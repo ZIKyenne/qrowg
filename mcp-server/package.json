@@ -1,0 +1,27 @@
+{
+  "name": "@qrfolio/mcp-server",
+  "version": "0.1.0",
+  "description": "QRfolio MCP Server — Agents IA spécialisés pour l'automatisation",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "inspect": "npx @modelcontextprotocol/inspector node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@supabase/supabase-js": "^2.43.0",
+    "stripe": "^16.0.0",
+    "zod": "^3.23.0",
+    "nanoid": "^5.0.0",
+    "resend": "^3.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "tsx": "^4.11.0",
+    "@types/node": "^20.0.0"
+  }
+}

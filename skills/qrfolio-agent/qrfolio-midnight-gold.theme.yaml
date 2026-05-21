@@ -1,0 +1,167 @@
+# QRfolio Theme — "Midnight Gold"
+# Compatible avec le skill theme-factory
+# Appliquable à tous les artifacts : slides, docs, landing pages
+
+name: midnight_gold
+display_name: Midnight Gold
+description: Noir profond et accents dorés. Élégance premium, identité forte. Le thème officiel de QRfolio.
+
+## Palette de couleurs
+
+colors:
+  background: "#080808"
+  surface: "#111009"
+  surface_raised: "#1A1812"
+
+  primary: "#C9A84C"         # Or principal
+  primary_light: "#E8C96A"   # Or clair (hover)
+  primary_dim: "rgba(201, 168, 76, 0.15)"
+  primary_border: "rgba(201, 168, 76, 0.3)"
+
+  accent: "#39FF8F"          # Neon vert (succès, badges actifs)
+  accent_dim: "rgba(57, 255, 143, 0.12)"
+  accent_border: "rgba(57, 255, 143, 0.3)"
+
+  text: "#F5F0E8"            # Texte principal (blanc chaud)
+  text_muted: "#8A8478"      # Texte secondaire
+  text_faint: "#4A4640"      # Texte très discret
+
+  error: "#FF4B4B"
+  warning: "#FF9500"
+  info: "#4B9FFF"
+
+## Typographies
+
+fonts:
+  display:
+    family: "Cormorant Garamond"
+    weights: [300, 400, 600, 700]
+    style: serif
+    usage: "Titres, hero, headings premium"
+    google_import: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700"
+
+  body:
+    family: "DM Sans"
+    weights: [300, 400, 500, 600]
+    style: sans-serif
+    usage: "Corps de texte, UI, labels, boutons"
+    google_import: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600"
+
+  mono:
+    family: "JetBrains Mono"
+    weights: [400, 500]
+    style: monospace
+    usage: "Code, commandes, données techniques"
+    google_import: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500"
+
+## Échelle typographique
+
+type_scale:
+  hero: { size: "clamp(48px, 8vw, 96px)", weight: 300, family: display, tracking: "-0.04em" }
+  h1: { size: "clamp(36px, 5vw, 72px)", weight: 300, family: display, tracking: "-0.03em" }
+  h2: { size: "clamp(28px, 4vw, 48px)", weight: 300, family: display, tracking: "-0.02em" }
+  h3: { size: "20px", weight: 400, family: display }
+  label: { size: "11px", weight: 400, family: body, tracking: "0.15em", transform: uppercase }
+  body: { size: "15px", weight: 400, family: body, line_height: "1.7" }
+  small: { size: "13px", weight: 400, family: body, color: text_muted }
+  mono: { size: "12px", weight: 400, family: mono }
+
+## Effets visuels
+
+effects:
+  border_radius:
+    none: "0"
+    sm: "2px"
+    md: "4px"
+    lg: "8px"
+    xl: "12px"
+    full: "9999px"
+
+  shadows:
+    gold_glow: "0 0 20px rgba(201, 168, 76, 0.2)"
+    gold_glow_lg: "0 0 40px rgba(201, 168, 76, 0.3)"
+    neon_glow: "0 0 16px rgba(57, 255, 143, 0.25)"
+    card: "0 1px 3px rgba(0, 0, 0, 0.5)"
+    card_hover: "0 4px 24px rgba(0, 0, 0, 0.6)"
+
+  gradients:
+    gold_line: "linear-gradient(90deg, transparent, #C9A84C, transparent)"
+    gold_bg: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,168,76,0.06) 0%, transparent 70%)"
+    gold_shimmer: "linear-gradient(90deg, transparent 0%, rgba(201,168,76,0.3) 50%, transparent 100%)"
+    card_hover: "linear-gradient(135deg, rgba(201,168,76,0.05) 0%, transparent 60%)"
+
+  animations:
+    fade_in: "opacity 0→1, translateY 8px→0, duration 300ms ease-out"
+    hover_lift: "translateY 0→-2px, duration 200ms ease"
+    gold_pulse: "box-shadow pulse, period 2s ease-in-out infinite"
+    shimmer: "backgroundPosition, duration 2s linear infinite"
+
+## Composants UI
+
+components:
+  button_primary:
+    background: primary
+    color: background
+    hover_background: primary_light
+    hover_shadow: gold_glow
+    border_radius: sm
+    padding: "11px 28px"
+    font: body 500 13px
+    transition: "all 200ms ease"
+
+  button_ghost:
+    background: transparent
+    color: text_muted
+    border: "1px solid primary_border"
+    hover_color: primary
+    hover_border: primary
+    hover_background: primary_dim
+    border_radius: sm
+    padding: "11px 28px"
+
+  card:
+    background: surface
+    border: "1px solid primary_border (opacity 0.15)"
+    border_radius: md
+    hover_border_opacity: 0.5
+
+  badge_gold:
+    background: primary_dim
+    border: "1px solid primary_border"
+    color: primary
+    font: label
+    border_radius: sm
+
+  badge_neon:
+    background: accent_dim
+    border: "1px solid accent_border"
+    color: accent
+    font: label
+    border_radius: sm
+
+  input:
+    background: transparent
+    border: "1px solid primary_border"
+    color: text
+    border_radius: md
+    focus_border: primary
+    placeholder_color: text_faint
+
+## Utilisation dans les artifacts
+
+artifact_css: |
+  :root {
+    --bg: #080808;
+    --surface: #111009;
+    --gold: #C9A84C;
+    --gold-light: #E8C96A;
+    --gold-dim: rgba(201,168,76,0.15);
+    --gold-border: rgba(201,168,76,0.3);
+    --neon: #39FF8F;
+    --neon-dim: rgba(57,255,143,0.12);
+    --ink: #F5F0E8;
+    --muted: #8A8478;
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }

@@ -1,0 +1,217 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── GOOGLE FONTS ─────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ─── CSS VARIABLES ────────────────────────────────────────────────── */
+:root {
+  /* Couleurs */
+  --color-canvas: #080808;
+  --color-canvas-soft: #0F0E0C;
+  --color-card: #111009;
+
+  --color-gold: #C9A84C;
+  --color-gold-light: #E8C96A;
+  --color-gold-dim: rgba(201, 168, 76, 0.15);
+  --color-gold-border: rgba(201, 168, 76, 0.3);
+
+  --color-neon: #39FF8F;
+  --color-neon-dim: rgba(57, 255, 143, 0.12);
+  --color-neon-border: rgba(57, 255, 143, 0.3);
+
+  --color-ink: #F5F0E8;
+  --color-ink-muted: #8A8478;
+  --color-ink-faint: #4A4640;
+
+  /* Typographies */
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Espacements */
+  --space-page-x: clamp(16px, 4vw, 48px);
+  --space-section-y: clamp(48px, 8vw, 96px);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* Z-index scale */
+  --z-base: 0;
+  --z-above: 10;
+  --z-dropdown: 100;
+  --z-modal: 200;
+  --z-toast: 300;
+  --z-cursor: 9999;
+}
+
+/* ─── BASE STYLES ───────────────────────────────────────────────────── */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-canvas text-ink font-sans;
+    min-height: 100dvh;
+  }
+
+  /* Scrollbar custom */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--color-canvas); }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-gold-border);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-gold); }
+
+  /* Sélection de texte */
+  ::selection {
+    background: var(--color-gold-dim);
+    color: var(--color-gold-light);
+  }
+
+  /* Focus visible */
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+/* ─── COMPOSANTS UTILITAIRES ────────────────────────────────────────── */
+@layer components {
+
+  /* Texte display */
+  .text-display {
+    font-family: var(--font-display);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  /* Badge gold */
+  .badge-gold {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 text-2xs tracking-widest uppercase;
+    color: var(--color-gold);
+    background: var(--color-gold-dim);
+    border: 1px solid var(--color-gold-border);
+    border-radius: 2px;
+  }
+
+  /* Badge neon */
+  .badge-neon {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 text-2xs tracking-widest uppercase;
+    color: var(--color-neon);
+    background: var(--color-neon-dim);
+    border: 1px solid var(--color-neon-border);
+    border-radius: 2px;
+  }
+
+  /* Card de base */
+  .card {
+    background: var(--color-card);
+    border: 1px solid var(--color-gold-border);
+    border-radius: 4px;
+    transition: border-color var(--transition-base);
+  }
+  .card:hover {
+    border-color: rgba(201, 168, 76, 0.5);
+  }
+
+  /* Bouton primaire */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium;
+    background: var(--color-gold);
+    color: #080808;
+    border-radius: 2px;
+    transition: all var(--transition-base);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-primary:hover {
+    background: var(--color-gold-light);
+    box-shadow: 0 0 20px rgba(201, 168, 76, 0.3);
+  }
+  .btn-primary:active { transform: scale(0.98); }
+
+  /* Bouton ghost */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium;
+    color: var(--color-ink-muted);
+    border: 1px solid var(--color-gold-border);
+    border-radius: 2px;
+    background: transparent;
+    transition: all var(--transition-base);
+    cursor: pointer;
+  }
+  .btn-ghost:hover {
+    color: var(--color-gold);
+    border-color: var(--color-gold);
+    background: var(--color-gold-dim);
+  }
+
+  /* Input */
+  .input {
+    @apply w-full px-4 py-3 text-sm bg-transparent;
+    color: var(--color-ink);
+    border: 1px solid var(--color-gold-border);
+    border-radius: 4px;
+    transition: border-color var(--transition-fast);
+  }
+  .input::placeholder { color: var(--color-ink-faint); }
+  .input:focus {
+    outline: none;
+    border-color: var(--color-gold);
+  }
+
+  /* Divider gold */
+  .divider-gold {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-gold-border), transparent);
+    border: none;
+  }
+
+  /* Shimmer skeleton */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--color-card) 0%,
+      rgba(201, 168, 76, 0.08) 50%,
+      var(--color-card) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s linear infinite;
+    border-radius: 4px;
+  }
+
+  /* Section container */
+  .section-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-page-x);
+  }
+
+  /* Ligne de séparation top gold */
+  .gold-top-line::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-gold), transparent);
+    opacity: 0.5;
+  }
+}
+
+/* ─── CURSOR CUSTOM ─────────────────────────────────────────────────── */
+@layer utilities {
+  .cursor-gold {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='4' fill='%23C9A84C' opacity='0.8'/%3E%3C/svg%3E") 10 10, auto;
+  }
+}
