@@ -1,53 +1,53 @@
 {
-  "name": "qrfolio",
-  "version": "0.0.1",
-  "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
-  "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "test": "turbo run test",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
-    "db:push": "supabase db push",
-    "db:reset": "supabase db reset",
-    "db:types": "supabase gen types typescript --local > packages/database/types/supabase.ts"
-  },
-  "devDependencies": {
-    "@commitlint/cli": "^19.0.0",
-    "@commitlint/config-conventional": "^19.0.0",
-    "@types/node": "25.9.1",
-    "@types/react": "19.2.15",
-    "@types/react-dom": "19.2.3",
-    "husky": "^9.0.0",
-    "lint-staged": "^15.0.0",
-    "prettier": "^3.2.0",
-    "prettier-plugin-tailwindcss": "^0.6.0",
-    "turbo": "^2.0.0",
-    "typescript": "^5.9.3"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md,css}": [
-      "prettier --write"
-    ]
-  },
-  "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=9.0.0"
-  },
-  "packageManager": "pnpm@9.1.0",
-  "dependencies": {
-    "@supabase/ssr": "^0.10.3",
-    "@supabase/supabase-js": "^2.106.1",
-    "next": "15.0.0",
-    "react": "18.3.1",
-    "react-dom": "18.3.1"
-  }
+    "name":  "qrfolio",
+    "version":  "0.0.1",
+    "private":  true,
+    "workspaces":  [
+                       "apps/*",
+                       "packages/*"
+                   ],
+    "scripts":  {
+                    "dev":  "turbo run dev",
+                    "build":  "cd apps/web \u0026\u0026 npx next build",
+                    "test":  "turbo run test",
+                    "lint":  "turbo run lint",
+                    "format":  "prettier --write \"**/*.{ts,tsx,md,json}\"",
+                    "db:push":  "supabase db push",
+                    "db:reset":  "supabase db reset",
+                    "db:types":  "supabase gen types typescript --local \u003e packages/database/types/supabase.ts"
+                },
+    "devDependencies":  {
+                            "@commitlint/cli":  "^19.0.0",
+                            "@commitlint/config-conventional":  "^19.0.0",
+                            "@types/node":  "25.9.1",
+                            "@types/react":  "19.2.15",
+                            "@types/react-dom":  "19.2.3",
+                            "husky":  "^9.0.0",
+                            "lint-staged":  "^15.0.0",
+                            "prettier":  "^3.2.0",
+                            "prettier-plugin-tailwindcss":  "^0.6.0",
+                            "turbo":  "^2.0.0",
+                            "typescript":  "^5.9.3"
+                        },
+    "lint-staged":  {
+                        "*.{ts,tsx}":  [
+                                           "eslint --fix",
+                                           "prettier --write"
+                                       ],
+                        "*.{json,md,css}":  [
+                                                "prettier --write"
+                                            ]
+                    },
+    "engines":  {
+                    "node":  "\u003e=20.0.0",
+                    "pnpm":  "\u003e=9.0.0"
+                },
+    "packageManager":  "pnpm@9.1.0",
+    "dependencies":  {
+                         "@supabase/ssr":  "^0.10.3",
+                         "@supabase/supabase-js":  "^2.106.1",
+                         "next":  "15.0.0",
+                         "react":  "18.3.1",
+                         "react-dom":  "18.3.1"
+                     }
 }
