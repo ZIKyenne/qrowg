@@ -1,5 +1,5 @@
 "use client"
-import BuilderV3 from "./BuilderV3"
+import BuilderV4 from "./BuilderV4"
 export default function BuilderDemoPage() {
-  return <BuilderV3 />
+  return <BuilderV4 />
 }

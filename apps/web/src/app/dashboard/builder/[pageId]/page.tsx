@@ -1,5 +1,5 @@
 "use client"
-import BuilderV3 from "../BuilderV3"
+import BuilderV4 from "../BuilderV4"
 export default function BuilderPage({ params }: { params: { pageId: string } }) {
-  return <BuilderV3 pageId={params.pageId} />
+  return <BuilderV4 pageId={params.pageId} />
 }
