@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { createServerSupabaseClient } from "@/lib/supabase/client"
+import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { LayoutDashboard, QrCode, BarChart2, Settings, Zap } from "lucide-react"
 

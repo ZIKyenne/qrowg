@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from "@/lib/supabase/client"
+import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import type { Metadata } from "next"
 import QRCustomizer from "./QRCustomizer"
