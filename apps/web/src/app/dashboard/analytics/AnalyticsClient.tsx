@@ -2,10 +2,11 @@
 
 import { useMemo, useState } from "react"
 import {
-  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
+  AreaChart, Area, BarChart, Bar, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts"
-import { QrCode, Eye, TrendingUp, Smartphone, Globe, BarChart2 } from "lucide-react"
+import { QrCode, Eye, TrendingUp, Globe, BarChart2 } from "lucide-react"
+import DeviceChart from "./DeviceChart"
 
 type Profile = { total_pages: number; total_scans: number; plan: string } | null
 type Page = { id: string; title: string; slug: string; total_views: number; unique_views: number; status: string }
@@ -69,8 +70,15 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function AnalyticsClient({ profile, pages, recentScans, recentViews }: Props) {
   const [selectedPage, setSelectedPage] = useState<string>("all")
-  const filteredScans = useMemo(() => selectedPage === "all" ? recentScans : recentScans.filter(s => s.page_id === selectedPage), [recentScans, selectedPage])
-  const filteredViews = useMemo(() => selectedPage === "all" ? recentViews : recentViews.filter(v => v.page_id === selectedPage), [recentViews, selectedPage])
+
+  const filteredScans = useMemo(() =>
+    selectedPage === "all" ? recentScans : recentScans.filter(s => s.page_id === selectedPage),
+    [recentScans, selectedPage])
+
+  const filteredViews = useMemo(() =>
+    selectedPage === "all" ? recentViews : recentViews.filter(v => v.page_id === selectedPage),
+    [recentViews, selectedPage])
+
   const dailyData = useMemo(() => buildDailyData(filteredScans, filteredViews), [filteredScans, filteredViews])
   const deviceData = useMemo(() => buildDeviceData(filteredScans), [filteredScans])
   const sourceData = useMemo(() => buildSourceData(filteredViews), [filteredViews])
@@ -78,6 +86,8 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
   return (
     <div style={{ minHeight: "100vh", background: "#080808", padding: "32px 24px", fontFamily: "DM Sans, sans-serif" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+
+        {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 32, flexWrap: "wrap", gap: 16 }}>
           <div>
             <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, color: "#F5F0E8", fontWeight: 700, margin: 0 }}>Analytics</h1>
@@ -89,6 +99,8 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             {pages.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
           </select>
         </div>
+
+        {/* KPI Cards */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 32 }}>
           {[
             { icon: <QrCode size={20} />, label: "Scans (30j)", value: filteredScans.length, color: GOLD },
@@ -105,6 +117,8 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             </div>
           ))}
         </div>
+
+        {/* Graphique area */}
         <div style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 12, padding: 24, marginBottom: 24 }}>
           <h2 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 600, marginBottom: 20, marginTop: 0 }}>Scans et Vues sur 30 jours</h2>
           <ResponsiveContainer width="100%" height={260}>
@@ -121,30 +135,24 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
               <XAxis dataKey="date" tick={{ fill: MUTED, fontSize: 11 }} axisLine={false} tickLine={false} interval={4} />
               <YAxis tick={{ fill: MUTED, fontSize: 11 }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
-              <Legend wrapperStyle={{ color: MUTED, fontSize: 13 }} />
               <Area type="monotone" dataKey="scans" name="Scans QR" stroke={GOLD} strokeWidth={2} fill="url(#gScans)" />
               <Area type="monotone" dataKey="views" name="Vues page" stroke={NEON} strokeWidth={2} fill="url(#gViews)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
+
+        {/* Device + Source */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
+
+          {/* Device — nouveau composant */}
           <div style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 12, padding: 24 }}>
-            <h2 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 600, marginBottom: 20, marginTop: 0, display: "flex", alignItems: "center", gap: 8 }}>
-              <Smartphone size={16} color={GOLD} /> Appareils
+            <h2 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 600, marginBottom: 20, marginTop: 0 }}>
+              Appareils
             </h2>
-            {deviceData.length === 0
-              ? <p style={{ color: MUTED, textAlign: "center", marginTop: 40 }}>Pas encore de donnees</p>
-              : <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie data={deviceData} cx="50%" cy="50%" outerRadius={80} dataKey="value"
-                      label={({ name, percent }: any) => name + " " + (percent * 100).toFixed(0) + "%"} labelLine={false}>
-                      {deviceData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                    </Pie>
-                    <Tooltip contentStyle={{ background: "#111009", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 8 }} />
-                  </PieChart>
-                </ResponsiveContainer>
-            }
+            <DeviceChart data={deviceData} />
           </div>
+
+          {/* Source */}
           <div style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 12, padding: 24 }}>
             <h2 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 600, marginBottom: 20, marginTop: 0, display: "flex", alignItems: "center", gap: 8 }}>
               <Globe size={16} color={NEON} /> Sources de trafic
@@ -165,6 +173,8 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             }
           </div>
         </div>
+
+        {/* Top pages */}
         <div style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 12, padding: 24 }}>
           <h2 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 600, marginBottom: 20, marginTop: 0 }}>Top Pages</h2>
           {pages.length === 0
@@ -191,6 +201,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
               </div>
           }
         </div>
+
       </div>
     </div>
   )
