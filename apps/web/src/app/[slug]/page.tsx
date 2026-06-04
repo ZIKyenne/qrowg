@@ -3,29 +3,45 @@ import { notFound } from "next/navigation"
 import PublicPageClient from "./PublicPageClient"
 import type { Metadata } from "next"
 
-interface Props {
-  params: { slug: string }
-}
+interface Props { params: { slug: string } }
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://qrfolio.app"
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = await createServerSupabaseClient()
   const { data: page } = await supabase
     .from("pages")
-    .select("title, seo_title, seo_description, og_image_url")
+    .select("title, seo_title, seo_description, og_image_url, slug, profiles(full_name, username)")
     .eq("slug", params.slug)
     .eq("status", "published")
     .single()
 
   if (!page) return { title: "Page introuvable" }
 
+  const profile = page.profiles as any
+  const title = page.seo_title || page.title
+  const description = page.seo_description || `Decouvre la page de ${profile?.full_name || page.title} sur QRfolio`
+  const image = page.og_image_url || `${APP_URL}/og-image.png`
+  const url = `${APP_URL}/${page.slug}`
+
   return {
-    title: page.seo_title || page.title,
-    description: page.seo_description || "",
+    title,
+    description,
     openGraph: {
-      title: page.seo_title || page.title,
-      description: page.seo_description || "",
-      images: page.og_image_url ? [page.og_image_url] : [],
+      type: "profile",
+      url,
+      title,
+      description,
+      images: [{ url: image, width: 1200, height: 630, alt: title }],
+      siteName: "QRfolio",
     },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+    alternates: { canonical: url },
   }
 }
 
@@ -48,12 +64,33 @@ export default async function PublicPage({ params }: Props) {
     .eq("is_visible", true)
     .order("position")
 
+  // JSON-LD structured data
+  const profile = page.profiles as any
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "name": page.title,
+    "description": page.seo_description || `Page de ${profile?.full_name || page.title}`,
+    "url": `${APP_URL}/${page.slug}`,
+    "mainEntity": {
+      "@type": "Person",
+      "name": profile?.full_name || page.title,
+      "url": `${APP_URL}/${page.slug}`,
+      ...(profile?.avatar_url ? { "image": profile.avatar_url } : {}),
+    }
+  }
+
   // Track page view
-  await supabase.from("page_views").insert({
+  supabase.from("page_views").insert({
     page_id: page.id,
     source: "direct",
     device: "unknown",
-  })
+  }).then(() => {})
 
-  return <PublicPageClient page={page} blocks={blocks || []} />
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <PublicPageClient page={page} blocks={blocks || []} />
+    </>
+  )
 }
