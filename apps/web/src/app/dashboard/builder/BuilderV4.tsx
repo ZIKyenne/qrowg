@@ -12,12 +12,12 @@ import { createClient } from "@/lib/supabase/client"
 
 type Message = { role: "user" | "assistant"; content: string }
 
-const AI_SYSTEM = `Tu es expert QRfolio. GÃ©nÃ¨re des blocs avec contenu rÃ©aliste.
+const AI_SYSTEM = `Tu es expert QRfolio. Génère des blocs avec contenu réaliste.
 Format: ADD_BLOCK:{"type":"type_id","content":{"key":"value"}}
 Types: profile, bio, skills, cta_button, contact_form, calendly, social_links, testimonials, heading, rich_text, faq, image, gallery, video, google_maps, opening_hours, pricing, product, promo_banner, menu_section, services_list, countdown, event_info, spotify_player, music_links, instagram_feed
-RÃ©ponds en franÃ§ais, sois concis.`
+Réponds en français, sois concis.`
 
-// â”€â”€ Countdown timer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Countdown timer ────────────────────────────────────────────────────────
 function CountdownDisplay({ date }: { date: string }) {
   const [time, setTime] = useState({ d: 0, h: 0, m: 0, s: 0 })
   useEffect(() => {
@@ -42,20 +42,20 @@ function CountdownDisplay({ date }: { date: string }) {
   )
 }
 
-// â”€â”€ FAQ Item â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── FAQ Item ───────────────────────────────────────────────────────────────
 function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false)
   return (
     <div style={{ border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, overflow: "hidden", marginBottom: 6 }}>
       <button onClick={() => setOpen(o => !o)} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", background: open ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.02)", border: "none", color: "#F5F0E8", fontSize: 13, fontWeight: 600, cursor: "pointer", textAlign: "left" }}>
-        {q} <span style={{ color: "#C9A84C", fontSize: 16 }}>{open ? "âˆ’" : "+"}</span>
+        {q} <span style={{ color: "#C9A84C", fontSize: 16 }}>{open ? "−" : "+"}</span>
       </button>
       {open && <div style={{ padding: "10px 14px 14px", background: "rgba(255,255,255,0.02)" }}><p style={{ color: "#8A8478", fontSize: 13, lineHeight: 1.6, margin: 0 }}>{a}</p></div>}
     </div>
   )
 }
 
-// â”€â”€ Block Preview â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Block Preview ──────────────────────────────────────────────────────────
 function BlockPreview({ block, theme }: { block: Block; theme: PageTheme }) {
   const c = block.content
   const G = theme.primary
@@ -108,13 +108,13 @@ function BlockPreview({ block, theme }: { block: Block; theme: PageTheme }) {
       <div style={{ padding: "14px 18px" }}>
         <div style={{ background: `${G}08`, border: `1px solid ${G}25`, borderRadius: 14, padding: "16px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-            <div style={{ width: 36, height: 36, background: `${G}15`, border: `1px solid ${G}30`, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>ðŸ“…</div>
+            <div style={{ width: 36, height: 36, background: `${G}15`, border: `1px solid ${G}30`, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>📅</div>
             <div>
-              <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label || "RÃ©server"}</p>
+              <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label || "Réserver"}</p>
               {c.description && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.description}</p>}
             </div>
           </div>
-          <a href={c.url || "#"} style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, color: "#080808", textAlign: "center", padding: "10px", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 700 }}>{c.label || "RÃ©server"}</a>
+          <a href={c.url || "#"} style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, color: "#080808", textAlign: "center", padding: "10px", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 700 }}>{c.label || "Réserver"}</a>
         </div>
       </div>
     )
@@ -122,7 +122,7 @@ function BlockPreview({ block, theme }: { block: Block; theme: PageTheme }) {
       const active = SOCIAL_NETWORKS.filter(n => c[n.key])
       return (
         <div style={{ padding: "12px 18px" }}>
-          {active.length === 0 ? <p style={{ color: MUTED, fontSize: 12, textAlign: "center", margin: 0 }}>Aucun rÃ©seau configurÃ©</p> :
+          {active.length === 0 ? <p style={{ color: MUTED, fontSize: 12, textAlign: "center", margin: 0 }}>Aucun réseau configuré</p> :
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {active.map(n => (
                 <a key={n.key} href={c[n.key]} target="_blank" rel="noopener noreferrer"
@@ -139,7 +139,7 @@ function BlockPreview({ block, theme }: { block: Block; theme: PageTheme }) {
     case "instagram_feed": return (
       <div style={{ padding: "14px 18px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 4, marginBottom: 12 }}>
-          {[0,1,2,3,4,5].map(i => <div key={i} style={{ background: "rgba(225,48,108,0.06)", border: "1px solid rgba(225,48,108,0.1)", borderRadius: 6, aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>ðŸ“¸</div>)}
+          {[0,1,2,3,4,5].map(i => <div key={i} style={{ background: "rgba(225,48,108,0.06)", border: "1px solid rgba(225,48,108,0.1)", borderRadius: 6, aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>📸</div>)}
         </div>
         {c.username && <p style={{ color: MUTED, fontSize: 12, textAlign: "center", margin: "0 0 10px" }}>{c.username}</p>}
         {c.cta_label && <a href={c.cta_url || "#"} style={{ display: "block", background: "rgba(225,48,108,0.15)", border: "1px solid rgba(225,48,108,0.3)", color: "#E1306C", textAlign: "center", padding: "10px", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 700 }}>{c.cta_label}</a>}
@@ -173,7 +173,7 @@ function BlockPreview({ block, theme }: { block: Block; theme: PageTheme }) {
             <img src={c.src} alt={c.caption || ""} style={{ width: "100%", maxHeight: 260, objectFit: "cover", display: "block", borderRadius: c.rounded === "circle" ? "50%" : c.rounded === "rounded" ? 12 : 0 }} />
             {c.caption && <p style={{ color: MUTED, fontSize: 11, textAlign: "center", margin: "8px 16px" }}>{c.caption}</p>}
           </div>
-        ) : <div style={{ background: "rgba(255,255,255,0.03)", border: "1px dashed rgba(255,255,255,0.1)", borderRadius: 10, padding: "32px", textAlign: "center" }}><span style={{ fontSize: 32 }}>ðŸ–¼ï¸</span><p style={{ color: MUTED, fontSize: 12, margin: "8px 0 0" }}>Aucune image</p></div>}
+        ) : <div style={{ background: "rgba(255,255,255,0.03)", border: "1px dashed rgba(255,255,255,0.1)", borderRadius: 10, padding: "32px", textAlign: "center" }}><span style={{ fontSize: 32 }}>🖼️</span><p style={{ color: MUTED, fontSize: 12, margin: "8px 0 0" }}>Aucune image</p></div>}
       </div>
     )
     case "gallery": {
@@ -182,15 +182,15 @@ function BlockPreview({ block, theme }: { block: Block; theme: PageTheme }) {
       return (
         <div style={{ padding: "12px 18px", display: "grid", gridTemplateColumns: `repeat(${cols},1fr)`, gap: 5 }}>
           {imgs.length > 0 ? imgs.map((img, i) => <img key={i} src={img} alt="" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: 8 }} />)
-            : [0,1,2,3,4,5].map(i => <div key={i} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 8, aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center", color: MUTED }}>ðŸ–¼ï¸</div>)}
+            : [0,1,2,3,4,5].map(i => <div key={i} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 8, aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center", color: MUTED }}>🖼️</div>)}
         </div>
       )
     }
     case "video": return (
       <div style={{ padding: "12px 18px" }}>
         <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "28px", textAlign: "center" }}>
-          <span style={{ fontSize: 32 }}>â–¶ï¸</span>
-          <p style={{ color: TEXT, fontSize: 14, margin: "10px 0 0", fontWeight: 600 }}>{c.title || "VidÃ©o"}</p>
+          <span style={{ fontSize: 32 }}>▶️</span>
+          <p style={{ color: TEXT, fontSize: 14, margin: "10px 0 0", fontWeight: 600 }}>{c.title || "Vidéo"}</p>
         </div>
       </div>
     )
@@ -198,7 +198,7 @@ function BlockPreview({ block, theme }: { block: Block; theme: PageTheme }) {
       <div style={{ padding: "14px 18px" }}>
         <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 12px" }}>{c.title || "Contact"}</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-          {["Nom", "Email", ...(c.show_phone === "yes" ? ["TÃ©lÃ©phone"] : []), "Message"].map(f => <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: f === "Message" ? "8px 12px 40px" : "8px 12px", color: MUTED, fontSize: 12 }}>{f}</div>)}
+          {["Nom", "Email", ...(c.show_phone === "yes" ? ["Téléphone"] : []), "Message"].map(f => <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: f === "Message" ? "8px 12px 40px" : "8px 12px", color: MUTED, fontSize: 12 }}>{f}</div>)}
           <div style={{ background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 8, padding: "11px", textAlign: "center", color: "#080808", fontSize: 13, fontWeight: 700 }}>{c.button_label || "Envoyer"}</div>
         </div>
       </div>
@@ -212,7 +212,7 @@ function BlockPreview({ block, theme }: { block: Block; theme: PageTheme }) {
               <div key={i} style={{ background: `${G}06`, border: `1px solid ${G}12`, borderRadius: 10, padding: "12px 14px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
                   <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0 }}>{n}</p>
-                  <p style={{ color: "#FFD700", fontSize: 12, margin: 0 }}>{"â˜…".repeat(parseInt(s || "5"))}</p>
+                  <p style={{ color: "#FFD700", fontSize: 12, margin: 0 }}>{"★".repeat(parseInt(s || "5"))}</p>
                 </div>
                 <p style={{ color: MUTED, fontSize: 12, margin: 0, fontStyle: "italic" }}>"{t}"</p>
               </div>
@@ -224,11 +224,11 @@ function BlockPreview({ block, theme }: { block: Block; theme: PageTheme }) {
       <div style={{ padding: "12px 18px" }}>
         <div style={{ background: "rgba(255,230,109,0.06)", border: "1px solid rgba(255,230,109,0.15)", borderRadius: 12, padding: "14px" }}>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-            <span style={{ fontSize: 24, flexShrink: 0 }}>ðŸ“</span>
+            <span style={{ fontSize: 24, flexShrink: 0 }}>📍</span>
             <div>
               <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{c.label || "Adresse"}</p>
               <p style={{ color: MUTED, fontSize: 12, margin: c.transport ? "0 0 4px" : "0" }}>{c.address}</p>
-              {c.transport && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>ðŸš‡ {c.transport}</p>}
+              {c.transport && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>🚇 {c.transport}</p>}
             </div>
           </div>
         </div>
@@ -238,7 +238,7 @@ function BlockPreview({ block, theme }: { block: Block; theme: PageTheme }) {
       <div style={{ padding: "14px 18px" }}>
         {c.title && <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          {[["Lun â€” Ven", c.mon_fri], ["Samedi", c.saturday], ["Dimanche", c.sunday]].filter(([, h]) => h).map(([d, h]) => (
+          {[["Lun — Ven", c.mon_fri], ["Samedi", c.saturday], ["Dimanche", c.sunday]].filter(([, h]) => h).map(([d, h]) => (
             <div key={d} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
               <span style={{ color: MUTED, fontSize: 13 }}>{d}</span>
               <span style={{ color: TEXT, fontSize: 13, fontWeight: 600 }}>{h}</span>
@@ -269,7 +269,7 @@ function BlockPreview({ block, theme }: { block: Block; theme: PageTheme }) {
       <div style={{ padding: "14px 18px" }}>
         <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, overflow: "hidden" }}>
           {c.image ? <img src={c.image} alt={c.name} style={{ width: "100%", height: 160, objectFit: "cover", display: "block" }} />
-            : <div style={{ height: 100, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(249,115,22,0.06)", fontSize: 32 }}>ðŸ›ï¸</div>}
+            : <div style={{ height: 100, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(249,115,22,0.06)", fontSize: 32 }}>🛍️</div>}
           <div style={{ padding: "12px 14px" }}>
             <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{c.name || "Produit"}</p>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
@@ -310,11 +310,11 @@ function BlockPreview({ block, theme }: { block: Block; theme: PageTheme }) {
     )
     case "reservation_form": return (
       <div style={{ padding: "14px 18px" }}>
-        <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 12px" }}>{c.title || "RÃ©server"}</p>
+        <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 12px" }}>{c.title || "Réserver"}</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-          {["Nom", "Date souhaitÃ©e", "Nb de personnes", "TÃ©lÃ©phone"].map(f => <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 12px", color: MUTED, fontSize: 12 }}>{f}</div>)}
-          {c.phone && <a href={`tel:${c.phone}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", color: "#EF4444", padding: "10px", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 700 }}>ðŸ“ž {c.phone}</a>}
-          <div style={{ background: "linear-gradient(90deg,#EF4444,#dc2626)", borderRadius: 8, padding: "11px", textAlign: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{c.button_label || "RÃ©server"}</div>
+          {["Nom", "Date souhaitée", "Nb de personnes", "Téléphone"].map(f => <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 12px", color: MUTED, fontSize: 12 }}>{f}</div>)}
+          {c.phone && <a href={`tel:${c.phone}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", color: "#EF4444", padding: "10px", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 700 }}>📞 {c.phone}</a>}
+          <div style={{ background: "linear-gradient(90deg,#EF4444,#dc2626)", borderRadius: 8, padding: "11px", textAlign: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{c.button_label || "Réserver"}</div>
         </div>
       </div>
     )
@@ -349,7 +349,7 @@ function BlockPreview({ block, theme }: { block: Block; theme: PageTheme }) {
         <div style={{ background: "rgba(236,72,153,0.08)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 14, padding: "16px" }}>
           <p style={{ color: TEXT, fontSize: 18, fontWeight: 700, margin: "0 0 12px", fontFamily: theme.fontDisplay }}>{c.name}</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 12 }}>
-            {[[" ðŸ“…", c.date], ["ðŸ•", c.time], ["ðŸ“", c.location], ["ðŸŽŸï¸", c.price]].filter(([, v]) => v).map(([icon, val]) => (
+            {[[" 📅", c.date], ["🕐", c.time], ["📍", c.location], ["🎟️", c.price]].filter(([, v]) => v).map(([icon, val]) => (
               <p key={icon} style={{ color: MUTED, fontSize: 13, margin: 0 }}>{icon} {val}</p>
             ))}
           </div>
@@ -360,22 +360,22 @@ function BlockPreview({ block, theme }: { block: Block; theme: PageTheme }) {
     case "spotify_player": return (
       <div style={{ padding: "14px 18px" }}>
         <div style={{ background: "rgba(29,185,84,0.08)", border: "1px solid rgba(29,185,84,0.2)", borderRadius: 14, padding: "16px", display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 48, height: 48, background: "#1DB954", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>ðŸŽ§</div>
+          <div style={{ width: 48, height: 48, background: "#1DB954", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>🎧</div>
           <div style={{ flex: 1 }}>
             <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{c.title || "Ma musique"}</p>
-            <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.url ? "Ã‰couter sur Spotify" : "URL non configurÃ©e"}</p>
+            <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.url ? "Écouter sur Spotify" : "URL non configurée"}</p>
           </div>
-          <a href={c.url || "#"} style={{ background: "#1DB954", color: "#000", padding: "6px 14px", borderRadius: 20, textDecoration: "none", fontSize: 12, fontWeight: 700 }}>â–¶ Play</a>
+          <a href={c.url || "#"} style={{ background: "#1DB954", color: "#000", padding: "6px 14px", borderRadius: 20, textDecoration: "none", fontSize: 12, fontWeight: 700 }}>▶ Play</a>
         </div>
       </div>
     )
     case "music_links": {
-      const platforms = [["spotify", "ðŸŽµ", "#1DB954", "Spotify"], ["apple_music", "ðŸŽ", "#FC3C44", "Apple Music"], ["deezer", "ðŸŽ¶", "#A238FF", "Deezer"], ["youtube_music", "â–¶ï¸", "#FF0000", "YouTube Music"], ["soundcloud", "â˜ï¸", "#FF5500", "SoundCloud"]].filter(([k]) => c[k as string])
+      const platforms = [["spotify", "🎵", "#1DB954", "Spotify"], ["apple_music", "🍎", "#FC3C44", "Apple Music"], ["deezer", "🎶", "#A238FF", "Deezer"], ["youtube_music", "▶️", "#FF0000", "YouTube Music"], ["soundcloud", "☁️", "#FF5500", "SoundCloud"]].filter(([k]) => c[k as string])
       return (
         <div style={{ padding: "14px 18px" }}>
           {c.artist_name && <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 12px", textAlign: "center" }}>{c.artist_name}</p>}
           <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-            {platforms.length === 0 ? <p style={{ color: MUTED, fontSize: 12, textAlign: "center", margin: 0 }}>Aucune plateforme configurÃ©e</p> :
+            {platforms.length === 0 ? <p style={{ color: MUTED, fontSize: 12, textAlign: "center", margin: 0 }}>Aucune plateforme configurée</p> :
               platforms.map(([k, icon, color, label]) => (
                 <a key={k} href={(c as any)[k as string]} target="_blank" rel="noopener noreferrer"
                   style={{ display: "flex", alignItems: "center", gap: 12, background: (color as string) + "12", border: `1px solid ${color}30`, borderRadius: 10, padding: "10px 14px", textDecoration: "none" }}>
@@ -398,8 +398,8 @@ function BlockPreview({ block, theme }: { block: Block; theme: PageTheme }) {
       const dStyles: Record<string, React.ReactNode> = {
         gold: <div style={{ height: 1, background: `linear-gradient(90deg,transparent,${G}60,transparent)` }} />,
         line: <div style={{ height: 1, background: "rgba(255,255,255,0.08)" }} />,
-        dots: <div style={{ textAlign: "center", color: MUTED, letterSpacing: 8, fontSize: 16 }}>â€¢ â€¢ â€¢</div>,
-        stars: <div style={{ textAlign: "center", color: G, letterSpacing: 8 }}>âœ¦ âœ¦ âœ¦</div>,
+        dots: <div style={{ textAlign: "center", color: MUTED, letterSpacing: 8, fontSize: 16 }}>• • •</div>,
+        stars: <div style={{ textAlign: "center", color: G, letterSpacing: 8 }}>✦ ✦ ✦</div>,
       }
       return <div style={{ padding: "8px 18px" }}>{dStyles[c.style || "gold"]}</div>
     }
@@ -414,7 +414,7 @@ function BlockPreview({ block, theme }: { block: Block; theme: PageTheme }) {
   }
 }
 
-// â”€â”€ Edit Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Edit Panel ─────────────────────────────────────────────────────────────
 function EditPanel({ block, onChange }: { block: Block; onChange: (key: string, val: string) => void }) {
   const def = BLOCK_DEFS[block.type]
   if (!def) return null
@@ -425,7 +425,7 @@ function EditPanel({ block, onChange }: { block: Block; onChange: (key: string, 
   if (block.type === "social_links") {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>Laisse vide pour masquer le rÃ©seau.</p>
+        <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>Laisse vide pour masquer le réseau.</p>
         {SOCIAL_NETWORKS.map(n => (
           <div key={n.key}>
             <label style={{ color: MUTED, fontSize: 11, display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
@@ -459,14 +459,14 @@ function EditPanel({ block, onChange }: { block: Block; onChange: (key: string, 
   )
 }
 
-// â”€â”€ Theme Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Theme Panel ────────────────────────────────────────────────────────────
 function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange: (t: PageTheme) => void }) {
   const MUTED = "#8A8478"
   const G = "#C9A84C"
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <div>
-        <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>ThÃ¨mes prÃ©dÃ©finis</p>
+        <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>Thèmes prédéfinis</p>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
           {Object.entries(PRESET_THEMES).map(([key, t]) => (
             <button key={key} onClick={() => onThemeChange(t)}
@@ -507,10 +507,10 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
   )
 }
 
-// â”€â”€ MAIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── MAIN ──────────────────────────────────────────────────────────────────
 export default function BuilderV4({ pageId }: { pageId?: string }) {
   const [blocks, setBlocks] = useState<Block[]>([
-    { id: "1", type: "profile", content: { name: "Mon Nom", tagline: "Mon activitÃ©" }, visible: true },
+    { id: "1", type: "profile", content: { name: "Mon Nom", tagline: "Mon activité" }, visible: true },
     { id: "2", type: "bio", content: { text: "Bienvenue sur ma page !" }, visible: true },
     { id: "3", type: "cta_button", content: { label: "Me contacter", url: "#", style: "gold" }, visible: true },
   ])
@@ -525,7 +525,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
   const [search, setSearch] = useState("")
   const [recentTypes, setRecentTypes] = useState<string[]>([])
   const [favorites, setFavorites] = useState<string[]>([])
-  const [messages, setMessages] = useState<Message[]>([{ role: "assistant", content: "Salut ! ðŸ‘‹ DÃ©cris ton activitÃ© et je construis ta page avec du contenu prÃªt Ã  l'emploi." }])
+  const [messages, setMessages] = useState<Message[]>([{ role: "assistant", content: "Salut ! 👋 Décris ton activité et je construis ta page avec du contenu prêt à l'emploi." }])
   const [aiInput, setAiInput] = useState("")
   const [aiLoading, setAiLoading] = useState(false)
   const [generating, setGenerating] = useState(false)
@@ -655,7 +655,8 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
 
   function parseAI(text: string) {
     let added = 0
-    text.split(/\r?\n/).forEach(line => {
+    text.split("
+").forEach(line => {
       if (line.startsWith("ADD_BLOCK:")) {
         try { const j = JSON.parse(line.replace("ADD_BLOCK:", "").trim()); addBlock(j.type, j.content); added++ } catch {}
       }
@@ -674,17 +675,19 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
       const data = await res.json()
       const reply = data.content?.[0]?.text || "Erreur."
       const added = parseAI(reply)
-      const clean = reply.split(/\r?\n/).filter((l: string) => !l.startsWith("ADD_BLOCK:")).join("\n").trim()
+      const clean = reply.split("
+").filter((l: string) => !l.startsWith("ADD_BLOCK:")).join("
+").trim()
       setMessages(p => [...p, { role: "assistant", content: clean + (added > 0 ? `
 
-âœ… ${added} bloc${added > 1 ? "s" : ""} ajoutÃ©${added > 1 ? "s" : ""} !` : "") }])
+✅ ${added} bloc${added > 1 ? "s" : ""} ajouté${added > 1 ? "s" : ""} !` : "") }])
     } catch { setMessages(p => [...p, { role: "assistant", content: "Erreur de connexion." }]) }
     setAiLoading(false)
   }
 
   async function generateFull() {
     setGenerating(true); setRightPanel("ai")
-    await sendAI("GÃ©nÃ¨re une page QRfolio complÃ¨te et professionnelle avec: profil, bio, compÃ©tences, rÃ©seaux sociaux, bouton CTA, avis clients, formulaire de contact. Contenu d'exemple accrocheur.")
+    await sendAI("Génère une page QRfolio complète et professionnelle avec: profil, bio, compétences, réseaux sociaux, bouton CTA, avis clients, formulaire de contact. Contenu d'exemple accrocheur.")
     setGenerating(false)
   }
 
@@ -710,20 +713,20 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.08)" }} />
         <input value={pageName} onChange={e => setPageName(e.target.value)} style={{ background: "transparent", border: "none", color: "#F5F0E8", fontSize: 13, outline: "none", width: 140 }} />
         {saving && <span style={{ color: MUTED, fontSize: 10 }}>Enregistrement...</span>}
-        {saved && <span style={{ color: "#39FF8F", fontSize: 10, display: "flex", alignItems: "center", gap: 3 }}><Check size={10} /> EnregistrÃ©</span>}
+        {saved && <span style={{ color: "#39FF8F", fontSize: 10, display: "flex", alignItems: "center", gap: 3 }}><Check size={10} /> Enregistré</span>}
         <div style={{ flex: 1 }} />
         {/* Undo/Redo */}
         <div style={{ display: "flex", gap: 3 }}>
           <button onClick={() => { if (histIdx > 0) { setHistIdx(h => h - 1); setBlocks(history[histIdx - 1] || []) } }} disabled={histIdx === 0}
-            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 5, width: 26, height: 26, color: histIdx === 0 ? "#4A4640" : MUTED, cursor: histIdx === 0 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>â†©</button>
+            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 5, width: 26, height: 26, color: histIdx === 0 ? "#4A4640" : MUTED, cursor: histIdx === 0 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>↩</button>
           <button onClick={() => { if (histIdx < history.length - 1) { setHistIdx(h => h + 1); setBlocks(history[histIdx + 1] || []) } }} disabled={histIdx >= history.length - 1}
-            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 5, width: 26, height: 26, color: histIdx >= history.length - 1 ? "#4A4640" : MUTED, cursor: histIdx >= history.length - 1 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>â†ª</button>
+            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 5, width: 26, height: 26, color: histIdx >= history.length - 1 ? "#4A4640" : MUTED, cursor: histIdx >= history.length - 1 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>↪</button>
         </div>
         <button onClick={generateFull} disabled={generating} style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "5px 11px", color: G, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
-          <Wand2 size={11} /> {generating ? "..." : "GÃ©nÃ©rer IA"}
+          <Wand2 size={11} /> {generating ? "..." : "Générer IA"}
         </button>
         <button onClick={() => setRightPanel(p => p === "theme" ? "preview" : "theme")} style={{ display: "flex", alignItems: "center", gap: 5, background: rightPanel === "theme" ? "rgba(201,168,76,0.15)" : "transparent", border: `1px solid ${rightPanel === "theme" ? "rgba(201,168,76,0.5)" : "rgba(201,168,76,0.2)"}`, borderRadius: 7, padding: "5px 11px", color: rightPanel === "theme" ? G : MUTED, fontSize: 11, cursor: "pointer" }}>
-          <Palette size={11} /> ThÃ¨me
+          <Palette size={11} /> Thème
         </button>
         <button onClick={() => setRightPanel(p => p === "ai" ? "preview" : "ai")} style={{ display: "flex", alignItems: "center", gap: 5, background: rightPanel === "ai" ? "rgba(201,168,76,0.15)" : "transparent", border: `1px solid ${rightPanel === "ai" ? "rgba(201,168,76,0.5)" : "rgba(201,168,76,0.2)"}`, borderRadius: 7, padding: "5px 11px", color: rightPanel === "ai" ? G : MUTED, fontSize: 11, cursor: "pointer" }}>
           <Sparkles size={11} /> IA
@@ -737,9 +740,9 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
           style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: MUTED }}>
           {previewDark ? <Sun size={12} /> : <Moon size={12} />}
         </button>
-        {pageId && <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 5, background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 7, padding: "5px 11px", color: MUTED, fontSize: 11, textDecoration: "none" }}><Eye size={11} /> AperÃ§u</a>}
+        {pageId && <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 5, background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 7, padding: "5px 11px", color: MUTED, fontSize: 11, textDecoration: "none" }}><Eye size={11} /> Aperçu</a>}
         <button onClick={handlePublish} disabled={publishing} style={{ display: "flex", alignItems: "center", gap: 5, background: published ? "rgba(57,255,143,0.15)" : `linear-gradient(90deg,${G},#b8953f)`, border: published ? "1px solid rgba(57,255,143,0.4)" : "none", color: published ? "#39FF8F" : "#080808", padding: "5px 14px", borderRadius: 7, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-          {published ? <><Check size={11} /> PubliÃ© !</> : publishing ? "..." : "Publier â†’"}
+          {published ? <><Check size={11} /> Publié !</> : publishing ? "..." : "Publier →"}
         </button>
       </div>
 
@@ -764,8 +767,8 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
             <div style={{ padding: "8px 8px 4px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
                 {[
-                  { id: "favorites", label: "â­", color: "#FFD700", desc: "Favoris" },
-                  { id: "recent", label: "ðŸ•", color: "#8A8478", desc: "RÃ©cents" },
+                  { id: "favorites", label: "⭐", color: "#FFD700", desc: "Favoris" },
+                  { id: "recent", label: "🕐", color: "#8A8478", desc: "Récents" },
                   ...BLOCK_CATEGORIES
                 ].map(cat => (
                   <button key={cat.id} onClick={() => setActiveCategory(cat.id)} title={cat.desc || cat.label}
@@ -787,7 +790,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
             {filteredBlocks.length === 0 ? (
               <div style={{ padding: "20px 10px", textAlign: "center" }}>
                 <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>
-                  {activeCategory === "favorites" ? "Aucun favori â€” clique â­" : activeCategory === "recent" ? "Aucun bloc rÃ©cent" : "Aucun rÃ©sultat"}
+                  {activeCategory === "favorites" ? "Aucun favori — clique ⭐" : activeCategory === "recent" ? "Aucun bloc récent" : "Aucun résultat"}
                 </p>
               </div>
             ) : filteredBlocks.map(([type, def]) => (
@@ -803,7 +806,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                   </div>
                 </button>
                 <button onClick={() => toggleFavorite(type)} style={{ background: "none", border: "none", color: favorites.includes(type) ? "#FFD700" : "#4A4640", cursor: "pointer", padding: "4px", fontSize: 11, flexShrink: 0 }}>
-                  â˜…
+                  ★
                 </button>
               </div>
             ))}
@@ -815,13 +818,13 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
           <div style={{ padding: "8px 18px", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
             <span style={{ fontSize: 9, letterSpacing: 2, textTransform: "uppercase", color: "#4A4640" }}>Canvas</span>
             <span style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "1px 7px", fontSize: 10, color: G }}>{blocks.length}</span>
-            {!pageId && <span style={{ color: "#4A4640", fontSize: 9, marginLeft: "auto" }}>Mode dÃ©mo â€” non sauvegardÃ©</span>}
+            {!pageId && <span style={{ color: "#4A4640", fontSize: 9, marginLeft: "auto" }}>Mode démo — non sauvegardé</span>}
           </div>
           <div style={{ flex: 1, overflowY: "auto", padding: "14px 18px" }}>
             {blocks.length === 0 ? (
               <div style={{ border: "1px dashed rgba(201,168,76,0.1)", borderRadius: 14, padding: "50px 30px", textAlign: "center", color: "#4A4640", maxWidth: 480, margin: "40px auto" }}>
                 <Sparkles size={24} style={{ margin: "0 auto 8px", opacity: 0.25 }} />
-                <p style={{ margin: 0, fontSize: 13 }}>Ajoute un bloc depuis la bibliothÃ¨que â†’</p>
+                <p style={{ margin: 0, fontSize: 13 }}>Ajoute un bloc depuis la bibliothèque →</p>
               </div>
             ) : blocks.map((block, idx) => {
               const def = BLOCK_DEFS[block.type]
@@ -834,8 +837,8 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                     <GripVertical size={11} color={MUTED} />
                     <div style={{ width: 20, height: 20, borderRadius: 5, background: `${def?.color || G}12`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11 }}>{def?.icon}</div>
                     <span style={{ color: isSel ? "#F5F0E8" : MUTED, fontSize: 11, fontWeight: 600, flex: 1 }}>{def?.label}</span>
-                    {!block.visible && <span style={{ fontSize: 9, color: MUTED, background: "rgba(255,255,255,0.06)", borderRadius: 4, padding: "1px 5px" }}>MASQUÃ‰</span>}
-                    {isSel && <span style={{ fontSize: 9, color: G, background: "rgba(201,168,76,0.08)", borderRadius: 4, padding: "1px 5px" }}>Ã‰DITION</span>}
+                    {!block.visible && <span style={{ fontSize: 9, color: MUTED, background: "rgba(255,255,255,0.06)", borderRadius: 4, padding: "1px 5px" }}>MASQUÉ</span>}
+                    {isSel && <span style={{ fontSize: 9, color: G, background: "rgba(201,168,76,0.08)", borderRadius: 4, padding: "1px 5px" }}>ÉDITION</span>}
                     <div style={{ display: "flex", gap: 2 }} onClick={e => e.stopPropagation()}>
                       <button onClick={() => moveBlock(block.id, "up")} disabled={idx === 0} style={{ background: "transparent", border: "none", color: idx === 0 ? "#4A4640" : MUTED, cursor: idx === 0 ? "default" : "pointer", padding: 3, display: "flex" }}><ChevronUp size={11} /></button>
                       <button onClick={() => moveBlock(block.id, "down")} disabled={idx === blocks.length - 1} style={{ background: "transparent", border: "none", color: idx === blocks.length - 1 ? "#4A4640" : MUTED, cursor: idx === blocks.length - 1 ? "default" : "pointer", padding: 3, display: "flex" }}><ChevronDown size={11} /></button>
@@ -855,7 +858,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         <div style={{ width: rightPanel === "ai" ? 340 : 280, background: "#0C0B09", borderLeft: "1px solid rgba(201,168,76,0.1)", display: "flex", flexDirection: "column", flexShrink: 0, transition: "width 0.2s ease", overflow: "hidden" }}>
           {/* Tabs */}
           <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
-            {([["preview", <Eye key="e" size={11} />, "Preview"], ["edit", <Settings key="s" size={11} />, "Ã‰diter"], ["theme", <Palette key="p" size={11} />, "ThÃ¨me"], ["ai", <Sparkles key="a" size={11} />, "IA"]] as const).map(([p, icon, label]) => (
+            {([["preview", <Eye key="e" size={11} />, "Preview"], ["edit", <Settings key="s" size={11} />, "Éditer"], ["theme", <Palette key="p" size={11} />, "Thème"], ["ai", <Sparkles key="a" size={11} />, "IA"]] as const).map(([p, icon, label]) => (
               <button key={p} onClick={() => setRightPanel(p)}
                 style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "9px 2px", background: "transparent", border: "none", borderBottom: `2px solid ${rightPanel === p ? G : "transparent"}`, color: rightPanel === p ? G : MUTED, fontSize: 10, fontWeight: rightPanel === p ? 700 : 400, cursor: "pointer" }}>
                 {icon} {label}
@@ -875,7 +878,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                     </div>
                   ))}
                   {blocks.filter(b => b.visible).length === 0 && <div style={{ padding: 20, textAlign: "center", color: "#4A4640", fontSize: 11 }}>Page vide</div>}
-                  <div style={{ textAlign: "center", padding: "10px 0" }}><p style={{ fontSize: 8, color: "#4A4640", margin: 0, letterSpacing: 1 }}>CrÃ©Ã© avec QRfolio</p></div>
+                  <div style={{ textAlign: "center", padding: "10px 0" }}><p style={{ fontSize: 8, color: "#4A4640", margin: 0, letterSpacing: 1 }}>Créé avec QRfolio</p></div>
                 </div>
               </div>
             </div>
@@ -887,7 +890,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
               {!selectedBlock ? (
                 <div style={{ textAlign: "center", padding: "40px 14px" }}>
                   <Settings size={24} color={MUTED} style={{ margin: "0 auto 8px", opacity: 0.25 }} />
-                  <p style={{ color: MUTED, fontSize: 12, margin: 0, lineHeight: 1.6 }}>Clique sur un bloc pour l'Ã©diter</p>
+                  <p style={{ color: MUTED, fontSize: 12, margin: 0, lineHeight: 1.6 }}>Clique sur un bloc pour l'éditer</p>
                 </div>
               ) : (
                 <>
@@ -940,13 +943,13 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                 <div ref={messagesEnd} />
               </div>
               <div style={{ padding: "5px 8px", display: "flex", gap: 3, flexWrap: "wrap", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
-                {["Freelance", "Restaurant", "Coach", "Artiste", "E-commerce", "MÃ©decin"].map(s => (
+                {["Freelance", "Restaurant", "Coach", "Artiste", "E-commerce", "Médecin"].map(s => (
                   <button key={s} onClick={() => sendAI(s)} style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.1)", borderRadius: 10, padding: "2px 7px", color: MUTED, fontSize: 9, cursor: "pointer" }}>{s}</button>
                 ))}
               </div>
               <div style={{ padding: "8px", borderTop: "1px solid rgba(201,168,76,0.1)", display: "flex", gap: 5 }}>
                 <input value={aiInput} onChange={e => setAiInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendAI() } }}
-                  placeholder="DÃ©cris ton activitÃ©..."
+                  placeholder="Décris ton activité..."
                   style={{ flex: 1, background: "#0d0c09", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 7, padding: "8px 10px", color: "#F5F0E8", fontSize: 11, outline: "none" }}
                   onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"}
                   onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />
@@ -963,5 +966,3 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
     </div>
   )
 }
-
-
