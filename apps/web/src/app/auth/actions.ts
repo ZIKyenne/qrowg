@@ -39,7 +39,7 @@ export async function signUp(formData: FormData) {
   // Trigger welcome email
   if (!error) {
     try {
-      await fetch(\/api/emails/welcome, {
+      await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/emails/welcome`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, name: full_name }),
