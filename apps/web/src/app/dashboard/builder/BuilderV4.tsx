@@ -655,8 +655,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
 
   function parseAI(text: string) {
     let added = 0
-    text.split("
-").forEach(line => {
+    text.split(/\r?\n/).forEach(line => {
       if (line.startsWith("ADD_BLOCK:")) {
         try { const j = JSON.parse(line.replace("ADD_BLOCK:", "").trim()); addBlock(j.type, j.content); added++ } catch {}
       }
