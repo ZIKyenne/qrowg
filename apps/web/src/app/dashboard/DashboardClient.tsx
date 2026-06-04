@@ -1,9 +1,9 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
-import { Plus, QrCode, BarChart2, Eye, Zap, ArrowRight, TrendingUp, Clock, Globe } from "lucide-react"
+import { Plus, QrCode, BarChart2, Eye, Zap, ArrowRight, TrendingUp, Clock, Globe, ChevronRight } from "lucide-react"
 import OnboardingChecklist from "./OnboardingChecklist"
 
 type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string }
