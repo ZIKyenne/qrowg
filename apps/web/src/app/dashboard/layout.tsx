@@ -15,7 +15,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     .single()
 
   const navItems = [
-    { href: "/dashboard/templates", label: "Templates", icon: LayoutTemplate },`n    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/dashboard/templates", label: "Templates", icon: LayoutTemplate }, { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2 },
     { href: "/dashboard/qr-codes", label: "QR Codes", icon: QrCode },
     { href: "/dashboard/profile", label: "Profil", icon: User },
@@ -52,3 +52,4 @@ export default async function DashboardLayout({ children }: { children: React.Re
     </div>
   )
 }
+

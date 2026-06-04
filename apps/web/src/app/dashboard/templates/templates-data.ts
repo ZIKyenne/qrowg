@@ -217,3 +217,4 @@ export const TEMPLATES: Template[] = [
 ]
 
 export default TEMPLATES
+
