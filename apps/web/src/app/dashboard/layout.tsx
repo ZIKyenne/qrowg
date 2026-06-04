@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
-import { LayoutDashboard, QrCode, BarChart2, Settings, Zap, User } from "lucide-react"
+import { LayoutDashboard, QrCode, BarChart2, Settings, Zap, User, Globe } from "lucide-react"
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createServerSupabaseClient()
@@ -19,7 +19,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
     { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2 },
     { href: "/dashboard/qr-codes", label: "QR Codes", icon: QrCode },
     { href: "/dashboard/profile", label: "Profil", icon: User },
-    { href: "/dashboard/domains", label: "Domaines", icon: Globe },`n    { href: "/dashboard/settings", label: "Parametres", icon: Settings },
+    { href: "/dashboard/domains", label: "Domaines", icon: Globe },
+    { href: "/dashboard/settings", label: "Parametres", icon: Settings },
   ]
 
   return (
