@@ -1,232 +1,152 @@
-import type { Metadata } from 'next'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-import { createCheckoutSession } from '../actions/stripe'
+"use client"
 
-export const metadata: Metadata = { title: 'Passer Pro — QRfolio' }
-
-async function createClient() {
-  const cookieStore = await cookies()
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return cookieStore.getAll() },
-        setAll(cookiesToSet) {
-          try { cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options)) } catch {}
-        },
-      },
-    }
-  )
-}
+import { useState, useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
+import { Check, Zap, Crown, Star, ArrowLeft } from "lucide-react"
+import Link from "next/link"
 
 const PLANS = [
   {
-    id: 'free',
-    name: 'Free',
-    price: '0',
-    desc: 'Pour démarrer',
-    priceId: null,
-    features: [
-      '1 page',
-      'QR code standard',
-      '500 vues / mois',
-      'Templates de base',
-      'Branding QRfolio visible',
-    ],
-    featured: false,
-    cta: 'Plan actuel',
+    id: "free", name: "Free", price: "0€", period: "", color: "#8A8478",
+    icon: <Star size={20} />,
+    description: "Pour démarrer",
+    perks: ["1 page", "500 vues / mois", "QR code basique", "Analytics de base", "Branding QRfolio"],
+    cta: "Plan actuel", ctaDisabled: true,
   },
   {
-    id: 'pro',
-    name: 'Pro',
-    price: '9,90',
-    desc: 'Pour les pros',
-    priceId: process.env.STRIPE_PRO_PRICE_ID,
-    features: [
-      'Pages illimitées',
-      'QR code premium (couleur, logo)',
-      'Vues illimitées',
-      'Domaine personnalisé',
-      'Analytics avancés',
-      'Sans branding QRfolio',
-      'Export HD pour impression',
-      '14 jours gratuits',
-    ],
-    featured: true,
-    cta: 'Essai gratuit 14 jours',
+    id: "pro", name: "Pro", price: "9,90€", period: "/mois", color: "#C9A84C",
+    icon: <Zap size={20} />,
+    description: "Pour les créatifs & freelances",
+    highlight: true,
+    badge: "POPULAIRE",
+    perks: ["Pages illimitées", "Vues illimitées", "Domaine personnalisé", "Analytics avancés", "Sans branding QRfolio", "Presets QR premium", "Support prioritaire"],
+    cta: "Commencer l'essai gratuit",
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID,
   },
   {
-    id: 'business',
-    name: 'Business',
-    price: '24,90',
-    desc: 'Pour les équipes',
-    priceId: process.env.STRIPE_BUSINESS_PRICE_ID,
-    features: [
-      'Tout Pro +',
-      'Multi-utilisateurs',
-      'API publique',
-      'Intégrations Stripe, Calendly',
-      'WhatsApp Business',
-      'Support prioritaire',
-      'SLA 99.9%',
-    ],
-    featured: false,
-    cta: 'Commencer',
+    id: "business", name: "Business", price: "24,90€", period: "/mois", color: "#39FF8F",
+    icon: <Crown size={20} />,
+    description: "Pour les équipes & agences",
+    perks: ["Tout Plan Pro inclus", "Gestion d'équipe (5 membres)", "Accès API complet", "Intégrations premium", "Pages en marque blanche", "Support 24/7 dédié", "Onboarding personnalisé"],
+    cta: "Contacter l'équipe",
+    priceId: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID,
   },
 ]
 
-export default async function UpgradePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ success?: string; canceled?: string; feature?: string }>
-}) {
-  const params = await searchParams
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+export default function UpgradePage() {
+  const [currentPlan, setCurrentPlan] = useState("free")
+  const [loading, setLoading] = useState<string | null>(null)
+  const [annual, setAnnual] = useState(false)
 
-  const { data: profile } = user ? await supabase
-    .from('profiles')
-    .select('plan')
-    .eq('id', user.id)
-    .single() : { data: null }
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return
+      supabase.from("profiles").select("plan").eq("id", user.id).single().then(({ data }) => {
+        if (data) setCurrentPlan(data.plan)
+      })
+    })
+  }, [])
 
-  const currentPlan = profile?.plan || 'free'
+  async function handleUpgrade(plan: typeof PLANS[0]) {
+    if (plan.ctaDisabled || currentPlan === plan.id) return
+    if (plan.id === "business") { window.location.href = "mailto:hello@qrfolio.app?subject=Plan Business"; return }
+    setLoading(plan.id)
+    // Rediriger vers Stripe checkout
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { window.location.href = "/auth/login"; return }
+    // Appel API Stripe
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priceId: plan.priceId, userId: user.id }),
+      })
+      const data = await res.json()
+      if (data.url) window.location.href = data.url
+    } catch { setLoading(null) }
+  }
 
   return (
-    <div style={{
-      minHeight: '100vh', background: '#080808', color: '#F5F0E8',
-      fontFamily: 'DM Sans, sans-serif',
-      backgroundImage: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(201,168,76,0.06) 0%, transparent 70%)',
-    }}>
-      {/* Nav */}
-      <div style={{ padding: '20px 32px', borderBottom: '1px solid rgba(201,168,76,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <a href="/dashboard" style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '22px', fontWeight: 300, color: '#F5F0E8', textDecoration: 'none' }}>
-          QR<span style={{ color: '#C9A84C', fontWeight: 600 }}>folio</span>
-        </a>
-        <a href="/dashboard" style={{ color: '#8A8478', fontSize: '13px', textDecoration: 'none' }}>← Retour au dashboard</a>
-      </div>
+    <div style={{ minHeight: "100vh", background: "#080808", fontFamily: "DM Sans, sans-serif", padding: "0 24px 80px" }}>
+      <style>{`@keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}} @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}`}</style>
 
-      <div style={{ maxWidth: '960px', margin: '0 auto', padding: '60px 32px' }}>
-
-        {/* Success banner */}
-        {params.success && (
-          <div style={{
-            background: 'rgba(57,255,143,0.08)', border: '1px solid rgba(57,255,143,0.3)',
-            borderRadius: '8px', padding: '16px 24px', marginBottom: '32px',
-            color: '#39FF8F', fontSize: '14px', textAlign: 'center',
-          }}>
-            🎉 Abonnement activé avec succès ! Bienvenue dans le plan Pro.
-          </div>
-        )}
+      {/* Back */}
+      <div style={{ maxWidth: 1000, margin: "0 auto", paddingTop: 32 }}>
+        <Link href="/dashboard" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "#8A8478", textDecoration: "none", fontSize: 14, marginBottom: 48 }}>
+          <ArrowLeft size={16} /> Retour au dashboard
+        </Link>
 
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '56px' }}>
-          <div style={{ fontSize: '11px', letterSpacing: '3px', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '12px' }}>
-            Tarifs
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <div style={{ display: "inline-block", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 20, padding: "6px 16px", marginBottom: 20, fontSize: 12, color: "#C9A84C", letterSpacing: 2, textTransform: "uppercase" }}>
+            ✦ Passez à la vitesse supérieure
           </div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(36px, 6vw, 64px)', fontWeight: 300, letterSpacing: '-1px', marginBottom: '12px' }}>
-            Choisissez votre <span style={{ color: '#C9A84C' }}>plan</span>
+          <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(32px,5vw,56px)", color: "#F5F0E8", fontWeight: 700, margin: "0 0 16px", lineHeight: 1.1 }}>
+            Choisissez votre plan
           </h1>
-          <p style={{ color: '#8A8478', fontSize: '15px' }}>
-            14 jours gratuits sur Pro · Annulable à tout moment
+          <p style={{ color: "#8A8478", fontSize: 17, maxWidth: 480, margin: "0 auto 28px", lineHeight: 1.7 }}>
+            Sans engagement, sans carte bancaire pour l'essai. Annulez à tout moment.
           </p>
+
+          {/* Annual toggle */}
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 12, background: "#111009", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 30, padding: "8px 16px" }}>
+            <span style={{ color: !annual ? "#F5F0E8" : "#8A8478", fontSize: 14, fontWeight: !annual ? 600 : 400 }}>Mensuel</span>
+            <button onClick={() => setAnnual(a => !a)} style={{ width: 44, height: 24, borderRadius: 12, background: annual ? "#C9A84C" : "rgba(255,255,255,0.1)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
+              <div style={{ position: "absolute", top: 3, left: annual ? 23 : 3, width: 18, height: 18, borderRadius: "50%", background: "#fff", transition: "left 0.2s" }} />
+            </button>
+            <span style={{ color: annual ? "#F5F0E8" : "#8A8478", fontSize: 14, fontWeight: annual ? 600 : 400 }}>Annuel</span>
+            {annual && <span style={{ background: "rgba(57,255,143,0.15)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 10, padding: "2px 8px", fontSize: 11, color: "#39FF8F", fontWeight: 700 }}>-20%</span>}
+          </div>
         </div>
 
-        {/* Plans */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
-          {PLANS.map(plan => (
-            <div key={plan.id} style={{
-              background: plan.featured
-                ? 'linear-gradient(160deg, rgba(201,168,76,0.08) 0%, #111009 60%)'
-                : '#111009',
-              border: '1px solid ' + (plan.featured ? 'rgba(201,168,76,0.4)' : 'rgba(201,168,76,0.12)'),
-              borderRadius: '8px', padding: '32px 24px',
-              position: 'relative',
-            }}>
-              {plan.featured && (
-                <div style={{
-                  position: 'absolute', top: '-11px', left: '50%', transform: 'translateX(-50%)',
-                  background: '#C9A84C', color: '#080808', fontSize: '9px', letterSpacing: '2px',
-                  textTransform: 'uppercase', padding: '3px 14px', borderRadius: '2px', fontWeight: 700,
-                }}>
-                  ⭐ Populaire
+        {/* Plans grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 20, alignItems: "center" }}>
+          {PLANS.map(plan => {
+            const isCurrentPlan = currentPlan === plan.id
+            const price = annual && plan.price !== "0€" ? `${(parseFloat(plan.price) * 0.8).toFixed(2).replace(".",",")}€` : plan.price
+            return (
+              <div key={plan.id}
+                style={{ background: plan.highlight ? "linear-gradient(135deg,rgba(201,168,76,0.1),rgba(57,255,143,0.04))" : "#111009", border: `1px solid ${plan.highlight ? "rgba(201,168,76,0.5)" : isCurrentPlan ? "rgba(57,255,143,0.3)" : "rgba(201,168,76,0.12)"}`, borderRadius: 20, padding: "32px 28px", position: "relative", overflow: "hidden", transform: plan.highlight ? "scale(1.03)" : "scale(1)", boxShadow: plan.highlight ? "0 0 60px rgba(201,168,76,0.12)" : "none", transition: "transform 0.2s" }}>
+                {plan.badge && (
+                  <div style={{ position: "absolute", top: 16, right: 16, background: "linear-gradient(90deg,#C9A84C,#39FF8F)", borderRadius: 20, padding: "4px 12px", fontSize: 10, fontWeight: 700, color: "#080808", letterSpacing: 1 }}>{plan.badge}</div>
+                )}
+                {isCurrentPlan && (
+                  <div style={{ position: "absolute", top: 16, right: 16, background: "rgba(57,255,143,0.15)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 20, padding: "4px 12px", fontSize: 10, fontWeight: 700, color: "#39FF8F", letterSpacing: 1 }}>ACTUEL</div>
+                )}
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                  <div style={{ color: plan.color, background: plan.color + "18", borderRadius: 8, padding: 8 }}>{plan.icon}</div>
+                  <div>
+                    <p style={{ color: "#F5F0E8", fontSize: 18, fontWeight: 700, margin: 0 }}>{plan.name}</p>
+                    <p style={{ color: "#8A8478", fontSize: 12, margin: 0 }}>{plan.description}</p>
+                  </div>
                 </div>
-              )}
-
-              {currentPlan === plan.id && (
-                <div style={{
-                  position: 'absolute', top: '-11px', right: '16px',
-                  background: '#39FF8F', color: '#080808', fontSize: '9px', letterSpacing: '1px',
-                  textTransform: 'uppercase', padding: '3px 10px', borderRadius: '2px', fontWeight: 700,
-                }}>
-                  Actuel
+                <div style={{ display: "flex", alignItems: "baseline", gap: 4, margin: "20px 0 24px" }}>
+                  <span style={{ color: plan.color, fontSize: 42, fontWeight: 700, fontFamily: "Cormorant Garamond, serif" }}>{price}</span>
+                  {plan.period && <span style={{ color: "#8A8478", fontSize: 14 }}>{plan.period}</span>}
                 </div>
-              )}
-
-              <div style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px' }}>{plan.name}</div>
-              <div style={{ fontSize: '12px', color: '#8A8478', marginBottom: '16px' }}>{plan.desc}</div>
-
-              <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '48px', fontWeight: 300, color: '#C9A84C', lineHeight: 1, marginBottom: '4px' }}>
-                {plan.price}€
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
+                  {plan.perks.map((perk, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <Check size={14} color="#39FF8F" style={{ flexShrink: 0 }} />
+                      <span style={{ color: "#8A8478", fontSize: 14 }}>{perk}</span>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => handleUpgrade(plan)} disabled={loading === plan.id || isCurrentPlan}
+                  style={{ width: "100%", padding: "14px 24px", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: isCurrentPlan ? "default" : "pointer", background: isCurrentPlan ? "rgba(57,255,143,0.08)" : plan.highlight ? "linear-gradient(90deg,#C9A84C,#b8953f)" : `${plan.color}15`, color: isCurrentPlan ? "#39FF8F" : plan.highlight ? "#080808" : plan.color, border: isCurrentPlan ? "1px solid rgba(57,255,143,0.2)" : plan.highlight ? "none" : `1px solid ${plan.color}30`, transition: "all 0.2s" }}>
+                  {loading === plan.id ? "Chargement..." : isCurrentPlan ? "✓ Plan actuel" : plan.cta}
+                </button>
               </div>
-              <div style={{ fontSize: '12px', color: '#8A8478', marginBottom: '24px' }}>/ mois</div>
-
-              <ul style={{ listStyle: 'none', marginBottom: '28px' }}>
-                {plan.features.map((f, i) => (
-                  <li key={i} style={{ fontSize: '13px', color: '#8A8478', padding: '5px 0', paddingLeft: '16px', position: 'relative' }}>
-                    <span style={{ position: 'absolute', left: 0, color: '#39FF8F', fontSize: '10px' }}>✓</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-
-              {plan.priceId && currentPlan !== plan.id ? (
-                <form action={createCheckoutSession.bind(null, plan.priceId)}>
-                  <button type="submit" style={{
-                    width: '100%',
-                    background: plan.featured ? '#C9A84C' : 'transparent',
-                    border: '1px solid ' + (plan.featured ? '#C9A84C' : 'rgba(201,168,76,0.3)'),
-                    color: plan.featured ? '#080808' : '#C9A84C',
-                    padding: '12px', borderRadius: '2px', fontSize: '13px',
-                    fontWeight: 700, cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
-                  }}>
-                    {plan.cta}
-                  </button>
-                </form>
-              ) : (
-                <div style={{
-                  width: '100%', background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  color: '#8A8478', padding: '12px', borderRadius: '2px',
-                  fontSize: '13px', textAlign: 'center',
-                }}>
-                  {currentPlan === plan.id ? '✓ Plan actuel' : plan.cta}
-                </div>
-              )}
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         {/* FAQ */}
-        <div style={{ marginTop: '64px', textAlign: 'center' }}>
-          <div style={{ fontSize: '11px', letterSpacing: '2px', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '24px' }}>
-            Questions fréquentes
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', textAlign: 'left' }}>
-            {[
-              { q: 'Puis-je annuler à tout moment ?', r: 'Oui, sans engagement. Vous gardez votre plan jusqu\'à la fin de la période.' },
-              { q: 'Le QR code change-t-il si je change de plan ?', r: 'Non, votre QR code est permanent et ne change jamais, peu importe votre plan.' },
-              { q: 'Que se passe-t-il à la fin du trial ?', r: 'Votre carte est débitée automatiquement. Vous pouvez annuler avant.' },
-              { q: 'Puis-je passer de Pro à Business ?', r: 'Oui, depuis le portail client. La différence est calculée au prorata.' },
-            ].map((faq, i) => (
-              <div key={i} style={{ background: '#111009', border: '1px solid rgba(201,168,76,0.1)', borderRadius: '6px', padding: '20px' }}>
-                <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>{faq.q}</div>
-                <div style={{ fontSize: '13px', color: '#8A8478', lineHeight: 1.6 }}>{faq.r}</div>
-              </div>
-            ))}
-          </div>
+        <div style={{ marginTop: 64, textAlign: "center" }}>
+          <p style={{ color: "#8A8478", fontSize: 14, marginBottom: 8 }}>Des questions ? <a href="mailto:hello@qrfolio.app" style={{ color: "#C9A84C", textDecoration: "none" }}>Contactez-nous</a></p>
+          <p style={{ color: "#8A8478", fontSize: 13 }}>✓ Paiement sécurisé par Stripe · ✓ Annulation à tout moment · ✓ Remboursement sous 14 jours</p>
         </div>
       </div>
     </div>
