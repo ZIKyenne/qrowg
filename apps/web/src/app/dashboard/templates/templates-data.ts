@@ -129,10 +129,7 @@ export const TEMPLATES: Template[] = [
       { type: "countdown", content: { title: "La soirée commence dans", date: "2025-12-31", subtitle: "Soyez prêts pour une nuit inoubliable !" } },
       { type: "event_info", content: { name: "GALA NIGHT 2025", date: "Mercredi 31 décembre 2025", time: "21h00 — 6h00", location: "Palais Brongniart, Paris 2e", price: "À partir de 80€", cta_label: "Réserver mes billets", cta_url: "#" } },
       { type: "heading", content: { text: "Au programme", size: "medium", align: "center", color: "primary" } },
-      { type: "rich_text", content: { text: "21h — Accueil cocktail & DJ set
-23h — Dîner gastronomique 5 services
-00h — Spectacle & surprises
-02h — Dancefloor jusqu'à l'aube", align: "left" } },
+      { type: "rich_text", content: { text: "21h Accueil cocktail - 23h Diner gastronomique - 00h Spectacle - 02h Dancefloor", align: "left" } },
       { type: "promo_banner", content: { emoji: "🥂", text: "Early Bird — 20% de réduction", subtext: "Offre valable jusqu'au 30 novembre", cta_label: "Profiter de l'offre", cta_url: "#" } },
       { type: "social_links", content: { instagram: "https://instagram.com", facebook: "https://facebook.com" } },
     ]
@@ -217,4 +214,5 @@ export const TEMPLATES: Template[] = [
 ]
 
 export default TEMPLATES
+
 
