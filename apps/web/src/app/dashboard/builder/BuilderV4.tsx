@@ -675,9 +675,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
       const reply = data.content?.[0]?.text || "Erreur."
       const added = parseAI(reply)
       const clean = reply.split(/\r?\n/).filter((l: string) => !l.startsWith("ADD_BLOCK:")).join("\n").trim()
-      setMessages(p => [...p, { role: "assistant", content: clean + (added > 0 ? `
-
-✅ ${added} bloc${added > 1 ? "s" : ""} ajouté${added > 1 ? "s" : ""} !` : "") }])
+      setMessages(p => [...p, { role: "assistant", content: clean + (added > 0 ? `\n✅ ${added} bloc${added > 1 ? "s" : ""} ajouté${added > 1 ? "s" : ""} !` : "") }])
     } catch { setMessages(p => [...p, { role: "assistant", content: "Erreur de connexion." }]) }
     setAiLoading(false)
   }
