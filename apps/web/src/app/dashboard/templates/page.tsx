@@ -1,340 +1,173 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { Sparkles, ArrowRight, Check, X, Lock, Star, Zap, Crown, Search } from "lucide-react"
+import { Sparkles, ArrowRight, Check, X, Lock, Search } from "lucide-react"
 
-// Templates data inline pour éviter les problèmes d'encodage
-const TEMPLATES = [
-  // ── GRATUITS ──────────────────────────────────────────────────────────────
-  {
-    id: "freelance", name: "Freelance Pro", category: "Business", plan: "free",
-    description: "Portfolio, services, tarifs, prise de contact",
-    emoji: "💼", color: "#C9A84C", accent: "#39FF8F",
-    bg: "#080808", surface: "#111009",
-    tags: ["Services", "Tarifs", "Contact", "Calendly"],
-    blockCount: 8,
-  },
-  {
-    id: "restaurant", name: "Restaurant & Bar", category: "Food", plan: "free",
-    description: "Menu, horaires, reservation, reseaux",
-    emoji: "🍽️", color: "#EF4444", accent: "#F97316",
-    bg: "#0D0505", surface: "#1A0A0A",
-    tags: ["Menu", "Horaires", "Carte", "Reservation"],
-    blockCount: 8,
-  },
-  {
-    id: "artiste", name: "Artiste & Musicien", category: "Creatif", plan: "free",
-    description: "Bio, musique, concerts, reseaux sociaux",
-    emoji: "🎵", color: "#A78BFA", accent: "#F472B6",
-    bg: "#0A0510", surface: "#130A20",
-    tags: ["Spotify", "Concerts", "Reseaux", "Bio"],
-    blockCount: 7,
-  },
-  {
-    id: "coach", name: "Coach & Therapeute", category: "Bien-etre", plan: "free",
-    description: "Presentation, methode, temoignages, RDV",
-    emoji: "🧘", color: "#4ADE80", accent: "#86EFAC",
-    bg: "#040D06", surface: "#081A0C",
-    tags: ["Services", "Temoignages", "Tarifs", "RDV"],
-    blockCount: 7,
-  },
-  {
-    id: "createur", name: "Createur de contenu", category: "Creatif", plan: "free",
-    description: "Liens reseaux, partenariats, stats",
-    emoji: "📱", color: "#FF6B6B", accent: "#FFD93D",
-    bg: "#080810", surface: "#10101E",
-    tags: ["Reseaux", "Stats", "Partenariats", "Feed"],
-    blockCount: 8,
-  },
-  {
-    id: "event", name: "Evenement & Soiree", category: "Event", plan: "free",
-    description: "Countdown, programme, billetterie",
-    emoji: "🎉", color: "#EC4899", accent: "#A855F7",
-    bg: "#05020D", surface: "#0D0620",
-    tags: ["Countdown", "Programme", "Billets", "Lieu"],
-    blockCount: 7,
-  },
-  // ── PRO ───────────────────────────────────────────────────────────────────
-  {
-    id: "ecommerce", name: "Boutique E-commerce", category: "Commerce", plan: "pro",
-    description: "Produits phares, promos, avis, boutique",
-    emoji: "🛍️", color: "#F97316", accent: "#FCD34D",
-    bg: "#0D0700", surface: "#1A1000",
-    tags: ["Produits", "Promo", "Avis", "Boutique"],
-    blockCount: 7,
-    highlight: "Catalogue produits + promo automatique",
-  },
-  {
-    id: "coiffeur", name: "Salon Beaute", category: "Beaute", plan: "pro",
-    description: "Services, galerie, avis, prise de RDV",
-    emoji: "✂️", color: "#F472B6", accent: "#FB7185",
-    bg: "#0D0508", surface: "#1A0812",
-    tags: ["Services", "Galerie", "Avis", "RDV"],
-    blockCount: 6,
-    highlight: "Galerie avant/apres + reservations en ligne",
-  },
-  {
-    id: "agence", name: "Agence & Studio", category: "Business", plan: "pro",
-    description: "Portfolio, services, tarifs, contact pro",
-    emoji: "🏢", color: "#38BDF8", accent: "#818CF8",
-    bg: "#020C18", surface: "#041828",
-    tags: ["Portfolio", "Services", "Tarifs", "Contact"],
-    blockCount: 7,
-    highlight: "Portfolio interactif + tunnel de conversion",
-  },
-  {
-    id: "medecin", name: "Medecin & Praticien", category: "Sante", plan: "pro",
-    description: "Cabinet, specialites, horaires, RDV Doctolib",
-    emoji: "🏥", color: "#34D399", accent: "#6EE7B7",
-    bg: "#020D08", surface: "#041A10",
-    tags: ["Cabinet", "Specialites", "Horaires", "RDV"],
-    blockCount: 7,
-    highlight: "Integration Doctolib + informations cabinet",
-  },
-  // ── BUSINESS ──────────────────────────────────────────────────────────────
-  {
-    id: "vente_produits", name: "Vente Produits Digitaux", category: "Commerce", plan: "business",
-    description: "Formations, ebooks, templates, acces membres",
-    emoji: "📦", color: "#A78BFA", accent: "#F472B6",
-    bg: "#060410", surface: "#0E0820",
-    tags: ["Formations", "Produits", "Temoignages", "Acces"],
-    blockCount: 7,
-    highlight: "Tunnel de vente complet + social proof",
-  },
-  {
-    id: "immobilier", name: "Agent Immobilier", category: "Immobilier", plan: "business",
-    description: "Biens, expertises, contact, avis clients",
-    emoji: "🏠", color: "#FBBF24", accent: "#F59E0B",
-    bg: "#0A0800", surface: "#171200",
-    tags: ["Biens", "Expertise", "Avis", "Contact"],
-    blockCount: 8,
-    highlight: "Vitrine biens + CRM integre + avis Google",
-  },
-  {
-    id: "startup", name: "Startup & SaaS", category: "Tech", plan: "business",
-    description: "Pitch, features, pricing, waitlist",
-    emoji: "🚀", color: "#22D3EE", accent: "#818CF8",
-    bg: "#030A14", surface: "#06152A",
-    tags: ["Features", "Pricing", "Waitlist", "Stats"],
-    blockCount: 9,
-    highlight: "Landing page SaaS avec waitlist integree",
-  },
-  {
-    id: "influenceur", name: "Influenceur & Personal Brand", category: "Creatif", plan: "business",
-    description: "Media kit, statistiques, partenariats premium",
-    emoji: "⭐", color: "#F59E0B", accent: "#EF4444",
-    bg: "#0A0500", surface: "#150B00",
-    tags: ["Media Kit", "Stats", "Partenariats", "Feed"],
-    blockCount: 10,
-    highlight: "Media kit professionnel + stats en temps reel",
-  },
-]
+const TEMPLATE_BLOCKS: Record<string, any[]> = {"freelance": [{"type": "profile", "content": {"name": "Jean Dupont", "tagline": "Developpeur Full-Stack & Consultant Digital", "badge": "Disponible pour missions"}}, {"type": "bio", "content": {"text": "10 ans d experience en developpement web. Je transforme vos idees en produits digitaux performants. Specialise React, Node.js et architecture cloud.", "align": "left"}}, {"type": "skills", "content": {"title": "Mes expertises", "tags": "React, Next.js, Node.js, TypeScript, AWS, Docker, UX Design"}}, {"type": "services_list", "content": {"title": "Mes services", "s1_icon": "💻", "s1_name": "Developpement sur mesure", "s1_desc": "Applications web et mobiles performantes", "s2_icon": "🎨", "s2_name": "Design & Prototypage", "s2_desc": "Figma, design system, UI/UX", "s3_icon": "🚀", "s3_name": "Conseil & Architecture", "s3_desc": "Audit technique, roadmap, choix stack"}}, {"type": "pricing", "content": {"title": "Mes tarifs", "title1": "Journee", "price1": "650 EUR", "desc1": "TJM standard", "title2": "Forfait web", "price2": "3500 EUR", "desc2": "Site vitrine complet", "title3": "Retainer", "price3": "2000 EUR", "desc3": "20h/mois", "cta_label": "Demander un devis", "cta_url": "#"}}, {"type": "testimonials", "content": {"name1": "Sarah M.", "text1": "Jean a livre notre MVP en 6 semaines. Code propre, communication parfaite.", "stars1": "5", "name2": "Thomas R.", "text2": "Excellent consultant, vision claire et pragmatique.", "stars2": "5"}}, {"type": "calendly", "content": {"label": "Reserver un appel decouverte", "url": "https://calendly.com", "description": "30 min - Gratuit - Visio ou telephone"}}, {"type": "social_links", "content": {"linkedin": "https://linkedin.com", "github": "https://github.com", "website": "https://monsite.com"}}], "restaurant": [{"type": "profile", "content": {"name": "Le Bistrot Parisien", "tagline": "Cuisine francaise depuis 1985", "badge": "Ouvert aujourd hui"}}, {"type": "cta_button", "content": {"label": "Reserver une table", "url": "#", "style": "gold", "icon": "🍷", "full_width": "yes"}}, {"type": "menu_section", "content": {"category": "Entrees", "item1_name": "Foie gras poele", "item1_price": "18 EUR", "item1_desc": "Chutney de figues", "item2_name": "Soupe a l oignon", "item2_price": "12 EUR", "item2_desc": "Gratinee au comte", "item3_name": "Tartare de saumon", "item3_price": "16 EUR", "item3_desc": "Avocat, citron vert"}}, {"type": "menu_section", "content": {"category": "Plats", "item1_name": "Entrecote 300g", "item1_price": "32 EUR", "item1_desc": "Sauce bearnaise, frites maison", "item2_name": "Filet de sole", "item2_price": "28 EUR", "item2_desc": "Beurre blanc, legumes", "item3_name": "Risotto aux truffes", "item3_price": "24 EUR", "item3_desc": "Parmesan, truffe noire"}}, {"type": "opening_hours", "content": {"title": "Nos horaires", "mon_fri": "12h-14h30 / 19h-23h", "saturday": "19h-23h30", "sunday": "12h-15h", "note": "Reservation recommandee"}}, {"type": "google_maps", "content": {"label": "Le Bistrot Parisien", "address": "12 rue de la Paix, 75001 Paris", "transport": "Metro Opera - Ligne 3, 7, 8"}}, {"type": "testimonials", "content": {"name1": "Marie L.", "text1": "Cuisine excellente, service impeccable. La meilleure entrecote de Paris !", "stars1": "5", "name2": "Pierre M.", "text2": "Cadre magnifique, plats savoureux.", "stars2": "5"}}, {"type": "social_links", "content": {"instagram": "https://instagram.com", "facebook": "https://facebook.com"}}], "artiste": [{"type": "profile", "content": {"name": "NOVA", "tagline": "Artiste electro-pop - Paris", "badge": "Nouvel EP disponible"}}, {"type": "bio", "content": {"text": "Productrice et chanteuse, NOVA melange electronique et pop emotionnelle pour creer un univers sonore unique. Plus de 2M de streams.", "align": "center"}}, {"type": "spotify_player", "content": {"title": "Ecouter mon dernier EP", "url": "https://open.spotify.com"}}, {"type": "music_links", "content": {"artist_name": "NOVA", "spotify": "https://open.spotify.com", "apple_music": "https://music.apple.com", "deezer": "https://deezer.com", "youtube_music": "https://music.youtube.com"}}, {"type": "event_info", "content": {"name": "Concert Release Party", "date": "Samedi 28 juin 2025", "time": "21h00", "location": "La Cigale, Paris 18e", "price": "25 EUR - Places limitees", "cta_label": "Reserver ma place", "cta_url": "#"}}, {"type": "cta_button", "content": {"label": "Me suivre sur Instagram", "url": "https://instagram.com", "style": "neon", "icon": "📸", "full_width": "yes"}}, {"type": "social_links", "content": {"instagram": "https://instagram.com", "tiktok": "https://tiktok.com", "youtube": "https://youtube.com", "spotify": "https://open.spotify.com"}}], "coach": [{"type": "profile", "content": {"name": "Marie Laurent", "tagline": "Coach de vie certifiee - PNL et Mindfulness", "badge": "+200 clients accompagnes"}}, {"type": "bio", "content": {"text": "Je vous accompagne vers une vie plus alignee avec vos valeurs. Ma methode combine la PNL, la pleine conscience et le coaching systemique.", "align": "center"}}, {"type": "services_list", "content": {"title": "Mon accompagnement", "s1_icon": "🎯", "s1_name": "Coaching individuel", "s1_desc": "Seances 1h, en visio ou presentiel", "s2_icon": "👥", "s2_name": "Ateliers de groupe", "s2_desc": "Petits groupes de 6 personnes max", "s3_icon": "📖", "s3_name": "Programme 3 mois", "s3_desc": "Transformation en profondeur"}}, {"type": "pricing", "content": {"title": "Tarifs", "title1": "Seance unique", "price1": "90 EUR", "desc1": "1h en visio", "title2": "Pack 5 seances", "price2": "380 EUR", "desc2": "Economisez 70 EUR", "title3": "Programme 3 mois", "price3": "850 EUR", "desc3": "12 seances + suivi"}}, {"type": "testimonials", "content": {"name1": "Lucie D.", "text1": "Marie m a aide a reprendre confiance en moi. Sa bienveillance est remarquable.", "stars1": "5", "name2": "Pierre M.", "text2": "Un accompagnement qui m a permis de changer de cap professionnel.", "stars2": "5"}}, {"type": "calendly", "content": {"label": "Seance decouverte offerte", "url": "https://calendly.com", "description": "45 min - Gratuit - Sans engagement"}}, {"type": "social_links", "content": {"instagram": "https://instagram.com", "linkedin": "https://linkedin.com"}}], "ecommerce": [{"type": "profile", "content": {"name": "Maison Lumiere", "tagline": "Decoration artisanale et objets de createurs", "badge": "Livraison gratuite des 60 EUR"}}, {"type": "promo_banner", "content": {"emoji": "🎉", "text": "Soldes ete jusqu a -40%", "subtext": "Offre valable jusqu au 31 juillet", "cta_label": "Voir les offres", "cta_url": "#"}}, {"type": "product", "content": {"name": "Vase ceramique artisanal", "price": "45 EUR", "old_price": "75 EUR", "description": "Fait main en France, collection printemps. Livre avec certificat d authenticite.", "cta_label": "Commander", "cta_url": "#"}}, {"type": "product", "content": {"name": "Bougie parfumee 200g", "price": "28 EUR", "description": "Cire vegetale, parfum vanille et santal. Duree de combustion 45h.", "cta_label": "Commander", "cta_url": "#"}}, {"type": "cta_button", "content": {"label": "Voir toute la boutique", "url": "#", "style": "gold", "icon": "🛍️", "full_width": "yes"}}, {"type": "testimonials", "content": {"name1": "Claire B.", "text1": "Des produits magnifiques, emballage soigne. Je recommande a 100% !", "stars1": "5", "name2": "Antoine L.", "text2": "Livraison rapide, qualite au rendez-vous.", "stars2": "5"}}, {"type": "social_links", "content": {"instagram": "https://instagram.com", "pinterest": "https://pinterest.com", "website": "https://monsite.com"}}], "event": [{"type": "profile", "content": {"name": "GALA NIGHT 2025", "tagline": "La soiree de l annee - 500 invites", "badge": "Dernieres places disponibles"}}, {"type": "countdown", "content": {"title": "La soiree commence dans", "date": "2025-12-31", "subtitle": "Soyez prets pour une nuit inoubliable !"}}, {"type": "event_info", "content": {"name": "GALA NIGHT 2025", "date": "Mercredi 31 decembre 2025", "time": "21h00 - 6h00", "location": "Palais Brongniart, Paris 2e", "price": "A partir de 80 EUR", "cta_label": "Reserver mes billets", "cta_url": "#"}}, {"type": "promo_banner", "content": {"emoji": "🥂", "text": "Early Bird - 20% de reduction", "subtext": "Offre valable jusqu au 30 novembre", "cta_label": "Profiter de l offre", "cta_url": "#"}}, {"type": "social_links", "content": {"instagram": "https://instagram.com", "facebook": "https://facebook.com"}}], "coiffeur": [{"type": "profile", "content": {"name": "Salon Eclat", "tagline": "Coiffure et Beaute - Paris 11e", "badge": "4.9/5 - 300 avis"}}, {"type": "bio", "content": {"text": "Votre salon de coiffure et beaute a Paris. Specialises en colorations naturelles, soins keratine et balayage californien.", "align": "center"}}, {"type": "services_list", "content": {"title": "Nos prestations", "s1_icon": "✂️", "s1_name": "Coupe et Brushing", "s1_desc": "Femme 55 EUR - Homme 35 EUR", "s2_icon": "🎨", "s2_name": "Coloration et Balayage", "s2_desc": "A partir de 80 EUR", "s3_icon": "💆", "s3_name": "Soins et Traitements", "s3_desc": "Keratine, lissage, soin profond"}}, {"type": "calendly", "content": {"label": "Prendre rendez-vous", "url": "https://calendly.com", "description": "Reservation en ligne 24h/24"}}, {"type": "testimonials", "content": {"name1": "Emma R.", "text1": "Super salon ! Le balayage est parfait, l equipe est adorable.", "stars1": "5", "name2": "Julie M.", "text2": "Meilleure coloration de ma vie. Merci Sophie !", "stars2": "5"}}, {"type": "opening_hours", "content": {"title": "Horaires", "mon_fri": "9h - 19h", "saturday": "9h - 18h", "sunday": "Ferme"}}, {"type": "social_links", "content": {"instagram": "https://instagram.com"}}], "agence": [{"type": "profile", "content": {"name": "Studio PIXEL", "tagline": "Agence creative - Web - Brand - Motion", "badge": "50+ projets livres"}}, {"type": "bio", "content": {"text": "Nous creons des experiences digitales memorables. De la strategie de marque au developpement web, nous accompagnons startups et entreprises.", "align": "left"}}, {"type": "services_list", "content": {"title": "Nos expertises", "s1_icon": "🎨", "s1_name": "Branding et Identite", "s1_desc": "Logo, charte graphique, guidelines", "s2_icon": "💻", "s2_name": "Developpement web", "s2_desc": "Sites, apps, e-commerce", "s3_icon": "📱", "s3_name": "Social Media et Contenu", "s3_desc": "Strategie, creation, gestion"}}, {"type": "pricing", "content": {"title": "Nos offres", "title1": "Starter", "price1": "2500 EUR", "desc1": "Site vitrine 5 pages", "title2": "Business", "price2": "6500 EUR", "desc2": "Site + branding complet", "title3": "Premium", "price3": "Sur devis", "desc3": "Solution sur mesure"}}, {"type": "contact_form", "content": {"title": "Parlons de votre projet", "button_label": "Envoyer"}}, {"type": "social_links", "content": {"linkedin": "https://linkedin.com", "instagram": "https://instagram.com", "website": "https://monsite.com"}}], "createur": [{"type": "profile", "content": {"name": "Alex Creator", "tagline": "Tech - Lifestyle - Voyages - 500K followers", "badge": "Partenariats ouverts"}}, {"type": "bio", "content": {"text": "Createur de contenu passionne par la tech et les voyages. Je partage mes decouvertes, mes aventures et mes bons plans sur YouTube, Instagram et TikTok.", "align": "center"}}, {"type": "social_links", "content": {"youtube": "https://youtube.com", "instagram": "https://instagram.com", "tiktok": "https://tiktok.com", "twitter": "https://twitter.com"}}, {"type": "cta_button", "content": {"label": "Voir ma derniere video YouTube", "url": "#", "style": "neon", "icon": "▶️", "full_width": "yes"}}, {"type": "cta_button", "content": {"label": "Me contacter pour un partenariat", "url": "mailto:contact@creator.com", "style": "outline", "icon": "📩", "full_width": "yes"}}, {"type": "visit_counter", "content": {"label": "visiteurs ce mois"}}], "vente_produits": [{"type": "profile", "content": {"name": "Digital Studio", "tagline": "Formations et Ressources pour entrepreneurs", "badge": "+1200 eleves formes"}}, {"type": "bio", "content": {"text": "Je cree des formations et ressources pratiques pour aider les entrepreneurs a developper leur business en ligne. Acces immediat apres paiement.", "align": "center"}}, {"type": "promo_banner", "content": {"emoji": "⚡", "text": "Formation bestseller a -50%", "subtext": "Offre limitee - 47 EUR au lieu de 97 EUR", "cta_label": "Profiter de l offre", "cta_url": "#"}}, {"type": "product", "content": {"name": "Formation Marketing Digital 2025", "price": "47 EUR", "old_price": "97 EUR", "description": "8h de contenu video, 50 ressources, acces a vie.", "cta_label": "Acceder a la formation", "cta_url": "#"}}, {"type": "product", "content": {"name": "Pack Templates Canva Pro", "price": "27 EUR", "description": "200+ templates premium pour vos reseaux sociaux.", "cta_label": "Telecharger le pack", "cta_url": "#"}}, {"type": "testimonials", "content": {"name1": "Marine C.", "text1": "Formation ultra complete et actionnable. J ai triple mon CA en 3 mois !", "stars1": "5", "name2": "Romain D.", "text2": "Les templates sont incroyables.", "stars2": "5"}}, {"type": "social_links", "content": {"instagram": "https://instagram.com", "youtube": "https://youtube.com"}}], "medecin": [{"type": "profile", "content": {"name": "Dr. Sophie Martin", "tagline": "Medecin generaliste - Paris 15e", "badge": "Nouveaux patients acceptes"}}, {"type": "bio", "content": {"text": "Medecin generaliste avec 15 ans d experience. Consultations en cabinet ou en teleconsultation. Specialisee en medecine preventive.", "align": "left"}}, {"type": "services_list", "content": {"title": "Consultations", "s1_icon": "🏥", "s1_name": "Consultation generale", "s1_desc": "En cabinet ou teleconsultation", "s2_icon": "💊", "s2_name": "Suivi maladies chroniques", "s2_desc": "Diabete, hypertension, asthme", "s3_icon": "🔬", "s3_name": "Bilan de sante", "s3_desc": "Bilan complet annuel"}}, {"type": "opening_hours", "content": {"title": "Horaires de consultation", "mon_fri": "8h30-12h30 / 14h-18h", "saturday": "8h30-12h30", "sunday": "Urgences uniquement"}}, {"type": "calendly", "content": {"label": "Prendre rendez-vous", "url": "https://doctolib.fr", "description": "Consultation en cabinet ou teleconsultation"}}, {"type": "google_maps", "content": {"label": "Cabinet medical", "address": "45 rue de la Convention, 75015 Paris", "transport": "Metro Convention - Ligne 12"}}, {"type": "social_links", "content": {"website": "https://doctolib.fr", "phone": "tel:+33123456789"}}], "immobilier": [{"type": "profile", "content": {"name": "Marc Dubois Immobilier", "tagline": "Agent immobilier - Paris et IDF", "badge": "+150 biens vendus"}}, {"type": "bio", "content": {"text": "Specialiste de l immobilier parisien depuis 12 ans. J accompagne acheteurs et vendeurs dans tous leurs projets immobiliers avec expertise et transparence.", "align": "left"}}, {"type": "services_list", "content": {"title": "Mes services", "s1_icon": "🏠", "s1_name": "Vente et Achat", "s1_desc": "Estimation, negociation, closing", "s2_icon": "🔑", "s2_name": "Location et Gestion", "s2_desc": "Mise en location, suivi locataires", "s3_icon": "📊", "s3_name": "Estimation gratuite", "s3_desc": "Valorisation de votre bien"}}, {"type": "testimonials", "content": {"name1": "Famille Moreau", "text1": "Marc a trouve notre appartement ideal en 3 semaines. Professionnel et efficace.", "stars1": "5", "name2": "Sophie L.", "text2": "Vente rapide au meilleur prix. Je recommande vivement !", "stars2": "5"}}, {"type": "cta_button", "content": {"label": "Estimation gratuite de mon bien", "url": "#", "style": "gold", "icon": "🏡", "full_width": "yes"}}, {"type": "contact_form", "content": {"title": "Contactez-moi", "button_label": "Envoyer ma demande"}}, {"type": "social_links", "content": {"linkedin": "https://linkedin.com", "website": "https://monsite.com", "phone": "tel:+33123456789"}}], "startup": [{"type": "profile", "content": {"name": "TechVision AI", "tagline": "La plateforme IA qui transforme vos donnees en decisions", "badge": "Beta - Acces gratuit"}}, {"type": "bio", "content": {"text": "TechVision AI utilise le machine learning pour analyser vos donnees metier et generer des insights actionnables en temps reel. Plus de 500 entreprises nous font confiance.", "align": "center"}}, {"type": "services_list", "content": {"title": "Fonctionnalites cles", "s1_icon": "🤖", "s1_name": "Analyse predictive", "s1_desc": "Anticipez les tendances de votre marche", "s2_icon": "📊", "s2_name": "Tableaux de bord IA", "s2_desc": "Visualisations intelligentes en temps reel", "s3_icon": "🔗", "s3_name": "Integrations natives", "s3_desc": "Salesforce, HubSpot, Notion et +50 outils"}}, {"type": "pricing", "content": {"title": "Tarifs simples", "title1": "Starter", "price1": "0 EUR", "desc1": "Pour tester", "title2": "Growth", "price2": "49 EUR/mois", "desc2": "Pour les equipes", "title3": "Enterprise", "price3": "Sur devis", "desc3": "Pour les grands comptes", "cta_label": "Commencer gratuitement", "cta_url": "#"}}, {"type": "cta_button", "content": {"label": "Rejoindre la beta gratuite", "url": "#", "style": "gold", "icon": "🚀", "full_width": "yes"}}, {"type": "social_links", "content": {"linkedin": "https://linkedin.com", "twitter": "https://twitter.com", "website": "https://monsite.com"}}], "influenceur": [{"type": "profile", "content": {"name": "Sarah Style", "tagline": "Influenceuse Mode et Lifestyle - 1.2M followers", "badge": "Collaborations ouvertes"}}, {"type": "bio", "content": {"text": "Passionnee de mode, beaute et lifestyle. Je partage mon quotidien avec authenticite et cree du contenu inspire pour une communaute engagee et bienveillante.", "align": "center"}}, {"type": "social_links", "content": {"instagram": "https://instagram.com", "tiktok": "https://tiktok.com", "youtube": "https://youtube.com", "pinterest": "https://pinterest.com"}}, {"type": "promo_banner", "content": {"emoji": "✨", "text": "Mon code promo -20%", "subtext": "Code SARAH20 sur toute la boutique partenaire", "cta_label": "Profiter du code", "cta_url": "#"}}, {"type": "cta_button", "content": {"label": "Telecharger mon media kit", "url": "#", "style": "outline", "icon": "📋", "full_width": "yes"}}, {"type": "cta_button", "content": {"label": "Proposer une collaboration", "url": "mailto:contact@sarah.com", "style": "gold", "icon": "💌", "full_width": "yes"}}, {"type": "visit_counter", "content": {"label": "visiteurs ce mois"}}]}
 
-const PLAN_CONFIG = {
-  free: { label: "Gratuit", color: "#8A8478", icon: "★", bg: "rgba(138,132,120,0.1)" },
-  pro: { label: "Pro", color: "#C9A84C", icon: "⚡", bg: "rgba(201,168,76,0.1)" },
-  business: { label: "Business", color: "#39FF8F", icon: "👑", bg: "rgba(57,255,143,0.1)" },
+const TEMPLATES: any[] = [{"id": "freelance", "name": "Freelance Pro", "category": "Business", "plan": "free", "description": "Portfolio, services, tarifs, prise de contact", "emoji": "💼", "color": "#C9A84C", "accent": "#39FF8F", "bg": "#080808", "surface": "#111009", "tags": ["Services", "Tarifs", "Contact", "Calendly"]}, {"id": "restaurant", "name": "Restaurant & Bar", "category": "Food", "plan": "free", "description": "Menu, horaires, reservation, reseaux", "emoji": "🍽️", "color": "#EF4444", "accent": "#F97316", "bg": "#0D0505", "surface": "#1A0A0A", "tags": ["Menu", "Horaires", "Carte", "Reservation"]}, {"id": "artiste", "name": "Artiste & Musicien", "category": "Creatif", "plan": "free", "description": "Bio, musique, concerts, reseaux sociaux", "emoji": "🎵", "color": "#A78BFA", "accent": "#F472B6", "bg": "#0A0510", "surface": "#130A20", "tags": ["Spotify", "Concerts", "Reseaux", "Bio"]}, {"id": "coach", "name": "Coach & Therapeute", "category": "Bien-etre", "plan": "free", "description": "Presentation, methode, temoignages, RDV", "emoji": "🧘", "color": "#4ADE80", "accent": "#86EFAC", "bg": "#040D06", "surface": "#081A0C", "tags": ["Services", "Temoignages", "Tarifs", "RDV"]}, {"id": "createur", "name": "Createur de contenu", "category": "Creatif", "plan": "free", "description": "Liens reseaux, partenariats, stats", "emoji": "📱", "color": "#FF6B6B", "accent": "#FFD93D", "bg": "#080810", "surface": "#10101E", "tags": ["Reseaux", "Stats", "Partenariats", "Feed"]}, {"id": "event", "name": "Evenement & Soiree", "category": "Event", "plan": "free", "description": "Countdown, programme, billetterie", "emoji": "🎉", "color": "#EC4899", "accent": "#A855F7", "bg": "#05020D", "surface": "#0D0620", "tags": ["Countdown", "Programme", "Billets", "Lieu"]}, {"id": "ecommerce", "name": "Boutique E-commerce", "category": "Commerce", "plan": "starter", "description": "Produits phares, promos, avis, boutique", "emoji": "🛍️", "color": "#F97316", "accent": "#FCD34D", "bg": "#0D0700", "surface": "#1A1000", "tags": ["Produits", "Promo", "Avis", "Boutique"], "highlight": "Catalogue produits + promo"}, {"id": "coiffeur", "name": "Salon Beaute", "category": "Beaute", "plan": "starter", "description": "Services, galerie, avis, prise de RDV", "emoji": "✂️", "color": "#F472B6", "accent": "#FB7185", "bg": "#0D0508", "surface": "#1A0812", "tags": ["Services", "Galerie", "Avis", "RDV"], "highlight": "Galerie + reservations en ligne"}, {"id": "agence", "name": "Agence & Studio", "category": "Business", "plan": "starter", "description": "Portfolio, services, tarifs, contact pro", "emoji": "🏢", "color": "#38BDF8", "accent": "#818CF8", "bg": "#020C18", "surface": "#041828", "tags": ["Portfolio", "Services", "Tarifs", "Contact"], "highlight": "Portfolio + tunnel de conversion"}, {"id": "medecin", "name": "Medecin & Praticien", "category": "Sante", "plan": "starter", "description": "Cabinet, specialites, horaires, RDV", "emoji": "🏥", "color": "#34D399", "accent": "#6EE7B7", "bg": "#020D08", "surface": "#041A10", "tags": ["Cabinet", "Specialites", "Horaires", "RDV"], "highlight": "Integration Doctolib + infos cabinet"}, {"id": "vente_produits", "name": "Vente Produits Digitaux", "category": "Commerce", "plan": "pro", "description": "Formations, ebooks, templates, acces membres", "emoji": "📦", "color": "#A78BFA", "accent": "#F472B6", "bg": "#060410", "surface": "#0E0820", "tags": ["Formations", "Produits", "Temoignages", "Acces"], "highlight": "Tunnel de vente complet"}, {"id": "immobilier", "name": "Agent Immobilier", "category": "Immobilier", "plan": "pro", "description": "Biens, expertises, contact, avis clients", "emoji": "🏠", "color": "#FBBF24", "accent": "#F59E0B", "bg": "#0A0800", "surface": "#171200", "tags": ["Biens", "Expertise", "Avis", "Contact"], "highlight": "Vitrine biens + avis Google"}, {"id": "startup", "name": "Startup & SaaS", "category": "Tech", "plan": "pro", "description": "Pitch, features, pricing, waitlist", "emoji": "🚀", "color": "#22D3EE", "accent": "#818CF8", "bg": "#030A14", "surface": "#06152A", "tags": ["Features", "Pricing", "Waitlist", "Stats"], "highlight": "Landing page SaaS avec waitlist"}, {"id": "influenceur", "name": "Influenceur & Personal Brand", "category": "Creatif", "plan": "pro", "description": "Media kit, statistiques, partenariats premium", "emoji": "⭐", "color": "#F59E0B", "accent": "#EF4444", "bg": "#0A0500", "surface": "#150B00", "tags": ["Media Kit", "Stats", "Partenariats", "Feed"], "highlight": "Media kit professionnel"}]
+
+const PLAN_CONFIG: Record<string, { label: string; color: string; icon: string }> = {
+  free: { label: "Gratuit", color: "#8A8478", icon: "★" },
+  starter: { label: "Starter", color: "#38BDF8", icon: "⚡" },
+  pro: { label: "Pro", color: "#C9A84C", icon: "🔥" },
+  business: { label: "Business", color: "#39FF8F", icon: "👑" },
 }
 
+const PLAN_RANK: Record<string, number> = { free: 0, starter: 1, pro: 2, business: 3 }
 const CATEGORIES = ["Tous", "Business", "Food", "Creatif", "Bien-etre", "Commerce", "Event", "Beaute", "Sante", "Tech", "Immobilier"]
 
 export default function TemplatesPage() {
   const [selected, setSelected] = useState<string | null>(null)
   const [activeCategory, setActiveCategory] = useState("Tous")
-  const [activePlan, setActivePlan] = useState<"all" | "free" | "pro" | "business">("all")
+  const [activePlan, setActivePlan] = useState("all")
   const [search, setSearch] = useState("")
   const [creating, setCreating] = useState(false)
-  const [userPlan] = useState("free") // TODO: fetch from profile
+  const [userPlan] = useState("free")
   const router = useRouter()
 
-  const filtered = TEMPLATES.filter(t => {
+  const filtered = TEMPLATES.filter((t: any) => {
     const matchCat = activeCategory === "Tous" || t.category === activeCategory
     const matchPlan = activePlan === "all" || t.plan === activePlan
-    const matchSearch = !search || t.name.toLowerCase().includes(search.toLowerCase()) || t.description.toLowerCase().includes(search.toLowerCase())
+    const matchSearch = !search || t.name.toLowerCase().includes(search.toLowerCase())
     return matchCat && matchPlan && matchSearch
   })
 
-  const planRank: Record<string, number> = { free: 0, pro: 1, business: 2 }
   function canUse(templatePlan: string) {
-    return planRank[userPlan] >= planRank[templatePlan]
+    return PLAN_RANK[userPlan] >= PLAN_RANK[templatePlan]
   }
 
   async function createFromTemplate(templateId: string) {
-    const template = TEMPLATES.find(t => t.id === templateId)
+    const template = TEMPLATES.find((t: any) => t.id === templateId)
     if (!template) return
-    if (!canUse(template.plan)) {
-      router.push("/upgrade"); return
-    }
+    if (!canUse(template.plan)) { router.push("/upgrade"); return }
     setCreating(true)
+
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push("/auth/login"); return }
 
-    const slug = template.id + "-" + Date.now().toString(36)
-    const { data: page } = await supabase.from("pages").insert({
+    const slug = templateId + "-" + Date.now().toString(36)
+    const { data: page, error } = await supabase.from("pages").insert({
       user_id: user.id,
       title: template.name,
       slug,
       status: "draft",
-      template_id: template.id,
-      theme: { name: template.name, bg: template.bg, surface: template.surface, primary: template.color, accent: template.accent, text: "#F5F0E8", muted: "#8A8478", fontDisplay: "Cormorant Garamond", fontBody: "DM Sans", bgMode: "solid" },
+      template_id: templateId,
+      theme: { name: template.name, bg: template.bg, surface: template.surface, primary: template.color, accent: template.accent, text: "#F5F0E8", muted: "#8A8478", fontDisplay: "Cormorant Garamond, serif", fontBody: "DM Sans, sans-serif" },
     }).select().single()
 
-    if (!page) { setCreating(false); return }
+    if (error || !page) { setCreating(false); return }
 
-    // QR code
+    const blocks = TEMPLATE_BLOCKS[templateId] || []
+    if (blocks.length > 0) {
+      await supabase.from("blocks").insert(
+        blocks.map((b: any, i: number) => ({ page_id: page.id, type: b.type, position: i, content: b.content, is_visible: true, styles: {} }))
+      )
+    }
+
     const shortCode = Math.random().toString(36).slice(2, 10)
     await supabase.from("qr_codes").insert({ page_id: page.id, user_id: user.id, short_code: shortCode })
 
-    router.push(`/dashboard/builder/${page.id}`)
+    router.push("/dashboard/builder/" + page.id)
   }
 
   const G = "#C9A84C"; const MUTED = "#8A8478"
-  const selectedTemplate = TEMPLATES.find(t => t.id === selected)
+  const selectedTemplate = TEMPLATES.find((t: any) => t.id === selected)
 
   return (
     <div style={{ minHeight: "100vh", background: "#080808", padding: "32px 24px 100px", fontFamily: "DM Sans, sans-serif" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-
-        {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: 36 }}>
+        <div style={{ textAlign: "center", marginBottom: 32 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 20, padding: "6px 16px", marginBottom: 14 }}>
             <Sparkles size={14} color={G} />
             <span style={{ color: G, fontSize: 12, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase" }}>14 templates disponibles</span>
           </div>
-          <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(28px,4vw,44px)", color: "#F5F0E8", fontWeight: 700, margin: "0 0 10px" }}>
-            Choisis ton template
-          </h1>
-          <p style={{ color: MUTED, fontSize: 15, margin: 0 }}>
-            Page pre-configuree, contenu ready, publie en 5 minutes.
-          </p>
+          <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(28px,4vw,44px)", color: "#F5F0E8", fontWeight: 700, margin: "0 0 10px" }}>Choisis ton template</h1>
+          <p style={{ color: MUTED, fontSize: 15, margin: 0 }}>Page pre-configuree avec les vrais blocs de ton domaine. Cree en 1 clic, personnalise en 5 minutes.</p>
         </div>
 
-        {/* Filters */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
-          {/* Search */}
-          <div style={{ position: "relative", maxWidth: 400, margin: "0 auto", width: "100%" }}>
-            <Search size={14} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: MUTED }} />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher un template..."
-              style={{ width: "100%", background: "#111009", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 10, padding: "10px 10px 10px 34px", color: "#F5F0E8", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
-          </div>
-
-          {/* Plan filter */}
-          <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-            {([["all", "Tous les plans", "#8A8478"], ["free", "Gratuit ★", "#8A8478"], ["pro", "Pro ⚡", "#C9A84C"], ["business", "Business 👑", "#39FF8F"]] as const).map(([plan, label, color]) => (
-              <button key={plan} onClick={() => setActivePlan(plan)}
-                style={{ background: activePlan === plan ? `${color}15` : "transparent", border: `1px solid ${activePlan === plan ? color + "50" : "rgba(255,255,255,0.08)"}`, borderRadius: 20, padding: "6px 16px", color: activePlan === plan ? color : MUTED, fontSize: 12, fontWeight: activePlan === plan ? 700 : 400, cursor: "pointer" }}>
-                {label}
-              </button>
-            ))}
-          </div>
-
-          {/* Category filter */}
-          <div style={{ display: "flex", gap: 6, justifyContent: "center", flexWrap: "wrap" }}>
-            {CATEGORIES.map(cat => (
-              <button key={cat} onClick={() => setActiveCategory(cat)}
-                style={{ background: activeCategory === cat ? "rgba(201,168,76,0.1)" : "transparent", border: `1px solid ${activeCategory === cat ? "rgba(201,168,76,0.3)" : "rgba(255,255,255,0.06)"}`, borderRadius: 16, padding: "5px 12px", color: activeCategory === cat ? G : MUTED, fontSize: 11, cursor: "pointer" }}>
-                {cat}
-              </button>
-            ))}
-          </div>
+        <div style={{ position: "relative", maxWidth: 400, margin: "0 auto 20px", width: "100%" }}>
+          <Search size={14} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: MUTED }} />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher un template..."
+            style={{ width: "100%", background: "#111009", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 10, padding: "10px 10px 10px 34px", color: "#F5F0E8", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
         </div>
 
-        {/* Stats */}
-        <div style={{ display: "flex", gap: 16, justifyContent: "center", marginBottom: 28 }}>
-          {[
-            { count: TEMPLATES.filter(t => t.plan === "free").length, label: "Gratuits", color: "#8A8478" },
-            { count: TEMPLATES.filter(t => t.plan === "pro").length, label: "Pro", color: G },
-            { count: TEMPLATES.filter(t => t.plan === "business").length, label: "Business", color: "#39FF8F" },
-          ].map((s, i) => (
-            <div key={i} style={{ textAlign: "center" }}>
-              <p style={{ color: s.color, fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>{s.count}</p>
-              <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{s.label}</p>
-            </div>
+        <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 12 }}>
+          {[["all", "Tous les plans", "#8A8478"], ["free", "Gratuit", "#8A8478"], ["starter", "Starter 2.99€", "#38BDF8"], ["pro", "Pro 9.99€", "#C9A84C"], ["business", "Business 24.99€", "#39FF8F"]].map(([plan, label, color]) => (
+            <button key={String(plan)} onClick={() => setActivePlan(String(plan))}
+              style={{ background: activePlan === plan ? String(color) + "20" : "transparent", border: "1px solid " + (activePlan === plan ? String(color) + "60" : "rgba(255,255,255,0.08)"), borderRadius: 20, padding: "6px 14px", color: activePlan === plan ? String(color) : MUTED, fontSize: 12, fontWeight: activePlan === plan ? 700 : 400, cursor: "pointer" }}>
+              {String(label)}
+            </button>
           ))}
         </div>
 
-        {/* Templates grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 18 }}>
-          {filtered.map(template => {
+        <div style={{ display: "flex", gap: 6, justifyContent: "center", flexWrap: "wrap", marginBottom: 28 }}>
+          {CATEGORIES.map(cat => (
+            <button key={cat} onClick={() => setActiveCategory(cat)}
+              style={{ background: activeCategory === cat ? "rgba(201,168,76,0.1)" : "transparent", border: "1px solid " + (activeCategory === cat ? "rgba(201,168,76,0.3)" : "rgba(255,255,255,0.06)"), borderRadius: 16, padding: "5px 12px", color: activeCategory === cat ? G : MUTED, fontSize: 11, cursor: "pointer" }}>
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: 16 }}>
+          {filtered.map((template: any) => {
             const isSelected = selected === template.id
             const planCfg = PLAN_CONFIG[template.plan]
             const locked = !canUse(template.plan)
+            const blockCount = (TEMPLATE_BLOCKS[template.id] || []).length
 
             return (
-              <div key={template.id} onClick={() => !locked && setSelected(isSelected ? null : template.id)}
-                style={{ background: isSelected ? "rgba(201,168,76,0.06)" : "#111009", border: `2px solid ${isSelected ? "rgba(201,168,76,0.6)" : locked ? "rgba(255,255,255,0.05)" : "rgba(201,168,76,0.1)"}`, borderRadius: 16, overflow: "hidden", cursor: locked ? "not-allowed" : "pointer", transition: "all 0.2s", transform: isSelected ? "scale(1.02)" : "scale(1)", opacity: locked ? 0.7 : 1, position: "relative" }}>
+              <div key={template.id} onClick={() => { if (!locked) setSelected(isSelected ? null : template.id) }}
+                style={{ background: isSelected ? "rgba(201,168,76,0.06)" : "#111009", border: "2px solid " + (isSelected ? "rgba(201,168,76,0.6)" : locked ? "rgba(255,255,255,0.04)" : "rgba(201,168,76,0.1)"), borderRadius: 16, overflow: "hidden", cursor: locked ? "not-allowed" : "pointer", transition: "all 0.2s", transform: isSelected ? "scale(1.02)" : "scale(1)", opacity: locked ? 0.65 : 1, position: "relative" }}>
 
-                {/* Preview header */}
-                <div style={{ height: 130, background: `linear-gradient(135deg, ${template.bg}, ${template.surface})`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
-                  {/* Glow */}
-                  <div style={{ position: "absolute", inset: 0, background: `radial-gradient(circle at 50% 50%, ${template.color}15, transparent 70%)` }} />
-
-                  {/* Mini page preview */}
-                  <div style={{ width: 100, background: template.bg, border: `1px solid ${template.color}30`, borderRadius: 8, overflow: "hidden", zIndex: 1 }}>
-                    <div style={{ height: 6, background: `linear-gradient(90deg,${template.color},${template.accent})` }} />
-                    <div style={{ padding: "8px 6px", display: "flex", flexDirection: "column", gap: 3 }}>
-                      <div style={{ width: "60%", height: 4, background: template.color + "60", borderRadius: 2, margin: "0 auto" }} />
-                      <div style={{ width: "40%", height: 3, background: MUTED + "40", borderRadius: 2, margin: "0 auto" }} />
-                      {template.tags.slice(0, 3).map((_, i) => (
-                        <div key={i} style={{ width: `${80 - i * 15}%`, height: 3, background: template.color + "20", borderRadius: 2 }} />
-                      ))}
-                      <div style={{ height: 8, background: template.color + "40", borderRadius: 2, marginTop: 2 }} />
+                <div style={{ height: 120, background: "linear-gradient(135deg, " + template.bg + ", " + template.surface + ")", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
+                  <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 50% 50%, " + template.color + "15, transparent 70%)" }} />
+                  <div style={{ width: 90, background: template.bg, border: "1px solid " + template.color + "25", borderRadius: 7, overflow: "hidden", zIndex: 1 }}>
+                    <div style={{ height: 5, background: "linear-gradient(90deg," + template.color + "," + template.accent + ")" }} />
+                    <div style={{ padding: "7px 6px", display: "flex", flexDirection: "column", gap: 3 }}>
+                      <div style={{ width: "60%", height: 3, background: template.color + "60", borderRadius: 2, margin: "0 auto" }} />
+                      <div style={{ width: "40%", height: 2, background: MUTED + "40", borderRadius: 2, margin: "0 auto" }} />
+                      {[80, 65, 50].map((w: number, i: number) => <div key={i} style={{ width: w + "%", height: 2, background: template.color + "20", borderRadius: 2 }} />)}
+                      <div style={{ height: 7, background: template.color + "35", borderRadius: 2, marginTop: 2 }} />
                     </div>
                   </div>
-
-                  {/* Emoji */}
-                  <div style={{ position: "absolute", top: 10, right: 12, fontSize: 26 }}>{template.emoji}</div>
-
-                  {/* Plan badge */}
-                  <div style={{ position: "absolute", top: 10, left: 12, display: "flex", alignItems: "center", gap: 4, background: planCfg.bg, border: `1px solid ${planCfg.color}30`, borderRadius: 12, padding: "3px 8px" }}>
-                    <span style={{ fontSize: 10 }}>{planCfg.icon}</span>
-                    <span style={{ color: planCfg.color, fontSize: 10, fontWeight: 700 }}>{planCfg.label}</span>
+                  <div style={{ position: "absolute", top: 8, right: 10, fontSize: 22 }}>{template.emoji}</div>
+                  <div style={{ position: "absolute", top: 8, left: 10, display: "flex", alignItems: "center", gap: 4, background: planCfg.color + "18", border: "1px solid " + planCfg.color + "30", borderRadius: 10, padding: "2px 7px" }}>
+                    <span style={{ fontSize: 9 }}>{planCfg.icon}</span>
+                    <span style={{ color: planCfg.color, fontSize: 9, fontWeight: 700 }}>{planCfg.label}</span>
                   </div>
-
-                  {/* Selected check */}
-                  {isSelected && (
-                    <div style={{ position: "absolute", bottom: 8, right: 8, background: G, borderRadius: "50%", width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <Check size={12} color="#080808" />
-                    </div>
-                  )}
-
-                  {/* Lock overlay */}
+                  {isSelected && <div style={{ position: "absolute", bottom: 8, right: 8, background: G, borderRadius: "50%", width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center" }}><Check size={11} color="#080808" /></div>}
                   {locked && (
-                    <div style={{ position: "absolute", inset: 0, background: "rgba(8,8,8,0.5)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4 }}>
-                      <Lock size={20} color={planCfg.color} />
-                      <span style={{ color: planCfg.color, fontSize: 11, fontWeight: 700 }}>Plan {planCfg.label} requis</span>
+                    <div style={{ position: "absolute", inset: 0, background: "rgba(8,8,8,0.55)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4 }}>
+                      <Lock size={18} color={planCfg.color} />
+                      <span style={{ color: planCfg.color, fontSize: 10, fontWeight: 700 }}>Plan {planCfg.label} requis</span>
                     </div>
                   )}
-
-                  {/* Bottom accent */}
-                  <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg,${template.color},${template.accent})` }} />
+                  <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg," + template.color + "," + template.accent + ")" }} />
                 </div>
 
-                {/* Info */}
-                <div style={{ padding: "14px 16px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-                    <h3 style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: 0, flex: 1 }}>{template.name}</h3>
-                    <span style={{ background: template.color + "12", border: `1px solid ${template.color}25`, borderRadius: 8, padding: "2px 7px", fontSize: 9, color: template.color, fontWeight: 600 }}>{template.category}</span>
+                <div style={{ padding: "12px 14px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4 }}>
+                    <h3 style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 700, margin: 0, flex: 1 }}>{template.name}</h3>
+                    <span style={{ background: template.color + "12", border: "1px solid " + template.color + "20", borderRadius: 6, padding: "1px 6px", fontSize: 9, color: template.color, fontWeight: 600 }}>{template.category}</span>
                   </div>
-                  <p style={{ color: MUTED, fontSize: 11, margin: "0 0 8px", lineHeight: 1.5 }}>{template.description}</p>
-
+                  <p style={{ color: MUTED, fontSize: 11, margin: "0 0 7px", lineHeight: 1.5 }}>{template.description}</p>
                   {template.highlight && (
-                    <div style={{ display: "flex", alignItems: "center", gap: 5, background: template.color + "08", border: `1px solid ${template.color}15`, borderRadius: 6, padding: "5px 8px", marginBottom: 8 }}>
-                      <span style={{ color: template.color, fontSize: 10 }}>✦</span>
-                      <span style={{ color: template.color, fontSize: 10, fontWeight: 600 }}>{template.highlight}</span>
+                    <div style={{ background: template.color + "08", border: "1px solid " + template.color + "15", borderRadius: 5, padding: "4px 7px", marginBottom: 7 }}>
+                      <span style={{ color: template.color, fontSize: 9, fontWeight: 600 }}>✦ {template.highlight}</span>
                     </div>
                   )}
-
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
-                      {template.tags.slice(0, 3).map((tag, i) => (
-                        <span key={i} style={{ background: "rgba(255,255,255,0.05)", borderRadius: 4, padding: "2px 5px", fontSize: 9, color: MUTED }}>{tag}</span>
+                    <div style={{ display: "flex", gap: 3 }}>
+                      {template.tags.slice(0, 3).map((tag: string, i: number) => (
+                        <span key={i} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 3, padding: "1px 5px", fontSize: 9, color: MUTED }}>{tag}</span>
                       ))}
                     </div>
-                    <span style={{ color: MUTED, fontSize: 10 }}>{template.blockCount} blocs</span>
+                    <span style={{ color: template.color, fontSize: 10, fontWeight: 700 }}>{blockCount} blocs</span>
                   </div>
                 </div>
               </div>
@@ -342,40 +175,30 @@ export default function TemplatesPage() {
           })}
         </div>
 
-        {filtered.length === 0 && (
-          <div style={{ textAlign: "center", padding: "60px 24px", color: MUTED }}>
-            <p style={{ fontSize: 32, margin: "0 0 12px" }}>🔍</p>
-            <p style={{ fontSize: 14 }}>Aucun template pour cette recherche</p>
-          </div>
-        )}
-
-        {/* Blank option */}
-        <div style={{ textAlign: "center", marginTop: 32 }}>
-          <button onClick={() => router.push("/dashboard")}
-            style={{ background: "transparent", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 10, padding: "12px 24px", color: MUTED, fontSize: 13, cursor: "pointer" }}>
+        <div style={{ textAlign: "center", marginTop: 28 }}>
+          <button onClick={() => router.push("/dashboard")} style={{ background: "transparent", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 10, padding: "11px 22px", color: MUTED, fontSize: 13, cursor: "pointer" }}>
             Commencer avec une page vide →
           </button>
         </div>
       </div>
 
-      {/* Bottom CTA */}
       {selected && selectedTemplate && (
         <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#0C0B09", borderTop: "1px solid rgba(201,168,76,0.2)", padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, zIndex: 100, boxShadow: "0 -8px 30px rgba(0,0,0,0.5)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <div style={{ width: 44, height: 44, background: selectedTemplate.bg, border: `1px solid ${selectedTemplate.color}30`, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{selectedTemplate.emoji}</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 40, height: 40, background: selectedTemplate.bg, border: "1px solid " + selectedTemplate.color + "30", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>{selectedTemplate.emoji}</div>
             <div>
-              <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: 0 }}>{selectedTemplate.name}</p>
-              <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{selectedTemplate.blockCount} blocs · theme {selectedTemplate.category}</p>
+              <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 700, margin: 0 }}>{selectedTemplate.name}</p>
+              <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{(TEMPLATE_BLOCKS[selectedTemplate.id] || []).length} blocs preconfigures — pret a personnaliser</p>
             </div>
           </div>
-          <div style={{ display: "flex", gap: 10 }}>
-            <button onClick={() => setSelected(null)}
-              style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 16px", color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}>
-              <X size={13} /> Annuler
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={() => setSelected(null)} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, padding: "9px 14px", color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", gap: 5, fontSize: 12 }}>
+              <X size={12} /> Annuler
             </button>
-            <button onClick={() => createFromTemplate(selected)} disabled={creating}
-              style={{ display: "flex", alignItems: "center", gap: 8, background: `linear-gradient(90deg,${G},#b8953f)`, border: "none", borderRadius: 10, padding: "10px 22px", color: "#080808", fontSize: 13, fontWeight: 700, cursor: creating ? "wait" : "pointer", opacity: creating ? 0.7 : 1, boxShadow: `0 4px 20px rgba(201,168,76,0.3)` }}>
-              {creating ? "Creation..." : <><Sparkles size={13} /> Utiliser ce template <ArrowRight size={13} /></>}
+            <button onClick={() => createFromTemplate(selected!)} disabled={creating}
+              style={{ display: "flex", alignItems: "center", gap: 7, background: "linear-gradient(90deg,#C9A84C,#b8953f)", border: "none", borderRadius: 9, padding: "9px 20px", color: "#080808", fontSize: 13, fontWeight: 700, cursor: creating ? "wait" : "pointer", opacity: creating ? 0.7 : 1 }}>
+              {creating ? "Creation en cours..." : "Utiliser ce template"}
+              {!creating && <ArrowRight size={12} />}
             </button>
           </div>
         </div>
