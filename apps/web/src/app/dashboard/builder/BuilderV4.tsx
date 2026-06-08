@@ -603,6 +603,9 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
   const [publishing, setPublishing] = useState(false)
   const [pageName, setPageName] = useState("")
   const [demoMode, setDemoMode] = useState(false)
+  const [qrCodeUrl, setQrCodeUrl] = useState("")
+  const [qrShortCode, setQrShortCode] = useState("")
+  const [showQrPanel, setShowQrPanel] = useState(false)
   const G = "#C9A84C"; const MUTED = "#8A8478"
 
   // Load
@@ -617,6 +620,18 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
       if (page.theme && typeof page.theme === "object") setTheme({ ...PRESET_THEMES.midnight_gold, ...page.theme })
       const { data: blks } = await supabase.from("blocks").select("*").eq("page_id", pageId).order("position")
       if (blks) setBlocks(blks.map(b => ({ id: b.id, type: b.type, content: b.content || {}, visible: b.is_visible !== false })))
+
+      // Charger le QR code
+      const { data: qr } = await supabase.from("qr_codes").select("short_code, qr_url").eq("page_id", pageId).single()
+      if (qr) {
+        setQrShortCode(qr.short_code || "")
+        if (qr.qr_url) setQrCodeUrl(qr.qr_url)
+        else {
+          // Générer l URL du QR via api publique
+          const appUrl = typeof window !== "undefined" ? window.location.origin : ""
+          setQrCodeUrl(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(appUrl + "/q/" + qr.short_code)}&color=C9A84C&bgcolor=080808&margin=10`)
+        }
+      }
     }
     load()
   }, [pageId])
@@ -733,6 +748,8 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "#080808", fontFamily: "DM Sans, sans-serif" }}>
       {/* Fonts */}
+      {showQrPanel && <div onClick={() => setShowQrPanel(false)} style={{ position: "fixed", inset: 0, zIndex: 199 }} />}
+
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}
         @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}} @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}} .iphone-scroll::-webkit-scrollbar{display:none}
@@ -818,6 +835,47 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
             style={{ width: 30, height: 30, background: dayMode ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.05)", border: `1px solid ${dayMode ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.08)"}`, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: dayMode ? "#F59E0B" : MUTED }}>
             {dayMode ? <Sun size={14} /> : <Moon size={14} />}
           </button>
+
+          {/* QR Code button */}
+          {qrCodeUrl && (
+            <div style={{ position: "relative" }}>
+              <button onClick={() => setShowQrPanel(p => !p)}
+                style={{ display: "flex", alignItems: "center", gap: 6, background: showQrPanel ? "rgba(201,168,76,0.15)" : "rgba(201,168,76,0.08)", border: `1px solid ${showQrPanel ? "rgba(201,168,76,0.5)" : "rgba(201,168,76,0.2)"}`, borderRadius: 8, padding: "5px 12px", color: G, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                <span style={{ fontSize: 14 }}>⬛</span> QR Code
+              </button>
+
+              {showQrPanel && (
+                <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, background: "#161616", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 16, padding: "20px", zIndex: 200, boxShadow: "0 8px 40px rgba(0,0,0,0.6)", width: 220 }}>
+                  <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 700, margin: "0 0 12px", textAlign: "center", fontFamily: "Cormorant Garamond, serif" }}>Mon QR Code</p>
+
+                  {/* QR image */}
+                  <div style={{ background: "#080808", borderRadius: 12, padding: 12, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(201,168,76,0.15)" }}>
+                    <img src={qrCodeUrl} alt="QR Code" style={{ width: 140, height: 140, imageRendering: "pixelated" }} />
+                  </div>
+
+                  {/* URL courte */}
+                  <div style={{ background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 8, padding: "8px 10px", marginBottom: 10 }}>
+                    <p style={{ color: MUTED, fontSize: 9, margin: "0 0 2px", textTransform: "uppercase", letterSpacing: 1 }}>URL de scan</p>
+                    <p style={{ color: G, fontSize: 11, margin: 0, fontFamily: "JetBrains Mono, monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {typeof window !== "undefined" ? window.location.origin : ""}/q/{qrShortCode}
+                    </p>
+                  </div>
+
+                  {/* Actions */}
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <a href={qrCodeUrl} download="qrcode.png"
+                      style={{ flex: 1, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 8, padding: "8px", color: G, textDecoration: "none", fontSize: 11, fontWeight: 600, textAlign: "center" }}>
+                      ↓ PNG
+                    </a>
+                    <a href="/dashboard/qr-codes"
+                      style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "8px", color: MUTED, textDecoration: "none", fontSize: 11, textAlign: "center" }}>
+                      Perso →
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Preview plein ecran */}
           {pageStatus === "published" && pageSlug && (
