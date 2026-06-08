@@ -308,6 +308,166 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
         ))}
       </div>
     )
+    case "cover_banner": return (
+      <div style={{ position: "relative", overflow: "hidden", borderRadius: "10px 10px 0 0" }}>
+        {c.src
+          ? <img src={c.src} alt="" style={{ width: "100%", height: c.height === "lg" ? 160 : c.height === "sm" ? 80 : 120, objectFit: "cover", display: "block" }} />
+          : <div style={{ width: "100%", height: c.height === "lg" ? 160 : c.height === "sm" ? 80 : 120, background: `linear-gradient(135deg, ${G}30, ${theme.accent || "#39FF8F"}20)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ color: MUTED, fontSize: 11 }}>Banniere / Cover</span>
+            </div>
+        }
+        {c.overlay_color && <div style={{ position: "absolute", inset: 0, background: c.overlay_color, opacity: parseFloat(c.overlay_opacity || "0.3") }} />}
+        {c.cover_title && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "flex-end", padding: "12px 16px" }}>
+          <p style={{ color: "#fff", fontSize: 18, fontWeight: 700, margin: 0, fontFamily: `${FD}, serif`, textShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>{c.cover_title}</p>
+        </div>}
+      </div>
+    )
+
+    case "about": return (
+      <div style={{ padding: "12px 16px", ...s }}>
+        {c.emoji && <span style={{ fontSize: 20, display: "block", marginBottom: 6 }}>{c.emoji}</span>}
+        {c.title && <p style={{ color: G, fontSize: 11, fontWeight: 700, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1.5 }}>{c.title}</p>}
+        <p style={{ color: TEXT, fontSize: 13, lineHeight: 1.75, margin: 0 }}>{c.text || "Votre histoire ici..."}</p>
+        {c.collapsible === "yes" && <button style={{ color: G, fontSize: 11, background: "none", border: "none", cursor: "pointer", padding: "6px 0 0", fontWeight: 600 }}>Lire la suite →</button>}
+      </div>
+    )
+
+    case "availability": {
+      const statusConfig: Record<string, { color: string; bg: string; border: string; label: string }> = {
+        available: { color: "#39FF8F", bg: "rgba(57,255,143,0.08)", border: "rgba(57,255,143,0.25)", label: "Disponible" },
+        busy: { color: "#F97316", bg: "rgba(249,115,22,0.08)", border: "rgba(249,115,22,0.25)", label: "En mission" },
+        closed: { color: "#EF4444", bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.25)", label: "Indisponible" },
+      }
+      const sc = statusConfig[c.status || "available"]
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          <div style={{ background: sc.bg, border: `1px solid ${sc.border}`, borderRadius: 13, padding: "14px 16px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: c.message ? 6 : 0 }}>
+              <div style={{ width: 10, height: 10, borderRadius: "50%", background: sc.color, boxShadow: `0 0 8px ${sc.color}80`, flexShrink: 0 }} />
+              <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0 }}>{sc.label}</p>
+              {c.available_from && <span style={{ color: MUTED, fontSize: 11, marginLeft: "auto" }}>dès {c.available_from}</span>}
+            </div>
+            {c.message && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 10px", lineHeight: 1.5 }}>{c.message}</p>}
+            {c.cta_label && <div style={{ background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 9, padding: "10px", textAlign: "center", fontSize: 13, fontWeight: 700, color: dayMode ? "#fff" : "#080808" }}>{c.cta_label}</div>}
+          </div>
+        </div>
+      )
+    }
+
+    case "journey": {
+      const lines = [c.line_1, c.line_2, c.line_3, c.line_4].filter(Boolean)
+      return lines.length > 0 ? (
+        <div style={{ padding: "10px 16px 14px", ...s }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {lines.map((line: string, i: number) => (
+              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, background: `${G}06`, border: `1px solid ${G}12`, borderRadius: 10, padding: "10px 12px" }}>
+                <span style={{ fontSize: 16, flexShrink: 0, lineHeight: 1.4 }}>{line.split(" ")[0]}</span>
+                <span style={{ color: TEXT, fontSize: 13, lineHeight: 1.5 }}>{line.split(" ").slice(1).join(" ")}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : <div style={{ padding: "16px", textAlign: "center", color: MUTED, fontSize: 12, ...s }}>Ajoutez vos chiffres cles</div>
+    }
+
+    case "expertise": {
+      const skills = [
+        [c.s1_name, c.s1_level, c.s1_icon],
+        [c.s2_name, c.s2_level, c.s2_icon],
+        [c.s3_name, c.s3_level, c.s3_icon],
+        [c.s4_name, c.s4_level, c.s4_icon],
+        [c.s5_name, c.s5_level, c.s5_icon],
+      ].filter(([n]) => n)
+      return skills.length > 0 ? (
+        <div style={{ padding: "10px 16px 14px", ...s }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+            {skills.map(([name, level, icon], i: number) => {
+              const pct = Math.round((parseInt(level || "3") / 5) * 100)
+              return (
+                <div key={i}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+                    <span style={{ color: TEXT, fontSize: 12, display: "flex", alignItems: "center", gap: 6 }}>
+                      {icon && <span>{icon}</span>}{name}
+                    </span>
+                    <span style={{ color: G, fontSize: 10, fontWeight: 700 }}>{pct}%</span>
+                  </div>
+                  <div style={{ height: 5, background: dayMode ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${pct}%`, background: `linear-gradient(90deg,${G},${theme.accent || "#39FF8F"})`, borderRadius: 3, transition: "width 0.5s" }} />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      ) : <div style={{ padding: "16px", textAlign: "center", color: MUTED, fontSize: 12, ...s }}>Ajoutez vos expertises</div>
+    }
+
+    case "languages": {
+      const langs = [
+        [c.lang_1_flag, c.lang_1_name, c.lang_1_level],
+        [c.lang_2_flag, c.lang_2_name, c.lang_2_level],
+        [c.lang_3_flag, c.lang_3_name, c.lang_3_level],
+        [c.lang_4_flag, c.lang_4_name, c.lang_4_level],
+      ].filter(([, n]) => n)
+      return langs.length > 0 ? (
+        <div style={{ padding: "10px 16px 14px", ...s }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+            {langs.map(([flag, name, level], i: number) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 12px", background: dayMode ? "#F3F4F6" : "rgba(255,255,255,0.03)", border: `1px solid ${dayMode ? "#E5E7EB" : "rgba(255,255,255,0.06)"}`, borderRadius: 10 }}>
+                <span style={{ fontSize: 20 }}>{flag || "🌐"}</span>
+                <span style={{ color: TEXT, fontSize: 13, fontWeight: 600, flex: 1 }}>{name}</span>
+                <span style={{ background: G + "15", border: `1px solid ${G}25`, borderRadius: 20, padding: "3px 10px", color: G, fontSize: 10, fontWeight: 600 }}>{level || "Courant"}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : <div style={{ padding: "16px", textAlign: "center", color: MUTED, fontSize: 12, ...s }}>Ajoutez vos langues</div>
+    }
+
+    case "certifications": {
+      const certs = [
+        [c.cert_1_icon, c.cert_1_name, c.cert_1_org, c.cert_1_year],
+        [c.cert_2_icon, c.cert_2_name, c.cert_2_org, c.cert_2_year],
+        [c.cert_3_icon, c.cert_3_name, c.cert_3_org, c.cert_3_year],
+        [c.cert_4_icon, c.cert_4_name, c.cert_4_org, c.cert_4_year],
+      ].filter(([, n]) => n)
+      return certs.length > 0 ? (
+        <div style={{ padding: "10px 16px 14px", ...s }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+            {certs.map(([icon, name, org, year], i: number) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", background: `${G}06`, border: `1px solid ${G}12`, borderRadius: 11 }}>
+                <span style={{ fontSize: 20, flexShrink: 0 }}>{icon || "🏆"}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ color: TEXT, fontSize: 12, fontWeight: 700, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</p>
+                  <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{org}{year ? ` · ${year}` : ""}</p>
+                </div>
+                <Check size={13} color={G} style={{ flexShrink: 0 }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : <div style={{ padding: "16px", textAlign: "center", color: MUTED, fontSize: 12, ...s }}>Ajoutez vos certifications</div>
+    }
+
+    case "company": return (
+      <div style={{ padding: "10px 16px 14px", ...s }}>
+        <div style={{ display: "flex", gap: 13, alignItems: "center", background: dayMode ? "#F3F4F6" : "rgba(255,255,255,0.03)", border: `1px solid ${dayMode ? "#E5E7EB" : "rgba(255,255,255,0.06)"}`, borderRadius: 13, padding: "13px 14px" }}>
+          {c.logo_url
+            ? <img src={c.logo_url} alt="" style={{ width: 44, height: 44, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
+            : <div style={{ width: 44, height: 44, borderRadius: 10, background: `${G}15`, border: `1px solid ${G}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>🏢</div>
+          }
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 2px", fontFamily: `${FD}, serif` }}>{c.company_name || "Mon Entreprise"}</p>
+            <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.sector}{c.founded_year ? ` · Depuis ${c.founded_year}` : ""}</p>
+          </div>
+        </div>
+      </div>
+    )
+
     default: return (
       <div style={{ padding: "12px 16px", textAlign: "center", ...s }}>
         <span style={{ fontSize: 24 }}>{BLOCK_DEFS[block.type]?.icon || "📦"}</span>
