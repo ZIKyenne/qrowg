@@ -785,8 +785,6 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "url", label: "Lien formulaire", type: "url", placeholder: "https://..." },
       { key: "description", label: "Description", type: "text", placeholder: "Reponse sous 24h" },
     ],
-  },
-}
 
   // ── Nouveaux blocs Identite ───────────────────────────────────────────────
   cover_banner: {
