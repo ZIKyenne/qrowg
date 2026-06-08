@@ -324,7 +324,7 @@ function EditPanel({ block, onChange }: { block: Block; onChange: (content: Bloc
 
   const G = "#C9A84C"; const MUTED = "#8A8478"
   const inputStyle: React.CSSProperties = {
-    width: "100%", background: "#0d0c09", border: "1px solid rgba(201,168,76,0.2)",
+    width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)",
     borderRadius: 9, padding: "9px 12px", color: "#F5F0E8", fontSize: 13,
     outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif",
     transition: "border-color 0.2s"
@@ -380,7 +380,7 @@ function ThemePanel({ theme, onChange }: { theme: PageTheme; onChange: (t: PageT
   const [activeTab, setActiveTab] = useState<"presets" | "colors" | "fonts" | "bg">("presets")
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", background: "#0d0c09", border: "1px solid rgba(201,168,76,0.2)",
+    width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)",
     borderRadius: 9, padding: "9px 12px", color: "#F5F0E8", fontSize: 13,
     outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif"
   }
@@ -743,7 +743,7 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
       `}</style>
 
       {/* ── SIDEBAR GAUCHE — Bibliothèque ─────────────────────────────────── */}
-      <div style={{ width: 260, background: "#0C0B09", borderRight: "1px solid rgba(201,168,76,0.1)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ width: 260, background: "#0A0A0A", borderRight: "1px solid rgba(201,168,76,0.1)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         {/* Search */}
         <div style={{ padding: "14px 12px 8px" }}>
           <div style={{ position: "relative" }}>
@@ -799,7 +799,7 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
 
       {/* ── TOPBAR ─────────────────────────────────────────────────────────── */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <div style={{ height: 50, background: "#0C0B09", borderBottom: "1px solid rgba(201,168,76,0.1)", display: "flex", alignItems: "center", padding: "0 16px", gap: 10, flexShrink: 0 }}>
+        <div style={{ height: 50, background: "#0D0D0D", borderBottom: "1px solid rgba(201,168,76,0.12)", display: "flex", alignItems: "center", padding: "0 16px", gap: 10, flexShrink: 0 }}>
           {/* Back */}
           <a href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 5, color: MUTED, textDecoration: "none", fontSize: 12, marginRight: 6 }}>
             ← <span style={{ fontFamily: "Cormorant Garamond, serif", color: G, fontSize: 18, fontWeight: 700 }}>QRfolio</span>
@@ -836,13 +836,13 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
 
           {/* Publish */}
           <button onClick={() => setShowPublish(true)}
-            style={{ display: "flex", alignItems: "center", gap: 6, background: pageStatus === "published" ? "rgba(57,255,143,0.1)" : "linear-gradient(90deg,#C9A84C,#b8953f)", border: pageStatus === "published" ? "1px solid rgba(57,255,143,0.3)" : "none", borderRadius: 9, padding: "7px 16px", color: pageStatus === "published" ? "#39FF8F" : "#080808", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+            style={{ display: "flex", alignItems: "center", gap: 6, background: pageStatus === "published" ? "rgba(57,255,143,0.1)" : "linear-gradient(90deg,#C9A84C,#b8953f)", border: pageStatus === "published" ? "1px solid rgba(57,255,143,0.3)" : "none", borderRadius: 10, padding: "9px 22px", color: pageStatus === "published" ? "#39FF8F" : "#080808", fontSize: 14, fontWeight: 700, cursor: "pointer", boxShadow: pageStatus === "published" ? "none" : "0 4px 20px rgba(201,168,76,0.35)" }}>
             {pageStatus === "published" ? <><Check size={13} /> Publie</> : "Publier"}
           </button>
         </div>
 
         {/* ── CANVAS ────────────────────────────────────────────────────── */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", justifyContent: "center" }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", justifyContent: "center", background: "#111111" }}>
           <div style={{ width: "100%", maxWidth: 540 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
               <span style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 6, padding: "2px 10px", fontSize: 11, color: G, fontWeight: 600 }}>CANVAS</span>
@@ -919,7 +919,7 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
       </div>
 
       {/* ── PANEL DROIT ───────────────────────────────────────────────────── */}
-      <div style={{ width: 310, background: "#0C0B09", borderLeft: "1px solid rgba(201,168,76,0.1)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ width: 310, background: "#161616", borderLeft: "1px solid rgba(201,168,76,0.12)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         {/* Tabs */}
         <div style={{ display: "flex", borderBottom: "1px solid rgba(201,168,76,0.1)", flexShrink: 0 }}>
           {(["preview", "edit", "theme"] as const).map(tab => (
