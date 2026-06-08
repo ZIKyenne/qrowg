@@ -596,6 +596,198 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "size", label: "Taille", type: "select", options: ["xs", "sm", "md", "lg", "xl"] },
     ],
   },
+  // ── Nouveaux blocs Actions ────────────────────────────────────────────────
+  call_button: {
+    label: "Appeler", description: "Bouton d appel telephonique direct",
+    icon: "📞", color: "#39FF8F", category: "actions",
+    defaultContent: { label: "Appeler maintenant", phone: "" },
+    fields: [
+      { key: "label", label: "Texte", type: "text", placeholder: "Appeler maintenant" },
+      { key: "phone", label: "Numero de telephone", type: "text", placeholder: "+33 6 12 34 56 78" },
+      { key: "icon", label: "Emoji", type: "text", placeholder: "📞" },
+    ],
+  },
+  whatsapp_button: {
+    label: "WhatsApp", description: "Ouvrir une conversation WhatsApp",
+    icon: "💬", color: "#25D366", category: "actions",
+    defaultContent: { label: "Discuter sur WhatsApp", phone: "", message: "" },
+    fields: [
+      { key: "label", label: "Texte", type: "text", placeholder: "Discuter sur WhatsApp" },
+      { key: "phone", label: "Numero (avec indicatif)", type: "text", placeholder: "33612345678" },
+      { key: "message", label: "Message pre-rempli", type: "text", placeholder: "Bonjour, j ai une question..." },
+    ],
+  },
+  email_button: {
+    label: "Email", description: "Bouton pour envoyer un email",
+    icon: "✉️", color: "#38BDF8", category: "actions",
+    defaultContent: { label: "Envoyer un email", email: "", subject: "" },
+    fields: [
+      { key: "label", label: "Texte", type: "text", placeholder: "Envoyer un email" },
+      { key: "email", label: "Adresse email", type: "text", placeholder: "contact@monsite.com" },
+      { key: "subject", label: "Sujet pre-rempli", type: "text", placeholder: "Demande de renseignements" },
+    ],
+  },
+  download_file: {
+    label: "Telecharger un fichier", description: "Bouton de telechargement document",
+    icon: "📄", color: "#A78BFA", category: "actions",
+    defaultContent: { label: "Telecharger la brochure", type_doc: "PDF" },
+    fields: [
+      { key: "label", label: "Texte", type: "text", placeholder: "Telecharger la brochure" },
+      { key: "url", label: "Lien du fichier", type: "url", placeholder: "https://..." },
+      { key: "type_doc", label: "Type", type: "select", options: ["PDF","Brochure","CV","Carte","Catalogue","Tarif"] },
+      { key: "icon", label: "Emoji", type: "text", placeholder: "📄" },
+    ],
+  },
+  vcard: {
+    label: "Ajouter aux contacts", description: "vCard — ajouter la fiche contact",
+    icon: "👤", color: "#C9A84C", category: "actions",
+    defaultContent: { label: "Ajouter a mes contacts", name: "" },
+    fields: [
+      { key: "label", label: "Texte bouton", type: "text", placeholder: "Ajouter a mes contacts" },
+      { key: "name", label: "Nom complet", type: "text", placeholder: "Jean Dupont" },
+      { key: "phone", label: "Telephone", type: "text", placeholder: "+33 6 12 34 56 78" },
+      { key: "email", label: "Email", type: "text", placeholder: "jean@email.com" },
+      { key: "company", label: "Entreprise", type: "text", placeholder: "Studio PIXEL" },
+      { key: "website", label: "Site web", type: "url", placeholder: "https://monsite.com" },
+      { key: "address", label: "Adresse", type: "text", placeholder: "Paris, France" },
+    ],
+  },
+  google_review: {
+    label: "Laisser un avis Google", description: "Redirection vers Google Reviews",
+    icon: "⭐", color: "#FBBF24", category: "actions",
+    defaultContent: { label: "Donner un avis", url: "" },
+    fields: [
+      { key: "label", label: "Texte", type: "text", placeholder: "Donner un avis" },
+      { key: "url", label: "Lien Google Review", type: "url", placeholder: "https://g.page/r/..." },
+      { key: "stars", label: "Etoiles affichees", type: "select", options: ["5","4","3"] },
+    ],
+  },
+  table_booking: {
+    label: "Reserver une table", description: "Reservation restaurant externe",
+    icon: "🍽️", color: "#EF4444", category: "actions",
+    defaultContent: { label: "Reserver une table", platform: "TheFork" },
+    fields: [
+      { key: "label", label: "Texte", type: "text", placeholder: "Reserver une table" },
+      { key: "url", label: "Lien reservation", type: "url", placeholder: "https://..." },
+      { key: "platform", label: "Plateforme", type: "select", options: ["TheFork","Zenchef","OpenTable","URL personnalisee"] },
+    ],
+  },
+  order_online: {
+    label: "Commander en ligne", description: "Livraison ou commande en ligne",
+    icon: "🛒", color: "#F97316", category: "actions",
+    defaultContent: { label: "Commander maintenant", platform: "Uber Eats" },
+    fields: [
+      { key: "label", label: "Texte", type: "text", placeholder: "Commander maintenant" },
+      { key: "url", label: "Lien commande", type: "url", placeholder: "https://..." },
+      { key: "platform", label: "Plateforme", type: "select", options: ["Uber Eats","Deliveroo","Just Eat","DoorDash","Glovo","Site web"] },
+    ],
+  },
+  free_gift: {
+    label: "Cadeau gratuit", description: "Offrir un document ou ressource",
+    icon: "🎁", color: "#EC4899", category: "actions",
+    defaultContent: { label: "Recevoir mon guide gratuit", description: "" },
+    fields: [
+      { key: "label", label: "Texte bouton", type: "text", placeholder: "Recevoir mon guide gratuit" },
+      { key: "description", label: "Description courte", type: "text", placeholder: "Guide PDF gratuit - 20 pages" },
+      { key: "url", label: "Lien du fichier", type: "url", placeholder: "https://..." },
+      { key: "emoji", label: "Emoji", type: "text", placeholder: "🎁" },
+    ],
+  },
+  donation: {
+    label: "Faire un don", description: "Soutenir le createur",
+    icon: "☕", color: "#F59E0B", category: "actions",
+    defaultContent: { label: "Soutenir mon travail", platform: "Ko-fi" },
+    fields: [
+      { key: "label", label: "Texte", type: "text", placeholder: "Soutenir mon travail" },
+      { key: "url", label: "Lien", type: "url", placeholder: "https://ko-fi.com/..." },
+      { key: "platform", label: "Plateforme", type: "select", options: ["Ko-fi","Buy Me A Coffee","Patreon","PayPal","Tipeee"] },
+    ],
+  },
+  multi_cta: {
+    label: "Multi CTA", description: "Plusieurs actions dans un seul bloc",
+    icon: "⚡", color: "#39FF8F", category: "actions",
+    defaultContent: { btn1_label: "Appeler", btn1_icon: "📞", btn1_url: "tel:", btn2_label: "WhatsApp", btn2_icon: "💬", btn2_url: "https://wa.me/" },
+    fields: [
+      { key: "btn1_icon", label: "Btn 1 — Emoji", type: "text", placeholder: "📞" },
+      { key: "btn1_label", label: "Btn 1 — Texte", type: "text", placeholder: "Appeler" },
+      { key: "btn1_url", label: "Btn 1 — Lien", type: "url", placeholder: "tel:+33..." },
+      { key: "btn2_icon", label: "Btn 2 — Emoji", type: "text", placeholder: "💬" },
+      { key: "btn2_label", label: "Btn 2 — Texte", type: "text", placeholder: "WhatsApp" },
+      { key: "btn2_url", label: "Btn 2 — Lien", type: "url", placeholder: "https://wa.me/..." },
+      { key: "btn3_icon", label: "Btn 3 — Emoji", type: "text", placeholder: "📅" },
+      { key: "btn3_label", label: "Btn 3 — Texte", type: "text", placeholder: "Reserver" },
+      { key: "btn3_url", label: "Btn 3 — Lien", type: "url", placeholder: "https://..." },
+      { key: "btn4_icon", label: "Btn 4 — Emoji", type: "text", placeholder: "✉️" },
+      { key: "btn4_label", label: "Btn 4 — Texte", type: "text", placeholder: "Email" },
+      { key: "btn4_url", label: "Btn 4 — Lien", type: "url", placeholder: "mailto:..." },
+    ],
+  },
+  app_download: {
+    label: "Telecharger l application", description: "Liens App Store et Google Play",
+    icon: "📲", color: "#818CF8", category: "actions",
+    defaultContent: { label: "Telecharger l application", ios_url: "", android_url: "" },
+    fields: [
+      { key: "label", label: "Titre", type: "text", placeholder: "Telecharger l application" },
+      { key: "ios_url", label: "Lien App Store", type: "url", placeholder: "https://apps.apple.com/..." },
+      { key: "android_url", label: "Lien Google Play", type: "url", placeholder: "https://play.google.com/..." },
+    ],
+  },
+  promo_code: {
+    label: "Coupon promo", description: "Afficher un code promotionnel",
+    icon: "🎟️", color: "#F97316", category: "actions",
+    defaultContent: { code: "QRFOLIO10", description: "-10% sur votre commande" },
+    fields: [
+      { key: "code", label: "Code promo", type: "text", placeholder: "QRFOLIO10" },
+      { key: "description", label: "Description", type: "text", placeholder: "-10% sur votre commande" },
+      { key: "expires", label: "Date expiration", type: "text", placeholder: "30 juin 2025" },
+    ],
+  },
+  limited_offer: {
+    label: "Offre limitee", description: "Promotion temporaire urgente",
+    icon: "⚡", color: "#EF4444", category: "actions",
+    defaultContent: { title: "Offre limitee", description: "Valable jusqu au 30 juin", cta_label: "Profiter de l offre", cta_url: "#" },
+    fields: [
+      { key: "title", label: "Titre", type: "text", placeholder: "Offre speciale -30%" },
+      { key: "description", label: "Description", type: "text", placeholder: "Valable jusqu au 30 juin" },
+      { key: "expires", label: "Date limite", type: "text", placeholder: "30 juin 2025" },
+      { key: "cta_label", label: "Texte bouton", type: "text", placeholder: "Profiter de l offre" },
+      { key: "cta_url", label: "Lien", type: "url", placeholder: "https://..." },
+    ],
+  },
+  booking_button: {
+    label: "Prendre rendez-vous", description: "Reservation autre que Calendly",
+    icon: "📅", color: "#38BDF8", category: "actions",
+    defaultContent: { label: "Prendre rendez-vous", platform: "URL personnalisee" },
+    fields: [
+      { key: "label", label: "Texte", type: "text", placeholder: "Prendre rendez-vous" },
+      { key: "url", label: "Lien", type: "url", placeholder: "https://..." },
+      { key: "platform", label: "Plateforme", type: "select", options: ["Google Calendar","Microsoft Bookings","HubSpot Meetings","URL personnalisee"] },
+      { key: "description", label: "Description", type: "text", placeholder: "30 min - Gratuit" },
+    ],
+  },
+  payment_button: {
+    label: "Paiement direct", description: "Encaisser un paiement en ligne",
+    icon: "💳", color: "#39FF8F", category: "actions",
+    defaultContent: { label: "Payer maintenant", platform: "Stripe" },
+    fields: [
+      { key: "label", label: "Texte", type: "text", placeholder: "Payer maintenant" },
+      { key: "url", label: "Lien de paiement", type: "url", placeholder: "https://buy.stripe.com/..." },
+      { key: "platform", label: "Plateforme", type: "select", options: ["Stripe","PayPal","Lydia","Revolut","SumUp"] },
+      { key: "amount", label: "Montant affiche", type: "text", placeholder: "29€" },
+    ],
+  },
+  quote_request: {
+    label: "Demander un devis", description: "Redirection vers formulaire devis",
+    icon: "📋", color: "#C9A84C", category: "actions",
+    defaultContent: { label: "Demander un devis", url: "#" },
+    fields: [
+      { key: "label", label: "Texte", type: "text", placeholder: "Demander un devis" },
+      { key: "url", label: "Lien formulaire", type: "url", placeholder: "https://..." },
+      { key: "description", label: "Description", type: "text", placeholder: "Reponse sous 24h" },
+    ],
+  },
+}
+
   // ── Nouveaux blocs Identite ───────────────────────────────────────────────
   cover_banner: {
     label: "Banniere / Cover", description: "Image de fond en haut de page",

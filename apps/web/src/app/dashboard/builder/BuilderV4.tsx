@@ -1,4 +1,5 @@
 ﻿"use client"
+import React from "react"
 
 import { useState, useRef, useEffect, useCallback } from "react"
 import {
@@ -308,163 +309,255 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
         ))}
       </div>
     )
-    case "cover_banner": return (
-      <div style={{ position: "relative", overflow: "hidden", borderRadius: "10px 10px 0 0" }}>
-        {c.src
-          ? <img src={c.src} alt="" style={{ width: "100%", height: c.height === "lg" ? 160 : c.height === "sm" ? 80 : 120, objectFit: "cover", display: "block" }} />
-          : <div style={{ width: "100%", height: c.height === "lg" ? 160 : c.height === "sm" ? 80 : 120, background: `linear-gradient(135deg, ${G}30, ${theme.accent || "#39FF8F"}20)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ color: MUTED, fontSize: 11 }}>Banniere / Cover</span>
-            </div>
-        }
-        {c.overlay_color && <div style={{ position: "absolute", inset: 0, background: c.overlay_color, opacity: parseFloat(c.overlay_opacity || "0.3") }} />}
-        {c.cover_title && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "flex-end", padding: "12px 16px" }}>
-          <p style={{ color: "#fff", fontSize: 18, fontWeight: 700, margin: 0, fontFamily: `${FD}, serif`, textShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>{c.cover_title}</p>
-        </div>}
+
+    case "call_button": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <a href={`tel:${c.phone}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(57,255,143,0.1)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 14, padding: "14px 20px", textDecoration: "none", transition: "transform 0.15s" }}>
+          <span style={{ fontSize: 18 }}>{c.icon || "📞"}</span>
+          <span style={{ color: "#39FF8F", fontSize: 14, fontWeight: 700 }}>{c.label || "Appeler maintenant"}</span>
+        </a>
       </div>
     )
 
-    case "about": return (
-      <div style={{ padding: "12px 16px", ...s }}>
-        {c.emoji && <span style={{ fontSize: 20, display: "block", marginBottom: 6 }}>{c.emoji}</span>}
-        {c.title && <p style={{ color: G, fontSize: 11, fontWeight: 700, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1.5 }}>{c.title}</p>}
-        <p style={{ color: TEXT, fontSize: 13, lineHeight: 1.75, margin: 0 }}>{c.text || "Votre histoire ici..."}</p>
-        {c.collapsible === "yes" && <button style={{ color: G, fontSize: 11, background: "none", border: "none", cursor: "pointer", padding: "6px 0 0", fontWeight: 600 }}>Lire la suite →</button>}
-      </div>
-    )
-
-    case "availability": {
-      const statusConfig: Record<string, { color: string; bg: string; border: string; label: string }> = {
-        available: { color: "#39FF8F", bg: "rgba(57,255,143,0.08)", border: "rgba(57,255,143,0.25)", label: "Disponible" },
-        busy: { color: "#F97316", bg: "rgba(249,115,22,0.08)", border: "rgba(249,115,22,0.25)", label: "En mission" },
-        closed: { color: "#EF4444", bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.25)", label: "Indisponible" },
-      }
-      const sc = statusConfig[c.status || "available"]
+    case "whatsapp_button": {
+      const waUrl = c.phone ? `https://wa.me/${c.phone}${c.message ? `?text=${encodeURIComponent(c.message)}` : ""}` : "#"
       return (
-        <div style={{ padding: "10px 16px", ...s }}>
-          <div style={{ background: sc.bg, border: `1px solid ${sc.border}`, borderRadius: 13, padding: "14px 16px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: c.message ? 6 : 0 }}>
-              <div style={{ width: 10, height: 10, borderRadius: "50%", background: sc.color, boxShadow: `0 0 8px ${sc.color}80`, flexShrink: 0 }} />
-              <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0 }}>{sc.label}</p>
-              {c.available_from && <span style={{ color: MUTED, fontSize: 11, marginLeft: "auto" }}>dès {c.available_from}</span>}
+        <div style={{ padding: "4px 16px 10px", ...s }}>
+          <a href={waUrl} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(37,211,102,0.1)", border: "1.5px solid rgba(37,211,102,0.3)", borderRadius: 14, padding: "14px 20px", textDecoration: "none" }}>
+            <span style={{ fontSize: 18 }}>💬</span>
+            <span style={{ color: "#25D366", fontSize: 14, fontWeight: 700 }}>{c.label || "Discuter sur WhatsApp"}</span>
+          </a>
+        </div>
+      )
+    }
+
+    case "email_button": {
+      const mailUrl = c.email ? `mailto:${c.email}${c.subject ? `?subject=${encodeURIComponent(c.subject)}` : ""}` : "#"
+      return (
+        <div style={{ padding: "4px 16px 10px", ...s }}>
+          <a href={mailUrl} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(56,189,248,0.1)", border: "1.5px solid rgba(56,189,248,0.3)", borderRadius: 14, padding: "14px 20px", textDecoration: "none" }}>
+            <span style={{ fontSize: 18 }}>✉️</span>
+            <span style={{ color: "#38BDF8", fontSize: 14, fontWeight: 700 }}>{c.label || "Envoyer un email"}</span>
+          </a>
+        </div>
+      )
+    }
+
+    case "download_file": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <a href={c.url || "#"} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(167,139,250,0.08)", border: "1.5px solid rgba(167,139,250,0.25)", borderRadius: 14, padding: "13px 16px", textDecoration: "none" }}>
+          <div style={{ width: 40, height: 40, background: "rgba(167,139,250,0.15)", border: "1px solid rgba(167,139,250,0.25)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+            {c.icon || "📄"}
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label || "Telecharger la brochure"}</p>
+            {c.type_doc && <p style={{ color: "#8A8478", fontSize: 10, margin: "2px 0 0" }}>{c.type_doc}</p>}
+          </div>
+          <span style={{ color: "#A78BFA", fontSize: 18 }}>↓</span>
+        </a>
+      </div>
+    )
+
+    case "vcard": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <div style={{ background: `${G}08`, border: `1.5px solid ${G}30`, borderRadius: 14, padding: "14px 16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: c.name ? 10 : 0 }}>
+            <div style={{ width: 40, height: 40, borderRadius: "50%", background: `linear-gradient(135deg,${G},${G}80)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>👤</div>
+            <div style={{ flex: 1 }}>
+              {c.name && <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0 }}>{c.name}</p>}
+              {c.company && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.company}</p>}
             </div>
-            {c.message && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 10px", lineHeight: 1.5 }}>{c.message}</p>}
-            {c.cta_label && <div style={{ background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 9, padding: "10px", textAlign: "center", fontSize: 13, fontWeight: 700, color: dayMode ? "#fff" : "#080808" }}>{c.cta_label}</div>}
+          </div>
+          <div style={{ background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 10, padding: "11px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#080808" }}>
+            {c.label || "Ajouter a mes contacts"}
+          </div>
+        </div>
+      </div>
+    )
+
+    case "google_review": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <a href={c.url || "#"} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(251,191,36,0.08)", border: "1.5px solid rgba(251,191,36,0.25)", borderRadius: 14, padding: "13px 16px", textDecoration: "none" }}>
+          <div style={{ flexShrink: 0, textAlign: "center" }}>
+            <div style={{ display: "flex", gap: 2, marginBottom: 2 }}>
+              {Array.from({length: parseInt(c.stars || "5")}).map((_, i) => <span key={i} style={{ color: "#FBBF24", fontSize: 14 }}>★</span>)}
+            </div>
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label || "Donner un avis"}</p>
+            <p style={{ color: MUTED, fontSize: 10, margin: "2px 0 0" }}>Google Reviews</p>
+          </div>
+          <span style={{ color: "#FBBF24", fontSize: 20 }}>⭐</span>
+        </a>
+      </div>
+    )
+
+    case "table_booking": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <a href={c.url || "#"} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(239,68,68,0.1)", border: "1.5px solid rgba(239,68,68,0.25)", borderRadius: 14, padding: "14px 20px", textDecoration: "none" }}>
+          <span style={{ fontSize: 18 }}>🍽️</span>
+          <div style={{ textAlign: "center" }}>
+            <p style={{ color: "#EF4444", fontSize: 14, fontWeight: 700, margin: 0 }}>{c.label || "Reserver une table"}</p>
+            {c.platform && c.platform !== "URL personnalisee" && <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>via {c.platform}</p>}
+          </div>
+        </a>
+      </div>
+    )
+
+    case "order_online": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <a href={c.url || "#"} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(249,115,22,0.1)", border: "1.5px solid rgba(249,115,22,0.25)", borderRadius: 14, padding: "14px 20px", textDecoration: "none" }}>
+          <span style={{ fontSize: 18 }}>🛒</span>
+          <div style={{ textAlign: "center" }}>
+            <p style={{ color: "#F97316", fontSize: 14, fontWeight: 700, margin: 0 }}>{c.label || "Commander maintenant"}</p>
+            {c.platform && <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>via {c.platform}</p>}
+          </div>
+        </a>
+      </div>
+    )
+
+    case "free_gift": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <div style={{ background: "rgba(236,72,153,0.08)", border: "1.5px solid rgba(236,72,153,0.25)", borderRadius: 14, padding: "14px 16px", textAlign: "center" }}>
+          <span style={{ fontSize: 32, display: "block", marginBottom: 8 }}>{c.emoji || "🎁"}</span>
+          {c.description && <p style={{ color: MUTED, fontSize: 11, margin: "0 0 10px", lineHeight: 1.5 }}>{c.description}</p>}
+          <div style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 10, padding: "11px", fontSize: 13, fontWeight: 700, color: "#fff" }}>
+            {c.label || "Recevoir mon guide gratuit"}
+          </div>
+        </div>
+      </div>
+    )
+
+    case "donation": {
+      const donationColors: Record<string, string> = { "Ko-fi": "#FF5E5B", "Buy Me A Coffee": "#FFDD00", "Patreon": "#FF424D", "PayPal": "#009CDE", "Tipeee": "#E55100" }
+      const dc = donationColors[c.platform || "Ko-fi"] || "#F59E0B"
+      const donationIcons: Record<string, string> = { "Ko-fi": "☕", "Buy Me A Coffee": "☕", "Patreon": "🎨", "PayPal": "💙", "Tipeee": "💜" }
+      const di = donationIcons[c.platform || "Ko-fi"] || "☕"
+      return (
+        <div style={{ padding: "4px 16px 10px", ...s }}>
+          <a href={c.url || "#"} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: dc + "12", border: `1.5px solid ${dc}30`, borderRadius: 14, padding: "14px 20px", textDecoration: "none" }}>
+            <span style={{ fontSize: 20 }}>{di}</span>
+            <div style={{ textAlign: "center" }}>
+              <p style={{ color: dc, fontSize: 14, fontWeight: 700, margin: 0 }}>{c.label || "Soutenir mon travail"}</p>
+              {c.platform && <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{c.platform}</p>}
+            </div>
+          </a>
+        </div>
+      )
+    }
+
+    case "multi_cta": {
+      const btns = [[c.btn1_icon,c.btn1_label,c.btn1_url],[c.btn2_icon,c.btn2_label,c.btn2_url],[c.btn3_icon,c.btn3_label,c.btn3_url],[c.btn4_icon,c.btn4_label,c.btn4_url]].filter(([,l]) => l)
+      return (
+        <div style={{ padding: "4px 16px 10px", ...s }}>
+          <div style={{ display: "grid", gridTemplateColumns: btns.length <= 2 ? "1fr 1fr" : btns.length === 3 ? "1fr 1fr 1fr" : "1fr 1fr", gap: 8 }}>
+            {btns.map(([icon, label, url], i) => (
+              <a key={i} href={url || "#"} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, background: i % 2 === 0 ? `${G}10` : "rgba(57,255,143,0.08)", border: `1px solid ${i % 2 === 0 ? G + "25" : "rgba(57,255,143,0.2)"}`, borderRadius: 12, padding: "12px 8px", textDecoration: "none" }}>
+                <span style={{ fontSize: 22 }}>{icon || "⚡"}</span>
+                <span style={{ color: TEXT, fontSize: 11, fontWeight: 600, textAlign: "center" }}>{label}</span>
+              </a>
+            ))}
           </div>
         </div>
       )
     }
 
-    case "journey": {
-      const lines = [c.line_1, c.line_2, c.line_3, c.line_4].filter(Boolean)
-      return lines.length > 0 ? (
-        <div style={{ padding: "10px 16px 14px", ...s }}>
-          {c.title && <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {lines.map((line: string, i: number) => (
-              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, background: `${G}06`, border: `1px solid ${G}12`, borderRadius: 10, padding: "10px 12px" }}>
-                <span style={{ fontSize: 16, flexShrink: 0, lineHeight: 1.4 }}>{line.split(" ")[0]}</span>
-                <span style={{ color: TEXT, fontSize: 13, lineHeight: 1.5 }}>{line.split(" ").slice(1).join(" ")}</span>
+    case "app_download": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {c.ios_url && (
+            <a href={c.ios_url} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(0,0,0,0.3)", border: "1.5px solid rgba(255,255,255,0.15)", borderRadius: 13, padding: "12px 16px", textDecoration: "none" }}>
+              <span style={{ fontSize: 26 }}>🍎</span>
+              <div>
+                <p style={{ color: MUTED, fontSize: 9, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>Disponible sur</p>
+                <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0 }}>App Store</p>
               </div>
-            ))}
-          </div>
-        </div>
-      ) : <div style={{ padding: "16px", textAlign: "center", color: MUTED, fontSize: 12, ...s }}>Ajoutez vos chiffres cles</div>
-    }
-
-    case "expertise": {
-      const skills = [
-        [c.s1_name, c.s1_level, c.s1_icon],
-        [c.s2_name, c.s2_level, c.s2_icon],
-        [c.s3_name, c.s3_level, c.s3_icon],
-        [c.s4_name, c.s4_level, c.s4_icon],
-        [c.s5_name, c.s5_level, c.s5_icon],
-      ].filter(([n]) => n)
-      return skills.length > 0 ? (
-        <div style={{ padding: "10px 16px 14px", ...s }}>
-          {c.title && <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
-          <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-            {skills.map(([name, level, icon], i: number) => {
-              const pct = Math.round((parseInt(level || "3") / 5) * 100)
-              return (
-                <div key={i}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-                    <span style={{ color: TEXT, fontSize: 12, display: "flex", alignItems: "center", gap: 6 }}>
-                      {icon && <span>{icon}</span>}{name}
-                    </span>
-                    <span style={{ color: G, fontSize: 10, fontWeight: 700 }}>{pct}%</span>
-                  </div>
-                  <div style={{ height: 5, background: dayMode ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: `${pct}%`, background: `linear-gradient(90deg,${G},${theme.accent || "#39FF8F"})`, borderRadius: 3, transition: "width 0.5s" }} />
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      ) : <div style={{ padding: "16px", textAlign: "center", color: MUTED, fontSize: 12, ...s }}>Ajoutez vos expertises</div>
-    }
-
-    case "languages": {
-      const langs = [
-        [c.lang_1_flag, c.lang_1_name, c.lang_1_level],
-        [c.lang_2_flag, c.lang_2_name, c.lang_2_level],
-        [c.lang_3_flag, c.lang_3_name, c.lang_3_level],
-        [c.lang_4_flag, c.lang_4_name, c.lang_4_level],
-      ].filter(([, n]) => n)
-      return langs.length > 0 ? (
-        <div style={{ padding: "10px 16px 14px", ...s }}>
-          {c.title && <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
-          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-            {langs.map(([flag, name, level], i: number) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 12px", background: dayMode ? "#F3F4F6" : "rgba(255,255,255,0.03)", border: `1px solid ${dayMode ? "#E5E7EB" : "rgba(255,255,255,0.06)"}`, borderRadius: 10 }}>
-                <span style={{ fontSize: 20 }}>{flag || "🌐"}</span>
-                <span style={{ color: TEXT, fontSize: 13, fontWeight: 600, flex: 1 }}>{name}</span>
-                <span style={{ background: G + "15", border: `1px solid ${G}25`, borderRadius: 20, padding: "3px 10px", color: G, fontSize: 10, fontWeight: 600 }}>{level || "Courant"}</span>
+            </a>
+          )}
+          {c.android_url && (
+            <a href={c.android_url} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(0,0,0,0.3)", border: "1.5px solid rgba(255,255,255,0.15)", borderRadius: 13, padding: "12px 16px", textDecoration: "none" }}>
+              <span style={{ fontSize: 26 }}>🤖</span>
+              <div>
+                <p style={{ color: MUTED, fontSize: 9, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>Disponible sur</p>
+                <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0 }}>Google Play</p>
               </div>
-            ))}
+            </a>
+          )}
+          {!c.ios_url && !c.android_url && (
+            <div style={{ textAlign: "center", padding: "16px", color: MUTED, fontSize: 12 }}>Ajoutez vos liens App Store / Google Play</div>
+          )}
+        </div>
+      </div>
+    )
+
+    case "promo_code": {
+      const [copied, setCopied] = React.useState(false)
+      return (
+        <div style={{ padding: "4px 16px 10px", ...s }}>
+          <div style={{ background: "rgba(249,115,22,0.08)", border: "2px dashed rgba(249,115,22,0.3)", borderRadius: 14, padding: "16px", textAlign: "center" }}>
+            {c.description && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 10px" }}>{c.description}</p>}
+            <button onClick={() => { navigator.clipboard.writeText(c.code || ""); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
+              style={{ background: "rgba(249,115,22,0.15)", border: "2px solid rgba(249,115,22,0.4)", borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontFamily: "JetBrains Mono, monospace", fontSize: 20, fontWeight: 700, color: "#F97316", letterSpacing: 3, width: "100%", transition: "all 0.2s" }}>
+              {c.code || "PROMO10"}
+            </button>
+            <p style={{ color: MUTED, fontSize: 10, margin: "6px 0 0" }}>{copied ? "✓ Code copie !" : "Cliquer pour copier"}</p>
+            {c.expires && <p style={{ color: MUTED, fontSize: 10, margin: "4px 0 0" }}>Expire le {c.expires}</p>}
           </div>
         </div>
-      ) : <div style={{ padding: "16px", textAlign: "center", color: MUTED, fontSize: 12, ...s }}>Ajoutez vos langues</div>
+      )
     }
 
-    case "certifications": {
-      const certs = [
-        [c.cert_1_icon, c.cert_1_name, c.cert_1_org, c.cert_1_year],
-        [c.cert_2_icon, c.cert_2_name, c.cert_2_org, c.cert_2_year],
-        [c.cert_3_icon, c.cert_3_name, c.cert_3_org, c.cert_3_year],
-        [c.cert_4_icon, c.cert_4_name, c.cert_4_org, c.cert_4_year],
-      ].filter(([, n]) => n)
-      return certs.length > 0 ? (
-        <div style={{ padding: "10px 16px 14px", ...s }}>
-          {c.title && <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
-          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-            {certs.map(([icon, name, org, year], i: number) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", background: `${G}06`, border: `1px solid ${G}12`, borderRadius: 11 }}>
-                <span style={{ fontSize: 20, flexShrink: 0 }}>{icon || "🏆"}</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ color: TEXT, fontSize: 12, fontWeight: 700, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</p>
-                  <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{org}{year ? ` · ${year}` : ""}</p>
-                </div>
-                <Check size={13} color={G} style={{ flexShrink: 0 }} />
-              </div>
-            ))}
+    case "limited_offer": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <div style={{ background: "rgba(239,68,68,0.08)", border: "1.5px solid rgba(239,68,68,0.3)", borderRadius: 14, padding: "14px 16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 6 }}>
+            <span style={{ color: "#EF4444", fontSize: 16 }}>⚡</span>
+            <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0 }}>{c.title || "Offre limitee"}</p>
           </div>
+          {c.description && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 8px", lineHeight: 1.5 }}>{c.description}</p>}
+          {c.expires && <p style={{ color: "#EF4444", fontSize: 11, margin: "0 0 10px", fontWeight: 600 }}>⏰ Expire le {c.expires}</p>}
+          {c.cta_label && <div style={{ background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 9, padding: "10px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#EF4444" }}>{c.cta_label}</div>}
         </div>
-      ) : <div style={{ padding: "16px", textAlign: "center", color: MUTED, fontSize: 12, ...s }}>Ajoutez vos certifications</div>
-    }
+      </div>
+    )
 
-    case "company": return (
-      <div style={{ padding: "10px 16px 14px", ...s }}>
-        <div style={{ display: "flex", gap: 13, alignItems: "center", background: dayMode ? "#F3F4F6" : "rgba(255,255,255,0.03)", border: `1px solid ${dayMode ? "#E5E7EB" : "rgba(255,255,255,0.06)"}`, borderRadius: 13, padding: "13px 14px" }}>
-          {c.logo_url
-            ? <img src={c.logo_url} alt="" style={{ width: 44, height: 44, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
-            : <div style={{ width: 44, height: 44, borderRadius: 10, background: `${G}15`, border: `1px solid ${G}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>🏢</div>
-          }
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 2px", fontFamily: `${FD}, serif` }}>{c.company_name || "Mon Entreprise"}</p>
-            <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.sector}{c.founded_year ? ` · Depuis ${c.founded_year}` : ""}</p>
+    case "booking_button": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <a href={c.url || "#"} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(56,189,248,0.08)", border: "1.5px solid rgba(56,189,248,0.25)", borderRadius: 14, padding: "13px 16px", textDecoration: "none" }}>
+          <div style={{ width: 42, height: 42, background: "rgba(56,189,248,0.12)", border: "1px solid rgba(56,189,248,0.25)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>📅</div>
+          <div style={{ flex: 1 }}>
+            <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label || "Prendre rendez-vous"}</p>
+            {c.description && <p style={{ color: MUTED, fontSize: 10, margin: "2px 0 0" }}>{c.description}</p>}
+            {c.platform && c.platform !== "URL personnalisee" && <p style={{ color: "#38BDF8", fontSize: 9, margin: "2px 0 0" }}>via {c.platform}</p>}
           </div>
-        </div>
+        </a>
+      </div>
+    )
+
+    case "payment_button": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <a href={c.url || "#"} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(57,255,143,0.1)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 14, padding: "14px 20px", textDecoration: "none" }}>
+          <span style={{ fontSize: 18 }}>💳</span>
+          <div style={{ textAlign: "center" }}>
+            <p style={{ color: "#39FF8F", fontSize: 14, fontWeight: 700, margin: 0 }}>
+              {c.label || "Payer maintenant"}{c.amount ? ` — ${c.amount}` : ""}
+            </p>
+            {c.platform && <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>via {c.platform}</p>}
+          </div>
+        </a>
+      </div>
+    )
+
+    case "quote_request": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <a href={c.url || "#"} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 12, background: `${G}08`, border: `1.5px solid ${G}25`, borderRadius: 14, padding: "13px 16px", textDecoration: "none" }}>
+          <div style={{ width: 42, height: 42, background: `${G}12`, border: `1px solid ${G}25`, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>📋</div>
+          <div style={{ flex: 1 }}>
+            <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label || "Demander un devis"}</p>
+            {c.description && <p style={{ color: MUTED, fontSize: 10, margin: "2px 0 0" }}>{c.description}</p>}
+          </div>
+          <span style={{ color: G, fontSize: 16 }}>→</span>
+        </a>
       </div>
     )
 
