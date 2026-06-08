@@ -725,4 +725,3 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
 }
-}
