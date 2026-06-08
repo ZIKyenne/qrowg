@@ -1041,8 +1041,8 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
                   <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#39FF8F", animation: "pulse 2s infinite" }} />
                 </div>
                 <a href={pageSlug ? `/${pageSlug}` : "#"} target="_blank" rel="noopener noreferrer"
-                  style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 7, padding: "5px 10px", color: G, textDecoration: "none", fontSize: 11, fontWeight: 600 }}>
-                  <ExternalLink size={11} /> Voir
+                  style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 8, padding: "6px 12px", color: G, textDecoration: "none", fontSize: 11, fontWeight: 700, boxShadow: "0 2px 8px rgba(201,168,76,0.15)" }}>
+                  <ExternalLink size={11} /> Voir en direct
                 </a>
               </div>
 
@@ -1128,43 +1128,55 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
               </div>
 
               {/* QR Code + Stats sous l iPhone */}
-              <div style={{ marginTop: 20, display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+              <div style={{ marginTop: 24, display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
 
-                {/* QR Code */}
-                {qrCodeUrl ? (
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-                    <div style={{ background: "#080808", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 14, padding: 10, boxShadow: "0 4px 20px rgba(0,0,0,0.5)" }}>
-                      <img src={qrCodeUrl} alt="QR" style={{ width: 90, height: 90, imageRendering: "pixelated", display: "block" }} />
+                {/* QR Code — grand, fond blanc */}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+                  <p style={{ color: MUTED, fontSize: 10, margin: 0, textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 600 }}>QR Code</p>
+                  {qrCodeUrl ? (
+                    <div style={{ background: "#FFFFFF", border: "3px solid rgba(201,168,76,0.3)", borderRadius: 16, padding: 10, boxShadow: "0 8px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.1)" }}>
+                      <img src={qrCodeUrl} alt="QR" style={{ width: 140, height: 140, imageRendering: "pixelated", display: "block" }} />
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: pageStatus === "published" ? "#39FF8F" : MUTED, boxShadow: pageStatus === "published" ? "0 0 6px #39FF8F60" : "none" }} />
-                      <span style={{ color: MUTED, fontSize: 10, fontFamily: "JetBrains Mono, monospace" }}>/q/{qrShortCode}</span>
+                  ) : (
+                    <div style={{ background: "#FFFFFF", border: "3px solid rgba(201,168,76,0.2)", borderRadius: 16, padding: 10, width: 140, height: 140, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 30px rgba(0,0,0,0.4)" }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2, width: 100, height: 100 }}>
+                        {Array.from({length: 49}).map((_, i) => {
+                          const corners = [0,1,2,6,7,13,14,42,43,35,41,48,47,46]
+                          const isCorner = corners.includes(i)
+                          return <div key={i} style={{ background: isCorner ? "#111" : Math.random() > 0.5 ? "#111" : "transparent", borderRadius: 1 }} />
+                        })}
+                      </div>
                     </div>
+                  )}
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, padding: "4px 12px" }}>
+                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: pageStatus === "published" ? "#39FF8F" : MUTED, boxShadow: pageStatus === "published" ? "0 0 6px #39FF8F80" : "none" }} />
+                    <span style={{ color: MUTED, fontSize: 10, fontFamily: "JetBrains Mono, monospace" }}>
+                      {qrShortCode ? `/q/${qrShortCode}` : "en attente"}
+                    </span>
                   </div>
-                ) : (
-                  <div style={{ background: "#080808", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 14, padding: 16, textAlign: "center", width: 110 }}>
-                    <p style={{ fontSize: 28, margin: "0 0 4px" }}>⬛</p>
-                    <p style={{ color: MUTED, fontSize: 9, margin: 0 }}>QR apres publication</p>
-                  </div>
-                )}
+                </div>
 
                 {/* Stats */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, width: "100%" }}>
-                  <div style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 10, padding: "10px 12px", textAlign: "center" }}>
-                    <p style={{ color: "#C9A84C", fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>{pageStats.views.toLocaleString("fr-FR")}</p>
-                    <p style={{ color: MUTED, fontSize: 9, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>👁 Vues</p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, width: "100%" }}>
+                  <div style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 12, padding: "14px 12px", textAlign: "center" }}>
+                    <p style={{ color: "#C9A84C", fontSize: 26, fontWeight: 700, margin: "0 0 3px", fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{pageStats.views.toLocaleString("fr-FR")}</p>
+                    <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>👁 Vues</p>
                   </div>
-                  <div style={{ background: "rgba(57,255,143,0.06)", border: "1px solid rgba(57,255,143,0.15)", borderRadius: 10, padding: "10px 12px", textAlign: "center" }}>
-                    <p style={{ color: "#39FF8F", fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>{pageStats.scans.toLocaleString("fr-FR")}</p>
-                    <p style={{ color: MUTED, fontSize: 9, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>📱 Scans</p>
+                  <div style={{ background: "rgba(57,255,143,0.06)", border: "1px solid rgba(57,255,143,0.18)", borderRadius: 12, padding: "14px 12px", textAlign: "center" }}>
+                    <p style={{ color: "#39FF8F", fontSize: 26, fontWeight: 700, margin: "0 0 3px", fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{pageStats.scans.toLocaleString("fr-FR")}</p>
+                    <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>📱 Scans</p>
                   </div>
                 </div>
 
-                {/* Status + blocs */}
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: pageStatus === "published" ? "#39FF8F" : MUTED }} />
-                  <span style={{ color: MUTED, fontSize: 10 }}>{pageStatus === "published" ? "En ligne" : "Brouillon"} • {blocks.filter(b => b.visible).length} bloc{blocks.filter(b => b.visible).length > 1 ? "s" : ""}</span>
+                {/* Status */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "8px 16px", background: pageStatus === "published" ? "rgba(57,255,143,0.06)" : "rgba(255,255,255,0.03)", border: `1px solid ${pageStatus === "published" ? "rgba(57,255,143,0.2)" : "rgba(255,255,255,0.07)"}`, borderRadius: 20, width: "fit-content" }}>
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: pageStatus === "published" ? "#39FF8F" : MUTED, boxShadow: pageStatus === "published" ? "0 0 6px #39FF8F60" : "none" }} />
+                  <span style={{ color: pageStatus === "published" ? "#39FF8F" : MUTED, fontSize: 11, fontWeight: 600 }}>
+                    {pageStatus === "published" ? "En ligne" : "Brouillon"}
+                  </span>
+                  <span style={{ color: MUTED, fontSize: 10 }}>• {blocks.filter(b => b.visible).length} bloc{blocks.filter(b => b.visible).length > 1 ? "s" : ""}</span>
                 </div>
+
               </div>
             </div>
           )}
