@@ -757,6 +757,8 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
         ::-webkit-scrollbar-track{background:transparent}
         ::-webkit-scrollbar-thumb{background:rgba(201,168,76,0.2);border-radius:2px}
         .qrf-block-item:hover{background:rgba(201,168,76,0.05)!important;border-color:rgba(201,168,76,0.2)!important}
+        .block-drag-handle:active{cursor:grabbing}
+        @keyframes blockIn{from{opacity:0;transform:scale(0.98) translateY(4px)}to{opacity:1;transform:scale(1) translateY(0)}}
       `}</style>
 
       {/* ── SIDEBAR GAUCHE — Bibliothèque ─────────────────────────────────── */}
@@ -900,7 +902,7 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
         </div>
 
         {/* ── CANVAS ────────────────────────────────────────────────────── */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", justifyContent: "center", background: "#111111" }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: "24px 20px", display: "flex", justifyContent: "center", background: "linear-gradient(180deg, #111111 0%, #0E0E0E 100%)" }}>
           <div style={{ width: "100%", maxWidth: 540 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
               <span style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 6, padding: "2px 10px", fontSize: 11, color: G, fontWeight: 600 }}>CANVAS</span>
@@ -920,44 +922,66 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
                 return (
                   <div key={block.id}
                     onClick={() => { setSelectedId(block.id); setRightTab("edit") }}
-                    style={{ position: "relative", marginBottom: 6, border: `2px solid ${isSelected ? G + "80" : "rgba(255,255,255,0.04)"}`, borderRadius: 12, overflow: "visible", cursor: "pointer", transition: "border-color 0.2s", opacity: block.visible ? 1 : 0.4, background: "#0C0B09" }}
-                    onMouseEnter={e => { if (!isSelected) e.currentTarget.style.borderColor = "rgba(201,168,76,0.25)" }}
-                    onMouseLeave={e => { if (!isSelected) e.currentTarget.style.borderColor = "rgba(255,255,255,0.04)" }}>
+                    style={{ position: "relative", marginBottom: 8, border: `2px solid ${isSelected ? G + "90" : "rgba(255,255,255,0.03)"}`, borderRadius: 14, overflow: "visible", cursor: "pointer", transition: "all 0.2s", opacity: block.visible ? 1 : 0.4, background: "#131313", boxShadow: isSelected ? `0 0 0 1px ${G}30, 0 4px 20px rgba(0,0,0,0.4)` : "none" }}
+                    onMouseEnter={e => {
+                      if (!isSelected) e.currentTarget.style.borderColor = "rgba(201,168,76,0.3)"
+                      if (!isSelected) e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.3)"
+                      const overlay = e.currentTarget.querySelector(".block-actions-overlay") as HTMLElement
+                      const handle = e.currentTarget.querySelector(".block-drag-handle") as HTMLElement
+                      if (overlay) overlay.style.opacity = "1"
+                      if (handle) handle.style.opacity = "1"
+                    }}
+                    onMouseLeave={e => {
+                      if (!isSelected) e.currentTarget.style.borderColor = "rgba(255,255,255,0.03)"
+                      if (!isSelected) e.currentTarget.style.boxShadow = "none"
+                      const overlay = e.currentTarget.querySelector(".block-actions-overlay") as HTMLElement
+                      const handle = e.currentTarget.querySelector(".block-drag-handle") as HTMLElement
+                      if (overlay) overlay.style.opacity = "0"
+                      if (handle) handle.style.opacity = "0"
+                    }}>
 
-                    {/* Block header */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                      <GripVertical size={12} color={MUTED} style={{ cursor: "grab", opacity: 0.4 }} />
-                      <span style={{ fontSize: 14 }}>{def?.icon || "📦"}</span>
-                      <span style={{ color: isSelected ? G : "#F5F0E8", fontSize: 12, fontWeight: 600, flex: 1 }}>{def?.label || block.type}</span>
-                      {isSelected && <span style={{ background: G + "15", border: `1px solid ${G}30`, borderRadius: 4, padding: "1px 6px", color: G, fontSize: 9, fontWeight: 700 }}>Selectionne</span>}
+                    {/* Overlay actions — apparaissent au hover */}
+                    <div className="block-actions-overlay" style={{ position: "absolute", top: 6, right: 6, display: "flex", gap: 3, opacity: 0, transition: "opacity 0.15s", zIndex: 10 }}
+                      onClick={e => e.stopPropagation()}>
+                      <button onClick={() => moveBlock(block.id, -1)} disabled={idx === 0} title="Monter"
+                        style={{ width: 24, height: 24, background: "rgba(15,15,15,0.9)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: idx === 0 ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: idx === 0 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>
+                        <ChevronUp size={11} />
+                      </button>
+                      <button onClick={() => moveBlock(block.id, 1)} disabled={idx === blocks.length - 1} title="Descendre"
+                        style={{ width: 24, height: 24, background: "rgba(15,15,15,0.9)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: idx === blocks.length - 1 ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: idx === blocks.length - 1 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>
+                        <ChevronDown size={11} />
+                      </button>
+                      <button onClick={() => duplicateBlock(block.id)} title="Dupliquer"
+                        style={{ width: 24, height: 24, background: "rgba(15,15,15,0.9)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>
+                        <Copy size={11} />
+                      </button>
+                      <button onClick={() => toggleVisible(block.id)} title={block.visible ? "Masquer" : "Afficher"}
+                        style={{ width: 24, height: 24, background: "rgba(15,15,15,0.9)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: block.visible ? MUTED : "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>
+                        {block.visible ? <Eye size={11} /> : <EyeOff size={11} />}
+                      </button>
+                      <button onClick={() => deleteBlock(block.id)} title="Supprimer"
+                        style={{ width: 24, height: 24, background: "rgba(239,68,68,0.15)", backdropFilter: "blur(4px)", border: "1px solid rgba(239,68,68,0.3)", color: "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>
+                        <Trash2 size={11} />
+                      </button>
+                    </div>
 
-                      {/* Actions */}
-                      <div style={{ display: "flex", gap: 3 }} onClick={e => e.stopPropagation()}>
-                        <button onClick={() => moveBlock(block.id, -1)} disabled={idx === 0}
-                          style={{ width: 22, height: 22, background: "transparent", border: "none", color: idx === 0 ? "rgba(255,255,255,0.1)" : MUTED, cursor: idx === 0 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 4 }}>
-                          <ChevronUp size={11} />
-                        </button>
-                        <button onClick={() => moveBlock(block.id, 1)} disabled={idx === blocks.length - 1}
-                          style={{ width: 22, height: 22, background: "transparent", border: "none", color: idx === blocks.length - 1 ? "rgba(255,255,255,0.1)" : MUTED, cursor: idx === blocks.length - 1 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 4 }}>
-                          <ChevronDown size={11} />
-                        </button>
-                        <button onClick={() => duplicateBlock(block.id)}
-                          style={{ width: 22, height: 22, background: "transparent", border: "none", color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 4 }}>
-                          <Copy size={11} />
-                        </button>
-                        <button onClick={() => toggleVisible(block.id)}
-                          style={{ width: 22, height: 22, background: "transparent", border: "none", color: block.visible ? MUTED : "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 4 }}>
-                          {block.visible ? <Eye size={11} /> : <EyeOff size={11} />}
-                        </button>
-                        <button onClick={() => deleteBlock(block.id)}
-                          style={{ width: 22, height: 22, background: "transparent", border: "none", color: "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 4 }}>
-                          <Trash2 size={11} />
-                        </button>
+                    {/* Drag handle — gauche, apparait au hover */}
+                    <div className="block-drag-handle" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 20, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0, transition: "opacity 0.15s", cursor: "grab", zIndex: 10 }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                        {[0,1,2,3,4,5].map(i => <div key={i} style={{ width: 3, height: 3, borderRadius: "50%", background: "rgba(201,168,76,0.6)" }} />)}
                       </div>
                     </div>
 
-                    {/* Block preview */}
-                    <div style={{ ...bgStyle(), borderRadius: "0 0 10px 10px", overflow: "hidden" }}>
+                    {/* Badge type — coin bas gauche, discret */}
+                    {isSelected && (
+                      <div style={{ position: "absolute", bottom: 6, left: 24, display: "flex", alignItems: "center", gap: 4, background: "rgba(8,8,8,0.85)", backdropFilter: "blur(4px)", border: `1px solid ${G}30`, borderRadius: 6, padding: "2px 7px", zIndex: 10 }}>
+                        <span style={{ fontSize: 10 }}>{def?.icon}</span>
+                        <span style={{ color: G, fontSize: 9, fontWeight: 700 }}>{def?.label}</span>
+                      </div>
+                    )}
+
+                    {/* Block preview — pleine largeur, rendu final */}
+                    <div style={{ ...bgStyle(), borderRadius: 10, overflow: "hidden", minHeight: 40 }}>
                       <BlockPreview block={block} theme={theme} dayMode={dayMode} />
                     </div>
                   </div>
