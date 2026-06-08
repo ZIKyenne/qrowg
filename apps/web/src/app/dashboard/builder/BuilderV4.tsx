@@ -606,6 +606,7 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
   const [qrCodeUrl, setQrCodeUrl] = useState("")
   const [qrShortCode, setQrShortCode] = useState("")
   const [showQrPanel, setShowQrPanel] = useState(false)
+  const [pageStats, setPageStats] = useState({ views: 0, scans: 0, trend: 0 })
   const G = "#C9A84C"; const MUTED = "#8A8478"
 
   // Load
@@ -622,16 +623,17 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
       if (blks) setBlocks(blks.map(b => ({ id: b.id, type: b.type, content: b.content || {}, visible: b.is_visible !== false })))
 
       // Charger le QR code
-      const { data: qr } = await supabase.from("qr_codes").select("short_code, qr_url").eq("page_id", pageId).single()
+      const { data: qr } = await supabase.from("qr_codes").select("short_code, qr_url, total_scans").eq("page_id", pageId).single()
       if (qr) {
         setQrShortCode(qr.short_code || "")
-        if (qr.qr_url) setQrCodeUrl(qr.qr_url)
-        else {
-          // Générer l URL du QR via api publique
-          const appUrl = typeof window !== "undefined" ? window.location.origin : ""
-          setQrCodeUrl(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(appUrl + "/q/" + qr.short_code)}&color=C9A84C&bgcolor=080808&margin=10`)
-        }
+        const appUrl = typeof window !== "undefined" ? window.location.origin : ""
+        setQrCodeUrl(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(appUrl + "/q/" + qr.short_code)}&color=C9A84C&bgcolor=080808&margin=10`)
+        setPageStats(s => ({ ...s, scans: qr.total_scans || 0 }))
       }
+
+      // Charger les stats de la page
+      const { data: pageData } = await supabase.from("pages").select("total_views").eq("id", pageId).single()
+      if (pageData) setPageStats(s => ({ ...s, views: pageData.total_views || 0 }))
     }
     load()
   }, [pageId])
@@ -902,7 +904,7 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
         </div>
 
         {/* ── CANVAS ────────────────────────────────────────────────────── */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "24px 20px", display: "flex", justifyContent: "center", background: "linear-gradient(180deg, #111111 0%, #0E0E0E 100%)" }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: "24px 20px", display: "flex", justifyContent: "center", background: "#101010", backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "32px 32px" }}>
           <div style={{ width: "100%", maxWidth: 540 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
               <span style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 6, padding: "2px 10px", fontSize: 11, color: G, fontWeight: 600 }}>CANVAS</span>
@@ -989,19 +991,34 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
               })
             )}
 
-            {/* Add block */}
+            {/* Add block — CTA principal */}
             <button onClick={() => { setActiveCategory("identity"); setSearch("") }}
-              style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "transparent", border: "2px dashed rgba(201,168,76,0.15)", borderRadius: 12, padding: "14px", color: MUTED, fontSize: 13, cursor: "pointer", marginTop: 8, transition: "all 0.15s" }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)"; e.currentTarget.style.color = G }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(201,168,76,0.15)"; e.currentTarget.style.color = MUTED }}>
-              <Plus size={15} /> Ajouter un bloc
+              style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: "rgba(201,168,76,0.04)", border: "2px dashed rgba(201,168,76,0.2)", borderRadius: 14, padding: "18px", color: MUTED, fontSize: 14, fontWeight: 600, cursor: "pointer", marginTop: 10, transition: "all 0.2s", fontFamily: "DM Sans, sans-serif" }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = "rgba(201,168,76,0.5)"
+                e.currentTarget.style.color = G
+                e.currentTarget.style.background = "rgba(201,168,76,0.08)"
+                e.currentTarget.style.transform = "translateY(-1px)"
+                e.currentTarget.style.boxShadow = "0 4px 20px rgba(201,168,76,0.1)"
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = "rgba(201,168,76,0.2)"
+                e.currentTarget.style.color = MUTED
+                e.currentTarget.style.background = "rgba(201,168,76,0.04)"
+                e.currentTarget.style.transform = "translateY(0)"
+                e.currentTarget.style.boxShadow = "none"
+              }}>
+              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Plus size={14} color={G} />
+              </div>
+              Ajouter un nouveau bloc
             </button>
           </div>
         </div>
       </div>
 
       {/* ── PANEL DROIT ───────────────────────────────────────────────────── */}
-      <div style={{ width: 310, background: "#161616", borderLeft: "1px solid rgba(201,168,76,0.12)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ width: 340, background: "#161616", borderLeft: "1px solid rgba(201,168,76,0.12)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         {/* Tabs */}
         <div style={{ display: "flex", borderBottom: "1px solid rgba(201,168,76,0.1)", flexShrink: 0 }}>
           {(["preview", "edit", "theme"] as const).map(tab => (
@@ -1110,10 +1127,44 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
                 </div>
               </div>
 
-              {/* Info sous le mockup */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 14 }}>
-                <div style={{ width: 6, height: 6, borderRadius: "50%", background: pageStatus === "published" ? "#39FF8F" : MUTED }} />
-                <span style={{ color: MUTED, fontSize: 10 }}>{pageStatus === "published" ? "En ligne" : "Brouillon"} • {blocks.filter(b => b.visible).length} bloc{blocks.filter(b => b.visible).length > 1 ? "s" : ""}</span>
+              {/* QR Code + Stats sous l iPhone */}
+              <div style={{ marginTop: 20, display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+
+                {/* QR Code */}
+                {qrCodeUrl ? (
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+                    <div style={{ background: "#080808", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 14, padding: 10, boxShadow: "0 4px 20px rgba(0,0,0,0.5)" }}>
+                      <img src={qrCodeUrl} alt="QR" style={{ width: 90, height: 90, imageRendering: "pixelated", display: "block" }} />
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: pageStatus === "published" ? "#39FF8F" : MUTED, boxShadow: pageStatus === "published" ? "0 0 6px #39FF8F60" : "none" }} />
+                      <span style={{ color: MUTED, fontSize: 10, fontFamily: "JetBrains Mono, monospace" }}>/q/{qrShortCode}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ background: "#080808", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 14, padding: 16, textAlign: "center", width: 110 }}>
+                    <p style={{ fontSize: 28, margin: "0 0 4px" }}>⬛</p>
+                    <p style={{ color: MUTED, fontSize: 9, margin: 0 }}>QR apres publication</p>
+                  </div>
+                )}
+
+                {/* Stats */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, width: "100%" }}>
+                  <div style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 10, padding: "10px 12px", textAlign: "center" }}>
+                    <p style={{ color: "#C9A84C", fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>{pageStats.views.toLocaleString("fr-FR")}</p>
+                    <p style={{ color: MUTED, fontSize: 9, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>👁 Vues</p>
+                  </div>
+                  <div style={{ background: "rgba(57,255,143,0.06)", border: "1px solid rgba(57,255,143,0.15)", borderRadius: 10, padding: "10px 12px", textAlign: "center" }}>
+                    <p style={{ color: "#39FF8F", fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>{pageStats.scans.toLocaleString("fr-FR")}</p>
+                    <p style={{ color: MUTED, fontSize: 9, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>📱 Scans</p>
+                  </div>
+                </div>
+
+                {/* Status + blocs */}
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: pageStatus === "published" ? "#39FF8F" : MUTED }} />
+                  <span style={{ color: MUTED, fontSize: 10 }}>{pageStatus === "published" ? "En ligne" : "Brouillon"} • {blocks.filter(b => b.visible).length} bloc{blocks.filter(b => b.visible).length > 1 ? "s" : ""}</span>
+                </div>
               </div>
             </div>
           )}
