@@ -735,7 +735,7 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
       {/* Fonts */}
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}
-        @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}} @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}} .iphone-scroll::-webkit-scrollbar{display:none}
         ::-webkit-scrollbar{width:4px;height:4px}
         ::-webkit-scrollbar-track{background:transparent}
         ::-webkit-scrollbar-thumb{background:rgba(201,168,76,0.2);border-radius:2px}
@@ -931,40 +931,107 @@ export default function BuilderV4({ pageId }: { pageId: string }) {
         </div>
 
         <div style={{ flex: 1, overflowY: "auto" }}>
-          {/* Preview */}
+          {/* Preview iPhone Mockup */}
           {rightTab === "preview" && (
-            <div style={{ padding: "14px" }}>
-              {/* Bouton plein ecran */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>Apercu mobile</p>
+            <div style={{ padding: "14px 10px" }}>
+              {/* Header */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <Smartphone size={13} color={G} />
+                  <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: 0 }}>Apercu live</p>
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#39FF8F", animation: "pulse 2s infinite" }} />
+                </div>
                 <a href={pageSlug ? `/${pageSlug}` : "#"} target="_blank" rel="noopener noreferrer"
                   style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 7, padding: "5px 10px", color: G, textDecoration: "none", fontSize: 11, fontWeight: 600 }}>
-                  <ExternalLink size={11} /> Plein ecran
+                  <ExternalLink size={11} /> Voir
                 </a>
               </div>
 
-              {/* Miniature */}
-              <div style={{ border: "1px solid rgba(201,168,76,0.15)", borderRadius: 16, overflow: "hidden", boxShadow: "0 4px 30px rgba(0,0,0,0.5)" }}>
-                {/* Phone notch */}
-                <div style={{ height: 24, ...bgStyle(), display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <div style={{ width: 40, height: 5, background: "rgba(255,255,255,0.1)", borderRadius: 3 }} />
-                </div>
-                <div style={{ maxHeight: 500, overflowY: "auto", ...bgStyle() }}>
-                  {blocks.filter(b => b.visible).map(block => (
-                    <div key={block.id} onClick={() => { setSelectedId(block.id); setRightTab("edit") }} style={{ cursor: "pointer" }}>
-                      <BlockPreview block={block} theme={theme} dayMode={dayMode} />
+              {/* iPhone Mockup */}
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <div style={{ position: "relative", width: 240, flexShrink: 0 }}>
+                  {/* iPhone outer frame */}
+                  <div style={{
+                    width: 240,
+                    background: "linear-gradient(145deg, #2A2A2A, #1A1A1A)",
+                    borderRadius: 36,
+                    padding: "10px 8px",
+                    boxShadow: "0 0 0 1px #3A3A3A, 0 20px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.08)",
+                    position: "relative"
+                  }}>
+                    {/* Side buttons */}
+                    <div style={{ position: "absolute", left: -3, top: 72, width: 3, height: 26, background: "#2A2A2A", borderRadius: "2px 0 0 2px" }} />
+                    <div style={{ position: "absolute", left: -3, top: 108, width: 3, height: 40, background: "#2A2A2A", borderRadius: "2px 0 0 2px" }} />
+                    <div style={{ position: "absolute", left: -3, top: 158, width: 3, height: 40, background: "#2A2A2A", borderRadius: "2px 0 0 2px" }} />
+                    <div style={{ position: "absolute", right: -3, top: 100, width: 3, height: 60, background: "#2A2A2A", borderRadius: "0 2px 2px 0" }} />
+
+                    {/* Screen */}
+                    <div style={{
+                      borderRadius: 28,
+                      overflow: "hidden",
+                      position: "relative",
+                      background: theme.bg || "#080808",
+                      boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.5)"
+                    }}>
+                      {/* Dynamic Island / Notch */}
+                      <div style={{ ...bgStyle(), padding: "10px 0 4px", display: "flex", justifyContent: "center", position: "relative" }}>
+                        <div style={{ width: 80, height: 22, background: "#000", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
+                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#111", border: "1px solid #222" }} />
+                          <div style={{ width: 40, height: 8, borderRadius: 4, background: "#111" }} />
+                        </div>
+                        {/* Status bar */}
+                        <div style={{ position: "absolute", right: 14, top: 6, display: "flex", gap: 4, alignItems: "center" }}>
+                          <span style={{ color: dayMode ? "#333" : "#F5F0E8", fontSize: 7, fontWeight: 600, opacity: 0.6 }}>9:41</span>
+                          <div style={{ display: "flex", gap: 1 }}>
+                            {[3,2,1].map(i => <div key={i} style={{ width: 2, height: i * 2 + 2, background: dayMode ? "#333" : "#F5F0E8", opacity: 0.5, borderRadius: 1 }} />)}
+                          </div>
+                          <div style={{ width: 12, height: 6, border: `1px solid ${dayMode ? "#333" : "#F5F0E8"}`, borderRadius: 2, opacity: 0.5, position: "relative" }}>
+                            <div style={{ width: "80%", height: "100%", background: "#39FF8F", borderRadius: 1 }} />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Page content */}
+                      <div style={{ maxHeight: 440, overflowY: "auto", ...bgStyle() }}
+                        className="iphone-scroll">
+                        {blocks.filter(b => b.visible).length === 0 ? (
+                          <div style={{ padding: "40px 16px", textAlign: "center" }}>
+                            <p style={{ fontSize: 28, margin: "0 0 8px" }}>✦</p>
+                            <p style={{ color: MUTED, fontSize: 11 }}>Ta page apparaitra ici</p>
+                          </div>
+                        ) : (
+                          blocks.filter(b => b.visible).map(block => (
+                            <div key={block.id}
+                              onClick={() => { setSelectedId(block.id); setRightTab("edit") }}
+                              style={{ cursor: "pointer", transition: "opacity 0.15s" }}
+                              onMouseEnter={e => e.currentTarget.style.opacity = "0.85"}
+                              onMouseLeave={e => e.currentTarget.style.opacity = "1"}>
+                              <BlockPreview block={block} theme={theme} dayMode={dayMode} />
+                            </div>
+                          ))
+                        )}
+                        {/* Branding */}
+                        <div style={{ padding: "10px", textAlign: "center", borderTop: `1px solid ${dayMode ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.04)"}` }}>
+                          <p style={{ color: MUTED, fontSize: 8, margin: 0, opacity: 0.4, fontFamily: "DM Sans, sans-serif" }}>Cree avec QRfolio</p>
+                        </div>
+                      </div>
+
+                      {/* Home indicator */}
+                      <div style={{ ...bgStyle(), padding: "6px 0 8px", display: "flex", justifyContent: "center" }}>
+                        <div style={{ width: 80, height: 4, background: dayMode ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.2)", borderRadius: 2 }} />
+                      </div>
                     </div>
-                  ))}
-                  {blocks.length === 0 && (
-                    <div style={{ padding: "40px 20px", textAlign: "center" }}>
-                      <p style={{ color: MUTED, fontSize: 12 }}>Aucun bloc</p>
-                    </div>
-                  )}
-                  {/* Branding */}
-                  <div style={{ padding: "12px", textAlign: "center", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
-                    <p style={{ color: MUTED, fontSize: 9, margin: 0, opacity: 0.5 }}>Cree avec QRfolio</p>
                   </div>
+
+                  {/* Reflet */}
+                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, borderRadius: 36, background: "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 40%)", pointerEvents: "none" }} />
                 </div>
+              </div>
+
+              {/* Info sous le mockup */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 14 }}>
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: pageStatus === "published" ? "#39FF8F" : MUTED }} />
+                <span style={{ color: MUTED, fontSize: 10 }}>{pageStatus === "published" ? "En ligne" : "Brouillon"} • {blocks.filter(b => b.visible).length} bloc{blocks.filter(b => b.visible).length > 1 ? "s" : ""}</span>
               </div>
             </div>
           )}
