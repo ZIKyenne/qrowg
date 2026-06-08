@@ -696,9 +696,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
       const data = await res.json()
       const reply = data.content?.[0]?.text || "Erreur."
       const added = parseAI(reply)
-      const clean = reply.split(/?
-/).filter((l: string) => !l.startsWith("ADD_BLOCK:")).join("
-").trim()
+      const clean = reply.split(/\r?\n/).filter((l: string) => !l.startsWith("ADD_BLOCK:")).join("\n").trim()
       setMessages(p => [...p, { role: "assistant", content: clean + (added > 0 ? `
 ✅ ${added} bloc${added > 1 ? "s" : ""} ajoute${added > 1 ? "s" : ""} !` : "") }])
     } catch { setMessages(p => [...p, { role: "assistant", content: "Erreur de connexion." }]) }
@@ -707,8 +705,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
 
   function parseAI(text: string) {
     let added = 0
-    text.split(/?
-/).forEach(line => {
+    text.split(/\r?\n/).forEach(line => {
       if (line.startsWith("ADD_BLOCK:")) {
         try { const j = JSON.parse(line.replace("ADD_BLOCK:", "").trim()); addBlock(j.type, j.content); added++ } catch {}
       }
