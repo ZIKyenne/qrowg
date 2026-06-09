@@ -2520,7 +2520,8 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
   const [themeTab, setThemeTab] = useState<"themes"|"colors"|"fonts"|"bg">("themes")
   const [bgMode, setBgMode] = useState<string>(theme.bgMode||"solid")
   const [bgSubTab, setBgSubTab] = useState<"type"|"effects"|"animation"|"presets"|"advanced">("presets")
-  const [patternType, setPatternType] = useState<string>((theme as any).bgPattern||"dots")
+  const [patternTypeLocal, setPatternType] = useState<string>((theme as any).bgPattern||"dots")
+  const patternType = patternTypeLocal = useState<string>((theme as any).bgPattern||"dots")
   const [effectNoise, setEffectNoise] = useState(false)
   const [effectGlow, setEffectGlow] = useState(false)
   const [effectVignette, setEffectVignette] = useState(false)
@@ -3227,6 +3228,39 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
   // selectedBlock recalculé depuis blocks à chaque render — garantit fraîcheur
   const selectedBlock = blocks.find(b => b.id === selectedId)
 
+  // Fond du thème appliqué partout
+  function bgStyle(): React.CSSProperties {
+    if (dayMode) return { background: "#FAFAFA" }
+    const t = theme as any
+    if (t.bgMode === "pattern") {
+      const patSize = t.pattern_size || 20
+      const patOpacity = t.pattern_opacity || 0.15
+      const patColor = t.pattern_color || "#C9A84C"
+      const alpha = Math.round(patOpacity * 255).toString(16).padStart(2, "0")
+      const c = patColor + alpha
+      let bgImg = ""
+      switch(t.bgPattern || "dots") {
+        case "dots": bgImg = `radial-gradient(circle, ${c} 1px, transparent 1px)`; break
+        case "grid": bgImg = `linear-gradient(${c} 1px, transparent 1px), linear-gradient(90deg, ${c} 1px, transparent 1px)`; break
+        case "lines": bgImg = `linear-gradient(0deg, ${c} 1px, transparent 1px)`; break
+        case "diagonals": bgImg = `linear-gradient(45deg, ${c} 1px, transparent 1px)`; break
+        case "hexagons": bgImg = `radial-gradient(circle, ${c} 2px, transparent 2px)`; break
+        case "circles": bgImg = `radial-gradient(circle, transparent ${patSize*0.3}px, ${c} ${patSize*0.3}px, ${c} ${patSize*0.32}px, transparent ${patSize*0.32}px)`; break
+        case "zigzag": bgImg = `linear-gradient(135deg, ${c} 25%, transparent 25%), linear-gradient(225deg, ${c} 25%, transparent 25%)`; break
+        default: bgImg = `radial-gradient(circle, ${c} 1px, transparent 1px)`
+      }
+      return { background: theme.bg, backgroundImage: bgImg, backgroundSize: `${patSize}px ${patSize}px` }
+    }
+    if (t.bgMode === "mesh") {
+      const c1 = t.mesh_c1 || "#C9A84C"; const c2 = t.mesh_c2 || "#39FF8F"; const c3 = t.mesh_c3 || "#7B2FBE"
+      return { background: `radial-gradient(ellipse at 0% 0%, ${c1}60, transparent 50%), radial-gradient(ellipse at 100% 100%, ${c2}60, transparent 50%), radial-gradient(ellipse at 100% 0%, ${c3}40, transparent 50%), ${theme.bg}` }
+    }
+    if (t.bgMode === "image" && t.bgImage) {
+      return { backgroundImage: `url(${t.bgImage})`, backgroundSize: t.bgImageSize || "cover", backgroundPosition: "center" }
+    }
+    return { background: theme.bgGradient || theme.bg }
+  }
+
   return (
     <div style={{ height: "100vh", background: "#080808", display: "flex", flexDirection: "column", fontFamily: "DM Sans, sans-serif", color: "#F5F0E8", overflow: "hidden" }}>
 
@@ -3407,14 +3441,15 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         {/* CANVAS */}
         <div style={{ flex: 1, overflowY: "auto", padding: "20px", background: "#101010", backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "32px 32px" }}>
           <div style={{ maxWidth: 640, margin: "0 auto" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, padding: "6px 12px", background: "#0A0A0A", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 9 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, padding: "6px 12px", background: "rgba(10,10,10,0.8)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 9, backdropFilter: "blur(10px)", position: "sticky", top: 0, zIndex: 10 }}>
               <span style={{ fontSize: 9, letterSpacing: 2, textTransform: "uppercase", color: "#4A4640" }}>CANVAS</span>
               <span style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 6, padding: "1px 6px", fontSize: 10, color: G }}>{blocks.length} bloc{blocks.length!==1?"s":""}</span>
               {!pageId && <span style={{ color: "#4A4640", fontSize: 9, marginLeft: "auto" }}>Mode démo</span>}
             </div>
 
+            <div style={{ ...bgStyle(), borderRadius: 16, overflow: "hidden", minHeight: 200, position: "relative" }}>
             {blocks.length===0 ? (
-              <div style={{ border: "1px dashed rgba(201,168,76,0.12)", borderRadius: 16, padding: "60px 30px", textAlign: "center" }}>
+              <div style={{ padding: "60px 30px", textAlign: "center" }}>
                 <p style={{ color: "#4A4640", fontSize: 28, margin: "0 0 8px" }}>✦</p>
                 <p style={{ color: MUTED, fontSize: 13, margin: 0 }}>Page vide — ajoute des blocs depuis la bibliothèque</p>
               </div>
@@ -3424,16 +3459,16 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
               return (
                 <div key={block.id}
                   onClick={() => { setSelectedId(block.id); setRightTab("edit") }}
-                  style={{ position: "relative", marginBottom: 8, border: `2px solid ${isSelected ? G+"90" : "rgba(255,255,255,0.04)"}`, borderRadius: 14, overflow: "visible", cursor: "pointer", transition: "all 0.15s", opacity: block.visible ? 1 : 0.45, background: "#131313", boxShadow: isSelected ? `0 0 0 1px ${G}25, 0 4px 20px rgba(0,0,0,0.4)` : "none" }}
+                  style={{ position: "relative", marginBottom: 0, borderLeft: isSelected ? `3px solid ${G}` : "3px solid transparent", overflow: "visible", cursor: "pointer", transition: "border-left-color 0.15s", opacity: block.visible ? 1 : 0.45, background: "transparent" }}
                   onMouseEnter={e => {
-                    if (!isSelected) { e.currentTarget.style.borderColor = "rgba(201,168,76,0.3)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.3)" }
+                    if (!isSelected) e.currentTarget.style.borderLeftColor = "rgba(201,168,76,0.4)"
                     const overlay = e.currentTarget.querySelector(".block-overlay") as HTMLElement
                     const handle = e.currentTarget.querySelector(".block-handle") as HTMLElement
                     if (overlay) overlay.style.opacity = "1"
                     if (handle) handle.style.opacity = "1"
                   }}
                   onMouseLeave={e => {
-                    if (!isSelected) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.04)"; e.currentTarget.style.boxShadow = "none" }
+                    if (!isSelected) e.currentTarget.style.borderLeftColor = "transparent"
                     const overlay = e.currentTarget.querySelector(".block-overlay") as HTMLElement
                     const handle = e.currentTarget.querySelector(".block-handle") as HTMLElement
                     if (overlay) overlay.style.opacity = "0"
@@ -3462,7 +3497,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                     </div>
                   )}
 
-                  <div style={{ borderRadius: 12, overflow: "hidden", minHeight: 36 }}>
+                  <div style={{ overflow: "hidden", minHeight: 36 }}>
                     <BlockPreview block={block} theme={theme} dayMode={dayMode} />
                   </div>
                 </div>
@@ -3508,7 +3543,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                     <div style={{ position: "absolute", left: -3, top: 146, width: 3, height: 38, background: "#2A2A2A", borderRadius: "2px 0 0 2px" }} />
                     <div style={{ position: "absolute", right: -3, top: 96, width: 3, height: 58, background: "#2A2A2A", borderRadius: "0 2px 2px 0" }} />
 
-                    <div style={{ borderRadius: 26, overflow: "hidden", background: dayMode ? "#FAFAFA" : theme.bg }}>
+                    <div style={{ borderRadius: 26, overflow: "hidden", ...bgStyle() }}>
                       <div style={{ background: dayMode ? "#FAFAFA" : (theme.bgGradient||theme.bg), padding: "9px 0 3px", display: "flex", justifyContent: "center", position: "relative" }}>
                         <div style={{ width: 78, height: 20, background: "#000", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
                           <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#111", border: "1px solid #222" }} />
@@ -3520,9 +3555,9 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                         </div>
                       </div>
 
-                      <div style={{ maxHeight: 420, overflowY: "auto", background: dayMode ? "#FAFAFA" : (theme.bgGradient||theme.bg) }} className="iphone-scroll">
+                      <div style={{ maxHeight: 420, overflowY: "auto", ...bgStyle() }} className="iphone-scroll">
                         {blocks.filter(b => b.visible).length===0
-                          ? <div style={{ padding: "40px 14px", textAlign: "center", background: dayMode ? "#FAFAFA" : theme.bg }}><p style={{ fontSize: 24, margin: "0 0 6px" }}>✦</p><p style={{ color: MUTED, fontSize: 10 }}>Ta page apparaîtra ici</p></div>
+                          ? <div style={{ padding: "40px 14px", textAlign: "center", ...bgStyle() }}><p style={{ fontSize: 24, margin: "0 0 6px" }}>✦</p><p style={{ color: MUTED, fontSize: 10 }}>Ta page apparaîtra ici</p></div>
                           : blocks.filter(b => b.visible).map(b => (
                             <div key={b.id} onClick={() => { setSelectedId(b.id); setRightTab("edit") }} style={{ cursor: "pointer" }}
                               onMouseEnter={e => e.currentTarget.style.opacity="0.85"}
@@ -3530,12 +3565,12 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                               <BlockPreview block={b} theme={theme} dayMode={dayMode} />
                             </div>
                           ))}
-                        <div style={{ padding: "8px", textAlign: "center", background: dayMode ? "#FAFAFA" : theme.bg }}>
+                        <div style={{ padding: "8px", textAlign: "center", ...bgStyle() }}>
                           <p style={{ color: MUTED, fontSize: 7, margin: 0, opacity: 0.4 }}>Créé avec QRfolio</p>
                         </div>
                       </div>
 
-                      <div style={{ background: dayMode ? "#FAFAFA" : (theme.bgGradient||theme.bg), padding: "5px 0 7px", display: "flex", justifyContent: "center" }}>
+                      <div style={{ ...bgStyle(), padding: "5px 0 7px", display: "flex", justifyContent: "center" }}>
                         <div style={{ width: 72, height: 3.5, background: dayMode ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.2)", borderRadius: 2 }} />
                       </div>
                     </div>
