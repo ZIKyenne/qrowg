@@ -3556,7 +3556,7 @@ const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 
                     <span>📋</span><span>Coller JSON</span>
                   </button>
                 </div>
-              </div>/button>
+              </div>
               {/* Aperçu fond actuel */}
               <div>
                 <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 6 }}>Aperçu fond actuel</label>
