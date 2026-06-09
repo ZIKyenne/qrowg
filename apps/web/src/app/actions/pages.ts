@@ -144,7 +144,7 @@ export async function updatePage(pageId: string, data: {
   status?: 'draft' | 'published' | 'archived'
   seo_title?: string
   seo_description?: string
-  theme?: Record<string, string>
+  theme?: Record<string, unknown>
 }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

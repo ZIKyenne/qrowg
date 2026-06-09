@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import type { Metadata } from 'next'
+import { resolveTheme, fontsUrl, backgroundStyle, readableText, type PageTheme } from '../dashboard/builder/themes'
 
 async function createClient() {
   const cookieStore = await cookies()
@@ -56,20 +57,17 @@ export default async function PublicPage({ params }: { params: Promise<{ slug: s
   if (!page) notFound()
 
   const blocks = (page.blocks ?? []).sort((a: any, b: any) => a.position - b.position)
-  const theme = page.theme as Record<string, string>
+  const theme = resolveTheme(page.theme)
 
   return (
     <div style={{
       minHeight: '100vh',
-      background: theme.background || '#080808',
-      color: theme.text || '#F5F0E8',
-      fontFamily: `'${theme.font_body || 'DM Sans'}', sans-serif`,
+      ...backgroundStyle(theme),
+      color: theme.text,
+      fontFamily: `'${theme.font_body}', sans-serif`,
     }}>
       {/* Google Fonts */}
-      <link
-        href={`https://fonts.googleapis.com/css2?family=${(theme.font_display || 'Cormorant+Garamond').replace(' ', '+')}:wght@300;400;600&family=${(theme.font_body || 'DM+Sans').replace(' ', '+')}:wght@400;500;600&display=swap`}
-        rel="stylesheet"
-      />
+      <link href={fontsUrl(theme)} rel="stylesheet" />
 
       <div style={{ maxWidth: '520px', margin: '0 auto', padding: '32px 20px 80px' }}>
         {blocks.map((block: any) => (
@@ -92,10 +90,13 @@ export default async function PublicPage({ params }: { params: Promise<{ slug: s
   )
 }
 
-function BlockRenderer({ block, theme }: { block: any; theme: Record<string, string> }) {
-  const primary = theme.primary || '#C9A84C'
-  const text = theme.text || '#F5F0E8'
-  const muted = 'rgba(255,255,255,0.5)'
+function BlockRenderer({ block, theme }: { block: any; theme: PageTheme }) {
+  const primary = theme.primary
+  const accent = theme.accent
+  const text = theme.text
+  const muted = theme.muted
+  const surface = theme.surface
+  const onPrimary = readableText(primary)
 
   switch (block.type) {
     case 'profile': {
@@ -136,7 +137,7 @@ function BlockRenderer({ block, theme }: { block: any; theme: Record<string, str
           {(c.links || []).filter((l: any) => l.url).map((link: any, i: number) => (
             <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" style={{
               display: 'flex', alignItems: 'center', gap: '6px',
-              background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+              background: surface, border: '1px solid ' + accent + '33',
               borderRadius: '6px', padding: '8px 16px', textDecoration: 'none',
               color: text, fontSize: '13px',
             }}>
@@ -153,7 +154,7 @@ function BlockRenderer({ block, theme }: { block: any; theme: Record<string, str
       return (
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
           <a href={c.url || '#'} target={c.open_new_tab ? '_blank' : '_self'} rel="noopener noreferrer" style={{
-            display: 'inline-block', background: primary, color: '#080808',
+            display: 'inline-block', background: primary, color: onPrimary,
             padding: '14px 36px', borderRadius: '4px', textDecoration: 'none',
             fontSize: '15px', fontWeight: 600, letterSpacing: '0.3px',
           }}>
@@ -166,13 +167,13 @@ function BlockRenderer({ block, theme }: { block: any; theme: Record<string, str
     case 'contact_form': {
       return (
         <div style={{ marginBottom: '24px' }}>
-          <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '24px' }}>
+          <div style={{ background: surface, border: '1px solid ' + accent + '22', borderRadius: '8px', padding: '24px' }}>
             <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '16px', color: text }}>Me contacter</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <input placeholder="Votre nom" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', padding: '10px 12px', color: text, fontSize: '14px', outline: 'none', fontFamily: 'inherit' }} />
-              <input placeholder="Votre email" type="email" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', padding: '10px 12px', color: text, fontSize: '14px', outline: 'none', fontFamily: 'inherit' }} />
-              <textarea placeholder="Votre message" rows={4} style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', padding: '10px 12px', color: text, fontSize: '14px', outline: 'none', resize: 'vertical', fontFamily: 'inherit' }} />
-              <button style={{ background: primary, color: '#080808', border: 'none', borderRadius: '4px', padding: '12px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
+              <input placeholder="Votre nom" style={{ background: 'rgba(0,0,0,0.15)', border: '1px solid ' + muted + '44', borderRadius: '4px', padding: '10px 12px', color: text, fontSize: '14px', outline: 'none', fontFamily: 'inherit' }} />
+              <input placeholder="Votre email" type="email" style={{ background: 'rgba(0,0,0,0.15)', border: '1px solid ' + muted + '44', borderRadius: '4px', padding: '10px 12px', color: text, fontSize: '14px', outline: 'none', fontFamily: 'inherit' }} />
+              <textarea placeholder="Votre message" rows={4} style={{ background: 'rgba(0,0,0,0.15)', border: '1px solid ' + muted + '44', borderRadius: '4px', padding: '10px 12px', color: text, fontSize: '14px', outline: 'none', resize: 'vertical', fontFamily: 'inherit' }} />
+              <button style={{ background: primary, color: onPrimary, border: 'none', borderRadius: '4px', padding: '12px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
                 Envoyer
               </button>
             </div>

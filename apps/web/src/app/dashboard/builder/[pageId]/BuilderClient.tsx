@@ -1,7 +1,18 @@
 'use client'
+// QRfolio builder — sélecteur de thèmes intégré
 
 import { useState, useEffect, useCallback } from 'react'
 import { saveBlocks, updatePage } from '../../../actions/pages'
+import {
+  PRESET_THEMES,
+  CATEGORY_LABELS,
+  resolveTheme,
+  fontsUrl,
+  backgroundStyle,
+  readableText,
+  type PageTheme,
+  type ThemeCategory,
+} from '../themes'
 
 const BLOCK_TYPES = [
   { type: 'profile', icon: '👤', label: 'Profil' },
@@ -32,12 +43,19 @@ type Page = {
   title: string
   slug: string
   status: string
-  theme: Record<string, string>
+  theme: Record<string, string> | null
 }
 
 type BuilderClientProps = {
   page: Page
   initialBlocks: Block[]
+}
+
+// Clé du preset correspondant au thème enregistré sur la page (pour la surbrillance)
+function matchThemeKey(raw: unknown): string {
+  if (!raw || typeof raw !== 'object') return ''
+  const name = (raw as { name?: string }).name
+  return Object.keys(PRESET_THEMES).find(k => PRESET_THEMES[k]!.name === name) ?? ''
 }
 
 export default function BuilderClient({ page, initialBlocks }: BuilderClientProps) {
@@ -48,7 +66,12 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved')
   const [isPublishing, setIsPublishing] = useState(false)
 
-  // Autosave toutes les 30 secondes
+  // ── Thèmes ──
+  const [leftTab, setLeftTab] = useState<'blocks' | 'themes'>('blocks')
+  const [theme, setTheme] = useState<PageTheme>(() => resolveTheme(page.theme))
+  const [activeThemeKey, setActiveThemeKey] = useState<string>(() => matchThemeKey(page.theme))
+
+  // Autosave des blocs toutes les 30 secondes
   const handleSave = useCallback(async () => {
     setSaveStatus('saving')
     const result = await saveBlocks(page.id, blocks.map((b, i) => ({
@@ -71,6 +94,16 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
     const timer = setInterval(handleSave, 30000)
     return () => clearInterval(timer)
   }, [handleSave])
+
+  const applyTheme = async (key: string) => {
+    const next = PRESET_THEMES[key]
+    if (!next) return
+    setTheme(next)
+    setActiveThemeKey(key)
+    setSaveStatus('saving')
+    const result = await updatePage(page.id, { theme: next as unknown as Record<string, unknown> })
+    setSaveStatus(result.error ? 'unsaved' : 'saved')
+  }
 
   const handlePublish = async () => {
     setIsPublishing(true)
@@ -119,8 +152,19 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
+  // Presets groupés par catégorie pour l'onglet Thèmes
+  const grouped: Record<string, Array<[string, PageTheme]>> = {}
+  for (const [key, t] of Object.entries(PRESET_THEMES)) {
+    ;(grouped[t.category] ??= []).push([key, t])
+  }
+
+  const onPrimary = readableText(theme.primary)
+
   return (
     <div style={{ minHeight: '100vh', background: '#080808', display: 'flex', flexDirection: 'column' }}>
+
+      {/* Charge les polices du thème sélectionné pour l'aperçu */}
+      <link href={fontsUrl(theme)} rel="stylesheet" />
 
       {/* Top Bar */}
       <div style={{
@@ -189,27 +233,90 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
       {/* Body */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
 
-        {/* LEFT — Blocs */}
+        {/* LEFT — Blocs / Thèmes */}
         <div style={{
-          width: '210px', background: '#0C0B09',
+          width: '230px', background: '#0C0B09',
           borderRight: '1px solid rgba(201,168,76,0.1)',
-          padding: '16px 10px', overflowY: 'auto', flexShrink: 0,
+          padding: '14px 10px', overflowY: 'auto', flexShrink: 0,
         }}>
-          <div style={{ fontSize: '10px', letterSpacing: '2px', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '10px', paddingLeft: '8px' }}>
-            Ajouter un bloc
+          {/* Onglets */}
+          <div style={{
+            display: 'flex', background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.08)', borderRadius: '4px',
+            overflow: 'hidden', marginBottom: '14px',
+          }}>
+            {(['blocks', 'themes'] as const).map(tab => (
+              <button key={tab} onClick={() => setLeftTab(tab)} style={{
+                flex: 1, background: leftTab === tab ? 'rgba(201,168,76,0.15)' : 'transparent',
+                border: 'none', color: leftTab === tab ? '#C9A84C' : '#8A8478',
+                padding: '7px 8px', fontSize: '12px', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
+              }}>
+                {tab === 'blocks' ? 'Blocs' : 'Thèmes'}
+              </button>
+            ))}
           </div>
-          {BLOCK_TYPES.map(block => (
-            <button key={block.type} onClick={() => addBlock(block.type)} style={{
-              width: '100%', display: 'flex', alignItems: 'center', gap: '8px',
-              padding: '8px 10px', background: 'transparent', border: '1px solid transparent',
-              borderRadius: '4px', color: '#8A8478', fontSize: '13px', cursor: 'pointer',
-              fontFamily: 'DM Sans, sans-serif', textAlign: 'left', marginBottom: '2px',
-            }}>
-              <span style={{ fontSize: '15px' }}>{block.icon}</span>
-              {block.label}
-              <span style={{ marginLeft: 'auto', opacity: 0.4 }}>+</span>
-            </button>
-          ))}
+
+          {leftTab === 'blocks' && (
+            <>
+              {BLOCK_TYPES.map(block => (
+                <button key={block.type} onClick={() => addBlock(block.type)} style={{
+                  width: '100%', display: 'flex', alignItems: 'center', gap: '8px',
+                  padding: '8px 10px', background: 'transparent', border: '1px solid transparent',
+                  borderRadius: '4px', color: '#8A8478', fontSize: '13px', cursor: 'pointer',
+                  fontFamily: 'DM Sans, sans-serif', textAlign: 'left', marginBottom: '2px',
+                }}>
+                  <span style={{ fontSize: '15px' }}>{block.icon}</span>
+                  {block.label}
+                  <span style={{ marginLeft: 'auto', opacity: 0.4 }}>+</span>
+                </button>
+              ))}
+            </>
+          )}
+
+          {leftTab === 'themes' && (
+            <>
+              {Object.entries(grouped).map(([category, list]) => (
+                <div key={category} style={{ marginBottom: '14px' }}>
+                  <div style={{
+                    fontSize: '10px', letterSpacing: '1.5px', textTransform: 'uppercase',
+                    color: '#C9A84C', marginBottom: '8px', paddingLeft: '4px',
+                  }}>
+                    {CATEGORY_LABELS[category as ThemeCategory] ?? category}
+                  </div>
+                  {list.map(([key, t]) => {
+                    const active = activeThemeKey === key
+                    return (
+                      <button key={key} onClick={() => applyTheme(key)} style={{
+                        width: '100%', display: 'flex', alignItems: 'center', gap: '10px',
+                        padding: '8px', marginBottom: '4px', cursor: 'pointer', textAlign: 'left',
+                        background: active ? 'rgba(201,168,76,0.1)' : 'transparent',
+                        border: '1px solid ' + (active ? 'rgba(201,168,76,0.45)' : 'rgba(255,255,255,0.07)'),
+                        borderRadius: '6px',
+                      }}>
+                        {/* Pastille d'aperçu des couleurs */}
+                        <span style={{
+                          width: '34px', height: '34px', borderRadius: '6px', flexShrink: 0,
+                          background: t.background, border: '1px solid rgba(255,255,255,0.12)',
+                          position: 'relative', overflow: 'hidden',
+                        }}>
+                          <span style={{ position: 'absolute', left: '6px', bottom: '6px', width: '10px', height: '10px', borderRadius: '50%', background: t.primary }} />
+                          <span style={{ position: 'absolute', right: '6px', top: '6px', width: '8px', height: '8px', borderRadius: '50%', background: t.accent }} />
+                        </span>
+                        <span style={{ flex: 1, minWidth: 0 }}>
+                          <span style={{ display: 'block', fontSize: '12px', color: '#F5F0E8', fontFamily: 'DM Sans, sans-serif' }}>{t.name}</span>
+                          <span style={{ display: 'block', fontSize: '10px', color: '#6E6A60' }}>{t.font_display}</span>
+                        </span>
+                        {active && <span style={{ color: '#39FF8F', fontSize: '13px' }}>✓</span>}
+                      </button>
+                    )
+                  })}
+                </div>
+              ))}
+              <div style={{ fontSize: '10px', color: '#4A4640', lineHeight: 1.5, padding: '4px 4px 0' }}>
+                Le thème s'applique à l'aperçu et à ta page publiée. Pense à republier pour le voir en ligne.
+              </div>
+            </>
+          )}
         </div>
 
         {/* CENTER — Canvas */}
@@ -278,42 +385,54 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
           alignItems: 'center', flexShrink: 0, overflowY: 'auto',
         }}>
           <div style={{ fontSize: '10px', letterSpacing: '2px', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '16px' }}>
-            Preview {previewMode}
+            Aperçu · {theme.name}
           </div>
 
           {/* Phone frame */}
           <div style={{
-            width: '220px', minHeight: '400px', background: '#080808',
+            width: '220px', minHeight: '400px',
             border: '5px solid #1A1812', borderRadius: '28px', overflow: 'hidden',
             boxShadow: '0 0 32px rgba(0,0,0,0.6)', position: 'relative',
+            ...backgroundStyle(theme),
           }}>
             <div style={{
               position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
               width: '52px', height: '10px', background: '#1A1812', borderRadius: '0 0 6px 6px', zIndex: 10,
             }} />
-            <div style={{ padding: '20px 12px 12px' }}>
+            <div style={{ padding: '20px 12px 12px', fontFamily: `'${theme.font_body}', sans-serif` }}>
               <div style={{ textAlign: 'center', marginBottom: '14px' }}>
                 <div style={{
-                  width: '52px', height: '52px', background: 'rgba(201,168,76,0.15)',
-                  border: '2px solid rgba(201,168,76,0.3)', borderRadius: '50%',
+                  width: '52px', height: '52px',
+                  background: theme.primary + '26',
+                  border: '2px solid ' + theme.primary,
+                  borderRadius: '50%',
                   margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px',
                 }}>👤</div>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: '#F5F0E8' }}>{pageName}</div>
-                <div style={{ fontSize: '10px', color: '#8A8478' }}>{appUrl}/{page.slug}</div>
+                <div style={{ fontSize: '15px', fontWeight: 600, color: theme.text, fontFamily: `'${theme.font_display}', serif` }}>{pageName}</div>
+                <div style={{ fontSize: '10px', color: theme.muted }}>{appUrl.replace(/^https?:\/\//, '')}/{page.slug}</div>
               </div>
+
+              {/* CTA d'exemple */}
+              <div style={{
+                background: theme.primary, color: onPrimary, textAlign: 'center',
+                borderRadius: '5px', padding: '8px', fontSize: '11px', fontWeight: 600, marginBottom: '8px',
+              }}>
+                Bouton CTA
+              </div>
+
               {blocks.map(block => (
                 <div key={block.id} style={{
-                  background: selectedId === block.id ? 'rgba(201,168,76,0.08)' : 'rgba(255,255,255,0.03)',
-                  border: '1px solid ' + (selectedId === block.id ? 'rgba(201,168,76,0.3)' : 'rgba(255,255,255,0.05)'),
+                  background: theme.surface,
+                  border: '1px solid ' + theme.accent + '33',
                   borderRadius: '5px', padding: '8px 10px', marginBottom: '4px',
                   display: 'flex', alignItems: 'center', gap: '6px',
                 }}>
                   <span style={{ fontSize: '12px' }}>{block.icon}</span>
-                  <span style={{ fontSize: '10px', color: '#8A8478' }}>{block.label}</span>
+                  <span style={{ fontSize: '10px', color: theme.muted }}>{block.label}</span>
                 </div>
               ))}
               <div style={{ textAlign: 'center', marginTop: '12px' }}>
-                <div style={{ fontSize: '8px', color: '#4A4640', letterSpacing: '0.5px' }}>Créé avec QRfolio</div>
+                <div style={{ fontSize: '8px', color: theme.muted, letterSpacing: '0.5px' }}>Créé avec QRfolio</div>
               </div>
             </div>
           </div>
