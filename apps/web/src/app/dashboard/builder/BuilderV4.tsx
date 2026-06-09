@@ -4251,25 +4251,93 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         <div style={{ flex: 1, overflowY: "auto", padding: "20px", background: "#0A0A0A" }}
           onClick={e => { if (e.target === e.currentTarget) { setSelectedId(null); setMultiSelection([]) } }}>
           <div style={{ maxWidth: 640, margin: "0 auto" }}>
-            {/* Barre actions multi-sélection */}
-            {multiSelection.length > 0 && (
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, padding: "8px 12px", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 10, backdropFilter: "blur(10px)", position: "sticky", top: 0, zIndex: 15 }}>
-                <span style={{ color: G, fontSize: 12, fontWeight: 700 }}>✓ {multiSelection.length} bloc{multiSelection.length>1?"s":""} sélectionné{multiSelection.length>1?"s":""}</span>
+            {/* ── Toolbar flottante multi-sélection (≥2 blocs) ─────────────── */}
+            {multiSelection.length >= 2 && (
+              <div style={{
+                position: "sticky", top: 0, zIndex: 20, marginBottom: 10,
+                display: "flex", alignItems: "center", gap: 6,
+                padding: "8px 12px",
+                background: "rgba(8,8,8,0.92)",
+                border: `1px solid ${G}40`,
+                borderRadius: 12,
+                backdropFilter: "blur(12px)",
+                boxShadow: `0 4px 24px rgba(0,0,0,0.5), 0 0 0 1px ${G}15`,
+                animation: "popoverIn 0.15s ease",
+              }}>
+                {/* Badge sélection */}
+                <div style={{ display: "flex", alignItems: "center", gap: 6, paddingRight: 8, borderRight: "1px solid rgba(255,255,255,0.08)" }}>
+                  <div style={{ width: 20, height: 20, borderRadius: 6, background: G+"20", border: `1px solid ${G}40`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span style={{ color: G, fontSize: 9, fontWeight: 700 }}>{multiSelection.length}</span>
+                  </div>
+                  <span style={{ color: G, fontSize: 11, fontWeight: 700 }}>
+                    {multiSelection.length} bloc{multiSelection.length>1?"s":""} sélectionné{multiSelection.length>1?"s":""}
+                  </span>
+                </div>
+
                 <div style={{ flex: 1 }} />
-                <button onClick={toggleVisibleMulti} title="Masquer/Afficher"
-                  style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 7, padding: "5px 10px", color: "#F5F0E8", fontSize: 11, cursor: "pointer" }}>
-                  <Eye size={11} /> Masquer
-                </button>
-                <button onClick={duplicateMulti} title="Dupliquer la sélection"
-                  style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 7, padding: "5px 10px", color: "#F5F0E8", fontSize: 11, cursor: "pointer" }}>
-                  <Copy size={11} /> Dupliquer
-                </button>
-                <button onClick={deleteMulti} title="Supprimer la sélection"
-                  style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 7, padding: "5px 10px", color: "#EF4444", fontSize: 11, cursor: "pointer" }}>
-                  <Trash2 size={11} /> Supprimer
-                </button>
-                <button onClick={() => setMultiSelection([])} title="Désélectionner"
-                  style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, color: MUTED, cursor: "pointer", fontSize: 14 }}>
+
+                {/* Actions */}
+                {(() => {
+                  const allVisible = multiSelection.every(id => blocks.find(b => b.id===id)?.visible)
+                  const allLocked = multiSelection.every(id => blocks.find(b => b.id===id)?.locked)
+                  const lockedCount = multiSelection.filter(id => blocks.find(b => b.id===id)?.locked).length
+
+                  return (<>
+                    {/* Masquer/Afficher */}
+                    <button onClick={toggleVisibleMulti}
+                      title={allVisible ? "Masquer les blocs sélectionnés" : "Afficher les blocs sélectionnés"}
+                      style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "6px 11px", color: allVisible ? MUTED : "#EF4444", fontSize: 11, cursor: "pointer", transition: "all 0.15s" }}
+                      onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.1)"; e.currentTarget.style.color="#F5F0E8" }}
+                      onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.05)"; e.currentTarget.style.color=allVisible?MUTED:"#EF4444" }}>
+                      {allVisible ? <><EyeOff size={11} /> <span>Masquer</span></> : <><Eye size={11} /> <span>Afficher</span></>}
+                    </button>
+
+                    {/* Verrouiller/Déverrouiller */}
+                    <button onClick={() => {
+                        const ids = multiSelection
+                        setBlocks(p => p.map(b => ids.includes(b.id) ? {...b, locked: !allLocked} : b))
+                      }}
+                      title={allLocked ? "Déverrouiller" : `Verrouiller${lockedCount>0?` (${lockedCount} déjà verrouillé${lockedCount>1?"s":""})`:""}`}
+                      style={{ display: "flex", alignItems: "center", gap: 5, background: allLocked ? "rgba(99,102,241,0.12)" : "rgba(255,255,255,0.05)", border: `1px solid ${allLocked ? "rgba(99,102,241,0.3)" : "rgba(255,255,255,0.1)"}`, borderRadius: 8, padding: "6px 11px", color: allLocked ? "#818CF8" : MUTED, fontSize: 11, cursor: "pointer", transition: "all 0.15s" }}
+                      onMouseEnter={e => { e.currentTarget.style.background="rgba(99,102,241,0.15)"; e.currentTarget.style.color="#818CF8" }}
+                      onMouseLeave={e => { e.currentTarget.style.background=allLocked?"rgba(99,102,241,0.12)":"rgba(255,255,255,0.05)"; e.currentTarget.style.color=allLocked?"#818CF8":MUTED }}>
+                      <span style={{ fontSize: 11 }}>{allLocked ? "🔓" : "🔒"}</span>
+                      <span>{allLocked ? "Déverrouiller" : "Verrouiller"}</span>
+                    </button>
+
+                    {/* Dupliquer */}
+                    <button onClick={duplicateMulti}
+                      title={`Dupliquer ${multiSelection.length} blocs`}
+                      style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "6px 11px", color: MUTED, fontSize: 11, cursor: "pointer", transition: "all 0.15s" }}
+                      onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.1)"; e.currentTarget.style.color="#F5F0E8" }}
+                      onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.05)"; e.currentTarget.style.color=MUTED }}>
+                      <Copy size={11} /> <span>Dupliquer</span>
+                    </button>
+
+                    {/* Supprimer avec confirmation */}
+                    <button onClick={() => {
+                        const unlocked = multiSelection.filter(id => !blocks.find(b => b.id===id)?.locked)
+                        if (unlocked.length === 0) return
+                        const msg = `Supprimer ${unlocked.length} bloc${unlocked.length>1?"s":""}${unlocked.length<multiSelection.length?` (${multiSelection.length-unlocked.length} verrouillé${multiSelection.length-unlocked.length>1?"s":""} ignoré${multiSelection.length-unlocked.length>1?"s":""})`:""}?`
+                        if (window.confirm(msg)) deleteMulti()
+                      }}
+                      title="Supprimer les blocs sélectionnés"
+                      style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 8, padding: "6px 11px", color: "#EF4444", fontSize: 11, cursor: "pointer", transition: "all 0.15s" }}
+                      onMouseEnter={e => { e.currentTarget.style.background="rgba(239,68,68,0.18)"; e.currentTarget.style.borderColor="rgba(239,68,68,0.5)" }}
+                      onMouseLeave={e => { e.currentTarget.style.background="rgba(239,68,68,0.08)"; e.currentTarget.style.borderColor="rgba(239,68,68,0.25)" }}>
+                      <Trash2 size={11} /> <span>Supprimer</span>
+                    </button>
+                  </>)
+                })()}
+
+                {/* Séparateur */}
+                <div style={{ width: 1, height: 20, background: "rgba(255,255,255,0.08)", margin: "0 2px" }} />
+
+                {/* Désélectionner */}
+                <button onClick={() => setMultiSelection([])} title="Désélectionner (Échap)"
+                  style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, color: MUTED, cursor: "pointer", fontSize: 14, fontWeight: 300 }}
+                  onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.1)"; e.currentTarget.style.color="#F5F0E8" }}
+                  onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.color=MUTED }}>
                   ×
                 </button>
               </div>
