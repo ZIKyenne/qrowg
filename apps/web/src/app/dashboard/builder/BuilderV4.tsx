@@ -3505,94 +3505,71 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
     setAiLoading(false)
   }
 
-  // ── Synonymes de recherche ─────────────────────────────────────────────
+  // ── Synonymes et recherche enrichie ───────────────────────────────────────
   const SYNONYMS: Record<string, string[]> = {
-    téléphone: ["appel","phone","tel","contact","call"],
-    mail: ["email","courriel","message","contact","@"],
-    maps: ["adresse","localisation","lieu","carte","google maps","direction","itinéraire"],
-    avis: ["témoignage","review","avis","note","étoile","star","google","recommandation","client"],
-    musique: ["spotify","deezer","apple music","soundcloud","chanson","titre","album","playlist","artiste"],
-    restaurant: ["menu","carte","réservation","plat","gastronomie","cuisine","table"],
-    vente: ["produit","tarif","prix","service","boutique","shop","achat","commande","paiement"],
-    photo: ["image","galerie","photo","picture","visuel","cover","bannière"],
-    vidéo: ["youtube","tiktok","reel","clip","stream","twitch","live","vimeo"],
-    réseau: ["instagram","facebook","twitter","linkedin","tiktok","snapchat","social"],
-    blog: ["article","post","actualité","news","texte","rédaction"],
-    événement: ["concert","festival","soirée","date","billet","ticket","réservation"],
-    contact: ["formulaire","email","téléphone","whatsapp","message"],
-    lien: ["bouton","cta","url","action","redirection","click"],
-    profil: ["bio","présentation","photo","avatar","identité","nom"],
-    boutique: ["produit","shop","catalogue","e-commerce","achat","panier"],
-    podcast: ["audio","son","écoute","radio","épisode"],
-    stats: ["statistique","chiffre","nombre","compteur","analytics"],
-    countdown: ["compte à rebours","timer","délai","date"],
-    qr: ["qr code","scan","flash","code-barres"],
+    "téléphone": ["appel","phone","tel","call"],
+    "mail": ["email","courriel","message","@"],
+    "maps": ["adresse","localisation","lieu","carte","direction","itinéraire"],
+    "avis": ["témoignage","review","note","étoile","recommandation","client"],
+    "musique": ["spotify","deezer","apple music","soundcloud","chanson","album","playlist","artiste"],
+    "restaurant": ["menu","carte","réservation","plat","cuisine","table"],
+    "vente": ["produit","tarif","prix","service","boutique","achat","paiement"],
+    "photo": ["image","galerie","picture","visuel","cover","bannière"],
+    "vidéo": ["youtube","tiktok","clip","stream","twitch","live","vimeo"],
+    "réseau": ["instagram","facebook","twitter","linkedin","snapchat","social"],
+    "événement": ["concert","festival","soirée","date","billet","ticket"],
+    "contact": ["formulaire","email","téléphone","whatsapp","message"],
+    "lien": ["bouton","cta","url","action","click"],
+    "profil": ["bio","présentation","avatar","identité","nom"],
+    "podcast": ["audio","son","écoute","radio","épisode"],
+    "stats": ["statistique","chiffre","nombre","compteur"],
+    "qr": ["qr code","scan","flash"],
   }
 
-  function searchScore(type: string, def: { label: string; description: string; category: string }, q: string): number {
+  function searchScore(type: string, def: {label:string;description:string;category:string}, q: string): number {
     const query = q.toLowerCase().trim()
     if (!query) return 0
     const label = def.label.toLowerCase()
     const desc = def.description.toLowerCase()
     const cat = def.category.toLowerCase()
-    const blockType = type.toLowerCase()
-
-    // Match exact label → score max
     if (label === query) return 100
     if (label.startsWith(query)) return 90
     if (label.includes(query)) return 80
-    // Match description
     if (desc.includes(query)) return 60
-    // Match type key
-    if (blockType.includes(query)) return 50
-    // Match catégorie
+    if (type.toLowerCase().includes(query)) return 50
     if (cat.includes(query)) return 40
-    // Match synonymes
-    for (const [synonym, aliases] of Object.entries(SYNONYMS)) {
-      const allTerms = [synonym, ...aliases]
-      const queryMatchesSynonym = allTerms.some(t => t.includes(query) || query.includes(t))
-      if (queryMatchesSynonym) {
-        if (label.includes(synonym) || aliases.some(a => label.includes(a))) return 35
-        if (desc.includes(synonym) || aliases.some(a => desc.includes(a))) return 25
-        if (cat.includes(synonym) || aliases.some(a => cat.includes(a))) return 20
+    for (const [syn, aliases] of Object.entries(SYNONYMS)) {
+      const allTerms = [syn, ...aliases]
+      if (allTerms.some(t => query.includes(t) || t.includes(query))) {
+        if (allTerms.some(t => label.includes(t))) return 35
+        if (allTerms.some(t => desc.includes(t))) return 25
       }
     }
     return 0
   }
 
-  // Résultats groupés par catégorie avec score
   const filteredBlocks = (() => {
     if (!search) return Object.entries(BLOCK_DEFS).filter(([, def]) => def.category === activeCategory)
-    const scored = Object.entries(BLOCK_DEFS)
+    return Object.entries(BLOCK_DEFS)
       .map(([type, def]) => ({ type, def, score: searchScore(type, def, search) }))
       .filter(({ score }) => score > 0)
       .sort((a, b) => b.score - a.score)
-    return scored.map(({ type, def }) => [type, def] as [string, typeof def])
+      .map(({ type, def }) => [type, def] as [string, (typeof BLOCK_DEFS)[string]])
   })()
 
-  // Grouper par catégorie pour l'affichage en mode recherche
   const groupedResults = search
-    ? BLOCK_CATEGORIES
-        .map(cat => ({
-          cat,
-          blocks: filteredBlocks.filter(([, def]) => def.category === cat.id)
-        }))
-        .filter(({ blocks }) => blocks.length > 0)
+    ? BLOCK_CATEGORIES.map(cat => ({
+        cat,
+        blocks: filteredBlocks.filter(([, def]) => def.category === cat.id)
+      })).filter(({ blocks }) => blocks.length > 0)
     : null
 
-  // Surlignage du terme recherché
-  function highlight(text: string, query: string): React.ReactNode {
+  function hlText(text: string, query: string): React.ReactNode {
     if (!query.trim()) return text
-    const q = query.toLowerCase()
-    const idx = text.toLowerCase().indexOf(q)
+    const lo = text.toLowerCase()
+    const idx = lo.indexOf(query.toLowerCase())
     if (idx === -1) return text
-    return (
-      <>
-        {text.slice(0, idx)}
-        <mark style={{ background: "rgba(201,168,76,0.3)", color: "#F5F0E8", borderRadius: 2, padding: "0 1px" }}>{text.slice(idx, idx + q.length)}</mark>
-        {text.slice(idx + q.length)}
-      </>
-    )
+    return <>{text.slice(0, idx)}<mark style={{ background: "rgba(201,168,76,0.25)", color: "#F5F0E8", borderRadius: 2, padding: "0 1px" }}>{text.slice(idx, idx + query.length)}</mark>{text.slice(idx + query.length)}</>
   }
 
   // selectedBlock recalculé depuis blocks à chaque render — garantit fraîcheur
@@ -3883,47 +3860,40 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
             </div>
           )}
 
-          {!blocksCollapsed && (
-          <div style={{ flex: 1, overflowY: "auto", padding: "5px 6px" }}>
+          {!blocksCollapsed && <div style={{ flex: 1, overflowY: "auto", padding: "5px 6px" }}>
             {filteredBlocks.length===0
               ? (
-                <div style={{ padding: "30px 16px", textAlign: "center" }}>
-                  <p style={{ fontSize: 24, margin: "0 0 8px" }}>🔍</p>
-                  <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: "0 0 4px" }}>Aucun bloc trouvé</p>
-                  <p style={{ color: MUTED, fontSize: 11, margin: "0 0 14px" }}>pour "{search}"</p>
-                  <button onClick={() => setSearch("")}
-                    style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 8, padding: "6px 14px", color: G, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
-                    Effacer la recherche
-                  </button>
+                <div style={{ padding: "30px 14px", textAlign: "center" }}>
+                  <p style={{ fontSize: 22, margin: "0 0 8px" }}>🔍</p>
+                  <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: "0 0 3px" }}>Aucun bloc trouvé</p>
+                  <p style={{ color: MUTED, fontSize: 10, margin: "0 0 12px" }}>"{search}"</p>
+                  <button onClick={() => setSearch("")} style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "5px 12px", color: G, fontSize: 10, fontWeight: 600, cursor: "pointer" }}>Effacer</button>
                 </div>
               )
               : search && groupedResults
-              ? (
-                // Mode recherche : résultats groupés par catégorie
-                <div>
-                  {groupedResults.map(({ cat, blocks: catBlocks }) => (
-                    <div key={cat.id} style={{ marginBottom: 6 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 6px 3px", marginBottom: 2 }}>
-                        <span style={{ fontSize: 11 }}>{cat.icon}</span>
-                        <span style={{ color: cat.color, fontSize: 9, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>{cat.label}</span>
-                        <span style={{ color: MUTED, fontSize: 9 }}>({catBlocks.length})</span>
-                      </div>
-                      {catBlocks.map(([type, def]) => (
-                        <button key={type} onClick={() => addBlock(type)}
-                          style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "7px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 2 }}
-                          onMouseEnter={e => { e.currentTarget.style.background = def.color+"10"; e.currentTarget.style.borderColor = def.color+"20"; e.currentTarget.style.color = "#F5F0E8" }}
-                          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.color = MUTED }}>
-                          <div style={{ width: 28, height: 28, borderRadius: 7, background: def.color+"12", border: `1px solid ${def.color}20`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>{def.icon}</div>
-                          <div style={{ flex: 1, minWidth: 0, textAlign: "left" as const }}>
-                            <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "inherit", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{highlight(def.label, search)}</p>
-                            <p style={{ margin: 0, fontSize: 9, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{highlight(def.description, search)}</p>
-                          </div>
-                        </button>
-                      ))}
+              ? (<>
+                {groupedResults.map(({ cat, blocks: catBlocks }) => (
+                  <div key={cat.id} style={{ marginBottom: 4 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 6px 3px" }}>
+                      <span style={{ fontSize: 11 }}>{cat.icon}</span>
+                      <span style={{ color: cat.color, fontSize: 9, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>{cat.label}</span>
+                      <span style={{ color: MUTED, fontSize: 9 }}>·{catBlocks.length}</span>
                     </div>
-                  ))}
-                </div>
-              )
+                    {catBlocks.map(([type, def]) => (
+                      <button key={type} onClick={() => addBlock(type)}
+                        style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "7px 8px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 1 }}
+                        onMouseEnter={e => { e.currentTarget.style.background = def.color+"10"; e.currentTarget.style.color = "#F5F0E8" }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MUTED }}>
+                        <div style={{ width: 26, height: 26, borderRadius: 6, background: def.color+"12", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>{def.icon}</div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: "inherit", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{hlText(def.label, search)}</p>
+                          <p style={{ margin: 0, fontSize: 9, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{hlText(def.description, search)}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </>)
               : filteredBlocks.map(([type, def]) => (
                 <button key={type} onClick={() => addBlock(type)}
                   style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left", marginBottom: 2, transition: "all 0.15s" }}
@@ -3936,9 +3906,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                   </div>
                 </button>
               ))}
-            </div>
-          </div>
-          )}
+          </div>}
         </div>
 
         {/* POIGNÉE RESIZE sidebar blocs */}
