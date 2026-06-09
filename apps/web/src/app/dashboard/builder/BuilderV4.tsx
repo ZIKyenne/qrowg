@@ -3422,6 +3422,24 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
       return next
     })
   }, [])
+
+  // ── Catégories repliées ───────────────────────────────────────────────────
+  const [collapsedCats, setCollapsedCats] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      try { return JSON.parse(localStorage.getItem("qrfolio_collapsed_cats") || "[]") } catch { return [] }
+    }
+    return []
+  })
+
+  const toggleCat = useCallback((catId: string) => {
+    setCollapsedCats(prev => {
+      const next = prev.includes(catId) ? prev.filter(c => c !== catId) : [...prev, catId]
+      localStorage.setItem("qrfolio_collapsed_cats", JSON.stringify(next))
+      return next
+    })
+  }, [])
+
+  const isCatCollapsed = useCallback((catId: string) => collapsedCats.includes(catId), [collapsedCats])
   function toggleFocus() {
     setFocusMode(p => {
       const next = !p
@@ -3939,57 +3957,120 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
           )}
 
           {!blocksCollapsed && <div style={{ flex: 1, overflowY: "auto", padding: "5px 6px" }}>
-            {filteredBlocks.length===0
-              ? (
-                <div style={{ padding: "30px 14px", textAlign: "center" }}>
-                  <p style={{ fontSize: 22, margin: "0 0 8px" }}>🔍</p>
-                  <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: "0 0 3px" }}>Aucun bloc trouvé</p>
-                  <p style={{ color: MUTED, fontSize: 10, margin: "0 0 12px" }}>"{search}"</p>
-                  <button onClick={() => setSearch("")} style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "5px 12px", color: G, fontSize: 10, fontWeight: 600, cursor: "pointer" }}>Effacer</button>
-                </div>
-              )
-              : search && groupedResults
-              ? (<>
-                {groupedResults.map(({ cat, blocks: catBlocks }) => (
-                  <div key={cat.id} style={{ marginBottom: 4 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 6px 3px" }}>
-                      <span style={{ fontSize: 11 }}>{cat.icon}</span>
-                      <span style={{ color: cat.color, fontSize: 9, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>{cat.label}</span>
-                      <span style={{ color: MUTED, fontSize: 9 }}>·{catBlocks.length}</span>
+            {search
+              ? (filteredBlocks.length===0
+                ? (
+                  <div style={{ padding: "30px 14px", textAlign: "center" }}>
+                    <p style={{ fontSize: 22, margin: "0 0 8px" }}>🔍</p>
+                    <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: "0 0 3px" }}>Aucun bloc trouvé</p>
+                    <p style={{ color: MUTED, fontSize: 10, margin: "0 0 12px" }}>"{search}"</p>
+                    <button onClick={() => setSearch("")} style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "5px 12px", color: G, fontSize: 10, fontWeight: 600, cursor: "pointer" }}>Effacer</button>
+                  </div>
+                )
+                : (<>
+                  {(groupedResults||[]).map(({ cat, blocks: catBlocks }) => (
+                    <div key={cat.id} style={{ marginBottom: 4 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 6px 3px" }}>
+                        <span style={{ fontSize: 11 }}>{cat.icon}</span>
+                        <span style={{ color: cat.color, fontSize: 9, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>{cat.label}</span>
+                        <span style={{ color: MUTED, fontSize: 9 }}>·{catBlocks.length}</span>
+                      </div>
+                      {catBlocks.map(([type, def]) => (
+                        <button key={type} onClick={() => addBlock(type)}
+                          style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "7px 8px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 1 }}
+                          onMouseEnter={e => { e.currentTarget.style.background = def.color+"10"; e.currentTarget.style.color = "#F5F0E8" }}
+                          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MUTED }}>
+                          <div style={{ width: 26, height: 26, borderRadius: 6, background: def.color+"12", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>{def.icon}</div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: "inherit", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{hlText(def.label, search)}</p>
+                            <p style={{ margin: 0, fontSize: 9, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{hlText(def.description, search)}</p>
+                          </div>
+                        </button>
+                      ))}
                     </div>
-                    {catBlocks.map(([type, def]) => (
-                      <button key={type} onClick={() => addBlock(type)}
-                        style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "7px 8px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 1 }}
-                        onMouseEnter={e => { e.currentTarget.style.background = def.color+"10"; e.currentTarget.style.color = "#F5F0E8" }}
-                        onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MUTED }}>
-                        <div style={{ width: 26, height: 26, borderRadius: 6, background: def.color+"12", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>{def.icon}</div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: "inherit", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{hlText(def.label, search)}</p>
-                          <p style={{ margin: 0, fontSize: 9, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{hlText(def.description, search)}</p>
-                        </div>
+                  ))}
+                </>)
+              )
+              : (
+                /* Mode normal — accordéon par catégorie */
+                <>
+                  {/* Récents */}
+                  {activeCategory==="recents" && recentBlocks.length > 0 && filteredBlocks.map(([type, def]) => (
+                    <button key={type} onClick={() => addBlock(type)}
+                      style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 2 }}
+                      onMouseEnter={e => { const el = e.currentTarget; el.style.background = "#38BDF810"; el.style.color = "#F5F0E8" }}
+                      onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = MUTED }}>
+                      <div style={{ width: 30, height: 30, borderRadius: 8, background: def.color+"12", border: `1px solid ${def.color}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
+                        <p style={{ margin: 0, fontSize: 9, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.description}</p>
+                      </div>
+                      <button onClick={e => { e.stopPropagation(); toggleFav(type) }} title={isFav(type) ? "Retirer des favoris" : "Ajouter aux favoris"}
+                        style={{ width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", cursor: "pointer", flexShrink: 0, fontSize: 13, opacity: isFav(type) ? 1 : 0, color: isFav(type) ? "#FFD700" : MUTED }}
+                        className="fav-star">
+                        {isFav(type) ? "⭐" : "☆"}
                       </button>
-                    ))}
-                  </div>
-                ))}
-              </>)
-              : filteredBlocks.map(([type, def]) => (
-                <button key={type} onClick={() => addBlock(type)}
-                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left", marginBottom: 2, transition: "all 0.15s" }}
-                  onMouseEnter={e => { const el = e.currentTarget; el.style.background = def.color+"10"; el.style.color = "#F5F0E8"; el.style.borderColor = def.color+"20"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0.5" }}
-                  onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = MUTED; el.style.borderColor = "transparent"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0" }}>
-                  <div style={{ width: 30, height: 30, borderRadius: 8, background: def.color+"12", border: `1px solid ${def.color}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
-                    <p style={{ margin: 0, fontSize: 9, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1.3 }}>{def.description}</p>
-                  </div>
-                  <button onClick={e => { e.stopPropagation(); toggleFav(type) }}
-                    title={isFav(type) ? "Retirer des favoris" : "Ajouter aux favoris"}
-                    style={{ width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", cursor: "pointer", flexShrink: 0, fontSize: 13, opacity: isFav(type) ? 1 : 0, transition: "opacity 0.15s, transform 0.15s", color: isFav(type) ? "#FFD700" : MUTED }}
-                    className="fav-star">
-                    {isFav(type) ? "⭐" : "☆"}
-                  </button>
-                </button>
-              ))}
+                    </button>
+                  ))}
+                  {/* Favoris */}
+                  {activeCategory==="favorites" && favorites.length > 0 && filteredBlocks.map(([type, def]) => (
+                    <button key={type} onClick={() => addBlock(type)}
+                      style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 2 }}
+                      onMouseEnter={e => { const el = e.currentTarget; el.style.background = "#FFD70010"; el.style.color = "#F5F0E8" }}
+                      onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = MUTED }}>
+                      <div style={{ width: 30, height: 30, borderRadius: 8, background: def.color+"12", border: `1px solid ${def.color}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
+                        <p style={{ margin: 0, fontSize: 9, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.description}</p>
+                      </div>
+                      <button onClick={e => { e.stopPropagation(); toggleFav(type) }} title="Retirer des favoris"
+                        style={{ width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", cursor: "pointer", flexShrink: 0, fontSize: 13, opacity: 1, color: "#FFD700" }}
+                        className="fav-star">⭐</button>
+                    </button>
+                  ))}
+                  {/* Catégories normales en accordéon */}
+                  {activeCategory!=="recents" && activeCategory!=="favorites" && (
+                    <div>
+                      {/* Header catégorie active avec collapse */}
+                      {(() => {
+                        const cat = BLOCK_CATEGORIES.find(c => c.id===activeCategory)
+                        if (!cat) return null
+                        const collapsed = isCatCollapsed(activeCategory)
+                        const catBlocks = Object.entries(BLOCK_DEFS).filter(([, def]) => def.category === activeCategory)
+                        return (
+                          <div>
+                            <button onClick={() => toggleCat(activeCategory)}
+                              style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "7px 9px 6px", background: "transparent", border: "none", borderBottom: `1px solid rgba(255,255,255,0.05)`, cursor: "pointer", marginBottom: collapsed ? 0 : 4 }}>
+                              <span style={{ fontSize: 13 }}>{cat.icon}</span>
+                              <span style={{ color: cat.color, fontSize: 10, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 1.5, flex: 1, textAlign: "left" as const }}>{cat.label}</span>
+                              <span style={{ color: MUTED, fontSize: 9, marginRight: 4 }}>{catBlocks.length}</span>
+                              <span style={{ color: MUTED, fontSize: 10, display: "inline-block", transform: collapsed ? "rotate(-90deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>▾</span>
+                            </button>
+                            {!collapsed && catBlocks.map(([type, def]) => (
+                              <button key={type} onClick={() => addBlock(type)}
+                                style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 2, transition: "all 0.15s" }}
+                                onMouseEnter={e => { const el = e.currentTarget; el.style.background = def.color+"10"; el.style.color = "#F5F0E8"; el.style.borderColor = def.color+"20"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0.5" }}
+                                onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = MUTED; el.style.borderColor = "transparent"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0" }}>
+                                <div style={{ width: 30, height: 30, borderRadius: 8, background: def.color+"12", border: `1px solid ${def.color}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
+                                  <p style={{ margin: 0, fontSize: 9, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1.3 }}>{def.description}</p>
+                                </div>
+                                <button onClick={e => { e.stopPropagation(); toggleFav(type) }}
+                                  title={isFav(type) ? "Retirer des favoris" : "Ajouter aux favoris"}
+                                  style={{ width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", cursor: "pointer", flexShrink: 0, fontSize: 13, opacity: isFav(type) ? 1 : 0, transition: "opacity 0.15s", color: isFav(type) ? "#FFD700" : MUTED }}
+                                  className="fav-star">
+                                  {isFav(type) ? "⭐" : "☆"}
+                                </button>
+                              </button>
+                            ))}
+                          </div>
+                        )
+                      })()}
+                    </div>
+                  )}
+                </>
+              )}
           </div>}
         </div>
 
