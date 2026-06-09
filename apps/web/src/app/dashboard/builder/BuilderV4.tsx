@@ -4618,7 +4618,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
             <div style={{ ...bgStyle(), borderRadius: 20, overflow: "hidden", minHeight: 200, position: "relative", boxShadow: "0 8px 60px rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.05)" }}>
             {/* Effets overlay */}
             {(theme as any).effect_noise && (
-              <div style={{ position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none", opacity: (theme as any).noise_opacity ? (theme as any).noise_opacity/100 : 0.06, mixBlendMode: "overlay" as const, backgroundImage: NOISE_SVG_URL", backgroundRepeat: "repeat", backgroundSize: "128px 128px" }} />
+              <div style={{ position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none", opacity: (theme as any).noise_opacity ? (theme as any).noise_opacity/100 : 0.06, mixBlendMode: "overlay" as const, backgroundImage: NOISE_SVG_URL, backgroundRepeat: "repeat", backgroundSize: "128px 128px" }} />
             )}
             {(theme as any).effect_glow && <div style={{ position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none", background: `radial-gradient(ellipse at 50% 0%, ${(theme as any).glow_color||"#C9A84C"}${Math.round(((theme as any).glow_intensity||40)/100*180).toString(16).padStart(2,"0")}, transparent ${(theme as any).glow_size||300}px)` }} />}
             {(theme as any).effect_overlay && <div style={{ position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none", background: (theme as any).overlay_color||"#000000", opacity: ((theme as any).overlay_opacity||30)/100 }} />}
