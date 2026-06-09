@@ -1615,6 +1615,201 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
       </div>
     )
 
+
+    case "google_maps_embed": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        {c.label && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.label}</p>}
+        {c.embed_url
+          ? <iframe src={c.embed_url} width="100%" height={c.height==="lg" ? 200 : c.height==="sm" ? 120 : 160} style={{ border: "none", borderRadius: 12, display: "block" }} loading="lazy" />
+          : <div style={{ height: 160, background: "rgba(66,133,244,0.06)", border: "1px solid rgba(66,133,244,0.2)", borderRadius: 12, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
+              <span style={{ fontSize: 32 }}>🗺️</span>
+              <p style={{ color: muted, fontSize: 11, margin: 0, textAlign: "center" }}>{c.address||"Ajoutez l URL embed Google Maps"}</p>
+            </div>}
+        {c.show_directions!=="no" && c.address && (
+          <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(c.address)}`} target="_blank" rel="noopener noreferrer"
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, marginTop: 10, background: "rgba(66,133,244,0.1)", border: "1px solid rgba(66,133,244,0.25)", borderRadius: 9, padding: "10px", color: "#4285F4", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+            🧭 Obtenir l&apos;itinéraire
+          </a>
+        )}
+      </div>
+    )
+
+    case "quote_form": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>{c.title||"Demander un devis"}</p>
+        {c.description && <p style={{ color: muted, fontSize: 11, margin: "0 0 12px" }}>{c.description}</p>}
+        <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+          {["Nom complet","Email"].map(f => <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>{f}</div>)}
+          {c.show_phone!=="no" && <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>Téléphone</div>}
+          {c.show_budget==="yes" && <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>Budget estimé</div>}
+          <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px 36px", color: muted, fontSize: 11 }}>Description du projet</div>
+          <div style={{ background: `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 9, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#080808" }}>{c.button_label||"Envoyer ma demande"}</div>
+        </div>
+      </div>
+    )
+
+    case "quick_contact": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+        <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+          {[
+            [c.phone, "📞", "#39FF8F", `tel:${c.phone}`],
+            [c.email, "✉️", "#38BDF8", `mailto:${c.email}`],
+            [c.whatsapp, "💬", "#25D366", `https://wa.me/${c.whatsapp}`],
+            [c.address, "📍", primary, null],
+            [c.hours, "🕐", MUTED, null],
+          ].filter(([v]) => v).map(([value, icon, color, href], i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, background: (color as string)+"10", border: `1px solid ${color as string}20`, borderRadius: 10, padding: "11px 14px" }}>
+              <span style={{ fontSize: 18, flexShrink: 0 }}>{icon}</span>
+              <span style={{ color: text, fontSize: 12, fontWeight: 600, flex: 1 }}>{value}</span>
+              {href && <ExternalLink size={11} color={color as string} style={{ flexShrink: 0 }} />}
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+
+    case "multi_contact": {
+      const contacts = [
+        [c.c1_photo, c.c1_name, c.c1_role, c.c1_phone, c.c1_email],
+        [c.c2_photo, c.c2_name, c.c2_role, c.c2_phone, c.c2_email],
+        [c.c3_photo, c.c3_name, c.c3_role, c.c3_phone, c.c3_email],
+      ].filter(([,n])=>n)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+            {contacts.length===0
+              ? [0,1].map(i => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
+                  <div style={{ width: 40, height: 40, borderRadius: "50%", background: primary+"20", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>👤</div>
+                  <div style={{ flex: 1 }}><p style={{ color: text, fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>Prénom Nom</p><p style={{ color: primary, fontSize: 10, margin: "0 0 3px" }}>Poste</p></div>
+                </div>
+              ))
+              : contacts.map(([photo,name,role,phone,email],i) => (
+                <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: (phone||email) ? 10 : 0 }}>
+                    {photo
+                      ? <img src={String(photo)} alt="" style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${primary}40` }} />
+                      : <div style={{ width: 40, height: 40, borderRadius: "50%", background: `linear-gradient(135deg,${primary},${accent})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, color: "#080808", flexShrink: 0 }}>{String(name)[0]}</div>}
+                    <div><p style={{ color: text, fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>{name}</p><p style={{ color: primary, fontSize: 10, margin: 0 }}>{role}</p></div>
+                  </div>
+                  {(phone||email) && (
+                    <div style={{ display: "flex", gap: 7 }}>
+                      {phone && <a href={`tel:${phone}`} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, background: "rgba(57,255,143,0.08)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 8, padding: "7px", color: "#39FF8F", textDecoration: "none", fontSize: 11, fontWeight: 600 }}>📞 Appeler</a>}
+                      {email && <a href={`mailto:${email}`} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, background: "rgba(56,189,248,0.08)", border: "1px solid rgba(56,189,248,0.2)", borderRadius: 8, padding: "7px", color: "#38BDF8", textDecoration: "none", fontSize: 11, fontWeight: 600 }}>✉️ Email</a>}
+                    </div>
+                  )}
+                </div>
+              ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "service_area": {
+      const cities = [c.city1,c.city2,c.city3,c.city4,c.city5,c.city6].filter(Boolean)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+          {c.area && (
+            <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(66,133,244,0.08)", border: "1px solid rgba(66,133,244,0.2)", borderRadius: 10, padding: "11px 14px", marginBottom: 10 }}>
+              <span style={{ fontSize: 20 }}>📍</span>
+              <div>
+                <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{c.area}</p>
+                {c.radius && <p style={{ color: muted, fontSize: 11, margin: 0 }}>{c.radius}</p>}
+              </div>
+            </div>
+          )}
+          {cities.length>0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+              {cities.map((city: string, i: number) => (
+                <span key={i} style={{ background: "rgba(66,133,244,0.08)", border: "1px solid rgba(66,133,244,0.2)", borderRadius: 20, padding: "5px 12px", color: text, fontSize: 12 }}>📍 {city}</span>
+              ))}
+            </div>
+          )}
+          {c.note && <p style={{ color: muted, fontSize: 11, margin: "10px 0 0", fontStyle: "italic" }}>{c.note}</p>}
+        </div>
+      )
+    }
+
+    case "legal_info": {
+      const rows = [
+        ["Société", c.company_name],
+        ["SIRET", c.siret],
+        ["N° TVA", c.tva],
+        ["Siège social", c.address],
+        ["Capital", c.capital],
+        ["RCS", c.rcs],
+        ["Email", c.email],
+      ].filter(([,v])=>v)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+          <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, overflow: "hidden" }}>
+            {rows.map(([label,value],i) => (
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 14px", borderBottom: i<rows.length-1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+                <span style={{ color: muted, fontSize: 11 }}>{label}</span>
+                <span style={{ color: text, fontSize: 11, fontWeight: 600, maxWidth: "55%", textAlign: "right", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{value}</span>
+              </div>
+            ))}
+            {rows.length===0 && <p style={{ color: muted, fontSize: 11, textAlign: "center", padding: "20px", margin: 0 }}>Ajoutez vos informations légales</p>}
+          </div>
+        </div>
+      )
+    }
+
+    case "business_certifications": {
+      const certs = [
+        [c.c1_icon,c.c1_name,c.c1_org,c.c1_year],
+        [c.c2_icon,c.c2_name,c.c2_org,c.c2_year],
+        [c.c3_icon,c.c3_name,c.c3_org,c.c3_year],
+        [c.c4_icon,c.c4_name,c.c4_org,c.c4_year],
+      ].filter(([,n])=>n)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+            {certs.length===0
+              ? [["✅","Qualiopi","Ministère du Travail","2023"],["🏆","RGE","ADEME","2024"]].map(([icon,name,org,year],i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, background: primary+"06", border: `1px solid ${primary}15`, borderRadius: 11, padding: "10px 12px" }}>
+                  <span style={{ fontSize: 20 }}>{icon}</span>
+                  <div style={{ flex: 1 }}><p style={{ color: text, fontSize: 12, fontWeight: 700, margin: 0 }}>{name}</p><p style={{ color: muted, fontSize: 10, margin: 0 }}>{org} · {year}</p></div>
+                  <Check size={13} color={primary} />
+                </div>
+              ))
+              : certs.map(([icon,name,org,year],i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, background: primary+"06", border: `1px solid ${primary}15`, borderRadius: 11, padding: "10px 12px" }}>
+                  <span style={{ fontSize: 20 }}>{icon||"🏅"}</span>
+                  <div style={{ flex: 1 }}><p style={{ color: text, fontSize: 12, fontWeight: 700, margin: 0 }}>{name}</p><p style={{ color: muted, fontSize: 10, margin: 0 }}>{org}{year ? ` · ${year}` : ""}</p></div>
+                  <Check size={13} color={primary} />
+                </div>
+              ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "on_site_services": {
+      const svcs = [
+        [c.s1_icon,c.s1_label],[c.s2_icon,c.s2_label],[c.s3_icon,c.s3_label],[c.s4_icon,c.s4_label],
+        [c.s5_icon,c.s5_label],[c.s6_icon,c.s6_label],[c.s7_icon,c.s7_label],[c.s8_icon,c.s8_label],
+      ].filter(([,l])=>l)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            {(svcs.length===0 ? [["♿","Accès PMR"],["📶","WiFi gratuit"],["🚗","Parking"],["💳","CB acceptée"]] : svcs).map(([icon,label],i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 9, background: "rgba(66,133,244,0.06)", border: "1px solid rgba(66,133,244,0.15)", borderRadius: 10, padding: "10px 12px" }}>
+                <span style={{ fontSize: 20, flexShrink: 0 }}>{icon}</span>
+                <span style={{ color: text, fontSize: 11, fontWeight: 600 }}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
     default: {
       const def = BLOCK_DEFS[block.type]
       return <div style={{ padding: "12px 16px", textAlign: "center", ...s }}><span style={{ fontSize: 22 }}>{def?.icon||"📦"}</span><p style={{ color: muted, fontSize: 11, margin: "5px 0 0" }}>{def?.label||block.type}</p></div>
