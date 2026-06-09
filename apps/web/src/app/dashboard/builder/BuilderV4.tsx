@@ -2521,7 +2521,7 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
   const [bgMode, setBgMode] = useState<string>(theme.bgMode||"solid")
   const [bgSubTab, setBgSubTab] = useState<"type"|"effects"|"animation"|"presets"|"advanced">("presets")
   const [patternTypeLocal, setPatternType] = useState<string>((theme as any).bgPattern||"dots")
-  const patternType = patternTypeLocal = useState<string>((theme as any).bgPattern||"dots")
+  
   const [effectNoise, setEffectNoise] = useState(false)
   const [effectGlow, setEffectGlow] = useState(false)
   const [effectVignette, setEffectVignette] = useState(false)
