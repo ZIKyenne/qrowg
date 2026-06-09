@@ -3511,6 +3511,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
               <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}><Plus size={14} color={G} /></div>
               Ajouter un nouveau bloc
             </button>
+            </div>
           </div>
         </div>
 
