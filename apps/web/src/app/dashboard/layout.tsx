@@ -1,198 +1,226 @@
-﻿"use server"
+﻿"use client"
+
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { createServerSupabaseClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
+import { usePathname } from "next/navigation"
 import {
-  LayoutDashboard, QrCode, BarChart2, Settings, Zap,
-  User, Globe, LayoutTemplate, ChevronDown, Crown,
-  Sparkles, Star, TrendingUp, ChevronRight
+  LayoutDashboard, FileText, BarChart2, QrCode, User,
+  Zap, ChevronRight, LogOut, Settings, Menu, X, Eye
 } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
 
-export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect("/auth/login")
+const G = "#C9A84C"
+const MUTED = "#8A8478"
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("full_name, email, plan, avatar_url, total_pages, total_scans")
-    .eq("id", user.id)
-    .single()
+const NAV_ITEMS = [
+  { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard", exact: true },
+  { href: "/dashboard/templates", icon: FileText, label: "Templates" },
+  { href: "/dashboard/analytics", icon: BarChart2, label: "Analytics" },
+  { href: "/dashboard/qr-codes", icon: QrCode, label: "QR Codes" },
+  { href: "/dashboard/settings", icon: Settings, label: "Paramètres" },
+]
 
-  const PLAN_LIMITS: Record<string, number> = { free: 500, starter: 5000, pro: 50000, business: Infinity }
-  const limit = PLAN_LIMITS[profile?.plan || "free"]
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("qrfolio_sidebar") === "collapsed"
+    }
+    return false
+  })
+  const [user, setUser] = useState<any>(null)
+  const [profile, setProfile] = useState<any>(null)
+  const [mounted, setMounted] = useState(false)
 
-  const { data: pages } = await supabase
-    .from("pages")
-    .select("total_views")
-    .eq("user_id", user.id)
+  useEffect(() => {
+    setMounted(true)
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        setUser(data.user)
+        supabase.from("profiles").select("*").eq("id", data.user.id).single()
+          .then(({ data: p }) => setProfile(p))
+      }
+    })
+  }, [])
 
-  const totalViews = (pages || []).reduce((s: number, p: any) => s + (p.total_views || 0), 0)
-  const usagePct = limit === Infinity ? 0 : Math.min(100, Math.round((totalViews / limit) * 100))
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem("qrfolio_sidebar", collapsed ? "collapsed" : "expanded")
+    }
+  }, [collapsed, mounted])
 
-  const planColors: Record<string, string> = { free: "#8A8478", starter: "#38BDF8", pro: "#C9A84C", business: "#39FF8F" }
-  const pc = planColors[profile?.plan || "free"]
-  const plan = profile?.plan || "free"
+  const isActive = (href: string, exact = false) => {
+    if (exact) return pathname === href
+    return pathname.startsWith(href)
+  }
+
+  const W = collapsed ? 72 : 240
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#080808", fontFamily: "DM Sans, sans-serif" }}>
-      <style>{`
-        .nav-link { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; text-decoration: none; color: #8A8478; font-size: 13px; transition: all 0.15s; }
-        .nav-link:hover { background: rgba(201,168,76,0.07); color: #F5F0E8; }
-        .nav-link.active { background: rgba(201,168,76,0.1); color: #C9A84C; }
-        .nav-group-header { display: flex; align-items: center; gap: 8px; padding: 6px 12px; cursor: pointer; border-radius: 6px; transition: background 0.15s; width: 100%; background: transparent; border: none; }
-        .nav-group-header:hover { background: rgba(255,255,255,0.03); }
-        details > summary { list-style: none; }
-        details > summary::-webkit-details-marker { display: none; }
-        details[open] .chevron { transform: rotate(90deg); }
-        .chevron { transition: transform 0.2s; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-      `}</style>
-
-      <aside style={{ width: 220, background: "#0A0A0A", borderRight: "1px solid rgba(201,168,76,0.1)", display: "flex", flexDirection: "column", padding: "0 10px 16px", position: "fixed", top: 0, left: 0, height: "100vh", overflowY: "auto" }}>
-
-        {/* Logo */}
-        <div style={{ padding: "20px 12px 16px", borderBottom: "1px solid rgba(255,255,255,0.04)", marginBottom: 10 }}>
-          <Link href="/dashboard" style={{ textDecoration: "none" }}>
-            <span style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 24, color: "#C9A84C", fontWeight: 700 }}>QRfolio</span>
+    <div style={{ display: "flex", height: "100vh", background: "#080808", fontFamily: "DM Sans, sans-serif", overflow: "hidden" }}>
+      {/* SIDEBAR */}
+      <div style={{
+        width: W, minWidth: W, background: "#0A0A0A",
+        borderRight: "1px solid rgba(201,168,76,0.1)",
+        display: "flex", flexDirection: "column",
+        transition: "width 0.25s cubic-bezier(0.4,0,0.2,1), min-width 0.25s cubic-bezier(0.4,0,0.2,1)",
+        overflow: "hidden", flexShrink: 0, position: "relative", zIndex: 30
+      }}>
+        {/* Header: Logo + Toggle */}
+        <div style={{ height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", padding: collapsed ? "0 14px" : "0 16px 0 20px", borderBottom: "1px solid rgba(201,168,76,0.08)", flexShrink: 0 }}>
+          {/* Logo */}
+          <Link href="/dashboard" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 8, overflow: "hidden" }}>
+            <div style={{ width: 28, height: 28, borderRadius: 8, background: `linear-gradient(135deg, ${G}, #b8953f)`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: `0 2px 8px ${G}40` }}>
+              <QrCode size={14} color="#080808" />
+            </div>
+            {!collapsed && (
+              <span style={{ color: G, fontFamily: "Cormorant Garamond, serif", fontSize: 18, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden" }}>
+                QRfolio
+              </span>
+            )}
           </Link>
+          {/* Bouton toggle */}
+          <button onClick={() => setCollapsed(p => !p)}
+            style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, cursor: "pointer", color: MUTED, flexShrink: 0, transition: "all 0.2s" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.1)"; e.currentTarget.style.color = G; e.currentTarget.style.borderColor = "rgba(201,168,76,0.3)" }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.color = MUTED; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)" }}>
+            <ChevronRight size={13} style={{ transform: collapsed ? "rotate(0deg)" : "rotate(180deg)", transition: "transform 0.25s" }} />
+          </button>
         </div>
 
-        {/* Nav principale */}
-        <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: 1 }}>
-
-          {/* Dashboard */}
-          <Link href="/dashboard" className="nav-link">
-            <LayoutDashboard size={15} /> Dashboard
-          </Link>
-
-          {/* Templates */}
-          <Link href="/dashboard/templates" className="nav-link">
-            <LayoutTemplate size={15} /> Templates
-          </Link>
-
-          {/* Analytics */}
-          <Link href="/dashboard/analytics" className="nav-link">
-            <BarChart2 size={15} /> Analytics
-          </Link>
-
-          {/* QR Codes */}
-          <Link href="/dashboard/qr-codes" className="nav-link">
-            <QrCode size={15} /> QR Codes
-          </Link>
-
-          {/* Separateur */}
-          <div style={{ height: 1, background: "rgba(255,255,255,0.04)", margin: "8px 4px" }} />
-
-          {/* Compte — depliable */}
-          <details>
-            <summary>
-              <div className="nav-group-header">
-                <User size={15} color="#8A8478" />
-                <span style={{ color: "#8A8478", fontSize: 13, flex: 1, textAlign: "left" }}>Compte</span>
-                <ChevronRight size={12} color="#8A8478" className="chevron" />
-              </div>
-            </summary>
-            <div style={{ paddingLeft: 14, display: "flex", flexDirection: "column", gap: 1, marginTop: 2 }}>
-              <Link href="/dashboard/profile" className="nav-link" style={{ fontSize: 12, padding: "7px 12px" }}>
-                <User size={13} /> Profil
-              </Link>
-              <Link href="/dashboard/domains" className="nav-link" style={{ fontSize: 12, padding: "7px 12px" }}>
-                <Globe size={13} /> Domaines
-              </Link>
-              <Link href="/dashboard/settings" className="nav-link" style={{ fontSize: 12, padding: "7px 12px" }}>
-                <Settings size={13} /> Parametres
-              </Link>
-            </div>
-          </details>
-
-          {/* Separateur */}
-          <div style={{ height: 1, background: "rgba(255,255,255,0.04)", margin: "8px 4px" }} />
-
-          {/* Upgrade — toujours visible */}
-          <Link href="/upgrade" className="nav-link" style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 10, padding: "10px 12px", marginTop: 2 }}>
-            <Zap size={15} color="#C9A84C" />
-            <div style={{ flex: 1 }}>
-              <p style={{ color: "#C9A84C", fontSize: 12, fontWeight: 700, margin: 0 }}>Upgrade</p>
-              <p style={{ color: "#8A8478", fontSize: 10, margin: 0 }}>
-                {plan === "free" ? "Starter 2,99€/mois" : plan === "starter" ? "Pro 9,99€/mois" : plan === "pro" ? "Business 24,99€/mois" : "Plan actif ✓"}
-              </p>
-            </div>
-            <ChevronRight size={12} color="#C9A84C" style={{ opacity: 0.6 }} />
-          </Link>
-
-          {/* Plans apercu depliable */}
-          <details style={{ marginTop: 4 }}>
-            <summary>
-              <div className="nav-group-header" style={{ padding: "6px 12px" }}>
-                <Crown size={14} color="#8A8478" />
-                <span style={{ color: "#8A8478", fontSize: 12, flex: 1, textAlign: "left" }}>Voir les plans</span>
-                <ChevronRight size={11} color="#8A8478" className="chevron" />
-              </div>
-            </summary>
-            <div style={{ padding: "8px 10px", display: "flex", flexDirection: "column", gap: 6, marginTop: 2 }}>
-              {[
-                { id: "free", label: "Gratuit", price: "0€", color: "#8A8478", icon: "★", perks: "1 page • 500 vues" },
-                { id: "starter", label: "Starter", price: "2,99€", color: "#38BDF8", icon: "⚡", perks: "3 pages • 5k vues" },
-                { id: "pro", label: "Pro", price: "9,99€", color: "#C9A84C", icon: "🔥", perks: "Illimité • 50k vues" },
-                { id: "business", label: "Business", price: "24,99€", color: "#39FF8F", icon: "👑", perks: "Vues illimitées • API" },
-              ].map(p => (
-                <Link key={p.id} href="/upgrade"
-                  style={{ display: "flex", alignItems: "center", gap: 8, background: plan === p.id ? p.color + "12" : "rgba(255,255,255,0.02)", border: `1px solid ${plan === p.id ? p.color + "35" : "rgba(255,255,255,0.05)"}`, borderRadius: 9, padding: "8px 10px", textDecoration: "none", transition: "all 0.15s" }}>
-                  <span style={{ fontSize: 14 }}>{p.icon}</span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                      <p style={{ color: plan === p.id ? p.color : "#F5F0E8", fontSize: 11, fontWeight: 700, margin: 0 }}>{p.label}</p>
-                      {plan === p.id && <span style={{ background: p.color + "20", borderRadius: 4, padding: "1px 5px", fontSize: 8, color: p.color, fontWeight: 700 }}>ACTUEL</span>}
-                    </div>
-                    <p style={{ color: "#8A8478", fontSize: 9, margin: 0 }}>{p.perks}</p>
+        {/* Navigation */}
+        <nav style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: "10px 8px" }} className="sidebar-nav">
+          {NAV_ITEMS.map(({ href, icon: Icon, label, exact }) => {
+            const active = isActive(href, exact)
+            return (
+              <div key={href} style={{ position: "relative" }} className="sidebar-item">
+                <Link href={href} style={{ textDecoration: "none" }}>
+                  <div style={{
+                    display: "flex", alignItems: "center", gap: 10,
+                    padding: collapsed ? "10px 0" : "9px 12px",
+                    justifyContent: collapsed ? "center" : "flex-start",
+                    borderRadius: 9,
+                    background: active ? `${G}12` : "transparent",
+                    border: `1px solid ${active ? G+"30" : "transparent"}`,
+                    color: active ? G : MUTED,
+                    fontSize: 13, fontWeight: active ? 600 : 400,
+                    cursor: "pointer",
+                    transition: "all 0.15s",
+                    marginBottom: 2,
+                    whiteSpace: "nowrap", overflow: "hidden",
+                  }}
+                  onMouseEnter={e => { if (!active) { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.color = "#F5F0E8" } }}
+                  onMouseLeave={e => { if (!active) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MUTED } }}>
+                    <Icon size={16} style={{ flexShrink: 0 }} />
+                    {!collapsed && <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{label}</span>}
+                    {!collapsed && active && <div style={{ width: 4, height: 4, borderRadius: "50%", background: G, marginLeft: "auto", flexShrink: 0 }} />}
                   </div>
-                  <span style={{ color: p.color, fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{p.price}<span style={{ color: "#8A8478", fontSize: 9, fontWeight: 400 }}>/mois</span></span>
                 </Link>
-              ))}
-            </div>
-          </details>
-
+                {/* Tooltip en mode collapsed */}
+                {collapsed && (
+                  <div className="sidebar-tooltip" style={{
+                    position: "absolute", left: "calc(100% + 10px)", top: "50%", transform: "translateY(-50%)",
+                    background: "#1A1A1A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8,
+                    padding: "6px 12px", color: "#F5F0E8", fontSize: 12, fontWeight: 600,
+                    whiteSpace: "nowrap", pointerEvents: "none", zIndex: 100,
+                    opacity: 0, transition: "opacity 0.15s", boxShadow: "0 4px 16px rgba(0,0,0,0.4)"
+                  }}>
+                    {label}
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </nav>
 
-        {/* Quota vues */}
-        {limit !== Infinity && (
-          <div style={{ marginBottom: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, padding: "10px 12px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-              <span style={{ color: "#8A8478", fontSize: 10 }}>Vues ce mois</span>
-              <span style={{ color: usagePct >= 80 ? "#EF4444" : "#C9A84C", fontSize: 10, fontWeight: 700 }}>{usagePct}%</span>
-            </div>
-            <div style={{ height: 4, background: "rgba(255,255,255,0.06)", borderRadius: 2, overflow: "hidden", marginBottom: 4 }}>
-              <div style={{ height: "100%", width: usagePct + "%", background: usagePct >= 80 ? "#EF4444" : "linear-gradient(90deg,#C9A84C,#39FF8F)", borderRadius: 2, transition: "width 0.5s" }} />
-            </div>
-            <p style={{ color: "#8A8478", fontSize: 9, margin: 0 }}>{totalViews.toLocaleString("fr-FR")} / {limit.toLocaleString("fr-FR")}</p>
-          </div>
-        )}
-
-        {/* User card */}
-        <div style={{ padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            {profile?.avatar_url
-              ? <img src={profile.avatar_url} alt="" style={{ width: 30, height: 30, borderRadius: "50%", objectFit: "cover", border: `1.5px solid ${pc}40`, flexShrink: 0 }} />
-              : <div style={{ width: 30, height: 30, borderRadius: "50%", background: `linear-gradient(135deg,${pc},${pc}80)`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 13, fontWeight: 700, color: "#080808" }}>
-                  {(profile?.full_name || profile?.email || "?")[0]?.toUpperCase()}
-                </div>
-            }
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {profile?.full_name || profile?.email?.split("@")[0]}
-              </p>
-              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <div style={{ width: 5, height: 5, borderRadius: "50%", background: pc, animation: "pulse 2s infinite" }} />
-                <p style={{ color: pc, fontSize: 9, margin: 0, fontWeight: 600, textTransform: "capitalize" }}>Plan {plan}</p>
+        {/* Section bas: Upgrade + User */}
+        <div style={{ padding: "8px", borderTop: "1px solid rgba(255,255,255,0.05)", flexShrink: 0 }}>
+          {/* Upgrade */}
+          <div style={{ position: "relative" }} className="sidebar-item">
+            <Link href="/upgrade" style={{ textDecoration: "none" }}>
+              <div style={{
+                display: "flex", alignItems: "center", gap: 10,
+                padding: collapsed ? "10px 0" : "9px 12px",
+                justifyContent: collapsed ? "center" : "flex-start",
+                borderRadius: 9, cursor: "pointer",
+                background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)",
+                marginBottom: 6, transition: "all 0.15s", overflow: "hidden",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.14)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)" }}
+              onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,168,76,0.08)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.2)" }}>
+                <Zap size={16} color={G} style={{ flexShrink: 0 }} />
+                {!collapsed && (
+                  <div style={{ overflow: "hidden", minWidth: 0 }}>
+                    <p style={{ color: G, fontSize: 12, fontWeight: 700, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Upgrade</p>
+                    <p style={{ color: MUTED, fontSize: 10, margin: 0, whiteSpace: "nowrap" }}>{profile?.plan === "business" ? "Business" : profile?.plan === "pro" ? "Plan Pro" : "Passer Pro"}</p>
+                  </div>
+                )}
               </div>
-            </div>
+            </Link>
+            {collapsed && (
+              <div className="sidebar-tooltip" style={{
+                position: "absolute", left: "calc(100% + 10px)", top: "50%", transform: "translateY(-50%)",
+                background: "#1A1A1A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8,
+                padding: "6px 12px", color: G, fontSize: 12, fontWeight: 600,
+                whiteSpace: "nowrap", pointerEvents: "none", zIndex: 100,
+                opacity: 0, transition: "opacity 0.15s", boxShadow: "0 4px 16px rgba(0,0,0,0.4)"
+              }}>
+                Upgrade
+              </div>
+            )}
           </div>
+
+          {/* Utilisateur */}
+          {user && (
+            <div style={{ position: "relative" }} className="sidebar-item">
+              <div style={{
+                display: "flex", alignItems: "center", gap: 10,
+                padding: collapsed ? "8px 0" : "8px 10px",
+                justifyContent: collapsed ? "center" : "flex-start",
+                borderRadius: 9, overflow: "hidden",
+              }}>
+                <div style={{ width: 28, height: 28, borderRadius: "50%", background: `linear-gradient(135deg, ${G}, #b8953f)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#080808", flexShrink: 0 }}>
+                  {(profile?.full_name || user.email || "?")[0].toUpperCase()}
+                </div>
+                {!collapsed && (
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {profile?.full_name || user.email?.split("@")[0] || "Utilisateur"}
+                    </p>
+                    <p style={{ color: MUTED, fontSize: 10, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {profile?.plan ? `Plan ${profile.plan}` : "Plan Free"}
+                    </p>
+                  </div>
+                )}
+              </div>
+              {collapsed && (
+                <div className="sidebar-tooltip" style={{
+                  position: "absolute", left: "calc(100% + 10px)", top: "50%", transform: "translateY(-50%)",
+                  background: "#1A1A1A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8,
+                  padding: "6px 12px", color: "#F5F0E8", fontSize: 12, fontWeight: 600,
+                  whiteSpace: "nowrap", pointerEvents: "none", zIndex: 100,
+                  opacity: 0, transition: "opacity 0.15s", boxShadow: "0 4px 16px rgba(0,0,0,0.4)"
+                }}>
+                  {profile?.full_name || user.email?.split("@")[0] || "Compte"}
+                </div>
+              )}
+            </div>
+          )}
         </div>
+      </div>
 
-      </aside>
+      {/* MAIN CONTENT */}
+      <main style={{ flex: 1, overflow: "auto", minWidth: 0 }}>
+        {children}
+      </main>
 
-      <main style={{ marginLeft: 220, flex: 1, minWidth: 0 }}>{children}</main>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+        .sidebar-nav::-webkit-scrollbar { display: none }
+        .sidebar-item:hover .sidebar-tooltip { opacity: 1 !important }
+        * { box-sizing: border-box; }
+      `}</style>
     </div>
   )
 }
