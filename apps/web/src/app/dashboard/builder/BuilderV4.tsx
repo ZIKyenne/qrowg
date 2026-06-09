@@ -2731,17 +2731,17 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
     const c = color + Math.round(opacity * 255).toString(16).padStart(2, "0")
     const s = size
     switch(pattern) {
-      case "dots": return `radial-gradient(circle, ${c} 1px, transparent 1px)`
+      case "dots": return `radial-gradient(circle, ${c} 1.5px, transparent 1.5px)`
       case "grid": return `linear-gradient(${c} 1px, transparent 1px), linear-gradient(90deg, ${c} 1px, transparent 1px)`
-      case "lines": return `linear-gradient(0deg, ${c} 1px, transparent 1px)`
-      case "waves": return `radial-gradient(ellipse at 50% 50%, ${c} 0%, transparent 70%)`
-      case "diagonals": return `linear-gradient(45deg, ${c} 1px, transparent 1px)`
-      case "hexagons": return `radial-gradient(circle at 50% 50%, ${c} 2px, transparent 2px)`
+      case "lines": return `repeating-linear-gradient(0deg, ${c} 0px, ${c} 1px, transparent 1px, transparent ${s}px)`
+      case "waves": return `repeating-linear-gradient(90deg, ${c} 0px, ${c} 1px, transparent 1px, transparent ${s}px), repeating-linear-gradient(180deg, ${c} 0px, ${c} 1px, transparent 1px, transparent ${s}px)`
+      case "diagonals": return `repeating-linear-gradient(45deg, ${c} 0px, ${c} 1px, transparent 1px, transparent ${s}px)`
+      case "hexagons": return `radial-gradient(circle at 0% 50%, ${c} ${s*0.12}px, transparent ${s*0.12}px), radial-gradient(circle at 100% 50%, ${c} ${s*0.12}px, transparent ${s*0.12}px), radial-gradient(circle at 50% 0%, ${c} ${s*0.12}px, transparent ${s*0.12}px)`
       case "squares": return `linear-gradient(${c} 1px, transparent 1px), linear-gradient(90deg, ${c} 1px, transparent 1px)`
       case "circles": return `radial-gradient(circle, transparent ${s*0.3}px, ${c} ${s*0.3}px, ${c} ${s*0.35}px, transparent ${s*0.35}px)`
       case "zigzag": return `linear-gradient(135deg, ${c} 25%, transparent 25%), linear-gradient(225deg, ${c} 25%, transparent 25%)`
-      case "stars": return `radial-gradient(circle, ${c} 1px, transparent 1px)`
-      default: return `radial-gradient(circle, ${c} 1px, transparent 1px)`
+      case "stars": return `radial-gradient(circle, ${c} 1px, transparent 1px), radial-gradient(circle at ${s/2}px ${s/2}px, ${c} 1px, transparent 1px)`
+      default: return `radial-gradient(circle, ${c} 1.5px, transparent 1.5px)`
     }
   }
 
@@ -2973,7 +2973,8 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 5 }}>
                   {[
                     { id: "solid", label: "Uni", icon: "🎨" },
-                    { id: "gradient", label: "Dégradé", icon: "🌈" },
+                    { id: "gradient", label: "Linéaire", icon: "🌈" },
+                    { id: "radial", label: "Radial", icon: "🔴" },
                     { id: "mesh", label: "Mesh", icon: "✨" },
                     { id: "pattern", label: "Motif", icon: "▦" },
                     { id: "image", label: "Image", icon: "🖼️" },
@@ -3052,6 +3053,86 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
                       <button key={i} onClick={() => onThemeChange({...theme, bgGradient: g, bgMode: "gradient"} as any)}
                         style={{ height: 32, background: g, border: `2px solid ${theme.bgGradient===g ? G : "rgba(255,255,255,0.08)"}`, borderRadius: 8, cursor: "pointer", position: "relative" }}>
                         {theme.bgGradient===g && <Check size={11} color={G} style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)" }} />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* DÉGRADÉ RADIAL */}
+              {bgMode==="radial" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <label style={{ color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Dégradé radial</label>
+                  {/* Preview */}
+                  <div style={{ height: 80, borderRadius: 10, background: `radial-gradient(circle at ${(theme as any).radial_x||50}% ${(theme as any).radial_y||50}%, ${(theme as any).radial_c1||"#C9A84C"}, ${(theme as any).radial_c2||"#080808"}${(theme as any).radial_c3 ? `, ${(theme as any).radial_c3}` : ""})`, border: "1px solid rgba(255,255,255,0.1)" }} />
+                  {/* Couleurs */}
+                  {[
+                    { label: "Couleur centre", key: "radial_c1", default: "#C9A84C" },
+                    { label: "Couleur milieu", key: "radial_c2", default: "#1A1A1A" },
+                    { label: "Couleur bord (opt.)", key: "radial_c3", default: "" },
+                  ].map(({ label, key, default: def }) => (
+                    <div key={key}>
+                      <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>{label}</label>
+                      <div style={{ display: "flex", gap: 7 }}>
+                        <input type="color" value={(theme as any)[key]||def||"#080808"}
+                          onChange={e => {
+                            const t2 = {...theme, [key]: e.target.value}
+                            const c1 = (t2 as any).radial_c1||"#C9A84C"
+                            const c2 = (t2 as any).radial_c2||"#080808"
+                            const c3 = (t2 as any).radial_c3
+                            const x = (t2 as any).radial_x||50
+                            const y = (t2 as any).radial_y||50
+                            onThemeChange({...t2, bgGradient: `radial-gradient(circle at ${x}% ${y}%, ${c1}, ${c2}${c3?`, ${c3}`:""})`} as any)
+                          }}
+                          style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }} />
+                        <input type="text" value={(theme as any)[key]||""}
+                          onChange={e => onThemeChange({...theme, [key]: e.target.value} as any)}
+                          placeholder={def} style={{ ...inputStyle, flex: 1 }} />
+                      </div>
+                    </div>
+                  ))}
+                  {/* Position du centre */}
+                  <div style={{ display: "flex", gap: 10 }}>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Centre X: {(theme as any).radial_x||50}%</label>
+                      <input type="range" min="0" max="100" value={(theme as any).radial_x||50}
+                        onChange={e => {
+                          const x = parseInt(e.target.value)
+                          const c1 = (theme as any).radial_c1||"#C9A84C"
+                          const c2 = (theme as any).radial_c2||"#080808"
+                          const c3 = (theme as any).radial_c3
+                          const y = (theme as any).radial_y||50
+                          onThemeChange({...theme, radial_x: x, bgGradient: `radial-gradient(circle at ${x}% ${y}%, ${c1}, ${c2}${c3?`, ${c3}`:""})`} as any)
+                        }}
+                        style={{ width: "100%", accentColor: G }} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Centre Y: {(theme as any).radial_y||50}%</label>
+                      <input type="range" min="0" max="100" value={(theme as any).radial_y||50}
+                        onChange={e => {
+                          const y = parseInt(e.target.value)
+                          const c1 = (theme as any).radial_c1||"#C9A84C"
+                          const c2 = (theme as any).radial_c2||"#080808"
+                          const c3 = (theme as any).radial_c3
+                          const x = (theme as any).radial_x||50
+                          onThemeChange({...theme, radial_y: y, bgGradient: `radial-gradient(circle at ${x}% ${y}%, ${c1}, ${c2}${c3?`, ${c3}`:""})`} as any)
+                        }}
+                        style={{ width: "100%", accentColor: G }} />
+                    </div>
+                  </div>
+                  {/* Type de forme */}
+                  <div style={{ display: "flex", gap: 6 }}>
+                    {["circle", "ellipse"].map(shape => (
+                      <button key={shape} onClick={() => {
+                        const c1 = (theme as any).radial_c1||"#C9A84C"
+                        const c2 = (theme as any).radial_c2||"#080808"
+                        const c3 = (theme as any).radial_c3
+                        const x = (theme as any).radial_x||50
+                        const y = (theme as any).radial_y||50
+                        onThemeChange({...theme, radial_shape: shape, bgGradient: `radial-gradient(${shape} at ${x}% ${y}%, ${c1}, ${c2}${c3?`, ${c3}`:""})`} as any)
+                      }}
+                      style={{ flex: 1, padding: "6px", background: ((theme as any).radial_shape||"circle")===shape ? G+"15" : "rgba(255,255,255,0.04)", border: `1px solid ${((theme as any).radial_shape||"circle")===shape ? G+"40" : "rgba(255,255,255,0.08)"}`, borderRadius: 8, color: ((theme as any).radial_shape||"circle")===shape ? G : MUTED, fontSize: 10, cursor: "pointer" }}>
+                        {shape === "circle" ? "⭕ Cercle" : "🔵 Ellipse"}
                       </button>
                     ))}
                   </div>
@@ -3143,10 +3224,22 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
                     </div>
                   )}
                   <div>
-                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Taille</label>
-                    <select value={(theme as any).bgImageSize||"cover"} onChange={e => onThemeChange({...theme, bgImageSize: e.target.value} as any)} style={{ ...inputStyle }}>
-                      {["cover","contain","repeat","center"].map(o => <option key={o} value={o}>{o}</option>)}
-                    </select>
+                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 6 }}>Taille & position</label>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                      {[
+                        { val: "cover", label: "Cover", icon: "⬛", desc: "Remplit tout" },
+                        { val: "contain", label: "Contain", icon: "🔲", desc: "Affiche tout" },
+                        { val: "repeat", label: "Mosaïque", icon: "⊞", desc: "Répète" },
+                        { val: "auto", label: "Auto", icon: "⬜", desc: "Taille réelle" },
+                      ].map(({ val, label, icon, desc }) => (
+                        <button key={val} onClick={() => onThemeChange({...theme, bgImageSize: val} as any)}
+                          style={{ padding: "7px", background: ((theme as any).bgImageSize||"cover")===val ? G+"15" : "rgba(255,255,255,0.04)", border: `1px solid ${((theme as any).bgImageSize||"cover")===val ? G+"40" : "rgba(255,255,255,0.08)"}`, borderRadius: 8, cursor: "pointer", color: ((theme as any).bgImageSize||"cover")===val ? G : MUTED, fontSize: 10, textAlign: "left" as const }}>
+                          <div style={{ fontSize: 14, marginBottom: 2 }}>{icon}</div>
+                          <div style={{ fontWeight: 600 }}>{label}</div>
+                          <div style={{ fontSize: 8, opacity: 0.7 }}>{desc}</div>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <div>
                     <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Overlay: {Math.round(((theme as any).bgOverlayOpacity||0.5)*100)}%</label>
@@ -3887,6 +3980,8 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         default: bgImg = `radial-gradient(circle, ${c} 1px, transparent 1px)`
       }
       base = { background: theme.bg, backgroundImage: bgImg, backgroundSize: `${patSize}px ${patSize}px` }
+    } else if (t.bgMode === "radial") {
+      return { background: t.bgGradient || `radial-gradient(circle at 50% 50%, ${theme.primary}, ${theme.bg})` }
     } else if (t.bgMode === "mesh") {
       const c1 = t.mesh_c1 || "#C9A84C"; const c2 = t.mesh_c2 || "#39FF8F"; const c3 = t.mesh_c3 || "#7B2FBE"
       const blurPx = Math.round((t.mesh_blur||40)/3)
