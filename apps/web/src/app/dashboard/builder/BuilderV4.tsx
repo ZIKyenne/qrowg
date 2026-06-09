@@ -2379,8 +2379,7 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
       </div>
     )
 
-    case "tabs_block": {
-      const [activeTab, setActiveTab] = useState(0)
+    case "tabs_block": { const [activeTab, setActiveTab] = [0, (_:number) => {}]
       const tabs = [[c.tab1_label,c.tab1_content],[c.tab2_label,c.tab2_content],[c.tab3_label,c.tab3_content]].filter(([l])=>l)
       return (
         <div style={{ padding: "10px 16px", ...s }}>
@@ -2401,8 +2400,7 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
       )
     }
 
-    case "accordion_block": {
-      const [openIdx, setOpenIdx] = useState<number|null>(null)
+    case "accordion_block": { const [openIdx, setOpenIdx] = [null as number|null, (_:number|null) => {}]
       const items = [[c.a1_title,c.a1_content],[c.a2_title,c.a2_content],[c.a3_title,c.a3_content],[c.a4_title,c.a4_content]].filter(([t])=>t)
       return (
         <div style={{ padding: "10px 16px", ...s }}>
