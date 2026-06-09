@@ -2044,6 +2044,223 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
       )
     }
 
+
+    case "event_program": {
+      const steps = [
+        [c.s1_time, c.s1_title, c.s1_desc],
+        [c.s2_time, c.s2_title, c.s2_desc],
+        [c.s3_time, c.s3_title, c.s3_desc],
+        [c.s4_time, c.s4_title, c.s4_desc],
+        [c.s5_time, c.s5_title, c.s5_desc],
+      ].filter(([,t])=>t)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+            {(steps.length===0 ? [["18h00","Accueil","Espace lounge"],["19h00","Concert live","Scène principale"],["22h00","DJ Set","Jusqu au matin"]] : steps).map(([time,title,desc],i,arr) => (
+              <div key={i} style={{ display: "flex", gap: 14, paddingBottom: i<arr.length-1 ? 14 : 0 }}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: `linear-gradient(135deg,#EC4899,#F472B6)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{time}</div>
+                  {i<arr.length-1 && <div style={{ width: 2, flex: 1, background: "rgba(236,72,153,0.2)", marginTop: 4 }} />}
+                </div>
+                <div style={{ flex: 1, paddingTop: 6 }}>
+                  <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{title}</p>
+                  {desc && <p style={{ color: muted, fontSize: 11, margin: 0 }}>{desc}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "event_ticketing": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ background: "rgba(236,72,153,0.08)", border: "1.5px solid rgba(236,72,153,0.3)", borderRadius: 14, padding: "16px" }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 14 }}>
+            <span style={{ fontSize: 32, flexShrink: 0 }}>🎟️</span>
+            <div style={{ flex: 1 }}>
+              <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>{c.event_name||"Mon événement"}</p>
+              {c.date && <p style={{ color: muted, fontSize: 11, margin: "0 0 2px" }}>📅 {c.date}</p>}
+              {c.location && <p style={{ color: muted, fontSize: 11, margin: "0 0 2px" }}>📍 {c.location}</p>}
+              {c.price && <p style={{ color: "#EC4899", fontSize: 12, fontWeight: 700, margin: 0 }}>💶 {c.price}</p>}
+            </div>
+          </div>
+          <div style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff" }}>
+            {c.label||"Réserver ma place"} {c.platform && c.platform!=="URL personnalisée" ? `— ${c.platform}` : ""}
+          </div>
+        </div>
+      </div>
+    )
+
+    case "event_guests": {
+      const guests = [[c.g1_photo,c.g1_name,c.g1_role,c.g1_desc],[c.g2_photo,c.g2_name,c.g2_role,c.g2_desc],[c.g3_photo,c.g3_name,c.g3_role,c.g3_desc],[c.g4_photo,c.g4_name,c.g4_role,c.g4_desc]].filter(([,n])=>n)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {(guests.length===0 ? [[null,"DJ Shadow","Headliner","DJ & Producteur"],[null,"Marie D.","Conférencière","CEO Startup"]] : guests).map(([photo,name,role,desc],i) => (
+              <div key={i} style={{ background: "rgba(236,72,153,0.06)", border: "1px solid rgba(236,72,153,0.15)", borderRadius: 12, padding: "12px 10px", textAlign: "center" }}>
+                {photo
+                  ? <img src={String(photo)} alt="" style={{ width: 52, height: 52, borderRadius: "50%", objectFit: "cover", margin: "0 auto 8px", display: "block", border: "2px solid rgba(236,72,153,0.4)" }} />
+                  : <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#EC4899,#F472B6)", margin: "0 auto 8px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#fff" }}>{String(name)[0]}</div>}
+                <p style={{ color: text, fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>{name}</p>
+                {role && <span style={{ background: "rgba(236,72,153,0.12)", border: "1px solid rgba(236,72,153,0.25)", borderRadius: 20, padding: "2px 8px", color: "#EC4899", fontSize: 9, fontWeight: 700 }}>{role}</span>}
+                {desc && <p style={{ color: muted, fontSize: 10, margin: "4px 0 0" }}>{desc}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "lineup": {
+      const artists = [[c.a1_name,c.a1_stage,c.a1_time,c.a1_headliner],[c.a2_name,c.a2_stage,c.a2_time,c.a2_headliner],[c.a3_name,c.a3_stage,c.a3_time,c.a3_headliner],[c.a4_name,c.a4_stage,c.a4_time,c.a4_headliner]].filter(([n])=>n)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+            {(artists.length===0 ? [["DJ Shadow","Scène principale","22h00","yes"],["The Blaze","Scène 2","20h00","no"],["Polo & Pan","Scène électro","18h00","no"]] : artists).map(([name,stage,time,headliner],i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, background: headliner==="yes" ? "rgba(236,72,153,0.1)" : "rgba(255,255,255,0.03)", border: `1.5px solid ${headliner==="yes" ? "rgba(236,72,153,0.4)" : "rgba(255,255,255,0.07)"}`, borderRadius: 12, padding: "11px 14px" }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                    <p style={{ color: headliner==="yes" ? "#EC4899" : text, fontSize: headliner==="yes" ? 15 : 13, fontWeight: 700, margin: 0 }}>{name}</p>
+                    {headliner==="yes" && <span style={{ background: "#EC4899", color: "#fff", borderRadius: 10, padding: "1px 7px", fontSize: 8, fontWeight: 700 }}>HEADLINER</span>}
+                  </div>
+                  {stage && <p style={{ color: muted, fontSize: 10, margin: "2px 0 0" }}>🎭 {stage}</p>}
+                </div>
+                {time && <span style={{ color: headliner==="yes" ? "#EC4899" : muted, fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{time}</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "event_access": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+        {c.embed_url
+          ? <iframe src={c.embed_url} width="100%" height={150} style={{ border: "none", borderRadius: 12, display: "block", marginBottom: 10 }} loading="lazy" />
+          : <div style={{ height: 130, background: "rgba(236,72,153,0.06)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 12, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 10 }}>
+              <span style={{ fontSize: 28 }}>🗺️</span>
+              {c.address && <p style={{ color: muted, fontSize: 11, margin: 0, textAlign: "center", padding: "0 14px" }}>📍 {c.address}</p>}
+            </div>}
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {[
+            [c.transport1_icon, c.transport1_label],
+            [c.transport2_icon, c.transport2_label],
+            [c.transport3_icon, c.transport3_label],
+          ].filter(([,l])=>l).map(([icon,label],i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, padding: "9px 12px" }}>
+              <span style={{ fontSize: 18 }}>{icon}</span>
+              <span style={{ color: text, fontSize: 12 }}>{label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+
+    case "event_register": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>{c.title||"S inscrire gratuitement"}</p>
+        {c.description && <p style={{ color: "#EC4899", fontSize: 11, margin: "0 0 12px", fontWeight: 600 }}>⚡ {c.description}</p>}
+        <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+          {["Prénom & Nom","Email"].map(f => <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>{f}</div>)}
+          {c.show_phone==="yes" && <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>Téléphone</div>}
+          {c.show_company==="yes" && <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>Société</div>}
+          <div style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 9, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff" }}>{c.button_label||"Je m inscris"}</div>
+        </div>
+      </div>
+    )
+
+    case "rsvp": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>{c.title||"Serez-vous présent ?"}</p>
+        {c.description && <p style={{ color: muted, fontSize: 11, margin: "0 0 14px" }}>{c.description}</p>}
+        <div style={{ display: "flex", gap: 8 }}>
+          <button style={{ flex: 2, background: "rgba(57,255,143,0.1)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 10, padding: "12px 8px", color: "#39FF8F", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>{c.yes_label||"✅ Oui, je viens"}</button>
+          <button style={{ flex: 1, background: "rgba(251,191,36,0.08)", border: "1.5px solid rgba(251,191,36,0.25)", borderRadius: 10, padding: "12px 8px", color: "#FBBF24", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>{c.maybe_label||"🤔 Peut-être"}</button>
+          <button style={{ flex: 1, background: "rgba(239,68,68,0.08)", border: "1.5px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "12px 8px", color: "#EF4444", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>{c.no_label||"❌ Non"}</button>
+        </div>
+      </div>
+    )
+
+    case "add_to_calendar": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ background: "rgba(236,72,153,0.06)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 14, padding: "14px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+            <div style={{ width: 42, height: 42, borderRadius: 10, background: "rgba(236,72,153,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>📅</div>
+            <div>
+              <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{c.event_name||"Mon événement"}</p>
+              {c.start_date && <p style={{ color: muted, fontSize: 11, margin: 0 }}>🕐 {c.start_date}</p>}
+              {c.location && <p style={{ color: muted, fontSize: 11, margin: 0 }}>📍 {c.location}</p>}
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 7 }}>
+            {c.google_url
+              ? <>
+                  <div style={{ flex: 1, background: "rgba(66,133,244,0.12)", border: "1px solid rgba(66,133,244,0.25)", borderRadius: 8, padding: "9px", textAlign: "center", fontSize: 11, fontWeight: 700, color: "#4285F4" }}>📅 Google</div>
+                  <div style={{ flex: 1, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "9px", textAlign: "center", fontSize: 11, fontWeight: 700, color: text }}>🍎 Apple</div>
+                  <div style={{ flex: 1, background: "rgba(0,120,212,0.1)", border: "1px solid rgba(0,120,212,0.2)", borderRadius: 8, padding: "9px", textAlign: "center", fontSize: 11, fontWeight: 700, color: "#0078D4" }}>📆 Outlook</div>
+                </>
+              : <div style={{ flex: 1, background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 9, padding: "11px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff" }}>{c.cta_label||"Ajouter à mon agenda"}</div>}
+          </div>
+        </div>
+      </div>
+    )
+
+    case "participants_count": {
+      const total = parseInt(c.count||"287")
+      const max = parseInt(c.max||"500")
+      const pct = Math.min(100, Math.round((total/max)*100))
+      return (
+        <div style={{ padding: "14px 16px", textAlign: "center", ...s }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 12, background: "rgba(236,72,153,0.08)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 14, padding: "16px 24px", marginBottom: c.show_progress!=="no" ? 12 : 0 }}>
+            <span style={{ fontSize: 28 }}>{c.emoji||"👥"}</span>
+            <div>
+              <p style={{ color: "#EC4899", fontSize: 32, fontWeight: 700, margin: 0, fontFamily: theme.fontDisplay, lineHeight: 1 }}>{c.count||"287"}</p>
+              <p style={{ color: muted, fontSize: 11, margin: "3px 0 0" }}>{c.label||"participants inscrits"}</p>
+            </div>
+          </div>
+          {c.show_progress!=="no" && (
+            <div style={{ marginTop: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                <span style={{ color: muted, fontSize: 10 }}>Inscriptions</span>
+                <span style={{ color: "#EC4899", fontSize: 10, fontWeight: 700 }}>{pct}% · {total}/{max}</span>
+              </div>
+              <div style={{ height: 6, background: "rgba(255,255,255,0.07)", borderRadius: 3, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 3 }} />
+              </div>
+            </div>
+          )}
+        </div>
+      )
+    }
+
+    case "tickets_left": {
+      const urgencyStyles: Record<string,any> = {
+        high: { bg: "rgba(239,68,68,0.1)", border: "rgba(239,68,68,0.4)", color: "#EF4444", pulse: true },
+        medium: { bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.3)", color: "#FBBF24", pulse: false },
+        low: { bg: "rgba(57,255,143,0.08)", border: "rgba(57,255,143,0.25)", color: "#39FF8F", pulse: false },
+      }
+      const us = urgencyStyles[c.urgency||"high"]
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          <div style={{ background: us.bg, border: `1.5px solid ${us.border}`, borderRadius: 14, padding: "16px", textAlign: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 12 }}>
+              <span style={{ fontSize: 28 }}>🎟️</span>
+              <div>
+                <p style={{ color: us.color, fontSize: 32, fontWeight: 700, margin: 0, fontFamily: theme.fontDisplay, lineHeight: 1 }}>{c.count||"14"}</p>
+                <p style={{ color: muted, fontSize: 11, margin: "3px 0 0" }}>{c.label||"places restantes"}</p>
+              </div>
+            </div>
+            {c.cta_label && <div style={{ background: us.color, borderRadius: 10, padding: "12px", fontSize: 13, fontWeight: 700, color: c.urgency==="medium" ? "#080808" : "#fff" }}>{c.cta_label}</div>}
+          </div>
+        </div>
+      )
+    }
+
     default: {
       const def = BLOCK_DEFS[block.type]
       return <div style={{ padding: "12px 16px", textAlign: "center", ...s }}><span style={{ fontSize: 22 }}>{def?.icon||"📦"}</span><p style={{ color: muted, fontSize: 11, margin: "5px 0 0" }}>{def?.label||block.type}</p></div>
