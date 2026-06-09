@@ -126,7 +126,7 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
             ? <p style={{ color: muted, fontSize: 11, textAlign: "center", margin: 0 }}>Aucun réseau configuré</p>
             : <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {active.map(n => (
-                  <div key={n.key} style={{ display: "flex", alignItems: "center", gap: 10, background: n.bg, border: `1px solid ${n.color}25`, borderRadius: 10, padding: "9px 12px" }}>
+                  <div key={n.key} style={{ display: "flex", alignItems: "center", gap: 10, background: n.color+"10", border: `1px solid ${n.color}25`, borderRadius: 10, padding: "9px 12px" }}>
                     <span style={{ fontSize: 15 }}>{n.icon}</span>
                     <span style={{ color: text, fontSize: 12, fontWeight: 600, flex: 1 }}>{n.label}</span>
                     <ExternalLink size={11} color={n.color} />
@@ -646,6 +646,139 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
         </div>
       </div>
     )
+
+    case "tiktok_feed": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 3, marginBottom: 10 }}>
+          {[0,1,2,3,4,5].map(i => <div key={i} style={{ background: "rgba(245,240,232,0.06)", border: "1px solid rgba(245,240,232,0.1)", borderRadius: 5, aspectRatio: "9/16", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🎵</div>)}
+        </div>
+        {c.username && <p style={{ color: muted, fontSize: 11, textAlign: "center", margin: "0 0 8px" }}>{c.username}</p>}
+        {c.cta_label && <div style={{ background: "rgba(245,240,232,0.08)", border: "1px solid rgba(245,240,232,0.2)", color: text, textAlign: "center", padding: "9px", borderRadius: 7, fontSize: 12, fontWeight: 700 }}>{c.cta_label}</div>}
+      </div>
+    )
+
+    case "youtube_channel": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 12 }}>
+          <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(255,0,0,0.15)", border: "2px solid rgba(255,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>▶️</div>
+          <div style={{ flex: 1 }}>
+            <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{c.channel_name||"Ma Chaîne"}</p>
+            {c.subscribers && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{c.subscribers}</p>}
+          </div>
+        </div>
+        {c.cta_label && <div style={{ background: "#FF0000", color: "#fff", textAlign: "center", padding: "10px", borderRadius: 8, fontSize: 12, fontWeight: 700 }}>{c.cta_label}</div>}
+      </div>
+    )
+
+    case "twitch_live": {
+      const isLive = c.status === "live"
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          <div style={{ background: isLive ? "rgba(145,70,255,0.1)" : "rgba(255,255,255,0.03)", border: `1.5px solid ${isLive ? "rgba(145,70,255,0.4)" : "rgba(255,255,255,0.08)"}`, borderRadius: 12, padding: "14px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 10 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 9, background: "rgba(145,70,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🎮</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: 0 }}>{c.username||"monpseudo"}</p>
+                  {isLive && <span style={{ background: "#EF4444", color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 9, fontWeight: 700 }}>● LIVE</span>}
+                </div>
+                {c.game && <p style={{ color: muted, fontSize: 10, margin: 0 }}>🎯 {c.game}</p>}
+                {c.viewers && isLive && <p style={{ color: "#9146FF", fontSize: 10, margin: 0 }}>👁 {c.viewers}</p>}
+                {!isLive && <p style={{ color: muted, fontSize: 10, margin: 0 }}>Hors ligne</p>}
+              </div>
+            </div>
+            <div style={{ background: "#9146FF", color: "#fff", textAlign: "center", padding: "9px", borderRadius: 8, fontSize: 12, fontWeight: 700 }}>{c.cta_label||"Rejoindre le live"}</div>
+          </div>
+        </div>
+      )
+    }
+
+    case "discord_server": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ background: "rgba(88,101,242,0.08)", border: "1.5px solid rgba(88,101,242,0.25)", borderRadius: 12, padding: "14px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+            <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(88,101,242,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>🎮</div>
+            <div style={{ flex: 1 }}>
+              <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 1px" }}>{c.server_name||"Mon Serveur"}</p>
+              {c.members && <p style={{ color: muted, fontSize: 10, margin: "0 0 1px" }}>👥 {c.members}</p>}
+              {c.description && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{c.description}</p>}
+            </div>
+          </div>
+          <div style={{ background: "#5865F2", color: "#fff", textAlign: "center", padding: "10px", borderRadius: 8, fontSize: 12, fontWeight: 700 }}>{c.cta_label||"Rejoindre le Discord"}</div>
+        </div>
+      </div>
+    )
+
+    case "telegram_channel": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ background: "rgba(38,165,228,0.08)", border: "1.5px solid rgba(38,165,228,0.25)", borderRadius: 12, padding: "14px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+            <div style={{ width: 42, height: 42, borderRadius: "50%", background: "rgba(38,165,228,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>✈️</div>
+            <div style={{ flex: 1 }}>
+              <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 1px" }}>{c.channel_name||"Mon Canal"}</p>
+              {c.members && <p style={{ color: muted, fontSize: 10, margin: "0 0 1px" }}>👥 {c.members}</p>}
+              {c.description && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{c.description}</p>}
+            </div>
+          </div>
+          <div style={{ background: "#26A5E4", color: "#fff", textAlign: "center", padding: "10px", borderRadius: 8, fontSize: 12, fontWeight: 700 }}>{c.cta_label||"Rejoindre le canal"}</div>
+        </div>
+      </div>
+    )
+
+    case "podcast_links": {
+      const platforms = [["spotify_url","🟢","#1DB954","Spotify Podcasts"],["apple_url","🍎","#B150E2","Apple Podcasts"],["pocket_url","📻","#F43E37","Pocket Casts"],["rss_url","📡","#F97316","RSS Feed"]].filter(([k])=>c[k as string])
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 12 }}>
+            {c.cover_url
+              ? <img src={c.cover_url} alt="" style={{ width: 52, height: 52, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
+              : <div style={{ width: 52, height: 52, borderRadius: 10, background: "rgba(177,80,226,0.15)", border: "1px solid rgba(177,80,226,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, flexShrink: 0 }}>🎙️</div>}
+            <div>
+              <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>{c.podcast_name||"Mon Podcast"}</p>
+              {c.description && <p style={{ color: muted, fontSize: 11, margin: 0 }}>{c.description}</p>}
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {platforms.length===0
+              ? <p style={{ color: muted, fontSize: 11, textAlign: "center", margin: 0 }}>Ajoutez vos plateformes d écoute</p>
+              : platforms.map(([k,icon,color,label]) => (
+                <div key={String(k)} style={{ display: "flex", alignItems: "center", gap: 10, background: (color as string)+"12", border: `1px solid ${color}25`, borderRadius: 9, padding: "9px 12px" }}>
+                  <span style={{ fontSize: 16 }}>{icon}</span>
+                  <span style={{ color: text, fontSize: 12, fontWeight: 600, flex: 1 }}>{label}</span>
+                  <ExternalLink size={11} color={color as string} />
+                </div>
+              ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "favorite_links": {
+      const links = [
+        [c.link_1_icon, c.link_1_label, c.link_1_url],
+        [c.link_2_icon, c.link_2_label, c.link_2_url],
+        [c.link_3_icon, c.link_3_label, c.link_3_url],
+        [c.link_4_icon, c.link_4_label, c.link_4_url],
+        [c.link_5_icon, c.link_5_label, c.link_5_url],
+      ].filter(([,l])=>l)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+          {links.length===0
+            ? <p style={{ color: muted, fontSize: 11, textAlign: "center", margin: 0 }}>Ajoutez vos liens favoris</p>
+            : <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                {links.map(([icon,label,url],i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, background: primary+"08", border: `1px solid ${primary}15`, borderRadius: 10, padding: "10px 12px" }}>
+                    <span style={{ fontSize: 20, flexShrink: 0 }}>{icon||"🔗"}</span>
+                    <span style={{ color: text, fontSize: 13, fontWeight: 600, flex: 1 }}>{label}</span>
+                    <ExternalLink size={11} color={primary} />
+                  </div>
+                ))}
+              </div>}
+        </div>
+      )
+    }
+
     default: {
       const def = BLOCK_DEFS[block.type]
       return <div style={{ padding: "12px 16px", textAlign: "center", ...s }}><span style={{ fontSize: 22 }}>{def?.icon||"📦"}</span><p style={{ color: muted, fontSize: 11, margin: "5px 0 0" }}>{def?.label||block.type}</p></div>
