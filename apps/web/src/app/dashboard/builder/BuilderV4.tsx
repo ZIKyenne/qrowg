@@ -6,7 +6,7 @@ import {
   Eye, Plus, Settings, Check, Search, Copy, EyeOff,
   ExternalLink, Palette, GripVertical, QrCode
 } from "lucide-react"
-import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, type Block, type BlockContent, type PageTheme } from "./types"
+import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, type Block, type BlockContent, type PageTheme } from "./types"
 import { createClient } from "@/lib/supabase/client"
 
 const G = "#C9A84C"
@@ -2613,6 +2613,7 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
   const [themeTab, setThemeTab] = useState<"themes"|"colors"|"fonts"|"bg">("themes")
   const [bgMode, setBgMode] = useState<string>(theme.bgMode||"solid")
   const [bgSubTab, setBgSubTab] = useState<"type"|"effects"|"animation"|"presets"|"advanced">("presets")
+  const [activeCat, setActiveCat] = useState<string>(PRESET_CATEGORIES[0].id)
   const [patternTypeLocal, setPatternType] = useState<string>((theme as any).bgPattern||"dots")
   const [effectNoise, setEffectNoise] = useState(false)
   const [effectGlow, setEffectGlow] = useState(false)
@@ -2744,17 +2745,36 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
 
       {/* ── ONGLET THÈMES ── */}
       {themeTab==="themes" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7 }}>
-          {Object.entries(PRESET_THEMES).map(([key, t]) => (
-            <button key={key} onClick={() => onThemeChange(t)}
-              style={{ background: t.bgGradient || t.bg, border: `2px solid ${theme.name===t.name ? G : "rgba(255,255,255,0.08)"}`, borderRadius: 12, padding: "10px 8px", cursor: "pointer", textAlign: "left", position: "relative", overflow: "hidden" }}>
-              <div style={{ display: "flex", gap: 4, marginBottom: 5 }}>
-                {[t.primary, t.accent, t.text].map((col, i) => <div key={i} style={{ width: 12, height: 12, borderRadius: "50%", background: col, boxShadow: `0 0 4px ${col}60` }} />)}
-              </div>
-              <p style={{ color: t.text, fontSize: 10, fontWeight: 700, margin: 0, fontFamily: t.fontDisplay }}>{t.name}</p>
-              {theme.name===t.name && <div style={{ position: "absolute", top: 4, right: 4, width: 14, height: 14, background: G, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}><Check size={8} color="#000" /></div>}
-            </button>
-          ))}
+        <div>
+          {/* Chips catégories */}
+          <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 12 }}>
+            {PRESET_CATEGORIES.map(cat => (
+              <button key={cat.id} onClick={() => setActiveCat(cat.id)}
+                style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", background: activeCat===cat.id ? cat.color+"20" : "rgba(255,255,255,0.04)", border: `1px solid ${activeCat===cat.id ? cat.color+"50" : "rgba(255,255,255,0.08)"}`, borderRadius: 20, color: activeCat===cat.id ? cat.color : MUTED, fontSize: 10, fontWeight: activeCat===cat.id ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                <span>{cat.icon}</span><span style={{ marginLeft: 3 }}>{cat.id}</span>
+              </button>
+            ))}
+          </div>
+          {/* Grille presets filtrés par catégorie */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7 }}>
+            {Object.entries(PRESET_THEMES).filter(([, t]) => t.category === activeCat).map(([key, t]) => (
+              <button key={key} onClick={() => onThemeChange(t)}
+                style={{ background: t.bgGradient || t.bg, border: `2px solid ${theme.name===t.name ? G : "rgba(255,255,255,0.1)"}`, borderRadius: 12, padding: "10px 10px", cursor: "pointer", textAlign: "left" as const, position: "relative", overflow: "hidden", minHeight: 72, transition: "border-color 0.15s" }}>
+                <div style={{ display: "flex", gap: 4, marginBottom: 6 }}>
+                  {[t.primary, t.accent, t.text].map((col, i) => (
+                    <div key={i} style={{ width: 10, height: 10, borderRadius: "50%", background: col, boxShadow: `0 0 4px ${col}80` }} />
+                  ))}
+                </div>
+                <p style={{ color: t.text, fontSize: 11, fontWeight: 700, margin: "0 0 2px", fontFamily: `${t.fontDisplay}, serif`, textShadow: "0 1px 3px rgba(0,0,0,0.5)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>{t.name}</p>
+                <span style={{ fontSize: 11, opacity: 0.7 }}>{t.emoji}</span>
+                {theme.name===t.name && (
+                  <div style={{ position: "absolute", top: 5, right: 5, width: 16, height: 16, background: G, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Check size={9} color="#000" />
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 

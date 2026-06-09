@@ -26,7 +26,25 @@ export interface PageTheme {
   bgGradient?: string
   bgPattern?: string
   bgImage?: string
+  // Preset metadata
+  category?: string   // "Business" | "Luxury" | "Creator" | "Startup" | "Restaurant" | "Immobilier" | "Fitness" | "Event" | "Music" | "Portfolio"
+  emoji?: string      // Emoji représentatif
+  tags?: string[]     // Mots-clés
 }
+
+// ── Catégories de presets ─────────────────────────────────────────────────────
+export const PRESET_CATEGORIES = [
+  { id: "Business",     icon: "💼", color: "#3B82F6" },
+  { id: "Luxury",       icon: "💎", color: "#C9A84C" },
+  { id: "Creator",      icon: "🎨", color: "#EC4899" },
+  { id: "Startup",      icon: "🚀", color: "#8B5CF6" },
+  { id: "Restaurant",   icon: "🍽️", color: "#F97316" },
+  { id: "Immobilier",   icon: "🏠", color: "#10B981" },
+  { id: "Fitness",      icon: "💪", color: "#EF4444" },
+  { id: "Event",        icon: "🎉", color: "#F59E0B" },
+  { id: "Music",        icon: "🎵", color: "#1DB954" },
+  { id: "Portfolio",    icon: "📐", color: "#6366F1" },
+] as const
 
 // ── 50+ Google Fonts ──────────────────────────────────────────────────────────
 export const GOOGLE_FONTS = [
@@ -51,136 +69,271 @@ export const GOOGLE_FONTS = [
 
 // ── Thèmes prédéfinis ─────────────────────────────────────────────────────────
 export const PRESET_THEMES: Record<string, PageTheme> = {
+
+  // ── BUSINESS ─────────────────────────────────────────────────────────────
   midnight_gold: {
-    name: "Midnight Gold",
-    bg: "#080808", surface: "#111009",
-    primary: "#C9A84C", accent: "#39FF8F",
-    text: "#F5F0E8", muted: "#8A8478",
-    fontDisplay: "Cormorant Garamond", fontBody: "DM Sans",
+    name: "Midnight Gold", category: "Business", emoji: "💼", tags: ["premium","sombre","or"],
+    bg: "#080808", surface: "#111009", primary: "#C9A84C", accent: "#39FF8F",
+    text: "#F5F0E8", muted: "#8A8478", fontDisplay: "Cormorant Garamond", fontBody: "DM Sans",
     bgMode: "solid",
   },
+  corporate_navy: {
+    name: "Corporate Navy", category: "Business", emoji: "🏢", tags: ["corporate","bleu","professionnel"],
+    bg: "#0D1B2A", surface: "#1A2A3D", primary: "#3B82F6", accent: "#60A5FA",
+    text: "#F0F4FF", muted: "#7A8FA8", fontDisplay: "Inter", fontBody: "Inter",
+    bgMode: "gradient", bgGradient: "linear-gradient(135deg,#0D1B2A,#1A3050)",
+  },
+  executive_slate: {
+    name: "Executive Slate", category: "Business", emoji: "📊", tags: ["consulting","gris","moderne"],
+    bg: "#1C2128", surface: "#252C36", primary: "#58A6FF", accent: "#3FB950",
+    text: "#E6EDF3", muted: "#8B949E", fontDisplay: "DM Sans", fontBody: "DM Sans",
+    bgMode: "solid",
+  },
+  boardroom: {
+    name: "Boardroom", category: "Business", emoji: "👔", tags: ["executive","sombre","elegant"],
+    bg: "#111111", surface: "#1A1A1A", primary: "#E5E5E5", accent: "#C9A84C",
+    text: "#F5F5F5", muted: "#888888", fontDisplay: "Playfair Display", fontBody: "DM Sans",
+    bgMode: "solid",
+  },
+
+  // ── LUXURY ───────────────────────────────────────────────────────────────
   velvet_noir: {
-    name: "Velvet Noir",
-    bg: "#0A0A0F", surface: "#13131A",
-    primary: "#A78BFA", accent: "#F472B6",
-    text: "#F5F3FF", muted: "#9D84BC",
-    fontDisplay: "Syne", fontBody: "DM Sans",
-    bgMode: "gradient",
-    bgGradient: "linear-gradient(135deg, #0A0A0F 0%, #13131A 50%, #0A0A0F 100%)",
-  },
-  ocean_deep: {
-    name: "Ocean Deep",
-    bg: "#020C18", surface: "#041828",
-    primary: "#38BDF8", accent: "#818CF8",
-    text: "#F0F9FF", muted: "#6494B0",
-    fontDisplay: "Space Grotesk", fontBody: "Inter",
-    bgMode: "gradient",
-    bgGradient: "linear-gradient(135deg, #020C18 0%, #041828 60%, #060420 100%)",
-  },
-  forest_zen: {
-    name: "Forest Zen",
-    bg: "#040D06", surface: "#081A0C",
-    primary: "#4ADE80", accent: "#86EFAC",
-    text: "#F0FDF4", muted: "#6DB882",
-    fontDisplay: "Lora", fontBody: "Nunito",
+    name: "Velvet Noir", category: "Luxury", emoji: "🖤", tags: ["luxe","violet","sombre"],
+    bg: "#0A0A0F", surface: "#13131A", primary: "#A78BFA", accent: "#F472B6",
+    text: "#F5F3FF", muted: "#7C6FA8", fontDisplay: "Cormorant Garamond", fontBody: "DM Sans",
     bgMode: "solid",
   },
-  sunset_fire: {
-    name: "Sunset Fire",
-    bg: "#0D0700", surface: "#1A1000",
-    primary: "#F97316", accent: "#FCD34D",
-    text: "#FFF7ED", muted: "#B89070",
-    fontDisplay: "Raleway", fontBody: "Poppins",
-    bgMode: "gradient",
-    bgGradient: "linear-gradient(135deg, #0D0700 0%, #1A0A00 50%, #0D0700 100%)",
+  golden_luxury: {
+    name: "Golden Luxury", category: "Luxury", emoji: "✨", tags: ["or","prestige","dark"],
+    bg: "#0A0800", surface: "#1A1400", primary: "#FFD700", accent: "#FFA500",
+    text: "#FFF8E1", muted: "#9A8A60", fontDisplay: "Cormorant Garamond", fontBody: "Lora",
+    bgMode: "gradient", bgGradient: "linear-gradient(135deg,#0A0800,#1A1200)",
   },
-  rose_luxe: {
-    name: "Rose Luxe",
-    bg: "#0D0508", surface: "#1A0812",
-    primary: "#F472B6", accent: "#FB7185",
-    text: "#FFF0F6", muted: "#B87A99",
-    fontDisplay: "Playfair Display", fontBody: "DM Sans",
-    bgMode: "gradient",
-    bgGradient: "linear-gradient(135deg, #0D0508 0%, #1A0812 100%)",
+  royal_purple: {
+    name: "Royal Purple", category: "Luxury", emoji: "👑", tags: ["royal","violet","premium"],
+    bg: "#0A0015", surface: "#150020", primary: "#8B00FF", accent: "#DA70D6",
+    text: "#F5F0FF", muted: "#8A6A9A", fontDisplay: "Playfair Display", fontBody: "DM Sans",
+    bgMode: "gradient", bgGradient: "linear-gradient(135deg,#0A0015,#1A0030)",
   },
-  pure_white: {
-    name: "Pure White",
-    bg: "#FFFFFF", surface: "#F8F8F8",
-    primary: "#111111", accent: "#6366F1",
-    text: "#111111", muted: "#6B7280",
-    fontDisplay: "Playfair Display", fontBody: "Inter",
+  pearl_white: {
+    name: "Pearl White", category: "Luxury", emoji: "🤍", tags: ["blanc","pur","minimaliste"],
+    bg: "#FAFAFA", surface: "#F0F0F5", primary: "#1A1A2E", accent: "#C9A84C",
+    text: "#1A1A2E", muted: "#6B7280", fontDisplay: "Cormorant Garamond", fontBody: "DM Sans",
     bgMode: "solid",
   },
-  minimal_cream: {
-    name: "Minimal Cream",
-    bg: "#FAFAF7", surface: "#F0EFE9",
-    primary: "#C9A84C", accent: "#2D2D2D",
-    text: "#1A1A1A", muted: "#8A8478",
-    fontDisplay: "Cormorant Garamond", fontBody: "DM Sans",
+  champagne: {
+    name: "Champagne", category: "Luxury", emoji: "🥂", tags: ["champagne","rose","elegant"],
+    bg: "#1A0F0A", surface: "#2A1A12", primary: "#E8C896", accent: "#D4A76A",
+    text: "#FFF5E6", muted: "#9A8070", fontDisplay: "Cormorant Garamond", fontBody: "Lora",
+    bgMode: "gradient", bgGradient: "linear-gradient(160deg,#1A0F0A,#2D1A10)",
+  },
+
+  // ── CREATOR ──────────────────────────────────────────────────────────────
+  neon_creator: {
+    name: "Neon Creator", category: "Creator", emoji: "⚡", tags: ["neon","creator","moderne"],
+    bg: "#050505", surface: "#0F0F0F", primary: "#FF0080", accent: "#00FFFF",
+    text: "#F5F0E8", muted: "#888888", fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
     bgMode: "solid",
   },
   electric_neon: {
-    name: "Electric Neon",
-    bg: "#050505", surface: "#0F0F0F",
-    primary: "#39FF8F", accent: "#FF006E",
-    text: "#FFFFFF", muted: "#707070",
-    fontDisplay: "Bebas Neue", fontBody: "Space Grotesk",
-    bgMode: "pattern",
-    bgPattern: "dots",
+    name: "Electric Neon", category: "Creator", emoji: "🟢", tags: ["vert","neon","tech"],
+    bg: "#050505", surface: "#0A0A0A", primary: "#39FF8F", accent: "#00FFFF",
+    text: "#F5F0E8", muted: "#5A8A7A", fontDisplay: "Space Grotesk", fontBody: "DM Sans",
+    bgMode: "solid",
   },
+  tiktok_vibes: {
+    name: "TikTok Vibes", category: "Creator", emoji: "🎵", tags: ["tiktok","rouge","bleu"],
+    bg: "#010101", surface: "#111111", primary: "#FF0050", accent: "#00F2EA",
+    text: "#FFFFFF", muted: "#888888", fontDisplay: "Inter", fontBody: "Inter",
+    bgMode: "solid",
+  },
+  cyber_punk: {
+    name: "Cyber Punk", category: "Creator", emoji: "🤖", tags: ["cyber","violet","futuriste"],
+    bg: "#08001A", surface: "#100028", primary: "#BF00FF", accent: "#FF6B00",
+    text: "#F5F0E8", muted: "#7A6A8A", fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
+    bgMode: "gradient", bgGradient: "linear-gradient(135deg,#08001A,#150030)",
+  },
+
+  // ── STARTUP ──────────────────────────────────────────────────────────────
   deep_space: {
-    name: "Deep Space",
-    bg: "#030308", surface: "#08081A",
-    primary: "#818CF8", accent: "#E879F9",
-    text: "#EDE9FE", muted: "#7C7A9E",
-    fontDisplay: "Unbounded", fontBody: "Outfit",
-    bgMode: "pattern",
-    bgPattern: "stars",
+    name: "Deep Space", category: "Startup", emoji: "🚀", tags: ["tech","sombre","bleu"],
+    bg: "#020B18", surface: "#0A1628", primary: "#00D4FF", accent: "#7B2FBE",
+    text: "#F5F0E8", muted: "#8A9BA8", fontDisplay: "Space Grotesk", fontBody: "Inter",
+    bgMode: "gradient", bgGradient: "linear-gradient(135deg,#020B18,#0A1628)",
   },
   aurora: {
-    name: "Aurora",
-    bg: "#020B0D", surface: "#041518",
-    primary: "#22D3EE", accent: "#A855F7",
-    text: "#F0FDFF", muted: "#64B5C4",
-    fontDisplay: "Syne", fontBody: "Plus Jakarta Sans",
-    bgMode: "gradient",
-    bgGradient: "linear-gradient(135deg, #020B0D 0%, #041518 30%, #08101A 60%, #030B0D 100%)",
+    name: "Aurora", category: "Startup", emoji: "🌌", tags: ["aurora","gradient","moderne"],
+    bg: "#0A0F1E", surface: "#0F1628", primary: "#00FF9D", accent: "#FF6B6B",
+    text: "#F5F0E8", muted: "#8A8FA0", fontDisplay: "Space Grotesk", fontBody: "Inter",
+    bgMode: "gradient", bgGradient: "linear-gradient(135deg,#0A0F1E,#1A0A28)",
   },
-  golden_luxury: {
-    name: "Golden Luxury",
-    bg: "#0A0700", surface: "#171200",
-    primary: "#FBBF24", accent: "#F59E0B",
-    text: "#FFFBEB", muted: "#A0885A",
-    fontDisplay: "Cormorant Garamond", fontBody: "Raleway",
-    bgMode: "pattern",
-    bgPattern: "grid",
-  },
-  cherry_blossom: {
-    name: "Cherry Blossom",
-    bg: "#0F0408", surface: "#1A0812",
-    primary: "#FB7185", accent: "#FBBF24",
-    text: "#FFF1F2", muted: "#BF8A96",
-    fontDisplay: "Dancing Script", fontBody: "Nunito",
-    bgMode: "gradient",
-    bgGradient: "linear-gradient(135deg, #0F0408 0%, #1A0812 50%, #100408 100%)",
+  saas_blue: {
+    name: "SaaS Blue", category: "Startup", emoji: "💡", tags: ["saas","bleu","clean"],
+    bg: "#F8FAFF", surface: "#EEF2FF", primary: "#4F46E5", accent: "#7C3AED",
+    text: "#1E1B4B", muted: "#6B7280", fontDisplay: "Inter", fontBody: "Inter",
+    bgMode: "solid",
   },
   matrix_code: {
-    name: "Matrix Code",
-    bg: "#000000", surface: "#050A05",
-    primary: "#00FF41", accent: "#008F11",
-    text: "#00FF41", muted: "#007A1A",
-    fontDisplay: "JetBrains Mono", fontBody: "Fira Code",
-    bgMode: "pattern",
-    bgPattern: "matrix",
+    name: "Matrix Code", category: "Startup", emoji: "💻", tags: ["matrix","vert","hacker"],
+    bg: "#000D00", surface: "#001500", primary: "#00FF41", accent: "#00CC33",
+    text: "#00FF41", muted: "#006B1A", fontDisplay: "JetBrains Mono", fontBody: "JetBrains Mono",
+    bgMode: "solid",
+  },
+
+  // ── RESTAURANT ────────────────────────────────────────────────────────────
+  sunset_fire: {
+    name: "Sunset Fire", category: "Restaurant", emoji: "🔥", tags: ["orange","chaud","bistro"],
+    bg: "#1A0500", surface: "#2D0A00", primary: "#FF6B00", accent: "#FF8C00",
+    text: "#FFF5E6", muted: "#9A7A5A", fontDisplay: "Playfair Display", fontBody: "Lora",
+    bgMode: "gradient", bgGradient: "linear-gradient(135deg,#1A0500,#2D0A00)",
+  },
+  bistro_rouge: {
+    name: "Bistro Rouge", category: "Restaurant", emoji: "🍷", tags: ["rouge","vin","francais"],
+    bg: "#1A0008", surface: "#2D0012", primary: "#DC2626", accent: "#EF4444",
+    text: "#FFF0F0", muted: "#9A7A78", fontDisplay: "Playfair Display", fontBody: "DM Sans",
+    bgMode: "solid",
+  },
+  coffee_house: {
+    name: "Coffee House", category: "Restaurant", emoji: "☕", tags: ["cafe","marron","cosy"],
+    bg: "#1A0F0A", surface: "#2D1A10", primary: "#8B4513", accent: "#D2691E",
+    text: "#FFF5E6", muted: "#9A8A7A", fontDisplay: "Lora", fontBody: "Lora",
+    bgMode: "solid",
+  },
+  garden_fresh: {
+    name: "Garden Fresh", category: "Restaurant", emoji: "🌿", tags: ["bio","vert","frais"],
+    bg: "#F5FFF5", surface: "#E8F5E8", primary: "#16A34A", accent: "#4ADE80",
+    text: "#052E16", muted: "#6B7A6B", fontDisplay: "Merriweather", fontBody: "DM Sans",
+    bgMode: "solid",
+  },
+
+  // ── IMMOBILIER ────────────────────────────────────────────────────────────
+  prestige_immo: {
+    name: "Prestige Immo", category: "Immobilier", emoji: "🏠", tags: ["prestige","or","luxe"],
+    bg: "#0F0F0F", surface: "#1A1A1A", primary: "#D4AF37", accent: "#F0D060",
+    text: "#F5F0E8", muted: "#9A9080", fontDisplay: "Cormorant Garamond", fontBody: "DM Sans",
+    bgMode: "solid",
+  },
+  coastal_living: {
+    name: "Coastal Living", category: "Immobilier", emoji: "🌊", tags: ["mer","bleu","clair"],
+    bg: "#F0F8FF", surface: "#E0F0FF", primary: "#0284C7", accent: "#0EA5E9",
+    text: "#0C2340", muted: "#4A7A9A", fontDisplay: "Playfair Display", fontBody: "Inter",
+    bgMode: "solid",
+  },
+  urban_loft: {
+    name: "Urban Loft", category: "Immobilier", emoji: "🏙️", tags: ["urbain","gris","moderne"],
+    bg: "#1C1C1C", surface: "#2C2C2C", primary: "#E5E5E5", accent: "#888888",
+    text: "#F5F5F5", muted: "#888888", fontDisplay: "Space Grotesk", fontBody: "Inter",
+    bgMode: "solid",
+  },
+
+  // ── FITNESS ───────────────────────────────────────────────────────────────
+  power_red: {
+    name: "Power Red", category: "Fitness", emoji: "💪", tags: ["rouge","energie","sport"],
+    bg: "#0A0000", surface: "#180000", primary: "#DC2626", accent: "#F97316",
+    text: "#FFF0F0", muted: "#9A6A6A", fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
+    bgMode: "solid",
+  },
+  iron_black: {
+    name: "Iron Black", category: "Fitness", emoji: "🏋️", tags: ["noir","metal","muscu"],
+    bg: "#080808", surface: "#111111", primary: "#FFFFFF", accent: "#EF4444",
+    text: "#F5F5F5", muted: "#888888", fontDisplay: "Space Grotesk", fontBody: "Inter",
+    bgMode: "solid",
+  },
+  zen_wellness: {
+    name: "Zen Wellness", category: "Fitness", emoji: "🧘", tags: ["zen","vert","calme"],
+    bg: "#F5FFF5", surface: "#E8F5E8", primary: "#059669", accent: "#34D399",
+    text: "#064E3B", muted: "#6B8A7A", fontDisplay: "Merriweather", fontBody: "DM Sans",
+    bgMode: "solid",
+  },
+  orange_boost: {
+    name: "Orange Boost", category: "Fitness", emoji: "🏃", tags: ["orange","running","energie"],
+    bg: "#0A0500", surface: "#1A0A00", primary: "#EA580C", accent: "#FB923C",
+    text: "#FFF5E6", muted: "#9A7A5A", fontDisplay: "Space Grotesk", fontBody: "Inter",
+    bgMode: "gradient", bgGradient: "linear-gradient(135deg,#0A0500,#1A0800)",
+  },
+
+  // ── EVENT ─────────────────────────────────────────────────────────────────
+  festival_night: {
+    name: "Festival Night", category: "Event", emoji: "🎉", tags: ["festival","sombre","fete"],
+    bg: "#050008", surface: "#0A0012", primary: "#FF6B35", accent: "#FFD700",
+    text: "#F5F0E8", muted: "#8A7A6A", fontDisplay: "Space Grotesk", fontBody: "DM Sans",
+    bgMode: "gradient", bgGradient: "linear-gradient(135deg,#050008,#0A000F)",
+  },
+  celebration: {
+    name: "Celebration", category: "Event", emoji: "🥳", tags: ["fete","or","festif"],
+    bg: "#0A0500", surface: "#150A00", primary: "#F59E0B", accent: "#FCD34D",
+    text: "#FFF5E6", muted: "#9A8060", fontDisplay: "Playfair Display", fontBody: "DM Sans",
+    bgMode: "solid",
+  },
+  corporate_event: {
+    name: "Corporate Event", category: "Event", emoji: "🎯", tags: ["conference","bleu","pro"],
+    bg: "#0D1B2A", surface: "#1A2A3D", primary: "#3B82F6", accent: "#60A5FA",
+    text: "#F0F4FF", muted: "#7A8FA8", fontDisplay: "Inter", fontBody: "Inter",
+    bgMode: "gradient", bgGradient: "linear-gradient(160deg,#0D1B2A,#1A3050)",
+  },
+  wedding: {
+    name: "Wedding", category: "Event", emoji: "💍", tags: ["mariage","rose","elegant"],
+    bg: "#FDF8F5", surface: "#F5EEE8", primary: "#BE8A6A", accent: "#E8B89A",
+    text: "#3D2B1A", muted: "#9A8070", fontDisplay: "Cormorant Garamond", fontBody: "Lora",
+    bgMode: "solid",
+  },
+
+  // ── MUSIC ─────────────────────────────────────────────────────────────────
+  studio_dark: {
+    name: "Studio Dark", category: "Music", emoji: "🎙️", tags: ["studio","sombre","rap"],
+    bg: "#050505", surface: "#0F0F0F", primary: "#1DB954", accent: "#1ED760",
+    text: "#FFFFFF", muted: "#B3B3B3", fontDisplay: "Space Grotesk", fontBody: "DM Sans",
+    bgMode: "solid",
+  },
+  rose_luxe: {
+    name: "Rose Luxe", category: "Music", emoji: "🌸", tags: ["rose","pop","girly"],
+    bg: "#0D0008", surface: "#1A0012", primary: "#EC4899", accent: "#F472B6",
+    text: "#FFF0F8", muted: "#9A7A88", fontDisplay: "Cormorant Garamond", fontBody: "DM Sans",
+    bgMode: "gradient", bgGradient: "linear-gradient(135deg,#0D0008,#1A0015)",
+  },
+  vinyl_club: {
+    name: "Vinyl Club", category: "Music", emoji: "🎵", tags: ["vinyle","retro","jazz"],
+    bg: "#1A1209", surface: "#2A1E10", primary: "#D97706", accent: "#F59E0B",
+    text: "#FFF8E6", muted: "#9A8A6A", fontDisplay: "Lora", fontBody: "Lora",
+    bgMode: "solid",
+  },
+  cherry_blossom: {
+    name: "Cherry Blossom", category: "Music", emoji: "🌺", tags: ["rose","sakura","doux"],
+    bg: "#1A0010", surface: "#2D0018", primary: "#FF6B9D", accent: "#FFB3C8",
+    text: "#FFF0F5", muted: "#9A7A85", fontDisplay: "Cormorant Garamond", fontBody: "DM Sans",
+    bgMode: "solid",
+  },
+
+  // ── PORTFOLIO ─────────────────────────────────────────────────────────────
+  pure_white: {
+    name: "Pure White", category: "Portfolio", emoji: "⬜", tags: ["blanc","minimaliste","clean"],
+    bg: "#FFFFFF", surface: "#F8F8F8", primary: "#1A1A1A", accent: "#C9A84C",
+    text: "#1A1A1A", muted: "#6B7280", fontDisplay: "Playfair Display", fontBody: "Inter",
+    bgMode: "solid",
+  },
+  minimal_cream: {
+    name: "Minimal Cream", category: "Portfolio", emoji: "🤎", tags: ["creme","chaud","design"],
+    bg: "#FAF7F2", surface: "#F0EDE8", primary: "#1A1A1A", accent: "#C9A84C",
+    text: "#2D2D2D", muted: "#7A7060", fontDisplay: "Cormorant Garamond", fontBody: "DM Sans",
+    bgMode: "solid",
+  },
+  ocean_deep: {
+    name: "Ocean Deep", category: "Portfolio", emoji: "🌊", tags: ["ocean","bleu","sombre"],
+    bg: "#050F1A", surface: "#0A1E2A", primary: "#00B4D8", accent: "#0096C7",
+    text: "#F5F0E8", muted: "#6A8A9A", fontDisplay: "Space Grotesk", fontBody: "Inter",
+    bgMode: "gradient", bgGradient: "linear-gradient(160deg,#050F1A,#0A1E2A)",
   },
   candy_pop: {
-    name: "Candy Pop",
-    bg: "#0D0510", surface: "#1A0820",
-    primary: "#F0ABFC", accent: "#67E8F9",
-    text: "#FAF5FF", muted: "#C084FC",
-    fontDisplay: "Fredoka One", fontBody: "Poppins",
-    bgMode: "gradient",
-    bgGradient: "linear-gradient(135deg, #0D0510 0%, #1A0820 50%, #0D0510 100%)",
+    name: "Candy Pop", category: "Portfolio", emoji: "🍭", tags: ["coloré","fun","jeune"],
+    bg: "#FFF0FA", surface: "#FFE0F5", primary: "#EC4899", accent: "#8B5CF6",
+    text: "#1A1A1A", muted: "#9A6A8A", fontDisplay: "Space Grotesk", fontBody: "Inter",
+    bgMode: "solid",
+  },
+  forest_zen: {
+    name: "Forest Zen", category: "Portfolio", emoji: "🌿", tags: ["nature","vert","calme"],
+    bg: "#0A1A0E", surface: "#0F2414", primary: "#2ECC71", accent: "#27AE60",
+    text: "#F5F0E8", muted: "#6A8A6A", fontDisplay: "Merriweather", fontBody: "DM Sans",
+    bgMode: "gradient", bgGradient: "linear-gradient(135deg,#0A1A0E,#0F2414)",
   },
 }
 
