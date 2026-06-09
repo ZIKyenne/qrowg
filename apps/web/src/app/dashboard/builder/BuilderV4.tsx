@@ -3334,7 +3334,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
       const { data: pg } = await supabase.from("pages").select("title,slug,status,theme,total_views").eq("id", pageId).single()
       if (pg) { setPageName(pg.title); setPageSlug(pg.slug); setPageStatus(pg.status||"draft"); if (pg.theme) setTheme(pg.theme as PageTheme); setPageStats(s => ({ ...s, views: pg.total_views||0 })) }
       const { data: blks } = await supabase.from("blocks").select("*").eq("page_id", pageId).order("position")
-      if (blks?.length) setBlocks(blks.map(b => ({ id: b.id, type: b.type, content: b.content||{}, visible: b.is_visible!==false, draft: b.is_draft||false })))
+      if (blks?.length) setBlocks(blks.map(b => ({ id: b.id, type: b.type, content: b.content||{}, visible: b.is_visible!==false, draft: b.is_draft||false, locked: b.is_locked||false })))
       const { data: qr } = await supabase.from("qr_codes").select("short_code,total_scans").eq("page_id", pageId).single()
       if (qr) {
         setQrShortCode(qr.short_code||"")
@@ -3354,7 +3354,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
       const supabase = createClient()
       await supabase.from("pages").update({ title: pageName, theme }).eq("id", pageId)
       await supabase.from("blocks").delete().eq("page_id", pageId)
-      if (blocks.length > 0) await supabase.from("blocks").insert(blocks.map((b, i) => ({ page_id: pageId, type: b.type, position: i, content: b.content, is_visible: b.visible && !b.draft, is_draft: b.draft || false, styles: {} })))
+      if (blocks.length > 0) await supabase.from("blocks").insert(blocks.map((b, i) => ({ page_id: pageId, type: b.type, position: i, content: b.content, is_visible: b.visible && !b.draft, is_draft: b.draft || false, is_locked: b.locked || false, styles: {} })))
       setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
     }, 800)
   }, [blocks, pageName, theme, pageId])
@@ -3374,6 +3374,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
   }
 
   function deleteBlock(id: string) {
+    if (blocks.find(b => b.id === id)?.locked) return
     setBlocks(p => p.filter(b => b.id !== id))
     if (selectedId === id) { setSelectedId(null); setRightTab("preview") }
   }
@@ -3388,8 +3389,11 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
 
   function toggleVisible(id: string) { setBlocks(p => p.map(b => b.id===id ? {...b, visible: !b.visible} : b)) }
   function toggleDraft(id: string) { setBlocks(p => p.map(b => b.id===id ? {...b, draft: !b.draft} : b)) }
+  function toggleLock(id: string) { setBlocks(p => p.map(b => b.id===id ? {...b, locked: !b.locked} : b)) }
 
   function moveBlock(id: string, dir: number) {
+    const block = blocks.find(b => b.id === id)
+    if (block?.locked) return // Bloc verrouillé — déplacement interdit
     const idx = blocks.findIndex(b => b.id === id)
     const ni = idx + dir; if (ni < 0 || ni >= blocks.length) return
     setBlocks(p => { const n = [...p]; [n[idx], n[ni]] = [n[ni], n[idx]]; return n })
@@ -3786,7 +3790,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
               return (
                 <div key={block.id}
                   onClick={() => { setSelectedId(block.id); setRightTab("edit") }}
-                  style={{ position: "relative", marginBottom: 0, border: "none", overflow: "visible", cursor: "pointer", transition: "box-shadow 0.15s", opacity: block.visible ? (block.draft ? 0.6 : 1) : 0.35, background: block.draft ? "rgba(251,191,36,0.03)" : "transparent", boxShadow: isSelected ? `inset 3px 0 0 ${G}` : block.draft ? "inset 3px 0 0 rgba(251,191,36,0.5)" : "none" }}
+                  style={{ position: "relative", marginBottom: 0, border: "none", overflow: "visible", cursor: block.locked ? "default" : "pointer", transition: "box-shadow 0.15s", opacity: block.visible ? (block.draft ? 0.6 : 1) : 0.35, background: block.draft ? "rgba(251,191,36,0.03)" : "transparent", boxShadow: isSelected ? `inset 3px 0 0 ${G}` : block.draft ? "inset 3px 0 0 rgba(251,191,36,0.5)" : block.locked ? "inset 3px 0 0 rgba(99,102,241,0.5)" : "none" }}
                   onMouseEnter={e => {
                     if (!isSelected) e.currentTarget.style.boxShadow = `inset 3px 0 0 rgba(201,168,76,0.3)`
                     const overlay = e.currentTarget.querySelector(".block-overlay") as HTMLElement
@@ -3802,7 +3806,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                     if (handle) handle.style.opacity = "0"
                   }}>
 
-                  <div className="block-handle" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 18, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0, transition: "opacity 0.15s", cursor: "grab", zIndex: 10 }}>
+                  <div className="block-handle" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 18, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0, transition: "opacity 0.15s", cursor: block.locked ? "not-allowed" : "grab", zIndex: 10 }}>
                     <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                       {[0,1,2,3,4,5].map(i => <div key={i} style={{ width: 3, height: 3, borderRadius: "50%", background: "rgba(201,168,76,0.5)" }} />)}
                     </div>
@@ -3821,7 +3825,13 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                       style={{ width: 24, height: 24, background: block.draft ? "rgba(251,191,36,0.15)" : "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: `1px solid ${block.draft ? "rgba(251,191,36,0.4)" : "rgba(255,255,255,0.1)"}`, color: block.draft ? "#FBBF24" : MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6, fontSize: 10, fontWeight: 700 }}>
                       ✏
                     </button>
-                    <button onClick={() => deleteBlock(block.id)} style={{ width: 24, height: 24, background: "rgba(239,68,68,0.12)", backdropFilter: "blur(4px)", border: "1px solid rgba(239,68,68,0.3)", color: "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><Trash2 size={10} /></button>
+                    <button onClick={e => { e.stopPropagation(); toggleLock(block.id) }} title={block.locked ? "Déverrouiller" : "Verrouiller"}
+                      style={{ width: 24, height: 24, background: block.locked ? "rgba(99,102,241,0.15)" : "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: `1px solid ${block.locked ? "rgba(99,102,241,0.4)" : "rgba(255,255,255,0.1)"}`, color: block.locked ? "#818CF8" : MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6, fontSize: 10 }}>
+                      {block.locked ? "🔒" : "🔓"}
+                    </button>
+                    {!block.locked && (
+                      <button onClick={() => deleteBlock(block.id)} style={{ width: 24, height: 24, background: "rgba(239,68,68,0.12)", backdropFilter: "blur(4px)", border: "1px solid rgba(239,68,68,0.3)", color: "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><Trash2 size={10} /></button>
+                    )}
                   </div>
 
                   {isSelected && (
@@ -3830,10 +3840,16 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                       <span style={{ color: G, fontSize: 9, fontWeight: 700 }}>{def?.label}</span>
                     </div>
                   )}
-                  {block.draft && (
+                  {block.draft && !block.locked && (
                     <div style={{ position: "absolute", top: 6, left: 22, display: "flex", alignItems: "center", gap: 4, background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.35)", borderRadius: 5, padding: "2px 7px", zIndex: 10, pointerEvents: "none" }}>
                       <span style={{ fontSize: 8 }}>✏️</span>
                       <span style={{ color: "#FBBF24", fontSize: 8, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" as const }}>Brouillon</span>
+                    </div>
+                  )}
+                  {block.locked && (
+                    <div style={{ position: "absolute", top: 6, right: 8, display: "flex", alignItems: "center", gap: 3, background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 5, padding: "2px 6px", zIndex: 10, pointerEvents: "none" }}>
+                      <span style={{ fontSize: 8 }}>🔒</span>
+                      <span style={{ color: "#818CF8", fontSize: 8, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" as const }}>Verrouillé</span>
                     </div>
                   )}
 
@@ -4012,7 +4028,13 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                           style={{ background: selectedBlock.draft ? "rgba(251,191,36,0.1)" : "rgba(255,255,255,0.04)", border: `1px solid ${selectedBlock.draft ? "rgba(251,191,36,0.35)" : "rgba(255,255,255,0.07)"}`, borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: selectedBlock.draft ? "#FBBF24" : MUTED, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>
                           ✏
                         </button>
-                        <button onClick={() => deleteBlock(selectedBlock.id)} title="Supprimer" style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: "#EF4444", display: "flex", alignItems: "center", justifyContent: "center" }}><Trash2 size={10} /></button>
+                        <button onClick={() => toggleLock(selectedBlock.id)} title={selectedBlock.locked ? "Déverrouiller" : "Verrouiller"}
+                          style={{ background: selectedBlock.locked ? "rgba(99,102,241,0.1)" : "rgba(255,255,255,0.04)", border: `1px solid ${selectedBlock.locked ? "rgba(99,102,241,0.35)" : "rgba(255,255,255,0.07)"}`, borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: selectedBlock.locked ? "#818CF8" : MUTED, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>
+                          {selectedBlock.locked ? "🔒" : "🔓"}
+                        </button>
+                        {!selectedBlock.locked && (
+                          <button onClick={() => deleteBlock(selectedBlock.id)} title="Supprimer" style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: "#EF4444", display: "flex", alignItems: "center", justifyContent: "center" }}><Trash2 size={10} /></button>
+                        )}
                       </div>
                     </div>
                     {/* key=selectedBlock.id force le remount quand on change de bloc */}

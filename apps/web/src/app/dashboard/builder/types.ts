@@ -8,6 +8,8 @@ export interface Block {
   type: string
   content: BlockContent
   visible: boolean
+  draft?: boolean
+  locked?: boolean
 }
 
 export interface PageTheme {
