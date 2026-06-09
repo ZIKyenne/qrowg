@@ -3883,7 +3883,8 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
             </div>
           )}
 
-          {!blocksCollapsed && <div style={{ flex: 1, overflowY: "auto", padding: "5px 6px" }}>
+          {!blocksCollapsed && (
+          <div style={{ flex: 1, overflowY: "auto", padding: "5px 6px" }}>
             {filteredBlocks.length===0
               ? (
                 <div style={{ padding: "30px 16px", textAlign: "center" }}>
@@ -3937,6 +3938,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
               ))}
             </div>
           </div>
+          )}
         </div>
 
         {/* POIGNÉE RESIZE sidebar blocs */}
