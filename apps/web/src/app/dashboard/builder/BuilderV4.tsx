@@ -2379,7 +2379,7 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
       </div>
     )
 
-    case "tabs_block": { const [activeTab, setActiveTab] = [0, (_:number) => {}]
+    case "tabs_block": { const [activeTab, setActiveTab] = [0, (_:number) => {}] as const
       const tabs = [[c.tab1_label,c.tab1_content],[c.tab2_label,c.tab2_content],[c.tab3_label,c.tab3_content]].filter(([l])=>l)
       return (
         <div style={{ padding: "10px 16px", ...s }}>
@@ -2400,7 +2400,7 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
       )
     }
 
-    case "accordion_block": { const [openIdx, setOpenIdx] = [null as number|null, (_:number|null) => {}]
+    case "accordion_block": { const [openIdx, setOpenIdx] = [null as number|null, (_:number|null) => {}] as const
       const items = [[c.a1_title,c.a1_content],[c.a2_title,c.a2_content],[c.a3_title,c.a3_content],[c.a4_title,c.a4_content]].filter(([t])=>t)
       return (
         <div style={{ padding: "10px 16px", ...s }}>
@@ -2849,7 +2849,7 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
               {bgMode==="mesh" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   <label style={{ color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Dégradé Mesh</label>
-                  <div style={{ height: 60, borderRadius: 10, background: `radial-gradient(ellipse at 0% 0%, ${(theme as any).mesh_c1||"#C9A84C"}60, transparent 50%), radial-gradient(ellipse at 100% 100%, ${(theme as any).mesh_c2||"#39FF8F"}60, transparent 50%), radial-gradient(ellipse at 100% 0%, ${(theme as any).mesh_c3||"#7B2FBE"}40, transparent 50%), ${theme.bg}`, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10 }} />
+                  <div style={{ height: 60, borderRadius: 10, background: `radial-gradient(ellipse at 0% 0%, ${(theme as any).mesh_c1||"#C9A84C"}80, transparent 50%), radial-gradient(ellipse at 100% 100%, ${(theme as any).mesh_c2||"#39FF8F"}80, transparent 50%), radial-gradient(ellipse at 100% 0%, ${(theme as any).mesh_c3||"#7B2FBE"}60, transparent 50%), ${theme.bg}`, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, filter: `blur(${Math.round(((theme as any).mesh_blur||40)/5)}px)`, overflow: "hidden" }} />
                   {[
                     { label: "Couleur 1", key: "mesh_c1", default: "#C9A84C" },
                     { label: "Couleur 2", key: "mesh_c2", default: "#39FF8F" },
@@ -2903,9 +2903,32 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
               {bgMode==="image" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   <label style={{ color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Image de fond</label>
-                  <input type="url" value={(theme as any).bgImage||""} onChange={e => onThemeChange({...theme, bgImage: e.target.value} as any)}
+                  {/* Upload fichier */}
+                  <label style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, height: 48, background: "rgba(201,168,76,0.08)", border: "1.5px dashed rgba(201,168,76,0.3)", borderRadius: 10, cursor: "pointer", color: G, fontSize: 12, fontWeight: 600 }}>
+                    <span>📁</span> Choisir une image
+                    <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => {
+                      const file = e.target.files?.[0]
+                      if (file) {
+                        const reader = new FileReader()
+                        reader.onload = ev => onThemeChange({...theme, bgImage: ev.target?.result as string, bgMode: "image"} as any)
+                        reader.readAsDataURL(file)
+                      }
+                    }} />
+                  </label>
+                  {/* OU lien URL */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
+                    <span style={{ color: MUTED, fontSize: 10 }}>ou URL</span>
+                    <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
+                  </div>
+                  <input type="url" value={(theme as any).bgImage?.startsWith("data:") ? "" : (theme as any).bgImage||""} onChange={e => onThemeChange({...theme, bgImage: e.target.value} as any)}
                     placeholder="https://..." style={{ ...inputStyle }} />
-                  {(theme as any).bgImage && <img src={(theme as any).bgImage} alt="" style={{ width: "100%", height: 80, objectFit: "cover", borderRadius: 8 }} />}
+                  {(theme as any).bgImage && (
+                    <div style={{ position: "relative" }}>
+                      <img src={(theme as any).bgImage} alt="" style={{ width: "100%", height: 80, objectFit: "cover", borderRadius: 8, display: "block" }} />
+                      <button onClick={() => onThemeChange({...theme, bgImage: ""} as any)} style={{ position: "absolute", top: 4, right: 4, background: "rgba(0,0,0,0.7)", border: "none", borderRadius: "50%", width: 22, height: 22, color: "#fff", cursor: "pointer", fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
+                    </div>
+                  )}
                   <div>
                     <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Taille</label>
                     <select value={(theme as any).bgImageSize||"cover"} onChange={e => onThemeChange({...theme, bgImageSize: e.target.value} as any)} style={{ ...inputStyle }}>
@@ -2913,12 +2936,12 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
                     </select>
                   </div>
                   <div>
-                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Overlay opacité: {Math.round(((theme as any).bgOverlayOpacity||0.5)*100)}%</label>
+                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Overlay: {Math.round(((theme as any).bgOverlayOpacity||0.5)*100)}%</label>
                     <input type="range" min="0" max="100" value={Math.round(((theme as any).bgOverlayOpacity||0.5)*100)} onChange={e => onThemeChange({...theme, bgOverlayOpacity: parseInt(e.target.value)/100} as any)} style={{ width: "100%", accentColor: G }} />
                   </div>
                   <div>
-                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Blur: {(theme as any).bgBlur||0}px</label>
-                    <input type="range" min="0" max="30" value={(theme as any).bgBlur||0} onChange={e => onThemeChange({...theme, bgBlur: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
+                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Flou: {(theme as any).bgBlur||0}px</label>
+                    <input type="range" min="0" max="20" value={(theme as any).bgBlur||0} onChange={e => onThemeChange({...theme, bgBlur: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
                   </div>
                 </div>
               )}
@@ -2931,7 +2954,7 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
               {/* Preview fond actuel avec effets */}
               <div style={{ position: "relative", height: 80, borderRadius: 12, overflow: "hidden", border: "1px solid rgba(255,255,255,0.1)", marginBottom: 4 }}>
                 <div style={{ position: "absolute", inset: 0, background: theme.bgGradient||theme.bg }} />
-                {effectNoise && <div style={{ position: "absolute", inset: 0, opacity: (theme as any).noise_opacity ? (theme as any).noise_opacity/100 : 0.2, background: 'rgba(128,128,128,0.15)', mixBlendMode: 'overlay' as const }} />}
+                {effectNoise && <div style={{ position: "absolute", inset: 0, background: "rgba(128,128,128,0.15)", opacity: 0.2, mixBlendMode: "overlay" as const }} />}
                 {effectGlow && <div style={{ position: "absolute", inset: 0, background: `radial-gradient(circle at 50% 50%, ${(theme as any).glow_color||G}${Math.round(((theme as any).glow_intensity||30)/100*255).toString(16).padStart(2,"0")}, transparent ${(theme as any).glow_size||200}px)` }} />}
                 {effectVignette && <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at center, transparent ${100-(theme as any).vignette_intensity||60}%, rgba(0,0,0,0.8) 100%)` }} />}
                 <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -2940,13 +2963,13 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
               </div>
               {/* Noise */}
               <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: effectNoise ? 10 : 0 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_noise ? 10 : 0 }}>
                   <label style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600 }}>🌫️ Noise</label>
-                  <button onClick={() => setEffectNoise(!effectNoise)} style={{ width: 36, height: 20, borderRadius: 10, background: effectNoise ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
-                    <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: effectNoise ? 18 : 2, transition: "left 0.2s" }} />
+                  <button onClick={() => onThemeChange({...theme, effect_noise: !(theme as any).effect_noise} as any)} style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_noise ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
+                    <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_noise ? 18 : 2, transition: "left 0.2s" }} />
                   </button>
                 </div>
-                {effectNoise && (
+                {(theme as any).effect_noise && (
                   <div>
                     <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Opacité: {(theme as any).noise_opacity||20}%</label>
                     <input type="range" min="1" max="80" value={(theme as any).noise_opacity||20} onChange={e => onThemeChange({...theme, noise_opacity: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
@@ -2956,13 +2979,13 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
 
               {/* Glow */}
               <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: effectGlow ? 10 : 0 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_glow ? 10 : 0 }}>
                   <label style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600 }}>✨ Glow</label>
-                  <button onClick={() => setEffectGlow(!effectGlow)} style={{ width: 36, height: 20, borderRadius: 10, background: effectGlow ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
-                    <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: effectGlow ? 18 : 2, transition: "left 0.2s" }} />
+                  <button onClick={() => onThemeChange({...theme, effect_glow: !(theme as any).effect_glow} as any)} style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_glow ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
+                    <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_glow ? 18 : 2, transition: "left 0.2s" }} />
                   </button>
                 </div>
-                {effectGlow && (
+                {(theme as any).effect_glow && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     <div style={{ display: "flex", gap: 7, alignItems: "center" }}>
                       <input type="color" value={(theme as any).glow_color||G} onChange={e => onThemeChange({...theme, glow_color: e.target.value} as any)} style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }} />
@@ -2982,13 +3005,13 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
 
               {/* Vignette */}
               <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: effectVignette ? 10 : 0 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_vignette ? 10 : 0 }}>
                   <label style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600 }}>🌑 Vignette</label>
-                  <button onClick={() => setEffectVignette(!effectVignette)} style={{ width: 36, height: 20, borderRadius: 10, background: effectVignette ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
-                    <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: effectVignette ? 18 : 2, transition: "left 0.2s" }} />
+                  <button onClick={() => onThemeChange({...theme, effect_vignette: !(theme as any).effect_vignette} as any)} style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_vignette ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
+                    <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_vignette ? 18 : 2, transition: "left 0.2s" }} />
                   </button>
                 </div>
-                {effectVignette && (
+                {(theme as any).effect_vignette && (
                   <div>
                     <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Intensité: {(theme as any).vignette_intensity||40}%</label>
                     <input type="range" min="5" max="100" value={(theme as any).vignette_intensity||40} onChange={e => onThemeChange({...theme, vignette_intensity: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
@@ -3255,6 +3278,8 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
   function bgStyle(): React.CSSProperties {
     if (dayMode) return { background: "#FAFAFA" }
     const t = theme as any
+    let base: React.CSSProperties = {}
+
     if (t.bgMode === "pattern") {
       const patSize = t.pattern_size || 20
       const patOpacity = t.pattern_opacity || 0.15
@@ -3262,7 +3287,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
       const alpha = Math.round(patOpacity * 255).toString(16).padStart(2, "0")
       const c = patColor + alpha
       let bgImg = ""
-      switch(t.bgPattern || "dots") {
+      switch(t.bgPattern || patternType || "dots") {
         case "dots": bgImg = `radial-gradient(circle, ${c} 1px, transparent 1px)`; break
         case "grid": bgImg = `linear-gradient(${c} 1px, transparent 1px), linear-gradient(90deg, ${c} 1px, transparent 1px)`; break
         case "lines": bgImg = `linear-gradient(0deg, ${c} 1px, transparent 1px)`; break
@@ -3272,16 +3297,30 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         case "zigzag": bgImg = `linear-gradient(135deg, ${c} 25%, transparent 25%), linear-gradient(225deg, ${c} 25%, transparent 25%)`; break
         default: bgImg = `radial-gradient(circle, ${c} 1px, transparent 1px)`
       }
-      return { background: theme.bg, backgroundImage: bgImg, backgroundSize: `${patSize}px ${patSize}px` }
-    }
-    if (t.bgMode === "mesh") {
+      base = { background: theme.bg, backgroundImage: bgImg, backgroundSize: `${patSize}px ${patSize}px` }
+    } else if (t.bgMode === "mesh") {
       const c1 = t.mesh_c1 || "#C9A84C"; const c2 = t.mesh_c2 || "#39FF8F"; const c3 = t.mesh_c3 || "#7B2FBE"
-      return { background: `radial-gradient(ellipse at 0% 0%, ${c1}60, transparent 50%), radial-gradient(ellipse at 100% 100%, ${c2}60, transparent 50%), radial-gradient(ellipse at 100% 0%, ${c3}40, transparent 50%), ${theme.bg}` }
+      const blurPx = Math.round((t.mesh_blur||40)/3)
+      base = {
+        background: `radial-gradient(ellipse at 10% 20%, ${c1}90, transparent 55%), radial-gradient(ellipse at 90% 80%, ${c2}90, transparent 55%), radial-gradient(ellipse at 80% 10%, ${c3}70, transparent 55%), ${theme.bg}`,
+        ...(blurPx > 0 ? { backdropFilter: `blur(${blurPx}px)` } : {})
+      }
+    } else if (t.bgMode === "image" && t.bgImage) {
+      base = {
+        backgroundImage: `url(${t.bgImage})`,
+        backgroundSize: t.bgImageSize || "cover",
+        backgroundPosition: "center",
+        ...(t.bgBlur > 0 ? { filter: `blur(${t.bgBlur}px)` } : {})
+      }
+    } else {
+      const animStyle: React.CSSProperties = t.bgAnimation === "gradient-flow"
+        ? { backgroundSize: "400% 400%", animation: `gradientShift ${t.anim_speed||8}s ease infinite` }
+        : t.bgAnimation === "aurora"
+        ? { backgroundSize: "300% 300%", animation: `auroraShift ${t.anim_speed||12}s ease infinite` }
+        : {}
+      base = { background: theme.bgGradient || theme.bg, ...animStyle }
     }
-    if (t.bgMode === "image" && t.bgImage) {
-      return { backgroundImage: `url(${t.bgImage})`, backgroundSize: t.bgImageSize || "cover", backgroundPosition: "center" }
-    }
-    return { background: theme.bgGradient || theme.bg }
+    return base
   }
 
   return (
@@ -3470,7 +3509,10 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
               {!pageId && <span style={{ color: "#4A4640", fontSize: 9, marginLeft: "auto" }}>Mode démo</span>}
             </div>
 
-            <div style={{ ...bgStyle(), borderRadius: 16, overflow: "hidden", minHeight: 200, position: "relative" }}>
+            <div style={{ ...bgStyle(), borderRadius: 20, overflow: "hidden", minHeight: 200, position: "relative", boxShadow: "0 8px 60px rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.05)" }}>
+            {/* Effets overlay */}
+            {(theme as any).effect_glow && <div style={{ position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none", background: `radial-gradient(ellipse at 50% 0%, ${(theme as any).glow_color||"#C9A84C"}${Math.round(((theme as any).glow_intensity||40)/100*180).toString(16).padStart(2,"0")}, transparent ${(theme as any).glow_size||300}px)` }} />}
+            {(theme as any).effect_vignette && <div style={{ position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none", background: `radial-gradient(ellipse at 50% 50%, transparent ${Math.max(10, 100-((theme as any).vignette_intensity||40))}%, rgba(0,0,0,${((theme as any).vignette_intensity||40)/100}) 100%)` }} />}
             {blocks.length===0 ? (
               <div style={{ padding: "60px 30px", textAlign: "center" }}>
                 <p style={{ color: "#4A4640", fontSize: 28, margin: "0 0 8px" }}>✦</p>
@@ -3520,7 +3562,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                     </div>
                   )}
 
-                  <div style={{ overflow: "hidden", minHeight: 36 }}>
+                  <div style={{ overflow: "hidden", minHeight: 36, position: "relative", zIndex: 2 }}>
                     <BlockPreview block={block} theme={theme} dayMode={dayMode} />
                   </div>
                 </div>
