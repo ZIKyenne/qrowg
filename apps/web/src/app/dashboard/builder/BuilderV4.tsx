@@ -13,6 +13,55 @@ const G = "#C9A84C"
 const MUTED = "#8A8478"
 type Message = { role: "user" | "assistant"; content: string }
 
+// ── Historique Undo/Redo ─────────────────────────────────────────────────
+const MAX_HISTORY = 50
+
+function useUndoRedo(initial: Block[]) {
+  const historyRef = useRef<Block[][]>([JSON.parse(JSON.stringify(initial))])
+  const cursorRef = useRef(0)
+  const [, forceRender] = useState(0)
+
+  const getState = () => historyRef.current[cursorRef.current]
+
+  const push = useCallback((next: Block[]) => {
+    // Tronquer le futur
+    historyRef.current = historyRef.current.slice(0, cursorRef.current + 1)
+    // Deep clone
+    historyRef.current.push(JSON.parse(JSON.stringify(next)))
+    // Limiter
+    if (historyRef.current.length > MAX_HISTORY + 1) {
+      historyRef.current.shift()
+    } else {
+      cursorRef.current++
+    }
+  }, [])
+
+  const undo = useCallback(() => {
+    if (cursorRef.current > 0) {
+      cursorRef.current--
+      forceRender(n => n + 1)
+      return historyRef.current[cursorRef.current]
+    }
+    return null
+  }, [])
+
+  const redo = useCallback(() => {
+    if (cursorRef.current < historyRef.current.length - 1) {
+      cursorRef.current++
+      forceRender(n => n + 1)
+      return historyRef.current[cursorRef.current]
+    }
+    return null
+  }, [])
+
+  const canUndo = () => cursorRef.current > 0
+  const canRedo = () => cursorRef.current < historyRef.current.length - 1
+  const size = () => historyRef.current.length
+  const pos = () => cursorRef.current
+
+  return { getState, push, undo, redo, canUndo, canRedo, size, pos }
+}
+
 // ── Hook resize panneau ────────────────────────────────────────────────────
 function useResize(key: string, defaultW: number, min: number, max: number) {
   const [width, setWidth] = useState(() => {
@@ -3184,11 +3233,25 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
 
 
 export default function BuilderV4({ pageId }: { pageId?: string }) {
-  const [blocks, setBlocks] = useState<Block[]>([
+  const undoRedo = useUndoRedo([
     { id: "1", type: "profile", content: { name: "Mon Nom", tagline: "Mon activité" }, visible: true },
     { id: "2", type: "bio", content: { text: "Bienvenue sur ma page !" }, visible: true },
     { id: "3", type: "cta_button", content: { label: "Me contacter", url: "#", style: "gold" }, visible: true },
   ])
+  const [blocks, setBlocksRaw] = useState<Block[]>([
+    { id: "1", type: "profile", content: { name: "Mon Nom", tagline: "Mon activité" }, visible: true },
+    { id: "2", type: "bio", content: { text: "Bienvenue sur ma page !" }, visible: true },
+    { id: "3", type: "cta_button", content: { label: "Me contacter", url: "#", style: "gold" }, visible: true },
+  ])
+
+  // setBlocks avec push historique automatique
+  const setBlocks = useCallback((updater: Block[] | ((prev: Block[]) => Block[]), skipHistory = false) => {
+    setBlocksRaw(prev => {
+      const next = typeof updater === "function" ? updater(prev) : updater
+      if (!skipHistory) undoRedo.push(next)
+      return next
+    })
+  }, [undoRedo])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [pageName, setPageName] = useState("Ma Page")
   const [pageSlug, setPageSlug] = useState("ma-page")
@@ -3245,6 +3308,21 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
 
     const handler = (e: KeyboardEvent) => {
       const ctrl = e.ctrlKey || e.metaKey // Ctrl Windows / Cmd Mac
+
+      // Ctrl+Z — Undo
+      if (ctrl && !e.shiftKey && (e.key === "z" || e.key === "Z") && !isEditing(e)) {
+        e.preventDefault()
+        const prev = undoRedo.undo()
+        if (prev) setBlocksRaw(prev)
+        return
+      }
+      // Ctrl+Shift+Z / Ctrl+Y — Redo
+      if (ctrl && (e.shiftKey && (e.key === "z" || e.key === "Z") || e.key === "y" || e.key === "Y") && !isEditing(e)) {
+        e.preventDefault()
+        const next = undoRedo.redo()
+        if (next) setBlocksRaw(next)
+        return
+      }
 
       // Ctrl+B — Bibliothèque de blocs
       if (ctrl && (e.key === "b" || e.key === "B") && !isEditing(e)) {
@@ -3334,7 +3412,11 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
       const { data: pg } = await supabase.from("pages").select("title,slug,status,theme,total_views").eq("id", pageId).single()
       if (pg) { setPageName(pg.title); setPageSlug(pg.slug); setPageStatus(pg.status||"draft"); if (pg.theme) setTheme(pg.theme as PageTheme); setPageStats(s => ({ ...s, views: pg.total_views||0 })) }
       const { data: blks } = await supabase.from("blocks").select("*").eq("page_id", pageId).order("position")
-      if (blks?.length) setBlocks(blks.map(b => ({ id: b.id, type: b.type, content: b.content||{}, visible: b.is_visible!==false, draft: b.is_draft||false, locked: b.is_locked||false })))
+      if (blks?.length) {
+          const loaded = blks.map(b => ({ id: b.id, type: b.type, content: b.content||{}, visible: b.is_visible!==false, draft: b.is_draft||false, locked: b.is_locked||false }))
+          setBlocksRaw(loaded)
+          undoRedo.push(loaded)
+        }
       const { data: qr } = await supabase.from("qr_codes").select("short_code,total_scans").eq("page_id", pageId).single()
       if (qr) {
         setQrShortCode(qr.short_code||"")
@@ -3492,6 +3574,26 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         {saved && <span style={{ color: "#39FF8F", fontSize: 10, display: "flex", alignItems: "center", gap: 3 }}><Check size={10} /> Enregistré</span>}
         {!pageId && <span style={{ color: "#4A4640", fontSize: 9 }}>Mode démo</span>}
         <div style={{ flex: 1 }} />
+
+        {/* Boutons Undo / Redo */}
+        <div style={{ display: "flex", gap: 3 }}>
+          <button onClick={() => { const p = undoRedo.undo(); if(p) setBlocksRaw(p) }}
+            disabled={!undoRedo.canUndo()}
+            title="Annuler — Ctrl+Z"
+            style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, cursor: undoRedo.canUndo() ? "pointer" : "default", color: undoRedo.canUndo() ? "#F5F0E8" : "rgba(255,255,255,0.2)", fontSize: 13, transition: "all 0.15s" }}
+            onMouseEnter={e => { if(undoRedo.canUndo()) { e.currentTarget.style.background="rgba(201,168,76,0.1)"; e.currentTarget.style.borderColor="rgba(201,168,76,0.3)" }}}
+            onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor="rgba(255,255,255,0.08)" }}>
+            ↩
+          </button>
+          <button onClick={() => { const n = undoRedo.redo(); if(n) setBlocksRaw(n) }}
+            disabled={!undoRedo.canRedo()}
+            title="Rétablir — Ctrl+Shift+Z"
+            style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, cursor: undoRedo.canRedo() ? "pointer" : "default", color: undoRedo.canRedo() ? "#F5F0E8" : "rgba(255,255,255,0.2)", fontSize: 13, transition: "all 0.15s" }}
+            onMouseEnter={e => { if(undoRedo.canRedo()) { e.currentTarget.style.background="rgba(201,168,76,0.1)"; e.currentTarget.style.borderColor="rgba(201,168,76,0.3)" }}}
+            onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor="rgba(255,255,255,0.08)" }}>
+            ↪
+          </button>
+        </div>
 
         {/* Bouton Focus Mode */}
         <button onClick={toggleFocus} title="Mode Focus — Ctrl+F"
