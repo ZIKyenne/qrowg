@@ -1810,6 +1810,240 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
       )
     }
 
+
+    case "spotify_embed": {
+      const getSpotifyId = (url: string, type: string) => {
+        const match = url?.match(new RegExp(`spotify\.com\/${type}\/([a-zA-Z0-9]+)`))
+        return match?.[1] || null
+      }
+      const embedType = c.type || "track"
+      const spotifyId = c.url ? getSpotifyId(c.url, embedType) : null
+      const height = c.size==="lg" ? 352 : c.size==="sm" ? 80 : 152
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {spotifyId
+            ? <iframe src={`https://open.spotify.com/embed/${embedType}/${spotifyId}?utm_source=generator&theme=0`}
+                width="100%" height={height} style={{ borderRadius: 12, border: "none", display: "block" }}
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" />
+            : <div style={{ height: 152, background: "rgba(29,185,84,0.08)", border: "1.5px solid rgba(29,185,84,0.25)", borderRadius: 12, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                <span style={{ fontSize: 32 }}>🎧</span>
+                <p style={{ color: muted, fontSize: 11, margin: 0 }}>Ajoutez un lien Spotify</p>
+                <p style={{ color: MUTED, fontSize: 9, margin: 0 }}>track / album / playlist / artist</p>
+              </div>}
+        </div>
+      )
+    }
+
+    case "latest_release": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ background: "linear-gradient(135deg,rgba(29,185,84,0.12),rgba(29,185,84,0.06))", border: "1.5px solid rgba(29,185,84,0.3)", borderRadius: 16, overflow: "hidden" }}>
+          {c.badge && <div style={{ background: "rgba(29,185,84,0.2)", padding: "6px 14px", fontSize: 11, fontWeight: 700, color: "#1DB954", textAlign: "center" }}>{c.badge}</div>}
+          <div style={{ display: "flex", gap: 14, padding: "14px" }}>
+            {c.cover
+              ? <img src={c.cover} alt="" style={{ width: 80, height: 80, borderRadius: 10, objectFit: "cover", flexShrink: 0, boxShadow: "0 4px 16px rgba(0,0,0,0.4)" }} />
+              : <div style={{ width: 80, height: 80, borderRadius: 10, background: "rgba(29,185,84,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, flexShrink: 0 }}>🎵</div>}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ color: text, fontSize: 16, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.title||"Nouveau titre"}</p>
+              {c.artist && <p style={{ color: muted, fontSize: 12, margin: "0 0 4px" }}>{c.artist}</p>}
+              {c.release_date && <p style={{ color: "#1DB954", fontSize: 11, margin: "0 0 10px", fontWeight: 600 }}>📅 {c.release_date}</p>}
+              <div style={{ display: "flex", gap: 6 }}>
+                {c.spotify_url && <div style={{ background: "#1DB954", borderRadius: 6, padding: "4px 10px", fontSize: 10, fontWeight: 700, color: "#000" }}>🎧 Spotify</div>}
+                {c.apple_url && <div style={{ background: "rgba(252,60,68,0.15)", border: "1px solid rgba(252,60,68,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 10, fontWeight: 700, color: "#FC3C44" }}>🍎 Apple</div>}
+                {c.youtube_url && <div style={{ background: "rgba(255,0,0,0.12)", border: "1px solid rgba(255,0,0,0.25)", borderRadius: 6, padding: "4px 10px", fontSize: 10, fontWeight: 700, color: "#FF0000" }}>▶ YT</div>}
+              </div>
+            </div>
+          </div>
+          {c.cta_label && <div style={{ margin: "0 14px 14px", background: "#1DB954", borderRadius: 10, padding: "11px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#000" }}>{c.cta_label}</div>}
+        </div>
+      </div>
+    )
+
+    case "discography": {
+      const albums = [[c.a1_cover,c.a1_title,c.a1_year,c.a1_type,c.a1_url],[c.a2_cover,c.a2_title,c.a2_year,c.a2_type,c.a2_url],[c.a3_cover,c.a3_title,c.a3_year,c.a3_type,c.a3_url]].filter(([,t])=>t)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {albums.length===0
+              ? [["","Album 1","2024","Album"],["","Single","2023","Single"]].map(([,title,year,type],i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 52, height: 52, borderRadius: 8, background: "rgba(29,185,84,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>💿</div>
+                  <div style={{ flex: 1 }}><p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{title}</p><p style={{ color: muted, fontSize: 11, margin: 0 }}>{type} · {year}</p></div>
+                  <span style={{ color: "#1DB954", fontSize: 18 }}>▶</span>
+                </div>
+              ))
+              : albums.map(([cover,title,year,type],i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  {cover
+                    ? <img src={String(cover)} alt="" style={{ width: 52, height: 52, borderRadius: 8, objectFit: "cover", flexShrink: 0 }} />
+                    : <div style={{ width: 52, height: 52, borderRadius: 8, background: "rgba(29,185,84,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>💿</div>}
+                  <div style={{ flex: 1 }}>
+                    <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{title}</p>
+                    <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                      <span style={{ background: "rgba(29,185,84,0.12)", border: "1px solid rgba(29,185,84,0.2)", borderRadius: 10, padding: "1px 7px", color: "#1DB954", fontSize: 9, fontWeight: 700 }}>{type}</span>
+                      <span style={{ color: muted, fontSize: 11 }}>{year}</span>
+                    </div>
+                  </div>
+                  <span style={{ color: "#1DB954", fontSize: 18 }}>▶</span>
+                </div>
+              ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "album_block": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ background: "rgba(29,185,84,0.06)", border: "1px solid rgba(29,185,84,0.2)", borderRadius: 14, overflow: "hidden" }}>
+          {c.cover
+            ? <img src={c.cover} alt="" style={{ width: "100%", height: 160, objectFit: "cover", display: "block" }} />
+            : <div style={{ height: 140, background: "rgba(29,185,84,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 48 }}>💿</div>}
+          <div style={{ padding: "14px" }}>
+            <p style={{ color: text, fontSize: 18, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay }}>{c.title||"Mon Album"}</p>
+            {c.artist && <p style={{ color: muted, fontSize: 12, margin: "0 0 3px" }}>{c.artist}</p>}
+            <div style={{ display: "flex", gap: 10, marginBottom: c.description ? 10 : 12 }}>
+              {c.year && <span style={{ color: "#1DB954", fontSize: 11, fontWeight: 600 }}>{c.year}</span>}
+              {c.tracks && <span style={{ color: muted, fontSize: 11 }}>· {c.tracks}</span>}
+            </div>
+            {c.description && <p style={{ color: muted, fontSize: 12, margin: "0 0 12px", lineHeight: 1.6 }}>{c.description}</p>}
+            <div style={{ display: "flex", gap: 7, marginBottom: 12 }}>
+              {c.spotify_url && <div style={{ flex: 1, background: "#1DB954", borderRadius: 8, padding: "8px", textAlign: "center", fontSize: 11, fontWeight: 700, color: "#000" }}>🎧 Spotify</div>}
+              {c.apple_url && <div style={{ flex: 1, background: "rgba(252,60,68,0.15)", border: "1px solid rgba(252,60,68,0.3)", borderRadius: 8, padding: "8px", textAlign: "center", fontSize: 11, fontWeight: 700, color: "#FC3C44" }}>🍎 Apple</div>}
+              {c.deezer_url && <div style={{ flex: 1, background: "rgba(162,56,255,0.12)", border: "1px solid rgba(162,56,255,0.25)", borderRadius: 8, padding: "8px", textAlign: "center", fontSize: 11, fontWeight: 700, color: "#A238FF" }}>🎶 Deezer</div>}
+            </div>
+            {!c.spotify_url && !c.apple_url && !c.deezer_url && c.cta_label && (
+              <div style={{ background: "#1DB954", borderRadius: 9, padding: "11px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#000" }}>{c.cta_label}</div>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+
+    case "playlist_block": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
+          {c.cover
+            ? <img src={c.cover} alt="" style={{ width: 60, height: 60, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
+            : <div style={{ width: 60, height: 60, borderRadius: 10, background: "rgba(29,185,84,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, flexShrink: 0 }}>📋</div>}
+          <div style={{ flex: 1 }}>
+            <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>{c.title||"Ma Playlist"}</p>
+            {c.description && <p style={{ color: muted, fontSize: 11, margin: "0 0 3px" }}>{c.description}</p>}
+            {c.tracks_count && <p style={{ color: "#1DB954", fontSize: 11, margin: 0, fontWeight: 600 }}>🎵 {c.tracks_count}</p>}
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: 7 }}>
+          {c.spotify_url && <div style={{ flex: 1, background: "#1DB954", borderRadius: 8, padding: "9px", textAlign: "center", fontSize: 11, fontWeight: 700, color: "#000" }}>🎧 Spotify</div>}
+          {c.apple_url && <div style={{ flex: 1, background: "rgba(252,60,68,0.15)", border: "1px solid rgba(252,60,68,0.3)", borderRadius: 8, padding: "9px", textAlign: "center", fontSize: 11, fontWeight: 700, color: "#FC3C44" }}>🍎 Apple</div>}
+          {c.deezer_url && <div style={{ flex: 1, background: "rgba(162,56,255,0.12)", border: "1px solid rgba(162,56,255,0.25)", borderRadius: 8, padding: "9px", textAlign: "center", fontSize: 11, fontWeight: 700, color: "#A238FF" }}>🎶 Deezer</div>}
+          {!c.spotify_url && !c.apple_url && !c.deezer_url && (
+            <div style={{ flex: 1, background: "#1DB954", borderRadius: 8, padding: "9px", textAlign: "center", fontSize: 11, fontWeight: 700, color: "#000" }}>{c.cta_label||"Écouter la playlist"}</div>
+          )}
+        </div>
+      </div>
+    )
+
+    case "concerts": {
+      const shows = [[c.c1_date,c.c1_city,c.c1_venue,c.c1_url],[c.c2_date,c.c2_city,c.c2_venue,c.c2_url],[c.c3_date,c.c3_city,c.c3_venue,c.c3_url],[c.c4_date,c.c4_city,c.c4_venue,c.c4_url]].filter(([,city])=>city)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {shows.length===0
+              ? [["15 juin","Paris","L Olympia"],["22 juin","Lyon","Le Transbordeur"]].map(([date,city,venue],i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(145,70,255,0.06)", border: "1px solid rgba(145,70,255,0.2)", borderRadius: 12, padding: "12px 14px" }}>
+                  <div style={{ textAlign: "center", flexShrink: 0, minWidth: 44 }}><p style={{ color: "#9146FF", fontSize: 13, fontWeight: 700, margin: 0 }}>{date}</p></div>
+                  <div style={{ flex: 1 }}><p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{city}</p><p style={{ color: muted, fontSize: 11, margin: 0 }}>🎭 {venue}</p></div>
+                  <div style={{ background: "#9146FF", borderRadius: 7, padding: "6px 12px", fontSize: 11, fontWeight: 700, color: "#fff" }}>Billets</div>
+                </div>
+              ))
+              : shows.map(([date,city,venue,url],i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(145,70,255,0.06)", border: "1px solid rgba(145,70,255,0.2)", borderRadius: 12, padding: "12px 14px" }}>
+                  <div style={{ textAlign: "center", flexShrink: 0, minWidth: 44 }}><p style={{ color: "#9146FF", fontSize: 13, fontWeight: 700, margin: 0, lineHeight: 1.2 }}>{date}</p></div>
+                  <div style={{ flex: 1 }}><p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{city}</p>{venue && <p style={{ color: muted, fontSize: 11, margin: 0 }}>🎭 {venue}</p>}</div>
+                  {url && <div style={{ background: "#9146FF", borderRadius: 7, padding: "6px 12px", fontSize: 11, fontWeight: 700, color: "#fff", flexShrink: 0 }}>Billets →</div>}
+                </div>
+              ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "ticketing": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ background: "rgba(145,70,255,0.08)", border: "1.5px solid rgba(145,70,255,0.3)", borderRadius: 14, padding: "16px" }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 14 }}>
+            <span style={{ fontSize: 32, flexShrink: 0 }}>🎟️</span>
+            <div>
+              <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>{c.event_name||"Mon Concert"}</p>
+              {c.date && <p style={{ color: muted, fontSize: 11, margin: "0 0 2px" }}>📅 {c.date}</p>}
+              {c.venue && <p style={{ color: muted, fontSize: 11, margin: "0 0 2px" }}>📍 {c.venue}</p>}
+              {c.price && <p style={{ color: "#9146FF", fontSize: 12, fontWeight: 700, margin: 0 }}>💶 {c.price}</p>}
+            </div>
+          </div>
+          <div style={{ background: "#9146FF", borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff" }}>
+            {c.label||"Acheter mes billets"} {c.platform && c.platform!=="URL personnalisée" ? `— ${c.platform}` : ""}
+          </div>
+        </div>
+      </div>
+    )
+
+    case "presave": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ background: "linear-gradient(135deg,rgba(29,185,84,0.1),rgba(29,185,84,0.05))", border: "1.5px solid rgba(29,185,84,0.3)", borderRadius: 16, padding: "16px", textAlign: "center" }}>
+          {c.cover
+            ? <img src={c.cover} alt="" style={{ width: 100, height: 100, borderRadius: 12, objectFit: "cover", margin: "0 auto 12px", display: "block", boxShadow: "0 4px 20px rgba(0,0,0,0.4)" }} />
+            : <div style={{ width: 100, height: 100, borderRadius: 12, background: "rgba(29,185,84,0.15)", margin: "0 auto 12px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40 }}>💾</div>}
+          <p style={{ color: text, fontSize: 16, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay }}>{c.release_name||"Mon prochain titre"}</p>
+          {c.release_date && <p style={{ color: "#1DB954", fontSize: 12, fontWeight: 600, margin: "0 0 14px" }}>📅 Sortie le {c.release_date}</p>}
+          <div style={{ display: "flex", gap: 8 }}>
+            {c.spotify_url && <div style={{ flex: 1, background: "#1DB954", borderRadius: 9, padding: "11px", fontSize: 12, fontWeight: 700, color: "#000" }}>💾 Pré-save Spotify</div>}
+            {c.apple_url && <div style={{ flex: 1, background: "rgba(252,60,68,0.15)", border: "1px solid rgba(252,60,68,0.3)", borderRadius: 9, padding: "11px", fontSize: 12, fontWeight: 700, color: "#FC3C44" }}>🍎 Apple Music</div>}
+          </div>
+          {!c.spotify_url && !c.apple_url && (
+            <div style={{ background: "#1DB954", borderRadius: 9, padding: "12px", fontSize: 13, fontWeight: 700, color: "#000" }}>{c.cta_label||"Pré-sauvegarder sur Spotify"}</div>
+          )}
+        </div>
+      </div>
+    )
+
+    case "booking_request": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>{c.title||"Réserver pour un événement"}</p>
+        {c.description && <p style={{ color: muted, fontSize: 11, margin: "0 0 12px" }}>{c.description}</p>}
+        <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+          {["Nom / Organisation","Email","Type d événement","Date souhaitée"].map(f => (
+            <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>{f}</div>
+          ))}
+          <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px 32px", color: muted, fontSize: 11 }}>Message</div>
+          <div style={{ background: "linear-gradient(90deg,#9146FF,#7B3FCC)", borderRadius: 9, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff" }}>{c.button_label||"Envoyer ma demande"}</div>
+        </div>
+      </div>
+    )
+
+    case "merch": {
+      const products = [[c.img1,c.name1,c.price1],[c.img2,c.name2,c.price2],[c.img3,c.name3,c.price3]].filter(([,n])=>n)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
+          {c.description && <p style={{ color: muted, fontSize: 11, margin: "0 0 12px" }}>{c.description}</p>}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, marginBottom: 12 }}>
+            {(products.length===0 ? [[null,"T-shirt","25€"],[null,"Vinyle","35€"],[null,"Casquette","20€"]] : products).map(([img,name,price],i) => (
+              <div key={i} style={{ background: "rgba(145,70,255,0.06)", border: "1px solid rgba(145,70,255,0.15)", borderRadius: 10, overflow: "hidden" }}>
+                {img
+                  ? <img src={String(img)} alt="" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", display: "block" }} />
+                  : <div style={{ aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>👕</div>}
+                <div style={{ padding: "6px 8px" }}>
+                  <p style={{ color: text, fontSize: 10, fontWeight: 700, margin: "0 0 1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</p>
+                  <p style={{ color: "#9146FF", fontSize: 11, fontWeight: 700, margin: 0 }}>{price}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          {c.cta_label && <div style={{ background: "linear-gradient(90deg,#9146FF,#7B3FCC)", borderRadius: 9, padding: "11px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff" }}>{c.cta_label}</div>}
+        </div>
+      )
+    }
+
     default: {
       const def = BLOCK_DEFS[block.type]
       return <div style={{ padding: "12px 16px", textAlign: "center", ...s }}><span style={{ fontSize: 22 }}>{def?.icon||"📦"}</span><p style={{ color: muted, fontSize: 11, margin: "5px 0 0" }}>{def?.label||block.type}</p></div>
