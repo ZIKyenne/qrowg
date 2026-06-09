@@ -3235,14 +3235,57 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
     if (typeof window !== "undefined") localStorage.setItem("qrfolio_blocks_collapsed", String(blocksCollapsed))
   }, [blocksCollapsed])
 
-  // Raccourci clavier F = Focus Mode
+  // ── Raccourcis clavier ────────────────────────────────────────────────────
   useEffect(() => {
+    const isEditing = (e: KeyboardEvent) =>
+      e.target instanceof HTMLInputElement ||
+      e.target instanceof HTMLTextAreaElement ||
+      e.target instanceof HTMLSelectElement ||
+      (e.target as HTMLElement)?.isContentEditable
+
     const handler = (e: KeyboardEvent) => {
-      if ((e.key === "f" || e.key === "F") && !e.ctrlKey && !e.metaKey && !(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLTextAreaElement)) {
+      const ctrl = e.ctrlKey || e.metaKey // Ctrl Windows / Cmd Mac
+
+      // Ctrl+B — Bibliothèque de blocs
+      if (ctrl && (e.key === "b" || e.key === "B") && !isEditing(e)) {
+        e.preventDefault()
+        setBlocksCollapsed(p => !p)
+        setFocusMode(false)
+        return
+      }
+      // Ctrl+E — Éditeur (panel droit)
+      if (ctrl && (e.key === "e" || e.key === "E") && !isEditing(e)) {
+        e.preventDefault()
+        setRightCollapsed(p => !p)
+        setFocusMode(false)
+        return
+      }
+      // Ctrl+P — Preview (switch onglet)
+      if (ctrl && (e.key === "p" || e.key === "P") && !isEditing(e)) {
+        e.preventDefault()
+        setRightCollapsed(false)
+        setRightTab("preview")
+        return
+      }
+      // Ctrl+F — Mode Focus
+      if (ctrl && (e.key === "f" || e.key === "F") && !isEditing(e)) {
+        e.preventDefault()
         setFocusMode(prev => {
           const next = !prev
-          if (next) { setSidebarCollapsed(true); setBlocksCollapsed(true); setRightCollapsed(true) }
-          else { setSidebarCollapsed(false); setBlocksCollapsed(false); setRightCollapsed(false) }
+          setSidebarCollapsed(next)
+          setBlocksCollapsed(next)
+          setRightCollapsed(next)
+          return next
+        })
+        return
+      }
+      // F seul — Mode Focus (fallback sans modificateur)
+      if (!ctrl && !e.shiftKey && !e.altKey && (e.key === "f" || e.key === "F") && !isEditing(e)) {
+        setFocusMode(prev => {
+          const next = !prev
+          setSidebarCollapsed(next)
+          setBlocksCollapsed(next)
+          setRightCollapsed(next)
           return next
         })
       }
@@ -3446,10 +3489,35 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         <div style={{ flex: 1 }} />
 
         {/* Bouton Focus Mode */}
-        <button onClick={toggleFocus} title="Mode Focus — touche F"
+        <button onClick={toggleFocus} title="Mode Focus — Ctrl+F"
           style={{ display: "flex", alignItems: "center", gap: 5, background: focusMode ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.04)", border: `1px solid ${focusMode ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.08)"}`, borderRadius: 7, padding: "5px 10px", color: focusMode ? G : MUTED, fontSize: 10, fontWeight: focusMode ? 700 : 400, cursor: "pointer" }}>
           {focusMode ? "⊞" : "⊡"} Focus
         </button>
+
+        {/* Raccourcis clavier — tooltip */}
+        <div style={{ position: "relative" }}>
+          <button
+            style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, cursor: "pointer", color: MUTED, fontSize: 11, fontWeight: 700 }}
+            title="Raccourcis clavier"
+            onMouseEnter={e => { const t = e.currentTarget.nextElementSibling as HTMLElement; if(t) t.style.opacity = "1"; if(t) t.style.pointerEvents = "none" }}
+            onMouseLeave={e => { const t = e.currentTarget.nextElementSibling as HTMLElement; if(t) t.style.opacity = "0" }}>
+            ?
+          </button>
+          <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, background: "#161616", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 12, padding: "12px 14px", zIndex: 200, opacity: 0, transition: "opacity 0.15s", pointerEvents: "none", minWidth: 200, boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}>
+            <p style={{ color: MUTED, fontSize: 9, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>Raccourcis</p>
+            {[
+              ["Ctrl+B", "Bibliothèque"],
+              ["Ctrl+E", "Éditeur"],
+              ["Ctrl+P", "Preview"],
+              ["Ctrl+F", "Mode Focus"],
+            ].map(([k, v]) => (
+              <div key={k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <span style={{ color: MUTED, fontSize: 11 }}>{v}</span>
+                <kbd style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 5, padding: "2px 7px", color: G, fontSize: 10, fontFamily: "monospace", fontWeight: 700 }}>{k}</kbd>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <button onClick={() => setRightTab(t => t==="theme" ? "preview" : "theme")} style={{ display: "flex", alignItems: "center", gap: 5, background: rightTab==="theme" ? "rgba(201,168,76,0.12)" : "transparent", border: `1px solid ${rightTab==="theme" ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.2)"}`, borderRadius: 7, padding: "5px 11px", color: rightTab==="theme" ? G : MUTED, fontSize: 11, cursor: "pointer" }}>
           <Palette size={11} /> Thème
