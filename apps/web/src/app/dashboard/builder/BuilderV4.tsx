@@ -48,7 +48,7 @@ function CountdownDisplay({ date, theme }: { date: string; theme: PageTheme }) {
 
 function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageTheme; dayMode: boolean }) {
   const c = block.content
-  const bg = dayMode ? "#FFFFFF" : (theme.bgGradient || theme.bg)
+  const bg = "transparent"
   const text = dayMode ? "#1A1A1A" : theme.text
   const muted = dayMode ? "#6B7280" : theme.muted
   const primary = theme.primary
