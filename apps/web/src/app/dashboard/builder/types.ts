@@ -317,7 +317,7 @@ export interface BlockDef {
 // Cas d usage pour les blocs clés
 export const BLOCK_HINTS: Record<string, { hint: string; preview: string }> = {
   profile:        { hint: "Idéal en premier bloc", preview: "Photo · Nom · Accroche" },
-  bio:            { hint: "Présentez-vous en 2-3 phrases", preview: "Dev passionne..." },
+  bio:            { hint: "Présentez-vous en 2-3 phrases", preview: "'Développeur passionné...'" },
   cta_button:     { hint: "Votre action principale", preview: "[ Me contacter → ]" },
   social_links:   { hint: "Tous vos réseaux en un clic", preview: "Instagram · TikTok · LinkedIn" },
   link_button:    { hint: "Lien vers n importe quelle URL", preview: "[ Mon site web → ]" },
@@ -327,7 +327,7 @@ export const BLOCK_HINTS: Record<string, { hint: string; preview: string }> = {
   product:        { hint: "Fiche produit avec prix et CTA", preview: "Produit · 29€ · [Acheter]" },
   pricing:        { hint: "Grille de tarifs / abonnements", preview: "Free · Pro · Business" },
   faq:            { hint: "Questions fréquentes accordéon", preview: "▸ Comment ça marche ?" },
-  testimonials:   { hint: "Avis clients avec étoiles", preview: "⭐⭐⭐⭐⭐ "Excellent !"" },
+  testimonials:   { hint: "Avis clients avec étoiles", preview: "⭐⭐⭐⭐⭐ 'Excellent !'" },
   countdown:      { hint: "Compte à rebours événement", preview: "12j 4h 23m 15s" },
   map_embed:      { hint: "Carte Google Maps intégrée", preview: "📍 12 rue de la Paix, Paris" },
   contact_form:   { hint: "Formulaire nom + email + message", preview: "Nom · Email · [Envoyer]" },
