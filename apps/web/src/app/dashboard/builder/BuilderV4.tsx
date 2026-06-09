@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import {
   X, ChevronUp, ChevronDown, Trash2,
   Eye, Plus, Settings, Check, Search, Copy, EyeOff,
@@ -12,6 +12,52 @@ import { createClient } from "@/lib/supabase/client"
 const G = "#C9A84C"
 const MUTED = "#8A8478"
 type Message = { role: "user" | "assistant"; content: string }
+
+// ── Hook resize panneau ────────────────────────────────────────────────────
+function useResize(key: string, defaultW: number, min: number, max: number) {
+  const [width, setWidth] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(`qrfolio_resize_${key}`)
+      if (saved) return Math.min(max, Math.max(min, parseInt(saved)))
+    }
+    return defaultW
+  })
+  const dragging = useRef(false)
+  const startX = useRef(0)
+  const startW = useRef(0)
+
+  const onMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    dragging.current = true
+    startX.current = e.clientX
+    startW.current = width
+    document.body.style.cursor = "col-resize"
+    document.body.style.userSelect = "none"
+
+    const onMove = (ev: MouseEvent) => {
+      if (!dragging.current) return
+      const delta = ev.clientX - startX.current
+      const next = Math.min(max, Math.max(min, startW.current + delta))
+      setWidth(next)
+    }
+    const onUp = () => {
+      dragging.current = false
+      document.body.style.cursor = ""
+      document.body.style.userSelect = ""
+      setWidth(prev => {
+        localStorage.setItem(`qrfolio_resize_${key}`, String(prev))
+        return prev
+      })
+      window.removeEventListener("mousemove", onMove)
+      window.removeEventListener("mouseup", onUp)
+    }
+    window.addEventListener("mousemove", onMove)
+    window.addEventListener("mouseup", onUp)
+  }, [width, min, max, key])
+
+  return { width, onMouseDown }
+}
+
 
 function FAQItem({ q, a, theme }: { q: string; a: string; theme: PageTheme }) {
   const [open, setOpen] = useState(false)
@@ -3217,6 +3263,10 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
   function toggleSidebar() { setSidebarCollapsed(p => !p); setFocusMode(false) }
   function toggleBlocks() { setBlocksCollapsed(p => !p); setFocusMode(false) }
   function toggleRight() { setRightCollapsed(p => !p); setFocusMode(false) }
+
+  // ── Resize panneaux ────────────────────────────────────────────────────
+  const blocksResize = useResize("blocks", 230, 180, 480)
+  const rightResize = useResize("right", 340, 280, 520)
   function toggleFocus() {
     setFocusMode(p => {
       const next = !p
@@ -3518,7 +3568,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
       <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
 
         {/* SIDEBAR BLOCS */}
-        <div style={{ width: blocksCollapsed ? 64 : 230, background: "#0A0A0A", borderRight: "1px solid rgba(201,168,76,0.1)", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden", transition: "width 0.25s ease", position: "relative" }}>
+        <div style={{ width: blocksCollapsed ? 64 : blocksResize.width, background: "#0A0A0A", borderRight: "none", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden", transition: blocksCollapsed ? "width 0.25s ease" : "none", position: "relative" }}>
           {/* Bouton collapse/expand */}
           <button onClick={toggleBlocks} title={blocksCollapsed ? "Ouvrir" : "Réduire"}
             style={{ position: "absolute", top: 8, right: 8, zIndex: 20, width: 22, height: 22, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10 }}>
@@ -3590,6 +3640,26 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
               ))}
           </div>}
         </div>
+
+        {/* POIGNÉE RESIZE sidebar blocs */}
+        {!blocksCollapsed && (
+          <div
+            onMouseDown={blocksResize.onMouseDown}
+            style={{
+              width: 4, flexShrink: 0, background: "rgba(201,168,76,0.1)",
+              borderRight: "1px solid rgba(201,168,76,0.1)",
+              cursor: "col-resize", position: "relative", zIndex: 10,
+              transition: "background 0.15s"
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = "rgba(201,168,76,0.4)"}
+            onMouseLeave={e => e.currentTarget.style.background = "rgba(201,168,76,0.1)"}
+          >
+            {/* Indicateur visuel */}
+            <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", display: "flex", flexDirection: "column", gap: 3 }}>
+              {[0,1,2].map(i => <div key={i} style={{ width: 2, height: 2, borderRadius: "50%", background: "rgba(201,168,76,0.6)" }} />)}
+            </div>
+          </div>
+        )}
 
         {/* DRAWER FLOTTANT — mode réduit blocs */}
         {blocksCollapsed && drawerCategory && (
@@ -3699,7 +3769,25 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         </div>
 
         {/* PANEL DROIT */}
-        <div style={{ width: rightCollapsed ? 48 : 340, background: "#161616", borderLeft: "1px solid rgba(201,168,76,0.12)", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden", transition: "width 0.25s ease", position: "relative" }}>
+        {/* POIGNÉE RESIZE panel droit */}
+        {!rightCollapsed && (
+          <div
+            onMouseDown={rightResize.onMouseDown}
+            style={{
+              width: 4, flexShrink: 0, background: "rgba(201,168,76,0.1)",
+              borderLeft: "1px solid rgba(201,168,76,0.1)",
+              cursor: "col-resize", position: "relative", zIndex: 10,
+              transition: "background 0.15s"
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = "rgba(201,168,76,0.4)"}
+            onMouseLeave={e => e.currentTarget.style.background = "rgba(201,168,76,0.1)"}
+          >
+            <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", display: "flex", flexDirection: "column", gap: 3 }}>
+              {[0,1,2].map(i => <div key={i} style={{ width: 2, height: 2, borderRadius: "50%", background: "rgba(201,168,76,0.6)" }} />)}
+            </div>
+          </div>
+        )}
+        <div style={{ width: rightCollapsed ? 48 : rightResize.width, background: "#161616", borderLeft: "none", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden", transition: rightCollapsed ? "width 0.25s ease" : "none", position: "relative" }}>
           <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
             {rightCollapsed
               ? /* Mode réduit: onglets verticaux */
