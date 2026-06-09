@@ -995,6 +995,148 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
 
 
 
+
+  // ── Nouveaux blocs Mise en page ───────────────────────────────────────────
+  qr_code_block: {
+    label: "Bloc QR Code", description: "Affiche le QR code de la page",
+    icon: "⬛", color: "#C9A84C", category: "layout",
+    defaultContent: { size: "md", label: "Scannez-moi", show_url: "yes" },
+    fields: [
+      { key: "size", label: "Taille", type: "select", options: ["sm", "md", "lg"] },
+      { key: "label", label: "Label sous le QR", type: "text", placeholder: "Scannez-moi" },
+      { key: "show_url", label: "Afficher l URL", type: "select", options: ["yes", "no"] },
+    ],
+  },
+  hero_banner: {
+    label: "Hero Banner", description: "Grande bannière d ouverture premium",
+    icon: "🚀", color: "#C9A84C", category: "layout",
+    defaultContent: { title: "Mon Titre Principal", subtitle: "Sous-titre accrocheur", cta_label: "Découvrir" },
+    fields: [
+      { key: "bg_image", label: "Image de fond", type: "image" },
+      { key: "bg_color", label: "Couleur de fond", type: "color" },
+      { key: "title", label: "Titre principal", type: "text", placeholder: "Mon Titre Principal" },
+      { key: "subtitle", label: "Sous-titre", type: "text", placeholder: "Sous-titre accrocheur" },
+      { key: "cta_label", label: "Bouton principal", type: "text", placeholder: "Découvrir" },
+      { key: "cta_url", label: "Lien bouton", type: "url", placeholder: "https://..." },
+      { key: "cta2_label", label: "Bouton secondaire", type: "text", placeholder: "En savoir plus" },
+      { key: "cta2_url", label: "Lien bouton 2", type: "url", placeholder: "https://..." },
+      { key: "height", label: "Hauteur", type: "select", options: ["sm", "md", "lg"] },
+      { key: "align", label: "Alignement texte", type: "select", options: ["center", "left"] },
+    ],
+  },
+  section_banner: {
+    label: "Bannière de section", description: "Titre visuel séparateur de section",
+    icon: "━", color: "#C9A84C", category: "layout",
+    defaultContent: { title: "MES SERVICES", style: "lines" },
+    fields: [
+      { key: "title", label: "Titre", type: "text", placeholder: "MES SERVICES" },
+      { key: "style", label: "Style", type: "select", options: ["lines", "dots", "gradient", "minimal", "badge"] },
+      { key: "color", label: "Couleur", type: "color" },
+    ],
+  },
+  two_columns: {
+    label: "Colonnes", description: "Mise en page 2 colonnes côte à côte",
+    icon: "▐", color: "#C9A84C", category: "layout",
+    defaultContent: { col1_title: "Colonne 1", col2_title: "Colonne 2" },
+    fields: [
+      { key: "col1_title", label: "Colonne 1 — Titre", type: "text", placeholder: "Colonne 1" },
+      { key: "col1_text", label: "Colonne 1 — Texte", type: "textarea", placeholder: "Votre contenu..." },
+      { key: "col1_icon", label: "Colonne 1 — Emoji", type: "text", placeholder: "🚀" },
+      { key: "col2_title", label: "Colonne 2 — Titre", type: "text", placeholder: "Colonne 2" },
+      { key: "col2_text", label: "Colonne 2 — Texte", type: "textarea", placeholder: "Votre contenu..." },
+      { key: "col2_icon", label: "Colonne 2 — Emoji", type: "text", placeholder: "💡" },
+    ],
+  },
+  grid_section: {
+    label: "Grille", description: "Organisation en cartes 2 ou 3 colonnes",
+    icon: "⊞", color: "#C9A84C", category: "layout",
+    defaultContent: { columns: "3", title: "" },
+    fields: [
+      { key: "title", label: "Titre section", type: "text", placeholder: "" },
+      { key: "columns", label: "Colonnes", type: "select", options: ["2", "3", "4"] },
+      { key: "c1_icon", label: "Carte 1 — Emoji", type: "text", placeholder: "🚀" },
+      { key: "c1_title", label: "Carte 1 — Titre", type: "text", placeholder: "Innovation" },
+      { key: "c1_text", label: "Carte 1 — Texte", type: "text", placeholder: "Description courte" },
+      { key: "c2_icon", label: "Carte 2 — Emoji", type: "text", placeholder: "💎" },
+      { key: "c2_title", label: "Carte 2 — Titre", type: "text", placeholder: "Qualité" },
+      { key: "c2_text", label: "Carte 2 — Texte", type: "text", placeholder: "Description courte" },
+      { key: "c3_icon", label: "Carte 3 — Emoji", type: "text", placeholder: "🎯" },
+      { key: "c3_title", label: "Carte 3 — Titre", type: "text", placeholder: "Précision" },
+      { key: "c3_text", label: "Carte 3 — Texte", type: "text", placeholder: "Description courte" },
+      { key: "c4_icon", label: "Carte 4 — Emoji", type: "text", placeholder: "⚡" },
+      { key: "c4_title", label: "Carte 4 — Titre", type: "text", placeholder: "Rapidité" },
+      { key: "c4_text", label: "Carte 4 — Texte", type: "text", placeholder: "Description courte" },
+      { key: "c5_icon", label: "Carte 5 — Emoji", type: "text", placeholder: "🌍" },
+      { key: "c5_title", label: "Carte 5 — Titre", type: "text", placeholder: "Global" },
+      { key: "c5_text", label: "Carte 5 — Texte", type: "text", placeholder: "Description courte" },
+      { key: "c6_icon", label: "Carte 6 — Emoji", type: "text", placeholder: "🔒" },
+      { key: "c6_title", label: "Carte 6 — Titre", type: "text", placeholder: "Sécurité" },
+      { key: "c6_text", label: "Carte 6 — Texte", type: "text", placeholder: "Description courte" },
+    ],
+  },
+  section_block: {
+    label: "Section", description: "Bloc parent avec titre et contenu structuré",
+    icon: "📄", color: "#C9A84C", category: "layout",
+    defaultContent: { title: "À propos", show_divider: "yes" },
+    fields: [
+      { key: "title", label: "Titre de section", type: "text", placeholder: "À propos" },
+      { key: "subtitle", label: "Sous-titre", type: "text", placeholder: "Description de la section" },
+      { key: "show_divider", label: "Ligne séparatrice", type: "select", options: ["yes", "no"] },
+      { key: "bg_style", label: "Style fond", type: "select", options: ["transparent", "card", "highlight"] },
+    ],
+  },
+  embed_block: {
+    label: "Embed", description: "Intégration iframe (Forms, Typeform, Notion...)",
+    icon: "🔗", color: "#C9A84C", category: "layout",
+    defaultContent: { height: "400", title: "Formulaire" },
+    fields: [
+      { key: "url", label: "URL à intégrer", type: "url", placeholder: "https://docs.google.com/forms/..." },
+      { key: "title", label: "Titre (optionnel)", type: "text", placeholder: "Mon formulaire" },
+      { key: "height", label: "Hauteur (px)", type: "text", placeholder: "400" },
+      { key: "type", label: "Type", type: "select", options: ["Google Forms", "Typeform", "Notion", "Airtable", "Autre"] },
+    ],
+  },
+  tabs_block: {
+    label: "Onglets", description: "Contenu organisé par tabs",
+    icon: "📑", color: "#C9A84C", category: "layout",
+    defaultContent: { tab1_label: "Présentation", tab2_label: "Tarifs", tab3_label: "FAQ" },
+    fields: [
+      { key: "tab1_label", label: "Onglet 1 — Titre", type: "text", placeholder: "Présentation" },
+      { key: "tab1_content", label: "Onglet 1 — Contenu", type: "textarea", placeholder: "Contenu de l onglet 1..." },
+      { key: "tab2_label", label: "Onglet 2 — Titre", type: "text", placeholder: "Tarifs" },
+      { key: "tab2_content", label: "Onglet 2 — Contenu", type: "textarea", placeholder: "Contenu de l onglet 2..." },
+      { key: "tab3_label", label: "Onglet 3 — Titre", type: "text", placeholder: "FAQ" },
+      { key: "tab3_content", label: "Onglet 3 — Contenu", type: "textarea", placeholder: "Contenu de l onglet 3..." },
+    ],
+  },
+  accordion_block: {
+    label: "Accordéon", description: "Sections repliables pour longues pages",
+    icon: "🪗", color: "#C9A84C", category: "layout",
+    defaultContent: { title: "En savoir plus" },
+    fields: [
+      { key: "title", label: "Titre section", type: "text", placeholder: "En savoir plus" },
+      { key: "a1_title", label: "Section 1 — Titre", type: "text", placeholder: "Nos services" },
+      { key: "a1_content", label: "Section 1 — Contenu", type: "textarea", placeholder: "Détail des services..." },
+      { key: "a2_title", label: "Section 2 — Titre", type: "text", placeholder: "Nos tarifs" },
+      { key: "a2_content", label: "Section 2 — Contenu", type: "textarea", placeholder: "Détail des tarifs..." },
+      { key: "a3_title", label: "Section 3 — Titre", type: "text", placeholder: "Conditions" },
+      { key: "a3_content", label: "Section 3 — Contenu", type: "textarea", placeholder: "Nos conditions..." },
+      { key: "a4_title", label: "Section 4 — Titre", type: "text", placeholder: "" },
+      { key: "a4_content", label: "Section 4 — Contenu", type: "textarea", placeholder: "" },
+    ],
+  },
+  info_box: {
+    label: "Encadré info", description: "Mettre un texte important en avant",
+    icon: "💡", color: "#C9A84C", category: "layout",
+    defaultContent: { type: "info", emoji: "💡", message: "Information importante à retenir." },
+    fields: [
+      { key: "type", label: "Style", type: "select", options: ["info", "warning", "success", "tip", "important"] },
+      { key: "emoji", label: "Emoji", type: "text", placeholder: "💡" },
+      { key: "title", label: "Titre (optionnel)", type: "text", placeholder: "À savoir" },
+      { key: "message", label: "Message", type: "textarea", placeholder: "Information importante à retenir." },
+    ],
+  },
+
   // ── Nouveaux blocs Event ──────────────────────────────────────────────────
   event_program: {
     label: "Programme", description: "Planning détaillé de l événement",

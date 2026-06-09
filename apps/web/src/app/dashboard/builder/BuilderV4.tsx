@@ -2261,6 +2261,196 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
       )
     }
 
+
+    case "qr_code_block": return (
+      <div style={{ padding: "16px", textAlign: "center", ...s }}>
+        <div style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+          <div style={{ background: "#FFFFFF", border: `3px solid ${primary}30`, borderRadius: 14, padding: c.size==="lg" ? 14 : c.size==="sm" ? 7 : 10, boxShadow: "0 8px 30px rgba(0,0,0,0.4)" }}>
+            <div style={{ width: c.size==="lg" ? 160 : c.size==="sm" ? 80 : 120, height: c.size==="lg" ? 160 : c.size==="sm" ? 80 : 120, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 2, width: "100%", height: "100%" }}>
+                {Array.from({length:25}).map((_,i) => {
+                  const corners = [0,1,2,3,4,5,9,10,14,15,19,20,21,22,23,24]
+                  return <div key={i} style={{ background: corners.includes(i) ? "#111" : Math.random()>0.4 ? "#111" : "transparent", borderRadius: 1 }} />
+                })}
+              </div>
+            </div>
+          </div>
+          {c.label && <p style={{ color: text, fontSize: 12, fontWeight: 600, margin: 0 }}>{c.label}</p>}
+          {c.show_url!=="no" && <p style={{ color: muted, fontSize: 10, margin: 0, fontFamily: "monospace" }}>/q/...</p>}
+        </div>
+      </div>
+    )
+
+    case "hero_banner": {
+      const h = c.height==="lg" ? 220 : c.height==="sm" ? 140 : 180
+      const align = c.align==="left" ? "flex-start" : "center"
+      const textAlign = c.align==="left" ? "left" : "center"
+      return (
+        <div style={{ position: "relative", overflow: "hidden", borderRadius: 12 }}>
+          {c.bg_image
+            ? <img src={c.bg_image} alt="" style={{ width: "100%", height: h, objectFit: "cover", display: "block" }} />
+            : <div style={{ width: "100%", height: h, background: c.bg_color ? c.bg_color : `linear-gradient(135deg,${primary}30,${accent}15,#080808)` }} />}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,transparent 20%,rgba(0,0,0,0.7) 100%)" }} />
+          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: align, justifyContent: "flex-end", padding: c.height==="sm" ? "14px" : "20px" }}>
+            {c.title && <h2 style={{ color: "#fff", fontSize: c.height==="lg" ? 26 : 20, fontWeight: 700, margin: "0 0 6px", fontFamily: theme.fontDisplay, textAlign, textShadow: "0 2px 10px rgba(0,0,0,0.5)", lineHeight: 1.2 }}>{c.title}</h2>}
+            {c.subtitle && <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 13, margin: "0 0 14px", textAlign }}>{c.subtitle}</p>}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: align === "center" ? "center" : "flex-start" }}>
+              {c.cta_label && <div style={{ background: `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 9, padding: "10px 18px", fontSize: 12, fontWeight: 700, color: "#080808" }}>{c.cta_label}</div>}
+              {c.cta2_label && <div style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 9, padding: "10px 18px", fontSize: 12, fontWeight: 600, color: "#fff" }}>{c.cta2_label}</div>}
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    case "section_banner": {
+      const bannerStyles: Record<string,any> = {
+        lines: <div style={{ display: "flex", alignItems: "center", gap: 12 }}><div style={{ flex: 1, height: 1, background: `linear-gradient(90deg,transparent,${primary}60)` }} /><span style={{ color: c.color||primary, fontSize: 12, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", whiteSpace: "nowrap" }}>{c.title||"SECTION"}</span><div style={{ flex: 1, height: 1, background: `linear-gradient(90deg,${primary}60,transparent)` }} /></div>,
+        dots: <div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ display: "flex", gap: 3 }}>{[0,1,2].map(i=><div key={i} style={{ width: 4, height: 4, borderRadius: "50%", background: c.color||primary }}/>)}</div><span style={{ color: c.color||primary, fontSize: 12, fontWeight: 700, letterSpacing: 3 }}>{c.title||"SECTION"}</span><div style={{ display: "flex", gap: 3 }}>{[0,1,2].map(i=><div key={i} style={{ width: 4, height: 4, borderRadius: "50%", background: c.color||primary }}/>)}</div></div>,
+        gradient: <div style={{ background: `linear-gradient(90deg,${primary}15,${accent}10)`, borderRadius: 8, padding: "10px 16px", textAlign: "center" }}><span style={{ color: c.color||primary, fontSize: 13, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase" }}>{c.title||"SECTION"}</span></div>,
+        minimal: <p style={{ color: c.color||primary, fontSize: 13, fontWeight: 700, letterSpacing: 4, textTransform: "uppercase", textAlign: "center", margin: 0 }}>{c.title||"SECTION"}</p>,
+        badge: <div style={{ textAlign: "center" }}><span style={{ background: (c.color||primary)+"18", border: `1px solid ${c.color||primary}35`, borderRadius: 20, padding: "6px 18px", color: c.color||primary, fontSize: 12, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase" }}>{c.title||"SECTION"}</span></div>,
+      }
+      return <div style={{ padding: "12px 16px", ...s }}>{bannerStyles[c.style||"lines"]}</div>
+    }
+
+    case "two_columns": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          {[[c.col1_icon,c.col1_title,c.col1_text],[c.col2_icon,c.col2_title,c.col2_text]].map(([icon,title,text_col],i) => (
+            <div key={i} style={{ background: primary+"06", border: `1px solid ${primary}15`, borderRadius: 12, padding: "13px 12px" }}>
+              {icon && <span style={{ fontSize: 24, display: "block", marginBottom: 8 }}>{icon}</span>}
+              {title && <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 5px" }}>{title}</p>}
+              {text_col && <p style={{ color: muted, fontSize: 11, margin: 0, lineHeight: 1.6 }}>{text_col}</p>}
+              {!title && !text_col && <p style={{ color: muted, fontSize: 11, margin: 0 }}>Colonne {i+1}</p>}
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+
+    case "grid_section": {
+      const cols = parseInt(c.columns||"3")
+      const cards = [
+        [c.c1_icon,c.c1_title,c.c1_text],[c.c2_icon,c.c2_title,c.c2_text],
+        [c.c3_icon,c.c3_title,c.c3_text],[c.c4_icon,c.c4_title,c.c4_text],
+        [c.c5_icon,c.c5_title,c.c5_text],[c.c6_icon,c.c6_title,c.c6_text],
+      ].filter(([,t])=>t)
+      const displayCards = cards.length===0 ? Array.from({length:cols}).map((_,i)=>["⚡",`Carte ${i+1}`,"Description"]) : cards
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
+          <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols},1fr)`, gap: 8 }}>
+            {displayCards.slice(0, cols*2).map(([icon,title,txt],i) => (
+              <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "12px 10px", textAlign: "center" }}>
+                {icon && <span style={{ fontSize: 22, display: "block", marginBottom: 6 }}>{icon}</span>}
+                <p style={{ color: text, fontSize: 11, fontWeight: 700, margin: "0 0 3px" }}>{title}</p>
+                {txt && <p style={{ color: muted, fontSize: 9, margin: 0 }}>{txt}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "section_block": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ background: c.bg_style==="card" ? "rgba(255,255,255,0.03)" : c.bg_style==="highlight" ? primary+"08" : "transparent", border: c.bg_style==="card" ? "1px solid rgba(255,255,255,0.07)" : c.bg_style==="highlight" ? `1px solid ${primary}20` : "none", borderRadius: c.bg_style!=="transparent" ? 12 : 0, padding: c.bg_style!=="transparent" ? "14px" : "0" }}>
+          {c.title && <p style={{ color: primary, fontSize: 14, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay }}>{c.title}</p>}
+          {c.subtitle && <p style={{ color: muted, fontSize: 12, margin: c.show_divider!=="no" ? "0 0 10px" : "0" }}>{c.subtitle}</p>}
+          {c.show_divider!=="no" && <div style={{ height: 1, background: `linear-gradient(90deg,${primary}50,transparent)`, marginTop: c.title && !c.subtitle ? 8 : 0 }} />}
+          {!c.title && <p style={{ color: muted, fontSize: 11, margin: 0, textAlign: "center" }}>Section — ajoutez un titre</p>}
+        </div>
+      </div>
+    )
+
+    case "embed_block": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        {c.url
+          ? <div>
+              {c.title && <p style={{ color: muted, fontSize: 10, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: 1.5 }}>{c.title}</p>}
+              <iframe src={c.url} width="100%" height={parseInt(c.height||"400")} style={{ border: "none", borderRadius: 12, display: "block" }} loading="lazy" />
+            </div>
+          : <div style={{ background: "rgba(201,168,76,0.06)", border: "1.5px dashed rgba(201,168,76,0.25)", borderRadius: 12, padding: "30px", textAlign: "center" }}>
+              <span style={{ fontSize: 32, display: "block", marginBottom: 10 }}>🔗</span>
+              <p style={{ color: text, fontSize: 13, fontWeight: 600, margin: "0 0 5px" }}>{c.title||"Embed externe"}</p>
+              <p style={{ color: muted, fontSize: 11, margin: 0 }}>{c.type||"Google Forms, Typeform, Notion..."}</p>
+            </div>}
+      </div>
+    )
+
+    case "tabs_block": {
+      const [activeTab, setActiveTab] = useState(0)
+      const tabs = [[c.tab1_label,c.tab1_content],[c.tab2_label,c.tab2_content],[c.tab3_label,c.tab3_content]].filter(([l])=>l)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          <div style={{ display: "flex", gap: 0, borderBottom: "1px solid rgba(255,255,255,0.08)", marginBottom: 12 }}>
+            {(tabs.length===0 ? [["Présentation"],["Tarifs"],["FAQ"]] : tabs).map(([label],i) => (
+              <button key={i} onClick={() => setActiveTab(i)}
+                style={{ padding: "8px 14px", background: "transparent", border: "none", borderBottom: `2px solid ${activeTab===i ? primary : "transparent"}`, color: activeTab===i ? primary : muted, fontSize: 11, fontWeight: activeTab===i ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                {label}
+              </button>
+            ))}
+          </div>
+          <div style={{ minHeight: 60 }}>
+            {tabs.length===0
+              ? <p style={{ color: muted, fontSize: 11, margin: 0 }}>Contenu de l onglet {activeTab+1}</p>
+              : <p style={{ color: text, fontSize: 12, margin: 0, lineHeight: 1.7 }}>{tabs[activeTab]?.[1]||"Ajoutez du contenu..."}</p>}
+          </div>
+        </div>
+      )
+    }
+
+    case "accordion_block": {
+      const [openIdx, setOpenIdx] = useState<number|null>(null)
+      const items = [[c.a1_title,c.a1_content],[c.a2_title,c.a2_content],[c.a3_title,c.a3_content],[c.a4_title,c.a4_content]].filter(([t])=>t)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {(items.length===0 ? [["Nos services","Détail des services..."],["Nos tarifs","Détail des tarifs..."],["Conditions","Nos conditions..."]] : items).map(([title,content],i) => (
+              <div key={i} style={{ border: `1px solid ${openIdx===i ? primary+"40" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, overflow: "hidden" }}>
+                <button onClick={() => setOpenIdx(openIdx===i ? null : i)}
+                  style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 14px", background: openIdx===i ? primary+"08" : "transparent", border: "none", color: openIdx===i ? primary : text, fontSize: 13, fontWeight: 600, cursor: "pointer", textAlign: "left" }}>
+                  {title}
+                  <span style={{ color: primary, fontSize: 16, lineHeight: 1 }}>{openIdx===i ? "−" : "+"}</span>
+                </button>
+                {openIdx===i && content && (
+                  <div style={{ padding: "4px 14px 12px", background: "rgba(0,0,0,0.15)" }}>
+                    <p style={{ color: muted, fontSize: 12, margin: 0, lineHeight: 1.6 }}>{content}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "info_box": {
+      const boxStyles: Record<string,any> = {
+        info: { bg: "rgba(56,189,248,0.08)", border: "rgba(56,189,248,0.3)", color: "#38BDF8" },
+        warning: { bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.3)", color: "#FBBF24" },
+        success: { bg: "rgba(57,255,143,0.08)", border: "rgba(57,255,143,0.3)", color: "#39FF8F" },
+        tip: { bg: "rgba(201,168,76,0.08)", border: "rgba(201,168,76,0.3)", color: "#C9A84C" },
+        important: { bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.3)", color: "#EF4444" },
+      }
+      const bs = boxStyles[c.type||"info"]
+      return (
+        <div style={{ padding: "8px 16px", ...s }}>
+          <div style={{ background: bs.bg, border: `1.5px solid ${bs.border}`, borderRadius: 12, padding: "14px 16px" }}>
+            <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+              <span style={{ fontSize: 20, flexShrink: 0 }}>{c.emoji||"💡"}</span>
+              <div>
+                {c.title && <p style={{ color: bs.color, fontSize: 12, fontWeight: 700, margin: "0 0 4px" }}>{c.title}</p>}
+                <p style={{ color: text, fontSize: 12, margin: 0, lineHeight: 1.6 }}>{c.message||"Information importante à retenir."}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
     default: {
       const def = BLOCK_DEFS[block.type]
       return <div style={{ padding: "12px 16px", textAlign: "center", ...s }}><span style={{ fontSize: 22 }}>{def?.icon||"📦"}</span><p style={{ color: muted, fontSize: 11, margin: "5px 0 0" }}>{def?.label||block.type}</p></div>
