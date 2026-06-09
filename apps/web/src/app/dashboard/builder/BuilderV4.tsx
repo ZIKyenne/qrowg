@@ -2,9 +2,9 @@
 
 import { useState, useRef, useEffect } from "react"
 import {
-  Sparkles, Send, X, ChevronUp, ChevronDown, Trash2, Bot, User as UserIcon,
+  X, ChevronUp, ChevronDown, Trash2,
   Eye, Plus, Settings, Check, Search, Copy, EyeOff,
-  ExternalLink, Palette, Sun, Moon, GripVertical, QrCode
+  ExternalLink, Palette, GripVertical, QrCode
 } from "lucide-react"
 import { BLOCK_DEFS, BLOCK_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, type Block, type BlockContent, type PageTheme } from "./types"
 import { createClient } from "@/lib/supabase/client"
@@ -1888,7 +1888,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
   const [pageSlug, setPageSlug] = useState("ma-page")
   const [pageStatus, setPageStatus] = useState("draft")
   const [theme, setTheme] = useState<PageTheme>(PRESET_THEMES.midnight_gold)
-  const [rightTab, setRightTab] = useState<"preview"|"edit"|"theme"|"ai">("preview")
+  const [rightTab, setRightTab] = useState<"preview"|"edit"|"theme">("preview")
   const [activeCategory, setActiveCategory] = useState("identity")
   const [search, setSearch] = useState("")
   const [dayMode, setDayMode] = useState(false)
@@ -2027,9 +2027,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         {!pageId && <span style={{ color: "#4A4640", fontSize: 9 }}>Mode démo</span>}
         <div style={{ flex: 1 }} />
 
-        <button onClick={() => setRightTab("ai")} style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 7, padding: "5px 11px", color: G, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
-          <Sparkles size={11} /> Générer IA
-        </button>
+
 
         <button onClick={() => setRightTab(t => t==="theme" ? "preview" : "theme")} style={{ display: "flex", alignItems: "center", gap: 5, background: rightTab==="theme" ? "rgba(201,168,76,0.12)" : "transparent", border: `1px solid ${rightTab==="theme" ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.2)"}`, borderRadius: 7, padding: "5px 11px", color: rightTab==="theme" ? G : MUTED, fontSize: 11, cursor: "pointer" }}>
           <Palette size={11} /> Thème
@@ -2062,9 +2060,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
           </div>
         )}
 
-        <button onClick={() => setDayMode(d => !d)} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: MUTED }}>
-          {dayMode ? <Moon size={12} /> : <Sun size={12} />}
-        </button>
+
 
         {pageId && pageSlug && (
           <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "5px 11px", color: G, textDecoration: "none", fontSize: 11, fontWeight: 600 }}>
@@ -2079,19 +2075,67 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
           </button>
           {showPublishPopup && (
             <>
-              <div onClick={() => setShowPublishPopup(false)} style={{ position: "fixed", inset: 0, zIndex: 199 }} />
-              <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, background: "#161616", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 14, padding: "18px", zIndex: 200, boxShadow: "0 8px 40px rgba(0,0,0,0.6)", width: 240 }}>
-                <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 700, margin: "0 0 8px" }}>Publier la page</p>
+              <div onClick={() => setShowPublishPopup(false)} style={{ position: "fixed", inset: 0, zIndex: 199, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }} />
+              <div style={{ position: "absolute", top: "calc(100% + 12px)", right: 0, background: "#0F0F0F", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 20, padding: "24px", zIndex: 200, boxShadow: "0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(201,168,76,0.1)", width: 320 }}>
+                {/* Header */}
+                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+                  <div style={{ width: 42, height: 42, borderRadius: 12, background: pageStatus==="published" ? "rgba(57,255,143,0.12)" : "rgba(201,168,76,0.12)", border: `1px solid ${pageStatus==="published" ? "rgba(57,255,143,0.3)" : "rgba(201,168,76,0.3)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
+                    {pageStatus==="published" ? "🌐" : "🚀"}
+                  </div>
+                  <div>
+                    <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0 }}>{pageStatus==="published" ? "Page en ligne" : "Publier la page"}</p>
+                    <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{pageStatus==="published" ? "Votre page est accessible" : "Rendre la page accessible"}</p>
+                  </div>
+                </div>
+
+                {/* Statut */}
+                <div style={{ display: "flex", alignItems: "center", gap: 8, background: pageStatus==="published" ? "rgba(57,255,143,0.08)" : "rgba(255,255,255,0.04)", border: `1px solid ${pageStatus==="published" ? "rgba(57,255,143,0.2)" : "rgba(255,255,255,0.08)"}`, borderRadius: 10, padding: "10px 12px", marginBottom: 14 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: pageStatus==="published" ? "#39FF8F" : MUTED, boxShadow: pageStatus==="published" ? "0 0 6px #39FF8F80" : "none" }} />
+                  <span style={{ color: pageStatus==="published" ? "#39FF8F" : MUTED, fontSize: 12, fontWeight: 600 }}>{pageStatus==="published" ? "En ligne" : "Brouillon"}</span>
+                  <span style={{ color: MUTED, fontSize: 11, marginLeft: "auto" }}>{blocks.length} bloc{blocks.length!==1?"s":""}</span>
+                </div>
+
+                {/* URL */}
                 {pageSlug && (
-                  <div style={{ background: "#0A0A0A", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 10px", marginBottom: 12, display: "flex", alignItems: "center", gap: 7 }}>
-                    <p style={{ color: G, fontSize: 11, margin: 0, fontFamily: "monospace", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>/{pageSlug}</p>
-                    <button onClick={() => navigator.clipboard.writeText(window.location.origin+"/"+pageSlug)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 0 }}><Copy size={11} /></button>
+                  <div style={{ marginBottom: 16 }}>
+                    <p style={{ color: MUTED, fontSize: 10, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1.5 }}>URL de la page</p>
+                    <div style={{ background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 10, padding: "10px 12px", display: "flex", alignItems: "center", gap: 8 }}>
+                      <p style={{ color: G, fontSize: 12, margin: 0, fontFamily: "JetBrains Mono, monospace", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {typeof window !== "undefined" ? window.location.origin : ""}/{pageSlug}
+                      </p>
+                      <button onClick={() => { navigator.clipboard.writeText((typeof window !== "undefined" ? window.location.origin : "")+"/"+pageSlug) }}
+                        style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 6, padding: "4px 8px", color: G, cursor: "pointer", fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
+                        Copier
+                      </button>
+                    </div>
                   </div>
                 )}
-                <button onClick={handlePublish} disabled={publishing}
-                  style={{ width: "100%", background: `linear-gradient(90deg,${G},#b8953f)`, border: "none", borderRadius: 9, padding: "11px", color: "#080808", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-                  {publishing ? "Publication..." : pageStatus==="published" ? "✓ Déjà publié" : "Publier maintenant →"}
+
+                {/* Stats rapides */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
+                  <div style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 10, padding: "10px", textAlign: "center" }}>
+                    <p style={{ color: G, fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>{pageStats.views}</p>
+                    <p style={{ color: MUTED, fontSize: 9, margin: 0 }}>👁 Vues</p>
+                  </div>
+                  <div style={{ background: "rgba(57,255,143,0.06)", border: "1px solid rgba(57,255,143,0.15)", borderRadius: 10, padding: "10px", textAlign: "center" }}>
+                    <p style={{ color: "#39FF8F", fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>{pageStats.scans}</p>
+                    <p style={{ color: MUTED, fontSize: 9, margin: 0 }}>📱 Scans</p>
+                  </div>
+                </div>
+
+                {/* Bouton principal */}
+                <button onClick={handlePublish} disabled={publishing || pageStatus==="published"}
+                  style={{ width: "100%", background: pageStatus==="published" ? "rgba(57,255,143,0.1)" : `linear-gradient(90deg,${G},#b8953f)`, border: pageStatus==="published" ? "1px solid rgba(57,255,143,0.3)" : "none", borderRadius: 12, padding: "14px", color: pageStatus==="published" ? "#39FF8F" : "#080808", fontSize: 14, fontWeight: 700, cursor: pageStatus==="published" ? "default" : "pointer", marginBottom: pageSlug ? 10 : 0, boxShadow: pageStatus==="published" ? "none" : "0 4px 20px rgba(201,168,76,0.3)" }}>
+                  {publishing ? "⏳ Publication..." : pageStatus==="published" ? "✓ Déjà publié" : "🚀 Publier maintenant"}
                 </button>
+
+                {/* Voir la page */}
+                {pageSlug && (
+                  <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer"
+                    style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "12px", color: MUTED, textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
+                    <ExternalLink size={13} /> Voir la page
+                  </a>
+                )}
               </div>
             </>
           )}
@@ -2225,10 +2269,10 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         {/* PANEL DROIT */}
         <div style={{ width: 340, background: "#161616", borderLeft: "1px solid rgba(201,168,76,0.12)", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden" }}>
           <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
-            {(["preview","edit","theme","ai"] as const).map(tab => (
+            {(["preview","edit","theme"] as const).map(tab => (
               <button key={tab} onClick={() => setRightTab(tab)}
-                style={{ flex: 1, padding: "10px 4px", background: "transparent", border: "none", borderBottom: `2px solid ${rightTab===tab ? G : "transparent"}`, color: rightTab===tab ? G : MUTED, fontSize: 11, fontWeight: rightTab===tab ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
-                {tab==="preview" ? "Preview" : tab==="edit" ? "Éditer" : tab==="theme" ? "Thème" : "IA"}
+                style={{ flex: 1, padding: "11px 4px", background: "transparent", border: "none", borderBottom: `2px solid ${rightTab===tab ? G : "transparent"}`, color: rightTab===tab ? G : MUTED, fontSize: 12, fontWeight: rightTab===tab ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                {tab==="preview" ? "Preview" : tab==="edit" ? "Éditer" : "Thème"}
               </button>
             ))}
           </div>
