@@ -1,1479 +1,1290 @@
 ﻿"use client"
-import React from "react"
 
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useRef, useEffect } from "react"
 import {
-  ChevronUp, ChevronDown, Trash2, Eye, EyeOff, Copy,
-  Plus, Check, Search, ExternalLink, Sun, Moon,
-  GripVertical, X, Share2, Link, Smartphone
+  Sparkles, Send, X, ChevronUp, ChevronDown, Trash2, Bot, User as UserIcon,
+  Eye, Plus, Settings, Check, Search, Copy, EyeOff,
+  ExternalLink, Palette, Sun, Moon, GripVertical, QrCode
 } from "lucide-react"
-import { BLOCK_DEFS, BLOCK_CATEGORIES, PRESET_THEMES, GOOGLE_FONTS, type Block, type BlockContent, type PageTheme } from "./types"
+import { BLOCK_DEFS, BLOCK_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, type Block, type BlockContent, type PageTheme } from "./types"
 import { createClient } from "@/lib/supabase/client"
 
-// ── Helpers ────────────────────────────────────────────────────────────────
-function uid() { return Math.random().toString(36).slice(2, 10) }
+const G = "#C9A84C"
+const MUTED = "#8A8478"
+type Message = { role: "user" | "assistant"; content: string }
 
-function patternCSS(pattern: string, color: string): string {
-  switch (pattern) {
-    case "dots": return `radial-gradient(circle, ${color}30 1px, transparent 1px) 0 0 / 20px 20px`
-    case "grid": return `linear-gradient(${color}15 1px, transparent 1px) 0 0 / 24px 24px, linear-gradient(90deg, ${color}15 1px, transparent 1px) 0 0 / 24px 24px`
-    case "stars": return `radial-gradient(circle, ${color}40 1px, transparent 1px) 0 0 / 30px 30px, radial-gradient(circle, ${color}20 1px, transparent 1px) 15px 15px / 30px 30px`
-    case "matrix": return `repeating-linear-gradient(0deg, ${color}08 0px, ${color}08 1px, transparent 1px, transparent 20px)`
-    case "hexagons": return `radial-gradient(circle at center, ${color}15 0, transparent 60%) 0 0 / 40px 40px`
-    case "waves": return `repeating-linear-gradient(45deg, ${color}10 0px, ${color}10 2px, transparent 2px, transparent 20px)`
-    default: return ""
-  }
-}
-
-// ── ImageUpload inline ──────────────────────────────────────────────────────
-function ImageUpload({ value, onChange }: { value: string; onChange: (url: string) => void }) {
-  const ref = useRef<HTMLInputElement>(null)
-  const [uploading, setUploading] = useState(false)
-  async function upload(file: File) {
-    setUploading(true)
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { setUploading(false); return }
-    const path = `blocks/${user.id}/${uid()}.${file.name.split(".").pop()}`
-    const { error } = await supabase.storage.from("page-assets").upload(path, file, { upsert: true })
-    if (!error) {
-      const { data: { publicUrl } } = supabase.storage.from("page-assets").getPublicUrl(path)
-      onChange(publicUrl)
-    }
-    setUploading(false)
-  }
+function FAQItem({ q, a, theme }: { q: string; a: string; theme: PageTheme }) {
+  const [open, setOpen] = useState(false)
   return (
-    <div>
-      <div onClick={() => ref.current?.click()}
-        style={{ border: "2px dashed rgba(201,168,76,0.3)", borderRadius: 10, padding: "16px", textAlign: "center", cursor: "pointer", background: "rgba(201,168,76,0.04)", transition: "all 0.2s" }}
-        onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(201,168,76,0.6)")}
-        onMouseLeave={e => (e.currentTarget.style.borderColor = "rgba(201,168,76,0.3)")}>
-        {value ? (
-          <img src={value} alt="" style={{ maxHeight: 80, borderRadius: 8, display: "block", margin: "0 auto 8px" }} />
-        ) : (
-          <div style={{ fontSize: 28, marginBottom: 6 }}>🖼️</div>
-        )}
-        <p style={{ color: "#8A8478", fontSize: 11, margin: 0 }}>{uploading ? "Upload..." : value ? "Changer l image" : "Clique ou glisse une image"}</p>
-      </div>
-      <input ref={ref} type="file" accept="image/*" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) upload(f) }} />
+    <div style={{ border: `1px solid ${theme.muted}20`, borderRadius: 8, overflow: "hidden", marginBottom: 5 }}>
+      <button onClick={() => setOpen(o => !o)} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: open ? theme.primary + "08" : "transparent", border: "none", color: theme.text, fontSize: 13, cursor: "pointer", textAlign: "left" }}>
+        {q} <span style={{ color: theme.primary }}>{open ? "−" : "+"}</span>
+      </button>
+      {open && <div style={{ padding: "8px 12px 12px" }}><p style={{ color: theme.muted, fontSize: 12, lineHeight: 1.6, margin: 0 }}>{a}</p></div>}
     </div>
   )
 }
 
-// ── BlockPreview ────────────────────────────────────────────────────────────
+function CountdownDisplay({ date, theme }: { date: string; theme: PageTheme }) {
+  const [time, setTime] = useState({ d: 0, h: 0, m: 0, s: 0 })
+  useEffect(() => {
+    const update = () => {
+      const diff = new Date(date).getTime() - Date.now()
+      if (diff > 0) setTime({ d: Math.floor(diff/86400000), h: Math.floor(diff/3600000)%24, m: Math.floor(diff/60000)%60, s: Math.floor(diff/1000)%60 })
+    }
+    update(); const t = setInterval(update, 1000); return () => clearInterval(t)
+  }, [date])
+  return (
+    <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+      {[["d","J"],["h","H"],["m","M"],["s","S"]].map(([k,l]) => (
+        <div key={k} style={{ textAlign: "center", background: theme.primary+"15", border: `1px solid ${theme.primary}30`, borderRadius: 8, padding: "8px 10px", minWidth: 44 }}>
+          <p style={{ color: theme.primary, fontSize: 20, fontWeight: 700, margin: 0 }}>{String((time as any)[k]).padStart(2,"0")}</p>
+          <p style={{ color: theme.muted, fontSize: 9, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>{l}</p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageTheme; dayMode: boolean }) {
   const c = block.content
-  const G = dayMode ? "#8B6914" : (theme.primary || "#C9A84C")
-  const TEXT = dayMode ? "#111111" : (theme.text || "#F5F0E8")
-  const MUTED = dayMode ? "#6B7280" : (theme.muted || "#8A8478")
-  const SURFACE = dayMode ? "#F3F4F6" : (theme.surface || "#111009")
-  const BG = dayMode ? "#FFFFFF" : (theme.bg || "#080808")
-  const FD = theme.fontDisplay || "Cormorant Garamond"
-  const FB = theme.fontBody || "DM Sans"
-
-  const s = { fontFamily: `${FB}, sans-serif` }
+  const bg = dayMode ? "#FFFFFF" : (theme.bgGradient || theme.bg)
+  const text = dayMode ? "#1A1A1A" : theme.text
+  const muted = dayMode ? "#6B7280" : theme.muted
+  const primary = theme.primary
+  const accent = theme.accent
+  const s = { background: bg }
 
   switch (block.type) {
     case "profile": return (
-      <div style={{ textAlign: "center", padding: "20px 16px 12px", ...s }}>
+      <div style={{ textAlign: "center", padding: "20px 16px", ...s }}>
         {c.avatar
-          ? <img src={c.avatar} alt="" style={{ width: 72, height: 72, borderRadius: "50%", objectFit: "cover", margin: "0 auto 10px", display: "block", border: `2px solid ${G}50` }} />
-          : <div style={{ width: 72, height: 72, borderRadius: "50%", background: `linear-gradient(135deg,${G},${G}80)`, margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 700, color: dayMode ? "#fff" : "#080808", fontFamily: `${FD}, serif` }}>{(c.name || "?")[0]?.toUpperCase()}</div>}
-        <h2 style={{ color: TEXT, fontSize: 20, fontWeight: 700, margin: "0 0 3px", fontFamily: `${FD}, serif` }}>{c.name || "Mon Nom"}</h2>
-        <p style={{ color: MUTED, fontSize: 13, margin: c.badge ? "0 0 7px" : "0" }}>{c.tagline}</p>
-        {c.badge && <span style={{ background: `${G}15`, border: `1px solid ${G}30`, borderRadius: 20, padding: "3px 12px", fontSize: 11, color: G }}>{c.badge}</span>}
+          ? <img src={c.avatar} alt="" style={{ width: 72, height: 72, borderRadius: "50%", objectFit: "cover", margin: "0 auto 10px", display: "block", border: `3px solid ${primary}60` }} />
+          : <div style={{ width: 72, height: 72, borderRadius: "50%", background: `linear-gradient(135deg,${primary},${accent})`, margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 700, color: "#080808" }}>{(c.name||"?")[0].toUpperCase()}</div>}
+        <p style={{ color: text, fontSize: 18, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay }}>{c.name || "Mon Nom"}</p>
+        <p style={{ color: muted, fontSize: 13, margin: c.badge ? "0 0 7px" : "0" }}>{c.tagline}</p>
+        {c.badge && <span style={{ background: primary+"18", border: `1px solid ${primary}40`, borderRadius: 20, padding: "3px 10px", fontSize: 11, color: primary }}>{c.badge}</span>}
       </div>
     )
     case "bio": return (
-      <div style={{ padding: "4px 16px 12px", textAlign: (c.align as any) || "left", ...s }}>
-        <p style={{ color: TEXT, fontSize: 13, lineHeight: 1.7, margin: 0 }}>{c.text || "Texte de bio..."}</p>
+      <div style={{ padding: "12px 16px", textAlign: (c.align as any)||"left", ...s }}>
+        <p style={{ color: text, fontSize: 13, lineHeight: 1.7, margin: 0 }}>{c.text}</p>
       </div>
     )
     case "skills": {
-      const tags = (c.tags || "").split(",").map((t: string) => t.trim()).filter(Boolean)
+      const tags = (c.tags||"").split(",").map((t:string)=>t.trim()).filter(Boolean)
       return (
-        <div style={{ padding: "4px 16px 12px", ...s }}>
-          {c.title && <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>{c.title}</p>}
+        <div style={{ padding: "12px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>{c.title}</p>}
           <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-            {tags.map((t: string, i: number) => <span key={i} style={{ background: `${G}12`, border: `1px solid ${G}25`, borderRadius: 20, padding: "4px 10px", fontSize: 11, color: G, fontWeight: 600 }}>{t}</span>)}
+            {tags.map((tag:string, i:number) => <span key={i} style={{ background: primary+"12", border: `1px solid ${primary}30`, borderRadius: 20, padding: "3px 10px", fontSize: 11, color: primary, fontWeight: 600 }}>{tag}</span>)}
           </div>
         </div>
       )
     }
     case "cta_button": {
-      const btnS: Record<string, React.CSSProperties> = {
-        gold: { background: `linear-gradient(90deg,${G},${G}cc)`, color: dayMode ? "#fff" : "#080808", border: "none" },
-        neon: { background: `${theme.accent || "#39FF8F"}15`, border: `1.5px solid ${theme.accent || "#39FF8F"}`, color: theme.accent || "#39FF8F" },
-        outline: { background: "transparent", border: `2px solid ${G}`, color: G },
-        ghost: { background: dayMode ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.06)", color: TEXT, border: `1px solid ${dayMode ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)"}` },
-        red: { background: "rgba(239,68,68,0.12)", border: "1.5px solid #EF4444", color: "#EF4444" },
+      const btnStyles: Record<string,any> = {
+        gold: { background: `linear-gradient(90deg,${primary},${primary}cc)`, color: "#080808", border: "none" },
+        neon: { background: accent+"15", border: `1.5px solid ${accent}`, color: accent },
+        outline: { background: "transparent", border: `1.5px solid ${primary}`, color: primary },
+        ghost: { background: "rgba(255,255,255,0.06)", color: text, border: "1px solid rgba(255,255,255,0.1)" },
+        red: { background: "rgba(239,68,68,0.15)", border: "1.5px solid #EF4444", color: "#EF4444" },
       }
       return (
-        <div style={{ padding: "4px 16px 8px", ...s }}>
-          <div style={{ ...btnS[c.style || "gold"], borderRadius: 12, padding: "12px 20px", textAlign: "center", fontSize: 14, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-            {c.icon && <span>{c.icon}</span>}{c.label || "Bouton"}
+        <div style={{ padding: "10px 16px", ...s }}>
+          <div style={{ ...btnStyles[c.style||"gold"], display: "flex", alignItems: "center", justifyContent: "center", gap: 7, borderRadius: 12, padding: "13px 18px", fontSize: 14, fontWeight: 700 }}>
+            {c.icon && <span>{c.icon}</span>}{c.label||"Bouton"}
           </div>
         </div>
       )
     }
-    case "social_links": return (
-      <div style={{ padding: "4px 16px 12px", display: "flex", flexDirection: "column", gap: 7, ...s }}>
-        {Object.entries(c).slice(0, 3).map(([k, v]) => v ? (
-          <div key={k} style={{ display: "flex", alignItems: "center", gap: 10, background: dayMode ? "#F3F4F6" : "rgba(255,255,255,0.04)", border: `1px solid ${dayMode ? "#E5E7EB" : "rgba(255,255,255,0.08)"}`, borderRadius: 10, padding: "10px 12px" }}>
-            <span style={{ fontSize: 16 }}>🔗</span>
-            <span style={{ color: TEXT, fontSize: 13, fontWeight: 600, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{k}</span>
-            <ExternalLink size={11} color={MUTED} />
-          </div>
-        ) : null)}
+    case "heading": {
+      const sizes: Record<string,number> = { small: 15, medium: 20, large: 27, xl: 34 }
+      const hColors: Record<string,string> = { default: text, primary, accent, muted }
+      return (
+        <div style={{ padding: "14px 16px", textAlign: (c.align as any)||"center", ...s }}>
+          <h2 style={{ fontFamily: theme.fontDisplay, fontSize: sizes[c.size||"medium"], color: hColors[c.color||"default"], fontWeight: 700, margin: "0 0 3px" }}>{c.text||"Titre"}</h2>
+          {c.subtitle && <p style={{ color: muted, fontSize: 12, margin: 0 }}>{c.subtitle}</p>}
+        </div>
+      )
+    }
+    case "rich_text": {
+      const tSizes: Record<string,number> = { small: 11, normal: 13, large: 15 }
+      return <div style={{ padding: "8px 16px", textAlign: (c.align as any)||"left", ...s }}><p style={{ color: muted, fontSize: tSizes[c.size||"normal"], lineHeight: 1.7, margin: 0 }}>{c.text}</p></div>
+    }
+    case "faq": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+        {[[c.q1,c.a1],[c.q2,c.a2],[c.q3,c.a3]].filter(([q])=>q).map(([q,a],i) => <FAQItem key={i} q={q!} a={a||""} theme={theme} />)}
       </div>
     )
-    case "heading": return (
-      <div style={{ padding: "10px 16px 6px", textAlign: (c.align as any) || "center", ...s }}>
-        <h2 style={{ color: c.color === "primary" ? G : c.color === "accent" ? (theme.accent || "#39FF8F") : TEXT, fontSize: c.size === "xl" ? 32 : c.size === "large" ? 24 : c.size === "small" ? 16 : 20, fontWeight: 700, margin: "0 0 3px", fontFamily: `${FD}, serif` }}>{c.text || "Titre"}</h2>
-        {c.subtitle && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{c.subtitle}</p>}
-      </div>
-    )
-    case "testimonials": return (
-      <div style={{ padding: "4px 16px 12px", display: "flex", flexDirection: "column", gap: 8, ...s }}>
-        {[[c.name1, c.text1, c.stars1], [c.name2, c.text2, c.stars2]].filter(([n]) => n).map(([n, t, s], i) => (
-          <div key={i} style={{ background: `${G}06`, border: `1px solid ${G}15`, borderRadius: 10, padding: "10px 12px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-              <p style={{ color: TEXT, fontSize: 12, fontWeight: 700, margin: 0 }}>{n}</p>
-              <p style={{ color: "#FFD700", fontSize: 11, margin: 0 }}>{"★".repeat(parseInt(String(s || "5")))}</p>
+    case "social_links": {
+      const active = SOCIAL_NETWORKS.filter(n => c[n.key])
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {active.length === 0
+            ? <p style={{ color: muted, fontSize: 11, textAlign: "center", margin: 0 }}>Aucun réseau configuré</p>
+            : <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {active.map(n => (
+                  <div key={n.key} style={{ display: "flex", alignItems: "center", gap: 10, background: n.bg, border: `1px solid ${n.color}25`, borderRadius: 10, padding: "9px 12px" }}>
+                    <span style={{ fontSize: 15 }}>{n.icon}</span>
+                    <span style={{ color: text, fontSize: 12, fontWeight: 600, flex: 1 }}>{n.label}</span>
+                    <ExternalLink size={11} color={n.color} />
+                  </div>
+                ))}
+              </div>}
+        </div>
+      )
+    }
+    case "testimonials": {
+      const reviews = [[c.name1,c.text1,c.stars1],[c.name2,c.text2,c.stars2],[c.name3,c.text3,c.stars3]].filter(([n])=>n)
+      return (
+        <div style={{ padding: "10px 16px", display: "flex", flexDirection: "column", gap: 7, ...s }}>
+          {reviews.map(([n,t,stars],i) => (
+            <div key={i} style={{ background: primary+"06", border: `1px solid ${primary}12`, borderRadius: 9, padding: "10px 12px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                <p style={{ color: text, fontSize: 12, fontWeight: 700, margin: 0 }}>{n}</p>
+                <p style={{ color: "#FFD700", fontSize: 11, margin: 0 }}>{"★".repeat(parseInt(stars||"5"))}</p>
+              </div>
+              <p style={{ color: muted, fontSize: 11, margin: 0, fontStyle: "italic" }}>"{t}"</p>
             </div>
-            <p style={{ color: MUTED, fontSize: 11, margin: 0, fontStyle: "italic", lineHeight: 1.6 }}>"{t}"</p>
+          ))}
+        </div>
+      )
+    }
+    case "image": return (
+      <div style={{ ...s }}>
+        {c.src
+          ? <div><img src={c.src} alt={c.caption||""} style={{ width: "100%", maxHeight: 220, objectFit: "cover", display: "block", borderRadius: c.rounded==="circle" ? "50%" : c.rounded==="rounded" ? 10 : 0 }} />{c.caption && <p style={{ color: muted, fontSize: 10, textAlign: "center", margin: "6px 14px" }}>{c.caption}</p>}</div>
+          : <div style={{ background: "rgba(255,255,255,0.03)", border: "1px dashed rgba(255,255,255,0.1)", borderRadius: 8, padding: "28px", textAlign: "center", margin: "10px 16px" }}><span style={{ fontSize: 28 }}>🖼️</span><p style={{ color: muted, fontSize: 11, margin: "6px 0 0" }}>Aucune image</p></div>}
+      </div>
+    )
+    case "gallery": {
+      const imgs = [c.img1,c.img2,c.img3,c.img4,c.img5,c.img6].filter(Boolean)
+      return (
+        <div style={{ padding: "10px 14px", display: "grid", gridTemplateColumns: `repeat(${parseInt(c.columns||"3")},1fr)`, gap: 4, ...s }}>
+          {imgs.length>0 ? imgs.map((img,i) => <img key={i} src={img} alt="" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: 6 }} />)
+            : [0,1,2,3,4,5].map(i => <div key={i} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 6, aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: muted }}>🖼️</div>)}
+        </div>
+      )
+    }
+    case "video": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "24px", textAlign: "center" }}>
+          <span style={{ fontSize: 28 }}>▶️</span>
+          <p style={{ color: text, fontSize: 13, margin: "8px 0 0", fontWeight: 600 }}>{c.title||"Vidéo"}</p>
+        </div>
+      </div>
+    )
+    case "visit_counter": return (
+      <div style={{ padding: "14px 16px", textAlign: "center", ...s }}>
+        <p style={{ fontFamily: theme.fontDisplay, fontSize: 34, color: primary, fontWeight: 700, margin: "0 0 3px" }}>1 234</p>
+        <p style={{ color: muted, fontSize: 11, margin: 0 }}>{c.label||"visiteurs"}</p>
+      </div>
+    )
+    case "google_maps": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ background: "rgba(255,230,109,0.06)", border: "1px solid rgba(255,230,109,0.15)", borderRadius: 10, padding: "12px" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+            <span style={{ fontSize: 20, flexShrink: 0 }}>📍</span>
+            <div><p style={{ color: text, fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>{c.label||"Adresse"}</p><p style={{ color: muted, fontSize: 11, margin: 0 }}>{c.address}</p>{c.transport && <p style={{ color: muted, fontSize: 10, margin: "3px 0 0" }}>🚇 {c.transport}</p>}</div>
           </div>
-        ))}
+        </div>
+      </div>
+    )
+    case "opening_hours": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>{c.title}</p>}
+        <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+          {[["Lun — Ven",c.mon_fri],["Samedi",c.saturday],["Dimanche",c.sunday]].filter(([,h])=>h).map(([d,h]) => (
+            <div key={String(d)} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+              <span style={{ color: muted, fontSize: 12 }}>{d}</span>
+              <span style={{ color: text, fontSize: 12, fontWeight: 600 }}>{h}</span>
+            </div>
+          ))}
+        </div>
       </div>
     )
     case "pricing": {
-      const plans = [[c.title1, c.price1, c.desc1], [c.title2, c.price2, c.desc2], [c.title3, c.price3, c.desc3]].filter(([t]) => t)
+      const plans = [[c.title1,c.price1,c.desc1],[c.title2,c.price2,c.desc2],[c.title3,c.price3,c.desc3]].filter(([t])=>t)
       return (
-        <div style={{ padding: "4px 16px 12px", ...s }}>
-          {c.title && <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>{c.title}</p>}
-          <div style={{ display: "flex", gap: 6 }}>
-            {plans.map(([t, p, d], i) => (
-              <div key={i} style={{ flex: 1, background: i === 1 ? `${G}12` : dayMode ? "#F3F4F6" : "rgba(255,255,255,0.03)", border: `1px solid ${i === 1 ? G + "40" : dayMode ? "#E5E7EB" : "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: "10px 8px", textAlign: "center" }}>
-                <p style={{ color: MUTED, fontSize: 9, margin: "0 0 3px", textTransform: "uppercase" }}>{t}</p>
-                <p style={{ color: G, fontSize: 18, fontWeight: 700, margin: "0 0 2px", fontFamily: `${FD}, serif` }}>{p}</p>
-                <p style={{ color: MUTED, fontSize: 9, margin: 0 }}>{d}</p>
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {plans.map(([t,p,d],i) => (
+              <div key={i} style={{ flex: 1, minWidth: 70, background: i===1 ? primary+"12" : "rgba(255,255,255,0.04)", border: `1px solid ${i===1 ? primary+"40" : "rgba(255,255,255,0.08)"}`, borderRadius: 9, padding: "12px 8px", textAlign: "center" }}>
+                <p style={{ color: muted, fontSize: 9, margin: "0 0 3px", textTransform: "uppercase", letterSpacing: 1 }}>{t}</p>
+                <p style={{ color: primary, fontSize: 20, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay }}>{p}</p>
+                <p style={{ color: muted, fontSize: 9, margin: 0 }}>{d}</p>
               </div>
             ))}
           </div>
         </div>
       )
     }
-    case "image": return c.src ? (
-      <div style={{ overflow: "hidden" }}>
-        <img src={c.src} alt={c.caption || ""} style={{ width: "100%", maxHeight: 160, objectFit: "cover", display: "block", borderRadius: c.rounded === "circle" ? "50%" : c.rounded === "rounded" ? 10 : 0 }} />
-        {c.caption && <p style={{ color: MUTED, fontSize: 10, textAlign: "center", margin: "4px 0", ...s }}>{c.caption}</p>}
-      </div>
-    ) : <div style={{ padding: "20px 16px", textAlign: "center", color: MUTED, fontSize: 13, ...s }}>🖼️ Aucune image</div>
     case "product": return (
-      <div style={{ padding: "4px 16px 12px", ...s }}>
-        <div style={{ background: dayMode ? "#F9FAFB" : "rgba(255,255,255,0.03)", border: `1px solid ${dayMode ? "#E5E7EB" : "rgba(255,255,255,0.06)"}`, borderRadius: 12, overflow: "hidden" }}>
-          {c.image && <img src={c.image} alt="" style={{ width: "100%", height: 100, objectFit: "cover" }} />}
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, overflow: "hidden" }}>
+          {c.image ? <img src={c.image} alt={c.name} style={{ width: "100%", height: 140, objectFit: "cover", display: "block" }} />
+            : <div style={{ height: 80, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(249,115,22,0.06)", fontSize: 28 }}>🛍️</div>}
           <div style={{ padding: "10px 12px" }}>
-            <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 3px", fontFamily: `${FD}, serif` }}>{c.name}</p>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ color: G, fontSize: 16, fontWeight: 700 }}>{c.price}</span>
-              {c.old_price && <span style={{ color: MUTED, fontSize: 12, textDecoration: "line-through" }}>{c.old_price}</span>}
+            <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>{c.name||"Produit"}</p>
+            <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 5 }}>
+              <span style={{ color: primary, fontSize: 16, fontWeight: 700 }}>{c.price}</span>
+              {c.old_price && <span style={{ color: muted, fontSize: 12, textDecoration: "line-through" }}>{c.old_price}</span>}
             </div>
+            {c.cta_label && <div style={{ background: `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 7, padding: "8px", textAlign: "center", fontSize: 12, fontWeight: 700, color: "#080808" }}>{c.cta_label}</div>}
           </div>
-        </div>
-      </div>
-    )
-    case "divider": {
-      const dvMap: Record<string, React.ReactNode> = {
-        gold: <div style={{ height: 1, background: `linear-gradient(90deg,transparent,${G}60,transparent)` }} />,
-        line: <div style={{ height: 1, background: dayMode ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.06)" }} />,
-        dots: <div style={{ textAlign: "center", color: MUTED, letterSpacing: 8, fontSize: 16 }}>• • •</div>,
-        stars: <div style={{ textAlign: "center", color: G, letterSpacing: 8, fontSize: 14 }}>✦ ✦ ✦</div>,
-      }
-      return <div style={{ padding: "8px 16px" }}>{dvMap[c.style || "gold"]}</div>
-    }
-    case "spacer": {
-      const spMap: Record<string, number> = { xs: 8, sm: 14, md: 24, lg: 40, xl: 60 }
-      return <div style={{ height: spMap[c.size || "md"] }} />
-    }
-    case "contact_form": return (
-      <div style={{ padding: "4px 16px 12px", ...s }}>
-        {c.title && <h3 style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 10px", fontFamily: `${FD}, serif` }}>{c.title}</h3>}
-        {["Nom", "Email", "Message"].map(f => f === "Message"
-          ? <div key={f} style={{ height: 50, background: dayMode ? "#F3F4F6" : "rgba(255,255,255,0.04)", border: `1px solid ${dayMode ? "#E5E7EB" : "rgba(255,255,255,0.08)"}`, borderRadius: 8, marginBottom: 6, display: "flex", alignItems: "flex-start", padding: "8px 12px" }}><span style={{ color: MUTED, fontSize: 12 }}>{f}...</span></div>
-          : <div key={f} style={{ height: 34, background: dayMode ? "#F3F4F6" : "rgba(255,255,255,0.04)", border: `1px solid ${dayMode ? "#E5E7EB" : "rgba(255,255,255,0.08)"}`, borderRadius: 8, marginBottom: 6, display: "flex", alignItems: "center", padding: "0 12px" }}><span style={{ color: MUTED, fontSize: 12 }}>{f}...</span></div>
-        )}
-        <div style={{ background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 9, padding: "10px", textAlign: "center", fontSize: 13, fontWeight: 700, color: dayMode ? "#fff" : "#080808" }}>{c.button_label || "Envoyer"}</div>
-      </div>
-    )
-    case "opening_hours": return (
-      <div style={{ padding: "4px 16px 12px", ...s }}>
-        {c.title && <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>{c.title}</p>}
-        <div style={{ background: dayMode ? "#F3F4F6" : "rgba(255,255,255,0.03)", border: `1px solid ${dayMode ? "#E5E7EB" : "rgba(255,255,255,0.06)"}`, borderRadius: 10, overflow: "hidden" }}>
-          {[[c.mon_fri, "Lun-Ven"], [c.saturday, "Sam"], [c.sunday, "Dim"]].filter(([h]) => h).map(([h, d], i) => (
-            <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "8px 12px", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-              <span style={{ color: MUTED, fontSize: 11 }}>{d}</span>
-              <span style={{ color: TEXT, fontSize: 11, fontWeight: 600 }}>{h}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    )
-    case "google_maps": return (
-      <div style={{ padding: "4px 16px 12px", ...s }}>
-        <div style={{ display: "flex", gap: 10, background: "rgba(255,230,109,0.06)", border: "1px solid rgba(255,230,109,0.15)", borderRadius: 12, padding: "12px 14px" }}>
-          <span style={{ fontSize: 22 }}>📍</span>
-          <div>
-            <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{c.label || "Adresse"}</p>
-            <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.address}</p>
-          </div>
-        </div>
-      </div>
-    )
-    case "countdown": return (
-      <div style={{ padding: "12px 16px", textAlign: "center", ...s }}>
-        {c.title && <p style={{ color: MUTED, fontSize: 10, margin: "0 0 10px", textTransform: "uppercase", letterSpacing: 1.5 }}>{c.title}</p>}
-        <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-          {[["00", "J"], ["00", "H"], ["00", "M"], ["00", "S"]].map(([v, l], i) => (
-            <div key={i} style={{ background: `${G}12`, border: `1px solid ${G}25`, borderRadius: 8, padding: "8px 10px", textAlign: "center" }}>
-              <p style={{ color: G, fontSize: 18, fontWeight: 700, margin: 0, fontFamily: `${FD}, serif` }}>{v}</p>
-              <p style={{ color: MUTED, fontSize: 9, margin: 0, textTransform: "uppercase" }}>{l}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    )
-    case "event_info": return (
-      <div style={{ padding: "4px 16px 12px", ...s }}>
-        <div style={{ background: "rgba(236,72,153,0.07)", border: "1px solid rgba(236,72,153,0.18)", borderRadius: 12, padding: "14px" }}>
-          <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 8px", fontFamily: `${FD}, serif` }}>{c.name}</p>
-          {[[c.date, "📅"], [c.time, "🕐"], [c.location, "📍"], [c.price, "🎟️"]].filter(([v]) => v).map(([v, i]) => (
-            <p key={String(i)} style={{ color: MUTED, fontSize: 11, margin: "3px 0" }}>{i} {v}</p>
-          ))}
         </div>
       </div>
     )
     case "promo_banner": return (
-      <div style={{ padding: "4px 16px 12px", ...s }}>
-        <div style={{ background: "rgba(249,115,22,0.08)", border: "1px solid rgba(249,115,22,0.2)", borderRadius: 12, padding: "14px", textAlign: "center" }}>
-          {c.emoji && <span style={{ fontSize: 24, display: "block", marginBottom: 6 }}>{c.emoji}</span>}
-          <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 3px", fontFamily: `${FD}, serif` }}>{c.text}</p>
-          {c.subtext && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.subtext}</p>}
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ background: "linear-gradient(135deg,rgba(249,115,22,0.15),rgba(249,115,22,0.08))", border: "1px solid rgba(249,115,22,0.3)", borderRadius: 10, padding: "12px 14px", textAlign: "center" }}>
+          {c.emoji && <span style={{ fontSize: 24 }}>{c.emoji}</span>}
+          <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "5px 0 2px" }}>{c.text}</p>
+          {c.subtext && <p style={{ color: muted, fontSize: 11, margin: "0 0 8px" }}>{c.subtext}</p>}
+          {c.cta_label && <div style={{ display: "inline-block", background: "#F97316", color: "#fff", padding: "6px 16px", borderRadius: 7, fontSize: 12, fontWeight: 700 }}>{c.cta_label}</div>}
         </div>
       </div>
     )
     case "menu_section": return (
-      <div style={{ padding: "4px 16px 12px", ...s }}>
-        {c.category && <p style={{ color: G, fontSize: 11, fontWeight: 700, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: 1.5 }}>{c.category}</p>}
-        {[[c.item1_name, c.item1_price], [c.item2_name, c.item2_price], [c.item3_name, c.item3_price]].filter(([n]) => n).map(([n, p], i) => (
-          <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-            <span style={{ color: TEXT, fontSize: 12 }}>{n}</span>
-            <span style={{ color: G, fontSize: 12, fontWeight: 700 }}>{p}</span>
-          </div>
-        ))}
-      </div>
-    )
-    case "services_list": return (
-      <div style={{ padding: "4px 16px 12px", display: "flex", flexDirection: "column", gap: 7, ...s }}>
-        {[[c.s1_icon, c.s1_name, c.s1_desc], [c.s2_icon, c.s2_name, c.s2_desc], [c.s3_icon, c.s3_name, c.s3_desc]].filter(([, n]) => n).map(([icon, name, desc], i) => (
-          <div key={i} style={{ display: "flex", gap: 10, background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.12)", borderRadius: 10, padding: "10px 12px" }}>
-            <span style={{ fontSize: 18 }}>{icon}</span>
-            <div>
-              <p style={{ color: TEXT, fontSize: 12, fontWeight: 700, margin: 0 }}>{name}</p>
-              {desc && <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{desc}</p>}
+      <div style={{ padding: "10px 16px", ...s }}>
+        {c.category && <p style={{ color: primary, fontSize: 12, fontWeight: 700, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: 1 }}>{c.category}</p>}
+        <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+          {[[c.item1_name,c.item1_price,c.item1_desc],[c.item2_name,c.item2_price,c.item2_desc],[c.item3_name,c.item3_price,c.item3_desc]].filter(([n])=>n).map(([n,p,d],i) => (
+            <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 7, padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+              <div style={{ flex: 1 }}><p style={{ color: text, fontSize: 13, fontWeight: 600, margin: "0 0 1px" }}>{n}</p>{d && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{d}</p>}</div>
+              <span style={{ color: primary, fontSize: 13, fontWeight: 700, flexShrink: 0 }}>{p}</span>
             </div>
-          </div>
-        ))}
-      </div>
-    )
-    case "spotify_player": return (
-      <div style={{ padding: "4px 16px 12px", ...s }}>
-        <div style={{ background: "rgba(29,185,84,0.08)", border: "1px solid rgba(29,185,84,0.2)", borderRadius: 12, padding: "12px 14px", display: "flex", gap: 10, alignItems: "center" }}>
-          <div style={{ width: 40, height: 40, background: "#1DB954", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🎧</div>
-          <div>
-            <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0 }}>{c.title || "Ma musique"}</p>
-            <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>Ecouter sur Spotify</p>
-          </div>
+          ))}
         </div>
       </div>
     )
-    case "faq": return (
-      <div style={{ padding: "4px 16px 12px", ...s }}>
-        {[[c.q1, c.a1], [c.q2, c.a2]].filter(([q]) => q).map(([q, a], i) => (
-          <div key={i} style={{ border: `1px solid ${dayMode ? "#E5E7EB" : "rgba(255,255,255,0.07)"}`, borderRadius: 9, marginBottom: 6, overflow: "hidden" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", background: dayMode ? "#F9FAFB" : "rgba(255,255,255,0.02)" }}>
-              <span style={{ color: TEXT, fontSize: 12, fontWeight: 600 }}>{q}</span>
-              <span style={{ color: G }}>+</span>
-            </div>
-          </div>
-        ))}
+    case "reservation_form": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 10px" }}>{c.title||"Réserver"}</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {["Nom","Date souhaitée","Nb personnes"].map(f => <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 7, padding: "7px 10px", color: muted, fontSize: 11 }}>{f}</div>)}
+          <div style={{ background: "linear-gradient(90deg,#EF4444,#dc2626)", borderRadius: 7, padding: "9px", textAlign: "center", color: "#fff", fontSize: 12, fontWeight: 700 }}>{c.button_label||"Réserver"}</div>
+        </div>
       </div>
     )
-
-    case "call_button": return (
-      <div style={{ padding: "4px 16px 10px", ...s }}>
-        <a href={`tel:${c.phone}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(57,255,143,0.1)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 14, padding: "14px 20px", textDecoration: "none", transition: "transform 0.15s" }}>
-          <span style={{ fontSize: 18 }}>{c.icon || "📞"}</span>
-          <span style={{ color: "#39FF8F", fontSize: 14, fontWeight: 700 }}>{c.label || "Appeler maintenant"}</span>
-        </a>
-      </div>
-    )
-
-    case "whatsapp_button": {
-      const waUrl = c.phone ? `https://wa.me/${c.phone}${c.message ? `?text=${encodeURIComponent(c.message)}` : ""}` : "#"
+    case "services_list": {
+      const services = [[c.s1_icon,c.s1_name,c.s1_desc],[c.s2_icon,c.s2_name,c.s2_desc],[c.s3_icon,c.s3_name,c.s3_desc]].filter(([,n])=>n)
       return (
-        <div style={{ padding: "4px 16px 10px", ...s }}>
-          <a href={waUrl} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(37,211,102,0.1)", border: "1.5px solid rgba(37,211,102,0.3)", borderRadius: 14, padding: "14px 20px", textDecoration: "none" }}>
-            <span style={{ fontSize: 18 }}>💬</span>
-            <span style={{ color: "#25D366", fontSize: 14, fontWeight: 700 }}>{c.label || "Discuter sur WhatsApp"}</span>
-          </a>
-        </div>
-      )
-    }
-
-    case "email_button": {
-      const mailUrl = c.email ? `mailto:${c.email}${c.subject ? `?subject=${encodeURIComponent(c.subject)}` : ""}` : "#"
-      return (
-        <div style={{ padding: "4px 16px 10px", ...s }}>
-          <a href={mailUrl} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(56,189,248,0.1)", border: "1.5px solid rgba(56,189,248,0.3)", borderRadius: 14, padding: "14px 20px", textDecoration: "none" }}>
-            <span style={{ fontSize: 18 }}>✉️</span>
-            <span style={{ color: "#38BDF8", fontSize: 14, fontWeight: 700 }}>{c.label || "Envoyer un email"}</span>
-          </a>
-        </div>
-      )
-    }
-
-    case "download_file": return (
-      <div style={{ padding: "4px 16px 10px", ...s }}>
-        <a href={c.url || "#"} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(167,139,250,0.08)", border: "1.5px solid rgba(167,139,250,0.25)", borderRadius: 14, padding: "13px 16px", textDecoration: "none" }}>
-          <div style={{ width: 40, height: 40, background: "rgba(167,139,250,0.15)", border: "1px solid rgba(167,139,250,0.25)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
-            {c.icon || "📄"}
-          </div>
-          <div style={{ flex: 1 }}>
-            <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label || "Telecharger la brochure"}</p>
-            {c.type_doc && <p style={{ color: "#8A8478", fontSize: 10, margin: "2px 0 0" }}>{c.type_doc}</p>}
-          </div>
-          <span style={{ color: "#A78BFA", fontSize: 18 }}>↓</span>
-        </a>
-      </div>
-    )
-
-    case "vcard": return (
-      <div style={{ padding: "4px 16px 10px", ...s }}>
-        <div style={{ background: `${G}08`, border: `1.5px solid ${G}30`, borderRadius: 14, padding: "14px 16px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: c.name ? 10 : 0 }}>
-            <div style={{ width: 40, height: 40, borderRadius: "50%", background: `linear-gradient(135deg,${G},${G}80)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>👤</div>
-            <div style={{ flex: 1 }}>
-              {c.name && <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0 }}>{c.name}</p>}
-              {c.company && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.company}</p>}
-            </div>
-          </div>
-          <div style={{ background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 10, padding: "11px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#080808" }}>
-            {c.label || "Ajouter a mes contacts"}
-          </div>
-        </div>
-      </div>
-    )
-
-    case "google_review": return (
-      <div style={{ padding: "4px 16px 10px", ...s }}>
-        <a href={c.url || "#"} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(251,191,36,0.08)", border: "1.5px solid rgba(251,191,36,0.25)", borderRadius: 14, padding: "13px 16px", textDecoration: "none" }}>
-          <div style={{ flexShrink: 0, textAlign: "center" }}>
-            <div style={{ display: "flex", gap: 2, marginBottom: 2 }}>
-              {Array.from({length: parseInt(c.stars || "5")}).map((_, i) => <span key={i} style={{ color: "#FBBF24", fontSize: 14 }}>★</span>)}
-            </div>
-          </div>
-          <div style={{ flex: 1 }}>
-            <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label || "Donner un avis"}</p>
-            <p style={{ color: MUTED, fontSize: 10, margin: "2px 0 0" }}>Google Reviews</p>
-          </div>
-          <span style={{ color: "#FBBF24", fontSize: 20 }}>⭐</span>
-        </a>
-      </div>
-    )
-
-    case "table_booking": return (
-      <div style={{ padding: "4px 16px 10px", ...s }}>
-        <a href={c.url || "#"} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(239,68,68,0.1)", border: "1.5px solid rgba(239,68,68,0.25)", borderRadius: 14, padding: "14px 20px", textDecoration: "none" }}>
-          <span style={{ fontSize: 18 }}>🍽️</span>
-          <div style={{ textAlign: "center" }}>
-            <p style={{ color: "#EF4444", fontSize: 14, fontWeight: 700, margin: 0 }}>{c.label || "Reserver une table"}</p>
-            {c.platform && c.platform !== "URL personnalisee" && <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>via {c.platform}</p>}
-          </div>
-        </a>
-      </div>
-    )
-
-    case "order_online": return (
-      <div style={{ padding: "4px 16px 10px", ...s }}>
-        <a href={c.url || "#"} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(249,115,22,0.1)", border: "1.5px solid rgba(249,115,22,0.25)", borderRadius: 14, padding: "14px 20px", textDecoration: "none" }}>
-          <span style={{ fontSize: 18 }}>🛒</span>
-          <div style={{ textAlign: "center" }}>
-            <p style={{ color: "#F97316", fontSize: 14, fontWeight: 700, margin: 0 }}>{c.label || "Commander maintenant"}</p>
-            {c.platform && <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>via {c.platform}</p>}
-          </div>
-        </a>
-      </div>
-    )
-
-    case "free_gift": return (
-      <div style={{ padding: "4px 16px 10px", ...s }}>
-        <div style={{ background: "rgba(236,72,153,0.08)", border: "1.5px solid rgba(236,72,153,0.25)", borderRadius: 14, padding: "14px 16px", textAlign: "center" }}>
-          <span style={{ fontSize: 32, display: "block", marginBottom: 8 }}>{c.emoji || "🎁"}</span>
-          {c.description && <p style={{ color: MUTED, fontSize: 11, margin: "0 0 10px", lineHeight: 1.5 }}>{c.description}</p>}
-          <div style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 10, padding: "11px", fontSize: 13, fontWeight: 700, color: "#fff" }}>
-            {c.label || "Recevoir mon guide gratuit"}
-          </div>
-        </div>
-      </div>
-    )
-
-    case "donation": {
-      const donationColors: Record<string, string> = { "Ko-fi": "#FF5E5B", "Buy Me A Coffee": "#FFDD00", "Patreon": "#FF424D", "PayPal": "#009CDE", "Tipeee": "#E55100" }
-      const dc = donationColors[c.platform || "Ko-fi"] || "#F59E0B"
-      const donationIcons: Record<string, string> = { "Ko-fi": "☕", "Buy Me A Coffee": "☕", "Patreon": "🎨", "PayPal": "💙", "Tipeee": "💜" }
-      const di = donationIcons[c.platform || "Ko-fi"] || "☕"
-      return (
-        <div style={{ padding: "4px 16px 10px", ...s }}>
-          <a href={c.url || "#"} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: dc + "12", border: `1.5px solid ${dc}30`, borderRadius: 14, padding: "14px 20px", textDecoration: "none" }}>
-            <span style={{ fontSize: 20 }}>{di}</span>
-            <div style={{ textAlign: "center" }}>
-              <p style={{ color: dc, fontSize: 14, fontWeight: 700, margin: 0 }}>{c.label || "Soutenir mon travail"}</p>
-              {c.platform && <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{c.platform}</p>}
-            </div>
-          </a>
-        </div>
-      )
-    }
-
-    case "multi_cta": {
-      const btns = [[c.btn1_icon,c.btn1_label,c.btn1_url],[c.btn2_icon,c.btn2_label,c.btn2_url],[c.btn3_icon,c.btn3_label,c.btn3_url],[c.btn4_icon,c.btn4_label,c.btn4_url]].filter(([,l]) => l)
-      return (
-        <div style={{ padding: "4px 16px 10px", ...s }}>
-          <div style={{ display: "grid", gridTemplateColumns: btns.length <= 2 ? "1fr 1fr" : btns.length === 3 ? "1fr 1fr 1fr" : "1fr 1fr", gap: 8 }}>
-            {btns.map(([icon, label, url], i) => (
-              <a key={i} href={url || "#"} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, background: i % 2 === 0 ? `${G}10` : "rgba(57,255,143,0.08)", border: `1px solid ${i % 2 === 0 ? G + "25" : "rgba(57,255,143,0.2)"}`, borderRadius: 12, padding: "12px 8px", textDecoration: "none" }}>
-                <span style={{ fontSize: 22 }}>{icon || "⚡"}</span>
-                <span style={{ color: TEXT, fontSize: 11, fontWeight: 600, textAlign: "center" }}>{label}</span>
-              </a>
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+            {services.map(([icon,name,desc],i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 10px", background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.12)", borderRadius: 9 }}>
+                <span style={{ fontSize: 20 }}>{icon}</span>
+                <div><p style={{ color: text, fontSize: 12, fontWeight: 700, margin: 0 }}>{name}</p>{desc && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{desc}</p>}</div>
+              </div>
             ))}
           </div>
         </div>
       )
     }
-
-    case "app_download": return (
-      <div style={{ padding: "4px 16px 10px", ...s }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {c.ios_url && (
-            <a href={c.ios_url} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(0,0,0,0.3)", border: "1.5px solid rgba(255,255,255,0.15)", borderRadius: 13, padding: "12px 16px", textDecoration: "none" }}>
-              <span style={{ fontSize: 26 }}>🍎</span>
-              <div>
-                <p style={{ color: MUTED, fontSize: 9, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>Disponible sur</p>
-                <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0 }}>App Store</p>
-              </div>
-            </a>
-          )}
-          {c.android_url && (
-            <a href={c.android_url} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(0,0,0,0.3)", border: "1.5px solid rgba(255,255,255,0.15)", borderRadius: 13, padding: "12px 16px", textDecoration: "none" }}>
-              <span style={{ fontSize: 26 }}>🤖</span>
-              <div>
-                <p style={{ color: MUTED, fontSize: 9, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>Disponible sur</p>
-                <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0 }}>Google Play</p>
-              </div>
-            </a>
-          )}
-          {!c.ios_url && !c.android_url && (
-            <div style={{ textAlign: "center", padding: "16px", color: MUTED, fontSize: 12 }}>Ajoutez vos liens App Store / Google Play</div>
-          )}
+    case "countdown": return (
+      <div style={{ padding: "14px 16px", textAlign: "center", ...s }}>
+        {c.title && <p style={{ color: muted, fontSize: 11, margin: "0 0 12px", textTransform: "uppercase", letterSpacing: 1 }}>{c.title}</p>}
+        <CountdownDisplay date={c.date||"2026-12-31"} theme={theme} />
+        {c.subtitle && <p style={{ color: muted, fontSize: 11, margin: "10px 0 0" }}>{c.subtitle}</p>}
+      </div>
+    )
+    case "event_info": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ background: "rgba(236,72,153,0.08)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 12, padding: "14px" }}>
+          <p style={{ color: text, fontSize: 16, fontWeight: 700, margin: "0 0 10px", fontFamily: theme.fontDisplay }}>{c.name}</p>
+          {[["📅",c.date],["🕐",c.time],["📍",c.location],["🎟️",c.price]].filter(([,v])=>v).map(([icon,val]) => (
+            <p key={String(icon)} style={{ color: muted, fontSize: 12, margin: "0 0 4px" }}>{icon} {val}</p>
+          ))}
+          {c.cta_label && <div style={{ background: "#EC4899", color: "#fff", textAlign: "center", padding: "9px", borderRadius: 7, fontSize: 12, fontWeight: 700, marginTop: 10 }}>{c.cta_label}</div>}
         </div>
       </div>
     )
-
-    case "promo_code": {
-      const [copied, setCopied] = React.useState(false)
+    case "spotify_player": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ background: "rgba(29,185,84,0.08)", border: "1px solid rgba(29,185,84,0.2)", borderRadius: 12, padding: "14px", display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 42, height: 42, background: "#1DB954", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🎧</div>
+          <div style={{ flex: 1 }}><p style={{ color: text, fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>{c.title||"Ma musique"}</p><p style={{ color: muted, fontSize: 10, margin: 0 }}>Écouter sur Spotify</p></div>
+          <div style={{ background: "#1DB954", color: "#000", padding: "5px 12px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>▶ Play</div>
+        </div>
+      </div>
+    )
+    case "music_links": {
+      const platforms = [["spotify","🎵","#1DB954","Spotify"],["apple_music","🍎","#FC3C44","Apple Music"],["deezer","🎶","#A238FF","Deezer"],["youtube_music","▶️","#FF0000","YouTube Music"],["soundcloud","☁️","#FF5500","SoundCloud"]].filter(([k])=>c[k as string])
       return (
-        <div style={{ padding: "4px 16px 10px", ...s }}>
-          <div style={{ background: "rgba(249,115,22,0.08)", border: "2px dashed rgba(249,115,22,0.3)", borderRadius: 14, padding: "16px", textAlign: "center" }}>
-            {c.description && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 10px" }}>{c.description}</p>}
-            <button onClick={() => { navigator.clipboard.writeText(c.code || ""); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
-              style={{ background: "rgba(249,115,22,0.15)", border: "2px solid rgba(249,115,22,0.4)", borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontFamily: "JetBrains Mono, monospace", fontSize: 20, fontWeight: 700, color: "#F97316", letterSpacing: 3, width: "100%", transition: "all 0.2s" }}>
-              {c.code || "PROMO10"}
-            </button>
-            <p style={{ color: MUTED, fontSize: 10, margin: "6px 0 0" }}>{copied ? "✓ Code copie !" : "Cliquer pour copier"}</p>
-            {c.expires && <p style={{ color: MUTED, fontSize: 10, margin: "4px 0 0" }}>Expire le {c.expires}</p>}
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.artist_name && <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 10px", textAlign: "center" }}>{c.artist_name}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {platforms.length===0 ? <p style={{ color: muted, fontSize: 11, textAlign: "center", margin: 0 }}>Aucune plateforme configurée</p>
+              : platforms.map(([k,icon,color,label]) => (
+                <div key={String(k)} style={{ display: "flex", alignItems: "center", gap: 10, background: (color as string)+"12", border: `1px solid ${color}25`, borderRadius: 9, padding: "9px 12px" }}>
+                  <span style={{ fontSize: 16 }}>{icon}</span>
+                  <span style={{ color: text, fontSize: 12, fontWeight: 600, flex: 1 }}>{label}</span>
+                  <ExternalLink size={11} color={color as string} />
+                </div>
+              ))}
           </div>
         </div>
       )
     }
-
-    case "limited_offer": return (
-      <div style={{ padding: "4px 16px 10px", ...s }}>
-        <div style={{ background: "rgba(239,68,68,0.08)", border: "1.5px solid rgba(239,68,68,0.3)", borderRadius: 14, padding: "14px 16px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 6 }}>
-            <span style={{ color: "#EF4444", fontSize: 16 }}>⚡</span>
-            <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0 }}>{c.title || "Offre limitee"}</p>
-          </div>
-          {c.description && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 8px", lineHeight: 1.5 }}>{c.description}</p>}
-          {c.expires && <p style={{ color: "#EF4444", fontSize: 11, margin: "0 0 10px", fontWeight: 600 }}>⏰ Expire le {c.expires}</p>}
-          {c.cta_label && <div style={{ background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 9, padding: "10px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#EF4444" }}>{c.cta_label}</div>}
+    case "instagram_feed": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 3, marginBottom: 10 }}>
+          {[0,1,2,3,4,5].map(i => <div key={i} style={{ background: "rgba(225,48,108,0.06)", border: "1px solid rgba(225,48,108,0.1)", borderRadius: 5, aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>📸</div>)}
+        </div>
+        {c.username && <p style={{ color: muted, fontSize: 11, textAlign: "center", margin: "0 0 8px" }}>{c.username}</p>}
+        {c.cta_label && <div style={{ background: "rgba(225,48,108,0.15)", border: "1px solid rgba(225,48,108,0.3)", color: "#E1306C", textAlign: "center", padding: "9px", borderRadius: 7, fontSize: 12, fontWeight: 700 }}>{c.cta_label}</div>}
+      </div>
+    )
+    case "contact_form": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 10px" }}>{c.title||"Contact"}</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {["Nom","Email","Message"].map(f => <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 7, padding: f==="Message" ? "7px 10px 32px" : "7px 10px", color: muted, fontSize: 11 }}>{f}</div>)}
+          <div style={{ background: `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 7, padding: "9px", textAlign: "center", color: "#080808", fontSize: 12, fontWeight: 700 }}>{c.button_label||"Envoyer"}</div>
         </div>
       </div>
     )
-
+    case "divider": {
+      const dStyles: Record<string,any> = {
+        gold: <div style={{ height: 1, background: `linear-gradient(90deg,transparent,${primary}60,transparent)` }} />,
+        line: <div style={{ height: 1, background: "rgba(255,255,255,0.08)" }} />,
+        dots: <div style={{ textAlign: "center", color: muted, letterSpacing: 8, fontSize: 14 }}>• • •</div>,
+        stars: <div style={{ textAlign: "center", color: primary, letterSpacing: 8 }}>✦ ✦ ✦</div>,
+      }
+      return <div style={{ padding: "6px 16px", ...s }}>{dStyles[c.style||"gold"]}</div>
+    }
+    case "spacer": {
+      const sSizes: Record<string,number> = { xs: 6, sm: 12, md: 24, lg: 40, xl: 60 }
+      return <div style={{ height: sSizes[c.size||"md"] }} />
+    }
+    case "call_button": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(57,255,143,0.1)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 12, padding: "13px 18px" }}>
+          <span style={{ fontSize: 16 }}>{c.icon||"📞"}</span>
+          <span style={{ color: "#39FF8F", fontSize: 13, fontWeight: 700 }}>{c.label||"Appeler maintenant"}</span>
+        </div>
+      </div>
+    )
+    case "whatsapp_button": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(37,211,102,0.1)", border: "1.5px solid rgba(37,211,102,0.3)", borderRadius: 12, padding: "13px 18px" }}>
+          <span style={{ fontSize: 16 }}>💬</span>
+          <span style={{ color: "#25D366", fontSize: 13, fontWeight: 700 }}>{c.label||"Discuter sur WhatsApp"}</span>
+        </div>
+      </div>
+    )
+    case "email_button": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(56,189,248,0.1)", border: "1.5px solid rgba(56,189,248,0.3)", borderRadius: 12, padding: "13px 18px" }}>
+          <span style={{ fontSize: 16 }}>✉️</span>
+          <span style={{ color: "#38BDF8", fontSize: 13, fontWeight: 700 }}>{c.label||"Envoyer un email"}</span>
+        </div>
+      </div>
+    )
+    case "download_file": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(167,139,250,0.08)", border: "1.5px solid rgba(167,139,250,0.25)", borderRadius: 12, padding: "11px 14px" }}>
+          <div style={{ width: 36, height: 36, background: "rgba(167,139,250,0.15)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{c.icon||"📄"}</div>
+          <div style={{ flex: 1 }}><p style={{ color: text, fontSize: 12, fontWeight: 700, margin: 0 }}>{c.label||"Télécharger"}</p>{c.type_doc && <p style={{ color: muted, fontSize: 9, margin: 0 }}>{c.type_doc}</p>}</div>
+          <span style={{ color: "#A78BFA", fontSize: 16 }}>↓</span>
+        </div>
+      </div>
+    )
+    case "vcard": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <div style={{ background: primary+"08", border: `1.5px solid ${primary}25`, borderRadius: 12, padding: "12px 14px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+            <div style={{ width: 36, height: 36, borderRadius: "50%", background: `linear-gradient(135deg,${primary},${primary}80)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>👤</div>
+            <div>{c.name && <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: 0 }}>{c.name}</p>}{c.company && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{c.company}</p>}</div>
+          </div>
+          <div style={{ background: `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 8, padding: "9px", textAlign: "center", fontSize: 12, fontWeight: 700, color: "#080808" }}>{c.label||"Ajouter à mes contacts"}</div>
+        </div>
+      </div>
+    )
+    case "google_review": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(251,191,36,0.08)", border: "1.5px solid rgba(251,191,36,0.25)", borderRadius: 12, padding: "11px 14px" }}>
+          <div style={{ display: "flex", gap: 1 }}>{Array.from({length: parseInt(c.stars||"5")}).map((_,i) => <span key={i} style={{ color: "#FBBF24", fontSize: 12 }}>★</span>)}</div>
+          <div style={{ flex: 1 }}><p style={{ color: text, fontSize: 12, fontWeight: 700, margin: 0 }}>{c.label||"Donner un avis"}</p><p style={{ color: muted, fontSize: 9, margin: 0 }}>Google Reviews</p></div>
+          <span style={{ fontSize: 18 }}>⭐</span>
+        </div>
+      </div>
+    )
+    case "table_booking": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(239,68,68,0.1)", border: "1.5px solid rgba(239,68,68,0.25)", borderRadius: 12, padding: "13px 18px" }}>
+          <span style={{ fontSize: 16 }}>🍽️</span>
+          <p style={{ color: "#EF4444", fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label||"Réserver une table"}</p>
+        </div>
+      </div>
+    )
+    case "order_online": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(249,115,22,0.1)", border: "1.5px solid rgba(249,115,22,0.25)", borderRadius: 12, padding: "13px 18px" }}>
+          <span style={{ fontSize: 16 }}>🛒</span>
+          <p style={{ color: "#F97316", fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label||"Commander maintenant"}</p>
+        </div>
+      </div>
+    )
+    case "free_gift": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <div style={{ background: "rgba(236,72,153,0.08)", border: "1.5px solid rgba(236,72,153,0.25)", borderRadius: 12, padding: "12px 14px", textAlign: "center" }}>
+          <span style={{ fontSize: 28, display: "block", marginBottom: 6 }}>{c.emoji||"🎁"}</span>
+          {c.description && <p style={{ color: muted, fontSize: 10, margin: "0 0 8px" }}>{c.description}</p>}
+          <div style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 8, padding: "9px", fontSize: 12, fontWeight: 700, color: "#fff" }}>{c.label||"Recevoir mon guide gratuit"}</div>
+        </div>
+      </div>
+    )
+    case "donation": {
+      const dc = ({"Ko-fi":"#FF5E5B","Buy Me A Coffee":"#FFDD00","Patreon":"#FF424D","PayPal":"#009CDE","Tipeee":"#E55100"} as any)[c.platform||"Ko-fi"]||"#F59E0B"
+      return (
+        <div style={{ padding: "4px 16px 10px", ...s }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: dc+"12", border: `1.5px solid ${dc}30`, borderRadius: 12, padding: "13px 18px" }}>
+            <span style={{ fontSize: 18 }}>☕</span>
+            <p style={{ color: dc, fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label||"Soutenir mon travail"}</p>
+          </div>
+        </div>
+      )
+    }
+    case "multi_cta": {
+      const btns = [[c.btn1_icon,c.btn1_label],[c.btn2_icon,c.btn2_label],[c.btn3_icon,c.btn3_label],[c.btn4_icon,c.btn4_label]].filter(([,l])=>l)
+      return (
+        <div style={{ padding: "4px 16px 10px", ...s }}>
+          <div style={{ display: "grid", gridTemplateColumns: btns.length<=2 ? "1fr 1fr" : "1fr 1fr", gap: 6 }}>
+            {btns.map(([icon,label],i) => (
+              <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, background: primary+"10", border: `1px solid ${primary}20`, borderRadius: 10, padding: "10px 6px" }}>
+                <span style={{ fontSize: 20 }}>{icon||"⚡"}</span>
+                <span style={{ color: text, fontSize: 10, fontWeight: 600, textAlign: "center" }}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+    case "app_download": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+          {c.ios_url && <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(0,0,0,0.25)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 11, padding: "10px 14px" }}><span style={{ fontSize: 22 }}>🍎</span><div><p style={{ color: muted, fontSize: 8, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>Disponible sur</p><p style={{ color: text, fontSize: 13, fontWeight: 700, margin: 0 }}>App Store</p></div></div>}
+          {c.android_url && <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(0,0,0,0.25)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 11, padding: "10px 14px" }}><span style={{ fontSize: 22 }}>🤖</span><div><p style={{ color: muted, fontSize: 8, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>Disponible sur</p><p style={{ color: text, fontSize: 13, fontWeight: 700, margin: 0 }}>Google Play</p></div></div>}
+          {!c.ios_url && !c.android_url && <div style={{ textAlign: "center", padding: "14px", color: muted, fontSize: 11 }}>Ajoutez vos liens App Store / Play Store</div>}
+        </div>
+      </div>
+    )
+    case "promo_code": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <div style={{ background: "rgba(249,115,22,0.08)", border: "2px dashed rgba(249,115,22,0.3)", borderRadius: 12, padding: "14px", textAlign: "center" }}>
+          {c.description && <p style={{ color: muted, fontSize: 11, margin: "0 0 8px" }}>{c.description}</p>}
+          <div style={{ background: "rgba(249,115,22,0.15)", border: "2px solid rgba(249,115,22,0.4)", borderRadius: 8, padding: "9px 16px", fontFamily: "monospace", fontSize: 18, fontWeight: 700, color: "#F97316", letterSpacing: 3 }}>{c.code||"PROMO10"}</div>
+          {c.expires && <p style={{ color: muted, fontSize: 9, margin: "5px 0 0" }}>Expire le {c.expires}</p>}
+        </div>
+      </div>
+    )
+    case "limited_offer": return (
+      <div style={{ padding: "4px 16px 10px", ...s }}>
+        <div style={{ background: "rgba(239,68,68,0.08)", border: "1.5px solid rgba(239,68,68,0.3)", borderRadius: 12, padding: "12px 14px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}><span style={{ color: "#EF4444" }}>⚡</span><p style={{ color: text, fontSize: 13, fontWeight: 700, margin: 0 }}>{c.title||"Offre limitée"}</p></div>
+          {c.description && <p style={{ color: muted, fontSize: 11, margin: "0 0 6px" }}>{c.description}</p>}
+          {c.expires && <p style={{ color: "#EF4444", fontSize: 10, margin: "0 0 8px", fontWeight: 600 }}>⏰ Expire le {c.expires}</p>}
+          {c.cta_label && <div style={{ background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 7, padding: "9px", textAlign: "center", fontSize: 12, fontWeight: 700, color: "#EF4444" }}>{c.cta_label}</div>}
+        </div>
+      </div>
+    )
     case "booking_button": return (
       <div style={{ padding: "4px 16px 10px", ...s }}>
-        <a href={c.url || "#"} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(56,189,248,0.08)", border: "1.5px solid rgba(56,189,248,0.25)", borderRadius: 14, padding: "13px 16px", textDecoration: "none" }}>
-          <div style={{ width: 42, height: 42, background: "rgba(56,189,248,0.12)", border: "1px solid rgba(56,189,248,0.25)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>📅</div>
-          <div style={{ flex: 1 }}>
-            <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label || "Prendre rendez-vous"}</p>
-            {c.description && <p style={{ color: MUTED, fontSize: 10, margin: "2px 0 0" }}>{c.description}</p>}
-            {c.platform && c.platform !== "URL personnalisee" && <p style={{ color: "#38BDF8", fontSize: 9, margin: "2px 0 0" }}>via {c.platform}</p>}
-          </div>
-        </a>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(56,189,248,0.08)", border: "1.5px solid rgba(56,189,248,0.25)", borderRadius: 12, padding: "11px 14px" }}>
+          <div style={{ width: 38, height: 38, background: "rgba(56,189,248,0.12)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>📅</div>
+          <div style={{ flex: 1 }}><p style={{ color: text, fontSize: 12, fontWeight: 700, margin: 0 }}>{c.label||"Prendre rendez-vous"}</p>{c.description && <p style={{ color: muted, fontSize: 9, margin: 0 }}>{c.description}</p>}</div>
+        </div>
       </div>
     )
-
     case "payment_button": return (
       <div style={{ padding: "4px 16px 10px", ...s }}>
-        <a href={c.url || "#"} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(57,255,143,0.1)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 14, padding: "14px 20px", textDecoration: "none" }}>
-          <span style={{ fontSize: 18 }}>💳</span>
-          <div style={{ textAlign: "center" }}>
-            <p style={{ color: "#39FF8F", fontSize: 14, fontWeight: 700, margin: 0 }}>
-              {c.label || "Payer maintenant"}{c.amount ? ` — ${c.amount}` : ""}
-            </p>
-            {c.platform && <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>via {c.platform}</p>}
-          </div>
-        </a>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(57,255,143,0.1)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 12, padding: "13px 18px" }}>
+          <span style={{ fontSize: 16 }}>💳</span>
+          <p style={{ color: "#39FF8F", fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label||"Payer maintenant"}{c.amount ? ` — ${c.amount}` : ""}</p>
+        </div>
       </div>
     )
-
     case "quote_request": return (
       <div style={{ padding: "4px 16px 10px", ...s }}>
-        <a href={c.url || "#"} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 12, background: `${G}08`, border: `1.5px solid ${G}25`, borderRadius: 14, padding: "13px 16px", textDecoration: "none" }}>
-          <div style={{ width: 42, height: 42, background: `${G}12`, border: `1px solid ${G}25`, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>📋</div>
-          <div style={{ flex: 1 }}>
-            <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label || "Demander un devis"}</p>
-            {c.description && <p style={{ color: MUTED, fontSize: 10, margin: "2px 0 0" }}>{c.description}</p>}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, background: primary+"08", border: `1.5px solid ${primary}20`, borderRadius: 12, padding: "11px 14px" }}>
+          <div style={{ width: 38, height: 38, background: primary+"12", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>📋</div>
+          <div style={{ flex: 1 }}><p style={{ color: text, fontSize: 12, fontWeight: 700, margin: 0 }}>{c.label||"Demander un devis"}</p>{c.description && <p style={{ color: muted, fontSize: 9, margin: 0 }}>{c.description}</p>}</div>
+          <span style={{ color: primary, fontSize: 14 }}>→</span>
+        </div>
+      </div>
+    )
+    case "cover_banner": return (
+      <div style={{ position: "relative", overflow: "hidden", borderRadius: "10px 10px 0 0" }}>
+        {c.src
+          ? <img src={c.src} alt="" style={{ width: "100%", height: c.height==="lg" ? 140 : c.height==="sm" ? 70 : 100, objectFit: "cover", display: "block" }} />
+          : <div style={{ width: "100%", height: c.height==="lg" ? 140 : c.height==="sm" ? 70 : 100, background: `linear-gradient(135deg,${primary}30,${accent}20)`, display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: muted, fontSize: 11 }}>Bannière / Cover</span></div>}
+        {c.cover_title && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "flex-end", padding: "10px 14px" }}><p style={{ color: "#fff", fontSize: 16, fontWeight: 700, margin: 0, textShadow: "0 2px 8px rgba(0,0,0,0.5)", fontFamily: theme.fontDisplay }}>{c.cover_title}</p></div>}
+      </div>
+    )
+    case "about": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        {c.emoji && <span style={{ fontSize: 18, display: "block", marginBottom: 5 }}>{c.emoji}</span>}
+        {c.title && <p style={{ color: primary, fontSize: 10, fontWeight: 700, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: 1.5 }}>{c.title}</p>}
+        <p style={{ color: text, fontSize: 12, lineHeight: 1.75, margin: 0 }}>{c.text||"Votre histoire ici..."}</p>
+        {c.collapsible==="yes" && <button style={{ color: primary, fontSize: 10, background: "none", border: "none", cursor: "pointer", padding: "5px 0 0", fontWeight: 600 }}>Lire la suite →</button>}
+      </div>
+    )
+    case "availability": {
+      const scMap: Record<string,any> = {
+        available: { color: "#39FF8F", bg: "rgba(57,255,143,0.08)", border: "rgba(57,255,143,0.25)", label: "Disponible" },
+        busy: { color: "#F97316", bg: "rgba(249,115,22,0.08)", border: "rgba(249,115,22,0.25)", label: "En mission" },
+        closed: { color: "#EF4444", bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.25)", label: "Indisponible" },
+      }
+      const sc = scMap[c.status||"available"]
+      return (
+        <div style={{ padding: "8px 16px", ...s }}>
+          <div style={{ background: sc.bg, border: `1px solid ${sc.border}`, borderRadius: 12, padding: "12px 14px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: c.message ? 5 : 0 }}>
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: sc.color, boxShadow: `0 0 6px ${sc.color}80`, flexShrink: 0 }} />
+              <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: 0 }}>{sc.label}</p>
+              {c.available_from && <span style={{ color: muted, fontSize: 10, marginLeft: "auto" }}>dès {c.available_from}</span>}
+            </div>
+            {c.message && <p style={{ color: muted, fontSize: 11, margin: "0 0 8px", lineHeight: 1.5 }}>{c.message}</p>}
+            {c.cta_label && <div style={{ background: `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 8, padding: "9px", textAlign: "center", fontSize: 12, fontWeight: 700, color: "#080808" }}>{c.cta_label}</div>}
           </div>
-          <span style={{ color: G, fontSize: 16 }}>→</span>
-        </a>
+        </div>
+      )
+    }
+    case "journey": {
+      const lines = [c.line_1,c.line_2,c.line_3,c.line_4].filter(Boolean)
+      return lines.length>0 ? (
+        <div style={{ padding: "8px 16px 12px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {lines.map((line:string,i:number) => (
+              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 9, background: primary+"06", border: `1px solid ${primary}12`, borderRadius: 9, padding: "9px 10px" }}>
+                <span style={{ fontSize: 14, flexShrink: 0 }}>{line.split(" ")[0]}</span>
+                <span style={{ color: text, fontSize: 12, lineHeight: 1.5 }}>{line.split(" ").slice(1).join(" ")}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : <div style={{ padding: "14px", textAlign: "center", color: muted, fontSize: 11, ...s }}>Ajoutez vos chiffres clés</div>
+    }
+    case "expertise": {
+      const skills = [[c.s1_name,c.s1_level,c.s1_icon],[c.s2_name,c.s2_level,c.s2_icon],[c.s3_name,c.s3_level,c.s3_icon],[c.s4_name,c.s4_level,c.s4_icon],[c.s5_name,c.s5_level,c.s5_icon]].filter(([n])=>n)
+      return skills.length>0 ? (
+        <div style={{ padding: "8px 16px 12px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {skills.map(([name,level,icon],i:number) => {
+              const pct = Math.round((parseInt(String(level)||"3")/5)*100)
+              return (
+                <div key={i}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 3 }}>
+                    <span style={{ color: text, fontSize: 11, display: "flex", alignItems: "center", gap: 5 }}>{icon && <span>{icon}</span>}{name}</span>
+                    <span style={{ color: primary, fontSize: 9, fontWeight: 700 }}>{pct}%</span>
+                  </div>
+                  <div style={{ height: 4, background: "rgba(255,255,255,0.07)", borderRadius: 2, overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${pct}%`, background: `linear-gradient(90deg,${primary},${accent})`, borderRadius: 2 }} />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      ) : <div style={{ padding: "14px", textAlign: "center", color: muted, fontSize: 11, ...s }}>Ajoutez vos expertises</div>
+    }
+    case "languages": {
+      const langs = [[c.lang_1_flag,c.lang_1_name,c.lang_1_level],[c.lang_2_flag,c.lang_2_name,c.lang_2_level],[c.lang_3_flag,c.lang_3_name,c.lang_3_level],[c.lang_4_flag,c.lang_4_name,c.lang_4_level]].filter(([,n])=>n)
+      return langs.length>0 ? (
+        <div style={{ padding: "8px 16px 12px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {langs.map(([flag,name,level],i:number) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 10px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 9 }}>
+                <span style={{ fontSize: 18 }}>{flag||"🌐"}</span>
+                <span style={{ color: text, fontSize: 12, fontWeight: 600, flex: 1 }}>{name}</span>
+                <span style={{ background: primary+"15", border: `1px solid ${primary}25`, borderRadius: 20, padding: "2px 8px", color: primary, fontSize: 9, fontWeight: 600 }}>{level||"Courant"}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : <div style={{ padding: "14px", textAlign: "center", color: muted, fontSize: 11, ...s }}>Ajoutez vos langues</div>
+    }
+    case "certifications": {
+      const certs = [[c.cert_1_icon,c.cert_1_name,c.cert_1_org,c.cert_1_year],[c.cert_2_icon,c.cert_2_name,c.cert_2_org,c.cert_2_year],[c.cert_3_icon,c.cert_3_name,c.cert_3_org,c.cert_3_year],[c.cert_4_icon,c.cert_4_name,c.cert_4_org,c.cert_4_year]].filter(([,n])=>n)
+      return certs.length>0 ? (
+        <div style={{ padding: "8px 16px 12px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {certs.map(([icon,name,org,year],i:number) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 9, padding: "8px 10px", background: primary+"06", border: `1px solid ${primary}12`, borderRadius: 10 }}>
+                <span style={{ fontSize: 18, flexShrink: 0 }}>{icon||"🏆"}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ color: text, fontSize: 11, fontWeight: 700, margin: 0 }}>{name}</p>
+                  <p style={{ color: muted, fontSize: 9, margin: 0 }}>{org}{year ? ` · ${year}` : ""}</p>
+                </div>
+                <Check size={11} color={primary} style={{ flexShrink: 0 }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : <div style={{ padding: "14px", textAlign: "center", color: muted, fontSize: 11, ...s }}>Ajoutez vos certifications</div>
+    }
+    case "company": return (
+      <div style={{ padding: "8px 16px 12px", ...s }}>
+        <div style={{ display: "flex", gap: 11, alignItems: "center", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: "11px 12px" }}>
+          {c.logo_url
+            ? <img src={c.logo_url} alt="" style={{ width: 40, height: 40, borderRadius: 9, objectFit: "cover", flexShrink: 0 }} />
+            : <div style={{ width: 40, height: 40, borderRadius: 9, background: primary+"15", border: `1px solid ${primary}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🏢</div>}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 1px", fontFamily: theme.fontDisplay }}>{c.company_name||"Mon Entreprise"}</p>
+            <p style={{ color: muted, fontSize: 10, margin: 0 }}>{c.sector}{c.founded_year ? ` · Depuis ${c.founded_year}` : ""}</p>
+          </div>
+        </div>
       </div>
     )
-
-    default: return (
-      <div style={{ padding: "12px 16px", textAlign: "center", ...s }}>
-        <span style={{ fontSize: 24 }}>{BLOCK_DEFS[block.type]?.icon || "📦"}</span>
-        <p style={{ color: MUTED, fontSize: 12, margin: "4px 0 0" }}>{BLOCK_DEFS[block.type]?.label || block.type}</p>
-      </div>
-    )
+    default: {
+      const def = BLOCK_DEFS[block.type]
+      return <div style={{ padding: "12px 16px", textAlign: "center", ...s }}><span style={{ fontSize: 22 }}>{def?.icon||"📦"}</span><p style={{ color: muted, fontSize: 11, margin: "5px 0 0" }}>{def?.label||block.type}</p></div>
+    }
   }
 }
 
-// ── Edit Panel ──────────────────────────────────────────────────────────────
-function EditPanel({ block, onChange }: { block: Block; onChange: (content: BlockContent) => void }) {
+function EditPanel({ block, onChange }: { block: Block; onChange: (key: string, val: string) => void }) {
   const def = BLOCK_DEFS[block.type]
   if (!def) return null
+  const inputStyle: React.CSSProperties = { width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: "#F5F0E8", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
 
-  const G = "#C9A84C"; const MUTED = "#8A8478"
-  const inputStyle: React.CSSProperties = {
-    width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)",
-    borderRadius: 9, padding: "9px 12px", color: "#F5F0E8", fontSize: 13,
-    outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif",
-    transition: "border-color 0.2s"
-  }
-
-  return (
-    <div style={{ padding: "16px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, paddingBottom: 14, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-        <div style={{ width: 36, height: 36, borderRadius: 9, background: def.color + "15", border: `1px solid ${def.color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{def.icon}</div>
-        <div>
-          <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: 0 }}>{def.label}</p>
-          <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{def.description}</p>
-        </div>
-      </div>
-      <style>{`
-        .qrf-input:focus { border-color: rgba(201,168,76,0.5) !important; background: #111009 !important; }
-        .qrf-input::placeholder { color: #4A4640; }
-      `}</style>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {def.fields.map(field => (
-          <div key={field.key}>
-            <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>{field.label}</label>
-            {field.type === "image" ? (
-              <ImageUpload value={block.content[field.key] || ""} onChange={v => onChange({ ...block.content, [field.key]: v })} />
-            ) : field.type === "textarea" ? (
-              <textarea className="qrf-input" value={block.content[field.key] || ""} onChange={e => onChange({ ...block.content, [field.key]: e.target.value })}
-                placeholder={field.placeholder} rows={3}
-                style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }} />
-            ) : field.type === "select" ? (
-              <select className="qrf-input" value={block.content[field.key] || ""} onChange={e => onChange({ ...block.content, [field.key]: e.target.value })}
-                style={{ ...inputStyle, cursor: "pointer" }}>
-                {field.options?.map(o => <option key={o} value={o}>{o}</option>)}
-              </select>
-            ) : field.type === "date" ? (
-              <input type="date" className="qrf-input" value={block.content[field.key] || ""} onChange={e => onChange({ ...block.content, [field.key]: e.target.value })}
-                style={{ ...inputStyle, cursor: "pointer" }} />
-            ) : (
-              <input type={field.type === "url" ? "url" : "text"} className="qrf-input"
-                value={block.content[field.key] || ""} onChange={e => onChange({ ...block.content, [field.key]: e.target.value })}
-                placeholder={field.placeholder} style={inputStyle} />
-            )}
-            {field.hint && <p style={{ color: MUTED, fontSize: 10, margin: "3px 0 0", fontStyle: "italic" }}>{field.hint}</p>}
+  if (block.type === "social_links") {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>Laisse vide pour masquer le réseau.</p>
+        {SOCIAL_NETWORKS.map(n => (
+          <div key={n.key}>
+            <label style={{ color: MUTED, fontSize: 11, display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
+              <span style={{ fontSize: 14 }}>{n.icon}</span>
+              <span style={{ color: n.color, fontWeight: 600 }}>{n.label}</span>
+            </label>
+            <input type="url" value={block.content[n.key]||""} onChange={e => onChange(n.key, e.target.value)}
+              placeholder={`https://${n.key}.com/...`}
+              style={{ ...inputStyle, borderColor: block.content[n.key] ? n.color+"50" : "rgba(201,168,76,0.2)" }}
+              onFocus={e => e.target.style.borderColor = n.color+"80"}
+              onBlur={e => e.target.style.borderColor = block.content[n.key] ? n.color+"50" : "rgba(201,168,76,0.2)"} />
           </div>
         ))}
       </div>
+    )
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      {def.fields.map(field => (
+        <div key={field.key}>
+          <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>{field.label}</label>
+          {field.type === "textarea"
+            ? <textarea value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)}
+                placeholder={field.placeholder} rows={3}
+                style={{ ...inputStyle, resize: "vertical" }}
+                onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"}
+                onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />
+            : field.type === "select"
+            ? <select value={block.content[field.key]||field.options?.[0]} onChange={e => onChange(field.key, e.target.value)} style={inputStyle}>
+                {field.options?.map(o => <option key={o} value={o}>{o}</option>)}
+              </select>
+            : field.type === "color"
+            ? <div style={{ display: "flex", gap: 7 }}>
+                <input type="color" value={block.content[field.key]||"#C9A84C"} onChange={e => onChange(field.key, e.target.value)} style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }} />
+                <input type="text" value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)} placeholder={field.placeholder} style={{ ...inputStyle, flex: 1 }} onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"} onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />
+              </div>
+            : <input type={field.type==="url" ? "url" : "text"} value={block.content[field.key]||""}
+                onChange={e => onChange(field.key, e.target.value)}
+                placeholder={field.placeholder} style={inputStyle}
+                onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"}
+                onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />}
+          {field.hint && <p style={{ color: MUTED, fontSize: 9, margin: "3px 0 0" }}>{field.hint}</p>}
+        </div>
+      ))}
     </div>
   )
 }
 
-// ── Theme Panel ─────────────────────────────────────────────────────────────
-function ThemePanel({ theme, onChange }: { theme: PageTheme; onChange: (t: PageTheme) => void }) {
-  const G = "#C9A84C"; const MUTED = "#8A8478"
-  const [activeTab, setActiveTab] = useState<"presets" | "colors" | "fonts" | "bg">("presets")
-
-  const inputStyle: React.CSSProperties = {
-    width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)",
-    borderRadius: 9, padding: "9px 12px", color: "#F5F0E8", fontSize: 13,
-    outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif"
-  }
-
-  // Charger Google Fonts pour la preview
-  useEffect(() => {
-    const families = GOOGLE_FONTS.slice(0, 20).map(f => f.replace(/ /g, "+")).join("&family=")
-    const link = document.createElement("link")
-    link.rel = "stylesheet"
-    link.href = `https://fonts.googleapis.com/css2?family=${families}:wght@400;700&display=swap`
-    document.head.appendChild(link)
-  }, [])
-
+function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange: (t: PageTheme) => void }) {
   return (
-    <div style={{ padding: "14px" }}>
-      <div style={{ display: "flex", gap: 4, marginBottom: 16, background: "#0d0c09", borderRadius: 8, padding: 3 }}>
-        {(["presets", "colors", "fonts", "bg"] as const).map(tab => (
-          <button key={tab} onClick={() => setActiveTab(tab)}
-            style={{ flex: 1, background: activeTab === tab ? "#111009" : "transparent", border: activeTab === tab ? "1px solid rgba(201,168,76,0.2)" : "1px solid transparent", borderRadius: 6, padding: "6px 4px", color: activeTab === tab ? "#F5F0E8" : MUTED, fontSize: 10, cursor: "pointer", fontFamily: "DM Sans, sans-serif", fontWeight: activeTab === tab ? 600 : 400 }}>
-            {tab === "presets" ? "Thèmes" : tab === "colors" ? "Couleurs" : tab === "fonts" ? "Polices" : "Fond"}
-          </button>
-        ))}
-      </div>
-
-      {activeTab === "presets" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div>
+        <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>Thèmes prédéfinis</p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
           {Object.entries(PRESET_THEMES).map(([key, t]) => (
-            <button key={key} onClick={() => onChange(t)}
-              style={{ background: t.bg, border: `2px solid ${theme.name === t.name ? t.primary : "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: "10px 8px", cursor: "pointer", position: "relative", overflow: "hidden", transition: "border-color 0.2s" }}>
-              {/* Mini preview */}
-              <div style={{ height: 4, background: `linear-gradient(90deg,${t.primary},${t.accent})`, borderRadius: 2, marginBottom: 6 }} />
-              <p style={{ color: t.text, fontSize: 10, fontWeight: 700, margin: "0 0 1px", fontFamily: `${t.fontDisplay}, serif`, textAlign: "left" }}>{t.name}</p>
-              <div style={{ display: "flex", gap: 3 }}>
-                {[t.primary, t.accent, t.surface].map((c, i) => (
-                  <div key={i} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />
-                ))}
-              </div>
-              {theme.name === t.name && (
-                <div style={{ position: "absolute", top: 4, right: 4, width: 14, height: 14, background: G, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Check size={8} color="#080808" />
-                </div>
-              )}
+            <button key={key} onClick={() => onThemeChange(t)}
+              style={{ background: t.bg, border: `2px solid ${theme.name===t.name ? G : "rgba(255,255,255,0.08)"}`, borderRadius: 10, padding: "9px 7px", cursor: "pointer", textAlign: "left", position: "relative" }}>
+              <div style={{ display: "flex", gap: 3, marginBottom: 4 }}>{[t.primary,t.accent,t.text].map((col,i) => <div key={i} style={{ width: 10, height: 10, borderRadius: "50%", background: col }} />)}</div>
+              <p style={{ color: t.text, fontSize: 9, fontWeight: 600, margin: 0 }}>{t.name}</p>
+              {theme.name===t.name && <div style={{ position: "absolute", top: 3, right: 3, width: 12, height: 12, background: G, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}><Check size={7} color="#000" /></div>}
             </button>
           ))}
         </div>
-      )}
-
-      {activeTab === "colors" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {[
-            { key: "primary", label: "Couleur principale", hint: "Boutons, accents" },
-            { key: "accent", label: "Couleur d accent", hint: "Hover, highlights" },
-            { key: "bg", label: "Fond principal" },
-            { key: "surface", label: "Fond surface" },
-            { key: "text", label: "Texte principal" },
-            { key: "muted", label: "Texte secondaire" },
-          ].map(({ key, label, hint }) => (
-            <div key={key}>
-              <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5 }}>{label}</label>
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <input type="color" value={(theme as any)[key] || "#000000"} onChange={e => onChange({ ...theme, [key]: e.target.value })}
-                  style={{ width: 36, height: 36, borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", cursor: "pointer", background: "transparent" }} />
-                <input value={(theme as any)[key] || ""} onChange={e => onChange({ ...theme, [key]: e.target.value })}
-                  style={{ ...inputStyle, flex: 1, padding: "7px 10px", fontFamily: "JetBrains Mono, monospace", fontSize: 12 }} />
-              </div>
-              {hint && <p style={{ color: MUTED, fontSize: 10, margin: "3px 0 0" }}>{hint}</p>}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {activeTab === "fonts" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div>
-            <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 8 }}>Police titres</label>
-            <div style={{ maxHeight: 200, overflowY: "auto", display: "flex", flexDirection: "column", gap: 4 }}>
-              {GOOGLE_FONTS.map(f => (
-                <button key={f} onClick={() => onChange({ ...theme, fontDisplay: f })}
-                  style={{ background: theme.fontDisplay === f ? "rgba(201,168,76,0.1)" : "transparent", border: `1px solid ${theme.fontDisplay === f ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.04)"}`, borderRadius: 7, padding: "8px 12px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontFamily: `"${f}", serif`, color: "#F5F0E8", fontSize: 14 }}>{f}</span>
-                  {theme.fontDisplay === f && <Check size={11} color="#C9A84C" />}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 8 }}>Police corps</label>
-            <div style={{ maxHeight: 180, overflowY: "auto", display: "flex", flexDirection: "column", gap: 4 }}>
-              {GOOGLE_FONTS.map(f => (
-                <button key={f} onClick={() => onChange({ ...theme, fontBody: f })}
-                  style={{ background: theme.fontBody === f ? "rgba(201,168,76,0.1)" : "transparent", border: `1px solid ${theme.fontBody === f ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.04)"}`, borderRadius: 7, padding: "8px 12px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontFamily: `"${f}", sans-serif`, color: "#F5F0E8", fontSize: 13 }}>{f}</span>
-                  {theme.fontBody === f && <Check size={11} color="#C9A84C" />}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {activeTab === "bg" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <div>
-            <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 8 }}>Type de fond</label>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-              {(["solid", "gradient", "pattern", "image"] as const).map(mode => (
-                <button key={mode} onClick={() => onChange({ ...theme, bgMode: mode })}
-                  style={{ background: theme.bgMode === mode ? "rgba(201,168,76,0.1)" : "#0d0c09", border: `1px solid ${theme.bgMode === mode ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.06)"}`, borderRadius: 8, padding: "10px 8px", cursor: "pointer", textAlign: "center" }}>
-                  <p style={{ color: theme.bgMode === mode ? "#C9A84C" : MUTED, fontSize: 11, fontWeight: 600, margin: 0 }}>
-                    {mode === "solid" ? "🎨 Uni" : mode === "gradient" ? "🌈 Degradé" : mode === "pattern" ? "✦ Motif" : "🖼️ Image"}
-                  </p>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {theme.bgMode === "gradient" && (
-            <div>
-              <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 8 }}>Dégradés prédéfinis</label>
-              {[
-                "linear-gradient(135deg, #080808 0%, #1a0830 100%)",
-                "linear-gradient(135deg, #020C18 0%, #041828 100%)",
-                "linear-gradient(135deg, #080808 0%, #1a0808 100%)",
-                "linear-gradient(135deg, #04080D 0%, #0A1628 50%, #040808 100%)",
-                "linear-gradient(180deg, #080808 0%, #111009 100%)",
-                "linear-gradient(135deg, #0A0500 0%, #1A1000 100%)",
-              ].map((g, i) => (
-                <button key={i} onClick={() => onChange({ ...theme, bgGradient: g })}
-                  style={{ width: "100%", height: 32, background: g, border: `2px solid ${theme.bgGradient === g ? "#C9A84C" : "rgba(255,255,255,0.08)"}`, borderRadius: 7, cursor: "pointer", marginBottom: 6 }} />
-              ))}
-              <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5 }}>CSS personnalisé</label>
-              <input value={theme.bgGradient || ""} onChange={e => onChange({ ...theme, bgGradient: e.target.value })}
-                placeholder="linear-gradient(135deg, #000 0%, #111 100%)"
-                style={{ ...inputStyle, fontFamily: "JetBrains Mono, monospace", fontSize: 10 }} />
-            </div>
-          )}
-
-          {theme.bgMode === "pattern" && (
-            <div>
-              <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 8 }}>Motif</label>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-                {(["dots", "grid", "stars", "matrix", "hexagons", "waves"] as const).map(p => (
-                  <button key={p} onClick={() => onChange({ ...theme, bgPattern: p })}
-                    style={{ height: 50, border: `2px solid ${theme.bgPattern === p ? "#C9A84C" : "rgba(255,255,255,0.06)"}`, borderRadius: 8, cursor: "pointer", position: "relative", overflow: "hidden", background: theme.bg }}>
-                    <div style={{ position: "absolute", inset: 0, backgroundImage: patternCSS(p, theme.primary) }} />
-                    <span style={{ position: "relative", color: "#F5F0E8", fontSize: 10, fontWeight: 600 }}>{p}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {theme.bgMode === "image" && (
-            <div>
-              <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5 }}>URL de l image</label>
-              <input value={theme.bgImage || ""} onChange={e => onChange({ ...theme, bgImage: e.target.value })}
-                placeholder="https://..." style={{ ...inputStyle }} />
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ── Publish Modal ────────────────────────────────────────────────────────────
-function PublishModal({ slug, onClose, onPublish, publishing }: { slug: string; onClose: () => void; onPublish: () => void; publishing: boolean }) {
-  const [copied, setCopied] = useState(false)
-  const url = typeof window !== "undefined" ? `${window.location.origin}/${slug}` : `https://qrfolio.app/${slug}`
-
-  function copy() {
-    navigator.clipboard.writeText(url).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000) })
-  }
-
-  return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 24 }}>
-      <div style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 20, padding: "32px", maxWidth: 440, width: "100%", fontFamily: "DM Sans, sans-serif" }}>
-        <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <div style={{ fontSize: 48, marginBottom: 12 }}>🚀</div>
-          <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 26, color: "#F5F0E8", fontWeight: 700, margin: "0 0 8px" }}>Publier ta page</h2>
-          <p style={{ color: "#8A8478", fontSize: 14, margin: 0, lineHeight: 1.6 }}>Ta page sera visible par tous les visiteurs qui scannent ton QR code.</p>
-        </div>
-
-        <div style={{ background: "#0d0c09", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 12, padding: "14px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
-          <Link size={14} color="#C9A84C" style={{ flexShrink: 0 }} />
-          <span style={{ color: "#C9A84C", fontSize: 13, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "JetBrains Mono, monospace" }}>{url}</span>
-          <button onClick={copy} style={{ background: copied ? "rgba(57,255,143,0.1)" : "rgba(201,168,76,0.1)", border: `1px solid ${copied ? "rgba(57,255,143,0.3)" : "rgba(201,168,76,0.25)"}`, borderRadius: 7, padding: "5px 10px", color: copied ? "#39FF8F" : "#C9A84C", fontSize: 12, cursor: "pointer", flexShrink: 0, fontFamily: "DM Sans, sans-serif" }}>
-            {copied ? "✓ Copié" : "Copier"}
-          </button>
-        </div>
-
-        <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={onClose} style={{ flex: 1, background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "12px", color: "#8A8478", fontSize: 14, cursor: "pointer", fontFamily: "DM Sans, sans-serif" }}>
-            Annuler
-          </button>
-          <button onClick={onPublish} disabled={publishing}
-            style={{ flex: 2, background: "linear-gradient(90deg,#C9A84C,#b8953f)", border: "none", borderRadius: 12, padding: "12px", color: "#080808", fontSize: 14, fontWeight: 700, cursor: publishing ? "wait" : "pointer", fontFamily: "DM Sans, sans-serif", opacity: publishing ? 0.7 : 1 }}>
-            {publishing ? "Publication..." : "Publier maintenant ✓"}
-          </button>
+      </div>
+      <div>
+        <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>Police d&apos;affichage</p>
+        <select value={theme.fontDisplay} onChange={e => onThemeChange({...theme, fontDisplay: e.target.value})} style={{ width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "8px 10px", color: "#F5F0E8", fontSize: 12, outline: "none" }}>
+          {GOOGLE_FONTS.map(f => <option key={f} value={f}>{f}</option>)}
+        </select>
+      </div>
+      <div>
+        <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>Police de corps</p>
+        <select value={theme.fontBody} onChange={e => onThemeChange({...theme, fontBody: e.target.value})} style={{ width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "8px 10px", color: "#F5F0E8", fontSize: 12, outline: "none" }}>
+          {GOOGLE_FONTS.map(f => <option key={f} value={f}>{f}</option>)}
+        </select>
+      </div>
+      <div>
+        <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>Couleur principale</p>
+        <div style={{ display: "flex", gap: 8 }}>
+          <input type="color" value={theme.primary} onChange={e => onThemeChange({...theme, primary: e.target.value})} style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }} />
+          <input type="text" value={theme.primary} onChange={e => onThemeChange({...theme, primary: e.target.value})} style={{ flex: 1, background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "8px 10px", color: "#F5F0E8", fontSize: 12, outline: "none", fontFamily: "monospace" }} />
         </div>
       </div>
     </div>
   )
 }
 
-// ── Main Builder ────────────────────────────────────────────────────────────
-export default function BuilderV4({ pageId }: { pageId: string }) {
-  const [blocks, setBlocks] = useState<Block[]>([])
-  const [theme, setTheme] = useState<PageTheme>(PRESET_THEMES.midnight_gold)
+export default function BuilderV4({ pageId }: { pageId?: string }) {
+  const [blocks, setBlocks] = useState<Block[]>([
+    { id: "1", type: "profile", content: { name: "Mon Nom", tagline: "Mon activité" }, visible: true },
+    { id: "2", type: "bio", content: { text: "Bienvenue sur ma page !" }, visible: true },
+    { id: "3", type: "cta_button", content: { label: "Me contacter", url: "#", style: "gold" }, visible: true },
+  ])
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [rightTab, setRightTab] = useState<"preview" | "edit" | "theme">("preview")
-  const [dayMode, setDayMode] = useState(false)
-  const [search, setSearch] = useState("")
+  const [pageName, setPageName] = useState("Ma Page")
+  const [pageSlug, setPageSlug] = useState("ma-page")
+  const [pageStatus, setPageStatus] = useState("draft")
+  const [theme, setTheme] = useState<PageTheme>(PRESET_THEMES.midnight_gold)
+  const [rightTab, setRightTab] = useState<"preview"|"edit"|"theme"|"ai">("preview")
   const [activeCategory, setActiveCategory] = useState("identity")
+  const [search, setSearch] = useState("")
+  const [dayMode, setDayMode] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [pageSlug, setPageSlug] = useState("")
-  const [pageStatus, setPageStatus] = useState("draft")
-  const [showPublish, setShowPublish] = useState(false)
+  const [showPublishPopup, setShowPublishPopup] = useState(false)
   const [publishing, setPublishing] = useState(false)
-  const [pageName, setPageName] = useState("")
-  const [demoMode, setDemoMode] = useState(false)
   const [qrCodeUrl, setQrCodeUrl] = useState("")
   const [qrShortCode, setQrShortCode] = useState("")
   const [showQrPanel, setShowQrPanel] = useState(false)
-  const [pageStats, setPageStats] = useState({ views: 0, scans: 0, trend: 0 })
-  const G = "#C9A84C"; const MUTED = "#8A8478"
+  const [pageStats, setPageStats] = useState({ views: 0, scans: 0 })
+  const [messages, setMessages] = useState<Message[]>([{ role: "assistant", content: "Salut ! 👋 Décris ton activité et je construis ta page." }])
+  const [aiInput, setAiInput] = useState("")
+  const [aiLoading, setAiLoading] = useState(false)
+  const messagesEnd = useRef<HTMLDivElement>(null)
+  const saveTimeout = useRef<ReturnType<typeof setTimeout>>()
 
-  // Load
+  useEffect(() => { messagesEnd.current?.scrollIntoView({ behavior: "smooth" }) }, [messages])
+
   useEffect(() => {
+    const fonts = [theme.fontDisplay, theme.fontBody].filter(Boolean).map(f => f.replace(/ /g,"+")).join("&family=")
+    const link = document.createElement("link"); link.rel = "stylesheet"
+    link.href = `https://fonts.googleapis.com/css2?family=${fonts}&display=swap`
+    document.head.appendChild(link)
+  }, [theme.fontDisplay, theme.fontBody])
+
+  useEffect(() => {
+    if (!pageId) return
     const supabase = createClient()
     async function load() {
-      const { data: page } = await supabase.from("pages").select("*").eq("id", pageId).single()
-      if (!page) { setDemoMode(true); return }
-      setPageSlug(page.slug || "")
-      setPageStatus(page.status || "draft")
-      setPageName(page.title || "Ma Page")
-      if (page.theme && typeof page.theme === "object") setTheme({ ...PRESET_THEMES.midnight_gold, ...page.theme })
+      const { data: pg } = await supabase.from("pages").select("title,slug,status,theme,total_views").eq("id", pageId).single()
+      if (pg) { setPageName(pg.title); setPageSlug(pg.slug); setPageStatus(pg.status||"draft"); if (pg.theme) setTheme(pg.theme as PageTheme); setPageStats(s => ({ ...s, views: pg.total_views||0 })) }
       const { data: blks } = await supabase.from("blocks").select("*").eq("page_id", pageId).order("position")
-      if (blks) setBlocks(blks.map(b => ({ id: b.id, type: b.type, content: b.content || {}, visible: b.is_visible !== false })))
-
-      // Charger le QR code
-      const { data: qr } = await supabase.from("qr_codes").select("short_code, qr_url, total_scans").eq("page_id", pageId).single()
+      if (blks?.length) setBlocks(blks.map(b => ({ id: b.id, type: b.type, content: b.content||{}, visible: b.is_visible!==false })))
+      const { data: qr } = await supabase.from("qr_codes").select("short_code,total_scans").eq("page_id", pageId).single()
       if (qr) {
-        setQrShortCode(qr.short_code || "")
+        setQrShortCode(qr.short_code||"")
         const appUrl = typeof window !== "undefined" ? window.location.origin : ""
-        setQrCodeUrl(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(appUrl + "/q/" + qr.short_code)}&color=C9A84C&bgcolor=080808&margin=10`)
-        setPageStats(s => ({ ...s, scans: qr.total_scans || 0 }))
+        setQrCodeUrl(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(appUrl+"/q/"+qr.short_code)}&color=C9A84C&bgcolor=080808&margin=10`)
+        setPageStats(s => ({ ...s, scans: qr.total_scans||0 }))
       }
-
-      // Charger les stats de la page
-      const { data: pageData } = await supabase.from("pages").select("total_views").eq("id", pageId).single()
-      if (pageData) setPageStats(s => ({ ...s, views: pageData.total_views || 0 }))
     }
     load()
   }, [pageId])
 
-  // Load Google Fonts
   useEffect(() => {
-    const fonts = [theme.fontDisplay, theme.fontBody].filter(Boolean).map(f => f.replace(/ /g, "+")).join("&family=")
-    if (fonts) {
-      const id = "qrf-fonts-" + fonts.slice(0, 20)
-      if (!document.getElementById(id)) {
-        const link = document.createElement("link")
-        link.id = id; link.rel = "stylesheet"
-        link.href = `https://fonts.googleapis.com/css2?family=${fonts}:wght@400;600;700&display=swap`
-        document.head.appendChild(link)
-      }
-    }
-  }, [theme.fontDisplay, theme.fontBody])
+    if (!pageId) return
+    clearTimeout(saveTimeout.current)
+    saveTimeout.current = setTimeout(async () => {
+      setSaving(true)
+      const supabase = createClient()
+      await supabase.from("pages").update({ title: pageName, theme }).eq("id", pageId)
+      await supabase.from("blocks").delete().eq("page_id", pageId)
+      if (blocks.length > 0) await supabase.from("blocks").insert(blocks.map((b, i) => ({ page_id: pageId, type: b.type, position: i, content: b.content, is_visible: b.visible, styles: {} })))
+      setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
+    }, 800)
+  }, [blocks, pageName, theme, pageId])
 
-  // Auto-save
-  const save = useCallback(async (b: Block[], t: PageTheme) => {
-    if (demoMode) return
-    setSaving(true)
-    const supabase = createClient()
-    await supabase.from("pages").update({ theme: t, updated_at: new Date().toISOString() }).eq("id", pageId)
-    await supabase.from("blocks").delete().eq("page_id", pageId)
-    if (b.length > 0) {
-      await supabase.from("blocks").insert(b.map((blk, i) => ({ id: blk.id, page_id: pageId, type: blk.type, position: i, content: blk.content, is_visible: blk.visible, styles: {} })))
-    }
-    setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
-  }, [pageId, demoMode])
-
-  function addBlock(type: string) {
-    const def = BLOCK_DEFS[type]
-    if (!def) return
-    const b: Block = { id: uid(), type, content: { ...def.defaultContent }, visible: true }
-    const newBlocks = [...blocks, b]
-    setBlocks(newBlocks)
-    setSelectedId(b.id)
-    setRightTab("edit")
-    save(newBlocks, theme)
+  async function handlePublish() {
+    if (!pageId) return
+    setPublishing(true)
+    await createClient().from("pages").update({ status: "published", published_at: new Date().toISOString() }).eq("id", pageId)
+    setPageStatus("published"); setPublishing(false); setShowPublishPopup(false)
   }
 
-  function updateBlock(id: string, content: BlockContent) {
-    const newBlocks = blocks.map(b => b.id === id ? { ...b, content } : b)
-    setBlocks(newBlocks)
-    save(newBlocks, theme)
+  function addBlock(type: string, content?: BlockContent) {
+    const def = BLOCK_DEFS[type]; if (!def) return
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2)
+    setBlocks(p => [...p, { id, type, content: content||{...def.defaultContent}, visible: true }])
+    setSelectedId(id); setRightTab("edit")
   }
 
   function deleteBlock(id: string) {
-    const newBlocks = blocks.filter(b => b.id !== id)
-    setBlocks(newBlocks)
-    if (selectedId === id) setSelectedId(null)
-    save(newBlocks, theme)
-  }
-
-  function moveBlock(id: string, dir: -1 | 1) {
-    const idx = blocks.findIndex(b => b.id === id)
-    if ((dir === -1 && idx === 0) || (dir === 1 && idx === blocks.length - 1)) return
-    const newBlocks = [...blocks]
-    ;[newBlocks[idx], newBlocks[idx + dir]] = [newBlocks[idx + dir], newBlocks[idx]]
-    setBlocks(newBlocks)
-    save(newBlocks, theme)
-  }
-
-  function toggleVisible(id: string) {
-    const newBlocks = blocks.map(b => b.id === id ? { ...b, visible: !b.visible } : b)
-    setBlocks(newBlocks)
-    save(newBlocks, theme)
+    setBlocks(p => p.filter(b => b.id !== id))
+    if (selectedId === id) { setSelectedId(null); setRightTab("preview") }
   }
 
   function duplicateBlock(id: string) {
-    const b = blocks.find(x => x.id === id)
-    if (!b) return
-    const clone = { ...b, id: uid() }
-    const idx = blocks.findIndex(x => x.id === id)
-    const newBlocks = [...blocks.slice(0, idx + 1), clone, ...blocks.slice(idx + 1)]
-    setBlocks(newBlocks)
-    save(newBlocks, theme)
+    const block = blocks.find(b => b.id === id); if (!block) return
+    const newId = Date.now().toString(36) + Math.random().toString(36).slice(2)
+    const idx = blocks.findIndex(b => b.id === id)
+    setBlocks(p => [...p.slice(0, idx+1), { ...block, id: newId, content: {...block.content} }, ...p.slice(idx+1)])
+    setSelectedId(newId)
   }
 
-  function updateTheme(t: PageTheme) {
-    setTheme(t)
-    save(blocks, t)
+  function toggleVisible(id: string) { setBlocks(p => p.map(b => b.id===id ? {...b, visible: !b.visible} : b)) }
+
+  function moveBlock(id: string, dir: number) {
+    const idx = blocks.findIndex(b => b.id === id)
+    const ni = idx + dir; if (ni < 0 || ni >= blocks.length) return
+    setBlocks(p => { const n = [...p]; [n[idx], n[ni]] = [n[ni], n[idx]]; return n })
   }
 
-  async function publish() {
-    setPublishing(true)
-    const supabase = createClient()
-    await supabase.from("pages").update({ status: "published" }).eq("id", pageId)
-    await save(blocks, theme)
-    setPageStatus("published")
-    setPublishing(false)
+  // ── FIX CRITIQUE: updateBlock immédiat + EditPanel key ────────────────────
+  function updateBlock(id: string, key: string, value: string) {
+    setBlocks(prev => prev.map(b => b.id === id ? { ...b, content: { ...b.content, [key]: value } } : b))
   }
 
-  // Filtres
-  const filteredBlocks = Object.entries(BLOCK_DEFS).filter(([type, def]) => {
-    const matchCat = !activeCategory || def.category === activeCategory
-    const matchSearch = !search || def.label.toLowerCase().includes(search.toLowerCase()) || type.toLowerCase().includes(search.toLowerCase())
-    return matchCat && matchSearch
+  async function sendAI(prompt?: string) {
+    const msg = (prompt || aiInput).trim(); if (!msg || aiLoading) return
+    setAiInput("")
+    setMessages(p => [...p, { role: "user", content: msg }])
+    setAiLoading(true)
+    try {
+      const res = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: [...messages, { role: "user", content: msg }] }) })
+      const data = await res.json()
+      const reply = data.content?.[0]?.text || "Erreur."
+      let added = 0
+      reply.split("\n").forEach((line: string) => {
+        if (line.startsWith("ADD_BLOCK:")) { try { const j = JSON.parse(line.replace("ADD_BLOCK:","").trim()); addBlock(j.type, j.content); added++ } catch {} }
+      })
+      const clean = reply.split("\n").filter((l: string) => !l.startsWith("ADD_BLOCK:")).join("\n").trim()
+      setMessages(p => [...p, { role: "assistant", content: clean + (added>0 ? `\n\n✅ ${added} bloc${added>1?"s":""} ajouté${added>1?"s":""}!` : "") }])
+    } catch { setMessages(p => [...p, { role: "assistant", content: "Erreur de connexion." }]) }
+    setAiLoading(false)
+  }
+
+  const filteredBlocks = Object.entries(BLOCK_DEFS).filter(([, def]) => {
+    if (search) return def.label.toLowerCase().includes(search.toLowerCase()) || def.description.toLowerCase().includes(search.toLowerCase())
+    return def.category === activeCategory
   })
 
-  const selected = blocks.find(b => b.id === selectedId)
-
-  // Calcul du style de fond
-  function bgStyle(): React.CSSProperties {
-    const base = theme.bg || "#080808"
-    if (dayMode) return { background: "#FFFFFF" }
-    if (theme.bgMode === "gradient" && theme.bgGradient) return { background: theme.bgGradient }
-    if (theme.bgMode === "pattern" && theme.bgPattern) return { background: base, backgroundImage: patternCSS(theme.bgPattern, theme.primary) }
-    if (theme.bgMode === "image" && theme.bgImage) return { background: base, backgroundImage: `url(${theme.bgImage})`, backgroundSize: "cover", backgroundPosition: "center" }
-    return { background: base }
-  }
+  // selectedBlock recalculé depuis blocks à chaque render — garantit fraîcheur
+  const selectedBlock = blocks.find(b => b.id === selectedId)
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "#080808", fontFamily: "DM Sans, sans-serif" }}>
-      {/* Fonts */}
-      {showQrPanel && <div onClick={() => setShowQrPanel(false)} style={{ position: "fixed", inset: 0, zIndex: 199 }} />}
+    <div style={{ height: "100vh", background: "#080808", display: "flex", flexDirection: "column", fontFamily: "DM Sans, sans-serif", color: "#F5F0E8", overflow: "hidden" }}>
 
-      <style>{`
-        @keyframes spin{to{transform:rotate(360deg)}}
-        @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}} @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}} .iphone-scroll::-webkit-scrollbar{display:none}
-        ::-webkit-scrollbar{width:4px;height:4px}
-        ::-webkit-scrollbar-track{background:transparent}
-        ::-webkit-scrollbar-thumb{background:rgba(201,168,76,0.2);border-radius:2px}
-        .qrf-block-item:hover{background:rgba(201,168,76,0.05)!important;border-color:rgba(201,168,76,0.2)!important}
-        .block-drag-handle:active{cursor:grabbing}
-        @keyframes blockIn{from{opacity:0;transform:scale(0.98) translateY(4px)}to{opacity:1;transform:scale(1) translateY(0)}}
-      `}</style>
+      {/* TOPBAR */}
+      <div style={{ height: 50, background: "#0D0D0D", borderBottom: "1px solid rgba(201,168,76,0.12)", display: "flex", alignItems: "center", padding: "0 14px", gap: 10, flexShrink: 0, zIndex: 20 }}>
+        <a href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 4, textDecoration: "none", color: G, fontFamily: "Cormorant Garamond, serif", fontSize: 16, fontWeight: 700 }}>← QRfolio</a>
+        <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.08)" }} />
+        <input value={pageName} onChange={e => setPageName(e.target.value)} style={{ background: "transparent", border: "none", color: "#F5F0E8", fontSize: 13, fontWeight: 600, outline: "none", width: 160 }} />
+        {saving && <span style={{ color: MUTED, fontSize: 10 }}>Enregistrement...</span>}
+        {saved && <span style={{ color: "#39FF8F", fontSize: 10, display: "flex", alignItems: "center", gap: 3 }}><Check size={10} /> Enregistré</span>}
+        {!pageId && <span style={{ color: "#4A4640", fontSize: 9 }}>Mode démo</span>}
+        <div style={{ flex: 1 }} />
 
-      {/* ── SIDEBAR GAUCHE — Bibliothèque ─────────────────────────────────── */}
-      <div style={{ width: 260, background: "#0A0A0A", borderRight: "1px solid rgba(201,168,76,0.1)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        {/* Search */}
-        <div style={{ padding: "14px 12px 8px" }}>
+        <button onClick={() => setRightTab("ai")} style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 7, padding: "5px 11px", color: G, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
+          <Sparkles size={11} /> Générer IA
+        </button>
+
+        <button onClick={() => setRightTab(t => t==="theme" ? "preview" : "theme")} style={{ display: "flex", alignItems: "center", gap: 5, background: rightTab==="theme" ? "rgba(201,168,76,0.12)" : "transparent", border: `1px solid ${rightTab==="theme" ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.2)"}`, borderRadius: 7, padding: "5px 11px", color: rightTab==="theme" ? G : MUTED, fontSize: 11, cursor: "pointer" }}>
+          <Palette size={11} /> Thème
+        </button>
+
+        {qrCodeUrl && (
           <div style={{ position: "relative" }}>
-            <Search size={13} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: MUTED }} />
-            <input value={search} onChange={e => { setSearch(e.target.value); if (e.target.value) setActiveCategory("") }}
-              placeholder="Rechercher un bloc..." style={{ width: "100%", background: "#111009", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 8, padding: "8px 8px 8px 30px", color: "#F5F0E8", fontSize: 12, outline: "none", boxSizing: "border-box" }} />
-          </div>
-        </div>
-
-        {/* Categories */}
-        {!search && (
-          <div style={{ padding: "0 10px 8px", display: "flex", flexWrap: "wrap", gap: 4 }}>
-            {BLOCK_CATEGORIES.map(cat => (
-              <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
-                style={{ display: "flex", alignItems: "center", gap: 5, background: activeCategory === cat.id ? cat.color + "15" : "transparent", border: `1px solid ${activeCategory === cat.id ? cat.color + "40" : "rgba(255,255,255,0.06)"}`, borderRadius: 16, padding: "4px 8px", cursor: "pointer", transition: "all 0.15s" }}>
-                <span style={{ fontSize: 13 }}>{cat.icon}</span>
-                <span style={{ color: activeCategory === cat.id ? cat.color : MUTED, fontSize: 10, fontWeight: activeCategory === cat.id ? 700 : 400 }}>{cat.label}</span>
-              </button>
-            ))}
+            <button onClick={() => setShowQrPanel(p => !p)} style={{ display: "flex", alignItems: "center", gap: 5, background: showQrPanel ? "rgba(201,168,76,0.12)" : "rgba(201,168,76,0.06)", border: `1px solid ${showQrPanel ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.2)"}`, borderRadius: 8, padding: "5px 11px", color: G, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
+              <QrCode size={11} /> QR Code
+            </button>
+            {showQrPanel && (
+              <>
+                <div onClick={() => setShowQrPanel(false)} style={{ position: "fixed", inset: 0, zIndex: 199 }} />
+                <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, background: "#161616", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 16, padding: "18px", zIndex: 200, boxShadow: "0 8px 40px rgba(0,0,0,0.6)", width: 200 }}>
+                  <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 700, margin: "0 0 10px", textAlign: "center" }}>Mon QR Code</p>
+                  <div style={{ background: "#FFFFFF", borderRadius: 10, padding: 8, marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <img src={qrCodeUrl} alt="QR" style={{ width: 120, height: 120, imageRendering: "pixelated", display: "block" }} />
+                  </div>
+                  <div style={{ background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 7, padding: "6px 9px", marginBottom: 8 }}>
+                    <p style={{ color: MUTED, fontSize: 8, margin: "0 0 1px", textTransform: "uppercase", letterSpacing: 1 }}>URL de scan</p>
+                    <p style={{ color: G, fontSize: 10, margin: 0, fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>/q/{qrShortCode}</p>
+                  </div>
+                  <div style={{ display: "flex", gap: 5 }}>
+                    <a href={qrCodeUrl} download="qrcode.png" style={{ flex: 1, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "7px", color: G, textDecoration: "none", fontSize: 10, fontWeight: 600, textAlign: "center" }}>↓ PNG</a>
+                    <a href="/dashboard/qr-codes" style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px", color: MUTED, textDecoration: "none", fontSize: 10, textAlign: "center" }}>Perso →</a>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         )}
 
-        {/* Category desc */}
-        {activeCategory && !search && (
-          <div style={{ padding: "0 12px 8px" }}>
-            <p style={{ color: MUTED, fontSize: 10, margin: 0, fontStyle: "italic" }}>
-              {BLOCK_CATEGORIES.find(c => c.id === activeCategory)?.desc}
-            </p>
-          </div>
+        <button onClick={() => setDayMode(d => !d)} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: MUTED }}>
+          {dayMode ? <Moon size={12} /> : <Sun size={12} />}
+        </button>
+
+        {pageId && pageSlug && (
+          <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "5px 11px", color: G, textDecoration: "none", fontSize: 11, fontWeight: 600 }}>
+            <ExternalLink size={11} /> Voir en direct
+          </a>
         )}
 
-        {/* Block list */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "0 8px 8px" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-            {filteredBlocks.map(([type, def]) => (
-              <button key={type}
-                className="qrf-block-item"
-                onClick={() => addBlock(type)}
-                style={{ display: "flex", alignItems: "center", gap: 10, background: "transparent", border: "1px solid transparent", borderRadius: 9, padding: "8px 10px", cursor: "pointer", textAlign: "left", width: "100%", transition: "all 0.15s" }}>
-                <div style={{ width: 32, height: 32, borderRadius: 8, background: def.color + "15", border: `1px solid ${def.color}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
-                  {def.icon}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.label}</p>
-                  <p style={{ color: MUTED, fontSize: 10, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.description}</p>
-                </div>
-                <Plus size={12} color={MUTED} style={{ flexShrink: 0, opacity: 0.5 }} />
-              </button>
-            ))}
-          </div>
+        <div style={{ position: "relative" }}>
+          <button onClick={() => setShowPublishPopup(p => !p)}
+            style={{ display: "flex", alignItems: "center", gap: 6, background: pageStatus==="published" ? "rgba(57,255,143,0.12)" : `linear-gradient(90deg,${G},#b8953f)`, border: pageStatus==="published" ? "1px solid rgba(57,255,143,0.35)" : "none", borderRadius: 9, padding: "8px 18px", color: pageStatus==="published" ? "#39FF8F" : "#080808", fontSize: 14, fontWeight: 700, cursor: "pointer", boxShadow: pageStatus==="published" ? "none" : `0 4px 16px rgba(201,168,76,0.3)` }}>
+            {pageStatus==="published" ? <><Check size={13} /> Publié</> : "Publier"}
+          </button>
+          {showPublishPopup && (
+            <>
+              <div onClick={() => setShowPublishPopup(false)} style={{ position: "fixed", inset: 0, zIndex: 199 }} />
+              <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, background: "#161616", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 14, padding: "18px", zIndex: 200, boxShadow: "0 8px 40px rgba(0,0,0,0.6)", width: 240 }}>
+                <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 700, margin: "0 0 8px" }}>Publier la page</p>
+                {pageSlug && (
+                  <div style={{ background: "#0A0A0A", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 10px", marginBottom: 12, display: "flex", alignItems: "center", gap: 7 }}>
+                    <p style={{ color: G, fontSize: 11, margin: 0, fontFamily: "monospace", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>/{pageSlug}</p>
+                    <button onClick={() => navigator.clipboard.writeText(window.location.origin+"/"+pageSlug)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 0 }}><Copy size={11} /></button>
+                  </div>
+                )}
+                <button onClick={handlePublish} disabled={publishing}
+                  style={{ width: "100%", background: `linear-gradient(90deg,${G},#b8953f)`, border: "none", borderRadius: 9, padding: "11px", color: "#080808", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                  {publishing ? "Publication..." : pageStatus==="published" ? "✓ Déjà publié" : "Publier maintenant →"}
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      {/* ── TOPBAR ─────────────────────────────────────────────────────────── */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <div style={{ height: 50, background: "#0D0D0D", borderBottom: "1px solid rgba(201,168,76,0.12)", display: "flex", alignItems: "center", padding: "0 16px", gap: 10, flexShrink: 0 }}>
-          {/* Back */}
-          <a href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 5, color: MUTED, textDecoration: "none", fontSize: 12, marginRight: 6 }}>
-            ← <span style={{ fontFamily: "Cormorant Garamond, serif", color: G, fontSize: 18, fontWeight: 700 }}>QRfolio</span>
-          </a>
-          <span style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 600, flex: 1 }}>{pageName}</span>
+      {/* BODY */}
+      <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
 
-          {/* Status */}
-          {demoMode && <span style={{ color: MUTED, fontSize: 11, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, padding: "3px 8px" }}>Mode demo — non sauvegarde</span>}
-
-          {/* Save indicator */}
-          {saving && <div style={{ width: 14, height: 14, border: "2px solid rgba(201,168,76,0.2)", borderTopColor: G, borderRadius: "50%", animation: "spin 0.6s linear infinite" }} />}
-          {saved && <span style={{ color: "#39FF8F", fontSize: 11 }}>✓ Sauvegarde</span>}
-
-          {/* Day/Night */}
-          <button onClick={() => setDayMode(d => !d)} title={dayMode ? "Mode nuit" : "Mode jour"}
-            style={{ width: 30, height: 30, background: dayMode ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.05)", border: `1px solid ${dayMode ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.08)"}`, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: dayMode ? "#F59E0B" : MUTED }}>
-            {dayMode ? <Sun size={14} /> : <Moon size={14} />}
-          </button>
-
-          {/* QR Code button */}
-          {qrCodeUrl && (
+        {/* SIDEBAR BLOCS */}
+        <div style={{ width: 230, background: "#0A0A0A", borderRight: "1px solid rgba(201,168,76,0.1)", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden" }}>
+          <div style={{ padding: "10px 8px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
             <div style={{ position: "relative" }}>
-              <button onClick={() => setShowQrPanel(p => !p)}
-                style={{ display: "flex", alignItems: "center", gap: 6, background: showQrPanel ? "rgba(201,168,76,0.15)" : "rgba(201,168,76,0.08)", border: `1px solid ${showQrPanel ? "rgba(201,168,76,0.5)" : "rgba(201,168,76,0.2)"}`, borderRadius: 8, padding: "5px 12px", color: G, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
-                <span style={{ fontSize: 14 }}>⬛</span> QR Code
-              </button>
-
-              {showQrPanel && (
-                <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, background: "#161616", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 16, padding: "20px", zIndex: 200, boxShadow: "0 8px 40px rgba(0,0,0,0.6)", width: 220 }}>
-                  <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 700, margin: "0 0 12px", textAlign: "center", fontFamily: "Cormorant Garamond, serif" }}>Mon QR Code</p>
-
-                  {/* QR image */}
-                  <div style={{ background: "#080808", borderRadius: 12, padding: 12, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(201,168,76,0.15)" }}>
-                    <img src={qrCodeUrl} alt="QR Code" style={{ width: 140, height: 140, imageRendering: "pixelated" }} />
-                  </div>
-
-                  {/* URL courte */}
-                  <div style={{ background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 8, padding: "8px 10px", marginBottom: 10 }}>
-                    <p style={{ color: MUTED, fontSize: 9, margin: "0 0 2px", textTransform: "uppercase", letterSpacing: 1 }}>URL de scan</p>
-                    <p style={{ color: G, fontSize: 11, margin: 0, fontFamily: "JetBrains Mono, monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {typeof window !== "undefined" ? window.location.origin : ""}/q/{qrShortCode}
-                    </p>
-                  </div>
-
-                  {/* Actions */}
-                  <div style={{ display: "flex", gap: 6 }}>
-                    <a href={qrCodeUrl} download="qrcode.png"
-                      style={{ flex: 1, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 8, padding: "8px", color: G, textDecoration: "none", fontSize: 11, fontWeight: 600, textAlign: "center" }}>
-                      ↓ PNG
-                    </a>
-                    <a href="/dashboard/qr-codes"
-                      style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "8px", color: MUTED, textDecoration: "none", fontSize: 11, textAlign: "center" }}>
-                      Perso →
-                    </a>
-                  </div>
-                </div>
-              )}
+              <Search size={11} style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", color: MUTED }} />
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher un bloc..."
+                style={{ width: "100%", background: "#111", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 7, padding: "7px 7px 7px 24px", color: "#F5F0E8", fontSize: 11, outline: "none", boxSizing: "border-box" }}
+                onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.4)"}
+                onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.15)"} />
+              {search && <button onClick={() => setSearch("")} style={{ position: "absolute", right: 7, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 0 }}><X size={10} /></button>}
             </div>
-          )}
-
-          {/* Preview plein ecran */}
-          {pageStatus === "published" && pageSlug && (
-            <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer"
-              style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "5px 10px", color: MUTED, textDecoration: "none", fontSize: 12 }}>
-              <ExternalLink size={12} /> Voir
-            </a>
-          )}
-
-          {/* Devices */}
-          <div style={{ display: "flex", gap: 2 }}>
-            <button style={{ width: 28, height: 28, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: MUTED }}>
-              <Smartphone size={12} />
-            </button>
           </div>
 
-          {/* Publish */}
-          <button onClick={() => setShowPublish(true)}
-            style={{ display: "flex", alignItems: "center", gap: 6, background: pageStatus === "published" ? "rgba(57,255,143,0.1)" : "linear-gradient(90deg,#C9A84C,#b8953f)", border: pageStatus === "published" ? "1px solid rgba(57,255,143,0.3)" : "none", borderRadius: 10, padding: "9px 22px", color: pageStatus === "published" ? "#39FF8F" : "#080808", fontSize: 14, fontWeight: 700, cursor: "pointer", boxShadow: pageStatus === "published" ? "none" : "0 4px 20px rgba(201,168,76,0.35)" }}>
-            {pageStatus === "published" ? <><Check size={13} /> Publie</> : "Publier"}
-          </button>
+          {!search && (
+            <div style={{ padding: "7px 8px 5px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
+                {BLOCK_CATEGORIES.map(cat => (
+                  <button key={cat.id} onClick={() => setActiveCategory(cat.id)} title={cat.desc}
+                    style={{ display: "flex", alignItems: "center", gap: 3, background: activeCategory===cat.id ? cat.color+"18" : "transparent", border: `1px solid ${activeCategory===cat.id ? cat.color+"40" : "transparent"}`, borderRadius: 6, padding: "3px 6px", color: activeCategory===cat.id ? cat.color : MUTED, fontSize: 10, cursor: "pointer" }}>
+                    <span>{cat.icon}</span>
+                    <span style={{ display: activeCategory===cat.id ? "inline" : "none" }}>{cat.label}</span>
+                  </button>
+                ))}
+              </div>
+              <p style={{ color: MUTED, fontSize: 9, margin: "4px 0 0", paddingLeft: 2 }}>{BLOCK_CATEGORIES.find(c => c.id===activeCategory)?.desc}</p>
+            </div>
+          )}
+
+          <div style={{ flex: 1, overflowY: "auto", padding: "5px 6px" }}>
+            {filteredBlocks.length===0
+              ? <div style={{ padding: "20px 10px", textAlign: "center" }}><p style={{ color: MUTED, fontSize: 11, margin: 0 }}>Aucun résultat</p></div>
+              : filteredBlocks.map(([type, def]) => (
+                <button key={type} onClick={() => addBlock(type)}
+                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left", marginBottom: 2, transition: "all 0.15s" }}
+                  onMouseEnter={e => { const el = e.currentTarget; el.style.background = def.color+"10"; el.style.color = "#F5F0E8"; el.style.borderColor = def.color+"20" }}
+                  onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = MUTED; el.style.borderColor = "transparent" }}>
+                  <div style={{ width: 30, height: 30, borderRadius: 8, background: def.color+"12", border: `1px solid ${def.color}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
+                    <p style={{ margin: 0, fontSize: 9, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1.3 }}>{def.description}</p>
+                  </div>
+                </button>
+              ))}
+          </div>
         </div>
 
-        {/* ── CANVAS ────────────────────────────────────────────────────── */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "24px 20px", display: "flex", justifyContent: "center", background: "#101010", backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "32px 32px" }}>
-          <div style={{ width: "100%", maxWidth: 540 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-              <span style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 6, padding: "2px 10px", fontSize: 11, color: G, fontWeight: 600 }}>CANVAS</span>
-              <span style={{ background: "rgba(255,255,255,0.05)", borderRadius: 6, padding: "2px 8px", fontSize: 11, color: MUTED }}>{blocks.length} bloc{blocks.length > 1 ? "s" : ""}</span>
+        {/* CANVAS */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "20px", background: "#101010", backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "32px 32px" }}>
+          <div style={{ maxWidth: 640, margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, padding: "6px 12px", background: "#0A0A0A", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 9 }}>
+              <span style={{ fontSize: 9, letterSpacing: 2, textTransform: "uppercase", color: "#4A4640" }}>CANVAS</span>
+              <span style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 6, padding: "1px 6px", fontSize: 10, color: G }}>{blocks.length} bloc{blocks.length!==1?"s":""}</span>
+              {!pageId && <span style={{ color: "#4A4640", fontSize: 9, marginLeft: "auto" }}>Mode démo</span>}
             </div>
 
-            {blocks.length === 0 ? (
-              <div style={{ border: "2px dashed rgba(201,168,76,0.15)", borderRadius: 16, padding: "48px 24px", textAlign: "center" }}>
-                <p style={{ fontSize: 36, margin: "0 0 12px" }}>✦</p>
-                <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 600, margin: "0 0 6px" }}>Page vide</p>
-                <p style={{ color: MUTED, fontSize: 13, margin: 0 }}>Ajoute des blocs depuis la bibliotheque a gauche</p>
+            {blocks.length===0 ? (
+              <div style={{ border: "1px dashed rgba(201,168,76,0.12)", borderRadius: 16, padding: "60px 30px", textAlign: "center" }}>
+                <p style={{ color: "#4A4640", fontSize: 28, margin: "0 0 8px" }}>✦</p>
+                <p style={{ color: MUTED, fontSize: 13, margin: 0 }}>Page vide — ajoute des blocs depuis la bibliothèque</p>
               </div>
-            ) : (
-              blocks.map((block, idx) => {
-                const isSelected = selectedId === block.id
-                const def = BLOCK_DEFS[block.type]
-                return (
-                  <div key={block.id}
-                    onClick={() => { setSelectedId(block.id); setRightTab("edit") }}
-                    style={{ position: "relative", marginBottom: 8, border: `2px solid ${isSelected ? G + "90" : "rgba(255,255,255,0.03)"}`, borderRadius: 14, overflow: "visible", cursor: "pointer", transition: "all 0.2s", opacity: block.visible ? 1 : 0.4, background: "#131313", boxShadow: isSelected ? `0 0 0 1px ${G}30, 0 4px 20px rgba(0,0,0,0.4)` : "none" }}
-                    onMouseEnter={e => {
-                      if (!isSelected) e.currentTarget.style.borderColor = "rgba(201,168,76,0.3)"
-                      if (!isSelected) e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.3)"
-                      const overlay = e.currentTarget.querySelector(".block-actions-overlay") as HTMLElement
-                      const handle = e.currentTarget.querySelector(".block-drag-handle") as HTMLElement
-                      if (overlay) overlay.style.opacity = "1"
-                      if (handle) handle.style.opacity = "1"
-                    }}
-                    onMouseLeave={e => {
-                      if (!isSelected) e.currentTarget.style.borderColor = "rgba(255,255,255,0.03)"
-                      if (!isSelected) e.currentTarget.style.boxShadow = "none"
-                      const overlay = e.currentTarget.querySelector(".block-actions-overlay") as HTMLElement
-                      const handle = e.currentTarget.querySelector(".block-drag-handle") as HTMLElement
-                      if (overlay) overlay.style.opacity = "0"
-                      if (handle) handle.style.opacity = "0"
-                    }}>
+            ) : blocks.map((block, idx) => {
+              const def = BLOCK_DEFS[block.type]
+              const isSelected = block.id === selectedId
+              return (
+                <div key={block.id}
+                  onClick={() => { setSelectedId(block.id); setRightTab("edit") }}
+                  style={{ position: "relative", marginBottom: 8, border: `2px solid ${isSelected ? G+"90" : "rgba(255,255,255,0.04)"}`, borderRadius: 14, overflow: "visible", cursor: "pointer", transition: "all 0.15s", opacity: block.visible ? 1 : 0.45, background: "#131313", boxShadow: isSelected ? `0 0 0 1px ${G}25, 0 4px 20px rgba(0,0,0,0.4)` : "none" }}
+                  onMouseEnter={e => {
+                    if (!isSelected) { e.currentTarget.style.borderColor = "rgba(201,168,76,0.3)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.3)" }
+                    const overlay = e.currentTarget.querySelector(".block-overlay") as HTMLElement
+                    const handle = e.currentTarget.querySelector(".block-handle") as HTMLElement
+                    if (overlay) overlay.style.opacity = "1"
+                    if (handle) handle.style.opacity = "1"
+                  }}
+                  onMouseLeave={e => {
+                    if (!isSelected) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.04)"; e.currentTarget.style.boxShadow = "none" }
+                    const overlay = e.currentTarget.querySelector(".block-overlay") as HTMLElement
+                    const handle = e.currentTarget.querySelector(".block-handle") as HTMLElement
+                    if (overlay) overlay.style.opacity = "0"
+                    if (handle) handle.style.opacity = "0"
+                  }}>
 
-                    {/* Overlay actions — apparaissent au hover */}
-                    <div className="block-actions-overlay" style={{ position: "absolute", top: 6, right: 6, display: "flex", gap: 3, opacity: 0, transition: "opacity 0.15s", zIndex: 10 }}
-                      onClick={e => e.stopPropagation()}>
-                      <button onClick={() => moveBlock(block.id, -1)} disabled={idx === 0} title="Monter"
-                        style={{ width: 24, height: 24, background: "rgba(15,15,15,0.9)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: idx === 0 ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: idx === 0 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>
-                        <ChevronUp size={11} />
-                      </button>
-                      <button onClick={() => moveBlock(block.id, 1)} disabled={idx === blocks.length - 1} title="Descendre"
-                        style={{ width: 24, height: 24, background: "rgba(15,15,15,0.9)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: idx === blocks.length - 1 ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: idx === blocks.length - 1 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>
-                        <ChevronDown size={11} />
-                      </button>
-                      <button onClick={() => duplicateBlock(block.id)} title="Dupliquer"
-                        style={{ width: 24, height: 24, background: "rgba(15,15,15,0.9)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>
-                        <Copy size={11} />
-                      </button>
-                      <button onClick={() => toggleVisible(block.id)} title={block.visible ? "Masquer" : "Afficher"}
-                        style={{ width: 24, height: 24, background: "rgba(15,15,15,0.9)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: block.visible ? MUTED : "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>
-                        {block.visible ? <Eye size={11} /> : <EyeOff size={11} />}
-                      </button>
-                      <button onClick={() => deleteBlock(block.id)} title="Supprimer"
-                        style={{ width: 24, height: 24, background: "rgba(239,68,68,0.15)", backdropFilter: "blur(4px)", border: "1px solid rgba(239,68,68,0.3)", color: "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>
-                        <Trash2 size={11} />
-                      </button>
-                    </div>
-
-                    {/* Drag handle — gauche, apparait au hover */}
-                    <div className="block-drag-handle" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 20, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0, transition: "opacity 0.15s", cursor: "grab", zIndex: 10 }}>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                        {[0,1,2,3,4,5].map(i => <div key={i} style={{ width: 3, height: 3, borderRadius: "50%", background: "rgba(201,168,76,0.6)" }} />)}
-                      </div>
-                    </div>
-
-                    {/* Badge type — coin bas gauche, discret */}
-                    {isSelected && (
-                      <div style={{ position: "absolute", bottom: 6, left: 24, display: "flex", alignItems: "center", gap: 4, background: "rgba(8,8,8,0.85)", backdropFilter: "blur(4px)", border: `1px solid ${G}30`, borderRadius: 6, padding: "2px 7px", zIndex: 10 }}>
-                        <span style={{ fontSize: 10 }}>{def?.icon}</span>
-                        <span style={{ color: G, fontSize: 9, fontWeight: 700 }}>{def?.label}</span>
-                      </div>
-                    )}
-
-                    {/* Block preview — pleine largeur, rendu final */}
-                    <div style={{ ...bgStyle(), borderRadius: 10, overflow: "hidden", minHeight: 40 }}>
-                      <BlockPreview block={block} theme={theme} dayMode={dayMode} />
+                  <div className="block-handle" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 18, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0, transition: "opacity 0.15s", cursor: "grab", zIndex: 10 }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                      {[0,1,2,3,4,5].map(i => <div key={i} style={{ width: 3, height: 3, borderRadius: "50%", background: "rgba(201,168,76,0.5)" }} />)}
                     </div>
                   </div>
-                )
-              })
-            )}
 
-            {/* Add block — CTA principal */}
+                  <div className="block-overlay" style={{ position: "absolute", top: 6, right: 6, display: "flex", gap: 3, opacity: 0, transition: "opacity 0.15s", zIndex: 10 }}
+                    onClick={e => e.stopPropagation()}>
+                    <button onClick={() => moveBlock(block.id, -1)} disabled={idx===0} style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: idx===0 ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: idx===0 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><ChevronUp size={10} /></button>
+                    <button onClick={() => moveBlock(block.id, 1)} disabled={idx===blocks.length-1} style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: idx===blocks.length-1 ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: idx===blocks.length-1 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><ChevronDown size={10} /></button>
+                    <button onClick={() => duplicateBlock(block.id)} style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><Copy size={10} /></button>
+                    <button onClick={() => toggleVisible(block.id)} style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: block.visible ? MUTED : "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>{block.visible ? <Eye size={10} /> : <EyeOff size={10} />}</button>
+                    <button onClick={() => deleteBlock(block.id)} style={{ width: 24, height: 24, background: "rgba(239,68,68,0.12)", backdropFilter: "blur(4px)", border: "1px solid rgba(239,68,68,0.3)", color: "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><Trash2 size={10} /></button>
+                  </div>
+
+                  {isSelected && (
+                    <div style={{ position: "absolute", bottom: 6, left: 22, display: "flex", alignItems: "center", gap: 4, background: "rgba(8,8,8,0.88)", backdropFilter: "blur(4px)", border: `1px solid ${G}25`, borderRadius: 6, padding: "2px 7px", zIndex: 10 }}>
+                      <span style={{ fontSize: 10 }}>{def?.icon}</span>
+                      <span style={{ color: G, fontSize: 9, fontWeight: 700 }}>{def?.label}</span>
+                    </div>
+                  )}
+
+                  <div style={{ borderRadius: 12, overflow: "hidden", minHeight: 36 }}>
+                    <BlockPreview block={block} theme={theme} dayMode={dayMode} />
+                  </div>
+                </div>
+              )
+            })}
+
             <button onClick={() => { setActiveCategory("identity"); setSearch("") }}
-              style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: "rgba(201,168,76,0.04)", border: "2px dashed rgba(201,168,76,0.2)", borderRadius: 14, padding: "18px", color: MUTED, fontSize: 14, fontWeight: 600, cursor: "pointer", marginTop: 10, transition: "all 0.2s", fontFamily: "DM Sans, sans-serif" }}
-              onMouseEnter={e => {
-                e.currentTarget.style.borderColor = "rgba(201,168,76,0.5)"
-                e.currentTarget.style.color = G
-                e.currentTarget.style.background = "rgba(201,168,76,0.08)"
-                e.currentTarget.style.transform = "translateY(-1px)"
-                e.currentTarget.style.boxShadow = "0 4px 20px rgba(201,168,76,0.1)"
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.borderColor = "rgba(201,168,76,0.2)"
-                e.currentTarget.style.color = MUTED
-                e.currentTarget.style.background = "rgba(201,168,76,0.04)"
-                e.currentTarget.style.transform = "translateY(0)"
-                e.currentTarget.style.boxShadow = "none"
-              }}>
-              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Plus size={14} color={G} />
-              </div>
+              style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: "rgba(201,168,76,0.04)", border: "2px dashed rgba(201,168,76,0.2)", borderRadius: 14, padding: "18px", color: MUTED, fontSize: 14, fontWeight: 600, cursor: "pointer", marginTop: 8, transition: "all 0.2s" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(201,168,76,0.5)"; e.currentTarget.style.color=G; e.currentTarget.style.background="rgba(201,168,76,0.08)"; e.currentTarget.style.transform="translateY(-1px)" }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor="rgba(201,168,76,0.2)"; e.currentTarget.style.color=MUTED; e.currentTarget.style.background="rgba(201,168,76,0.04)"; e.currentTarget.style.transform="translateY(0)" }}>
+              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}><Plus size={14} color={G} /></div>
               Ajouter un nouveau bloc
             </button>
           </div>
         </div>
-      </div>
 
-      {/* ── PANEL DROIT ───────────────────────────────────────────────────── */}
-      <div style={{ width: 340, background: "#161616", borderLeft: "1px solid rgba(201,168,76,0.12)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        {/* Tabs */}
-        <div style={{ display: "flex", borderBottom: "1px solid rgba(201,168,76,0.1)", flexShrink: 0 }}>
-          {(["preview", "edit", "theme"] as const).map(tab => (
-            <button key={tab} onClick={() => setRightTab(tab)}
-              style={{ flex: 1, padding: "12px 4px", background: "transparent", border: "none", borderBottom: `2px solid ${rightTab === tab ? G : "transparent"}`, color: rightTab === tab ? G : MUTED, fontSize: 12, fontWeight: rightTab === tab ? 700 : 400, cursor: "pointer", fontFamily: "DM Sans, sans-serif", transition: "all 0.15s" }}>
-              {tab === "preview" ? "Preview" : tab === "edit" ? "Editer" : "Theme"}
-            </button>
-          ))}
-        </div>
+        {/* PANEL DROIT */}
+        <div style={{ width: 340, background: "#161616", borderLeft: "1px solid rgba(201,168,76,0.12)", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden" }}>
+          <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+            {(["preview","edit","theme","ai"] as const).map(tab => (
+              <button key={tab} onClick={() => setRightTab(tab)}
+                style={{ flex: 1, padding: "10px 4px", background: "transparent", border: "none", borderBottom: `2px solid ${rightTab===tab ? G : "transparent"}`, color: rightTab===tab ? G : MUTED, fontSize: 11, fontWeight: rightTab===tab ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                {tab==="preview" ? "Preview" : tab==="edit" ? "Éditer" : tab==="theme" ? "Thème" : "IA"}
+              </button>
+            ))}
+          </div>
 
-        <div style={{ flex: 1, overflowY: "auto" }}>
-          {/* Preview iPhone Mockup */}
-          {rightTab === "preview" && (
-            <div style={{ padding: "14px 10px" }}>
-              {/* Header */}
+          {rightTab==="preview" && (
+            <div style={{ flex: 1, overflowY: "auto", padding: "14px 10px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <Smartphone size={13} color={G} />
-                  <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: 0 }}>Apercu live</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                  <span style={{ fontSize: 12, color: "#F5F0E8", fontWeight: 600 }}>Aperçu live</span>
                   <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#39FF8F", animation: "pulse 2s infinite" }} />
                 </div>
-                <a href={pageSlug ? `/${pageSlug}` : "#"} target="_blank" rel="noopener noreferrer"
-                  style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 8, padding: "6px 12px", color: G, textDecoration: "none", fontSize: 11, fontWeight: 700, boxShadow: "0 2px 8px rgba(201,168,76,0.15)" }}>
-                  <ExternalLink size={11} /> Voir en direct
-                </a>
+                {pageSlug && <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 7, padding: "5px 10px", color: G, textDecoration: "none", fontSize: 10, fontWeight: 700 }}><ExternalLink size={10} /> Voir en direct</a>}
               </div>
 
-              {/* iPhone Mockup */}
               <div style={{ display: "flex", justifyContent: "center" }}>
-                <div style={{ position: "relative", width: 240, flexShrink: 0 }}>
-                  {/* iPhone outer frame */}
-                  <div style={{
-                    width: 240,
-                    background: "linear-gradient(145deg, #2A2A2A, #1A1A1A)",
-                    borderRadius: 36,
-                    padding: "10px 8px",
-                    boxShadow: "0 0 0 1px #3A3A3A, 0 20px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.08)",
-                    position: "relative"
-                  }}>
-                    {/* Side buttons */}
-                    <div style={{ position: "absolute", left: -3, top: 72, width: 3, height: 26, background: "#2A2A2A", borderRadius: "2px 0 0 2px" }} />
-                    <div style={{ position: "absolute", left: -3, top: 108, width: 3, height: 40, background: "#2A2A2A", borderRadius: "2px 0 0 2px" }} />
-                    <div style={{ position: "absolute", left: -3, top: 158, width: 3, height: 40, background: "#2A2A2A", borderRadius: "2px 0 0 2px" }} />
-                    <div style={{ position: "absolute", right: -3, top: 100, width: 3, height: 60, background: "#2A2A2A", borderRadius: "0 2px 2px 0" }} />
+                <div style={{ position: "relative", width: 220 }}>
+                  <div style={{ width: 220, background: "linear-gradient(145deg,#2A2A2A,#1A1A1A)", borderRadius: 34, padding: "10px 8px", boxShadow: "0 0 0 1px #3A3A3A, 0 20px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.08)", position: "relative" }}>
+                    <div style={{ position: "absolute", left: -3, top: 68, width: 3, height: 24, background: "#2A2A2A", borderRadius: "2px 0 0 2px" }} />
+                    <div style={{ position: "absolute", left: -3, top: 100, width: 3, height: 38, background: "#2A2A2A", borderRadius: "2px 0 0 2px" }} />
+                    <div style={{ position: "absolute", left: -3, top: 146, width: 3, height: 38, background: "#2A2A2A", borderRadius: "2px 0 0 2px" }} />
+                    <div style={{ position: "absolute", right: -3, top: 96, width: 3, height: 58, background: "#2A2A2A", borderRadius: "0 2px 2px 0" }} />
 
-                    {/* Screen */}
-                    <div style={{
-                      borderRadius: 28,
-                      overflow: "hidden",
-                      position: "relative",
-                      background: theme.bg || "#080808",
-                      boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.5)"
-                    }}>
-                      {/* Dynamic Island / Notch */}
-                      <div style={{ ...bgStyle(), padding: "10px 0 4px", display: "flex", justifyContent: "center", position: "relative" }}>
-                        <div style={{ width: 80, height: 22, background: "#000", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
-                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#111", border: "1px solid #222" }} />
-                          <div style={{ width: 40, height: 8, borderRadius: 4, background: "#111" }} />
+                    <div style={{ borderRadius: 26, overflow: "hidden", background: dayMode ? "#FAFAFA" : theme.bg }}>
+                      <div style={{ background: dayMode ? "#FAFAFA" : (theme.bgGradient||theme.bg), padding: "9px 0 3px", display: "flex", justifyContent: "center", position: "relative" }}>
+                        <div style={{ width: 78, height: 20, background: "#000", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
+                          <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#111", border: "1px solid #222" }} />
+                          <div style={{ width: 36, height: 7, borderRadius: 3.5, background: "#111" }} />
                         </div>
-                        {/* Status bar */}
-                        <div style={{ position: "absolute", right: 14, top: 6, display: "flex", gap: 4, alignItems: "center" }}>
-                          <span style={{ color: dayMode ? "#333" : "#F5F0E8", fontSize: 7, fontWeight: 600, opacity: 0.6 }}>9:41</span>
-                          <div style={{ display: "flex", gap: 1 }}>
-                            {[3,2,1].map(i => <div key={i} style={{ width: 2, height: i * 2 + 2, background: dayMode ? "#333" : "#F5F0E8", opacity: 0.5, borderRadius: 1 }} />)}
-                          </div>
-                          <div style={{ width: 12, height: 6, border: `1px solid ${dayMode ? "#333" : "#F5F0E8"}`, borderRadius: 2, opacity: 0.5, position: "relative" }}>
-                            <div style={{ width: "80%", height: "100%", background: "#39FF8F", borderRadius: 1 }} />
-                          </div>
+                        <div style={{ position: "absolute", right: 12, top: 5, display: "flex", gap: 3, alignItems: "center" }}>
+                          <span style={{ color: dayMode ? "#333" : "#F5F0E8", fontSize: 6, fontWeight: 600, opacity: 0.6 }}>9:41</span>
+                          <div style={{ width: 10, height: 5, border: `1px solid ${dayMode?"#333":"#F5F0E8"}`, borderRadius: 1.5, opacity: 0.5 }}><div style={{ width: "75%", height: "100%", background: "#39FF8F", borderRadius: 1 }} /></div>
                         </div>
                       </div>
 
-                      {/* Page content */}
-                      <div style={{ maxHeight: 440, overflowY: "auto", ...bgStyle() }}
-                        className="iphone-scroll">
-                        {blocks.filter(b => b.visible).length === 0 ? (
-                          <div style={{ padding: "40px 16px", textAlign: "center" }}>
-                            <p style={{ fontSize: 28, margin: "0 0 8px" }}>✦</p>
-                            <p style={{ color: MUTED, fontSize: 11 }}>Ta page apparaitra ici</p>
-                          </div>
-                        ) : (
-                          blocks.filter(b => b.visible).map(block => (
-                            <div key={block.id}
-                              onClick={() => { setSelectedId(block.id); setRightTab("edit") }}
-                              style={{ cursor: "pointer", transition: "opacity 0.15s" }}
-                              onMouseEnter={e => e.currentTarget.style.opacity = "0.85"}
-                              onMouseLeave={e => e.currentTarget.style.opacity = "1"}>
-                              <BlockPreview block={block} theme={theme} dayMode={dayMode} />
+                      <div style={{ maxHeight: 420, overflowY: "auto", background: dayMode ? "#FAFAFA" : (theme.bgGradient||theme.bg) }} className="iphone-scroll">
+                        {blocks.filter(b => b.visible).length===0
+                          ? <div style={{ padding: "40px 14px", textAlign: "center", background: dayMode ? "#FAFAFA" : theme.bg }}><p style={{ fontSize: 24, margin: "0 0 6px" }}>✦</p><p style={{ color: MUTED, fontSize: 10 }}>Ta page apparaîtra ici</p></div>
+                          : blocks.filter(b => b.visible).map(b => (
+                            <div key={b.id} onClick={() => { setSelectedId(b.id); setRightTab("edit") }} style={{ cursor: "pointer" }}
+                              onMouseEnter={e => e.currentTarget.style.opacity="0.85"}
+                              onMouseLeave={e => e.currentTarget.style.opacity="1"}>
+                              <BlockPreview block={b} theme={theme} dayMode={dayMode} />
                             </div>
-                          ))
-                        )}
-                        {/* Branding */}
-                        <div style={{ padding: "10px", textAlign: "center", borderTop: `1px solid ${dayMode ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.04)"}` }}>
-                          <p style={{ color: MUTED, fontSize: 8, margin: 0, opacity: 0.4, fontFamily: "DM Sans, sans-serif" }}>Cree avec QRfolio</p>
+                          ))}
+                        <div style={{ padding: "8px", textAlign: "center", background: dayMode ? "#FAFAFA" : theme.bg }}>
+                          <p style={{ color: MUTED, fontSize: 7, margin: 0, opacity: 0.4 }}>Créé avec QRfolio</p>
                         </div>
                       </div>
 
-                      {/* Home indicator */}
-                      <div style={{ ...bgStyle(), padding: "6px 0 8px", display: "flex", justifyContent: "center" }}>
-                        <div style={{ width: 80, height: 4, background: dayMode ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.2)", borderRadius: 2 }} />
+                      <div style={{ background: dayMode ? "#FAFAFA" : (theme.bgGradient||theme.bg), padding: "5px 0 7px", display: "flex", justifyContent: "center" }}>
+                        <div style={{ width: 72, height: 3.5, background: dayMode ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.2)", borderRadius: 2 }} />
                       </div>
                     </div>
                   </div>
-
-                  {/* Reflet */}
-                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, borderRadius: 36, background: "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 40%)", pointerEvents: "none" }} />
+                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, borderRadius: 34, background: "linear-gradient(135deg,rgba(255,255,255,0.04) 0%,transparent 40%)", pointerEvents: "none" }} />
                 </div>
               </div>
 
-              {/* QR Code + Stats sous l iPhone */}
-              <div style={{ marginTop: 24, display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
-
-                {/* QR Code — grand, fond blanc */}
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+              <div style={{ marginTop: 22, display: "flex", flexDirection: "column", alignItems: "center", gap: 18 }}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
                   <p style={{ color: MUTED, fontSize: 10, margin: 0, textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 600 }}>QR Code</p>
-                  {qrCodeUrl ? (
-                    <div style={{ background: "#FFFFFF", border: "3px solid rgba(201,168,76,0.3)", borderRadius: 16, padding: 10, boxShadow: "0 8px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.1)" }}>
-                      <img src={qrCodeUrl} alt="QR" style={{ width: 140, height: 140, imageRendering: "pixelated", display: "block" }} />
-                    </div>
-                  ) : (
-                    <div style={{ background: "#FFFFFF", border: "3px solid rgba(201,168,76,0.2)", borderRadius: 16, padding: 10, width: 140, height: 140, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 30px rgba(0,0,0,0.4)" }}>
-                      <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2, width: 100, height: 100 }}>
-                        {Array.from({length: 49}).map((_, i) => {
-                          const corners = [0,1,2,6,7,13,14,42,43,35,41,48,47,46]
-                          const isCorner = corners.includes(i)
-                          return <div key={i} style={{ background: isCorner ? "#111" : Math.random() > 0.5 ? "#111" : "transparent", borderRadius: 1 }} />
-                        })}
+                  {qrCodeUrl
+                    ? <div style={{ background: "#FFFFFF", border: "3px solid rgba(201,168,76,0.3)", borderRadius: 14, padding: 9, boxShadow: "0 8px 30px rgba(0,0,0,0.5)" }}>
+                        <img src={qrCodeUrl} alt="QR" style={{ width: 130, height: 130, imageRendering: "pixelated", display: "block" }} />
                       </div>
-                    </div>
-                  )}
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, padding: "4px 12px" }}>
-                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: pageStatus === "published" ? "#39FF8F" : MUTED, boxShadow: pageStatus === "published" ? "0 0 6px #39FF8F80" : "none" }} />
-                    <span style={{ color: MUTED, fontSize: 10, fontFamily: "JetBrains Mono, monospace" }}>
-                      {qrShortCode ? `/q/${qrShortCode}` : "en attente"}
-                    </span>
+                    : <div style={{ background: "#FFFFFF", border: "3px solid rgba(201,168,76,0.2)", borderRadius: 14, width: 130, height: 130, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 30px rgba(0,0,0,0.4)" }}>
+                        <QrCode size={48} color="#C9A84C" />
+                      </div>}
+                  <div style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, padding: "3px 10px" }}>
+                    <div style={{ width: 5, height: 5, borderRadius: "50%", background: pageStatus==="published" ? "#39FF8F" : MUTED, boxShadow: pageStatus==="published" ? "0 0 5px #39FF8F70" : "none" }} />
+                    <span style={{ color: MUTED, fontSize: 9, fontFamily: "monospace" }}>{qrShortCode ? `/q/${qrShortCode}` : "en attente"}</span>
                   </div>
                 </div>
 
-                {/* Stats */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, width: "100%" }}>
-                  <div style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 12, padding: "14px 12px", textAlign: "center" }}>
-                    <p style={{ color: "#C9A84C", fontSize: 26, fontWeight: 700, margin: "0 0 3px", fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{pageStats.views.toLocaleString("fr-FR")}</p>
-                    <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>👁 Vues</p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9, width: "100%" }}>
+                  <div style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 11, padding: "12px 10px", textAlign: "center" }}>
+                    <p style={{ color: G, fontSize: 24, fontWeight: 700, margin: "0 0 2px", fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{pageStats.views.toLocaleString("fr-FR")}</p>
+                    <p style={{ color: MUTED, fontSize: 9, margin: 0 }}>👁 Vues</p>
                   </div>
-                  <div style={{ background: "rgba(57,255,143,0.06)", border: "1px solid rgba(57,255,143,0.18)", borderRadius: 12, padding: "14px 12px", textAlign: "center" }}>
-                    <p style={{ color: "#39FF8F", fontSize: 26, fontWeight: 700, margin: "0 0 3px", fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{pageStats.scans.toLocaleString("fr-FR")}</p>
-                    <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>📱 Scans</p>
+                  <div style={{ background: "rgba(57,255,143,0.06)", border: "1px solid rgba(57,255,143,0.18)", borderRadius: 11, padding: "12px 10px", textAlign: "center" }}>
+                    <p style={{ color: "#39FF8F", fontSize: 24, fontWeight: 700, margin: "0 0 2px", fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{pageStats.scans.toLocaleString("fr-FR")}</p>
+                    <p style={{ color: MUTED, fontSize: 9, margin: 0 }}>📱 Scans</p>
                   </div>
                 </div>
 
-                {/* Status */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "8px 16px", background: pageStatus === "published" ? "rgba(57,255,143,0.06)" : "rgba(255,255,255,0.03)", border: `1px solid ${pageStatus === "published" ? "rgba(57,255,143,0.2)" : "rgba(255,255,255,0.07)"}`, borderRadius: 20, width: "fit-content" }}>
-                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: pageStatus === "published" ? "#39FF8F" : MUTED, boxShadow: pageStatus === "published" ? "0 0 6px #39FF8F60" : "none" }} />
-                  <span style={{ color: pageStatus === "published" ? "#39FF8F" : MUTED, fontSize: 11, fontWeight: 600 }}>
-                    {pageStatus === "published" ? "En ligne" : "Brouillon"}
-                  </span>
-                  <span style={{ color: MUTED, fontSize: 10 }}>• {blocks.filter(b => b.visible).length} bloc{blocks.filter(b => b.visible).length > 1 ? "s" : ""}</span>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "7px 14px", background: pageStatus==="published" ? "rgba(57,255,143,0.06)" : "rgba(255,255,255,0.03)", border: `1px solid ${pageStatus==="published" ? "rgba(57,255,143,0.2)" : "rgba(255,255,255,0.07)"}`, borderRadius: 20 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: pageStatus==="published" ? "#39FF8F" : MUTED, boxShadow: pageStatus==="published" ? "0 0 5px #39FF8F50" : "none" }} />
+                  <span style={{ color: pageStatus==="published" ? "#39FF8F" : MUTED, fontSize: 10, fontWeight: 600 }}>{pageStatus==="published" ? "En ligne" : "Brouillon"}</span>
+                  <span style={{ color: MUTED, fontSize: 9 }}>• {blocks.filter(b=>b.visible).length} bloc{blocks.filter(b=>b.visible).length!==1?"s":""}</span>
                 </div>
-
               </div>
             </div>
           )}
 
-          {/* Edit */}
-          {rightTab === "edit" && (
-            selected
-              ? <EditPanel block={selected} onChange={content => updateBlock(selected.id, content)} />
-              : (
-                <div style={{ padding: "40px 20px", textAlign: "center" }}>
-                  <p style={{ fontSize: 32, margin: "0 0 10px" }}>👆</p>
-                  <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 600, margin: "0 0 6px" }}>Selectionne un bloc</p>
-                  <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>Clique sur un bloc du canvas pour l'editer</p>
-                </div>
-              )
+          {rightTab==="edit" && (
+            <div style={{ flex: 1, overflowY: "auto", padding: 14 }}>
+              {!selectedBlock
+                ? <div style={{ textAlign: "center", padding: "50px 14px" }}>
+                    <Settings size={28} color={MUTED} style={{ margin: "0 auto 8px", opacity: 0.2, display: "block" }} />
+                    <p style={{ color: MUTED, fontSize: 12, margin: 0, lineHeight: 1.7 }}>Clique sur un bloc dans le canvas pour l&apos;éditer</p>
+                  </div>
+                : <>
+                    <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 16, paddingBottom: 12, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                      <div style={{ background: `${BLOCK_DEFS[selectedBlock.type]?.color||G}12`, border: `1px solid ${BLOCK_DEFS[selectedBlock.type]?.color||G}25`, borderRadius: 8, width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>
+                        {BLOCK_DEFS[selectedBlock.type]?.icon}
+                      </div>
+                      <div>
+                        <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 700, margin: 0 }}>{BLOCK_DEFS[selectedBlock.type]?.label}</p>
+                        <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{BLOCK_DEFS[selectedBlock.type]?.description}</p>
+                      </div>
+                      <div style={{ marginLeft: "auto", display: "flex", gap: 4 }}>
+                        <button onClick={() => duplicateBlock(selectedBlock.id)} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: MUTED, display: "flex", alignItems: "center", justifyContent: "center" }}><Copy size={10} /></button>
+                        <button onClick={() => deleteBlock(selectedBlock.id)} style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: "#EF4444", display: "flex", alignItems: "center", justifyContent: "center" }}><Trash2 size={10} /></button>
+                      </div>
+                    </div>
+                    {/* key=selectedBlock.id force le remount quand on change de bloc */}
+                    <EditPanel
+                      key={selectedBlock.id}
+                      block={selectedBlock}
+                      onChange={(key, val) => updateBlock(selectedBlock.id, key, val)}
+                    />
+                  </>
+              }
+            </div>
           )}
 
-          {/* Theme */}
-          {rightTab === "theme" && (
-            <ThemePanel theme={theme} onChange={updateTheme} />
+          {rightTab==="theme" && (
+            <div style={{ flex: 1, overflowY: "auto", padding: 14 }}>
+              <ThemePanel theme={theme} onThemeChange={setTheme} />
+            </div>
           )}
-        </div>
 
-        {/* Bottom info */}
-        <div style={{ padding: "10px 16px", borderTop: "1px solid rgba(255,255,255,0.04)", display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 8, height: 8, borderRadius: "50%", background: pageStatus === "published" ? "#39FF8F" : MUTED, boxShadow: pageStatus === "published" ? "0 0 6px #39FF8F60" : "none" }} />
-          <span style={{ color: MUTED, fontSize: 11 }}>{pageStatus === "published" ? "Page publiee" : "Brouillon"}</span>
-          {pageStatus === "published" && pageSlug && (
-            <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: "auto", color: G, fontSize: 10, textDecoration: "none" }}>
-              Voir la page →
-            </a>
+          {rightTab==="ai" && (
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+              <div style={{ flex: 1, overflowY: "auto", padding: 10, display: "flex", flexDirection: "column", gap: 8 }}>
+                {messages.map((msg, i) => (
+                  <div key={i} style={{ display: "flex", gap: 6, flexDirection: msg.role==="user" ? "row-reverse" : "row" }}>
+                    <div style={{ width: 22, height: 22, borderRadius: "50%", background: msg.role==="assistant" ? "rgba(201,168,76,0.12)" : "rgba(57,255,143,0.1)", border: `1px solid ${msg.role==="assistant" ? "rgba(201,168,76,0.3)" : "rgba(57,255,143,0.3)"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      {msg.role==="assistant" ? <Bot size={10} color={G} /> : <UserIcon size={10} color="#39FF8F" />}
+                    </div>
+                    <div style={{ maxWidth: "84%", background: msg.role==="assistant" ? "#111" : "rgba(57,255,143,0.06)", border: `1px solid ${msg.role==="assistant" ? "rgba(201,168,76,0.1)" : "rgba(57,255,143,0.2)"}`, borderRadius: msg.role==="user" ? "9px 3px 9px 9px" : "3px 9px 9px 9px", padding: "7px 10px" }}>
+                      <p style={{ color: "#F5F0E8", fontSize: 11, margin: 0, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{msg.content}</p>
+                    </div>
+                  </div>
+                ))}
+                {aiLoading && (
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}><Bot size={10} color={G} /></div>
+                    <div style={{ background: "#111", border: "1px solid rgba(201,168,76,0.1)", borderRadius: "3px 9px 9px 9px", padding: "8px 12px", display: "flex", gap: 3 }}>
+                      {[0,1,2].map(i => <div key={i} style={{ width: 4, height: 4, borderRadius: "50%", background: G, animation: `bounce 1s ease ${i*0.2}s infinite` }} />)}
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEnd} />
+              </div>
+              <div style={{ padding: "5px 8px", display: "flex", gap: 3, flexWrap: "wrap", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+                {["Freelance","Restaurant","Coach","Artiste","E-commerce","Médecin"].map(s => (
+                  <button key={s} onClick={() => sendAI(s)} style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.1)", borderRadius: 10, padding: "2px 7px", color: MUTED, fontSize: 9, cursor: "pointer" }}>{s}</button>
+                ))}
+              </div>
+              <div style={{ padding: "8px", borderTop: "1px solid rgba(201,168,76,0.1)", display: "flex", gap: 5 }}>
+                <input value={aiInput} onChange={e => setAiInput(e.target.value)}
+                  onKeyDown={e => { if (e.key==="Enter" && !e.shiftKey) { e.preventDefault(); sendAI() } }}
+                  placeholder="Décris ton activité..."
+                  style={{ flex: 1, background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 7, padding: "8px 10px", color: "#F5F0E8", fontSize: 11, outline: "none" }}
+                  onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"}
+                  onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />
+                <button onClick={() => sendAI()} disabled={aiLoading || !aiInput.trim()}
+                  style={{ background: `linear-gradient(90deg,${G},#b8953f)`, border: "none", borderRadius: 7, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", opacity: !aiInput.trim() ? 0.5 : 1, flexShrink: 0 }}>
+                  <Send size={11} color="#080808" />
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>
 
-      {/* Publish Modal */}
-      {showPublish && (
-        <PublishModal
-          slug={pageSlug}
-          onClose={() => setShowPublish(false)}
-          onPublish={async () => { await publish(); setShowPublish(false) }}
-          publishing={publishing}
-        />
-      )}
+      <style>{`
+        @keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+        .iphone-scroll::-webkit-scrollbar{display:none}
+        .block-handle:active{cursor:grabbing}
+      `}</style>
     </div>
   )
 }
