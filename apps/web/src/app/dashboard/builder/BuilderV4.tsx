@@ -779,6 +779,416 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
       )
     }
 
+
+    case "product_catalog": {
+      const products = [
+        [c.p1_img, c.p1_name, c.p1_price, c.p1_desc, c.p1_url],
+        [c.p2_img, c.p2_name, c.p2_price, c.p2_desc, c.p2_url],
+        [c.p3_img, c.p3_name, c.p3_price, c.p3_desc, c.p3_url],
+      ].filter(([,n])=>n)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {products.length===0
+              ? <div style={{ textAlign: "center", padding: "20px", color: muted, fontSize: 11 }}>Ajoutez vos produits</div>
+              : products.map(([img,name,price,desc,url],i) => (
+                <div key={i} style={{ display: "flex", gap: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, overflow: "hidden" }}>
+                  {img
+                    ? <img src={String(img)} alt="" style={{ width: 70, height: 70, objectFit: "cover", flexShrink: 0 }} />
+                    : <div style={{ width: 70, height: 70, background: "rgba(249,115,22,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>🛍️</div>}
+                  <div style={{ flex: 1, padding: "8px 10px 8px 0" }}>
+                    <p style={{ color: text, fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>{name}</p>
+                    {desc && <p style={{ color: muted, fontSize: 10, margin: "0 0 4px" }}>{desc}</p>}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <span style={{ color: primary, fontSize: 14, fontWeight: 700 }}>{price}</span>
+                      {c.cta_label && <span style={{ background: primary, color: "#080808", borderRadius: 6, padding: "3px 9px", fontSize: 10, fontWeight: 700 }}>{c.cta_label}</span>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "featured_product": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ background: `linear-gradient(135deg,${primary}10,${accent}08)`, border: `1.5px solid ${primary}30`, borderRadius: 14, overflow: "hidden" }}>
+          {c.badge && <div style={{ background: primary, color: "#080808", padding: "6px 14px", fontSize: 11, fontWeight: 700, textAlign: "center" }}>{c.badge}</div>}
+          {c.image
+            ? <img src={c.image} alt="" style={{ width: "100%", height: 160, objectFit: "cover", display: "block" }} />
+            : <div style={{ height: 120, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(249,115,22,0.06)", fontSize: 40 }}>⭐</div>}
+          <div style={{ padding: "14px" }}>
+            <p style={{ color: text, fontSize: 16, fontWeight: 700, margin: "0 0 6px", fontFamily: theme.fontDisplay }}>{c.name||"Mon produit phare"}</p>
+            {c.description && <p style={{ color: muted, fontSize: 12, margin: "0 0 10px", lineHeight: 1.5 }}>{c.description}</p>}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+              <span style={{ color: primary, fontSize: 22, fontWeight: 700 }}>{c.price||"99€"}</span>
+              {c.old_price && <span style={{ color: muted, fontSize: 14, textDecoration: "line-through" }}>{c.old_price}</span>}
+              {c.old_price && <span style={{ background: "#EF4444", color: "#fff", borderRadius: 6, padding: "2px 7px", fontSize: 10, fontWeight: 700 }}>Promo</span>}
+            </div>
+            {c.cta_label && <div style={{ background: `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#080808" }}>{c.cta_label}</div>}
+          </div>
+        </div>
+      </div>
+    )
+
+    case "offer_comparison": {
+      const plans = [
+        { name: c.plan1_name, price: c.plan1_price, features: c.plan1_features, highlight: false },
+        { name: c.plan2_name, price: c.plan2_price, features: c.plan2_features, highlight: c.plan2_highlight==="yes" },
+        { name: c.plan3_name, price: c.plan3_price, features: c.plan3_features, highlight: false },
+      ].filter(p => p.name)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", textAlign: "center" }}>{c.title}</p>}
+          <div style={{ display: "flex", gap: 7 }}>
+            {plans.map((plan, i) => (
+              <div key={i} style={{ flex: 1, background: plan.highlight ? primary+"12" : "rgba(255,255,255,0.03)", border: `1.5px solid ${plan.highlight ? primary+"50" : "rgba(255,255,255,0.08)"}`, borderRadius: 12, padding: "12px 10px", position: "relative" }}>
+                {plan.highlight && <div style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", background: primary, color: "#080808", borderRadius: 20, padding: "2px 10px", fontSize: 9, fontWeight: 700, whiteSpace: "nowrap" }}>⭐ Populaire</div>}
+                <p style={{ color: plan.highlight ? primary : text, fontSize: 11, fontWeight: 700, margin: "0 0 4px", textAlign: "center" }}>{plan.name}</p>
+                <p style={{ color: primary, fontSize: 18, fontWeight: 700, margin: "0 0 8px", textAlign: "center", fontFamily: theme.fontDisplay }}>{plan.price}</p>
+                {plan.features && plan.features.split("
+").filter(Boolean).map((f: string, j: number) => (
+                  <p key={j} style={{ color: muted, fontSize: 9, margin: "0 0 3px", display: "flex", alignItems: "center", gap: 4 }}>
+                    <span style={{ color: "#39FF8F" }}>✓</span> {f}
+                  </p>
+                ))}
+                {c.cta_label && <div style={{ background: plan.highlight ? `linear-gradient(90deg,${primary},${primary}cc)` : "rgba(255,255,255,0.06)", borderRadius: 7, padding: "8px", textAlign: "center", fontSize: 10, fontWeight: 700, color: plan.highlight ? "#080808" : text, marginTop: 8 }}>{c.cta_label}</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "packs": {
+      const packs = [
+        [c.pack1_icon, c.pack1_name, c.pack1_price, c.pack1_content, c.pack1_url],
+        [c.pack2_icon, c.pack2_name, c.pack2_price, c.pack2_content, c.pack2_url],
+        [c.pack3_icon, c.pack3_name, c.pack3_price, c.pack3_content, c.pack3_url],
+      ].filter(([,n])=>n)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {packs.map(([icon, name, price, content, url], i) => (
+              <div key={i} style={{ background: i===1 ? primary+"10" : "rgba(255,255,255,0.03)", border: `1.5px solid ${i===1 ? primary+"35" : "rgba(255,255,255,0.07)"}`, borderRadius: 12, padding: "13px 14px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 20 }}>{icon||"🚀"}</span>
+                    <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: 0 }}>{name}</p>
+                  </div>
+                  <span style={{ color: primary, fontSize: 16, fontWeight: 700 }}>{price}</span>
+                </div>
+                {content && content.split("
+").filter(Boolean).map((line: string, j: number) => (
+                  <p key={j} style={{ color: muted, fontSize: 11, margin: "0 0 3px", display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ color: "#39FF8F", fontSize: 10 }}>✓</span> {line}
+                  </p>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "before_after": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        {c.title && <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 10px", textAlign: "center" }}>{c.title}</p>}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          <div style={{ borderRadius: 10, overflow: "hidden" }}>
+            {c.before_img
+              ? <img src={c.before_img} alt="Avant" style={{ width: "100%", height: 120, objectFit: "cover", display: "block" }} />
+              : <div style={{ height: 120, background: "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>📸</div>}
+            <div style={{ background: "rgba(239,68,68,0.15)", padding: "5px", textAlign: "center" }}>
+              <p style={{ color: "#EF4444", fontSize: 11, fontWeight: 700, margin: 0 }}>{c.before_label||"Avant"}</p>
+            </div>
+          </div>
+          <div style={{ borderRadius: 10, overflow: "hidden" }}>
+            {c.after_img
+              ? <img src={c.after_img} alt="Après" style={{ width: "100%", height: 120, objectFit: "cover", display: "block" }} />
+              : <div style={{ height: 120, background: "rgba(57,255,143,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>✨</div>}
+            <div style={{ background: "rgba(57,255,143,0.15)", padding: "5px", textAlign: "center" }}>
+              <p style={{ color: "#39FF8F", fontSize: 11, fontWeight: 700, margin: 0 }}>{c.after_label||"Après"}</p>
+            </div>
+          </div>
+        </div>
+        {c.description && <p style={{ color: muted, fontSize: 11, textAlign: "center", margin: "8px 0 0" }}>{c.description}</p>}
+      </div>
+    )
+
+    case "portfolio_work": {
+      const works = [[c.work1_img,c.work1_title,c.work1_desc],[c.work2_img,c.work2_title,c.work2_desc],[c.work3_img,c.work3_title,c.work3_desc]].filter(([,t])=>t)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            {works.map(([img,title,desc],i) => (
+              <div key={i} style={{ borderRadius: 10, overflow: "hidden", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                {img
+                  ? <img src={String(img)} alt="" style={{ width: "100%", height: 80, objectFit: "cover", display: "block" }} />
+                  : <div style={{ height: 80, background: primary+"08", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>📂</div>}
+                <div style={{ padding: "8px" }}>
+                  <p style={{ color: text, fontSize: 11, fontWeight: 700, margin: "0 0 2px" }}>{title}</p>
+                  {desc && <p style={{ color: muted, fontSize: 9, margin: 0 }}>{desc}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+          {c.cta_label && <div style={{ marginTop: 10, background: primary+"10", border: `1px solid ${primary}25`, borderRadius: 9, padding: "10px", textAlign: "center", fontSize: 12, fontWeight: 700, color: primary }}>{c.cta_label}</div>}
+        </div>
+      )
+    }
+
+    case "google_reviews_block": {
+      const reviews = [[c.r1_name,c.r1_text,c.r1_stars],[c.r2_name,c.r2_text,c.r2_stars],[c.r3_name,c.r3_text,c.r3_stars]].filter(([n])=>n)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {(c.avg_rating || c.title) && (
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12, padding: "10px 12px", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.2)", borderRadius: 10 }}>
+              <div style={{ textAlign: "center" }}>
+                <p style={{ color: "#FBBF24", fontSize: 28, fontWeight: 700, margin: 0, fontFamily: theme.fontDisplay }}>{c.avg_rating||"5.0"}</p>
+                <div style={{ display: "flex", gap: 2 }}>{[1,2,3,4,5].map(i => <span key={i} style={{ color: "#FBBF24", fontSize: 10 }}>★</span>)}</div>
+              </div>
+              <div>
+                <p style={{ color: text, fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>{c.title||"Avis clients"}</p>
+                {c.total_reviews && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{c.total_reviews} avis</p>}
+              </div>
+            </div>
+          )}
+          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+            {reviews.map(([name,text_review,stars],i) => (
+              <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, padding: "10px 12px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                  <p style={{ color: text, fontSize: 11, fontWeight: 700, margin: 0 }}>{name}</p>
+                  <p style={{ color: "#FBBF24", fontSize: 10, margin: 0 }}>{"★".repeat(parseInt(stars||"5"))}</p>
+                </div>
+                <p style={{ color: muted, fontSize: 11, margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>"{text_review}"</p>
+              </div>
+            ))}
+          </div>
+          {c.google_url && <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#4285F4", fontSize: 11, fontWeight: 600 }}>
+            <span>📍</span> Voir sur Google
+          </div>}
+        </div>
+      )
+    }
+
+    case "business_stats": {
+      const stats = [
+        [c.stat1_icon, c.stat1_value, c.stat1_label],
+        [c.stat2_icon, c.stat2_value, c.stat2_label],
+        [c.stat3_icon, c.stat3_value, c.stat3_label],
+        [c.stat4_icon, c.stat4_value, c.stat4_label],
+      ].filter(([,v])=>v)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          <div style={{ display: "grid", gridTemplateColumns: stats.length<=2 ? "1fr 1fr" : stats.length===3 ? "1fr 1fr 1fr" : "1fr 1fr", gap: 8 }}>
+            {stats.map(([icon,value,label],i) => (
+              <div key={i} style={{ background: primary+"08", border: `1px solid ${primary}15`, borderRadius: 12, padding: "14px 10px", textAlign: "center" }}>
+                {icon && <span style={{ fontSize: 20, display: "block", marginBottom: 5 }}>{icon}</span>}
+                <p style={{ color: primary, fontSize: 22, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay, lineHeight: 1 }}>{value}</p>
+                <p style={{ color: muted, fontSize: 10, margin: 0 }}>{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "partners": {
+      const logos = [
+        [c.logo1_img, c.logo1_name],[c.logo2_img, c.logo2_name],[c.logo3_img, c.logo3_name],
+        [c.logo4_img, c.logo4_name],[c.logo5_img, c.logo5_name],[c.logo6_img, c.logo6_name],
+      ].filter(([,n])=>n)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", textAlign: "center" }}>{c.title}</p>}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
+            {logos.length===0
+              ? [0,1,2,3,4,5].map(i => <div key={i} style={{ height: 44, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", color: muted, fontSize: 10 }}>Logo</div>)
+              : logos.map(([img,name],i) => (
+                <div key={i} style={{ height: 44, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                  {img
+                    ? <img src={String(img)} alt={String(name)} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", padding: 4 }} />
+                    : <p style={{ color: muted, fontSize: 10, margin: 0, textAlign: "center", padding: "0 4px" }}>{name}</p>}
+                </div>
+              ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "brands": {
+      const brandList = [
+        [c.brand1_icon, c.brand1_name],[c.brand2_icon, c.brand2_name],[c.brand3_icon, c.brand3_name],
+        [c.brand4_icon, c.brand4_name],[c.brand5_icon, c.brand5_name],[c.brand6_icon, c.brand6_name],
+      ].filter(([,n])=>n)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+            {brandList.map(([icon,name],i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: "5px 12px" }}>
+                {icon && <span style={{ fontSize: 16 }}>{icon}</span>}
+                <span style={{ color: text, fontSize: 11, fontWeight: 600 }}>{name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "gift_card": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ background: `linear-gradient(135deg,#EC489915,#F472B610)`, border: "1.5px solid rgba(236,72,153,0.3)", borderRadius: 14, padding: "16px" }}>
+          <div style={{ textAlign: "center", marginBottom: 12 }}>
+            <span style={{ fontSize: 32 }}>🎁</span>
+            <p style={{ color: text, fontSize: 15, fontWeight: 700, margin: "6px 0 3px" }}>{c.title||"Offrez une expérience"}</p>
+            {c.description && <p style={{ color: muted, fontSize: 11, margin: 0 }}>{c.description}</p>}
+          </div>
+          <div style={{ display: "flex", gap: 7, justifyContent: "center", marginBottom: 12 }}>
+            {[c.amount1, c.amount2, c.amount3].filter(Boolean).map((amount, i) => (
+              <div key={i} style={{ background: i===1 ? "rgba(236,72,153,0.2)" : "rgba(255,255,255,0.06)", border: `1.5px solid ${i===1 ? "rgba(236,72,153,0.4)" : "rgba(255,255,255,0.1)"}`, borderRadius: 10, padding: "10px 14px", textAlign: "center" }}>
+                <p style={{ color: i===1 ? "#EC4899" : text, fontSize: 16, fontWeight: 700, margin: 0 }}>{amount}</p>
+              </div>
+            ))}
+          </div>
+          {c.cta_label && <div style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 10, padding: "11px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff" }}>{c.cta_label}</div>}
+        </div>
+      </div>
+    )
+
+    case "services_pricing": {
+      const svcs = [
+        [c.s1_name, c.s1_price, c.s1_duration, c.s1_desc],
+        [c.s2_name, c.s2_price, c.s2_duration, c.s2_desc],
+        [c.s3_name, c.s3_price, c.s3_duration, c.s3_desc],
+        [c.s4_name, c.s4_price, c.s4_duration, c.s4_desc],
+        [c.s5_name, c.s5_price, c.s5_duration, c.s5_desc],
+      ].filter(([n])=>n)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+            {svcs.map(([name, price, duration, desc], i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0", borderBottom: i<svcs.length-1 ? `1px solid ${dayMode?"rgba(0,0,0,0.06)":"rgba(255,255,255,0.05)"}` : "none" }}>
+                <div style={{ flex: 1 }}>
+                  <p style={{ color: text, fontSize: 13, fontWeight: 600, margin: "0 0 1px" }}>{name}</p>
+                  {desc && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{desc}</p>}
+                </div>
+                <div style={{ textAlign: "right", flexShrink: 0 }}>
+                  <p style={{ color: primary, fontSize: 14, fontWeight: 700, margin: 0 }}>{price}</p>
+                  {duration && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{duration}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "external_shop": return (
+      <div style={{ padding: "4px 16px 12px", ...s }}>
+        {c.description && <p style={{ color: muted, fontSize: 12, margin: "0 0 10px", textAlign: "center" }}>{c.description}</p>}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: primary+"10", border: `1.5px solid ${primary}30`, borderRadius: 12, padding: "14px 18px" }}>
+          <span style={{ fontSize: 20 }}>🛒</span>
+          <div>
+            <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label||"Voir la boutique"}</p>
+            {c.platform && <p style={{ color: muted, fontSize: 9, margin: 0 }}>via {c.platform}</p>}
+          </div>
+          <ExternalLink size={13} color={primary} style={{ marginLeft: "auto" }} />
+        </div>
+      </div>
+    )
+
+    case "advantages": {
+      const advList = [c.adv1, c.adv2, c.adv3, c.adv4, c.adv5, c.adv6].filter(Boolean)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+            {advList.length===0
+              ? <p style={{ color: muted, fontSize: 11, textAlign: "center", margin: 0 }}>Ajoutez vos avantages</p>
+              : advList.map((adv: string, i: number) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", background: "rgba(57,255,143,0.05)", border: "1px solid rgba(57,255,143,0.15)", borderRadius: 9 }}>
+                  <p style={{ color: text, fontSize: 13, margin: 0 }}>{adv}</p>
+                </div>
+              ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "reassurance": {
+      const guarantees = [
+        [c.g1_icon, c.g1_label, c.g1_desc],
+        [c.g2_icon, c.g2_label, c.g2_desc],
+        [c.g3_icon, c.g3_label, c.g3_desc],
+        [c.g4_icon, c.g4_label, c.g4_desc],
+      ].filter(([,l])=>l)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          <div style={{ display: "grid", gridTemplateColumns: guarantees.length<=2 ? "1fr 1fr" : "1fr 1fr", gap: 8 }}>
+            {guarantees.map(([icon, label, desc], i) => (
+              <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, background: "rgba(57,255,143,0.05)", border: "1px solid rgba(57,255,143,0.12)", borderRadius: 11, padding: "12px 8px", textAlign: "center" }}>
+                <span style={{ fontSize: 24 }}>{icon||"✅"}</span>
+                <p style={{ color: text, fontSize: 11, fontWeight: 700, margin: 0 }}>{label}</p>
+                {desc && <p style={{ color: muted, fontSize: 9, margin: 0 }}>{desc}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "sales_counter": return (
+      <div style={{ padding: "10px 16px", ...s }}>
+        <div style={{ background: "rgba(239,68,68,0.08)", border: "1.5px solid rgba(239,68,68,0.25)", borderRadius: 14, padding: "16px", textAlign: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: c.subtext ? 6 : 0 }}>
+            <span style={{ fontSize: 28 }}>{c.emoji||"🔥"}</span>
+            <div>
+              <p style={{ color: "#EF4444", fontSize: 28, fontWeight: 700, margin: 0, fontFamily: theme.fontDisplay, lineHeight: 1 }}>
+                <span style={{ color: text }}>{c.count||"127"}</span> <span style={{ fontSize: 14 }}>{c.label||"ventes"}</span>
+              </p>
+              {c.period && <p style={{ color: muted, fontSize: 11, margin: 0 }}>{c.period}</p>}
+            </div>
+          </div>
+          {c.subtext && <p style={{ color: "#EF4444", fontSize: 12, fontWeight: 600, margin: 0 }}>{c.subtext}</p>}
+        </div>
+      </div>
+    )
+
+    case "popular_products": {
+      const tops = [
+        [c.p1_rank, c.p1_img, c.p1_name, c.p1_price, c.p1_sales, c.p1_url],
+        [c.p2_rank, c.p2_img, c.p2_name, c.p2_price, c.p2_sales, c.p2_url],
+        [c.p3_rank, null, c.p3_name, c.p3_price, c.p3_sales, c.p3_url],
+      ].filter(([,, n])=>n)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {tops.map(([rank, img, name, price, sales], i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, background: i===0 ? primary+"08" : "rgba(255,255,255,0.03)", border: `1px solid ${i===0 ? primary+"20" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, padding: "10px 12px" }}>
+                {rank && <span style={{ fontSize: 18, flexShrink: 0 }}>{rank.split(" ")[0]}</span>}
+                {img
+                  ? <img src={String(img)} alt="" style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 7, flexShrink: 0 }} />
+                  : <div style={{ width: 40, height: 40, background: primary+"10", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🏆</div>}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ color: text, fontSize: 12, fontWeight: 700, margin: "0 0 1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</p>
+                  {sales && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{sales}</p>}
+                </div>
+                {price && <span style={{ color: primary, fontSize: 13, fontWeight: 700, flexShrink: 0 }}>{price}</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
     default: {
       const def = BLOCK_DEFS[block.type]
       return <div style={{ padding: "12px 16px", textAlign: "center", ...s }}><span style={{ fontSize: 22 }}>{def?.icon||"📦"}</span><p style={{ color: muted, fontSize: 11, margin: "5px 0 0" }}>{def?.label||block.type}</p></div>
