@@ -3324,6 +3324,53 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
                   </div>
                 )}
               </div>
+
+              {/* Overlay couleur */}
+              <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_overlay ? 10 : 0 }}>
+                  <label style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600 }}>🎨 Overlay</label>
+                  <button onClick={() => onThemeChange({...theme, effect_overlay: !(theme as any).effect_overlay} as any)}
+                    style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_overlay ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
+                    <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_overlay ? 18 : 2, transition: "left 0.2s" }} />
+                  </button>
+                </div>
+                {(theme as any).effect_overlay && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    <div style={{ display: "flex", gap: 7, alignItems: "center" }}>
+                      <input type="color" value={(theme as any).overlay_color||"#000000"}
+                        onChange={e => onThemeChange({...theme, overlay_color: e.target.value} as any)}
+                        style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }} />
+                      <span style={{ color: MUTED, fontSize: 11 }}>Couleur de l overlay</span>
+                    </div>
+                    <div>
+                      <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Opacité: {(theme as any).overlay_opacity||30}%</label>
+                      <input type="range" min="1" max="90" value={(theme as any).overlay_opacity||30}
+                        onChange={e => onThemeChange({...theme, overlay_opacity: parseInt(e.target.value)} as any)}
+                        style={{ width: "100%", accentColor: G }} />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Blur global */}
+              <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_blur ? 10 : 0 }}>
+                  <label style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600 }}>💧 Blur</label>
+                  <button onClick={() => onThemeChange({...theme, effect_blur: !(theme as any).effect_blur} as any)}
+                    style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_blur ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
+                    <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_blur ? 18 : 2, transition: "left 0.2s" }} />
+                  </button>
+                </div>
+                {(theme as any).effect_blur && (
+                  <div>
+                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Intensité: {(theme as any).blur_amount||4}px</label>
+                    <input type="range" min="1" max="20" value={(theme as any).blur_amount||4}
+                      onChange={e => onThemeChange({...theme, blur_amount: parseInt(e.target.value)} as any)}
+                      style={{ width: "100%", accentColor: G }} />
+                    <p style={{ color: MUTED, fontSize: 9, margin: "5px 0 0" }}>⚠ S applique au fond — les blocs restent nets</p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -4568,8 +4615,15 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
 
             <div style={{ ...bgStyle(), borderRadius: 20, overflow: "hidden", minHeight: 200, position: "relative", boxShadow: "0 8px 60px rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.05)" }}>
             {/* Effets overlay */}
+            {(theme as any).effect_noise && (
+              <div style={{ position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none", opacity: (theme as any).noise_opacity ? (theme as any).noise_opacity/100 : 0.06, mixBlendMode: "overlay" as const, backgroundImage: "url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")", backgroundRepeat: "repeat", backgroundSize: "128px 128px" }} />
+            )}
             {(theme as any).effect_glow && <div style={{ position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none", background: `radial-gradient(ellipse at 50% 0%, ${(theme as any).glow_color||"#C9A84C"}${Math.round(((theme as any).glow_intensity||40)/100*180).toString(16).padStart(2,"0")}, transparent ${(theme as any).glow_size||300}px)` }} />}
+            {(theme as any).effect_overlay && <div style={{ position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none", background: (theme as any).overlay_color||"#000000", opacity: ((theme as any).overlay_opacity||30)/100 }} />}
             {(theme as any).effect_vignette && <div style={{ position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none", background: `radial-gradient(ellipse at 50% 50%, transparent ${Math.max(10, 100-((theme as any).vignette_intensity||40))}%, rgba(0,0,0,${((theme as any).vignette_intensity||40)/100}) 100%)` }} />}
+            {(theme as any).effect_blur && (
+              <div style={{ position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none", backdropFilter: `blur(${(theme as any).blur_amount||4}px)`, WebkitBackdropFilter: `blur(${(theme as any).blur_amount||4}px)` }} />
+            )}
             {blocks.length===0 ? (
               <div style={{ padding: "60px 30px", textAlign: "center" }}>
                 <p style={{ color: "#4A4640", fontSize: 28, margin: "0 0 8px" }}>✦</p>
