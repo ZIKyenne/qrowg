@@ -3166,6 +3166,65 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
   const messagesEnd = useRef<HTMLDivElement>(null)
   const saveTimeout = useRef<ReturnType<typeof setTimeout>>()
 
+  // ── États collapse panneaux ────────────────────────────────────────────────
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    if (typeof window !== "undefined") return localStorage.getItem("qrfolio_sidebar_collapsed") === "true"
+    return false
+  })
+  const [blocksCollapsed, setBlocksCollapsed] = useState(() => {
+    if (typeof window !== "undefined") return localStorage.getItem("qrfolio_blocks_collapsed") === "true"
+    return false
+  })
+  const [rightCollapsed, setRightCollapsed] = useState(false)
+  const [focusMode, setFocusMode] = useState(false)
+  const [drawerCategory, setDrawerCategory] = useState<string|null>(null)
+  const drawerRef = useRef<HTMLDivElement>(null)
+
+  // Persister collapse sidebar
+  useEffect(() => {
+    if (typeof window !== "undefined") localStorage.setItem("qrfolio_sidebar_collapsed", String(sidebarCollapsed))
+  }, [sidebarCollapsed])
+
+  useEffect(() => {
+    if (typeof window !== "undefined") localStorage.setItem("qrfolio_blocks_collapsed", String(blocksCollapsed))
+  }, [blocksCollapsed])
+
+  // Raccourci clavier F = Focus Mode
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.key === "f" || e.key === "F") && !e.ctrlKey && !e.metaKey && !(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLTextAreaElement)) {
+        setFocusMode(prev => {
+          const next = !prev
+          if (next) { setSidebarCollapsed(true); setBlocksCollapsed(true); setRightCollapsed(true) }
+          else { setSidebarCollapsed(false); setBlocksCollapsed(false); setRightCollapsed(false) }
+          return next
+        })
+      }
+    }
+    window.addEventListener("keydown", handler)
+    return () => window.removeEventListener("keydown", handler)
+  }, [])
+
+  // Fermer drawer au clic extérieur
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (drawerRef.current && !drawerRef.current.contains(e.target as Node)) setDrawerCategory(null)
+    }
+    if (drawerCategory) document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [drawerCategory])
+
+  function toggleSidebar() { setSidebarCollapsed(p => !p); setFocusMode(false) }
+  function toggleBlocks() { setBlocksCollapsed(p => !p); setFocusMode(false) }
+  function toggleRight() { setRightCollapsed(p => !p); setFocusMode(false) }
+  function toggleFocus() {
+    setFocusMode(p => {
+      const next = !p
+      setSidebarCollapsed(next); setBlocksCollapsed(next); setRightCollapsed(next)
+      return next
+    })
+  }
+
   useEffect(() => { messagesEnd.current?.scrollIntoView({ behavior: "smooth" }) }, [messages])
 
   useEffect(() => {
@@ -3336,7 +3395,11 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         {!pageId && <span style={{ color: "#4A4640", fontSize: 9 }}>Mode démo</span>}
         <div style={{ flex: 1 }} />
 
-
+        {/* Bouton Focus Mode */}
+        <button onClick={toggleFocus} title="Mode Focus — touche F"
+          style={{ display: "flex", alignItems: "center", gap: 5, background: focusMode ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.04)", border: `1px solid ${focusMode ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.08)"}`, borderRadius: 7, padding: "5px 10px", color: focusMode ? G : MUTED, fontSize: 10, fontWeight: focusMode ? 700 : 400, cursor: "pointer" }}>
+          {focusMode ? "⊞" : "⊡"} Focus
+        </button>
 
         <button onClick={() => setRightTab(t => t==="theme" ? "preview" : "theme")} style={{ display: "flex", alignItems: "center", gap: 5, background: rightTab==="theme" ? "rgba(201,168,76,0.12)" : "transparent", border: `1px solid ${rightTab==="theme" ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.2)"}`, borderRadius: 7, padding: "5px 11px", color: rightTab==="theme" ? G : MUTED, fontSize: 11, cursor: "pointer" }}>
           <Palette size={11} /> Thème
@@ -3452,23 +3515,39 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
       </div>
 
       {/* BODY */}
-      <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+      <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
 
         {/* SIDEBAR BLOCS */}
-        <div style={{ width: 230, background: "#0A0A0A", borderRight: "1px solid rgba(201,168,76,0.1)", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden" }}>
-          <div style={{ padding: "10px 8px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
-            <div style={{ position: "relative" }}>
-              <Search size={11} style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", color: MUTED }} />
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher un bloc..."
-                style={{ width: "100%", background: "#111", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 7, padding: "7px 7px 7px 24px", color: "#F5F0E8", fontSize: 11, outline: "none", boxSizing: "border-box" }}
-                onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.4)"}
-                onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.15)"} />
-              {search && <button onClick={() => setSearch("")} style={{ position: "absolute", right: 7, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 0 }}><X size={10} /></button>}
+        <div style={{ width: blocksCollapsed ? 64 : 230, background: "#0A0A0A", borderRight: "1px solid rgba(201,168,76,0.1)", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden", transition: "width 0.25s ease", position: "relative" }}>
+          {/* Bouton collapse/expand */}
+          <button onClick={toggleBlocks} title={blocksCollapsed ? "Ouvrir" : "Réduire"}
+            style={{ position: "absolute", top: 8, right: 8, zIndex: 20, width: 22, height: 22, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10 }}>
+            {blocksCollapsed ? "›" : "‹"}
+          </button>
+          {/* Mode étendu: recherche normale */}
+          {!blocksCollapsed && (
+            <div style={{ padding: "10px 8px 10px 10px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
+              <div style={{ position: "relative" }}>
+                <Search size={11} style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", color: MUTED }} />
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher un bloc..."
+                  style={{ width: "100%", background: "#111", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 7, padding: "7px 7px 7px 24px", color: "#F5F0E8", fontSize: 11, outline: "none", boxSizing: "border-box" }}
+                  onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.4)"}
+                  onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.15)"} />
+                {search && <button onClick={() => setSearch("")} style={{ position: "absolute", right: 7, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 0 }}><X size={10} /></button>}
+              </div>
             </div>
-          </div>
+          )}
+          {/* Mode réduit: icône loupe */}
+          {blocksCollapsed && (
+            <div style={{ padding: "10px 0", display: "flex", justifyContent: "center", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
+              <button onClick={toggleBlocks} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 4 }}>
+                <Search size={16} />
+              </button>
+            </div>
+          )}
 
-          {!search && (
-            <div style={{ padding: "7px 8px 5px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
+          {!search && !blocksCollapsed && (
+            <div style={{ padding: "7px 8px 5px 10px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {BLOCK_CATEGORIES.map(cat => (
                   <button key={cat.id} onClick={() => setActiveCategory(cat.id)} title={cat.desc}
@@ -3481,8 +3560,20 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
               <p style={{ color: MUTED, fontSize: 10, margin: "6px 0 0", paddingLeft: 2 }}>{BLOCK_CATEGORIES.find(c => c.id===activeCategory)?.desc}</p>
             </div>
           )}
+          {/* Mode réduit : icônes catégories + drawer flottant */}
+          {blocksCollapsed && (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "8px 4px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
+              {BLOCK_CATEGORIES.map(cat => (
+                <button key={cat.id} onClick={() => { setDrawerCategory(drawerCategory===cat.id ? null : cat.id); setActiveCategory(cat.id) }}
+                  title={cat.label}
+                  style={{ width: 44, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: (drawerCategory===cat.id || activeCategory===cat.id) ? cat.color+"18" : "transparent", border: `1px solid ${(drawerCategory===cat.id || activeCategory===cat.id) ? cat.color+"40" : "transparent"}`, borderRadius: 8, cursor: "pointer", fontSize: 16, transition: "all 0.15s" }}>
+                  {cat.icon}
+                </button>
+              ))}
+            </div>
+          )}
 
-          <div style={{ flex: 1, overflowY: "auto", padding: "5px 6px" }}>
+          {!blocksCollapsed && <div style={{ flex: 1, overflowY: "auto", padding: "5px 6px" }}>
             {filteredBlocks.length===0
               ? <div style={{ padding: "20px 10px", textAlign: "center" }}><p style={{ color: MUTED, fontSize: 11, margin: 0 }}>Aucun résultat</p></div>
               : filteredBlocks.map(([type, def]) => (
@@ -3497,11 +3588,38 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                   </div>
                 </button>
               ))}
-          </div>
+          </div>}
         </div>
 
+        {/* DRAWER FLOTTANT — mode réduit blocs */}
+        {blocksCollapsed && drawerCategory && (
+          <div ref={drawerRef} style={{ position: "absolute", left: 64, top: 0, width: 240, height: "100%", background: "#0D0D0D", borderRight: "1px solid rgba(201,168,76,0.15)", zIndex: 50, display: "flex", flexDirection: "column", boxShadow: "4px 0 24px rgba(0,0,0,0.5)" }}>
+            <div style={{ padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                <span style={{ fontSize: 14 }}>{BLOCK_CATEGORIES.find(c => c.id===drawerCategory)?.icon}</span>
+                <span style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 700 }}>{BLOCK_CATEGORIES.find(c => c.id===drawerCategory)?.label}</span>
+              </div>
+              <button onClick={() => setDrawerCategory(null)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 2 }}><X size={13} /></button>
+            </div>
+            <div style={{ flex: 1, overflowY: "auto", padding: "5px 6px" }}>
+              {Object.entries(BLOCK_DEFS).filter(([, def]) => def.category === drawerCategory).map(([type, def]) => (
+                <button key={type} onClick={() => { addBlock(type); setDrawerCategory(null) }}
+                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 2 }}
+                  onMouseEnter={e => { const el = e.currentTarget; el.style.background = BLOCK_DEFS[type]?.color+"10"; el.style.color = "#F5F0E8" }}
+                  onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = MUTED }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 7, background: def.color+"12", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
+                    <p style={{ margin: 0, fontSize: 9, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.description}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* CANVAS */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "20px", background: "#101010", backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "32px 32px" }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: "20px", background: "#0A0A0A" }}>
           <div style={{ maxWidth: 640, margin: "0 auto" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, padding: "6px 12px", background: "rgba(10,10,10,0.8)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 9, backdropFilter: "blur(10px)", position: "sticky", top: 0, zIndex: 10 }}>
               <span style={{ fontSize: 9, letterSpacing: 2, textTransform: "uppercase", color: "#4A4640" }}>CANVAS</span>
@@ -3581,17 +3699,33 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         </div>
 
         {/* PANEL DROIT */}
-        <div style={{ width: 340, background: "#161616", borderLeft: "1px solid rgba(201,168,76,0.12)", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden" }}>
+        <div style={{ width: rightCollapsed ? 48 : 340, background: "#161616", borderLeft: "1px solid rgba(201,168,76,0.12)", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden", transition: "width 0.25s ease", position: "relative" }}>
           <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
-            {(["preview","edit","theme"] as const).map(tab => (
-              <button key={tab} onClick={() => setRightTab(tab)}
-                style={{ flex: 1, padding: "11px 4px", background: "transparent", border: "none", borderBottom: `2px solid ${rightTab===tab ? G : "transparent"}`, color: rightTab===tab ? G : MUTED, fontSize: 12, fontWeight: rightTab===tab ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
-                {tab==="preview" ? "Preview" : tab==="edit" ? "Éditer" : "Thème"}
-              </button>
-            ))}
+            {rightCollapsed
+              ? /* Mode réduit: onglets verticaux */
+                <div style={{ display: "flex", flexDirection: "column", width: "100%", gap: 0 }}>
+                  {(["preview","edit","theme"] as const).map(tab => (
+                    <button key={tab} onClick={() => { setRightTab(tab); setRightCollapsed(false) }}
+                      style={{ padding: "14px 4px", background: "transparent", border: "none", borderLeft: `2px solid ${rightTab===tab ? G : "transparent"}`, color: rightTab===tab ? G : MUTED, fontSize: 9, fontWeight: rightTab===tab ? 700 : 400, cursor: "pointer", writingMode: "vertical-rl" as const, textOrientation: "mixed" as const, letterSpacing: 1 }}>
+                      {tab==="preview" ? "▶" : tab==="edit" ? "✏" : "🎨"}
+                    </button>
+                  ))}
+                  <button onClick={toggleRight} style={{ padding: "12px 4px", background: "none", border: "none", color: MUTED, cursor: "pointer", fontSize: 14, marginTop: "auto" }}>›</button>
+                </div>
+              : /* Mode normal: onglets horizontaux */
+                <>
+                  {(["preview","edit","theme"] as const).map(tab => (
+                    <button key={tab} onClick={() => setRightTab(tab)}
+                      style={{ flex: 1, padding: "11px 4px", background: "transparent", border: "none", borderBottom: `2px solid ${rightTab===tab ? G : "transparent"}`, color: rightTab===tab ? G : MUTED, fontSize: 12, fontWeight: rightTab===tab ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                      {tab==="preview" ? "Preview" : tab==="edit" ? "Éditer" : "Thème"}
+                    </button>
+                  ))}
+                  <button onClick={toggleRight} title="Réduire" style={{ padding: "11px 8px", background: "none", border: "none", color: MUTED, cursor: "pointer", fontSize: 12 }}>‹</button>
+                </>
+            }
           </div>
 
-          {rightTab==="preview" && (
+          {!rightCollapsed && rightTab==="preview" && (
             <div style={{ flex: 1, overflowY: "auto", padding: "14px 10px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
@@ -3681,7 +3815,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
             </div>
           )}
 
-          {rightTab==="edit" && (
+          {!rightCollapsed && rightTab==="edit" && (
             <div style={{ flex: 1, overflowY: "auto", padding: 14 }}>
               {!selectedBlock
                 ? <div style={{ textAlign: "center", padding: "50px 14px" }}>
@@ -3713,7 +3847,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
             </div>
           )}
 
-          {rightTab==="theme" && (
+          {!rightCollapsed && rightTab==="theme" && (
             <div style={{ flex: 1, overflowY: "auto", padding: 14 }}>
               <ThemePanel theme={theme} onThemeChange={setTheme} />
             </div>
@@ -3729,6 +3863,8 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         @keyframes auroraShift{0%{background-position:0% 0%}33%{background-position:100% 0%}66%{background-position:50% 100%}100%{background-position:0% 0%}}
         .iphone-scroll::-webkit-scrollbar{display:none}
         .block-handle:active{cursor:grabbing}
+        .panel-collapse{transition:width 0.25s cubic-bezier(0.4,0,0.2,1)}
+        .focus-mode .sidebar{width:64px!important}
       `}</style>
     </div>
   )
