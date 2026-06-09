@@ -1372,6 +1372,249 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
       )
     }
 
+
+    case "stats_block": {
+      const stats = [[c.s1_icon,c.s1_value,c.s1_label],[c.s2_icon,c.s2_value,c.s2_label],[c.s3_icon,c.s3_value,c.s3_label],[c.s4_icon,c.s4_value,c.s4_label]].filter(([,v])=>v)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          <div style={{ display: "grid", gridTemplateColumns: stats.length<=2 ? "1fr 1fr" : stats.length===3 ? "1fr 1fr 1fr" : "1fr 1fr", gap: 8 }}>
+            {stats.length===0
+              ? [0,1,2].map(i => <div key={i} style={{ background: primary+"08", border: `1px solid ${primary}15`, borderRadius: 12, padding: "14px 10px", textAlign: "center" }}><p style={{ color: primary, fontSize: 22, fontWeight: 700, margin: "0 0 3px" }}>—</p><p style={{ color: muted, fontSize: 10, margin: 0 }}>Label</p></div>)
+              : stats.map(([icon,value,label],i) => (
+                <div key={i} style={{ background: primary+"08", border: `1px solid ${primary}15`, borderRadius: 12, padding: "14px 10px", textAlign: "center" }}>
+                  {icon && <span style={{ fontSize: 20, display: "block", marginBottom: 4 }}>{icon}</span>}
+                  <p style={{ color: primary, fontSize: 22, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay, lineHeight: 1 }}>{value}</p>
+                  <p style={{ color: muted, fontSize: 10, margin: 0 }}>{label}</p>
+                </div>
+              ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "scan_counter": return (
+      <div style={{ padding: "14px 16px", textAlign: "center", ...s }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(57,255,143,0.08)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 14, padding: "16px 24px" }}>
+          <span style={{ fontSize: 28 }}>{c.emoji||"📱"}</span>
+          <div>
+            <p style={{ color: "#39FF8F", fontSize: 32, fontWeight: 700, margin: 0, fontFamily: theme.fontDisplay, lineHeight: 1 }}>1 284</p>
+            <p style={{ color: muted, fontSize: 11, margin: "3px 0 0" }}>{c.label||"scans QR ce mois"}</p>
+          </div>
+        </div>
+      </div>
+    )
+
+    case "timeline": {
+      const events = [[c.e1_date,c.e1_title,c.e1_desc],[c.e2_date,c.e2_title,c.e2_desc],[c.e3_date,c.e3_title,c.e3_desc],[c.e4_date,c.e4_title,c.e4_desc]].filter(([,t])=>t)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 14px" }}>{c.title}</p>}
+          <div style={{ position: "relative", paddingLeft: 20 }}>
+            <div style={{ position: "absolute", left: 6, top: 8, bottom: 8, width: 2, background: `linear-gradient(180deg,${primary},${primary}40)`, borderRadius: 1 }} />
+            {events.length===0
+              ? [0,1,2].map(i => (
+                <div key={i} style={{ position: "relative", marginBottom: 16 }}>
+                  <div style={{ position: "absolute", left: -17, top: 4, width: 10, height: 10, borderRadius: "50%", background: primary, border: `2px solid ${primary}40` }} />
+                  <p style={{ color: primary, fontSize: 11, fontWeight: 700, margin: "0 0 2px" }}>202{i+2}</p>
+                  <p style={{ color: text, fontSize: 12, fontWeight: 600, margin: "0 0 2px" }}>Étape {i+1}</p>
+                  <p style={{ color: muted, fontSize: 11, margin: 0 }}>Description</p>
+                </div>
+              ))
+              : events.map(([date,title,desc],i) => (
+                <div key={i} style={{ position: "relative", marginBottom: i<events.length-1 ? 16 : 0 }}>
+                  <div style={{ position: "absolute", left: -17, top: 4, width: 10, height: 10, borderRadius: "50%", background: i===events.length-1 ? "#39FF8F" : primary, border: `2px solid ${i===events.length-1 ? "#39FF8F40" : primary+"40"}` }} />
+                  <p style={{ color: primary, fontSize: 11, fontWeight: 700, margin: "0 0 2px" }}>{date}</p>
+                  <p style={{ color: text, fontSize: 12, fontWeight: 600, margin: "0 0 2px" }}>{title}</p>
+                  {desc && <p style={{ color: muted, fontSize: 11, margin: 0 }}>{desc}</p>}
+                </div>
+              ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "process_steps": {
+      const steps = [[c.s1_icon,c.s1_title,c.s1_desc],[c.s2_icon,c.s2_title,c.s2_desc],[c.s3_icon,c.s3_title,c.s3_desc],[c.s4_icon,c.s4_title,c.s4_desc]].filter(([,t])=>t)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {steps.length===0
+              ? [1,2,3].map(i => (
+                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                  <div style={{ width: 28, height: 28, borderRadius: "50%", background: primary, color: "#080808", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{i}</div>
+                  <div><p style={{ color: text, fontSize: 12, fontWeight: 700, margin: 0 }}>Étape {i}</p></div>
+                </div>
+              ))
+              : steps.map(([icon,title,desc],i) => (
+                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: `linear-gradient(135deg,${primary},${accent})`, color: "#080808", display: "flex", alignItems: "center", justifyContent: "center", fontSize: icon ? 16 : 13, fontWeight: 700, flexShrink: 0 }}>{icon||i+1}</div>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ color: text, fontSize: 12, fontWeight: 700, margin: "4px 0 2px" }}>{title}</p>
+                    {desc && <p style={{ color: muted, fontSize: 11, margin: 0 }}>{desc}</p>}
+                  </div>
+                  {i < steps.length-1 && <div style={{ position: "absolute", left: 31, marginTop: 32, width: 2, height: 16, background: primary+"30" }} />}
+                </div>
+              ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "values": {
+      const vals = [[c.v1_icon,c.v1_label,c.v1_desc],[c.v2_icon,c.v2_label,c.v2_desc],[c.v3_icon,c.v3_label,c.v3_desc],[c.v4_icon,c.v4_label,c.v4_desc]].filter(([,l])=>l)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            {(vals.length===0 ? [[" 🤝","Transparence",""],[" ⚡","Réactivité",""],[" 🎯","Qualité",""]] : vals).map(([icon,label,desc],i) => (
+              <div key={i} style={{ background: primary+"08", border: `1px solid ${primary}15`, borderRadius: 12, padding: "12px 10px", textAlign: "center" }}>
+                <span style={{ fontSize: 24, display: "block", marginBottom: 6 }}>{icon}</span>
+                <p style={{ color: text, fontSize: 12, fontWeight: 700, margin: desc ? "0 0 3px" : "0" }}>{label}</p>
+                {desc && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{desc}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "team": {
+      const members = [[c.m1_photo,c.m1_name,c.m1_role,c.m1_bio],[c.m2_photo,c.m2_name,c.m2_role,c.m2_bio],[c.m3_photo,c.m3_name,c.m3_role,c.m3_bio]].filter(([,n])=>n)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {members.length===0
+              ? [0,1].map(i => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
+                  <div style={{ width: 44, height: 44, borderRadius: "50%", background: primary+"20", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>👤</div>
+                  <div><p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>Prénom Nom</p><p style={{ color: muted, fontSize: 11, margin: 0 }}>Poste</p></div>
+                </div>
+              ))
+              : members.map(([photo,name,role,bio],i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
+                  {photo
+                    ? <img src={String(photo)} alt={String(name)} style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${primary}40` }} />
+                    : <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg,${primary},${accent})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 700, color: "#080808", flexShrink: 0 }}>{String(name)[0]}</div>}
+                  <div>
+                    <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{name}</p>
+                    <p style={{ color: primary, fontSize: 11, margin: "0 0 1px" }}>{role}</p>
+                    {bio && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{bio}</p>}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "engagements": {
+      const engList = [c.e1,c.e2,c.e3,c.e4,c.e5,c.e6].filter(Boolean)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+            {(engList.length===0 ? ["✅ Réponse sous 24h","✅ Satisfaction garantie","✅ Sans engagement"] : engList).map((eng: string, i: number) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: "rgba(57,255,143,0.05)", border: "1px solid rgba(57,255,143,0.15)", borderRadius: 10 }}>
+                <p style={{ color: text, fontSize: 13, margin: 0, lineHeight: 1.4 }}>{eng}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "trust_badge": {
+      const badges = [[c.b1_icon,c.b1_label],[c.b2_icon,c.b2_label],[c.b3_icon,c.b3_label],[c.b4_icon,c.b4_label]].filter(([,l])=>l)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", textAlign: "center" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center" }}>
+            {(badges.length===0 ? [["✔","Vérifié"],["🏆","Certifié"],["⭐","Partenaire officiel"]] : badges).map(([icon,label],i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 7, background: "rgba(57,255,143,0.08)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 20, padding: "7px 14px" }}>
+                <span style={{ color: "#39FF8F", fontSize: 14, fontWeight: 700 }}>{icon}</span>
+                <span style={{ color: text, fontSize: 12, fontWeight: 600 }}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "quote_block": return (
+      <div style={{ padding: "14px 16px", ...s }}>
+        <div style={{ background: primary+"08", border: `1px solid ${primary}20`, borderRadius: 14, padding: "18px 16px", position: "relative" }}>
+          <span style={{ position: "absolute", top: 10, left: 14, color: primary, fontSize: 36, fontFamily: "Georgia, serif", lineHeight: 1, opacity: 0.4 }}>"</span>
+          <p style={{ color: text, fontSize: 15, fontStyle: "italic", lineHeight: 1.7, margin: "0 0 10px", paddingTop: 10, fontFamily: theme.fontDisplay }}>{c.quote||"La qualité n est jamais un accident."}</p>
+          {c.author && (
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 24, height: 2, background: primary, borderRadius: 1 }} />
+              <p style={{ color: primary, fontSize: 12, fontWeight: 700, margin: 0 }}>{c.author}{c.source ? <span style={{ color: muted, fontWeight: 400 }}> — {c.source}</span> : null}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+
+    case "announcement": {
+      const typeStyles: Record<string,any> = {
+        warning: { bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.3)", color: "#FBBF24" },
+        info: { bg: "rgba(56,189,248,0.08)", border: "rgba(56,189,248,0.3)", color: "#38BDF8" },
+        success: { bg: "rgba(57,255,143,0.08)", border: "rgba(57,255,143,0.3)", color: "#39FF8F" },
+        promo: { bg: "rgba(201,168,76,0.08)", border: "rgba(201,168,76,0.3)", color: "#C9A84C" },
+      }
+      const ts = typeStyles[c.type||"warning"]
+      return (
+        <div style={{ padding: "8px 16px", ...s }}>
+          <div style={{ background: ts.bg, border: `1.5px solid ${ts.border}`, borderRadius: 12, padding: "14px 16px" }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+              <span style={{ fontSize: 22, flexShrink: 0 }}>{c.emoji||"⚠️"}</span>
+              <div>
+                {c.title && <p style={{ color: ts.color, fontSize: 13, fontWeight: 700, margin: "0 0 4px" }}>{c.title}</p>}
+                {c.message && <p style={{ color: text, fontSize: 12, margin: 0, lineHeight: 1.5 }}>{c.message}</p>}
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    case "info_table": {
+      const rows = [[c.r1_label,c.r1_value],[c.r2_label,c.r2_value],[c.r3_label,c.r3_value],[c.r4_label,c.r4_value],[c.r5_label,c.r5_value],[c.r6_label,c.r6_value]].filter(([l])=>l)
+      return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {(rows.length===0 ? [["Création","2020"],["Clients","500+"],["Pays","12"]] : rows).map(([label,value],i,arr) => (
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 0", borderBottom: i<arr.length-1 ? `1px solid ${dayMode?"rgba(0,0,0,0.06)":"rgba(255,255,255,0.05)"}` : "none" }}>
+                <span style={{ color: muted, fontSize: 12 }}>{label}</span>
+                <span style={{ color: text, fontSize: 12, fontWeight: 600 }}>{value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    case "founder_message": return (
+      <div style={{ padding: "12px 16px", ...s }}>
+        <div style={{ background: primary+"06", border: `1px solid ${primary}15`, borderRadius: 14, padding: "16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+            {c.photo
+              ? <img src={c.photo} alt="" style={{ width: 50, height: 50, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${primary}40` }} />
+              : <div style={{ width: 50, height: 50, borderRadius: "50%", background: `linear-gradient(135deg,${primary},${accent})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>👤</div>}
+            <div>
+              <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: theme.fontDisplay }}>{c.name||"Jean Dupont"}</p>
+              <p style={{ color: primary, fontSize: 11, margin: 0 }}>{c.role||"Fondateur & CEO"}</p>
+            </div>
+          </div>
+          <p style={{ color: muted, fontSize: 12, lineHeight: 1.7, margin: c.signature ? "0 0 10px" : "0", fontStyle: "italic" }}>"{c.message||"Bienvenue ! Notre mission est de vous offrir le meilleur service possible."}"</p>
+          {c.signature && <p style={{ color: primary, fontSize: 14, fontFamily: "Georgia, serif", margin: 0, fontStyle: "italic" }}>{c.signature}</p>}
+        </div>
+      </div>
+    )
+
     default: {
       const def = BLOCK_DEFS[block.type]
       return <div style={{ padding: "12px 16px", textAlign: "center", ...s }}><span style={{ fontSize: 22 }}>{def?.icon||"📦"}</span><p style={{ color: muted, fontSize: 11, margin: "5px 0 0" }}>{def?.label||block.type}</p></div>
@@ -1873,16 +2116,16 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
 
           {!search && (
             <div style={{ padding: "7px 8px 5px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {BLOCK_CATEGORIES.map(cat => (
                   <button key={cat.id} onClick={() => setActiveCategory(cat.id)} title={cat.desc}
-                    style={{ display: "flex", alignItems: "center", gap: 3, background: activeCategory===cat.id ? cat.color+"18" : "transparent", border: `1px solid ${activeCategory===cat.id ? cat.color+"40" : "transparent"}`, borderRadius: 6, padding: "3px 6px", color: activeCategory===cat.id ? cat.color : MUTED, fontSize: 10, cursor: "pointer" }}>
-                    <span>{cat.icon}</span>
-                    <span style={{ display: activeCategory===cat.id ? "inline" : "none" }}>{cat.label}</span>
+                    style={{ display: "flex", alignItems: "center", gap: 5, background: activeCategory===cat.id ? cat.color+"18" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory===cat.id ? cat.color+"50" : "rgba(255,255,255,0.06)"}`, borderRadius: 8, padding: "6px 9px", color: activeCategory===cat.id ? cat.color : MUTED, fontSize: 11, fontWeight: activeCategory===cat.id ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                    <span style={{ fontSize: 14 }}>{cat.icon}</span>
+                    <span>{cat.label}</span>
                   </button>
                 ))}
               </div>
-              <p style={{ color: MUTED, fontSize: 9, margin: "4px 0 0", paddingLeft: 2 }}>{BLOCK_CATEGORIES.find(c => c.id===activeCategory)?.desc}</p>
+              <p style={{ color: MUTED, fontSize: 10, margin: "6px 0 0", paddingLeft: 2 }}>{BLOCK_CATEGORIES.find(c => c.id===activeCategory)?.desc}</p>
             </div>
           )}
 
