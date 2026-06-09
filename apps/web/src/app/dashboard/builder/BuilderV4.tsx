@@ -848,8 +848,7 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
                 {plan.highlight && <div style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", background: primary, color: "#080808", borderRadius: 20, padding: "2px 10px", fontSize: 9, fontWeight: 700, whiteSpace: "nowrap" }}>⭐ Populaire</div>}
                 <p style={{ color: plan.highlight ? primary : text, fontSize: 11, fontWeight: 700, margin: "0 0 4px", textAlign: "center" }}>{plan.name}</p>
                 <p style={{ color: primary, fontSize: 18, fontWeight: 700, margin: "0 0 8px", textAlign: "center", fontFamily: theme.fontDisplay }}>{plan.price}</p>
-                {plan.features && plan.features.split("
-").filter(Boolean).map((f: string, j: number) => (
+                {plan.features && plan.features.split("\n").filter(Boolean).map((f: string, j: number) => (
                   <p key={j} style={{ color: muted, fontSize: 9, margin: "0 0 3px", display: "flex", alignItems: "center", gap: 4 }}>
                     <span style={{ color: "#39FF8F" }}>✓</span> {f}
                   </p>
@@ -881,8 +880,7 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
                   </div>
                   <span style={{ color: primary, fontSize: 16, fontWeight: 700 }}>{price}</span>
                 </div>
-                {content && content.split("
-").filter(Boolean).map((line: string, j: number) => (
+                {content && content.split("\n").filter(Boolean).map((line: string, j: number) => (
                   <p key={j} style={{ color: muted, fontSize: 11, margin: "0 0 3px", display: "flex", alignItems: "center", gap: 6 }}>
                     <span style={{ color: "#39FF8F", fontSize: 10 }}>✓</span> {line}
                   </p>
