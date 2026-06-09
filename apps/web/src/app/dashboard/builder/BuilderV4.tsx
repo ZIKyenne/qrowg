@@ -2752,7 +2752,7 @@ const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 
     { id: "stars", label: "Étoiles", icon: "✦" },
   ]
 
-  const getPatternCSS = (pattern: string, color: string, size: number, opacity: number) => {
+    const getPatternCSS = (pattern: string, color: string, size: number, opacity: number): string => {
     const c = color + Math.round(opacity * 255).toString(16).padStart(2, "0")
     const s = size
     switch(pattern) {
