@@ -2981,7 +2981,7 @@ const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 
                     { id: "pattern", label: "Motif", icon: "▦" },
                     { id: "image", label: "Image", icon: "🖼️" },
                   ].map(({ id, label, icon }) => (
-                    <button key={id} onClick={() => { setBgMode(id); onThemeChange({...theme, bgMode: id} as any) }}
+                    <button type="button" key={id} onClick={() => { setBgMode(id); onThemeChange({...theme, bgMode: id} as any) }}
                       style={{ background: bgMode===id ? G+"15" : "rgba(255,255,255,0.03)", border: `1.5px solid ${bgMode===id ? G+"50" : "rgba(255,255,255,0.08)"}`, borderRadius: 9, padding: "9px 5px", cursor: "pointer", color: bgMode===id ? G : MUTED, fontSize: 10, fontWeight: bgMode===id ? 700 : 400, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
                       <span style={{ fontSize: 16 }}>{icon}</span>
                       <span>{label}</span>
@@ -3172,7 +3172,7 @@ const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 
                   <label style={{ color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Motif</label>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 5 }}>
                     {PATTERNS_LIST.map(p => (
-                      <button key={p.id} onClick={() => setPatternType(p.id)}
+                      <button key={p.id} onClick={() => { setPatternType(p.id); onThemeChange({...theme, bgPattern: p.id} as any) }}
                         style={{ padding: "8px 4px", background: patternType===p.id ? G+"15" : "rgba(255,255,255,0.03)", border: `1.5px solid ${patternType===p.id ? G+"50" : "rgba(255,255,255,0.08)"}`, borderRadius: 8, cursor: "pointer", color: patternType===p.id ? G : MUTED, fontSize: 9, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
                         <span style={{ fontSize: 16 }}>{p.icon}</span>
                         <span>{p.label}</span>
@@ -4018,7 +4018,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
       const alpha = Math.round(patOpacity * 255).toString(16).padStart(2, "0")
       const c = patColor + alpha
       let bgImg = ""
-      switch(t.bgPattern || patternType || "dots") {
+      switch(t.bgPattern || "dots") {
         case "dots": bgImg = `radial-gradient(circle, ${c} 1px, transparent 1px)`; break
         case "grid": bgImg = `linear-gradient(${c} 1px, transparent 1px), linear-gradient(90deg, ${c} 1px, transparent 1px)`; break
         case "lines": bgImg = `linear-gradient(0deg, ${c} 1px, transparent 1px)`; break
