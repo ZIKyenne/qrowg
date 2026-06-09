@@ -2615,6 +2615,29 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
   const [bgMode, setBgMode] = useState<string>(theme.bgMode||"solid")
   const [bgSubTab, setBgSubTab] = useState<"type"|"effects"|"animation"|"presets"|"advanced">("presets")
   const [activeCat, setActiveCat] = useState<string>(PRESET_CATEGORIES[0].id)
+  const [copyFeedback, setCopyFeedback] = useState<"idle"|"copied"|"pasted"|"error">("idle")
+
+  function copyTheme() {
+    try {
+      localStorage.setItem("qrfolio_clipboard_theme", JSON.stringify(theme))
+      setCopyFeedback("copied")
+      setTimeout(() => setCopyFeedback("idle"), 2000)
+    } catch { setCopyFeedback("error"); setTimeout(() => setCopyFeedback("idle"), 2000) }
+  }
+
+  function pasteTheme() {
+    try {
+      const raw = localStorage.getItem("qrfolio_clipboard_theme")
+      if (!raw) { setCopyFeedback("error"); setTimeout(() => setCopyFeedback("idle"), 2000); return }
+      const pasted = JSON.parse(raw) as PageTheme
+      // Conserver le name de la page actuelle
+      onThemeChange({ ...pasted, name: theme.name })
+      setCopyFeedback("pasted")
+      setTimeout(() => setCopyFeedback("idle"), 2000)
+    } catch { setCopyFeedback("error"); setTimeout(() => setCopyFeedback("idle"), 2000) }
+  }
+
+  const hasClipboard = typeof window !== "undefined" && !!localStorage.getItem("qrfolio_clipboard_theme")
   const [colorFormat, setColorFormat] = useState<"hex"|"rgb"|"hsl">("hex")
   const [recentColors, setRecentColors] = useState<string[]>(() => {
     try { return JSON.parse(localStorage.getItem("qrfolio_recent_colors") || "[]") } catch { return [] }
@@ -2767,6 +2790,20 @@ const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+      {/* ── Copier / Coller thème ─────────────────────────────────────── */}
+      <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+        <button type="button" onClick={copyTheme}
+          style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: "7px", background: copyFeedback==="copied" ? "rgba(57,255,143,0.1)" : "rgba(255,255,255,0.04)", border: `1px solid ${copyFeedback==="copied" ? "rgba(57,255,143,0.4)" : "rgba(255,255,255,0.08)"}`, borderRadius: 9, color: copyFeedback==="copied" ? "#39FF8F" : MUTED, fontSize: 11, fontWeight: 500, cursor: "pointer", transition: "all 0.2s" }}>
+          <span style={{ fontSize: 13 }}>{copyFeedback==="copied" ? "✓" : "📋"}</span>
+          <span>{copyFeedback==="copied" ? "Copié !" : "Copier le thème"}</span>
+        </button>
+        <button type="button" onClick={pasteTheme}
+          style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: "7px", background: copyFeedback==="pasted" ? "rgba(201,168,76,0.12)" : copyFeedback==="error" ? "rgba(239,68,68,0.08)" : "rgba(255,255,255,0.04)", border: `1px solid ${copyFeedback==="pasted" ? "rgba(201,168,76,0.4)" : copyFeedback==="error" ? "rgba(239,68,68,0.3)" : "rgba(255,255,255,0.08)"}`, borderRadius: 9, color: copyFeedback==="pasted" ? G : copyFeedback==="error" ? "#EF4444" : MUTED, fontSize: 11, fontWeight: 500, cursor: "pointer", transition: "all 0.2s" }}>
+          <span style={{ fontSize: 13 }}>{copyFeedback==="pasted" ? "✓" : copyFeedback==="error" ? "✗" : "⬆️"}</span>
+          <span>{copyFeedback==="pasted" ? "Appliqué !" : copyFeedback==="error" ? "Aucun thème copié" : "Coller le thème"}</span>
+        </button>
+      </div>
+
       {/* Onglets principaux */}
       <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,0.06)", marginBottom: 14, flexShrink: 0 }}>
         {(["themes","colors","fonts","bg"] as const).map(tab => (
