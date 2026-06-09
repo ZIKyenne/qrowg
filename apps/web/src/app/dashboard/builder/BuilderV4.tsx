@@ -3583,7 +3583,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
   // Surlignage du terme recherché
   function highlight(text: string, query: string): React.ReactNode {
     if (!query.trim()) return text
-    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\]/g, '\$&')})`, "gi")
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\$&')})`, "gi")
     const parts = text.split(regex)
     return parts.map((part, i) =>
       regex.test(part)
