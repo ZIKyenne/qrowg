@@ -2521,7 +2521,6 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
   const [bgMode, setBgMode] = useState<string>(theme.bgMode||"solid")
   const [bgSubTab, setBgSubTab] = useState<"type"|"effects"|"animation"|"presets"|"advanced">("presets")
   const [patternTypeLocal, setPatternType] = useState<string>((theme as any).bgPattern||"dots")
-  
   const [effectNoise, setEffectNoise] = useState(false)
   const [effectGlow, setEffectGlow] = useState(false)
   const [effectVignette, setEffectVignette] = useState(false)
@@ -2931,6 +2930,16 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
           {/* EFFETS */}
           {bgSubTab==="effects" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {/* Preview fond actuel avec effets */}
+              <div style={{ position: "relative", height: 80, borderRadius: 12, overflow: "hidden", border: "1px solid rgba(255,255,255,0.1)", marginBottom: 4 }}>
+                <div style={{ position: "absolute", inset: 0, background: theme.bgGradient||theme.bg }} />
+                {effectNoise && <div style={{ position: "absolute", inset: 0, backgroundImage: "url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(%23n)"/></svg>')", opacity: (theme as any).noise_opacity ? (theme as any).noise_opacity/100 : 0.2, mixBlendMode: "overlay" as const }} />}
+                {effectGlow && <div style={{ position: "absolute", inset: 0, background: `radial-gradient(circle at 50% 50%, ${(theme as any).glow_color||G}${Math.round(((theme as any).glow_intensity||30)/100*255).toString(16).padStart(2,"0")}, transparent ${(theme as any).glow_size||200}px)` }} />}
+                {effectVignette && <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at center, transparent ${100-(theme as any).vignette_intensity||60}%, rgba(0,0,0,0.8) 100%)` }} />}
+                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, margin: 0, letterSpacing: 2, textTransform: "uppercase" as const }}>Aperçu des effets</p>
+                </div>
+              </div>
               {/* Noise */}
               <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: effectNoise ? 10 : 0 }}>
@@ -2994,6 +3003,22 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
           {/* ANIMATION */}
           {bgSubTab==="animation" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {/* Preview animation */}
+              <div style={{ position: "relative", height: 80, borderRadius: 12, overflow: "hidden", border: "1px solid rgba(255,255,255,0.1)", marginBottom: 4 }}>
+                <div style={{
+                  position: "absolute", inset: 0,
+                  background: animation==="aurora"
+                    ? `radial-gradient(ellipse at 20% 50%, ${theme.primary}40, transparent 50%), radial-gradient(ellipse at 80% 20%, ${theme.accent||"#39FF8F"}30, transparent 50%), ${theme.bgGradient||theme.bg}`
+                    : theme.bgGradient||theme.bg,
+                  animation: animation==="gradient-flow" ? `gradientShift ${(theme as any).anim_speed||8}s ease infinite` : animation==="aurora" ? `auroraShift ${(theme as any).anim_speed||12}s ease infinite` : "none",
+                  backgroundSize: "200% 200%",
+                }} />
+                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 10, margin: 0, letterSpacing: 2, textTransform: "uppercase" as const }}>
+                    {animation==="none" ? "Statique" : animation==="gradient-flow" ? "🌊 Gradient Flow" : animation==="aurora" ? "🌌 Aurora" : animation}
+                  </p>
+                </div>
+              </div>
               <label style={{ color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Animation de fond</label>
               {[
                 { id: "none", label: "Statique", desc: "Aucune animation", icon: "⏸" },
@@ -3459,16 +3484,16 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
               return (
                 <div key={block.id}
                   onClick={() => { setSelectedId(block.id); setRightTab("edit") }}
-                  style={{ position: "relative", marginBottom: 0, borderLeft: isSelected ? `3px solid ${G}` : "3px solid transparent", overflow: "visible", cursor: "pointer", transition: "border-left-color 0.15s", opacity: block.visible ? 1 : 0.45, background: "transparent" }}
+                  style={{ position: "relative", marginBottom: 0, border: "none", overflow: "visible", cursor: "pointer", transition: "box-shadow 0.15s", opacity: block.visible ? 1 : 0.45, background: "transparent", boxShadow: isSelected ? `inset 3px 0 0 ${G}` : "none" }}
                   onMouseEnter={e => {
-                    if (!isSelected) e.currentTarget.style.borderLeftColor = "rgba(201,168,76,0.4)"
+                    if (!isSelected) e.currentTarget.style.boxShadow = `inset 3px 0 0 rgba(201,168,76,0.3)`
                     const overlay = e.currentTarget.querySelector(".block-overlay") as HTMLElement
                     const handle = e.currentTarget.querySelector(".block-handle") as HTMLElement
                     if (overlay) overlay.style.opacity = "1"
                     if (handle) handle.style.opacity = "1"
                   }}
                   onMouseLeave={e => {
-                    if (!isSelected) e.currentTarget.style.borderLeftColor = "transparent"
+                    if (!isSelected) e.currentTarget.style.boxShadow = "none"
                     const overlay = e.currentTarget.querySelector(".block-overlay") as HTMLElement
                     const handle = e.currentTarget.querySelector(".block-handle") as HTMLElement
                     if (overlay) overlay.style.opacity = "0"
@@ -3660,6 +3685,8 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
       <style>{`
         @keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+        @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+        @keyframes auroraShift{0%{background-position:0% 0%}33%{background-position:100% 0%}66%{background-position:50% 100%}100%{background-position:0% 0%}}
         .iphone-scroll::-webkit-scrollbar{display:none}
         .block-handle:active{cursor:grabbing}
       `}</style>
