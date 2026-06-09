@@ -3932,8 +3932,8 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                   </div>
                 </button>
               ))}
-            </div>}
-          </div>}
+            </div>
+          </div>
         </div>
 
         {/* POIGNÉE RESIZE sidebar blocs */}
