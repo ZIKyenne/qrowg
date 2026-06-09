@@ -3406,6 +3406,22 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
   }, [])
 
   const isFav = useCallback((type: string) => favorites.includes(type), [favorites])
+
+  // ── Blocs récents ─────────────────────────────────────────────────────────
+  const [recentBlocks, setRecentBlocks] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      try { return JSON.parse(localStorage.getItem("qrfolio_recent_blocks") || "[]") } catch { return [] }
+    }
+    return []
+  })
+
+  const pushRecent = useCallback((type: string) => {
+    setRecentBlocks(prev => {
+      const next = [type, ...prev.filter(t => t !== type)].slice(0, 8)
+      localStorage.setItem("qrfolio_recent_blocks", JSON.stringify(next))
+      return next
+    })
+  }, [])
   function toggleFocus() {
     setFocusMode(p => {
       const next = !p
@@ -3471,6 +3487,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2)
     setBlocks(p => [...p, { id, type, content: content||{...def.defaultContent}, visible: true }])
     setSelectedId(id); setRightTab("edit")
+    pushRecent(type)
   }
 
   function deleteBlock(id: string) {
@@ -3568,6 +3585,11 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
 
   const filteredBlocks = (() => {
     if (!search) {
+      if (activeCategory === "recents") {
+        return recentBlocks
+          .filter(type => BLOCK_DEFS[type])
+          .map(type => [type, BLOCK_DEFS[type]] as [string, (typeof BLOCK_DEFS)[string]])
+      }
       if (activeCategory === "favorites") {
         return Object.entries(BLOCK_DEFS).filter(([type]) => favorites.includes(type))
       }
@@ -3859,6 +3881,14 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
           {!search && !blocksCollapsed && (
             <div style={{ padding: "7px 8px 5px 10px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                {/* Catégorie Récents — visible seulement si au moins 1 récent */}
+                {recentBlocks.length > 0 && (
+                  <button onClick={() => setActiveCategory("recents")} title="Blocs récemment utilisés"
+                    style={{ display: "flex", alignItems: "center", gap: 5, background: activeCategory==="recents" ? "#38BDF818" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory==="recents" ? "#38BDF850" : "rgba(255,255,255,0.06)"}`, borderRadius: 8, padding: "6px 9px", color: activeCategory==="recents" ? "#38BDF8" : MUTED, fontSize: 11, fontWeight: activeCategory==="recents" ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                    <span style={{ fontSize: 14 }}>🕐</span>
+                    <span>Récents</span>
+                  </button>
+                )}
                 {/* Catégorie Favoris — visible seulement si au moins 1 favori */}
                 {favorites.length > 0 && (
                   <button onClick={() => setActiveCategory("favorites")} title="Vos blocs favoris"
@@ -3877,13 +3907,20 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                 ))}
               </div>
               <p style={{ color: MUTED, fontSize: 10, margin: "6px 0 0", paddingLeft: 2 }}>
-                {activeCategory==="favorites" ? `${favorites.length} bloc${favorites.length>1?"s":""} favori${favorites.length>1?"s":""}` : BLOCK_CATEGORIES.find(c => c.id===activeCategory)?.desc}
+                {activeCategory==="recents" ? `${recentBlocks.length} bloc${recentBlocks.length>1?"s":""} récent${recentBlocks.length>1?"s":""}` : activeCategory==="favorites" ? `${favorites.length} bloc${favorites.length>1?"s":""} favori${favorites.length>1?"s":""}` : BLOCK_CATEGORIES.find(c => c.id===activeCategory)?.desc}
               </p>
             </div>
           )}
           {/* Mode réduit : icônes catégories + drawer flottant */}
           {blocksCollapsed && (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "8px 4px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
+              {recentBlocks.length > 0 && (
+                <button onClick={() => { setDrawerCategory("recents"); setActiveCategory("recents") }}
+                  title={`Récents (${recentBlocks.length})`}
+                  style={{ width: 44, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: (drawerCategory==="recents" || activeCategory==="recents") ? "#38BDF818" : "transparent", border: `1px solid ${(drawerCategory==="recents" || activeCategory==="recents") ? "#38BDF840" : "transparent"}`, borderRadius: 8, cursor: "pointer", fontSize: 16, transition: "all 0.15s" }}>
+                  🕐
+                </button>
+              )}
               {favorites.length > 0 && (
                 <button onClick={() => { setDrawerCategory("favorites"); setActiveCategory("favorites") }}
                   title={`Favoris (${favorites.length})`}
@@ -3981,13 +4018,15 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
           <div ref={drawerRef} style={{ position: "absolute", left: 64, top: 0, width: 240, height: "100%", background: "#0D0D0D", borderRight: "1px solid rgba(201,168,76,0.15)", zIndex: 50, display: "flex", flexDirection: "column", boxShadow: "4px 0 24px rgba(0,0,0,0.5)" }}>
             <div style={{ padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                <span style={{ fontSize: 14 }}>{drawerCategory==="favorites" ? "⭐" : BLOCK_CATEGORIES.find(c => c.id===drawerCategory)?.icon}</span>
-                <span style={{ color: drawerCategory==="favorites" ? "#FFD700" : "#F5F0E8", fontSize: 12, fontWeight: 700 }}>{drawerCategory==="favorites" ? `Favoris (${favorites.length})` : BLOCK_CATEGORIES.find(c => c.id===drawerCategory)?.label}</span>
+                <span style={{ fontSize: 14 }}>{drawerCategory==="recents" ? "🕐" : drawerCategory==="favorites" ? "⭐" : BLOCK_CATEGORIES.find(c => c.id===drawerCategory)?.icon}</span>
+                <span style={{ color: drawerCategory==="recents" ? "#38BDF8" : drawerCategory==="favorites" ? "#FFD700" : "#F5F0E8", fontSize: 12, fontWeight: 700 }}>{drawerCategory==="recents" ? `Récents (${recentBlocks.length})` : drawerCategory==="favorites" ? `Favoris (${favorites.length})` : BLOCK_CATEGORIES.find(c => c.id===drawerCategory)?.label}</span>
               </div>
               <button onClick={() => setDrawerCategory(null)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 2 }}><X size={13} /></button>
             </div>
             <div style={{ flex: 1, overflowY: "auto", padding: "5px 6px" }}>
-              {(drawerCategory === "favorites"
+              {(drawerCategory === "recents"
+                ? recentBlocks.filter(t => BLOCK_DEFS[t]).map(t => [t, BLOCK_DEFS[t]] as [string, (typeof BLOCK_DEFS)[string]])
+                : drawerCategory === "favorites"
                 ? Object.entries(BLOCK_DEFS).filter(([type]) => favorites.includes(type))
                 : Object.entries(BLOCK_DEFS).filter(([, def]) => def.category === drawerCategory)
               ).map(([type, def]) => (
