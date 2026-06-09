@@ -1,61 +1,71 @@
+<<<<<<< HEAD
 import { notFound } from 'next/navigation'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import type { Metadata } from 'next'
 import { resolveTheme, fontsUrl, backgroundStyle, readableText, type PageTheme } from '../dashboard/builder/themes'
+=======
+import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { notFound } from "next/navigation"
+import PublicPageClient from "./PublicPageClient"
+import type { Metadata } from "next"
+>>>>>>> 0975e2ee40b8d075e54661ca298f7f8228f45550
 
-async function createClient() {
-  const cookieStore = await cookies()
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return cookieStore.getAll() },
-        setAll(cookiesToSet) {
-          try { cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options)) } catch {}
-        },
-      },
-    }
-  )
-}
+interface Props { params: { slug: string } }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params
-  const supabase = await createClient()
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://qrfolio.app"
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const supabase = await createServerSupabaseClient()
   const { data: page } = await supabase
-    .from('pages')
-    .select('title, seo_title, seo_description, og_image_url')
-    .eq('slug', slug)
-    .eq('status', 'published')
+    .from("pages")
+    .select("title, seo_title, seo_description, og_image_url, slug, profiles(full_name, username)")
+    .eq("slug", params.slug)
+    .eq("status", "published")
     .single()
 
-  if (!page) return { title: 'Page introuvable' }
+  if (!page) return { title: "Page introuvable" }
+
+  const profile = page.profiles as any
+  const title = page.seo_title || page.title
+  const description = page.seo_description || `Decouvre la page de ${profile?.full_name || page.title} sur QRfolio`
+  const image = page.og_image_url || `${APP_URL}/og-image.png`
+  const url = `${APP_URL}/${page.slug}`
 
   return {
-    title: page.seo_title || page.title,
-    description: page.seo_description || '',
+    title,
+    description,
     openGraph: {
-      title: page.seo_title || page.title,
-      description: page.seo_description || '',
-      images: page.og_image_url ? [page.og_image_url] : [],
+      type: "profile",
+      url,
+      title,
+      description,
+      images: [{ url: image, width: 1200, height: 630, alt: title }],
+      siteName: "QRfolio",
     },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+    alternates: { canonical: url },
   }
 }
 
-export default async function PublicPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
-  const supabase = await createClient()
+export default async function PublicPage({ params }: Props) {
+  const supabase = await createServerSupabaseClient()
 
   const { data: page } = await supabase
-    .from('pages')
-    .select('*, blocks(*), profiles(full_name, avatar_url)')
-    .eq('slug', slug)
-    .eq('status', 'published')
+    .from("pages")
+    .select("*, profiles(full_name, username, avatar_url)")
+    .eq("slug", params.slug)
+    .eq("status", "published")
     .single()
 
   if (!page) notFound()
 
+<<<<<<< HEAD
   const blocks = (page.blocks ?? []).sort((a: any, b: any) => a.position - b.position)
   const theme = resolveTheme(page.theme)
 
@@ -197,3 +207,42 @@ function BlockRenderer({ block, theme }: { block: any; theme: PageTheme }) {
       return null
   }
 }
+=======
+  const { data: blocks } = await supabase
+    .from("blocks")
+    .select("*")
+    .eq("page_id", page.id)
+    .eq("is_visible", true)
+    .order("position")
+
+  // JSON-LD structured data
+  const profile = page.profiles as any
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "name": page.title,
+    "description": page.seo_description || `Page de ${profile?.full_name || page.title}`,
+    "url": `${APP_URL}/${page.slug}`,
+    "mainEntity": {
+      "@type": "Person",
+      "name": profile?.full_name || page.title,
+      "url": `${APP_URL}/${page.slug}`,
+      ...(profile?.avatar_url ? { "image": profile.avatar_url } : {}),
+    }
+  }
+
+  // Track page view
+  supabase.from("page_views").insert({
+    page_id: page.id,
+    source: "direct",
+    device: "unknown",
+  }).then(() => {})
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <PublicPageClient page={page} blocks={blocks || []} />
+    </>
+  )
+}
+>>>>>>> 0975e2ee40b8d075e54661ca298f7f8228f45550

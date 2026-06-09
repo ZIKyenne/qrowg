@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
@@ -60,6 +60,19 @@ export async function GET(
     ip_hash: ipHash,
   }).then(() => {})
 
+  // Trigger email premier scan si total_scans === 0
+  supabase.from('qr_codes').select('total_scans, user_id, profiles(email, full_name)').eq('id', qr.id).single().then(async ({ data: qrData }) => {
+    if (qrData?.total_scans === 0) {
+      const profile = (qrData as any).profiles as any
+      if (profile?.email) {
+        fetch(new URL('/api/emails/first-scan', request.url).toString(), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: profile.email, name: profile.full_name, page_title: page.slug }),
+        }).catch(() => {})
+      }
+    }
+  })
   // Rediriger vers la page publique
   return NextResponse.redirect(new URL('/' + page.slug, request.url))
 }

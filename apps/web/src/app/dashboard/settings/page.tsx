@@ -1,0 +1,284 @@
+﻿"use client"
+
+import { useEffect, useState } from "react"
+import { createClient } from "@/lib/supabase/client"
+import { Save, Check, AlertTriangle, Eye, EyeOff, Bell, Shield, Trash2, LogOut, Key, Globe, Palette, Moon } from "lucide-react"
+
+type Profile = { id: string; email: string; full_name: string | null; plan: string }
+
+function Section({ title, subtitle, icon, children }: { title: string; subtitle?: string; icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 16, overflow: "hidden", marginBottom: 20 }}>
+      <div style={{ padding: "18px 24px", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ color: "#C9A84C", background: "rgba(201,168,76,0.1)", borderRadius: 8, padding: 8 }}>{icon}</div>
+        <div>
+          <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0 }}>{title}</p>
+          {subtitle && <p style={{ color: "#8A8478", fontSize: 12, margin: 0 }}>{subtitle}</p>}
+        </div>
+      </div>
+      <div style={{ padding: "20px 24px" }}>{children}</div>
+    </div>
+  )
+}
+
+function Toggle({ value, onChange, label, description }: { value: boolean; onChange: (v: boolean) => void; label: string; description?: string }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+      <div>
+        <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 600, margin: 0 }}>{label}</p>
+        {description && <p style={{ color: "#8A8478", fontSize: 11, margin: "2px 0 0" }}>{description}</p>}
+      </div>
+      <button onClick={() => onChange(!value)}
+        style={{ width: 44, height: 24, borderRadius: 12, background: value ? "#C9A84C" : "rgba(255,255,255,0.08)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s", flexShrink: 0 }}>
+        <div style={{ position: "absolute", top: 3, left: value ? 23 : 3, width: 18, height: 18, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 4px rgba(0,0,0,0.3)" }} />
+      </button>
+    </div>
+  )
+}
+
+export default function SettingsPage() {
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  // Mot de passe
+  const [currentPwd, setCurrentPwd] = useState("")
+  const [newPwd, setNewPwd] = useState("")
+  const [confirmPwd, setConfirmPwd] = useState("")
+  const [showPwd, setShowPwd] = useState(false)
+  const [pwdSaving, setPwdSaving] = useState(false)
+  const [pwdSaved, setPwdSaved] = useState(false)
+  const [pwdError, setPwdError] = useState("")
+
+  // Notifications
+  const [notifs, setNotifs] = useState({ scan_alert: true, weekly_report: true, product_updates: false, marketing: false })
+  const [notifSaved, setNotifSaved] = useState(false)
+
+  // Apparence
+  const [appearance, setAppearance] = useState({ compact_mode: false, animations: true })
+
+  // Danger zone
+  const [deleteConfirm, setDeleteConfirm] = useState("")
+  const [deleting, setDeleting] = useState(false)
+
+  useEffect(() => {
+    const supabase = createClient()
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { window.location.href = "/auth/login"; return }
+      const { data } = await supabase.from("profiles").select("id,email,full_name,plan").eq("id", user.id).single()
+      if (data) setProfile(data)
+      setLoading(false)
+    }
+    load()
+  }, [])
+
+  async function changePassword() {
+    if (!newPwd || !confirmPwd) { setPwdError("Remplis tous les champs"); return }
+    if (newPwd !== confirmPwd) { setPwdError("Les mots de passe ne correspondent pas"); return }
+    if (newPwd.length < 8) { setPwdError("Minimum 8 caracteres"); return }
+    setPwdError(""); setPwdSaving(true)
+    const supabase = createClient()
+    const { error } = await supabase.auth.updateUser({ password: newPwd })
+    if (error) { setPwdError(error.message); setPwdSaving(false); return }
+    setCurrentPwd(""); setNewPwd(""); setConfirmPwd("")
+    setPwdSaving(false); setPwdSaved(true); setTimeout(() => setPwdSaved(false), 3000)
+  }
+
+  async function saveNotifications() {
+    // Sauvegarder dans localStorage pour l'instant
+    localStorage.setItem("qrfolio_notifs", JSON.stringify(notifs))
+    setNotifSaved(true); setTimeout(() => setNotifSaved(false), 2000)
+  }
+
+  async function handleLogout() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    window.location.href = "/auth/login"
+  }
+
+  async function deleteAccount() {
+    if (deleteConfirm !== profile?.email) return
+    setDeleting(true)
+    // Dans une vraie app on appellerait une API route sécurisée
+    alert("Fonctionnalite en cours de deploiement. Contacte support@qrfolio.app")
+    setDeleting(false)
+  }
+
+  const G = "#C9A84C"; const MUTED = "#8A8478"
+  const inputStyle: React.CSSProperties = {
+    width: "100%", background: "#0d0c09", border: "1px solid rgba(201,168,76,0.2)",
+    borderRadius: 10, padding: "11px 14px", color: "#F5F0E8", fontSize: 14,
+    outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif"
+  }
+
+  if (loading) return (
+    <div style={{ minHeight: "100vh", background: "#080808", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ width: 36, height: 36, border: "2px solid rgba(201,168,76,0.15)", borderTopColor: G, borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+    </div>
+  )
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#080808", padding: "32px 28px", fontFamily: "DM Sans, sans-serif" }}>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}} input:focus,textarea:focus{border-color:rgba(201,168,76,0.5)!important;background:#111009!important}`}</style>
+
+      <div style={{ maxWidth: 680, margin: "0 auto" }}>
+        <div style={{ marginBottom: 28 }}>
+          <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, color: "#F5F0E8", fontWeight: 700, margin: 0 }}>Parametres</h1>
+          <p style={{ color: MUTED, fontSize: 14, margin: "4px 0 0" }}>Gere ton compte et tes preferences</p>
+        </div>
+
+        {/* Compte */}
+        <Section title="Informations du compte" subtitle="Email et identifiant" icon={<Shield size={16} />}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <div>
+              <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5 }}>Email</label>
+              <div style={{ ...inputStyle, opacity: 0.6, cursor: "not-allowed", display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ color: "#F5F0E8" }}>{profile?.email}</span>
+                <span style={{ marginLeft: "auto", color: "#39FF8F", fontSize: 10, background: "rgba(57,255,143,0.1)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 6, padding: "2px 7px" }}>Verifie</span>
+              </div>
+              <p style={{ color: MUTED, fontSize: 10, margin: "4px 0 0" }}>L'email ne peut pas etre modifie pour des raisons de securite.</p>
+            </div>
+            <div>
+              <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5 }}>Plan actuel</label>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ background: G + "12", border: `1px solid ${G}25`, borderRadius: 8, padding: "6px 14px", color: G, fontSize: 13, fontWeight: 700, textTransform: "capitalize" }}>
+                  {profile?.plan || "free"}
+                </span>
+                {profile?.plan !== "business" && (
+                  <a href="/upgrade" style={{ color: G, fontSize: 12, textDecoration: "none", opacity: 0.8 }}>Changer de plan →</a>
+                )}
+              </div>
+            </div>
+          </div>
+        </Section>
+
+        {/* Mot de passe */}
+        <Section title="Securite" subtitle="Mot de passe et authentification" icon={<Key size={16} />}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div>
+              <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5 }}>Nouveau mot de passe</label>
+              <div style={{ position: "relative" }}>
+                <input type={showPwd ? "text" : "password"} value={newPwd} onChange={e => setNewPwd(e.target.value)}
+                  placeholder="Minimum 8 caracteres" style={{ ...inputStyle, paddingRight: 40 }}
+                  onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"}
+                  onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />
+                <button onClick={() => setShowPwd(s => !s)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: MUTED, cursor: "pointer" }}>
+                  {showPwd ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+              </div>
+            </div>
+            <div>
+              <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5 }}>Confirmer le mot de passe</label>
+              <input type={showPwd ? "text" : "password"} value={confirmPwd} onChange={e => setConfirmPwd(e.target.value)}
+                placeholder="Repete le mot de passe" style={inputStyle}
+                onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"}
+                onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />
+            </div>
+
+            {/* Strength indicator */}
+            {newPwd && (
+              <div>
+                <div style={{ display: "flex", gap: 4, marginBottom: 4 }}>
+                  {[1,2,3,4].map(i => (
+                    <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i <= (newPwd.length >= 12 && /[A-Z]/.test(newPwd) && /[0-9]/.test(newPwd) ? 4 : newPwd.length >= 10 ? 3 : newPwd.length >= 8 ? 2 : 1) ? (newPwd.length >= 12 ? "#39FF8F" : newPwd.length >= 10 ? G : newPwd.length >= 8 ? "#F97316" : "#EF4444") : "rgba(255,255,255,0.06)" }} />
+                  ))}
+                </div>
+                <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{newPwd.length < 8 ? "Trop court" : newPwd.length < 10 ? "Acceptable" : newPwd.length < 12 ? "Bon" : "Excellent"}</p>
+              </div>
+            )}
+
+            {pwdError && (
+              <div style={{ display: "flex", gap: 7, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "9px 12px" }}>
+                <AlertTriangle size={14} color="#EF4444" style={{ flexShrink: 0, marginTop: 1 }} />
+                <p style={{ color: "#EF4444", fontSize: 12, margin: 0 }}>{pwdError}</p>
+              </div>
+            )}
+
+            <button onClick={changePassword} disabled={pwdSaving || !newPwd || !confirmPwd}
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, background: pwdSaved ? "rgba(57,255,143,0.1)" : (pwdSaving || !newPwd) ? "rgba(201,168,76,0.2)" : `linear-gradient(90deg,${G},#b8953f)`, border: pwdSaved ? "1px solid rgba(57,255,143,0.3)" : "none", borderRadius: 10, padding: "12px", color: pwdSaved ? "#39FF8F" : (!newPwd || pwdSaving) ? MUTED : "#080808", fontSize: 14, fontWeight: 700, cursor: (pwdSaving || !newPwd) ? "not-allowed" : "pointer", transition: "all 0.2s" }}>
+              {pwdSaved ? <><Check size={14} /> Mot de passe modifie !</> : pwdSaving ? "Modification..." : <><Key size={14} /> Changer le mot de passe</>}
+            </button>
+          </div>
+        </Section>
+
+        {/* Notifications */}
+        <Section title="Notifications" subtitle="Gere les emails que tu recois" icon={<Bell size={16} />}>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Toggle value={notifs.scan_alert} onChange={v => setNotifs(n => ({ ...n, scan_alert: v }))}
+              label="Alertes de scans" description="Recois un email quand ton QR code est scanne" />
+            <Toggle value={notifs.weekly_report} onChange={v => setNotifs(n => ({ ...n, weekly_report: v }))}
+              label="Rapport hebdomadaire" description="Résumé de tes stats chaque lundi" />
+            <Toggle value={notifs.product_updates} onChange={v => setNotifs(n => ({ ...n, product_updates: v }))}
+              label="Nouveautes produit" description="Nouvelles fonctionnalites et mises a jour" />
+            <Toggle value={notifs.marketing} onChange={v => setNotifs(n => ({ ...n, marketing: v }))}
+              label="Offres et promotions" description="Reductions et offres speciales" />
+            <div style={{ paddingTop: 14 }}>
+              <button onClick={saveNotifications}
+                style={{ display: "flex", alignItems: "center", gap: 7, background: notifSaved ? "rgba(57,255,143,0.1)" : `${G}12`, border: `1px solid ${notifSaved ? "rgba(57,255,143,0.3)" : G + "25"}`, borderRadius: 9, padding: "9px 18px", color: notifSaved ? "#39FF8F" : G, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                {notifSaved ? <><Check size={12} /> Sauvegarde !</> : <><Save size={12} /> Sauvegarder les preferences</>}
+              </button>
+            </div>
+          </div>
+        </Section>
+
+        {/* Apparence */}
+        <Section title="Apparence" subtitle="Interface et affichage" icon={<Palette size={16} />}>
+          <div>
+            <Toggle value={appearance.compact_mode} onChange={v => setAppearance(a => ({ ...a, compact_mode: v }))}
+              label="Mode compact" description="Interface plus dense, moins d'espacement" />
+            <Toggle value={appearance.animations} onChange={v => setAppearance(a => ({ ...a, animations: v }))}
+              label="Animations" description="Transitions et effets visuels dans l'interface" />
+          </div>
+        </Section>
+
+        {/* Session */}
+        <Section title="Session" subtitle="Connexion et deconnexion" icon={<LogOut size={16} />}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, padding: "12px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#39FF8F", animation: "pulse 2s infinite" }} />
+              <div style={{ flex: 1 }}>
+                <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 600, margin: 0 }}>Session active</p>
+                <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{profile?.email}</p>
+              </div>
+            </div>
+            <button onClick={handleLogout}
+              style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "12px 18px", color: "#EF4444", fontSize: 14, fontWeight: 600, cursor: "pointer", width: "fit-content" }}>
+              <LogOut size={15} /> Se deconnecter
+            </button>
+          </div>
+          <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}`}</style>
+        </Section>
+
+        {/* Danger zone */}
+        <div style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 16, overflow: "hidden" }}>
+          <div style={{ padding: "18px 24px", borderBottom: "1px solid rgba(239,68,68,0.1)", display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ color: "#EF4444", background: "rgba(239,68,68,0.1)", borderRadius: 8, padding: 8 }}><AlertTriangle size={16} /></div>
+            <div>
+              <p style={{ color: "#EF4444", fontSize: 15, fontWeight: 700, margin: 0 }}>Zone de danger</p>
+              <p style={{ color: "#8A8478", fontSize: 12, margin: 0 }}>Actions irreversibles</p>
+            </div>
+          </div>
+          <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
+            <p style={{ color: MUTED, fontSize: 13, margin: 0, lineHeight: 1.6 }}>
+              La suppression de ton compte effacera definitivement toutes tes pages, QR codes et donnees analytics. Cette action est irreversible.
+            </p>
+            <div>
+              <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5 }}>Confirme en tapant ton email : <span style={{ color: "#EF4444" }}>{profile?.email}</span></label>
+              <input value={deleteConfirm} onChange={e => setDeleteConfirm(e.target.value)}
+                placeholder={profile?.email || "ton@email.com"}
+                style={{ ...inputStyle, borderColor: deleteConfirm === profile?.email ? "rgba(239,68,68,0.4)" : "rgba(239,68,68,0.15)", background: "rgba(239,68,68,0.04)" }}
+                onFocus={e => e.target.style.borderColor = "rgba(239,68,68,0.5)"}
+                onBlur={e => e.target.style.borderColor = deleteConfirm === profile?.email ? "rgba(239,68,68,0.4)" : "rgba(239,68,68,0.15)"} />
+            </div>
+            <button onClick={deleteAccount} disabled={deleteConfirm !== profile?.email || deleting}
+              style={{ display: "flex", alignItems: "center", gap: 8, background: deleteConfirm === profile?.email ? "rgba(239,68,68,0.15)" : "rgba(239,68,68,0.05)", border: `1px solid ${deleteConfirm === profile?.email ? "rgba(239,68,68,0.4)" : "rgba(239,68,68,0.15)"}`, borderRadius: 10, padding: "12px 18px", color: deleteConfirm === profile?.email ? "#EF4444" : "rgba(239,68,68,0.4)", fontSize: 14, fontWeight: 700, cursor: deleteConfirm === profile?.email ? "pointer" : "not-allowed", width: "fit-content", transition: "all 0.2s" }}>
+              <Trash2 size={15} /> Supprimer definitivement mon compte
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  )
+}

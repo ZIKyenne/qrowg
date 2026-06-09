@@ -1,4 +1,4 @@
-'use server'
+﻿'use server'
 
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
@@ -36,6 +36,16 @@ export async function signUp(formData: FormData) {
     options: { data: { full_name } },
   })
 
+  // Trigger welcome email
+  if (!error) {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/emails/welcome`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, name: full_name }),
+      })
+    } catch {}
+  }
   if (error) redirect('/auth/signup?error=' + encodeURIComponent(error.message))
   redirect('/dashboard')
 }
