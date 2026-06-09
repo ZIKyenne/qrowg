@@ -3334,7 +3334,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
       const { data: pg } = await supabase.from("pages").select("title,slug,status,theme,total_views").eq("id", pageId).single()
       if (pg) { setPageName(pg.title); setPageSlug(pg.slug); setPageStatus(pg.status||"draft"); if (pg.theme) setTheme(pg.theme as PageTheme); setPageStats(s => ({ ...s, views: pg.total_views||0 })) }
       const { data: blks } = await supabase.from("blocks").select("*").eq("page_id", pageId).order("position")
-      if (blks?.length) setBlocks(blks.map(b => ({ id: b.id, type: b.type, content: b.content||{}, visible: b.is_visible!==false })))
+      if (blks?.length) setBlocks(blks.map(b => ({ id: b.id, type: b.type, content: b.content||{}, visible: b.is_visible!==false, draft: b.is_draft||false })))
       const { data: qr } = await supabase.from("qr_codes").select("short_code,total_scans").eq("page_id", pageId).single()
       if (qr) {
         setQrShortCode(qr.short_code||"")
@@ -3354,7 +3354,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
       const supabase = createClient()
       await supabase.from("pages").update({ title: pageName, theme }).eq("id", pageId)
       await supabase.from("blocks").delete().eq("page_id", pageId)
-      if (blocks.length > 0) await supabase.from("blocks").insert(blocks.map((b, i) => ({ page_id: pageId, type: b.type, position: i, content: b.content, is_visible: b.visible, styles: {} })))
+      if (blocks.length > 0) await supabase.from("blocks").insert(blocks.map((b, i) => ({ page_id: pageId, type: b.type, position: i, content: b.content, is_visible: b.visible && !b.draft, is_draft: b.draft || false, styles: {} })))
       setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
     }, 800)
   }, [blocks, pageName, theme, pageId])
@@ -3387,6 +3387,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
   }
 
   function toggleVisible(id: string) { setBlocks(p => p.map(b => b.id===id ? {...b, visible: !b.visible} : b)) }
+  function toggleDraft(id: string) { setBlocks(p => p.map(b => b.id===id ? {...b, draft: !b.draft} : b)) }
 
   function moveBlock(id: string, dir: number) {
     const idx = blocks.findIndex(b => b.id === id)
@@ -3762,6 +3763,11 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, padding: "6px 12px", background: "rgba(10,10,10,0.8)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 9, backdropFilter: "blur(10px)", position: "sticky", top: 0, zIndex: 10 }}>
               <span style={{ fontSize: 9, letterSpacing: 2, textTransform: "uppercase", color: "#4A4640" }}>CANVAS</span>
               <span style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 6, padding: "1px 6px", fontSize: 10, color: G }}>{blocks.length} bloc{blocks.length!==1?"s":""}</span>
+              {blocks.filter(b => b.draft).length > 0 && (
+                <span style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", borderRadius: 6, padding: "1px 6px", fontSize: 10, color: "#FBBF24" }}>
+                  ✏ {blocks.filter(b => b.draft).length} brouillon{blocks.filter(b => b.draft).length > 1 ? "s" : ""}
+                </span>
+              )}
               {!pageId && <span style={{ color: "#4A4640", fontSize: 9, marginLeft: "auto" }}>Mode démo</span>}
             </div>
 
@@ -3780,7 +3786,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
               return (
                 <div key={block.id}
                   onClick={() => { setSelectedId(block.id); setRightTab("edit") }}
-                  style={{ position: "relative", marginBottom: 0, border: "none", overflow: "visible", cursor: "pointer", transition: "box-shadow 0.15s", opacity: block.visible ? 1 : 0.45, background: "transparent", boxShadow: isSelected ? `inset 3px 0 0 ${G}` : "none" }}
+                  style={{ position: "relative", marginBottom: 0, border: "none", overflow: "visible", cursor: "pointer", transition: "box-shadow 0.15s", opacity: block.visible ? (block.draft ? 0.6 : 1) : 0.35, background: block.draft ? "rgba(251,191,36,0.03)" : "transparent", boxShadow: isSelected ? `inset 3px 0 0 ${G}` : block.draft ? "inset 3px 0 0 rgba(251,191,36,0.5)" : "none" }}
                   onMouseEnter={e => {
                     if (!isSelected) e.currentTarget.style.boxShadow = `inset 3px 0 0 rgba(201,168,76,0.3)`
                     const overlay = e.currentTarget.querySelector(".block-overlay") as HTMLElement
@@ -3807,7 +3813,14 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                     <button onClick={() => moveBlock(block.id, -1)} disabled={idx===0} style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: idx===0 ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: idx===0 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><ChevronUp size={10} /></button>
                     <button onClick={() => moveBlock(block.id, 1)} disabled={idx===blocks.length-1} style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: idx===blocks.length-1 ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: idx===blocks.length-1 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><ChevronDown size={10} /></button>
                     <button onClick={() => duplicateBlock(block.id)} style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><Copy size={10} /></button>
-                    <button onClick={() => toggleVisible(block.id)} style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: block.visible ? MUTED : "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>{block.visible ? <Eye size={10} /> : <EyeOff size={10} />}</button>
+                    <button onClick={() => toggleVisible(block.id)} title={block.visible ? "Masquer" : "Afficher"}
+                      style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: block.visible ? MUTED : "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>
+                      {block.visible ? <Eye size={10} /> : <EyeOff size={10} />}
+                    </button>
+                    <button onClick={e => { e.stopPropagation(); toggleDraft(block.id) }} title={block.draft ? "Retirer du brouillon" : "Mettre en brouillon"}
+                      style={{ width: 24, height: 24, background: block.draft ? "rgba(251,191,36,0.15)" : "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: `1px solid ${block.draft ? "rgba(251,191,36,0.4)" : "rgba(255,255,255,0.1)"}`, color: block.draft ? "#FBBF24" : MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6, fontSize: 10, fontWeight: 700 }}>
+                      ✏
+                    </button>
                     <button onClick={() => deleteBlock(block.id)} style={{ width: 24, height: 24, background: "rgba(239,68,68,0.12)", backdropFilter: "blur(4px)", border: "1px solid rgba(239,68,68,0.3)", color: "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><Trash2 size={10} /></button>
                   </div>
 
@@ -3815,6 +3828,12 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                     <div style={{ position: "absolute", bottom: 6, left: 22, display: "flex", alignItems: "center", gap: 4, background: "rgba(8,8,8,0.88)", backdropFilter: "blur(4px)", border: `1px solid ${G}25`, borderRadius: 6, padding: "2px 7px", zIndex: 10 }}>
                       <span style={{ fontSize: 10 }}>{def?.icon}</span>
                       <span style={{ color: G, fontSize: 9, fontWeight: 700 }}>{def?.label}</span>
+                    </div>
+                  )}
+                  {block.draft && (
+                    <div style={{ position: "absolute", top: 6, left: 22, display: "flex", alignItems: "center", gap: 4, background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.35)", borderRadius: 5, padding: "2px 7px", zIndex: 10, pointerEvents: "none" }}>
+                      <span style={{ fontSize: 8 }}>✏️</span>
+                      <span style={{ color: "#FBBF24", fontSize: 8, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" as const }}>Brouillon</span>
                     </div>
                   )}
 
@@ -3914,7 +3933,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                       <div style={{ maxHeight: 420, overflowY: "auto", ...bgStyle() }} className="iphone-scroll">
                         {blocks.filter(b => b.visible).length===0
                           ? <div style={{ padding: "40px 14px", textAlign: "center", ...bgStyle() }}><p style={{ fontSize: 24, margin: "0 0 6px" }}>✦</p><p style={{ color: MUTED, fontSize: 10 }}>Ta page apparaîtra ici</p></div>
-                          : blocks.filter(b => b.visible).map(b => (
+                          : blocks.filter(b => b.visible && !b.draft).map(b => (
                             <div key={b.id} onClick={() => { setSelectedId(b.id); setRightTab("edit") }} style={{ cursor: "pointer" }}
                               onMouseEnter={e => e.currentTarget.style.opacity="0.85"}
                               onMouseLeave={e => e.currentTarget.style.opacity="1"}>
@@ -3988,8 +4007,12 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                         <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{BLOCK_DEFS[selectedBlock.type]?.description}</p>
                       </div>
                       <div style={{ marginLeft: "auto", display: "flex", gap: 4 }}>
-                        <button onClick={() => duplicateBlock(selectedBlock.id)} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: MUTED, display: "flex", alignItems: "center", justifyContent: "center" }}><Copy size={10} /></button>
-                        <button onClick={() => deleteBlock(selectedBlock.id)} style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: "#EF4444", display: "flex", alignItems: "center", justifyContent: "center" }}><Trash2 size={10} /></button>
+                        <button onClick={() => duplicateBlock(selectedBlock.id)} title="Dupliquer" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: MUTED, display: "flex", alignItems: "center", justifyContent: "center" }}><Copy size={10} /></button>
+                        <button onClick={() => toggleDraft(selectedBlock.id)} title={selectedBlock.draft ? "Retirer du brouillon" : "Mettre en brouillon"}
+                          style={{ background: selectedBlock.draft ? "rgba(251,191,36,0.1)" : "rgba(255,255,255,0.04)", border: `1px solid ${selectedBlock.draft ? "rgba(251,191,36,0.35)" : "rgba(255,255,255,0.07)"}`, borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: selectedBlock.draft ? "#FBBF24" : MUTED, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>
+                          ✏
+                        </button>
+                        <button onClick={() => deleteBlock(selectedBlock.id)} title="Supprimer" style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: "#EF4444", display: "flex", alignItems: "center", justifyContent: "center" }}><Trash2 size={10} /></button>
                       </div>
                     </div>
                     {/* key=selectedBlock.id force le remount quand on change de bloc */}
