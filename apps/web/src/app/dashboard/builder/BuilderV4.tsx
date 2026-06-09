@@ -3653,48 +3653,6 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
             </div>
           )}
 
-          {rightTab==="ai" && (
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-              <div style={{ flex: 1, overflowY: "auto", padding: 10, display: "flex", flexDirection: "column", gap: 8 }}>
-                {messages.map((msg, i) => (
-                  <div key={i} style={{ display: "flex", gap: 6, flexDirection: msg.role==="user" ? "row-reverse" : "row" }}>
-                    <div style={{ width: 22, height: 22, borderRadius: "50%", background: msg.role==="assistant" ? "rgba(201,168,76,0.12)" : "rgba(57,255,143,0.1)", border: `1px solid ${msg.role==="assistant" ? "rgba(201,168,76,0.3)" : "rgba(57,255,143,0.3)"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      {msg.role==="assistant" ? <Bot size={10} color={G} /> : <UserIcon size={10} color="#39FF8F" />}
-                    </div>
-                    <div style={{ maxWidth: "84%", background: msg.role==="assistant" ? "#111" : "rgba(57,255,143,0.06)", border: `1px solid ${msg.role==="assistant" ? "rgba(201,168,76,0.1)" : "rgba(57,255,143,0.2)"}`, borderRadius: msg.role==="user" ? "9px 3px 9px 9px" : "3px 9px 9px 9px", padding: "7px 10px" }}>
-                      <p style={{ color: "#F5F0E8", fontSize: 11, margin: 0, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{msg.content}</p>
-                    </div>
-                  </div>
-                ))}
-                {aiLoading && (
-                  <div style={{ display: "flex", gap: 6 }}>
-                    <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}><Bot size={10} color={G} /></div>
-                    <div style={{ background: "#111", border: "1px solid rgba(201,168,76,0.1)", borderRadius: "3px 9px 9px 9px", padding: "8px 12px", display: "flex", gap: 3 }}>
-                      {[0,1,2].map(i => <div key={i} style={{ width: 4, height: 4, borderRadius: "50%", background: G, animation: `bounce 1s ease ${i*0.2}s infinite` }} />)}
-                    </div>
-                  </div>
-                )}
-                <div ref={messagesEnd} />
-              </div>
-              <div style={{ padding: "5px 8px", display: "flex", gap: 3, flexWrap: "wrap", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
-                {["Freelance","Restaurant","Coach","Artiste","E-commerce","Médecin"].map(s => (
-                  <button key={s} onClick={() => sendAI(s)} style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.1)", borderRadius: 10, padding: "2px 7px", color: MUTED, fontSize: 9, cursor: "pointer" }}>{s}</button>
-                ))}
-              </div>
-              <div style={{ padding: "8px", borderTop: "1px solid rgba(201,168,76,0.1)", display: "flex", gap: 5 }}>
-                <input value={aiInput} onChange={e => setAiInput(e.target.value)}
-                  onKeyDown={e => { if (e.key==="Enter" && !e.shiftKey) { e.preventDefault(); sendAI() } }}
-                  placeholder="Décris ton activité..."
-                  style={{ flex: 1, background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 7, padding: "8px 10px", color: "#F5F0E8", fontSize: 11, outline: "none" }}
-                  onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"}
-                  onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />
-                <button onClick={() => sendAI()} disabled={aiLoading || !aiInput.trim()}
-                  style={{ background: `linear-gradient(90deg,${G},#b8953f)`, border: "none", borderRadius: 7, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", opacity: !aiInput.trim() ? 0.5 : 1, flexShrink: 0 }}>
-                  <Send size={11} color="#080808" />
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
