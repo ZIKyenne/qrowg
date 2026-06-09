@@ -6,7 +6,7 @@ import {
   Eye, Plus, Settings, Check, Search, Copy, EyeOff,
   ExternalLink, Palette, GripVertical, QrCode
 } from "lucide-react"
-import { BLOCK_DEFS, BLOCK_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, type Block, type BlockContent, type PageTheme } from "./types"
+import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, type Block, type BlockContent, type PageTheme } from "./types"
 import { createClient } from "@/lib/supabase/client"
 
 const G = "#C9A84C"
@@ -3390,6 +3390,23 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
   const rightResize = useResize("right", 340, 280, 520)
 
   // ── Favoris ───────────────────────────────────────────────────────────────
+  // ── Popover aperçu bloc ─────────────────────────────────────────────────
+  const [popover, setPopover] = useState<{ type: string; x: number; y: number } | null>(null)
+  const popoverTimer = useRef<ReturnType<typeof setTimeout>>()
+
+  const showPopover = useCallback((type: string, e: React.MouseEvent) => {
+    clearTimeout(popoverTimer.current)
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    popoverTimer.current = setTimeout(() => {
+      setPopover({ type, x: rect.right + 8, y: rect.top })
+    }, 300)
+  }, [])
+
+  const hidePopover = useCallback(() => {
+    clearTimeout(popoverTimer.current)
+    setPopover(null)
+  }, [])
+
   const [favorites, setFavorites] = useState<string[]>(() => {
     if (typeof window !== "undefined") {
       try { return JSON.parse(localStorage.getItem("qrfolio_fav_blocks") || "[]") } catch { return [] }
@@ -3993,8 +4010,8 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                       {catBlocks.map(([type, def]) => (
                         <button key={type} onClick={() => addBlock(type)}
                           style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "7px 8px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 1 }}
-                          onMouseEnter={e => { e.currentTarget.style.background = def.color+"10"; e.currentTarget.style.color = "#F5F0E8" }}
-                          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MUTED }}>
+                          onMouseEnter={e => { e.currentTarget.style.background = def.color+"10"; e.currentTarget.style.color = "#F5F0E8"; showPopover(type, e) }}
+                          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MUTED; hidePopover() }}>
                           <div style={{ width: 26, height: 26, borderRadius: 6, background: def.color+"12", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>{def.icon}</div>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: "inherit", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{hlText(def.label, search)}</p>
@@ -4064,8 +4081,8 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                             {!collapsed && catBlocks.map(([type, def]) => (
                               <button key={type} onClick={() => addBlock(type)}
                                 style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 2, transition: "all 0.15s" }}
-                                onMouseEnter={e => { const el = e.currentTarget; el.style.background = def.color+"10"; el.style.color = "#F5F0E8"; el.style.borderColor = def.color+"20"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0.5" }}
-                                onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = MUTED; el.style.borderColor = "transparent"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0" }}>
+                                onMouseEnter={e => { const el = e.currentTarget; el.style.background = def.color+"10"; el.style.color = "#F5F0E8"; el.style.borderColor = def.color+"20"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0.5"; showPopover(type, e) }}
+                                onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = MUTED; el.style.borderColor = "transparent"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0"; hidePopover() }}>
                                 <div style={{ width: 30, height: 30, borderRadius: 8, background: def.color+"12", border: `1px solid ${def.color}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
                                 <div style={{ flex: 1, minWidth: 0 }}>
                                   <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
@@ -4447,7 +4464,69 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         </div>
       </div>
 
+      {/* Popover aperçu bloc */}
+      {popover && (() => {
+        const def = BLOCK_DEFS[popover.type]
+        const hint = BLOCK_HINTS[popover.type]
+        if (!def) return null
+        const cat = BLOCK_CATEGORIES.find(c => c.id === def.category)
+        // Ajustement vertical pour rester dans l'écran
+        const adjustedY = Math.min(popover.y, window.innerHeight - 200)
+        return (
+          <div style={{
+            position: "fixed", left: popover.x, top: adjustedY, zIndex: 9999,
+            width: 220, background: "#161616",
+            border: `1px solid ${def.color}30`,
+            borderRadius: 14, overflow: "hidden",
+            boxShadow: `0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)`,
+            animation: "popoverIn 0.15s ease",
+            pointerEvents: "none",
+          }}>
+            {/* Header coloré */}
+            <div style={{ padding: "12px 14px", background: `linear-gradient(135deg, ${def.color}12, ${def.color}06)`, borderBottom: `1px solid ${def.color}20` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                <div style={{ width: 32, height: 32, borderRadius: 8, background: def.color+"18", border: `1px solid ${def.color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>{def.icon}</div>
+                <div>
+                  <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 700, margin: "0 0 1px" }}>{def.label}</p>
+                  {cat && <span style={{ background: cat.color+"15", color: cat.color, borderRadius: 10, padding: "1px 6px", fontSize: 8, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 0.8 }}>{cat.label}</span>}
+                </div>
+              </div>
+              <p style={{ color: "rgba(245,240,232,0.65)", fontSize: 10, margin: 0, lineHeight: 1.5 }}>{def.description}</p>
+            </div>
+            {/* Preview + hint */}
+            <div style={{ padding: "10px 14px" }}>
+              {hint ? (
+                <>
+                  <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 8, padding: "8px 10px", marginBottom: 8, fontFamily: "monospace", fontSize: 10, color: "rgba(245,240,232,0.5)", lineHeight: 1.5 }}>
+                    {hint.preview}
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                    <span style={{ fontSize: 9 }}>💡</span>
+                    <span style={{ color: def.color, fontSize: 10, fontWeight: 500 }}>{hint.hint}</span>
+                  </div>
+                </>
+              ) : (
+                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                  <span style={{ fontSize: 9 }}>💡</span>
+                  <span style={{ color: MUTED, fontSize: 10 }}>Cliquez pour ajouter à la page</span>
+                </div>
+              )}
+            </div>
+            {/* Champs disponibles */}
+            {def.fields.length > 0 && (
+              <div style={{ padding: "0 14px 10px", display: "flex", flexWrap: "wrap", gap: 4 }}>
+                {def.fields.slice(0, 4).map(f => (
+                  <span key={f.key} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 6, padding: "2px 6px", fontSize: 8, color: "rgba(245,240,232,0.4)" }}>{f.label.split(" — ").pop()}</span>
+                ))}
+                {def.fields.length > 4 && <span style={{ fontSize: 8, color: MUTED }}>+{def.fields.length - 4}</span>}
+              </div>
+            )}
+          </div>
+        )
+      })()}
+
       <style>{`
+        @keyframes popoverIn { from { opacity: 0; transform: translateX(-4px) scale(0.97) } to { opacity: 1; transform: translateX(0) scale(1) } }
         @keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
         @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}

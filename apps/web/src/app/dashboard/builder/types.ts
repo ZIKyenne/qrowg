@@ -310,6 +310,45 @@ export interface BlockDef {
   category: string
   defaultContent: BlockContent
   fields: BlockField[]
+  hint?: string    // Cas d usage court (1 ligne)
+  preview?: string // Aperçu textuel exemple
+}
+
+// Cas d usage pour les blocs clés
+export const BLOCK_HINTS: Record<string, { hint: string; preview: string }> = {
+  profile:        { hint: "Idéal en premier bloc", preview: "Photo · Nom · Accroche" },
+  bio:            { hint: "Présentez-vous en 2-3 phrases", preview: ""Développeur passionné..."" },
+  cta_button:     { hint: "Votre action principale", preview: "[ Me contacter → ]" },
+  social_links:   { hint: "Tous vos réseaux en un clic", preview: "Instagram · TikTok · LinkedIn" },
+  link_button:    { hint: "Lien vers n importe quelle URL", preview: "[ Mon site web → ]" },
+  image_block:    { hint: "Photo ou illustration", preview: "🖼 Image pleine largeur" },
+  video_embed:    { hint: "YouTube, Vimeo, TikTok...", preview: "▶ Lecture directe" },
+  gallery:        { hint: "Grille de photos 2x ou 3x", preview: "📷 📷 📷" },
+  product:        { hint: "Fiche produit avec prix et CTA", preview: "Produit · 29€ · [Acheter]" },
+  pricing:        { hint: "Grille de tarifs / abonnements", preview: "Free · Pro · Business" },
+  faq:            { hint: "Questions fréquentes accordéon", preview: "▸ Comment ça marche ?" },
+  testimonials:   { hint: "Avis clients avec étoiles", preview: "⭐⭐⭐⭐⭐ "Excellent !"" },
+  countdown:      { hint: "Compte à rebours événement", preview: "12j 4h 23m 15s" },
+  map_embed:      { hint: "Carte Google Maps intégrée", preview: "📍 12 rue de la Paix, Paris" },
+  contact_form:   { hint: "Formulaire nom + email + message", preview: "Nom · Email · [Envoyer]" },
+  stats:          { hint: "Chiffres clés de votre activité", preview: "500+ clients · 98% satisfaction" },
+  spotify_embed:  { hint: "Lecteur Spotify intégré", preview: "🎧 Titre · Album · Artiste" },
+  latest_release: { hint: "Mise en avant de votre sortie", preview: "🔥 Nouveau single dispo" },
+  concerts:       { hint: "Dates de tournée et billetterie", preview: "📍 Paris · 15 juin · [Billets]" },
+  event_program:  { hint: "Planning détaillé de l événement", preview: "18h Accueil · 20h Concert" },
+  hero_banner:    { hint: "Grande bannière d ouverture", preview: "TITRE · Sous-titre · [CTA]" },
+  section_banner: { hint: "Séparateur visuel de section", preview: "━━━ MES SERVICES ━━━" },
+  qr_code_block:  { hint: "Affiche le QR code de la page", preview: "⬛⬛ QR Code ⬛⬛" },
+  tabs_block:     { hint: "Contenu organisé par onglets", preview: "| Tab 1 | Tab 2 | Tab 3 |" },
+  accordion_block:{ hint: "Sections repliables (FAQ, infos)", preview: "▸ Section 1  ▸ Section 2" },
+  embed_block:    { hint: "Intégrer Google Forms, Typeform...", preview: "🔗 iframe externe" },
+  two_columns:    { hint: "Mise en page côte à côte", preview: "| Col 1 | Col 2 |" },
+  grid_section:   { hint: "Grille de cartes 2/3/4 colonnes", preview: "⬜⬜⬜ cartes" },
+  merch:          { hint: "Boutique de produits dérivés", preview: "👕 T-shirt · 🧢 Cap · 💿 Vinyle" },
+  presave:        { hint: "Pré-save avant une sortie", preview: "💾 Sort le 15 juin · [Pré-save]" },
+  rsvp:           { hint: "Confirmation de présence", preview: "[✅ Oui] [🤔 Peut-être] [❌ Non]" },
+  lineup:         { hint: "Liste des artistes festival", preview: "HEADLINER · Artiste 2 · ..." },
+  info_box:       { hint: "Mettre un texte important en avant", preview: "💡 À savoir : ..." },
 }
 
 export const BLOCK_DEFS: Record<string, BlockDef> = {
