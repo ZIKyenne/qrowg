@@ -14,6 +14,7 @@ export interface Block {
 
 export interface PageTheme {
   name: string
+  _v?: number              // Version du format (pour compatibilité future)
   // ── Design tokens couleurs ────────────────────────────────────────────────
   bg: string           // Fond global de la page
   surface: string      // Fond des cartes / blocs
@@ -77,6 +78,146 @@ export function wcagLevel(ratio: number): "AAA" | "AA" | "fail" {
   if (ratio >= 7) return "AAA"
   if (ratio >= 4.5) return "AA"
   return "fail"
+}
+
+// ── Import / Export thème ────────────────────────────────────────────────────
+export const THEME_FORMAT_VERSION = 1
+
+export interface ThemeExport {
+  _qrfolio: true
+  _v: number
+  _exported: string        // ISO date
+  name: string
+  colors: {
+    bg: string; surface: string; primary: string; secondary?: string
+    accent: string; text: string; muted: string; border?: string
+  }
+  typography: { fontDisplay: string; fontBody: string }
+  background: {
+    mode: string; gradient?: string; pattern?: string
+    patternSize?: number; patternColor?: string; patternOpacity?: number
+    image?: string; imageSize?: string; imageOverlay?: string; imageBlur?: number
+    meshC1?: string; meshC2?: string; meshC3?: string; meshBlur?: number
+    radialX?: number; radialY?: number; radialShape?: string
+    radialC1?: string; radialC2?: string; radialC3?: string
+    customCSS?: string
+  }
+  effects: {
+    noise?: boolean; noiseOpacity?: number
+    glow?: boolean; glowColor?: string; glowIntensity?: number; glowSize?: number
+    overlay?: boolean; overlayColor?: string; overlayOpacity?: number
+    blur?: boolean; blurAmount?: number
+    vignette?: boolean; vignetteIntensity?: number
+  }
+  animation: { type?: string; speed?: number }
+}
+
+export function exportThemeToJSON(theme: PageTheme): string {
+  const t = theme as any
+  const data: ThemeExport = {
+    _qrfolio: true,
+    _v: THEME_FORMAT_VERSION,
+    _exported: new Date().toISOString(),
+    name: theme.name,
+    colors: {
+      bg: theme.bg, surface: theme.surface, primary: theme.primary,
+      secondary: theme.secondary, accent: theme.accent, text: theme.text,
+      muted: theme.muted, border: theme.border,
+    },
+    typography: { fontDisplay: theme.fontDisplay, fontBody: theme.fontBody },
+    background: {
+      mode: theme.bgMode, gradient: theme.bgGradient, pattern: theme.bgPattern,
+      patternSize: t.pattern_size, patternColor: t.pattern_color, patternOpacity: t.pattern_opacity,
+      image: theme.bgImage, imageSize: t.bgImageSize, imageOverlay: t.bgImageOverlay, imageBlur: t.bgImageBlur,
+      meshC1: t.mesh_c1, meshC2: t.mesh_c2, meshC3: t.mesh_c3, meshBlur: t.mesh_blur,
+      radialX: t.radial_x, radialY: t.radial_y, radialShape: t.radial_shape,
+      radialC1: t.radial_c1, radialC2: t.radial_c2, radialC3: t.radial_c3,
+      customCSS: t.customCSS,
+    },
+    effects: {
+      noise: t.effect_noise, noiseOpacity: t.noise_opacity,
+      glow: t.effect_glow, glowColor: t.glow_color, glowIntensity: t.glow_intensity, glowSize: t.glow_size,
+      overlay: t.effect_overlay, overlayColor: t.overlay_color, overlayOpacity: t.overlay_opacity,
+      blur: t.effect_blur, blurAmount: t.blur_amount,
+      vignette: t.effect_vignette, vignetteIntensity: t.vignette_intensity,
+    },
+    animation: { type: t.bgAnimation, speed: t.animationSpeed },
+  }
+  // Nettoyer les undefined
+  return JSON.stringify(data, (_, v) => v === undefined ? undefined : v, 2)
+}
+
+export interface ThemeValidationResult {
+  ok: boolean
+  theme?: PageTheme
+  errors: string[]
+  warnings: string[]
+  version: number
+}
+
+export function importThemeFromJSON(raw: string): ThemeValidationResult {
+  const errors: string[] = []
+  const warnings: string[] = []
+
+  let data: any
+  try { data = JSON.parse(raw) } catch {
+    return { ok: false, errors: ["JSON invalide"], warnings: [], version: 0 }
+  }
+
+  // Validation _qrfolio marker
+  if (!data._qrfolio) errors.push("Marqueur _qrfolio manquant — ce fichier n'est pas un thème QRfolio")
+  const version = data._v || 0
+  if (version > THEME_FORMAT_VERSION) warnings.push(`Version ${version} supérieure à la version actuelle (${THEME_FORMAT_VERSION}) — certains paramètres peuvent être ignorés`)
+
+  // Valider les couleurs obligatoires
+  const hexRe = /^#[0-9a-fA-F]{3,8}$/
+  for (const key of ["bg","surface","primary","accent","text","muted"] as const) {
+    const val = data.colors?.[key]
+    if (!val) errors.push(`Couleur obligatoire manquante: ${key}`)
+    else if (!hexRe.test(val)) warnings.push(`Couleur ${key} format inhabituel: ${val}`)
+  }
+
+  // Valider bgMode
+  const validModes = ["solid","gradient","radial","mesh","pattern","image"]
+  if (data.background?.mode && !validModes.includes(data.background.mode))
+    warnings.push(`bgMode inconnu: ${data.background.mode}`)
+
+  if (errors.length > 0) return { ok: false, errors, warnings, version }
+
+  // Reconstruire le PageTheme
+  const c = data.colors || {}
+  const bg = data.background || {}
+  const fx = data.effects || {}
+  const an = data.animation || {}
+
+  const theme: any = {
+    name: data.name || "Thème importé",
+    _v: version,
+    // Couleurs
+    bg: c.bg, surface: c.surface, primary: c.primary, secondary: c.secondary,
+    accent: c.accent, text: c.text, muted: c.muted, border: c.border,
+    // Typo
+    fontDisplay: data.typography?.fontDisplay || "DM Sans",
+    fontBody: data.typography?.fontBody || "DM Sans",
+    // Fond
+    bgMode: bg.mode || "solid", bgGradient: bg.gradient, bgPattern: bg.pattern,
+    pattern_size: bg.patternSize, pattern_color: bg.patternColor, pattern_opacity: bg.patternOpacity,
+    bgImage: bg.image, bgImageSize: bg.imageSize, bgImageOverlay: bg.imageOverlay, bgImageBlur: bg.imageBlur,
+    mesh_c1: bg.meshC1, mesh_c2: bg.meshC2, mesh_c3: bg.meshC3, mesh_blur: bg.meshBlur,
+    radial_x: bg.radialX, radial_y: bg.radialY, radial_shape: bg.radialShape,
+    radial_c1: bg.radialC1, radial_c2: bg.radialC2, radial_c3: bg.radialC3,
+    customCSS: bg.customCSS,
+    // Effets
+    effect_noise: fx.noise, noise_opacity: fx.noiseOpacity,
+    effect_glow: fx.glow, glow_color: fx.glowColor, glow_intensity: fx.glowIntensity, glow_size: fx.glowSize,
+    effect_overlay: fx.overlay, overlay_color: fx.overlayColor, overlay_opacity: fx.overlayOpacity,
+    effect_blur: fx.blur, blur_amount: fx.blurAmount,
+    effect_vignette: fx.vignette, vignette_intensity: fx.vignetteIntensity,
+    // Animation
+    bgAnimation: an.type, animationSpeed: an.speed,
+  }
+
+  return { ok: true, theme: theme as PageTheme, errors: [], warnings, version }
 }
 
 // ── Catégories de presets ─────────────────────────────────────────────────────

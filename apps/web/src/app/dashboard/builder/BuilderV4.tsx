@@ -6,7 +6,7 @@ import {
   Eye, Plus, Settings, Check, Search, Copy, EyeOff,
   ExternalLink, Palette, GripVertical, QrCode
 } from "lucide-react"
-import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, type Block, type BlockContent, type PageTheme } from "./types"
+import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, exportThemeToJSON, importThemeFromJSON, type Block, type BlockContent, type PageTheme } from "./types"
 import { createClient } from "@/lib/supabase/client"
 
 const G = "#C9A84C"
@@ -3502,18 +3502,61 @@ const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 
                   📥 Importer
                 </button>
               </div>
+              {/* ── Export thème ─────────────────────────────────────────── */}
               <button type="button" onClick={() => {
-                const exportData = {
-                  background: { bg: theme.bg, bgGradient: theme.bgGradient, bgMode: (theme as any).bgMode, bgImage: (theme as any).bgImage },
-                  effects: { noise: (theme as any).noise_opacity, glow: (theme as any).glow_color, vignette: (theme as any).vignette_intensity },
-                  animation: { type: (theme as any).bgAnimation, speed: (theme as any).anim_speed }
-                }
-                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" })
+                const json = exportThemeToJSON(theme)
+                const blob = new Blob([json], { type: "application/json" })
                 const url = URL.createObjectURL(blob)
-                const a = document.createElement("a"); a.href = url; a.download = "qrfolio-style.json"; a.click()
-              }} style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 9, padding: "10px", color: G, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
-                📤 Exporter le style complet
+                const a = document.createElement("a")
+                a.href = url
+                a.download = `qrfolio-theme-${theme.name.toLowerCase().replace(/[^a-z0-9]+/g,"-")}-v1.json`
+                a.click(); URL.revokeObjectURL(url)
+                setCopiedStyle(true); setTimeout(() => setCopiedStyle(false), 2000)
+              }} style={{ background: copiedStyle ? "rgba(57,255,143,0.1)" : "rgba(201,168,76,0.08)", border: `1px solid ${copiedStyle ? "rgba(57,255,143,0.4)" : "rgba(201,168,76,0.25)"}`, borderRadius: 10, padding: "10px 14px", color: copiedStyle ? "#39FF8F" : G, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, transition: "all 0.2s" }}>
+                <span style={{ fontSize: 15 }}>{copiedStyle ? "✓" : "📤"}</span>
+                <span>{copiedStyle ? "Exporté !" : "Exporter le thème (.json)"}</span>
               </button>
+
+              {/* ── Import thème ─────────────────────────────────────────── */}
+              <div>
+                <label style={{ color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5, display: "block", marginBottom: 8 }}>Importer un thème</label>
+                <div style={{ display: "flex", gap: 7 }}>
+                  <label style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: MUTED, fontSize: 11, cursor: "pointer" }}
+                    onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background="rgba(255,255,255,0.08)"; el.style.color="#F5F0E8" }}
+                    onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background="rgba(255,255,255,0.04)"; el.style.color=MUTED }}>
+                    <span>📁</span><span>Fichier .json</span>
+                    <input type="file" accept=".json,application/json" style={{ display: "none" }}
+                      onChange={e => {
+                        const file = e.target.files?.[0]; if (!file) return
+                        const reader = new FileReader()
+                        reader.onload = ev => {
+                          const result = importThemeFromJSON(ev.target?.result as string)
+                          if (result.ok && result.theme) {
+                            onThemeChange({ ...result.theme, name: theme.name })
+                            if (result.warnings.length) alert("⚠️ " + result.warnings.join("\n"))
+                          } else { alert("❌ " + result.errors.join("\n")) }
+                          e.target.value = ""
+                        }
+                        reader.readAsText(file)
+                      }} />
+                  </label>
+                  <button type="button"
+                    style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: MUTED, fontSize: 11, cursor: "pointer" }}
+                    onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.08)"; e.currentTarget.style.color="#F5F0E8" }}
+                    onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.color=MUTED }}
+                    onClick={() => {
+                      const raw = prompt("Collez le JSON du thème QRfolio :")
+                      if (!raw) return
+                      const result = importThemeFromJSON(raw)
+                      if (result.ok && result.theme) {
+                        onThemeChange({ ...result.theme, name: theme.name })
+                        if (result.warnings.length) alert("⚠️ " + result.warnings.join("\n"))
+                      } else { alert("❌ " + result.errors.join("\n")) }
+                    }}>
+                    <span>📋</span><span>Coller JSON</span>
+                  </button>
+                </div>
+              </div>/button>
               {/* Aperçu fond actuel */}
               <div>
                 <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 6 }}>Aperçu fond actuel</label>
