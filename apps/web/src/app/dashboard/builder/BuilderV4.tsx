@@ -1438,40 +1438,198 @@ function EditPanel({ block, onChange }: { block: Block; onChange: (key: string, 
 }
 
 function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange: (t: PageTheme) => void }) {
+  const [themeTab, setThemeTab] = useState<"themes"|"colors"|"fonts"|"bg">("themes")
+
+  const inputStyle: React.CSSProperties = {
+    flex: 1, background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)",
+    borderRadius: 8, padding: "8px 10px", color: "#F5F0E8", fontSize: 12, outline: "none", fontFamily: "monospace"
+  }
+
+  const GRADIENTS = [
+    "linear-gradient(135deg,#080808,#1a1a08)",
+    "linear-gradient(135deg,#020B18,#0A1628)",
+    "linear-gradient(135deg,#0D0A1A,#1A0D2E)",
+    "linear-gradient(135deg,#0A1A0E,#0F2414)",
+    "linear-gradient(135deg,#1A0A00,#2D1500)",
+    "linear-gradient(135deg,#1A000A,#2D0015)",
+    "linear-gradient(135deg,#FAFAFA,#F0F0F0)",
+    "linear-gradient(135deg,#F8F0E8,#EDE0D0)",
+  ]
+
+  const PATTERNS = [
+    { id: "dots", label: "Points" },
+    { id: "grid", label: "Grille" },
+    { id: "lines", label: "Lignes" },
+    { id: "waves", label: "Vagues" },
+  ]
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div>
-        <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>Thèmes prédéfinis</p>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+      {/* Onglets thème */}
+      <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,0.06)", marginBottom: 16, flexShrink: 0 }}>
+        {(["themes","colors","fonts","bg"] as const).map(tab => (
+          <button key={tab} onClick={() => setThemeTab(tab)}
+            style={{ flex: 1, padding: "8px 2px", background: "transparent", border: "none", borderBottom: `2px solid ${themeTab===tab ? G : "transparent"}`, color: themeTab===tab ? G : MUTED, fontSize: 10, fontWeight: themeTab===tab ? 700 : 400, cursor: "pointer" }}>
+            {tab==="themes" ? "Thèmes" : tab==="colors" ? "Couleurs" : tab==="fonts" ? "Polices" : "Fond"}
+          </button>
+        ))}
+      </div>
+
+      {/* Onglet Thèmes */}
+      {themeTab==="themes" && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7 }}>
           {Object.entries(PRESET_THEMES).map(([key, t]) => (
             <button key={key} onClick={() => onThemeChange(t)}
-              style={{ background: t.bg, border: `2px solid ${theme.name===t.name ? G : "rgba(255,255,255,0.08)"}`, borderRadius: 10, padding: "9px 7px", cursor: "pointer", textAlign: "left", position: "relative" }}>
-              <div style={{ display: "flex", gap: 3, marginBottom: 4 }}>{[t.primary,t.accent,t.text].map((col,i) => <div key={i} style={{ width: 10, height: 10, borderRadius: "50%", background: col }} />)}</div>
-              <p style={{ color: t.text, fontSize: 9, fontWeight: 600, margin: 0 }}>{t.name}</p>
-              {theme.name===t.name && <div style={{ position: "absolute", top: 3, right: 3, width: 12, height: 12, background: G, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}><Check size={7} color="#000" /></div>}
+              style={{ background: t.bgGradient || t.bg, border: `2px solid ${theme.name===t.name ? G : "rgba(255,255,255,0.08)"}`, borderRadius: 12, padding: "10px 8px", cursor: "pointer", textAlign: "left", position: "relative", overflow: "hidden" }}>
+              <div style={{ display: "flex", gap: 4, marginBottom: 5 }}>
+                {[t.primary, t.accent, t.text].map((col, i) => <div key={i} style={{ width: 12, height: 12, borderRadius: "50%", background: col, boxShadow: `0 0 4px ${col}60` }} />)}
+              </div>
+              <p style={{ color: t.text, fontSize: 10, fontWeight: 700, margin: 0, fontFamily: t.fontDisplay }}>{t.name}</p>
+              {theme.name===t.name && (
+                <div style={{ position: "absolute", top: 4, right: 4, width: 14, height: 14, background: G, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Check size={8} color="#000" />
+                </div>
+              )}
             </button>
           ))}
         </div>
-      </div>
-      <div>
-        <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>Police d&apos;affichage</p>
-        <select value={theme.fontDisplay} onChange={e => onThemeChange({...theme, fontDisplay: e.target.value})} style={{ width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "8px 10px", color: "#F5F0E8", fontSize: 12, outline: "none" }}>
-          {GOOGLE_FONTS.map(f => <option key={f} value={f}>{f}</option>)}
-        </select>
-      </div>
-      <div>
-        <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>Police de corps</p>
-        <select value={theme.fontBody} onChange={e => onThemeChange({...theme, fontBody: e.target.value})} style={{ width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "8px 10px", color: "#F5F0E8", fontSize: 12, outline: "none" }}>
-          {GOOGLE_FONTS.map(f => <option key={f} value={f}>{f}</option>)}
-        </select>
-      </div>
-      <div>
-        <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>Couleur principale</p>
-        <div style={{ display: "flex", gap: 8 }}>
-          <input type="color" value={theme.primary} onChange={e => onThemeChange({...theme, primary: e.target.value})} style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }} />
-          <input type="text" value={theme.primary} onChange={e => onThemeChange({...theme, primary: e.target.value})} style={{ flex: 1, background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "8px 10px", color: "#F5F0E8", fontSize: 12, outline: "none", fontFamily: "monospace" }} />
+      )}
+
+      {/* Onglet Couleurs */}
+      {themeTab==="colors" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {[
+            { key: "primary", label: "Couleur principale", hint: "Boutons, accents" },
+            { key: "accent", label: "Couleur d accent", hint: "Hover, highlights" },
+            { key: "bg", label: "Fond principal", hint: "" },
+            { key: "surface", label: "Fond surface", hint: "" },
+            { key: "text", label: "Texte principal", hint: "" },
+            { key: "muted", label: "Texte secondaire", hint: "" },
+          ].map(({ key, label, hint }) => (
+            <div key={key}>
+              <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 5, fontWeight: 500 }}>{label}</label>
+              {hint && <p style={{ color: MUTED, fontSize: 9, margin: "-3px 0 5px", opacity: 0.7 }}>{hint}</p>}
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <input type="color" value={(theme as any)[key]||"#000000"}
+                  onChange={e => onThemeChange({...theme, [key]: e.target.value})}
+                  style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0, flexShrink: 0 }} />
+                <input type="text" value={(theme as any)[key]||""}
+                  onChange={e => onThemeChange({...theme, [key]: e.target.value})}
+                  style={inputStyle} />
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
+      )}
+
+      {/* Onglet Polices */}
+      {themeTab==="fonts" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div>
+            <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 8, fontWeight: 500, textTransform: "uppercase", letterSpacing: 1.5 }}>Police titres</label>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4, maxHeight: 200, overflowY: "auto" }} className="iphone-scroll">
+              {GOOGLE_FONTS.map(f => (
+                <button key={f} onClick={() => onThemeChange({...theme, fontDisplay: f})}
+                  style={{ padding: "9px 12px", background: theme.fontDisplay===f ? G+"12" : "rgba(255,255,255,0.03)", border: `1px solid ${theme.fontDisplay===f ? G+"30" : "rgba(255,255,255,0.06)"}`, borderRadius: 8, color: theme.fontDisplay===f ? G : "#F5F0E8", fontSize: 14, cursor: "pointer", textAlign: "left", fontFamily: f, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  {f}
+                  {theme.fontDisplay===f && <Check size={11} color={G} />}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 8, fontWeight: 500, textTransform: "uppercase", letterSpacing: 1.5 }}>Police corps</label>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4, maxHeight: 200, overflowY: "auto" }} className="iphone-scroll">
+              {GOOGLE_FONTS.map(f => (
+                <button key={f} onClick={() => onThemeChange({...theme, fontBody: f})}
+                  style={{ padding: "9px 12px", background: theme.fontBody===f ? G+"12" : "rgba(255,255,255,0.03)", border: `1px solid ${theme.fontBody===f ? G+"30" : "rgba(255,255,255,0.06)"}`, borderRadius: 8, color: theme.fontBody===f ? G : "#F5F0E8", fontSize: 13, cursor: "pointer", textAlign: "left", fontFamily: f, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  {f}
+                  {theme.fontBody===f && <Check size={11} color={G} />}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Onglet Fond */}
+      {themeTab==="bg" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {/* Type de fond */}
+          <div>
+            <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 8, fontWeight: 500, textTransform: "uppercase", letterSpacing: 1.5 }}>Type de fond</label>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+              {[
+                { id: "solid", label: "Uni", icon: "🎨" },
+                { id: "gradient", label: "Dégradé", icon: "🌈" },
+                { id: "pattern", label: "Motif", icon: "✦" },
+                { id: "image", label: "Image", icon: "🖼️" },
+              ].map(({ id, label, icon }) => (
+                <button key={id} onClick={() => onThemeChange({...theme, bgMode: id as any})}
+                  style={{ background: (theme.bgMode||"solid")===id ? G+"12" : "rgba(255,255,255,0.03)", border: `1.5px solid ${(theme.bgMode||"solid")===id ? G+"40" : "rgba(255,255,255,0.08)"}`, borderRadius: 10, padding: "10px 8px", cursor: "pointer", color: (theme.bgMode||"solid")===id ? G : MUTED, fontSize: 11, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ fontSize: 14 }}>{icon}</span> {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Uni */}
+          {(theme.bgMode||"solid")==="solid" && (
+            <div>
+              <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 8 }}>Couleur de fond</label>
+              <div style={{ display: "flex", gap: 8 }}>
+                <input type="color" value={theme.bg} onChange={e => onThemeChange({...theme, bg: e.target.value})} style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }} />
+                <input type="text" value={theme.bg} onChange={e => onThemeChange({...theme, bg: e.target.value})} style={inputStyle} />
+              </div>
+            </div>
+          )}
+
+          {/* Dégradé */}
+          {theme.bgMode==="gradient" && (
+            <div>
+              <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 8 }}>Dégradés prédéfinis</label>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {GRADIENTS.map((g, i) => (
+                  <button key={i} onClick={() => onThemeChange({...theme, bgGradient: g})}
+                    style={{ height: 36, background: g, border: `2px solid ${theme.bgGradient===g ? G : "rgba(255,255,255,0.08)"}`, borderRadius: 9, cursor: "pointer", position: "relative" }}>
+                    {theme.bgGradient===g && <Check size={12} color={G} style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)" }} />}
+                  </button>
+                ))}
+              </div>
+              <label style={{ color: MUTED, fontSize: 10, display: "block", margin: "12px 0 6px" }}>CSS personnalisé</label>
+              <input type="text" value={theme.bgGradient||""} onChange={e => onThemeChange({...theme, bgGradient: e.target.value})}
+                placeholder="linear-gradient(135deg, #000, #111)"
+                style={{ ...inputStyle, width: "100%", boxSizing: "border-box", flex: "none" }} />
+            </div>
+          )}
+
+          {/* Motif */}
+          {theme.bgMode==="pattern" && (
+            <div>
+              <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 8 }}>Motif</label>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                {PATTERNS.map(p => (
+                  <button key={p.id} onClick={() => onThemeChange({...theme, bgPattern: p.id} as any)}
+                    style={{ padding: "10px", background: (theme as any).bgPattern===p.id ? G+"12" : "rgba(255,255,255,0.03)", border: `1.5px solid ${(theme as any).bgPattern===p.id ? G+"40" : "rgba(255,255,255,0.08)"}`, borderRadius: 9, cursor: "pointer", color: (theme as any).bgPattern===p.id ? G : MUTED, fontSize: 11, fontWeight: 600 }}>
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Image */}
+          {theme.bgMode==="image" && (
+            <div>
+              <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 8 }}>URL de l&apos;image de fond</label>
+              <input type="url" value={theme.bgImage||""} onChange={e => onThemeChange({...theme, bgImage: e.target.value})}
+                placeholder="https://..."
+                style={{ ...inputStyle, width: "100%", boxSizing: "border-box", flex: "none" }} />
+              {theme.bgImage && <img src={theme.bgImage} alt="" style={{ width: "100%", height: 80, objectFit: "cover", borderRadius: 8, marginTop: 8 }} />}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
