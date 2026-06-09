@@ -3388,6 +3388,24 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
   // ── Resize panneaux ────────────────────────────────────────────────────
   const blocksResize = useResize("blocks", 230, 180, 480)
   const rightResize = useResize("right", 340, 280, 520)
+
+  // ── Favoris ───────────────────────────────────────────────────────────────
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      try { return JSON.parse(localStorage.getItem("qrfolio_fav_blocks") || "[]") } catch { return [] }
+    }
+    return []
+  })
+
+  const toggleFav = useCallback((type: string) => {
+    setFavorites(prev => {
+      const next = prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
+      localStorage.setItem("qrfolio_fav_blocks", JSON.stringify(next))
+      return next
+    })
+  }, [])
+
+  const isFav = useCallback((type: string) => favorites.includes(type), [favorites])
   function toggleFocus() {
     setFocusMode(p => {
       const next = !p
@@ -3549,7 +3567,12 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
   }
 
   const filteredBlocks = (() => {
-    if (!search) return Object.entries(BLOCK_DEFS).filter(([, def]) => def.category === activeCategory)
+    if (!search) {
+      if (activeCategory === "favorites") {
+        return Object.entries(BLOCK_DEFS).filter(([type]) => favorites.includes(type))
+      }
+      return Object.entries(BLOCK_DEFS).filter(([, def]) => def.category === activeCategory)
+    }
     return Object.entries(BLOCK_DEFS)
       .map(([type, def]) => ({ type, def, score: searchScore(type, def, search) }))
       .filter(({ score }) => score > 0)
@@ -3836,6 +3859,15 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
           {!search && !blocksCollapsed && (
             <div style={{ padding: "7px 8px 5px 10px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                {/* Catégorie Favoris — visible seulement si au moins 1 favori */}
+                {favorites.length > 0 && (
+                  <button onClick={() => setActiveCategory("favorites")} title="Vos blocs favoris"
+                    style={{ display: "flex", alignItems: "center", gap: 5, background: activeCategory==="favorites" ? "#FFD70018" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory==="favorites" ? "#FFD70050" : "rgba(255,255,255,0.06)"}`, borderRadius: 8, padding: "6px 9px", color: activeCategory==="favorites" ? "#FFD700" : MUTED, fontSize: 11, fontWeight: activeCategory==="favorites" ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                    <span style={{ fontSize: 14 }}>⭐</span>
+                    <span>Favoris</span>
+                    <span style={{ background: "rgba(255,215,0,0.15)", borderRadius: 10, padding: "0px 5px", fontSize: 9, fontWeight: 700 }}>{favorites.length}</span>
+                  </button>
+                )}
                 {BLOCK_CATEGORIES.map(cat => (
                   <button key={cat.id} onClick={() => setActiveCategory(cat.id)} title={cat.desc}
                     style={{ display: "flex", alignItems: "center", gap: 5, background: activeCategory===cat.id ? cat.color+"18" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory===cat.id ? cat.color+"50" : "rgba(255,255,255,0.06)"}`, borderRadius: 8, padding: "6px 9px", color: activeCategory===cat.id ? cat.color : MUTED, fontSize: 11, fontWeight: activeCategory===cat.id ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
@@ -3844,12 +3876,21 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                   </button>
                 ))}
               </div>
-              <p style={{ color: MUTED, fontSize: 10, margin: "6px 0 0", paddingLeft: 2 }}>{BLOCK_CATEGORIES.find(c => c.id===activeCategory)?.desc}</p>
+              <p style={{ color: MUTED, fontSize: 10, margin: "6px 0 0", paddingLeft: 2 }}>
+                {activeCategory==="favorites" ? `${favorites.length} bloc${favorites.length>1?"s":""} favori${favorites.length>1?"s":""}` : BLOCK_CATEGORIES.find(c => c.id===activeCategory)?.desc}
+              </p>
             </div>
           )}
           {/* Mode réduit : icônes catégories + drawer flottant */}
           {blocksCollapsed && (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "8px 4px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
+              {favorites.length > 0 && (
+                <button onClick={() => { setDrawerCategory("favorites"); setActiveCategory("favorites") }}
+                  title={`Favoris (${favorites.length})`}
+                  style={{ width: 44, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: (drawerCategory==="favorites" || activeCategory==="favorites") ? "#FFD70018" : "transparent", border: `1px solid ${(drawerCategory==="favorites" || activeCategory==="favorites") ? "#FFD70040" : "transparent"}`, borderRadius: 8, cursor: "pointer", fontSize: 16, transition: "all 0.15s" }}>
+                  ⭐
+                </button>
+              )}
               {BLOCK_CATEGORIES.map(cat => (
                 <button key={cat.id} onClick={() => { setDrawerCategory(drawerCategory===cat.id ? null : cat.id); setActiveCategory(cat.id) }}
                   title={cat.label}
@@ -3897,13 +3938,19 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
               : filteredBlocks.map(([type, def]) => (
                 <button key={type} onClick={() => addBlock(type)}
                   style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left", marginBottom: 2, transition: "all 0.15s" }}
-                  onMouseEnter={e => { const el = e.currentTarget; el.style.background = def.color+"10"; el.style.color = "#F5F0E8"; el.style.borderColor = def.color+"20" }}
-                  onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = MUTED; el.style.borderColor = "transparent" }}>
+                  onMouseEnter={e => { const el = e.currentTarget; el.style.background = def.color+"10"; el.style.color = "#F5F0E8"; el.style.borderColor = def.color+"20"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0.5" }}
+                  onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = MUTED; el.style.borderColor = "transparent"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0" }}>
                   <div style={{ width: 30, height: 30, borderRadius: 8, background: def.color+"12", border: `1px solid ${def.color}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
                     <p style={{ margin: 0, fontSize: 9, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1.3 }}>{def.description}</p>
                   </div>
+                  <button onClick={e => { e.stopPropagation(); toggleFav(type) }}
+                    title={isFav(type) ? "Retirer des favoris" : "Ajouter aux favoris"}
+                    style={{ width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", cursor: "pointer", flexShrink: 0, fontSize: 13, opacity: isFav(type) ? 1 : 0, transition: "opacity 0.15s, transform 0.15s", color: isFav(type) ? "#FFD700" : MUTED }}
+                    className="fav-star">
+                    {isFav(type) ? "⭐" : "☆"}
+                  </button>
                 </button>
               ))}
           </div>}
@@ -3934,13 +3981,16 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
           <div ref={drawerRef} style={{ position: "absolute", left: 64, top: 0, width: 240, height: "100%", background: "#0D0D0D", borderRight: "1px solid rgba(201,168,76,0.15)", zIndex: 50, display: "flex", flexDirection: "column", boxShadow: "4px 0 24px rgba(0,0,0,0.5)" }}>
             <div style={{ padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                <span style={{ fontSize: 14 }}>{BLOCK_CATEGORIES.find(c => c.id===drawerCategory)?.icon}</span>
-                <span style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 700 }}>{BLOCK_CATEGORIES.find(c => c.id===drawerCategory)?.label}</span>
+                <span style={{ fontSize: 14 }}>{drawerCategory==="favorites" ? "⭐" : BLOCK_CATEGORIES.find(c => c.id===drawerCategory)?.icon}</span>
+                <span style={{ color: drawerCategory==="favorites" ? "#FFD700" : "#F5F0E8", fontSize: 12, fontWeight: 700 }}>{drawerCategory==="favorites" ? `Favoris (${favorites.length})` : BLOCK_CATEGORIES.find(c => c.id===drawerCategory)?.label}</span>
               </div>
               <button onClick={() => setDrawerCategory(null)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 2 }}><X size={13} /></button>
             </div>
             <div style={{ flex: 1, overflowY: "auto", padding: "5px 6px" }}>
-              {Object.entries(BLOCK_DEFS).filter(([, def]) => def.category === drawerCategory).map(([type, def]) => (
+              {(drawerCategory === "favorites"
+                ? Object.entries(BLOCK_DEFS).filter(([type]) => favorites.includes(type))
+                : Object.entries(BLOCK_DEFS).filter(([, def]) => def.category === drawerCategory)
+              ).map(([type, def]) => (
                 <button key={type} onClick={() => { addBlock(type); setDrawerCategory(null) }}
                   style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 2 }}
                   onMouseEnter={e => { const el = e.currentTarget; el.style.background = BLOCK_DEFS[type]?.color+"10"; el.style.color = "#F5F0E8" }}
@@ -3950,6 +4000,11 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                     <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
                     <p style={{ margin: 0, fontSize: 9, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.description}</p>
                   </div>
+                  <button onClick={e => { e.stopPropagation(); toggleFav(type) }}
+                    title={isFav(type) ? "Retirer des favoris" : "Ajouter aux favoris"}
+                    style={{ width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", cursor: "pointer", flexShrink: 0, fontSize: 12, color: isFav(type) ? "#FFD700" : "rgba(255,255,255,0.25)" }}>
+                    {isFav(type) ? "⭐" : "☆"}
+                  </button>
                 </button>
               ))}
             </div>
