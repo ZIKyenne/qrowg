@@ -317,7 +317,7 @@ export interface BlockDef {
 // Cas d usage pour les blocs clés
 export const BLOCK_HINTS: Record<string, { hint: string; preview: string }> = {
   profile:        { hint: "Idéal en premier bloc", preview: "Photo · Nom · Accroche" },
-  bio:            { hint: "Présentez-vous en 2-3 phrases", preview: "'Développeur passionné...'" },
+  bio:            { hint: "Présentez-vous en 2-3 phrases", preview: "Dev passionne..." },
   cta_button:     { hint: "Votre action principale", preview: "[ Me contacter → ]" },
   social_links:   { hint: "Tous vos réseaux en un clic", preview: "Instagram · TikTok · LinkedIn" },
   link_button:    { hint: "Lien vers n importe quelle URL", preview: "[ Mon site web → ]" },

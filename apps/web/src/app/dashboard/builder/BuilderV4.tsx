@@ -3253,6 +3253,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
     })
   }, [undoRedo])
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [multiSelection, setMultiSelection] = useState<string[]>([])
   const [pageName, setPageName] = useState("Ma Page")
   const [pageSlug, setPageSlug] = useState("ma-page")
   const [pageStatus, setPageStatus] = useState("draft")
@@ -3355,6 +3356,24 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
           setRightCollapsed(next)
           return next
         })
+        return
+      }
+      // Escape — désélectionner tout
+      if (e.key === "Escape" && !isEditing(e)) {
+        setMultiSelection([])
+        setSelectedId(null)
+        return
+      }
+      // Ctrl+A — sélectionner tous les blocs
+      if (ctrl && (e.key === "a" || e.key === "A") && !isEditing(e)) {
+        e.preventDefault()
+        setMultiSelection(blocks.map(b => b.id))
+        return
+      }
+      // Delete/Backspace — supprimer la sélection multiple
+      if ((e.key === "Delete" || e.key === "Backspace") && multiSelection.length > 0 && !isEditing(e)) {
+        e.preventDefault()
+        deleteMulti()
         return
       }
       // F seul — Mode Focus (fallback sans modificateur)
@@ -3542,6 +3561,66 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
   function toggleVisible(id: string) { setBlocks(p => p.map(b => b.id===id ? {...b, visible: !b.visible} : b)) }
   function toggleDraft(id: string) { setBlocks(p => p.map(b => b.id===id ? {...b, draft: !b.draft} : b)) }
   function toggleLock(id: string) { setBlocks(p => p.map(b => b.id===id ? {...b, locked: !b.locked} : b)) }
+
+  // ── Sélection multiple ────────────────────────────────────────────────────
+  function handleBlockClick(e: React.MouseEvent, blockId: string, blockIdx: number) {
+    if (e.ctrlKey || e.metaKey) {
+      // Ctrl/Cmd+clic : toggle dans la sélection multiple
+      e.preventDefault()
+      setMultiSelection(prev =>
+        prev.includes(blockId) ? prev.filter(id => id !== blockId) : [...prev, blockId]
+      )
+      if (multiSelection.length === 0) setSelectedId(blockId)
+    } else if (e.shiftKey && selectedId) {
+      // Shift+clic : sélectionner une plage
+      e.preventDefault()
+      const selectedIdx = blocks.findIndex(b => b.id === selectedId)
+      const min = Math.min(selectedIdx, blockIdx)
+      const max = Math.max(selectedIdx, blockIdx)
+      setMultiSelection(blocks.slice(min, max + 1).map(b => b.id))
+    } else {
+      // Clic simple
+      setMultiSelection([])
+      setSelectedId(blockId)
+      setRightTab("edit")
+    }
+  }
+
+  function deleteMulti() {
+    const ids = multiSelection.length > 0 ? multiSelection : []
+    if (ids.length === 0) return
+    setBlocks(p => p.filter(b => !ids.includes(b.id) || b.locked))
+    setMultiSelection([])
+    setSelectedId(null)
+  }
+
+  function duplicateMulti() {
+    const ids = multiSelection
+    if (ids.length === 0) return
+    setBlocks(p => {
+      const result = [...p]
+      const newIds: string[] = []
+      // Insérer les clones après le dernier bloc sélectionné
+      const lastIdx = Math.max(...ids.map(id => result.findIndex(b => b.id === id)))
+      const clones = ids.map(id => {
+        const orig = result.find(b => b.id === id)!
+        const newId = Date.now().toString(36) + Math.random().toString(36).slice(2)
+        newIds.push(newId)
+        return { ...orig, id: newId, content: { ...orig.content } }
+      })
+      result.splice(lastIdx + 1, 0, ...clones)
+      return result
+    })
+    setMultiSelection([])
+  }
+
+  function toggleVisibleMulti() {
+    const ids = multiSelection
+    if (ids.length === 0) return
+    // Si tous visibles → masquer tous, sinon → afficher tous
+    const allVisible = ids.every(id => blocks.find(b => b.id === id)?.visible)
+    setBlocks(p => p.map(b => ids.includes(b.id) ? { ...b, visible: !allVisible } : b))
+  }
 
   function moveBlock(id: string, dir: number) {
     const block = blocks.find(b => b.id === id)
@@ -4169,8 +4248,32 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         )}
 
         {/* CANVAS */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "20px", background: "#0A0A0A" }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: "20px", background: "#0A0A0A" }}
+          onClick={e => { if (e.target === e.currentTarget) { setSelectedId(null); setMultiSelection([]) } }}>
           <div style={{ maxWidth: 640, margin: "0 auto" }}>
+            {/* Barre actions multi-sélection */}
+            {multiSelection.length > 0 && (
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, padding: "8px 12px", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 10, backdropFilter: "blur(10px)", position: "sticky", top: 0, zIndex: 15 }}>
+                <span style={{ color: G, fontSize: 12, fontWeight: 700 }}>✓ {multiSelection.length} bloc{multiSelection.length>1?"s":""} sélectionné{multiSelection.length>1?"s":""}</span>
+                <div style={{ flex: 1 }} />
+                <button onClick={toggleVisibleMulti} title="Masquer/Afficher"
+                  style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 7, padding: "5px 10px", color: "#F5F0E8", fontSize: 11, cursor: "pointer" }}>
+                  <Eye size={11} /> Masquer
+                </button>
+                <button onClick={duplicateMulti} title="Dupliquer la sélection"
+                  style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 7, padding: "5px 10px", color: "#F5F0E8", fontSize: 11, cursor: "pointer" }}>
+                  <Copy size={11} /> Dupliquer
+                </button>
+                <button onClick={deleteMulti} title="Supprimer la sélection"
+                  style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 7, padding: "5px 10px", color: "#EF4444", fontSize: 11, cursor: "pointer" }}>
+                  <Trash2 size={11} /> Supprimer
+                </button>
+                <button onClick={() => setMultiSelection([])} title="Désélectionner"
+                  style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, color: MUTED, cursor: "pointer", fontSize: 14 }}>
+                  ×
+                </button>
+              </div>
+            )}
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, padding: "6px 12px", background: "rgba(10,10,10,0.8)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 9, backdropFilter: "blur(10px)", position: "sticky", top: 0, zIndex: 10 }}>
               <span style={{ fontSize: 9, letterSpacing: 2, textTransform: "uppercase", color: "#4A4640" }}>CANVAS</span>
               <span style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 6, padding: "1px 6px", fontSize: 10, color: G }}>{blocks.length} bloc{blocks.length!==1?"s":""}</span>
@@ -4194,10 +4297,11 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
             ) : blocks.map((block, idx) => {
               const def = BLOCK_DEFS[block.type]
               const isSelected = block.id === selectedId
+              const isMultiSelected = multiSelection.includes(block.id)
               return (
                 <div key={block.id}
-                  onClick={() => { setSelectedId(block.id); setRightTab("edit") }}
-                  style={{ position: "relative", marginBottom: 0, border: "none", overflow: "visible", cursor: block.locked ? "default" : "pointer", transition: "box-shadow 0.15s", opacity: block.visible ? (block.draft ? 0.6 : 1) : 0.35, background: block.draft ? "rgba(251,191,36,0.03)" : "transparent", boxShadow: isSelected ? `inset 3px 0 0 ${G}` : block.draft ? "inset 3px 0 0 rgba(251,191,36,0.5)" : block.locked ? "inset 3px 0 0 rgba(99,102,241,0.5)" : "none" }}
+                  onClick={(e) => handleBlockClick(e, block.id, idx)}
+                  style={{ position: "relative", marginBottom: 0, border: "none", overflow: "visible", cursor: block.locked ? "default" : "pointer", transition: "box-shadow 0.15s, background 0.1s", opacity: block.visible ? (block.draft ? 0.6 : 1) : 0.35, background: isMultiSelected ? "rgba(201,168,76,0.06)" : block.draft ? "rgba(251,191,36,0.03)" : "transparent", boxShadow: isSelected ? `inset 3px 0 0 ${G}` : isMultiSelected ? `inset 3px 0 0 ${G}80` : block.draft ? "inset 3px 0 0 rgba(251,191,36,0.5)" : block.locked ? "inset 3px 0 0 rgba(99,102,241,0.5)" : "none" }}
                   onMouseEnter={e => {
                     if (!isSelected) e.currentTarget.style.boxShadow = `inset 3px 0 0 rgba(201,168,76,0.3)`
                     const overlay = e.currentTarget.querySelector(".block-overlay") as HTMLElement
