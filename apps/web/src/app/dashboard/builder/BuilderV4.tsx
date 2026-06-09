@@ -3627,6 +3627,17 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
       })).filter(({ blocks }) => blocks.length > 0)
     : null
 
+  // Compteurs par catégorie — calculés une seule fois par render
+  const catCounts = Object.values(BLOCK_DEFS).reduce((acc, def) => {
+    acc[def.category] = (acc[def.category] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+
+  // Compteurs recherche — nb de résultats par catégorie
+  const searchCounts = search && groupedResults
+    ? Object.fromEntries(groupedResults.map(({ cat, blocks }) => [cat.id, blocks.length]))
+    : null
+
   function hlText(text: string, query: string): React.ReactNode {
     if (!query.trim()) return text
     const lo = text.toLowerCase()
@@ -3921,6 +3932,9 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                     style={{ display: "flex", alignItems: "center", gap: 5, background: activeCategory===cat.id ? cat.color+"18" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory===cat.id ? cat.color+"50" : "rgba(255,255,255,0.06)"}`, borderRadius: 8, padding: "6px 9px", color: activeCategory===cat.id ? cat.color : MUTED, fontSize: 11, fontWeight: activeCategory===cat.id ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
                     <span style={{ fontSize: 14 }}>{cat.icon}</span>
                     <span>{cat.label}</span>
+                    <span style={{ background: activeCategory===cat.id ? cat.color+"20" : "rgba(255,255,255,0.06)", color: activeCategory===cat.id ? cat.color : MUTED, borderRadius: 10, padding: "0px 5px", fontSize: 9, fontWeight: 700, lineHeight: "16px" }}>
+                      {search && searchCounts ? (searchCounts[cat.id] || 0) : (catCounts[cat.id] || 0)}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -3948,9 +3962,10 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
               )}
               {BLOCK_CATEGORIES.map(cat => (
                 <button key={cat.id} onClick={() => { setDrawerCategory(drawerCategory===cat.id ? null : cat.id); setActiveCategory(cat.id) }}
-                  title={cat.label}
-                  style={{ width: 44, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: (drawerCategory===cat.id || activeCategory===cat.id) ? cat.color+"18" : "transparent", border: `1px solid ${(drawerCategory===cat.id || activeCategory===cat.id) ? cat.color+"40" : "transparent"}`, borderRadius: 8, cursor: "pointer", fontSize: 16, transition: "all 0.15s" }}>
+                  title={`${cat.label} (${catCounts[cat.id] || 0})`}
+                  style={{ width: 44, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: (drawerCategory===cat.id || activeCategory===cat.id) ? cat.color+"18" : "transparent", border: `1px solid ${(drawerCategory===cat.id || activeCategory===cat.id) ? cat.color+"40" : "transparent"}`, borderRadius: 8, cursor: "pointer", fontSize: 16, transition: "all 0.15s", position: "relative" as const }}>
                   {cat.icon}
+                  <span style={{ position: "absolute", bottom: 2, right: 3, fontSize: 7, color: MUTED, fontWeight: 700, lineHeight: 1 }}>{catCounts[cat.id]||0}</span>
                 </button>
               ))}
             </div>
@@ -4101,6 +4116,11 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
               <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
                 <span style={{ fontSize: 14 }}>{drawerCategory==="recents" ? "🕐" : drawerCategory==="favorites" ? "⭐" : BLOCK_CATEGORIES.find(c => c.id===drawerCategory)?.icon}</span>
                 <span style={{ color: drawerCategory==="recents" ? "#38BDF8" : drawerCategory==="favorites" ? "#FFD700" : "#F5F0E8", fontSize: 12, fontWeight: 700 }}>{drawerCategory==="recents" ? `Récents (${recentBlocks.length})` : drawerCategory==="favorites" ? `Favoris (${favorites.length})` : BLOCK_CATEGORIES.find(c => c.id===drawerCategory)?.label}</span>
+                {drawerCategory!=="recents" && drawerCategory!=="favorites" && (
+                  <span style={{ background: "rgba(255,255,255,0.07)", color: MUTED, borderRadius: 10, padding: "1px 7px", fontSize: 9, fontWeight: 700, marginLeft: 4 }}>
+                    {catCounts[drawerCategory||""] || 0}
+                  </span>
+                )}
               </div>
               <button onClick={() => setDrawerCategory(null)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 2 }}><X size={13} /></button>
             </div>
