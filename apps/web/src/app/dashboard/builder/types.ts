@@ -14,22 +14,69 @@ export interface Block {
 
 export interface PageTheme {
   name: string
-  bg: string
-  surface: string
-  primary: string
-  accent: string
-  text: string
-  muted: string
+  // ── Design tokens couleurs ────────────────────────────────────────────────
+  bg: string           // Fond global de la page
+  surface: string      // Fond des cartes / blocs
+  primary: string      // Couleur primaire (boutons, CTA)
+  secondary?: string   // Couleur secondaire
+  accent: string       // Accent / highlights
+  text: string         // Texte principal
+  muted: string        // Texte secondaire / placeholder
+  border?: string      // Couleur des bordures
+  // ── Typographie ──────────────────────────────────────────────────────────
   fontDisplay: string
   fontBody: string
+  // ── Fond ─────────────────────────────────────────────────────────────────
   bgMode: "solid" | "gradient" | "pattern" | "image"
   bgGradient?: string
   bgPattern?: string
   bgImage?: string
-  // Preset metadata
-  category?: string   // "Business" | "Luxury" | "Creator" | "Startup" | "Restaurant" | "Immobilier" | "Fitness" | "Event" | "Music" | "Portfolio"
-  emoji?: string      // Emoji représentatif
-  tags?: string[]     // Mots-clés
+  // ── Preset metadata ───────────────────────────────────────────────────────
+  category?: string
+  emoji?: string
+  tags?: string[]
+}
+
+// Utilitaires couleurs
+export function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const m = hex.replace("#","").match(/.{2}/g)
+  if (!m || m.length < 3) return null
+  return { r: parseInt(m[0],16), g: parseInt(m[1],16), b: parseInt(m[2],16) }
+}
+
+export function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
+  r /= 255; g /= 255; b /= 255
+  const max = Math.max(r,g,b), min = Math.min(r,g,b)
+  let h = 0, s = 0
+  const l = (max+min)/2
+  if (max !== min) {
+    const d = max - min
+    s = l > 0.5 ? d/(2-max-min) : d/(max+min)
+    switch(max) {
+      case r: h = ((g-b)/d + (g<b?6:0))/6; break
+      case g: h = ((b-r)/d + 2)/6; break
+      case b: h = ((r-g)/d + 4)/6; break
+    }
+  }
+  return { h: Math.round(h*360), s: Math.round(s*100), l: Math.round(l*100) }
+}
+
+export function contrastRatio(hex1: string, hex2: string): number {
+  function lum(hex: string) {
+    const rgb = hexToRgb(hex)
+    if (!rgb) return 0
+    const { r, g, b } = rgb
+    const [R,G,B] = [r,g,b].map(v => { v/=255; return v<=0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055,2.4) })
+    return 0.2126*R + 0.7152*G + 0.0722*B
+  }
+  const l1 = lum(hex1), l2 = lum(hex2)
+  return (Math.max(l1,l2)+0.05)/(Math.min(l1,l2)+0.05)
+}
+
+export function wcagLevel(ratio: number): "AAA" | "AA" | "fail" {
+  if (ratio >= 7) return "AAA"
+  if (ratio >= 4.5) return "AA"
+  return "fail"
 }
 
 // ── Catégories de presets ─────────────────────────────────────────────────────

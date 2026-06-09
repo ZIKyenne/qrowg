@@ -6,7 +6,7 @@ import {
   Eye, Plus, Settings, Check, Search, Copy, EyeOff,
   ExternalLink, Palette, GripVertical, QrCode
 } from "lucide-react"
-import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, type Block, type BlockContent, type PageTheme } from "./types"
+import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, type Block, type BlockContent, type PageTheme } from "./types"
 import { createClient } from "@/lib/supabase/client"
 
 const G = "#C9A84C"
@@ -2614,6 +2614,38 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
   const [bgMode, setBgMode] = useState<string>(theme.bgMode||"solid")
   const [bgSubTab, setBgSubTab] = useState<"type"|"effects"|"animation"|"presets"|"advanced">("presets")
   const [activeCat, setActiveCat] = useState<string>(PRESET_CATEGORIES[0].id)
+  const [colorFormat, setColorFormat] = useState<"hex"|"rgb"|"hsl">("hex")
+  const [recentColors, setRecentColors] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem("qrfolio_recent_colors") || "[]") } catch { return [] }
+  })
+
+  function addRecentColor(hex: string) {
+    setRecentColors(prev => {
+      const next = [hex, ...prev.filter(c => c !== hex)].slice(0, 10)
+      localStorage.setItem("qrfolio_recent_colors", JSON.stringify(next))
+      return next
+    })
+  }
+
+  function formatColor(hex: string, fmt: "hex"|"rgb"|"hsl"): string {
+    if (fmt === "hex") return hex
+    const rgb = hexToRgb(hex)
+    if (!rgb) return hex
+    if (fmt === "rgb") return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
+    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b)
+    return `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`
+  }
+
+  function parseColorInput(val: string): string | null {
+    val = val.trim()
+    if (/^#[0-9a-fA-F]{3,6}$/.test(val)) return val
+    const rgbM = val.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/)
+    if (rgbM) {
+      const [, r, g, b] = rgbM.map(Number)
+      return "#" + [r,g,b].map(v => v.toString(16).padStart(2,"0")).join("")
+    }
+    return null
+  }
   const [patternTypeLocal, setPatternType] = useState<string>((theme as any).bgPattern||"dots")
   const [effectNoise, setEffectNoise] = useState(false)
   const [effectGlow, setEffectGlow] = useState(false)
@@ -2780,25 +2812,91 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
 
       {/* ── ONGLET COULEURS ── */}
       {themeTab==="colors" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+          {/* Sélecteur de format */}
+          <div style={{ display: "flex", gap: 4, marginBottom: 14 }}>
+            {(["hex","rgb","hsl"] as const).map(fmt => (
+              <button key={fmt} onClick={() => setColorFormat(fmt)}
+                style={{ flex: 1, padding: "5px", background: colorFormat===fmt ? G+"15" : "rgba(255,255,255,0.04)", border: `1px solid ${colorFormat===fmt ? G+"40" : "rgba(255,255,255,0.07)"}`, borderRadius: 7, color: colorFormat===fmt ? G : MUTED, fontSize: 10, fontWeight: colorFormat===fmt ? 700 : 400, cursor: "pointer", textTransform: "uppercase" as const }}>
+                {fmt}
+              </button>
+            ))}
+          </div>
+
+          {/* Tokens de couleur */}
           {[
-            { key: "primary", label: "Couleur principale", hint: "Boutons, accents" },
-            { key: "accent", label: "Couleur d accent", hint: "Hover, highlights" },
-            { key: "bg", label: "Fond principal", hint: "" },
-            { key: "text", label: "Texte principal", hint: "" },
-            { key: "muted", label: "Texte secondaire", hint: "" },
-          ].map(({ key, label, hint }) => (
-            <div key={key}>
-              <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4, fontWeight: 500 }}>{label}</label>
-              {hint && <p style={{ color: MUTED, fontSize: 9, margin: "-2px 0 4px", opacity: 0.7 }}>{hint}</p>}
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <input type="color" value={(theme as any)[key]||"#000000"} onChange={e => onThemeChange({...theme, [key]: e.target.value})}
-                  style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0, flexShrink: 0 }} />
-                <input type="text" value={(theme as any)[key]||""} onChange={e => onThemeChange({...theme, [key]: e.target.value})}
-                  style={{ ...inputStyle, flex: 1 }} />
+            { key: "primary",   label: "Primaire",   hint: "Boutons, CTA, liens",       icon: "🎨" },
+            { key: "accent",    label: "Accent",      hint: "Highlights, hover",          icon: "✨" },
+            { key: "bg",        label: "Fond",        hint: "Arrière-plan de la page",   icon: "🖼️" },
+            { key: "surface",   label: "Cartes",      hint: "Fond des blocs et cartes",  icon: "▣" },
+            { key: "text",      label: "Texte",       hint: "Texte principal",           icon: "T" },
+            { key: "muted",     label: "Secondaire",  hint: "Texte secondaire, labels",  icon: "t" },
+            { key: "border",    label: "Bordures",    hint: "Contours des éléments",     icon: "⬜" },
+          ].map(({ key, label, hint, icon }) => {
+            const val: string = (theme as any)[key] || "#000000"
+            const ratio = contrastRatio(val, (theme as any).bg || "#000000")
+            const wcag = wcagLevel(ratio)
+            return (
+              <div key={key} style={{ marginBottom: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}>
+                  <span style={{ fontSize: 12, width: 18, textAlign: "center" as const }}>{icon}</span>
+                  <label style={{ color: "#F5F0E8", fontSize: 11, fontWeight: 600, flex: 1 }}>{label}</label>
+                  <span style={{ fontSize: 9, color: MUTED }}>{hint}</span>
+                  {/* Badge contraste */}
+                  {(key === "text" || key === "muted") && (
+                    <span style={{ background: wcag==="AAA" ? "rgba(57,255,143,0.15)" : wcag==="AA" ? "rgba(251,191,36,0.15)" : "rgba(239,68,68,0.15)", border: `1px solid ${wcag==="AAA" ? "rgba(57,255,143,0.3)" : wcag==="AA" ? "rgba(251,191,36,0.3)" : "rgba(239,68,68,0.3)"}`, borderRadius: 6, padding: "1px 6px", fontSize: 9, fontWeight: 700, color: wcag==="AAA" ? "#39FF8F" : wcag==="AA" ? "#FBBF24" : "#EF4444" }}>
+                      {wcag} {ratio.toFixed(1)}:1
+                    </span>
+                  )}
+                </div>
+                <div style={{ display: "flex", gap: 7, alignItems: "center" }}>
+                  {/* Color picker natif */}
+                  <div style={{ position: "relative", flexShrink: 0 }}>
+                    <input type="color" value={val.startsWith("#") ? val : "#000000"}
+                      onChange={e => { onThemeChange({...theme, [key]: e.target.value} as any); addRecentColor(e.target.value) }}
+                      style={{ width: 38, height: 36, border: "none", borderRadius: 8, cursor: "pointer", padding: 2, background: "transparent" }} />
+                    <div style={{ position: "absolute", inset: 0, borderRadius: 8, border: "2px solid rgba(255,255,255,0.15)", pointerEvents: "none" }} />
+                  </div>
+                  {/* Input format */}
+                  <input
+                    value={formatColor(val, colorFormat)}
+                    onChange={e => {
+                      const parsed = parseColorInput(e.target.value) || e.target.value
+                      if (parsed.startsWith("#")) { onThemeChange({...theme, [key]: parsed} as any); addRecentColor(parsed) }
+                    }}
+                    style={{ ...inputStyle, flex: 1, fontFamily: "JetBrains Mono, monospace", fontSize: 11 }}
+                    placeholder={colorFormat === "hex" ? "#000000" : colorFormat === "rgb" ? "rgb(0,0,0)" : "hsl(0,0%,0%)"}
+                  />
+                </div>
+              </div>
+            )
+          })}
+
+          {/* Couleurs récentes */}
+          {recentColors.length > 0 && (
+            <div style={{ marginTop: 8 }}>
+              <p style={{ color: MUTED, fontSize: 9, textTransform: "uppercase" as const, letterSpacing: 2, margin: "0 0 8px" }}>Récentes</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {recentColors.map((col, i) => (
+                  <button key={i} title={col}
+                    style={{ width: 24, height: 24, borderRadius: 6, background: col, border: "2px solid rgba(255,255,255,0.1)", cursor: "pointer", flexShrink: 0 }}
+                    onClick={() => onThemeChange({...theme, primary: col} as any)} />
+                ))}
               </div>
             </div>
-          ))}
+          )}
+
+          {/* Aperçu des couleurs appliquées */}
+          <div style={{ marginTop: 14, background: theme.surface || theme.bg, borderRadius: 12, overflow: "hidden", border: "1px solid rgba(255,255,255,0.06)" }}>
+            <div style={{ padding: "12px 14px" }}>
+              <p style={{ color: theme.text, fontSize: 13, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay }}>Aperçu live</p>
+              <p style={{ color: theme.muted, fontSize: 11, margin: "0 0 10px" }}>Texte secondaire exemple</p>
+              <div style={{ display: "flex", gap: 7 }}>
+                <div style={{ flex: 1, background: theme.primary, borderRadius: 7, padding: "7px", textAlign: "center", fontSize: 11, fontWeight: 700, color: contrastRatio(theme.primary, "#ffffff") > 4.5 ? "#ffffff" : "#000000" }}>Bouton primaire</div>
+                <div style={{ flex: 1, background: theme.accent, borderRadius: 7, padding: "7px", textAlign: "center", fontSize: 11, fontWeight: 700, color: contrastRatio(theme.accent, "#ffffff") > 4.5 ? "#ffffff" : "#000000" }}>Accent</div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
