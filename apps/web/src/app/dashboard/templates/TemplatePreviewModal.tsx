@@ -2,7 +2,7 @@
 "use client"
 import { useEffect, useRef } from "react"
 import { X, ArrowRight, Lock, Check, Layers, Clock } from "lucide-react"
-import { type Block, type PageTheme, BLOCK_DEFS } from "./types"
+import { type Block, type PageTheme, BLOCK_DEFS } from "../builder/types"
 
 const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%274%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E')"
 
