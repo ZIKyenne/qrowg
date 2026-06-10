@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react"
 import { ExternalLink } from "lucide-react"
+import { trackPageView } from "@/lib/trackPageView"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -515,6 +516,11 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
       document.head.appendChild(link)
     }
   }, [])
+
+  // Track page view avec détection source réelle
+  useEffect(() => {
+    trackPageView(page.id)
+  }, [page.id])
 
   // Scroll handler
   useEffect(() => {

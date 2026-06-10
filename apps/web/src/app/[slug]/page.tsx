@@ -15,15 +15,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .eq("slug", params.slug)
     .eq("status", "published")
     .single()
+
   if (!page) return { title: "Page introuvable" }
-  const title = (page as any).seo_title || (page as any).title || "QRfolio"
-  const description = (page as any).seo_description || `Page de ${(page as any).profiles?.full_name || "QRfolio"}`
-  const ogImage = (page as any).og_image_url || `${APP_URL}/og-default.png`
+
+  const profile = page.profiles as any
+  const title = page.seo_title || page.title
+  const description = page.seo_description || `Decouvre la page de ${profile?.full_name || page.title} sur QRfolio`
+  const image = page.og_image_url || `${APP_URL}/og-image.png`
+  const url = `${APP_URL}/${page.slug}`
+
   return {
     title,
     description,
-    openGraph: { title, description, images: [{ url: ogImage }], type: "profile" },
-    twitter: { card: "summary_large_image", title, description, images: [ogImage] },
+    openGraph: {
+      type: "profile",
+      url,
+      title,
+      description,
+      images: [{ url: image, width: 1200, height: 630, alt: title }],
+      siteName: "QRfolio",
+    },
+    twitter: { card: "summary_large_image", title, description, images: [image] },
+    alternates: { canonical: url },
   }
 }
 
@@ -44,21 +57,30 @@ export default async function PublicPage({ params }: Props) {
     .select("*")
     .eq("page_id", page.id)
     .eq("is_visible", true)
-    .order("position", { ascending: true })
+    .order("position")
 
-  // Incrémenter le compteur de vues
-  supabase.from("pages").update({ total_views: ((page as any).total_views || 0) + 1 }).eq("id", page.id).then(() => {})
-
-  const structuredData = {
+  // JSON-LD structured data
+  const profile = page.profiles as any
+  const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ProfilePage",
-    name: (page as any).title,
-    url: `${APP_URL}/${params.slug}`,
+    "name": page.title,
+    "description": page.seo_description || `Page de ${profile?.full_name || page.title}`,
+    "url": `${APP_URL}/${page.slug}`,
+    "mainEntity": {
+      "@type": "Person",
+      "name": profile?.full_name || page.title,
+      "url": `${APP_URL}/${page.slug}`,
+      ...(profile?.avatar_url ? { "image": profile.avatar_url } : {}),
+    }
   }
+
+  // Le tracking est fait côté client dans PublicPageClient
+  // pour détecter la vraie source (referrer HTTP, paramètres UTM)
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <PublicPageClient page={page} blocks={blocks || []} />
     </>
   )
