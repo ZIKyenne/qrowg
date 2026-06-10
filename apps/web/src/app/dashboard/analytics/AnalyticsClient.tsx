@@ -8,12 +8,14 @@ import {
 import { QrCode, Eye, TrendingUp, Smartphone, Globe, BarChart2 } from "lucide-react"
 import TrafficSourcesPanel from "./TrafficSourcesPanel"
 import TopLinksPanel from "./TopLinksPanel"
+import BlockPerformancePanel from "./BlockPerformancePanel"
 
 type Profile = { total_pages: number; total_scans: number; plan: string } | null
 type Page = { id: string; title: string; slug: string; total_views: number; unique_views: number; status: string }
 type Scan = { scanned_at: string; device: string; country: string | null; page_id: string }
 type View = { viewed_at: string; device: string; source: string | null; country: string | null; page_id: string }
 type Click = { block_id: string; click_target: string | null; clicked_at: string; page_id: string; block_type?: string }
+type BRow  = { id: string; type: string; page_id: string; position: number; is_visible: boolean }
 
 interface Props {
   profile: Profile
@@ -21,6 +23,7 @@ interface Props {
   recentScans: Scan[]
   recentViews: View[]
   clicks?: Click[]
+  blocks?: BRow[]
 }
 
 const GOLD = "#C9A84C"
@@ -82,7 +85,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   )
 }
 
-export default function AnalyticsClient({ profile, pages, recentScans, recentViews, clicks = [] }: Props) {
+export default function AnalyticsClient({ profile, pages, recentScans, recentViews, clicks = [], blocks = [] }: Props) {
   const [selectedPage, setSelectedPage] = useState<string>("all")
 
   const filteredScans = useMemo(() =>
@@ -234,6 +237,16 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
         {/* ── Top liens ─────────────────────────────────────────────────── */}
         <div style={{ marginBottom: 24 }}>
           <TopLinksPanel
+            clicks={clicks}
+            pageViews={filteredViews}
+            pages={pages}
+          />
+        </div>
+
+        {/* ── Performance blocs ─────────────────────────────────────────── */}
+        <div style={{ marginBottom: 24 }}>
+          <BlockPerformancePanel
+            blocks={blocks}
             clicks={clicks}
             pageViews={filteredViews}
             pages={pages}

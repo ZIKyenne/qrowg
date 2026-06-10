@@ -53,6 +53,13 @@ export default async function AnalyticsPage() {
     .gte("viewed_at", since.toISOString())
     .order("viewed_at", { ascending: true })
 
+  // Blocs de toutes les pages
+  const { data: allBlocks } = await supabase
+    .from("blocks")
+    .select("id, type, page_id, position, is_visible")
+    .in("page_id", (pages || []).map(p => p.id))
+    .eq("is_visible", true)
+
   // Normaliser les clics (joindre block_type depuis blocks)
   const clicks = (recentClicks || []).map((c: any) => ({
     block_id:     c.block_id,
@@ -69,6 +76,7 @@ export default async function AnalyticsPage() {
       recentScans={recentScans || []}
       recentViews={recentViews || []}
       clicks={clicks}
+      blocks={allBlocks || []}
     />
   )
 }
