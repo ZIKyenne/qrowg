@@ -1,11 +1,11 @@
-﻿import { createClient } from "@/lib/supabase/server"
+﻿import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import AnalyticsClient from "./AnalyticsClient"
 
 export const metadata = { title: "Analytics — QRfolio" }
 
 export default async function AnalyticsPage() {
-  const supabase = await createClient()
+  const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/auth/login")
 

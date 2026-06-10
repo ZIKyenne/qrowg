@@ -275,8 +275,8 @@ export default function TopLinksPanel({ clicks, pageViews, pages }: Props) {
         </div>
 
       ) : (
-
-        /* ── Tableau ────────────────────────────────────────────────────── */}
+        <>
+        {/* ── Tableau ─────────────────────────────────────────────────── */}
         <div>
           {/* En-têtes */}
           <div style={{ display: "grid", gridTemplateColumns: "28px 1fr 90px 80px 80px 120px", gap: 8, padding: "0 8px 8px", borderBottom: "1px solid " + BORDER }}>
@@ -332,6 +332,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages }: Props) {
             </div>
           ))}
         </div>
+        </>
       )}
     </div>
   )
