@@ -9,13 +9,15 @@ import { QrCode, Eye, TrendingUp, Smartphone, Globe, BarChart2 } from "lucide-re
 import TrafficSourcesPanel from "./TrafficSourcesPanel"
 import TopLinksPanel from "./TopLinksPanel"
 import BlockPerformancePanel from "./BlockPerformancePanel"
+import GeoPanel from "./GeoPanel"
 
 type Profile = { total_pages: number; total_scans: number; plan: string } | null
 type Page = { id: string; title: string; slug: string; total_views: number; unique_views: number; status: string }
 type Scan = { scanned_at: string; device: string; country: string | null; page_id: string }
 type View = { viewed_at: string; device: string; source: string | null; country: string | null; page_id: string }
 type Click = { block_id: string; click_target: string | null; clicked_at: string; page_id: string; block_type?: string }
-type BRow  = { id: string; type: string; page_id: string; position: number; is_visible: boolean }
+type BRow    = { id: string; type: string; page_id: string; position: number; is_visible: boolean }
+type GeoScan = { country: string | null; city: string | null; page_id: string; scanned_at: string }
 
 interface Props {
   profile: Profile
@@ -24,6 +26,7 @@ interface Props {
   recentViews: View[]
   clicks?: Click[]
   blocks?: BRow[]
+  geoScans?: GeoScan[]
 }
 
 const GOLD = "#C9A84C"
@@ -85,7 +88,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   )
 }
 
-export default function AnalyticsClient({ profile, pages, recentScans, recentViews, clicks = [], blocks = [] }: Props) {
+export default function AnalyticsClient({ profile, pages, recentScans, recentViews, clicks = [], blocks = [], geoScans = [] }: Props) {
   const [selectedPage, setSelectedPage] = useState<string>("all")
 
   const filteredScans = useMemo(() =>
@@ -248,6 +251,15 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
           <BlockPerformancePanel
             blocks={blocks}
             clicks={clicks}
+            pageViews={filteredViews}
+            pages={pages}
+          />
+        </div>
+
+        {/* ── Géographie ──────────────────────────────────────────────────── */}
+        <div style={{ marginBottom: 24 }}>
+          <GeoPanel
+            scans={geoScans}
             pageViews={filteredViews}
             pages={pages}
           />
