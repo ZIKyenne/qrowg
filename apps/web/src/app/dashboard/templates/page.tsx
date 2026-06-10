@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { Sparkles, ArrowRight, Check, X, Lock, Search, Heart, Eye, Clock, Grid3x3, Layers } from "lucide-react"
+import { Sparkles, ArrowRight, Check, X, Lock, Search, Heart, Eye, Clock, Layers } from "lucide-react"
+import TemplatePreviewModal from "./TemplatePreviewModal"
 
 // ── Temps estimé par template ──────────────────────────────────────────────
 const SETUP_TIME: Record<string, string> = {
@@ -53,6 +54,7 @@ export default function TemplatesPage() {
   const [userPlan] = useState("free")
   const [favs, setFavs] = useState<string[]>([])
   const [preview, setPreview] = useState<string | null>(null)
+  const [isCreating, setIsCreating] = useState(false)
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
   const router = useRouter()
 
@@ -299,60 +301,23 @@ export default function TemplatesPage() {
         </div>
       </div>
 
-      {/* ── Modal Aperçu ────────────────────────────────────────────────────── */}
+      {/* ── Modal Aperçu ─────────────────────────────────────────────────── */}
       {preview && previewTemplate && (
-        <div onClick={() => setPreview(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, backdropFilter: "blur(4px)" }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: "#0F0E0B", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 20, width: "100%", maxWidth: 480, maxHeight: "90vh", overflowY: "auto", padding: "24px" }}>
-            {/* Header modal */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 9, background: previewTemplate.bg, border: "1px solid " + previewTemplate.color + "30", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{previewTemplate.emoji}</div>
-                <div>
-                  <h3 style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0 }}>{previewTemplate.name}</h3>
-                  <span style={{ color: MUTED, fontSize: 11 }}>{previewTemplate.category} · {(TEMPLATE_BLOCKS[previewTemplate.id] || []).length} blocs · ≈ {SETUP_TIME[previewTemplate.id] || "5 min"}</span>
-                </div>
-              </div>
-              <button type="button" onClick={() => setPreview(null)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                <X size={14} color={MUTED} />
-              </button>
-            </div>
-
-            {/* Description */}
-            <p style={{ color: MUTED, fontSize: 12, marginBottom: 16, lineHeight: 1.6 }}>{previewTemplate.description}</p>
-
-            {/* Liste des blocs */}
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-                <Grid3x3 size={12} color={G} />
-                <span style={{ color: G, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Blocs inclus</span>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                {(TEMPLATE_BLOCKS[previewTemplate.id] || []).map((block: any, i: number) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 8 }}>
-                    <Check size={10} color={previewTemplate.color} />
-                    <span style={{ color: "#F5F0E8", fontSize: 11, fontWeight: 500, textTransform: "capitalize", flex: 1 }}>{block.type.replace(/_/g, " ")}</span>
-                    {block.content?.name && <span style={{ color: MUTED, fontSize: 10 }}>"{block.content.name}"</span>}
-                    {block.content?.title && !block.content?.name && <span style={{ color: MUTED, fontSize: 10 }}>"{block.content.title}"</span>}
-                    {block.content?.label && !block.content?.name && !block.content?.title && <span style={{ color: MUTED, fontSize: 10 }}>"{block.content.label}"</span>}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Actions modal */}
-            <div style={{ display: "flex", gap: 10 }}>
-              <button type="button" onClick={() => toggleFav(previewTemplate.id, { stopPropagation: () => {} } as any)}
-                style={{ padding: "10px 14px", background: favs.includes(previewTemplate.id) ? "rgba(239,68,68,0.1)" : "rgba(255,255,255,0.04)", border: "1px solid " + (favs.includes(previewTemplate.id) ? "rgba(239,68,68,0.3)" : "rgba(255,255,255,0.08)"), borderRadius: 10, display: "flex", alignItems: "center", gap: 6, color: favs.includes(previewTemplate.id) ? "#EF4444" : MUTED, fontSize: 11, cursor: "pointer" }}>
-                <Heart size={12} fill={favs.includes(previewTemplate.id) ? "#EF4444" : "none"} color={favs.includes(previewTemplate.id) ? "#EF4444" : MUTED} />
-                {favs.includes(previewTemplate.id) ? "Sauvegardé" : "Sauvegarder"}
-              </button>
-              <button type="button" onClick={() => { setPreview(null); if (!canUse(previewTemplate.plan)) { router.push("/upgrade"); return } createFromTemplate(previewTemplate.id) }}
-                style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "10px", background: canUse(previewTemplate.plan) ? "linear-gradient(90deg,#C9A84C,#b8953f)" : "rgba(255,255,255,0.05)", border: canUse(previewTemplate.plan) ? "none" : "1px solid rgba(255,255,255,0.08)", borderRadius: 10, color: canUse(previewTemplate.plan) ? "#080808" : MUTED, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-                {canUse(previewTemplate.plan) ? <><ArrowRight size={13} /> Utiliser ce template</> : <><Lock size={12} /> Plan {PLAN_CONFIG[previewTemplate.plan].label} requis</>}
-              </button>
-            </div>
-          </div>
-        </div>
+        <TemplatePreviewModal
+          template={previewTemplate}
+          blocks={TEMPLATE_BLOCKS[previewTemplate.id] || []}
+          onClose={() => setPreview(null)}
+          onUse={() => {
+            setPreview(null)
+            if (!canUse(previewTemplate.plan)) {
+              alert(`Plan ${previewTemplate.plan} requis`)
+              return
+            }
+            handleUse(previewTemplate.id)
+          }}
+          canUse={canUse(previewTemplate.plan)}
+          isCreating={isCreating}
+        />
       )}
 
       {/* ── Barre de sélection fixe ─────────────────────────────────────────── */}
