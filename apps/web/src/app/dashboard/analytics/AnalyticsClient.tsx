@@ -11,6 +11,7 @@ import TopLinksPanel from "./TopLinksPanel"
 import BlockPerformancePanel from "./BlockPerformancePanel"
 import GeoPanel from "./GeoPanel"
 import DevicePanel from "./DevicePanel"
+import ExportPanel from "./ExportPanel"
 
 type Profile = { total_pages: number; total_scans: number; plan: string } | null
 type Page = { id: string; title: string; slug: string; total_views: number; unique_views: number; status: string }
@@ -274,6 +275,19 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             scans={deviceScans}
             pageViews={filteredViews}
             pages={pages}
+          />
+        </div>
+
+        {/* ── Export CSV ──────────────────────────────────────────────────────── */}
+        <div style={{ marginBottom: 24 }}>
+          <ExportPanel
+            plan={profile?.plan ?? "free"}
+            pages={pages}
+            views={filteredViews}
+            scans={recentScans as any}
+            clicks={clicks}
+            blocks={blocks}
+            geoScans={geoScans}
           />
         </div>
 
