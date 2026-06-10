@@ -12,8 +12,9 @@ import BlockPerformancePanel from "./BlockPerformancePanel"
 import GeoPanel from "./GeoPanel"
 import DevicePanel from "./DevicePanel"
 import ExportPanel from "./ExportPanel"
+import ReportSubscriptionPanel from "./ReportSubscriptionPanel"
 
-type Profile = { total_pages: number; total_scans: number; plan: string } | null
+type Profile = { total_pages: number; total_scans: number; plan: string; email?: string; full_name?: string } | null
 type Page = { id: string; title: string; slug: string; total_views: number; unique_views: number; status: string }
 type Scan = { scanned_at: string; device: string; country: string | null; page_id: string }
 type View = { viewed_at: string; device: string; source: string | null; country: string | null; page_id: string }
@@ -31,6 +32,7 @@ interface Props {
   blocks?: BRow[]
   geoScans?: GeoScan[]
   deviceScans?: DeviceScan[]
+  userEmail?: string
 }
 
 const GOLD = "#C9A84C"
@@ -92,7 +94,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   )
 }
 
-export default function AnalyticsClient({ profile, pages, recentScans, recentViews, clicks = [], blocks = [], geoScans = [], deviceScans = [] }: Props) {
+export default function AnalyticsClient({ profile, pages, recentScans, recentViews, clicks = [], blocks = [], geoScans = [], deviceScans = [], userEmail = "" }: Props) {
   const [selectedPage, setSelectedPage] = useState<string>("all")
 
   const filteredScans = useMemo(() =>
@@ -288,6 +290,14 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             clicks={clicks}
             blocks={blocks}
             geoScans={geoScans}
+          />
+        </div>
+
+        {/* ── Rapports automatiques ───────────────────────────────────────── */}
+        <div style={{ marginBottom: 24 }}>
+          <ReportSubscriptionPanel
+            userEmail={userEmail || profile?.email || ""}
+            plan={profile?.plan ?? "free"}
           />
         </div>
 

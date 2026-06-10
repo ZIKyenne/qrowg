@@ -12,7 +12,7 @@ export default async function AnalyticsPage() {
   // Stats globales du profil
   const { data: profile } = await supabase
     .from("profiles")
-    .select("total_pages, total_scans, plan")
+    .select("total_pages, total_scans, plan, email, full_name")
     .eq("id", user.id)
     .single()
 
@@ -96,6 +96,7 @@ export default async function AnalyticsPage() {
       blocks={allBlocks || []}
       geoScans={geoScans}
       deviceScans={deviceScans}
+      userEmail={profile?.email ?? ""}
     />
   )
 }
