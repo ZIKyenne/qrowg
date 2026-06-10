@@ -10,6 +10,7 @@ import TrafficSourcesPanel from "./TrafficSourcesPanel"
 import TopLinksPanel from "./TopLinksPanel"
 import BlockPerformancePanel from "./BlockPerformancePanel"
 import GeoPanel from "./GeoPanel"
+import DevicePanel from "./DevicePanel"
 
 type Profile = { total_pages: number; total_scans: number; plan: string } | null
 type Page = { id: string; title: string; slug: string; total_views: number; unique_views: number; status: string }
@@ -17,7 +18,8 @@ type Scan = { scanned_at: string; device: string; country: string | null; page_i
 type View = { viewed_at: string; device: string; source: string | null; country: string | null; page_id: string }
 type Click = { block_id: string; click_target: string | null; clicked_at: string; page_id: string; block_type?: string }
 type BRow    = { id: string; type: string; page_id: string; position: number; is_visible: boolean }
-type GeoScan = { country: string | null; city: string | null; page_id: string; scanned_at: string }
+type GeoScan    = { country: string | null; city: string | null; page_id: string; scanned_at: string }
+type DeviceScan = { device: string; os: string | null; browser: string | null; page_id: string; scanned_at: string }
 
 interface Props {
   profile: Profile
@@ -27,6 +29,7 @@ interface Props {
   clicks?: Click[]
   blocks?: BRow[]
   geoScans?: GeoScan[]
+  deviceScans?: DeviceScan[]
 }
 
 const GOLD = "#C9A84C"
@@ -88,7 +91,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   )
 }
 
-export default function AnalyticsClient({ profile, pages, recentScans, recentViews, clicks = [], blocks = [], geoScans = [] }: Props) {
+export default function AnalyticsClient({ profile, pages, recentScans, recentViews, clicks = [], blocks = [], geoScans = [], deviceScans = [] }: Props) {
   const [selectedPage, setSelectedPage] = useState<string>("all")
 
   const filteredScans = useMemo(() =>
@@ -260,6 +263,15 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
         <div style={{ marginBottom: 24 }}>
           <GeoPanel
             scans={geoScans}
+            pageViews={filteredViews}
+            pages={pages}
+          />
+        </div>
+
+        {/* ── Appareils ──────────────────────────────────────────────────────── */}
+        <div style={{ marginBottom: 24 }}>
+          <DevicePanel
+            scans={deviceScans}
             pageViews={filteredViews}
             pages={pages}
           />

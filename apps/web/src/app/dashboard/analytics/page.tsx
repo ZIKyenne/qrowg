@@ -29,7 +29,7 @@ export default async function AnalyticsPage() {
 
   const { data: recentScans } = await supabase
     .from("scans")
-    .select("scanned_at, device, country, city, page_id")
+    .select("scanned_at, device, country, city, os, browser, page_id")
     .in("page_id", (pages || []).map(p => p.id))
     .gte("scanned_at", since.toISOString())
     .order("scanned_at", { ascending: true })
@@ -77,6 +77,15 @@ export default async function AnalyticsPage() {
     scanned_at: s.scanned_at,
   }))
 
+  // Données device normalisées
+  const deviceScans = (recentScans || []).map((s: any) => ({
+    device:     s.device,
+    os:         s.os ?? null,
+    browser:    s.browser ?? null,
+    page_id:    s.page_id,
+    scanned_at: s.scanned_at,
+  }))
+
   return (
     <AnalyticsClient
       profile={profile}
@@ -86,6 +95,7 @@ export default async function AnalyticsPage() {
       clicks={clicks}
       blocks={allBlocks || []}
       geoScans={geoScans}
+      deviceScans={deviceScans}
     />
   )
 }
