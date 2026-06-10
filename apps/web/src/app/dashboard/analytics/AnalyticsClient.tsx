@@ -5,19 +5,22 @@ import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from "recharts"
-import TrafficSourcesPanel from "./TrafficSourcesPanel"
 import { QrCode, Eye, TrendingUp, Smartphone, Globe, BarChart2 } from "lucide-react"
+import TrafficSourcesPanel from "./TrafficSourcesPanel"
+import TopLinksPanel from "./TopLinksPanel"
 
 type Profile = { total_pages: number; total_scans: number; plan: string } | null
 type Page = { id: string; title: string; slug: string; total_views: number; unique_views: number; status: string }
 type Scan = { scanned_at: string; device: string; country: string | null; page_id: string }
 type View = { viewed_at: string; device: string; source: string | null; country: string | null; page_id: string }
+type Click = { block_id: string; click_target: string | null; clicked_at: string; page_id: string; block_type?: string }
 
 interface Props {
   profile: Profile
   pages: Page[]
   recentScans: Scan[]
   recentViews: View[]
+  clicks?: Click[]
 }
 
 const GOLD = "#C9A84C"
@@ -79,7 +82,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   )
 }
 
-export default function AnalyticsClient({ profile, pages, recentScans, recentViews }: Props) {
+export default function AnalyticsClient({ profile, pages, recentScans, recentViews, clicks = [] }: Props) {
   const [selectedPage, setSelectedPage] = useState<string>("all")
 
   const filteredScans = useMemo(() =>
@@ -202,11 +205,39 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             )}
           </div>
 
+          {/* Source */}
+          <div style={{
+            background: "#111009", border: "1px solid rgba(201,168,76,0.15)",
+            borderRadius: 12, padding: "24px"
+          }}>
+            <h2 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 600, marginBottom: 20, marginTop: 0, display: "flex", alignItems: "center", gap: 8 }}>
+              <Globe size={16} color={NEON} /> Sources de trafic
+            </h2>
+            {sourceData.length === 0 ? (
+              <p style={{ color: MUTED, textAlign: "center", marginTop: 40 }}>Pas encore de données</p>
+            ) : (
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={sourceData} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
+                  <XAxis type="number" tick={{ fill: MUTED, fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="name" tick={{ fill: MUTED, fontSize: 12 }} axisLine={false} tickLine={false} width={60} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="value" name="Vues" radius={[0, 4, 4, 0]}>
+                    {sourceData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
         </div>
 
-        {/* ── Sources de trafic ──────────────────────────────────────────── */}
+        {/* ── Top liens ─────────────────────────────────────────────────── */}
         <div style={{ marginBottom: 24 }}>
-          <TrafficSourcesPanel views={filteredViews} period={30} />
+          <TopLinksPanel
+            clicks={clicks}
+            pageViews={filteredViews}
+            pages={pages}
+          />
         </div>
 
         {/* Top pages */}
