@@ -416,7 +416,7 @@ export default function TemplatesPage() {
           onClose={() => setPreview(null)}
           onUse={() => {
             setPreview(null)
-            if (!canUse(previewTemplate.plan)) { alert(\`Plan \${previewTemplate.plan} requis\`); return }
+            if (!canUse(previewTemplate.plan)) { alert(`Plan ${previewTemplate.plan} requis`); return }
             createFromTemplate(previewTemplate.id)
           }}
           canUse={canUse(previewTemplate.plan)}
