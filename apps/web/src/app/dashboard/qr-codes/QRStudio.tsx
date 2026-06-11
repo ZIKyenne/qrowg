@@ -1629,7 +1629,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   }
 
   return (
-    <div style={{ display:"grid", gridTemplateColumns:"280px 1fr 300px", gap:0, height:"calc(100vh - 140px)", background:BG, borderRadius:16, border:"1px solid rgba(201,168,76,0.1)", overflow:"hidden", fontFamily:"DM Sans, sans-serif", position:"relative" }}>
+    <div style={{ display:"grid", gridTemplateColumns:"clamp(260px,22vw,320px) 1fr clamp(280px,24vw,340px)", gap:0, minHeight:"calc(100vh - 80px)", background:BG, borderRadius:16, border:"1px solid rgba(201,168,76,0.1)", overflow:"hidden", fontFamily:"DM Sans, sans-serif", position:"relative" }}>
 
 
       {/* -- Modal preview plein ecran ------------------------------------------- */}
@@ -1728,7 +1728,12 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         {/* Header + filtres */}
         <div style={{ padding:"12px 12px 10px", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", gap:8 }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>QR Codes</p>
+            <div>
+              <p style={{ color:"#F5F0E8", fontSize:11, fontWeight:700, margin:"0 0 1px" }}>QR Codes</p>
+              <p style={{ color:MUTED, fontSize:9, margin:0 }}>
+                {qrCodes.length} total
+              </p>
+            </div>
             <div style={{ display:"flex", gap:5, alignItems:"center" }}>
               <span style={{ background:"rgba(201,168,76,0.12)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:5, padding:"1px 7px", fontSize:10, color:G, fontWeight:700 }}>{filteredQR.length}/{qrCodes.length}</span>
               <button type="button" onClick={() => setShowArchived(p => !p)}
@@ -1774,8 +1779,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           {filteredQR.length === 0 ? (
             <div style={{ textAlign:"center", padding:"32px 12px", color:MUTED }}>
               <QrCode size={24} color={MUTED} style={{ marginBottom:8 }}/>
-              <p style={{ fontSize:12, margin:"0 0 3px", color:"#F5F0E8" }}>Aucun resultat</p>
-              <p style={{ fontSize:10, margin:0 }}>Modifier les filtres</p>
+              <p style={{ fontSize:12, margin:"0 0 3px", color:"#F5F0E8", fontWeight:600 }}>Aucun resultat</p>
+              <p style={{ fontSize:10, margin:0, lineHeight:1.5 }}>Aucun QR ne correspond<br/>a vos filtres</p>
             </div>
           ) : filteredQR.map(qr => {
             const page = qr.pages
@@ -1812,9 +1817,14 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       </span>
                       <span style={{ color:qr.total_scans>0?G:MUTED, fontSize:9 }}>{qr.total_scans} scans</span>
                     </div>
-                    <p style={{ color:MUTED, fontSize:9, margin:"3px 0 0" }}>
-                      {qr.last_scan_at ? formatDate(qr.last_scan_at) : "Jamais scanne"}
-                    </p>
+                    <div style={{ display:"flex", alignItems:"center", gap:4, marginTop:3 }}>
+                      {qr.last_scan_at && (new Date().getTime() - new Date(qr.last_scan_at).getTime()) < 86400000 && (
+                        <div style={{ width:5, height:5, borderRadius:"50%", background:"#39FF8F", animation:"pulse 1.5s infinite", flexShrink:0 }}/>
+                      )}
+                      <p style={{ color:MUTED, fontSize:9, margin:0 }}>
+                        {qr.last_scan_at ? formatDate(qr.last_scan_at) : "Jamais scanne"}
+                      </p>
+                    </div>
                   </div>
                   <button type="button" onClick={e => { e.stopPropagation(); setMenuId(isM ? null : qr.id) }}
                     style={{ width:22, height:22, background:"none", border:"none", color:MUTED, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
@@ -1873,6 +1883,15 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
       {/* -- COL 2 : Preview premium -------------------------------------------- */}
       <div style={{ display:"flex", flexDirection:"column", overflow:"hidden", background:"#0A0907" }}>
+        {/* Section label */}
+        <div style={{ padding:"10px 16px 8px", borderBottom:"1px solid rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Apercu</p>
+          {active && (
+            <span style={{ color:MUTED, fontSize:9 }}>
+              {new Date(active.created_at).toLocaleDateString("fr-FR", { day:"numeric", month:"short", year:"numeric" })}
+            </span>
+          )}
+        </div>
         {active ? (() => {
           const diag = getDiagnostic(diagFg || fg, diagBg || bg)
           return (
@@ -1947,6 +1966,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               </div>
 
               {/* Stats */}
+              {/* Stats QR */}
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, padding:"14px 16px", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
                 {[
                   { label:"Scans total",   value:active.total_scans.toLocaleString(),               color:"#C9A84C", icon:"📡" },
@@ -2314,14 +2334,29 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             </div>
           )
         })() : (
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100%", color:"#8A8478" }}>
-            <p style={{ fontSize:12 }}>Selectionne un QR code</p>
+          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:"100%", gap:16, padding:32 }}>
+            <div style={{ width:72, height:72, borderRadius:20, background:"rgba(201,168,76,0.06)", border:"1px solid rgba(201,168,76,0.12)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <QrCode size={28} color="rgba(201,168,76,0.4)"/>
+            </div>
+            <div style={{ textAlign:"center" as const }}>
+              <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:600, margin:"0 0 6px" }}>Aucun QR selectionne</p>
+              <p style={{ color:MUTED, fontSize:12, margin:0, lineHeight:1.6 }}>Choisissez un QR dans la liste<br/>pour le personnaliser</p>
+            </div>
           </div>
         )}
       </div>
 
       {/* -- COL 3 : Personnalisation premium ------------------------------------ */}
       <div style={{ borderLeft:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", overflow:"hidden" }}>
+        {/* Section label */}
+        <div style={{ padding:"10px 16px 8px", borderBottom:"1px solid rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Personnalisation & Export</p>
+          {active && saved && (
+            <span style={{ color:"#39FF8F", fontSize:9, display:"flex", alignItems:"center", gap:3 }}>
+              <Check size={9}/> Sauvegarde
+            </span>
+          )}
+        </div>
 
         {/* Tabs principaux Style/Export */}
         <div style={{ display:"flex", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
@@ -3160,7 +3195,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       </div>
 
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+      <style>{`@keyframes spin { to { transform: rotate(360deg) } } @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} }`}</style>
     </div>
   )
 }
