@@ -1,48 +1,52 @@
+﻿// middleware.ts — Routing des domaines personnalisés
+// Intercepte les requêtes sur des domaines custom et les redirige vers la page QRfolio associée
 
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from "next/server"
 
-export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request })
+// Domaines propres à QRfolio (à NE PAS intercepter)
+const QRFOLIO_DOMAINS = [
+  "qrfolio.app",
+  "www.qrfolio.app",
+  "localhost",
+]
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return request.cookies.getAll() },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({ request })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
+export async function middleware(req: NextRequest) {
+  const hostname = req.headers.get("host") ?? ""
+  const pathname = req.nextUrl.pathname
 
-  const { data: { user } } = await supabase.auth.getUser()
-  const pathname = request.nextUrl.pathname
+  // Ne pas intercepter les domaines QRfolio natifs
+  const isQrfolioHost = QRFOLIO_DOMAINS.some(d => hostname === d || hostname.endsWith(".vercel.app"))
+  if (isQrfolioHost) return NextResponse.next()
 
-  // Protect dashboard
-  if (pathname.startsWith('/dashboard') && !user) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/auth/login'
-    return NextResponse.redirect(url)
+  // Ne pas intercepter les routes API, _next, assets
+  if (
+    pathname.startsWith("/api/") ||
+    pathname.startsWith("/_next/") ||
+    pathname.startsWith("/dashboard/") ||
+    pathname.startsWith("/auth/") ||
+    pathname.startsWith("/favicon") ||
+    pathname.includes(".")
+  ) {
+    return NextResponse.next()
   }
 
-  // Redirect logged-in users away from auth pages
-  if (pathname.startsWith('/auth') && user) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
-    return NextResponse.redirect(url)
-  }
+  // Nettoyer le hostname (retirer www. et le port)
+  const domain = hostname.replace(/^www\./, "").replace(/:\d+$/, "")
 
-  return supabaseResponse
+  // Chercher la page associée à ce domaine via Supabase
+  // On passe le domaine en header pour que la page [slug] puisse le résoudre
+  const url = req.nextUrl.clone()
+
+  // Réécrire vers la route de résolution domaine custom
+  url.pathname = `/api/domains/resolve`
+  url.searchParams.set("domain", domain)
+  url.searchParams.set("path", pathname)
+
+  return NextResponse.rewrite(url)
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*))'],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|api/|auth/).*)",
+  ],
 }
