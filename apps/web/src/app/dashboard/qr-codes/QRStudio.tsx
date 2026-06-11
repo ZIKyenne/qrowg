@@ -94,19 +94,90 @@ const DEFAULT_STYLE: QRStyleConfig = {
   logoBg: "white", logoBgColor: "#FFFFFF", logoPadding: 4,
 }
 
-const PRESETS = [
-  { label: "Classic",  fg: "#080808", bg: "#FFFFFF", plan: "free" },
-  { label: "Gold",     fg: "#C9A84C", bg: "#080808", plan: "free" },
-  { label: "Midnight", fg: "#F5F0E8", bg: "#080808", plan: "free" },
-  { label: "Neon",     fg: "#39FF8F", bg: "#0A0A0A", plan: "pro"  },
-  { label: "Cobalt",   fg: "#0078D4", bg: "#FFFFFF", plan: "pro"  },
-  { label: "Rose",     fg: "#FF5CA8", bg: "#1A0010", plan: "pro"  },
-  { label: "Sunset",   fg: "#FF6B35", bg: "#1A0800", plan: "pro"  },
-  { label: "Arctic",   fg: "#00D4FF", bg: "#001A1F", plan: "pro"  },
-  { label: "Luxury",   fg: "#C9A84C", bg: "#1A1200", plan: "business" },
-  { label: "Emerald",  fg: "#00C896", bg: "#001A12", plan: "business" },
-  { label: "Royal",    fg: "#7B61FF", bg: "#0A0015", plan: "business" },
-  { label: "Carbon",   fg: "#F5F0E8", bg: "#1A1A1A", plan: "business" },
+// ── Bibliothèque de presets premium ──────────────────────────────────────────
+type Preset = {
+  id:       string
+  label:    string
+  cat:      string
+  fg:       string
+  bg:       string
+  fg2?:     string
+  corner?:  string
+  eye?:     string
+  gradient?: "none"|"linear"|"radial"|"diagonal"
+  dotStyle?: string
+  cornerStyle?: string
+  plan:     string
+}
+
+const PRESET_CATS = [
+  { id:"all",        label:"Tous",       emoji:"✦" },
+  { id:"classic",    label:"Classic",    emoji:"⬛" },
+  { id:"business",   label:"Business",   emoji:"💼" },
+  { id:"luxury",     label:"Luxury",     emoji:"✨" },
+  { id:"restaurant", label:"Restaurant", emoji:"🍽" },
+  { id:"nightlife",  label:"Nightlife",  emoji:"🌙" },
+  { id:"creator",    label:"Creator",    emoji:"🎨" },
+  { id:"realestate", label:"Immobilier", emoji:"🏠" },
+  { id:"event",      label:"Event",      emoji:"🎉" },
+  { id:"minimal",    label:"Minimal",    emoji:"▪️" },
+  { id:"neon",       label:"Neon",       emoji:"💜" },
+]
+
+const PRESETS: Preset[] = [
+  // ── Classic ────────────────────────────────────────────────────────────────
+  { id:"classic-black",   label:"Classic Black",  cat:"classic",    fg:"#080808", bg:"#FFFFFF", plan:"free"     },
+  { id:"midnight-gold",   label:"Midnight Gold",  cat:"classic",    fg:"#C9A84C", bg:"#080808", plan:"free"     },
+  { id:"snow-white",      label:"Snow White",     cat:"classic",    fg:"#1A1A1A", bg:"#F8F8F8", plan:"free"     },
+
+  // ── Business ───────────────────────────────────────────────────────────────
+  { id:"emerald-biz",     label:"Emerald Biz",    cat:"business",   fg:"#00C896", bg:"#001A12", plan:"pro"      },
+  { id:"cobalt-pro",      label:"Cobalt Pro",     cat:"business",   fg:"#0078D4", bg:"#FFFFFF", plan:"pro"      },
+  { id:"slate-corp",      label:"Slate Corp",     cat:"business",   fg:"#64748B", bg:"#F1F5F9", plan:"pro"      },
+  { id:"tech-matrix",     label:"Tech Matrix",    cat:"business",   fg:"#00FF41", bg:"#0D0D0D", dotStyle:"dot",  plan:"pro" },
+
+  // ── Luxury ─────────────────────────────────────────────────────────────────
+  { id:"luxury-gold",     label:"Luxury Gold",    cat:"luxury",     fg:"#C9A84C", bg:"#1A1200", plan:"business" },
+  { id:"royal-purple",    label:"Royal Purple",   cat:"luxury",     fg:"#7B61FF", bg:"#0A0015", plan:"business" },
+  { id:"carbon-fiber",    label:"Carbon Fiber",   cat:"luxury",     fg:"#F5F0E8", bg:"#1A1A1A", plan:"business" },
+  { id:"champagne",       label:"Champagne",      cat:"luxury",     fg:"#D4AF37", bg:"#FAF7F0", gradient:"linear", fg2:"#B8960C", plan:"business" },
+  { id:"obsidian",        label:"Obsidian",       cat:"luxury",     fg:"#C0C0C0", bg:"#0A0A0A", cornerStyle:"rounded", plan:"business" },
+
+  // ── Restaurant ─────────────────────────────────────────────────────────────
+  { id:"restaurant-red",  label:"Restaurant Red", cat:"restaurant", fg:"#E63946", bg:"#FFF8F8", plan:"free"     },
+  { id:"coffee-brown",    label:"Coffee Brown",   cat:"restaurant", fg:"#6B3F2A", bg:"#FDF6EE", plan:"free"     },
+  { id:"bistro-noir",     label:"Bistro Noir",    cat:"restaurant", fg:"#2D2D2D", bg:"#F5F0E0", plan:"pro"      },
+  { id:"saffron-spice",   label:"Saffron Spice",  cat:"restaurant", fg:"#FF9500", bg:"#1A0D00", gradient:"radial", fg2:"#FF6B00", plan:"pro" },
+
+  // ── Nightlife ──────────────────────────────────────────────────────────────
+  { id:"cocktail-sunset", label:"Cocktail Sunset",cat:"nightlife",  fg:"#FF6B35", bg:"#1A0800", gradient:"linear", fg2:"#FF0080", plan:"pro" },
+  { id:"velvet-night",    label:"Velvet Night",   cat:"nightlife",  fg:"#FF2D78", bg:"#0D0008", plan:"pro"      },
+  { id:"arctic-blue",     label:"Arctic Blue",    cat:"nightlife",  fg:"#00D4FF", bg:"#001A1F", plan:"pro"      },
+  { id:"festival-purple", label:"Festival Purple",cat:"nightlife",  fg:"#BF5FFF", bg:"#0D0020", gradient:"radial", fg2:"#FF2D78", plan:"business" },
+
+  // ── Creator ────────────────────────────────────────────────────────────────
+  { id:"beauty-rose",     label:"Beauty Rose",    cat:"creator",    fg:"#FF5CA8", bg:"#1A0010", plan:"pro"      },
+  { id:"creator-coral",   label:"Creator Coral",  cat:"creator",    fg:"#FF6B6B", bg:"#FFF5F5", plan:"pro"      },
+  { id:"retro-amber",     label:"Retro Amber",    cat:"creator",    fg:"#FFAA00", bg:"#1A0F00", dotStyle:"rounded", plan:"pro" },
+  { id:"wedding-cream",   label:"Wedding Cream",  cat:"creator",    fg:"#C9A84C", bg:"#FFFFF0", cornerStyle:"rounded", plan:"business" },
+
+  // ── Immobilier ─────────────────────────────────────────────────────────────
+  { id:"navy-realestate", label:"Real Estate Navy",cat:"realestate", fg:"#1B3A5C", bg:"#F0F4F8", plan:"pro"     },
+  { id:"forest-green",    label:"Forest Green",   cat:"realestate", fg:"#2D6A4F", bg:"#F0F7F4", plan:"pro"      },
+  { id:"marble-luxe",     label:"Marble Luxe",    cat:"realestate", fg:"#8B7355", bg:"#FAFAFA",  cornerStyle:"rounded", plan:"business" },
+
+  // ── Event ──────────────────────────────────────────────────────────────────
+  { id:"event-gold",      label:"Event Gold",     cat:"event",      fg:"#FFD700", bg:"#0D0D00", gradient:"radial", fg2:"#FF8C00", plan:"pro" },
+  { id:"confetti",        label:"Confetti",       cat:"event",      fg:"#FF2D78", bg:"#FFF0F5", dotStyle:"dot",  plan:"pro"      },
+
+  // ── Minimal ────────────────────────────────────────────────────────────────
+  { id:"minimal-ink",     label:"Minimal Ink",    cat:"minimal",    fg:"#1A1A1A", bg:"#FAFAFA", plan:"free"     },
+  { id:"minimal-gray",    label:"Minimal Gray",   cat:"minimal",    fg:"#6B7280", bg:"#F9FAFB", cornerStyle:"rounded", plan:"free" },
+
+  // ── Neon ───────────────────────────────────────────────────────────────────
+  { id:"neon-green",      label:"Neon Green",     cat:"neon",       fg:"#39FF8F", bg:"#0A0A0A", plan:"pro"      },
+  { id:"neon-pink",       label:"Neon Pink",      cat:"neon",       fg:"#FF2D78", bg:"#0D0008", dotStyle:"dot",  plan:"pro"      },
+  { id:"neon-cyber",      label:"Neon Cyber",     cat:"neon",       fg:"#00FFFF", bg:"#001A1A", gradient:"linear", fg2:"#7B61FF", plan:"business" },
 ]
 
 const CORNER_STYLES = [
@@ -160,7 +231,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [ecLevel,    setEcLevel]    = useState<"L"|"M"|"Q"|"H">("M")
   const [styleConf,  setStyleConf]  = useState<QRStyleConfig>({ ...DEFAULT_STYLE })
   const [styleTab,   setStyleTab]   = useState<"colors"|"logo"|"style"|"corners"|"advanced">("colors")
-  const [applyAllOk, setApplyAllOk] = useState(false)
+  const [applyAllOk,   setApplyAllOk]   = useState(false)
+  const [selectedCat,  setSelectedCat]  = useState("all")
+  const [upsellPreset, setUpsellPreset] = useState<string | null>(null)
   const [saving,     setSaving]     = useState(false)
   const [saved,      setSaved]      = useState(false)
   const [copied,     setCopied]     = useState<"link"|"short"|null>(null)
@@ -491,6 +564,20 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
   function removeLogo() {
     setStyleConf(p => ({ ...p, logoUrl: "" }))
+  }
+
+  function applyPreset(preset: Preset) {
+    const canAccess = PLAN_RANK[userPlan] >= PLAN_RANK[preset.plan]
+    if (!canAccess) { setUpsellPreset(preset.id); return }
+    setFg(preset.fg)
+    setBg(preset.bg)
+    setStyleConf(p => ({
+      ...p,
+      fg2:          preset.fg2 ?? "",
+      gradient:     preset.gradient ?? "none",
+      dotStyle:     (preset.dotStyle as any) ?? p.dotStyle,
+      cornerStyle:  (preset.cornerStyle as any) ?? p.cornerStyle,
+    }))
   }
 
   async function applyToAll() {
@@ -1046,31 +1133,89 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </div>
                   </div>
 
-                  {/* Presets */}
+                  {/* ── Bibliothèque de presets ──────────────────── */}
                   <div>
-                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Presets</p>
-                    <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:5 }}>
-                      {PRESETS.map(preset => {
+                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Bibliotheque de presets</p>
+
+                    {/* Filtres catégorie */}
+                    <div style={{ display:"flex", gap:4, overflowX:"auto", paddingBottom:8, marginBottom:10 }}>
+                      {PRESET_CATS.map(cat => (
+                        <button key={cat.id} type="button" onClick={() => setSelectedCat(cat.id)}
+                          style={{ display:"inline-flex", alignItems:"center", gap:3, padding:"4px 9px", background:selectedCat===cat.id?"rgba(201,168,76,0.15)":"rgba(255,255,255,0.04)", border:`1px solid ${selectedCat===cat.id?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.08)"}`, borderRadius:20, color:selectedCat===cat.id?G:MUTED, fontSize:9, fontWeight:selectedCat===cat.id?700:500, cursor:"pointer", whiteSpace:"nowrap" as const, flexShrink:0 }}>
+                          <span>{cat.emoji}</span>{cat.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Grille presets */}
+                    <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:6 }}>
+                      {PRESETS.filter(p => selectedCat==="all" || p.cat===selectedCat).map(preset => {
                         const canAccess = PLAN_RANK[userPlan] >= PLAN_RANK[preset.plan]
                         const isActive  = fg===preset.fg && bg===preset.bg
+                        const planLabel = preset.plan === "free" ? null : preset.plan === "pro" ? "PRO" : "BIZ"
                         return (
-                          <div key={preset.label} onClick={() => canAccess && (setFg(preset.fg),setBg(preset.bg))}
-                            style={{ position:"relative", cursor:canAccess?"pointer":"not-allowed", borderRadius:7, overflow:"hidden", border:`1.5px solid ${isActive?"#C9A84C":"rgba(255,255,255,0.07)"}`, opacity:canAccess?1:0.45 }}>
-                            <div style={{ background:preset.bg, padding:"7px 5px", display:"flex", justifyContent:"center" }}>
-                              <div style={{ width:20, height:20, borderRadius:4, background:`linear-gradient(135deg,${preset.fg} 50%,${preset.bg} 50%)`, border:`1px solid ${preset.fg}40` }}/>
+                          <div key={preset.id} onClick={() => applyPreset(preset)}
+                            style={{ position:"relative", cursor:"pointer", borderRadius:9, overflow:"hidden", border:`1.5px solid ${isActive?"#C9A84C":canAccess?"rgba(255,255,255,0.08)":"rgba(255,255,255,0.04)"}`, transition:"all 0.15s", opacity:canAccess?1:0.7 }}>
+
+                            {/* Preview miniature */}
+                            <div style={{ background:preset.bg, padding:"10px 8px", display:"flex", alignItems:"center", justifyContent:"center", position:"relative", minHeight:42 }}>
+                              {preset.gradient && preset.gradient !== "none" && preset.fg2 && (
+                                <div style={{ position:"absolute", inset:0, background:`linear-gradient(135deg,${preset.fg}30,${preset.fg2}30)` }}/>
+                              )}
+                              <div style={{ position:"relative", width:28, height:28 }}>
+                                <div style={{ position:"absolute", inset:0, background:preset.fg, borderRadius:3, opacity:0.9 }}/>
+                                <div style={{ position:"absolute", inset:4, background:preset.bg, borderRadius:2 }}/>
+                                <div style={{ position:"absolute", inset:8, background:preset.fg, borderRadius:1 }}/>
+                              </div>
+                              {isActive && (
+                                <div style={{ position:"absolute", top:3, left:3, width:10, height:10, background:G, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                                  <Check size={6} color="#080808"/>
+                                </div>
+                              )}
                             </div>
-                            <div style={{ background:"#111009", padding:"3px 2px", textAlign:"center" as const }}>
-                              <p style={{ color:isActive?G:"#F5F0E8", fontSize:8, fontWeight:600, margin:0 }}>{preset.label}</p>
+
+                            {/* Nom + badge plan */}
+                            <div style={{ background:"#0F0E0B", padding:"5px 5px 6px", textAlign:"center" as const }}>
+                              <p style={{ color:isActive?G:"#F5F0E8", fontSize:8, fontWeight:isActive?700:500, margin:"0 0 2px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
+                                {preset.label}
+                              </p>
+                              {planLabel && (
+                                <span style={{ background:canAccess?(preset.plan==="pro"?"rgba(201,168,76,0.15)":"rgba(57,255,143,0.12)"):"rgba(255,255,255,0.06)", borderRadius:3, padding:"1px 4px", fontSize:7, color:canAccess?(preset.plan==="pro"?G:"#39FF8F"):MUTED, fontWeight:700 }}>
+                                  {planLabel}
+                                </span>
+                              )}
                             </div>
+
+                            {/* Overlay lock */}
                             {!canAccess && (
-                              <div style={{ position:"absolute", inset:0, background:"rgba(8,8,8,0.6)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                                <Lock size={11} color={MUTED}/>
+                              <div style={{ position:"absolute", inset:0, background:"rgba(8,8,8,0.5)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                                <Lock size={12} color={MUTED}/>
                               </div>
                             )}
                           </div>
                         )
                       })}
                     </div>
+
+                    {/* Upsell modal inline */}
+                    {upsellPreset !== null && (
+                      <div style={{ marginTop:10, padding:"12px 14px", background:"rgba(201,168,76,0.06)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:10 }}>
+                        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:6 }}>
+                          <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:700, margin:0 }}>Preset premium</p>
+                          <button type="button" onClick={() => setUpsellPreset(null)}
+                            style={{ background:"none", border:"none", color:MUTED, cursor:"pointer", display:"flex" }}>
+                            <X size={13}/>
+                          </button>
+                        </div>
+                        <p style={{ color:MUTED, fontSize:11, margin:"0 0 10px", lineHeight:1.5 }}>
+                          Ce preset necessite un plan superieur. Passez a Pro ou Business pour debloquer tous les presets.
+                        </p>
+                        <a href="/dashboard/upgrade"
+                          style={{ display:"block", textAlign:"center" as const, padding:"8px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius:8, color:"#080808", fontSize:11, fontWeight:700, textDecoration:"none" }}>
+                          Voir les plans
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
