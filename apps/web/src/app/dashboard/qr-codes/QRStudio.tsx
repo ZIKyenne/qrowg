@@ -24,6 +24,9 @@ type QRCode = {
   logo_url:         string | null
   dest_override:    Record<string, any> | null
   dest_history:     Array<Record<string, any>>
+  status:           "active"|"draft"|"paused"|"archived"|"expired"
+  pause_message:    string | null
+  expires_at:       string | null
   total_scans:      number
   last_scan_at:     string | null
   created_at:       string
@@ -199,11 +202,21 @@ const EC_LEVELS = [
 
 const PLAN_RANK: Record<string, number> = { free: 0, pro: 1, business: 2 }
 
+// ── Statuts pages (pour l'affichage de la page liée)
 const STATUS_CFG: Record<string, { label: string; dot: string; badge: string; text: string }> = {
   published: { label: "Publie",    dot: "#39FF8F", badge: "rgba(57,255,143,0.12)",  text: "#39FF8F" },
   draft:     { label: "Brouillon", dot: "#8A8478", badge: "rgba(138,132,120,0.12)", text: "#8A8478" },
   archived:  { label: "Archive",   dot: "#F97316", badge: "rgba(249,115,22,0.12)",  text: "#F97316" },
   paused:    { label: "En pause",  dot: "#FF6B6B", badge: "rgba(255,107,107,0.12)", text: "#FF6B6B" },
+}
+
+// ── Statuts QR Code
+const QR_STATUS_CFG: Record<string, { label: string; dot: string; badge: string; text: string; desc: string }> = {
+  active:   { label: "Actif",     dot: "#39FF8F", badge: "rgba(57,255,143,0.12)",  text: "#39FF8F", desc: "Redirection normale" },
+  draft:    { label: "Brouillon", dot: "#8A8478", badge: "rgba(138,132,120,0.12)", text: "#8A8478", desc: "Visible dans le dashboard uniquement" },
+  paused:   { label: "En pause",  dot: "#F97316", badge: "rgba(249,115,22,0.12)",  text: "#F97316", desc: "Page indisponible affichee" },
+  archived: { label: "Archive",   dot: "#6B7280", badge: "rgba(107,114,128,0.12)", text: "#6B7280", desc: "Masque et bloque" },
+  expired:  { label: "Expire",    dot: "#FF6B6B", badge: "rgba(255,107,107,0.12)", text: "#FF6B6B", desc: "Acces expire" },
 }
 
 const PLAN_BADGE: Record<string, { color: string; label: string } | null> = {
@@ -274,6 +287,12 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [destHistory, setDestHistory] = useState<DestEntry[]>([])
   const [destConfirm, setDestConfirm] = useState(false)
   const [destCopied,  setDestCopied]  = useState(false)
+  // ── QR Status states ─────────────────────────────────────────────────
+  const [qrStatusLoading,setQrStatusLoading]= useState<string | null>(null)
+  const [pauseMsg,       setPauseMsg]       = useState("")
+  const [showPauseMsgEdit,setShowPauseMsgEdit]=useState(false)
+  const [confirmAction,  setConfirmAction]  = useState<{action:string;qrId:string;label:string}|null>(null)
+  const [showArchived,   setShowArchived]   = useState(false)
   const [suppTplId,   setSuppTplId]   = useState("a4-poster")
   const [suppTitle,   setSuppTitle]   = useState("")
   const [suppSubtitle,setSuppSubtitle]= useState("Scannez pour voir le menu")
@@ -799,6 +818,52 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       }
       img.src = url
     })
+  }
+
+  // ── Fonctions QR Status ──────────────────────────────────────────────────────
+  async function changeQRStatus(qrId: string, action: string, extra?: Record<string, any>) {
+    setQrStatusLoading(qrId)
+    try {
+      const res = await fetch("/api/qr-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ qr_id: qrId, action, ...extra }),
+      })
+      const d = await res.json()
+      if (d.ok) {
+        setQRCodes(prev => prev.map(q => q.id === qrId
+          ? { ...q, status: d.status, ...(extra?.pause_message !== undefined ? { pause_message: extra.pause_message } : {}) }
+          : q
+        ))
+        if (activeId === qrId && d.status) {
+          // Mettre à jour le qr actif
+        }
+      }
+    } catch {}
+    setQrStatusLoading(null)
+    setConfirmAction(null)
+    setMenuId(null)
+  }
+
+  async function hardDeleteQR(qrId: string) {
+    setQrStatusLoading(qrId)
+    try {
+      await fetch("/api/qr-status", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ qr_id: qrId }),
+      })
+      const rest = qrCodes.filter(q => q.id !== qrId)
+      setQRCodes(rest)
+      if (activeId === qrId) setActiveId(rest[0]?.id ?? null)
+    } catch {}
+    setQrStatusLoading(null)
+    setConfirmAction(null)
+  }
+
+  function requestAction(qrId: string, action: string, label: string) {
+    setConfirmAction({ action, qrId, label })
+    setMenuId(null)
   }
 
   // ── Fonctions destination dynamique ─────────────────────────────────────────
@@ -1335,11 +1400,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [sb_asc, sb_dir] = sortKey.split("-")
   const filteredQR = qrCodes
     .filter(qr => {
-      const t = qr.pages?.title?.toLowerCase() ?? ""
-      const c = qr.short_code?.toLowerCase() ?? ""
-      const s = qr.pages?.status ?? "draft"
+      const t  = qr.pages?.title?.toLowerCase() ?? ""
+      const c  = qr.short_code?.toLowerCase() ?? ""
+      const qs = qr.status ?? "active"
+      // Masquer les archivés sauf si filtre explicite ou showArchived
+      if (qs === "archived" && filterSt !== "archived" && !showArchived) return false
       return (!search || t.includes(search.toLowerCase()) || c.includes(search.toLowerCase()))
-        && (filterSt === "all" || s === filterSt)
+        && (filterSt === "all" || qs === filterSt)
     })
     .sort((a, b) => {
       let cmp = 0
@@ -1468,7 +1535,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         <div style={{ padding:"12px 12px 10px", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", gap:8 }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>QR Codes</p>
-            <span style={{ background:"rgba(201,168,76,0.12)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:5, padding:"1px 7px", fontSize:10, color:G, fontWeight:700 }}>{filteredQR.length}/{qrCodes.length}</span>
+            <div style={{ display:"flex", gap:5, alignItems:"center" }}>
+              <span style={{ background:"rgba(201,168,76,0.12)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:5, padding:"1px 7px", fontSize:10, color:G, fontWeight:700 }}>{filteredQR.length}/{qrCodes.length}</span>
+              <button type="button" onClick={() => setShowArchived(p => !p)}
+                style={{ padding:"1px 6px", background:showArchived?"rgba(107,114,128,0.2)":"transparent", border:"1px solid rgba(107,114,128,0.2)", borderRadius:5, color:MUTED, fontSize:8, cursor:"pointer" }}>
+                {showArchived?"- Archives":"+ Archives"}
+              </button>
+            </div>
           </div>
           <div style={{ position:"relative" }}>
             <Search size={11} style={{ position:"absolute", left:8, top:"50%", transform:"translateY(-50%)", color:MUTED, pointerEvents:"none" }}/>
@@ -1484,10 +1557,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             <select value={filterSt} onChange={e => setFilterSt(e.target.value)}
               style={{ flex:1, background:"#111009", border:"1px solid rgba(255,255,255,0.07)", borderRadius:7, color:MUTED, padding:"5px 6px", fontSize:10, outline:"none", cursor:"pointer" }}>
               <option value="all">Tous</option>
-              <option value="published">Publie</option>
+              <option value="active">Actif</option>
               <option value="draft">Brouillon</option>
-              <option value="archived">Archive</option>
               <option value="paused">En pause</option>
+              <option value="archived">Archive</option>
+              <option value="expired">Expire</option>
             </select>
             <select value={sortKey} onChange={e => setSortKey(e.target.value)}
               style={{ flex:1, background:"#111009", border:"1px solid rgba(255,255,255,0.07)", borderRadius:7, color:MUTED, padding:"5px 6px", fontSize:10, outline:"none", cursor:"pointer" }}>
@@ -1512,8 +1586,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           ) : filteredQR.map(qr => {
             const page = qr.pages
             const isA  = qr.id === activeId
-            const st   = page?.status ?? "draft"
-            const sCfg = STATUS_CFG[st] ?? STATUS_CFG.draft
+            const qs   = qr.status ?? "active"
+            const sCfg = QR_STATUS_CFG[qs] ?? QR_STATUS_CFG.active
             const url  = `${appUrl}/q/${qr.short_code}`
             const isM  = menuId === qr.id
             const isC  = copyQRId === qr.id
@@ -1522,7 +1596,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               <div key={qr.id} onClick={() => { setActiveId(qr.id); setMenuId(null) }}
                 style={{ padding:"11px 12px", cursor:"pointer", borderBottom:"1px solid rgba(255,255,255,0.04)", background:isA?"rgba(201,168,76,0.06)":"transparent", borderLeft:isA?`2px solid ${G}`:"2px solid transparent", position:"relative" }}>
                 <div style={{ display:"flex", alignItems:"flex-start", gap:9 }}>
-                  <div style={{ width:34, height:34, borderRadius:8, background:qr.background_color, border:"1px solid rgba(255,255,255,0.1)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, position:"relative" }}>
+                  <div style={{ width:34, height:34, borderRadius:8, background:qr.background_color, border:`1px solid ${qs==="active"?"rgba(57,255,143,0.3)":qs==="paused"?"rgba(249,115,22,0.3)":qs==="expired"?"rgba(255,107,107,0.3)":"rgba(255,255,255,0.1)"}`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, position:"relative" }}>
                     <QrCode size={16} color={qr.foreground_color}/>
                     {pb && (
                       <span style={{ position:"absolute", top:-4, right:-4, background:pb.color, color:"#080808", fontSize:7, fontWeight:800, borderRadius:3, padding:"1px 3px" }}>
@@ -1559,11 +1633,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   <div style={{ position:"absolute", right:8, top:38, zIndex:200, background:"#1A1710", border:"1px solid rgba(201,168,76,0.2)", borderRadius:10, padding:"5px", boxShadow:"0 8px 32px rgba(0,0,0,0.7)", minWidth:158 }}
                     onClick={e => e.stopPropagation()}>
                     {([
-                      { icon: <Pencil size={11}/>,  label: "Modifier",   action: () => { window.location.href = `/dashboard/builder/${page?.id}` }, color: "#F5F0E8", disabled: false },
+                      { icon: <Pencil size={11}/>,  label: "Modifier",     action: () => { window.location.href = `/dashboard/builder/${page?.id}` }, color: "#F5F0E8", disabled: false },
                       { icon: isC ? <Check size={11}/> : <Copy size={11}/>, label: isC ? "Copie !" : "Copier lien", action: () => copyQRLink(qr.id, url), color: isC ? "#39FF8F" : "#F5F0E8", disabled: false },
-                      { icon: <Download size={11}/>, label: "PNG",        action: () => { setActiveId(qr.id); setTimeout(() => downloadPNG(400), 100); setMenuId(null) }, color: "#F5F0E8", disabled: false },
-                      { icon: <Archive size={11}/>,  label: "Archiver",   action: () => archiveQR(qr.id), color: "#F97316", disabled: st === "archived" },
-                      { icon: <Trash2 size={11}/>,   label: "Supprimer",  action: () => { setConfirmId(qr.id); setMenuId(null) }, color: "#FF6B6B", disabled: false },
+                      { icon: <Download size={11}/>, label: "PNG",          action: () => { setActiveId(qr.id); setTimeout(() => downloadPNG(400), 100); setMenuId(null) }, color: "#F5F0E8", disabled: false },
+                      ...(qs === "active" ? [{ icon: <Archive size={11}/>, label: "Mettre en pause", action: () => requestAction(qr.id, "pause", "Mettre en pause"), color: "#F97316", disabled: false }] : []),
+                      ...(qs === "paused" || qs === "draft" ? [{ icon: <Check size={11}/>, label: "Activer", action: () => changeQRStatus(qr.id, "activate"), color: "#39FF8F", disabled: false }] : []),
+                      ...(qs !== "archived" ? [{ icon: <Archive size={11}/>, label: "Archiver", action: () => requestAction(qr.id, "archive", "Archiver ce QR"), color: "#6B7280", disabled: false }] : [{ icon: <RotateCcw size={11}/>, label: "Restaurer", action: () => changeQRStatus(qr.id, "restore"), color: "#38BDF8", disabled: false }]),
+                      { icon: <Trash2 size={11}/>,   label: "Supprimer definitif", action: () => requestAction(qr.id, "delete", "Supprimer definitivement ce QR ?"), color: "#FF6B6B", disabled: qs !== "archived" },
                     ]).map((item, i) => (
                       <button key={i} type="button" onClick={item.disabled ? undefined : item.action} disabled={item.disabled}
                         style={{ width:"100%", display:"flex", alignItems:"center", gap:8, padding:"8px 10px", background:"none", border:"none", color:item.disabled ? "rgba(138,132,120,0.4)" : item.color, fontSize:11, cursor:item.disabled ? "not-allowed" : "pointer", borderRadius:7, textAlign:"left" as const }}>
@@ -2858,5 +2934,3 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     </div>
   )
 }
-#   0 6 / 1 1 / 2 0 2 6   1 6 : 5 8 : 5 3  
- 
