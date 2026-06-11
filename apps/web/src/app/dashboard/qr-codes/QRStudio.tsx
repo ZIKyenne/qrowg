@@ -483,15 +483,75 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const canvas = canvasModalRef.current
     const ctx    = canvas.getContext("2d"); if (!ctx) return
     const img    = new Image()
-    const url    = buildQRUrl(800).replace("size=400x400","size=800x800").replace("margin=10","margin=20")
+    const url    = buildQRUrl(800)
     img.crossOrigin = "anonymous"
     img.onload = () => {
       canvas.width = 800; canvas.height = 800
-      ctx.clearRect(0,0,800,800)
-      ctx.drawImage(img,0,0,800,800)
+      ctx.clearRect(0, 0, 800, 800)
+      // Fond
+      if (!styleConf.transparent) {
+        if (styleConf.gradient !== "none" && styleConf.gradientBg) {
+          const grad = styleConf.gradient === "radial"
+            ? ctx.createRadialGradient(400,400,0,400,400,400)
+            : ctx.createLinearGradient(styleConf.gradient==="diagonal"?0:0, 0, styleConf.gradient==="diagonal"?800:0, 800)
+          grad.addColorStop(0, bg); grad.addColorStop(1, styleConf.gradientBg)
+          ctx.fillStyle = grad
+        } else { ctx.fillStyle = bg }
+        ctx.fillRect(0, 0, 800, 800)
+      }
+      // QR dégradé
+      if (styleConf.gradient !== "none" && styleConf.fg2) {
+        ctx.drawImage(img, 0, 0, 800, 800)
+        const grad = styleConf.gradient === "radial"
+          ? ctx.createRadialGradient(400,400,0,400,400,400)
+          : ctx.createLinearGradient(styleConf.gradient==="diagonal"?0:0, 0, styleConf.gradient==="diagonal"?800:0, 800)
+        grad.addColorStop(0, fg); grad.addColorStop(1, styleConf.fg2)
+        ctx.globalCompositeOperation = "multiply"
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, 800, 800)
+        ctx.globalCompositeOperation = "source-over"
+      } else {
+        ctx.drawImage(img, 0, 0, 800, 800)
+      }
+      // Logo
+      if (styleConf.logoUrl) {
+        const logoImg = new Image(); logoImg.crossOrigin = "anonymous"
+        logoImg.onload = () => {
+          const ratio = Math.min((styleConf.logoSize ?? 18) / 100, 0.30)
+          const size  = 800 * ratio; const pad = (styleConf.logoPadding ?? 4) * 2
+          const bgSz  = size + pad; const cx = 400; const cy = 400
+          const r = styleConf.logoShape === "circle" ? bgSz/2 : styleConf.logoShape === "rounded" ? bgSz*0.2 : 0
+          if (styleConf.logoBg !== "transparent") {
+            ctx.save(); ctx.beginPath()
+            if (r > 0) {
+              ctx.moveTo(cx-bgSz/2+r, cy-bgSz/2); ctx.lineTo(cx+bgSz/2-r, cy-bgSz/2)
+              ctx.quadraticCurveTo(cx+bgSz/2, cy-bgSz/2, cx+bgSz/2, cy-bgSz/2+r)
+              ctx.lineTo(cx+bgSz/2, cy+bgSz/2-r)
+              ctx.quadraticCurveTo(cx+bgSz/2, cy+bgSz/2, cx+bgSz/2-r, cy+bgSz/2)
+              ctx.lineTo(cx-bgSz/2+r, cy+bgSz/2)
+              ctx.quadraticCurveTo(cx-bgSz/2, cy+bgSz/2, cx-bgSz/2, cy+bgSz/2-r)
+              ctx.lineTo(cx-bgSz/2, cy-bgSz/2+r)
+              ctx.quadraticCurveTo(cx-bgSz/2, cy-bgSz/2, cx-bgSz/2+r, cy-bgSz/2)
+              ctx.closePath()
+            } else { ctx.rect(cx-bgSz/2, cy-bgSz/2, bgSz, bgSz) }
+            ctx.fillStyle = styleConf.logoBg==="custom"?(styleConf.logoBgColor??"#FFF"):styleConf.logoBg==="black"?"#000":"#FFF"
+            ctx.fill(); ctx.restore()
+          }
+          ctx.save(); ctx.beginPath()
+          if (styleConf.logoShape==="circle") { ctx.arc(cx, cy, size/2, 0, Math.PI*2) }
+          else if (styleConf.logoShape==="rounded") {
+            const rr=size*0.2; ctx.moveTo(cx-size/2+rr,cy-size/2); ctx.lineTo(cx+size/2-rr,cy-size/2)
+            ctx.quadraticCurveTo(cx+size/2,cy-size/2,cx+size/2,cy-size/2+rr); ctx.lineTo(cx+size/2,cy+size/2-rr)
+            ctx.quadraticCurveTo(cx+size/2,cy+size/2,cx+size/2-rr,cy+size/2); ctx.lineTo(cx-size/2+rr,cy+size/2)
+            ctx.quadraticCurveTo(cx-size/2,cy+size/2,cx-size/2,cy+size/2-rr); ctx.lineTo(cx-size/2,cy-size/2+rr)
+            ctx.quadraticCurveTo(cx-size/2,cy-size/2,cx-size/2+rr,cy-size/2); ctx.closePath()
+          } else { ctx.rect(cx-size/2, cy-size/2, size, size) }
+          ctx.clip(); ctx.drawImage(logoImg, cx-size/2, cy-size/2, size, size); ctx.restore()
+        }
+        logoImg.src = styleConf.logoUrl
+      }
     }
     img.src = url
-  }, [qrUrl, fg, bg, ecLevel])
+  }, [qrUrl, fg, bg, corner, ecLevel, styleConf])
 
   useEffect(() => { if (showModal) drawModalCanvas() }, [showModal, drawModalCanvas])
   useEffect(() => { setDiagFg(fg); setDiagBg(bg) }, [fg, bg])
@@ -510,7 +570,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       ? { ...q, foreground_color: fg, background_color: bg, corner_style: corner, error_correction: ecLevel, style_config: styleConf }
       : q))
     setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
-  }, [active, fg, bg, corner, ecLevel])
+  }, [active, fg, bg, corner, ecLevel, styleConf])
 
   function downloadPNG(size = 400) {
     if (size === 400) {
@@ -537,6 +597,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setFg(active.foreground_color); setBg(active.background_color)
     setCorner(active.corner_style); setEcLevel(active.error_correction)
     setStyleConf({ ...DEFAULT_STYLE, ...(active.style_config ?? {}) })
+    setUpsellPreset(null)
+    setSelectedCat("all")
   }
 
   // Upload logo → Supabase Storage OU data URL si pas encore uploadé
@@ -571,13 +633,18 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     if (!canAccess) { setUpsellPreset(preset.id); return }
     setFg(preset.fg)
     setBg(preset.bg)
+    // Sync corner state legacy (utilisé pour le clipping canvas)
+    if (preset.cornerStyle === "rounded" || preset.dotStyle === "rounded") setCorner("rounded")
+    else if (preset.dotStyle === "dot") setCorner("dot")
+    else setCorner("square")
     setStyleConf(p => ({
       ...p,
       fg2:          preset.fg2 ?? "",
       gradient:     preset.gradient ?? "none",
-      dotStyle:     (preset.dotStyle as any) ?? p.dotStyle,
-      cornerStyle:  (preset.cornerStyle as any) ?? p.cornerStyle,
+      dotStyle:     (preset.dotStyle as any) ?? "square",
+      cornerStyle:  (preset.cornerStyle as any) ?? "square",
     }))
+    setUpsellPreset(null)
   }
 
   async function applyToAll() {
@@ -1416,7 +1483,14 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         const isPro = ["diamond","luxury"].includes(cs.id ?? "")
                         const canAccess = !isPro || PLAN_RANK[userPlan] >= 1
                         return (
-                          <button key={cs.id ?? "sq"} type="button" onClick={() => canAccess && setStyleConf(p => ({ ...p, cornerStyle: cs.id }))}
+                          <button key={cs.id ?? "sq"} type="button" onClick={() => {
+                        if (!canAccess) return
+                        setStyleConf(p => ({ ...p, cornerStyle: cs.id }))
+                        // Sync le state corner pour le clipping canvas
+                        if (cs.id === "rounded" || cs.id === "circle" || cs.id === "luxury") setCorner("rounded")
+                        else if (cs.id === "minimal") setCorner("dot")
+                        else setCorner("square")
+                      }}
                             style={{ padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:canAccess?"pointer":"not-allowed", opacity:canAccess?1:0.5, position:"relative" as const }}>
                             <p style={{ color:isActive?G:"#F5F0E8", fontSize:11, fontWeight:isActive?700:500, margin:0, textAlign:"center" as const }}>{cs.label}</p>
                             {isPro && !canAccess && (
