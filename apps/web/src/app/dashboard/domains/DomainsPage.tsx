@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import DnsChecker from "./DnsChecker"
+import SslBadge from "./SslBadge"
 import {
   Globe, Plus, Trash2, CheckCircle, Clock, AlertCircle,
   Copy, ExternalLink, Loader, ChevronDown, ChevronUp, X, RefreshCw
@@ -245,6 +246,9 @@ export default function DomainsPage({ pages, plan }: Props) {
                             <span style={{ display:"flex", alignItems:"center", gap:4, background:`${statusCfg.color}15`, border:`1px solid ${statusCfg.color}30`, borderRadius:6, padding:"2px 8px", fontSize:10, color:statusCfg.color, fontWeight:600 }}>
                               {statusCfg.icon}{statusCfg.label}
                             </span>
+                            <div style={{ position:"relative" }}>
+                              <SslBadge domain={rec.domain} verified={rec.verified} />
+                            </div>
                           </div>
                           <p style={{ color:MUTED, fontSize:11, margin:0 }}>
                             → {rec.pages?.title ?? "Page inconnue"} · Ajouté le {formatDate(rec.created_at)}
