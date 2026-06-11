@@ -1,6 +1,6 @@
 ﻿import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
-import GoalsDashboard from "../../analytics/GoalsDashboard"
+import GoalsDashboard from "../analytics/GoalsDashboard"
 
 export const metadata = { title: "Objectifs — QRfolio" }
 
