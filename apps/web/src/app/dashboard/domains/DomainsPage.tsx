@@ -1,6 +1,7 @@
 ﻿"use client"
 
 import { useState, useEffect } from "react"
+import DnsChecker from "./DnsChecker"
 import {
   Globe, Plus, Trash2, CheckCircle, Clock, AlertCircle,
   Copy, ExternalLink, Loader, ChevronDown, ChevronUp, X, RefreshCw
@@ -47,6 +48,7 @@ export default function DomainsPage({ pages, plan }: Props) {
   const [deleting,   setDeleting]   = useState<string | null>(null)
   const [saving,     setSaving]     = useState(false)
   const [error,      setError]      = useState("")
+  const [showChecker, setShowChecker] = useState<string | null>(null)
 
   const [fDomain,  setFDomain]  = useState("")
   const [fPageId,  setFPageId]  = useState(pages[0]?.id ?? "")
@@ -256,10 +258,10 @@ export default function DomainsPage({ pages, plan }: Props) {
                             </a>
                           )}
                           {!rec.verified && (
-                            <button type="button" onClick={() => verifyDomain(rec)} disabled={isBusy}
-                              style={{ display:"flex", alignItems:"center", gap:5, padding:"6px 12px", background:"rgba(201,168,76,0.1)", border:`1px solid rgba(201,168,76,0.25)`, borderRadius:8, color:G, fontSize:11, fontWeight:700, cursor:isBusy?"wait":"pointer", opacity:isBusy?0.7:1 }}>
-                              {verifying===rec.id ? <Loader size={12} style={{ animation:"spin 0.8s linear infinite" }}/> : <RefreshCw size={12}/>}
-                              Vérifier
+                            <button type="button" onClick={() => setShowChecker(showChecker === rec.id ? null : rec.id)}
+                              style={{ display:"flex", alignItems:"center", gap:5, padding:"6px 12px", background: showChecker===rec.id ? "rgba(201,168,76,0.2)" : "rgba(201,168,76,0.1)", border:`1px solid rgba(201,168,76,0.25)`, borderRadius:8, color:G, fontSize:11, fontWeight:700, cursor:"pointer" }}>
+                              <RefreshCw size={12}/>
+                              {showChecker === rec.id ? "Fermer" : "Vérifier DNS"}
                             </button>
                           )}
                           <button type="button" onClick={() => deleteDomain(rec.id)} disabled={isBusy}
@@ -276,7 +278,18 @@ export default function DomainsPage({ pages, plan }: Props) {
                       {/* Instructions DNS (accordéon) */}
                       {isOpen && (
                         <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"18px 18px 20px", background:"rgba(255,255,255,0.01)" }}>
-                          {!rec.verified ? (
+                          {showChecker === rec.id && !rec.verified && (
+                        <DnsChecker
+                          domain={rec.domain}
+                          onVerified={() => {
+                            setDomains(prev => prev.map(r =>
+                              r.id === rec.id ? { ...r, verified: true, vercel_status: "active" } : r
+                            ))
+                            setShowChecker(null)
+                          }}
+                        />
+                      )}
+                      {!rec.verified ? (
                             <div>
                               <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 14px" }}>
                                 📋 Instructions de configuration DNS
