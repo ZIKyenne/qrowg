@@ -6,7 +6,8 @@ import {
   Eye, EyeOff, ChevronRight, Scan, Clock,
   Palette, Settings, Share2, ExternalLink, Copy,
   RotateCcw, Loader, Search, Trash2, Archive,
-  MoreVertical, AlertTriangle, X
+  MoreVertical, AlertTriangle, X,
+  Image, FileText, Maximize2, Clipboard, Sliders
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
@@ -233,7 +234,17 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [styleTab,   setStyleTab]   = useState<"colors"|"logo"|"style"|"corners"|"advanced">("colors")
   const [applyAllOk,   setApplyAllOk]   = useState(false)
   const [selectedCat,  setSelectedCat]  = useState("all")
-  const [upsellPreset, setUpsellPreset] = useState<string | null>(null)
+  const [upsellPreset,  setUpsellPreset]  = useState<string | null>(null)
+  const [expFormat,     setExpFormat]     = useState<"png"|"png-t"|"webp"|"svg"|"pdf">("png")
+  const [expSize,       setExpSize]       = useState<512|1024|2048|4096|"custom">(1024)
+  const [expCustomSize, setExpCustomSize] = useState(1024)
+  const [expMargin,     setExpMargin]     = useState(10)
+  const [expFilename,   setExpFilename]   = useState("")
+  const [expIncludeName,setExpIncludeName]= useState(false)
+  const [expIncludeUrl, setExpIncludeUrl] = useState(false)
+  const [expExporting,  setExpExporting]  = useState(false)
+  const [expCopied,     setExpCopied]     = useState<string | null>(null)
+  const exportCanvasRef = useRef<HTMLCanvasElement>(null)
   const [saving,     setSaving]     = useState(false)
   const [saved,      setSaved]      = useState(false)
   const [copied,     setCopied]     = useState<"link"|"short"|null>(null)
@@ -572,20 +583,194 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
   }, [active, fg, bg, corner, ecLevel, styleConf])
 
-  function downloadPNG(size = 400) {
-    if (size === 400) {
-      const canvas = canvasRef.current; if (!canvas) return
-      const link = document.createElement("a")
-      link.download = `qrfolio-${active?.short_code ?? "qr"}.png`
-      link.href = canvas.toDataURL("image/png"); link.click()
-    } else {
-      window.open(`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(qrUrl)}&color=${fg.replace("#","")}&bgcolor=${bg.replace("#","")}&ecc=${ecLevel}&margin=10`, "_blank")
-    }
+  // ── Nom de fichier auto ────────────────────────────────────────────────────
+  function getFilename(ext: string): string {
+    const base = expFilename.trim() || active?.pages?.title?.replace(/[^a-z0-9]/gi, "-").toLowerCase() || active?.short_code || "qr"
+    return `${base}.${ext}`
   }
 
-  function downloadSVG() {
-    window.open(`https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrUrl)}&color=${fg.replace("#","")}&bgcolor=${bg.replace("#","")}&ecc=${ecLevel}&format=svg`, "_blank")
+  // ── Construire canvas export à la taille voulue (avec logo) ────────────────
+  async function buildExportCanvas(px: number, transparent: boolean): Promise<HTMLCanvasElement> {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement("canvas")
+      canvas.width = px; canvas.height = px
+      const ctx    = canvas.getContext("2d")!
+      const margin = expMargin
+
+      // URL QR à la bonne taille
+      const fgH  = fg.replace("#","")
+      const bgH  = transparent ? "ffffff00" : (styleConf.transparent ? "ffffff00" : bg.replace("#",""))
+      const url  = `https://api.qrserver.com/v1/create-qr-code/?size=${px}x${px}&data=${encodeURIComponent(qrUrl)}&color=${fgH}&bgcolor=ffffff&ecc=${effectiveEcc}&margin=${margin}`
+
+      const img  = new Image(); img.crossOrigin = "anonymous"
+      img.onerror = () => reject(new Error("QR load failed"))
+      img.onload  = () => {
+        ctx.clearRect(0, 0, px, px)
+        // Fond
+        if (!transparent && !styleConf.transparent) {
+          if (styleConf.gradient !== "none" && styleConf.gradientBg) {
+            const grad = styleConf.gradient === "radial"
+              ? ctx.createRadialGradient(px/2,px/2,0,px/2,px/2,px/2)
+              : ctx.createLinearGradient(styleConf.gradient==="diagonal"?0:0,0,styleConf.gradient==="diagonal"?px:0,px)
+            grad.addColorStop(0, bg); grad.addColorStop(1, styleConf.gradientBg)
+            ctx.fillStyle = grad
+          } else { ctx.fillStyle = bg }
+          ctx.fillRect(0, 0, px, px)
+        }
+        // QR + dégradé
+        if (styleConf.gradient !== "none" && styleConf.fg2) {
+          ctx.drawImage(img, 0, 0, px, px)
+          const grad = styleConf.gradient === "radial"
+            ? ctx.createRadialGradient(px/2,px/2,0,px/2,px/2,px/2)
+            : ctx.createLinearGradient(styleConf.gradient==="diagonal"?0:0,0,styleConf.gradient==="diagonal"?px:0,px)
+          grad.addColorStop(0, fg); grad.addColorStop(1, styleConf.fg2)
+          ctx.globalCompositeOperation = "multiply"
+          ctx.fillStyle = grad; ctx.fillRect(0, 0, px, px)
+          ctx.globalCompositeOperation = "source-over"
+        } else { ctx.drawImage(img, 0, 0, px, px) }
+
+        // Bandeau bas: nom page + URL
+        let bannerH = 0
+        if (expIncludeName || expIncludeUrl) {
+          bannerH = Math.round(px * 0.08)
+          ctx.fillStyle = "rgba(0,0,0,0.7)"
+          ctx.fillRect(0, px - bannerH, px, bannerH)
+          ctx.fillStyle = "#F5F0E8"
+          const fSize = Math.round(bannerH * 0.32)
+          ctx.font = `600 ${fSize}px 'DM Sans', Arial, sans-serif`
+          ctx.textAlign = "center"
+          if (expIncludeName && active?.pages?.title) {
+            ctx.fillText(active.pages.title, px/2, px - bannerH + fSize*1.1, px*0.9)
+          }
+          if (expIncludeUrl) {
+            ctx.fillStyle = "#C9A84C"; ctx.font = `400 ${Math.round(fSize*0.8)}px monospace`
+            ctx.fillText(qrUrl, px/2, px - bannerH + (expIncludeName?fSize*2.2:fSize*1.5), px*0.9)
+          }
+          ctx.textAlign = "start"
+        }
+
+        // Logo
+        if (styleConf.logoUrl) {
+          const logoImg = new Image(); logoImg.crossOrigin = "anonymous"
+          logoImg.onload = () => {
+            const ratio = Math.min((styleConf.logoSize ?? 18)/100, 0.30)
+            const size  = px * ratio; const pad = (styleConf.logoPadding ?? 4) * (px/400)
+            const bgSz  = size + pad*2; const cx  = px/2; const cy = (px - bannerH)/2
+            const r     = styleConf.logoShape === "circle" ? bgSz/2 : styleConf.logoShape === "rounded" ? bgSz*0.2 : 0
+            if (styleConf.logoBg !== "transparent") {
+              ctx.save(); ctx.beginPath()
+              if (r > 0) {
+                ctx.moveTo(cx-bgSz/2+r,cy-bgSz/2); ctx.lineTo(cx+bgSz/2-r,cy-bgSz/2)
+                ctx.quadraticCurveTo(cx+bgSz/2,cy-bgSz/2,cx+bgSz/2,cy-bgSz/2+r)
+                ctx.lineTo(cx+bgSz/2,cy+bgSz/2-r); ctx.quadraticCurveTo(cx+bgSz/2,cy+bgSz/2,cx+bgSz/2-r,cy+bgSz/2)
+                ctx.lineTo(cx-bgSz/2+r,cy+bgSz/2); ctx.quadraticCurveTo(cx-bgSz/2,cy+bgSz/2,cx-bgSz/2,cy+bgSz/2-r)
+                ctx.lineTo(cx-bgSz/2,cy-bgSz/2+r); ctx.quadraticCurveTo(cx-bgSz/2,cy-bgSz/2,cx-bgSz/2+r,cy-bgSz/2)
+                ctx.closePath()
+              } else { ctx.rect(cx-bgSz/2,cy-bgSz/2,bgSz,bgSz) }
+              ctx.fillStyle = styleConf.logoBg==="custom"?(styleConf.logoBgColor??"#FFF"):styleConf.logoBg==="black"?"#000":"#FFF"
+              ctx.fill(); ctx.restore()
+            }
+            ctx.save(); ctx.beginPath()
+            if (styleConf.logoShape==="circle") { ctx.arc(cx,cy,size/2,0,Math.PI*2) }
+            else if (styleConf.logoShape==="rounded") {
+              const rr=size*0.2; ctx.moveTo(cx-size/2+rr,cy-size/2); ctx.lineTo(cx+size/2-rr,cy-size/2)
+              ctx.quadraticCurveTo(cx+size/2,cy-size/2,cx+size/2,cy-size/2+rr); ctx.lineTo(cx+size/2,cy+size/2-rr)
+              ctx.quadraticCurveTo(cx+size/2,cy+size/2,cx+size/2-rr,cy+size/2); ctx.lineTo(cx-size/2+rr,cy+size/2)
+              ctx.quadraticCurveTo(cx-size/2,cy+size/2,cx-size/2,cy+size/2-rr); ctx.lineTo(cx-size/2,cy-size/2+rr)
+              ctx.quadraticCurveTo(cx-size/2,cy-size/2,cx-size/2+rr,cy-size/2); ctx.closePath()
+            } else { ctx.rect(cx-size/2,cy-size/2,size,size) }
+            ctx.clip(); ctx.drawImage(logoImg,cx-size/2,cy-size/2,size,size); ctx.restore()
+            resolve(canvas)
+          }
+          logoImg.onerror = () => resolve(canvas)
+          logoImg.src = styleConf.logoUrl
+        } else { resolve(canvas) }
+      }
+      img.src = url
+    })
   }
+
+  // ── Export principal ───────────────────────────────────────────────────────
+  async function runExport() {
+    if (!active || expExporting) return
+    setExpExporting(true)
+    try {
+      const px          = expSize === "custom" ? Math.max(256, Math.min(8192, expCustomSize)) : expSize
+      const isTransparent = expFormat === "png-t"
+      const canvas      = await buildExportCanvas(px, isTransparent)
+
+      if (expFormat === "svg") {
+        // SVG via qrserver (vecteur pur)
+        const svgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${px}x${px}&data=${encodeURIComponent(qrUrl)}&color=${fg.replace("#","")}&bgcolor=${bg.replace("#","")}&ecc=${effectiveEcc}&margin=${expMargin}&format=svg`
+        const resp   = await fetch(svgUrl)
+        const text   = await resp.text()
+        const blob   = new Blob([text], { type: "image/svg+xml" })
+        const url    = URL.createObjectURL(blob)
+        const a      = document.createElement("a"); a.href = url; a.download = getFilename("svg"); a.click()
+        URL.revokeObjectURL(url)
+
+      } else if (expFormat === "pdf") {
+        // PDF via canvas → data URL → lien download (simple iframe)
+        const dataUrl = canvas.toDataURL("image/png", 1.0)
+        // Créer un PDF A4 avec le QR centré via jsPDF-like en pur canvas
+        const pdfCanvas = document.createElement("canvas")
+        const dpi = 96; const a4w = Math.round(8.27 * dpi); const a4h = Math.round(11.69 * dpi)
+        pdfCanvas.width = a4w; pdfCanvas.height = a4h
+        const pdfCtx = pdfCanvas.getContext("2d")!
+        pdfCtx.fillStyle = "#FFFFFF"; pdfCtx.fillRect(0, 0, a4w, a4h)
+        const imgEl = new Image(); imgEl.src = dataUrl
+        await new Promise<void>(r => { imgEl.onload = () => r() })
+        const qrDisplaySize = Math.min(a4w * 0.7, a4h * 0.5)
+        const qrX = (a4w - qrDisplaySize) / 2; const qrY = (a4h - qrDisplaySize) / 2 - 40
+        pdfCtx.drawImage(imgEl, qrX, qrY, qrDisplaySize, qrDisplaySize)
+        // Titre + URL
+        pdfCtx.fillStyle = "#1A1A1A"; pdfCtx.font = `bold 22px Arial`; pdfCtx.textAlign = "center"
+        pdfCtx.fillText(active?.pages?.title ?? "", a4w/2, qrY - 24, a4w*0.8)
+        pdfCtx.fillStyle = "#C9A84C"; pdfCtx.font = `14px monospace`
+        pdfCtx.fillText(qrUrl, a4w/2, qrY + qrDisplaySize + 30, a4w*0.8)
+        pdfCtx.textAlign = "start"
+        const pdfData = pdfCanvas.toDataURL("image/png", 1.0)
+        const a = document.createElement("a"); a.href = pdfData; a.download = getFilename("pdf"); a.click()
+
+      } else {
+        // PNG / PNG transparent / WEBP
+        const mime    = expFormat === "webp" ? "image/webp" : "image/png"
+        const quality = expFormat === "webp" ? 0.92 : undefined
+        const dataUrl = quality !== undefined ? canvas.toDataURL(mime, quality) : canvas.toDataURL(mime)
+        const ext     = expFormat === "webp" ? "webp" : "png"
+        const a       = document.createElement("a"); a.href = dataUrl; a.download = getFilename(ext); a.click()
+      }
+    } catch (e) { console.error("Export error:", e) }
+    setExpExporting(false)
+  }
+
+  // ── Copier image dans le presse-papier ────────────────────────────────────
+  async function copyImageToClipboard() {
+    if (!active) return
+    try {
+      const px     = 512
+      const canvas = await buildExportCanvas(px, false)
+      canvas.toBlob(async blob => {
+        if (!blob) return
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })])
+        setExpCopied("img"); setTimeout(() => setExpCopied(null), 2000)
+      }, "image/png")
+    } catch { setExpCopied("img-err"); setTimeout(() => setExpCopied(null), 2000) }
+  }
+
+  // ── Copier SVG texte ──────────────────────────────────────────────────────
+  async function copySVG() {
+    if (!active) return
+    try {
+      const svgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrUrl)}&color=${fg.replace("#","")}&bgcolor=${bg.replace("#","")}&ecc=${effectiveEcc}&format=svg`
+      const text   = await fetch(svgUrl).then(r => r.text())
+      await navigator.clipboard.writeText(text)
+      setExpCopied("svg"); setTimeout(() => setExpCopied(null), 2000)
+    } catch { setExpCopied("svg-err"); setTimeout(() => setExpCopied(null), 2000) }
+  }
+
+  // Legacy compat
+  function downloadPNG(size = 400) { runExport() }
 
   function copy(type: "link"|"short") {
     navigator.clipboard.writeText(type === "link" ? pageUrl : qrUrl).catch(() => {})
@@ -1596,53 +1781,216 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         )}
 
         {/* ── Export tab ────────────────────────────────────────────────────── */}
-        {activeTab === "export" && active && (
-          <div style={{ flex:1, overflowY:"auto", padding:"16px" }}>
-            <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+        {activeTab === "export" && active && (() => {
+          const realPx = expSize === "custom" ? Math.max(256, Math.min(8192, expCustomSize)) : expSize
+          const FORMAT_CFG: Record<string, { label: string; ext: string; color: string; desc: string; plan: string }> = {
+            "png":   { label:"PNG",       ext:"png",  color:"#38BDF8", desc:"Universel, opaque",        plan:"free"     },
+            "png-t": { label:"PNG Alpha", ext:"png",  color:"#39FF8F", desc:"Fond transparent, sticker", plan:"pro"      },
+            "webp":  { label:"WEBP",      ext:"webp", color:"#818CF8", desc:"Web optimise, plus leger",  plan:"pro"      },
+            "svg":   { label:"SVG",       ext:"svg",  color:"#C9A84C", desc:"Vectoriel, impression HD",  plan:"pro"      },
+            "pdf":   { label:"PDF",       ext:"pdf",  color:"#FF6B6B", desc:"Impression A4 avec titre",  plan:"business" },
+          }
+          const fmt = FORMAT_CFG[expFormat] ?? FORMAT_CFG["png"]
+          const RECO = [
+            { emoji:"🌐", label:"Web",           fmt:"png",   size:1024, note:"PNG 1024px — standard" },
+            { emoji:"🖨️", label:"Impression",    fmt:"pdf",   size:2048, note:"PDF / SVG 2048px+" },
+            { emoji:"🏷️",  label:"Sticker",      fmt:"png-t", size:1024, note:"PNG transparent 1024px" },
+            { emoji:"📱",  label:"Reseaux",       fmt:"png",   size:512,  note:"PNG 512px — leger" },
+          ]
+          return (
+          <div style={{ flex:1, overflowY:"auto", padding:"14px" }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+
+              {/* ── Recommandations ────────────────────────────────────────── */}
               <div>
-                <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Liens</p>
-                {([
-                  { label:"Lien de scan", val:qrUrl,   type:"short" as const, icon:<Link size={12}/> },
-                  { label:"Lien de page", val:pageUrl, type:"link"  as const, icon:<ExternalLink size={12}/> },
-                ]).map(l => (
-                  <div key={l.type} style={{ marginBottom:8 }}>
-                    <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>{l.label}</label>
-                    <div style={{ display:"flex", gap:6, alignItems:"center" }}>
-                      <code style={{ flex:1, background:"#111009", border:"1px solid rgba(255,255,255,0.07)", borderRadius:7, padding:"7px 9px", color:G, fontSize:10, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>{l.val}</code>
-                      <button type="button" onClick={() => copy(l.type)}
-                        style={{ width:28, height:28, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:copied===l.type?"#39FF8F":MUTED, flexShrink:0 }}>
-                        {copied===l.type ? <Check size={11}/> : <Copy size={11}/>}
+                <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>
+                  Recommandations
+                </p>
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:5 }}>
+                  {RECO.map(r => {
+                    const canReco = PLAN_RANK[userPlan] >= PLAN_RANK[FORMAT_CFG[r.fmt]?.plan ?? "free"]
+                    return (
+                      <button key={r.label} type="button"
+                        onClick={() => { if (!canReco) return; setExpFormat(r.fmt as any); setExpSize(r.size as any) }}
+                        style={{ padding:"8px 7px", background:"rgba(255,255,255,0.02)", border:`1px solid ${expFormat===r.fmt&&expSize===r.size?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:canReco?"pointer":"not-allowed", textAlign:"left" as const, opacity:canReco?1:0.6, position:"relative" as const }}>
+                        <p style={{ color:"#F5F0E8", fontSize:10, fontWeight:600, margin:"0 0 2px" }}>{r.emoji} {r.label}</p>
+                        <p style={{ color:MUTED, fontSize:9, margin:0 }}>{r.note}</p>
+                        {!canReco && <Lock size={9} color={MUTED} style={{ position:"absolute", top:5, right:5 }}/>}
                       </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* ── Format ─────────────────────────────────────────────────── */}
+              <div>
+                <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Format</p>
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:5 }}>
+                  {Object.entries(FORMAT_CFG).map(([id, cfg]) => {
+                    const canFmt = PLAN_RANK[userPlan] >= PLAN_RANK[cfg.plan]
+                    const isA    = expFormat === id
+                    const badge  = cfg.plan === "free" ? null : cfg.plan === "pro" ? "PRO" : "BIZ"
+                    return (
+                      <button key={id} type="button"
+                        onClick={() => canFmt && setExpFormat(id as any)}
+                        style={{ padding:"9px 8px", background:isA?`${cfg.color}12`:"rgba(255,255,255,0.02)", border:`1px solid ${isA?cfg.color+"50":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:canFmt?"pointer":"not-allowed", opacity:canFmt?1:0.55, position:"relative" as const, textAlign:"left" as const }}>
+                        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:2 }}>
+                          <span style={{ color:isA?cfg.color:"#F5F0E8", fontSize:11, fontWeight:700 }}>{cfg.label}</span>
+                          {badge && <span style={{ background:`${cfg.color}20`, borderRadius:3, padding:"1px 4px", fontSize:7, color:cfg.color, fontWeight:800 }}>{badge}</span>}
+                        </div>
+                        <p style={{ color:MUTED, fontSize:9, margin:0 }}>{cfg.desc}</p>
+                        {!canFmt && <Lock size={9} color={MUTED} style={{ position:"absolute", top:5, right:5 }}/>}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* ── Taille ─────────────────────────────────────────────────── */}
+              <div>
+                <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Taille</p>
+                <div style={{ display:"flex", gap:5, flexWrap:"wrap" as const, marginBottom:8 }}>
+                  {([512, 1024, 2048, 4096, "custom"] as const).map(s => {
+                    const isHD  = s === 4096 || s === 2048
+                    const canHD = !isHD || canPro
+                    return (
+                      <button key={String(s)} type="button"
+                        onClick={() => canHD && setExpSize(s as any)}
+                        style={{ padding:"5px 10px", background:expSize===s?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1px solid ${expSize===s?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:expSize===s?G:canHD?"#F5F0E8":MUTED, fontSize:10, cursor:canHD?"pointer":"not-allowed", fontWeight:expSize===s?700:400, opacity:canHD?1:0.55 }}>
+                        {s === "custom" ? "Perso" : `${s}px`}
+                        {isHD && !canHD && <Lock size={8} color={MUTED} style={{ marginLeft:3 }}/>}
+                      </button>
+                    )
+                  })}
+                </div>
+                {expSize === "custom" && (
+                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <input type="number" min={256} max={8192} value={expCustomSize}
+                      onChange={e => setExpCustomSize(Math.max(256, Math.min(8192, Number(e.target.value))))}
+                      style={{ flex:1, background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 10px", color:"#F5F0E8", fontSize:12, outline:"none" }}/>
+                    <span style={{ color:MUTED, fontSize:11 }}>px</span>
+                  </div>
+                )}
+                <p style={{ color:MUTED, fontSize:10, margin:"5px 0 0" }}>
+                  Export : <strong style={{ color:G }}>{realPx}×{realPx}px</strong>
+                  {(expIncludeName || expIncludeUrl) && " + bandeau"}
+                </p>
+              </div>
+
+              {/* ── Options ────────────────────────────────────────────────── */}
+              <div>
+                <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Options</p>
+                <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+
+                  {/* Marge */}
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                    <span style={{ color:MUTED, fontSize:11 }}>Marge</span>
+                    <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                      <input type="range" min={0} max={30} value={expMargin}
+                        onChange={e => setExpMargin(Number(e.target.value))}
+                        style={{ width:80, accentColor:G, cursor:"pointer" }}/>
+                      <span style={{ color:G, fontSize:11, fontWeight:700, width:28, textAlign:"right" as const }}>{expMargin}px</span>
                     </div>
                   </div>
-                ))}
-              </div>
-              <div>
-                <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Telecharger</p>
-                <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
-                  <button type="button" onClick={() => downloadPNG(400)}
-                    style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:9, color:"#080808", fontSize:12, fontWeight:700, cursor:"pointer" }}>
-                    <Download size={13}/> PNG 400x400
-                  </button>
-                  <button type="button" onClick={() => canPro && downloadPNG(1200)}
-                    style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px", background:canPro?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.03)", border:`1px solid ${canPro?"rgba(201,168,76,0.3)":"rgba(255,255,255,0.07)"}`, borderRadius:9, color:canPro?G:MUTED, fontSize:12, cursor:canPro?"pointer":"not-allowed" }}>
-                    {!canPro && <Lock size={12}/>}<Download size={13}/> HD 1200x1200 {!canPro && "- Pro"}
-                  </button>
-                  <button type="button" onClick={() => canPro && downloadSVG()}
-                    style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px", background:canPro?"rgba(57,255,143,0.08)":"rgba(255,255,255,0.03)", border:`1px solid ${canPro?"rgba(57,255,143,0.25)":"rgba(255,255,255,0.07)"}`, borderRadius:9, color:canPro?"#39FF8F":MUTED, fontSize:12, cursor:canPro?"pointer":"not-allowed" }}>
-                    {!canPro && <Lock size={12}/>}<Share2 size={13}/> SVG {!canPro && "- Pro"}
-                  </button>
+
+                  {/* Nom de fichier */}
+                  <div>
+                    <label style={{ color:MUTED, fontSize:11, display:"block", marginBottom:4 }}>Nom du fichier</label>
+                    <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+                      <input type="text" value={expFilename}
+                        onChange={e => setExpFilename(e.target.value)}
+                        placeholder={active?.pages?.title?.replace(/[^a-z0-9]/gi,"-").toLowerCase() ?? "qr-code"}
+                        style={{ flex:1, background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none" }}/>
+                      <span style={{ color:MUTED, fontSize:11 }}>.{fmt.ext}</span>
+                    </div>
+                  </div>
+
+                  {/* Inclure nom + URL (sauf SVG) */}
+                  {expFormat !== "svg" && (
+                    <>
+                      {[
+                        { state:expIncludeName, set:setExpIncludeName, label:"Inclure nom de la page", plan:"free"     },
+                        { state:expIncludeUrl,  set:setExpIncludeUrl,  label:"Inclure URL courte",    plan:"pro"      },
+                      ].map((opt, i) => {
+                        const can = PLAN_RANK[userPlan] >= PLAN_RANK[opt.plan]
+                        return (
+                          <div key={i} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", opacity:can?1:0.5 }}>
+                            <span style={{ color:MUTED, fontSize:11 }}>{opt.label}{!can&&" (Pro)"}</span>
+                            <button type="button" onClick={() => can && opt.set(!opt.state)}
+                              style={{ width:34, height:20, borderRadius:10, background:opt.state&&can?"linear-gradient(90deg,#C9A84C,#b8953f)":"rgba(255,255,255,0.1)", border:"none", cursor:can?"pointer":"not-allowed", position:"relative" as const, transition:"background 0.2s" }}>
+                              <div style={{ position:"absolute", top:2, left:opt.state&&can?16:2, width:16, height:16, borderRadius:"50%", background:"#F5F0E8", transition:"left 0.2s" }}/>
+                            </button>
+                          </div>
+                        )
+                      })}
+                    </>
+                  )}
+
+                  {/* Logo actif */}
+                  {styleConf.logoUrl && (
+                    <div style={{ display:"flex", alignItems:"center", gap:7, padding:"7px 10px", background:"rgba(57,255,143,0.06)", border:"1px solid rgba(57,255,143,0.15)", borderRadius:8 }}>
+                      <Check size={11} color="#39FF8F"/>
+                      <span style={{ color:"#39FF8F", fontSize:10 }}>Logo inclus dans l&apos;export</span>
+                    </div>
+                  )}
                 </div>
               </div>
+
+              {/* ── Actions ────────────────────────────────────────────────── */}
+              <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+
+                {/* Bouton principal Télécharger */}
+                <button type="button" onClick={runExport} disabled={expExporting}
+                  style={{ padding:"11px", background:`linear-gradient(90deg,${fmt.color},${fmt.color}cc)`, border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:expExporting?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7, opacity:expExporting?0.7:1 }}>
+                  {expExporting
+                    ? <><Loader size={14} style={{ animation:"spin 0.8s linear infinite" }}/> Export en cours...</>
+                    : <><Download size={14}/> Telecharger {fmt.label} {realPx}px</>}
+                </button>
+
+                {/* Copier image */}
+                <button type="button" onClick={copyImageToClipboard}
+                  style={{ padding:"9px", background:expCopied==="img"?"rgba(57,255,143,0.1)":"rgba(255,255,255,0.04)", border:`1px solid ${expCopied==="img"?"rgba(57,255,143,0.3)":"rgba(255,255,255,0.08)"}`, borderRadius:9, color:expCopied==="img"?"#39FF8F":expCopied==="img-err"?"#FF6B6B":MUTED, fontSize:11, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                  {expCopied==="img" ? <><Check size={12}/> Image copiee !</>
+                    : expCopied==="img-err" ? <><AlertTriangle size={12}/> Non supporte</>
+                    : <><Clipboard size={12}/> Copier l&apos;image (PNG 512px)</>}
+                </button>
+
+                {/* Copier SVG */}
+                <button type="button" onClick={copySVG}
+                  style={{ padding:"9px", background:expCopied==="svg"?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.04)", border:`1px solid ${expCopied==="svg"?"rgba(201,168,76,0.3)":"rgba(255,255,255,0.08)"}`, borderRadius:9, color:expCopied==="svg"?G:MUTED, fontSize:11, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                  {expCopied==="svg" ? <><Check size={12}/> SVG copie !</> : <><Copy size={12}/> Copier le SVG</>}
+                </button>
+
+                {/* Copier lien */}
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
+                  {[
+                    { key:"short", label:"Lien scan", val:qrUrl   },
+                    { key:"link",  label:"Lien page", val:pageUrl  },
+                  ].map(l => (
+                    <button key={l.key} type="button" onClick={() => copy(l.key as any)}
+                      style={{ padding:"7px", background:copied===l.key?"rgba(57,255,143,0.08)":"rgba(255,255,255,0.03)", border:`1px solid ${copied===l.key?"rgba(57,255,143,0.2)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:copied===l.key?"#39FF8F":MUTED, fontSize:10, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:5 }}>
+                      {copied===l.key ? <Check size={10}/> : <Link size={10}/>} {l.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Upsell */}
               {!canPro && (
                 <div style={{ padding:"12px 14px", background:"rgba(201,168,76,0.05)", border:"1px solid rgba(201,168,76,0.15)", borderRadius:10 }}>
-                  <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 5px" }}>Debloquer les exports HD</p>
-                  <a href="/dashboard/upgrade" style={{ display:"inline-block", background:"linear-gradient(90deg,#C9A84C,#b8953f)", color:"#080808", textDecoration:"none", fontSize:11, fontWeight:700, padding:"6px 14px", borderRadius:7 }}>Passer Pro</a>
+                  <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 4px" }}>Formats HD + SVG + PDF</p>
+                  <p style={{ color:MUTED, fontSize:10, margin:"0 0 8px" }}>Pro: PNG alpha, WEBP, SVG · Business: PDF A4</p>
+                  <a href="/dashboard/upgrade" style={{ display:"block", textAlign:"center" as const, padding:"7px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius:7, color:"#080808", fontSize:11, fontWeight:700, textDecoration:"none" }}>
+                    Voir les plans
+                  </a>
                 </div>
               )}
+
             </div>
           </div>
-        )}
+          )
+        })()}
+
       </div>
 
 
