@@ -2311,7 +2311,6 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 )}
               </div>
 
-              )}
             </div>
           )
         })() : (
