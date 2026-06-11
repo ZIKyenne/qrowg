@@ -112,7 +112,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [archivingId,setArchivingId]= useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [copyQRId,   setCopyQRId]   = useState<string | null>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [showModal,  setShowModal]  = useState(false)
+  const [diagFg,     setDiagFg]     = useState("")
+  const [diagBg,     setDiagBg]     = useState("")
+  const canvasRef      = useRef<HTMLCanvasElement>(null)
+  const canvasModalRef = useRef<HTMLCanvasElement>(null)
 
   const active  = qrCodes.find(q => q.id === activeId) ?? null
   const qrUrl   = active ? `${appUrl}/q/${active.short_code}` : ""
@@ -176,6 +180,57 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     navigator.clipboard.writeText(url).catch(() => {})
     setCopyQRId(id); setTimeout(() => setCopyQRId(null), 2000)
   }
+
+  // ── Calcul contraste WCAG ─────────────────────────────────────────────────
+  function hexToRgb(hex: string): [number,number,number] {
+    const h = hex.replace("#","")
+    return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]
+  }
+  function relativeLuminance(r:number,g:number,b:number): number {
+    const c = [r,g,b].map(v => { const s=v/255; return s<=0.03928?s/12.92:Math.pow((s+0.055)/1.055,2.4) })
+    return 0.2126*c[0]+0.7152*c[1]+0.0722*c[2]
+  }
+  function contrastRatio(hex1:string, hex2:string): number {
+    const [r1,g1,b1] = hexToRgb(hex1)
+    const [r2,g2,b2] = hexToRgb(hex2)
+    const l1 = relativeLuminance(r1,g1,b1)
+    const l2 = relativeLuminance(r2,g2,b2)
+    const lMax = Math.max(l1,l2), lMin = Math.min(l1,l2)
+    return (lMax+0.05)/(lMin+0.05)
+  }
+  function getDiagnostic(fgHex:string, bgHex:string) {
+    if (!fgHex || !bgHex) return null
+    const ratio   = contrastRatio(fgHex, bgHex)
+    const percent = Math.min(100, Math.round(((ratio-1)/(21-1))*100))
+    let readability: "Excellente"|"Bonne"|"Moyenne"|"Risquee"
+    let readColor:   string
+    if (ratio >= 7)    { readability = "Excellente"; readColor = "#39FF8F" }
+    else if (ratio >= 4.5) { readability = "Bonne";  readColor = "#C9A84C" }
+    else if (ratio >= 3)   { readability = "Moyenne"; readColor = "#F97316" }
+    else                   { readability = "Risquee"; readColor = "#FF6B6B" }
+    const minSize = ratio >= 7 ? "15mm" : ratio >= 4.5 ? "20mm" : ratio >= 3 ? "25mm" : "30mm+"
+    return { ratio: ratio.toFixed(1), percent, readability, readColor, minSize,
+      warnContrast: ratio < 3, warnLow: ratio < 4.5 }
+  }
+
+  // Canvas modal plein écran
+  const drawModalCanvas = useCallback(() => {
+    if (!canvasModalRef.current || !qrUrl) return
+    const canvas = canvasModalRef.current
+    const ctx    = canvas.getContext("2d"); if (!ctx) return
+    const img    = new Image()
+    const url    = `https://api.qrserver.com/v1/create-qr-code/?size=800x800&data=${encodeURIComponent(qrUrl)}&color=${fg.replace("#","")}&bgcolor=${bg.replace("#","")}&ecc=${ecLevel}&margin=20`
+    img.crossOrigin = "anonymous"
+    img.onload = () => {
+      canvas.width = 800; canvas.height = 800
+      ctx.clearRect(0,0,800,800)
+      ctx.drawImage(img,0,0,800,800)
+    }
+    img.src = url
+  }, [qrUrl, fg, bg, ecLevel])
+
+  useEffect(() => { if (showModal) drawModalCanvas() }, [showModal, drawModalCanvas])
+  useEffect(() => { setDiagFg(fg); setDiagBg(bg) }, [fg, bg])
 
   const saveCustomization = useCallback(async () => {
     if (!active) return
@@ -255,6 +310,73 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
   return (
     <div style={{ display:"grid", gridTemplateColumns:"280px 1fr 300px", gap:0, height:"calc(100vh - 140px)", background:BG, borderRadius:16, border:"1px solid rgba(201,168,76,0.1)", overflow:"hidden", fontFamily:"DM Sans, sans-serif", position:"relative" }}>
+
+
+      {/* ── Modal preview plein écran ─────────────────────────────────────────── */}
+      {showModal && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.92)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:2000, padding:32 }}
+          onClick={() => setShowModal(false)}>
+          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:20, maxWidth:600, width:"100%" }}
+            onClick={e => e.stopPropagation()}>
+
+            {/* Header */}
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", width:"100%" }}>
+              <div>
+                <p style={{ color:"#F5F0E8", fontSize:16, fontWeight:700, margin:"0 0 3px" }}>{active?.pages?.title}</p>
+                <p style={{ color:"#8A8478", fontSize:11, margin:0 }}>Scannez pour tester • {appUrl}/q/{active?.short_code}</p>
+              </div>
+              <button type="button" onClick={() => setShowModal(false)}
+                style={{ width:36, height:36, background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#8A8478" }}>
+                <X size={16}/>
+              </button>
+            </div>
+
+            {/* QR grand */}
+            <div style={{ padding:28, borderRadius:24, background:bg, boxShadow:"0 0 0 1px rgba(201,168,76,0.3), 0 32px 80px rgba(0,0,0,0.9)" }}>
+              <canvas ref={canvasModalRef} width={800} height={800} style={{ display:"block", width:320, height:320, imageRendering:"pixelated" }}/>
+            </div>
+
+            {/* Actions */}
+            <div style={{ display:"flex", gap:10, width:"100%", maxWidth:400 }}>
+              <button type="button" onClick={() => downloadPNG(1200)}
+                style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"11px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                <Download size={14}/> PNG HD
+              </button>
+              <button type="button" onClick={() => copy("short")}
+                style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"11px", background: copied==="short"?"rgba(57,255,143,0.12)":"rgba(255,255,255,0.05)", border:`1px solid ${copied==="short"?"rgba(57,255,143,0.3)":"rgba(255,255,255,0.1)"}`, borderRadius:10, color:copied==="short"?"#39FF8F":"#F5F0E8", fontSize:13, cursor:"pointer" }}>
+                {copied==="short" ? <Check size={14}/> : <Copy size={14}/>}
+                {copied==="short" ? "Copie !" : "Copier lien"}
+              </button>
+              <a href={pageUrl} target="_blank" rel="noopener noreferrer"
+                style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"11px", background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, color:"#F5F0E8", fontSize:13, textDecoration:"none" }}>
+                <ExternalLink size={14}/> Ouvrir
+              </a>
+            </div>
+
+            {/* Diagnostic dans la modal */}
+            {(() => {
+              const diag = getDiagnostic(diagFg || fg, diagBg || bg)
+              if (!diag) return null
+              return (
+                <div style={{ display:"flex", gap:8, flexWrap:"wrap" as const, justifyContent:"center" }}>
+                  {[
+                    { label: diag.readability, color: diag.readColor },
+                    { label: `Contraste ${diag.ratio}:1`, color: diag.warnContrast?"#FF6B6B":diag.warnLow?"#F97316":"#39FF8F" },
+                    { label: `Min ${diag.minSize}`, color: "#8A8478" },
+                    { label: `ECC ${ecLevel}`, color: "#C9A84C" },
+                  ].map((b,i) => (
+                    <span key={i} style={{ background:`${b.color}12`, border:`1px solid ${b.color}35`, borderRadius:7, padding:"4px 12px", fontSize:11, color:b.color, fontWeight:600 }}>{b.label}</span>
+                  ))}
+                </div>
+              )
+            })()}
+
+            <p style={{ color:"rgba(138,132,120,0.6)", fontSize:11, textAlign:"center" as const }}>
+              Cliquez en dehors pour fermer
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* ── Modale suppression ────────────────────────────────────────────────── */}
       {confirmId !== null && (
@@ -420,43 +542,171 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         </div>
       </div>
 
-      {/* ── COL 2 : Preview centrale ────────────────────────────────────────── */}
-      <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"32px", gap:24, background:"#0A0907" }}>
-        {active ? (
-          <>
-            <div style={{ position:"relative", padding:24, borderRadius:24, background:bg, boxShadow:`0 0 0 1px rgba(201,168,76,0.2), 0 20px 60px rgba(0,0,0,0.8)`, transition:"background 0.3s" }}>
-              {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h], i) => (
-                <div key={i} style={{ position:"absolute", [v]:10, [h]:10, width:14, height:14,
-                  borderTop:    v==="top"    ? `2px solid rgba(201,168,76,0.6)` : "none",
-                  borderBottom: v==="bottom" ? `2px solid rgba(201,168,76,0.6)` : "none",
-                  borderLeft:   h==="left"   ? `2px solid rgba(201,168,76,0.6)` : "none",
-                  borderRight:  h==="right"  ? `2px solid rgba(201,168,76,0.6)` : "none",
-                }}/>
-              ))}
-              <canvas ref={canvasRef} width={400} height={400} style={{ display:"block", width:240, height:240, imageRendering:"pixelated" }}/>
-            </div>
-            <div style={{ textAlign:"center" }}>
-              <p style={{ color:"#F5F0E8", fontSize:16, fontWeight:700, margin:"0 0 4px" }}>{active.pages?.title}</p>
-              <p style={{ color:MUTED, fontSize:11, margin:0 }}>{appUrl}/q/{active.short_code}</p>
-            </div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12, width:"100%", maxWidth:360 }}>
-              {[
-                { label:"Scans",     value:active.total_scans.toLocaleString(), color:G },
-                { label:"Vues page", value:(active.pages?.total_views ?? 0).toLocaleString(), color:"#39FF8F" },
-                { label:"Dernier",   value:formatDate(active.last_scan_at), color:MUTED },
-              ].map((s, i) => (
-                <div key={i} style={{ background:SURF, border:"1px solid rgba(255,255,255,0.06)", borderRadius:10, padding:"10px 12px", textAlign:"center" }}>
-                  <p style={{ color:s.color, fontSize:16, fontWeight:800, margin:"0 0 2px" }}>{s.value}</p>
-                  <p style={{ color:MUTED, fontSize:10, textTransform:"uppercase", letterSpacing:1, margin:0 }}>{s.label}</p>
+      {/* ── COL 2 : Preview premium ──────────────────────────────────────────── */}
+      <div style={{ display:"flex", flexDirection:"column", overflow:"hidden", background:"#0A0907" }}>
+        {active ? (() => {
+          const diag = getDiagnostic(diagFg || fg, diagBg || bg)
+          return (
+            <div style={{ display:"flex", flexDirection:"column", height:"100%", overflowY:"auto" }}>
+
+              {/* QR Card */}
+              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"24px 24px 16px", gap:16, borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+                <div style={{ position:"relative" }}>
+                  <div style={{ position:"relative", padding:20, borderRadius:20, background:bg, boxShadow:`0 0 0 1px rgba(201,168,76,0.2), 0 20px 60px rgba(0,0,0,0.8)`, transition:"background 0.3s", cursor:"pointer" }}
+                    onClick={() => setShowModal(true)}>
+                    {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h], i) => (
+                      <div key={i} style={{ position:"absolute", [v]:8, [h]:8, width:12, height:12,
+                        borderTop:    v==="top"    ? "2px solid rgba(201,168,76,0.6)" : "none",
+                        borderBottom: v==="bottom" ? "2px solid rgba(201,168,76,0.6)" : "none",
+                        borderLeft:   h==="left"   ? "2px solid rgba(201,168,76,0.6)" : "none",
+                        borderRight:  h==="right"  ? "2px solid rgba(201,168,76,0.6)" : "none",
+                      }}/>
+                    ))}
+                    <canvas ref={canvasRef} width={400} height={400} style={{ display:"block", width:200, height:200, imageRendering:"pixelated" }}/>
+                    {/* Hover overlay */}
+                    <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0)", display:"flex", alignItems:"center", justifyContent:"center", borderRadius:20, transition:"background 0.2s" }}
+                      onMouseEnter={e => (e.currentTarget.style.background="rgba(0,0,0,0.4)")}
+                      onMouseLeave={e => (e.currentTarget.style.background="rgba(0,0,0,0)")}>
+                      <span style={{ color:"rgba(255,255,255,0)", fontSize:11, fontWeight:700, transition:"color 0.2s", pointerEvents:"none" }}
+                        onMouseEnter={e => (e.currentTarget.style.color="#F5F0E8")}
+                        onMouseLeave={e => (e.currentTarget.style.color="rgba(255,255,255,0)")}>
+                        Agrandir
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              ))}
+
+                {/* Nom + URL + statut */}
+                <div style={{ textAlign:"center", width:"100%" }}>
+                  <p style={{ color:"#F5F0E8", fontSize:15, fontWeight:700, margin:"0 0 4px" }}>{active.pages?.title ?? "Sans titre"}</p>
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, marginBottom:6 }}>
+                    <code style={{ color:"#C9A84C", fontSize:10, background:"rgba(201,168,76,0.08)", padding:"2px 8px", borderRadius:5 }}>
+                      /q/{active.short_code}
+                    </code>
+                    <button type="button" onClick={() => copy("short")}
+                      style={{ width:20, height:20, background:"none", border:"none", cursor:"pointer", color:copied==="short"?"#39FF8F":"#8A8478", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      {copied==="short" ? <Check size={11}/> : <Copy size={11}/>}
+                    </button>
+                  </div>
+                  {(() => {
+                    const st   = active.pages?.status ?? "draft"
+                    const sCfg = ({ published:{dot:"#39FF8F",label:"Publie"}, draft:{dot:"#8A8478",label:"Brouillon"}, archived:{dot:"#F97316",label:"Archive"}, paused:{dot:"#FF6B6B",label:"En pause"} } as any)[st] ?? {dot:"#8A8478",label:"Inconnu"}
+                    return (
+                      <span style={{ display:"inline-flex", alignItems:"center", gap:4, fontSize:10, color:sCfg.dot, background:`${sCfg.dot}15`, border:`1px solid ${sCfg.dot}40`, borderRadius:6, padding:"2px 8px", fontWeight:600 }}>
+                        <div style={{ width:5, height:5, borderRadius:"50%", background:sCfg.dot }}/>{sCfg.label}
+                      </span>
+                    )
+                  })()}
+                </div>
+
+                {/* Actions rapides */}
+                <div style={{ display:"flex", gap:6, width:"100%" }}>
+                  <button type="button" onClick={() => copy("link")}
+                    style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"8px", background:copied==="link"?"rgba(57,255,143,0.1)":"rgba(255,255,255,0.04)", border:`1px solid ${copied==="link"?"rgba(57,255,143,0.3)":"rgba(255,255,255,0.08)"}`, borderRadius:9, color:copied==="link"?"#39FF8F":"#8A8478", fontSize:11, cursor:"pointer", transition:"all 0.15s" }}>
+                    {copied==="link" ? <Check size={12}/> : <Copy size={12}/>}
+                    {copied==="link" ? "Copie !" : "Copier"}
+                  </button>
+                  <a href={pageUrl} target="_blank" rel="noopener noreferrer"
+                    style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"8px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:"#8A8478", fontSize:11, textDecoration:"none" }}>
+                    <ExternalLink size={12}/> Ouvrir
+                  </a>
+                  <button type="button" onClick={() => setShowModal(true)}
+                    style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"8px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:9, color:"#C9A84C", fontSize:11, cursor:"pointer" }}>
+                    <Eye size={12}/> Tester
+                  </button>
+                </div>
+              </div>
+
+              {/* Stats */}
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, padding:"14px 16px", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+                {[
+                  { label:"Scans total",   value:active.total_scans.toLocaleString(),               color:"#C9A84C", icon:"📡" },
+                  { label:"Vues page",     value:(active.pages?.total_views ?? 0).toLocaleString(),  color:"#39FF8F", icon:"👁" },
+                  { label:"Dernier scan",  value:formatDate(active.last_scan_at),                   color:"#8A8478", icon:"🕐" },
+                  { label:"Cree le",       value:new Date(active.created_at).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"}), color:"#8A8478", icon:"📅" },
+                ].map((s,i) => (
+                  <div key={i} style={{ background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.06)", borderRadius:9, padding:"10px 12px" }}>
+                    <p style={{ color:"#8A8478", fontSize:9, textTransform:"uppercase", letterSpacing:1.2, margin:"0 0 4px" }}>{s.icon} {s.label}</p>
+                    <p style={{ color:s.color, fontSize:12, fontWeight:700, margin:0 }}>{s.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Destination */}
+              <div style={{ padding:"12px 16px", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+                <p style={{ color:"#8A8478", fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:"0 0 7px" }}>Destination</p>
+                <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 10px", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.06)", borderRadius:9 }}>
+                  <div style={{ width:6, height:6, borderRadius:"50%", background: active.pages?.status==="published"?"#39FF8F":"#8A8478", flexShrink:0 }}/>
+                  <code style={{ flex:1, color:"#C9A84C", fontSize:10, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
+                    {pageUrl || "—"}
+                  </code>
+                  <a href={pageUrl} target="_blank" rel="noopener noreferrer"
+                    style={{ color:"#8A8478", textDecoration:"none", flexShrink:0 }}>
+                    <ExternalLink size={10}/>
+                  </a>
+                </div>
+              </div>
+
+              {/* Diagnostic */}
+              {diag && (
+                <div style={{ padding:"12px 16px" }}>
+                  <p style={{ color:"#8A8478", fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:"0 0 10px" }}>Diagnostic lisibilite</p>
+
+                  {/* Lisibilité badge */}
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
+                    <span style={{ color:"#8A8478", fontSize:11 }}>Lisibilite</span>
+                    <span style={{ background:`${diag.readColor}15`, border:`1px solid ${diag.readColor}40`, borderRadius:6, padding:"2px 10px", fontSize:10, color:diag.readColor, fontWeight:700 }}>
+                      {diag.readability}
+                    </span>
+                  </div>
+
+                  {/* Contraste */}
+                  <div style={{ marginBottom:10 }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:5 }}>
+                      <span style={{ color:"#8A8478", fontSize:11 }}>Contraste</span>
+                      <span style={{ color: diag.warnContrast?"#FF6B6B":diag.warnLow?"#F97316":"#39FF8F", fontSize:11, fontWeight:700 }}>
+                        {diag.ratio}:1
+                      </span>
+                    </div>
+                    <div style={{ height:5, background:"rgba(255,255,255,0.07)", borderRadius:3, overflow:"hidden" }}>
+                      <div style={{ height:"100%", width:`${diag.percent}%`, background: diag.warnContrast?"#FF6B6B":diag.warnLow?"#F97316":"linear-gradient(90deg,#C9A84C,#39FF8F)", borderRadius:3, transition:"width 0.4s, background 0.3s" }}/>
+                    </div>
+                  </div>
+
+                  {/* Badges info */}
+                  <div style={{ display:"flex", gap:6, flexWrap:"wrap" as const }}>
+                    <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 8px", fontSize:9, color:"#8A8478" }}>
+                      Min {diag.minSize}
+                    </span>
+                    <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 8px", fontSize:9, color:"#8A8478" }}>
+                      Marge 10px
+                    </span>
+                    <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 8px", fontSize:9, color: ecLevel==="H"||ecLevel==="Q"?"#39FF8F":"#C9A84C" }}>
+                      ECC {ecLevel}
+                    </span>
+                  </div>
+
+                  {/* Warnings */}
+                  {diag.warnContrast && (
+                    <div style={{ display:"flex", alignItems:"center", gap:7, marginTop:10, padding:"8px 10px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:8 }}>
+                      <AlertTriangle size={12} color="#FF6B6B"/>
+                      <p style={{ color:"#FF6B6B", fontSize:11, margin:0 }}>Contraste trop faible — QR risque d&apos;etre illisible</p>
+                    </div>
+                  )}
+                  {!diag.warnContrast && diag.warnLow && (
+                    <div style={{ display:"flex", alignItems:"center", gap:7, marginTop:10, padding:"8px 10px", background:"rgba(249,115,22,0.08)", border:"1px solid rgba(249,115,22,0.2)", borderRadius:8 }}>
+                      <AlertTriangle size={12} color="#F97316"/>
+                      <p style={{ color:"#F97316", fontSize:11, margin:0 }}>Contraste moyen — privilegiez une impression a 25mm+</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-            <p style={{ color:MUTED, fontSize:11 }}>
-              Cree le {new Date(active.created_at).toLocaleDateString("fr-FR", { day:"numeric", month:"long", year:"numeric" })}
-            </p>
-          </>
-        ) : (
-          <p style={{ color:MUTED }}>Selectionne un QR code</p>
+          )
+        })() : (
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100%", color:"#8A8478" }}>
+            <p style={{ fontSize:12 }}>Selectionne un QR code</p>
+          </div>
         )}
       </div>
 
