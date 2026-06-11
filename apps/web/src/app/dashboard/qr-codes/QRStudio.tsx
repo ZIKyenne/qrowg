@@ -2858,3 +2858,5 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     </div>
   )
 }
+#   0 6 / 1 1 / 2 0 2 6   1 6 : 5 8 : 5 3  
+ 
