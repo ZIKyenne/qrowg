@@ -8,7 +8,7 @@ import {
   RotateCcw, Loader, Search, Trash2, Archive,
   MoreVertical, AlertTriangle, X,
   Image, FileText, Maximize2, Clipboard, Sliders,
-  Printer, LayoutGrid
+  Printer, LayoutGrid, TrendingUp, TrendingDown, BarChart2
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
@@ -245,8 +245,20 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [expIncludeUrl, setExpIncludeUrl] = useState(false)
   const [expExporting,  setExpExporting]  = useState(false)
   const [expCopied,     setExpCopied]     = useState<string | null>(null)
+  // ── Types stats ─────────────────────────────────────────────────────────
+  type QRStats = {
+    total: number; current: number; prev: number; evolution: number
+    last_scan: string | null; top_device: string | null; top_country: string | null
+    sparkline: number[]; period: number; created_at: string
+  }
+
   const exportCanvasRef   = useRef<HTMLCanvasElement>(null)
   const supportCanvasRef  = useRef<HTMLCanvasElement>(null)
+  const sparkCanvasRef    = useRef<HTMLCanvasElement>(null)
+  const [stats,         setStats]         = useState<QRStats | null>(null)
+  const [statsLoading,  setStatsLoading]  = useState(false)
+  const [statsPeriod,   setStatsPeriod]   = useState<7|30>(7)
+  const [statsExporting,setStatsExporting]= useState(false)
   const [suppTplId,   setSuppTplId]   = useState("a4-poster")
   const [suppTitle,   setSuppTitle]   = useState("")
   const [suppSubtitle,setSuppSubtitle]= useState("Scannez pour voir le menu")
@@ -573,6 +585,75 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
   useEffect(() => { if (showModal) drawModalCanvas() }, [showModal, drawModalCanvas])
   useEffect(() => { setDiagFg(fg); setDiagBg(bg) }, [fg, bg])
+
+  // Charger stats QR au changement de sélection ou période
+  useEffect(() => {
+    if (!activeId) return
+    setStats(null)
+    setStatsLoading(true)
+    fetch(`/api/qr-stats/${activeId}?period=${statsPeriod}`)
+      .then(r => r.json())
+      .then(d => { if (!d.error) setStats(d) })
+      .catch(() => {})
+      .finally(() => setStatsLoading(false))
+  }, [activeId, statsPeriod])
+
+  // Dessiner la sparkline quand stats change
+  useEffect(() => {
+    const canvas = sparkCanvasRef.current
+    if (!canvas || !stats?.sparkline?.length) return
+    const ctx   = canvas.getContext("2d"); if (!ctx) return
+    const data  = stats.sparkline
+    const W     = canvas.offsetWidth || 260
+    const H     = 48
+    canvas.width  = W * 2; canvas.height = H * 2
+    ctx.scale(2, 2)
+    ctx.clearRect(0, 0, W, H)
+    const max   = Math.max(...data, 1)
+    const step  = W / (data.length - 1 || 1)
+    const pts   = data.map((v, i) => [i * step, H - 4 - (v / max) * (H - 10)] as [number,number])
+    // Zone de remplissage
+    const grad  = ctx.createLinearGradient(0, 0, 0, H)
+    grad.addColorStop(0, "rgba(201,168,76,0.3)")
+    grad.addColorStop(1, "rgba(201,168,76,0)")
+    ctx.beginPath()
+    ctx.moveTo(pts[0][0], H)
+    pts.forEach(([x,y]) => ctx.lineTo(x, y))
+    ctx.lineTo(pts[pts.length-1][0], H)
+    ctx.closePath()
+    ctx.fillStyle = grad; ctx.fill()
+    // Ligne
+    ctx.beginPath()
+    pts.forEach(([x,y], i) => i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y))
+    ctx.strokeStyle = "#C9A84C"; ctx.lineWidth = 1.5
+    ctx.lineJoin = "round"; ctx.stroke()
+    // Points
+    pts.forEach(([x,y]) => {
+      ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI*2)
+      ctx.fillStyle = "#C9A84C"; ctx.fill()
+    })
+  }, [stats])
+
+  // Export CSV des scans
+  async function exportQRCSV() {
+    if (!active || !stats) return
+    setStatsExporting(true)
+    try {
+      const res  = await fetch(`/api/qr-stats/${activeId}?period=30`)
+      const d    = await res.json()
+      const rows = d.sparkline?.map((v: number, i: number) => {
+        const date = new Date(); date.setDate(date.getDate() - 30 + i)
+        return `${date.toLocaleDateString("fr-FR")},${v}`
+      }) ?? []
+      const csv  = ["Date,Scans", ...rows].join("\r\n")
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" })
+      const url  = URL.createObjectURL(blob)
+      const a    = document.createElement("a")
+      a.href = url; a.download = `scans-${active.short_code}.csv`; a.click()
+      URL.revokeObjectURL(url)
+    } catch {}
+    setStatsExporting(false)
+  }
 
   const saveCustomization = useCallback(async () => {
     if (!active) return
@@ -1591,6 +1672,90 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       <p style={{ color:"#F97316", fontSize:11, margin:0 }}>Contraste moyen — privilegiez une impression a 25mm+</p>
                     </div>
                   )}
+
+              {/* ── Performance QR ───────────────────────────────────────── */}
+              <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"14px 16px" }}>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                    <BarChart2 size={13} color={G}/>
+                    <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:700, margin:0 }}>Performance</p>
+                  </div>
+                  <div style={{ display:"flex", alignItems:"center", gap:5 }}>
+                    {([7,30] as const).map(p => (
+                      <button key={p} type="button" onClick={() => setStatsPeriod(p)}
+                        style={{ padding:"2px 8px", background:statsPeriod===p?"rgba(201,168,76,0.15)":"transparent", border:`1px solid ${statsPeriod===p?"rgba(201,168,76,0.35)":"rgba(255,255,255,0.1)"}`, borderRadius:5, color:statsPeriod===p?G:MUTED, fontSize:9, fontWeight:statsPeriod===p?700:400, cursor:"pointer" }}>
+                        {p}j
+                      </button>
+                    ))}
+                    <a href={`/dashboard/analytics`}
+                      style={{ padding:"2px 8px", background:"transparent", border:"1px solid rgba(255,255,255,0.1)", borderRadius:5, color:MUTED, fontSize:9, textDecoration:"none", display:"flex", alignItems:"center", gap:3 }}>
+                      <ExternalLink size={8}/> Tout
+                    </a>
+                  </div>
+                </div>
+
+                {statsLoading ? (
+                  <div style={{ display:"flex", justifyContent:"center", padding:"16px 0" }}>
+                    <Loader size={16} color={MUTED} style={{ animation:"spin 0.8s linear infinite" }}/>
+                  </div>
+                ) : !stats || stats.total === 0 ? (
+                  <div style={{ textAlign:"center", padding:"16px 0" }}>
+                    <Scan size={20} color={MUTED} style={{ marginBottom:6 }}/>
+                    <p style={{ color:MUTED, fontSize:11, margin:"0 0 2px" }}>Aucun scan pour le moment</p>
+                    <p style={{ color:"rgba(138,132,120,0.6)", fontSize:9, margin:0 }}>Partagez votre QR code pour voir les stats</p>
+                  </div>
+                ) : (
+                  <>
+                    {/* KPIs 2x2 */}
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7, marginBottom:12 }}>
+                      {[
+                        { label:"Total",       value:stats.total.toLocaleString(),   color:G,        sub:null },
+                        { label:`${statsPeriod}j`,  value:stats.current.toLocaleString(), color:"#F5F0E8",
+                          sub: stats.evolution !== 0 ? (
+                            <span style={{ display:"inline-flex", alignItems:"center", gap:2, fontSize:9, color:stats.evolution>0?"#39FF8F":"#FF6B6B", fontWeight:700 }}>
+                              {stats.evolution>0 ? <TrendingUp size={8}/> : <TrendingDown size={8}/>}
+                              {stats.evolution>0?"+":""}{stats.evolution}%
+                            </span>
+                          ) : null
+                        },
+                        { label:"Top appareil", value: stats.top_device
+                            ? ({"mobile":"📱 Mobile","desktop":"🖥 Desktop","tablet":"📟 Tablet"} as any)[stats.top_device] ?? stats.top_device
+                            : "—",
+                          color:"#F5F0E8", sub:null },
+                        { label:"Top pays",    value:stats.top_country ? `🌍 ${stats.top_country}` : "—", color:"#F5F0E8", sub:null },
+                      ].map((k,i) => (
+                        <div key={i} style={{ background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.06)", borderRadius:8, padding:"8px 10px" }}>
+                          <p style={{ color:MUTED, fontSize:8, textTransform:"uppercase", letterSpacing:1, margin:"0 0 3px" }}>{k.label}</p>
+                          <p style={{ color:k.color, fontSize:13, fontWeight:700, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>{k.value}</p>
+                          {k.sub && <div style={{ marginTop:2 }}>{k.sub}</div>}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Dernier scan */}
+                    {stats.last_scan && (
+                      <p style={{ color:MUTED, fontSize:9, margin:"0 0 10px", display:"flex", alignItems:"center", gap:4 }}>
+                        <Clock size={9}/> Dernier scan : {formatDate(stats.last_scan)}
+                      </p>
+                    )}
+
+                    {/* Sparkline */}
+                    <div style={{ marginBottom:10 }}>
+                      <p style={{ color:MUTED, fontSize:8, textTransform:"uppercase", letterSpacing:1, margin:"0 0 5px" }}>
+                        Scans / jour ({statsPeriod}j)
+                      </p>
+                      <canvas ref={sparkCanvasRef} style={{ width:"100%", height:48, borderRadius:6, display:"block" }}/>
+                    </div>
+
+                    {/* Export CSV */}
+                    <button type="button" onClick={exportQRCSV} disabled={statsExporting}
+                      style={{ width:"100%", padding:"6px", background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:7, color:MUTED, fontSize:10, cursor:statsExporting?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:5 }}>
+                      {statsExporting ? <><Loader size={10} style={{ animation:"spin 0.8s linear infinite" }}/> Export...</> : <><Download size={10}/> Exporter CSV</>}
+                    </button>
+                  </>
+                )}
+              </div>
+
                 </div>
               )}
             </div>
