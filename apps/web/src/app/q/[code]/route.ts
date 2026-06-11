@@ -1,112 +1,83 @@
-﻿import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+﻿// app/q/[code]/route.ts
+// Résolution QR Code : override → page QRfolio par défaut
+// Ce fichier REMPLACE la logique de redirection QR existante
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ code: string }> }
-) {
-  const { code } = await params
-  const cookieStore = await cookies()
+import { createAdminClient } from "@/lib/supabase/server"
+import { NextRequest, NextResponse } from "next/server"
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return cookieStore.getAll() },
-        setAll(cookiesToSet) {
-          try { cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options)) } catch {}
-        },
-      },
+export async function GET(req: NextRequest, { params }: { params: { code: string } }) {
+  const { code } = params
+  if (!code) return NextResponse.redirect(new URL("/", req.url))
+
+  const supabase   = createAdminClient()
+  const appUrl     = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrfolio.app"
+
+  try {
+    // Récupérer le QR avec son éventuel override
+    const { data: qr } = await supabase
+      .from("qr_codes")
+      .select("id, page_id, dest_override, pages(slug, status)")
+      .eq("short_code", code)
+      .single()
+
+    if (!qr) {
+      return NextResponse.redirect(new URL("/?qr=notfound", appUrl))
     }
-  )
 
-  // Trouver le QR code par son short_code
-  const { data: qr } = await supabase
-    .from('qr_codes')
-    .select('id, page_id, pages(slug, status)')
-    .eq('short_code', code)
-    .single()
+    // Incrémenter total_scans (fire-and-forget)
+    supabase
+      .from("qr_codes")
+      .update({ total_scans: supabase.rpc("increment_qr_scans", { qr_id: qr.id }) as any, last_scan_at: new Date().toISOString() })
+      .eq("id", qr.id)
+      .then(() => {})
+      .catch(() => {})
 
-  if (!qr || !qr.pages) {
-    return NextResponse.redirect(new URL('/', request.url))
-  }
+    // Enregistrer le scan (fire-and-forget)
+    const ua       = req.headers.get("user-agent") ?? ""
+    const device   = /Mobile|Android|iPhone/i.test(ua) ? "mobile"
+      : /Tablet|iPad/i.test(ua) ? "tablet" : "desktop"
+    supabase.from("scans").insert({
+      qr_code_id: qr.id,
+      page_id:    qr.page_id,
+      device,
+    }).then(() => {}).catch(() => {})
 
-  const page = qr.pages as any
+    // ── Résolution de la destination ──────────────────────────────────────
+    const override = qr.dest_override as any
 
-  // Vérifier que la page est publiée
-  if (page.status !== 'published') {
-    return NextResponse.redirect(new URL('/', request.url))
-  }
-
-  // Enregistrer le scan en arrière-plan
-  const userAgent = request.headers.get('user-agent') || ''
-  const device = detectDevice(userAgent)
-  const os = detectOS(userAgent)
-  const browser = detectBrowser(userAgent)
-  const referrer = request.headers.get('referer') || null
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || ''
-  const ipHash = ip ? simpleHash(ip) : null
-
-  // Insert scan (non-bloquant)
-  supabase.from('scans').insert({
-    qr_code_id: qr.id,
-    page_id: qr.page_id,
-    device,
-    os,
-    browser,
-    referrer,
-    ip_hash: ipHash,
-  }).then(() => {})
-
-  // Trigger email premier scan si total_scans === 0
-  supabase.from('qr_codes').select('total_scans, user_id, profiles(email, full_name)').eq('id', qr.id).single().then(async ({ data: qrData }) => {
-    if (qrData?.total_scans === 0) {
-      const profile = (qrData as any).profiles as any
-      if (profile?.email) {
-        fetch(new URL('/api/emails/first-scan', request.url).toString(), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: profile.email, name: profile.full_name, page_title: page.slug }),
-        }).catch(() => {})
+    if (override) {
+      const dest = override.url || override.value
+      switch (override.type) {
+        case "url":
+        case "file":
+          return NextResponse.redirect(dest.startsWith("http") ? dest : `https://${dest}`, { status: 302 })
+        case "email":
+          return NextResponse.redirect(dest.startsWith("mailto:") ? dest : `mailto:${dest}`, { status: 302 })
+        case "phone":
+          return NextResponse.redirect(dest.startsWith("tel:") ? dest : `tel:${dest}`, { status: 302 })
+        case "whatsapp":
+          return NextResponse.redirect(dest, { status: 302 })
+        case "page":
+          // Override vers une autre page QRfolio
+          const { data: targetPage } = await supabase
+            .from("pages")
+            .select("slug")
+            .eq("id", override.value)
+            .single()
+          if (targetPage) return NextResponse.redirect(`${appUrl}/${targetPage.slug}`, { status: 302 })
+          break
       }
     }
-  })
-  // Rediriger vers la page publique
-  return NextResponse.redirect(new URL('/' + page.slug, request.url))
-}
 
-function detectDevice(ua: string): string {
-  if (/mobile/i.test(ua)) return 'mobile'
-  if (/tablet|ipad/i.test(ua)) return 'tablet'
-  if (/windows|macintosh|linux/i.test(ua)) return 'desktop'
-  return 'unknown'
-}
+    // ── Destination par défaut : page QRfolio ─────────────────────────────
+    const page = qr.pages as any
+    if (page?.slug) {
+      return NextResponse.redirect(`${appUrl}/${page.slug}`, { status: 302 })
+    }
 
-function detectOS(ua: string): string {
-  if (/windows/i.test(ua)) return 'Windows'
-  if (/macintosh|mac os/i.test(ua)) return 'macOS'
-  if (/iphone|ipad/i.test(ua)) return 'iOS'
-  if (/android/i.test(ua)) return 'Android'
-  if (/linux/i.test(ua)) return 'Linux'
-  return 'Unknown'
-}
-
-function detectBrowser(ua: string): string {
-  if (/chrome/i.test(ua) && !/edge/i.test(ua)) return 'Chrome'
-  if (/safari/i.test(ua) && !/chrome/i.test(ua)) return 'Safari'
-  if (/firefox/i.test(ua)) return 'Firefox'
-  if (/edge/i.test(ua)) return 'Edge'
-  return 'Unknown'
-}
-
-function simpleHash(str: string): string {
-  let hash = 0
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i)
-    hash = ((hash << 5) - hash) + char
-    hash = hash & hash
+    return NextResponse.redirect(new URL("/?qr=error", appUrl))
+  } catch (e) {
+    console.error("[qr-redirect]", e)
+    return NextResponse.redirect(new URL("/?qr=error", appUrl))
   }
-  return Math.abs(hash).toString(16)
 }

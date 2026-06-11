@@ -22,6 +22,8 @@ type QRCode = {
   error_correction: "L" | "M" | "Q" | "H"
   style_config:     Record<string, any>
   logo_url:         string | null
+  dest_override:    Record<string, any> | null
+  dest_history:     Array<Record<string, any>>
   total_scans:      number
   last_scan_at:     string | null
   created_at:       string
@@ -259,6 +261,19 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [statsLoading,  setStatsLoading]  = useState(false)
   const [statsPeriod,   setStatsPeriod]   = useState<7|30>(7)
   const [statsExporting,setStatsExporting]= useState(false)
+  // ── Destination states ───────────────────────────────────────────────
+  type DestEntry = { type:string; value:string; url?:string; label?:string|null; set_at?:string|null }
+  const [destMode,    setDestMode]    = useState<"view"|"edit">("view")
+  const [destType,    setDestType]    = useState<"page"|"url"|"file"|"email"|"phone"|"whatsapp">("page")
+  const [destValue,   setDestValue]   = useState("")
+  const [destLabel,   setDestLabel]   = useState("")
+  const [destLoading, setDestLoading] = useState(false)
+  const [destError,   setDestError]   = useState("")
+  const [destSaved,   setDestSaved]   = useState(false)
+  const [destOverride,setDestOverride]= useState<DestEntry | null>(null)
+  const [destHistory, setDestHistory] = useState<DestEntry[]>([])
+  const [destConfirm, setDestConfirm] = useState(false)
+  const [destCopied,  setDestCopied]  = useState(false)
   const [suppTplId,   setSuppTplId]   = useState("a4-poster")
   const [suppTitle,   setSuppTitle]   = useState("")
   const [suppSubtitle,setSuppSubtitle]= useState("Scannez pour voir le menu")
@@ -584,6 +599,14 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   }, [qrUrl, fg, bg, corner, ecLevel, styleConf])
 
   useEffect(() => { if (showModal) drawModalCanvas() }, [showModal, drawModalCanvas])
+  useEffect(() => {
+    if (!active) return
+    setDestOverride(active.dest_override ?? null)
+    setDestHistory(active.dest_history ?? [])
+    setDestMode("view")
+    setDestError("")
+  }, [activeId])
+
   useEffect(() => { setDiagFg(fg); setDiagBg(bg) }, [fg, bg])
 
   // Charger stats QR au changement de sélection ou période
@@ -776,6 +799,69 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       }
       img.src = url
     })
+  }
+
+  // ── Fonctions destination dynamique ─────────────────────────────────────────
+  const DEST_TYPES = [
+    { id:"page",     label:"Page QRfolio", icon:"📄", ph:"ID ou slug de la page" },
+    { id:"url",      label:"URL externe",  icon:"🌐", ph:"https://mon-site.com"  },
+    { id:"file",     label:"Fichier",      icon:"📎", ph:"https://drive.google.com/..." },
+    { id:"email",    label:"Email",        icon:"✉️",  ph:"contact@mon-site.com" },
+    { id:"phone",    label:"Telephone",    icon:"📞", ph:"+33 6 12 34 56 78"    },
+    { id:"whatsapp", label:"WhatsApp",     icon:"💬", ph:"+33612345678"          },
+  ]
+  function getDestUrl(e: DestEntry | null): string { return e ? (e.url || e.value || pageUrl) : pageUrl }
+  function getDestLabel(e: DestEntry | null): string {
+    if (!e) return active?.pages?.title ?? "Page QRfolio"
+    const cfg = DEST_TYPES.find(d => d.id === e.type)
+    return e.label || cfg?.label || e.type
+  }
+  function getDestStatusColor(e: DestEntry | null): string {
+    if (!e) return active?.pages?.status === "published" ? "#39FF8F" : "#8A8478"
+    return e.type === "page" ? (active?.pages?.status === "published" ? "#39FF8F" : "#F97316") : "#38BDF8"
+  }
+  async function saveDest() {
+    if (!active || !destValue.trim()) return
+    setDestLoading(true); setDestError("")
+    try {
+      const res = await fetch("/api/qr-destination", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ qr_id:active.id, type:destType, value:destValue.trim(), label:destLabel.trim()||null }),
+      })
+      const d = await res.json()
+      if (d.error) { setDestError(d.error); return }
+      setDestOverride(d.dest_override); setDestHistory(d.dest_history ?? [])
+      setQRCodes(prev => prev.map(q => q.id === active.id
+        ? { ...q, dest_override:d.dest_override, dest_history:d.dest_history??[] } : q))
+      setDestMode("view"); setDestSaved(true); setTimeout(()=>setDestSaved(false), 2500)
+    } catch { setDestError("Erreur reseau") }
+    setDestLoading(false); setDestConfirm(false)
+  }
+  async function removeDest() {
+    if (!active) return
+    setDestLoading(true)
+    try {
+      await fetch("/api/qr-destination", { method:"DELETE", headers:{"Content-Type":"application/json"}, body:JSON.stringify({qr_id:active.id}) })
+      setDestOverride(null)
+      setQRCodes(prev => prev.map(q => q.id === active.id ? {...q,dest_override:null} : q))
+    } catch {}
+    setDestLoading(false)
+  }
+  async function restoreDest(index: number) {
+    if (!active) return; setDestLoading(true)
+    try {
+      const res = await fetch("/api/qr-destination", { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({qr_id:active.id, index}) })
+      const d   = await res.json()
+      if (d.ok) {
+        const hd = await fetch(`/api/qr-destination?qr_id=${active.id}`).then(r=>r.json())
+        setDestOverride(hd.dest_override); setDestHistory(hd.dest_history??[])
+      }
+    } catch {}
+    setDestLoading(false)
+  }
+  function copyDest() {
+    navigator.clipboard.writeText(getDestUrl(destOverride)).catch(()=>{})
+    setDestCopied(true); setTimeout(()=>setDestCopied(false), 2000)
   }
 
   // ── Templates supports imprimables ─────────────────────────────────────────
@@ -1606,21 +1692,182 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               </div>
 
               {/* Destination */}
-              <div style={{ padding:"12px 16px", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
-                <p style={{ color:"#8A8478", fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:"0 0 7px" }}>Destination</p>
-                <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 10px", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.06)", borderRadius:9 }}>
-                  <div style={{ width:6, height:6, borderRadius:"50%", background: active.pages?.status==="published"?"#39FF8F":"#8A8478", flexShrink:0 }}/>
-                  <code style={{ flex:1, color:"#C9A84C", fontSize:10, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
-                    {pageUrl || "—"}
-                  </code>
-                  <a href={pageUrl} target="_blank" rel="noopener noreferrer"
-                    style={{ color:"#8A8478", textDecoration:"none", flexShrink:0 }}>
-                    <ExternalLink size={10}/>
-                  </a>
+              <div style={{ borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+
+                {/* Header */}
+                <div style={{ padding:"12px 16px 10px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                    <div style={{ width:7, height:7, borderRadius:"50%", background:getDestStatusColor(destOverride) }}/>
+                    <p style={{ color:"#8A8478", fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:0 }}>
+                      Destination {destOverride ? "• Modifiee" : "• Page par defaut"}
+                    </p>
+                  </div>
+                  <div style={{ display:"flex", gap:4 }}>
+                    <button type="button" onClick={copyDest}
+                      style={{ width:22, height:22, background:"none", border:"none", cursor:"pointer", color:destCopied?"#39FF8F":"#8A8478", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      {destCopied ? <Check size={11}/> : <Copy size={11}/>}
+                    </button>
+                    <a href={getDestUrl(destOverride)} target="_blank" rel="noopener noreferrer"
+                      style={{ width:22, height:22, background:"none", border:"none", color:"#8A8478", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      <ExternalLink size={11}/>
+                    </a>
+                    {destMode === "view" ? (
+                      <button type="button" onClick={() => { setDestMode("edit"); setDestType("url"); setDestValue(""); setDestError("") }}
+                        style={{ width:22, height:22, background:"none", border:"none", cursor:"pointer", color:"#C9A84C", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                        <Pencil size={11}/>
+                      </button>
+                    ) : (
+                      <button type="button" onClick={() => setDestMode("view")}
+                        style={{ width:22, height:22, background:"none", border:"none", cursor:"pointer", color:"#8A8478", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                        <X size={11}/>
+                      </button>
+                    )}
+                  </div>
                 </div>
+
+                {/* URL actuelle */}
+                <div style={{ padding:"0 16px 10px" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:7, padding:"7px 10px", background:"#0F0E0B", border:`1px solid ${destOverride?"rgba(56,189,248,0.25)":"rgba(255,255,255,0.07)"}`, borderRadius:8 }}>
+                    <span style={{ fontSize:13, flexShrink:0 }}>
+                      {DEST_TYPES.find(d => d.id === (destOverride?.type ?? "page"))?.icon ?? "📄"}
+                    </span>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <p style={{ color:"#8A8478", fontSize:8, textTransform:"uppercase", letterSpacing:1, margin:"0 0 1px" }}>
+                        {getDestLabel(destOverride)}
+                      </p>
+                      <code style={{ color:"#C9A84C", fontSize:9, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, display:"block" }}>
+                        {getDestUrl(destOverride)}
+                      </code>
+                    </div>
+                    {destOverride && (
+                      <button type="button" onClick={removeDest} disabled={destLoading}
+                        style={{ width:20, height:20, background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:5, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#FF6B6B", flexShrink:0 }}>
+                        <X size={10}/>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Message dynamique */}
+                  {!destOverride && (
+                    <p style={{ color:"rgba(138,132,120,0.6)", fontSize:9, margin:"5px 0 0", lineHeight:1.5 }}>
+                      ♻️ Ce QR est dynamique : changez la destination sans reimprimer.
+                    </p>
+                  )}
+                </div>
+
+                {/* Formulaire édition */}
+                {destMode === "edit" && (
+                  <div style={{ padding:"0 16px 12px", display:"flex", flexDirection:"column", gap:8 }}>
+
+                    {/* Type */}
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:4 }}>
+                      {DEST_TYPES.map(dt => (
+                        <button key={dt.id} type="button" onClick={() => { setDestType(dt.id as any); setDestValue(""); setDestError("") }}
+                          style={{ padding:"5px 4px", background:destType===dt.id?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${destType===dt.id?"rgba(201,168,76,0.35)":"rgba(255,255,255,0.07)"}`, borderRadius:7, cursor:"pointer", textAlign:"center" as const }}>
+                          <span style={{ fontSize:12, display:"block", marginBottom:1 }}>{dt.icon}</span>
+                          <span style={{ color:destType===dt.id?G:"#8A8478", fontSize:8, fontWeight:destType===dt.id?700:400 }}>{dt.label}</span>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Valeur */}
+                    <input
+                      value={destValue}
+                      onChange={e => { setDestValue(e.target.value); setDestError("") }}
+                      placeholder={DEST_TYPES.find(d => d.id === destType)?.ph ?? ""}
+                      style={{ width:"100%", background:"#111009", border:`1px solid ${destError?"rgba(255,107,107,0.4)":"rgba(255,255,255,0.08)"}`, borderRadius:8, padding:"8px 10px", color:"#F5F0E8", fontSize:11, outline:"none", boxSizing:"border-box" as const }}/>
+
+                    {/* Label optionnel */}
+                    <input
+                      value={destLabel}
+                      onChange={e => setDestLabel(e.target.value)}
+                      placeholder="Note interne (optionnel)"
+                      style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.06)", borderRadius:8, padding:"7px 10px", color:"#F5F0E8", fontSize:10, outline:"none", boxSizing:"border-box" as const }}/>
+
+                    {destError && (
+                      <div style={{ display:"flex", alignItems:"center", gap:6, padding:"6px 9px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:7 }}>
+                        <AlertTriangle size={11} color="#FF6B6B"/>
+                        <span style={{ color:"#FF6B6B", fontSize:10 }}>{destError}</span>
+                      </div>
+                    )}
+
+                    {/* Warning changement critique */}
+                    {destValue && !destConfirm && (
+                      <div style={{ display:"flex", alignItems:"flex-start", gap:6, padding:"7px 9px", background:"rgba(201,168,76,0.07)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:7 }}>
+                        <AlertTriangle size={10} color="#C9A84C" style={{ marginTop:1, flexShrink:0 }}/>
+                        <p style={{ color:"#C9A84C", fontSize:9, margin:0, lineHeight:1.5 }}>
+                          Les QR deja imprimes pointeront vers cette nouvelle destination.
+                        </p>
+                      </div>
+                    )}
+
+                    <div style={{ display:"flex", gap:6 }}>
+                      <button type="button" onClick={() => setDestMode("view")}
+                        style={{ flex:1, padding:"8px", background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, color:"#8A8478", fontSize:11, cursor:"pointer" }}>
+                        Annuler
+                      </button>
+                      <button type="button" onClick={() => destValue ? setDestConfirm(true) : null} disabled={!destValue || destLoading}
+                        style={{ flex:2, padding:"8px", background:destValue?"linear-gradient(90deg,#C9A84C,#b8953f)":"rgba(255,255,255,0.05)", border:"none", borderRadius:8, color:destValue?"#080808":"#8A8478", fontSize:11, fontWeight:700, cursor:destValue&&!destLoading?"pointer":"not-allowed", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                        {destLoading ? <><Loader size={11} style={{ animation:"spin 0.8s linear infinite" }}/> Enregistrement...</> : destSaved ? <><Check size={11}/> Applique !</> : "Appliquer la destination"}
+                      </button>
+                    </div>
+
+                    {/* Modal confirmation */}
+                    {destConfirm && (
+                      <div style={{ padding:"10px 12px", background:"rgba(255,107,107,0.07)", border:"1px solid rgba(255,107,107,0.25)", borderRadius:9 }}>
+                        <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:700, margin:"0 0 6px" }}>Confirmer le changement</p>
+                        <p style={{ color:"#8A8478", fontSize:10, margin:"0 0 10px", lineHeight:1.5 }}>
+                          Tous les QR codes imprimes pointeront vers <strong style={{ color:"#F5F0E8" }}>{destValue}</strong>. Cette action est immediate.
+                        </p>
+                        <div style={{ display:"flex", gap:6 }}>
+                          <button type="button" onClick={() => setDestConfirm(false)}
+                            style={{ flex:1, padding:"7px", background:"transparent", border:"1px solid rgba(255,255,255,0.1)", borderRadius:7, color:"#8A8478", fontSize:11, cursor:"pointer" }}>
+                            Annuler
+                          </button>
+                          <button type="button" onClick={saveDest} disabled={destLoading}
+                            style={{ flex:2, padding:"7px", background:"linear-gradient(90deg,#FF6B6B,#e05555)", border:"none", borderRadius:7, color:"#F5F0E8", fontSize:11, fontWeight:700, cursor:"pointer" }}>
+                            Confirmer le changement
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Historique */}
+                {destMode === "view" && destHistory.length > 0 && (
+                  <div style={{ padding:"0 16px 12px" }}>
+                    <p style={{ color:"#8A8478", fontSize:8, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:"0 0 6px" }}>
+                      Historique ({destHistory.length})
+                    </p>
+                    <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+                      {destHistory.slice(0, 5).map((h, i) => {
+                        const cfg = DEST_TYPES.find(d => d.id === h.type)
+                        return (
+                          <div key={i} style={{ display:"flex", alignItems:"center", gap:7, padding:"5px 8px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.05)", borderRadius:7 }}>
+                            <span style={{ fontSize:11, flexShrink:0 }}>{cfg?.icon ?? "📄"}</span>
+                            <div style={{ flex:1, minWidth:0 }}>
+                              <p style={{ color:"#8A8478", fontSize:9, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
+                                {h.label || cfg?.label || h.type}
+                              </p>
+                              <code style={{ color:"rgba(201,168,76,0.6)", fontSize:8, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, display:"block" }}>
+                                {h.url || h.value}
+                              </code>
+                            </div>
+                            <button type="button" onClick={() => restoreDest(i)} disabled={destLoading}
+                              style={{ padding:"2px 7px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:5, color:"#C9A84C", fontSize:8, cursor:"pointer", flexShrink:0 }}>
+                              ↩
+                            </button>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Diagnostic */}
+              
+{/* Diagnostic */}
               {diag && (
                 <div style={{ padding:"12px 16px" }}>
                   <p style={{ color:"#8A8478", fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:"0 0 10px" }}>Diagnostic lisibilite</p>
