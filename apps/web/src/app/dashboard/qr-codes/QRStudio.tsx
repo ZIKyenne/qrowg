@@ -5,7 +5,9 @@ import {
   QrCode, Download, Link, Check, Lock, Pencil,
   Eye, EyeOff, ChevronRight, Scan, Clock,
   Palette, Settings, Share2, ExternalLink, Copy,
-  RotateCcw, Loader
+  RotateCcw, Loader, Search, Filter, Trash2,
+  Archive, SortAsc, SortDesc, MoreVertical, AlertTriangle,
+  Star, X, ChevronDown
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
@@ -85,6 +87,21 @@ function formatDate(iso: string | null): string {
   return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" })
 }
 
+// ── Status config ─────────────────────────────────────────────────────────────
+const STATUS_CFG: Record<string, { label: string; dot: string; badge: string; text: string }> = {
+  published: { label: "Publié",   dot: "#39FF8F", badge: "rgba(57,255,143,0.12)",  text: "#39FF8F" },
+  draft:     { label: "Brouillon",dot: "#8A8478", badge: "rgba(138,132,120,0.12)", text: "#8A8478" },
+  archived:  { label: "Archivé",  dot: "#F97316", badge: "rgba(249,115,22,0.12)",  text: "#F97316" },
+  paused:    { label: "En pause", dot: "#FF6B6B", badge: "rgba(255,107,107,0.12)", text: "#FF6B6B" },
+}
+
+const PLAN_BADGE: Record<string, { color: string; label: string } | null> = {
+  free: null,
+  pro:      { color: "#C9A84C", label: "PRO" },
+  business: { color: "#39FF8F", label: "BIZ" },
+}
+
+
 // ── Composant principal ───────────────────────────────────────────────────────
 export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: Props) {
   const [qrCodes,    setQRCodes]    = useState<QRCode[]>(initialQRCodes)
@@ -98,6 +115,18 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [saved,      setSaved]      = useState(false)
   const [copied,     setCopied]     = useState<"link"|"short"|null>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  // ── Search / Filter / Sort ───────────────────────────────────────────────
+  const [search,     setSearch]     = useState("")
+  const [filterStatus, setFilterStatus] = useState<string>("all")
+  const [sortBy,     setSortBy]     = useState<"scans"|"date"|"name">("date")
+  const [sortDir,    setSortDir]    = useState<"asc"|"desc">("desc")
+  const [menuOpenId, setMenuOpenId] = useState<string | null>(null)
+  const [confirmDel, setConfirmDel] = useState<string | null>(null)
+  const [archiving,  setArchiving]  = useState<string | null>(null)
+  const [deleting,   setDeleting]   = useState<string | null>(null)
+  const [copyId,     setCopyId]     = useState<string | null>(null)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   const active = qrCodes.find(q => q.id === activeId) ?? null
   const qrUrl  = active ? `${appUrl}/q/${active.short_code}` : ""
@@ -145,6 +174,38 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     }
     img.src = url
   }, [qrUrl, fg, bg, corner, ecLevel])
+
+
+  async function archiveQR(id: string) {
+    setArchiving(id)
+    const supabase = createClient()
+    await supabase.from("pages").update({ status: "archived" }).eq("id",
+      qrCodes.find(q => q.id === id)?.page_id ?? ""
+    )
+    setQRCodes(prev => prev.map(q => q.id === id
+      ? { ...q, pages: q.pages ? { ...q.pages, status: "archived" } : null }
+      : q
+    ))
+    setArchiving(null)
+    setMenuOpenId(null)
+  }
+
+  async function deleteQR(id: string) {
+    setDeleting(id)
+    const supabase = createClient()
+    await supabase.from("qr_codes").delete().eq("id", id)
+    setQRCodes(prev => prev.filter(q => q.id !== id))
+    if (activeId === id) setActiveId(qrCodes.filter(q => q.id !== id)[0]?.id ?? null)
+    setDeleting(null)
+    setConfirmDel(null)
+    setMenuOpenId(null)
+  }
+
+  function copyQRLink(id: string, url: string) {
+    navigator.clipboard.writeText(url).catch(() => {})
+    setCopyId(id)
+    setTimeout(() => setCopyId(null), 2000)
+  }
 
   // Sauvegarder la personnalisation
   const saveCustomization = useCallback(async () => {
@@ -201,6 +262,25 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setEcLevel(active.error_correction)
   }
 
+
+  // Filtrage + tri
+  const filteredQRCodes = qrCodes
+    .filter(qr => {
+      const title = qr.pages?.title?.toLowerCase() ?? ""
+      const code  = qr.short_code?.toLowerCase() ?? ""
+      const matchSearch = !search || title.includes(search.toLowerCase()) || code.includes(search.toLowerCase())
+      const status = qr.pages?.status ?? "draft"
+      const matchStatus = filterStatus === "all" || status === filterStatus
+      return matchSearch && matchStatus
+    })
+    .sort((a, b) => {
+      let cmp = 0
+      if (sortBy === "scans") cmp = (a.total_scans ?? 0) - (b.total_scans ?? 0)
+      if (sortBy === "date")  cmp = new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      if (sortBy === "name")  cmp = (a.pages?.title ?? "").localeCompare(b.pages?.title ?? "")
+      return sortDir === "desc" ? -cmp : cmp
+    })
+
   const canPro      = PLAN_RANK[userPlan] >= 1
   const canBusiness = PLAN_RANK[userPlan] >= 2
 
@@ -228,70 +308,174 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
       {/* ── COL 1 : Liste QR Codes ──────────────────────────────────────────── */}
       <div style={{ borderRight:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", overflow:"hidden" }}>
-        <div style={{ padding:"16px 16px 12px", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
-          <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>
-            Mes QR Codes ({qrCodes.length})
-          </p>
+
+        {/* Header + contrôles */}
+        <div style={{ padding:"12px 12px 10px", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", gap:8 }}>
+
+          {/* Titre + count */}
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>
+              QR Codes
+            </p>
+            <span style={{ background:"rgba(201,168,76,0.12)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:5, padding:"1px 7px", fontSize:10, color:G, fontWeight:700 }}>
+              {filteredQRCodes.length}/{qrCodes.length}
+            </span>
+          </div>
+
+          {/* Recherche */}
+          <div style={{ position:"relative" }}>
+            <Search size={11} style={{ position:"absolute", left:8, top:"50%", transform:"translateY(-50%)", color:MUTED, pointerEvents:"none" }}/>
+            <input value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="Rechercher par nom, URL…"
+              style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.07)", borderRadius:8, padding:"6px 8px 6px 26px", color:"#F5F0E8", fontSize:11, outline:"none", boxSizing:"border-box" as const }}/>
+            {search && (
+              <button type="button" onClick={() => setSearch("")}
+                style={{ position:"absolute", right:6, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", color:MUTED, display:"flex" }}>
+                <X size={11}/>
+              </button>
+            )}
+          </div>
+
+          {/* Filtre statut + tri */}
+          <div style={{ display:"flex", gap:5 }}>
+            <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+              style={{ flex:1, background:"#111009", border:"1px solid rgba(255,255,255,0.07)", borderRadius:7, color: filterStatus !== "all" ? "#F5F0E8" : MUTED, padding:"5px 7px", fontSize:10, outline:"none", cursor:"pointer" }}>
+              <option value="all">Tous statuts</option>
+              <option value="published">Publié</option>
+              <option value="draft">Brouillon</option>
+              <option value="archived">Archivé</option>
+              <option value="paused">En pause</option>
+            </select>
+            <select value={`${sortBy}-${sortDir}`} onChange={e => {
+              const [by, dir] = e.target.value.split("-")
+              setSortBy(by as any); setSortDir(dir as any)
+            }}
+              style={{ flex:1, background:"#111009", border:"1px solid rgba(255,255,255,0.07)", borderRadius:7, color:MUTED, padding:"5px 7px", fontSize:10, outline:"none", cursor:"pointer" }}>
+              <option value="date-desc">Date ↓</option>
+              <option value="date-asc">Date ↑</option>
+              <option value="scans-desc">Scans ↓</option>
+              <option value="scans-asc">Scans ↑</option>
+              <option value="name-asc">Nom A→Z</option>
+              <option value="name-desc">Nom Z→A</option>
+            </select>
+          </div>
         </div>
 
+        {/* Liste */}
         <div style={{ flex:1, overflowY:"auto" }}>
-          {qrCodes.map(qr => {
-            const page    = qr.pages
+          {filteredQRCodes.length === 0 ? (
+            <div style={{ textAlign:"center", padding:"32px 16px", color:MUTED }}>
+              <QrCode size={28} color={MUTED} style={{ marginBottom:8 }}/>
+              <p style={{ fontSize:12, margin:"0 0 4px", color:"#F5F0E8" }}>Aucun résultat</p>
+              <p style={{ fontSize:10, margin:0 }}>Modifiez vos filtres</p>
+            </div>
+          ) : filteredQRCodes.map(qr => {
+            const page     = qr.pages
             const isActive = qr.id === activeId
-            const published = page?.status === "published"
+            const status   = page?.status ?? "draft"
+            const sCfg     = STATUS_CFG[status] ?? STATUS_CFG.draft
+            const qrUrl    = `${appUrl}/q/${qr.short_code}`
+            const isMenu   = menuOpenId === qr.id
+            const isCopied = copyId === qr.id
+            const planBadge = PLAN_BADGE[userPlan]
 
             return (
-              <div key={qr.id} onClick={() => setActiveId(qr.id)}
-                style={{ padding:"12px 14px", cursor:"pointer", borderBottom:"1px solid rgba(255,255,255,0.04)", background: isActive ? "rgba(201,168,76,0.07)" : "transparent", borderLeft: isActive ? `2px solid ${G}` : "2px solid transparent", transition:"all 0.15s" }}>
+              <div key={qr.id}
+                style={{ padding:"11px 12px", cursor:"pointer", borderBottom:"1px solid rgba(255,255,255,0.04)", background: isActive ? "rgba(201,168,76,0.06)" : "transparent", borderLeft: isActive ? `2px solid ${G}` : "2px solid transparent", position:"relative", transition:"all 0.15s" }}
+                onClick={() => { setActiveId(qr.id); setMenuOpenId(null) }}>
 
-                <div style={{ display:"flex", alignItems:"flex-start", gap:10 }}>
-                  {/* Mini QR preview color swatch */}
-                  <div style={{ width:36, height:36, borderRadius:8, background:qr.background_color, border:"1px solid rgba(255,255,255,0.1)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                    <QrCode size={18} color={qr.foreground_color}/>
+                <div style={{ display:"flex", alignItems:"flex-start", gap:9 }}>
+                  {/* Color swatch */}
+                  <div style={{ width:34, height:34, borderRadius:8, background:qr.background_color, border:"1px solid rgba(255,255,255,0.1)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, position:"relative" }}>
+                    <QrCode size={16} color={qr.foreground_color}/>
+                    {planBadge && userPlan !== "free" && (
+                      <span style={{ position:"absolute", top:-4, right:-4, background:planBadge.color, color:"#080808", fontSize:7, fontWeight:800, borderRadius:3, padding:"1px 3px", lineHeight:1 }}>
+                        {planBadge.label}
+                      </span>
+                    )}
                   </div>
 
                   <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ display:"flex", alignItems:"center", gap:5, marginBottom:3 }}>
-                      <span style={{ color: isActive ? "#F5F0E8" : "#D4CFC7", fontSize:12, fontWeight:700, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
-                        {page?.title ?? "Page sans titre"}
-                      </span>
-                    </div>
+                    {/* Nom */}
+                    <p style={{ color: isActive ? "#F5F0E8" : "#D4CFC7", fontSize:12, fontWeight:700, margin:"0 0 3px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
+                      {page?.title ?? "Page sans titre"}
+                    </p>
 
-                    <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap" }}>
-                      <div style={{ display:"flex", alignItems:"center", gap:3 }}>
-                        <div style={{ width:5, height:5, borderRadius:"50%", background: published ? "#39FF8F" : MUTED }}/>
-                        <span style={{ color:MUTED, fontSize:10 }}>{published ? "Publié" : "Brouillon"}</span>
-                      </div>
-                      <span style={{ color:MUTED, fontSize:10 }}>·</span>
-                      <div style={{ display:"flex", alignItems:"center", gap:3 }}>
-                        <Scan size={9} color={MUTED}/>
-                        <span style={{ color: qr.total_scans > 0 ? G : MUTED, fontSize:10, fontWeight: qr.total_scans > 0 ? 700 : 400 }}>
+                    {/* URL courte */}
+                    <p style={{ color:MUTED, fontSize:9, margin:"0 0 4px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, fontFamily:"monospace" }}>
+                      /q/{qr.short_code}
+                    </p>
+
+                    {/* Statut + scans */}
+                    <div style={{ display:"flex", alignItems:"center", gap:5, flexWrap:"wrap" as const }}>
+                      <span style={{ display:"inline-flex", alignItems:"center", gap:3, padding:"1px 6px", background:sCfg.badge, borderRadius:4, fontSize:9, color:sCfg.text, fontWeight:600 }}>
+                        <div style={{ width:4, height:4, borderRadius:"50%", background:sCfg.dot }}/>
+                        {sCfg.label}
+                      </span>
+                      <div style={{ display:"flex", alignItems:"center", gap:2 }}>
+                        <Scan size={8} color={qr.total_scans > 0 ? G : MUTED}/>
+                        <span style={{ color: qr.total_scans > 0 ? G : MUTED, fontSize:9, fontWeight: qr.total_scans > 0 ? 700 : 400 }}>
                           {qr.total_scans}
                         </span>
                       </div>
                     </div>
 
-                    <div style={{ display:"flex", alignItems:"center", gap:3, marginTop:3 }}>
-                      <Clock size={9} color={MUTED}/>
+                    {/* Dernier scan + date création */}
+                    <div style={{ display:"flex", gap:8, marginTop:3 }}>
                       <span style={{ color:MUTED, fontSize:9 }}>
                         {qr.last_scan_at ? formatDate(qr.last_scan_at) : "Jamais scanné"}
+                      </span>
+                      <span style={{ color:"rgba(138,132,120,0.5)", fontSize:9 }}>
+                        Créé {formatDate(qr.created_at)}
                       </span>
                     </div>
                   </div>
 
-                  {isActive && <ChevronRight size={13} color={G}/>}
+                  {/* Menu ⋮ */}
+                  <button type="button"
+                    onClick={e => { e.stopPropagation(); setMenuOpenId(isMenu ? null : qr.id) }}
+                    style={{ width:22, height:22, background:"none", border:"none", color:MUTED, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, borderRadius:5, transition:"background 0.1s" }}>
+                    <MoreVertical size={13}/>
+                  </button>
                 </div>
 
-                {/* Actions rapides inline */}
+                {/* Menu contextuel */}
+                {isMenu && (
+                  <div style={{ position:"absolute", right:10, top:36, zIndex:100, background:"#1A1710", border:"1px solid rgba(201,168,76,0.2)", borderRadius:10, padding:"5px", boxShadow:"0 8px 32px rgba(0,0,0,0.7)", minWidth:160 }}
+                    onClick={e => e.stopPropagation()}>
+                    {[
+                      { icon:<Pencil size={11}/>,  label:"Modifier la page",  action:() => { window.location.href = `/dashboard/builder/${page?.id}` }, color:"#F5F0E8" },
+                      { icon: isCopied ? <Check size={11}/> : <Copy size={11}/>, label: isCopied ? "Copié !" : "Copier le lien", action:() => copyQRLink(qr.id, qrUrl), color: isCopied ? "#39FF8F" : "#F5F0E8" },
+                      { icon:<Download size={11}/>, label:"Télécharger PNG",    action:() => { setActiveId(qr.id); setTimeout(() => downloadPNG(400), 100); setMenuOpenId(null) }, color:"#F5F0E8" },
+                      { icon:<Archive size={11}/>,  label:"Archiver",           action:() => archiveQR(qr.id), color:"#F97316", disabled: status === "archived" },
+                      { icon:<Trash2 size={11}/>,   label:"Supprimer",          action:() => { setConfirmDel(qr.id); setMenuOpenId(null) }, color:"#FF6B6B" },
+                    ].map((item, i) => (
+                      <button key={i} type="button"
+                        onClick={item.disabled ? undefined : item.action}
+                        disabled={item.disabled}
+                        style={{ width:"100%", display:"flex", alignItems:"center", gap:8, padding:"8px 10px", background:"none", border:"none", color: item.disabled ? "rgba(138,132,120,0.4)" : item.color, fontSize:11, cursor: item.disabled ? "not-allowed" : "pointer", borderRadius:7, textAlign:"left" as const, transition:"background 0.1s" }}>
+                        {archiving === qr.id && item.label === "Archiver" ? <Loader size={11} style={{ animation:"spin 0.8s linear infinite" }}/> : item.icon}
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Actions rapides si sélectionné */}
                 {isActive && (
-                  <div style={{ display:"flex", gap:5, marginTop:8, paddingTop:8, borderTop:"1px solid rgba(255,255,255,0.05)" }}>
+                  <div style={{ display:"flex", gap:5, marginTop:8, paddingTop:8, borderTop:"1px solid rgba(255,255,255,0.04)" }}
+                    onClick={e => e.stopPropagation()}>
                     <a href={`/dashboard/builder/${page?.id}`}
                       style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:4, padding:"5px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.15)", borderRadius:7, color:G, fontSize:10, fontWeight:600, textDecoration:"none" }}>
                       <Pencil size={10}/> Modifier
                     </a>
-                    <button type="button" onClick={e => { e.stopPropagation(); downloadPNG(400) }}
-                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:4, padding:"5px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:7, color:MUTED, fontSize:10, cursor:"pointer" }}>
-                      <Download size={10}/> PNG
+                    <button type="button" onClick={() => copyQRLink(qr.id, qrUrl)}
+                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:4, padding:"5px", background: isCopied ? "rgba(57,255,143,0.1)" : "rgba(255,255,255,0.04)", border:`1px solid ${isCopied ? "rgba(57,255,143,0.3)" : "rgba(255,255,255,0.08)"}`, borderRadius:7, color: isCopied ? "#39FF8F" : MUTED, fontSize:10, cursor:"pointer" }}>
+                      {isCopied ? <Check size={10}/> : <Copy size={10}/>} {isCopied ? "Copié" : "Lien"}
+                    </button>
+                    <button type="button" onClick={() => downloadPNG(400)}
+                      style={{ width:28, display:"flex", alignItems:"center", justifyContent:"center", padding:"5px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:7, color:MUTED, fontSize:10, cursor:"pointer" }}>
+                      <Download size={10}/>
                     </button>
                   </div>
                 )}
@@ -301,6 +485,41 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         </div>
       </div>
 
+      </div>
+
+      {/* ── Modale confirmation suppression ──────────────────────────────────── */}
+      {confirmDel && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.75)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1000, padding:20 }}
+          onClick={() => setConfirmDel(null)}>
+          <div style={{ background:"#111009", border:"1px solid rgba(255,107,107,0.3)", borderRadius:16, padding:28, maxWidth:380, width:"100%", fontFamily:"DM Sans, sans-serif" }}
+            onClick={e => e.stopPropagation()}>
+            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
+              <AlertTriangle size={20} color="#FF6B6B"/>
+              <p style={{ color:"#F5F0E8", fontSize:15, fontWeight:700, margin:0 }}>Supprimer ce QR Code ?</p>
+            </div>
+            <p style={{ color:MUTED, fontSize:13, margin:"0 0 24px", lineHeight:1.6 }}>
+              Cette action est irréversible. Le QR Code et toutes ses statistiques seront définitivement supprimés.
+            </p>
+            <div style={{ display:"flex", gap:10 }}>
+              <button type="button" onClick={() => setConfirmDel(null)}
+                style={{ flex:1, padding:"10px", background:"transparent", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, color:MUTED, fontSize:13, cursor:"pointer" }}>
+                Annuler
+              </button>
+              <button type="button" onClick={() => deleteQR(confirmDel)} disabled={!!deleting}
+                style={{ flex:1, padding:"10px", background: deleting ? "rgba(255,107,107,0.3)" : "linear-gradient(90deg,#FF6B6B,#e05555)", border:"none", borderRadius:9, color:"#F5F0E8", fontSize:13, fontWeight:700, cursor:deleting?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7 }}>
+                {deleting ? <><Loader size={13} style={{ animation:"spin 0.8s linear infinite" }}/> Suppression…</> : <><Trash2 size={13}/> Supprimer</>}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fermer menu au clic extérieur */}
+      {menuOpenId && (
+        <div style={{ position:"fixed", inset:0, zIndex:90 }} onClick={() => setMenuOpenId(null)}/>
+      )}
+
+      {/* ── COL 2 : Preview centrale ────────────────────────────────────────── */}
       {/* ── COL 2 : Preview centrale ────────────────────────────────────────── */}
       <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"32px", gap:24, background:"#0A0907" }}>
         {active ? (
