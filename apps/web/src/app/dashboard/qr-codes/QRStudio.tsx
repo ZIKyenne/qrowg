@@ -18,6 +18,7 @@ type QRCode = {
   background_color: string
   corner_style:     "square" | "rounded" | "dot"
   error_correction: "L" | "M" | "Q" | "H"
+  style_config:     Record<string, any>
   total_scans:      number
   last_scan_at:     string | null
   created_at:       string
@@ -35,6 +36,53 @@ interface Props {
   qrCodes:  QRCode[]
   userPlan: string
   appUrl:   string
+}
+
+// ── QR Style Config type ─────────────────────────────────────────────────────
+type QRStyleConfig = {
+  fg2?:          string    // couleur secondaire (dégradé)
+  cornerColor?:  string    // couleur des coins
+  eyeColor?:     string    // couleur des yeux (centres)
+  transparent?:  boolean   // fond transparent
+  gradient?:     "none"|"linear"|"radial"|"diagonal"
+  gradientBg?:   string    // couleur fin de dégradé fond
+  dotStyle?:     "square"|"rounded"|"dot"|"softSquare"|"pixel"|"minimal"|"neon"|"luxury"
+  cornerStyle?:  "square"|"rounded"|"circle"|"diamond"|"luxury"|"minimal"
+  margin?:       number    // 0–30
+  density?:      "low"|"medium"|"high"  // correction auto ECC
+}
+
+const DOT_STYLES: { id: QRStyleConfig["dotStyle"]; label: string; emoji: string }[] = [
+  { id:"square",     label:"Classique",    emoji:"⬛" },
+  { id:"rounded",    label:"Arrondi",      emoji:"🔵" },
+  { id:"dot",        label:"Dots",         emoji:"⚫" },
+  { id:"softSquare", label:"Carres doux",  emoji:"🟦" },
+  { id:"pixel",      label:"Pixel",        emoji:"🟧" },
+  { id:"minimal",    label:"Minimal",      emoji:"▪️" },
+  { id:"neon",       label:"Neon",         emoji:"💜" },
+  { id:"luxury",     label:"Luxury",       emoji:"✨" },
+]
+
+const CORNER_STYLE_LIST: { id: QRStyleConfig["cornerStyle"]; label: string }[] = [
+  { id:"square",   label:"Carre"   },
+  { id:"rounded",  label:"Arrondi" },
+  { id:"circle",   label:"Cercle"  },
+  { id:"diamond",  label:"Diamond" },
+  { id:"luxury",   label:"Luxury"  },
+  { id:"minimal",  label:"Minimal" },
+]
+
+const GRADIENT_OPTS: { id: QRStyleConfig["gradient"]; label: string }[] = [
+  { id:"none",     label:"Aucun"    },
+  { id:"linear",   label:"Lineaire" },
+  { id:"radial",   label:"Radial"   },
+  { id:"diagonal", label:"Diagonal" },
+]
+
+const DEFAULT_STYLE: QRStyleConfig = {
+  fg2: "", cornerColor: "", eyeColor: "", transparent: false,
+  gradient: "none", gradientBg: "", dotStyle: "square",
+  cornerStyle: "square", margin: 10, density: "medium",
 }
 
 const PRESETS = [
@@ -101,6 +149,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [bg,         setBg]         = useState("")
   const [corner,     setCorner]     = useState<"square"|"rounded"|"dot">("square")
   const [ecLevel,    setEcLevel]    = useState<"L"|"M"|"Q"|"H">("M")
+  const [styleConf,  setStyleConf]  = useState<QRStyleConfig>({ ...DEFAULT_STYLE })
+  const [styleTab,   setStyleTab]   = useState<"colors"|"style"|"corners"|"advanced">("colors")
+  const [applyAllOk, setApplyAllOk] = useState(false)
   const [saving,     setSaving]     = useState(false)
   const [saved,      setSaved]      = useState(false)
   const [copied,     setCopied]     = useState<"link"|"short"|null>(null)
@@ -128,7 +179,16 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setBg(active.background_color)
     setCorner(active.corner_style)
     setEcLevel(active.error_correction)
+    setStyleConf({ ...DEFAULT_STYLE, ...(active.style_config ?? {}) })
   }, [activeId])
+
+  // Construire l'URL QR en tenant compte du style_config
+  function buildQRUrl(size: number): string {
+    const fgHex = fg.replace("#","")
+    const bgHex = styleConf.transparent ? "ffffff00" : bg.replace("#","")
+    const margin = styleConf.margin ?? 10
+    return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(qrUrl)}&color=${fgHex}&bgcolor=${bgHex}&ecc=${ecLevel}&margin=${margin}`
+  }
 
   useEffect(() => {
     if (!canvasRef.current || !qrUrl) return
@@ -136,25 +196,70 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const ctx    = canvas.getContext("2d")
     if (!ctx) return
     const img = new Image()
-    const url = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrUrl)}&color=${fg.replace("#","")}&bgcolor=${bg.replace("#","")}&ecc=${ecLevel}&margin=10`
     img.crossOrigin = "anonymous"
     img.onload = () => {
       canvas.width = 400; canvas.height = 400
       ctx.clearRect(0, 0, 400, 400)
+
+      // Fond (dégradé ou uni)
+      if (!styleConf.transparent) {
+        if (styleConf.gradient !== "none" && styleConf.gradientBg) {
+          let grad: CanvasGradient
+          if (styleConf.gradient === "radial") {
+            grad = ctx.createRadialGradient(200,200,0,200,200,200)
+          } else if (styleConf.gradient === "diagonal") {
+            grad = ctx.createLinearGradient(0,0,400,400)
+          } else {
+            grad = ctx.createLinearGradient(0,0,0,400)
+          }
+          grad.addColorStop(0, bg)
+          grad.addColorStop(1, styleConf.gradientBg)
+          ctx.fillStyle = grad
+          ctx.fillRect(0,0,400,400)
+        } else {
+          ctx.fillStyle = bg
+          ctx.fillRect(0,0,400,400)
+        }
+      }
+
+      // Coins arrondis
       if (corner === "rounded") {
         ctx.save(); const r = 20
-        ctx.beginPath(); ctx.moveTo(r, 0)
-        ctx.lineTo(400-r, 0); ctx.quadraticCurveTo(400, 0, 400, r)
-        ctx.lineTo(400, 400-r); ctx.quadraticCurveTo(400, 400, 400-r, 400)
-        ctx.lineTo(r, 400); ctx.quadraticCurveTo(0, 400, 0, 400-r)
-        ctx.lineTo(0, r); ctx.quadraticCurveTo(0, 0, r, 0)
+        ctx.beginPath(); ctx.moveTo(r,0)
+        ctx.lineTo(400-r,0); ctx.quadraticCurveTo(400,0,400,r)
+        ctx.lineTo(400,400-r); ctx.quadraticCurveTo(400,400,400-r,400)
+        ctx.lineTo(r,400); ctx.quadraticCurveTo(0,400,0,400-r)
+        ctx.lineTo(0,r); ctx.quadraticCurveTo(0,0,r,0)
         ctx.closePath(); ctx.clip()
       }
-      ctx.drawImage(img, 0, 0, 400, 400)
+
+      // Dégradé sur le QR
+      if (styleConf.gradient !== "none" && styleConf.fg2) {
+        ctx.globalCompositeOperation = "source-over"
+        let grad: CanvasGradient
+        if (styleConf.gradient === "radial") {
+          grad = ctx.createRadialGradient(200,200,0,200,200,200)
+        } else if (styleConf.gradient === "diagonal") {
+          grad = ctx.createLinearGradient(0,0,400,400)
+        } else {
+          grad = ctx.createLinearGradient(0,0,0,400)
+        }
+        grad.addColorStop(0, fg)
+        grad.addColorStop(1, styleConf.fg2)
+        // Dessin QR puis colorisation
+        ctx.drawImage(img,0,0,400,400)
+        ctx.globalCompositeOperation = "multiply"
+        ctx.fillStyle = grad
+        ctx.fillRect(0,0,400,400)
+        ctx.globalCompositeOperation = "source-over"
+      } else {
+        ctx.drawImage(img,0,0,400,400)
+      }
+
       if (corner === "rounded") ctx.restore()
     }
-    img.src = url
-  }, [qrUrl, fg, bg, corner, ecLevel])
+    img.src = buildQRUrl(400)
+  }, [qrUrl, fg, bg, corner, ecLevel, styleConf, showModal])
 
   async function archiveQR(id: string) {
     setArchivingId(id)
@@ -219,7 +324,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const canvas = canvasModalRef.current
     const ctx    = canvas.getContext("2d"); if (!ctx) return
     const img    = new Image()
-    const url    = `https://api.qrserver.com/v1/create-qr-code/?size=800x800&data=${encodeURIComponent(qrUrl)}&color=${fg.replace("#","")}&bgcolor=${bg.replace("#","")}&ecc=${ecLevel}&margin=20`
+    const url    = buildQRUrl(800).replace("size=400x400","size=800x800").replace("margin=10","margin=20")
     img.crossOrigin = "anonymous"
     img.onload = () => {
       canvas.width = 800; canvas.height = 800
@@ -239,10 +344,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     await supabase.from("qr_codes").update({
       foreground_color: fg, background_color: bg,
       corner_style: corner, error_correction: ecLevel,
+      style_config: styleConf,
       updated_at: new Date().toISOString(),
     }).eq("id", active.id)
     setQRCodes(prev => prev.map(q => q.id === active.id
-      ? { ...q, foreground_color: fg, background_color: bg, corner_style: corner, error_correction: ecLevel }
+      ? { ...q, foreground_color: fg, background_color: bg, corner_style: corner, error_correction: ecLevel, style_config: styleConf }
       : q))
     setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
   }, [active, fg, bg, corner, ecLevel])
@@ -271,6 +377,15 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     if (!active) return
     setFg(active.foreground_color); setBg(active.background_color)
     setCorner(active.corner_style); setEcLevel(active.error_correction)
+    setStyleConf({ ...DEFAULT_STYLE, ...(active.style_config ?? {}) })
+  }
+
+  async function applyToAll() {
+    const sb = createClient()
+    const payload = { foreground_color:fg, background_color:bg, corner_style:corner, error_correction:ecLevel, style_config:styleConf, updated_at:new Date().toISOString() }
+    await sb.from("qr_codes").update(payload).eq("user_id", qrCodes[0]?.user_id ?? "")
+    setQRCodes(prev => prev.map(q => ({ ...q, ...payload })))
+    setApplyAllOk(true); setTimeout(()=>setApplyAllOk(false), 2500)
   }
 
   const [sb_asc, sb_dir] = sortKey.split("-")
@@ -710,134 +825,308 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         )}
       </div>
 
-      {/* ── COL 3 : Personnalisation + Export ──────────────────────────────── */}
+      {/* ── COL 3 : Personnalisation premium ──────────────────────────────────── */}
       <div style={{ borderLeft:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", overflow:"hidden" }}>
-        <div style={{ display:"flex", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
-          {([["style","Style","🎨"],["export","Export","📤"]] as const).map(([id, label, emoji]) => (
+
+        {/* Tabs principaux Style/Export */}
+        <div style={{ display:"flex", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
+          {([["style","Style","🎨"],["export","Export","📤"]] as const).map(([id,label,emoji]) => (
             <button key={id} type="button" onClick={() => setActiveTab(id)}
-              style={{ flex:1, padding:"12px 8px", background:activeTab===id?"rgba(201,168,76,0.06)":"transparent", border:"none", borderBottom:activeTab===id?`2px solid ${G}`:"2px solid transparent", color:activeTab===id?G:MUTED, fontSize:12, fontWeight:600, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:5 }}>
+              style={{ flex:1, padding:"11px 8px", background:activeTab===id?"rgba(201,168,76,0.06)":"transparent", border:"none", borderBottom:activeTab===id?`2px solid ${G}`:"2px solid transparent", color:activeTab===id?G:MUTED, fontSize:12, fontWeight:600, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:5 }}>
               <span>{emoji}</span>{label}
             </button>
           ))}
         </div>
 
-        <div style={{ flex:1, overflowY:"auto", padding:"16px" }}>
-          {activeTab === "style" && active && (
-            <div style={{ display:"flex", flexDirection:"column", gap:18 }}>
-              <div>
-                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10 }}>
-                  <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Couleurs</p>
-                  <button type="button" onClick={resetColors} style={{ background:"none", border:"none", color:MUTED, cursor:"pointer", display:"flex", alignItems:"center", gap:3, fontSize:10 }}>
-                    <RotateCcw size={10}/> Reset
+        {activeTab === "style" && active && (
+          <div style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
+
+            {/* Sous-tabs Couleurs/Style/Coins/Avancé */}
+            <div style={{ display:"flex", borderBottom:"1px solid rgba(255,255,255,0.05)", padding:"0 8px", flexShrink:0, overflowX:"auto" }}>
+              {([
+                ["colors",   "Couleurs", "🎨"],
+                ["style",    "Style",    "✦"],
+                ["corners",  "Coins",    "⬡"],
+                ["advanced", "Avance",   "⚙"],
+              ] as const).map(([id,label,emoji]) => (
+                <button key={id} type="button" onClick={() => setStyleTab(id)}
+                  style={{ padding:"8px 10px", background:"none", border:"none", borderBottom:styleTab===id?`2px solid ${G}`:"2px solid transparent", color:styleTab===id?G:MUTED, fontSize:10, fontWeight:styleTab===id?700:500, cursor:"pointer", whiteSpace:"nowrap" as const, display:"flex", alignItems:"center", gap:4 }}>
+                  <span style={{ fontSize:11 }}>{emoji}</span>{label}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ flex:1, overflowY:"auto", padding:"14px" }}>
+
+              {/* ── COULEURS ────────────────────────────────────────────────── */}
+              {styleTab === "colors" && (
+                <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+
+                  {/* Couleurs principales */}
+                  <div>
+                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Couleurs principales</p>
+                    <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                      {([
+                        { label:"QR principal",    key:"fg",  val:fg,  set:(v:string)=>setFg(v) },
+                        { label:"Fond",             key:"bg",  val:bg,  set:(v:string)=>setBg(v) },
+                      ]).map(c => (
+                        <div key={c.key} style={{ display:"flex", alignItems:"center", gap:8 }}>
+                          <label style={{ color:MUTED, fontSize:11, flex:1 }}>{c.label}</label>
+                          <div style={{ position:"relative", width:28, height:28, borderRadius:6, overflow:"hidden", border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }}>
+                            <input type="color" value={c.val} onChange={e => c.set(e.target.value)}
+                              style={{ position:"absolute", inset:-4, width:"calc(100%+8px)", height:"calc(100%+8px)", cursor:"pointer", border:"none" }}/>
+                          </div>
+                          <input type="text" value={c.val} onChange={e => c.set(e.target.value)}
+                            style={{ width:72, background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"5px 7px", color:"#F5F0E8", fontSize:10, fontFamily:"monospace", outline:"none" }}/>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Couleurs avancées */}
+                  <div>
+                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Couleurs avancees</p>
+                    <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                      {([
+                        { label:"QR secondaire",   key:"fg2",         val:styleConf.fg2??""          },
+                        { label:"Couleur coins",   key:"cornerColor", val:styleConf.cornerColor??""  },
+                        { label:"Couleur yeux",    key:"eyeColor",    val:styleConf.eyeColor??""     },
+                        { label:"Fond degrade",    key:"gradientBg",  val:styleConf.gradientBg??""   },
+                      ]).map(c => (
+                        <div key={c.key} style={{ display:"flex", alignItems:"center", gap:8 }}>
+                          <label style={{ color:MUTED, fontSize:11, flex:1 }}>{c.label}</label>
+                          <div style={{ position:"relative", width:28, height:28, borderRadius:6, overflow:"hidden", border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }}>
+                            <input type="color" value={c.val || "#080808"} onChange={e => setStyleConf(p => ({ ...p, [c.key]: e.target.value }))}
+                              style={{ position:"absolute", inset:-4, width:"calc(100%+8px)", height:"calc(100%+8px)", cursor:"pointer", border:"none" }}/>
+                          </div>
+                          <input type="text" value={c.val} onChange={e => setStyleConf(p => ({ ...p, [c.key]: e.target.value }))}
+                            placeholder="#——"
+                            style={{ width:72, background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"5px 7px", color:c.val?"#F5F0E8":MUTED, fontSize:10, fontFamily:"monospace", outline:"none" }}/>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Fond transparent */}
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 12px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:9 }}>
+                    <div>
+                      <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 2px" }}>Fond transparent</p>
+                      <p style={{ color:MUTED, fontSize:10, margin:0 }}>PNG avec canal alpha</p>
+                    </div>
+                    <button type="button" onClick={() => setStyleConf(p => ({ ...p, transparent: !p.transparent }))}
+                      style={{ width:38, height:22, borderRadius:11, background:styleConf.transparent?"linear-gradient(90deg,#C9A84C,#b8953f)":"rgba(255,255,255,0.1)", border:"none", cursor:"pointer", position:"relative", transition:"background 0.2s" }}>
+                      <div style={{ position:"absolute", top:3, left:styleConf.transparent?18:3, width:16, height:16, borderRadius:"50%", background:"#F5F0E8", transition:"left 0.2s" }}/>
+                    </button>
+                  </div>
+
+                  {/* Dégradé */}
+                  <div>
+                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Degrade</p>
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
+                      {GRADIENT_OPTS.map(g => (
+                        <button key={g.id ?? "none"} type="button" onClick={() => setStyleConf(p => ({ ...p, gradient: g.id ?? "none" }))}
+                          style={{ padding:"7px 8px", background:(styleConf.gradient??"none")===(g.id??"none")?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${(styleConf.gradient??"none")===(g.id??"none")?"rgba(201,168,76,0.35)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:(styleConf.gradient??"none")===(g.id??"none")?G:MUTED, fontSize:10, cursor:"pointer", fontWeight:(styleConf.gradient??"none")===(g.id??"none")?700:400 }}>
+                          {g.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Presets */}
+                  <div>
+                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Presets</p>
+                    <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:5 }}>
+                      {PRESETS.map(preset => {
+                        const canAccess = PLAN_RANK[userPlan] >= PLAN_RANK[preset.plan]
+                        const isActive  = fg===preset.fg && bg===preset.bg
+                        return (
+                          <div key={preset.label} onClick={() => canAccess && (setFg(preset.fg),setBg(preset.bg))}
+                            style={{ position:"relative", cursor:canAccess?"pointer":"not-allowed", borderRadius:7, overflow:"hidden", border:`1.5px solid ${isActive?"#C9A84C":"rgba(255,255,255,0.07)"}`, opacity:canAccess?1:0.45 }}>
+                            <div style={{ background:preset.bg, padding:"7px 5px", display:"flex", justifyContent:"center" }}>
+                              <div style={{ width:20, height:20, borderRadius:4, background:`linear-gradient(135deg,${preset.fg} 50%,${preset.bg} 50%)`, border:`1px solid ${preset.fg}40` }}/>
+                            </div>
+                            <div style={{ background:"#111009", padding:"3px 2px", textAlign:"center" as const }}>
+                              <p style={{ color:isActive?G:"#F5F0E8", fontSize:8, fontWeight:600, margin:0 }}>{preset.label}</p>
+                            </div>
+                            {!canAccess && (
+                              <div style={{ position:"absolute", inset:0, background:"rgba(8,8,8,0.6)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                                <Lock size={11} color={MUTED}/>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── STYLE QR ────────────────────────────────────────────────── */}
+              {styleTab === "style" && (
+                <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+                  <div>
+                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 10px" }}>Style des modules</p>
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7 }}>
+                      {DOT_STYLES.map(ds => {
+                        const isActive = (styleConf.dotStyle??"square") === ds.id
+                        const isPro = ["pixel","neon","luxury"].includes(ds.id ?? "")
+                        const canAccess = !isPro || PLAN_RANK[userPlan] >= 1
+                        return (
+                          <button key={ds.id ?? "sq"} type="button" onClick={() => canAccess && setStyleConf(p => ({ ...p, dotStyle: ds.id }))}
+                            style={{ position:"relative", padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:canAccess?"pointer":"not-allowed", opacity:canAccess?1:0.5, textAlign:"center" as const }}>
+                            <div style={{ fontSize:18, marginBottom:4 }}>{ds.emoji}</div>
+                            <p style={{ color:isActive?G:"#F5F0E8", fontSize:10, fontWeight:isActive?700:500, margin:0 }}>{ds.label}</p>
+                            {isPro && !canAccess && (
+                              <span style={{ position:"absolute", top:4, right:4, background:"rgba(201,168,76,0.15)", borderRadius:4, padding:"1px 4px", fontSize:7, color:G, fontWeight:800 }}>PRO</span>
+                            )}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── COINS ───────────────────────────────────────────────────── */}
+              {styleTab === "corners" && (
+                <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+                  <div>
+                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 10px" }}>Style des coins</p>
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7 }}>
+                      {CORNER_STYLE_LIST.map(cs => {
+                        const isActive = (styleConf.cornerStyle??"square") === cs.id
+                        const isPro = ["diamond","luxury"].includes(cs.id ?? "")
+                        const canAccess = !isPro || PLAN_RANK[userPlan] >= 1
+                        return (
+                          <button key={cs.id ?? "sq"} type="button" onClick={() => canAccess && setStyleConf(p => ({ ...p, cornerStyle: cs.id }))}
+                            style={{ padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:canAccess?"pointer":"not-allowed", opacity:canAccess?1:0.5, position:"relative" as const }}>
+                            <p style={{ color:isActive?G:"#F5F0E8", fontSize:11, fontWeight:isActive?700:500, margin:0, textAlign:"center" as const }}>{cs.label}</p>
+                            {isPro && !canAccess && (
+                              <span style={{ position:"absolute", top:4, right:4, background:"rgba(201,168,76,0.15)", borderRadius:4, padding:"1px 4px", fontSize:7, color:G, fontWeight:800 }}>PRO</span>
+                            )}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Corner style legacy (arrondi canvas) */}
+                  <div>
+                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Arrondi general</p>
+                    <div style={{ display:"flex", gap:6 }}>
+                      {(["square","rounded","dot"] as const).map(c => (
+                        <button key={c} type="button" onClick={() => setCorner(c)}
+                          style={{ flex:1, padding:"7px 6px", background:corner===c?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1px solid ${corner===c?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:corner===c?G:MUTED, fontSize:10, cursor:"pointer", fontWeight:corner===c?700:400 }}>
+                          {c==="square"?"Carre":c==="rounded"?"Arrondi":"Dots"}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── AVANCÉ ──────────────────────────────────────────────────── */}
+              {styleTab === "advanced" && (
+                <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+
+                  {/* Marge */}
+                  <div>
+                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:7 }}>
+                      <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Marge</p>
+                      <span style={{ color:G, fontSize:11, fontWeight:700 }}>{styleConf.margin ?? 10}px</span>
+                    </div>
+                    <input type="range" min={0} max={30} value={styleConf.margin ?? 10}
+                      onChange={e => setStyleConf(p => ({ ...p, margin: Number(e.target.value) }))}
+                      style={{ width:"100%", accentColor:G, cursor:"pointer" }}/>
+                    <div style={{ display:"flex", justifyContent:"space-between" }}>
+                      <span style={{ color:MUTED, fontSize:9 }}>0</span>
+                      <span style={{ color:MUTED, fontSize:9 }}>30</span>
+                    </div>
+                  </div>
+
+                  {/* Correction d'erreur */}
+                  <div>
+                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Correction erreur</p>
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
+                      {EC_LEVELS.map(ec => {
+                        const locked = (ec.id==="Q"||ec.id==="H") && !canPro
+                        return (
+                          <button key={ec.id} type="button" onClick={() => !locked && setEcLevel(ec.id as any)} disabled={locked}
+                            style={{ position:"relative", padding:"7px 8px", background:ecLevel===ec.id?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${ecLevel===ec.id?"rgba(201,168,76,0.35)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:locked?MUTED:ecLevel===ec.id?G:"#F5F0E8", fontSize:10, cursor:locked?"not-allowed":"pointer", opacity:locked?0.5:1, textAlign:"center" as const }}>
+                            <div style={{ fontWeight:700, marginBottom:1 }}>{ec.label}</div>
+                            <div style={{ color:MUTED, fontSize:9 }}>{ec.desc}</div>
+                            {locked && <Lock size={9} color={MUTED} style={{ position:"absolute", top:4, right:4 }}/>}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Densité visuelle */}
+                  <div>
+                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Densite visuelle</p>
+                    <div style={{ display:"flex", gap:6 }}>
+                      {(["low","medium","high"] as const).map(d => (
+                        <button key={d} type="button" onClick={() => setStyleConf(p => ({ ...p, density: d }))}
+                          style={{ flex:1, padding:"7px 6px", background:(styleConf.density??"medium")===d?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1px solid ${(styleConf.density??"medium")===d?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:(styleConf.density??"medium")===d?G:MUTED, fontSize:10, cursor:"pointer", fontWeight:(styleConf.density??"medium")===d?700:400 }}>
+                          {d==="low"?"Faible":d==="medium"?"Normale":"Forte"}
+                        </button>
+                      ))}
+                    </div>
+                    <p style={{ color:MUTED, fontSize:10, margin:"6px 0 0", lineHeight:1.5 }}>
+                      Une densite forte augmente la complexite — preferer ECC H.
+                    </p>
+                  </div>
+
+                  {/* Reset */}
+                  <button type="button" onClick={resetColors}
+                    style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"9px", background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:MUTED, fontSize:12, cursor:"pointer" }}>
+                    <RotateCcw size={12}/> Reinitialiser par defaut
                   </button>
                 </div>
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-                  {[{ label:"QR Code", val:fg, set:setFg }, { label:"Fond", val:bg, set:setBg }].map(c => (
-                    <div key={c.label}>
-                      <label style={{ color:MUTED, fontSize:11, display:"block", marginBottom:5 }}>{c.label}</label>
-                      <div style={{ display:"flex", gap:6, alignItems:"center" }}>
-                        <div style={{ position:"relative", width:32, height:32, borderRadius:7, overflow:"hidden", border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }}>
-                          <input type="color" value={c.val} onChange={e => c.set(e.target.value)}
-                            style={{ position:"absolute", inset:-4, width:"calc(100% + 8px)", height:"calc(100% + 8px)", cursor:"pointer", border:"none" }}/>
-                        </div>
-                        <input type="text" value={c.val} onChange={e => c.set(e.target.value)}
-                          style={{ flex:1, background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:7, padding:"6px 8px", color:"#F5F0E8", fontSize:11, fontFamily:"monospace", outline:"none" }}/>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              )}
+            </div>
 
-              <div>
-                <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Style des coins</p>
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:7 }}>
-                  {CORNER_STYLES.map(cs => (
-                    <button key={cs.id} type="button" onClick={() => setCorner(cs.id as any)}
-                      style={{ padding:"8px 6px", background:corner===cs.id?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1px solid ${corner===cs.id?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:corner===cs.id?G:MUTED, fontSize:10, fontWeight:corner===cs.id?700:500, cursor:"pointer", textAlign:"center" as const }}>
-                      <div style={{ fontSize:16, marginBottom:3 }}>{cs.icon}</div>
-                      {cs.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Correction erreur</p>
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
-                  {EC_LEVELS.map(ec => {
-                    const locked = (ec.id === "Q" || ec.id === "H") && !canPro
-                    return (
-                      <button key={ec.id} type="button" onClick={() => !locked && setEcLevel(ec.id as any)} disabled={locked}
-                        style={{ position:"relative", padding:"7px 8px", background:ecLevel===ec.id?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${ecLevel===ec.id?"rgba(201,168,76,0.35)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:locked?MUTED:ecLevel===ec.id?G:"#F5F0E8", fontSize:10, cursor:locked?"not-allowed":"pointer", opacity:locked?0.5:1, textAlign:"center" as const }}>
-                        <div style={{ fontWeight:700, marginBottom:1 }}>{ec.label}</div>
-                        <div style={{ color:MUTED, fontSize:9 }}>{ec.desc}</div>
-                        {locked && <Lock size={9} color={MUTED} style={{ position:"absolute", top:4, right:4 }}/>}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-
-              <div>
-                <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Presets</p>
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:6 }}>
-                  {PRESETS.map(preset => {
-                    const canAccess = PLAN_RANK[userPlan] >= PLAN_RANK[preset.plan]
-                    const isActive  = fg === preset.fg && bg === preset.bg
-                    return (
-                      <div key={preset.label} onClick={() => canAccess && (setFg(preset.fg), setBg(preset.bg))}
-                        style={{ position:"relative", cursor:canAccess?"pointer":"not-allowed", borderRadius:8, overflow:"hidden", border:`1.5px solid ${isActive?"#C9A84C":"rgba(255,255,255,0.07)"}`, opacity:canAccess?1:0.45 }}>
-                        <div style={{ background:preset.bg, padding:"8px 6px", display:"flex", justifyContent:"center" }}>
-                          <div style={{ width:22, height:22, borderRadius:5, background:`linear-gradient(135deg,${preset.fg} 50%,${preset.bg} 50%)`, border:`1px solid ${preset.fg}40` }}/>
-                        </div>
-                        <div style={{ background:"#111009", padding:"4px 2px", textAlign:"center" as const }}>
-                          <p style={{ color:isActive?G:"#F5F0E8", fontSize:9, fontWeight:600, margin:0 }}>{preset.label}</p>
-                        </div>
-                        {!canAccess && (
-                          <div style={{ position:"absolute", inset:0, background:"rgba(8,8,8,0.6)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                            <Lock size={12} color={MUTED}/>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-
+            {/* Actions en bas */}
+            <div style={{ padding:"12px 14px", borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", gap:7, flexShrink:0 }}>
               <button type="button" onClick={saveCustomization} disabled={saving}
-                style={{ padding:"11px", background:saved?"rgba(57,255,143,0.12)":"linear-gradient(90deg,#C9A84C,#b8953f)", border:saved?"1px solid rgba(57,255,143,0.3)":"none", borderRadius:10, color:saved?"#39FF8F":"#080808", fontSize:13, fontWeight:700, cursor:saving?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7, opacity:saving?0.7:1 }}>
-                {saving ? <><Loader size={13} style={{ animation:"spin 0.8s linear infinite" }}/> Enregistrement...</>
-                  : saved ? <><Check size={13}/> Sauvegarde !</>
-                  : <><Palette size={13}/> Enregistrer le style</>}
+                style={{ padding:"10px", background:saved?"rgba(57,255,143,0.12)":"linear-gradient(90deg,#C9A84C,#b8953f)", border:saved?"1px solid rgba(57,255,143,0.3)":"none", borderRadius:9, color:saved?"#39FF8F":"#080808", fontSize:12, fontWeight:700, cursor:saving?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7, opacity:saving?0.7:1, transition:"all 0.2s" }}>
+                {saving ? <><Loader size={12} style={{ animation:"spin 0.8s linear infinite" }}/> Enregistrement...</>
+                  : saved ? <><Check size={12}/> Sauvegarde !</>
+                  : <><Palette size={12}/> Enregistrer le style</>}
+              </button>
+              <button type="button" onClick={applyToAll}
+                style={{ padding:"9px", background:applyAllOk?"rgba(57,255,143,0.1)":"rgba(255,255,255,0.03)", border:`1px solid ${applyAllOk?"rgba(57,255,143,0.25)":"rgba(255,255,255,0.08)"}`, borderRadius:9, color:applyAllOk?"#39FF8F":MUTED, fontSize:11, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                {applyAllOk ? <><Check size={11}/> Applique a tous !</> : <><Settings size={11}/> Appliquer a tous mes QR</>}
               </button>
             </div>
-          )}
+          </div>
+        )}
 
-          {activeTab === "export" && active && (
+        {/* ── Export tab ────────────────────────────────────────────────────── */}
+        {activeTab === "export" && active && (
+          <div style={{ flex:1, overflowY:"auto", padding:"16px" }}>
             <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
               <div>
-                <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Liens</p>
-                {[
+                <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Liens</p>
+                {([
                   { label:"Lien de scan", val:qrUrl,   type:"short" as const, icon:<Link size={12}/> },
                   { label:"Lien de page", val:pageUrl, type:"link"  as const, icon:<ExternalLink size={12}/> },
-                ].map(l => (
+                ]).map(l => (
                   <div key={l.type} style={{ marginBottom:8 }}>
                     <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>{l.label}</label>
                     <div style={{ display:"flex", gap:6, alignItems:"center" }}>
-                      <code style={{ flex:1, background:"#111009", border:"1px solid rgba(255,255,255,0.07)", borderRadius:7, padding:"7px 9px", color:G, fontSize:10, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
-                        {l.val}
-                      </code>
+                      <code style={{ flex:1, background:"#111009", border:"1px solid rgba(255,255,255,0.07)", borderRadius:7, padding:"7px 9px", color:G, fontSize:10, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>{l.val}</code>
                       <button type="button" onClick={() => copy(l.type)}
                         style={{ width:28, height:28, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:copied===l.type?"#39FF8F":MUTED, flexShrink:0 }}>
-                        {copied === l.type ? <Check size={11}/> : <Copy size={11}/>}
+                        {copied===l.type ? <Check size={11}/> : <Copy size={11}/>}
                       </button>
                     </div>
                   </div>
                 ))}
               </div>
-
               <div>
-                <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Telecharger</p>
+                <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Telecharger</p>
                 <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
                   <button type="button" onClick={() => downloadPNG(400)}
                     style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:9, color:"#080808", fontSize:12, fontWeight:700, cursor:"pointer" }}>
@@ -845,38 +1134,25 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   </button>
                   <button type="button" onClick={() => canPro && downloadPNG(1200)}
                     style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px", background:canPro?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.03)", border:`1px solid ${canPro?"rgba(201,168,76,0.3)":"rgba(255,255,255,0.07)"}`, borderRadius:9, color:canPro?G:MUTED, fontSize:12, cursor:canPro?"pointer":"not-allowed" }}>
-                    {!canPro && <Lock size={12}/>}
-                    <Download size={13}/> HD 1200x1200 {!canPro && "- Pro"}
+                    {!canPro && <Lock size={12}/>}<Download size={13}/> HD 1200x1200 {!canPro && "- Pro"}
                   </button>
                   <button type="button" onClick={() => canPro && downloadSVG()}
                     style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px", background:canPro?"rgba(57,255,143,0.08)":"rgba(255,255,255,0.03)", border:`1px solid ${canPro?"rgba(57,255,143,0.25)":"rgba(255,255,255,0.07)"}`, borderRadius:9, color:canPro?"#39FF8F":MUTED, fontSize:12, cursor:canPro?"pointer":"not-allowed" }}>
-                    {!canPro && <Lock size={12}/>}
-                    <Share2 size={13}/> SVG Vectoriel {!canPro && "- Pro"}
+                    {!canPro && <Lock size={12}/>}<Share2 size={13}/> SVG {!canPro && "- Pro"}
                   </button>
                 </div>
               </div>
-
-              <div>
-                <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Voir la page</p>
-                <a href={pageUrl} target="_blank" rel="noopener noreferrer"
-                  style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px", background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:9, color:MUTED, fontSize:12, textDecoration:"none" }}>
-                  <ExternalLink size={13}/> Ouvrir {active.pages?.slug}
-                </a>
-              </div>
-
               {!canPro && (
-                <div style={{ marginTop:8, padding:"12px 14px", background:"rgba(201,168,76,0.05)", border:"1px solid rgba(201,168,76,0.15)", borderRadius:10 }}>
+                <div style={{ padding:"12px 14px", background:"rgba(201,168,76,0.05)", border:"1px solid rgba(201,168,76,0.15)", borderRadius:10 }}>
                   <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 5px" }}>Debloquer les exports HD</p>
-                  <p style={{ color:MUTED, fontSize:11, margin:"0 0 10px" }}>PNG 1200px, SVG vectoriel, tous les presets</p>
-                  <a href="/dashboard/upgrade" style={{ display:"inline-block", background:"linear-gradient(90deg,#C9A84C,#b8953f)", color:"#080808", textDecoration:"none", fontSize:11, fontWeight:700, padding:"6px 14px", borderRadius:7 }}>
-                    Passer Pro
-                  </a>
+                  <a href="/dashboard/upgrade" style={{ display:"inline-block", background:"linear-gradient(90deg,#C9A84C,#b8953f)", color:"#080808", textDecoration:"none", fontSize:11, fontWeight:700, padding:"6px 14px", borderRadius:7 }}>Passer Pro</a>
                 </div>
               )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
+
 
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
     </div>
