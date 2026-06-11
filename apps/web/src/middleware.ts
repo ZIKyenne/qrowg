@@ -1,24 +1,15 @@
-﻿// middleware.ts — Routing des domaines personnalisés
-// Intercepte les requêtes sur des domaines custom et les redirige vers la page QRfolio associée
+﻿// middleware.ts — Routing domaines custom + sous-domaines *.qrfolio.app
 
 import { NextRequest, NextResponse } from "next/server"
 
-// Domaines propres à QRfolio (à NE PAS intercepter)
-const QRFOLIO_DOMAINS = [
-  "qrfolio.app",
-  "www.qrfolio.app",
-  "localhost",
-]
+const APP_DOMAIN     = process.env.NEXT_PUBLIC_APP_URL?.replace(/^https?:\/\//, "") ?? "qrfolio.app"
+const QRFOLIO_HOSTS  = new Set(["qrfolio.app", "www.qrfolio.app", "localhost"])
 
 export async function middleware(req: NextRequest) {
-  const hostname = req.headers.get("host") ?? ""
-  const pathname = req.nextUrl.pathname
+  const hostname = (req.headers.get("host") ?? "").replace(/:\d+$/, "")
+  const pathname  = req.nextUrl.pathname
 
-  // Ne pas intercepter les domaines QRfolio natifs
-  const isQrfolioHost = QRFOLIO_DOMAINS.some(d => hostname === d || hostname.endsWith(".vercel.app"))
-  if (isQrfolioHost) return NextResponse.next()
-
-  // Ne pas intercepter les routes API, _next, assets
+  // Exclure les routes système
   if (
     pathname.startsWith("/api/") ||
     pathname.startsWith("/_next/") ||
@@ -30,23 +21,33 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
-  // Nettoyer le hostname (retirer www. et le port)
-  const domain = hostname.replace(/^www\./, "").replace(/:\d+$/, "")
+  // ── Cas 1 : sous-domaine *.qrfolio.app ────────────────────────────────────
+  const isSubdomain = hostname.endsWith(`.${APP_DOMAIN}`) && !QRFOLIO_HOSTS.has(hostname)
 
-  // Chercher la page associée à ce domaine via Supabase
-  // On passe le domaine en header pour que la page [slug] puisse le résoudre
-  const url = req.nextUrl.clone()
+  if (isSubdomain) {
+    const subdomain = hostname.replace(`.${APP_DOMAIN}`, "")
+    if (!subdomain || subdomain === "www") return NextResponse.next()
 
-  // Réécrire vers la route de résolution domaine custom
-  url.pathname = `/api/domains/resolve`
-  url.searchParams.set("domain", domain)
-  url.searchParams.set("path", pathname)
+    const url      = req.nextUrl.clone()
+    url.pathname   = "/api/subdomain/resolve"
+    url.searchParams.set("username", subdomain)
+    url.searchParams.set("path",     pathname)
+    return NextResponse.rewrite(url)
+  }
 
+  // ── Cas 2 : domaine racine QRfolio ────────────────────────────────────────
+  if (QRFOLIO_HOSTS.has(hostname) || hostname.endsWith(".vercel.app")) {
+    return NextResponse.next()
+  }
+
+  // ── Cas 3 : domaine custom ────────────────────────────────────────────────
+  const url      = req.nextUrl.clone()
+  url.pathname   = "/api/domains/resolve"
+  url.searchParams.set("domain", hostname)
+  url.searchParams.set("path",   pathname)
   return NextResponse.rewrite(url)
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|api/|auth/).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/|auth/).*)" ],
 }
