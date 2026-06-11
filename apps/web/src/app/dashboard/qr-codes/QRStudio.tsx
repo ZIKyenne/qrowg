@@ -19,6 +19,7 @@ type QRCode = {
   corner_style:     "square" | "rounded" | "dot"
   error_correction: "L" | "M" | "Q" | "H"
   style_config:     Record<string, any>
+  logo_url:         string | null
   total_scans:      number
   last_scan_at:     string | null
   created_at:       string
@@ -49,7 +50,13 @@ type QRStyleConfig = {
   dotStyle?:     "square"|"rounded"|"dot"|"softSquare"|"pixel"|"minimal"|"neon"|"luxury"
   cornerStyle?:  "square"|"rounded"|"circle"|"diamond"|"luxury"|"minimal"
   margin?:       number    // 0–30
-  density?:      "low"|"medium"|"high"  // correction auto ECC
+  density?:      "low"|"medium"|"high"
+  logoUrl?:      string    // data URL ou URL Supabase
+  logoSize?:     number    // % du QR, 10-30, défaut 18
+  logoShape?:    "square"|"rounded"|"circle"
+  logoBg?:       "transparent"|"white"|"black"|"custom"
+  logoBgColor?:  string
+  logoPadding?:  number    // px, 0-12, défaut 4
 }
 
 const DOT_STYLES: { id: QRStyleConfig["dotStyle"]; label: string; emoji: string }[] = [
@@ -83,6 +90,8 @@ const DEFAULT_STYLE: QRStyleConfig = {
   fg2: "", cornerColor: "", eyeColor: "", transparent: false,
   gradient: "none", gradientBg: "", dotStyle: "square",
   cornerStyle: "square", margin: 10, density: "medium",
+  logoUrl: "", logoSize: 18, logoShape: "rounded",
+  logoBg: "white", logoBgColor: "#FFFFFF", logoPadding: 4,
 }
 
 const PRESETS = [
@@ -150,7 +159,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [corner,     setCorner]     = useState<"square"|"rounded"|"dot">("square")
   const [ecLevel,    setEcLevel]    = useState<"L"|"M"|"Q"|"H">("M")
   const [styleConf,  setStyleConf]  = useState<QRStyleConfig>({ ...DEFAULT_STYLE })
-  const [styleTab,   setStyleTab]   = useState<"colors"|"style"|"corners"|"advanced">("colors")
+  const [styleTab,   setStyleTab]   = useState<"colors"|"logo"|"style"|"corners"|"advanced">("colors")
   const [applyAllOk, setApplyAllOk] = useState(false)
   const [saving,     setSaving]     = useState(false)
   const [saved,      setSaved]      = useState(false)
@@ -166,6 +175,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [showModal,  setShowModal]  = useState(false)
   const [diagFg,     setDiagFg]     = useState("")
   const [diagBg,     setDiagBg]     = useState("")
+  const [logoUploading, setLogoUploading] = useState(false)
+  const logoInputRef = useRef<HTMLInputElement>(null)
   const canvasRef      = useRef<HTMLCanvasElement>(null)
   const canvasModalRef = useRef<HTMLCanvasElement>(null)
 
@@ -179,15 +190,21 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setBg(active.background_color)
     setCorner(active.corner_style)
     setEcLevel(active.error_correction)
-    setStyleConf({ ...DEFAULT_STYLE, ...(active.style_config ?? {}) })
+    const sc = { ...DEFAULT_STYLE, ...(active.style_config ?? {}) }
+    // Initialiser logoUrl depuis style_config ou logo_url de la page
+    if (!sc.logoUrl && active.logo_url) sc.logoUrl = active.logo_url
+    setStyleConf(sc)
   }, [activeId])
 
   // Construire l'URL QR en tenant compte du style_config
+  // ECC forcé H si logo actif (logo masque des modules QR)
+  const effectiveEcc = styleConf.logoUrl ? "H" : ecLevel
+
   function buildQRUrl(size: number): string {
     const fgHex = fg.replace("#","")
     const bgHex = styleConf.transparent ? "ffffff00" : bg.replace("#","")
     const margin = styleConf.margin ?? 10
-    return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(qrUrl)}&color=${fgHex}&bgcolor=${bgHex}&ecc=${ecLevel}&margin=${margin}`
+    return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(qrUrl)}&color=${fgHex}&bgcolor=${bgHex}&ecc=${effectiveEcc}&margin=${margin}`
   }
 
   useEffect(() => {
@@ -257,6 +274,75 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       }
 
       if (corner === "rounded") ctx.restore()
+
+      // ── Dessin du logo central ───────────────────────────────────────
+      if (styleConf.logoUrl) {
+        const logoImg  = new Image()
+        logoImg.crossOrigin = "anonymous"
+        logoImg.onload = () => {
+          const pct      = (styleConf.logoSize ?? 18) / 100
+          const maxRatio = 0.30  // jamais > 30% du QR
+          const ratio    = Math.min(pct, maxRatio)
+          const size     = canvas.width * ratio
+          const pad      = styleConf.logoPadding ?? 4
+          const cx       = canvas.width  / 2
+          const cy       = canvas.height / 2
+          const bgSize   = size + pad * 2
+          const r        = styleConf.logoShape === "circle"
+                             ? bgSize / 2
+                             : styleConf.logoShape === "rounded"
+                             ? bgSize * 0.2
+                             : 0
+          // Fond du conteneur
+          if (styleConf.logoBg !== "transparent") {
+            ctx.save()
+            ctx.beginPath()
+            if (r > 0) {
+              ctx.moveTo(cx - bgSize/2 + r, cy - bgSize/2)
+              ctx.lineTo(cx + bgSize/2 - r, cy - bgSize/2)
+              ctx.quadraticCurveTo(cx + bgSize/2, cy - bgSize/2, cx + bgSize/2, cy - bgSize/2 + r)
+              ctx.lineTo(cx + bgSize/2, cy + bgSize/2 - r)
+              ctx.quadraticCurveTo(cx + bgSize/2, cy + bgSize/2, cx + bgSize/2 - r, cy + bgSize/2)
+              ctx.lineTo(cx - bgSize/2 + r, cy + bgSize/2)
+              ctx.quadraticCurveTo(cx - bgSize/2, cy + bgSize/2, cx - bgSize/2, cy + bgSize/2 - r)
+              ctx.lineTo(cx - bgSize/2, cy - bgSize/2 + r)
+              ctx.quadraticCurveTo(cx - bgSize/2, cy - bgSize/2, cx - bgSize/2 + r, cy - bgSize/2)
+              ctx.closePath()
+            } else {
+              ctx.rect(cx - bgSize/2, cy - bgSize/2, bgSize, bgSize)
+            }
+            ctx.fillStyle = styleConf.logoBg === "custom"
+              ? (styleConf.logoBgColor ?? "#FFFFFF")
+              : styleConf.logoBg === "black" ? "#000000" : "#FFFFFF"
+            ctx.fill()
+            ctx.restore()
+          }
+          // Clipping pour le logo
+          ctx.save()
+          ctx.beginPath()
+          if (styleConf.logoShape === "circle") {
+            ctx.arc(cx, cy, size / 2, 0, Math.PI * 2)
+          } else if (styleConf.logoShape === "rounded") {
+            const rr = size * 0.2
+            ctx.moveTo(cx - size/2 + rr, cy - size/2)
+            ctx.lineTo(cx + size/2 - rr, cy - size/2)
+            ctx.quadraticCurveTo(cx + size/2, cy - size/2, cx + size/2, cy - size/2 + rr)
+            ctx.lineTo(cx + size/2, cy + size/2 - rr)
+            ctx.quadraticCurveTo(cx + size/2, cy + size/2, cx + size/2 - rr, cy + size/2)
+            ctx.lineTo(cx - size/2 + rr, cy + size/2)
+            ctx.quadraticCurveTo(cx - size/2, cy + size/2, cx - size/2, cy + size/2 - rr)
+            ctx.lineTo(cx - size/2, cy - size/2 + rr)
+            ctx.quadraticCurveTo(cx - size/2, cy - size/2, cx - size/2 + rr, cy - size/2)
+            ctx.closePath()
+          } else {
+            ctx.rect(cx - size/2, cy - size/2, size, size)
+          }
+          ctx.clip()
+          ctx.drawImage(logoImg, cx - size/2, cy - size/2, size, size)
+          ctx.restore()
+        }
+        logoImg.src = styleConf.logoUrl
+      }
     }
     img.src = buildQRUrl(400)
   }, [qrUrl, fg, bg, corner, ecLevel, styleConf, showModal])
@@ -378,6 +464,33 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setFg(active.foreground_color); setBg(active.background_color)
     setCorner(active.corner_style); setEcLevel(active.error_correction)
     setStyleConf({ ...DEFAULT_STYLE, ...(active.style_config ?? {}) })
+  }
+
+  // Upload logo → Supabase Storage OU data URL si pas encore uploadé
+  async function handleLogoUpload(file: File) {
+    if (!file.type.startsWith("image/")) return
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Logo trop volumineux (max 2 Mo)")
+      return
+    }
+    setLogoUploading(true)
+    try {
+      // Convertir en data URL pour preview immédiate
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string
+        setStyleConf(p => ({ ...p, logoUrl: dataUrl }))
+        // Si ECC n'est pas déjà H, le forcer (effectiveEcc s'en charge automatiquement)
+        setLogoUploading(false)
+      }
+      reader.readAsDataURL(file)
+    } catch {
+      setLogoUploading(false)
+    }
+  }
+
+  function removeLogo() {
+    setStyleConf(p => ({ ...p, logoUrl: "" }))
   }
 
   async function applyToAll() {
@@ -845,6 +958,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             <div style={{ display:"flex", borderBottom:"1px solid rgba(255,255,255,0.05)", padding:"0 8px", flexShrink:0, overflowX:"auto" }}>
               {([
                 ["colors",   "Couleurs", "🎨"],
+                ["logo",     "Logo",     "🖼"],
                 ["style",    "Style",    "✦"],
                 ["corners",  "Coins",    "⬡"],
                 ["advanced", "Avance",   "⚙"],
@@ -958,6 +1072,165 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       })}
                     </div>
                   </div>
+                </div>
+              )}
+
+
+              {/* ── LOGO ─────────────────────────────────────────────────── */}
+              {styleTab === "logo" && (
+                <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+
+                  {/* ECC warning automatique */}
+                  {styleConf.logoUrl && (
+                    <div style={{ display:"flex", alignItems:"center", gap:7, padding:"9px 12px", background:"rgba(201,168,76,0.07)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:9 }}>
+                      <AlertTriangle size={13} color={G}/>
+                      <p style={{ color:G, fontSize:11, margin:0, lineHeight:1.4 }}>
+                        Correction d&apos;erreur forcee a <strong>H</strong> automatiquement pour garantir la scannabilite.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Dropzone / aperçu */}
+                  <div>
+                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Logo central</p>
+
+                    {!styleConf.logoUrl ? (
+                      <div
+                        onClick={() => logoInputRef.current?.click()}
+                        onDragOver={e => { e.preventDefault(); (e.currentTarget as HTMLElement).style.borderColor = G }}
+                        onDragLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.1)" }}
+                        onDrop={e => {
+                          e.preventDefault();
+                          (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.1)"
+                          const file = e.dataTransfer.files[0]
+                          if (file) handleLogoUpload(file)
+                        }}
+                        style={{ border:"2px dashed rgba(255,255,255,0.1)", borderRadius:12, padding:"24px 16px", textAlign:"center" as const, cursor:"pointer", transition:"border-color 0.2s", background:"rgba(255,255,255,0.01)" }}>
+                        <div style={{ fontSize:28, marginBottom:8 }}>{logoUploading ? "⏳" : "🖼"}</div>
+                        <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 4px" }}>
+                          {logoUploading ? "Chargement..." : "Deposer votre logo"}
+                        </p>
+                        <p style={{ color:MUTED, fontSize:10, margin:"0 0 10px" }}>PNG, SVG, WEBP — max 2 Mo</p>
+                        <span style={{ display:"inline-block", padding:"5px 14px", background:"rgba(201,168,76,0.1)", border:"1px solid rgba(201,168,76,0.25)", borderRadius:7, color:G, fontSize:11, fontWeight:600 }}>
+                          Parcourir
+                        </span>
+                        <input ref={logoInputRef} type="file" accept="image/*" style={{ display:"none" }}
+                          onChange={e => { const f = e.target.files?.[0]; if (f) handleLogoUpload(f); e.target.value = "" }}/>
+                      </div>
+                    ) : (
+                      <div style={{ display:"flex", gap:10, alignItems:"center", padding:"12px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:10 }}>
+                        <div style={{ width:48, height:48, borderRadius:8, overflow:"hidden", flexShrink:0, background:"rgba(255,255,255,0.05)", display:"flex", alignItems:"center", justifyContent:"center", border:"1px solid rgba(255,255,255,0.1)" }}>
+                          <img src={styleConf.logoUrl} alt="Logo" style={{ width:"100%", height:"100%", objectFit:"contain" }}/>
+                        </div>
+                        <div style={{ flex:1, minWidth:0 }}>
+                          <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 2px" }}>Logo actif</p>
+                          <p style={{ color:MUTED, fontSize:10, margin:0 }}>ECC force H — scannabilite optimale</p>
+                        </div>
+                        <button type="button" onClick={removeLogo}
+                          style={{ width:30, height:30, background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#FF6B6B", flexShrink:0 }}>
+                          <Trash2 size={13}/>
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Utiliser logo de la page */}
+                    {active.pages && !styleConf.logoUrl && (
+                      <button type="button" onClick={() => {
+                        const pageLogoUrl = (active as any).pages?.logo_url
+                        if (pageLogoUrl) setStyleConf(p => ({ ...p, logoUrl: pageLogoUrl }))
+                        else logoInputRef.current?.click()
+                      }}
+                        style={{ marginTop:8, width:"100%", padding:"8px", background:"rgba(255,255,255,0.02)", border:"1px dashed rgba(255,255,255,0.1)", borderRadius:8, color:MUTED, fontSize:11, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                        <span>🔗</span> Utiliser le logo/avatar de la page
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Options logo (si logo actif) */}
+                  {styleConf.logoUrl && (
+                    <>
+                      {/* Taille */}
+                      <div>
+                        <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
+                          <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Taille du logo</p>
+                          <span style={{ color: (styleConf.logoSize ?? 18) > 25 ? "#FF6B6B" : G, fontSize:11, fontWeight:700 }}>
+                            {styleConf.logoSize ?? 18}%
+                          </span>
+                        </div>
+                        <input type="range" min={10} max={30} step={1} value={styleConf.logoSize ?? 18}
+                          onChange={e => setStyleConf(p => ({ ...p, logoSize: Number(e.target.value) }))}
+                          style={{ width:"100%", accentColor: (styleConf.logoSize ?? 18) > 25 ? "#FF6B6B" : G, cursor:"pointer" }}/>
+                        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:4 }}>
+                          <span style={{ color:MUTED, fontSize:9 }}>10% — Min</span>
+                          <span style={{ color:G, fontSize:9, fontWeight:600 }}>✦ 15-20% recommande</span>
+                          <span style={{ color:MUTED, fontSize:9 }}>30% — Max</span>
+                        </div>
+                        {(styleConf.logoSize ?? 18) > 25 && (
+                          <div style={{ display:"flex", alignItems:"center", gap:6, marginTop:7, padding:"7px 10px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:8 }}>
+                            <AlertTriangle size={12} color="#FF6B6B"/>
+                            <p style={{ color:"#FF6B6B", fontSize:10, margin:0 }}>Logo trop grand — risque de rendre le QR illisible</p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Forme du conteneur */}
+                      <div>
+                        <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Forme du conteneur</p>
+                        <div style={{ display:"flex", gap:6 }}>
+                          {([
+                            { id:"square",  label:"Carre",   icon:"⬛" },
+                            { id:"rounded", label:"Arrondi", icon:"🔲" },
+                            { id:"circle",  label:"Cercle",  icon:"⚪" },
+                          ] as const).map(s => (
+                            <button key={s.id} type="button" onClick={() => setStyleConf(p => ({ ...p, logoShape: s.id }))}
+                              style={{ flex:1, padding:"9px 6px", background:(styleConf.logoShape??"rounded")===s.id?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1px solid ${(styleConf.logoShape??"rounded")===s.id?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:"pointer", textAlign:"center" as const }}>
+                              <div style={{ fontSize:16, marginBottom:3 }}>{s.icon}</div>
+                              <p style={{ color:(styleConf.logoShape??"rounded")===s.id?G:MUTED, fontSize:9, margin:0, fontWeight:(styleConf.logoShape??"rounded")===s.id?700:400 }}>{s.label}</p>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Fond du conteneur */}
+                      <div>
+                        <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Fond du conteneur</p>
+                        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6, marginBottom:8 }}>
+                          {([
+                            { id:"transparent", label:"Transparent" },
+                            { id:"white",       label:"Blanc" },
+                            { id:"black",       label:"Noir" },
+                            { id:"custom",      label:"Personnalise" },
+                          ] as const).map(b => (
+                            <button key={b.id} type="button" onClick={() => setStyleConf(p => ({ ...p, logoBg: b.id }))}
+                              style={{ padding:"7px 8px", background:(styleConf.logoBg??"white")===b.id?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${(styleConf.logoBg??"white")===b.id?"rgba(201,168,76,0.35)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:(styleConf.logoBg??"white")===b.id?G:MUTED, fontSize:10, cursor:"pointer", fontWeight:(styleConf.logoBg??"white")===b.id?700:400 }}>
+                              {b.label}
+                            </button>
+                          ))}
+                        </div>
+                        {styleConf.logoBg === "custom" && (
+                          <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                            <div style={{ position:"relative", width:28, height:28, borderRadius:6, overflow:"hidden", border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }}>
+                              <input type="color" value={styleConf.logoBgColor ?? "#FFFFFF"} onChange={e => setStyleConf(p => ({ ...p, logoBgColor: e.target.value }))}
+                                style={{ position:"absolute", inset:-4, width:"calc(100%+8px)", height:"calc(100%+8px)", cursor:"pointer", border:"none" }}/>
+                            </div>
+                            <input type="text" value={styleConf.logoBgColor ?? "#FFFFFF"} onChange={e => setStyleConf(p => ({ ...p, logoBgColor: e.target.value }))}
+                              style={{ flex:1, background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:7, padding:"6px 8px", color:"#F5F0E8", fontSize:10, fontFamily:"monospace", outline:"none" }}/>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Padding */}
+                      <div>
+                        <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
+                          <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Padding</p>
+                          <span style={{ color:G, fontSize:11, fontWeight:700 }}>{styleConf.logoPadding ?? 4}px</span>
+                        </div>
+                        <input type="range" min={0} max={12} step={1} value={styleConf.logoPadding ?? 4}
+                          onChange={e => setStyleConf(p => ({ ...p, logoPadding: Number(e.target.value) }))}
+                          style={{ width:"100%", accentColor:G, cursor:"pointer" }}/>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
 
