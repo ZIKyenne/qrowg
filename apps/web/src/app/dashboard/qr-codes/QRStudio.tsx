@@ -46,35 +46,35 @@ interface Props {
   appUrl:   string
 }
 
-// ── QR Style Config type ─────────────────────────────────────────────────────
+// -- QR Style Config type -----------------------------------------------------
 type QRStyleConfig = {
-  fg2?:          string    // couleur secondaire (dégradé)
+  fg2?:          string    // couleur secondaire (degrade)
   cornerColor?:  string    // couleur des coins
   eyeColor?:     string    // couleur des yeux (centres)
   transparent?:  boolean   // fond transparent
   gradient?:     "none"|"linear"|"radial"|"diagonal"
-  gradientBg?:   string    // couleur fin de dégradé fond
+  gradientBg?:   string    // couleur fin de degrade fond
   dotStyle?:     "square"|"rounded"|"dot"|"softSquare"|"pixel"|"minimal"|"neon"|"luxury"
   cornerStyle?:  "square"|"rounded"|"circle"|"diamond"|"luxury"|"minimal"
-  margin?:       number    // 0–30
+  margin?:       number    // 0-30
   density?:      "low"|"medium"|"high"
   logoUrl?:      string    // data URL ou URL Supabase
-  logoSize?:     number    // % du QR, 10-30, défaut 18
+  logoSize?:     number    // % du QR, 10-30, defaut 18
   logoShape?:    "square"|"rounded"|"circle"
   logoBg?:       "transparent"|"white"|"black"|"custom"
   logoBgColor?:  string
-  logoPadding?:  number    // px, 0-12, défaut 4
+  logoPadding?:  number    // px, 0-12, defaut 4
 }
 
 const DOT_STYLES: { id: QRStyleConfig["dotStyle"]; label: string; emoji: string }[] = [
-  { id:"square",     label:"Classique",    emoji:"⬛" },
+  { id:"square",     label:"Classique",    emoji:"?" },
   { id:"rounded",    label:"Arrondi",      emoji:"🔵" },
-  { id:"dot",        label:"Dots",         emoji:"⚫" },
+  { id:"dot",        label:"Dots",         emoji:"?" },
   { id:"softSquare", label:"Carres doux",  emoji:"🟦" },
   { id:"pixel",      label:"Pixel",        emoji:"🟧" },
-  { id:"minimal",    label:"Minimal",      emoji:"▪️" },
+  { id:"minimal",    label:"Minimal",      emoji:"?️" },
   { id:"neon",       label:"Neon",         emoji:"💜" },
-  { id:"luxury",     label:"Luxury",       emoji:"✨" },
+  { id:"luxury",     label:"Luxury",       emoji:"?" },
 ]
 
 const CORNER_STYLE_LIST: { id: QRStyleConfig["cornerStyle"]; label: string }[] = [
@@ -101,7 +101,7 @@ const DEFAULT_STYLE: QRStyleConfig = {
   logoBg: "white", logoBgColor: "#FFFFFF", logoPadding: 4,
 }
 
-// ── Bibliothèque de presets premium ──────────────────────────────────────────
+// -- Bibliotheque de presets premium ------------------------------------------
 type Preset = {
   id:       string
   label:    string
@@ -118,79 +118,79 @@ type Preset = {
 }
 
 const PRESET_CATS = [
-  { id:"all",        label:"Tous",       emoji:"✦" },
-  { id:"classic",    label:"Classic",    emoji:"⬛" },
+  { id:"all",        label:"Tous",       emoji:"?" },
+  { id:"classic",    label:"Classic",    emoji:"?" },
   { id:"business",   label:"Business",   emoji:"💼" },
-  { id:"luxury",     label:"Luxury",     emoji:"✨" },
+  { id:"luxury",     label:"Luxury",     emoji:"?" },
   { id:"restaurant", label:"Restaurant", emoji:"🍽" },
   { id:"nightlife",  label:"Nightlife",  emoji:"🌙" },
   { id:"creator",    label:"Creator",    emoji:"🎨" },
   { id:"realestate", label:"Immobilier", emoji:"🏠" },
   { id:"event",      label:"Event",      emoji:"🎉" },
-  { id:"minimal",    label:"Minimal",    emoji:"▪️" },
+  { id:"minimal",    label:"Minimal",    emoji:"?️" },
   { id:"neon",       label:"Neon",       emoji:"💜" },
 ]
 
 const PRESETS: Preset[] = [
-  // ── Classic ────────────────────────────────────────────────────────────────
+  // -- Classic ----------------------------------------------------------------
   { id:"classic-black",   label:"Classic Black",  cat:"classic",    fg:"#080808", bg:"#FFFFFF", plan:"free"     },
   { id:"midnight-gold",   label:"Midnight Gold",  cat:"classic",    fg:"#C9A84C", bg:"#080808", plan:"free"     },
   { id:"snow-white",      label:"Snow White",     cat:"classic",    fg:"#1A1A1A", bg:"#F8F8F8", plan:"free"     },
 
-  // ── Business ───────────────────────────────────────────────────────────────
+  // -- Business ---------------------------------------------------------------
   { id:"emerald-biz",     label:"Emerald Biz",    cat:"business",   fg:"#00C896", bg:"#001A12", plan:"pro"      },
   { id:"cobalt-pro",      label:"Cobalt Pro",     cat:"business",   fg:"#0078D4", bg:"#FFFFFF", plan:"pro"      },
   { id:"slate-corp",      label:"Slate Corp",     cat:"business",   fg:"#64748B", bg:"#F1F5F9", plan:"pro"      },
   { id:"tech-matrix",     label:"Tech Matrix",    cat:"business",   fg:"#00FF41", bg:"#0D0D0D", dotStyle:"dot",  plan:"pro" },
 
-  // ── Luxury ─────────────────────────────────────────────────────────────────
+  // -- Luxury -----------------------------------------------------------------
   { id:"luxury-gold",     label:"Luxury Gold",    cat:"luxury",     fg:"#C9A84C", bg:"#1A1200", plan:"business" },
   { id:"royal-purple",    label:"Royal Purple",   cat:"luxury",     fg:"#7B61FF", bg:"#0A0015", plan:"business" },
   { id:"carbon-fiber",    label:"Carbon Fiber",   cat:"luxury",     fg:"#F5F0E8", bg:"#1A1A1A", plan:"business" },
   { id:"champagne",       label:"Champagne",      cat:"luxury",     fg:"#D4AF37", bg:"#FAF7F0", gradient:"linear", fg2:"#B8960C", plan:"business" },
   { id:"obsidian",        label:"Obsidian",       cat:"luxury",     fg:"#C0C0C0", bg:"#0A0A0A", cornerStyle:"rounded", plan:"business" },
 
-  // ── Restaurant ─────────────────────────────────────────────────────────────
+  // -- Restaurant -------------------------------------------------------------
   { id:"restaurant-red",  label:"Restaurant Red", cat:"restaurant", fg:"#E63946", bg:"#FFF8F8", plan:"free"     },
   { id:"coffee-brown",    label:"Coffee Brown",   cat:"restaurant", fg:"#6B3F2A", bg:"#FDF6EE", plan:"free"     },
   { id:"bistro-noir",     label:"Bistro Noir",    cat:"restaurant", fg:"#2D2D2D", bg:"#F5F0E0", plan:"pro"      },
   { id:"saffron-spice",   label:"Saffron Spice",  cat:"restaurant", fg:"#FF9500", bg:"#1A0D00", gradient:"radial", fg2:"#FF6B00", plan:"pro" },
 
-  // ── Nightlife ──────────────────────────────────────────────────────────────
+  // -- Nightlife --------------------------------------------------------------
   { id:"cocktail-sunset", label:"Cocktail Sunset",cat:"nightlife",  fg:"#FF6B35", bg:"#1A0800", gradient:"linear", fg2:"#FF0080", plan:"pro" },
   { id:"velvet-night",    label:"Velvet Night",   cat:"nightlife",  fg:"#FF2D78", bg:"#0D0008", plan:"pro"      },
   { id:"arctic-blue",     label:"Arctic Blue",    cat:"nightlife",  fg:"#00D4FF", bg:"#001A1F", plan:"pro"      },
   { id:"festival-purple", label:"Festival Purple",cat:"nightlife",  fg:"#BF5FFF", bg:"#0D0020", gradient:"radial", fg2:"#FF2D78", plan:"business" },
 
-  // ── Creator ────────────────────────────────────────────────────────────────
+  // -- Creator ----------------------------------------------------------------
   { id:"beauty-rose",     label:"Beauty Rose",    cat:"creator",    fg:"#FF5CA8", bg:"#1A0010", plan:"pro"      },
   { id:"creator-coral",   label:"Creator Coral",  cat:"creator",    fg:"#FF6B6B", bg:"#FFF5F5", plan:"pro"      },
   { id:"retro-amber",     label:"Retro Amber",    cat:"creator",    fg:"#FFAA00", bg:"#1A0F00", dotStyle:"rounded", plan:"pro" },
   { id:"wedding-cream",   label:"Wedding Cream",  cat:"creator",    fg:"#C9A84C", bg:"#FFFFF0", cornerStyle:"rounded", plan:"business" },
 
-  // ── Immobilier ─────────────────────────────────────────────────────────────
+  // -- Immobilier -------------------------------------------------------------
   { id:"navy-realestate", label:"Real Estate Navy",cat:"realestate", fg:"#1B3A5C", bg:"#F0F4F8", plan:"pro"     },
   { id:"forest-green",    label:"Forest Green",   cat:"realestate", fg:"#2D6A4F", bg:"#F0F7F4", plan:"pro"      },
   { id:"marble-luxe",     label:"Marble Luxe",    cat:"realestate", fg:"#8B7355", bg:"#FAFAFA",  cornerStyle:"rounded", plan:"business" },
 
-  // ── Event ──────────────────────────────────────────────────────────────────
+  // -- Event ------------------------------------------------------------------
   { id:"event-gold",      label:"Event Gold",     cat:"event",      fg:"#FFD700", bg:"#0D0D00", gradient:"radial", fg2:"#FF8C00", plan:"pro" },
   { id:"confetti",        label:"Confetti",       cat:"event",      fg:"#FF2D78", bg:"#FFF0F5", dotStyle:"dot",  plan:"pro"      },
 
-  // ── Minimal ────────────────────────────────────────────────────────────────
+  // -- Minimal ----------------------------------------------------------------
   { id:"minimal-ink",     label:"Minimal Ink",    cat:"minimal",    fg:"#1A1A1A", bg:"#FAFAFA", plan:"free"     },
   { id:"minimal-gray",    label:"Minimal Gray",   cat:"minimal",    fg:"#6B7280", bg:"#F9FAFB", cornerStyle:"rounded", plan:"free" },
 
-  // ── Neon ───────────────────────────────────────────────────────────────────
+  // -- Neon -------------------------------------------------------------------
   { id:"neon-green",      label:"Neon Green",     cat:"neon",       fg:"#39FF8F", bg:"#0A0A0A", plan:"pro"      },
   { id:"neon-pink",       label:"Neon Pink",      cat:"neon",       fg:"#FF2D78", bg:"#0D0008", dotStyle:"dot",  plan:"pro"      },
   { id:"neon-cyber",      label:"Neon Cyber",     cat:"neon",       fg:"#00FFFF", bg:"#001A1A", gradient:"linear", fg2:"#7B61FF", plan:"business" },
 ]
 
 const CORNER_STYLES = [
-  { id: "square",  label: "Carre",   icon: "⬛" },
+  { id: "square",  label: "Carre",   icon: "?" },
   { id: "rounded", label: "Arrondi", icon: "🔲" },
-  { id: "dot",     label: "Points",  icon: "⚫" },
+  { id: "dot",     label: "Points",  icon: "?" },
 ]
 
 const EC_LEVELS = [
@@ -202,7 +202,7 @@ const EC_LEVELS = [
 
 const PLAN_RANK: Record<string, number> = { free: 0, pro: 1, business: 2 }
 
-// ── Statuts pages (pour l'affichage de la page liée)
+// -- Statuts pages (pour l'affichage de la page liee)
 const STATUS_CFG: Record<string, { label: string; dot: string; badge: string; text: string }> = {
   published: { label: "Publie",    dot: "#39FF8F", badge: "rgba(57,255,143,0.12)",  text: "#39FF8F" },
   draft:     { label: "Brouillon", dot: "#8A8478", badge: "rgba(138,132,120,0.12)", text: "#8A8478" },
@@ -210,7 +210,7 @@ const STATUS_CFG: Record<string, { label: string; dot: string; badge: string; te
   paused:    { label: "En pause",  dot: "#FF6B6B", badge: "rgba(255,107,107,0.12)", text: "#FF6B6B" },
 }
 
-// ── Statuts QR Code
+// -- Statuts QR Code
 const QR_STATUS_CFG: Record<string, { label: string; dot: string; badge: string; text: string; desc: string }> = {
   active:   { label: "Actif",     dot: "#39FF8F", badge: "rgba(57,255,143,0.12)",  text: "#39FF8F", desc: "Redirection normale" },
   draft:    { label: "Brouillon", dot: "#8A8478", badge: "rgba(138,132,120,0.12)", text: "#8A8478", desc: "Visible dans le dashboard uniquement" },
@@ -229,7 +229,7 @@ const SURF  = "#0F0E0B"
 const BG    = "#080808"
 
 function formatDate(iso: string | null): string {
-  if (!iso) return "—"
+  if (!iso) return "--"
   const d = new Date(iso), now = new Date()
   const diff = Math.floor((now.getTime() - d.getTime()) / 60000)
   if (diff < 60)   return `il y a ${diff}min`
@@ -260,7 +260,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [expIncludeUrl, setExpIncludeUrl] = useState(false)
   const [expExporting,  setExpExporting]  = useState(false)
   const [expCopied,     setExpCopied]     = useState<string | null>(null)
-  // ── Types stats ─────────────────────────────────────────────────────────
+  // -- Types stats ---------------------------------------------------------
   type QRStats = {
     total: number; current: number; prev: number; evolution: number
     last_scan: string | null; top_device: string | null; top_country: string | null
@@ -274,7 +274,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [statsLoading,  setStatsLoading]  = useState(false)
   const [statsPeriod,   setStatsPeriod]   = useState<7|30>(7)
   const [statsExporting,setStatsExporting]= useState(false)
-  // ── Destination states ───────────────────────────────────────────────
+  // -- Destination states -----------------------------------------------
   type DestEntry = { type:string; value:string; url?:string; label?:string|null; set_at?:string|null }
   const [destMode,    setDestMode]    = useState<"view"|"edit">("view")
   const [destType,    setDestType]    = useState<"page"|"url"|"file"|"email"|"phone"|"whatsapp">("page")
@@ -287,7 +287,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [destHistory, setDestHistory] = useState<DestEntry[]>([])
   const [destConfirm, setDestConfirm] = useState(false)
   const [destCopied,  setDestCopied]  = useState(false)
-  // ── QR Status states ─────────────────────────────────────────────────
+  // -- QR Status states -------------------------------------------------
   const [qrStatusLoading,setQrStatusLoading]= useState<string | null>(null)
   const [pauseMsg,       setPauseMsg]       = useState("")
   const [showPauseMsgEdit,setShowPauseMsgEdit]=useState(false)
@@ -334,7 +334,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   }, [activeId])
 
   // Construire l'URL QR en tenant compte du style_config
-  // ECC forcé H si logo actif (logo masque des modules QR)
+  // ECC force H si logo actif (logo masque des modules QR)
   const effectiveEcc = styleConf.logoUrl ? "H" : ecLevel
 
   function buildQRUrl(size: number): string {
@@ -355,7 +355,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       canvas.width = 400; canvas.height = 400
       ctx.clearRect(0, 0, 400, 400)
 
-      // Fond (dégradé ou uni)
+      // Fond (degrade ou uni)
       if (!styleConf.transparent) {
         if (styleConf.gradient !== "none" && styleConf.gradientBg) {
           let grad: CanvasGradient
@@ -387,7 +387,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         ctx.closePath(); ctx.clip()
       }
 
-      // Dégradé sur le QR
+      // Degrade sur le QR
       if (styleConf.gradient !== "none" && styleConf.fg2) {
         ctx.globalCompositeOperation = "source-over"
         let grad: CanvasGradient
@@ -412,7 +412,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
       if (corner === "rounded") ctx.restore()
 
-      // ── Dessin du logo central ───────────────────────────────────────
+      // -- Dessin du logo central ---------------------------------------
       if (styleConf.logoUrl) {
         const logoImg  = new Image()
         logoImg.crossOrigin = "anonymous"
@@ -509,7 +509,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setCopyQRId(id); setTimeout(() => setCopyQRId(null), 2000)
   }
 
-  // ── Calcul contraste WCAG ─────────────────────────────────────────────────
+  // -- Calcul contraste WCAG -------------------------------------------------
   function hexToRgb(hex: string): [number,number,number] {
     const h = hex.replace("#","")
     return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]
@@ -526,7 +526,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const lMax = Math.max(l1,l2), lMin = Math.min(l1,l2)
     return (lMax+0.05)/(lMin+0.05)
   }
-  // ── Moteur de scannabilite complet ──────────────────────────────────────────
+  // -- Moteur de scannabilite complet ------------------------------------------
   type ScanIssue = {
     id:       string
     severity: "critical"|"warning"|"info"
@@ -553,26 +553,26 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const fgHex = diagFg || fg || "#080808"
     const bgHex = diagBg || bg || "#FFFFFF"
 
-    // ── 1. Contraste QR/fond ──────────────────────────────────────────────────
+    // -- 1. Contraste QR/fond --------------------------------------------------
     const ratio = contrastRatio(fgHex, bgHex)
     if (ratio < 2) {
       issues.push({ id:"contrast-critical", severity:"critical",
-        title:"Contraste insuffisant", detail:`Ratio ${ratio.toFixed(1)}:1 — le QR sera illisible sur la plupart des scanners.`,
+        title:"Contraste insuffisant", detail:`Ratio ${ratio.toFixed(1)}:1 -- le QR sera illisible sur la plupart des scanners.`,
         fix:"Passer en noir sur blanc", fixable:true })
       score -= 35
     } else if (ratio < 3) {
       issues.push({ id:"contrast-low", severity:"critical",
-        title:"Contraste trop faible", detail:`Ratio ${ratio.toFixed(1)}:1 — moins de 50% des scanners liront ce QR.`,
+        title:"Contraste trop faible", detail:`Ratio ${ratio.toFixed(1)}:1 -- moins de 50% des scanners liront ce QR.`,
         fix:"Renforcer le contraste", fixable:true })
       score -= 25
     } else if (ratio < 4.5) {
       issues.push({ id:"contrast-warn", severity:"warning",
-        title:"Contraste moyen", detail:`Ratio ${ratio.toFixed(1)}:1 — privilegiez 4.5:1 minimum pour le print.`,
+        title:"Contraste moyen", detail:`Ratio ${ratio.toFixed(1)}:1 -- privilegiez 4.5:1 minimum pour le print.`,
         fix:"Renforcer le contraste", fixable:true })
       score -= 12
     }
 
-    // ── 2. Fond transparent risqué ────────────────────────────────────────────
+    // -- 2. Fond transparent risque --------------------------------------------
     if (styleConf.transparent) {
       issues.push({ id:"transparent", severity:"warning",
         title:"Fond transparent", detail:"Le fond transparent peut rendre le QR illisible sur les surfaces colorees.",
@@ -580,17 +580,17 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       score -= 10
     }
 
-    // ── 3. Logo trop grand ────────────────────────────────────────────────────
+    // -- 3. Logo trop grand ----------------------------------------------------
     if (styleConf.logoUrl) {
       const logoSize = styleConf.logoSize ?? 18
       if (logoSize > 25) {
         issues.push({ id:"logo-big", severity:"critical",
-          title:"Logo trop grand", detail:`${logoSize}% du QR est masque — max recommande : 25%.`,
+          title:"Logo trop grand", detail:`${logoSize}% du QR est masque -- max recommande : 25%.`,
           fix:"Reduire le logo a 20%", fixable:true })
         score -= 20
       } else if (logoSize > 20) {
         issues.push({ id:"logo-warn", severity:"warning",
-          title:"Logo un peu grand", detail:`${logoSize}% — recommande : 15-20%.`,
+          title:"Logo un peu grand", detail:`${logoSize}% -- recommande : 15-20%.`,
           fix:"Reduire le logo a 18%", fixable:true })
         score -= 8
       }
@@ -603,7 +603,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       }
     }
 
-    // ── 4. Correction d'erreur faible sans logo ───────────────────────────────
+    // -- 4. Correction d'erreur faible sans logo -------------------------------
     if (!styleConf.logoUrl) {
       if (ecLevel === "L") {
         issues.push({ id:"ecc-l", severity:"warning",
@@ -613,21 +613,21 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       }
     }
 
-    // ── 5. Marge insuffisante ─────────────────────────────────────────────────
+    // -- 5. Marge insuffisante -------------------------------------------------
     const margin = styleConf.margin ?? 10
     if (margin < 4) {
       issues.push({ id:"margin-none", severity:"critical",
-        title:"Marge trop petite", detail:`Marge ${margin}px — minimum 4 modules (10px) requis pour la decouverte.`,
+        title:"Marge trop petite", detail:`Marge ${margin}px -- minimum 4 modules (10px) requis pour la decouverte.`,
         fix:"Ajouter une marge de 12px", fixable:true })
       score -= 18
     } else if (margin < 8) {
       issues.push({ id:"margin-low", severity:"warning",
-        title:"Marge reduite", detail:`Marge ${margin}px — 10px+ recommande pour l'impression.`,
+        title:"Marge reduite", detail:`Marge ${margin}px -- 10px+ recommande pour l'impression.`,
         fix:"Ajouter une marge de 10px", fixable:true })
       score -= 6
     }
 
-    // ── 6. Style trop complexe ────────────────────────────────────────────────
+    // -- 6. Style trop complexe ------------------------------------------------
     const dotStyle = styleConf.dotStyle ?? "square"
     if (dotStyle === "neon" || dotStyle === "luxury") {
       issues.push({ id:"style-complex", severity:"warning",
@@ -636,7 +636,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       score -= 6
     }
 
-    // ── 7. Couleurs trop proches (QR ~ fond) ──────────────────────────────────
+    // -- 7. Couleurs trop proches (QR ~ fond) ----------------------------------
     const fgComponents = hexToRgb(fgHex)
     const bgComponents = hexToRgb(bgHex)
     const colorDist = Math.sqrt(
@@ -646,17 +646,17 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     )
     if (colorDist < 60 && ratio >= 3) {
       issues.push({ id:"colors-close", severity:"info",
-        title:"Couleurs proches", detail:"La distance chromatique est faible — peut poser probleme sur ecrans a faible gamme.",
+        title:"Couleurs proches", detail:"La distance chromatique est faible -- peut poser probleme sur ecrans a faible gamme.",
         fix:null, fixable:false })
       score -= 4
     }
 
-    // ── 8. Degrades risques ───────────────────────────────────────────────────
+    // -- 8. Degrades risques ---------------------------------------------------
     if (styleConf.gradient !== "none" && styleConf.fg2) {
       const ratio2 = contrastRatio(styleConf.fg2, bgHex)
       if (ratio2 < 3) {
         issues.push({ id:"gradient-contrast", severity:"warning",
-          title:"Degrade — couleur secondaire peu contrastee",
+          title:"Degrade -- couleur secondaire peu contrastee",
           detail:`La couleur fin de degrade a un contraste de ${ratio2.toFixed(1)}:1 avec le fond.`,
           fix:"Supprimer le degrade", fixable:true })
         score -= 10
@@ -672,7 +672,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     return { score, grade, gradeColor, issues, ratio: ratio.toFixed(1), minSize, canAutoFix }
   }
 
-  // Compat getDiagnostic (utilisé dans la modal)
+  // Compat getDiagnostic (utilise dans la modal)
   function getDiagnostic(fgHex: string, bgHex: string) {
     if (!fgHex || !bgHex) return null
     const ratio   = contrastRatio(fgHex, bgHex)
@@ -684,7 +684,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     return { ratio: ratio.toFixed(1), percent, readability, readColor, minSize, warnContrast, warnLow }
   }
 
-  // Canvas modal plein écran
+  // Canvas modal plein ecran
   const drawModalCanvas = useCallback(() => {
     if (!canvasModalRef.current || !qrUrl) return
     const canvas = canvasModalRef.current
@@ -706,7 +706,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         } else { ctx.fillStyle = bg }
         ctx.fillRect(0, 0, 800, 800)
       }
-      // QR dégradé
+      // QR degrade
       if (styleConf.gradient !== "none" && styleConf.fg2) {
         ctx.drawImage(img, 0, 0, 800, 800)
         const grad = styleConf.gradient === "radial"
@@ -771,10 +771,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
   useEffect(() => { setDiagFg(fg); setDiagBg(bg) }, [fg, bg])
 
-  // Score scannabilité calculé à chaque changement de config
+  // Score scannabilite calcule a chaque changement de config
   const scanScore = active ? computeScannability() : null
 
-  // Charger stats QR au changement de sélection ou période
+  // Charger stats QR au changement de selection ou periode
   useEffect(() => {
     if (!activeId) return
     setStats(null)
@@ -859,13 +859,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
   }, [active, fg, bg, corner, ecLevel, styleConf])
 
-  // ── Nom de fichier auto ────────────────────────────────────────────────────
+  // -- Nom de fichier auto ----------------------------------------------------
   function getFilename(ext: string): string {
     const base = expFilename.trim() || active?.pages?.title?.replace(/[^a-z0-9]/gi, "-").toLowerCase() || active?.short_code || "qr"
     return `${base}.${ext}`
   }
 
-  // ── Construire canvas export à la taille voulue (avec logo) ────────────────
+  // -- Construire canvas export a la taille voulue (avec logo) ----------------
   async function buildExportCanvas(px: number, transparent: boolean): Promise<HTMLCanvasElement> {
     return new Promise((resolve, reject) => {
       const canvas = document.createElement("canvas")
@@ -873,7 +873,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       const ctx    = canvas.getContext("2d")!
       const margin = expMargin
 
-      // URL QR à la bonne taille
+      // URL QR a la bonne taille
       const fgH  = fg.replace("#","")
       const bgH  = transparent ? "ffffff00" : (styleConf.transparent ? "ffffff00" : bg.replace("#",""))
       const url  = `https://api.qrserver.com/v1/create-qr-code/?size=${px}x${px}&data=${encodeURIComponent(qrUrl)}&color=${fgH}&bgcolor=ffffff&ecc=${effectiveEcc}&margin=${margin}`
@@ -893,7 +893,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           } else { ctx.fillStyle = bg }
           ctx.fillRect(0, 0, px, px)
         }
-        // QR + dégradé
+        // QR + degrade
         if (styleConf.gradient !== "none" && styleConf.fg2) {
           ctx.drawImage(img, 0, 0, px, px)
           const grad = styleConf.gradient === "radial"
@@ -966,7 +966,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     })
   }
 
-  // ── Fonctions QR Status ──────────────────────────────────────────────────────
+  // -- Fonctions QR Status ------------------------------------------------------
   async function changeQRStatus(qrId: string, action: string, extra?: Record<string, any>) {
     setQrStatusLoading(qrId)
     try {
@@ -982,7 +982,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           : q
         ))
         if (activeId === qrId && d.status) {
-          // Mettre à jour le qr actif
+          // Mettre a jour le qr actif
         }
       }
     } catch {}
@@ -1012,7 +1012,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setMenuId(null)
   }
 
-  // ── Auto-fix scannabilité ────────────────────────────────────────────────────
+  // -- Auto-fix scannabilite ----------------------------------------------------
   function autoFix() {
     if (!scanScore) return
     let newFg = fg; let newBg = bg; let newEc = ecLevel
@@ -1026,7 +1026,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           newFg = "#080808"; newBg = "#FFFFFF"
           break
         case "contrast-warn":
-          // Assombrir fg si fond clair, éclaircir si fond sombre
+          // Assombrir fg si fond clair, eclaircir si fond sombre
           newFg = parseInt(bg.replace("#","").slice(0,2),16) > 128 ? "#000000" : "#FFFFFF"
           break
         case "transparent":
@@ -1056,12 +1056,12 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setFg(newFg); setBg(newBg); setEcLevel(newEc); setStyleConf(newStyleConf)
   }
 
-  // ── Fonctions destination dynamique ─────────────────────────────────────────
+  // -- Fonctions destination dynamique -----------------------------------------
   const DEST_TYPES = [
     { id:"page",     label:"Page QRfolio", icon:"📄", ph:"ID ou slug de la page" },
     { id:"url",      label:"URL externe",  icon:"🌐", ph:"https://mon-site.com"  },
     { id:"file",     label:"Fichier",      icon:"📎", ph:"https://drive.google.com/..." },
-    { id:"email",    label:"Email",        icon:"✉️",  ph:"contact@mon-site.com" },
+    { id:"email",    label:"Email",        icon:"?️",  ph:"contact@mon-site.com" },
     { id:"phone",    label:"Telephone",    icon:"📞", ph:"+33 6 12 34 56 78"    },
     { id:"whatsapp", label:"WhatsApp",     icon:"💬", ph:"+33612345678"          },
   ]
@@ -1119,14 +1119,14 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setDestCopied(true); setTimeout(()=>setDestCopied(false), 2000)
   }
 
-  // ── Templates supports imprimables ─────────────────────────────────────────
+  // -- Templates supports imprimables -----------------------------------------
   type SuppTpl = {
     id: string; label: string; emoji: string; w: number; h: number
     plan: string; cat: string; desc: string
   }
 
   const SUPP_TPLS: SuppTpl[] = [
-    { id:"qr-only",     label:"QR seul",           emoji:"⬛", w:800,  h:800,  plan:"free",     cat:"Base",       desc:"QR Code sans decoration" },
+    { id:"qr-only",     label:"QR seul",           emoji:"?", w:800,  h:800,  plan:"free",     cat:"Base",       desc:"QR Code sans decoration" },
     { id:"a4-poster",   label:"Affiche A4",         emoji:"📋", w:795,  h:1122, plan:"free",     cat:"Print",      desc:"Portrait A4 avec titre et fond" },
     { id:"flyer",       label:"Flyer",              emoji:"📄", w:795,  h:561,  plan:"free",     cat:"Print",      desc:"Demi A4 paysage" },
     { id:"sticker",     label:"Sticker vitrine",    emoji:"🏷️",  w:600,  h:600,  plan:"free",     cat:"Print",      desc:"Carre 6cm avec cadre" },
@@ -1138,7 +1138,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     { id:"post",        label:"Post Instagram",     emoji:"🟫", w:1080, h:1080, plan:"business", cat:"Social",     desc:"Carre 1:1" },
   ]
 
-  // ── Rendu d'un support sur canvas ────────────────────────────────────────
+  // -- Rendu d'un support sur canvas ----------------------------------------
   async function renderSupport(
     canvas: HTMLCanvasElement,
     tpl: SuppTpl,
@@ -1168,13 +1168,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     // Charger le QR
     const qrImg = await loadImg(opts.qrDataUrl).catch(() => null)
 
-    // ── QR seul ────────────────────────────────────────────────────────────
+    // -- QR seul ------------------------------------------------------------
     if (tpl.id === "qr-only") {
       if (qrImg) ctx.drawImage(qrImg, 0, 0, w, h)
       return
     }
 
-    // ── Fond commun ────────────────────────────────────────────────────────
+    // -- Fond commun --------------------------------------------------------
     if (tpl.id === "story" || tpl.id === "post") {
       const grad = ctx.createLinearGradient(0, 0, 0, h)
       grad.addColorStop(0, bgColor); grad.addColorStop(1, isDark ? "#0A0A0A" : "#E8E8E8")
@@ -1184,20 +1184,20 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     }
     ctx.fillRect(0, 0, w, h)
 
-    // ── Bande de couleur latérale (sauf social) ────────────────────────────
+    // -- Bande de couleur laterale (sauf social) ----------------------------
     if (!["story","post","qr-only"].includes(tpl.id)) {
       ctx.fillStyle = fgColor
       const bw = Math.round(w * 0.04)
       ctx.fillRect(0, 0, bw, h)
     }
 
-    // ── Templates spécifiques ─────────────────────────────────────────────
+    // -- Templates specifiques ---------------------------------------------
     const pad    = Math.round(w * 0.06)
     const bw     = Math.round(w * 0.04)  // largeur bande
 
     const drawQR = (x: number, y: number, size: number) => {
       if (!qrImg) return
-      // Fond blanc derrière le QR si fond sombre
+      // Fond blanc derriere le QR si fond sombre
       if (isDark) {
         ctx.fillStyle = "#FFFFFF"
         const margin = Math.round(size * 0.04)
@@ -1225,7 +1225,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       ctx.fillRect(x, y, lineW, Math.max(3, Math.round(w * 0.005)))
     }
 
-    // ── A4 Poster ──────────────────────────────────────────────────────────
+    // -- A4 Poster ----------------------------------------------------------
     if (tpl.id === "a4-poster") {
       const qrSize = Math.round(w * 0.52)
       const qrX    = bw + pad
@@ -1238,7 +1238,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       ctx.fillStyle = accentCol; ctx.fillRect(bw, h - Math.round(h*0.04), w - bw, Math.round(h*0.04))
     }
 
-    // ── Flyer ──────────────────────────────────────────────────────────────
+    // -- Flyer --------------------------------------------------------------
     else if (tpl.id === "flyer") {
       const qrSize = Math.round(h * 0.72)
       const qrX    = w - qrSize - pad
@@ -1251,7 +1251,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       drawQR(qrX, qrY, qrSize)
     }
 
-    // ── Sticker ────────────────────────────────────────────────────────────
+    // -- Sticker ------------------------------------------------------------
     else if (tpl.id === "sticker") {
       const r = Math.round(w * 0.08)
       ctx.save(); ctx.beginPath()
@@ -1274,7 +1274,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       drawSub(opts.subtitle, w/2, Math.round(h * 0.88), Math.round(w * 0.038), accentCol, "center")
     }
 
-    // ── Carte de table ─────────────────────────────────────────────────────
+    // -- Carte de table -----------------------------------------------------
     else if (tpl.id === "table-card") {
       const qrSize = Math.round(h * 0.7)
       const qrY    = Math.round((h - qrSize) / 2)
@@ -1289,7 +1289,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       drawQR(qrX, qrY, qrSize)
     }
 
-    // ── Menu QR ────────────────────────────────────────────────────────────
+    // -- Menu QR ------------------------------------------------------------
     else if (tpl.id === "menu-qr") {
       const headerH = Math.round(h * 0.22)
       ctx.fillStyle = fgColor; ctx.fillRect(0, 0, w, headerH)
@@ -1301,7 +1301,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       ctx.fillStyle = fgColor; ctx.fillRect(0, h - Math.round(h*0.035), w, Math.round(h*0.035))
     }
 
-    // ── Carte de visite ────────────────────────────────────────────────────
+    // -- Carte de visite ----------------------------------------------------
     else if (tpl.id === "business") {
       const qrSize  = Math.round(h * 0.72)
       const qrX     = w - qrSize - pad
@@ -1316,7 +1316,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       drawQR(qrX, qrY, qrSize)
     }
 
-    // ── Badge événement ────────────────────────────────────────────────────
+    // -- Badge evenement ----------------------------------------------------
     else if (tpl.id === "event-badge") {
       const qrSize  = Math.round(h * 0.68)
       const qrX     = Math.round(w * 0.52)
@@ -1329,7 +1329,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       drawQR(qrX, qrY, qrSize)
     }
 
-    // ── Story Instagram ────────────────────────────────────────────────────
+    // -- Story Instagram ----------------------------------------------------
     else if (tpl.id === "story") {
       const qrSize  = Math.round(w * 0.55)
       const qrY     = Math.round(h * 0.35)
@@ -1345,7 +1345,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       ctx.fillRect(Math.round(w*0.1), Math.round(h*0.87), Math.round(w*0.8), Math.round(h*0.005))
     }
 
-    // ── Post Instagram ─────────────────────────────────────────────────────
+    // -- Post Instagram -----------------------------------------------------
     else if (tpl.id === "post") {
       const qrSize  = Math.round(w * 0.52)
       ctx.fillStyle = fgColor + "18"; ctx.fillRect(0, 0, w, h)
@@ -1359,14 +1359,14 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     }
   }
 
-  // ── Générer preview support ───────────────────────────────────────────────
+  // -- Generer preview support -----------------------------------------------
   async function previewSupport() {
     const canvas = supportCanvasRef.current; if (!canvas) return
     const tpl    = SUPP_TPLS.find(t => t.id === suppTplId)
     if (!tpl) return
     setSuppRendered(false)
     try {
-      // Générer le QR à la bonne taille
+      // Generer le QR a la bonne taille
       const qrPx    = Math.min(tpl.w, tpl.h)
       const qrUrl2  = buildQRUrl(qrPx)
       const qrImg   = new Image(); qrImg.crossOrigin = "anonymous"
@@ -1374,7 +1374,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       const tmpC    = document.createElement("canvas")
       tmpC.width = qrPx; tmpC.height = qrPx
       const tmpCtx  = tmpC.getContext("2d")!
-      // Dessiner QR avec fond/dégradé/logo
+      // Dessiner QR avec fond/degrade/logo
       tmpCtx.fillStyle = bg; tmpCtx.fillRect(0, 0, qrPx, qrPx)
       tmpCtx.drawImage(qrImg, 0, 0, qrPx, qrPx)
       if (styleConf.logoUrl) {
@@ -1391,7 +1391,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     } catch { setSuppRendered(false) }
   }
 
-  // ── Export support ────────────────────────────────────────────────────────
+  // -- Export support --------------------------------------------------------
   async function exportSupport(fmt: "png"|"pdf") {
     const tpl = SUPP_TPLS.find(t => t.id === suppTplId); if (!tpl) return
     setSuppExporting(true)
@@ -1437,7 +1437,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setSuppExporting(false)
   }
 
-    // ── Export principal ───────────────────────────────────────────────────────
+    // -- Export principal -------------------------------------------------------
   async function runExport() {
     if (!active || expExporting) return
     if (scanScore && scanScore.score < 30) {
@@ -1461,9 +1461,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         URL.revokeObjectURL(url)
 
       } else if (expFormat === "pdf") {
-        // PDF via canvas → data URL → lien download (simple iframe)
+        // PDF via canvas -> data URL -> lien download (simple iframe)
         const dataUrl = canvas.toDataURL("image/png", 1.0)
-        // Créer un PDF A4 avec le QR centré via jsPDF-like en pur canvas
+        // Creer un PDF A4 avec le QR centre via jsPDF-like en pur canvas
         const pdfCanvas = document.createElement("canvas")
         const dpi = 96; const a4w = Math.round(8.27 * dpi); const a4h = Math.round(11.69 * dpi)
         pdfCanvas.width = a4w; pdfCanvas.height = a4h
@@ -1495,7 +1495,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setExpExporting(false)
   }
 
-  // ── Copier image dans le presse-papier ────────────────────────────────────
+  // -- Copier image dans le presse-papier ------------------------------------
   async function copyImageToClipboard() {
     if (!active) return
     try {
@@ -1509,7 +1509,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     } catch { setExpCopied("img-err"); setTimeout(() => setExpCopied(null), 2000) }
   }
 
-  // ── Copier SVG texte ──────────────────────────────────────────────────────
+  // -- Copier SVG texte ------------------------------------------------------
   async function copySVG() {
     if (!active) return
     try {
@@ -1537,7 +1537,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setSelectedCat("all")
   }
 
-  // Upload logo → Supabase Storage OU data URL si pas encore uploadé
+  // Upload logo -> Supabase Storage OU data URL si pas encore uploade
   async function handleLogoUpload(file: File) {
     if (!file.type.startsWith("image/")) return
     if (file.size > 2 * 1024 * 1024) {
@@ -1546,12 +1546,12 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     }
     setLogoUploading(true)
     try {
-      // Convertir en data URL pour preview immédiate
+      // Convertir en data URL pour preview immediate
       const reader = new FileReader()
       reader.onload = (e) => {
         const dataUrl = e.target?.result as string
         setStyleConf(p => ({ ...p, logoUrl: dataUrl }))
-        // Si ECC n'est pas déjà H, le forcer (effectiveEcc s'en charge automatiquement)
+        // Si ECC n'est pas deja H, le forcer (effectiveEcc s'en charge automatiquement)
         setLogoUploading(false)
       }
       reader.readAsDataURL(file)
@@ -1569,7 +1569,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     if (!canAccess) { setUpsellPreset(preset.id); return }
     setFg(preset.fg)
     setBg(preset.bg)
-    // Sync corner state legacy (utilisé pour le clipping canvas)
+    // Sync corner state legacy (utilise pour le clipping canvas)
     if (preset.cornerStyle === "rounded" || preset.dotStyle === "rounded") setCorner("rounded")
     else if (preset.dotStyle === "dot") setCorner("dot")
     else setCorner("square")
@@ -1597,7 +1597,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       const t  = qr.pages?.title?.toLowerCase() ?? ""
       const c  = qr.short_code?.toLowerCase() ?? ""
       const qs = qr.status ?? "active"
-      // Masquer les archivés sauf si filtre explicite ou showArchived
+      // Masquer les archives sauf si filtre explicite ou showArchived
       if (qs === "archived" && filterSt !== "archived" && !showArchived) return false
       return (!search || t.includes(search.toLowerCase()) || c.includes(search.toLowerCase()))
         && (filterSt === "all" || qs === filterSt)
@@ -1632,7 +1632,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     <div style={{ display:"grid", gridTemplateColumns:"280px 1fr 300px", gap:0, height:"calc(100vh - 140px)", background:BG, borderRadius:16, border:"1px solid rgba(201,168,76,0.1)", overflow:"hidden", fontFamily:"DM Sans, sans-serif", position:"relative" }}>
 
 
-      {/* ── Modal preview plein écran ─────────────────────────────────────────── */}
+      {/* -- Modal preview plein ecran ------------------------------------------- */}
       {showModal && (
         <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.92)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:2000, padding:32 }}
           onClick={() => setShowModal(false)}>
@@ -1643,7 +1643,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", width:"100%" }}>
               <div>
                 <p style={{ color:"#F5F0E8", fontSize:16, fontWeight:700, margin:"0 0 3px" }}>{active?.pages?.title}</p>
-                <p style={{ color:"#8A8478", fontSize:11, margin:0 }}>Scannez pour tester • {appUrl}/q/{active?.short_code}</p>
+                <p style={{ color:"#8A8478", fontSize:11, margin:0 }}>Scannez pour tester * {appUrl}/q/{active?.short_code}</p>
               </div>
               <button type="button" onClick={() => setShowModal(false)}
                 style={{ width:36, height:36, background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#8A8478" }}>
@@ -1698,7 +1698,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         </div>
       )}
 
-      {/* ── Modale suppression ────────────────────────────────────────────────── */}
+      {/* -- Modale suppression -------------------------------------------------- */}
       {confirmId !== null && (
         <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.75)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1000, padding:20 }} onClick={() => setConfirmId(null)}>
           <div style={{ background:"#111009", border:"1px solid rgba(255,107,107,0.3)", borderRadius:16, padding:28, maxWidth:380, width:"100%", fontFamily:"DM Sans, sans-serif" }} onClick={e => e.stopPropagation()}>
@@ -1722,7 +1722,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         <div style={{ position:"fixed", inset:0, zIndex:90 }} onClick={() => setMenuId(null)}/>
       )}
 
-      {/* ── COL 1 : Liste ────────────────────────────────────────────────────── */}
+      {/* -- COL 1 : Liste ------------------------------------------------------ */}
       <div style={{ borderRight:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", overflow:"hidden" }}>
 
         {/* Header + filtres */}
@@ -1847,7 +1847,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   </div>
                 )}
 
-                {/* Actions rapides si sélectionné */}
+                {/* Actions rapides si selectionne */}
                 {isA && (
                   <div style={{ display:"flex", gap:5, marginTop:8, paddingTop:8, borderTop:"1px solid rgba(255,255,255,0.04)" }}
                     onClick={e => e.stopPropagation()}>
@@ -1871,7 +1871,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         </div>
       </div>
 
-      {/* ── COL 2 : Preview premium ──────────────────────────────────────────── */}
+      {/* -- COL 2 : Preview premium -------------------------------------------- */}
       <div style={{ display:"flex", flexDirection:"column", overflow:"hidden", background:"#0A0907" }}>
         {active ? (() => {
           const diag = getDiagnostic(diagFg || fg, diagBg || bg)
@@ -1969,7 +1969,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                     <div style={{ width:7, height:7, borderRadius:"50%", background:getDestStatusColor(destOverride) }}/>
                     <p style={{ color:"#8A8478", fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:0 }}>
-                      Destination {destOverride ? "• Modifiee" : "• Page par defaut"}
+                      Destination {destOverride ? "* Modifiee" : "* Page par defaut"}
                     </p>
                   </div>
                   <div style={{ display:"flex", gap:4 }}>
@@ -2020,12 +2020,12 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   {/* Message dynamique */}
                   {!destOverride && (
                     <p style={{ color:"rgba(138,132,120,0.6)", fontSize:9, margin:"5px 0 0", lineHeight:1.5 }}>
-                      ♻️ Ce QR est dynamique : changez la destination sans reimprimer.
+                      ?️ Ce QR est dynamique : changez la destination sans reimprimer.
                     </p>
                   )}
                 </div>
 
-                {/* Formulaire édition */}
+                {/* Formulaire edition */}
                 {destMode === "edit" && (
                   <div style={{ padding:"0 16px 12px", display:"flex", flexDirection:"column", gap:8 }}>
 
@@ -2126,7 +2126,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                             </div>
                             <button type="button" onClick={() => restoreDest(i)} disabled={destLoading}
                               style={{ padding:"2px 7px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:5, color:"#C9A84C", fontSize:8, cursor:"pointer", flexShrink:0 }}>
-                              ↩
+                              ?
                             </button>
                           </div>
                         )
@@ -2202,7 +2202,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     <div style={{ height:"100%", width:`${scanScore.score}%`, background:`linear-gradient(90deg,${scanScore.gradeColor}80,${scanScore.gradeColor})`, borderRadius:2, transition:"width 0.5s ease" }}/>
                   </div>
 
-                  {/* Liste des problèmes */}
+                  {/* Liste des problemes */}
                   {scanScore.issues.length > 0 && (
                     <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
                       {scanScore.issues.map(issue => (
@@ -2215,7 +2215,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                             <p style={{ color:"#8A8478", fontSize:9, margin:0, lineHeight:1.5 }}>{issue.detail}</p>
                             {issue.fix && (
                               <p style={{ color:`${issue.severity==="critical"?"#FF6B6B":"#F97316"}`, fontSize:9, margin:"3px 0 0", fontWeight:600 }}>
-                                ✦ {issue.fix}
+                                ? {issue.fix}
                               </p>
                             )}
                           </div>
@@ -2227,7 +2227,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               )}
 
               
-{/* ── Performance QR ───────────────────────────────────────── */}
+{/* -- Performance QR ----------------------------------------- */}
               <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"14px 16px" }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
                   <div style={{ display:"flex", alignItems:"center", gap:6 }}>
@@ -2274,9 +2274,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         },
                         { label:"Top appareil", value: stats.top_device
                             ? ({"mobile":"📱 Mobile","desktop":"🖥 Desktop","tablet":"📟 Tablet"} as any)[stats.top_device] ?? stats.top_device
-                            : "—",
+                            : "--",
                           color:"#F5F0E8", sub:null },
-                        { label:"Top pays",    value:stats.top_country ? `🌍 ${stats.top_country}` : "—", color:"#F5F0E8", sub:null },
+                        { label:"Top pays",    value:stats.top_country ? `🌍 ${stats.top_country}` : "--", color:"#F5F0E8", sub:null },
                       ].map((k,i) => (
                         <div key={i} style={{ background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.06)", borderRadius:8, padding:"8px 10px" }}>
                           <p style={{ color:MUTED, fontSize:8, textTransform:"uppercase", letterSpacing:1, margin:"0 0 3px" }}>{k.label}</p>
@@ -2321,7 +2321,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         )}
       </div>
 
-      {/* ── COL 3 : Personnalisation premium ──────────────────────────────────── */}
+      {/* -- COL 3 : Personnalisation premium ------------------------------------ */}
       <div style={{ borderLeft:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", overflow:"hidden" }}>
 
         {/* Tabs principaux Style/Export */}
@@ -2337,14 +2337,14 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         {activeTab === "style" && active && (
           <div style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
 
-            {/* Sous-tabs Couleurs/Style/Coins/Avancé */}
+            {/* Sous-tabs Couleurs/Style/Coins/Avance */}
             <div style={{ display:"flex", borderBottom:"1px solid rgba(255,255,255,0.05)", padding:"0 8px", flexShrink:0, overflowX:"auto" }}>
               {([
                 ["colors",   "Couleurs", "🎨"],
                 ["logo",     "Logo",     "🖼"],
-                ["style",    "Style",    "✦"],
-                ["corners",  "Coins",    "⬡"],
-                ["advanced", "Avance",   "⚙"],
+                ["style",    "Style",    "?"],
+                ["corners",  "Coins",    "?"],
+                ["advanced", "Avance",   "?"],
               ] as const).map(([id,label,emoji]) => (
                 <button key={id} type="button" onClick={() => setStyleTab(id)}
                   style={{ padding:"8px 10px", background:"none", border:"none", borderBottom:styleTab===id?`2px solid ${G}`:"2px solid transparent", color:styleTab===id?G:MUTED, fontSize:10, fontWeight:styleTab===id?700:500, cursor:"pointer", whiteSpace:"nowrap" as const, display:"flex", alignItems:"center", gap:4 }}>
@@ -2355,7 +2355,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
             <div style={{ flex:1, overflowY:"auto", padding:"14px" }}>
 
-              {/* ── COULEURS ────────────────────────────────────────────────── */}
+              {/* -- COULEURS -------------------------------------------------- */}
               {styleTab === "colors" && (
                 <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
@@ -2380,7 +2380,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </div>
                   </div>
 
-                  {/* Couleurs avancées */}
+                  {/* Couleurs avancees */}
                   <div>
                     <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Couleurs avancees</p>
                     <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
@@ -2397,7 +2397,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                               style={{ position:"absolute", inset:-4, width:"calc(100%+8px)", height:"calc(100%+8px)", cursor:"pointer", border:"none" }}/>
                           </div>
                           <input type="text" value={c.val} onChange={e => setStyleConf(p => ({ ...p, [c.key]: e.target.value }))}
-                            placeholder="#——"
+                            placeholder="#----"
                             style={{ width:72, background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"5px 7px", color:c.val?"#F5F0E8":MUTED, fontSize:10, fontFamily:"monospace", outline:"none" }}/>
                         </div>
                       ))}
@@ -2416,7 +2416,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </button>
                   </div>
 
-                  {/* Dégradé */}
+                  {/* Degrade */}
                   <div>
                     <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Degrade</p>
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
@@ -2429,11 +2429,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </div>
                   </div>
 
-                  {/* ── Bibliothèque de presets ──────────────────── */}
+                  {/* -- Bibliotheque de presets -------------------- */}
                   <div>
                     <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Bibliotheque de presets</p>
 
-                    {/* Filtres catégorie */}
+                    {/* Filtres categorie */}
                     <div style={{ display:"flex", gap:4, overflowX:"auto", paddingBottom:8, marginBottom:10 }}>
                       {PRESET_CATS.map(cat => (
                         <button key={cat.id} type="button" onClick={() => setSelectedCat(cat.id)}
@@ -2517,7 +2517,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               )}
 
 
-              {/* ── LOGO ─────────────────────────────────────────────────── */}
+              {/* -- LOGO --------------------------------------------------- */}
               {styleTab === "logo" && (
                 <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
@@ -2531,7 +2531,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </div>
                   )}
 
-                  {/* Dropzone / aperçu */}
+                  {/* Dropzone / apercu */}
                   <div>
                     <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Logo central</p>
 
@@ -2547,11 +2547,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           if (file) handleLogoUpload(file)
                         }}
                         style={{ border:"2px dashed rgba(255,255,255,0.1)", borderRadius:12, padding:"24px 16px", textAlign:"center" as const, cursor:"pointer", transition:"border-color 0.2s", background:"rgba(255,255,255,0.01)" }}>
-                        <div style={{ fontSize:28, marginBottom:8 }}>{logoUploading ? "⏳" : "🖼"}</div>
+                        <div style={{ fontSize:28, marginBottom:8 }}>{logoUploading ? "?" : "🖼"}</div>
                         <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 4px" }}>
                           {logoUploading ? "Chargement..." : "Deposer votre logo"}
                         </p>
-                        <p style={{ color:MUTED, fontSize:10, margin:"0 0 10px" }}>PNG, SVG, WEBP — max 2 Mo</p>
+                        <p style={{ color:MUTED, fontSize:10, margin:"0 0 10px" }}>PNG, SVG, WEBP -- max 2 Mo</p>
                         <span style={{ display:"inline-block", padding:"5px 14px", background:"rgba(201,168,76,0.1)", border:"1px solid rgba(201,168,76,0.25)", borderRadius:7, color:G, fontSize:11, fontWeight:600 }}>
                           Parcourir
                         </span>
@@ -2565,7 +2565,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         </div>
                         <div style={{ flex:1, minWidth:0 }}>
                           <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 2px" }}>Logo actif</p>
-                          <p style={{ color:MUTED, fontSize:10, margin:0 }}>ECC force H — scannabilite optimale</p>
+                          <p style={{ color:MUTED, fontSize:10, margin:0 }}>ECC force H -- scannabilite optimale</p>
                         </div>
                         <button type="button" onClick={removeLogo}
                           style={{ width:30, height:30, background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#FF6B6B", flexShrink:0 }}>
@@ -2602,14 +2602,14 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           onChange={e => setStyleConf(p => ({ ...p, logoSize: Number(e.target.value) }))}
                           style={{ width:"100%", accentColor: (styleConf.logoSize ?? 18) > 25 ? "#FF6B6B" : G, cursor:"pointer" }}/>
                         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:4 }}>
-                          <span style={{ color:MUTED, fontSize:9 }}>10% — Min</span>
-                          <span style={{ color:G, fontSize:9, fontWeight:600 }}>✦ 15-20% recommande</span>
-                          <span style={{ color:MUTED, fontSize:9 }}>30% — Max</span>
+                          <span style={{ color:MUTED, fontSize:9 }}>10% -- Min</span>
+                          <span style={{ color:G, fontSize:9, fontWeight:600 }}>? 15-20% recommande</span>
+                          <span style={{ color:MUTED, fontSize:9 }}>30% -- Max</span>
                         </div>
                         {(styleConf.logoSize ?? 18) > 25 && (
                           <div style={{ display:"flex", alignItems:"center", gap:6, marginTop:7, padding:"7px 10px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:8 }}>
                             <AlertTriangle size={12} color="#FF6B6B"/>
-                            <p style={{ color:"#FF6B6B", fontSize:10, margin:0 }}>Logo trop grand — risque de rendre le QR illisible</p>
+                            <p style={{ color:"#FF6B6B", fontSize:10, margin:0 }}>Logo trop grand -- risque de rendre le QR illisible</p>
                           </div>
                         )}
                       </div>
@@ -2619,9 +2619,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Forme du conteneur</p>
                         <div style={{ display:"flex", gap:6 }}>
                           {([
-                            { id:"square",  label:"Carre",   icon:"⬛" },
+                            { id:"square",  label:"Carre",   icon:"?" },
                             { id:"rounded", label:"Arrondi", icon:"🔲" },
-                            { id:"circle",  label:"Cercle",  icon:"⚪" },
+                            { id:"circle",  label:"Cercle",  icon:"?" },
                           ] as const).map(s => (
                             <button key={s.id} type="button" onClick={() => setStyleConf(p => ({ ...p, logoShape: s.id }))}
                               style={{ flex:1, padding:"9px 6px", background:(styleConf.logoShape??"rounded")===s.id?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1px solid ${(styleConf.logoShape??"rounded")===s.id?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:"pointer", textAlign:"center" as const }}>
@@ -2675,7 +2675,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 </div>
               )}
 
-              {/* ── STYLE QR ────────────────────────────────────────────────── */}
+              {/* -- STYLE QR -------------------------------------------------- */}
               {styleTab === "style" && (
                 <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                   <div>
@@ -2701,7 +2701,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 </div>
               )}
 
-              {/* ── COINS ───────────────────────────────────────────────────── */}
+              {/* -- COINS ----------------------------------------------------- */}
               {styleTab === "corners" && (
                 <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                   <div>
@@ -2746,7 +2746,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 </div>
               )}
 
-              {/* ── AVANCÉ ──────────────────────────────────────────────────── */}
+              {/* -- AVANCE ---------------------------------------------------- */}
               {styleTab === "advanced" && (
                 <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
@@ -2783,7 +2783,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </div>
                   </div>
 
-                  {/* Densité visuelle */}
+                  {/* Densite visuelle */}
                   <div>
                     <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Densite visuelle</p>
                     <div style={{ display:"flex", gap:6 }}>
@@ -2795,7 +2795,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       ))}
                     </div>
                     <p style={{ color:MUTED, fontSize:10, margin:"6px 0 0", lineHeight:1.5 }}>
-                      Une densite forte augmente la complexite — preferer ECC H.
+                      Une densite forte augmente la complexite -- preferer ECC H.
                     </p>
                   </div>
 
@@ -2824,14 +2824,14 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           </div>
         )}
 
-        {/* ── Export tab ────────────────────────────────────────────────────── */}
+        {/* -- Export tab ------------------------------------------------------ */}
         {activeTab === "supports" && active && (() => {
           const tpl = SUPP_TPLS.find(t => t.id === suppTplId) ?? SUPP_TPLS[0]
           const canTpl = PLAN_RANK[userPlan] >= PLAN_RANK[tpl.plan]
           return (
           <div style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
 
-            {/* ── Sélecteur templates ──────────────────────────────────── */}
+            {/* -- Selecteur templates ------------------------------------ */}
             <div style={{ padding:"10px 12px", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
               <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Support</p>
               <div style={{ display:"flex", flexDirection:"column", gap:4, maxHeight:220, overflowY:"auto" }}>
@@ -2864,7 +2864,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
             <div style={{ flex:1, overflowY:"auto", padding:"12px" }}>
 
-              {/* ── Textes ───────────────────────────────────────────── */}
+              {/* -- Textes --------------------------------------------- */}
               <div style={{ marginBottom:12 }}>
                 <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Textes</p>
                 <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
@@ -2875,7 +2875,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none", boxSizing:"border-box" as const }}/>
                   </div>
                   <div>
-                    <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Sous-titre / Appel à l&apos;action</label>
+                    <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Sous-titre / Appel a l&apos;action</label>
                     <select value={suppSubtitle} onChange={e => { setSuppSubtitle(e.target.value); setSuppRendered(false) }}
                       style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                       {[
@@ -2892,11 +2892,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 </div>
               </div>
 
-              {/* ── Preview ──────────────────────────────────────────── */}
+              {/* -- Preview -------------------------------------------- */}
               <div style={{ marginBottom:12 }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
                   <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Apercu</p>
-                  <span style={{ color:MUTED, fontSize:9 }}>{tpl.w}×{tpl.h}px</span>
+                  <span style={{ color:MUTED, fontSize:9 }}>{tpl.w}?{tpl.h}px</span>
                 </div>
 
                 <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:10, padding:12, display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
@@ -2928,7 +2928,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 </div>
               </div>
 
-              {/* ── Export ───────────────────────────────────────────── */}
+              {/* -- Export --------------------------------------------- */}
               {canTpl && (
                 <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
                   <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 2px" }}>Exporter</p>
@@ -2959,16 +2959,16 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           }
           const fmt = FORMAT_CFG[expFormat] ?? FORMAT_CFG["png"]
           const RECO = [
-            { emoji:"🌐", label:"Web",           fmt:"png",   size:1024, note:"PNG 1024px — standard" },
+            { emoji:"🌐", label:"Web",           fmt:"png",   size:1024, note:"PNG 1024px -- standard" },
             { emoji:"🖨️", label:"Impression",    fmt:"pdf",   size:2048, note:"PDF / SVG 2048px+" },
             { emoji:"🏷️",  label:"Sticker",      fmt:"png-t", size:1024, note:"PNG transparent 1024px" },
-            { emoji:"📱",  label:"Reseaux",       fmt:"png",   size:512,  note:"PNG 512px — leger" },
+            { emoji:"📱",  label:"Reseaux",       fmt:"png",   size:512,  note:"PNG 512px -- leger" },
           ]
           return (
           <div style={{ flex:1, overflowY:"auto", padding:"14px" }}>
             <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
-              {/* ── Recommandations ────────────────────────────────────────── */}
+              {/* -- Recommandations ------------------------------------------ */}
               <div>
                 <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>
                   Recommandations
@@ -2989,7 +2989,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 </div>
               </div>
 
-              {/* ── Format ─────────────────────────────────────────────────── */}
+              {/* -- Format --------------------------------------------------- */}
               <div>
                 <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Format</p>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:5 }}>
@@ -3013,7 +3013,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 </div>
               </div>
 
-              {/* ── Taille ─────────────────────────────────────────────────── */}
+              {/* -- Taille --------------------------------------------------- */}
               <div>
                 <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Taille</p>
                 <div style={{ display:"flex", gap:5, flexWrap:"wrap" as const, marginBottom:8 }}>
@@ -3039,12 +3039,12 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   </div>
                 )}
                 <p style={{ color:MUTED, fontSize:10, margin:"5px 0 0" }}>
-                  Export : <strong style={{ color:G }}>{realPx}×{realPx}px</strong>
+                  Export : <strong style={{ color:G }}>{realPx}?{realPx}px</strong>
                   {(expIncludeName || expIncludeUrl) && " + bandeau"}
                 </p>
               </div>
 
-              {/* ── Options ────────────────────────────────────────────────── */}
+              {/* -- Options -------------------------------------------------- */}
               <div>
                 <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Options</p>
                 <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
@@ -3103,10 +3103,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 </div>
               </div>
 
-              {/* ── Actions ────────────────────────────────────────────────── */}
+              {/* -- Actions -------------------------------------------------- */}
               <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
 
-                {/* Bouton principal Télécharger */}
+                {/* Bouton principal Telecharger */}
                 <button type="button" onClick={runExport} disabled={expExporting}
                   style={{ padding:"11px", background:`linear-gradient(90deg,${fmt.color},${fmt.color}cc)`, border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:expExporting?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7, opacity:expExporting?0.7:1 }}>
                   {expExporting
@@ -3146,7 +3146,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               {!canPro && (
                 <div style={{ padding:"12px 14px", background:"rgba(201,168,76,0.05)", border:"1px solid rgba(201,168,76,0.15)", borderRadius:10 }}>
                   <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 4px" }}>Formats HD + SVG + PDF</p>
-                  <p style={{ color:MUTED, fontSize:10, margin:"0 0 8px" }}>Pro: PNG alpha, WEBP, SVG · Business: PDF A4</p>
+                  <p style={{ color:MUTED, fontSize:10, margin:"0 0 8px" }}>Pro: PNG alpha, WEBP, SVG . Business: PDF A4</p>
                   <a href="/dashboard/upgrade" style={{ display:"block", textAlign:"center" as const, padding:"7px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius:7, color:"#080808", fontSize:11, fontWeight:700, textDecoration:"none" }}>
                     Voir les plans
                   </a>
