@@ -2215,7 +2215,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                             <p style={{ color:"#8A8478", fontSize:9, margin:0, lineHeight:1.5 }}>{issue.detail}</p>
                             {issue.fix && (
                               <p style={{ color:`${issue.severity==="critical"?"#FF6B6B":"#F97316"}`, fontSize:9, margin:"3px 0 0", fontWeight:600 }}>
-                                ? {issue.fix}
+                                {issue.fix}
                               </p>
                             )}
                           </div>
