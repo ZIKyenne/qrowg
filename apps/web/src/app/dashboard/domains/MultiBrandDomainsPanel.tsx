@@ -83,7 +83,7 @@ export default function MultiBrandDomainsPanel({ domains, plan, onSetPrimary, on
     setDeleting(null)
   }
 
-  function DomainCard({ rec, isPrimary }: { rec: DomainRecord; isPrimary: boolean }) {
+  function DomainCard({ rec, isPrimary, hasPrimary }: { rec: DomainRecord; isPrimary: boolean; hasPrimary: boolean }) {
     return (
       <div style={{ background: isPrimary ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.02)", border: isPrimary ? "1px solid rgba(201,168,76,0.25)" : "1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"14px 16px", transition:"all 0.15s" }}>
         <div style={{ display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>
@@ -99,7 +99,12 @@ export default function MultiBrandDomainsPanel({ domains, plan, onSetPrimary, on
               <span style={{ color:"#F5F0E8", fontSize:13, fontWeight:700 }}>{rec.domain}</span>
               {isPrimary && (
                 <span style={{ background:"rgba(201,168,76,0.15)", border:"1px solid rgba(201,168,76,0.3)", borderRadius:6, padding:"2px 8px", fontSize:9, color:G, fontWeight:700, textTransform:"uppercase", letterSpacing:1 }}>
-                  Principal
+                  ⭐ Principal
+                </span>
+              )}
+              {!isPrimary && rec.verified && hasPrimary && (
+                <span style={{ background:"rgba(56,189,248,0.1)", border:"1px solid rgba(56,189,248,0.2)", borderRadius:6, padding:"2px 8px", fontSize:9, color:"#38BDF8", fontWeight:600 }}>
+                  → 301 vers principal
                 </span>
               )}
               <StatusBadge status={rec.vercel_status} verified={rec.verified}/>
@@ -194,7 +199,7 @@ export default function MultiBrandDomainsPanel({ domains, plan, onSetPrimary, on
             Domaine principal
           </p>
           {primary ? (
-            <DomainCard rec={primary} isPrimary={true}/>
+            <DomainCard rec={primary} isPrimary={true} hasPrimary={true}/>
           ) : (
             <div style={{ padding:"12px 14px", background:"rgba(255,255,255,0.02)", border:"1px dashed rgba(255,255,255,0.08)", borderRadius:10 }}>
               <p style={{ color:MUTED, fontSize:12, margin:0 }}>
@@ -211,12 +216,17 @@ export default function MultiBrandDomainsPanel({ domains, plan, onSetPrimary, on
       {/* Domaines secondaires (Business) */}
       {isBusiness && secondary.length > 0 && (
         <div style={{ marginBottom:16 }}>
-          <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>
-            Domaines secondaires ({secondary.length})
-          </p>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
+            <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>
+              Domaines secondaires ({secondary.length})
+            </p>
+            {primary && (
+              <span style={{ color:"#38BDF8", fontSize:10 }}>301 → {primary.domain}</span>
+            )}
+          </div>
           <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
             {secondary.map(rec => (
-              <DomainCard key={rec.id} rec={rec} isPrimary={false}/>
+              <DomainCard key={rec.id} rec={rec} isPrimary={false} hasPrimary={!!primary}/>
             ))}
           </div>
         </div>
@@ -226,7 +236,7 @@ export default function MultiBrandDomainsPanel({ domains, plan, onSetPrimary, on
       {!isBusiness && domains.length > 0 && !primary && (
         <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
           {domains.map(rec => (
-            <DomainCard key={rec.id} rec={rec} isPrimary={false}/>
+            <DomainCard key={rec.id} rec={rec} isPrimary={false} hasPrimary={!!primary}/>
           ))}
         </div>
       )}

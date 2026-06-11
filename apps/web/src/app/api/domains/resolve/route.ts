@@ -14,6 +14,31 @@ export async function GET(req: NextRequest) {
     const supabase = createAdminClient()
     const appUrl   = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrfolio.app"
 
+    // ── Étape -1: domaine secondaire → redirection vers principal ──────────────
+    // Si ce domaine n'est pas principal et qu'un principal existe, rediriger
+    const { data: domainVerif } = await supabase
+      .from("domain_verifications")
+      .select("is_primary, user_id")
+      .eq("domain", domain)
+      .eq("verified", true)
+      .maybeSingle()
+
+    if (domainVerif && !domainVerif.is_primary) {
+      // Chercher le domaine principal de cet user
+      const { data: primaryDomain } = await supabase
+        .from("domain_verifications")
+        .select("domain")
+        .eq("user_id", domainVerif.user_id)
+        .eq("is_primary", true)
+        .maybeSingle()
+
+      if (primaryDomain) {
+        const path = req.nextUrl.searchParams.get("path") ?? "/"
+        const dest = `https://${primaryDomain.domain}${path !== "/" ? path : ""}`
+        return NextResponse.redirect(dest, { status: 301 })
+      }
+    }
+
     // ── Étape 0: vérifier les redirections ──────────────────────────────────────
     const path = req.nextUrl.searchParams.get("path") ?? "/"
 

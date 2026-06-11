@@ -130,19 +130,51 @@ export async function POST(req: NextRequest) {
   // ── Action: définir domaine principal ────────────────────────────────────
   if (action === "set_primary") {
     if (!domain) return NextResponse.json({ error: "domain requis" }, { status: 400 })
-    // Retirer is_primary de tous les domaines de l'user
+
+    // 1. Récupérer tous les domaines vérifiés de l'user
+    const { data: allDomains } = await supabase
+      .from("domain_verifications")
+      .select("domain, is_primary")
+      .eq("user_id", user.id)
+      .eq("verified", true)
+
+    // 2. Retirer is_primary partout
     await supabase
       .from("domain_verifications")
       .update({ is_primary: false })
       .eq("user_id", user.id)
-    // Définir le nouveau primaire
+
+    // 3. Définir le nouveau principal
     const { error: pe } = await supabase
       .from("domain_verifications")
       .update({ is_primary: true })
       .eq("domain", domain)
       .eq("user_id", user.id)
     if (pe) return NextResponse.json({ error: pe.message }, { status: 500 })
-    return NextResponse.json({ ok: true })
+
+    // 4. Créer des redirections 301 automatiques:
+    //    tous les autres domaines vérifiés → domaine principal
+    const otherDomains = (allDomains ?? []).filter(d => d.domain !== domain)
+
+    for (const other of otherDomains) {
+      await supabase
+        .from("domain_redirects")
+        .upsert({
+          user_id:       user.id,
+          from_domain:   other.domain,
+          from_path:     "/",
+          to_url:        `https://${domain}`,
+          redirect_type: 301,
+          label:         `Auto — redirection vers domaine principal ${domain}`,
+          enabled:       true,
+        }, { onConflict: "from_domain,from_path" })
+    }
+
+    return NextResponse.json({
+      ok:             true,
+      primary:        domain,
+      redirected:     otherDomains.map(d => d.domain),
+    })
   }
 
   // ── Action: ajouter ──────────────────────────────────────────────────────
