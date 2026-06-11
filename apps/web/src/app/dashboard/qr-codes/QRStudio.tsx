@@ -7,7 +7,8 @@ import {
   Palette, Settings, Share2, ExternalLink, Copy,
   RotateCcw, Loader, Search, Trash2, Archive,
   MoreVertical, AlertTriangle, X,
-  Image, FileText, Maximize2, Clipboard, Sliders
+  Image, FileText, Maximize2, Clipboard, Sliders,
+  Printer, LayoutGrid
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
@@ -225,7 +226,7 @@ function formatDate(iso: string | null): string {
 export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: Props) {
   const [qrCodes,    setQRCodes]    = useState<QRCode[]>(initialQRCodes)
   const [activeId,   setActiveId]   = useState<string | null>(initialQRCodes[0]?.id ?? null)
-  const [activeTab,  setActiveTab]  = useState<"style" | "export">("style")
+  const [activeTab,  setActiveTab]  = useState<"style" | "supports" | "export">("style")
   const [fg,         setFg]         = useState("")
   const [bg,         setBg]         = useState("")
   const [corner,     setCorner]     = useState<"square"|"rounded"|"dot">("square")
@@ -244,7 +245,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [expIncludeUrl, setExpIncludeUrl] = useState(false)
   const [expExporting,  setExpExporting]  = useState(false)
   const [expCopied,     setExpCopied]     = useState<string | null>(null)
-  const exportCanvasRef = useRef<HTMLCanvasElement>(null)
+  const exportCanvasRef   = useRef<HTMLCanvasElement>(null)
+  const supportCanvasRef  = useRef<HTMLCanvasElement>(null)
+  const [suppTplId,   setSuppTplId]   = useState("a4-poster")
+  const [suppTitle,   setSuppTitle]   = useState("")
+  const [suppSubtitle,setSuppSubtitle]= useState("Scannez pour voir le menu")
+  const [suppRendered,setSuppRendered]= useState(false)
+  const [suppExporting,setSuppExporting]=useState(false)
   const [saving,     setSaving]     = useState(false)
   const [saved,      setSaved]      = useState(false)
   const [copied,     setCopied]     = useState<"link"|"short"|null>(null)
@@ -690,7 +697,325 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     })
   }
 
-  // ── Export principal ───────────────────────────────────────────────────────
+  // ── Templates supports imprimables ─────────────────────────────────────────
+  type SuppTpl = {
+    id: string; label: string; emoji: string; w: number; h: number
+    plan: string; cat: string; desc: string
+  }
+
+  const SUPP_TPLS: SuppTpl[] = [
+    { id:"qr-only",     label:"QR seul",           emoji:"⬛", w:800,  h:800,  plan:"free",     cat:"Base",       desc:"QR Code sans decoration" },
+    { id:"a4-poster",   label:"Affiche A4",         emoji:"📋", w:795,  h:1122, plan:"free",     cat:"Print",      desc:"Portrait A4 avec titre et fond" },
+    { id:"flyer",       label:"Flyer",              emoji:"📄", w:795,  h:561,  plan:"free",     cat:"Print",      desc:"Demi A4 paysage" },
+    { id:"sticker",     label:"Sticker vitrine",    emoji:"🏷️",  w:600,  h:600,  plan:"free",     cat:"Print",      desc:"Carre 6cm avec cadre" },
+    { id:"table-card",  label:"Carte de table",     emoji:"🪧",  w:900,  h:506,  plan:"pro",      cat:"Restaurant", desc:"Format paysage 9x5cm" },
+    { id:"menu-qr",     label:"Menu QR",            emoji:"🍽",  w:600,  h:900,  plan:"pro",      cat:"Restaurant", desc:"Carte portrait avec titre menu" },
+    { id:"business",    label:"Carte de visite",    emoji:"💳", w:1063, h:591,  plan:"pro",      cat:"Business",   desc:"Format CR80 standard" },
+    { id:"event-badge", label:"Badge evenement",    emoji:"🎫", w:680,  h:400,  plan:"pro",      cat:"Event",      desc:"Badge horizontal 85x50mm" },
+    { id:"story",       label:"Story Instagram",    emoji:"📱", w:1080, h:1920, plan:"business", cat:"Social",     desc:"9:16 vertical stories" },
+    { id:"post",        label:"Post Instagram",     emoji:"🟫", w:1080, h:1080, plan:"business", cat:"Social",     desc:"Carre 1:1" },
+  ]
+
+  // ── Rendu d'un support sur canvas ────────────────────────────────────────
+  async function renderSupport(
+    canvas: HTMLCanvasElement,
+    tpl: SuppTpl,
+    opts: { title: string; subtitle: string; qrDataUrl: string; logoUrl?: string; scale?: number }
+  ): Promise<void> {
+    const sc  = opts.scale ?? 1
+    const w   = Math.round(tpl.w * sc)
+    const h   = Math.round(tpl.h * sc)
+    canvas.width  = w
+    canvas.height = h
+    const ctx = canvas.getContext("2d")!
+    ctx.clearRect(0, 0, w, h)
+
+    const fgColor  = fg || "#080808"
+    const bgColor  = bg || "#FFFFFF"
+    const isDark   = parseInt(bgColor.replace("#","").slice(0,2), 16) < 128
+    const textCol  = isDark ? "#F5F0E8" : "#1A1A1A"
+    const accentCol= fgColor
+    const gold     = "#C9A84C"
+
+    const loadImg  = (src: string): Promise<HTMLImageElement> =>
+      new Promise((res, rej) => {
+        const i = new Image(); i.crossOrigin = "anonymous"
+        i.onload = () => res(i); i.onerror = () => rej(); i.src = src
+      })
+
+    // Charger le QR
+    const qrImg = await loadImg(opts.qrDataUrl).catch(() => null)
+
+    // ── QR seul ────────────────────────────────────────────────────────────
+    if (tpl.id === "qr-only") {
+      if (qrImg) ctx.drawImage(qrImg, 0, 0, w, h)
+      return
+    }
+
+    // ── Fond commun ────────────────────────────────────────────────────────
+    if (tpl.id === "story" || tpl.id === "post") {
+      const grad = ctx.createLinearGradient(0, 0, 0, h)
+      grad.addColorStop(0, bgColor); grad.addColorStop(1, isDark ? "#0A0A0A" : "#E8E8E8")
+      ctx.fillStyle = grad
+    } else {
+      ctx.fillStyle = bgColor
+    }
+    ctx.fillRect(0, 0, w, h)
+
+    // ── Bande de couleur latérale (sauf social) ────────────────────────────
+    if (!["story","post","qr-only"].includes(tpl.id)) {
+      ctx.fillStyle = fgColor
+      const bw = Math.round(w * 0.04)
+      ctx.fillRect(0, 0, bw, h)
+    }
+
+    // ── Templates spécifiques ─────────────────────────────────────────────
+    const pad    = Math.round(w * 0.06)
+    const bw     = Math.round(w * 0.04)  // largeur bande
+
+    const drawQR = (x: number, y: number, size: number) => {
+      if (!qrImg) return
+      // Fond blanc derrière le QR si fond sombre
+      if (isDark) {
+        ctx.fillStyle = "#FFFFFF"
+        const margin = Math.round(size * 0.04)
+        ctx.fillRect(x - margin, y - margin, size + margin*2, size + margin*2)
+      }
+      ctx.drawImage(qrImg, x, y, size, size)
+    }
+
+    const drawTitle = (text: string, x: number, y: number, size: number, color: string, align: CanvasTextAlign = "left", maxW?: number) => {
+      if (!text) return
+      ctx.fillStyle = color; ctx.font = `700 ${size}px 'Arial', sans-serif`; ctx.textAlign = align
+      ctx.fillText(text, x, y, maxW ?? w * 0.9)
+      ctx.textAlign = "left"
+    }
+
+    const drawSub = (text: string, x: number, y: number, size: number, color: string, align: CanvasTextAlign = "left") => {
+      if (!text) return
+      ctx.fillStyle = color; ctx.font = `400 ${size}px 'Arial', sans-serif`; ctx.textAlign = align
+      ctx.fillText(text, x, y, w * 0.85)
+      ctx.textAlign = "left"
+    }
+
+    const drawAccentLine = (x: number, y: number, lineW: number) => {
+      ctx.fillStyle = accentCol
+      ctx.fillRect(x, y, lineW, Math.max(3, Math.round(w * 0.005)))
+    }
+
+    // ── A4 Poster ──────────────────────────────────────────────────────────
+    if (tpl.id === "a4-poster") {
+      const qrSize = Math.round(w * 0.52)
+      const qrX    = bw + pad
+      const qrY    = Math.round(h * 0.28)
+      drawAccentLine(bw + pad, Math.round(h * 0.07), Math.round(w * 0.2))
+      drawTitle(opts.title || active?.pages?.title || "", bw + pad, Math.round(h * 0.13), Math.round(w * 0.045), textCol, "left", w - bw - pad*2)
+      drawSub(opts.subtitle, bw + pad, Math.round(h * 0.19), Math.round(w * 0.03), accentCol)
+      drawQR(qrX + (w - bw - pad*2 - qrSize)/2, qrY, qrSize)
+      drawSub(qrUrl, w/2, Math.round(h * 0.89), Math.round(w * 0.022), isDark ? "rgba(245,240,232,0.5)" : "rgba(26,26,26,0.4)", "center")
+      ctx.fillStyle = accentCol; ctx.fillRect(bw, h - Math.round(h*0.04), w - bw, Math.round(h*0.04))
+    }
+
+    // ── Flyer ──────────────────────────────────────────────────────────────
+    else if (tpl.id === "flyer") {
+      const qrSize = Math.round(h * 0.72)
+      const qrX    = w - qrSize - pad
+      const qrY    = Math.round((h - qrSize) / 2)
+      const txtX   = bw + pad
+      ctx.fillStyle = fgColor; ctx.fillRect(w - qrSize - pad*2, 0, Math.round(w * 0.004), h)
+      drawTitle(opts.title || active?.pages?.title || "", txtX, Math.round(h * 0.32), Math.round(w * 0.038), textCol, "left", qrX - txtX - pad)
+      drawAccentLine(txtX, Math.round(h * 0.37), Math.round(w * 0.15))
+      drawSub(opts.subtitle, txtX, Math.round(h * 0.55), Math.round(w * 0.026), accentCol)
+      drawQR(qrX, qrY, qrSize)
+    }
+
+    // ── Sticker ────────────────────────────────────────────────────────────
+    else if (tpl.id === "sticker") {
+      const r = Math.round(w * 0.08)
+      ctx.save(); ctx.beginPath()
+      ctx.moveTo(r,0); ctx.lineTo(w-r,0); ctx.quadraticCurveTo(w,0,w,r)
+      ctx.lineTo(w,h-r); ctx.quadraticCurveTo(w,h,w-r,h)
+      ctx.lineTo(r,h); ctx.quadraticCurveTo(0,h,0,h-r)
+      ctx.lineTo(0,r); ctx.quadraticCurveTo(0,0,r,0); ctx.closePath()
+      ctx.clip()
+      ctx.fillStyle = bgColor; ctx.fillRect(0, 0, w, h)
+      // Bordure accent
+      ctx.strokeStyle = accentCol; ctx.lineWidth = Math.round(w * 0.025)
+      ctx.beginPath()
+      ctx.moveTo(r,0); ctx.lineTo(w-r,0); ctx.quadraticCurveTo(w,0,w,r)
+      ctx.lineTo(w,h-r); ctx.quadraticCurveTo(w,h,w-r,h)
+      ctx.lineTo(r,h); ctx.quadraticCurveTo(0,h,0,h-r)
+      ctx.lineTo(0,r); ctx.quadraticCurveTo(0,0,r,0); ctx.closePath(); ctx.stroke()
+      ctx.restore()
+      const qrSize = Math.round(w * 0.62)
+      drawQR((w - qrSize)/2, Math.round(h * 0.12), qrSize)
+      drawSub(opts.subtitle, w/2, Math.round(h * 0.88), Math.round(w * 0.038), accentCol, "center")
+    }
+
+    // ── Carte de table ─────────────────────────────────────────────────────
+    else if (tpl.id === "table-card") {
+      const qrSize = Math.round(h * 0.7)
+      const qrY    = Math.round((h - qrSize) / 2)
+      const qrX    = w - qrSize - pad
+      ctx.fillStyle = fgColor
+      ctx.fillRect(0, 0, w, Math.round(h * 0.08))
+      ctx.fillRect(0, h - Math.round(h*0.08), w, Math.round(h * 0.08))
+      const txtX   = bw + pad
+      drawTitle(opts.title || active?.pages?.title || "", txtX, Math.round(h * 0.38), Math.round(h * 0.09), textCol, "left", qrX - txtX - pad)
+      drawAccentLine(txtX, Math.round(h * 0.44), Math.round(w * 0.1))
+      drawSub(opts.subtitle, txtX, Math.round(h * 0.6), Math.round(h * 0.065), accentCol)
+      drawQR(qrX, qrY, qrSize)
+    }
+
+    // ── Menu QR ────────────────────────────────────────────────────────────
+    else if (tpl.id === "menu-qr") {
+      const headerH = Math.round(h * 0.22)
+      ctx.fillStyle = fgColor; ctx.fillRect(0, 0, w, headerH)
+      const qrSize  = Math.round(w * 0.62)
+      drawTitle(opts.title || active?.pages?.title || "Notre Menu", w/2, Math.round(headerH * 0.55), Math.round(w * 0.055), bgColor, "center", w * 0.85)
+      drawSub(opts.subtitle, w/2, Math.round(headerH * 0.80), Math.round(w * 0.034), isDark ? "rgba(201,168,76,0.85)" : "rgba(255,255,255,0.75)", "center")
+      drawQR((w - qrSize)/2, Math.round(h * 0.3), qrSize)
+      drawSub(qrUrl, w/2, Math.round(h * 0.93), Math.round(w * 0.027), isDark ? "rgba(245,240,232,0.4)" : "rgba(26,26,26,0.35)", "center")
+      ctx.fillStyle = fgColor; ctx.fillRect(0, h - Math.round(h*0.035), w, Math.round(h*0.035))
+    }
+
+    // ── Carte de visite ────────────────────────────────────────────────────
+    else if (tpl.id === "business") {
+      const qrSize  = Math.round(h * 0.72)
+      const qrX     = w - qrSize - pad
+      const qrY     = Math.round((h - qrSize) / 2)
+      ctx.fillStyle = fgColor; ctx.fillRect(0, 0, Math.round(w * 0.38), h)
+      ctx.fillStyle = bgColor
+      const lx = Math.round(w * 0.19); const ly = Math.round(h * 0.3)
+      drawTitle(opts.title || active?.pages?.title || "", lx, ly, Math.round(h * 0.11), isDark?"#F5F0E8":"#FFFFFF", "center", Math.round(w * 0.32))
+      ctx.fillStyle = isDark ? "rgba(201,168,76,0.8)" : "rgba(255,255,255,0.6)"
+      ctx.fillRect(lx - Math.round(w * 0.05), ly + Math.round(h*0.04), Math.round(w * 0.14), Math.round(h*0.007))
+      drawSub(opts.subtitle, lx, Math.round(h * 0.67), Math.round(h * 0.07), isDark?"rgba(201,168,76,0.9)":"rgba(255,255,255,0.8)", "center")
+      drawQR(qrX, qrY, qrSize)
+    }
+
+    // ── Badge événement ────────────────────────────────────────────────────
+    else if (tpl.id === "event-badge") {
+      const qrSize  = Math.round(h * 0.68)
+      const qrX     = Math.round(w * 0.52)
+      const qrY     = Math.round((h - qrSize) / 2)
+      ctx.fillStyle = fgColor; ctx.fillRect(0, 0, w, Math.round(h * 0.14))
+      ctx.fillStyle = fgColor; ctx.fillRect(0, h - Math.round(h*0.14), w, Math.round(h*0.14))
+      drawTitle(opts.title || active?.pages?.title || "", pad, Math.round(h * 0.44), Math.round(h * 0.1), textCol, "left", qrX - pad - Math.round(w*0.03))
+      drawAccentLine(pad, Math.round(h * 0.51), Math.round(w * 0.12))
+      drawSub(opts.subtitle, pad, Math.round(h * 0.68), Math.round(h * 0.075), accentCol)
+      drawQR(qrX, qrY, qrSize)
+    }
+
+    // ── Story Instagram ────────────────────────────────────────────────────
+    else if (tpl.id === "story") {
+      const qrSize  = Math.round(w * 0.55)
+      const qrY     = Math.round(h * 0.35)
+      ctx.fillStyle = fgColor + "22"
+      ctx.fillRect(0, 0, w, Math.round(h * 0.28))
+      ctx.fillRect(0, Math.round(h * 0.72), w, Math.round(h * 0.28))
+      drawTitle(opts.title || active?.pages?.title || "", w/2, Math.round(h * 0.12), Math.round(w * 0.055), textCol, "center", w * 0.82)
+      drawAccentLine(Math.round(w*0.3), Math.round(h * 0.16), Math.round(w * 0.4))
+      drawSub(opts.subtitle, w/2, Math.round(h * 0.21), Math.round(w * 0.038), accentCol, "center")
+      drawQR((w - qrSize)/2, qrY, qrSize)
+      drawSub(qrUrl, w/2, Math.round(h * 0.82), Math.round(w * 0.028), isDark?"rgba(245,240,232,0.5)":"rgba(26,26,26,0.4)", "center")
+      ctx.fillStyle = accentCol
+      ctx.fillRect(Math.round(w*0.1), Math.round(h*0.87), Math.round(w*0.8), Math.round(h*0.005))
+    }
+
+    // ── Post Instagram ─────────────────────────────────────────────────────
+    else if (tpl.id === "post") {
+      const qrSize  = Math.round(w * 0.52)
+      ctx.fillStyle = fgColor + "18"; ctx.fillRect(0, 0, w, h)
+      drawTitle(opts.title || active?.pages?.title || "", w/2, Math.round(h * 0.14), Math.round(w * 0.052), textCol, "center", w * 0.82)
+      drawAccentLine(Math.round(w*0.35), Math.round(h * 0.18), Math.round(w * 0.3))
+      drawSub(opts.subtitle, w/2, Math.round(h * 0.24), Math.round(w * 0.036), accentCol, "center")
+      drawQR((w - qrSize)/2, Math.round(h * 0.31), qrSize)
+      drawSub(qrUrl, w/2, Math.round(h * 0.91), Math.round(w * 0.026), isDark?"rgba(245,240,232,0.4)":"rgba(26,26,26,0.35)", "center")
+      ctx.strokeStyle = accentCol + "40"; ctx.lineWidth = Math.round(w * 0.018)
+      ctx.strokeRect(Math.round(w*0.009), Math.round(h*0.009), w - Math.round(w*0.018), h - Math.round(h*0.018))
+    }
+  }
+
+  // ── Générer preview support ───────────────────────────────────────────────
+  async function previewSupport() {
+    const canvas = supportCanvasRef.current; if (!canvas) return
+    const tpl    = SUPP_TPLS.find(t => t.id === suppTplId)
+    if (!tpl) return
+    setSuppRendered(false)
+    try {
+      // Générer le QR à la bonne taille
+      const qrPx    = Math.min(tpl.w, tpl.h)
+      const qrUrl2  = buildQRUrl(qrPx)
+      const qrImg   = new Image(); qrImg.crossOrigin = "anonymous"
+      await new Promise<void>((res, rej) => { qrImg.onload = () => res(); qrImg.onerror = () => rej(); qrImg.src = qrUrl2 })
+      const tmpC    = document.createElement("canvas")
+      tmpC.width = qrPx; tmpC.height = qrPx
+      const tmpCtx  = tmpC.getContext("2d")!
+      // Dessiner QR avec fond/dégradé/logo
+      tmpCtx.fillStyle = bg; tmpCtx.fillRect(0, 0, qrPx, qrPx)
+      tmpCtx.drawImage(qrImg, 0, 0, qrPx, qrPx)
+      if (styleConf.logoUrl) {
+        const logoI = new Image(); logoI.crossOrigin = "anonymous"
+        await new Promise<void>((res) => { logoI.onload = () => res(); logoI.onerror = () => res(); logoI.src = styleConf.logoUrl! })
+        const ls = Math.round(qrPx * Math.min((styleConf.logoSize??18)/100, 0.28))
+        tmpCtx.drawImage(logoI, (qrPx-ls)/2, (qrPx-ls)/2, ls, ls)
+      }
+      const qrDataUrl = tmpC.toDataURL("image/png")
+      // Scale pour la preview (max 300px de large)
+      const previewScale = Math.min(1, 280 / tpl.w)
+      await renderSupport(canvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, logoUrl:styleConf.logoUrl, scale:previewScale })
+      setSuppRendered(true)
+    } catch { setSuppRendered(false) }
+  }
+
+  // ── Export support ────────────────────────────────────────────────────────
+  async function exportSupport(fmt: "png"|"pdf") {
+    const tpl = SUPP_TPLS.find(t => t.id === suppTplId); if (!tpl) return
+    setSuppExporting(true)
+    try {
+      const qrPx    = Math.min(tpl.w, tpl.h) * 2
+      const qrUrl2  = buildQRUrl(qrPx)
+      const qrImg   = new Image(); qrImg.crossOrigin = "anonymous"
+      await new Promise<void>((res, rej) => { qrImg.onload = () => res(); qrImg.onerror = () => rej(); qrImg.src = qrUrl2 })
+      const tmpC    = document.createElement("canvas")
+      tmpC.width = qrPx; tmpC.height = qrPx
+      const tmpCtx  = tmpC.getContext("2d")!
+      tmpCtx.fillStyle = bg; tmpCtx.fillRect(0, 0, qrPx, qrPx)
+      tmpCtx.drawImage(qrImg, 0, 0, qrPx, qrPx)
+      if (styleConf.logoUrl) {
+        const logoI = new Image(); logoI.crossOrigin = "anonymous"
+        await new Promise<void>((res) => { logoI.onload = () => res(); logoI.onerror = () => res(); logoI.src = styleConf.logoUrl! })
+        const ls = Math.round(qrPx * Math.min((styleConf.logoSize??18)/100, 0.28))
+        tmpCtx.drawImage(logoI, (qrPx-ls)/2, (qrPx-ls)/2, ls, ls)
+      }
+      const qrDataUrl = tmpC.toDataURL("image/png")
+      const outCanvas = document.createElement("canvas")
+      await renderSupport(outCanvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, scale:2 })
+      const filename  = `${(tpl.label).replace(/\s+/g,"-").toLowerCase()}-${active?.short_code ?? "qr"}.${fmt}`
+      if (fmt === "pdf") {
+        const dpr = window.devicePixelRatio || 1
+        const dataUrl = outCanvas.toDataURL("image/png", 1.0)
+        const isPort  = tpl.h > tpl.w
+        const pw = isPort ? 595 : 842; const ph = isPort ? 842 : 595
+        const pdfC = document.createElement("canvas")
+        pdfC.width = pw; pdfC.height = ph
+        const pdfCtx = pdfC.getContext("2d")!
+        pdfCtx.fillStyle = "#FFFFFF"; pdfCtx.fillRect(0, 0, pw, ph)
+        const img2 = new Image(); img2.src = dataUrl
+        await new Promise<void>(r => { img2.onload = () => r() })
+        const ratio   = Math.min(pw / outCanvas.width, ph / outCanvas.height)
+        const iw = outCanvas.width * ratio; const ih = outCanvas.height * ratio
+        pdfCtx.drawImage(img2, (pw-iw)/2, (ph-ih)/2, iw, ih)
+        const a = document.createElement("a"); a.href = pdfC.toDataURL("image/png",1.0); a.download = filename; a.click()
+      } else {
+        const a = document.createElement("a"); a.href = outCanvas.toDataURL("image/png",1.0); a.download = filename; a.click()
+      }
+    } catch (e) { console.error("Export support error:", e) }
+    setSuppExporting(false)
+  }
+
+    // ── Export principal ───────────────────────────────────────────────────────
   async function runExport() {
     if (!active || expExporting) return
     setExpExporting(true)
@@ -1282,7 +1607,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
         {/* Tabs principaux Style/Export */}
         <div style={{ display:"flex", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
-          {([["style","Style","🎨"],["export","Export","📤"]] as const).map(([id,label,emoji]) => (
+          {([["style","Style","🎨"],["supports","Supports","🖨️"],["export","Export","📤"]] as const).map(([id,label,emoji]) => (
             <button key={id} type="button" onClick={() => setActiveTab(id)}
               style={{ flex:1, padding:"11px 8px", background:activeTab===id?"rgba(201,168,76,0.06)":"transparent", border:"none", borderBottom:activeTab===id?`2px solid ${G}`:"2px solid transparent", color:activeTab===id?G:MUTED, fontSize:12, fontWeight:600, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:5 }}>
               <span>{emoji}</span>{label}
@@ -1781,6 +2106,129 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         )}
 
         {/* ── Export tab ────────────────────────────────────────────────────── */}
+        {activeTab === "supports" && active && (() => {
+          const tpl = SUPP_TPLS.find(t => t.id === suppTplId) ?? SUPP_TPLS[0]
+          const canTpl = PLAN_RANK[userPlan] >= PLAN_RANK[tpl.plan]
+          return (
+          <div style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
+
+            {/* ── Sélecteur templates ──────────────────────────────────── */}
+            <div style={{ padding:"10px 12px", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
+              <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Support</p>
+              <div style={{ display:"flex", flexDirection:"column", gap:4, maxHeight:220, overflowY:"auto" }}>
+                {SUPP_TPLS.map(t => {
+                  const can   = PLAN_RANK[userPlan] >= PLAN_RANK[t.plan]
+                  const isA   = t.id === suppTplId
+                  const badge = t.plan === "free" ? null : t.plan === "pro" ? "PRO" : "BIZ"
+                  return (
+                    <button key={t.id} type="button"
+                      onClick={() => { setSuppTplId(t.id); setSuppRendered(false) }}
+                      style={{ display:"flex", alignItems:"center", gap:8, padding:"7px 9px", background:isA?"rgba(201,168,76,0.08)":"rgba(255,255,255,0.02)", border:`1px solid ${isA?"rgba(201,168,76,0.3)":"rgba(255,255,255,0.06)"}`, borderRadius:8, cursor:"pointer", textAlign:"left" as const, opacity:can?1:0.6, position:"relative" as const }}>
+                      <span style={{ fontSize:16, flexShrink:0 }}>{t.emoji}</span>
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <p style={{ color:isA?G:"#F5F0E8", fontSize:11, fontWeight:isA?700:500, margin:"0 0 1px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
+                          {t.label}
+                        </p>
+                        <p style={{ color:MUTED, fontSize:9, margin:0 }}>{t.desc}</p>
+                      </div>
+                      {badge && (
+                        <span style={{ background:can?(t.plan==="pro"?"rgba(201,168,76,0.15)":"rgba(57,255,143,0.12)"):"rgba(255,255,255,0.06)", borderRadius:4, padding:"1px 5px", fontSize:7, color:can?(t.plan==="pro"?G:"#39FF8F"):MUTED, fontWeight:800, flexShrink:0 }}>
+                          {badge}
+                        </span>
+                      )}
+                      {!can && <Lock size={10} color={MUTED} style={{ flexShrink:0 }}/>}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div style={{ flex:1, overflowY:"auto", padding:"12px" }}>
+
+              {/* ── Textes ───────────────────────────────────────────── */}
+              <div style={{ marginBottom:12 }}>
+                <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Textes</p>
+                <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+                  <div>
+                    <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Titre</label>
+                    <input value={suppTitle} onChange={e => { setSuppTitle(e.target.value); setSuppRendered(false) }}
+                      placeholder={active?.pages?.title ?? "Titre de votre page"}
+                      style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none", boxSizing:"border-box" as const }}/>
+                  </div>
+                  <div>
+                    <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Sous-titre / Appel à l&apos;action</label>
+                    <select value={suppSubtitle} onChange={e => { setSuppSubtitle(e.target.value); setSuppRendered(false) }}
+                      style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
+                      {[
+                        "Scannez pour voir le menu",
+                        "Scannez pour reserver",
+                        "Scannez pour laisser un avis",
+                        "Scannez pour nous suivre",
+                        "Scannez pour decouvrir la page",
+                        "Scannez pour telecharger le fichier",
+                        "Scannez pour en savoir plus",
+                      ].map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Preview ──────────────────────────────────────────── */}
+              <div style={{ marginBottom:12 }}>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
+                  <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Apercu</p>
+                  <span style={{ color:MUTED, fontSize:9 }}>{tpl.w}×{tpl.h}px</span>
+                </div>
+
+                <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:10, padding:12, display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
+                  {canTpl ? (
+                    <>
+                      <canvas ref={supportCanvasRef} style={{ maxWidth:"100%", borderRadius:6, display: suppRendered ? "block" : "none" }}/>
+                      {!suppRendered && (
+                        <div style={{ width:"100%", height:160, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:8 }}>
+                          <span style={{ fontSize:28 }}>{tpl.emoji}</span>
+                          <p style={{ color:MUTED, fontSize:11, margin:0 }}>Cliquez pour generer</p>
+                        </div>
+                      )}
+                      <button type="button" onClick={previewSupport}
+                        style={{ width:"100%", padding:"8px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:8, color:G, fontSize:11, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                        <Eye size={12}/> {suppRendered ? "Regenerer l'apercu" : "Generer l'apercu"}
+                      </button>
+                    </>
+                  ) : (
+                    <div style={{ padding:"20px 0", textAlign:"center" as const }}>
+                      <Lock size={22} color={MUTED} style={{ marginBottom:8 }}/>
+                      <p style={{ color:MUTED, fontSize:12, margin:"0 0 10px" }}>
+                        {tpl.plan === "pro" ? "Necessites le plan Pro" : "Necessites le plan Business"}
+                      </p>
+                      <a href="/dashboard/upgrade" style={{ display:"inline-block", padding:"7px 16px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius:8, color:"#080808", fontSize:11, fontWeight:700, textDecoration:"none" }}>
+                        Voir les plans
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* ── Export ───────────────────────────────────────────── */}
+              {canTpl && (
+                <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+                  <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 2px" }}>Exporter</p>
+                  <button type="button" onClick={() => exportSupport("png")} disabled={suppExporting}
+                    style={{ padding:"10px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:9, color:"#080808", fontSize:12, fontWeight:700, cursor:suppExporting?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7, opacity:suppExporting?0.7:1 }}>
+                    {suppExporting ? <><Loader size={13} style={{ animation:"spin 0.8s linear infinite" }}/> Export...</>
+                      : <><Download size={13}/> PNG haute resolution</>}
+                  </button>
+                  <button type="button" onClick={() => exportSupport("pdf")} disabled={suppExporting}
+                    style={{ padding:"9px", background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:9, color:"#FF6B6B", fontSize:11, cursor:suppExporting?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7, opacity:suppExporting?0.7:1 }}>
+                    {suppExporting ? <><Loader size={12} style={{ animation:"spin 0.8s linear infinite" }}/></> : <><Printer size={12}/> PDF pret a imprimer</>}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+          )
+        })()}
+
         {activeTab === "export" && active && (() => {
           const realPx = expSize === "custom" ? Math.max(256, Math.min(8192, expCustomSize)) : expSize
           const FORMAT_CFG: Record<string, { label: string; ext: string; color: string; desc: string; plan: string }> = {
