@@ -2224,6 +2224,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </div>
                   )}
                 
+                </div>
               )}
 
               
@@ -2310,7 +2311,6 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 )}
               </div>
 
-                </div>
               )}
             </div>
           )
