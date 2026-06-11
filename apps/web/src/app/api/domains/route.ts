@@ -67,7 +67,7 @@ export async function GET() {
 
   const { data } = await supabase
     .from("domain_verifications")
-    .select("*, pages(title, slug)")
+    .select("*, pages(title, slug)").order("is_primary", { ascending: false })
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
 
@@ -127,9 +127,65 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ verified: true, vercel_ok: vercel.ok, vercel_error: vercel.error })
   }
 
+  // ── Action: définir domaine principal ────────────────────────────────────
+  if (action === "set_primary") {
+    if (!domain) return NextResponse.json({ error: "domain requis" }, { status: 400 })
+    // Retirer is_primary de tous les domaines de l'user
+    await supabase
+      .from("domain_verifications")
+      .update({ is_primary: false })
+      .eq("user_id", user.id)
+    // Définir le nouveau primaire
+    const { error: pe } = await supabase
+      .from("domain_verifications")
+      .update({ is_primary: true })
+      .eq("domain", domain)
+      .eq("user_id", user.id)
+    if (pe) return NextResponse.json({ error: pe.message }, { status: 500 })
+    return NextResponse.json({ ok: true })
+  }
+
   // ── Action: ajouter ──────────────────────────────────────────────────────
   if (!domain || !page_id) {
     return NextResponse.json({ error: "domain et page_id requis" }, { status: 400 })
+  }
+
+  // Vérifier la limite par plan
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("plan")
+    .eq("id", user.id)
+    .single()
+
+  const userPlan = profile?.plan ?? "free"
+
+  const { data: limitRow } = await supabase
+    .from("plan_domain_limits")
+    .select("max_domains")
+    .eq("plan", userPlan)
+    .single()
+
+  const maxDomains = limitRow?.max_domains ?? 0
+
+  if (maxDomains === 0) {
+    return NextResponse.json({
+      error: "Les domaines personnalisés nécessitent un plan Pro ou Business",
+      upgrade_required: true,
+    }, { status: 403 })
+  }
+
+  if (maxDomains !== -1) {
+    const { count } = await supabase
+      .from("domain_verifications")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+    if ((count ?? 0) >= maxDomains) {
+      return NextResponse.json({
+        error: `Limite atteinte (${maxDomains} domaine${maxDomains > 1 ? "s" : ""} max sur votre plan). Passez au plan Business pour des domaines illimités.`,
+        upgrade_required: true,
+        limit: maxDomains,
+      }, { status: 403 })
+    }
   }
 
   // Normaliser le domaine
@@ -166,6 +222,7 @@ export async function POST(req: NextRequest) {
       txt_record: token,
       verified:   false,
       vercel_status: "pending",
+      is_primary: false,
     }, { onConflict: "domain" })
     .select()
     .single()

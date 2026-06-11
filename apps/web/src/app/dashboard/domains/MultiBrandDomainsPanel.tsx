@@ -1,0 +1,268 @@
+﻿"use client"
+
+import { useState, useEffect } from "react"
+import {
+  Globe, Star, StarOff, Crown, Plus, Trash2,
+  CheckCircle, AlertCircle, Clock, ExternalLink,
+  ArrowUpRight, Loader, Shield
+} from "lucide-react"
+
+// ── Types ─────────────────────────────────────────────────────────────────────
+type DomainRecord = {
+  id:            string
+  domain:        string
+  page_id:       string
+  is_primary:    boolean
+  verified:      boolean
+  vercel_status: string
+  created_at:    string
+  pages:         { title: string; slug: string } | null
+}
+
+interface Props {
+  domains:    DomainRecord[]
+  plan:       string
+  onSetPrimary: (domain: string) => Promise<void>
+  onDelete:     (id: string) => Promise<void>
+  onAddClick:   () => void
+}
+
+const PLAN_LIMITS: Record<string, { max: number; label: string }> = {
+  free:     { max: 0,  label: "Non disponible" },
+  starter:  { max: 0,  label: "Non disponible" },
+  pro:      { max: 1,  label: "1 domaine" },
+  business: { max: -1, label: "Illimité" },
+}
+
+const G     = "#C9A84C"
+const MUTED = "#8A8478"
+
+function StatusBadge({ status, verified }: { status: string; verified: boolean }) {
+  if (!verified) return (
+    <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:"rgba(249,115,22,0.1)", border:"1px solid rgba(249,115,22,0.25)", borderRadius:6, padding:"2px 8px", fontSize:10, color:"#F97316", fontWeight:600 }}>
+      <Clock size={10}/> En attente
+    </span>
+  )
+  if (status === "active") return (
+    <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:"rgba(57,255,143,0.1)", border:"1px solid rgba(57,255,143,0.25)", borderRadius:6, padding:"2px 8px", fontSize:10, color:"#39FF8F", fontWeight:600 }}>
+      <CheckCircle size={10}/> Actif
+    </span>
+  )
+  if (status === "error") return (
+    <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.25)", borderRadius:6, padding:"2px 8px", fontSize:10, color:"#FF6B6B", fontWeight:600 }}>
+      <AlertCircle size={10}/> Erreur
+    </span>
+  )
+  return (
+    <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:6, padding:"2px 8px", fontSize:10, color:MUTED, fontWeight:600 }}>
+      <Clock size={10}/> {status}
+    </span>
+  )
+}
+
+export default function MultiBrandDomainsPanel({ domains, plan, onSetPrimary, onDelete, onAddClick }: Props) {
+  const [settingPrimary, setSettingPrimary] = useState<string | null>(null)
+  const [deleting,       setDeleting]       = useState<string | null>(null)
+
+  const planInfo  = PLAN_LIMITS[plan?.toLowerCase()] ?? PLAN_LIMITS.free
+  const isBusiness = plan?.toLowerCase() === "business"
+  const primary   = domains.find(d => d.is_primary)
+  const secondary = domains.filter(d => !d.is_primary)
+  const canAdd    = planInfo.max === -1 || domains.length < planInfo.max
+  const atLimit   = planInfo.max !== -1 && domains.length >= planInfo.max && planInfo.max > 0
+
+  async function handleSetPrimary(domain: string) {
+    setSettingPrimary(domain)
+    await onSetPrimary(domain)
+    setSettingPrimary(null)
+  }
+
+  async function handleDelete(id: string) {
+    setDeleting(id)
+    await onDelete(id)
+    setDeleting(null)
+  }
+
+  function DomainCard({ rec, isPrimary }: { rec: DomainRecord; isPrimary: boolean }) {
+    return (
+      <div style={{ background: isPrimary ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.02)", border: isPrimary ? "1px solid rgba(201,168,76,0.25)" : "1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"14px 16px", transition:"all 0.15s" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>
+
+          {/* Icône */}
+          <div style={{ width:38, height:38, background: isPrimary ? "rgba(201,168,76,0.12)" : rec.verified ? "rgba(57,255,143,0.08)" : "rgba(255,255,255,0.04)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+            {isPrimary ? <Star size={17} color={G}/> : <Globe size={17} color={rec.verified ? "#39FF8F" : MUTED}/>}
+          </div>
+
+          {/* Infos */}
+          <div style={{ flex:1, minWidth:0 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:3, flexWrap:"wrap" }}>
+              <span style={{ color:"#F5F0E8", fontSize:13, fontWeight:700 }}>{rec.domain}</span>
+              {isPrimary && (
+                <span style={{ background:"rgba(201,168,76,0.15)", border:"1px solid rgba(201,168,76,0.3)", borderRadius:6, padding:"2px 8px", fontSize:9, color:G, fontWeight:700, textTransform:"uppercase", letterSpacing:1 }}>
+                  Principal
+                </span>
+              )}
+              <StatusBadge status={rec.vercel_status} verified={rec.verified}/>
+            </div>
+            <p style={{ color:MUTED, fontSize:11, margin:0 }}>
+              → {rec.pages?.title ?? "Aucune page"} · {new Date(rec.created_at).toLocaleDateString("fr-FR")}
+            </p>
+          </div>
+
+          {/* Actions */}
+          <div style={{ display:"flex", gap:6, alignItems:"center", flexShrink:0 }}>
+            {rec.verified && (
+              <a href={`https://${rec.domain}`} target="_blank" rel="noopener noreferrer"
+                style={{ width:30, height:30, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:MUTED, textDecoration:"none" }}>
+                <ExternalLink size={12}/>
+              </a>
+            )}
+
+            {/* Définir comme principal (Business uniquement, si pas déjà principal) */}
+            {isBusiness && !isPrimary && rec.verified && (
+              <button type="button" onClick={() => handleSetPrimary(rec.domain)} disabled={settingPrimary === rec.domain}
+                style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 10px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:8, color:G, fontSize:11, fontWeight:600, cursor:settingPrimary===rec.domain?"wait":"pointer", opacity:settingPrimary===rec.domain?0.6:1 }}>
+                {settingPrimary === rec.domain ? <Loader size={11} style={{ animation:"spin 0.8s linear infinite" }}/> : <Star size={11}/>}
+                Définir principal
+              </button>
+            )}
+
+            {/* Supprimer */}
+            <button type="button" onClick={() => handleDelete(rec.id)} disabled={deleting === rec.id}
+              style={{ width:30, height:30, background:"rgba(255,100,100,0.08)", border:"1px solid rgba(255,100,100,0.15)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#FF6B6B", cursor:deleting===rec.id?"wait":"pointer", opacity:deleting===rec.id?0.5:1 }}>
+              {deleting === rec.id ? <Loader size={12} style={{ animation:"spin 0.8s linear infinite" }}/> : <Trash2 size={12}/>}
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ fontFamily:"DM Sans, sans-serif" }}>
+
+      {/* Header plan + compteur */}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16, flexWrap:"wrap", gap:10 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:6, padding:"5px 12px", background: isBusiness ? "rgba(201,168,76,0.1)" : "rgba(255,255,255,0.04)", border: isBusiness ? "1px solid rgba(201,168,76,0.25)" : "1px solid rgba(255,255,255,0.08)", borderRadius:8 }}>
+            {isBusiness && <Crown size={12} color={G}/>}
+            <span style={{ color: isBusiness ? G : MUTED, fontSize:11, fontWeight:700 }}>
+              {plan?.toUpperCase()} — {planInfo.label}
+            </span>
+          </div>
+          <span style={{ color:MUTED, fontSize:12 }}>
+            {domains.length} domaine{domains.length !== 1 ? "s" : ""}
+            {planInfo.max !== -1 && ` / ${planInfo.max}`}
+          </span>
+        </div>
+
+        {canAdd && (
+          <button type="button" onClick={onAddClick}
+            style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 14px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:9, color:"#080808", fontSize:12, fontWeight:700, cursor:"pointer" }}>
+            <Plus size={13}/> Ajouter un domaine
+          </button>
+        )}
+      </div>
+
+      {/* Barre de progression (plan Pro uniquement) */}
+      {planInfo.max !== -1 && planInfo.max > 0 && (
+        <div style={{ marginBottom:16 }}>
+          <div style={{ display:"flex", justifyContent:"space-between", marginBottom:5 }}>
+            <span style={{ color:MUTED, fontSize:11 }}>Utilisation</span>
+            <span style={{ color: atLimit ? "#FF6B6B" : G, fontSize:11, fontWeight:700 }}>
+              {domains.length}/{planInfo.max}
+            </span>
+          </div>
+          <div style={{ height:5, background:"rgba(255,255,255,0.06)", borderRadius:3, overflow:"hidden" }}>
+            <div style={{ height:"100%", width:`${Math.min((domains.length/planInfo.max)*100, 100)}%`, background: atLimit ? "#FF6B6B" : "linear-gradient(90deg,#C9A84C,#39FF8F)", borderRadius:3, transition:"width 0.5s" }}/>
+          </div>
+          {atLimit && (
+            <div style={{ marginTop:8, display:"flex", alignItems:"center", gap:7, padding:"8px 12px", background:"rgba(201,168,76,0.06)", border:"1px solid rgba(201,168,76,0.15)", borderRadius:8 }}>
+              <Crown size={13} color={G}/>
+              <span style={{ color:MUTED, fontSize:11 }}>
+                Limite atteinte · <a href="/dashboard/upgrade" style={{ color:G, textDecoration:"none", fontWeight:600 }}>Passer au Business pour des domaines illimités →</a>
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Domaine principal */}
+      {domains.length > 0 && (
+        <div style={{ marginBottom:16 }}>
+          <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>
+            Domaine principal
+          </p>
+          {primary ? (
+            <DomainCard rec={primary} isPrimary={true}/>
+          ) : (
+            <div style={{ padding:"12px 14px", background:"rgba(255,255,255,0.02)", border:"1px dashed rgba(255,255,255,0.08)", borderRadius:10 }}>
+              <p style={{ color:MUTED, fontSize:12, margin:0 }}>
+                {isBusiness
+                  ? "Aucun domaine principal défini — cliquez sur \"Définir principal\" sur un domaine vérifié"
+                  : "Votre domaine vérifié sera le domaine principal"
+                }
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Domaines secondaires (Business) */}
+      {isBusiness && secondary.length > 0 && (
+        <div style={{ marginBottom:16 }}>
+          <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>
+            Domaines secondaires ({secondary.length})
+          </p>
+          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+            {secondary.map(rec => (
+              <DomainCard key={rec.id} rec={rec} isPrimary={false}/>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Domaines (plan Pro: liste simple) */}
+      {!isBusiness && domains.length > 0 && !primary && (
+        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+          {domains.map(rec => (
+            <DomainCard key={rec.id} rec={rec} isPrimary={false}/>
+          ))}
+        </div>
+      )}
+
+      {/* Empty state */}
+      {domains.length === 0 && (
+        <div style={{ textAlign:"center", padding:"32px 20px", background:"rgba(255,255,255,0.01)", border:"1px dashed rgba(255,255,255,0.08)", borderRadius:12 }}>
+          <Globe size={32} color={MUTED} style={{ marginBottom:12 }}/>
+          <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 5px" }}>Aucun domaine</p>
+          <p style={{ color:MUTED, fontSize:12, margin:"0 0 16px" }}>Ajoutez votre premier domaine personnalisé</p>
+          {canAdd && (
+            <button type="button" onClick={onAddClick}
+              style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"9px 18px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:9, color:"#080808", fontSize:12, fontWeight:700, cursor:"pointer" }}>
+              <Plus size={13}/> Ajouter un domaine
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* CTA upgrade pour Business si plan Pro limité */}
+      {!isBusiness && plan?.toLowerCase() === "pro" && domains.length > 0 && (
+        <div style={{ marginTop:14, padding:"12px 14px", background:"rgba(201,168,76,0.05)", border:"1px solid rgba(201,168,76,0.12)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, flexWrap:"wrap" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+            <Crown size={14} color={G}/>
+            <span style={{ color:MUTED, fontSize:12 }}>
+              Domaines illimités + multi-marques avec le plan <strong style={{ color:"#F5F0E8" }}>Business</strong>
+            </span>
+          </div>
+          <a href="/dashboard/upgrade"
+            style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"6px 14px", background:"rgba(201,168,76,0.1)", border:"1px solid rgba(201,168,76,0.25)", borderRadius:8, color:G, fontSize:11, fontWeight:700, textDecoration:"none" }}>
+            Upgrade <ArrowUpRight size={11}/>
+          </a>
+        </div>
+      )}
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+    </div>
+  )
+}

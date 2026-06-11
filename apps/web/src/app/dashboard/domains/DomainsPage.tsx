@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import DnsChecker from "./DnsChecker"
+import MultiBrandDomainsPanel from "./MultiBrandDomainsPanel"
 import DomainRoutesPanel from "./DomainRoutesPanel"
 import {
   Globe, Plus, Trash2, CheckCircle, Clock, AlertCircle,
@@ -14,6 +15,7 @@ type DomainRecord = {
   domain:        string
   page_id:       string
   txt_record:    string
+  is_primary:    boolean
   verified:      boolean
   verified_at:   string | null
   vercel_status: string
@@ -96,6 +98,15 @@ export default function DomainsPage({ pages, plan }: Props) {
     setVerifying(null)
   }
 
+  async function setPrimaryDomain(domain: string) {
+    await fetch("/api/domains", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ action: "set_primary", domain }),
+    })
+    setDomains(prev => prev.map(d => ({ ...d, is_primary: d.domain === domain })))
+  }
+
   async function deleteDomain(id: string) {
     setDeleting(id)
     await fetch("/api/domains", {
@@ -132,12 +143,7 @@ export default function DomainsPage({ pages, plan }: Props) {
               Connectez votre propre domaine à vos pages QRfolio
             </p>
           </div>
-          {isPaid && (
-            <button type="button" onClick={() => setShowForm(true)}
-              style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 20px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:11, color:"#080808", fontSize:13, fontWeight:700, cursor:"pointer" }}>
-              <Plus size={15}/> Ajouter un domaine
-            </button>
-          )}
+
         </div>
 
         {!isPaid ? (
@@ -155,6 +161,17 @@ export default function DomainsPage({ pages, plan }: Props) {
           </div>
         ) : (
           <div>
+            {/* ── Vue multi-brand ──────────────────────────────────────────── */}
+            <div style={{ marginBottom: 20 }}>
+              <MultiBrandDomainsPanel
+                domains={domains}
+                plan={plan}
+                onSetPrimary={setPrimaryDomain}
+                onDelete={async (id) => { await deleteDomain(id) }}
+                onAddClick={() => setShowForm(true)}
+              />
+            </div>
+
             {/* Formulaire ajout */}
             {showForm && (
               <div style={{ background:"#0F0E0B", border:`1px solid rgba(201,168,76,0.2)`, borderRadius:14, padding:22, marginBottom:20 }}>
