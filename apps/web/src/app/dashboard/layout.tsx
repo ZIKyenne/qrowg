@@ -17,7 +17,8 @@ const NAV_ITEMS = [
   { href: "/dashboard/templates", icon: FileText, label: "Templates" },
   { href: "/dashboard/analytics", icon: BarChart2, label: "Analytics" },
   { href: "/dashboard/qr-codes", icon: QrCode, label: "QR Codes" },
-  { href: "/dashboard/settings", icon: Settings, label: "Paramètres" },
+  { href: "/dashboard/profile", icon: User, label: "Profil" },
+  { href: "/dashboard/settings", icon: Settings, label: "Parametres" },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -174,12 +175,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* Utilisateur */}
           {user && (
             <div style={{ position: "relative" }} className="sidebar-item">
-              <div style={{
-                display: "flex", alignItems: "center", gap: 10,
+              <Link href="/dashboard/profile" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10,
                 padding: collapsed ? "8px 0" : "8px 10px",
                 justifyContent: collapsed ? "center" : "flex-start",
-                borderRadius: 9, overflow: "hidden",
-              }}>
+                borderRadius: 9, overflow: "hidden", cursor: "pointer" }}>
                 <div style={{ width: 28, height: 28, borderRadius: "50%", background: `linear-gradient(135deg, ${G}, #b8953f)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#080808", flexShrink: 0 }}>
                   {(profile?.full_name || user.email || "?")[0].toUpperCase()}
                 </div>
@@ -193,7 +192,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </p>
                   </div>
                 )}
-              </div>
+              </Link>
               {collapsed && (
                 <div className="sidebar-tooltip" style={{
                   position: "absolute", left: "calc(100% + 10px)", top: "50%", transform: "translateY(-50%)",

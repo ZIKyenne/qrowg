@@ -111,7 +111,7 @@ export default function ProfilePage() {
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
 
-          {/* ── Colonne gauche ── */}
+          {/* -- Colonne gauche -- */}
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
 
             {/* Identite + Avatar */}
@@ -191,7 +191,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* ── Colonne droite ── */}
+          {/* -- Colonne droite -- */}
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
 
             {/* Plan */}

@@ -6,7 +6,7 @@ import {
   Eye, Plus, Settings, Check, Search, Copy, EyeOff,
   ExternalLink, Palette, GripVertical, QrCode
 } from "lucide-react"
-import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, exportThemeToJSON, importThemeFromJSON, OFFICIAL_TEMPLATES, templateToBlocks, saveUserTemplate, getUserTemplates, deleteUserTemplate, getFavTemplates, toggleFavTemplate, exportTemplateToJSON, importTemplateFromJSON, type QRfolioTemplate, type Block, type BlockContent, type PageTheme } from "./types"
+import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, type Block, type BlockContent, type PageTheme } from "./types"
 import { createClient } from "@/lib/supabase/client"
 
 const G = "#C9A84C"
@@ -2615,29 +2615,6 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
   const [bgMode, setBgMode] = useState<string>(theme.bgMode||"solid")
   const [bgSubTab, setBgSubTab] = useState<"type"|"effects"|"animation"|"presets"|"advanced">("presets")
   const [activeCat, setActiveCat] = useState<string>(PRESET_CATEGORIES[0].id)
-  const [copyFeedback, setCopyFeedback] = useState<"idle"|"copied"|"pasted"|"error">("idle")
-
-  function copyTheme() {
-    try {
-      localStorage.setItem("qrfolio_clipboard_theme", JSON.stringify(theme))
-      setCopyFeedback("copied")
-      setTimeout(() => setCopyFeedback("idle"), 2000)
-    } catch { setCopyFeedback("error"); setTimeout(() => setCopyFeedback("idle"), 2000) }
-  }
-
-  function pasteTheme() {
-    try {
-      const raw = localStorage.getItem("qrfolio_clipboard_theme")
-      if (!raw) { setCopyFeedback("error"); setTimeout(() => setCopyFeedback("idle"), 2000); return }
-      const pasted = JSON.parse(raw) as PageTheme
-      // Conserver le name de la page actuelle
-      onThemeChange({ ...pasted, name: theme.name })
-      setCopyFeedback("pasted")
-      setTimeout(() => setCopyFeedback("idle"), 2000)
-    } catch { setCopyFeedback("error"); setTimeout(() => setCopyFeedback("idle"), 2000) }
-  }
-
-  const hasClipboard = typeof window !== "undefined" && !!localStorage.getItem("qrfolio_clipboard_theme")
   const [colorFormat, setColorFormat] = useState<"hex"|"rgb"|"hsl">("hex")
   const [recentColors, setRecentColors] = useState<string[]>(() => {
     try { return JSON.parse(localStorage.getItem("qrfolio_recent_colors") || "[]") } catch { return [] }
@@ -2752,7 +2729,7 @@ const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 
     { id: "stars", label: "Étoiles", icon: "✦" },
   ]
 
-    const getPatternCSS = (pattern: string, color: string, size: number, opacity: number): string => {
+  const getPatternCSS = (pattern: string, color: string, size: number, opacity: number) => {
     const c = color + Math.round(opacity * 255).toString(16).padStart(2, "0")
     const s = size
     switch(pattern) {
@@ -2790,20 +2767,6 @@ const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-      {/* ── Copier / Coller thème ─────────────────────────────────────── */}
-      <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
-        <button type="button" onClick={copyTheme}
-          style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: "7px", background: copyFeedback==="copied" ? "rgba(57,255,143,0.1)" : "rgba(255,255,255,0.04)", border: `1px solid ${copyFeedback==="copied" ? "rgba(57,255,143,0.4)" : "rgba(255,255,255,0.08)"}`, borderRadius: 9, color: copyFeedback==="copied" ? "#39FF8F" : MUTED, fontSize: 11, fontWeight: 500, cursor: "pointer", transition: "all 0.2s" }}>
-          <span style={{ fontSize: 13 }}>{copyFeedback==="copied" ? "✓" : "📋"}</span>
-          <span>{copyFeedback==="copied" ? "Copié !" : "Copier le thème"}</span>
-        </button>
-        <button type="button" onClick={pasteTheme}
-          style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: "7px", background: copyFeedback==="pasted" ? "rgba(201,168,76,0.12)" : copyFeedback==="error" ? "rgba(239,68,68,0.08)" : "rgba(255,255,255,0.04)", border: `1px solid ${copyFeedback==="pasted" ? "rgba(201,168,76,0.4)" : copyFeedback==="error" ? "rgba(239,68,68,0.3)" : "rgba(255,255,255,0.08)"}`, borderRadius: 9, color: copyFeedback==="pasted" ? G : copyFeedback==="error" ? "#EF4444" : MUTED, fontSize: 11, fontWeight: 500, cursor: "pointer", transition: "all 0.2s" }}>
-          <span style={{ fontSize: 13 }}>{copyFeedback==="pasted" ? "✓" : copyFeedback==="error" ? "✗" : "⬆️"}</span>
-          <span>{copyFeedback==="pasted" ? "Appliqué !" : copyFeedback==="error" ? "Aucun thème copié" : "Coller le thème"}</span>
-        </button>
-      </div>
-
       {/* Onglets principaux */}
       <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,0.06)", marginBottom: 14, flexShrink: 0 }}>
         {(["themes","colors","fonts","bg"] as const).map(tab => (
@@ -3259,7 +3222,7 @@ const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 
                   {(theme as any).bgImage && (
                     <div style={{ position: "relative" }}>
                       <img src={(theme as any).bgImage} alt="" style={{ width: "100%", height: 80, objectFit: "cover", borderRadius: 8, display: "block" }} />
-                      <button type="button" onClick={() => onThemeChange({...theme, bgImage: ""} as any)} style={{ position: "absolute", top: 4, right: 4, background: "rgba(0,0,0,0.7)", border: "none", borderRadius: "50%", width: 22, height: 22, color: "#fff", cursor: "pointer", fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
+                      <button onClick={() => onThemeChange({...theme, bgImage: ""} as any)} style={{ position: "absolute", top: 4, right: 4, background: "rgba(0,0,0,0.7)", border: "none", borderRadius: "50%", width: 22, height: 22, color: "#fff", cursor: "pointer", fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
                     </div>
                   )}
                   <div>
@@ -3310,7 +3273,7 @@ const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 
               <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_noise ? 10 : 0 }}>
                   <label style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600 }}>🌫️ Noise</label>
-                  <button type="button" onClick={() => onThemeChange({...theme, effect_noise: !(theme as any).effect_noise} as any)} style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_noise ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
+                  <button onClick={() => onThemeChange({...theme, effect_noise: !(theme as any).effect_noise} as any)} style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_noise ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
                     <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_noise ? 18 : 2, transition: "left 0.2s" }} />
                   </button>
                 </div>
@@ -3326,7 +3289,7 @@ const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 
               <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_glow ? 10 : 0 }}>
                   <label style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600 }}>✨ Glow</label>
-                  <button type="button" onClick={() => onThemeChange({...theme, effect_glow: !(theme as any).effect_glow} as any)} style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_glow ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
+                  <button onClick={() => onThemeChange({...theme, effect_glow: !(theme as any).effect_glow} as any)} style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_glow ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
                     <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_glow ? 18 : 2, transition: "left 0.2s" }} />
                   </button>
                 </div>
@@ -3352,7 +3315,7 @@ const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 
               <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_vignette ? 10 : 0 }}>
                   <label style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600 }}>🌑 Vignette</label>
-                  <button type="button" onClick={() => onThemeChange({...theme, effect_vignette: !(theme as any).effect_vignette} as any)} style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_vignette ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
+                  <button onClick={() => onThemeChange({...theme, effect_vignette: !(theme as any).effect_vignette} as any)} style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_vignette ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
                     <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_vignette ? 18 : 2, transition: "left 0.2s" }} />
                   </button>
                 </div>
@@ -3368,7 +3331,7 @@ const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 
               <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_overlay ? 10 : 0 }}>
                   <label style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600 }}>🎨 Overlay</label>
-                  <button type="button" onClick={() => onThemeChange({...theme, effect_overlay: !(theme as any).effect_overlay} as any)}
+                  <button onClick={() => onThemeChange({...theme, effect_overlay: !(theme as any).effect_overlay} as any)}
                     style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_overlay ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
                     <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_overlay ? 18 : 2, transition: "left 0.2s" }} />
                   </button>
@@ -3395,7 +3358,7 @@ const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 
               <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_blur ? 10 : 0 }}>
                   <label style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600 }}>💧 Blur</label>
-                  <button type="button" onClick={() => onThemeChange({...theme, effect_blur: !(theme as any).effect_blur} as any)}
+                  <button onClick={() => onThemeChange({...theme, effect_blur: !(theme as any).effect_blur} as any)}
                     style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_blur ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
                     <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_blur ? 18 : 2, transition: "left 0.2s" }} />
                   </button>
@@ -3482,7 +3445,7 @@ const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 
                   style={{ ...inputStyle, resize: "vertical" as const, lineHeight: 1.6 }} />
               </div>
               <div style={{ display: "flex", gap: 8 }}>
-                <button type="button" onClick={() => {
+                <button onClick={() => {
                   const style = { bg: theme.bg, bgGradient: theme.bgGradient, bgMode: (theme as any).bgMode, bgImage: (theme as any).bgImage }
                   navigator.clipboard.writeText(JSON.stringify(style, null, 2))
                   setCopiedStyle(true)
@@ -3490,7 +3453,7 @@ const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 
                 }} style={{ flex: 1, background: copiedStyle ? "#39FF8F20" : "rgba(255,255,255,0.05)", border: `1px solid ${copiedStyle ? "#39FF8F40" : "rgba(255,255,255,0.1)"}`, borderRadius: 9, padding: "10px", color: copiedStyle ? "#39FF8F" : MUTED, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
                   {copiedStyle ? "✓ Copié !" : "📋 Copier le style"}
                 </button>
-                <button type="button" onClick={() => {
+                <button onClick={() => {
                   const input = prompt("Collez le JSON du style:")
                   if (input) {
                     try {
@@ -3502,61 +3465,18 @@ const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 
                   📥 Importer
                 </button>
               </div>
-              {/* ── Export thème ─────────────────────────────────────────── */}
-              <button type="button" onClick={() => {
-                const json = exportThemeToJSON(theme)
-                const blob = new Blob([json], { type: "application/json" })
+              <button onClick={() => {
+                const exportData = {
+                  background: { bg: theme.bg, bgGradient: theme.bgGradient, bgMode: (theme as any).bgMode, bgImage: (theme as any).bgImage },
+                  effects: { noise: (theme as any).noise_opacity, glow: (theme as any).glow_color, vignette: (theme as any).vignette_intensity },
+                  animation: { type: (theme as any).bgAnimation, speed: (theme as any).anim_speed }
+                }
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" })
                 const url = URL.createObjectURL(blob)
-                const a = document.createElement("a")
-                a.href = url
-                a.download = `qrfolio-theme-${theme.name.toLowerCase().replace(/[^a-z0-9]+/g,"-")}-v1.json`
-                a.click(); URL.revokeObjectURL(url)
-                setCopiedStyle(true); setTimeout(() => setCopiedStyle(false), 2000)
-              }} style={{ background: copiedStyle ? "rgba(57,255,143,0.1)" : "rgba(201,168,76,0.08)", border: `1px solid ${copiedStyle ? "rgba(57,255,143,0.4)" : "rgba(201,168,76,0.25)"}`, borderRadius: 10, padding: "10px 14px", color: copiedStyle ? "#39FF8F" : G, fontSize: 11, fontWeight: 600, cursor: "pointer", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, transition: "all 0.2s" }}>
-                <span style={{ fontSize: 15 }}>{copiedStyle ? "✓" : "📤"}</span>
-                <span>{copiedStyle ? "Exporté !" : "Exporter le thème (.json)"}</span>
+                const a = document.createElement("a"); a.href = url; a.download = "qrfolio-style.json"; a.click()
+              }} style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 9, padding: "10px", color: G, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
+                📤 Exporter le style complet
               </button>
-
-              {/* ── Import thème ─────────────────────────────────────────── */}
-              <div>
-                <label style={{ color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5, display: "block", marginBottom: 8 }}>Importer un thème</label>
-                <div style={{ display: "flex", gap: 7 }}>
-                  <label style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: MUTED, fontSize: 11, cursor: "pointer" }}
-                    onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background="rgba(255,255,255,0.08)"; el.style.color="#F5F0E8" }}
-                    onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background="rgba(255,255,255,0.04)"; el.style.color=MUTED }}>
-                    <span>📁</span><span>Fichier .json</span>
-                    <input type="file" accept=".json,application/json" style={{ display: "none" }}
-                      onChange={e => {
-                        const file = e.target.files?.[0]; if (!file) return
-                        const reader = new FileReader()
-                        reader.onload = ev => {
-                          const result = importThemeFromJSON(ev.target?.result as string)
-                          if (result.ok && result.theme) {
-                            onThemeChange({ ...result.theme, name: theme.name })
-                            if (result.warnings.length) alert("⚠️ " + result.warnings.join("\n"))
-                          } else { alert("❌ " + result.errors.join("\n")) }
-                          e.target.value = ""
-                        }
-                        reader.readAsText(file)
-                      }} />
-                  </label>
-                  <button type="button"
-                    style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: MUTED, fontSize: 11, cursor: "pointer" }}
-                    onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.08)"; e.currentTarget.style.color="#F5F0E8" }}
-                    onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.color=MUTED }}
-                    onClick={() => {
-                      const raw = prompt("Collez le JSON du thème QRfolio :")
-                      if (!raw) return
-                      const result = importThemeFromJSON(raw)
-                      if (result.ok && result.theme) {
-                        onThemeChange({ ...result.theme, name: theme.name })
-                        if (result.warnings.length) alert("⚠️ " + result.warnings.join("\n"))
-                      } else { alert("❌ " + result.errors.join("\n")) }
-                    }}>
-                    <span>📋</span><span>Coller JSON</span>
-                  </button>
-                </div>
-              </div>
               {/* Aperçu fond actuel */}
               <div>
                 <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 6 }}>Aperçu fond actuel</label>
@@ -4151,7 +4071,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
 
         {/* Boutons Undo / Redo */}
         <div style={{ display: "flex", gap: 3 }}>
-          <button type="button" onClick={() => { const p = undoRedo.undo(); if(p) setBlocksRaw(p) }}
+          <button onClick={() => { const p = undoRedo.undo(); if(p) setBlocksRaw(p) }}
             disabled={!undoRedo.canUndo()}
             title="Annuler — Ctrl+Z"
             style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, cursor: undoRedo.canUndo() ? "pointer" : "default", color: undoRedo.canUndo() ? "#F5F0E8" : "rgba(255,255,255,0.2)", fontSize: 13, transition: "all 0.15s" }}
@@ -4159,7 +4079,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
             onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor="rgba(255,255,255,0.08)" }}>
             ↩
           </button>
-          <button type="button" onClick={() => { const n = undoRedo.redo(); if(n) setBlocksRaw(n) }}
+          <button onClick={() => { const n = undoRedo.redo(); if(n) setBlocksRaw(n) }}
             disabled={!undoRedo.canRedo()}
             title="Rétablir — Ctrl+Shift+Z"
             style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, cursor: undoRedo.canRedo() ? "pointer" : "default", color: undoRedo.canRedo() ? "#F5F0E8" : "rgba(255,255,255,0.2)", fontSize: 13, transition: "all 0.15s" }}
@@ -4170,7 +4090,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         </div>
 
         {/* Bouton Focus Mode */}
-        <button type="button" onClick={toggleFocus} title="Mode Focus — Ctrl+F"
+        <button onClick={toggleFocus} title="Mode Focus — Ctrl+F"
           style={{ display: "flex", alignItems: "center", gap: 5, background: focusMode ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.04)", border: `1px solid ${focusMode ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.08)"}`, borderRadius: 7, padding: "5px 10px", color: focusMode ? G : MUTED, fontSize: 10, fontWeight: focusMode ? 700 : 400, cursor: "pointer" }}>
           {focusMode ? "⊞" : "⊡"} Focus
         </button>
@@ -4200,13 +4120,13 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
           </div>
         </div>
 
-        <button type="button" onClick={() => setRightTab(t => t==="theme" ? "preview" : "theme")} style={{ display: "flex", alignItems: "center", gap: 5, background: rightTab==="theme" ? "rgba(201,168,76,0.12)" : "transparent", border: `1px solid ${rightTab==="theme" ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.2)"}`, borderRadius: 7, padding: "5px 11px", color: rightTab==="theme" ? G : MUTED, fontSize: 11, cursor: "pointer" }}>
+        <button onClick={() => setRightTab(t => t==="theme" ? "preview" : "theme")} style={{ display: "flex", alignItems: "center", gap: 5, background: rightTab==="theme" ? "rgba(201,168,76,0.12)" : "transparent", border: `1px solid ${rightTab==="theme" ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.2)"}`, borderRadius: 7, padding: "5px 11px", color: rightTab==="theme" ? G : MUTED, fontSize: 11, cursor: "pointer" }}>
           <Palette size={11} /> Thème
         </button>
 
         {qrCodeUrl && (
           <div style={{ position: "relative" }}>
-            <button type="button" onClick={() => setShowQrPanel(p => !p)} style={{ display: "flex", alignItems: "center", gap: 5, background: showQrPanel ? "rgba(201,168,76,0.12)" : "rgba(201,168,76,0.06)", border: `1px solid ${showQrPanel ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.2)"}`, borderRadius: 8, padding: "5px 11px", color: G, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
+            <button onClick={() => setShowQrPanel(p => !p)} style={{ display: "flex", alignItems: "center", gap: 5, background: showQrPanel ? "rgba(201,168,76,0.12)" : "rgba(201,168,76,0.06)", border: `1px solid ${showQrPanel ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.2)"}`, borderRadius: 8, padding: "5px 11px", color: G, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
               <QrCode size={11} /> QR Code
             </button>
             {showQrPanel && (
@@ -4239,30 +4159,8 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
           </a>
         )}
 
-        {/* Bouton Sauvegarder comme Template */}
-        <button type="button" onClick={() => {
-          const name = prompt("Nom du template :", theme.name + " Template")
-          if (!name) return
-          const tpl: QRfolioTemplate = {
-            meta: {
-              id: "tpl_user_" + Date.now().toString(36), _v: 1,
-              name, source: "user" as const,
-              description: "Template créé depuis le builder",
-              category: "Personal" as const, tags: [],
-              preview_colors: [theme.bg, theme.primary, theme.accent],
-              created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
-            },
-            theme: { ...theme },
-            blocks: blocks.map((b, i) => ({ type: b.type, content: { ...b.content }, visible: b.visible, _order: i })),
-          }
-          saveUserTemplate(tpl)
-          alert("Template " + name + " sauvegarde !")
-        }} style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, padding: "7px 11px", color: MUTED, fontSize: 11, cursor: "pointer" }}>
-          <span style={{ fontSize: 12 }}>💾</span><span>Template</span>
-        </button>
-
         <div style={{ position: "relative" }}>
-          <button type="button" onClick={() => setShowPublishPopup(p => !p)}
+          <button onClick={() => setShowPublishPopup(p => !p)}
             style={{ display: "flex", alignItems: "center", gap: 6, background: pageStatus==="published" ? "rgba(57,255,143,0.12)" : `linear-gradient(90deg,${G},#b8953f)`, border: pageStatus==="published" ? "1px solid rgba(57,255,143,0.35)" : "none", borderRadius: 9, padding: "8px 18px", color: pageStatus==="published" ? "#39FF8F" : "#080808", fontSize: 14, fontWeight: 700, cursor: "pointer", boxShadow: pageStatus==="published" ? "none" : `0 4px 16px rgba(201,168,76,0.3)` }}>
             {pageStatus==="published" ? <><Check size={13} /> Publié</> : "Publier"}
           </button>
@@ -4296,7 +4194,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                       <p style={{ color: G, fontSize: 12, margin: 0, fontFamily: "JetBrains Mono, monospace", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {typeof window !== "undefined" ? window.location.origin : ""}/{pageSlug}
                       </p>
-                      <button type="button" onClick={() => { navigator.clipboard.writeText((typeof window !== "undefined" ? window.location.origin : "")+"/"+pageSlug) }}
+                      <button onClick={() => { navigator.clipboard.writeText((typeof window !== "undefined" ? window.location.origin : "")+"/"+pageSlug) }}
                         style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 6, padding: "4px 8px", color: G, cursor: "pointer", fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
                         Copier
                       </button>
@@ -4317,7 +4215,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                 </div>
 
                 {/* Bouton principal */}
-                <button type="button" onClick={handlePublish} disabled={publishing || pageStatus==="published"}
+                <button onClick={handlePublish} disabled={publishing || pageStatus==="published"}
                   style={{ width: "100%", background: pageStatus==="published" ? "rgba(57,255,143,0.1)" : `linear-gradient(90deg,${G},#b8953f)`, border: pageStatus==="published" ? "1px solid rgba(57,255,143,0.3)" : "none", borderRadius: 12, padding: "14px", color: pageStatus==="published" ? "#39FF8F" : "#080808", fontSize: 14, fontWeight: 700, cursor: pageStatus==="published" ? "default" : "pointer", marginBottom: pageSlug ? 10 : 0, boxShadow: pageStatus==="published" ? "none" : "0 4px 20px rgba(201,168,76,0.3)" }}>
                   {publishing ? "⏳ Publication..." : pageStatus==="published" ? "✓ Déjà publié" : "🚀 Publier maintenant"}
                 </button>
@@ -4341,7 +4239,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         {/* SIDEBAR BLOCS */}
         <div style={{ width: blocksCollapsed ? 64 : blocksResize.width, background: "#0A0A0A", borderRight: "none", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden", transition: blocksCollapsed ? "width 0.25s ease" : "none", position: "relative" }}>
           {/* Bouton collapse/expand */}
-          <button type="button" onClick={toggleBlocks} title={blocksCollapsed ? "Ouvrir" : "Réduire"}
+          <button onClick={toggleBlocks} title={blocksCollapsed ? "Ouvrir" : "Réduire"}
             style={{ position: "absolute", top: 8, right: 8, zIndex: 20, width: 22, height: 22, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10 }}>
             {blocksCollapsed ? "›" : "‹"}
           </button>
@@ -4354,14 +4252,14 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                   style={{ width: "100%", background: "#111", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 7, padding: "7px 7px 7px 24px", color: "#F5F0E8", fontSize: 11, outline: "none", boxSizing: "border-box" }}
                   onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.4)"}
                   onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.15)"} />
-                {search && <button type="button" onClick={() => setSearch("")} style={{ position: "absolute", right: 7, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 0 }}><X size={10} /></button>}
+                {search && <button onClick={() => setSearch("")} style={{ position: "absolute", right: 7, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 0 }}><X size={10} /></button>}
               </div>
             </div>
           )}
           {/* Mode réduit: icône loupe */}
           {blocksCollapsed && (
             <div style={{ padding: "10px 0", display: "flex", justifyContent: "center", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
-              <button type="button" onClick={toggleBlocks} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 4 }}>
+              <button onClick={toggleBlocks} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 4 }}>
                 <Search size={16} />
               </button>
             </div>
@@ -4372,7 +4270,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {/* Catégorie Récents — visible seulement si au moins 1 récent */}
                 {recentBlocks.length > 0 && (
-                  <button type="button" onClick={() => setActiveCategory("recents")} title="Blocs récemment utilisés"
+                  <button onClick={() => setActiveCategory("recents")} title="Blocs récemment utilisés"
                     style={{ display: "flex", alignItems: "center", gap: 5, background: activeCategory==="recents" ? "#38BDF818" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory==="recents" ? "#38BDF850" : "rgba(255,255,255,0.06)"}`, borderRadius: 8, padding: "6px 9px", color: activeCategory==="recents" ? "#38BDF8" : MUTED, fontSize: 11, fontWeight: activeCategory==="recents" ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
                     <span style={{ fontSize: 14 }}>🕐</span>
                     <span>Récents</span>
@@ -4380,7 +4278,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                 )}
                 {/* Catégorie Favoris — visible seulement si au moins 1 favori */}
                 {favorites.length > 0 && (
-                  <button type="button" onClick={() => setActiveCategory("favorites")} title="Vos blocs favoris"
+                  <button onClick={() => setActiveCategory("favorites")} title="Vos blocs favoris"
                     style={{ display: "flex", alignItems: "center", gap: 5, background: activeCategory==="favorites" ? "#FFD70018" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory==="favorites" ? "#FFD70050" : "rgba(255,255,255,0.06)"}`, borderRadius: 8, padding: "6px 9px", color: activeCategory==="favorites" ? "#FFD700" : MUTED, fontSize: 11, fontWeight: activeCategory==="favorites" ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
                     <span style={{ fontSize: 14 }}>⭐</span>
                     <span>Favoris</span>
@@ -4407,14 +4305,14 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
           {blocksCollapsed && (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "8px 4px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
               {recentBlocks.length > 0 && (
-                <button type="button" onClick={() => { setDrawerCategory("recents"); setActiveCategory("recents") }}
+                <button onClick={() => { setDrawerCategory("recents"); setActiveCategory("recents") }}
                   title={`Récents (${recentBlocks.length})`}
                   style={{ width: 44, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: (drawerCategory==="recents" || activeCategory==="recents") ? "#38BDF818" : "transparent", border: `1px solid ${(drawerCategory==="recents" || activeCategory==="recents") ? "#38BDF840" : "transparent"}`, borderRadius: 8, cursor: "pointer", fontSize: 16, transition: "all 0.15s" }}>
                   🕐
                 </button>
               )}
               {favorites.length > 0 && (
-                <button type="button" onClick={() => { setDrawerCategory("favorites"); setActiveCategory("favorites") }}
+                <button onClick={() => { setDrawerCategory("favorites"); setActiveCategory("favorites") }}
                   title={`Favoris (${favorites.length})`}
                   style={{ width: 44, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: (drawerCategory==="favorites" || activeCategory==="favorites") ? "#FFD70018" : "transparent", border: `1px solid ${(drawerCategory==="favorites" || activeCategory==="favorites") ? "#FFD70040" : "transparent"}`, borderRadius: 8, cursor: "pointer", fontSize: 16, transition: "all 0.15s" }}>
                   ⭐
@@ -4439,7 +4337,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                     <p style={{ fontSize: 22, margin: "0 0 8px" }}>🔍</p>
                     <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: "0 0 3px" }}>Aucun bloc trouvé</p>
                     <p style={{ color: MUTED, fontSize: 10, margin: "0 0 12px" }}>"{search}"</p>
-                    <button type="button" onClick={() => setSearch("")} style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "5px 12px", color: G, fontSize: 10, fontWeight: 600, cursor: "pointer" }}>Effacer</button>
+                    <button onClick={() => setSearch("")} style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "5px 12px", color: G, fontSize: 10, fontWeight: 600, cursor: "pointer" }}>Effacer</button>
                   </div>
                 )
                 : (<>
@@ -4480,7 +4378,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                         <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
                         <p style={{ margin: 0, fontSize: 9, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.description}</p>
                       </div>
-                      <button type="button" onClick={e => { e.stopPropagation(); toggleFav(type) }} title={isFav(type) ? "Retirer des favoris" : "Ajouter aux favoris"}
+                      <button onClick={e => { e.stopPropagation(); toggleFav(type) }} title={isFav(type) ? "Retirer des favoris" : "Ajouter aux favoris"}
                         style={{ width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", cursor: "pointer", flexShrink: 0, fontSize: 13, opacity: isFav(type) ? 1 : 0, color: isFav(type) ? "#FFD700" : MUTED }}
                         className="fav-star">
                         {isFav(type) ? "⭐" : "☆"}
@@ -4498,7 +4396,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                         <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
                         <p style={{ margin: 0, fontSize: 9, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.description}</p>
                       </div>
-                      <button type="button" onClick={e => { e.stopPropagation(); toggleFav(type) }} title="Retirer des favoris"
+                      <button onClick={e => { e.stopPropagation(); toggleFav(type) }} title="Retirer des favoris"
                         style={{ width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", cursor: "pointer", flexShrink: 0, fontSize: 13, opacity: 1, color: "#FFD700" }}
                         className="fav-star">⭐</button>
                     </button>
@@ -4514,7 +4412,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                         const catBlocks = Object.entries(BLOCK_DEFS).filter(([, def]) => def.category === activeCategory)
                         return (
                           <div>
-                            <button type="button" onClick={() => toggleCat(activeCategory)}
+                            <button onClick={() => toggleCat(activeCategory)}
                               style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "7px 9px 6px", background: "transparent", border: "none", borderBottom: `1px solid rgba(255,255,255,0.05)`, cursor: "pointer", marginBottom: collapsed ? 0 : 4 }}>
                               <span style={{ fontSize: 13 }}>{cat.icon}</span>
                               <span style={{ color: cat.color, fontSize: 10, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 1.5, flex: 1, textAlign: "left" as const }}>{cat.label}</span>
@@ -4531,7 +4429,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                                   <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
                                   <p style={{ margin: 0, fontSize: 9, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1.3 }}>{def.description}</p>
                                 </div>
-                                <button type="button" onClick={e => { e.stopPropagation(); toggleFav(type) }}
+                                <button onClick={e => { e.stopPropagation(); toggleFav(type) }}
                                   title={isFav(type) ? "Retirer des favoris" : "Ajouter aux favoris"}
                                   style={{ width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", cursor: "pointer", flexShrink: 0, fontSize: 13, opacity: isFav(type) ? 1 : 0, transition: "opacity 0.15s", color: isFav(type) ? "#FFD700" : MUTED }}
                                   className="fav-star">
@@ -4582,7 +4480,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                   </span>
                 )}
               </div>
-              <button type="button" onClick={() => setDrawerCategory(null)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 2 }}><X size={13} /></button>
+              <button onClick={() => setDrawerCategory(null)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 2 }}><X size={13} /></button>
             </div>
             <div style={{ flex: 1, overflowY: "auto", padding: "5px 6px" }}>
               {(drawerCategory === "recents"
@@ -4600,7 +4498,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                     <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
                     <p style={{ margin: 0, fontSize: 9, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.description}</p>
                   </div>
-                  <button type="button" onClick={e => { e.stopPropagation(); toggleFav(type) }}
+                  <button onClick={e => { e.stopPropagation(); toggleFav(type) }}
                     title={isFav(type) ? "Retirer des favoris" : "Ajouter aux favoris"}
                     style={{ width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", cursor: "pointer", flexShrink: 0, fontSize: 12, color: isFav(type) ? "#FFD700" : "rgba(255,255,255,0.25)" }}>
                     {isFav(type) ? "⭐" : "☆"}
@@ -4648,7 +4546,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
 
                   return (<>
                     {/* Masquer/Afficher */}
-                    <button type="button" onClick={toggleVisibleMulti}
+                    <button onClick={toggleVisibleMulti}
                       title={allVisible ? "Masquer les blocs sélectionnés" : "Afficher les blocs sélectionnés"}
                       style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "6px 11px", color: allVisible ? MUTED : "#EF4444", fontSize: 11, cursor: "pointer", transition: "all 0.15s" }}
                       onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.1)"; e.currentTarget.style.color="#F5F0E8" }}
@@ -4657,7 +4555,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                     </button>
 
                     {/* Verrouiller/Déverrouiller */}
-                    <button type="button" onClick={() => {
+                    <button onClick={() => {
                         const ids = multiSelection
                         setBlocks(p => p.map(b => ids.includes(b.id) ? {...b, locked: !allLocked} : b))
                       }}
@@ -4670,7 +4568,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                     </button>
 
                     {/* Dupliquer */}
-                    <button type="button" onClick={duplicateMulti}
+                    <button onClick={duplicateMulti}
                       title={`Dupliquer ${multiSelection.length} blocs`}
                       style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "6px 11px", color: MUTED, fontSize: 11, cursor: "pointer", transition: "all 0.15s" }}
                       onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.1)"; e.currentTarget.style.color="#F5F0E8" }}
@@ -4679,7 +4577,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                     </button>
 
                     {/* Supprimer avec confirmation */}
-                    <button type="button" onClick={() => {
+                    <button onClick={() => {
                         const unlocked = multiSelection.filter(id => !blocks.find(b => b.id===id)?.locked)
                         if (unlocked.length === 0) return
                         const msg = `Supprimer ${unlocked.length} bloc${unlocked.length>1?"s":""}${unlocked.length<multiSelection.length?` (${multiSelection.length-unlocked.length} verrouillé${multiSelection.length-unlocked.length>1?"s":""} ignoré${multiSelection.length-unlocked.length>1?"s":""})`:""}?`
@@ -4698,7 +4596,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                 <div style={{ width: 1, height: 20, background: "rgba(255,255,255,0.08)", margin: "0 2px" }} />
 
                 {/* Désélectionner */}
-                <button type="button" onClick={() => setMultiSelection([])} title="Désélectionner (Échap)"
+                <button onClick={() => setMultiSelection([])} title="Désélectionner (Échap)"
                   style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, color: MUTED, cursor: "pointer", fontSize: 14, fontWeight: 300 }}
                   onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.1)"; e.currentTarget.style.color="#F5F0E8" }}
                   onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.color=MUTED }}>
@@ -4764,23 +4662,23 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
 
                   <div className="block-overlay" style={{ position: "absolute", top: 6, right: 6, display: "flex", gap: 3, opacity: 0, transition: "opacity 0.15s", zIndex: 10 }}
                     onClick={e => e.stopPropagation()}>
-                    <button type="button" onClick={() => moveBlock(block.id, -1)} disabled={idx===0} style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: idx===0 ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: idx===0 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><ChevronUp size={10} /></button>
-                    <button type="button" onClick={() => moveBlock(block.id, 1)} disabled={idx===blocks.length-1} style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: idx===blocks.length-1 ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: idx===blocks.length-1 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><ChevronDown size={10} /></button>
-                    <button type="button" onClick={() => duplicateBlock(block.id)} style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><Copy size={10} /></button>
-                    <button type="button" onClick={() => toggleVisible(block.id)} title={block.visible ? "Masquer" : "Afficher"}
+                    <button onClick={() => moveBlock(block.id, -1)} disabled={idx===0} style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: idx===0 ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: idx===0 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><ChevronUp size={10} /></button>
+                    <button onClick={() => moveBlock(block.id, 1)} disabled={idx===blocks.length-1} style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: idx===blocks.length-1 ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: idx===blocks.length-1 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><ChevronDown size={10} /></button>
+                    <button onClick={() => duplicateBlock(block.id)} style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><Copy size={10} /></button>
+                    <button onClick={() => toggleVisible(block.id)} title={block.visible ? "Masquer" : "Afficher"}
                       style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: block.visible ? MUTED : "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>
                       {block.visible ? <Eye size={10} /> : <EyeOff size={10} />}
                     </button>
-                    <button type="button" onClick={e => { e.stopPropagation(); toggleDraft(block.id) }} title={block.draft ? "Retirer du brouillon" : "Mettre en brouillon"}
+                    <button onClick={e => { e.stopPropagation(); toggleDraft(block.id) }} title={block.draft ? "Retirer du brouillon" : "Mettre en brouillon"}
                       style={{ width: 24, height: 24, background: block.draft ? "rgba(251,191,36,0.15)" : "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: `1px solid ${block.draft ? "rgba(251,191,36,0.4)" : "rgba(255,255,255,0.1)"}`, color: block.draft ? "#FBBF24" : MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6, fontSize: 10, fontWeight: 700 }}>
                       ✏
                     </button>
-                    <button type="button" onClick={e => { e.stopPropagation(); toggleLock(block.id) }} title={block.locked ? "Déverrouiller" : "Verrouiller"}
+                    <button onClick={e => { e.stopPropagation(); toggleLock(block.id) }} title={block.locked ? "Déverrouiller" : "Verrouiller"}
                       style={{ width: 24, height: 24, background: block.locked ? "rgba(99,102,241,0.15)" : "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: `1px solid ${block.locked ? "rgba(99,102,241,0.4)" : "rgba(255,255,255,0.1)"}`, color: block.locked ? "#818CF8" : MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6, fontSize: 10 }}>
                       {block.locked ? "🔒" : "🔓"}
                     </button>
                     {!block.locked && (
-                      <button type="button" onClick={() => deleteBlock(block.id)} style={{ width: 24, height: 24, background: "rgba(239,68,68,0.12)", backdropFilter: "blur(4px)", border: "1px solid rgba(239,68,68,0.3)", color: "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><Trash2 size={10} /></button>
+                      <button onClick={() => deleteBlock(block.id)} style={{ width: 24, height: 24, background: "rgba(239,68,68,0.12)", backdropFilter: "blur(4px)", border: "1px solid rgba(239,68,68,0.3)", color: "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><Trash2 size={10} /></button>
                     )}
                   </div>
 
@@ -4810,7 +4708,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
               )
             })}
 
-            <button type="button" onClick={() => { setActiveCategory("identity"); setSearch("") }}
+            <button onClick={() => { setActiveCategory("identity"); setSearch("") }}
               style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: "rgba(201,168,76,0.04)", border: "2px dashed rgba(201,168,76,0.2)", borderRadius: 14, padding: "18px", color: MUTED, fontSize: 14, fontWeight: 600, cursor: "pointer", marginTop: 8, transition: "all 0.2s" }}
               onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(201,168,76,0.5)"; e.currentTarget.style.color=G; e.currentTarget.style.background="rgba(201,168,76,0.08)"; e.currentTarget.style.transform="translateY(-1px)" }}
               onMouseLeave={e => { e.currentTarget.style.borderColor="rgba(201,168,76,0.2)"; e.currentTarget.style.color=MUTED; e.currentTarget.style.background="rgba(201,168,76,0.04)"; e.currentTarget.style.transform="translateY(0)" }}>
@@ -4851,7 +4749,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                       {tab==="preview" ? "▶" : tab==="edit" ? "✏" : "🎨"}
                     </button>
                   ))}
-                  <button type="button" onClick={toggleRight} style={{ padding: "12px 4px", background: "none", border: "none", color: MUTED, cursor: "pointer", fontSize: 14, marginTop: "auto" }}>›</button>
+                  <button onClick={toggleRight} style={{ padding: "12px 4px", background: "none", border: "none", color: MUTED, cursor: "pointer", fontSize: 14, marginTop: "auto" }}>›</button>
                 </div>
               : /* Mode normal: onglets horizontaux */
                 <>
@@ -4861,7 +4759,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                       {tab==="preview" ? "Preview" : tab==="edit" ? "Éditer" : "Thème"}
                     </button>
                   ))}
-                  <button type="button" onClick={toggleRight} title="Réduire" style={{ padding: "11px 8px", background: "none", border: "none", color: MUTED, cursor: "pointer", fontSize: 12 }}>‹</button>
+                  <button onClick={toggleRight} title="Réduire" style={{ padding: "11px 8px", background: "none", border: "none", color: MUTED, cursor: "pointer", fontSize: 12 }}>‹</button>
                 </>
             }
           </div>
@@ -4896,7 +4794,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                         </div>
                       </div>
 
-                      <div style={{ maxHeight: 420, overflowY: "auto", ...bgStyle(), position: "relative" as const }} className="iphone-scroll">
+                      <div style={{ maxHeight: 420, overflowY: "auto", ...bgStyle() }} className="iphone-scroll">
                         {blocks.filter(b => b.visible).length===0
                           ? <div style={{ padding: "40px 14px", textAlign: "center", ...bgStyle() }}><p style={{ fontSize: 24, margin: "0 0 6px" }}>✦</p><p style={{ color: MUTED, fontSize: 10 }}>Ta page apparaîtra ici</p></div>
                           : blocks.filter(b => b.visible && !b.draft).map(b => (
@@ -4973,17 +4871,17 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                         <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{BLOCK_DEFS[selectedBlock.type]?.description}</p>
                       </div>
                       <div style={{ marginLeft: "auto", display: "flex", gap: 4 }}>
-                        <button type="button" onClick={() => duplicateBlock(selectedBlock.id)} title="Dupliquer" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: MUTED, display: "flex", alignItems: "center", justifyContent: "center" }}><Copy size={10} /></button>
-                        <button type="button" onClick={() => toggleDraft(selectedBlock.id)} title={selectedBlock.draft ? "Retirer du brouillon" : "Mettre en brouillon"}
+                        <button onClick={() => duplicateBlock(selectedBlock.id)} title="Dupliquer" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: MUTED, display: "flex", alignItems: "center", justifyContent: "center" }}><Copy size={10} /></button>
+                        <button onClick={() => toggleDraft(selectedBlock.id)} title={selectedBlock.draft ? "Retirer du brouillon" : "Mettre en brouillon"}
                           style={{ background: selectedBlock.draft ? "rgba(251,191,36,0.1)" : "rgba(255,255,255,0.04)", border: `1px solid ${selectedBlock.draft ? "rgba(251,191,36,0.35)" : "rgba(255,255,255,0.07)"}`, borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: selectedBlock.draft ? "#FBBF24" : MUTED, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>
                           ✏
                         </button>
-                        <button type="button" onClick={() => toggleLock(selectedBlock.id)} title={selectedBlock.locked ? "Déverrouiller" : "Verrouiller"}
+                        <button onClick={() => toggleLock(selectedBlock.id)} title={selectedBlock.locked ? "Déverrouiller" : "Verrouiller"}
                           style={{ background: selectedBlock.locked ? "rgba(99,102,241,0.1)" : "rgba(255,255,255,0.04)", border: `1px solid ${selectedBlock.locked ? "rgba(99,102,241,0.35)" : "rgba(255,255,255,0.07)"}`, borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: selectedBlock.locked ? "#818CF8" : MUTED, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>
                           {selectedBlock.locked ? "🔒" : "🔓"}
                         </button>
                         {!selectedBlock.locked && (
-                          <button type="button" onClick={() => deleteBlock(selectedBlock.id)} title="Supprimer" style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: "#EF4444", display: "flex", alignItems: "center", justifyContent: "center" }}><Trash2 size={10} /></button>
+                          <button onClick={() => deleteBlock(selectedBlock.id)} title="Supprimer" style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: "#EF4444", display: "flex", alignItems: "center", justifyContent: "center" }}><Trash2 size={10} /></button>
                         )}
                       </div>
                     </div>
