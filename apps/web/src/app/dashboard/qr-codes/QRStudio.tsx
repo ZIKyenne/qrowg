@@ -526,19 +526,162 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const lMax = Math.max(l1,l2), lMin = Math.min(l1,l2)
     return (lMax+0.05)/(lMin+0.05)
   }
-  function getDiagnostic(fgHex:string, bgHex:string) {
+  // ── Moteur de scannabilite complet ──────────────────────────────────────────
+  type ScanIssue = {
+    id:       string
+    severity: "critical"|"warning"|"info"
+    title:    string
+    detail:   string
+    fix?:     string   // label du fix auto
+    fixable:  boolean
+  }
+
+  type ScanScore = {
+    score:      number   // 0-100
+    grade:      "Excellent"|"Bon"|"Moyen"|"Risque"
+    gradeColor: string
+    issues:     ScanIssue[]
+    ratio:      string
+    minSize:    string
+    canAutoFix: boolean
+  }
+
+  function computeScannability(): ScanScore {
+    const issues: ScanIssue[] = []
+    let score = 100
+
+    const fgHex = diagFg || fg || "#080808"
+    const bgHex = diagBg || bg || "#FFFFFF"
+
+    // ── 1. Contraste QR/fond ──────────────────────────────────────────────────
+    const ratio = contrastRatio(fgHex, bgHex)
+    if (ratio < 2) {
+      issues.push({ id:"contrast-critical", severity:"critical",
+        title:"Contraste insuffisant", detail:`Ratio ${ratio.toFixed(1)}:1 — le QR sera illisible sur la plupart des scanners.`,
+        fix:"Passer en noir sur blanc", fixable:true })
+      score -= 35
+    } else if (ratio < 3) {
+      issues.push({ id:"contrast-low", severity:"critical",
+        title:"Contraste trop faible", detail:`Ratio ${ratio.toFixed(1)}:1 — moins de 50% des scanners liront ce QR.`,
+        fix:"Renforcer le contraste", fixable:true })
+      score -= 25
+    } else if (ratio < 4.5) {
+      issues.push({ id:"contrast-warn", severity:"warning",
+        title:"Contraste moyen", detail:`Ratio ${ratio.toFixed(1)}:1 — privilegiez 4.5:1 minimum pour le print.`,
+        fix:"Renforcer le contraste", fixable:true })
+      score -= 12
+    }
+
+    // ── 2. Fond transparent risqué ────────────────────────────────────────────
+    if (styleConf.transparent) {
+      issues.push({ id:"transparent", severity:"warning",
+        title:"Fond transparent", detail:"Le fond transparent peut rendre le QR illisible sur les surfaces colorees.",
+        fix:"Ajouter un fond blanc", fixable:true })
+      score -= 10
+    }
+
+    // ── 3. Logo trop grand ────────────────────────────────────────────────────
+    if (styleConf.logoUrl) {
+      const logoSize = styleConf.logoSize ?? 18
+      if (logoSize > 25) {
+        issues.push({ id:"logo-big", severity:"critical",
+          title:"Logo trop grand", detail:`${logoSize}% du QR est masque — max recommande : 25%.`,
+          fix:"Reduire le logo a 20%", fixable:true })
+        score -= 20
+      } else if (logoSize > 20) {
+        issues.push({ id:"logo-warn", severity:"warning",
+          title:"Logo un peu grand", detail:`${logoSize}% — recommande : 15-20%.`,
+          fix:"Reduire le logo a 18%", fixable:true })
+        score -= 8
+      }
+      // ECC insuffisant avec logo
+      if (effectiveEcc !== "H") {
+        issues.push({ id:"ecc-logo", severity:"critical",
+          title:"Correction insuffisante pour le logo", detail:"Avec un logo, la correction H est obligatoire.",
+          fix:"Passer en ECC H", fixable:true })
+        score -= 15
+      }
+    }
+
+    // ── 4. Correction d'erreur faible sans logo ───────────────────────────────
+    if (!styleConf.logoUrl) {
+      if (ecLevel === "L") {
+        issues.push({ id:"ecc-l", severity:"warning",
+          title:"Correction L trop legere", detail:"ECC L (7%) est insuffisant pour l'impression ou les surfaces abimees.",
+          fix:"Passer en ECC M", fixable:true })
+        score -= 8
+      }
+    }
+
+    // ── 5. Marge insuffisante ─────────────────────────────────────────────────
+    const margin = styleConf.margin ?? 10
+    if (margin < 4) {
+      issues.push({ id:"margin-none", severity:"critical",
+        title:"Marge trop petite", detail:`Marge ${margin}px — minimum 4 modules (10px) requis pour la decouverte.`,
+        fix:"Ajouter une marge de 12px", fixable:true })
+      score -= 18
+    } else if (margin < 8) {
+      issues.push({ id:"margin-low", severity:"warning",
+        title:"Marge reduite", detail:`Marge ${margin}px — 10px+ recommande pour l'impression.`,
+        fix:"Ajouter une marge de 10px", fixable:true })
+      score -= 6
+    }
+
+    // ── 6. Style trop complexe ────────────────────────────────────────────────
+    const dotStyle = styleConf.dotStyle ?? "square"
+    if (dotStyle === "neon" || dotStyle === "luxury") {
+      issues.push({ id:"style-complex", severity:"warning",
+        title:"Style QR complexe", detail:"Les styles Neon/Luxury peuvent perturber la detection par certains scanners anciens.",
+        fix:null, fixable:false })
+      score -= 6
+    }
+
+    // ── 7. Couleurs trop proches (QR ~ fond) ──────────────────────────────────
+    const fgComponents = hexToRgb(fgHex)
+    const bgComponents = hexToRgb(bgHex)
+    const colorDist = Math.sqrt(
+      Math.pow(fgComponents[0]-bgComponents[0], 2) +
+      Math.pow(fgComponents[1]-bgComponents[1], 2) +
+      Math.pow(fgComponents[2]-bgComponents[2], 2)
+    )
+    if (colorDist < 60 && ratio >= 3) {
+      issues.push({ id:"colors-close", severity:"info",
+        title:"Couleurs proches", detail:"La distance chromatique est faible — peut poser probleme sur ecrans a faible gamme.",
+        fix:null, fixable:false })
+      score -= 4
+    }
+
+    // ── 8. Degrades risques ───────────────────────────────────────────────────
+    if (styleConf.gradient !== "none" && styleConf.fg2) {
+      const ratio2 = contrastRatio(styleConf.fg2, bgHex)
+      if (ratio2 < 3) {
+        issues.push({ id:"gradient-contrast", severity:"warning",
+          title:"Degrade — couleur secondaire peu contrastee",
+          detail:`La couleur fin de degrade a un contraste de ${ratio2.toFixed(1)}:1 avec le fond.`,
+          fix:"Supprimer le degrade", fixable:true })
+        score -= 10
+      }
+    }
+
+    score = Math.max(0, Math.min(100, score))
+    const grade: ScanScore["grade"] = score >= 85 ? "Excellent" : score >= 65 ? "Bon" : score >= 40 ? "Moyen" : "Risque"
+    const gradeColor = score >= 85 ? "#39FF8F" : score >= 65 ? "#C9A84C" : score >= 40 ? "#F97316" : "#FF6B6B"
+    const minSize = ratio >= 7 ? "15mm" : ratio >= 4.5 ? "20mm" : ratio >= 3 ? "25mm" : "30mm+"
+    const canAutoFix = issues.some(i => i.fixable)
+
+    return { score, grade, gradeColor, issues, ratio: ratio.toFixed(1), minSize, canAutoFix }
+  }
+
+  // Compat getDiagnostic (utilisé dans la modal)
+  function getDiagnostic(fgHex: string, bgHex: string) {
     if (!fgHex || !bgHex) return null
     const ratio   = contrastRatio(fgHex, bgHex)
     const percent = Math.min(100, Math.round(((ratio-1)/(21-1))*100))
-    let readability: "Excellente"|"Bonne"|"Moyenne"|"Risquee"
-    let readColor:   string
-    if (ratio >= 7)    { readability = "Excellente"; readColor = "#39FF8F" }
-    else if (ratio >= 4.5) { readability = "Bonne";  readColor = "#C9A84C" }
-    else if (ratio >= 3)   { readability = "Moyenne"; readColor = "#F97316" }
-    else                   { readability = "Risquee"; readColor = "#FF6B6B" }
+    const warnContrast = ratio < 3; const warnLow = ratio < 4.5
+    const readability = ratio >= 7 ? "Excellente" : ratio >= 4.5 ? "Bonne" : ratio >= 3 ? "Moyenne" : "Risquee"
+    const readColor   = ratio >= 7 ? "#39FF8F" : ratio >= 4.5 ? "#C9A84C" : ratio >= 3 ? "#F97316" : "#FF6B6B"
     const minSize = ratio >= 7 ? "15mm" : ratio >= 4.5 ? "20mm" : ratio >= 3 ? "25mm" : "30mm+"
-    return { ratio: ratio.toFixed(1), percent, readability, readColor, minSize,
-      warnContrast: ratio < 3, warnLow: ratio < 4.5 }
+    return { ratio: ratio.toFixed(1), percent, readability, readColor, minSize, warnContrast, warnLow }
   }
 
   // Canvas modal plein écran
@@ -627,6 +770,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   }, [activeId])
 
   useEffect(() => { setDiagFg(fg); setDiagBg(bg) }, [fg, bg])
+
+  // Score scannabilité calculé à chaque changement de config
+  const scanScore = active ? computeScannability() : null
 
   // Charger stats QR au changement de sélection ou période
   useEffect(() => {
@@ -864,6 +1010,50 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   function requestAction(qrId: string, action: string, label: string) {
     setConfirmAction({ action, qrId, label })
     setMenuId(null)
+  }
+
+  // ── Auto-fix scannabilité ────────────────────────────────────────────────────
+  function autoFix() {
+    if (!scanScore) return
+    let newFg = fg; let newBg = bg; let newEc = ecLevel
+    let newStyleConf = { ...styleConf }
+
+    for (const issue of scanScore.issues) {
+      if (!issue.fixable) continue
+      switch (issue.id) {
+        case "contrast-critical":
+        case "contrast-low":
+          newFg = "#080808"; newBg = "#FFFFFF"
+          break
+        case "contrast-warn":
+          // Assombrir fg si fond clair, éclaircir si fond sombre
+          newFg = parseInt(bg.replace("#","").slice(0,2),16) > 128 ? "#000000" : "#FFFFFF"
+          break
+        case "transparent":
+          newStyleConf = { ...newStyleConf, transparent: false }
+          break
+        case "logo-big":
+          newStyleConf = { ...newStyleConf, logoSize: 20 }
+          break
+        case "logo-warn":
+          newStyleConf = { ...newStyleConf, logoSize: 18 }
+          break
+        case "ecc-logo":
+        case "ecc-l":
+          newEc = "H"
+          break
+        case "margin-none":
+          newStyleConf = { ...newStyleConf, margin: 12 }
+          break
+        case "margin-low":
+          newStyleConf = { ...newStyleConf, margin: 10 }
+          break
+        case "gradient-contrast":
+          newStyleConf = { ...newStyleConf, gradient: "none", fg2: "" }
+          break
+      }
+    }
+    setFg(newFg); setBg(newBg); setEcLevel(newEc); setStyleConf(newStyleConf)
   }
 
   // ── Fonctions destination dynamique ─────────────────────────────────────────
@@ -1250,6 +1440,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     // ── Export principal ───────────────────────────────────────────────────────
   async function runExport() {
     if (!active || expExporting) return
+    if (scanScore && scanScore.score < 30) {
+      const crits = scanScore.issues.filter(i => i.severity === "critical")
+      if (crits.length > 0 && !window.confirm("Score critique (" + scanScore.score + "/100). Exporter quand meme ?")) return
+    }
     setExpExporting(true)
     try {
       const px          = expSize === "custom" ? Math.max(256, Math.min(8192, expCustomSize)) : expSize
@@ -1943,60 +2137,97 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               </div>
 
               
-{/* Diagnostic */}
-              {diag && (
-                <div style={{ padding:"12px 16px" }}>
-                  <p style={{ color:"#8A8478", fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:"0 0 10px" }}>Diagnostic lisibilite</p>
+{/* Diagnostic scannabilite */}
+              {scanScore && (
+                <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"12px 16px" }}>
 
-                  {/* Lisibilité badge */}
-                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
-                    <span style={{ color:"#8A8478", fontSize:11 }}>Lisibilite</span>
-                    <span style={{ background:`${diag.readColor}15`, border:`1px solid ${diag.readColor}40`, borderRadius:6, padding:"2px 10px", fontSize:10, color:diag.readColor, fontWeight:700 }}>
-                      {diag.readability}
-                    </span>
-                  </div>
-
-                  {/* Contraste */}
-                  <div style={{ marginBottom:10 }}>
-                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:5 }}>
-                      <span style={{ color:"#8A8478", fontSize:11 }}>Contraste</span>
-                      <span style={{ color: diag.warnContrast?"#FF6B6B":diag.warnLow?"#F97316":"#39FF8F", fontSize:11, fontWeight:700 }}>
-                        {diag.ratio}:1
-                      </span>
-                    </div>
-                    <div style={{ height:5, background:"rgba(255,255,255,0.07)", borderRadius:3, overflow:"hidden" }}>
-                      <div style={{ height:"100%", width:`${diag.percent}%`, background: diag.warnContrast?"#FF6B6B":diag.warnLow?"#F97316":"linear-gradient(90deg,#C9A84C,#39FF8F)", borderRadius:3, transition:"width 0.4s, background 0.3s" }}/>
+                  {/* Header score */}
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
+                    <p style={{ color:"#8A8478", fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:0 }}>
+                      Scannabilite
+                    </p>
+                    <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                      {scanScore.canAutoFix && (
+                        <button type="button" onClick={autoFix}
+                          style={{ padding:"2px 8px", background:"rgba(201,168,76,0.1)", border:"1px solid rgba(201,168,76,0.25)", borderRadius:5, color:G, fontSize:9, fontWeight:600, cursor:"pointer" }}>
+                          Corriger auto
+                        </button>
+                      )}
                     </div>
                   </div>
 
-                  {/* Badges info */}
-                  <div style={{ display:"flex", gap:6, flexWrap:"wrap" as const }}>
-                    <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 8px", fontSize:9, color:"#8A8478" }}>
-                      Min {diag.minSize}
-                    </span>
-                    <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 8px", fontSize:9, color:"#8A8478" }}>
-                      Marge 10px
-                    </span>
-                    <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 8px", fontSize:9, color: ecLevel==="H"||ecLevel==="Q"?"#39FF8F":"#C9A84C" }}>
-                      ECC {ecLevel}
-                    </span>
+                  {/* Score visuel */}
+                  <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:12 }}>
+                    {/* Cercle score */}
+                    <div style={{ position:"relative", width:54, height:54, flexShrink:0 }}>
+                      <svg width="54" height="54" viewBox="0 0 54 54" style={{ transform:"rotate(-90deg)" }}>
+                        <circle cx="27" cy="27" r="22" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="5"/>
+                        <circle cx="27" cy="27" r="22" fill="none"
+                          stroke={scanScore.gradeColor} strokeWidth="5"
+                          strokeDasharray={`${(scanScore.score/100)*138.2} 138.2`}
+                          strokeLinecap="round"
+                          style={{ transition:"stroke-dasharray 0.5s ease, stroke 0.3s" }}/>
+                      </svg>
+                      <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
+                        <span style={{ color:scanScore.gradeColor, fontSize:14, fontWeight:800, lineHeight:1 }}>{scanScore.score}</span>
+                      </div>
+                    </div>
+
+                    {/* Grade + infos */}
+                    <div style={{ flex:1 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:5 }}>
+                        <span style={{ background:`${scanScore.gradeColor}15`, border:`1px solid ${scanScore.gradeColor}35`, borderRadius:6, padding:"2px 9px", fontSize:10, color:scanScore.gradeColor, fontWeight:700 }}>
+                          {scanScore.grade}
+                        </span>
+                        {scanScore.issues.length === 0 && (
+                          <span style={{ color:"#39FF8F", fontSize:9 }}>Aucun probleme detecte</span>
+                        )}
+                      </div>
+                      <div style={{ display:"flex", gap:6, flexWrap:"wrap" as const }}>
+                        <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:5, padding:"2px 7px", fontSize:8, color:"#8A8478" }}>
+                          Contraste {scanScore.ratio}:1
+                        </span>
+                        <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:5, padding:"2px 7px", fontSize:8, color:"#8A8478" }}>
+                          Min {scanScore.minSize}
+                        </span>
+                        <span style={{ background:`${ecLevel==="H"?"rgba(57,255,143,0.1)":ecLevel==="M"?"rgba(201,168,76,0.1)":"rgba(249,115,22,0.1)"}`, border:`1px solid ${ecLevel==="H"?"rgba(57,255,143,0.25)":ecLevel==="M"?"rgba(201,168,76,0.25)":"rgba(249,115,22,0.25)"}`, borderRadius:5, padding:"2px 7px", fontSize:8, color:ecLevel==="H"?"#39FF8F":ecLevel==="M"?G:"#F97316" }}>
+                          ECC {ecLevel}
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Warnings */}
-                  {diag.warnContrast && (
-                    <div style={{ display:"flex", alignItems:"center", gap:7, marginTop:10, padding:"8px 10px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:8 }}>
-                      <AlertTriangle size={12} color="#FF6B6B"/>
-                      <p style={{ color:"#FF6B6B", fontSize:11, margin:0 }}>Contraste trop faible — QR risque d&apos;etre illisible</p>
+                  {/* Barre de progression */}
+                  <div style={{ height:4, background:"rgba(255,255,255,0.07)", borderRadius:2, overflow:"hidden", marginBottom:10 }}>
+                    <div style={{ height:"100%", width:`${scanScore.score}%`, background:`linear-gradient(90deg,${scanScore.gradeColor}80,${scanScore.gradeColor})`, borderRadius:2, transition:"width 0.5s ease" }}/>
+                  </div>
+
+                  {/* Liste des problèmes */}
+                  {scanScore.issues.length > 0 && (
+                    <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                      {scanScore.issues.map(issue => (
+                        <div key={issue.id} style={{ display:"flex", alignItems:"flex-start", gap:7, padding:"7px 9px", background:`${issue.severity==="critical"?"rgba(255,107,107,0.07)":issue.severity==="warning"?"rgba(249,115,22,0.06)":"rgba(255,255,255,0.03)"}`, border:`1px solid ${issue.severity==="critical"?"rgba(255,107,107,0.2)":issue.severity==="warning"?"rgba(249,115,22,0.18)":"rgba(255,255,255,0.07)"}`, borderRadius:8 }}>
+                          <span style={{ fontSize:11, flexShrink:0, marginTop:1 }}>
+                            {issue.severity==="critical"?"🔴":issue.severity==="warning"?"🟡":"🔵"}
+                          </span>
+                          <div style={{ flex:1, minWidth:0 }}>
+                            <p style={{ color:"#F5F0E8", fontSize:11, fontWeight:600, margin:"0 0 2px" }}>{issue.title}</p>
+                            <p style={{ color:"#8A8478", fontSize:9, margin:0, lineHeight:1.5 }}>{issue.detail}</p>
+                            {issue.fix && (
+                              <p style={{ color:`${issue.severity==="critical"?"#FF6B6B":"#F97316"}`, fontSize:9, margin:"3px 0 0", fontWeight:600 }}>
+                                ✦ {issue.fix}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   )}
-                  {!diag.warnContrast && diag.warnLow && (
-                    <div style={{ display:"flex", alignItems:"center", gap:7, marginTop:10, padding:"8px 10px", background:"rgba(249,115,22,0.08)", border:"1px solid rgba(249,115,22,0.2)", borderRadius:8 }}>
-                      <AlertTriangle size={12} color="#F97316"/>
-                      <p style={{ color:"#F97316", fontSize:11, margin:0 }}>Contraste moyen — privilegiez une impression a 25mm+</p>
-                    </div>
-                  )}
+                
+              )}
 
-              {/* ── Performance QR ───────────────────────────────────────── */}
+              
+{/* ── Performance QR ───────────────────────────────────────── */}
               <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"14px 16px" }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
                   <div style={{ display:"flex", alignItems:"center", gap:6 }}>
