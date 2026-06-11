@@ -14,6 +14,52 @@ export async function GET(req: NextRequest) {
     const supabase = createAdminClient()
     const appUrl   = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrfolio.app"
 
+    // ── Étape 0: vérifier les redirections ──────────────────────────────────────
+    const path = req.nextUrl.searchParams.get("path") ?? "/"
+
+    // Chercher une redirection exacte (domaine + chemin)
+    const { data: redirect } = await supabase
+      .from("domain_redirects")
+      .select("to_url, redirect_type, id")
+      .eq("from_domain", domain)
+      .eq("from_path", path)
+      .eq("enabled", true)
+      .maybeSingle()
+
+    if (redirect) {
+      // Incrémenter hit_count (fire-and-forget)
+      supabase
+        .from("domain_redirects")
+        .update({ hit_count: supabase.rpc("domain_redirects_increment", { rid: redirect.id }), last_hit_at: new Date().toISOString() })
+        .eq("id", redirect.id)
+        .then(() => {})
+        .catch(() => {})
+
+      const dest = redirect.to_url.startsWith("http")
+        ? redirect.to_url
+        : new URL(redirect.to_url.startsWith("/") ? redirect.to_url : "/" + redirect.to_url, appUrl).toString()
+
+      return NextResponse.redirect(dest, { status: redirect.redirect_type })
+    }
+
+    // Redirection wildcard (domaine seul, chemin "/" par défaut)
+    if (path !== "/") {
+      const { data: wildcardRedir } = await supabase
+        .from("domain_redirects")
+        .select("to_url, redirect_type")
+        .eq("from_domain", domain)
+        .eq("from_path", "/")
+        .eq("enabled", true)
+        .maybeSingle()
+
+      if (wildcardRedir) {
+        const dest = wildcardRedir.to_url.startsWith("http")
+          ? wildcardRedir.to_url
+          : new URL(wildcardRedir.to_url, appUrl).toString()
+        return NextResponse.redirect(dest, { status: wildcardRedir.redirect_type })
+      }
+    }
+
     // ── Étape 1: chercher dans domain_routes (multi-page) ─────────────────────
     // Extraire le domaine racine et le sous-domaine éventuel
     // ex: "booking.restaurant.fr" → root="restaurant.fr", sub="booking"
