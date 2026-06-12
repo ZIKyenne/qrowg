@@ -89,11 +89,50 @@ const BG = "#080808"
 const SURF = "#111009"
 const SURF2 = "#0F0E0B"
 
-const PLAN_CFG = {
-  free:     { color: MUTED,      label: "Free",     icon: Star,   features: ["1 page active","500 vues/mois","QR code basique","Analytics 7j"] },
-  pro:      { color: G,          label: "Pro",       icon: Zap,    features: ["Pages illimitees","Vues illimitees","Domaine personnalise","Analytics 30j","QR premium"] },
-  business: { color: "#39FF8F",  label: "Business",  icon: Crown,  features: ["Tout Plan Pro inclus","Gestion equipe","Acces API complet","Support dedie 24/7","Exports PDF"] },
+// -- Plans complets avec limites reelles --------------------------------------
+type PlanLimit = { pages: number|null; views: number|null; qr: number|null; team: number|null }
+
+const PLAN_CFG: Record<string, {
+  color: string; label: string; icon: any
+  price_monthly: string; price_annual: string
+  description: string
+  limits: PlanLimit
+  features: string[]
+  badge?: string
+}> = {
+  free: {
+    color: MUTED, label: "Gratuit", icon: Star,
+    price_monthly: "0", price_annual: "0",
+    description: "Pour decouvrir QRfolio",
+    limits: { pages: 1, views: 500, qr: 1, team: null },
+    features: ["1 page active","500 vues/mois","1 QR code basique","Analytics de base","Branding QRfolio visible"],
+  },
+  starter: {
+    color: "#38BDF8", label: "Starter", icon: Zap,
+    price_monthly: "2.99", price_annual: "2.39",
+    description: "Pour les createurs individuels",
+    limits: { pages: 3, views: 5000, qr: null, team: null },
+    features: ["3 pages","5 000 vues/mois","QR codes personnalises","Sans branding","Analytics standard","Domaine personnalise"],
+    badge: "POPULAIRE",
+  },
+  pro: {
+    color: G, label: "Pro", icon: Zap,
+    price_monthly: "9.99", price_annual: "7.99",
+    description: "Pour les professionnels et commerces",
+    limits: { pages: null, views: 50000, qr: null, team: null },
+    features: ["Pages illimitees","50 000 vues/mois","QR codes avances","Analytics avances + export","Tous les templates","Support prioritaire"],
+  },
+  business: {
+    color: "#39FF8F", label: "Business", icon: Crown,
+    price_monthly: "24.99", price_annual: "19.99",
+    description: "Pour les agences et equipes",
+    limits: { pages: null, views: null, qr: null, team: 5 },
+    features: ["Vues illimitees","Tout Plan Pro inclus","Equipe 5 membres","Acces API complet","Marque blanche","Support 24/7 dedie"],
+  },
 }
+
+// Plans ordonnes pour l'upsell
+const PLAN_ORDER = ["free","starter","pro","business"]
 
 // -- Composants utilitaires ----------------------------------------------------
 function SectionCard({ title, icon: Icon, color = G, children, action, tag }: {
@@ -171,6 +210,11 @@ export default function ProfilePage() {
   const [activityFilter,  setActivityFilter] = useState("all")
   const [activityPage,    setActivityPage]   = useState(0)
   const ACTIVITY_PAGE_SIZE = 10
+  // Subscription state (simule depuis le plan Supabase, enrichi si Stripe webhook)
+  const [subStatus,   setSubStatus]   = useState<"active"|"trialing"|"canceled"|"past_due"|"free">("free")
+  const [subRenewal,  setSubRenewal]  = useState<string|null>(null)
+  const [subCycle,    setSubCycle]    = useState<"monthly"|"annual">("monthly")
+  const [subLoading,  setSubLoading]  = useState(true)
   const usernameTimer = useRef<NodeJS.Timeout | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const cropRef = useRef<HTMLCanvasElement>(null)
@@ -222,6 +266,12 @@ export default function ProfilePage() {
         }
         // Sera override par buildTimelineFromData si vide
       } catch { /* activity_logs pas encore cree */ }
+      // Statut subscription (simplifie : free = free, autre = active)
+      // En prod, ces donnees viendraient d'un webhook Stripe
+      if (prof) {
+        setSubStatus(prof.plan === "free" ? "free" : "active")
+      }
+      setSubLoading(false)
       setActivityLoading(false)
       setStatsLoading(false)
       setLoading(false)
@@ -503,13 +553,25 @@ export default function ProfilePage() {
   const convRate       = totalViews > 0 ? Math.round((totalScansQR / totalViews) * 100) : 0
   const avgViews       = totalPages > 0 ? Math.round(totalViews / totalPages) : 0
 
+  // -- Consommation calculee --------------------------------------------------
+  const currentPlan  = profile?.plan || "free"
+  const planLimits   = PLAN_CFG[currentPlan]?.limits ?? { pages:1, views:500, qr:1, team:null }
+  const nextPlanKey  = PLAN_ORDER[Math.min(PLAN_ORDER.indexOf(currentPlan)+1, PLAN_ORDER.length-1)]
+  const nextPlan     = PLAN_CFG[nextPlanKey]
+  const pagesUsagePct  = planLimits.pages  ? Math.min((totalPages  / planLimits.pages)  * 100, 100) : 0
+  const viewsUsagePct  = planLimits.views  ? Math.min((totalViews  / planLimits.views)  * 100, 100) : 0
+  const isNearPages    = planLimits.pages  && totalPages  >= Math.floor(planLimits.pages  * 0.8)
+  const isNearViews    = planLimits.views  && totalViews  >= Math.floor(planLimits.views  * 0.8)
+  const isAtLimitPages = planLimits.pages  && totalPages  >= planLimits.pages
+  const isAtLimitViews = planLimits.views  && totalViews  >= planLimits.views
+
   const hasChanges = form.full_name !== formOriginal.full_name
     || form.username !== formOriginal.username
     || form.bio !== formOriginal.bio
     || form.website !== formOriginal.website
   const publicUrl  = form.username ? `https://qrfolio.app/@${form.username}` : null
 
-  const planCfg       = PLAN_CFG[profile?.plan as keyof typeof PLAN_CFG] || PLAN_CFG.free
+  const planCfg       = PLAN_CFG[profile?.plan || "free"] || PLAN_CFG["free"]
   const PlanIcon      = planCfg.icon
   const pc            = planCfg.color
   const validatedRefs = referrals.filter(r => r.status === "validated" || r.status === "rewarded").length
@@ -1224,43 +1286,259 @@ export default function ProfilePage() {
 
           {/* 6. ABONNEMENT */}
           <SectionCard title="Abonnement" icon={CreditCard} color={pc}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16, padding: "14px 16px", background: pc + "08", border: `1px solid ${pc}20`, borderRadius: 10 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: pc + "15", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <PlanIcon size={18} color={pc}/>
+            {subLoading ? (
+              <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+                {[...Array(3)].map((_,i) => (
+                  <div key={i} style={{ height:52, borderRadius:10, background:"rgba(255,255,255,0.04)", animation:"pulse 1.4s ease-in-out infinite", animationDelay:`${i*0.15}s` }}/>
+                ))}
               </div>
-              <div style={{ flex: 1 }}>
-                <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0 }}>Plan {planCfg.label}</p>
-                <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
-                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#39FF8F" }}/>
-                  <span style={{ color: "#39FF8F", fontSize: 11 }}>Actif</span>
-                </div>
-              </div>
-              {profile?.plan !== "business" && (
-                <a href="/upgrade" style={{ display: "flex", alignItems: "center", gap: 5, background: `linear-gradient(90deg,${G},#b8953f)`, borderRadius: 8, padding: "7px 13px", color: "#080808", textDecoration: "none", fontSize: 11, fontWeight: 700 }}>
-                  <Zap size={11}/> Upgrade
-                </a>
-              )}
-            </div>
+            ) : (
+              <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {planCfg.features.map((perk, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <CheckCircle size={13} color="#39FF8F"/>
-                  <span style={{ color: MUTED, fontSize: 12 }}>{perk}</span>
-                </div>
-              ))}
-            </div>
+                {/* En-tete plan */}
+                <div style={{ padding:"14px 16px", background:pc+"08", border:`1px solid ${pc}20`, borderRadius:12, position:"relative" as const, overflow:"hidden" }}>
+                  <div style={{ position:"absolute", top:-20, right:-20, width:80, height:80, borderRadius:"50%", background:`radial-gradient(circle,${pc}15,transparent 70%)`, pointerEvents:"none" }}/>
+                  <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+                    <div style={{ width:44, height:44, borderRadius:11, background:pc+"18", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                      <PlanIcon size={20} color={pc}/>
+                    </div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:3 }}>
+                        <p style={{ color:"#F5F0E8", fontSize:16, fontWeight:700, margin:0 }}>
+                          Plan {planCfg.label}
+                        </p>
+                        {planCfg.badge && (
+                          <span style={{ background:"rgba(56,189,248,0.15)", border:"1px solid rgba(56,189,248,0.3)", borderRadius:5, padding:"1px 7px", fontSize:9, color:"#38BDF8", fontWeight:800 }}>
+                            {planCfg.badge}
+                          </span>
+                        )}
+                        <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:subStatus==="active"?"rgba(57,255,143,0.1)":subStatus==="trialing"?"rgba(201,168,76,0.1)":subStatus==="free"?"rgba(138,132,120,0.1)":"rgba(255,107,107,0.1)", border:`1px solid ${subStatus==="active"?"rgba(57,255,143,0.25)":subStatus==="trialing"?"rgba(201,168,76,0.25)":subStatus==="free"?"rgba(138,132,120,0.2)":"rgba(255,107,107,0.25)"}`, borderRadius:20, padding:"2px 9px" }}>
+                          <div style={{ width:5, height:5, borderRadius:"50%", background:subStatus==="active"?"#39FF8F":subStatus==="trialing"?"#C9A84C":subStatus==="free"?"#8A8478":"#FF6B6B" }}/>
+                          <span style={{ color:subStatus==="active"?"#39FF8F":subStatus==="trialing"?"#C9A84C":subStatus==="free"?"#8A8478":"#FF6B6B", fontSize:10, fontWeight:600 }}>
+                            {subStatus==="active"?"Actif":subStatus==="trialing"?"Essai gratuit":subStatus==="free"?"Plan gratuit":subStatus==="past_due"?"Paiement en attente":"Annule"}
+                          </span>
+                        </span>
+                      </div>
+                      <p style={{ color:MUTED, fontSize:11, margin:0 }}>{planCfg.description}</p>
+                    </div>
+                    {/* Prix */}
+                    <div style={{ textAlign:"right" as const, flexShrink:0 }}>
+                      {planCfg.price_monthly === "0" ? (
+                        <p style={{ color:MUTED, fontSize:14, fontWeight:700, margin:0 }}>Gratuit</p>
+                      ) : (
+                        <>
+                          <p style={{ color:"#F5F0E8", fontSize:18, fontWeight:800, margin:0, fontFamily:"Cormorant Garamond, serif", lineHeight:1 }}>
+                            {subCycle==="annual" ? planCfg.price_annual : planCfg.price_monthly}.
+                          </p>
+                          <p style={{ color:MUTED, fontSize:9, margin:"2px 0 0" }}>/ mois</p>
+                        </>
+                      )}
+                    </div>
+                  </div>
 
-            {profile?.plan === "free" && (
-              <div style={{ marginTop: 16, padding: "12px 14px", background: `${G}06`, border: `1px solid ${G}15`, borderRadius: 9 }}>
-                <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: "0 0 4px" }}>Passez a Pro</p>
-                <p style={{ color: MUTED, fontSize: 11, margin: "0 0 10px" }}>Pages illimitees, domaine perso, analytics avances</p>
-                <a href="/upgrade" style={{ display: "block", textAlign: "center" as const, padding: "8px", background: `linear-gradient(90deg,${G},#b8953f)`, borderRadius: 8, color: "#080808", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
-                  Voir les plans
-                </a>
+                  {/* Cycle toggle */}
+                  {planCfg.price_monthly !== "0" && (
+                    <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:12, paddingTop:12, borderTop:"1px solid rgba(255,255,255,0.06)" }}>
+                      <p style={{ color:MUTED, fontSize:10, margin:0 }}>Cycle de facturation :</p>
+                      <div style={{ display:"flex", gap:5 }}>
+                        {(["monthly","annual"] as const).map(c => (
+                          <button key={c} type="button" onClick={() => setSubCycle(c)}
+                            style={{ padding:"3px 10px", background:subCycle===c?"rgba(201,168,76,0.12)":"transparent", border:`1px solid ${subCycle===c?"rgba(201,168,76,0.3)":"rgba(255,255,255,0.08)"}`, borderRadius:6, color:subCycle===c?G:MUTED, fontSize:10, fontWeight:subCycle===c?700:400, cursor:"pointer" }}>
+                            {c==="monthly"?"Mensuel":"Annuel -20%"}
+                          </button>
+                        ))}
+                      </div>
+                      {subRenewal && (
+                        <p style={{ color:MUTED, fontSize:10, margin:"0 0 0 auto" }}>
+                          Renouvellement : {new Date(subRenewal).toLocaleDateString("fr-FR", { day:"numeric", month:"long" })}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Features incluses */}
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
+                  {planCfg.features.map((f, i) => (
+                    <div key={i} style={{ display:"flex", alignItems:"center", gap:7 }}>
+                      <CheckCircle size={12} color="#39FF8F" style={{ flexShrink:0 }}/>
+                      <span style={{ color:MUTED, fontSize:11 }}>{f}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Boutons action */}
+                <div style={{ display:"flex", gap:8 }}>
+                  {currentPlan !== "business" && (
+                    <a href="/upgrade"
+                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"10px", background:`linear-gradient(90deg,${pc},${pc}cc)`, borderRadius:9, color: pc === MUTED ? "#F5F0E8" : "#080808", textDecoration:"none", fontSize:12, fontWeight:700 }}>
+                      <Zap size={13}/>
+                      {currentPlan==="free"?"Choisir un plan":"Upgrader vers "+nextPlan?.label}
+                    </a>
+                  )}
+                  {currentPlan !== "free" && (
+                    <a href="https://billing.stripe.com/p/login/test" target="_blank" rel="noopener noreferrer"
+                      style={{ flex:currentPlan==="business"?1:0, display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding:"10px 14px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:MUTED, textDecoration:"none", fontSize:12, cursor:"pointer", whiteSpace:"nowrap" as const }}>
+                      <CreditCard size={13}/> Gerer la facturation
+                    </a>
+                  )}
+                </div>
               </div>
             )}
           </SectionCard>
+
+          {/* CONSOMMATION */}
+          <SectionCard title="Consommation" icon={TrendingUp} color="#38BDF8">
+            {statsLoading ? (
+              <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+                {[...Array(3)].map((_,i) => (
+                  <div key={i} style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                    <div style={{ height:10, width:"60%", borderRadius:4, background:"rgba(255,255,255,0.04)", animation:"pulse 1.4s ease-in-out infinite" }}/>
+                    <div style={{ height:6, borderRadius:3, background:"rgba(255,255,255,0.04)", animation:"pulse 1.4s ease-in-out infinite", animationDelay:`${i*0.1}s` }}/>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+
+                {/* Alert limite atteinte */}
+                {(isAtLimitPages || isAtLimitViews) && (
+                  <div style={{ display:"flex", alignItems:"flex-start", gap:9, padding:"10px 12px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.25)", borderRadius:9 }}>
+                    <AlertTriangle size={14} color="#FF6B6B" style={{ flexShrink:0, marginTop:1 }}/>
+                    <div>
+                      <p style={{ color:"#FF6B6B", fontSize:12, fontWeight:700, margin:"0 0 2px" }}>Limite atteinte</p>
+                      <p style={{ color:"rgba(255,107,107,0.8)", fontSize:11, margin:"0 0 8px" }}>
+                        {isAtLimitPages ? "Vous avez atteint la limite de pages de votre plan." : "Vous avez atteint la limite de vues mensuelle."}
+                      </p>
+                      <a href="/upgrade" style={{ color:"#FF6B6B", fontSize:11, fontWeight:700 }}>Upgrader maintenant .</a>
+                    </div>
+                  </div>
+                )}
+
+                {/* Barre Pages */}
+                {(() => {
+                  const limit = planLimits.pages
+                  const used  = totalPages
+                  const pct   = limit ? Math.min((used/limit)*100, 100) : 0
+                  const isNear = limit && used >= Math.floor(limit * 0.8)
+                  const isAt   = limit && used >= limit
+                  const barColor = isAt ? "#FF6B6B" : isNear ? "#F97316" : "#38BDF8"
+                  return (
+                    <div>
+                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6 }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+                          <Eye size={12} color="#38BDF8"/>
+                          <span style={{ color:"#F5F0E8", fontSize:12, fontWeight:600 }}>Pages</span>
+                          {isNear && !isAt && <span style={{ color:"#F97316", fontSize:9, fontWeight:700, background:"rgba(249,115,22,0.1)", border:"1px solid rgba(249,115,22,0.2)", borderRadius:4, padding:"1px 5px" }}>Bientot plein</span>}
+                          {isAt && <span style={{ color:"#FF6B6B", fontSize:9, fontWeight:700, background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:4, padding:"1px 5px" }}>Limite atteinte</span>}
+                        </div>
+                        <span style={{ color:isAt?"#FF6B6B":isNear?"#F97316":MUTED, fontSize:11, fontWeight:600 }}>
+                          {used} {limit ? `/ ${limit}` : "/ illimite"}
+                        </span>
+                      </div>
+                      {limit ? (
+                        <div style={{ height:6, background:"rgba(255,255,255,0.06)", borderRadius:3, overflow:"hidden" }}>
+                          <div style={{ height:"100%", width:`${pct}%`, background:isAt?"#FF6B6B":isNear?`linear-gradient(90deg,#F97316,#FF6B6B)`:`linear-gradient(90deg,#38BDF8,#7B61FF)`, borderRadius:3, transition:"width 0.6s ease" }}/>
+                        </div>
+                      ) : (
+                        <div style={{ height:6, background:`linear-gradient(90deg,#38BDF8,#7B61FF)`, borderRadius:3, opacity:0.3 }}/>
+                      )}
+                    </div>
+                  )
+                })()}
+
+                {/* Barre Vues */}
+                {(() => {
+                  const limit = planLimits.views
+                  const used  = totalViews
+                  const pct   = limit ? Math.min((used/limit)*100, 100) : 0
+                  const isNear = limit && used >= Math.floor(limit * 0.8)
+                  const isAt   = limit && used >= limit
+                  const barColor = isAt ? "#FF6B6B" : isNear ? "#F97316" : G
+                  return (
+                    <div>
+                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6 }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+                          <TrendingUp size={12} color={G}/>
+                          <span style={{ color:"#F5F0E8", fontSize:12, fontWeight:600 }}>Vues ce mois</span>
+                          {isNear && !isAt && <span style={{ color:"#F97316", fontSize:9, fontWeight:700, background:"rgba(249,115,22,0.1)", border:"1px solid rgba(249,115,22,0.2)", borderRadius:4, padding:"1px 5px" }}>Bientot plein</span>}
+                          {isAt && <span style={{ color:"#FF6B6B", fontSize:9, fontWeight:700, background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:4, padding:"1px 5px" }}>Limite atteinte</span>}
+                        </div>
+                        <span style={{ color:isAt?"#FF6B6B":isNear?"#F97316":MUTED, fontSize:11, fontWeight:600 }}>
+                          {used.toLocaleString("fr-FR")} {limit ? `/ ${limit.toLocaleString("fr-FR")}` : "/ illimite"}
+                        </span>
+                      </div>
+                      {limit ? (
+                        <div style={{ height:6, background:"rgba(255,255,255,0.06)", borderRadius:3, overflow:"hidden" }}>
+                          <div style={{ height:"100%", width:`${pct}%`, background:isAt?"#FF6B6B":isNear?`linear-gradient(90deg,#F97316,#FF6B6B)`:`linear-gradient(90deg,${G},#38BDF8)`, borderRadius:3, transition:"width 0.6s ease" }}/>
+                        </div>
+                      ) : (
+                        <div style={{ height:6, background:`linear-gradient(90deg,${G},#39FF8F)`, borderRadius:3, opacity:0.3 }}/>
+                      )}
+                    </div>
+                  )
+                })()}
+
+                {/* QR Codes */}
+                <div>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6 }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+                      <QrCode size={12} color="#F97316"/>
+                      <span style={{ color:"#F5F0E8", fontSize:12, fontWeight:600 }}>QR Codes actifs</span>
+                    </div>
+                    <span style={{ color:MUTED, fontSize:11, fontWeight:600 }}>
+                      {activeQR} {planLimits.qr ? `/ ${planLimits.qr}` : "/ illimite"}
+                    </span>
+                  </div>
+                  {planLimits.qr ? (
+                    <div style={{ height:6, background:"rgba(255,255,255,0.06)", borderRadius:3, overflow:"hidden" }}>
+                      <div style={{ height:"100%", width:`${Math.min((activeQR/planLimits.qr)*100,100)}%`, background:"linear-gradient(90deg,#F97316,#FF6B6B)", borderRadius:3, transition:"width 0.6s ease" }}/>
+                    </div>
+                  ) : (
+                    <div style={{ height:6, background:"linear-gradient(90deg,#F97316,#C9A84C)", borderRadius:3, opacity:0.3 }}/>
+                  )}
+                </div>
+
+                {/* Equipe -- Business only */}
+                {planLimits.team && (
+                  <div>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+                        <Users size={12} color="#7B61FF"/>
+                        <span style={{ color:"#F5F0E8", fontSize:12, fontWeight:600 }}>Membres equipe</span>
+                      </div>
+                      <span style={{ color:MUTED, fontSize:11, fontWeight:600 }}>1 / {planLimits.team}</span>
+                    </div>
+                    <div style={{ height:6, background:"rgba(255,255,255,0.06)", borderRadius:3, overflow:"hidden" }}>
+                      <div style={{ height:"100%", width:`${(1/planLimits.team)*100}%`, background:"linear-gradient(90deg,#7B61FF,#38BDF8)", borderRadius:3 }}/>
+                    </div>
+                  </div>
+                )}
+
+                {/* CTA upgrade contextuel */}
+                {currentPlan !== "business" && (isNearPages || isNearViews) && (
+                  <div style={{ padding:"12px 14px", background:`${nextPlan?.color || G}06`, border:`1px solid ${nextPlan?.color || G}20`, borderRadius:10 }}>
+                    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10 }}>
+                      <div>
+                        <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:700, margin:"0 0 3px" }}>
+                          Passez a {nextPlan?.label}
+                        </p>
+                        <p style={{ color:MUTED, fontSize:11, margin:0 }}>
+                          {planLimits.views ? `${(nextPlan?.limits.views || 0) > (planLimits.views || 0) ? "+" + ((nextPlan?.limits.views ?? 0) - (planLimits.views ?? 0)).toLocaleString("fr-FR") : "Illimite"} vues/mois` : "Capacite augmentee"}
+                          {" "}&middot; {nextPlan?.price_monthly}./mois
+                        </p>
+                      </div>
+                      <a href="/upgrade"
+                        style={{ display:"flex", alignItems:"center", gap:5, padding:"8px 14px", background:`linear-gradient(90deg,${nextPlan?.color || G},${nextPlan?.color || G}cc)`, borderRadius:8, color:"#080808", textDecoration:"none", fontSize:11, fontWeight:700, flexShrink:0 }}>
+                        <Zap size={11}/> Upgrader
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </SectionCard>
+
 
           {/* 7. RECOMPENSES */}
           <SectionCard title="Recompenses" icon={Star} color="#F59E0B" tag={totalMonths > 0 ? `${totalMonths} mois` : undefined}>
