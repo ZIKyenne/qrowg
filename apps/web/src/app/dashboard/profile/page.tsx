@@ -79,6 +79,19 @@ const ACTIVITY_FILTER_OPTS = [
   { id: "account",   label: "Compte"     },
 ]
 
+type DomainRecord = {
+  id:            string
+  domain:        string
+  page_id:       string
+  is_primary:    boolean
+  verified:      boolean
+  verified_at:   string | null
+  vercel_status: string   // "pending" | "active" | "error"
+  vercel_error:  string | null
+  created_at:    string
+  pages:         { title: string; slug: string } | null
+}
+
 type QRStat = {
   id: string; short_code: string; total_scans: number; status: string | null
   pages: { title: string } | null
@@ -219,6 +232,10 @@ export default function ProfilePage() {
   const [subStatus,   setSubStatus]   = useState<"active"|"trialing"|"canceled"|"past_due"|"free">("free")
   const [subRenewal,  setSubRenewal]  = useState<string|null>(null)
   const [subCycle,    setSubCycle]    = useState<"monthly"|"annual">("monthly")
+  const [domains,       setDomains]       = useState<DomainRecord[]>([])
+  const [domainsLoading,setDomainsLoading]= useState(true)
+  const [deletingDomain,setDeletingDomain]= useState<string|null>(null)
+  const [settingPrimary,setSettingPrimary]= useState<string|null>(null)
   const [subLoading,  setSubLoading]  = useState(true)
   // -- Securite ------------------------------------------
   const [authUser,       setAuthUser]       = useState<any>(null)
@@ -309,6 +326,13 @@ export default function ProfilePage() {
       if (prof) {
         setSubStatus(prof.plan === "free" ? "free" : "active")
       }
+      // Charger les domaines
+      try {
+        const dRes = await fetch("/api/domains")
+        const dData = await dRes.json()
+        setDomains(dData.domains ?? [])
+      } catch { /* API domains peut ne pas etre disponible */ }
+      setDomainsLoading(false)
       setSubLoading(false)
       setActivityLoading(false)
       setStatsLoading(false)
@@ -417,6 +441,45 @@ export default function ProfilePage() {
     try {
       await sb.from("activity_logs").insert({ ...evt })
     } catch { /* table peut ne pas exister encore */ }
+  }
+
+  // -- Fonctions domaines ----------------------------------------
+  async function deleteDomain(id: string) {
+    setDeletingDomain(id)
+    try {
+      const res = await fetch("/api/domains", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      })
+      const d = await res.json()
+      if (d.ok || d.success) {
+        setDomains(prev => prev.filter(dm => dm.id !== id))
+        showToast("Domaine supprime")
+      } else {
+        showToast(d.error || "Erreur suppression", "err")
+      }
+    } catch { showToast("Erreur reseau", "err") }
+    setDeletingDomain(null)
+  }
+
+  async function setPrimaryDomain(id: string) {
+    setSettingPrimary(id)
+    try {
+      const res = await fetch("/api/domains", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, action: "set_primary" }),
+      })
+      const d = await res.json()
+      if (d.ok || d.success) {
+        setDomains(prev => prev.map(dm => ({ ...dm, is_primary: dm.id === id })))
+        showToast("Domaine principal defini")
+      } else {
+        showToast(d.error || "Erreur", "err")
+      }
+    } catch { showToast("Erreur reseau", "err") }
+    setSettingPrimary(null)
   }
 
   // -- Fonctions securite ----------------------------------------
@@ -2183,19 +2246,166 @@ export default function ProfilePage() {
           </SectionCard>
 
           {/* 9. DOMAINES */}
-          <SectionCard title="Domaines personnalises" icon={Globe} color="#38BDF8" tag="Bientot">
-            <div style={{ textAlign: "center" as const, padding: "16px 0" }}>
-              <Globe size={28} color={MUTED} style={{ marginBottom: 8 }}/>
-              <p style={{ color: MUTED, fontSize: 12, margin: "0 0 4px" }}>Connectez votre domaine</p>
-              <p style={{ color: MUTED, fontSize: 11, margin: "0 0 10px", lineHeight: 1.5 }}>
-                Bientot : utilisez votre propre domaine<br/>pour toutes vos pages QRfolio
-              </p>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 14px", background: "rgba(56,189,248,0.08)", border: "1px solid rgba(56,189,248,0.15)", borderRadius: 20 }}>
-                <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#38BDF8" }}/>
-                <span style={{ color: "#38BDF8", fontSize: 10 }}>En cours de developpement</span>
+          <SectionCard title="Domaines personnalises" icon={Globe} color="#38BDF8"
+            tag={domains.length > 0 ? `${domains.length}` : undefined}
+            action={
+              <a href="/dashboard/domains"
+                style={{ display:"flex", alignItems:"center", gap:4, color:MUTED, fontSize:11, textDecoration:"none" }}>
+                Gerer <ChevronRight size={12}/>
+              </a>
+            }>
+            {currentPlan === "free" ? (
+              /* CTA upgrade plan insuffisant */
+              <div style={{ textAlign:"center" as const, padding:"20px 0" }}>
+                <Globe size={28} color={MUTED} style={{ marginBottom:10 }}/>
+                <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 5px" }}>Domaines personnalises</p>
+                <p style={{ color:MUTED, fontSize:11, margin:"0 0 14px", lineHeight:1.5 }}>
+                  Connectez votre propre domaine<br/>a vos pages QRfolio.
+                </p>
+                <a href="/upgrade"
+                  style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"9px 18px", background:`linear-gradient(90deg,${G},#b8953f)`, border:"none", borderRadius:9, color:"#080808", textDecoration:"none", fontSize:12, fontWeight:700 }}>
+                  <Zap size={13}/> Passer a Starter ou Pro
+                </a>
               </div>
-            </div>
+            ) : domainsLoading ? (
+              /* Skeleton */
+              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                {[...Array(2)].map((_,i) => (
+                  <div key={i} style={{ height:60, borderRadius:9, background:"rgba(255,255,255,0.04)", animation:"pulse 1.4s ease-in-out infinite", animationDelay:`${i*0.1}s` }}/>
+                ))}
+              </div>
+            ) : domains.length === 0 ? (
+              /* Empty state Pro */
+              <div style={{ textAlign:"center" as const, padding:"16px 0" }}>
+                <Globe size={26} color={MUTED} style={{ marginBottom:9 }}/>
+                <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 4px" }}>Aucun domaine connecte</p>
+                <p style={{ color:MUTED, fontSize:11, margin:"0 0 14px", lineHeight:1.5 }}>
+                  Utilisez votre propre domaine pour<br/>toutes vos pages QRfolio.
+                </p>
+                <a href="/dashboard/domains"
+                  style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"9px 18px", background:"rgba(56,189,248,0.1)", border:"1px solid rgba(56,189,248,0.25)", borderRadius:9, color:"#38BDF8", textDecoration:"none", fontSize:12, fontWeight:700 }}>
+                  <Plus size={13}/> Ajouter un domaine
+                </a>
+              </div>
+            ) : (
+              /* Liste domaines */
+              <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+
+                {/* KPIs rapides */}
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:7 }}>
+                  {([
+                    { label:"Total",    value:domains.length,                                              color:"#38BDF8" },
+                    { label:"Actifs",   value:domains.filter(d=>d.vercel_status==="active").length,        color:"#39FF8F" },
+                    { label:"En attente",value:domains.filter(d=>d.vercel_status==="pending").length,      color:"#F97316" },
+                  ] as const).map((k,i) => (
+                    <div key={i} style={{ background:SURF2, border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"9px 10px", textAlign:"center" as const }}>
+                      <p style={{ color:k.color, fontSize:18, fontWeight:800, margin:0, fontFamily:"Cormorant Garamond, serif", lineHeight:1 }}>{k.value}</p>
+                      <p style={{ color:MUTED, fontSize:9, margin:"3px 0 0" }}>{k.label}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Cartes domaines */}
+                {domains.slice(0, 4).map(dm => {
+                  const statusMap: Record<string, { label:string; color:string; dot:string }> = {
+                    active:  { label:"Actif",       color:"#39FF8F", dot:"#39FF8F" },
+                    pending: { label:"En attente",  color:"#F97316", dot:"#F97316" },
+                    error:   { label:"Erreur DNS",  color:"#FF6B6B", dot:"#FF6B6B" },
+                  }
+                  const st = statusMap[dm.vercel_status] ?? statusMap["pending"]
+                  return (
+                    <div key={dm.id} style={{ background:SURF2, border:`1px solid ${dm.is_primary?"rgba(201,168,76,0.2)":"rgba(255,255,255,0.06)"}`, borderRadius:10, overflow:"hidden" }}>
+                      {/* Header domaine */}
+                      <div style={{ display:"flex", alignItems:"center", gap:10, padding:"11px 13px" }}>
+                        {/* Dot statut */}
+                        <div style={{ width:8, height:8, borderRadius:"50%", background:st.dot, flexShrink:0, boxShadow:dm.vercel_status==="active"?`0 0 6px ${st.dot}60`:undefined }}/>
+                        <div style={{ flex:1, minWidth:0 }}>
+                          <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+                            <a href={`https://${dm.domain}`} target="_blank" rel="noopener noreferrer"
+                              style={{ color:"#F5F0E8", fontSize:12, fontWeight:700, textDecoration:"none", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
+                              {dm.domain}
+                            </a>
+                            {dm.is_primary && (
+                              <span style={{ background:"rgba(201,168,76,0.12)", border:"1px solid rgba(201,168,76,0.25)", borderRadius:4, padding:"1px 6px", fontSize:8, color:G, fontWeight:800, flexShrink:0 }}>
+                                PRINCIPAL
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:2 }}>
+                            <span style={{ color:st.color, fontSize:9, fontWeight:600 }}>{st.label}</span>
+                            {dm.pages && (
+                              <span style={{ color:MUTED, fontSize:9 }}>
+                                {" . "}{dm.pages.title}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {/* Actions */}
+                        <div style={{ display:"flex", gap:5, flexShrink:0 }}>
+                          {!dm.is_primary && dm.vercel_status === "active" && (
+                            <button type="button"
+                              onClick={() => setPrimaryDomain(dm.id)}
+                              disabled={settingPrimary === dm.id}
+                              title="Definir comme principal"
+                              style={{ width:26, height:26, background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:G }}>
+                              {settingPrimary===dm.id
+                                ? <div style={{ width:11, height:11, border:`1.5px solid ${G}30`, borderTopColor:G, borderRadius:"50%", animation:"spin 0.7s linear infinite" }}/>
+                                : <CheckCircle size={12}/>}
+                            </button>
+                          )}
+                          <a href="/dashboard/domains"
+                            title="Configurer DNS"
+                            style={{ width:26, height:26, background:"rgba(56,189,248,0.06)", border:"1px solid rgba(56,189,248,0.15)", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", color:"#38BDF8", textDecoration:"none" }}>
+                            <Settings size={11}/>
+                          </a>
+                          <button type="button"
+                            onClick={() => deleteDomain(dm.id)}
+                            disabled={deletingDomain === dm.id}
+                            title="Supprimer"
+                            style={{ width:26, height:26, background:"rgba(255,107,107,0.06)", border:"1px solid rgba(255,107,107,0.15)", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#FF6B6B" }}>
+                            {deletingDomain===dm.id
+                              ? <div style={{ width:11, height:11, border:"1.5px solid rgba(255,107,107,0.3)", borderTopColor:"#FF6B6B", borderRadius:"50%", animation:"spin 0.7s linear infinite" }}/>
+                              : <Trash2 size={11}/>}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Alerte erreur DNS */}
+                      {dm.vercel_status === "error" && dm.vercel_error && (
+                        <div style={{ padding:"8px 13px", background:"rgba(255,107,107,0.06)", borderTop:"1px solid rgba(255,107,107,0.12)" }}>
+                          <p style={{ color:"rgba(255,107,107,0.8)", fontSize:10, margin:0 }}>{dm.vercel_error}</p>
+                        </div>
+                      )}
+
+                      {/* Bande SSL si actif */}
+                      {dm.vercel_status === "active" && (
+                        <div style={{ display:"flex", alignItems:"center", gap:6, padding:"6px 13px", background:"rgba(57,255,143,0.03)", borderTop:"1px solid rgba(57,255,143,0.08)" }}>
+                          <Shield size={10} color="#39FF8F"/>
+                          <span style={{ color:"rgba(57,255,143,0.7)", fontSize:9 }}>
+                            SSL actif {dm.verified_at ? `depuis le ${new Date(dm.verified_at).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})}` : ""}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+
+                {domains.length > 4 && (
+                  <a href="/dashboard/domains"
+                    style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"8px", color:MUTED, fontSize:11, textDecoration:"none" }}>
+                    Voir les {domains.length - 4} autres domaines <ChevronRight size={12}/>
+                  </a>
+                )}
+
+                {/* CTA ajouter */}
+                <a href="/dashboard/domains"
+                  style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"10px", background:"rgba(56,189,248,0.06)", border:"1px solid rgba(56,189,248,0.15)", borderRadius:9, color:"#38BDF8", textDecoration:"none", fontSize:12, fontWeight:600 }}>
+                  <Plus size={13}/> Ajouter un domaine
+                </a>
+              </div>
+            )}
           </SectionCard>
+
 
           {/* 10. PREFERENCES */}
           <SectionCard title="Preferences" icon={Bell} color="#F97316">
