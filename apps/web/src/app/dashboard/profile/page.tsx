@@ -805,14 +805,112 @@ export default function ProfilePage() {
     setConfirmRevoke(null)
   }
 
-  async function exportData() {
-    if (!profile) return
-    const data = { profile, referrals, apiKeys: apiKeys.map(k => ({ ...k, key_hash: "[REDACTED]" })) }
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" })
+  // -- Exports RGPD -----------------------------------------------
+  type ExportJob = { id:string; label:string; status:"idle"|"running"|"done"|"error"; filename?:string }
+  const [exportJobs, setExportJobs] = useState<ExportJob[]>([
+    { id:"full",      label:"Export complet",        status:"idle" },
+    { id:"pages",     label:"Pages",                 status:"idle" },
+    { id:"qrcodes",   label:"QR Codes",              status:"idle" },
+    { id:"analytics", label:"Analytics",             status:"idle" },
+    { id:"activity",  label:"Historique activite",   status:"idle" },
+  ])
+  const [exportHistory, setExportHistory] = useState<{date:string;label:string;format:string}[]>([])
+
+  function downloadBlob(content: string, filename: string, mime: string) {
+    const blob = new Blob([content], { type: mime })
     const url  = URL.createObjectURL(blob)
-    const a    = document.createElement("a"); a.href = url; a.download = `qrfolio-export-${profile.username || profile.id.slice(0,8)}.json`; a.click()
-    URL.revokeObjectURL(url)
+    const a    = Object.assign(document.createElement("a"), { href:url, download:filename })
+    a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
+
+  function arrayToCsv(rows: Record<string,any>[], cols?: string[]): string {
+    if (!rows.length) return ""
+    const keys = cols ?? Object.keys(rows[0])
+    const esc  = (v: any) => `"${String(v ?? "").replace(/"/g, '"\""' )}"`
+    return [keys.join(","), ...rows.map(r => keys.map(k => esc(r[k])).join(","))].join("\r\n")
+  }
+
+  function setJobStatus(id: string, status: ExportJob["status"], filename?: string) {
+    setExportJobs(prev => prev.map(j => j.id===id ? {...j,status,filename} : j))
+  }
+
+  async function runExport(jobId: string) {
+    if (!profile) return
+    setJobStatus(jobId, "running")
+    const slug = profile.username || profile.id.slice(0,8)
+    const ts   = new Date().toISOString().slice(0,10)
+
+    try {
+      switch (jobId) {
+
+        case "full": {
+          // Export complet RGPD -- JSON
+          const data = {
+            _rgpd: { exported_at: new Date().toISOString(), user_id: profile.id },
+            profile: {
+              id: profile.id, email: profile.email, full_name: profile.full_name,
+              username: profile.username, bio: profile.bio, website: profile.website,
+              plan: profile.plan, created_at: profile.created_at,
+            },
+            preferences: prefs,
+            pages: allPages.map(p => ({ id:p.id, title:p.title, slug:p.slug, status:p.status, total_views:p.total_views, unique_views:p.unique_views, created_at:p.created_at })),
+            qr_codes: qrStats.map(q => ({ id:q.id, short_code:q.short_code, total_scans:q.total_scans, status:q.status })),
+            referrals: referrals.map(r => ({ id:r.id, status:r.status, reward_months:r.reward_months, created_at:r.created_at })),
+            api_keys: apiKeys.map(k => ({ id:k.id, name:k.name, key_preview:k.key_preview, is_active:k.is_active, created_at:k.created_at, last_used_at:k.last_used_at })),
+            activity: activityLog.map(e => ({ id:e.id, event_type:e.event_type, title:e.title, description:e.description, created_at:e.created_at })),
+          }
+          const fn = `qrfolio-export-complet-${slug}-${ts}.json`
+          downloadBlob(JSON.stringify(data, null, 2), fn, "application/json")
+          setJobStatus(jobId, "done", fn)
+          setExportHistory(h => [{ date:new Date().toISOString(), label:"Export complet", format:"JSON" }, ...h].slice(0,10))
+          break
+        }
+
+        case "pages": {
+          // Pages en CSV
+          const rows = allPages.map(p => ({ titre:p.title, slug:p.slug, statut:p.status, vues:p.total_views, visiteurs_uniques:p.unique_views, cree_le:p.created_at, modifie_le:p.updated_at }))
+          const fn   = `qrfolio-pages-${slug}-${ts}.csv`
+          downloadBlob("\uFEFF" + arrayToCsv(rows), fn, "text/csv;charset=utf-8")
+          setJobStatus(jobId, "done", fn)
+          setExportHistory(h => [{ date:new Date().toISOString(), label:"Pages", format:"CSV" }, ...h].slice(0,10))
+          break
+        }
+
+        case "qrcodes": {
+          // QR Codes en CSV
+          const rows = qrStats.map(q => ({ short_code:q.short_code, page:(q.pages as any)?.title||"", total_scans:q.total_scans, statut:q.status||"active" }))
+          const fn   = `qrfolio-qrcodes-${slug}-${ts}.csv`
+          downloadBlob("\uFEFF" + arrayToCsv(rows), fn, "text/csv;charset=utf-8")
+          setJobStatus(jobId, "done", fn)
+          setExportHistory(h => [{ date:new Date().toISOString(), label:"QR Codes", format:"CSV" }, ...h].slice(0,10))
+          break
+        }
+
+        case "analytics": {
+          // Analytics pages en CSV
+          const rows = allPages.map(p => ({ page:p.title, slug:p.slug, vues_total:p.total_views, visiteurs_uniques:p.unique_views }))
+          const fn   = `qrfolio-analytics-${slug}-${ts}.csv`
+          downloadBlob("\uFEFF" + arrayToCsv(rows), fn, "text/csv;charset=utf-8")
+          setJobStatus(jobId, "done", fn)
+          setExportHistory(h => [{ date:new Date().toISOString(), label:"Analytics", format:"CSV" }, ...h].slice(0,10))
+          break
+        }
+
+        case "activity": {
+          // Historique activite en JSON
+          const data = activityLog.map(e => ({ type:e.event_type, titre:e.title, detail:e.description, date:e.created_at }))
+          const fn   = `qrfolio-activite-${slug}-${ts}.json`
+          downloadBlob(JSON.stringify(data, null, 2), fn, "application/json")
+          setJobStatus(jobId, "done", fn)
+          setExportHistory(h => [{ date:new Date().toISOString(), label:"Activite", format:"JSON" }, ...h].slice(0,10))
+          break
+        }
+      }
+    } catch { setJobStatus(jobId, "error") }
+  }
+
+  // Compat ancien export
+  async function exportData() { runExport("full") }
 
   async function signOut() {
     const supabase = createClient()
@@ -1850,35 +1948,145 @@ export default function ProfilePage() {
 
 
           {/* 5. EXPORT + DANGER */}
-          <SectionCard title="Donnees & Compte" icon={Download} color="#6B7280">
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <button onClick={exportData}
-                style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 14px", background: SURF2, border: "1px solid rgba(255,255,255,0.06)", borderRadius: 9, cursor: "pointer", textAlign: "left" as const }}>
-                <Download size={14} color="#6B7280"/>
-                <div>
-                  <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: 0 }}>Exporter mes donnees</p>
-                  <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>Telecharger profil, pages et QR codes en JSON</p>
-                </div>
-              </button>
+          <SectionCard title="Donnees personnelles" icon={Download} color="#38BDF8">
+            <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
-              <div style={{ padding: "12px 14px", background: "rgba(255,107,107,0.04)", border: "1px solid rgba(255,107,107,0.15)", borderRadius: 9 }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: showDanger ? 12 : 0 }}>
-                  <div>
-                    <p style={{ color: "#FF6B6B", fontSize: 12, fontWeight: 700, margin: 0 }}>Supprimer mon compte</p>
-                    <p style={{ color: MUTED, fontSize: 10, margin: "2px 0 0" }}>Action irreversible -- toutes les donnees seront perdues</p>
+              {/* Badge RGPD */}
+              <div style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px", background:"rgba(56,189,248,0.05)", border:"1px solid rgba(56,189,248,0.15)", borderRadius:10 }}>
+                <div style={{ width:36, height:36, borderRadius:10, background:"rgba(56,189,248,0.1)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  <Shield size={16} color="#38BDF8"/>
+                </div>
+                <div>
+                  <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:2 }}>
+                    <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:700, margin:0 }}>Vos droits RGPD</p>
+                    <span style={{ background:"rgba(56,189,248,0.12)", border:"1px solid rgba(56,189,248,0.25)", borderRadius:4, padding:"1px 7px", fontSize:8, color:"#38BDF8", fontWeight:800 }}>
+                      RGPD
+                    </span>
                   </div>
-                  <button onClick={() => setShowDanger(!showDanger)}
-                    style={{ padding: "6px 12px", background: "rgba(255,107,107,0.1)", border: "1px solid rgba(255,107,107,0.2)", borderRadius: 7, color: "#FF6B6B", fontSize: 11, cursor: "pointer" }}>
+                  <p style={{ color:MUTED, fontSize:10, margin:0, lineHeight:1.5 }}>
+                    Conformement au RGPD, vous pouvez exporter, corriger ou supprimer vos donnees a tout moment. Seules vos donnees sont incluses.
+                  </p>
+                </div>
+              </div>
+
+              {/* Exports granulaires */}
+              <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+                <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:0 }}>Telecharger mes donnees</p>
+                {exportJobs.map(job => {
+                  const fmtMap: Record<string,string> = {
+                    full:"JSON", pages:"CSV", qrcodes:"CSV", analytics:"CSV", activity:"JSON"
+                  }
+                  const iconMap: Record<string, React.ReactNode> = {
+                    full:      <Download size={13}/>,
+                    pages:     <Eye size={13}/>,
+                    qrcodes:   <QrCode size={13}/>,
+                    analytics: <TrendingUp size={13}/>,
+                    activity:  <Clock size={13}/>,
+                  }
+                  const fmt = fmtMap[job.id] ?? "JSON"
+                  return (
+                    <div key={job.id} style={{ display:"flex", alignItems:"center", gap:10, padding:"11px 13px", background:SURF2, border:`1px solid ${job.status==="done"?"rgba(57,255,143,0.15)":job.status==="error"?"rgba(255,107,107,0.15)":"rgba(255,255,255,0.06)"}`, borderRadius:9 }}>
+                      <div style={{ width:32, height:32, borderRadius:8, background:"rgba(56,189,248,0.08)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, color:"#38BDF8" }}>
+                        {iconMap[job.id]}
+                      </div>
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+                          <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:0 }}>{job.label}</p>
+                          <span style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:4, padding:"1px 6px", fontSize:8, color:MUTED, fontFamily:"monospace" }}>
+                            {fmt}
+                          </span>
+                        </div>
+                        <p style={{ color:MUTED, fontSize:10, margin:0 }}>
+                          {job.status==="done" && job.filename
+                            ? <span style={{ color:"#39FF8F" }}>{job.filename}</span>
+                            : job.status==="error"
+                            ? <span style={{ color:"#FF6B6B" }}>Erreur -- reessayez</span>
+                            : job.id==="full"       ? "Toutes vos donnees en un fichier (profil, pages, QR, activite)"
+                            : job.id==="pages"      ? "Titre, slug, statut, vues par page"
+                            : job.id==="qrcodes"    ? "Short code, scans, statut par QR"
+                            : job.id==="analytics"  ? "Vues et visiteurs uniques par page"
+                            : "Historique de vos actions sur QRfolio"
+                          }
+                        </p>
+                      </div>
+                      <button type="button"
+                        onClick={() => { if (job.status !== "running") runExport(job.id) }}
+                        disabled={job.status === "running"}
+                        style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 13px", background:job.status==="done"?"rgba(57,255,143,0.08)":job.status==="error"?"rgba(255,107,107,0.08)":"rgba(56,189,248,0.08)", border:`1px solid ${job.status==="done"?"rgba(57,255,143,0.2)":job.status==="error"?"rgba(255,107,107,0.2)":"rgba(56,189,248,0.2)"}`, borderRadius:7, color:job.status==="done"?"#39FF8F":job.status==="error"?"#FF6B6B":"#38BDF8", fontSize:11, fontWeight:600, cursor:job.status==="running"?"wait":"pointer", flexShrink:0 }}>
+                        {job.status==="running"
+                          ? <><div style={{ width:11, height:11, border:"1.5px solid rgba(56,189,248,0.3)", borderTopColor:"#38BDF8", borderRadius:"50%", animation:"spin 0.7s linear infinite" }}/> Export...</>
+                          : job.status==="done"
+                          ? <><Check size={12}/> OK</>
+                          : job.status==="error"
+                          ? <><RotateCcw size={12}/> Retry</>
+                          : <><Download size={12}/> Exporter</>}
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Historique exports */}
+              {exportHistory.length > 0 && (
+                <div>
+                  <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 8px" }}>
+                    Historique de cette session ({exportHistory.length})
+                  </p>
+                  <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                    {exportHistory.slice(0,5).map((h,i) => (
+                      <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"7px 11px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.04)", borderRadius:8 }}>
+                        <Check size={11} color="#39FF8F"/>
+                        <span style={{ flex:1, color:MUTED, fontSize:10 }}>{h.label}</span>
+                        <span style={{ background:"rgba(255,255,255,0.05)", borderRadius:4, padding:"1px 6px", fontSize:8, color:MUTED, fontFamily:"monospace" }}>{h.format}</span>
+                        <span style={{ color:MUTED, fontSize:9 }}>
+                          {new Date(h.date).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Note securite */}
+              <div style={{ padding:"10px 13px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9 }}>
+                <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                  {([
+                    "Seules vos propres donnees sont incluses dans l'export",
+                    "Les exports se font directement dans votre navigateur (aucune URL publique)",
+                    "Les cles API sont masquees (key_preview uniquement)",
+                  ] as const).map((note, i) => (
+                    <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:7 }}>
+                      <Shield size={10} color={MUTED} style={{ flexShrink:0, marginTop:1 }}/>
+                      <span style={{ color:MUTED, fontSize:10, lineHeight:1.5 }}>{note}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </SectionCard>
+
+          {/* -- Zone Danger ------------------------------------------- */}
+          <SectionCard title="Zone danger" icon={AlertTriangle} color="#FF6B6B">
+            <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+              <div style={{ padding:"12px 14px", background:"rgba(255,107,107,0.04)", border:"1px solid rgba(255,107,107,0.15)", borderRadius:9 }}>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:showDanger?12:0 }}>
+                  <div>
+                    <p style={{ color:"#FF6B6B", fontSize:12, fontWeight:700, margin:0 }}>Supprimer mon compte</p>
+                    <p style={{ color:MUTED, fontSize:10, margin:"2px 0 0" }}>Action irreversible -- toutes les donnees seront perdues</p>
+                  </div>
+                  <button type="button" onClick={() => setShowDanger(!showDanger)}
+                    style={{ padding:"6px 12px", background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:7, color:"#FF6B6B", fontSize:11, cursor:"pointer" }}>
                     {showDanger ? "Annuler" : "Supprimer"}
                   </button>
                 </div>
                 {showDanger && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    <p style={{ color: "#FF6B6B", fontSize: 11, margin: 0 }}>Tape <strong>SUPPRIMER</strong> pour confirmer :</p>
+                  <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                    <p style={{ color:"#FF6B6B", fontSize:11, margin:0 }}>Tape <strong>SUPPRIMER</strong> pour confirmer :</p>
                     <input value={dangerConfirm} onChange={e => setDangerConfirm(e.target.value)}
-                      placeholder="SUPPRIMER" style={{ ...inputStyle, borderColor: "rgba(255,107,107,0.3)" }}/>
-                    <button disabled={dangerConfirm !== "SUPPRIMER"}
-                      style={{ padding: "9px", background: dangerConfirm === "SUPPRIMER" ? "rgba(255,107,107,0.2)" : "rgba(255,255,255,0.03)", border: "1px solid rgba(255,107,107,0.3)", borderRadius: 8, color: dangerConfirm === "SUPPRIMER" ? "#FF6B6B" : MUTED, fontSize: 12, fontWeight: 700, cursor: dangerConfirm === "SUPPRIMER" ? "pointer" : "not-allowed" }}>
+                      placeholder="SUPPRIMER"
+                      style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,107,107,0.3)", borderRadius:8, padding:"9px 12px", color:"#F5F0E8", fontSize:12, outline:"none", boxSizing:"border-box" as const }}/>
+                    <button type="button" disabled={dangerConfirm !== "SUPPRIMER"}
+                      style={{ padding:"9px", background:dangerConfirm==="SUPPRIMER"?"rgba(255,107,107,0.2)":"rgba(255,255,255,0.03)", border:"1px solid rgba(255,107,107,0.3)", borderRadius:8, color:dangerConfirm==="SUPPRIMER"?"#FF6B6B":MUTED, fontSize:12, fontWeight:700, cursor:dangerConfirm==="SUPPRIMER"?"pointer":"not-allowed" }}>
                       Confirmer la suppression
                     </button>
                   </div>
@@ -1886,6 +2094,7 @@ export default function ProfilePage() {
               </div>
             </div>
           </SectionCard>
+
         </div>
 
         {/* == COLONNE DROITE ================================================== */}
