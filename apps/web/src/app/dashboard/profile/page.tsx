@@ -25,11 +25,16 @@ type ApiKey = {
 
 type RecentPage = {
   id: string; title: string; slug: string; status: string
-  total_views: number; updated_at: string
+  total_views: number; unique_views: number; updated_at: string; created_at: string
 }
 
 type RecentScan = {
   id: string; scanned_at: string; device: string; country: string | null
+}
+
+type QRStat = {
+  id: string; short_code: string; total_scans: number; status: string | null
+  pages: { title: string } | null
 }
 
 // -- Constantes ---------------------------------------------------------------
@@ -112,6 +117,10 @@ export default function ProfilePage() {
   const [cropMode, setCropMode]         = useState(false)
   const [cropSrc, setCropSrc]           = useState<string|null>(null)
   const [deletingAvatar, setDeletingAvatar] = useState(false)
+  const [allPages,   setAllPages]   = useState<RecentPage[]>([])
+  const [qrStats,    setQrStats]    = useState<QRStat[]>([])
+  const [statsLoading, setStatsLoading] = useState(true)
+  const [statsTooltip, setStatsTooltip] = useState<string | null>(null)
   const usernameTimer = useRef<NodeJS.Timeout | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const cropRef = useRef<HTMLCanvasElement>(null)
@@ -128,13 +137,15 @@ export default function ProfilePage() {
         { data: refs },
         { data: keys },
         { data: pages },
-        { data: scans },
+        { data: allPagesData },
+        { data: qrData },
       ] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", user.id).single(),
         supabase.from("referrals").select("*").eq("referrer_id", user.id).order("created_at", { ascending: false }).limit(10),
         supabase.from("api_keys").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
-        supabase.from("pages").select("id,title,slug,status,total_views,updated_at").eq("user_id", user.id).order("updated_at", { ascending: false }).limit(5),
-        supabase.from("scans").select("id,scanned_at,device,country").eq("qr_code_id", user.id).order("scanned_at", { ascending: false }).limit(8),
+        supabase.from("pages").select("id,title,slug,status,total_views,unique_views,updated_at,created_at").eq("user_id", user.id).order("updated_at", { ascending: false }).limit(5),
+        supabase.from("pages").select("id,title,slug,status,total_views,unique_views,updated_at,created_at").eq("user_id", user.id),
+        supabase.from("qr_codes").select("id,short_code,total_scans,status,pages(title)").eq("user_id", user.id).order("total_scans", { ascending: false }),
       ])
 
       if (prof) {
@@ -145,8 +156,10 @@ export default function ProfilePage() {
       }
       if (refs)  setReferrals(refs)
       if (keys)  setApiKeys(keys)
-      if (pages) setRecentPages(pages)
-      if (scans) setRecentScans(scans)
+      if (pages)       setRecentPages(pages)
+      if (allPagesData) setAllPages(allPagesData)
+      if (qrData)      setQrStats(qrData)
+      setStatsLoading(false)
       setLoading(false)
     }
     load()
@@ -310,6 +323,20 @@ export default function ProfilePage() {
   }
 
   // -- Donnees calculees --------------------------------------------------------
+  // -- Stats calculees ------------------------------------------------------
+  const totalPages     = allPages.length
+  const publishedPages = allPages.filter(p => p.status === "published").length
+  const draftPages     = allPages.filter(p => p.status === "draft").length
+  const totalViews     = allPages.reduce((s, p) => s + (p.total_views || 0), 0)
+  const uniqueViews    = allPages.reduce((s, p) => s + (p.unique_views || 0), 0)
+  const totalQR        = qrStats.length
+  const activeQR       = qrStats.filter(q => (q.status ?? "active") === "active").length
+  const totalScansQR   = qrStats.reduce((s, q) => s + (q.total_scans || 0), 0)
+  const topPage        = [...allPages].sort((a,b) => (b.total_views||0)-(a.total_views||0))[0] ?? null
+  const topQR          = qrStats[0] ?? null  // deja trie par total_scans DESC
+  const convRate       = totalViews > 0 ? Math.round((totalScansQR / totalViews) * 100) : 0
+  const avgViews       = totalPages > 0 ? Math.round(totalViews / totalPages) : 0
+
   const hasChanges = form.full_name !== formOriginal.full_name
     || form.username !== formOriginal.username
     || form.bio !== formOriginal.bio
@@ -357,10 +384,18 @@ export default function ProfilePage() {
         @keyframes spin{to{transform:rotate(360deg)}}
         @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
         @keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+        @keyframes pulse{0%,100%{opacity:0.3}50%{opacity:0.7}}
         input:focus,textarea:focus,select:focus{border-color:rgba(201,168,76,0.4)!important}
         .section-card{animation:fadeIn 0.3s ease}
         * { box-sizing: border-box }
       `}</style>
+
+      {/* Tooltip stats */}
+      {statsTooltip && (
+        <div style={{ position:"fixed", bottom:70, left:"50%", transform:"translateX(-50%)", zIndex:9998, padding:"7px 14px", background:"rgba(20,18,12,0.95)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:8, color:"#8A8478", fontSize:11, whiteSpace:"nowrap" as const, backdropFilter:"blur(8px)", pointerEvents:"none" }}>
+          {statsTooltip}
+        </div>
+      )}
 
       {/* Toast */}
       {toast && (
@@ -429,10 +464,10 @@ export default function ProfilePage() {
       <div style={{ background: "rgba(255,255,255,0.01)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "14px 28px" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", gap: 12, overflowX: "auto" }}>
           {[
-            { icon: Eye,       label: "Pages",       value: profile?.total_pages || 0,   color: G },
-            { icon: TrendingUp,label: "Scans",        value: profile?.total_scans || 0,   color: "#39FF8F" },
+            { icon: Eye,       label: "Pages",       value: totalPages || profile?.total_pages || 0,   color: G },
+            { icon: TrendingUp,label: "Vues",         value: totalViews > 0 ? totalViews.toLocaleString("fr-FR") : (profile?.total_scans || 0),   color: "#39FF8F" },
+            { icon: QrCode,    label: "QR actifs",    value: activeQR,                    color: "#38BDF8" },
             { icon: Users,     label: "Parrainages",  value: validatedRefs,               color: "#7B61FF" },
-            { icon: Gift,      label: "Mois Pro",     value: totalMonths,                 color: "#EC4899" },
           ].map((s, i) => (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", background: SURF, border: "1px solid rgba(255,255,255,0.06)", borderRadius: 9, flexShrink: 0 }}>
               <s.icon size={13} color={s.color}/>
@@ -700,6 +735,137 @@ export default function ProfilePage() {
               </div>
             )}
           </SectionCard>
+
+          {/* STATISTIQUES */}
+          <SectionCard title="Statistiques" icon={TrendingUp} color="#38BDF8"
+            tag={statsLoading ? "..." : `${totalPages} pages`}
+            action={
+              <a href="/dashboard/analytics"
+                style={{ display:"flex", alignItems:"center", gap:4, color:MUTED, fontSize:11, textDecoration:"none" }}>
+                Analytics <ChevronRight size={12}/>
+              </a>
+            }>
+            {statsLoading ? (
+              /* Skeleton */
+              <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8 }}>
+                  {[...Array(6)].map((_,i) => (
+                    <div key={i} style={{ height:60, borderRadius:9, background:"rgba(255,255,255,0.04)", animation:"pulse 1.5s ease-in-out infinite", animationDelay:`${i*0.1}s` }}/>
+                  ))}
+                </div>
+              </div>
+            ) : totalPages === 0 && totalQR === 0 ? (
+              /* Empty state */
+              <div style={{ textAlign:"center" as const, padding:"20px 0" }}>
+                <TrendingUp size={28} color={MUTED} style={{ marginBottom:8 }}/>
+                <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 4px" }}>Aucune donnee</p>
+                <p style={{ color:MUTED, fontSize:11, margin:"0 0 12px" }}>Creez votre premiere page pour voir vos stats</p>
+                <a href="/dashboard" style={{ color:G, fontSize:11, display:"inline-block" }}>Creer une page</a>
+              </div>
+            ) : (
+              <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+
+                {/* Grille principale 3x2 */}
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8 }}>
+                  {[
+                    { icon:Eye,        label:"Pages",        value:totalPages,              color:G,          tooltip:"Nombre total de pages creees" },
+                    { icon:CheckCircle,label:"Publiees",      value:publishedPages,          color:"#39FF8F",  tooltip:"Pages avec statut Publie" },
+                    { icon:QrCode,     label:"QR actifs",     value:activeQR,                color:"#38BDF8",  tooltip:"QR Codes avec statut Actif" },
+                    { icon:TrendingUp, label:"Vues total",    value:totalViews.toLocaleString("fr-FR"), color:"#C9A84C", tooltip:"Total des vues sur toutes les pages" },
+                    { icon:Users,      label:"Visiteurs uniq",value:uniqueViews.toLocaleString("fr-FR"),color:"#7B61FF", tooltip:"Visiteurs uniques (hors doublons)" },
+                    { icon:QrCode,     label:"Scans QR",      value:totalScansQR.toLocaleString("fr-FR"),color:"#F97316",tooltip:"Total des scans sur tous les QR" },
+                  ].map((s, i) => (
+                    <div key={i}
+                      onMouseEnter={() => setStatsTooltip(s.tooltip)}
+                      onMouseLeave={() => setStatsTooltip(null)}
+                      style={{ position:"relative" as const, background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 11px", cursor:"default" }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:5 }}>
+                        <div style={{ width:22, height:22, borderRadius:6, background:s.color+"15", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                          <s.icon size={11} color={s.color}/>
+                        </div>
+                        <span style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:0.8, lineHeight:1.2 }}>{s.label}</span>
+                      </div>
+                      <p style={{ color:"#F5F0E8", fontSize:18, fontWeight:800, margin:0, fontFamily:"Cormorant Garamond, serif", lineHeight:1 }}>
+                        {s.value}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Ligne de conversion */}
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                  <div style={{ background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 12px" }}>
+                    <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:0.8, margin:"0 0 5px" }}>Taux conversion</p>
+                    <div style={{ display:"flex", alignItems:"flex-end", gap:6 }}>
+                      <p style={{ color:convRate > 10 ? "#39FF8F" : convRate > 5 ? G : MUTED, fontSize:22, fontWeight:800, margin:0, fontFamily:"Cormorant Garamond, serif", lineHeight:1 }}>
+                        {convRate}%
+                      </p>
+                      <span style={{ color:MUTED, fontSize:9, paddingBottom:2 }}>scans / vues</span>
+                    </div>
+                    {/* Barre */}
+                    <div style={{ height:3, background:"rgba(255,255,255,0.05)", borderRadius:2, marginTop:6, overflow:"hidden" }}>
+                      <div style={{ height:"100%", width:`${Math.min(convRate*5, 100)}%`, background:`linear-gradient(90deg,${G},#39FF8F)`, borderRadius:2, transition:"width 0.6s ease" }}/>
+                    </div>
+                  </div>
+                  <div style={{ background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 12px" }}>
+                    <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:0.8, margin:"0 0 5px" }}>Vues / page moy.</p>
+                    <p style={{ color:"#F5F0E8", fontSize:22, fontWeight:800, margin:0, fontFamily:"Cormorant Garamond, serif", lineHeight:1 }}>
+                      {avgViews.toLocaleString("fr-FR")}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Top page / Top QR -- Pro+ */}
+                {(profile?.plan === "pro" || profile?.plan === "business") && (topPage || topQR) && (
+                  <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+                    <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1, margin:0 }}>Top performers</p>
+                    {topPage && (
+                      <a href={`/dashboard/builder/${topPage.id}`} style={{ display:"flex", alignItems:"center", gap:9, padding:"9px 11px", background:"rgba(201,168,76,0.05)", border:"1px solid rgba(201,168,76,0.12)", borderRadius:9, textDecoration:"none" }}>
+                        <div style={{ width:28, height:28, borderRadius:7, background:"rgba(201,168,76,0.1)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                          <Eye size={13} color={G}/>
+                        </div>
+                        <div style={{ flex:1, minWidth:0 }}>
+                          <p style={{ color:"#F5F0E8", fontSize:11, fontWeight:600, margin:"0 0 1px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
+                            {topPage.title}
+                          </p>
+                          <p style={{ color:MUTED, fontSize:10, margin:0 }}>{topPage.total_views.toLocaleString("fr-FR")} vues</p>
+                        </div>
+                        <span style={{ color:G, fontSize:9, fontWeight:700, background:"rgba(201,168,76,0.1)", borderRadius:5, padding:"2px 7px", flexShrink:0 }}>Top page</span>
+                      </a>
+                    )}
+                    {topQR && topQR.total_scans > 0 && (
+                      <div style={{ display:"flex", alignItems:"center", gap:9, padding:"9px 11px", background:"rgba(249,115,22,0.05)", border:"1px solid rgba(249,115,22,0.12)", borderRadius:9 }}>
+                        <div style={{ width:28, height:28, borderRadius:7, background:"rgba(249,115,22,0.1)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                          <QrCode size={13} color="#F97316"/>
+                        </div>
+                        <div style={{ flex:1, minWidth:0 }}>
+                          <p style={{ color:"#F5F0E8", fontSize:11, fontWeight:600, margin:"0 0 1px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
+                            {(topQR.pages as any)?.title || topQR.short_code}
+                          </p>
+                          <p style={{ color:MUTED, fontSize:10, margin:0 }}>/{topQR.short_code} . {topQR.total_scans.toLocaleString("fr-FR")} scans</p>
+                        </div>
+                        <span style={{ color:"#F97316", fontSize:9, fontWeight:700, background:"rgba(249,115,22,0.1)", borderRadius:5, padding:"2px 7px", flexShrink:0 }}>Top QR</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Teaser Pro si free */}
+                {profile?.plan === "free" && (
+                  <div style={{ padding:"10px 12px", background:"rgba(201,168,76,0.04)", border:"1px dashed rgba(201,168,76,0.2)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"space-between", gap:10 }}>
+                    <div>
+                      <p style={{ color:"#F5F0E8", fontSize:11, fontWeight:600, margin:"0 0 2px" }}>Top page & Top QR</p>
+                      <p style={{ color:MUTED, fontSize:10, margin:0 }}>Disponible en plan Pro</p>
+                    </div>
+                    <a href="/upgrade" style={{ display:"flex", alignItems:"center", gap:5, padding:"6px 12px", background:`linear-gradient(90deg,${G},#b8953f)`, borderRadius:7, color:"#080808", textDecoration:"none", fontSize:11, fontWeight:700, flexShrink:0 }}>
+                      Upgrade
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
+          </SectionCard>
+
 
           {/* 4. SECURITE */}
           <SectionCard title="Securite" icon={Shield} color="#FF6B6B">
