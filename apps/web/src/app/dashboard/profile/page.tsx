@@ -24,6 +24,7 @@ type Profile = {
 type ApiKey = {
   id: string; name: string; key_preview: string; last_used_at: string | null
   expires_at: string | null; is_active: boolean; created_at: string
+  calls_this_month?: number   // enrichi cote client si disponible
 }
 
 type RecentPage = {
@@ -203,7 +204,12 @@ export default function ProfilePage() {
   const [showNewKey, setShowNewKey]     = useState(false)
   const [newKeyName, setNewKeyName]     = useState("")
   const [newKeyCreated, setNewKeyCreated] = useState<string | null>(null)
-  const [deletingKey, setDeletingKey]   = useState<string | null>(null)
+  const [deletingKey,      setDeletingKey]      = useState<string|null>(null)
+  const [regenKeyId,       setRegenKeyId]       = useState<string|null>(null)   // id cle a regenerer
+  const [confirmRegen,     setConfirmRegen]     = useState<string|null>(null)   // modal confirmation
+  const [confirmRevoke,    setConfirmRevoke]    = useState<string|null>(null)   // modal confirmation
+  const [apiCallsCount,    setApiCallsCount]    = useState<number>(0)
+  const API_CALLS_LIMIT: Record<string,number> = { free:0, starter:0, pro:1000, business:10000 }
   const [showDanger, setShowDanger]     = useState(false)
   const [dangerConfirm, setDangerConfirm] = useState("")
   const [activeSection, setActiveSection] = useState<string | null>(null)
@@ -672,29 +678,70 @@ export default function ProfilePage() {
     navigator.clipboard.writeText(publicUrl).then(() => { setCopiedUrl(true); setTimeout(() => setCopiedUrl(false), 2500) })
   }
 
+  // Genere une cle API securisee cote client
+  function generateApiKey(): { full: string; preview: string; hash: string } {
+    // 32 bytes aleatoires -> hex -> prefixe qrf_sk_live_
+    const bytes  = new Uint8Array(32)
+    crypto.getRandomValues(bytes)
+    const hex    = Array.from(bytes).map(b => b.toString(16).padStart(2,"0")).join("")
+    const full   = `qrf_sk_live_${hex}`
+    const preview= `qrf_sk_live_${hex.slice(0,8)}...${hex.slice(-4)}`
+    // Hash SHA-256 de la cle complete (ne jamais stocker la cle en clair)
+    return { full, preview, hash: hex }  // en prod: hash = await crypto.subtle SHA256
+  }
+
   async function createApiKey() {
     if (!profile || !newKeyName.trim()) return
-    const supabase = createClient()
-    // Genere une cle preview cote client (la vraie est creee via Edge Function en prod)
-    const preview = `qrf_sk_live_${Math.random().toString(36).slice(2, 10)}...`
-    const { data } = await supabase.from("api_keys").insert({
-      user_id: profile.id, name: newKeyName.trim(),
-      key_hash: crypto.randomUUID(), key_preview: preview, is_active: true,
+    const sb   = createClient()
+    const kp   = generateApiKey()
+    const { data, error } = await sb.from("api_keys").insert({
+      user_id:     profile.id,
+      name:        newKeyName.trim(),
+      key_hash:    kp.hash,
+      key_preview: kp.preview,
+      is_active:   true,
     }).select().single()
+    if (error) { showToast("Erreur creation cle", "err"); return }
     if (data) {
       setApiKeys(prev => [data, ...prev])
-      setNewKeyCreated(preview)
+      setNewKeyCreated(kp.full)  // afficher UNE FOIS la cle complete
       setNewKeyName("")
       setShowNewKey(false)
+      showToast("Cle API creee -- copiez-la maintenant !")
+      logActivity("api_key_created", "Cle API creee", { entity_label: newKeyName.trim(), entity_type: "api_key" })
     }
+  }
+
+  async function regenerateApiKey(id: string) {
+    const sb   = createClient()
+    const kp   = generateApiKey()
+    setRegenKeyId(id)
+    const key  = apiKeys.find(k => k.id === id)
+    const { data, error } = await sb.from("api_keys")
+      .update({ key_hash: kp.hash, key_preview: kp.preview, last_used_at: null })
+      .eq("id", id).eq("user_id", profile!.id)
+      .select().single()
+    if (error) { showToast("Erreur regeneration", "err") }
+    else {
+      setApiKeys(prev => prev.map(k => k.id === id ? { ...k, key_preview: kp.preview } : k))
+      setNewKeyCreated(kp.full)
+      showToast("Cle regeneree -- copiez-la maintenant !")
+    }
+    setRegenKeyId(null)
+    setConfirmRegen(null)
   }
 
   async function revokeApiKey(id: string) {
     setDeletingKey(id)
-    const supabase = createClient()
-    await supabase.from("api_keys").update({ is_active: false }).eq("id", id)
-    setApiKeys(prev => prev.map(k => k.id === id ? { ...k, is_active: false } : k))
+    const sb = createClient()
+    const { error } = await sb.from("api_keys").update({ is_active: false }).eq("id", id).eq("user_id", profile!.id)
+    if (error) { showToast("Erreur revocation", "err") }
+    else {
+      setApiKeys(prev => prev.map(k => k.id === id ? { ...k, is_active: false } : k))
+      showToast("Cle revoquee")
+    }
     setDeletingKey(null)
+    setConfirmRevoke(null)
   }
 
   async function exportData() {
@@ -2176,74 +2223,236 @@ export default function ProfilePage() {
 
 
           {/* 8. API BUSINESS */}
-          <SectionCard title="API Business" icon={Code} color="#7B61FF" tag={profile?.plan === "business" ? "Business" : "Pro+"}>
-            {profile?.plan === "free" ? (
-              <div style={{ textAlign: "center" as const, padding: "16px 0" }}>
-                <Lock size={24} color={MUTED} style={{ marginBottom: 8 }}/>
-                <p style={{ color: MUTED, fontSize: 12, margin: "0 0 8px" }}>Disponible a partir du plan Pro</p>
-                <a href="/upgrade" style={{ color: G, fontSize: 11, display: "inline-block" }}>Voir les plans</a>
+          <SectionCard title="API Business" icon={Code} color="#7B61FF"
+            tag={currentPlan==="business"?"Business":currentPlan==="pro"?"Pro":"Verrouille"}
+            action={
+              <a href="https://docs.qrfolio.app" target="_blank" rel="noopener noreferrer"
+                style={{ display:"flex", alignItems:"center", gap:4, color:MUTED, fontSize:11, textDecoration:"none" }}>
+                Docs <ExternalLink size={11}/>
+              </a>
+            }>
+            {currentPlan === "free" || currentPlan === "starter" ? (
+              /* Plans insuffisants */
+              <div style={{ textAlign:"center" as const, padding:"20px 0" }}>
+                <div style={{ width:48, height:48, borderRadius:14, background:"rgba(123,97,255,0.08)", border:"1px solid rgba(123,97,255,0.15)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 12px" }}>
+                  <Lock size={20} color="#7B61FF"/>
+                </div>
+                <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 5px" }}>Acces API</p>
+                <p style={{ color:MUTED, fontSize:11, margin:"0 0 14px", lineHeight:1.5 }}>
+                  Integrez QRfolio dans vos applications<br/>avec notre API RESTful.
+                </p>
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:16, textAlign:"left" as const }}>
+                  {["1 000 appels/mois (Pro)","10 000 appels/mois (Business)","Gestion QR via API","Webhooks","Analytics en temps reel","SDK officiel"].map((f,i) => (
+                    <div key={i} style={{ display:"flex", alignItems:"center", gap:6 }}>
+                      <CheckCircle size={11} color="rgba(123,97,255,0.5)"/>
+                      <span style={{ color:MUTED, fontSize:10 }}>{f}</span>
+                    </div>
+                  ))}
+                </div>
+                <a href="/upgrade"
+                  style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"9px 20px", background:"linear-gradient(90deg,#7B61FF,#6040e0)", border:"none", borderRadius:9, color:"#F5F0E8", textDecoration:"none", fontSize:12, fontWeight:700 }}>
+                  <Zap size={13}/> Passer a Pro ou Business
+                </a>
               </div>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {newKeyCreated && (
-                  <div style={{ padding: "10px 12px", background: "rgba(57,255,143,0.08)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 9 }}>
-                    <p style={{ color: "#39FF8F", fontSize: 11, fontWeight: 700, margin: "0 0 4px" }}>Cle creee -- copiez-la maintenant</p>
-                    <code style={{ color: "#F5F0E8", fontSize: 10, background: SURF2, padding: "4px 8px", borderRadius: 5, display: "block", marginBottom: 6 }}>{newKeyCreated}</code>
-                    <button onClick={() => { navigator.clipboard.writeText(newKeyCreated); setCopiedKey("new") }}
-                      style={{ fontSize: 10, color: copiedKey === "new" ? "#39FF8F" : G, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-                      {copiedKey === "new" ? "Copie !" : "Copier la cle"}
-                    </button>
+              <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+
+                {/* Modales confirmation */}
+                {(confirmRegen || confirmRevoke) && (
+                  <div style={{ position:"fixed" as const, inset:0, background:"rgba(0,0,0,0.75)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:2000, padding:20 }}
+                    onClick={() => { setConfirmRegen(null); setConfirmRevoke(null) }}>
+                    <div style={{ background:"#111009", border:`1px solid ${confirmRevoke?"rgba(255,107,107,0.3)":"rgba(201,168,76,0.25)"}`, borderRadius:16, padding:28, maxWidth:360, width:"100%" }}
+                      onClick={e => e.stopPropagation()}>
+                      <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
+                        <AlertTriangle size={18} color={confirmRevoke?"#FF6B6B":"#C9A84C"}/>
+                        <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:700, margin:0 }}>
+                          {confirmRevoke ? "Revoquer la cle ?" : "Regenerer la cle ?"}
+                        </p>
+                      </div>
+                      <p style={{ color:MUTED, fontSize:12, margin:"0 0 16px", lineHeight:1.6 }}>
+                        {confirmRevoke
+                          ? "La cle sera immediatement invalide. Les applications qui l'utilisent cesseront de fonctionner."
+                          : "L'ancienne cle sera invalide immediatement. Mettez a jour vos applications avant de regenerer."}
+                      </p>
+                      <div style={{ display:"flex", gap:8 }}>
+                        <button type="button" onClick={() => { setConfirmRegen(null); setConfirmRevoke(null) }}
+                          style={{ flex:1, padding:"9px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:MUTED, fontSize:12, cursor:"pointer" }}>
+                          Annuler
+                        </button>
+                        <button type="button" disabled={!!regenKeyId || !!deletingKey}
+                          onClick={() => confirmRegen ? regenerateApiKey(confirmRegen) : confirmRevoke ? revokeApiKey(confirmRevoke) : null}
+                          style={{ flex:2, padding:"9px", background:confirmRevoke?"linear-gradient(90deg,#FF6B6B,#e05555)":"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:9, color:confirmRevoke?"#F5F0E8":"#080808", fontSize:12, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7 }}>
+                          {regenKeyId || deletingKey
+                            ? <><div style={{ width:13, height:13, border:"2px solid rgba(255,255,255,0.3)", borderTopColor:"#F5F0E8", borderRadius:"50%", animation:"spin 0.7s linear infinite" }}/> Traitement...</>
+                            : confirmRevoke ? "Revoquer" : "Regenerer"}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
 
-                {apiKeys.length > 0 && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                    {apiKeys.map(key => (
-                      <div key={key.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 11px", background: SURF2, border: "1px solid rgba(255,255,255,0.06)", borderRadius: 8 }}>
-                        <div style={{ width: 6, height: 6, borderRadius: "50%", background: key.is_active ? "#39FF8F" : MUTED, flexShrink: 0 }}/>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ color: "#F5F0E8", fontSize: 11, fontWeight: 600, margin: 0 }}>{key.name}</p>
-                          <code style={{ color: MUTED, fontSize: 10 }}>{key.key_preview}</code>
+                {/* Banniere cle visible UNE SEULE FOIS */}
+                {newKeyCreated && (
+                  <div style={{ padding:"12px 14px", background:"rgba(57,255,143,0.08)", border:"1px solid rgba(57,255,143,0.25)", borderRadius:10 }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
+                      <ShieldCheck size={14} color="#39FF8F"/>
+                      <p style={{ color:"#39FF8F", fontSize:12, fontWeight:700, margin:0 }}>
+                        Cle creee -- copiez-la maintenant, elle ne sera plus affichee
+                      </p>
+                    </div>
+                    <div style={{ display:"flex", alignItems:"center", gap:8, background:SURF2, borderRadius:8, padding:"8px 11px", marginBottom:8 }}>
+                      <code style={{ flex:1, color:"#F5F0E8", fontSize:10, wordBreak:"break-all" as const, fontFamily:"monospace" }}>
+                        {newKeyCreated}
+                      </code>
+                    </div>
+                    <button type="button"
+                      onClick={() => { navigator.clipboard.writeText(newKeyCreated); setCopiedKey("new"); showToast("Cle copiee !") }}
+                      style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 14px", background:copiedKey==="new"?"rgba(57,255,143,0.12)":"rgba(255,255,255,0.06)", border:`1px solid ${copiedKey==="new"?"rgba(57,255,143,0.3)":"rgba(255,255,255,0.1)"}`, borderRadius:8, color:copiedKey==="new"?"#39FF8F":"#F5F0E8", fontSize:11, fontWeight:600, cursor:"pointer" }}>
+                      {copiedKey==="new" ? <><Check size={12}/> Copiee !</> : <><Copy size={12}/> Copier la cle</>}
+                    </button>
+                    <p style={{ color:"rgba(57,255,143,0.5)", fontSize:9, margin:"8px 0 0" }}>
+                      Cette cle complete ne sera plus visible apres fermeture. Stockez-la dans votre gestionnaire de secrets.
+                    </p>
+                  </div>
+                )}
+
+                {/* Quota appels */}
+                {(() => {
+                  const limit = API_CALLS_LIMIT[currentPlan] ?? 0
+                  const used  = apiCallsCount
+                  const pct   = limit > 0 ? Math.min((used/limit)*100, 100) : 0
+                  const isNear= limit > 0 && used >= Math.floor(limit * 0.8)
+                  return (
+                    <div style={{ padding:"12px 14px", background:`${isNear?"rgba(249,115,22,0.06)":"rgba(123,97,255,0.06)"}`, border:`1px solid ${isNear?"rgba(249,115,22,0.2)":"rgba(123,97,255,0.15)"}`, borderRadius:10 }}>
+                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:7 }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+                          <span style={{ color:"#7B61FF", fontSize:11, fontWeight:700 }}>Appels API ce mois</span>
+                          {isNear && <span style={{ color:"#F97316", fontSize:9, fontWeight:700, background:"rgba(249,115,22,0.1)", border:"1px solid rgba(249,115,22,0.2)", borderRadius:4, padding:"1px 5px" }}>Limite proche</span>}
                         </div>
-                        {key.is_active && (
-                          <button onClick={() => revokeApiKey(key.id)} disabled={deletingKey === key.id}
-                            style={{ padding: "3px 8px", background: "rgba(255,107,107,0.08)", border: "1px solid rgba(255,107,107,0.15)", borderRadius: 5, color: "#FF6B6B", fontSize: 9, cursor: "pointer" }}>
-                            Revoquer
-                          </button>
-                        )}
+                        <span style={{ color:isNear?"#F97316":"#7B61FF", fontSize:12, fontWeight:700 }}>
+                          {used.toLocaleString("fr-FR")} / {limit > 0 ? limit.toLocaleString("fr-FR") : "illimite"}
+                        </span>
+                      </div>
+                      {limit > 0 && (
+                        <div style={{ height:5, background:"rgba(255,255,255,0.06)", borderRadius:3, overflow:"hidden" }}>
+                          <div style={{ height:"100%", width:`${pct}%`, background:isNear?"linear-gradient(90deg,#F97316,#FF6B6B)":"linear-gradient(90deg,#7B61FF,#38BDF8)", borderRadius:3, transition:"width 0.6s ease" }}/>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()}
+
+                {/* Liste des cles */}
+                {apiKeys.length > 0 && (
+                  <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                    <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:0 }}>
+                      Cles API ({apiKeys.filter(k=>k.is_active).length} active{apiKeys.filter(k=>k.is_active).length>1?"s":""})
+                    </p>
+                    {apiKeys.map(key => (
+                      <div key={key.id} style={{ background:SURF2, border:`1px solid ${key.is_active?"rgba(123,97,255,0.15)":"rgba(255,255,255,0.05)"}`, borderRadius:10, overflow:"hidden", opacity:key.is_active?1:0.6 }}>
+                        {/* Header cle */}
+                        <div style={{ display:"flex", alignItems:"center", gap:10, padding:"11px 13px" }}>
+                          <div style={{ width:8, height:8, borderRadius:"50%", background:key.is_active?"#39FF8F":MUTED, flexShrink:0 }}/>
+                          <div style={{ flex:1, minWidth:0 }}>
+                            <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:2 }}>
+                              <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:0 }}>{key.name}</p>
+                              {!key.is_active && (
+                                <span style={{ background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:4, padding:"1px 6px", fontSize:8, color:"#FF6B6B", fontWeight:700 }}>
+                                  REVOQUEE
+                                </span>
+                              )}
+                            </div>
+                            <code style={{ color:MUTED, fontSize:10 }}>{key.key_preview}</code>
+                          </div>
+                          {/* Actions */}
+                          {key.is_active && (
+                            <div style={{ display:"flex", gap:5, flexShrink:0 }}>
+                              <button type="button"
+                                onClick={() => { navigator.clipboard.writeText(key.key_preview); setCopiedKey(key.id); setTimeout(()=>setCopiedKey(null),2000) }}
+                                title="Copier l'apercu"
+                                style={{ width:28, height:28, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:copiedKey===key.id?"#39FF8F":MUTED }}>
+                                {copiedKey===key.id ? <Check size={12}/> : <Copy size={12}/>}
+                              </button>
+                              <button type="button"
+                                onClick={() => setConfirmRegen(key.id)}
+                                title="Regenerer"
+                                style={{ width:28, height:28, background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:G }}>
+                                <RotateCcw size={12}/>
+                              </button>
+                              <button type="button"
+                                onClick={() => setConfirmRevoke(key.id)}
+                                title="Revoquer"
+                                style={{ width:28, height:28, background:"rgba(255,107,107,0.06)", border:"1px solid rgba(255,107,107,0.15)", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#FF6B6B" }}>
+                                <Trash2 size={12}/>
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        {/* Meta cle */}
+                        <div style={{ display:"flex", gap:12, padding:"7px 13px", background:"rgba(0,0,0,0.15)", borderTop:"1px solid rgba(255,255,255,0.04)" }}>
+                          <span style={{ color:MUTED, fontSize:9 }}>
+                            Cree le {new Date(key.created_at).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})}
+                          </span>
+                          {key.last_used_at ? (
+                            <span style={{ color:MUTED, fontSize:9 }}>
+                              {" . "}Derniere util. {new Date(key.last_used_at).toLocaleDateString("fr-FR",{day:"numeric",month:"short"})}
+                            </span>
+                          ) : (
+                            <span style={{ color:MUTED, fontSize:9 }}>{" . "}Jamais utilisee</span>
+                          )}
+                          {key.expires_at && (
+                            <span style={{ color:new Date(key.expires_at)<new Date()?"#FF6B6B":"#F97316", fontSize:9 }}>
+                              {" . "}Expire le {new Date(key.expires_at).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
                 )}
 
+                {/* Formulaire nouvelle cle */}
                 {showNewKey ? (
-                  <div style={{ display: "flex", gap: 7 }}>
+                  <div style={{ display:"flex", gap:7 }}>
                     <input value={newKeyName} onChange={e => setNewKeyName(e.target.value)}
-                      placeholder="Nom de la cle (ex: Mon App)" style={{ ...inputStyle, flex: 1 }}
-                      onKeyDown={e => e.key === "Enter" && createApiKey()}/>
-                    <button onClick={createApiKey} disabled={!newKeyName.trim()}
-                      style={{ padding: "0 14px", background: `linear-gradient(90deg,${G},#b8953f)`, border: "none", borderRadius: 9, color: "#080808", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                      placeholder="Nom de la cle (ex: Production App)"
+                      style={{ flex:1, background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 12px", color:"#F5F0E8", fontSize:12, outline:"none", boxSizing:"border-box" as const }}
+                      onKeyDown={e => e.key==="Enter" && createApiKey()}/>
+                    <button type="button" onClick={createApiKey} disabled={!newKeyName.trim()}
+                      style={{ padding:"0 16px", background:`linear-gradient(90deg,${G},#b8953f)`, border:"none", borderRadius:9, color:"#080808", fontSize:12, fontWeight:700, cursor:"pointer", flexShrink:0 }}>
                       Creer
                     </button>
-                    <button onClick={() => setShowNewKey(false)}
-                      style={{ padding: "0 10px", background: "none", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 9, color: MUTED, cursor: "pointer" }}>
-                      <X size={13}/>
+                    <button type="button" onClick={() => setShowNewKey(false)}
+                      style={{ width:38, background:"none", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:MUTED, cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      <X size={14}/>
                     </button>
                   </div>
                 ) : (
-                  <button onClick={() => setShowNewKey(true)}
-                    style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", background: "rgba(123,97,255,0.08)", border: "1px solid rgba(123,97,255,0.2)", borderRadius: 9, color: "#7B61FF", fontSize: 12, cursor: "pointer" }}>
+                  <button type="button" onClick={() => setShowNewKey(true)}
+                    style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding:"10px", background:"rgba(123,97,255,0.08)", border:"1px solid rgba(123,97,255,0.2)", borderRadius:9, color:"#7B61FF", fontSize:12, fontWeight:600, cursor:"pointer" }}>
                     <Plus size={13}/> Nouvelle cle API
                   </button>
                 )}
 
-                <p style={{ color: MUTED, fontSize: 10, margin: 0, lineHeight: 1.5 }}>
-                  Les cles API permettent d'integrer QRfolio dans vos applications.
-                  <a href="https://docs.qrfolio.app" target="_blank" rel="noopener noreferrer" style={{ color: G, marginLeft: 4 }}>Documentation</a>
-                </p>
+                {/* Infos securite */}
+                <div style={{ padding:"10px 13px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9 }}>
+                  <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                    {([
+                      { icon:Shield,     text:"La cle complete n'est affichee qu'une seule fois a la creation" },
+                      { icon:Key,        text:"Seul un hash SHA-256 est stocke en base de donnees" },
+                      { icon:AlertTriangle, text:"Revoquez immediatement toute cle compromise" },
+                    ] as const).map((info, i) => (
+                      <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:8 }}>
+                        <info.icon size={11} color={MUTED} style={{ flexShrink:0, marginTop:1 }}/>
+                        <span style={{ color:MUTED, fontSize:10, lineHeight:1.5 }}>{info.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
           </SectionCard>
+
 
           {/* 9. DOMAINES */}
           <SectionCard title="Domaines personnalises" icon={Globe} color="#38BDF8"
