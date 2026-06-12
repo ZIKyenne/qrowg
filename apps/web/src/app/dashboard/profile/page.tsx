@@ -10,7 +10,8 @@ import {
   CreditCard, Code, Settings, CheckCircle, AtSign, Link, Link2,
   ImageOff, Crop, UserCheck, UserX,
   Clock, Filter, Calendar, FileEdit, Scan, Tag, Award,
-  Share2, MessageCircle, Mail, Twitter, Linkedin
+  Share2, MessageCircle, Mail, Twitter, Linkedin,
+  Smartphone, Monitor, Tablet, Wifi, ShieldCheck, ShieldOff
 } from "lucide-react"
 
 // -- Types --------------------------------------------------------------------
@@ -219,6 +220,26 @@ export default function ProfilePage() {
   const [subRenewal,  setSubRenewal]  = useState<string|null>(null)
   const [subCycle,    setSubCycle]    = useState<"monthly"|"annual">("monthly")
   const [subLoading,  setSubLoading]  = useState(true)
+  // -- Securite ------------------------------------------
+  const [authUser,       setAuthUser]       = useState<any>(null)
+  const [emailVerified,  setEmailVerified]  = useState(false)
+  const [lastSignIn,     setLastSignIn]      = useState<string|null>(null)
+  const [sessions,       setSessions]        = useState<any[]>([])
+  const [secLoading,     setSecLoading]      = useState(true)
+  const [sendingVerif,   setSendingVerif]    = useState(false)
+  const [verifSent,      setVerifSent]       = useState(false)
+  const [pwdLoading,     setPwdLoading]      = useState(false)
+  const [pwdSent,        setPwdSent]         = useState(false)
+  const [signOutAllLoading, setSignOutAllLoading] = useState(false)
+  const [showReauthModal, setShowReauthModal] = useState(false)
+  const [reauthAction,   setReauthAction]    = useState<string|null>(null)
+  const [reauthPwd,      setReauthPwd]       = useState("")
+  const [reauthError,    setReauthError]     = useState("")
+  const [reauthLoading,  setReauthLoading]   = useState(false)
+  const [showPwdChange,  setShowPwdChange]   = useState(false)
+  const [newPwd,         setNewPwd]          = useState("")
+  const [newPwdConfirm,  setNewPwdConfirm]  = useState("")
+  const [pwdStrength,    setPwdStrength]     = useState(0)
   const usernameTimer = useRef<NodeJS.Timeout | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const cropRef = useRef<HTMLCanvasElement>(null)
@@ -229,6 +250,19 @@ export default function ProfilePage() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { window.location.href = "/auth/login"; return }
+      setAuthUser(user)
+      setEmailVerified(!!user.email_confirmed_at)
+      setLastSignIn(user.last_sign_in_at || null)
+      // Simuler sessions (Supabase ne retourne pas la liste des sessions actives en client)
+      setSessions([{
+        id: "current", device: navigator.userAgent.includes("Mobile") ? "mobile" : "desktop",
+        browser: navigator.userAgent.includes("Chrome") ? "Chrome"
+          : navigator.userAgent.includes("Firefox") ? "Firefox"
+          : navigator.userAgent.includes("Safari") ? "Safari" : "Navigateur",
+        location: "Session actuelle",
+        last_active: new Date().toISOString(), current: true,
+      }])
+      setSecLoading(false)
 
       const [
         { data: prof },
@@ -383,6 +417,67 @@ export default function ProfilePage() {
     try {
       await sb.from("activity_logs").insert({ ...evt })
     } catch { /* table peut ne pas exister encore */ }
+  }
+
+  // -- Fonctions securite ----------------------------------------
+  async function sendVerificationEmail() {
+    if (!authUser?.email) return
+    setSendingVerif(true)
+    const sb = createClient()
+    try {
+      await sb.auth.resend({ type: "signup", email: authUser.email })
+      setVerifSent(true); showToast("Email de verification envoye !")
+      setTimeout(() => setVerifSent(false), 5000)
+    } catch { showToast("Erreur envoi email", "err") }
+    setSendingVerif(false)
+  }
+
+  async function sendPasswordReset() {
+    if (!authUser?.email) return
+    setPwdLoading(true)
+    const sb = createClient()
+    try {
+      await sb.auth.resetPasswordForEmail(authUser.email, {
+        redirectTo: window.location.origin + "/auth/reset-password",
+      })
+      setPwdSent(true); showToast("Email de reinitialisation envoye !")
+      setTimeout(() => setPwdSent(false), 5000)
+    } catch { showToast("Erreur envoi email", "err") }
+    setPwdLoading(false)
+    setShowPwdChange(false)
+  }
+
+  async function changePasswordDirect() {
+    if (newPwd.length < 8) { showToast("Mot de passe trop court (min 8 car.)", "err"); return }
+    if (newPwd !== newPwdConfirm) { showToast("Les mots de passe ne correspondent pas", "err"); return }
+    setPwdLoading(true)
+    const sb = createClient()
+    try {
+      const { error } = await sb.auth.updateUser({ password: newPwd })
+      if (error) { showToast("Erreur : " + error.message, "err") }
+      else { showToast("Mot de passe mis a jour !"); setShowPwdChange(false); setNewPwd(""); setNewPwdConfirm("") }
+    } catch { showToast("Erreur", "err") }
+    setPwdLoading(false)
+  }
+
+  async function signOutAllDevices() {
+    setSignOutAllLoading(true)
+    const sb = createClient()
+    try {
+      await sb.auth.signOut({ scope: "global" })
+      window.location.href = "/auth/login"
+    } catch { showToast("Erreur deconnexion globale", "err") }
+    setSignOutAllLoading(false)
+  }
+
+  function computePwdStrength(pwd: string): number {
+    let score = 0
+    if (pwd.length >= 8)  score += 25
+    if (pwd.length >= 12) score += 15
+    if (/[A-Z]/.test(pwd)) score += 20
+    if (/[0-9]/.test(pwd)) score += 20
+    if (/[^A-Za-z0-9]/.test(pwd)) score += 20
+    return Math.min(score, 100)
   }
 
   function showToast(msg: string, type: "ok"|"err" = "ok") {
@@ -1392,27 +1487,196 @@ export default function ProfilePage() {
 
           {/* 4. SECURITE */}
           <SectionCard title="Securite" icon={Shield} color="#FF6B6B">
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {[
-                { icon: Lock,     label: "Changer le mot de passe", desc: "Envoie un email de reinitialisation",
-                  action: () => { const s = createClient(); s.auth.resetPasswordForEmail(profile?.email || ""); alert("Email envoye !") } },
-                { icon: LogOut,   label: "Deconnexion", desc: "Se deconnecter de tous les appareils",
-                  action: signOut },
-              ].map((item, i) => (
-                <button key={i} onClick={item.action}
-                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: SURF2, border: "1px solid rgba(255,255,255,0.06)", borderRadius: 9, cursor: "pointer", textAlign: "left" as const, width: "100%" }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,107,107,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <item.icon size={14} color="#FF6B6B"/>
+            {secLoading ? (
+              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                {[...Array(3)].map((_,i) => (
+                  <div key={i} style={{ height:52, borderRadius:9, background:"rgba(255,255,255,0.04)", animation:"pulse 1.4s ease-in-out infinite", animationDelay:`${i*0.15}s` }}/>
+                ))}
+              </div>
+            ) : (
+              <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+
+                {/* Alerte email non verifie */}
+                {!emailVerified && (
+                  <div style={{ display:"flex", alignItems:"flex-start", gap:10, padding:"12px 14px", background:"rgba(249,115,22,0.08)", border:"1px solid rgba(249,115,22,0.25)", borderRadius:10 }}>
+                    <AlertTriangle size={15} color="#F97316" style={{ flexShrink:0, marginTop:1 }}/>
+                    <div style={{ flex:1 }}>
+                      <p style={{ color:"#F97316", fontSize:12, fontWeight:700, margin:"0 0 3px" }}>Email non verifie</p>
+                      <p style={{ color:"rgba(249,115,22,0.8)", fontSize:11, margin:"0 0 8px" }}>
+                        Verifiez votre email pour securiser votre compte et recevoir les notifications.
+                      </p>
+                      <button onClick={sendVerificationEmail} disabled={sendingVerif || verifSent}
+                        style={{ display:"flex", alignItems:"center", gap:6, padding:"6px 13px", background:"rgba(249,115,22,0.15)", border:"1px solid rgba(249,115,22,0.3)", borderRadius:7, color:"#F97316", fontSize:11, fontWeight:700, cursor:sendingVerif||verifSent?"default":"pointer" }}>
+                        {verifSent ? <><Check size={11}/> Email envoye !</>
+                          : sendingVerif ? "Envoi..."
+                          : <><Mail size={11}/> Renvoyer l'email de verification</>}
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: 0 }}>{item.label}</p>
-                    <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{item.desc}</p>
+                )}
+
+                {/* Statut email */}
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 14px", background:SURF2, border:"1px solid rgba(255,255,255,0.06)", borderRadius:9 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                    <div style={{ width:32, height:32, borderRadius:8, background:emailVerified?"rgba(57,255,143,0.1)":"rgba(249,115,22,0.1)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      {emailVerified
+                        ? <ShieldCheck size={15} color="#39FF8F"/>
+                        : <ShieldOff   size={15} color="#F97316"/>}
+                    </div>
+                    <div>
+                      <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 1px" }}>
+                        {authUser?.email || profile?.email}
+                      </p>
+                      <div style={{ display:"flex", alignItems:"center", gap:5 }}>
+                        <div style={{ width:5, height:5, borderRadius:"50%", background:emailVerified?"#39FF8F":"#F97316" }}/>
+                        <span style={{ color:emailVerified?"#39FF8F":"#F97316", fontSize:10 }}>
+                          {emailVerified ? "Email verifie" : "Email non verifie"}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <ChevronRight size={14} color={MUTED} style={{ marginLeft: "auto" }}/>
-                </button>
-              ))}
-            </div>
+                  {lastSignIn && (
+                    <div style={{ textAlign:"right" as const }}>
+                      <p style={{ color:MUTED, fontSize:9, margin:0 }}>Derniere connexion</p>
+                      <p style={{ color:"#F5F0E8", fontSize:10, fontWeight:600, margin:0 }}>
+                        {new Date(lastSignIn).toLocaleDateString("fr-FR", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" })}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Mot de passe */}
+                <div style={{ background:SURF2, border:"1px solid rgba(255,255,255,0.06)", borderRadius:9, overflow:"hidden" }}>
+                  <button type="button" onClick={() => setShowPwdChange(p => !p)}
+                    style={{ display:"flex", alignItems:"center", gap:10, padding:"12px 14px", background:"none", border:"none", cursor:"pointer", width:"100%", textAlign:"left" as const }}>
+                    <div style={{ width:32, height:32, borderRadius:8, background:"rgba(255,107,107,0.1)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                      <Lock size={14} color="#FF6B6B"/>
+                    </div>
+                    <div style={{ flex:1 }}>
+                      <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:0 }}>Mot de passe</p>
+                      <p style={{ color:MUTED, fontSize:10, margin:0 }}>Modifier ou reinitialiser votre mot de passe</p>
+                    </div>
+                    <ChevronRight size={14} color={MUTED} style={{ transform:showPwdChange?"rotate(90deg)":"none", transition:"transform 0.2s" }}/>
+                  </button>
+
+                  {showPwdChange && (
+                    <div style={{ padding:"0 14px 14px", borderTop:"1px solid rgba(255,255,255,0.05)", display:"flex", flexDirection:"column", gap:10 }}>
+                      <div style={{ display:"flex", gap:7, marginTop:12 }}>
+                        <button type="button" onClick={sendPasswordReset} disabled={pwdLoading||pwdSent}
+                          style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding:"9px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, color:MUTED, fontSize:11, cursor:"pointer" }}>
+                          <Mail size={12}/>
+                          {pwdSent ? "Email envoye !" : "Recevoir un email de reinitialisation"}
+                        </button>
+                      </div>
+                      <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                        <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.06)" }}/>
+                        <span style={{ color:MUTED, fontSize:9 }}>ou changer directement</span>
+                        <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.06)" }}/>
+                      </div>
+                      <div>
+                        <input type="password" value={newPwd}
+                          onChange={e => { setNewPwd(e.target.value); setPwdStrength(computePwdStrength(e.target.value)) }}
+                          placeholder="Nouveau mot de passe"
+                          style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"9px 12px", color:"#F5F0E8", fontSize:12, outline:"none", boxSizing:"border-box" as const, marginBottom:6 }}/>
+                        {newPwd && (
+                          <div>
+                            <div style={{ height:4, background:"rgba(255,255,255,0.06)", borderRadius:2, overflow:"hidden", marginBottom:3 }}>
+                              <div style={{ height:"100%", width:`${pwdStrength}%`, background:pwdStrength<40?"#FF6B6B":pwdStrength<70?"#F97316":"#39FF8F", borderRadius:2, transition:"width 0.3s, background 0.3s" }}/>
+                            </div>
+                            <p style={{ color:pwdStrength<40?"#FF6B6B":pwdStrength<70?"#F97316":"#39FF8F", fontSize:9, margin:0 }}>
+                              {pwdStrength<40?"Mot de passe faible":pwdStrength<70?"Correct -- ajoutez des chiffres et symboles":"Mot de passe fort"}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                      <input type="password" value={newPwdConfirm}
+                        onChange={e => setNewPwdConfirm(e.target.value)}
+                        placeholder="Confirmer le mot de passe"
+                        style={{ width:"100%", background:"#0F0E0B", border:`1px solid ${newPwdConfirm && newPwd !== newPwdConfirm?"rgba(255,107,107,0.4)":"rgba(255,255,255,0.08)"}`, borderRadius:8, padding:"9px 12px", color:"#F5F0E8", fontSize:12, outline:"none", boxSizing:"border-box" as const }}/>
+                      {newPwdConfirm && newPwd !== newPwdConfirm && (
+                        <p style={{ color:"#FF6B6B", fontSize:10, margin:"0" }}>Les mots de passe ne correspondent pas</p>
+                      )}
+                      <button type="button" onClick={changePasswordDirect}
+                        disabled={pwdLoading || newPwd.length < 8 || newPwd !== newPwdConfirm}
+                        style={{ padding:"10px", background:newPwd.length>=8&&newPwd===newPwdConfirm?"linear-gradient(90deg,#FF6B6B,#e05555)":"rgba(255,255,255,0.04)", border:"none", borderRadius:8, color:newPwd.length>=8&&newPwd===newPwdConfirm?"#F5F0E8":MUTED, fontSize:12, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                        {pwdLoading ? "Mise a jour..." : <><Lock size={12}/> Mettre a jour le mot de passe</>}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Sessions actives */}
+                <div>
+                  <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 8px" }}>Sessions actives</p>
+                  <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+                    {sessions.map((sess, i) => {
+                      const DevIcon = sess.device === "mobile" ? Smartphone : sess.device === "tablet" ? Tablet : Monitor
+                      return (
+                        <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 12px", background:sess.current?"rgba(57,255,143,0.04)":SURF2, border:`1px solid ${sess.current?"rgba(57,255,143,0.15)":"rgba(255,255,255,0.06)"}`, borderRadius:9 }}>
+                          <div style={{ width:32, height:32, borderRadius:8, background:sess.current?"rgba(57,255,143,0.1)":"rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                            <DevIcon size={15} color={sess.current?"#39FF8F":MUTED}/>
+                          </div>
+                          <div style={{ flex:1, minWidth:0 }}>
+                            <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+                              <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:0 }}>{sess.browser}</p>
+                              {sess.current && (
+                                <span style={{ background:"rgba(57,255,143,0.1)", border:"1px solid rgba(57,255,143,0.2)", borderRadius:4, padding:"1px 6px", fontSize:8, color:"#39FF8F", fontWeight:700 }}>
+                                  Session actuelle
+                                </span>
+                              )}
+                            </div>
+                            <p style={{ color:MUTED, fontSize:10, margin:0 }}>{sess.location}</p>
+                          </div>
+                          {!sess.current && (
+                            <button type="button" onClick={() => signOutAllDevices()}
+                              style={{ padding:"4px 10px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.15)", borderRadius:6, color:"#FF6B6B", fontSize:10, cursor:"pointer" }}>
+                              Revoquer
+                            </button>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Actions globales */}
+                <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+                  <button type="button" onClick={signOutAllDevices} disabled={signOutAllLoading}
+                    style={{ display:"flex", alignItems:"center", gap:10, padding:"12px 14px", background:"rgba(255,107,107,0.06)", border:"1px solid rgba(255,107,107,0.15)", borderRadius:9, cursor:"pointer", textAlign:"left" as const, opacity:signOutAllLoading?0.7:1 }}>
+                    <div style={{ width:32, height:32, borderRadius:8, background:"rgba(255,107,107,0.1)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                      <LogOut size={14} color="#FF6B6B"/>
+                    </div>
+                    <div style={{ flex:1 }}>
+                      <p style={{ color:"#FF6B6B", fontSize:12, fontWeight:600, margin:0 }}>
+                        {signOutAllLoading ? "Deconnexion en cours..." : "Deconnecter tous les appareils"}
+                      </p>
+                      <p style={{ color:MUTED, fontSize:10, margin:0 }}>Met fin a toutes les sessions actives</p>
+                    </div>
+                    <ChevronRight size={14} color="#FF6B6B"/>
+                  </button>
+                </div>
+
+                {/* Badges securite */}
+                <div style={{ display:"flex", gap:7, flexWrap:"wrap" as const }}>
+                  <span style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"4px 10px", background:emailVerified?"rgba(57,255,143,0.08)":"rgba(249,115,22,0.08)", border:`1px solid ${emailVerified?"rgba(57,255,143,0.2)":"rgba(249,115,22,0.2)"}`, borderRadius:20, fontSize:10, color:emailVerified?"#39FF8F":"#F97316" }}>
+                    {emailVerified ? <ShieldCheck size={11}/> : <ShieldOff size={11}/>}
+                    Email {emailVerified?"verifie":"non verifie"}
+                  </span>
+                  <span style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"4px 10px", background:"rgba(57,255,143,0.08)", border:"1px solid rgba(57,255,143,0.2)", borderRadius:20, fontSize:10, color:"#39FF8F" }}>
+                    <Shield size={11}/>
+                    Compte actif
+                  </span>
+                  {profile?.plan !== "free" && (
+                    <span style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"4px 10px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:20, fontSize:10, color:G }}>
+                      <Key size={11}/>
+                      Plan payant
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </SectionCard>
+
 
           {/* 5. EXPORT + DANGER */}
           <SectionCard title="Donnees & Compte" icon={Download} color="#6B7280">
