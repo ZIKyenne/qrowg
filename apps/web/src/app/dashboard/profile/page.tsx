@@ -80,6 +80,29 @@ const ACTIVITY_FILTER_OPTS = [
   { id: "account",   label: "Compte"     },
 ]
 
+// -- Preferences utilisateur --------------------------------------------------
+type UserPreferences = {
+  locale:         string   // fr | en | es | de | pt
+  timezone:       string   // IANA timezone
+  date_format:    string   // DD/MM/YYYY | MM/DD/YYYY | YYYY-MM-DD
+  time_format:    string   // 24h | 12h
+  currency:       string   // EUR | USD | GBP | CHF
+  notif_email:    boolean
+  notif_scan:     boolean
+  notif_security: boolean
+  report_weekly:  boolean
+  report_monthly: boolean
+  accent_color:   string   // hex color
+}
+
+const DEFAULT_PREFS: UserPreferences = {
+  locale: "fr", timezone: "Europe/Paris", date_format: "DD/MM/YYYY",
+  time_format: "24h", currency: "EUR",
+  notif_email: true, notif_scan: true, notif_security: true,
+  report_weekly: false, report_monthly: false,
+  accent_color: "#C9A84C",
+}
+
 type DomainRecord = {
   id:            string
   domain:        string
@@ -240,6 +263,10 @@ export default function ProfilePage() {
   const [subCycle,    setSubCycle]    = useState<"monthly"|"annual">("monthly")
   const [domains,       setDomains]       = useState<DomainRecord[]>([])
   const [domainsLoading,setDomainsLoading]= useState(true)
+  const [prefs,         setPrefs]         = useState<UserPreferences>(DEFAULT_PREFS)
+  const [prefsSaving,   setPrefsSaving]   = useState(false)
+  const [prefsSaved,    setPrefsSaved]    = useState(false)
+  const prefsSaveTimer = useRef<NodeJS.Timeout|null>(null)
   const [deletingDomain,setDeletingDomain]= useState<string|null>(null)
   const [settingPrimary,setSettingPrimary]= useState<string|null>(null)
   const [subLoading,  setSubLoading]  = useState(true)
@@ -308,6 +335,14 @@ export default function ProfilePage() {
         const init = { full_name: prof.full_name || "", username: prof.username || "", bio: prof.bio || "", website: prof.website || "" }
         setForm(init)
         setFormOriginal(init)
+        // Charger les preferences (JSONB) + auto-detect timezone si absent
+        const storedPrefs = prof.preferences as Partial<UserPreferences> | null
+        const detectedTz  = Intl.DateTimeFormat().resolvedOptions().timeZone
+        setPrefs({
+          ...DEFAULT_PREFS,
+          timezone: detectedTz || DEFAULT_PREFS.timezone,
+          ...storedPrefs,
+        })
       }
       if (refs)  setReferrals(refs)
       if (keys)  setApiKeys(keys)
@@ -447,6 +482,32 @@ export default function ProfilePage() {
     try {
       await sb.from("activity_logs").insert({ ...evt })
     } catch { /* table peut ne pas exister encore */ }
+  }
+
+  // -- Fonctions preferences ----------------------------------------
+  async function savePrefs(updated: UserPreferences) {
+    if (!profile) return
+    setPrefs(updated)
+    // Debounce: annuler le timer precedent
+    if (prefsSaveTimer.current) clearTimeout(prefsSaveTimer.current)
+    prefsSaveTimer.current = setTimeout(async () => {
+      setPrefsSaving(true)
+      const sb = createClient()
+      const { error } = await sb.from("profiles")
+        .update({ preferences: updated })
+        .eq("id", profile.id)
+      if (error) { showToast("Erreur sauvegarde preferences", "err") }
+      else { setPrefsSaved(true); setTimeout(() => setPrefsSaved(false), 2000) }
+      setPrefsSaving(false)
+    }, 800)  // 800ms debounce pour les toggles
+  }
+
+  function togglePref(key: keyof UserPreferences, value: boolean) {
+    savePrefs({ ...prefs, [key]: value })
+  }
+
+  function setPrefField<K extends keyof UserPreferences>(key: K, value: UserPreferences[K]) {
+    savePrefs({ ...prefs, [key]: value })
   }
 
   // -- Fonctions domaines ----------------------------------------
@@ -2617,28 +2678,204 @@ export default function ProfilePage() {
 
 
           {/* 10. PREFERENCES */}
-          <SectionCard title="Preferences" icon={Bell} color="#F97316">
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {([
-                { label: "Notifications par email", desc: "Recevez les alertes scan et analytics" },
-                { label: "Resume hebdomadaire", desc: "Stats de la semaine chaque lundi" },
-                { label: "Alertes de securite", desc: "Connexions et changements de compte" },
-              ] as const).map((pref, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", background: SURF2, border: "1px solid rgba(255,255,255,0.05)", borderRadius: 9 }}>
+          <SectionCard title="Preferences" icon={Settings} color="#F97316"
+            action={
+              <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                {prefsSaving && (
+                  <div style={{ width:12, height:12, border:"1.5px solid rgba(249,115,22,0.3)", borderTopColor:"#F97316", borderRadius:"50%", animation:"spin 0.7s linear infinite" }}/>
+                )}
+                {prefsSaved && !prefsSaving && (
+                  <span style={{ color:"#39FF8F", fontSize:10, display:"flex", alignItems:"center", gap:4 }}>
+                    <Check size={10}/> Sauvegarde
+                  </span>
+                )}
+              </div>
+            }>
+            <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+
+              {/* -- Localisation ---------------------------------------- */}
+              <div>
+                <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 10px" }}>Localisation</p>
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+
+                  {/* Langue */}
                   <div>
-                    <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: 0 }}>{pref.label}</p>
-                    <p style={{ color: MUTED, fontSize: 10, margin: "2px 0 0" }}>{pref.desc}</p>
+                    <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:5, fontWeight:500 }}>Langue</label>
+                    <select value={prefs.locale} onChange={e => setPrefField("locale", e.target.value)}
+                      style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"#F5F0E8", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
+                      <option value="fr">Francais</option>
+                      <option value="en">English</option>
+                      <option value="es">Espanol</option>
+                      <option value="de">Deutsch</option>
+                      <option value="pt">Portugues</option>
+                    </select>
                   </div>
-                  <div style={{ width: 36, height: 20, borderRadius: 10, background: `linear-gradient(90deg,${G},#b8953f)`, position: "relative" as const, flexShrink: 0 }}>
-                    <div style={{ position: "absolute", top: 2, left: 18, width: 16, height: 16, borderRadius: "50%", background: "#F5F0E8" }}/>
+
+                  {/* Devise */}
+                  <div>
+                    <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:5, fontWeight:500 }}>Devise</label>
+                    <select value={prefs.currency} onChange={e => setPrefField("currency", e.target.value)}
+                      style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"#F5F0E8", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
+                      <option value="EUR">EUR (Euro)</option>
+                      <option value="USD">USD (Dollar)</option>
+                      <option value="GBP">GBP (Livre)</option>
+                      <option value="CHF">CHF (Franc suisse)</option>
+                      <option value="CAD">CAD (Dollar canadien)</option>
+                    </select>
+                  </div>
+
+                  {/* Fuseau horaire */}
+                  <div style={{ gridColumn:"1 / -1" }}>
+                    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:5 }}>
+                      <label style={{ color:MUTED, fontSize:10, fontWeight:500 }}>Fuseau horaire</label>
+                      <button type="button"
+                        onClick={() => setPrefField("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone)}
+                        style={{ color:G, fontSize:9, background:"none", border:"none", cursor:"pointer", padding:0, display:"flex", alignItems:"center", gap:3 }}>
+                        <RotateCcw size={9}/> Auto-detecter
+                      </button>
+                    </div>
+                    <select value={prefs.timezone} onChange={e => setPrefField("timezone", e.target.value)}
+                      style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"#F5F0E8", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
+                      {[
+                        "Europe/Paris","Europe/London","Europe/Berlin","Europe/Madrid","Europe/Rome",
+                        "America/New_York","America/Chicago","America/Denver","America/Los_Angeles",
+                        "America/Sao_Paulo","America/Montreal",
+                        "Asia/Tokyo","Asia/Shanghai","Asia/Kolkata","Asia/Dubai",
+                        "Pacific/Auckland","Australia/Sydney","Africa/Casablanca",
+                      ].map(tz => <option key={tz} value={tz}>{tz.replace("_"," ")}</option>)}
+                    </select>
+                  </div>
+
+                  {/* Format date */}
+                  <div>
+                    <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:5, fontWeight:500 }}>Format date</label>
+                    <select value={prefs.date_format} onChange={e => setPrefField("date_format", e.target.value)}
+                      style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"#F5F0E8", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
+                      <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                      <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                      <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                      <option value="D MMMM YYYY">D MMMM YYYY</option>
+                    </select>
+                  </div>
+
+                  {/* Format heure */}
+                  <div>
+                    <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:5, fontWeight:500 }}>Format heure</label>
+                    <select value={prefs.time_format} onChange={e => setPrefField("time_format", e.target.value)}
+                      style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"#F5F0E8", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
+                      <option value="24h">24h (14:30)</option>
+                      <option value="12h">12h (2:30 PM)</option>
+                    </select>
                   </div>
                 </div>
-              ))}
-              <p style={{ color: MUTED, fontSize: 10, margin: "4px 0 0", lineHeight: 1.5 }}>
-                La gestion des preferences sera disponible dans une prochaine version.
-              </p>
+
+                {/* Preview format */}
+                <div style={{ marginTop:8, padding:"7px 11px", background:"rgba(249,115,22,0.05)", border:"1px solid rgba(249,115,22,0.12)", borderRadius:8, display:"flex", alignItems:"center", gap:8 }}>
+                  <Clock size={11} color="#F97316"/>
+                  <span style={{ color:MUTED, fontSize:10 }}>
+                    Apercu : {(() => {
+                      const now = new Date()
+                      const d   = now.getDate().toString().padStart(2,"0")
+                      const m   = (now.getMonth()+1).toString().padStart(2,"0")
+                      const y   = now.getFullYear()
+                      const h24 = now.getHours().toString().padStart(2,"0")
+                      const min = now.getMinutes().toString().padStart(2,"0")
+                      const h12 = now.getHours() % 12 || 12
+                      const ampm = now.getHours() >= 12 ? "PM" : "AM"
+                      const dateStr = prefs.date_format === "DD/MM/YYYY" ? `${d}/${m}/${y}`
+                        : prefs.date_format === "MM/DD/YYYY" ? `${m}/${d}/${y}`
+                        : prefs.date_format === "YYYY-MM-DD" ? `${y}-${m}-${d}`
+                        : `${now.getDate()} ${now.toLocaleString("fr-FR",{month:"long"})} ${y}`
+                      const timeStr = prefs.time_format === "24h" ? `${h24}:${min}` : `${h12}:${min} ${ampm}`
+                      return `${dateStr} a ${timeStr}`
+                    })()}
+                  </span>
+                </div>
+              </div>
+
+              {/* -- Notifications --------------------------------------- */}
+              <div>
+                <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 10px" }}>Notifications</p>
+                <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+                  {([
+                    { key:"notif_email"    as const, label:"Notifications par email",   desc:"Alertes scans, vues, QR codes"         },
+                    { key:"notif_scan"     as const, label:"Alertes scan en temps reel", desc:"Notification a chaque scan QR"         },
+                    { key:"notif_security" as const, label:"Alertes de securite",        desc:"Connexions et changements de compte"   },
+                  ]).map(item => (
+                    <div key={item.key} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 12px", background:SURF2, border:"1px solid rgba(255,255,255,0.05)", borderRadius:9 }}>
+                      <div>
+                        <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:0 }}>{item.label}</p>
+                        <p style={{ color:MUTED, fontSize:10, margin:"2px 0 0" }}>{item.desc}</p>
+                      </div>
+                      <button type="button" onClick={() => togglePref(item.key, !prefs[item.key])}
+                        style={{ width:38, height:21, borderRadius:11, background:prefs[item.key]?`linear-gradient(90deg,${G},#b8953f)`:"rgba(255,255,255,0.08)", border:"none", cursor:"pointer", position:"relative" as const, transition:"background 0.2s", flexShrink:0 }}>
+                        <div style={{ position:"absolute" as const, top:2.5, left:prefs[item.key]?20:3, width:16, height:16, borderRadius:"50%", background:"#F5F0E8", transition:"left 0.2s", boxShadow:"0 1px 3px rgba(0,0,0,0.3)" }}/>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* -- Rapports ------------------------------------------- */}
+              <div>
+                <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 10px" }}>Rapports automatiques</p>
+                <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+                  {([
+                    { key:"report_weekly"  as const, label:"Resume hebdomadaire", desc:"Stats de la semaine chaque lundi matin",   plan:"free" },
+                    { key:"report_monthly" as const, label:"Rapport mensuel",     desc:"Bilan complet du mois + recommandations",  plan:"pro"  },
+                  ]).map(item => {
+                    const locked = item.plan === "pro" && currentPlan === "free"
+                    return (
+                      <div key={item.key} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 12px", background:SURF2, border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, opacity:locked?0.6:1 }}>
+                        <div>
+                          <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+                            <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:0 }}>{item.label}</p>
+                            {locked && <span style={{ background:`${G}12`, border:`1px solid ${G}25`, borderRadius:4, padding:"1px 6px", fontSize:8, color:G, fontWeight:700 }}>Pro</span>}
+                          </div>
+                          <p style={{ color:MUTED, fontSize:10, margin:"2px 0 0" }}>{item.desc}</p>
+                        </div>
+                        <button type="button"
+                          disabled={locked}
+                          onClick={() => !locked && togglePref(item.key, !prefs[item.key])}
+                          style={{ width:38, height:21, borderRadius:11, background:!locked&&prefs[item.key]?`linear-gradient(90deg,${G},#b8953f)`:"rgba(255,255,255,0.08)", border:"none", cursor:locked?"not-allowed":"pointer", position:"relative" as const, transition:"background 0.2s", flexShrink:0 }}>
+                          <div style={{ position:"absolute" as const, top:2.5, left:!locked&&prefs[item.key]?20:3, width:16, height:16, borderRadius:"50%", background:"#F5F0E8", transition:"left 0.2s", boxShadow:"0 1px 3px rgba(0,0,0,0.3)" }}/>
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* -- Couleur d'accent ------------------------------------ */}
+              <div>
+                <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 10px" }}>Couleur d'accent</p>
+                <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                  <div style={{ display:"flex", gap:7, flexWrap:"wrap" as const }}>
+                    {[
+                      "#C9A84C","#39FF8F","#38BDF8","#7B61FF",
+                      "#EC4899","#F97316","#FF6B6B","#F5F0E8",
+                    ].map(color => (
+                      <button key={color} type="button" onClick={() => setPrefField("accent_color", color)}
+                        style={{ width:28, height:28, borderRadius:8, background:color, border:prefs.accent_color===color?`2px solid #F5F0E8`:"2px solid transparent", cursor:"pointer", transition:"border 0.15s", boxShadow:prefs.accent_color===color?`0 0 10px ${color}60`:"none" }}/>
+                    ))}
+                    <label style={{ width:28, height:28, borderRadius:8, border:"1px dashed rgba(255,255,255,0.2)", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", position:"relative" as const, overflow:"hidden" as const }}
+                      title="Couleur personnalisee">
+                      <span style={{ color:MUTED, fontSize:14 }}>+</span>
+                      <input type="color" value={prefs.accent_color}
+                        onChange={e => setPrefField("accent_color", e.target.value)}
+                        style={{ position:"absolute" as const, inset:0, opacity:0, cursor:"pointer", width:"100%", height:"100%" }}/>
+                    </label>
+                  </div>
+                  <div style={{ flex:1, height:6, borderRadius:3, background:`linear-gradient(90deg,${prefs.accent_color},${prefs.accent_color}40)`, transition:"background 0.3s" }}/>
+                  <code style={{ color:prefs.accent_color, fontSize:10, fontFamily:"monospace", flexShrink:0 }}>{prefs.accent_color}</code>
+                </div>
+                <p style={{ color:MUTED, fontSize:9, margin:"6px 0 0" }}>
+                  La couleur d'accent sera appliquee dans une prochaine mise a jour de l'interface.
+                </p>
+              </div>
             </div>
           </SectionCard>
+
         </div>
       </div>
     </div>
