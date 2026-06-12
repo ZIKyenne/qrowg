@@ -9,7 +9,8 @@ import {
   LogOut, AlertTriangle, Plus, X, RotateCcw, Activity,
   CreditCard, Code, Settings, CheckCircle, AtSign, Link, Link2,
   ImageOff, Crop, UserCheck, UserX,
-  Clock, Filter, Calendar, FileEdit, Scan, Tag, Award
+  Clock, Filter, Calendar, FileEdit, Scan, Tag, Award,
+  Share2, MessageCircle, Mail, Twitter, Linkedin
 } from "lucide-react"
 
 // -- Types --------------------------------------------------------------------
@@ -197,6 +198,9 @@ export default function ProfilePage() {
   const [usernameStatus, setUsernameStatus] = useState<"idle"|"checking"|"ok"|"taken"|"invalid">("idle")
   const [usernameMsg, setUsernameMsg]   = useState("")
   const [copiedUrl, setCopiedUrl]       = useState(false)
+  const [copiedRef, setCopiedRef]       = useState(false)
+  const [refFilter, setRefFilter]       = useState("all")
+  const [showShareMenu, setShowShareMenu] = useState(false)
   const [toast, setToast]               = useState<{msg:string;type:"ok"|"err"}|null>(null)
   const [cropMode, setCropMode]         = useState(false)
   const [cropSrc, setCropSrc]           = useState<string|null>(null)
@@ -235,7 +239,7 @@ export default function ProfilePage() {
         { data: qrData },
       ] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", user.id).single(),
-        supabase.from("referrals").select("*").eq("referrer_id", user.id).order("created_at", { ascending: false }).limit(10),
+        supabase.from("referrals").select("id,status,reward_months,created_at,referee_id").eq("referrer_id", user.id).order("created_at", { ascending: false }),
         supabase.from("api_keys").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
         supabase.from("pages").select("id,title,slug,status,total_views,unique_views,updated_at,created_at").eq("user_id", user.id).order("updated_at", { ascending: false }).limit(5),
         supabase.from("pages").select("id,title,slug,status,total_views,unique_views,updated_at,created_at").eq("user_id", user.id),
@@ -489,8 +493,20 @@ export default function ProfilePage() {
   }
 
   function copyReferral() {
-    const link = `https://qrfolio.app?ref=${profile?.ref_code || profile?.id?.slice(0, 8)}`
-    navigator.clipboard.writeText(link).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2500) })
+    navigator.clipboard.writeText(referralLink).then(() => { setCopiedRef(true); setTimeout(() => setCopiedRef(false), 2500) })
+  }
+
+  // Partage vers les reseaux
+  function shareRef(platform: "whatsapp"|"email"|"twitter"|"linkedin") {
+    const msg = `Rejoins QRfolio, la plateforme de QR codes dynamiques professionnels ! Cree ta premiere page gratuitement : ${referralLink}`
+    const urls: Record<string, string> = {
+      whatsapp:  `https://wa.me/?text=${encodeURIComponent(msg)}`,
+      email:     `mailto:?subject=${encodeURIComponent("Rejoins QRfolio !")}&body=${encodeURIComponent(msg)}`,
+      twitter:   `https://twitter.com/intent/tweet?text=${encodeURIComponent(msg)}`,
+      linkedin:  `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(referralLink)}`,
+    }
+    window.open(urls[platform], "_blank", "noopener,noreferrer")
+    setShowShareMenu(false)
   }
 
   function copyPublicUrl() {
@@ -628,9 +644,15 @@ export default function ProfilePage() {
   const planCfg       = PLAN_CFG[profile?.plan || "free"] || PLAN_CFG["free"]
   const PlanIcon      = planCfg.icon
   const pc            = planCfg.color
+  const pendingRefs   = referrals.filter(r => r.status === "pending").length
   const validatedRefs = referrals.filter(r => r.status === "validated" || r.status === "rewarded").length
+  const expiredRefs   = referrals.filter(r => r.status === "expired").length
   const totalMonths   = referrals.reduce((s, r) => s + (r.reward_months || 0), 0)
   const referralLink  = `https://qrfolio.app?ref=${profile?.ref_code || profile?.id?.slice(0, 8) || ""}`
+  const filteredRefs  = refFilter === "all" ? referrals
+    : referrals.filter(r => refFilter === "validated"
+      ? (r.status === "validated" || r.status === "rewarded")
+      : r.status === refFilter)
   const memberMonths  = profile ? Math.floor((Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24 * 30)) : 0
 
   const inputStyle: React.CSSProperties = {
@@ -1090,56 +1112,152 @@ export default function ProfilePage() {
 
           {/* 3. PARRAINAGE */}
           <SectionCard title="Programme de parrainage" icon={Gift} color="#EC4899">
-            {/* Steps */}
-            <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
-              {[["🔗","Partage ton lien"],["👤","Un ami s'inscrit"],["🎁","1 mois Pro offert"]].map(([icon, label], i) => (
-                <div key={i} style={{ flex: 1, background: "rgba(236,72,153,0.06)", border: "1px solid rgba(236,72,153,0.12)", borderRadius: 8, padding: "10px 6px", textAlign: "center" as const }}>
-                  <span style={{ fontSize: 18, display: "block", marginBottom: 4 }}>{icon}</span>
-                  <span style={{ color: MUTED, fontSize: 9, lineHeight: 1.4, display: "block" }}>{label}</span>
-                </div>
-              ))}
-            </div>
+            <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
-            {/* Stats */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 14 }}>
-              {[
-                { value: validatedRefs, label: "Valides",   color: "#7B61FF" },
-                { value: totalMonths,   label: "Mois Pro",  color: "#39FF8F" },
-                { value: profile?.ref_code || "--", label: "Code", color: G },
-              ].map((s, i) => (
-                <div key={i} style={{ background: SURF2, border: "1px solid rgba(255,255,255,0.05)", borderRadius: 8, padding: "10px 8px", textAlign: "center" as const }}>
-                  <p style={{ color: s.color, fontSize: 18, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>{s.value}</p>
-                  <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{s.label}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Lien */}
-            <div style={{ display: "flex", gap: 7, marginBottom: referrals.length > 0 ? 14 : 0 }}>
-              <div style={{ flex: 1, background: SURF2, border: `1px solid ${G}20`, borderRadius: 8, padding: "9px 11px", color: G, fontSize: 11, fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>
-                {referralLink}
-              </div>
-              <button onClick={copyReferral}
-                style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 5, background: copied ? "rgba(57,255,143,0.1)" : G + "12", border: `1px solid ${copied ? "rgba(57,255,143,0.3)" : G + "25"}`, borderRadius: 8, padding: "9px 13px", color: copied ? "#39FF8F" : G, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
-                {copied ? <><Check size={12}/> Copie !</> : <><Copy size={12}/> Copier</>}
-              </button>
-            </div>
-
-            {/* Historique */}
-            {referrals.length > 0 && (
-              <div>
-                <p style={{ color: MUTED, fontSize: 10, margin: "0 0 7px", textTransform: "uppercase", letterSpacing: 0.8 }}>Historique</p>
-                {referrals.slice(0, 4).map((r, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 0", borderBottom: i < 3 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
-                    <span style={{ color: MUTED, fontSize: 11 }}>{formatDate(r.created_at)}</span>
-                    <span style={{ color: r.status === "validated" || r.status === "rewarded" ? "#39FF8F" : MUTED, fontSize: 11, fontWeight: 600, background: (r.status === "validated" || r.status === "rewarded") ? "rgba(57,255,143,0.08)" : "rgba(255,255,255,0.03)", border: `1px solid ${(r.status === "validated" || r.status === "rewarded") ? "rgba(57,255,143,0.2)" : "rgba(255,255,255,0.06)"}`, borderRadius: 5, padding: "2px 7px" }}>
-                      {r.status === "pending" ? "En attente" : r.status === "validated" ? "Valide" : "Recompense"}
-                    </span>
+              {/* Etapes visuelles */}
+              <div style={{ display:"flex", alignItems:"center", gap:0 }}>
+                {([
+                  { emoji:"🔗", step:"1", label:"Partage",     desc:"Tu envoies ton lien"          },
+                  { emoji:"👤", step:"2", label:"Inscription",  desc:"Un ami cree son compte"       },
+                  { emoji:"🎁", step:"3", label:"Recompense",   desc:"+1 mois Pro offert"            },
+                ] as const).map((s, i) => (
+                  <div key={i} style={{ display:"flex", alignItems:"center", flex:1 }}>
+                    <div style={{ flex:1, background:"rgba(236,72,153,0.06)", border:"1px solid rgba(236,72,153,0.14)", borderRadius:9, padding:"10px 8px", textAlign:"center" as const, position:"relative" as const }}>
+                      <div style={{ position:"absolute" as const, top:-8, left:"50%", transform:"translateX(-50%)", background:"rgba(236,72,153,0.15)", border:"1px solid rgba(236,72,153,0.3)", borderRadius:20, padding:"1px 7px", fontSize:8, color:"#EC4899", fontWeight:800 }}>{s.step}</div>
+                      <span style={{ fontSize:20, display:"block", margin:"4px 0 5px" }}>{s.emoji}</span>
+                      <p style={{ color:"#F5F0E8", fontSize:10, fontWeight:700, margin:"0 0 2px" }}>{s.label}</p>
+                      <p style={{ color:MUTED, fontSize:9, margin:0, lineHeight:1.4 }}>{s.desc}</p>
+                    </div>
+                    {i < 2 && <div style={{ width:16, height:1, background:"rgba(236,72,153,0.25)", flexShrink:0 }}/>}
                   </div>
                 ))}
               </div>
-            )}
+
+              {/* KPIs */}
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:7 }}>
+                {([
+                  { value:referrals.length, label:"Invitations",  color:"#38BDF8" },
+                  { value:pendingRefs,       label:"En attente",   color:"#F97316" },
+                  { value:validatedRefs,     label:"Valides",      color:"#7B61FF" },
+                  { value:totalMonths,       label:"Mois Pro",     color:"#39FF8F" },
+                ] as const).map((k, i) => (
+                  <div key={i} style={{ background:SURF2, border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 8px", textAlign:"center" as const }}>
+                    <p style={{ color:k.color, fontSize:20, fontWeight:800, margin:0, fontFamily:"Cormorant Garamond, serif", lineHeight:1 }}>{k.value}</p>
+                    <p style={{ color:MUTED, fontSize:9, margin:"3px 0 0", lineHeight:1.3 }}>{k.label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Condition de validation */}
+              <div style={{ padding:"10px 13px", background:"rgba(201,168,76,0.05)", border:"1px solid rgba(201,168,76,0.15)", borderRadius:9 }}>
+                <p style={{ color:G, fontSize:11, fontWeight:700, margin:"0 0 3px", display:"flex", alignItems:"center", gap:6 }}>
+                  Comment gagner un mois Pro ?
+                </p>
+                <p style={{ color:MUTED, fontSize:10, margin:0, lineHeight:1.6 }}>
+                  Ton filleul doit s'inscrire via ton lien et <strong style={{ color:"#F5F0E8" }}>souscrire a un plan payant</strong> dans les 30 jours. La recompense est creditee automatiquement.
+                </p>
+              </div>
+
+              {/* Lien + actions partage */}
+              <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+                <label style={{ color:MUTED, fontSize:10, fontWeight:500 }}>Ton lien de parrainage</label>
+                <div style={{ display:"flex", gap:7 }}>
+                  <div style={{ flex:1, background:SURF2, border:`1px solid ${G}20`, borderRadius:9, padding:"9px 12px", color:G, fontSize:11, fontFamily:"monospace", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, display:"flex", alignItems:"center" }}>
+                    {referralLink}
+                  </div>
+                  <button onClick={copyReferral}
+                    style={{ flexShrink:0, display:"flex", alignItems:"center", gap:5, background:copiedRef?"rgba(57,255,143,0.1)":G+"12", border:`1px solid ${copiedRef?"rgba(57,255,143,0.3)":G+"25"}`, borderRadius:9, padding:"9px 14px", color:copiedRef?"#39FF8F":G, fontSize:11, fontWeight:600, cursor:"pointer" }}>
+                    {copiedRef ? <><Check size={12}/> Copie !</> : <><Copy size={12}/> Copier</>}
+                  </button>
+                </div>
+
+                {/* Boutons de partage */}
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:6 }}>
+                  {([
+                    { id:"whatsapp" as const, label:"WhatsApp", color:"#25D366", emoji:"💬" },
+                    { id:"email"    as const, label:"Email",    color:"#38BDF8", emoji:"✉" },
+                    { id:"twitter"  as const, label:"X / Twitter", color:"#F5F0E8", emoji:"🐦" },
+                    { id:"linkedin" as const, label:"LinkedIn", color:"#0A66C2", emoji:"💼" },
+                  ]).map(btn => (
+                    <button key={btn.id} type="button" onClick={() => shareRef(btn.id)}
+                      style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:4, padding:"8px 4px", background:`${btn.color}10`, border:`1px solid ${btn.color}25`, borderRadius:9, cursor:"pointer" }}>
+                      <span style={{ fontSize:16 }}>{btn.emoji}</span>
+                      <span style={{ color:MUTED, fontSize:8, fontWeight:600 }}>{btn.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Historique filleuls */}
+              {referrals.length === 0 ? (
+                <div style={{ textAlign:"center" as const, padding:"20px 0" }}>
+                  <Gift size={28} color={MUTED} style={{ marginBottom:8 }}/>
+                  <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 5px" }}>Aucun filleul pour l'instant</p>
+                  <p style={{ color:MUTED, fontSize:11, margin:"0 0 12px", lineHeight:1.5 }}>
+                    Partage ton lien et gagne 1 mois Pro<br/>pour chaque ami qui s'abonne.
+                  </p>
+                  <button onClick={copyReferral}
+                    style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"9px 18px", background:`linear-gradient(90deg,#EC4899,#c73b7e)`, border:"none", borderRadius:9, color:"#F5F0E8", fontSize:12, fontWeight:700, cursor:"pointer" }}>
+                    <Share2 size={13}/> Partager maintenant
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                  {/* Filtres */}
+                  <div style={{ display:"flex", gap:5 }}>
+                    {([
+                      { id:"all",       label:"Tous",       count:referrals.length },
+                      { id:"pending",   label:"En attente", count:pendingRefs      },
+                      { id:"validated", label:"Valides",    count:validatedRefs    },
+                      { id:"expired",   label:"Expires",    count:expiredRefs      },
+                    ] as const).filter(f => f.id === "all" || f.count > 0).map(f => (
+                      <button key={f.id} type="button" onClick={() => setRefFilter(f.id)}
+                        style={{ display:"inline-flex", alignItems:"center", gap:4, padding:"3px 10px", background:refFilter===f.id?"rgba(236,72,153,0.12)":"rgba(255,255,255,0.04)", border:`1px solid ${refFilter===f.id?"rgba(236,72,153,0.35)":"rgba(255,255,255,0.07)"}`, borderRadius:20, color:refFilter===f.id?"#EC4899":MUTED, fontSize:10, fontWeight:refFilter===f.id?700:400, cursor:"pointer" }}>
+                        {f.label}
+                        <span style={{ background:"rgba(255,255,255,0.07)", borderRadius:10, padding:"0 5px", fontSize:9 }}>{f.count}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Liste filleuls */}
+                  <div style={{ display:"flex", flexDirection:"column", gap:0 }}>
+                    {filteredRefs.slice(0, 8).map((r, i) => {
+                      const STATUS_CFG2: Record<string, { label:string; color:string; bg:string }> = {
+                        pending:   { label:"Inscrit",  color:"#F97316", bg:"rgba(249,115,22,0.1)"  },
+                        validated: { label:"Valide",   color:"#39FF8F", bg:"rgba(57,255,143,0.1)"  },
+                        rewarded:  { label:"Recompense",color:"#7B61FF",bg:"rgba(123,97,255,0.1)"  },
+                        expired:   { label:"Expire",   color:"#FF6B6B", bg:"rgba(255,107,107,0.1)" },
+                      }
+                      const scfg = STATUS_CFG2[r.status] ?? STATUS_CFG2.pending
+                      const isLast = i === Math.min(filteredRefs.length, 8) - 1
+                      return (
+                        <div key={r.id || i} style={{ display:"flex", alignItems:"center", gap:10, padding:"9px 0", borderBottom:isLast?"none":"1px solid rgba(255,255,255,0.04)" }}>
+                          {/* Avatar initiales anonyme */}
+                          <div style={{ width:30, height:30, borderRadius:"50%", background:`${scfg.color}18`, border:`1px solid ${scfg.color}30`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontSize:12 }}>
+                            👤
+                          </div>
+                          <div style={{ flex:1, minWidth:0 }}>
+                            <p style={{ color:"#F5F0E8", fontSize:11, fontWeight:600, margin:"0 0 1px" }}>Filleul #{i+1}</p>
+                            <p style={{ color:MUTED, fontSize:9, margin:0 }}>{formatDate(r.created_at)}{r.reward_months ? ` . +${r.reward_months} mois Pro` : ""}</p>
+                          </div>
+                          <span style={{ background:scfg.bg, border:`1px solid ${scfg.color}30`, borderRadius:5, padding:"2px 8px", fontSize:9, color:scfg.color, fontWeight:700, flexShrink:0 }}>
+                            {scfg.label}
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  {filteredRefs.length > 8 && (
+                    <p style={{ color:MUTED, fontSize:11, textAlign:"center" as const, margin:"4px 0 0" }}>
+                      +{filteredRefs.length - 8} autres filleuls
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
           </SectionCard>
+
 
           {/* STATISTIQUES */}
           <SectionCard title="Statistiques" icon={TrendingUp} color="#38BDF8"
@@ -1621,7 +1739,7 @@ export default function ProfilePage() {
                         <div style={{ display:"flex", alignItems:"baseline", gap:8, marginBottom:2 }}>
                           <p style={{ color:"#F5F0E8", fontSize:15, fontWeight:800, margin:0 }}>{lvl.current.label}</p>
                           {lvl.nextLvl && (
-                            <span style={{ color:MUTED, fontSize:10 }}>{"-> "}{lvl.nextLvl.label}</span>
+                            <span style={{ color:MUTED, fontSize:10 }}>-> {lvl.nextLvl.label}</span>
                           )}
                         </div>
                         <p style={{ color:MUTED, fontSize:11, margin:0 }}>Score QRfolio : <span style={{ color:lvl.current.color, fontWeight:700 }}>{lvl.score}/100</span></p>
@@ -1699,7 +1817,7 @@ export default function ProfilePage() {
                               </p>
                               {badge.unlocked && (
                                 <div style={{ position:"absolute" as const, top:-4, right:-4, width:14, height:14, borderRadius:"50%", background:"#39FF8F", border:"2px solid #080808", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                                  <span style={{ fontSize:7, color:"#080808", fontWeight:900 }}>✓</span>
+                                  <span style={{ fontSize:7, color:"#080808", fontWeight:900 }}>v</span>
                                 </div>
                               )}
                             </div>
