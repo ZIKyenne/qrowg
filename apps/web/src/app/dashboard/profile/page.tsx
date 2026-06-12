@@ -1739,7 +1739,7 @@ export default function ProfilePage() {
                         <div style={{ display:"flex", alignItems:"baseline", gap:8, marginBottom:2 }}>
                           <p style={{ color:"#F5F0E8", fontSize:15, fontWeight:800, margin:0 }}>{lvl.current.label}</p>
                           {lvl.nextLvl && (
-                            <span style={{ color:MUTED, fontSize:10 }}>-> {lvl.nextLvl.label}</span>
+                            <span style={{ color:MUTED, fontSize:10 }}>{"-> "}{lvl.nextLvl.label}</span>
                           )}
                         </div>
                         <p style={{ color:MUTED, fontSize:11, margin:0 }}>Score QRfolio : <span style={{ color:lvl.current.color, fontWeight:700 }}>{lvl.score}/100</span></p>
