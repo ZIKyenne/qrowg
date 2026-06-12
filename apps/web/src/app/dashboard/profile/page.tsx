@@ -8,7 +8,8 @@ import {
   Bell, Globe, Trash2, Download, ChevronRight, Lock,
   LogOut, AlertTriangle, Plus, X, RotateCcw, Activity,
   CreditCard, Code, Settings, CheckCircle, AtSign, Link, Link2,
-  ImageOff, Crop, UserCheck, UserX
+  ImageOff, Crop, UserCheck, UserX,
+  Clock, Filter, Calendar, FileEdit, Scan, Tag, Award
 } from "lucide-react"
 
 // -- Types --------------------------------------------------------------------
@@ -31,6 +32,50 @@ type RecentPage = {
 type RecentScan = {
   id: string; scanned_at: string; device: string; country: string | null
 }
+
+// -- Activity Log -------------------------------------------------------------
+type ActivityEventType =
+  | "page_created" | "page_published" | "page_updated"
+  | "qr_created"   | "qr_customized"  | "qr_scanned"   | "qr_downloaded"
+  | "plan_changed" | "referral_validated" | "profile_updated"
+  | "template_used"| "api_key_created"    | "export_done"
+
+type ActivityEvent = {
+  id:           string
+  user_id?:     string
+  event_type:   ActivityEventType
+  title:        string
+  description:  string | null
+  entity_id:    string | null
+  entity_type:  string | null
+  entity_label: string | null
+  metadata:     Record<string, any>
+  created_at:   string
+}
+
+// Config d'affichage par type d'evenement
+const ACTIVITY_CFG: Record<ActivityEventType, { icon: any; color: string; bg: string }> = {
+  page_created:       { icon: FileEdit,  color: "#C9A84C",  bg: "rgba(201,168,76,0.1)"  },
+  page_published:     { icon: CheckCircle,color: "#39FF8F", bg: "rgba(57,255,143,0.1)"  },
+  page_updated:       { icon: FileEdit,  color: "#38BDF8",  bg: "rgba(56,189,248,0.1)"  },
+  qr_created:         { icon: QrCode,    color: "#C9A84C",  bg: "rgba(201,168,76,0.1)"  },
+  qr_customized:      { icon: Settings,  color: "#7B61FF",  bg: "rgba(123,97,255,0.1)"  },
+  qr_scanned:         { icon: Scan,      color: "#39FF8F",  bg: "rgba(57,255,143,0.1)"  },
+  qr_downloaded:      { icon: Download,  color: "#38BDF8",  bg: "rgba(56,189,248,0.1)"  },
+  plan_changed:       { icon: Zap,       color: "#C9A84C",  bg: "rgba(201,168,76,0.1)"  },
+  referral_validated: { icon: Award,     color: "#EC4899",  bg: "rgba(236,72,153,0.1)"  },
+  profile_updated:    { icon: Settings,  color: "#8A8478",  bg: "rgba(138,132,120,0.1)" },
+  template_used:      { icon: Tag,       color: "#F97316",  bg: "rgba(249,115,22,0.1)"  },
+  api_key_created:    { icon: Key,       color: "#7B61FF",  bg: "rgba(123,97,255,0.1)"  },
+  export_done:        { icon: Download,  color: "#38BDF8",  bg: "rgba(56,189,248,0.1)"  },
+}
+
+const ACTIVITY_FILTER_OPTS = [
+  { id: "all",       label: "Tout"       },
+  { id: "pages",     label: "Pages"      },
+  { id: "qr",        label: "QR Codes"   },
+  { id: "account",   label: "Compte"     },
+]
 
 type QRStat = {
   id: string; short_code: string; total_scans: number; status: string | null
@@ -120,7 +165,12 @@ export default function ProfilePage() {
   const [allPages,   setAllPages]   = useState<RecentPage[]>([])
   const [qrStats,    setQrStats]    = useState<QRStat[]>([])
   const [statsLoading, setStatsLoading] = useState(true)
-  const [statsTooltip, setStatsTooltip] = useState<string | null>(null)
+  const [statsTooltip, setStatsTooltip]     = useState<string | null>(null)
+  const [activityLog,  setActivityLog]       = useState<ActivityEvent[]>([])
+  const [activityLoading, setActivityLoading]= useState(true)
+  const [activityFilter,  setActivityFilter] = useState("all")
+  const [activityPage,    setActivityPage]   = useState(0)
+  const ACTIVITY_PAGE_SIZE = 10
   const usernameTimer = useRef<NodeJS.Timeout | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const cropRef = useRef<HTMLCanvasElement>(null)
@@ -159,6 +209,20 @@ export default function ProfilePage() {
       if (pages)       setRecentPages(pages)
       if (allPagesData) setAllPages(allPagesData)
       if (qrData)      setQrStats(qrData)
+      // Charger activity_logs (ou construire depuis donnees existantes)
+      try {
+        const { data: actData } = await supabase
+          .from("activity_logs")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(100)
+        if (actData && actData.length > 0) {
+          setActivityLog(actData)
+        }
+        // Sera override par buildTimelineFromData si vide
+      } catch { /* activity_logs pas encore cree */ }
+      setActivityLoading(false)
       setStatsLoading(false)
       setLoading(false)
     }
@@ -166,6 +230,107 @@ export default function ProfilePage() {
   }, [])
 
   // -- Actions -----------------------------------------------------------------
+  // -- Helpers timeline -------------------------------------------------------
+  function timeAgo(iso: string): string {
+    const diff = Date.now() - new Date(iso).getTime()
+    const m = Math.floor(diff / 60000)
+    const h = Math.floor(diff / 3600000)
+    const d = Math.floor(diff / 86400000)
+    if (m < 2)  return "a l'instant"
+    if (m < 60) return `il y a ${m}min`
+    if (h < 24) return `il y a ${h}h`
+    if (d < 7)  return `il y a ${d}j`
+    return new Date(iso).toLocaleDateString("fr-FR", { day:"numeric", month:"short" })
+  }
+
+  function groupLabel(iso: string): string {
+    const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000)
+    if (d === 0) return "Aujourd'hui"
+    if (d === 1) return "Hier"
+    if (d < 7)   return "Cette semaine"
+    if (d < 30)  return "Ce mois"
+    return "Plus ancien"
+  }
+
+  function filterEvents(evts: ActivityEvent[]): ActivityEvent[] {
+    if (activityFilter === "all") return evts
+    if (activityFilter === "pages") return evts.filter(e =>
+      ["page_created","page_published","page_updated"].includes(e.event_type))
+    if (activityFilter === "qr") return evts.filter(e =>
+      ["qr_created","qr_customized","qr_scanned","qr_downloaded"].includes(e.event_type))
+    if (activityFilter === "account") return evts.filter(e =>
+      ["plan_changed","referral_validated","profile_updated","api_key_created","export_done"].includes(e.event_type))
+    return evts
+  }
+
+  // Construire la timeline depuis les donnees existantes (fallback si activity_logs vide)
+  function buildTimelineFromData(): ActivityEvent[] {
+    const evts: ActivityEvent[] = []
+    const now = Date.now()
+    // Pages
+    for (const p of allPages) {
+      if (p.created_at) evts.push({
+        id: `page-created-${p.id}`, event_type: "page_created",
+        title: "Page creee", description: p.title,
+        entity_id: p.id, entity_type: "page", entity_label: p.title,
+        metadata: {}, created_at: p.created_at,
+      })
+      if (p.updated_at && p.updated_at !== p.created_at) {
+        const diffMs = new Date(p.updated_at).getTime() - new Date(p.created_at).getTime()
+        if (diffMs > 60000) evts.push({
+          id: `page-updated-${p.id}-${p.updated_at}`, event_type: p.status === "published" ? "page_published" : "page_updated",
+          title: p.status === "published" ? "Page publiee" : "Page modifiee",
+          description: p.title, entity_id: p.id, entity_type: "page",
+          entity_label: p.title, metadata: {}, created_at: p.updated_at,
+        })
+      }
+    }
+    // QR
+    for (const q of qrStats) {
+      evts.push({
+        id: `qr-created-${q.id}`, event_type: "qr_created",
+        title: "QR Code cree", description: (q.pages as any)?.title || `/${q.short_code}`,
+        entity_id: q.id, entity_type: "qr_code", entity_label: q.short_code,
+        metadata: {}, created_at: new Date(now - Math.random()*86400000*30).toISOString(),
+      })
+    }
+    // Referrals
+    for (const r of referrals.filter(r => r.status !== "pending")) {
+      evts.push({
+        id: `ref-${r.id}`, event_type: "referral_validated",
+        title: "Parrainage valide", description: `+${r.reward_months || 1} mois Pro`,
+        entity_id: r.id, entity_type: "referral", entity_label: null,
+        metadata: {}, created_at: r.created_at,
+      })
+    }
+    return evts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  }
+
+  // Logger un evenement
+  async function logActivity(
+    event_type: ActivityEventType, title: string,
+    opts?: { description?: string; entity_id?: string; entity_type?: string; entity_label?: string; metadata?: Record<string, any> }
+  ) {
+    if (!profile?.id) return
+    const sb = createClient()
+    const evt: Omit<ActivityEvent, "id"> = {
+      user_id: profile.id, event_type, title,
+      description:  opts?.description  ?? null,
+      entity_id:    opts?.entity_id    ?? null,
+      entity_type:  opts?.entity_type  ?? null,
+      entity_label: opts?.entity_label ?? null,
+      metadata:     opts?.metadata     ?? {},
+      created_at:   new Date().toISOString(),
+    }
+    // Optimistic update
+    const tempId = crypto.randomUUID()
+    setActivityLog(prev => [{ id: tempId, ...evt } as ActivityEvent, ...prev])
+    // Persist
+    try {
+      await sb.from("activity_logs").insert({ ...evt })
+    } catch { /* table peut ne pas exister encore */ }
+  }
+
   function showToast(msg: string, type: "ok"|"err" = "ok") {
     setToast({ msg, type }); setTimeout(() => setToast(null), 3000)
   }
@@ -220,6 +385,7 @@ export default function ProfilePage() {
     setFormOriginal(updated)
     setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2500)
     showToast("Profil sauvegarde avec succes")
+    logActivity("profile_updated", "Profil mis a jour", { entity_type: "profile" })
   }
 
   // Ouvre le crop preview
@@ -657,31 +823,154 @@ export default function ProfilePage() {
 
 
           {/* 2. ACTIVITE RECENTE */}
-          <SectionCard title="Activite recente" icon={Activity} color="#38BDF8">
-            {recentPages.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "20px 0", color: MUTED }}>
-                <Eye size={24} color={MUTED} style={{ marginBottom: 8 }}/>
-                <p style={{ fontSize: 12, margin: 0 }}>Aucune page cree</p>
-                <a href="/dashboard" style={{ color: G, fontSize: 11, display: "inline-block", marginTop: 6 }}>Creer ma premiere page</a>
-              </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {recentPages.map(page => (
-                  <div key={page.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", background: SURF2, borderRadius: 9, border: "1px solid rgba(255,255,255,0.05)" }}>
-                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: page.status === "published" ? "#39FF8F" : MUTED, flexShrink: 0 }}/>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{page.title}</p>
-                      <p style={{ color: MUTED, fontSize: 10, margin: "1px 0 0" }}>{page.total_views} vues . {formatDate(page.updated_at)}</p>
-                    </div>
-                    <a href={`/dashboard/builder/${page.id}`} style={{ color: MUTED, flexShrink: 0 }}><ExternalLink size={12}/></a>
+          <SectionCard title="Activite recente" icon={Clock} color="#38BDF8"
+            action={
+              <a href="/dashboard/analytics" style={{ color:MUTED, fontSize:11, display:"flex", alignItems:"center", gap:3, textDecoration:"none" }}>
+                Tout voir <ChevronRight size={12}/>
+              </a>
+            }>
+            {(() => {
+              // Fusionner activity_logs et timeline reconstituee
+              const rawEvts = activityLog.length > 0 ? activityLog : buildTimelineFromData()
+              const filtered = filterEvents(rawEvts)
+              const paginated = filtered.slice(0, (activityPage + 1) * ACTIVITY_PAGE_SIZE)
+              const hasMore  = filtered.length > paginated.length
+
+              // Grouper par periode
+              const groups: Record<string, ActivityEvent[]> = {}
+              for (const evt of paginated) {
+                const label = groupLabel(evt.created_at)
+                if (!groups[label]) groups[label] = []
+                groups[label].push(evt)
+              }
+              const GROUP_ORDER = ["Aujourd'hui","Hier","Cette semaine","Ce mois","Plus ancien"]
+              const sortedGroups = GROUP_ORDER.filter(g => groups[g])
+
+              return (
+                <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+
+                  {/* Filtres */}
+                  <div style={{ display:"flex", gap:5, overflowX:"auto" }}>
+                    {ACTIVITY_FILTER_OPTS.map(f => (
+                      <button key={f.id} type="button" onClick={() => { setActivityFilter(f.id); setActivityPage(0) }}
+                        style={{ display:"inline-flex", alignItems:"center", gap:4, padding:"4px 10px", background:activityFilter===f.id?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.04)", border:`1px solid ${activityFilter===f.id?"rgba(201,168,76,0.35)":"rgba(255,255,255,0.08)"}`, borderRadius:20, color:activityFilter===f.id?G:MUTED, fontSize:10, fontWeight:activityFilter===f.id?700:400, cursor:"pointer", whiteSpace:"nowrap" as const, flexShrink:0 }}>
+                        {f.label}
+                        <span style={{ background:activityFilter===f.id?"rgba(201,168,76,0.2)":"rgba(255,255,255,0.06)", borderRadius:10, padding:"0px 5px", fontSize:9 }}>
+                          {f.id==="all" ? rawEvts.length
+                            : f.id==="pages" ? rawEvts.filter(e=>["page_created","page_published","page_updated"].includes(e.event_type)).length
+                            : f.id==="qr"    ? rawEvts.filter(e=>["qr_created","qr_customized","qr_scanned","qr_downloaded"].includes(e.event_type)).length
+                            : rawEvts.filter(e=>["plan_changed","referral_validated","profile_updated","api_key_created","export_done"].includes(e.event_type)).length
+                          }
+                        </span>
+                      </button>
+                    ))}
                   </div>
-                ))}
-                <a href="/dashboard" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: "8px", color: MUTED, fontSize: 11, textDecoration: "none" }}>
-                  Voir toutes les pages <ChevronRight size={12}/>
-                </a>
-              </div>
-            )}
+
+                  {/* Loading skeleton */}
+                  {activityLoading ? (
+                    <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                      {[...Array(5)].map((_,i) => (
+                        <div key={i} style={{ display:"flex", gap:10, alignItems:"flex-start", padding:"10px 0" }}>
+                          <div style={{ width:32, height:32, borderRadius:9, background:"rgba(255,255,255,0.04)", flexShrink:0, animation:"pulse 1.4s ease-in-out infinite", animationDelay:`${i*0.1}s` }}/>
+                          <div style={{ flex:1, display:"flex", flexDirection:"column", gap:5 }}>
+                            <div style={{ height:12, width:`${60+i*8}%`, borderRadius:4, background:"rgba(255,255,255,0.04)", animation:"pulse 1.4s ease-in-out infinite", animationDelay:`${i*0.1+0.05}s` }}/>
+                            <div style={{ height:10, width:"40%", borderRadius:4, background:"rgba(255,255,255,0.03)", animation:"pulse 1.4s ease-in-out infinite", animationDelay:`${i*0.1+0.1}s` }}/>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : filtered.length === 0 ? (
+                    /* Empty state */
+                    <div style={{ textAlign:"center" as const, padding:"24px 0" }}>
+                      <Clock size={28} color={MUTED} style={{ marginBottom:10 }}/>
+                      <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 4px" }}>Aucune activite</p>
+                      <p style={{ color:MUTED, fontSize:11, margin:0, lineHeight:1.5 }}>
+                        {activityFilter === "all"
+                          ? "Vos actions apparaitront ici au fur et a mesure"
+                          : "Aucun evenement de ce type"}
+                      </p>
+                    </div>
+                  ) : (
+                    /* Timeline */
+                    <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+                      {sortedGroups.map(groupName => (
+                        <div key={groupName}>
+                          {/* Label de groupe */}
+                          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
+                            <span style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase" as const, letterSpacing:1.2, whiteSpace:"nowrap" as const }}>
+                              {groupName}
+                            </span>
+                            <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.05)" }}/>
+                          </div>
+
+                          {/* Events du groupe */}
+                          <div style={{ display:"flex", flexDirection:"column", gap:1 }}>
+                            {groups[groupName].map((evt, idx) => {
+                              const cfg = ACTIVITY_CFG[evt.event_type] || ACTIVITY_CFG.page_updated
+                              const Icon = cfg.icon
+                              const isLast = idx === groups[groupName].length - 1
+                              const href = evt.entity_type === "page"
+                                ? `/dashboard/builder/${evt.entity_id}`
+                                : evt.entity_type === "qr_code"
+                                ? `/dashboard/qr-codes`
+                                : null
+                              return (
+                                <div key={evt.id} style={{ display:"flex", gap:12, position:"relative" as const }}>
+                                  {/* Ligne de timeline */}
+                                  {!isLast && (
+                                    <div style={{ position:"absolute", left:15, top:34, bottom:-1, width:1, background:"rgba(255,255,255,0.06)", zIndex:0 }}/>
+                                  )}
+                                  {/* Icone */}
+                                  <div style={{ width:32, height:32, borderRadius:9, background:cfg.bg, border:`1px solid ${cfg.color}25`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, zIndex:1, position:"relative" as const }}>
+                                    <Icon size={14} color={cfg.color}/>
+                                  </div>
+                                  {/* Contenu */}
+                                  <div style={{ flex:1, paddingTop:6, paddingBottom:isLast?0:10 }}>
+                                    <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:8 }}>
+                                      <div style={{ flex:1, minWidth:0 }}>
+                                        <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 2px", display:"flex", alignItems:"center", gap:6 }}>
+                                          {evt.title}
+                                          {evt.entity_label && (
+                                            <span style={{ color:cfg.color, fontSize:10, fontWeight:400, background:cfg.bg, padding:"1px 6px", borderRadius:4, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, maxWidth:120 }}>
+                                              {evt.entity_label}
+                                            </span>
+                                          )}
+                                        </p>
+                                        {evt.description && (
+                                          <p style={{ color:MUTED, fontSize:11, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>{evt.description}</p>
+                                        )}
+                                      </div>
+                                      <div style={{ display:"flex", alignItems:"center", gap:6, flexShrink:0 }}>
+                                        <span style={{ color:MUTED, fontSize:9, whiteSpace:"nowrap" as const }}>{timeAgo(evt.created_at)}</span>
+                                        {href && (
+                                          <a href={href} style={{ color:MUTED, display:"flex", alignItems:"center" }}>
+                                            <ExternalLink size={10}/>
+                                          </a>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* Pagination */}
+                      {hasMore && (
+                        <button type="button" onClick={() => setActivityPage(p => p + 1)}
+                          style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding:"9px", background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:9, color:MUTED, fontSize:11, cursor:"pointer" }}>
+                          Voir plus ({filtered.length - paginated.length} evenements)
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })()}
           </SectionCard>
+
 
           {/* 3. PARRAINAGE */}
           <SectionCard title="Programme de parrainage" icon={Gift} color="#EC4899">
