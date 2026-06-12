@@ -553,6 +553,60 @@ export default function ProfilePage() {
   const convRate       = totalViews > 0 ? Math.round((totalScansQR / totalViews) * 100) : 0
   const avgViews       = totalPages > 0 ? Math.round(totalViews / totalPages) : 0
 
+  // -- Badges + Niveau QRfolio -----------------------------------
+  type Badge = {
+    id: string; emoji: string; label: string; desc: string
+    category: "pages"|"scans"|"referrals"|"plan"|"milestone"
+    color: string; unlocked: boolean
+  }
+
+  function computeBadges(): Badge[] {
+    const plan    = profile?.plan || "free"
+    const isPro   = plan === "pro" || plan === "business"
+    const isBiz   = plan === "business"
+    const isEarly = memberMonths >= 0 && memberMonths <= 6
+    return [
+      { id:"first_page",     emoji:"📄", label:"Premiere page",      desc:"Publiez votre premiere page",               category:"pages",     color:"#C9A84C", unlocked: publishedPages >= 1      },
+      { id:"builder_expert", emoji:"🏗",  label:"Builder Expert",     desc:"Publiez 10 pages differentes",              category:"pages",     color:"#38BDF8", unlocked: publishedPages >= 10     },
+      { id:"template_master",emoji:"🎨", label:"Template Master",     desc:"Creez 3 pages ou plus",                    category:"pages",     color:"#7B61FF", unlocked: totalPages >= 3          },
+      { id:"first_qr",       emoji:"⬛", label:"Premier QR",         desc:"Creez votre premier QR Code",              category:"scans",     color:"#F97316", unlocked: qrStats.length >= 1      },
+      { id:"scans_100",      emoji:"📡", label:"100 Scans",          desc:"Atteignez 100 scans au total",             category:"scans",     color:"#39FF8F", unlocked: totalScansQR >= 100      },
+      { id:"scans_1k",       emoji:"🚀", label:"1 000 Scans",        desc:"Atteignez 1 000 scans",                    category:"scans",     color:"#C9A84C", unlocked: totalScansQR >= 1000     },
+      { id:"scans_10k",      emoji:"💫", label:"10 000 Scans",       desc:"Top 1% des utilisateurs",                  category:"scans",     color:"#EC4899", unlocked: totalScansQR >= 10000    },
+      { id:"first_ref",      emoji:"🤝", label:"Parrain",            desc:"Validez votre premier parrainage",         category:"referrals", color:"#7B61FF", unlocked: validatedRefs >= 1       },
+      { id:"refs_5",         emoji:"🌟", label:"Super Parrain",      desc:"Validez 5 parrainages",                    category:"referrals", color:"#EC4899", unlocked: validatedRefs >= 5       },
+      { id:"pro_user",       emoji:"⚡", label:"Utilisateur Pro",    desc:"Passez au plan Pro ou superieur",          category:"plan",      color:"#C9A84C", unlocked: isPro                   },
+      { id:"business_user",  emoji:"👑", label:"Business",           desc:"Atteignez le plan Business",               category:"plan",      color:"#39FF8F", unlocked: isBiz                   },
+      { id:"early_user",     emoji:"🌱", label:"Early User",         desc:"Parmi les premiers utilisateurs",          category:"milestone", color:"#39FF8F", unlocked: isEarly                 },
+    ]
+  }
+
+  function computeLevel() {
+    const score = Math.min(Math.round(
+      Math.min(totalScansQR / 100, 30)   +
+      Math.min(publishedPages * 5, 25)   +
+      Math.min(validatedRefs * 5, 20)    +
+      (profile?.plan==="business"?15 : profile?.plan==="pro"?10 : profile?.plan==="starter"?5 : 0) +
+      Math.min(memberMonths, 10)
+    ), 100)
+    type LevelDef = { min:number; label:string; color:string; emoji:string; next:number }
+    const LEVELS: LevelDef[] = [
+      { min:0,  label:"Debutant",      color:"#8A8478", emoji:"🌱", next:15  },
+      { min:15, label:"Explorateur",   color:"#38BDF8", emoji:"🧭", next:30  },
+      { min:30, label:"Createur",      color:"#C9A84C", emoji:"✨", next:50  },
+      { min:50, label:"Professionnel", color:"#F97316", emoji:"🔥", next:70  },
+      { min:70, label:"Expert",        color:"#7B61FF", emoji:"💎", next:90  },
+      { min:90, label:"Legende",       color:"#EC4899", emoji:"👑", next:100 },
+    ]
+    const current     = [...LEVELS].reverse().find(l => score >= l.min) ?? LEVELS[0]
+    const nextIdx     = LEVELS.findIndex(l => l.min === current.min) + 1
+    const nextLvl     = nextIdx < LEVELS.length ? LEVELS[nextIdx] : null
+    const progressPct = nextLvl
+      ? Math.round(((score - current.min) / (nextLvl.min - current.min)) * 100)
+      : 100
+    return { score, current, nextLvl, progressPct }
+  }
+
   // -- Consommation calculee --------------------------------------------------
   const currentPlan  = profile?.plan || "free"
   const planLimits   = PLAN_CFG[currentPlan]?.limits ?? { pages:1, views:500, qr:1, team:null }
@@ -1541,28 +1595,140 @@ export default function ProfilePage() {
 
 
           {/* 7. RECOMPENSES */}
-          <SectionCard title="Recompenses" icon={Star} color="#F59E0B" tag={totalMonths > 0 ? `${totalMonths} mois` : undefined}>
-            {totalMonths === 0 && validatedRefs === 0 ? (
-              <div style={{ textAlign: "center" as const, padding: "16px 0" }}>
-                <Gift size={28} color={MUTED} style={{ marginBottom: 8 }}/>
-                <p style={{ color: MUTED, fontSize: 12, margin: "0 0 4px" }}>Aucune recompense pour l'instant</p>
-                <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>Parrainez des amis pour gagner des mois Pro</p>
-              </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                  <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.15)", borderRadius: 9, padding: "12px", textAlign: "center" as const }}>
-                    <p style={{ color: "#F59E0B", fontSize: 24, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>{totalMonths}</p>
-                    <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>Mois Pro gagnes</p>
+          <SectionCard title="Recompenses & Niveau" icon={Star} color="#F59E0B">
+            {(() => {
+              const badges  = computeBadges()
+              const lvl     = computeLevel()
+              const earned  = badges.filter(b => b.unlocked)
+              const locked  = badges.filter(b => !b.unlocked)
+              const cats    = ["pages","scans","referrals","plan","milestone"] as const
+              const catLabels: Record<string, string> = {
+                pages:"Pages", scans:"Scans", referrals:"Parrainage", plan:"Plan", milestone:"Special"
+              }
+              return (
+                <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+
+                  {/* Niveau + Score */}
+                  <div style={{ padding:"16px", background:`${lvl.current.color}08`, border:`1px solid ${lvl.current.color}25`, borderRadius:12, position:"relative" as const, overflow:"hidden" }}>
+                    <div style={{ position:"absolute", top:-24, right:-24, width:90, height:90, borderRadius:"50%", background:`radial-gradient(circle,${lvl.current.color}15,transparent 70%)`, pointerEvents:"none" }}/>
+
+                    <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:12 }}>
+                      {/* Emoji niveau */}
+                      <div style={{ width:44, height:44, borderRadius:12, background:`${lvl.current.color}15`, border:`1px solid ${lvl.current.color}30`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>
+                        {lvl.current.emoji}
+                      </div>
+                      <div style={{ flex:1 }}>
+                        <div style={{ display:"flex", alignItems:"baseline", gap:8, marginBottom:2 }}>
+                          <p style={{ color:"#F5F0E8", fontSize:15, fontWeight:800, margin:0 }}>{lvl.current.label}</p>
+                          {lvl.nextLvl && (
+                            <span style={{ color:MUTED, fontSize:10 }}>-> {lvl.nextLvl.label}</span>
+                          )}
+                        </div>
+                        <p style={{ color:MUTED, fontSize:11, margin:0 }}>Score QRfolio : <span style={{ color:lvl.current.color, fontWeight:700 }}>{lvl.score}/100</span></p>
+                      </div>
+                      {/* Score cercle */}
+                      <div style={{ position:"relative" as const, width:48, height:48, flexShrink:0 }}>
+                        <svg width="48" height="48" viewBox="0 0 48 48" style={{ transform:"rotate(-90deg)" }}>
+                          <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="4"/>
+                          <circle cx="24" cy="24" r="20" fill="none"
+                            stroke={lvl.current.color} strokeWidth="4"
+                            strokeDasharray={`${(lvl.score/100)*125.7} 125.7`}
+                            strokeLinecap="round"
+                            style={{ transition:"stroke-dasharray 0.8s ease" }}/>
+                        </svg>
+                        <span style={{ position:"absolute" as const, inset:0, display:"flex", alignItems:"center", justifyContent:"center", color:lvl.current.color, fontSize:11, fontWeight:800 }}>
+                          {lvl.score}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Barre progression vers prochain niveau */}
+                    {lvl.nextLvl && (
+                      <div>
+                        <div style={{ display:"flex", justifyContent:"space-between", marginBottom:5 }}>
+                          <span style={{ color:MUTED, fontSize:9 }}>Progression vers {lvl.nextLvl.label}</span>
+                          <span style={{ color:lvl.current.color, fontSize:9, fontWeight:700 }}>{lvl.progressPct}%</span>
+                        </div>
+                        <div style={{ height:5, background:"rgba(255,255,255,0.06)", borderRadius:3, overflow:"hidden" }}>
+                          <div style={{ height:"100%", width:`${lvl.progressPct}%`, background:`linear-gradient(90deg,${lvl.current.color},${lvl.nextLvl.color})`, borderRadius:3, transition:"width 0.8s ease" }}/>
+                        </div>
+                        <p style={{ color:MUTED, fontSize:9, margin:"4px 0 0" }}>
+                          Gagnez des points en publiant des pages, obtenant des scans et parrainant des amis
+                        </p>
+                      </div>
+                    )}
+                    {!lvl.nextLvl && (
+                      <p style={{ color:lvl.current.color, fontSize:11, fontWeight:700, margin:0, textAlign:"center" as const }}>
+                        Niveau maximum atteint !
+                      </p>
+                    )}
                   </div>
-                  <div style={{ background: "rgba(123,97,255,0.08)", border: "1px solid rgba(123,97,255,0.15)", borderRadius: 9, padding: "12px", textAlign: "center" as const }}>
-                    <p style={{ color: "#7B61FF", fontSize: 24, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>{validatedRefs}</p>
-                    <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>Parrainages valides</p>
+
+                  {/* Compteur badges */}
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                    <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:0 }}>
+                      Badges debloques
+                    </p>
+                    <span style={{ color:"#F5F0E8", fontSize:11, fontWeight:700 }}>
+                      {earned.length} / {badges.length}
+                    </span>
                   </div>
+
+                  {/* Grille badges par categorie */}
+                  {cats.map(cat => {
+                    const catBadges = badges.filter(b => b.category === cat)
+                    if (catBadges.length === 0) return null
+                    return (
+                      <div key={cat}>
+                        <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1, margin:"0 0 8px", display:"flex", alignItems:"center", gap:6 }}>
+                          {catLabels[cat]}
+                          <span style={{ color:"rgba(138,132,120,0.5)", fontSize:9 }}>
+                            {catBadges.filter(b=>b.unlocked).length}/{catBadges.length}
+                          </span>
+                        </p>
+                        <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:7 }}>
+                          {catBadges.map(badge => (
+                            <div key={badge.id}
+                              title={badge.unlocked ? badge.desc : `Verrou : ${badge.desc}`}
+                              style={{ position:"relative" as const, display:"flex", flexDirection:"column", alignItems:"center", gap:5, padding:"10px 8px", background:badge.unlocked?`${badge.color}08`:"rgba(255,255,255,0.02)", border:`1px solid ${badge.unlocked?`${badge.color}25`:"rgba(255,255,255,0.05)"}`, borderRadius:10, textAlign:"center" as const, filter:badge.unlocked?"none":"grayscale(1)", opacity:badge.unlocked?1:0.45, transition:"all 0.2s" }}>
+                              <span style={{ fontSize:22, lineHeight:1, filter:badge.unlocked?"none":"brightness(0.3)" }}>
+                                {badge.emoji}
+                              </span>
+                              <p style={{ color:badge.unlocked?badge.color:MUTED, fontSize:9, fontWeight:badge.unlocked?700:400, margin:0, lineHeight:1.3 }}>
+                                {badge.label}
+                              </p>
+                              {badge.unlocked && (
+                                <div style={{ position:"absolute" as const, top:-4, right:-4, width:14, height:14, borderRadius:"50%", background:"#39FF8F", border:"2px solid #080808", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                                  <span style={{ fontSize:7, color:"#080808", fontWeight:900 }}>✓</span>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })}
+
+                  {/* Stats parrainage conservees */}
+                  {(totalMonths > 0 || validatedRefs > 0) && (
+                    <div style={{ padding:"12px 14px", background:"rgba(236,72,153,0.05)", border:"1px solid rgba(236,72,153,0.12)", borderRadius:10 }}>
+                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, textAlign:"center" as const }}>
+                        <div>
+                          <p style={{ color:"#EC4899", fontSize:20, fontWeight:800, margin:0, fontFamily:"Cormorant Garamond, serif" }}>{totalMonths}</p>
+                          <p style={{ color:MUTED, fontSize:10, margin:0 }}>Mois Pro gagnes</p>
+                        </div>
+                        <div>
+                          <p style={{ color:"#7B61FF", fontSize:20, fontWeight:800, margin:0, fontFamily:"Cormorant Garamond, serif" }}>{validatedRefs}</p>
+                          <p style={{ color:MUTED, fontSize:10, margin:0 }}>Parrainages valides</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              )
+            })()}
           </SectionCard>
+
 
           {/* 8. API BUSINESS */}
           <SectionCard title="API Business" icon={Code} color="#7B61FF" tag={profile?.plan === "business" ? "Business" : "Pro+"}>
