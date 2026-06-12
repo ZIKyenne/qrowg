@@ -7,7 +7,8 @@ import {
   Crown, Zap, Camera, Save, ExternalLink, Shield, Key,
   Bell, Globe, Trash2, Download, ChevronRight, Lock,
   LogOut, AlertTriangle, Plus, X, RotateCcw, Activity,
-  CreditCard, Code, Settings, CheckCircle
+  CreditCard, Code, Settings, CheckCircle, AtSign, Link, Link2,
+  ImageOff, Crop, UserCheck, UserX
 } from "lucide-react"
 
 // -- Types --------------------------------------------------------------------
@@ -103,7 +104,17 @@ export default function ProfilePage() {
   const [dangerConfirm, setDangerConfirm] = useState("")
   const [activeSection, setActiveSection] = useState<string | null>(null)
   const [form, setForm]                 = useState({ full_name: "", username: "", bio: "", website: "" })
+  const [formOriginal, setFormOriginal] = useState({ full_name: "", username: "", bio: "", website: "" })
+  const [usernameStatus, setUsernameStatus] = useState<"idle"|"checking"|"ok"|"taken"|"invalid">("idle")
+  const [usernameMsg, setUsernameMsg]   = useState("")
+  const [copiedUrl, setCopiedUrl]       = useState(false)
+  const [toast, setToast]               = useState<{msg:string;type:"ok"|"err"}|null>(null)
+  const [cropMode, setCropMode]         = useState(false)
+  const [cropSrc, setCropSrc]           = useState<string|null>(null)
+  const [deletingAvatar, setDeletingAvatar] = useState(false)
+  const usernameTimer = useRef<NodeJS.Timeout | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+  const cropRef = useRef<HTMLCanvasElement>(null)
 
   // -- Chargement --------------------------------------------------------------
   useEffect(() => {
@@ -128,7 +139,9 @@ export default function ProfilePage() {
 
       if (prof) {
         setProfile(prof)
-        setForm({ full_name: prof.full_name || "", username: prof.username || "", bio: prof.bio || "", website: prof.website || "" })
+        const init = { full_name: prof.full_name || "", username: prof.username || "", bio: prof.bio || "", website: prof.website || "" }
+        setForm(init)
+        setFormOriginal(init)
       }
       if (refs)  setReferrals(refs)
       if (keys)  setApiKeys(keys)
@@ -140,39 +153,120 @@ export default function ProfilePage() {
   }, [])
 
   // -- Actions -----------------------------------------------------------------
+  function showToast(msg: string, type: "ok"|"err" = "ok") {
+    setToast({ msg, type }); setTimeout(() => setToast(null), 3000)
+  }
+
+  // Validation username temps reel
+  function handleUsernameChange(val: string) {
+    const clean2 = val.toLowerCase().replace(/[^a-z0-9_-]/g, "")
+    setForm(f => ({ ...f, username: clean2 }))
+    if (usernameTimer.current) clearTimeout(usernameTimer.current)
+    if (!clean2) { setUsernameStatus("idle"); setUsernameMsg(""); return }
+    if (clean2.length < 3) {
+      setUsernameStatus("invalid")
+      setUsernameMsg("Minimum 3 caracteres")
+      return
+    }
+    if (clean2.length > 30) {
+      setUsernameStatus("invalid")
+      setUsernameMsg("Maximum 30 caracteres")
+      return
+    }
+    if (clean2 === formOriginal.username) {
+      setUsernameStatus("ok"); setUsernameMsg("Username actuel"); return
+    }
+    setUsernameStatus("checking"); setUsernameMsg("Verification...")
+    usernameTimer.current = setTimeout(async () => {
+      const sb = createClient()
+      const { data } = await sb.from("profiles").select("id").eq("username", clean2).single()
+      if (data) {
+        setUsernameStatus("taken"); setUsernameMsg("Deja utilise")
+      } else {
+        setUsernameStatus("ok"); setUsernameMsg("Disponible")
+      }
+    }, 500)
+  }
+
   async function saveProfile() {
-    if (!profile) return
+    if (!profile || !hasChanges) return
+    if (usernameStatus === "taken") { showToast("Username deja utilise", "err"); return }
+    if (usernameStatus === "invalid") { showToast("Username invalide", "err"); return }
+    if (form.username && form.username.length < 3) { showToast("Username trop court", "err"); return }
     setSaving(true)
-    const supabase = createClient()
-    await supabase.from("profiles").update({
+    const sb = createClient()
+    const { error } = await sb.from("profiles").update({
       full_name: form.full_name || null,
       username:  form.username || null,
       bio:       form.bio || null,
       website:   form.website || null,
     }).eq("id", profile.id)
-    setProfile(p => p ? { ...p, ...form } : p)
+    if (error) { showToast("Erreur de sauvegarde", "err"); setSaving(false); return }
+    const updated = { ...form }
+    setProfile(p => p ? { ...p, ...updated } : p)
+    setFormOriginal(updated)
     setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2500)
+    showToast("Profil sauvegarde avec succes")
   }
 
-  async function uploadAvatar(file: File) {
+  // Ouvre le crop preview
+  function handleAvatarFile(file: File) {
+    if (!file.type.startsWith("image/")) { showToast("Format non supporte (PNG, JPG, WEBP)", "err"); return }
+    if (file.size > 5 * 1024 * 1024) { showToast("Image trop lourde (max 5 Mo)", "err"); return }
+    const reader = new FileReader()
+    reader.onload = e => { setCropSrc(e.target?.result as string); setCropMode(true) }
+    reader.readAsDataURL(file)
+  }
+
+  // Crop carre 400x400 et upload
+  async function uploadAvatar(dataUrl?: string) {
     if (!profile) return
-    if (file.size > 5 * 1024 * 1024) { alert("Image trop lourde (max 5 Mo)"); return }
-    setUploadingAvatar(true)
-    const supabase = createClient()
-    const ext = file.name.split(".").pop()
-    const path = `avatars/${profile.id}.${ext}`
-    const { error } = await supabase.storage.from("page-assets").upload(path, file, { upsert: true })
-    if (!error) {
-      const { data: { publicUrl } } = supabase.storage.from("page-assets").getPublicUrl(path)
-      await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("id", profile.id)
-      setProfile(p => p ? { ...p, avatar_url: publicUrl } : p)
-    }
+    const src = dataUrl || cropSrc
+    if (!src) return
+    setUploadingAvatar(true); setCropMode(false); setCropSrc(null)
+    try {
+      // Redimensionner en 400x400 via canvas
+      const canvas = document.createElement("canvas")
+      canvas.width = 400; canvas.height = 400
+      const ctx = canvas.getContext("2d")!
+      const img = new Image(); img.src = src
+      await new Promise<void>(r => { img.onload = () => r() })
+      // Crop carre centree
+      const size = Math.min(img.width, img.height)
+      const sx = (img.width - size) / 2; const sy = (img.height - size) / 2
+      ctx.drawImage(img, sx, sy, size, size, 0, 0, 400, 400)
+      // Convertir en blob
+      const blob: Blob = await new Promise(res => canvas.toBlob(b => res(b!), "image/jpeg", 0.92))
+      const sb = createClient()
+      const path = `avatars/${profile.id}.jpg`
+      const { error } = await sb.storage.from("page-assets").upload(path, blob, { upsert: true, contentType: "image/jpeg" })
+      if (error) { showToast("Erreur upload avatar", "err"); return }
+      const { data: { publicUrl } } = sb.storage.from("page-assets").getPublicUrl(path)
+      const cacheBust = publicUrl + "?v=" + Date.now()
+      await sb.from("profiles").update({ avatar_url: cacheBust }).eq("id", profile.id)
+      setProfile(p => p ? { ...p, avatar_url: cacheBust } : p)
+      showToast("Avatar mis a jour")
+    } catch { showToast("Erreur lors de l'upload", "err") }
     setUploadingAvatar(false)
+  }
+
+  async function deleteAvatar() {
+    if (!profile?.avatar_url) return
+    setDeletingAvatar(true)
+    const sb = createClient()
+    await sb.from("profiles").update({ avatar_url: null }).eq("id", profile.id)
+    setProfile(p => p ? { ...p, avatar_url: null } : p)
+    setDeletingAvatar(false); showToast("Avatar supprime")
   }
 
   function copyReferral() {
     const link = `https://qrfolio.app?ref=${profile?.ref_code || profile?.id?.slice(0, 8)}`
     navigator.clipboard.writeText(link).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2500) })
+  }
+
+  function copyPublicUrl() {
+    if (!publicUrl) return
+    navigator.clipboard.writeText(publicUrl).then(() => { setCopiedUrl(true); setTimeout(() => setCopiedUrl(false), 2500) })
   }
 
   async function createApiKey() {
@@ -216,6 +310,12 @@ export default function ProfilePage() {
   }
 
   // -- Donnees calculees --------------------------------------------------------
+  const hasChanges = form.full_name !== formOriginal.full_name
+    || form.username !== formOriginal.username
+    || form.bio !== formOriginal.bio
+    || form.website !== formOriginal.website
+  const publicUrl  = form.username ? `https://qrfolio.app/@${form.username}` : null
+
   const planCfg       = PLAN_CFG[profile?.plan as keyof typeof PLAN_CFG] || PLAN_CFG.free
   const PlanIcon      = planCfg.icon
   const pc            = planCfg.color
@@ -256,10 +356,20 @@ export default function ProfilePage() {
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}
         @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
         input:focus,textarea:focus,select:focus{border-color:rgba(201,168,76,0.4)!important}
         .section-card{animation:fadeIn 0.3s ease}
         * { box-sizing: border-box }
       `}</style>
+
+      {/* Toast */}
+      {toast && (
+        <div style={{ position:"fixed", bottom:24, left:"50%", transform:"translateX(-50%)", zIndex:9999, display:"flex", alignItems:"center", gap:9, padding:"11px 20px", background:toast.type==="ok"?"rgba(57,255,143,0.12)":"rgba(255,107,107,0.12)", border:`1px solid ${toast.type==="ok"?"rgba(57,255,143,0.3)":"rgba(255,107,107,0.3)"}`, borderRadius:12, backdropFilter:"blur(12px)", boxShadow:"0 8px 32px rgba(0,0,0,0.5)", whiteSpace:"nowrap" as const }}>
+          {toast.type==="ok" ? <Check size={14} color="#39FF8F"/> : <AlertTriangle size={14} color="#FF6B6B"/>}
+          <span style={{ color:toast.type==="ok"?"#39FF8F":"#FF6B6B", fontSize:13, fontWeight:600 }}>{toast.msg}</span>
+        </div>
+      )}
+
 
       {/* -- Hero header ------------------------------------------------------- */}
       <div style={{ background: "linear-gradient(180deg,rgba(201,168,76,0.05) 0%,transparent 100%)", borderBottom: "1px solid rgba(201,168,76,0.1)", padding: "28px 28px 20px" }}>
@@ -278,7 +388,7 @@ export default function ProfilePage() {
                   ? <div style={{ width: 9, height: 9, border: "1.5px solid #080808", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.6s linear infinite" }}/>
                   : <Camera size={10} color="#080808"/>}
               </button>
-              <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) uploadAvatar(f) }}/>
+              <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) handleAvatarFile(f); e.target.value="" }}/>
             </div>
 
             {/* Infos */}
@@ -340,39 +450,176 @@ export default function ProfilePage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
 
           {/* 1. IDENTITE */}
-          <SectionCard title="Identite" icon={Settings} color={G}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <div>
-                <label style={labelStyle}>Nom complet</label>
-                <input value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))}
-                  placeholder="Jean Dupont" style={inputStyle}/>
+          <SectionCard title="Identite" icon={Settings} color={G}
+            action={
+              <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                {profile?.plan === "free" && memberMonths <= 6 && (
+                  <span style={{ background:"rgba(57,255,143,0.1)", border:"1px solid rgba(57,255,143,0.2)", borderRadius:20, padding:"2px 8px", fontSize:9, color:"#39FF8F", fontWeight:700 }}>
+                    Early User
+                  </span>
+                )}
+                <span style={{ background:pc+"15", border:`1px solid ${pc}30`, borderRadius:20, padding:"2px 9px", fontSize:9, color:pc, fontWeight:700 }}>
+                  {planCfg.label}
+                </span>
               </div>
-              <div>
-                <label style={labelStyle}>Nom d'utilisateur</label>
-                <div style={{ position: "relative" }}>
-                  <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: MUTED, fontSize: 13 }}>@</span>
-                  <input value={form.username} onChange={e => setForm(f => ({ ...f, username: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, "") }))}
-                    placeholder="jean-dupont" style={{ ...inputStyle, paddingLeft: 26 }}/>
+            }>
+            <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+
+              {/* Avatar premium */}
+              <div style={{ display:"flex", alignItems:"center", gap:14, padding:"14px", background:"#0F0E0B", borderRadius:12, border:"1px solid rgba(255,255,255,0.06)" }}>
+                {/* Avatar */}
+                <div style={{ position:"relative", flexShrink:0 }}>
+                  <div style={{ width:72, height:72, borderRadius:"50%", background:profile?.avatar_url?"transparent":`linear-gradient(135deg,${pc},${pc}80)`, border:`2px solid ${pc}40`, overflow:"hidden", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:`0 0 20px ${pc}15` }}>
+                    {uploadingAvatar ? (
+                      <div style={{ width:22, height:22, border:`2px solid ${pc}30`, borderTopColor:pc, borderRadius:"50%", animation:"spin 0.7s linear infinite" }}/>
+                    ) : profile?.avatar_url ? (
+                      <img src={profile.avatar_url} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
+                    ) : (
+                      <span style={{ fontSize:26, fontWeight:700, color:"#080808", fontFamily:"Cormorant Garamond, serif" }}>
+                        {(form.full_name || profile?.email || "?")[0]?.toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                  {/* Bouton camera */}
+                  <button onClick={() => fileRef.current?.click()} disabled={uploadingAvatar}
+                    style={{ position:"absolute", bottom:0, right:0, width:24, height:24, borderRadius:"50%", background:G, border:"2px solid #080808", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", boxShadow:"0 2px 8px rgba(0,0,0,0.4)" }}>
+                    <Camera size={10} color="#080808"/>
+                  </button>
+                  <input ref={fileRef} type="file" accept="image/*" style={{ display:"none" }}
+                    onChange={e => { const f = e.target.files?.[0]; if (f) handleAvatarFile(f); e.target.value="" }}/>
                 </div>
-                <p style={{ color: MUTED, fontSize: 10, margin: "3px 0 0" }}>3-30 caracteres, lettres, chiffres, _ et -</p>
+                {/* Infos preview + actions */}
+                <div style={{ flex:1, minWidth:0 }}>
+                  <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:700, margin:"0 0 2px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, fontFamily:"Cormorant Garamond, serif" }}>
+                    {form.full_name || "Sans nom"}
+                  </p>
+                  {form.username && (
+                    <p style={{ color:"#8A8478", fontSize:12, margin:"0 0 8px", fontFamily:"monospace" }}>@{form.username}</p>
+                  )}
+                  <div style={{ display:"flex", gap:6 }}>
+                    <button onClick={() => fileRef.current?.click()}
+                      style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 10px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:7, color:G, fontSize:11, cursor:"pointer" }}>
+                      <Camera size={11}/> Changer
+                    </button>
+                    {profile?.avatar_url && (
+                      <button onClick={deleteAvatar} disabled={deletingAvatar}
+                        style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 10px", background:"rgba(255,107,107,0.06)", border:"1px solid rgba(255,107,107,0.15)", borderRadius:7, color:"#FF6B6B", fontSize:11, cursor:"pointer" }}>
+                        <ImageOff size={11}/> Supprimer
+                      </button>
+                    )}
+                  </div>
+                  <p style={{ color:"#8A8478", fontSize:9, margin:"6px 0 0" }}>PNG, JPG, WEBP -- max 5 Mo -- recadrage automatique 400x400</p>
+                </div>
               </div>
+
+              {/* Modal crop */}
+              {cropMode && cropSrc && (
+                <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.85)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:2000, padding:24 }}
+                  onClick={() => { setCropMode(false); setCropSrc(null) }}>
+                  <div style={{ background:"#111009", border:"1px solid rgba(201,168,76,0.2)", borderRadius:16, padding:24, maxWidth:440, width:"100%" }}
+                    onClick={e => e.stopPropagation()}>
+                    <p style={{ color:"#F5F0E8", fontSize:15, fontWeight:700, margin:"0 0 14px" }}>Apercu de l'avatar</p>
+                    <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:16, marginBottom:18 }}>
+                      <img src={cropSrc} alt="preview" style={{ width:120, height:120, objectFit:"cover", borderRadius:"50%", border:"2px solid rgba(201,168,76,0.3)" }}/>
+                      <div>
+                        <p style={{ color:"#8A8478", fontSize:11, margin:"0 0 6px" }}>L'image sera recadree<br/>en carre 400x400 px.</p>
+                        <p style={{ color:"#8A8478", fontSize:10, margin:0 }}>Format: JPEG 92%</p>
+                      </div>
+                    </div>
+                    <div style={{ display:"flex", gap:8 }}>
+                      <button onClick={() => { setCropMode(false); setCropSrc(null) }}
+                        style={{ flex:1, padding:"10px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:"#8A8478", fontSize:13, cursor:"pointer" }}>
+                        Annuler
+                      </button>
+                      <button onClick={() => uploadAvatar(cropSrc)}
+                        style={{ flex:2, padding:"10px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:9, color:"#080808", fontSize:13, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7 }}>
+                        <Camera size={13}/> Utiliser cette photo
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Nom complet */}
               <div>
-                <label style={labelStyle}>Bio</label>
+                <label style={{ color:"#8A8478", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>Nom complet</label>
+                <input value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))}
+                  placeholder="Jean Dupont"
+                  style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 13px", color:"#F5F0E8", fontSize:13, outline:"none", boxSizing:"border-box" as const }}/>
+              </div>
+
+              {/* Username avec validation live */}
+              <div>
+                <label style={{ color:"#8A8478", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>Nom d'utilisateur</label>
+                <div style={{ position:"relative" }}>
+                  <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", color:"#8A8478", fontSize:13 }}>@</span>
+                  <input value={form.username}
+                    onChange={e => handleUsernameChange(e.target.value)}
+                    placeholder="jean-dupont"
+                    style={{ width:"100%", background:"#0F0E0B", border:`1px solid ${usernameStatus==="ok"?"rgba(57,255,143,0.3)":usernameStatus==="taken"||usernameStatus==="invalid"?"rgba(255,107,107,0.3)":"rgba(255,255,255,0.08)"}`, borderRadius:9, padding:"10px 36px 10px 26px", color:"#F5F0E8", fontSize:13, outline:"none", boxSizing:"border-box" as const }}/>
+                  {/* Icone statut */}
+                  <div style={{ position:"absolute", right:11, top:"50%", transform:"translateY(-50%)" }}>
+                    {usernameStatus==="checking" && <div style={{ width:13, height:13, border:"1.5px solid rgba(201,168,76,0.3)", borderTopColor:"#C9A84C", borderRadius:"50%", animation:"spin 0.7s linear infinite" }}/>}
+                    {usernameStatus==="ok"      && <UserCheck size={14} color="#39FF8F"/>}
+                    {(usernameStatus==="taken"||usernameStatus==="invalid") && <UserX size={14} color="#FF6B6B"/>}
+                  </div>
+                </div>
+                {/* Message validation */}
+                {usernameMsg && (
+                  <p style={{ color:usernameStatus==="ok"?"#39FF8F":usernameStatus==="checking"?"#8A8478":"#FF6B6B", fontSize:10, margin:"4px 0 0", display:"flex", alignItems:"center", gap:4 }}>
+                    {usernameMsg}
+                  </p>
+                )}
+                <p style={{ color:"#8A8478", fontSize:10, margin:"3px 0 0" }}>3-30 caracteres -- lettres, chiffres, _ et -</p>
+              </div>
+
+              {/* URL publique */}
+              {publicUrl && (
+                <div style={{ display:"flex", alignItems:"center", gap:7, padding:"9px 12px", background:"rgba(201,168,76,0.05)", border:"1px solid rgba(201,168,76,0.15)", borderRadius:9 }}>
+                  <Link size={12} color={G} style={{ flexShrink:0 }}/>
+                  <span style={{ flex:1, color:G, fontSize:11, fontFamily:"monospace", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
+                    {publicUrl}
+                  </span>
+                  <button onClick={copyPublicUrl}
+                    style={{ width:26, height:26, background:"none", border:"none", cursor:"pointer", color:copiedUrl?"#39FF8F":G, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    {copiedUrl ? <Check size={12}/> : <Copy size={12}/>}
+                  </button>
+                  <a href={publicUrl} target="_blank" rel="noopener noreferrer"
+                    style={{ width:26, height:26, background:"none", border:"none", display:"flex", alignItems:"center", justifyContent:"center", color:"#8A8478", flexShrink:0 }}>
+                    <ExternalLink size={12}/>
+                  </a>
+                </div>
+              )}
+
+              {/* Bio */}
+              <div>
+                <label style={{ color:"#8A8478", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>Bio</label>
                 <textarea value={form.bio} onChange={e => setForm(f => ({ ...f, bio: e.target.value }))}
                   placeholder="Decris-toi en quelques mots..." rows={2}
-                  style={{ ...inputStyle, resize: "vertical" as const, lineHeight: 1.6 }}/>
+                  style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 13px", color:"#F5F0E8", fontSize:13, outline:"none", boxSizing:"border-box" as const, resize:"vertical" as const, lineHeight:1.6 }}/>
+                <p style={{ color:"#8A8478", fontSize:10, margin:"3px 0 0" }}>{form.bio.length}/160</p>
               </div>
+
+              {/* Site web */}
               <div>
-                <label style={labelStyle}>Site web</label>
+                <label style={{ color:"#8A8478", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>Site web</label>
                 <input value={form.website} onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
-                  placeholder="https://mon-site.com" style={inputStyle}/>
+                  placeholder="https://mon-site.com"
+                  style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 13px", color:"#F5F0E8", fontSize:13, outline:"none", boxSizing:"border-box" as const }}/>
               </div>
-              <button onClick={saveProfile} disabled={saving}
-                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, background: saved ? "rgba(57,255,143,0.1)" : `linear-gradient(90deg,${G},#b8953f)`, border: saved ? "1px solid rgba(57,255,143,0.3)" : "none", borderRadius: 9, padding: "11px", color: saved ? "#39FF8F" : "#080808", fontSize: 13, fontWeight: 700, cursor: saving ? "wait" : "pointer", transition: "all 0.2s" }}>
-                {saved ? <><Check size={13}/> Sauvegarde !</> : saving ? "Sauvegarde..." : <><Save size={13}/> Sauvegarder les modifications</>}
+
+              {/* Bouton save */}
+              <button onClick={saveProfile}
+                disabled={saving || !hasChanges || usernameStatus==="taken" || usernameStatus==="invalid" || usernameStatus==="checking"}
+                style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:7, background:saved?"rgba(57,255,143,0.1)":hasChanges?"linear-gradient(90deg,#C9A84C,#b8953f)":"rgba(255,255,255,0.04)", border:saved?"1px solid rgba(57,255,143,0.3)":"none", borderRadius:9, padding:"11px", color:saved?"#39FF8F":hasChanges?"#080808":"#8A8478", fontSize:13, fontWeight:700, cursor:saving||!hasChanges||usernameStatus==="taken"||usernameStatus==="invalid"||usernameStatus==="checking"?"not-allowed":"pointer", transition:"all 0.2s", opacity:saving?0.7:1 }}>
+                {saved ? <><Check size={13}/> Sauvegarde !</>
+                  : saving ? "Sauvegarde..."
+                  : !hasChanges ? "Aucune modification"
+                  : <><Save size={13}/> Sauvegarder les modifications</>}
               </button>
             </div>
           </SectionCard>
+
 
           {/* 2. ACTIVITE RECENTE */}
           <SectionCard title="Activite recente" icon={Activity} color="#38BDF8">
