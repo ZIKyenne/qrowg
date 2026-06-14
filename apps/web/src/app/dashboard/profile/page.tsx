@@ -1,15 +1,15 @@
-﻿"use client"
+"use client"
 
 import { useEffect, useState, useRef, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import {
   Copy, Check, Gift, Star, TrendingUp, Users, QrCode, Eye,
-  Crown, Zap, Camera, Save, ExternalLink, Shield, Key,
+  Crown, Activity, Camera, Save, ExternalLink, Shield, Key,
   Bell, Globe, Trash2, Download, ChevronRight, Lock,
   LogOut, AlertTriangle, Plus, X, RotateCcw, Activity,
   CreditCard, Code, Settings, CheckCircle, AtSign, Link, Link2,
   ImageOff, Crop, UserCheck, UserX,
-  Clock, Filter, Calendar, FileEdit, Scan, Tag, Award,
+  Clock, Filter, Calendar, FileEdit, ScanLine, Tag, Award,
   Share2, MessageCircle, Mail, Twitter, Linkedin,
   Smartphone, Monitor, Tablet, Wifi, ShieldCheck, ShieldOff
 } from "lucide-react"
@@ -63,9 +63,9 @@ const ACTIVITY_CFG: Record<ActivityEventType, { icon: any; color: string; bg: st
   page_updated:       { icon: FileEdit,  color: "#38BDF8",  bg: "rgba(56,189,248,0.1)"  },
   qr_created:         { icon: QrCode,    color: "#C9A84C",  bg: "rgba(201,168,76,0.1)"  },
   qr_customized:      { icon: Settings,  color: "#7B61FF",  bg: "rgba(123,97,255,0.1)"  },
-  qr_scanned:         { icon: Scan,      color: "#39FF8F",  bg: "rgba(57,255,143,0.1)"  },
+  qr_scanned:         { icon: ScanLine,      color: "#39FF8F",  bg: "rgba(57,255,143,0.1)"  },
   qr_downloaded:      { icon: Download,  color: "#38BDF8",  bg: "rgba(56,189,248,0.1)"  },
-  plan_changed:       { icon: Zap,       color: "#C9A84C",  bg: "rgba(201,168,76,0.1)"  },
+  plan_changed:       { icon: Activity,       color: "#C9A84C",  bg: "rgba(201,168,76,0.1)"  },
   referral_validated: { icon: Award,     color: "#EC4899",  bg: "rgba(236,72,153,0.1)"  },
   profile_updated:    { icon: Settings,  color: "#8A8478",  bg: "rgba(138,132,120,0.1)" },
   template_used:      { icon: Tag,       color: "#F97316",  bg: "rgba(249,115,22,0.1)"  },
@@ -147,7 +147,7 @@ const PLAN_CFG: Record<string, {
     features: ["1 page active","500 vues/mois","1 QR code basique","Analytics de base","Branding QRfolio visible"],
   },
   starter: {
-    color: "#38BDF8", label: "Starter", icon: Zap,
+    color: "#38BDF8", label: "Starter", icon: Activity,
     price_monthly: "2.99", price_annual: "2.39",
     description: "Pour les createurs individuels",
     limits: { pages: 3, views: 5000, qr: null, team: null },
@@ -155,7 +155,7 @@ const PLAN_CFG: Record<string, {
     badge: "POPULAIRE",
   },
   pro: {
-    color: G, label: "Pro", icon: Zap,
+    color: G, label: "Pro", icon: Activity,
     price_monthly: "9.99", price_annual: "7.99",
     description: "Pour les professionnels et commerces",
     limits: { pages: null, views: 50000, qr: null, team: null },
@@ -670,7 +670,7 @@ export default function ProfilePage() {
   // Ouvre le crop preview
   function handleAvatarFile(file: File) {
     if (!file.type.startsWith("image/")) { showToast("Format non supporte (PNG, JPG, WEBP)", "err"); return }
-    if (file.size > 5 * 1024 * 1024) { showToast("Image trop lourde (max 5 Mo)", "err"); return }
+    if (file.size > 5 * 1024 * 1024) { showToast("ImageIcon trop lourde (max 5 Mo)", "err"); return }
     const reader = new FileReader()
     reader.onload = e => { setCropSrc(e.target?.result as string); setCropMode(true) }
     reader.readAsDataURL(file)
@@ -687,7 +687,7 @@ export default function ProfilePage() {
       const canvas = document.createElement("canvas")
       canvas.width = 400; canvas.height = 400
       const ctx = canvas.getContext("2d")!
-      const img = new Image(); img.src = src
+      const img = new ImageIcon(); img.src = src
       await new Promise<void>(r => { img.onload = () => r() })
       // Crop carre centree
       const size = Math.min(img.width, img.height)
@@ -1121,7 +1121,7 @@ export default function ProfilePage() {
             {profile?.plan !== "business" && (
               <a href="/upgrade"
                 style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: `linear-gradient(90deg,${G},#b8953f)`, border: "none", borderRadius: 9, color: "#080808", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
-                <Zap size={13}/> Upgrade
+                <Activity size={13}/> Upgrade
               </a>
             )}
           </div>
@@ -2188,7 +2188,7 @@ export default function ProfilePage() {
                   {currentPlan !== "business" && (
                     <a href="/upgrade"
                       style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"10px", background:`linear-gradient(90deg,${pc},${pc}cc)`, borderRadius:9, color: pc === MUTED ? "#F5F0E8" : "#080808", textDecoration:"none", fontSize:12, fontWeight:700 }}>
-                      <Zap size={13}/>
+                      <Activity size={13}/>
                       {currentPlan==="free"?"Choisir un plan":"Upgrader vers "+nextPlan?.label}
                     </a>
                   )}
@@ -2346,7 +2346,7 @@ export default function ProfilePage() {
                       </div>
                       <a href="/upgrade"
                         style={{ display:"flex", alignItems:"center", gap:5, padding:"8px 14px", background:`linear-gradient(90deg,${nextPlan?.color || G},${nextPlan?.color || G}cc)`, borderRadius:8, color:"#080808", textDecoration:"none", fontSize:11, fontWeight:700, flexShrink:0 }}>
-                        <Zap size={11}/> Upgrader
+                        <Activity size={11}/> Upgrader
                       </a>
                     </div>
                   </div>
@@ -2521,7 +2521,7 @@ export default function ProfilePage() {
                 </div>
                 <a href="/upgrade"
                   style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"9px 20px", background:"linear-gradient(90deg,#7B61FF,#6040e0)", border:"none", borderRadius:9, color:"#F5F0E8", textDecoration:"none", fontSize:12, fontWeight:700 }}>
-                  <Zap size={13}/> Passer a Pro ou Business
+                  <Activity size={13}/> Passer a Pro ou Business
                 </a>
               </div>
             ) : (
@@ -2743,7 +2743,7 @@ export default function ProfilePage() {
                 </p>
                 <a href="/upgrade"
                   style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"9px 18px", background:`linear-gradient(90deg,${G},#b8953f)`, border:"none", borderRadius:9, color:"#080808", textDecoration:"none", fontSize:12, fontWeight:700 }}>
-                  <Zap size={13}/> Passer a Starter ou Pro
+                  <Activity size={13}/> Passer a Starter ou Pro
                 </a>
               </div>
             ) : domainsLoading ? (
