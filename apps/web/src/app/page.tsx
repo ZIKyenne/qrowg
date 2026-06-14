@@ -805,6 +805,323 @@ function TemplatesSection() {
   )
 }
 
+// ── Navbar ────────────────────────────────────────────────────────────────────
+const NAV_LINKS = [
+  { label: "Fonctionnalites", href: "#features"  },
+  { label: "Templates",       href: "#templates" },
+  { label: "Exemples",        href: "#examples"  },
+  { label: "Tarifs",          href: "#pricing"   },
+  { label: "FAQ",             href: "#faq"       },
+]
+function Navbar() {
+  const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [active,   setActive]   = useState("")
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 20)
+    window.addEventListener("scroll", fn, { passive: true })
+    return () => window.removeEventListener("scroll", fn)
+  }, [])
+  useEffect(() => {
+    const ids = NAV_LINKS.map(l => l.href.replace("#",""))
+    const obs = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id) }),
+      { rootMargin: "-40% 0px -55% 0px" }
+    )
+    ids.forEach(id => { const el = document.getElementById(id); if (el) obs.observe(el) })
+    return () => obs.disconnect()
+  }, [])
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : ""
+    return () => { document.body.style.overflow = "" }
+  }, [menuOpen])
+  return (
+    <>
+      <style>{`
+        .nl::after{content:"";position:absolute;bottom:-2px;left:0;right:0;height:1.5px;
+          background:linear-gradient(90deg,#C9A84C,#d4a843);transform:scaleX(0);
+          transform-origin:left;transition:transform 0.25s ease;border-radius:2px;}
+        .nl:hover::after,.nl.act::after{transform:scaleX(1);}
+        .nl:hover{color:#F5F0E8 !important;}
+        .nl:focus-visible,.nct:focus-visible{outline:2px solid rgba(201,168,76,0.6);outline-offset:4px;border-radius:4px;}
+        .ml{display:block;color:#8A8478;text-decoration:none;font-size:18px;padding:16px 0;
+          border-bottom:1px solid rgba(201,168,76,0.08);transition:color 0.2s;}
+        .ml:hover,.ml.act{color:#F5F0E8;}
+        @keyframes slideMenu{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+        @media(max-width:900px){.dNav{display:none !important;}.brg{display:flex !important;}}
+        @media(min-width:901px){.brg{display:none !important;}#mobileMenu{display:none !important;}}
+        @media(max-width:640px){.navWrap{padding:0 20px !important;}}
+        @media(prefers-reduced-motion:reduce){.nl::after{transition:none;}}
+      `}</style>
+      <nav aria-label="Navigation principale" className="navWrap" style={{
+        position:"fixed",top:0,left:0,right:0,zIndex:200,
+        display:"flex",alignItems:"center",justifyContent:"space-between",
+        padding:"0 48px",height:68,
+        background:scrolled?"rgba(8,8,8,0.93)":"rgba(8,8,8,0.65)",
+        backdropFilter:"blur(28px)",WebkitBackdropFilter:"blur(28px)",
+        borderBottom:scrolled?"1px solid rgba(201,168,76,0.2)":"1px solid rgba(201,168,76,0.07)",
+        boxShadow:scrolled?"0 4px 32px rgba(0,0,0,0.5)":"none",
+        transition:"background 0.3s,border-color 0.3s,box-shadow 0.3s",
+      }}>
+        <Link href="/" style={{textDecoration:"none"}}>
+          <span style={{fontFamily:"Cormorant Garamond, serif",fontSize:22,color:"#C9A84C",fontWeight:700}}>QRfolio</span>
+        </Link>
+        <div className="dNav" role="menubar" style={{display:"flex",alignItems:"center",gap:32}}>
+          {NAV_LINKS.map(({label,href})=>{
+            const id=href.replace("#",""); const isAct=active===id
+            return(<Link key={href} href={href} role="menuitem" aria-current={isAct?"page":undefined}
+              className={"nl"+(isAct?" act":"")}
+              style={{color:isAct?"#F5F0E8":"#8A8478",textDecoration:"none",fontSize:14,
+                fontWeight:isAct?600:400,position:"relative",paddingBottom:2,transition:"color 0.2s"}}>{label}</Link>)
+          })}
+        </div>
+        <div className="dNav" style={{display:"flex",alignItems:"center",gap:16}}>
+          <Link href="/auth/login" className="nl"
+            style={{color:"#8A8478",textDecoration:"none",fontSize:14,position:"relative",paddingBottom:2,transition:"color 0.2s"}}>Connexion</Link>
+          <Link href="/auth/signup" className="nct" style={{
+            background:"linear-gradient(90deg,#C9A84C,#b8953f)",color:"#080808",
+            textDecoration:"none",fontSize:14,fontWeight:700,padding:"9px 22px",borderRadius:10,
+            display:"inline-block",boxShadow:"0 2px 16px rgba(201,168,76,0.3)",
+            transition:"transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.2s",
+          }}
+            onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="translateY(-2px) scale(1.03)";el.style.boxShadow="0 6px 24px rgba(201,168,76,0.5)"}}
+            onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="none";el.style.boxShadow="0 2px 16px rgba(201,168,76,0.3)"}}>
+            Commencer
+          </Link>
+          <button onClick={()=>setMenuOpen(o=>!o)} aria-label={menuOpen?"Fermer":"Menu"}
+            aria-expanded={menuOpen} aria-controls="mobileMenu" className="brg"
+            style={{display:"none",background:"none",border:"none",cursor:"pointer",
+              padding:8,flexDirection:"column",gap:5,alignItems:"center",justifyContent:"center"}}>
+            {[
+              {tf:menuOpen?"rotate(45deg) translate(4.5px,4.5px)":"none",op:1},
+              {tf:"none",op:menuOpen?0:1},
+              {tf:menuOpen?"rotate(-45deg) translate(4.5px,-4.5px)":"none",op:1},
+            ].map((s,i)=>(
+              <span key={i} style={{display:"block",width:22,height:1.5,background:"#C9A84C",
+                borderRadius:2,transform:s.tf,opacity:s.op,transition:"transform 0.25s,opacity 0.2s"}}/>
+            ))}
+          </button>
+        </div>
+      </nav>
+      {menuOpen&&(
+        <div id="mobileMenu" role="dialog" aria-label="Menu mobile" style={{
+          position:"fixed",top:68,left:0,right:0,bottom:0,zIndex:199,
+          background:"rgba(8,8,8,0.97)",backdropFilter:"blur(20px)",
+          padding:"32px",display:"flex",flexDirection:"column",
+          animation:"slideMenu 0.25s ease",overflowY:"auto",
+        }}>
+          {NAV_LINKS.map(({label,href})=>(
+            <Link key={href} href={href}
+              className={"ml"+(active===href.replace("#","")?" act":"")}
+              onClick={()=>setMenuOpen(false)}>{label}</Link>
+          ))}
+          <div style={{marginTop:32,display:"flex",flexDirection:"column",gap:12}}>
+            <Link href="/auth/login" onClick={()=>setMenuOpen(false)} style={{
+              display:"block",textAlign:"center",color:"#8A8478",textDecoration:"none",
+              fontSize:16,padding:"14px",border:"1px solid rgba(201,168,76,0.15)",borderRadius:12}}>Connexion</Link>
+            <Link href="/auth/signup" onClick={()=>setMenuOpen(false)} style={{
+              display:"block",textAlign:"center",
+              background:"linear-gradient(90deg,#C9A84C,#b8953f)",
+              color:"#080808",textDecoration:"none",fontSize:16,fontWeight:700,
+              padding:"16px",borderRadius:12,boxShadow:"0 4px 24px rgba(201,168,76,0.4)"}}>
+              Commencer gratuitement →</Link>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
+// ── How it works ──────────────────────────────────────────────────────────────
+const HOW_STEPS = [
+  {icon:"🎨",title:"Choisis un template",   desc:"Selectionne parmi nos modeles concus pour convertir. Adapte a ton secteur."},
+  {icon:"✏️", title:"Personnalise ta page",  desc:"Ajoute tes infos, liens, photo. Zero code, resultat professionnel en minutes."},
+  {icon:"📱",title:"Genere ton QR code",    desc:"Un QR dynamique est cree automatiquement. Change ta page sans le reimprimer."},
+  {icon:"🚀",title:"Partage partout",        desc:"Cartes de visite, reseaux, emails, en presentiel. Un seul QR, partout."},
+  {icon:"📊",title:"Analyse les resultats", desc:"Vois qui scanne, quand et depuis quel appareil. En temps reel."},
+] as const
+function HowItWorks() {
+  const {ref,visible}=useInView(0.08)
+  return(
+    <section id="how" ref={ref} aria-labelledby="how-title"
+      style={{padding:"100px 48px",position:"relative",zIndex:1}}>
+      <style>{`
+        .hsteps{display:grid;grid-template-columns:repeat(5,1fr);gap:20px;position:relative;}
+        .hstep{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;}
+        .hline{position:absolute;top:44px;left:calc(10%+28px);right:calc(10%+28px);height:1px;
+          background:linear-gradient(90deg,transparent,rgba(201,168,76,0.25)10%,rgba(201,168,76,0.25)90%,transparent);
+          pointer-events:none;}
+        @media(max-width:900px){.hsteps{grid-template-columns:1fr!important;gap:0!important;}
+          .hline{display:none!important;}
+          .hstep{flex-direction:row!important;text-align:left!important;align-items:flex-start!important;
+            gap:20px!important;padding:24px 0!important;border-bottom:1px solid rgba(201,168,76,0.07)!important;}
+          .hstep:last-child{border-bottom:none!important;}}
+        @media(max-width:640px){#how{padding:72px 24px!important;}}
+      `}</style>
+      <div style={{maxWidth:1140,margin:"0 auto 72px",textAlign:"center",
+        opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(24px)",
+        transition:"opacity 0.6s ease,transform 0.6s ease"}}>
+        <p style={{color:"#C9A84C",fontSize:11,letterSpacing:3.5,textTransform:"uppercase",fontWeight:600,marginBottom:16}}>Comment ca marche</p>
+        <h2 id="how-title" style={{fontFamily:"Cormorant Garamond, serif",fontSize:"clamp(28px,4vw,52px)",
+          color:"#F5F0E8",fontWeight:700,margin:"0 auto",lineHeight:1.12,maxWidth:560,letterSpacing:"-0.02em"}}>
+          De zero a scannable{" "}<span style={{color:"#C9A84C"}}>en 5 minutes</span>
+        </h2>
+      </div>
+      <div style={{maxWidth:1140,margin:"0 auto",position:"relative"}}>
+        <div aria-hidden="true" className="hline" style={{opacity:visible?1:0,transition:"opacity 0.8s ease 0.3s"}}/>
+        <div className="hsteps">
+          {HOW_STEPS.map((step,i)=>(
+            <div key={step.title} className="hstep"
+              style={{opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(28px)",
+                transition:`opacity 0.55s ease ${i*110}ms,transform 0.55s ease ${i*110}ms`}}>
+              <div style={{position:"relative",flexShrink:0}}>
+                <span style={{position:"absolute",top:-6,right:-8,width:18,height:18,borderRadius:"50%",
+                  background:"linear-gradient(135deg,#C9A84C,#b8953f)",display:"flex",alignItems:"center",
+                  justifyContent:"center",fontSize:9,fontWeight:800,color:"#080808",zIndex:1,
+                  boxShadow:"0 0 0 2px #080808"}}>{i+1}</span>
+                <div style={{width:56,height:56,borderRadius:16,background:"rgba(201,168,76,0.07)",
+                  border:"1px solid rgba(201,168,76,0.18)",display:"flex",alignItems:"center",
+                  justifyContent:"center",fontSize:24,boxShadow:"0 0 0 6px rgba(8,8,8,0.9)"}}>{step.icon}</div>
+              </div>
+              <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                <h3 style={{color:"#F5F0E8",fontSize:14,fontWeight:700,margin:0,lineHeight:1.3}}>{step.title}</h3>
+                <p style={{color:"rgba(138,132,120,0.85)",fontSize:12.5,margin:0,lineHeight:1.6}}>{step.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{textAlign:"center",marginTop:64,opacity:visible?1:0,transition:"opacity 0.6s ease 0.7s"}}>
+        <a href="/auth/signup" style={{display:"inline-flex",alignItems:"center",gap:10,
+          background:"transparent",border:"1px solid rgba(201,168,76,0.3)",
+          color:"#C9A84C",textDecoration:"none",fontSize:14,fontWeight:600,
+          padding:"12px 28px",borderRadius:10,transition:"all 0.2s ease"}}
+          onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.background="rgba(201,168,76,0.08)";el.style.borderColor="rgba(201,168,76,0.55)"}}
+          onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.background="transparent";el.style.borderColor="rgba(201,168,76,0.3)"}}>
+          Essayer maintenant — c'est gratuit <span style={{fontSize:16}}>→</span>
+        </a>
+      </div>
+    </section>
+  )
+}
+
+// ── Builder section ───────────────────────────────────────────────────────────
+function BuilderMockup(){
+  const BL=[{icon:"👤",label:"Profil",c:"#C9A84C"},{icon:"🔗",label:"Liens",c:"#38BDF8"},
+    {icon:"📸",label:"Galerie",c:"#A78BFA"},{icon:"💬",label:"WhatsApp",c:"#39FF8F"},
+    {icon:"📅",label:"Reservation",c:"#F97316"},{icon:"💳",label:"Paiement",c:"#F43F5E"}]
+  const PH=[{h:28,c:"rgba(201,168,76,0.5)",w:"80%"},{h:14,c:"rgba(255,255,255,0.12)",w:"60%"},
+    {h:10,c:"rgba(201,168,76,0.25)",w:"40%"},{h:32,c:"rgba(56,189,248,0.25)",w:"90%"},
+    {h:12,c:"rgba(255,255,255,0.08)",w:"70%"},{h:28,c:"rgba(57,255,143,0.2)",w:"85%"}]
+  return(
+    <div className="bm" style={{display:"grid",gridTemplateColumns:"1fr 2.2fr 1fr",gap:12,alignItems:"start",maxWidth:820,margin:"0 auto"}}>
+      <div style={{background:"rgba(255,255,255,0.025)",border:"1px solid rgba(201,168,76,0.12)",borderRadius:14,padding:"14px 10px",display:"flex",flexDirection:"column",gap:6}}>
+        <p style={{color:"rgba(201,168,76,0.6)",fontSize:9,letterSpacing:2,textTransform:"uppercase",fontWeight:700,marginBottom:4,paddingLeft:4}}>Blocs</p>
+        {BL.map(b=>(<div key={b.label} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 10px",borderRadius:9,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)"}}>
+          <span style={{fontSize:14}}>{b.icon}</span>
+          <span style={{color:"rgba(245,240,232,0.7)",fontSize:11,fontWeight:500}}>{b.label}</span>
+          <span style={{marginLeft:"auto",width:6,height:6,borderRadius:"50%",background:b.c,opacity:0.7,flexShrink:0}}/>
+        </div>))}
+      </div>
+      <div style={{background:"rgba(255,255,255,0.018)",border:"1px solid rgba(201,168,76,0.15)",borderRadius:16,padding:16,display:"flex",flexDirection:"column",gap:10}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,paddingBottom:10,borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
+          {["#FF6B6B","#F97316","#39FF8F"].map((c,i)=>(<div key={i} style={{width:8,height:8,borderRadius:"50%",background:c,opacity:0.6}}/>))}
+          <span style={{flex:1,textAlign:"center",color:"rgba(201,168,76,0.5)",fontSize:10,letterSpacing:1}}>Canvas</span>
+          <div style={{padding:"3px 10px",borderRadius:5,background:"rgba(201,168,76,0.12)",border:"1px solid rgba(201,168,76,0.25)",fontSize:9,color:"#C9A84C",fontWeight:700}}>PUBLIER</div>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+          <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:8,padding:"16px 12px",background:"rgba(201,168,76,0.04)",border:"1px dashed rgba(201,168,76,0.2)",borderRadius:10}}>
+            <div style={{width:44,height:44,borderRadius:"50%",background:"linear-gradient(135deg,#C9A84C,#b8953f)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>👤</div>
+            <div style={{height:7,width:"60%",borderRadius:4,background:"rgba(245,240,232,0.2)"}}/>
+            <div style={{height:5,width:"40%",borderRadius:4,background:"rgba(245,240,232,0.1)"}}/>
+          </div>
+          <div style={{padding:"10px 12px",borderRadius:9,background:"linear-gradient(90deg,rgba(201,168,76,0.25),rgba(201,168,76,0.12))",border:"1px solid rgba(201,168,76,0.3)",display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:14}}>💬</span><div style={{height:6,width:"50%",borderRadius:3,background:"rgba(201,168,76,0.5)"}}/>
+          </div>
+          <div style={{padding:"10px 12px",borderRadius:9,background:"rgba(56,189,248,0.06)",border:"1px solid rgba(56,189,248,0.15)",display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:14}}>🔗</span><div style={{height:5,width:"65%",borderRadius:3,background:"rgba(56,189,248,0.3)"}}/>
+          </div>
+          <div style={{padding:"10px 12px",borderRadius:9,background:"rgba(167,139,250,0.06)",border:"1px solid rgba(167,139,250,0.12)",display:"flex",gap:6}}>
+            {[0,1,2].map(i=>(<div key={i} style={{flex:1,height:28,borderRadius:6,background:"rgba(167,139,250,0.2)"}}/>))}
+          </div>
+        </div>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:8}}>
+        <p style={{color:"rgba(201,168,76,0.5)",fontSize:9,letterSpacing:2,textTransform:"uppercase",fontWeight:700}}>Apercu</p>
+        <div style={{width:88,border:"2px solid rgba(201,168,76,0.25)",borderRadius:18,padding:"10px 6px",background:"rgba(8,8,8,0.8)",boxShadow:"0 0 24px rgba(201,168,76,0.08)",display:"flex",flexDirection:"column"}}>
+          <div style={{width:24,height:4,borderRadius:2,background:"rgba(255,255,255,0.1)",margin:"0 auto 8px"}}/>
+          <div style={{display:"flex",flexDirection:"column",gap:5,alignItems:"center"}}>
+            <div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#C9A84C,#b8953f)",marginBottom:2}}/>
+            {PH.map((b,i)=>(<div key={i} style={{height:b.h,width:b.w,borderRadius:5,background:b.c}}/>))}
+          </div>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:5,padding:"4px 10px",borderRadius:20,background:"rgba(57,255,143,0.08)",border:"1px solid rgba(57,255,143,0.2)"}}>
+          <div style={{width:5,height:5,borderRadius:"50%",background:"#39FF8F",animation:"livePulse 1.5s ease-in-out infinite"}}/>
+          <span style={{color:"#39FF8F",fontSize:9,fontWeight:700,letterSpacing:1}}>LIVE</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+function BuilderSection(){
+  const {ref,visible}=useInView(0.07)
+  const BEN=[
+    {icon:"🧱",title:"Blocs prets a l'emploi",desc:"Profil, liens, galerie, WhatsApp, paiement — tout y est."},
+    {icon:"🎨",title:"Templates metiers",desc:"Restaurant, freelance, artiste, coach — adapte des le depart."},
+    {icon:"📱",title:"Apercu mobile instantane",desc:"Vois le rendu en temps reel pendant que tu edites."},
+  ]
+  return(
+    <section id="builder" ref={ref} aria-labelledby="builder-title"
+      style={{padding:"100px 48px",position:"relative",zIndex:1}}>
+      <style>{`
+        @keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.3)}}
+        @media(max-width:900px){.bm{grid-template-columns:1fr 1fr!important;}}
+        @media(max-width:640px){#builder{padding:72px 20px!important;}.bm{grid-template-columns:1fr!important;}}
+        @media(max-width:900px){.bben{grid-template-columns:1fr!important;}}
+      `}</style>
+      <div style={{maxWidth:1140,margin:"0 auto"}}>
+        <div style={{textAlign:"center",marginBottom:64,opacity:visible?1:0,
+          transform:visible?"translateY(0)":"translateY(24px)",transition:"opacity 0.6s,transform 0.6s"}}>
+          <p style={{color:"#C9A84C",fontSize:11,letterSpacing:3.5,textTransform:"uppercase",fontWeight:600,marginBottom:16}}>Builder</p>
+          <h2 id="builder-title" style={{fontFamily:"Cormorant Garamond, serif",fontSize:"clamp(28px,4vw,52px)",
+            color:"#F5F0E8",fontWeight:700,margin:"0 auto 20px",lineHeight:1.1,maxWidth:680,letterSpacing:"-0.02em"}}>
+            Construis une page professionnelle{" "}<span style={{color:"#C9A84C"}}>en quelques minutes.</span>
+          </h2>
+          <p style={{color:"rgba(138,132,120,0.85)",fontSize:16,maxWidth:520,margin:"0 auto",lineHeight:1.7}}>
+            Ajoute des blocs, personnalise ton theme, publie et partage ton QR code.
+          </p>
+        </div>
+        <div style={{opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(32px)",
+          transition:"opacity 0.7s ease 0.15s,transform 0.7s ease 0.15s",marginBottom:56}}>
+          <BuilderMockup/>
+        </div>
+        <div className="bben" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16,maxWidth:860,margin:"0 auto"}}>
+          {BEN.map((b,i)=>(
+            <div key={b.title} style={{display:"flex",flexDirection:"column",gap:10,padding:"20px",
+              background:"rgba(255,255,255,0.02)",border:"1px solid rgba(201,168,76,0.1)",borderRadius:14,
+              opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(20px)",
+              transition:`opacity 0.5s ease ${0.35+i*0.1}s,transform 0.5s ease ${0.35+i*0.1}s`}}>
+              <span style={{fontSize:22}}>{b.icon}</span>
+              <h3 style={{color:"#F5F0E8",fontSize:14,fontWeight:700,margin:0}}>{b.title}</h3>
+              <p style={{color:"rgba(138,132,120,0.8)",fontSize:12.5,margin:0,lineHeight:1.6}}>{b.desc}</p>
+            </div>
+          ))}
+        </div>
+        <div style={{textAlign:"center",marginTop:48,opacity:visible?1:0,transition:"opacity 0.6s ease 0.7s"}}>
+          <a href="/dashboard/builder" style={{display:"inline-flex",alignItems:"center",gap:10,
+            background:"linear-gradient(90deg,#C9A84C,#b8953f)",color:"#080808",textDecoration:"none",
+            fontSize:14,fontWeight:700,padding:"13px 30px",borderRadius:11,
+            boxShadow:"0 4px 24px rgba(201,168,76,0.35)",transition:"transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.2s"}}
+            onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="translateY(-3px) scale(1.03)";el.style.boxShadow="0 8px 32px rgba(201,168,76,0.5)"}}
+            onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="none";el.style.boxShadow="0 4px 24px rgba(201,168,76,0.35)"}}>
+            Ouvrir le builder <span style={{fontSize:16}}>→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [titleVisible, setTitleVisible] = useState(false)
@@ -853,36 +1170,7 @@ export default function HomePage() {
       <Particles />
 
       {/* NAV */}
-      <nav style={{
-        position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "20px 48px",
-        background: "rgba(8,8,8,0.85)", backdropFilter: "blur(24px)",
-        borderBottom: "1px solid rgba(201,168,76,0.1)"
-      }}>
-        <span style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 24, color: "#C9A84C", fontWeight: 600 }}>QRfolio</span>
-        <div className="nav-links" style={{ display: "flex", alignItems: "center", gap: 32 }}>
-          <Link href="#features" style={{ color: "#8A8478", textDecoration: "none", fontSize: 14 }}
-            onMouseEnter={e => (e.currentTarget.style.color = "#F5F0E8")}
-            onMouseLeave={e => (e.currentTarget.style.color = "#8A8478")}>Fonctionnalités</Link>
-          <Link href="#pricing" style={{ color: "#8A8478", textDecoration: "none", fontSize: 14 }}
-            onMouseEnter={e => (e.currentTarget.style.color = "#F5F0E8")}
-            onMouseLeave={e => (e.currentTarget.style.color = "#8A8478")}>Tarifs</Link>
-          <Link href="/auth/login" style={{ color: "#8A8478", textDecoration: "none", fontSize: 14 }}
-            onMouseEnter={e => (e.currentTarget.style.color = "#F5F0E8")}
-            onMouseLeave={e => (e.currentTarget.style.color = "#8A8478")}>Connexion</Link>
-          <Link href="/auth/signup" style={{
-            background: "linear-gradient(90deg, #C9A84C, #b8953f)",
-            color: "#080808", textDecoration: "none", fontSize: 14, fontWeight: 700,
-            padding: "10px 22px", borderRadius: 10,
-            transition: "opacity 0.2s, transform 0.2s", display: "inline-block"
-          }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = "0.85"; (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)" }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = "1"; (e.currentTarget as HTMLElement).style.transform = "translateY(0)" }}>
-            Commencer
-          </Link>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* HERO */}
       <section style={{
@@ -1018,8 +1306,14 @@ export default function HomePage() {
       {/* PROOF STRIP */}
       <ProofStrip />
 
+      {/* HOW IT WORKS */}
+      <HowItWorks />
+
       {/* FEATURES */}
       <FeaturesSection />
+
+      {/* BUILDER */}
+      <BuilderSection />
 
       {/* TEMPLATES */}
       <TemplatesSection />
