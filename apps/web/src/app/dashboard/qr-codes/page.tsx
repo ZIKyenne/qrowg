@@ -1,8 +1,8 @@
-﻿import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import type { Metadata } from "next"
 import QRStudio from "./QRStudio"
-import { Plus, QrCode, TrendingUp, Zap } from "lucide-react"
+import { Plus, QrCode, TrendingUp, Activity } from "lucide-react"
 
 export const metadata: Metadata = { title: "QR Studio - QRfolio" }
 
@@ -54,7 +54,7 @@ export default async function QRCodesPage() {
             {/* KPIs rapides */}
             <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
               {[
-                { label: "QR actifs", value: activeQR, icon: <Zap size={11} color="#39FF8F"/>, color: "#39FF8F" },
+                { label: "QR actifs", value: activeQR, icon: <Activity size={11} color="#39FF8F"/>, color: "#39FF8F" },
                 { label: "Scans total", value: totalScans.toLocaleString("fr-FR"), icon: <TrendingUp size={11} color="#C9A84C"/>, color: "#C9A84C" },
               ].map((k, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
