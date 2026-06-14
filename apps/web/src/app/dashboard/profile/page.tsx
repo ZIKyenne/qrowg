@@ -64,7 +64,7 @@ const ACTIVITY_CFG: Record<ActivityEventType, { icon: any; color: string; bg: st
   page_updated:       { icon: FileEdit,  color: "#38BDF8",  bg: "rgba(56,189,248,0.1)"  },
   qr_created:         { icon: QrCode,    color: "#C9A84C",  bg: "rgba(201,168,76,0.1)"  },
   qr_customized:      { icon: Settings,  color: "#7B61FF",  bg: "rgba(123,97,255,0.1)"  },
-  qr_scanned:         { icon: Scan,      color: "#39FF8F",  bg: "rgba(57,255,143,0.1)"  },
+  qr_scanned:         { icon: ScanLine,      color: "#39FF8F",  bg: "rgba(57,255,143,0.1)"  },
   qr_downloaded:      { icon: Download,  color: "#38BDF8",  bg: "rgba(56,189,248,0.1)"  },
   plan_changed:       { icon: Zap,       color: "#C9A84C",  bg: "rgba(201,168,76,0.1)"  },
   referral_validated: { icon: Award,     color: "#EC4899",  bg: "rgba(236,72,153,0.1)"  },
