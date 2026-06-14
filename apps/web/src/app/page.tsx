@@ -158,31 +158,177 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
   )
 }
 
-// ── Feature card ──────────────────────────────────────────────────────────────
-function FeatureCard({ icon, title, desc, delay }: { icon: string; title: string; desc: string; delay: number }) {
-  const [hovered, setHovered] = useState(false)
+// ── Features section ──────────────────────────────────────────────────────────
+const FEATURES = [
+  {
+    icon: "⚡",
+    tag: "Builder",
+    title: "Cree ta page sans coder",
+    desc: "Builder drag & drop, blocs prets a l'emploi, personnalisation rapide. En ligne en 5 minutes.",
+    accent: "#C9A84C",
+  },
+  {
+    icon: "🔄",
+    tag: "QR Dynamique",
+    title: "Transforme ton QR en outil business",
+    desc: "Modifie ta destination, ton contenu, tes liens — sans jamais reimprimer ton QR code.",
+    accent: "#38BDF8",
+  },
+  {
+    icon: "📊",
+    tag: "Analytics",
+    title: "Mesure chaque scan",
+    desc: "Vues, scans, appareils, sources et performances. Tout en temps reel, tout inclus.",
+    accent: "#39FF8F",
+  },
+  {
+    icon: "🎯",
+    tag: "Conversion",
+    title: "Convertis tes visiteurs",
+    desc: "Boutons WhatsApp, reservation, paiement, formulaire de contact, CTA personnalises.",
+    accent: "#F97316",
+  },
+  {
+    icon: "🎨",
+    tag: "Templates",
+    title: "Demarre avec un template metier",
+    desc: "Restaurant, freelance, coach, artiste, immobilier, commerce. Adapte a ton secteur.",
+    accent: "#A78BFA",
+  },
+  {
+    icon: "🏢",
+    tag: "Marque pro",
+    title: "Passe en marque pro",
+    desc: "Domaine personnalise, sans branding QRfolio, design premium. Une image irreprochable.",
+    accent: "#C9A84C",
+  },
+] as const
+
+function FeaturesSection() {
+  const { ref, visible } = useInView(0.06)
+  const [hovered, setHovered] = useState<number | null>(null)
   return (
-    <FadeIn delay={delay}>
+    <section
+      id="features"
+      ref={ref}
+      aria-labelledby="features-title"
+      style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}
+    >
+      {/* Header */}
+      <div style={{
+        maxWidth: 1140, margin: "0 auto 64px", textAlign: "center",
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(24px)",
+        transition: "opacity 0.6s ease, transform 0.6s ease",
+      }}>
+        <p style={{
+          color: "#C9A84C", fontSize: 11, letterSpacing: 3.5,
+          textTransform: "uppercase", fontWeight: 600, marginBottom: 16,
+        }}>Fonctionnalites</p>
+        <h2 id="features-title" style={{
+          fontFamily: "Cormorant Garamond, serif",
+          fontSize: "clamp(28px, 4vw, 52px)",
+          color: "#F5F0E8", fontWeight: 700, margin: "0 auto",
+          lineHeight: 1.1, maxWidth: 560, letterSpacing: "-0.02em",
+        }}>
+          Tout ce qu'il faut pour{" "}
+          <span style={{ color: "#C9A84C" }}>convertir</span>
+        </h2>
+      </div>
+
+      {/* Grid */}
       <div
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
+        className="feat-grid"
         style={{
-          background: hovered ? "rgba(201,168,76,0.08)" : "#111009",
-          border: `1px solid ${hovered ? "rgba(201,168,76,0.5)" : "rgba(201,168,76,0.15)"}`,
-          borderRadius: 16, padding: "28px 24px",
-          transition: "all 0.3s ease",
-          transform: hovered ? "translateY(-4px)" : "translateY(0)",
-          boxShadow: hovered ? "0 12px 40px rgba(201,168,76,0.12)" : "none",
-          cursor: "default"
+          maxWidth: 1140, margin: "0 auto",
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: 20,
         }}
       >
-        <div style={{ fontSize: 32, marginBottom: 16 }}>{icon}</div>
-        <h3 style={{ color: "#F5F0E8", fontSize: 18, fontWeight: 600, margin: "0 0 8px", fontFamily: "Cormorant Garamond, serif" }}>{title}</h3>
-        <p style={{ color: "#8A8478", fontSize: 14, lineHeight: 1.6, margin: 0 }}>{desc}</p>
+        {FEATURES.map((f, i) => {
+          const isHovered = hovered === i
+          return (
+            <div
+              key={f.tag}
+              onMouseEnter={() => setHovered(i)}
+              onMouseLeave={() => setHovered(null)}
+              style={{
+                background: isHovered
+                  ? "rgba(255,255,255,0.035)"
+                  : "rgba(255,255,255,0.018)",
+                border: `1px solid ${isHovered ? f.accent + "35" : "rgba(201,168,76,0.1)"}`,
+                borderRadius: 18,
+                padding: "28px 26px",
+                display: "flex", flexDirection: "column", gap: 14,
+                position: "relative", overflow: "hidden",
+                cursor: "default",
+                transform: visible
+                  ? isHovered ? "translateY(-4px)" : "translateY(0)"
+                  : "translateY(28px)",
+                opacity: visible ? 1 : 0,
+                transition: `opacity 0.5s ease ${i * 80}ms, transform 0.35s cubic-bezier(0.34,1.56,0.64,1) ${visible ? "0ms" : i * 80 + "ms"}, border-color 0.25s ease, background 0.25s ease`,
+                boxShadow: isHovered
+                  ? `0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px ${f.accent}18`
+                  : "none",
+              }}
+            >
+              {/* Top accent */}
+              <div style={{
+                position: "absolute", top: 0, left: 0, right: 0, height: 1,
+                background: isHovered
+                  ? `linear-gradient(90deg, transparent, ${f.accent}55, transparent)`
+                  : "linear-gradient(90deg, transparent, rgba(201,168,76,0.15), transparent)",
+                transition: "background 0.3s ease",
+              }} />
+
+              {/* Icon + tag row */}
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{
+                  width: 42, height: 42, borderRadius: 12,
+                  background: `${f.accent}12`,
+                  border: `1px solid ${f.accent}28`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 20, flexShrink: 0,
+                  transition: "background 0.25s ease, border-color 0.25s ease",
+                  ...(isHovered && {
+                    background: `${f.accent}20`,
+                    borderColor: `${f.accent}50`,
+                  }),
+                }}>{f.icon}</div>
+                <span style={{
+                  color: f.accent,
+                  fontSize: 10, fontWeight: 700,
+                  letterSpacing: 2, textTransform: "uppercase",
+                  opacity: 0.8,
+                }}>{f.tag}</span>
+              </div>
+
+              {/* Title */}
+              <h3 style={{
+                color: "#F5F0E8", fontSize: 16, fontWeight: 700,
+                margin: 0, lineHeight: 1.3,
+              }}>{f.title}</h3>
+
+              {/* Desc */}
+              <p style={{
+                color: "rgba(138,132,120,0.85)", fontSize: 13,
+                margin: 0, lineHeight: 1.65,
+              }}>{f.desc}</p>
+            </div>
+          )
+        })}
       </div>
-    </FadeIn>
+
+      <style>{`
+        @media (max-width: 900px) { .feat-grid { grid-template-columns: repeat(2,1fr) !important; } }
+        @media (max-width: 580px) { .feat-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 640px) { #features { padding: 72px 24px !important; } }
+      `}</style>
+    </section>
   )
 }
+
 
 // ── Pricing card ──────────────────────────────────────────────────────────────
 function PricingCard({ plan, price, features, highlight, delay }: any) {
@@ -333,102 +479,6 @@ function ProofStrip() {
     </section>
   )
 }
-// ── How it works ──────────────────────────────────────────────────────────────
-const HOW_STEPS = [
-  { n:"01", icon:"🎨", title:"Choisis un template",    desc:"Selectionne parmi nos modeles concus pour convertir. Adapte a ton secteur des le depart." },
-  { n:"02", icon:"✏️",  title:"Personnalise ta page",   desc:"Ajoute tes infos, tes liens, ta photo. Zero code, resultat professionnel en minutes." },
-  { n:"03", icon:"📱", title:"Genere ton QR code",     desc:"Un QR dynamique est cree automatiquement. Change ta page sans jamais le reimprimer." },
-  { n:"04", icon:"🚀", title:"Partage partout",         desc:"Sur tes cartes de visite, reseaux sociaux, emails ou en presentiel. Un seul QR." },
-  { n:"05", icon:"📊", title:"Analyse les resultats",  desc:"Vois qui scanne, quand et depuis quel appareil. Optimise en temps reel." },
-] as const
-
-function HowItWorks() {
-  const { ref, visible } = useInView(0.08)
-  return (
-    <section id="how" ref={ref} aria-labelledby="how-title"
-      style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
-      <style>{`
-        .how-steps { display:grid; grid-template-columns:repeat(5,1fr); gap:20px; position:relative; }
-        .how-step  { display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; }
-        .how-line  { position:absolute; top:44px; left:calc(10% + 28px); right:calc(10% + 28px); height:1px;
-                     background:linear-gradient(90deg,transparent,rgba(201,168,76,0.25) 10%,rgba(201,168,76,0.25) 90%,transparent);
-                     pointer-events:none; }
-        @media(max-width:900px){
-          .how-steps { grid-template-columns:1fr !important; gap:0 !important; }
-          .how-line  { display:none !important; }
-          .how-step  { flex-direction:row !important; text-align:left !important; align-items:flex-start !important;
-                       gap:20px !important; padding:24px 0 !important;
-                       border-bottom:1px solid rgba(201,168,76,0.07) !important; }
-          .how-step:last-child { border-bottom:none !important; }
-          .how-icon-wrap { flex-shrink:0; }
-        }
-        @media(max-width:640px){ #how { padding:72px 24px !important; } }
-      `}</style>
-
-      {/* Header */}
-      <div style={{ maxWidth:1140, margin:"0 auto 72px", textAlign:"center",
-        opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(24px)",
-        transition:"opacity 0.6s ease, transform 0.6s ease" }}>
-        <p style={{ color:"#C9A84C", fontSize:11, letterSpacing:3.5,
-          textTransform:"uppercase", fontWeight:600, marginBottom:16 }}>Comment ca marche</p>
-        <h2 id="how-title" style={{ fontFamily:"Cormorant Garamond, serif",
-          fontSize:"clamp(28px, 4vw, 52px)", color:"#F5F0E8", fontWeight:700,
-          margin:"0 auto", lineHeight:1.12, maxWidth:560, letterSpacing:"-0.02em" }}>
-          De zero a scannable{" "}
-          <span style={{ color:"#C9A84C" }}>en 5 minutes</span>
-        </h2>
-      </div>
-
-      {/* Steps */}
-      <div style={{ maxWidth:1140, margin:"0 auto", position:"relative" }}>
-        <div aria-hidden="true" className="how-line"
-          style={{ opacity:visible?1:0, transition:"opacity 0.8s ease 0.3s" }} />
-        <div className="how-steps">
-          {HOW_STEPS.map((step, i) => (
-            <div key={step.n} className="how-step"
-              style={{ opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(28px)",
-                transition:`opacity 0.55s ease ${i*110}ms, transform 0.55s ease ${i*110}ms` }}>
-              <div className="how-icon-wrap" style={{ position:"relative" }}>
-                <span style={{ position:"absolute", top:-6, right:-8,
-                  width:18, height:18, borderRadius:"50%",
-                  background:"linear-gradient(135deg,#C9A84C,#b8953f)",
-                  display:"flex", alignItems:"center", justifyContent:"center",
-                  fontSize:9, fontWeight:800, color:"#080808", zIndex:1,
-                  boxShadow:"0 0 0 2px #080808" }}>{i+1}</span>
-                <div style={{ width:56, height:56, borderRadius:16,
-                  background:"rgba(201,168,76,0.07)",
-                  border:"1px solid rgba(201,168,76,0.18)",
-                  display:"flex", alignItems:"center", justifyContent:"center",
-                  fontSize:24, boxShadow:"0 0 0 6px rgba(8,8,8,0.9)" }}>{step.icon}</div>
-              </div>
-              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                <h3 style={{ color:"#F5F0E8", fontSize:14, fontWeight:700,
-                  margin:0, lineHeight:1.3 }}>{step.title}</h3>
-                <p style={{ color:"rgba(138,132,120,0.85)", fontSize:12.5,
-                  margin:0, lineHeight:1.6 }}>{step.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* CTA */}
-      <div style={{ textAlign:"center", marginTop:64,
-        opacity:visible?1:0, transition:"opacity 0.6s ease 0.7s" }}>
-        <a href="/auth/signup" style={{
-          display:"inline-flex", alignItems:"center", gap:10,
-          background:"transparent", border:"1px solid rgba(201,168,76,0.3)",
-          color:"#C9A84C", textDecoration:"none", fontSize:14, fontWeight:600,
-          padding:"12px 28px", borderRadius:10, transition:"all 0.2s ease" }}
-          onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.background="rgba(201,168,76,0.08)";el.style.borderColor="rgba(201,168,76,0.55)"}}
-          onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.background="transparent";el.style.borderColor="rgba(201,168,76,0.3)"}}>
-          Essayer maintenant — c'est gratuit <span style={{fontSize:16}}>→</span>
-        </a>
-      </div>
-    </section>
-  )
-}
-
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [titleVisible, setTitleVisible] = useState(false)
@@ -448,14 +498,7 @@ export default function HomePage() {
     }
   }, [titleVisible, charIndex, title.length])
 
-  const features = [
-    { icon: "⚡", title: "Builder drag & drop", desc: "Crée ta page en 5 minutes sans coder." },
-    { icon: "📱", title: "QR codes dynamiques", desc: "Modifie ta page sans changer le QR. Toujours à jour." },
-    { icon: "📊", title: "Analytics détaillés", desc: "Vues, scans, appareils, sources de trafic en temps réel." },
-    { icon: "🎨", title: "Design premium", desc: "Templates professionnels pour freelances, créateurs, pros." },
-    { icon: "🔗", title: "Domaine personnalisé", desc: "Utilise ton propre domaine pour une image professionnelle." },
-    { icon: "👥", title: "Gestion d'équipe", desc: "Collaborez à plusieurs sur vos pages avec les rôles." },
-  ]
+
 
   return (
     <div style={{ background: "#080808", minHeight: "100vh", fontFamily: "DM Sans, sans-serif" }}>
@@ -649,25 +692,8 @@ export default function HomePage() {
       {/* PROOF STRIP */}
       <ProofStrip />
 
-      {/* HOW IT WORKS */}
-      <HowItWorks />
-
       {/* FEATURES */}
-      <section id="features" style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <FadeIn>
-            <div style={{ textAlign: "center", marginBottom: 64 }}>
-              <p style={{ color: "#C9A84C", fontSize: 13, letterSpacing: 3, textTransform: "uppercase", marginBottom: 16 }}>Fonctionnalités</p>
-              <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(28px, 4vw, 48px)", color: "#F5F0E8", fontWeight: 700, margin: 0 }}>
-                Tout ce dont tu as besoin
-              </h2>
-            </div>
-          </FadeIn>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24 }}>
-            {features.map((f, i) => <FeatureCard key={i} {...f} delay={i * 100} />)}
-          </div>
-        </div>
-      </section>
+      <FeaturesSection />
 
       {/* PRICING */}
       <section id="pricing" style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
