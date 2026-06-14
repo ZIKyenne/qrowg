@@ -333,6 +333,102 @@ function ProofStrip() {
     </section>
   )
 }
+// ── How it works ──────────────────────────────────────────────────────────────
+const HOW_STEPS = [
+  { n:"01", icon:"🎨", title:"Choisis un template",    desc:"Selectionne parmi nos modeles concus pour convertir. Adapte a ton secteur des le depart." },
+  { n:"02", icon:"✏️",  title:"Personnalise ta page",   desc:"Ajoute tes infos, tes liens, ta photo. Zero code, resultat professionnel en minutes." },
+  { n:"03", icon:"📱", title:"Genere ton QR code",     desc:"Un QR dynamique est cree automatiquement. Change ta page sans jamais le reimprimer." },
+  { n:"04", icon:"🚀", title:"Partage partout",         desc:"Sur tes cartes de visite, reseaux sociaux, emails ou en presentiel. Un seul QR." },
+  { n:"05", icon:"📊", title:"Analyse les resultats",  desc:"Vois qui scanne, quand et depuis quel appareil. Optimise en temps reel." },
+] as const
+
+function HowItWorks() {
+  const { ref, visible } = useInView(0.08)
+  return (
+    <section id="how" ref={ref} aria-labelledby="how-title"
+      style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
+      <style>{`
+        .how-steps { display:grid; grid-template-columns:repeat(5,1fr); gap:20px; position:relative; }
+        .how-step  { display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; }
+        .how-line  { position:absolute; top:44px; left:calc(10% + 28px); right:calc(10% + 28px); height:1px;
+                     background:linear-gradient(90deg,transparent,rgba(201,168,76,0.25) 10%,rgba(201,168,76,0.25) 90%,transparent);
+                     pointer-events:none; }
+        @media(max-width:900px){
+          .how-steps { grid-template-columns:1fr !important; gap:0 !important; }
+          .how-line  { display:none !important; }
+          .how-step  { flex-direction:row !important; text-align:left !important; align-items:flex-start !important;
+                       gap:20px !important; padding:24px 0 !important;
+                       border-bottom:1px solid rgba(201,168,76,0.07) !important; }
+          .how-step:last-child { border-bottom:none !important; }
+          .how-icon-wrap { flex-shrink:0; }
+        }
+        @media(max-width:640px){ #how { padding:72px 24px !important; } }
+      `}</style>
+
+      {/* Header */}
+      <div style={{ maxWidth:1140, margin:"0 auto 72px", textAlign:"center",
+        opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(24px)",
+        transition:"opacity 0.6s ease, transform 0.6s ease" }}>
+        <p style={{ color:"#C9A84C", fontSize:11, letterSpacing:3.5,
+          textTransform:"uppercase", fontWeight:600, marginBottom:16 }}>Comment ca marche</p>
+        <h2 id="how-title" style={{ fontFamily:"Cormorant Garamond, serif",
+          fontSize:"clamp(28px, 4vw, 52px)", color:"#F5F0E8", fontWeight:700,
+          margin:"0 auto", lineHeight:1.12, maxWidth:560, letterSpacing:"-0.02em" }}>
+          De zero a scannable{" "}
+          <span style={{ color:"#C9A84C" }}>en 5 minutes</span>
+        </h2>
+      </div>
+
+      {/* Steps */}
+      <div style={{ maxWidth:1140, margin:"0 auto", position:"relative" }}>
+        <div aria-hidden="true" className="how-line"
+          style={{ opacity:visible?1:0, transition:"opacity 0.8s ease 0.3s" }} />
+        <div className="how-steps">
+          {HOW_STEPS.map((step, i) => (
+            <div key={step.n} className="how-step"
+              style={{ opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(28px)",
+                transition:`opacity 0.55s ease ${i*110}ms, transform 0.55s ease ${i*110}ms` }}>
+              <div className="how-icon-wrap" style={{ position:"relative" }}>
+                <span style={{ position:"absolute", top:-6, right:-8,
+                  width:18, height:18, borderRadius:"50%",
+                  background:"linear-gradient(135deg,#C9A84C,#b8953f)",
+                  display:"flex", alignItems:"center", justifyContent:"center",
+                  fontSize:9, fontWeight:800, color:"#080808", zIndex:1,
+                  boxShadow:"0 0 0 2px #080808" }}>{i+1}</span>
+                <div style={{ width:56, height:56, borderRadius:16,
+                  background:"rgba(201,168,76,0.07)",
+                  border:"1px solid rgba(201,168,76,0.18)",
+                  display:"flex", alignItems:"center", justifyContent:"center",
+                  fontSize:24, boxShadow:"0 0 0 6px rgba(8,8,8,0.9)" }}>{step.icon}</div>
+              </div>
+              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                <h3 style={{ color:"#F5F0E8", fontSize:14, fontWeight:700,
+                  margin:0, lineHeight:1.3 }}>{step.title}</h3>
+                <p style={{ color:"rgba(138,132,120,0.85)", fontSize:12.5,
+                  margin:0, lineHeight:1.6 }}>{step.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div style={{ textAlign:"center", marginTop:64,
+        opacity:visible?1:0, transition:"opacity 0.6s ease 0.7s" }}>
+        <a href="/auth/signup" style={{
+          display:"inline-flex", alignItems:"center", gap:10,
+          background:"transparent", border:"1px solid rgba(201,168,76,0.3)",
+          color:"#C9A84C", textDecoration:"none", fontSize:14, fontWeight:600,
+          padding:"12px 28px", borderRadius:10, transition:"all 0.2s ease" }}
+          onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.background="rgba(201,168,76,0.08)";el.style.borderColor="rgba(201,168,76,0.55)"}}
+          onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.background="transparent";el.style.borderColor="rgba(201,168,76,0.3)"}}>
+          Essayer maintenant — c'est gratuit <span style={{fontSize:16}}>→</span>
+        </a>
+      </div>
+    </section>
+  )
+}
+
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [titleVisible, setTitleVisible] = useState(false)
@@ -552,6 +648,9 @@ export default function HomePage() {
 
       {/* PROOF STRIP */}
       <ProofStrip />
+
+      {/* HOW IT WORKS */}
+      <HowItWorks />
 
       {/* FEATURES */}
       <section id="features" style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
