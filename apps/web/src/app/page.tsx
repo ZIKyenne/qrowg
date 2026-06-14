@@ -238,319 +238,101 @@ function PricingCard({ plan, price, features, highlight, delay }: any) {
   )
 }
 
-// ── Navbar ────────────────────────────────────────────────────────────────────
-function Navbar() {
-  const [scrolled, setScrolled] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [active, setActive] = useState("")
+// ── Proof strip ───────────────────────────────────────────────────────────────
+const PROOFS = [
+  {
+    icon: "⚡",
+    value: "5 min",
+    label: "pour créer une page complète",
+    sub: "Sans coder, sans designer",
+  },
+  {
+    icon: "🔄",
+    value: "QR dynamique",
+    label: "Modifie le contenu sans changer le QR",
+    sub: "Le lien reste le même, toujours",
+  },
+  {
+    icon: "📊",
+    value: "Analytics",
+    label: "Scans, vues, appareils en temps réel",
+    sub: "Inclus dans tous les plans",
+  },
+  {
+    icon: "🎨",
+    value: "Templates",
+    label: "Prêts à l'emploi, adaptés au mobile",
+    sub: "Personnalisables en un clic",
+  },
+] as const
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => window.removeEventListener("scroll", onScroll)
-  }, [])
-
-  useEffect(() => {
-    const sections = ["features","templates","examples","pricing","faq"]
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id) })
-      },
-      { rootMargin: "-40% 0px -55% 0px" }
-    )
-    sections.forEach(id => {
-      const el = document.getElementById(id)
-      if (el) obs.observe(el)
-    })
-    return () => obs.disconnect()
-  }, [])
-
-  useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = ""
-    }
-    return () => { document.body.style.overflow = "" }
-  }, [menuOpen])
-
-  const NAV_LINKS = [
-    { label: "Fonctionnalités", href: "#features" },
-    { label: "Templates",       href: "#templates" },
-    { label: "Exemples",        href: "#examples" },
-    { label: "Tarifs",          href: "#pricing" },
-    { label: "FAQ",             href: "#faq" },
-  ]
-
-  const linkStyle = (id: string) => ({
-    color: active === id ? "#F5F0E8" : "#8A8478",
-    textDecoration: "none",
-    fontSize: 14,
-    fontWeight: active === id ? 600 : 400,
-    position: "relative" as const,
-    paddingBottom: 2,
-    transition: "color 0.2s ease",
-    outline: "none",
-  })
-
+function ProofStrip() {
+  const { ref, visible } = useInView(0.1)
   return (
-    <>
-      <style>{`
-        .nav-link::after {
-          content: "";
-          position: absolute;
-          bottom: -2px; left: 0; right: 0;
-          height: 1.5px;
-          background: linear-gradient(90deg, #C9A84C, #d4a843);
-          transform: scaleX(0);
-          transform-origin: left;
-          transition: transform 0.25s ease;
-          border-radius: 2px;
-        }
-        .nav-link:hover::after,
-        .nav-link.active::after { transform: scaleX(1); }
-        .nav-link:hover { color: #F5F0E8 !important; }
-        .nav-link:focus-visible {
-          outline: 2px solid rgba(201,168,76,0.6);
-          outline-offset: 4px;
-          border-radius: 4px;
-        }
-        .nav-cta:focus-visible {
-          outline: 2px solid rgba(201,168,76,0.8);
-          outline-offset: 3px;
-          border-radius: 11px;
-        }
-        .mobile-link {
-          display: block;
-          color: #8A8478;
-          text-decoration: none;
-          font-size: 18px;
-          font-weight: 500;
-          padding: 16px 0;
-          border-bottom: 1px solid rgba(201,168,76,0.08);
-          transition: color 0.2s ease;
-        }
-        .mobile-link:hover, .mobile-link.active { color: #F5F0E8; }
-        .mobile-link:focus-visible {
-          outline: 2px solid rgba(201,168,76,0.6);
-          outline-offset: 4px;
-          border-radius: 4px;
-        }
-        @keyframes menuSlideIn {
-          from { opacity: 0; transform: translateY(-8px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .nav-link::after { transition: none; }
-        }
-      `}</style>
-
-      <nav
-        role="navigation"
-        aria-label="Navigation principale"
-        style={{
-          position: "fixed", top: 0, left: 0, right: 0, zIndex: 200,
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "0 48px",
-          height: 68,
-          background: scrolled
-            ? "rgba(8,8,8,0.92)"
-            : "rgba(8,8,8,0.6)",
-          backdropFilter: "blur(28px)",
-          WebkitBackdropFilter: "blur(28px)",
-          borderBottom: scrolled
-            ? "1px solid rgba(201,168,76,0.18)"
-            : "1px solid rgba(201,168,76,0.06)",
-          transition: "background 0.3s ease, border-color 0.3s ease",
-          boxShadow: scrolled ? "0 4px 32px rgba(0,0,0,0.5)" : "none",
-        }}
-      >
-        {/* Logo */}
-        <Link
-          href="/"
-          aria-label="QRfolio - Retour à l'accueil"
-          style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}
-        >
-          <span style={{
-            fontFamily: "Cormorant Garamond, serif",
-            fontSize: 22, color: "#C9A84C", fontWeight: 700,
-            letterSpacing: "-0.01em"
-          }}>QRfolio</span>
-        </Link>
-
-        {/* Desktop links */}
-        <div
-          role="menubar"
-          aria-label="Liens de navigation"
-          style={{
-            display: "flex", alignItems: "center", gap: 36,
-          }}
-          className="desktop-nav"
-        >
-          {NAV_LINKS.map(({ label, href }) => {
-            const id = href.replace("#", "")
-            const isActive = active === id
-            return (
-              <Link
-                key={href}
-                href={href}
-                role="menuitem"
-                aria-current={isActive ? "page" : undefined}
-                className={"nav-link" + (isActive ? " active" : "")}
-                style={linkStyle(id)}
-              >
-                {label}
-              </Link>
-            )
-          })}
-        </div>
-
-        {/* Desktop right */}
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }} className="desktop-nav">
-          <Link
-            href="/auth/login"
-            className="nav-link"
-            style={{ color: "#8A8478", textDecoration: "none", fontSize: 14, position: "relative", paddingBottom: 2, transition: "color 0.2s ease" }}
-          >
-            Connexion
-          </Link>
-          <Link
-            href="/auth/signup"
-            className="nav-cta"
-            aria-label="Commencer gratuitement"
+    <section
+      ref={ref}
+      aria-label="Points clés"
+      style={{
+        padding: "0 48px 80px",
+        position: "relative", zIndex: 1,
+      }}
+    >
+      <div style={{
+        maxWidth: 1140, margin: "0 auto",
+        display: "grid",
+        gridTemplateColumns: "repeat(4, 1fr)",
+        gap: 16,
+      }} className="proof-grid">
+        {PROOFS.map((p, i) => (
+          <div
+            key={p.value}
             style={{
-              background: "linear-gradient(90deg, #C9A84C, #b8953f)",
-              color: "#080808", textDecoration: "none",
-              fontSize: 14, fontWeight: 700,
-              padding: "9px 22px", borderRadius: 10,
-              display: "inline-block",
-              boxShadow: "0 2px 16px rgba(201,168,76,0.3)",
-              transition: "transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease, opacity 0.2s ease",
-              whiteSpace: "nowrap" as const,
-            }}
-            onMouseEnter={e => {
-              const el = e.currentTarget as HTMLElement
-              el.style.transform = "translateY(-2px) scale(1.03)"
-              el.style.boxShadow = "0 6px 24px rgba(201,168,76,0.5)"
-            }}
-            onMouseLeave={e => {
-              const el = e.currentTarget as HTMLElement
-              el.style.transform = "translateY(0) scale(1)"
-              el.style.boxShadow = "0 2px 16px rgba(201,168,76,0.3)"
+              background: "rgba(255,255,255,0.025)",
+              border: "1px solid rgba(201,168,76,0.12)",
+              borderRadius: 16,
+              padding: "24px 22px",
+              display: "flex", flexDirection: "column", gap: 10,
+              opacity: visible ? 1 : 0,
+              transform: visible ? "translateY(0)" : "translateY(20px)",
+              transition: `opacity 0.5s ease ${i * 90}ms, transform 0.5s ease ${i * 90}ms`,
+              position: "relative", overflow: "hidden",
             }}
           >
-            Commencer
-          </Link>
-
-          {/* Burger mobile */}
-          <button
-            onClick={() => setMenuOpen(o => !o)}
-            aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
-            className="mobile-burger"
-            style={{
-              display: "none",
-              background: "none", border: "none",
-              cursor: "pointer", padding: 8,
-              color: "#F5F0E8", flexDirection: "column",
-              gap: 5, alignItems: "center", justifyContent: "center",
-            }}
-          >
-            <span style={{
-              display: "block", width: 22, height: 1.5,
-              background: "#C9A84C", borderRadius: 2,
-              transform: menuOpen ? "rotate(45deg) translate(4.5px, 4.5px)" : "none",
-              transition: "transform 0.25s ease"
+            {/* Accent line top */}
+            <div style={{
+              position: "absolute", top: 0, left: 24, right: 24, height: 1,
+              background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent)",
             }} />
-            <span style={{
-              display: "block", width: 22, height: 1.5,
-              background: "#C9A84C", borderRadius: 2,
-              opacity: menuOpen ? 0 : 1,
-              transition: "opacity 0.2s ease"
-            }} />
-            <span style={{
-              display: "block", width: 22, height: 1.5,
-              background: "#C9A84C", borderRadius: 2,
-              transform: menuOpen ? "rotate(-45deg) translate(4.5px, -4.5px)" : "none",
-              transition: "transform 0.25s ease"
-            }} />
-          </button>
-        </div>
-      </nav>
-
-      {/* Mobile menu overlay */}
-      {menuOpen && (
-        <div
-          id="mobile-menu"
-          role="dialog"
-          aria-label="Menu mobile"
-          style={{
-            position: "fixed", top: 68, left: 0, right: 0, bottom: 0,
-            zIndex: 199,
-            background: "rgba(8,8,8,0.97)",
-            backdropFilter: "blur(20px)",
-            padding: "32px 32px 48px",
-            display: "flex", flexDirection: "column",
-            animation: "menuSlideIn 0.25s ease",
-            overflowY: "auto",
-          }}
-        >
-          {NAV_LINKS.map(({ label, href }) => {
-            const id = href.replace("#", "")
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={"mobile-link" + (active === id ? " active" : "")}
-                onClick={() => setMenuOpen(false)}
-              >
-                {label}
-              </Link>
-            )
-          })}
-          <div style={{ marginTop: 32, display: "flex", flexDirection: "column", gap: 12 }}>
-            <Link href="/auth/login" onClick={() => setMenuOpen(false)} style={{
-              display: "block", textAlign: "center",
-              color: "#8A8478", textDecoration: "none",
-              fontSize: 16, padding: "14px",
-              border: "1px solid rgba(201,168,76,0.15)", borderRadius: 12,
-              transition: "all 0.2s ease"
-            }}>
-              Connexion
-            </Link>
-            <Link href="/auth/signup" onClick={() => setMenuOpen(false)} style={{
-              display: "block", textAlign: "center",
-              background: "linear-gradient(90deg, #C9A84C, #b8953f)",
-              color: "#080808", textDecoration: "none",
-              fontSize: 16, fontWeight: 700, padding: "16px",
-              borderRadius: 12,
-              boxShadow: "0 4px 24px rgba(201,168,76,0.4)"
-            }}>
-              Commencer gratuitement →
-            </Link>
+            {/* Icon */}
+            <span style={{ fontSize: 22, lineHeight: 1 }} aria-hidden="true">{p.icon}</span>
+            {/* Value */}
+            <p style={{
+              color: "#C9A84C",
+              fontSize: 18, fontWeight: 700,
+              margin: 0, letterSpacing: "-0.01em",
+              fontFamily: "Cormorant Garamond, serif",
+            }}>{p.value}</p>
+            {/* Label */}
+            <p style={{
+              color: "#F5F0E8", fontSize: 13, fontWeight: 500,
+              margin: 0, lineHeight: 1.45,
+            }}>{p.label}</p>
+            {/* Sub */}
+            <p style={{
+              color: "rgba(138,132,120,0.75)", fontSize: 11.5,
+              margin: 0, lineHeight: 1.4,
+            }}>{p.sub}</p>
           </div>
-        </div>
-      )}
-
+        ))}
+      </div>
       <style>{`
-        @media (max-width: 900px) {
-          .desktop-nav { display: none !important; }
-          .mobile-burger { display: flex !important; }
-        }
-        @media (min-width: 901px) {
-          .mobile-burger { display: none !important; }
-          #mobile-menu { display: none !important; }
-        }
-        nav { padding: 0 48px !important; }
-        @media (max-width: 640px) {
-          nav { padding: 0 20px !important; }
-        }
+        @media (max-width: 900px) { .proof-grid { grid-template-columns: repeat(2,1fr) !important; } }
+        @media (max-width: 480px) { .proof-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 640px) { .proof-grid { padding: 0 !important; } }
       `}</style>
-    </>
+    </section>
   )
 }
-
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [titleVisible, setTitleVisible] = useState(false)
@@ -605,7 +387,37 @@ export default function HomePage() {
 
       <Particles />
 
-      <Navbar />
+      {/* NAV */}
+      <nav style={{
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "20px 48px",
+        background: "rgba(8,8,8,0.85)", backdropFilter: "blur(24px)",
+        borderBottom: "1px solid rgba(201,168,76,0.1)"
+      }}>
+        <span style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 24, color: "#C9A84C", fontWeight: 600 }}>QRfolio</span>
+        <div className="nav-links" style={{ display: "flex", alignItems: "center", gap: 32 }}>
+          <Link href="#features" style={{ color: "#8A8478", textDecoration: "none", fontSize: 14 }}
+            onMouseEnter={e => (e.currentTarget.style.color = "#F5F0E8")}
+            onMouseLeave={e => (e.currentTarget.style.color = "#8A8478")}>Fonctionnalités</Link>
+          <Link href="#pricing" style={{ color: "#8A8478", textDecoration: "none", fontSize: 14 }}
+            onMouseEnter={e => (e.currentTarget.style.color = "#F5F0E8")}
+            onMouseLeave={e => (e.currentTarget.style.color = "#8A8478")}>Tarifs</Link>
+          <Link href="/auth/login" style={{ color: "#8A8478", textDecoration: "none", fontSize: 14 }}
+            onMouseEnter={e => (e.currentTarget.style.color = "#F5F0E8")}
+            onMouseLeave={e => (e.currentTarget.style.color = "#8A8478")}>Connexion</Link>
+          <Link href="/auth/signup" style={{
+            background: "linear-gradient(90deg, #C9A84C, #b8953f)",
+            color: "#080808", textDecoration: "none", fontSize: 14, fontWeight: 700,
+            padding: "10px 22px", borderRadius: 10,
+            transition: "opacity 0.2s, transform 0.2s", display: "inline-block"
+          }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = "0.85"; (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)" }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = "1"; (e.currentTarget as HTMLElement).style.transform = "translateY(0)" }}>
+            Commencer
+          </Link>
+        </div>
+      </nav>
 
       {/* HERO */}
       <section style={{
@@ -737,6 +549,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* PROOF STRIP */}
+      <ProofStrip />
 
       {/* FEATURES */}
       <section id="features" style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
