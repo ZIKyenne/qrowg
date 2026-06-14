@@ -349,7 +349,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const canvas = canvasRef.current
     const ctx    = canvas.getContext("2d")
     if (!ctx) return
-    const img = new ImageIcon()
+    const img = new Image()
     img.crossOrigin = "anonymous"
     img.onload = () => {
       canvas.width = 400; canvas.height = 400
@@ -414,7 +414,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
       // -- Dessin du logo central ---------------------------------------
       if (styleConf.logoUrl) {
-        const logoImg  = new ImageIcon()
+        const logoImg  = new Image()
         logoImg.crossOrigin = "anonymous"
         logoImg.onload = () => {
           const pct      = (styleConf.logoSize ?? 18) / 100
@@ -689,7 +689,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     if (!canvasModalRef.current || !qrUrl) return
     const canvas = canvasModalRef.current
     const ctx    = canvas.getContext("2d"); if (!ctx) return
-    const img    = new ImageIcon()
+    const img    = new Image()
     const url    = buildQRUrl(800)
     img.crossOrigin = "anonymous"
     img.onload = () => {
@@ -721,7 +721,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       }
       // Logo
       if (styleConf.logoUrl) {
-        const logoImg = new ImageIcon(); logoImg.crossOrigin = "anonymous"
+        const logoImg = new Image(); logoImg.crossOrigin = "anonymous"
         logoImg.onload = () => {
           const ratio = Math.min((styleConf.logoSize ?? 18) / 100, 0.30)
           const size  = 800 * ratio; const pad = (styleConf.logoPadding ?? 4) * 2
@@ -878,7 +878,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       const bgH  = transparent ? "ffffff00" : (styleConf.transparent ? "ffffff00" : bg.replace("#",""))
       const url  = `https://api.qrserver.com/v1/create-qr-code/?size=${px}x${px}&data=${encodeURIComponent(qrUrl)}&color=${fgH}&bgcolor=ffffff&ecc=${effectiveEcc}&margin=${margin}`
 
-      const img  = new ImageIcon(); img.crossOrigin = "anonymous"
+      const img  = new Image(); img.crossOrigin = "anonymous"
       img.onerror = () => reject(new Error("QR load failed"))
       img.onload  = () => {
         ctx.clearRect(0, 0, px, px)
@@ -927,7 +927,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
         // Logo
         if (styleConf.logoUrl) {
-          const logoImg = new ImageIcon(); logoImg.crossOrigin = "anonymous"
+          const logoImg = new Image(); logoImg.crossOrigin = "anonymous"
           logoImg.onload = () => {
             const ratio = Math.min((styleConf.logoSize ?? 18)/100, 0.30)
             const size  = px * ratio; const pad = (styleConf.logoPadding ?? 4) * (px/400)
@@ -1161,7 +1161,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
     const loadImg  = (src: string): Promise<HTMLImageElement> =>
       new Promise((res, rej) => {
-        const i = new ImageIcon(); i.crossOrigin = "anonymous"
+        const i = new Image(); i.crossOrigin = "anonymous"
         i.onload = () => res(i); i.onerror = () => rej(); i.src = src
       })
 
@@ -1369,7 +1369,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       // Generer le QR a la bonne taille
       const qrPx    = Math.min(tpl.w, tpl.h)
       const qrUrl2  = buildQRUrl(qrPx)
-      const qrImg   = new ImageIcon(); qrImg.crossOrigin = "anonymous"
+      const qrImg   = new Image(); qrImg.crossOrigin = "anonymous"
       await new Promise<void>((res, rej) => { qrImg.onload = () => res(); qrImg.onerror = () => rej(); qrImg.src = qrUrl2 })
       const tmpC    = document.createElement("canvas")
       tmpC.width = qrPx; tmpC.height = qrPx
@@ -1378,7 +1378,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       tmpCtx.fillStyle = bg; tmpCtx.fillRect(0, 0, qrPx, qrPx)
       tmpCtx.drawImage(qrImg, 0, 0, qrPx, qrPx)
       if (styleConf.logoUrl) {
-        const logoI = new ImageIcon(); logoI.crossOrigin = "anonymous"
+        const logoI = new Image(); logoI.crossOrigin = "anonymous"
         await new Promise<void>((res) => { logoI.onload = () => res(); logoI.onerror = () => res(); logoI.src = styleConf.logoUrl! })
         const ls = Math.round(qrPx * Math.min((styleConf.logoSize??18)/100, 0.28))
         tmpCtx.drawImage(logoI, (qrPx-ls)/2, (qrPx-ls)/2, ls, ls)
@@ -1398,7 +1398,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     try {
       const qrPx    = Math.min(tpl.w, tpl.h) * 2
       const qrUrl2  = buildQRUrl(qrPx)
-      const qrImg   = new ImageIcon(); qrImg.crossOrigin = "anonymous"
+      const qrImg   = new Image(); qrImg.crossOrigin = "anonymous"
       await new Promise<void>((res, rej) => { qrImg.onload = () => res(); qrImg.onerror = () => rej(); qrImg.src = qrUrl2 })
       const tmpC    = document.createElement("canvas")
       tmpC.width = qrPx; tmpC.height = qrPx
@@ -1406,7 +1406,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       tmpCtx.fillStyle = bg; tmpCtx.fillRect(0, 0, qrPx, qrPx)
       tmpCtx.drawImage(qrImg, 0, 0, qrPx, qrPx)
       if (styleConf.logoUrl) {
-        const logoI = new ImageIcon(); logoI.crossOrigin = "anonymous"
+        const logoI = new Image(); logoI.crossOrigin = "anonymous"
         await new Promise<void>((res) => { logoI.onload = () => res(); logoI.onerror = () => res(); logoI.src = styleConf.logoUrl! })
         const ls = Math.round(qrPx * Math.min((styleConf.logoSize??18)/100, 0.28))
         tmpCtx.drawImage(logoI, (qrPx-ls)/2, (qrPx-ls)/2, ls, ls)
@@ -1424,7 +1424,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         pdfC.width = pw; pdfC.height = ph
         const pdfCtx = pdfC.getContext("2d")!
         pdfCtx.fillStyle = "#FFFFFF"; pdfCtx.fillRect(0, 0, pw, ph)
-        const img2 = new ImageIcon(); img2.src = dataUrl
+        const img2 = new Image(); img2.src = dataUrl
         await new Promise<void>(r => { img2.onload = () => r() })
         const ratio   = Math.min(pw / outCanvas.width, ph / outCanvas.height)
         const iw = outCanvas.width * ratio; const ih = outCanvas.height * ratio
@@ -1469,7 +1469,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         pdfCanvas.width = a4w; pdfCanvas.height = a4h
         const pdfCtx = pdfCanvas.getContext("2d")!
         pdfCtx.fillStyle = "#FFFFFF"; pdfCtx.fillRect(0, 0, a4w, a4h)
-        const imgEl = new ImageIcon(); imgEl.src = dataUrl
+        const imgEl = new Image(); imgEl.src = dataUrl
         await new Promise<void>(r => { imgEl.onload = () => r() })
         const qrDisplaySize = Math.min(a4w * 0.7, a4h * 0.5)
         const qrX = (a4w - qrDisplaySize) / 2; const qrY = (a4h - qrDisplaySize) / 2 - 40
