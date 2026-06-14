@@ -1,11 +1,11 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
-  LayoutDashboard, FileText, BarChart2, QrCode, User,
-  Zap, ChevronRight, LogOut, Settings, Menu, X, Eye
+  LayoutDashboard, FileText, BarChart, QrCode, User,
+  Activity, ChevronRight, LogOut, Settings, Menu, X, Eye
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
@@ -15,7 +15,7 @@ const MUTED = "#8A8478"
 const NAV_ITEMS = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard", exact: true },
   { href: "/dashboard/templates", icon: FileText, label: "Templates" },
-  { href: "/dashboard/analytics", icon: BarChart2, label: "Analytics" },
+  { href: "/dashboard/analytics", icon: BarChart, label: "Analytics" },
   { href: "/dashboard/qr-codes", icon: QrCode, label: "QR Codes" },
   { href: "/dashboard/profile", icon: User, label: "Profil" },
   { href: "/dashboard/settings", icon: Settings, label: "Parametres" },
@@ -150,7 +150,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               }}
               onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.14)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)" }}
               onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,168,76,0.08)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.2)" }}>
-                <Zap size={16} color={G} style={{ flexShrink: 0 }} />
+                <Activity size={16} color={G} style={{ flexShrink: 0 }} />
                 {!collapsed && (
                   <div style={{ overflow: "hidden", minWidth: 0 }}>
                     <p style={{ color: G, fontSize: 12, fontWeight: 700, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Upgrade</p>
