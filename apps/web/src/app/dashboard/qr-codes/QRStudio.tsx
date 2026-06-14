@@ -1,14 +1,14 @@
-﻿"use client"
+"use client"
 
 import { useEffect, useRef, useState, useCallback } from "react"
 import {
   QrCode, Download, Link, Check, Lock, Pencil,
-  Eye, EyeOff, ChevronRight, Scan, Clock,
+  Eye, EyeOff, ChevronRight, ScanLine, Clock,
   Palette, Settings, Share2, ExternalLink, Copy,
-  RotateCcw, Loader, Search, Trash2, Archive,
+  RotateCcw, Loader2, Search, Trash2, Archive,
   MoreVertical, AlertTriangle, X,
-  Image, FileText, Maximize2, Clipboard, Sliders,
-  Printer, LayoutGrid, TrendingUp, TrendingDown, BarChart2
+  ImageIcon, FileText, Maximize2, ClipboardList, SlidersHorizontal,
+  Printer, LayoutGrid, TrendingUp, TrendingDown, BarChart
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
@@ -349,7 +349,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const canvas = canvasRef.current
     const ctx    = canvas.getContext("2d")
     if (!ctx) return
-    const img = new Image()
+    const img = new ImageIcon()
     img.crossOrigin = "anonymous"
     img.onload = () => {
       canvas.width = 400; canvas.height = 400
@@ -414,7 +414,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
       // -- Dessin du logo central ---------------------------------------
       if (styleConf.logoUrl) {
-        const logoImg  = new Image()
+        const logoImg  = new ImageIcon()
         logoImg.crossOrigin = "anonymous"
         logoImg.onload = () => {
           const pct      = (styleConf.logoSize ?? 18) / 100
@@ -689,7 +689,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     if (!canvasModalRef.current || !qrUrl) return
     const canvas = canvasModalRef.current
     const ctx    = canvas.getContext("2d"); if (!ctx) return
-    const img    = new Image()
+    const img    = new ImageIcon()
     const url    = buildQRUrl(800)
     img.crossOrigin = "anonymous"
     img.onload = () => {
@@ -721,7 +721,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       }
       // Logo
       if (styleConf.logoUrl) {
-        const logoImg = new Image(); logoImg.crossOrigin = "anonymous"
+        const logoImg = new ImageIcon(); logoImg.crossOrigin = "anonymous"
         logoImg.onload = () => {
           const ratio = Math.min((styleConf.logoSize ?? 18) / 100, 0.30)
           const size  = 800 * ratio; const pad = (styleConf.logoPadding ?? 4) * 2
@@ -878,7 +878,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       const bgH  = transparent ? "ffffff00" : (styleConf.transparent ? "ffffff00" : bg.replace("#",""))
       const url  = `https://api.qrserver.com/v1/create-qr-code/?size=${px}x${px}&data=${encodeURIComponent(qrUrl)}&color=${fgH}&bgcolor=ffffff&ecc=${effectiveEcc}&margin=${margin}`
 
-      const img  = new Image(); img.crossOrigin = "anonymous"
+      const img  = new ImageIcon(); img.crossOrigin = "anonymous"
       img.onerror = () => reject(new Error("QR load failed"))
       img.onload  = () => {
         ctx.clearRect(0, 0, px, px)
@@ -927,7 +927,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
         // Logo
         if (styleConf.logoUrl) {
-          const logoImg = new Image(); logoImg.crossOrigin = "anonymous"
+          const logoImg = new ImageIcon(); logoImg.crossOrigin = "anonymous"
           logoImg.onload = () => {
             const ratio = Math.min((styleConf.logoSize ?? 18)/100, 0.30)
             const size  = px * ratio; const pad = (styleConf.logoPadding ?? 4) * (px/400)
@@ -1161,7 +1161,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
     const loadImg  = (src: string): Promise<HTMLImageElement> =>
       new Promise((res, rej) => {
-        const i = new Image(); i.crossOrigin = "anonymous"
+        const i = new ImageIcon(); i.crossOrigin = "anonymous"
         i.onload = () => res(i); i.onerror = () => rej(); i.src = src
       })
 
@@ -1369,7 +1369,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       // Generer le QR a la bonne taille
       const qrPx    = Math.min(tpl.w, tpl.h)
       const qrUrl2  = buildQRUrl(qrPx)
-      const qrImg   = new Image(); qrImg.crossOrigin = "anonymous"
+      const qrImg   = new ImageIcon(); qrImg.crossOrigin = "anonymous"
       await new Promise<void>((res, rej) => { qrImg.onload = () => res(); qrImg.onerror = () => rej(); qrImg.src = qrUrl2 })
       const tmpC    = document.createElement("canvas")
       tmpC.width = qrPx; tmpC.height = qrPx
@@ -1378,7 +1378,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       tmpCtx.fillStyle = bg; tmpCtx.fillRect(0, 0, qrPx, qrPx)
       tmpCtx.drawImage(qrImg, 0, 0, qrPx, qrPx)
       if (styleConf.logoUrl) {
-        const logoI = new Image(); logoI.crossOrigin = "anonymous"
+        const logoI = new ImageIcon(); logoI.crossOrigin = "anonymous"
         await new Promise<void>((res) => { logoI.onload = () => res(); logoI.onerror = () => res(); logoI.src = styleConf.logoUrl! })
         const ls = Math.round(qrPx * Math.min((styleConf.logoSize??18)/100, 0.28))
         tmpCtx.drawImage(logoI, (qrPx-ls)/2, (qrPx-ls)/2, ls, ls)
@@ -1398,7 +1398,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     try {
       const qrPx    = Math.min(tpl.w, tpl.h) * 2
       const qrUrl2  = buildQRUrl(qrPx)
-      const qrImg   = new Image(); qrImg.crossOrigin = "anonymous"
+      const qrImg   = new ImageIcon(); qrImg.crossOrigin = "anonymous"
       await new Promise<void>((res, rej) => { qrImg.onload = () => res(); qrImg.onerror = () => rej(); qrImg.src = qrUrl2 })
       const tmpC    = document.createElement("canvas")
       tmpC.width = qrPx; tmpC.height = qrPx
@@ -1406,7 +1406,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       tmpCtx.fillStyle = bg; tmpCtx.fillRect(0, 0, qrPx, qrPx)
       tmpCtx.drawImage(qrImg, 0, 0, qrPx, qrPx)
       if (styleConf.logoUrl) {
-        const logoI = new Image(); logoI.crossOrigin = "anonymous"
+        const logoI = new ImageIcon(); logoI.crossOrigin = "anonymous"
         await new Promise<void>((res) => { logoI.onload = () => res(); logoI.onerror = () => res(); logoI.src = styleConf.logoUrl! })
         const ls = Math.round(qrPx * Math.min((styleConf.logoSize??18)/100, 0.28))
         tmpCtx.drawImage(logoI, (qrPx-ls)/2, (qrPx-ls)/2, ls, ls)
@@ -1424,7 +1424,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         pdfC.width = pw; pdfC.height = ph
         const pdfCtx = pdfC.getContext("2d")!
         pdfCtx.fillStyle = "#FFFFFF"; pdfCtx.fillRect(0, 0, pw, ph)
-        const img2 = new Image(); img2.src = dataUrl
+        const img2 = new ImageIcon(); img2.src = dataUrl
         await new Promise<void>(r => { img2.onload = () => r() })
         const ratio   = Math.min(pw / outCanvas.width, ph / outCanvas.height)
         const iw = outCanvas.width * ratio; const ih = outCanvas.height * ratio
@@ -1469,7 +1469,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         pdfCanvas.width = a4w; pdfCanvas.height = a4h
         const pdfCtx = pdfCanvas.getContext("2d")!
         pdfCtx.fillStyle = "#FFFFFF"; pdfCtx.fillRect(0, 0, a4w, a4h)
-        const imgEl = new Image(); imgEl.src = dataUrl
+        const imgEl = new ImageIcon(); imgEl.src = dataUrl
         await new Promise<void>(r => { imgEl.onload = () => r() })
         const qrDisplaySize = Math.min(a4w * 0.7, a4h * 0.5)
         const qrX = (a4w - qrDisplaySize) / 2; const qrY = (a4h - qrDisplaySize) / 2 - 40
@@ -1710,7 +1710,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             <div style={{ display:"flex", gap:10 }}>
               <button type="button" onClick={() => setConfirmId(null)} style={{ flex:1, padding:"10px", background:"transparent", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, color:MUTED, fontSize:13, cursor:"pointer" }}>Annuler</button>
               <button type="button" onClick={() => deleteQR(confirmId)} disabled={!!deletingId} style={{ flex:1, padding:"10px", background:deletingId?"rgba(255,107,107,0.3)":"linear-gradient(90deg,#FF6B6B,#e05555)", border:"none", borderRadius:9, color:"#F5F0E8", fontSize:13, fontWeight:700, cursor:deletingId?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7 }}>
-                {deletingId ? <><Loader size={13} style={{ animation:"spin 0.8s linear infinite" }}/> Suppression...</> : <><Trash2 size={13}/> Supprimer</>}
+                {deletingId ? <><Loader2 size={13} style={{ animation:"spin 0.8s linear infinite" }}/> Suppression...</> : <><Trash2 size={13}/> Supprimer</>}
               </button>
             </div>
           </div>
@@ -1848,7 +1848,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       <button key={i} type="button" onClick={item.disabled ? undefined : item.action} disabled={item.disabled}
                         style={{ width:"100%", display:"flex", alignItems:"center", gap:8, padding:"8px 10px", background:"none", border:"none", color:item.disabled ? "rgba(138,132,120,0.4)" : item.color, fontSize:11, cursor:item.disabled ? "not-allowed" : "pointer", borderRadius:7, textAlign:"left" as const }}>
                         {archivingId === qr.id && item.label === "Archiver"
-                          ? <Loader size={11} style={{ animation:"spin 0.8s linear infinite" }}/>
+                          ? <Loader2 size={11} style={{ animation:"spin 0.8s linear infinite" }}/>
                           : item.icon
                         }
                         {item.label}
@@ -2098,7 +2098,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       </button>
                       <button type="button" onClick={() => destValue ? setDestConfirm(true) : null} disabled={!destValue || destLoading}
                         style={{ flex:2, padding:"8px", background:destValue?"linear-gradient(90deg,#C9A84C,#b8953f)":"rgba(255,255,255,0.05)", border:"none", borderRadius:8, color:destValue?"#080808":"#8A8478", fontSize:11, fontWeight:700, cursor:destValue&&!destLoading?"pointer":"not-allowed", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
-                        {destLoading ? <><Loader size={11} style={{ animation:"spin 0.8s linear infinite" }}/> Enregistrement...</> : destSaved ? <><Check size={11}/> Applique !</> : "Appliquer la destination"}
+                        {destLoading ? <><Loader2 size={11} style={{ animation:"spin 0.8s linear infinite" }}/> Enregistrement...</> : destSaved ? <><Check size={11}/> Applique !</> : "Appliquer la destination"}
                       </button>
                     </div>
 
@@ -2252,7 +2252,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"14px 16px" }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
                   <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                    <BarChart2 size={13} color={G}/>
+                    <BarChart size={13} color={G}/>
                     <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:700, margin:0 }}>Performance</p>
                   </div>
                   <div style={{ display:"flex", alignItems:"center", gap:5 }}>
@@ -2271,11 +2271,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
                 {statsLoading ? (
                   <div style={{ display:"flex", justifyContent:"center", padding:"16px 0" }}>
-                    <Loader size={16} color={MUTED} style={{ animation:"spin 0.8s linear infinite" }}/>
+                    <Loader2 size={16} color={MUTED} style={{ animation:"spin 0.8s linear infinite" }}/>
                   </div>
                 ) : !stats || stats.total === 0 ? (
                   <div style={{ textAlign:"center", padding:"16px 0" }}>
-                    <Scan size={20} color={MUTED} style={{ marginBottom:6 }}/>
+                    <ScanLine size={20} color={MUTED} style={{ marginBottom:6 }}/>
                     <p style={{ color:MUTED, fontSize:11, margin:"0 0 2px" }}>Aucun scan pour le moment</p>
                     <p style={{ color:"rgba(138,132,120,0.6)", fontSize:9, margin:0 }}>Partagez votre QR code pour voir les stats</p>
                   </div>
@@ -2325,7 +2325,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     {/* Export CSV */}
                     <button type="button" onClick={exportQRCSV} disabled={statsExporting}
                       style={{ width:"100%", padding:"6px", background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:7, color:MUTED, fontSize:10, cursor:statsExporting?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:5 }}>
-                      {statsExporting ? <><Loader size={10} style={{ animation:"spin 0.8s linear infinite" }}/> Export...</> : <><Download size={10}/> Exporter CSV</>}
+                      {statsExporting ? <><Loader2 size={10} style={{ animation:"spin 0.8s linear infinite" }}/> Export...</> : <><Download size={10}/> Exporter CSV</>}
                     </button>
                   </>
                 )}
@@ -2846,7 +2846,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             <div style={{ padding:"12px 14px", borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", gap:7, flexShrink:0 }}>
               <button type="button" onClick={saveCustomization} disabled={saving}
                 style={{ padding:"10px", background:saved?"rgba(57,255,143,0.12)":"linear-gradient(90deg,#C9A84C,#b8953f)", border:saved?"1px solid rgba(57,255,143,0.3)":"none", borderRadius:9, color:saved?"#39FF8F":"#080808", fontSize:12, fontWeight:700, cursor:saving?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7, opacity:saving?0.7:1, transition:"all 0.2s" }}>
-                {saving ? <><Loader size={12} style={{ animation:"spin 0.8s linear infinite" }}/> Enregistrement...</>
+                {saving ? <><Loader2 size={12} style={{ animation:"spin 0.8s linear infinite" }}/> Enregistrement...</>
                   : saved ? <><Check size={12}/> Sauvegarde !</>
                   : <><Palette size={12}/> Enregistrer le style</>}
               </button>
@@ -2968,12 +2968,12 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 2px" }}>Exporter</p>
                   <button type="button" onClick={() => exportSupport("png")} disabled={suppExporting}
                     style={{ padding:"10px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:9, color:"#080808", fontSize:12, fontWeight:700, cursor:suppExporting?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7, opacity:suppExporting?0.7:1 }}>
-                    {suppExporting ? <><Loader size={13} style={{ animation:"spin 0.8s linear infinite" }}/> Export...</>
+                    {suppExporting ? <><Loader2 size={13} style={{ animation:"spin 0.8s linear infinite" }}/> Export...</>
                       : <><Download size={13}/> PNG haute resolution</>}
                   </button>
                   <button type="button" onClick={() => exportSupport("pdf")} disabled={suppExporting}
                     style={{ padding:"9px", background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:9, color:"#FF6B6B", fontSize:11, cursor:suppExporting?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7, opacity:suppExporting?0.7:1 }}>
-                    {suppExporting ? <><Loader size={12} style={{ animation:"spin 0.8s linear infinite" }}/></> : <><Printer size={12}/> PDF pret a imprimer</>}
+                    {suppExporting ? <><Loader2 size={12} style={{ animation:"spin 0.8s linear infinite" }}/></> : <><Printer size={12}/> PDF pret a imprimer</>}
                   </button>
                 </div>
               )}
@@ -3144,16 +3144,16 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 <button type="button" onClick={runExport} disabled={expExporting}
                   style={{ padding:"11px", background:`linear-gradient(90deg,${fmt.color},${fmt.color}cc)`, border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:expExporting?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7, opacity:expExporting?0.7:1 }}>
                   {expExporting
-                    ? <><Loader size={14} style={{ animation:"spin 0.8s linear infinite" }}/> Export en cours...</>
+                    ? <><Loader2 size={14} style={{ animation:"spin 0.8s linear infinite" }}/> Export en cours...</>
                     : <><Download size={14}/> Telecharger {fmt.label} {realPx}px</>}
                 </button>
 
                 {/* Copier image */}
                 <button type="button" onClick={copyImageToClipboard}
                   style={{ padding:"9px", background:expCopied==="img"?"rgba(57,255,143,0.1)":"rgba(255,255,255,0.04)", border:`1px solid ${expCopied==="img"?"rgba(57,255,143,0.3)":"rgba(255,255,255,0.08)"}`, borderRadius:9, color:expCopied==="img"?"#39FF8F":expCopied==="img-err"?"#FF6B6B":MUTED, fontSize:11, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
-                  {expCopied==="img" ? <><Check size={12}/> Image copiee !</>
+                  {expCopied==="img" ? <><Check size={12}/> ImageIcon copiee !</>
                     : expCopied==="img-err" ? <><AlertTriangle size={12}/> Non supporte</>
-                    : <><Clipboard size={12}/> Copier l&apos;image (PNG 512px)</>}
+                    : <><ClipboardList size={12}/> Copier l&apos;image (PNG 512px)</>}
                 </button>
 
                 {/* Copier SVG */}
