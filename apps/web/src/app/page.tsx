@@ -87,7 +87,7 @@ function Particles() {
 
   return <canvas ref={canvasRef} style={{
     position: "fixed", inset: 0, pointerEvents: "none",
-    zIndex: 0, opacity: 0.6,
+    zIndex: 0, opacity: 0.65,
     // GPU hint
     transform: "translateZ(0)",
     willChange: "transform",
@@ -2439,8 +2439,9 @@ export default function HomePage() {
 
 
   return (
-    <div style={{ background: "#080808", minHeight: "100vh", fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ background: "transparent", minHeight: "100vh", fontFamily: "DM Sans, sans-serif" }}>
       <style>{`
+        html { scroll-padding-top: 80px; }
         @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
         @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;}}
         @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }

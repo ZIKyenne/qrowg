@@ -43,3 +43,46 @@ body {
 
 a { transition: opacity 0.2s; }
 a:hover { opacity: 0.8; }
+
+/* === Polish global QRfolio === */
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+/* Selection */
+::selection {
+  background: rgba(201,168,76,0.3);
+  color: #F5F0E8;
+}
+
+/* Focus visible cohérent */
+:focus-visible {
+  outline: 2px solid rgba(201,168,76,0.6);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Liens */
+a { cursor: pointer; }
+button { cursor: pointer; }
+
+/* Scrollbar premium */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #0d0b08; }
+::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.25); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(201,168,76,0.5); }
+
+/* Prevent layout shift */
+img, video, canvas { max-width: 100%; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
