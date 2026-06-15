@@ -19,44 +19,94 @@ function useInView(threshold = 0.15) {
 function Particles() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   useEffect(() => {
+    // Respecter prefers-reduced-motion
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)")
+    if (mq.matches) return
+
     const canvas = canvasRef.current!
-    const ctx = canvas.getContext("2d")!
-    let W = canvas.width = window.innerWidth
+    if (!canvas) return
+    const ctx = canvas.getContext("2d", { alpha: true })!
+
+    // Adapter le nombre de particules selon l'appareil
+    const isMobile = window.innerWidth < 768
+    const COUNT = isMobile ? 20 : 35
+
+    let W = canvas.width  = window.innerWidth
     let H = canvas.height = window.innerHeight
-    const particles = Array.from({ length: 60 }, () => ({
+
+    const pts = Array.from({ length: COUNT }, () => ({
       x: Math.random() * W, y: Math.random() * H,
-      r: Math.random() * 1.5 + 0.3,
-      dx: (Math.random() - 0.5) * 0.3,
-      dy: (Math.random() - 0.5) * 0.3,
-      o: Math.random() * 0.5 + 0.1
+      r: Math.random() * 1.2 + 0.2,
+      dx: (Math.random() - 0.5) * 0.25,
+      dy: (Math.random() - 0.5) * 0.25,
+      o: Math.random() * 0.4 + 0.08,
     }))
-    let raf: number
+
+    let raf = 0
+    let paused = false
+
+    // Pause quand onglet caché (économise la batterie)
+    const onVisibility = () => { paused = document.hidden }
+    document.addEventListener("visibilitychange", onVisibility)
+
     function draw() {
-      ctx.clearRect(0, 0, W, H)
-      particles.forEach(p => {
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(201,168,76,${p.o})`
-        ctx.fill()
-        p.x += p.dx; p.y += p.dy
-        if (p.x < 0 || p.x > W) p.dx *= -1
-        if (p.y < 0 || p.y > H) p.dy *= -1
-      })
+      if (!paused) {
+        ctx.clearRect(0, 0, W, H)
+        for (const p of pts) {
+          ctx.beginPath()
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(201,168,76,${p.o})`
+          ctx.fill()
+          p.x += p.dx; p.y += p.dy
+          if (p.x < 0 || p.x > W) p.dx *= -1
+          if (p.y < 0 || p.y > H) p.dy *= -1
+        }
+      }
       raf = requestAnimationFrame(draw)
     }
     draw()
-    const onResize = () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight }
-    window.addEventListener("resize", onResize)
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", onResize) }
+
+    // Debounce resize pour éviter thrashing
+    let resizeTimer = 0
+    const onResize = () => {
+      clearTimeout(resizeTimer)
+      resizeTimer = window.setTimeout(() => {
+        W = canvas.width  = window.innerWidth
+        H = canvas.height = window.innerHeight
+      }, 150) as unknown as number
+    }
+    window.addEventListener("resize", onResize, { passive: true })
+
+    return () => {
+      cancelAnimationFrame(raf)
+      clearTimeout(resizeTimer)
+      window.removeEventListener("resize", onResize)
+      document.removeEventListener("visibilitychange", onVisibility)
+    }
   }, [])
-  return <canvas ref={canvasRef} style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }} />
+
+  return <canvas ref={canvasRef} style={{
+    position: "fixed", inset: 0, pointerEvents: "none",
+    zIndex: 0, opacity: 0.6,
+    // GPU hint
+    transform: "translateZ(0)",
+    willChange: "transform",
+  }} />
 }
 
 // ── Animated QR mockup ────────────────────────────────────────────────────────
 function QRMockup() {
   const [pulse, setPulse] = useState(false)
   const [hovered, setHovered] = useState(false)
+  const qrRef = useRef<HTMLDivElement>(null)
+  const [inView, setInView] = useState(false)
   useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.1 })
+    if (qrRef.current) obs.observe(qrRef.current)
+    return () => obs.disconnect()
+  }, [])
+  useEffect(() => {
+    if (!inView) return
     const t = setInterval(() => setPulse(p => !p), 2400)
     return () => clearInterval(t)
   }, [])
@@ -64,7 +114,7 @@ function QRMockup() {
     28,29,30,35,36,37,42,43,44,49,32,33,34,39,40,41,46,47,48]
   const goldCells = [24, 25, 26, 31, 32, 33, 38]
   return (
-    <div
+    <div ref={qrRef}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{ position: "relative", width: 300, height: 300, margin: "0 auto",
@@ -1572,14 +1622,14 @@ function QRDynamicSection() {
           }}>
             <div style={{
               position: "relative",
-              animation: "qrFloat 4s ease-in-out infinite",
+              animation: "qrFloat 4s ease-in-out infinite", willChange: "transform",
             }}>
               {/* Glow */}
               <div style={{
                 position: "absolute", inset: -24,
                 background: "radial-gradient(circle, " + QR_STYLES[active].tag + "25 0%, transparent 65%)",
                 borderRadius: "50%",
-                animation: "qrGlow 3s ease-in-out infinite",
+                animation: "qrGlow 3s ease-in-out infinite", willChange: "opacity",
                 pointerEvents: "none",
               }} />
               {/* Card principale */}
@@ -2392,6 +2442,7 @@ export default function HomePage() {
     <div style={{ background: "#080808", minHeight: "100vh", fontFamily: "DM Sans, sans-serif" }}>
       <style>{`
         @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+        @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;}}
         @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
         @keyframes gradientShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
@@ -2439,7 +2490,7 @@ export default function HomePage() {
               textTransform: "uppercase", fontWeight: 600,
               animation: "fadeUp 0.6s ease 0.1s both"
             }}>
-              <span style={{ fontSize: 9, animation: "glowPulse 2s ease-in-out infinite" }}>✦</span>
+              <span style={{ fontSize: 9, animation: "glowPulse 2s ease-in-out infinite", willChange: "opacity" }}>✦</span>
               La page qui remplace ta carte de visite
             </div>
 
@@ -2540,7 +2591,7 @@ export default function HomePage() {
 
           {/* Right: QR */}
           <div className="hero-qr" style={{
-            animation: "float 5s ease-in-out infinite",
+            animation: "float 5s ease-in-out infinite", willChange: "transform",
             zIndex: 1, display: "flex", justifyContent: "center"
           }}>
             <QRMockup />
