@@ -183,6 +183,12 @@ export default function TemplatesPage() {
     setCreating(templateId)
     try {
       const supabase = createClient()
+
+      // Forcer la session pour que le JWT soit dans les headers
+      const { data: sessionData } = await supabase.auth.getSession()
+      if (!sessionData.session) {
+        await supabase.auth.refreshSession()
+      }
       const { data: { user }, error: authErr } = await supabase.auth.getUser()
       if (authErr || !user) { router.push("/auth/login"); return }
 
