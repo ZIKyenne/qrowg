@@ -1,10 +1,55 @@
-﻿// TemplatePreviewModal.tsx — Preview d'un template dans une simulation iPhone
+// TemplatePreviewModal.tsx — Preview d'un template dans une simulation iPhone
 "use client"
 import { useEffect, useRef } from "react"
-import { X, ArrowRight, Lock, Check, Layers, Clock } from "lucide-react"
+import { X, ArrowRight, Lock, Check, Layers, Clock, ExternalLink } from "lucide-react"
 import { type Block, type PageTheme, BLOCK_DEFS } from "../builder/types"
 
 const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%274%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E')"
+
+// ── Définitions manquantes (réseaux sociaux, FAQ, compte à rebours) ──────────
+const SOCIAL_NETWORKS = [
+  { key: "instagram", icon: "📸", label: "Instagram", color: "#E1306C" },
+  { key: "facebook",  icon: "👍", label: "Facebook",  color: "#1877F2" },
+  { key: "tiktok",    icon: "🎵", label: "TikTok",    color: "#F5F0E8" },
+  { key: "youtube",   icon: "▶️", label: "YouTube",   color: "#FF0000" },
+  { key: "twitter",   icon: "🐦", label: "Twitter / X", color: "#1DA1F2" },
+  { key: "linkedin",  icon: "💼", label: "LinkedIn",  color: "#0A66C2" },
+  { key: "github",    icon: "💻", label: "GitHub",    color: "#F5F0E8" },
+  { key: "spotify",   icon: "🎧", label: "Spotify",   color: "#1DB954" },
+  { key: "pinterest", icon: "📌", label: "Pinterest", color: "#E60023" },
+  { key: "website",   icon: "🌐", label: "Site web",  color: "#C9A84C" },
+  { key: "phone",     icon: "📞", label: "Téléphone", color: "#39FF8F" },
+  { key: "email",     icon: "✉️", label: "Email",     color: "#38BDF8" },
+  { key: "whatsapp",  icon: "💬", label: "WhatsApp",  color: "#25D366" },
+]
+
+function FAQItem({ q, a, theme }: { q: string; a: string; theme: PageTheme }) {
+  return (
+    <div style={{ marginBottom: 8, background: theme.primary + "06", border: `1px solid ${theme.primary}12`, borderRadius: 9, padding: "10px 12px" }}>
+      <p style={{ color: theme.text, fontSize: 12, fontWeight: 700, margin: "0 0 4px" }}>{q}</p>
+      {a && <p style={{ color: theme.muted, fontSize: 11, margin: 0, lineHeight: 1.5 }}>{a}</p>}
+    </div>
+  )
+}
+
+function CountdownDisplay({ date, theme }: { date: string; theme: PageTheme }) {
+  const target = new Date(date).getTime()
+  let diff = Math.max(0, (isNaN(target) ? 0 : target) - Date.now())
+  const days = Math.floor(diff / 86400000); diff -= days * 86400000
+  const hours = Math.floor(diff / 3600000); diff -= hours * 3600000
+  const mins = Math.floor(diff / 60000)
+  const units: [number, string][] = [[days, "Jours"], [hours, "Heures"], [mins, "Min"]]
+  return (
+    <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
+      {units.map(([val, label], i) => (
+        <div key={i} style={{ background: theme.primary + "12", border: `1px solid ${theme.primary}25`, borderRadius: 10, padding: "10px 12px", minWidth: 52 }}>
+          <p style={{ color: theme.primary, fontSize: 22, fontWeight: 700, margin: 0, fontFamily: theme.fontDisplay, lineHeight: 1 }}>{String(val).padStart(2, "0")}</p>
+          <p style={{ color: theme.muted, fontSize: 9, margin: "3px 0 0", textTransform: "uppercase", letterSpacing: 1 }}>{label}</p>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 const SETUP_TIME: Record<string, string> = {
   freelance:"5 min",restaurant:"7 min",artiste:"5 min",coach:"6 min",
