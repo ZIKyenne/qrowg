@@ -182,61 +182,26 @@ export default function TemplatesPage() {
     }
     setCreating(templateId)
     try {
-      const supabase = createClient()
-
-      // Forcer la session pour que le JWT soit dans les headers
-      const { data: sessionData } = await supabase.auth.getSession()
-      if (!sessionData.session) {
-        await supabase.auth.refreshSession()
-      }
-      const { data: { user }, error: authErr } = await supabase.auth.getUser()
-      if (authErr || !user) { router.push("/auth/login"); return }
-
       const slug = templateId + "-" + Date.now().toString(36)
       const theme = TEMPLATE_THEMES[templateId] || TEMPLATE_THEMES["freelance"]
+      const blocks = TEMPLATE_BLOCKS[templateId] || []
 
-      const { data: newPage, error: pageErr } = await supabase
-        .from("pages")
-        .insert({
-          user_id: user.id,
-          title: template.name,
-          slug,
-          status: "draft",
-          template_id: templateId,
-          theme,
-        })
-        .select()
-        .single()
+      const res = await fetch("/api/templates/use", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ templateId, templateName: template.name, slug, theme, blocks }),
+      })
+      const json = await res.json()
 
-      if (pageErr || !newPage) {
-        setToast({ type: "error", msg: pageErr?.message || "Erreur creation page." })
+      if (!res.ok || !json.pageId) {
+        setToast({ type: "error", msg: json.error || "Erreur creation page." })
         setCreating(null)
         return
       }
 
-      const blocks = TEMPLATE_BLOCKS[templateId] || []
-      if (blocks.length > 0) {
-        await supabase.from("blocks").insert(
-          blocks.map((b: any, i: number) => ({
-            page_id: newPage.id,
-            type: b.type,
-            position: i,
-            content: b.content || {},
-            is_visible: true,
-            styles: {},
-          }))
-        )
-      }
-
-      const shortCode = Math.random().toString(36).slice(2, 10)
-      await supabase.from("qr_codes").insert({
-        page_id: newPage.id,
-        user_id: user.id,
-        short_code: shortCode,
-      })
-
       setToast({ type: "success", msg: "Page creee !" })
-      setTimeout(() => router.push("/dashboard/builder/" + newPage.id), 600)
+      setTimeout(() => router.push("/dashboard/builder/" + json.pageId), 600)
 
     } catch (err: any) {
       setToast({ type: "error", msg: (err as any)?.message || "Erreur reseau." })
