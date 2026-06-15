@@ -2841,7 +2841,7 @@ export default function HomePage() {
             <p className="footer-col-title">Ressources</p>
             <Link href="#faq"      className="footer-link">FAQ</Link>
             <Link href="#examples" className="footer-link">Exemples</Link>
-            <Link href="/auth/signup" className="footer-link">Contact</Link>
+            <Link href="/contact" className="footer-link">Contact</Link>
           </div>
 
           {/* Legal */}
