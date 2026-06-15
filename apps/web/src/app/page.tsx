@@ -168,23 +168,6 @@ function Particles() {
     willChange: "transform",
   }} />
 }
-    window.addEventListener("resize", onResize, { passive: true })
-
-    return () => {
-      cancelAnimationFrame(raf)
-      clearTimeout(resizeTimer)
-      window.removeEventListener("resize", onResize)
-      document.removeEventListener("visibilitychange", onVisibility)
-    }
-  }, [])
-
-  return <canvas ref={canvasRef} style={{
-    position: "fixed", inset: 0, pointerEvents: "none",
-    zIndex: 0, opacity: 1,
-    transform: "translateZ(0)",
-    willChange: "transform",
-  }} />
-}
 
 // ── Animated QR mockup ────────────────────────────────────────────────────────
 function QRMockup() {
