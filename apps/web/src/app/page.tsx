@@ -2798,80 +2798,115 @@ export default function HomePage() {
       </section>
 
       {/* FOOTER */}
-      <footer style={{
-        borderTop:"1px solid rgba(201,168,76,0.1)",
-        padding:"48px 48px 32px",
-        position:"relative", zIndex:1,
-      }}>
+      <footer style={{ borderTop:"1px solid rgba(201,168,76,0.1)", position:"relative", zIndex:2 }} aria-label="Pied de page">
         <style>{`
-          .footer-grid{ display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:40px; }
-          .footer-col-title{ color:#C9A84C; fontSize:10px; letterSpacing:2px; textTransform:uppercase; fontWeight:700; marginBottom:16px; }
-          .footer-link{ display:block; color:rgba(138,132,120,0.7); textDecoration:none; fontSize:13.5px; marginBottom:10px; transition:color 0.2s; }
-          .footer-link:hover{ color:#F5F0E8; }
-          .footer-link:focus-visible{ outline:2px solid rgba(201,168,76,0.5); outline-offset:3px; border-radius:3px; }
-          .footer-bottom{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
-          @media(max-width:900px){ .footer-grid{ grid-template-columns:1fr 1fr!important; gap:32px!important; } }
-          @media(max-width:580px){ .footer-grid{ grid-template-columns:1fr!important; } .footer-bottom{ flex-direction:column!important; align-items:flex-start!important; } }
-          @media(max-width:640px){ footer{ padding:40px 24px 28px!important; } }
+          .fg { display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:40px; padding:56px 48px 48px; }
+          .fc-title { color:#C9A84C; font-size:10px; letter-spacing:2.5px; text-transform:uppercase; font-weight:700; margin-bottom:18px; }
+          .fl { display:block; color:rgba(138,132,120,0.72); text-decoration:none; font-size:13.5px; margin-bottom:11px; line-height:1.4; transition:color 0.2s; }
+          .fl:hover { color:#F5F0E8; }
+          .fl:focus-visible { outline:2px solid rgba(201,168,76,0.5); outline-offset:3px; border-radius:3px; }
+          .fl-soon { color:rgba(138,132,120,0.35) !important; cursor:default; pointer-events:none; }
+          .fl-soon::after { content:" (bientôt)"; font-size:10px; }
+          .fb { padding:16px 48px 24px; border-top:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+          .fsoc { display:flex; align-items:center; gap:8px; margin-top:20px; }
+          .fsoc a { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); color:rgba(138,132,120,0.65); text-decoration:none; font-size:14px; transition:all 0.2s; }
+          .fsoc a:hover { border-color:rgba(201,168,76,0.4); color:#C9A84C; background:rgba(201,168,76,0.07); }
+          .fsoc a:focus-visible { outline:2px solid rgba(201,168,76,0.5); outline-offset:3px; }
+          .fstatus { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:20px; background:rgba(57,255,143,0.07); border:1px solid rgba(57,255,143,0.18); color:rgba(57,255,143,0.8); font-size:11px; font-weight:600; text-decoration:none; transition:all 0.2s; }
+          .fstatus:hover { background:rgba(57,255,143,0.12); border-color:rgba(57,255,143,0.35); }
+          .fstatus-dot { width:6px; height:6px; border-radius:50%; background:#39FF8F; animation:fpulse 2s ease-in-out infinite; }
+          @keyframes fpulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+          @media(max-width:1100px){ .fg{ grid-template-columns:1fr 1fr 1fr!important; gap:32px!important; } }
+          @media(max-width:700px){ .fg{ grid-template-columns:1fr 1fr!important; padding:40px 24px 32px!important; } .fb{ padding:16px 24px 20px!important; flex-direction:column!important; align-items:flex-start!important; } }
+          @media(max-width:420px){ .fg{ grid-template-columns:1fr!important; } }
+          @media(prefers-reduced-motion:reduce){ .fstatus-dot{ animation:none!important; } }
         `}</style>
 
-        <div className="footer-grid" style={{ marginBottom:40 }}>
+        {/* Grille 5 colonnes */}
+        <div className="fg">
 
-          {/* Brand */}
+          {/* Col 1: Brand */}
           <div>
-            <Link href="/" style={{ textDecoration:"none", display:"inline-block", marginBottom:14 }}>
-              <span style={{ fontFamily:"Cormorant Garamond, serif", fontSize:22, color:"#C9A84C", fontWeight:700 }}>QRfolio</span>
+            <Link href="/" aria-label="QRfolio — Accueil" style={{ textDecoration:"none", display:"inline-block", marginBottom:12 }}>
+              <span style={{ fontFamily:"Cormorant Garamond, serif", fontSize:24, color:"#C9A84C", fontWeight:700, letterSpacing:"-0.01em" }}>QRfolio</span>
             </Link>
-            <p style={{ color:"rgba(138,132,120,0.65)", fontSize:13, lineHeight:1.65, maxWidth:220, margin:0 }}>
-              La page mobile qui remplace ta carte de visite. Un QR code dynamique, une page professionnelle.
+            <p style={{ color:"rgba(138,132,120,0.65)", fontSize:13, lineHeight:1.7, maxWidth:220, margin:0 }}>
+              QRfolio transforme les QR codes en expériences interactives.
             </p>
+            {/* Réseaux sociaux */}
+            <div className="fsoc" role="list" aria-label="Réseaux sociaux">
+              <a href="https://x.com/qrfolio" target="_blank" rel="noopener noreferrer" aria-label="QRfolio sur X (Twitter)" role="listitem">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              </a>
+              <a href="https://linkedin.com/company/qrfolio" target="_blank" rel="noopener noreferrer" aria-label="QRfolio sur LinkedIn" role="listitem">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              </a>
+              <a href="https://instagram.com/qrfolio" target="_blank" rel="noopener noreferrer" aria-label="QRfolio sur Instagram" role="listitem">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+              </a>
+            </div>
           </div>
 
-          {/* Produit */}
-          <div>
-            <p className="footer-col-title">Produit</p>
-            <Link href="#features"  className="footer-link">Fonctionnalites</Link>
-            <Link href="#templates" className="footer-link">Templates</Link>
-            <Link href="#pricing"   className="footer-link">Tarifs</Link>
-            <Link href="/dashboard/builder" className="footer-link">Builder</Link>
-          </div>
+          {/* Col 2: Produit */}
+          <nav aria-label="Navigation Produit">
+            <p className="fc-title">Produit</p>
+            <Link href="/features"          className="fl">Fonctionnalités</Link>
+            <Link href="/#templates"        className="fl">Templates</Link>
+            <Link href="/dashboard/builder" className="fl">Builder</Link>
+            <Link href="/#analytics"        className="fl">Analytics</Link>
+            <Link href="/#qr-dynamique"     className="fl">QR Codes</Link>
+            <Link href="/#pricing"          className="fl">Tarifs</Link>
+          </nav>
 
-          {/* Ressources */}
-          <div>
-            <p className="footer-col-title">Ressources</p>
-            <Link href="#faq"      className="footer-link">FAQ</Link>
-            <Link href="#examples" className="footer-link">Exemples</Link>
-            <Link href="/contact" className="footer-link">Contact</Link>
-          </div>
+          {/* Col 3: Ressources */}
+          <nav aria-label="Navigation Ressources">
+            <p className="fc-title">Ressources</p>
+            <Link href="/#faq"     className="fl">FAQ</Link>
+            <Link href="/examples" className="fl">Exemples</Link>
+            <Link href="/contact"  className="fl">Contact</Link>
+            <span className="fl fl-soon" aria-label="Blog — bientôt disponible">Blog</span>
+          </nav>
 
-          {/* Legal */}
-          <div>
-            <p className="footer-col-title">Legal</p>
-            <Link href="/privacy"  className="footer-link">Confidentialite</Link>
-            <Link href="/terms"    className="footer-link">Conditions</Link>
-            <Link href="/legal"    className="footer-link">Mentions legales</Link>
-          </div>
+          {/* Col 4: Légal */}
+          <nav aria-label="Navigation Légal">
+            <p className="fc-title">Légal</p>
+            <Link href="/privacy" className="fl">Confidentialité</Link>
+            <Link href="/terms"   className="fl">Conditions</Link>
+            <Link href="/legal"   className="fl">Mentions légales</Link>
+          </nav>
+
+          {/* Col 5: Entreprise */}
+          <nav aria-label="Navigation Entreprise">
+            <p className="fc-title">Entreprise</p>
+            <span className="fl fl-soon" aria-label="À propos — bientôt disponible">À propos</span>
+            <span className="fl fl-soon" aria-label="Roadmap — bientôt disponible">Roadmap</span>
+            <span className="fl fl-soon" aria-label="Changelog — bientôt disponible">Changelog</span>
+          </nav>
 
         </div>
 
-        {/* Bottom bar */}
-        <div style={{
-          borderTop:"1px solid rgba(255,255,255,0.05)",
-          paddingTop:24,
-        }}>
-          <div className="footer-bottom">
-            <p style={{ color:"rgba(138,132,120,0.45)", fontSize:12.5, margin:0 }}>
-              © 2026 QRfolio. Tous droits reserves.
+        {/* Barre bas */}
+        <div className="fb" role="contentinfo">
+          <div style={{ display:"flex",alignItems:"center",gap:20,flexWrap:"wrap" }}>
+            <p style={{ color:"rgba(138,132,120,0.45)",fontSize:12,margin:0 }}>
+              © {new Date().getFullYear()} QRfolio. Tous droits réservés.
             </p>
-            <div style={{ display:"flex", gap:20 }}>
-              {[["Confidentialite","/privacy"],["Conditions","/terms"]].map(([label,href])=>(
-                <Link key={href} href={href} style={{
-                  color:"rgba(138,132,120,0.4)", fontSize:12, textDecoration:"none",
-                  transition:"color 0.2s",
-                }}
+            <span style={{ color:"rgba(138,132,120,0.2)",fontSize:12 }} aria-hidden="true">·</span>
+            <span style={{ color:"rgba(138,132,120,0.35)",fontSize:11,fontFamily:"monospace" }}>
+              v1.0.0
+            </span>
+          </div>
+          <div style={{ display:"flex",alignItems:"center",gap:16,flexWrap:"wrap" }}>
+            <a href="https://status.qrfolio.app" target="_blank" rel="noopener noreferrer" className="fstatus" aria-label="Statut de la plateforme — Tous les systèmes opérationnels">
+              <span className="fstatus-dot" aria-hidden="true"/>
+              Tous les systèmes opérationnels
+            </a>
+            <div style={{ display:"flex",gap:14 }}>
+              {([["Confidentialité","/privacy"],["Conditions","/terms"]] as const).map(([lbl,href])=>(
+                <Link key={href} href={href} style={{ color:"rgba(138,132,120,0.4)",fontSize:12,textDecoration:"none",transition:"color 0.2s" }}
                   onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color="#C9A84C"}}
                   onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color="rgba(138,132,120,0.4)"}}>
-                  {label}
+                  {lbl}
                 </Link>
               ))}
             </div>
