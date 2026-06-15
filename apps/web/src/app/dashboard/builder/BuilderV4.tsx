@@ -2647,7 +2647,7 @@ function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange:
     }
     return null
   }
-  const [patternTypeLocal, setPatternType] = useState<string>((theme as any).bgPattern||"dots")
+  const [patternType, setPatternType] = useState<string>((theme as any).bgPattern||"dots")
   const [effectNoise, setEffectNoise] = useState(false)
   const [effectGlow, setEffectGlow] = useState(false)
   const [effectVignette, setEffectVignette] = useState(false)
