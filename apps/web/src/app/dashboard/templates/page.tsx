@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
@@ -92,12 +92,26 @@ export default function TemplatesPage() {
   const [activePlan,   setActivePlan]   = useState("all")
   const [search,       setSearch]       = useState("")
   const [creating,     setCreating]     = useState<string | null>(null)
-  const [userPlan]                      = useState("free")
+  const [userPlan,     setUserPlan]     = useState("free")
   const [favs,         setFavs]         = useState<string[]>([])
   const [preview,      setPreview]      = useState<string | null>(null)
   const [hoveredCard,  setHoveredCard]  = useState<string | null>(null)
   const [isCreating,   setIsCreating]   = useState(false)
+  const [toast,        setToast]        = useState<{type:"success"|"error",msg:string}|null>(null)
   const router = useRouter()
+
+  // Fetch user plan
+  useEffect(() => {
+    (async () => {
+      try {
+        const sb = createClient()
+        const { data: { user } } = await sb.auth.getUser()
+        if (!user) return
+        const { data: profile } = await sb.from("profiles").select("plan").eq("id", user.id).single()
+        if (profile?.plan) setUserPlan(profile.plan)
+      } catch {}
+    })()
+  }, [])
 
   useEffect(() => {
     try { setFavs(JSON.parse(localStorage.getItem(FAV_KEY) || "[]")) } catch {}
@@ -138,27 +152,93 @@ export default function TemplatesPage() {
 
   function canUse(plan: string) { return PLAN_RANK[userPlan] >= PLAN_RANK[plan] }
 
+  // Thèmes complets par template (utilise les PRESET_THEMES officiels)
+  const TEMPLATE_THEMES: Record<string, any> = {
+    freelance:      { name:"Midnight Gold",bg:"#080808",surface:"#111009",primary:"#C9A84C",accent:"#39FF8F",text:"#F5F0E8",muted:"#8A8478",fontDisplay:"Cormorant Garamond",fontBody:"DM Sans",bgMode:"solid",effect_glow:true,glow_color:"#C9A84C",glow_intensity:20,glow_size:350 },
+    restaurant:     { name:"Sunset Fire",bg:"#120300",surface:"#200800",primary:"#FF6B00",accent:"#FF4500",text:"#FFF5EE",muted:"#9A5020",fontDisplay:"Playfair Display",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#120300,#1F0600)",effect_vignette:true,vignette_intensity:60 },
+    artiste:        { name:"Velvet Noir",bg:"#070508",surface:"#0F0A12",primary:"#C4A6E8",accent:"#F472B6",text:"#F5F0FF",muted:"#7A6A9A",fontDisplay:"Cormorant Garamond",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#070508,#100818)",effect_glow:true,glow_color:"#A78BFA",glow_intensity:25,glow_size:350 },
+    coach:          { name:"Zen Wellness",bg:"#F5FFF5",surface:"#EAFAEA",primary:"#059669",accent:"#34D399",text:"#064E3B",muted:"#407A60",fontDisplay:"DM Sans",fontBody:"DM Sans",bgMode:"solid" },
+    createur:       { name:"Neon Creator",bg:"#030303",surface:"#0A0A0A",primary:"#FF0080",accent:"#00FFFF",text:"#F8F0FF",muted:"#808080",fontDisplay:"Space Grotesk",fontBody:"Space Grotesk",bgMode:"solid",effect_glow:true,glow_color:"#FF0080",glow_intensity:30,glow_size:300 },
+    event:          { name:"Festival Night",bg:"#020008",surface:"#060012",primary:"#FF6B35",accent:"#FFD700",text:"#FFF5F0",muted:"#806050",fontDisplay:"Space Grotesk",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#020008,#08001A)",effect_glow:true,glow_color:"#FF6B35",glow_intensity:25,glow_size:350 },
+    ecommerce:      { name:"Hype Orange",bg:"#0A0500",surface:"#150A00",primary:"#FF6D00",accent:"#FFD600",text:"#FFF3E0",muted:"#9A6020",fontDisplay:"Space Grotesk",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#0A0500,#180A00)" },
+    coiffeur:       { name:"Rose Luxe",bg:"#0A0008",surface:"#150010",primary:"#EC4899",accent:"#F9A8D4",text:"#FFF0F8",muted:"#9060A0",fontDisplay:"DM Sans",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#0A0008,#180018)",effect_glow:true,glow_color:"#EC4899",glow_intensity:25,glow_size:350 },
+    agence:         { name:"Deep Space",bg:"#020B16",surface:"#071828",primary:"#00D4FF",accent:"#7B2FBE",text:"#EEF8FF",muted:"#5A7A9A",fontDisplay:"Space Grotesk",fontBody:"Inter",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#020B16,#071828)" },
+    medecin:        { name:"Zen Wellness",bg:"#F5FFF5",surface:"#EAFAEA",primary:"#059669",accent:"#34D399",text:"#064E3B",muted:"#407A60",fontDisplay:"DM Sans",fontBody:"DM Sans",bgMode:"solid" },
+    vente_produits: { name:"Velvet Noir",bg:"#070508",surface:"#0F0A12",primary:"#C4A6E8",accent:"#F472B6",text:"#F5F0FF",muted:"#7A6A9A",fontDisplay:"Cormorant Garamond",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#070508,#100818)" },
+    immobilier:     { name:"Prestige Immo",bg:"#0C0C0C",surface:"#161616",primary:"#D4AF37",accent:"#C9A84C",text:"#F5F0E0",muted:"#8A7840",fontDisplay:"Cormorant Garamond",fontBody:"DM Sans",bgMode:"solid",effect_glow:true,glow_color:"#D4AF37",glow_intensity:15,glow_size:400 },
+    startup:        { name:"Aurora",bg:"#080E1E",surface:"#0E1830",primary:"#00FF9D",accent:"#00CFFF",text:"#E8FFF5",muted:"#409898",fontDisplay:"Space Grotesk",fontBody:"Inter",bgMode:"mesh",mesh_c1:"#00FF9D",mesh_c2:"#00CFFF",mesh_c3:"#7B2FBE",mesh_blur:100 },
+    influenceur:    { name:"Golden Luxury",bg:"#060400",surface:"#120D00",primary:"#D4A843",accent:"#FFC940",text:"#FFF3D0",muted:"#8A7030",fontDisplay:"Cormorant Garamond",fontBody:"Lora",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#060400,#130E00,#060400)" },
+  }
+
   async function createFromTemplate(templateId: string) {
     const template = TEMPLATES.find((t: any) => t.id === templateId)
-    if (!template) return
-    if (!canUse(template.plan)) { router.push("/upgrade"); return }
-    setCreating(templateId)
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push("/auth/login"); return }
-    const slug = templateId + "-" + Date.now().toString(36)
-    const { data: page, error } = await supabase.from("pages").insert({
-      user_id: user.id, title: template.name, slug, status: "draft", template_id: templateId,
-      theme: { name: template.name, bg: template.bg, surface: template.surface, primary: template.color, accent: template.accent, text: "#F5F0E8", muted: "#8A8478", fontDisplay: "Cormorant Garamond, serif", fontBody: "DM Sans, sans-serif" },
-    }).select().single()
-    if (error || !page) { setCreating(null); return }
-    const blocks = TEMPLATE_BLOCKS[templateId] || []
-    if (blocks.length > 0) {
-      await supabase.from("blocks").insert(blocks.map((b: any, i: number) => ({ page_id: page.id, type: b.type, position: i, content: b.content, is_visible: true, styles: {} })))
+    if (!template) {
+      setToast({ type: "error", msg: "Template introuvable." })
+      return
     }
-    const shortCode = Math.random().toString(36).slice(2, 10)
-    await supabase.from("qr_codes").insert({ page_id: page.id, user_id: user.id, short_code: shortCode })
-    router.push("/dashboard/builder/" + page.id)
+    if (!canUse(template.plan)) {
+      router.push("/upgrade")
+      return
+    }
+    setCreating(templateId)
+    try {
+      const supabase = createClient()
+      const { data: { user }, error: authErr } = await supabase.auth.getUser()
+      if (authErr || !user) { router.push("/auth/login"); return }
+
+      const slug = templateId + "-" + Date.now().toString(36)
+      const theme = TEMPLATE_THEMES[templateId] || TEMPLATE_THEMES["freelance"]
+
+      const { data: newPage, error: pageErr } = await supabase
+        .from("pages")
+        .insert({
+          user_id: user.id,
+          title: template.name,
+          slug,
+          status: "draft",
+          template_id: templateId,
+          theme,
+        })
+        .select()
+        .single()
+
+      if (pageErr || !newPage) {
+        setToast({ type: "error", msg: pageErr?.message || "Erreur lors de la création de la page." })
+        setCreating(null)
+        return
+      }
+
+      // Blocs avec contenu prérempli
+      const blocks = TEMPLATE_BLOCKS[templateId] || []
+      if (blocks.length > 0) {
+        const { error: blocksErr } = await supabase.from("blocks").insert(
+          blocks.map((b: any, i: number) => ({
+            page_id: newPage.id,
+            type: b.type,
+            position: i,
+            content: b.content || {},
+            is_visible: true,
+            styles: {},
+          }))
+        )
+        if (blocksErr) console.warn("Blocks insert warning:", blocksErr.message)
+      }
+
+      // QR code dynamique
+      const shortCode = Math.random().toString(36).slice(2, 10)
+      await supabase.from("qr_codes").insert({
+        page_id: newPage.id,
+        user_id: user.id,
+        short_code: shortCode,
+      })
+
+      setToast({ type: "success", msg: "Page créée ! Redirection vers le builder…" })
+      setTimeout(() => router.push("/dashboard/builder/" + newPage.id), 800)
+
+    } catch (err: any) {
+      setToast({ type: "error", msg: err?.message || "Erreur réseau. Réessaie." })
+      setCreating(null)
+    }
   }
 
   const G = "#C9A84C"
@@ -443,6 +523,30 @@ export default function TemplatesPage() {
       )}
 
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+
+      {/* Toast notification */}
+      {toast && (
+        <div style={{
+          position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)",
+          zIndex: 9999, display: "flex", alignItems: "center", gap: 10,
+          background: toast.type === "success" ? "rgba(57,255,143,0.12)" : "rgba(239,68,68,0.12)",
+          border: `1px solid ${toast.type === "success" ? "rgba(57,255,143,0.4)" : "rgba(239,68,68,0.4)"}`,
+          borderRadius: 12, padding: "12px 20px",
+          backdropFilter: "blur(16px)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+          color: toast.type === "success" ? "#39FF8F" : "#F87171",
+          fontSize: 14, fontWeight: 600,
+          animation: "popIn 0.3s cubic-bezier(0.34,1.56,0.64,1)",
+        }}>
+          <span>{toast.type === "success" ? "✓" : "⚠"}</span>
+          <span>{toast.msg}</span>
+          <button onClick={() => setToast(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "inherit", fontSize: 16, lineHeight: 1, marginLeft: 8 }}>×</button>
+        </div>
+      )}
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg) } }
+        @keyframes popIn { from { opacity:0; transform:translateX(-50%) translateY(8px) scale(0.95) } to { opacity:1; transform:translateX(-50%) translateY(0) scale(1) } }
+      `}</style>
     </div>
   )
 }
