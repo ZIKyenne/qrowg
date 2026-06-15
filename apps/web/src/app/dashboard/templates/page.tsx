@@ -203,10 +203,10 @@ export default function TemplatesPage() {
       setTimeout(() => router.push("/dashboard/builder/" + json.pageId), 800)
 
     } catch (err: any) {
-      setToast({ type: "error", msg: err?.message || "Erreur reseau." })
+      setToast({ type: "error", msg: (err as any)?.message || "Erreur reseau." })
       setCreating(null)
+    }
   }
-
   const G = "#C9A84C"
   const MUTED = "#8A8478"
   const previewTemplate  = TEMPLATES.find((t: any) => t.id === preview)

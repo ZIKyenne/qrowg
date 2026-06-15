@@ -9,7 +9,12 @@ export async function POST(req: NextRequest) {
     const supabaseUser = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { cookies: { getAll: () => cookieStore.getAll(), setAll: (c) => c.forEach(({ name, value, options }) => cookieStore.set(name, value, options)) } }
+      {
+        cookies: {
+          getAll: () => cookieStore.getAll(),
+          setAll: (c) => c.forEach(({ name, value, options }) => cookieStore.set(name, value, options)),
+        },
+      }
     )
 
     const { data: { user }, error: authError } = await supabaseUser.auth.getUser()
@@ -26,12 +31,12 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { templateId, templateName, slug, theme, blocks } = body
 
-    const { data: page, error: pageError } = await supabaseAdmin
+    const { data: newPage, error: pageError } = await supabaseAdmin
       .from("pages")
       .insert({
         user_id: user.id,
         title: templateName || "Ma page",
-        slug: slug || templateId + "-" + Date.now().toString(36),
+        slug: slug || (templateId + "-" + Date.now().toString(36)),
         status: "draft",
         template_id: templateId,
         theme: theme || {},
@@ -39,14 +44,17 @@ export async function POST(req: NextRequest) {
       .select()
       .single()
 
-    if (pageError || !page) {
-      return NextResponse.json({ error: pageError?.message || "Erreur creation page" }, { status: 500 })
+    if (pageError || !newPage) {
+      return NextResponse.json(
+        { error: pageError?.message || "Erreur creation page" },
+        { status: 500 }
+      )
     }
 
-    if (blocks && blocks.length > 0) {
+    if (Array.isArray(blocks) && blocks.length > 0) {
       await supabaseAdmin.from("blocks").insert(
         blocks.map((b: any, i: number) => ({
-          page_id: page.id,
+          page_id: newPage.id,
           type: b.type,
           position: i,
           content: b.content || {},
@@ -58,14 +66,17 @@ export async function POST(req: NextRequest) {
 
     const shortCode = Math.random().toString(36).slice(2, 10)
     await supabaseAdmin.from("qr_codes").insert({
-      page_id: page.id,
+      page_id: newPage.id,
       user_id: user.id,
       short_code: shortCode,
     })
 
-    return NextResponse.json({ pageId: page.id, success: true })
+    return NextResponse.json({ pageId: newPage.id, success: true })
 
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Erreur serveur" }, { status: 500 })
+    return NextResponse.json(
+      { error: err?.message || "Erreur serveur" },
+      { status: 500 }
+    )
   }
 }
