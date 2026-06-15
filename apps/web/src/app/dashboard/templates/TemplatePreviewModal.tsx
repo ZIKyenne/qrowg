@@ -2693,10 +2693,10 @@ export default function TemplatePreviewModal({
 
                 {/* Blocs */}
                 <div style={{ minHeight: "100%" }}>
-                  {previewBlocks.map((block, i) => (
+                  {(canUse ? previewBlocks : previewBlocks.slice(0, 2)).map((block, i) => (
                     <BlockPreview key={i} block={block} theme={theme} dayMode={false} />
                   ))}
-                  <div style={{ height: 40 }} />
+                  {!canUse && (<div style={{ margin: "8px 16px 0", padding: "24px 16px", borderRadius: 14, background: theme.primary + "0A", border: "1px solid " + theme.primary + "25", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}><div style={{ width: 40, height: 40, borderRadius: "50%", background: theme.primary + "18", border: "1px solid " + theme.primary + "40", display: "flex", alignItems: "center", justifyContent: "center" }}><Lock size={16} color={theme.primary} /></div><p style={{ color: theme.text, fontSize: 13, fontWeight: 700, margin: 0 }}>Apercu limite</p><p style={{ color: theme.muted, fontSize: 11, margin: 0, lineHeight: 1.5 }}>{previewBlocks.length > 2 ? "+" + (previewBlocks.length - 2) + " blocs reserves au plan superieur" : "Reserve a un plan superieur"}</p></div>)}<div style={{ height: 40 }} />
                 </div>
               </div>
             </div>
