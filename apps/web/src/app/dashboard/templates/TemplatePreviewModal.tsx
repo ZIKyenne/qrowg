@@ -2760,7 +2760,7 @@ export default function TemplatePreviewModal({
           <div>
             <p style={{ color: MUTED, fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 10px" }}>Blocs du template</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 5, maxHeight: 220, overflowY: "auto", scrollbarWidth: "none" }}>
-              {blocks.map((block, i) => {
+            {(canUse ? blocks : blocks.slice(0, 3)).map((block, i) => {
                 const def = BLOCK_DEFS[block.type]
                 return (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 8 }}>
@@ -2771,7 +2771,13 @@ export default function TemplatePreviewModal({
                   </div>
                 )
               })}
-            </div>
+         </div>
+            {!canUse && blocks.length > 3 && (
+              <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", marginTop: 5, background: "rgba(201,168,76,0.06)", border: "1px dashed rgba(201,168,76,0.3)", borderRadius: 8 }}>
+                <Lock size={11} color={template.color} />
+                <span style={{ color: MUTED, fontSize: 11, fontWeight: 500, flex: 1 }}>+{blocks.length - 3} blocs reserves au plan superieur</span>
+              </div>
+            )}
           </div>
 
           {/* Tags */}
