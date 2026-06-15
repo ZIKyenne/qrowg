@@ -1,0 +1,64 @@
+import type { Metadata } from "next"
+import { LegalLayout } from "@/components/legal-layout"
+
+export const metadata: Metadata = {
+  title: "Conditions d’utilisation",
+  description: "Conditions générales d’utilisation du service QRfolio.",
+  robots: { index: true, follow: true },
+  alternates: { canonical: "https://qrfolio.app/terms" },
+}
+
+export default function TermsPage() {
+  return (
+    <LegalLayout title="Conditions d’utilisation" updated="15 juin 2026">
+      <div className="ls">
+        <p>Les présentes conditions générales régissent l’accès et l’utilisation du service QRfolio. En utilisant QRfolio, vous les acceptez intégralement.</p>
+      </div>
+      <div className="ls">
+        <h2>1. Description du service</h2>
+        <p>QRfolio est un service permettant de créer des pages mobiles professionnelles associées à des QR codes dynamiques, et d’en suivre les performances.</p>
+      </div>
+      <div className="ls">
+        <h2>2. Utilisation acceptable</h2>
+        <p>Il est interdit de :</p>
+        <ul>
+          <li>Publier du contenu illicite, frauduleux ou portant atteinte à des droits de tiers</li>
+          <li>Utiliser le service à des fins de spam ou d’activités malveillantes</li>
+          <li>Tenter de contourner les mesures de sécurité</li>
+          <li>Revendre l’accès sans autorisation écrite</li>
+          <li>Automatiser des accès de manière abusive</li>
+        </ul>
+      </div>
+      <div className="ls">
+        <h2>3. Abonnements et facturation</h2>
+        <h3>Plans disponibles</h3>
+        <p>Free (0€), Pro (à9,90€/mois), Business (24,90€/mois). Prix en euros, hors taxes applicables.</p>
+        <h3>Paiement</h3>
+        <p>Les paiements sont traités par Stripe. En souscrivant, vous autorisez le débit automatique à chaque période de facturation.</p>
+        <h3>Essai gratuit</h3>
+        <p>Les nouveaux abonnements Pro bénéficient de 14 jours d’essai gratuit. Aucun paiement n’est prélevé pendant cette période.</p>
+      </div>
+      <div className="ls">
+        <h2>4. Résiliation</h2>
+        <p>Vous pouvez résilier à tout moment depuis Paramètres. La résiliation prend effet à la fin de la période en cours. Aucun remboursement prorata.</p>
+        <p>Votre compte passe en Free. Vos données sont conservées 30 jours avant suppression.</p>
+      </div>
+      <div className="ls">
+        <h2>5. Propriété intellectuelle</h2>
+        <p>Le service QRfolio et son interface sont la propriété exclusive de QRfolio. Vous conservez la propriété des contenus que vous publiez.</p>
+      </div>
+      <div className="ls">
+        <h2>6. Disponibilité</h2>
+        <p>QRfolio s’efforce de maintenir une disponibilité maximale. Des interruptions pour maintenance peuvent survenir. QRfolio ne saurait être tenu responsable des pertes liées à une indisponibilité.</p>
+      </div>
+      <div className="ls">
+        <h2>7. Limitation de responsabilité</h2>
+        <p>La responsabilité de QRfolio est limitée au montant payé sur les 3 derniers mois. QRfolio n’est pas responsable des dommages indirects ou pertes de données.</p>
+      </div>
+      <div className="ls">
+        <h2>8. Droit applicable</h2>
+        <p>Ces conditions sont régies par le droit français. Tout litige sera soumis aux tribunaux compétents de Paris.</p>
+      </div>
+    </LegalLayout>
+  )
+}

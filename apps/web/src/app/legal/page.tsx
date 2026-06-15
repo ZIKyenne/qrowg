@@ -1,0 +1,53 @@
+import type { Metadata } from "next"
+import { LegalLayout } from "@/components/legal-layout"
+
+export const metadata: Metadata = {
+  title: "Mentions légales",
+  description: "Mentions légales du service QRfolio.",
+  robots: { index: true, follow: true },
+  alternates: { canonical: "https://qrfolio.app/legal" },
+}
+
+export default function LegalPage() {
+  return (
+    <LegalLayout title="Mentions légales" updated="15 juin 2026">
+      <div className="ls">
+        <h2>Éditeur du site</h2>
+        <p>
+          <strong>Raison sociale :</strong> <span className="lph">[ Nom société ]</span><br />
+          <strong>Forme juridique :</strong> <span className="lph">[ SAS / SASU / Auto-entrepreneur ]</span><br />
+          <strong>SIRET :</strong> <span className="lph">[ Numéro SIRET ]</span><br />
+          <strong>Siège social :</strong> <span className="lph">[ Adresse complète ]</span><br />
+          <strong>Directeur de la publication :</strong> <span className="lph">[ Nom Prénom ]</span>
+        </p>
+      </div>
+      <div className="ls">
+        <h2>Contact</h2>
+        <p>
+          <strong>E-mail :</strong> <a href="mailto:contact@qrfolio.app">contact@qrfolio.app</a><br />
+          <strong>Support :</strong> <a href="mailto:support@qrfolio.app">support@qrfolio.app</a><br />
+          <strong>RGPD :</strong> <a href="mailto:privacy@qrfolio.app">privacy@qrfolio.app</a>
+        </p>
+      </div>
+      <div className="ls">
+        <h2>Hébergement</h2>
+        <p><strong>Hébergeur :</strong> Vercel Inc. — 340 Pine Street, San Francisco, CA 94104 — <a href="https://vercel.com" target="_blank" rel="noopener noreferrer">vercel.com</a></p>
+        <p><strong>Base de données :</strong> Supabase Inc. — <a href="https://supabase.com" target="_blank" rel="noopener noreferrer">supabase.com</a></p>
+        <p><strong>Paiements :</strong> Stripe, Inc. — 510 Townsend Street, San Francisco, CA 94103 — <a href="https://stripe.com" target="_blank" rel="noopener noreferrer">stripe.com</a></p>
+      </div>
+      <div className="ls">
+        <h2>Propriété intellectuelle</h2>
+        <p>L’ensemble du contenu de QRfolio est protégé par le droit de la propriété intellectuelle. Toute reproduction sans autorisation écrite est interdite.</p>
+      </div>
+      <div className="ls">
+        <h2>Cookies</h2>
+        <p>QRfolio utilise des cookies nécessaires au fonctionnement. Voir notre <a href="/privacy">Politique de confidentialité</a>.</p>
+      </div>
+      <div className="ls">
+        <h2>Médiation</h2>
+        <p>En cas de litige non résolu : <a href="mailto:contact@qrfolio.app">contact@qrfolio.app</a></p>
+        <p>Plateforme européenne : <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a></p>
+      </div>
+    </LegalLayout>
+  )
+}
