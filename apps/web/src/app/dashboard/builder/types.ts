@@ -90,7 +90,8 @@ export const PRESET_CATEGORIES = [
   { id: "Fitness",      icon: "💪", color: "#EF4444" },
   { id: "Event",        icon: "🎉", color: "#F59E0B" },
   { id: "Music",        icon: "🎵", color: "#1DB954" },
-  { id: "Portfolio",    icon: "📐", color: "#6366F1" },
+  { id: "Portfolio",        icon: "📐", color: "#6366F1" },
+  { id: "QRfolio Signature", icon: "✦",  color: "#C9A84C" },
 ] as const
 
 // ── 50+ Google Fonts ──────────────────────────────────────────────────────────

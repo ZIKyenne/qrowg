@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useRef, useEffect, useCallback } from "react"
 import {
@@ -3526,6 +3526,8 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
   const [saved, setSaved] = useState(false)
   const [showPublishPopup, setShowPublishPopup] = useState(false)
   const [publishing, setPublishing] = useState(false)
+  const [publishSuccess, setPublishSuccess] = useState(false)
+  const [publishError, setPublishError] = useState("")
   const [qrCodeUrl, setQrCodeUrl] = useState("")
   const [qrShortCode, setQrShortCode] = useState("")
   const [showQrPanel, setShowQrPanel] = useState(false)
@@ -3792,8 +3794,21 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
   async function handlePublish() {
     if (!pageId) return
     setPublishing(true)
-    await createClient().from("pages").update({ status: "published", published_at: new Date().toISOString() }).eq("id", pageId)
-    setPageStatus("published"); setPublishing(false); setShowPublishPopup(false)
+    setPublishError("")
+    try {
+      const { error } = await createClient()
+        .from("pages")
+        .update({ status: "published", published_at: new Date().toISOString() })
+        .eq("id", pageId)
+      if (error) throw error
+      setPageStatus("published")
+      setPublishSuccess(true)
+      setTimeout(() => setPublishSuccess(false), 3500)
+    } catch (err: any) {
+      setPublishError(err?.message || "Erreur lors de la publication.")
+    } finally {
+      setPublishing(false)
+    }
   }
 
   function addBlock(type: string, content?: BlockContent) {
@@ -4008,6 +4023,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
   // Fond du thème appliqué partout
   function bgStyle(): React.CSSProperties {
     if (dayMode) return { background: "#FAFAFA" }
+    if (!theme) return { background: "#080808" }
     const t = theme as any
     let base: React.CSSProperties = {}
 
@@ -4026,6 +4042,10 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         case "hexagons": bgImg = `radial-gradient(circle, ${c} 2px, transparent 2px)`; break
         case "circles": bgImg = `radial-gradient(circle, transparent ${patSize*0.3}px, ${c} ${patSize*0.3}px, ${c} ${patSize*0.32}px, transparent ${patSize*0.32}px)`; break
         case "zigzag": bgImg = `linear-gradient(135deg, ${c} 25%, transparent 25%), linear-gradient(225deg, ${c} 25%, transparent 25%)`; break
+        case "waves": bgImg = `repeating-linear-gradient(90deg, ${c} 0px, ${c} 1px, transparent 1px, transparent ${patSize}px), repeating-linear-gradient(180deg, ${c} 0px, ${c} 1px, transparent 1px, transparent ${patSize}px)`; break
+        case "squares": bgImg = `linear-gradient(${c} 1px, transparent 1px), linear-gradient(90deg, ${c} 1px, transparent 1px)`; break
+        case "circles": bgImg = `radial-gradient(circle, transparent ${patSize*0.3}px, ${c} ${patSize*0.3}px, ${c} ${patSize*0.32}px, transparent ${patSize*0.32}px)`; break
+        case "stars": bgImg = `radial-gradient(circle, ${c} 1.5px, transparent 1.5px), radial-gradient(circle at ${patSize/2}px ${patSize/2}px, ${c} 1.5px, transparent 1.5px)`; break
         default: bgImg = `radial-gradient(circle, ${c} 1px, transparent 1px)`
       }
       base = { background: theme.bg, backgroundImage: bgImg, backgroundSize: `${patSize}px ${patSize}px` }
@@ -4217,9 +4237,26 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                 {/* Bouton principal */}
                 <button onClick={handlePublish} disabled={publishing || pageStatus==="published"}
                   style={{ width: "100%", background: pageStatus==="published" ? "rgba(57,255,143,0.1)" : `linear-gradient(90deg,${G},#b8953f)`, border: pageStatus==="published" ? "1px solid rgba(57,255,143,0.3)" : "none", borderRadius: 12, padding: "14px", color: pageStatus==="published" ? "#39FF8F" : "#080808", fontSize: 14, fontWeight: 700, cursor: pageStatus==="published" ? "default" : "pointer", marginBottom: pageSlug ? 10 : 0, boxShadow: pageStatus==="published" ? "none" : "0 4px 20px rgba(201,168,76,0.3)" }}>
-                  {publishing ? "⏳ Publication..." : pageStatus==="published" ? "✓ Déjà publié" : "🚀 Publier maintenant"}
+                  {publishing ? (
+                    <span style={{display:"flex",alignItems:"center",gap:8,justifyContent:"center"}}>
+                      <span style={{display:"inline-block",width:14,height:14,border:"2px solid #08080880",borderTopColor:"#080808",borderRadius:"50%",animation:"spin 0.7s linear infinite"}} />
+                      Publication…
+                    </span>
+                  ) : publishSuccess ? (
+                    <span style={{display:"flex",alignItems:"center",gap:8,justifyContent:"center"}}>
+                      <span style={{fontSize:16}}>✓</span> Page publiée !
+                    </span>
+                  ) : pageStatus==="published" ? "✓ Déjà publiée" : "🚀 Publier maintenant"}
                 </button>
 
+                {/* Erreur publication */}
+                {publishError && (
+                  <div style={{marginBottom:10,padding:"9px 12px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.25)",borderRadius:9,color:"#F87171",fontSize:12,display:"flex",alignItems:"center",gap:6}}>
+                    <span>⚠</span>
+                    <span>{publishError}</span>
+                    <button onClick={()=>setPublishError("")} style={{marginLeft:"auto",background:"none",border:"none",cursor:"pointer",color:"#F87171",fontSize:14,lineHeight:1}}>×</button>
+                  </div>
+                )}
                 {/* Voir la page */}
                 {pageSlug && (
                   <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer"
@@ -4782,7 +4819,12 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
                     <div style={{ position: "absolute", left: -3, top: 146, width: 3, height: 38, background: "#2A2A2A", borderRadius: "2px 0 0 2px" }} />
                     <div style={{ position: "absolute", right: -3, top: 96, width: 3, height: 58, background: "#2A2A2A", borderRadius: "0 2px 2px 0" }} />
 
-                    <div style={{ borderRadius: 26, overflow: "hidden", ...bgStyle() }}>
+                    <div style={{ borderRadius: 26, overflow: "hidden", ...bgStyle(), position: "relative" }}>
+                      {/* Overlays sync canvas */}
+                      {(theme as any).effect_noise && <div style={{ position:"absolute",inset:0,zIndex:2,pointerEvents:"none",opacity:(theme as any).noise_opacity?((theme as any).noise_opacity/100):0.06,mixBlendMode:"overlay" as const,backgroundImage:NOISE_SVG_URL,backgroundRepeat:"repeat",backgroundSize:"128px 128px",borderRadius:26 }} />}
+                      {(theme as any).effect_glow && <div style={{ position:"absolute",inset:0,zIndex:2,pointerEvents:"none",background:`radial-gradient(ellipse at 50% 0%, ${(theme as any).glow_color||"#C9A84C"}${Math.round(((theme as any).glow_intensity||40)/100*180).toString(16).padStart(2,"0")}, transparent ${(theme as any).glow_size||300}px)`,borderRadius:26 }} />}
+                      {(theme as any).effect_overlay && <div style={{ position:"absolute",inset:0,zIndex:2,pointerEvents:"none",background:(theme as any).overlay_color||"#000000",opacity:((theme as any).overlay_opacity||30)/100,borderRadius:26 }} />}
+                      {(theme as any).effect_vignette && <div style={{ position:"absolute",inset:0,zIndex:2,pointerEvents:"none",background:`radial-gradient(ellipse at 50% 50%, transparent ${Math.max(10,100-((theme as any).vignette_intensity||40))}%, rgba(0,0,0,${((theme as any).vignette_intensity||40)/100}) 100%)`,borderRadius:26 }} />}
                       <div style={{ background: dayMode ? "#FAFAFA" : (theme.bgGradient||theme.bg), padding: "9px 0 3px", display: "flex", justifyContent: "center", position: "relative" }}>
                         <div style={{ width: 78, height: 20, background: "#000", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
                           <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#111", border: "1px solid #222" }} />
@@ -4972,6 +5014,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
         @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
         @keyframes auroraShift{0%{background-position:0% 0%}33%{background-position:100% 0%}66%{background-position:50% 100%}100%{background-position:0% 0%}}
+        @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
         .iphone-scroll::-webkit-scrollbar{display:none}
         .block-handle:active{cursor:grabbing}
         .panel-collapse{transition:width 0.25s cubic-bezier(0.4,0,0.2,1)}
