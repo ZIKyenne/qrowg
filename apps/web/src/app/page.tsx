@@ -19,48 +19,102 @@ function useInView(threshold = 0.15) {
 function Particles() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   useEffect(() => {
-    // Respecter prefers-reduced-motion
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)")
-    if (mq.matches) return
-
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
     const canvas = canvasRef.current!
     if (!canvas) return
     const ctx = canvas.getContext("2d", { alpha: true })!
 
-    // Adapter le nombre de particules selon l'appareil
     const isMobile = window.innerWidth < 768
-    const COUNT = isMobile ? 20 : 35
+    const COUNT = isMobile ? 28 : 50
 
     let W = canvas.width  = window.innerWidth
     let H = canvas.height = window.innerHeight
 
+    // Chaque particule a une phase d'animation pour le glow pulsant
     const pts = Array.from({ length: COUNT }, () => ({
-      x: Math.random() * W, y: Math.random() * H,
-      r: Math.random() * 1.2 + 0.2,
-      dx: (Math.random() - 0.5) * 0.25,
-      dy: (Math.random() - 0.5) * 0.25,
-      o: Math.random() * 0.4 + 0.08,
+      x:     Math.random() * W,
+      y:     Math.random() * H,
+      r:     Math.random() * 2.2 + 0.8,       // rayon 0.8-3px
+      dx:    (Math.random() - 0.5) * 0.35,
+      dy:    (Math.random() - 0.5) * 0.35,
+      o:     Math.random() * 0.55 + 0.35,      // opacité 0.35-0.9
+      phase: Math.random() * Math.PI * 2,      // phase aléatoire pour pulse décalé
+      speed: Math.random() * 0.018 + 0.008,    // vitesse du pulse
+      glowR: Math.random() * 14 + 8,           // rayon max du glow 8-22px
     }))
 
     let raf = 0
     let paused = false
+    let t = 0
 
-    // Pause quand onglet caché (économise la batterie)
     const onVisibility = () => { paused = document.hidden }
     document.addEventListener("visibilitychange", onVisibility)
 
     function draw() {
+      t += 0.016
       if (!paused) {
         ctx.clearRect(0, 0, W, H)
+
         for (const p of pts) {
+          // Pulse: glow scale oscille entre 0 et 1 (sin)
+          const pulse = (Math.sin(t * p.speed * 60 + p.phase) + 1) / 2  // 0..1
+          const glowRadius = p.glowR * (0.4 + pulse * 0.6)              // 40%→100%
+          const coreAlpha  = p.o * (0.6 + pulse * 0.4)                  // opacité core
+
+          // ── Glow radial (halo autour) ──────────────────────────────
+          const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowRadius)
+          grad.addColorStop(0,   `rgba(201,168,76,${(coreAlpha * 0.7).toFixed(2)})`)
+          grad.addColorStop(0.35,`rgba(201,168,76,${(coreAlpha * 0.25).toFixed(2)})`)
+          grad.addColorStop(0.7, `rgba(201,168,76,${(coreAlpha * 0.08).toFixed(2)})`)
+          grad.addColorStop(1,   `rgba(201,168,76,0)`)
           ctx.beginPath()
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
-          ctx.fillStyle = `rgba(201,168,76,${p.o})`
+          ctx.arc(p.x, p.y, glowRadius, 0, Math.PI * 2)
+          ctx.fillStyle = grad
           ctx.fill()
+
+          // ── Point central ──────────────────────────────────────────
+          ctx.beginPath()
+          ctx.arc(p.x, p.y, p.r * (0.7 + pulse * 0.3), 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(255,220,120,${coreAlpha.toFixed(2)})`
+          ctx.fill()
+
+          // Mouvement
           p.x += p.dx; p.y += p.dy
-          if (p.x < 0 || p.x > W) p.dx *= -1
-          if (p.y < 0 || p.y > H) p.dy *= -1
+          if (p.x < -glowRadius)   p.x = W + glowRadius
+          if (p.x > W + glowRadius) p.x = -glowRadius
+          if (p.y < -glowRadius)   p.y = H + glowRadius
+          if (p.y > H + glowRadius) p.y = -glowRadius
         }
+      }
+      raf = requestAnimationFrame(draw)
+    }
+    draw()
+
+    let resizeTimer = 0
+    const onResize = () => {
+      clearTimeout(resizeTimer)
+      resizeTimer = window.setTimeout(() => {
+        W = canvas.width  = window.innerWidth
+        H = canvas.height = window.innerHeight
+      }, 150) as unknown as number
+    }
+    window.addEventListener("resize", onResize, { passive: true })
+
+    return () => {
+      cancelAnimationFrame(raf)
+      clearTimeout(resizeTimer)
+      window.removeEventListener("resize", onResize)
+      document.removeEventListener("visibilitychange", onVisibility)
+    }
+  }, [])
+
+  return <canvas ref={canvasRef} style={{
+    position: "fixed", inset: 0, pointerEvents: "none",
+    zIndex: 0, opacity: 1,
+    transform: "translateZ(0)",
+    willChange: "transform",
+  }} />
+}
       }
       raf = requestAnimationFrame(draw)
     }
