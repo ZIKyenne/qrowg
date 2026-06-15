@@ -2580,41 +2580,176 @@ export default function HomePage() {
       <FAQSection />
 
       {/* CTA FINAL */}
-      <section style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
-        <FadeIn>
+      <section style={{ padding:"100px 48px 80px", position:"relative", zIndex:1 }}>
+        <style>{`
+          @keyframes ctaGlow{0%,100%{opacity:0.5}50%{opacity:1}}
+          @media(max-width:640px){ .cta-final-section{padding:72px 20px 60px!important;} }
+        `}</style>
+        <div style={{
+          maxWidth:720, margin:"0 auto", textAlign:"center",
+          position:"relative",
+        }}>
+          {/* Glow orb */}
+          <div aria-hidden="true" style={{
+            position:"absolute", top:"50%", left:"50%",
+            transform:"translate(-50%,-50%)",
+            width:400, height:200,
+            background:"radial-gradient(ellipse, rgba(201,168,76,0.12) 0%, transparent 70%)",
+            animation:"ctaGlow 4s ease-in-out infinite",
+            pointerEvents:"none",
+          }}/>
+
+          {/* Card */}
           <div style={{
-            maxWidth: 700, margin: "0 auto", textAlign: "center",
-            background: "linear-gradient(135deg, rgba(201,168,76,0.08), rgba(57,255,143,0.04))",
-            border: "1px solid rgba(201,168,76,0.25)", borderRadius: 24, padding: "64px 48px"
+            background:"linear-gradient(145deg, rgba(201,168,76,0.08), rgba(201,168,76,0.03))",
+            border:"1px solid rgba(201,168,76,0.28)",
+            borderRadius:24, padding:"60px 48px",
+            position:"relative", overflow:"hidden",
           }}>
-            <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(28px, 4vw, 44px)", color: "#F5F0E8", fontWeight: 700, margin: "0 0 20px" }}>
-              Prêt à te démarquer ?
+            {/* Corner accents */}
+            {[{top:0,left:0,bt:"2px solid rgba(201,168,76,0.5)",bl:"2px solid rgba(201,168,76,0.5)",br:0,bb:0,btr:"24px 0 0 0"},
+              {bottom:0,right:0,bb:"2px solid rgba(201,168,76,0.5)",br2:"2px solid rgba(201,168,76,0.5)",bt:0,bl:0,btr:"0 0 24px 0"}
+            ].map((_, idx) => idx === 0 ? (
+              <div key={0} aria-hidden="true" style={{
+                position:"absolute",top:0,left:0,width:40,height:40,
+                borderTop:"2px solid rgba(201,168,76,0.45)",
+                borderLeft:"2px solid rgba(201,168,76,0.45)",
+                borderRadius:"24px 0 0 0",pointerEvents:"none",
+              }}/>
+            ) : (
+              <div key={1} aria-hidden="true" style={{
+                position:"absolute",bottom:0,right:0,width:40,height:40,
+                borderBottom:"2px solid rgba(201,168,76,0.45)",
+                borderRight:"2px solid rgba(201,168,76,0.45)",
+                borderRadius:"0 0 24px 0",pointerEvents:"none",
+              }}/>
+            ))}
+
+            <h2 style={{
+              fontFamily:"Cormorant Garamond, serif",
+              fontSize:"clamp(28px,4vw,48px)",
+              color:"#F5F0E8", fontWeight:700,
+              margin:"0 0 20px", lineHeight:1.12,
+              letterSpacing:"-0.02em",
+            }}>
+              Pret a transformer ton QR code en{" "}
+              <span style={{ color:"#C9A84C" }}>vraie page professionnelle ?</span>
             </h2>
-            <p style={{ color: "#8A8478", fontSize: 18, marginBottom: 40, lineHeight: 1.6 }}>
-              Rejoins les créateurs qui utilisent QRfolio pour transformer leurs QR codes en expériences mémorables.
+
+            <p style={{
+              color:"rgba(138,132,120,0.85)", fontSize:17,
+              lineHeight:1.7, margin:"0 0 44px", maxWidth:520,
+              marginLeft:"auto", marginRight:"auto",
+            }}>
+              Cree ton QRfolio gratuitement, personnalise ta page et commence a suivre tes scans en quelques minutes.
             </p>
+
             <Link href="/auth/signup" style={{
-              background: "linear-gradient(90deg, #C9A84C, #39FF8F)",
-              color: "#080808", textDecoration: "none", fontSize: 16, fontWeight: 700,
-              padding: "18px 40px", borderRadius: 12, display: "inline-block",
-              boxShadow: "0 4px 32px rgba(201,168,76,0.3)", transition: "all 0.2s"
+              display:"inline-flex", alignItems:"center", gap:10,
+              background:"linear-gradient(90deg,#C9A84C,#b8953f)",
+              color:"#080808", textDecoration:"none",
+              fontSize:16, fontWeight:800,
+              padding:"16px 40px", borderRadius:13,
+              boxShadow:"0 4px 32px rgba(201,168,76,0.4)",
+              letterSpacing:0.2,
+              transition:"transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s",
             }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 40px rgba(201,168,76,0.5)" }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 32px rgba(201,168,76,0.3)" }}>
-              Créer mon QRfolio gratuit →
+              onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="translateY(-3px) scale(1.03)";el.style.boxShadow="0 8px 40px rgba(201,168,76,0.55)"}}
+              onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="none";el.style.boxShadow="0 4px 32px rgba(201,168,76,0.4)"}}>
+              Creer mon QRfolio gratuit
+              <span style={{ fontSize:18 }}>→</span>
             </Link>
+
+            <p style={{
+              color:"rgba(138,132,120,0.5)", fontSize:12.5,
+              margin:"20px 0 0", letterSpacing:0.3,
+            }}>
+              Gratuit · Sans carte bancaire · Annulation a tout moment
+            </p>
           </div>
-        </FadeIn>
+        </div>
       </section>
 
       {/* FOOTER */}
       <footer style={{
-        borderTop: "1px solid rgba(201,168,76,0.1)", padding: "40px 48px",
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-        position: "relative", zIndex: 1
+        borderTop:"1px solid rgba(201,168,76,0.1)",
+        padding:"48px 48px 32px",
+        position:"relative", zIndex:1,
       }}>
-        <span style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 20, color: "#C9A84C", fontWeight: 700 }}>QRfolio</span>
-        <p style={{ color: "#8A8478", fontSize: 13, margin: 0 }}>© 2026 QRfolio. Tous droits réservés.</p>
+        <style>{`
+          .footer-grid{ display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:40px; }
+          .footer-col-title{ color:#C9A84C; fontSize:10px; letterSpacing:2px; textTransform:uppercase; fontWeight:700; marginBottom:16px; }
+          .footer-link{ display:block; color:rgba(138,132,120,0.7); textDecoration:none; fontSize:13.5px; marginBottom:10px; transition:color 0.2s; }
+          .footer-link:hover{ color:#F5F0E8; }
+          .footer-link:focus-visible{ outline:2px solid rgba(201,168,76,0.5); outline-offset:3px; border-radius:3px; }
+          .footer-bottom{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+          @media(max-width:900px){ .footer-grid{ grid-template-columns:1fr 1fr!important; gap:32px!important; } }
+          @media(max-width:580px){ .footer-grid{ grid-template-columns:1fr!important; } .footer-bottom{ flex-direction:column!important; align-items:flex-start!important; } }
+          @media(max-width:640px){ footer{ padding:40px 24px 28px!important; } }
+        `}</style>
+
+        <div className="footer-grid" style={{ marginBottom:40 }}>
+
+          {/* Brand */}
+          <div>
+            <Link href="/" style={{ textDecoration:"none", display:"inline-block", marginBottom:14 }}>
+              <span style={{ fontFamily:"Cormorant Garamond, serif", fontSize:22, color:"#C9A84C", fontWeight:700 }}>QRfolio</span>
+            </Link>
+            <p style={{ color:"rgba(138,132,120,0.65)", fontSize:13, lineHeight:1.65, maxWidth:220, margin:0 }}>
+              La page mobile qui remplace ta carte de visite. Un QR code dynamique, une page professionnelle.
+            </p>
+          </div>
+
+          {/* Produit */}
+          <div>
+            <p className="footer-col-title">Produit</p>
+            <Link href="#features"  className="footer-link">Fonctionnalites</Link>
+            <Link href="#templates" className="footer-link">Templates</Link>
+            <Link href="#pricing"   className="footer-link">Tarifs</Link>
+            <Link href="/dashboard/builder" className="footer-link">Builder</Link>
+          </div>
+
+          {/* Ressources */}
+          <div>
+            <p className="footer-col-title">Ressources</p>
+            <Link href="#faq"      className="footer-link">FAQ</Link>
+            <Link href="#examples" className="footer-link">Exemples</Link>
+            <Link href="/auth/signup" className="footer-link">Contact</Link>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <p className="footer-col-title">Legal</p>
+            <Link href="/privacy"  className="footer-link">Confidentialite</Link>
+            <Link href="/terms"    className="footer-link">Conditions</Link>
+            <Link href="/legal"    className="footer-link">Mentions legales</Link>
+          </div>
+
+        </div>
+
+        {/* Bottom bar */}
+        <div style={{
+          borderTop:"1px solid rgba(255,255,255,0.05)",
+          paddingTop:24,
+        }}>
+          <div className="footer-bottom">
+            <p style={{ color:"rgba(138,132,120,0.45)", fontSize:12.5, margin:0 }}>
+              © 2026 QRfolio. Tous droits reserves.
+            </p>
+            <div style={{ display:"flex", gap:20 }}>
+              {[["Confidentialite","/privacy"],["Conditions","/terms"]].map(([label,href])=>(
+                <Link key={href} href={href} style={{
+                  color:"rgba(138,132,120,0.4)", fontSize:12, textDecoration:"none",
+                  transition:"color 0.2s",
+                }}
+                  onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color="#C9A84C"}}
+                  onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color="rgba(138,132,120,0.4)"}}>
+                  {label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
       </footer>
     </div>
   )
