@@ -1122,6 +1122,328 @@ function BuilderSection(){
   )
 }
 
+// ── QR Dynamique section ──────────────────────────────────────────────────────
+
+// Mini QR code SVG généré en pur SVG (performance max, 0 dépendance)
+function QRMiniSvg({ fg, bg, accent, size = 80 }: { fg: string; bg: string; accent: string; size?: number }) {
+  // Matrice QR simplifiée 7x7 (pattern visuel, pas un vrai QR scannable)
+  const matrix = [
+    [1,1,1,1,1,1,1,0,1,0,0,1,0,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,1,0,0,1,1,0,0,0,1,0,0,0,0,0,1],
+    [1,0,1,1,1,0,1,0,1,0,1,1,0,0,1,0,1,1,1,0,1],
+    [1,0,1,1,1,0,1,0,0,1,0,1,1,0,1,0,1,1,1,0,1],
+    [1,0,1,1,1,0,1,0,1,1,0,0,1,0,1,0,1,1,1,0,1],
+    [1,0,0,0,0,0,1,0,1,0,1,1,0,0,1,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,0,1,0,1,0,1,0,1,1,1,1,1,1,1],
+    [0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0,0,0,0],
+    [1,0,1,1,0,0,1,1,0,1,1,0,1,1,1,0,1,0,1,1,0],
+    [0,1,0,0,1,1,0,1,1,0,0,1,0,1,0,1,0,1,0,0,1],
+    [1,1,0,1,0,1,1,0,1,1,0,0,1,0,1,1,0,0,1,1,0],
+    [0,0,1,0,1,0,0,0,0,1,1,0,0,1,0,0,1,1,0,1,1],
+    [1,0,1,0,0,1,1,1,0,1,0,1,1,0,1,0,1,0,0,1,0],
+    [0,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,1,0,1,0],
+    [1,1,1,1,1,1,1,0,0,1,0,0,1,0,1,0,0,0,1,0,1],
+    [1,0,0,0,0,0,1,0,1,0,1,1,0,1,1,1,1,0,0,1,0],
+    [1,0,1,1,1,0,1,0,0,1,0,0,1,0,0,0,0,1,1,0,1],
+    [1,0,1,1,1,0,1,0,1,0,1,0,0,1,1,0,1,0,1,0,0],
+    [1,0,1,1,1,0,1,0,0,1,1,0,1,0,0,1,0,1,0,1,1],
+    [1,0,0,0,0,0,1,0,1,1,0,1,0,1,1,0,1,0,1,0,0],
+    [1,1,1,1,1,1,1,0,0,0,1,0,1,0,0,1,0,0,0,1,0],
+  ]
+  const cols = matrix[0].length
+  const rows = matrix.length
+  const cell = size / Math.max(cols, rows)
+  // Cellules dorées (centre)
+  const goldCells = new Set(['10-10','10-11','11-10','9-10','10-9'])
+
+  return (
+    <svg width={size} height={size} viewBox={"0 0 " + size + " " + size}
+      xmlns="http://www.w3.org/2000/svg" style={{ display:"block" }}>
+      <rect width={size} height={size} fill={bg} rx={4}/>
+      {matrix.map((row, r) =>
+        row.map((cell_val, c) => {
+          if (!cell_val) return null
+          const isGold = goldCells.has(r + "-" + c)
+          return (
+            <rect key={r + "-" + c}
+              x={c * cell + 1} y={r * cell + 1}
+              width={cell - 1.5} height={cell - 1.5}
+              rx={1}
+              fill={isGold ? accent : fg}
+            />
+          )
+        })
+      )}
+    </svg>
+  )
+}
+
+const QR_STYLES = [
+  {
+    id: "classic",
+    name: "Classic",
+    desc: "Intemporel",
+    fg: "#1a1a1a", bg: "#ffffff", accent: "#C9A84C",
+    cardBg: "rgba(255,255,255,0.04)",
+    border: "rgba(255,255,255,0.1)",
+    tag: "#8A8478",
+  },
+  {
+    id: "gold",
+    name: "Gold",
+    desc: "Premium",
+    fg: "#C9A84C", bg: "#111009", accent: "#F5F0E8",
+    cardBg: "rgba(201,168,76,0.06)",
+    border: "rgba(201,168,76,0.3)",
+    tag: "#C9A84C",
+  },
+  {
+    id: "neon",
+    name: "Neon",
+    desc: "Impact",
+    fg: "#39FF8F", bg: "#050505", accent: "#A78BFA",
+    cardBg: "rgba(57,255,143,0.05)",
+    border: "rgba(57,255,143,0.25)",
+    tag: "#39FF8F",
+  },
+  {
+    id: "sunset",
+    name: "Sunset",
+    desc: "Chaleureux",
+    fg: "#F97316", bg: "#0d0805", accent: "#F43F5E",
+    cardBg: "rgba(249,115,22,0.06)",
+    border: "rgba(249,115,22,0.25)",
+    tag: "#F97316",
+  },
+  {
+    id: "business",
+    name: "Business",
+    desc: "Institutionnel",
+    fg: "#38BDF8", bg: "#030d14", accent: "#7C3AED",
+    cardBg: "rgba(56,189,248,0.05)",
+    border: "rgba(56,189,248,0.2)",
+    tag: "#38BDF8",
+  },
+] as const
+
+const QR_BENEFITS = [
+  { icon: "🔄", text: "Destination modifiable à tout moment" },
+  { icon: "🎨", text: "Couleurs et styles personnalisés" },
+  { icon: "⬇️", text: "Téléchargement PNG · SVG · PDF" },
+  { icon: "📊", text: "Analytics par scan en temps réel" },
+  { icon: "🖨️", text: "Résolution print HD incluse" },
+] as const
+
+function QRDynamicSection() {
+  const { ref, visible } = useInView(0.07)
+  const [active, setActive] = useState(0)
+
+  return (
+    <section id="qr-dynamique" ref={ref} aria-labelledby="qr-dyn-title"
+      style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
+      <style>{`
+        .qr-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; }
+        .qr-card { display:flex; flex-direction:column; align-items:center; gap:14px;
+          padding:20px 16px; border-radius:18px; cursor:pointer;
+          transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1), border-color 0.25s, background 0.25s; }
+        .qr-card:hover { transform:translateY(-6px) scale(1.03); }
+        .qr-card:focus-visible { outline:2px solid rgba(201,168,76,0.6); outline-offset:4px; border-radius:18px; }
+        .qr-ben { display:flex; flex-direction:column; gap:14px; }
+        @media(max-width:900px){ .qr-grid{ grid-template-columns:repeat(3,1fr)!important; } }
+        @media(max-width:580px){
+          .qr-grid{ grid-template-columns:repeat(2,1fr)!important; gap:10px!important; }
+          #qr-dynamique{ padding:72px 20px!important; }
+        }
+        @keyframes qrFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        @keyframes qrGlow  { 0%,100%{opacity:0.4} 50%{opacity:1} }
+      `}</style>
+
+      <div style={{ maxWidth: 1140, margin: "0 auto" }}>
+
+        {/* Header */}
+        <div style={{
+          display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64,
+          alignItems: "center", marginBottom: 72,
+        }} className="qr-header">
+          <div style={{
+            opacity: visible ? 1 : 0,
+            transform: visible ? "translateY(0)" : "translateY(24px)",
+            transition: "opacity 0.6s ease, transform 0.6s ease",
+          }}>
+            <p style={{ color: "#C9A84C", fontSize: 11, letterSpacing: 3.5,
+              textTransform: "uppercase", fontWeight: 600, marginBottom: 16 }}>
+              QR Codes dynamiques
+            </p>
+            <h2 id="qr-dyn-title" style={{
+              fontFamily: "Cormorant Garamond, serif",
+              fontSize: "clamp(28px, 3.5vw, 48px)",
+              color: "#F5F0E8", fontWeight: 700,
+              margin: "0 0 20px", lineHeight: 1.1,
+              letterSpacing: "-0.02em",
+            }}>
+              Un QR code dynamique,{" "}
+              <span style={{ color: "#C9A84C" }}>pas une image figée.</span>
+            </h2>
+            <p style={{ color: "rgba(138,132,120,0.85)", fontSize: 16,
+              lineHeight: 1.7, marginBottom: 36, maxWidth: 440 }}>
+              Modifie ta page ou ta destination sans jamais reimprimer ton QR code.
+            </p>
+
+            {/* Bénéfices */}
+            <div className="qr-ben">
+              {QR_BENEFITS.map((b, i) => (
+                <div key={i} style={{
+                  display: "flex", alignItems: "center", gap: 12,
+                  opacity: visible ? 1 : 0,
+                  transform: visible ? "translateX(0)" : "translateX(-16px)",
+                  transition: `opacity 0.5s ease ${0.2 + i * 0.08}s, transform 0.5s ease ${0.2 + i * 0.08}s`,
+                }}>
+                  <span style={{
+                    width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                    background: "rgba(201,168,76,0.1)",
+                    border: "1px solid rgba(201,168,76,0.2)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 13,
+                  }}>{b.icon}</span>
+                  <span style={{ color: "rgba(245,240,232,0.8)", fontSize: 13.5 }}>{b.text}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <div style={{
+              marginTop: 36,
+              opacity: visible ? 1 : 0,
+              transition: "opacity 0.6s ease 0.7s",
+            }}>
+              <a href="/auth/signup" style={{
+                display: "inline-flex", alignItems: "center", gap: 10,
+                background: "linear-gradient(90deg,#C9A84C,#b8953f)",
+                color: "#080808", textDecoration: "none",
+                fontSize: 14, fontWeight: 700,
+                padding: "12px 26px", borderRadius: 11,
+                boxShadow: "0 4px 20px rgba(201,168,76,0.35)",
+                transition: "transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s",
+              }}
+                onMouseEnter={e => {
+                  const el = e.currentTarget as HTMLElement
+                  el.style.transform = "translateY(-2px) scale(1.03)"
+                  el.style.boxShadow = "0 8px 28px rgba(201,168,76,0.5)"
+                }}
+                onMouseLeave={e => {
+                  const el = e.currentTarget as HTMLElement
+                  el.style.transform = "none"
+                  el.style.boxShadow = "0 4px 20px rgba(201,168,76,0.35)"
+                }}>
+                Creer mon QR gratuit <span style={{ fontSize: 16 }}>→</span>
+              </a>
+            </div>
+          </div>
+
+          {/* QR actif en grand */}
+          <div style={{
+            display: "flex", justifyContent: "center", alignItems: "center",
+            opacity: visible ? 1 : 0,
+            transition: "opacity 0.7s ease 0.2s",
+          }}>
+            <div style={{
+              position: "relative",
+              animation: "qrFloat 4s ease-in-out infinite",
+            }}>
+              {/* Glow */}
+              <div style={{
+                position: "absolute", inset: -24,
+                background: "radial-gradient(circle, " + QR_STYLES[active].tag + "25 0%, transparent 65%)",
+                borderRadius: "50%",
+                animation: "qrGlow 3s ease-in-out infinite",
+                pointerEvents: "none",
+              }} />
+              {/* Card principale */}
+              <div style={{
+                width: 180, height: 180,
+                background: QR_STYLES[active].cardBg,
+                border: "1px solid " + QR_STYLES[active].border,
+                borderRadius: 22,
+                display: "flex", flexDirection: "column",
+                alignItems: "center", justifyContent: "center",
+                gap: 12,
+                boxShadow: "0 0 60px " + QR_STYLES[active].tag + "30, 0 0 0 1px " + QR_STYLES[active].border,
+                transition: "all 0.4s ease",
+              }}>
+                <QRMiniSvg
+                  fg={QR_STYLES[active].fg}
+                  bg={QR_STYLES[active].bg}
+                  accent={QR_STYLES[active].accent}
+                  size={130}
+                />
+                <span style={{
+                  color: QR_STYLES[active].tag,
+                  fontSize: 10, letterSpacing: 2.5,
+                  textTransform: "uppercase", fontWeight: 700,
+                }}>QRFOLIO.APP</span>
+              </div>
+              {/* Badge style */}
+              <div style={{
+                position: "absolute", top: -10, right: -10,
+                background: "linear-gradient(135deg, #C9A84C, #b8953f)",
+                borderRadius: 20, padding: "4px 10px",
+                fontSize: 10, fontWeight: 800, color: "#080808",
+                boxShadow: "0 2px 12px rgba(201,168,76,0.5)",
+              }}>{QR_STYLES[active].name}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Grille de styles */}
+        <div style={{
+          opacity: visible ? 1 : 0,
+          transform: visible ? "translateY(0)" : "translateY(24px)",
+          transition: "opacity 0.6s ease 0.35s, transform 0.6s ease 0.35s",
+        }}>
+          <p style={{ color: "rgba(138,132,120,0.6)", fontSize: 11,
+            letterSpacing: 2, textTransform: "uppercase", textAlign: "center",
+            marginBottom: 20 }}>Choisir un style</p>
+
+          <div className="qr-grid">
+            {QR_STYLES.map((style, i) => (
+              <button
+                key={style.id}
+                onClick={() => setActive(i)}
+                aria-pressed={active === i}
+                aria-label={"Style " + style.name}
+                className="qr-card"
+                style={{
+                  background: active === i ? style.cardBg : "rgba(255,255,255,0.015)",
+                  border: "1px solid " + (active === i ? style.border : "rgba(255,255,255,0.07)"),
+                  boxShadow: active === i ? "0 0 32px " + style.tag + "20" : "none",
+                }}
+              >
+                <QRMiniSvg fg={style.fg} bg={style.bg} accent={style.accent} size={64} />
+                <div style={{ textAlign: "center" }}>
+                  <p style={{
+                    color: active === i ? style.tag : "#F5F0E8",
+                    fontSize: 13, fontWeight: 700, margin: "0 0 2px",
+                    transition: "color 0.25s",
+                  }}>{style.name}</p>
+                  <p style={{ color: "rgba(138,132,120,0.7)", fontSize: 10, margin: 0 }}>
+                    {style.desc}
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        @media(max-width:900px){
+          .qr-header { grid-template-columns:1fr!important; }
+        }
+      `}</style>
+    </section>
+  )
+}
+
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [titleVisible, setTitleVisible] = useState(false)
@@ -1317,6 +1639,9 @@ export default function HomePage() {
 
       {/* TEMPLATES */}
       <TemplatesSection />
+
+      {/* QR DYNAMIQUE */}
+      <QRDynamicSection />
 
       {/* PRICING */}
       <section id="pricing" style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
