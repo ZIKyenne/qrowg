@@ -1753,6 +1753,297 @@ function AnalyticsSection() {
   )
 }
 
+// ── Use cases section ─────────────────────────────────────────────────────────
+const USE_CASES = [
+  {
+    id: "restaurant",
+    icon: "🍽️",
+    label: "Restaurant",
+    title: "Transforme ta table en experience connectee.",
+    desc: "Tes clients scannent, voient ton menu a jour, reservent et laissent un avis en 2 taps.",
+    color: "#F97316",
+    blocks: [
+      { icon:"📋", label:"Menu interactif",   note:"Mis a jour sans reimprimer" },
+      { icon:"📅", label:"Reservations",      note:"Lien direct vers ton systeme" },
+      { icon:"⭐", label:"Avis Google",        note:"Redirection automatique" },
+      { icon:"🕐", label:"Horaires",          note:"Modifiables a tout moment" },
+      { icon:"📍", label:"Itineraire",         note:"Google Maps integre" },
+      { icon:"🎉", label:"Evenements speciaux",note:"Soirees, menus du jour" },
+    ],
+    cta: "Creer ma page restaurant",
+  },
+  {
+    id: "freelance",
+    icon: "💼",
+    label: "Freelance",
+    title: "Ta carte de visite devient une vitrine interactive.",
+    desc: "Un seul QR sur tes cartes pro. Le client arrive sur ton portfolio, tes services et ton contact.",
+    color: "#38BDF8",
+    blocks: [
+      { icon:"🖼️",  label:"Portfolio",       note:"Galerie de projets" },
+      { icon:"🛠️",  label:"Services & tarifs",note:"Ce que tu proposes" },
+      { icon:"💬", label:"WhatsApp direct",   note:"CTA de prise de contact" },
+      { icon:"📄", label:"CV telechargeable", note:"PDF en un clic" },
+      { icon:"🔗", label:"Liens sociaux",     note:"LinkedIn, Behance..." },
+      { icon:"📅", label:"Calendly",          note:"Prise de RDV integree" },
+    ],
+    cta: "Creer ma page freelance",
+  },
+  {
+    id: "creator",
+    icon: "🎵",
+    label: "Createur",
+    title: "Un lien unique pour tous tes contenus.",
+    desc: "Centralise tes reseaux, musiques, videos et collaborations sur une page elegante.",
+    color: "#A78BFA",
+    blocks: [
+      { icon:"📸", label:"Instagram / TikTok", note:"Tes dernieres publications" },
+      { icon:"🎬", label:"YouTube / Twitch",   note:"Lien vers ta chaine" },
+      { icon:"🎵", label:"Streaming",          note:"Spotify, Apple Music..." },
+      { icon:"🤝", label:"Partenariats",       note:"Tes codes promo" },
+      { icon:"💌", label:"Newsletter",         note:"Formulaire d'inscription" },
+      { icon:"🛍️",  label:"Boutique",          note:"Tes produits / merch" },
+    ],
+    cta: "Creer ma page createur",
+  },
+  {
+    id: "immo",
+    icon: "🏠",
+    label: "Immobilier",
+    title: "Chaque panneau devient un outil de vente.",
+    desc: "Colle ton QR sur tes panneaux et brochures. L'acheteur accede aux details en 1 scan.",
+    color: "#C9A84C",
+    blocks: [
+      { icon:"🏡", label:"Fiche du bien",      note:"Photos, surface, prix" },
+      { icon:"📞", label:"Contact direct",     note:"Appel ou message" },
+      { icon:"📅", label:"Visites",            note:"Demande de visite en ligne" },
+      { icon:"📄", label:"Brochure PDF",       note:"Telechargement instantane" },
+      { icon:"🗺️",  label:"Localisation",      note:"Plan interactif" },
+      { icon:"💶", label:"Financement",        note:"Simulateur de credit" },
+    ],
+    cta: "Creer ma page immobilier",
+  },
+  {
+    id: "event",
+    icon: "🎪",
+    label: "Evenement",
+    title: "Tiens tes participants informes en temps reel.",
+    desc: "Programme, billets, acces et mises a jour — tout sur une page modifiable meme la veille.",
+    color: "#39FF8F",
+    blocks: [
+      { icon:"📋", label:"Programme",          note:"Mis a jour en direct" },
+      { icon:"🎫", label:"Billetterie",        note:"Lien d'achat direct" },
+      { icon:"⏳", label:"Countdown",          note:"Decompte automatique" },
+      { icon:"📍", label:"Lieu & acces",       note:"Plan et transport" },
+      { icon:"📸", label:"Galerie",            note:"Photos de l'edition passee" },
+      { icon:"📣", label:"Intervenants",       note:"Biographies et horaires" },
+    ],
+    cta: "Creer ma page evenement",
+  },
+  {
+    id: "commerce",
+    icon: "🛍️",
+    label: "Commerce local",
+    title: "Attire plus de clients avec un QR sur ta vitrine.",
+    desc: "Tes promo, tes produits et tes horaires toujours a jour. Un scan depuis la rue suffit.",
+    color: "#F43F5E",
+    blocks: [
+      { icon:"🏷️",  label:"Promotions",        note:"Offres du moment" },
+      { icon:"📦", label:"Catalogue produits", note:"Mis a jour facilement" },
+      { icon:"🕐", label:"Horaires",           note:"Feries inclus" },
+      { icon:"⭐", label:"Avis clients",        note:"Lien Google / Tripadvisor" },
+      { icon:"📍", label:"Itineraire",          note:"Depuis n'importe ou" },
+      { icon:"💬", label:"Contact rapide",      note:"WhatsApp ou appel" },
+    ],
+    cta: "Creer ma page commerce",
+  },
+] as const
+
+function UseCasesSection() {
+  const { ref, visible } = useInView(0.06)
+  const [active, setActive] = useState(0)
+  const uc = USE_CASES[active]
+
+  return (
+    <section id="examples" ref={ref} aria-labelledby="uc-title"
+      style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
+      <style>{`
+        .uc-tabs  { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+        .uc-tab   { display:flex; align-items:center; gap:7px; padding:9px 18px; border-radius:100px;
+                    cursor:pointer; border:1px solid; transition:all 0.2s ease; font-size:13px; font-weight:500;
+                    background:transparent; white-space:nowrap; }
+        .uc-tab:focus-visible{ outline:2px solid rgba(201,168,76,0.6); outline-offset:3px; border-radius:100px; }
+        .uc-blocks{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+        @media(max-width:640px){
+          .uc-blocks{ grid-template-columns:repeat(2,1fr)!important; }
+          .uc-tabs { gap:6px!important; }
+          .uc-tab  { padding:7px 12px!important; font-size:12px!important; }
+          #examples{ padding:72px 20px!important; }
+        }
+        @media(max-width:400px){
+          .uc-blocks{ grid-template-columns:1fr!important; }
+        }
+        @keyframes ucFade{ from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+      `}</style>
+
+      {/* Header */}
+      <div style={{
+        maxWidth: 1140, margin: "0 auto 56px", textAlign: "center",
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(24px)",
+        transition: "opacity 0.6s ease, transform 0.6s ease",
+      }}>
+        <p style={{ color: "#C9A84C", fontSize: 11, letterSpacing: 3.5,
+          textTransform: "uppercase", fontWeight: 600, marginBottom: 16 }}>Cas d'usage</p>
+        <h2 id="uc-title" style={{
+          fontFamily: "Cormorant Garamond, serif",
+          fontSize: "clamp(28px, 4vw, 52px)",
+          color: "#F5F0E8", fontWeight: 700,
+          margin: "0 auto 16px", lineHeight: 1.1,
+          maxWidth: 600, letterSpacing: "-0.02em",
+        }}>
+          Fait pour <span style={{ color: "#C9A84C" }}>ton metier.</span>
+        </h2>
+        <p style={{ color: "rgba(138,132,120,0.8)", fontSize: 16,
+          maxWidth: 480, margin: "0 auto", lineHeight: 1.65 }}>
+          Selectionne ton activite et vois exactement ce que QRfolio peut faire pour toi.
+        </p>
+      </div>
+
+      <div style={{ maxWidth: 1140, margin: "0 auto" }}>
+
+        {/* Tabs */}
+        <div className="uc-tabs" style={{
+          marginBottom: 40,
+          opacity: visible ? 1 : 0,
+          transition: "opacity 0.6s ease 0.15s",
+        }}>
+          {USE_CASES.map((uc_item, i) => (
+            <button
+              key={uc_item.id}
+              onClick={() => setActive(i)}
+              aria-pressed={active === i}
+              aria-label={uc_item.label}
+              className="uc-tab"
+              style={{
+                color: active === i ? "#080808" : "rgba(245,240,232,0.65)",
+                borderColor: active === i ? uc_item.color : "rgba(255,255,255,0.1)",
+                background: active === i
+                  ? uc_item.color
+                  : "rgba(255,255,255,0.02)",
+                fontFamily: "inherit",
+              }}
+            >
+              <span style={{ fontSize: 15 }}>{uc_item.icon}</span>
+              {uc_item.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Contenu actif */}
+        <div key={uc.id} style={{
+          display: "grid", gridTemplateColumns: "1fr 1.8fr", gap: 40,
+          alignItems: "start",
+          animation: "ucFade 0.35s ease",
+        }} className="uc-content">
+          <style>{`@media(max-width:800px){.uc-content{grid-template-columns:1fr!important;}}`}</style>
+
+          {/* Info gauche */}
+          <div style={{
+            background: "rgba(255,255,255,0.018)",
+            border: "1px solid " + uc.color + "25",
+            borderRadius: 18, padding: "28px 24px",
+            position: "sticky", top: 88,
+          }}>
+            {/* Header card */}
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
+              <div style={{
+                width: 52, height: 52, borderRadius: 14,
+                background: uc.color + "14",
+                border: "1px solid " + uc.color + "30",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 24,
+              }}>{uc.icon}</div>
+              <div>
+                <p style={{ color: uc.color, fontSize: 10, fontWeight: 700,
+                  letterSpacing: 2, textTransform: "uppercase", margin: "0 0 4px" }}>{uc.label}</p>
+                <h3 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 700,
+                  margin: 0, lineHeight: 1.3 }}>{uc.title}</h3>
+              </div>
+            </div>
+
+            <p style={{ color: "rgba(138,132,120,0.85)", fontSize: 13.5,
+              lineHeight: 1.65, marginBottom: 24 }}>{uc.desc}</p>
+
+            {/* Ligne d'accent */}
+            <div style={{
+              height: 1, marginBottom: 24,
+              background: "linear-gradient(90deg, " + uc.color + "40, transparent)",
+            }} />
+
+            <a href="/auth/signup" style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              background: uc.color,
+              color: "#080808", textDecoration: "none",
+              fontSize: 13, fontWeight: 700,
+              padding: "12px 20px", borderRadius: 10,
+              transition: "opacity 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1)",
+            }}
+              onMouseEnter={e => {
+                const el = e.currentTarget as HTMLElement
+                el.style.opacity = "0.85"
+                el.style.transform = "translateY(-2px)"
+              }}
+              onMouseLeave={e => {
+                const el = e.currentTarget as HTMLElement
+                el.style.opacity = "1"
+                el.style.transform = "none"
+              }}>
+              {uc.cta} →
+            </a>
+          </div>
+
+          {/* Grille de blocs droite */}
+          <div>
+            <p style={{ color: "rgba(138,132,120,0.55)", fontSize: 10,
+              letterSpacing: 2, textTransform: "uppercase", marginBottom: 16 }}>
+              Blocs inclus dans ce template
+            </p>
+            <div className="uc-blocks">
+              {uc.blocks.map((block, i) => (
+                <div key={block.label} style={{
+                  background: "rgba(255,255,255,0.025)",
+                  border: "1px solid rgba(255,255,255,0.07)",
+                  borderRadius: 12, padding: "14px 14px",
+                  display: "flex", flexDirection: "column", gap: 6,
+                  transition: "border-color 0.2s, background 0.2s",
+                  animationDelay: i * 0.04 + "s",
+                  animation: "ucFade 0.35s ease both",
+                }}
+                  onMouseEnter={e => {
+                    const el = e.currentTarget as HTMLElement
+                    el.style.borderColor = uc.color + "40"
+                    el.style.background = uc.color + "06"
+                  }}
+                  onMouseLeave={e => {
+                    const el = e.currentTarget as HTMLElement
+                    el.style.borderColor = "rgba(255,255,255,0.07)"
+                    el.style.background = "rgba(255,255,255,0.025)"
+                  }}>
+                  <span style={{ fontSize: 18 }}>{block.icon}</span>
+                  <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 700, margin: 0 }}>{block.label}</p>
+                  <p style={{ color: "rgba(138,132,120,0.7)", fontSize: 11, margin: 0, lineHeight: 1.4 }}>{block.note}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  )
+}
+
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [titleVisible, setTitleVisible] = useState(false)
@@ -1954,6 +2245,9 @@ export default function HomePage() {
 
       {/* ANALYTICS */}
       <AnalyticsSection />
+
+      {/* USE CASES */}
+      <UseCasesSection />
 
       {/* PRICING */}
       <section id="pricing" style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
