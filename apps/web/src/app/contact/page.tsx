@@ -62,21 +62,21 @@ function InputField({
 
 const SUBJECTS = [
   "Support technique", "Question sur les tarifs", "Partenariat",
-  "Signalement d'un bug", "Demande de fonctionnalit\u00e9", "Autre",
+  "Signalement d'un bug", "Demande de fonctionnalité", "Autre",
 ]
 
 const FAQ = [
   {
     q: "Puis-je utiliser QRfolio gratuitement ?",
-    a: "Oui. Le plan Free donne acc\u00e8s \u00e0 1 page, 500 vues/mois et un QR code basique — sans carte bancaire.",
+    a: "Oui. Le plan Free donne accès à 1 page, 500 vues/mois et un QR code basique — sans carte bancaire.",
   },
   {
     q: "Puis-je connecter mon propre domaine ?",
-    a: "Oui, \u00e0 partir du plan Pro. Tu connectes ton sous-domaine (carte.tonsite.fr) en quelques clics.",
+    a: "Oui, à partir du plan Pro. Tu connectes ton sous-domaine (carte.tonsite.fr) en quelques clics.",
   },
   {
     q: "Comment fonctionne le QR dynamique ?",
-    a: "Le QR code reste identique \u00e0 l'impression. Tu modifies ta page ou destination \u00e0 tout moment depuis ton dashboard — sans r\u00e9imprimer.",
+    a: "Le QR code reste identique à l'impression. Tu modifies ta page ou destination à tout moment depuis ton dashboard — sans réimprimer.",
   },
 ]
 
@@ -97,7 +97,7 @@ export default function ContactPage() {
     if (!form.name.trim() || form.name.trim().length < 2) e.name = "Merci d'indiquer ton nom."
     if (!form.email.trim() || !/^[^@]+@[^@]+\.[^@]+$/.test(form.email)) e.email = "Email invalide."
     if (!form.subject) e.subject = "Choisis un sujet."
-    if (!form.message.trim() || form.message.trim().length < 10) e.message = "Message trop court (min. 10 caract\u00e8res)."
+    if (!form.message.trim() || form.message.trim().length < 10) e.message = "Message trop court (min. 10 caractères)."
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -118,7 +118,7 @@ export default function ContactPage() {
       setStatus("success")
       setForm({ name:"", email:"", subject:"", message:"", website:"" })
     } catch {
-      setErrMsg("Erreur r\u00e9seau. V\u00e9rifie ta connexion.")
+      setErrMsg("Erreur réseau. Vérifie ta connexion.")
       setStatus("error")
     }
   }
@@ -152,7 +152,7 @@ export default function ContactPage() {
           <Link href="/" style={{ color:MUT,textDecoration:"none",fontSize:13,display:"flex",alignItems:"center",gap:6,transition:"color 0.2s" }}
             onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color=INK}}
             onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color=MUT}}>
-            \u2190 Retour
+            ← Retour
           </Link>
           <Link href="/auth/signup" style={{ background:"linear-gradient(90deg,#C9A84C,#b8953f)",color:BG,textDecoration:"none",fontSize:13,fontWeight:700,padding:"8px 20px",borderRadius:9,boxShadow:"0 2px 14px rgba(201,168,76,0.3)" }}>
             Commencer
@@ -167,7 +167,7 @@ export default function ContactPage() {
             Une question ?<br /><span style={{color:G}}>Parlons-en.</span>
           </h1>
           <p style={{ color:MUT,fontSize:17,lineHeight:1.7,margin:0 }} className="au2">
-            Nous r\u00e9pondons g\u00e9n\u00e9ralement sous 24h.
+            Nous répondons généralement sous 24h.
           </p>
         </div>
       </section>
@@ -185,9 +185,9 @@ export default function ContactPage() {
                   border:"1px solid rgba(57,255,143,0.25)",
                   borderRadius:18,padding:"48px 40px",textAlign:"center",
                 }}>
-                  <div style={{ fontSize:40,marginBottom:20 }}>\u2705</div>
+                  <div style={{ fontSize:40,marginBottom:20 }}>✅</div>
                   <h2 style={{ fontFamily:"Cormorant Garamond,serif",fontSize:28,color:INK,fontWeight:700,margin:"0 0 12px" }}>
-                    Message envoy\u00e9 !
+                    Message envoyé !
                   </h2>
                   <p style={{ color:MUT,fontSize:15,lineHeight:1.7,margin:"0 0 28px" }}>
                     Merci pour ton message. Nous reviendrons vers toi sous 24h.
@@ -231,7 +231,7 @@ export default function ContactPage() {
                     {errors.subject && <span style={{color:ERR,fontSize:12}}>{errors.subject}</span>}
                   </div>
 
-                  <InputField id="message" label="Ton message" type="textarea" value={form.message} onChange={set("message")} error={errors.message} placeholder="D\u00e9cris ta question ou ton besoin..." />
+                  <InputField id="message" label="Ton message" type="textarea" value={form.message} onChange={set("message")} error={errors.message} placeholder="Décris ta question ou ton besoin..." />
 
                   {/* Compteur message */}
                   <div style={{ display:"flex",justifyContent:"flex-end",marginTop:-12 }}>
@@ -257,11 +257,11 @@ export default function ContactPage() {
                   }}
                     onMouseEnter={e=>{if(status!=="loading"){const el=e.currentTarget;el.style.transform="translateY(-2px)";el.style.boxShadow="0 6px 28px rgba(201,168,76,0.45)"}}}
                     onMouseLeave={e=>{const el=e.currentTarget;el.style.transform="none";el.style.boxShadow="0 4px 20px rgba(201,168,76,0.35)"}}>
-                    {status==="loading" ? "Envoi en cours..." : "Envoyer le message \u2192"}
+                    {status==="loading" ? "Envoi en cours..." : "Envoyer le message →"}
                   </button>
                   <p style={{ color:MUT.replace("0.8","0.45"),fontSize:11.5,textAlign:"center" }}>
                     En envoyant ce message, tu acceptes notre{" "}
-                    <Link href="/privacy" style={{color:G,textDecoration:"none"}}>politique de confidentialit\u00e9</Link>.
+                    <Link href="/privacy" style={{color:G,textDecoration:"none"}}>politique de confidentialité</Link>.
                   </p>
                 </form>
               )}
@@ -335,7 +335,7 @@ export default function ContactPage() {
                   <Link href="/faq" style={{color:G,fontSize:12,textDecoration:"none",display:"flex",alignItems:"center",gap:5,transition:"gap 0.2s"}}
                     onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.gap="8px"}}
                     onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.gap="5px"}}>
-                    Voir toutes les questions \u2192
+                    Voir toutes les questions →
                   </Link>
                 </div>
               </div>
@@ -343,7 +343,7 @@ export default function ContactPage() {
               {/* CTA */}
               <div style={{ background:"linear-gradient(145deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03))",border:BOR,borderRadius:14,padding:"22px 20px",textAlign:"center" }}>
                 <p style={{color:INK,fontSize:14,fontWeight:600,margin:"0 0 8px"}}>Pas encore sur QRfolio ?</p>
-                <p style={{color:MUT.replace("0.8","0.65"),fontSize:12.5,margin:"0 0 16px",lineHeight:1.5}}>Cr\u00e9e ta page gratuitement en 5 minutes.</p>
+                <p style={{color:MUT.replace("0.8","0.65"),fontSize:12.5,margin:"0 0 16px",lineHeight:1.5}}>Crée ta page gratuitement en 5 minutes.</p>
                 <Link href="/auth/signup" style={{
                   display:"block",textAlign:"center",
                   background:"linear-gradient(90deg,#C9A84C,#b8953f)",
@@ -351,7 +351,7 @@ export default function ContactPage() {
                   padding:"11px 20px",borderRadius:9,
                   boxShadow:"0 3px 16px rgba(201,168,76,0.3)",
                 }}>
-                  Cr\u00e9er mon QRfolio \u2192
+                  Créer mon QRfolio →
                 </Link>
               </div>
 
