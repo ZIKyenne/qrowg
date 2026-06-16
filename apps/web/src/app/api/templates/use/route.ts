@@ -46,10 +46,27 @@ export async function POST(req: NextRequest) {
     )
 
     const body = await req.json()
-    const { templateId, templateName, theme, blocks } = body
+    const { templateId, templateName, theme, blocks, slug } = body
 
-    // On IGNORE le slug recu du navigateur et on le fabrique proprement.
-    const cleanSlug = slugify(templateName || templateId || "page")
+    const RESERVED = ["dashboard","admin","auth","login","signup","pricing","templates","settings","profile","api","legal","privacy","terms","contact","features","examples","qr-codes","upgrade","new"]
+
+    let cleanSlug: string
+    if (slug && typeof slug === "string" && slug.trim()) {
+      const s = slug.trim().toLowerCase()
+      if (!/^[a-z0-9_-]{2,60}$/.test(s)) {
+        return NextResponse.json({ error: "Slug invalide (2-60 caracteres, lettres minuscules, chiffres et tirets)." }, { status: 400 })
+      }
+      if (RESERVED.includes(s)) {
+        return NextResponse.json({ error: "Ce slug est reserve, choisis-en un autre." }, { status: 400 })
+      }
+      const { data: taken } = await supabaseAdmin.from("pages").select("id").eq("slug", s).maybeSingle()
+      if (taken) {
+        return NextResponse.json({ error: "Ce slug est deja pris." }, { status: 409 })
+      }
+      cleanSlug = s
+    } else {
+      cleanSlug = slugify(templateName || templateId || "page")
+    }
 
     const { data: newPage, error: pageError } = await supabaseAdmin
       .from("pages")
@@ -65,9 +82,10 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (pageError || !newPage) {
+      const isDup = pageError?.message?.includes("pages_slug_unique") || pageError?.code === "23505"
       return NextResponse.json(
-        { error: pageError?.message || "Erreur creation page" },
-        { status: 500 }
+        { error: isDup ? "Ce slug est deja pris." : (pageError?.message || "Erreur creation page") },
+        { status: isDup ? 409 : 500 }
       )
     }
 
