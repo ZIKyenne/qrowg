@@ -98,6 +98,7 @@ export default function TemplatesPage() {
   const [hoveredCard,  setHoveredCard]  = useState<string | null>(null)
   const [isCreating,   setIsCreating]   = useState(false)
   const [toast,        setToast]        = useState<{type:"success"|"error",msg:string}|null>(null)
+  const [namingFor,    setNamingFor]    = useState<string | null>(null)
   const router = useRouter()
 
   // Fetch user plan
@@ -432,7 +433,7 @@ export default function TemplatesPage() {
                       </button>
 
                       {/* Utiliser */}
-                      <button type="button" onClick={(e) => { e.stopPropagation(); if (!locked) createFromTemplate(template.id) }}
+                      <button type="button" onClick={(e) => { e.stopPropagation(); if (!locked) setNamingFor(template.id) }}
                         disabled={!!creating || locked}
                         style={{ flex: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "8px 12px", background: locked ? "rgba(255,255,255,0.04)" : isCreating ? "rgba(201,168,76,0.2)" : "linear-gradient(90deg,#C9A84C,#b8953f)", border: locked ? "1px solid rgba(255,255,255,0.08)" : "none", borderRadius: 9, color: locked ? MUTED : "#080808", fontSize: 11, fontWeight: 700, cursor: locked || creating ? "not-allowed" : "pointer", opacity: creating && !isCreating ? 0.5 : 1, transition: "all 0.15s" }}>
                         {isCreating ? <><div style={{ width: 10, height: 10, border: "1.5px solid #C9A84C", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Création...</> : locked ? <><Lock size={10} /> {PLAN_CONFIG[template.plan].label}</> : <>Utiliser <ArrowRight size={10} /></>}
@@ -464,7 +465,7 @@ export default function TemplatesPage() {
           onUse={() => {
             setPreview(null)
             if (!canUse(previewTemplate.plan)) { alert(`Plan ${previewTemplate.plan} requis`); return }
-            createFromTemplate(previewTemplate.id)
+            setNamingFor(previewTemplate.id)
           }}
           canUse={canUse(previewTemplate.plan)}
           isCreating={isCreating}
@@ -482,7 +483,7 @@ export default function TemplatesPage() {
           <button type="button" onClick={() => setSelected(null)} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, padding: "9px 14px", color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", gap: 5, fontSize: 12 }}>
             <X size={12} /> Annuler
           </button>
-          <button type="button" onClick={() => createFromTemplate(selected!)} disabled={!!creating}
+          <button type="button" onClick={() => setNamingFor(selected!)} disabled={!!creating}
             style={{ display: "flex", alignItems: "center", gap: 7, background: creating ? "rgba(201,168,76,0.2)" : "linear-gradient(90deg,#C9A84C,#b8953f)", border: "none", borderRadius: 9, padding: "9px 20px", color: "#080808", fontSize: 13, fontWeight: 700, cursor: creating ? "wait" : "pointer", opacity: creating ? 0.7 : 1 }}>
             {creating === selected ? "Création en cours..." : <><ArrowRight size={12} /> Utiliser ce template</>}
           </button>
