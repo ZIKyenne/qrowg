@@ -149,7 +149,7 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
   const muted = dayMode ? "#6B7280" : theme.muted
   const primary = theme.primary
   const accent = theme.accent
-  const s = { background: bg }
+  const s = { background: bg, fontFamily: theme.fontBody || "DM Sans, sans-serif" }
 
   switch (block.type) {
     case "profile": return (
@@ -4675,8 +4675,7 @@ export default function BuilderV4({ pageId }: { pageId?: string }) {
               return (
                 <div key={block.id}
                   onClick={(e) => handleBlockClick(e, block.id, idx)}
-                  style={{ position: "relative", marginBottom: 0, border: "none", overflow: "visible", cursor: block.locked ? "default" : "pointer", transition: "box-shadow 0.15s, background 0.1s", opacity: block.visible ? (block.draft ? 0.6 : 1) : 0.35, background: isMultiSelected ? "rgba(201,168,76,0.06)" : block.draft ? "rgba(251,191,36,0.03)" : "transparent", boxShadow: isSelected ? `inset 3px 0 0 ${G}` : isMultiSelected ? `inset 3px 0 0 ${G}80` : block.draft ? "inset 3px 0 0 rgba(251,191,36,0.5)" : block.locked ? "inset 3px 0 0 rgba(99,102,241,0.5)" : "none" }}
-                  onMouseEnter={e => {
+style={{ fontFamily: theme.fontBody || "DM Sans, sans-serif", position: "relative", marginBottom: 0, border: "none", overflow: "visible", cursor: block.locked ? "default" : "pointer", transition: "box-shadow 0.15s, background 0.1s",                  onMouseEnter={e => {
                     if (!isSelected) e.currentTarget.style.boxShadow = `inset 3px 0 0 rgba(201,168,76,0.3)`
                     const overlay = e.currentTarget.querySelector(".block-overlay") as HTMLElement
                     const handle = e.currentTarget.querySelector(".block-handle") as HTMLElement
