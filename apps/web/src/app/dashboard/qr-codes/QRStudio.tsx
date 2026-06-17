@@ -2271,6 +2271,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         const cornR = preset.cornerStyle === "circle" || preset.cornerStyle === "rounded" || preset.cornerStyle === "luxury" ? "30%" : "2px"
                         return (
                           <div key={preset.id} onClick={() => applyPreset(preset)}
+                            onMouseEnter={e => { if (!isActive) { e.currentTarget.style.borderColor = "rgba(201,168,76,0.45)"; e.currentTarget.style.transform = "translateY(-2px)" } }}
+                            onMouseLeave={e => { if (!isActive) { e.currentTarget.style.borderColor = canAccess?"rgba(255,255,255,0.08)":"rgba(255,255,255,0.04)"; e.currentTarget.style.transform = "translateY(0)" } }}
                             style={{ position:"relative", cursor:"pointer", borderRadius:10, overflow:"hidden", border:`1.5px solid ${isActive?"#C9A84C":canAccess?"rgba(255,255,255,0.08)":"rgba(255,255,255,0.04)"}`, transition:"all 0.15s", opacity:canAccess?1:0.7 }}>
 
                             {/* Apercu QR miniature realiste */}
