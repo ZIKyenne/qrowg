@@ -357,6 +357,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [archivingId,setArchivingId]= useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [copyQRId,   setCopyQRId]   = useState<string | null>(null)
+  const [dupId,      setDupId]      = useState<string | null>(null)
   const [showModal,  setShowModal]  = useState(false)
   const [diagFg,     setDiagFg]     = useState("")
   const [diagBg,     setDiagBg]     = useState("")
@@ -781,6 +782,31 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       return canvas
     } finally {
       setTimeout(() => URL.revokeObjectURL(url), 1000)
+    }
+  }
+
+  // -- Dupliquer un QR ----------------------------------------------------------
+  async function duplicateQR(id: string) {
+    setMenuId(null)
+    if (dupId) return
+    setDupId(id)
+    try {
+      const res = await fetch("/api/qr-duplicate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ qr_id: id }),
+      })
+      const d = await res.json()
+      if (!res.ok || d.error || !d.qr) {
+        window.alert("Duplication impossible : " + (d.error || "erreur inconnue"))
+        return
+      }
+      setQRCodes(prev => [d.qr, ...prev])
+      setActiveId(d.qr.id)
+    } catch {
+      window.alert("Duplication impossible : erreur reseau")
+    } finally {
+      setDupId(null)
     }
   }
 
@@ -1684,6 +1710,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       { icon: <Pencil size={11}/>,  label: "Modifier",     action: () => { window.location.href = `/dashboard/builder/${page?.id}` }, color: "#F5F0E8", disabled: false },
                       { icon: isC ? <Check size={11}/> : <Copy size={11}/>, label: isC ? "Copie !" : "Copier lien", action: () => copyQRLink(qr.id, url), color: isC ? "#39FF8F" : "#F5F0E8", disabled: false },
                       { icon: <Download size={11}/>, label: "PNG",          action: () => { setActiveId(qr.id); setTimeout(() => downloadPNG(400), 100); setMenuId(null) }, color: "#F5F0E8", disabled: false },
+                      { icon: dupId === qr.id ? <Loader2 size={11} style={{ animation:"spin 0.8s linear infinite" }}/> : <Copy size={11}/>, label: dupId === qr.id ? "Duplication..." : "Dupliquer", action: () => duplicateQR(qr.id), color: "#F5F0E8", disabled: dupId === qr.id },
                       ...(qs === "active" ? [{ icon: <Archive size={11}/>, label: "Mettre en pause", action: () => requestAction(qr.id, "pause", "Mettre en pause"), color: "#F97316", disabled: false }] : []),
                       ...(qs === "paused" || qs === "draft" ? [{ icon: <Check size={11}/>, label: "Activer", action: () => changeQRStatus(qr.id, "activate"), color: "#39FF8F", disabled: false }] : []),
                       ...(qs !== "archived" ? [{ icon: <Archive size={11}/>, label: "Archiver", action: () => requestAction(qr.id, "archive", "Archiver ce QR"), color: "#6B7280", disabled: false }] : [{ icon: <RotateCcw size={11}/>, label: "Restaurer", action: () => changeQRStatus(qr.id, "restore"), color: "#38BDF8", disabled: false }]),
