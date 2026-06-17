@@ -4,11 +4,7 @@ import { NextResponse } from "next/server"
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { qr_id, foreground_color, background_color, corner_style, error_correction, style_config } = body
-
-    if (!qr_id) {
-      return NextResponse.json({ error: "qr_id manquant" }, { status: 400 })
-    }
+    const { qr_id, all, foreground_color, background_color, corner_style, error_correction, style_config } = body
 
     const supabase = await createServerSupabaseClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -16,16 +12,35 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Non authentifie" }, { status: 401 })
     }
 
+    const fields = {
+      foreground_color,
+      background_color,
+      corner_style,
+      error_correction,
+      style_config,
+      updated_at: new Date().toISOString(),
+    }
+
+    // Mode "appliquer a tous mes QR"
+    if (all === true) {
+      const { data, error } = await supabase
+        .from("qr_codes")
+        .update(fields)
+        .eq("user_id", user.id)
+        .select("id")
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 })
+      }
+      return NextResponse.json({ ok: true, count: data?.length ?? 0 })
+    }
+
+    // Mode "un seul QR"
+    if (!qr_id) {
+      return NextResponse.json({ error: "qr_id manquant" }, { status: 400 })
+    }
     const { data, error } = await supabase
       .from("qr_codes")
-      .update({
-        foreground_color,
-        background_color,
-        corner_style,
-        error_correction,
-        style_config,
-        updated_at: new Date().toISOString(),
-      })
+      .update(fields)
       .eq("id", qr_id)
       .eq("user_id", user.id)
       .select()

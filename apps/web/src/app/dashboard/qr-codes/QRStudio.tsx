@@ -1573,11 +1573,21 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   }
 
   async function applyToAll() {
-    const sb = createClient()
-    const payload = { foreground_color:fg, background_color:bg, corner_style:corner, error_correction:ecLevel, style_config:styleConf, updated_at:new Date().toISOString() }
-    await sb.from("qr_codes").update(payload).eq("user_id", (qrCodes[0] as any)?.user_id ?? "")
-    setQRCodes(prev => prev.map(q => ({ ...q, ...payload })))
-    setApplyAllOk(true); setTimeout(()=>setApplyAllOk(false), 2500)
+    if (!active) return
+    const payload = { foreground_color:fg, background_color:bg, corner_style:corner, error_correction:ecLevel, style_config:styleConf }
+    try {
+      const res = await fetch("/api/qr-style", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ all: true, ...payload }),
+      })
+      const d = await res.json()
+      if (!res.ok || d.error) { window.alert("Application impossible : " + (d.error || "echec")); return }
+      setQRCodes(prev => prev.map(q => ({ ...q, ...payload })))
+      setApplyAllOk(true); setTimeout(()=>setApplyAllOk(false), 2500)
+    } catch {
+      window.alert("Application impossible : erreur reseau")
+    }
   }
 
   const [sb_asc, sb_dir] = sortKey.split("-")
