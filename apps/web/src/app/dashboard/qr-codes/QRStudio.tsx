@@ -1519,7 +1519,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         </div>
 
         {/* Liste */}
-        <div style={{ flex:1, overflowY:"auto" }}>
+        <div style={{ flex:1, overflowY:"auto", paddingTop:10 }}>
           {filteredQR.length === 0 ? (
             <div style={{ textAlign:"center", padding:"32px 12px", color:MUTED }}>
               <QrCode size={24} color={MUTED} style={{ marginBottom:8 }}/>
@@ -1537,7 +1537,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             const pb   = PLAN_BADGE[userPlan]
             return (
               <div key={qr.id} onClick={() => { setActiveId(qr.id); setMenuId(null) }}
-                style={{ padding:"11px 12px", cursor:"pointer", borderBottom:"1px solid rgba(255,255,255,0.04)", background:isA?"rgba(201,168,76,0.06)":"transparent", borderLeft:isA?`2px solid ${G}`:"2px solid transparent", position:"relative" }}>
+                style={{ margin:"0 10px 8px", padding:"12px", cursor:"pointer", borderRadius:12, border:`1px solid ${isA?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, background:isA?"rgba(201,168,76,0.07)":"rgba(255,255,255,0.02)", boxShadow:isA?"0 4px 16px rgba(201,168,76,0.08)":"none", position:"relative", transition:"all 0.15s" }}
+                onMouseEnter={e => { if (!isA) e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)" }}
+                onMouseLeave={e => { if (!isA) e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)" }}>
                 <div style={{ display:"flex", alignItems:"flex-start", gap:9 }}>
                   <div style={{ width:34, height:34, borderRadius:8, background:qr.background_color, border:`1px solid ${qs==="active"?"rgba(57,255,143,0.3)":qs==="paused"?"rgba(249,115,22,0.3)":qs==="expired"?"rgba(255,107,107,0.3)":"rgba(255,255,255,0.1)"}`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, position:"relative" }}>
                     <QrCode size={16} color={qr.foreground_color}/>
