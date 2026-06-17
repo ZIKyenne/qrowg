@@ -47,7 +47,7 @@ export default async function QRCodesPage() {
                 QR Studio
               </h1>
               <p style={{ color: "#8A8478", fontSize: 11, margin: 0 }}>
-                Creez, personnalisez et exportez vos QR Codes
+                Créez, personnalisez et exportez vos QR Codes
               </p>
             </div>
           </div>
