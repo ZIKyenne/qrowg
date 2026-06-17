@@ -483,7 +483,7 @@ export default function TemplatesPage() {
           <button type="button" onClick={() => setSelected(null)} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, padding: "9px 14px", color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", gap: 5, fontSize: 12 }}>
             <X size={12} /> Annuler
           </button>
-          <button type="button" onClick={() => { console.log("CLIC UTILISER", selected); setNamingFor(selected!) }} disabled={!!creating}
+          <button type="button" onClick={() => setNamingFor(selected!)} disabled={!!creating}
             style={{ display: "flex", alignItems: "center", gap: 7, background: creating ? "rgba(201,168,76,0.2)" : "linear-gradient(90deg,#C9A84C,#b8953f)", border: "none", borderRadius: 9, padding: "9px 20px", color: "#080808", fontSize: 13, fontWeight: 700, cursor: creating ? "wait" : "pointer", opacity: creating ? 0.7 : 1 }}>
             {creating === selected ? "Création en cours..." : <><ArrowRight size={12} /> Utiliser ce template</>}
           </button>
