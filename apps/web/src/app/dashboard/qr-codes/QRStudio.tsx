@@ -11,6 +11,8 @@ import {
   Printer, LayoutGrid, TrendingUp, TrendingDown, BarChart
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
+import { createQR, updateQR, getQRBlob, downloadBlob, blobToDataUrl, buildAndDownloadPdf, type QROptions } from "./qrRender"
+import type QRCodeStyling from "qr-code-styling"
 
 type QRCode = {
   id:               string
@@ -314,8 +316,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [diagBg,     setDiagBg]     = useState("")
   const [logoUploading, setLogoUploading] = useState(false)
   const logoInputRef = useRef<HTMLInputElement>(null)
-  const canvasRef      = useRef<HTMLCanvasElement>(null)
-  const canvasModalRef = useRef<HTMLCanvasElement>(null)
+  const canvasRef      = useRef<HTMLDivElement>(null)
+  const canvasModalRef = useRef<HTMLDivElement>(null)
+  const qrInstRef      = useRef<QRCodeStyling | null>(null)
+  const qrModalInstRef = useRef<QRCodeStyling | null>(null)
 
   const active  = qrCodes.find(q => q.id === activeId) ?? null
   const qrUrl   = active ? `${appUrl}/q/${active.short_code}` : ""
@@ -337,152 +341,23 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   // ECC force H si logo actif (logo masque des modules QR)
   const effectiveEcc = styleConf.logoUrl ? "H" : ecLevel
 
-  function buildQRUrl(size: number): string {
-    const fgHex = fg.replace("#","")
-    const bgHex = styleConf.transparent ? "ffffff00" : bg.replace("#","")
-    const margin = styleConf.margin ?? 10
-    return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(qrUrl)}&color=${fgHex}&bgcolor=${bgHex}&ecc=${effectiveEcc}&margin=${margin}`
+  // Construit les options de rendu QR a partir de l'etat courant
+  function qrOpts(size: number): QROptions {
+    return { data: qrUrl, fg, bg, ecc: effectiveEcc, style: styleConf, size }
   }
 
+  // Rendu de l'apercu principal via qr-code-styling
   useEffect(() => {
     if (!canvasRef.current || !qrUrl) return
-    const canvas = canvasRef.current
-    const ctx    = canvas.getContext("2d")
-    if (!ctx) return
-    const img = new Image()
-    img.crossOrigin = "anonymous"
-    img.onload = () => {
-      canvas.width = 400; canvas.height = 400
-      ctx.clearRect(0, 0, 400, 400)
-
-      // Fond (degrade ou uni)
-      if (!styleConf.transparent) {
-        if (styleConf.gradient !== "none" && styleConf.gradientBg) {
-          let grad: CanvasGradient
-          if (styleConf.gradient === "radial") {
-            grad = ctx.createRadialGradient(200,200,0,200,200,200)
-          } else if (styleConf.gradient === "diagonal") {
-            grad = ctx.createLinearGradient(0,0,400,400)
-          } else {
-            grad = ctx.createLinearGradient(0,0,0,400)
-          }
-          grad.addColorStop(0, bg)
-          grad.addColorStop(1, styleConf.gradientBg)
-          ctx.fillStyle = grad
-          ctx.fillRect(0,0,400,400)
-        } else {
-          ctx.fillStyle = bg
-          ctx.fillRect(0,0,400,400)
-        }
-      }
-
-      // Coins arrondis
-      if (corner === "rounded") {
-        ctx.save(); const r = 20
-        ctx.beginPath(); ctx.moveTo(r,0)
-        ctx.lineTo(400-r,0); ctx.quadraticCurveTo(400,0,400,r)
-        ctx.lineTo(400,400-r); ctx.quadraticCurveTo(400,400,400-r,400)
-        ctx.lineTo(r,400); ctx.quadraticCurveTo(0,400,0,400-r)
-        ctx.lineTo(0,r); ctx.quadraticCurveTo(0,0,r,0)
-        ctx.closePath(); ctx.clip()
-      }
-
-      // Degrade sur le QR
-      if (styleConf.gradient !== "none" && styleConf.fg2) {
-        ctx.globalCompositeOperation = "source-over"
-        let grad: CanvasGradient
-        if (styleConf.gradient === "radial") {
-          grad = ctx.createRadialGradient(200,200,0,200,200,200)
-        } else if (styleConf.gradient === "diagonal") {
-          grad = ctx.createLinearGradient(0,0,400,400)
-        } else {
-          grad = ctx.createLinearGradient(0,0,0,400)
-        }
-        grad.addColorStop(0, fg)
-        grad.addColorStop(1, styleConf.fg2)
-        // Dessin QR puis colorisation
-        ctx.drawImage(img,0,0,400,400)
-        ctx.globalCompositeOperation = "multiply"
-        ctx.fillStyle = grad
-        ctx.fillRect(0,0,400,400)
-        ctx.globalCompositeOperation = "source-over"
-      } else {
-        ctx.drawImage(img,0,0,400,400)
-      }
-
-      if (corner === "rounded") ctx.restore()
-
-      // -- Dessin du logo central ---------------------------------------
-      if (styleConf.logoUrl) {
-        const logoImg  = new Image()
-        logoImg.crossOrigin = "anonymous"
-        logoImg.onload = () => {
-          const pct      = (styleConf.logoSize ?? 18) / 100
-          const maxRatio = 0.30  // jamais > 30% du QR
-          const ratio    = Math.min(pct, maxRatio)
-          const size     = canvas.width * ratio
-          const pad      = styleConf.logoPadding ?? 4
-          const cx       = canvas.width  / 2
-          const cy       = canvas.height / 2
-          const bgSize   = size + pad * 2
-          const r        = styleConf.logoShape === "circle"
-                             ? bgSize / 2
-                             : styleConf.logoShape === "rounded"
-                             ? bgSize * 0.2
-                             : 0
-          // Fond du conteneur
-          if (styleConf.logoBg !== "transparent") {
-            ctx.save()
-            ctx.beginPath()
-            if (r > 0) {
-              ctx.moveTo(cx - bgSize/2 + r, cy - bgSize/2)
-              ctx.lineTo(cx + bgSize/2 - r, cy - bgSize/2)
-              ctx.quadraticCurveTo(cx + bgSize/2, cy - bgSize/2, cx + bgSize/2, cy - bgSize/2 + r)
-              ctx.lineTo(cx + bgSize/2, cy + bgSize/2 - r)
-              ctx.quadraticCurveTo(cx + bgSize/2, cy + bgSize/2, cx + bgSize/2 - r, cy + bgSize/2)
-              ctx.lineTo(cx - bgSize/2 + r, cy + bgSize/2)
-              ctx.quadraticCurveTo(cx - bgSize/2, cy + bgSize/2, cx - bgSize/2, cy + bgSize/2 - r)
-              ctx.lineTo(cx - bgSize/2, cy - bgSize/2 + r)
-              ctx.quadraticCurveTo(cx - bgSize/2, cy - bgSize/2, cx - bgSize/2 + r, cy - bgSize/2)
-              ctx.closePath()
-            } else {
-              ctx.rect(cx - bgSize/2, cy - bgSize/2, bgSize, bgSize)
-            }
-            ctx.fillStyle = styleConf.logoBg === "custom"
-              ? (styleConf.logoBgColor ?? "#FFFFFF")
-              : styleConf.logoBg === "black" ? "#000000" : "#FFFFFF"
-            ctx.fill()
-            ctx.restore()
-          }
-          // Clipping pour le logo
-          ctx.save()
-          ctx.beginPath()
-          if (styleConf.logoShape === "circle") {
-            ctx.arc(cx, cy, size / 2, 0, Math.PI * 2)
-          } else if (styleConf.logoShape === "rounded") {
-            const rr = size * 0.2
-            ctx.moveTo(cx - size/2 + rr, cy - size/2)
-            ctx.lineTo(cx + size/2 - rr, cy - size/2)
-            ctx.quadraticCurveTo(cx + size/2, cy - size/2, cx + size/2, cy - size/2 + rr)
-            ctx.lineTo(cx + size/2, cy + size/2 - rr)
-            ctx.quadraticCurveTo(cx + size/2, cy + size/2, cx + size/2 - rr, cy + size/2)
-            ctx.lineTo(cx - size/2 + rr, cy + size/2)
-            ctx.quadraticCurveTo(cx - size/2, cy + size/2, cx - size/2, cy + size/2 - rr)
-            ctx.lineTo(cx - size/2, cy - size/2 + rr)
-            ctx.quadraticCurveTo(cx - size/2, cy - size/2, cx - size/2 + rr, cy - size/2)
-            ctx.closePath()
-          } else {
-            ctx.rect(cx - size/2, cy - size/2, size, size)
-          }
-          ctx.clip()
-          ctx.drawImage(logoImg, cx - size/2, cy - size/2, size, size)
-          ctx.restore()
-        }
-        logoImg.src = styleConf.logoUrl
-      }
+    const container = canvasRef.current
+    if (!qrInstRef.current) {
+      qrInstRef.current = createQR(qrOpts(400))
+      container.innerHTML = ""
+      qrInstRef.current.append(container)
+    } else {
+      updateQR(qrInstRef.current, qrOpts(400))
     }
-    img.src = buildQRUrl(400)
-  }, [qrUrl, fg, bg, corner, ecLevel, styleConf, showModal])
+  }, [qrUrl, fg, bg, corner, ecLevel, styleConf])
 
   async function archiveQR(id: string) {
     setArchivingId(id)
@@ -632,7 +507,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     if (dotStyle === "neon" || dotStyle === "luxury") {
       issues.push({ id:"style-complex", severity:"warning",
         title:"Style QR complexe", detail:"Les styles Neon/Luxury peuvent perturber la detection par certains scanners anciens.",
-        fix:null, fixable:false })
+        fix:undefined, fixable:false })
       score -= 6
     }
 
@@ -647,7 +522,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     if (colorDist < 60 && ratio >= 3) {
       issues.push({ id:"colors-close", severity:"info",
         title:"Couleurs proches", detail:"La distance chromatique est faible -- peut poser probleme sur ecrans a faible gamme.",
-        fix:null, fixable:false })
+        fix:undefined, fixable:false })
       score -= 4
     }
 
@@ -685,86 +560,18 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   }
 
   // Canvas modal plein ecran
-  const drawModalCanvas = useCallback(() => {
-    if (!canvasModalRef.current || !qrUrl) return
-    const canvas = canvasModalRef.current
-    const ctx    = canvas.getContext("2d"); if (!ctx) return
-    const img    = new Image()
-    const url    = buildQRUrl(800)
-    img.crossOrigin = "anonymous"
-    img.onload = () => {
-      canvas.width = 800; canvas.height = 800
-      ctx.clearRect(0, 0, 800, 800)
-      // Fond
-      if (!styleConf.transparent) {
-        if (styleConf.gradient !== "none" && styleConf.gradientBg) {
-          const grad = styleConf.gradient === "radial"
-            ? ctx.createRadialGradient(400,400,0,400,400,400)
-            : ctx.createLinearGradient(styleConf.gradient==="diagonal"?0:0, 0, styleConf.gradient==="diagonal"?800:0, 800)
-          grad.addColorStop(0, bg); grad.addColorStop(1, styleConf.gradientBg)
-          ctx.fillStyle = grad
-        } else { ctx.fillStyle = bg }
-        ctx.fillRect(0, 0, 800, 800)
-      }
-      // QR degrade
-      if (styleConf.gradient !== "none" && styleConf.fg2) {
-        ctx.drawImage(img, 0, 0, 800, 800)
-        const grad = styleConf.gradient === "radial"
-          ? ctx.createRadialGradient(400,400,0,400,400,400)
-          : ctx.createLinearGradient(styleConf.gradient==="diagonal"?0:0, 0, styleConf.gradient==="diagonal"?800:0, 800)
-        grad.addColorStop(0, fg); grad.addColorStop(1, styleConf.fg2)
-        ctx.globalCompositeOperation = "multiply"
-        ctx.fillStyle = grad; ctx.fillRect(0, 0, 800, 800)
-        ctx.globalCompositeOperation = "source-over"
-      } else {
-        ctx.drawImage(img, 0, 0, 800, 800)
-      }
-      // Logo
-      if (styleConf.logoUrl) {
-        const logoImg = new Image(); logoImg.crossOrigin = "anonymous"
-        logoImg.onload = () => {
-          const ratio = Math.min((styleConf.logoSize ?? 18) / 100, 0.30)
-          const size  = 800 * ratio; const pad = (styleConf.logoPadding ?? 4) * 2
-          const bgSz  = size + pad; const cx = 400; const cy = 400
-          const r = styleConf.logoShape === "circle" ? bgSz/2 : styleConf.logoShape === "rounded" ? bgSz*0.2 : 0
-          if (styleConf.logoBg !== "transparent") {
-            ctx.save(); ctx.beginPath()
-            if (r > 0) {
-              ctx.moveTo(cx-bgSz/2+r, cy-bgSz/2); ctx.lineTo(cx+bgSz/2-r, cy-bgSz/2)
-              ctx.quadraticCurveTo(cx+bgSz/2, cy-bgSz/2, cx+bgSz/2, cy-bgSz/2+r)
-              ctx.lineTo(cx+bgSz/2, cy+bgSz/2-r)
-              ctx.quadraticCurveTo(cx+bgSz/2, cy+bgSz/2, cx+bgSz/2-r, cy+bgSz/2)
-              ctx.lineTo(cx-bgSz/2+r, cy+bgSz/2)
-              ctx.quadraticCurveTo(cx-bgSz/2, cy+bgSz/2, cx-bgSz/2, cy+bgSz/2-r)
-              ctx.lineTo(cx-bgSz/2, cy-bgSz/2+r)
-              ctx.quadraticCurveTo(cx-bgSz/2, cy-bgSz/2, cx-bgSz/2+r, cy-bgSz/2)
-              ctx.closePath()
-            } else { ctx.rect(cx-bgSz/2, cy-bgSz/2, bgSz, bgSz) }
-            ctx.fillStyle = styleConf.logoBg==="custom"?(styleConf.logoBgColor??"#FFF"):styleConf.logoBg==="black"?"#000":"#FFF"
-            ctx.fill(); ctx.restore()
-          }
-          ctx.save(); ctx.beginPath()
-          if (styleConf.logoShape==="circle") { ctx.arc(cx, cy, size/2, 0, Math.PI*2) }
-          else if (styleConf.logoShape==="rounded") {
-            const rr=size*0.2; ctx.moveTo(cx-size/2+rr,cy-size/2); ctx.lineTo(cx+size/2-rr,cy-size/2)
-            ctx.quadraticCurveTo(cx+size/2,cy-size/2,cx+size/2,cy-size/2+rr); ctx.lineTo(cx+size/2,cy+size/2-rr)
-            ctx.quadraticCurveTo(cx+size/2,cy+size/2,cx+size/2-rr,cy+size/2); ctx.lineTo(cx-size/2+rr,cy+size/2)
-            ctx.quadraticCurveTo(cx-size/2,cy+size/2,cx-size/2,cy+size/2-rr); ctx.lineTo(cx-size/2,cy-size/2+rr)
-            ctx.quadraticCurveTo(cx-size/2,cy-size/2,cx-size/2+rr,cy-size/2); ctx.closePath()
-          } else { ctx.rect(cx-size/2, cy-size/2, size, size) }
-          ctx.clip(); ctx.drawImage(logoImg, cx-size/2, cy-size/2, size, size); ctx.restore()
-        }
-        logoImg.src = styleConf.logoUrl
-      }
-    }
-    img.src = url
-  }, [qrUrl, fg, bg, corner, ecLevel, styleConf])
-
-  useEffect(() => { if (showModal) drawModalCanvas() }, [showModal, drawModalCanvas])
+  // Rendu du QR plein ecran (modal) via qr-code-styling
+  useEffect(() => {
+    if (!showModal || !canvasModalRef.current || !qrUrl) return
+    const container = canvasModalRef.current
+    container.innerHTML = ""
+    qrModalInstRef.current = createQR(qrOpts(800))
+    qrModalInstRef.current.append(container)
+  }, [showModal, qrUrl, fg, bg, corner, ecLevel, styleConf])
   useEffect(() => {
     if (!active) return
-    setDestOverride(active.dest_override ?? null)
-    setDestHistory(active.dest_history ?? [])
+    setDestOverride((active.dest_override ?? null) as DestEntry | null)
+    setDestHistory((active.dest_history ?? []) as DestEntry[])
     setDestMode("view")
     setDestError("")
   }, [activeId])
@@ -866,104 +673,51 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   }
 
   // -- Construire canvas export a la taille voulue (avec logo) ----------------
+  // Construit un canvas d'export via qr-code-styling (logo gere nativement)
+  // + bandeau optionnel (nom page / url) dessine par-dessus.
   async function buildExportCanvas(px: number, transparent: boolean): Promise<HTMLCanvasElement> {
-    return new Promise((resolve, reject) => {
+    const opts: QROptions = {
+      data: qrUrl, fg, bg, ecc: effectiveEcc,
+      style: { ...styleConf, transparent: transparent || styleConf.transparent },
+      size: px,
+    }
+    const blob = await getQRBlob(opts, "png")
+    if (!blob) throw new Error("QR generation failed")
+    const url  = URL.createObjectURL(blob)
+    try {
+      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const i = new Image()
+        i.onload = () => resolve(i)
+        i.onerror = () => reject(new Error("QR image load failed"))
+        i.src = url
+      })
       const canvas = document.createElement("canvas")
       canvas.width = px; canvas.height = px
-      const ctx    = canvas.getContext("2d")!
-      const margin = expMargin
+      const ctx = canvas.getContext("2d")!
+      ctx.clearRect(0, 0, px, px)
+      ctx.drawImage(img, 0, 0, px, px)
 
-      // URL QR a la bonne taille
-      const fgH  = fg.replace("#","")
-      const bgH  = transparent ? "ffffff00" : (styleConf.transparent ? "ffffff00" : bg.replace("#",""))
-      const url  = `https://api.qrserver.com/v1/create-qr-code/?size=${px}x${px}&data=${encodeURIComponent(qrUrl)}&color=${fgH}&bgcolor=ffffff&ecc=${effectiveEcc}&margin=${margin}`
-
-      const img  = new Image(); img.crossOrigin = "anonymous"
-      img.onerror = () => reject(new Error("QR load failed"))
-      img.onload  = () => {
-        ctx.clearRect(0, 0, px, px)
-        // Fond
-        if (!transparent && !styleConf.transparent) {
-          if (styleConf.gradient !== "none" && styleConf.gradientBg) {
-            const grad = styleConf.gradient === "radial"
-              ? ctx.createRadialGradient(px/2,px/2,0,px/2,px/2,px/2)
-              : ctx.createLinearGradient(styleConf.gradient==="diagonal"?0:0,0,styleConf.gradient==="diagonal"?px:0,px)
-            grad.addColorStop(0, bg); grad.addColorStop(1, styleConf.gradientBg)
-            ctx.fillStyle = grad
-          } else { ctx.fillStyle = bg }
-          ctx.fillRect(0, 0, px, px)
+      // Bandeau bas : nom page + URL
+      if (expIncludeName || expIncludeUrl) {
+        const bannerH = Math.round(px * 0.08)
+        ctx.fillStyle = "rgba(0,0,0,0.7)"
+        ctx.fillRect(0, px - bannerH, px, bannerH)
+        const fSize = Math.round(bannerH * 0.32)
+        ctx.textAlign = "center"
+        if (expIncludeName && active?.pages?.title) {
+          ctx.fillStyle = "#F5F0E8"; ctx.font = `600 ${fSize}px 'DM Sans', Arial, sans-serif`
+          ctx.fillText(active.pages.title, px/2, px - bannerH + fSize*1.1, px*0.9)
         }
-        // QR + degrade
-        if (styleConf.gradient !== "none" && styleConf.fg2) {
-          ctx.drawImage(img, 0, 0, px, px)
-          const grad = styleConf.gradient === "radial"
-            ? ctx.createRadialGradient(px/2,px/2,0,px/2,px/2,px/2)
-            : ctx.createLinearGradient(styleConf.gradient==="diagonal"?0:0,0,styleConf.gradient==="diagonal"?px:0,px)
-          grad.addColorStop(0, fg); grad.addColorStop(1, styleConf.fg2)
-          ctx.globalCompositeOperation = "multiply"
-          ctx.fillStyle = grad; ctx.fillRect(0, 0, px, px)
-          ctx.globalCompositeOperation = "source-over"
-        } else { ctx.drawImage(img, 0, 0, px, px) }
-
-        // Bandeau bas: nom page + URL
-        let bannerH = 0
-        if (expIncludeName || expIncludeUrl) {
-          bannerH = Math.round(px * 0.08)
-          ctx.fillStyle = "rgba(0,0,0,0.7)"
-          ctx.fillRect(0, px - bannerH, px, bannerH)
-          ctx.fillStyle = "#F5F0E8"
-          const fSize = Math.round(bannerH * 0.32)
-          ctx.font = `600 ${fSize}px 'DM Sans', Arial, sans-serif`
-          ctx.textAlign = "center"
-          if (expIncludeName && active?.pages?.title) {
-            ctx.fillText(active.pages.title, px/2, px - bannerH + fSize*1.1, px*0.9)
-          }
-          if (expIncludeUrl) {
-            ctx.fillStyle = "#C9A84C"; ctx.font = `400 ${Math.round(fSize*0.8)}px monospace`
-            ctx.fillText(qrUrl, px/2, px - bannerH + (expIncludeName?fSize*2.2:fSize*1.5), px*0.9)
-          }
-          ctx.textAlign = "start"
+        if (expIncludeUrl) {
+          ctx.fillStyle = "#C9A84C"; ctx.font = `400 ${Math.round(fSize*0.8)}px monospace`
+          ctx.fillText(qrUrl, px/2, px - bannerH + (expIncludeName?fSize*2.2:fSize*1.5), px*0.9)
         }
-
-        // Logo
-        if (styleConf.logoUrl) {
-          const logoImg = new Image(); logoImg.crossOrigin = "anonymous"
-          logoImg.onload = () => {
-            const ratio = Math.min((styleConf.logoSize ?? 18)/100, 0.30)
-            const size  = px * ratio; const pad = (styleConf.logoPadding ?? 4) * (px/400)
-            const bgSz  = size + pad*2; const cx  = px/2; const cy = (px - bannerH)/2
-            const r     = styleConf.logoShape === "circle" ? bgSz/2 : styleConf.logoShape === "rounded" ? bgSz*0.2 : 0
-            if (styleConf.logoBg !== "transparent") {
-              ctx.save(); ctx.beginPath()
-              if (r > 0) {
-                ctx.moveTo(cx-bgSz/2+r,cy-bgSz/2); ctx.lineTo(cx+bgSz/2-r,cy-bgSz/2)
-                ctx.quadraticCurveTo(cx+bgSz/2,cy-bgSz/2,cx+bgSz/2,cy-bgSz/2+r)
-                ctx.lineTo(cx+bgSz/2,cy+bgSz/2-r); ctx.quadraticCurveTo(cx+bgSz/2,cy+bgSz/2,cx+bgSz/2-r,cy+bgSz/2)
-                ctx.lineTo(cx-bgSz/2+r,cy+bgSz/2); ctx.quadraticCurveTo(cx-bgSz/2,cy+bgSz/2,cx-bgSz/2,cy+bgSz/2-r)
-                ctx.lineTo(cx-bgSz/2,cy-bgSz/2+r); ctx.quadraticCurveTo(cx-bgSz/2,cy-bgSz/2,cx-bgSz/2+r,cy-bgSz/2)
-                ctx.closePath()
-              } else { ctx.rect(cx-bgSz/2,cy-bgSz/2,bgSz,bgSz) }
-              ctx.fillStyle = styleConf.logoBg==="custom"?(styleConf.logoBgColor??"#FFF"):styleConf.logoBg==="black"?"#000":"#FFF"
-              ctx.fill(); ctx.restore()
-            }
-            ctx.save(); ctx.beginPath()
-            if (styleConf.logoShape==="circle") { ctx.arc(cx,cy,size/2,0,Math.PI*2) }
-            else if (styleConf.logoShape==="rounded") {
-              const rr=size*0.2; ctx.moveTo(cx-size/2+rr,cy-size/2); ctx.lineTo(cx+size/2-rr,cy-size/2)
-              ctx.quadraticCurveTo(cx+size/2,cy-size/2,cx+size/2,cy-size/2+rr); ctx.lineTo(cx+size/2,cy+size/2-rr)
-              ctx.quadraticCurveTo(cx+size/2,cy+size/2,cx+size/2-rr,cy+size/2); ctx.lineTo(cx-size/2+rr,cy+size/2)
-              ctx.quadraticCurveTo(cx-size/2,cy+size/2,cx-size/2,cy+size/2-rr); ctx.lineTo(cx-size/2,cy-size/2+rr)
-              ctx.quadraticCurveTo(cx-size/2,cy-size/2,cx-size/2+rr,cy-size/2); ctx.closePath()
-            } else { ctx.rect(cx-size/2,cy-size/2,size,size) }
-            ctx.clip(); ctx.drawImage(logoImg,cx-size/2,cy-size/2,size,size); ctx.restore()
-            resolve(canvas)
-          }
-          logoImg.onerror = () => resolve(canvas)
-          logoImg.src = styleConf.logoUrl
-        } else { resolve(canvas) }
+        ctx.textAlign = "start"
       }
-      img.src = url
-    })
+      return canvas
+    } finally {
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+    }
   }
 
   // -- Fonctions QR Status ------------------------------------------------------
@@ -1366,24 +1120,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     if (!tpl) return
     setSuppRendered(false)
     try {
-      // Generer le QR a la bonne taille
+      // Generer le QR a la bonne taille via qr-code-styling (logo inclus)
       const qrPx    = Math.min(tpl.w, tpl.h)
-      const qrUrl2  = buildQRUrl(qrPx)
-      const qrImg   = new Image(); qrImg.crossOrigin = "anonymous"
-      await new Promise<void>((res, rej) => { qrImg.onload = () => res(); qrImg.onerror = () => rej(); qrImg.src = qrUrl2 })
-      const tmpC    = document.createElement("canvas")
-      tmpC.width = qrPx; tmpC.height = qrPx
-      const tmpCtx  = tmpC.getContext("2d")!
-      // Dessiner QR avec fond/degrade/logo
-      tmpCtx.fillStyle = bg; tmpCtx.fillRect(0, 0, qrPx, qrPx)
-      tmpCtx.drawImage(qrImg, 0, 0, qrPx, qrPx)
-      if (styleConf.logoUrl) {
-        const logoI = new Image(); logoI.crossOrigin = "anonymous"
-        await new Promise<void>((res) => { logoI.onload = () => res(); logoI.onerror = () => res(); logoI.src = styleConf.logoUrl! })
-        const ls = Math.round(qrPx * Math.min((styleConf.logoSize??18)/100, 0.28))
-        tmpCtx.drawImage(logoI, (qrPx-ls)/2, (qrPx-ls)/2, ls, ls)
-      }
-      const qrDataUrl = tmpC.toDataURL("image/png")
+      const qrBlob  = await getQRBlob({ data: qrUrl, fg, bg, ecc: effectiveEcc, style: styleConf, size: qrPx }, "png")
+      if (!qrBlob) throw new Error("qr gen failed")
+      const qrDataUrl = await blobToDataUrl(qrBlob)
       // Scale pour la preview (max 300px de large)
       const previewScale = Math.min(1, 280 / tpl.w)
       await renderSupport(canvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, logoUrl:styleConf.logoUrl, scale:previewScale })
@@ -1397,39 +1138,26 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setSuppExporting(true)
     try {
       const qrPx    = Math.min(tpl.w, tpl.h) * 2
-      const qrUrl2  = buildQRUrl(qrPx)
-      const qrImg   = new Image(); qrImg.crossOrigin = "anonymous"
-      await new Promise<void>((res, rej) => { qrImg.onload = () => res(); qrImg.onerror = () => rej(); qrImg.src = qrUrl2 })
-      const tmpC    = document.createElement("canvas")
-      tmpC.width = qrPx; tmpC.height = qrPx
-      const tmpCtx  = tmpC.getContext("2d")!
-      tmpCtx.fillStyle = bg; tmpCtx.fillRect(0, 0, qrPx, qrPx)
-      tmpCtx.drawImage(qrImg, 0, 0, qrPx, qrPx)
-      if (styleConf.logoUrl) {
-        const logoI = new Image(); logoI.crossOrigin = "anonymous"
-        await new Promise<void>((res) => { logoI.onload = () => res(); logoI.onerror = () => res(); logoI.src = styleConf.logoUrl! })
-        const ls = Math.round(qrPx * Math.min((styleConf.logoSize??18)/100, 0.28))
-        tmpCtx.drawImage(logoI, (qrPx-ls)/2, (qrPx-ls)/2, ls, ls)
-      }
-      const qrDataUrl = tmpC.toDataURL("image/png")
+      const qrBlob  = await getQRBlob({ data: qrUrl, fg, bg, ecc: effectiveEcc, style: styleConf, size: qrPx }, "png")
+      if (!qrBlob) throw new Error("qr gen failed")
+      const qrDataUrl = await blobToDataUrl(qrBlob)
       const outCanvas = document.createElement("canvas")
       await renderSupport(outCanvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, scale:2 })
       const filename  = `${(tpl.label).replace(/\s+/g,"-").toLowerCase()}-${active?.short_code ?? "qr"}.${fmt}`
       if (fmt === "pdf") {
-        const dpr = window.devicePixelRatio || 1
+        // Vrai PDF via jsPDF, oriente selon le support
+        const { jsPDF } = await import("jspdf")
+        const isPort = tpl.h > tpl.w
+        const pdf = new jsPDF({ unit: "pt", format: "a4", orientation: isPort ? "portrait" : "landscape" })
+        const PW = pdf.internal.pageSize.getWidth()
+        const PH = pdf.internal.pageSize.getHeight()
         const dataUrl = outCanvas.toDataURL("image/png", 1.0)
-        const isPort  = tpl.h > tpl.w
-        const pw = isPort ? 595 : 842; const ph = isPort ? 842 : 595
-        const pdfC = document.createElement("canvas")
-        pdfC.width = pw; pdfC.height = ph
-        const pdfCtx = pdfC.getContext("2d")!
-        pdfCtx.fillStyle = "#FFFFFF"; pdfCtx.fillRect(0, 0, pw, ph)
-        const img2 = new Image(); img2.src = dataUrl
-        await new Promise<void>(r => { img2.onload = () => r() })
-        const ratio   = Math.min(pw / outCanvas.width, ph / outCanvas.height)
-        const iw = outCanvas.width * ratio; const ih = outCanvas.height * ratio
-        pdfCtx.drawImage(img2, (pw-iw)/2, (ph-ih)/2, iw, ih)
-        const a = document.createElement("a"); a.href = pdfC.toDataURL("image/png",1.0); a.download = filename; a.click()
+        const ratio = Math.min(PW / outCanvas.width, PH / outCanvas.height)
+        const iw = outCanvas.width * ratio
+        const ih = outCanvas.height * ratio
+        pdf.setFillColor(255, 255, 255); pdf.rect(0, 0, PW, PH, "F")
+        pdf.addImage(dataUrl, "PNG", (PW - iw) / 2, (PH - ih) / 2, iw, ih)
+        pdf.save(filename)
       } else {
         const a = document.createElement("a"); a.href = outCanvas.toDataURL("image/png",1.0); a.download = filename; a.click()
       }
@@ -1446,50 +1174,40 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     }
     setExpExporting(true)
     try {
-      const px          = expSize === "custom" ? Math.max(256, Math.min(8192, expCustomSize)) : expSize
+      const px = expSize === "custom" ? Math.max(256, Math.min(8192, expCustomSize)) : expSize
       const isTransparent = expFormat === "png-t"
-      const canvas      = await buildExportCanvas(px, isTransparent)
+      const opts: QROptions = {
+        data: qrUrl, fg, bg, ecc: effectiveEcc,
+        style: { ...styleConf, transparent: isTransparent || styleConf.transparent, margin: expMargin },
+        size: px,
+      }
 
       if (expFormat === "svg") {
-        // SVG via qrserver (vecteur pur)
-        const svgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${px}x${px}&data=${encodeURIComponent(qrUrl)}&color=${fg.replace("#","")}&bgcolor=${bg.replace("#","")}&ecc=${effectiveEcc}&margin=${expMargin}&format=svg`
-        const resp   = await fetch(svgUrl)
-        const text   = await resp.text()
-        const blob   = new Blob([text], { type: "image/svg+xml" })
-        const url    = URL.createObjectURL(blob)
-        const a      = document.createElement("a"); a.href = url; a.download = getFilename("svg"); a.click()
-        URL.revokeObjectURL(url)
+        const blob = await getQRBlob(opts, "svg")
+        if (blob) downloadBlob(blob, getFilename("svg"))
 
       } else if (expFormat === "pdf") {
-        // PDF via canvas -> data URL -> lien download (simple iframe)
-        const dataUrl = canvas.toDataURL("image/png", 1.0)
-        // Creer un PDF A4 avec le QR centre via jsPDF-like en pur canvas
-        const pdfCanvas = document.createElement("canvas")
-        const dpi = 96; const a4w = Math.round(8.27 * dpi); const a4h = Math.round(11.69 * dpi)
-        pdfCanvas.width = a4w; pdfCanvas.height = a4h
-        const pdfCtx = pdfCanvas.getContext("2d")!
-        pdfCtx.fillStyle = "#FFFFFF"; pdfCtx.fillRect(0, 0, a4w, a4h)
-        const imgEl = new Image(); imgEl.src = dataUrl
-        await new Promise<void>(r => { imgEl.onload = () => r() })
-        const qrDisplaySize = Math.min(a4w * 0.7, a4h * 0.5)
-        const qrX = (a4w - qrDisplaySize) / 2; const qrY = (a4h - qrDisplaySize) / 2 - 40
-        pdfCtx.drawImage(imgEl, qrX, qrY, qrDisplaySize, qrDisplaySize)
-        // Titre + URL
-        pdfCtx.fillStyle = "#1A1A1A"; pdfCtx.font = `bold 22px Arial`; pdfCtx.textAlign = "center"
-        pdfCtx.fillText(active?.pages?.title ?? "", a4w/2, qrY - 24, a4w*0.8)
-        pdfCtx.fillStyle = "#C9A84C"; pdfCtx.font = `14px monospace`
-        pdfCtx.fillText(qrUrl, a4w/2, qrY + qrDisplaySize + 30, a4w*0.8)
-        pdfCtx.textAlign = "start"
-        const pdfData = pdfCanvas.toDataURL("image/png", 1.0)
-        const a = document.createElement("a"); a.href = pdfData; a.download = getFilename("pdf"); a.click()
+        // Vrai PDF A4 via jsPDF (QR PNG haute def + titre + url)
+        const pngBlob = await getQRBlob({ ...opts, style: { ...opts.style, transparent: false } }, "png")
+        if (pngBlob) {
+          await buildAndDownloadPdf(pngBlob, getFilename("pdf"), {
+            title: active?.pages?.title ?? "",
+            url: qrUrl,
+          })
+        }
 
       } else {
-        // PNG / PNG transparent / WEBP
-        const mime    = expFormat === "webp" ? "image/webp" : "image/png"
-        const quality = expFormat === "webp" ? 0.92 : undefined
-        const dataUrl = quality !== undefined ? canvas.toDataURL(mime, quality) : canvas.toDataURL(mime)
-        const ext     = expFormat === "webp" ? "webp" : "png"
-        const a       = document.createElement("a"); a.href = dataUrl; a.download = getFilename(ext); a.click()
+        // PNG / PNG transparent / WEBP — avec bandeau optionnel si demande
+        const ext = expFormat === "webp" ? "webp" : "png"
+        if (expIncludeName || expIncludeUrl) {
+          const canvas = await buildExportCanvas(px, isTransparent)
+          const mime = expFormat === "webp" ? "image/webp" : "image/png"
+          const dataUrl = expFormat === "webp" ? canvas.toDataURL(mime, 0.92) : canvas.toDataURL(mime)
+          const a = document.createElement("a"); a.href = dataUrl; a.download = getFilename(ext); a.click()
+        } else {
+          const blob = await getQRBlob(opts, ext as "png" | "webp")
+          if (blob) downloadBlob(blob, getFilename(ext))
+        }
       }
     } catch (e) { console.error("Export error:", e) }
     setExpExporting(false)
@@ -1513,8 +1231,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   async function copySVG() {
     if (!active) return
     try {
-      const svgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrUrl)}&color=${fg.replace("#","")}&bgcolor=${bg.replace("#","")}&ecc=${effectiveEcc}&format=svg`
-      const text   = await fetch(svgUrl).then(r => r.text())
+      const blob = await getQRBlob(qrOpts(400), "svg")
+      if (!blob) throw new Error("no svg")
+      const text = await blob.text()
       await navigator.clipboard.writeText(text)
       setExpCopied("svg"); setTimeout(() => setExpCopied(null), 2000)
     } catch { setExpCopied("svg-err"); setTimeout(() => setExpCopied(null), 2000) }
@@ -1586,7 +1305,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   async function applyToAll() {
     const sb = createClient()
     const payload = { foreground_color:fg, background_color:bg, corner_style:corner, error_correction:ecLevel, style_config:styleConf, updated_at:new Date().toISOString() }
-    await sb.from("qr_codes").update(payload).eq("user_id", qrCodes[0]?.user_id ?? "")
+    await sb.from("qr_codes").update(payload).eq("user_id", (qrCodes[0] as any)?.user_id ?? "")
     setQRCodes(prev => prev.map(q => ({ ...q, ...payload })))
     setApplyAllOk(true); setTimeout(()=>setApplyAllOk(false), 2500)
   }
@@ -1653,7 +1372,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
             {/* QR grand */}
             <div style={{ padding:28, borderRadius:24, background:bg, boxShadow:"0 0 0 1px rgba(201,168,76,0.3), 0 32px 80px rgba(0,0,0,0.9)" }}>
-              <canvas ref={canvasModalRef} width={800} height={800} style={{ display:"block", width:320, height:320, imageRendering:"pixelated" }}/>
+              <div ref={canvasModalRef} data-qr-container style={{ display:"flex", width:320, height:320, alignItems:"center", justifyContent:"center" }}/>
             </div>
 
             {/* Actions */}
@@ -1910,7 +1629,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         borderRight:  h==="right"  ? "2px solid rgba(201,168,76,0.6)" : "none",
                       }}/>
                     ))}
-                    <canvas ref={canvasRef} width={400} height={400} style={{ display:"block", width:200, height:200, imageRendering:"pixelated" }}/>
+                    <div ref={canvasRef} data-qr-container style={{ display:"flex", width:200, height:200, alignItems:"center", justifyContent:"center" }}/>
                     {/* Hover overlay */}
                     <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0)", display:"flex", alignItems:"center", justifyContent:"center", borderRadius:20, transition:"background 0.2s" }}
                       onMouseEnter={e => (e.currentTarget.style.background="rgba(0,0,0,0.4)")}
@@ -3195,7 +2914,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       </div>
 
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg) } } @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} }`}</style>
+      <style>{`@keyframes spin { to { transform: rotate(360deg) } } @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} } [data-qr-container] canvas, [data-qr-container] svg { width:100% !important; height:100% !important; display:block; }`}</style>
     </div>
   )
 }
