@@ -294,6 +294,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [styleConf,  setStyleConf]  = useState<QRStyleConfig>({ ...DEFAULT_STYLE })
   const [styleTab,   setStyleTab]   = useState<"apparence"|"branding"|"qualite">("apparence")
   const [openAcc,    setOpenAcc]    = useState<string>("presets")
+  const [autoMsg,    setAutoMsg]    = useState<string>("")
   const [applyAllOk,   setApplyAllOk]   = useState(false)
   const [selectedCat,  setSelectedCat]  = useState("all")
   const [upsellPreset,  setUpsellPreset]  = useState<string | null>(null)
@@ -1357,12 +1358,12 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
   // -- Style automatique : detecte la categorie via le titre/destination -------
   const RECO_KEYWORDS: { cat: string; words: string[] }[] = [
-    { cat:"restaurant", words:["resto","restaurant","pizz","bistro","cafe","café","coffee","brasserie","burger","sushi","food","cuisine","traiteur","cocktail","wine","vin","boulang","patiss","menu","gourmet","steak","kebab","tacos","glace"] },
-    { cat:"creator",    words:["photo","studio","portfolio","createur","créateur","creator","artist","artiste","design","youtube","tiktok","insta","twitch","stream","podcast","influence","blog","music","musique","beauty","makeup","tattoo"] },
-    { cat:"tech",       words:["tech","dev","software","app","saas","web3","crypto","blockchain","data","cyber","code","digital","startup","ia "," ai","robot","quantum"] },
-    { cat:"event",      words:["mariage","wedding","event","evenement","événement","gala","soiree","soirée","concert","festival","conference","conférence","anniversaire","birthday","networking","salon","seminaire"] },
-    { cat:"luxury",     words:["luxe","luxury","premium","joaill","bijou","jewel","prestige","diamond","exclusif","exclusive","monaco","yacht","or fin","haute"] },
-    { cat:"business",   words:["agence","agency","consult","avocat","cabinet","finance","immo","immobilier","startup","entreprise","corporate","conseil","expert","comptable","assurance","freelance","b2b","coach","notaire"] },
+    { cat:"restaurant", words:["resto","restaurant","pizz","bistro","cafe","café","coffee","brasserie","burger","sushi","food","cuisine","traiteur","cocktail","wine","vin","boulang","patiss","menu","gourmet","steak","kebab","tacos","glace","trattoria","grill","tapas","ramen"] },
+    { cat:"creator",    words:["photo","studio","portfolio","createur","créateur","creator","artist","artiste","design","youtube","tiktok","insta","twitch","stream","podcast","influence","blog","music","musique","beauty","makeup","tattoo","dj","mix","prod","beatmaker","danse","model"] },
+    { cat:"tech",       words:["tech","dev","software","app","saas","web3","crypto","blockchain","data","cyber","code","digital","startup","ia "," ai","robot","quantum","gaming","game","esport"] },
+    { cat:"event",      words:["mariage","wedding","event","evenement","événement","gala","soiree","soirée","concert","festival","conference","conférence","anniversaire","birthday","networking","seminaire","club","party","fete","fête"] },
+    { cat:"luxury",     words:["luxe","luxury","premium","joaill","bijou","jewel","prestige","diamond","exclusif","exclusive","monaco","yacht","or fin","haute","spa","institut"] },
+    { cat:"business",   words:["agence","agency","consult","avocat","cabinet","finance","immo","immobilier","entreprise","corporate","conseil","expert","comptable","assurance","freelance","b2b","coach","notaire","salon","coiffure","barber","auto","garage"] },
   ]
 
   function detectCat(): string {
@@ -1378,15 +1379,23 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   function pickPreset(cat: string): Preset | null {
     const inCat = PRESETS.filter(p => p.cat === cat)
     if (!inCat.length) return null
-    // priorite : le premier accessible avec le plan actuel, sinon le 1er (declenche upsell)
-    return inCat.find(p => PLAN_RANK[userPlan] >= PLAN_RANK[p.plan]) ?? inCat[0]
+    const accessible = inCat.filter(p => PLAN_RANK[userPlan] >= PLAN_RANK[p.plan])
+    const pool = accessible.length ? accessible : inCat
+    // eviter de re-appliquer le style deja actif -> garantit un changement visible
+    const different = pool.find(p => !(p.fg === fg && p.bg === bg))
+    return different ?? pool[0]
   }
 
   function autoStyle() {
     const cat = detectCat()
     setSelectedCat(cat)
     const p = pickPreset(cat)
-    if (p) applyPreset(p)
+    if (p) {
+      applyPreset(p)
+      const catLabel = PRESET_CATS.find(c => c.id === cat)?.label ?? cat
+      setAutoMsg(`Style « ${p.label} » applique (${catLabel})`)
+      setTimeout(() => setAutoMsg(""), 3500)
+    }
   }
 
   async function applyToAll() {
@@ -2243,9 +2252,14 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   <AccSection id="presets" title="Choisir un style" icon="✨" openId={openAcc} setOpenId={setOpenAcc}>
                     {/* Bouton style automatique */}
                     <button type="button" onClick={autoStyle}
-                      style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, marginBottom:12, padding:"10px", background:"linear-gradient(90deg, rgba(201,168,76,0.18), rgba(201,168,76,0.08))", border:"1px solid rgba(201,168,76,0.35)", borderRadius:10, color:G, fontSize:12, fontWeight:700, cursor:"pointer" }}>
+                      style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, marginBottom:autoMsg?6:12, padding:"10px", background:"linear-gradient(90deg, rgba(201,168,76,0.18), rgba(201,168,76,0.08))", border:"1px solid rgba(201,168,76,0.35)", borderRadius:10, color:G, fontSize:12, fontWeight:700, cursor:"pointer" }}>
                       <Sparkles size={14}/> Generer un style automatiquement
                     </button>
+                    {autoMsg && (
+                      <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:12, padding:"7px 10px", background:"rgba(57,255,143,0.08)", border:"1px solid rgba(57,255,143,0.25)", borderRadius:8, color:"#39FF8F", fontSize:11, fontWeight:600 }}>
+                        <Check size={12}/> {autoMsg}
+                      </div>
+                    )}
 
                     {/* Filtres par metier */}
                     <div style={{ display:"flex", gap:4, overflowX:"auto", paddingBottom:8, marginBottom:10 }}>
