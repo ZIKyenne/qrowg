@@ -2715,55 +2715,50 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             "pdf":   { label:"PDF",       ext:"pdf",  color:"#FF6B6B", desc:"Impression A4 avec titre",  plan:"business" },
           }
           const fmt = FORMAT_CFG[expFormat] ?? FORMAT_CFG["png"]
-          const RECO = [
-            { emoji:"🌐", label:"Web",           fmt:"png",   size:1024, note:"PNG 1024px -- standard" },
-            { emoji:"🖨️", label:"Impression",    fmt:"pdf",   size:2048, note:"PDF / SVG 2048px+" },
-            { emoji:"🏷️",  label:"Sticker",      fmt:"png-t", size:1024, note:"PNG transparent 1024px" },
-            { emoji:"📱",  label:"Reseaux",       fmt:"png",   size:512,  note:"PNG 512px -- leger" },
-          ]
           return (
           <div style={{ flex:1, overflowY:"auto", padding:"14px" }}>
             <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
-              {/* -- Recommandations ------------------------------------------ */}
+              {/* -- Format (cartes) ------------------------------------------ */}
               <div>
-                <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>
-                  Recommandations
-                </p>
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:5 }}>
-                  {RECO.map(r => {
-                    const canReco = PLAN_RANK[userPlan] >= PLAN_RANK[FORMAT_CFG[r.fmt]?.plan ?? "free"]
-                    return (
-                      <button key={r.label} type="button"
-                        onClick={() => { if (!canReco) return; setExpFormat(r.fmt as any); setExpSize(r.size as any) }}
-                        style={{ padding:"8px 7px", background:"rgba(255,255,255,0.02)", border:`1px solid ${expFormat===r.fmt&&expSize===r.size?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:canReco?"pointer":"not-allowed", textAlign:"left" as const, opacity:canReco?1:0.6, position:"relative" as const }}>
-                        <p style={{ color:"#F5F0E8", fontSize:10, fontWeight:600, margin:"0 0 2px" }}>{r.emoji} {r.label}</p>
-                        <p style={{ color:MUTED, fontSize:9, margin:0 }}>{r.note}</p>
-                        {!canReco && <Lock size={9} color={MUTED} style={{ position:"absolute", top:5, right:5 }}/>}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* -- Format --------------------------------------------------- */}
-              <div>
-                <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Format</p>
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:5 }}>
-                  {Object.entries(FORMAT_CFG).map(([id, cfg]) => {
+                <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 10px" }}>Choisissez un format</p>
+                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                  {([
+                    { id:"png",   emoji:"🌐", usage:"Usage web",        desc:"Universel, fond opaque. Le plus polyvalent." },
+                    { id:"svg",   emoji:"🖨️", usage:"Impression HD",     desc:"Vectoriel, net a toutes les tailles." },
+                    { id:"pdf",   emoji:"📄", usage:"Flyers & affiches", desc:"Document A4 pret a imprimer, avec titre." },
+                    { id:"webp",  emoji:"⚡", usage:"Web optimise",      desc:"Plus leger que le PNG, ideal sites rapides." },
+                    { id:"png-t", emoji:"🏷️", usage:"Sticker",          desc:"PNG a fond transparent, pour autocollants." },
+                  ] as const).map(f => {
+                    const cfg   = FORMAT_CFG[f.id]
                     const canFmt = PLAN_RANK[userPlan] >= PLAN_RANK[cfg.plan]
-                    const isA    = expFormat === id
-                    const badge  = cfg.plan === "free" ? null : cfg.plan === "pro" ? "PRO" : "BIZ"
+                    const isA    = expFormat === f.id
                     return (
-                      <button key={id} type="button"
-                        onClick={() => canFmt && setExpFormat(id as any)}
-                        style={{ padding:"9px 8px", background:isA?`${cfg.color}12`:"rgba(255,255,255,0.02)", border:`1px solid ${isA?cfg.color+"50":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:canFmt?"pointer":"not-allowed", opacity:canFmt?1:0.55, position:"relative" as const, textAlign:"left" as const }}>
-                        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:2 }}>
-                          <span style={{ color:isA?cfg.color:"#F5F0E8", fontSize:11, fontWeight:700 }}>{cfg.label}</span>
-                          {badge && <span style={{ background:`${cfg.color}20`, borderRadius:3, padding:"1px 4px", fontSize:7, color:cfg.color, fontWeight:800 }}>{badge}</span>}
+                      <button key={f.id} type="button"
+                        onClick={() => canFmt && setExpFormat(f.id as any)}
+                        style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 14px", background:isA?`${cfg.color}14`:"rgba(255,255,255,0.02)", border:`1.5px solid ${isA?cfg.color+"66":"rgba(255,255,255,0.07)"}`, borderRadius:12, cursor:canFmt?"pointer":"not-allowed", opacity:canFmt?1:0.5, textAlign:"left" as const, position:"relative" as const, transition:"all 0.15s" }}>
+                        <div style={{ width:38, height:38, borderRadius:10, background:isA?`${cfg.color}22`:"rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>
+                          {f.emoji}
                         </div>
-                        <p style={{ color:MUTED, fontSize:9, margin:0 }}>{cfg.desc}</p>
-                        {!canFmt && <Lock size={9} color={MUTED} style={{ position:"absolute", top:5, right:5 }}/>}
+                        <div style={{ flex:1, minWidth:0 }}>
+                          <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:2 }}>
+                            <span style={{ color:isA?cfg.color:"#F5F0E8", fontSize:13, fontWeight:700 }}>{cfg.label}</span>
+                            <span style={{ color:MUTED, fontSize:11 }}>{f.usage}</span>
+                          </div>
+                          <p style={{ color:MUTED, fontSize:10, margin:0, lineHeight:1.4 }}>{f.desc}</p>
+                        </div>
+                        <div style={{ flexShrink:0 }}>
+                          {canFmt ? (
+                            cfg.plan === "free"
+                              ? <span style={{ display:"inline-flex", alignItems:"center", gap:3, background:"rgba(57,255,143,0.12)", border:"1px solid rgba(57,255,143,0.3)", borderRadius:6, padding:"3px 8px", fontSize:9, color:"#39FF8F", fontWeight:700 }}><Check size={9}/> Gratuit</span>
+                              : <span style={{ background:`${cfg.color}20`, border:`1px solid ${cfg.color}40`, borderRadius:6, padding:"3px 8px", fontSize:9, color:cfg.color, fontWeight:800 }}>{cfg.plan === "pro" ? "PRO" : "BIZ"}</span>
+                          ) : (
+                            <span style={{ display:"inline-flex", alignItems:"center", gap:3, background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:6, padding:"3px 8px", fontSize:9, color:MUTED, fontWeight:700 }}><Lock size={9}/> {cfg.plan === "pro" ? "Pro" : "Business"}</span>
+                          )}
+                        </div>
+                        {isA && (
+                          <div style={{ position:"absolute", left:0, top:"50%", transform:"translateY(-50%)", width:3, height:"60%", background:cfg.color, borderRadius:"0 3px 3px 0" }}/>
+                        )}
                       </button>
                     )
                   })}
