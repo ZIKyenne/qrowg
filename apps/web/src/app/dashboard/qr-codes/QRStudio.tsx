@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback, type ReactNode } from "react"
 import {
-  QrCode, Download, Link, Check, Lock, Pencil,
+  QrCode, Download, Link, Check, Lock, Pencil, Plus,
   Eye, EyeOff, ChevronRight, ScanLine, Clock,
   Palette, Settings, Share2, ExternalLink, Copy,
   RotateCcw, Loader2, Search, Trash2, Archive,
@@ -1585,8 +1585,17 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           {filteredQR.length === 0 ? (
             <div style={{ textAlign:"center", padding:"32px 12px", color:MUTED }}>
               <QrCode size={24} color={MUTED} style={{ marginBottom:8 }}/>
-              <p style={{ fontSize:12, margin:"0 0 3px", color:"#F5F0E8", fontWeight:600 }}>Aucun resultat</p>
-              <p style={{ fontSize:10, margin:0, lineHeight:1.5 }}>Aucun QR ne correspond<br/>a vos filtres</p>
+              {qrCodes.length === 0 ? (
+                <>
+                  <p style={{ fontSize:12, margin:"0 0 3px", color:"#F5F0E8", fontWeight:600 }}>Aucun QR pour l'instant</p>
+                  <p style={{ fontSize:10, margin:0, lineHeight:1.5 }}>Creez votre premiere page<br/>pour demarrer</p>
+                </>
+              ) : (
+                <>
+                  <p style={{ fontSize:12, margin:"0 0 3px", color:"#F5F0E8", fontWeight:600 }}>Aucun resultat</p>
+                  <p style={{ fontSize:10, margin:0, lineHeight:1.5 }}>Aucun QR ne correspond<br/>a vos filtres</p>
+                </>
+              )}
             </div>
           ) : filteredQR.map(qr => {
             const page = qr.pages
@@ -2165,10 +2174,22 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             <div style={{ width:72, height:72, borderRadius:20, background:"rgba(201,168,76,0.06)", border:"1px solid rgba(201,168,76,0.12)", display:"flex", alignItems:"center", justifyContent:"center" }}>
               <QrCode size={28} color="rgba(201,168,76,0.4)"/>
             </div>
-            <div style={{ textAlign:"center" as const }}>
-              <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:600, margin:"0 0 6px" }}>Aucun QR selectionne</p>
-              <p style={{ color:MUTED, fontSize:12, margin:0, lineHeight:1.6 }}>Choisissez un QR dans la liste<br/>pour le personnaliser</p>
-            </div>
+            {qrCodes.length === 0 ? (
+              <>
+                <div style={{ textAlign:"center" as const }}>
+                  <p style={{ color:"#F5F0E8", fontSize:15, fontWeight:700, margin:"0 0 6px" }}>Bienvenue dans QR Studio</p>
+                  <p style={{ color:MUTED, fontSize:12, margin:0, lineHeight:1.6 }}>Creez votre premiere page pour generer<br/>un QR Code personnalisable.</p>
+                </div>
+                <a href="/dashboard" style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"11px 20px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, textDecoration:"none", boxShadow:"0 4px 14px rgba(201,168,76,0.2)" }}>
+                  <Plus size={15}/> Creer ma premiere page
+                </a>
+              </>
+            ) : (
+              <div style={{ textAlign:"center" as const }}>
+                <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:600, margin:"0 0 6px" }}>Aucun QR selectionne</p>
+                <p style={{ color:MUTED, fontSize:12, margin:0, lineHeight:1.6 }}>Choisissez un QR dans la liste<br/>pour le personnaliser</p>
+              </div>
+            )}
           </div>
         )}
       </div>
