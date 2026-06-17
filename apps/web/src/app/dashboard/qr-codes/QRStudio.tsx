@@ -1204,11 +1204,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   }
 
   // -- Generer preview support -----------------------------------------------
-  async function previewSupport() {
+  const previewSupport = useCallback(async () => {
     const canvas = supportCanvasRef.current; if (!canvas) return
     const tpl    = SUPP_TPLS.find(t => t.id === suppTplId)
     if (!tpl) return
-    setSuppRendered(false)
     try {
       // Generer le QR a la bonne taille via qr-code-styling (logo inclus)
       const qrPx    = Math.min(tpl.w, tpl.h)
@@ -1220,7 +1219,15 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       await renderSupport(canvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, logoUrl:styleConf.logoUrl, scale:previewScale })
       setSuppRendered(true)
     } catch { setSuppRendered(false) }
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [suppTplId, qrUrl, fg, bg, ecLevel, styleConf, suppTitle, suppSubtitle])
+
+  // Preview LIVE : regenere automatiquement quand un parametre change (debounce)
+  useEffect(() => {
+    if (activeTab !== "supports" || !active) return
+    const t = setTimeout(() => { previewSupport() }, 250)
+    return () => clearTimeout(t)
+  }, [activeTab, active, previewSupport])
 
   // -- Export support --------------------------------------------------------
   async function exportSupport(fmt: "png"|"pdf") {
@@ -2826,7 +2833,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   const badge = t.plan === "free" ? null : t.plan === "pro" ? "PRO" : "BIZ"
                   return (
                     <button key={t.id} type="button"
-                      onClick={() => { setSuppTplId(t.id); setSuppRendered(false) }}
+                      onClick={() => setSuppTplId(t.id)}
                       style={{ display:"flex", alignItems:"center", gap:8, padding:"7px 9px", background:isA?"rgba(201,168,76,0.08)":"rgba(255,255,255,0.02)", border:`1px solid ${isA?"rgba(201,168,76,0.3)":"rgba(255,255,255,0.06)"}`, borderRadius:8, cursor:"pointer", textAlign:"left" as const, opacity:can?1:0.6, position:"relative" as const }}>
                       <span style={{ fontSize:16, flexShrink:0 }}>{t.emoji}</span>
                       <div style={{ flex:1, minWidth:0 }}>
@@ -2855,13 +2862,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
                   <div>
                     <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Titre</label>
-                    <input value={suppTitle} onChange={e => { setSuppTitle(e.target.value); setSuppRendered(false) }}
+                    <input value={suppTitle} onChange={e => setSuppTitle(e.target.value)}
                       placeholder={active?.pages?.title ?? "Titre de votre page"}
                       style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none", boxSizing:"border-box" as const }}/>
                   </div>
                   <div>
                     <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Sous-titre / Appel a l&apos;action</label>
-                    <select value={suppSubtitle} onChange={e => { setSuppSubtitle(e.target.value); setSuppRendered(false) }}
+                    <select value={suppSubtitle} onChange={e => setSuppSubtitle(e.target.value)}
                       style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                       {[
                         "Scannez pour voir le menu",
@@ -2890,14 +2897,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       <canvas ref={supportCanvasRef} style={{ maxWidth:"100%", borderRadius:6, display: suppRendered ? "block" : "none" }}/>
                       {!suppRendered && (
                         <div style={{ width:"100%", height:160, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:8 }}>
-                          <span style={{ fontSize:28 }}>{tpl.emoji}</span>
-                          <p style={{ color:MUTED, fontSize:11, margin:0 }}>Cliquez pour generer</p>
+                          <Loader2 size={20} color={MUTED} style={{ animation:"spin 0.8s linear infinite" }}/>
+                          <p style={{ color:MUTED, fontSize:11, margin:0 }}>Generation de l&apos;apercu...</p>
                         </div>
                       )}
-                      <button type="button" onClick={previewSupport}
-                        style={{ width:"100%", padding:"8px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:8, color:G, fontSize:11, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
-                        <Eye size={12}/> {suppRendered ? "Régénérer l'aperçu" : "Générer l'aperçu"}
-                      </button>
+                      <p style={{ color:MUTED, fontSize:10, margin:0, display:"flex", alignItems:"center", gap:5 }}>
+                        <Eye size={11}/> Apercu en temps reel
+                      </p>
                     </>
                   ) : (
                     <div style={{ padding:"20px 0", textAlign:"center" as const }}>
