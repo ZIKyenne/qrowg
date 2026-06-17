@@ -111,82 +111,100 @@ type Preset = {
   fg:       string
   bg:       string
   fg2?:     string
-  corner?:  string
-  eye?:     string
+  cornerColor?: string
+  eyeColor?:    string
   gradient?: "none"|"linear"|"radial"|"diagonal"
-  dotStyle?: string
+  gradientBg?:  string
+  dotStyle?:    string
   cornerStyle?: string
+  ecc?:     "L"|"M"|"Q"|"H"
+  margin?:  number
+  density?: "low"|"medium"|"high"
+  transparent?: boolean
   plan:     string
 }
 
 const PRESET_CATS = [
   { id:"all",        label:"Tous",       emoji:"🎨" },
-  { id:"classic",    label:"Classic",    emoji:"⚫" },
+  { id:"classic",    label:"Classique",  emoji:"⚫" },
   { id:"business",   label:"Business",   emoji:"💼" },
-  { id:"luxury",     label:"Luxury",     emoji:"💎" },
-  { id:"restaurant", label:"Restaurant", emoji:"🍽" },
-  { id:"nightlife",  label:"Nightlife",  emoji:"🌙" },
-  { id:"creator",    label:"Creator",    emoji:"🎨" },
-  { id:"realestate", label:"Immobilier", emoji:"🏠" },
+  { id:"restaurant", label:"Restaurant", emoji:"🍽️" },
+  { id:"luxury",     label:"Luxe",       emoji:"💎" },
+  { id:"creator",    label:"Createur",   emoji:"🎬" },
+  { id:"tech",       label:"Tech",       emoji:"⚡" },
   { id:"event",      label:"Event",      emoji:"🎉" },
-  { id:"minimal",    label:"Minimal",    emoji:"▫️" },
-  { id:"neon",       label:"Neon",       emoji:"💜" },
 ]
 
 const PRESETS: Preset[] = [
-  // -- Classic ----------------------------------------------------------------
-  { id:"classic-black",   label:"Classic Black",  cat:"classic",    fg:"#080808", bg:"#FFFFFF", plan:"free"     },
-  { id:"midnight-gold",   label:"Midnight Gold",  cat:"classic",    fg:"#C9A84C", bg:"#080808", plan:"free"     },
-  { id:"snow-white",      label:"Snow White",     cat:"classic",    fg:"#1A1A1A", bg:"#F8F8F8", plan:"free"     },
+  // == CLASSIQUE ==============================================================
+  { id:"classic-black",     label:"Classic Black",   cat:"classic", fg:"#0A0A0A", bg:"#FFFFFF", dotStyle:"square",  cornerStyle:"square",  plan:"free" },
+  { id:"snow-white",        label:"Snow White",      cat:"classic", fg:"#1A1A1A", bg:"#F8F8F8", dotStyle:"rounded", cornerStyle:"rounded", plan:"free" },
+  { id:"minimal-gray",      label:"Minimal Gray",    cat:"classic", fg:"#4B5563", bg:"#F9FAFB", dotStyle:"minimal", cornerStyle:"minimal", plan:"free" },
+  { id:"midnight-gold",     label:"Midnight Gold",   cat:"classic", fg:"#C9A84C", bg:"#0A0A0A", dotStyle:"square",  cornerStyle:"square",  plan:"free" },
+  { id:"soft-blue",         label:"Soft Blue",       cat:"classic", fg:"#2563EB", bg:"#EFF6FF", dotStyle:"rounded", cornerStyle:"circle",  plan:"free" },
+  { id:"corporate-navy",    label:"Corporate Navy",  cat:"classic", fg:"#1E3A5F", bg:"#FFFFFF", dotStyle:"square",  cornerStyle:"square",  plan:"free" },
+  { id:"graphite",          label:"Graphite",        cat:"classic", fg:"#2D2D2D", bg:"#E5E5E5", dotStyle:"dot",     cornerStyle:"rounded", plan:"free" },
+  { id:"ivory-noir",        label:"Ivory Noir",      cat:"classic", fg:"#1A1A1A", bg:"#FBF8F0", dotStyle:"rounded", cornerStyle:"rounded", plan:"pro" },
 
-  // -- Business ---------------------------------------------------------------
-  { id:"emerald-biz",     label:"Emerald Biz",    cat:"business",   fg:"#00C896", bg:"#001A12", plan:"pro"      },
-  { id:"cobalt-pro",      label:"Cobalt Pro",     cat:"business",   fg:"#0078D4", bg:"#FFFFFF", plan:"pro"      },
-  { id:"slate-corp",      label:"Slate Corp",     cat:"business",   fg:"#64748B", bg:"#F1F5F9", plan:"pro"      },
-  { id:"tech-matrix",     label:"Tech Matrix",    cat:"business",   fg:"#00FF41", bg:"#0D0D0D", dotStyle:"dot",  plan:"pro" },
+  // == BUSINESS ===============================================================
+  { id:"corporate-blue",    label:"Corporate Blue",  cat:"business", fg:"#0A4DA6", bg:"#FFFFFF", dotStyle:"square",  cornerStyle:"square",  plan:"free" },
+  { id:"executive-gold",    label:"Executive Gold",  cat:"business", fg:"#B8860B", bg:"#0F0F0F", dotStyle:"rounded", cornerStyle:"rounded", ecc:"H", density:"high", margin:12, plan:"pro" },
+  { id:"realestate-navy",   label:"Real Estate Navy",cat:"business", fg:"#14274E", bg:"#F4F6FB", dotStyle:"square",  cornerStyle:"circle",  plan:"pro" },
+  { id:"emerald-business",  label:"Emerald Business",cat:"business", fg:"#047857", bg:"#ECFDF5", dotStyle:"rounded", cornerStyle:"rounded", plan:"pro" },
+  { id:"startup-indigo",    label:"Startup Indigo",  cat:"business", fg:"#4F46E5", bg:"#FFFFFF", dotStyle:"dot",     cornerStyle:"circle",  plan:"pro" },
+  { id:"finance-elite",     label:"Finance Elite",   cat:"business", fg:"#0B3D2E", bg:"#F0FFF8", dotStyle:"square",  cornerStyle:"square",  ecc:"H", density:"high", plan:"pro" },
+  { id:"consulting-premium",label:"Consulting Premium",cat:"business",fg:"#334155",bg:"#F8FAFC", dotStyle:"rounded", cornerStyle:"rounded", plan:"pro" },
+  { id:"platinum-executive",label:"Platinum Executive",cat:"business",fg:"#6B7280",bg:"#0D0D0D", dotStyle:"luxury",  cornerStyle:"luxury",  eyeColor:"#9CA3AF", ecc:"H", density:"high", margin:14, plan:"business" },
 
-  // -- Luxury -----------------------------------------------------------------
-  { id:"luxury-gold",     label:"Luxury Gold",    cat:"luxury",     fg:"#C9A84C", bg:"#1A1200", plan:"business" },
-  { id:"royal-purple",    label:"Royal Purple",   cat:"luxury",     fg:"#7B61FF", bg:"#0A0015", plan:"business" },
-  { id:"carbon-fiber",    label:"Carbon Fiber",   cat:"luxury",     fg:"#F5F0E8", bg:"#1A1A1A", plan:"business" },
-  { id:"champagne",       label:"Champagne",      cat:"luxury",     fg:"#D4AF37", bg:"#FAF7F0", gradient:"linear", fg2:"#B8960C", plan:"business" },
-  { id:"obsidian",        label:"Obsidian",       cat:"luxury",     fg:"#C0C0C0", bg:"#0A0A0A", cornerStyle:"rounded", plan:"business" },
+  // == RESTAURANT =============================================================
+  { id:"italian-bistro",    label:"Italian Bistro",  cat:"restaurant", fg:"#B91C1C", bg:"#FFF7ED", dotStyle:"rounded", cornerStyle:"rounded", plan:"free" },
+  { id:"french-gourmet",    label:"French Gourmet",  cat:"restaurant", fg:"#1F2937", bg:"#F5EFE0", dotStyle:"minimal", cornerStyle:"circle",  plan:"pro" },
+  { id:"steak-house",       label:"Steak House",     cat:"restaurant", fg:"#7F1D1D", bg:"#1A0F0A", dotStyle:"square",  cornerStyle:"square",  ecc:"H", density:"high", plan:"pro" },
+  { id:"sushi-premium",     label:"Sushi Premium",   cat:"restaurant", fg:"#0F172A", bg:"#FEF2F2", eyeColor:"#DC2626", dotStyle:"rounded", cornerStyle:"rounded", plan:"pro" },
+  { id:"cocktail-bar",      label:"Cocktail Bar",    cat:"restaurant", fg:"#DB2777", bg:"#1A0A14", dotStyle:"neon",    cornerStyle:"diamond", gradient:"diagonal", fg2:"#F59E0B", plan:"pro" },
+  { id:"coffee-house",      label:"Coffee House",    cat:"restaurant", fg:"#6B3F2A", bg:"#FDF6EE", dotStyle:"rounded", cornerStyle:"rounded", plan:"free" },
+  { id:"wine-cellar",       label:"Wine Cellar",     cat:"restaurant", fg:"#7B1E3B", bg:"#1A0610", dotStyle:"luxury",  cornerStyle:"luxury",  ecc:"H", density:"high", margin:12, plan:"business" },
+  { id:"fast-casual",       label:"Fast Casual",     cat:"restaurant", fg:"#EA580C", bg:"#FFFBEB", dotStyle:"dot",     cornerStyle:"circle",  plan:"free" },
 
-  // -- Restaurant -------------------------------------------------------------
-  { id:"restaurant-red",  label:"Restaurant Red", cat:"restaurant", fg:"#E63946", bg:"#FFF8F8", plan:"free"     },
-  { id:"coffee-brown",    label:"Coffee Brown",   cat:"restaurant", fg:"#6B3F2A", bg:"#FDF6EE", plan:"free"     },
-  { id:"bistro-noir",     label:"Bistro Noir",    cat:"restaurant", fg:"#2D2D2D", bg:"#F5F0E0", plan:"pro"      },
-  { id:"saffron-spice",   label:"Saffron Spice",  cat:"restaurant", fg:"#FF9500", bg:"#1A0D00", gradient:"radial", fg2:"#FF6B00", plan:"pro" },
+  // == LUXE ===================================================================
+  { id:"luxury-gold",       label:"Luxury Gold",     cat:"luxury", fg:"#C9A84C", bg:"#0A0700", dotStyle:"luxury",  cornerStyle:"luxury",  eyeColor:"#E8C766", ecc:"H", density:"high", margin:16, plan:"business" },
+  { id:"royal-black",       label:"Royal Black",     cat:"luxury", fg:"#E5E5E5", bg:"#050505", dotStyle:"luxury",  cornerStyle:"diamond", ecc:"H", density:"high", margin:14, plan:"business" },
+  { id:"diamond-elite",     label:"Diamond Elite",   cat:"luxury", fg:"#BFD7EA", bg:"#0A0F14", dotStyle:"luxury",  cornerStyle:"diamond", gradient:"linear", fg2:"#7FA8C9", ecc:"H", density:"high", plan:"business" },
+  { id:"platinum-white",    label:"Platinum White",  cat:"luxury", fg:"#8A8478", bg:"#FAFAF7", dotStyle:"luxury",  cornerStyle:"luxury",  ecc:"H", margin:14, plan:"business" },
+  { id:"luxury-emerald",    label:"Luxury Emerald",  cat:"luxury", fg:"#0FB37A", bg:"#021410", dotStyle:"luxury",  cornerStyle:"luxury",  eyeColor:"#34D399", ecc:"H", density:"high", plan:"business" },
+  { id:"midnight-prestige", label:"Midnight Prestige",cat:"luxury",fg:"#C0A062", bg:"#0A0A12", dotStyle:"luxury",  cornerStyle:"diamond", gradient:"radial", fg2:"#8A6E3A", ecc:"H", density:"high", plan:"business" },
+  { id:"black-velvet",      label:"Black Velvet",    cat:"luxury", fg:"#D4AF37", bg:"#0D0A05", dotStyle:"luxury",  cornerStyle:"luxury",  ecc:"H", density:"high", margin:16, plan:"business" },
+  { id:"monaco-gold",       label:"Monaco Gold",     cat:"luxury", fg:"#E0B84C", bg:"#14110A", dotStyle:"luxury",  cornerStyle:"diamond", gradient:"diagonal", fg2:"#B8860B", ecc:"H", density:"high", plan:"business" },
 
-  // -- Nightlife --------------------------------------------------------------
-  { id:"cocktail-sunset", label:"Cocktail Sunset",cat:"nightlife",  fg:"#FF6B35", bg:"#1A0800", gradient:"linear", fg2:"#FF0080", plan:"pro" },
-  { id:"velvet-night",    label:"Velvet Night",   cat:"nightlife",  fg:"#FF2D78", bg:"#0D0008", plan:"pro"      },
-  { id:"arctic-blue",     label:"Arctic Blue",    cat:"nightlife",  fg:"#00D4FF", bg:"#001A1F", plan:"pro"      },
-  { id:"festival-purple", label:"Festival Purple",cat:"nightlife",  fg:"#BF5FFF", bg:"#0D0020", gradient:"radial", fg2:"#FF2D78", plan:"business" },
+  // == CREATEUR ===============================================================
+  { id:"youtube-creator",   label:"YouTube Creator", cat:"creator", fg:"#FF0000", bg:"#0F0F0F", dotStyle:"rounded", cornerStyle:"circle",  plan:"pro" },
+  { id:"twitch-streamer",   label:"Twitch Streamer", cat:"creator", fg:"#9146FF", bg:"#0E0B16", dotStyle:"neon",    cornerStyle:"diamond", gradient:"linear", fg2:"#C77DFF", plan:"pro" },
+  { id:"tiktok-neon",       label:"TikTok Neon",     cat:"creator", fg:"#00F2EA", bg:"#010101", dotStyle:"neon",    cornerStyle:"circle",  gradient:"diagonal", fg2:"#FF0050", plan:"pro" },
+  { id:"instagram-creator", label:"Instagram Creator",cat:"creator",fg:"#E1306C", bg:"#1A0A14", dotStyle:"rounded", cornerStyle:"circle",  gradient:"diagonal", fg2:"#F77737", plan:"pro" },
+  { id:"podcast-pro",       label:"Podcast Pro",     cat:"creator", fg:"#A855F7", bg:"#150A1F", dotStyle:"rounded", cornerStyle:"rounded", plan:"pro" },
+  { id:"personal-brand",    label:"Personal Brand",  cat:"creator", fg:"#F5F0E8", bg:"#1A1A1A", dotStyle:"dot",     cornerStyle:"rounded", plan:"pro" },
+  { id:"purple-influence",  label:"Purple Influence",cat:"creator", fg:"#7C3AED", bg:"#FAF5FF", dotStyle:"dot",     cornerStyle:"circle",  plan:"free" },
+  { id:"creator-gold",      label:"Creator Gold",    cat:"creator", fg:"#E0B84C", bg:"#0F0D0A", dotStyle:"luxury",  cornerStyle:"luxury",  ecc:"H", density:"high", plan:"business" },
 
-  // -- Creator ----------------------------------------------------------------
-  { id:"beauty-rose",     label:"Beauty Rose",    cat:"creator",    fg:"#FF5CA8", bg:"#1A0010", plan:"pro"      },
-  { id:"creator-coral",   label:"Creator Coral",  cat:"creator",    fg:"#FF6B6B", bg:"#FFF5F5", plan:"pro"      },
-  { id:"retro-amber",     label:"Retro Amber",    cat:"creator",    fg:"#FFAA00", bg:"#1A0F00", dotStyle:"rounded", plan:"pro" },
-  { id:"wedding-cream",   label:"Wedding Cream",  cat:"creator",    fg:"#C9A84C", bg:"#FFFFF0", cornerStyle:"rounded", plan:"business" },
+  // == TECH ===================================================================
+  { id:"cyber-neon",        label:"Cyber Neon",      cat:"tech", fg:"#00FFD1", bg:"#050810", dotStyle:"neon",    cornerStyle:"diamond", gradient:"linear", fg2:"#0EA5E9", plan:"pro" },
+  { id:"matrix-green",      label:"Matrix Green",    cat:"tech", fg:"#00FF41", bg:"#000800", dotStyle:"pixel",   cornerStyle:"square",  density:"high", plan:"pro" },
+  { id:"ai-future",         label:"AI Future",       cat:"tech", fg:"#38BDF8", bg:"#020617", dotStyle:"neon",    cornerStyle:"circle",  gradient:"diagonal", fg2:"#818CF8", plan:"pro" },
+  { id:"web3-purple",       label:"Web3 Purple",     cat:"tech", fg:"#A78BFA", bg:"#0B0614", dotStyle:"pixel",   cornerStyle:"diamond", gradient:"linear", fg2:"#7C3AED", plan:"pro" },
+  { id:"startup-tech",      label:"Startup Tech",    cat:"tech", fg:"#2DD4BF", bg:"#042F2E", dotStyle:"rounded", cornerStyle:"rounded", plan:"pro" },
+  { id:"hacker-mode",       label:"Hacker Mode",     cat:"tech", fg:"#22C55E", bg:"#0A0A0A", dotStyle:"pixel",   cornerStyle:"square",  ecc:"H", density:"high", plan:"pro" },
+  { id:"quantum-blue",      label:"Quantum Blue",    cat:"tech", fg:"#3B82F6", bg:"#060A18", dotStyle:"neon",    cornerStyle:"circle",  gradient:"diagonal", fg2:"#22D3EE", plan:"pro" },
+  { id:"digital-grid",      label:"Digital Grid",    cat:"tech", fg:"#E2E8F0", bg:"#0F172A", dotStyle:"pixel",   cornerStyle:"square",  plan:"pro" },
 
-  // -- Immobilier -------------------------------------------------------------
-  { id:"navy-realestate", label:"Real Estate Navy",cat:"realestate", fg:"#1B3A5C", bg:"#F0F4F8", plan:"pro"     },
-  { id:"forest-green",    label:"Forest Green",   cat:"realestate", fg:"#2D6A4F", bg:"#F0F7F4", plan:"pro"      },
-  { id:"marble-luxe",     label:"Marble Luxe",    cat:"realestate", fg:"#8B7355", bg:"#FAFAFA",  cornerStyle:"rounded", plan:"business" },
-
-  // -- Event ------------------------------------------------------------------
-  { id:"event-gold",      label:"Event Gold",     cat:"event",      fg:"#FFD700", bg:"#0D0D00", gradient:"radial", fg2:"#FF8C00", plan:"pro" },
-  { id:"confetti",        label:"Confetti",       cat:"event",      fg:"#FF2D78", bg:"#FFF0F5", dotStyle:"dot",  plan:"pro"      },
-
-  // -- Minimal ----------------------------------------------------------------
-  { id:"minimal-ink",     label:"Minimal Ink",    cat:"minimal",    fg:"#1A1A1A", bg:"#FAFAFA", plan:"free"     },
-  { id:"minimal-gray",    label:"Minimal Gray",   cat:"minimal",    fg:"#6B7280", bg:"#F9FAFB", cornerStyle:"rounded", plan:"free" },
-
-  // -- Neon -------------------------------------------------------------------
-  { id:"neon-green",      label:"Neon Green",     cat:"neon",       fg:"#39FF8F", bg:"#0A0A0A", plan:"pro"      },
-  { id:"neon-pink",       label:"Neon Pink",      cat:"neon",       fg:"#FF2D78", bg:"#0D0008", dotStyle:"dot",  plan:"pro"      },
-  { id:"neon-cyber",      label:"Neon Cyber",     cat:"neon",       fg:"#00FFFF", bg:"#001A1A", gradient:"linear", fg2:"#7B61FF", plan:"business" },
+  // == EVENT ==================================================================
+  { id:"wedding-elegant",   label:"Wedding Elegant", cat:"event", fg:"#B08D57", bg:"#FBF7F0", dotStyle:"rounded", cornerStyle:"circle",  plan:"pro" },
+  { id:"gala-night",        label:"Gala Night",      cat:"event", fg:"#D4AF37", bg:"#0A0A0A", dotStyle:"luxury",  cornerStyle:"diamond", gradient:"radial", fg2:"#8A6E3A", ecc:"H", density:"high", plan:"business" },
+  { id:"festival-neon",     label:"Festival Neon",   cat:"event", fg:"#FF2EF0", bg:"#0A0014", dotStyle:"neon",    cornerStyle:"diamond", gradient:"diagonal", fg2:"#00F0FF", plan:"pro" },
+  { id:"conference-pro",    label:"Conference Pro",  cat:"event", fg:"#1D4ED8", bg:"#F8FAFC", dotStyle:"square",  cornerStyle:"rounded", plan:"pro" },
+  { id:"vip-event",         label:"VIP Event",       cat:"event", fg:"#C9A84C", bg:"#0D0D0D", dotStyle:"luxury",  cornerStyle:"luxury",  ecc:"H", density:"high", margin:14, plan:"business" },
+  { id:"concert-live",      label:"Concert Live",    cat:"event", fg:"#EF4444", bg:"#0A0A0A", dotStyle:"neon",    cornerStyle:"circle",  gradient:"linear", fg2:"#F59E0B", plan:"pro" },
+  { id:"birthday-gold",     label:"Birthday Gold",   cat:"event", fg:"#E0B84C", bg:"#1A140A", dotStyle:"rounded", cornerStyle:"circle",  plan:"free" },
+  { id:"networking-elite",  label:"Networking Elite",cat:"event", fg:"#334155", bg:"#F1F5F9", dotStyle:"minimal", cornerStyle:"rounded", plan:"pro" },
 ]
 
 const CORNER_STYLES = [
@@ -1316,15 +1334,23 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setFg(preset.fg)
     setBg(preset.bg)
     // Sync corner state legacy (utilise pour le clipping canvas)
-    if (preset.cornerStyle === "rounded" || preset.dotStyle === "rounded") setCorner("rounded")
-    else if (preset.dotStyle === "dot") setCorner("dot")
+    if (preset.cornerStyle === "rounded" || preset.cornerStyle === "circle" || preset.cornerStyle === "luxury" || preset.dotStyle === "rounded") setCorner("rounded")
+    else if (preset.dotStyle === "dot" || preset.cornerStyle === "minimal") setCorner("dot")
     else setCorner("square")
+    // ECC (uniquement si defini par le preset)
+    if (preset.ecc) setEcLevel(preset.ecc)
     setStyleConf(p => ({
       ...p,
       fg2:          preset.fg2 ?? "",
+      cornerColor:  preset.cornerColor ?? "",
+      eyeColor:     preset.eyeColor ?? "",
       gradient:     preset.gradient ?? "none",
+      gradientBg:   preset.gradientBg ?? "",
       dotStyle:     (preset.dotStyle as any) ?? "square",
       cornerStyle:  (preset.cornerStyle as any) ?? "square",
+      ...(preset.margin  !== undefined ? { margin: preset.margin }   : {}),
+      ...(preset.density !== undefined ? { density: preset.density } : {}),
+      ...(preset.transparent !== undefined ? { transparent: preset.transparent } : {}),
     }))
     setUpsellPreset(null)
   }
@@ -2196,7 +2222,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                                   if (isCorner && ((row===0||row===1)&&(col===0||col===1) || (row===0||row===1)&&(col===3||col===4) || (row===3||row===4)&&(col===0||col===1))) {
                                     // afficher le finder comme un carre plein avec la couleur coin
                                     if ((row===0&&col===0)||(row===0&&col===3)||(row===3&&col===0)) {
-                                      return <div key={i} style={{ gridColumn: col===3?"4 / 6":"1 / 3", gridRow: row===3?"4 / 6":"1 / 3", background:preset.corner||preset.fg, borderRadius:cornR }}/>
+                                      return <div key={i} style={{ gridColumn: col===3?"4 / 6":"1 / 3", gridRow: row===3?"4 / 6":"1 / 3", background:preset.cornerColor||preset.fg, borderRadius:cornR }}/>
                                     }
                                     return null
                                   }
