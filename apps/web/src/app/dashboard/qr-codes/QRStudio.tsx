@@ -351,11 +351,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     if (!canvasRef.current || !qrUrl) return
     const container = canvasRef.current
     if (!qrInstRef.current) {
-      qrInstRef.current = createQR(qrOpts(400))
+      qrInstRef.current = createQR(qrOpts(720))
       container.innerHTML = ""
       qrInstRef.current.append(container)
     } else {
-      updateQR(qrInstRef.current, qrOpts(400))
+      updateQR(qrInstRef.current, qrOpts(720))
     }
   }, [qrUrl, fg, bg, corner, ecLevel, styleConf])
 
@@ -1348,7 +1348,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   }
 
   return (
-    <div style={{ display:"grid", gridTemplateColumns:"clamp(260px,22vw,320px) 1fr clamp(280px,24vw,340px)", gap:0, minHeight:"calc(100vh - 80px)", background:BG, borderRadius:16, border:"1px solid rgba(201,168,76,0.1)", overflow:"hidden", fontFamily:"DM Sans, sans-serif", position:"relative" }}>
+    <div style={{ display:"grid", gridTemplateColumns:"clamp(240px,20vw,300px) 1.4fr clamp(280px,24vw,340px)", gap:0, minHeight:"calc(100vh - 80px)", background:BG, borderRadius:16, border:"1px solid rgba(201,168,76,0.1)", overflow:"hidden", fontFamily:"DM Sans, sans-serif", position:"relative" }}>
 
 
       {/* -- Modal preview plein ecran ------------------------------------------- */}
@@ -1617,24 +1617,24 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             <div style={{ display:"flex", flexDirection:"column", height:"100%", overflowY:"auto" }}>
 
               {/* QR Card */}
-              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"24px 24px 16px", gap:16, borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"36px 24px 24px", gap:20, borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
                 <div style={{ position:"relative" }}>
-                  <div style={{ position:"relative", padding:20, borderRadius:20, background:bg, boxShadow:`0 0 0 1px rgba(201,168,76,0.2), 0 20px 60px rgba(0,0,0,0.8)`, transition:"background 0.3s", cursor:"pointer" }}
+                  <div style={{ position:"relative", padding:28, borderRadius:28, background:bg, boxShadow:`0 0 0 1px rgba(201,168,76,0.25), 0 28px 80px rgba(0,0,0,0.85)`, transition:"background 0.3s", cursor:"pointer" }}
                     onClick={() => setShowModal(true)}>
                     {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h], i) => (
-                      <div key={i} style={{ position:"absolute", [v]:8, [h]:8, width:12, height:12,
-                        borderTop:    v==="top"    ? "2px solid rgba(201,168,76,0.6)" : "none",
-                        borderBottom: v==="bottom" ? "2px solid rgba(201,168,76,0.6)" : "none",
-                        borderLeft:   h==="left"   ? "2px solid rgba(201,168,76,0.6)" : "none",
-                        borderRight:  h==="right"  ? "2px solid rgba(201,168,76,0.6)" : "none",
+                      <div key={i} style={{ position:"absolute", [v]:10, [h]:10, width:18, height:18,
+                        borderTop:    v==="top"    ? "2px solid rgba(201,168,76,0.7)" : "none",
+                        borderBottom: v==="bottom" ? "2px solid rgba(201,168,76,0.7)" : "none",
+                        borderLeft:   h==="left"   ? "2px solid rgba(201,168,76,0.7)" : "none",
+                        borderRight:  h==="right"  ? "2px solid rgba(201,168,76,0.7)" : "none",
                       }}/>
                     ))}
-                    <div ref={canvasRef} data-qr-container style={{ display:"flex", width:200, height:200, alignItems:"center", justifyContent:"center" }}/>
+                    <div ref={canvasRef} data-qr-container style={{ display:"flex", width:"min(46vh, 360px)", height:"min(46vh, 360px)", alignItems:"center", justifyContent:"center" }}/>
                     {/* Hover overlay */}
-                    <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0)", display:"flex", alignItems:"center", justifyContent:"center", borderRadius:20, transition:"background 0.2s" }}
+                    <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0)", display:"flex", alignItems:"center", justifyContent:"center", borderRadius:28, transition:"background 0.2s" }}
                       onMouseEnter={e => (e.currentTarget.style.background="rgba(0,0,0,0.4)")}
                       onMouseLeave={e => (e.currentTarget.style.background="rgba(0,0,0,0)")}>
-                      <span style={{ color:"rgba(255,255,255,0)", fontSize:11, fontWeight:700, transition:"color 0.2s", pointerEvents:"none" }}
+                      <span style={{ color:"rgba(255,255,255,0)", fontSize:13, fontWeight:700, transition:"color 0.2s", pointerEvents:"none" }}
                         onMouseEnter={e => (e.currentTarget.style.color="#F5F0E8")}
                         onMouseLeave={e => (e.currentTarget.style.color="rgba(255,255,255,0)")}>
                         Agrandir
