@@ -345,6 +345,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const canvasModalRef = useRef<HTMLDivElement>(null)
   const qrInstRef      = useRef<QRCodeStyling | null>(null)
   const qrModalInstRef = useRef<QRCodeStyling | null>(null)
+  const scanWidgetRef  = useRef<HTMLDivElement>(null)
 
   const active  = qrCodes.find(q => q.id === activeId) ?? null
   const qrUrl   = active ? `${appUrl}/q/${active.short_code}` : ""
@@ -1691,23 +1692,42 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       </span>
                     )
                   })()}
+
+                  {/* Pastille score scannabilite (permanente) */}
+                  {scanScore && (
+                    <div
+                      onClick={() => scanWidgetRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" })}
+                      style={{ display:"inline-flex", alignItems:"center", gap:8, marginTop:10, marginLeft:6, padding:"6px 12px", background:`${scanScore.gradeColor}12`, border:`1px solid ${scanScore.gradeColor}40`, borderRadius:20, cursor:"pointer", verticalAlign:"middle" }}>
+                      <span style={{ display:"flex", alignItems:"center", justifyContent:"center", width:22, height:22, borderRadius:"50%", background:scanScore.gradeColor, color:"#080808", fontSize:10, fontWeight:800 }}>
+                        {scanScore.score}
+                      </span>
+                      <span style={{ color:scanScore.gradeColor, fontSize:12, fontWeight:700 }}>{scanScore.grade}</span>
+                      <span style={{ color:MUTED, fontSize:10 }}>scannabilite</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Actions rapides */}
-                <div style={{ display:"flex", gap:6, width:"100%" }}>
-                  <button type="button" onClick={() => copy("link")}
-                    style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"8px", background:copied==="link"?"rgba(57,255,143,0.1)":"rgba(255,255,255,0.04)", border:`1px solid ${copied==="link"?"rgba(57,255,143,0.3)":"rgba(255,255,255,0.08)"}`, borderRadius:9, color:copied==="link"?"#39FF8F":"#8A8478", fontSize:11, cursor:"pointer", transition:"all 0.15s" }}>
-                    {copied==="link" ? <Check size={12}/> : <Copy size={12}/>}
-                    {copied==="link" ? "Copie !" : "Copier"}
+                <div style={{ display:"flex", flexDirection:"column", gap:7, width:"100%" }}>
+                  <button type="button" onClick={() => downloadPNG(1024)}
+                    style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"11px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(201,168,76,0.2)" }}>
+                    <Download size={15}/> Telecharger
                   </button>
-                  <a href={pageUrl} target="_blank" rel="noopener noreferrer"
-                    style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"8px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:"#8A8478", fontSize:11, textDecoration:"none" }}>
-                    <ExternalLink size={12}/> Ouvrir
-                  </a>
-                  <button type="button" onClick={() => setShowModal(true)}
-                    style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"8px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:9, color:"#C9A84C", fontSize:11, cursor:"pointer" }}>
-                    <Eye size={12}/> Tester
-                  </button>
+                  <div style={{ display:"flex", gap:6, width:"100%" }}>
+                    <button type="button" onClick={() => copy("link")}
+                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"8px", background:copied==="link"?"rgba(57,255,143,0.1)":"rgba(255,255,255,0.04)", border:`1px solid ${copied==="link"?"rgba(57,255,143,0.3)":"rgba(255,255,255,0.08)"}`, borderRadius:9, color:copied==="link"?"#39FF8F":"#8A8478", fontSize:11, cursor:"pointer", transition:"all 0.15s" }}>
+                      {copied==="link" ? <Check size={12}/> : <Copy size={12}/>}
+                      {copied==="link" ? "Copie !" : "Copier"}
+                    </button>
+                    <a href={pageUrl} target="_blank" rel="noopener noreferrer"
+                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"8px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:"#8A8478", fontSize:11, textDecoration:"none" }}>
+                      <ExternalLink size={12}/> Ouvrir
+                    </a>
+                    <button type="button" onClick={() => setShowModal(true)}
+                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"8px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:9, color:"#C9A84C", fontSize:11, cursor:"pointer" }}>
+                      <Eye size={12}/> Tester
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -1905,7 +1925,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               
 {/* Diagnostic scannabilite premium */}
               {scanScore && (
-                <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"16px" }}>
+                <div ref={scanWidgetRef} style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"16px" }}>
 
                   {/* Header */}
                   <p style={{ color:"#8A8478", fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:"0 0 14px" }}>
