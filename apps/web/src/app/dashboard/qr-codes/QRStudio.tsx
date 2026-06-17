@@ -268,6 +268,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [qrCodes,    setQRCodes]    = useState<QRCode[]>(initialQRCodes)
   const [activeId,   setActiveId]   = useState<string | null>(initialQRCodes[0]?.id ?? null)
   const [activeTab,  setActiveTab]  = useState<"style" | "supports" | "export">("style")
+  const [showMoreFmt, setShowMoreFmt] = useState(false)
   const [fg,         setFg]         = useState("")
   const [bg,         setBg]         = useState("")
   const [corner,     setCorner]     = useState<"square"|"rounded"|"dot">("square")
@@ -2126,7 +2127,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
         {/* Tabs principaux Style/Export */}
         <div style={{ display:"flex", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
-          {([["style","Style","🎨"],["supports","Supports","🖨️"],["export","Export","📤"]] as const).map(([id,label,emoji]) => (
+          {([["style","Style","🎨"],["supports","Imprimables","🖨️"],["export","Export","📤"]] as const).map(([id,label,emoji]) => (
             <button key={id} type="button" onClick={() => setActiveTab(id)}
               style={{ flex:1, padding:"11px 8px", background:activeTab===id?"rgba(201,168,76,0.06)":"transparent", border:"none", borderBottom:activeTab===id?`2px solid ${G}`:"2px solid transparent", color:activeTab===id?G:MUTED, fontSize:12, fontWeight:600, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:5 }}>
               <span>{emoji}</span>{label}
@@ -2625,6 +2626,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
             {/* -- Selecteur templates ------------------------------------ */}
             <div style={{ padding:"10px 12px", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
+              <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:700, margin:"0 0 3px" }}>Modeles prets a imprimer</p>
+              <p style={{ color:MUTED, fontSize:10, margin:"0 0 10px", lineHeight:1.4 }}>Votre QR place dans un support fini : carte, flyer, affiche, sticker...</p>
               <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Support</p>
               <div style={{ display:"flex", flexDirection:"column", gap:4, maxHeight:220, overflowY:"auto" }}>
                 {SUPP_TPLS.map(t => {
@@ -2756,14 +2759,17 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
               {/* -- Format (cartes) ------------------------------------------ */}
               <div>
-                <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 10px" }}>Choisissez un format</p>
+                <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:700, margin:"0 0 3px" }}>Telecharger votre QR en fichier</p>
+                <p style={{ color:MUTED, fontSize:10, margin:"0 0 12px", lineHeight:1.4 }}>L'image de votre QR a integrer ou imprimer ou vous voulez.</p>
                 <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                   {([
                     { id:"png",   emoji:"🌐", usage:"Usage web",        desc:"Universel, fond opaque. Le plus polyvalent." },
                     { id:"svg",   emoji:"🖨️", usage:"Impression HD",     desc:"Vectoriel, net a toutes les tailles." },
                     { id:"pdf",   emoji:"📄", usage:"Flyers & affiches", desc:"Document A4 pret a imprimer, avec titre." },
-                    { id:"webp",  emoji:"⚡", usage:"Web optimise",      desc:"Plus leger que le PNG, ideal sites rapides." },
-                    { id:"png-t", emoji:"🏷️", usage:"Sticker",          desc:"PNG a fond transparent, pour autocollants." },
+                    ...(showMoreFmt ? [
+                      { id:"webp",  emoji:"⚡", usage:"Web optimise", desc:"Plus leger que le PNG, ideal sites rapides." },
+                      { id:"png-t", emoji:"🏷️", usage:"Sticker",     desc:"PNG a fond transparent, pour autocollants." },
+                    ] : []),
                   ] as const).map(f => {
                     const cfg   = FORMAT_CFG[f.id]
                     const canFmt = PLAN_RANK[userPlan] >= PLAN_RANK[cfg.plan]
@@ -2798,6 +2804,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     )
                   })}
                 </div>
+
+                {/* Toggle autres formats */}
+                <button type="button" onClick={() => setShowMoreFmt(v => !v)}
+                  style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:6, marginTop:8, padding:"8px", background:"none", border:"1px dashed rgba(255,255,255,0.12)", borderRadius:9, color:MUTED, fontSize:10, cursor:"pointer" }}>
+                  <ChevronRight size={12} style={{ transform: showMoreFmt ? "rotate(90deg)" : "rotate(0deg)", transition:"transform 0.2s" }}/>
+                  {showMoreFmt ? "Masquer les autres formats" : "Autres formats (WEBP, transparent)"}
+                </button>
               </div>
 
               {/* -- Taille --------------------------------------------------- */}
