@@ -282,6 +282,99 @@ function AccSection({ id, title, icon, openId, setOpenId, children }: {
   )
 }
 
+// -- Color picker premium integre --------------------------------------------
+function hexToRgb(hex: string): [number, number, number] {
+  const m = /^#?([0-9a-f]{6})$/i.exec((hex || "").trim())
+  if (!m) return [0, 0, 0]
+  const n = parseInt(m[1], 16)
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
+}
+function rgbToHex(r: number, g: number, b: number): string {
+  const h = (x: number) => Math.round(Math.max(0, Math.min(255, x))).toString(16).padStart(2, "0")
+  return `#${h(r)}${h(g)}${h(b)}`.toUpperCase()
+}
+function rgbToHsv(r: number, g: number, b: number): [number, number, number] {
+  r /= 255; g /= 255; b /= 255
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min
+  let h = 0
+  if (d) {
+    if (max === r) h = ((g - b) / d) % 6
+    else if (max === g) h = (b - r) / d + 2
+    else h = (r - g) / d + 4
+    h *= 60; if (h < 0) h += 360
+  }
+  return [h, max === 0 ? 0 : d / max, max]
+}
+function hsvToHex(h: number, s: number, v: number): string {
+  const c = v * s, x = c * (1 - Math.abs(((h / 60) % 2) - 1)), m = v - c
+  let r = 0, g = 0, b = 0
+  if (h < 60) { r = c; g = x } else if (h < 120) { r = x; g = c }
+  else if (h < 180) { g = c; b = x } else if (h < 240) { g = x; b = c }
+  else if (h < 300) { r = x; b = c } else { r = c; b = x }
+  return rgbToHex((r + m) * 255, (g + m) * 255, (b + m) * 255)
+}
+
+function ColorField({ label, value, onChange, onClear }: {
+  label: string; value: string; onChange: (hex: string) => void; onClear?: () => void
+}) {
+  const [open, setOpen] = useState(false)
+  const valid = /^#[0-9a-fA-F]{6}$/.test(value)
+  const safe  = valid ? value : "#080808"
+  const [hr, hg, hb] = hexToRgb(safe)
+  const [h, s, v] = rgbToHsv(hr, hg, hb)
+  const svRef  = useRef<HTMLDivElement>(null)
+  const hueRef = useRef<HTMLDivElement>(null)
+
+  const onSV = (e: React.PointerEvent) => {
+    const r = svRef.current?.getBoundingClientRect(); if (!r) return
+    const x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width))
+    const y = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height))
+    onChange(hsvToHex(h, x, 1 - y))
+  }
+  const onHue = (e: React.PointerEvent) => {
+    const r = hueRef.current?.getBoundingClientRect(); if (!r) return
+    const x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width))
+    onChange(hsvToHex(x * 360, s || 1, v || 1))
+  }
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+      <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+        <label style={{ color:"#8A8478", fontSize:11, flex:1 }}>{label}</label>
+        <button type="button" onClick={() => setOpen(o => !o)}
+          style={{ width:28, height:28, borderRadius:6, border:`1px solid ${open?"#C9A84C":"rgba(255,255,255,0.15)"}`, background: valid ? safe : "transparent", cursor:"pointer", flexShrink:0, position:"relative", overflow:"hidden", padding:0 }}>
+          {!valid && <span style={{ position:"absolute", inset:0, background:"repeating-linear-gradient(45deg,#222,#222 3px,#444 3px,#444 6px)" }}/>}
+        </button>
+        <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder="#----"
+          style={{ width:72, background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"5px 7px", color:valid?"#F5F0E8":"#8A8478", fontSize:10, fontFamily:"monospace", outline:"none" }}/>
+        {onClear && (
+          <button type="button" onClick={onClear} title="Effacer"
+            style={{ width:24, height:24, borderRadius:6, border:"1px solid rgba(255,255,255,0.08)", background:"rgba(255,255,255,0.03)", color:"#8A8478", cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, padding:0 }}>×</button>
+        )}
+      </div>
+
+      {open && (
+        <div style={{ padding:10, background:"rgba(255,255,255,0.02)", border:"1px solid rgba(201,168,76,0.25)", borderRadius:10, display:"flex", flexDirection:"column", gap:9 }}>
+          {/* Carre saturation / valeur */}
+          <div ref={svRef} onPointerDown={e => { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); onSV(e) }}
+            onPointerMove={e => { if (e.buttons === 1) onSV(e) }}
+            style={{ position:"relative", width:"100%", height:120, borderRadius:8, cursor:"crosshair", touchAction:"none",
+              background:`linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, ${hsvToHex(h,1,1)})` }}>
+            <div style={{ position:"absolute", left:`${s*100}%`, top:`${(1-v)*100}%`, width:12, height:12, borderRadius:"50%", border:"2px solid #fff", boxShadow:"0 0 0 1px rgba(0,0,0,0.4)", transform:"translate(-50%,-50%)", pointerEvents:"none", background:safe }}/>
+          </div>
+          {/* Slider teinte */}
+          <div ref={hueRef} onPointerDown={e => { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); onHue(e) }}
+            onPointerMove={e => { if (e.buttons === 1) onHue(e) }}
+            style={{ position:"relative", width:"100%", height:14, borderRadius:7, cursor:"pointer", touchAction:"none",
+              background:"linear-gradient(to right,#ff0000,#ffff00,#00ff00,#00ffff,#0000ff,#ff00ff,#ff0000)" }}>
+            <div style={{ position:"absolute", left:`${(h/360)*100}%`, top:"50%", width:14, height:14, borderRadius:"50%", border:"2px solid #fff", boxShadow:"0 0 0 1px rgba(0,0,0,0.4)", transform:"translate(-50%,-50%)", pointerEvents:"none", background:hsvToHex(h,1,1) }}/>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: Props) {
   const [qrCodes,    setQRCodes]    = useState<QRCode[]>(initialQRCodes)
   const [activeId,   setActiveId]   = useState<string | null>(initialQRCodes[0]?.id ?? null)
@@ -2453,20 +2546,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       <Sparkles size={13}/> Generer une palette
                     </button>
                     <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                      {([
-                        { label:"QR principal",    key:"fg",  val:fg,  set:(v:string)=>setFg(v) },
-                        { label:"Fond",             key:"bg",  val:bg,  set:(v:string)=>setBg(v) },
-                      ]).map(c => (
-                        <div key={c.key} style={{ display:"flex", alignItems:"center", gap:8 }}>
-                          <label style={{ color:MUTED, fontSize:11, flex:1 }}>{c.label}</label>
-                          <div style={{ position:"relative", width:28, height:28, borderRadius:6, overflow:"hidden", border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }}>
-                            <input type="color" value={c.val} onChange={e => c.set(e.target.value)}
-                              style={{ position:"absolute", inset:-4, width:"calc(100%+8px)", height:"calc(100%+8px)", cursor:"pointer", border:"none" }}/>
-                          </div>
-                          <input type="text" value={c.val} onChange={e => c.set(e.target.value)}
-                            style={{ width:72, background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"5px 7px", color:"#F5F0E8", fontSize:10, fontFamily:"monospace", outline:"none" }}/>
-                        </div>
-                      ))}
+                      <ColorField label="QR principal" value={fg} onChange={setFg}/>
+                      <ColorField label="Fond"          value={bg} onChange={setBg}/>
                     </div>
                     {/* Indicateur de contraste en direct */}
                     {(() => {
@@ -2545,21 +2626,15 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Couleurs avancees</p>
                     <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:14 }}>
                       {([
-                        { label:"QR secondaire",   key:"fg2",         val:styleConf.fg2??""          },
-                        { label:"Couleur coins",   key:"cornerColor", val:styleConf.cornerColor??""  },
-                        { label:"Couleur yeux",    key:"eyeColor",    val:styleConf.eyeColor??""     },
-                        { label:"Fond dégradé",    key:"gradientBg",  val:styleConf.gradientBg??""   },
-                      ]).map(c => (
-                        <div key={c.key} style={{ display:"flex", alignItems:"center", gap:8 }}>
-                          <label style={{ color:MUTED, fontSize:11, flex:1 }}>{c.label}</label>
-                          <div style={{ position:"relative", width:28, height:28, borderRadius:6, overflow:"hidden", border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }}>
-                            <input type="color" value={c.val || "#080808"} onChange={e => setStyleConf(p => ({ ...p, [c.key]: e.target.value }))}
-                              style={{ position:"absolute", inset:-4, width:"calc(100%+8px)", height:"calc(100%+8px)", cursor:"pointer", border:"none" }}/>
-                          </div>
-                          <input type="text" value={c.val} onChange={e => setStyleConf(p => ({ ...p, [c.key]: e.target.value }))}
-                            placeholder="#----"
-                            style={{ width:72, background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"5px 7px", color:c.val?"#F5F0E8":MUTED, fontSize:10, fontFamily:"monospace", outline:"none" }}/>
-                        </div>
+                        { label:"QR secondaire",   key:"fg2"         },
+                        { label:"Couleur coins",   key:"cornerColor" },
+                        { label:"Couleur yeux",    key:"eyeColor"    },
+                        { label:"Fond dégradé",    key:"gradientBg"  },
+                      ] as const).map(c => (
+                        <ColorField key={c.key} label={c.label}
+                          value={(styleConf as any)[c.key] ?? ""}
+                          onChange={(hex) => setStyleConf(p => ({ ...p, [c.key]: hex }))}
+                          onClear={() => setStyleConf(p => ({ ...p, [c.key]: "" }))}/>
                       ))}
                     </div>
 
