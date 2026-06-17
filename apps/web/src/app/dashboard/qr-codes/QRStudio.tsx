@@ -1375,7 +1375,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   }
 
   return (
-    <div style={{ display:"grid", gridTemplateColumns:"clamp(240px,20vw,300px) 1.4fr clamp(280px,24vw,340px)", gap:0, minHeight:"calc(100vh - 80px)", background:BG, borderRadius:16, border:"1px solid rgba(201,168,76,0.1)", overflow:"hidden", fontFamily:"DM Sans, sans-serif", position:"relative" }}>
+    <div className="qr-grid" style={{ display:"grid", gridTemplateColumns:"clamp(240px,20vw,300px) 1.4fr clamp(280px,24vw,340px)", gap:0, minHeight:"calc(100vh - 80px)", background:BG, borderRadius:16, border:"1px solid rgba(201,168,76,0.1)", overflow:"hidden", fontFamily:"DM Sans, sans-serif", position:"relative" }}>
 
 
       {/* -- Modal preview plein ecran ------------------------------------------- */}
@@ -1469,7 +1469,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       )}
 
       {/* -- COL 1 : Liste ------------------------------------------------------ */}
-      <div style={{ borderRight:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", overflow:"hidden" }}>
+      <div className="qr-col-list" style={{ borderRight:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", overflow:"hidden" }}>
 
         {/* Header + filtres */}
         <div style={{ padding:"12px 12px 10px", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", gap:8 }}>
@@ -1521,7 +1521,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         </div>
 
         {/* Liste */}
-        <div style={{ flex:1, overflowY:"auto", paddingTop:10 }}>
+        <div className="qr-scroll" style={{ flex:1, overflowY:"auto", paddingTop:10 }}>
           {filteredQR.length === 0 ? (
             <div style={{ textAlign:"center", padding:"32px 12px", color:MUTED }}>
               <QrCode size={24} color={MUTED} style={{ marginBottom:8 }}/>
@@ -1630,7 +1630,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       </div>
 
       {/* -- COL 2 : Preview premium -------------------------------------------- */}
-      <div style={{ display:"flex", flexDirection:"column", overflow:"hidden", background:"#0A0907" }}>
+      <div className="qr-col-preview" style={{ display:"flex", flexDirection:"column", overflow:"hidden", background:"#0A0907" }}>
         {/* Section label */}
         <div style={{ padding:"10px 16px 8px", borderBottom:"1px solid rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Aperçu</p>
@@ -1643,7 +1643,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         {active ? (() => {
           const diag = getDiagnostic(diagFg || fg, diagBg || bg)
           return (
-            <div style={{ display:"flex", flexDirection:"column", height:"100%", overflowY:"auto" }}>
+            <div className="qr-scroll" style={{ display:"flex", flexDirection:"column", height:"100%", overflowY:"auto" }}>
 
               {/* QR Card */}
               <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"36px 24px 24px", gap:20, borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
@@ -2114,7 +2114,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       </div>
 
       {/* -- COL 3 : Personnalisation premium ------------------------------------ */}
-      <div style={{ borderLeft:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", overflow:"hidden" }}>
+      <div className="qr-col-settings" style={{ borderLeft:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", overflow:"hidden" }}>
         {/* Section label */}
         <div style={{ padding:"10px 16px 8px", borderBottom:"1px solid rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Personnalisation & Export</p>
@@ -2136,7 +2136,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         </div>
 
         {activeTab === "style" && active && (
-          <div style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
+          <div className="qr-scroll" style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
 
             {/* Sous-tabs Apparence/Branding/Qualite */}
             <div style={{ display:"flex", borderBottom:"1px solid rgba(255,255,255,0.05)", padding:"0 8px", flexShrink:0, overflowX:"auto" }}>
@@ -2152,7 +2152,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               ))}
             </div>
 
-            <div style={{ flex:1, overflowY:"auto", padding:"14px" }}>
+            <div className="qr-scroll" style={{ flex:1, overflowY:"auto", padding:"14px" }}>
 
               {/* -- APPARENCE (accordeons) ----------------------------------- */}
               {styleTab === "apparence" && (
@@ -2622,14 +2622,14 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           const tpl = SUPP_TPLS.find(t => t.id === suppTplId) ?? SUPP_TPLS[0]
           const canTpl = PLAN_RANK[userPlan] >= PLAN_RANK[tpl.plan]
           return (
-          <div style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
+          <div className="qr-scroll" style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
 
             {/* -- Selecteur templates ------------------------------------ */}
             <div style={{ padding:"10px 12px", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
               <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:700, margin:"0 0 3px" }}>Modeles prets a imprimer</p>
               <p style={{ color:MUTED, fontSize:10, margin:"0 0 10px", lineHeight:1.4 }}>Votre QR place dans un support fini : carte, flyer, affiche, sticker...</p>
               <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Support</p>
-              <div style={{ display:"flex", flexDirection:"column", gap:4, maxHeight:220, overflowY:"auto" }}>
+              <div className="qr-scroll" style={{ display:"flex", flexDirection:"column", gap:4, maxHeight:220, overflowY:"auto" }}>
                 {SUPP_TPLS.map(t => {
                   const can   = PLAN_RANK[userPlan] >= PLAN_RANK[t.plan]
                   const isA   = t.id === suppTplId
@@ -2657,7 +2657,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               </div>
             </div>
 
-            <div style={{ flex:1, overflowY:"auto", padding:"12px" }}>
+            <div className="qr-scroll" style={{ flex:1, overflowY:"auto", padding:"12px" }}>
 
               {/* -- Textes --------------------------------------------- */}
               <div style={{ marginBottom:12 }}>
@@ -2754,7 +2754,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           }
           const fmt = FORMAT_CFG[expFormat] ?? FORMAT_CFG["png"]
           return (
-          <div style={{ flex:1, overflowY:"auto", padding:"14px" }}>
+          <div className="qr-scroll" style={{ flex:1, overflowY:"auto", padding:"14px" }}>
             <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
               {/* -- Format (cartes) ------------------------------------------ */}
@@ -2961,7 +2961,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       </div>
 
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg) } } @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} } [data-qr-container] canvas, [data-qr-container] svg { width:100% !important; height:100% !important; display:block; }`}</style>
+      <style>{`@keyframes spin { to { transform: rotate(360deg) } } @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} } [data-qr-container] canvas, [data-qr-container] svg { width:100% !important; height:100% !important; display:block; } @media (max-width: 859px) { .qr-grid { display:flex !important; flex-direction:column !important; min-height:0 !important; overflow:visible !important; } .qr-col-preview { order:1 !important; width:100% !important; overflow:visible !important; } .qr-col-settings { order:2 !important; width:100% !important; overflow:visible !important; border-left:none !important; border-top:1px solid rgba(255,255,255,0.06) !important; } .qr-col-list { order:3 !important; width:100% !important; overflow:visible !important; border-right:none !important; border-top:1px solid rgba(255,255,255,0.06) !important; } .qr-scroll { flex:none !important; height:auto !important; max-height:none !important; overflow:visible !important; } }`}</style>
     </div>
   )
 }
