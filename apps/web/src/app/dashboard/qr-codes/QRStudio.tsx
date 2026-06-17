@@ -2588,18 +2588,6 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         </button>
                       </div>
                     )}
-
-                    {/* Utiliser logo de la page */}
-                    {active.pages && !styleConf.logoUrl && (
-                      <button type="button" onClick={() => {
-                        const pageLogoUrl = (active as any).pages?.logo_url
-                        if (pageLogoUrl) setStyleConf(p => ({ ...p, logoUrl: pageLogoUrl }))
-                        else logoInputRef.current?.click()
-                      }}
-                        style={{ marginTop:8, width:"100%", padding:"8px", background:"rgba(255,255,255,0.02)", border:"1px dashed rgba(255,255,255,0.1)", borderRadius:8, color:MUTED, fontSize:11, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
-                        <span>🔗</span> Utiliser le logo/avatar de la page
-                      </button>
-                    )}
                   </div>
 
                   {/* Options logo (si logo actif) */}
@@ -2727,21 +2715,16 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </div>
                   </div>
 
-                  {/* Densite visuelle */}
-                  <div>
-                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Densite visuelle</p>
-                    <div style={{ display:"flex", gap:6 }}>
-                      {(["low","medium","high"] as const).map(d => (
-                        <button key={d} type="button" onClick={() => setStyleConf(p => ({ ...p, density: d }))}
-                          style={{ flex:1, padding:"7px 6px", background:(styleConf.density??"medium")===d?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1px solid ${(styleConf.density??"medium")===d?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:(styleConf.density??"medium")===d?G:MUTED, fontSize:10, cursor:"pointer", fontWeight:(styleConf.density??"medium")===d?700:400 }}>
-                          {d==="low"?"Faible":d==="medium"?"Normale":"Forte"}
-                        </button>
-                      ))}
+                  {/* Explication simple ECC */}
+                  <p style={{ color:MUTED, fontSize:10, margin:"-4px 0 0", lineHeight:1.5 }}>
+                    La correction d&apos;erreur permet au QR de rester lisible meme abime, sale ou partiellement couvert (logo). Plus elle est elevee, plus le QR est robuste -- mais aussi plus dense.
+                  </p>
+                  {styleConf.logoUrl && (
+                    <div style={{ display:"flex", alignItems:"center", gap:7, padding:"8px 10px", background:"rgba(201,168,76,0.07)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:8 }}>
+                      <AlertTriangle size={12} color={G}/>
+                      <p style={{ color:G, fontSize:10, margin:0, lineHeight:1.4 }}>Un logo est actif : correction forcee a H quel que soit le choix ci-dessus.</p>
                     </div>
-                    <p style={{ color:MUTED, fontSize:10, margin:"6px 0 0", lineHeight:1.5 }}>
-                      Une densite forte augmente la complexite -- preferer ECC H.
-                    </p>
-                  </div>
+                  )}
 
                   {/* Reset */}
                   <button type="button" onClick={resetColors}
