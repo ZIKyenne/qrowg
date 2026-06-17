@@ -274,7 +274,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [ecLevel,    setEcLevel]    = useState<"L"|"M"|"Q"|"H">("M")
   const [styleConf,  setStyleConf]  = useState<QRStyleConfig>({ ...DEFAULT_STYLE })
   const [styleTab,   setStyleTab]   = useState<"apparence"|"branding"|"qualite">("apparence")
-  const [openAcc,    setOpenAcc]    = useState<string>("couleurs")
+  const [openAcc,    setOpenAcc]    = useState<string>("presets")
   const [applyAllOk,   setApplyAllOk]   = useState(false)
   const [selectedCat,  setSelectedCat]  = useState("all")
   const [upsellPreset,  setUpsellPreset]  = useState<string | null>(null)
@@ -2137,171 +2137,63 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               {styleTab === "apparence" && (
                 <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
 
-                  {/* Couleurs principales */}
-                  <AccSection id="couleurs" title="Couleurs principales" icon="🎨" openId={openAcc} setOpenId={setOpenAcc}>
-                    <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                      {([
-                        { label:"QR principal",    key:"fg",  val:fg,  set:(v:string)=>setFg(v) },
-                        { label:"Fond",             key:"bg",  val:bg,  set:(v:string)=>setBg(v) },
-                      ]).map(c => (
-                        <div key={c.key} style={{ display:"flex", alignItems:"center", gap:8 }}>
-                          <label style={{ color:MUTED, fontSize:11, flex:1 }}>{c.label}</label>
-                          <div style={{ position:"relative", width:28, height:28, borderRadius:6, overflow:"hidden", border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }}>
-                            <input type="color" value={c.val} onChange={e => c.set(e.target.value)}
-                              style={{ position:"absolute", inset:-4, width:"calc(100%+8px)", height:"calc(100%+8px)", cursor:"pointer", border:"none" }}/>
-                          </div>
-                          <input type="text" value={c.val} onChange={e => c.set(e.target.value)}
-                            style={{ width:72, background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"5px 7px", color:"#F5F0E8", fontSize:10, fontFamily:"monospace", outline:"none" }}/>
-                        </div>
-                      ))}
-                    </div>
-                  </AccSection>
-
-                  {/* Couleurs avancees */}
-                  <AccSection id="couleurs-av" title="Couleurs avancees" icon="🎭" openId={openAcc} setOpenId={setOpenAcc}>
-                    <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                      {([
-                        { label:"QR secondaire",   key:"fg2",         val:styleConf.fg2??""          },
-                        { label:"Couleur coins",   key:"cornerColor", val:styleConf.cornerColor??""  },
-                        { label:"Couleur yeux",    key:"eyeColor",    val:styleConf.eyeColor??""     },
-                        { label:"Fond degrade",    key:"gradientBg",  val:styleConf.gradientBg??""   },
-                      ]).map(c => (
-                        <div key={c.key} style={{ display:"flex", alignItems:"center", gap:8 }}>
-                          <label style={{ color:MUTED, fontSize:11, flex:1 }}>{c.label}</label>
-                          <div style={{ position:"relative", width:28, height:28, borderRadius:6, overflow:"hidden", border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }}>
-                            <input type="color" value={c.val || "#080808"} onChange={e => setStyleConf(p => ({ ...p, [c.key]: e.target.value }))}
-                              style={{ position:"absolute", inset:-4, width:"calc(100%+8px)", height:"calc(100%+8px)", cursor:"pointer", border:"none" }}/>
-                          </div>
-                          <input type="text" value={c.val} onChange={e => setStyleConf(p => ({ ...p, [c.key]: e.target.value }))}
-                            placeholder="#----"
-                            style={{ width:72, background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"5px 7px", color:c.val?"#F5F0E8":MUTED, fontSize:10, fontFamily:"monospace", outline:"none" }}/>
-                        </div>
-                      ))}
-                    </div>
-                  </AccSection>
-
-                  {/* Fond & degrade */}
-                  <AccSection id="fond" title="Fond & degrade" icon="🌈" openId={openAcc} setOpenId={setOpenAcc}>
-                    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 12px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:9, marginBottom:12 }}>
-                      <div>
-                        <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 2px" }}>Fond transparent</p>
-                        <p style={{ color:MUTED, fontSize:10, margin:0 }}>PNG avec canal alpha</p>
-                      </div>
-                      <button type="button" onClick={() => setStyleConf(p => ({ ...p, transparent: !p.transparent }))}
-                        style={{ width:38, height:22, borderRadius:11, background:styleConf.transparent?"linear-gradient(90deg,#C9A84C,#b8953f)":"rgba(255,255,255,0.1)", border:"none", cursor:"pointer", position:"relative", transition:"background 0.2s" }}>
-                        <div style={{ position:"absolute", top:3, left:styleConf.transparent?18:3, width:16, height:16, borderRadius:"50%", background:"#F5F0E8", transition:"left 0.2s" }}/>
-                      </button>
-                    </div>
-                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Type de degrade</p>
-                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
-                      {GRADIENT_OPTS.map(g => (
-                        <button key={g.id ?? "none"} type="button" onClick={() => setStyleConf(p => ({ ...p, gradient: g.id ?? "none" }))}
-                          style={{ padding:"7px 8px", background:(styleConf.gradient??"none")===(g.id??"none")?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${(styleConf.gradient??"none")===(g.id??"none")?"rgba(201,168,76,0.35)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:(styleConf.gradient??"none")===(g.id??"none")?G:MUTED, fontSize:10, cursor:"pointer", fontWeight:(styleConf.gradient??"none")===(g.id??"none")?700:400 }}>
-                          {g.label}
-                        </button>
-                      ))}
-                    </div>
-                  </AccSection>
-
-                  {/* Style des modules */}
-                  <AccSection id="modules" title="Style des modules" icon="🔲" openId={openAcc} setOpenId={setOpenAcc}>
-                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7 }}>
-                      {DOT_STYLES.map(ds => {
-                        const isActive = (styleConf.dotStyle??"square") === ds.id
-                        const isPro = ["pixel","neon","luxury"].includes(ds.id ?? "")
-                        const canAccess = !isPro || PLAN_RANK[userPlan] >= 1
-                        return (
-                          <button key={ds.id ?? "sq"} type="button" onClick={() => canAccess && setStyleConf(p => ({ ...p, dotStyle: ds.id }))}
-                            style={{ position:"relative", padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:canAccess?"pointer":"not-allowed", opacity:canAccess?1:0.5, textAlign:"center" as const }}>
-                            <div style={{ fontSize:18, marginBottom:4 }}>{ds.emoji}</div>
-                            <p style={{ color:isActive?G:"#F5F0E8", fontSize:10, fontWeight:isActive?700:500, margin:0 }}>{ds.label}</p>
-                            {isPro && !canAccess && (
-                              <span style={{ position:"absolute", top:4, right:4, background:"rgba(201,168,76,0.15)", borderRadius:4, padding:"1px 4px", fontSize:7, color:G, fontWeight:800 }}>PRO</span>
-                            )}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </AccSection>
-
-                  {/* Coins */}
-                  <AccSection id="coins" title="Style des coins" icon="⬛" openId={openAcc} setOpenId={setOpenAcc}>
-                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7, marginBottom:14 }}>
-                      {CORNER_STYLE_LIST.map(cs => {
-                        const isActive = (styleConf.cornerStyle??"square") === cs.id
-                        const isPro = ["diamond","luxury"].includes(cs.id ?? "")
-                        const canAccess = !isPro || PLAN_RANK[userPlan] >= 1
-                        return (
-                          <button key={cs.id ?? "sq"} type="button" onClick={() => {
-                        if (!canAccess) return
-                        setStyleConf(p => ({ ...p, cornerStyle: cs.id }))
-                        // Sync le state corner pour le clipping canvas
-                        if (cs.id === "rounded" || cs.id === "circle" || cs.id === "luxury") setCorner("rounded")
-                        else if (cs.id === "minimal") setCorner("dot")
-                        else setCorner("square")
-                      }}
-                            style={{ padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:canAccess?"pointer":"not-allowed", opacity:canAccess?1:0.5, position:"relative" as const }}>
-                            <p style={{ color:isActive?G:"#F5F0E8", fontSize:11, fontWeight:isActive?700:500, margin:0, textAlign:"center" as const }}>{cs.label}</p>
-                            {isPro && !canAccess && (
-                              <span style={{ position:"absolute", top:4, right:4, background:"rgba(201,168,76,0.15)", borderRadius:4, padding:"1px 4px", fontSize:7, color:G, fontWeight:800 }}>PRO</span>
-                            )}
-                          </button>
-                        )
-                      })}
-                    </div>
-                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Arrondi general</p>
-                    <div style={{ display:"flex", gap:6 }}>
-                      {(["square","rounded","dot"] as const).map(c => (
-                        <button key={c} type="button" onClick={() => setCorner(c)}
-                          style={{ flex:1, padding:"7px 6px", background:corner===c?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1px solid ${corner===c?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:corner===c?G:MUTED, fontSize:10, cursor:"pointer", fontWeight:corner===c?700:400 }}>
-                          {c==="square"?"Carre":c==="rounded"?"Arrondi":"Dots"}
-                        </button>
-                      ))}
-                    </div>
-                  </AccSection>
-
-                  {/* Bibliotheque de presets */}
-                  <AccSection id="presets" title="Bibliotheque de presets" icon="✨" openId={openAcc} setOpenId={setOpenAcc}>
-                    {/* Filtres categorie */}
+                  {/* 1. Bibliotheque de presets (ouvert par defaut) */}
+                  <AccSection id="presets" title="Choisir un style" icon="✨" openId={openAcc} setOpenId={setOpenAcc}>
+                    {/* Filtres par metier */}
                     <div style={{ display:"flex", gap:4, overflowX:"auto", paddingBottom:8, marginBottom:10 }}>
                       {PRESET_CATS.map(cat => (
                         <button key={cat.id} type="button" onClick={() => setSelectedCat(cat.id)}
-                          style={{ display:"inline-flex", alignItems:"center", gap:3, padding:"4px 9px", background:selectedCat===cat.id?"rgba(201,168,76,0.15)":"rgba(255,255,255,0.04)", border:`1px solid ${selectedCat===cat.id?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.08)"}`, borderRadius:20, color:selectedCat===cat.id?G:MUTED, fontSize:9, fontWeight:selectedCat===cat.id?700:500, cursor:"pointer", whiteSpace:"nowrap" as const, flexShrink:0 }}>
+                          style={{ display:"inline-flex", alignItems:"center", gap:3, padding:"5px 10px", background:selectedCat===cat.id?"rgba(201,168,76,0.15)":"rgba(255,255,255,0.04)", border:`1px solid ${selectedCat===cat.id?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.08)"}`, borderRadius:20, color:selectedCat===cat.id?G:MUTED, fontSize:10, fontWeight:selectedCat===cat.id?700:500, cursor:"pointer", whiteSpace:"nowrap" as const, flexShrink:0 }}>
                           <span>{cat.emoji}</span>{cat.label}
                         </button>
                       ))}
                     </div>
 
-                    {/* Grille presets */}
-                    <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:6 }}>
+                    {/* Grille presets avec apercu QR realiste */}
+                    <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:7 }}>
                       {PRESETS.filter(p => selectedCat==="all" || p.cat===selectedCat).map(preset => {
                         const canAccess = PLAN_RANK[userPlan] >= PLAN_RANK[preset.plan]
                         const isActive  = fg===preset.fg && bg===preset.bg
                         const planLabel = preset.plan === "free" ? null : preset.plan === "pro" ? "PRO" : "BIZ"
+                        // forme des modules de l'apercu selon le style du preset
+                        const dotR = preset.dotStyle === "dot" ? "50%" : preset.dotStyle === "rounded" ? "30%" : "2px"
+                        const cornR = preset.cornerStyle === "circle" || preset.cornerStyle === "rounded" || preset.cornerStyle === "luxury" ? "30%" : "2px"
                         return (
                           <div key={preset.id} onClick={() => applyPreset(preset)}
-                            style={{ position:"relative", cursor:"pointer", borderRadius:9, overflow:"hidden", border:`1.5px solid ${isActive?"#C9A84C":canAccess?"rgba(255,255,255,0.08)":"rgba(255,255,255,0.04)"}`, transition:"all 0.15s", opacity:canAccess?1:0.7 }}>
+                            style={{ position:"relative", cursor:"pointer", borderRadius:10, overflow:"hidden", border:`1.5px solid ${isActive?"#C9A84C":canAccess?"rgba(255,255,255,0.08)":"rgba(255,255,255,0.04)"}`, transition:"all 0.15s", opacity:canAccess?1:0.7 }}>
 
-                            {/* Preview miniature */}
-                            <div style={{ background:preset.bg, padding:"10px 8px", display:"flex", alignItems:"center", justifyContent:"center", position:"relative", minHeight:42 }}>
+                            {/* Apercu QR miniature realiste */}
+                            <div style={{ background:preset.bg, padding:"12px", display:"flex", alignItems:"center", justifyContent:"center", position:"relative", minHeight:64 }}>
                               {preset.gradient && preset.gradient !== "none" && preset.fg2 && (
-                                <div style={{ position:"absolute", inset:0, background:`linear-gradient(135deg,${preset.fg}30,${preset.fg2}30)` }}/>
+                                <div style={{ position:"absolute", inset:0, background:`linear-gradient(135deg,${preset.fg}25,${preset.fg2}25)` }}/>
                               )}
-                              <div style={{ position:"relative", width:28, height:28 }}>
-                                <div style={{ position:"absolute", inset:0, background:preset.fg, borderRadius:3, opacity:0.9 }}/>
-                                <div style={{ position:"absolute", inset:4, background:preset.bg, borderRadius:2 }}/>
-                                <div style={{ position:"absolute", inset:8, background:preset.fg, borderRadius:1 }}/>
+                              <div style={{ position:"relative", display:"grid", gridTemplateColumns:"repeat(5,1fr)", gridTemplateRows:"repeat(5,1fr)", gap:2, width:38, height:38 }}>
+                                {/* 3 coins (finder patterns) + modules pseudo-aleatoires */}
+                                {Array.from({ length: 25 }).map((_, i) => {
+                                  const row = Math.floor(i/5), col = i%5
+                                  const isCorner = (row<2&&col<2) || (row<2&&col>2) || (row>2&&col<2)
+                                  if (isCorner && ((row===0||row===1)&&(col===0||col===1) || (row===0||row===1)&&(col===3||col===4) || (row===3||row===4)&&(col===0||col===1))) {
+                                    // afficher le finder comme un carre plein avec la couleur coin
+                                    if ((row===0&&col===0)||(row===0&&col===3)||(row===3&&col===0)) {
+                                      return <div key={i} style={{ gridColumn: col===3?"4 / 6":"1 / 3", gridRow: row===3?"4 / 6":"1 / 3", background:preset.corner||preset.fg, borderRadius:cornR }}/>
+                                    }
+                                    return null
+                                  }
+                                  // modules data : motif pseudo-aleatoire stable
+                                  const on = (i*7 + 3) % 5 < 2
+                                  return on ? <div key={i} style={{ background:preset.fg, borderRadius:dotR }}/> : <div key={i}/>
+                                })}
                               </div>
                               {isActive && (
-                                <div style={{ position:"absolute", top:3, left:3, width:10, height:10, background:G, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                                  <Check size={6} color="#080808"/>
+                                <div style={{ position:"absolute", top:5, left:5, width:14, height:14, background:G, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                                  <Check size={8} color="#080808"/>
                                 </div>
                               )}
                             </div>
 
                             {/* Nom + badge plan */}
-                            <div style={{ background:"#0F0E0B", padding:"5px 5px 6px", textAlign:"center" as const }}>
-                              <p style={{ color:isActive?G:"#F5F0E8", fontSize:8, fontWeight:isActive?700:500, margin:"0 0 2px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
+                            <div style={{ background:"#0F0E0B", padding:"6px 5px 7px", textAlign:"center" as const }}>
+                              <p style={{ color:isActive?G:"#F5F0E8", fontSize:9, fontWeight:isActive?700:500, margin:"0 0 2px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
                                 {preset.label}
                               </p>
                               {planLabel && (
@@ -2311,10 +2203,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                               )}
                             </div>
 
-                            {/* Overlay lock */}
                             {!canAccess && (
                               <div style={{ position:"absolute", inset:0, background:"rgba(8,8,8,0.5)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                                <Lock size={12} color={MUTED}/>
+                                <Lock size={13} color={MUTED}/>
                               </div>
                             )}
                           </div>
@@ -2341,6 +2232,128 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         </a>
                       </div>
                     )}
+                  </AccSection>
+
+                  {/* 2. Couleurs principales (ouvert par defaut) */}
+                  <AccSection id="couleurs" title="Couleurs" icon="🎨" openId={openAcc} setOpenId={setOpenAcc}>
+                    <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                      {([
+                        { label:"QR principal",    key:"fg",  val:fg,  set:(v:string)=>setFg(v) },
+                        { label:"Fond",             key:"bg",  val:bg,  set:(v:string)=>setBg(v) },
+                      ]).map(c => (
+                        <div key={c.key} style={{ display:"flex", alignItems:"center", gap:8 }}>
+                          <label style={{ color:MUTED, fontSize:11, flex:1 }}>{c.label}</label>
+                          <div style={{ position:"relative", width:28, height:28, borderRadius:6, overflow:"hidden", border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }}>
+                            <input type="color" value={c.val} onChange={e => c.set(e.target.value)}
+                              style={{ position:"absolute", inset:-4, width:"calc(100%+8px)", height:"calc(100%+8px)", cursor:"pointer", border:"none" }}/>
+                          </div>
+                          <input type="text" value={c.val} onChange={e => c.set(e.target.value)}
+                            style={{ width:72, background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"5px 7px", color:"#F5F0E8", fontSize:10, fontFamily:"monospace", outline:"none" }}/>
+                        </div>
+                      ))}
+                    </div>
+                  </AccSection>
+
+                  {/* 3. Style des modules (ferme) */}
+                  <AccSection id="modules" title="Style des modules" icon="🔲" openId={openAcc} setOpenId={setOpenAcc}>
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7 }}>
+                      {DOT_STYLES.map(ds => {
+                        const isActive = (styleConf.dotStyle??"square") === ds.id
+                        const isPro = ["pixel","neon","luxury"].includes(ds.id ?? "")
+                        const canAccess = !isPro || PLAN_RANK[userPlan] >= 1
+                        return (
+                          <button key={ds.id ?? "sq"} type="button" onClick={() => canAccess && setStyleConf(p => ({ ...p, dotStyle: ds.id }))}
+                            style={{ position:"relative", padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:canAccess?"pointer":"not-allowed", opacity:canAccess?1:0.5, textAlign:"center" as const }}>
+                            <div style={{ fontSize:18, marginBottom:4 }}>{ds.emoji}</div>
+                            <p style={{ color:isActive?G:"#F5F0E8", fontSize:10, fontWeight:isActive?700:500, margin:0 }}>{ds.label}</p>
+                            {isPro && !canAccess && (
+                              <span style={{ position:"absolute", top:4, right:4, background:"rgba(201,168,76,0.15)", borderRadius:4, padding:"1px 4px", fontSize:7, color:G, fontWeight:800 }}>PRO</span>
+                            )}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </AccSection>
+
+                  {/* 4. Style des coins (ferme) */}
+                  <AccSection id="coins" title="Style des coins" icon="⬛" openId={openAcc} setOpenId={setOpenAcc}>
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7, marginBottom:14 }}>
+                      {CORNER_STYLE_LIST.map(cs => {
+                        const isActive = (styleConf.cornerStyle??"square") === cs.id
+                        const isPro = ["diamond","luxury"].includes(cs.id ?? "")
+                        const canAccess = !isPro || PLAN_RANK[userPlan] >= 1
+                        return (
+                          <button key={cs.id ?? "sq"} type="button" onClick={() => {
+                        if (!canAccess) return
+                        setStyleConf(p => ({ ...p, cornerStyle: cs.id }))
+                        if (cs.id === "rounded" || cs.id === "circle" || cs.id === "luxury") setCorner("rounded")
+                        else if (cs.id === "minimal") setCorner("dot")
+                        else setCorner("square")
+                      }}
+                            style={{ padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:canAccess?"pointer":"not-allowed", opacity:canAccess?1:0.5, position:"relative" as const }}>
+                            <p style={{ color:isActive?G:"#F5F0E8", fontSize:11, fontWeight:isActive?700:500, margin:0, textAlign:"center" as const }}>{cs.label}</p>
+                            {isPro && !canAccess && (
+                              <span style={{ position:"absolute", top:4, right:4, background:"rgba(201,168,76,0.15)", borderRadius:4, padding:"1px 4px", fontSize:7, color:G, fontWeight:800 }}>PRO</span>
+                            )}
+                          </button>
+                        )
+                      })}
+                    </div>
+                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Arrondi general</p>
+                    <div style={{ display:"flex", gap:6 }}>
+                      {(["square","rounded","dot"] as const).map(c => (
+                        <button key={c} type="button" onClick={() => setCorner(c)}
+                          style={{ flex:1, padding:"7px 6px", background:corner===c?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1px solid ${corner===c?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:corner===c?G:MUTED, fontSize:10, cursor:"pointer", fontWeight:corner===c?700:400 }}>
+                          {c==="square"?"Carre":c==="rounded"?"Arrondi":"Dots"}
+                        </button>
+                      ))}
+                    </div>
+                  </AccSection>
+
+                  {/* 5. Reglages avances (ferme) : couleurs avancees + degrade */}
+                  <AccSection id="avances" title="Reglages avances" icon="⚙️" openId={openAcc} setOpenId={setOpenAcc}>
+                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Couleurs avancees</p>
+                    <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:14 }}>
+                      {([
+                        { label:"QR secondaire",   key:"fg2",         val:styleConf.fg2??""          },
+                        { label:"Couleur coins",   key:"cornerColor", val:styleConf.cornerColor??""  },
+                        { label:"Couleur yeux",    key:"eyeColor",    val:styleConf.eyeColor??""     },
+                        { label:"Fond degrade",    key:"gradientBg",  val:styleConf.gradientBg??""   },
+                      ]).map(c => (
+                        <div key={c.key} style={{ display:"flex", alignItems:"center", gap:8 }}>
+                          <label style={{ color:MUTED, fontSize:11, flex:1 }}>{c.label}</label>
+                          <div style={{ position:"relative", width:28, height:28, borderRadius:6, overflow:"hidden", border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }}>
+                            <input type="color" value={c.val || "#080808"} onChange={e => setStyleConf(p => ({ ...p, [c.key]: e.target.value }))}
+                              style={{ position:"absolute", inset:-4, width:"calc(100%+8px)", height:"calc(100%+8px)", cursor:"pointer", border:"none" }}/>
+                          </div>
+                          <input type="text" value={c.val} onChange={e => setStyleConf(p => ({ ...p, [c.key]: e.target.value }))}
+                            placeholder="#----"
+                            style={{ width:72, background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"5px 7px", color:c.val?"#F5F0E8":MUTED, fontSize:10, fontFamily:"monospace", outline:"none" }}/>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Fond transparent */}
+                    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 12px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:9, marginBottom:14 }}>
+                      <div>
+                        <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 2px" }}>Fond transparent</p>
+                        <p style={{ color:MUTED, fontSize:10, margin:0 }}>PNG avec canal alpha</p>
+                      </div>
+                      <button type="button" onClick={() => setStyleConf(p => ({ ...p, transparent: !p.transparent }))}
+                        style={{ width:38, height:22, borderRadius:11, background:styleConf.transparent?"linear-gradient(90deg,#C9A84C,#b8953f)":"rgba(255,255,255,0.1)", border:"none", cursor:"pointer", position:"relative", transition:"background 0.2s" }}>
+                        <div style={{ position:"absolute", top:3, left:styleConf.transparent?18:3, width:16, height:16, borderRadius:"50%", background:"#F5F0E8", transition:"left 0.2s" }}/>
+                      </button>
+                    </div>
+
+                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Degrade</p>
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
+                      {GRADIENT_OPTS.map(g => (
+                        <button key={g.id ?? "none"} type="button" onClick={() => setStyleConf(p => ({ ...p, gradient: g.id ?? "none" }))}
+                          style={{ padding:"7px 8px", background:(styleConf.gradient??"none")===(g.id??"none")?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${(styleConf.gradient??"none")===(g.id??"none")?"rgba(201,168,76,0.35)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:(styleConf.gradient??"none")===(g.id??"none")?G:MUTED, fontSize:10, cursor:"pointer", fontWeight:(styleConf.gradient??"none")===(g.id??"none")?700:400 }}>
+                          {g.label}
+                        </button>
+                      ))}
+                    </div>
                   </AccSection>
 
                 </div>
