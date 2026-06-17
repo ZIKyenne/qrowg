@@ -483,7 +483,7 @@ export default function TemplatesPage() {
           <button type="button" onClick={() => setSelected(null)} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, padding: "9px 14px", color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", gap: 5, fontSize: 12 }}>
             <X size={12} /> Annuler
           </button>
-          <button type="button" onClick={() => setNamingFor(selected!)} disabled={!!creating}
+          <button type="button" onClick={() => { console.log("CLIC UTILISER", selected); setNamingFor(selected!) }} disabled={!!creating}
             style={{ display: "flex", alignItems: "center", gap: 7, background: creating ? "rgba(201,168,76,0.2)" : "linear-gradient(90deg,#C9A84C,#b8953f)", border: "none", borderRadius: 9, padding: "9px 20px", color: "#080808", fontSize: 13, fontWeight: 700, cursor: creating ? "wait" : "pointer", opacity: creating ? 0.7 : 1 }}>
             {creating === selected ? "Création en cours..." : <><ArrowRight size={12} /> Utiliser ce template</>}
           </button>
@@ -491,6 +491,36 @@ export default function TemplatesPage() {
       )}
 
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+
+      {/* ── Modal de nommage ───────────────────────────────────────────── */}
+      {namingFor && (() => {
+        const tpl = TEMPLATES.find((t: any) => t.id === namingFor)
+        if (!tpl) return null
+        return (
+          <NamingModal
+            template={tpl}
+            blockCount={(TEMPLATE_BLOCKS[namingFor] || []).length}
+            onClose={() => setNamingFor(null)}
+            onCreate={async (name, slug, description) => {
+              const theme = TEMPLATE_THEMES[namingFor] || TEMPLATE_THEMES["freelance"]
+              const blocks = TEMPLATE_BLOCKS[namingFor] || []
+              const res = await fetch("/api/templates/use", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ templateId: namingFor, templateName: name, slug, description, theme, blocks }),
+              })
+              const json = await res.json()
+              if (!res.ok || !json.pageId) {
+                return { error: json.error || "Erreur creation page." }
+              }
+              setToast({ type: "success", msg: "Page creee avec succes" })
+              setTimeout(() => router.push("/dashboard/builder/" + json.pageId), 500)
+              return { ok: true }
+            }}
+          />
+        )
+      })()}
 
       {/* Toast notification */}
       {toast && (
@@ -515,6 +545,135 @@ export default function TemplatesPage() {
         @keyframes spin { to { transform: rotate(360deg) } }
         @keyframes popIn { from { opacity:0; transform:translateX(-50%) translateY(8px) scale(0.95) } to { opacity:1; transform:translateX(-50%) translateY(0) scale(1) } }
       `}</style>
+    </div>
+  )
+}// ── Composant Modal de nommage ──────────────────────────────────────────────
+function NamingModal({ template, blockCount, onClose, onCreate }: {
+  template: any
+  blockCount: number
+  onClose: () => void
+  onCreate: (name: string, slug: string, description: string) => Promise<{ ok?: boolean; error?: string }>
+}) {
+  const G = "#C9A84C"
+  const MUTED = "#8A8478"
+  const [name, setName] = useState(template.name || "")
+  const [slug, setSlug] = useState("")
+  const [slugTouched, setSlugTouched] = useState(false)
+  const [description, setDescription] = useState("")
+  const [slugStatus, setSlugStatus] = useState<"idle"|"checking"|"available"|"taken"|"invalid"|"reserved">("idle")
+  const [suggestions, setSuggestions] = useState<string[]>([])
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState("")
+
+  function slugify(input: string): string {
+    return (input || "")
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60)
+  }
+
+  // Auto-slug depuis le nom tant que l'utilisateur n'a pas touche le slug
+  useEffect(() => {
+    if (!slugTouched) setSlug(slugify(name))
+  }, [name, slugTouched])
+
+  // Verification du slug (debounce 400ms)
+  useEffect(() => {
+    if (!slug) { setSlugStatus("idle"); setSuggestions([]); return }
+    setSlugStatus("checking")
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/slug/check?slug=" + encodeURIComponent(slug))
+        const json = await res.json()
+        setSlugStatus(json.status === "available" ? "available" : json.status === "taken" ? "taken" : json.status === "reserved" ? "reserved" : "invalid")
+        setSuggestions(json.suggestions || [])
+      } catch {
+        setSlugStatus("idle")
+      }
+    }, 400)
+    return () => clearTimeout(t)
+  }, [slug])
+
+  const nameValid = name.trim().length >= 2 && name.trim().length <= 80
+  const canSubmit = nameValid && slugStatus === "available" && !submitting
+
+  async function handleCreate() {
+    if (!canSubmit) return
+    setSubmitting(true)
+    setError("")
+    const result = await onCreate(name.trim(), slug, description.trim())
+    if (result.error) {
+      setError(result.error)
+      setSubmitting(false)
+    }
+  }
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)",
+    borderRadius: 8, padding: "10px 12px", color: "#F5F0E8", fontSize: 13,
+    outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif",
+  }
+
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 9998, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0F0F0F", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 20, padding: 24, width: "100%", maxWidth: 440, boxShadow: "0 20px 60px rgba(0,0,0,0.8)", maxHeight: "90vh", overflowY: "auto" }}>
+
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+          <div style={{ width: 44, height: 44, borderRadius: 12, background: template.color + "18", border: "1px solid " + template.color + "35", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{template.emoji}</div>
+          <div style={{ flex: 1 }}>
+            <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0 }}>Creer une page depuis ce template</p>
+            <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{template.name} · {template.category} · {blockCount} blocs</p>
+          </div>
+          <button onClick={onClose} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 4 }}><X size={18} /></button>
+        </div>
+
+        {/* Nom */}
+        <div style={{ marginBottom: 14 }}>
+          <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>Nom du projet</label>
+          <input value={name} onChange={e => setName(e.target.value)} placeholder="Ex : Le Bistrot Parisien" style={inputStyle} autoFocus />
+          {!nameValid && name.length > 0 && <p style={{ color: "#F87171", fontSize: 10, margin: "4px 0 0" }}>Le nom doit faire 2 a 80 caracteres.</p>}
+        </div>
+
+        {/* Slug */}
+        <div style={{ marginBottom: 14 }}>
+          <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>Slug public</label>
+          <input value={slug} onChange={e => { setSlugTouched(true); setSlug(slugify(e.target.value)) }} placeholder="le-bistrot-parisien" style={{ ...inputStyle, fontFamily: "monospace" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "5px 0 0", minHeight: 16 }}>
+            {slugStatus === "checking" && <span style={{ color: MUTED, fontSize: 10 }}>Verification…</span>}
+            {slugStatus === "available" && <span style={{ color: "#39FF8F", fontSize: 10, fontWeight: 600 }}>✓ Disponible</span>}
+            {slugStatus === "taken" && <span style={{ color: "#F87171", fontSize: 10, fontWeight: 600 }}>✗ Deja pris</span>}
+            {slugStatus === "reserved" && <span style={{ color: "#F87171", fontSize: 10, fontWeight: 600 }}>✗ Slug reserve</span>}
+            {slugStatus === "invalid" && <span style={{ color: "#FBBF24", fontSize: 10, fontWeight: 600 }}>2-60 caracteres, minuscules, chiffres, tirets</span>}
+          </div>
+          <p style={{ color: MUTED, fontSize: 10, margin: "4px 0 0", fontFamily: "monospace" }}>qrfolio.app/{slug || "..."}</p>
+          {(slugStatus === "taken") && suggestions.length > 0 && (
+            <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 7 }}>
+              {suggestions.map(s => (
+                <button key={s} onClick={() => { setSlugTouched(true); setSlug(s) }} style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 6, padding: "3px 8px", color: G, fontSize: 10, cursor: "pointer", fontFamily: "monospace" }}>{s}</button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Description */}
+        <div style={{ marginBottom: 18 }}>
+          <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>Description (optionnel)</label>
+          <input value={description} onChange={e => setDescription(e.target.value)} placeholder="Courte description de la page" style={inputStyle} />
+        </div>
+
+        {/* Erreur */}
+        {error && <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 9, padding: "9px 12px", color: "#F87171", fontSize: 12, marginBottom: 14 }}>⚠ {error}</div>}
+
+        {/* Boutons */}
+        <div style={{ display: "flex", gap: 9 }}>
+          <button onClick={onClose} style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "11px", color: MUTED, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Annuler</button>
+          <button onClick={handleCreate} disabled={!canSubmit}
+            style={{ flex: 2, background: canSubmit ? "linear-gradient(90deg,#C9A84C,#b8953f)" : "rgba(201,168,76,0.2)", border: "none", borderRadius: 10, padding: "11px", color: canSubmit ? "#080808" : MUTED, fontSize: 13, fontWeight: 700, cursor: canSubmit ? "pointer" : "not-allowed" }}>
+            {submitting ? "Creation…" : "Creer ma page"}
+          </button>
+        </div>
+        <p style={{ color: MUTED, fontSize: 10, margin: "12px 0 0", textAlign: "center" }}>Tu pourras modifier ce nom plus tard.</p>
+      </div>
     </div>
   )
 }
