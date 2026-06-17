@@ -347,6 +347,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [suppExporting,setSuppExporting]=useState(false)
   const [saving,     setSaving]     = useState(false)
   const [saved,      setSaved]      = useState(false)
+  const [saveErr,    setSaveErr]    = useState("")
   const [copied,     setCopied]     = useState<"link"|"short"|null>(null)
   const [search,     setSearch]     = useState("")
   const [filterSt,   setFilterSt]   = useState("all")
@@ -699,17 +700,23 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const saveCustomization = useCallback(async () => {
     if (!active) return
     setSaving(true)
+    setSaveErr("")
     const supabase = createClient()
-    await supabase.from("qr_codes").update({
+    const { error } = await supabase.from("qr_codes").update({
       foreground_color: fg, background_color: bg,
       corner_style: corner, error_correction: ecLevel,
       style_config: styleConf,
       updated_at: new Date().toISOString(),
     }).eq("id", active.id)
+    setSaving(false)
+    if (error) {
+      setSaveErr(error.message || "Echec de l'enregistrement")
+      return
+    }
     setQRCodes(prev => prev.map(q => q.id === active.id
       ? { ...q, foreground_color: fg, background_color: bg, corner_style: corner, error_correction: ecLevel, style_config: styleConf }
       : q))
-    setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
+    setSaved(true); setTimeout(() => setSaved(false), 2000)
   }, [active, fg, bg, corner, ecLevel, styleConf])
 
   // -- Nom de fichier auto ----------------------------------------------------
@@ -2715,6 +2722,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   : saved ? <><Check size={12}/> Sauvegarde !</>
                   : <><Palette size={12}/> Enregistrer le style</>}
               </button>
+              {saveErr && (
+                <div style={{ padding:"8px 10px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.25)", borderRadius:8, color:"#FF6B6B", fontSize:10, lineHeight:1.4 }}>
+                  Echec de l'enregistrement : {saveErr}
+                </div>
+              )}
               <button type="button" onClick={applyToAll}
                 style={{ padding:"9px", background:applyAllOk?"rgba(57,255,143,0.1)":"rgba(255,255,255,0.03)", border:`1px solid ${applyAllOk?"rgba(57,255,143,0.25)":"rgba(255,255,255,0.08)"}`, borderRadius:9, color:applyAllOk?"#39FF8F":MUTED, fontSize:11, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
                 {applyAllOk ? <><Check size={11}/> Applique a tous !</> : <><Settings size={11}/> Appliquer a tous mes QR</>}
