@@ -72,7 +72,7 @@ const DOT_STYLES: { id: QRStyleConfig["dotStyle"]; label: string; emoji: string 
   { id:"square",     label:"Classique",    emoji:"⬛" },
   { id:"rounded",    label:"Arrondi",      emoji:"🔵" },
   { id:"dot",        label:"Dots",         emoji:"⚫" },
-  { id:"softSquare", label:"Carres doux",  emoji:"🟦" },
+  { id:"softSquare", label:"Carrés doux",  emoji:"🟦" },
   { id:"pixel",      label:"Pixel",        emoji:"🟧" },
   { id:"minimal",    label:"Minimal",      emoji:"▫️" },
   { id:"neon",       label:"Neon",         emoji:"💜" },
@@ -80,7 +80,7 @@ const DOT_STYLES: { id: QRStyleConfig["dotStyle"]; label: string; emoji: string 
 ]
 
 const CORNER_STYLE_LIST: { id: QRStyleConfig["cornerStyle"]; label: string }[] = [
-  { id:"square",   label:"Carre"   },
+  { id:"square",   label:"Carré"   },
   { id:"rounded",  label:"Arrondi" },
   { id:"circle",   label:"Cercle"  },
   { id:"diamond",  label:"Diamond" },
@@ -190,13 +190,13 @@ const PRESETS: Preset[] = [
 ]
 
 const CORNER_STYLES = [
-  { id: "square",  label: "Carre",   icon: "⬛" },
+  { id: "square",  label: "Carré",   icon: "⬛" },
   { id: "rounded", label: "Arrondi", icon: "🔲" },
   { id: "dot",     label: "Points",  icon: "⚫" },
 ]
 
 const EC_LEVELS = [
-  { id: "L", label: "L 7%",  desc: "Leger" },
+  { id: "L", label: "L 7%",  desc: "Léger" },
   { id: "M", label: "M 15%", desc: "Standard" },
   { id: "Q", label: "Q 25%", desc: "Eleve" },
   { id: "H", label: "H 30%", desc: "Maximum" },
@@ -206,9 +206,9 @@ const PLAN_RANK: Record<string, number> = { free: 0, pro: 1, business: 2 }
 
 // -- Statuts pages (pour l'affichage de la page liee)
 const STATUS_CFG: Record<string, { label: string; dot: string; badge: string; text: string }> = {
-  published: { label: "Publie",    dot: "#39FF8F", badge: "rgba(57,255,143,0.12)",  text: "#39FF8F" },
+  published: { label: "Publié",    dot: "#39FF8F", badge: "rgba(57,255,143,0.12)",  text: "#39FF8F" },
   draft:     { label: "Brouillon", dot: "#8A8478", badge: "rgba(138,132,120,0.12)", text: "#8A8478" },
-  archived:  { label: "Archive",   dot: "#F97316", badge: "rgba(249,115,22,0.12)",  text: "#F97316" },
+  archived:  { label: "Archivé",   dot: "#F97316", badge: "rgba(249,115,22,0.12)",  text: "#F97316" },
   paused:    { label: "En pause",  dot: "#FF6B6B", badge: "rgba(255,107,107,0.12)", text: "#FF6B6B" },
 }
 
@@ -217,7 +217,7 @@ const QR_STATUS_CFG: Record<string, { label: string; dot: string; badge: string;
   active:   { label: "Actif",     dot: "#39FF8F", badge: "rgba(57,255,143,0.12)",  text: "#39FF8F", desc: "Redirection normale" },
   draft:    { label: "Brouillon", dot: "#8A8478", badge: "rgba(138,132,120,0.12)", text: "#8A8478", desc: "Visible dans le dashboard uniquement" },
   paused:   { label: "En pause",  dot: "#F97316", badge: "rgba(249,115,22,0.12)",  text: "#F97316", desc: "Page indisponible affichee" },
-  archived: { label: "Archive",   dot: "#6B7280", badge: "rgba(107,114,128,0.12)", text: "#6B7280", desc: "Masque et bloque" },
+  archived: { label: "Archivé",   dot: "#6B7280", badge: "rgba(107,114,128,0.12)", text: "#6B7280", desc: "Masque et bloque" },
   expired:  { label: "Expire",    dot: "#FF6B6B", badge: "rgba(255,107,107,0.12)", text: "#FF6B6B", desc: "Acces expire" },
 }
 
@@ -509,7 +509,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     if (!styleConf.logoUrl) {
       if (ecLevel === "L") {
         issues.push({ id:"ecc-l", severity:"warning",
-          title:"Correction L trop legere", detail:"ECC L (7%) est insuffisant pour l'impression ou les surfaces abimees.",
+          title:"Correction L trop légère", detail:"ECC L (7%) est insuffisant pour l'impression ou les surfaces abimees.",
           fix:"Passer en ECC M", fixable:true })
         score -= 8
       }
@@ -524,7 +524,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       score -= 18
     } else if (margin < 8) {
       issues.push({ id:"margin-low", severity:"warning",
-        title:"Marge reduite", detail:`Marge ${margin}px -- 10px+ recommande pour l'impression.`,
+        title:"Marge réduite", detail:`Marge ${margin}px -- 10px+ recommande pour l'impression.`,
         fix:"Ajouter une marge de 10px", fixable:true })
       score -= 6
     }
@@ -533,7 +533,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const dotStyle = styleConf.dotStyle ?? "square"
     if (dotStyle === "neon" || dotStyle === "luxury") {
       issues.push({ id:"style-complex", severity:"warning",
-        title:"Style QR complexe", detail:"Les styles Neon/Luxury peuvent perturber la detection par certains scanners anciens.",
+        title:"Style QR complexe", detail:"Les styles Néon/Luxury peuvent perturber la détection par certains scanners anciens.",
         fix:undefined, fixable:false })
       score -= 6
     }
@@ -548,7 +548,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     )
     if (colorDist < 60 && ratio >= 3) {
       issues.push({ id:"colors-close", severity:"info",
-        title:"Couleurs proches", detail:"La distance chromatique est faible -- peut poser probleme sur ecrans a faible gamme.",
+        title:"Couleurs proches", detail:"La distance chromatique est faible — peut poser problème sur écrans à faible gamme.",
         fix:undefined, fixable:false })
       score -= 4
     }
@@ -558,9 +558,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       const ratio2 = contrastRatio(styleConf.fg2, bgHex)
       if (ratio2 < 3) {
         issues.push({ id:"gradient-contrast", severity:"warning",
-          title:"Degrade -- couleur secondaire peu contrastee",
+          title:"Dégradé — couleur secondaire peu contrastée",
           detail:`La couleur fin de degrade a un contraste de ${ratio2.toFixed(1)}:1 avec le fond.`,
-          fix:"Supprimer le degrade", fixable:true })
+          fix:"Supprimer le dégradé", fixable:true })
         score -= 10
       }
     }
@@ -910,13 +910,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     { id:"qr-only",     label:"QR seul",           emoji:"▣", w:800,  h:800,  plan:"free",     cat:"Base",       desc:"QR Code sans decoration" },
     { id:"a4-poster",   label:"Affiche A4",         emoji:"📋", w:795,  h:1122, plan:"free",     cat:"Print",      desc:"Portrait A4 avec titre et fond" },
     { id:"flyer",       label:"Flyer",              emoji:"📄", w:795,  h:561,  plan:"free",     cat:"Print",      desc:"Demi A4 paysage" },
-    { id:"sticker",     label:"Sticker vitrine",    emoji:"🏷️",  w:600,  h:600,  plan:"free",     cat:"Print",      desc:"Carre 6cm avec cadre" },
+    { id:"sticker",     label:"Sticker vitrine",    emoji:"🏷️",  w:600,  h:600,  plan:"free",     cat:"Print",      desc:"Carré 6cm avec cadre" },
     { id:"table-card",  label:"Carte de table",     emoji:"🪧",  w:900,  h:506,  plan:"pro",      cat:"Restaurant", desc:"Format paysage 9x5cm" },
     { id:"menu-qr",     label:"Menu QR",            emoji:"🍽",  w:600,  h:900,  plan:"pro",      cat:"Restaurant", desc:"Carte portrait avec titre menu" },
     { id:"business",    label:"Carte de visite",    emoji:"💳", w:1063, h:591,  plan:"pro",      cat:"Business",   desc:"Format CR80 standard" },
     { id:"event-badge", label:"Badge evenement",    emoji:"🎫", w:680,  h:400,  plan:"pro",      cat:"Event",      desc:"Badge horizontal 85x50mm" },
     { id:"story",       label:"Story Instagram",    emoji:"📱", w:1080, h:1920, plan:"business", cat:"Social",     desc:"9:16 vertical stories" },
-    { id:"post",        label:"Post Instagram",     emoji:"🟫", w:1080, h:1080, plan:"business", cat:"Social",     desc:"Carre 1:1" },
+    { id:"post",        label:"Post Instagram",     emoji:"🟫", w:1080, h:1080, plan:"business", cat:"Social",     desc:"Carré 1:1" },
   ]
 
   // -- Rendu d'un support sur canvas ----------------------------------------
@@ -1570,7 +1570,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         <div style={{ width:5, height:5, borderRadius:"50%", background:"#39FF8F", animation:"pulse 1.5s infinite", flexShrink:0 }}/>
                       )}
                       <p style={{ color:MUTED, fontSize:9, margin:0 }}>
-                        {qr.last_scan_at ? formatDate(qr.last_scan_at) : "Jamais scanne"}
+                        {qr.last_scan_at ? formatDate(qr.last_scan_at) : "Jamais scanné"}
                       </p>
                     </div>
                   </div>
@@ -1633,7 +1633,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       <div style={{ display:"flex", flexDirection:"column", overflow:"hidden", background:"#0A0907" }}>
         {/* Section label */}
         <div style={{ padding:"10px 16px 8px", borderBottom:"1px solid rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-          <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Apercu</p>
+          <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Aperçu</p>
           {active && (
             <span style={{ color:MUTED, fontSize:9 }}>
               {new Date(active.created_at).toLocaleDateString("fr-FR", { day:"numeric", month:"short", year:"numeric" })}
@@ -1686,7 +1686,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   </div>
                   {(() => {
                     const st   = active.pages?.status ?? "draft"
-                    const sCfg = ({ published:{dot:"#39FF8F",label:"Publie"}, draft:{dot:"#8A8478",label:"Brouillon"}, archived:{dot:"#F97316",label:"Archive"}, paused:{dot:"#FF6B6B",label:"En pause"} } as any)[st] ?? {dot:"#8A8478",label:"Inconnu"}
+                    const sCfg = ({ published:{dot:"#39FF8F",label:"Publié"}, draft:{dot:"#8A8478",label:"Brouillon"}, archived:{dot:"#F97316",label:"Archivé"}, paused:{dot:"#FF6B6B",label:"En pause"} } as any)[st] ?? {dot:"#8A8478",label:"Inconnu"}
                     return (
                       <span style={{ display:"inline-flex", alignItems:"center", gap:4, fontSize:10, color:sCfg.dot, background:`${sCfg.dot}15`, border:`1px solid ${sCfg.dot}40`, borderRadius:6, padding:"2px 8px", fontWeight:600 }}>
                         <div style={{ width:5, height:5, borderRadius:"50%", background:sCfg.dot }}/>{sCfg.label}
@@ -1712,7 +1712,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 <div style={{ display:"flex", flexDirection:"column", gap:7, width:"100%" }}>
                   <button type="button" onClick={() => downloadPNG(1024)}
                     style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"11px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(201,168,76,0.2)" }}>
-                    <Download size={15}/> Telecharger
+                    <Download size={15}/> Télécharger
                   </button>
                   <div style={{ display:"flex", gap:6, width:"100%" }}>
                     <button type="button" onClick={() => copy("link")}
@@ -1739,7 +1739,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   { label:"Scans total",   value:active.total_scans.toLocaleString(),               color:"#C9A84C", icon:"📡" },
                   { label:"Vues page",     value:(active.pages?.total_views ?? 0).toLocaleString(),  color:"#39FF8F", icon:"👁" },
                   { label:"Dernier scan",  value:formatDate(active.last_scan_at),                   color:"#8A8478", icon:"🕐" },
-                  { label:"Cree le",       value:new Date(active.created_at).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"}), color:"#8A8478", icon:"📅" },
+                  { label:"Créé le",       value:new Date(active.created_at).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"}), color:"#8A8478", icon:"📅" },
                 ].map((s,i) => (
                   <div key={i} style={{ background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.06)", borderRadius:9, padding:"10px 12px" }}>
                     <p style={{ color:"#8A8478", fontSize:9, textTransform:"uppercase", letterSpacing:1.2, margin:"0 0 4px" }}>{s.icon} {s.label}</p>
@@ -1980,7 +1980,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
                       {[
                         `Contraste parfait (${scanScore.ratio}:1)`,
-                        "Marge suffisante pour la detection",
+                        "Marge suffisante pour la détection",
                         `Correction d'erreur optimale (ECC ${ecLevel})`,
                       ].map((txt, i) => (
                         <div key={i} style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 10px", background:"rgba(57,255,143,0.05)", border:"1px solid rgba(57,255,143,0.15)", borderRadius:8 }}>
@@ -2143,7 +2143,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               {([
                 ["apparence", "Apparence", "🎨"],
                 ["branding",  "Branding",  "🖼"],
-                ["qualite",   "Qualite",   "🛡"],
+                ["qualite",   "Qualité",   "🛡"],
               ] as const).map(([id,label,emoji]) => (
                 <button key={id} type="button" onClick={() => setStyleTab(id)}
                   style={{ flex:1, padding:"10px 10px", background:"none", border:"none", borderBottom:styleTab===id?`2px solid ${G}`:"2px solid transparent", color:styleTab===id?G:MUTED, fontSize:11, fontWeight:styleTab===id?700:500, cursor:"pointer", whiteSpace:"nowrap" as const, display:"flex", alignItems:"center", justifyContent:"center", gap:5 }}>
@@ -2245,7 +2245,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           </button>
                         </div>
                         <p style={{ color:MUTED, fontSize:11, margin:"0 0 10px", lineHeight:1.5 }}>
-                          Ce preset necessite un plan superieur. Passez a Pro ou Business pour debloquer tous les presets.
+                          Ce preset nécessite un plan supérieur. Passez à Pro ou Business pour débloquer tous les presets.
                         </p>
                         <a href="/dashboard/upgrade"
                           style={{ display:"block", textAlign:"center" as const, padding:"8px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius:8, color:"#080808", fontSize:11, fontWeight:700, textDecoration:"none" }}>
@@ -2325,21 +2325,21 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       {(["square","rounded","dot"] as const).map(c => (
                         <button key={c} type="button" onClick={() => setCorner(c)}
                           style={{ flex:1, padding:"7px 6px", background:corner===c?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1px solid ${corner===c?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:corner===c?G:MUTED, fontSize:10, cursor:"pointer", fontWeight:corner===c?700:400 }}>
-                          {c==="square"?"Carre":c==="rounded"?"Arrondi":"Dots"}
+                          {c==="square"?"Carré":c==="rounded"?"Arrondi":"Dots"}
                         </button>
                       ))}
                     </div>
                   </AccSection>
 
                   {/* 5. Reglages avances (ferme) : couleurs avancees + degrade */}
-                  <AccSection id="avances" title="Reglages avances" icon="⚙️" openId={openAcc} setOpenId={setOpenAcc}>
+                  <AccSection id="avances" title="Réglages avancés" icon="⚙️" openId={openAcc} setOpenId={setOpenAcc}>
                     <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Couleurs avancees</p>
                     <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:14 }}>
                       {([
                         { label:"QR secondaire",   key:"fg2",         val:styleConf.fg2??""          },
                         { label:"Couleur coins",   key:"cornerColor", val:styleConf.cornerColor??""  },
                         { label:"Couleur yeux",    key:"eyeColor",    val:styleConf.eyeColor??""     },
-                        { label:"Fond degrade",    key:"gradientBg",  val:styleConf.gradientBg??""   },
+                        { label:"Fond dégradé",    key:"gradientBg",  val:styleConf.gradientBg??""   },
                       ]).map(c => (
                         <div key={c.key} style={{ display:"flex", alignItems:"center", gap:8 }}>
                           <label style={{ color:MUTED, fontSize:11, flex:1 }}>{c.label}</label>
@@ -2483,7 +2483,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Forme du conteneur</p>
                         <div style={{ display:"flex", gap:6 }}>
                           {([
-                            { id:"square",  label:"Carre",   icon:"⬛" },
+                            { id:"square",  label:"Carré",   icon:"⬛" },
                             { id:"rounded", label:"Arrondi", icon:"🔲" },
                             { id:"circle",  label:"Cercle",  icon:"⚫" },
                           ] as const).map(s => (
@@ -2675,11 +2675,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                       {[
                         "Scannez pour voir le menu",
-                        "Scannez pour reserver",
+                        "Scannez pour réserver",
                         "Scannez pour laisser un avis",
                         "Scannez pour nous suivre",
-                        "Scannez pour decouvrir la page",
-                        "Scannez pour telecharger le fichier",
+                        "Scannez pour découvrir la page",
+                        "Scannez pour télécharger le fichier",
                         "Scannez pour en savoir plus",
                       ].map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
@@ -2690,7 +2690,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               {/* -- Preview -------------------------------------------- */}
               <div style={{ marginBottom:12 }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
-                  <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Apercu</p>
+                  <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Aperçu</p>
                   <span style={{ color:MUTED, fontSize:9 }}>{tpl.w}×{tpl.h}px</span>
                 </div>
 
@@ -2706,14 +2706,14 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       )}
                       <button type="button" onClick={previewSupport}
                         style={{ width:"100%", padding:"8px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:8, color:G, fontSize:11, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
-                        <Eye size={12}/> {suppRendered ? "Regenerer l'apercu" : "Generer l'apercu"}
+                        <Eye size={12}/> {suppRendered ? "Régénérer l'aperçu" : "Générer l'aperçu"}
                       </button>
                     </>
                   ) : (
                     <div style={{ padding:"20px 0", textAlign:"center" as const }}>
                       <Lock size={22} color={MUTED} style={{ marginBottom:8 }}/>
                       <p style={{ color:MUTED, fontSize:12, margin:"0 0 10px" }}>
-                        {tpl.plan === "pro" ? "Necessites le plan Pro" : "Necessites le plan Business"}
+                        {tpl.plan === "pro" ? "Nécessite le plan Pro" : "Nécessite le plan Business"}
                       </p>
                       <a href="/dashboard/upgrade" style={{ display:"inline-block", padding:"7px 16px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius:8, color:"#080808", fontSize:11, fontWeight:700, textDecoration:"none" }}>
                         Voir les plans
@@ -2748,7 +2748,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           const FORMAT_CFG: Record<string, { label: string; ext: string; color: string; desc: string; plan: string }> = {
             "png":   { label:"PNG",       ext:"png",  color:"#38BDF8", desc:"Universel, opaque",        plan:"free"     },
             "png-t": { label:"PNG Alpha", ext:"png",  color:"#39FF8F", desc:"Fond transparent, sticker", plan:"pro"      },
-            "webp":  { label:"WEBP",      ext:"webp", color:"#818CF8", desc:"Web optimise, plus leger",  plan:"pro"      },
+            "webp":  { label:"WEBP",      ext:"webp", color:"#818CF8", desc:"Web optimisé, plus léger",  plan:"pro"      },
             "svg":   { label:"SVG",       ext:"svg",  color:"#C9A84C", desc:"Vectoriel, impression HD",  plan:"pro"      },
             "pdf":   { label:"PDF",       ext:"pdf",  color:"#FF6B6B", desc:"Impression A4 avec titre",  plan:"business" },
           }
@@ -2759,16 +2759,16 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
               {/* -- Format (cartes) ------------------------------------------ */}
               <div>
-                <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:700, margin:"0 0 3px" }}>Telecharger votre QR en fichier</p>
+                <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:700, margin:"0 0 3px" }}>Télécharger votre QR en fichier</p>
                 <p style={{ color:MUTED, fontSize:10, margin:"0 0 12px", lineHeight:1.4 }}>L'image de votre QR a integrer ou imprimer ou vous voulez.</p>
                 <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                   {([
                     { id:"png",   emoji:"🌐", usage:"Usage web",        desc:"Universel, fond opaque. Le plus polyvalent." },
-                    { id:"svg",   emoji:"🖨️", usage:"Impression HD",     desc:"Vectoriel, net a toutes les tailles." },
-                    { id:"pdf",   emoji:"📄", usage:"Flyers & affiches", desc:"Document A4 pret a imprimer, avec titre." },
+                    { id:"svg",   emoji:"🖨️", usage:"Impression HD",     desc:"Vectoriel, net à toutes les tailles." },
+                    { id:"pdf",   emoji:"📄", usage:"Flyers & affiches", desc:"Document A4 prêt à imprimer, avec titre." },
                     ...(showMoreFmt ? [
-                      { id:"webp",  emoji:"⚡", usage:"Web optimise", desc:"Plus leger que le PNG, ideal sites rapides." },
-                      { id:"png-t", emoji:"🏷️", usage:"Sticker",     desc:"PNG a fond transparent, pour autocollants." },
+                      { id:"webp",  emoji:"⚡", usage:"Web optimise", desc:"Plus léger que le PNG, idéal sites rapides." },
+                      { id:"png-t", emoji:"🏷️", usage:"Sticker",     desc:"PNG à fond transparent, pour autocollants." },
                     ] : []),
                   ] as const).map(f => {
                     const cfg   = FORMAT_CFG[f.id]
@@ -2911,7 +2911,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   style={{ padding:"11px", background:`linear-gradient(90deg,${fmt.color},${fmt.color}cc)`, border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:expExporting?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7, opacity:expExporting?0.7:1 }}>
                   {expExporting
                     ? <><Loader2 size={14} style={{ animation:"spin 0.8s linear infinite" }}/> Export en cours...</>
-                    : <><Download size={14}/> Telecharger {fmt.label} {realPx}px</>}
+                    : <><Download size={14}/> Télécharger {fmt.label} {realPx}px</>}
                 </button>
 
                 {/* Copier image */}
