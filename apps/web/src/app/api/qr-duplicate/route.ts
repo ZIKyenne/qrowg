@@ -1,5 +1,6 @@
 // app/api/qr-duplicate/route.ts
 // Duplique un QR code et sa page liee (nouvelle page + nouveau short_code)
+// Ne remplit QUE les colonnes reellement presentes dans la table.
 
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
@@ -9,6 +10,11 @@ function randCode(len = 8): string {
   let s = ""
   for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * chars.length)]
   return s
+}
+
+// Affecte une valeur uniquement si la cle existe deja dans l'objet (= colonne presente)
+function setIfPresent(obj: Record<string, any>, key: string, value: any) {
+  if (key in obj) obj[key] = value
 }
 
 export async function POST(req: NextRequest) {
@@ -37,20 +43,18 @@ export async function POST(req: NextRequest) {
       .eq("id", orig.page_id)
       .single()
     if (page) {
-      const p = page as any
+      const p: Record<string, any> = { ...page }
       delete p.id
       delete p.created_at
       delete p.updated_at
-      const newPage = {
-        ...p,
-        title: `${page.title ?? "Sans titre"} (copie)`,
-        slug:  `${(page.slug ?? "page")}-${randCode(5)}`,
-        status: "draft",
-        total_views: 0,
-      }
+      setIfPresent(p, "title", `${page.title ?? "Sans titre"} (copie)`)
+      setIfPresent(p, "slug", `${(page.slug ?? "page")}-${randCode(5)}`)
+      setIfPresent(p, "status", "draft")
+      setIfPresent(p, "total_views", 0)
+
       const { data: insertedPage, error: e2 } = await supabase
         .from("pages")
-        .insert(newPage)
+        .insert(p)
         .select("id")
         .single()
       if (e2 || !insertedPage) {
@@ -60,24 +64,24 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // 3. Creer le nouveau QR (copie du style, compteurs remis a zero)
-  const q = orig as any
+  // 3. Creer le nouveau QR (copie a l'identique, on ne reinitialise que l'existant)
+  const q: Record<string, any> = { ...orig }
   delete q.id
   delete q.created_at
   delete q.updated_at
-  const newQr = {
-    ...q,
-    page_id:       newPageId,
-    short_code:    randCode(8),
-    total_scans:   0,
-    last_scan_at:  null,
-    dest_override: null,
-    dest_history:  [],
-    status:        "active",
-  }
+  // colonnes que l'on sait presentes (utilisees ailleurs dans le code)
+  q.page_id    = newPageId
+  q.short_code = randCode(8)
+  // reinitialisations conditionnelles (uniquement si la colonne existe)
+  setIfPresent(q, "total_scans", 0)
+  setIfPresent(q, "last_scan_at", null)
+  setIfPresent(q, "dest_override", null)
+  setIfPresent(q, "dest_history", [])
+  setIfPresent(q, "status", "active")
+
   const { data: insertedQr, error: e3 } = await supabase
     .from("qr_codes")
-    .insert(newQr)
+    .insert(q)
     .select("*, pages(id, title, slug, status, total_views, updated_at)")
     .single()
   if (e3 || !insertedQr) {
