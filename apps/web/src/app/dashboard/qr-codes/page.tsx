@@ -34,43 +34,44 @@ export default async function QRCodesPage() {
     <div style={{ minHeight: "100vh", background: "#080808", fontFamily: "DM Sans, sans-serif" }}>
 
       {/* ===== Header ===== */}
-      <div style={{ borderBottom: "1px solid rgba(201,168,76,0.1)", background: "rgba(15,14,11,0.8)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 50, padding: "0 24px" }}>
-        <div style={{ maxWidth: 1320, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 60 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 9, background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <QrCode size={16} color="#C9A84C"/>
+      <div style={{ borderBottom: "1px solid rgba(201,168,76,0.1)", background: "rgba(15,14,11,0.85)", backdropFilter: "blur(14px)", position: "sticky", top: 0, zIndex: 50, padding: "0 24px" }}>
+        <div style={{ maxWidth: 1320, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 66 }}>
+
+          {/* Identite */}
+          <div style={{ display: "flex", alignItems: "center", gap: 13 }}>
+            <div style={{ width: 38, height: 38, borderRadius: 11, background: "linear-gradient(135deg, rgba(201,168,76,0.2), rgba(201,168,76,0.08))", border: "1px solid rgba(201,168,76,0.25)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 14px rgba(201,168,76,0.12)" }}>
+              <QrCode size={19} color="#C9A84C"/>
             </div>
             <div>
-              <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 20, color: "#F5F0E8", fontWeight: 700, margin: 0, lineHeight: 1.2 }}>
+              <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 22, color: "#F5F0E8", fontWeight: 700, margin: 0, lineHeight: 1.15 }}>
                 QR Studio
               </h1>
               <p style={{ color: "#8A8478", fontSize: 11, margin: 0 }}>
-                Gerez, personnalisez et exportez vos QR Codes dynamiques
+                Creez, personnalisez et exportez vos QR Codes
               </p>
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            {/* KPIs rapides */}
-            <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          {/* Actions */}
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            {/* KPIs en pastilles */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               {[
-                { label: "QR actifs", value: activeQR, icon: <Activity size={11} color="#39FF8F"/>, color: "#39FF8F" },
-                { label: "Scans total", value: totalScans.toLocaleString("fr-FR"), icon: <TrendingUp size={11} color="#C9A84C"/>, color: "#C9A84C" },
+                { label: "QR actifs",   value: activeQR,                      icon: <Activity size={13} color="#39FF8F"/>,    color: "#39FF8F" },
+                { label: "Scans total", value: totalScans.toLocaleString("fr-FR"), icon: <TrendingUp size={13} color="#C9A84C"/>, color: "#C9A84C" },
               ].map((k, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "7px 13px" }}>
                   {k.icon}
                   <div>
-                    <p style={{ color: k.color, fontSize: 13, fontWeight: 700, margin: 0, lineHeight: 1 }}>{k.value}</p>
-                    <p style={{ color: "#8A8478", fontSize: 9, margin: 0, textTransform: "uppercase", letterSpacing: 0.8 }}>{k.label}</p>
+                    <p style={{ color: k.color, fontSize: 14, fontWeight: 700, margin: 0, lineHeight: 1 }}>{k.value}</p>
+                    <p style={{ color: "#8A8478", fontSize: 9, margin: "1px 0 0", textTransform: "uppercase", letterSpacing: 0.8 }}>{k.label}</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div style={{ width: 1, height: 28, background: "rgba(255,255,255,0.08)" }}/>
-
-            <a href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 7, background: "linear-gradient(90deg,#C9A84C,#b8953f)", color: "#080808", textDecoration: "none", fontSize: 12, fontWeight: 700, padding: "8px 16px", borderRadius: 9, whiteSpace: "nowrap" as const }}>
-              <Plus size={13}/> Nouvelle page
+            <a href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 7, background: "linear-gradient(90deg,#C9A84C,#b8953f)", color: "#080808", textDecoration: "none", fontSize: 12.5, fontWeight: 700, padding: "10px 18px", borderRadius: 10, whiteSpace: "nowrap" as const, boxShadow: "0 4px 14px rgba(201,168,76,0.2)" }}>
+              <Plus size={14}/> Nouvelle page
             </a>
           </div>
         </div>
