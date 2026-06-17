@@ -390,7 +390,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [autoMsg,    setAutoMsg]    = useState<string>("")
   const [applyAllOk,   setApplyAllOk]   = useState(false)
   const [selectedCat,  setSelectedCat]  = useState("all")
-  const [upsellPreset,  setUpsellPreset]  = useState<string | null>(null)
+  const [upsell,        setUpsell]        = useState<{ feature: string; plan: string } | null>(null)
   const [expFormat,     setExpFormat]     = useState<"png"|"png-t"|"webp"|"svg"|"pdf">("png")
   const [expSize,       setExpSize]       = useState<512|1024|2048|4096|"custom">(1024)
   const [expCustomSize, setExpCustomSize] = useState(1024)
@@ -1442,7 +1442,6 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setFg(active.foreground_color); setBg(active.background_color)
     setCorner(active.corner_style); setEcLevel(active.error_correction)
     setStyleConf({ ...DEFAULT_STYLE, ...(active.style_config ?? {}) })
-    setUpsellPreset(null)
     setSelectedCat("all")
   }
 
@@ -1475,7 +1474,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
   function applyPreset(preset: Preset) {
     const canAccess = PLAN_RANK[userPlan] >= PLAN_RANK[preset.plan]
-    if (!canAccess) { setUpsellPreset(preset.id); return }
+    if (!canAccess) { setUpsell({ feature: `le style « ${preset.label} »`, plan: preset.plan }); return }
     setFg(preset.fg)
     setBg(preset.bg)
     // Sync corner state legacy (utilise pour le clipping canvas)
@@ -1497,7 +1496,6 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       ...(preset.density !== undefined ? { density: preset.density } : {}),
       ...(preset.transparent !== undefined ? { transparent: preset.transparent } : {}),
     }))
-    setUpsellPreset(null)
   }
 
   // -- Style automatique : detecte la categorie via le titre/destination -------
@@ -1688,6 +1686,56 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           </div>
         </div>
       )}
+
+      {/* -- Modale UPGRADE (conversion) ---------------------------------------- */}
+      {upsell && (() => {
+        const isBiz = upsell.plan === "business"
+        const planName = isBiz ? "Business" : "Pro"
+        const accent = isBiz ? "#39FF8F" : "#C9A84C"
+        const benefits = isBiz
+          ? ["Tous les presets premium ET luxe", "Modules & coins luxe", "Export PDF, SVG et WEBP", "Correction d'erreur maximale", "Logo central + branding complet"]
+          : ["Tous les presets premium", "Modules avances (pixel, neon...)", "Coins avances (diamond...)", "Export SVG et WEBP", "Correction d'erreur elevee (H)"]
+        return (
+          <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.85)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:2100, padding:24 }}
+            onClick={() => setUpsell(null)}>
+            <div onClick={e => e.stopPropagation()}
+              style={{ width:"100%", maxWidth:380, background:"linear-gradient(180deg,#14120C,#0C0B08)", border:`1px solid ${accent}40`, borderRadius:18, padding:"24px 22px", position:"relative", boxShadow:`0 24px 80px rgba(0,0,0,0.7), 0 0 40px ${accent}15` }}>
+              <button type="button" onClick={() => setUpsell(null)}
+                style={{ position:"absolute", top:14, right:14, background:"rgba(255,255,255,0.05)", border:"none", borderRadius:8, width:28, height:28, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:MUTED }}>
+                <X size={15}/>
+              </button>
+
+              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", textAlign:"center" as const, gap:6, marginBottom:18 }}>
+                <div style={{ width:52, height:52, borderRadius:14, background:`${accent}18`, border:`1px solid ${accent}40`, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:4 }}>
+                  <Sparkles size={24} color={accent}/>
+                </div>
+                <p style={{ color:"#F5F0E8", fontSize:18, fontWeight:800, margin:0, fontFamily:"Cormorant Garamond, serif" }}>Passez à {planName}</p>
+                <p style={{ color:MUTED, fontSize:12, margin:0, lineHeight:1.5 }}>Pour débloquer {upsell.feature} et bien plus.</p>
+              </div>
+
+              <div style={{ display:"flex", flexDirection:"column", gap:9, marginBottom:20 }}>
+                {benefits.map((b, i) => (
+                  <div key={i} style={{ display:"flex", alignItems:"center", gap:9 }}>
+                    <div style={{ width:18, height:18, borderRadius:"50%", background:`${accent}20`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                      <Check size={11} color={accent}/>
+                    </div>
+                    <span style={{ color:"#F5F0E8", fontSize:12.5 }}>{b}</span>
+                  </div>
+                ))}
+              </div>
+
+              <a href="/dashboard/upgrade"
+                style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:7, width:"100%", padding:"13px", background:`linear-gradient(90deg,${accent},${isBiz?"#2bd673":"#b8953f"})`, borderRadius:11, color:"#080808", fontSize:14, fontWeight:800, textDecoration:"none", boxShadow:`0 6px 20px ${accent}30` }}>
+                Voir les offres {planName}
+              </a>
+              <button type="button" onClick={() => setUpsell(null)}
+                style={{ width:"100%", marginTop:8, padding:"8px", background:"none", border:"none", color:MUTED, fontSize:11, cursor:"pointer" }}>
+                Plus tard
+              </button>
+            </div>
+          </div>
+        )
+      })()}
 
       {/* -- Modale suppression -------------------------------------------------- */}
       {confirmId !== null && (
@@ -2518,24 +2566,6 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </div>
 
                     {/* Upsell modal inline */}
-                    {upsellPreset !== null && (
-                      <div style={{ marginTop:10, padding:"12px 14px", background:"rgba(201,168,76,0.06)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:10 }}>
-                        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:6 }}>
-                          <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:700, margin:0 }}>Preset premium</p>
-                          <button type="button" onClick={() => setUpsellPreset(null)}
-                            style={{ background:"none", border:"none", color:MUTED, cursor:"pointer", display:"flex" }}>
-                            <X size={13}/>
-                          </button>
-                        </div>
-                        <p style={{ color:MUTED, fontSize:11, margin:"0 0 10px", lineHeight:1.5 }}>
-                          Ce preset nécessite un plan supérieur. Passez à Pro ou Business pour débloquer tous les presets.
-                        </p>
-                        <a href="/dashboard/upgrade"
-                          style={{ display:"block", textAlign:"center" as const, padding:"8px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius:8, color:"#080808", fontSize:11, fontWeight:700, textDecoration:"none" }}>
-                          Voir les plans
-                        </a>
-                      </div>
-                    )}
                   </AccSection>
 
                   {/* 2. Couleurs principales (ouvert par defaut) */}
@@ -2573,8 +2603,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         const isPro = ["pixel","neon","luxury"].includes(ds.id ?? "")
                         const canAccess = !isPro || PLAN_RANK[userPlan] >= 1
                         return (
-                          <button key={ds.id ?? "sq"} type="button" onClick={() => canAccess && setStyleConf(p => ({ ...p, dotStyle: ds.id }))}
-                            style={{ position:"relative", padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:canAccess?"pointer":"not-allowed", opacity:canAccess?1:0.5, textAlign:"center" as const }}>
+                          <button key={ds.id ?? "sq"} type="button" onClick={() => canAccess ? setStyleConf(p => ({ ...p, dotStyle: ds.id })) : setUpsell({ feature: `le style de modules « ${ds.label} »`, plan: "pro" })}
+                            style={{ position:"relative", padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:"pointer", opacity:canAccess?1:0.5, textAlign:"center" as const }}>
                             <div style={{ fontSize:18, marginBottom:4 }}>{ds.emoji}</div>
                             <p style={{ color:isActive?G:"#F5F0E8", fontSize:10, fontWeight:isActive?700:500, margin:0 }}>{ds.label}</p>
                             {isPro && !canAccess && (
@@ -2595,13 +2625,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         const canAccess = !isPro || PLAN_RANK[userPlan] >= 1
                         return (
                           <button key={cs.id ?? "sq"} type="button" onClick={() => {
-                        if (!canAccess) return
+                        if (!canAccess) { setUpsell({ feature: `le style de coins « ${cs.label} »`, plan: "pro" }); return }
                         setStyleConf(p => ({ ...p, cornerStyle: cs.id }))
                         if (cs.id === "rounded" || cs.id === "circle" || cs.id === "luxury") setCorner("rounded")
                         else if (cs.id === "minimal") setCorner("dot")
                         else setCorner("square")
                       }}
-                            style={{ padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:canAccess?"pointer":"not-allowed", opacity:canAccess?1:0.5, position:"relative" as const }}>
+                            style={{ padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:"pointer", opacity:canAccess?1:0.5, position:"relative" as const }}>
                             <p style={{ color:isActive?G:"#F5F0E8", fontSize:11, fontWeight:isActive?700:500, margin:0, textAlign:"center" as const }}>{cs.label}</p>
                             {isPro && !canAccess && (
                               <span style={{ position:"absolute", top:4, right:4, background:"rgba(201,168,76,0.15)", borderRadius:4, padding:"1px 4px", fontSize:7, color:G, fontWeight:800 }}>PRO</span>
@@ -2837,8 +2867,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       {EC_LEVELS.map(ec => {
                         const locked = (ec.id==="Q"||ec.id==="H") && !canPro
                         return (
-                          <button key={ec.id} type="button" onClick={() => !locked && setEcLevel(ec.id as any)} disabled={locked}
-                            style={{ position:"relative", padding:"7px 8px", background:ecLevel===ec.id?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${ecLevel===ec.id?"rgba(201,168,76,0.35)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:locked?MUTED:ecLevel===ec.id?G:"#F5F0E8", fontSize:10, cursor:locked?"not-allowed":"pointer", opacity:locked?0.5:1, textAlign:"center" as const }}>
+                          <button key={ec.id} type="button" onClick={() => locked ? setUpsell({ feature: `la correction d'erreur « ${ec.label} »`, plan: "pro" }) : setEcLevel(ec.id as any)}
+                            style={{ position:"relative", padding:"7px 8px", background:ecLevel===ec.id?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${ecLevel===ec.id?"rgba(201,168,76,0.35)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:locked?MUTED:ecLevel===ec.id?G:"#F5F0E8", fontSize:10, cursor:"pointer", opacity:locked?0.5:1, textAlign:"center" as const }}>
                             <div style={{ fontWeight:700, marginBottom:1 }}>{ec.label}</div>
                             <div style={{ color:MUTED, fontSize:9 }}>{ec.desc}</div>
                             {locked && <Lock size={9} color={MUTED} style={{ position:"absolute", top:4, right:4 }}/>}
@@ -3047,8 +3077,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     const isA    = expFormat === f.id
                     return (
                       <button key={f.id} type="button"
-                        onClick={() => canFmt && setExpFormat(f.id as any)}
-                        style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 14px", background:isA?`${cfg.color}14`:"rgba(255,255,255,0.02)", border:`1.5px solid ${isA?cfg.color+"66":"rgba(255,255,255,0.07)"}`, borderRadius:12, cursor:canFmt?"pointer":"not-allowed", opacity:canFmt?1:0.5, textAlign:"left" as const, position:"relative" as const, transition:"all 0.15s" }}>
+                        onClick={() => canFmt ? setExpFormat(f.id as any) : setUpsell({ feature: `l'export ${cfg.label}`, plan: cfg.plan })}
+                        style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 14px", background:isA?`${cfg.color}14`:"rgba(255,255,255,0.02)", border:`1.5px solid ${isA?cfg.color+"66":"rgba(255,255,255,0.07)"}`, borderRadius:12, cursor:"pointer", opacity:canFmt?1:0.5, textAlign:"left" as const, position:"relative" as const, transition:"all 0.15s" }}>
                         <div style={{ width:38, height:38, borderRadius:10, background:isA?`${cfg.color}22`:"rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>
                           {f.emoji}
                         </div>
