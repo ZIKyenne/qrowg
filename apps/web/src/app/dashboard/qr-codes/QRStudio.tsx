@@ -2521,8 +2521,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         return (
                           <div key={preset.id} onClick={() => applyPreset(preset)}
                             onMouseEnter={e => { if (!isActive) { e.currentTarget.style.borderColor = "rgba(201,168,76,0.45)"; e.currentTarget.style.transform = "translateY(-2px)" } }}
-                            onMouseLeave={e => { if (!isActive) { e.currentTarget.style.borderColor = canAccess?"rgba(255,255,255,0.08)":"rgba(255,255,255,0.04)"; e.currentTarget.style.transform = "translateY(0)" } }}
-                            style={{ position:"relative", cursor:"pointer", borderRadius:10, overflow:"hidden", border:`1.5px solid ${isActive?"#C9A84C":canAccess?"rgba(255,255,255,0.08)":"rgba(255,255,255,0.04)"}`, transition:"all 0.15s", opacity:canAccess?1:0.7 }}>
+                            onMouseLeave={e => { if (!isActive) { e.currentTarget.style.borderColor = canAccess?"rgba(255,255,255,0.08)":"rgba(201,168,76,0.28)"; e.currentTarget.style.transform = "translateY(0)" } }}
+                            style={{ position:"relative", cursor:"pointer", borderRadius:10, overflow:"hidden", border:`1.5px solid ${isActive?"#C9A84C":canAccess?"rgba(255,255,255,0.08)":"rgba(201,168,76,0.28)"}`, transition:"all 0.15s", opacity:1 }}>
 
                             {/* Apercu QR miniature realiste */}
                             <div style={{ background:preset.bg, padding:"12px", display:"flex", alignItems:"center", justifyContent:"center", position:"relative", minHeight:64 }}>
@@ -2559,15 +2559,16 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                                 {preset.label}
                               </p>
                               {planLabel && (
-                                <span style={{ background:canAccess?(preset.plan==="pro"?"rgba(201,168,76,0.15)":"rgba(57,255,143,0.12)"):"rgba(255,255,255,0.06)", borderRadius:3, padding:"1px 4px", fontSize:7, color:canAccess?(preset.plan==="pro"?G:"#39FF8F"):MUTED, fontWeight:700 }}>
+                                <span style={{ background:preset.plan==="pro"?"rgba(201,168,76,0.15)":"rgba(57,255,143,0.12)", borderRadius:3, padding:"1px 4px", fontSize:7, color:preset.plan==="pro"?G:"#39FF8F", fontWeight:700 }}>
                                   {planLabel}
                                 </span>
                               )}
                             </div>
 
                             {!canAccess && (
-                              <div style={{ position:"absolute", inset:0, background:"rgba(8,8,8,0.5)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                                <Lock size={13} color={MUTED}/>
+                              <div style={{ position:"absolute", top:5, right:5, display:"flex", alignItems:"center", gap:2, padding:"2px 5px", background:preset.plan==="business"?"#39FF8F":G, borderRadius:5, boxShadow:"0 2px 7px rgba(0,0,0,0.45)" }}>
+                                <Sparkles size={7} color="#080808"/>
+                                <span style={{ color:"#080808", fontSize:7, fontWeight:800 }}>{preset.plan==="business"?"BIZ":"PRO"}</span>
                               </div>
                             )}
                           </div>
@@ -2614,11 +2615,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         const canAccess = !isPro || PLAN_RANK[userPlan] >= 1
                         return (
                           <button key={ds.id ?? "sq"} type="button" onClick={() => canAccess ? setStyleConf(p => ({ ...p, dotStyle: ds.id })) : setUpsell({ feature: `le style de modules « ${ds.label} »`, plan: "pro" })}
-                            style={{ position:"relative", padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:"pointer", opacity:canAccess?1:0.5, textAlign:"center" as const }}>
+                            style={{ position:"relative", padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:"pointer", opacity:canAccess?1:0.85, textAlign:"center" as const }}>
                             <div style={{ fontSize:18, marginBottom:4 }}>{ds.emoji}</div>
                             <p style={{ color:isActive?G:"#F5F0E8", fontSize:10, fontWeight:isActive?700:500, margin:0 }}>{ds.label}</p>
                             {isPro && !canAccess && (
-                              <span style={{ position:"absolute", top:4, right:4, background:"rgba(201,168,76,0.15)", borderRadius:4, padding:"1px 4px", fontSize:7, color:G, fontWeight:800 }}>PRO</span>
+                              <span style={{ position:"absolute", top:4, right:4, display:"inline-flex", alignItems:"center", gap:1, background:G, borderRadius:4, padding:"1px 4px", fontSize:7, color:"#080808", fontWeight:800, boxShadow:"0 2px 6px rgba(0,0,0,0.4)" }}><Sparkles size={6} color="#080808"/>PRO</span>
                             )}
                           </button>
                         )
@@ -2641,10 +2642,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         else if (cs.id === "minimal") setCorner("dot")
                         else setCorner("square")
                       }}
-                            style={{ padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:"pointer", opacity:canAccess?1:0.5, position:"relative" as const }}>
+                            style={{ padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:"pointer", opacity:canAccess?1:0.85, position:"relative" as const }}>
                             <p style={{ color:isActive?G:"#F5F0E8", fontSize:11, fontWeight:isActive?700:500, margin:0, textAlign:"center" as const }}>{cs.label}</p>
                             {isPro && !canAccess && (
-                              <span style={{ position:"absolute", top:4, right:4, background:"rgba(201,168,76,0.15)", borderRadius:4, padding:"1px 4px", fontSize:7, color:G, fontWeight:800 }}>PRO</span>
+                              <span style={{ position:"absolute", top:4, right:4, display:"inline-flex", alignItems:"center", gap:1, background:G, borderRadius:4, padding:"1px 4px", fontSize:7, color:"#080808", fontWeight:800, boxShadow:"0 2px 6px rgba(0,0,0,0.4)" }}><Sparkles size={6} color="#080808"/>PRO</span>
                             )}
                           </button>
                         )
@@ -2825,14 +2826,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           ))}
                         </div>
                         {styleConf.logoBg === "custom" && (
-                          <div style={{ display:"flex", gap:8, alignItems:"center" }}>
-                            <div style={{ position:"relative", width:28, height:28, borderRadius:6, overflow:"hidden", border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }}>
-                              <input type="color" value={styleConf.logoBgColor ?? "#FFFFFF"} onChange={e => setStyleConf(p => ({ ...p, logoBgColor: e.target.value }))}
-                                style={{ position:"absolute", inset:-4, width:"calc(100%+8px)", height:"calc(100%+8px)", cursor:"pointer", border:"none" }}/>
-                            </div>
-                            <input type="text" value={styleConf.logoBgColor ?? "#FFFFFF"} onChange={e => setStyleConf(p => ({ ...p, logoBgColor: e.target.value }))}
-                              style={{ flex:1, background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:7, padding:"6px 8px", color:"#F5F0E8", fontSize:10, fontFamily:"monospace", outline:"none" }}/>
-                          </div>
+                          <ColorField label="Couleur du fond"
+                            value={styleConf.logoBgColor ?? "#FFFFFF"}
+                            onChange={(hex) => setStyleConf(p => ({ ...p, logoBgColor: hex }))}/>
                         )}
                       </div>
 
