@@ -701,22 +701,33 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     if (!active) return
     setSaving(true)
     setSaveErr("")
-    const supabase = createClient()
-    const { error } = await supabase.from("qr_codes").update({
-      foreground_color: fg, background_color: bg,
-      corner_style: corner, error_correction: ecLevel,
-      style_config: styleConf,
-      updated_at: new Date().toISOString(),
-    }).eq("id", active.id)
-    setSaving(false)
-    if (error) {
-      setSaveErr(error.message || "Echec de l'enregistrement")
-      return
+    try {
+      const res = await fetch("/api/qr-style", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          qr_id: active.id,
+          foreground_color: fg,
+          background_color: bg,
+          corner_style: corner,
+          error_correction: ecLevel,
+          style_config: styleConf,
+        }),
+      })
+      const d = await res.json()
+      setSaving(false)
+      if (!res.ok || d.error) {
+        setSaveErr(d.error || "Echec de l'enregistrement")
+        return
+      }
+      setQRCodes(prev => prev.map(q => q.id === active.id
+        ? { ...q, foreground_color: fg, background_color: bg, corner_style: corner, error_correction: ecLevel, style_config: styleConf }
+        : q))
+      setSaved(true); setTimeout(() => setSaved(false), 2000)
+    } catch {
+      setSaving(false)
+      setSaveErr("Erreur reseau")
     }
-    setQRCodes(prev => prev.map(q => q.id === active.id
-      ? { ...q, foreground_color: fg, background_color: bg, corner_style: corner, error_correction: ecLevel, style_config: styleConf }
-      : q))
-    setSaved(true); setTimeout(() => setSaved(false), 2000)
   }, [active, fg, bg, corner, ecLevel, styleConf])
 
   // -- Nom de fichier auto ----------------------------------------------------
