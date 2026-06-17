@@ -249,7 +249,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [corner,     setCorner]     = useState<"square"|"rounded"|"dot">("square")
   const [ecLevel,    setEcLevel]    = useState<"L"|"M"|"Q"|"H">("M")
   const [styleConf,  setStyleConf]  = useState<QRStyleConfig>({ ...DEFAULT_STYLE })
-  const [styleTab,   setStyleTab]   = useState<"colors"|"logo"|"style"|"corners"|"advanced">("colors")
+  const [styleTab,   setStyleTab]   = useState<"apparence"|"branding"|"qualite">("apparence")
   const [applyAllOk,   setApplyAllOk]   = useState(false)
   const [selectedCat,  setSelectedCat]  = useState("all")
   const [upsellPreset,  setUpsellPreset]  = useState<string | null>(null)
@@ -2090,18 +2090,16 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         {activeTab === "style" && active && (
           <div style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
 
-            {/* Sous-tabs Couleurs/Style/Coins/Avance */}
+            {/* Sous-tabs Apparence/Branding/Qualite */}
             <div style={{ display:"flex", borderBottom:"1px solid rgba(255,255,255,0.05)", padding:"0 8px", flexShrink:0, overflowX:"auto" }}>
               {([
-                ["colors",   "Couleurs", "🎨"],
-                ["logo",     "Logo",     "🖼"],
-                ["style",    "Style",    "?"],
-                ["corners",  "Coins",    "?"],
-                ["advanced", "Avance",   "?"],
+                ["apparence", "Apparence", "🎨"],
+                ["branding",  "Branding",  "🖼"],
+                ["qualite",   "Qualite",   "🛡"],
               ] as const).map(([id,label,emoji]) => (
                 <button key={id} type="button" onClick={() => setStyleTab(id)}
-                  style={{ padding:"8px 10px", background:"none", border:"none", borderBottom:styleTab===id?`2px solid ${G}`:"2px solid transparent", color:styleTab===id?G:MUTED, fontSize:10, fontWeight:styleTab===id?700:500, cursor:"pointer", whiteSpace:"nowrap" as const, display:"flex", alignItems:"center", gap:4 }}>
-                  <span style={{ fontSize:11 }}>{emoji}</span>{label}
+                  style={{ flex:1, padding:"10px 10px", background:"none", border:"none", borderBottom:styleTab===id?`2px solid ${G}`:"2px solid transparent", color:styleTab===id?G:MUTED, fontSize:11, fontWeight:styleTab===id?700:500, cursor:"pointer", whiteSpace:"nowrap" as const, display:"flex", alignItems:"center", justifyContent:"center", gap:5 }}>
+                  <span style={{ fontSize:12 }}>{emoji}</span>{label}
                 </button>
               ))}
             </div>
@@ -2109,7 +2107,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             <div style={{ flex:1, overflowY:"auto", padding:"14px" }}>
 
               {/* -- COULEURS -------------------------------------------------- */}
-              {styleTab === "colors" && (
+              {styleTab === "apparence" && (
                 <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
                   {/* Couleurs principales */}
@@ -2271,7 +2269,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
 
               {/* -- LOGO --------------------------------------------------- */}
-              {styleTab === "logo" && (
+              {styleTab === "branding" && (
                 <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
                   {/* ECC warning automatique */}
@@ -2429,8 +2427,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               )}
 
               {/* -- STYLE QR -------------------------------------------------- */}
-              {styleTab === "style" && (
-                <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+              {styleTab === "apparence" && (
+                <div style={{ display:"flex", flexDirection:"column", gap:14, marginTop:16, paddingTop:16, borderTop:"1px solid rgba(255,255,255,0.06)" }}>
                   <div>
                     <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 10px" }}>Style des modules</p>
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7 }}>
@@ -2455,8 +2453,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               )}
 
               {/* -- COINS ----------------------------------------------------- */}
-              {styleTab === "corners" && (
-                <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+              {styleTab === "apparence" && (
+                <div style={{ display:"flex", flexDirection:"column", gap:14, marginTop:16, paddingTop:16, borderTop:"1px solid rgba(255,255,255,0.06)" }}>
                   <div>
                     <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 10px" }}>Style des coins</p>
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7 }}>
@@ -2500,7 +2498,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               )}
 
               {/* -- AVANCE ---------------------------------------------------- */}
-              {styleTab === "advanced" && (
+              {styleTab === "qualite" && (
                 <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
                   {/* Marge */}
