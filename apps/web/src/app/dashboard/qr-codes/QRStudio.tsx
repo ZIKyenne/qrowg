@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState, useCallback } from "react"
+import { useEffect, useRef, useState, useCallback, type ReactNode } from "react"
 import {
   QrCode, Download, Link, Check, Lock, Pencil,
   Eye, EyeOff, ChevronRight, ScanLine, Clock,
@@ -69,14 +69,14 @@ type QRStyleConfig = {
 }
 
 const DOT_STYLES: { id: QRStyleConfig["dotStyle"]; label: string; emoji: string }[] = [
-  { id:"square",     label:"Classique",    emoji:"?" },
+  { id:"square",     label:"Classique",    emoji:"⬛" },
   { id:"rounded",    label:"Arrondi",      emoji:"🔵" },
-  { id:"dot",        label:"Dots",         emoji:"?" },
+  { id:"dot",        label:"Dots",         emoji:"⚫" },
   { id:"softSquare", label:"Carres doux",  emoji:"🟦" },
   { id:"pixel",      label:"Pixel",        emoji:"🟧" },
-  { id:"minimal",    label:"Minimal",      emoji:"?️" },
+  { id:"minimal",    label:"Minimal",      emoji:"▫️" },
   { id:"neon",       label:"Neon",         emoji:"💜" },
-  { id:"luxury",     label:"Luxury",       emoji:"?" },
+  { id:"luxury",     label:"Luxury",       emoji:"💎" },
 ]
 
 const CORNER_STYLE_LIST: { id: QRStyleConfig["cornerStyle"]; label: string }[] = [
@@ -120,16 +120,16 @@ type Preset = {
 }
 
 const PRESET_CATS = [
-  { id:"all",        label:"Tous",       emoji:"?" },
-  { id:"classic",    label:"Classic",    emoji:"?" },
+  { id:"all",        label:"Tous",       emoji:"🎨" },
+  { id:"classic",    label:"Classic",    emoji:"⚫" },
   { id:"business",   label:"Business",   emoji:"💼" },
-  { id:"luxury",     label:"Luxury",     emoji:"?" },
+  { id:"luxury",     label:"Luxury",     emoji:"💎" },
   { id:"restaurant", label:"Restaurant", emoji:"🍽" },
   { id:"nightlife",  label:"Nightlife",  emoji:"🌙" },
   { id:"creator",    label:"Creator",    emoji:"🎨" },
   { id:"realestate", label:"Immobilier", emoji:"🏠" },
   { id:"event",      label:"Event",      emoji:"🎉" },
-  { id:"minimal",    label:"Minimal",    emoji:"?️" },
+  { id:"minimal",    label:"Minimal",    emoji:"▫️" },
   { id:"neon",       label:"Neon",       emoji:"💜" },
 ]
 
@@ -190,9 +190,9 @@ const PRESETS: Preset[] = [
 ]
 
 const CORNER_STYLES = [
-  { id: "square",  label: "Carre",   icon: "?" },
+  { id: "square",  label: "Carre",   icon: "⬛" },
   { id: "rounded", label: "Arrondi", icon: "🔲" },
-  { id: "dot",     label: "Points",  icon: "?" },
+  { id: "dot",     label: "Points",  icon: "⚫" },
 ]
 
 const EC_LEVELS = [
@@ -240,6 +240,30 @@ function formatDate(iso: string | null): string {
   return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" })
 }
 
+// -- Section accordeon depliable (une seule ouverte a la fois) --------------
+function AccSection({ id, title, icon, openId, setOpenId, children }: {
+  id: string; title: string; icon?: string;
+  openId: string; setOpenId: (v: string) => void; children: ReactNode
+}) {
+  const open = openId === id
+  return (
+    <div style={{ border:`1px solid ${open?"rgba(201,168,76,0.25)":"rgba(255,255,255,0.07)"}`, borderRadius:10, overflow:"hidden", background:"rgba(255,255,255,0.015)", transition:"border-color 0.2s" }}>
+      <button type="button" onClick={() => setOpenId(open ? "" : id)}
+        style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"11px 13px", background: open ? "rgba(201,168,76,0.06)" : "transparent", border:"none", cursor:"pointer" }}>
+        <span style={{ display:"flex", alignItems:"center", gap:8, color: open ? "#C9A84C" : "#F5F0E8", fontSize:12, fontWeight:700 }}>
+          {icon && <span style={{ fontSize:14 }}>{icon}</span>}{title}
+        </span>
+        <ChevronRight size={15} color={open ? "#C9A84C" : "#8A8478"} style={{ transform: open ? "rotate(90deg)" : "rotate(0deg)", transition:"transform 0.2s" }}/>
+      </button>
+      {open && (
+        <div style={{ padding:"6px 13px 14px" }}>
+          {children}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: Props) {
   const [qrCodes,    setQRCodes]    = useState<QRCode[]>(initialQRCodes)
   const [activeId,   setActiveId]   = useState<string | null>(initialQRCodes[0]?.id ?? null)
@@ -250,6 +274,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [ecLevel,    setEcLevel]    = useState<"L"|"M"|"Q"|"H">("M")
   const [styleConf,  setStyleConf]  = useState<QRStyleConfig>({ ...DEFAULT_STYLE })
   const [styleTab,   setStyleTab]   = useState<"apparence"|"branding"|"qualite">("apparence")
+  const [openAcc,    setOpenAcc]    = useState<string>("couleurs")
   const [applyAllOk,   setApplyAllOk]   = useState(false)
   const [selectedCat,  setSelectedCat]  = useState("all")
   const [upsellPreset,  setUpsellPreset]  = useState<string | null>(null)
@@ -815,7 +840,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     { id:"page",     label:"Page QRfolio", icon:"📄", ph:"ID ou slug de la page" },
     { id:"url",      label:"URL externe",  icon:"🌐", ph:"https://mon-site.com"  },
     { id:"file",     label:"Fichier",      icon:"📎", ph:"https://drive.google.com/..." },
-    { id:"email",    label:"Email",        icon:"?️",  ph:"contact@mon-site.com" },
+    { id:"email",    label:"Email",        icon:"✉️",  ph:"contact@mon-site.com" },
     { id:"phone",    label:"Telephone",    icon:"📞", ph:"+33 6 12 34 56 78"    },
     { id:"whatsapp", label:"WhatsApp",     icon:"💬", ph:"+33612345678"          },
   ]
@@ -880,7 +905,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   }
 
   const SUPP_TPLS: SuppTpl[] = [
-    { id:"qr-only",     label:"QR seul",           emoji:"?", w:800,  h:800,  plan:"free",     cat:"Base",       desc:"QR Code sans decoration" },
+    { id:"qr-only",     label:"QR seul",           emoji:"▣", w:800,  h:800,  plan:"free",     cat:"Base",       desc:"QR Code sans decoration" },
     { id:"a4-poster",   label:"Affiche A4",         emoji:"📋", w:795,  h:1122, plan:"free",     cat:"Print",      desc:"Portrait A4 avec titre et fond" },
     { id:"flyer",       label:"Flyer",              emoji:"📄", w:795,  h:561,  plan:"free",     cat:"Print",      desc:"Demi A4 paysage" },
     { id:"sticker",     label:"Sticker vitrine",    emoji:"🏷️",  w:600,  h:600,  plan:"free",     cat:"Print",      desc:"Carre 6cm avec cadre" },
@@ -1864,8 +1889,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                               </code>
                             </div>
                             <button type="button" onClick={() => restoreDest(i)} disabled={destLoading}
-                              style={{ padding:"2px 7px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:5, color:"#C9A84C", fontSize:8, cursor:"pointer", flexShrink:0 }}>
-                              ?
+                              style={{ padding:"3px 7px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:5, color:"#C9A84C", fontSize:8, cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center" }}>
+                              <RotateCcw size={11}/>
                             </button>
                           </div>
                         )
@@ -2106,13 +2131,12 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
             <div style={{ flex:1, overflowY:"auto", padding:"14px" }}>
 
-              {/* -- COULEURS -------------------------------------------------- */}
+              {/* -- APPARENCE (accordeons) ----------------------------------- */}
               {styleTab === "apparence" && (
-                <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
 
                   {/* Couleurs principales */}
-                  <div>
-                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Couleurs principales</p>
+                  <AccSection id="couleurs" title="Couleurs principales" icon="🎨" openId={openAcc} setOpenId={setOpenAcc}>
                     <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                       {([
                         { label:"QR principal",    key:"fg",  val:fg,  set:(v:string)=>setFg(v) },
@@ -2129,11 +2153,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </AccSection>
 
                   {/* Couleurs avancees */}
-                  <div>
-                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Couleurs avancees</p>
+                  <AccSection id="couleurs-av" title="Couleurs avancees" icon="🎭" openId={openAcc} setOpenId={setOpenAcc}>
                     <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                       {([
                         { label:"QR secondaire",   key:"fg2",         val:styleConf.fg2??""          },
@@ -2153,23 +2176,21 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </AccSection>
 
-                  {/* Fond transparent */}
-                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 12px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:9 }}>
-                    <div>
-                      <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 2px" }}>Fond transparent</p>
-                      <p style={{ color:MUTED, fontSize:10, margin:0 }}>PNG avec canal alpha</p>
+                  {/* Fond & degrade */}
+                  <AccSection id="fond" title="Fond & degrade" icon="🌈" openId={openAcc} setOpenId={setOpenAcc}>
+                    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 12px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:9, marginBottom:12 }}>
+                      <div>
+                        <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 2px" }}>Fond transparent</p>
+                        <p style={{ color:MUTED, fontSize:10, margin:0 }}>PNG avec canal alpha</p>
+                      </div>
+                      <button type="button" onClick={() => setStyleConf(p => ({ ...p, transparent: !p.transparent }))}
+                        style={{ width:38, height:22, borderRadius:11, background:styleConf.transparent?"linear-gradient(90deg,#C9A84C,#b8953f)":"rgba(255,255,255,0.1)", border:"none", cursor:"pointer", position:"relative", transition:"background 0.2s" }}>
+                        <div style={{ position:"absolute", top:3, left:styleConf.transparent?18:3, width:16, height:16, borderRadius:"50%", background:"#F5F0E8", transition:"left 0.2s" }}/>
+                      </button>
                     </div>
-                    <button type="button" onClick={() => setStyleConf(p => ({ ...p, transparent: !p.transparent }))}
-                      style={{ width:38, height:22, borderRadius:11, background:styleConf.transparent?"linear-gradient(90deg,#C9A84C,#b8953f)":"rgba(255,255,255,0.1)", border:"none", cursor:"pointer", position:"relative", transition:"background 0.2s" }}>
-                      <div style={{ position:"absolute", top:3, left:styleConf.transparent?18:3, width:16, height:16, borderRadius:"50%", background:"#F5F0E8", transition:"left 0.2s" }}/>
-                    </button>
-                  </div>
-
-                  {/* Degrade */}
-                  <div>
-                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Degrade</p>
+                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Type de degrade</p>
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
                       {GRADIENT_OPTS.map(g => (
                         <button key={g.id ?? "none"} type="button" onClick={() => setStyleConf(p => ({ ...p, gradient: g.id ?? "none" }))}
@@ -2178,12 +2199,67 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         </button>
                       ))}
                     </div>
-                  </div>
+                  </AccSection>
 
-                  {/* -- Bibliotheque de presets -------------------- */}
-                  <div>
-                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Bibliotheque de presets</p>
+                  {/* Style des modules */}
+                  <AccSection id="modules" title="Style des modules" icon="🔲" openId={openAcc} setOpenId={setOpenAcc}>
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7 }}>
+                      {DOT_STYLES.map(ds => {
+                        const isActive = (styleConf.dotStyle??"square") === ds.id
+                        const isPro = ["pixel","neon","luxury"].includes(ds.id ?? "")
+                        const canAccess = !isPro || PLAN_RANK[userPlan] >= 1
+                        return (
+                          <button key={ds.id ?? "sq"} type="button" onClick={() => canAccess && setStyleConf(p => ({ ...p, dotStyle: ds.id }))}
+                            style={{ position:"relative", padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:canAccess?"pointer":"not-allowed", opacity:canAccess?1:0.5, textAlign:"center" as const }}>
+                            <div style={{ fontSize:18, marginBottom:4 }}>{ds.emoji}</div>
+                            <p style={{ color:isActive?G:"#F5F0E8", fontSize:10, fontWeight:isActive?700:500, margin:0 }}>{ds.label}</p>
+                            {isPro && !canAccess && (
+                              <span style={{ position:"absolute", top:4, right:4, background:"rgba(201,168,76,0.15)", borderRadius:4, padding:"1px 4px", fontSize:7, color:G, fontWeight:800 }}>PRO</span>
+                            )}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </AccSection>
 
+                  {/* Coins */}
+                  <AccSection id="coins" title="Style des coins" icon="⬛" openId={openAcc} setOpenId={setOpenAcc}>
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7, marginBottom:14 }}>
+                      {CORNER_STYLE_LIST.map(cs => {
+                        const isActive = (styleConf.cornerStyle??"square") === cs.id
+                        const isPro = ["diamond","luxury"].includes(cs.id ?? "")
+                        const canAccess = !isPro || PLAN_RANK[userPlan] >= 1
+                        return (
+                          <button key={cs.id ?? "sq"} type="button" onClick={() => {
+                        if (!canAccess) return
+                        setStyleConf(p => ({ ...p, cornerStyle: cs.id }))
+                        // Sync le state corner pour le clipping canvas
+                        if (cs.id === "rounded" || cs.id === "circle" || cs.id === "luxury") setCorner("rounded")
+                        else if (cs.id === "minimal") setCorner("dot")
+                        else setCorner("square")
+                      }}
+                            style={{ padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:canAccess?"pointer":"not-allowed", opacity:canAccess?1:0.5, position:"relative" as const }}>
+                            <p style={{ color:isActive?G:"#F5F0E8", fontSize:11, fontWeight:isActive?700:500, margin:0, textAlign:"center" as const }}>{cs.label}</p>
+                            {isPro && !canAccess && (
+                              <span style={{ position:"absolute", top:4, right:4, background:"rgba(201,168,76,0.15)", borderRadius:4, padding:"1px 4px", fontSize:7, color:G, fontWeight:800 }}>PRO</span>
+                            )}
+                          </button>
+                        )
+                      })}
+                    </div>
+                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Arrondi general</p>
+                    <div style={{ display:"flex", gap:6 }}>
+                      {(["square","rounded","dot"] as const).map(c => (
+                        <button key={c} type="button" onClick={() => setCorner(c)}
+                          style={{ flex:1, padding:"7px 6px", background:corner===c?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1px solid ${corner===c?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:corner===c?G:MUTED, fontSize:10, cursor:"pointer", fontWeight:corner===c?700:400 }}>
+                          {c==="square"?"Carre":c==="rounded"?"Arrondi":"Dots"}
+                        </button>
+                      ))}
+                    </div>
+                  </AccSection>
+
+                  {/* Bibliotheque de presets */}
+                  <AccSection id="presets" title="Bibliotheque de presets" icon="✨" openId={openAcc} setOpenId={setOpenAcc}>
                     {/* Filtres categorie */}
                     <div style={{ display:"flex", gap:4, overflowX:"auto", paddingBottom:8, marginBottom:10 }}>
                       {PRESET_CATS.map(cat => (
@@ -2263,7 +2339,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         </a>
                       </div>
                     )}
-                  </div>
+                  </AccSection>
+
                 </div>
               )}
 
@@ -2298,7 +2375,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           if (file) handleLogoUpload(file)
                         }}
                         style={{ border:"2px dashed rgba(255,255,255,0.1)", borderRadius:12, padding:"24px 16px", textAlign:"center" as const, cursor:"pointer", transition:"border-color 0.2s", background:"rgba(255,255,255,0.01)" }}>
-                        <div style={{ fontSize:28, marginBottom:8 }}>{logoUploading ? "?" : "🖼"}</div>
+                        <div style={{ fontSize:28, marginBottom:8 }}>{logoUploading ? "⏳" : "🖼️"}</div>
                         <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 4px" }}>
                           {logoUploading ? "Chargement..." : "Deposer votre logo"}
                         </p>
@@ -2354,7 +2431,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           style={{ width:"100%", accentColor: (styleConf.logoSize ?? 18) > 25 ? "#FF6B6B" : G, cursor:"pointer" }}/>
                         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:4 }}>
                           <span style={{ color:MUTED, fontSize:9 }}>10% -- Min</span>
-                          <span style={{ color:G, fontSize:9, fontWeight:600 }}>? 15-20% recommande</span>
+                          <span style={{ color:G, fontSize:9, fontWeight:600 }}>✓ 15-20% recommande</span>
                           <span style={{ color:MUTED, fontSize:9 }}>30% -- Max</span>
                         </div>
                         {(styleConf.logoSize ?? 18) > 25 && (
@@ -2370,9 +2447,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Forme du conteneur</p>
                         <div style={{ display:"flex", gap:6 }}>
                           {([
-                            { id:"square",  label:"Carre",   icon:"?" },
+                            { id:"square",  label:"Carre",   icon:"⬛" },
                             { id:"rounded", label:"Arrondi", icon:"🔲" },
-                            { id:"circle",  label:"Cercle",  icon:"?" },
+                            { id:"circle",  label:"Cercle",  icon:"⚫" },
                           ] as const).map(s => (
                             <button key={s.id} type="button" onClick={() => setStyleConf(p => ({ ...p, logoShape: s.id }))}
                               style={{ flex:1, padding:"9px 6px", background:(styleConf.logoShape??"rounded")===s.id?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1px solid ${(styleConf.logoShape??"rounded")===s.id?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:"pointer", textAlign:"center" as const }}>
@@ -2423,77 +2500,6 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       </div>
                     </>
                   )}
-                </div>
-              )}
-
-              {/* -- STYLE QR -------------------------------------------------- */}
-              {styleTab === "apparence" && (
-                <div style={{ display:"flex", flexDirection:"column", gap:14, marginTop:16, paddingTop:16, borderTop:"1px solid rgba(255,255,255,0.06)" }}>
-                  <div>
-                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 10px" }}>Style des modules</p>
-                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7 }}>
-                      {DOT_STYLES.map(ds => {
-                        const isActive = (styleConf.dotStyle??"square") === ds.id
-                        const isPro = ["pixel","neon","luxury"].includes(ds.id ?? "")
-                        const canAccess = !isPro || PLAN_RANK[userPlan] >= 1
-                        return (
-                          <button key={ds.id ?? "sq"} type="button" onClick={() => canAccess && setStyleConf(p => ({ ...p, dotStyle: ds.id }))}
-                            style={{ position:"relative", padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:canAccess?"pointer":"not-allowed", opacity:canAccess?1:0.5, textAlign:"center" as const }}>
-                            <div style={{ fontSize:18, marginBottom:4 }}>{ds.emoji}</div>
-                            <p style={{ color:isActive?G:"#F5F0E8", fontSize:10, fontWeight:isActive?700:500, margin:0 }}>{ds.label}</p>
-                            {isPro && !canAccess && (
-                              <span style={{ position:"absolute", top:4, right:4, background:"rgba(201,168,76,0.15)", borderRadius:4, padding:"1px 4px", fontSize:7, color:G, fontWeight:800 }}>PRO</span>
-                            )}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* -- COINS ----------------------------------------------------- */}
-              {styleTab === "apparence" && (
-                <div style={{ display:"flex", flexDirection:"column", gap:14, marginTop:16, paddingTop:16, borderTop:"1px solid rgba(255,255,255,0.06)" }}>
-                  <div>
-                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 10px" }}>Style des coins</p>
-                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7 }}>
-                      {CORNER_STYLE_LIST.map(cs => {
-                        const isActive = (styleConf.cornerStyle??"square") === cs.id
-                        const isPro = ["diamond","luxury"].includes(cs.id ?? "")
-                        const canAccess = !isPro || PLAN_RANK[userPlan] >= 1
-                        return (
-                          <button key={cs.id ?? "sq"} type="button" onClick={() => {
-                        if (!canAccess) return
-                        setStyleConf(p => ({ ...p, cornerStyle: cs.id }))
-                        // Sync le state corner pour le clipping canvas
-                        if (cs.id === "rounded" || cs.id === "circle" || cs.id === "luxury") setCorner("rounded")
-                        else if (cs.id === "minimal") setCorner("dot")
-                        else setCorner("square")
-                      }}
-                            style={{ padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:canAccess?"pointer":"not-allowed", opacity:canAccess?1:0.5, position:"relative" as const }}>
-                            <p style={{ color:isActive?G:"#F5F0E8", fontSize:11, fontWeight:isActive?700:500, margin:0, textAlign:"center" as const }}>{cs.label}</p>
-                            {isPro && !canAccess && (
-                              <span style={{ position:"absolute", top:4, right:4, background:"rgba(201,168,76,0.15)", borderRadius:4, padding:"1px 4px", fontSize:7, color:G, fontWeight:800 }}>PRO</span>
-                            )}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Corner style legacy (arrondi canvas) */}
-                  <div>
-                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Arrondi general</p>
-                    <div style={{ display:"flex", gap:6 }}>
-                      {(["square","rounded","dot"] as const).map(c => (
-                        <button key={c} type="button" onClick={() => setCorner(c)}
-                          style={{ flex:1, padding:"7px 6px", background:corner===c?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1px solid ${corner===c?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:corner===c?G:MUTED, fontSize:10, cursor:"pointer", fontWeight:corner===c?700:400 }}>
-                          {c==="square"?"Carre":c==="rounded"?"Arrondi":"Dots"}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               )}
 
