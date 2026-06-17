@@ -8,7 +8,7 @@ import {
   RotateCcw, Loader2, Search, Trash2, Archive,
   MoreVertical, AlertTriangle, X,
   ImageIcon, FileText, Maximize2, ClipboardList, SlidersHorizontal,
-  Printer, LayoutGrid, TrendingUp, TrendingDown, BarChart
+  Printer, LayoutGrid, TrendingUp, TrendingDown, BarChart, Sparkles
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { createQR, updateQR, getQRBlob, downloadBlob, blobToDataUrl, buildAndDownloadPdf, type QROptions } from "./qrRender"
@@ -1355,6 +1355,40 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setUpsellPreset(null)
   }
 
+  // -- Style automatique : detecte la categorie via le titre/destination -------
+  const RECO_KEYWORDS: { cat: string; words: string[] }[] = [
+    { cat:"restaurant", words:["resto","restaurant","pizz","bistro","cafe","café","coffee","brasserie","burger","sushi","food","cuisine","traiteur","cocktail","wine","vin","boulang","patiss","menu","gourmet","steak","kebab","tacos","glace"] },
+    { cat:"creator",    words:["photo","studio","portfolio","createur","créateur","creator","artist","artiste","design","youtube","tiktok","insta","twitch","stream","podcast","influence","blog","music","musique","beauty","makeup","tattoo"] },
+    { cat:"tech",       words:["tech","dev","software","app","saas","web3","crypto","blockchain","data","cyber","code","digital","startup","ia "," ai","robot","quantum"] },
+    { cat:"event",      words:["mariage","wedding","event","evenement","événement","gala","soiree","soirée","concert","festival","conference","conférence","anniversaire","birthday","networking","salon","seminaire"] },
+    { cat:"luxury",     words:["luxe","luxury","premium","joaill","bijou","jewel","prestige","diamond","exclusif","exclusive","monaco","yacht","or fin","haute"] },
+    { cat:"business",   words:["agence","agency","consult","avocat","cabinet","finance","immo","immobilier","startup","entreprise","corporate","conseil","expert","comptable","assurance","freelance","b2b","coach","notaire"] },
+  ]
+
+  function detectCat(): string {
+    const blob = `${active?.pages?.title ?? ""} ${active?.pages?.slug ?? ""} ${destValue}`.toLowerCase()
+    if (blob.trim()) {
+      for (const g of RECO_KEYWORDS) {
+        if (g.words.some(w => blob.includes(w))) return g.cat
+      }
+    }
+    return "classic"
+  }
+
+  function pickPreset(cat: string): Preset | null {
+    const inCat = PRESETS.filter(p => p.cat === cat)
+    if (!inCat.length) return null
+    // priorite : le premier accessible avec le plan actuel, sinon le 1er (declenche upsell)
+    return inCat.find(p => PLAN_RANK[userPlan] >= PLAN_RANK[p.plan]) ?? inCat[0]
+  }
+
+  function autoStyle() {
+    const cat = detectCat()
+    setSelectedCat(cat)
+    const p = pickPreset(cat)
+    if (p) applyPreset(p)
+  }
+
   async function applyToAll() {
     const sb = createClient()
     const payload = { foreground_color:fg, background_color:bg, corner_style:corner, error_correction:ecLevel, style_config:styleConf, updated_at:new Date().toISOString() }
@@ -2186,14 +2220,23 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
                   {/* 1. Bibliotheque de presets (ouvert par defaut) */}
                   <AccSection id="presets" title="Choisir un style" icon="✨" openId={openAcc} setOpenId={setOpenAcc}>
+                    {/* Bouton style automatique */}
+                    <button type="button" onClick={autoStyle}
+                      style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, marginBottom:12, padding:"10px", background:"linear-gradient(90deg, rgba(201,168,76,0.18), rgba(201,168,76,0.08))", border:"1px solid rgba(201,168,76,0.35)", borderRadius:10, color:G, fontSize:12, fontWeight:700, cursor:"pointer" }}>
+                      <Sparkles size={14}/> Generer un style automatiquement
+                    </button>
+
                     {/* Filtres par metier */}
                     <div style={{ display:"flex", gap:4, overflowX:"auto", paddingBottom:8, marginBottom:10 }}>
-                      {PRESET_CATS.map(cat => (
+                      {PRESET_CATS.map(cat => {
+                        const isReco = cat.id !== "all" && cat.id === detectCat()
+                        return (
                         <button key={cat.id} type="button" onClick={() => setSelectedCat(cat.id)}
-                          style={{ display:"inline-flex", alignItems:"center", gap:3, padding:"5px 10px", background:selectedCat===cat.id?"rgba(201,168,76,0.15)":"rgba(255,255,255,0.04)", border:`1px solid ${selectedCat===cat.id?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.08)"}`, borderRadius:20, color:selectedCat===cat.id?G:MUTED, fontSize:10, fontWeight:selectedCat===cat.id?700:500, cursor:"pointer", whiteSpace:"nowrap" as const, flexShrink:0 }}>
+                          style={{ position:"relative" as const, display:"inline-flex", alignItems:"center", gap:3, padding:"5px 10px", background:selectedCat===cat.id?"rgba(201,168,76,0.15)":"rgba(255,255,255,0.04)", border:`1px solid ${selectedCat===cat.id?"rgba(201,168,76,0.4)":isReco?"rgba(57,255,143,0.4)":"rgba(255,255,255,0.08)"}`, borderRadius:20, color:selectedCat===cat.id?G:MUTED, fontSize:10, fontWeight:selectedCat===cat.id?700:500, cursor:"pointer", whiteSpace:"nowrap" as const, flexShrink:0 }}>
                           <span>{cat.emoji}</span>{cat.label}
+                          {isReco && <span style={{ width:5, height:5, borderRadius:"50%", background:"#39FF8F", flexShrink:0 }}/>}
                         </button>
-                      ))}
+                      )})}
                     </div>
 
                     {/* Grille presets avec apercu QR realiste */}
