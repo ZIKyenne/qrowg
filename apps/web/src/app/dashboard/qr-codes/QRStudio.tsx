@@ -1901,77 +1901,77 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               </div>
 
               
-{/* Diagnostic scannabilite */}
+{/* Diagnostic scannabilite premium */}
               {scanScore && (
-                <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"12px 16px" }}>
+                <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"16px" }}>
 
-                  {/* Header score */}
-                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
-                    <p style={{ color:"#8A8478", fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:0 }}>
-                      Scannabilite
-                    </p>
-                    <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                      {scanScore.canAutoFix && (
-                        <button type="button" onClick={autoFix}
-                          style={{ padding:"2px 8px", background:"rgba(201,168,76,0.1)", border:"1px solid rgba(201,168,76,0.25)", borderRadius:5, color:G, fontSize:9, fontWeight:600, cursor:"pointer" }}>
-                          Corriger auto
-                        </button>
-                      )}
-                    </div>
-                  </div>
+                  {/* Header */}
+                  <p style={{ color:"#8A8478", fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:"0 0 14px" }}>
+                    Scannabilite
+                  </p>
 
-                  {/* Score visuel */}
-                  <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:12 }}>
-                    {/* Cercle score */}
-                    <div style={{ position:"relative", width:54, height:54, flexShrink:0 }}>
-                      <svg width="54" height="54" viewBox="0 0 54 54" style={{ transform:"rotate(-90deg)" }}>
-                        <circle cx="27" cy="27" r="22" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="5"/>
-                        <circle cx="27" cy="27" r="22" fill="none"
-                          stroke={scanScore.gradeColor} strokeWidth="5"
-                          strokeDasharray={`${(scanScore.score/100)*138.2} 138.2`}
+                  {/* Score central premium */}
+                  <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:8, marginBottom:14 }}>
+                    <div style={{ position:"relative", width:96, height:96 }}>
+                      <svg width="96" height="96" viewBox="0 0 96 96" style={{ transform:"rotate(-90deg)" }}>
+                        <circle cx="48" cy="48" r="40" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="7"/>
+                        <circle cx="48" cy="48" r="40" fill="none"
+                          stroke={scanScore.gradeColor} strokeWidth="7"
+                          strokeDasharray={`${(scanScore.score/100)*251.2} 251.2`}
                           strokeLinecap="round"
-                          style={{ transition:"stroke-dasharray 0.5s ease, stroke 0.3s" }}/>
+                          style={{ transition:"stroke-dasharray 0.6s ease, stroke 0.3s", filter:`drop-shadow(0 0 6px ${scanScore.gradeColor}66)` }}/>
                       </svg>
                       <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
-                        <span style={{ color:scanScore.gradeColor, fontSize:14, fontWeight:800, lineHeight:1 }}>{scanScore.score}</span>
+                        <span style={{ color:scanScore.gradeColor, fontSize:28, fontWeight:800, lineHeight:1 }}>{scanScore.score}</span>
+                        <span style={{ color:"#8A8478", fontSize:9, marginTop:2 }}>/ 100</span>
                       </div>
                     </div>
+                    <span style={{ background:`${scanScore.gradeColor}15`, border:`1px solid ${scanScore.gradeColor}40`, borderRadius:8, padding:"4px 14px", fontSize:13, color:scanScore.gradeColor, fontWeight:700 }}>
+                      {scanScore.grade}
+                    </span>
+                  </div>
 
-                    {/* Grade + infos */}
-                    <div style={{ flex:1 }}>
-                      <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:5 }}>
-                        <span style={{ background:`${scanScore.gradeColor}15`, border:`1px solid ${scanScore.gradeColor}35`, borderRadius:6, padding:"2px 9px", fontSize:10, color:scanScore.gradeColor, fontWeight:700 }}>
-                          {scanScore.grade}
-                        </span>
-                        {scanScore.issues.length === 0 && (
-                          <span style={{ color:"#39FF8F", fontSize:9 }}>Aucun probleme detecte</span>
-                        )}
-                      </div>
-                      <div style={{ display:"flex", gap:6, flexWrap:"wrap" as const }}>
-                        <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:5, padding:"2px 7px", fontSize:8, color:"#8A8478" }}>
-                          Contraste {scanScore.ratio}:1
-                        </span>
-                        <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:5, padding:"2px 7px", fontSize:8, color:"#8A8478" }}>
-                          Min {scanScore.minSize}
-                        </span>
-                        <span style={{ background:`${ecLevel==="H"?"rgba(57,255,143,0.1)":ecLevel==="M"?"rgba(201,168,76,0.1)":"rgba(249,115,22,0.1)"}`, border:`1px solid ${ecLevel==="H"?"rgba(57,255,143,0.25)":ecLevel==="M"?"rgba(201,168,76,0.25)":"rgba(249,115,22,0.25)"}`, borderRadius:5, padding:"2px 7px", fontSize:8, color:ecLevel==="H"?"#39FF8F":ecLevel==="M"?G:"#F97316" }}>
-                          ECC {ecLevel}
-                        </span>
-                      </div>
+                  {/* Chips infos */}
+                  <div style={{ display:"flex", gap:6, flexWrap:"wrap" as const, justifyContent:"center", marginBottom:14 }}>
+                    <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 9px", fontSize:9, color:"#8A8478" }}>
+                      Contraste {scanScore.ratio}:1
+                    </span>
+                    <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 9px", fontSize:9, color:"#8A8478" }}>
+                      Taille min {scanScore.minSize}
+                    </span>
+                    <span style={{ background:`${ecLevel==="H"?"rgba(57,255,143,0.1)":ecLevel==="M"?"rgba(201,168,76,0.1)":"rgba(249,115,22,0.1)"}`, border:`1px solid ${ecLevel==="H"?"rgba(57,255,143,0.25)":ecLevel==="M"?"rgba(201,168,76,0.25)":"rgba(249,115,22,0.25)"}`, borderRadius:6, padding:"3px 9px", fontSize:9, color:ecLevel==="H"?"#39FF8F":ecLevel==="M"?G:"#F97316" }}>
+                      ECC {ecLevel}
+                    </span>
+                  </div>
+
+                  {/* Bouton corriger auto (proeminent) */}
+                  {scanScore.canAutoFix && (
+                    <button type="button" onClick={autoFix}
+                      style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"10px", marginBottom:12, background:"rgba(201,168,76,0.1)", border:"1px solid rgba(201,168,76,0.3)", borderRadius:9, color:G, fontSize:12, fontWeight:700, cursor:"pointer" }}>
+                      <Check size={13}/> Corriger automatiquement
+                    </button>
+                  )}
+
+                  {/* Etat : tout bon -> checklist verte */}
+                  {scanScore.issues.length === 0 ? (
+                    <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+                      {[
+                        `Contraste parfait (${scanScore.ratio}:1)`,
+                        "Marge suffisante pour la detection",
+                        `Correction d'erreur optimale (ECC ${ecLevel})`,
+                      ].map((txt, i) => (
+                        <div key={i} style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 10px", background:"rgba(57,255,143,0.05)", border:"1px solid rgba(57,255,143,0.15)", borderRadius:8 }}>
+                          <Check size={13} color="#39FF8F" style={{ flexShrink:0 }}/>
+                          <span style={{ color:"#F5F0E8", fontSize:11 }}>{txt}</span>
+                        </div>
+                      ))}
                     </div>
-                  </div>
-
-                  {/* Barre de progression */}
-                  <div style={{ height:4, background:"rgba(255,255,255,0.07)", borderRadius:2, overflow:"hidden", marginBottom:10 }}>
-                    <div style={{ height:"100%", width:`${scanScore.score}%`, background:`linear-gradient(90deg,${scanScore.gradeColor}80,${scanScore.gradeColor})`, borderRadius:2, transition:"width 0.5s ease" }}/>
-                  </div>
-
-                  {/* Liste des problemes */}
-                  {scanScore.issues.length > 0 && (
-                    <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                  ) : (
+                    /* Liste des problemes */
+                    <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
                       {scanScore.issues.map(issue => (
-                        <div key={issue.id} style={{ display:"flex", alignItems:"flex-start", gap:7, padding:"7px 9px", background:`${issue.severity==="critical"?"rgba(255,107,107,0.07)":issue.severity==="warning"?"rgba(249,115,22,0.06)":"rgba(255,255,255,0.03)"}`, border:`1px solid ${issue.severity==="critical"?"rgba(255,107,107,0.2)":issue.severity==="warning"?"rgba(249,115,22,0.18)":"rgba(255,255,255,0.07)"}`, borderRadius:8 }}>
-                          <span style={{ fontSize:11, flexShrink:0, marginTop:1 }}>
+                        <div key={issue.id} style={{ display:"flex", alignItems:"flex-start", gap:8, padding:"9px 10px", background:`${issue.severity==="critical"?"rgba(255,107,107,0.07)":issue.severity==="warning"?"rgba(249,115,22,0.06)":"rgba(255,255,255,0.03)"}`, border:`1px solid ${issue.severity==="critical"?"rgba(255,107,107,0.2)":issue.severity==="warning"?"rgba(249,115,22,0.18)":"rgba(255,255,255,0.07)"}`, borderRadius:9 }}>
+                          <span style={{ fontSize:12, flexShrink:0, marginTop:1 }}>
                             {issue.severity==="critical"?"🔴":issue.severity==="warning"?"🟡":"🔵"}
                           </span>
                           <div style={{ flex:1, minWidth:0 }}>
@@ -1987,7 +1987,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       ))}
                     </div>
                   )}
-                
+
                 </div>
               )}
 
@@ -2653,7 +2653,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               <div style={{ marginBottom:12 }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
                   <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Apercu</p>
-                  <span style={{ color:MUTED, fontSize:9 }}>{tpl.w}?{tpl.h}px</span>
+                  <span style={{ color:MUTED, fontSize:9 }}>{tpl.w}×{tpl.h}px</span>
                 </div>
 
                 <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:10, padding:12, display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
@@ -2791,7 +2791,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   </div>
                 )}
                 <p style={{ color:MUTED, fontSize:10, margin:"5px 0 0" }}>
-                  Export : <strong style={{ color:G }}>{realPx}?{realPx}px</strong>
+                  Export : <strong style={{ color:G }}>{realPx}×{realPx}px</strong>
                   {(expIncludeName || expIncludeUrl) && " + bandeau"}
                 </p>
               </div>
