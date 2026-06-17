@@ -1442,6 +1442,38 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     }
   }
 
+  // -- Generateur de palette coherente (contraste garanti) ----------------------
+  function hslToHex(h: number, s: number, l: number): string {
+    s /= 100; l /= 100
+    const k = (n: number) => (n + h / 30) % 12
+    const a = s * Math.min(l, 1 - l)
+    const f = (n: number) => {
+      const c = l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)))
+      return Math.round(255 * c).toString(16).padStart(2, "0")
+    }
+    return `#${f(0)}${f(8)}${f(4)}`
+  }
+
+  function genPalette() {
+    const hue = Math.floor(Math.random() * 360)
+    const darkBg = Math.random() < 0.5
+    let newFg: string, newBg: string, cornerC: string, eyeC: string
+    if (darkBg) {
+      newBg   = hslToHex(hue, 35, 8)
+      newFg   = hslToHex(hue, 15, 92)
+      cornerC = hslToHex((hue + 30) % 360, 80, 62)
+      eyeC    = hslToHex((hue + 30) % 360, 85, 72)
+    } else {
+      newBg   = hslToHex(hue, 30, 97)
+      newFg   = hslToHex(hue, 60, 20)
+      cornerC = hslToHex((hue + 30) % 360, 70, 38)
+      eyeC    = hslToHex((hue + 30) % 360, 72, 48)
+    }
+    setFg(newFg)
+    setBg(newBg)
+    setStyleConf(p => ({ ...p, cornerColor: cornerC, eyeColor: eyeC, gradient: "none", fg2: "", gradientBg: "" }))
+  }
+
   async function applyToAll() {
     const sb = createClient()
     const payload = { foreground_color:fg, background_color:bg, corner_style:corner, error_correction:ecLevel, style_config:styleConf, updated_at:new Date().toISOString() }
@@ -2408,6 +2440,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
                   {/* 2. Couleurs principales (ouvert par defaut) */}
                   <AccSection id="couleurs" title="Couleurs" icon="🎨" openId={openAcc} setOpenId={setOpenAcc}>
+                    {/* Generer une palette */}
+                    <button type="button" onClick={genPalette}
+                      style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, marginBottom:10, padding:"9px", background:"linear-gradient(90deg, rgba(201,168,76,0.16), rgba(201,168,76,0.06))", border:"1px solid rgba(201,168,76,0.3)", borderRadius:9, color:G, fontSize:12, fontWeight:700, cursor:"pointer" }}>
+                      <Sparkles size={13}/> Generer une palette
+                    </button>
                     <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                       {([
                         { label:"QR principal",    key:"fg",  val:fg,  set:(v:string)=>setFg(v) },
@@ -2424,6 +2461,20 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         </div>
                       ))}
                     </div>
+                    {/* Indicateur de contraste en direct */}
+                    {(() => {
+                      const r = contrastRatio(fg, bg)
+                      const ok = r >= 4.5, mid = r >= 3
+                      const col = ok ? "#39FF8F" : mid ? "#F97316" : "#FF6B6B"
+                      const txt = ok ? "Bon contraste" : mid ? "Contraste moyen" : "Contraste insuffisant"
+                      return (
+                        <div style={{ display:"flex", alignItems:"center", gap:7, marginTop:10, padding:"7px 10px", background:`${col}10`, border:`1px solid ${col}30`, borderRadius:8 }}>
+                          {ok ? <Check size={12} color={col}/> : <AlertTriangle size={12} color={col}/>}
+                          <span style={{ color:col, fontSize:11, fontWeight:600 }}>{txt}</span>
+                          <span style={{ color:MUTED, fontSize:10, marginLeft:"auto" }}>{r.toFixed(1)}:1</span>
+                        </div>
+                      )
+                    })()}
                   </AccSection>
 
                   {/* 3. Style des modules (ferme) */}
