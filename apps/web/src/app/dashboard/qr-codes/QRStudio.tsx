@@ -1088,6 +1088,32 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     { id:"event-badge", label:"Badge evenement",    emoji:"🎫", w:680,  h:400,  plan:"pro",      cat:"Event",      desc:"Badge horizontal 85x50mm" },
     { id:"story",       label:"Story Instagram",    emoji:"📱", w:1080, h:1920, plan:"business", cat:"Social",     desc:"9:16 vertical stories" },
     { id:"post",        label:"Post Instagram",     emoji:"🟫", w:1080, h:1080, plan:"business", cat:"Social",     desc:"Carré 1:1" },
+
+    // ===== LOT 15 templates supplementaires =====
+  // ---- Print ----
+  { id:"affiche-minimal",     label:"Affiche minimale",   emoji:"🖼️", w:795,  h:1122, plan:"free",     cat:"Print",      desc:"A4 épuré, grand QR centré" },
+  { id:"affiche-premium",     label:"Affiche premium",    emoji:"✨", w:795,  h:1122, plan:"pro",      cat:"Print",      desc:"A4 filets dorés, look haut de gamme" },
+  { id:"flyer-paysage",       label:"Flyer paysage",      emoji:"📄", w:795,  h:561,  plan:"free",     cat:"Print",      desc:"Demi-A4, bande latérale + QR" },
+
+  // ---- Restaurant ----
+  { id:"menu-resto-portrait", label:"Menu resto",         emoji:"🍽️", w:600,  h:900,  plan:"free",     cat:"Restaurant", desc:"Header coloré, QR vers la carte" },
+  { id:"carte-table-resto",   label:"Carte de table",     emoji:"🍴", w:900,  h:506,  plan:"pro",      cat:"Restaurant", desc:"Paysage, QR à gauche, texte à droite" },
+  { id:"sticker-avis",        label:"Sticker avis",       emoji:"⭐", w:600,  h:600,  plan:"free",     cat:"Restaurant", desc:"Carré, demande d'avis client" },
+
+  // ---- Business ----
+  { id:"carte-visite-classic",label:"Carte de visite",    emoji:"💼", w:1063, h:591,  plan:"pro",      cat:"Business",   desc:"CR80, split coloré + QR" },
+  { id:"carte-visite-dark",   label:"Carte premium",      emoji:"🥇", w:1063, h:591,  plan:"business", cat:"Business",   desc:"CR80, cadre doré, ultra premium" },
+
+  // ---- Event ----
+  { id:"badge-event-pro",     label:"Badge événement",    emoji:"🎫", w:680,  h:400,  plan:"pro",      cat:"Event",      desc:"Badge header coloré + QR" },
+  { id:"affiche-event",       label:"Affiche événement",  emoji:"🎉", w:795,  h:1122, plan:"pro",      cat:"Event",      desc:"A4 bold, grand header" },
+  { id:"carte-table-event",   label:"Carte table event",  emoji:"📋", w:900,  h:506,  plan:"pro",      cat:"Event",      desc:"Paysage, QR centré, filets" },
+  { id:"badge-nominatif",     label:"Badge nominatif",    emoji:"🪪", w:680,  h:400,  plan:"business", cat:"Event",      desc:"Badge avec nom du participant" },
+
+  // ---- Social ----
+  { id:"story-insta",         label:"Story Instagram",    emoji:"📱", w:1080, h:1920, plan:"pro",      cat:"Social",     desc:"9:16, QR centré, bandes translucides" },
+  { id:"post-insta",          label:"Post Instagram",     emoji:"🟧", w:1080, h:1080, plan:"free",     cat:"Social",     desc:"1:1, QR cadré" },
+  { id:"story-promo",         label:"Story promo",        emoji:"🔥", w:1080, h:1920, plan:"pro",      cat:"Social",     desc:"9:16, gros header promo, QR bas" },
   ]
 
   // -- Rendu d'un support sur canvas ----------------------------------------
@@ -1327,6 +1353,172 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       ctx.strokeStyle = accentCol + "40"; ctx.lineWidth = Math.round(w * 0.018)
       ctx.strokeRect(Math.round(w*0.009), Math.round(h*0.009), w - Math.round(w*0.018), h - Math.round(h*0.018))
     }
+
+  // ===== Print =====
+  else if (tpl.id === "affiche-minimal") {
+    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, w, h)
+    drawTitle(opts.title || active?.pages?.title || "", w/2, Math.round(h*0.16), Math.round(w*0.06), textCol, "center", w*0.82)
+    drawAccentLine(Math.round(w*0.38), Math.round(h*0.21), Math.round(w*0.24))
+    drawSub(opts.subtitle, w/2, Math.round(h*0.27), Math.round(w*0.032), accentCol, "center")
+    const s = Math.round(w*0.52)
+    drawQR((w-s)/2, Math.round(h*0.38), s)
+    drawSub("Scannez-moi", w/2, Math.round(h*0.38)+s+Math.round(h*0.035), Math.round(w*0.026), textCol, "center")
+    drawContact(w/2, Math.round(h*0.9), Math.round(w*0.024), textCol, "center")
+  }
+  else if (tpl.id === "affiche-premium") {
+    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, w, h)
+    ctx.fillStyle = gold; ctx.fillRect(0, 0, w, Math.round(h*0.014))
+    ctx.fillStyle = gold; ctx.fillRect(0, h-Math.round(h*0.014), w, Math.round(h*0.014))
+    drawTitle(opts.title || active?.pages?.title || "", w/2, Math.round(h*0.15), Math.round(w*0.062), gold, "center", w*0.82)
+    drawAccentLine(Math.round(w*0.4), Math.round(h*0.2), Math.round(w*0.2))
+    drawSub(opts.subtitle, w/2, Math.round(h*0.25), Math.round(w*0.032), textCol, "center")
+    const s = Math.round(w*0.5)
+    drawQR((w-s)/2, Math.round(h*0.34), s)
+    drawContact(w/2, Math.round(h*0.88), Math.round(w*0.024), textCol, "center")
+    drawSub(qrUrl, w/2, Math.round(h*0.93), Math.round(w*0.022), isDark?"rgba(245,240,232,0.45)":"rgba(26,26,26,0.4)", "center")
+  }
+  else if (tpl.id === "flyer-paysage") {
+    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, w, h)
+    ctx.fillStyle = fgColor; ctx.fillRect(0, 0, Math.round(w*0.42), h)
+    const txtX = Math.round(w*0.06)
+    drawTitle(opts.title || active?.pages?.title || "", txtX, Math.round(h*0.3), Math.round(w*0.045), bgColor, "left", w*0.32)
+    drawAccentLine(txtX, Math.round(h*0.42), Math.round(w*0.18))
+    drawSub(opts.subtitle, txtX, Math.round(h*0.52), Math.round(w*0.026), bgColor, "left")
+    drawContact(txtX, Math.round(h*0.82), Math.round(w*0.02), bgColor, "left")
+    const s = Math.round(h*0.62)
+    drawQR(Math.round(w*0.42)+Math.round((w*0.58-s)/2), Math.round((h-s)/2), s)
+  }
+
+  // ===== Restaurant =====
+  else if (tpl.id === "menu-resto-portrait") {
+    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, w, h)
+    ctx.fillStyle = fgColor; ctx.fillRect(0, 0, w, Math.round(h*0.18))
+    drawTitle(opts.title || active?.pages?.title || "Notre Menu", w/2, Math.round(h*0.1), Math.round(w*0.07), bgColor, "center", w*0.85)
+    drawSub(opts.subtitle, w/2, Math.round(h*0.26), Math.round(w*0.04), accentCol, "center")
+    const s = Math.round(w*0.62)
+    drawQR((w-s)/2, Math.round(h*0.36), s)
+    drawSub("Scannez pour voir la carte", w/2, Math.round(h*0.36)+s+Math.round(h*0.04), Math.round(w*0.032), textCol, "center")
+    drawContact(w/2, Math.round(h*0.92), Math.round(w*0.03), textCol, "center")
+  }
+  else if (tpl.id === "carte-table-resto") {
+    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, w, h)
+    const s = Math.round(h*0.66)
+    drawQR(Math.round(w*0.08), Math.round((h-s)/2), s)
+    const tx = Math.round(w*0.08)+s+Math.round(w*0.06)
+    drawTitle(opts.title || active?.pages?.title || "Commandez ici", tx, Math.round(h*0.34), Math.round(w*0.05), textCol, "left", w*0.42)
+    drawAccentLine(tx, Math.round(h*0.46), Math.round(w*0.18))
+    drawSub(opts.subtitle, tx, Math.round(h*0.58), Math.round(w*0.028), accentCol, "left")
+    drawContact(tx, Math.round(h*0.8), Math.round(w*0.022), textCol, "left")
+  }
+  else if (tpl.id === "sticker-avis") {
+    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, w, h)
+    drawTitle(opts.title || "Votre avis compte", w/2, Math.round(h*0.16), Math.round(w*0.07), textCol, "center", w*0.85)
+    drawAccentLine(Math.round(w*0.38), Math.round(h*0.22), Math.round(w*0.24))
+    const s = Math.round(w*0.5)
+    drawQR((w-s)/2, Math.round(h*0.3), s)
+    drawSub(opts.subtitle || "Scannez & laissez un avis", w/2, Math.round(h*0.3)+s+Math.round(h*0.05), Math.round(w*0.04), accentCol, "center")
+    drawContact(w/2, Math.round(h*0.92), Math.round(w*0.03), textCol, "center")
+  }
+
+  // ===== Business =====
+  else if (tpl.id === "carte-visite-classic") {
+    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, w, h)
+    ctx.fillStyle = fgColor; ctx.fillRect(0, 0, Math.round(w*0.5), h)
+    const lx = Math.round(w*0.06)
+    drawTitle(opts.title || active?.pages?.title || "", lx, Math.round(h*0.3), Math.round(w*0.05), bgColor, "left", w*0.38)
+    drawAccentLine(lx, Math.round(h*0.42), Math.round(w*0.14))
+    drawSub(opts.subtitle, lx, Math.round(h*0.52), Math.round(w*0.026), bgColor, "left")
+    drawContact(lx, Math.round(h*0.82), Math.round(w*0.022), bgColor, "left")
+    const s = Math.round(h*0.6)
+    drawQR(Math.round(w*0.5)+Math.round((w*0.5-s)/2), Math.round((h-s)/2), s)
+  }
+  else if (tpl.id === "carte-visite-dark") {
+    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, w, h)
+    ctx.strokeStyle = gold; ctx.lineWidth = Math.max(2, Math.round(w*0.006))
+    ctx.strokeRect(Math.round(w*0.03), Math.round(h*0.05), w-Math.round(w*0.06), h-Math.round(h*0.1))
+    const lx = Math.round(w*0.08)
+    drawTitle(opts.title || active?.pages?.title || "", lx, Math.round(h*0.32), Math.round(w*0.052), gold, "left", w*0.46)
+    drawAccentLine(lx, Math.round(h*0.44), Math.round(w*0.16))
+    drawSub(opts.subtitle, lx, Math.round(h*0.55), Math.round(w*0.026), textCol, "left")
+    drawContact(lx, Math.round(h*0.8), Math.round(w*0.022), textCol, "left")
+    const s = Math.round(h*0.58)
+    drawQR(w-s-Math.round(w*0.1), Math.round((h-s)/2), s)
+  }
+
+  // ===== Event =====
+  else if (tpl.id === "badge-event-pro") {
+    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, w, h)
+    ctx.fillStyle = fgColor; ctx.fillRect(0, 0, w, Math.round(h*0.22))
+    drawTitle(opts.title || active?.pages?.title || "BADGE", w/2, Math.round(h*0.13), Math.round(w*0.05), bgColor, "center", w*0.85)
+    drawSub(opts.subtitle, Math.round(w*0.08), Math.round(h*0.42), Math.round(w*0.04), textCol, "left")
+    drawContact(Math.round(w*0.08), Math.round(h*0.78), Math.round(w*0.028), accentCol, "left")
+    const s = Math.round(h*0.5)
+    drawQR(w-s-Math.round(w*0.08), Math.round(h*0.32), s)
+  }
+  else if (tpl.id === "affiche-event") {
+    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, w, h)
+    ctx.fillStyle = fgColor; ctx.fillRect(0, 0, w, Math.round(h*0.32))
+    drawTitle(opts.title || active?.pages?.title || "ÉVÉNEMENT", w/2, Math.round(h*0.15), Math.round(w*0.075), bgColor, "center", w*0.88)
+    drawSub(opts.subtitle, w/2, Math.round(h*0.25), Math.round(w*0.036), bgColor, "center")
+    const s = Math.round(w*0.5)
+    drawQR((w-s)/2, Math.round(h*0.42), s)
+    drawSub("Scannez pour participer", w/2, Math.round(h*0.42)+s+Math.round(h*0.035), Math.round(w*0.03), accentCol, "center")
+    drawContact(w/2, Math.round(h*0.9), Math.round(w*0.024), textCol, "center")
+  }
+  else if (tpl.id === "carte-table-event") {
+    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, w, h)
+    ctx.fillStyle = fgColor; ctx.fillRect(0, 0, w, Math.round(h*0.04))
+    ctx.fillStyle = fgColor; ctx.fillRect(0, h-Math.round(h*0.04), w, Math.round(h*0.04))
+    drawTitle(opts.title || active?.pages?.title || "Bienvenue", w/2, Math.round(h*0.2), Math.round(w*0.045), textCol, "center", w*0.8)
+    const s = Math.round(h*0.42)
+    drawQR((w-s)/2, Math.round(h*0.3), s)
+    drawSub(opts.subtitle || "Scannez pour le programme", w/2, Math.round(h*0.3)+s+Math.round(h*0.06), Math.round(w*0.026), accentCol, "center")
+    drawContact(w/2, Math.round(h*0.9), Math.round(w*0.02), textCol, "center")
+  }
+  else if (tpl.id === "badge-nominatif") {
+    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, w, h)
+    ctx.fillStyle = fgColor; ctx.fillRect(0, 0, Math.round(w*0.04), h)
+    const lx = Math.round(w*0.1)
+    drawSub(opts.subtitle || "PARTICIPANT", lx, Math.round(h*0.2), Math.round(w*0.026), accentCol, "left")
+    drawTitle(opts.title || active?.pages?.title || "Nom Prénom", lx, Math.round(h*0.42), Math.round(w*0.055), textCol, "left", w*0.55)
+    drawAccentLine(lx, Math.round(h*0.54), Math.round(w*0.2))
+    drawContact(lx, Math.round(h*0.82), Math.round(w*0.024), textCol, "left")
+    const s = Math.round(h*0.5)
+    drawQR(w-s-Math.round(w*0.08), Math.round((h-s)/2), s)
+  }
+
+  // ===== Social =====
+  else if (tpl.id === "story-insta") {
+    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, w, h)
+    ctx.fillStyle = fgColor + "22"; ctx.fillRect(0, Math.round(h*0.12), w, Math.round(h*0.1))
+    drawTitle(opts.title || active?.pages?.title || "", w/2, Math.round(h*0.18), Math.round(w*0.07), textCol, "center", w*0.85)
+    drawSub(opts.subtitle, w/2, Math.round(h*0.28), Math.round(w*0.034), accentCol, "center")
+    const s = Math.round(w*0.62)
+    drawQR((w-s)/2, Math.round(h*0.4), s)
+    drawSub("Scannez l'écran", w/2, Math.round(h*0.4)+s+Math.round(h*0.035), Math.round(w*0.03), textCol, "center")
+    drawContact(w/2, Math.round(h*0.82), Math.round(w*0.026), textCol, "center")
+  }
+  else if (tpl.id === "post-insta") {
+    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, w, h)
+    ctx.strokeStyle = accentCol; ctx.lineWidth = Math.max(2, Math.round(w*0.008))
+    ctx.strokeRect(Math.round(w*0.06), Math.round(h*0.06), w-Math.round(w*0.12), h-Math.round(h*0.12))
+    drawTitle(opts.title || active?.pages?.title || "", w/2, Math.round(h*0.2), Math.round(w*0.06), textCol, "center", w*0.8)
+    const s = Math.round(w*0.46)
+    drawQR((w-s)/2, Math.round(h*0.32), s)
+    drawSub(opts.subtitle || "Scannez-moi", w/2, Math.round(h*0.32)+s+Math.round(h*0.05), Math.round(w*0.032), accentCol, "center")
+    drawContact(w/2, Math.round(h*0.86), Math.round(w*0.024), textCol, "center")
+  }
+  else if (tpl.id === "story-promo") {
+    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, w, h)
+    ctx.fillStyle = fgColor; ctx.fillRect(0, 0, w, Math.round(h*0.45))
+    drawTitle(opts.title || active?.pages?.title || "PROMO", w/2, Math.round(h*0.2), Math.round(w*0.09), bgColor, "center", w*0.85)
+    drawSub(opts.subtitle, w/2, Math.round(h*0.32), Math.round(w*0.038), bgColor, "center")
+    const s = Math.round(w*0.55)
+    drawQR((w-s)/2, Math.round(h*0.56), s)
+    drawSub("Scannez pour en profiter", w/2, Math.round(h*0.56)+s+Math.round(h*0.04), Math.round(w*0.032), textCol, "center")
+    drawContact(w/2, Math.round(h*0.9), Math.round(w*0.026), textCol, "center")
+  }
+
   }
 
   // -- Generer preview support -----------------------------------------------
