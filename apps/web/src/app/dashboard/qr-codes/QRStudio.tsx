@@ -375,6 +375,18 @@ function ColorField({ label, value, onChange, onClear }: {
   )
 }
 
+// -- Themes d'imprimables (palette independante du QR) -----------------------
+type SuppTheme = { id: string; label: string; bg: string; text: string; accent: string }
+const SUPP_THEMES: SuppTheme[] = [
+  { id:"auto",      label:"Auto (couleurs du QR)", bg:"",        text:"",        accent:""        },
+  { id:"minimal",   label:"Minimal",               bg:"#FFFFFF", text:"#1A1A1A", accent:"#1A1A1A" },
+  { id:"blackgold", label:"Black Gold",            bg:"#0A0A0A", text:"#F5F0E8", accent:"#C9A84C" },
+  { id:"cream",     label:"Creme & Or",            bg:"#F6F1E7", text:"#2A2419", accent:"#C9A84C" },
+  { id:"modern",    label:"Modern",                bg:"#0F1729", text:"#F1F5FF", accent:"#5B8DEF" },
+  { id:"nature",    label:"Nature",                bg:"#F2F4EC", text:"#26331C", accent:"#5B8A3A" },
+  { id:"coral",     label:"Coral",                 bg:"#FFF5F0", text:"#3A1E16", accent:"#E5634D" },
+]
+
 export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: Props) {
   const [qrCodes,    setQRCodes]    = useState<QRCode[]>(initialQRCodes)
   const [activeId,   setActiveId]   = useState<string | null>(initialQRCodes[0]?.id ?? null)
@@ -434,6 +446,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [confirmAction,  setConfirmAction]  = useState<{action:string;qrId:string;label:string}|null>(null)
   const [showArchived,   setShowArchived]   = useState(false)
   const [suppTplId,   setSuppTplId]   = useState("a4-poster")
+  const [suppTheme,   setSuppTheme]   = useState("auto")
   const [suppTitle,   setSuppTitle]   = useState("")
   const [suppSubtitle,setSuppSubtitle]= useState("Scannez pour voir le menu")
   const [suppRendered,setSuppRendered]= useState(false)
@@ -1079,7 +1092,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   async function renderSupport(
     canvas: HTMLCanvasElement,
     tpl: SuppTpl,
-    opts: { title: string; subtitle: string; qrDataUrl: string; logoUrl?: string; scale?: number }
+    opts: { title: string; subtitle: string; qrDataUrl: string; logoUrl?: string; scale?: number; theme?: SuppTheme }
   ): Promise<void> {
     const sc  = opts.scale ?? 1
     const w   = Math.round(tpl.w * sc)
@@ -1089,11 +1102,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const ctx = canvas.getContext("2d")!
     ctx.clearRect(0, 0, w, h)
 
-    const fgColor  = fg || "#080808"
-    const bgColor  = bg || "#FFFFFF"
+    // Theme : si defini (autre que auto), il pilote fond/texte/accent du support
+    const th       = opts.theme && opts.theme.bg ? opts.theme : null
+    const fgColor  = th ? th.accent : (fg || "#080808")
+    const bgColor  = th ? th.bg     : (bg || "#FFFFFF")
     const isDark   = parseInt(bgColor.replace("#","").slice(0,2), 16) < 128
-    const textCol  = isDark ? "#F5F0E8" : "#1A1A1A"
-    const accentCol= fgColor
+    const textCol  = th ? th.text   : (isDark ? "#F5F0E8" : "#1A1A1A")
+    const accentCol= th ? th.accent : fgColor
     const gold     = "#C9A84C"
 
     const loadImg  = (src: string): Promise<HTMLImageElement> =>
@@ -1309,11 +1324,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       const qrDataUrl = await blobToDataUrl(qrBlob)
       // Scale pour la preview (max 300px de large)
       const previewScale = Math.min(1, 280 / tpl.w)
-      await renderSupport(canvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, logoUrl:styleConf.logoUrl, scale:previewScale })
+      await renderSupport(canvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, logoUrl:styleConf.logoUrl, scale:previewScale, theme:SUPP_THEMES.find(t=>t.id===suppTheme) })
       setSuppRendered(true)
     } catch { setSuppRendered(false) }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [suppTplId, qrUrl, fg, bg, ecLevel, styleConf, suppTitle, suppSubtitle])
+  }, [suppTplId, qrUrl, fg, bg, ecLevel, styleConf, suppTitle, suppSubtitle, suppTheme])
 
   // Preview LIVE : regenere automatiquement quand un parametre change (debounce)
   useEffect(() => {
@@ -1332,7 +1347,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       if (!qrBlob) throw new Error("qr gen failed")
       const qrDataUrl = await blobToDataUrl(qrBlob)
       const outCanvas = document.createElement("canvas")
-      await renderSupport(outCanvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, scale:2 })
+      await renderSupport(outCanvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, scale:2, theme:SUPP_THEMES.find(t=>t.id===suppTheme) })
       const filename  = `${(tpl.label).replace(/\s+/g,"-").toLowerCase()}-${active?.short_code ?? "qr"}.${fmt}`
       if (fmt === "pdf") {
         // Vrai PDF via jsPDF, oriente selon le support
@@ -2966,6 +2981,27 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             </div>
 
             <div className="qr-scroll" style={{ flex:1, overflowY:"auto", padding:"12px" }}>
+
+              {/* -- Theme du support ----------------------------------- */}
+              <div style={{ marginBottom:12 }}>
+                <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Theme</p>
+                <div style={{ display:"flex", gap:6, overflowX:"auto", paddingBottom:4 }}>
+                  {SUPP_THEMES.map(t => {
+                    const sel = suppTheme === t.id
+                    const swatch = t.bg || (bg || "#FFFFFF")
+                    const acc    = t.accent || (fg || "#080808")
+                    return (
+                      <button key={t.id} type="button" onClick={() => setSuppTheme(t.id)}
+                        style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:4, padding:"6px 6px 5px", background:sel?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1.5px solid ${sel?G:"rgba(255,255,255,0.08)"}`, borderRadius:9, cursor:"pointer", flexShrink:0, minWidth:54 }}>
+                        <div style={{ position:"relative", width:30, height:30, borderRadius:6, background:swatch, border:"1px solid rgba(0,0,0,0.2)", overflow:"hidden" }}>
+                          <div style={{ position:"absolute", bottom:0, left:0, right:0, height:9, background:acc }}/>
+                        </div>
+                        <span style={{ color:sel?G:MUTED, fontSize:8, fontWeight:sel?700:500, whiteSpace:"nowrap" as const }}>{t.label.split(" ")[0]}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
 
               {/* -- Textes --------------------------------------------- */}
               <div style={{ marginBottom:12 }}>
