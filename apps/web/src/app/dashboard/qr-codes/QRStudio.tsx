@@ -449,6 +449,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [suppTheme,   setSuppTheme]   = useState("auto")
   const [suppTitle,   setSuppTitle]   = useState("")
   const [suppSubtitle,setSuppSubtitle]= useState("Scannez pour voir le menu")
+  const [suppPhone,   setSuppPhone]   = useState("")
+  const [suppWebsite, setSuppWebsite] = useState("")
   const [suppRendered,setSuppRendered]= useState(false)
   const [suppExporting,setSuppExporting]=useState(false)
   const [saving,     setSaving]     = useState(false)
@@ -1092,7 +1094,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   async function renderSupport(
     canvas: HTMLCanvasElement,
     tpl: SuppTpl,
-    opts: { title: string; subtitle: string; qrDataUrl: string; logoUrl?: string; scale?: number; theme?: SuppTheme }
+    opts: { title: string; subtitle: string; qrDataUrl: string; logoUrl?: string; scale?: number; theme?: SuppTheme; phone?: string; website?: string }
   ): Promise<void> {
     const sc  = opts.scale ?? 1
     const w   = Math.round(tpl.w * sc)
@@ -1177,6 +1179,15 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       ctx.fillRect(x, y, lineW, Math.max(3, Math.round(w * 0.005)))
     }
 
+    // Ligne de contact (tel + site) : dessinee seulement si renseignee
+    const contactStr = [opts.phone?.trim(), opts.website?.trim()].filter(Boolean).join("   ·   ")
+    const drawContact = (x: number, y: number, size: number, color: string, align: CanvasTextAlign = "center") => {
+      if (!contactStr) return
+      ctx.fillStyle = color; ctx.font = `500 ${size}px 'Arial', sans-serif`; ctx.textAlign = align
+      ctx.fillText(contactStr, x, y, w * 0.85)
+      ctx.textAlign = "left"
+    }
+
     // -- A4 Poster ----------------------------------------------------------
     if (tpl.id === "a4-poster") {
       const qrSize = Math.round(w * 0.52)
@@ -1186,6 +1197,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       drawTitle(opts.title || active?.pages?.title || "", bw + pad, Math.round(h * 0.13), Math.round(w * 0.045), textCol, "left", w - bw - pad*2)
       drawSub(opts.subtitle, bw + pad, Math.round(h * 0.19), Math.round(w * 0.03), accentCol)
       drawQR(qrX + (w - bw - pad*2 - qrSize)/2, qrY, qrSize)
+      drawContact(w/2, Math.round(h * 0.84), Math.round(w * 0.024), accentCol, "center")
       drawSub(qrUrl, w/2, Math.round(h * 0.89), Math.round(w * 0.022), isDark ? "rgba(245,240,232,0.5)" : "rgba(26,26,26,0.4)", "center")
       ctx.fillStyle = accentCol; ctx.fillRect(bw, h - Math.round(h*0.04), w - bw, Math.round(h*0.04))
     }
@@ -1200,6 +1212,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       drawTitle(opts.title || active?.pages?.title || "", txtX, Math.round(h * 0.32), Math.round(w * 0.038), textCol, "left", qrX - txtX - pad)
       drawAccentLine(txtX, Math.round(h * 0.37), Math.round(w * 0.15))
       drawSub(opts.subtitle, txtX, Math.round(h * 0.55), Math.round(w * 0.026), accentCol)
+      drawContact(txtX, Math.round(h * 0.70), Math.round(w * 0.023), textCol, "left")
       drawQR(qrX, qrY, qrSize)
     }
 
@@ -1238,6 +1251,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       drawTitle(opts.title || active?.pages?.title || "", txtX, Math.round(h * 0.38), Math.round(h * 0.09), textCol, "left", qrX - txtX - pad)
       drawAccentLine(txtX, Math.round(h * 0.44), Math.round(w * 0.1))
       drawSub(opts.subtitle, txtX, Math.round(h * 0.6), Math.round(h * 0.065), accentCol)
+      drawContact(txtX, Math.round(h * 0.76), Math.round(h * 0.05), textCol, "left")
       drawQR(qrX, qrY, qrSize)
     }
 
@@ -1249,6 +1263,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       drawTitle(opts.title || active?.pages?.title || "Notre Menu", w/2, Math.round(headerH * 0.55), Math.round(w * 0.055), bgColor, "center", w * 0.85)
       drawSub(opts.subtitle, w/2, Math.round(headerH * 0.80), Math.round(w * 0.034), isDark ? "rgba(201,168,76,0.85)" : "rgba(255,255,255,0.75)", "center")
       drawQR((w - qrSize)/2, Math.round(h * 0.3), qrSize)
+      drawContact(w/2, Math.round(h * 0.86), Math.round(w * 0.026), accentCol, "center")
       drawSub(qrUrl, w/2, Math.round(h * 0.93), Math.round(w * 0.027), isDark ? "rgba(245,240,232,0.4)" : "rgba(26,26,26,0.35)", "center")
       ctx.fillStyle = fgColor; ctx.fillRect(0, h - Math.round(h*0.035), w, Math.round(h*0.035))
     }
@@ -1265,6 +1280,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       ctx.fillStyle = isDark ? "rgba(201,168,76,0.8)" : "rgba(255,255,255,0.6)"
       ctx.fillRect(lx - Math.round(w * 0.05), ly + Math.round(h*0.04), Math.round(w * 0.14), Math.round(h*0.007))
       drawSub(opts.subtitle, lx, Math.round(h * 0.67), Math.round(h * 0.07), isDark?"rgba(201,168,76,0.9)":"rgba(255,255,255,0.8)", "center")
+      drawContact(lx, Math.round(h * 0.82), Math.round(h * 0.05), isDark?"rgba(245,240,232,0.85)":"rgba(255,255,255,0.85)", "center")
       drawQR(qrX, qrY, qrSize)
     }
 
@@ -1278,6 +1294,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       drawTitle(opts.title || active?.pages?.title || "", pad, Math.round(h * 0.44), Math.round(h * 0.1), textCol, "left", qrX - pad - Math.round(w*0.03))
       drawAccentLine(pad, Math.round(h * 0.51), Math.round(w * 0.12))
       drawSub(opts.subtitle, pad, Math.round(h * 0.68), Math.round(h * 0.075), accentCol)
+      drawContact(pad, Math.round(h * 0.79), Math.round(h * 0.05), textCol, "left")
       drawQR(qrX, qrY, qrSize)
     }
 
@@ -1293,6 +1310,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       drawSub(opts.subtitle, w/2, Math.round(h * 0.21), Math.round(w * 0.038), accentCol, "center")
       drawQR((w - qrSize)/2, qrY, qrSize)
       drawSub(qrUrl, w/2, Math.round(h * 0.82), Math.round(w * 0.028), isDark?"rgba(245,240,232,0.5)":"rgba(26,26,26,0.4)", "center")
+      drawContact(w/2, Math.round(h * 0.92), Math.round(w * 0.026), textCol, "center")
       ctx.fillStyle = accentCol
       ctx.fillRect(Math.round(w*0.1), Math.round(h*0.87), Math.round(w*0.8), Math.round(h*0.005))
     }
@@ -1324,11 +1342,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       const qrDataUrl = await blobToDataUrl(qrBlob)
       // Scale pour la preview (max 300px de large)
       const previewScale = Math.min(1, 280 / tpl.w)
-      await renderSupport(canvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, logoUrl:styleConf.logoUrl, scale:previewScale, theme:SUPP_THEMES.find(t=>t.id===suppTheme) })
+      await renderSupport(canvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, logoUrl:styleConf.logoUrl, scale:previewScale, theme:SUPP_THEMES.find(t=>t.id===suppTheme), phone:suppPhone, website:suppWebsite })
       setSuppRendered(true)
     } catch { setSuppRendered(false) }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [suppTplId, qrUrl, fg, bg, ecLevel, styleConf, suppTitle, suppSubtitle, suppTheme])
+  }, [suppTplId, qrUrl, fg, bg, ecLevel, styleConf, suppTitle, suppSubtitle, suppTheme, suppPhone, suppWebsite])
 
   // Preview LIVE : regenere automatiquement quand un parametre change (debounce)
   useEffect(() => {
@@ -1347,7 +1365,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       if (!qrBlob) throw new Error("qr gen failed")
       const qrDataUrl = await blobToDataUrl(qrBlob)
       const outCanvas = document.createElement("canvas")
-      await renderSupport(outCanvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, scale:2, theme:SUPP_THEMES.find(t=>t.id===suppTheme) })
+      await renderSupport(outCanvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, scale:2, theme:SUPP_THEMES.find(t=>t.id===suppTheme), phone:suppPhone, website:suppWebsite })
       const filename  = `${(tpl.label).replace(/\s+/g,"-").toLowerCase()}-${active?.short_code ?? "qr"}.${fmt}`
       if (fmt === "pdf") {
         // Vrai PDF via jsPDF, oriente selon le support
@@ -3028,6 +3046,21 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       ].map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
+                  <div style={{ display:"flex", gap:7 }}>
+                    <div style={{ flex:1 }}>
+                      <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Telephone</label>
+                      <input value={suppPhone} onChange={e => setSuppPhone(e.target.value)}
+                        placeholder="06 12 34 56 78"
+                        style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none", boxSizing:"border-box" as const }}/>
+                    </div>
+                    <div style={{ flex:1 }}>
+                      <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Site / adresse</label>
+                      <input value={suppWebsite} onChange={e => setSuppWebsite(e.target.value)}
+                        placeholder="monsite.fr"
+                        style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none", boxSizing:"border-box" as const }}/>
+                    </div>
+                  </div>
+                  <p style={{ color:MUTED, fontSize:9, margin:"-2px 0 0", lineHeight:1.4 }}>Laisse vide pour ne rien afficher. Visible sur affiche, flyer, carte, menu, badge et story.</p>
                 </div>
               </div>
 
