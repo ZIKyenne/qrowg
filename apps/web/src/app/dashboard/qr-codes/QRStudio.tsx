@@ -453,6 +453,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [confirmAction,  setConfirmAction]  = useState<{action:string;qrId:string;label:string}|null>(null)
   const [showArchived,   setShowArchived]   = useState(false)
   const [suppTplId,   setSuppTplId]   = useState("a4-poster")
+  const [suppOpenGroup, setSuppOpenGroup] = useState("Affiche")
   const [suppTheme,   setSuppTheme]   = useState("auto")
   const [suppTitle,   setSuppTitle]   = useState("")
   const [suppSubtitle,setSuppSubtitle]= useState("Scannez pour voir le menu")
@@ -1086,46 +1087,51 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   // -- Templates supports imprimables -----------------------------------------
   type SuppTpl = {
     id: string; label: string; emoji: string; w: number; h: number
-    plan: string; cat: string; desc: string
+    plan: string; cat: string; desc: string; support: string
   }
 
   const SUPP_TPLS: SuppTpl[] = [
-    { id:"qr-only",     label:"QR seul",           emoji:"▣", w:800,  h:800,  plan:"free",     cat:"Base",       desc:"QR Code sans decoration" },
-    { id:"a4-poster",   label:"Affiche A4",         emoji:"📋", w:795,  h:1122, plan:"free",     cat:"Print",      desc:"Portrait A4 avec titre et fond" },
-    { id:"flyer",       label:"Flyer",              emoji:"📄", w:795,  h:561,  plan:"free",     cat:"Print",      desc:"Demi A4 paysage" },
-    { id:"sticker",     label:"Sticker vitrine",    emoji:"🏷️",  w:600,  h:600,  plan:"free",     cat:"Print",      desc:"Carré 6cm avec cadre" },
-    { id:"table-card",  label:"Carte de table",     emoji:"🪧",  w:900,  h:506,  plan:"free",      cat:"Restaurant", desc:"Format paysage 9x5cm" },
-    { id:"menu-qr",     label:"Menu QR",            emoji:"🍽",  w:600,  h:900,  plan:"free",      cat:"Restaurant", desc:"Carte portrait avec titre menu" },
-    { id:"business",    label:"Carte de visite",    emoji:"💳", w:1063, h:591,  plan:"free",      cat:"Business",   desc:"Format CR80 standard" },
-    { id:"event-badge", label:"Badge evenement",    emoji:"🎫", w:680,  h:400,  plan:"free",      cat:"Event",      desc:"Badge horizontal 85x50mm" },
-    { id:"story",       label:"Story Instagram",    emoji:"📱", w:1080, h:1920, plan:"free", cat:"Social",     desc:"9:16 vertical stories" },
-    { id:"post",        label:"Post Instagram",     emoji:"🟫", w:1080, h:1080, plan:"free", cat:"Social",     desc:"Carré 1:1" },
+    { id:"qr-only",     label:"QR seul",           emoji:"▣", w:800,  h:800,  plan:"free",     cat:"Base",       desc:"QR Code sans decoration" , support:"QR seul"},
+    { id:"a4-poster",   label:"Affiche A4",         emoji:"📋", w:795,  h:1122, plan:"free",     cat:"Print",      desc:"Portrait A4 avec titre et fond" , support:"Affiche"},
+    { id:"flyer",       label:"Flyer",              emoji:"📄", w:795,  h:561,  plan:"free",     cat:"Print",      desc:"Demi A4 paysage" , support:"Flyer"},
+    { id:"sticker",     label:"Sticker vitrine",    emoji:"🏷️",  w:600,  h:600,  plan:"free",     cat:"Print",      desc:"Carré 6cm avec cadre" , support:"Sticker"},
+    { id:"table-card",  label:"Carte de table",     emoji:"🪧",  w:900,  h:506,  plan:"free",      cat:"Restaurant", desc:"Format paysage 9x5cm" , support:"Carte de table"},
+    { id:"menu-qr",     label:"Menu QR",            emoji:"🍽",  w:600,  h:900,  plan:"free",      cat:"Restaurant", desc:"Carte portrait avec titre menu" , support:"Menu"},
+    { id:"business",    label:"Carte de visite",    emoji:"💳", w:1063, h:591,  plan:"free",      cat:"Business",   desc:"Format CR80 standard" , support:"Carte de visite"},
+    { id:"event-badge", label:"Badge evenement",    emoji:"🎫", w:680,  h:400,  plan:"free",      cat:"Event",      desc:"Badge horizontal 85x50mm" , support:"Badge"},
+    { id:"story",       label:"Story Instagram",    emoji:"📱", w:1080, h:1920, plan:"free", cat:"Social",     desc:"9:16 vertical stories" , support:"Story"},
+    { id:"post",        label:"Post Instagram",     emoji:"🟫", w:1080, h:1080, plan:"free", cat:"Social",     desc:"Carré 1:1" , support:"Post"},
 
     // ===== LOT 15 templates supplementaires =====
   // ---- Print ----
-  { id:"affiche-minimal",     label:"Affiche minimale",   emoji:"🖼️", w:795,  h:1122, plan:"free",     cat:"Print",      desc:"A4 épuré, grand QR centré" },
-  { id:"affiche-premium",     label:"Affiche premium",    emoji:"✨", w:795,  h:1122, plan:"free",      cat:"Print",      desc:"A4 filets dorés, look haut de gamme" },
-  { id:"flyer-paysage",       label:"Flyer paysage",      emoji:"📄", w:795,  h:561,  plan:"free",     cat:"Print",      desc:"Demi-A4, bande latérale + QR" },
+  { id:"affiche-minimal",     label:"Affiche minimale",   emoji:"🖼️", w:795,  h:1122, plan:"free",     cat:"Print",      desc:"A4 épuré, grand QR centré" , support:"Affiche"},
+  { id:"affiche-premium",     label:"Affiche premium",    emoji:"✨", w:795,  h:1122, plan:"free",      cat:"Print",      desc:"A4 filets dorés, look haut de gamme" , support:"Affiche"},
+  { id:"flyer-paysage",       label:"Flyer paysage",      emoji:"📄", w:795,  h:561,  plan:"free",     cat:"Print",      desc:"Demi-A4, bande latérale + QR" , support:"Flyer"},
 
   // ---- Restaurant ----
-  { id:"menu-resto-portrait", label:"Menu resto",         emoji:"🍽️", w:600,  h:900,  plan:"free",     cat:"Restaurant", desc:"Header coloré, QR vers la carte" },
-  { id:"carte-table-resto",   label:"Carte de table",     emoji:"🍴", w:900,  h:506,  plan:"free",      cat:"Restaurant", desc:"Paysage, QR à gauche, texte à droite" },
-  { id:"sticker-avis",        label:"Sticker avis",       emoji:"⭐", w:600,  h:600,  plan:"free",     cat:"Restaurant", desc:"Carré, demande d'avis client" },
+  { id:"menu-resto-portrait", label:"Menu resto",         emoji:"🍽️", w:600,  h:900,  plan:"free",     cat:"Restaurant", desc:"Header coloré, QR vers la carte" , support:"Menu"},
+  { id:"carte-table-resto",   label:"Carte de table",     emoji:"🍴", w:900,  h:506,  plan:"free",      cat:"Restaurant", desc:"Paysage, QR à gauche, texte à droite" , support:"Carte de table"},
+  { id:"sticker-avis",        label:"Sticker avis",       emoji:"⭐", w:600,  h:600,  plan:"free",     cat:"Restaurant", desc:"Carré, demande d'avis client" , support:"Sticker"},
 
   // ---- Business ----
-  { id:"carte-visite-classic",label:"Carte de visite",    emoji:"💼", w:1063, h:591,  plan:"free",      cat:"Business",   desc:"CR80, split coloré + QR" },
-  { id:"carte-visite-dark",   label:"Carte premium",      emoji:"🥇", w:1063, h:591,  plan:"free", cat:"Business",   desc:"CR80, cadre doré, ultra premium" },
+  { id:"carte-visite-classic",label:"Carte de visite",    emoji:"💼", w:1063, h:591,  plan:"free",      cat:"Business",   desc:"CR80, split coloré + QR" , support:"Carte de visite"},
+  { id:"carte-visite-dark",   label:"Carte premium",      emoji:"🥇", w:1063, h:591,  plan:"free", cat:"Business",   desc:"CR80, cadre doré, ultra premium" , support:"Carte de visite"},
 
   // ---- Event ----
-  { id:"badge-event-pro",     label:"Badge événement",    emoji:"🎫", w:680,  h:400,  plan:"free",      cat:"Event",      desc:"Badge header coloré + QR" },
-  { id:"affiche-event",       label:"Affiche événement",  emoji:"🎉", w:795,  h:1122, plan:"free",      cat:"Event",      desc:"A4 bold, grand header" },
-  { id:"carte-table-event",   label:"Carte table event",  emoji:"📋", w:900,  h:506,  plan:"free",      cat:"Event",      desc:"Paysage, QR centré, filets" },
-  { id:"badge-nominatif",     label:"Badge nominatif",    emoji:"🪪", w:680,  h:400,  plan:"free", cat:"Event",      desc:"Badge avec nom du participant" },
+  { id:"badge-event-pro",     label:"Badge événement",    emoji:"🎫", w:680,  h:400,  plan:"free",      cat:"Event",      desc:"Badge header coloré + QR" , support:"Badge"},
+  { id:"affiche-event",       label:"Affiche événement",  emoji:"🎉", w:795,  h:1122, plan:"free",      cat:"Event",      desc:"A4 bold, grand header" , support:"Affiche"},
+    { id:"affiche-centre",  label:"Affiche centrée",     emoji:"🖼️", w:800, h:1131, plan:"free",     cat:"Print", desc:"Titre centré, QR encadré", support:"Affiche" },
+    { id:"affiche-cadre",   label:"Affiche cadre",       emoji:"🖼️", w:800, h:1131, plan:"free",     cat:"Print", desc:"Cadre élégant, ornements", support:"Affiche" },
+    { id:"affiche-bandeau", label:"Affiche bandeau",     emoji:"🖼️", w:800, h:1131, plan:"pro",      cat:"Print", desc:"QR en haut, bande de couleur", support:"Affiche" },
+    { id:"affiche-split",   label:"Affiche split",       emoji:"🖼️", w:800, h:1131, plan:"pro",      cat:"Print", desc:"Colonne couleur + QR", support:"Affiche" },
+    { id:"affiche-ticket",  label:"Affiche ticket",      emoji:"🎟️", w:800, h:1131, plan:"business", cat:"Print", desc:"Style billet, perforations", support:"Affiche" },
+  { id:"carte-table-event",   label:"Carte table event",  emoji:"📋", w:900,  h:506,  plan:"free",      cat:"Event",      desc:"Paysage, QR centré, filets" , support:"Carte de table"},
+  { id:"badge-nominatif",     label:"Badge nominatif",    emoji:"🪪", w:680,  h:400,  plan:"free", cat:"Event",      desc:"Badge avec nom du participant" , support:"Badge"},
 
   // ---- Social ----
-  { id:"story-insta",         label:"Story Instagram",    emoji:"📱", w:1080, h:1920, plan:"free",      cat:"Social",     desc:"9:16, QR centré, bandes translucides" },
-  { id:"post-insta",          label:"Post Instagram",     emoji:"🟧", w:1080, h:1080, plan:"free",     cat:"Social",     desc:"1:1, QR cadré" },
-  { id:"story-promo",         label:"Story promo",        emoji:"🔥", w:1080, h:1920, plan:"free",      cat:"Social",     desc:"9:16, gros header promo, QR bas" },
+  { id:"story-insta",         label:"Story Instagram",    emoji:"📱", w:1080, h:1920, plan:"free",      cat:"Social",     desc:"9:16, QR centré, bandes translucides" , support:"Story"},
+  { id:"post-insta",          label:"Post Instagram",     emoji:"🟧", w:1080, h:1080, plan:"free",     cat:"Social",     desc:"1:1, QR cadré" , support:"Post"},
+  { id:"story-promo",         label:"Story promo",        emoji:"🔥", w:1080, h:1920, plan:"free",      cat:"Social",     desc:"9:16, gros header promo, QR bas" , support:"Story"},
   ]
 
   // -- Rendu d'un support sur canvas ----------------------------------------
@@ -1231,6 +1237,63 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       ctx.fillStyle = color; ctx.font = `500 ${size}px 'Arial', sans-serif`; ctx.textAlign = align
       ctx.fillText(contactStr, x + offX, y + offY, maxW ?? w * 0.85)
       ctx.textAlign = "left"
+    }
+
+    // -- Helpers premium (variantes abouties) -------------------------------
+    const shade = (hex: string, amt: number) => {
+      if (!/^#[0-9a-fA-F]{6}$/.test(hex)) return hex
+      const n = parseInt(hex.slice(1), 16)
+      const cl = (v: number) => Math.max(0, Math.min(255, v))
+      const r = cl((n >> 16) + amt), g = cl(((n >> 8) & 255) + amt), b = cl((n & 255) + amt)
+      return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
+    }
+    const isDarkHex = (hex: string) => /^#/.test(hex) && parseInt(hex.replace("#","").slice(0,2), 16) < 128
+    const rr = (x: number, y: number, ww: number, hh: number, r: number) => {
+      ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+ww,y,x+ww,y+hh,r); ctx.arcTo(x+ww,y+hh,x,y+hh,r)
+      ctx.arcTo(x,y+hh,x,y,r); ctx.arcTo(x,y,x+ww,y,r); ctx.closePath()
+    }
+    const shadowOn = (blur: number, oy: number, col = "rgba(0,0,0,0.18)") => { ctx.shadowColor = col; ctx.shadowBlur = blur; ctx.shadowOffsetY = oy }
+    const shadowOff = () => { ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0 }
+    const drawLabel = (text: string, x: number, y: number, size: number, color: string, align: CanvasTextAlign = "center") => {
+      if (!text) return
+      ctx.fillStyle = color; ctx.font = `700 ${size}px 'Arial', sans-serif`; ctx.textAlign = align
+      try { (ctx as unknown as { letterSpacing: string }).letterSpacing = `${Math.max(2, Math.round(size*0.32))}px` } catch { /* noop */ }
+      ctx.fillText(text.toUpperCase(), x + offX, y + offY)
+      try { (ctx as unknown as { letterSpacing: string }).letterSpacing = "0px" } catch { /* noop */ }
+      ctx.textAlign = "left"
+    }
+    // Titre qui retrecit pour tenir sur une ligne (pas de compression)
+    const drawTitleFit = (text: string, x: number, y: number, maxSize: number, color: string, align: CanvasTextAlign = "center", maxW = w*0.85) => {
+      if (!text) return
+      const col = opts.titleColor && opts.titleColor.trim() ? opts.titleColor : color
+      let s = maxSize; ctx.font = `700 ${s}px '${titleFont}', Georgia, serif`
+      while (s > maxSize*0.55 && ctx.measureText(text).width > maxW) { s -= 2; ctx.font = `700 ${s}px '${titleFont}', Georgia, serif` }
+      ctx.fillStyle = col; ctx.textAlign = align; ctx.fillText(text, x + offX, y + offY); ctx.textAlign = "left"
+    }
+    // Titre multi-lignes, renvoie le Y de la derniere ligne
+    const drawTitleWrap = (text: string, x: number, y: number, size: number, lineH: number, color: string, align: CanvasTextAlign, maxW: number) => {
+      const col = opts.titleColor && opts.titleColor.trim() ? opts.titleColor : color
+      ctx.fillStyle = col; ctx.font = `700 ${size}px '${titleFont}', Georgia, serif`; ctx.textAlign = align
+      const words = (text || "").split(" "); let line = "", yy = y
+      for (const wd of words) { const t = line ? line+" "+wd : wd; if (ctx.measureText(t).width > maxW && line) { ctx.fillText(line, x + offX, yy + offY); line = wd; yy += lineH } else line = t }
+      if (line) ctx.fillText(line, x + offX, yy + offY)
+      ctx.textAlign = "left"; return yy
+    }
+    // Separateur ornemental : ligne - losange - ligne
+    const drawOrn = (cx: number, y: number, half: number, color: string) => {
+      ctx.fillStyle = color
+      ctx.fillRect(cx - half + offX, y - 1.5 + offY, half - 18, 3)
+      ctx.fillRect(cx + 18 + offX, y - 1.5 + offY, half - 18, 3)
+      ctx.save(); ctx.translate(cx + offX, y + offY); ctx.rotate(Math.PI/4); ctx.fillRect(-6, -6, 12, 12); ctx.restore()
+    }
+    // QR dans une carte blanche arrondie avec ombre douce
+    const drawQRFramed = (x: number, y: number, size: number) => {
+      if (!qrImg) return
+      x += offX; y += offY
+      const m = Math.round(size * 0.06)
+      ctx.fillStyle = "#FFFFFF"; shadowOn(28, 10, "rgba(0,0,0,0.22)")
+      rr(x - m, y - m, size + m*2, size + m*2, 14); ctx.fill(); shadowOff()
+      ctx.drawImage(qrImg, x, y, size, size)
     }
 
     // -- A4 Poster ----------------------------------------------------------
@@ -1536,6 +1599,91 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     drawQR((w-s)/2, Math.round(h*0.56), s)
     drawSub("Scannez pour en profiter", w/2, Math.round(h*0.56)+s+Math.round(h*0.04), Math.round(w*0.032), textCol, "center")
     drawContact(w/2, Math.round(h*0.9), Math.round(w*0.026), textCol, "center")
+  }
+
+  // ===== Affiches abouties =====
+  else if (tpl.id === "affiche-centre") {
+    const k = w/800, T = opts.title || active?.pages?.title || ""
+    ctx.fillStyle = bgColor; ctx.fillRect(0,0,w,h)
+    drawLabel("Établissement", w/2, 150*k, 16*k, accentCol)
+    drawTitleFit(T, w/2, 250*k, 82*k, textCol, "center", w*0.86)
+    drawOrn(w/2, 300*k, 90*k, accentCol)
+    drawSub(opts.subtitle, w/2, 360*k, 27*k, isDark?"rgba(245,240,232,0.8)":"rgba(42,36,25,0.75)", "center", w*0.78)
+    const s = 400*k, x = (w-s)/2, y = 440*k, p = 42*k
+    ctx.fillStyle = isDark?"rgba(255,255,255,0.05)":"#FFFFFF"; shadowOn(40*k,16*k, isDark?"rgba(0,0,0,0.45)":"rgba(0,0,0,0.12)")
+    rr(x-p, y-p, s+p*2, s+p*2, 22*k); ctx.fill(); shadowOff()
+    ctx.strokeStyle = accentCol; ctx.lineWidth = 1; rr(x-p+10*k, y-p+10*k, s+p*2-20*k, s+p*2-20*k, 16*k); ctx.stroke()
+    drawQR(x, y, s)
+    drawLabel("Scannez pour découvrir", w/2, y+s+p+58*k, 15*k, accentCol)
+    ctx.fillStyle = isDark?"rgba(245,240,232,0.18)":"rgba(42,36,25,0.15)"; ctx.fillRect(w/2-120*k, h-130*k, 240*k, 1)
+    drawContact(w/2, h-90*k, 21*k, isDark?"rgba(245,240,232,0.6)":"rgba(42,36,25,0.6)", "center")
+  }
+  else if (tpl.id === "affiche-bandeau") {
+    const k = w/800, T = opts.title || active?.pages?.title || ""
+    ctx.fillStyle = bgColor; ctx.fillRect(0,0,w,h)
+    drawLabel("Bienvenue", w/2, 120*k, 15*k, accentCol)
+    drawTitleFit(T, w/2, 200*k, 66*k, textCol, "center", w*0.86)
+    drawOrn(w/2, 250*k, 80*k, accentCol)
+    const s = 400*k; drawQRFramed((w-s)/2, 300*k, s)
+    const by = Math.round(h*0.72)
+    const g = ctx.createLinearGradient(0,by,0,h); g.addColorStop(0, accentCol); g.addColorStop(1, shade(accentCol,-18))
+    ctx.fillStyle = g; ctx.fillRect(0, by, w, h-by)
+    ctx.fillStyle = "rgba(255,255,255,0.25)"; ctx.fillRect(0, by, w, 2)
+    const on = isDarkHex(accentCol) ? "#FFFFFF" : "#0A0A0A"
+    drawSub(opts.subtitle, w/2, by+85*k, 30*k, on, "center", w*0.82)
+    drawLabel("Scannez le code ci-dessus", w/2, by+135*k, 13*k, on)
+    drawContact(w/2, h-65*k, 21*k, on, "center")
+  }
+  else if (tpl.id === "affiche-cadre") {
+    const k = w/800, T = opts.title || active?.pages?.title || ""
+    ctx.fillStyle = bgColor; ctx.fillRect(0,0,w,h)
+    ctx.strokeStyle = accentCol; ctx.lineWidth = 2.5*k; ctx.strokeRect(42*k,42*k,w-84*k,h-84*k)
+    ctx.lineWidth = 1; ctx.strokeRect(56*k,56*k,w-112*k,h-112*k)
+    ;[[56*k,56*k],[w-56*k,56*k],[56*k,h-56*k],[w-56*k,h-56*k]].forEach(([cx,cy]) => { ctx.fillStyle = accentCol; ctx.save(); ctx.translate(cx,cy); ctx.rotate(Math.PI/4); ctx.fillRect(-7*k,-7*k,14*k,14*k); ctx.restore() })
+    drawLabel("Établissement", w/2, 160*k, 15*k, accentCol)
+    drawTitleFit(T, w/2, 250*k, 80*k, textCol, "center", w*0.74)
+    drawOrn(w/2, 300*k, 80*k, accentCol)
+    drawSub(opts.subtitle, w/2, 358*k, 25*k, isDark?"rgba(245,240,232,0.8)":"rgba(42,36,25,0.72)", "center", w*0.7)
+    const s = 380*k; drawQRFramed((w-s)/2, 430*k, s)
+    drawLabel("Scannez-moi", w/2, 430*k+s+70*k, 15*k, textCol)
+    ctx.fillStyle = isDark?"rgba(245,240,232,0.18)":"rgba(42,36,25,0.15)"; ctx.fillRect(w/2-110*k, h-145*k, 220*k, 1)
+    drawContact(w/2, h-110*k, 20*k, isDark?"rgba(245,240,232,0.6)":"rgba(42,36,25,0.6)", "center")
+  }
+  else if (tpl.id === "affiche-split") {
+    const k = w/800, T = opts.title || active?.pages?.title || ""
+    ctx.fillStyle = bgColor; ctx.fillRect(0,0,w,h)
+    const cw = w*0.46
+    const g = ctx.createLinearGradient(0,0,0,h); g.addColorStop(0, accentCol); g.addColorStop(1, shade(accentCol,-16))
+    ctx.fillStyle = g; ctx.fillRect(0,0,cw,h)
+    ctx.fillStyle = "rgba(255,255,255,0.12)"; ctx.fillRect(cw-1, 0, 2, h)
+    const on = isDarkHex(accentCol) ? "#FFFFFF" : "#0A0A0A"
+    drawLabel("Établissement", 54*k, 150*k, 14*k, on, "left")
+    const tb = drawTitleWrap(T, 54*k, 240*k, 56*k, 56*k, on, "left", cw-100*k)
+    ctx.fillStyle = on; ctx.fillRect(54*k, tb+34*k, 80*k, 3)
+    drawSub(opts.subtitle, 54*k, tb+90*k, 22*k, on, "left", cw-100*k)
+    ctx.fillStyle = isDarkHex(accentCol)?"rgba(255,255,255,0.3)":"rgba(0,0,0,0.25)"; ctx.fillRect(54*k, h-130*k, cw-108*k, 1)
+    drawContact(54*k, h-95*k, 17*k, on, "left", cw-90*k)
+    const s = Math.min((w-cw)*0.78, 360*k), x = cw + ((w-cw)-s)/2, y = (h-s)/2 - 20*k
+    drawQRFramed(x, y, s)
+    drawLabel("Scannez-moi", cw+(w-cw)/2, y+s+70*k, 14*k, textCol)
+  }
+  else if (tpl.id === "affiche-ticket") {
+    const k = w/800, T = opts.title || active?.pages?.title || ""
+    ctx.fillStyle = bgColor; ctx.fillRect(0,0,w,h)
+    const cx = 86*k, cw = w-172*k, cy = 120*k, ch = h-240*k
+    ctx.fillStyle = isDark?"#15140F":"#FFFFFF"; shadowOn(45*k,18*k, isDark?"rgba(0,0,0,0.5)":"rgba(0,0,0,0.14)")
+    rr(cx, cy, cw, ch, 24*k); ctx.fill(); shadowOff()
+    ctx.strokeStyle = accentCol; ctx.lineWidth = 1.5; rr(cx+8*k, cy+8*k, cw-16*k, ch-16*k, 18*k); ctx.stroke()
+    const onC = isDark ? "#F5F0E8" : "#1A1A1A"
+    drawLabel("Invitation", w/2, cy+72*k, 15*k, accentCol)
+    drawTitleFit(T, w/2, cy+158*k, 66*k, onC, "center", cw-90*k)
+    drawSub(opts.subtitle, w/2, cy+212*k, 23*k, isDark?"rgba(245,240,232,0.75)":"rgba(42,36,25,0.7)", "center", cw-90*k)
+    const sy = cy+268*k; ctx.strokeStyle = accentCol; ctx.setLineDash([9*k,8*k]); ctx.lineWidth = 2
+    ctx.beginPath(); ctx.moveTo(cx+34*k, sy); ctx.lineTo(cx+cw-34*k, sy); ctx.stroke(); ctx.setLineDash([])
+    ctx.fillStyle = bgColor; ctx.beginPath(); ctx.arc(cx, sy, 17*k, 0, 7); ctx.fill(); ctx.beginPath(); ctx.arc(cx+cw, sy, 17*k, 0, 7); ctx.fill()
+    const s = 300*k; drawQRFramed((w-s)/2, sy+48*k, s)
+    drawLabel("Scannez pour réserver", w/2, sy+48*k+s+52*k, 14*k, accentCol)
+    drawContact(w/2, h-78*k, 19*k, isDark?"rgba(245,240,232,0.6)":"rgba(42,36,25,0.6)", "center")
   }
 
   }
@@ -3221,31 +3369,49 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:700, margin:"0 0 3px" }}>Modeles prets a imprimer</p>
               <p style={{ color:MUTED, fontSize:10, margin:"0 0 10px", lineHeight:1.4 }}>Votre QR place dans un support fini : carte, flyer, affiche, sticker...</p>
               <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Support</p>
-              <div className="qr-scroll" style={{ display:"flex", flexDirection:"column", gap:4, maxHeight:220, overflowY:"auto" }}>
-                {SUPP_TPLS.map(t => {
-                  const can   = PLAN_RANK[userPlan] >= PLAN_RANK[t.plan]
-                  const isA   = t.id === suppTplId
-                  const badge = t.plan === "free" ? null : t.plan === "pro" ? "PRO" : "BIZ"
-                  return (
-                    <button key={t.id} type="button"
-                      onClick={() => setSuppTplId(t.id)}
-                      style={{ display:"flex", alignItems:"center", gap:8, padding:"7px 9px", background:isA?"rgba(201,168,76,0.08)":"rgba(255,255,255,0.02)", border:`1px solid ${isA?"rgba(201,168,76,0.3)":"rgba(255,255,255,0.06)"}`, borderRadius:8, cursor:"pointer", textAlign:"left" as const, opacity:can?1:0.6, position:"relative" as const }}>
-                      <span style={{ fontSize:16, flexShrink:0 }}>{t.emoji}</span>
-                      <div style={{ flex:1, minWidth:0 }}>
-                        <p style={{ color:isA?G:"#F5F0E8", fontSize:11, fontWeight:isA?700:500, margin:"0 0 1px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
-                          {t.label}
-                        </p>
-                        <p style={{ color:MUTED, fontSize:9, margin:0 }}>{t.desc}</p>
+              <div className="qr-scroll" style={{ display:"flex", flexDirection:"column", gap:5, maxHeight:300, overflowY:"auto" }}>
+                {(() => {
+                  const groups: { name: string; items: SuppTpl[] }[] = []
+                  SUPP_TPLS.forEach(t => { let g = groups.find(x => x.name === t.support); if (!g) { g = { name:t.support, items:[] }; groups.push(g) } g.items.push(t) })
+                  return groups.map(grp => {
+                    const open = suppOpenGroup === grp.name
+                    const hasSel = grp.items.some(t => t.id === suppTplId)
+                    return (
+                      <div key={grp.name}>
+                        <button type="button" onClick={() => setSuppOpenGroup(open ? "" : grp.name)}
+                          style={{ width:"100%", display:"flex", alignItems:"center", gap:8, padding:"8px 9px", background:open?"rgba(201,168,76,0.07)":"rgba(255,255,255,0.02)", border:`1px solid ${hasSel?"rgba(201,168,76,0.3)":"rgba(255,255,255,0.07)"}`, borderRadius:8, cursor:"pointer", textAlign:"left" as const }}>
+                          <span style={{ fontSize:16, flexShrink:0 }}>{grp.items[0].emoji}</span>
+                          <span style={{ flex:1, color:hasSel?G:"#F5F0E8", fontSize:12, fontWeight:700 }}>{grp.name}</span>
+                          <span style={{ color:MUTED, fontSize:9 }}>{grp.items.length} style{grp.items.length>1?"s":""}</span>
+                          <ChevronRight size={13} color={open?G:MUTED} style={{ transform: open?"rotate(90deg)":"rotate(0deg)", transition:"transform 0.2s", flexShrink:0 }}/>
+                        </button>
+                        {open && (
+                          <div style={{ display:"flex", flexDirection:"column", gap:4, padding:"6px 0 6px 10px", marginLeft:6, borderLeft:"1px solid rgba(201,168,76,0.15)" }}>
+                            {grp.items.map(t => {
+                              const can = PLAN_RANK[userPlan] >= PLAN_RANK[t.plan]
+                              const isA = t.id === suppTplId
+                              const badge = t.plan === "free" ? null : t.plan === "pro" ? "PRO" : "BIZ"
+                              return (
+                                <button key={t.id} type="button"
+                                  onClick={() => can ? setSuppTplId(t.id) : setUpsell({ feature:`le modèle « ${t.label} »`, plan:t.plan })}
+                                  style={{ display:"flex", alignItems:"center", gap:8, padding:"6px 9px", background:isA?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isA?"rgba(201,168,76,0.35)":"rgba(255,255,255,0.06)"}`, borderRadius:7, cursor:"pointer", textAlign:"left" as const, opacity:can?1:0.65, position:"relative" as const }}>
+                                  <div style={{ flex:1, minWidth:0 }}>
+                                    <p style={{ color:isA?G:"#F5F0E8", fontSize:11, fontWeight:isA?700:500, margin:"0 0 1px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>{t.label}</p>
+                                    <p style={{ color:MUTED, fontSize:8.5, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>{t.desc}</p>
+                                  </div>
+                                  {badge && (
+                                    <span style={{ background:can?(t.plan==="pro"?"rgba(201,168,76,0.15)":"rgba(57,255,143,0.12)"):"rgba(255,255,255,0.06)", borderRadius:4, padding:"1px 5px", fontSize:7, color:can?(t.plan==="pro"?G:"#39FF8F"):MUTED, fontWeight:800, flexShrink:0 }}>{badge}</span>
+                                  )}
+                                  {!can && <Lock size={10} color={MUTED} style={{ flexShrink:0 }}/>}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        )}
                       </div>
-                      {badge && (
-                        <span style={{ background:can?(t.plan==="pro"?"rgba(201,168,76,0.15)":"rgba(57,255,143,0.12)"):"rgba(255,255,255,0.06)", borderRadius:4, padding:"1px 5px", fontSize:7, color:can?(t.plan==="pro"?G:"#39FF8F"):MUTED, fontWeight:800, flexShrink:0 }}>
-                          {badge}
-                        </span>
-                      )}
-                      {!can && <Lock size={10} color={MUTED} style={{ flexShrink:0 }}/>}
-                    </button>
-                  )
-                })}
+                    )
+                  })
+                })()}
               </div>
             </div>
 
