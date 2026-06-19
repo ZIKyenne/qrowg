@@ -462,6 +462,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [suppFont,     setSuppFont]     = useState("Cormorant Garamond")
   const [suppSubFont,  setSuppSubFont]  = useState("Arial")
   const [suppTracking, setSuppTracking] = useState(0)
+  const [suppTitleSize, setSuppTitleSize] = useState(1)
+  const [suppSubSize,   setSuppSubSize]   = useState(1)
   const [suppTitleColor, setSuppTitleColor] = useState("")
   const [suppSubColor,   setSuppSubColor]   = useState("")
   const [suppOffX,     setSuppOffX]     = useState(0)
@@ -1147,7 +1149,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   async function renderSupport(
     canvas: HTMLCanvasElement,
     tpl: SuppTpl,
-    opts: { title: string; subtitle: string; qrDataUrl: string; logoUrl?: string; scale?: number; theme?: SuppTheme; phone?: string; website?: string; font?: string; titleColor?: string; subColor?: string; offX?: number; offY?: number; subFont?: string; tracking?: number }
+    opts: { title: string; subtitle: string; qrDataUrl: string; logoUrl?: string; scale?: number; theme?: SuppTheme; phone?: string; website?: string; font?: string; titleColor?: string; subColor?: string; offX?: number; offY?: number; subFont?: string; tracking?: number; titleScale?: number; subScale?: number }
   ): Promise<void> {
     const sc  = opts.scale ?? 1
     const w   = Math.round(tpl.w * sc)
@@ -1207,6 +1209,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const titleFont = opts.font && opts.font.trim() ? opts.font : "Cormorant Garamond"
     const subFont   = opts.subFont && opts.subFont.trim() ? opts.subFont : "Arial"
     const trk       = Math.max(0, opts.tracking ?? 0)
+    const tScale    = opts.titleScale ?? 1
+    const sScale    = opts.subScale ?? 1
     const setTrk = (px: number) => { try { (ctx as unknown as { letterSpacing: string }).letterSpacing = `${px}px` } catch { /* noop */ } }
 
     const drawQR = (x: number, y: number, size: number) => {
@@ -1224,7 +1228,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const drawTitle = (text: string, x: number, y: number, size: number, color: string, align: CanvasTextAlign = "left", maxW?: number) => {
       if (!text) return
       const col = opts.titleColor && opts.titleColor.trim() ? opts.titleColor : color
-      ctx.fillStyle = col; ctx.font = `700 ${size}px '${titleFont}', Georgia, 'Times New Roman', serif`; ctx.textAlign = align; setTrk(trk)
+      ctx.fillStyle = col; ctx.font = `700 ${size*tScale}px '${titleFont}', Georgia, 'Times New Roman', serif`; ctx.textAlign = align; setTrk(trk)
       ctx.fillText(text, x + offX, y + offY, maxW ?? w * 0.9)
       ctx.textAlign = "left"; setTrk(0)
     }
@@ -1232,7 +1236,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const drawSub = (text: string, x: number, y: number, size: number, color: string, align: CanvasTextAlign = "left", maxW?: number) => {
       if (!text) return
       const col = (opts.subColor && opts.subColor.trim() && text === opts.subtitle) ? opts.subColor : color
-      ctx.fillStyle = col; ctx.font = `400 ${size}px '${subFont}', Arial, sans-serif`; ctx.textAlign = align; setTrk(trk)
+      ctx.fillStyle = col; ctx.font = `400 ${size*sScale}px '${subFont}', Arial, sans-serif`; ctx.textAlign = align; setTrk(trk)
       ctx.fillText(text, x + offX, y + offY, maxW ?? w * 0.85)
       ctx.textAlign = "left"; setTrk(0)
     }
@@ -1278,16 +1282,16 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const drawTitleFit = (text: string, x: number, y: number, maxSize: number, color: string, align: CanvasTextAlign = "center", maxW = w*0.85) => {
       if (!text) return
       const col = opts.titleColor && opts.titleColor.trim() ? opts.titleColor : color
-      let s = maxSize; setTrk(trk); ctx.font = `700 ${s}px '${titleFont}', Georgia, serif`
-      while (s > maxSize*0.55 && ctx.measureText(text).width > maxW) { s -= 2; ctx.font = `700 ${s}px '${titleFont}', Georgia, serif` }
+      let s = maxSize*tScale; setTrk(trk); ctx.font = `700 ${s}px '${titleFont}', Georgia, serif`
+      while (s > maxSize*tScale*0.55 && ctx.measureText(text).width > maxW) { s -= 2; ctx.font = `700 ${s}px '${titleFont}', Georgia, serif` }
       ctx.fillStyle = col; ctx.textAlign = align; ctx.fillText(text, x + offX, y + offY); ctx.textAlign = "left"; setTrk(0)
     }
     // Titre multi-lignes, renvoie le Y de la derniere ligne
     const drawTitleWrap = (text: string, x: number, y: number, size: number, lineH: number, color: string, align: CanvasTextAlign, maxW: number) => {
       const col = opts.titleColor && opts.titleColor.trim() ? opts.titleColor : color
-      ctx.fillStyle = col; ctx.font = `700 ${size}px '${titleFont}', Georgia, serif`; ctx.textAlign = align; setTrk(trk)
-      const words = (text || "").split(" "); let line = "", yy = y
-      for (const wd of words) { const t = line ? line+" "+wd : wd; if (ctx.measureText(t).width > maxW && line) { ctx.fillText(line, x + offX, yy + offY); line = wd; yy += lineH } else line = t }
+      ctx.fillStyle = col; ctx.font = `700 ${size*tScale}px '${titleFont}', Georgia, serif`; ctx.textAlign = align; setTrk(trk)
+      const words = (text || "").split(" "); let line = "", yy = y; const lh = lineH*tScale
+      for (const wd of words) { const t = line ? line+" "+wd : wd; if (ctx.measureText(t).width > maxW && line) { ctx.fillText(line, x + offX, yy + offY); line = wd; yy += lh } else line = t }
       if (line) ctx.fillText(line, x + offX, yy + offY)
       ctx.textAlign = "left"; setTrk(0); return yy
     }
@@ -1815,11 +1819,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       // Scale pour la preview (max 300px de large)
       // Rendre l'apercu en HAUTE resolution (net), le CSS le reduit a la colonne
       const previewScale = Math.min(2.5, 760 / tpl.w)
-      await renderSupport(canvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, logoUrl:styleConf.logoUrl, scale:previewScale, theme:SUPP_THEMES.find(t=>t.id===suppTheme), phone:suppPhone, website:suppWebsite, font:suppFont, titleColor:suppTitleColor, subColor:suppSubColor, offX:suppOffX, offY:suppOffY, subFont:suppSubFont, tracking:suppTracking })
+      await renderSupport(canvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, logoUrl:styleConf.logoUrl, scale:previewScale, theme:SUPP_THEMES.find(t=>t.id===suppTheme), phone:suppPhone, website:suppWebsite, font:suppFont, titleColor:suppTitleColor, subColor:suppSubColor, offX:suppOffX, offY:suppOffY, subFont:suppSubFont, tracking:suppTracking, titleScale:suppTitleSize, subScale:suppSubSize })
       setSuppRendered(true)
     } catch { setSuppRendered(false) }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [suppTplId, qrUrl, fg, bg, ecLevel, styleConf, suppTitle, suppSubtitle, suppTheme, suppPhone, suppWebsite, suppFont, suppTitleColor, suppSubColor, suppOffX, suppOffY, suppSubFont, suppTracking])
+  }, [suppTplId, qrUrl, fg, bg, ecLevel, styleConf, suppTitle, suppSubtitle, suppTheme, suppPhone, suppWebsite, suppFont, suppTitleColor, suppSubColor, suppOffX, suppOffY, suppSubFont, suppTracking, suppTitleSize, suppSubSize])
 
   // Charger des polices Google pour les imprimables (titre + sous-titre)
   useEffect(() => {
@@ -1849,7 +1853,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       const qrDataUrl = await blobToDataUrl(qrBlob)
       try { const d = (document as Document & { fonts?: { load: (f: string) => Promise<unknown> } }); if (d.fonts) { await Promise.all([d.fonts.load(`700 32px '${suppFont}'`), d.fonts.load(`400 24px '${suppSubFont}'`)]) } } catch { /* noop */ }
       const outCanvas = document.createElement("canvas")
-      await renderSupport(outCanvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, scale:2, theme:SUPP_THEMES.find(t=>t.id===suppTheme), phone:suppPhone, website:suppWebsite, font:suppFont, titleColor:suppTitleColor, subColor:suppSubColor, offX:suppOffX, offY:suppOffY, subFont:suppSubFont, tracking:suppTracking })
+      await renderSupport(outCanvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, scale:2, theme:SUPP_THEMES.find(t=>t.id===suppTheme), phone:suppPhone, website:suppWebsite, font:suppFont, titleColor:suppTitleColor, subColor:suppSubColor, offX:suppOffX, offY:suppOffY, subFont:suppSubFont, tracking:suppTracking, titleScale:suppTitleSize, subScale:suppSubSize })
       const filename  = `${(tpl.label).replace(/\s+/g,"-").toLowerCase()}-${active?.short_code ?? "qr"}.${fmt}`
       if (fmt === "pdf") {
         // Vrai PDF via jsPDF, oriente selon le support
@@ -2294,42 +2298,6 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       {/* -- COL 1 : Liste ------------------------------------------------------ */}
       <div className="qr-col-list" style={{ borderRight:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", overflow:"hidden" }}>
 
-        {/* Apercu live du support (uniquement onglet Imprimables) */}
-        {activeTab === "supports" && active && (
-          <div style={{ padding:"12px", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0, background:"#0A0907" }}>
-            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
-              <p style={{ color:G, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0, display:"flex", alignItems:"center", gap:5 }}>
-                <Eye size={12}/> Aperçu en direct
-              </p>
-              <span style={{ color:MUTED, fontSize:9 }}>{suppTpl.w}×{suppTpl.h}px</span>
-            </div>
-            <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(201,168,76,0.18)", borderRadius:10, padding:12, display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
-              {suppCanTpl ? (
-                <>
-                  <canvas ref={supportCanvasRef} style={{ maxWidth:"100%", borderRadius:6, display: suppRendered ? "block" : "none" }}/>
-                  {!suppRendered && (
-                    <div style={{ width:"100%", height:150, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:8 }}>
-                      <Loader2 size={20} color={MUTED} style={{ animation:"spin 0.8s linear infinite" }}/>
-                      <p style={{ color:MUTED, fontSize:11, margin:0 }}>Génération de l&apos;aperçu...</p>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div style={{ padding:"18px 0", textAlign:"center" as const }}>
-                  <Lock size={20} color={MUTED} style={{ marginBottom:8 }}/>
-                  <p style={{ color:MUTED, fontSize:11, margin:"0 0 10px" }}>
-                    {suppTpl.plan === "pro" ? "Nécessite le plan Pro" : "Nécessite le plan Business"}
-                  </p>
-                  <button type="button" onClick={() => setUpsell({ feature:`le support « ${suppTpl.label} »`, plan: suppTpl.plan })}
-                    style={{ display:"inline-block", padding:"7px 16px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:8, color:"#080808", fontSize:11, fontWeight:700, cursor:"pointer" }}>
-                    Voir les offres
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
         {/* Header + filtres */}
         <div style={{ padding:"12px 12px 10px", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", gap:8 }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
@@ -2509,7 +2477,36 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             </span>
           )}
         </div>
-        {active ? (() => {
+        {active && activeTab === "supports" ? (
+          <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"24px", gap:14, overflow:"hidden" }}>
+            {suppCanTpl ? (
+              <>
+                <canvas ref={supportCanvasRef} style={{ maxWidth:"100%", maxHeight:"calc(100% - 40px)", borderRadius:10, boxShadow:"0 24px 70px rgba(0,0,0,0.6)", display: suppRendered ? "block" : "none" }}/>
+                {!suppRendered && (
+                  <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:10, height:240 }}>
+                    <Loader2 size={26} color={MUTED} style={{ animation:"spin 0.8s linear infinite" }}/>
+                    <p style={{ color:MUTED, fontSize:12, margin:0 }}>Génération de l&apos;aperçu...</p>
+                  </div>
+                )}
+                <p style={{ color:MUTED, fontSize:11, margin:0, display:"flex", alignItems:"center", gap:6 }}>
+                  <Eye size={12} color={G}/> Aperçu en direct — {suppTpl.label} · {suppTpl.w}×{suppTpl.h}px
+                </p>
+              </>
+            ) : (
+              <div style={{ textAlign:"center" as const, maxWidth:300 }}>
+                <Lock size={28} color={MUTED} style={{ marginBottom:12 }}/>
+                <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:600, margin:"0 0 4px" }}>{suppTpl.label}</p>
+                <p style={{ color:MUTED, fontSize:12, margin:"0 0 14px" }}>
+                  {suppTpl.plan === "pro" ? "Disponible avec le plan Pro" : "Disponible avec le plan Business"}
+                </p>
+                <button type="button" onClick={() => setUpsell({ feature:`le support « ${suppTpl.label} »`, plan: suppTpl.plan })}
+                  style={{ padding:"9px 20px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:9, color:"#080808", fontSize:12, fontWeight:700, cursor:"pointer" }}>
+                  Voir les offres
+                </button>
+              </div>
+            )}
+          </div>
+        ) : active ? (() => {
           const diag = getDiagnostic(diagFg || fg, diagBg || bg)
           return (
             <div className="qr-scroll" style={{ display:"flex", flexDirection:"column", height:"100%", overflowY:"auto" }}>
@@ -3652,6 +3649,18 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none" }}>
                         {fontOpts}
                       </select>
+                    </div>
+                    <div style={{ marginBottom:10 }}>
+                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                        <label style={{ color:MUTED, fontSize:10 }}>Taille du titre</label>
+                        <span style={{ color:MUTED, fontSize:9 }}>{Math.round(suppTitleSize*100)}%</span>
+                      </div>
+                      <input type="range" min={0.6} max={1.6} step={0.05} value={suppTitleSize} onChange={e => setSuppTitleSize(+e.target.value)} style={{ width:"100%", accentColor:G }}/>
+                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginTop:4 }}>
+                        <label style={{ color:MUTED, fontSize:10 }}>Taille du sous-titre</label>
+                        <span style={{ color:MUTED, fontSize:9 }}>{Math.round(suppSubSize*100)}%</span>
+                      </div>
+                      <input type="range" min={0.6} max={1.6} step={0.05} value={suppSubSize} onChange={e => setSuppSubSize(+e.target.value)} style={{ width:"100%", accentColor:G }}/>
                     </div>
                     <ColorField label="Couleur du titre" value={suppTitleColor} onChange={setSuppTitleColor} onClear={() => setSuppTitleColor("")}/>
                     <div style={{ height:8 }}/>
