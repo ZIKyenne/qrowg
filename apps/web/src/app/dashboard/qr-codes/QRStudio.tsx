@@ -1533,7 +1533,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       if (!qrBlob) throw new Error("qr gen failed")
       const qrDataUrl = await blobToDataUrl(qrBlob)
       // Scale pour la preview (max 300px de large)
-      const previewScale = Math.min(1, 280 / tpl.w)
+      // Rendre l'apercu en HAUTE resolution (net), le CSS le reduit a la colonne
+      const previewScale = Math.min(2.5, 760 / tpl.w)
       await renderSupport(canvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, logoUrl:styleConf.logoUrl, scale:previewScale, theme:SUPP_THEMES.find(t=>t.id===suppTheme), phone:suppPhone, website:suppWebsite })
       setSuppRendered(true)
     } catch { setSuppRendered(false) }
