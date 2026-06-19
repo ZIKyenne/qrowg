@@ -2275,6 +2275,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           userPlan={userPlan}
           onClose={() => setEditorOpen(false)}
           onUpsell={(feature, plan) => setUpsell({ feature, plan })}
+          prefill={{
+            name: suppTitle || active.pages?.title || "",
+            phone: suppPhone,
+            website: suppWebsite,
+          }}
         />
       )}
 

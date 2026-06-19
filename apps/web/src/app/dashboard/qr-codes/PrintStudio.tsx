@@ -93,6 +93,8 @@ type Props = {
   userPlan: string
   onClose: () => void
   onUpsell?: (feature: string, plan: string) => void
+  // Donnees deja saisies cote QRStudio, pour pre-remplir les modeles
+  prefill?: { name?: string; phone?: string; website?: string }
 }
 
 // ---- Etat de selection (pour le panneau proprietes) ------------------------
@@ -164,7 +166,7 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
   )
 }
 
-export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpsell }: Props) {
+export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpsell, prefill }: Props) {
   const elRef   = useRef<HTMLCanvasElement>(null)
   const fcRef   = useRef<fabric.Canvas | null>(null)
   const qrUrlRef = useRef(qrDataUrl)
@@ -517,9 +519,17 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     })
     const ICON = (k: string) => LIB_ICONS.find(i => i.key === k)!.d
 
+    // Donnees reelles (deja saisies cote QRStudio) ; sinon placeholders
+    const name    = (prefill?.name ?? "").trim()
+    const phone   = (prefill?.phone ?? "").trim()
+    const website = (prefill?.website ?? "").trim()
+    // Ligne de marque (nom de l'etablissement) ajoutee si dispo
+    const brand = (top: number) => { if (name) addText(name, top, W * 0.038, { font: "Arial", weight: "bold", fill: accent }) }
+
     switch (id) {
       case "avis-or":
       case "avis-clair":
+        brand(H * 0.02)
         addText("Vous avez aimé ?", H * 0.06, W * 0.075, { weight: "bold" })
         addStars(5, H * 0.19, W * 0.07, accent)
         addText("Laissez-nous un avis en 30 secondes", H * 0.27, W * 0.034, { font: "Arial", width: W * 0.72 })
@@ -528,12 +538,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         break
       case "menu":
         fc.add(new fabric.Rect({ left: 0, top: 0, width: W, height: Math.round(H * 0.16), fill: accent }))
-        addText("Notre Carte", H * 0.045, W * 0.085, { weight: "bold", fill: bg })
+        addText(name || "Notre Carte", H * 0.045, W * 0.085, { weight: "bold", fill: bg })
         addText("Scannez pour découvrir nos plats", H * 0.24, W * 0.034, { font: "Arial" })
         await placeQrT(H * 0.34, 0.5)
         addCTA("Voir le menu", H * 0.85)
         break
       case "reserver":
+        brand(H * 0.015)
         await addIconT(ICON("cal"), W * 0.14, H * 0.07, accent)
         addText("Réservez votre table", H * 0.2, W * 0.07, { weight: "bold" })
         addText("En quelques secondes, où que vous soyez", H * 0.28, W * 0.032, { font: "Arial", width: W * 0.72 })
@@ -541,6 +552,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         addCTA("Réservez", H * 0.85)
         break
       case "insta":
+        brand(H * 0.015)
         await addIconT(ICON("cam"), W * 0.14, H * 0.07, accent)
         addText("Suivez-nous", H * 0.2, W * 0.085, { weight: "bold" })
         addText("@votrecompte", H * 0.29, W * 0.04, { font: "Arial", fill: accent })
@@ -548,14 +560,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         addCTA("Suivez-nous", H * 0.85)
         break
       case "contact":
-        addText("Prénom Nom", H * 0.09, W * 0.08, { weight: "bold" })
+        addText(name || "Prénom Nom", H * 0.09, W * 0.08, { weight: "bold" })
         addText("Votre métier", H * 0.18, W * 0.036, { font: "Arial", fill: accent })
         await placeQrT(H * 0.28, 0.5)
-        addText("📞  06 12 34 56 78", H * 0.74, W * 0.034, { font: "Arial" })
-        addText("✉  contact@email.com", H * 0.80, W * 0.034, { font: "Arial" })
-        addText("🌐  monsite.fr", H * 0.86, W * 0.034, { font: "Arial" })
+        addText(`📞  ${phone || "06 12 34 56 78"}`, H * 0.76, W * 0.034, { font: "Arial" })
+        addText(`🌐  ${website || "monsite.fr"}`, H * 0.83, W * 0.034, { font: "Arial" })
         break
       case "decouvrir":
+        brand(H * 0.035)
         addText("Découvrez-nous", H * 0.1, W * 0.08, { weight: "bold" })
         addText("Scannez pour en savoir plus", H * 0.19, W * 0.034, { font: "Arial" })
         await placeQrT(H * 0.3, 0.5)
