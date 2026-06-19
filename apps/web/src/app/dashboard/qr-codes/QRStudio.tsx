@@ -3151,6 +3151,32 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, marginBottom:10, padding:"9px", background:"linear-gradient(90deg, rgba(201,168,76,0.16), rgba(201,168,76,0.06))", border:"1px solid rgba(201,168,76,0.3)", borderRadius:9, color:G, fontSize:12, fontWeight:700, cursor:"pointer" }}>
                       <Sparkles size={13}/> Générer une palette
                     </button>
+                    {/* Palettes en un clic */}
+                    <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:6, marginBottom:12 }}>
+                      {[
+                        { name:"Noir classique", fg:"#0A0A0A", bg:"#FFFFFF" },
+                        { name:"Or & Noir",       fg:"#C9A84C", bg:"#0A0A0A" },
+                        { name:"Corporate",       fg:"#1E3A5F", bg:"#FFFFFF" },
+                        { name:"Néon",            fg:"#39FF14", bg:"#0A0A0A" },
+                        { name:"Crypto",          fg:"#F7931A", bg:"#0A0A0A" },
+                        { name:"Forêt",           fg:"#2D5A3D", bg:"#F2F4EC" },
+                        { name:"Corail",          fg:"#E5634D", bg:"#FFF5F0" },
+                        { name:"Océan",           fg:"#0E5C7F", bg:"#EAF4F8" },
+                        { name:"Bordeaux",        fg:"#6E1423", bg:"#FBF4F1" },
+                        { name:"Minimal",         fg:"#4A4A4A", bg:"#F5F5F5" },
+                      ].map(p => {
+                        const sel = fg.toUpperCase() === p.fg && bg.toUpperCase() === p.bg
+                        return (
+                          <button key={p.name} type="button" onClick={() => { setFg(p.fg); setBg(p.bg) }}
+                            style={{ display:"flex", alignItems:"center", gap:7, padding:"6px 8px", background:sel?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.02)", border:`1px solid ${sel?G:"rgba(255,255,255,0.07)"}`, borderRadius:8, cursor:"pointer", textAlign:"left" as const }}>
+                            <span style={{ width:22, height:22, borderRadius:5, background:p.bg, border:"1px solid rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                              <span style={{ width:11, height:11, borderRadius:2, background:p.fg }}/>
+                            </span>
+                            <span style={{ color:sel?G:"#F5F0E8", fontSize:10, fontWeight:sel?700:500, whiteSpace:"nowrap" as const, overflow:"hidden", textOverflow:"ellipsis" }}>{p.name}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
                     <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                       <ColorField label="QR principal" value={fg} onChange={setFg}/>
                       <ColorField label="Fond"          value={bg} onChange={setBg}/>
