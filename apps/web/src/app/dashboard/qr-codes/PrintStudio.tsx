@@ -19,6 +19,7 @@ import {
   X, Type as TypeIcon, QrCode, Square, Circle as CircleIcon, Minus,
   Copy, Trash2, Lock, Unlock, ChevronUp, ChevronDown,
   Download, Printer, Loader2, Check, Save,
+  Shapes, Star, Award, MousePointerClick, ArrowRight,
 } from "lucide-react"
 
 // ---- Constantes design (Midnight Gold) -------------------------------------
@@ -48,6 +49,42 @@ function editDims(fmt: FormatId) {
 
 // ---- Polices web-safe (rendu canvas fiable) --------------------------------
 const FONTS = ["Georgia", "Arial", "Helvetica", "Times New Roman", "Courier New", "Verdana", "Trebuchet MS", "Impact"]
+
+// ---- Helpers geometrie (etoile / polygone reguliers) -----------------------
+function starPts(spikes: number, outer: number, inner: number): { x: number; y: number }[] {
+  const pts: { x: number; y: number }[] = []
+  let rot = (Math.PI / 2) * 3
+  const step = Math.PI / spikes
+  for (let i = 0; i < spikes; i++) {
+    pts.push({ x: outer + Math.cos(rot) * outer, y: outer + Math.sin(rot) * outer }); rot += step
+    pts.push({ x: outer + Math.cos(rot) * inner, y: outer + Math.sin(rot) * inner }); rot += step
+  }
+  return pts
+}
+function polyPts(sides: number, r: number): { x: number; y: number }[] {
+  const pts: { x: number; y: number }[] = []
+  for (let i = 0; i < sides; i++) {
+    const a = (Math.PI * 2 * i) / sides - Math.PI / 2
+    pts.push({ x: r + r * Math.cos(a), y: r + r * Math.sin(a) })
+  }
+  return pts
+}
+
+// ---- Catalogue d'icones (SVG mono-path => recolorables via le panneau) ------
+const LIB_ICONS: { key: string; label: string; d: string }[] = [
+  { key:"star",  label:"Avis",      d:"M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" },
+  { key:"phone", label:"Téléphone", d:"M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.21z" },
+  { key:"mail",  label:"Email",     d:"M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" },
+  { key:"pin",   label:"Adresse",   d:"M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" },
+  { key:"clock", label:"Horaires",  d:"M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" },
+  { key:"web",   label:"Site web",  d:"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" },
+  { key:"cal",   label:"Réserver",  d:"M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z" },
+  { key:"cam",   label:"Photo",     d:"M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15a5 5 0 110-10 5 5 0 010 10zm0-2a3 3 0 100-6 3 3 0 000 6z" },
+  { key:"heart", label:"J'aime",    d:"M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" },
+  { key:"check", label:"Validé",    d:"M12 2a10 10 0 100 20 10 10 0 000-20zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" },
+  { key:"cart",  label:"Commander", d:"M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 15h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" },
+  { key:"gift",  label:"Offre",     d:"M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 00-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 12 7.4l3.38 4.6L17 10.83 14.92 8H20v6z" },
+]
 
 // ---- Props -----------------------------------------------------------------
 type Props = {
@@ -90,6 +127,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [saving, setSaving]   = useState(false)
   const [saved, setSaved]     = useState(false)
   const [exporting, setExporting] = useState(false)
+  const [libOpen, setLibOpen] = useState(false)
+  const [libCat, setLibCat]   = useState<"cta" | "icons" | "badges" | "shapes" | "arrows">("cta")
 
   const isPro = userPlan === "pro" || userPlan === "business"
 
@@ -252,6 +291,61 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const addRect = () => centerObj(new fabric.Rect({ width: 180, height: 100, fill: G, rx: 6, ry: 6 }))
   const addCircle = () => centerObj(new fabric.Circle({ radius: 60, fill: G }))
   const addLine = () => centerObj(new fabric.Line([0, 0, 200, 0], { stroke: G, strokeWidth: 4 }))
+
+  // ---- Bibliotheque d'elements ---------------------------------------------
+  // Icone : SVG mono-path => Fabric renvoie un Path unique (recolorable via panneau)
+  const addIcon = (d: string) => {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="${d}" fill="${G}"/></svg>`
+    fabric.loadSVGFromString(svg, (objects, options) => {
+      const obj = fabric.util.groupSVGElements(objects, options) as fabric.Object
+      obj.scaleToWidth(110)
+      centerObj(obj)
+    })
+  }
+  // Formes decoratives
+  const addShape = (k: string) => {
+    let o: fabric.Object
+    switch (k) {
+      case "rrect":  o = new fabric.Rect({ width: 220, height: 130, rx: 18, ry: 18, fill: G }); break
+      case "circle": o = new fabric.Circle({ radius: 75, fill: G }); break
+      case "tri":    o = new fabric.Triangle({ width: 160, height: 140, fill: G }); break
+      case "star":   o = new fabric.Polygon(starPts(5, 85, 36), { fill: G }); break
+      case "hexa":   o = new fabric.Polygon(polyPts(6, 85), { fill: G }); break
+      case "banner": o = new fabric.Rect({ width: 300, height: 70, fill: G }); break
+      default:       o = new fabric.Rect({ width: 200, height: 120, fill: G })
+    }
+    centerObj(o)
+  }
+  // Bouton CTA (forme + texte groupes)
+  const addCTA = (label: string) => {
+    const rect = new fabric.Rect({ width: 320, height: 80, rx: 40, ry: 40, fill: G })
+    const txt  = new fabric.Text(label, { fontSize: 30, fontFamily: "DM Sans", fontWeight: "bold", fill: "#080808", originX: "center", originY: "center", left: 160, top: 40 })
+    centerObj(new fabric.Group([rect, txt]))
+  }
+  // Badge rond (sceau cranté) ou ruban (fanion)
+  const addBadge = (label: string, kind: "seal" | "ribbon") => {
+    if (kind === "seal") {
+      const burst = new fabric.Polygon(starPts(16, 95, 80), { fill: G })
+      const txt   = new fabric.Text(label, { fontSize: 26, fontFamily: "DM Sans", fontWeight: "bold", fill: "#080808", originX: "center", originY: "center", left: 95, top: 95 })
+      centerObj(new fabric.Group([burst, txt]))
+    } else {
+      const W = 300, H = 74, N = 30
+      const ribbon = new fabric.Polygon([
+        { x: 0, y: 0 }, { x: W, y: 0 }, { x: W - N, y: H / 2 }, { x: W, y: H }, { x: 0, y: H }, { x: N, y: H / 2 },
+      ], { fill: G })
+      const txt = new fabric.Text(label, { fontSize: 28, fontFamily: "DM Sans", fontWeight: "bold", fill: "#080808", originX: "center", originY: "center", left: W / 2, top: H / 2 })
+      centerObj(new fabric.Group([ribbon, txt]))
+    }
+  }
+  // Fleche (polygone), pointant vers la droite par defaut + rotation
+  const addArrow = (angle: number) => {
+    const w = 230, h = 130
+    const pts = [
+      { x: 0, y: h * 0.3 }, { x: w * 0.6, y: h * 0.3 }, { x: w * 0.6, y: 0 }, { x: w, y: h * 0.5 },
+      { x: w * 0.6, y: h }, { x: w * 0.6, y: h * 0.7 }, { x: 0, y: h * 0.7 },
+    ]
+    centerObj(new fabric.Polygon(pts, { fill: G, angle }))
+  }
 
   // ---- Mutation de l'objet actif -------------------------------------------
   const mutate = (fn: (o: fabric.Object) => void) => {
@@ -463,7 +557,114 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           <button type="button" onClick={addRect}   style={btnTool}><Square size={16} /> Rect.</button>
           <button type="button" onClick={addCircle} style={btnTool}><CircleIcon size={16} /> Cercle</button>
           <button type="button" onClick={addLine}   style={btnTool}><Minus size={16} /> Ligne</button>
+          <button type="button" onClick={() => setLibOpen(v => !v)}
+            style={{ ...btnTool, marginTop: 4, background: libOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.12),rgba(201,168,76,0.05))", border: `1px solid ${libOpen ? G : "rgba(201,168,76,0.3)"}`, color: libOpen ? G : INK, fontWeight: 700 }}>
+            <Shapes size={16} /> Éléments
+          </button>
         </div>
+
+        {/* Bibliotheque d'elements (flyout) */}
+        {libOpen && (
+          <div className="qr-scroll" style={{ width: 234, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+              <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Bibliothèque</span>
+              <button type="button" onClick={() => setLibOpen(false)} aria-label="Fermer la bibliothèque"
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}>
+                <X size={13} />
+              </button>
+            </div>
+
+            {/* Onglets categories */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 4, padding: "8px 10px", flexShrink: 0 }}>
+              {([
+                ["cta",    "CTA",     <MousePointerClick size={12} key="i" />],
+                ["icons",  "Icônes",  <Star size={12} key="i" />],
+                ["badges", "Badges",  <Award size={12} key="i" />],
+                ["shapes", "Formes",  <Shapes size={12} key="i" />],
+                ["arrows", "Flèches", <ArrowRight size={12} key="i" />],
+              ] as const).map(([id, label, icon]) => {
+                const on = libCat === id
+                return (
+                  <button key={id} type="button" onClick={() => setLibCat(id)}
+                    style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 8px", borderRadius: 7, cursor: "pointer", fontSize: 10, fontWeight: on ? 700 : 500, background: on ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? G : "rgba(255,255,255,0.07)"}`, color: on ? G : MUTED }}>
+                    {icon} {label}
+                  </button>
+                )
+              })}
+            </div>
+
+            <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "4px 10px 16px" }}>
+              {/* CTA */}
+              {libCat === "cta" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                  {["Scannez-moi", "Réservez", "Voir le menu", "Suivez-nous", "Commandez", "En savoir plus"].map(l => (
+                    <button key={l} type="button" onClick={() => addCTA(l)}
+                      style={{ width: "100%", padding: "11px 0", borderRadius: 22, border: "none", cursor: "pointer", background: "linear-gradient(90deg,#C9A84C,#b8953f)", color: "#080808", fontSize: 11.5, fontWeight: 800 }}>
+                      {l}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {/* Icones */}
+              {libCat === "icons" && (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                  {LIB_ICONS.map(ic => (
+                    <button key={ic.key} type="button" onClick={() => addIcon(ic.d)} title={ic.label}
+                      style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "9px 2px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
+                      <svg width="24" height="24" viewBox="0 0 24 24"><path d={ic.d} fill={INK} /></svg>
+                      <span style={{ color: MUTED, fontSize: 8 }}>{ic.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              {/* Badges & rubans */}
+              {libCat === "badges" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                  {([
+                    ["NOUVEAU", "ribbon"], ["-20%", "ribbon"], ["PROMO", "seal"], ["TOP", "seal"], ["VIP", "seal"],
+                  ] as const).map(([l, k]) => (
+                    <button key={l} type="button" onClick={() => addBadge(l, k)}
+                      style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 11px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
+                      <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 54, padding: "4px 8px", background: G, color: "#080808", fontSize: 10, fontWeight: 800, borderRadius: k === "seal" ? "50%" : 4, width: k === "seal" ? 32 : "auto", height: k === "seal" ? 32 : "auto" }}>{l}</span>
+                      <span style={{ color: INK, fontSize: 10.5 }}>{k === "seal" ? "Sceau rond" : "Ruban"}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              {/* Formes */}
+              {libCat === "shapes" && (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                  {([
+                    ["rrect", "Rectangle", <svg width="30" height="22" key="s"><rect x="2" y="3" width="26" height="16" rx="4" fill={G} /></svg>],
+                    ["circle", "Cercle",   <svg width="24" height="24" key="s"><circle cx="12" cy="12" r="10" fill={G} /></svg>],
+                    ["tri", "Triangle",    <svg width="26" height="24" key="s"><polygon points="13,2 24,22 2,22" fill={G} /></svg>],
+                    ["star", "Étoile",     <svg width="24" height="24" viewBox="0 0 24 24" key="s"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill={G} /></svg>],
+                    ["hexa", "Hexagone",   <svg width="24" height="24" viewBox="0 0 24 24" key="s"><path d="M12 2l8.66 5v10L12 22 3.34 17V7z" fill={G} /></svg>],
+                    ["banner", "Bandeau",  <svg width="30" height="16" key="s"><rect x="1" y="3" width="28" height="10" fill={G} /></svg>],
+                  ] as const).map(([k, label, prev]) => (
+                    <button key={k} type="button" onClick={() => addShape(k)} title={label}
+                      style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "10px 2px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
+                      {prev}
+                      <span style={{ color: MUTED, fontSize: 8 }}>{label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              {/* Fleches */}
+              {libCat === "arrows" && (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                  {([["→", 0], ["↓", 90], ["←", 180], ["↑", 270]] as const).map(([sym, ang]) => (
+                    <button key={ang} type="button" onClick={() => addArrow(ang)}
+                      style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "16px 0", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer", color: G, fontSize: 22, fontWeight: 800 }}>
+                      {sym}
+                    </button>
+                  ))}
+                  <p style={{ gridColumn: "1 / 3", color: MUTED, fontSize: 9, margin: "2px 0 0", lineHeight: 1.4 }}>Astuce : fais pointer une flèche vers ton QR pour guider le scan.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Zone canvas */}
         <div style={{ flex: 1, overflow: "auto", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, background: "#0A0907", position: "relative" }}>
