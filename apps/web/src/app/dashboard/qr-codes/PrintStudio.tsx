@@ -20,6 +20,7 @@ import {
   Copy, Trash2, Lock, Unlock, ChevronUp, ChevronDown,
   Download, Printer, Loader2, Check, Save,
   Shapes, Star, Award, MousePointerClick, ArrowRight, LayoutTemplate,
+  Undo2, Redo2,
 } from "lucide-react"
 
 // ---- Constantes design (Midnight Gold) -------------------------------------
@@ -199,6 +200,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const vGuideRef = useRef<fabric.Line | null>(null)
   const hGuideRef = useRef<fabric.Line | null>(null)
   const clipRef = useRef<fabric.Object | null>(null) // presse-papier (copier/coller)
+  const histRef = useRef<{ stack: string[]; i: number; lock: boolean }>({ stack: [], i: -1, lock: false })
+  const pushTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const [format, setFormat]   = useState<FormatId>("a4")
   const [sel, setSel]         = useState<SelState>(null)
@@ -210,6 +213,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [libOpen, setLibOpen] = useState(false)
   const [libCat, setLibCat]   = useState<"cta" | "icons" | "badges" | "shapes" | "arrows">("cta")
   const [tplOpen, setTplOpen] = useState(false)
+  const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
 
   const isPro = userPlan === "pro" || userPlan === "business"
 
@@ -255,6 +259,53 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     refreshSel()
   }, [refreshSel])
 
+  // ---- Historique (undo / redo) --------------------------------------------
+  // Snapshot du canvas en JSON (guides exclus). Le verrou evite que la
+  // restauration (loadFromJSON) ne reempile des etats.
+  const snapshot = (fc: fabric.Canvas): string => {
+    const json = fc.toJSON([...TOJSON_PROPS, "isGuide"]) as { objects?: { isGuide?: boolean }[] }
+    json.objects = (json.objects ?? []).filter(o => !o.isGuide)
+    return JSON.stringify(json)
+  }
+  const pushHistory = () => {
+    const fc = fcRef.current, h = histRef.current
+    if (!fc || h.lock) return
+    h.stack = h.stack.slice(0, h.i + 1)
+    h.stack.push(snapshot(fc))
+    if (h.stack.length > 60) h.stack.shift()
+    h.i = h.stack.length - 1
+    setHistVer(v => v + 1)
+  }
+  const pushHistorySoon = () => {
+    if (histRef.current.lock) return
+    clearTimeout(pushTimerRef.current)
+    pushTimerRef.current = setTimeout(pushHistory, 350)
+  }
+  const restoreHistory = (s: string) => {
+    const fc = fcRef.current; if (!fc) return
+    histRef.current.lock = true
+    fc.loadFromJSON(JSON.parse(s), () => {
+      const vG = vGuideRef.current, hG = hGuideRef.current
+      if (vG) fc.add(vG)
+      if (hG) fc.add(hG)
+      const bgc = (fc.backgroundColor as string) || CANVAS_BG_DEFAULT
+      setBgColor(typeof bgc === "string" ? bgc : CANVAS_BG_DEFAULT)
+      fc.discardActiveObject(); fc.requestRenderAll()
+      histRef.current.lock = false
+      setSel(null)
+    })
+  }
+  const undo = () => {
+    const h = histRef.current
+    if (h.i <= 0) return
+    h.i--; restoreHistory(h.stack[h.i]); setHistVer(v => v + 1)
+  }
+  const redo = () => {
+    const h = histRef.current
+    if (h.i >= h.stack.length - 1) return
+    h.i++; restoreHistory(h.stack[h.i]); setHistVer(v => v + 1)
+  }
+
   // ---- Init Fabric (une seule fois) ---------------------------------------
   useEffect(() => {
     if (!elRef.current) return
@@ -274,6 +325,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     }
     const vG = new fabric.Line([0, 0, 0, 0], guideOpts)
     const hG = new fabric.Line([0, 0, 0, 0], guideOpts)
+    ;(vG as any).isGuide = true; (hG as any).isGuide = true
     fc.add(vG); fc.add(hG)
     vGuideRef.current = vG; hGuideRef.current = hG
 
@@ -300,6 +352,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     fc.on("selection:updated", refreshSel)
     fc.on("selection:cleared", () => setSel(null))
 
+    // Historique : capter ajout / suppression / modification (drag, scale, rotate)
+    fc.on("object:added", pushHistory)
+    fc.on("object:removed", pushHistory)
+    fc.on("object:modified", pushHistory)
+
     // ---- Chargement du design existant ou QR initial ----------------------
     ;(async () => {
       try {
@@ -311,12 +368,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           fc.setDimensions({ width: d.w, height: d.h })
         }
         if (json?.design) {
+          histRef.current.lock = true // ne pas empiler pendant le chargement
           fc.loadFromJSON(json.design, () => {
             // remettre les guides au-dessus apres rechargement
             fc.add(vG); fc.add(hG)
             const bgc = (fc.backgroundColor as string) || CANVAS_BG_DEFAULT
             setBgColor(typeof bgc === "string" ? bgc : CANVAS_BG_DEFAULT)
             fc.requestRenderAll()
+            histRef.current.lock = false
+            pushHistory() // etat initial = design charge
             setLoading(false)
           })
           return
@@ -379,6 +439,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       } else if (meta && (e.key === "d" || e.key === "D")) {
         if (!o) return
         e.preventDefault(); dropClone(fc, o, 24, 24)
+      } else if (meta && (e.key === "z" || e.key === "Z")) {
+        e.preventDefault(); if (e.shiftKey) redo(); else undo()
+      } else if (meta && (e.key === "y" || e.key === "Y")) {
+        e.preventDefault(); redo()
       } else if (o && e.key.startsWith("Arrow")) {
         e.preventDefault()
         const s = e.shiftKey ? 10 : 1
@@ -386,7 +450,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         if (e.key === "ArrowRight") o.set("left", (o.left ?? 0) + s)
         if (e.key === "ArrowUp")    o.set("top",  (o.top  ?? 0) - s)
         if (e.key === "ArrowDown")  o.set("top",  (o.top  ?? 0) + s)
-        o.setCoords(); fc.requestRenderAll()
+        o.setCoords(); fc.requestRenderAll(); pushHistorySoon()
       }
     }
     window.addEventListener("keydown", onKey)
@@ -478,6 +542,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     fn(o)
     fc.requestRenderAll()
     refreshSel()
+    pushHistorySoon()
   }
 
   // Changer le libelle d'un groupe CTA / badge (texte interne) + ajuster la pilule
@@ -502,6 +567,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     grp.setCoords()
     fc.requestRenderAll()
     refreshSel()
+    pushHistorySoon()
   }
 
   // Couleur : recolore les formes (non-texte) d'un groupe, ou l'objet simple
@@ -556,6 +622,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     if (vGuideRef.current) fc.bringToFront(vGuideRef.current)
     if (hGuideRef.current) fc.bringToFront(hGuideRef.current)
     fc.requestRenderAll(); refreshSel()
+    pushHistorySoon() // front/back/fwd/bwd/lock ne declenchent pas d'evenement
   }
 
   // ---- Format --------------------------------------------------------------
@@ -572,6 +639,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const fc = fcRef.current; if (!fc) return
     fc.setBackgroundColor(color, fc.renderAll.bind(fc))
     setBgColor(color)
+    pushHistorySoon()
   }
 
   // ---- Appliquer un modele oriente objectif --------------------------------
@@ -583,6 +651,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const hasContent = fc.getObjects().some(o => o !== vG && o !== hG)
     if (hasContent && !window.confirm("Remplacer le contenu actuel par ce modèle ?")) return
 
+    histRef.current.lock = true // tout le modele = une seule etape d'historique
     fc.getObjects().slice().forEach(o => { if (o !== vG && o !== hG) fc.remove(o) })
     const W = fc.getWidth(), H = fc.getHeight()
     const { bg, ink, accent } = meta
@@ -684,6 +753,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     if (vG) fc.bringToFront(vG)
     if (hG) fc.bringToFront(hG)
     fc.discardActiveObject(); setSel(null); fc.requestRenderAll()
+    histRef.current.lock = false
+    pushHistory() // modele applique = une etape
     setTplOpen(false)
   }
 
@@ -776,6 +847,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     fontSize: 10, cursor: "pointer",
   }
 
+  const canUndo = histVer >= 0 && histRef.current.i > 0
+  const canRedo = histVer >= 0 && histRef.current.i < histRef.current.stack.length - 1
+  const histBtn = (enabled: boolean) => ({
+    display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32,
+    background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8,
+    color: enabled ? INK : MUTED, cursor: enabled ? "pointer" : "not-allowed", opacity: enabled ? 1 : 0.4,
+  })
+
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 3000, background: BG,
@@ -807,6 +886,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               </button>
             ))}
           </div>
+
+          <button type="button" onClick={undo} disabled={!canUndo} aria-label="Annuler" title="Annuler (Ctrl/⌘+Z)" style={histBtn(canUndo)}>
+            <Undo2 size={15} />
+          </button>
+          <button type="button" onClick={redo} disabled={!canRedo} aria-label="Rétablir" title="Rétablir (Ctrl/⌘+Maj+Z)" style={histBtn(canRedo)}>
+            <Redo2 size={15} />
+          </button>
 
           <button type="button" onClick={save} disabled={saving} style={topBtn(false)}>
             {saving ? <Loader2 size={13} style={{ animation: "spin 0.8s linear infinite" }} />
@@ -1102,7 +1188,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             <div style={{ color: MUTED, fontSize: 11, lineHeight: 1.6, padding: "10px 2px" }}>
               Sélectionne un élément pour modifier sa couleur, son opacité, sa position…<br /><br />
               Double-clic sur un texte pour l'éditer.<br />
-              <strong style={{ color: INK }}>Suppr</strong> retire · <strong style={{ color: INK }}>Ctrl/⌘+C/V</strong> copier-coller · <strong style={{ color: INK }}>Ctrl/⌘+D</strong> dupliquer · <strong style={{ color: INK }}>flèches</strong> déplacer (Maj ×10).
+              <strong style={{ color: INK }}>Suppr</strong> retire · <strong style={{ color: INK }}>Ctrl/⌘+C/V</strong> copier-coller · <strong style={{ color: INK }}>Ctrl/⌘+D</strong> dupliquer · <strong style={{ color: INK }}>Ctrl/⌘+Z</strong> annuler · <strong style={{ color: INK }}>flèches</strong> déplacer (Maj ×10).
             </div>
           )}
         </div>
