@@ -1128,6 +1128,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     { id:"affiche-split",   label:"Affiche split",       emoji:"🖼️", w:800, h:1131, plan:"pro",      cat:"Print", desc:"Colonne couleur + QR", support:"Affiche" },
     { id:"affiche-ticket",  label:"Affiche ticket",      emoji:"🎟️", w:800, h:1131, plan:"business", cat:"Print", desc:"Style billet, perforations", support:"Affiche" },
   { id:"carte-table-event",   label:"Carte table event",  emoji:"📋", w:900,  h:506,  plan:"free",      cat:"Event",      desc:"Paysage, QR centré, filets" , support:"Carte de table"},
+    { id:"carte-bloc",    label:"Carte bloc",        emoji:"🍽️", w:900, h:506, plan:"free",     cat:"Restaurant", desc:"Bloc de couleur + QR", support:"Carte de table" },
+    { id:"carte-header",  label:"Carte header",      emoji:"🍽️", w:900, h:506, plan:"pro",      cat:"Restaurant", desc:"Bandeau couleur en haut", support:"Carte de table" },
+    { id:"carte-pleine",  label:"Carte pleine",      emoji:"🍽️", w:900, h:506, plan:"pro",      cat:"Restaurant", desc:"Couleur pleine + monogramme", support:"Carte de table" },
+    { id:"carte-duo",     label:"Carte duo",         emoji:"🍽️", w:900, h:506, plan:"free",     cat:"Restaurant", desc:"QR à gauche, texte à droite", support:"Carte de table" },
+    { id:"bock-plein",    label:"Sous-bock plein",   emoji:"🍺", w:900, h:900, plan:"free",     cat:"Bar",        desc:"Rond, couleur pleine", support:"Sous-bock" },
+    { id:"bock-cerne",    label:"Sous-bock cerné",   emoji:"🍺", w:900, h:900, plan:"free",     cat:"Bar",        desc:"Rond, double anneau doré", support:"Sous-bock" },
+    { id:"bock-mono",     label:"Sous-bock mono",    emoji:"🍺", w:900, h:900, plan:"pro",      cat:"Bar",        desc:"Rond, monogramme", support:"Sous-bock" },
   { id:"badge-nominatif",     label:"Badge nominatif",    emoji:"🪪", w:680,  h:400,  plan:"free", cat:"Event",      desc:"Badge avec nom du participant" , support:"Badge"},
 
   // ---- Social ----
@@ -1689,6 +1696,105 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const s = 300*k; drawQRFramed((w-s)/2, sy+48*k, s)
     drawLabel("Scannez pour réserver", w/2, sy+48*k+s+52*k, 14*k, accentCol)
     drawContact(w/2, h-78*k, 19*k, isDark?"rgba(245,240,232,0.6)":"rgba(42,36,25,0.6)", "center")
+  }
+
+  // ===== Cartes de table (v2, contraste fort) =====
+  else if (tpl.id === "carte-bloc") {
+    const k = w/900, T = opts.title || active?.pages?.title || "", pw = w*0.54
+    ctx.fillStyle = bgColor; ctx.fillRect(0,0,w,h)
+    const g = ctx.createLinearGradient(0,0,pw,h); g.addColorStop(0, shade(accentCol,12)); g.addColorStop(1, shade(accentCol,-22))
+    ctx.fillStyle = g; ctx.fillRect(0,0,pw,h)
+    const on = isDarkHex(accentCol) ? "#FFFFFF" : "#1A1209"
+    drawLabel("Établissement", 56*k, 96*k, 15*k, on, "left")
+    drawTitleFit(T, 56*k, 176*k, 58*k, on, "left", pw-100*k)
+    ctx.fillStyle = on; ctx.fillRect(56*k, 206*k, 72*k, Math.max(2,Math.round(3*k)))
+    drawSub(opts.subtitle, 56*k, 254*k, 23*k, on, "left", pw-100*k)
+    drawContact(56*k, h-56*k, 17*k, on, "left", pw-90*k)
+    const s = 300*k; drawQRFramed(pw + ((w-pw)-s)/2, (h-s)/2, s)
+  }
+  else if (tpl.id === "carte-header") {
+    const k = w/900, T = opts.title || active?.pages?.title || "", bh = h*0.40
+    ctx.fillStyle = bgColor; ctx.fillRect(0,0,w,h)
+    const g = ctx.createLinearGradient(0,0,w,0); g.addColorStop(0, accentCol); g.addColorStop(1, shade(accentCol,-20))
+    ctx.fillStyle = g; ctx.fillRect(0,0,w,bh)
+    const on = isDarkHex(accentCol) ? "#FFFFFF" : "#1A1209"
+    drawLabel("Bienvenue", 56*k, 70*k, 13*k, on, "left")
+    drawTitleFit(T, 56*k, 140*k, 52*k, on, "left", w-120*k)
+    const txt = isDark?"#F5F0E8":"#2A2419", soft = isDark?"rgba(245,240,232,0.7)":"rgba(42,36,25,0.65)"
+    const qs = 210*k, qx = 64*k, qy = bh+30*k; drawQRFramed(qx, qy, qs)
+    const tx = qx+qs+46*k
+    drawSub(opts.subtitle, tx, bh+90*k, 24*k, txt, "left", w-tx-60*k)
+    ctx.fillStyle = accentCol; ctx.fillRect(tx, bh+112*k, 60*k, Math.max(2,Math.round(3*k)))
+    drawContact(tx, bh+170*k, 18*k, soft, "left", w-tx-60*k)
+  }
+  else if (tpl.id === "carte-pleine") {
+    const k = w/900, T = opts.title || active?.pages?.title || ""
+    const base = isDark ? bgColor : textCol, on = isDark ? textCol : bgColor
+    const ini = ((T || "A").trim()[0] || "A").toUpperCase()
+    ctx.fillStyle = base; ctx.fillRect(0,0,w,h)
+    ctx.save(); ctx.globalAlpha = 0.06; ctx.fillStyle = on; ctx.font = `700 ${520*k}px '${titleFont}', serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(ini, w*0.30, h*0.52); ctx.restore(); ctx.textBaseline = "alphabetic"
+    drawLabel("La Carte", 60*k, 108*k, 14*k, accentCol, "left")
+    drawTitleFit(T, 60*k, 182*k, 56*k, on, "left", w*0.56)
+    ctx.fillStyle = accentCol; ctx.fillRect(60*k, 212*k, 72*k, Math.max(2,Math.round(3*k)))
+    drawSub(opts.subtitle, 60*k, 262*k, 23*k, on, "left", w*0.52)
+    drawContact(60*k, h-56*k, 17*k, accentCol, "left", w*0.52)
+    const s = 300*k; drawQRFramed(w-s-70*k, (h-s)/2, s)
+  }
+  else if (tpl.id === "carte-duo") {
+    const k = w/900, T = opts.title || active?.pages?.title || ""
+    const txt = isDark?"#F5F0E8":"#2A2419", soft = isDark?"rgba(245,240,232,0.7)":"rgba(42,36,25,0.62)"
+    const ini = ((T || "A").trim()[0] || "A").toUpperCase()
+    ctx.fillStyle = bgColor; ctx.fillRect(0,0,w,h)
+    ctx.fillStyle = accentCol; ctx.fillRect(0,0,14*k,h)
+    const qs = 346*k, qx = 70*k, qy = (h-qs)/2; drawQRFramed(qx, qy, qs)
+    const x0 = qx+qs+60*k, mw = w-x0-60*k
+    ctx.save(); ctx.globalAlpha = 0.05; ctx.fillStyle = accentCol; ctx.font = `700 ${360*k}px '${titleFont}', serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(ini, x0+mw*0.6, h*0.5); ctx.restore(); ctx.textBaseline = "alphabetic"
+    drawLabel("Établissement", x0, 112*k, 15*k, accentCol, "left")
+    drawTitleFit(T, x0, 180*k, 54*k, txt, "left", mw)
+    ctx.fillStyle = accentCol; ctx.fillRect(x0, 210*k, 72*k, Math.max(2,Math.round(3*k)))
+    drawSub(opts.subtitle, x0, 258*k, 23*k, txt, "left", mw)
+    drawContact(x0, h-58*k, 17*k, soft, "left", mw)
+  }
+  // ===== Sous-bocks (ronds) =====
+  else if (tpl.id === "bock-plein") {
+    const k = w/900, T = opts.title || active?.pages?.title || "", R = 430*k
+    ctx.fillStyle = bgColor; ctx.fillRect(0,0,w,h)
+    ctx.save(); ctx.beginPath(); ctx.arc(w/2,h/2,R,0,Math.PI*2); ctx.clip()
+    const base = isDark ? bgColor : textCol, on = isDark ? textCol : bgColor
+    ctx.fillStyle = base; ctx.fillRect(0,0,w,h)
+    drawLabel("La Carte des bières", w/2, 180*k, 18*k, accentCol, "center")
+    drawTitleFit(T, w/2, 255*k, 52*k, on, "center", R*1.5)
+    const qs = 300*k; drawQRFramed(w/2-qs/2, h/2-qs/2+30*k, qs)
+    drawSub(opts.subtitle, w/2, h/2+qs/2+90*k, 22*k, on, "center", R*1.5)
+    ctx.restore()
+    ctx.strokeStyle = accentCol; ctx.lineWidth = 6*k; ctx.beginPath(); ctx.arc(w/2,h/2,R-3*k,0,Math.PI*2); ctx.stroke()
+  }
+  else if (tpl.id === "bock-cerne") {
+    const k = w/900, T = opts.title || active?.pages?.title || "", R = 430*k
+    ctx.fillStyle = isDark?"#0A0A0A":"#FFFFFF"; ctx.fillRect(0,0,w,h)
+    ctx.save(); ctx.beginPath(); ctx.arc(w/2,h/2,R,0,Math.PI*2); ctx.clip(); ctx.fillStyle = bgColor; ctx.fillRect(0,0,w,h); ctx.restore()
+    ctx.strokeStyle = accentCol; ctx.lineWidth = 8*k; ctx.beginPath(); ctx.arc(w/2,h/2,R-6*k,0,Math.PI*2); ctx.stroke()
+    ctx.lineWidth = 2*k; ctx.beginPath(); ctx.arc(w/2,h/2,R-26*k,0,Math.PI*2); ctx.stroke()
+    const txt = isDark?"#F5F0E8":"#2A2419"
+    drawLabel("Bières & Cocktails", w/2, 210*k, 17*k, accentCol, "center")
+    drawTitleFit(T, w/2, 285*k, 50*k, txt, "center", R*1.4)
+    const qs = 300*k; drawQRFramed(w/2-qs/2, h/2-qs/2+40*k, qs)
+    drawSub(opts.subtitle, w/2, h/2+qs/2+100*k, 21*k, txt, "center", R*1.4)
+  }
+  else if (tpl.id === "bock-mono") {
+    const k = w/900, T = opts.title || active?.pages?.title || "", R = 430*k
+    const ini = ((T || "A").trim()[0] || "A").toUpperCase()
+    ctx.fillStyle = isDark?"#0A0A0A":"#FFFFFF"; ctx.fillRect(0,0,w,h)
+    ctx.save(); ctx.beginPath(); ctx.arc(w/2,h/2,R,0,Math.PI*2); ctx.clip()
+    const base = isDark ? bgColor : textCol, on = isDark ? textCol : bgColor
+    ctx.fillStyle = base; ctx.fillRect(0,0,w,h); ctx.restore()
+    ctx.strokeStyle = accentCol; ctx.lineWidth = 6*k; ctx.beginPath(); ctx.arc(w/2,h/2,R-4*k,0,Math.PI*2); ctx.stroke()
+    ctx.lineWidth = 3*k; ctx.beginPath(); ctx.arc(w/2,205*k,54*k,0,Math.PI*2); ctx.stroke()
+    const onTxt = isDark ? textCol : bgColor
+    ctx.fillStyle = onTxt; ctx.font = `700 ${62*k}px '${titleFont}', serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(ini, w/2, 208*k); ctx.textBaseline = "alphabetic"; ctx.textAlign = "left"
+    drawTitleFit(T, w/2, 330*k, 40*k, onTxt, "center", R*1.3)
+    const qs = 270*k; drawQRFramed(w/2-qs/2, h/2-qs/2+70*k, qs)
+    drawLabel("Scannez la carte", w/2, h/2+qs/2+120*k, 14*k, accentCol, "center")
   }
 
   }
