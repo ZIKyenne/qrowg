@@ -625,6 +625,23 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     pushHistorySoon() // front/back/fwd/bwd/lock ne declenchent pas d'evenement
   }
 
+  // ---- Alignement sur le support -------------------------------------------
+  const align = (action: "left" | "centerH" | "right" | "top" | "centerV" | "bottom") => {
+    const fc = fcRef.current; if (!fc) return
+    const o = fc.getActiveObject(); if (!o) return
+    const W = fc.getWidth(), H = fc.getHeight()
+    const b = o.getBoundingRect(true) // boite englobante en coords canvas
+    switch (action) {
+      case "left":    o.set("left", (o.left ?? 0) - b.left); break
+      case "centerH": o.set("left", (o.left ?? 0) + (W / 2 - (b.left + b.width / 2))); break
+      case "right":   o.set("left", (o.left ?? 0) + (W - (b.left + b.width))); break
+      case "top":     o.set("top",  (o.top ?? 0) - b.top); break
+      case "centerV": o.set("top",  (o.top ?? 0) + (H / 2 - (b.top + b.height / 2))); break
+      case "bottom":  o.set("top",  (o.top ?? 0) + (H - (b.top + b.height))); break
+    }
+    o.setCoords(); fc.requestRenderAll(); pushHistorySoon()
+  }
+
   // ---- Format --------------------------------------------------------------
   const applyFormat = (fmt: FormatId) => {
     const fc = fcRef.current; if (!fc) return
@@ -1163,6 +1180,27 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     </button>
                   </>
                 )}
+              </div>
+
+              {/* Alignement sur le support */}
+              <div>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Aligner sur le support</p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                  {([
+                    ["left", "Gauche", "v", 1.5], ["centerH", "Centre H", "v", 7], ["right", "Droite", "v", 12.5],
+                    ["top", "Haut", "h", 1.5], ["centerV", "Centre V", "h", 7], ["bottom", "Bas", "h", 12.5],
+                  ] as const).map(([action, label, axis, pos]) => (
+                    <button key={action} type="button" onClick={() => align(action)} title={label}
+                      style={{ ...layerBtn, padding: "7px" }}>
+                      <svg width="16" height="16" viewBox="0 0 16 16">
+                        <rect x="0.5" y="0.5" width="15" height="15" rx="2" fill="none" stroke={MUTED} strokeWidth="1" />
+                        {axis === "v"
+                          ? <rect x={pos} y="3" width="2" height="10" rx="1" fill={G} />
+                          : <rect x="3" y={pos} width="10" height="2" rx="1" fill={G} />}
+                      </svg>
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Calques */}
