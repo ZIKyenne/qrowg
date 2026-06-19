@@ -106,7 +106,9 @@ type SelState = {
   fontSize: number
   bold: boolean
   locked: boolean
-  label: string | null // libelle editable (groupe CTA/badge contenant un texte)
+  label: string | null    // libelle editable (groupe CTA/badge contenant un texte)
+  isGroup: boolean        // true => "Couleur" recolore les formes du groupe
+  textFill: string | null // couleur du texte interne (groupe avec texte)
 } | null
 
 // Trouve l'objet texte dans un groupe (CTA / badge), s'il y en a un
@@ -200,16 +202,26 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const readSel = useCallback((o: fabric.Object | undefined | null): SelState => {
     if (!o) return null
     const isText = o.type === "i-text" || o.type === "text" || o.type === "textbox"
+    const isGroup = o.type === "group"
     const t = o as any
+    const txtChild = groupText(o)
+    // Pour un groupe, la "couleur" affichee = celle de la 1re forme (non-texte)
+    let fill = typeof o.fill === "string" ? o.fill : "#C9A84C"
+    if (isGroup) {
+      const shape = (o as fabric.Group).getObjects().find(c => c.type !== "text" && c.type !== "i-text" && c.type !== "textbox")
+      if (shape && typeof shape.fill === "string") fill = shape.fill
+    }
     return {
       isText,
-      fill: typeof o.fill === "string" ? o.fill : "#C9A84C",
+      fill,
       opacity: o.opacity ?? 1,
       fontFamily: isText ? (t.fontFamily ?? "Georgia") : "Georgia",
       fontSize: isText ? (t.fontSize ?? 40) : 40,
       bold: isText ? (t.fontWeight === "bold" || t.fontWeight === 700) : false,
       locked: !!o.lockMovementX,
-      label: groupText(o)?.text ?? null,
+      label: txtChild?.text ?? null,
+      isGroup,
+      textFill: txtChild && typeof txtChild.fill === "string" ? txtChild.fill : null,
     }
   }, [])
 
@@ -442,6 +454,25 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     fc.requestRenderAll()
     refreshSel()
   }
+
+  // Couleur : recolore les formes (non-texte) d'un groupe, ou l'objet simple
+  const setFill = (color: string) => mutate(o => {
+    if (o.type === "group") {
+      ;(o as fabric.Group).getObjects().forEach(c => {
+        if (c.type !== "text" && c.type !== "i-text" && c.type !== "textbox") c.set("fill", color)
+      })
+      o.dirty = true
+    } else {
+      o.set("fill", color)
+    }
+  })
+
+  // Couleur du texte interne d'un groupe (CTA / badge)
+  const setTextColor = (color: string) => mutate(o => {
+    const txt = groupText(o); if (!txt) return
+    txt.set("fill", color)
+    o.dirty = true
+  })
 
   // ---- Calques -------------------------------------------------------------
   const layer = (action: "front" | "back" | "fwd" | "bwd" | "dup" | "lock" | "del") => {
@@ -938,17 +969,25 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <div style={{ marginBottom: 12 }}>
                     <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Texte du bouton</label>
                     <input value={sel.label} onChange={e => setLabel(e.target.value)} placeholder="Votre texte"
-                      style={{ width: "100%", background: BG, border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, outline: "none", boxSizing: "border-box" }} />
+                      style={{ width: "100%", background: BG, border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, outline: "none", boxSizing: "border-box", marginBottom: 8 }} />
+                    {sel.textFill !== null && (
+                      <>
+                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Couleur du texte</label>
+                        <input type="color" value={/^#/.test(sel.textFill) ? sel.textFill : "#080808"}
+                          onChange={e => setTextColor(e.target.value)}
+                          style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
+                      </>
+                    )}
                   </div>
                 )}
 
-                {/* Couleur */}
-                <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Couleur</label>
+                {/* Couleur (fond du groupe ou objet simple) */}
+                <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>{sel.isGroup ? "Couleur du fond" : "Couleur"}</label>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                   <input type="color" value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"}
-                    onChange={e => mutate(o => o.set("fill", e.target.value))}
+                    onChange={e => setFill(e.target.value)}
                     style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
-                  <input value={sel.fill} onChange={e => mutate(o => o.set("fill", e.target.value))}
+                  <input value={sel.fill} onChange={e => setFill(e.target.value)}
                     style={{ flex: 1, background: BG, border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, fontFamily: "monospace", outline: "none", boxSizing: "border-box" }} />
                 </div>
 
