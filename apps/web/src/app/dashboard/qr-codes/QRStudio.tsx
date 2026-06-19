@@ -2152,7 +2152,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   }
 
   return (
-    <div className="qr-grid" style={{ display:"grid", gridTemplateColumns:"clamp(240px,20vw,300px) 1.4fr clamp(280px,24vw,340px)", gap:0, minHeight:"calc(100vh - 80px)", background:BG, borderRadius:16, border:"1px solid rgba(201,168,76,0.1)", overflow:"hidden", fontFamily:"DM Sans, sans-serif", position:"relative" }}>
+    <div className="qr-grid" style={{ display:"grid", gridTemplateColumns:"clamp(200px,15vw,260px) 2.5fr clamp(290px,21vw,340px)", gap:0, minHeight:"calc(100vh - 80px)", background:BG, borderRadius:16, border:"1px solid rgba(201,168,76,0.1)", overflow:"hidden", fontFamily:"DM Sans, sans-serif", position:"relative" }}>
 
 
       {/* -- Modal preview plein ecran ------------------------------------------- */}
