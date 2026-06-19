@@ -1816,6 +1816,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   }
 
   const [sb_asc, sb_dir] = sortKey.split("-")
+  const suppTpl    = SUPP_TPLS.find(t => t.id === suppTplId) ?? SUPP_TPLS[0]
+  const suppCanTpl = PLAN_RANK[userPlan] >= PLAN_RANK[suppTpl.plan]
+
   const filteredQR = qrCodes
     .filter(qr => {
       const t  = qr.pages?.title?.toLowerCase() ?? ""
@@ -1998,6 +2001,42 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
       {/* -- COL 1 : Liste ------------------------------------------------------ */}
       <div className="qr-col-list" style={{ borderRight:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", overflow:"hidden" }}>
+
+        {/* Apercu live du support (uniquement onglet Imprimables) */}
+        {activeTab === "supports" && active && (
+          <div style={{ padding:"12px", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0, background:"#0A0907" }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
+              <p style={{ color:G, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0, display:"flex", alignItems:"center", gap:5 }}>
+                <Eye size={12}/> Aperçu en direct
+              </p>
+              <span style={{ color:MUTED, fontSize:9 }}>{suppTpl.w}×{suppTpl.h}px</span>
+            </div>
+            <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(201,168,76,0.18)", borderRadius:10, padding:12, display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
+              {suppCanTpl ? (
+                <>
+                  <canvas ref={supportCanvasRef} style={{ maxWidth:"100%", borderRadius:6, display: suppRendered ? "block" : "none" }}/>
+                  {!suppRendered && (
+                    <div style={{ width:"100%", height:150, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:8 }}>
+                      <Loader2 size={20} color={MUTED} style={{ animation:"spin 0.8s linear infinite" }}/>
+                      <p style={{ color:MUTED, fontSize:11, margin:0 }}>Génération de l&apos;aperçu...</p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div style={{ padding:"18px 0", textAlign:"center" as const }}>
+                  <Lock size={20} color={MUTED} style={{ marginBottom:8 }}/>
+                  <p style={{ color:MUTED, fontSize:11, margin:"0 0 10px" }}>
+                    {suppTpl.plan === "pro" ? "Nécessite le plan Pro" : "Nécessite le plan Business"}
+                  </p>
+                  <button type="button" onClick={() => setUpsell({ feature:`le support « ${suppTpl.label} »`, plan: suppTpl.plan })}
+                    style={{ display:"inline-block", padding:"7px 16px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:8, color:"#080808", fontSize:11, fontWeight:700, cursor:"pointer" }}>
+                    Voir les offres
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Header + filtres */}
         <div style={{ padding:"12px 12px 10px", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", gap:8 }}>
@@ -3256,40 +3295,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 </div>
               </div>
 
-              {/* -- Preview -------------------------------------------- */}
-              <div style={{ marginBottom:12 }}>
-                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
-                  <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Aperçu</p>
-                  <span style={{ color:MUTED, fontSize:9 }}>{tpl.w}×{tpl.h}px</span>
-                </div>
-
-                <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:10, padding:12, display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
-                  {canTpl ? (
-                    <>
-                      <canvas ref={supportCanvasRef} style={{ maxWidth:"100%", borderRadius:6, display: suppRendered ? "block" : "none" }}/>
-                      {!suppRendered && (
-                        <div style={{ width:"100%", height:160, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:8 }}>
-                          <Loader2 size={20} color={MUTED} style={{ animation:"spin 0.8s linear infinite" }}/>
-                          <p style={{ color:MUTED, fontSize:11, margin:0 }}>Generation de l&apos;apercu...</p>
-                        </div>
-                      )}
-                      <p style={{ color:MUTED, fontSize:10, margin:0, display:"flex", alignItems:"center", gap:5 }}>
-                        <Eye size={11}/> Apercu en temps reel
-                      </p>
-                    </>
-                  ) : (
-                    <div style={{ padding:"20px 0", textAlign:"center" as const }}>
-                      <Lock size={22} color={MUTED} style={{ marginBottom:8 }}/>
-                      <p style={{ color:MUTED, fontSize:12, margin:"0 0 10px" }}>
-                        {tpl.plan === "pro" ? "Nécessite le plan Pro" : "Nécessite le plan Business"}
-                      </p>
-                      <a href="/dashboard/upgrade" style={{ display:"inline-block", padding:"7px 16px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius:8, color:"#080808", fontSize:11, fontWeight:700, textDecoration:"none" }}>
-                        Voir les plans
-                      </a>
-                    </div>
-                  )}
-                </div>
-              </div>
+              {/* -- Preview (deplacee en haut de la colonne de gauche) -- */}
 
               {/* -- Export --------------------------------------------- */}
               {canTpl && (
