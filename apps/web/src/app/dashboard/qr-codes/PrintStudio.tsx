@@ -104,7 +104,15 @@ type SelState = {
   fontSize: number
   bold: boolean
   locked: boolean
+  label: string | null // libelle editable (groupe CTA/badge contenant un texte)
 } | null
+
+// Trouve l'objet texte dans un groupe (CTA / badge), s'il y en a un
+function groupText(o: fabric.Object | undefined | null): fabric.Text | null {
+  if (!o || o.type !== "group") return null
+  const child = (o as fabric.Group).getObjects().find(c => c.type === "text" || c.type === "i-text" || c.type === "textbox")
+  return (child as fabric.Text) ?? null
+}
 
 const TOJSON_PROPS = [
   "isQR",
@@ -189,6 +197,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       fontSize: isText ? (t.fontSize ?? 40) : 40,
       bold: isText ? (t.fontWeight === "bold" || t.fontWeight === 700) : false,
       locked: !!o.lockMovementX,
+      label: groupText(o)?.text ?? null,
     }
   }, [])
 
@@ -396,6 +405,17 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const fc = fcRef.current; if (!fc) return
     const o = fc.getActiveObject(); if (!o) return
     fn(o)
+    fc.requestRenderAll()
+    refreshSel()
+  }
+
+  // Changer le libelle d'un groupe CTA / badge (texte interne)
+  const setLabel = (value: string) => {
+    const fc = fcRef.current; if (!fc) return
+    const txt = groupText(fc.getActiveObject())
+    if (!txt) return
+    txt.set({ text: value })
+    ;(fc.getActiveObject() as fabric.Group).dirty = true
     fc.requestRenderAll()
     refreshSel()
   }
@@ -879,6 +899,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             <>
               <div>
                 <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Élément sélectionné</p>
+
+                {/* Texte du bouton / badge (groupe avec texte) */}
+                {sel.label !== null && (
+                  <div style={{ marginBottom: 12 }}>
+                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Texte du bouton</label>
+                    <input value={sel.label} onChange={e => setLabel(e.target.value)} placeholder="Votre texte"
+                      style={{ width: "100%", background: BG, border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, outline: "none", boxSizing: "border-box" }} />
+                  </div>
+                )}
 
                 {/* Couleur */}
                 <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Couleur</label>
