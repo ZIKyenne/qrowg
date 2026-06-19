@@ -460,6 +460,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [suppPhone,   setSuppPhone]   = useState("")
   const [suppWebsite, setSuppWebsite] = useState("")
   const [suppFont,     setSuppFont]     = useState("Cormorant Garamond")
+  const [suppSubFont,  setSuppSubFont]  = useState("Arial")
+  const [suppTracking, setSuppTracking] = useState(0)
   const [suppTitleColor, setSuppTitleColor] = useState("")
   const [suppSubColor,   setSuppSubColor]   = useState("")
   const [suppOffX,     setSuppOffX]     = useState(0)
@@ -1138,7 +1140,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   async function renderSupport(
     canvas: HTMLCanvasElement,
     tpl: SuppTpl,
-    opts: { title: string; subtitle: string; qrDataUrl: string; logoUrl?: string; scale?: number; theme?: SuppTheme; phone?: string; website?: string; font?: string; titleColor?: string; subColor?: string; offX?: number; offY?: number }
+    opts: { title: string; subtitle: string; qrDataUrl: string; logoUrl?: string; scale?: number; theme?: SuppTheme; phone?: string; website?: string; font?: string; titleColor?: string; subColor?: string; offX?: number; offY?: number; subFont?: string; tracking?: number }
   ): Promise<void> {
     const sc  = opts.scale ?? 1
     const w   = Math.round(tpl.w * sc)
@@ -1196,6 +1198,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const offX = Math.round((opts.offX ?? 0) / 100 * w)
     const offY = Math.round((opts.offY ?? 0) / 100 * h)
     const titleFont = opts.font && opts.font.trim() ? opts.font : "Cormorant Garamond"
+    const subFont   = opts.subFont && opts.subFont.trim() ? opts.subFont : "Arial"
+    const trk       = Math.max(0, opts.tracking ?? 0)
+    const setTrk = (px: number) => { try { (ctx as unknown as { letterSpacing: string }).letterSpacing = `${px}px` } catch { /* noop */ } }
 
     const drawQR = (x: number, y: number, size: number) => {
       if (!qrImg) return
@@ -1212,17 +1217,17 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const drawTitle = (text: string, x: number, y: number, size: number, color: string, align: CanvasTextAlign = "left", maxW?: number) => {
       if (!text) return
       const col = opts.titleColor && opts.titleColor.trim() ? opts.titleColor : color
-      ctx.fillStyle = col; ctx.font = `700 ${size}px '${titleFont}', Georgia, 'Times New Roman', serif`; ctx.textAlign = align
+      ctx.fillStyle = col; ctx.font = `700 ${size}px '${titleFont}', Georgia, 'Times New Roman', serif`; ctx.textAlign = align; setTrk(trk)
       ctx.fillText(text, x + offX, y + offY, maxW ?? w * 0.9)
-      ctx.textAlign = "left"
+      ctx.textAlign = "left"; setTrk(0)
     }
 
     const drawSub = (text: string, x: number, y: number, size: number, color: string, align: CanvasTextAlign = "left", maxW?: number) => {
       if (!text) return
       const col = (opts.subColor && opts.subColor.trim() && text === opts.subtitle) ? opts.subColor : color
-      ctx.fillStyle = col; ctx.font = `400 ${size}px 'Arial', sans-serif`; ctx.textAlign = align
+      ctx.fillStyle = col; ctx.font = `400 ${size}px '${subFont}', Arial, sans-serif`; ctx.textAlign = align; setTrk(trk)
       ctx.fillText(text, x + offX, y + offY, maxW ?? w * 0.85)
-      ctx.textAlign = "left"
+      ctx.textAlign = "left"; setTrk(0)
     }
 
     const drawAccentLine = (x: number, y: number, lineW: number) => {
@@ -1266,18 +1271,18 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const drawTitleFit = (text: string, x: number, y: number, maxSize: number, color: string, align: CanvasTextAlign = "center", maxW = w*0.85) => {
       if (!text) return
       const col = opts.titleColor && opts.titleColor.trim() ? opts.titleColor : color
-      let s = maxSize; ctx.font = `700 ${s}px '${titleFont}', Georgia, serif`
+      let s = maxSize; setTrk(trk); ctx.font = `700 ${s}px '${titleFont}', Georgia, serif`
       while (s > maxSize*0.55 && ctx.measureText(text).width > maxW) { s -= 2; ctx.font = `700 ${s}px '${titleFont}', Georgia, serif` }
-      ctx.fillStyle = col; ctx.textAlign = align; ctx.fillText(text, x + offX, y + offY); ctx.textAlign = "left"
+      ctx.fillStyle = col; ctx.textAlign = align; ctx.fillText(text, x + offX, y + offY); ctx.textAlign = "left"; setTrk(0)
     }
     // Titre multi-lignes, renvoie le Y de la derniere ligne
     const drawTitleWrap = (text: string, x: number, y: number, size: number, lineH: number, color: string, align: CanvasTextAlign, maxW: number) => {
       const col = opts.titleColor && opts.titleColor.trim() ? opts.titleColor : color
-      ctx.fillStyle = col; ctx.font = `700 ${size}px '${titleFont}', Georgia, serif`; ctx.textAlign = align
+      ctx.fillStyle = col; ctx.font = `700 ${size}px '${titleFont}', Georgia, serif`; ctx.textAlign = align; setTrk(trk)
       const words = (text || "").split(" "); let line = "", yy = y
       for (const wd of words) { const t = line ? line+" "+wd : wd; if (ctx.measureText(t).width > maxW && line) { ctx.fillText(line, x + offX, yy + offY); line = wd; yy += lineH } else line = t }
       if (line) ctx.fillText(line, x + offX, yy + offY)
-      ctx.textAlign = "left"; return yy
+      ctx.textAlign = "left"; setTrk(0); return yy
     }
     // Separateur ornemental : ligne - losange - ligne
     const drawOrn = (cx: number, y: number, half: number, color: string) => {
@@ -1699,14 +1704,26 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       const qrBlob  = await getQRBlob({ data: qrUrl, fg, bg, ecc: effectiveEcc, style: styleConf, size: qrPx }, "png")
       if (!qrBlob) throw new Error("qr gen failed")
       const qrDataUrl = await blobToDataUrl(qrBlob)
+      // Charger les polices choisies avant de dessiner (sinon rendu en police de secours)
+      try { const d = (document as Document & { fonts?: { load: (f: string) => Promise<unknown> } }); if (d.fonts) { await Promise.all([d.fonts.load(`700 32px '${suppFont}'`), d.fonts.load(`400 24px '${suppSubFont}'`)]) } } catch { /* noop */ }
       // Scale pour la preview (max 300px de large)
       // Rendre l'apercu en HAUTE resolution (net), le CSS le reduit a la colonne
       const previewScale = Math.min(2.5, 760 / tpl.w)
-      await renderSupport(canvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, logoUrl:styleConf.logoUrl, scale:previewScale, theme:SUPP_THEMES.find(t=>t.id===suppTheme), phone:suppPhone, website:suppWebsite, font:suppFont, titleColor:suppTitleColor, subColor:suppSubColor, offX:suppOffX, offY:suppOffY })
+      await renderSupport(canvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, logoUrl:styleConf.logoUrl, scale:previewScale, theme:SUPP_THEMES.find(t=>t.id===suppTheme), phone:suppPhone, website:suppWebsite, font:suppFont, titleColor:suppTitleColor, subColor:suppSubColor, offX:suppOffX, offY:suppOffY, subFont:suppSubFont, tracking:suppTracking })
       setSuppRendered(true)
     } catch { setSuppRendered(false) }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [suppTplId, qrUrl, fg, bg, ecLevel, styleConf, suppTitle, suppSubtitle, suppTheme, suppPhone, suppWebsite, suppFont, suppTitleColor, suppSubColor, suppOffX, suppOffY])
+  }, [suppTplId, qrUrl, fg, bg, ecLevel, styleConf, suppTitle, suppSubtitle, suppTheme, suppPhone, suppWebsite, suppFont, suppTitleColor, suppSubColor, suppOffX, suppOffY, suppSubFont, suppTracking])
+
+  // Charger des polices Google pour les imprimables (titre + sous-titre)
+  useEffect(() => {
+    const id = "qrfolio-print-fonts"
+    if (typeof document === "undefined" || document.getElementById(id)) return
+    const link = document.createElement("link")
+    link.id = id; link.rel = "stylesheet"
+    link.href = "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:wght@500;700&family=Lora:wght@400;700&family=Merriweather:wght@400;700&family=Poppins:wght@400;600&family=Montserrat:wght@400;700&family=Raleway:wght@400;600&family=Oswald:wght@400;600&family=Bebas+Neue&family=Abril+Fatface&family=Dancing+Script:wght@700&family=Pacifico&display=swap"
+    document.head.appendChild(link)
+  }, [])
 
   // Preview LIVE : regenere automatiquement quand un parametre change (debounce)
   useEffect(() => {
@@ -1724,8 +1741,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       const qrBlob  = await getQRBlob({ data: qrUrl, fg, bg, ecc: effectiveEcc, style: styleConf, size: qrPx }, "png")
       if (!qrBlob) throw new Error("qr gen failed")
       const qrDataUrl = await blobToDataUrl(qrBlob)
+      try { const d = (document as Document & { fonts?: { load: (f: string) => Promise<unknown> } }); if (d.fonts) { await Promise.all([d.fonts.load(`700 32px '${suppFont}'`), d.fonts.load(`400 24px '${suppSubFont}'`)]) } } catch { /* noop */ }
       const outCanvas = document.createElement("canvas")
-      await renderSupport(outCanvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, scale:2, theme:SUPP_THEMES.find(t=>t.id===suppTheme), phone:suppPhone, website:suppWebsite, font:suppFont, titleColor:suppTitleColor, subColor:suppSubColor, offX:suppOffX, offY:suppOffY })
+      await renderSupport(outCanvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, scale:2, theme:SUPP_THEMES.find(t=>t.id===suppTheme), phone:suppPhone, website:suppWebsite, font:suppFont, titleColor:suppTitleColor, subColor:suppSubColor, offX:suppOffX, offY:suppOffY, subFont:suppSubFont, tracking:suppTracking })
       const filename  = `${(tpl.label).replace(/\s+/g,"-").toLowerCase()}-${active?.short_code ?? "qr"}.${fmt}`
       if (fmt === "pdf") {
         // Vrai PDF via jsPDF, oriente selon le support
@@ -3361,6 +3379,37 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         {activeTab === "supports" && active && (() => {
           const tpl = SUPP_TPLS.find(t => t.id === suppTplId) ?? SUPP_TPLS[0]
           const canTpl = PLAN_RANK[userPlan] >= PLAN_RANK[tpl.plan]
+          const fontOpts = (
+            <>
+              <optgroup label="Élégantes">
+                <option value="Cormorant Garamond">Cormorant</option>
+                <option value="Playfair Display">Playfair Display</option>
+                <option value="Lora">Lora</option>
+                <option value="Merriweather">Merriweather</option>
+                <option value="Abril Fatface">Abril Fatface</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Times New Roman">Times</option>
+              </optgroup>
+              <optgroup label="Modernes">
+                <option value="Poppins">Poppins</option>
+                <option value="Montserrat">Montserrat</option>
+                <option value="Raleway">Raleway</option>
+                <option value="Oswald">Oswald</option>
+                <option value="Bebas Neue">Bebas Neue</option>
+                <option value="Arial">Arial</option>
+                <option value="Trebuchet MS">Trebuchet</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Impact">Impact</option>
+              </optgroup>
+              <optgroup label="Manuscrites">
+                <option value="Dancing Script">Dancing Script</option>
+                <option value="Pacifico">Pacifico</option>
+              </optgroup>
+              <optgroup label="Autre">
+                <option value="Courier New">Courier</option>
+              </optgroup>
+            </>
+          )
           return (
           <div className="qr-scroll" style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
 
@@ -3455,19 +3504,15 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none", boxSizing:"border-box" as const }}/>
                   </div>
                   <div>
-                    <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Sous-titre / Appel a l&apos;action</label>
-                    <select value={suppSubtitle} onChange={e => setSuppSubtitle(e.target.value)}
-                      style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
-                      {[
-                        "Scannez pour voir le menu",
-                        "Scannez pour réserver",
-                        "Scannez pour laisser un avis",
-                        "Scannez pour nous suivre",
-                        "Scannez pour découvrir la page",
-                        "Scannez pour télécharger le fichier",
-                        "Scannez pour en savoir plus",
-                      ].map(s => <option key={s} value={s}>{s}</option>)}
-                    </select>
+                    <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Sous-titre / Appel à l&apos;action</label>
+                    <input value={suppSubtitle} onChange={e => setSuppSubtitle(e.target.value)} placeholder="Écris ton message (ex : Scannez pour réserver)"
+                      style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none", boxSizing:"border-box" as const }}/>
+                    <div style={{ display:"flex", flexWrap:"wrap" as const, gap:4, marginTop:6 }}>
+                      {["Scannez pour voir le menu","Scannez pour réserver","Scannez pour laisser un avis","Scannez pour nous suivre","Scannez pour en savoir plus"].map(s => (
+                        <button key={s} type="button" onClick={() => setSuppSubtitle(s)}
+                          style={{ background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.18)", borderRadius:20, padding:"2px 9px", color:MUTED, fontSize:8.5, cursor:"pointer" }}>{s}</button>
+                      ))}
+                    </div>
                   </div>
                   <div style={{ display:"flex", gap:7 }}>
                     <div style={{ flex:1 }}>
@@ -3492,19 +3537,26 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Police du titre</label>
                       <select value={suppFont} onChange={e => setSuppFont(e.target.value)}
                         style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none" }}>
-                        <option value="Cormorant Garamond">Cormorant (élégant)</option>
-                        <option value="Georgia">Georgia (serif)</option>
-                        <option value="Times New Roman">Times</option>
-                        <option value="Arial">Arial (sans)</option>
-                        <option value="Trebuchet MS">Trebuchet</option>
-                        <option value="Verdana">Verdana</option>
-                        <option value="Impact">Impact (fort)</option>
-                        <option value="Courier New">Courier</option>
+                        {fontOpts}
+                      </select>
+                    </div>
+                    <div style={{ marginBottom:10 }}>
+                      <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Police du sous-titre</label>
+                      <select value={suppSubFont} onChange={e => setSuppSubFont(e.target.value)}
+                        style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none" }}>
+                        {fontOpts}
                       </select>
                     </div>
                     <ColorField label="Couleur du titre" value={suppTitleColor} onChange={setSuppTitleColor} onClear={() => setSuppTitleColor("")}/>
                     <div style={{ height:8 }}/>
                     <ColorField label="Couleur du sous-titre" value={suppSubColor} onChange={setSuppSubColor} onClear={() => setSuppSubColor("")}/>
+                    <div style={{ marginTop:10 }}>
+                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                        <label style={{ color:MUTED, fontSize:10 }}>Espacement des lettres</label>
+                        <span style={{ color:MUTED, fontSize:9 }}>{suppTracking}px</span>
+                      </div>
+                      <input type="range" min={0} max={16} value={suppTracking} onChange={e => setSuppTracking(+e.target.value)} style={{ width:"100%", accentColor:G }}/>
+                    </div>
                     <div style={{ marginTop:10 }}>
                       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
                         <label style={{ color:MUTED, fontSize:10 }}>Décalage horizontal</label>
