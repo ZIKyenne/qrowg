@@ -10,9 +10,13 @@ import {
   ImageIcon, FileText, Maximize2, ClipboardList, SlidersHorizontal,
   Printer, LayoutGrid, TrendingUp, TrendingDown, BarChart, Sparkles
 } from "lucide-react"
+import dynamic from "next/dynamic"
 import { createClient } from "@/lib/supabase/client"
 import { createQR, updateQR, getQRBlob, downloadBlob, blobToDataUrl, buildAndDownloadPdf, type QROptions } from "./qrRender"
 import type QRCodeStyling from "qr-code-styling"
+
+// Editeur libre (Fabric.js) : charge uniquement cote client (touche au DOM)
+const PrintStudio = dynamic(() => import("./PrintStudio"), { ssr: false })
 
 type QRCode = {
   id:               string
@@ -392,6 +396,14 @@ const SUPP_THEMES: SuppTheme[] = [
   { id:"marbre",    label:"Marbre",                bg:"#F4F2EC", text:"#262220", accent:"#8A7250", plan:"pro" },
   { id:"neon",      label:"Neon",                  bg:"#0A0A12", text:"#EAEAFF", accent:"#FF3D9A", plan:"business" },
   { id:"royal",     label:"Royal",                 bg:"#0C1A3A", text:"#F5F8FF", accent:"#D4AF37", plan:"business" },
+  // -- Palettes signature (un clic = tout le support change) --
+  { id:"corporate", label:"Corporate",             bg:"#F5F8FC", text:"#102A43", accent:"#1D4ED8", plan:"free" },
+  { id:"restaurant",label:"Restaurant",            bg:"#FFF4E8", text:"#3A2316", accent:"#C0392B", plan:"free" },
+  { id:"ocean",     label:"Ocean",                 bg:"#EAF6F6", text:"#0B3A3A", accent:"#0E7490", plan:"free" },
+  { id:"dark",      label:"Dark",                  bg:"#0E0E11", text:"#F2F2F2", accent:"#FFFFFF", plan:"free" },
+  { id:"luxgold",   label:"Luxury Gold",           bg:"#0B0805", text:"#F4E7C4", accent:"#D4AF37", plan:"pro" },
+  { id:"crypto",    label:"Crypto",                bg:"#0A0F1A", text:"#E4ECF7", accent:"#F7931A", plan:"pro" },
+  { id:"bordeaux",  label:"Bordeaux",              bg:"#1A0610", text:"#F5E4EA", accent:"#C9A84C", plan:"business" },
 ]
 
 // Objectifs marketing : on pense "but" (avis, menu, reservation...) plutot que "format"
@@ -467,6 +479,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [suppOpenGroup, setSuppOpenGroup] = useState("Affiche")
   const [suppObjective, setSuppObjective] = useState("")
   const [suppTheme,   setSuppTheme]   = useState("auto")
+  // -- Editeur libre (PrintStudio / Fabric) -----------------------------
+  const [editorOpen,    setEditorOpen]    = useState(false)
+  const [editorQrUrl,   setEditorQrUrl]   = useState<string | null>(null)
+  const [editorLoading, setEditorLoading] = useState(false)
   const [suppTitle,   setSuppTitle]   = useState("")
   const [suppSubtitle,setSuppSubtitle]= useState("Scannez pour voir le menu")
   const [suppPhone,   setSuppPhone]   = useState("")
@@ -1815,6 +1831,23 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
   }
 
+  // -- Ouvrir l'editeur libre (genere le vrai QR du code actif) ---------------
+  const openEditor = async () => {
+    if (!active || editorLoading) return
+    setEditorLoading(true)
+    try {
+      const qrBlob = await getQRBlob({ data: qrUrl, fg, bg, ecc: effectiveEcc, style: styleConf, size: 1000 }, "png")
+      if (!qrBlob) throw new Error("Generation du QR impossible")
+      const dataUrl = await blobToDataUrl(qrBlob)
+      setEditorQrUrl(dataUrl)
+      setEditorOpen(true)
+    } catch (e) {
+      alert("Impossible d'ouvrir l'editeur : " + (e as Error).message)
+    } finally {
+      setEditorLoading(false)
+    }
+  }
+
   // -- Generer preview support -----------------------------------------------
   const previewSupport = useCallback(async () => {
     const canvas = supportCanvasRef.current; if (!canvas) return
@@ -2234,6 +2267,17 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       )}
 
       {/* -- Modale UPGRADE (conversion) ---------------------------------------- */}
+      {/* -- Editeur libre (PrintStudio / Fabric) plein ecran ------------------ */}
+      {editorOpen && editorQrUrl && active && (
+        <PrintStudio
+          qrId={active.id}
+          qrDataUrl={editorQrUrl}
+          userPlan={userPlan}
+          onClose={() => setEditorOpen(false)}
+          onUpsell={(feature, plan) => setUpsell({ feature, plan })}
+        />
+      )}
+
       {upsell && (() => {
         const isBiz = upsell.plan === "business"
         const planName = isBiz ? "Business" : "Pro"
@@ -3556,8 +3600,22 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
             {/* -- Selecteur templates ------------------------------------ */}
             <div style={{ padding:"10px 12px", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
-              <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:700, margin:"0 0 3px" }}>Modeles prets a imprimer</p>
-              <p style={{ color:MUTED, fontSize:10, margin:"0 0 10px", lineHeight:1.4 }}>Votre QR place dans un support fini : carte, flyer, affiche, sticker...</p>
+
+              {/* Editeur libre (Fabric) */}
+              <button type="button" onClick={openEditor} disabled={editorLoading}
+                style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"12px", marginBottom:6, background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:10, color:"#080808", fontSize:12.5, fontWeight:800, cursor:editorLoading?"wait":"pointer", boxShadow:"0 6px 20px rgba(201,168,76,0.22)", opacity:editorLoading?0.7:1 }}>
+                {editorLoading ? <Loader2 size={14} style={{ animation:"spin 0.8s linear infinite" }}/> : <Sparkles size={14}/>}
+                {editorLoading ? "Ouverture..." : "Éditeur libre — créez votre design"}
+              </button>
+              <p style={{ color:MUTED, fontSize:9.5, textAlign:"center" as const, margin:"0 0 14px", lineHeight:1.4 }}>
+                Déplacez, redimensionnez, ajoutez textes et formes librement (type Canva).
+              </p>
+
+              <div style={{ display:"flex", alignItems:"center", gap:7, margin:"0 0 3px" }}>
+                <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:700, margin:0 }}>Modèles prêts à imprimer</p>
+                <span style={{ background:"rgba(255,255,255,0.06)", color:MUTED, borderRadius:5, padding:"1px 6px", fontSize:8, fontWeight:800, textTransform:"uppercase" as const, letterSpacing:0.5 }}>Mode rapide</span>
+              </div>
+              <p style={{ color:MUTED, fontSize:10, margin:"0 0 10px", lineHeight:1.4 }}>Votre QR placé dans un support fini : carte, flyer, affiche, sticker...</p>
 
               {/* Objectif marketing */}
               <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 6px" }}>Ton objectif</p>
