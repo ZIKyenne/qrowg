@@ -19,7 +19,7 @@ import {
   X, Type as TypeIcon, QrCode, Square, Circle as CircleIcon, Minus,
   Copy, Trash2, Lock, Unlock, ChevronUp, ChevronDown,
   Download, Printer, Loader2, Check, Save,
-  Shapes, Star, Award, MousePointerClick, ArrowRight,
+  Shapes, Star, Award, MousePointerClick, ArrowRight, LayoutTemplate,
 } from "lucide-react"
 
 // ---- Constantes design (Midnight Gold) -------------------------------------
@@ -113,6 +113,19 @@ const TOJSON_PROPS = [
   "lockRotation", "selectable", "evented",
 ]
 
+// ---- Modeles orientes objectifs (points de depart editables) ---------------
+// Chaque modele compose un design (fond + titre + sous-titre + QR + decor) dans
+// l'editeur. Les couleurs sont reprises des palettes signature de QRStudio.
+const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; desc: string; bg: string; ink: string; accent: string }[] = [
+  { id:"avis-or",    label:"Avis — Or",       obj:"Avis",     emoji:"⭐", desc:"5 étoiles dorées + invitation à noter", bg:"#0B0805", ink:"#F4E7C4", accent:"#D4AF37" },
+  { id:"avis-clair", label:"Avis — Clair",    obj:"Avis",     emoji:"⭐", desc:"Fond crème, sobre et lisible",          bg:"#FFF9EF", ink:"#2A2419", accent:"#C0392B" },
+  { id:"menu",       label:"Menu — Élégant",  obj:"Menu",     emoji:"🍽️", desc:"Bandeau coloré + « Notre carte »",       bg:"#101010", ink:"#F5F0E8", accent:"#C9A84C" },
+  { id:"reserver",   label:"Réservation",     obj:"Réserver", emoji:"📅", desc:"Picto agenda + « Réservez votre table »", bg:"#06231C", ink:"#EAF7F0", accent:"#34D399" },
+  { id:"insta",      label:"Instagram",       obj:"Abonnés",  emoji:"📷", desc:"Picto photo + « Suivez-nous » + @compte", bg:"#1A0A14", ink:"#FFF0F6", accent:"#E1306C" },
+  { id:"contact",    label:"Carte contact",   obj:"Contact",  emoji:"💳", desc:"Nom, métier, coordonnées + QR",          bg:"#0F1729", ink:"#F1F5FF", accent:"#5B8DEF" },
+  { id:"decouvrir",  label:"Découvrir",       obj:"Page",     emoji:"🔗", desc:"Invitation simple à scanner",            bg:"#FFFFFF", ink:"#1A1A1A", accent:"#1D4ED8" },
+]
+
 export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpsell }: Props) {
   const elRef   = useRef<HTMLCanvasElement>(null)
   const fcRef   = useRef<fabric.Canvas | null>(null)
@@ -129,6 +142,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [exporting, setExporting] = useState(false)
   const [libOpen, setLibOpen] = useState(false)
   const [libCat, setLibCat]   = useState<"cta" | "icons" | "badges" | "shapes" | "arrows">("cta")
+  const [tplOpen, setTplOpen] = useState(false)
 
   const isPro = userPlan === "pro" || userPlan === "business"
 
@@ -407,6 +421,104 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     setBgColor(color)
   }
 
+  // ---- Appliquer un modele oriente objectif --------------------------------
+  // Vide le canvas (hors guides), pose un design complet et editable, place le vrai QR.
+  const applyTemplate = async (id: string) => {
+    const fc = fcRef.current; if (!fc) return
+    const meta = PRINT_TEMPLATES.find(t => t.id === id); if (!meta) return
+    const vG = vGuideRef.current, hG = hGuideRef.current
+    const hasContent = fc.getObjects().some(o => o !== vG && o !== hG)
+    if (hasContent && !window.confirm("Remplacer le contenu actuel par ce modèle ?")) return
+
+    fc.getObjects().slice().forEach(o => { if (o !== vG && o !== hG) fc.remove(o) })
+    const W = fc.getWidth(), H = fc.getHeight()
+    const { bg, ink, accent } = meta
+    fc.setBackgroundColor(bg, () => {}); setBgColor(bg)
+
+    const addText = (s: string, top: number, size: number, o: { weight?: string; fill?: string; font?: string; width?: number } = {}) => {
+      fc.add(new fabric.Textbox(s, {
+        width: o.width ?? W * 0.82, left: W / 2, top, originX: "center", textAlign: "center",
+        fontFamily: o.font ?? "Georgia", fontWeight: o.weight ?? "normal", fontSize: size, fill: o.fill ?? ink,
+      }))
+    }
+    const addStars = (n: number, cy: number, s: number, color: string) => {
+      const objs: fabric.Object[] = []
+      for (let i = 0; i < n; i++) objs.push(new fabric.Polygon(starPts(5, s / 2, s / 5), { fill: color, left: i * (s * 1.25), top: 0 }))
+      fc.add(new fabric.Group(objs, { originX: "center", left: W / 2, top: cy }))
+    }
+    const addCTA = (label: string, top: number) => {
+      const rw = Math.min(W * 0.7, 360), rh = Math.round(rw * 0.2)
+      const rect = new fabric.Rect({ width: rw, height: rh, rx: rh / 2, ry: rh / 2, fill: accent })
+      const txt  = new fabric.Text(label, { fontSize: Math.round(rh * 0.42), fontFamily: "Arial", fontWeight: "bold", fill: bg, originX: "center", originY: "center", left: rw / 2, top: rh / 2 })
+      fc.add(new fabric.Group([rect, txt], { originX: "center", left: W / 2, top }))
+    }
+    const addIconT = (d: string, size: number, top: number, color: string) => new Promise<void>(res => {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="${d}" fill="${color}"/></svg>`
+      fabric.loadSVGFromString(svg, (objs, opt) => {
+        const o = fabric.util.groupSVGElements(objs, opt) as fabric.Object
+        o.scaleToWidth(size); o.set({ originX: "center", originY: "top", left: W / 2, top }); fc.add(o); res()
+      })
+    })
+    const placeQrT = (top: number, wFrac: number) => new Promise<void>(res => {
+      fabric.Image.fromURL(qrUrlRef.current, (img) => {
+        img.scaleToWidth(W * wFrac); (img as any).isQR = true
+        img.set({ originX: "center", originY: "top", left: W / 2, top }); fc.add(img); res()
+      })
+    })
+    const ICON = (k: string) => LIB_ICONS.find(i => i.key === k)!.d
+
+    switch (id) {
+      case "avis-or":
+      case "avis-clair":
+        addText("Vous avez aimé ?", H * 0.06, W * 0.075, { weight: "bold" })
+        addStars(5, H * 0.19, W * 0.07, accent)
+        addText("Laissez-nous un avis en 30 secondes", H * 0.27, W * 0.034, { font: "Arial", width: W * 0.72 })
+        await placeQrT(H * 0.37, 0.46)
+        addCTA("Scannez-moi", H * 0.85)
+        break
+      case "menu":
+        fc.add(new fabric.Rect({ left: 0, top: 0, width: W, height: Math.round(H * 0.16), fill: accent }))
+        addText("Notre Carte", H * 0.045, W * 0.085, { weight: "bold", fill: bg })
+        addText("Scannez pour découvrir nos plats", H * 0.24, W * 0.034, { font: "Arial" })
+        await placeQrT(H * 0.34, 0.5)
+        addCTA("Voir le menu", H * 0.85)
+        break
+      case "reserver":
+        await addIconT(ICON("cal"), W * 0.14, H * 0.07, accent)
+        addText("Réservez votre table", H * 0.2, W * 0.07, { weight: "bold" })
+        addText("En quelques secondes, où que vous soyez", H * 0.28, W * 0.032, { font: "Arial", width: W * 0.72 })
+        await placeQrT(H * 0.38, 0.44)
+        addCTA("Réservez", H * 0.85)
+        break
+      case "insta":
+        await addIconT(ICON("cam"), W * 0.14, H * 0.07, accent)
+        addText("Suivez-nous", H * 0.2, W * 0.085, { weight: "bold" })
+        addText("@votrecompte", H * 0.29, W * 0.04, { font: "Arial", fill: accent })
+        await placeQrT(H * 0.38, 0.44)
+        addCTA("Suivez-nous", H * 0.85)
+        break
+      case "contact":
+        addText("Prénom Nom", H * 0.09, W * 0.08, { weight: "bold" })
+        addText("Votre métier", H * 0.18, W * 0.036, { font: "Arial", fill: accent })
+        await placeQrT(H * 0.28, 0.5)
+        addText("📞  06 12 34 56 78", H * 0.74, W * 0.034, { font: "Arial" })
+        addText("✉  contact@email.com", H * 0.80, W * 0.034, { font: "Arial" })
+        addText("🌐  monsite.fr", H * 0.86, W * 0.034, { font: "Arial" })
+        break
+      case "decouvrir":
+        addText("Découvrez-nous", H * 0.1, W * 0.08, { weight: "bold" })
+        addText("Scannez pour en savoir plus", H * 0.19, W * 0.034, { font: "Arial" })
+        await placeQrT(H * 0.3, 0.5)
+        addCTA("En savoir plus", H * 0.85)
+        break
+    }
+
+    if (vG) fc.bringToFront(vG)
+    if (hG) fc.bringToFront(hG)
+    fc.discardActiveObject(); setSel(null); fc.requestRenderAll()
+    setTplOpen(false)
+  }
+
   // ---- Sauvegarde ----------------------------------------------------------
   const save = async () => {
     const fc = fcRef.current; if (!fc) return
@@ -551,17 +663,60 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Rail outils */}
         <div style={{ width: 92, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", padding: 12, display: "flex", flexDirection: "column", gap: 8, background: SURFACE }}>
-          <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 2px" }}>Ajouter</p>
+          <button type="button" onClick={() => { setTplOpen(v => !v); setLibOpen(false) }}
+            style={{ ...btnTool, background: tplOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.14),rgba(201,168,76,0.05))", border: `1px solid ${tplOpen ? G : "rgba(201,168,76,0.3)"}`, color: tplOpen ? G : INK, fontWeight: 700 }}>
+            <LayoutTemplate size={16} /> Modèles
+          </button>
+          <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "6px 0 2px" }}>Ajouter</p>
           <button type="button" onClick={addText}   style={btnTool}><TypeIcon size={16} /> Texte</button>
           <button type="button" onClick={addQr}     style={btnTool}><QrCode size={16} /> QR</button>
           <button type="button" onClick={addRect}   style={btnTool}><Square size={16} /> Rect.</button>
           <button type="button" onClick={addCircle} style={btnTool}><CircleIcon size={16} /> Cercle</button>
           <button type="button" onClick={addLine}   style={btnTool}><Minus size={16} /> Ligne</button>
-          <button type="button" onClick={() => setLibOpen(v => !v)}
+          <button type="button" onClick={() => { setLibOpen(v => !v); setTplOpen(false) }}
             style={{ ...btnTool, marginTop: 4, background: libOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.12),rgba(201,168,76,0.05))", border: `1px solid ${libOpen ? G : "rgba(201,168,76,0.3)"}`, color: libOpen ? G : INK, fontWeight: 700 }}>
             <Shapes size={16} /> Éléments
           </button>
         </div>
+
+        {/* Modeles orientes objectif (flyout) */}
+        {tplOpen && (
+          <div className="qr-scroll" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+              <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Modèles par objectif</span>
+              <button type="button" onClick={() => setTplOpen(false)} aria-label="Fermer les modèles"
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}>
+                <X size={13} />
+              </button>
+            </div>
+            <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "10px 10px 16px" }}>
+              {["Avis", "Menu", "Réserver", "Abonnés", "Contact", "Page"].map(obj => {
+                const items = PRINT_TEMPLATES.filter(t => t.obj === obj)
+                if (!items.length) return null
+                return (
+                  <div key={obj} style={{ marginBottom: 12 }}>
+                    <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>{obj}</p>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      {items.map(t => (
+                        <button key={t.id} type="button" onClick={() => applyTemplate(t.id)}
+                          style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 10px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer", textAlign: "left" }}>
+                          <span style={{ fontSize: 18, flexShrink: 0 }}>{t.emoji}</span>
+                          <span style={{ minWidth: 0 }}>
+                            <span style={{ display: "block", color: INK, fontSize: 11.5, fontWeight: 700 }}>{t.label}</span>
+                            <span style={{ display: "block", color: MUTED, fontSize: 9, lineHeight: 1.3 }}>{t.desc}</span>
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+              <p style={{ color: MUTED, fontSize: 9, margin: "4px 2px 0", lineHeight: 1.4 }}>
+                Un modèle remplace le contenu actuel. Tout reste ensuite modifiable (textes, couleurs, position…).
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Bibliotheque d'elements (flyout) */}
         {libOpen && (
