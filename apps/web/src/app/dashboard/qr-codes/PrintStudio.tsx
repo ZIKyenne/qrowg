@@ -110,6 +110,8 @@ type SelState = {
   label: string | null    // libelle editable (groupe CTA/badge contenant un texte)
   isGroup: boolean        // true => "Couleur" recolore les formes du groupe
   textFill: string | null // couleur du texte interne (groupe avec texte)
+  shadow: boolean         // ombre portee active
+  shadowBlur: number      // intensite du flou de l'ombre
 } | null
 
 // Trouve l'objet texte dans un groupe (CTA / badge), s'il y en a un
@@ -241,6 +243,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       label: txtChild?.text ?? null,
       isGroup,
       textFill: txtChild && typeof txtChild.fill === "string" ? txtChild.fill : null,
+      shadow: !!o.shadow,
+      shadowBlur: o.shadow ? ((o.shadow as fabric.Shadow).blur ?? 18) : 18,
     }
   }, [])
 
@@ -586,6 +590,17 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const setTextColor = (color: string) => mutate(o => {
     const txt = groupText(o); if (!txt) return
     txt.set("fill", color)
+    o.dirty = true
+  })
+
+  // Effet : ombre portee
+  const setShadow = (on: boolean) => mutate(o => {
+    o.set("shadow", on ? new fabric.Shadow({ color: "rgba(0,0,0,0.35)", blur: 18, offsetX: 0, offsetY: 8 }) : null)
+    o.dirty = true
+  })
+  const setShadowBlur = (v: number) => mutate(o => {
+    const s = o.shadow as fabric.Shadow | null; if (!s) return
+    s.blur = v
     o.dirty = true
   })
 
@@ -1178,6 +1193,23 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                       style={{ ...layerBtn, width: "100%", background: sel.bold ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", color: sel.bold ? G : INK, fontWeight: 700 }}>
                       Gras
                     </button>
+                  </>
+                )}
+              </div>
+
+              {/* Effets */}
+              <div>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Effets</p>
+                <button type="button" onClick={() => setShadow(!sel.shadow)}
+                  style={{ ...layerBtn, width: "100%", background: sel.shadow ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", color: sel.shadow ? G : INK, fontWeight: 700, marginBottom: sel.shadow ? 8 : 0 }}>
+                  Ombre portée {sel.shadow ? "✓" : ""}
+                </button>
+                {sel.shadow && (
+                  <>
+                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Flou — {Math.round(sel.shadowBlur)}px</label>
+                    <input type="range" min={0} max={60} step={1} value={sel.shadowBlur}
+                      onChange={e => setShadowBlur(parseInt(e.target.value))}
+                      style={{ width: "100%", accentColor: G }} />
                   </>
                 )}
               </div>
