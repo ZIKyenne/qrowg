@@ -198,6 +198,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const qrUrlRef = useRef(qrDataUrl)
   const vGuideRef = useRef<fabric.Line | null>(null)
   const hGuideRef = useRef<fabric.Line | null>(null)
+  const clipRef = useRef<fabric.Object | null>(null) // presse-papier (copier/coller)
 
   const [format, setFormat]   = useState<FormatId>("a4")
   const [sel, setSel]         = useState<SelState>(null)
@@ -343,20 +344,51 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     }
   }, [qrDataUrl])
 
-  // ---- Suppression au clavier ----------------------------------------------
+  // ---- Raccourcis clavier (supprimer, copier/coller, dupliquer, deplacer) --
   useEffect(() => {
+    const isTyping = () => {
+      const el = document.activeElement as HTMLElement | null
+      return !!el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)
+    }
+    // Clone + ajoute au canvas, decale et selectionne
+    const dropClone = (fc: fabric.Canvas, src: fabric.Object, dx: number, dy: number) => {
+      src.clone((c: fabric.Object) => {
+        c.set({ left: (src.left ?? 0) + dx, top: (src.top ?? 0) + dy })
+        ;(c as any).isQR = (src as any).isQR
+        fc.add(c); fc.setActiveObject(c); fc.requestRenderAll(); refreshSel()
+      }, TOJSON_PROPS)
+    }
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Delete" && e.key !== "Backspace") return
       const fc = fcRef.current; if (!fc) return
       const o = fc.getActiveObject()
-      if (o && !(o as any).isEditing) {
+      if (isTyping() || (o as any)?.isEditing) return // ne pas gener la saisie de texte
+      const meta = e.ctrlKey || e.metaKey
+
+      if (e.key === "Delete" || e.key === "Backspace") {
+        if (!o) return
+        e.preventDefault(); fc.remove(o); fc.discardActiveObject(); fc.requestRenderAll(); setSel(null)
+      } else if (meta && (e.key === "c" || e.key === "C")) {
+        if (!o) return
+        e.preventDefault(); o.clone((c: fabric.Object) => { clipRef.current = c }, TOJSON_PROPS)
+      } else if (meta && (e.key === "v" || e.key === "V")) {
+        if (!clipRef.current) return
+        e.preventDefault(); dropClone(fc, clipRef.current, 24, 24)
+      } else if (meta && (e.key === "d" || e.key === "D")) {
+        if (!o) return
+        e.preventDefault(); dropClone(fc, o, 24, 24)
+      } else if (o && e.key.startsWith("Arrow")) {
         e.preventDefault()
-        fc.remove(o); fc.discardActiveObject(); fc.requestRenderAll(); setSel(null)
+        const s = e.shiftKey ? 10 : 1
+        if (e.key === "ArrowLeft")  o.set("left", (o.left ?? 0) - s)
+        if (e.key === "ArrowRight") o.set("left", (o.left ?? 0) + s)
+        if (e.key === "ArrowUp")    o.set("top",  (o.top  ?? 0) - s)
+        if (e.key === "ArrowDown")  o.set("top",  (o.top  ?? 0) + s)
+        o.setCoords(); fc.requestRenderAll()
       }
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [])
+  }, [refreshSel])
 
   // ---- Poser le vrai QR ----------------------------------------------------
   function placeQr(fc: fabric.Canvas) {
@@ -1066,7 +1098,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           ) : (
             <div style={{ color: MUTED, fontSize: 11, lineHeight: 1.6, padding: "10px 2px" }}>
               Sélectionne un élément pour modifier sa couleur, son opacité, sa position…<br /><br />
-              Double-clic sur un texte pour l'éditer. Touche <strong style={{ color: INK }}>Suppr</strong> pour retirer l'élément sélectionné.
+              Double-clic sur un texte pour l'éditer.<br />
+              <strong style={{ color: INK }}>Suppr</strong> retire · <strong style={{ color: INK }}>Ctrl/⌘+C/V</strong> copier-coller · <strong style={{ color: INK }}>Ctrl/⌘+D</strong> dupliquer · <strong style={{ color: INK }}>flèches</strong> déplacer (Maj ×10).
             </div>
           )}
         </div>
