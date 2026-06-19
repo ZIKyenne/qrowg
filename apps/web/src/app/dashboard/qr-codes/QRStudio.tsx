@@ -1188,15 +1188,15 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
     const drawTitle = (text: string, x: number, y: number, size: number, color: string, align: CanvasTextAlign = "left", maxW?: number) => {
       if (!text) return
-      ctx.fillStyle = color; ctx.font = `700 ${size}px 'Arial', sans-serif`; ctx.textAlign = align
+      ctx.fillStyle = color; ctx.font = `700 ${size}px 'Cormorant Garamond', Georgia, 'Times New Roman', serif`; ctx.textAlign = align
       ctx.fillText(text, x, y, maxW ?? w * 0.9)
       ctx.textAlign = "left"
     }
 
-    const drawSub = (text: string, x: number, y: number, size: number, color: string, align: CanvasTextAlign = "left") => {
+    const drawSub = (text: string, x: number, y: number, size: number, color: string, align: CanvasTextAlign = "left", maxW?: number) => {
       if (!text) return
       ctx.fillStyle = color; ctx.font = `400 ${size}px 'Arial', sans-serif`; ctx.textAlign = align
-      ctx.fillText(text, x, y, w * 0.85)
+      ctx.fillText(text, x, y, maxW ?? w * 0.85)
       ctx.textAlign = "left"
     }
 
@@ -1207,10 +1207,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
     // Ligne de contact (tel + site) : dessinee seulement si renseignee
     const contactStr = [opts.phone?.trim(), opts.website?.trim()].filter(Boolean).join("   ·   ")
-    const drawContact = (x: number, y: number, size: number, color: string, align: CanvasTextAlign = "center") => {
+    const drawContact = (x: number, y: number, size: number, color: string, align: CanvasTextAlign = "center", maxW?: number) => {
       if (!contactStr) return
       ctx.fillStyle = color; ctx.font = `500 ${size}px 'Arial', sans-serif`; ctx.textAlign = align
-      ctx.fillText(contactStr, x, y, w * 0.85)
+      ctx.fillText(contactStr, x, y, maxW ?? w * 0.85)
       ctx.textAlign = "left"
     }
 
@@ -1305,8 +1305,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       drawTitle(opts.title || active?.pages?.title || "", lx, ly, Math.round(h * 0.11), isDark?"#F5F0E8":"#FFFFFF", "center", Math.round(w * 0.32))
       ctx.fillStyle = isDark ? "rgba(201,168,76,0.8)" : "rgba(255,255,255,0.6)"
       ctx.fillRect(lx - Math.round(w * 0.05), ly + Math.round(h*0.04), Math.round(w * 0.14), Math.round(h*0.007))
-      drawSub(opts.subtitle, lx, Math.round(h * 0.67), Math.round(h * 0.07), isDark?"rgba(201,168,76,0.9)":"rgba(255,255,255,0.8)", "center")
-      drawContact(lx, Math.round(h * 0.82), Math.round(h * 0.05), isDark?"rgba(245,240,232,0.85)":"rgba(255,255,255,0.85)", "center")
+      drawSub(opts.subtitle, lx, Math.round(h * 0.66), Math.round(h * 0.05), isDark?"rgba(201,168,76,0.9)":"rgba(255,255,255,0.85)", "center", Math.round(w * 0.30))
+      drawContact(lx, Math.round(h * 0.80), Math.round(h * 0.036), isDark?"rgba(245,240,232,0.85)":"rgba(255,255,255,0.85)", "center", Math.round(w * 0.30))
       drawQR(qrX, qrY, qrSize)
     }
 
@@ -1844,9 +1844,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           <QrCode size={32} color={G}/>
         </div>
         <h2 style={{ fontFamily:"Cormorant Garamond, serif", fontSize:24, color:"#F5F0E8", fontWeight:700, margin:"0 0 10px" }}>Aucun QR code</h2>
-        <p style={{ color:MUTED, fontSize:14, lineHeight:1.7, margin:"0 0 28px" }}>Cree ta premiere page pour generer automatiquement un QR code.</p>
+        <p style={{ color:MUTED, fontSize:14, lineHeight:1.7, margin:"0 0 28px" }}>Crée ta première page pour générer automatiquement un QR code.</p>
         <a href="/dashboard" style={{ background:"linear-gradient(90deg,#C9A84C,#b8953f)", color:"#080808", textDecoration:"none", fontSize:14, fontWeight:700, padding:"14px 28px", borderRadius:10, display:"inline-block" }}>
-          Creer ma premiere page
+          Créer ma première page
         </a>
       </div>
     )
@@ -2056,7 +2056,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               {qrCodes.length === 0 ? (
                 <>
                   <p style={{ fontSize:12, margin:"0 0 3px", color:"#F5F0E8", fontWeight:600 }}>Aucun QR pour l'instant</p>
-                  <p style={{ fontSize:10, margin:0, lineHeight:1.5 }}>Creez votre premiere page<br/>pour demarrer</p>
+                  <p style={{ fontSize:10, margin:0, lineHeight:1.5 }}>Créez votre première page<br/>pour démarrer</p>
                 </>
               ) : (
                 <>
@@ -2647,10 +2647,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               <>
                 <div style={{ textAlign:"center" as const }}>
                   <p style={{ color:"#F5F0E8", fontSize:15, fontWeight:700, margin:"0 0 6px" }}>Bienvenue dans QR Studio</p>
-                  <p style={{ color:MUTED, fontSize:12, margin:0, lineHeight:1.6 }}>Creez votre premiere page pour generer<br/>un QR Code personnalisable.</p>
+                  <p style={{ color:MUTED, fontSize:12, margin:0, lineHeight:1.6 }}>Créez votre première page pour générer<br/>un QR Code personnalisable.</p>
                 </div>
                 <a href="/dashboard" style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"11px 20px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, textDecoration:"none", boxShadow:"0 4px 14px rgba(201,168,76,0.2)" }}>
-                  <Plus size={15}/> Creer ma premiere page
+                  <Plus size={15}/> Créer ma première page
                 </a>
               </>
             ) : (
@@ -2713,7 +2713,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     {/* Bouton style automatique */}
                     <button type="button" onClick={autoStyle}
                       style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, marginBottom:autoMsg?6:12, padding:"10px", background:"linear-gradient(90deg, rgba(201,168,76,0.18), rgba(201,168,76,0.08))", border:"1px solid rgba(201,168,76,0.35)", borderRadius:10, color:G, fontSize:12, fontWeight:700, cursor:"pointer" }}>
-                      <Sparkles size={14}/> Generer un style automatiquement
+                      <Sparkles size={14}/> Générer un style automatiquement
                     </button>
                     {autoMsg && (
                       <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:12, padding:"7px 10px", background:"rgba(57,255,143,0.08)", border:"1px solid rgba(57,255,143,0.25)", borderRadius:8, color:"#39FF8F", fontSize:11, fontWeight:600 }}>
@@ -2809,7 +2809,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     {/* Generer une palette */}
                     <button type="button" onClick={genPalette}
                       style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, marginBottom:10, padding:"9px", background:"linear-gradient(90deg, rgba(201,168,76,0.16), rgba(201,168,76,0.06))", border:"1px solid rgba(201,168,76,0.3)", borderRadius:9, color:G, fontSize:12, fontWeight:700, cursor:"pointer" }}>
-                      <Sparkles size={13}/> Generer une palette
+                      <Sparkles size={13}/> Générer une palette
                     </button>
                     <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                       <ColorField label="QR principal" value={fg} onChange={setFg}/>
