@@ -126,6 +126,36 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"decouvrir",  label:"Découvrir",       obj:"Page",     emoji:"🔗", desc:"Invitation simple à scanner",            bg:"#FFFFFF", ink:"#1A1A1A", accent:"#1D4ED8" },
 ]
 
+// Mini-apercu schematique d'un modele (fond + couleurs + disposition)
+function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
+  const isMenu = t.id === "menu"
+  const isContact = t.id === "contact"
+  const isAvis = t.id.startsWith("avis")
+  const starClip = "polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)"
+  return (
+    <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", background: t.bg, borderRadius: 6, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", gap: "6%", padding: isMenu ? "0 10% 12%" : "13% 10%", boxSizing: "border-box" }}>
+      {isMenu && <div style={{ width: "100%", height: "18%", background: t.accent, marginBottom: "8%" }} />}
+      <div style={{ width: "68%", height: 5, borderRadius: 3, background: t.ink, opacity: 0.92 }} />
+      {isAvis ? (
+        <div style={{ display: "flex", gap: "4%", width: "52%", justifyContent: "center" }}>
+          {[0, 1, 2, 3, 4].map(i => <div key={i} style={{ width: "13%", aspectRatio: "1", background: t.accent, clipPath: starClip }} />)}
+        </div>
+      ) : (
+        <div style={{ width: "38%", height: 4, borderRadius: 2, background: t.accent }} />
+      )}
+      <div style={{ width: "44%", aspectRatio: "1", background: "#fff", borderRadius: 3, marginTop: "2%" }} />
+      {isContact ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, width: "72%", alignItems: "center", marginTop: "5%" }}>
+          <div style={{ width: "82%", height: 3, borderRadius: 2, background: t.ink, opacity: 0.7 }} />
+          <div style={{ width: "64%", height: 3, borderRadius: 2, background: t.ink, opacity: 0.7 }} />
+        </div>
+      ) : (
+        <div style={{ width: "56%", height: 8, borderRadius: 5, background: t.accent, marginTop: "6%" }} />
+      )}
+    </div>
+  )
+}
+
 export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpsell }: Props) {
   const elRef   = useRef<HTMLCanvasElement>(null)
   const fcRef   = useRef<fabric.Canvas | null>(null)
@@ -696,15 +726,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 return (
                   <div key={obj} style={{ marginBottom: 12 }}>
                     <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>{obj}</p>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                       {items.map(t => (
-                        <button key={t.id} type="button" onClick={() => applyTemplate(t.id)}
-                          style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 10px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer", textAlign: "left" }}>
-                          <span style={{ fontSize: 18, flexShrink: 0 }}>{t.emoji}</span>
-                          <span style={{ minWidth: 0 }}>
-                            <span style={{ display: "block", color: INK, fontSize: 11.5, fontWeight: 700 }}>{t.label}</span>
-                            <span style={{ display: "block", color: MUTED, fontSize: 9, lineHeight: 1.3 }}>{t.desc}</span>
-                          </span>
+                        <button key={t.id} type="button" onClick={() => applyTemplate(t.id)} title={t.desc}
+                          style={{ display: "flex", flexDirection: "column", gap: 5, padding: 6, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, cursor: "pointer" }}>
+                          {tplThumb(t)}
+                          <span style={{ color: INK, fontSize: 10, fontWeight: 700, textAlign: "center", lineHeight: 1.2 }}>{t.label}</span>
                         </button>
                       ))}
                     </div>
