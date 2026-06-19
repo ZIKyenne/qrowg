@@ -376,15 +376,22 @@ function ColorField({ label, value, onChange, onClear }: {
 }
 
 // -- Themes d'imprimables (palette independante du QR) -----------------------
-type SuppTheme = { id: string; label: string; bg: string; text: string; accent: string }
+type SuppTheme = { id: string; label: string; bg: string; text: string; accent: string; plan: string }
 const SUPP_THEMES: SuppTheme[] = [
-  { id:"auto",      label:"Auto (couleurs du QR)", bg:"",        text:"",        accent:""        },
-  { id:"minimal",   label:"Minimal",               bg:"#FFFFFF", text:"#1A1A1A", accent:"#1A1A1A" },
-  { id:"blackgold", label:"Black Gold",            bg:"#0A0A0A", text:"#F5F0E8", accent:"#C9A84C" },
-  { id:"cream",     label:"Creme & Or",            bg:"#F6F1E7", text:"#2A2419", accent:"#C9A84C" },
-  { id:"modern",    label:"Modern",                bg:"#0F1729", text:"#F1F5FF", accent:"#5B8DEF" },
-  { id:"nature",    label:"Nature",                bg:"#F2F4EC", text:"#26331C", accent:"#5B8A3A" },
-  { id:"coral",     label:"Coral",                 bg:"#FFF5F0", text:"#3A1E16", accent:"#E5634D" },
+  { id:"auto",      label:"Auto (couleurs du QR)", bg:"",        text:"",        accent:"",        plan:"free" },
+  { id:"minimal",   label:"Minimal",               bg:"#FFFFFF", text:"#1A1A1A", accent:"#1A1A1A", plan:"free" },
+  { id:"blackgold", label:"Black Gold",            bg:"#0A0A0A", text:"#F5F0E8", accent:"#C9A84C", plan:"free" },
+  { id:"cream",     label:"Creme & Or",            bg:"#F6F1E7", text:"#2A2419", accent:"#C9A84C", plan:"free" },
+  { id:"modern",    label:"Modern",                bg:"#0F1729", text:"#F1F5FF", accent:"#5B8DEF", plan:"free" },
+  { id:"nature",    label:"Nature",                bg:"#F2F4EC", text:"#26331C", accent:"#5B8A3A", plan:"free" },
+  { id:"coral",     label:"Coral",                 bg:"#FFF5F0", text:"#3A1E16", accent:"#E5634D", plan:"free" },
+  // -- Premium --
+  { id:"emeraude",  label:"Emeraude",              bg:"#06231C", text:"#EAF7F0", accent:"#34D399", plan:"pro" },
+  { id:"velours",   label:"Velours",               bg:"#1A0F2E", text:"#F3ECFF", accent:"#C9A84C", plan:"pro" },
+  { id:"ardoise",   label:"Ardoise",               bg:"#1E232B", text:"#EEF2F6", accent:"#C9A84C", plan:"pro" },
+  { id:"marbre",    label:"Marbre",                bg:"#F4F2EC", text:"#262220", accent:"#8A7250", plan:"pro" },
+  { id:"neon",      label:"Neon",                  bg:"#0A0A12", text:"#EAEAFF", accent:"#FF3D9A", plan:"business" },
+  { id:"royal",     label:"Royal",                 bg:"#0C1A3A", text:"#F5F8FF", accent:"#D4AF37", plan:"business" },
 ]
 
 export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: Props) {
@@ -451,6 +458,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [suppSubtitle,setSuppSubtitle]= useState("Scannez pour voir le menu")
   const [suppPhone,   setSuppPhone]   = useState("")
   const [suppWebsite, setSuppWebsite] = useState("")
+  const [suppFont,     setSuppFont]     = useState("Cormorant Garamond")
+  const [suppTitleColor, setSuppTitleColor] = useState("")
+  const [suppSubColor,   setSuppSubColor]   = useState("")
+  const [suppOffX,     setSuppOffX]     = useState(0)
+  const [suppOffY,     setSuppOffY]     = useState(0)
   const [suppRendered,setSuppRendered]= useState(false)
   const [suppExporting,setSuppExporting]=useState(false)
   const [saving,     setSaving]     = useState(false)
@@ -1082,45 +1094,45 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     { id:"a4-poster",   label:"Affiche A4",         emoji:"📋", w:795,  h:1122, plan:"free",     cat:"Print",      desc:"Portrait A4 avec titre et fond" },
     { id:"flyer",       label:"Flyer",              emoji:"📄", w:795,  h:561,  plan:"free",     cat:"Print",      desc:"Demi A4 paysage" },
     { id:"sticker",     label:"Sticker vitrine",    emoji:"🏷️",  w:600,  h:600,  plan:"free",     cat:"Print",      desc:"Carré 6cm avec cadre" },
-    { id:"table-card",  label:"Carte de table",     emoji:"🪧",  w:900,  h:506,  plan:"pro",      cat:"Restaurant", desc:"Format paysage 9x5cm" },
-    { id:"menu-qr",     label:"Menu QR",            emoji:"🍽",  w:600,  h:900,  plan:"pro",      cat:"Restaurant", desc:"Carte portrait avec titre menu" },
-    { id:"business",    label:"Carte de visite",    emoji:"💳", w:1063, h:591,  plan:"pro",      cat:"Business",   desc:"Format CR80 standard" },
-    { id:"event-badge", label:"Badge evenement",    emoji:"🎫", w:680,  h:400,  plan:"pro",      cat:"Event",      desc:"Badge horizontal 85x50mm" },
-    { id:"story",       label:"Story Instagram",    emoji:"📱", w:1080, h:1920, plan:"business", cat:"Social",     desc:"9:16 vertical stories" },
-    { id:"post",        label:"Post Instagram",     emoji:"🟫", w:1080, h:1080, plan:"business", cat:"Social",     desc:"Carré 1:1" },
+    { id:"table-card",  label:"Carte de table",     emoji:"🪧",  w:900,  h:506,  plan:"free",      cat:"Restaurant", desc:"Format paysage 9x5cm" },
+    { id:"menu-qr",     label:"Menu QR",            emoji:"🍽",  w:600,  h:900,  plan:"free",      cat:"Restaurant", desc:"Carte portrait avec titre menu" },
+    { id:"business",    label:"Carte de visite",    emoji:"💳", w:1063, h:591,  plan:"free",      cat:"Business",   desc:"Format CR80 standard" },
+    { id:"event-badge", label:"Badge evenement",    emoji:"🎫", w:680,  h:400,  plan:"free",      cat:"Event",      desc:"Badge horizontal 85x50mm" },
+    { id:"story",       label:"Story Instagram",    emoji:"📱", w:1080, h:1920, plan:"free", cat:"Social",     desc:"9:16 vertical stories" },
+    { id:"post",        label:"Post Instagram",     emoji:"🟫", w:1080, h:1080, plan:"free", cat:"Social",     desc:"Carré 1:1" },
 
     // ===== LOT 15 templates supplementaires =====
   // ---- Print ----
   { id:"affiche-minimal",     label:"Affiche minimale",   emoji:"🖼️", w:795,  h:1122, plan:"free",     cat:"Print",      desc:"A4 épuré, grand QR centré" },
-  { id:"affiche-premium",     label:"Affiche premium",    emoji:"✨", w:795,  h:1122, plan:"pro",      cat:"Print",      desc:"A4 filets dorés, look haut de gamme" },
+  { id:"affiche-premium",     label:"Affiche premium",    emoji:"✨", w:795,  h:1122, plan:"free",      cat:"Print",      desc:"A4 filets dorés, look haut de gamme" },
   { id:"flyer-paysage",       label:"Flyer paysage",      emoji:"📄", w:795,  h:561,  plan:"free",     cat:"Print",      desc:"Demi-A4, bande latérale + QR" },
 
   // ---- Restaurant ----
   { id:"menu-resto-portrait", label:"Menu resto",         emoji:"🍽️", w:600,  h:900,  plan:"free",     cat:"Restaurant", desc:"Header coloré, QR vers la carte" },
-  { id:"carte-table-resto",   label:"Carte de table",     emoji:"🍴", w:900,  h:506,  plan:"pro",      cat:"Restaurant", desc:"Paysage, QR à gauche, texte à droite" },
+  { id:"carte-table-resto",   label:"Carte de table",     emoji:"🍴", w:900,  h:506,  plan:"free",      cat:"Restaurant", desc:"Paysage, QR à gauche, texte à droite" },
   { id:"sticker-avis",        label:"Sticker avis",       emoji:"⭐", w:600,  h:600,  plan:"free",     cat:"Restaurant", desc:"Carré, demande d'avis client" },
 
   // ---- Business ----
-  { id:"carte-visite-classic",label:"Carte de visite",    emoji:"💼", w:1063, h:591,  plan:"pro",      cat:"Business",   desc:"CR80, split coloré + QR" },
-  { id:"carte-visite-dark",   label:"Carte premium",      emoji:"🥇", w:1063, h:591,  plan:"business", cat:"Business",   desc:"CR80, cadre doré, ultra premium" },
+  { id:"carte-visite-classic",label:"Carte de visite",    emoji:"💼", w:1063, h:591,  plan:"free",      cat:"Business",   desc:"CR80, split coloré + QR" },
+  { id:"carte-visite-dark",   label:"Carte premium",      emoji:"🥇", w:1063, h:591,  plan:"free", cat:"Business",   desc:"CR80, cadre doré, ultra premium" },
 
   // ---- Event ----
-  { id:"badge-event-pro",     label:"Badge événement",    emoji:"🎫", w:680,  h:400,  plan:"pro",      cat:"Event",      desc:"Badge header coloré + QR" },
-  { id:"affiche-event",       label:"Affiche événement",  emoji:"🎉", w:795,  h:1122, plan:"pro",      cat:"Event",      desc:"A4 bold, grand header" },
-  { id:"carte-table-event",   label:"Carte table event",  emoji:"📋", w:900,  h:506,  plan:"pro",      cat:"Event",      desc:"Paysage, QR centré, filets" },
-  { id:"badge-nominatif",     label:"Badge nominatif",    emoji:"🪪", w:680,  h:400,  plan:"business", cat:"Event",      desc:"Badge avec nom du participant" },
+  { id:"badge-event-pro",     label:"Badge événement",    emoji:"🎫", w:680,  h:400,  plan:"free",      cat:"Event",      desc:"Badge header coloré + QR" },
+  { id:"affiche-event",       label:"Affiche événement",  emoji:"🎉", w:795,  h:1122, plan:"free",      cat:"Event",      desc:"A4 bold, grand header" },
+  { id:"carte-table-event",   label:"Carte table event",  emoji:"📋", w:900,  h:506,  plan:"free",      cat:"Event",      desc:"Paysage, QR centré, filets" },
+  { id:"badge-nominatif",     label:"Badge nominatif",    emoji:"🪪", w:680,  h:400,  plan:"free", cat:"Event",      desc:"Badge avec nom du participant" },
 
   // ---- Social ----
-  { id:"story-insta",         label:"Story Instagram",    emoji:"📱", w:1080, h:1920, plan:"pro",      cat:"Social",     desc:"9:16, QR centré, bandes translucides" },
+  { id:"story-insta",         label:"Story Instagram",    emoji:"📱", w:1080, h:1920, plan:"free",      cat:"Social",     desc:"9:16, QR centré, bandes translucides" },
   { id:"post-insta",          label:"Post Instagram",     emoji:"🟧", w:1080, h:1080, plan:"free",     cat:"Social",     desc:"1:1, QR cadré" },
-  { id:"story-promo",         label:"Story promo",        emoji:"🔥", w:1080, h:1920, plan:"pro",      cat:"Social",     desc:"9:16, gros header promo, QR bas" },
+  { id:"story-promo",         label:"Story promo",        emoji:"🔥", w:1080, h:1920, plan:"free",      cat:"Social",     desc:"9:16, gros header promo, QR bas" },
   ]
 
   // -- Rendu d'un support sur canvas ----------------------------------------
   async function renderSupport(
     canvas: HTMLCanvasElement,
     tpl: SuppTpl,
-    opts: { title: string; subtitle: string; qrDataUrl: string; logoUrl?: string; scale?: number; theme?: SuppTheme; phone?: string; website?: string }
+    opts: { title: string; subtitle: string; qrDataUrl: string; logoUrl?: string; scale?: number; theme?: SuppTheme; phone?: string; website?: string; font?: string; titleColor?: string; subColor?: string; offX?: number; offY?: number }
   ): Promise<void> {
     const sc  = opts.scale ?? 1
     const w   = Math.round(tpl.w * sc)
@@ -1175,8 +1187,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const pad    = Math.round(w * 0.06)
     const bw     = Math.round(w * 0.04)  // largeur bande
 
+    const offX = Math.round((opts.offX ?? 0) / 100 * w)
+    const offY = Math.round((opts.offY ?? 0) / 100 * h)
+    const titleFont = opts.font && opts.font.trim() ? opts.font : "Cormorant Garamond"
+
     const drawQR = (x: number, y: number, size: number) => {
       if (!qrImg) return
+      x += offX; y += offY
       // Fond blanc derriere le QR si fond sombre
       if (isDark) {
         ctx.fillStyle = "#FFFFFF"
@@ -1188,21 +1205,23 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
     const drawTitle = (text: string, x: number, y: number, size: number, color: string, align: CanvasTextAlign = "left", maxW?: number) => {
       if (!text) return
-      ctx.fillStyle = color; ctx.font = `700 ${size}px 'Cormorant Garamond', Georgia, 'Times New Roman', serif`; ctx.textAlign = align
-      ctx.fillText(text, x, y, maxW ?? w * 0.9)
+      const col = opts.titleColor && opts.titleColor.trim() ? opts.titleColor : color
+      ctx.fillStyle = col; ctx.font = `700 ${size}px '${titleFont}', Georgia, 'Times New Roman', serif`; ctx.textAlign = align
+      ctx.fillText(text, x + offX, y + offY, maxW ?? w * 0.9)
       ctx.textAlign = "left"
     }
 
     const drawSub = (text: string, x: number, y: number, size: number, color: string, align: CanvasTextAlign = "left", maxW?: number) => {
       if (!text) return
-      ctx.fillStyle = color; ctx.font = `400 ${size}px 'Arial', sans-serif`; ctx.textAlign = align
-      ctx.fillText(text, x, y, maxW ?? w * 0.85)
+      const col = (opts.subColor && opts.subColor.trim() && text === opts.subtitle) ? opts.subColor : color
+      ctx.fillStyle = col; ctx.font = `400 ${size}px 'Arial', sans-serif`; ctx.textAlign = align
+      ctx.fillText(text, x + offX, y + offY, maxW ?? w * 0.85)
       ctx.textAlign = "left"
     }
 
     const drawAccentLine = (x: number, y: number, lineW: number) => {
       ctx.fillStyle = accentCol
-      ctx.fillRect(x, y, lineW, Math.max(3, Math.round(w * 0.005)))
+      ctx.fillRect(x + offX, y + offY, lineW, Math.max(3, Math.round(w * 0.005)))
     }
 
     // Ligne de contact (tel + site) : dessinee seulement si renseignee
@@ -1210,7 +1229,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const drawContact = (x: number, y: number, size: number, color: string, align: CanvasTextAlign = "center", maxW?: number) => {
       if (!contactStr) return
       ctx.fillStyle = color; ctx.font = `500 ${size}px 'Arial', sans-serif`; ctx.textAlign = align
-      ctx.fillText(contactStr, x, y, maxW ?? w * 0.85)
+      ctx.fillText(contactStr, x + offX, y + offY, maxW ?? w * 0.85)
       ctx.textAlign = "left"
     }
 
@@ -1535,11 +1554,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       // Scale pour la preview (max 300px de large)
       // Rendre l'apercu en HAUTE resolution (net), le CSS le reduit a la colonne
       const previewScale = Math.min(2.5, 760 / tpl.w)
-      await renderSupport(canvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, logoUrl:styleConf.logoUrl, scale:previewScale, theme:SUPP_THEMES.find(t=>t.id===suppTheme), phone:suppPhone, website:suppWebsite })
+      await renderSupport(canvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, logoUrl:styleConf.logoUrl, scale:previewScale, theme:SUPP_THEMES.find(t=>t.id===suppTheme), phone:suppPhone, website:suppWebsite, font:suppFont, titleColor:suppTitleColor, subColor:suppSubColor, offX:suppOffX, offY:suppOffY })
       setSuppRendered(true)
     } catch { setSuppRendered(false) }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [suppTplId, qrUrl, fg, bg, ecLevel, styleConf, suppTitle, suppSubtitle, suppTheme, suppPhone, suppWebsite])
+  }, [suppTplId, qrUrl, fg, bg, ecLevel, styleConf, suppTitle, suppSubtitle, suppTheme, suppPhone, suppWebsite, suppFont, suppTitleColor, suppSubColor, suppOffX, suppOffY])
 
   // Preview LIVE : regenere automatiquement quand un parametre change (debounce)
   useEffect(() => {
@@ -1558,7 +1577,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       if (!qrBlob) throw new Error("qr gen failed")
       const qrDataUrl = await blobToDataUrl(qrBlob)
       const outCanvas = document.createElement("canvas")
-      await renderSupport(outCanvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, scale:2, theme:SUPP_THEMES.find(t=>t.id===suppTheme), phone:suppPhone, website:suppWebsite })
+      await renderSupport(outCanvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, scale:2, theme:SUPP_THEMES.find(t=>t.id===suppTheme), phone:suppPhone, website:suppWebsite, font:suppFont, titleColor:suppTitleColor, subColor:suppSubColor, offX:suppOffX, offY:suppOffY })
       const filename  = `${(tpl.label).replace(/\s+/g,"-").toLowerCase()}-${active?.short_code ?? "qr"}.${fmt}`
       if (fmt === "pdf") {
         // Vrai PDF via jsPDF, oriente selon le support
@@ -3240,13 +3259,19 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     const sel = suppTheme === t.id
                     const swatch = t.bg || (bg || "#FFFFFF")
                     const acc    = t.accent || (fg || "#080808")
+                    const canTheme = PLAN_RANK[userPlan] >= PLAN_RANK[t.plan]
                     return (
-                      <button key={t.id} type="button" onClick={() => setSuppTheme(t.id)}
-                        style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:4, padding:"6px 6px 5px", background:sel?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1.5px solid ${sel?G:"rgba(255,255,255,0.08)"}`, borderRadius:9, cursor:"pointer", flexShrink:0, minWidth:54 }}>
+                      <button key={t.id} type="button" onClick={() => canTheme ? setSuppTheme(t.id) : setUpsell({ feature:`le thème « ${t.label} »`, plan:t.plan })}
+                        style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:4, padding:"6px 6px 5px", background:sel?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1.5px solid ${sel?G:"rgba(255,255,255,0.08)"}`, borderRadius:9, cursor:"pointer", flexShrink:0, minWidth:54, position:"relative" as const }}>
                         <div style={{ position:"relative", width:30, height:30, borderRadius:6, background:swatch, border:"1px solid rgba(0,0,0,0.2)", overflow:"hidden" }}>
                           <div style={{ position:"absolute", bottom:0, left:0, right:0, height:9, background:acc }}/>
                         </div>
                         <span style={{ color:sel?G:MUTED, fontSize:8, fontWeight:sel?700:500, whiteSpace:"nowrap" as const }}>{t.label.split(" ")[0]}</span>
+                        {!canTheme && (
+                          <span style={{ position:"absolute", top:3, right:3, display:"inline-flex", alignItems:"center", gap:1, background:t.plan==="business"?"#39FF8F":G, borderRadius:3, padding:"0px 3px", fontSize:6, color:"#080808", fontWeight:800 }}>
+                            <Sparkles size={5} color="#080808"/>{t.plan==="business"?"BIZ":"PRO"}
+                          </span>
+                        )}
                       </button>
                     )
                   })}
@@ -3293,6 +3318,44 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </div>
                   </div>
                   <p style={{ color:MUTED, fontSize:9, margin:"-2px 0 0", lineHeight:1.4 }}>Laisse vide pour ne rien afficher. Visible sur affiche, flyer, carte, menu, badge et story.</p>
+
+                  {/* Personnalisation avancee */}
+                  <div style={{ marginTop:14, paddingTop:12, borderTop:"1px solid rgba(255,255,255,0.06)" }}>
+                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Personnalisation</p>
+                    <div style={{ marginBottom:10 }}>
+                      <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Police du titre</label>
+                      <select value={suppFont} onChange={e => setSuppFont(e.target.value)}
+                        style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none" }}>
+                        <option value="Cormorant Garamond">Cormorant (élégant)</option>
+                        <option value="Georgia">Georgia (serif)</option>
+                        <option value="Times New Roman">Times</option>
+                        <option value="Arial">Arial (sans)</option>
+                        <option value="Trebuchet MS">Trebuchet</option>
+                        <option value="Verdana">Verdana</option>
+                        <option value="Impact">Impact (fort)</option>
+                        <option value="Courier New">Courier</option>
+                      </select>
+                    </div>
+                    <ColorField label="Couleur du titre" value={suppTitleColor} onChange={setSuppTitleColor} onClear={() => setSuppTitleColor("")}/>
+                    <div style={{ height:8 }}/>
+                    <ColorField label="Couleur du sous-titre" value={suppSubColor} onChange={setSuppSubColor} onClear={() => setSuppSubColor("")}/>
+                    <div style={{ marginTop:10 }}>
+                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                        <label style={{ color:MUTED, fontSize:10 }}>Décalage horizontal</label>
+                        <span style={{ color:MUTED, fontSize:9 }}>{suppOffX}%</span>
+                      </div>
+                      <input type="range" min={-15} max={15} value={suppOffX} onChange={e => setSuppOffX(+e.target.value)} style={{ width:"100%", accentColor:G }}/>
+                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginTop:4 }}>
+                        <label style={{ color:MUTED, fontSize:10 }}>Décalage vertical</label>
+                        <span style={{ color:MUTED, fontSize:9 }}>{suppOffY}%</span>
+                      </div>
+                      <input type="range" min={-15} max={15} value={suppOffY} onChange={e => setSuppOffY(+e.target.value)} style={{ width:"100%", accentColor:G }}/>
+                      {(suppOffX !== 0 || suppOffY !== 0) && (
+                        <button type="button" onClick={() => { setSuppOffX(0); setSuppOffY(0) }}
+                          style={{ marginTop:6, background:"none", border:"none", color:G, fontSize:10, cursor:"pointer", padding:0 }}>Recentrer</button>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
 
