@@ -365,8 +365,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       const meta = e.ctrlKey || e.metaKey
 
       if (e.key === "Delete" || e.key === "Backspace") {
-        if (!o) return
-        e.preventDefault(); fc.remove(o); fc.discardActiveObject(); fc.requestRenderAll(); setSel(null)
+        const objs = fc.getActiveObjects() // gere la selection multiple
+        if (!objs.length) return
+        e.preventDefault(); objs.forEach(x => fc.remove(x)); fc.discardActiveObject(); fc.requestRenderAll(); setSel(null)
+      } else if (e.key === "Escape") {
+        fc.discardActiveObject(); fc.requestRenderAll(); setSel(null)
       } else if (meta && (e.key === "c" || e.key === "C")) {
         if (!o) return
         e.preventDefault(); o.clone((c: fabric.Object) => { clipRef.current = c }, TOJSON_PROPS)
