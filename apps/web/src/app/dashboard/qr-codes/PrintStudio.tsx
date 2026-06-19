@@ -112,6 +112,9 @@ type SelState = {
   textFill: string | null // couleur du texte interne (groupe avec texte)
   shadow: boolean         // ombre portee active
   shadowBlur: number      // intensite du flou de l'ombre
+  border: boolean         // bordure/contour active
+  strokeColor: string     // couleur du contour
+  strokeWidth: number     // epaisseur du contour
 } | null
 
 // Trouve l'objet texte dans un groupe (CTA / badge), s'il y en a un
@@ -245,6 +248,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       textFill: txtChild && typeof txtChild.fill === "string" ? txtChild.fill : null,
       shadow: !!o.shadow,
       shadowBlur: o.shadow ? ((o.shadow as fabric.Shadow).blur ?? 18) : 18,
+      border: !!o.stroke && (o.strokeWidth ?? 0) > 0,
+      strokeColor: typeof o.stroke === "string" ? o.stroke : G,
+      strokeWidth: o.strokeWidth ?? 0,
     }
   }, [])
 
@@ -601,6 +607,23 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const setShadowBlur = (v: number) => mutate(o => {
     const s = o.shadow as fabric.Shadow | null; if (!s) return
     s.blur = v
+    o.dirty = true
+  })
+
+  // Effet : bordure / contour (strokeUniform => epaisseur constante)
+  const setBorder = (on: boolean) => mutate(o => {
+    if (on) o.set({ stroke: G, strokeWidth: (o.strokeWidth ?? 0) > 0 ? o.strokeWidth : 4, strokeUniform: true })
+    else o.set({ stroke: null, strokeWidth: 0 })
+    o.dirty = true
+  })
+  const setBorderColor = (color: string) => mutate(o => {
+    o.set({ stroke: color, strokeUniform: true })
+    if ((o.strokeWidth ?? 0) === 0) o.set("strokeWidth", 4)
+    o.dirty = true
+  })
+  const setBorderWidth = (v: number) => mutate(o => {
+    o.set({ strokeWidth: v, strokeUniform: true })
+    if (v > 0 && !o.stroke) o.set("stroke", G)
     o.dirty = true
   })
 
@@ -1170,6 +1193,25 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 <input type="range" min={0} max={1} step={0.05} value={sel.opacity}
                   onChange={e => mutate(o => o.set("opacity", parseFloat(e.target.value)))}
                   style={{ width: "100%", accentColor: G, marginBottom: 12 }} />
+
+                {/* Bordure / contour */}
+                <button type="button" onClick={() => setBorder(!sel.border)}
+                  style={{ ...layerBtn, width: "100%", background: sel.border ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", color: sel.border ? G : INK, fontWeight: 700, marginBottom: sel.border ? 8 : 12 }}>
+                  Bordure {sel.border ? "✓" : ""}
+                </button>
+                {sel.border && (
+                  <div style={{ marginBottom: 12 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                      <input type="color" value={/^#/.test(sel.strokeColor) ? sel.strokeColor : "#C9A84C"}
+                        onChange={e => setBorderColor(e.target.value)}
+                        style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
+                      <span style={{ color: MUTED, fontSize: 10 }}>Épaisseur — {Math.round(sel.strokeWidth)}px</span>
+                    </div>
+                    <input type="range" min={1} max={30} step={1} value={sel.strokeWidth || 4}
+                      onChange={e => setBorderWidth(parseInt(e.target.value))}
+                      style={{ width: "100%", accentColor: G }} />
+                  </div>
+                )}
 
                 {/* Texte uniquement */}
                 {sel.isText && (
