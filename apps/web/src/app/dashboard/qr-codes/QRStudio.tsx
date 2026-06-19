@@ -394,6 +394,17 @@ const SUPP_THEMES: SuppTheme[] = [
   { id:"royal",     label:"Royal",                 bg:"#0C1A3A", text:"#F5F8FF", accent:"#D4AF37", plan:"business" },
 ]
 
+// Objectifs marketing : on pense "but" (avis, menu, reservation...) plutot que "format"
+type SuppObjective = { id: string; label: string; emoji: string; cta: string; supports: string[] }
+const SUPP_OBJECTIVES: SuppObjective[] = [
+  { id:"avis",      label:"Obtenir des avis",      emoji:"⭐", cta:"Scannez pour laisser un avis",   supports:["Sticker","Carte de table","Sous-bock"] },
+  { id:"menu",      label:"Faire voir le menu",    emoji:"🍽️", cta:"Scannez pour voir la carte",     supports:["Carte de table","Menu","Sous-bock"] },
+  { id:"reserver",  label:"Faire réserver",        emoji:"📅", cta:"Scannez pour réserver",          supports:["Carte de table","Affiche"] },
+  { id:"insta",     label:"Gagner des abonnés",    emoji:"📷", cta:"Scannez pour nous suivre",       supports:["Sticker","Story","Affiche"] },
+  { id:"contact",   label:"Partager mes infos",    emoji:"💳", cta:"Scannez pour mes coordonnées",   supports:["Carte de visite"] },
+  { id:"page",      label:"Faire voir ma page",    emoji:"🔗", cta:"Scannez pour découvrir",         supports:["Affiche","Flyer","Post"] },
+]
+
 export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: Props) {
   const [qrCodes,    setQRCodes]    = useState<QRCode[]>(initialQRCodes)
   const [activeId,   setActiveId]   = useState<string | null>(initialQRCodes[0]?.id ?? null)
@@ -454,6 +465,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [showArchived,   setShowArchived]   = useState(false)
   const [suppTplId,   setSuppTplId]   = useState("a4-poster")
   const [suppOpenGroup, setSuppOpenGroup] = useState("Affiche")
+  const [suppObjective, setSuppObjective] = useState("")
   const [suppTheme,   setSuppTheme]   = useState("auto")
   const [suppTitle,   setSuppTitle]   = useState("")
   const [suppSubtitle,setSuppSubtitle]= useState("Scannez pour voir le menu")
@@ -3520,10 +3532,28 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             <div style={{ padding:"10px 12px", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
               <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:700, margin:"0 0 3px" }}>Modeles prets a imprimer</p>
               <p style={{ color:MUTED, fontSize:10, margin:"0 0 10px", lineHeight:1.4 }}>Votre QR place dans un support fini : carte, flyer, affiche, sticker...</p>
+
+              {/* Objectif marketing */}
+              <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 6px" }}>Ton objectif</p>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:5, marginBottom:12 }}>
+                {SUPP_OBJECTIVES.map(o => {
+                  const sel = suppObjective === o.id
+                  return (
+                    <button key={o.id} type="button"
+                      onClick={() => { setSuppObjective(o.id); setSuppSubtitle(o.cta); setSuppOpenGroup(o.supports[0]) }}
+                      style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 8px", background:sel?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.02)", border:`1px solid ${sel?G:"rgba(255,255,255,0.07)"}`, borderRadius:8, cursor:"pointer", textAlign:"left" as const }}>
+                      <span style={{ fontSize:14, flexShrink:0 }}>{o.emoji}</span>
+                      <span style={{ color:sel?G:"#F5F0E8", fontSize:10, fontWeight:sel?700:500, lineHeight:1.2 }}>{o.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
+
               <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Support</p>
               <div className="qr-scroll" style={{ display:"flex", flexDirection:"column", gap:5, maxHeight:300, overflowY:"auto" }}>
                 {(() => {
                   const groups: { name: string; items: SuppTpl[] }[] = []
+                  const objSupports = SUPP_OBJECTIVES.find(o => o.id === suppObjective)?.supports ?? []
                   SUPP_TPLS.forEach(t => { let g = groups.find(x => x.name === t.support); if (!g) { g = { name:t.support, items:[] }; groups.push(g) } g.items.push(t) })
                   return groups.map(grp => {
                     const open = suppOpenGroup === grp.name
@@ -3534,6 +3564,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           style={{ width:"100%", display:"flex", alignItems:"center", gap:8, padding:"8px 9px", background:open?"rgba(201,168,76,0.07)":"rgba(255,255,255,0.02)", border:`1px solid ${hasSel?"rgba(201,168,76,0.3)":"rgba(255,255,255,0.07)"}`, borderRadius:8, cursor:"pointer", textAlign:"left" as const }}>
                           <span style={{ fontSize:16, flexShrink:0 }}>{grp.items[0].emoji}</span>
                           <span style={{ flex:1, color:hasSel?G:"#F5F0E8", fontSize:12, fontWeight:700 }}>{grp.name}</span>
+                          {objSupports.includes(grp.name) && (
+                            <span style={{ background:"rgba(201,168,76,0.18)", color:G, borderRadius:4, padding:"1px 5px", fontSize:7, fontWeight:800, flexShrink:0 }}>★ CONSEILLÉ</span>
+                          )}
                           <span style={{ color:MUTED, fontSize:9 }}>{grp.items.length} style{grp.items.length>1?"s":""}</span>
                           <ChevronRight size={13} color={open?G:MUTED} style={{ transform: open?"rotate(90deg)":"rotate(0deg)", transition:"transform 0.2s", flexShrink:0 }}/>
                         </button>
