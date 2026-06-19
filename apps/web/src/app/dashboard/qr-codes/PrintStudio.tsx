@@ -125,6 +125,15 @@ const TOJSON_PROPS = [
   "lockRotation", "selectable", "evented",
 ]
 
+// Couleur de texte lisible (noir/blanc) sur un fond donne
+function lum(hex: string): number {
+  const h = hex.replace("#", "")
+  if (h.length < 6) return 1
+  const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16)
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255
+}
+function readableOn(hex: string): string { return lum(hex) > 0.6 ? "#111111" : "#FFFFFF" }
+
 // Construit un bouton "pilule" (rect arrondi + texte) dimensionne au texte
 function buildPill(label: string, o: { rectFill: string; textFill: string; height: number; fontSize: number }): fabric.Group {
   const txt = new fabric.Text(label, { fontSize: o.fontSize, fontFamily: "Arial", fontWeight: "bold", fill: o.textFill, originX: "center", originY: "center" })
@@ -139,19 +148,24 @@ function buildPill(label: string, o: { rectFill: string; textFill: string; heigh
 // Chaque modele compose un design (fond + titre + sous-titre + QR + decor) dans
 // l'editeur. Les couleurs sont reprises des palettes signature de QRStudio.
 const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; desc: string; bg: string; ink: string; accent: string }[] = [
-  { id:"avis-or",    label:"Avis — Or",       obj:"Avis",     emoji:"⭐", desc:"5 étoiles dorées + invitation à noter", bg:"#0B0805", ink:"#F4E7C4", accent:"#D4AF37" },
-  { id:"avis-clair", label:"Avis — Clair",    obj:"Avis",     emoji:"⭐", desc:"Fond crème, sobre et lisible",          bg:"#FFF9EF", ink:"#2A2419", accent:"#C0392B" },
-  { id:"menu",       label:"Menu — Élégant",  obj:"Menu",     emoji:"🍽️", desc:"Bandeau coloré + « Notre carte »",       bg:"#101010", ink:"#F5F0E8", accent:"#C9A84C" },
-  { id:"reserver",   label:"Réservation",     obj:"Réserver", emoji:"📅", desc:"Picto agenda + « Réservez votre table »", bg:"#06231C", ink:"#EAF7F0", accent:"#34D399" },
-  { id:"insta",      label:"Instagram",       obj:"Abonnés",  emoji:"📷", desc:"Picto photo + « Suivez-nous » + @compte", bg:"#1A0A14", ink:"#FFF0F6", accent:"#E1306C" },
-  { id:"contact",    label:"Carte contact",   obj:"Contact",  emoji:"💳", desc:"Nom, métier, coordonnées + QR",          bg:"#0F1729", ink:"#F1F5FF", accent:"#5B8DEF" },
-  { id:"decouvrir",  label:"Découvrir",       obj:"Page",     emoji:"🔗", desc:"Invitation simple à scanner",            bg:"#FFFFFF", ink:"#1A1A1A", accent:"#1D4ED8" },
+  { id:"avis-or",       label:"Avis — Or",          obj:"Avis",     emoji:"⭐", desc:"5 étoiles dorées + invitation à noter",   bg:"#0B0805", ink:"#F4E7C4", accent:"#D4AF37" },
+  { id:"avis-clair",    label:"Avis — Clair",       obj:"Avis",     emoji:"⭐", desc:"Fond crème, sobre et lisible",            bg:"#FFF9EF", ink:"#2A2419", accent:"#C0392B" },
+  { id:"menu",          label:"Menu — Élégant",     obj:"Menu",     emoji:"🍽️", desc:"Bandeau coloré + « Notre carte »",        bg:"#101010", ink:"#F5F0E8", accent:"#C9A84C" },
+  { id:"menu-clair",    label:"Menu — Clair",       obj:"Menu",     emoji:"🍽️", desc:"Fond crème, bandeau doré",               bg:"#FBF3E7", ink:"#3A2316", accent:"#B8860B" },
+  { id:"reserver",      label:"Réservation",        obj:"Réserver", emoji:"📅", desc:"Picto agenda + « Réservez votre table »", bg:"#06231C", ink:"#EAF7F0", accent:"#34D399" },
+  { id:"reserver-clair",label:"Réservation — Clair",obj:"Réserver", emoji:"📅", desc:"Fond clair, accent vert",                bg:"#F2F7F4", ink:"#10271E", accent:"#0E7A5F" },
+  { id:"insta",         label:"Instagram",          obj:"Abonnés",  emoji:"📷", desc:"Picto photo + « Suivez-nous » + @compte", bg:"#1A0A14", ink:"#FFF0F6", accent:"#E1306C" },
+  { id:"insta-clair",   label:"Instagram — Clair",  obj:"Abonnés",  emoji:"📷", desc:"Fond clair, accent rose",                bg:"#FFF5F8", ink:"#2A0A18", accent:"#E1306C" },
+  { id:"contact",       label:"Carte contact",      obj:"Contact",  emoji:"💳", desc:"Nom, métier, coordonnées + QR",          bg:"#0F1729", ink:"#F1F5FF", accent:"#5B8DEF" },
+  { id:"contact-clair", label:"Carte contact — Clair",obj:"Contact",emoji:"💳", desc:"Fond clair, sobre",                      bg:"#F7F9FC", ink:"#0F2540", accent:"#1D4ED8" },
+  { id:"decouvrir",     label:"Découvrir",          obj:"Page",     emoji:"🔗", desc:"Invitation simple à scanner",            bg:"#FFFFFF", ink:"#1A1A1A", accent:"#1D4ED8" },
+  { id:"decouvrir-or",  label:"Découvrir — Or",     obj:"Page",     emoji:"🔗", desc:"Fond sombre, accent or",                 bg:"#0B0805", ink:"#F4E7C4", accent:"#D4AF37" },
 ]
 
 // Mini-apercu schematique d'un modele (fond + couleurs + disposition)
 function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
-  const isMenu = t.id === "menu"
-  const isContact = t.id === "contact"
+  const isMenu = t.id.startsWith("menu")
+  const isContact = t.id.startsWith("contact")
   const isAvis = t.id.startsWith("avis")
   const starClip = "polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)"
   return (
@@ -552,7 +566,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     }
     const addCTA = (label: string, top: number) => {
       const rh = Math.round(Math.min(W * 0.7, 360) * 0.2)
-      const g = buildPill(label, { rectFill: accent, textFill: bg, height: rh, fontSize: Math.round(rh * 0.42) })
+      const g = buildPill(label, { rectFill: accent, textFill: readableOn(accent), height: rh, fontSize: Math.round(rh * 0.42) })
       g.set({ originX: "center", left: W / 2, top })
       fc.add(g)
     }
@@ -589,13 +603,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         addCTA("Scannez-moi", H * 0.85)
         break
       case "menu":
+      case "menu-clair":
         fc.add(new fabric.Rect({ left: 0, top: 0, width: W, height: Math.round(H * 0.16), fill: accent }))
-        addText(name || "Notre Carte", H * 0.045, W * 0.085, { weight: "bold", fill: bg })
+        addText(name || "Notre Carte", H * 0.045, W * 0.085, { weight: "bold", fill: readableOn(accent) })
         addText("Scannez pour découvrir nos plats", H * 0.24, W * 0.034, { font: "Arial" })
         await placeQrT(H * 0.34, 0.5)
         addCTA("Voir le menu", H * 0.85)
         break
       case "reserver":
+      case "reserver-clair":
         brand(H * 0.015)
         await addIconT(ICON("cal"), W * 0.14, H * 0.07, accent)
         addText("Réservez votre table", H * 0.2, W * 0.07, { weight: "bold" })
@@ -604,6 +620,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         addCTA("Réservez", H * 0.85)
         break
       case "insta":
+      case "insta-clair":
         brand(H * 0.015)
         await addIconT(ICON("cam"), W * 0.14, H * 0.07, accent)
         addText("Suivez-nous", H * 0.2, W * 0.085, { weight: "bold" })
@@ -612,6 +629,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         addCTA("Suivez-nous", H * 0.85)
         break
       case "contact":
+      case "contact-clair":
         addText(name || "Prénom Nom", H * 0.09, W * 0.08, { weight: "bold" })
         addText("Votre métier", H * 0.18, W * 0.036, { font: "Arial", fill: accent })
         await placeQrT(H * 0.28, 0.5)
@@ -619,6 +637,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         addText(`🌐  ${website || "monsite.fr"}`, H * 0.83, W * 0.034, { font: "Arial" })
         break
       case "decouvrir":
+      case "decouvrir-or":
         brand(H * 0.035)
         addText("Découvrez-nous", H * 0.1, W * 0.08, { weight: "bold" })
         addText("Scannez pour en savoir plus", H * 0.19, W * 0.034, { font: "Arial" })
