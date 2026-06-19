@@ -123,6 +123,16 @@ const TOJSON_PROPS = [
   "lockRotation", "selectable", "evented",
 ]
 
+// Construit un bouton "pilule" (rect arrondi + texte) dimensionne au texte
+function buildPill(label: string, o: { rectFill: string; textFill: string; height: number; fontSize: number }): fabric.Group {
+  const txt = new fabric.Text(label, { fontSize: o.fontSize, fontFamily: "Arial", fontWeight: "bold", fill: o.textFill, originX: "center", originY: "center" })
+  const padX = o.height * 0.6
+  const rw = Math.max(o.height * 2, (txt.width ?? 0) + padX * 2)
+  const rect = new fabric.Rect({ width: rw, height: o.height, rx: o.height / 2, ry: o.height / 2, fill: o.rectFill })
+  txt.set({ left: rw / 2, top: o.height / 2 })
+  return new fabric.Group([rect, txt])
+}
+
 // ---- Modeles orientes objectifs (points de depart editables) ---------------
 // Chaque modele compose un design (fond + titre + sous-titre + QR + decor) dans
 // l'editeur. Les couleurs sont reprises des palettes signature de QRStudio.
@@ -371,11 +381,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     }
     centerObj(o)
   }
-  // Bouton CTA (forme + texte groupes)
+  // Bouton CTA (pilule dimensionnee au texte)
   const addCTA = (label: string) => {
-    const rect = new fabric.Rect({ width: 320, height: 80, rx: 40, ry: 40, fill: G })
-    const txt  = new fabric.Text(label, { fontSize: 30, fontFamily: "DM Sans", fontWeight: "bold", fill: "#080808", originX: "center", originY: "center", left: 160, top: 40 })
-    centerObj(new fabric.Group([rect, txt]))
+    centerObj(buildPill(label, { rectFill: G, textFill: "#080808", height: 80, fontSize: 30 }))
   }
   // Badge rond (sceau cranté) ou ruban (fanion)
   const addBadge = (label: string, kind: "seal" | "ribbon") => {
@@ -411,13 +419,26 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     refreshSel()
   }
 
-  // Changer le libelle d'un groupe CTA / badge (texte interne)
+  // Changer le libelle d'un groupe CTA / badge (texte interne) + ajuster la pilule
   const setLabel = (value: string) => {
     const fc = fcRef.current; if (!fc) return
-    const txt = groupText(fc.getActiveObject())
-    if (!txt) return
+    const grp = fc.getActiveObject() as fabric.Group | undefined
+    const txt = groupText(grp)
+    if (!grp || !txt) return
     txt.set({ text: value })
-    ;(fc.getActiveObject() as fabric.Group).dirty = true
+    ;(txt as unknown as { initDimensions?: () => void }).initDimensions?.()
+    // Pilule (rect arrondi + texte) : ajuster la largeur au texte, garder centre
+    const kids = grp.getObjects()
+    const rect = kids.find(o => o.type === "rect") as fabric.Rect | undefined
+    if (rect && kids.length === 2) {
+      const h = rect.height ?? 60
+      const newW = Math.max(h * 2, (txt.width ?? 0) + h * 0.6 * 2)
+      rect.set({ width: newW, left: -newW / 2 })
+      txt.set({ left: 0 })
+      grp.set({ width: newW })
+    }
+    grp.dirty = true
+    grp.setCoords()
     fc.requestRenderAll()
     refreshSel()
   }
@@ -499,10 +520,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       fc.add(new fabric.Group(objs, { originX: "center", left: W / 2, top: cy }))
     }
     const addCTA = (label: string, top: number) => {
-      const rw = Math.min(W * 0.7, 360), rh = Math.round(rw * 0.2)
-      const rect = new fabric.Rect({ width: rw, height: rh, rx: rh / 2, ry: rh / 2, fill: accent })
-      const txt  = new fabric.Text(label, { fontSize: Math.round(rh * 0.42), fontFamily: "Arial", fontWeight: "bold", fill: bg, originX: "center", originY: "center", left: rw / 2, top: rh / 2 })
-      fc.add(new fabric.Group([rect, txt], { originX: "center", left: W / 2, top }))
+      const rh = Math.round(Math.min(W * 0.7, 360) * 0.2)
+      const g = buildPill(label, { rectFill: accent, textFill: bg, height: rh, fontSize: Math.round(rh * 0.42) })
+      g.set({ originX: "center", left: W / 2, top })
+      fc.add(g)
     }
     const addIconT = (d: string, size: number, top: number, color: string) => new Promise<void>(res => {
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="${d}" fill="${color}"/></svg>`
