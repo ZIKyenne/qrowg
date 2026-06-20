@@ -209,6 +209,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const histRef = useRef<{ stack: string[]; i: number; lock: boolean }>({ stack: [], i: -1, lock: false })
   const pushTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const dragIdxRef = useRef<number | null>(null) // index du calque en cours de glissement
+  const scrollRef = useRef<HTMLDivElement>(null) // zone scrollable autour du canvas
 
   const [format, setFormat]   = useState<FormatId>("a4")
   const [sel, setSel]         = useState<SelState>(null)
@@ -474,6 +475,27 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
   }, [refreshSel])
+
+  // ---- Zoom a la molette (Ctrl/Cmd + molette), centre sur le curseur -------
+  useEffect(() => {
+    const cont = scrollRef.current; if (!cont) return
+    const onWheel = (e: WheelEvent) => {
+      if (!(e.ctrlKey || e.metaKey)) return // sinon : scroll normal
+      e.preventDefault()
+      const fc = fcRef.current, canvas = elRef.current; if (!fc || !canvas) return
+      const r0 = canvas.getBoundingClientRect()
+      const fx = (e.clientX - r0.left) / r0.width   // fraction design sous le curseur
+      const fy = (e.clientY - r0.top) / r0.height
+      applyZoom((fc.getZoom() || 1) * (e.deltaY < 0 ? 1.1 : 1 / 1.1))
+      // garder le point sous le curseur en compensant via le scroll
+      const r1 = canvas.getBoundingClientRect()
+      cont.scrollLeft += (r1.left + fx * r1.width) - e.clientX
+      cont.scrollTop += (r1.top + fy * r1.height) - e.clientY
+    }
+    cont.addEventListener("wheel", onWheel, { passive: false })
+    return () => cont.removeEventListener("wheel", onWheel)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // ---- Poser le vrai QR ----------------------------------------------------
   function placeQr(fc: fabric.Canvas) {
@@ -762,10 +784,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // Zoom = setZoom + agrandissement de l'element (la zone autour scrolle).
   const applyZoom = (z: number) => {
     const fc = fcRef.current; if (!fc) return
+    const z0 = fc.getZoom() || 1
+    const baseW = fc.getWidth() / z0, baseH = fc.getHeight() / z0 // dims design courantes
     const nz = Math.min(3, Math.max(0.25, z))
-    const base = editDims(format)
     fc.setZoom(nz)
-    fc.setDimensions({ width: Math.round(base.w * nz), height: Math.round(base.h * nz) })
+    fc.setDimensions({ width: Math.round(baseW * nz), height: Math.round(baseH * nz) })
     fc.requestRenderAll()
     setZoom(nz)
   }
@@ -1231,7 +1254,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         )}
 
         {/* Zone canvas */}
-        <div style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, background: "#0A0907", position: "relative" }}>
+        <div ref={scrollRef} style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, background: "#0A0907", position: "relative" }}>
           {loading && (
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: MUTED, zIndex: 5, pointerEvents: "none" }}>
               <Loader2 size={18} style={{ animation: "spin 0.8s linear infinite" }} /> Chargement…
