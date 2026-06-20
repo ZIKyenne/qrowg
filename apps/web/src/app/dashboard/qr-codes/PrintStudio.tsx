@@ -118,6 +118,9 @@ type SelState = {
   textFill: string | null // couleur du texte interne (groupe avec texte)
   shadow: boolean         // ombre portee active
   shadowBlur: number      // intensite du flou de l'ombre
+  textAlign: string       // alignement du texte (gauche/centre/droite)
+  charSpacing: number     // espacement des lettres
+  lineHeight: number      // interligne
   border: boolean         // bordure/contour active
   strokeColor: string     // couleur du contour
   strokeWidth: number     // epaisseur du contour
@@ -261,6 +264,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       textFill: txtChild && typeof txtChild.fill === "string" ? txtChild.fill : null,
       shadow: !!o.shadow,
       shadowBlur: o.shadow ? ((o.shadow as fabric.Shadow).blur ?? 18) : 18,
+      textAlign: isText ? (t.textAlign ?? "left") : "left",
+      charSpacing: isText ? (t.charSpacing ?? 0) : 0,
+      lineHeight: isText ? (t.lineHeight ?? 1.16) : 1.16,
       border: !!o.stroke && (o.strokeWidth ?? 0) > 0,
       strokeColor: typeof o.stroke === "string" ? o.stroke : G,
       strokeWidth: o.strokeWidth ?? 0,
@@ -1410,9 +1416,38 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
                     <button type="button"
                       onClick={() => mutate(o => (o as fabric.IText).set("fontWeight", sel.bold ? "normal" : "bold"))}
-                      style={{ ...layerBtn, width: "100%", background: sel.bold ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", color: sel.bold ? G : INK, fontWeight: 700 }}>
+                      style={{ ...layerBtn, width: "100%", background: sel.bold ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", color: sel.bold ? G : INK, fontWeight: 700, marginBottom: 10 }}>
                       Gras
                     </button>
+
+                    {/* Alignement du texte */}
+                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Alignement</label>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 10 }}>
+                      {(["left", "center", "right"] as const).map(a => {
+                        const on = sel.textAlign === a
+                        const bars = a === "left" ? [[1, 14], [1, 9], [1, 12]] : a === "center" ? [[1, 14], [4, 8], [2.5, 11]] : [[1, 14], [6, 9], [3, 12]]
+                        return (
+                          <button key={a} type="button" onClick={() => mutate(o => (o as fabric.IText).set("textAlign", a))} title={a}
+                            style={{ ...layerBtn, padding: "7px", background: on ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)" }}>
+                            <svg width="16" height="16" viewBox="0 0 16 16">
+                              {bars.map(([x, w], i) => <rect key={i} x={x} y={3 + i * 4} width={w} height="2" rx="1" fill={on ? G : MUTED} />)}
+                            </svg>
+                          </button>
+                        )
+                      })}
+                    </div>
+
+                    {/* Espacement des lettres */}
+                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Espacement — {Math.round(sel.charSpacing)}</label>
+                    <input type="range" min={0} max={800} step={10} value={sel.charSpacing}
+                      onChange={e => mutate(o => (o as fabric.IText).set("charSpacing", parseInt(e.target.value)))}
+                      style={{ width: "100%", accentColor: G, marginBottom: 10 }} />
+
+                    {/* Interligne */}
+                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Interligne — {sel.lineHeight.toFixed(2)}</label>
+                    <input type="range" min={0.8} max={2} step={0.05} value={sel.lineHeight}
+                      onChange={e => mutate(o => (o as fabric.IText).set("lineHeight", parseFloat(e.target.value)))}
+                      style={{ width: "100%", accentColor: G }} />
                   </>
                 )}
               </div>
