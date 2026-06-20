@@ -141,11 +141,14 @@ function groupText(o: fabric.Object | undefined | null): fabric.Text | null {
 }
 
 const TOJSON_PROPS = [
-  "isQR", "name",
+  "isQR", "name", "role",
   "lockMovementX", "lockMovementY",
   "lockScalingX", "lockScalingY",
   "lockRotation", "selectable", "evented",
 ]
+const ROLE_PREFIX: Record<string, string> = { phone: "📞  ", website: "🌐  " }
+const ROLE_LABEL: Record<string, string> = { title: "Titre", subtitle: "Sous-titre", phone: "Téléphone", website: "Site / adresse" }
+const ROLE_ORDER = ["title", "subtitle", "phone", "website"]
 
 // Couleur de texte lisible (noir/blanc) sur un fond donne
 function lum(hex: string): number {
@@ -255,6 +258,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [zoom, setZoom] = useState(1)
   const [wizard, setWizard] = useState(0) // 0 = ferme, 1 = objectif, 2 = style, 3 = pret
   const [wizObj, setWizObj] = useState("")
+  const [infoVer, setInfoVer] = useState(0) // rafraichit le panneau infos
 
   const isPro = userPlan === "pro" || userPlan === "business"
 
@@ -848,6 +852,24 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     ;(o as any).name = value.trim() || undefined
     setEditLayer(null); setLayersVer(v => v + 1); pushHistorySoon()
   }
+  // Infos du support : textes marques par role (titre / sous-titre / tel / site)
+  const roleObjects = (): fabric.Object[] => {
+    const objs = fcRef.current?.getObjects() ?? []
+    return ROLE_ORDER.map(r => objs.find(o => (o as any).role === r)).filter(Boolean) as fabric.Object[]
+  }
+  const roleValue = (o: fabric.Object): string => {
+    const role = (o as any).role as string
+    const txt = ((o as fabric.Textbox).text ?? "")
+    const p = ROLE_PREFIX[role]
+    return p && txt.startsWith(p) ? txt.slice(p.length) : txt
+  }
+  const updateRole = (role: string, value: string) => {
+    const fc = fcRef.current; if (!fc) return
+    const o = fc.getObjects().find(x => (x as any).role === role) as fabric.Textbox | undefined
+    if (!o) return
+    o.set({ text: (ROLE_PREFIX[role] ?? "") + value })
+    fc.requestRenderAll(); setInfoVer(v => v + 1); pushHistorySoon()
+  }
   // Reordonner par glisser-deposer (indices dans la liste affichee = front-first)
   const reorderLayers = (from: number, to: number) => {
     const fc = fcRef.current; if (!fc || from === to) return
@@ -968,11 +990,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const { bg, ink, accent } = meta
     fc.setBackgroundColor(bg, () => {}); setBgColor(bg)
 
-    const addText = (s: string, top: number, size: number, o: { weight?: string; fill?: string; font?: string; width?: number } = {}) => {
-      fc.add(new fabric.Textbox(s, {
+    const addText = (s: string, top: number, size: number, o: { weight?: string; fill?: string; font?: string; width?: number; role?: string } = {}) => {
+      const t = new fabric.Textbox(s, {
         width: o.width ?? W * 0.82, left: W / 2, top, originX: "center", textAlign: "center",
         fontFamily: o.font ?? "Georgia", fontWeight: o.weight ?? "normal", fontSize: size, fill: o.fill ?? ink,
-      }))
+      })
+      if (o.role) (t as any).role = o.role
+      fc.add(t); return t
     }
     const addStars = (n: number, cy: number, s: number, color: string) => {
       const objs: fabric.Object[] = []
@@ -1011,17 +1035,17 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "avis-or":
       case "avis-clair":
         brand(H * 0.02)
-        addText("Vous avez aimé ?", H * 0.06, W * 0.075, { weight: "bold" })
+        addText("Vous avez aimé ?", H * 0.06, W * 0.075, { weight: "bold", role: "title" })
         addStars(5, H * 0.19, W * 0.07, accent)
-        addText("Laissez-nous un avis en 30 secondes", H * 0.27, W * 0.034, { font: "Arial", width: W * 0.72 })
+        addText("Laissez-nous un avis en 30 secondes", H * 0.27, W * 0.034, { font: "Arial", width: W * 0.72, role: "subtitle" })
         await placeQrT(H * 0.37, 0.46)
         addCTA("Scannez-moi", H * 0.85)
         break
       case "menu":
       case "menu-clair":
         fc.add(new fabric.Rect({ left: 0, top: 0, width: W, height: Math.round(H * 0.16), fill: accent }))
-        addText(name || "Notre Carte", H * 0.045, W * 0.085, { weight: "bold", fill: readableOn(accent) })
-        addText("Scannez pour découvrir nos plats", H * 0.24, W * 0.034, { font: "Arial" })
+        addText(name || "Notre Carte", H * 0.045, W * 0.085, { weight: "bold", fill: readableOn(accent), role: "title" })
+        addText("Scannez pour découvrir nos plats", H * 0.24, W * 0.034, { font: "Arial", role: "subtitle" })
         await placeQrT(H * 0.34, 0.5)
         addCTA("Voir le menu", H * 0.85)
         break
@@ -1029,8 +1053,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "reserver-clair":
         brand(H * 0.015)
         await addIconT(ICON("cal"), W * 0.14, H * 0.07, accent)
-        addText("Réservez votre table", H * 0.2, W * 0.07, { weight: "bold" })
-        addText("En quelques secondes, où que vous soyez", H * 0.28, W * 0.032, { font: "Arial", width: W * 0.72 })
+        addText("Réservez votre table", H * 0.2, W * 0.07, { weight: "bold", role: "title" })
+        addText("En quelques secondes, où que vous soyez", H * 0.28, W * 0.032, { font: "Arial", width: W * 0.72, role: "subtitle" })
         await placeQrT(H * 0.38, 0.44)
         addCTA("Réservez", H * 0.85)
         break
@@ -1038,24 +1062,24 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "insta-clair":
         brand(H * 0.015)
         await addIconT(ICON("cam"), W * 0.14, H * 0.07, accent)
-        addText("Suivez-nous", H * 0.2, W * 0.085, { weight: "bold" })
-        addText("@votrecompte", H * 0.29, W * 0.04, { font: "Arial", fill: accent })
+        addText("Suivez-nous", H * 0.2, W * 0.085, { weight: "bold", role: "title" })
+        addText("@votrecompte", H * 0.29, W * 0.04, { font: "Arial", fill: accent, role: "subtitle" })
         await placeQrT(H * 0.38, 0.44)
         addCTA("Suivez-nous", H * 0.85)
         break
       case "contact":
       case "contact-clair":
-        addText(name || "Prénom Nom", H * 0.09, W * 0.08, { weight: "bold" })
-        addText("Votre métier", H * 0.18, W * 0.036, { font: "Arial", fill: accent })
+        addText(name || "Prénom Nom", H * 0.09, W * 0.08, { weight: "bold", role: "title" })
+        addText("Votre métier", H * 0.18, W * 0.036, { font: "Arial", fill: accent, role: "subtitle" })
         await placeQrT(H * 0.28, 0.5)
-        addText(`📞  ${phone || "06 12 34 56 78"}`, H * 0.76, W * 0.034, { font: "Arial" })
-        addText(`🌐  ${website || "monsite.fr"}`, H * 0.83, W * 0.034, { font: "Arial" })
+        addText(`📞  ${phone || "06 12 34 56 78"}`, H * 0.76, W * 0.034, { font: "Arial", role: "phone" })
+        addText(`🌐  ${website || "monsite.fr"}`, H * 0.83, W * 0.034, { font: "Arial", role: "website" })
         break
       case "decouvrir":
       case "decouvrir-or":
         brand(H * 0.035)
-        addText("Découvrez-nous", H * 0.1, W * 0.08, { weight: "bold" })
-        addText("Scannez pour en savoir plus", H * 0.19, W * 0.034, { font: "Arial" })
+        addText("Découvrez-nous", H * 0.1, W * 0.08, { weight: "bold", role: "title" })
+        addText("Scannez pour en savoir plus", H * 0.19, W * 0.034, { font: "Arial", role: "subtitle" })
         await placeQrT(H * 0.3, 0.5)
         addCTA("En savoir plus", H * 0.85)
         break
@@ -1613,6 +1637,29 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               </div>
             )}
           </div>
+
+          {/* Infos du support (textes pre-remplis editables) */}
+          {infoVer >= 0 && (() => {
+            const ros = roleObjects()
+            if (!ros.length) return null
+            return (
+              <div>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Infos du support</p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {ros.map(o => {
+                    const role = (o as any).role as string
+                    return (
+                      <div key={role}>
+                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 3 }}>{ROLE_LABEL[role] ?? role}</label>
+                        <input value={roleValue(o)} onChange={e => updateRole(role, e.target.value)}
+                          style={{ width: "100%", background: BG, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, outline: "none", boxSizing: "border-box" }} />
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })()}
 
           {/* Proprietes de l'objet selectionne */}
           {sel ? (
