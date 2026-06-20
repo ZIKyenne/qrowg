@@ -1118,7 +1118,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // Changer le libelle du 1er bouton CTA (pilule) du design
   const setCtaLabel = (value: string) => {
     const fc = fcRef.current; if (!fc) return
-    const grp = fc.getObjects().find(o => o.type === "group" && (o as fabric.Group).getObjects().some(c => c.type === "rect")) as fabric.Group | undefined
+    const grp = fc.getObjects().find(o => o.type === "group" && !!groupText(o) && (o as fabric.Group).getObjects().some(c => c.type === "rect")) as fabric.Group | undefined
     const txt = grp ? groupText(grp) : null
     if (!grp || !txt) return
     txt.set({ text: value }); (txt as unknown as { initDimensions?: () => void }).initDimensions?.()
