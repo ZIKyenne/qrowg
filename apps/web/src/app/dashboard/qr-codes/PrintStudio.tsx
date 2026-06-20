@@ -319,6 +319,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [mockEnv, setMockEnv] = useState<"wall" | "table" | "window" | "desk">("wall")
   const [mockUrl, setMockUrl] = useState("")
   const [ctx, setCtx] = useState<{ x: number; y: number } | null>(null) // menu clic-droit
+  const [showAdvanced, setShowAdvanced] = useState(false) // panneau de reglages avances (progressive disclosure)
   const [libOpen, setLibOpen] = useState(false)
   const [libCat, setLibCat]   = useState<"text" | "shapes" | "lines" | "frames" | "cta" | "icons" | "badges" | "arrows" | "deco">("text")
   const [tplOpen, setTplOpen] = useState(false)
@@ -487,9 +488,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     fc.on("object:modified", () => { vG.set({ visible: false }); hG.set({ visible: false }); fc.requestRenderAll() })
     fc.on("mouse:up",       () => { vG.set({ visible: false }); hG.set({ visible: false }); fc.requestRenderAll() })
 
-    fc.on("selection:created", refreshSel)
-    fc.on("selection:updated", refreshSel)
-    fc.on("selection:cleared", () => setSel(null))
+    fc.on("selection:created", () => { refreshSel(); setShowAdvanced(false) })
+    fc.on("selection:updated", () => { refreshSel(); setShowAdvanced(false) })
+    fc.on("selection:cleared", () => { setSel(null); setShowAdvanced(false) })
 
     // Historique : capter ajout / suppression / modification (drag, scale, rotate)
     fc.on("object:added", () => { pushHistory(); setLayersVer(v => v + 1) })
@@ -1445,6 +1446,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     display: "flex", alignItems: "center", justifyContent: "center", width: 22, height: 22,
     background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 0, flexShrink: 0,
   } as const
+  const tb = {
+    display: "flex", alignItems: "center", justifyContent: "center", minWidth: 26, height: 26, padding: "0 7px",
+    background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 7, color: INK, fontSize: 12, cursor: "pointer",
+  } as const
+  const swatch = {
+    width: 28, height: 24, borderRadius: 6, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", cursor: "pointer", padding: 0, flexShrink: 0,
+  } as const
 
   const canUndo = histVer >= 0 && histRef.current.i > 0
   const canRedo = histVer >= 0 && histRef.current.i < histRef.current.stack.length - 1
@@ -1552,7 +1560,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       </div>
 
       {/* ---- Corps : rail outils | canvas | proprietes ---- */}
-      <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+      <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
 
         {/* Assistant debutant (colonne guidee) */}
         {wizard > 0 && (() => {
@@ -2069,8 +2077,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           </div>
         </div>
 
-        {/* Panneau contextuel (apparait uniquement a la selection) */}
-        {sel && (
+        {/* Panneau de reglages avances (ouvert via "Réglages") */}
+        {sel && showAdvanced && (
         <div className="qr-scroll" style={{ width: 280, flexShrink: 0, borderLeft: "1px solid rgba(255,255,255,0.07)", padding: 14, overflowY: "auto", background: SURFACE, display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
                 <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Élément sélectionné</p>
@@ -2267,6 +2275,38 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 </button>
               </div>
             </div>
+        )}
+
+        {/* Barre contextuelle flottante (progressive disclosure) */}
+        {sel && (
+          <div style={{ position: "absolute", top: 12, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", background: "#14120C", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, boxShadow: "0 10px 30px rgba(0,0,0,0.5)", maxWidth: "92%", flexWrap: "wrap" }}>
+            {sel.isText ? (
+              <>
+                <input type="color" value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"} onChange={e => setFill(e.target.value)} style={swatch} />
+                <button type="button" style={tb} title="Réduire" onClick={() => mutate(o => (o as fabric.IText).set("fontSize", Math.max(8, sel.fontSize - 2)))}>A−</button>
+                <span style={{ color: MUTED, fontSize: 11, minWidth: 22, textAlign: "center" }}>{Math.round(sel.fontSize)}</span>
+                <button type="button" style={tb} title="Agrandir" onClick={() => mutate(o => (o as fabric.IText).set("fontSize", sel.fontSize + 2))}>A+</button>
+                <button type="button" style={{ ...tb, color: sel.bold ? G : INK, fontWeight: 800 }} onClick={() => mutate(o => (o as fabric.IText).set("fontWeight", sel.bold ? "normal" : "bold"))}>B</button>
+                <button type="button" style={{ ...tb, color: sel.italic ? G : INK, fontStyle: "italic" }} onClick={() => mutate(o => (o as fabric.IText).set("fontStyle", sel.italic ? "normal" : "italic"))}>I</button>
+                <button type="button" style={{ ...tb, color: sel.underline ? G : INK, textDecoration: "underline" }} onClick={() => mutate(o => (o as fabric.IText).set("underline", !sel.underline))}>U</button>
+              </>
+            ) : sel.label !== null ? (
+              <>
+                <input value={sel.label} onChange={e => setLabel(e.target.value)} placeholder="Texte"
+                  style={{ background: BG, border: "1px solid rgba(255,255,255,0.12)", borderRadius: 7, padding: "5px 8px", color: INK, fontSize: 11, width: 130, outline: "none" }} />
+                <input type="color" value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"} onChange={e => setFill(e.target.value)} style={swatch} title="Couleur du fond" />
+              </>
+            ) : (
+              <input type="color" value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"} onChange={e => setFill(e.target.value)} style={swatch} title="Couleur" />
+            )}
+            <span style={{ width: 1, height: 20, background: "rgba(255,255,255,0.12)" }} />
+            <button type="button" style={tb} title="Dupliquer" onClick={() => layer("dup")}><Copy size={14} /></button>
+            <button type="button" style={{ ...tb, color: "#FF6B6B" }} title="Supprimer" onClick={() => layer("del")}><Trash2 size={14} /></button>
+            <button type="button" onClick={() => setShowAdvanced(v => !v)}
+              style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 10px", background: showAdvanced ? "rgba(201,168,76,0.18)" : "rgba(255,255,255,0.06)", border: `1px solid ${showAdvanced ? G : "rgba(255,255,255,0.1)"}`, borderRadius: 8, color: showAdvanced ? G : INK, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+              Réglages {showAdvanced ? "▸" : ""}
+            </button>
+          </div>
         )}
       </div>
 
