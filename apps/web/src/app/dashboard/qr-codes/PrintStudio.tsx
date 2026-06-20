@@ -249,6 +249,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [saving, setSaving]   = useState(false)
   const [saved, setSaved]     = useState(false)
   const [exporting, setExporting] = useState(false)
+  const [expOpen, setExpOpen] = useState(false)
+  const [expDpi, setExpDpi]   = useState(300)
+  const [expMarks, setExpMarks] = useState(false)
   const [libOpen, setLibOpen] = useState(false)
   const [libCat, setLibCat]   = useState<"text" | "shapes" | "lines" | "frames" | "cta" | "icons" | "badges" | "arrows">("text")
   const [tplOpen, setTplOpen] = useState(false)
@@ -1178,6 +1181,45 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     } finally { setExporting(false) }
   }
 
+  // ---- Export pro (DPI + format + traits de coupe / fond perdu) -------------
+  const targetWidth = () => Math.round(FORMATS[format].exportW * (expDpi / 300))
+  const exportImage = (type: "png" | "jpeg") => {
+    const fc = fcRef.current; if (!fc) return
+    setExporting(true)
+    try {
+      prepExport(fc)
+      const tw = targetWidth()
+      const url = withBaseZoom(fc, base => fc.toDataURL({ format: type, quality: type === "jpeg" ? 0.92 : 1, multiplier: tw / base.w }))
+      const a = document.createElement("a")
+      a.href = url; a.download = `qrfolio-${format}-${expDpi}dpi.${type === "jpeg" ? "jpg" : "png"}`; a.click()
+    } finally { setExporting(false); setExpOpen(false) }
+  }
+  const exportPdfPro = async () => {
+    if (!isPro) { onUpsell?.("l'export PDF pro (traits de coupe, fond perdu)", "pro"); return }
+    const fc = fcRef.current; if (!fc) return
+    setExporting(true)
+    try {
+      prepExport(fc)
+      const w = targetWidth(), h = Math.round(w / FORMATS[format].ratio)
+      const url = withBaseZoom(fc, base => fc.toDataURL({ format: "png", multiplier: w / base.w }))
+      const { jsPDF } = await import("jspdf")
+      const bleed = expMarks ? Math.round(w * 0.03) : 0
+      const pageW = w + bleed * 2, pageH = h + bleed * 2
+      const pdf = new jsPDF({ orientation: pageW > pageH ? "l" : "p", unit: "px", format: [pageW, pageH] })
+      pdf.addImage(url, "PNG", bleed, bleed, w, h)
+      if (expMarks) {
+        const m = bleed, L = Math.round(bleed * 0.6)
+        pdf.setDrawColor(0); pdf.setLineWidth(Math.max(1, Math.round(w / 800)))
+        // 4 coins du trait de coupe (lignes a l'exterieur de la zone de rognage)
+        pdf.line(0, m, L, m);           pdf.line(m, 0, m, L)                       // haut-gauche
+        pdf.line(pageW, m, pageW - L, m); pdf.line(m + w, 0, m + w, L)             // haut-droite
+        pdf.line(0, m + h, L, m + h);   pdf.line(m, pageH, m, pageH - L)           // bas-gauche
+        pdf.line(pageW, m + h, pageW - L, m + h); pdf.line(m + w, pageH, m + w, pageH - L) // bas-droite
+      }
+      pdf.save(`qrfolio-${format}-${expDpi}dpi.pdf`)
+    } finally { setExporting(false); setExpOpen(false) }
+  }
+
   // ==========================================================================
   // UI
   // ==========================================================================
@@ -1273,12 +1315,31 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               : saved ? <Check size={13} color="#39FF8F" /> : <Save size={13} />}
             {saved ? "Enregistré" : "Enregistrer"}
           </button>
-          <button type="button" onClick={exportPng} disabled={exporting} style={topBtn(true)}>
-            <Download size={13} /> PNG
-          </button>
-          <button type="button" onClick={exportPdf} disabled={exporting} style={topBtn(false)}>
-            <Printer size={13} /> PDF{!isPro ? " 🔒" : ""}
-          </button>
+          <div style={{ position: "relative" }}>
+            <button type="button" onClick={() => setExpOpen(v => !v)} disabled={exporting} style={topBtn(true)}>
+              {exporting ? <Loader2 size={13} style={{ animation: "spin 0.8s linear infinite" }} /> : <Download size={13} />} Exporter
+            </button>
+            {expOpen && (
+              <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, width: 232, background: "#14120C", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: 12, boxShadow: "0 18px 50px rgba(0,0,0,0.6)", zIndex: 60 }}>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>Qualité</p>
+                <div style={{ display: "flex", gap: 4, marginBottom: 12 }}>
+                  {[72, 150, 300].map(d => (
+                    <button key={d} type="button" onClick={() => setExpDpi(d)}
+                      style={{ flex: 1, padding: "6px 0", borderRadius: 7, border: `1px solid ${expDpi === d ? G : "rgba(255,255,255,0.1)"}`, background: expDpi === d ? "rgba(201,168,76,0.15)" : "transparent", color: expDpi === d ? G : INK, fontSize: 10.5, fontWeight: 700, cursor: "pointer" }}>{d}<span style={{ fontSize: 7, opacity: 0.7 }}> DPI</span></button>
+                  ))}
+                </div>
+                <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, cursor: "pointer", color: INK, fontSize: 10.5, lineHeight: 1.3 }}>
+                  <input type="checkbox" checked={expMarks} onChange={e => setExpMarks(e.target.checked)} style={{ accentColor: G, flexShrink: 0 }} />
+                  Traits de coupe + fond perdu <span style={{ color: MUTED }}>(PDF)</span>
+                </label>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <button type="button" onClick={() => exportImage("png")} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 11px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer" }}><Download size={13} /> PNG</button>
+                  <button type="button" onClick={() => exportImage("jpeg")} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 11px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer" }}><Download size={13} /> JPG</button>
+                  <button type="button" onClick={exportPdfPro} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 11px", background: "linear-gradient(90deg,#C9A84C,#b8953f)", border: "none", borderRadius: 9, color: "#080808", fontSize: 12, fontWeight: 800, cursor: "pointer" }}><Printer size={13} /> PDF{!isPro ? " 🔒" : ""}</button>
+                </div>
+              </div>
+            )}
+          </div>
           <button type="button" onClick={onClose} aria-label="Fermer"
             style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: MUTED, cursor: "pointer" }}>
             <X size={16} />
