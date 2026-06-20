@@ -1456,6 +1456,28 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
   const canUndo = histVer >= 0 && histRef.current.i > 0
   const canRedo = histVer >= 0 && histRef.current.i < histRef.current.stack.length - 1
+
+  // Garde-fou scannabilite du QR (recalcule a chaque rendu ; histVer/layersVer declenchent)
+  const qrIssues = (() => {
+    void histVer; void layersVer
+    const fc = fcRef.current; if (!fc) return null
+    const objs = fc.getObjects()
+    const qr = objs.find(o => (o as any).isQR); if (!qr) return null
+    const z = fc.getZoom() || 1
+    const W = fc.getWidth() / z
+    const qb = qr.getBoundingRect(true)
+    const small = qb.width < W * 0.16
+    let covered = false
+    const qi = objs.indexOf(qr)
+    for (let i = qi + 1; i < objs.length; i++) {
+      const o = objs[i]; if ((o as any).isGuide || o.visible === false) continue
+      const b = o.getBoundingRect(true)
+      const ix = Math.min(b.left + b.width, qb.left + qb.width) - Math.max(b.left, qb.left)
+      const iy = Math.min(b.top + b.height, qb.top + qb.height) - Math.max(b.top, qb.top)
+      if (ix > qb.width * 0.15 && iy > qb.height * 0.15) { covered = true; break }
+    }
+    return small || covered ? { small, covered } : null
+  })()
   const histBtn = (enabled: boolean) => ({
     display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32,
     background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8,
@@ -2290,6 +2312,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 </button>
               </div>
             </div>
+        )}
+
+        {/* Garde-fou scannabilite du QR */}
+        {qrIssues && (
+          <div style={{ position: "absolute", top: 12, left: 12, zIndex: 39, display: "flex", alignItems: "center", gap: 7, padding: "7px 11px", background: "rgba(40,28,8,0.92)", border: "1px solid rgba(249,158,46,0.5)", borderRadius: 10, color: "#F9C46E", fontSize: 11, fontWeight: 600, maxWidth: 260, boxShadow: "0 8px 22px rgba(0,0,0,0.4)" }}>
+            <span style={{ fontSize: 14 }}>⚠️</span>
+            <span>{qrIssues.covered ? "Un élément couvre le QR — il risque de ne pas se scanner." : "QR un peu petit : agrandis-le pour un scan fiable."}</span>
+          </div>
         )}
 
         {/* Barre contextuelle flottante (progressive disclosure) */}
