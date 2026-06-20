@@ -115,6 +115,7 @@ type SelState = {
   border: boolean         // bordure/contour active
   strokeColor: string     // couleur du contour
   strokeWidth: number     // epaisseur du contour
+  radius: number | null   // coins arrondis (rectangles uniquement), null sinon
 } | null
 
 // Trouve l'objet texte dans un groupe (CTA / badge), s'il y en a un
@@ -251,6 +252,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       border: !!o.stroke && (o.strokeWidth ?? 0) > 0,
       strokeColor: typeof o.stroke === "string" ? o.stroke : G,
       strokeWidth: o.strokeWidth ?? 0,
+      radius: o.type === "rect" ? ((o as fabric.Rect).rx ?? 0) : null,
     }
   }, [])
 
@@ -624,6 +626,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const setBorderWidth = (v: number) => mutate(o => {
     o.set({ strokeWidth: v, strokeUniform: true })
     if (v > 0 && !o.stroke) o.set("stroke", G)
+    o.dirty = true
+  })
+
+  // Coins arrondis (rectangles)
+  const setRadius = (v: number) => mutate(o => {
+    if (o.type !== "rect") return
+    ;(o as fabric.Rect).set({ rx: v, ry: v })
     o.dirty = true
   })
 
@@ -1209,6 +1218,16 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     </div>
                     <input type="range" min={1} max={30} step={1} value={sel.strokeWidth || 4}
                       onChange={e => setBorderWidth(parseInt(e.target.value))}
+                      style={{ width: "100%", accentColor: G }} />
+                  </div>
+                )}
+
+                {/* Coins arrondis (rectangles) */}
+                {sel.radius !== null && (
+                  <div style={{ marginBottom: 12 }}>
+                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Coins arrondis — {Math.round(sel.radius)}px</label>
+                    <input type="range" min={0} max={80} step={1} value={sel.radius}
+                      onChange={e => setRadius(parseInt(e.target.value))}
                       style={{ width: "100%", accentColor: G }} />
                   </div>
                 )}
