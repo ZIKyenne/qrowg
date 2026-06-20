@@ -33,19 +33,23 @@ const CANVAS_BG_DEFAULT = "#FFFFFF"
 
 // ---- Formats supportes -----------------------------------------------------
 // ratio = largeur / hauteur ; exportW = largeur cible export (~300 DPI / format reseau)
-type FormatId = "a4" | "square" | "story"
+type FormatId = "a4" | "square" | "story" | "carte" | "flyer" | "table"
 const FORMATS: Record<FormatId, { label: string; ratio: number; exportW: number }> = {
-  a4:     { label: "A4",    ratio: 210 / 297,  exportW: 2480 }, // portrait, ~300 DPI
-  square: { label: "Carré", ratio: 1,          exportW: 2000 },
-  story:  { label: "Story", ratio: 1080 / 1920, exportW: 1080 }, // 9:16
+  a4:     { label: "A4",     ratio: 210 / 297,   exportW: 2480 }, // portrait, ~300 DPI
+  square: { label: "Carré",  ratio: 1,           exportW: 2000 },
+  story:  { label: "Story",  ratio: 1080 / 1920, exportW: 1080 }, // 9:16
+  carte:  { label: "Carte",  ratio: 85 / 55,     exportW: 1004 }, // carte de visite 85x55mm paysage
+  flyer:  { label: "Flyer",  ratio: 148 / 210,   exportW: 1748 }, // A5 portrait
+  table:  { label: "Table",  ratio: 100 / 70,    exportW: 1181 }, // carte de table 10x7cm paysage
 }
 const EDIT_MAX_H = 620 // hauteur max du canvas d'edition a l'ecran
+const EDIT_MAX_W = 740 // largeur max (pour les formats paysage)
 
 function editDims(fmt: FormatId) {
-  const { ratio } = FORMATS[fmt]
-  const h = EDIT_MAX_H
-  const w = Math.round(h * ratio)
-  return { w, h }
+  const { ratio } = FORMATS[fmt] // largeur / hauteur
+  let h = EDIT_MAX_H, w = h * ratio
+  if (w > EDIT_MAX_W) { w = EDIT_MAX_W; h = w / ratio }
+  return { w: Math.round(w), h: Math.round(h) }
 }
 
 // ---- Polices web-safe (rendu canvas fiable) --------------------------------

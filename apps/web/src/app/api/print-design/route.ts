@@ -11,7 +11,7 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 
-const ALLOWED_FORMATS = ["a4", "square", "story"] as const
+const ALLOWED_FORMATS = ["a4", "square", "story", "carte", "flyer", "table"] as const
 
 export async function POST(req: NextRequest) {
   try {
