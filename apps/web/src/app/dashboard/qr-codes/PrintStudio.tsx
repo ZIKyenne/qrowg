@@ -259,6 +259,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [wizard, setWizard] = useState(0) // 0 = ferme, 1 = objectif, 2 = style, 3 = pret
   const [wizObj, setWizObj] = useState("")
   const [infoVer, setInfoVer] = useState(0) // rafraichit le panneau infos
+  const [side, setSide] = useState<"" | "layers" | "bg">("") // panneaux gauche Calques / Fond
 
   const isPro = userPlan === "pro" || userPlan === "business"
 
@@ -652,7 +653,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     fc.add(o); fc.setActiveObject(o); fc.requestRenderAll(); refreshSel()
   }
   // Ouvrir la bibliotheque sur un onglet donne (depuis le rail)
-  const openLib = (c: typeof libCat) => { setLibCat(c); setLibOpen(true); setTplOpen(false) }
+  const openLib = (c: typeof libCat) => { setLibCat(c); setLibOpen(true); setTplOpen(false); setSide("") }
+  // Ouvrir / fermer un panneau lateral (calques / fond)
+  const openSide = (s: "layers" | "bg") => { setSide(prev => prev === s ? "" : s); setLibOpen(false); setTplOpen(false) }
   // Bouton CTA (pilule dimensionnee au texte)
   const addCTA = (label: string) => {
     centerObj(buildPill(label, { rectFill: G, textFill: "#080808", height: 80, fontSize: 30 }))
@@ -1234,7 +1237,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 6, color: INK, fontSize: 15, cursor: "pointer" }}>+</button>
           </div>
 
-          <button type="button" onClick={() => { setWizard(1); setLibOpen(false); setTplOpen(false) }} title="Assistant de création"
+          <button type="button" onClick={() => { setWizard(1); setLibOpen(false); setTplOpen(false); setSide("") }} title="Assistant de création"
             style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 9, color: G, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
             <Sparkles size={14} /> Assistant
           </button>
@@ -1365,7 +1368,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {/* Rail outils */}
         {wizard === 0 && (
         <div style={{ width: 92, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", padding: 12, display: "flex", flexDirection: "column", gap: 8, background: SURFACE }}>
-          <button type="button" onClick={() => { setTplOpen(v => !v); setLibOpen(false) }}
+          <button type="button" onClick={() => { setTplOpen(v => !v); setLibOpen(false); setSide("") }}
             style={{ ...btnTool, background: tplOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.14),rgba(201,168,76,0.05))", border: `1px solid ${tplOpen ? G : "rgba(201,168,76,0.3)"}`, color: tplOpen ? G : INK, fontWeight: 700 }}>
             <LayoutTemplate size={16} /> Modèles
           </button>
@@ -1388,6 +1391,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           <button type="button" onClick={() => openLib("cta")}
             style={{ ...btnTool, marginTop: 4, background: (libOpen && ["cta", "icons", "badges", "arrows"].includes(libCat)) ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.12),rgba(201,168,76,0.05))", border: `1px solid ${(libOpen && ["cta", "icons", "badges", "arrows"].includes(libCat)) ? G : "rgba(201,168,76,0.3)"}`, color: INK, fontWeight: 700 }}>
             <MousePointerClick size={16} /> Éléments
+          </button>
+          <div style={{ flex: 1 }} />
+          <button type="button" onClick={() => openSide("layers")}
+            style={{ ...btnTool, background: side === "layers" ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${side === "layers" ? G : "rgba(255,255,255,0.07)"}`, color: side === "layers" ? G : INK }}>
+            <Copy size={16} /> Calques
+          </button>
+          <button type="button" onClick={() => openSide("bg")}
+            style={{ ...btnTool, background: side === "bg" ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${side === "bg" ? G : "rgba(255,255,255,0.07)"}`, color: side === "bg" ? G : INK }}>
+            <Square size={16} /> Fond
           </button>
         </div>
         )}
@@ -1601,6 +1613,113 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           </div>
         )}
 
+        {/* Panneau Calques (gauche) */}
+        {side === "layers" && (
+          <div className="qr-scroll" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+              <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Calques</span>
+              <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
+            </div>
+            <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "10px 12px 16px" }}>
+              {(() => {
+                const items = layerList()
+                const active = fcRef.current?.getActiveObject()
+                if (!items.length) return <p style={{ color: MUTED, fontSize: 11 }}>Aucun élément. Ajoute du texte, une forme ou un modèle.</p>
+                return (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    {items.map((o, idx) => {
+                      const on = active === o
+                      return (
+                        <div key={idx} draggable
+                          onDragStart={() => { dragIdxRef.current = idx }}
+                          onDragOver={e => { e.preventDefault(); if (dragOver !== idx) setDragOver(idx) }}
+                          onDragLeave={() => { if (dragOver === idx) setDragOver(null) }}
+                          onDrop={() => { if (dragIdxRef.current !== null) reorderLayers(dragIdxRef.current, idx); dragIdxRef.current = null; setDragOver(null) }}
+                          onDragEnd={() => { dragIdxRef.current = null; setDragOver(null) }}
+                          style={{ display: "flex", alignItems: "center", gap: 2, padding: "5px 7px", borderRadius: 7, background: on ? "rgba(201,168,76,0.14)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? G : "rgba(255,255,255,0.06)"}`, boxShadow: dragOver === idx ? `inset 0 2px 0 ${G}` : "none" }}>
+                          <svg width="9" height="14" viewBox="0 0 9 14" style={{ cursor: "grab", flexShrink: 0, marginRight: 2 }}>
+                            {[2.5, 7, 11.5].map((cy, r) => [2.5, 6.5].map((cx, c) => <circle key={`${r}-${c}`} cx={cx} cy={cy} r="1" fill={MUTED} />))}
+                          </svg>
+                          {editLayer === idx ? (
+                            <input autoFocus defaultValue={layerName(o)}
+                              onBlur={e => renameLayer(o, e.target.value)}
+                              onKeyDown={e => { if (e.key === "Enter") renameLayer(o, (e.target as HTMLInputElement).value); else if (e.key === "Escape") setEditLayer(null) }}
+                              style={{ flex: 1, minWidth: 0, background: BG, border: `1px solid ${G}`, borderRadius: 5, padding: "2px 5px", color: INK, fontSize: 10.5, outline: "none" }} />
+                          ) : (
+                            <button type="button" onClick={() => selectLayer(o)} onDoubleClick={() => setEditLayer(idx)} title="Double-clic pour renommer"
+                              style={{ flex: 1, minWidth: 0, textAlign: "left", background: "none", border: "none", color: on ? G : INK, fontSize: 10.5, cursor: "pointer", padding: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", opacity: o.visible ? 1 : 0.4 }}>
+                              {layerName(o)}
+                            </button>
+                          )}
+                          <button type="button" onClick={() => toggleVisible(o)} title="Afficher / masquer" style={iconMini}>
+                            <svg width="13" height="13" viewBox="0 0 24 24"><path d="M12 5C5 5 1 12 1 12s4 7 11 7 11-7 11-7-4-7-11-7zm0 11.5A4.5 4.5 0 1112 7a4.5 4.5 0 010 9.5z" fill={o.visible ? G : MUTED} /></svg>
+                          </button>
+                          <button type="button" onClick={() => moveLayer(o, "up")} title="Monter" style={iconMini}><ChevronUp size={13} /></button>
+                          <button type="button" onClick={() => moveLayer(o, "down")} title="Descendre" style={iconMini}><ChevronDown size={13} /></button>
+                          <button type="button" onClick={() => removeLayer(o)} title="Supprimer" style={{ ...iconMini, color: "#FF6B6B" }}><Trash2 size={12} /></button>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )
+              })()}
+            </div>
+          </div>
+        )}
+
+        {/* Panneau Fond + infos (gauche) */}
+        {side === "bg" && (
+          <div className="qr-scroll" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+              <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Fond &amp; infos</span>
+              <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
+            </div>
+            <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "12px 12px 16px", display: "flex", flexDirection: "column", gap: 16 }}>
+              <div>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Fond du support</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <input type="color" value={/^#/.test(bgColor) ? bgColor : "#FFFFFF"} onChange={e => applyBg(e.target.value)}
+                    style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
+                  <input value={bgColor} onChange={e => applyBg(e.target.value)}
+                    style={{ flex: 1, background: BG, border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, fontFamily: "monospace", outline: "none", boxSizing: "border-box" }} />
+                </div>
+                <button type="button" onClick={() => toggleGrad(!bgGrad)}
+                  style={{ ...layerBtn, width: "100%", marginTop: 8, background: bgGrad ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", color: bgGrad ? G : INK, fontWeight: 700 }}>
+                  Dégradé {bgGrad ? "✓" : ""}
+                </button>
+                {bgGrad && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
+                    <input type="color" value={/^#/.test(bgC2) ? bgC2 : "#0A0A0A"} onChange={e => applyBgC2(e.target.value)}
+                      style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
+                    <span style={{ color: MUTED, fontSize: 10 }}>2ᵉ couleur</span>
+                  </div>
+                )}
+              </div>
+              {infoVer >= 0 && (() => {
+                const ros = roleObjects()
+                if (!ros.length) return null
+                return (
+                  <div>
+                    <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Infos du support</p>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      {ros.map(o => {
+                        const role = (o as any).role as string
+                        return (
+                          <div key={role}>
+                            <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 3 }}>{ROLE_LABEL[role] ?? role}</label>
+                            <input value={roleValue(o)} onChange={e => updateRole(role, e.target.value)}
+                              style={{ width: "100%", background: BG, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, outline: "none", boxSizing: "border-box" }} />
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })()}
+            </div>
+          </div>
+        )}
+
         {/* Zone canvas */}
         <div ref={scrollRef} style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, background: "#0A0907", position: "relative" }}>
           {loading && (
@@ -1613,57 +1732,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           </div>
         </div>
 
-        {/* Panneau proprietes + calques */}
-        <div className="qr-scroll" style={{ width: 264, flexShrink: 0, borderLeft: "1px solid rgba(255,255,255,0.07)", padding: 14, overflowY: "auto", background: SURFACE, display: "flex", flexDirection: "column", gap: 16 }}>
-
-          {/* Fond du canvas */}
-          <div>
-            <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Fond du support</p>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <input type="color" value={/^#/.test(bgColor) ? bgColor : "#FFFFFF"} onChange={e => applyBg(e.target.value)}
-                style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
-              <input value={bgColor} onChange={e => applyBg(e.target.value)}
-                style={{ flex: 1, background: BG, border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, fontFamily: "monospace", outline: "none", boxSizing: "border-box" }} />
-            </div>
-            <button type="button" onClick={() => toggleGrad(!bgGrad)}
-              style={{ ...layerBtn, width: "100%", marginTop: 8, background: bgGrad ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", color: bgGrad ? G : INK, fontWeight: 700 }}>
-              Dégradé {bgGrad ? "✓" : ""}
-            </button>
-            {bgGrad && (
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
-                <input type="color" value={/^#/.test(bgC2) ? bgC2 : "#0A0A0A"} onChange={e => applyBgC2(e.target.value)}
-                  style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
-                <span style={{ color: MUTED, fontSize: 10 }}>2ᵉ couleur (vers le bas)</span>
-              </div>
-            )}
-          </div>
-
-          {/* Infos du support (textes pre-remplis editables) */}
-          {infoVer >= 0 && (() => {
-            const ros = roleObjects()
-            if (!ros.length) return null
-            return (
-              <div>
-                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Infos du support</p>
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {ros.map(o => {
-                    const role = (o as any).role as string
-                    return (
-                      <div key={role}>
-                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 3 }}>{ROLE_LABEL[role] ?? role}</label>
-                        <input value={roleValue(o)} onChange={e => updateRole(role, e.target.value)}
-                          style={{ width: "100%", background: BG, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, outline: "none", boxSizing: "border-box" }} />
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )
-          })()}
-
-          {/* Proprietes de l'objet selectionne */}
-          {sel ? (
-            <>
+        {/* Panneau contextuel (apparait uniquement a la selection) */}
+        {sel && (
+        <div className="qr-scroll" style={{ width: 280, flexShrink: 0, borderLeft: "1px solid rgba(255,255,255,0.07)", padding: 14, overflowY: "auto", background: SURFACE, display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
                 <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Élément sélectionné</p>
 
@@ -1854,64 +1925,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <Trash2 size={12} /> Supprimer
                 </button>
               </div>
-            </>
-          ) : (
-            <div style={{ color: MUTED, fontSize: 11, lineHeight: 1.6, padding: "10px 2px" }}>
-              Sélectionne un élément pour modifier sa couleur, son opacité, sa position…<br /><br />
-              Double-clic sur un texte pour l'éditer.<br />
-              <strong style={{ color: INK }}>Suppr</strong> retire · <strong style={{ color: INK }}>Ctrl/⌘+C/V</strong> copier-coller · <strong style={{ color: INK }}>Ctrl/⌘+D</strong> dupliquer · <strong style={{ color: INK }}>Ctrl/⌘+Z</strong> annuler · <strong style={{ color: INK }}>flèches</strong> déplacer (Maj ×10).
             </div>
-          )}
-
-          {/* Liste des calques (toujours visible) */}
-          {layersVer >= 0 && (() => {
-            const items = layerList()
-            const active = fcRef.current?.getActiveObject()
-            return (
-              <div>
-                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Calques ({items.length})</p>
-                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  {items.map((o, idx) => {
-                    const on = active === o
-                    return (
-                      <div key={idx} draggable
-                        onDragStart={() => { dragIdxRef.current = idx }}
-                        onDragOver={e => { e.preventDefault(); if (dragOver !== idx) setDragOver(idx) }}
-                        onDragLeave={() => { if (dragOver === idx) setDragOver(null) }}
-                        onDrop={() => { if (dragIdxRef.current !== null) reorderLayers(dragIdxRef.current, idx); dragIdxRef.current = null; setDragOver(null) }}
-                        onDragEnd={() => { dragIdxRef.current = null; setDragOver(null) }}
-                        style={{ display: "flex", alignItems: "center", gap: 2, padding: "4px 6px", borderRadius: 7, background: on ? "rgba(201,168,76,0.14)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? G : "rgba(255,255,255,0.06)"}`, boxShadow: dragOver === idx ? `inset 0 2px 0 ${G}` : "none" }}>
-                        <svg width="9" height="14" viewBox="0 0 9 14" style={{ cursor: "grab", flexShrink: 0, marginRight: 2 }}>
-                          {[2.5, 7, 11.5].map((cy, r) => [2.5, 6.5].map((cx, c) => (
-                            <circle key={`${r}-${c}`} cx={cx} cy={cy} r="1" fill={MUTED} />
-                          )))}
-                        </svg>
-                        {editLayer === idx ? (
-                          <input autoFocus defaultValue={layerName(o)}
-                            onBlur={e => renameLayer(o, e.target.value)}
-                            onKeyDown={e => { if (e.key === "Enter") renameLayer(o, (e.target as HTMLInputElement).value); else if (e.key === "Escape") setEditLayer(null) }}
-                            style={{ flex: 1, minWidth: 0, background: BG, border: `1px solid ${G}`, borderRadius: 5, padding: "2px 5px", color: INK, fontSize: 10.5, outline: "none" }} />
-                        ) : (
-                          <button type="button" onClick={() => selectLayer(o)} onDoubleClick={() => setEditLayer(idx)} title="Double-clic pour renommer"
-                            style={{ flex: 1, minWidth: 0, textAlign: "left", background: "none", border: "none", color: on ? G : INK, fontSize: 10.5, cursor: "pointer", padding: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", opacity: o.visible ? 1 : 0.4 }}>
-                            {layerName(o)}
-                          </button>
-                        )}
-                        <button type="button" onClick={() => toggleVisible(o)} title="Afficher / masquer" style={iconMini}>
-                          <svg width="13" height="13" viewBox="0 0 24 24"><path d="M12 5C5 5 1 12 1 12s4 7 11 7 11-7 11-7-4-7-11-7zm0 11.5A4.5 4.5 0 1112 7a4.5 4.5 0 010 9.5z" fill={o.visible ? G : MUTED} /></svg>
-                        </button>
-                        <button type="button" onClick={() => moveLayer(o, "up")} title="Monter (devant)" style={iconMini}><ChevronUp size={13} /></button>
-                        <button type="button" onClick={() => moveLayer(o, "down")} title="Descendre (derrière)" style={iconMini}><ChevronDown size={13} /></button>
-                        <button type="button" onClick={() => removeLayer(o)} title="Supprimer" style={{ ...iconMini, color: "#FF6B6B" }}><Trash2 size={12} /></button>
-                      </div>
-                    )
-                  })}
-                  {items.length === 0 && <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>Aucun élément.</p>}
-                </div>
-              </div>
-            )
-          })()}
-        </div>
+        )}
       </div>
     </div>
   )
