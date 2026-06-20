@@ -225,6 +225,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [format, setFormat]   = useState<FormatId>("a4")
   const [sel, setSel]         = useState<SelState>(null)
   const [bgColor, setBgColor] = useState(CANVAS_BG_DEFAULT)
+  const [bgGrad, setBgGrad]   = useState(false)
+  const [bgC2, setBgC2]       = useState("#0A0A0A")
   const [loading, setLoading] = useState(true)
   const [saving, setSaving]   = useState(false)
   const [saved, setSaved]     = useState(false)
@@ -824,6 +826,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const fc = fcRef.current; if (!fc) return
     const d = editDims(fmt)
     fc.setZoom(1); fc.setDimensions({ width: d.w, height: d.h }) // changer de format reinitialise le zoom
+    if (bgGrad) applyGradient(bgColor, bgC2) // recalculer le degrade aux nouvelles dimensions
     fc.requestRenderAll()
     setFormat(fmt); setZoom(1)
   }
@@ -850,13 +853,33 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     return out
   }
 
-  // ---- Couleur de fond -----------------------------------------------------
-  const applyBg = (color: string) => {
+  // ---- Couleur / degrade de fond -------------------------------------------
+  // Degrade vertical en coordonnees design (getHeight/zoom), insensible au zoom.
+  const applyGradient = (c1: string, c2: string) => {
     const fc = fcRef.current; if (!fc) return
-    fc.setBackgroundColor(color, fc.renderAll.bind(fc))
-    setBgColor(color)
+    const h = fc.getHeight() / (fc.getZoom() || 1)
+    const grad = new fabric.Gradient({
+      type: "linear", gradientUnits: "pixels",
+      coords: { x1: 0, y1: 0, x2: 0, y2: h },
+      colorStops: [{ offset: 0, color: c1 }, { offset: 1, color: c2 }],
+    })
+    fc.setBackgroundColor(grad as unknown as string, fc.renderAll.bind(fc))
     pushHistorySoon()
   }
+  const applyBg = (color: string) => {
+    const fc = fcRef.current; if (!fc) return
+    setBgColor(color)
+    if (bgGrad) { applyGradient(color, bgC2); return }
+    fc.setBackgroundColor(color, fc.renderAll.bind(fc))
+    pushHistorySoon()
+  }
+  const toggleGrad = (on: boolean) => {
+    setBgGrad(on)
+    const fc = fcRef.current; if (!fc) return
+    if (on) applyGradient(bgColor, bgC2)
+    else { fc.setBackgroundColor(bgColor, fc.renderAll.bind(fc)); pushHistorySoon() }
+  }
+  const applyBgC2 = (c2: string) => { setBgC2(c2); if (bgGrad) applyGradient(bgColor, c2) }
 
   // ---- Appliquer un modele oriente objectif --------------------------------
   // Vide le canvas (hors guides), pose un design complet et editable, place le vrai QR.
@@ -1325,6 +1348,17 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <input value={bgColor} onChange={e => applyBg(e.target.value)}
                 style={{ flex: 1, background: BG, border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, fontFamily: "monospace", outline: "none", boxSizing: "border-box" }} />
             </div>
+            <button type="button" onClick={() => toggleGrad(!bgGrad)}
+              style={{ ...layerBtn, width: "100%", marginTop: 8, background: bgGrad ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", color: bgGrad ? G : INK, fontWeight: 700 }}>
+              Dégradé {bgGrad ? "✓" : ""}
+            </button>
+            {bgGrad && (
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
+                <input type="color" value={/^#/.test(bgC2) ? bgC2 : "#0A0A0A"} onChange={e => applyBgC2(e.target.value)}
+                  style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
+                <span style={{ color: MUTED, fontSize: 10 }}>2ᵉ couleur (vers le bas)</span>
+              </div>
+            )}
           </div>
 
           {/* Proprietes de l'objet selectionne */}
