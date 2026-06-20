@@ -112,6 +112,8 @@ type SelState = {
   fontFamily: string
   fontSize: number
   bold: boolean
+  italic: boolean
+  underline: boolean
   locked: boolean
   label: string | null    // libelle editable (groupe CTA/badge contenant un texte)
   isGroup: boolean        // true => "Couleur" recolore les formes du groupe
@@ -258,6 +260,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       fontFamily: isText ? (t.fontFamily ?? "Georgia") : "Georgia",
       fontSize: isText ? (t.fontSize ?? 40) : 40,
       bold: isText ? (t.fontWeight === "bold" || t.fontWeight === 700) : false,
+      italic: isText ? (t.fontStyle === "italic") : false,
+      underline: isText ? !!t.underline : false,
       locked: !!o.lockMovementX,
       label: txtChild?.text ?? null,
       isGroup,
@@ -1414,11 +1418,23 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                       onChange={e => mutate(o => (o as fabric.IText).set("fontSize", parseInt(e.target.value)))}
                       style={{ width: "100%", accentColor: G, marginBottom: 10 }} />
 
-                    <button type="button"
-                      onClick={() => mutate(o => (o as fabric.IText).set("fontWeight", sel.bold ? "normal" : "bold"))}
-                      style={{ ...layerBtn, width: "100%", background: sel.bold ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", color: sel.bold ? G : INK, fontWeight: 700, marginBottom: 10 }}>
-                      Gras
-                    </button>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 10 }}>
+                      <button type="button" title="Gras"
+                        onClick={() => mutate(o => (o as fabric.IText).set("fontWeight", sel.bold ? "normal" : "bold"))}
+                        style={{ ...layerBtn, background: sel.bold ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", color: sel.bold ? G : INK, fontWeight: 800 }}>
+                        B
+                      </button>
+                      <button type="button" title="Italique"
+                        onClick={() => mutate(o => (o as fabric.IText).set("fontStyle", sel.italic ? "normal" : "italic"))}
+                        style={{ ...layerBtn, background: sel.italic ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", color: sel.italic ? G : INK, fontStyle: "italic", fontWeight: 700 }}>
+                        I
+                      </button>
+                      <button type="button" title="Souligné"
+                        onClick={() => mutate(o => (o as fabric.IText).set("underline", !sel.underline))}
+                        style={{ ...layerBtn, background: sel.underline ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", color: sel.underline ? G : INK, textDecoration: "underline", fontWeight: 700 }}>
+                        U
+                      </button>
+                    </div>
 
                     {/* Alignement du texte */}
                     <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Alignement</label>
