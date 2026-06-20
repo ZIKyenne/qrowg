@@ -95,6 +95,10 @@ const LIB_ICONS: { key: string; label: string; d: string }[] = [
   { key:"check", label:"Validé",    d:"M12 2a10 10 0 100 20 10 10 0 000-20zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" },
   { key:"cart",  label:"Commander", d:"M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 15h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" },
   { key:"gift",  label:"Offre",     d:"M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 00-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 12 7.4l3.38 4.6L17 10.83 14.92 8H20v6z" },
+  { key:"play",  label:"Vidéo",     d:"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM10 16.5v-9l6 4.5-6 4.5z" },
+  { key:"chat",  label:"Message",   d:"M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" },
+  { key:"like",  label:"J'aime",    d:"M1 21h4V9H1v12zM23 10c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1z" },
+  { key:"music", label:"Audio",     d:"M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" },
 ]
 
 // ---- Props -----------------------------------------------------------------
@@ -313,7 +317,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [mockEnv, setMockEnv] = useState<"wall" | "table" | "window" | "desk">("wall")
   const [mockUrl, setMockUrl] = useState("")
   const [libOpen, setLibOpen] = useState(false)
-  const [libCat, setLibCat]   = useState<"text" | "shapes" | "lines" | "frames" | "cta" | "icons" | "badges" | "arrows">("text")
+  const [libCat, setLibCat]   = useState<"text" | "shapes" | "lines" | "frames" | "cta" | "icons" | "badges" | "arrows" | "deco">("text")
   const [tplOpen, setTplOpen] = useState(false)
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
   const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
@@ -732,6 +736,31 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     }
     ;(o as any).perPixelTargetFind = true
     fc.add(o); fc.setActiveObject(o); fc.requestRenderAll(); refreshSel()
+  }
+  // Decorations (formes decoratives construites en Fabric)
+  const addDeco = (k: string) => {
+    let o: fabric.Object
+    switch (k) {
+      case "sparkle": o = new fabric.Polygon(starPts(4, 80, 22), { fill: G }); break
+      case "burst":   o = new fabric.Polygon(starPts(12, 85, 66), { fill: G }); break
+      case "ring":    o = new fabric.Circle({ radius: 70, fill: "transparent", stroke: G, strokeWidth: 8, strokeUniform: true }); break
+      case "dots": {
+        const a: fabric.Object[] = []
+        for (let i = 0; i < 5; i++) a.push(new fabric.Circle({ radius: 9, fill: G, left: i * 30, top: 0 }))
+        o = new fabric.Group(a); break
+      }
+      case "wave":
+        o = new fabric.Polyline([{ x: 0, y: 14 }, { x: 22, y: 0 }, { x: 44, y: 14 }, { x: 66, y: 0 }, { x: 88, y: 14 }, { x: 110, y: 0 }, { x: 132, y: 14 }],
+          { fill: "", stroke: G, strokeWidth: 5, strokeLineCap: "round", strokeLineJoin: "round" }); break
+      case "confetti": {
+        const a: fabric.Object[] = []
+        ;[[0, 0, 15], [40, 12, -20], [82, 2, 30], [22, 44, 40], [72, 48, -15], [114, 26, 10], [126, 64, -30]]
+          .forEach(([x, y, ang]) => a.push(new fabric.Rect({ left: x, top: y, width: 10, height: 22, rx: 3, ry: 3, fill: G, angle: ang })))
+        o = new fabric.Group(a); break
+      }
+      default: o = new fabric.Polygon(starPts(4, 80, 22), { fill: G })
+    }
+    centerObj(o)
   }
   // Ouvrir la bibliotheque sur un onglet donne (depuis le rail)
   const openLib = (c: typeof libCat) => { setLibCat(c); setLibOpen(true); setTplOpen(false); setSide("") }
@@ -1669,6 +1698,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 ["icons",  "Icônes",  <Star size={12} key="i" />],
                 ["badges", "Badges",  <Award size={12} key="i" />],
                 ["arrows", "Flèches", <ArrowRight size={12} key="i" />],
+                ["deco",   "Déco",    <Sparkles size={12} key="i" />],
               ] as const).map(([id, label, icon]) => {
                 const on = libCat === id
                 return (
@@ -1814,6 +1844,25 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     </button>
                   ))}
                   <p style={{ gridColumn: "1 / 3", color: MUTED, fontSize: 9, margin: "2px 0 0", lineHeight: 1.4 }}>Astuce : fais pointer une flèche vers ton QR pour guider le scan.</p>
+                </div>
+              )}
+              {/* Decorations */}
+              {libCat === "deco" && (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                  {([
+                    ["sparkle", "Étincelle", <svg width="24" height="24" viewBox="0 0 24 24" key="d"><path d="M12 2l2 8 8 2-8 2-2 8-2-8-8-2 8-2z" fill={G} /></svg>],
+                    ["burst", "Éclat",       <svg width="24" height="24" viewBox="0 0 24 24" key="d"><path d="M12 2l1.8 4.5 4.7-1.6-1.6 4.7L21.4 12l-4.5 1.4 1.6 4.7-4.7-1.6L12 21l-1.8-4.5-4.7 1.6 1.6-4.7L2.6 12l4.5-1.4-1.6-4.7 4.7 1.6z" fill={G} /></svg>],
+                    ["ring", "Anneau",       <svg width="24" height="24" key="d"><circle cx="12" cy="12" r="9" fill="none" stroke={G} strokeWidth="3" /></svg>],
+                    ["dots", "Points",       <svg width="34" height="14" key="d">{[3, 11, 19, 27].map(x => <circle key={x} cx={x} cy="7" r="3" fill={G} />)}</svg>],
+                    ["wave", "Vague",        <svg width="34" height="14" viewBox="0 0 34 14" key="d"><polyline points="1,11 7,3 13,11 19,3 25,11 31,3" fill="none" stroke={G} strokeWidth="2" /></svg>],
+                    ["confetti", "Confettis", <svg width="26" height="24" viewBox="0 0 26 24" key="d">{[[2, 2, 12], [12, 8, -20], [20, 3, 25], [7, 15, 35], [18, 16, -15]].map(([x, y, a], i) => <rect key={i} x={x} y={y} width="4" height="8" rx="1" fill={G} transform={`rotate(${a} ${x + 2} ${y + 4})`} />)}</svg>],
+                  ] as const).map(([k, label, prev]) => (
+                    <button key={k} type="button" onClick={() => addDeco(k)} title={label}
+                      style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "10px 2px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
+                      {prev}
+                      <span style={{ color: MUTED, fontSize: 8 }}>{label}</span>
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
