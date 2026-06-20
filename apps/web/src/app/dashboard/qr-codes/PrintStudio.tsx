@@ -208,6 +208,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const clipRef = useRef<fabric.Object | null>(null) // presse-papier (copier/coller)
   const histRef = useRef<{ stack: string[]; i: number; lock: boolean }>({ stack: [], i: -1, lock: false })
   const pushTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const dragIdxRef = useRef<number | null>(null) // index du calque en cours de glissement
 
   const [format, setFormat]   = useState<FormatId>("a4")
   const [sel, setSel]         = useState<SelState>(null)
@@ -221,6 +222,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [tplOpen, setTplOpen] = useState(false)
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
   const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
+  const [dragOver, setDragOver] = useState<number | null>(null) // ligne survolee pendant un glisser
 
   const isPro = userPlan === "pro" || userPlan === "business"
 
@@ -711,6 +713,19 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const removeLayer = (o: fabric.Object) => {
     const fc = fcRef.current; if (!fc) return
     fc.setActiveObject(o); layer("del")
+  }
+  // Reordonner par glisser-deposer (indices dans la liste affichee = front-first)
+  const reorderLayers = (from: number, to: number) => {
+    const fc = fcRef.current; if (!fc || from === to) return
+    const disp = layerList()
+    if (from < 0 || from >= disp.length || to < 0 || to >= disp.length) return
+    const moved = disp.splice(from, 1)[0]
+    disp.splice(to, 0, moved)
+    // disp est front-first => l'ordre Fabric (arriere->avant) est l'inverse
+    disp.slice().reverse().forEach((obj, i) => fc.moveTo(obj, i))
+    if (vGuideRef.current) fc.bringToFront(vGuideRef.current)
+    if (hGuideRef.current) fc.bringToFront(hGuideRef.current)
+    fc.requestRenderAll(); setLayersVer(v => v + 1); pushHistorySoon()
   }
 
   // ---- Alignement sur le support -------------------------------------------
@@ -1375,7 +1390,18 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   {items.map((o, idx) => {
                     const on = active === o
                     return (
-                      <div key={idx} style={{ display: "flex", alignItems: "center", gap: 2, padding: "4px 6px", borderRadius: 7, background: on ? "rgba(201,168,76,0.14)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? G : "rgba(255,255,255,0.06)"}` }}>
+                      <div key={idx} draggable
+                        onDragStart={() => { dragIdxRef.current = idx }}
+                        onDragOver={e => { e.preventDefault(); if (dragOver !== idx) setDragOver(idx) }}
+                        onDragLeave={() => { if (dragOver === idx) setDragOver(null) }}
+                        onDrop={() => { if (dragIdxRef.current !== null) reorderLayers(dragIdxRef.current, idx); dragIdxRef.current = null; setDragOver(null) }}
+                        onDragEnd={() => { dragIdxRef.current = null; setDragOver(null) }}
+                        style={{ display: "flex", alignItems: "center", gap: 2, padding: "4px 6px", borderRadius: 7, background: on ? "rgba(201,168,76,0.14)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? G : "rgba(255,255,255,0.06)"}`, boxShadow: dragOver === idx ? `inset 0 2px 0 ${G}` : "none" }}>
+                        <svg width="9" height="14" viewBox="0 0 9 14" style={{ cursor: "grab", flexShrink: 0, marginRight: 2 }}>
+                          {[2.5, 7, 11.5].map((cy, r) => [2.5, 6.5].map((cx, c) => (
+                            <circle key={`${r}-${c}`} cx={cx} cy={cy} r="1" fill={MUTED} />
+                          )))}
+                        </svg>
                         <button type="button" onClick={() => selectLayer(o)} title={layerName(o)}
                           style={{ flex: 1, minWidth: 0, textAlign: "left", background: "none", border: "none", color: on ? G : INK, fontSize: 10.5, cursor: "pointer", padding: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", opacity: o.visible ? 1 : 0.4 }}>
                           {layerName(o)}
