@@ -20,7 +20,7 @@ import {
   Copy, Trash2, Lock, Unlock, ChevronUp, ChevronDown,
   Download, Printer, Loader2, Check, Save,
   Shapes, Star, Award, MousePointerClick, ArrowRight, LayoutTemplate,
-  Undo2, Redo2, Sparkles, Image as ImageIcon, Palette,
+  Undo2, Redo2, Sparkles, Image as ImageIcon, Palette, Eye,
 } from "lucide-react"
 
 // ---- Constantes design (Midnight Gold) -------------------------------------
@@ -263,6 +263,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [expOpen, setExpOpen] = useState(false)
   const [expDpi, setExpDpi]   = useState(300)
   const [expMarks, setExpMarks] = useState(false)
+  const [mockOpen, setMockOpen] = useState(false)
+  const [mockEnv, setMockEnv] = useState<"wall" | "table" | "window" | "desk">("wall")
+  const [mockUrl, setMockUrl] = useState("")
   const [libOpen, setLibOpen] = useState(false)
   const [libCat, setLibCat]   = useState<"text" | "shapes" | "lines" | "frames" | "cta" | "icons" | "badges" | "arrows">("text")
   const [tplOpen, setTplOpen] = useState(false)
@@ -1220,6 +1223,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     } finally { setExporting(false) }
   }
 
+  // ---- Apercu en situation (mockup CSS) ------------------------------------
+  const openMock = () => {
+    const fc = fcRef.current; if (!fc) return
+    prepExport(fc)
+    const url = withBaseZoom(fc, base => fc.toDataURL({ format: "png", multiplier: Math.min(2, 1000 / base.w) }))
+    setMockUrl(url); setMockOpen(true)
+  }
+
   // ---- Export pro (DPI + format + traits de coupe / fond perdu) -------------
   const targetWidth = () => Math.round(FORMATS[format].exportW * (expDpi / 300))
   const exportImage = (type: "png" | "jpeg") => {
@@ -1336,6 +1347,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             <button type="button" onClick={() => applyZoom(zoom * 1.25)} title="Zoom avant" aria-label="Zoom avant"
               style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 6, color: INK, fontSize: 15, cursor: "pointer" }}>+</button>
           </div>
+
+          <button type="button" onClick={openMock} title="Aperçu en situation"
+            style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+            <Eye size={14} /> Aperçu
+          </button>
 
           <button type="button" onClick={() => { setWizard(1); setLibOpen(false); setTplOpen(false); setSide("") }} title="Assistant de création"
             style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 9, color: G, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
@@ -2080,6 +2096,35 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             </div>
         )}
       </div>
+
+      {/* Apercu en situation (mockup) */}
+      {mockOpen && (() => {
+        const scenes: Record<string, { bg: string; transform: string; maxH: string; glass?: boolean }> = {
+          wall:   { bg: "linear-gradient(180deg,#ece7dd 0%,#ddd6ca 62%,#c7bfb0 62%,#b4ac9c 100%)", transform: "none", maxH: "74%" },
+          table:  { bg: "linear-gradient(180deg,#3a2a1c,#5a4330)", transform: "perspective(1300px) rotateX(50deg)", maxH: "62%" },
+          window: { bg: "linear-gradient(135deg,#d3e6ed,#a9c6d2 55%,#8aacba)", transform: "rotate(-2deg)", maxH: "62%", glass: true },
+          desk:   { bg: "linear-gradient(180deg,#2c2c31,#191920)", transform: "perspective(1500px) rotateX(44deg) rotateZ(-3deg)", maxH: "56%" },
+        }
+        const s = scenes[mockEnv]
+        return (
+          <div style={{ position: "fixed", inset: 0, zIndex: 4000, background: "rgba(0,0,0,0.88)", backdropFilter: "blur(4px)", display: "flex", flexDirection: "column", fontFamily: "DM Sans, sans-serif" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px" }}>
+              <span style={{ color: INK, fontWeight: 800, fontSize: 14, display: "flex", alignItems: "center", gap: 7 }}><Eye size={15} /> Aperçu en situation</span>
+              <button type="button" onClick={() => setMockOpen(false)} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 9, color: INK, cursor: "pointer" }}><X size={16} /></button>
+            </div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "center", paddingBottom: 12 }}>
+              {([["wall", "Mur"], ["table", "Table"], ["window", "Vitrine"], ["desk", "Bureau"]] as const).map(([id, l]) => (
+                <button key={id} type="button" onClick={() => setMockEnv(id)}
+                  style={{ padding: "7px 16px", borderRadius: 9, cursor: "pointer", fontSize: 12, fontWeight: mockEnv === id ? 700 : 500, background: mockEnv === id ? "rgba(201,168,76,0.18)" : "rgba(255,255,255,0.05)", border: `1px solid ${mockEnv === id ? G : "rgba(255,255,255,0.1)"}`, color: mockEnv === id ? G : INK }}>{l}</button>
+              ))}
+            </div>
+            <div style={{ flex: 1, margin: "0 16px 16px", borderRadius: 16, overflow: "hidden", position: "relative", background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", perspective: "1400px" }}>
+              {mockUrl && <img src={mockUrl} alt="aperçu" style={{ maxHeight: s.maxH, maxWidth: "62%", transform: s.transform, transformOrigin: "center", boxShadow: "0 40px 70px rgba(0,0,0,0.45), 0 6px 14px rgba(0,0,0,0.3)", borderRadius: 3 }} />}
+              {s.glass && <div style={{ position: "absolute", inset: 0, background: "linear-gradient(115deg,rgba(255,255,255,0.28) 0%,transparent 28%,transparent 70%,rgba(255,255,255,0.18) 100%)", pointerEvents: "none" }} />}
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }
