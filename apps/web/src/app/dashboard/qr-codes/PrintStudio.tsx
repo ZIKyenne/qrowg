@@ -20,7 +20,7 @@ import {
   Copy, Trash2, Lock, Unlock, ChevronUp, ChevronDown,
   Download, Printer, Loader2, Check, Save,
   Shapes, Star, Award, MousePointerClick, ArrowRight, LayoutTemplate,
-  Undo2, Redo2,
+  Undo2, Redo2, Sparkles,
 } from "lucide-react"
 
 // ---- Constantes design (Midnight Gold) -------------------------------------
@@ -210,6 +210,16 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
   )
 }
 
+// Objectifs marketing de l'assistant debutant
+const WIZ_OBJECTIVES: { obj: string; emoji: string; label: string }[] = [
+  { obj: "Avis", emoji: "⭐", label: "Obtenir des avis" },
+  { obj: "Menu", emoji: "🍽️", label: "Faire voir le menu" },
+  { obj: "Réserver", emoji: "📅", label: "Faire réserver" },
+  { obj: "Abonnés", emoji: "📷", label: "Gagner des abonnés" },
+  { obj: "Contact", emoji: "💳", label: "Partager mes infos" },
+  { obj: "Page", emoji: "🔗", label: "Faire découvrir ma page" },
+]
+
 export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpsell, prefill }: Props) {
   const elRef   = useRef<HTMLCanvasElement>(null)
   const fcRef   = useRef<fabric.Canvas | null>(null)
@@ -239,6 +249,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [dragOver, setDragOver] = useState<number | null>(null) // ligne survolee pendant un glisser
   const [editLayer, setEditLayer] = useState<number | null>(null) // index du calque en cours de renommage
   const [zoom, setZoom] = useState(1)
+  const [wizard, setWizard] = useState(0) // 0 = ferme, 1 = objectif, 2 = style, 3 = pret
+  const [wizObj, setWizObj] = useState("")
 
   const isPro = userPlan === "pro" || userPlan === "business"
 
@@ -418,9 +430,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           return
         }
       } catch { /* pas de design : on pose le QR */ }
-      // Aucun design sauvegarde -> poser le vrai QR au centre
+      // Aucun design sauvegarde -> poser le vrai QR au centre + ouvrir l'assistant
       placeQr(fc)
       setLoading(false)
+      setWizard(1)
     })()
 
     return () => { fc.dispose(); fcRef.current = null }
@@ -937,12 +950,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
   // ---- Appliquer un modele oriente objectif --------------------------------
   // Vide le canvas (hors guides), pose un design complet et editable, place le vrai QR.
-  const applyTemplate = async (id: string) => {
+  const applyTemplate = async (id: string, skipConfirm = false) => {
     const fc = fcRef.current; if (!fc) return
     const meta = PRINT_TEMPLATES.find(t => t.id === id); if (!meta) return
     const vG = vGuideRef.current, hG = hGuideRef.current
     const hasContent = fc.getObjects().some(o => o !== vG && o !== hG)
-    if (hasContent && !window.confirm("Remplacer le contenu actuel par ce modèle ?")) return
+    if (!skipConfirm && hasContent && !window.confirm("Remplacer le contenu actuel par ce modèle ?")) return
 
     histRef.current.lock = true // tout le modele = une seule etape d'historique
     fc.getObjects().slice().forEach(o => { if (o !== vG && o !== hG) fc.remove(o) })
@@ -1193,6 +1206,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 6, color: INK, fontSize: 15, cursor: "pointer" }}>+</button>
           </div>
 
+          <button type="button" onClick={() => { setWizard(1); setLibOpen(false); setTplOpen(false) }} title="Assistant de création"
+            style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 9, color: G, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+            <Sparkles size={14} /> Assistant
+          </button>
+
           <button type="button" onClick={undo} disabled={!canUndo} aria-label="Annuler" title="Annuler (Ctrl/⌘+Z)" style={histBtn(canUndo)}>
             <Undo2 size={15} />
           </button>
@@ -1221,7 +1239,103 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       {/* ---- Corps : rail outils | canvas | proprietes ---- */}
       <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
 
+        {/* Assistant debutant (colonne guidee) */}
+        {wizard > 0 && (() => {
+          const objTpls = PRINT_TEMPLATES.filter(t => t.obj === wizObj)
+          return (
+            <div className="qr-scroll" style={{ width: 300, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+                <span style={{ color: G, fontWeight: 800, fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}><Sparkles size={14} /> Création guidée</span>
+                <button type="button" onClick={() => setWizard(0)} aria-label="Fermer l'assistant"
+                  style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}>
+                  <X size={13} />
+                </button>
+              </div>
+
+              {/* Fil d'etapes */}
+              <div style={{ display: "flex", gap: 6, padding: "10px 14px", flexShrink: 0 }}>
+                {[1, 2, 3].map(s => (
+                  <div key={s} style={{ flex: 1, height: 4, borderRadius: 2, background: wizard >= s ? G : "rgba(255,255,255,0.1)" }} />
+                ))}
+              </div>
+
+              <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "6px 14px 18px" }}>
+                {/* Etape 1 : objectif */}
+                {wizard === 1 && (
+                  <>
+                    <p style={{ color: INK, fontSize: 14, fontWeight: 700, margin: "4px 0 3px" }}>Quel est ton objectif ?</p>
+                    <p style={{ color: MUTED, fontSize: 11, margin: "0 0 12px", lineHeight: 1.4 }}>On choisit le bon support pour toi.</p>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                      {WIZ_OBJECTIVES.map(o => (
+                        <button key={o.obj} type="button" onClick={() => { setWizObj(o.obj); setWizard(2) }}
+                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 12px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, cursor: "pointer", textAlign: "left" }}>
+                          <span style={{ fontSize: 20 }}>{o.emoji}</span>
+                          <span style={{ color: INK, fontSize: 12.5, fontWeight: 600 }}>{o.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {/* Etape 2 : style */}
+                {wizard === 2 && (
+                  <>
+                    <button type="button" onClick={() => setWizard(1)} style={{ background: "none", border: "none", color: MUTED, fontSize: 11, cursor: "pointer", padding: 0, marginBottom: 8 }}>← Objectif</button>
+                    <p style={{ color: INK, fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>Choisis un style</p>
+                    <p style={{ color: MUTED, fontSize: 11, margin: "0 0 12px", lineHeight: 1.4 }}>Ton QR et tes infos sont déjà placés.</p>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                      {objTpls.map(t => (
+                        <button key={t.id} type="button" onClick={() => { applyTemplate(t.id, true); setWizard(3) }} title={t.desc}
+                          style={{ display: "flex", flexDirection: "column", gap: 5, padding: 6, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, cursor: "pointer" }}>
+                          {tplThumb(t)}
+                          <span style={{ color: INK, fontSize: 10, fontWeight: 700, textAlign: "center" }}>{t.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {/* Etape 3 : pret */}
+                {wizard === 3 && (
+                  <>
+                    <button type="button" onClick={() => setWizard(2)} style={{ background: "none", border: "none", color: MUTED, fontSize: 11, cursor: "pointer", padding: 0, marginBottom: 8 }}>← Style</button>
+                    <p style={{ color: INK, fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>C&apos;est prêt ! 🎉</p>
+                    <p style={{ color: MUTED, fontSize: 11, margin: "0 0 12px", lineHeight: 1.4 }}>Change de variante, exporte, ou personnalise tout en mode avancé.</p>
+                    {objTpls.length > 1 && (
+                      <>
+                        <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>Autre variante</p>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
+                          {objTpls.map(t => (
+                            <button key={t.id} type="button" onClick={() => applyTemplate(t.id, true)} title={t.desc}
+                              style={{ display: "flex", flexDirection: "column", gap: 5, padding: 6, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, cursor: "pointer" }}>
+                              {tplThumb(t)}
+                              <span style={{ color: INK, fontSize: 10, fontWeight: 700, textAlign: "center" }}>{t.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                    <button type="button" onClick={save} disabled={saving}
+                      style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "11px", marginBottom: 8, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, color: INK, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                      <Save size={14} /> {saved ? "Enregistré ✓" : "Enregistrer"}
+                    </button>
+                    <button type="button" onClick={exportPng} disabled={exporting}
+                      style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "11px", marginBottom: 8, background: "linear-gradient(90deg,#C9A84C,#b8953f)", border: "none", borderRadius: 10, color: "#080808", fontSize: 12, fontWeight: 800, cursor: "pointer" }}>
+                      <Download size={14} /> Télécharger en PNG
+                    </button>
+                    <button type="button" onClick={() => setWizard(0)}
+                      style={{ width: "100%", padding: "10px", background: "none", border: "1px dashed rgba(255,255,255,0.15)", borderRadius: 10, color: MUTED, fontSize: 11.5, cursor: "pointer" }}>
+                      Tout personnaliser (mode avancé) →
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          )
+        })()}
+
         {/* Rail outils */}
+        {wizard === 0 && (
         <div style={{ width: 92, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", padding: 12, display: "flex", flexDirection: "column", gap: 8, background: SURFACE }}>
           <button type="button" onClick={() => { setTplOpen(v => !v); setLibOpen(false) }}
             style={{ ...btnTool, background: tplOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.14),rgba(201,168,76,0.05))", border: `1px solid ${tplOpen ? G : "rgba(201,168,76,0.3)"}`, color: tplOpen ? G : INK, fontWeight: 700 }}>
@@ -1248,6 +1362,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             <MousePointerClick size={16} /> Éléments
           </button>
         </div>
+        )}
 
         {/* Modeles orientes objectif (flyout) */}
         {tplOpen && (
