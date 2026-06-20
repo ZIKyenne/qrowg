@@ -20,7 +20,7 @@ import {
   Copy, Trash2, Lock, Unlock, ChevronUp, ChevronDown,
   Download, Printer, Loader2, Check, Save,
   Shapes, Star, Award, MousePointerClick, ArrowRight, LayoutTemplate,
-  Undo2, Redo2, Sparkles,
+  Undo2, Redo2, Sparkles, Image as ImageIcon,
 } from "lucide-react"
 
 // ---- Constantes design (Midnight Gold) -------------------------------------
@@ -238,6 +238,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const pushTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const dragIdxRef = useRef<number | null>(null) // index du calque en cours de glissement
   const scrollRef = useRef<HTMLDivElement>(null) // zone scrollable autour du canvas
+  const fileRef = useRef<HTMLInputElement>(null) // import d'image / logo
 
   const [format, setFormat]   = useState<FormatId>("a4")
   const [sel, setSel]         = useState<SelState>(null)
@@ -576,6 +577,23 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
   // ---- Outils d'ajout ------------------------------------------------------
   const addQr = () => { const fc = fcRef.current; if (fc) placeQr(fc) }
+  // Import d'une image / logo depuis le disque
+  const onPickImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = "" // permettre de re-importer le meme fichier
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      fabric.Image.fromURL(String(reader.result), (img) => {
+        const fc = fcRef.current; if (!fc) return
+        const W = fc.getWidth() / (fc.getZoom() || 1)
+        img.scaleToWidth(Math.min(W * 0.6, img.width ?? W * 0.6))
+        ;(img as any).name = "Image"
+        centerObj(img)
+      })
+    }
+    reader.readAsDataURL(file)
+  }
 
   // ---- Bibliotheque d'elements ---------------------------------------------
   // Icone : SVG mono-path => Fabric renvoie un Path unique (recolorable via panneau)
@@ -1200,6 +1218,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       position: "fixed", inset: 0, zIndex: 3000, background: BG,
       display: "flex", flexDirection: "column", fontFamily: "DM Sans, sans-serif",
     }}>
+      <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} style={{ display: "none" }} />
       {/* ---- Barre du haut ---- */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -1388,6 +1407,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             )
           })}
           <button type="button" onClick={addQr} style={btnTool}><QrCode size={16} /> QR</button>
+          <button type="button" onClick={() => fileRef.current?.click()} style={btnTool}><ImageIcon size={16} /> Image</button>
           <button type="button" onClick={() => openLib("cta")}
             style={{ ...btnTool, marginTop: 4, background: (libOpen && ["cta", "icons", "badges", "arrows"].includes(libCat)) ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.12),rgba(201,168,76,0.05))", border: `1px solid ${(libOpen && ["cta", "icons", "badges", "arrows"].includes(libCat)) ? G : "rgba(201,168,76,0.3)"}`, color: INK, fontWeight: 700 }}>
             <MousePointerClick size={16} /> Éléments
