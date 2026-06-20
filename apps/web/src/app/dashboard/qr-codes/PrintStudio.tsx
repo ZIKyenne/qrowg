@@ -729,6 +729,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "penta":   o = new fabric.Polygon(polyPts(5, 85), { fill: G }); break
       case "pill":    o = new fabric.Rect({ width: 280, height: 96, rx: 48, ry: 48, fill: G }); break
       case "banner":  o = new fabric.Rect({ width: 300, height: 70, fill: G }); break
+      case "octo":    o = new fabric.Polygon(polyPts(8, 85), { fill: G }); break
+      case "heart":   o = new fabric.Path("M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21z", { fill: G }); o.scaleToWidth(150); break
+      case "cross": {
+        const a = new fabric.Rect({ width: 44, height: 150, rx: 8, ry: 8, fill: G, left: 53, top: 0 })
+        const b = new fabric.Rect({ width: 150, height: 44, rx: 8, ry: 8, fill: G, left: 0, top: 53 })
+        o = new fabric.Group([a, b]); break
+      }
       default:        o = new fabric.Rect({ width: 200, height: 120, fill: G })
     }
     centerObj(o)
@@ -800,6 +807,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         const a: fabric.Object[] = []
         ;[[0, 0, 15], [40, 12, -20], [82, 2, 30], [22, 44, 40], [72, 48, -15], [114, 26, 10], [126, 64, -30]]
           .forEach(([x, y, ang]) => a.push(new fabric.Rect({ left: x, top: y, width: 10, height: 22, rx: 3, ry: 3, fill: G, angle: ang })))
+        o = new fabric.Group(a); break
+      }
+      case "stars3": {
+        const a: fabric.Object[] = []
+        ;[[0, 22, 20], [44, 0, 28], [88, 26, 17]].forEach(([x, y, s]) => a.push(new fabric.Polygon(starPts(5, s, s * 0.42), { fill: G, left: x, top: y })))
         o = new fabric.Group(a); break
       }
       default: o = new fabric.Polygon(starPts(4, 80, 22), { fill: G })
@@ -1952,6 +1964,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     ["penta", "Pentagone", <svg width="24" height="24" viewBox="0 0 24 24" key="s"><polygon points="12,1 23,9.5 18.5,23 5.5,23 1,9.5" fill={G} /></svg>],
                     ["pill", "Pilule",     <svg width="30" height="18" key="s"><rect x="1" y="2" width="28" height="14" rx="7" fill={G} /></svg>],
                     ["banner", "Bandeau",  <svg width="30" height="16" key="s"><rect x="1" y="3" width="28" height="10" fill={G} /></svg>],
+                    ["octo", "Octogone",   <svg width="24" height="24" viewBox="0 0 24 24" key="s"><path d="M8 2h8l6 6v8l-6 6H8l-6-6V8z" fill={G} /></svg>],
+                    ["heart", "Cœur",      <svg width="24" height="24" viewBox="0 0 24 24" key="s"><path d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21z" fill={G} /></svg>],
+                    ["cross", "Croix",     <svg width="24" height="24" viewBox="0 0 24 24" key="s"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" fill={G} /></svg>],
                   ] as const).map(([k, label, prev]) => (
                     <button key={k} type="button" onClick={() => addShape(k)} title={label}
                       style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "10px 2px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
@@ -1983,6 +1998,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     ["dots", "Points",       <svg width="34" height="14" key="d">{[3, 11, 19, 27].map(x => <circle key={x} cx={x} cy="7" r="3" fill={G} />)}</svg>],
                     ["wave", "Vague",        <svg width="34" height="14" viewBox="0 0 34 14" key="d"><polyline points="1,11 7,3 13,11 19,3 25,11 31,3" fill="none" stroke={G} strokeWidth="2" /></svg>],
                     ["confetti", "Confettis", <svg width="26" height="24" viewBox="0 0 26 24" key="d">{[[2, 2, 12], [12, 8, -20], [20, 3, 25], [7, 15, 35], [18, 16, -15]].map(([x, y, a], i) => <rect key={i} x={x} y={y} width="4" height="8" rx="1" fill={G} transform={`rotate(${a} ${x + 2} ${y + 4})`} />)}</svg>],
+                    ["stars3", "Étoiles",  <svg width="26" height="22" viewBox="0 0 26 22" key="d">{[[5, 11, 4.5], [14, 5, 6], [21, 13, 4]].map(([cx, cy, r], i) => <path key={i} d="M0 -1L0.3 -0.3L1 -0.3L0.4 0.2L0.6 1L0 0.5L-0.6 1L-0.4 0.2L-1 -0.3L-0.3 -0.3Z" fill={G} transform={`translate(${cx} ${cy}) scale(${r})`} />)}</svg>],
                   ] as const).map(([k, label, prev]) => (
                     <button key={k} type="button" onClick={() => addDeco(k)} title={label}
                       style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "10px 2px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
