@@ -458,21 +458,29 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     vGuideRef.current = vG; hGuideRef.current = hG
 
     // Snap au centre + guides (dimensions en coords design = element / zoom)
+    // Guides magnetiques : centre/bords du support + bords/centres des autres objets
     fc.on("object:moving", (e) => {
       const o = e.target; if (!o) return
       const z = fc.getZoom() || 1
       const cw = fc.getWidth() / z, ch = fc.getHeight() / z
-      const cx = cw / 2, cy = ch / 2, snap = 8
-      const c = o.getCenterPoint()
-      if (Math.abs(c.x - cx) < snap) {
-        o.setPositionByOrigin(new fabric.Point(cx, c.y), "center", "center")
-        vG.set({ x1: cx, y1: 0, x2: cx, y2: ch, visible: true })
-      } else { vG.set({ visible: false }) }
-      const c2 = o.getCenterPoint()
-      if (Math.abs(c2.y - cy) < snap) {
-        o.setPositionByOrigin(new fabric.Point(c2.x, cy), "center", "center")
-        hG.set({ x1: 0, y1: cy, x2: cw, y2: cy, visible: true })
-      } else { hG.set({ visible: false }) }
+      const snap = 7
+      const b = o.getBoundingRect(true)
+      const ax = [b.left, b.left + b.width / 2, b.left + b.width]
+      const ay = [b.top, b.top + b.height / 2, b.top + b.height]
+      const xs = [0, cw / 2, cw], ys = [0, ch / 2, ch]
+      fc.getObjects().forEach(t => {
+        if (t === o || (t as any).isGuide) return
+        const r = t.getBoundingRect(true)
+        xs.push(r.left, r.left + r.width / 2, r.left + r.width)
+        ys.push(r.top, r.top + r.height / 2, r.top + r.height)
+      })
+      let dx: number | null = null, dxBest = snap, gx = 0
+      for (const a of ax) for (const c of xs) { const d = Math.abs(a - c); if (d < dxBest) { dxBest = d; dx = c - a; gx = c } }
+      let dy: number | null = null, dyBest = snap, gy = 0
+      for (const a of ay) for (const c of ys) { const d = Math.abs(a - c); if (d < dyBest) { dyBest = d; dy = c - a; gy = c } }
+      if (dx !== null) { o.set("left", (o.left ?? 0) + dx); vG.set({ x1: gx, y1: 0, x2: gx, y2: ch, visible: true }) } else vG.set({ visible: false })
+      if (dy !== null) { o.set("top", (o.top ?? 0) + dy); hG.set({ x1: 0, y1: gy, x2: cw, y2: gy, visible: true }) } else hG.set({ visible: false })
+      o.setCoords()
       fc.bringToFront(vG); fc.bringToFront(hG)
     })
     fc.on("object:modified", () => { vG.set({ visible: false }); hG.set({ visible: false }); fc.requestRenderAll() })
