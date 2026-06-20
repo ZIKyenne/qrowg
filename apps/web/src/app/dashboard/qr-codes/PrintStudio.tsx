@@ -324,8 +324,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       const vG = vGuideRef.current, hG = hGuideRef.current
       if (vG) fc.add(vG)
       if (hG) fc.add(hG)
-      const bgc = (fc.backgroundColor as string) || CANVAS_BG_DEFAULT
-      setBgColor(typeof bgc === "string" ? bgc : CANVAS_BG_DEFAULT)
+      syncBgFromCanvas(fc)
       fc.discardActiveObject(); fc.requestRenderAll()
       histRef.current.lock = false
       setSel(null)
@@ -410,8 +409,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           fc.loadFromJSON(json.design, () => {
             // remettre les guides au-dessus apres rechargement
             fc.add(vG); fc.add(hG)
-            const bgc = (fc.backgroundColor as string) || CANVAS_BG_DEFAULT
-            setBgColor(typeof bgc === "string" ? bgc : CANVAS_BG_DEFAULT)
+            syncBgFromCanvas(fc)
             fc.requestRenderAll()
             histRef.current.lock = false
             pushHistory() // etat initial = design charge
@@ -880,6 +878,18 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     else { fc.setBackgroundColor(bgColor, fc.renderAll.bind(fc)); pushHistorySoon() }
   }
   const applyBgC2 = (c2: string) => { setBgC2(c2); if (bgGrad) applyGradient(bgColor, c2) }
+  // Synchronise les controles de fond avec l'etat reel du canvas (apres chargement / undo)
+  const syncBgFromCanvas = (fc: fabric.Canvas) => {
+    const bg = fc.backgroundColor as unknown as { colorStops?: { color: string }[] } | string
+    if (bg && typeof bg === "object" && Array.isArray(bg.colorStops) && bg.colorStops.length) {
+      setBgGrad(true)
+      setBgColor(bg.colorStops[0]?.color ?? CANVAS_BG_DEFAULT)
+      setBgC2(bg.colorStops[bg.colorStops.length - 1]?.color ?? "#0A0A0A")
+    } else {
+      setBgGrad(false)
+      setBgColor(typeof bg === "string" ? bg : CANVAS_BG_DEFAULT)
+    }
+  }
 
   // ---- Appliquer un modele oriente objectif --------------------------------
   // Vide le canvas (hors guides), pose un design complet et editable, place le vrai QR.
