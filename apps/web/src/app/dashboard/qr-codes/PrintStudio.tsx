@@ -318,6 +318,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [mockOpen, setMockOpen] = useState(false)
   const [mockEnv, setMockEnv] = useState<"wall" | "table" | "window" | "desk">("wall")
   const [mockUrl, setMockUrl] = useState("")
+  const [ctx, setCtx] = useState<{ x: number; y: number } | null>(null) // menu clic-droit
   const [libOpen, setLibOpen] = useState(false)
   const [libCat, setLibCat]   = useState<"text" | "shapes" | "lines" | "frames" | "cta" | "icons" | "badges" | "arrows" | "deco">("text")
   const [tplOpen, setTplOpen] = useState(false)
@@ -1048,6 +1049,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     if (!a || a.type !== "group") return
     ;(a as fabric.Group).toActiveSelection()
     fc.requestRenderAll(); refreshSel(); setLayersVer(v => v + 1); pushHistorySoon()
+  }
+  const onCanvasContext = (e: React.MouseEvent) => {
+    const fc = fcRef.current; if (!fc) return
+    e.preventDefault()
+    const target = (fc as unknown as { findTarget: (ev: Event, skip?: boolean) => fabric.Object | undefined }).findTarget(e.nativeEvent, false)
+    if (target && !(target as any).isGuide) { fc.setActiveObject(target); fc.requestRenderAll(); refreshSel() }
+    if (fc.getActiveObject()) setCtx({ x: e.clientX, y: e.clientY })
+    else setCtx(null)
   }
   const selectAll = () => {
     const fc = fcRef.current; if (!fc) return
@@ -2049,7 +2058,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         )}
 
         {/* Zone canvas */}
-        <div ref={scrollRef} style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, background: "#0A0907", position: "relative" }}>
+        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, background: "#0A0907", position: "relative" }}>
           {loading && (
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: MUTED, zIndex: 5, pointerEvents: "none" }}>
               <Loader2 size={18} style={{ animation: "spin 0.8s linear infinite" }} /> Chargement…
@@ -2289,6 +2298,27 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           </div>
         )
       })()}
+
+      {/* Menu clic-droit */}
+      {ctx && (
+        <>
+          <div onClick={() => setCtx(null)} onContextMenu={e => { e.preventDefault(); setCtx(null) }} style={{ position: "fixed", inset: 0, zIndex: 3500 }} />
+          <div style={{ position: "fixed", left: Math.min(ctx.x, (typeof window !== "undefined" ? window.innerWidth : 9999) - 180), top: ctx.y, zIndex: 3600, background: "#14120C", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: 6, minWidth: 168, boxShadow: "0 12px 36px rgba(0,0,0,0.6)" }}>
+            {([
+              ["Dupliquer", () => layer("dup")],
+              ["Mettre devant", () => layer("front")],
+              ["Mettre derrière", () => layer("back")],
+              [sel?.locked ? "Déverrouiller" : "Verrouiller", () => layer("lock")],
+              ["__del__", () => layer("del")],
+            ] as const).map(([label, fn], i) => (
+              <button key={i} type="button" onClick={() => { fn(); setCtx(null) }}
+                style={{ display: "block", width: "100%", textAlign: "left", padding: "8px 10px", background: "none", border: "none", borderRadius: 7, color: label === "__del__" ? "#FF6B6B" : INK, fontSize: 12, cursor: "pointer" }}>
+                {label === "__del__" ? "Supprimer" : label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
 }
