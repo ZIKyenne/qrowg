@@ -126,7 +126,7 @@ function groupText(o: fabric.Object | undefined | null): fabric.Text | null {
 }
 
 const TOJSON_PROPS = [
-  "isQR",
+  "isQR", "name",
   "lockMovementX", "lockMovementY",
   "lockScalingX", "lockScalingY",
   "lockRotation", "selectable", "evented",
@@ -224,6 +224,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
   const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
   const [dragOver, setDragOver] = useState<number | null>(null) // ligne survolee pendant un glisser
+  const [editLayer, setEditLayer] = useState<number | null>(null) // index du calque en cours de renommage
   const [zoom, setZoom] = useState(1)
 
   const isPro = userPlan === "pro" || userPlan === "business"
@@ -462,6 +463,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         e.preventDefault(); if (e.shiftKey) redo(); else undo()
       } else if (meta && (e.key === "y" || e.key === "Y")) {
         e.preventDefault(); redo()
+      } else if (meta && (e.key === "+" || e.key === "=")) {
+        e.preventDefault(); applyZoom((fcRef.current?.getZoom() || 1) * 1.25)
+      } else if (meta && e.key === "-") {
+        e.preventDefault(); applyZoom((fcRef.current?.getZoom() || 1) / 1.25)
+      } else if (meta && e.key === "0") {
+        e.preventDefault(); applyZoom(1)
       } else if (o && e.key.startsWith("Arrow")) {
         e.preventDefault()
         const s = e.shiftKey ? 10 : 1
@@ -703,6 +710,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
   // ---- Liste des calques ---------------------------------------------------
   const layerName = (o: fabric.Object): string => {
+    const custom = (o as any).name
+    if (typeof custom === "string" && custom.trim()) return custom.trim().slice(0, 22)
     if ((o as any).isQR) return "QR Code"
     const t = groupText(o)
     if (t) return (t.text || "Bouton").slice(0, 18)
@@ -738,6 +747,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const removeLayer = (o: fabric.Object) => {
     const fc = fcRef.current; if (!fc) return
     fc.setActiveObject(o); layer("del")
+  }
+  const renameLayer = (o: fabric.Object, value: string) => {
+    ;(o as any).name = value.trim() || undefined
+    setEditLayer(null); setLayersVer(v => v + 1); pushHistorySoon()
   }
   // Reordonner par glisser-deposer (indices dans la liste affichee = front-first)
   const reorderLayers = (from: number, to: number) => {
@@ -1459,10 +1472,17 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                             <circle key={`${r}-${c}`} cx={cx} cy={cy} r="1" fill={MUTED} />
                           )))}
                         </svg>
-                        <button type="button" onClick={() => selectLayer(o)} title={layerName(o)}
-                          style={{ flex: 1, minWidth: 0, textAlign: "left", background: "none", border: "none", color: on ? G : INK, fontSize: 10.5, cursor: "pointer", padding: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", opacity: o.visible ? 1 : 0.4 }}>
-                          {layerName(o)}
-                        </button>
+                        {editLayer === idx ? (
+                          <input autoFocus defaultValue={layerName(o)}
+                            onBlur={e => renameLayer(o, e.target.value)}
+                            onKeyDown={e => { if (e.key === "Enter") renameLayer(o, (e.target as HTMLInputElement).value); else if (e.key === "Escape") setEditLayer(null) }}
+                            style={{ flex: 1, minWidth: 0, background: BG, border: `1px solid ${G}`, borderRadius: 5, padding: "2px 5px", color: INK, fontSize: 10.5, outline: "none" }} />
+                        ) : (
+                          <button type="button" onClick={() => selectLayer(o)} onDoubleClick={() => setEditLayer(idx)} title="Double-clic pour renommer"
+                            style={{ flex: 1, minWidth: 0, textAlign: "left", background: "none", border: "none", color: on ? G : INK, fontSize: 10.5, cursor: "pointer", padding: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", opacity: o.visible ? 1 : 0.4 }}>
+                            {layerName(o)}
+                          </button>
+                        )}
                         <button type="button" onClick={() => toggleVisible(o)} title="Afficher / masquer" style={iconMini}>
                           <svg width="13" height="13" viewBox="0 0 24 24"><path d="M12 5C5 5 1 12 1 12s4 7 11 7 11-7 11-7-4-7-11-7zm0 11.5A4.5 4.5 0 1112 7a4.5 4.5 0 010 9.5z" fill={o.visible ? G : MUTED} /></svg>
                         </button>
