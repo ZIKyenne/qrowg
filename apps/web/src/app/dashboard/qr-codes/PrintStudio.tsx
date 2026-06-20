@@ -1463,10 +1463,25 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   })
 
   return (
-    <div style={{
+    <div className="ps-root" style={{
       position: "fixed", inset: 0, zIndex: 3000, background: BG,
       display: "flex", flexDirection: "column", fontFamily: "DM Sans, sans-serif",
     }}>
+      <style>{`
+        .ps-root button { transition: background .14s ease, border-color .14s ease, color .14s ease, transform .07s ease, filter .14s ease; }
+        .ps-root button:hover:not(:disabled) { filter: brightness(1.13); }
+        .ps-root button:active:not(:disabled) { transform: scale(0.96); }
+        .ps-root input, .ps-root select { transition: border-color .14s ease, box-shadow .14s ease; }
+        .ps-root input:focus, .ps-root select:focus { border-color: ${G} !important; box-shadow: 0 0 0 2px rgba(201,168,76,0.18); }
+        .ps-fly { animation: psSlide .18s cubic-bezier(.2,.8,.2,1); }
+        .ps-pop { animation: psPop .18s cubic-bezier(.2,.8,.2,1); }
+        @keyframes psSlide { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes psPop { from { opacity: 0; transform: translate(-50%, -8px) scale(.97); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
+        .ps-root .qr-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+        .ps-root .qr-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 8px; }
+        .ps-root .qr-scroll::-webkit-scrollbar-thumb:hover { background: rgba(201,168,76,0.4); }
+        .ps-root .qr-scroll::-webkit-scrollbar-track { background: transparent; }
+      `}</style>
       <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} style={{ display: "none" }} />
       {/* ---- Barre du haut ---- */}
       <div style={{
@@ -1566,7 +1581,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {wizard > 0 && (() => {
           const metier = METIERS.find(m => m.id === wizMetier)
           return (
-            <div className="qr-scroll" style={{ width: 300, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div className="qr-scroll ps-fly" style={{ width: 300, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
                 <span style={{ color: G, fontWeight: 800, fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}><Sparkles size={14} /> Création guidée</span>
                 <button type="button" onClick={() => setWizard(0)} aria-label="Fermer l'assistant"
@@ -1703,7 +1718,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Modeles orientes objectif (flyout) */}
         {tplOpen && (
-          <div className="qr-scroll" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <div className="qr-scroll ps-fly" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Modèles par objectif</span>
               <button type="button" onClick={() => setTplOpen(false)} aria-label="Fermer les modèles"
@@ -1739,7 +1754,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Bibliotheque d'elements (flyout) */}
         {libOpen && (
-          <div className="qr-scroll" style={{ width: 234, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <div className="qr-scroll ps-fly" style={{ width: 234, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Bibliothèque</span>
               <button type="button" onClick={() => setLibOpen(false)} aria-label="Fermer la bibliothèque"
@@ -1932,7 +1947,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Panneau Styles globaux (gauche) */}
         {side === "styles" && (
-          <div className="qr-scroll" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <div className="qr-scroll ps-fly" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Styles</span>
               <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
@@ -1960,7 +1975,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Panneau Calques (gauche) */}
         {side === "layers" && (
-          <div className="qr-scroll" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <div className="qr-scroll ps-fly" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Calques</span>
               <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
@@ -2014,7 +2029,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Panneau Fond + infos (gauche) */}
         {side === "bg" && (
-          <div className="qr-scroll" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <div className="qr-scroll ps-fly" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Fond &amp; infos</span>
               <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
@@ -2079,7 +2094,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Panneau de reglages avances (ouvert via "Réglages") */}
         {sel && showAdvanced && (
-        <div className="qr-scroll" style={{ width: 280, flexShrink: 0, borderLeft: "1px solid rgba(255,255,255,0.07)", padding: 14, overflowY: "auto", background: SURFACE, display: "flex", flexDirection: "column", gap: 16 }}>
+        <div className="qr-scroll ps-fly" style={{ width: 280, flexShrink: 0, borderLeft: "1px solid rgba(255,255,255,0.07)", padding: 14, overflowY: "auto", background: SURFACE, display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
                 <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Élément sélectionné</p>
 
@@ -2279,7 +2294,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Barre contextuelle flottante (progressive disclosure) */}
         {sel && (
-          <div style={{ position: "absolute", top: 12, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", background: "#14120C", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, boxShadow: "0 10px 30px rgba(0,0,0,0.5)", maxWidth: "92%", flexWrap: "wrap" }}>
+          <div className="ps-pop" style={{ position: "absolute", top: 12, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", background: "#14120C", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, boxShadow: "0 10px 30px rgba(0,0,0,0.5)", maxWidth: "92%", flexWrap: "wrap" }}>
             {sel.isText ? (
               <>
                 <input type="color" value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"} onChange={e => setFill(e.target.value)} style={swatch} />
