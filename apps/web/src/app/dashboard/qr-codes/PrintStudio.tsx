@@ -223,6 +223,30 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
   )
 }
 
+// Fonds prets a l'emploi (couleurs unies + degrades) — galerie visible
+const BG_PRESETS: { id: string; type: "solid" | "grad"; c1: string; c2?: string }[] = [
+  { id: "white",   type: "solid", c1: "#FFFFFF" },
+  { id: "cream",   type: "solid", c1: "#F6F1E7" },
+  { id: "sand",    type: "solid", c1: "#EFE7D8" },
+  { id: "rose",    type: "solid", c1: "#FBEEF0" },
+  { id: "mint",    type: "solid", c1: "#E7F4EC" },
+  { id: "sky",     type: "solid", c1: "#E7F0FA" },
+  { id: "black",   type: "solid", c1: "#0A0A0A" },
+  { id: "dark",    type: "solid", c1: "#101010" },
+  { id: "navy",    type: "solid", c1: "#0F1729" },
+  { id: "emerald", type: "solid", c1: "#06231C" },
+  { id: "wine",    type: "solid", c1: "#1A0A14" },
+  { id: "plum",    type: "solid", c1: "#1A0F2E" },
+  { id: "gold",    type: "grad",  c1: "#1A1206", c2: "#0A0703" },
+  { id: "sunset",  type: "grad",  c1: "#FF7E5F", c2: "#FEB47B" },
+  { id: "ocean",   type: "grad",  c1: "#2193B0", c2: "#6DD5ED" },
+  { id: "purple",  type: "grad",  c1: "#41295A", c2: "#2F0743" },
+  { id: "night",   type: "grad",  c1: "#0F2027", c2: "#203A43" },
+  { id: "peach",   type: "grad",  c1: "#FFF1EB", c2: "#ACE0F9" },
+  { id: "roseg",   type: "grad",  c1: "#FFF5F8", c2: "#F7C5D6" },
+  { id: "charcoal",type: "grad",  c1: "#3A3D40", c2: "#181A1B" },
+]
+
 // Styles globaux : un clic recolore + retypographie tout le design
 const GLOBAL_STYLES: { id: string; label: string; bg: string; ink: string; accent: string; titleFont: string; bodyFont: string }[] = [
   { id: "luxgold",     label: "Luxury Gold",      bg: "#0B0805", ink: "#F4E7C4", accent: "#D4AF37", titleFont: "Cormorant Garamond", bodyFont: "Montserrat" },
@@ -1128,6 +1152,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     else { fc.setBackgroundColor(bgColor, fc.renderAll.bind(fc)); pushHistorySoon() }
   }
   const applyBgC2 = (c2: string) => { setBgC2(c2); if (bgGrad) applyGradient(bgColor, c2) }
+  const applyBgPreset = (p: typeof BG_PRESETS[number]) => {
+    const fc = fcRef.current; if (!fc) return
+    if (p.type === "grad" && p.c2) { setBgGrad(true); setBgColor(p.c1); setBgC2(p.c2); applyGradient(p.c1, p.c2) }
+    else { setBgGrad(false); setBgColor(p.c1); fc.setBackgroundColor(p.c1, fc.renderAll.bind(fc)); pushHistorySoon() }
+  }
   // Synchronise les controles de fond avec l'etat reel du canvas (apres chargement / undo)
   const syncBgFromCanvas = (fc: fabric.Canvas) => {
     const bg = fc.backgroundColor as unknown as { colorStops?: { color: string }[] } | string
@@ -2058,7 +2087,17 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             </div>
             <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "12px 12px 16px", display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
-                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Fond du support</p>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Fonds</p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 6, marginBottom: 12 }}>
+                  {BG_PRESETS.map(p => {
+                    const active = bgGrad ? (p.type === "grad" && bgColor === p.c1 && bgC2 === p.c2) : (p.type === "solid" && bgColor === p.c1)
+                    return (
+                      <button key={p.id} type="button" onClick={() => applyBgPreset(p)} title={p.id}
+                        style={{ width: "100%", aspectRatio: "1.3", borderRadius: 8, cursor: "pointer", border: `2px solid ${active ? G : "rgba(255,255,255,0.14)"}`, background: p.type === "grad" ? `linear-gradient(180deg, ${p.c1}, ${p.c2})` : p.c1, padding: 0 }} />
+                    )
+                  })}
+                </div>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>Couleur personnalisée</p>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <input type="color" value={/^#/.test(bgColor) ? bgColor : "#FFFFFF"} onChange={e => applyBg(e.target.value)}
                     style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
