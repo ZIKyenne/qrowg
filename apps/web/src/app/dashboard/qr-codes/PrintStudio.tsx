@@ -228,14 +228,60 @@ const GLOBAL_STYLES: { id: string; label: string; bg: string; ink: string; accen
   { id: "premiumdark", label: "Premium Dark",     bg: "#101010", ink: "#F5F0E8", accent: "#C9A84C", titleFont: "Cormorant Garamond", bodyFont: "Montserrat" },
 ]
 
-// Objectifs marketing de l'assistant debutant
-const WIZ_OBJECTIVES: { obj: string; emoji: string; label: string }[] = [
-  { obj: "Avis", emoji: "⭐", label: "Obtenir des avis" },
-  { obj: "Menu", emoji: "🍽️", label: "Faire voir le menu" },
-  { obj: "Réserver", emoji: "📅", label: "Faire réserver" },
-  { obj: "Abonnés", emoji: "📷", label: "Gagner des abonnés" },
-  { obj: "Contact", emoji: "💳", label: "Partager mes infos" },
-  { obj: "Page", emoji: "🔗", label: "Faire découvrir ma page" },
+// Generateur par metier : metier -> objectifs (template + style + textes pre-remplis)
+type MObj = { label: string; tpl: string; title: string; subtitle: string; cta: string }
+const METIERS: { id: string; label: string; emoji: string; style: string; objs: MObj[] }[] = [
+  { id: "resto", label: "Restaurant", emoji: "🍽️", style: "restofresh", objs: [
+    { label: "Voir le menu", tpl: "menu", title: "Notre Carte", subtitle: "Scannez pour découvrir nos plats", cta: "Voir le menu" },
+    { label: "Réserver une table", tpl: "reserver", title: "Réservez votre table", subtitle: "En quelques secondes", cta: "Réserver" },
+    { label: "Laisser un avis", tpl: "avis-clair", title: "Vous avez aimé ?", subtitle: "Laissez-nous un avis en 30 s", cta: "Donner mon avis" },
+    { label: "Suivre Instagram", tpl: "insta", title: "Suivez-nous", subtitle: "@votrecompte", cta: "Nous suivre" },
+  ] },
+  { id: "bar", label: "Bar", emoji: "🍸", style: "neon", objs: [
+    { label: "Voir la carte", tpl: "menu", title: "La Carte", subtitle: "Cocktails & boissons", cta: "Voir la carte" },
+    { label: "Instagram", tpl: "insta", title: "Suivez le bar", subtitle: "@votrecompte", cta: "Nous suivre" },
+    { label: "Laisser un avis", tpl: "avis-or", title: "Bonne soirée ?", subtitle: "Laissez un avis", cta: "Donner mon avis" },
+  ] },
+  { id: "commerce", label: "Commerce", emoji: "🛍️", style: "corporate", objs: [
+    { label: "Laisser un avis", tpl: "avis-clair", title: "Votre avis compte", subtitle: "30 secondes suffisent", cta: "Donner mon avis" },
+    { label: "Voir le catalogue", tpl: "decouvrir", title: "Notre catalogue", subtitle: "Découvrez nos produits", cta: "Voir le catalogue" },
+    { label: "Obtenir une réduction", tpl: "decouvrir", title: "Votre réduction", subtitle: "Scannez pour en profiter", cta: "J'en profite" },
+    { label: "Programme fidélité", tpl: "decouvrir", title: "Programme fidélité", subtitle: "Rejoignez le programme", cta: "M'inscrire" },
+  ] },
+  { id: "immo", label: "Immobilier", emoji: "🏠", style: "premiumdark", objs: [
+    { label: "Visite virtuelle", tpl: "decouvrir", title: "Visite virtuelle", subtitle: "Découvrez ce bien", cta: "Voir le bien" },
+    { label: "Me contacter", tpl: "contact", title: "Votre conseiller", subtitle: "Agent immobilier", cta: "Me contacter" },
+    { label: "Estimer un bien", tpl: "decouvrir", title: "Estimation gratuite", subtitle: "En 2 minutes", cta: "Estimer mon bien" },
+  ] },
+  { id: "airbnb", label: "Airbnb", emoji: "🛏️", style: "minimal", objs: [
+    { label: "Guide du logement", tpl: "decouvrir", title: "Bienvenue !", subtitle: "Le guide du logement", cta: "Voir le guide" },
+    { label: "Laisser un avis", tpl: "avis-clair", title: "Bon séjour ?", subtitle: "Laissez un avis", cta: "Donner mon avis" },
+    { label: "Wifi & infos", tpl: "decouvrir", title: "Infos pratiques", subtitle: "Wifi, check-out, contacts…", cta: "Voir les infos" },
+  ] },
+  { id: "event", label: "Événement", emoji: "🎉", style: "modernblack", objs: [
+    { label: "Le programme", tpl: "decouvrir", title: "Le programme", subtitle: "Toutes les infos", cta: "Voir le programme" },
+    { label: "Billetterie", tpl: "decouvrir", title: "Réservez vos places", subtitle: "Billetterie en ligne", cta: "Réserver" },
+    { label: "Instagram", tpl: "insta", title: "Suivez l'événement", subtitle: "@votrecompte", cta: "Nous suivre" },
+  ] },
+  { id: "createur", label: "Créateur", emoji: "🎬", style: "neon", objs: [
+    { label: "Mes réseaux", tpl: "insta", title: "Suivez-moi", subtitle: "@votrecompte", cta: "Me suivre" },
+    { label: "Tous mes liens", tpl: "decouvrir", title: "Tous mes liens", subtitle: "Retrouvez-moi ici", cta: "Découvrir" },
+  ] },
+  { id: "coach", label: "Coach", emoji: "💪", style: "corporate", objs: [
+    { label: "Prendre RDV", tpl: "reserver", title: "Réservez une séance", subtitle: "En quelques clics", cta: "Prendre RDV" },
+    { label: "Me contacter", tpl: "contact", title: "Votre coach", subtitle: "Coach certifié", cta: "Me contacter" },
+    { label: "Mes offres", tpl: "decouvrir", title: "Mes programmes", subtitle: "Découvrez mes offres", cta: "Voir les offres" },
+  ] },
+  { id: "artisan", label: "Artisan", emoji: "🔨", style: "premiumdark", objs: [
+    { label: "Devis gratuit", tpl: "decouvrir", title: "Devis gratuit", subtitle: "Réponse rapide", cta: "Demander un devis" },
+    { label: "Me contacter", tpl: "contact", title: "Votre artisan", subtitle: "Savoir-faire local", cta: "Me contacter" },
+    { label: "Mes réalisations", tpl: "decouvrir", title: "Mes réalisations", subtitle: "Découvrez mon travail", cta: "Voir le portfolio" },
+  ] },
+  { id: "asso", label: "Association", emoji: "🤝", style: "corporate", objs: [
+    { label: "Faire un don", tpl: "decouvrir", title: "Soutenez-nous", subtitle: "Chaque don compte", cta: "Faire un don" },
+    { label: "Adhérer", tpl: "decouvrir", title: "Rejoignez-nous", subtitle: "Devenez membre", cta: "Adhérer" },
+    { label: "Nos actions", tpl: "decouvrir", title: "Nos actions", subtitle: "Découvrez nos projets", cta: "En savoir plus" },
+  ] },
 ]
 
 export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpsell, prefill }: Props) {
@@ -275,7 +321,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [editLayer, setEditLayer] = useState<number | null>(null) // index du calque en cours de renommage
   const [zoom, setZoom] = useState(1)
   const [wizard, setWizard] = useState(0) // 0 = ferme, 1 = objectif, 2 = style, 3 = pret
-  const [wizObj, setWizObj] = useState("")
+  const [wizMetier, setWizMetier] = useState("")
   const [infoVer, setInfoVer] = useState(0) // rafraichit le panneau infos
   const [side, setSide] = useState<"" | "layers" | "bg" | "styles">("") // panneaux gauche Calques / Fond / Styles
 
@@ -1040,6 +1086,27 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     } catch { /* noop */ }
   }
 
+  // Changer le libelle du 1er bouton CTA (pilule) du design
+  const setCtaLabel = (value: string) => {
+    const fc = fcRef.current; if (!fc) return
+    const grp = fc.getObjects().find(o => o.type === "group" && (o as fabric.Group).getObjects().some(c => c.type === "rect")) as fabric.Group | undefined
+    const txt = grp ? groupText(grp) : null
+    if (!grp || !txt) return
+    txt.set({ text: value }); (txt as unknown as { initDimensions?: () => void }).initDimensions?.()
+    const rect = grp.getObjects().find(o => o.type === "rect") as fabric.Rect | undefined
+    if (rect) { const h = rect.height ?? 60; const nw = Math.max(h * 2, (txt.width ?? 0) + h * 0.6 * 2); rect.set({ width: nw, left: -nw / 2 }); txt.set({ left: 0 }); grp.set({ width: nw }) }
+    grp.dirty = true; grp.setCoords(); fc.requestRenderAll()
+  }
+
+  // ---- Generateur : metier + objectif -> design complet auto ---------------
+  const generate = async (metier: typeof METIERS[number], o: MObj) => {
+    await applyTemplate(o.tpl, true)
+    const st = GLOBAL_STYLES.find(s => s.id === metier.style); if (st) applyStyle(st)
+    updateRole("title", o.title); updateRole("subtitle", o.subtitle)
+    setCtaLabel(o.cta)
+    setWizard(3)
+  }
+
   // ---- Appliquer un modele oriente objectif --------------------------------
   // Vide le canvas (hors guides), pose un design complet et editable, place le vrai QR.
   const applyTemplate = async (id: string, skipConfirm = false) => {
@@ -1407,7 +1474,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Assistant debutant (colonne guidee) */}
         {wizard > 0 && (() => {
-          const objTpls = PRINT_TEMPLATES.filter(t => t.obj === wizObj)
+          const metier = METIERS.find(m => m.id === wizMetier)
           return (
             <div className="qr-scroll" style={{ width: 300, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
@@ -1426,35 +1493,35 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               </div>
 
               <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "6px 14px 18px" }}>
-                {/* Etape 1 : objectif */}
+                {/* Etape 1 : metier */}
                 {wizard === 1 && (
                   <>
-                    <p style={{ color: INK, fontSize: 14, fontWeight: 700, margin: "4px 0 3px" }}>Quel est ton objectif ?</p>
-                    <p style={{ color: MUTED, fontSize: 11, margin: "0 0 12px", lineHeight: 1.4 }}>On choisit le bon support pour toi.</p>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                      {WIZ_OBJECTIVES.map(o => (
-                        <button key={o.obj} type="button" onClick={() => { setWizObj(o.obj); setWizard(2) }}
-                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 12px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, cursor: "pointer", textAlign: "left" }}>
-                          <span style={{ fontSize: 20 }}>{o.emoji}</span>
-                          <span style={{ color: INK, fontSize: 12.5, fontWeight: 600 }}>{o.label}</span>
+                    <p style={{ color: INK, fontSize: 14, fontWeight: 700, margin: "4px 0 3px" }}>Quel est ton métier ?</p>
+                    <p style={{ color: MUTED, fontSize: 11, margin: "0 0 12px", lineHeight: 1.4 }}>On adapte les designs à ton activité.</p>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7 }}>
+                      {METIERS.map(m => (
+                        <button key={m.id} type="button" onClick={() => { setWizMetier(m.id); setWizard(2) }}
+                          style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "12px 6px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, cursor: "pointer" }}>
+                          <span style={{ fontSize: 22 }}>{m.emoji}</span>
+                          <span style={{ color: INK, fontSize: 11, fontWeight: 600, textAlign: "center" }}>{m.label}</span>
                         </button>
                       ))}
                     </div>
                   </>
                 )}
 
-                {/* Etape 2 : style */}
-                {wizard === 2 && (
+                {/* Etape 2 : objectif -> generation auto */}
+                {wizard === 2 && metier && (
                   <>
-                    <button type="button" onClick={() => setWizard(1)} style={{ background: "none", border: "none", color: MUTED, fontSize: 11, cursor: "pointer", padding: 0, marginBottom: 8 }}>← Objectif</button>
-                    <p style={{ color: INK, fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>Choisis un style</p>
-                    <p style={{ color: MUTED, fontSize: 11, margin: "0 0 12px", lineHeight: 1.4 }}>Ton QR et tes infos sont déjà placés.</p>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                      {objTpls.map(t => (
-                        <button key={t.id} type="button" onClick={() => { applyTemplate(t.id, true); setWizard(3) }} title={t.desc}
-                          style={{ display: "flex", flexDirection: "column", gap: 5, padding: 6, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, cursor: "pointer" }}>
-                          {tplThumb(t)}
-                          <span style={{ color: INK, fontSize: 10, fontWeight: 700, textAlign: "center" }}>{t.label}</span>
+                    <button type="button" onClick={() => setWizard(1)} style={{ background: "none", border: "none", color: MUTED, fontSize: 11, cursor: "pointer", padding: 0, marginBottom: 8 }}>← Métier</button>
+                    <p style={{ color: INK, fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>{metier.emoji} Ton objectif ?</p>
+                    <p style={{ color: MUTED, fontSize: 11, margin: "0 0 12px", lineHeight: 1.4 }}>Clique : on génère tout (design, couleurs, textes, QR).</p>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                      {metier.objs.map((o, i) => (
+                        <button key={i} type="button" onClick={() => generate(metier, o)}
+                          style={{ display: "flex", alignItems: "center", gap: 9, padding: "11px 12px", background: "linear-gradient(90deg,rgba(201,168,76,0.14),rgba(201,168,76,0.05))", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 10, cursor: "pointer", textAlign: "left" }}>
+                          <Sparkles size={14} color={G} style={{ flexShrink: 0 }} />
+                          <span style={{ color: INK, fontSize: 12.5, fontWeight: 600 }}>{o.label}</span>
                         </button>
                       ))}
                     </div>
@@ -1464,18 +1531,18 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 {/* Etape 3 : pret */}
                 {wizard === 3 && (
                   <>
-                    <button type="button" onClick={() => setWizard(2)} style={{ background: "none", border: "none", color: MUTED, fontSize: 11, cursor: "pointer", padding: 0, marginBottom: 8 }}>← Style</button>
+                    <button type="button" onClick={() => setWizard(2)} style={{ background: "none", border: "none", color: MUTED, fontSize: 11, cursor: "pointer", padding: 0, marginBottom: 8 }}>← Objectif</button>
                     <p style={{ color: INK, fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>C&apos;est prêt ! 🎉</p>
-                    <p style={{ color: MUTED, fontSize: 11, margin: "0 0 12px", lineHeight: 1.4 }}>Change de variante, exporte, ou personnalise tout en mode avancé.</p>
-                    {objTpls.length > 1 && (
+                    <p style={{ color: MUTED, fontSize: 11, margin: "0 0 12px", lineHeight: 1.4 }}>Régénère un autre objectif, exporte, ou personnalise tout en mode avancé.</p>
+                    {metier && (
                       <>
-                        <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>Autre variante</p>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
-                          {objTpls.map(t => (
-                            <button key={t.id} type="button" onClick={() => applyTemplate(t.id, true)} title={t.desc}
-                              style={{ display: "flex", flexDirection: "column", gap: 5, padding: 6, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, cursor: "pointer" }}>
-                              {tplThumb(t)}
-                              <span style={{ color: INK, fontSize: 10, fontWeight: 700, textAlign: "center" }}>{t.label}</span>
+                        <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>Autre objectif</p>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 14 }}>
+                          {metier.objs.map((o, i) => (
+                            <button key={i} type="button" onClick={() => generate(metier, o)}
+                              style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer", textAlign: "left" }}>
+                              <Sparkles size={12} color={G} style={{ flexShrink: 0 }} />
+                              <span style={{ color: INK, fontSize: 11, fontWeight: 600 }}>{o.label}</span>
                             </button>
                           ))}
                         </div>
