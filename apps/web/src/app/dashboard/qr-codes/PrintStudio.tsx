@@ -232,7 +232,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [saved, setSaved]     = useState(false)
   const [exporting, setExporting] = useState(false)
   const [libOpen, setLibOpen] = useState(false)
-  const [libCat, setLibCat]   = useState<"cta" | "icons" | "badges" | "shapes" | "arrows">("cta")
+  const [libCat, setLibCat]   = useState<"text" | "shapes" | "lines" | "frames" | "cta" | "icons" | "badges" | "arrows">("text")
   const [tplOpen, setTplOpen] = useState(false)
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
   const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
@@ -553,16 +553,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   }
 
   // ---- Outils d'ajout ------------------------------------------------------
-  const addText = () => {
-    const t = new fabric.IText("Votre texte", {
-      fontFamily: "Georgia", fill: INK, fontSize: 40, fontWeight: "bold",
-    })
-    centerObj(t)
-  }
   const addQr = () => { const fc = fcRef.current; if (fc) placeQr(fc) }
-  const addRect = () => centerObj(new fabric.Rect({ width: 180, height: 100, fill: G, rx: 6, ry: 6 }))
-  const addCircle = () => centerObj(new fabric.Circle({ radius: 60, fill: G }))
-  const addLine = () => centerObj(new fabric.Line([0, 0, 200, 0], { stroke: G, strokeWidth: 4 }))
 
   // ---- Bibliotheque d'elements ---------------------------------------------
   // Icone : SVG mono-path => Fabric renvoie un Path unique (recolorable via panneau)
@@ -578,16 +569,69 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const addShape = (k: string) => {
     let o: fabric.Object
     switch (k) {
-      case "rrect":  o = new fabric.Rect({ width: 220, height: 130, rx: 18, ry: 18, fill: G }); break
-      case "circle": o = new fabric.Circle({ radius: 75, fill: G }); break
-      case "tri":    o = new fabric.Triangle({ width: 160, height: 140, fill: G }); break
-      case "star":   o = new fabric.Polygon(starPts(5, 85, 36), { fill: G }); break
-      case "hexa":   o = new fabric.Polygon(polyPts(6, 85), { fill: G }); break
-      case "banner": o = new fabric.Rect({ width: 300, height: 70, fill: G }); break
-      default:       o = new fabric.Rect({ width: 200, height: 120, fill: G })
+      case "rrect":   o = new fabric.Rect({ width: 220, height: 130, rx: 18, ry: 18, fill: G }); break
+      case "circle":  o = new fabric.Circle({ radius: 75, fill: G }); break
+      case "tri":     o = new fabric.Triangle({ width: 160, height: 140, fill: G }); break
+      case "star":    o = new fabric.Polygon(starPts(5, 85, 36), { fill: G }); break
+      case "hexa":    o = new fabric.Polygon(polyPts(6, 85), { fill: G }); break
+      case "diamond": o = new fabric.Polygon(polyPts(4, 90), { fill: G }); break
+      case "penta":   o = new fabric.Polygon(polyPts(5, 85), { fill: G }); break
+      case "pill":    o = new fabric.Rect({ width: 280, height: 96, rx: 48, ry: 48, fill: G }); break
+      case "banner":  o = new fabric.Rect({ width: 300, height: 70, fill: G }); break
+      default:        o = new fabric.Rect({ width: 200, height: 120, fill: G })
     }
     centerObj(o)
   }
+  // Texte pre-style (titre / sous-titre / corps / impact / manuscrit)
+  const addTextPreset = (p: { text: string; size: number; weight: string; font: string }) => {
+    centerObj(new fabric.IText(p.text, { fontFamily: p.font, fontWeight: p.weight, fontSize: p.size, fill: INK }))
+    try {
+      const d = document as Document & { fonts?: { load: (f: string) => Promise<unknown> } }
+      d.fonts?.load(`${p.weight} ${p.size}px '${p.font}'`).then(() => fcRef.current?.requestRenderAll()).catch(() => {})
+    } catch { /* noop */ }
+  }
+  // Lignes & separateurs (variantes)
+  const addLineVariant = (k: string) => {
+    const L = 260
+    switch (k) {
+      case "thick":  centerObj(new fabric.Line([0, 0, L, 0], { stroke: G, strokeWidth: 10, strokeLineCap: "round" })); break
+      case "thin":   centerObj(new fabric.Line([0, 0, L, 0], { stroke: G, strokeWidth: 1.5 })); break
+      case "dashed": centerObj(new fabric.Line([0, 0, L, 0], { stroke: G, strokeWidth: 4, strokeDashArray: [14, 9] })); break
+      case "dotted": centerObj(new fabric.Line([0, 0, L, 0], { stroke: G, strokeWidth: 6, strokeDashArray: [1, 14], strokeLineCap: "round" })); break
+      case "double": {
+        const a = new fabric.Line([0, 0, L, 0], { stroke: G, strokeWidth: 2 })
+        const b = new fabric.Line([0, 10, L, 10], { stroke: G, strokeWidth: 2 })
+        centerObj(new fabric.Group([a, b])); break
+      }
+      case "ornament": {
+        const ln = new fabric.Line([0, 0, L, 0], { stroke: G, strokeWidth: 2, left: 0, top: 0 })
+        const dot = new fabric.Polygon(starPts(4, 14, 5), { fill: G, left: L / 2 - 14, top: -14 })
+        centerObj(new fabric.Group([ln, dot])); break
+      }
+      default: centerObj(new fabric.Line([0, 0, L, 0], { stroke: G, strokeWidth: 4 }))
+    }
+  }
+  // Cadres / bordures autour du support (clic inside ignore via perPixelTargetFind)
+  const addFrame = (k: string) => {
+    const fc = fcRef.current; if (!fc) return
+    const z = fc.getZoom() || 1, W = fc.getWidth() / z, H = fc.getHeight() / z
+    const m = Math.round(W * 0.05)
+    const base = { fill: "transparent", stroke: G, strokeUniform: true, perPixelTargetFind: true } as const
+    let o: fabric.Object
+    if (k === "double") {
+      const r1 = new fabric.Rect({ left: 0, top: 0, width: W - 2 * m, height: H - 2 * m, ...base, strokeWidth: 2 })
+      const r2 = new fabric.Rect({ left: 9, top: 9, width: W - 2 * m - 18, height: H - 2 * m - 18, ...base, strokeWidth: 1 })
+      o = new fabric.Group([r1, r2], { left: m, top: m })
+    } else {
+      const sw = k === "thick" ? 8 : 2
+      const rx = k === "rounded" ? 26 : 0
+      o = new fabric.Rect({ left: m, top: m, width: W - 2 * m, height: H - 2 * m, ...base, strokeWidth: sw, rx, ry: rx })
+    }
+    ;(o as any).perPixelTargetFind = true
+    fc.add(o); fc.setActiveObject(o); fc.requestRenderAll(); refreshSel()
+  }
+  // Ouvrir la bibliotheque sur un onglet donne (depuis le rail)
+  const openLib = (c: typeof libCat) => { setLibCat(c); setLibOpen(true); setTplOpen(false) }
   // Bouton CTA (pilule dimensionnee au texte)
   const addCTA = (label: string) => {
     centerObj(buildPill(label, { rectFill: G, textFill: "#080808", height: 80, fontSize: 30 }))
@@ -1184,14 +1228,24 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             <LayoutTemplate size={16} /> Modèles
           </button>
           <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "6px 0 2px" }}>Ajouter</p>
-          <button type="button" onClick={addText}   style={btnTool}><TypeIcon size={16} /> Texte</button>
-          <button type="button" onClick={addQr}     style={btnTool}><QrCode size={16} /> QR</button>
-          <button type="button" onClick={addRect}   style={btnTool}><Square size={16} /> Rect.</button>
-          <button type="button" onClick={addCircle} style={btnTool}><CircleIcon size={16} /> Cercle</button>
-          <button type="button" onClick={addLine}   style={btnTool}><Minus size={16} /> Ligne</button>
-          <button type="button" onClick={() => { setLibOpen(v => !v); setTplOpen(false) }}
-            style={{ ...btnTool, marginTop: 4, background: libOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.12),rgba(201,168,76,0.05))", border: `1px solid ${libOpen ? G : "rgba(201,168,76,0.3)"}`, color: libOpen ? G : INK, fontWeight: 700 }}>
-            <Shapes size={16} /> Éléments
+          {([
+            ["text", "Texte", <TypeIcon size={16} key="i" />],
+            ["shapes", "Formes", <Shapes size={16} key="i" />],
+            ["lines", "Lignes", <Minus size={16} key="i" />],
+            ["frames", "Cadres", <Square size={16} key="i" />],
+          ] as const).map(([cat, label, icon]) => {
+            const on = libOpen && libCat === cat
+            return (
+              <button key={cat} type="button" onClick={() => openLib(cat)}
+                style={{ ...btnTool, background: on ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${on ? G : "rgba(255,255,255,0.07)"}`, color: on ? G : INK }}>
+                {icon} {label}
+              </button>
+            )
+          })}
+          <button type="button" onClick={addQr} style={btnTool}><QrCode size={16} /> QR</button>
+          <button type="button" onClick={() => openLib("cta")}
+            style={{ ...btnTool, marginTop: 4, background: (libOpen && ["cta", "icons", "badges", "arrows"].includes(libCat)) ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.12),rgba(201,168,76,0.05))", border: `1px solid ${(libOpen && ["cta", "icons", "badges", "arrows"].includes(libCat)) ? G : "rgba(201,168,76,0.3)"}`, color: INK, fontWeight: 700 }}>
+            <MousePointerClick size={16} /> Éléments
           </button>
         </div>
 
@@ -1245,10 +1299,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             {/* Onglets categories */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 4, padding: "8px 10px", flexShrink: 0 }}>
               {([
+                ["text",   "Texte",   <TypeIcon size={12} key="i" />],
+                ["shapes", "Formes",  <Shapes size={12} key="i" />],
+                ["lines",  "Lignes",  <Minus size={12} key="i" />],
+                ["frames", "Cadres",  <Square size={12} key="i" />],
                 ["cta",    "CTA",     <MousePointerClick size={12} key="i" />],
                 ["icons",  "Icônes",  <Star size={12} key="i" />],
                 ["badges", "Badges",  <Award size={12} key="i" />],
-                ["shapes", "Formes",  <Shapes size={12} key="i" />],
                 ["arrows", "Flèches", <ArrowRight size={12} key="i" />],
               ] as const).map(([id, label, icon]) => {
                 const on = libCat === id
@@ -1262,6 +1319,70 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             </div>
 
             <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "4px 10px 16px" }}>
+              {/* Texte */}
+              {libCat === "text" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                  {([
+                    { text: "Titre", size: 54, weight: "bold", font: "Cormorant Garamond", label: "Titre", pv: 22 },
+                    { text: "Sous-titre", size: 30, weight: "normal", font: "Montserrat", label: "Sous-titre", pv: 15 },
+                    { text: "Votre texte ici", size: 20, weight: "normal", font: "Arial", label: "Corps de texte", pv: 12 },
+                    { text: "TITRE", size: 62, weight: "bold", font: "Bebas Neue", label: "Titre impact", pv: 20 },
+                    { text: "Merci", size: 46, weight: "normal", font: "Pacifico", label: "Manuscrit", pv: 20 },
+                  ] as const).map((p, i) => (
+                    <button key={i} type="button" onClick={() => addTextPreset(p)}
+                      style={{ width: "100%", textAlign: "left", padding: "11px 12px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer", color: INK, fontFamily: p.font, fontSize: p.pv, fontWeight: p.weight as any }}>
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {/* Lignes & separateurs */}
+              {libCat === "lines" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                  {([
+                    ["solid", "Pleine", { sw: 2 }], ["thick", "Épaisse", { sw: 5 }], ["thin", "Fine", { sw: 1 }],
+                    ["dashed", "Pointillés", { sw: 2, dash: "7,5" }], ["dotted", "Points", { sw: 3, dash: "0.5,6", round: true }],
+                    ["double", "Double", { double: true }], ["ornament", "Ornement", { orn: true }],
+                  ] as const).map(([k, label, o]) => (
+                    <button key={k} type="button" onClick={() => addLineVariant(k)} title={label}
+                      style={{ display: "flex", flexDirection: "column", gap: 5, padding: "9px 10px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
+                      <svg width="100%" height="14" viewBox="0 0 100 14" preserveAspectRatio="none">
+                        {"double" in o && (o as any).double ? (
+                          <>
+                            <line x1="2" y1="5" x2="98" y2="5" stroke={G} strokeWidth="2" />
+                            <line x1="2" y1="9" x2="98" y2="9" stroke={G} strokeWidth="2" />
+                          </>
+                        ) : "orn" in o && (o as any).orn ? (
+                          <>
+                            <line x1="2" y1="7" x2="98" y2="7" stroke={G} strokeWidth="2" />
+                            <rect x="46" y="3" width="8" height="8" fill={G} transform="rotate(45 50 7)" />
+                          </>
+                        ) : (
+                          <line x1="2" y1="7" x2="98" y2="7" stroke={G} strokeWidth={(o as any).sw} strokeDasharray={(o as any).dash} strokeLinecap={(o as any).round ? "round" : "butt"} />
+                        )}
+                      </svg>
+                      <span style={{ color: MUTED, fontSize: 9 }}>{label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              {/* Cadres */}
+              {libCat === "frames" && (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                  {([
+                    ["filet", "Filet", 1, 0], ["thick", "Épais", 3, 0], ["double", "Double", 1, 0], ["rounded", "Arrondi", 2, 6],
+                  ] as const).map(([k, label, sw, rx]) => (
+                    <button key={k} type="button" onClick={() => addFrame(k)} title={label}
+                      style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "10px 2px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
+                      <svg width="36" height="46" viewBox="0 0 36 46">
+                        <rect x="3" y="3" width="30" height="40" rx={rx} fill="none" stroke={G} strokeWidth={sw} />
+                        {k === "double" && <rect x="6" y="6" width="24" height="34" fill="none" stroke={G} strokeWidth="0.7" />}
+                      </svg>
+                      <span style={{ color: MUTED, fontSize: 9 }}>{label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
               {/* CTA */}
               {libCat === "cta" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
@@ -1308,6 +1429,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     ["tri", "Triangle",    <svg width="26" height="24" key="s"><polygon points="13,2 24,22 2,22" fill={G} /></svg>],
                     ["star", "Étoile",     <svg width="24" height="24" viewBox="0 0 24 24" key="s"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill={G} /></svg>],
                     ["hexa", "Hexagone",   <svg width="24" height="24" viewBox="0 0 24 24" key="s"><path d="M12 2l8.66 5v10L12 22 3.34 17V7z" fill={G} /></svg>],
+                    ["diamond", "Losange", <svg width="24" height="24" viewBox="0 0 24 24" key="s"><polygon points="12,1 23,12 12,23 1,12" fill={G} /></svg>],
+                    ["penta", "Pentagone", <svg width="24" height="24" viewBox="0 0 24 24" key="s"><polygon points="12,1 23,9.5 18.5,23 5.5,23 1,9.5" fill={G} /></svg>],
+                    ["pill", "Pilule",     <svg width="30" height="18" key="s"><rect x="1" y="2" width="28" height="14" rx="7" fill={G} /></svg>],
                     ["banner", "Bandeau",  <svg width="30" height="16" key="s"><rect x="1" y="3" width="28" height="10" fill={G} /></svg>],
                   ] as const).map(([k, label, prev]) => (
                     <button key={k} type="button" onClick={() => addShape(k)} title={label}
