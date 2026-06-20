@@ -1424,10 +1424,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // UI
   // ==========================================================================
   const btnTool = {
-    display: "flex", flexDirection: "column" as const, alignItems: "center", gap: 4,
-    width: "100%", padding: "10px 4px", background: "rgba(255,255,255,0.03)",
+    display: "flex", flexDirection: "column" as const, alignItems: "center", gap: 3,
+    width: "100%", padding: "8px 2px", background: "rgba(255,255,255,0.03)",
     border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, color: INK,
-    fontSize: 9.5, cursor: "pointer",
+    fontSize: 8.5, cursor: "pointer",
   }
   const topBtn = (primary = false) => ({
     display: "flex", alignItems: "center", gap: 6, padding: "8px 13px",
@@ -1674,9 +1674,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Rail outils */}
         {wizard === 0 && (
-        <div style={{ width: 92, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", padding: 12, display: "flex", flexDirection: "column", gap: 8, background: SURFACE }}>
-          <button type="button" onClick={() => { setTplOpen(v => !v); setLibOpen(false); setSide("") }}
-            style={{ ...btnTool, background: tplOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.14),rgba(201,168,76,0.05))", border: `1px solid ${tplOpen ? G : "rgba(201,168,76,0.3)"}`, color: tplOpen ? G : INK, fontWeight: 700 }}>
+        <div style={{ width: 76, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", padding: "10px 8px", display: "flex", flexDirection: "column", gap: 6, background: SURFACE }}>
+          <button type="button" onClick={() => { setWizard(1); setLibOpen(false); setTplOpen(false); setSide("") }}
+            style={{ ...btnTool, background: wizard > 0 ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.14),rgba(201,168,76,0.05))", border: `1px solid ${wizard > 0 ? G : "rgba(201,168,76,0.3)"}`, color: wizard > 0 ? G : INK, fontWeight: 700 }}>
             <LayoutTemplate size={16} /> Modèles
           </button>
           <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "6px 0 2px" }}>Ajouter</p>
