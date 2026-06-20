@@ -223,6 +223,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
   const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
   const [dragOver, setDragOver] = useState<number | null>(null) // ligne survolee pendant un glisser
+  const [zoom, setZoom] = useState(1)
 
   const isPro = userPlan === "pro" || userPlan === "business"
 
@@ -344,19 +345,21 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     fc.add(vG); fc.add(hG)
     vGuideRef.current = vG; hGuideRef.current = hG
 
-    // Snap au centre + guides
+    // Snap au centre + guides (dimensions en coords design = element / zoom)
     fc.on("object:moving", (e) => {
       const o = e.target; if (!o) return
-      const cx = fc.getWidth() / 2, cy = fc.getHeight() / 2, snap = 8
+      const z = fc.getZoom() || 1
+      const cw = fc.getWidth() / z, ch = fc.getHeight() / z
+      const cx = cw / 2, cy = ch / 2, snap = 8
       const c = o.getCenterPoint()
       if (Math.abs(c.x - cx) < snap) {
         o.setPositionByOrigin(new fabric.Point(cx, c.y), "center", "center")
-        vG.set({ x1: cx, y1: 0, x2: cx, y2: fc.getHeight(), visible: true })
+        vG.set({ x1: cx, y1: 0, x2: cx, y2: ch, visible: true })
       } else { vG.set({ visible: false }) }
       const c2 = o.getCenterPoint()
       if (Math.abs(c2.y - cy) < snap) {
         o.setPositionByOrigin(new fabric.Point(c2.x, cy), "center", "center")
-        hG.set({ x1: 0, y1: cy, x2: fc.getWidth(), y2: cy, visible: true })
+        hG.set({ x1: 0, y1: cy, x2: cw, y2: cy, visible: true })
       } else { hG.set({ visible: false }) }
       fc.bringToFront(vG); fc.bringToFront(hG)
     })
@@ -475,7 +478,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // ---- Poser le vrai QR ----------------------------------------------------
   function placeQr(fc: fabric.Canvas) {
     fabric.Image.fromURL(qrUrlRef.current, (img) => {
-      img.scaleToWidth(Math.round(fc.getWidth() * 0.42))
+      img.scaleToWidth(Math.round((fc.getWidth() / (fc.getZoom() || 1)) * 0.42))
       ;(img as any).isQR = true
       fc.add(img)
       fc.viewportCenterObject(img)
@@ -732,7 +735,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const align = (action: "left" | "centerH" | "right" | "top" | "centerV" | "bottom") => {
     const fc = fcRef.current; if (!fc) return
     const o = fc.getActiveObject(); if (!o) return
-    const W = fc.getWidth(), H = fc.getHeight()
+    const z = fc.getZoom() || 1
+    const W = fc.getWidth() / z, H = fc.getHeight() / z // dimensions en coords design
     const b = o.getBoundingRect(true) // boite englobante en coords canvas
     switch (action) {
       case "left":    o.set("left", (o.left ?? 0) - b.left); break
@@ -749,9 +753,30 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const applyFormat = (fmt: FormatId) => {
     const fc = fcRef.current; if (!fc) return
     const d = editDims(fmt)
-    fc.setDimensions({ width: d.w, height: d.h })
+    fc.setZoom(1); fc.setDimensions({ width: d.w, height: d.h }) // changer de format reinitialise le zoom
     fc.requestRenderAll()
-    setFormat(fmt)
+    setFormat(fmt); setZoom(1)
+  }
+
+  // ---- Zoom ----------------------------------------------------------------
+  // Zoom = setZoom + agrandissement de l'element (la zone autour scrolle).
+  const applyZoom = (z: number) => {
+    const fc = fcRef.current; if (!fc) return
+    const nz = Math.min(3, Math.max(0.25, z))
+    const base = editDims(format)
+    fc.setZoom(nz)
+    fc.setDimensions({ width: Math.round(base.w * nz), height: Math.round(base.h * nz) })
+    fc.requestRenderAll()
+    setZoom(nz)
+  }
+  // Execute fn() avec le canvas ramene a zoom 1 (pour un export propre), puis restaure.
+  const withBaseZoom = <T,>(fc: fabric.Canvas, fn: (base: { w: number; h: number }) => T): T => {
+    const z = fc.getZoom() || 1
+    const base = editDims(format)
+    fc.setZoom(1); fc.setDimensions({ width: base.w, height: base.h }); fc.requestRenderAll()
+    const out = fn(base)
+    fc.setZoom(z); fc.setDimensions({ width: Math.round(base.w * z), height: Math.round(base.h * z) }); fc.requestRenderAll()
+    return out
   }
 
   // ---- Couleur de fond -----------------------------------------------------
@@ -773,7 +798,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
     histRef.current.lock = true // tout le modele = une seule etape d'historique
     fc.getObjects().slice().forEach(o => { if (o !== vG && o !== hG) fc.remove(o) })
-    const W = fc.getWidth(), H = fc.getHeight()
+    const z = fc.getZoom() || 1
+    const W = fc.getWidth() / z, H = fc.getHeight() / z // coords design
     const { bg, ink, accent } = meta
     fc.setBackgroundColor(bg, () => {}); setBgColor(bg)
 
@@ -920,8 +946,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     setExporting(true)
     try {
       prepExport(fc)
-      const multiplier = FORMATS[format].exportW / fc.getWidth()
-      const url = fc.toDataURL({ format: "png", multiplier })
+      const url = withBaseZoom(fc, base => fc.toDataURL({ format: "png", multiplier: FORMATS[format].exportW / base.w }))
       const a = document.createElement("a")
       a.href = url; a.download = `qrfolio-${format}.png`; a.click()
     } finally { setExporting(false) }
@@ -933,8 +958,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     setExporting(true)
     try {
       prepExport(fc)
-      const multiplier = FORMATS[format].exportW / fc.getWidth()
-      const url = fc.toDataURL({ format: "png", multiplier })
+      const url = withBaseZoom(fc, base => fc.toDataURL({ format: "png", multiplier: FORMATS[format].exportW / base.w }))
       const w = FORMATS[format].exportW
       const h = Math.round(w / FORMATS[format].ratio)
       const { jsPDF } = await import("jspdf")
@@ -1009,6 +1033,16 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 {FORMATS[f].label}
               </button>
             ))}
+          </div>
+
+          {/* Zoom */}
+          <div style={{ display: "flex", alignItems: "center", gap: 2, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
+            <button type="button" onClick={() => applyZoom(zoom / 1.25)} title="Zoom arrière" aria-label="Zoom arrière"
+              style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 6, color: INK, fontSize: 16, cursor: "pointer" }}>−</button>
+            <button type="button" onClick={() => applyZoom(1)} title="100 %"
+              style={{ minWidth: 42, height: 26, background: "none", border: "none", color: MUTED, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>{Math.round(zoom * 100)}%</button>
+            <button type="button" onClick={() => applyZoom(zoom * 1.25)} title="Zoom avant" aria-label="Zoom avant"
+              style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 6, color: INK, fontSize: 15, cursor: "pointer" }}>+</button>
           </div>
 
           <button type="button" onClick={undo} disabled={!canUndo} aria-label="Annuler" title="Annuler (Ctrl/⌘+Z)" style={histBtn(canUndo)}>
@@ -1197,13 +1231,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         )}
 
         {/* Zone canvas */}
-        <div style={{ flex: 1, overflow: "auto", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, background: "#0A0907", position: "relative" }}>
+        <div style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, background: "#0A0907", position: "relative" }}>
           {loading && (
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: MUTED, zIndex: 5, pointerEvents: "none" }}>
               <Loader2 size={18} style={{ animation: "spin 0.8s linear infinite" }} /> Chargement…
             </div>
           )}
-          <div style={{ boxShadow: "0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.15)", borderRadius: 4, overflow: "hidden" }}>
+          <div style={{ margin: "auto", boxShadow: "0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.15)", borderRadius: 4, overflow: "hidden", flexShrink: 0 }}>
             <canvas ref={elRef} />
           </div>
         </div>
