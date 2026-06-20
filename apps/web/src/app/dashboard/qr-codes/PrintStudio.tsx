@@ -220,6 +220,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [libCat, setLibCat]   = useState<"cta" | "icons" | "badges" | "shapes" | "arrows">("cta")
   const [tplOpen, setTplOpen] = useState(false)
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
+  const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
 
   const isPro = userPlan === "pro" || userPlan === "business"
 
@@ -365,8 +366,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     fc.on("selection:cleared", () => setSel(null))
 
     // Historique : capter ajout / suppression / modification (drag, scale, rotate)
-    fc.on("object:added", pushHistory)
-    fc.on("object:removed", pushHistory)
+    fc.on("object:added", () => { pushHistory(); setLayersVer(v => v + 1) })
+    fc.on("object:removed", () => { pushHistory(); setLayersVer(v => v + 1) })
     fc.on("object:modified", pushHistory)
 
     // ---- Chargement du design existant ou QR initial ----------------------
@@ -670,6 +671,46 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     if (hGuideRef.current) fc.bringToFront(hGuideRef.current)
     fc.requestRenderAll(); refreshSel()
     pushHistorySoon() // front/back/fwd/bwd/lock ne declenchent pas d'evenement
+    setLayersVer(v => v + 1)
+  }
+
+  // ---- Liste des calques ---------------------------------------------------
+  const layerName = (o: fabric.Object): string => {
+    if ((o as any).isQR) return "QR Code"
+    const t = groupText(o)
+    if (t) return (t.text || "Bouton").slice(0, 18)
+    switch (o.type) {
+      case "i-text": case "text": case "textbox": return ((o as fabric.IText).text || "Texte").slice(0, 18)
+      case "rect": return "Rectangle"
+      case "circle": return "Cercle"
+      case "triangle": return "Triangle"
+      case "polygon": return "Forme"
+      case "line": return "Ligne"
+      case "image": return "Image"
+      case "path": return "Icône"
+      case "group": return "Groupe"
+      default: return "Élément"
+    }
+  }
+  // Objets du plus haut (devant) au plus bas (derriere), guides exclus
+  const layerList = (): fabric.Object[] =>
+    (fcRef.current?.getObjects() ?? []).filter(o => !(o as any).isGuide).slice().reverse()
+  const selectLayer = (o: fabric.Object) => {
+    const fc = fcRef.current; if (!fc) return
+    fc.setActiveObject(o); fc.requestRenderAll(); refreshSel()
+  }
+  const toggleVisible = (o: fabric.Object) => {
+    const fc = fcRef.current; if (!fc) return
+    o.visible = !o.visible; o.dirty = true
+    fc.requestRenderAll(); setLayersVer(v => v + 1); pushHistorySoon()
+  }
+  const moveLayer = (o: fabric.Object, dir: "up" | "down") => {
+    const fc = fcRef.current; if (!fc) return
+    fc.setActiveObject(o); layer(dir === "up" ? "fwd" : "bwd")
+  }
+  const removeLayer = (o: fabric.Object) => {
+    const fc = fcRef.current; if (!fc) return
+    fc.setActiveObject(o); layer("del")
   }
 
   // ---- Alignement sur le support -------------------------------------------
@@ -910,6 +951,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, color: INK,
     fontSize: 10, cursor: "pointer",
   }
+  const iconMini = {
+    display: "flex", alignItems: "center", justifyContent: "center", width: 22, height: 22,
+    background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 0, flexShrink: 0,
+  } as const
 
   const canUndo = histVer >= 0 && histRef.current.i > 0
   const canRedo = histVer >= 0 && histRef.current.i < histRef.current.stack.length - 1
@@ -1296,14 +1341,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 </div>
               </div>
 
-              {/* Calques */}
+              {/* Actions rapides */}
               <div>
-                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Calques</p>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Actions</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-                  <button type="button" onClick={() => layer("front")} style={layerBtn}><ChevronUp size={12} /> Devant</button>
-                  <button type="button" onClick={() => layer("back")}  style={layerBtn}><ChevronDown size={12} /> Derrière</button>
-                  <button type="button" onClick={() => layer("fwd")}   style={layerBtn}>+1</button>
-                  <button type="button" onClick={() => layer("bwd")}   style={layerBtn}>−1</button>
                   <button type="button" onClick={() => layer("dup")}   style={layerBtn}><Copy size={12} /> Dupliquer</button>
                   <button type="button" onClick={() => layer("lock")}  style={{ ...layerBtn, color: sel.locked ? G : INK }}>
                     {sel.locked ? <Lock size={12} /> : <Unlock size={12} />} {sel.locked ? "Verr." : "Libre"}
@@ -1322,6 +1363,37 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <strong style={{ color: INK }}>Suppr</strong> retire · <strong style={{ color: INK }}>Ctrl/⌘+C/V</strong> copier-coller · <strong style={{ color: INK }}>Ctrl/⌘+D</strong> dupliquer · <strong style={{ color: INK }}>Ctrl/⌘+Z</strong> annuler · <strong style={{ color: INK }}>flèches</strong> déplacer (Maj ×10).
             </div>
           )}
+
+          {/* Liste des calques (toujours visible) */}
+          {layersVer >= 0 && (() => {
+            const items = layerList()
+            const active = fcRef.current?.getActiveObject()
+            return (
+              <div>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Calques ({items.length})</p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  {items.map((o, idx) => {
+                    const on = active === o
+                    return (
+                      <div key={idx} style={{ display: "flex", alignItems: "center", gap: 2, padding: "4px 6px", borderRadius: 7, background: on ? "rgba(201,168,76,0.14)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? G : "rgba(255,255,255,0.06)"}` }}>
+                        <button type="button" onClick={() => selectLayer(o)} title={layerName(o)}
+                          style={{ flex: 1, minWidth: 0, textAlign: "left", background: "none", border: "none", color: on ? G : INK, fontSize: 10.5, cursor: "pointer", padding: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", opacity: o.visible ? 1 : 0.4 }}>
+                          {layerName(o)}
+                        </button>
+                        <button type="button" onClick={() => toggleVisible(o)} title="Afficher / masquer" style={iconMini}>
+                          <svg width="13" height="13" viewBox="0 0 24 24"><path d="M12 5C5 5 1 12 1 12s4 7 11 7 11-7 11-7-4-7-11-7zm0 11.5A4.5 4.5 0 1112 7a4.5 4.5 0 010 9.5z" fill={o.visible ? G : MUTED} /></svg>
+                        </button>
+                        <button type="button" onClick={() => moveLayer(o, "up")} title="Monter (devant)" style={iconMini}><ChevronUp size={13} /></button>
+                        <button type="button" onClick={() => moveLayer(o, "down")} title="Descendre (derrière)" style={iconMini}><ChevronDown size={13} /></button>
+                        <button type="button" onClick={() => removeLayer(o)} title="Supprimer" style={{ ...iconMini, color: "#FF6B6B" }}><Trash2 size={12} /></button>
+                      </div>
+                    )
+                  })}
+                  {items.length === 0 && <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>Aucun élément.</p>}
+                </div>
+              </div>
+            )
+          })()}
         </div>
       </div>
     </div>
