@@ -135,6 +135,8 @@ type SelState = {
   strokeColor: string     // couleur du contour
   strokeWidth: number     // epaisseur du contour
   radius: number | null   // coins arrondis (rectangles uniquement), null sinon
+  isGroupObj: boolean     // un vrai groupe (degroupable)
+  multi: boolean          // selection multiple (groupable)
 } | null
 
 // Trouve l'objet texte dans un groupe (CTA / badge), s'il y en a un
@@ -366,6 +368,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       strokeColor: typeof o.stroke === "string" ? o.stroke : G,
       strokeWidth: o.strokeWidth ?? 0,
       radius: o.type === "rect" ? ((o as fabric.Rect).rx ?? 0) : null,
+      isGroupObj: o.type === "group",
+      multi: o.type === "activeSelection",
     }
   }, [])
 
@@ -569,6 +573,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         e.preventDefault(); if (e.shiftKey) redo(); else undo()
       } else if (meta && (e.key === "y" || e.key === "Y")) {
         e.preventDefault(); redo()
+      } else if (meta && (e.key === "a" || e.key === "A")) {
+        e.preventDefault(); selectAll()
+      } else if (meta && e.shiftKey && (e.key === "g" || e.key === "G")) {
+        e.preventDefault(); ungroupSel()
+      } else if (meta && (e.key === "g" || e.key === "G")) {
+        e.preventDefault(); groupSel()
       } else if (meta && (e.key === "+" || e.key === "=")) {
         e.preventDefault(); applyZoom((fcRef.current?.getZoom() || 1) * 1.25)
       } else if (meta && e.key === "-") {
@@ -1013,6 +1023,32 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "bottom":  o.set("top",  (o.top ?? 0) + (H - (b.top + b.height))); break
     }
     o.setCoords(); fc.requestRenderAll(); pushHistorySoon()
+  }
+
+  // ---- Outils : miroir, grouper, degrouper, tout selectionner --------------
+  const flip = (axis: "x" | "y") => mutate(o => o.set(axis === "x" ? "flipX" : "flipY", !(axis === "x" ? o.flipX : o.flipY)))
+  const groupSel = () => {
+    const fc = fcRef.current; if (!fc) return
+    const a = fc.getActiveObject()
+    if (!a || a.type !== "activeSelection") return
+    ;(a as fabric.ActiveSelection).toGroup()
+    fc.requestRenderAll(); refreshSel(); setLayersVer(v => v + 1); pushHistorySoon()
+  }
+  const ungroupSel = () => {
+    const fc = fcRef.current; if (!fc) return
+    const a = fc.getActiveObject()
+    if (!a || a.type !== "group") return
+    ;(a as fabric.Group).toActiveSelection()
+    fc.requestRenderAll(); refreshSel(); setLayersVer(v => v + 1); pushHistorySoon()
+  }
+  const selectAll = () => {
+    const fc = fcRef.current; if (!fc) return
+    const objs = fc.getObjects().filter(o => !(o as any).isGuide && o.selectable !== false && o.visible !== false)
+    if (!objs.length) return
+    fc.discardActiveObject()
+    if (objs.length === 1) fc.setActiveObject(objs[0])
+    else fc.setActiveObject(new fabric.ActiveSelection(objs, { canvas: fc }))
+    fc.requestRenderAll(); refreshSel()
   }
 
   // ---- Format --------------------------------------------------------------
@@ -2203,6 +2239,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <button type="button" onClick={() => layer("lock")}  style={{ ...layerBtn, color: sel.locked ? G : INK }}>
                     {sel.locked ? <Lock size={12} /> : <Unlock size={12} />} {sel.locked ? "Verr." : "Libre"}
                   </button>
+                  <button type="button" onClick={() => flip("x")} style={layerBtn} title="Miroir horizontal">⇆ Miroir H</button>
+                  <button type="button" onClick={() => flip("y")} style={layerBtn} title="Miroir vertical">⇅ Miroir V</button>
+                  {sel.multi && <button type="button" onClick={groupSel} style={{ ...layerBtn, gridColumn: "1 / 3", color: G }}>⊞ Grouper</button>}
+                  {sel.isGroupObj && <button type="button" onClick={ungroupSel} style={{ ...layerBtn, gridColumn: "1 / 3" }}>⊟ Dégrouper</button>}
                 </div>
                 <button type="button" onClick={() => layer("del")}
                   style={{ ...layerBtn, width: "100%", marginTop: 6, background: "rgba(255,107,107,0.1)", border: "1px solid rgba(255,107,107,0.2)", color: "#FF6B6B" }}>
