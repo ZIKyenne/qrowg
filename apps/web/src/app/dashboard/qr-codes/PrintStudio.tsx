@@ -20,7 +20,7 @@ import {
   Copy, Trash2, Lock, Unlock, ChevronUp, ChevronDown,
   Download, Printer, Loader2, Check, Save,
   Shapes, Star, Award, MousePointerClick, ArrowRight, LayoutTemplate,
-  Undo2, Redo2, Sparkles, Image as ImageIcon,
+  Undo2, Redo2, Sparkles, Image as ImageIcon, Palette,
 } from "lucide-react"
 
 // ---- Constantes design (Midnight Gold) -------------------------------------
@@ -217,6 +217,17 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
   )
 }
 
+// Styles globaux : un clic recolore + retypographie tout le design
+const GLOBAL_STYLES: { id: string; label: string; bg: string; ink: string; accent: string; titleFont: string; bodyFont: string }[] = [
+  { id: "luxgold",     label: "Luxury Gold",      bg: "#0B0805", ink: "#F4E7C4", accent: "#D4AF37", titleFont: "Cormorant Garamond", bodyFont: "Montserrat" },
+  { id: "modernblack", label: "Modern Black",     bg: "#0E0E10", ink: "#FFFFFF", accent: "#FFFFFF", titleFont: "Bebas Neue",         bodyFont: "Montserrat" },
+  { id: "restofresh",  label: "Restaurant Fresh", bg: "#FFF8EE", ink: "#2A2419", accent: "#C0392B", titleFont: "Playfair Display",   bodyFont: "Poppins" },
+  { id: "corporate",   label: "Corporate Blue",   bg: "#F4F8FC", ink: "#0F2540", accent: "#1D4ED8", titleFont: "Montserrat",         bodyFont: "Arial" },
+  { id: "neon",        label: "Neon Creator",     bg: "#0A0A14", ink: "#EAEAFF", accent: "#FF3D9A", titleFont: "Bebas Neue",         bodyFont: "Poppins" },
+  { id: "minimal",     label: "Minimal White",    bg: "#FFFFFF", ink: "#1A1A1A", accent: "#1A1A1A", titleFont: "Raleway",            bodyFont: "Arial" },
+  { id: "premiumdark", label: "Premium Dark",     bg: "#101010", ink: "#F5F0E8", accent: "#C9A84C", titleFont: "Cormorant Garamond", bodyFont: "Montserrat" },
+]
+
 // Objectifs marketing de l'assistant debutant
 const WIZ_OBJECTIVES: { obj: string; emoji: string; label: string }[] = [
   { obj: "Avis", emoji: "⭐", label: "Obtenir des avis" },
@@ -263,7 +274,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [wizard, setWizard] = useState(0) // 0 = ferme, 1 = objectif, 2 = style, 3 = pret
   const [wizObj, setWizObj] = useState("")
   const [infoVer, setInfoVer] = useState(0) // rafraichit le panneau infos
-  const [side, setSide] = useState<"" | "layers" | "bg">("") // panneaux gauche Calques / Fond
+  const [side, setSide] = useState<"" | "layers" | "bg" | "styles">("") // panneaux gauche Calques / Fond / Styles
 
   const isPro = userPlan === "pro" || userPlan === "business"
 
@@ -676,7 +687,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // Ouvrir la bibliotheque sur un onglet donne (depuis le rail)
   const openLib = (c: typeof libCat) => { setLibCat(c); setLibOpen(true); setTplOpen(false); setSide("") }
   // Ouvrir / fermer un panneau lateral (calques / fond)
-  const openSide = (s: "layers" | "bg") => { setSide(prev => prev === s ? "" : s); setLibOpen(false); setTplOpen(false) }
+  const openSide = (s: "layers" | "bg" | "styles") => { setSide(prev => prev === s ? "" : s); setLibOpen(false); setTplOpen(false) }
   // Bouton CTA (pilule dimensionnee au texte)
   const addCTA = (label: string) => {
     centerObj(buildPill(label, { rectFill: G, textFill: "#080808", height: 80, fontSize: 30 }))
@@ -996,6 +1007,34 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       setBgGrad(false)
       setBgColor(typeof bg === "string" ? bg : CANVAS_BG_DEFAULT)
     }
+  }
+
+  // ---- Appliquer un style global (couleurs + typo + accents) ---------------
+  const applyStyle = (s: typeof GLOBAL_STYLES[number]) => {
+    const fc = fcRef.current; if (!fc) return
+    histRef.current.lock = true
+    setBgGrad(false); fc.setBackgroundColor(s.bg, () => {}); setBgColor(s.bg)
+    const isTxt = (t?: string) => t === "i-text" || t === "text" || t === "textbox"
+    fc.getObjects().forEach(o => {
+      if ((o as any).isGuide || (o as any).isQR) return
+      if (isTxt(o.type)) {
+        ;(o as fabric.IText).set({ fontFamily: (o as any).role === "title" ? s.titleFont : s.bodyFont, fill: s.ink })
+      } else if (o.type === "group") {
+        ;(o as fabric.Group).getObjects().forEach(c => {
+          c.set("fill", isTxt(c.type) ? readableOn(s.accent) : s.accent)
+        })
+        o.dirty = true
+      } else {
+        if (typeof o.fill === "string" && o.fill && o.fill !== "transparent") o.set("fill", s.accent)
+        if (typeof o.stroke === "string" && o.stroke) o.set("stroke", s.accent)
+      }
+    })
+    histRef.current.lock = false
+    fc.requestRenderAll(); pushHistory(); setLayersVer(v => v + 1); setInfoVer(v => v + 1)
+    try {
+      const d = document as Document & { fonts?: { load: (f: string) => Promise<unknown> } }
+      Promise.all([d.fonts?.load(`700 40px '${s.titleFont}'`), d.fonts?.load(`400 24px '${s.bodyFont}'`)]).then(() => fc.requestRenderAll()).catch(() => {})
+    } catch { /* noop */ }
   }
 
   // ---- Appliquer un modele oriente objectif --------------------------------
@@ -1474,6 +1513,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             <MousePointerClick size={16} /> Éléments
           </button>
           <div style={{ flex: 1 }} />
+          <button type="button" onClick={() => openSide("styles")}
+            style={{ ...btnTool, background: side === "styles" ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${side === "styles" ? G : "rgba(255,255,255,0.07)"}`, color: side === "styles" ? G : INK }}>
+            <Palette size={16} /> Styles
+          </button>
           <button type="button" onClick={() => openSide("layers")}
             style={{ ...btnTool, background: side === "layers" ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${side === "layers" ? G : "rgba(255,255,255,0.07)"}`, color: side === "layers" ? G : INK }}>
             <Copy size={16} /> Calques
@@ -1690,6 +1733,34 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <p style={{ gridColumn: "1 / 3", color: MUTED, fontSize: 9, margin: "2px 0 0", lineHeight: 1.4 }}>Astuce : fais pointer une flèche vers ton QR pour guider le scan.</p>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Panneau Styles globaux (gauche) */}
+        {side === "styles" && (
+          <div className="qr-scroll" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+              <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Styles</span>
+              <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
+            </div>
+            <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "10px 12px 16px" }}>
+              <p style={{ color: MUTED, fontSize: 10, margin: "0 0 10px", lineHeight: 1.4 }}>Un clic restyle tout le design (couleurs, polices, accents).</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {GLOBAL_STYLES.map(s => (
+                  <button key={s.id} type="button" onClick={() => applyStyle(s)}
+                    style={{ display: "flex", alignItems: "center", gap: 10, padding: 8, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, cursor: "pointer", textAlign: "left" }}>
+                    <span style={{ display: "flex", flexShrink: 0, width: 44, height: 34, borderRadius: 7, overflow: "hidden", border: "1px solid rgba(0,0,0,0.25)" }}>
+                      <span style={{ flex: 1, background: s.bg }} />
+                      <span style={{ width: 14, background: s.accent }} />
+                    </span>
+                    <span style={{ minWidth: 0 }}>
+                      <span style={{ display: "block", color: INK, fontSize: 12, fontWeight: 700, fontFamily: s.titleFont }}>{s.label}</span>
+                      <span style={{ display: "block", color: MUTED, fontSize: 9 }}>{s.titleFont}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
