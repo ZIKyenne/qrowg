@@ -49,7 +49,13 @@ function editDims(fmt: FormatId) {
 }
 
 // ---- Polices web-safe (rendu canvas fiable) --------------------------------
-const FONTS = ["Georgia", "Arial", "Helvetica", "Times New Roman", "Courier New", "Verdana", "Trebuchet MS", "Impact"]
+// Polices : web-safe + Google (injectees par QRStudio et par PrintStudio)
+const FONT_GROUPS: { label: string; fonts: string[] }[] = [
+  { label: "Élégantes",  fonts: ["Cormorant Garamond", "Playfair Display", "Lora", "Merriweather", "Abril Fatface", "Georgia", "Times New Roman"] },
+  { label: "Modernes",   fonts: ["Poppins", "Montserrat", "Raleway", "Oswald", "Bebas Neue", "Arial", "Helvetica", "Trebuchet MS", "Verdana", "Impact"] },
+  { label: "Manuscrites", fonts: ["Dancing Script", "Pacifico"] },
+  { label: "Autre",      fonts: ["Courier New"] },
+]
 
 // ---- Helpers geometrie (etoile / polygone reguliers) -----------------------
 function starPts(spikes: number, outer: number, inner: number): { x: number; y: number }[] {
@@ -503,6 +509,25 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     return () => cont.removeEventListener("wheel", onWheel)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // ---- Polices Google (injecter le lien si absent) -------------------------
+  useEffect(() => {
+    const id = "qrfolio-print-fonts"
+    if (typeof document === "undefined" || document.getElementById(id)) return
+    const link = document.createElement("link")
+    link.id = id; link.rel = "stylesheet"
+    link.href = "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:wght@500;700&family=Lora:wght@400;700&family=Merriweather:wght@400;700&family=Poppins:wght@400;600&family=Montserrat:wght@400;700&family=Raleway:wght@400;600&family=Oswald:wght@400;600&family=Bebas+Neue&family=Abril+Fatface&family=Dancing+Script:wght@700&family=Pacifico&display=swap"
+    document.head.appendChild(link)
+  }, [])
+
+  // Changer la police d'un texte : charger la fonte puis re-rendre (sinon fallback)
+  const setFont = (family: string) => {
+    mutate(o => (o as fabric.IText).set("fontFamily", family))
+    try {
+      const d = document as Document & { fonts?: { load: (f: string) => Promise<unknown> } }
+      d.fonts?.load(`700 40px '${family}'`).then(() => fcRef.current?.requestRenderAll()).catch(() => {})
+    } catch { /* noop */ }
+  }
 
   // ---- Poser le vrai QR ----------------------------------------------------
   function placeQr(fc: fabric.Canvas) {
@@ -1367,9 +1392,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <>
                     <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Police</label>
                     <select value={sel.fontFamily}
-                      onChange={e => mutate(o => (o as fabric.IText).set("fontFamily", e.target.value))}
+                      onChange={e => setFont(e.target.value)}
                       style={{ width: "100%", background: BG, border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, outline: "none", cursor: "pointer", marginBottom: 10, boxSizing: "border-box" }}>
-                      {FONTS.map(f => <option key={f} value={f} style={{ fontFamily: f }}>{f}</option>)}
+                      {FONT_GROUPS.map(g => (
+                        <optgroup key={g.label} label={g.label}>
+                          {g.fonts.map(f => <option key={f} value={f} style={{ fontFamily: f }}>{f}</option>)}
+                        </optgroup>
+                      ))}
                     </select>
 
                     <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>
