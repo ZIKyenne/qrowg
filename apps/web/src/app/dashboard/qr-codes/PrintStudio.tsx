@@ -414,6 +414,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [libOpen, setLibOpen] = useState(false)
   const [libCat, setLibCat]   = useState<"text" | "shapes" | "lines" | "frames" | "cta" | "icons" | "badges" | "arrows" | "deco">("text")
   const [tplOpen, setTplOpen] = useState(false)
+  const [tplSearch, setTplSearch] = useState("")
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
   const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
   const [dragOver, setDragOver] = useState<number | null>(null) // ligne survolee pendant un glisser
@@ -1981,9 +1982,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 <X size={13} />
               </button>
             </div>
+            <div style={{ padding: "10px 12px 0", flexShrink: 0 }}>
+              <input value={tplSearch} onChange={e => setTplSearch(e.target.value)} placeholder="Rechercher un modèle…"
+                style={{ width: "100%", background: BG, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "8px 10px", color: INK, fontSize: 11, outline: "none", boxSizing: "border-box" }} />
+            </div>
             <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "10px 10px 16px" }}>
               {["Avis", "Menu", "Réserver", "Abonnés", "Contact", "Page"].map(obj => {
-                const items = PRINT_TEMPLATES.filter(t => t.obj === obj)
+                const q = tplSearch.trim().toLowerCase()
+                const items = PRINT_TEMPLATES.filter(t => t.obj === obj && (!q || t.label.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q) || obj.toLowerCase().includes(q)))
                 if (!items.length) return null
                 return (
                   <div key={obj} style={{ marginBottom: 12 }}>
