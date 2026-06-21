@@ -208,6 +208,12 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"insta-band",    label:"Instagram — Bandeau",obj:"Abonnés",  emoji:"📷", desc:"Grand bandeau rose",                    bg:"#15101C", ink:"#FBEAF4", accent:"#E1306C" },
   { id:"contact-band",  label:"Contact — Bandeau",  obj:"Contact",  emoji:"💳", desc:"Bandeau d'en-tête bleu",                bg:"#0F1729", ink:"#F1F5FF", accent:"#5B8DEF" },
   { id:"decouvrir-band",label:"Découvrir — Bandeau",obj:"Page",     emoji:"🔗", desc:"Bandeau d'en-tête vert",                bg:"#10130F", ink:"#EAF4E6", accent:"#16A34A" },
+  { id:"avis-frame",    label:"Avis — Cadre",       obj:"Avis",     emoji:"⭐", desc:"Filet doré, élégant",                   bg:"#FBF6EC", ink:"#2A2419", accent:"#B8860B" },
+  { id:"menu-frame",    label:"Menu — Cadre",       obj:"Menu",     emoji:"🍽️", desc:"Cadre or sur fond sombre",              bg:"#0E0E0E", ink:"#F5F0E8", accent:"#C9A84C" },
+  { id:"reserver-frame",label:"Réservation — Cadre",obj:"Réserver", emoji:"📅", desc:"Cadre vert, sobre",                     bg:"#F2F7F4", ink:"#10271E", accent:"#0E7A5F" },
+  { id:"insta-frame",   label:"Instagram — Cadre",  obj:"Abonnés",  emoji:"📷", desc:"Cadre rose sur fond clair",            bg:"#FFF5F8", ink:"#2A0A18", accent:"#E1306C" },
+  { id:"contact-frame", label:"Contact — Cadre",    obj:"Contact",  emoji:"💳", desc:"Cadre or, premium",                    bg:"#0F1729", ink:"#F1F5FF", accent:"#C9A84C" },
+  { id:"decouvrir-frame",label:"Découvrir — Cadre", obj:"Page",     emoji:"🔗", desc:"Cadre bleu, minimal",                  bg:"#FFFFFF", ink:"#1A1A1A", accent:"#1D4ED8" },
 ]
 
 // Mini-apercu schematique d'un modele (fond + couleurs + disposition)
@@ -215,9 +221,11 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
   const isMenu = t.id.startsWith("menu") || t.id.endsWith("-band")
   const isContact = t.id === "contact" || t.id === "contact-clair"
   const isAvis = t.id.startsWith("avis") && !t.id.endsWith("-band")
+  const isFrame = t.id.endsWith("-frame")
   const starClip = "polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)"
   return (
     <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", background: t.bg, borderRadius: 6, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", gap: "6%", padding: isMenu ? "0 10% 12%" : "13% 10%", boxSizing: "border-box" }}>
+      {isFrame && <div style={{ position: "absolute", inset: "7%", border: `1.5px solid ${t.accent}`, borderRadius: 4, pointerEvents: "none" }} />}
       {isMenu && <div style={{ width: "100%", height: "18%", background: t.accent, marginBottom: "8%" }} />}
       <div style={{ width: "68%", height: 5, borderRadius: 3, background: t.ink, opacity: 0.92 }} />
       {isAvis ? (
@@ -1346,6 +1354,17 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       await placeQrT(H * 0.40, 0.46)
       addCTA(cta, H * 0.86)
     }
+    // Mise en page "cadre premium" : filet insere + divider + QR + CTA
+    const frameLayout = async (title: string, subtitle: string, cta: string) => {
+      const f = new fabric.Rect({ left: W * 0.05, top: H * 0.05, width: W * 0.90, height: H * 0.90, fill: "transparent", stroke: accent, strokeWidth: Math.max(2, Math.round(W * 0.006)), strokeUniform: true, rx: 8, ry: 8 })
+      ;(f as any).perPixelTargetFind = true
+      fc.add(f)
+      addText(title, H * 0.12, W * 0.072, { weight: "bold", role: "title" })
+      fc.add(new fabric.Rect({ width: Math.round(W * 0.14), height: Math.max(3, Math.round(W * 0.007)), rx: 2, ry: 2, fill: accent, originX: "center", left: W / 2, top: H * 0.205 }))
+      addText(subtitle, H * 0.25, W * 0.032, { font: "Arial", role: "subtitle" })
+      await placeQrT(H * 0.36, 0.44)
+      addCTA(cta, H * 0.82)
+    }
 
     // Donnees reelles (deja saisies cote QRStudio) ; sinon placeholders
     const name    = (prefill?.name ?? "").trim()
@@ -1411,6 +1430,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "insta-band":     await bandLayout("Suivez-nous", "@votrecompte", "Nous suivre"); break
       case "contact-band":   await bandLayout("Mes coordonnées", "Scannez pour me contacter", "Enregistrer"); break
       case "decouvrir-band": await bandLayout("Découvrez-nous", "Tout est ici", "En savoir plus"); break
+      case "avis-frame":      await frameLayout("Vous avez aimé ?", "Laissez-nous un avis", "Donner mon avis"); break
+      case "menu-frame":      await frameLayout(name || "Notre Carte", "Scannez pour la carte", "Voir le menu"); break
+      case "reserver-frame":  await frameLayout("Réservez votre table", "En quelques secondes", "Réserver"); break
+      case "insta-frame":     await frameLayout("Suivez-nous", "@votrecompte", "Nous suivre"); break
+      case "contact-frame":   await frameLayout(name || "Mes coordonnées", "Scannez pour me contacter", "Enregistrer"); break
+      case "decouvrir-frame": await frameLayout("Découvrez-nous", "Scannez pour en savoir plus", "En savoir plus"); break
     }
 
     if (vG) fc.bringToFront(vG)
