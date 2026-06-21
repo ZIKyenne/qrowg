@@ -568,10 +568,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           return
         }
       } catch { /* pas de design : on pose le QR */ }
-      // Aucun design sauvegarde -> poser le vrai QR au centre + ouvrir l'assistant
+      // Aucun design sauvegarde -> poser le vrai QR au centre + ouvrir la galerie de modeles
       placeQr(fc)
       setLoading(false)
-      setWizard(1)
+      setTplOpen(true)
     })()
 
     return () => { fc.dispose(); fcRef.current = null }
@@ -1280,7 +1280,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const fc = fcRef.current; if (!fc) return
     const meta = PRINT_TEMPLATES.find(t => t.id === id); if (!meta) return
     const vG = vGuideRef.current, hG = hGuideRef.current
-    const hasContent = fc.getObjects().some(o => o !== vG && o !== hG)
+    const hasContent = fc.getObjects().some(o => o !== vG && o !== hG && !(o as any).isQR && !(o as any).isQrCard)
     if (!skipConfirm && hasContent && !window.confirm("Remplacer le contenu actuel par ce modèle ?")) return
 
     histRef.current.lock = true // tout le modele = une seule etape d'historique
@@ -1649,11 +1649,6 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             <Eye size={14} /> Aperçu
           </button>
 
-          <button type="button" onClick={() => { setWizard(1); setLibOpen(false); setTplOpen(false); setSide("") }} title="Assistant de création"
-            style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 9, color: G, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-            <Sparkles size={14} /> Assistant
-          </button>
-
           <button type="button" onClick={undo} disabled={!canUndo} aria-label="Annuler" title="Annuler (Ctrl/⌘+Z)" style={histBtn(canUndo)}>
             <Undo2 size={15} />
           </button>
@@ -1799,8 +1794,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {/* Rail outils */}
         {wizard === 0 && (
         <div style={{ width: 76, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", padding: "10px 8px", display: "flex", flexDirection: "column", gap: 6, background: SURFACE }}>
-          <button type="button" onClick={() => { setWizard(1); setLibOpen(false); setTplOpen(false); setSide("") }}
-            style={{ ...btnTool, background: wizard > 0 ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.14),rgba(201,168,76,0.05))", border: `1px solid ${wizard > 0 ? G : "rgba(201,168,76,0.3)"}`, color: wizard > 0 ? G : INK, fontWeight: 700 }}>
+          <button type="button" onClick={() => { setTplOpen(v => !v); setLibOpen(false); setSide(""); setWizard(0) }}
+            style={{ ...btnTool, background: tplOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.14),rgba(201,168,76,0.05))", border: `1px solid ${tplOpen ? G : "rgba(201,168,76,0.3)"}`, color: tplOpen ? G : INK, fontWeight: 700 }}>
             <LayoutTemplate size={16} /> Modèles
           </button>
           <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "6px 0 2px" }}>Ajouter</p>
