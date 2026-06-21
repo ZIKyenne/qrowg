@@ -99,6 +99,18 @@ const LIB_ICONS: { key: string; label: string; d: string }[] = [
   { key:"chat",  label:"Message",   d:"M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" },
   { key:"like",  label:"J'aime",    d:"M1 21h4V9H1v12zM23 10c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1z" },
   { key:"music", label:"Audio",     d:"M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" },
+  { key:"home",  label:"Adresse",   d:"M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" },
+  { key:"user",  label:"Profil",    d:"M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" },
+  { key:"tag",   label:"Étiquette", d:"M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z" },
+  { key:"bell",  label:"Alerte",    d:"M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5S10.5 3.17 10.5 4v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" },
+  { key:"key",   label:"Accès",     d:"M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z" },
+  { key:"coffee",label:"Café",      d:"M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM2 21h18v-2H2v2z" },
+  { key:"truck", label:"Livraison", d:"M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-1.5-9l1.96 2.5H17V9.5h-.5z" },
+  { key:"search",label:"Recherche", d:"M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" },
+  { key:"share", label:"Partager",  d:"M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z" },
+  { key:"link",  label:"Lien",      d:"M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z" },
+  { key:"dl",    label:"Télécharger",d:"M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" },
+  { key:"sun",   label:"Soleil",    d:"M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm-7 6H2v-2h3v2zm17 0h-3v-2h3v2zM13 2v3h-2V2h2zm0 17v3h-2v-3h2zM6.76 5.34L4.96 3.55 3.55 4.96l1.79 1.8 1.42-1.42zm12.69 12.69l-1.79-1.8-1.42 1.42 1.8 1.79 1.41-1.41zM5.34 17.24l-1.79 1.8 1.41 1.41 1.8-1.79-1.42-1.42zM20.45 4.96l-1.41-1.41-1.8 1.79 1.42 1.42 1.79-1.8z" },
 ]
 
 // ---- Props -----------------------------------------------------------------
@@ -245,6 +257,14 @@ const BG_PRESETS: { id: string; type: "solid" | "grad"; c1: string; c2?: string 
   { id: "peach",   type: "grad",  c1: "#FFF1EB", c2: "#ACE0F9" },
   { id: "roseg",   type: "grad",  c1: "#FFF5F8", c2: "#F7C5D6" },
   { id: "charcoal",type: "grad",  c1: "#3A3D40", c2: "#181A1B" },
+  { id: "teal",    type: "solid", c1: "#0B3A3A" },
+  { id: "terra",   type: "solid", c1: "#7A2E1E" },
+  { id: "slate",   type: "solid", c1: "#1E232B" },
+  { id: "blush",   type: "solid", c1: "#F7E9E4" },
+  { id: "goldrich",type: "grad",  c1: "#D4AF37", c2: "#8A6E2F" },
+  { id: "fire",    type: "grad",  c1: "#F83600", c2: "#FE8C00" },
+  { id: "forest",  type: "grad",  c1: "#134E5E", c2: "#71B280" },
+  { id: "lavender",type: "grad",  c1: "#C9D6FF", c2: "#E2E2F0" },
 ]
 
 // Styles globaux : un clic recolore + retypographie tout le design
@@ -812,6 +832,16 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "stars3": {
         const a: fabric.Object[] = []
         ;[[0, 22, 20], [44, 0, 28], [88, 26, 17]].forEach(([x, y, s]) => a.push(new fabric.Polygon(starPts(5, s, s * 0.42), { fill: G, left: x, top: y })))
+        o = new fabric.Group(a); break
+      }
+      case "dotgrid": {
+        const a: fabric.Object[] = []
+        for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) a.push(new fabric.Circle({ radius: 6, fill: G, left: c * 28, top: r * 28 }))
+        o = new fabric.Group(a); break
+      }
+      case "chevrons": {
+        const a: fabric.Object[] = []
+        for (let i = 0; i < 3; i++) a.push(new fabric.Polyline([{ x: 0, y: 0 }, { x: 18, y: 16 }, { x: 0, y: 32 }], { fill: "", stroke: G, strokeWidth: 5, strokeLineCap: "round", strokeLineJoin: "round", left: i * 20, top: 0 }))
         o = new fabric.Group(a); break
       }
       default: o = new fabric.Polygon(starPts(4, 80, 22), { fill: G })
@@ -1901,7 +1931,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <div id="lib-cta" style={{ marginBottom: 16 }}>
                 <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Boutons CTA</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                  {["Scannez-moi", "Réservez", "Voir le menu", "Suivez-nous", "Commandez", "En savoir plus"].map(l => (
+                  {["Scannez-moi", "Réservez", "Voir le menu", "Suivez-nous", "Commandez", "En savoir plus", "Laisser un avis", "Télécharger", "S'inscrire", "Nous trouver", "Profiter de l'offre", "Prendre RDV"].map(l => (
                     <button key={l} type="button" onClick={() => addCTA(l)}
                       style={{ width: "100%", padding: "11px 0", borderRadius: 22, border: "none", cursor: "pointer", background: "linear-gradient(90deg,#C9A84C,#b8953f)", color: "#080808", fontSize: 11.5, fontWeight: 800 }}>
                       {l}
@@ -1927,7 +1957,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Badges & rubans</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                   {([
-                    ["NOUVEAU", "ribbon"], ["-20%", "ribbon"], ["PROMO", "seal"], ["TOP", "seal"], ["VIP", "seal"],
+                    ["NOUVEAU", "ribbon"], ["-20%", "ribbon"], ["-50%", "ribbon"], ["PROMO", "seal"], ["TOP", "seal"], ["VIP", "seal"], ["GRATUIT", "ribbon"], ["EXCLU", "seal"], ["★★★★★", "ribbon"],
                   ] as const).map(([l, k]) => (
                     <button key={l} type="button" onClick={() => addBadge(l, k)}
                       style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 11px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
@@ -1988,6 +2018,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     ["wave", "Vague",        <svg width="34" height="14" viewBox="0 0 34 14" key="d"><polyline points="1,11 7,3 13,11 19,3 25,11 31,3" fill="none" stroke={G} strokeWidth="2" /></svg>],
                     ["confetti", "Confettis", <svg width="26" height="24" viewBox="0 0 26 24" key="d">{[[2, 2, 12], [12, 8, -20], [20, 3, 25], [7, 15, 35], [18, 16, -15]].map(([x, y, a], i) => <rect key={i} x={x} y={y} width="4" height="8" rx="1" fill={G} transform={`rotate(${a} ${x + 2} ${y + 4})`} />)}</svg>],
                     ["stars3", "Étoiles",  <svg width="26" height="22" viewBox="0 0 26 22" key="d">{[[5, 11, 4.5], [14, 5, 6], [21, 13, 4]].map(([cx, cy, r], i) => <path key={i} d="M0 -1L0.3 -0.3L1 -0.3L0.4 0.2L0.6 1L0 0.5L-0.6 1L-0.4 0.2L-1 -0.3L-0.3 -0.3Z" fill={G} transform={`translate(${cx} ${cy}) scale(${r})`} />)}</svg>],
+                    ["dotgrid", "Grille",  <svg width="24" height="24" key="d">{[4, 11, 18].map(y => [4, 11, 18].map(x => <circle key={`${x}-${y}`} cx={x} cy={y} r="2" fill={G} />))}</svg>],
+                    ["chevrons", "Chevrons", <svg width="26" height="20" viewBox="0 0 26 20" key="d">{[2, 10, 18].map((x, i) => <polyline key={i} points={`${x},3 ${x + 7},10 ${x},17`} fill="none" stroke={G} strokeWidth="2.5" strokeLinecap="round" />)}</svg>],
                   ] as const).map(([k, label, prev]) => (
                     <button key={k} type="button" onClick={() => addDeco(k)} title={label}
                       style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "10px 2px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
