@@ -699,10 +699,17 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // ---- Poser le vrai QR ----------------------------------------------------
   function placeQr(fc: fabric.Canvas) {
     fabric.Image.fromURL(qrUrlRef.current, (img) => {
-      img.scaleToWidth(Math.round((fc.getWidth() / (fc.getZoom() || 1)) * 0.42))
+      const w = Math.round((fc.getWidth() / (fc.getZoom() || 1)) * 0.42)
+      img.scaleToWidth(w)
       ;(img as any).isQR = true
-      fc.add(img)
-      fc.viewportCenterObject(img)
+      const pad = Math.round(w * 0.07)
+      const card = new fabric.Rect({
+        width: w + pad * 2, height: w + pad * 2, rx: Math.round(w * 0.06), ry: Math.round(w * 0.06),
+        fill: "#FFFFFF", shadow: new fabric.Shadow({ color: "rgba(0,0,0,0.20)", blur: 26, offsetX: 0, offsetY: 10 }),
+      })
+      ;(card as any).isQrCard = true
+      fc.add(card); fc.add(img)
+      fc.viewportCenterObject(card); fc.viewportCenterObject(img)
       fc.setActiveObject(img)
       fc.requestRenderAll()
       refreshSel()
@@ -2453,6 +2460,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             ) : (
               <input type="color" value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"} onChange={e => setFill(e.target.value)} style={swatch} title="Couleur" />
             )}
+            {SWATCHES.slice(0, 8).map(c => (
+              <button key={c} type="button" onClick={() => setFill(c)} title={c}
+                style={{ width: 18, height: 18, borderRadius: "50%", cursor: "pointer", background: c, border: sel.fill.toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(255,255,255,0.25)", padding: 0, flexShrink: 0 }} />
+            ))}
             <span style={{ width: 1, height: 20, background: "rgba(255,255,255,0.12)" }} />
             <button type="button" style={tb} title="Dupliquer" onClick={() => layer("dup")}><Copy size={14} /></button>
             <button type="button" style={{ ...tb, color: "#FF6B6B" }} title="Supprimer" onClick={() => layer("del")}><Trash2 size={14} /></button>
