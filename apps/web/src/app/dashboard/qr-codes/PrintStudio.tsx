@@ -235,6 +235,9 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
   )
 }
 
+// Palette de couleurs rapides (pastilles cliquables)
+const SWATCHES = ["#C9A84C", "#0A0A0A", "#FFFFFF", "#F5F0E8", "#8A8478", "#C0392B", "#EA580C", "#E0B84C", "#16A34A", "#0E7490", "#1D4ED8", "#7C3AED", "#E1306C", "#6B3F2A"]
+
 // Fonds prets a l'emploi (couleurs unies + degrades) — galerie visible
 const BG_PRESETS: { id: string; type: "solid" | "grad"; c1: string; c2?: string }[] = [
   { id: "white",   type: "solid", c1: "#FFFFFF" },
@@ -2233,6 +2236,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
                 {/* Couleur (fond du groupe ou objet simple) */}
                 <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>{sel.isGroup ? "Couleur du fond" : "Couleur"}</label>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
+                  {SWATCHES.map(c => (
+                    <button key={c} type="button" onClick={() => setFill(c)} title={c}
+                      style={{ width: 22, height: 22, borderRadius: "50%", cursor: "pointer", background: c, border: sel.fill.toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(255,255,255,0.2)", padding: 0 }} />
+                  ))}
+                </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                   <input type="color" value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"}
                     onChange={e => setFill(e.target.value)}
