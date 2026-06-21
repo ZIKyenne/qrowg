@@ -203,13 +203,18 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"contact-clair", label:"Carte contact — Clair",obj:"Contact",emoji:"💳", desc:"Fond clair, sobre",                      bg:"#F7F9FC", ink:"#0F2540", accent:"#1D4ED8" },
   { id:"decouvrir",     label:"Découvrir",          obj:"Page",     emoji:"🔗", desc:"Invitation simple à scanner",            bg:"#FFFFFF", ink:"#1A1A1A", accent:"#1D4ED8" },
   { id:"decouvrir-or",  label:"Découvrir — Or",     obj:"Page",     emoji:"🔗", desc:"Fond sombre, accent or",                 bg:"#0B0805", ink:"#F4E7C4", accent:"#D4AF37" },
+  { id:"avis-band",     label:"Avis — Bandeau",     obj:"Avis",     emoji:"⭐", desc:"Grand bandeau en-tête doré",              bg:"#1A1206", ink:"#F4E7C4", accent:"#D4AF37" },
+  { id:"reserver-band", label:"Réservation — Bandeau", obj:"Réserver", emoji:"📅", desc:"Bandeau d'en-tête, accent teal",       bg:"#0E1B2A", ink:"#EAF2FF", accent:"#2DD4BF" },
+  { id:"insta-band",    label:"Instagram — Bandeau",obj:"Abonnés",  emoji:"📷", desc:"Grand bandeau rose",                    bg:"#15101C", ink:"#FBEAF4", accent:"#E1306C" },
+  { id:"contact-band",  label:"Contact — Bandeau",  obj:"Contact",  emoji:"💳", desc:"Bandeau d'en-tête bleu",                bg:"#0F1729", ink:"#F1F5FF", accent:"#5B8DEF" },
+  { id:"decouvrir-band",label:"Découvrir — Bandeau",obj:"Page",     emoji:"🔗", desc:"Bandeau d'en-tête vert",                bg:"#10130F", ink:"#EAF4E6", accent:"#16A34A" },
 ]
 
 // Mini-apercu schematique d'un modele (fond + couleurs + disposition)
 function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
-  const isMenu = t.id.startsWith("menu")
-  const isContact = t.id.startsWith("contact")
-  const isAvis = t.id.startsWith("avis")
+  const isMenu = t.id.startsWith("menu") || t.id.endsWith("-band")
+  const isContact = t.id === "contact" || t.id === "contact-clair"
+  const isAvis = t.id.startsWith("avis") && !t.id.endsWith("-band")
   const starClip = "polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)"
   return (
     <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", background: t.bg, borderRadius: 6, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", gap: "6%", padding: isMenu ? "0 10% 12%" : "13% 10%", boxSizing: "border-box" }}>
@@ -1333,6 +1338,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       })
     })
     const ICON = (k: string) => LIB_ICONS.find(i => i.key === k)!.d
+    // Mise en page "bandeau" : grand en-tete colore + QR + CTA
+    const bandLayout = async (title: string, subtitle: string, cta: string) => {
+      fc.add(new fabric.Rect({ left: 0, top: 0, width: W, height: Math.round(H * 0.30), fill: accent }))
+      addText(title, H * 0.085, W * 0.08, { weight: "bold", fill: readableOn(accent), role: "title" })
+      addText(subtitle, H * 0.205, W * 0.032, { font: "Arial", fill: readableOn(accent), role: "subtitle" })
+      await placeQrT(H * 0.40, 0.46)
+      addCTA(cta, H * 0.86)
+    }
 
     // Donnees reelles (deja saisies cote QRStudio) ; sinon placeholders
     const name    = (prefill?.name ?? "").trim()
@@ -1393,6 +1406,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         await placeQrT(H * 0.3, 0.5)
         addCTA("En savoir plus", H * 0.85)
         break
+      case "avis-band":      await bandLayout("Votre avis ?", "Aidez-nous en 30 secondes", "Donner mon avis"); break
+      case "reserver-band":  await bandLayout("Réservez", "Votre table en 1 clic", "Réserver"); break
+      case "insta-band":     await bandLayout("Suivez-nous", "@votrecompte", "Nous suivre"); break
+      case "contact-band":   await bandLayout("Mes coordonnées", "Scannez pour me contacter", "Enregistrer"); break
+      case "decouvrir-band": await bandLayout("Découvrez-nous", "Tout est ici", "En savoir plus"); break
     }
 
     if (vG) fc.bringToFront(vG)
