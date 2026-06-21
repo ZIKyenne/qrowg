@@ -226,6 +226,12 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"insta-hero",    label:"Instagram — QR géant",obj:"Abonnés", emoji:"📷", desc:"Minimal, QR dominant",                  bg:"#FFFFFF", ink:"#2A0A18", accent:"#E1306C" },
   { id:"contact-hero",  label:"Contact — QR géant", obj:"Contact",  emoji:"💳", desc:"Minimal sombre, QR dominant",          bg:"#0F1729", ink:"#F1F5FF", accent:"#5B8DEF" },
   { id:"decouvrir-hero",label:"Découvrir — QR géant",obj:"Page",    emoji:"🔗", desc:"Minimal sombre, QR dominant",          bg:"#0B0805", ink:"#F4E7C4", accent:"#D4AF37" },
+  { id:"avis-diag",     label:"Avis — Diagonale",   obj:"Avis",     emoji:"⭐", desc:"Bandeau en biais, dynamique",          bg:"#0B0805", ink:"#F4E7C4", accent:"#D4AF37" },
+  { id:"menu-diag",     label:"Menu — Diagonale",   obj:"Menu",     emoji:"🍽️", desc:"Bandeau en biais, chaleureux",         bg:"#FFF6EC", ink:"#3A2316", accent:"#C0392B" },
+  { id:"reserver-diag", label:"Réservation — Diagonale",obj:"Réserver",emoji:"📅",desc:"Bandeau en biais, vert",            bg:"#06231C", ink:"#EAF7F0", accent:"#34D399" },
+  { id:"insta-diag",    label:"Instagram — Diagonale",obj:"Abonnés",emoji:"📷", desc:"Bandeau en biais, rose",              bg:"#1A0A14", ink:"#FFF0F6", accent:"#E1306C" },
+  { id:"contact-diag",  label:"Contact — Diagonale",obj:"Contact",  emoji:"💳", desc:"Bandeau en biais, bleu",              bg:"#0F1729", ink:"#F1F5FF", accent:"#5B8DEF" },
+  { id:"decouvrir-diag",label:"Découvrir — Diagonale",obj:"Page",   emoji:"🔗", desc:"Bandeau en biais, violet",            bg:"#FFFFFF", ink:"#1A1A1A", accent:"#7C3AED" },
 ]
 
 // Mini-apercu schematique d'un modele (fond + couleurs + disposition)
@@ -236,10 +242,12 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
   const isFrame = t.id.endsWith("-frame")
   const isFooter = t.id.endsWith("-footer")
   const isHero = t.id.endsWith("-hero")
+  const isDiag = t.id.endsWith("-diag")
   const starClip = "polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)"
   return (
     <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", background: t.bg, borderRadius: 6, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", gap: "6%", padding: isMenu ? "0 10% 12%" : "13% 10%", boxSizing: "border-box" }}>
       {isFrame && <div style={{ position: "absolute", inset: "7%", border: `1.5px solid ${t.accent}`, borderRadius: 4, pointerEvents: "none" }} />}
+      {isDiag && <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "32%", background: t.accent, clipPath: "polygon(0 0,100% 0,100% 55%,0 100%)" }} />}
       {isMenu && <div style={{ width: "100%", height: "18%", background: t.accent, marginBottom: "8%" }} />}
       <div style={{ width: "68%", height: 5, borderRadius: 3, background: t.ink, opacity: 0.92 }} />
       {isAvis ? (
@@ -1395,6 +1403,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       addText(subtitle, H * 0.80, W * 0.034, { font: "Arial", role: "subtitle" })
       addText(cta, H * 0.87, W * 0.04, { weight: "bold", fill: accent })
     }
+    // Mise en page "diagonale" : bandeau d'accent en biais en haut
+    const diagLayout = async (title: string, subtitle: string, cta: string) => {
+      fc.add(new fabric.Polygon([{ x: 0, y: 0 }, { x: W, y: 0 }, { x: W, y: H * 0.22 }, { x: 0, y: H * 0.34 }], { fill: accent }))
+      addText(title, H * 0.085, W * 0.072, { weight: "bold", fill: readableOn(accent), role: "title" })
+      addText(subtitle, H * 0.42, W * 0.032, { font: "Arial", role: "subtitle" })
+      await placeQrT(H * 0.48, 0.44)
+      addCTA(cta, H * 0.86)
+    }
 
     // Donnees reelles (deja saisies cote QRStudio) ; sinon placeholders
     const name    = (prefill?.name ?? "").trim()
@@ -1478,6 +1494,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "insta-hero":     await heroLayout("Suivez-nous", "Scannez pour nous suivre", "@votrecompte"); break
       case "contact-hero":   await heroLayout(name || "Mon contact", "Scannez ma carte", ""); break
       case "decouvrir-hero": await heroLayout("Scannez-moi", "Pour tout découvrir", ""); break
+      case "avis-diag":      await diagLayout("Vous avez aimé ?", "Laissez-nous un avis", "Donner mon avis"); break
+      case "menu-diag":      await diagLayout(name || "Notre Carte", "Scannez pour la carte", "Voir le menu"); break
+      case "reserver-diag":  await diagLayout("Réservez votre table", "En quelques secondes", "Réserver"); break
+      case "insta-diag":     await diagLayout("Suivez-nous", "@votrecompte", "Nous suivre"); break
+      case "contact-diag":   await diagLayout(name || "Mes coordonnées", "Scannez pour me contacter", "Enregistrer"); break
+      case "decouvrir-diag": await diagLayout("Découvrez-nous", "Scannez pour en savoir plus", "En savoir plus"); break
     }
 
     if (vG) fc.bringToFront(vG)
