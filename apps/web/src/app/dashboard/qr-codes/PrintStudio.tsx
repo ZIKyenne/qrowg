@@ -214,6 +214,12 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"insta-frame",   label:"Instagram — Cadre",  obj:"Abonnés",  emoji:"📷", desc:"Cadre rose sur fond clair",            bg:"#FFF5F8", ink:"#2A0A18", accent:"#E1306C" },
   { id:"contact-frame", label:"Contact — Cadre",    obj:"Contact",  emoji:"💳", desc:"Cadre or, premium",                    bg:"#0F1729", ink:"#F1F5FF", accent:"#C9A84C" },
   { id:"decouvrir-frame",label:"Découvrir — Cadre", obj:"Page",     emoji:"🔗", desc:"Cadre bleu, minimal",                  bg:"#FFFFFF", ink:"#1A1A1A", accent:"#1D4ED8" },
+  { id:"avis-footer",    label:"Avis — Footer",      obj:"Avis",     emoji:"⭐", desc:"Barre d'appel en bas",                  bg:"#FFFDF7", ink:"#2A2419", accent:"#C0392B" },
+  { id:"menu-footer",    label:"Menu — Footer",      obj:"Menu",     emoji:"🍽️", desc:"Footer doré sur fond sombre",           bg:"#101010", ink:"#F5F0E8", accent:"#C9A84C" },
+  { id:"reserver-footer",label:"Réservation — Footer",obj:"Réserver",emoji:"📅", desc:"Footer bleu, pro",                      bg:"#F3F7FB", ink:"#0F2540", accent:"#1D4ED8" },
+  { id:"insta-footer",   label:"Instagram — Footer", obj:"Abonnés",  emoji:"📷", desc:"Footer rose",                          bg:"#FFF7FB", ink:"#2A0A18", accent:"#E1306C" },
+  { id:"contact-footer", label:"Contact — Footer",   obj:"Contact",  emoji:"💳", desc:"Footer teal",                          bg:"#0E1B2A", ink:"#EAF2FF", accent:"#2DD4BF" },
+  { id:"decouvrir-footer",label:"Découvrir — Footer",obj:"Page",     emoji:"🔗", desc:"Footer or sur fond sombre",            bg:"#0B0805", ink:"#F4E7C4", accent:"#D4AF37" },
 ]
 
 // Mini-apercu schematique d'un modele (fond + couleurs + disposition)
@@ -222,6 +228,7 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
   const isContact = t.id === "contact" || t.id === "contact-clair"
   const isAvis = t.id.startsWith("avis") && !t.id.endsWith("-band")
   const isFrame = t.id.endsWith("-frame")
+  const isFooter = t.id.endsWith("-footer")
   const starClip = "polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)"
   return (
     <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", background: t.bg, borderRadius: 6, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", gap: "6%", padding: isMenu ? "0 10% 12%" : "13% 10%", boxSizing: "border-box" }}>
@@ -241,9 +248,10 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
           <div style={{ width: "82%", height: 3, borderRadius: 2, background: t.ink, opacity: 0.7 }} />
           <div style={{ width: "64%", height: 3, borderRadius: 2, background: t.ink, opacity: 0.7 }} />
         </div>
-      ) : (
+      ) : isFooter ? null : (
         <div style={{ width: "56%", height: 8, borderRadius: 5, background: t.accent, marginTop: "6%" }} />
       )}
+      {isFooter && <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: "20%", background: t.accent }} />}
     </div>
   )
 }
@@ -1365,6 +1373,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       await placeQrT(H * 0.36, 0.44)
       addCTA(cta, H * 0.82)
     }
+    // Mise en page "footer" : titre + QR en haut, barre coloree en bas avec le CTA
+    const footerLayout = async (title: string, subtitle: string, cta: string) => {
+      addText(title, H * 0.075, W * 0.078, { weight: "bold", role: "title" })
+      addText(subtitle, H * 0.175, W * 0.032, { font: "Arial", role: "subtitle" })
+      await placeQrT(H * 0.30, 0.46)
+      fc.add(new fabric.Rect({ left: 0, top: Math.round(H * 0.82), width: W, height: Math.round(H * 0.18), fill: accent }))
+      addText(cta, H * 0.875, W * 0.05, { weight: "bold", fill: readableOn(accent) })
+    }
 
     // Donnees reelles (deja saisies cote QRStudio) ; sinon placeholders
     const name    = (prefill?.name ?? "").trim()
@@ -1436,6 +1452,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "insta-frame":     await frameLayout("Suivez-nous", "@votrecompte", "Nous suivre"); break
       case "contact-frame":   await frameLayout(name || "Mes coordonnées", "Scannez pour me contacter", "Enregistrer"); break
       case "decouvrir-frame": await frameLayout("Découvrez-nous", "Scannez pour en savoir plus", "En savoir plus"); break
+      case "avis-footer":      await footerLayout("Vous avez aimé ?", "Votre avis compte", "Donner mon avis →"); break
+      case "menu-footer":      await footerLayout(name || "Notre Carte", "Tous nos plats", "Voir le menu →"); break
+      case "reserver-footer":  await footerLayout("Réservez votre table", "En quelques secondes", "Réserver →"); break
+      case "insta-footer":     await footerLayout("Suivez-nous", "@votrecompte", "Nous suivre →"); break
+      case "contact-footer":   await footerLayout(name || "Mes coordonnées", "Restons en contact", "Me contacter →"); break
+      case "decouvrir-footer": await footerLayout("Découvrez-nous", "Scannez pour explorer", "En savoir plus →"); break
     }
 
     if (vG) fc.bringToFront(vG)
