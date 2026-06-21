@@ -220,6 +220,12 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"insta-footer",   label:"Instagram — Footer", obj:"Abonnés",  emoji:"📷", desc:"Footer rose",                          bg:"#FFF7FB", ink:"#2A0A18", accent:"#E1306C" },
   { id:"contact-footer", label:"Contact — Footer",   obj:"Contact",  emoji:"💳", desc:"Footer teal",                          bg:"#0E1B2A", ink:"#EAF2FF", accent:"#2DD4BF" },
   { id:"decouvrir-footer",label:"Découvrir — Footer",obj:"Page",     emoji:"🔗", desc:"Footer or sur fond sombre",            bg:"#0B0805", ink:"#F4E7C4", accent:"#D4AF37" },
+  { id:"avis-hero",     label:"Avis — QR géant",    obj:"Avis",     emoji:"⭐", desc:"Minimal, QR dominant",                  bg:"#FFFFFF", ink:"#1A1A1A", accent:"#C0392B" },
+  { id:"menu-hero",     label:"Menu — QR géant",    obj:"Menu",     emoji:"🍽️", desc:"Minimal sombre, QR dominant",           bg:"#0E0E0E", ink:"#F5F0E8", accent:"#C9A84C" },
+  { id:"reserver-hero", label:"Réservation — QR géant",obj:"Réserver",emoji:"📅",desc:"Minimal, QR dominant",                 bg:"#FFFFFF", ink:"#0F2540", accent:"#0E7A5F" },
+  { id:"insta-hero",    label:"Instagram — QR géant",obj:"Abonnés", emoji:"📷", desc:"Minimal, QR dominant",                  bg:"#FFFFFF", ink:"#2A0A18", accent:"#E1306C" },
+  { id:"contact-hero",  label:"Contact — QR géant", obj:"Contact",  emoji:"💳", desc:"Minimal sombre, QR dominant",          bg:"#0F1729", ink:"#F1F5FF", accent:"#5B8DEF" },
+  { id:"decouvrir-hero",label:"Découvrir — QR géant",obj:"Page",    emoji:"🔗", desc:"Minimal sombre, QR dominant",          bg:"#0B0805", ink:"#F4E7C4", accent:"#D4AF37" },
 ]
 
 // Mini-apercu schematique d'un modele (fond + couleurs + disposition)
@@ -229,6 +235,7 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
   const isAvis = t.id.startsWith("avis") && !t.id.endsWith("-band")
   const isFrame = t.id.endsWith("-frame")
   const isFooter = t.id.endsWith("-footer")
+  const isHero = t.id.endsWith("-hero")
   const starClip = "polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)"
   return (
     <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", background: t.bg, borderRadius: 6, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", gap: "6%", padding: isMenu ? "0 10% 12%" : "13% 10%", boxSizing: "border-box" }}>
@@ -242,7 +249,7 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
       ) : (
         <div style={{ width: "38%", height: 4, borderRadius: 2, background: t.accent }} />
       )}
-      <div style={{ width: "44%", aspectRatio: "1", background: "#fff", borderRadius: 3, marginTop: "2%" }} />
+      <div style={{ width: isHero ? "66%" : "44%", aspectRatio: "1", background: "#fff", borderRadius: 3, marginTop: "2%" }} />
       {isContact ? (
         <div style={{ display: "flex", flexDirection: "column", gap: 5, width: "72%", alignItems: "center", marginTop: "5%" }}>
           <div style={{ width: "82%", height: 3, borderRadius: 2, background: t.ink, opacity: 0.7 }} />
@@ -1381,6 +1388,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       fc.add(new fabric.Rect({ left: 0, top: Math.round(H * 0.82), width: W, height: Math.round(H * 0.18), fill: accent }))
       addText(cta, H * 0.875, W * 0.05, { weight: "bold", fill: readableOn(accent) })
     }
+    // Mise en page "QR geant" : minimal, QR dominant
+    const heroLayout = async (title: string, subtitle: string, cta: string) => {
+      addText(title, H * 0.10, W * 0.062, { weight: "bold", role: "title" })
+      await placeQrT(H * 0.24, 0.60)
+      addText(subtitle, H * 0.80, W * 0.034, { font: "Arial", role: "subtitle" })
+      addText(cta, H * 0.87, W * 0.04, { weight: "bold", fill: accent })
+    }
 
     // Donnees reelles (deja saisies cote QRStudio) ; sinon placeholders
     const name    = (prefill?.name ?? "").trim()
@@ -1458,6 +1472,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "insta-footer":     await footerLayout("Suivez-nous", "@votrecompte", "Nous suivre →"); break
       case "contact-footer":   await footerLayout(name || "Mes coordonnées", "Restons en contact", "Me contacter →"); break
       case "decouvrir-footer": await footerLayout("Découvrez-nous", "Scannez pour explorer", "En savoir plus →"); break
+      case "avis-hero":      await heroLayout("Vous avez aimé ?", "Scannez pour laisser un avis", "MERCI 🙏"); break
+      case "menu-hero":      await heroLayout(name || "Notre Carte", "Scannez pour voir le menu", "BON APPÉTIT"); break
+      case "reserver-hero":  await heroLayout("Réservez", "Scannez pour réserver", "À BIENTÔT"); break
+      case "insta-hero":     await heroLayout("Suivez-nous", "Scannez pour nous suivre", "@votrecompte"); break
+      case "contact-hero":   await heroLayout(name || "Mon contact", "Scannez ma carte", ""); break
+      case "decouvrir-hero": await heroLayout("Scannez-moi", "Pour tout découvrir", ""); break
     }
 
     if (vG) fc.bringToFront(vG)
