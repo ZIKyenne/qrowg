@@ -1369,6 +1369,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       })
     })
     const ICON = (k: string) => LIB_ICONS.find(i => i.key === k)!.d
+    // Filet d'accent (divider) centre, sous un titre
+    const rule = (top: number) => fc.add(new fabric.Rect({ width: Math.round(W * 0.13), height: Math.max(3, Math.round(W * 0.007)), rx: 2, ry: 2, fill: accent, originX: "center", left: W / 2, top }))
     // Mise en page "bandeau" : grand en-tete colore + QR + CTA
     const bandLayout = async (title: string, subtitle: string, cta: string) => {
       fc.add(new fabric.Rect({ left: 0, top: 0, width: W, height: Math.round(H * 0.30), fill: accent }))
@@ -1442,7 +1444,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         brand(H * 0.015)
         await addIconT(ICON("cal"), W * 0.14, H * 0.07, accent)
         addText("Réservez votre table", H * 0.2, W * 0.07, { weight: "bold", role: "title" })
-        addText("En quelques secondes, où que vous soyez", H * 0.28, W * 0.032, { font: "Arial", width: W * 0.72, role: "subtitle" })
+        rule(H * 0.255)
+        addText("En quelques secondes, où que vous soyez", H * 0.285, W * 0.032, { font: "Arial", width: W * 0.72, role: "subtitle" })
         await placeQrT(H * 0.38, 0.44)
         addCTA("Réservez", H * 0.85)
         break
@@ -1458,7 +1461,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "contact":
       case "contact-clair":
         addText(name || "Prénom Nom", H * 0.09, W * 0.08, { weight: "bold", role: "title" })
-        addText("Votre métier", H * 0.18, W * 0.036, { font: "Arial", fill: accent, role: "subtitle" })
+        rule(H * 0.16)
+        addText("Votre métier", H * 0.185, W * 0.036, { font: "Arial", fill: accent, role: "subtitle" })
         await placeQrT(H * 0.28, 0.5)
         addText(`📞  ${phone || "06 12 34 56 78"}`, H * 0.76, W * 0.034, { font: "Arial", role: "phone" })
         addText(`🌐  ${website || "monsite.fr"}`, H * 0.83, W * 0.034, { font: "Arial", role: "website" })
@@ -1467,7 +1471,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "decouvrir-or":
         brand(H * 0.035)
         addText("Découvrez-nous", H * 0.1, W * 0.08, { weight: "bold", role: "title" })
-        addText("Scannez pour en savoir plus", H * 0.19, W * 0.034, { font: "Arial", role: "subtitle" })
+        rule(H * 0.165)
+        addText("Scannez pour en savoir plus", H * 0.195, W * 0.034, { font: "Arial", role: "subtitle" })
         await placeQrT(H * 0.3, 0.5)
         addCTA("En savoir plus", H * 0.85)
         break
