@@ -2226,6 +2226,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     {sel.textFill !== null && (
                       <>
                         <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Couleur du texte</label>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
+                          {SWATCHES.map(c => (
+                            <button key={c} type="button" onClick={() => setTextColor(c)} title={c}
+                              style={{ width: 22, height: 22, borderRadius: "50%", cursor: "pointer", background: c, border: (sel.textFill ?? "").toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(255,255,255,0.2)", padding: 0 }} />
+                          ))}
+                        </div>
                         <input type="color" value={/^#/.test(sel.textFill) ? sel.textFill : "#080808"}
                           onChange={e => setTextColor(e.target.value)}
                           style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
