@@ -159,7 +159,7 @@ function groupText(o: fabric.Object | undefined | null): fabric.Text | null {
 }
 
 const TOJSON_PROPS = [
-  "isQR", "name", "role",
+  "isQR", "name", "role", "isQrCard",
   "lockMovementX", "lockMovementY",
   "lockScalingX", "lockScalingY",
   "lockRotation", "selectable", "evented",
@@ -1222,7 +1222,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     setBgGrad(false); fc.setBackgroundColor(s.bg, () => {}); setBgColor(s.bg)
     const isTxt = (t?: string) => t === "i-text" || t === "text" || t === "textbox"
     fc.getObjects().forEach(o => {
-      if ((o as any).isGuide || (o as any).isQR) return
+      if ((o as any).isGuide || (o as any).isQR || (o as any).isQrCard) return
       if (isTxt(o.type)) {
         ;(o as fabric.IText).set({ fontFamily: (o as any).role === "title" ? s.titleFont : s.bodyFont, fill: s.ink })
       } else if (o.type === "group") {
@@ -1308,8 +1308,18 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     })
     const placeQrT = (top: number, wFrac: number) => new Promise<void>(res => {
       fabric.Image.fromURL(qrUrlRef.current, (img) => {
-        img.scaleToWidth(W * wFrac); (img as any).isQR = true
-        img.set({ originX: "center", originY: "top", left: W / 2, top }); fc.add(img); res()
+        const w = W * wFrac
+        img.scaleToWidth(w); (img as any).isQR = true
+        img.set({ originX: "center", originY: "top", left: W / 2, top })
+        // carte blanche derriere le QR (look premium + zone de silence pour le scan)
+        const pad = Math.round(w * 0.07)
+        const card = new fabric.Rect({
+          width: w + pad * 2, height: w + pad * 2, rx: Math.round(w * 0.06), ry: Math.round(w * 0.06),
+          fill: "#FFFFFF", originX: "center", originY: "top", left: W / 2, top: top - pad,
+          shadow: new fabric.Shadow({ color: "rgba(0,0,0,0.20)", blur: 26, offsetX: 0, offsetY: 10 }),
+        })
+        ;(card as any).isQrCard = true
+        fc.add(card); fc.add(img); res()
       })
     })
     const ICON = (k: string) => LIB_ICONS.find(i => i.key === k)!.d
