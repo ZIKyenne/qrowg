@@ -1394,9 +1394,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   }
 
   // ---- Sauvegarde ----------------------------------------------------------
-  const save = async () => {
+  const save = async (silent = false) => {
     const fc = fcRef.current; if (!fc) return
-    setSaving(true); setSaved(false)
+    if (!silent) { setSaving(true); setSaved(false) }
     try {
       // ne pas serialiser les guides (excludeFromExport ne suffit pas pour toJSON)
       const vG = vGuideRef.current, hG = hGuideRef.current
@@ -1415,11 +1415,19 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       setSaved(true)
       setTimeout(() => setSaved(false), 2200)
     } catch (e) {
-      alert("Sauvegarde impossible : " + (e as Error).message)
+      if (!silent) alert("Sauvegarde impossible : " + (e as Error).message)
     } finally {
-      setSaving(false)
+      if (!silent) setSaving(false)
     }
   }
+
+  // Auto-sauvegarde : 2,5 s apres la derniere modification (silencieuse)
+  useEffect(() => {
+    if (loading || histRef.current.i < 1) return
+    const t = setTimeout(() => { save(true) }, 2500)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [histVer, loading])
 
   // ---- Export --------------------------------------------------------------
   const prepExport = (fc: fabric.Canvas) => {
@@ -1643,7 +1651,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             <Redo2 size={15} />
           </button>
 
-          <button type="button" onClick={save} disabled={saving} style={topBtn(false)}>
+          <button type="button" onClick={() => save()} disabled={saving} style={topBtn(false)}>
             {saving ? <Loader2 size={13} style={{ animation: "spin 0.8s linear infinite" }} />
               : saved ? <Check size={13} color="#39FF8F" /> : <Save size={13} />}
             {saved ? "Enregistré" : "Enregistrer"}
@@ -1759,7 +1767,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                         </div>
                       </>
                     )}
-                    <button type="button" onClick={save} disabled={saving}
+                    <button type="button" onClick={() => save()} disabled={saving}
                       style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "11px", marginBottom: 8, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, color: INK, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                       <Save size={14} /> {saved ? "Enregistré ✓" : "Enregistrer"}
                     </button>
