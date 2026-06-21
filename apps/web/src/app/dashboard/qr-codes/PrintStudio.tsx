@@ -819,7 +819,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     centerObj(o)
   }
   // Ouvrir la bibliotheque sur un onglet donne (depuis le rail)
-  const openLib = (c: typeof libCat) => { setLibCat(c); setLibOpen(true); setTplOpen(false); setSide("") }
+  const openLib = (c: typeof libCat) => {
+    setLibCat(c); setLibOpen(true); setTplOpen(false); setSide("")
+    setTimeout(() => document.getElementById("lib-" + c)?.scrollIntoView({ behavior: "smooth", block: "start" }), 70)
+  }
   // Ouvrir / fermer un panneau lateral (calques / fond)
   const openSide = (s: "layers" | "bg" | "styles") => { setSide(prev => prev === s ? "" : s); setLibOpen(false); setTplOpen(false) }
   // Bouton CTA (pilule dimensionnee au texte)
@@ -1826,32 +1829,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               </button>
             </div>
 
-            {/* Onglets categories */}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 4, padding: "8px 10px", flexShrink: 0 }}>
-              {([
-                ["text",   "Texte",   <TypeIcon size={12} key="i" />],
-                ["shapes", "Formes",  <Shapes size={12} key="i" />],
-                ["lines",  "Lignes",  <Minus size={12} key="i" />],
-                ["frames", "Cadres",  <Square size={12} key="i" />],
-                ["cta",    "CTA",     <MousePointerClick size={12} key="i" />],
-                ["icons",  "Icônes",  <Star size={12} key="i" />],
-                ["badges", "Badges",  <Award size={12} key="i" />],
-                ["arrows", "Flèches", <ArrowRight size={12} key="i" />],
-                ["deco",   "Déco",    <Sparkles size={12} key="i" />],
-              ] as const).map(([id, label, icon]) => {
-                const on = libCat === id
-                return (
-                  <button key={id} type="button" onClick={() => setLibCat(id)}
-                    style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 8px", borderRadius: 7, cursor: "pointer", fontSize: 10, fontWeight: on ? 700 : 500, background: on ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? G : "rgba(255,255,255,0.07)"}`, color: on ? G : MUTED }}>
-                    {icon} {label}
-                  </button>
-                )
-              })}
-            </div>
-
-            <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "4px 10px 16px" }}>
+            <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "10px 10px 16px" }}>
               {/* Texte */}
-              {libCat === "text" && (
+              <div id="lib-text" style={{ marginBottom: 16 }}>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Texte</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                   {([
                     { text: "Titre", size: 54, weight: "bold", font: "Cormorant Garamond", label: "Titre", pv: 22 },
@@ -1866,9 +1847,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     </button>
                   ))}
                 </div>
-              )}
+              </div>
               {/* Lignes & separateurs */}
-              {libCat === "lines" && (
+              <div id="lib-lines" style={{ marginBottom: 16 }}>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Lignes</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                   {([
                     ["solid", "Pleine", { sw: 2 }], ["thick", "Épaisse", { sw: 5 }], ["thin", "Fine", { sw: 1 }],
@@ -1896,9 +1878,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     </button>
                   ))}
                 </div>
-              )}
+              </div>
               {/* Cadres */}
-              {libCat === "frames" && (
+              <div id="lib-frames" style={{ marginBottom: 16 }}>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Cadres</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                   {([
                     ["filet", "Filet", 1, 0], ["thick", "Épais", 3, 0], ["double", "Double", 1, 0], ["rounded", "Arrondi", 2, 6],
@@ -1913,9 +1896,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     </button>
                   ))}
                 </div>
-              )}
+              </div>
               {/* CTA */}
-              {libCat === "cta" && (
+              <div id="lib-cta" style={{ marginBottom: 16 }}>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Boutons CTA</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                   {["Scannez-moi", "Réservez", "Voir le menu", "Suivez-nous", "Commandez", "En savoir plus"].map(l => (
                     <button key={l} type="button" onClick={() => addCTA(l)}
@@ -1924,9 +1908,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     </button>
                   ))}
                 </div>
-              )}
+              </div>
               {/* Icones */}
-              {libCat === "icons" && (
+              <div id="lib-icons" style={{ marginBottom: 16 }}>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Icônes</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
                   {LIB_ICONS.map(ic => (
                     <button key={ic.key} type="button" onClick={() => addIcon(ic.d)} title={ic.label}
@@ -1936,9 +1921,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     </button>
                   ))}
                 </div>
-              )}
+              </div>
               {/* Badges & rubans */}
-              {libCat === "badges" && (
+              <div id="lib-badges" style={{ marginBottom: 16 }}>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Badges & rubans</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                   {([
                     ["NOUVEAU", "ribbon"], ["-20%", "ribbon"], ["PROMO", "seal"], ["TOP", "seal"], ["VIP", "seal"],
@@ -1950,9 +1936,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     </button>
                   ))}
                 </div>
-              )}
+              </div>
               {/* Formes */}
-              {libCat === "shapes" && (
+              <div id="lib-shapes" style={{ marginBottom: 16 }}>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Formes</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
                   {([
                     ["rrect", "Rectangle", <svg width="30" height="22" key="s"><rect x="2" y="3" width="26" height="16" rx="4" fill={G} /></svg>],
@@ -1975,9 +1962,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     </button>
                   ))}
                 </div>
-              )}
+              </div>
               {/* Fleches */}
-              {libCat === "arrows" && (
+              <div id="lib-arrows" style={{ marginBottom: 16 }}>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Flèches</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                   {([["→", 0], ["↓", 90], ["←", 180], ["↑", 270]] as const).map(([sym, ang]) => (
                     <button key={ang} type="button" onClick={() => addArrow(ang)}
@@ -1987,9 +1975,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   ))}
                   <p style={{ gridColumn: "1 / 3", color: MUTED, fontSize: 9, margin: "2px 0 0", lineHeight: 1.4 }}>Astuce : fais pointer une flèche vers ton QR pour guider le scan.</p>
                 </div>
-              )}
+              </div>
               {/* Decorations */}
-              {libCat === "deco" && (
+              <div id="lib-deco" style={{ marginBottom: 4 }}>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Décorations</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
                   {([
                     ["sparkle", "Étincelle", <svg width="24" height="24" viewBox="0 0 24 24" key="d"><path d="M12 2l2 8 8 2-8 2-2 8-2-8-8-2 8-2z" fill={G} /></svg>],
@@ -2007,7 +1996,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     </button>
                   ))}
                 </div>
-              )}
+              </div>
             </div>
           </div>
         )}
