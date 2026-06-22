@@ -159,6 +159,7 @@ type SelState = {
   isGroupObj: boolean     // un vrai groupe (degroupable)
   multi: boolean          // selection multiple (groupable)
   isQr: boolean           // l'objet selectionne est le QR (regenerable)
+  isImage: boolean        // image (photo/logo) -> filtres disponibles
 } | null
 
 // Trouve l'objet texte dans un groupe (CTA / badge), s'il y en a un
@@ -610,6 +611,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       isGroupObj: o.type === "group",
       multi: o.type === "activeSelection",
       isQr: !!(o as any).isQR,
+      isImage: o.type === "image" && !(o as any).isQR,
     }
   }, [])
 
@@ -1185,6 +1187,26 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       if (vG) fc.bringToFront(vG); if (hG) fc.bringToFront(hG)
       fc.requestRenderAll(); pushHistorySoon(); setLayersVer(v => v + 1)
     }, { crossOrigin: "anonymous" })
+  }
+  // Filtres photo (toggle) sur l'image selectionnee
+  const toggleFilter = (key: string) => {
+    const fc = fcRef.current; if (!fc) return
+    const o = fc.getActiveObject() as fabric.Image | undefined
+    if (!o || o.type !== "image") return
+    const F = (fabric.Image as any).filters
+    const filters = ((o.filters || []) as any[])
+    const has = filters.some(f => f.__k === key)
+    let next = filters.filter(f => f.__k !== key)
+    if (!has) {
+      let f: any
+      if (key === "dark") f = new F.Brightness({ brightness: -0.3 })
+      else if (key === "gray") f = new F.Grayscale()
+      else if (key === "blur") f = new F.Blur({ blur: 0.18 })
+      else if (key === "duo") f = new F.BlendColor({ color: G, mode: "tint", alpha: 0.5 })
+      if (f) { f.__k = key; next = [...next, f] }
+    }
+    o.filters = next as any
+    o.applyFilters(); fc.requestRenderAll(); pushHistorySoon()
   }
   // Bouton CTA (pilule dimensionnee au texte)
   const addCTA = (label: string) => {
@@ -3166,6 +3188,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               ) : (
                 <span style={{ color: MUTED, fontSize: 10.5 }}>QR — glisse les poignées pour redimensionner</span>
               )
+            ) : sel.isImage ? (
+              <>
+                <span style={{ color: MUTED, fontSize: 10, fontWeight: 700, marginRight: 1 }}>Photo</span>
+                {([["dark", "Foncé"], ["gray", "N&B"], ["blur", "Flou"], ["duo", "Teinte"]] as const).map(([k, label]) => (
+                  <button key={k} type="button" style={{ ...tb, fontSize: 11 }} title={`Filtre : ${label}`} onClick={() => toggleFilter(k)}>{label}</button>
+                ))}
+              </>
             ) : (<>
             {sel.isText ? (
               <>
