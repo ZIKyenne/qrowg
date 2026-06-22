@@ -333,11 +333,17 @@ const START_GOALS: { pool: string[]; emoji: string; label: string; desc: string 
   { pool: ["promo-premium", "decouvrir-photo", "event-ornate", "decouvrir-or"],  emoji: "🏷️", label: "Mettre en avant une offre", desc: "Promo, nouveauté…" },
 ]
 
-// Mini-apercu schematique d'un modele (fond + couleurs + disposition)
-function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
+// Photo representative par objectif (pour les vignettes de galerie) — 6 requetes max, mises en cache
+const OBJ_PHOTO_Q: Record<string, string> = {
+  "Avis": "happy customer cafe", "Menu": "gourmet food plate", "Réserver": "restaurant interior",
+  "Abonnés": "lifestyle aesthetic", "Contact": "modern office desk", "Page": "boutique shop interior",
+}
+// Mini-apercu schematique d'un modele (fond + couleurs + disposition). photoUrl : vraie photo de fond (galerie)
+function tplThumb(t: { id: string; bg: string; ink: string; accent: string }, photoUrl?: string) {
+  const photoBg = photoUrl ? `#222 url(${photoUrl}) center/cover no-repeat` : ""
   if (t.id.endsWith("-photo")) {
     return (
-      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: `linear-gradient(135deg, ${t.accent}, ${t.bg})` }}>
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: photoBg || `linear-gradient(135deg, ${t.accent}, ${t.bg})` }}>
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.5), transparent 42%, rgba(0,0,0,0.42))" }} />
         <div style={{ position: "absolute", top: "12%", left: "12%", right: "12%", display: "flex", flexDirection: "column", gap: 4 }}>
           <div style={{ height: 6, width: "78%", borderRadius: 3, background: "#fff" }} />
@@ -350,7 +356,7 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
   if (t.id.endsWith("-split")) {
     return (
       <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: t.bg, display: "flex", flexDirection: "column" }}>
-        <div style={{ height: "50%", background: `linear-gradient(135deg, ${t.accent}, ${t.bg})` }} />
+        <div style={{ height: "50%", background: photoBg || `linear-gradient(135deg, ${t.accent}, ${t.bg})` }} />
         <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, padding: "0 12%" }}>
           <div style={{ height: 5, width: "70%", borderRadius: 3, background: t.ink, opacity: 0.9 }} />
           <div style={{ height: 3, width: "48%", borderRadius: 2, background: t.ink, opacity: 0.5 }} />
@@ -361,7 +367,7 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
   }
   if (t.id.endsWith("-card")) {
     return (
-      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: `linear-gradient(135deg, ${t.accent}, ${t.bg})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: photoBg || `linear-gradient(135deg, ${t.accent}, ${t.bg})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.28)" }} />
         <div style={{ position: "relative", width: "74%", height: "56%", background: "#fff", borderRadius: 8, boxShadow: "0 6px 18px rgba(0,0,0,0.3)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, padding: "0 10%" }}>
           <div style={{ height: 5, width: "72%", borderRadius: 3, background: "#1A1A1A" }} />
@@ -372,7 +378,7 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
   }
   if (t.id.endsWith("-studio")) {
     return (
-      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: `linear-gradient(135deg, ${t.accent}, ${t.bg})`, display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: photoBg || `linear-gradient(135deg, ${t.accent}, ${t.bg})`, display: "flex", flexDirection: "column", alignItems: "center" }}>
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.5), rgba(0,0,0,0.18) 45%, rgba(0,0,0,0.55))" }} />
         <div style={{ position: "absolute", top: "6%", right: "10%", width: "15%", aspectRatio: "1", borderRadius: "50%", background: "#fff" }} />
         <div style={{ position: "relative", marginTop: "13%", width: "20%", aspectRatio: "1", borderRadius: "50%", background: t.accent }} />
@@ -582,6 +588,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [tplSearch, setTplSearch] = useState("")
   const [tplSector, setTplSector] = useState("")
   const [compOpen, setCompOpen] = useState(false) // flyout composants metier
+  const [thumbCache, setThumbCache] = useState<Record<string, string>>({}) // photo par objectif pour les vignettes
   const [photoOpen, setPhotoOpen] = useState(false) // flyout recherche photos (Unsplash)
   const [photoQuery, setPhotoQuery] = useState("")
   const [photoResults, setPhotoResults] = useState<{ id: string; thumb: string; regular: string; author: string }[]>([])
@@ -2157,6 +2164,20 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     window: "shop storefront window glass", desk: "modern wood office desk",
     cadre: "living room wall interior cozy", counter: "cafe bar counter wood",
   }
+  // Precharge une photo representative par objectif pour les vignettes de galerie (6 req max, en cache)
+  useEffect(() => {
+    if (!tplOpen) return
+    let cancelled = false
+    Object.keys(OBJ_PHOTO_Q).forEach(obj => {
+      if (thumbCache[obj]) return
+      fetch(`/api/unsplash?q=${encodeURIComponent(OBJ_PHOTO_Q[obj])}&orientation=portrait`)
+        .then(r => (r.ok ? r.json() : null))
+        .then(d => { const u = d?.photos?.[0]?.regular; if (u && !cancelled) setThumbCache(c => ({ ...c, [obj]: u })) })
+        .catch(() => {})
+    })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tplOpen])
   useEffect(() => {
     if (!mockOpen) return
     let cancelled = false
@@ -2600,7 +2621,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                       {items.map(t => (
                         <button key={t.id} type="button" onClick={() => applyTemplate(t.id)} title={t.desc}
                           style={{ display: "flex", flexDirection: "column", gap: 5, padding: 6, background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: 10, cursor: "pointer" }}>
-                          {tplThumb(t)}
+                          {tplThumb(t, thumbCache[obj])}
                           <span style={{ color: INK, fontSize: 10, fontWeight: 700, textAlign: "center", lineHeight: 1.2 }}>{t.label}</span>
                         </button>
                       ))}
