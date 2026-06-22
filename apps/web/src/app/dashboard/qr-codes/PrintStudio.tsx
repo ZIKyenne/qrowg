@@ -2635,8 +2635,6 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           {([
             ["text", "Texte", <TypeIcon size={16} key="i" />],
             ["shapes", "Formes", <Shapes size={16} key="i" />],
-            ["lines", "Lignes", <Minus size={16} key="i" />],
-            ["frames", "Cadres", <Square size={16} key="i" />],
           ] as const).map(([cat, label, icon]) => {
             const on = libOpen && libCat === cat
             return (
