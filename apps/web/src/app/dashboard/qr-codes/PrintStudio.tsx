@@ -2410,21 +2410,6 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {/* Formats */}
-          <div style={{ display: "flex", gap: 3, background: "rgba(0,0,0,0.04)", borderRadius: 9, padding: 3 }}>
-            {(Object.keys(FORMATS) as FormatId[]).map(f => (
-              <button key={f} type="button" onClick={() => applyFormat(f)}
-                style={{
-                  padding: "6px 12px", borderRadius: 7, border: "none", cursor: "pointer",
-                  fontSize: 11, fontWeight: format === f ? 700 : 500,
-                  background: format === f ? "rgba(201,168,76,0.18)" : "transparent",
-                  color: format === f ? G : MUTED,
-                }}>
-                {FORMATS[f].label}
-              </button>
-            ))}
-          </div>
-
           {/* Zoom */}
           <div style={{ display: "flex", alignItems: "center", gap: 2, background: "rgba(0,0,0,0.04)", borderRadius: 9, padding: 3 }}>
             <button type="button" onClick={() => applyZoom(zoom / 1.25)} title="Zoom arrière" aria-label="Zoom arrière"
@@ -3140,8 +3125,28 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           </div>
         </div>
 
+        {/* Rail droit : formats avec mini-apercu */}
+        <div className="qr-scroll" style={{ width: 92, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: "12px 8px", display: "flex", flexDirection: "column", gap: 9, background: SURFACE, overflowY: "auto" }}>
+          <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 2px", textAlign: "center" }}>Format</p>
+          {(Object.keys(FORMATS) as FormatId[]).map(f => {
+            const r = FORMATS[f].ratio
+            const bw = r >= 1 ? 40 : Math.round(40 * r)
+            const bh = r >= 1 ? Math.round(40 / r) : 40
+            const on = format === f
+            return (
+              <button key={f} type="button" onClick={() => applyFormat(f)}
+                style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "8px 4px", background: on ? "rgba(201,168,76,0.16)" : "transparent", border: `1px solid ${on ? G : "rgba(0,0,0,0.08)"}`, borderRadius: 10, cursor: "pointer" }}>
+                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 44, height: 44 }}>
+                  <span style={{ width: bw, height: bh, background: on ? G : "#FFFFFF", border: `1px solid ${on ? G : "rgba(0,0,0,0.22)"}`, borderRadius: 3, boxShadow: "0 1px 2px rgba(0,0,0,0.12)" }} />
+                </span>
+                <span style={{ color: on ? G : INK, fontSize: 10, fontWeight: on ? 700 : 600 }}>{FORMATS[f].label}</span>
+              </button>
+            )
+          })}
+        </div>
+
         {/* Zoom flottant sur le rendu central (facon Canva) */}
-        <div style={{ position: "absolute", bottom: 16, right: 16, zIndex: 38, display: "flex", alignItems: "center", gap: 2, background: SURFACE, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 999, padding: 4, boxShadow: "0 4px 16px rgba(0,0,0,0.12)" }}>
+        <div style={{ position: "absolute", bottom: 16, right: 108, zIndex: 38, display: "flex", alignItems: "center", gap: 2, background: SURFACE, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 999, padding: 4, boxShadow: "0 4px 16px rgba(0,0,0,0.12)" }}>
           <button type="button" onClick={() => applyZoom(zoom / 1.2)} title="Dézoomer" aria-label="Dézoomer"
             style={{ width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 999, color: INK, fontSize: 18, cursor: "pointer" }}>−</button>
           <button type="button" onClick={() => applyZoom(1)} title="Réinitialiser à 100 %"
@@ -3368,7 +3373,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Garde-fou scannabilite du QR */}
         {qrIssues && (
-          <div style={{ position: "absolute", bottom: 62, right: 16, zIndex: 39, display: "flex", alignItems: "center", gap: 7, padding: "7px 11px", background: "#FEF3E2", border: "1px solid rgba(217,160,40,0.5)", borderRadius: 10, color: "#92520E", fontSize: 11, fontWeight: 600, maxWidth: 260, boxShadow: "0 8px 22px rgba(0,0,0,0.14)" }}>
+          <div style={{ position: "absolute", bottom: 62, right: 108, zIndex: 39, display: "flex", alignItems: "center", gap: 7, padding: "7px 11px", background: "#FEF3E2", border: "1px solid rgba(217,160,40,0.5)", borderRadius: 10, color: "#92520E", fontSize: 11, fontWeight: 600, maxWidth: 240, boxShadow: "0 8px 22px rgba(0,0,0,0.14)" }}>
             <span style={{ fontSize: 14 }}>⚠️</span>
             <span>{qrIssues.covered ? "Un élément couvre le QR — il risque de ne pas se scanner." : "QR un peu petit : agrandis-le pour un scan fiable."}</span>
           </div>
