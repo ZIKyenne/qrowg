@@ -622,7 +622,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [showAdvanced, setShowAdvanced] = useState(false) // panneau de reglages avances (progressive disclosure)
   const [libOpen, setLibOpen] = useState(false)
   const [libCat, setLibCat]   = useState<"text" | "shapes" | "lines" | "frames" | "cta" | "icons" | "badges" | "arrows" | "deco">("text")
-  const [tplOpen, setTplOpen] = useState(false)
+  const [tplOpen, setTplOpen] = useState(true) // menu Modeles deplie par defaut (vue globale)
   const [tplSearch, setTplSearch] = useState("")
   const [tplSector, setTplSector] = useState("")
   const [compOpen, setCompOpen] = useState(false) // flyout composants metier
@@ -1779,6 +1779,24 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     fc.requestRenderAll()
     setZoom(nz)
   }
+  // Zoom auto : ajuste pour que tout le support tienne dans la zone visible (vue globale).
+  const fitToScreen = (fmt?: FormatId) => {
+    const fc = fcRef.current, sc = scrollRef.current; if (!fc || !sc) return
+    const base = editDims(fmt ?? format)
+    const cs = getComputedStyle(sc)
+    const availW = sc.clientWidth - parseFloat(cs.paddingLeft || "24") - parseFloat(cs.paddingRight || "24")
+    const availH = sc.clientHeight - parseFloat(cs.paddingTop || "24") - parseFloat(cs.paddingBottom || "24")
+    if (availW <= 40 || availH <= 40) return
+    const z = Math.min(availW / base.w, availH / base.h) * 0.96
+    const nz = Math.max(0.3, Math.min(1, z))
+    fc.setZoom(nz)
+    fc.setDimensions({ width: Math.round(base.w * nz), height: Math.round(base.h * nz) })
+    fc.requestRenderAll()
+    setZoom(nz)
+  }
+  // Ajuste automatiquement le zoom au chargement et a chaque changement de format (vue globale).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (loading) return; const t = setTimeout(() => fitToScreen(), 90); return () => clearTimeout(t) }, [format, loading])
   // Execute fn() avec le canvas ramene a zoom 1 (pour un export propre), puis restaure.
   const withBaseZoom = <T,>(fc: fabric.Canvas, fn: (base: { w: number; h: number }) => T): T => {
     const z = fc.getZoom() || 1
