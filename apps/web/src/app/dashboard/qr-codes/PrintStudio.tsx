@@ -429,6 +429,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [tplOpen, setTplOpen] = useState(false)
   const [tplSearch, setTplSearch] = useState("")
   const [showHelp, setShowHelp] = useState(false)
+  const [hintOff, setHintOff] = useState(false)
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
   const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
   const [dragOver, setDragOver] = useState<number | null>(null) // ligne survolee pendant un glisser
@@ -2663,6 +2664,16 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 10px", background: showAdvanced ? "rgba(201,168,76,0.18)" : "rgba(255,255,255,0.06)", border: `1px solid ${showAdvanced ? G : "rgba(255,255,255,0.1)"}`, borderRadius: 8, color: showAdvanced ? G : INK, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
               Réglages {showAdvanced ? "▸" : ""}
             </button>
+          </div>
+        )}
+
+        {/* Astuce d'accueil (masquable) : guide le debutant quand rien n'est selectionne */}
+        {!sel && !hintOff && (
+          <div style={{ position: "absolute", bottom: 14, left: "50%", transform: "translateX(-50%)", zIndex: 35, display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "rgba(20,18,12,0.92)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 999, boxShadow: "0 8px 24px rgba(0,0,0,0.45)", maxWidth: "90%" }}>
+            <Sparkles size={13} color={G} style={{ flexShrink: 0 }} />
+            <span style={{ color: INK, fontSize: 11.5 }}>Choisis un <b>modèle</b> à gauche, ou <b>double-clique</b> ici pour ajouter du texte.</span>
+            <button type="button" onClick={() => setHintOff(true)} aria-label="Masquer l'astuce"
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 6, color: MUTED, cursor: "pointer", flexShrink: 0 }}><X size={11} /></button>
           </div>
         )}
       </div>
