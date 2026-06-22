@@ -2036,7 +2036,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Rail outils */}
         {wizard === 0 && (
-        <div style={{ width: 76, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", padding: "10px 8px", display: "flex", flexDirection: "column", gap: 6, background: SURFACE }}>
+        <div className="qr-scroll" style={{ width: 76, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", padding: "10px 8px", display: "flex", flexDirection: "column", gap: 6, background: SURFACE, overflowY: "auto" }}>
           <button type="button" onClick={() => { setTplOpen(v => !v); setLibOpen(false); setSide(""); setWizard(0) }}
             style={{ ...btnTool, background: tplOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.14),rgba(201,168,76,0.05))", border: `1px solid ${tplOpen ? G : "rgba(201,168,76,0.3)"}`, color: tplOpen ? G : INK, fontWeight: 700 }}>
             <LayoutTemplate size={16} /> Modèles
@@ -2057,11 +2057,20 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             )
           })}
           <button type="button" onClick={addQr} style={btnTool}><QrCode size={16} /> QR</button>
-          <button type="button" onClick={() => fileRef.current?.click()} style={btnTool}><ImageIcon size={16} /> Image</button>
-          <button type="button" onClick={() => openLib("cta")}
-            style={{ ...btnTool, marginTop: 4, background: (libOpen && ["cta", "icons", "badges", "arrows"].includes(libCat)) ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.12),rgba(201,168,76,0.05))", border: `1px solid ${(libOpen && ["cta", "icons", "badges", "arrows"].includes(libCat)) ? G : "rgba(201,168,76,0.3)"}`, color: INK, fontWeight: 700 }}>
-            <MousePointerClick size={16} /> Éléments
-          </button>
+          <button type="button" onClick={() => fileRef.current?.click()} style={btnTool} title="Image ou logo"><ImageIcon size={16} /> Image</button>
+          {([
+            ["icons", "Icône", <Star size={16} key="i" />],
+            ["cta", "CTA", <MousePointerClick size={16} key="i" />],
+            ["badges", "Badge", <Award size={16} key="i" />],
+          ] as const).map(([cat, label, icon]) => {
+            const on = libOpen && libCat === cat
+            return (
+              <button key={cat} type="button" onClick={() => openLib(cat)}
+                style={{ ...btnTool, background: on ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${on ? G : "rgba(255,255,255,0.07)"}`, color: on ? G : INK }}>
+                {icon} {label}
+              </button>
+            )
+          })}
           <div style={{ flex: 1 }} />
           <button type="button" onClick={() => openSide("styles")}
             style={{ ...btnTool, background: side === "styles" ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${side === "styles" ? G : "rgba(255,255,255,0.07)"}`, color: side === "styles" ? G : INK }}>
