@@ -2550,36 +2550,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             </span>
           )}
         </div>
-        {active && activeTab === "supports" ? (
-          <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"24px", gap:14, overflow:"hidden" }}>
-            {suppCanTpl ? (
-              <>
-                <canvas ref={supportCanvasRef} style={{ maxWidth:"100%", maxHeight:"calc(100% - 40px)", borderRadius:10, boxShadow:"0 24px 70px rgba(0,0,0,0.6)", display: suppRendered ? "block" : "none" }}/>
-                {!suppRendered && (
-                  <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:10, height:240 }}>
-                    <Loader2 size={26} color={MUTED} style={{ animation:"spin 0.8s linear infinite" }}/>
-                    <p style={{ color:MUTED, fontSize:12, margin:0 }}>Génération de l&apos;aperçu...</p>
-                  </div>
-                )}
-                <p style={{ color:MUTED, fontSize:11, margin:0, display:"flex", alignItems:"center", gap:6 }}>
-                  <Eye size={12} color={G}/> Aperçu en direct — {suppTpl.label} · {suppTpl.w}×{suppTpl.h}px
-                </p>
-              </>
-            ) : (
-              <div style={{ textAlign:"center" as const, maxWidth:300 }}>
-                <Lock size={28} color={MUTED} style={{ marginBottom:12 }}/>
-                <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:600, margin:"0 0 4px" }}>{suppTpl.label}</p>
-                <p style={{ color:MUTED, fontSize:12, margin:"0 0 14px" }}>
-                  {suppTpl.plan === "pro" ? "Disponible avec le plan Pro" : "Disponible avec le plan Business"}
-                </p>
-                <button type="button" onClick={() => setUpsell({ feature:`le support « ${suppTpl.label} »`, plan: suppTpl.plan })}
-                  style={{ padding:"9px 20px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:9, color:"#080808", fontSize:12, fontWeight:700, cursor:"pointer" }}>
-                  Voir les offres
-                </button>
-              </div>
-            )}
-          </div>
-        ) : active ? (() => {
+        {active ? (() => {
           const diag = getDiagnostic(diagFg || fg, diagBg || bg)
           return (
             <div className="qr-scroll" style={{ display:"flex", flexDirection:"column", height:"100%", overflowY:"auto" }}>
@@ -3577,276 +3548,49 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           </div>
         )}
 
-        {/* -- Export tab ------------------------------------------------------ */}
-        {activeTab === "supports" && active && (() => {
-          const tpl = SUPP_TPLS.find(t => t.id === suppTplId) ?? SUPP_TPLS[0]
-          const canTpl = PLAN_RANK[userPlan] >= PLAN_RANK[tpl.plan]
-          const fontOpts = (
-            <>
-              <optgroup label="Élégantes">
-                <option value="Cormorant Garamond">Cormorant</option>
-                <option value="Playfair Display">Playfair Display</option>
-                <option value="Lora">Lora</option>
-                <option value="Merriweather">Merriweather</option>
-                <option value="Abril Fatface">Abril Fatface</option>
-                <option value="Georgia">Georgia</option>
-                <option value="Times New Roman">Times</option>
-              </optgroup>
-              <optgroup label="Modernes">
-                <option value="Poppins">Poppins</option>
-                <option value="Montserrat">Montserrat</option>
-                <option value="Raleway">Raleway</option>
-                <option value="Oswald">Oswald</option>
-                <option value="Bebas Neue">Bebas Neue</option>
-                <option value="Arial">Arial</option>
-                <option value="Trebuchet MS">Trebuchet</option>
-                <option value="Verdana">Verdana</option>
-                <option value="Impact">Impact</option>
-              </optgroup>
-              <optgroup label="Manuscrites">
-                <option value="Dancing Script">Dancing Script</option>
-                <option value="Pacifico">Pacifico</option>
-              </optgroup>
-              <optgroup label="Autre">
-                <option value="Courier New">Courier</option>
-              </optgroup>
-            </>
-          )
-          return (
-          <div className="qr-scroll" style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
+        {/* -- Imprimables : entree vers QR Print Studio + explicatif ---------- */}
+        {activeTab === "supports" && active && (
+          <div className="qr-scroll" style={{ display:"flex", flexDirection:"column", flex:1, overflow:"auto", padding:"18px 16px", gap:14 }}>
+            {/* CTA principal : ouvrir l'editeur QR Print Studio */}
+            <button type="button" onClick={openEditor} disabled={editorLoading}
+              style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:9, padding:"15px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:12, color:"#080808", fontSize:14, fontWeight:800, cursor:editorLoading?"wait":"pointer", boxShadow:"0 8px 26px rgba(201,168,76,0.3)", opacity:editorLoading?0.7:1 }}>
+              {editorLoading ? <Loader2 size={16} style={{ animation:"spin 0.8s linear infinite" }}/> : <Sparkles size={16}/>}
+              {editorLoading ? "Ouverture..." : "Ouvrir QR Print Studio"}
+            </button>
+            <p style={{ color:MUTED, fontSize:11, textAlign:"center" as const, margin:0, lineHeight:1.5 }}>
+              Transformez votre QR en support marketing prêt à imprimer — affiche, flyer, carte de visite, sticker, carte de table…
+            </p>
 
-            {/* -- Selecteur templates ------------------------------------ */}
-            <div style={{ padding:"10px 12px", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
-
-              {/* Editeur libre (Fabric) */}
-              <button type="button" onClick={openEditor} disabled={editorLoading}
-                style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"12px", marginBottom:6, background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:10, color:"#080808", fontSize:12.5, fontWeight:800, cursor:editorLoading?"wait":"pointer", boxShadow:"0 6px 20px rgba(201,168,76,0.22)", opacity:editorLoading?0.7:1 }}>
-                {editorLoading ? <Loader2 size={14} style={{ animation:"spin 0.8s linear infinite" }}/> : <Sparkles size={14}/>}
-                {editorLoading ? "Ouverture..." : "Éditeur libre — créez votre design"}
-              </button>
-              <p style={{ color:MUTED, fontSize:9.5, textAlign:"center" as const, margin:"0 0 14px", lineHeight:1.4 }}>
-                Déplacez, redimensionnez, ajoutez textes et formes librement (type Canva).
+            {/* Explicatif : ce que QR Print Studio permet de faire */}
+            <div style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"15px 15px 5px" }}>
+              <p style={{ color:"#F5F0E8", fontSize:12.5, fontWeight:700, margin:"0 0 13px", display:"flex", alignItems:"center", gap:7 }}>
+                <span style={{ width:7, height:7, borderRadius:2, background:G }}/> Ce que vous pouvez créer
               </p>
-
-              <div style={{ display:"flex", alignItems:"center", gap:7, margin:"0 0 3px" }}>
-                <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:700, margin:0 }}>Modèles prêts à imprimer</p>
-                <span style={{ background:"rgba(255,255,255,0.06)", color:MUTED, borderRadius:5, padding:"1px 6px", fontSize:8, fontWeight:800, textTransform:"uppercase" as const, letterSpacing:0.5 }}>Mode rapide</span>
-              </div>
-              <p style={{ color:MUTED, fontSize:10, margin:"0 0 10px", lineHeight:1.4 }}>Votre QR placé dans un support fini : carte, flyer, affiche, sticker...</p>
-
-              {/* Objectif marketing */}
-              <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 6px" }}>Ton objectif</p>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:5, marginBottom:12 }}>
-                {SUPP_OBJECTIVES.map(o => {
-                  const sel = suppObjective === o.id
-                  return (
-                    <button key={o.id} type="button"
-                      onClick={() => { setSuppObjective(o.id); setSuppSubtitle(o.cta); setSuppOpenGroup(o.supports[0]) }}
-                      style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 8px", background:sel?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.02)", border:`1px solid ${sel?G:"rgba(255,255,255,0.07)"}`, borderRadius:8, cursor:"pointer", textAlign:"left" as const }}>
-                      <span style={{ fontSize:14, flexShrink:0 }}>{o.emoji}</span>
-                      <span style={{ color:sel?G:"#F5F0E8", fontSize:10, fontWeight:sel?700:500, lineHeight:1.2 }}>{o.label}</span>
-                    </button>
-                  )
-                })}
-              </div>
-
-              <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Support</p>
-              <div className="qr-scroll" style={{ display:"flex", flexDirection:"column", gap:5, maxHeight:300, overflowY:"auto" }}>
-                {(() => {
-                  const groups: { name: string; items: SuppTpl[] }[] = []
-                  const objSupports = SUPP_OBJECTIVES.find(o => o.id === suppObjective)?.supports ?? []
-                  SUPP_TPLS.forEach(t => { let g = groups.find(x => x.name === t.support); if (!g) { g = { name:t.support, items:[] }; groups.push(g) } g.items.push(t) })
-                  return groups.map(grp => {
-                    const open = suppOpenGroup === grp.name
-                    const hasSel = grp.items.some(t => t.id === suppTplId)
-                    return (
-                      <div key={grp.name}>
-                        <button type="button" onClick={() => setSuppOpenGroup(open ? "" : grp.name)}
-                          style={{ width:"100%", display:"flex", alignItems:"center", gap:8, padding:"8px 9px", background:open?"rgba(201,168,76,0.07)":"rgba(255,255,255,0.02)", border:`1px solid ${hasSel?"rgba(201,168,76,0.3)":"rgba(255,255,255,0.07)"}`, borderRadius:8, cursor:"pointer", textAlign:"left" as const }}>
-                          <span style={{ fontSize:16, flexShrink:0 }}>{grp.items[0].emoji}</span>
-                          <span style={{ flex:1, color:hasSel?G:"#F5F0E8", fontSize:12, fontWeight:700 }}>{grp.name}</span>
-                          {objSupports.includes(grp.name) && (
-                            <span style={{ background:"rgba(201,168,76,0.18)", color:G, borderRadius:4, padding:"1px 5px", fontSize:7, fontWeight:800, flexShrink:0 }}>★ CONSEILLÉ</span>
-                          )}
-                          <span style={{ color:MUTED, fontSize:9 }}>{grp.items.length} style{grp.items.length>1?"s":""}</span>
-                          <ChevronRight size={13} color={open?G:MUTED} style={{ transform: open?"rotate(90deg)":"rotate(0deg)", transition:"transform 0.2s", flexShrink:0 }}/>
-                        </button>
-                        {open && (
-                          <div style={{ display:"flex", flexDirection:"column", gap:4, padding:"6px 0 6px 10px", marginLeft:6, borderLeft:"1px solid rgba(201,168,76,0.15)" }}>
-                            {grp.items.map(t => {
-                              const can = PLAN_RANK[userPlan] >= PLAN_RANK[t.plan]
-                              const isA = t.id === suppTplId
-                              const badge = t.plan === "free" ? null : t.plan === "pro" ? "PRO" : "BIZ"
-                              return (
-                                <button key={t.id} type="button"
-                                  onClick={() => can ? setSuppTplId(t.id) : setUpsell({ feature:`le modèle « ${t.label} »`, plan:t.plan })}
-                                  style={{ display:"flex", alignItems:"center", gap:8, padding:"6px 9px", background:isA?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isA?"rgba(201,168,76,0.35)":"rgba(255,255,255,0.06)"}`, borderRadius:7, cursor:"pointer", textAlign:"left" as const, opacity:can?1:0.65, position:"relative" as const }}>
-                                  <div style={{ flex:1, minWidth:0 }}>
-                                    <p style={{ color:isA?G:"#F5F0E8", fontSize:11, fontWeight:isA?700:500, margin:"0 0 1px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>{t.label}</p>
-                                    <p style={{ color:MUTED, fontSize:8.5, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>{t.desc}</p>
-                                  </div>
-                                  {badge && (
-                                    <span style={{ background:can?(t.plan==="pro"?"rgba(201,168,76,0.15)":"rgba(57,255,143,0.12)"):"rgba(255,255,255,0.06)", borderRadius:4, padding:"1px 5px", fontSize:7, color:can?(t.plan==="pro"?G:"#39FF8F"):MUTED, fontWeight:800, flexShrink:0 }}>{badge}</span>
-                                  )}
-                                  {!can && <Lock size={10} color={MUTED} style={{ flexShrink:0 }}/>}
-                                </button>
-                              )
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })
-                })()}
-              </div>
+              {([
+                ["🎯","Création guidée en 30 s","Votre métier → votre objectif → un design pro généré automatiquement."],
+                ["🖼️","Modèles premium","Affiches, flyers, cartes, stickers, cartes de table — formats A4, carré, story, carte."],
+                ["📶","Supports métier","Wifi, carte de fidélité, menu, avis, réservation, abonnés…"],
+                ["🎨","Éditeur libre type Canva","Déplacez, redimensionnez, ajoutez textes, formes, photos, icônes."],
+                ["✨","Réglages avancés","Dégradés, motifs, ombres colorées, contour de texte, transformer, aligner…"],
+                ["📸","Photos & logos","Banque d'images intégrée + vos propres visuels."],
+                ["⬇️","Export pro","PNG haute résolution & PDF prêt à imprimer."],
+              ] as const).map(([emoji,title,desc]) => (
+                <div key={title} style={{ display:"flex", gap:10, marginBottom:12 }}>
+                  <span style={{ fontSize:17, flexShrink:0, lineHeight:1.2 }}>{emoji}</span>
+                  <div>
+                    <p style={{ color:"#F5F0E8", fontSize:11.5, fontWeight:700, margin:"0 0 2px" }}>{title}</p>
+                    <p style={{ color:MUTED, fontSize:10.5, margin:0, lineHeight:1.45 }}>{desc}</p>
+                  </div>
+                </div>
+              ))}
             </div>
 
-            <div className="qr-scroll" style={{ flex:1, overflowY:"auto", padding:"12px" }}>
-
-              {/* -- Theme du support ----------------------------------- */}
-              <div style={{ marginBottom:12 }}>
-                <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Theme</p>
-                <div style={{ display:"flex", gap:6, overflowX:"auto", paddingBottom:4 }}>
-                  {SUPP_THEMES.map(t => {
-                    const sel = suppTheme === t.id
-                    const swatch = t.bg || (bg || "#FFFFFF")
-                    const acc    = t.accent || (fg || "#080808")
-                    const canTheme = PLAN_RANK[userPlan] >= PLAN_RANK[t.plan]
-                    return (
-                      <button key={t.id} type="button" onClick={() => canTheme ? setSuppTheme(t.id) : setUpsell({ feature:`le thème « ${t.label} »`, plan:t.plan })}
-                        style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:4, padding:"6px 6px 5px", background:sel?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1.5px solid ${sel?G:"rgba(255,255,255,0.08)"}`, borderRadius:9, cursor:"pointer", flexShrink:0, minWidth:54, position:"relative" as const }}>
-                        <div style={{ position:"relative", width:30, height:30, borderRadius:6, background:swatch, border:"1px solid rgba(0,0,0,0.2)", overflow:"hidden" }}>
-                          <div style={{ position:"absolute", bottom:0, left:0, right:0, height:9, background:acc }}/>
-                        </div>
-                        <span style={{ color:sel?G:MUTED, fontSize:8, fontWeight:sel?700:500, whiteSpace:"nowrap" as const }}>{t.label.split(" ")[0]}</span>
-                        {!canTheme && (
-                          <span style={{ position:"absolute", top:3, right:3, display:"inline-flex", alignItems:"center", gap:1, background:t.plan==="business"?"#39FF8F":G, borderRadius:3, padding:"0px 3px", fontSize:6, color:"#080808", fontWeight:800 }}>
-                            <Sparkles size={5} color="#080808"/>{t.plan==="business"?"BIZ":"PRO"}
-                          </span>
-                        )}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* -- Textes --------------------------------------------- */}
-              <div style={{ marginBottom:12 }}>
-                <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Textes</p>
-                <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
-                  <div>
-                    <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Titre</label>
-                    <input value={suppTitle} onChange={e => setSuppTitle(e.target.value)}
-                      placeholder={active?.pages?.title ?? "Titre de votre page"}
-                      style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none", boxSizing:"border-box" as const }}/>
-                  </div>
-                  <div>
-                    <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Sous-titre / Appel à l&apos;action</label>
-                    <input value={suppSubtitle} onChange={e => setSuppSubtitle(e.target.value)} placeholder="Écris ton message (ex : Scannez pour réserver)"
-                      style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none", boxSizing:"border-box" as const }}/>
-                    <div style={{ display:"flex", flexWrap:"wrap" as const, gap:4, marginTop:6 }}>
-                      {["Scannez pour voir le menu","Scannez pour réserver","Scannez pour laisser un avis","Scannez pour nous suivre","Scannez pour en savoir plus"].map(s => (
-                        <button key={s} type="button" onClick={() => setSuppSubtitle(s)}
-                          style={{ background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.18)", borderRadius:20, padding:"2px 9px", color:MUTED, fontSize:8.5, cursor:"pointer" }}>{s}</button>
-                      ))}
-                    </div>
-                  </div>
-                  <div style={{ display:"flex", gap:7 }}>
-                    <div style={{ flex:1 }}>
-                      <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Telephone</label>
-                      <input value={suppPhone} onChange={e => setSuppPhone(e.target.value)}
-                        placeholder="06 12 34 56 78"
-                        style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none", boxSizing:"border-box" as const }}/>
-                    </div>
-                    <div style={{ flex:1 }}>
-                      <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Site / adresse</label>
-                      <input value={suppWebsite} onChange={e => setSuppWebsite(e.target.value)}
-                        placeholder="monsite.fr"
-                        style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none", boxSizing:"border-box" as const }}/>
-                    </div>
-                  </div>
-                  <p style={{ color:MUTED, fontSize:9, margin:"-2px 0 0", lineHeight:1.4 }}>Laisse vide pour ne rien afficher. Visible sur affiche, flyer, carte, menu, badge et story.</p>
-
-                  {/* Personnalisation avancee */}
-                  <div style={{ marginTop:14, paddingTop:12, borderTop:"1px solid rgba(255,255,255,0.06)" }}>
-                    <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Personnalisation</p>
-                    <div style={{ marginBottom:10 }}>
-                      <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Police du titre</label>
-                      <select value={suppFont} onChange={e => setSuppFont(e.target.value)}
-                        style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none" }}>
-                        {fontOpts}
-                      </select>
-                    </div>
-                    <div style={{ marginBottom:10 }}>
-                      <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:4 }}>Police du sous-titre</label>
-                      <select value={suppSubFont} onChange={e => setSuppSubFont(e.target.value)}
-                        style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 9px", color:"#F5F0E8", fontSize:11, outline:"none" }}>
-                        {fontOpts}
-                      </select>
-                    </div>
-                    <div style={{ marginBottom:10 }}>
-                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-                        <label style={{ color:MUTED, fontSize:10 }}>Taille du titre</label>
-                        <span style={{ color:MUTED, fontSize:9 }}>{Math.round(suppTitleSize*100)}%</span>
-                      </div>
-                      <input type="range" min={0.6} max={1.6} step={0.05} value={suppTitleSize} onChange={e => setSuppTitleSize(+e.target.value)} style={{ width:"100%", accentColor:G }}/>
-                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginTop:4 }}>
-                        <label style={{ color:MUTED, fontSize:10 }}>Taille du sous-titre</label>
-                        <span style={{ color:MUTED, fontSize:9 }}>{Math.round(suppSubSize*100)}%</span>
-                      </div>
-                      <input type="range" min={0.6} max={1.6} step={0.05} value={suppSubSize} onChange={e => setSuppSubSize(+e.target.value)} style={{ width:"100%", accentColor:G }}/>
-                    </div>
-                    <ColorField label="Couleur du titre" value={suppTitleColor} onChange={setSuppTitleColor} onClear={() => setSuppTitleColor("")}/>
-                    <div style={{ height:8 }}/>
-                    <ColorField label="Couleur du sous-titre" value={suppSubColor} onChange={setSuppSubColor} onClear={() => setSuppSubColor("")}/>
-                    <div style={{ marginTop:10 }}>
-                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-                        <label style={{ color:MUTED, fontSize:10 }}>Espacement des lettres</label>
-                        <span style={{ color:MUTED, fontSize:9 }}>{suppTracking}px</span>
-                      </div>
-                      <input type="range" min={0} max={16} value={suppTracking} onChange={e => setSuppTracking(+e.target.value)} style={{ width:"100%", accentColor:G }}/>
-                    </div>
-                    <div style={{ marginTop:10 }}>
-                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-                        <label style={{ color:MUTED, fontSize:10 }}>Décalage horizontal</label>
-                        <span style={{ color:MUTED, fontSize:9 }}>{suppOffX}%</span>
-                      </div>
-                      <input type="range" min={-15} max={15} value={suppOffX} onChange={e => setSuppOffX(+e.target.value)} style={{ width:"100%", accentColor:G }}/>
-                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginTop:4 }}>
-                        <label style={{ color:MUTED, fontSize:10 }}>Décalage vertical</label>
-                        <span style={{ color:MUTED, fontSize:9 }}>{suppOffY}%</span>
-                      </div>
-                      <input type="range" min={-15} max={15} value={suppOffY} onChange={e => setSuppOffY(+e.target.value)} style={{ width:"100%", accentColor:G }}/>
-                      {(suppOffX !== 0 || suppOffY !== 0) && (
-                        <button type="button" onClick={() => { setSuppOffX(0); setSuppOffY(0) }}
-                          style={{ marginTop:6, background:"none", border:"none", color:G, fontSize:10, cursor:"pointer", padding:0 }}>Recentrer</button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* -- Preview (deplacee en haut de la colonne de gauche) -- */}
-
-              {/* -- Export --------------------------------------------- */}
-              {canTpl && (
-                <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
-                  <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 2px" }}>Exporter</p>
-                  <button type="button" onClick={() => exportSupport("png")} disabled={suppExporting}
-                    style={{ padding:"10px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:9, color:"#080808", fontSize:12, fontWeight:700, cursor:suppExporting?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7, opacity:suppExporting?0.7:1 }}>
-                    {suppExporting ? <><Loader2 size={13} style={{ animation:"spin 0.8s linear infinite" }}/> Export...</>
-                      : <><Download size={13}/> PNG haute resolution</>}
-                  </button>
-                  <button type="button" onClick={() => exportSupport("pdf")} disabled={suppExporting}
-                    style={{ padding:"9px", background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:9, color:"#FF6B6B", fontSize:11, cursor:suppExporting?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7, opacity:suppExporting?0.7:1 }}>
-                    {suppExporting ? <><Loader2 size={12} style={{ animation:"spin 0.8s linear infinite" }}/></> : <><Printer size={12}/> PDF pret a imprimer</>}
-                  </button>
-                </div>
-              )}
-            </div>
+            <button type="button" onClick={openEditor} disabled={editorLoading}
+              style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"11px", background:"rgba(255,255,255,0.03)", border:`1px solid ${G}`, borderRadius:10, color:G, fontSize:12, fontWeight:700, cursor:editorLoading?"wait":"pointer" }}>
+              <Sparkles size={13}/> Commencer maintenant
+            </button>
           </div>
-          )
-        })()}
+        )}
 
         {activeTab === "export" && active && (() => {
           const realPx = expSize === "custom" ? Math.max(256, Math.min(8192, expCustomSize)) : expSize
