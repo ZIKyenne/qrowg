@@ -1785,13 +1785,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const { bg, ink, accent } = meta
     fc.setBackgroundColor(bg, () => {}); setBgColor(bg)
 
-    const addText = (s: string, top: number, size: number, o: { weight?: string; fill?: string; font?: string; width?: number; role?: string; keepColor?: boolean } = {}) => {
+    const addText = (s: string, top: number, size: number, o: { weight?: string; fill?: string; font?: string; width?: number; role?: string; keepColor?: boolean; shadow?: boolean } = {}) => {
       const t = new fabric.Textbox(s, {
         width: o.width ?? W * 0.82, left: W / 2, top, originX: "center", textAlign: "center",
         fontFamily: o.font ?? "Georgia", fontWeight: o.weight ?? "normal", fontSize: size, fill: o.fill ?? ink,
       })
       if (o.role) (t as any).role = o.role
       if (o.keepColor) (t as any).keepColor = true // un theme global ne doit pas ecraser cette couleur (texte sur photo)
+      if (o.shadow) t.set("shadow", new fabric.Shadow({ color: "rgba(0,0,0,0.55)", blur: 9, offsetX: 0, offsetY: 1 })) // lisibilite sur photo
       fc.add(t); return t
     }
     const addStars = (n: number, cy: number, s: number, color: string) => {
@@ -1898,8 +1899,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       const scrim = new fabric.Rect({ left: 0, top: 0, width: W, height: H })
       scrim.set("fill", new fabric.Gradient({ type: "linear", coords: { x1: 0, y1: 0, x2: 0, y2: H }, colorStops: [{ offset: 0, color: "rgba(0,0,0,0.58)" }, { offset: 0.38, color: "rgba(0,0,0,0.12)" }, { offset: 1, color: "rgba(0,0,0,0.45)" }] }))
       fc.add(scrim)
-      addText(title, H * 0.10, W * 0.078, { weight: "bold", fill: "#FFFFFF", role: "title", keepColor: true })
-      addText(subtitle, H * 0.205, W * 0.034, { font: "Arial", fill: "#F0EDE6", role: "subtitle", keepColor: true })
+      addText(title, H * 0.10, W * 0.078, { weight: "bold", fill: "#FFFFFF", role: "title", keepColor: true, shadow: true })
+      addText(subtitle, H * 0.205, W * 0.034, { font: "Arial", fill: "#F0EDE6", role: "subtitle", keepColor: true, shadow: true })
       await placeQrT(H * 0.64, 0.32, W * 0.73)
     }
     // Mise en page "photo bandeau" : image en haut, panneau couleur en bas (texte + QR)
@@ -1951,9 +1952,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       const circ = new fabric.Circle({ radius: r, fill: accent, originX: "center", originY: "center" })
       const ico = new fabric.Text(opts.emoji, { fontSize: Math.round(r * 1.05), originX: "center", originY: "center", left: 0, top: 0 })
       fc.add(new fabric.Group([circ, ico], { originX: "center", originY: "center", left: W / 2, top: H * 0.115 }))
-      addText(title, H * 0.20, W * 0.082, { weight: "bold", fill: "#FFFFFF", role: "title", keepColor: true })
+      addText(title, H * 0.20, W * 0.082, { weight: "bold", fill: "#FFFFFF", role: "title", keepColor: true, shadow: true })
       rule(H * 0.285)
-      addText(subtitle, H * 0.31, W * 0.032, { font: "Arial", fill: "#F0EDE6", role: "subtitle", keepColor: true })
+      addText(subtitle, H * 0.31, W * 0.032, { font: "Arial", fill: "#F0EDE6", role: "subtitle", keepColor: true, shadow: true })
       await placeQrT(H * 0.40, 0.40)
       addCTA(cta, H * 0.84)
       if (opts.badge) {
@@ -3346,7 +3347,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Garde-fou scannabilite du QR */}
         {qrIssues && (
-          <div style={{ position: "absolute", top: 12, left: 12, zIndex: 39, display: "flex", alignItems: "center", gap: 7, padding: "7px 11px", background: "#FEF3E2", border: "1px solid rgba(217,160,40,0.5)", borderRadius: 10, color: "#92520E", fontSize: 11, fontWeight: 600, maxWidth: 260, boxShadow: "0 8px 22px rgba(0,0,0,0.14)" }}>
+          <div style={{ position: "absolute", bottom: 62, right: 16, zIndex: 39, display: "flex", alignItems: "center", gap: 7, padding: "7px 11px", background: "#FEF3E2", border: "1px solid rgba(217,160,40,0.5)", borderRadius: 10, color: "#92520E", fontSize: 11, fontWeight: 600, maxWidth: 260, boxShadow: "0 8px 22px rgba(0,0,0,0.14)" }}>
             <span style={{ fontSize: 14 }}>⚠️</span>
             <span>{qrIssues.covered ? "Un élément couvre le QR — il risque de ne pas se scanner." : "QR un peu petit : agrandis-le pour un scan fiable."}</span>
           </div>
