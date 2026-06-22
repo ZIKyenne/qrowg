@@ -590,6 +590,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [bgColor, setBgColor] = useState(CANVAS_BG_DEFAULT)
   const [bgGrad, setBgGrad]   = useState(false)
   const [bgC2, setBgC2]       = useState("#0A0A0A")
+  const [gradC2, setGradC2]   = useState(G)      // 2e couleur pour le degrade d'un element
   const [loading, setLoading] = useState(true)
   const [saving, setSaving]   = useState(false)
   const [saved, setSaved]     = useState(false)
@@ -1436,6 +1437,26 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     }
   })
 
+  // Remplissage dégradé (forme ou texte) — coords en repere local de l'objet
+  const gradOf = (el: fabric.Object, c1: string, c2: string) => {
+    const w = (el.width ?? 100), h = (el.height ?? 100)
+    return new fabric.Gradient({ type: "linear", gradientUnits: "pixels", coords: { x1: 0, y1: 0, x2: w, y2: h }, colorStops: [{ offset: 0, color: c1 }, { offset: 1, color: c2 }] })
+  }
+  const setGradientFill = (c1: string, c2: string) => mutate(o => {
+    if (o.type === "group") {
+      ;(o as fabric.Group).getObjects().forEach(c => { if (c.type !== "text" && c.type !== "i-text" && c.type !== "textbox") c.set("fill", gradOf(c, c1, c2) as unknown as string) })
+      o.dirty = true
+    } else {
+      o.set("fill", gradOf(o, c1, c2) as unknown as string)
+    }
+  })
+  // Couleur de l'ombre (garde flou/decalage actuels)
+  const setShadowColor = (color: string) => mutate(o => {
+    const s = o.shadow as fabric.Shadow | null
+    if (!s) { o.set("shadow", new fabric.Shadow({ color, blur: 22, offsetX: 0, offsetY: 10 })) }
+    else { s.color = color }
+    o.dirty = true
+  })
   // Couleur du texte interne d'un groupe (CTA / badge)
   const setTextColor = (color: string) => mutate(o => {
     const txt = groupText(o); if (!txt) return
@@ -3244,6 +3265,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   onChange={e => mutate(o => o.set("opacity", parseFloat(e.target.value)))}
                   style={{ width: "100%", accentColor: G, marginBottom: 12 }} />
 
+                {/* Degrade */}
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>Dégradé</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                  <input type="color" value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"} onChange={e => setFill(e.target.value)} title="Couleur 1" style={{ width: 30, height: 28, borderRadius: 6, border: "1px solid rgba(0,0,0,0.15)", cursor: "pointer", padding: 0 }} />
+                  <span style={{ color: MUTED, fontSize: 14 }}>→</span>
+                  <input type="color" value={gradC2} onChange={e => setGradC2(e.target.value)} title="Couleur 2" style={{ width: 30, height: 28, borderRadius: 6, border: "1px solid rgba(0,0,0,0.15)", cursor: "pointer", padding: 0 }} />
+                  <button type="button" onClick={() => setGradientFill(/^#/.test(sel.fill) ? sel.fill : "#C9A84C", gradC2)} style={{ ...layerBtn, flex: 1 }}>Appliquer</button>
+                </div>
+
                 {/* Bordure / contour */}
                 <button type="button" onClick={() => setBorder(!sel.border)}
                   style={{ ...layerBtn, width: "100%", background: sel.border ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: sel.border ? G : INK, fontWeight: 700, marginBottom: sel.border ? 8 : 12 }}>
@@ -3358,6 +3388,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     <input type="range" min={0} max={60} step={1} value={sel.shadowBlur}
                       onChange={e => setShadowBlur(parseInt(e.target.value))}
                       style={{ width: "100%", accentColor: G }} />
+                    <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 6 }}>
+                      <span style={{ color: MUTED, fontSize: 10 }}>Couleur :</span>
+                      {["rgba(0,0,0,0.4)", G, "#C0392B", "#1D4ED8", "#0E7A5F", "#E1306C"].map(c => (
+                        <button key={c} type="button" onClick={() => setShadowColor(c)} title="Couleur de l'ombre"
+                          style={{ width: 18, height: 18, borderRadius: "50%", background: c, border: "1px solid rgba(0,0,0,0.2)", cursor: "pointer", padding: 0, flexShrink: 0 }} />
+                      ))}
+                      <input type="color" onChange={e => setShadowColor(e.target.value)} title="Couleur personnalisée" style={{ width: 22, height: 18, borderRadius: 4, border: "1px solid rgba(0,0,0,0.2)", cursor: "pointer", padding: 0 }} />
+                    </div>
                   </>
                 )}
                 <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "10px 0 6px" }}>Halo</p>
