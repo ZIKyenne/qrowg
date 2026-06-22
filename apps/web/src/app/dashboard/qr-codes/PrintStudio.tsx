@@ -1723,11 +1723,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     histRef.current.lock = true
     setBgGrad(false); fc.setBackgroundColor(s.bg, () => {}); setBgColor(s.bg)
     const isTxt = (t?: string) => t === "i-text" || t === "text" || t === "textbox"
+    // une photo derriere ? -> on garde le texte clair ; sinon on garantit le contraste avec le fond du theme
+    const hasPhoto = fc.getObjects().some(o => o.type === "image" && !(o as any).isQR)
     fc.getObjects().forEach(o => {
       if ((o as any).isGuide || (o as any).isQR || (o as any).isQrCard) return
       if (isTxt(o.type)) {
         ;(o as fabric.IText).set("fontFamily", (o as any).role === "title" ? s.titleFont : s.bodyFont)
-        if (!(o as any).keepColor) (o as fabric.IText).set("fill", s.ink) // garder le texte blanc sur photo
+        if ((o as any).keepColor) { if (!hasPhoto) (o as fabric.IText).set("fill", readableOn(s.bg)) } // texte "photo" sans photo -> lisible sur le theme
+        else (o as fabric.IText).set("fill", s.ink)
       } else if (o.type === "group") {
         ;(o as fabric.Group).getObjects().forEach(c => {
           c.set("fill", isTxt(c.type) ? readableOn(s.accent) : s.accent)
