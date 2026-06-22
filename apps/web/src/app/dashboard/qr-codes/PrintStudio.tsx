@@ -1415,7 +1415,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     })
     const placeQrT = (top: number, wFrac: number) => new Promise<void>(res => {
       fabric.Image.fromURL(qrUrlRef.current, (img) => {
-        const w = W * wFrac
+        // Taille bornee par la plus petite dimension utile : garde le A4 identique
+        // et empeche le QR de deborder verticalement (Carre / paysage) sur les textes.
+        const w = wFrac * Math.min(W, H * 0.707)
         img.scaleToWidth(w); (img as any).isQR = true
         img.set({ originX: "center", originY: "top", left: W / 2, top })
         // carte blanche derriere le QR (look premium + zone de silence pour le scan)
