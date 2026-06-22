@@ -2,10 +2,12 @@ import { Resend } from "resend"
 import { NextRequest, NextResponse } from "next/server"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function POST(req: NextRequest) {
   try {
+    const apiKey = process.env.RESEND_API_KEY
+    if (!apiKey) return NextResponse.json({ error: "Service email non configuré" }, { status: 503 })
+    const resend = new Resend(apiKey)
+
     // Verifier secret pour cron job
     const { secret } = await req.json()
     if (secret !== process.env.CRON_SECRET) return NextResponse.json({ error: "Non autorise" }, { status: 401 })
