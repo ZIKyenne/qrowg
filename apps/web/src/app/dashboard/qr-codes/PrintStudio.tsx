@@ -824,6 +824,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         if (!objs.length) return
         e.preventDefault(); objs.forEach(x => fc.remove(x)); fc.discardActiveObject(); fc.requestRenderAll(); setSel(null)
       } else if (e.key === "Escape") {
+        setTplOpen(false); setLibOpen(false); setCompOpen(false); setPhotoOpen(false); setSide(""); setShowHelp(false)
         fc.discardActiveObject(); fc.requestRenderAll(); setSel(null)
       } else if (meta && (e.key === "s" || e.key === "S")) {
         e.preventDefault(); save()
