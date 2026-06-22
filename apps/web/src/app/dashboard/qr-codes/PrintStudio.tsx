@@ -824,6 +824,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         const b = new fabric.Rect({ width: 150, height: 44, rx: 8, ry: 8, fill: G, left: 0, top: 53 })
         o = new fabric.Group([a, b]); break
       }
+      case "tag":     o = new fabric.Polygon([{ x: 40, y: 0 }, { x: 230, y: 0 }, { x: 230, y: 120 }, { x: 40, y: 120 }, { x: 0, y: 60 }], { fill: G }); break
+      case "bubble": {
+        const r = new fabric.Rect({ left: 0, top: 0, width: 210, height: 130, rx: 18, ry: 18, fill: G })
+        const tail = new fabric.Polygon([{ x: 0, y: 0 }, { x: 46, y: 0 }, { x: 8, y: 36 }], { fill: G, left: 38, top: 128 })
+        o = new fabric.Group([r, tail]); break
+      }
       default:        o = new fabric.Rect({ width: 200, height: 120, fill: G })
     }
     centerObj(o)
@@ -2162,6 +2168,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     ["octo", "Octogone",   <svg width="24" height="24" viewBox="0 0 24 24" key="s"><path d="M8 2h8l6 6v8l-6 6H8l-6-6V8z" fill={G} /></svg>],
                     ["heart", "Cœur",      <svg width="24" height="24" viewBox="0 0 24 24" key="s"><path d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21z" fill={G} /></svg>],
                     ["cross", "Croix",     <svg width="24" height="24" viewBox="0 0 24 24" key="s"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" fill={G} /></svg>],
+                    ["tag", "Étiquette",   <svg width="30" height="20" viewBox="0 0 30 20" key="s"><polygon points="9,1 29,1 29,19 9,19 1,10" fill={G} /></svg>],
+                    ["bubble", "Bulle",    <svg width="26" height="24" viewBox="0 0 26 24" key="s"><rect x="2" y="2" width="22" height="15" rx="4" fill={G} /><polygon points="6,16 14,16 6,23" fill={G} /></svg>],
                   ] as const).map(([k, label, prev]) => (
                     <button key={k} type="button" onClick={() => addShape(k)} title={label}
                       style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "10px 2px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
