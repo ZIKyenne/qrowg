@@ -286,15 +286,18 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"event-studio",  label:"Événement — Studio", obj:"Page",     emoji:"🎉", desc:"Soirée, billetterie",                  bg:"#160726", ink:"#FFFFFF", accent:"#E0479E" },
   { id:"cafe-studio",   label:"Café — Studio",      obj:"Menu",     emoji:"☕", desc:"Café, carte du jour",                  bg:"#1C140C", ink:"#FFFFFF", accent:"#C9874C" },
   { id:"boutique-studio",label:"Boutique — Studio", obj:"Page",     emoji:"🛍️", desc:"Commerce, collection",                 bg:"#1A1018", ink:"#FFFFFF", accent:"#C9A84C" },
+  { id:"wifi-or",       label:"Wifi — Doré",        obj:"Wifi",     emoji:"📶", desc:"Réseau + mot de passe, scan",          bg:"#0E0D0B", ink:"#F4ECD8", accent:"#C9A84C" },
+  { id:"wifi-vert",     label:"Wifi — Vert",        obj:"Wifi",     emoji:"📶", desc:"Réseau + mot de passe, scan",          bg:"#0E1A16", ink:"#EAF4F0", accent:"#2E8B7B" },
+  { id:"wifi-bleu",     label:"Wifi — Bleu",        obj:"Wifi",     emoji:"📶", desc:"Réseau + mot de passe, scan",          bg:"#0C1322", ink:"#EAF1FB", accent:"#3B82F6" },
 ]
 
 // Secteurs d'activite -> objectifs pertinents (pour filtrer la galerie)
 const SECTORS: { id: string; label: string; emoji: string; objs: string[] }[] = [
-  { id: "resto",   label: "Restaurant",  emoji: "🍽️", objs: ["Menu", "Réserver", "Avis", "Page"] },
-  { id: "bar",     label: "Bar / Café",  emoji: "🍸", objs: ["Menu", "Réserver", "Abonnés", "Page"] },
-  { id: "commerce",label: "Commerce",    emoji: "🛍️", objs: ["Avis", "Abonnés", "Contact", "Page"] },
+  { id: "resto",   label: "Restaurant",  emoji: "🍽️", objs: ["Menu", "Réserver", "Avis", "Wifi", "Page"] },
+  { id: "bar",     label: "Bar / Café",  emoji: "🍸", objs: ["Menu", "Réserver", "Abonnés", "Wifi", "Page"] },
+  { id: "commerce",label: "Commerce",    emoji: "🛍️", objs: ["Avis", "Abonnés", "Contact", "Wifi", "Page"] },
   { id: "immo",    label: "Immobilier",  emoji: "🏠", objs: ["Contact", "Réserver", "Page"] },
-  { id: "airbnb",  label: "Airbnb",      emoji: "🛏️", objs: ["Contact", "Avis", "Réserver", "Page"] },
+  { id: "airbnb",  label: "Airbnb",      emoji: "🛏️", objs: ["Wifi", "Contact", "Avis", "Réserver", "Page"] },
   { id: "event",   label: "Événement",   emoji: "🎉", objs: ["Réserver", "Abonnés", "Page"] },
   { id: "createur",label: "Créateur",    emoji: "🎨", objs: ["Abonnés", "Contact", "Avis", "Page"] },
 ]
@@ -334,18 +337,19 @@ const OBJ_META: Record<string, { emoji: string; label: string; pool: string[] }>
   "Réserver": { emoji: "📅", label: "Prendre des réservations",   pool: ["reserver-studio", "coach-studio", "beaute-studio", "reserver-premium", "reserver-photo"] },
   "Contact":  { emoji: "💳", label: "Partager mes coordonnées",   pool: ["contact-studio", "immo-studio", "contact-premium", "contact-photo", "contact-card"] },
   "Page":     { emoji: "🏷️", label: "Présenter / faire découvrir", pool: ["decouvrir-studio", "event-studio", "boutique-studio", "promo-premium", "decouvrir-photo"] },
+  "Wifi":     { emoji: "📶", label: "Partager le Wifi",          pool: ["wifi-or", "wifi-vert", "wifi-bleu"] },
 }
 // Generateur guide : metier -> objectifs pertinents + style recommande
 const GUIDE_METIERS: { id: string; emoji: string; label: string; objs: string[]; style: string }[] = [
-  { id: "resto",    emoji: "🍽️", label: "Restaurant",        objs: ["Menu", "Réserver", "Avis", "Page"],        style: "restofresh" },
-  { id: "bar",      emoji: "🍸", label: "Bar / Café",        objs: ["Menu", "Abonnés", "Avis", "Page"],          style: "premiumdark" },
-  { id: "commerce", emoji: "🛍️", label: "Commerce",          objs: ["Avis", "Abonnés", "Contact", "Page"],       style: "minimal" },
+  { id: "resto",    emoji: "🍽️", label: "Restaurant",        objs: ["Menu", "Réserver", "Avis", "Wifi", "Page"], style: "restofresh" },
+  { id: "bar",      emoji: "🍸", label: "Bar / Café",        objs: ["Menu", "Abonnés", "Avis", "Wifi", "Page"],  style: "premiumdark" },
+  { id: "commerce", emoji: "🛍️", label: "Commerce",          objs: ["Avis", "Abonnés", "Contact", "Wifi", "Page"], style: "minimal" },
   { id: "immo",     emoji: "🏠", label: "Immobilier",        objs: ["Contact", "Réserver", "Page"],              style: "corporate" },
   { id: "beaute",   emoji: "💇", label: "Beauté / Bien-être", objs: ["Réserver", "Avis", "Abonnés"],             style: "sage" },
   { id: "createur", emoji: "🎨", label: "Créateur",          objs: ["Abonnés", "Contact", "Page"],               style: "neon" },
   { id: "event",    emoji: "🎉", label: "Événement",         objs: ["Réserver", "Abonnés", "Page"],              style: "sunset" },
-  { id: "airbnb",   emoji: "🏡", label: "Location / Airbnb",  objs: ["Contact", "Avis", "Réserver", "Page"],      style: "sage" },
-  { id: "hotel",    emoji: "🏨", label: "Hôtel",             objs: ["Réserver", "Avis", "Contact", "Page"],      style: "corporate" },
+  { id: "airbnb",   emoji: "🏡", label: "Location / Airbnb",  objs: ["Wifi", "Contact", "Avis", "Réserver", "Page"], style: "sage" },
+  { id: "hotel",    emoji: "🏨", label: "Hôtel",             objs: ["Wifi", "Réserver", "Avis", "Contact", "Page"], style: "corporate" },
   { id: "fitness",  emoji: "💪", label: "Sport / Coach",      objs: ["Réserver", "Abonnés", "Avis"],              style: "neon" },
   { id: "artisan",  emoji: "🔧", label: "Artisan",           objs: ["Contact", "Avis", "Page"],                  style: "premiumdark" },
   { id: "autre",    emoji: "✨", label: "Autre",             objs: ["Avis", "Abonnés", "Menu", "Réserver", "Contact", "Page"], style: "luxgold" },
@@ -2118,7 +2122,22 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     // Ligne de marque (nom de l'etablissement) ajoutee si dispo
     const brand = (top: number) => { if (name) addText(name, top, W * 0.038, { font: "Arial", weight: "bold", fill: accent }) }
 
+    // Mise en page "Wifi" : bandeau + carte reseau/mot de passe + QR + invite
+    const wifiLayout = async () => {
+      fc.add(new fabric.Rect({ left: 0, top: 0, width: W, height: Math.round(H * 0.16), fill: accent }))
+      addText("📶  Wifi gratuit", H * 0.045, W * 0.072, { weight: "bold", fill: readableOn(accent), role: "title" })
+      const cw = Math.round(W * 0.82), ch = Math.round(H * 0.215)
+      fc.add(new fabric.Rect({ width: cw, height: ch, rx: 16, ry: 16, fill: "#FFFFFF", originX: "center", originY: "top", left: W / 2, top: H * 0.225, shadow: new fabric.Shadow({ color: "rgba(0,0,0,0.16)", blur: 20, offsetX: 0, offsetY: 8 }) }))
+      addText("RÉSEAU", H * 0.255, W * 0.028, { font: "Arial", fill: "#8A8478" })
+      addText("MonReseau", H * 0.29, W * 0.052, { weight: "bold", fill: "#1A1A1A" })
+      addText("MOT DE PASSE", H * 0.355, W * 0.028, { font: "Arial", fill: "#8A8478" })
+      addText("••••••••", H * 0.39, W * 0.052, { weight: "bold", fill: "#1A1A1A" })
+      await placeQrT(H * 0.50, 0.40)
+      addText("Scannez pour vous connecter", H * 0.88, W * 0.032, { font: "Arial", role: "subtitle" })
+    }
+
     switch (id) {
+      case "wifi-or": case "wifi-vert": case "wifi-bleu": await wifiLayout(); break
       case "avis-or":
       case "avis-clair":
         brand(H * 0.02)
@@ -2787,7 +2806,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "10px 10px 16px" }}>
               {(() => {
                 const sectorObjs = SECTORS.find(s => s.id === tplSector)?.objs ?? null
-                const visibleObjs = ["Avis", "Menu", "Réserver", "Abonnés", "Contact", "Page"].filter(o => !sectorObjs || sectorObjs.includes(o))
+                const visibleObjs = ["Avis", "Menu", "Réserver", "Abonnés", "Contact", "Wifi", "Page"].filter(o => !sectorObjs || sectorObjs.includes(o))
                 return visibleObjs.map(obj => {
                 const q = tplSearch.trim().toLowerCase()
                 const rank = (id: string) => id.endsWith("-studio") ? 0 : id.endsWith("-photo") ? 1 : id.endsWith("-card") ? 2 : id.endsWith("-split") ? 3 : id.endsWith("-premium") ? 4 : id.endsWith("-ornate") ? 5 : 6
