@@ -1584,6 +1584,30 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     else { ctx.strokeRect(0, 0, 22, 22) }
     o.set("fill", new fabric.Pattern({ source: pc, repeat: "repeat" }) as unknown as string); o.dirty = true
   })
+  // Bordure degradee : le contour devient un degrade (Fabric accepte un Gradient sur stroke)
+  const setBorderGradient = (c1: string, c2: string) => mutate(o => {
+    o.set({ stroke: gradOf(o, c1, c2) as unknown as string, strokeWidth: (o.strokeWidth ?? 0) > 0 ? o.strokeWidth : 5, strokeUniform: true })
+    o.dirty = true
+  })
+  // Taille : verrou du ratio (scale uniquement par les coins) + remplir / ajuster au support
+  const toggleRatioLock = () => {
+    const fc = fcRef.current; if (!fc) return
+    const o = fc.getActiveObject(); if (!o) return
+    const on = (o as any)._ratio !== true
+    ;(o as any)._ratio = on
+    o.setControlsVisibility({ ml: !on, mr: !on, mt: !on, mb: !on })
+    fc.requestRenderAll(); setLayersVer(v => v + 1)
+  }
+  const sizeToCanvas = (mode: "fill" | "fit") => {
+    const fc = fcRef.current; if (!fc) return
+    const o = fc.getActiveObject(); if (!o) return
+    const z = fc.getZoom() || 1
+    const cw = fc.getWidth() / z, ch = fc.getHeight() / z
+    const baseW = (o.width || 1), baseH = (o.height || 1)
+    const s = mode === "fill" ? Math.max(cw / baseW, ch / baseH) : Math.min(cw / baseW, ch / baseH)
+    o.set({ scaleX: s, scaleY: s, originX: "center", originY: "center", left: cw / 2, top: ch / 2 })
+    o.setCoords(); fc.requestRenderAll(); refreshSel(); pushHistorySoon()
+  }
   // Contour seul (forme "creuse") : remplissage transparent + bordure de la couleur courante
   const makeOutline = () => mutate(o => {
     const cur = typeof o.fill === "string" && /^#/.test(o.fill) ? o.fill : (typeof o.stroke === "string" ? o.stroke : G)
@@ -3528,6 +3552,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                         <button key={k} type="button" onClick={() => mutate(o => { o.set({ strokeDashArray: dash as number[] | null, strokeLineCap: k === "dotted" ? "round" : "butt" }); o.dirty = true })} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>{label}</button>
                       ))}
                     </div>
+                    <button type="button" onClick={() => setBorderGradient(/^#/.test(sel.strokeColor) ? sel.strokeColor : "#C9A84C", gradC2)} style={{ ...layerBtn, width: "100%", marginTop: 5, fontSize: 9.5 }} title="Contour en dégradé (utilise la 2e couleur du dégradé)">Bordure dégradée</button>
                   </div>
                 )}
 
@@ -3540,6 +3565,24 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                       style={{ width: "100%", accentColor: G }} />
                   </div>
                 )}
+
+                {/* Taille */}
+                {!sel.isQr && (() => {
+                  const ao = fcRef.current?.getActiveObject()
+                  const ratioOn = !!(ao && (ao as any)._ratio)
+                  return (
+                    <div style={{ marginBottom: 12 }}>
+                      <p className="ps-sec-label">Taille</p>
+                      <button type="button" onClick={toggleRatioLock} style={{ ...layerBtn, width: "100%", fontSize: 9.5, marginBottom: 5, color: ratioOn ? G : INK, borderColor: ratioOn ? G : "rgba(31,36,48,0.1)" }}>
+                        {ratioOn ? "🔒 Ratio verrouillé" : "🔓 Verrouiller le ratio"}
+                      </button>
+                      <div style={{ display: "flex", gap: 5 }}>
+                        <button type="button" onClick={() => sizeToCanvas("fit")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }} title="Ajuster entièrement dans le support">Ajuster</button>
+                        <button type="button" onClick={() => sizeToCanvas("fill")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }} title="Remplir tout le support">Remplir</button>
+                      </div>
+                    </div>
+                  )
+                })()}
 
                 {/* Texte uniquement */}
                 {sel.isText && (
