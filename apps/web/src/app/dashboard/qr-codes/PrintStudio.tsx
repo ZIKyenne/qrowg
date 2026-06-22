@@ -687,6 +687,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         e.preventDefault(); objs.forEach(x => fc.remove(x)); fc.discardActiveObject(); fc.requestRenderAll(); setSel(null)
       } else if (e.key === "Escape") {
         fc.discardActiveObject(); fc.requestRenderAll(); setSel(null)
+      } else if (meta && (e.key === "s" || e.key === "S")) {
+        e.preventDefault(); save()
       } else if (meta && (e.key === "c" || e.key === "C")) {
         if (!o) return
         e.preventDefault(); o.clone((c: fabric.Object) => { clipRef.current = c }, TOJSON_PROPS)
@@ -2713,7 +2715,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               {([
                 ["Suppr", "Supprimer la sélection"], ["Ctrl + C / V", "Copier / Coller"],
                 ["Ctrl + D", "Dupliquer"], ["Ctrl + Z / Y", "Annuler / Rétablir"],
-                ["Ctrl + A", "Tout sélectionner"], ["Ctrl + G", "Grouper"],
+                ["Ctrl + S", "Enregistrer"], ["Ctrl + A", "Tout sélectionner"], ["Ctrl + G", "Grouper"],
                 ["Ctrl + Maj + G", "Dégrouper"], ["Ctrl + + / − / 0", "Zoom"],
                 ["Flèches", "Déplacer (Maj = plus vite)"], ["Échap", "Désélectionner"],
               ] as const).map(([k, v]) => (
