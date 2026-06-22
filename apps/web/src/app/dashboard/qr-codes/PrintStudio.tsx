@@ -56,10 +56,12 @@ function editDims(fmt: FormatId) {
 // ---- Polices web-safe (rendu canvas fiable) --------------------------------
 // Polices : web-safe + Google (injectees par QRStudio et par PrintStudio)
 const FONT_GROUPS: { label: string; fonts: string[] }[] = [
-  { label: "Élégantes",  fonts: ["Cormorant Garamond", "Playfair Display", "EB Garamond", "Lora", "Merriweather", "Abril Fatface", "Georgia", "Times New Roman"] },
-  { label: "Modernes",   fonts: ["Poppins", "Montserrat", "Raleway", "Josefin Sans", "Oswald", "Bebas Neue", "Anton", "Arial", "Helvetica", "Trebuchet MS", "Verdana", "Impact"] },
+  { label: "Luxe & raffinées", fonts: ["Cinzel", "Marcellus", "Italiana", "Cormorant Garamond", "Playfair Display", "Fraunces", "DM Serif Display", "EB Garamond", "Libre Baskerville", "Abril Fatface"] },
+  { label: "Élégantes",  fonts: ["Lora", "Merriweather", "Georgia", "Times New Roman"] },
+  { label: "Modernes",   fonts: ["Inter", "Manrope", "Outfit", "Space Grotesk", "Sora", "Archivo", "Poppins", "Montserrat", "Raleway", "Josefin Sans"] },
+  { label: "Impact & display", fonts: ["Bebas Neue", "Anton", "Oswald", "Syne", "Unbounded", "Bricolage Grotesque", "Impact"] },
   { label: "Manuscrites", fonts: ["Dancing Script", "Pacifico", "Lobster", "Caveat", "Great Vibes"] },
-  { label: "Autre",      fonts: ["Courier New"] },
+  { label: "Système",    fonts: ["Arial", "Helvetica", "Trebuchet MS", "Verdana", "Courier New"] },
 ]
 
 // ---- Helpers geometrie (etoile / polygone reguliers) -----------------------
@@ -995,7 +997,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     if (typeof document === "undefined" || document.getElementById(id)) return
     const link = document.createElement("link")
     link.id = id; link.rel = "stylesheet"
-    link.href = "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:wght@500;700&family=Lora:wght@400;700&family=Merriweather:wght@400;700&family=Poppins:wght@400;600&family=Montserrat:wght@400;700&family=Raleway:wght@400;600&family=Oswald:wght@400;600&family=Bebas+Neue&family=Abril+Fatface&family=Dancing+Script:wght@700&family=Pacifico&family=EB+Garamond:wght@400;700&family=Josefin+Sans:wght@400;600&family=Anton&family=Lobster&family=Caveat:wght@400;700&family=Great+Vibes&display=swap"
+    link.href = "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:wght@500;700&family=Lora:wght@400;700&family=Merriweather:wght@400;700&family=Poppins:wght@400;600&family=Montserrat:wght@400;700&family=Raleway:wght@400;600&family=Oswald:wght@400;600&family=Bebas+Neue&family=Abril+Fatface&family=Dancing+Script:wght@700&family=Pacifico&family=EB+Garamond:wght@400;700&family=Josefin+Sans:wght@400;600&family=Anton&family=Lobster&family=Caveat:wght@400;700&family=Great+Vibes&family=Inter:wght@400;600;800&family=Manrope:wght@400;700&family=Space+Grotesk:wght@400;600&family=Sora:wght@400;700&family=Outfit:wght@400;700&family=Archivo:wght@400;700&family=Fraunces:wght@400;700&family=DM+Serif+Display&family=Libre+Baskerville:wght@400;700&family=Italiana&family=Cinzel:wght@400;700&family=Marcellus&family=Syne:wght@400;800&family=Unbounded:wght@400;700&family=Bricolage+Grotesque:wght@400;700&display=swap"
     document.head.appendChild(link)
   }, [])
 
