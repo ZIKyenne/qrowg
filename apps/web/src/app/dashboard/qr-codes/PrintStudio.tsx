@@ -270,6 +270,21 @@ const SECTORS: { id: string; label: string; emoji: string; objs: string[] }[] = 
   { id: "createur",label: "Créateur",    emoji: "🎨", objs: ["Abonnés", "Contact", "Avis", "Page"] },
 ]
 
+// Composants metier 1-clic (sidebar inspirante)
+const COMPONENTS: { key: string; emoji: string; label: string; desc: string }[] = [
+  { key: "avis",     emoji: "⭐", label: "Avis Google",     desc: "Bloc 5 étoiles + invitation" },
+  { key: "insta",    emoji: "📷", label: "Instagram",       desc: "Votre @ en pastille" },
+  { key: "whatsapp", emoji: "💬", label: "WhatsApp",        desc: "Bouton de contact" },
+  { key: "phone",    emoji: "📞", label: "Téléphone",       desc: "Numéro en pastille" },
+  { key: "email",    emoji: "✉️", label: "Email",           desc: "Adresse en pastille" },
+  { key: "menu",     emoji: "🍽️", label: "Menu",            desc: "Bouton voir le menu" },
+  { key: "reserver", emoji: "📅", label: "Réservation",     desc: "Bouton réserver" },
+  { key: "pay",      emoji: "💳", label: "Paiement",        desc: "Bouton payer en ligne" },
+  { key: "wifi",     emoji: "📶", label: "Wifi",            desc: "Réseau + mot de passe" },
+  { key: "horaires", emoji: "🕐", label: "Horaires",        desc: "Vos horaires d'ouverture" },
+  { key: "contact",  emoji: "🪪", label: "Carte de visite", desc: "Nom, métier, contact" },
+]
+
 // Ecran d'accueil : objectifs -> meilleur modele (design instantane en 1 clic)
 const START_GOALS: { id: string; emoji: string; label: string; desc: string }[] = [
   { id: "avis-premium",     emoji: "⭐", label: "Obtenir plus d'avis",   desc: "Boostez vos avis clients" },
@@ -475,6 +490,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [tplOpen, setTplOpen] = useState(false)
   const [tplSearch, setTplSearch] = useState("")
   const [tplSector, setTplSector] = useState("")
+  const [compOpen, setCompOpen] = useState(false) // flyout composants metier
   const [showHelp, setShowHelp] = useState(false)
   const [hintOff, setHintOff] = useState(false)
   const [showStart, setShowStart] = useState(false) // ecran d'accueil guide (objectif -> design instantane)
@@ -1051,11 +1067,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   }
   // Ouvrir la bibliotheque sur un onglet donne (depuis le rail)
   const openLib = (c: typeof libCat) => {
-    setLibCat(c); setLibOpen(true); setTplOpen(false); setSide("")
+    setLibCat(c); setLibOpen(true); setTplOpen(false); setSide(""); setCompOpen(false)
     setTimeout(() => document.getElementById("lib-" + c)?.scrollIntoView({ behavior: "smooth", block: "start" }), 70)
   }
   // Ouvrir / fermer un panneau lateral (calques / fond)
-  const openSide = (s: "layers" | "bg" | "styles") => { setSide(prev => prev === s ? "" : s); setLibOpen(false); setTplOpen(false) }
+  const openSide = (s: "layers" | "bg" | "styles") => { setSide(prev => prev === s ? "" : s); setLibOpen(false); setTplOpen(false); setCompOpen(false) }
+  // Ouvrir / fermer le flyout composants metier
+  const openComp = () => { setCompOpen(v => !v); setTplOpen(false); setLibOpen(false); setSide("") }
   // Bouton CTA (pilule dimensionnee au texte)
   const addCTA = (label: string) => {
     centerObj(buildPill(label, { rectFill: G, textFill: "#080808", height: 80, fontSize: 30 }))
@@ -1074,6 +1092,44 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       const txt = new fabric.Text(label, { fontSize: 28, fontFamily: "DM Sans", fontWeight: "bold", fill: "#080808", originX: "center", originY: "center", left: W / 2, top: H / 2 })
       centerObj(new fabric.Group([ribbon, txt]))
     }
+  }
+  // Composants metier prets a l'emploi (1 clic) : pilule ou carte pre-composee
+  const addComponent = (key: string) => {
+    const pill = (text: string, bg: string, fg: string) => {
+      const t = new fabric.Text(text, { fontSize: 24, fontWeight: "bold", fill: fg, fontFamily: "Arial", originX: "center", originY: "center" })
+      const w = Math.round((t.width ?? 160) + 56), h = Math.round((t.height ?? 30) + 34)
+      const r = new fabric.Rect({ width: w, height: h, rx: h / 2, ry: h / 2, fill: bg })
+      t.set({ left: w / 2, top: h / 2 })
+      return new fabric.Group([r, t])
+    }
+    const card = (title: string, lines: string[]) => {
+      const w = 330, lh = 32, h = 64 + lines.length * lh
+      const objs: fabric.Object[] = [new fabric.Rect({ width: w, height: h, rx: 16, ry: 16, fill: "#FFFFFF", shadow: new fabric.Shadow({ color: "rgba(0,0,0,0.14)", blur: 20, offsetX: 0, offsetY: 7 }) })]
+      objs.push(new fabric.Text(title, { left: 26, top: 22, fontSize: 19, fontWeight: "bold", fill: "#1A1A1A", fontFamily: "Arial" }))
+      lines.forEach((ln, i) => objs.push(new fabric.Text(ln, { left: 26, top: 56 + i * lh, fontSize: 15, fill: "#555555", fontFamily: "Arial" })))
+      return new fabric.Group(objs)
+    }
+    let o: fabric.Object
+    switch (key) {
+      case "avis": {
+        const bg = new fabric.Rect({ width: 320, height: 120, rx: 18, ry: 18, fill: "#FFFFFF", shadow: new fabric.Shadow({ color: "rgba(0,0,0,0.14)", blur: 20, offsetX: 0, offsetY: 7 }) })
+        const stars = new fabric.Text("★★★★★", { fontSize: 34, fill: "#F4B400", left: 160, top: 22, originX: "center", fontFamily: "Arial" })
+        const t = new fabric.Text("Laissez-nous un avis", { fontSize: 18, fontWeight: "bold", fill: "#1A1A1A", left: 160, top: 76, originX: "center", fontFamily: "Arial" })
+        o = new fabric.Group([bg, stars, t]); break
+      }
+      case "insta":    o = pill("📷  @votrecompte", "#E1306C", "#FFFFFF"); break
+      case "whatsapp": o = pill("💬  WhatsApp", "#25D366", "#FFFFFF"); break
+      case "phone":    o = pill("📞  06 12 34 56 78", G, "#080808"); break
+      case "email":    o = pill("✉️  contact@email.fr", "#1F2937", "#FFFFFF"); break
+      case "menu":     o = pill("🍽️  Voir le menu", G, "#080808"); break
+      case "reserver": o = pill("📅  Réserver", "#0E7A5F", "#FFFFFF"); break
+      case "pay":      o = pill("💳  Payer en ligne", "#1D4ED8", "#FFFFFF"); break
+      case "wifi":     o = card("📶  Wifi", ["Réseau : MonReseau", "Mot de passe : ********"]); break
+      case "horaires": o = card("🕐  Horaires", ["Lun–Ven : 9h – 19h", "Samedi : 10h – 18h", "Dimanche : fermé"]); break
+      case "contact":  o = card("🪪  Prénom Nom", ["Votre métier", "📞 06 12 34 56 78", "🌐 monsite.fr"]); break
+      default:         o = pill("Bouton", G, "#080808")
+    }
+    centerObj(o)
   }
   // Fleche (polygone), pointant vers la droite par defaut + rotation
   const addArrow = (angle: number) => {
@@ -2111,9 +2167,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {/* Rail outils */}
         {wizard === 0 && (
         <div className="qr-scroll" style={{ width: 76, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", padding: "10px 8px", display: "flex", flexDirection: "column", gap: 6, background: SURFACE, overflowY: "auto" }}>
-          <button type="button" onClick={() => { setTplOpen(v => !v); setLibOpen(false); setSide(""); setWizard(0) }}
+          <button type="button" onClick={() => { setTplOpen(v => !v); setLibOpen(false); setSide(""); setCompOpen(false); setWizard(0) }}
             style={{ ...btnTool, background: tplOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.14),rgba(201,168,76,0.05))", border: `1px solid ${tplOpen ? G : "rgba(201,168,76,0.3)"}`, color: tplOpen ? G : INK, fontWeight: 700 }}>
             <LayoutTemplate size={16} /> Modèles
+          </button>
+          <button type="button" onClick={openComp}
+            style={{ ...btnTool, background: compOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.12),rgba(201,168,76,0.04))", border: `1px solid ${compOpen ? G : "rgba(201,168,76,0.3)"}`, color: compOpen ? G : INK, fontWeight: 700 }}>
+            <Sparkles size={16} /> Blocs
           </button>
           <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "6px 0 2px" }}>Ajouter</p>
           {([
@@ -2217,6 +2277,29 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <p style={{ color: MUTED, fontSize: 9, margin: "8px 2px 0", lineHeight: 1.4 }}>
                 Un modèle remplace le contenu actuel. Tout reste ensuite modifiable (textes, couleurs, position…).
               </p>
+            </div>
+          </div>
+        )}
+
+        {/* Composants metier 1-clic (flyout) */}
+        {compOpen && (
+          <div className="qr-scroll ps-fly" style={{ width: 280, background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.07)", flexShrink: 0 }}>
+              <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Blocs prêts à l'emploi</span>
+              <button type="button" onClick={() => setCompOpen(false)} aria-label="Fermer"
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
+            </div>
+            <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "10px 10px 16px", display: "flex", flexDirection: "column", gap: 7 }}>
+              {COMPONENTS.map(c => (
+                <button key={c.key} className="ps-goal" type="button" onClick={() => addComponent(c.key)}
+                  style={{ display: "flex", alignItems: "center", gap: 11, padding: "10px 12px", background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 12, cursor: "pointer", textAlign: "left" }}>
+                  <span style={{ fontSize: 22, flexShrink: 0 }}>{c.emoji}</span>
+                  <span style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                    <span style={{ color: INK, fontSize: 13, fontWeight: 700 }}>{c.label}</span>
+                    <span style={{ color: MUTED, fontSize: 10.5, lineHeight: 1.25 }}>{c.desc}</span>
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
         )}
@@ -2560,7 +2643,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         )}
 
         {/* Zone canvas (heros) : panneaux flottants -> on recadre pour garder l'artboard centre dans le visible */}
-        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, paddingLeft: 24 + (tplOpen ? 290 : libOpen ? 234 : side ? 250 : 0), paddingRight: 24 + (sel && showAdvanced ? 280 : 0), background: "#E5E8ED", position: "relative", transition: "padding .22s cubic-bezier(.2,.8,.2,1)" }}>
+        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, paddingLeft: 24 + (tplOpen ? 290 : compOpen ? 280 : libOpen ? 234 : side ? 250 : 0), paddingRight: 24 + (sel && showAdvanced ? 280 : 0), background: "#E5E8ED", position: "relative", transition: "padding .22s cubic-bezier(.2,.8,.2,1)" }}>
           {loading && (
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: MUTED, zIndex: 5, pointerEvents: "none" }}>
               <Loader2 size={18} style={{ animation: "spin 0.8s linear infinite" }} /> Chargement…
