@@ -174,6 +174,7 @@ const TOJSON_PROPS = [
   "lockMovementX", "lockMovementY",
   "lockScalingX", "lockScalingY",
   "lockRotation", "selectable", "evented",
+  "crossOrigin", // indispensable : sinon une photo distante "tainte" le canvas au rechargement -> export casse
 ]
 const ROLE_PREFIX: Record<string, string> = { phone: "📞  ", website: "🌐  " }
 const ROLE_LABEL: Record<string, string> = { title: "Titre", subtitle: "Sous-titre", phone: "Téléphone", website: "Site / adresse" }
@@ -558,6 +559,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [showStart, setShowStart] = useState(false) // ecran d'accueil guide (objectif -> design instantane)
   const [starting, setStarting] = useState(false)   // generation en cours depuis l'accueil
   const genIdxRef = useRef(0)                        // rotation des propositions de l'accueil
+  const saveRef = useRef<(silent?: boolean) => void>(() => {}) // ref vers le save courant (evite closure perimee dans Ctrl+S)
+  const applyingRef = useRef(false)                  // verrou anti-reentrance pendant l'application d'un modele (async photo)
   const [lastPool, setLastPool] = useState<string[] | null>(null) // dernier objectif (pour Régénérer)
   const [qrFg, setQrFg] = useState("")      // couleur courante du QR (apres regeneration)
   const [qrDot, setQrDot] = useState("")    // style de modules courant du QR
@@ -830,7 +833,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         setTplOpen(false); setLibOpen(false); setCompOpen(false); setPhotoOpen(false); setSide(""); setShowHelp(false)
         fc.discardActiveObject(); fc.requestRenderAll(); setSel(null)
       } else if (meta && (e.key === "s" || e.key === "S")) {
-        e.preventDefault(); save()
+        e.preventDefault(); saveRef.current()
       } else if (meta && (e.key === "c" || e.key === "C")) {
         if (!o) return
         e.preventDefault(); o.clone((c: fabric.Object) => { clipRef.current = c }, TOJSON_PROPS)
@@ -942,7 +945,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     try {
       const url = await regenQr({ fg: opts.fg ?? (qrFg || undefined), dotStyle: opts.dotStyle ?? (qrDot || undefined) })
       if (url) {
-        img.setSrc(url, () => { fc.requestRenderAll(); pushHistorySoon() }, { crossOrigin: "anonymous" } as fabric.IImageOptions)
+        // conserver largeur affichee + centre meme si le QR regenere a d'autres dimensions pixel
+        const w = img.getScaledWidth(); const center = img.getCenterPoint()
+        img.setSrc(url, () => {
+          img.scaleToWidth(w); img.setPositionByOrigin(center, "center", "center"); img.setCoords()
+          fc.requestRenderAll(); pushHistorySoon()
+        }, { crossOrigin: "anonymous" } as fabric.IImageOptions)
         if (opts.fg) setQrFg(opts.fg)
         if (opts.dotStyle) setQrDot(opts.dotStyle)
       }
@@ -1195,16 +1203,18 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const o = fc.getActiveObject() as fabric.Image | undefined
     if (!o || o.type !== "image") return
     const F = (fabric.Image as any).filters
+    const ctor: Record<string, any> = { dark: F.Brightness, gray: F.Grayscale, blur: F.Blur, duo: F.BlendColor }
+    // detection par TYPE de filtre (survit a la serialisation, contrairement a un marqueur custom)
     const filters = ((o.filters || []) as any[])
-    const has = filters.some(f => f.__k === key)
-    let next = filters.filter(f => f.__k !== key)
+    const has = filters.some(f => f instanceof ctor[key])
+    let next = filters.filter(f => !(f instanceof ctor[key]))
     if (!has) {
       let f: any
       if (key === "dark") f = new F.Brightness({ brightness: -0.3 })
       else if (key === "gray") f = new F.Grayscale()
       else if (key === "blur") f = new F.Blur({ blur: 0.18 })
       else if (key === "duo") f = new F.BlendColor({ color: G, mode: "tint", alpha: 0.5 })
-      if (f) { f.__k = key; next = [...next, f] }
+      if (f) next = [...next, f]
     }
     o.filters = next as any
     o.applyFilters(); fc.requestRenderAll(); pushHistorySoon()
@@ -1663,12 +1673,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // ---- Appliquer un modele oriente objectif --------------------------------
   // Vide le canvas (hors guides), pose un design complet et editable, place le vrai QR.
   const applyTemplate = async (id: string, skipConfirm = false) => {
+    if (applyingRef.current) return // anti-reentrance : un modele photo charge en async, on ignore les appels concurrents
     const fc = fcRef.current; if (!fc) return
     const meta = PRINT_TEMPLATES.find(t => t.id === id); if (!meta) return
     const vG = vGuideRef.current, hG = hGuideRef.current
     const hasContent = fc.getObjects().some(o => o !== vG && o !== hG && !(o as any).isQR && !(o as any).isQrCard)
     if (!skipConfirm && hasContent && !window.confirm("Remplacer le contenu actuel par ce modèle ?")) return
 
+    applyingRef.current = true
     histRef.current.lock = true // tout le modele = une seule etape d'historique
     fc.getObjects().slice().forEach(o => { if (o !== vG && o !== hG) fc.remove(o) })
     const z = fc.getZoom() || 1
@@ -1975,6 +1987,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     histRef.current.lock = false
     pushHistory() // modele applique = une etape
     setTplOpen(false)
+    applyingRef.current = false
   }
 
   // ---- Sauvegarde ----------------------------------------------------------
@@ -2004,6 +2017,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       if (!silent) setSaving(false)
     }
   }
+  saveRef.current = save // tenir la ref a jour a chaque render (Ctrl+S utilise toujours le save courant)
 
   // Auto-sauvegarde : 2,5 s apres la derniere modification (silencieuse)
   useEffect(() => {
@@ -2254,7 +2268,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           )}
           <div style={{ display: "flex", background: "rgba(0,0,0,0.05)", borderRadius: 9, padding: 3, gap: 2 }}>
             {([["Simple", false], ["Avancé", true]] as const).map(([l, v]) => (
-              <button key={l} type="button" onClick={() => { setAdvanced(v); if (!v) setShowAdvanced(false) }}
+              <button key={l} type="button" onClick={() => { setAdvanced(v); if (!v) { setShowAdvanced(false); if (side === "layers") setSide("") } }}
                 style={{ padding: "6px 11px", borderRadius: 7, border: "none", background: advanced === v ? SURFACE : "transparent", color: advanced === v ? INK : MUTED, fontSize: 11, fontWeight: advanced === v ? 700 : 500, cursor: "pointer", boxShadow: advanced === v ? "0 1px 3px rgba(0,0,0,0.12)" : "none" }}>{l}</button>
             ))}
           </div>
