@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import { Plus, QrCode, BarChart2, Eye, Zap, ArrowRight, Globe, Trash2, ExternalLink, Edit3, AlertTriangle, X } from "lucide-react"
+import { getPlan } from "@/lib/plans"
 
 type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string }
 type Profile = { full_name: string | null; plan: string; total_scans: number; total_pages: number; avatar_url: string | null }
@@ -53,6 +54,7 @@ export default function DashboardClient() {
   const [pageToDelete, setPageToDelete] = useState<Page | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [hour] = useState(new Date().getHours())
+  const [monthViews, setMonthViews] = useState(0) // vues du mois en cours (quota)
 
   const greeting = hour < 12 ? "Bonjour" : hour < 18 ? "Bon apres-midi" : "Bonsoir"
 
@@ -66,6 +68,14 @@ export default function DashboardClient() {
     ])
     if (prof) setProfile(prof)
     if (pgs) setPages(pgs)
+    // Vues du mois en cours (quota) — compte les page_views des pages de l'user depuis le 1er du mois
+    const ids = (pgs ?? []).map(p => p.id)
+    if (ids.length) {
+      const now = new Date()
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+      const { count } = await supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("created_at", monthStart)
+      setMonthViews(count ?? 0)
+    } else setMonthViews(0)
     setLoading(false)
   }
 
@@ -93,6 +103,11 @@ export default function DashboardClient() {
   const planCfg = PLAN_CONFIG[profile?.plan || "free"]
   const G = "#C9A84C"; const MUTED = "#8A8478"
   const publishedCount = pages.filter(p => p.status === "published").length
+  // Quota de vues mensuel (soft-cap : on alerte, on ne bloque jamais les pages publiques)
+  const viewsLimit = getPlan(profile?.plan).limits.views // null = illimité
+  const viewsPct   = viewsLimit ? Math.min(Math.round((monthViews / viewsLimit) * 100), 999) : 0
+  const nearViews  = viewsLimit != null && monthViews >= viewsLimit * 0.8 && monthViews < viewsLimit
+  const overViews  = viewsLimit != null && monthViews >= viewsLimit
 
   if (loading) return (
     <div style={{ minHeight: "100vh", background: "#080808", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -132,12 +147,37 @@ export default function DashboardClient() {
           </Link>
         </div>
 
+        {/* Soft-cap quota de vues : alerte (jamais de blocage des pages publiques) */}
+        {(nearViews || overViews) && (
+          <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", background: overViews ? "rgba(255,107,107,0.08)" : "rgba(201,168,76,0.08)", border: "1px solid " + (overViews ? "rgba(255,107,107,0.3)" : "rgba(201,168,76,0.3)"), borderRadius: 14, padding: "14px 18px", marginBottom: 22 }}>
+            <AlertTriangle size={18} color={overViews ? "#FF6B6B" : G} style={{ flexShrink: 0 }} />
+            <div style={{ flex: 1, minWidth: 220 }}>
+              <p style={{ color: "#F5F0E8", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>
+                {overViews
+                  ? `Quota de vues atteint (${monthViews.toLocaleString("fr-FR")} / ${viewsLimit!.toLocaleString("fr-FR")} ce mois-ci)`
+                  : `Bientôt à court de vues : ${monthViews.toLocaleString("fr-FR")} / ${viewsLimit!.toLocaleString("fr-FR")} (${viewsPct}%)`}
+              </p>
+              <p style={{ color: MUTED, fontSize: 11.5, margin: 0, lineHeight: 1.5 }}>
+                {overViews
+                  ? "Tes QR codes et pages restent 100% en ligne — rien n'est coupé. Passe à un plan supérieur pour relancer le compteur et débloquer plus de vues."
+                  : "Tes pages restent en ligne sans interruption. Pense à monter en plan pour ne pas être limité."}
+              </p>
+              <div style={{ height: 5, borderRadius: 3, background: "rgba(255,255,255,0.08)", marginTop: 8, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: Math.min(viewsPct, 100) + "%", background: overViews ? "linear-gradient(90deg,#FF6B6B,#F97316)" : "linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius: 3 }} />
+              </div>
+            </div>
+            <Link href="/upgrade" style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, background: overViews ? "linear-gradient(90deg,#FF6B6B,#F97316)" : "linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius: 10, padding: "9px 16px", color: "#080808", textDecoration: "none", fontSize: 12.5, fontWeight: 800 }}>
+              <Zap size={13} /> Augmenter mon quota
+            </Link>
+          </div>
+        )}
+
         {/* KPI */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 28 }}>
           {[
             { icon: <Eye size={18} />, label: "Pages creees", value: profile?.total_pages || 0, color: G, sub: publishedCount + " publiee" + (publishedCount > 1 ? "s" : "") },
             { icon: <QrCode size={18} />, label: "Scans totaux", value: profile?.total_scans || 0, color: "#39FF8F", sub: "tous temps" },
-            { icon: <BarChart2 size={18} />, label: "Vues totales", value: pages.reduce((s, p) => s + (p.total_views || 0), 0), color: "#7B61FF", sub: "toutes pages" },
+            { icon: <BarChart2 size={18} />, label: "Vues ce mois", value: monthViews, color: overViews ? "#FF6B6B" : "#7B61FF", sub: viewsLimit ? `/ ${viewsLimit.toLocaleString("fr-FR")} ce mois` : "illimitées" },
             { icon: <Globe size={18} />, label: "Publiees", value: publishedCount, color: "#38BDF8", sub: "sur " + pages.length + " pages" },
           ].map((kpi, i) => (
             <div key={i} style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 14, padding: "18px 20px", position: "relative", overflow: "hidden" }}>
