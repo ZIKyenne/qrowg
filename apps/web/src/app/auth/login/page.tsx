@@ -4,11 +4,12 @@ import { signIn } from '../actions'
 
 export const metadata: Metadata = { title: 'Connexion' }
 
-export default function LoginPage({
+export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: { error?: string }
+  searchParams: Promise<{ error?: string }>
 }) {
+  const sp = await searchParams
   return (
     <div style={{
       minHeight: '100vh', background: '#080808',
@@ -26,9 +27,9 @@ export default function LoginPage({
 
         <div style={{ background: '#111009', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '8px', padding: '36px' }}>
 
-          {searchParams.error && (
+          {sp.error && (
             <div style={{ background: 'rgba(255,82,82,0.08)', border: '1px solid rgba(255,82,82,0.2)', borderRadius: '4px', padding: '12px 16px', marginBottom: '20px', fontSize: '13px', color: '#FF8080' }}>
-              {decodeURIComponent(searchParams.error)}
+              {decodeURIComponent(sp.error)}
             </div>
           )}
 
