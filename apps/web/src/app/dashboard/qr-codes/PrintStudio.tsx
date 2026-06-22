@@ -149,6 +149,8 @@ type SelState = {
   textFill: string | null // couleur du texte interne (groupe avec texte)
   shadow: boolean         // ombre portee active
   shadowBlur: number      // intensite du flou de l'ombre
+  shadowX: number         // decalage horizontal de l'ombre
+  shadowY: number         // decalage vertical de l'ombre
   textAlign: string       // alignement du texte (gauche/centre/droite)
   charSpacing: number     // espacement des lettres
   lineHeight: number      // interligne
@@ -672,6 +674,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       textFill: txtChild && typeof txtChild.fill === "string" ? txtChild.fill : null,
       shadow: !!o.shadow,
       shadowBlur: o.shadow ? ((o.shadow as fabric.Shadow).blur ?? 18) : 18,
+      shadowX: o.shadow ? ((o.shadow as fabric.Shadow).offsetX ?? 0) : 0,
+      shadowY: o.shadow ? ((o.shadow as fabric.Shadow).offsetY ?? 0) : 0,
       textAlign: isText ? (t.textAlign ?? "left") : "left",
       charSpacing: isText ? (t.charSpacing ?? 0) : 0,
       lineHeight: isText ? (t.lineHeight ?? 1.16) : 1.16,
@@ -1474,6 +1478,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const setShadowBlur = (v: number) => mutate(o => {
     const s = o.shadow as fabric.Shadow | null; if (!s) return
     s.blur = v
+    o.dirty = true
+  })
+  const setShadowOffset = (axis: "x" | "y", v: number) => mutate(o => {
+    const s = o.shadow as fabric.Shadow | null; if (!s) return
+    if (axis === "x") s.offsetX = v; else s.offsetY = v
     o.dirty = true
   })
   // Presets d'ombre nommes (Canva-like)
@@ -3425,6 +3434,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     <label style={{ color: MUTED, fontSize: 10, display: "block", margin: "4px 0 4px" }}>Flou — {Math.round(sel.shadowBlur)}px</label>
                     <input type="range" min={0} max={60} step={1} value={sel.shadowBlur}
                       onChange={e => setShadowBlur(parseInt(e.target.value))}
+                      style={{ width: "100%", accentColor: G }} />
+                    <label style={{ color: MUTED, fontSize: 10, display: "block", margin: "6px 0 4px" }}>Décalage X — {Math.round(sel.shadowX)}px</label>
+                    <input type="range" min={-30} max={30} step={1} value={sel.shadowX}
+                      onChange={e => setShadowOffset("x", parseInt(e.target.value))}
+                      style={{ width: "100%", accentColor: G }} />
+                    <label style={{ color: MUTED, fontSize: 10, display: "block", margin: "6px 0 4px" }}>Décalage Y — {Math.round(sel.shadowY)}px</label>
+                    <input type="range" min={-30} max={30} step={1} value={sel.shadowY}
+                      onChange={e => setShadowOffset("y", parseInt(e.target.value))}
                       style={{ width: "100%", accentColor: G }} />
                     <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 6 }}>
                       <span style={{ color: MUTED, fontSize: 10 }}>Couleur :</span>
