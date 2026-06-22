@@ -270,6 +270,16 @@ const SECTORS: { id: string; label: string; emoji: string; objs: string[] }[] = 
   { id: "createur",label: "Créateur",    emoji: "🎨", objs: ["Abonnés", "Contact", "Avis", "Page"] },
 ]
 
+// Ecran d'accueil : objectifs -> meilleur modele (design instantane en 1 clic)
+const START_GOALS: { id: string; emoji: string; label: string; desc: string }[] = [
+  { id: "avis-premium",     emoji: "⭐", label: "Obtenir plus d'avis",   desc: "Boostez vos avis clients" },
+  { id: "insta-premium",    emoji: "📱", label: "Gagner des abonnés",    desc: "Réseaux sociaux" },
+  { id: "menu-premium",     emoji: "🍽️", label: "Montrer mon menu",      desc: "Carte accessible au scan" },
+  { id: "reserver-premium", emoji: "📅", label: "Prendre des réservations", desc: "Réservez en un scan" },
+  { id: "contact-premium",  emoji: "💳", label: "Partager mes coordonnées", desc: "Carte de visite digitale" },
+  { id: "promo-premium",    emoji: "🏷️", label: "Mettre en avant une offre", desc: "Promo, nouveauté…" },
+]
+
 // Mini-apercu schematique d'un modele (fond + couleurs + disposition)
 function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
   const isPremium = t.id.endsWith("-premium")
@@ -467,6 +477,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [tplSector, setTplSector] = useState("")
   const [showHelp, setShowHelp] = useState(false)
   const [hintOff, setHintOff] = useState(false)
+  const [showStart, setShowStart] = useState(false) // ecran d'accueil guide (objectif -> design instantane)
+  const [starting, setStarting] = useState(false)   // generation en cours depuis l'accueil
   const [qrFg, setQrFg] = useState("")      // couleur courante du QR (apres regeneration)
   const [qrDot, setQrDot] = useState("")    // style de modules courant du QR
   const [qrBusy, setQrBusy] = useState(false)
@@ -679,10 +691,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           return
         }
       } catch { /* pas de design : on pose le QR */ }
-      // Aucun design sauvegarde -> poser le vrai QR au centre + ouvrir la galerie de modeles
+      // Aucun design sauvegarde -> poser le vrai QR au centre + ecran d'accueil guide
       placeQr(fc)
       setLoading(false)
-      setTplOpen(true)
+      setShowStart(true)
     })()
 
     return () => { fc.dispose(); fcRef.current = null }
@@ -1898,6 +1910,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         .ps-fly { animation: psSlide .18s cubic-bezier(.2,.8,.2,1); position: absolute; top: 0; bottom: 0; left: 76px; z-index: 30; box-shadow: 8px 0 28px rgba(0,0,0,0.08); }
         .ps-fly-right { left: auto !important; right: 0 !important; box-shadow: -8px 0 28px rgba(0,0,0,0.08) !important; }
         .ps-pop { animation: psPop .18s cubic-bezier(.2,.8,.2,1); }
+        .ps-goal { transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
+        .ps-goal:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(0,0,0,0.12); border-color: ${G} !important; }
         @keyframes psSlide { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
         @keyframes psPop { from { opacity: 0; transform: translate(-50%, -8px) scale(.97); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
         .ps-root .qr-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -2861,6 +2875,34 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           </div>
         )}
       </div>
+
+      {/* Ecran d'accueil guide : objectif -> design instantane */}
+      {showStart && (
+        <div style={{ position: "absolute", inset: 0, zIndex: 60, background: "linear-gradient(180deg,#FFFFFF,#F1F4F8)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "DM Sans, sans-serif", overflowY: "auto" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+            <span style={{ width: 10, height: 10, borderRadius: 3, background: G }} />
+            <span style={{ color: MUTED, fontSize: 11.5, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase" }}>QR Print Studio</span>
+          </div>
+          <h2 style={{ color: INK, fontSize: 28, fontWeight: 800, margin: "0 0 7px", textAlign: "center" }}>Que voulez-vous créer ?</h2>
+          <p style={{ color: MUTED, fontSize: 14, margin: "0 0 28px", textAlign: "center", maxWidth: 440, lineHeight: 1.5 }}>Choisissez un objectif — votre design est prêt en 1 clic. Tout reste modifiable ensuite.</p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(170px, 200px))", gap: 14, maxWidth: "100%" }}>
+            {START_GOALS.map(g => (
+              <button key={g.id} className="ps-goal" type="button" disabled={starting}
+                onClick={async () => { setStarting(true); await applyTemplate(g.id, true); setStarting(false); setShowStart(false) }}
+                style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 6, padding: "18px 16px", background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 16, cursor: starting ? "wait" : "pointer", textAlign: "left", opacity: starting ? 0.6 : 1 }}>
+                <span style={{ fontSize: 30 }}>{g.emoji}</span>
+                <span style={{ color: INK, fontSize: 15, fontWeight: 800, lineHeight: 1.2 }}>{g.label}</span>
+                <span style={{ color: MUTED, fontSize: 12, lineHeight: 1.3 }}>{g.desc}</span>
+              </button>
+            ))}
+          </div>
+          <div style={{ display: "flex", gap: 20, marginTop: 26, alignItems: "center" }}>
+            <button type="button" onClick={() => { setShowStart(false); setTplOpen(true) }} style={{ background: "none", border: "none", color: INK, fontSize: 13, fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}>Parcourir tous les modèles</button>
+            <button type="button" onClick={() => setShowStart(false)} style={{ background: "none", border: "none", color: MUTED, fontSize: 13, cursor: "pointer" }}>Partir d'une page vierge</button>
+          </div>
+          {starting && <div style={{ marginTop: 18, display: "flex", alignItems: "center", gap: 8, color: G, fontSize: 13, fontWeight: 600 }}><Loader2 size={15} style={{ animation: "spin 0.8s linear infinite" }} /> Création de votre design…</div>}
+        </div>
+      )}
 
       {/* Aide & raccourcis */}
       {showHelp && (
