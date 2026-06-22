@@ -23,12 +23,12 @@ import {
   Undo2, Redo2, Sparkles, Image as ImageIcon, Palette, Eye,
 } from "lucide-react"
 
-// ---- Constantes design (Midnight Gold) -------------------------------------
-const G       = "#C9A84C"
-const INK     = "#F5F0E8"
-const MUTED   = "#8A8478"
-const SURFACE = "#111009"
-const BG      = "#080808"
+// ---- Constantes design (Clair & aere, style Canva) -------------------------
+const G       = "#C9A84C"   // accent (or de marque) : etats actifs, boutons primaires
+const INK     = "#1F2430"   // texte principal (fonce sur clair)
+const MUTED   = "#6B7280"   // texte secondaire (gris)
+const SURFACE = "#FFFFFF"   // panneaux / barres
+const BG      = "#EDEFF3"   // zone de travail + champs (gris clair)
 const CANVAS_BG_DEFAULT = "#FFFFFF"
 
 // ---- Formats supportes -----------------------------------------------------
@@ -1825,21 +1825,21 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // ==========================================================================
   const btnTool = {
     display: "flex", flexDirection: "column" as const, alignItems: "center", gap: 3,
-    width: "100%", padding: "8px 2px", background: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, color: INK,
+    width: "100%", padding: "8px 2px", background: "rgba(0,0,0,0.03)",
+    border: "1px solid rgba(0,0,0,0.07)", borderRadius: 9, color: INK,
     fontSize: 8.5, cursor: "pointer",
   }
   const topBtn = (primary = false) => ({
     display: "flex", alignItems: "center", gap: 6, padding: "8px 13px",
-    background: primary ? "linear-gradient(90deg,#C9A84C,#b8953f)" : "rgba(255,255,255,0.05)",
-    border: primary ? "none" : "1px solid rgba(255,255,255,0.1)",
+    background: primary ? "linear-gradient(90deg,#C9A84C,#b8953f)" : "rgba(0,0,0,0.05)",
+    border: primary ? "none" : "1px solid rgba(0,0,0,0.1)",
     borderRadius: 9, color: primary ? "#080808" : INK, fontSize: 12,
     fontWeight: primary ? 700 : 500, cursor: "pointer",
   })
   const layerBtn = {
     display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
-    padding: "8px", background: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, color: INK,
+    padding: "8px", background: "rgba(0,0,0,0.03)",
+    border: "1px solid rgba(0,0,0,0.07)", borderRadius: 8, color: INK,
     fontSize: 10, cursor: "pointer",
   }
   const iconMini = {
@@ -1848,10 +1848,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   } as const
   const tb = {
     display: "flex", alignItems: "center", justifyContent: "center", minWidth: 26, height: 26, padding: "0 7px",
-    background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 7, color: INK, fontSize: 12, cursor: "pointer",
+    background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 7, color: INK, fontSize: 12, cursor: "pointer",
   } as const
   const swatch = {
-    width: 28, height: 24, borderRadius: 6, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", cursor: "pointer", padding: 0, flexShrink: 0,
+    width: 28, height: 24, borderRadius: 6, border: "1px solid rgba(0,0,0,0.15)", background: "transparent", cursor: "pointer", padding: 0, flexShrink: 0,
   } as const
 
   const canUndo = histVer >= 0 && histRef.current.i > 0
@@ -1880,7 +1880,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   })()
   const histBtn = (enabled: boolean) => ({
     display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32,
-    background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8,
+    background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 8,
     color: enabled ? INK : MUTED, cursor: enabled ? "pointer" : "not-allowed", opacity: enabled ? 1 : 0.4,
   })
 
@@ -1891,7 +1891,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     }}>
       <style>{`
         .ps-root button { transition: background .14s ease, border-color .14s ease, color .14s ease, transform .07s ease, filter .14s ease; }
-        .ps-root button:hover:not(:disabled) { filter: brightness(1.13); }
+        .ps-root button:hover:not(:disabled) { filter: brightness(0.96); }
         .ps-root button:active:not(:disabled) { transform: scale(0.96); }
         .ps-root input, .ps-root select { transition: border-color .14s ease, box-shadow .14s ease; }
         .ps-root input:focus, .ps-root select:focus { border-color: ${G} !important; box-shadow: 0 0 0 2px rgba(201,168,76,0.18); }
@@ -1900,7 +1900,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         @keyframes psSlide { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
         @keyframes psPop { from { opacity: 0; transform: translate(-50%, -8px) scale(.97); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
         .ps-root .qr-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
-        .ps-root .qr-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 8px; }
+        .ps-root .qr-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 8px; }
         .ps-root .qr-scroll::-webkit-scrollbar-thumb:hover { background: rgba(201,168,76,0.4); }
         .ps-root .qr-scroll::-webkit-scrollbar-track { background: transparent; }
       `}</style>
@@ -1908,7 +1908,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       {/* ---- Barre du haut ---- */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.07)",
+        padding: "10px 16px", borderBottom: "1px solid rgba(0,0,0,0.07)",
         background: SURFACE, flexShrink: 0,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -1918,7 +1918,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {/* Formats */}
-          <div style={{ display: "flex", gap: 3, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
+          <div style={{ display: "flex", gap: 3, background: "rgba(0,0,0,0.04)", borderRadius: 9, padding: 3 }}>
             {(Object.keys(FORMATS) as FormatId[]).map(f => (
               <button key={f} type="button" onClick={() => applyFormat(f)}
                 style={{
@@ -1933,7 +1933,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           </div>
 
           {/* Zoom */}
-          <div style={{ display: "flex", alignItems: "center", gap: 2, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 2, background: "rgba(0,0,0,0.04)", borderRadius: 9, padding: 3 }}>
             <button type="button" onClick={() => applyZoom(zoom / 1.25)} title="Zoom arrière" aria-label="Zoom arrière"
               style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 6, color: INK, fontSize: 16, cursor: "pointer" }}>−</button>
             <button type="button" onClick={() => applyZoom(1)} title="100 %"
@@ -1943,10 +1943,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           </div>
 
           <button type="button" onClick={() => setShowHelp(true)} title="Aide & raccourcis" aria-label="Aide et raccourcis"
-            style={{ width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: INK, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>?</button>
+            style={{ width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 9, color: INK, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>?</button>
 
           <button type="button" onClick={openMock} title="Aperçu en situation"
-            style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+            style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 9, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
             <Eye size={14} /> Aperçu
           </button>
 
@@ -1967,12 +1967,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               {exporting ? <Loader2 size={13} style={{ animation: "spin 0.8s linear infinite" }} /> : <Download size={13} />} Exporter
             </button>
             {expOpen && (
-              <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, width: 232, background: "#14120C", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: 12, boxShadow: "0 18px 50px rgba(0,0,0,0.6)", zIndex: 60 }}>
+              <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, width: 232, background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.12)", borderRadius: 12, padding: 12, boxShadow: "0 12px 32px rgba(0,0,0,0.16)", zIndex: 60 }}>
                 <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>Qualité</p>
                 <div style={{ display: "flex", gap: 4, marginBottom: 12 }}>
                   {[72, 150, 300].map(d => (
                     <button key={d} type="button" onClick={() => setExpDpi(d)}
-                      style={{ flex: 1, padding: "6px 0", borderRadius: 7, border: `1px solid ${expDpi === d ? G : "rgba(255,255,255,0.1)"}`, background: expDpi === d ? "rgba(201,168,76,0.15)" : "transparent", color: expDpi === d ? G : INK, fontSize: 10.5, fontWeight: 700, cursor: "pointer" }}>{d}<span style={{ fontSize: 7, opacity: 0.7 }}> DPI</span></button>
+                      style={{ flex: 1, padding: "6px 0", borderRadius: 7, border: `1px solid ${expDpi === d ? G : "rgba(0,0,0,0.1)"}`, background: expDpi === d ? "rgba(201,168,76,0.15)" : "transparent", color: expDpi === d ? G : INK, fontSize: 10.5, fontWeight: 700, cursor: "pointer" }}>{d}<span style={{ fontSize: 7, opacity: 0.7 }}> DPI</span></button>
                   ))}
                 </div>
                 <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, cursor: "pointer", color: INK, fontSize: 10.5, lineHeight: 1.3 }}>
@@ -1980,15 +1980,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   Traits de coupe + fond perdu <span style={{ color: MUTED }}>(PDF)</span>
                 </label>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  <button type="button" onClick={() => exportImage("png")} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 11px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer" }}><Download size={13} /> PNG</button>
-                  <button type="button" onClick={() => exportImage("jpeg")} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 11px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer" }}><Download size={13} /> JPG</button>
+                  <button type="button" onClick={() => exportImage("png")} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 11px", background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 9, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer" }}><Download size={13} /> PNG</button>
+                  <button type="button" onClick={() => exportImage("jpeg")} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 11px", background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 9, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer" }}><Download size={13} /> JPG</button>
                   <button type="button" onClick={exportPdfPro} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 11px", background: "linear-gradient(90deg,#C9A84C,#b8953f)", border: "none", borderRadius: 9, color: "#080808", fontSize: 12, fontWeight: 800, cursor: "pointer" }}><Printer size={13} /> PDF{!isPro ? " 🔒" : ""}</button>
                 </div>
               </div>
             )}
           </div>
           <button type="button" onClick={onClose} aria-label="Fermer"
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: MUTED, cursor: "pointer" }}>
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 9, color: MUTED, cursor: "pointer" }}>
             <X size={16} />
           </button>
         </div>
@@ -2001,11 +2001,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {wizard > 0 && (() => {
           const metier = METIERS.find(m => m.id === wizMetier)
           return (
-            <div className="qr-scroll ps-fly" style={{ width: 300, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+            <div className="qr-scroll ps-fly" style={{ width: 300, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
                 <span style={{ color: G, fontWeight: 800, fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}><Sparkles size={14} /> Création guidée</span>
                 <button type="button" onClick={() => setWizard(0)} aria-label="Fermer l'assistant"
-                  style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}>
+                  style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}>
                   <X size={13} />
                 </button>
               </div>
@@ -2013,7 +2013,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               {/* Fil d'etapes */}
               <div style={{ display: "flex", gap: 6, padding: "10px 14px", flexShrink: 0 }}>
                 {[1, 2, 3].map(s => (
-                  <div key={s} style={{ flex: 1, height: 4, borderRadius: 2, background: wizard >= s ? G : "rgba(255,255,255,0.1)" }} />
+                  <div key={s} style={{ flex: 1, height: 4, borderRadius: 2, background: wizard >= s ? G : "rgba(0,0,0,0.1)" }} />
                 ))}
               </div>
 
@@ -2026,7 +2026,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7 }}>
                       {METIERS.map(m => (
                         <button key={m.id} type="button" onClick={() => { setWizMetier(m.id); setWizard(2) }}
-                          style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "12px 6px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, cursor: "pointer" }}>
+                          style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "12px 6px", background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 10, cursor: "pointer" }}>
                           <span style={{ fontSize: 22 }}>{m.emoji}</span>
                           <span style={{ color: INK, fontSize: 11, fontWeight: 600, textAlign: "center" }}>{m.label}</span>
                         </button>
@@ -2065,7 +2065,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                         <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 14 }}>
                           {metier.objs.map((o, i) => (
                             <button key={i} type="button" onClick={() => generate(metier, o)}
-                              style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer", textAlign: "left" }}>
+                              style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: 9, cursor: "pointer", textAlign: "left" }}>
                               <Sparkles size={12} color={G} style={{ flexShrink: 0 }} />
                               <span style={{ color: INK, fontSize: 11, fontWeight: 600 }}>{o.label}</span>
                             </button>
@@ -2074,7 +2074,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                       </>
                     )}
                     <button type="button" onClick={() => save()} disabled={saving}
-                      style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "11px", marginBottom: 8, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, color: INK, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                      style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "11px", marginBottom: 8, background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.12)", borderRadius: 10, color: INK, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                       <Save size={14} /> {saved ? "Enregistré ✓" : "Enregistrer"}
                     </button>
                     <button type="button" onClick={exportPng} disabled={exporting}
@@ -2082,7 +2082,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                       <Download size={14} /> Télécharger en PNG
                     </button>
                     <button type="button" onClick={() => setWizard(0)}
-                      style={{ width: "100%", padding: "10px", background: "none", border: "1px dashed rgba(255,255,255,0.15)", borderRadius: 10, color: MUTED, fontSize: 11.5, cursor: "pointer" }}>
+                      style={{ width: "100%", padding: "10px", background: "none", border: "1px dashed rgba(0,0,0,0.15)", borderRadius: 10, color: MUTED, fontSize: 11.5, cursor: "pointer" }}>
                       Tout personnaliser (mode avancé) →
                     </button>
                   </>
@@ -2094,7 +2094,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Rail outils */}
         {wizard === 0 && (
-        <div className="qr-scroll" style={{ width: 76, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", padding: "10px 8px", display: "flex", flexDirection: "column", gap: 6, background: SURFACE, overflowY: "auto" }}>
+        <div className="qr-scroll" style={{ width: 76, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", padding: "10px 8px", display: "flex", flexDirection: "column", gap: 6, background: SURFACE, overflowY: "auto" }}>
           <button type="button" onClick={() => { setTplOpen(v => !v); setLibOpen(false); setSide(""); setWizard(0) }}
             style={{ ...btnTool, background: tplOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.14),rgba(201,168,76,0.05))", border: `1px solid ${tplOpen ? G : "rgba(201,168,76,0.3)"}`, color: tplOpen ? G : INK, fontWeight: 700 }}>
             <LayoutTemplate size={16} /> Modèles
@@ -2109,7 +2109,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             const on = libOpen && libCat === cat
             return (
               <button key={cat} type="button" onClick={() => openLib(cat)}
-                style={{ ...btnTool, background: on ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${on ? G : "rgba(255,255,255,0.07)"}`, color: on ? G : INK }}>
+                style={{ ...btnTool, background: on ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${on ? G : "rgba(0,0,0,0.07)"}`, color: on ? G : INK }}>
                 {icon} {label}
               </button>
             )
@@ -2124,22 +2124,22 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             const on = libOpen && libCat === cat
             return (
               <button key={cat} type="button" onClick={() => openLib(cat)}
-                style={{ ...btnTool, background: on ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${on ? G : "rgba(255,255,255,0.07)"}`, color: on ? G : INK }}>
+                style={{ ...btnTool, background: on ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${on ? G : "rgba(0,0,0,0.07)"}`, color: on ? G : INK }}>
                 {icon} {label}
               </button>
             )
           })}
           <div style={{ flex: 1 }} />
           <button type="button" onClick={() => openSide("styles")}
-            style={{ ...btnTool, background: side === "styles" ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${side === "styles" ? G : "rgba(255,255,255,0.07)"}`, color: side === "styles" ? G : INK }}>
+            style={{ ...btnTool, background: side === "styles" ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${side === "styles" ? G : "rgba(0,0,0,0.07)"}`, color: side === "styles" ? G : INK }}>
             <Palette size={16} /> Styles
           </button>
           <button type="button" onClick={() => openSide("layers")}
-            style={{ ...btnTool, background: side === "layers" ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${side === "layers" ? G : "rgba(255,255,255,0.07)"}`, color: side === "layers" ? G : INK }}>
+            style={{ ...btnTool, background: side === "layers" ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${side === "layers" ? G : "rgba(0,0,0,0.07)"}`, color: side === "layers" ? G : INK }}>
             <Copy size={16} /> Calques
           </button>
           <button type="button" onClick={() => openSide("bg")}
-            style={{ ...btnTool, background: side === "bg" ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${side === "bg" ? G : "rgba(255,255,255,0.07)"}`, color: side === "bg" ? G : INK }}>
+            style={{ ...btnTool, background: side === "bg" ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${side === "bg" ? G : "rgba(0,0,0,0.07)"}`, color: side === "bg" ? G : INK }}>
             <Square size={16} /> Fond
           </button>
         </div>
@@ -2147,23 +2147,23 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Modeles orientes objectif (flyout) */}
         {tplOpen && (
-          <div className="qr-scroll ps-fly" style={{ width: 290, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+          <div className="qr-scroll ps-fly" style={{ width: 290, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Modèles par objectif</span>
               <button type="button" onClick={() => setTplOpen(false)} aria-label="Fermer les modèles"
-                style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}>
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}>
                 <X size={13} />
               </button>
             </div>
             <div style={{ padding: "10px 12px 0", flexShrink: 0 }}>
               <input value={tplSearch} onChange={e => setTplSearch(e.target.value)} placeholder="Rechercher un modèle…"
-                style={{ width: "100%", background: BG, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "8px 10px", color: INK, fontSize: 11, outline: "none", boxSizing: "border-box" }} />
+                style={{ width: "100%", background: BG, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 8, padding: "8px 10px", color: INK, fontSize: 11, outline: "none", boxSizing: "border-box" }} />
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 9 }}>
                 {[{ id: "", label: "Tous", emoji: "✨" }, ...SECTORS].map(s => {
                   const on = tplSector === s.id
                   return (
                     <button key={s.id} type="button" onClick={() => setTplSector(s.id)} title={s.label}
-                      style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 9px", borderRadius: 999, cursor: "pointer", fontSize: 10.5, fontWeight: on ? 700 : 500, background: on ? "rgba(201,168,76,0.18)" : "rgba(255,255,255,0.04)", border: `1px solid ${on ? G : "rgba(255,255,255,0.1)"}`, color: on ? G : INK }}>
+                      style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 9px", borderRadius: 999, cursor: "pointer", fontSize: 10.5, fontWeight: on ? 700 : 500, background: on ? "rgba(201,168,76,0.18)" : "rgba(0,0,0,0.04)", border: `1px solid ${on ? G : "rgba(0,0,0,0.1)"}`, color: on ? G : INK }}>
                       <span>{s.emoji}</span>{s.label}
                     </button>
                   )
@@ -2184,7 +2184,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                       {items.map(t => (
                         <button key={t.id} type="button" onClick={() => applyTemplate(t.id)} title={t.desc}
-                          style={{ display: "flex", flexDirection: "column", gap: 5, padding: 6, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, cursor: "pointer" }}>
+                          style={{ display: "flex", flexDirection: "column", gap: 5, padding: 6, background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: 10, cursor: "pointer" }}>
                           {tplThumb(t)}
                           <span style={{ color: INK, fontSize: 10, fontWeight: 700, textAlign: "center", lineHeight: 1.2 }}>{t.label}</span>
                         </button>
@@ -2195,7 +2195,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               })
               })()}
               <button type="button" onClick={resetCanvas}
-                style={{ width: "100%", marginTop: 8, padding: "9px 10px", background: "rgba(255,255,255,0.04)", border: "1px dashed rgba(255,255,255,0.18)", borderRadius: 9, color: INK, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
+                style={{ width: "100%", marginTop: 8, padding: "9px 10px", background: "rgba(0,0,0,0.04)", border: "1px dashed rgba(0,0,0,0.18)", borderRadius: 9, color: INK, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
                 ＋ Page vierge (repartir de zéro)
               </button>
               <p style={{ color: MUTED, fontSize: 9, margin: "8px 2px 0", lineHeight: 1.4 }}>
@@ -2207,11 +2207,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Bibliotheque d'elements (flyout) */}
         {libOpen && (
-          <div className="qr-scroll ps-fly" style={{ width: 234, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+          <div className="qr-scroll ps-fly" style={{ width: 234, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Bibliothèque</span>
               <button type="button" onClick={() => setLibOpen(false)} aria-label="Fermer la bibliothèque"
-                style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}>
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}>
                 <X size={13} />
               </button>
             </div>
@@ -2233,7 +2233,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     { text: "Bienvenue", size: 40, weight: "normal", font: "Dancing Script", label: "Script élégant", pv: 20 },
                   ] as const).map((p, i) => (
                     <button key={i} type="button" onClick={() => addTextPreset(p)}
-                      style={{ width: "100%", textAlign: "left", padding: "11px 12px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer", color: INK, fontFamily: p.font, fontSize: p.pv, fontWeight: p.weight as any }}>
+                      style={{ width: "100%", textAlign: "left", padding: "11px 12px", background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: 9, cursor: "pointer", color: INK, fontFamily: p.font, fontSize: p.pv, fontWeight: p.weight as any }}>
                       {p.label}
                     </button>
                   ))}
@@ -2249,7 +2249,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     ["double", "Double", { double: true }], ["ornament", "Ornement", { orn: true }],
                   ] as const).map(([k, label, o]) => (
                     <button key={k} type="button" onClick={() => addLineVariant(k)} title={label}
-                      style={{ display: "flex", flexDirection: "column", gap: 5, padding: "9px 10px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
+                      style={{ display: "flex", flexDirection: "column", gap: 5, padding: "9px 10px", background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: 9, cursor: "pointer" }}>
                       <svg width="100%" height="14" viewBox="0 0 100 14" preserveAspectRatio="none">
                         {"double" in o && (o as any).double ? (
                           <>
@@ -2278,7 +2278,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     ["filet", "Filet", 1, 0], ["thick", "Épais", 3, 0], ["double", "Double", 1, 0], ["rounded", "Arrondi", 2, 6],
                   ] as const).map(([k, label, sw, rx]) => (
                     <button key={k} type="button" onClick={() => addFrame(k)} title={label}
-                      style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "10px 2px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
+                      style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "10px 2px", background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: 9, cursor: "pointer" }}>
                       <svg width="36" height="46" viewBox="0 0 36 46">
                         <rect x="3" y="3" width="30" height="40" rx={rx} fill="none" stroke={G} strokeWidth={sw} />
                         {k === "double" && <rect x="6" y="6" width="24" height="34" fill="none" stroke={G} strokeWidth="0.7" />}
@@ -2306,7 +2306,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
                   {LIB_ICONS.map(ic => (
                     <button key={ic.key} type="button" onClick={() => addIcon(ic.d)} title={ic.label}
-                      style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "9px 2px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
+                      style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "9px 2px", background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: 9, cursor: "pointer" }}>
                       <svg width="24" height="24" viewBox="0 0 24 24"><path d={ic.d} fill={INK} /></svg>
                       <span style={{ color: MUTED, fontSize: 8 }}>{ic.label}</span>
                     </button>
@@ -2321,7 +2321,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     ["NOUVEAU", "ribbon"], ["-20%", "ribbon"], ["-30%", "ribbon"], ["-50%", "ribbon"], ["PROMO", "seal"], ["TOP", "seal"], ["VIP", "seal"], ["GRATUIT", "ribbon"], ["OFFERT", "ribbon"], ["LIMITÉ", "ribbon"], ["EXCLU", "seal"], ["★★★★★", "ribbon"],
                   ] as const).map(([l, k]) => (
                     <button key={l} type="button" onClick={() => addBadge(l, k)}
-                      style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 11px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
+                      style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 11px", background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: 9, cursor: "pointer" }}>
                       <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 54, padding: "4px 8px", background: G, color: "#080808", fontSize: 10, fontWeight: 800, borderRadius: k === "seal" ? "50%" : 4, width: k === "seal" ? 32 : "auto", height: k === "seal" ? 32 : "auto" }}>{l}</span>
                       <span style={{ color: INK, fontSize: 10.5 }}>{k === "seal" ? "Sceau rond" : "Ruban"}</span>
                     </button>
@@ -2349,7 +2349,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     ["bubble", "Bulle",    <svg width="26" height="24" viewBox="0 0 26 24" key="s"><rect x="2" y="2" width="22" height="15" rx="4" fill={G} /><polygon points="6,16 14,16 6,23" fill={G} /></svg>],
                   ] as const).map(([k, label, prev]) => (
                     <button key={k} type="button" onClick={() => addShape(k)} title={label}
-                      style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "10px 2px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
+                      style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "10px 2px", background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: 9, cursor: "pointer" }}>
                       {prev}
                       <span style={{ color: MUTED, fontSize: 8 }}>{label}</span>
                     </button>
@@ -2362,7 +2362,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                   {([["→", 0], ["↓", 90], ["←", 180], ["↑", 270]] as const).map(([sym, ang]) => (
                     <button key={ang} type="button" onClick={() => addArrow(ang)}
-                      style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "16px 0", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer", color: G, fontSize: 22, fontWeight: 800 }}>
+                      style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "16px 0", background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: 9, cursor: "pointer", color: G, fontSize: 22, fontWeight: 800 }}>
                       {sym}
                     </button>
                   ))}
@@ -2387,7 +2387,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     ["swoosh", "Trait",    <svg width="26" height="14" viewBox="0 0 26 14" key="d"><path d="M2 9 Q13 1 24 7" fill="none" stroke={G} strokeWidth="2.5" strokeLinecap="round" /></svg>],
                   ] as const).map(([k, label, prev]) => (
                     <button key={k} type="button" onClick={() => addDeco(k)} title={label}
-                      style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "10px 2px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
+                      style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "10px 2px", background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: 9, cursor: "pointer" }}>
                       {prev}
                       <span style={{ color: MUTED, fontSize: 8 }}>{label}</span>
                     </button>
@@ -2400,17 +2400,17 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Panneau Styles globaux (gauche) */}
         {side === "styles" && (
-          <div className="qr-scroll ps-fly" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+          <div className="qr-scroll ps-fly" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Styles</span>
-              <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
+              <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
             </div>
             <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "10px 12px 16px" }}>
               <p style={{ color: MUTED, fontSize: 10, margin: "0 0 10px", lineHeight: 1.4 }}>Un clic restyle tout le design (couleurs, polices, accents).</p>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {GLOBAL_STYLES.map(s => (
                   <button key={s.id} type="button" onClick={() => applyStyle(s)}
-                    style={{ display: "flex", alignItems: "center", gap: 10, padding: 8, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, cursor: "pointer", textAlign: "left" }}>
+                    style={{ display: "flex", alignItems: "center", gap: 10, padding: 8, background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 10, cursor: "pointer", textAlign: "left" }}>
                     <span style={{ display: "flex", flexShrink: 0, width: 44, height: 34, borderRadius: 7, overflow: "hidden", border: "1px solid rgba(0,0,0,0.25)" }}>
                       <span style={{ flex: 1, background: s.bg }} />
                       <span style={{ width: 14, background: s.accent }} />
@@ -2428,10 +2428,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Panneau Calques (gauche) */}
         {side === "layers" && (
-          <div className="qr-scroll ps-fly" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+          <div className="qr-scroll ps-fly" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Calques</span>
-              <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
+              <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
             </div>
             <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "10px 12px 16px" }}>
               {(() => {
@@ -2449,7 +2449,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                           onDragLeave={() => { if (dragOver === idx) setDragOver(null) }}
                           onDrop={() => { if (dragIdxRef.current !== null) reorderLayers(dragIdxRef.current, idx); dragIdxRef.current = null; setDragOver(null) }}
                           onDragEnd={() => { dragIdxRef.current = null; setDragOver(null) }}
-                          style={{ display: "flex", alignItems: "center", gap: 2, padding: "5px 7px", borderRadius: 7, background: on ? "rgba(201,168,76,0.14)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? G : "rgba(255,255,255,0.06)"}`, boxShadow: dragOver === idx ? `inset 0 2px 0 ${G}` : "none" }}>
+                          style={{ display: "flex", alignItems: "center", gap: 2, padding: "5px 7px", borderRadius: 7, background: on ? "rgba(201,168,76,0.14)" : "rgba(0,0,0,0.03)", border: `1px solid ${on ? G : "rgba(0,0,0,0.06)"}`, boxShadow: dragOver === idx ? `inset 0 2px 0 ${G}` : "none" }}>
                           <svg width="9" height="14" viewBox="0 0 9 14" style={{ cursor: "grab", flexShrink: 0, marginRight: 2 }}>
                             {[2.5, 7, 11.5].map((cy, r) => [2.5, 6.5].map((cx, c) => <circle key={`${r}-${c}`} cx={cx} cy={cy} r="1" fill={MUTED} />))}
                           </svg>
@@ -2482,10 +2482,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Panneau Fond + infos (gauche) */}
         {side === "bg" && (
-          <div className="qr-scroll ps-fly" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+          <div className="qr-scroll ps-fly" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Fond &amp; infos</span>
-              <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
+              <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
             </div>
             <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "12px 12px 16px", display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
@@ -2495,25 +2495,25 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     const active = bgGrad ? (p.type === "grad" && bgColor === p.c1 && bgC2 === p.c2) : (p.type === "solid" && bgColor === p.c1)
                     return (
                       <button key={p.id} type="button" onClick={() => applyBgPreset(p)} title={p.id}
-                        style={{ width: "100%", aspectRatio: "1.3", borderRadius: 8, cursor: "pointer", border: `2px solid ${active ? G : "rgba(255,255,255,0.14)"}`, background: p.type === "grad" ? `linear-gradient(180deg, ${p.c1}, ${p.c2})` : p.c1, padding: 0 }} />
+                        style={{ width: "100%", aspectRatio: "1.3", borderRadius: 8, cursor: "pointer", border: `2px solid ${active ? G : "rgba(0,0,0,0.14)"}`, background: p.type === "grad" ? `linear-gradient(180deg, ${p.c1}, ${p.c2})` : p.c1, padding: 0 }} />
                     )
                   })}
                 </div>
                 <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>Couleur personnalisée</p>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <input type="color" value={/^#/.test(bgColor) ? bgColor : "#FFFFFF"} onChange={e => applyBg(e.target.value)}
-                    style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
+                    style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(0,0,0,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
                   <input value={bgColor} onChange={e => applyBg(e.target.value)}
-                    style={{ flex: 1, background: BG, border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, fontFamily: "monospace", outline: "none", boxSizing: "border-box" }} />
+                    style={{ flex: 1, background: BG, border: "1px solid rgba(0,0,0,0.08)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, fontFamily: "monospace", outline: "none", boxSizing: "border-box" }} />
                 </div>
                 <button type="button" onClick={() => toggleGrad(!bgGrad)}
-                  style={{ ...layerBtn, width: "100%", marginTop: 8, background: bgGrad ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", color: bgGrad ? G : INK, fontWeight: 700 }}>
+                  style={{ ...layerBtn, width: "100%", marginTop: 8, background: bgGrad ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: bgGrad ? G : INK, fontWeight: 700 }}>
                   Dégradé {bgGrad ? "✓" : ""}
                 </button>
                 {bgGrad && (
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
                     <input type="color" value={/^#/.test(bgC2) ? bgC2 : "#0A0A0A"} onChange={e => applyBgC2(e.target.value)}
-                      style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
+                      style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(0,0,0,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
                     <span style={{ color: MUTED, fontSize: 10 }}>2ᵉ couleur</span>
                   </div>
                 )}
@@ -2531,7 +2531,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                           <div key={role}>
                             <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 3 }}>{ROLE_LABEL[role] ?? role}</label>
                             <input value={roleValue(o)} onChange={e => updateRole(role, e.target.value)}
-                              style={{ width: "100%", background: BG, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, outline: "none", boxSizing: "border-box" }} />
+                              style={{ width: "100%", background: BG, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, outline: "none", boxSizing: "border-box" }} />
                           </div>
                         )
                       })}
@@ -2544,20 +2544,20 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         )}
 
         {/* Zone canvas */}
-        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, background: "#0A0907", position: "relative" }}>
+        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, background: "#E5E8ED", position: "relative" }}>
           {loading && (
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: MUTED, zIndex: 5, pointerEvents: "none" }}>
               <Loader2 size={18} style={{ animation: "spin 0.8s linear infinite" }} /> Chargement…
             </div>
           )}
-          <div style={{ margin: "auto", boxShadow: "0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.15)", borderRadius: 4, overflow: "hidden", flexShrink: 0 }}>
+          <div style={{ margin: "auto", boxShadow: "0 1px 3px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.12)", borderRadius: 4, overflow: "hidden", flexShrink: 0 }}>
             <canvas ref={elRef} />
           </div>
         </div>
 
         {/* Panneau de reglages avances (ouvert via "Réglages") */}
         {sel && showAdvanced && (
-        <div className="qr-scroll ps-fly" style={{ width: 280, flexShrink: 0, borderLeft: "1px solid rgba(255,255,255,0.07)", padding: 14, overflowY: "auto", background: SURFACE, display: "flex", flexDirection: "column", gap: 16 }}>
+        <div className="qr-scroll ps-fly" style={{ width: 280, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: 14, overflowY: "auto", background: SURFACE, display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
                 <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Élément sélectionné</p>
 
@@ -2573,12 +2573,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
                           {SWATCHES.map(c => (
                             <button key={c} type="button" onClick={() => setTextColor(c)} title={c}
-                              style={{ width: 22, height: 22, borderRadius: "50%", cursor: "pointer", background: c, border: (sel.textFill ?? "").toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(255,255,255,0.2)", padding: 0 }} />
+                              style={{ width: 22, height: 22, borderRadius: "50%", cursor: "pointer", background: c, border: (sel.textFill ?? "").toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.2)", padding: 0 }} />
                           ))}
                         </div>
                         <input type="color" value={/^#/.test(sel.textFill) ? sel.textFill : "#080808"}
                           onChange={e => setTextColor(e.target.value)}
-                          style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
+                          style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(0,0,0,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
                       </>
                     )}
                   </div>
@@ -2589,15 +2589,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
                   {SWATCHES.map(c => (
                     <button key={c} type="button" onClick={() => setFill(c)} title={c}
-                      style={{ width: 22, height: 22, borderRadius: "50%", cursor: "pointer", background: c, border: sel.fill.toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(255,255,255,0.2)", padding: 0 }} />
+                      style={{ width: 22, height: 22, borderRadius: "50%", cursor: "pointer", background: c, border: sel.fill.toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.2)", padding: 0 }} />
                   ))}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                   <input type="color" value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"}
                     onChange={e => setFill(e.target.value)}
-                    style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
+                    style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(0,0,0,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
                   <input value={sel.fill} onChange={e => setFill(e.target.value)}
-                    style={{ flex: 1, background: BG, border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, fontFamily: "monospace", outline: "none", boxSizing: "border-box" }} />
+                    style={{ flex: 1, background: BG, border: "1px solid rgba(0,0,0,0.08)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, fontFamily: "monospace", outline: "none", boxSizing: "border-box" }} />
                 </div>
 
                 {/* Opacite */}
@@ -2610,7 +2610,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
                 {/* Bordure / contour */}
                 <button type="button" onClick={() => setBorder(!sel.border)}
-                  style={{ ...layerBtn, width: "100%", background: sel.border ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", color: sel.border ? G : INK, fontWeight: 700, marginBottom: sel.border ? 8 : 12 }}>
+                  style={{ ...layerBtn, width: "100%", background: sel.border ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: sel.border ? G : INK, fontWeight: 700, marginBottom: sel.border ? 8 : 12 }}>
                   Bordure {sel.border ? "✓" : ""}
                 </button>
                 {sel.border && (
@@ -2618,7 +2618,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                       <input type="color" value={/^#/.test(sel.strokeColor) ? sel.strokeColor : "#C9A84C"}
                         onChange={e => setBorderColor(e.target.value)}
-                        style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
+                        style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(0,0,0,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
                       <span style={{ color: MUTED, fontSize: 10 }}>Épaisseur — {Math.round(sel.strokeWidth)}px</span>
                     </div>
                     <input type="range" min={1} max={30} step={1} value={sel.strokeWidth || 4}
@@ -2643,7 +2643,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Police</label>
                     <select value={sel.fontFamily}
                       onChange={e => setFont(e.target.value)}
-                      style={{ width: "100%", background: BG, border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, outline: "none", cursor: "pointer", marginBottom: 10, boxSizing: "border-box" }}>
+                      style={{ width: "100%", background: BG, border: "1px solid rgba(0,0,0,0.08)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, outline: "none", cursor: "pointer", marginBottom: 10, boxSizing: "border-box" }}>
                       {FONT_GROUPS.map(g => (
                         <optgroup key={g.label} label={g.label}>
                           {g.fonts.map(f => <option key={f} value={f} style={{ fontFamily: f }}>{f}</option>)}
@@ -2661,17 +2661,17 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 10 }}>
                       <button type="button" title="Gras"
                         onClick={() => mutate(o => (o as fabric.IText).set("fontWeight", sel.bold ? "normal" : "bold"))}
-                        style={{ ...layerBtn, background: sel.bold ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", color: sel.bold ? G : INK, fontWeight: 800 }}>
+                        style={{ ...layerBtn, background: sel.bold ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: sel.bold ? G : INK, fontWeight: 800 }}>
                         B
                       </button>
                       <button type="button" title="Italique"
                         onClick={() => mutate(o => (o as fabric.IText).set("fontStyle", sel.italic ? "normal" : "italic"))}
-                        style={{ ...layerBtn, background: sel.italic ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", color: sel.italic ? G : INK, fontStyle: "italic", fontWeight: 700 }}>
+                        style={{ ...layerBtn, background: sel.italic ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: sel.italic ? G : INK, fontStyle: "italic", fontWeight: 700 }}>
                         I
                       </button>
                       <button type="button" title="Souligné"
                         onClick={() => mutate(o => (o as fabric.IText).set("underline", !sel.underline))}
-                        style={{ ...layerBtn, background: sel.underline ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", color: sel.underline ? G : INK, textDecoration: "underline", fontWeight: 700 }}>
+                        style={{ ...layerBtn, background: sel.underline ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: sel.underline ? G : INK, textDecoration: "underline", fontWeight: 700 }}>
                         U
                       </button>
                     </div>
@@ -2684,7 +2684,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                         const bars = a === "left" ? [[1, 14], [1, 9], [1, 12]] : a === "center" ? [[1, 14], [4, 8], [2.5, 11]] : [[1, 14], [6, 9], [3, 12]]
                         return (
                           <button key={a} type="button" onClick={() => mutate(o => (o as fabric.IText).set("textAlign", a))} title={a}
-                            style={{ ...layerBtn, padding: "7px", background: on ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)" }}>
+                            style={{ ...layerBtn, padding: "7px", background: on ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)" }}>
                             <svg width="16" height="16" viewBox="0 0 16 16">
                               {bars.map(([x, w], i) => <rect key={i} x={x} y={3 + i * 4} width={w} height="2" rx="1" fill={on ? G : MUTED} />)}
                             </svg>
@@ -2712,7 +2712,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <div>
                 <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Effets</p>
                 <button type="button" onClick={() => setShadow(!sel.shadow)}
-                  style={{ ...layerBtn, width: "100%", background: sel.shadow ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.03)", color: sel.shadow ? G : INK, fontWeight: 700, marginBottom: sel.shadow ? 8 : 0 }}>
+                  style={{ ...layerBtn, width: "100%", background: sel.shadow ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: sel.shadow ? G : INK, fontWeight: 700, marginBottom: sel.shadow ? 8 : 0 }}>
                   Ombre portée {sel.shadow ? "✓" : ""}
                 </button>
                 {sel.shadow && (
@@ -2769,7 +2769,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Garde-fou scannabilite du QR */}
         {qrIssues && (
-          <div style={{ position: "absolute", top: 12, left: 12, zIndex: 39, display: "flex", alignItems: "center", gap: 7, padding: "7px 11px", background: "rgba(40,28,8,0.92)", border: "1px solid rgba(249,158,46,0.5)", borderRadius: 10, color: "#F9C46E", fontSize: 11, fontWeight: 600, maxWidth: 260, boxShadow: "0 8px 22px rgba(0,0,0,0.4)" }}>
+          <div style={{ position: "absolute", top: 12, left: 12, zIndex: 39, display: "flex", alignItems: "center", gap: 7, padding: "7px 11px", background: "rgba(40,28,8,0.92)", border: "1px solid rgba(249,158,46,0.5)", borderRadius: 10, color: "#F9C46E", fontSize: 11, fontWeight: 600, maxWidth: 260, boxShadow: "0 8px 22px rgba(0,0,0,0.14)" }}>
             <span style={{ fontSize: 14 }}>⚠️</span>
             <span>{qrIssues.covered ? "Un élément couvre le QR — il risque de ne pas se scanner." : "QR un peu petit : agrandis-le pour un scan fiable."}</span>
           </div>
@@ -2777,22 +2777,22 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Barre contextuelle flottante (progressive disclosure) */}
         {sel && (
-          <div className="ps-pop" style={{ position: "absolute", top: 12, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", background: "#14120C", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, boxShadow: "0 10px 30px rgba(0,0,0,0.5)", maxWidth: "92%", flexWrap: "wrap" }}>
+          <div className="ps-pop" style={{ position: "absolute", top: 12, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.12)", borderRadius: 12, boxShadow: "0 10px 30px rgba(0,0,0,0.15)", maxWidth: "92%", flexWrap: "wrap" }}>
             {sel.isQr ? (
               regenQr ? (
                 <>
                   <span style={{ color: MUTED, fontSize: 10, fontWeight: 700, marginRight: 1 }}>QR</span>
                   {QR_FG.map(c => (
                     <button key={c} type="button" disabled={qrBusy} onClick={() => applyQrRender({ fg: c })} title="Couleur du QR (scannable)"
-                      style={{ width: 18, height: 18, borderRadius: "50%", cursor: "pointer", background: c, border: qrFg.toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(255,255,255,0.25)", padding: 0, flexShrink: 0, opacity: qrBusy ? 0.5 : 1 }} />
+                      style={{ width: 18, height: 18, borderRadius: "50%", cursor: "pointer", background: c, border: qrFg.toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.25)", padding: 0, flexShrink: 0, opacity: qrBusy ? 0.5 : 1 }} />
                   ))}
-                  <span style={{ width: 1, height: 20, background: "rgba(255,255,255,0.12)" }} />
+                  <span style={{ width: 1, height: 20, background: "rgba(0,0,0,0.12)" }} />
                   {QR_DOTS.map(d => (
                     <button key={d.k} type="button" disabled={qrBusy} onClick={() => applyQrRender({ dotStyle: d.k })} title={`Style : ${d.label}`}
                       style={{ ...tb, fontSize: 13, color: qrDot === d.k ? G : INK, opacity: qrBusy ? 0.5 : 1 }}>{d.icon}</button>
                   ))}
                   {qrBusy && <Loader2 size={13} style={{ animation: "spin 0.8s linear infinite", color: G }} />}
-                  <span style={{ width: 1, height: 20, background: "rgba(255,255,255,0.12)" }} />
+                  <span style={{ width: 1, height: 20, background: "rgba(0,0,0,0.12)" }} />
                   <button type="button" style={tb} title="Réduire le QR" onClick={() => scaleQrBy(0.9)}>QR−</button>
                   <button type="button" style={tb} title="Agrandir le QR" onClick={() => scaleQrBy(1.1)}>QR+</button>
                   <button type="button" style={tb} title="Moins de marge blanche" onClick={() => adjustQrMargin(0.94)}>▫−</button>
@@ -2815,7 +2815,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             ) : sel.label !== null ? (
               <>
                 <input value={sel.label} onChange={e => setLabel(e.target.value)} placeholder="Texte"
-                  style={{ background: BG, border: "1px solid rgba(255,255,255,0.12)", borderRadius: 7, padding: "5px 8px", color: INK, fontSize: 11, width: 130, outline: "none" }} />
+                  style={{ background: BG, border: "1px solid rgba(0,0,0,0.12)", borderRadius: 7, padding: "5px 8px", color: INK, fontSize: 11, width: 130, outline: "none" }} />
                 <input type="color" value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"} onChange={e => setFill(e.target.value)} style={swatch} title="Couleur du fond" />
               </>
             ) : (
@@ -2823,17 +2823,17 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             )}
             {SWATCHES.slice(0, 8).map(c => (
               <button key={c} type="button" onClick={() => setFill(c)} title={c}
-                style={{ width: 18, height: 18, borderRadius: "50%", cursor: "pointer", background: c, border: sel.fill.toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(255,255,255,0.25)", padding: 0, flexShrink: 0 }} />
+                style={{ width: 18, height: 18, borderRadius: "50%", cursor: "pointer", background: c, border: sel.fill.toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.25)", padding: 0, flexShrink: 0 }} />
             ))}
             </>)}
-            <span style={{ width: 1, height: 20, background: "rgba(255,255,255,0.12)" }} />
+            <span style={{ width: 1, height: 20, background: "rgba(0,0,0,0.12)" }} />
             <button type="button" style={tb} title="Dupliquer" onClick={() => layer("dup")}><Copy size={14} /></button>
             <button type="button" style={tb} title="Mettre devant" onClick={() => layer("front")}><ChevronUp size={14} /></button>
             <button type="button" style={tb} title="Mettre derrière" onClick={() => layer("back")}><ChevronDown size={14} /></button>
             <button type="button" style={{ ...tb, color: sel.locked ? G : INK }} title={sel.locked ? "Déverrouiller" : "Verrouiller"} onClick={() => layer("lock")}>{sel.locked ? <Unlock size={14} /> : <Lock size={14} />}</button>
             <button type="button" style={{ ...tb, color: "#FF6B6B" }} title="Supprimer" onClick={() => layer("del")}><Trash2 size={14} /></button>
             <button type="button" onClick={() => setShowAdvanced(v => !v)}
-              style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 10px", background: showAdvanced ? "rgba(201,168,76,0.18)" : "rgba(255,255,255,0.06)", border: `1px solid ${showAdvanced ? G : "rgba(255,255,255,0.1)"}`, borderRadius: 8, color: showAdvanced ? G : INK, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+              style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 10px", background: showAdvanced ? "rgba(201,168,76,0.18)" : "rgba(0,0,0,0.06)", border: `1px solid ${showAdvanced ? G : "rgba(0,0,0,0.1)"}`, borderRadius: 8, color: showAdvanced ? G : INK, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
               Réglages {showAdvanced ? "▸" : ""}
             </button>
           </div>
@@ -2841,11 +2841,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Astuce d'accueil (masquable) : guide le debutant quand rien n'est selectionne */}
         {!sel && !hintOff && (
-          <div style={{ position: "absolute", bottom: 14, left: "50%", transform: "translateX(-50%)", zIndex: 35, display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "rgba(20,18,12,0.92)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 999, boxShadow: "0 8px 24px rgba(0,0,0,0.45)", maxWidth: "90%" }}>
+          <div style={{ position: "absolute", bottom: 14, left: "50%", transform: "translateX(-50%)", zIndex: 35, display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "rgba(20,18,12,0.92)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 999, boxShadow: "0 8px 24px rgba(0,0,0,0.14)", maxWidth: "90%" }}>
             <Sparkles size={13} color={G} style={{ flexShrink: 0 }} />
             <span style={{ color: INK, fontSize: 11.5 }}>Choisis un <b>modèle</b> à gauche, ou <b>double-clique</b> ici pour ajouter du texte.</span>
             <button type="button" onClick={() => setHintOff(true)} aria-label="Masquer l'astuce"
-              style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 6, color: MUTED, cursor: "pointer", flexShrink: 0 }}><X size={11} /></button>
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, background: "rgba(0,0,0,0.06)", border: "none", borderRadius: 6, color: MUTED, cursor: "pointer", flexShrink: 0 }}><X size={11} /></button>
           </div>
         )}
       </div>
@@ -2853,11 +2853,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       {/* Aide & raccourcis */}
       {showHelp && (
         <div onClick={() => setShowHelp(false)} style={{ position: "fixed", inset: 0, zIndex: 4200, background: "rgba(0,0,0,0.78)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, fontFamily: "DM Sans, sans-serif" }}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "min(560px,100%)", maxHeight: "86vh", overflowY: "auto", background: SURFACE, border: "1px solid rgba(255,255,255,0.12)", borderRadius: 16, padding: 22 }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "min(560px,100%)", maxHeight: "86vh", overflowY: "auto", background: SURFACE, border: "1px solid rgba(0,0,0,0.12)", borderRadius: 16, padding: 22 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 16 }}>Aide & raccourcis</span>
               <button type="button" onClick={() => setShowHelp(false)} aria-label="Fermer"
-                style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, color: MUTED, cursor: "pointer" }}><X size={14} /></button>
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, background: "rgba(0,0,0,0.06)", border: "none", borderRadius: 8, color: MUTED, cursor: "pointer" }}><X size={14} /></button>
             </div>
             <p style={{ color: G, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 8px" }}>Astuces</p>
             <ul style={{ color: INK, fontSize: 12.5, lineHeight: 1.7, margin: "0 0 16px", paddingLeft: 18 }}>
@@ -2878,7 +2878,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 ["Flèches", "Déplacer (Maj = plus vite)"], ["Échap", "Désélectionner"],
               ] as const).map(([k, v]) => (
                 <div key={k} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
-                  <kbd style={{ flexShrink: 0, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 6, padding: "2px 7px", color: INK, fontSize: 10.5, fontWeight: 600, fontFamily: "monospace" }}>{k}</kbd>
+                  <kbd style={{ flexShrink: 0, background: "rgba(0,0,0,0.07)", border: "1px solid rgba(0,0,0,0.14)", borderRadius: 6, padding: "2px 7px", color: INK, fontSize: 10.5, fontWeight: 600, fontFamily: "monospace" }}>{k}</kbd>
                   <span style={{ color: MUTED }}>{v}</span>
                 </div>
               ))}
@@ -2902,12 +2902,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           <div style={{ position: "fixed", inset: 0, zIndex: 4000, background: "rgba(0,0,0,0.88)", backdropFilter: "blur(4px)", display: "flex", flexDirection: "column", fontFamily: "DM Sans, sans-serif" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px" }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 14, display: "flex", alignItems: "center", gap: 7 }}><Eye size={15} /> Aperçu en situation</span>
-              <button type="button" onClick={() => setMockOpen(false)} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 9, color: INK, cursor: "pointer" }}><X size={16} /></button>
+              <button type="button" onClick={() => setMockOpen(false)} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, background: "rgba(0,0,0,0.08)", border: "1px solid rgba(0,0,0,0.12)", borderRadius: 9, color: INK, cursor: "pointer" }}><X size={16} /></button>
             </div>
             <div style={{ display: "flex", gap: 8, justifyContent: "center", paddingBottom: 12 }}>
               {([["wall", "Mur"], ["table", "Table"], ["window", "Vitrine"], ["desk", "Bureau"], ["cadre", "Cadre"], ["counter", "Comptoir"]] as const).map(([id, l]) => (
                 <button key={id} type="button" onClick={() => setMockEnv(id)}
-                  style={{ padding: "7px 16px", borderRadius: 9, cursor: "pointer", fontSize: 12, fontWeight: mockEnv === id ? 700 : 500, background: mockEnv === id ? "rgba(201,168,76,0.18)" : "rgba(255,255,255,0.05)", border: `1px solid ${mockEnv === id ? G : "rgba(255,255,255,0.1)"}`, color: mockEnv === id ? G : INK }}>{l}</button>
+                  style={{ padding: "7px 16px", borderRadius: 9, cursor: "pointer", fontSize: 12, fontWeight: mockEnv === id ? 700 : 500, background: mockEnv === id ? "rgba(201,168,76,0.18)" : "rgba(0,0,0,0.05)", border: `1px solid ${mockEnv === id ? G : "rgba(0,0,0,0.1)"}`, color: mockEnv === id ? G : INK }}>{l}</button>
               ))}
             </div>
             <div style={{ flex: 1, margin: "0 16px 16px", borderRadius: 16, overflow: "hidden", position: "relative", background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", perspective: "1400px" }}>
@@ -2926,7 +2926,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       {ctx && (
         <>
           <div onClick={() => setCtx(null)} onContextMenu={e => { e.preventDefault(); setCtx(null) }} style={{ position: "fixed", inset: 0, zIndex: 3500 }} />
-          <div style={{ position: "fixed", left: Math.min(ctx.x, (typeof window !== "undefined" ? window.innerWidth : 9999) - 180), top: ctx.y, zIndex: 3600, background: "#14120C", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: 6, minWidth: 168, boxShadow: "0 12px 36px rgba(0,0,0,0.6)" }}>
+          <div style={{ position: "fixed", left: Math.min(ctx.x, (typeof window !== "undefined" ? window.innerWidth : 9999) - 180), top: ctx.y, zIndex: 3600, background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.12)", borderRadius: 10, padding: 6, minWidth: 168, boxShadow: "0 12px 36px rgba(0,0,0,0.18)" }}>
             {([
               ["Dupliquer", () => layer("dup")],
               ["Mettre devant", () => layer("front")],
