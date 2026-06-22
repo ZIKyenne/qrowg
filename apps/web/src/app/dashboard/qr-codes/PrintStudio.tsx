@@ -342,6 +342,10 @@ const GUIDE_METIERS: { id: string; emoji: string; label: string; objs: string[];
   { id: "beaute",   emoji: "💇", label: "Beauté / Bien-être", objs: ["Réserver", "Avis", "Abonnés"],             style: "sage" },
   { id: "createur", emoji: "🎨", label: "Créateur",          objs: ["Abonnés", "Contact", "Page"],               style: "neon" },
   { id: "event",    emoji: "🎉", label: "Événement",         objs: ["Réserver", "Abonnés", "Page"],              style: "sunset" },
+  { id: "airbnb",   emoji: "🏡", label: "Location / Airbnb",  objs: ["Contact", "Avis", "Réserver", "Page"],      style: "sage" },
+  { id: "hotel",    emoji: "🏨", label: "Hôtel",             objs: ["Réserver", "Avis", "Contact", "Page"],      style: "corporate" },
+  { id: "fitness",  emoji: "💪", label: "Sport / Coach",      objs: ["Réserver", "Abonnés", "Avis"],              style: "neon" },
+  { id: "artisan",  emoji: "🔧", label: "Artisan",           objs: ["Contact", "Avis", "Page"],                  style: "premiumdark" },
   { id: "autre",    emoji: "✨", label: "Autre",             objs: ["Avis", "Abonnés", "Menu", "Réserver", "Contact", "Page"], style: "luxgold" },
 ]
 
