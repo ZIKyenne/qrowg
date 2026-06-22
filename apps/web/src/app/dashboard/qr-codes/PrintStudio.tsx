@@ -420,7 +420,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [expDpi, setExpDpi]   = useState(300)
   const [expMarks, setExpMarks] = useState(false)
   const [mockOpen, setMockOpen] = useState(false)
-  const [mockEnv, setMockEnv] = useState<"wall" | "table" | "window" | "desk">("wall")
+  const [mockEnv, setMockEnv] = useState<"wall" | "table" | "window" | "desk" | "cadre" | "counter">("wall")
   const [mockUrl, setMockUrl] = useState("")
   const [ctx, setCtx] = useState<{ x: number; y: number } | null>(null) // menu clic-droit
   const [showAdvanced, setShowAdvanced] = useState(false) // panneau de reglages avances (progressive disclosure)
@@ -2686,11 +2686,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
       {/* Apercu en situation (mockup) */}
       {mockOpen && (() => {
-        const scenes: Record<string, { bg: string; transform: string; maxH: string; glass?: boolean }> = {
+        const scenes: Record<string, { bg: string; transform: string; maxH: string; glass?: boolean; frame?: boolean }> = {
           wall:   { bg: "linear-gradient(180deg,#ece7dd 0%,#ddd6ca 62%,#c7bfb0 62%,#b4ac9c 100%)", transform: "none", maxH: "74%" },
           table:  { bg: "linear-gradient(180deg,#3a2a1c,#5a4330)", transform: "perspective(1300px) rotateX(50deg)", maxH: "62%" },
           window: { bg: "linear-gradient(135deg,#d3e6ed,#a9c6d2 55%,#8aacba)", transform: "rotate(-2deg)", maxH: "62%", glass: true },
           desk:   { bg: "linear-gradient(180deg,#2c2c31,#191920)", transform: "perspective(1500px) rotateX(44deg) rotateZ(-3deg)", maxH: "56%" },
+          cadre:  { bg: "linear-gradient(180deg,#e6ded2,#cdc4b4)", transform: "none", maxH: "70%", frame: true },
+          counter:{ bg: "linear-gradient(180deg,#d9d2c6 0%,#cfc7b8 54%,#8d7f6a 54%,#6f6353 100%)", transform: "perspective(1400px) rotateX(38deg)", maxH: "58%" },
         }
         const s = scenes[mockEnv]
         return (
@@ -2700,13 +2702,17 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <button type="button" onClick={() => setMockOpen(false)} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 9, color: INK, cursor: "pointer" }}><X size={16} /></button>
             </div>
             <div style={{ display: "flex", gap: 8, justifyContent: "center", paddingBottom: 12 }}>
-              {([["wall", "Mur"], ["table", "Table"], ["window", "Vitrine"], ["desk", "Bureau"]] as const).map(([id, l]) => (
+              {([["wall", "Mur"], ["table", "Table"], ["window", "Vitrine"], ["desk", "Bureau"], ["cadre", "Cadre"], ["counter", "Comptoir"]] as const).map(([id, l]) => (
                 <button key={id} type="button" onClick={() => setMockEnv(id)}
                   style={{ padding: "7px 16px", borderRadius: 9, cursor: "pointer", fontSize: 12, fontWeight: mockEnv === id ? 700 : 500, background: mockEnv === id ? "rgba(201,168,76,0.18)" : "rgba(255,255,255,0.05)", border: `1px solid ${mockEnv === id ? G : "rgba(255,255,255,0.1)"}`, color: mockEnv === id ? G : INK }}>{l}</button>
               ))}
             </div>
             <div style={{ flex: 1, margin: "0 16px 16px", borderRadius: 16, overflow: "hidden", position: "relative", background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", perspective: "1400px" }}>
-              {mockUrl && <img src={mockUrl} alt="aperçu" style={{ maxHeight: s.maxH, maxWidth: "62%", transform: s.transform, transformOrigin: "center", boxShadow: "0 40px 70px rgba(0,0,0,0.45), 0 6px 14px rgba(0,0,0,0.3)", borderRadius: 3 }} />}
+              {mockUrl && (s.frame
+                ? <div style={{ maxHeight: s.maxH, maxWidth: "62%", padding: "3% 3% 3%", background: "linear-gradient(145deg,#3a2c18,#1c140a)", borderRadius: 4, boxShadow: "0 40px 70px rgba(0,0,0,0.5), 0 6px 14px rgba(0,0,0,0.35)", display: "flex" }}>
+                    <div style={{ padding: "5%", background: "#fff" }}><img src={mockUrl} alt="aperçu" style={{ maxHeight: "100%", maxWidth: "100%", display: "block" }} /></div>
+                  </div>
+                : <img src={mockUrl} alt="aperçu" style={{ maxHeight: s.maxH, maxWidth: "62%", transform: s.transform, transformOrigin: "center", boxShadow: "0 40px 70px rgba(0,0,0,0.45), 0 6px 14px rgba(0,0,0,0.3)", borderRadius: 3 }} />)}
               {s.glass && <div style={{ position: "absolute", inset: 0, background: "linear-gradient(115deg,rgba(255,255,255,0.28) 0%,transparent 28%,transparent 70%,rgba(255,255,255,0.18) 100%)", pointerEvents: "none" }} />}
             </div>
           </div>
