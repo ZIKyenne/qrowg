@@ -286,14 +286,18 @@ const SECTORS: { id: string; label: string; emoji: string; objs: string[] }[] = 
 const COMPONENTS: { key: string; emoji: string; label: string; desc: string }[] = [
   { key: "avis",     emoji: "⭐", label: "Avis Google",     desc: "Bloc 5 étoiles + invitation" },
   { key: "insta",    emoji: "📷", label: "Instagram",       desc: "Votre @ en pastille" },
+  { key: "tiktok",   emoji: "🎵", label: "TikTok",          desc: "Bouton TikTok" },
   { key: "whatsapp", emoji: "💬", label: "WhatsApp",        desc: "Bouton de contact" },
   { key: "phone",    emoji: "📞", label: "Téléphone",       desc: "Numéro en pastille" },
   { key: "email",    emoji: "✉️", label: "Email",           desc: "Adresse en pastille" },
   { key: "menu",     emoji: "🍽️", label: "Menu",            desc: "Bouton voir le menu" },
   { key: "reserver", emoji: "📅", label: "Réservation",     desc: "Bouton réserver" },
   { key: "pay",      emoji: "💳", label: "Paiement",        desc: "Bouton payer en ligne" },
+  { key: "catalogue",emoji: "🛍️", label: "Catalogue",       desc: "Bouton voir le catalogue" },
+  { key: "portfolio",emoji: "🎨", label: "Portfolio",       desc: "Bouton voir le portfolio" },
   { key: "wifi",     emoji: "📶", label: "Wifi",            desc: "Réseau + mot de passe" },
   { key: "horaires", emoji: "🕐", label: "Horaires",        desc: "Vos horaires d'ouverture" },
+  { key: "adresse",  emoji: "📍", label: "Adresse",         desc: "Votre adresse postale" },
   { key: "contact",  emoji: "🪪", label: "Carte de visite", desc: "Nom, métier, contact" },
 ]
 
@@ -1196,14 +1200,18 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         o = new fabric.Group([bg, stars, t]); break
       }
       case "insta":    o = pill("📷  @votrecompte", "#E1306C", "#FFFFFF"); break
+      case "tiktok":   o = pill("🎵  TikTok", "#111111", "#FFFFFF"); break
       case "whatsapp": o = pill("💬  WhatsApp", "#25D366", "#FFFFFF"); break
       case "phone":    o = pill("📞  06 12 34 56 78", G, "#080808"); break
       case "email":    o = pill("✉️  contact@email.fr", "#1F2937", "#FFFFFF"); break
       case "menu":     o = pill("🍽️  Voir le menu", G, "#080808"); break
       case "reserver": o = pill("📅  Réserver", "#0E7A5F", "#FFFFFF"); break
       case "pay":      o = pill("💳  Payer en ligne", "#1D4ED8", "#FFFFFF"); break
+      case "catalogue":o = pill("🛍️  Voir le catalogue", G, "#080808"); break
+      case "portfolio":o = pill("🎨  Mon portfolio", "#1F2937", "#FFFFFF"); break
       case "wifi":     o = card("📶  Wifi", ["Réseau : MonReseau", "Mot de passe : ********"]); break
       case "horaires": o = card("🕐  Horaires", ["Lun–Ven : 9h – 19h", "Samedi : 10h – 18h", "Dimanche : fermé"]); break
+      case "adresse":  o = card("📍  Adresse", ["12 rue de l'Exemple", "75001 Paris"]); break
       case "contact":  o = card("🪪  Prénom Nom", ["Votre métier", "📞 06 12 34 56 78", "🌐 monsite.fr"]); break
       default:         o = pill("Bouton", G, "#080808")
     }
