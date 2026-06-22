@@ -428,6 +428,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [libCat, setLibCat]   = useState<"text" | "shapes" | "lines" | "frames" | "cta" | "icons" | "badges" | "arrows" | "deco">("text")
   const [tplOpen, setTplOpen] = useState(false)
   const [tplSearch, setTplSearch] = useState("")
+  const [showHelp, setShowHelp] = useState(false)
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
   const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
   const [dragOver, setDragOver] = useState<number | null>(null) // ligne survolee pendant un glisser
@@ -1810,6 +1811,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 6, color: INK, fontSize: 15, cursor: "pointer" }}>+</button>
           </div>
 
+          <button type="button" onClick={() => setShowHelp(true)} title="Aide & raccourcis" aria-label="Aide et raccourcis"
+            style={{ width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: INK, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>?</button>
+
           <button type="button" onClick={openMock} title="Aperçu en situation"
             style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
             <Eye size={14} /> Aperçu
@@ -2642,6 +2646,43 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           </div>
         )}
       </div>
+
+      {/* Aide & raccourcis */}
+      {showHelp && (
+        <div onClick={() => setShowHelp(false)} style={{ position: "fixed", inset: 0, zIndex: 4200, background: "rgba(0,0,0,0.78)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, fontFamily: "DM Sans, sans-serif" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "min(560px,100%)", maxHeight: "86vh", overflowY: "auto", background: SURFACE, border: "1px solid rgba(255,255,255,0.12)", borderRadius: 16, padding: 22 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+              <span style={{ color: INK, fontWeight: 800, fontSize: 16 }}>Aide & raccourcis</span>
+              <button type="button" onClick={() => setShowHelp(false)} aria-label="Fermer"
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, color: MUTED, cursor: "pointer" }}><X size={14} /></button>
+            </div>
+            <p style={{ color: G, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 8px" }}>Astuces</p>
+            <ul style={{ color: INK, fontSize: 12.5, lineHeight: 1.7, margin: "0 0 16px", paddingLeft: 18 }}>
+              <li>Choisis un <b>modèle</b> dans la galerie, puis personnalise tout.</li>
+              <li><b>Double-clic</b> sur une zone vide = ajouter un texte.</li>
+              <li><b>Double-clic</b> sur un texte = l'éditer.</li>
+              <li>Sélectionne un élément pour voir la <b>barre d'outils flottante</b> (couleur, calques, réglages).</li>
+              <li>Le <b>guide doré</b> apparaît quand un élément est centré.</li>
+              <li>Ton QR reste net : ne le déforme pas (garde-fou intégré).</li>
+            </ul>
+            <p style={{ color: G, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 8px" }}>Raccourcis clavier</p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px" }}>
+              {([
+                ["Suppr", "Supprimer la sélection"], ["Ctrl + C / V", "Copier / Coller"],
+                ["Ctrl + D", "Dupliquer"], ["Ctrl + Z / Y", "Annuler / Rétablir"],
+                ["Ctrl + A", "Tout sélectionner"], ["Ctrl + G", "Grouper"],
+                ["Ctrl + Maj + G", "Dégrouper"], ["Ctrl + + / − / 0", "Zoom"],
+                ["Flèches", "Déplacer (Maj = plus vite)"], ["Échap", "Désélectionner"],
+              ] as const).map(([k, v]) => (
+                <div key={k} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
+                  <kbd style={{ flexShrink: 0, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 6, padding: "2px 7px", color: INK, fontSize: 10.5, fontWeight: 600, fontFamily: "monospace" }}>{k}</kbd>
+                  <span style={{ color: MUTED }}>{v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Apercu en situation (mockup) */}
       {mockOpen && (() => {
