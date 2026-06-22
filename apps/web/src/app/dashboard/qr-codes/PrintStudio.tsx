@@ -2655,6 +2655,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             ))}
             <span style={{ width: 1, height: 20, background: "rgba(255,255,255,0.12)" }} />
             <button type="button" style={tb} title="Dupliquer" onClick={() => layer("dup")}><Copy size={14} /></button>
+            <button type="button" style={tb} title="Mettre devant" onClick={() => layer("front")}><ChevronUp size={14} /></button>
+            <button type="button" style={tb} title="Mettre derrière" onClick={() => layer("back")}><ChevronDown size={14} /></button>
+            <button type="button" style={{ ...tb, color: sel.locked ? G : INK }} title={sel.locked ? "Déverrouiller" : "Verrouiller"} onClick={() => layer("lock")}>{sel.locked ? <Unlock size={14} /> : <Lock size={14} />}</button>
             <button type="button" style={{ ...tb, color: "#FF6B6B" }} title="Supprimer" onClick={() => layer("del")}><Trash2 size={14} /></button>
             <button type="button" onClick={() => setShowAdvanced(v => !v)}
               style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 10px", background: showAdvanced ? "rgba(201,168,76,0.18)" : "rgba(255,255,255,0.06)", border: `1px solid ${showAdvanced ? G : "rgba(255,255,255,0.1)"}`, borderRadius: 8, color: showAdvanced ? G : INK, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
