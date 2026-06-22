@@ -251,6 +251,9 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"avis-premium",  label:"Avis — Premium",     obj:"Avis",     emoji:"⭐", desc:"En-tête + badge, haut de gamme",        bg:"#0E0D0B", ink:"#F4ECD8", accent:"#C9A84C" },
   { id:"menu-premium",  label:"Menu — Premium",     obj:"Menu",     emoji:"🍽️", desc:"En-tête + badge, terracotta",          bg:"#14110C", ink:"#F0E6CE", accent:"#B8472F" },
   { id:"promo-premium", label:"Promo — Premium",    obj:"Page",     emoji:"🏷️", desc:"En-tête + badge promo",                 bg:"#0B1E2D", ink:"#EAF4FA", accent:"#F0A93B" },
+  { id:"reserver-premium",label:"Réservation — Premium",obj:"Réserver",emoji:"📅",desc:"En-tête + badge, vert",              bg:"#0F2027", ink:"#EAF4F4", accent:"#2E8B7B" },
+  { id:"insta-premium", label:"Instagram — Premium",obj:"Abonnés",   emoji:"📷", desc:"En-tête + badge, rose",                bg:"#1A0E18", ink:"#FBE9F4", accent:"#E1306C" },
+  { id:"contact-premium",label:"Contact — Premium", obj:"Contact",   emoji:"💳", desc:"En-tête + badge, bleu",                bg:"#0C1322", ink:"#EEF3FB", accent:"#5B8DEF" },
 ]
 
 // Secteurs d'activite -> objectifs pertinents (pour filtrer la galerie)
@@ -1627,6 +1630,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "avis-premium":   await premiumLayout("Votre avis compte", "Scannez pour nous noter", "Donner mon avis", "AVIS"); break
       case "menu-premium":   await premiumLayout(name || "Notre Carte", "Scannez pour découvrir", "Voir le menu", "MENU"); break
       case "promo-premium":  await premiumLayout("Offre spéciale", "Scannez pour en profiter", "J'en profite", "-20%"); break
+      case "reserver-premium": await premiumLayout("Réservez votre table", "Scannez pour réserver", "Réserver", "RÉSA"); break
+      case "insta-premium":  await premiumLayout("Suivez-nous", "Scannez pour nous suivre", "S'abonner", "@"); break
+      case "contact-premium": await premiumLayout(name || "Mes coordonnées", "Scannez ma carte", "Enregistrer", "VIP"); break
     }
 
     if (vG) fc.bringToFront(vG)
