@@ -1527,6 +1527,20 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     o.set("fill", new fabric.Gradient({ type: "radial", gradientUnits: "pixels", coords: { x1: w / 2, y1: h / 2, r1: 0, x2: w / 2, y2: h / 2, r2: Math.max(w, h) / 2 }, colorStops: [{ offset: 0, color: c1 }, { offset: 1, color: c2 }] }) as unknown as string)
     o.dirty = true
   })
+  // Motif / texture de remplissage (points, rayures, grille) base sur la couleur courante
+  const setPatternFill = (kind: "dots" | "stripes" | "grid") => mutate(o => {
+    if (typeof document === "undefined") return
+    const base = typeof o.fill === "string" && /^#/.test(o.fill) ? o.fill : G
+    const motif = lum(base) > 0.6 ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.24)"
+    const pc = document.createElement("canvas"); pc.width = 22; pc.height = 22
+    const ctx = pc.getContext("2d"); if (!ctx) return
+    ctx.fillStyle = base; ctx.fillRect(0, 0, 22, 22)
+    ctx.fillStyle = motif; ctx.strokeStyle = motif; ctx.lineWidth = 3
+    if (kind === "dots") { ctx.beginPath(); ctx.arc(11, 11, 3.2, 0, Math.PI * 2); ctx.fill() }
+    else if (kind === "stripes") { ctx.beginPath(); ctx.moveTo(-4, 22); ctx.lineTo(22, -4); ctx.moveTo(6, 26); ctx.lineTo(26, 6); ctx.stroke() }
+    else { ctx.strokeRect(0, 0, 22, 22) }
+    o.set("fill", new fabric.Pattern({ source: pc, repeat: "repeat" }) as unknown as string); o.dirty = true
+  })
   // Pinceau de format : copier/coller le style d'un element a l'autre
   const copyStyle = () => {
     const o = fcRef.current?.getActiveObject() as any; if (!o) return
@@ -3314,6 +3328,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <input type="color" value={gradC2} onChange={e => setGradC2(e.target.value)} title="Couleur 2" style={{ width: 30, height: 28, borderRadius: 6, border: "1px solid rgba(0,0,0,0.15)", cursor: "pointer", padding: 0 }} />
                   <button type="button" onClick={() => setGradientFill(/^#/.test(sel.fill) ? sel.fill : "#C9A84C", gradC2)} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Linéaire</button>
                   <button type="button" onClick={() => setRadialFill(/^#/.test(sel.fill) ? sel.fill : "#C9A84C", gradC2)} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Radial</button>
+                </div>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>Motif</p>
+                <div style={{ display: "flex", gap: 5, marginBottom: 12 }}>
+                  <button type="button" onClick={() => setPatternFill("dots")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Points</button>
+                  <button type="button" onClick={() => setPatternFill("stripes")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Rayures</button>
+                  <button type="button" onClick={() => setPatternFill("grid")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Grille</button>
                 </div>
 
                 {/* Bordure / contour */}
