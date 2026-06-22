@@ -929,6 +929,17 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         for (let i = 0; i < 3; i++) a.push(new fabric.Polyline([{ x: 0, y: 0 }, { x: 18, y: 16 }, { x: 0, y: 32 }], { fill: "", stroke: G, strokeWidth: 5, strokeLineCap: "round", strokeLineJoin: "round", left: i * 20, top: 0 }))
         o = new fabric.Group(a); break
       }
+      case "corners": {
+        const W = 200, H = 140, t = 6, l = 38
+        const r = (x: number, y: number, w: number, h: number) => new fabric.Rect({ left: x, top: y, width: w, height: h, fill: G })
+        o = new fabric.Group([
+          r(0, 0, l, t), r(0, 0, t, l),                 // haut gauche
+          r(W - l, 0, l, t), r(W - t, 0, t, l),          // haut droite
+          r(0, H - t, l, t), r(0, H - l, t, l),          // bas gauche
+          r(W - l, H - t, l, t), r(W - t, H - l, t, l),  // bas droite
+        ]); break
+      }
+      case "swoosh": o = new fabric.Path("M0 22 Q 75 -8 150 16", { fill: "", stroke: G, strokeWidth: 7, strokeLineCap: "round" }); break
       default: o = new fabric.Polygon(starPts(4, 80, 22), { fill: G })
     }
     centerObj(o)
@@ -2224,6 +2235,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     ["stars3", "Étoiles",  <svg width="26" height="22" viewBox="0 0 26 22" key="d">{[[5, 11, 4.5], [14, 5, 6], [21, 13, 4]].map(([cx, cy, r], i) => <path key={i} d="M0 -1L0.3 -0.3L1 -0.3L0.4 0.2L0.6 1L0 0.5L-0.6 1L-0.4 0.2L-1 -0.3L-0.3 -0.3Z" fill={G} transform={`translate(${cx} ${cy}) scale(${r})`} />)}</svg>],
                     ["dotgrid", "Grille",  <svg width="24" height="24" key="d">{[4, 11, 18].map(y => [4, 11, 18].map(x => <circle key={`${x}-${y}`} cx={x} cy={y} r="2" fill={G} />))}</svg>],
                     ["chevrons", "Chevrons", <svg width="26" height="20" viewBox="0 0 26 20" key="d">{[2, 10, 18].map((x, i) => <polyline key={i} points={`${x},3 ${x + 7},10 ${x},17`} fill="none" stroke={G} strokeWidth="2.5" strokeLinecap="round" />)}</svg>],
+                    ["corners", "Angles",  <svg width="26" height="20" viewBox="0 0 26 20" key="d"><path d="M2 7V2h5M19 2h5v5M24 13v5h-5M7 18H2v-5" fill="none" stroke={G} strokeWidth="2.2" /></svg>],
+                    ["swoosh", "Trait",    <svg width="26" height="14" viewBox="0 0 26 14" key="d"><path d="M2 9 Q13 1 24 7" fill="none" stroke={G} strokeWidth="2.5" strokeLinecap="round" /></svg>],
                   ] as const).map(([k, label, prev]) => (
                     <button key={k} type="button" onClick={() => addDeco(k)} title={label}
                       style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "10px 2px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
