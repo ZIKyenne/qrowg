@@ -129,7 +129,6 @@ type Preset = {
 }
 
 const PRESET_CATS = [
-  { id:"all",        label:"Tous",       emoji:"🎨" },
   { id:"classic",    label:"Classique",  emoji:"⚫" },
   { id:"business",   label:"Business",   emoji:"💼" },
   { id:"restaurant", label:"Restaurant", emoji:"🍽️" },
@@ -431,7 +430,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [openAcc,    setOpenAcc]    = useState<string>("presets")
   const [autoMsg,    setAutoMsg]    = useState<string>("")
   const [applyAllOk,   setApplyAllOk]   = useState(false)
-  const [selectedCat,  setSelectedCat]  = useState("all")
+  const [selectedCat,  setSelectedCat]  = useState("classic")
   const [upsell,        setUpsell]        = useState<{ feature: string; plan: string } | null>(null)
   const [expFormat,     setExpFormat]     = useState<"png"|"png-t"|"webp"|"svg"|"pdf">("png")
   const [expSize,       setExpSize]       = useState<512|1024|2048|4096|"custom">(1024)
@@ -3570,7 +3569,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 ["🎯","Création guidée en 30 s","Votre métier → votre objectif → un design pro généré automatiquement."],
                 ["🖼️","Modèles premium","Affiches, flyers, cartes, stickers, cartes de table — formats A4, carré, story, carte."],
                 ["📶","Supports métier","Wifi, carte de fidélité, menu, avis, réservation, abonnés…"],
-                ["🎨","Éditeur libre type Canva","Déplacez, redimensionnez, ajoutez textes, formes, photos, icônes."],
+                ["🎨","Éditeur libre","Déplacez, redimensionnez, ajoutez textes, formes, photos, icônes."],
                 ["✨","Réglages avancés","Dégradés, motifs, ombres colorées, contour de texte, transformer, aligner…"],
                 ["📸","Photos & logos","Banque d'images intégrée + vos propres visuels."],
                 ["⬇️","Export pro","PNG haute résolution & PDF prêt à imprimer."],
