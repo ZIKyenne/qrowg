@@ -271,6 +271,12 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"avis-card",     label:"Avis — Carte photo", obj:"Avis",     emoji:"🪟", desc:"Carte blanche sur photo",              bg:"#1A1410", ink:"#FFFFFF", accent:"#C9A84C" },
   { id:"insta-card",    label:"Instagram — Carte photo",obj:"Abonnés",emoji:"🪟",desc:"Carte blanche sur photo",             bg:"#1A0E18", ink:"#FFFFFF", accent:"#E1306C" },
   { id:"contact-card",  label:"Contact — Carte photo",obj:"Contact",emoji:"🪟", desc:"Carte blanche sur photo",              bg:"#0C1322", ink:"#FFFFFF", accent:"#5B8DEF" },
+  { id:"avis-studio",   label:"Avis — Studio",      obj:"Avis",     emoji:"🎨", desc:"Photo + picto + badge + CTA",          bg:"#1A1410", ink:"#FFFFFF", accent:"#C9A84C" },
+  { id:"menu-studio",   label:"Menu — Studio",      obj:"Menu",     emoji:"🎨", desc:"Photo + picto + badge + CTA",          bg:"#14110C", ink:"#FFFFFF", accent:"#C0392B" },
+  { id:"reserver-studio",label:"Réservation — Studio",obj:"Réserver",emoji:"🎨",desc:"Photo + picto + badge + CTA",          bg:"#0E1A16", ink:"#FFFFFF", accent:"#2E8B7B" },
+  { id:"insta-studio",  label:"Instagram — Studio", obj:"Abonnés",  emoji:"🎨", desc:"Photo + picto + badge + CTA",          bg:"#1A0E18", ink:"#FFFFFF", accent:"#E1306C" },
+  { id:"contact-studio",label:"Contact — Studio",   obj:"Contact",  emoji:"🎨", desc:"Photo + picto + badge + CTA",          bg:"#0C1322", ink:"#FFFFFF", accent:"#5B8DEF" },
+  { id:"decouvrir-studio",label:"Découvrir — Studio",obj:"Page",    emoji:"🎨", desc:"Photo + picto + badge + CTA",          bg:"#160726", ink:"#FFFFFF", accent:"#A855F7" },
 ]
 
 // Secteurs d'activite -> objectifs pertinents (pour filtrer la galerie)
@@ -355,6 +361,19 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
           <div style={{ height: 5, width: "72%", borderRadius: 3, background: "#1A1A1A" }} />
           <div style={{ width: "42%", aspectRatio: "1", background: "#111", borderRadius: 3, marginTop: "4%" }} />
         </div>
+      </div>
+    )
+  }
+  if (t.id.endsWith("-studio")) {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: `linear-gradient(135deg, ${t.accent}, ${t.bg})`, display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.5), rgba(0,0,0,0.18) 45%, rgba(0,0,0,0.55))" }} />
+        <div style={{ position: "absolute", top: "6%", right: "10%", width: "15%", aspectRatio: "1", borderRadius: "50%", background: "#fff" }} />
+        <div style={{ position: "relative", marginTop: "13%", width: "20%", aspectRatio: "1", borderRadius: "50%", background: t.accent }} />
+        <div style={{ position: "relative", marginTop: "7%", width: "66%", height: 6, borderRadius: 3, background: "#fff" }} />
+        <div style={{ position: "relative", marginTop: "4%", width: "30%", height: 4, borderRadius: 2, background: t.accent }} />
+        <div style={{ position: "relative", marginTop: "7%", width: "40%", aspectRatio: "1", background: "#fff", borderRadius: 3 }} />
+        <div style={{ position: "relative", marginTop: "7%", width: "50%", height: 9, borderRadius: 5, background: t.accent }} />
       </div>
     )
   }
@@ -1857,6 +1876,29 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         fc.add(new fabric.Group([circ, txt], { originX: "center", originY: "center", left: W * 0.80, top: H * 0.135, angle: 12 }))
       }
     }
+    // Mise en page "studio" : photo + pastille icone metier + badge + titre fort + filet + QR + CTA (designer)
+    const studioLayout = async (title: string, subtitle: string, cta: string, opts: { query: string; emoji: string; badge?: string }) => {
+      const url = await fetchPhoto(opts.query); if (url) await addCover(url, 0, 0, W, H); else gradBg(0, 0, W, H)
+      const scrim = new fabric.Rect({ left: 0, top: 0, width: W, height: H })
+      scrim.set("fill", new fabric.Gradient({ type: "linear", coords: { x1: 0, y1: 0, x2: 0, y2: H }, colorStops: [{ offset: 0, color: "rgba(0,0,0,0.55)" }, { offset: 0.5, color: "rgba(0,0,0,0.32)" }, { offset: 1, color: "rgba(0,0,0,0.62)" }] }))
+      fc.add(scrim)
+      // pastille icone metier (cercle accent + emoji) centree en haut
+      const r = Math.round(W * 0.085)
+      const circ = new fabric.Circle({ radius: r, fill: accent, originX: "center", originY: "center" })
+      const ico = new fabric.Text(opts.emoji, { fontSize: Math.round(r * 1.05), originX: "center", originY: "center", left: 0, top: 0 })
+      fc.add(new fabric.Group([circ, ico], { originX: "center", originY: "center", left: W / 2, top: H * 0.115 }))
+      addText(title, H * 0.20, W * 0.082, { weight: "bold", fill: "#FFFFFF", role: "title" })
+      rule(H * 0.285)
+      addText(subtitle, H * 0.31, W * 0.032, { font: "Arial", fill: "#F0EDE6", role: "subtitle" })
+      await placeQrT(H * 0.40, 0.40)
+      addCTA(cta, H * 0.84)
+      if (opts.badge) {
+        const br = Math.round(W * 0.072)
+        const bc = new fabric.Circle({ radius: br, fill: "#FFFFFF", originX: "center", originY: "center" })
+        const bt = new fabric.Textbox(opts.badge, { width: br * 1.9, fontSize: Math.round(br * 0.4), fontWeight: "bold", fill: "#1A1A1A", textAlign: "center", originX: "center", originY: "center" })
+        fc.add(new fabric.Group([bc, bt], { originX: "center", originY: "center", left: W * 0.83, top: H * 0.065, angle: 12 }))
+      }
+    }
     // Mise en page "orne" : stack centre + etoiles decoratives en coins
     const ornateLayout = async (title: string, subtitle: string, cta: string) => {
       fc.add(new fabric.Polygon(starPts(4, W * 0.05, W * 0.016), { fill: accent, originX: "center", originY: "center", left: W * 0.16, top: H * 0.11 }))
@@ -1994,6 +2036,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "avis-card":      await photoCardLayout("Vous avez aimé ?", "Laissez-nous un avis", "happy people cafe friends"); break
       case "insta-card":     await photoCardLayout("Suivez-nous", "@votrecompte", "aesthetic lifestyle flatlay"); break
       case "contact-card":   await photoCardLayout(name || "Mes coordonnées", "Scannez ma carte", "modern workspace desk"); break
+      case "avis-studio":     await studioLayout("Vous avez aimé ?", "Scannez pour laisser un avis", "Donner mon avis", { query: "happy customers restaurant smiling", emoji: "⭐", badge: "AVIS" }); break
+      case "menu-studio":     await studioLayout(name || "Notre Carte", "Scannez pour découvrir le menu", "Voir le menu", { query: "gourmet plate gastronomy", emoji: "🍽️", badge: "MENU" }); break
+      case "reserver-studio": await studioLayout("Réservez votre table", "Scannez pour réserver", "Réserver", { query: "elegant restaurant table setting", emoji: "📅", badge: "RÉSA" }); break
+      case "insta-studio":    await studioLayout("Suivez-nous", "Notre univers en images", "S'abonner", { query: "lifestyle aesthetic influencer", emoji: "📷", badge: "@" }); break
+      case "contact-studio":  await studioLayout(name || "Mes coordonnées", "Scannez ma carte de visite", "Enregistrer", { query: "modern professional office portrait", emoji: "💼", badge: "PRO" }); break
+      case "decouvrir-studio":await studioLayout("Découvrez-nous", "Scannez pour explorer", "En savoir plus", { query: "premium boutique shop interior", emoji: "✨", badge: "NEW" }); break
     }
 
     if (vG) fc.bringToFront(vG)
