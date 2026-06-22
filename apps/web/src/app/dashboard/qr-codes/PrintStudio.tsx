@@ -788,6 +788,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
   // ---- Outils d'ajout ------------------------------------------------------
   const addQr = () => { const fc = fcRef.current; if (fc) placeQr(fc) }
+  // Repartir d'une page vierge : on retire tout (sauf guides) et on replace le QR
+  const resetCanvas = () => {
+    const fc = fcRef.current; if (!fc) return
+    if (typeof window !== "undefined" && !window.confirm("Repartir d'une page vierge ? Le contenu actuel sera supprimé (le QR est replacé au centre).")) return
+    fc.getObjects().slice().forEach(o => { if (!(o as any).isGuide) fc.remove(o) })
+    placeQr(fc)
+    pushHistorySoon(); refreshSel()
+  }
   // Import d'une image / logo depuis le disque
   const onPickImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -2019,7 +2027,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Modeles orientes objectif (flyout) */}
         {tplOpen && (
-          <div className="qr-scroll ps-fly" style={{ width: 250, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <div className="qr-scroll ps-fly" style={{ width: 290, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Modèles par objectif</span>
               <button type="button" onClick={() => setTplOpen(false)} aria-label="Fermer les modèles"
@@ -2051,7 +2059,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   </div>
                 )
               })}
-              <p style={{ color: MUTED, fontSize: 9, margin: "4px 2px 0", lineHeight: 1.4 }}>
+              <button type="button" onClick={resetCanvas}
+                style={{ width: "100%", marginTop: 8, padding: "9px 10px", background: "rgba(255,255,255,0.04)", border: "1px dashed rgba(255,255,255,0.18)", borderRadius: 9, color: INK, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
+                ＋ Page vierge (repartir de zéro)
+              </button>
+              <p style={{ color: MUTED, fontSize: 9, margin: "8px 2px 0", lineHeight: 1.4 }}>
                 Un modèle remplace le contenu actuel. Tout reste ensuite modifiable (textes, couleurs, position…).
               </p>
             </div>
