@@ -1277,7 +1277,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const o = fc.getActiveObject() as fabric.Image | undefined
     if (!o || o.type !== "image") return
     const F = (fabric.Image as any).filters
-    const ctor: Record<string, any> = { dark: F.Brightness, gray: F.Grayscale, blur: F.Blur, duo: F.BlendColor }
+    const ctor: Record<string, any> = { dark: F.Brightness, gray: F.Grayscale, blur: F.Blur, duo: F.BlendColor, vintage: F.Sepia, luxe: F.Contrast }
     // detection par TYPE de filtre (survit a la serialisation, contrairement a un marqueur custom)
     const filters = ((o.filters || []) as any[])
     const has = filters.some(f => f instanceof ctor[key])
@@ -1288,6 +1288,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       else if (key === "gray") f = new F.Grayscale()
       else if (key === "blur") f = new F.Blur({ blur: 0.18 })
       else if (key === "duo") f = new F.BlendColor({ color: G, mode: "tint", alpha: 0.5 })
+      else if (key === "vintage") f = new F.Sepia()
+      else if (key === "luxe") f = new F.Contrast({ contrast: 0.2 })
       if (f) next = [...next, f]
     }
     o.filters = next as any
@@ -3381,7 +3383,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             ) : sel.isImage ? (
               <>
                 <span style={{ color: MUTED, fontSize: 10, fontWeight: 700, marginRight: 1 }}>Photo</span>
-                {([["dark", "Foncé"], ["gray", "N&B"], ["blur", "Flou"], ["duo", "Teinte"]] as const).map(([k, label]) => (
+                {([["dark", "Foncé"], ["gray", "N&B"], ["vintage", "Vintage"], ["luxe", "Luxe"], ["blur", "Flou"], ["duo", "Teinte"]] as const).map(([k, label]) => (
                   <button key={k} type="button" style={{ ...tb, fontSize: 11 }} title={`Filtre : ${label}`} onClick={() => toggleFilter(k)}>{label}</button>
                 ))}
               </>
