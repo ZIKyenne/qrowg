@@ -683,6 +683,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     })
     fcRef.current = fc
 
+    // Poignees & cadre de selection premium (cercles dores) — sensation soignee a chaque clic
+    fabric.Object.prototype.set({
+      borderColor: G, cornerColor: "#FFFFFF", cornerStrokeColor: G,
+      cornerStyle: "circle", cornerSize: 11, transparentCorners: false,
+      borderScaleFactor: 1.4, padding: 3,
+    })
+
     // Guides de centrage (dores), exclus de l'export
     const guideOpts = {
       stroke: G, strokeWidth: 1, selectable: false, evented: false,
