@@ -2068,6 +2068,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     { text: "Votre texte ici", size: 20, weight: "normal", font: "Arial", label: "Corps de texte", pv: 12 },
                     { text: "TITRE", size: 62, weight: "bold", font: "Bebas Neue", label: "Titre impact", pv: 20 },
                     { text: "Merci", size: 46, weight: "normal", font: "Pacifico", label: "Manuscrit", pv: 20 },
+                    { text: "Élégance", size: 50, weight: "bold", font: "Playfair Display", label: "Titre chic", pv: 21 },
+                    { text: "Nouveauté", size: 34, weight: "bold", font: "Oswald", label: "Accroche condensée", pv: 17 },
+                    { text: "« Citation »", size: 28, weight: "normal", font: "Cormorant Garamond", label: "Citation", pv: 16 },
+                    { text: "Bienvenue", size: 40, weight: "normal", font: "Dancing Script", label: "Script élégant", pv: 20 },
                   ] as const).map((p, i) => (
                     <button key={i} type="button" onClick={() => addTextPreset(p)}
                       style={{ width: "100%", textAlign: "left", padding: "11px 12px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer", color: INK, fontFamily: p.font, fontSize: p.pv, fontWeight: p.weight as any }}>
