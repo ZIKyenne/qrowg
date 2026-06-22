@@ -1966,8 +1966,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         .ps-fly { animation: psSlide .18s cubic-bezier(.2,.8,.2,1); position: absolute; top: 0; bottom: 0; left: 76px; z-index: 30; box-shadow: 8px 0 28px rgba(0,0,0,0.08); }
         .ps-fly-right { left: auto !important; right: 0 !important; box-shadow: -8px 0 28px rgba(0,0,0,0.08) !important; }
         .ps-pop { animation: psPop .18s cubic-bezier(.2,.8,.2,1); }
-        .ps-goal { transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
+        .ps-goal { transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease; animation: psRise .34s cubic-bezier(.2,.8,.2,1) both; }
         .ps-goal:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(0,0,0,0.12); border-color: ${G} !important; }
+        @keyframes psRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes psSlide { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
         @keyframes psPop { from { opacity: 0; transform: translate(-50%, -8px) scale(.97); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
         .ps-root .qr-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -3048,6 +3049,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               ))}
             </div>
             <div style={{ flex: 1, margin: "0 16px 16px", borderRadius: 16, overflow: "hidden", position: "relative", background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", perspective: "1400px" }}>
+              {/* vignette : profondeur photo (bords assombris) */}
+              <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(120% 95% at 50% 38%, transparent 52%, rgba(0,0,0,0.32) 100%)" }} />
               {mockUrl && (s.frame
                 ? <div style={{ maxHeight: s.maxH, maxWidth: "62%", padding: "3% 3% 3%", background: "linear-gradient(145deg,#3a2c18,#1c140a)", borderRadius: 4, boxShadow: "0 40px 70px rgba(0,0,0,0.5), 0 6px 14px rgba(0,0,0,0.35)", display: "flex" }}>
                     <div style={{ padding: "5%", background: "#fff" }}><img src={mockUrl} alt="aperçu" style={{ maxHeight: "100%", maxWidth: "100%", display: "block" }} /></div>
