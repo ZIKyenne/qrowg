@@ -603,7 +603,6 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [mockBg, setMockBg] = useState("") // photo d'environnement (Unsplash) pour le mockup
   const [ctx, setCtx] = useState<{ x: number; y: number } | null>(null) // menu clic-droit
   const [showAdvanced, setShowAdvanced] = useState(false) // panneau de reglages avances (progressive disclosure)
-  const [advanced, setAdvanced] = useState(false) // mode Avance (true) vs Simple (false, par defaut)
   const [libOpen, setLibOpen] = useState(false)
   const [libCat, setLibCat]   = useState<"text" | "shapes" | "lines" | "frames" | "cta" | "icons" | "badges" | "arrows" | "deco">("text")
   const [tplOpen, setTplOpen] = useState(false)
@@ -2470,12 +2469,6 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <Sparkles size={14} /> Régénérer
             </button>
           )}
-          <div style={{ display: "flex", alignItems: "center", background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.35)", borderRadius: 999, padding: 3, gap: 3 }}>
-            {([["Simple", false], ["Avancé", true]] as const).map(([l, v]) => (
-              <button key={l} type="button" onClick={() => { setAdvanced(v); if (!v) { setShowAdvanced(false); if (side === "layers") setSide("") } }}
-                style={{ padding: "7px 16px", borderRadius: 999, border: "none", background: advanced === v ? G : "transparent", color: advanced === v ? "#080808" : "#8A6D14", fontSize: 12.5, fontWeight: advanced === v ? 800 : 600, cursor: "pointer", boxShadow: advanced === v ? "0 2px 6px rgba(201,168,76,0.4)" : "none", transition: "all .15s" }}>{l}</button>
-            ))}
-          </div>
           <button type="button" onClick={() => setShowHelp(true)} title="Aide & raccourcis" aria-label="Aide et raccourcis"
             style={{ display: "flex", alignItems: "center", gap: 5, height: 34, padding: "0 12px", background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 9, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>? Aide</button>
 
@@ -2639,12 +2632,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             <Sparkles size={16} /> Ajouter
           </button>
           <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "6px 0 2px" }}>Éléments</p>
-          {(([
+          {([
             ["text", "Texte", <TypeIcon size={16} key="i" />],
             ["shapes", "Formes", <Shapes size={16} key="i" />],
             ["lines", "Lignes", <Minus size={16} key="i" />],
             ["frames", "Cadres", <Square size={16} key="i" />],
-          ] as const).filter(([cat]) => advanced || cat === "text")).map(([cat, label, icon]) => {
+          ] as const).map(([cat, label, icon]) => {
             const on = libOpen && libCat === cat
             return (
               <button key={cat} type="button" onClick={() => openLib(cat)}
@@ -2676,12 +2669,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             style={{ ...btnTool, background: side === "styles" ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${side === "styles" ? G : "rgba(0,0,0,0.07)"}`, color: side === "styles" ? G : INK }}>
             <Palette size={16} /> Styles
           </button>
-          {advanced && (
           <button type="button" onClick={() => openSide("layers")}
             style={{ ...btnTool, background: side === "layers" ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${side === "layers" ? G : "rgba(0,0,0,0.07)"}`, color: side === "layers" ? G : INK }}>
             <Copy size={16} /> Calques
           </button>
-          )}
           <button type="button" onClick={() => openSide("bg")}
             style={{ ...btnTool, background: side === "bg" ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${side === "bg" ? G : "rgba(0,0,0,0.07)"}`, color: side === "bg" ? G : INK }}>
             <Square size={16} /> Fond
@@ -3511,12 +3502,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             <button type="button" style={tb} title="Mettre derrière" onClick={() => layer("back")}><ChevronDown size={14} /></button>
             <button type="button" style={{ ...tb, color: sel.locked ? G : INK }} title={sel.locked ? "Déverrouiller" : "Verrouiller"} onClick={() => layer("lock")}>{sel.locked ? <Unlock size={14} /> : <Lock size={14} />}</button>
             <button type="button" style={{ ...tb, color: "#FF6B6B" }} title="Supprimer" onClick={() => layer("del")}><Trash2 size={14} /></button>
-            {advanced && (
             <button type="button" onClick={() => setShowAdvanced(v => !v)}
               style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 10px", background: showAdvanced ? "rgba(201,168,76,0.18)" : "rgba(0,0,0,0.06)", border: `1px solid ${showAdvanced ? G : "rgba(0,0,0,0.1)"}`, borderRadius: 8, color: showAdvanced ? G : INK, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
               Réglages {showAdvanced ? "▸" : ""}
             </button>
-            )}
           </div>
         )}
 
