@@ -301,14 +301,14 @@ const COMPONENTS: { key: string; emoji: string; label: string; desc: string }[] 
   { key: "contact",  emoji: "🪪", label: "Carte de visite", desc: "Nom, métier, contact" },
 ]
 
-// Ecran d'accueil : objectifs -> meilleur modele (design instantane en 1 clic)
-const START_GOALS: { id: string; emoji: string; label: string; desc: string }[] = [
-  { id: "avis-premium",     emoji: "⭐", label: "Obtenir plus d'avis",   desc: "Boostez vos avis clients" },
-  { id: "insta-premium",    emoji: "📱", label: "Gagner des abonnés",    desc: "Réseaux sociaux" },
-  { id: "menu-premium",     emoji: "🍽️", label: "Montrer mon menu",      desc: "Carte accessible au scan" },
-  { id: "reserver-premium", emoji: "📅", label: "Prendre des réservations", desc: "Réservez en un scan" },
-  { id: "contact-premium",  emoji: "💳", label: "Partager mes coordonnées", desc: "Carte de visite digitale" },
-  { id: "promo-premium",    emoji: "🏷️", label: "Mettre en avant une offre", desc: "Promo, nouveauté…" },
+// Ecran d'accueil : objectif -> pool des meilleurs modeles (rotation = effet "generer")
+const START_GOALS: { pool: string[]; emoji: string; label: string; desc: string }[] = [
+  { pool: ["avis-premium", "avis-photo", "avis-card", "avis-ornate"],            emoji: "⭐", label: "Obtenir plus d'avis",       desc: "Boostez vos avis clients" },
+  { pool: ["insta-premium", "insta-photo", "insta-card"],                        emoji: "📱", label: "Gagner des abonnés",        desc: "Réseaux sociaux" },
+  { pool: ["menu-premium", "menu-photo", "menu-split", "resto-footer"],          emoji: "🍽️", label: "Montrer mon menu",          desc: "Carte accessible au scan" },
+  { pool: ["reserver-premium", "reserver-photo", "reserver-split"],              emoji: "📅", label: "Prendre des réservations",  desc: "Réservez en un scan" },
+  { pool: ["contact-premium", "contact-photo", "contact-card", "immo-frame"],    emoji: "💳", label: "Partager mes coordonnées",  desc: "Carte de visite digitale" },
+  { pool: ["promo-premium", "decouvrir-photo", "event-ornate", "decouvrir-or"],  emoji: "🏷️", label: "Mettre en avant une offre", desc: "Promo, nouveauté…" },
 ]
 
 // Mini-apercu schematique d'un modele (fond + couleurs + disposition)
@@ -552,6 +552,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [hintOff, setHintOff] = useState(false)
   const [showStart, setShowStart] = useState(false) // ecran d'accueil guide (objectif -> design instantane)
   const [starting, setStarting] = useState(false)   // generation en cours depuis l'accueil
+  const genIdxRef = useRef(0)                        // rotation des propositions de l'accueil
+  const [lastPool, setLastPool] = useState<string[] | null>(null) // dernier objectif (pour Régénérer)
   const [qrFg, setQrFg] = useState("")      // couleur courante du QR (apres regeneration)
   const [qrDot, setQrDot] = useState("")    // style de modules courant du QR
   const [qrBusy, setQrBusy] = useState(false)
@@ -1991,6 +1993,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   }
 
   // ---- Apercu en situation (mockup CSS) ------------------------------------
+  // Régénérer : proposer le modèle suivant du dernier objectif choisi
+  const regenerate = async () => {
+    if (!lastPool || !lastPool.length) return
+    const id = lastPool[genIdxRef.current++ % lastPool.length]
+    await applyTemplate(id, true)
+  }
   const openMock = () => {
     const fc = fcRef.current; if (!fc) return
     prepExport(fc)
@@ -2181,6 +2189,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 6, color: INK, fontSize: 15, cursor: "pointer" }}>+</button>
           </div>
 
+          {lastPool && (
+            <button type="button" onClick={regenerate} title="Régénérer — une autre proposition"
+              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", background: "linear-gradient(90deg,rgba(201,168,76,0.16),rgba(201,168,76,0.06))", border: "1px solid rgba(201,168,76,0.4)", borderRadius: 9, color: "#8A6D14", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+              <Sparkles size={14} /> Régénérer
+            </button>
+          )}
           <button type="button" onClick={() => setShowHelp(true)} title="Aide & raccourcis" aria-label="Aide et raccourcis"
             style={{ width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 9, color: INK, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>?</button>
 
@@ -3177,8 +3191,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           <p style={{ color: MUTED, fontSize: 14, margin: "0 0 28px", textAlign: "center", maxWidth: 440, lineHeight: 1.5 }}>Choisissez un objectif — votre design est prêt en 1 clic. Tout reste modifiable ensuite.</p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(170px, 200px))", gap: 14, maxWidth: "100%" }}>
             {START_GOALS.map(g => (
-              <button key={g.id} className="ps-goal" type="button" disabled={starting}
-                onClick={async () => { setStarting(true); await applyTemplate(g.id, true); setStarting(false); setShowStart(false) }}
+              <button key={g.label} className="ps-goal" type="button" disabled={starting}
+                onClick={async () => { setStarting(true); setLastPool(g.pool); const id = g.pool[genIdxRef.current++ % g.pool.length]; await applyTemplate(id, true); setStarting(false); setShowStart(false) }}
                 style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 6, padding: "18px 16px", background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 16, cursor: starting ? "wait" : "pointer", textAlign: "left", opacity: starting ? 0.6 : 1 }}>
                 <span style={{ fontSize: 30 }}>{g.emoji}</span>
                 <span style={{ color: INK, fontSize: 15, fontWeight: 800, lineHeight: 1.2 }}>{g.label}</span>
