@@ -284,23 +284,31 @@ const SECTORS: { id: string; label: string; emoji: string; objs: string[] }[] = 
   { id: "createur",label: "Créateur",    emoji: "🎨", objs: ["Abonnés", "Contact", "Avis", "Page"] },
 ]
 
-// Composants metier 1-clic (sidebar inspirante)
-const COMPONENTS: { key: string; emoji: string; label: string; desc: string }[] = [
-  { key: "avis",     emoji: "⭐", label: "Avis Google",     desc: "Bloc 5 étoiles + invitation" },
-  { key: "insta",    emoji: "📷", label: "Instagram",       desc: "Votre @ en pastille" },
-  { key: "tiktok",   emoji: "🎵", label: "TikTok",          desc: "Bouton TikTok" },
-  { key: "whatsapp", emoji: "💬", label: "WhatsApp",        desc: "Bouton de contact" },
-  { key: "phone",    emoji: "📞", label: "Téléphone",       desc: "Numéro en pastille" },
-  { key: "email",    emoji: "✉️", label: "Email",           desc: "Adresse en pastille" },
-  { key: "menu",     emoji: "🍽️", label: "Menu",            desc: "Bouton voir le menu" },
-  { key: "reserver", emoji: "📅", label: "Réservation",     desc: "Bouton réserver" },
-  { key: "pay",      emoji: "💳", label: "Paiement",        desc: "Bouton payer en ligne" },
-  { key: "catalogue",emoji: "🛍️", label: "Catalogue",       desc: "Bouton voir le catalogue" },
-  { key: "portfolio",emoji: "🎨", label: "Portfolio",       desc: "Bouton voir le portfolio" },
-  { key: "wifi",     emoji: "📶", label: "Wifi",            desc: "Réseau + mot de passe" },
-  { key: "horaires", emoji: "🕐", label: "Horaires",        desc: "Vos horaires d'ouverture" },
-  { key: "adresse",  emoji: "📍", label: "Adresse",         desc: "Votre adresse postale" },
-  { key: "contact",  emoji: "🪪", label: "Carte de visite", desc: "Nom, métier, contact" },
+// Composants metier 1-clic, ranges par objectif (logique metier, pas graphique)
+const COMP_CATS = ["Avis", "Réseaux", "Restaurant", "Contact", "Pratique", "Business"] as const
+const COMPONENTS: { key: string; emoji: string; label: string; desc: string; cat: typeof COMP_CATS[number] }[] = [
+  { key: "avis",     emoji: "⭐", label: "Avis Google",     desc: "Bloc 5 étoiles + invitation",   cat: "Avis" },
+  { key: "insta",    emoji: "📷", label: "Instagram",       desc: "Votre @ en pastille",           cat: "Réseaux" },
+  { key: "tiktok",   emoji: "🎵", label: "TikTok",          desc: "Bouton TikTok",                 cat: "Réseaux" },
+  { key: "facebook", emoji: "👍", label: "Facebook",        desc: "Bouton Facebook",               cat: "Réseaux" },
+  { key: "youtube",  emoji: "▶️", label: "YouTube",         desc: "Bouton YouTube",                cat: "Réseaux" },
+  { key: "menu",     emoji: "🍽️", label: "Menu",            desc: "Bouton voir le menu",           cat: "Restaurant" },
+  { key: "reserver", emoji: "📅", label: "Réservation",     desc: "Bouton réserver",               cat: "Restaurant" },
+  { key: "phone",    emoji: "📞", label: "Téléphone",       desc: "Numéro en pastille",            cat: "Contact" },
+  { key: "email",    emoji: "✉️", label: "Email",           desc: "Adresse en pastille",           cat: "Contact" },
+  { key: "whatsapp", emoji: "💬", label: "WhatsApp",        desc: "Bouton de contact",             cat: "Contact" },
+  { key: "site",     emoji: "🌐", label: "Site web",        desc: "Lien vers votre site",          cat: "Contact" },
+  { key: "contact",  emoji: "🪪", label: "Carte de visite", desc: "Nom, métier, contact",          cat: "Contact" },
+  { key: "wifi",     emoji: "📶", label: "Wifi",            desc: "Réseau + mot de passe",         cat: "Pratique" },
+  { key: "horaires", emoji: "🕐", label: "Horaires",        desc: "Vos horaires d'ouverture",      cat: "Pratique" },
+  { key: "adresse",  emoji: "📍", label: "Adresse",         desc: "Votre adresse postale",         cat: "Pratique" },
+  { key: "maps",     emoji: "🗺️", label: "Itinéraire",      desc: "Bouton Google Maps",            cat: "Pratique" },
+  { key: "pay",      emoji: "💳", label: "Paiement",        desc: "Bouton payer en ligne",         cat: "Business" },
+  { key: "catalogue",emoji: "🛍️", label: "Catalogue",       desc: "Bouton voir le catalogue",      cat: "Business" },
+  { key: "portfolio",emoji: "🎨", label: "Portfolio",       desc: "Bouton voir le portfolio",      cat: "Business" },
+  { key: "promo",    emoji: "🎟️", label: "Code promo",      desc: "Carte offre / réduction",       cat: "Business" },
+  { key: "newsletter",emoji: "📨", label: "Newsletter",     desc: "Bouton inscription",            cat: "Business" },
+  { key: "don",      emoji: "❤️", label: "Faire un don",    desc: "Bouton de don",                 cat: "Business" },
 ]
 
 // Ecran d'accueil : objectif -> pool des meilleurs modeles (rotation = effet "generer")
@@ -1264,6 +1272,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       }
       case "insta":    o = pill("📷  @votrecompte", "#E1306C", "#FFFFFF"); break
       case "tiktok":   o = pill("🎵  TikTok", "#111111", "#FFFFFF"); break
+      case "facebook": o = pill("👍  Facebook", "#1877F2", "#FFFFFF"); break
+      case "youtube":  o = pill("▶  YouTube", "#FF0000", "#FFFFFF"); break
+      case "site":     o = pill("🌐  monsite.fr", G, "#080808"); break
+      case "maps":     o = pill("🗺️  Itinéraire", "#0E7A5F", "#FFFFFF"); break
+      case "newsletter": o = pill("📨  S'inscrire à la newsletter", "#1F2937", "#FFFFFF"); break
+      case "don":      o = pill("❤️  Faire un don", "#C0392B", "#FFFFFF"); break
+      case "promo":    o = card("🎟️  Code promo", ["PROMO10", "−10% sur votre commande"]); break
       case "whatsapp": o = pill("💬  WhatsApp", "#25D366", "#FFFFFF"); break
       case "phone":    o = pill("📞  06 12 34 56 78", G, "#080808"); break
       case "email":    o = pill("✉️  contact@email.fr", "#1F2937", "#FFFFFF"); break
@@ -2431,7 +2446,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           </button>
           <button type="button" onClick={openComp}
             style={{ ...btnTool, background: compOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.12),rgba(201,168,76,0.04))", border: `1px solid ${compOpen ? G : "rgba(201,168,76,0.3)"}`, color: compOpen ? G : INK, fontWeight: 700 }}>
-            <Sparkles size={16} /> Blocs
+            <Sparkles size={16} /> Ajouter
           </button>
           <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "6px 0 2px" }}>Ajouter</p>
           {(([
@@ -2543,24 +2558,31 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           </div>
         )}
 
-        {/* Composants metier 1-clic (flyout) */}
+        {/* Ajouter : composants metier 1-clic, ranges par objectif (flyout) */}
         {compOpen && (
-          <div className="qr-scroll ps-fly" style={{ width: 280, background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.07)", flexShrink: 0 }}>
-              <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Blocs prêts à l'emploi</span>
+          <div className="qr-scroll ps-fly" style={{ width: 300, background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "13px 14px", borderBottom: "1px solid rgba(0,0,0,0.07)", flexShrink: 0 }}>
+              <span style={{ color: INK, fontWeight: 800, fontSize: 14 }}>➕ Ajouter</span>
               <button type="button" onClick={() => setCompOpen(false)} aria-label="Fermer"
-                style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={14} /></button>
             </div>
-            <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "10px 10px 16px", display: "flex", flexDirection: "column", gap: 7 }}>
-              {COMPONENTS.map(c => (
-                <button key={c.key} className="ps-goal" type="button" onClick={() => addComponent(c.key)}
-                  style={{ display: "flex", alignItems: "center", gap: 11, padding: "10px 12px", background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 12, cursor: "pointer", textAlign: "left" }}>
-                  <span style={{ fontSize: 22, flexShrink: 0 }}>{c.emoji}</span>
-                  <span style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                    <span style={{ color: INK, fontSize: 13, fontWeight: 700 }}>{c.label}</span>
-                    <span style={{ color: MUTED, fontSize: 10.5, lineHeight: 1.25 }}>{c.desc}</span>
-                  </span>
-                </button>
+            <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "12px 12px 18px" }}>
+              {COMP_CATS.map(cat => (
+                <div key={cat} style={{ marginBottom: 16 }}>
+                  <p style={{ color: MUTED, fontSize: 9.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>{cat}</p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {COMPONENTS.filter(c => c.cat === cat).map(c => (
+                      <button key={c.key} className="ps-goal" type="button" onClick={() => addComponent(c.key)}
+                        style={{ display: "flex", alignItems: "center", gap: 13, padding: "13px 14px", background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 13, cursor: "pointer", textAlign: "left" }}>
+                        <span style={{ fontSize: 26, flexShrink: 0, lineHeight: 1 }}>{c.emoji}</span>
+                        <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                          <span style={{ color: INK, fontSize: 14, fontWeight: 700 }}>{c.label}</span>
+                          <span style={{ color: MUTED, fontSize: 11, lineHeight: 1.3 }}>{c.desc}</span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </div>
@@ -2944,7 +2966,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         )}
 
         {/* Zone canvas (heros) : panneaux flottants -> on recadre pour garder l'artboard centre dans le visible */}
-        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, paddingLeft: 24 + (tplOpen ? 290 : photoOpen ? 290 : compOpen ? 280 : libOpen ? 234 : side ? 250 : 0), paddingRight: 24 + (sel && showAdvanced ? 280 : 0), background: "#E5E8ED", position: "relative", transition: "padding .22s cubic-bezier(.2,.8,.2,1)" }}>
+        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, paddingLeft: 24 + (tplOpen ? 290 : photoOpen ? 290 : compOpen ? 300 : libOpen ? 234 : side ? 250 : 0), paddingRight: 24 + (sel && showAdvanced ? 280 : 0), background: "#E5E8ED", position: "relative", transition: "padding .22s cubic-bezier(.2,.8,.2,1)" }}>
           {loading && (
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: MUTED, zIndex: 5, pointerEvents: "none" }}>
               <Loader2 size={18} style={{ animation: "spin 0.8s linear infinite" }} /> Chargement…
