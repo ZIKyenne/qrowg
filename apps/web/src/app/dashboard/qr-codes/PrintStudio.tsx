@@ -1502,9 +1502,18 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   })
 
   // Effet : bordure / contour (strokeUniform => epaisseur constante)
+  const isTextObj = (o: fabric.Object) => o.type === "i-text" || o.type === "text" || o.type === "textbox"
   const setBorder = (on: boolean) => mutate(o => {
-    if (on) o.set({ stroke: G, strokeWidth: (o.strokeWidth ?? 0) > 0 ? o.strokeWidth : 4, strokeUniform: true })
-    else o.set({ stroke: null, strokeWidth: 0 })
+    if (on) {
+      o.set({ stroke: G, strokeWidth: (o.strokeWidth ?? 0) > 0 ? o.strokeWidth : 4, strokeUniform: true })
+      if (isTextObj(o)) o.set("paintFirst", "stroke") // contour propre derriere le texte (pas en surimpression)
+    } else o.set({ stroke: null, strokeWidth: 0 })
+    o.dirty = true
+  })
+  // Degrade radial (depuis le centre) sur l'element
+  const setRadialFill = (c1: string, c2: string) => mutate(o => {
+    const w = (o.width ?? 100), h = (o.height ?? 100)
+    o.set("fill", new fabric.Gradient({ type: "radial", gradientUnits: "pixels", coords: { x1: w / 2, y1: h / 2, r1: 0, x2: w / 2, y2: h / 2, r2: Math.max(w, h) / 2 }, colorStops: [{ offset: 0, color: c1 }, { offset: 1, color: c2 }] }) as unknown as string)
     o.dirty = true
   })
   const setBorderColor = (color: string) => mutate(o => {
@@ -3271,7 +3280,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <input type="color" value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"} onChange={e => setFill(e.target.value)} title="Couleur 1" style={{ width: 30, height: 28, borderRadius: 6, border: "1px solid rgba(0,0,0,0.15)", cursor: "pointer", padding: 0 }} />
                   <span style={{ color: MUTED, fontSize: 14 }}>→</span>
                   <input type="color" value={gradC2} onChange={e => setGradC2(e.target.value)} title="Couleur 2" style={{ width: 30, height: 28, borderRadius: 6, border: "1px solid rgba(0,0,0,0.15)", cursor: "pointer", padding: 0 }} />
-                  <button type="button" onClick={() => setGradientFill(/^#/.test(sel.fill) ? sel.fill : "#C9A84C", gradC2)} style={{ ...layerBtn, flex: 1 }}>Appliquer</button>
+                  <button type="button" onClick={() => setGradientFill(/^#/.test(sel.fill) ? sel.fill : "#C9A84C", gradC2)} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Linéaire</button>
+                  <button type="button" onClick={() => setRadialFill(/^#/.test(sel.fill) ? sel.fill : "#C9A84C", gradC2)} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Radial</button>
                 </div>
 
                 {/* Bordure / contour */}
