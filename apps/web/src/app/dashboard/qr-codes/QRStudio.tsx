@@ -2280,6 +2280,18 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             phone: suppPhone,
             website: suppWebsite,
           }}
+          regenQr={async (opts) => {
+            try {
+              const blob = await getQRBlob({
+                data: qrUrl, fg: opts.fg ?? fg, bg,
+                ecc: effectiveEcc,
+                style: opts.dotStyle ? { ...styleConf, dotStyle: opts.dotStyle as typeof styleConf.dotStyle } : styleConf,
+                size: 1000,
+              }, "png")
+              if (!blob) return null
+              return await blobToDataUrl(blob)
+            } catch { return null }
+          }}
         />
       )}
 

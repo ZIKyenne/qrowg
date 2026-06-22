@@ -129,6 +129,8 @@ type Props = {
   onUpsell?: (feature: string, plan: string) => void
   // Donnees deja saisies cote QRStudio, pour pre-remplir les modeles
   prefill?: { name?: string; phone?: string; website?: string }
+  // Regenere le QR (couleur / style des modules) via le moteur qrRender de QRStudio
+  regenQr?: (opts: { fg?: string; dotStyle?: string }) => Promise<string | null>
 }
 
 // ---- Etat de selection (pour le panneau proprietes) ------------------------
@@ -156,6 +158,7 @@ type SelState = {
   radius: number | null   // coins arrondis (rectangles uniquement), null sinon
   isGroupObj: boolean     // un vrai groupe (degroupable)
   multi: boolean          // selection multiple (groupable)
+  isQr: boolean           // l'objet selectionne est le QR (regenerable)
 } | null
 
 // Trouve l'objet texte dans un groupe (CTA / badge), s'il y en a un
@@ -312,6 +315,16 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
 // Palette de couleurs rapides (pastilles cliquables)
 const SWATCHES = ["#C9A84C", "#0A0A0A", "#FFFFFF", "#F5F0E8", "#8A8478", "#C0392B", "#EA580C", "#E0B84C", "#16A34A", "#0E7490", "#1D4ED8", "#7C3AED", "#E1306C", "#6B3F2A"]
 
+// Couleurs de QR garanties scannables (foncees, fort contraste sur la carte blanche)
+const QR_FG = ["#0A0A0A", "#13243A", "#0F3D2E", "#3A1212", "#2A0A2E", "#5A3A12", "#1D4ED8", "#7C3AED"]
+// Styles de modules du QR (cle compatible qrRender)
+const QR_DOTS: { k: string; label: string; icon: string }[] = [
+  { k: "square", label: "Carré", icon: "▦" },
+  { k: "rounded", label: "Arrondi", icon: "▢" },
+  { k: "dot", label: "Points", icon: "⣿" },
+  { k: "luxury", label: "Luxe", icon: "◆" },
+]
+
 // Fonds prets a l'emploi (couleurs unies + degrades) — galerie visible
 const BG_PRESETS: { id: string; type: "solid" | "grad"; c1: string; c2?: string }[] = [
   { id: "white",   type: "solid", c1: "#FFFFFF" },
@@ -417,7 +430,7 @@ const METIERS: { id: string; label: string; emoji: string; style: string; objs: 
   ] },
 ]
 
-export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpsell, prefill }: Props) {
+export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpsell, prefill, regenQr }: Props) {
   const elRef   = useRef<HTMLCanvasElement>(null)
   const fcRef   = useRef<fabric.Canvas | null>(null)
   const qrUrlRef = useRef(qrDataUrl)
@@ -454,6 +467,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [tplSector, setTplSector] = useState("")
   const [showHelp, setShowHelp] = useState(false)
   const [hintOff, setHintOff] = useState(false)
+  const [qrFg, setQrFg] = useState("")      // couleur courante du QR (apres regeneration)
+  const [qrDot, setQrDot] = useState("")    // style de modules courant du QR
+  const [qrBusy, setQrBusy] = useState(false)
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
   const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
   const [dragOver, setDragOver] = useState<number | null>(null) // ligne survolee pendant un glisser
@@ -503,6 +519,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       radius: o.type === "rect" ? ((o as fabric.Rect).rx ?? 0) : null,
       isGroupObj: o.type === "group",
       multi: o.type === "activeSelection",
+      isQr: !!(o as any).isQR,
     }
   }, [])
 
@@ -814,6 +831,22 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
   // ---- Outils d'ajout ------------------------------------------------------
   const addQr = () => { const fc = fcRef.current; if (fc) placeQr(fc) }
+  // Regenere le QR (couleur / style) et remplace l'image en place (position/taille conservees)
+  const applyQrRender = async (opts: { fg?: string; dotStyle?: string }) => {
+    if (!regenQr || qrBusy) return
+    const fc = fcRef.current; if (!fc) return
+    const img = fc.getObjects().find(o => (o as any).isQR) as fabric.Image | undefined
+    if (!img) return
+    setQrBusy(true)
+    try {
+      const url = await regenQr({ fg: opts.fg ?? (qrFg || undefined), dotStyle: opts.dotStyle ?? (qrDot || undefined) })
+      if (url) {
+        img.setSrc(url, () => { fc.requestRenderAll(); pushHistorySoon() }, { crossOrigin: "anonymous" } as fabric.IImageOptions)
+        if (opts.fg) setQrFg(opts.fg)
+        if (opts.dotStyle) setQrDot(opts.dotStyle)
+      }
+    } catch { /* noop */ } finally { setQrBusy(false) }
+  }
   // Repartir d'une page vierge : on retire tout (sauf guides) et on replace le QR
   const resetCanvas = () => {
     const fc = fcRef.current; if (!fc) return
@@ -2720,6 +2753,25 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {/* Barre contextuelle flottante (progressive disclosure) */}
         {sel && (
           <div className="ps-pop" style={{ position: "absolute", top: 12, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", background: "#14120C", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, boxShadow: "0 10px 30px rgba(0,0,0,0.5)", maxWidth: "92%", flexWrap: "wrap" }}>
+            {sel.isQr ? (
+              regenQr ? (
+                <>
+                  <span style={{ color: MUTED, fontSize: 10, fontWeight: 700, marginRight: 1 }}>QR</span>
+                  {QR_FG.map(c => (
+                    <button key={c} type="button" disabled={qrBusy} onClick={() => applyQrRender({ fg: c })} title="Couleur du QR (scannable)"
+                      style={{ width: 18, height: 18, borderRadius: "50%", cursor: "pointer", background: c, border: qrFg.toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(255,255,255,0.25)", padding: 0, flexShrink: 0, opacity: qrBusy ? 0.5 : 1 }} />
+                  ))}
+                  <span style={{ width: 1, height: 20, background: "rgba(255,255,255,0.12)" }} />
+                  {QR_DOTS.map(d => (
+                    <button key={d.k} type="button" disabled={qrBusy} onClick={() => applyQrRender({ dotStyle: d.k })} title={`Style : ${d.label}`}
+                      style={{ ...tb, fontSize: 13, color: qrDot === d.k ? G : INK, opacity: qrBusy ? 0.5 : 1 }}>{d.icon}</button>
+                  ))}
+                  {qrBusy && <Loader2 size={13} style={{ animation: "spin 0.8s linear infinite", color: G }} />}
+                </>
+              ) : (
+                <span style={{ color: MUTED, fontSize: 10.5 }}>QR — glisse les poignées pour redimensionner</span>
+              )
+            ) : (<>
             {sel.isText ? (
               <>
                 <input type="color" value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"} onChange={e => setFill(e.target.value)} style={swatch} />
@@ -2743,6 +2795,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <button key={c} type="button" onClick={() => setFill(c)} title={c}
                 style={{ width: 18, height: 18, borderRadius: "50%", cursor: "pointer", background: c, border: sel.fill.toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(255,255,255,0.25)", padding: 0, flexShrink: 0 }} />
             ))}
+            </>)}
             <span style={{ width: 1, height: 20, background: "rgba(255,255,255,0.12)" }} />
             <button type="button" style={tb} title="Dupliquer" onClick={() => layer("dup")}><Copy size={14} /></button>
             <button type="button" style={tb} title="Mettre devant" onClick={() => layer("front")}><ChevronUp size={14} /></button>
