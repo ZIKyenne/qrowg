@@ -694,6 +694,16 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const fc = fcRef.current; if (!fc) return
     fc.add(o)
     fc.viewportCenterObject(o)
+    // ne jamais poser un nouvel element PILE sur le QR : le decaler au-dessus (ou en dessous)
+    const qrc = (fc.getObjects().find(x => (x as any).isQrCard) || fc.getObjects().find(x => (x as any).isQR)) as fabric.Object | undefined
+    if (qrc && !(o as any).isQR && !(o as any).isQrCard) {
+      const z = fc.getZoom() || 1, H = fc.getHeight() / z
+      const c = qrc.getCenterPoint(), half = qrc.getScaledHeight() / 2, oh = o.getScaledHeight(), cx = o.getCenterPoint().x
+      let cy = c.y - half - oh / 2 - 18 // au-dessus du QR
+      if (cy - oh / 2 < 12) cy = c.y + half + oh / 2 + 18 // sinon en dessous
+      if (cy + oh / 2 > H - 12) cy = Math.max(oh / 2 + 12, c.y - half - oh / 2 - 18)
+      o.setPositionByOrigin(new fabric.Point(cx, cy), "center", "center"); o.setCoords()
+    }
     fc.setActiveObject(o)
     fc.requestRenderAll()
     refreshSel()
@@ -1758,12 +1768,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const isTxt = (t?: string) => t === "i-text" || t === "text" || t === "textbox"
     // une photo derriere ? -> on garde le texte clair ; sinon on garantit le contraste avec le fond du theme
     const hasPhoto = fc.getObjects().some(o => o.type === "image" && !(o as any).isQR)
+    // garde-fou contraste : si l'encre du theme contraste mal avec son fond, on bascule sur du lisible
+    const inkFill = Math.abs(lum(s.ink) - lum(s.bg)) < 0.35 ? readableOn(s.bg) : s.ink
     fc.getObjects().forEach(o => {
       if ((o as any).isGuide || (o as any).isQR || (o as any).isQrCard) return
       if (isTxt(o.type)) {
         ;(o as fabric.IText).set("fontFamily", (o as any).role === "title" ? s.titleFont : s.bodyFont)
         if ((o as any).keepColor) { if (!hasPhoto) (o as fabric.IText).set("fill", readableOn(s.bg)) } // texte "photo" sans photo -> lisible sur le theme
-        else (o as fabric.IText).set("fill", s.ink)
+        else (o as fabric.IText).set("fill", inkFill)
       } else if (o.type === "group") {
         ;(o as fabric.Group).getObjects().forEach(c => {
           c.set("fill", isTxt(c.type) ? readableOn(s.accent) : s.accent)
