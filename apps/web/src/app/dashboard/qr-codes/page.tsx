@@ -2,7 +2,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import type { Metadata } from "next"
 import QRStudio from "./QRStudio"
-import { Plus, QrCode } from "lucide-react"
+import { Plus, QrCode, TrendingUp, Activity } from "lucide-react"
 
 export const metadata: Metadata = { title: "QR Studio - QRfolio" }
 
@@ -25,6 +25,9 @@ export default async function QRCodesPage() {
 
   const appUrl   = process.env.NEXT_PUBLIC_APP_URL || "https://qrfolio.app"
   const userPlan = profile?.plan || "free"
+
+  const totalScans = (qrCodes ?? []).reduce((a, q) => a + (q.total_scans ?? 0), 0)
+  const activeQR   = (qrCodes ?? []).filter((q: any) => (q.status ?? "active") === "active").length
 
   return (
     <div style={{ minHeight: "100vh", background: "#080808", fontFamily: "DM Sans, sans-serif" }}>
@@ -50,6 +53,22 @@ export default async function QRCodesPage() {
 
           {/* Actions */}
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            {/* KPIs en pastilles */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              {[
+                { label: "QR actifs",   value: activeQR,                      icon: <Activity size={13} color="#39FF8F"/>,    color: "#39FF8F" },
+                { label: "Scans total", value: totalScans.toLocaleString("fr-FR"), icon: <TrendingUp size={13} color="#C9A84C"/>, color: "#C9A84C" },
+              ].map((k, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "7px 13px" }}>
+                  {k.icon}
+                  <div>
+                    <p style={{ color: k.color, fontSize: 14, fontWeight: 700, margin: 0, lineHeight: 1 }}>{k.value}</p>
+                    <p style={{ color: "#8A8478", fontSize: 9, margin: "1px 0 0", textTransform: "uppercase", letterSpacing: 0.8 }}>{k.label}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
             <a href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 7, background: "linear-gradient(90deg,#C9A84C,#b8953f)", color: "#080808", textDecoration: "none", fontSize: 12.5, fontWeight: 700, padding: "10px 18px", borderRadius: 10, whiteSpace: "nowrap" as const, boxShadow: "0 4px 14px rgba(201,168,76,0.2)" }}>
               <Plus size={14}/> Nouvelle page
             </a>
