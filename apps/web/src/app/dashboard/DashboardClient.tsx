@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import { Plus, QrCode, BarChart2, Eye, Zap, ArrowRight, Globe, Trash2, ExternalLink, Edit3, AlertTriangle, X } from "lucide-react"
-import OnboardingChecklist from "./OnboardingChecklist"
 
 type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string }
 type Profile = { full_name: string | null; plan: string; total_scans: number; total_pages: number; avatar_url: string | null }
@@ -132,9 +131,6 @@ export default function DashboardClient() {
             <Plus size={16} /> Nouvelle page
           </Link>
         </div>
-
-        {/* Onboarding */}
-        <OnboardingChecklist />
 
         {/* KPI */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 28 }}>
