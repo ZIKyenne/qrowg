@@ -257,6 +257,12 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"reserver-premium",label:"Réservation — Premium",obj:"Réserver",emoji:"📅",desc:"En-tête + badge, vert",              bg:"#0F2027", ink:"#EAF4F4", accent:"#2E8B7B" },
   { id:"insta-premium", label:"Instagram — Premium",obj:"Abonnés",   emoji:"📷", desc:"En-tête + badge, rose",                bg:"#1A0E18", ink:"#FBE9F4", accent:"#E1306C" },
   { id:"contact-premium",label:"Contact — Premium", obj:"Contact",   emoji:"💳", desc:"En-tête + badge, bleu",                bg:"#0C1322", ink:"#EEF3FB", accent:"#5B8DEF" },
+  { id:"avis-photo",    label:"Avis — Photo",       obj:"Avis",     emoji:"📸", desc:"Image plein cadre + QR en coin",        bg:"#1A1410", ink:"#FFFFFF", accent:"#C9A84C" },
+  { id:"menu-photo",    label:"Menu — Photo",       obj:"Menu",     emoji:"📸", desc:"Photo gourmande + QR en coin",          bg:"#14110C", ink:"#FFFFFF", accent:"#C9A84C" },
+  { id:"reserver-photo",label:"Réservation — Photo",obj:"Réserver", emoji:"📸", desc:"Ambiance resto + QR en coin",           bg:"#0E1A16", ink:"#FFFFFF", accent:"#34D399" },
+  { id:"insta-photo",   label:"Instagram — Photo",  obj:"Abonnés",  emoji:"📸", desc:"Lifestyle + QR en coin",               bg:"#1A0E18", ink:"#FFFFFF", accent:"#E1306C" },
+  { id:"contact-photo", label:"Contact — Photo",    obj:"Contact",  emoji:"📸", desc:"Bureau moderne + QR en coin",           bg:"#0C1322", ink:"#FFFFFF", accent:"#5B8DEF" },
+  { id:"decouvrir-photo",label:"Découvrir — Photo", obj:"Page",     emoji:"📸", desc:"Boutique + QR en coin",                 bg:"#14110C", ink:"#FFFFFF", accent:"#C9A84C" },
 ]
 
 // Secteurs d'activite -> objectifs pertinents (pour filtrer la galerie)
@@ -297,6 +303,18 @@ const START_GOALS: { id: string; emoji: string; label: string; desc: string }[] 
 
 // Mini-apercu schematique d'un modele (fond + couleurs + disposition)
 function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
+  if (t.id.endsWith("-photo")) {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: `linear-gradient(135deg, ${t.accent}, ${t.bg})` }}>
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.5), transparent 42%, rgba(0,0,0,0.42))" }} />
+        <div style={{ position: "absolute", top: "12%", left: "12%", right: "12%", display: "flex", flexDirection: "column", gap: 4 }}>
+          <div style={{ height: 6, width: "78%", borderRadius: 3, background: "#fff" }} />
+          <div style={{ height: 4, width: "52%", borderRadius: 2, background: "rgba(255,255,255,0.72)" }} />
+        </div>
+        <div style={{ position: "absolute", bottom: "10%", right: "12%", width: "30%", aspectRatio: "1", background: "#fff", borderRadius: 3 }} />
+      </div>
+    )
+  }
   const isPremium = t.id.endsWith("-premium")
   const isMenu = (t.id.startsWith("menu") || t.id.endsWith("-band")) && !isPremium
   const isContact = t.id === "contact" || t.id === "contact-clair"
@@ -1593,18 +1611,18 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         o.scaleToWidth(size); o.set({ originX: "center", originY: "top", left: W / 2, top }); fc.add(o); res()
       })
     })
-    const placeQrT = (top: number, wFrac: number) => new Promise<void>(res => {
+    const placeQrT = (top: number, wFrac: number, cx: number = W / 2) => new Promise<void>(res => {
       fabric.Image.fromURL(qrUrlRef.current, (img) => {
         // Taille bornee par la plus petite dimension utile : garde le A4 identique
         // et empeche le QR de deborder verticalement (Carre / paysage) sur les textes.
         const w = wFrac * Math.min(W, H * 0.707)
         img.scaleToWidth(w); (img as any).isQR = true
-        img.set({ originX: "center", originY: "top", left: W / 2, top })
+        img.set({ originX: "center", originY: "top", left: cx, top })
         // carte blanche derriere le QR (look premium + zone de silence pour le scan)
         const pad = Math.round(w * 0.07)
         const card = new fabric.Rect({
           width: w + pad * 2, height: w + pad * 2, rx: Math.round(w * 0.06), ry: Math.round(w * 0.06),
-          fill: "#FFFFFF", originX: "center", originY: "top", left: W / 2, top: top - pad,
+          fill: "#FFFFFF", originX: "center", originY: "top", left: cx, top: top - pad,
           shadow: new fabric.Shadow({ color: "rgba(0,0,0,0.20)", blur: 26, offsetX: 0, offsetY: 10 }),
         })
         ;(card as any).isQrCard = true
@@ -1647,6 +1665,30 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       await placeQrT(H * 0.24, 0.60)
       addText(subtitle, H * 0.80, W * 0.034, { font: "Arial", role: "subtitle" })
       addText(cta, H * 0.87, W * 0.04, { weight: "bold", fill: accent })
+    }
+    // Mise en page "photo" : image plein cadre + voile + titre haut + QR en coin (editorial)
+    const photoLayout = async (title: string, subtitle: string, query: string) => {
+      let imgUrl: string | null = null
+      try {
+        const ratio = FORMATS[format]?.ratio ?? 0.7
+        const orient = ratio < 0.9 ? "portrait" : ratio > 1.1 ? "landscape" : "squarish"
+        const res = await fetch(`/api/unsplash?q=${encodeURIComponent(query)}&orientation=${orient}`)
+        if (res.ok) { const d = await res.json(); imgUrl = d.photos?.[0]?.regular ?? null }
+      } catch { /* pas de photo -> on garde le fond couleur (degradation gracieuse) */ }
+      if (imgUrl) {
+        await new Promise<void>(r => fabric.Image.fromURL(imgUrl as string, (im) => {
+          const sc = Math.max(W / (im.width || W), H / (im.height || H))
+          im.set({ scaleX: sc, scaleY: sc, left: W / 2, top: H / 2, originX: "center", originY: "center" })
+          fc.add(im); r()
+        }, { crossOrigin: "anonymous" }))
+      }
+      // voile degrade : assombrit le haut (titre) et le bas (QR) pour la lisibilite
+      const scrim = new fabric.Rect({ left: 0, top: 0, width: W, height: H })
+      scrim.set("fill", new fabric.Gradient({ type: "linear", coords: { x1: 0, y1: 0, x2: 0, y2: H }, colorStops: [{ offset: 0, color: "rgba(0,0,0,0.58)" }, { offset: 0.38, color: "rgba(0,0,0,0.12)" }, { offset: 1, color: "rgba(0,0,0,0.45)" }] }))
+      fc.add(scrim)
+      addText(title, H * 0.10, W * 0.078, { weight: "bold", fill: "#FFFFFF", role: "title" })
+      addText(subtitle, H * 0.205, W * 0.034, { font: "Arial", fill: "#F0EDE6", role: "subtitle" })
+      await placeQrT(H * 0.64, 0.32, W * 0.73)
     }
     // Mise en page "premium" : en-tete colore + badge rond + hierarchie + QR + CTA
     const premiumLayout = async (title: string, subtitle: string, cta: string, badge?: string) => {
@@ -1789,6 +1831,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "reserver-premium": await premiumLayout("Réservez votre table", "Scannez pour réserver", "Réserver", "RÉSA"); break
       case "insta-premium":  await premiumLayout("Suivez-nous", "Scannez pour nous suivre", "S'abonner", "@"); break
       case "contact-premium": await premiumLayout(name || "Mes coordonnées", "Scannez ma carte", "Enregistrer", "VIP"); break
+      case "avis-photo":     await photoLayout("Vous avez aimé ?", "Scannez pour laisser un avis", "happy customer restaurant smiling"); break
+      case "menu-photo":     await photoLayout(name || "Notre Carte", "Scannez pour découvrir le menu", "gourmet food plate restaurant"); break
+      case "reserver-photo": await photoLayout("Réservez votre table", "Scannez pour réserver", "elegant restaurant interior ambiance"); break
+      case "insta-photo":    await photoLayout("Suivez-nous", "@votrecompte", "lifestyle aesthetic flatlay"); break
+      case "contact-photo":  await photoLayout(name || "Mes coordonnées", "Scannez ma carte de visite", "modern minimal office desk"); break
+      case "decouvrir-photo":await photoLayout("Découvrez-nous", "Scannez pour explorer", "boutique shop interior cozy"); break
     }
 
     if (vG) fc.bringToFront(vG)
