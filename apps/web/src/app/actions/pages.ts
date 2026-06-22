@@ -65,10 +65,21 @@ export async function getPageById(id: string) {
   return data
 }
 
+// Nombre de pages autorisees par plan (null = illimite). Free = 1, Starter = 3.
+const PAGE_LIMITS: Record<string, number | null> = { free: 1, starter: 3, pro: null, business: null }
+
 export async function createPage(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
+
+  // Garde-fou plan : on bloque la creation au-dela de la limite du plan
+  const { data: prof } = await supabase.from('profiles').select('plan').eq('id', user.id).single()
+  const limit = PAGE_LIMITS[(prof?.plan as string) || 'free'] ?? null
+  if (limit !== null) {
+    const { count } = await supabase.from('pages').select('id', { count: 'exact', head: true }).eq('user_id', user.id)
+    if ((count ?? 0) >= limit) redirect('/upgrade?reason=pages')
+  }
 
   const title = formData.get('title') as string || 'Ma Page'
   const templateId = formData.get('template_id') as string || 'freelance'

@@ -950,7 +950,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       })
       const d = await res.json()
       if (!res.ok || d.error || !d.qr) {
-        window.alert("Duplication impossible : " + (d.error || "erreur inconnue"))
+        window.alert("Duplication impossible : " + (d.message || d.error || "erreur inconnue"))
         return
       }
       setQRCodes(prev => [d.qr, ...prev])

@@ -25,6 +25,17 @@ export async function POST(req: NextRequest) {
   const { qr_id } = await req.json()
   if (!qr_id) return NextResponse.json({ error: "qr_id requis" }, { status: 400 })
 
+  // Garde-fou plan : la duplication cree une page -> bloquer au-dela de la limite
+  const PAGE_LIMITS: Record<string, number | null> = { free: 1, starter: 3, pro: null, business: null }
+  const { data: prof } = await supabase.from("profiles").select("plan").eq("id", user.id).single()
+  const pageLimit = PAGE_LIMITS[(prof?.plan as string) || "free"] ?? null
+  if (pageLimit !== null) {
+    const { count } = await supabase.from("pages").select("id", { count: "exact", head: true }).eq("user_id", user.id)
+    if ((count ?? 0) >= pageLimit) {
+      return NextResponse.json({ error: "limit", message: `Votre plan permet ${pageLimit} page${pageLimit > 1 ? "s" : ""}. Passez à un plan supérieur pour dupliquer.` }, { status: 403 })
+    }
+  }
+
   // 1. Recuperer le QR original (verif proprietaire)
   const { data: orig, error: e1 } = await supabase
     .from("qr_codes")

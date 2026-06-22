@@ -196,7 +196,7 @@ export default function TemplatesPage() {
       const json = await res.json()
 
       if (!res.ok || !json.pageId) {
-        setToast({ type: "error", msg: json.error || "Erreur creation page." })
+        setToast({ type: "error", msg: json.message || json.error || "Erreur creation page." })
         setCreating(null)
         return
       }
