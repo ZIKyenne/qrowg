@@ -1340,6 +1340,27 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     o.filters = next as any
     o.applyFilters(); fc.requestRenderAll(); pushHistorySoon()
   }
+  // Ajustements image continus (luminosite / contraste / saturation / teinte) — un filtre par type
+  const ADJ_MAP: Record<string, [string, string]> = {
+    brightness: ["Brightness", "brightness"], contrast: ["Contrast", "contrast"],
+    saturation: ["Saturation", "saturation"], hue: ["HueRotation", "rotation"],
+  }
+  const imgAdjustVal = (o: fabric.Object | undefined, kind: string): number => {
+    if (!o || o.type !== "image") return 0
+    const F = (fabric.Image as any).filters; const [ctor, prop] = ADJ_MAP[kind]
+    const f = (((o as fabric.Image).filters || []) as any[]).find(x => x instanceof F[ctor])
+    return f ? (f[prop] ?? 0) : 0
+  }
+  const setImageAdjust = (kind: string, value: number) => {
+    const fc = fcRef.current; if (!fc) return
+    const o = fc.getActiveObject() as fabric.Image | undefined
+    if (!o || o.type !== "image") return
+    const F = (fabric.Image as any).filters; const [ctor, prop] = ADJ_MAP[kind]
+    let filters = ((o.filters || []) as any[]).filter(f => !(f instanceof F[ctor]))
+    if (value !== 0) { const f = new F[ctor]({}); f[prop] = value; filters = [...filters, f] }
+    o.filters = filters as any
+    o.applyFilters(); fc.requestRenderAll(); setLayersVer(v => v + 1); pushHistorySoon()
+  }
   // Bouton CTA (pilule dimensionnee au texte)
   const addCTA = (label: string) => {
     centerObj(buildPill(label, { rectFill: G, textFill: "#080808", height: 80, fontSize: 30 }))
@@ -3437,6 +3458,31 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 <input type="range" min={0} max={1} step={0.05} value={sel.opacity}
                   onChange={e => mutate(o => o.set("opacity", parseFloat(e.target.value)))}
                   style={{ width: "100%", accentColor: G, marginBottom: 12 }} />
+
+                {/* Ajustements image (luminosite / contraste / saturation / teinte) */}
+                {sel.isImage && (() => {
+                  const ao = fcRef.current?.getActiveObject()
+                  return (
+                    <div style={{ marginBottom: 12 }}>
+                      <p className="ps-sec-label">Ajustements</p>
+                      {([
+                        ["brightness", "Luminosité"], ["contrast", "Contraste"], ["saturation", "Saturation"], ["hue", "Teinte"],
+                      ] as const).map(([k, label]) => {
+                        const v = imgAdjustVal(ao, k)
+                        return (
+                          <div key={k} style={{ marginBottom: 8 }}>
+                            <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 3 }}>{label} — {Math.round(v * 100)}</label>
+                            <input type="range" min={-1} max={1} step={0.05} value={v}
+                              onChange={e => setImageAdjust(k, parseFloat(e.target.value))}
+                              style={{ width: "100%", accentColor: G }} />
+                          </div>
+                        )
+                      })}
+                      <button type="button" onClick={() => { setImageAdjust("brightness", 0); setImageAdjust("contrast", 0); setImageAdjust("saturation", 0); setImageAdjust("hue", 0) }}
+                        style={{ ...layerBtn, width: "100%", fontSize: 9.5 }}>Réinitialiser les ajustements</button>
+                    </div>
+                  )
+                })()}
 
                 {/* Degrade */}
                 <p className="ps-sec-label">Dégradé</p>
