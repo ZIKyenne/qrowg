@@ -55,9 +55,9 @@ function editDims(fmt: FormatId) {
 // ---- Polices web-safe (rendu canvas fiable) --------------------------------
 // Polices : web-safe + Google (injectees par QRStudio et par PrintStudio)
 const FONT_GROUPS: { label: string; fonts: string[] }[] = [
-  { label: "Élégantes",  fonts: ["Cormorant Garamond", "Playfair Display", "Lora", "Merriweather", "Abril Fatface", "Georgia", "Times New Roman"] },
-  { label: "Modernes",   fonts: ["Poppins", "Montserrat", "Raleway", "Oswald", "Bebas Neue", "Arial", "Helvetica", "Trebuchet MS", "Verdana", "Impact"] },
-  { label: "Manuscrites", fonts: ["Dancing Script", "Pacifico"] },
+  { label: "Élégantes",  fonts: ["Cormorant Garamond", "Playfair Display", "EB Garamond", "Lora", "Merriweather", "Abril Fatface", "Georgia", "Times New Roman"] },
+  { label: "Modernes",   fonts: ["Poppins", "Montserrat", "Raleway", "Josefin Sans", "Oswald", "Bebas Neue", "Anton", "Arial", "Helvetica", "Trebuchet MS", "Verdana", "Impact"] },
+  { label: "Manuscrites", fonts: ["Dancing Script", "Pacifico", "Lobster", "Caveat", "Great Vibes"] },
   { label: "Autre",      fonts: ["Courier New"] },
 ]
 
@@ -753,7 +753,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     if (typeof document === "undefined" || document.getElementById(id)) return
     const link = document.createElement("link")
     link.id = id; link.rel = "stylesheet"
-    link.href = "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:wght@500;700&family=Lora:wght@400;700&family=Merriweather:wght@400;700&family=Poppins:wght@400;600&family=Montserrat:wght@400;700&family=Raleway:wght@400;600&family=Oswald:wght@400;600&family=Bebas+Neue&family=Abril+Fatface&family=Dancing+Script:wght@700&family=Pacifico&display=swap"
+    link.href = "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:wght@500;700&family=Lora:wght@400;700&family=Merriweather:wght@400;700&family=Poppins:wght@400;600&family=Montserrat:wght@400;700&family=Raleway:wght@400;600&family=Oswald:wght@400;600&family=Bebas+Neue&family=Abril+Fatface&family=Dancing+Script:wght@700&family=Pacifico&family=EB+Garamond:wght@400;700&family=Josefin+Sans:wght@400;600&family=Anton&family=Lobster&family=Caveat:wght@400;700&family=Great+Vibes&display=swap"
     document.head.appendChild(link)
   }, [])
 
