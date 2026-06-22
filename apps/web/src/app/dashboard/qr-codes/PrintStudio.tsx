@@ -450,6 +450,11 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }, ph
 // Palette de couleurs rapides (pastilles cliquables)
 const SWATCHES = ["#C9A84C", "#0A0A0A", "#FFFFFF", "#F5F0E8", "#8A8478", "#C0392B", "#EA580C", "#E0B84C", "#16A34A", "#0E7490", "#1D4ED8", "#7C3AED", "#E1306C", "#6B3F2A"]
 
+// Degrades prets a l'emploi (1 clic) pour les elements
+const GRADIENT_PRESETS: [string, string][] = [
+  ["#FF6FD8", "#3813C2"], ["#F0A93B", "#C0392B"], ["#46C2A8", "#1E6F5C"],
+  ["#2E8FD0", "#0E4C7A"], ["#E1306C", "#F0A93B"], ["#C9A84C", "#6B3F2A"],
+]
 // Couleurs de QR garanties scannables (foncees, fort contraste sur la carte blanche)
 const QR_FG = ["#0A0A0A", "#13243A", "#0F3D2E", "#3A1212", "#2A0A2E", "#5A3A12", "#1D4ED8", "#7C3AED"]
 // Styles de modules du QR (cle compatible qrRender)
@@ -3322,6 +3327,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
                 {/* Degrade */}
                 <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>Dégradé</p>
+                <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+                  {GRADIENT_PRESETS.map(([a, b]) => (
+                    <button key={a + b} type="button" onClick={() => setGradientFill(a, b)} title="Dégradé prêt à l'emploi"
+                      style={{ flex: 1, height: 24, borderRadius: 6, border: "1px solid rgba(0,0,0,0.12)", cursor: "pointer", background: `linear-gradient(135deg, ${a}, ${b})`, padding: 0 }} />
+                  ))}
+                </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                   <input type="color" value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"} onChange={e => setFill(e.target.value)} title="Couleur 1" style={{ width: 30, height: 28, borderRadius: 6, border: "1px solid rgba(0,0,0,0.15)", cursor: "pointer", padding: 0 }} />
                   <span style={{ color: MUTED, fontSize: 14 }}>→</span>
