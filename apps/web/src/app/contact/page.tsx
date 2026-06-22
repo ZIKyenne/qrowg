@@ -68,7 +68,7 @@ const SUBJECTS = [
 const FAQ = [
   {
     q: "Puis-je utiliser QRfolio gratuitement ?",
-    a: "Oui. Le plan Free donne accès à 1 page, 500 vues/mois et un QR code basique — sans carte bancaire.",
+    a: "Oui. Le plan Free donne accès à 3 pages, 200 vues/mois et 3 QR codes basiques — sans carte bancaire.",
   },
   {
     q: "Puis-je connecter mon propre domaine ?",

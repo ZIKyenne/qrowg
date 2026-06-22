@@ -2354,7 +2354,7 @@ function UseCasesSection() {
 // ── FAQ section ───────────────────────────────────────────────────────────────
 const FAQ_ITEMS = [
   { q:"Est-ce que le QR code reste le meme si je modifie ma page ?",       a:"Oui, c'est l'avantage cle d'un QR dynamique. Tu modifies ta page autant de fois que tu veux — le QR code imprime reste identique et continue de fonctionner." },
-  { q:"Puis-je utiliser QRfolio gratuitement ?",                           a:"Oui. Le plan Free donne acces a 1 page active, 500 vues par mois et un QR code basique. Aucune carte bancaire requise pour commencer." },
+  { q:"Puis-je utiliser QRfolio gratuitement ?",                           a:"Oui. Le plan Free donne acces a 3 pages, 200 vues par mois et 3 QR codes basiques. Aucune carte bancaire requise pour commencer." },
   { q:"Est-ce que je peux connecter mon propre domaine ?",                 a:"Oui, a partir du plan Pro. Tu peux utiliser un sous-domaine personnalise (ex: carte.tonsite.fr) pour donner une image professionnelle." },
   { q:"Est-ce que je vois les statistiques de scans ?",                   a:"Oui. Vues, scans, appareils, sources de trafic et pages les plus visitees. Analytics basiques inclus sur Free, analytics avances sur Pro." },
   { q:"Puis-je retirer le branding QRfolio ?",                             a:"Oui, a partir du plan Pro. Sur le plan Free, une mention discrete apparait en bas de ta page." },
