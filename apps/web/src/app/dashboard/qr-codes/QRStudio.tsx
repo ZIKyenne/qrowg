@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 import dynamic from "next/dynamic"
 import { createClient } from "@/lib/supabase/client"
+import { PLAN_RANK, canPrintStudio, minPlanFor } from "@/lib/plans"
 import { createQR, updateQR, getQRBlob, downloadBlob, blobToDataUrl, buildAndDownloadPdf, type QROptions } from "./qrRender"
 import type QRCodeStyling from "qr-code-styling"
 
@@ -223,7 +224,7 @@ const EC_LEVELS = [
   { id: "H", label: "H 30%", desc: "Maximum" },
 ]
 
-const PLAN_RANK: Record<string, number> = { free: 0, pro: 1, business: 2 }
+// PLAN_RANK importé de lib/plans (free 0, starter 1, pro 2, business 3)
 
 // -- Statuts pages (pour l'affichage de la page liee)
 const STATUS_CFG: Record<string, { label: string; dot: string; badge: string; text: string }> = {
@@ -1833,6 +1834,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   // -- Ouvrir l'editeur libre (genere le vrai QR du code actif) ---------------
   const openEditor = async () => {
     if (!active || editorLoading) return
+    // Gating : QR Print Studio requiert au moins le plan Starter
+    if (!canPrintStudio(userPlan)) {
+      setUpsell({ feature: "QR Print Studio (éditeur d'imprimables)", plan: minPlanFor("printStudio") })
+      return
+    }
     setEditorLoading(true)
     try {
       const qrBlob = await getQRBlob({ data: qrUrl, fg, bg, ecc: effectiveEcc, style: styleConf, size: 1000 }, "png")
@@ -2177,8 +2183,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       return sb_dir === "desc" ? -cmp : cmp
     })
 
-  const canPro      = PLAN_RANK[userPlan] >= 1
-  const canBusiness = PLAN_RANK[userPlan] >= 2
+  const canPro      = PLAN_RANK[userPlan] >= 2
+  const canBusiness = PLAN_RANK[userPlan] >= 3
 
   if (qrCodes.length === 0) {
     return (
@@ -2296,10 +2302,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
       {upsell && (() => {
         const isBiz = upsell.plan === "business"
-        const planName = isBiz ? "Business" : "Pro"
-        const accent = isBiz ? "#39FF8F" : "#C9A84C"
+        const isStarter = upsell.plan === "starter"
+        const planName = isBiz ? "Business" : isStarter ? "Starter" : "Pro"
+        const accent = isBiz ? "#39FF8F" : isStarter ? "#38BDF8" : "#C9A84C"
         const benefits = isBiz
           ? ["Tous les presets premium ET luxe", "Modules & coins luxe", "Export PDF, SVG et WEBP", "Correction d'erreur maximale", "Logo central + branding complet"]
+          : isStarter
+          ? ["QR Print Studio (imprimables)", "QR Studio (personnalisation)", "5 pages · 850 vues/mois", "Sans branding QRfolio", "Domaine personnalisé"]
           : ["Tous les presets premium", "Modules avances (pixel, neon...)", "Coins avances (diamond...)", "Export SVG et WEBP", "Correction d'erreur elevee (H)"]
         return (
           <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.85)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:2100, padding:24 }}
@@ -3151,7 +3160,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       {DOT_STYLES.map(ds => {
                         const isActive = (styleConf.dotStyle??"square") === ds.id
                         const isPro = ["pixel","neon","luxury"].includes(ds.id ?? "")
-                        const canAccess = !isPro || PLAN_RANK[userPlan] >= 1
+                        const canAccess = !isPro || PLAN_RANK[userPlan] >= 2
                         return (
                           <button key={ds.id ?? "sq"} type="button" onClick={() => canAccess ? setStyleConf(p => ({ ...p, dotStyle: ds.id })) : setUpsell({ feature: `le style de modules « ${ds.label} »`, plan: "pro" })}
                             style={{ position:"relative", padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:"pointer", opacity:canAccess?1:0.85, textAlign:"center" as const }}>
@@ -3172,7 +3181,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       {CORNER_STYLE_LIST.map(cs => {
                         const isActive = (styleConf.cornerStyle??"square") === cs.id
                         const isPro = ["diamond","luxury"].includes(cs.id ?? "")
-                        const canAccess = !isPro || PLAN_RANK[userPlan] >= 1
+                        const canAccess = !isPro || PLAN_RANK[userPlan] >= 2
                         return (
                           <button key={cs.id ?? "sq"} type="button" onClick={() => {
                         if (!canAccess) { setUpsell({ feature: `le style de coins « ${cs.label} »`, plan: "pro" }); return }
@@ -3515,7 +3524,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             "png-t": { label:"PNG Alpha", ext:"png",  color:"#39FF8F", desc:"Fond transparent, sticker", plan:"pro"      },
             "webp":  { label:"WEBP",      ext:"webp", color:"#818CF8", desc:"Web optimisé, plus léger",  plan:"pro"      },
             "svg":   { label:"SVG",       ext:"svg",  color:"#C9A84C", desc:"Vectoriel, impression HD",  plan:"pro"      },
-            "pdf":   { label:"PDF",       ext:"pdf",  color:"#FF6B6B", desc:"Impression A4 avec titre",  plan:"business" },
+            "pdf":   { label:"PDF",       ext:"pdf",  color:"#FF6B6B", desc:"Impression A4 avec titre",  plan:"pro" },
           }
           const fmt = FORMAT_CFG[expFormat] ?? FORMAT_CFG["png"]
           return (

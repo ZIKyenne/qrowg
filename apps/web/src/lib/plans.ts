@@ -21,6 +21,16 @@ export type PlanLimits = {
   team: number | null
 }
 
+export type ExportFormat = "png" | "jpg" | "pdf" | "svg"
+
+// Capacités (fonctionnalités débloquées) par plan — utilisées pour le gating
+export type PlanCaps = {
+  printStudio: boolean      // accès à QR Print Studio (éditeur imprimables)
+  qrStudioAdvanced: boolean // personnalisation QR avancée (couleurs / modules / coins)
+  ai: boolean               // génération + rapports IA
+  exportFormats: ExportFormat[]
+}
+
 export interface Plan {
   id: PlanId
   label: string
@@ -30,6 +40,7 @@ export interface Plan {
   priceAnnual: number  // € / mois (si facturé annuellement)
   badge: string | null
   limits: PlanLimits
+  caps: PlanCaps
   features: string[] // liste courte (carte plan du dashboard)
   perks: { text: string; included: boolean }[] // liste détaillée (page /upgrade)
 }
@@ -44,6 +55,7 @@ export const PLANS: Record<PlanId, Plan> = {
     priceAnnual: 0,
     badge: null,
     limits: { pages: 3, views: 200, qr: 3, team: null },
+    caps: { printStudio: false, qrStudioAdvanced: false, ai: false, exportFormats: ["png"] },
     features: ["3 pages", "200 vues/mois", "3 QR codes basiques", "Branding QRfolio visible", "Analytics de base", "6 templates gratuits"],
     perks: [
       { text: "3 pages", included: true },
@@ -67,6 +79,7 @@ export const PLANS: Record<PlanId, Plan> = {
     priceAnnual: 2.39,
     badge: "MEILLEUR RAPPORT Q/P",
     limits: { pages: 5, views: 850, qr: 7, team: null },
+    caps: { printStudio: true, qrStudioAdvanced: true, ai: false, exportFormats: ["png"] },
     features: ["5 pages", "850 vues/mois", "7 QR codes personnalises", "Sans branding", "Domaine personnalise", "10 templates premium", "QR Studio (limite)", "QR Print Studio (limite)"],
     perks: [
       { text: "5 pages", included: true },
@@ -92,6 +105,7 @@ export const PLANS: Record<PlanId, Plan> = {
     priceAnnual: 7.99,
     badge: "POPULAIRE",
     limits: { pages: 25, views: 15000, qr: 35, team: null },
+    caps: { printStudio: true, qrStudioAdvanced: true, ai: true, exportFormats: ["png", "jpg", "pdf", "svg"] },
     features: ["25 pages", "15 000 vues/mois", "35 QR codes avances", "Tous les templates", "QR Studio complet", "QR Print Studio complet", "Generation IA", "Export PNG / JPG / PDF HD"],
     perks: [
       { text: "25 pages", included: true },
@@ -119,6 +133,7 @@ export const PLANS: Record<PlanId, Plan> = {
     priceAnnual: 19.99,
     badge: null,
     limits: { pages: null, views: null, qr: null, team: 5 },
+    caps: { printStudio: true, qrStudioAdvanced: true, ai: true, exportFormats: ["png", "jpg", "pdf", "svg"] },
     features: ["Pages illimitees", "Vues illimitees", "QR codes illimites", "Generation IA illimitee", "5 membres d'equipe", "API + marque blanche"],
     perks: [
       { text: "Pages illimitees", included: true },
@@ -148,6 +163,22 @@ export const getPlan = (id?: string | null): Plan => PLANS[(id as PlanId)] ?? PL
 
 // Limite de pages d'un plan (null = illimité) — utilisée par l'enforcement
 export const pageLimit = (id?: string | null): number | null => getPlan(id).limits.pages
+
+// Capacités d'un plan (gating fonctionnalités)
+export const caps = (id?: string | null): PlanCaps => getPlan(id).caps
+export const canPrintStudio = (id?: string | null): boolean => getPlan(id).caps.printStudio
+export const canQrAdvanced = (id?: string | null): boolean => getPlan(id).caps.qrStudioAdvanced
+export const canAI = (id?: string | null): boolean => getPlan(id).caps.ai
+export const canExport = (id: string | null | undefined, fmt: ExportFormat): boolean => getPlan(id).caps.exportFormats.includes(fmt)
+// Plan minimum requis pour une capacité (pour les messages d'upsell)
+export const minPlanFor = (cap: "printStudio" | "qrStudioAdvanced" | "ai"): PlanId => {
+  const found = PLAN_LIST.find(p => p.caps[cap])
+  return (found?.id ?? "pro")
+}
+export const minPlanForFormat = (fmt: ExportFormat): PlanId => {
+  const found = PLAN_LIST.find(p => p.caps.exportFormats.includes(fmt))
+  return (found?.id ?? "pro")
+}
 
 // Formatte un prix pour l'affichage : 0 -> "0", 2.99 -> "2.99", 8 -> "8"
 export const fmtPrice = (n: number): string => (n === 0 ? "0" : String(n))
