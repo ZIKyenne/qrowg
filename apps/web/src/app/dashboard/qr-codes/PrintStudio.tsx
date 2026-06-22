@@ -2556,6 +2556,16 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           </div>
         </div>
 
+        {/* Zoom flottant sur le rendu central (facon Canva) */}
+        <div style={{ position: "absolute", bottom: 16, right: 16, zIndex: 38, display: "flex", alignItems: "center", gap: 2, background: SURFACE, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 999, padding: 4, boxShadow: "0 4px 16px rgba(0,0,0,0.12)" }}>
+          <button type="button" onClick={() => applyZoom(zoom / 1.2)} title="Dézoomer" aria-label="Dézoomer"
+            style={{ width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 999, color: INK, fontSize: 18, cursor: "pointer" }}>−</button>
+          <button type="button" onClick={() => applyZoom(1)} title="Réinitialiser à 100 %"
+            style={{ minWidth: 46, height: 30, background: "none", border: "none", color: MUTED, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>{Math.round(zoom * 100)}%</button>
+          <button type="button" onClick={() => applyZoom(zoom * 1.2)} title="Zoomer" aria-label="Zoomer"
+            style={{ width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 999, color: INK, fontSize: 17, cursor: "pointer" }}>+</button>
+        </div>
+
         {/* Panneau de reglages avances (ouvert via "Réglages") */}
         {sel && showAdvanced && (
         <div className="qr-scroll ps-fly" style={{ width: 280, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: 14, overflowY: "auto", background: SURFACE, display: "flex", flexDirection: "column", gap: 16 }}>
