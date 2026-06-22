@@ -1437,6 +1437,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     s.blur = v
     o.dirty = true
   })
+  // Glow / Neon : halo colore (ombre sans decalage), base sur la couleur de l'element
+  const setGlow = (kind: "soft" | "neon" | "off") => mutate(o => {
+    if (kind === "off") { o.set("shadow", null); o.dirty = true; return }
+    const base = typeof o.fill === "string" && /^#/.test(o.fill) ? o.fill : G
+    o.set("shadow", new fabric.Shadow({ color: base, blur: kind === "neon" ? 30 : 16, offsetX: 0, offsetY: 0 }))
+    o.dirty = true
+  })
 
   // Effet : bordure / contour (strokeUniform => epaisseur constante)
   const setBorder = (on: boolean) => mutate(o => {
@@ -3304,6 +3311,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                       style={{ width: "100%", accentColor: G }} />
                   </>
                 )}
+                <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
+                  <button type="button" onClick={() => setGlow("soft")} style={{ ...layerBtn, flex: 1 }}>✨ Glow</button>
+                  <button type="button" onClick={() => setGlow("neon")} style={{ ...layerBtn, flex: 1 }}>💡 Néon</button>
+                </div>
               </div>
 
               {/* Alignement sur le support */}
