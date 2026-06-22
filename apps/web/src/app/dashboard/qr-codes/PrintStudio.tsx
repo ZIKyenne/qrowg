@@ -2612,7 +2612,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 const visibleObjs = ["Avis", "Menu", "Réserver", "Abonnés", "Contact", "Page"].filter(o => !sectorObjs || sectorObjs.includes(o))
                 return visibleObjs.map(obj => {
                 const q = tplSearch.trim().toLowerCase()
-                const items = PRINT_TEMPLATES.filter(t => t.obj === obj && (!q || t.label.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q) || obj.toLowerCase().includes(q)))
+                const rank = (id: string) => id.endsWith("-studio") ? 0 : id.endsWith("-photo") ? 1 : id.endsWith("-card") ? 2 : id.endsWith("-split") ? 3 : id.endsWith("-premium") ? 4 : id.endsWith("-ornate") ? 5 : 6
+                const items = PRINT_TEMPLATES.filter(t => t.obj === obj && (!q || t.label.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q) || obj.toLowerCase().includes(q))).slice().sort((a, b) => rank(a.id) - rank(b.id))
                 if (!items.length) return null
                 return (
                   <div key={obj} style={{ marginBottom: 12 }}>
