@@ -277,6 +277,12 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"insta-studio",  label:"Instagram — Studio", obj:"Abonnés",  emoji:"🎨", desc:"Photo + picto + badge + CTA",          bg:"#1A0E18", ink:"#FFFFFF", accent:"#E1306C" },
   { id:"contact-studio",label:"Contact — Studio",   obj:"Contact",  emoji:"🎨", desc:"Photo + picto + badge + CTA",          bg:"#0C1322", ink:"#FFFFFF", accent:"#5B8DEF" },
   { id:"decouvrir-studio",label:"Découvrir — Studio",obj:"Page",    emoji:"🎨", desc:"Photo + picto + badge + CTA",          bg:"#160726", ink:"#FFFFFF", accent:"#A855F7" },
+  { id:"coach-studio",  label:"Coach — Studio",     obj:"Réserver", emoji:"🧘", desc:"Bien-être, RDV",                        bg:"#10231C", ink:"#FFFFFF", accent:"#5FA88C" },
+  { id:"beaute-studio", label:"Beauté — Studio",    obj:"Réserver", emoji:"💇", desc:"Salon, prise de RDV",                  bg:"#2A0E1E", ink:"#FFFFFF", accent:"#E08AAE" },
+  { id:"immo-studio",   label:"Immobilier — Studio",obj:"Contact",  emoji:"🏠", desc:"Bien immobilier, visite",              bg:"#0E1726", ink:"#FFFFFF", accent:"#3FA796" },
+  { id:"event-studio",  label:"Événement — Studio", obj:"Page",     emoji:"🎉", desc:"Soirée, billetterie",                  bg:"#160726", ink:"#FFFFFF", accent:"#E0479E" },
+  { id:"cafe-studio",   label:"Café — Studio",      obj:"Menu",     emoji:"☕", desc:"Café, carte du jour",                  bg:"#1C140C", ink:"#FFFFFF", accent:"#C9874C" },
+  { id:"boutique-studio",label:"Boutique — Studio", obj:"Page",     emoji:"🛍️", desc:"Commerce, collection",                 bg:"#1A1018", ink:"#FFFFFF", accent:"#C9A84C" },
 ]
 
 // Secteurs d'activite -> objectifs pertinents (pour filtrer la galerie)
@@ -2042,6 +2048,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "insta-studio":    await studioLayout("Suivez-nous", "Notre univers en images", "S'abonner", { query: "lifestyle aesthetic influencer", emoji: "📷", badge: "@" }); break
       case "contact-studio":  await studioLayout(name || "Mes coordonnées", "Scannez ma carte de visite", "Enregistrer", { query: "modern professional office portrait", emoji: "💼", badge: "PRO" }); break
       case "decouvrir-studio":await studioLayout("Découvrez-nous", "Scannez pour explorer", "En savoir plus", { query: "premium boutique shop interior", emoji: "✨", badge: "NEW" }); break
+      case "coach-studio":    await studioLayout("Première séance offerte", "Scannez pour réserver", "Prendre RDV", { query: "wellness yoga coach calm meditation", emoji: "🧘", badge: "COACH" }); break
+      case "beaute-studio":   await studioLayout("Sublimez-vous", "Scannez pour prendre RDV", "Réserver", { query: "beauty salon hair spa elegant", emoji: "💇", badge: "BEAUTÉ" }); break
+      case "immo-studio":     await studioLayout("Votre futur chez-vous", "Scannez pour visiter", "Visiter", { query: "modern luxury house architecture interior", emoji: "🏠", badge: "IMMO" }); break
+      case "event-studio":    await studioLayout("L'événement", "Scannez pour le programme", "J'y vais", { query: "concert party event crowd lights", emoji: "🎉", badge: "EVENT" }); break
+      case "cafe-studio":     await studioLayout(name || "Notre Carte", "Scannez pour la carte du jour", "Voir le menu", { query: "cozy coffee shop latte cup", emoji: "☕", badge: "CAFÉ" }); break
+      case "boutique-studio": await studioLayout("Nouvelle collection", "Scannez pour découvrir", "Découvrir", { query: "fashion boutique clothing store", emoji: "🛍️", badge: "SHOP" }); break
     }
 
     if (vG) fc.bringToFront(vG)
