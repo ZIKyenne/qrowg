@@ -3290,6 +3290,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     <input type="range" min={1} max={30} step={1} value={sel.strokeWidth || 4}
                       onChange={e => setBorderWidth(parseInt(e.target.value))}
                       style={{ width: "100%", accentColor: G }} />
+                    <div style={{ display: "flex", gap: 5, marginTop: 8 }}>
+                      {([["solid", "Pleine", null], ["dashed", "Tirets", [12, 8]], ["dotted", "Pointillée", [2, 8]]] as const).map(([k, label, dash]) => (
+                        <button key={k} type="button" onClick={() => mutate(o => { o.set({ strokeDashArray: dash as number[] | null, strokeLineCap: k === "dotted" ? "round" : "butt" }); o.dirty = true })} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>{label}</button>
+                      ))}
+                    </div>
                   </div>
                 )}
 
