@@ -1441,6 +1441,18 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     s.blur = v
     o.dirty = true
   })
+  // Presets d'ombre nommes (Canva-like)
+  const setShadowPreset = (kind: "off" | "soft" | "medium" | "strong" | "floating" | "luxury") => mutate(o => {
+    const P: Record<string, fabric.Shadow | null> = {
+      off: null,
+      soft:     new fabric.Shadow({ color: "rgba(0,0,0,0.18)", blur: 8,  offsetX: 0, offsetY: 3 }),
+      medium:   new fabric.Shadow({ color: "rgba(0,0,0,0.28)", blur: 18, offsetX: 0, offsetY: 8 }),
+      strong:   new fabric.Shadow({ color: "rgba(0,0,0,0.40)", blur: 28, offsetX: 0, offsetY: 14 }),
+      floating: new fabric.Shadow({ color: "rgba(0,0,0,0.30)", blur: 44, offsetX: 0, offsetY: 30 }),
+      luxury:   new fabric.Shadow({ color: "rgba(120,90,20,0.35)", blur: 26, offsetX: 0, offsetY: 12 }),
+    }
+    o.set("shadow", P[kind]); o.dirty = true
+  })
   // Glow / Neon : halo colore (ombre sans decalage), base sur la couleur de l'element
   const setGlow = (kind: "soft" | "neon" | "off") => mutate(o => {
     if (kind === "off") { o.set("shadow", null); o.dirty = true; return }
@@ -3319,20 +3331,22 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
               {/* Effets */}
               <div>
-                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Effets</p>
-                <button type="button" onClick={() => setShadow(!sel.shadow)}
-                  style={{ ...layerBtn, width: "100%", background: sel.shadow ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: sel.shadow ? G : INK, fontWeight: 700, marginBottom: sel.shadow ? 8 : 0 }}>
-                  Ombre portée {sel.shadow ? "✓" : ""}
-                </button>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>Ombre</p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 5, marginBottom: 6 }}>
+                  {([["off", "Aucune"], ["soft", "Soft"], ["medium", "Medium"], ["strong", "Strong"], ["floating", "Floating"], ["luxury", "Luxe"]] as const).map(([k, label]) => (
+                    <button key={k} type="button" onClick={() => setShadowPreset(k)} style={{ ...layerBtn, padding: "7px 2px", fontSize: 9.5 }}>{label}</button>
+                  ))}
+                </div>
                 {sel.shadow && (
                   <>
-                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Flou — {Math.round(sel.shadowBlur)}px</label>
+                    <label style={{ color: MUTED, fontSize: 10, display: "block", margin: "4px 0 4px" }}>Flou — {Math.round(sel.shadowBlur)}px</label>
                     <input type="range" min={0} max={60} step={1} value={sel.shadowBlur}
                       onChange={e => setShadowBlur(parseInt(e.target.value))}
                       style={{ width: "100%", accentColor: G }} />
                   </>
                 )}
-                <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "10px 0 6px" }}>Halo</p>
+                <div style={{ display: "flex", gap: 6 }}>
                   <button type="button" onClick={() => setGlow("soft")} style={{ ...layerBtn, flex: 1 }}>✨ Glow</button>
                   <button type="button" onClick={() => setGlow("neon")} style={{ ...layerBtn, flex: 1 }}>💡 Néon</button>
                 </div>
