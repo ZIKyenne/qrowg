@@ -1969,8 +1969,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       addText(title, H * 0.20, W * 0.082, { weight: "bold", fill: "#FFFFFF", role: "title", keepColor: true, shadow: true })
       rule(H * 0.285)
       addText(subtitle, H * 0.31, W * 0.032, { font: "Arial", fill: "#F0EDE6", role: "subtitle", keepColor: true, shadow: true })
-      await placeQrT(H * 0.40, 0.40)
-      addCTA(cta, H * 0.84)
+      await placeQrT(H * 0.41, 0.42)
+      addCTA(cta, H * 0.80)
       if (opts.badge) {
         const br = Math.round(W * 0.072)
         const bc = new fabric.Circle({ radius: br, fill: "#FFFFFF", originX: "center", originY: "center" })
@@ -3126,20 +3126,20 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         </div>
 
         {/* Rail droit : formats avec mini-apercu */}
-        <div className="qr-scroll" style={{ width: 92, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: "12px 8px", display: "flex", flexDirection: "column", gap: 9, background: SURFACE, overflowY: "auto" }}>
-          <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 2px", textAlign: "center" }}>Format</p>
+        <div className="qr-scroll" style={{ width: 84, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: "10px 7px", display: "flex", flexDirection: "column", gap: 5, background: SURFACE, overflowY: "auto" }}>
+          <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 1px", textAlign: "center" }}>Format</p>
           {(Object.keys(FORMATS) as FormatId[]).map(f => {
             const r = FORMATS[f].ratio
-            const bw = r >= 1 ? 40 : Math.round(40 * r)
-            const bh = r >= 1 ? Math.round(40 / r) : 40
+            const bw = r >= 1 ? 28 : Math.round(28 * r)
+            const bh = r >= 1 ? Math.round(28 / r) : 28
             const on = format === f
             return (
               <button key={f} type="button" onClick={() => applyFormat(f)}
-                style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "8px 4px", background: on ? "rgba(201,168,76,0.16)" : "transparent", border: `1px solid ${on ? G : "rgba(0,0,0,0.08)"}`, borderRadius: 10, cursor: "pointer" }}>
-                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 44, height: 44 }}>
-                  <span style={{ width: bw, height: bh, background: on ? G : "#FFFFFF", border: `1px solid ${on ? G : "rgba(0,0,0,0.22)"}`, borderRadius: 3, boxShadow: "0 1px 2px rgba(0,0,0,0.12)" }} />
+                style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "6px 3px", background: on ? "rgba(201,168,76,0.16)" : "transparent", border: `1px solid ${on ? G : "rgba(0,0,0,0.08)"}`, borderRadius: 9, cursor: "pointer" }}>
+                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30 }}>
+                  <span style={{ width: bw, height: bh, background: on ? G : "#FFFFFF", border: `1px solid ${on ? G : "rgba(0,0,0,0.22)"}`, borderRadius: 2.5, boxShadow: "0 1px 2px rgba(0,0,0,0.12)" }} />
                 </span>
-                <span style={{ color: on ? G : INK, fontSize: 10, fontWeight: on ? 700 : 600 }}>{FORMATS[f].label}</span>
+                <span style={{ color: on ? G : INK, fontSize: 9.5, fontWeight: on ? 700 : 600 }}>{FORMATS[f].label}</span>
               </button>
             )
           })}
