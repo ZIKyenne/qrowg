@@ -2605,7 +2605,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           <div style={{ display: "flex", alignItems: "center", gap: 2, background: "rgba(0,0,0,0.04)", borderRadius: 9, padding: 3 }}>
             <button type="button" onClick={() => applyZoom(zoom / 1.25)} title="Zoom arrière" aria-label="Zoom arrière"
               style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 6, color: INK, fontSize: 16, cursor: "pointer" }}>−</button>
-            <button type="button" onClick={() => applyZoom(1)} title="100 %"
+            <button type="button" onClick={() => fitToScreen()} title="Ajuster à l'écran"
               style={{ minWidth: 42, height: 26, background: "none", border: "none", color: MUTED, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>{Math.round(zoom * 100)}%</button>
             <button type="button" onClick={() => applyZoom(zoom * 1.25)} title="Zoom avant" aria-label="Zoom avant"
               style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 6, color: INK, fontSize: 15, cursor: "pointer" }}>+</button>
@@ -3333,7 +3333,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         <div style={{ position: "absolute", bottom: 16, right: 108, zIndex: 38, display: "flex", alignItems: "center", gap: 2, background: SURFACE, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 999, padding: 4, boxShadow: "0 4px 16px rgba(0,0,0,0.12)" }}>
           <button type="button" onClick={() => applyZoom(zoom / 1.2)} title="Dézoomer" aria-label="Dézoomer"
             style={{ width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 999, color: INK, fontSize: 18, cursor: "pointer" }}>−</button>
-          <button type="button" onClick={() => applyZoom(1)} title="Réinitialiser à 100 %"
+          <button type="button" onClick={() => fitToScreen()} title="Ajuster à l'écran"
             style={{ minWidth: 46, height: 30, background: "none", border: "none", color: MUTED, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>{Math.round(zoom * 100)}%</button>
           <button type="button" onClick={() => applyZoom(zoom * 1.2)} title="Zoomer" aria-label="Zoomer"
             style={{ width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 999, color: INK, fontSize: 17, cursor: "pointer" }}>+</button>
