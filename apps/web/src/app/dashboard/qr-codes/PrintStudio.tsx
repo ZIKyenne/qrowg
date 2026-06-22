@@ -651,6 +651,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
   const [dragOver, setDragOver] = useState<number | null>(null) // ligne survolee pendant un glisser
   const [editLayer, setEditLayer] = useState<number | null>(null) // index du calque en cours de renommage
+  const [layerSearch, setLayerSearch] = useState("") // filtre de recherche dans les calques
   const [zoom, setZoom] = useState(1)
   const [wizard, setWizard] = useState(0) // 0 = ferme, 1 = objectif, 2 = style, 3 = pret
   const [wizMetier, setWizMetier] = useState("")
@@ -1687,6 +1688,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const renameLayer = (o: fabric.Object, value: string) => {
     ;(o as any).name = value.trim() || undefined
     setEditLayer(null); setLayersVer(v => v + 1); pushHistorySoon()
+  }
+  const toggleLockLayer = (o: fabric.Object) => {
+    const fc = fcRef.current; if (!fc) return
+    fc.setActiveObject(o); layer("lock")
   }
   // Infos du support : textes marques par role (titre / sous-titre / tel / site)
   const roleObjects = (): fabric.Object[] => {
@@ -3206,11 +3211,21 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Calques</span>
               <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
             </div>
+            <div style={{ padding: "10px 12px 0", flexShrink: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, background: BG, border: "1px solid rgba(0,0,0,0.08)", borderRadius: 8, padding: "6px 9px" }}>
+                <Search size={12} color={MUTED} />
+                <input value={layerSearch} onChange={e => setLayerSearch(e.target.value)} placeholder="Rechercher un calque..."
+                  style={{ flex: 1, minWidth: 0, background: "none", border: "none", color: INK, fontSize: 11, outline: "none" }} />
+                {layerSearch && <button type="button" onClick={() => setLayerSearch("")} aria-label="Effacer" style={{ ...iconMini, width: 16, height: 16 }}><X size={11} /></button>}
+              </div>
+            </div>
             <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "10px 12px 16px" }}>
               {(() => {
-                const items = layerList()
+                const q = layerSearch.trim().toLowerCase()
+                const items = layerList().filter(o => !q || layerName(o).toLowerCase().includes(q))
                 const active = fcRef.current?.getActiveObject()
-                if (!items.length) return <p style={{ color: MUTED, fontSize: 11 }}>Aucun élément. Ajoute du texte, une forme ou un modèle.</p>
+                if (!layerList().length) return <p style={{ color: MUTED, fontSize: 11 }}>Aucun élément. Ajoute du texte, une forme ou un modèle.</p>
+                if (!items.length) return <p style={{ color: MUTED, fontSize: 11 }}>Aucun calque ne correspond à « {layerSearch} ».</p>
                 return (
                   <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                     {items.map((o, idx) => {
@@ -3239,6 +3254,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                           )}
                           <button type="button" onClick={() => toggleVisible(o)} title="Afficher / masquer" style={iconMini}>
                             <svg width="13" height="13" viewBox="0 0 24 24"><path d="M12 5C5 5 1 12 1 12s4 7 11 7 11-7 11-7-4-7-11-7zm0 11.5A4.5 4.5 0 1112 7a4.5 4.5 0 010 9.5z" fill={o.visible ? G : MUTED} /></svg>
+                          </button>
+                          <button type="button" onClick={() => toggleLockLayer(o)} title={o.lockMovementX ? "Déverrouiller" : "Verrouiller"} style={{ ...iconMini, color: o.lockMovementX ? G : MUTED }}>
+                            {o.lockMovementX ? <Lock size={12} /> : <Unlock size={12} />}
                           </button>
                           <button type="button" onClick={() => moveLayer(o, "up")} title="Monter" style={iconMini}><ChevronUp size={13} /></button>
                           <button type="button" onClick={() => moveLayer(o, "down")} title="Descendre" style={iconMini}><ChevronDown size={13} /></button>
