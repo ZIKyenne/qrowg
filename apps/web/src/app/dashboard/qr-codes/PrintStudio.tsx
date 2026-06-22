@@ -2571,13 +2571,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       {/* ---- Barre du haut ---- */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "10px 16px", borderBottom: "1px solid rgba(0,0,0,0.07)",
-        background: SURFACE, flexShrink: 0,
+        padding: "10px 16px", borderBottom: "1px solid rgba(31,36,48,0.06)",
+        background: SURFACE, flexShrink: 0, boxShadow: "0 1px 8px rgba(31,36,48,0.04)", zIndex: 5,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ width: 9, height: 9, borderRadius: 3, background: G, flexShrink: 0 }} />
-          <span style={{ color: INK, fontWeight: 800, fontSize: 14, letterSpacing: 0.3 }}>QR Print Studio</span>
-          <span style={{ color: "#8A6D14", fontSize: 10, background: "rgba(201,168,76,0.16)", border: "1px solid rgba(201,168,76,0.35)", borderRadius: 6, padding: "2px 7px", fontWeight: 700 }}>BÊTA</span>
+          <span style={{ width: 30, height: 30, borderRadius: 9, background: "linear-gradient(135deg,#D9BC6A,#B8923A)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 9px rgba(201,168,76,0.45)", flexShrink: 0 }}>
+            <QrCode size={17} color="#fff" />
+          </span>
+          <span style={{ color: INK, fontWeight: 800, fontSize: 15, letterSpacing: 0.2 }}>QR Print <span style={{ color: G }}>Studio</span></span>
+          <span style={{ color: "#8A6D14", fontSize: 9.5, background: "rgba(201,168,76,0.16)", border: "1px solid rgba(201,168,76,0.35)", borderRadius: 6, padding: "2px 7px", fontWeight: 700, letterSpacing: 0.5 }}>BÊTA</span>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
