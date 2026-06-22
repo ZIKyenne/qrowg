@@ -289,13 +289,15 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"wifi-or",       label:"Wifi — Doré",        obj:"Wifi",     emoji:"📶", desc:"Réseau + mot de passe, scan",          bg:"#0E0D0B", ink:"#F4ECD8", accent:"#C9A84C" },
   { id:"wifi-vert",     label:"Wifi — Vert",        obj:"Wifi",     emoji:"📶", desc:"Réseau + mot de passe, scan",          bg:"#0E1A16", ink:"#EAF4F0", accent:"#2E8B7B" },
   { id:"wifi-bleu",     label:"Wifi — Bleu",        obj:"Wifi",     emoji:"📶", desc:"Réseau + mot de passe, scan",          bg:"#0C1322", ink:"#EAF1FB", accent:"#3B82F6" },
+  { id:"fidelite-or",   label:"Fidélité — Doré",    obj:"Fidélité", emoji:"🎁", desc:"Tampons + offre + QR",                 bg:"#0E0D0B", ink:"#F4ECD8", accent:"#C9A84C" },
+  { id:"fidelite-rouge",label:"Fidélité — Rouge",   obj:"Fidélité", emoji:"🎁", desc:"Tampons + offre + QR",                 bg:"#1A0E0C", ink:"#F8E8E0", accent:"#C0392B" },
 ]
 
 // Secteurs d'activite -> objectifs pertinents (pour filtrer la galerie)
 const SECTORS: { id: string; label: string; emoji: string; objs: string[] }[] = [
-  { id: "resto",   label: "Restaurant",  emoji: "🍽️", objs: ["Menu", "Réserver", "Avis", "Wifi", "Page"] },
-  { id: "bar",     label: "Bar / Café",  emoji: "🍸", objs: ["Menu", "Réserver", "Abonnés", "Wifi", "Page"] },
-  { id: "commerce",label: "Commerce",    emoji: "🛍️", objs: ["Avis", "Abonnés", "Contact", "Wifi", "Page"] },
+  { id: "resto",   label: "Restaurant",  emoji: "🍽️", objs: ["Menu", "Réserver", "Avis", "Wifi", "Fidélité", "Page"] },
+  { id: "bar",     label: "Bar / Café",  emoji: "🍸", objs: ["Menu", "Réserver", "Abonnés", "Wifi", "Fidélité", "Page"] },
+  { id: "commerce",label: "Commerce",    emoji: "🛍️", objs: ["Avis", "Abonnés", "Contact", "Fidélité", "Wifi", "Page"] },
   { id: "immo",    label: "Immobilier",  emoji: "🏠", objs: ["Contact", "Réserver", "Page"] },
   { id: "airbnb",  label: "Airbnb",      emoji: "🛏️", objs: ["Wifi", "Contact", "Avis", "Réserver", "Page"] },
   { id: "event",   label: "Événement",   emoji: "🎉", objs: ["Réserver", "Abonnés", "Page"] },
@@ -338,12 +340,13 @@ const OBJ_META: Record<string, { emoji: string; label: string; pool: string[] }>
   "Contact":  { emoji: "💳", label: "Partager mes coordonnées",   pool: ["contact-studio", "immo-studio", "contact-premium", "contact-photo", "contact-card"] },
   "Page":     { emoji: "🏷️", label: "Présenter / faire découvrir", pool: ["decouvrir-studio", "event-studio", "boutique-studio", "promo-premium", "decouvrir-photo"] },
   "Wifi":     { emoji: "📶", label: "Partager le Wifi",          pool: ["wifi-or", "wifi-vert", "wifi-bleu"] },
+  "Fidélité": { emoji: "🎁", label: "Carte de fidélité",         pool: ["fidelite-or", "fidelite-rouge"] },
 }
 // Generateur guide : metier -> objectifs pertinents + style recommande
 const GUIDE_METIERS: { id: string; emoji: string; label: string; objs: string[]; style: string }[] = [
-  { id: "resto",    emoji: "🍽️", label: "Restaurant",        objs: ["Menu", "Réserver", "Avis", "Wifi", "Page"], style: "restofresh" },
-  { id: "bar",      emoji: "🍸", label: "Bar / Café",        objs: ["Menu", "Abonnés", "Avis", "Wifi", "Page"],  style: "premiumdark" },
-  { id: "commerce", emoji: "🛍️", label: "Commerce",          objs: ["Avis", "Abonnés", "Contact", "Wifi", "Page"], style: "minimal" },
+  { id: "resto",    emoji: "🍽️", label: "Restaurant",        objs: ["Menu", "Réserver", "Avis", "Wifi", "Fidélité", "Page"], style: "restofresh" },
+  { id: "bar",      emoji: "🍸", label: "Bar / Café",        objs: ["Menu", "Abonnés", "Avis", "Wifi", "Fidélité", "Page"], style: "premiumdark" },
+  { id: "commerce", emoji: "🛍️", label: "Commerce",          objs: ["Avis", "Abonnés", "Contact", "Fidélité", "Wifi", "Page"], style: "minimal" },
   { id: "immo",     emoji: "🏠", label: "Immobilier",        objs: ["Contact", "Réserver", "Page"],              style: "corporate" },
   { id: "beaute",   emoji: "💇", label: "Beauté / Bien-être", objs: ["Réserver", "Avis", "Abonnés"],             style: "sage" },
   { id: "createur", emoji: "🎨", label: "Créateur",          objs: ["Abonnés", "Contact", "Page"],               style: "neon" },
@@ -2136,8 +2139,24 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       addText("Scannez pour vous connecter", H * 0.88, W * 0.032, { font: "Arial", role: "subtitle" })
     }
 
+    // Mise en page "fidelite" : bandeau + tampons (10) + offre + QR
+    const loyaltyLayout = async () => {
+      fc.add(new fabric.Rect({ left: 0, top: 0, width: W, height: Math.round(H * 0.15), fill: accent }))
+      addText("Carte de fidélité", H * 0.04, W * 0.068, { weight: "bold", fill: readableOn(accent), role: "title" })
+      addText(name || "Votre enseigne", H * 0.18, W * 0.034, { font: "Arial", role: "subtitle" })
+      const r = Math.round(W * 0.04), gapX = W * 0.155, startX = W / 2 - gapX * 2
+      for (let i = 0; i < 10; i++) {
+        const row = Math.floor(i / 5), col = i % 5
+        fc.add(new fabric.Circle({ radius: r, fill: "transparent", stroke: accent, strokeWidth: Math.max(2, Math.round(W * 0.006)), originX: "center", originY: "center", left: startX + col * gapX, top: row === 0 ? H * 0.30 : H * 0.40 }))
+      }
+      addText("10 visites = 1 offert 🎁", H * 0.475, W * 0.04, { weight: "bold", role: "subtitle" })
+      await placeQrT(H * 0.55, 0.34)
+      addText("Scannez à chaque passage", H * 0.90, W * 0.03, { font: "Arial", role: "subtitle" })
+    }
+
     switch (id) {
       case "wifi-or": case "wifi-vert": case "wifi-bleu": await wifiLayout(); break
+      case "fidelite-or": case "fidelite-rouge": await loyaltyLayout(); break
       case "avis-or":
       case "avis-clair":
         brand(H * 0.02)
@@ -2806,7 +2825,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "10px 10px 16px" }}>
               {(() => {
                 const sectorObjs = SECTORS.find(s => s.id === tplSector)?.objs ?? null
-                const visibleObjs = ["Avis", "Menu", "Réserver", "Abonnés", "Contact", "Wifi", "Page"].filter(o => !sectorObjs || sectorObjs.includes(o))
+                const visibleObjs = ["Avis", "Menu", "Réserver", "Abonnés", "Contact", "Wifi", "Fidélité", "Page"].filter(o => !sectorObjs || sectorObjs.includes(o))
                 return visibleObjs.map(obj => {
                 const q = tplSearch.trim().toLowerCase()
                 const rank = (id: string) => id.endsWith("-studio") ? 0 : id.endsWith("-photo") ? 1 : id.endsWith("-card") ? 2 : id.endsWith("-split") ? 3 : id.endsWith("-premium") ? 4 : id.endsWith("-ornate") ? 5 : 6
