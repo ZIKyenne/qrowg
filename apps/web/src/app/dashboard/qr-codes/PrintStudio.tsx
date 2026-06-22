@@ -175,6 +175,7 @@ const TOJSON_PROPS = [
   "lockScalingX", "lockScalingY",
   "lockRotation", "selectable", "evented",
   "crossOrigin", // indispensable : sinon une photo distante "tainte" le canvas au rechargement -> export casse
+  "keepColor",   // texte sur photo : ne pas ecraser sa couleur lors d'un theme global
 ]
 const ROLE_PREFIX: Record<string, string> = { phone: "📞  ", website: "🌐  " }
 const ROLE_LABEL: Record<string, string> = { title: "Titre", subtitle: "Sous-titre", phone: "Téléphone", website: "Site / adresse" }
@@ -323,14 +324,25 @@ const COMPONENTS: { key: string; emoji: string; label: string; desc: string; cat
   { key: "don",      emoji: "❤️", label: "Faire un don",    desc: "Bouton de don",                 cat: "Business" },
 ]
 
-// Ecran d'accueil : objectif -> pool des meilleurs modeles (rotation = effet "generer")
-const START_GOALS: { pool: string[]; emoji: string; label: string; desc: string }[] = [
-  { pool: ["avis-studio", "avis-premium", "avis-photo", "avis-card", "avis-ornate"],           emoji: "⭐", label: "Obtenir plus d'avis",       desc: "Boostez vos avis clients" },
-  { pool: ["insta-studio", "insta-premium", "insta-photo", "insta-card"],                      emoji: "📱", label: "Gagner des abonnés",        desc: "Réseaux sociaux" },
-  { pool: ["menu-studio", "cafe-studio", "menu-premium", "menu-photo", "menu-split"],          emoji: "🍽️", label: "Montrer mon menu",          desc: "Carte accessible au scan" },
-  { pool: ["reserver-studio", "coach-studio", "beaute-studio", "reserver-premium", "reserver-photo"], emoji: "📅", label: "Prendre des réservations", desc: "Réservez en un scan" },
-  { pool: ["contact-studio", "immo-studio", "contact-premium", "contact-photo", "contact-card"], emoji: "💳", label: "Partager mes coordonnées",  desc: "Carte de visite digitale" },
-  { pool: ["decouvrir-studio", "event-studio", "boutique-studio", "promo-premium", "decouvrir-photo"], emoji: "🏷️", label: "Mettre en avant une offre", desc: "Promo, nouveauté…" },
+// Generateur guide : objectif -> meta (emoji, libelle, pool de modeles premium-first)
+const OBJ_META: Record<string, { emoji: string; label: string; pool: string[] }> = {
+  "Avis":     { emoji: "⭐", label: "Obtenir plus d'avis",        pool: ["avis-studio", "avis-premium", "avis-photo", "avis-card", "avis-ornate"] },
+  "Abonnés":  { emoji: "📱", label: "Gagner des abonnés",         pool: ["insta-studio", "insta-premium", "insta-photo", "insta-card"] },
+  "Menu":     { emoji: "🍽️", label: "Montrer mon menu",           pool: ["menu-studio", "cafe-studio", "menu-premium", "menu-photo", "menu-split"] },
+  "Réserver": { emoji: "📅", label: "Prendre des réservations",   pool: ["reserver-studio", "coach-studio", "beaute-studio", "reserver-premium", "reserver-photo"] },
+  "Contact":  { emoji: "💳", label: "Partager mes coordonnées",   pool: ["contact-studio", "immo-studio", "contact-premium", "contact-photo", "contact-card"] },
+  "Page":     { emoji: "🏷️", label: "Présenter / faire découvrir", pool: ["decouvrir-studio", "event-studio", "boutique-studio", "promo-premium", "decouvrir-photo"] },
+}
+// Generateur guide : metier -> objectifs pertinents + style recommande
+const GUIDE_METIERS: { id: string; emoji: string; label: string; objs: string[]; style: string }[] = [
+  { id: "resto",    emoji: "🍽️", label: "Restaurant",        objs: ["Menu", "Réserver", "Avis", "Page"],        style: "restofresh" },
+  { id: "bar",      emoji: "🍸", label: "Bar / Café",        objs: ["Menu", "Abonnés", "Avis", "Page"],          style: "premiumdark" },
+  { id: "commerce", emoji: "🛍️", label: "Commerce",          objs: ["Avis", "Abonnés", "Contact", "Page"],       style: "minimal" },
+  { id: "immo",     emoji: "🏠", label: "Immobilier",        objs: ["Contact", "Réserver", "Page"],              style: "corporate" },
+  { id: "beaute",   emoji: "💇", label: "Beauté / Bien-être", objs: ["Réserver", "Avis", "Abonnés"],             style: "sage" },
+  { id: "createur", emoji: "🎨", label: "Créateur",          objs: ["Abonnés", "Contact", "Page"],               style: "neon" },
+  { id: "event",    emoji: "🎉", label: "Événement",         objs: ["Réserver", "Abonnés", "Page"],              style: "sunset" },
+  { id: "autre",    emoji: "✨", label: "Autre",             objs: ["Avis", "Abonnés", "Menu", "Réserver", "Contact", "Page"], style: "luxgold" },
 ]
 
 // Photo representative par objectif (pour les vignettes de galerie) — 6 requetes max, mises en cache
@@ -596,7 +608,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [photoErr, setPhotoErr] = useState("")
   const [showHelp, setShowHelp] = useState(false)
   const [hintOff, setHintOff] = useState(false)
-  const [showStart, setShowStart] = useState(false) // ecran d'accueil guide (objectif -> design instantane)
+  const [showStart, setShowStart] = useState(false) // ecran d'accueil guide (metier -> objectif -> style)
+  const [startStep, setStartStep] = useState<"metier" | "objectif" | "style">("metier")
+  const [guideMetier, setGuideMetier] = useState<typeof GUIDE_METIERS[number] | null>(null)
+  const [guideObj, setGuideObj] = useState<string>("")
   const [starting, setStarting] = useState(false)   // generation en cours depuis l'accueil
   const genIdxRef = useRef(0)                        // rotation des propositions de l'accueil
   const saveRef = useRef<(silent?: boolean) => void>(() => {}) // ref vers le save courant (evite closure perimee dans Ctrl+S)
@@ -1677,7 +1692,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     fc.getObjects().forEach(o => {
       if ((o as any).isGuide || (o as any).isQR || (o as any).isQrCard) return
       if (isTxt(o.type)) {
-        ;(o as fabric.IText).set({ fontFamily: (o as any).role === "title" ? s.titleFont : s.bodyFont, fill: s.ink })
+        ;(o as fabric.IText).set("fontFamily", (o as any).role === "title" ? s.titleFont : s.bodyFont)
+        if (!(o as any).keepColor) (o as fabric.IText).set("fill", s.ink) // garder le texte blanc sur photo
       } else if (o.type === "group") {
         ;(o as fabric.Group).getObjects().forEach(c => {
           c.set("fill", isTxt(c.type) ? readableOn(s.accent) : s.accent)
@@ -1735,12 +1751,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const { bg, ink, accent } = meta
     fc.setBackgroundColor(bg, () => {}); setBgColor(bg)
 
-    const addText = (s: string, top: number, size: number, o: { weight?: string; fill?: string; font?: string; width?: number; role?: string } = {}) => {
+    const addText = (s: string, top: number, size: number, o: { weight?: string; fill?: string; font?: string; width?: number; role?: string; keepColor?: boolean } = {}) => {
       const t = new fabric.Textbox(s, {
         width: o.width ?? W * 0.82, left: W / 2, top, originX: "center", textAlign: "center",
         fontFamily: o.font ?? "Georgia", fontWeight: o.weight ?? "normal", fontSize: size, fill: o.fill ?? ink,
       })
       if (o.role) (t as any).role = o.role
+      if (o.keepColor) (t as any).keepColor = true // un theme global ne doit pas ecraser cette couleur (texte sur photo)
       fc.add(t); return t
     }
     const addStars = (n: number, cy: number, s: number, color: string) => {
@@ -1847,8 +1864,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       const scrim = new fabric.Rect({ left: 0, top: 0, width: W, height: H })
       scrim.set("fill", new fabric.Gradient({ type: "linear", coords: { x1: 0, y1: 0, x2: 0, y2: H }, colorStops: [{ offset: 0, color: "rgba(0,0,0,0.58)" }, { offset: 0.38, color: "rgba(0,0,0,0.12)" }, { offset: 1, color: "rgba(0,0,0,0.45)" }] }))
       fc.add(scrim)
-      addText(title, H * 0.10, W * 0.078, { weight: "bold", fill: "#FFFFFF", role: "title" })
-      addText(subtitle, H * 0.205, W * 0.034, { font: "Arial", fill: "#F0EDE6", role: "subtitle" })
+      addText(title, H * 0.10, W * 0.078, { weight: "bold", fill: "#FFFFFF", role: "title", keepColor: true })
+      addText(subtitle, H * 0.205, W * 0.034, { font: "Arial", fill: "#F0EDE6", role: "subtitle", keepColor: true })
       await placeQrT(H * 0.64, 0.32, W * 0.73)
     }
     // Mise en page "photo bandeau" : image en haut, panneau couleur en bas (texte + QR)
@@ -1900,9 +1917,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       const circ = new fabric.Circle({ radius: r, fill: accent, originX: "center", originY: "center" })
       const ico = new fabric.Text(opts.emoji, { fontSize: Math.round(r * 1.05), originX: "center", originY: "center", left: 0, top: 0 })
       fc.add(new fabric.Group([circ, ico], { originX: "center", originY: "center", left: W / 2, top: H * 0.115 }))
-      addText(title, H * 0.20, W * 0.082, { weight: "bold", fill: "#FFFFFF", role: "title" })
+      addText(title, H * 0.20, W * 0.082, { weight: "bold", fill: "#FFFFFF", role: "title", keepColor: true })
       rule(H * 0.285)
-      addText(subtitle, H * 0.31, W * 0.032, { font: "Arial", fill: "#F0EDE6", role: "subtitle" })
+      addText(subtitle, H * 0.31, W * 0.032, { font: "Arial", fill: "#F0EDE6", role: "subtitle", keepColor: true })
       await placeQrT(H * 0.40, 0.40)
       addCTA(cta, H * 0.84)
       if (opts.badge) {
@@ -2151,6 +2168,16 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     if (!lastPool || !lastPool.length) return
     const id = lastPool[genIdxRef.current++ % lastPool.length]
     await applyTemplate(id, true)
+  }
+  // Générateur guidé : objectif choisi -> meilleur modèle + style optionnel
+  const guidedGenerate = async (styleId: string | null) => {
+    const meta = OBJ_META[guideObj]; if (!meta) return
+    setStarting(true)
+    setLastPool(meta.pool)
+    const id = meta.pool[genIdxRef.current++ % meta.pool.length]
+    await applyTemplate(id, true)
+    if (styleId) { const st = GLOBAL_STYLES.find(s => s.id === styleId); if (st) applyStyle(st) }
+    setStarting(false); setShowStart(false); setStartStep("metier")
   }
   const openMock = () => {
     const fc = fcRef.current; if (!fc) return
@@ -3375,30 +3402,81 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         )}
       </div>
 
-      {/* Ecran d'accueil guide : objectif -> design instantane */}
+      {/* Ecran d'accueil guide : Metier -> Objectif -> Style -> design pret */}
       {showStart && (
         <div style={{ position: "absolute", inset: 0, zIndex: 60, background: "linear-gradient(180deg,#FFFFFF,#F1F4F8)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "DM Sans, sans-serif", overflowY: "auto" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
             <span style={{ width: 10, height: 10, borderRadius: 3, background: G }} />
             <span style={{ color: MUTED, fontSize: 11.5, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase" }}>QR Print Studio</span>
           </div>
-          <h2 style={{ color: INK, fontSize: 28, fontWeight: 800, margin: "0 0 7px", textAlign: "center" }}>Que voulez-vous créer ?</h2>
-          <p style={{ color: MUTED, fontSize: 14, margin: "0 0 28px", textAlign: "center", maxWidth: 440, lineHeight: 1.5 }}>Choisissez un objectif — votre design est prêt en 1 clic. Tout reste modifiable ensuite.</p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(170px, 200px))", gap: 14, maxWidth: "100%" }}>
-            {START_GOALS.map(g => (
-              <button key={g.label} className="ps-goal" type="button" disabled={starting}
-                onClick={async () => { setStarting(true); setLastPool(g.pool); const id = g.pool[genIdxRef.current++ % g.pool.length]; await applyTemplate(id, true); setStarting(false); setShowStart(false) }}
-                style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 6, padding: "18px 16px", background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 16, cursor: starting ? "wait" : "pointer", textAlign: "left", opacity: starting ? 0.6 : 1 }}>
-                <span style={{ fontSize: 30 }}>{g.emoji}</span>
-                <span style={{ color: INK, fontSize: 15, fontWeight: 800, lineHeight: 1.2 }}>{g.label}</span>
-                <span style={{ color: MUTED, fontSize: 12, lineHeight: 1.3 }}>{g.desc}</span>
-              </button>
+          {/* progression */}
+          <div style={{ display: "flex", gap: 6, marginBottom: 18 }}>
+            {["metier", "objectif", "style"].map((s, i) => (
+              <span key={s} style={{ width: startStep === s ? 22 : 8, height: 8, borderRadius: 999, background: ["metier", "objectif", "style"].indexOf(startStep) >= i ? G : "rgba(0,0,0,0.12)", transition: "all .2s" }} />
             ))}
           </div>
-          <div style={{ display: "flex", gap: 20, marginTop: 26, alignItems: "center" }}>
-            <button type="button" onClick={() => { setShowStart(false); setTplOpen(true) }} style={{ background: "none", border: "none", color: INK, fontSize: 13, fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}>Parcourir tous les modèles</button>
-            <button type="button" onClick={() => setShowStart(false)} style={{ background: "none", border: "none", color: MUTED, fontSize: 13, cursor: "pointer" }}>Partir d'une page vierge</button>
-          </div>
+
+          {startStep === "metier" && (
+            <>
+              <h2 style={{ color: INK, fontSize: 26, fontWeight: 800, margin: "0 0 6px", textAlign: "center" }}>Vous êtes…</h2>
+              <p style={{ color: MUTED, fontSize: 13.5, margin: "0 0 24px", textAlign: "center", maxWidth: 440, lineHeight: 1.5 }}>On vous prépare un design pro en 3 choix, sans réglage technique.</p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(120px, 150px))", gap: 12, maxWidth: "100%" }}>
+                {GUIDE_METIERS.map(m => (
+                  <button key={m.id} className="ps-goal" type="button" onClick={() => { setGuideMetier(m); setStartStep("objectif") }}
+                    style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "20px 12px", background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 16, cursor: "pointer" }}>
+                    <span style={{ fontSize: 32 }}>{m.emoji}</span>
+                    <span style={{ color: INK, fontSize: 13, fontWeight: 700, textAlign: "center" }}>{m.label}</span>
+                  </button>
+                ))}
+              </div>
+              <div style={{ display: "flex", gap: 20, marginTop: 24, alignItems: "center" }}>
+                <button type="button" onClick={() => { setShowStart(false); setTplOpen(true) }} style={{ background: "none", border: "none", color: INK, fontSize: 13, fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}>Parcourir tous les modèles</button>
+                <button type="button" onClick={() => setShowStart(false)} style={{ background: "none", border: "none", color: MUTED, fontSize: 13, cursor: "pointer" }}>Page vierge</button>
+              </div>
+            </>
+          )}
+
+          {startStep === "objectif" && guideMetier && (
+            <>
+              <button type="button" onClick={() => setStartStep("metier")} style={{ background: "none", border: "none", color: MUTED, fontSize: 12.5, cursor: "pointer", marginBottom: 8 }}>← {guideMetier.emoji} {guideMetier.label}</button>
+              <h2 style={{ color: INK, fontSize: 26, fontWeight: 800, margin: "0 0 6px", textAlign: "center" }}>Votre objectif ?</h2>
+              <p style={{ color: MUTED, fontSize: 13.5, margin: "0 0 24px", textAlign: "center" }}>Que doit faire votre support ?</p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(180px, 220px))", gap: 12, maxWidth: "100%" }}>
+                {guideMetier.objs.map(obj => OBJ_META[obj] && (
+                  <button key={obj} className="ps-goal" type="button" onClick={() => { setGuideObj(obj); setStartStep("style") }}
+                    style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 16px", background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 14, cursor: "pointer", textAlign: "left" }}>
+                    <span style={{ fontSize: 26 }}>{OBJ_META[obj].emoji}</span>
+                    <span style={{ color: INK, fontSize: 13.5, fontWeight: 700 }}>{OBJ_META[obj].label}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
+          {startStep === "style" && (
+            <>
+              <button type="button" onClick={() => setStartStep("objectif")} style={{ background: "none", border: "none", color: MUTED, fontSize: 12.5, cursor: "pointer", marginBottom: 8 }}>← Objectif</button>
+              <h2 style={{ color: INK, fontSize: 26, fontWeight: 800, margin: "0 0 6px", textAlign: "center" }}>Un style ?</h2>
+              <p style={{ color: MUTED, fontSize: 13.5, margin: "0 0 22px", textAlign: "center" }}>On applique tout : couleurs, typo, ambiance. Modifiable après.</p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(110px, 130px))", gap: 10, maxWidth: "100%" }}>
+                {GLOBAL_STYLES.map(s => {
+                  const reco = guideMetier?.style === s.id
+                  return (
+                    <button key={s.id} className="ps-goal" type="button" disabled={starting} onClick={() => guidedGenerate(s.id)}
+                      style={{ display: "flex", flexDirection: "column", gap: 6, padding: 8, background: "#FFFFFF", border: `1px solid ${reco ? G : "rgba(0,0,0,0.1)"}`, borderRadius: 12, cursor: starting ? "wait" : "pointer", opacity: starting ? 0.5 : 1 }}>
+                      <div style={{ width: "100%", height: 40, borderRadius: 8, background: s.bg, border: "1px solid rgba(0,0,0,0.06)", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
+                        <span style={{ width: 13, height: 13, borderRadius: "50%", background: s.accent }} />
+                        <span style={{ color: s.ink, fontSize: 12, fontWeight: 800, fontFamily: s.titleFont }}>Aa</span>
+                      </div>
+                      <span style={{ color: INK, fontSize: 10.5, fontWeight: 600, textAlign: "center" }}>{reco ? "✨ " : ""}{s.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
+              <button type="button" disabled={starting} onClick={() => guidedGenerate(null)} style={{ marginTop: 18, background: "none", border: "1px dashed rgba(0,0,0,0.2)", borderRadius: 10, padding: "9px 16px", color: MUTED, fontSize: 12.5, cursor: "pointer" }}>Sans thème (garder le modèle tel quel)</button>
+            </>
+          )}
+
           {starting && <div style={{ marginTop: 18, display: "flex", alignItems: "center", gap: 8, color: G, fontSize: 13, fontWeight: 600 }}><Loader2 size={15} style={{ animation: "spin 0.8s linear infinite" }} /> Création de votre design…</div>}
         </div>
       )}
