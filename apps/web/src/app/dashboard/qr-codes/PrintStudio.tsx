@@ -1036,6 +1036,19 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     card.setCoords(); card.setPositionByOrigin(center, "center", "center"); card.setCoords()
     fc.requestRenderAll(); pushHistorySoon()
   }
+  // Habiller le QR : cadre decoratif autour + label "SCANNEZ-MOI" en dessous (1 clic)
+  const dressQr = () => {
+    const fc = fcRef.current; if (!fc) return
+    const img = fc.getObjects().find(o => (o as any).isQR) as fabric.Image | undefined; if (!img) return
+    const c = img.getCenterPoint(); const w = img.getScaledWidth()
+    const fr = w * 1.34
+    const frame = new fabric.Rect({ width: fr, height: fr, rx: Math.round(w * 0.1), ry: Math.round(w * 0.1), fill: "transparent", stroke: G, strokeWidth: Math.max(3, Math.round(w * 0.03)), strokeUniform: true, originX: "center", originY: "center", left: c.x, top: c.y })
+    ;(frame as any).perPixelTargetFind = true
+    const label = buildPill("SCANNEZ-MOI", { rectFill: G, textFill: "#080808", height: Math.round(w * 0.2), fontSize: Math.round(w * 0.1) })
+    label.set({ originX: "center", originY: "top", left: c.x, top: c.y + fr / 2 + 12 })
+    fc.add(frame); fc.add(label)
+    fc.setActiveObject(label); fc.requestRenderAll(); pushHistorySoon(); setLayersVer(v => v + 1)
+  }
   // Repartir d'une page vierge : on retire tout (sauf guides) et on replace le QR
   const resetCanvas = () => {
     const fc = fcRef.current; if (!fc) return
@@ -3340,6 +3353,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <button type="button" style={tb} title="Agrandir le QR" onClick={() => scaleQrBy(1.1)}>QR+</button>
                   <button type="button" style={tb} title="Moins de marge blanche" onClick={() => adjustQrMargin(0.94)}>▫−</button>
                   <button type="button" style={tb} title="Plus de marge blanche" onClick={() => adjustQrMargin(1.06)}>▫+</button>
+                  <span style={{ width: 1, height: 20, background: "rgba(0,0,0,0.12)" }} />
+                  <button type="button" style={{ ...tb, width: "auto", padding: "0 10px", fontWeight: 700 }} title="Cadre + « Scannez-moi »" onClick={dressQr}>🏷️ Habiller</button>
                 </>
               ) : (
                 <span style={{ color: MUTED, fontSize: 10.5 }}>QR — glisse les poignées pour redimensionner</span>
