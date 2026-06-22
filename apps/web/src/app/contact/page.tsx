@@ -332,7 +332,7 @@ export default function ContactPage() {
                   )
                 })}
                 <div style={{ padding:"14px 18px",borderTop:"1px solid rgba(255,255,255,0.05)" }}>
-                  <Link href="/faq" style={{color:G,fontSize:12,textDecoration:"none",display:"flex",alignItems:"center",gap:5,transition:"gap 0.2s"}}
+                  <Link href="/#faq" style={{color:G,fontSize:12,textDecoration:"none",display:"flex",alignItems:"center",gap:5,transition:"gap 0.2s"}}
                     onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.gap="8px"}}
                     onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.gap="5px"}}>
                     Voir toutes les questions →

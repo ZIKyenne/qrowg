@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
+import { PLAN_RANK } from "@/lib/plans"
 import { Sparkles, ArrowRight, Check, X, Lock, Search, Heart, Eye, Clock, Layers } from "lucide-react"
 import TemplatePreviewModal from "./TemplatePreviewModal"
 
@@ -83,7 +84,6 @@ const PLAN_CONFIG: Record<string, { label: string; color: string; icon: string }
   pro:      { label: "Pro",      color: "#C9A84C", icon: "🔥" },
   business: { label: "Business", color: "#39FF8F", icon: "👑" },
 }
-const PLAN_RANK: Record<string, number> = { free: 0, starter: 1, pro: 2, business: 3 }
 const FAV_KEY = "qrfolio_fav_templates"
 
 export default function TemplatesPage() {
