@@ -1162,6 +1162,19 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       centerObj(img)
     }, { crossOrigin: "anonymous" })
   }
+  // Definir une photo comme fond plein cadre (cover), derriere tous les elements
+  const setPhotoBg = (url: string) => {
+    const fc = fcRef.current; if (!fc) return
+    fabric.Image.fromURL(url, (img) => {
+      const z = fc.getZoom() || 1, W = fc.getWidth() / z, H = fc.getHeight() / z
+      const sc = Math.max(W / (img.width || W), H / (img.height || H))
+      img.set({ scaleX: sc, scaleY: sc, left: W / 2, top: H / 2, originX: "center", originY: "center" })
+      fc.add(img); fc.sendToBack(img)
+      const vG = vGuideRef.current, hG = hGuideRef.current
+      if (vG) fc.bringToFront(vG); if (hG) fc.bringToFront(hG)
+      fc.requestRenderAll(); pushHistorySoon(); setLayersVer(v => v + 1)
+    }, { crossOrigin: "anonymous" })
+  }
   // Bouton CTA (pilule dimensionnee au texte)
   const addCTA = (label: string) => {
     centerObj(buildPill(label, { rectFill: G, textFill: "#080808", height: 80, fontSize: 30 }))
@@ -2524,10 +2537,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               {!photoLoading && !photoErr && !photoResults.length && <p style={{ color: MUTED, fontSize: 11, lineHeight: 1.5, padding: "8px 2px" }}>Cherchez une ambiance (métier, matière, lieu…) et cliquez une photo pour l'ajouter.</p>}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                 {photoResults.map(p => (
-                  <button key={p.id} type="button" onClick={() => addPhoto(p.regular)} title={`Photo : ${p.author}`}
-                    style={{ padding: 0, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 8, overflow: "hidden", cursor: "pointer", aspectRatio: "1", background: BG }}>
-                    <img src={p.thumb} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                  </button>
+                  <div key={p.id} style={{ position: "relative", aspectRatio: "1", borderRadius: 8, overflow: "hidden", border: "1px solid rgba(0,0,0,0.1)", background: BG }}>
+                    <img src={p.thumb} alt="" onClick={() => addPhoto(p.regular)} title={`Ajouter l'image — ${p.author}`} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", cursor: "pointer" }} />
+                    <button type="button" onClick={() => setPhotoBg(p.regular)} title="Définir comme fond plein cadre"
+                      style={{ position: "absolute", bottom: 5, right: 5, padding: "3px 8px", background: "rgba(0,0,0,0.62)", color: "#fff", border: "none", borderRadius: 999, fontSize: 9, fontWeight: 700, cursor: "pointer", backdropFilter: "blur(2px)" }}>Fond</button>
+                  </div>
                 ))}
               </div>
               {photoResults.length > 0 && <p style={{ color: MUTED, fontSize: 8.5, margin: "10px 2px 0", lineHeight: 1.4 }}>Photos via Unsplash.</p>}
