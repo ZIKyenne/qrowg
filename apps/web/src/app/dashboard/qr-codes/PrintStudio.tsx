@@ -263,6 +263,12 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"insta-photo",   label:"Instagram — Photo",  obj:"Abonnés",  emoji:"📸", desc:"Lifestyle + QR en coin",               bg:"#1A0E18", ink:"#FFFFFF", accent:"#E1306C" },
   { id:"contact-photo", label:"Contact — Photo",    obj:"Contact",  emoji:"📸", desc:"Bureau moderne + QR en coin",           bg:"#0C1322", ink:"#FFFFFF", accent:"#5B8DEF" },
   { id:"decouvrir-photo",label:"Découvrir — Photo", obj:"Page",     emoji:"📸", desc:"Boutique + QR en coin",                 bg:"#14110C", ink:"#FFFFFF", accent:"#C9A84C" },
+  { id:"menu-split",    label:"Menu — Bandeau",     obj:"Menu",     emoji:"🖼️", desc:"Photo en haut, infos en bas",          bg:"#F6F1E7", ink:"#2A2419", accent:"#C0392B" },
+  { id:"reserver-split",label:"Réservation — Bandeau",obj:"Réserver",emoji:"🖼️",desc:"Photo en haut, infos en bas",          bg:"#F6F1E7", ink:"#2A2419", accent:"#0E7A5F" },
+  { id:"decouvrir-split",label:"Découvrir — Bandeau",obj:"Page",    emoji:"🖼️", desc:"Photo en haut, infos en bas",          bg:"#F6F1E7", ink:"#2A2419", accent:"#7C3AED" },
+  { id:"avis-card",     label:"Avis — Carte photo", obj:"Avis",     emoji:"🪟", desc:"Carte blanche sur photo",              bg:"#1A1410", ink:"#FFFFFF", accent:"#C9A84C" },
+  { id:"insta-card",    label:"Instagram — Carte photo",obj:"Abonnés",emoji:"🪟",desc:"Carte blanche sur photo",             bg:"#1A0E18", ink:"#FFFFFF", accent:"#E1306C" },
+  { id:"contact-card",  label:"Contact — Carte photo",obj:"Contact",emoji:"🪟", desc:"Carte blanche sur photo",              bg:"#0C1322", ink:"#FFFFFF", accent:"#5B8DEF" },
 ]
 
 // Secteurs d'activite -> objectifs pertinents (pour filtrer la galerie)
@@ -312,6 +318,29 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
           <div style={{ height: 4, width: "52%", borderRadius: 2, background: "rgba(255,255,255,0.72)" }} />
         </div>
         <div style={{ position: "absolute", bottom: "10%", right: "12%", width: "30%", aspectRatio: "1", background: "#fff", borderRadius: 3 }} />
+      </div>
+    )
+  }
+  if (t.id.endsWith("-split")) {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: t.bg, display: "flex", flexDirection: "column" }}>
+        <div style={{ height: "50%", background: `linear-gradient(135deg, ${t.accent}, ${t.bg})` }} />
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, padding: "0 12%" }}>
+          <div style={{ height: 5, width: "70%", borderRadius: 3, background: t.ink, opacity: 0.9 }} />
+          <div style={{ height: 3, width: "48%", borderRadius: 2, background: t.ink, opacity: 0.5 }} />
+          <div style={{ width: "30%", aspectRatio: "1", background: "#fff", borderRadius: 3, marginTop: "4%", boxShadow: "0 1px 4px rgba(0,0,0,0.15)" }} />
+        </div>
+      </div>
+    )
+  }
+  if (t.id.endsWith("-card")) {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: `linear-gradient(135deg, ${t.accent}, ${t.bg})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.28)" }} />
+        <div style={{ position: "relative", width: "74%", height: "56%", background: "#fff", borderRadius: 8, boxShadow: "0 6px 18px rgba(0,0,0,0.3)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, padding: "0 10%" }}>
+          <div style={{ height: 5, width: "72%", borderRadius: 3, background: "#1A1A1A" }} />
+          <div style={{ width: "42%", aspectRatio: "1", background: "#111", borderRadius: 3, marginTop: "4%" }} />
+        </div>
       </div>
     )
   }
@@ -1666,29 +1695,56 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       addText(subtitle, H * 0.80, W * 0.034, { font: "Arial", role: "subtitle" })
       addText(cta, H * 0.87, W * 0.04, { weight: "bold", fill: accent })
     }
-    // Mise en page "photo" : image plein cadre + voile + titre haut + QR en coin (editorial)
-    const photoLayout = async (title: string, subtitle: string, query: string) => {
-      let imgUrl: string | null = null
+    // --- Helpers photo (Unsplash) -------------------------------------------
+    const fetchPhoto = async (query: string): Promise<string | null> => {
       try {
         const ratio = FORMATS[format]?.ratio ?? 0.7
         const orient = ratio < 0.9 ? "portrait" : ratio > 1.1 ? "landscape" : "squarish"
         const res = await fetch(`/api/unsplash?q=${encodeURIComponent(query)}&orientation=${orient}`)
-        if (res.ok) { const d = await res.json(); imgUrl = d.photos?.[0]?.regular ?? null }
-      } catch { /* pas de photo -> on garde le fond couleur (degradation gracieuse) */ }
-      if (imgUrl) {
-        await new Promise<void>(r => fabric.Image.fromURL(imgUrl as string, (im) => {
-          const sc = Math.max(W / (im.width || W), H / (im.height || H))
-          im.set({ scaleX: sc, scaleY: sc, left: W / 2, top: H / 2, originX: "center", originY: "center" })
-          fc.add(im); r()
-        }, { crossOrigin: "anonymous" }))
-      }
-      // voile degrade : assombrit le haut (titre) et le bas (QR) pour la lisibilite
+        if (res.ok) { const d = await res.json(); return d.photos?.[0]?.regular ?? null }
+      } catch { /* degradation gracieuse */ }
+      return null
+    }
+    // Place une image en "cover" sur une region (rx,ry,rw,rh), clippee a cette region
+    const addCover = (url: string, rx: number, ry: number, rw: number, rh: number) => new Promise<void>(r => {
+      fabric.Image.fromURL(url, (im) => {
+        const sc = Math.max(rw / (im.width || rw), rh / (im.height || rh))
+        im.set({ scaleX: sc, scaleY: sc, left: rx + rw / 2, top: ry + rh / 2, originX: "center", originY: "center" })
+        im.clipPath = new fabric.Rect({ left: rx, top: ry, width: rw, height: rh, originX: "left", originY: "top", absolutePositioned: true })
+        fc.add(im); r()
+      }, { crossOrigin: "anonymous" })
+    })
+    // Mise en page "photo" : image plein cadre + voile + titre haut + QR en coin (editorial)
+    const photoLayout = async (title: string, subtitle: string, query: string) => {
+      const url = await fetchPhoto(query); if (url) await addCover(url, 0, 0, W, H)
       const scrim = new fabric.Rect({ left: 0, top: 0, width: W, height: H })
       scrim.set("fill", new fabric.Gradient({ type: "linear", coords: { x1: 0, y1: 0, x2: 0, y2: H }, colorStops: [{ offset: 0, color: "rgba(0,0,0,0.58)" }, { offset: 0.38, color: "rgba(0,0,0,0.12)" }, { offset: 1, color: "rgba(0,0,0,0.45)" }] }))
       fc.add(scrim)
       addText(title, H * 0.10, W * 0.078, { weight: "bold", fill: "#FFFFFF", role: "title" })
       addText(subtitle, H * 0.205, W * 0.034, { font: "Arial", fill: "#F0EDE6", role: "subtitle" })
       await placeQrT(H * 0.64, 0.32, W * 0.73)
+    }
+    // Mise en page "photo bandeau" : image en haut, panneau couleur en bas (texte + QR)
+    const photoSplitLayout = async (title: string, subtitle: string, query: string) => {
+      const splitY = Math.round(H * 0.50)
+      const url = await fetchPhoto(query)
+      if (url) await addCover(url, 0, 0, W, splitY)
+      else fc.add(new fabric.Rect({ left: 0, top: 0, width: W, height: splitY, fill: accent }))
+      fc.add(new fabric.Rect({ left: 0, top: splitY, width: W, height: H - splitY, fill: bg }))
+      addText(title, H * 0.565, W * 0.072, { weight: "bold", role: "title" })
+      addText(subtitle, H * 0.66, W * 0.032, { font: "Arial", role: "subtitle" })
+      await placeQrT(H * 0.73, 0.34)
+    }
+    // Mise en page "carte sur photo" : image plein cadre + carte blanche centrale (titre + QR)
+    const photoCardLayout = async (title: string, subtitle: string, query: string) => {
+      const url = await fetchPhoto(query); if (url) await addCover(url, 0, 0, W, H)
+      const scrim = new fabric.Rect({ left: 0, top: 0, width: W, height: H, fill: "rgba(0,0,0,0.28)" })
+      fc.add(scrim)
+      const cw = Math.round(W * 0.76), ch = Math.round(H * 0.56)
+      fc.add(new fabric.Rect({ width: cw, height: ch, rx: 20, ry: 20, fill: "#FFFFFF", originX: "center", originY: "center", left: W / 2, top: H / 2, shadow: new fabric.Shadow({ color: "rgba(0,0,0,0.35)", blur: 34, offsetX: 0, offsetY: 14 }) }))
+      addText(title, H * 0.27, W * 0.07, { weight: "bold", fill: "#1A1A1A", role: "title" })
+      addText(subtitle, H * 0.355, W * 0.03, { font: "Arial", fill: "#666666", role: "subtitle" })
+      await placeQrT(H * 0.43, 0.34)
     }
     // Mise en page "premium" : en-tete colore + badge rond + hierarchie + QR + CTA
     const premiumLayout = async (title: string, subtitle: string, cta: string, badge?: string) => {
@@ -1837,6 +1893,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "insta-photo":    await photoLayout("Suivez-nous", "@votrecompte", "lifestyle aesthetic flatlay"); break
       case "contact-photo":  await photoLayout(name || "Mes coordonnées", "Scannez ma carte de visite", "modern minimal office desk"); break
       case "decouvrir-photo":await photoLayout("Découvrez-nous", "Scannez pour explorer", "boutique shop interior cozy"); break
+      case "menu-split":     await photoSplitLayout(name || "Notre Carte", "Scannez pour le menu", "restaurant food table gourmet"); break
+      case "reserver-split": await photoSplitLayout("Réservez votre table", "Scannez pour réserver", "cozy restaurant interior"); break
+      case "decouvrir-split":await photoSplitLayout("Découvrez-nous", "Scannez pour explorer", "boutique lifestyle shop"); break
+      case "avis-card":      await photoCardLayout("Vous avez aimé ?", "Laissez-nous un avis", "happy people cafe friends"); break
+      case "insta-card":     await photoCardLayout("Suivez-nous", "@votrecompte", "aesthetic lifestyle flatlay"); break
+      case "contact-card":   await photoCardLayout(name || "Mes coordonnées", "Scannez ma carte", "modern workspace desk"); break
     }
 
     if (vG) fc.bringToFront(vG)
