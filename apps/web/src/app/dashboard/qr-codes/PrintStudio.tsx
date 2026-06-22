@@ -1912,8 +1912,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         background: SURFACE, flexShrink: 0,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ color: G, fontWeight: 800, fontSize: 14, letterSpacing: 0.3 }}>QR Print Studio</span>
-          <span style={{ color: MUTED, fontSize: 10, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 6, padding: "2px 7px", fontWeight: 700 }}>BÊTA</span>
+          <span style={{ width: 9, height: 9, borderRadius: 3, background: G, flexShrink: 0 }} />
+          <span style={{ color: INK, fontWeight: 800, fontSize: 14, letterSpacing: 0.3 }}>QR Print Studio</span>
+          <span style={{ color: "#8A6D14", fontSize: 10, background: "rgba(201,168,76,0.16)", border: "1px solid rgba(201,168,76,0.35)", borderRadius: 6, padding: "2px 7px", fontWeight: 700 }}>BÊTA</span>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -2769,7 +2770,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Garde-fou scannabilite du QR */}
         {qrIssues && (
-          <div style={{ position: "absolute", top: 12, left: 12, zIndex: 39, display: "flex", alignItems: "center", gap: 7, padding: "7px 11px", background: "rgba(40,28,8,0.92)", border: "1px solid rgba(249,158,46,0.5)", borderRadius: 10, color: "#F9C46E", fontSize: 11, fontWeight: 600, maxWidth: 260, boxShadow: "0 8px 22px rgba(0,0,0,0.14)" }}>
+          <div style={{ position: "absolute", top: 12, left: 12, zIndex: 39, display: "flex", alignItems: "center", gap: 7, padding: "7px 11px", background: "#FEF3E2", border: "1px solid rgba(217,160,40,0.5)", borderRadius: 10, color: "#92520E", fontSize: 11, fontWeight: 600, maxWidth: 260, boxShadow: "0 8px 22px rgba(0,0,0,0.14)" }}>
             <span style={{ fontSize: 14 }}>⚠️</span>
             <span>{qrIssues.covered ? "Un élément couvre le QR — il risque de ne pas se scanner." : "QR un peu petit : agrandis-le pour un scan fiable."}</span>
           </div>
@@ -2841,7 +2842,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Astuce d'accueil (masquable) : guide le debutant quand rien n'est selectionne */}
         {!sel && !hintOff && (
-          <div style={{ position: "absolute", bottom: 14, left: "50%", transform: "translateX(-50%)", zIndex: 35, display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "rgba(20,18,12,0.92)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 999, boxShadow: "0 8px 24px rgba(0,0,0,0.14)", maxWidth: "90%" }}>
+          <div style={{ position: "absolute", bottom: 14, left: "50%", transform: "translateX(-50%)", zIndex: 35, display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "#FFFFFF", border: "1px solid rgba(201,168,76,0.45)", borderRadius: 999, boxShadow: "0 8px 24px rgba(0,0,0,0.14)", maxWidth: "90%" }}>
             <Sparkles size={13} color={G} style={{ flexShrink: 0 }} />
             <span style={{ color: INK, fontSize: 11.5 }}>Choisis un <b>modèle</b> à gauche, ou <b>double-clique</b> ici pour ajouter du texte.</span>
             <button type="button" onClick={() => setHintOff(true)} aria-label="Masquer l'astuce"
@@ -2901,13 +2902,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         return (
           <div style={{ position: "fixed", inset: 0, zIndex: 4000, background: "rgba(0,0,0,0.88)", backdropFilter: "blur(4px)", display: "flex", flexDirection: "column", fontFamily: "DM Sans, sans-serif" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px" }}>
-              <span style={{ color: INK, fontWeight: 800, fontSize: 14, display: "flex", alignItems: "center", gap: 7 }}><Eye size={15} /> Aperçu en situation</span>
-              <button type="button" onClick={() => setMockOpen(false)} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, background: "rgba(0,0,0,0.08)", border: "1px solid rgba(0,0,0,0.12)", borderRadius: 9, color: INK, cursor: "pointer" }}><X size={16} /></button>
+              <span style={{ color: "#F5F0E8", fontWeight: 800, fontSize: 14, display: "flex", alignItems: "center", gap: 7 }}><Eye size={15} /> Aperçu en situation</span>
+              <button type="button" onClick={() => setMockOpen(false)} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 9, color: "#F5F0E8", cursor: "pointer" }}><X size={16} /></button>
             </div>
             <div style={{ display: "flex", gap: 8, justifyContent: "center", paddingBottom: 12 }}>
               {([["wall", "Mur"], ["table", "Table"], ["window", "Vitrine"], ["desk", "Bureau"], ["cadre", "Cadre"], ["counter", "Comptoir"]] as const).map(([id, l]) => (
                 <button key={id} type="button" onClick={() => setMockEnv(id)}
-                  style={{ padding: "7px 16px", borderRadius: 9, cursor: "pointer", fontSize: 12, fontWeight: mockEnv === id ? 700 : 500, background: mockEnv === id ? "rgba(201,168,76,0.18)" : "rgba(0,0,0,0.05)", border: `1px solid ${mockEnv === id ? G : "rgba(0,0,0,0.1)"}`, color: mockEnv === id ? G : INK }}>{l}</button>
+                  style={{ padding: "7px 16px", borderRadius: 9, cursor: "pointer", fontSize: 12, fontWeight: mockEnv === id ? 700 : 500, background: mockEnv === id ? "rgba(201,168,76,0.22)" : "rgba(255,255,255,0.08)", border: `1px solid ${mockEnv === id ? G : "rgba(255,255,255,0.16)"}`, color: mockEnv === id ? G : "#E8E6E0" }}>{l}</button>
               ))}
             </div>
             <div style={{ flex: 1, margin: "0 16px 16px", borderRadius: 16, overflow: "hidden", position: "relative", background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", perspective: "1400px" }}>
