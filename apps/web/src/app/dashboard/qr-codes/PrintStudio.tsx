@@ -245,6 +245,9 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"insta-ornate",  label:"Instagram — Orné",   obj:"Abonnés",  emoji:"📷", desc:"Ornements roses",                       bg:"#15101C", ink:"#FBEAF4", accent:"#E1306C" },
   { id:"contact-ornate",label:"Contact — Orné",     obj:"Contact",  emoji:"💳", desc:"Ornements dorés, royal",               bg:"#0C1A3A", ink:"#F5F8FF", accent:"#D4AF37" },
   { id:"decouvrir-ornate",label:"Découvrir — Orné", obj:"Page",     emoji:"🔗", desc:"Ornements dorés, crème",               bg:"#FBF6EC", ink:"#2A2419", accent:"#B8860B" },
+  { id:"resto-footer",  label:"Restaurant — Ardoise",obj:"Menu",    emoji:"🍽️", desc:"Footer chaleureux, ardoise",            bg:"#1C1C1A", ink:"#F0E8D8", accent:"#C9A84C" },
+  { id:"immo-frame",    label:"Immobilier — Carte", obj:"Contact",  emoji:"🏠", desc:"Cadre épuré, pro",                      bg:"#FFFFFF", ink:"#10243F", accent:"#1F6F8B" },
+  { id:"event-ornate",  label:"Événement — Affiche",obj:"Page",     emoji:"🎉", desc:"Orné festif",                           bg:"#160726", ink:"#FBEAF6", accent:"#E0479E" },
 ]
 
 // Secteurs d'activite -> objectifs pertinents (pour filtrer la galerie)
@@ -1596,6 +1599,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "insta-ornate":     await ornateLayout("Suivez-nous", "@votrecompte", "Nous suivre"); break
       case "contact-ornate":   await ornateLayout(name || "Mes coordonnées", "Restons en contact", "Me contacter"); break
       case "decouvrir-ornate": await ornateLayout("Découvrez-nous", "Scannez pour explorer", "En savoir plus"); break
+      case "resto-footer":   await footerLayout(name || "Notre Carte", "Scannez pour la carte du jour", "Voir le menu"); break
+      case "immo-frame":     await frameLayout(name || "Votre agent", "Scannez ma carte de visite", "Me contacter"); break
+      case "event-ornate":   await ornateLayout("L'événement", "Scannez pour le programme", "J'y vais"); break
     }
 
     if (vG) fc.bringToFront(vG)
