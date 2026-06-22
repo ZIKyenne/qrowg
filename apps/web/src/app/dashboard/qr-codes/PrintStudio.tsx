@@ -591,6 +591,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [bgGrad, setBgGrad]   = useState(false)
   const [bgC2, setBgC2]       = useState("#0A0A0A")
   const [gradC2, setGradC2]   = useState(G)      // 2e couleur pour le degrade d'un element
+  const styleClipRef = useRef<any>(null)         // pinceau de format (style copie)
+  const [hasStyleClip, setHasStyleClip] = useState(false)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving]   = useState(false)
   const [saved, setSaved]     = useState(false)
@@ -1516,6 +1518,27 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     o.set("fill", new fabric.Gradient({ type: "radial", gradientUnits: "pixels", coords: { x1: w / 2, y1: h / 2, r1: 0, x2: w / 2, y2: h / 2, r2: Math.max(w, h) / 2 }, colorStops: [{ offset: 0, color: c1 }, { offset: 1, color: c2 }] }) as unknown as string)
     o.dirty = true
   })
+  // Pinceau de format : copier/coller le style d'un element a l'autre
+  const copyStyle = () => {
+    const o = fcRef.current?.getActiveObject() as any; if (!o) return
+    styleClipRef.current = {
+      fill: o.fill, stroke: o.stroke, strokeWidth: o.strokeWidth, strokeDashArray: o.strokeDashArray, strokeLineCap: o.strokeLineCap, paintFirst: o.paintFirst,
+      opacity: o.opacity, shadow: o.shadow ? (o.shadow.toObject ? o.shadow.toObject() : o.shadow) : null,
+      fontFamily: o.fontFamily, fontWeight: o.fontWeight, fontStyle: o.fontStyle, textAlign: o.textAlign, charSpacing: o.charSpacing, lineHeight: o.lineHeight,
+    }
+    setHasStyleClip(true)
+  }
+  const pasteStyle = () => {
+    const c = styleClipRef.current; if (!c) return
+    mutate(o => {
+      o.set({ fill: c.fill, stroke: c.stroke ?? null, strokeWidth: c.strokeWidth ?? 0, strokeDashArray: c.strokeDashArray ?? null, opacity: c.opacity ?? 1 })
+      if (c.strokeLineCap) o.set("strokeLineCap", c.strokeLineCap)
+      if (c.paintFirst) o.set("paintFirst", c.paintFirst)
+      o.set("shadow", c.shadow ? new fabric.Shadow(c.shadow) : null)
+      if (isTextObj(o)) o.set({ fontFamily: c.fontFamily, fontWeight: c.fontWeight, fontStyle: c.fontStyle, textAlign: c.textAlign, charSpacing: c.charSpacing, lineHeight: c.lineHeight })
+      o.dirty = true
+    })
+  }
   const setBorderColor = (color: string) => mutate(o => {
     o.set({ stroke: color, strokeUniform: true })
     if ((o.strokeWidth ?? 0) === 0) o.set("strokeWidth", 4)
@@ -3468,6 +3491,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   </button>
                   <button type="button" onClick={() => flip("x")} style={layerBtn} title="Miroir horizontal">⇆ Miroir H</button>
                   <button type="button" onClick={() => flip("y")} style={layerBtn} title="Miroir vertical">⇅ Miroir V</button>
+                  <button type="button" onClick={copyStyle} style={{ ...layerBtn, gridColumn: hasStyleClip ? "auto" : "1 / 3" }} title="Copier l'apparence">🎨 Copier le style</button>
+                  {hasStyleClip && <button type="button" onClick={pasteStyle} style={{ ...layerBtn, color: G }} title="Appliquer le style copié">Coller le style</button>}
                   {sel.multi && <button type="button" onClick={groupSel} style={{ ...layerBtn, gridColumn: "1 / 3", color: G }}>⊞ Grouper</button>}
                   {sel.isGroupObj && <button type="button" onClick={ungroupSel} style={{ ...layerBtn, gridColumn: "1 / 3" }}>⊟ Dégrouper</button>}
                 </div>
