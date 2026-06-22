@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { PLAN_LIST, PLAN_ORDER, fmtPrice } from "@/lib/plans"
 import {
   Copy, Check, Gift, Star, TrendingUp, Users,
   QrCode, Eye, Crown, Camera, Save, ExternalLink,
@@ -132,6 +133,9 @@ const SURF2 = "#0F0E0B"
 // -- Plans complets avec limites reelles --------------------------------------
 type PlanLimit = { pages: number|null; views: number|null; qr: number|null; team: number|null }
 
+// Icônes par plan (l'UI seule ; les données viennent de lib/plans)
+const PLAN_ICONS: Record<string, any> = { free: Star, starter: Activity, pro: Activity, business: Crown }
+// PLAN_CFG dérivé de la source unique (lib/plans) — même forme qu'avant pour le reste du fichier
 const PLAN_CFG: Record<string, {
   color: string; label: string; icon: any
   price_monthly: string; price_annual: string
@@ -139,40 +143,12 @@ const PLAN_CFG: Record<string, {
   limits: PlanLimit
   features: string[]
   badge?: string
-}> = {
-  free: {
-    color: MUTED, label: "Gratuit", icon: Star,
-    price_monthly: "0", price_annual: "0",
-    description: "Pour decouvrir QRfolio",
-    limits: { pages: 1, views: 500, qr: 1, team: null },
-    features: ["1 page active","500 vues/mois","1 QR code basique","Analytics de base","Branding QRfolio visible"],
-  },
-  starter: {
-    color: "#38BDF8", label: "Starter", icon: Activity,
-    price_monthly: "2.99", price_annual: "2.39",
-    description: "Pour les createurs individuels",
-    limits: { pages: 3, views: 5000, qr: null, team: null },
-    features: ["3 pages","5 000 vues/mois","QR codes personnalises","Sans branding","Analytics standard","Domaine personnalise"],
-    badge: "POPULAIRE",
-  },
-  pro: {
-    color: G, label: "Pro", icon: Activity,
-    price_monthly: "9.99", price_annual: "7.99",
-    description: "Pour les professionnels et commerces",
-    limits: { pages: null, views: 50000, qr: null, team: null },
-    features: ["Pages illimitees","50 000 vues/mois","QR codes avances","Analytics avances + export","Tous les templates","Support prioritaire"],
-  },
-  business: {
-    color: "#39FF8F", label: "Business", icon: Crown,
-    price_monthly: "24.99", price_annual: "19.99",
-    description: "Pour les agences et equipes",
-    limits: { pages: null, views: null, qr: null, team: 5 },
-    features: ["Vues illimitees","Tout Plan Pro inclus","Equipe 5 membres","Acces API complet","Marque blanche","Support 24/7 dedie"],
-  },
-}
-
-// Plans ordonnes pour l'upsell
-const PLAN_ORDER = ["free","starter","pro","business"]
+}> = Object.fromEntries(PLAN_LIST.map(p => [p.id, {
+  color: p.color, label: p.label, icon: PLAN_ICONS[p.id],
+  price_monthly: fmtPrice(p.priceMonthly), price_annual: fmtPrice(p.priceAnnual),
+  description: p.description, limits: p.limits, features: p.features,
+  badge: p.badge ?? undefined,
+}]))
 
 // -- Composants utilitaires ----------------------------------------------------
 function SectionCard({ title, icon: Icon, color = G, children, action, tag }: {

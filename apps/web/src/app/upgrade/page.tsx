@@ -4,112 +4,28 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Check, Zap, Crown, Star, ArrowLeft, Sparkles } from "lucide-react"
 import Link from "next/link"
+import { PLAN_LIST, PLAN_COMPARISON, fmtPrice } from "@/lib/plans"
 
-const PLANS = [
-  {
-    id: "free",
-    name: "Gratuit",
-    price: { monthly: "0", annual: "0" },
-    color: "#8A8478",
-    icon: <Star size={20} />,
-    description: "Pour decouvrir QRfolio",
-    badge: null,
-    perks: [
-      { text: "1 page", included: true },
-      { text: "500 vues / mois", included: true },
-      { text: "1 QR code basique", included: true },
-      { text: "Analytics de base", included: true },
-      { text: "Branding QRfolio visible", included: true },
-      { text: "Domaine personnalise", included: false },
-      { text: "QR codes personnalises", included: false },
-      { text: "Analytics avances", included: false },
-      { text: "Templates premium", included: false },
-    ],
-    cta: "Plan actuel",
-    ctaDisabled: true,
-  },
-  {
-    id: "starter",
-    name: "Starter",
-    price: { monthly: "2.99", annual: "2.39" },
-    color: "#38BDF8",
-    icon: <Zap size={20} />,
-    description: "Pour les createurs individuels",
-    badge: "POPULAIRE",
-    highlight: true,
-    perks: [
-      { text: "3 pages", included: true },
-      { text: "5 000 vues / mois", included: true },
-      { text: "QR codes personnalises", included: true },
-      { text: "Sans branding QRfolio", included: true },
-      { text: "Analytics standard", included: true },
-      { text: "Domaine personnalise", included: true },
-      { text: "Templates Starter", included: true },
-      { text: "Support par email", included: true },
-      { text: "Analytics avances", included: false },
-    ],
-    cta: "Commencer l essai gratuit",
-    priceId: "starter",
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    price: { monthly: "9.99", annual: "7.99" },
-    color: "#C9A84C",
-    icon: <Sparkles size={20} />,
-    description: "Pour les professionnels et commerces",
-    badge: null,
-    perks: [
-      { text: "Pages illimitees", included: true },
-      { text: "50 000 vues / mois", included: true },
-      { text: "QR codes personnalises avances", included: true },
-      { text: "Sans branding QRfolio", included: true },
-      { text: "Analytics avances + export", included: true },
-      { text: "Domaine personnalise", included: true },
-      { text: "Tous les templates", included: true },
-      { text: "Support prioritaire", included: true },
-      { text: "Rapport hebdo par IA", included: true },
-    ],
-    cta: "Passer a Pro",
-    priceId: "pro",
-  },
-  {
-    id: "business",
-    name: "Business",
-    price: { monthly: "24.99", annual: "19.99" },
-    color: "#39FF8F",
-    icon: <Crown size={20} />,
-    description: "Pour les agences et equipes",
-    badge: null,
-    perks: [
-      { text: "Vues illimitees", included: true },
-      { text: "Tout Plan Pro inclus", included: true },
-      { text: "Gestion equipe (5 membres)", included: true },
-      { text: "Acces API complet", included: true },
-      { text: "Pages en marque blanche", included: true },
-      { text: "Support dedie 24/7", included: true },
-      { text: "Onboarding personnalise", included: true },
-      { text: "SLA garanti 99.9%", included: true },
-      { text: "Facturation entreprise", included: true },
-    ],
-    cta: "Contacter l equipe",
-    priceId: "business",
-  },
-]
+// UI par plan (icône, CTA, mise en avant) ; les DONNÉES viennent de lib/plans
+const PLAN_UI = {
+  free:     { icon: <Star size={20} />,     cta: "Plan actuel",                 ctaDisabled: true,  highlight: false, priceId: undefined },
+  starter:  { icon: <Zap size={20} />,      cta: "Commencer l essai gratuit",   ctaDisabled: false, highlight: true,  priceId: "starter"  },
+  pro:      { icon: <Sparkles size={20} />, cta: "Passer a Pro",                ctaDisabled: false, highlight: false, priceId: "pro"      },
+  business: { icon: <Crown size={20} />,    cta: "Contacter l equipe",          ctaDisabled: false, highlight: false, priceId: "business" },
+} as Record<string, any>
 
-const COMPARISON = [
-  { feature: "Pages", free: "1", starter: "3", pro: "Illimitees", business: "Illimitees" },
-  { feature: "Vues / mois", free: "500", starter: "5 000", pro: "50 000", business: "Illimitees" },
-  { feature: "QR codes", free: "Basique", starter: "Personnalise", pro: "Avance", business: "Avance" },
-  { feature: "Branding QRfolio", free: "Oui", starter: "Non", pro: "Non", business: "Non" },
-  { feature: "Domaine perso", free: "—", starter: "✓", pro: "✓", business: "✓" },
-  { feature: "Analytics", free: "De base", starter: "Standard", pro: "Avances + export", business: "Avances + export" },
-  { feature: "Templates", free: "6 gratuits", starter: "+4 Starter", pro: "Tous", business: "Tous" },
-  { feature: "Rapport IA", free: "—", starter: "—", pro: "✓", business: "✓" },
-  { feature: "Equipe", free: "—", starter: "—", pro: "—", business: "5 membres" },
-  { feature: "API", free: "—", starter: "—", pro: "—", business: "✓" },
-  { feature: "Support", free: "FAQ", starter: "Email", pro: "Prioritaire", business: "Dedie 24/7" },
-]
+const PLANS = PLAN_LIST.map(p => ({
+  id: p.id,
+  name: p.label,
+  price: { monthly: fmtPrice(p.priceMonthly), annual: fmtPrice(p.priceAnnual) },
+  color: p.color,
+  description: p.description,
+  badge: p.badge,
+  perks: p.perks,
+  ...PLAN_UI[p.id],
+}))
+
+const COMPARISON = PLAN_COMPARISON
 
 export default function UpgradePage() {
   const [currentPlan, setCurrentPlan] = useState("free")

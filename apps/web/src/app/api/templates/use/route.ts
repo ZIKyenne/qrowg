@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
+import { pageLimit } from "@/lib/plans"
 
 // Transforme un texte en slug valide : minuscules, accents retires,
 // tout ce qui n'est pas lettre/chiffre devient "-", + suffixe aleatoire.
@@ -45,14 +46,13 @@ export async function POST(req: NextRequest) {
       { cookies: { getAll: () => [], setAll: () => {} } }
     )
 
-    // Garde-fou plan : limite de pages (Free = 1, Starter = 3, Pro/Business = illimite)
-    const PAGE_LIMITS: Record<string, number | null> = { free: 1, starter: 3, pro: null, business: null }
+    // Garde-fou plan : limite de pages (cf. lib/plans)
     const { data: prof } = await supabaseAdmin.from("profiles").select("plan").eq("id", user.id).single()
-    const pageLimit = PAGE_LIMITS[(prof?.plan as string) || "free"] ?? null
-    if (pageLimit !== null) {
+    const limit = pageLimit(prof?.plan as string)
+    if (limit !== null) {
       const { count } = await supabaseAdmin.from("pages").select("id", { count: "exact", head: true }).eq("user_id", user.id)
-      if ((count ?? 0) >= pageLimit) {
-        return NextResponse.json({ error: "limit", limit: pageLimit, message: `Votre plan permet ${pageLimit} page${pageLimit > 1 ? "s" : ""}. Passez à un plan supérieur pour en créer plus.` }, { status: 403 })
+      if ((count ?? 0) >= limit) {
+        return NextResponse.json({ error: "limit", limit, message: `Votre plan permet ${limit} page${limit > 1 ? "s" : ""}. Passez à un plan supérieur pour en créer plus.` }, { status: 403 })
       }
     }
 
