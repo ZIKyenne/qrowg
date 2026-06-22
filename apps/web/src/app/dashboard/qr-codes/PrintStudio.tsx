@@ -598,7 +598,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [expDpi, setExpDpi]   = useState(300)
   const [expMarks, setExpMarks] = useState(false)
   const [mockOpen, setMockOpen] = useState(false)
-  const [mockEnv, setMockEnv] = useState<"wall" | "table" | "window" | "desk" | "cadre" | "counter">("wall")
+  const [mockEnv, setMockEnv] = useState<"wall" | "table" | "window" | "desk" | "cadre" | "counter" | "main" | "carte">("wall")
   const [mockUrl, setMockUrl] = useState("")
   const [mockBg, setMockBg] = useState("") // photo d'environnement (Unsplash) pour le mockup
   const [ctx, setCtx] = useState<{ x: number; y: number } | null>(null) // menu clic-droit
@@ -2270,6 +2270,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     wall: "white brick wall interior", table: "wooden cafe table top",
     window: "shop storefront window glass", desk: "modern wood office desk",
     cadre: "living room wall interior cozy", counter: "cafe bar counter wood",
+    main: "hand holding paper blurred background", carte: "wooden desk minimal flatlay",
   }
   // Precharge une photo representative par objectif pour les vignettes (galerie + etape "Choisir un design")
   useEffect(() => {
@@ -3640,6 +3641,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           desk:   { bg: "linear-gradient(180deg,#2c2c31,#191920)", transform: "perspective(1500px) rotateX(44deg) rotateZ(-3deg)", maxH: "56%" },
           cadre:  { bg: "linear-gradient(180deg,#e6ded2,#cdc4b4)", transform: "none", maxH: "70%", frame: true },
           counter:{ bg: "linear-gradient(180deg,#d9d2c6 0%,#cfc7b8 54%,#8d7f6a 54%,#6f6353 100%)", transform: "perspective(1400px) rotateX(38deg)", maxH: "58%" },
+          main:   { bg: "linear-gradient(180deg,#cdb3a0,#a98a73)", transform: "perspective(1500px) rotateX(14deg) rotateZ(-4deg)", maxH: "60%" },
+          carte:  { bg: "linear-gradient(160deg,#e8e2d6,#c9c0ad)", transform: "perspective(1500px) rotateX(50deg) rotateZ(2deg)", maxH: "40%" },
         }
         const s = scenes[mockEnv]
         return (
@@ -3649,7 +3652,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <button type="button" onClick={() => setMockOpen(false)} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 9, color: "#F5F0E8", cursor: "pointer" }}><X size={16} /></button>
             </div>
             <div style={{ display: "flex", gap: 8, justifyContent: "center", paddingBottom: 12 }}>
-              {([["wall", "Mur"], ["table", "Table"], ["window", "Vitrine"], ["desk", "Bureau"], ["cadre", "Cadre"], ["counter", "Comptoir"]] as const).map(([id, l]) => (
+              {([["wall", "Mur"], ["table", "Table"], ["window", "Vitrine"], ["desk", "Bureau"], ["cadre", "Cadre"], ["counter", "Comptoir"], ["main", "En main"], ["carte", "Carte de visite"]] as const).map(([id, l]) => (
                 <button key={id} type="button" onClick={() => setMockEnv(id)}
                   style={{ padding: "7px 16px", borderRadius: 9, cursor: "pointer", fontSize: 12, fontWeight: mockEnv === id ? 700 : 500, background: mockEnv === id ? "rgba(201,168,76,0.22)" : "rgba(255,255,255,0.08)", border: `1px solid ${mockEnv === id ? G : "rgba(255,255,255,0.16)"}`, color: mockEnv === id ? G : "#E8E6E0" }}>{l}</button>
               ))}
