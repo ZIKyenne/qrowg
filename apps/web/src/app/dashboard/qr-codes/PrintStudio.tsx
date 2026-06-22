@@ -319,6 +319,12 @@ const BG_PRESETS: { id: string; type: "solid" | "grad"; c1: string; c2?: string 
   { id: "fire",    type: "grad",  c1: "#F83600", c2: "#FE8C00" },
   { id: "forest",  type: "grad",  c1: "#134E5E", c2: "#71B280" },
   { id: "lavender",type: "grad",  c1: "#C9D6FF", c2: "#E2E2F0" },
+  { id: "midnight",type: "grad",  c1: "#0F2027", c2: "#2C5364" },
+  { id: "candy",   type: "grad",  c1: "#FF6FD8", c2: "#3813C2" },
+  { id: "coral",   type: "grad",  c1: "#FF512F", c2: "#DD2476" },
+  { id: "lime",    type: "grad",  c1: "#56AB2F", c2: "#A8E063" },
+  { id: "steel",   type: "grad",  c1: "#485563", c2: "#29323C" },
+  { id: "cream2",  type: "solid", c1: "#F3E9DC" },
 ]
 
 // Styles globaux : un clic recolore + retypographie tout le design
@@ -2103,7 +2109,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <div id="lib-cta" style={{ marginBottom: 16 }}>
                 <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Boutons CTA</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                  {["Scannez-moi", "Réservez", "Voir le menu", "Suivez-nous", "Commandez", "En savoir plus", "Laisser un avis", "Télécharger", "S'inscrire", "Nous trouver", "Profiter de l'offre", "Prendre RDV"].map(l => (
+                  {["Scannez-moi", "Réservez", "Voir le menu", "Suivez-nous", "Commandez", "En savoir plus", "Laisser un avis", "Télécharger", "S'inscrire", "Nous trouver", "Profiter de l'offre", "Prendre RDV", "Rejoignez-nous", "Contactez-nous", "Voir plus", "Profitez-en"].map(l => (
                     <button key={l} type="button" onClick={() => addCTA(l)}
                       style={{ width: "100%", padding: "11px 0", borderRadius: 22, border: "none", cursor: "pointer", background: "linear-gradient(90deg,#C9A84C,#b8953f)", color: "#080808", fontSize: 11.5, fontWeight: 800 }}>
                       {l}
@@ -2129,7 +2135,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Badges & rubans</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                   {([
-                    ["NOUVEAU", "ribbon"], ["-20%", "ribbon"], ["-50%", "ribbon"], ["PROMO", "seal"], ["TOP", "seal"], ["VIP", "seal"], ["GRATUIT", "ribbon"], ["EXCLU", "seal"], ["★★★★★", "ribbon"],
+                    ["NOUVEAU", "ribbon"], ["-20%", "ribbon"], ["-30%", "ribbon"], ["-50%", "ribbon"], ["PROMO", "seal"], ["TOP", "seal"], ["VIP", "seal"], ["GRATUIT", "ribbon"], ["OFFERT", "ribbon"], ["LIMITÉ", "ribbon"], ["EXCLU", "seal"], ["★★★★★", "ribbon"],
                   ] as const).map(([l, k]) => (
                     <button key={l} type="button" onClick={() => addBadge(l, k)}
                       style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 11px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, cursor: "pointer" }}>
