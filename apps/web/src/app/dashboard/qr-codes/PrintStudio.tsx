@@ -1725,9 +1725,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         fc.add(im); r()
       }, { crossOrigin: "anonymous" })
     })
+    // Fond dégradé riche (fallback quand pas de photo) sur une region
+    const gradBg = (rx: number, ry: number, rw: number, rh: number) => {
+      const r = new fabric.Rect({ left: rx, top: ry, width: rw, height: rh })
+      r.set("fill", new fabric.Gradient({ type: "linear", coords: { x1: 0, y1: 0, x2: rw, y2: rh }, colorStops: [{ offset: 0, color: accent }, { offset: 1, color: bg }] }))
+      fc.add(r)
+    }
     // Mise en page "photo" : image plein cadre + voile + titre haut + QR en coin (editorial)
     const photoLayout = async (title: string, subtitle: string, query: string) => {
-      const url = await fetchPhoto(query); if (url) await addCover(url, 0, 0, W, H)
+      const url = await fetchPhoto(query); if (url) await addCover(url, 0, 0, W, H); else gradBg(0, 0, W, H)
       const scrim = new fabric.Rect({ left: 0, top: 0, width: W, height: H })
       scrim.set("fill", new fabric.Gradient({ type: "linear", coords: { x1: 0, y1: 0, x2: 0, y2: H }, colorStops: [{ offset: 0, color: "rgba(0,0,0,0.58)" }, { offset: 0.38, color: "rgba(0,0,0,0.12)" }, { offset: 1, color: "rgba(0,0,0,0.45)" }] }))
       fc.add(scrim)
@@ -1740,7 +1746,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       const splitY = Math.round(H * 0.50)
       const url = await fetchPhoto(query)
       if (url) await addCover(url, 0, 0, W, splitY)
-      else fc.add(new fabric.Rect({ left: 0, top: 0, width: W, height: splitY, fill: accent }))
+      else gradBg(0, 0, W, splitY)
       fc.add(new fabric.Rect({ left: 0, top: splitY, width: W, height: H - splitY, fill: bg }))
       addText(title, H * 0.565, W * 0.072, { weight: "bold", role: "title" })
       addText(subtitle, H * 0.66, W * 0.032, { font: "Arial", role: "subtitle" })
@@ -1748,7 +1754,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     }
     // Mise en page "carte sur photo" : image plein cadre + carte blanche centrale (titre + QR)
     const photoCardLayout = async (title: string, subtitle: string, query: string) => {
-      const url = await fetchPhoto(query); if (url) await addCover(url, 0, 0, W, H)
+      const url = await fetchPhoto(query); if (url) await addCover(url, 0, 0, W, H); else gradBg(0, 0, W, H)
       const scrim = new fabric.Rect({ left: 0, top: 0, width: W, height: H, fill: "rgba(0,0,0,0.28)" })
       fc.add(scrim)
       const cw = Math.round(W * 0.76), ch = Math.round(H * 0.56)
