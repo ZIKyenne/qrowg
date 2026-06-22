@@ -1134,7 +1134,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // Ouvrir / fermer le flyout composants metier
   const openComp = () => { setCompOpen(v => !v); setTplOpen(false); setLibOpen(false); setSide(""); setPhotoOpen(false) }
   // Ouvrir / fermer le flyout recherche de photos
-  const openPhoto = () => { setPhotoOpen(v => !v); setTplOpen(false); setLibOpen(false); setSide(""); setCompOpen(false) }
+  const openPhoto = () => {
+    const opening = !photoOpen
+    setPhotoOpen(opening); setTplOpen(false); setLibOpen(false); setSide(""); setCompOpen(false)
+    if (opening && !photoResults.length && !photoLoading) searchPhotos("ambiance lifestyle")
+  }
   // Rechercher des photos (Unsplash, via notre route serveur)
   const searchPhotos = async (q: string) => {
     const term = q.trim(); if (!term) return
