@@ -3668,10 +3668,6 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             ) : (
               <input type="color" value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"} onChange={e => setFill(e.target.value)} style={swatch} title="Couleur" />
             )}
-            {SWATCHES.slice(0, 8).map(c => (
-              <button key={c} type="button" onClick={() => setFill(c)} title={c}
-                style={{ width: 18, height: 18, borderRadius: "50%", cursor: "pointer", background: c, border: sel.fill.toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.25)", padding: 0, flexShrink: 0 }} />
-            ))}
             </>)}
             <span style={{ width: 1, height: 20, background: "rgba(0,0,0,0.12)" }} />
             <button type="button" style={tb} title="Dupliquer" onClick={() => layer("dup")}><Copy size={14} /></button>
