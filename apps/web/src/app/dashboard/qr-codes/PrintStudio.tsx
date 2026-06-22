@@ -448,6 +448,9 @@ const GLOBAL_STYLES: { id: string; label: string; bg: string; ink: string; accen
   { id: "neon",        label: "Neon Creator",     bg: "#0A0A14", ink: "#EAEAFF", accent: "#FF3D9A", titleFont: "Bebas Neue",         bodyFont: "Poppins" },
   { id: "minimal",     label: "Minimal White",    bg: "#FFFFFF", ink: "#1A1A1A", accent: "#1A1A1A", titleFont: "Raleway",            bodyFont: "Arial" },
   { id: "premiumdark", label: "Premium Dark",     bg: "#101010", ink: "#F5F0E8", accent: "#C9A84C", titleFont: "Cormorant Garamond", bodyFont: "Montserrat" },
+  { id: "sunset",      label: "Bold Sunset",      bg: "#1A0E14", ink: "#FFE8D6", accent: "#FF7A4D", titleFont: "Bebas Neue",         bodyFont: "Poppins" },
+  { id: "sage",        label: "Sage Natural",     bg: "#F2F4EE", ink: "#2B3326", accent: "#6B8E5A", titleFont: "Lora",               bodyFont: "Raleway" },
+  { id: "editorial",   label: "Ink Editorial",    bg: "#FBFAF7", ink: "#1A1A1A", accent: "#1A1A1A", titleFont: "Playfair Display",   bodyFont: "Montserrat" },
 ]
 
 // Generateur par metier : metier -> objectifs (template + style + textes pre-remplis)
