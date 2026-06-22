@@ -455,7 +455,7 @@ const QR_DOTS: { k: string; label: string; icon: string }[] = [
 ]
 
 // Fonds prets a l'emploi (couleurs unies + degrades) — galerie visible
-const BG_PRESETS: { id: string; type: "solid" | "grad"; c1: string; c2?: string }[] = [
+const BG_PRESETS: { id: string; type: "solid" | "grad" | "mesh"; c1: string; c2?: string; c3?: string }[] = [
   { id: "white",   type: "solid", c1: "#FFFFFF" },
   { id: "cream",   type: "solid", c1: "#F6F1E7" },
   { id: "sand",    type: "solid", c1: "#EFE7D8" },
@@ -490,6 +490,12 @@ const BG_PRESETS: { id: string; type: "solid" | "grad"; c1: string; c2?: string 
   { id: "lime",    type: "grad",  c1: "#56AB2F", c2: "#A8E063" },
   { id: "steel",   type: "grad",  c1: "#485563", c2: "#29323C" },
   { id: "cream2",  type: "solid", c1: "#F3E9DC" },
+  { id: "aurora",  type: "mesh",  c1: "#6D3B8E", c2: "#3B2F6B", c3: "#140C28" },
+  { id: "oceanm",  type: "mesh",  c1: "#2E8FD0", c2: "#0E4C7A", c3: "#05192B" },
+  { id: "sunsetm", type: "mesh",  c1: "#F0A93B", c2: "#C0392B", c3: "#2A0A1E" },
+  { id: "emerm",   type: "mesh",  c1: "#46C2A8", c2: "#1E6F5C", c3: "#05201A" },
+  { id: "rosem",   type: "mesh",  c1: "#E89ABC", c2: "#B84C7A", c3: "#240A18" },
+  { id: "noirm",   type: "mesh",  c1: "#44444E", c2: "#1C1C24", c3: "#08080C" },
 ]
 
 // Styles globaux : un clic recolore + retypographie tout le design
@@ -1664,6 +1670,18 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     fc.setBackgroundColor(grad as unknown as string, fc.renderAll.bind(fc))
     pushHistorySoon()
   }
+  // Fond "mesh" : degrade radial 3 couleurs (look premium spotlight)
+  const applyMesh = (c1: string, c2: string, c3: string) => {
+    const fc = fcRef.current; if (!fc) return
+    const z = fc.getZoom() || 1, w = fc.getWidth() / z, h = fc.getHeight() / z
+    const grad = new fabric.Gradient({
+      type: "radial", gradientUnits: "pixels",
+      coords: { x1: w * 0.5, y1: h * 0.34, r1: 0, x2: w * 0.5, y2: h * 0.34, r2: Math.max(w, h) * 0.95 },
+      colorStops: [{ offset: 0, color: c1 }, { offset: 0.55, color: c2 }, { offset: 1, color: c3 }],
+    })
+    fc.setBackgroundColor(grad as unknown as string, fc.renderAll.bind(fc))
+    pushHistorySoon()
+  }
   const applyBg = (color: string) => {
     const fc = fcRef.current; if (!fc) return
     setBgColor(color)
@@ -1680,7 +1698,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const applyBgC2 = (c2: string) => { setBgC2(c2); if (bgGrad) applyGradient(bgColor, c2) }
   const applyBgPreset = (p: typeof BG_PRESETS[number]) => {
     const fc = fcRef.current; if (!fc) return
-    if (p.type === "grad" && p.c2) { setBgGrad(true); setBgColor(p.c1); setBgC2(p.c2); applyGradient(p.c1, p.c2) }
+    if (p.type === "mesh" && p.c2 && p.c3) { setBgGrad(false); setBgColor(p.c1); setBgC2(p.c3); applyMesh(p.c1, p.c2, p.c3) }
+    else if (p.type === "grad" && p.c2) { setBgGrad(true); setBgColor(p.c1); setBgC2(p.c2); applyGradient(p.c1, p.c2) }
     else { setBgGrad(false); setBgColor(p.c1); fc.setBackgroundColor(p.c1, fc.renderAll.bind(fc)); pushHistorySoon() }
   }
   // Synchronise les controles de fond avec l'etat reel du canvas (apres chargement / undo)
@@ -3041,7 +3060,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     const active = bgGrad ? (p.type === "grad" && bgColor === p.c1 && bgC2 === p.c2) : (p.type === "solid" && bgColor === p.c1)
                     return (
                       <button key={p.id} type="button" onClick={() => applyBgPreset(p)} title={p.id}
-                        style={{ width: "100%", aspectRatio: "1.3", borderRadius: 8, cursor: "pointer", border: `2px solid ${active ? G : "rgba(0,0,0,0.14)"}`, background: p.type === "grad" ? `linear-gradient(180deg, ${p.c1}, ${p.c2})` : p.c1, padding: 0 }} />
+                        style={{ width: "100%", aspectRatio: "1.3", borderRadius: 8, cursor: "pointer", border: `2px solid ${active ? G : "rgba(0,0,0,0.14)"}`, background: p.type === "mesh" ? `radial-gradient(circle at 50% 34%, ${p.c1}, ${p.c2} 55%, ${p.c3})` : p.type === "grad" ? `linear-gradient(180deg, ${p.c1}, ${p.c2})` : p.c1, padding: 0 }} />
                     )
                   })}
                 </div>
