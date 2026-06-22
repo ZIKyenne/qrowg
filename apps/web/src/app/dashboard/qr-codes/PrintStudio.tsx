@@ -1121,6 +1121,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         const tail = new fabric.Polygon([{ x: 0, y: 0 }, { x: 46, y: 0 }, { x: 8, y: 36 }], { fill: G, left: 38, top: 128 })
         o = new fabric.Group([r, tail]); break
       }
+      case "capsule": o = new fabric.Rect({ width: 250, height: 96, rx: 48, ry: 48, fill: G }); break
+      case "blob":    o = new fabric.Path("M120 18 C168 8 210 44 205 96 C200 150 158 188 104 182 C54 176 14 140 20 86 C25 42 60 26 120 18 Z", { fill: G }); break
+      case "wave":    o = new fabric.Path("M0 30 Q 50 0 100 30 T 200 30 L 200 110 L 0 110 Z", { fill: G }); break
       default:        o = new fabric.Rect({ width: 200, height: 120, fill: G })
     }
     centerObj(o)
@@ -2938,6 +2941,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     ["cross", "Croix",     <svg width="24" height="24" viewBox="0 0 24 24" key="s"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" fill={G} /></svg>],
                     ["tag", "Étiquette",   <svg width="30" height="20" viewBox="0 0 30 20" key="s"><polygon points="9,1 29,1 29,19 9,19 1,10" fill={G} /></svg>],
                     ["bubble", "Bulle",    <svg width="26" height="24" viewBox="0 0 26 24" key="s"><rect x="2" y="2" width="22" height="15" rx="4" fill={G} /><polygon points="6,16 14,16 6,23" fill={G} /></svg>],
+                    ["capsule", "Capsule", <svg width="30" height="16" viewBox="0 0 30 16" key="s"><rect x="1" y="1" width="28" height="14" rx="7" fill={G} /></svg>],
+                    ["blob", "Blob",       <svg width="24" height="24" viewBox="0 0 220 200" key="s"><path d="M120 18 C168 8 210 44 205 96 C200 150 158 188 104 182 C54 176 14 140 20 86 C25 42 60 26 120 18 Z" fill={G} /></svg>],
+                    ["wave", "Vague",      <svg width="28" height="18" viewBox="0 0 200 110" key="s"><path d="M0 30 Q 50 0 100 30 T 200 30 L 200 110 L 0 110 Z" fill={G} /></svg>],
                   ] as const).map(([k, label, prev]) => (
                     <button key={k} type="button" onClick={() => addShape(k)} title={label}
                       style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "10px 2px", background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: 9, cursor: "pointer" }}>
