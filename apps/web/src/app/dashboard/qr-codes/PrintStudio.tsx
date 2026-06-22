@@ -294,6 +294,10 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"wifi-bleu",     label:"Wifi — Bleu",        obj:"Wifi",     emoji:"📶", desc:"Réseau + mot de passe, scan",          bg:"#0C1322", ink:"#EAF1FB", accent:"#3B82F6" },
   { id:"fidelite-or",   label:"Fidélité — Doré",    obj:"Fidélité", emoji:"🎁", desc:"Tampons + offre + QR",                 bg:"#0E0D0B", ink:"#F4ECD8", accent:"#C9A84C" },
   { id:"fidelite-rouge",label:"Fidélité — Rouge",   obj:"Fidélité", emoji:"🎁", desc:"Tampons + offre + QR",                 bg:"#1A0E0C", ink:"#F8E8E0", accent:"#C0392B" },
+  // — Bespoke premium (calibrage qualité) —
+  { id:"avis-prestige", label:"Avis — Prestige",    obj:"Avis",     emoji:"⭐", desc:"Éditorial sombre & or, 5 étoiles, déco",   bg:"#0C0B08", ink:"#F4ECD8", accent:"#C9A84C" },
+  { id:"resto-ornate",  label:"Menu — Ornement",    obj:"Menu",     emoji:"🍽️", desc:"Cadre ornemental crème & bronze, chic",    bg:"#FBF6EC", ink:"#2A2419", accent:"#9A6E3A" },
+  { id:"insta-block",   label:"Instagram — Color-block", obj:"Abonnés", emoji:"📸", desc:"Bloc couleur + QR chevauchant, moderne", bg:"#140A1E", ink:"#FFFFFF", accent:"#E1306C" },
 ]
 
 // Secteurs d'activite -> objectifs pertinents (pour filtrer la galerie)
@@ -369,6 +373,52 @@ const OBJ_PHOTO_Q: Record<string, string> = {
 // Mini-apercu schematique d'un modele (fond + couleurs + disposition). photoUrl : vraie photo de fond (galerie)
 function tplThumb(t: { id: string; bg: string; ink: string; accent: string }, photoUrl?: string) {
   const photoBg = photoUrl ? `#222 url(${photoUrl}) center/cover no-repeat` : ""
+  // — Aperçus fidèles des templates bespoke premium —
+  if (t.id === "avis-prestige") {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: t.bg }}>
+        <div style={{ position: "absolute", top: "-12%", right: "-16%", width: "56%", aspectRatio: "1", borderRadius: "50%", background: t.accent, opacity: 0.16 }} />
+        <div style={{ position: "absolute", bottom: "-8%", left: "-10%", width: "28%", aspectRatio: "1", borderRadius: "50%", background: t.accent, opacity: 0.12 }} />
+        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "13%", gap: 4 }}>
+          <div style={{ color: t.accent, fontSize: 8, letterSpacing: 1, fontWeight: 700 }}>★ ★ ★ ★ ★</div>
+          <div style={{ height: 6, width: "60%", borderRadius: 3, background: t.ink, marginTop: 5 }} />
+          <div style={{ height: 6, width: "46%", borderRadius: 3, background: t.ink }} />
+          <div style={{ width: "34%", aspectRatio: "1", background: "#fff", borderRadius: 4, marginTop: "7%" }} />
+          <div style={{ marginTop: "7%", height: "9%", width: "50%", borderRadius: 20, background: t.accent }} />
+        </div>
+      </div>
+    )
+  }
+  if (t.id === "resto-ornate") {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: t.bg }}>
+        <div style={{ position: "absolute", inset: "5%", border: `1.5px solid ${t.accent}`, borderRadius: 2 }} />
+        <div style={{ position: "absolute", inset: "8%", border: `0.5px solid ${t.accent}`, opacity: 0.5 }} />
+        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "13%", gap: 4 }}>
+          <div style={{ fontSize: 13 }}>🍽️</div>
+          <div style={{ color: t.accent, fontSize: 6, letterSpacing: 2, fontWeight: 700, marginTop: 3 }}>LA CARTE</div>
+          <div style={{ height: 6, width: "48%", borderRadius: 3, background: t.ink, marginTop: 2 }} />
+          <div style={{ width: "26%", height: 2, background: t.accent, marginTop: 3, borderRadius: 2 }} />
+          <div style={{ width: "31%", aspectRatio: "1", background: "#fff", borderRadius: 3, marginTop: "6%", boxShadow: "0 1px 4px rgba(0,0,0,0.15)" }} />
+          <div style={{ marginTop: "6%", height: "8%", width: "44%", borderRadius: 20, background: t.accent }} />
+        </div>
+      </div>
+    )
+  }
+  if (t.id === "insta-block") {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: t.bg }}>
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "47%", background: `linear-gradient(135deg, ${t.accent}, ${t.accent}cc)` }} />
+        <div style={{ position: "absolute", top: "8%", left: 0, right: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+          <div style={{ fontSize: 12 }}>📸</div>
+          <div style={{ height: 6, width: "48%", borderRadius: 3, background: "#fff" }} />
+          <div style={{ height: 3, width: "36%", borderRadius: 2, background: "rgba(255,255,255,0.82)" }} />
+        </div>
+        <div style={{ position: "absolute", top: "37%", left: "34%", width: "32%", aspectRatio: "1", background: "#fff", borderRadius: 4, boxShadow: "0 2px 8px rgba(0,0,0,0.32)" }} />
+        <div style={{ position: "absolute", bottom: "9%", left: "27%", width: "46%", height: "8%", borderRadius: 20, background: t.accent }} />
+      </div>
+    )
+  }
   if (t.id.endsWith("-photo")) {
     return (
       <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: photoBg || `linear-gradient(135deg, ${t.accent}, ${t.bg})` }}>
@@ -2256,7 +2306,44 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       addText("Scannez à chaque passage", H * 0.90, W * 0.03, { font: "Arial", role: "subtitle" })
     }
 
+    // ===== Templates BESPOKE premium (compositions distinctes, calibrage qualité) =====
+    // A) Avis — Prestige : éditorial sombre/or, cercles décoratifs + 5 étoiles
+    const avisHero = async () => {
+      fc.add(new fabric.Circle({ radius: W * 0.46, fill: accent, opacity: 0.13, originX: "center", originY: "center", left: W * 0.96, top: H * 0.05 }))
+      fc.add(new fabric.Circle({ radius: W * 0.22, fill: accent, opacity: 0.10, originX: "center", originY: "center", left: W * 0.06, top: H * 0.92 }))
+      addText("★  AVIS GOOGLE  ★", H * 0.095, W * 0.034, { font: "Arial", weight: "bold", fill: accent, role: "subtitle" })
+      addStars(5, H * 0.17, W * 0.072, accent)
+      addText(name ? `Votre avis sur\n${name}` : "Votre avis\ncompte vraiment", H * 0.225, W * 0.092, { weight: "bold", role: "title" })
+      addText("Partagez votre expérience en 30 secondes", H * 0.41, W * 0.032, { font: "Arial", role: "subtitle" })
+      await placeQrT(H * 0.48, 0.40)
+      addCTA("Laisser un avis", H * 0.87)
+    }
+    // B) Menu — Ornement : crème/bronze, double cadre ornemental + emoji + filet
+    const restoOrnate = async () => {
+      fc.add(new fabric.Rect({ left: W * 0.045, top: H * 0.045, width: W * 0.91, height: H * 0.91, fill: "transparent", stroke: accent, strokeWidth: Math.max(2, Math.round(W * 0.004)), strokeUniform: true }))
+      fc.add(new fabric.Rect({ left: W * 0.07, top: H * 0.07, width: W * 0.86, height: H * 0.86, fill: "transparent", stroke: accent, strokeWidth: 1, strokeUniform: true, opacity: 0.55 }))
+      addText("🍽", H * 0.115, W * 0.08, { keepColor: true })
+      addText("L A   C A R T E", H * 0.235, W * 0.03, { font: "Arial", weight: "bold", fill: accent, role: "subtitle" })
+      addText(name || "Notre Menu", H * 0.275, W * 0.082, { weight: "bold", role: "title" })
+      rule(H * 0.40)
+      addText("Découvrez nos plats & suggestions du jour", H * 0.43, W * 0.03, { font: "Arial", role: "subtitle" })
+      await placeQrT(H * 0.50, 0.38)
+      addCTA("Voir le menu", H * 0.85)
+    }
+    // C) Instagram — Color-block : bloc couleur haut + QR chevauchant la limite
+    const instaBlock = async () => {
+      fc.add(new fabric.Rect({ left: 0, top: 0, width: W, height: Math.round(H * 0.47), fill: accent }))
+      addText("📸", H * 0.06, W * 0.07, { keepColor: true })
+      addText(name ? `@${name.toLowerCase().replace(/\s+/g, "")}` : "@votre_compte", H * 0.17, W * 0.062, { weight: "bold", fill: readableOn(accent), keepColor: true, role: "title" })
+      addText("Suivez-nous sur Instagram", H * 0.265, W * 0.034, { font: "Arial", fill: readableOn(accent), keepColor: true, role: "subtitle" })
+      await placeQrT(H * 0.36, 0.40)
+      addCTA("S'abonner", H * 0.88)
+    }
+
     switch (id) {
+      case "avis-prestige": await avisHero(); break
+      case "resto-ornate": await restoOrnate(); break
+      case "insta-block": await instaBlock(); break
       case "wifi-or": case "wifi-vert": case "wifi-bleu": await wifiLayout(); break
       case "fidelite-or": case "fidelite-rouge": await loyaltyLayout(); break
       case "avis-or":
