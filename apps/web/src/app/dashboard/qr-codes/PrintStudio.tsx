@@ -847,6 +847,31 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       }
     } catch { /* noop */ } finally { setQrBusy(false) }
   }
+  // Redimensionne le QR ET sa carte ensemble (concentriques), centre conserve
+  const scaleQrBy = (factor: number) => {
+    const fc = fcRef.current; if (!fc) return
+    const img = fc.getObjects().find(o => (o as any).isQR)
+    const card = fc.getObjects().find(o => (o as any).isQrCard)
+    if (!img) return
+    const center = img.getCenterPoint()
+    ;[card, img].forEach(o => {
+      if (!o) return
+      o.scaleX = (o.scaleX ?? 1) * factor; o.scaleY = (o.scaleY ?? 1) * factor
+      o.setCoords(); o.setPositionByOrigin(center, "center", "center"); o.setCoords()
+    })
+    fc.requestRenderAll(); pushHistorySoon()
+  }
+  // Ajuste la marge blanche : on redimensionne seulement la carte autour du QR
+  const adjustQrMargin = (factor: number) => {
+    const fc = fcRef.current; if (!fc) return
+    const img = fc.getObjects().find(o => (o as any).isQR)
+    const card = fc.getObjects().find(o => (o as any).isQrCard)
+    if (!card || !img) return
+    const center = img.getCenterPoint()
+    card.scaleX = (card.scaleX ?? 1) * factor; card.scaleY = (card.scaleY ?? 1) * factor
+    card.setCoords(); card.setPositionByOrigin(center, "center", "center"); card.setCoords()
+    fc.requestRenderAll(); pushHistorySoon()
+  }
   // Repartir d'une page vierge : on retire tout (sauf guides) et on replace le QR
   const resetCanvas = () => {
     const fc = fcRef.current; if (!fc) return
@@ -2767,6 +2792,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                       style={{ ...tb, fontSize: 13, color: qrDot === d.k ? G : INK, opacity: qrBusy ? 0.5 : 1 }}>{d.icon}</button>
                   ))}
                   {qrBusy && <Loader2 size={13} style={{ animation: "spin 0.8s linear infinite", color: G }} />}
+                  <span style={{ width: 1, height: 20, background: "rgba(255,255,255,0.12)" }} />
+                  <button type="button" style={tb} title="Réduire le QR" onClick={() => scaleQrBy(0.9)}>QR−</button>
+                  <button type="button" style={tb} title="Agrandir le QR" onClick={() => scaleQrBy(1.1)}>QR+</button>
+                  <button type="button" style={tb} title="Moins de marge blanche" onClick={() => adjustQrMargin(0.94)}>▫−</button>
+                  <button type="button" style={tb} title="Plus de marge blanche" onClick={() => adjustQrMargin(1.06)}>▫+</button>
                 </>
               ) : (
                 <span style={{ color: MUTED, fontSize: 10.5 }}>QR — glisse les poignées pour redimensionner</span>
