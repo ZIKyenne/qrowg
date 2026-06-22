@@ -2500,6 +2500,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {/* Rail outils */}
         {wizard === 0 && (
         <div className="qr-scroll" style={{ width: 76, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", padding: "10px 8px", display: "flex", flexDirection: "column", gap: 6, background: SURFACE, overflowY: "auto" }}>
+          <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 2px" }}>Créer</p>
           <button type="button" onClick={() => { setTplOpen(v => !v); setLibOpen(false); setSide(""); setCompOpen(false); setPhotoOpen(false); setWizard(0) }}
             style={{ ...btnTool, background: tplOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.14),rgba(201,168,76,0.05))", border: `1px solid ${tplOpen ? G : "rgba(201,168,76,0.3)"}`, color: tplOpen ? G : INK, fontWeight: 700 }}>
             <LayoutTemplate size={16} /> Modèles
@@ -2508,7 +2509,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             style={{ ...btnTool, background: compOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.12),rgba(201,168,76,0.04))", border: `1px solid ${compOpen ? G : "rgba(201,168,76,0.3)"}`, color: compOpen ? G : INK, fontWeight: 700 }}>
             <Sparkles size={16} /> Ajouter
           </button>
-          <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "6px 0 2px" }}>Ajouter</p>
+          <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "6px 0 2px" }}>Éléments</p>
           {(([
             ["text", "Texte", <TypeIcon size={16} key="i" />],
             ["shapes", "Formes", <Shapes size={16} key="i" />],
@@ -2541,6 +2542,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             )
           })}
           <div style={{ flex: 1 }} />
+          <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "2px 0" }}>Modifier</p>
           <button type="button" onClick={() => openSide("styles")}
             style={{ ...btnTool, background: side === "styles" ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${side === "styles" ? G : "rgba(0,0,0,0.07)"}`, color: side === "styles" ? G : INK }}>
             <Palette size={16} /> Styles
