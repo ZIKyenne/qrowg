@@ -597,6 +597,16 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     fc.on("selection:updated", () => { refreshSel(); setShowAdvanced(false) })
     fc.on("selection:cleared", () => { setSel(null); setShowAdvanced(false) })
 
+    // Double-clic sur une zone vide = ajouter un texte (reflexe type Canva)
+    fc.on("mouse:dblclick", (e) => {
+      if (e.target) return
+      const p = (e as any).absolutePointer || fc.getPointer(e.e)
+      const t = new fabric.IText("Votre texte", { left: p.x, top: p.y, originX: "center", originY: "center", fontFamily: "Georgia", fontWeight: "bold", fontSize: 38, fill: INK })
+      fc.add(t); fc.setActiveObject(t)
+      t.enterEditing(); t.selectAll()
+      fc.requestRenderAll(); refreshSel()
+    })
+
     // Historique : capter ajout / suppression / modification (drag, scale, rotate)
     fc.on("object:added", () => { pushHistory(); setLayersVer(v => v + 1) })
     fc.on("object:removed", () => { pushHistory(); setLayersVer(v => v + 1) })
