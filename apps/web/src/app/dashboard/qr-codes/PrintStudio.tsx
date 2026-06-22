@@ -1456,6 +1456,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     }
     o.set("shadow", P[kind]); o.dirty = true
   })
+  // Transformations : rotation par pas + inclinaison (skew)
+  const rotateBy = (deg: number) => mutate(o => { o.set("angle", (((o.angle ?? 0) + deg) % 360 + 360) % 360); o.setCoords() })
+  const skewBy = (axis: "x" | "y", d: number) => mutate(o => {
+    const k = axis === "x" ? "skewX" : "skewY"
+    o.set(k, Math.max(-60, Math.min(60, ((o as any)[k] ?? 0) + d))); o.setCoords()
+  })
+  const resetTransform = () => mutate(o => { o.set({ angle: 0, skewX: 0, skewY: 0 }); o.setCoords() })
   // Glow / Neon : halo colore (ombre sans decalage), base sur la couleur de l'element
   const setGlow = (kind: "soft" | "neon" | "off") => mutate(o => {
     if (kind === "off") { o.set("shadow", null); o.dirty = true; return }
@@ -3355,6 +3362,23 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 <div style={{ display: "flex", gap: 6 }}>
                   <button type="button" onClick={() => setGlow("soft")} style={{ ...layerBtn, flex: 1 }}>✨ Glow</button>
                   <button type="button" onClick={() => setGlow("neon")} style={{ ...layerBtn, flex: 1 }}>💡 Néon</button>
+                </div>
+              </div>
+
+              {/* Transformer : rotation + inclinaison */}
+              <div>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>Transformer</p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 5, marginBottom: 6 }}>
+                  <button type="button" title="Rotation −90°" onClick={() => rotateBy(-90)} style={{ ...layerBtn }}>⟲</button>
+                  <button type="button" title="Rotation +90°" onClick={() => rotateBy(90)} style={{ ...layerBtn }}>⟳</button>
+                  <button type="button" title="Rotation 180°" onClick={() => rotateBy(180)} style={{ ...layerBtn, fontSize: 9.5 }}>180°</button>
+                  <button type="button" title="Réinitialiser" onClick={resetTransform} style={{ ...layerBtn, fontSize: 9.5 }}>Reset</button>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 5 }}>
+                  <button type="button" title="Incliner ← (H)" onClick={() => skewBy("x", -8)} style={{ ...layerBtn, fontSize: 11 }}>⇤</button>
+                  <button type="button" title="Incliner → (H)" onClick={() => skewBy("x", 8)} style={{ ...layerBtn, fontSize: 11 }}>⇥</button>
+                  <button type="button" title="Incliner ↑ (V)" onClick={() => skewBy("y", -8)} style={{ ...layerBtn, fontSize: 11 }}>⤒</button>
+                  <button type="button" title="Incliner ↓ (V)" onClick={() => skewBy("y", 8)} style={{ ...layerBtn, fontSize: 11 }}>⤓</button>
                 </div>
               </div>
 
