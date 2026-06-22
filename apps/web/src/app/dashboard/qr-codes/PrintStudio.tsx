@@ -530,6 +530,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [mockOpen, setMockOpen] = useState(false)
   const [mockEnv, setMockEnv] = useState<"wall" | "table" | "window" | "desk" | "cadre" | "counter">("wall")
   const [mockUrl, setMockUrl] = useState("")
+  const [mockBg, setMockBg] = useState("") // photo d'environnement (Unsplash) pour le mockup
   const [ctx, setCtx] = useState<{ x: number; y: number } | null>(null) // menu clic-droit
   const [showAdvanced, setShowAdvanced] = useState(false) // panneau de reglages avances (progressive disclosure)
   const [libOpen, setLibOpen] = useState(false)
@@ -1988,6 +1989,23 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const url = withBaseZoom(fc, base => fc.toDataURL({ format: "png", multiplier: Math.min(2, 1000 / base.w) }))
     setMockUrl(url); setMockOpen(true)
   }
+  // Decor reel (Unsplash) pour le mockup, selon l'environnement choisi
+  const SCENE_Q: Record<string, string> = {
+    wall: "white brick wall interior", table: "wooden cafe table top",
+    window: "shop storefront window glass", desk: "modern wood office desk",
+    cadre: "living room wall interior cozy", counter: "cafe bar counter wood",
+  }
+  useEffect(() => {
+    if (!mockOpen) return
+    let cancelled = false
+    setMockBg("")
+    fetch(`/api/unsplash?q=${encodeURIComponent(SCENE_Q[mockEnv] || "interior")}&orientation=landscape`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => { if (!cancelled) setMockBg(d?.photos?.[0]?.regular || "") })
+      .catch(() => {})
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mockOpen, mockEnv])
 
   // ---- Export pro (DPI + format + traits de coupe / fond perdu) -------------
   const targetWidth = () => Math.round(FORMATS[format].exportW * (expDpi / 300))
@@ -3228,7 +3246,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   style={{ padding: "7px 16px", borderRadius: 9, cursor: "pointer", fontSize: 12, fontWeight: mockEnv === id ? 700 : 500, background: mockEnv === id ? "rgba(201,168,76,0.22)" : "rgba(255,255,255,0.08)", border: `1px solid ${mockEnv === id ? G : "rgba(255,255,255,0.16)"}`, color: mockEnv === id ? G : "#E8E6E0" }}>{l}</button>
               ))}
             </div>
-            <div style={{ flex: 1, margin: "0 16px 16px", borderRadius: 16, overflow: "hidden", position: "relative", background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", perspective: "1400px" }}>
+            <div style={{ flex: 1, margin: "0 16px 16px", borderRadius: 16, overflow: "hidden", position: "relative", background: mockBg ? `#222 url(${mockBg}) center/cover no-repeat` : s.bg, display: "flex", alignItems: "center", justifyContent: "center", perspective: "1400px" }}>
               {/* vignette : profondeur photo (bords assombris) */}
               <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(120% 95% at 50% 38%, transparent 52%, rgba(0,0,0,0.32) 100%)" }} />
               {mockUrl && (s.frame
