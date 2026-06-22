@@ -2309,10 +2309,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // UI
   // ==========================================================================
   const btnTool = {
-    display: "flex", flexDirection: "column" as const, alignItems: "center", gap: 3,
-    width: "100%", padding: "8px 2px", background: "rgba(0,0,0,0.03)",
-    border: "1px solid rgba(0,0,0,0.07)", borderRadius: 9, color: INK,
-    fontSize: 8.5, cursor: "pointer",
+    display: "flex", flexDirection: "column" as const, alignItems: "center", gap: 4,
+    width: "100%", padding: "10px 2px", background: "rgba(0,0,0,0.03)",
+    border: "1px solid rgba(0,0,0,0.07)", borderRadius: 10, color: INK,
+    fontSize: 10, fontWeight: 600, cursor: "pointer",
   }
   const topBtn = (primary = false) => ({
     display: "flex", alignItems: "center", gap: 6, padding: "8px 13px",
@@ -2383,7 +2383,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         .ps-root button:active:not(:disabled) { transform: scale(0.96); }
         .ps-root input, .ps-root select { transition: border-color .14s ease, box-shadow .14s ease; }
         .ps-root input:focus, .ps-root select:focus { border-color: ${G} !important; box-shadow: 0 0 0 2px rgba(201,168,76,0.18); }
-        .ps-fly { animation: psSlide .18s cubic-bezier(.2,.8,.2,1); position: absolute; top: 0; bottom: 0; left: 76px; z-index: 30; box-shadow: 8px 0 28px rgba(0,0,0,0.08); }
+        .ps-fly { animation: psSlide .18s cubic-bezier(.2,.8,.2,1); position: absolute; top: 0; bottom: 0; left: 92px; z-index: 30; box-shadow: 8px 0 28px rgba(0,0,0,0.08); }
         .ps-fly-right { left: auto !important; right: 0 !important; box-shadow: -8px 0 28px rgba(0,0,0,0.08) !important; }
         .ps-pop { animation: psPop .18s cubic-bezier(.2,.8,.2,1); }
         .ps-goal { transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease; animation: psRise .34s cubic-bezier(.2,.8,.2,1) both; }
@@ -2584,7 +2584,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Rail outils */}
         {wizard === 0 && (
-        <div className="qr-scroll" style={{ width: 76, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", padding: "10px 8px", display: "flex", flexDirection: "column", gap: 6, background: SURFACE, overflowY: "auto" }}>
+        <div className="qr-scroll" style={{ width: 92, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", padding: "10px 9px", display: "flex", flexDirection: "column", gap: 6, background: SURFACE, overflowY: "auto" }}>
           <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 2px" }}>Créer</p>
           <button type="button" onClick={() => { setTplOpen(v => !v); setLibOpen(false); setSide(""); setCompOpen(false); setPhotoOpen(false); setWizard(0) }}
             style={{ ...btnTool, background: tplOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.14),rgba(201,168,76,0.05))", border: `1px solid ${tplOpen ? G : "rgba(201,168,76,0.3)"}`, color: tplOpen ? G : INK, fontWeight: 700 }}>
