@@ -247,6 +247,17 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"decouvrir-ornate",label:"Découvrir — Orné", obj:"Page",     emoji:"🔗", desc:"Ornements dorés, crème",               bg:"#FBF6EC", ink:"#2A2419", accent:"#B8860B" },
 ]
 
+// Secteurs d'activite -> objectifs pertinents (pour filtrer la galerie)
+const SECTORS: { id: string; label: string; emoji: string; objs: string[] }[] = [
+  { id: "resto",   label: "Restaurant",  emoji: "🍽️", objs: ["Menu", "Réserver", "Avis", "Page"] },
+  { id: "bar",     label: "Bar / Café",  emoji: "🍸", objs: ["Menu", "Réserver", "Abonnés", "Page"] },
+  { id: "commerce",label: "Commerce",    emoji: "🛍️", objs: ["Avis", "Abonnés", "Contact", "Page"] },
+  { id: "immo",    label: "Immobilier",  emoji: "🏠", objs: ["Contact", "Réserver", "Page"] },
+  { id: "airbnb",  label: "Airbnb",      emoji: "🛏️", objs: ["Contact", "Avis", "Réserver", "Page"] },
+  { id: "event",   label: "Événement",   emoji: "🎉", objs: ["Réserver", "Abonnés", "Page"] },
+  { id: "createur",label: "Créateur",    emoji: "🎨", objs: ["Abonnés", "Contact", "Avis", "Page"] },
+]
+
 // Mini-apercu schematique d'un modele (fond + couleurs + disposition)
 function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
   const isMenu = t.id.startsWith("menu") || t.id.endsWith("-band")
@@ -428,6 +439,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [libCat, setLibCat]   = useState<"text" | "shapes" | "lines" | "frames" | "cta" | "icons" | "badges" | "arrows" | "deco">("text")
   const [tplOpen, setTplOpen] = useState(false)
   const [tplSearch, setTplSearch] = useState("")
+  const [tplSector, setTplSector] = useState("")
   const [showHelp, setShowHelp] = useState(false)
   const [hintOff, setHintOff] = useState(false)
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
@@ -2042,9 +2054,23 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             <div style={{ padding: "10px 12px 0", flexShrink: 0 }}>
               <input value={tplSearch} onChange={e => setTplSearch(e.target.value)} placeholder="Rechercher un modèle…"
                 style={{ width: "100%", background: BG, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "8px 10px", color: INK, fontSize: 11, outline: "none", boxSizing: "border-box" }} />
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 9 }}>
+                {[{ id: "", label: "Tous", emoji: "✨" }, ...SECTORS].map(s => {
+                  const on = tplSector === s.id
+                  return (
+                    <button key={s.id} type="button" onClick={() => setTplSector(s.id)} title={s.label}
+                      style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 9px", borderRadius: 999, cursor: "pointer", fontSize: 10.5, fontWeight: on ? 700 : 500, background: on ? "rgba(201,168,76,0.18)" : "rgba(255,255,255,0.04)", border: `1px solid ${on ? G : "rgba(255,255,255,0.1)"}`, color: on ? G : INK }}>
+                      <span>{s.emoji}</span>{s.label}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
             <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "10px 10px 16px" }}>
-              {["Avis", "Menu", "Réserver", "Abonnés", "Contact", "Page"].map(obj => {
+              {(() => {
+                const sectorObjs = SECTORS.find(s => s.id === tplSector)?.objs ?? null
+                const visibleObjs = ["Avis", "Menu", "Réserver", "Abonnés", "Contact", "Page"].filter(o => !sectorObjs || sectorObjs.includes(o))
+                return visibleObjs.map(obj => {
                 const q = tplSearch.trim().toLowerCase()
                 const items = PRINT_TEMPLATES.filter(t => t.obj === obj && (!q || t.label.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q) || obj.toLowerCase().includes(q)))
                 if (!items.length) return null
@@ -2062,7 +2088,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     </div>
                   </div>
                 )
-              })}
+              })
+              })()}
               <button type="button" onClick={resetCanvas}
                 style={{ width: "100%", marginTop: 8, padding: "9px 10px", background: "rgba(255,255,255,0.04)", border: "1px dashed rgba(255,255,255,0.18)", borderRadius: 9, color: INK, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
                 ＋ Page vierge (repartir de zéro)
