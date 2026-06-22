@@ -1128,7 +1128,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const addShape = (k: string) => {
     let o: fabric.Object
     switch (k) {
+      case "rect":    o = new fabric.Rect({ width: 220, height: 140, fill: G }); break
+      case "square":  o = new fabric.Rect({ width: 150, height: 150, fill: G }); break
       case "rrect":   o = new fabric.Rect({ width: 220, height: 130, rx: 18, ry: 18, fill: G }); break
+      case "ticket": {
+        const base = new fabric.Rect({ width: 280, height: 130, rx: 12, ry: 12, fill: G })
+        const perf = new fabric.Line([196, 10, 196, 120], { stroke: "rgba(255,255,255,0.65)", strokeWidth: 3, strokeDashArray: [6, 6] })
+        o = new fabric.Group([base, perf]); break
+      }
+      case "ribbon":  o = new fabric.Polygon([{ x: 0, y: 0 }, { x: 300, y: 0 }, { x: 268, y: 35 }, { x: 300, y: 70 }, { x: 0, y: 70 }, { x: 32, y: 35 }], { fill: G }); break
       case "circle":  o = new fabric.Circle({ radius: 75, fill: G }); break
       case "tri":     o = new fabric.Triangle({ width: 160, height: 140, fill: G }); break
       case "star":    o = new fabric.Polygon(starPts(5, 85, 36), { fill: G }); break
@@ -1553,6 +1561,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     else if (kind === "stripes") { ctx.beginPath(); ctx.moveTo(-4, 22); ctx.lineTo(22, -4); ctx.moveTo(6, 26); ctx.lineTo(26, 6); ctx.stroke() }
     else { ctx.strokeRect(0, 0, 22, 22) }
     o.set("fill", new fabric.Pattern({ source: pc, repeat: "repeat" }) as unknown as string); o.dirty = true
+  })
+  // Contour seul (forme "creuse") : remplissage transparent + bordure de la couleur courante
+  const makeOutline = () => mutate(o => {
+    const cur = typeof o.fill === "string" && /^#/.test(o.fill) ? o.fill : (typeof o.stroke === "string" ? o.stroke : G)
+    o.set({ fill: "transparent", stroke: cur, strokeWidth: (o.strokeWidth ?? 0) > 0 ? o.strokeWidth : 5, strokeUniform: true })
+    o.dirty = true
   })
   // Pinceau de format : copier/coller le style d'un element a l'autre
   const copyStyle = () => {
@@ -3085,7 +3099,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Formes</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
                   {([
-                    ["rrect", "Rectangle", <svg width="30" height="22" key="s"><rect x="2" y="3" width="26" height="16" rx="4" fill={G} /></svg>],
+                    ["rect", "Rectangle",  <svg width="30" height="22" key="s"><rect x="2" y="3" width="26" height="16" fill={G} /></svg>],
+                    ["square", "Carré",    <svg width="24" height="24" key="s"><rect x="3" y="3" width="18" height="18" fill={G} /></svg>],
+                    ["rrect", "Arrondi",   <svg width="30" height="22" key="s"><rect x="2" y="3" width="26" height="16" rx="6" fill={G} /></svg>],
                     ["circle", "Cercle",   <svg width="24" height="24" key="s"><circle cx="12" cy="12" r="10" fill={G} /></svg>],
                     ["tri", "Triangle",    <svg width="26" height="24" key="s"><polygon points="13,2 24,22 2,22" fill={G} /></svg>],
                     ["star", "Étoile",     <svg width="24" height="24" viewBox="0 0 24 24" key="s"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill={G} /></svg>],
@@ -3102,6 +3118,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     ["capsule", "Capsule", <svg width="30" height="16" viewBox="0 0 30 16" key="s"><rect x="1" y="1" width="28" height="14" rx="7" fill={G} /></svg>],
                     ["blob", "Blob",       <svg width="24" height="24" viewBox="0 0 220 200" key="s"><path d="M120 18 C168 8 210 44 205 96 C200 150 158 188 104 182 C54 176 14 140 20 86 C25 42 60 26 120 18 Z" fill={G} /></svg>],
                     ["wave", "Vague",      <svg width="28" height="18" viewBox="0 0 200 110" key="s"><path d="M0 30 Q 50 0 100 30 T 200 30 L 200 110 L 0 110 Z" fill={G} /></svg>],
+                    ["ticket", "Ticket",   <svg width="30" height="18" viewBox="0 0 30 18" key="s"><rect x="1" y="2" width="28" height="14" rx="3" fill={G} /><line x1="21" y1="3" x2="21" y2="15" stroke="#fff" strokeWidth="1.4" strokeDasharray="2 2" /></svg>],
+                    ["ribbon", "Ruban",    <svg width="30" height="16" viewBox="0 0 30 16" key="s"><polygon points="0,1 30,1 26,8 30,15 0,15 4,8" fill={G} /></svg>],
                   ] as const).map(([k, label, prev]) => (
                     <button key={k} type="button" onClick={() => addShape(k)} title={label}
                       style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "10px 2px", background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: 9, cursor: "pointer" }}>
@@ -3423,6 +3441,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <button type="button" onClick={() => setPatternFill("stripes")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Rayures</button>
                   <button type="button" onClick={() => setPatternFill("grid")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Grille</button>
                 </div>
+                <button type="button" onClick={makeOutline} style={{ ...layerBtn, width: "100%", fontSize: 9.5, marginBottom: 12 }} title="Forme creuse : contour seul, remplissage transparent">◯ Contour seul (creuse)</button>
 
                 {/* Bordure / contour */}
                 <button type="button" onClick={() => setBorder(!sel.border)}
