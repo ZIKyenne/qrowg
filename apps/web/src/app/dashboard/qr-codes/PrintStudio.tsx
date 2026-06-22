@@ -1919,6 +1919,23 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     else if (p.type === "grad" && p.c2) { setBgGrad(true); setBgColor(p.c1); setBgC2(p.c2); applyGradient(p.c1, p.c2) }
     else { setBgGrad(false); setBgColor(p.c1); fc.setBackgroundColor(p.c1, fc.renderAll.bind(fc)); pushHistorySoon() }
   }
+  // Motif / texture de fond (sur la couleur de fond courante) — subtil, type papier premium
+  const applyBgPattern = (kind: "dots" | "stripes" | "grid" | "cross") => {
+    const fc = fcRef.current; if (!fc || typeof document === "undefined") return
+    const base = /^#/.test(bgColor) ? bgColor : "#FFFFFF"
+    const motif = lum(base) > 0.6 ? "rgba(0,0,0,0.09)" : "rgba(255,255,255,0.11)"
+    const pc = document.createElement("canvas"); pc.width = 26; pc.height = 26
+    const ctx = pc.getContext("2d"); if (!ctx) return
+    ctx.fillStyle = base; ctx.fillRect(0, 0, 26, 26)
+    ctx.fillStyle = motif; ctx.strokeStyle = motif; ctx.lineWidth = 2
+    if (kind === "dots") { ctx.beginPath(); ctx.arc(13, 13, 3, 0, Math.PI * 2); ctx.fill() }
+    else if (kind === "stripes") { ctx.beginPath(); ctx.moveTo(-4, 26); ctx.lineTo(26, -4); ctx.moveTo(8, 30); ctx.lineTo(30, 8); ctx.stroke() }
+    else if (kind === "grid") { ctx.strokeRect(0, 0, 26, 26) }
+    else { ctx.beginPath(); ctx.moveTo(13, 8); ctx.lineTo(13, 18); ctx.moveTo(8, 13); ctx.lineTo(18, 13); ctx.stroke() }
+    setBgGrad(false)
+    fc.setBackgroundColor(new fabric.Pattern({ source: pc, repeat: "repeat" }) as unknown as string, fc.renderAll.bind(fc))
+    pushHistorySoon()
+  }
   // Synchronise les controles de fond avec l'etat reel du canvas (apres chargement / undo)
   const syncBgFromCanvas = (fc: fabric.Canvas) => {
     const bg = fc.backgroundColor as unknown as { colorStops?: { color: string }[] } | string
@@ -3336,6 +3353,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                         style={{ width: "100%", aspectRatio: "1.3", borderRadius: 8, cursor: "pointer", border: `2px solid ${active ? G : "rgba(0,0,0,0.14)"}`, background: p.type === "mesh" ? `radial-gradient(circle at 50% 34%, ${p.c1}, ${p.c2} 55%, ${p.c3})` : p.type === "grad" ? `linear-gradient(180deg, ${p.c1}, ${p.c2})` : p.c1, padding: 0 }} />
                     )
                   })}
+                </div>
+                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>Texture / motif</p>
+                <div style={{ display: "flex", gap: 5, marginBottom: 12 }}>
+                  {([["dots", "Points"], ["stripes", "Rayures"], ["grid", "Grille"], ["cross", "Croix"]] as const).map(([k, label]) => (
+                    <button key={k} type="button" onClick={() => applyBgPattern(k)} style={{ ...layerBtn, flex: 1, fontSize: 9 }}>{label}</button>
+                  ))}
                 </div>
                 <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>Couleur personnalisée</p>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
