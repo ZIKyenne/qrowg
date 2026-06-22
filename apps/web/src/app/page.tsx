@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
+import { PLAN_LIST, fmtPrice } from "@/lib/plans"
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function useInView(threshold = 0.15) {
@@ -456,71 +457,28 @@ function FeaturesSection() {
 
 
 // ── Pricing card ──────────────────────────────────────────────────────────────
-const PLANS = [
-  {
-    id: "free",
-    name: "Free",
-    tagline: "Pour tester QRfolio",
-    price: "0",
-    period: "",
-    highlight: false,
-    badge: null,
-    color: "#8A8478",
-    cta: "Commencer gratuitement",
-    ctaHref: "/auth/signup",
-    features: [
-      { text: "1 page active",             ok: true  },
-      { text: "500 vues / mois",           ok: true  },
-      { text: "QR code basique",           ok: true  },
-      { text: "Analytics simples",         ok: true  },
-      { text: "Branding QRfolio",          ok: false },
-      { text: "Domaine personnalise",      ok: false },
-    ],
-    note: null,
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    tagline: "Pour les independants et commerces",
-    price: "9,90",
-    period: "/ mois",
-    highlight: true,
-    badge: "Le plus populaire",
-    color: "#C9A84C",
-    cta: "Demarrer l'essai gratuit",
-    ctaHref: "/auth/signup?plan=pro",
-    features: [
-      { text: "Pages illimitees",          ok: true },
-      { text: "Vues illimitees",           ok: true },
-      { text: "QR dynamiques",             ok: true },
-      { text: "Analytics avances",         ok: true },
-      { text: "Sans branding QRfolio",     ok: true },
-      { text: "Domaine personnalise",      ok: true },
-    ],
-    note: "14 jours d'essai · Sans engagement · Sans CB",
-  },
-  {
-    id: "business",
-    name: "Business",
-    tagline: "Pour equipes, agences et marques",
-    price: "24,90",
-    period: "/ mois",
-    highlight: false,
-    badge: null,
-    color: "#A78BFA",
-    cta: "Contacter l'equipe",
-    ctaHref: "/auth/signup?plan=business",
-    features: [
-      { text: "Tout Pro inclus",           ok: true },
-      { text: "Gestion d'equipe",          ok: true },
-      { text: "Acces API",                 ok: true },
-      { text: "Integrations premium",      ok: true },
-      { text: "Support prioritaire",       ok: true },
-      { text: "Facturation equipe",        ok: true },
-    ],
-    note: null,
-  },
-] as const
+// Pricing landing : derive de la source unique (lib/plans) -> 4 plans, Pro en avant
+const PLAN_LANDING_UI = {
+  free:     { cta: "Commencer gratuitement",     href: "/auth/signup",                 badge: null,                note: null },
+  starter:  { cta: "Demarrer l essai gratuit",    href: "/auth/signup?plan=starter",  badge: "Meilleur rapport Q/P", note: null },
+  pro:      { cta: "Demarrer l essai gratuit",    href: "/auth/signup?plan=pro",      badge: "Le plus populaire",   note: "14 jours d essai - Sans engagement - Sans CB" },
+  business: { cta: "Contacter l equipe",          href: "/auth/signup?plan=business", badge: null,                note: null },
+} as Record<string, { cta: string; href: string; badge: string | null; note: string | null }>
+
+const PLANS = PLAN_LIST.map(p => ({
+  id: p.id,
+  name: p.label,
+  tagline: p.description,
+  price: fmtPrice(p.priceMonthly),
+  period: p.priceMonthly === 0 ? "" : "/ mois",
+  highlight: p.id === "pro",
+  badge: PLAN_LANDING_UI[p.id].badge,
+  color: p.color,
+  cta: PLAN_LANDING_UI[p.id].cta,
+  ctaHref: PLAN_LANDING_UI[p.id].href,
+  features: p.perks.slice(0, 6).map(k => ({ text: k.text, ok: k.included })),
+  note: PLAN_LANDING_UI[p.id].note,
+}))
 
 function PricingSection() {
   const { ref, visible } = useInView(0.06)
@@ -529,14 +487,14 @@ function PricingSection() {
     <section id="pricing" ref={ref} aria-labelledby="pricing-title"
       style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
       <style>{`
-        .plans-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; align-items:center; }
-        .plan-card  { border-radius:22px; padding:32px 28px; position:relative; overflow:hidden;
+        .plans-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; align-items:center; }
+        .plan-card  { border-radius:20px; padding:28px 22px; position:relative; overflow:hidden;
                       transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s, border-color 0.25s; }
         .plan-card:hover { transform:translateY(-6px); }
-        .plan-card.highlight { transform:scale(1.04); }
-        .plan-card.highlight:hover { transform:scale(1.04) translateY(-6px); }
-        @media(max-width:900px){ .plans-grid{ grid-template-columns:1fr!important; max-width:420px!important; margin:0 auto!important; } .plan-card.highlight{ transform:none!important; } .plan-card.highlight:hover{ transform:translateY(-4px)!important; } }
-        @media(max-width:640px){ #pricing{ padding:72px 20px!important; } }
+        .plan-card.highlight { transform:scale(1.05); }
+        .plan-card.highlight:hover { transform:scale(1.05) translateY(-6px); }
+        @media(max-width:1024px){ .plans-grid{ grid-template-columns:repeat(2,1fr)!important; max-width:680px!important; margin:0 auto!important; } .plan-card.highlight{ transform:none!important; } .plan-card.highlight:hover{ transform:translateY(-4px)!important; } }
+        @media(max-width:560px){ .plans-grid{ grid-template-columns:1fr!important; max-width:420px!important; } #pricing{ padding:72px 20px!important; } }
       `}</style>
 
       {/* Header */}
@@ -565,7 +523,7 @@ function PricingSection() {
       </div>
 
       {/* Cards */}
-      <div style={{ maxWidth:1000, margin:"0 auto" }}>
+      <div style={{ maxWidth:1180, margin:"0 auto" }}>
         <div className="plans-grid">
           {PLANS.map((plan, i) => (
             <div

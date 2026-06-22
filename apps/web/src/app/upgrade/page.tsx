@@ -9,8 +9,8 @@ import { PLAN_LIST, PLAN_COMPARISON, fmtPrice } from "@/lib/plans"
 // UI par plan (icône, CTA, mise en avant) ; les DONNÉES viennent de lib/plans
 const PLAN_UI = {
   free:     { icon: <Star size={20} />,     cta: "Plan actuel",                 ctaDisabled: true,  highlight: false, priceId: undefined },
-  starter:  { icon: <Zap size={20} />,      cta: "Commencer l essai gratuit",   ctaDisabled: false, highlight: true,  priceId: "starter"  },
-  pro:      { icon: <Sparkles size={20} />, cta: "Passer a Pro",                ctaDisabled: false, highlight: false, priceId: "pro"      },
+  starter:  { icon: <Zap size={20} />,      cta: "Commencer l essai gratuit",   ctaDisabled: false, highlight: false, priceId: "starter"  },
+  pro:      { icon: <Sparkles size={20} />, cta: "Passer a Pro",                ctaDisabled: false, highlight: true,  priceId: "pro"      },
   business: { icon: <Crown size={20} />,    cta: "Contacter l equipe",          ctaDisabled: false, highlight: false, priceId: "business" },
 } as Record<string, any>
 
@@ -110,10 +110,10 @@ export default function UpgradePage() {
 
             return (
               <div key={plan.id}
-                style={{ background: plan.highlight ? "linear-gradient(135deg,rgba(56,189,248,0.08),rgba(56,189,248,0.03))" : "#111009", border: "1px solid " + (plan.highlight ? "rgba(56,189,248,0.4)" : isCurrentPlan ? "rgba(57,255,143,0.3)" : "rgba(201,168,76,0.12)"), borderRadius: 20, padding: "28px 24px", position: "relative", overflow: "hidden", transform: plan.highlight ? "scale(1.02)" : "scale(1)", boxShadow: plan.highlight ? "0 0 50px rgba(56,189,248,0.1)" : "none" }}>
+                style={{ background: plan.highlight ? `linear-gradient(135deg, ${pc}16, ${pc}05)` : "#111009", border: "1px solid " + (plan.highlight ? `${pc}88` : isCurrentPlan ? "rgba(57,255,143,0.3)" : "rgba(201,168,76,0.12)"), borderRadius: 20, padding: plan.highlight ? "34px 24px" : "28px 24px", position: "relative", overflow: "hidden", transform: plan.highlight ? "scale(1.04)" : "scale(1)", boxShadow: plan.highlight ? `0 0 60px ${pc}26` : "none", zIndex: plan.highlight ? 2 : 1 }}>
 
                 {plan.badge && (
-                  <div style={{ position: "absolute", top: 16, right: 16, background: "linear-gradient(90deg,#38BDF8,#818CF8)", borderRadius: 20, padding: "4px 12px", fontSize: 10, fontWeight: 700, color: "#080808", letterSpacing: 1 }}>{plan.badge}</div>
+                  <div style={{ position: "absolute", top: 16, right: 16, background: pc, borderRadius: 20, padding: "4px 12px", fontSize: 10, fontWeight: 800, color: "#080808", letterSpacing: 1 }}>{plan.badge}</div>
                 )}
                 {isCurrentPlan && (
                   <div style={{ position: "absolute", top: 16, right: 16, background: "rgba(57,255,143,0.15)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 20, padding: "4px 12px", fontSize: 10, fontWeight: 700, color: "#39FF8F" }}>ACTUEL</div>
