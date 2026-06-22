@@ -114,7 +114,7 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
           <p style={{ color: MUTED, fontSize: 12, margin: "0 0 20px", lineHeight: 1.6 }}>
             Visites, scans, top liens et croissance<br />directement dans votre boîte mail
           </p>
-          <a href="/dashboard/upgrade"
+          <a href="/upgrade"
             style={{ display: "inline-block", background: "linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius: 10, padding: "10px 24px", color: "#080808", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
             Passer au Pro
           </a>

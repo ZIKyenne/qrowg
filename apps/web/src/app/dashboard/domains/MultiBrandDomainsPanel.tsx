@@ -185,7 +185,7 @@ export default function MultiBrandDomainsPanel({ domains, plan, onSetPrimary, on
             <div style={{ marginTop:8, display:"flex", alignItems:"center", gap:7, padding:"8px 12px", background:"rgba(201,168,76,0.06)", border:"1px solid rgba(201,168,76,0.15)", borderRadius:8 }}>
               <Crown size={13} color={G}/>
               <span style={{ color:MUTED, fontSize:11 }}>
-                Limite atteinte · <a href="/dashboard/upgrade" style={{ color:G, textDecoration:"none", fontWeight:600 }}>Passer au Business pour des domaines illimités →</a>
+                Limite atteinte · <a href="/upgrade" style={{ color:G, textDecoration:"none", fontWeight:600 }}>Passer au Business pour des domaines illimités →</a>
               </span>
             </div>
           )}
@@ -265,7 +265,7 @@ export default function MultiBrandDomainsPanel({ domains, plan, onSetPrimary, on
               Domaines illimités + multi-marques avec le plan <strong style={{ color:"#F5F0E8" }}>Business</strong>
             </span>
           </div>
-          <a href="/dashboard/upgrade"
+          <a href="/upgrade"
             style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"6px 14px", background:"rgba(201,168,76,0.1)", border:"1px solid rgba(201,168,76,0.25)", borderRadius:8, color:G, fontSize:11, fontWeight:700, textDecoration:"none" }}>
             Upgrade <ArrowUpRight size={11}/>
           </a>

@@ -2339,7 +2339,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 ))}
               </div>
 
-              <a href="/dashboard/upgrade"
+              <a href="/upgrade"
                 style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:7, width:"100%", padding:"13px", background:`linear-gradient(90deg,${accent},${isBiz?"#2bd673":"#b8953f"})`, borderRadius:11, color:"#080808", fontSize:14, fontWeight:800, textDecoration:"none", boxShadow:`0 6px 20px ${accent}30` }}>
                 Voir les offres {planName}
               </a>
@@ -3721,7 +3721,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 <div style={{ padding:"12px 14px", background:"rgba(201,168,76,0.05)", border:"1px solid rgba(201,168,76,0.15)", borderRadius:10 }}>
                   <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 4px" }}>Formats HD + SVG + PDF</p>
                   <p style={{ color:MUTED, fontSize:10, margin:"0 0 8px" }}>Pro: PNG alpha, WEBP, SVG . Business: PDF A4</p>
-                  <a href="/dashboard/upgrade" style={{ display:"block", textAlign:"center" as const, padding:"7px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius:7, color:"#080808", fontSize:11, fontWeight:700, textDecoration:"none" }}>
+                  <a href="/upgrade" style={{ display:"block", textAlign:"center" as const, padding:"7px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius:7, color:"#080808", fontSize:11, fontWeight:700, textDecoration:"none" }}>
                     Voir les plans
                   </a>
                 </div>

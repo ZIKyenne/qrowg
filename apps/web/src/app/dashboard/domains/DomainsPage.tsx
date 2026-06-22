@@ -154,7 +154,7 @@ export default function DomainsPage({ pages, plan }: Props) {
             <p style={{ color:MUTED, fontSize:13, margin:"0 0 24px", lineHeight:1.6 }}>
               Connectez emilien.fr, monrestaurant.com…<br/>directement à vos pages QRfolio.
             </p>
-            <a href="/dashboard/upgrade"
+            <a href="/upgrade"
               style={{ display:"inline-block", background:"linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius:10, padding:"11px 26px", color:"#080808", fontSize:13, fontWeight:700, textDecoration:"none" }}>
               Passer au Pro
             </a>
