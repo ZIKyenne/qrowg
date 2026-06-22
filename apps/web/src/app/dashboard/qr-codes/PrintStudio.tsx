@@ -619,7 +619,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [showHelp, setShowHelp] = useState(false)
   const [hintOff, setHintOff] = useState(false)
   const [showStart, setShowStart] = useState(false) // ecran d'accueil guide (metier -> objectif -> style)
-  const [startStep, setStartStep] = useState<"metier" | "objectif" | "style">("metier")
+  const [startStep, setStartStep] = useState<"metier" | "objectif" | "design">("metier")
   const [guideMetier, setGuideMetier] = useState<typeof GUIDE_METIERS[number] | null>(null)
   const [guideObj, setGuideObj] = useState<string>("")
   const [starting, setStarting] = useState(false)   // generation en cours depuis l'accueil
@@ -2229,6 +2229,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     setStarting(false); setShowStart(false); setStartStep("metier")
     setTplOpen(true) // ouvrir la galerie : panneau interactif qui remplit le cote gauche + permet d'explorer d'autres modeles
   }
+  // Choix d'un design precis dans l'etape guidee (+ style metier applique pour la coherence)
+  const guidedPick = async (id: string) => {
+    setStarting(true)
+    setLastPool(OBJ_META[guideObj]?.pool ?? [id])
+    await applyTemplate(id, true)
+    if (guideMetier) { const st = GLOBAL_STYLES.find(s => s.id === guideMetier.style); if (st) applyStyle(st) }
+    setStarting(false); setShowStart(false); setStartStep("metier"); setTplOpen(true)
+  }
   const openMock = () => {
     const fc = fcRef.current; if (!fc) return
     prepExport(fc)
@@ -2241,9 +2249,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     window: "shop storefront window glass", desk: "modern wood office desk",
     cadre: "living room wall interior cozy", counter: "cafe bar counter wood",
   }
-  // Precharge une photo representative par objectif pour les vignettes de galerie (6 req max, en cache)
+  // Precharge une photo representative par objectif pour les vignettes (galerie + etape "Choisir un design")
   useEffect(() => {
-    if (!tplOpen) return
+    if (!tplOpen && startStep !== "design") return
     let cancelled = false
     Object.keys(OBJ_PHOTO_Q).forEach(obj => {
       if (thumbCache[obj]) return
@@ -2254,7 +2262,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     })
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tplOpen])
+  }, [tplOpen, startStep])
   useEffect(() => {
     if (!mockOpen) return
     let cancelled = false
@@ -3475,8 +3483,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           </div>
           {/* progression */}
           <div style={{ display: "flex", gap: 6, marginBottom: 18 }}>
-            {["metier", "objectif", "style"].map((s, i) => (
-              <span key={s} style={{ width: startStep === s ? 22 : 8, height: 8, borderRadius: 999, background: ["metier", "objectif", "style"].indexOf(startStep) >= i ? G : "rgba(0,0,0,0.12)", transition: "all .2s" }} />
+            {["metier", "objectif", "design"].map((s, i) => (
+              <span key={s} style={{ width: startStep === s ? 22 : 8, height: 8, borderRadius: 999, background: ["metier", "objectif", "design"].indexOf(startStep) >= i ? G : "rgba(0,0,0,0.12)", transition: "all .2s" }} />
             ))}
           </div>
 
@@ -3507,7 +3515,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <p style={{ color: MUTED, fontSize: 13.5, margin: "0 0 24px", textAlign: "center" }}>Que doit faire votre support ?</p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(180px, 220px))", gap: 12, maxWidth: "100%" }}>
                 {guideMetier.objs.map(obj => OBJ_META[obj] && (
-                  <button key={obj} className="ps-goal" type="button" onClick={() => { setGuideObj(obj); setStartStep("style") }}
+                  <button key={obj} className="ps-goal" type="button" onClick={() => { setGuideObj(obj); setStartStep("design") }}
                     style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 16px", background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 14, cursor: "pointer", textAlign: "left" }}>
                     <span style={{ fontSize: 26 }}>{OBJ_META[obj].emoji}</span>
                     <span style={{ color: INK, fontSize: 13.5, fontWeight: 700 }}>{OBJ_META[obj].label}</span>
@@ -3517,27 +3525,24 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             </>
           )}
 
-          {startStep === "style" && (
+          {startStep === "design" && (
             <>
               <button type="button" onClick={() => setStartStep("objectif")} style={{ background: "none", border: "none", color: MUTED, fontSize: 12.5, cursor: "pointer", marginBottom: 8 }}>← Objectif</button>
-              <h2 style={{ color: INK, fontSize: 26, fontWeight: 800, margin: "0 0 6px", textAlign: "center" }}>Un style ?</h2>
-              <p style={{ color: MUTED, fontSize: 13.5, margin: "0 0 22px", textAlign: "center" }}>On applique tout : couleurs, typo, ambiance. Modifiable après.</p>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(110px, 130px))", gap: 10, maxWidth: "100%" }}>
-                {GLOBAL_STYLES.map(s => {
-                  const reco = guideMetier?.style === s.id
+              <h2 style={{ color: INK, fontSize: 26, fontWeight: 800, margin: "0 0 6px", textAlign: "center" }}>Choisissez un design</h2>
+              <p style={{ color: MUTED, fontSize: 13.5, margin: "0 0 22px", textAlign: "center" }}>Cliquez — c'est prêt à exporter. Tout reste modifiable.</p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(120px, 150px))", gap: 14, maxWidth: "100%" }}>
+                {(OBJ_META[guideObj]?.pool ?? []).map(id => {
+                  const t = PRINT_TEMPLATES.find(x => x.id === id); if (!t) return null
                   return (
-                    <button key={s.id} className="ps-goal" type="button" disabled={starting} onClick={() => guidedGenerate(s.id)}
-                      style={{ display: "flex", flexDirection: "column", gap: 6, padding: 8, background: "#FFFFFF", border: `1px solid ${reco ? G : "rgba(0,0,0,0.1)"}`, borderRadius: 12, cursor: starting ? "wait" : "pointer", opacity: starting ? 0.5 : 1 }}>
-                      <div style={{ width: "100%", height: 40, borderRadius: 8, background: s.bg, border: "1px solid rgba(0,0,0,0.06)", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
-                        <span style={{ width: 13, height: 13, borderRadius: "50%", background: s.accent }} />
-                        <span style={{ color: s.ink, fontSize: 12, fontWeight: 800, fontFamily: s.titleFont }}>Aa</span>
-                      </div>
-                      <span style={{ color: INK, fontSize: 10.5, fontWeight: 600, textAlign: "center" }}>{reco ? "✨ " : ""}{s.label}</span>
+                    <button key={id} className="ps-goal" type="button" disabled={starting} onClick={() => guidedPick(id)}
+                      style={{ display: "flex", flexDirection: "column", gap: 7, padding: 8, background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 13, cursor: starting ? "wait" : "pointer", opacity: starting ? 0.5 : 1 }}>
+                      {tplThumb(t, thumbCache[guideObj])}
+                      <span style={{ color: INK, fontSize: 10.5, fontWeight: 700, textAlign: "center", lineHeight: 1.2 }}>{t.label.split(" — ")[1] ?? t.label}</span>
                     </button>
                   )
                 })}
               </div>
-              <button type="button" disabled={starting} onClick={() => guidedGenerate(null)} style={{ marginTop: 18, background: "none", border: "1px dashed rgba(0,0,0,0.2)", borderRadius: 10, padding: "9px 16px", color: MUTED, fontSize: 12.5, cursor: "pointer" }}>Sans thème (garder le modèle tel quel)</button>
+              <button type="button" onClick={() => { setShowStart(false); setTplOpen(true) }} style={{ marginTop: 20, background: "none", border: "none", color: INK, fontSize: 13, fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}>Voir tous les modèles</button>
             </>
           )}
 
