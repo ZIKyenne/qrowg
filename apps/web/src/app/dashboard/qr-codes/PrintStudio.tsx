@@ -20,7 +20,7 @@ import {
   Copy, Trash2, Lock, Unlock, ChevronUp, ChevronDown,
   Download, Printer, Loader2, Check, Save,
   Shapes, Star, Award, MousePointerClick, ArrowRight, LayoutTemplate,
-  Undo2, Redo2, Sparkles, Image as ImageIcon, Palette, Eye,
+  Undo2, Redo2, Sparkles, Image as ImageIcon, Palette, Eye, Search,
 } from "lucide-react"
 
 // ---- Constantes design (Clair & aere, style Canva) -------------------------
@@ -491,6 +491,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [tplSearch, setTplSearch] = useState("")
   const [tplSector, setTplSector] = useState("")
   const [compOpen, setCompOpen] = useState(false) // flyout composants metier
+  const [photoOpen, setPhotoOpen] = useState(false) // flyout recherche photos (Unsplash)
+  const [photoQuery, setPhotoQuery] = useState("")
+  const [photoResults, setPhotoResults] = useState<{ id: string; thumb: string; regular: string; author: string }[]>([])
+  const [photoLoading, setPhotoLoading] = useState(false)
+  const [photoErr, setPhotoErr] = useState("")
   const [showHelp, setShowHelp] = useState(false)
   const [hintOff, setHintOff] = useState(false)
   const [showStart, setShowStart] = useState(false) // ecran d'accueil guide (objectif -> design instantane)
@@ -1067,13 +1072,38 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   }
   // Ouvrir la bibliotheque sur un onglet donne (depuis le rail)
   const openLib = (c: typeof libCat) => {
-    setLibCat(c); setLibOpen(true); setTplOpen(false); setSide(""); setCompOpen(false)
+    setLibCat(c); setLibOpen(true); setTplOpen(false); setSide(""); setCompOpen(false); setPhotoOpen(false)
     setTimeout(() => document.getElementById("lib-" + c)?.scrollIntoView({ behavior: "smooth", block: "start" }), 70)
   }
   // Ouvrir / fermer un panneau lateral (calques / fond)
-  const openSide = (s: "layers" | "bg" | "styles") => { setSide(prev => prev === s ? "" : s); setLibOpen(false); setTplOpen(false); setCompOpen(false) }
+  const openSide = (s: "layers" | "bg" | "styles") => { setSide(prev => prev === s ? "" : s); setLibOpen(false); setTplOpen(false); setCompOpen(false); setPhotoOpen(false) }
   // Ouvrir / fermer le flyout composants metier
-  const openComp = () => { setCompOpen(v => !v); setTplOpen(false); setLibOpen(false); setSide("") }
+  const openComp = () => { setCompOpen(v => !v); setTplOpen(false); setLibOpen(false); setSide(""); setPhotoOpen(false) }
+  // Ouvrir / fermer le flyout recherche de photos
+  const openPhoto = () => { setPhotoOpen(v => !v); setTplOpen(false); setLibOpen(false); setSide(""); setCompOpen(false) }
+  // Rechercher des photos (Unsplash, via notre route serveur)
+  const searchPhotos = async (q: string) => {
+    const term = q.trim(); if (!term) return
+    setPhotoLoading(true); setPhotoErr("")
+    try {
+      const r = FORMATS[format]?.ratio ?? 0.7
+      const orient = r < 0.9 ? "portrait" : r > 1.1 ? "landscape" : "squarish"
+      const res = await fetch(`/api/unsplash?q=${encodeURIComponent(term)}&orientation=${orient}`)
+      const data = await res.json().catch(() => ({ photos: [] }))
+      if (res.status === 503) { setPhotoErr("Recherche d'images non configurée — ajoute la variable d'env UNSPLASH_ACCESS_KEY sur Vercel."); setPhotoResults([]) }
+      else if (!res.ok) { setPhotoErr("Recherche indisponible pour le moment."); setPhotoResults([]) }
+      else { setPhotoResults(data.photos || []); if (!data.photos?.length) setPhotoErr("Aucun résultat.") }
+    } catch { setPhotoErr("Erreur réseau.") } finally { setPhotoLoading(false) }
+  }
+  // Ajouter une photo au canvas (crossOrigin pour permettre l'export)
+  const addPhoto = (url: string) => {
+    const fc = fcRef.current; if (!fc) return
+    fabric.Image.fromURL(url, (img) => {
+      const W = fc.getWidth() / (fc.getZoom() || 1)
+      img.scaleToWidth(W * 0.6)
+      centerObj(img)
+    }, { crossOrigin: "anonymous" })
+  }
   // Bouton CTA (pilule dimensionnee au texte)
   const addCTA = (label: string) => {
     centerObj(buildPill(label, { rectFill: G, textFill: "#080808", height: 80, fontSize: 30 }))
@@ -2168,7 +2198,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {/* Rail outils */}
         {wizard === 0 && (
         <div className="qr-scroll" style={{ width: 76, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", padding: "10px 8px", display: "flex", flexDirection: "column", gap: 6, background: SURFACE, overflowY: "auto" }}>
-          <button type="button" onClick={() => { setTplOpen(v => !v); setLibOpen(false); setSide(""); setCompOpen(false); setWizard(0) }}
+          <button type="button" onClick={() => { setTplOpen(v => !v); setLibOpen(false); setSide(""); setCompOpen(false); setPhotoOpen(false); setWizard(0) }}
             style={{ ...btnTool, background: tplOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.14),rgba(201,168,76,0.05))", border: `1px solid ${tplOpen ? G : "rgba(201,168,76,0.3)"}`, color: tplOpen ? G : INK, fontWeight: 700 }}>
             <LayoutTemplate size={16} /> Modèles
           </button>
@@ -2192,7 +2222,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             )
           })}
           <button type="button" onClick={addQr} style={btnTool}><QrCode size={16} /> QR</button>
-          <button type="button" onClick={() => fileRef.current?.click()} style={btnTool} title="Image ou logo"><ImageIcon size={16} /> Image</button>
+          <button type="button" onClick={() => fileRef.current?.click()} style={btnTool} title="Importer une image ou un logo"><ImageIcon size={16} /> Image</button>
+          <button type="button" onClick={openPhoto} title="Rechercher une photo"
+            style={{ ...btnTool, background: photoOpen ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${photoOpen ? G : "rgba(0,0,0,0.07)"}`, color: photoOpen ? G : INK }}><Search size={16} /> Photos</button>
           {([
             ["icons", "Icône", <Star size={16} key="i" />],
             ["cta", "CTA", <MousePointerClick size={16} key="i" />],
@@ -2301,6 +2333,44 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   </span>
                 </button>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Recherche de photos (Unsplash) (flyout) */}
+        {photoOpen && (
+          <div className="qr-scroll ps-fly" style={{ width: 290, background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.07)", flexShrink: 0 }}>
+              <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Photos</span>
+              <button type="button" onClick={() => setPhotoOpen(false)} aria-label="Fermer"
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
+            </div>
+            <div style={{ padding: "10px 12px 6px", flexShrink: 0 }}>
+              <form onSubmit={e => { e.preventDefault(); searchPhotos(photoQuery) }} style={{ display: "flex", gap: 6 }}>
+                <input value={photoQuery} onChange={e => setPhotoQuery(e.target.value)} placeholder="Restaurant, café, fleurs…"
+                  style={{ flex: 1, background: BG, border: "1px solid rgba(0,0,0,0.12)", borderRadius: 8, padding: "8px 10px", color: INK, fontSize: 11, outline: "none", boxSizing: "border-box" }} />
+                <button type="submit" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, background: G, border: "none", borderRadius: 8, color: "#080808", cursor: "pointer", flexShrink: 0 }}><Search size={14} /></button>
+              </form>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 8 }}>
+                {["café", "restaurant", "boutique", "fleurs", "texture", "marbre", "food", "nature"].map(s => (
+                  <button key={s} type="button" onClick={() => { setPhotoQuery(s); searchPhotos(s) }}
+                    style={{ padding: "4px 9px", borderRadius: 999, background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.1)", color: MUTED, fontSize: 10, cursor: "pointer" }}>{s}</button>
+                ))}
+              </div>
+            </div>
+            <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "8px 10px 16px" }}>
+              {photoLoading && <div style={{ display: "flex", alignItems: "center", gap: 8, color: MUTED, fontSize: 12, padding: "12px 2px" }}><Loader2 size={14} style={{ animation: "spin 0.8s linear infinite" }} /> Recherche…</div>}
+              {!photoLoading && photoErr && <p style={{ color: MUTED, fontSize: 11, lineHeight: 1.5, padding: "8px 2px" }}>{photoErr}</p>}
+              {!photoLoading && !photoErr && !photoResults.length && <p style={{ color: MUTED, fontSize: 11, lineHeight: 1.5, padding: "8px 2px" }}>Cherchez une ambiance (métier, matière, lieu…) et cliquez une photo pour l'ajouter.</p>}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                {photoResults.map(p => (
+                  <button key={p.id} type="button" onClick={() => addPhoto(p.regular)} title={`Photo : ${p.author}`}
+                    style={{ padding: 0, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 8, overflow: "hidden", cursor: "pointer", aspectRatio: "1", background: BG }}>
+                    <img src={p.thumb} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  </button>
+                ))}
+              </div>
+              {photoResults.length > 0 && <p style={{ color: MUTED, fontSize: 8.5, margin: "10px 2px 0", lineHeight: 1.4 }}>Photos via Unsplash.</p>}
             </div>
           </div>
         )}
@@ -2644,7 +2714,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         )}
 
         {/* Zone canvas (heros) : panneaux flottants -> on recadre pour garder l'artboard centre dans le visible */}
-        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, paddingLeft: 24 + (tplOpen ? 290 : compOpen ? 280 : libOpen ? 234 : side ? 250 : 0), paddingRight: 24 + (sel && showAdvanced ? 280 : 0), background: "#E5E8ED", position: "relative", transition: "padding .22s cubic-bezier(.2,.8,.2,1)" }}>
+        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, paddingLeft: 24 + (tplOpen ? 290 : photoOpen ? 290 : compOpen ? 280 : libOpen ? 234 : side ? 250 : 0), paddingRight: 24 + (sel && showAdvanced ? 280 : 0), background: "#E5E8ED", position: "relative", transition: "padding .22s cubic-bezier(.2,.8,.2,1)" }}>
           {loading && (
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: MUTED, zIndex: 5, pointerEvents: "none" }}>
               <Loader2 size={18} style={{ animation: "spin 0.8s linear infinite" }} /> Chargement…
