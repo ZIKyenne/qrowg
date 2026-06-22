@@ -3269,7 +3269,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         )}
 
         {/* Zone canvas (heros) : panneaux flottants -> on recadre pour garder l'artboard centre dans le visible */}
-        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, paddingLeft: 24 + (tplOpen ? 330 : photoOpen ? 290 : compOpen ? 300 : libOpen ? 234 : side ? 250 : 0), paddingRight: 24 + (sel && showAdvanced ? 280 : 0), background: "#E5E8ED", position: "relative", transition: "padding .22s cubic-bezier(.2,.8,.2,1)" }}>
+        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, paddingLeft: 24 + (tplOpen ? 330 : photoOpen ? 290 : compOpen ? 300 : libOpen ? 234 : side ? 250 : 0), paddingRight: 24 + (sel ? 288 : 0), background: "#E5E8ED", position: "relative", transition: "padding .22s cubic-bezier(.2,.8,.2,1)" }}>
           {loading && (
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: MUTED, zIndex: 5, pointerEvents: "none" }}>
               <Loader2 size={18} style={{ animation: "spin 0.8s linear infinite" }} /> Chargement…
@@ -3310,11 +3310,20 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             style={{ width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 999, color: INK, fontSize: 17, cursor: "pointer" }}>+</button>
         </div>
 
-        {/* Panneau de reglages avances (ouvert via "Réglages") */}
-        {sel && showAdvanced && (
-        <div className="qr-scroll ps-fly ps-fly-right" style={{ width: 280, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: 14, overflowY: "auto", background: SURFACE, display: "flex", flexDirection: "column", gap: 16 }}>
+        {/* Panneau de reglages : toujours visible quand un element est selectionne */}
+        {sel && (
+        <div className="qr-scroll ps-fly ps-fly-right" style={{ width: 288, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: 0, overflowY: "auto", background: SURFACE, display: "flex", flexDirection: "column" }}>
+              {/* En-tete contextuel */}
+              <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "13px 16px", borderBottom: "1px solid rgba(0,0,0,0.06)", position: "sticky", top: 0, background: SURFACE, zIndex: 2 }}>
+                <span style={{ width: 30, height: 30, borderRadius: 9, background: "rgba(201,168,76,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}>{sel.isQr ? "▦" : sel.isImage ? "🖼️" : sel.isText ? "T" : sel.label !== null ? "◉" : sel.isGroupObj ? "▣" : "◆"}</span>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span style={{ color: INK, fontSize: 13.5, fontWeight: 800 }}>{sel.isQr ? "QR Code" : sel.isImage ? "Image" : sel.isText ? "Texte" : sel.label !== null ? "Bouton" : sel.isGroupObj ? "Groupe" : "Forme"}</span>
+                  <span style={{ color: MUTED, fontSize: 10 }}>Réglages</span>
+                </div>
+                <button type="button" onClick={() => { fcRef.current?.discardActiveObject(); fcRef.current?.requestRenderAll(); setSel(null) }} aria-label="Fermer" style={{ marginLeft: "auto", display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
+              </div>
+              <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
-                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Élément sélectionné</p>
 
                 {/* Texte du bouton / badge (groupe avec texte) */}
                 {sel.label !== null && (
@@ -3587,6 +3596,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <Trash2 size={12} /> Supprimer
                 </button>
               </div>
+              </div>
             </div>
         )}
 
@@ -3664,10 +3674,6 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             <button type="button" style={tb} title="Mettre derrière" onClick={() => layer("back")}><ChevronDown size={14} /></button>
             <button type="button" style={{ ...tb, color: sel.locked ? G : INK }} title={sel.locked ? "Déverrouiller" : "Verrouiller"} onClick={() => layer("lock")}>{sel.locked ? <Unlock size={14} /> : <Lock size={14} />}</button>
             <button type="button" style={{ ...tb, color: "#FF6B6B" }} title="Supprimer" onClick={() => layer("del")}><Trash2 size={14} /></button>
-            <button type="button" onClick={() => setShowAdvanced(v => !v)}
-              style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 10px", background: showAdvanced ? "rgba(201,168,76,0.18)" : "rgba(0,0,0,0.06)", border: `1px solid ${showAdvanced ? G : "rgba(0,0,0,0.1)"}`, borderRadius: 8, color: showAdvanced ? G : INK, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-              Réglages {showAdvanced ? "▸" : ""}
-            </button>
           </div>
         )}
 
