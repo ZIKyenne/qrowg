@@ -42,8 +42,8 @@ const FORMATS: Record<FormatId, { label: string; ratio: number; exportW: number 
   flyer:  { label: "Flyer",  ratio: 148 / 210,   exportW: 1748 }, // A5 portrait
   table:  { label: "Table",  ratio: 100 / 70,    exportW: 1181 }, // carte de table 10x7cm paysage
 }
-const EDIT_MAX_H = 540 // hauteur max du canvas d'edition a l'ecran (laisse de l'air en haut/bas)
-const EDIT_MAX_W = 700 // largeur max (pour les formats paysage)
+const EDIT_MAX_H = 600 // hauteur max du canvas d'edition a l'ecran
+const EDIT_MAX_W = 860 // largeur max (pour les formats paysage / carre -> remplit mieux)
 
 function editDims(fmt: FormatId) {
   const { ratio } = FORMATS[fmt] // largeur / hauteur
@@ -2227,6 +2227,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     await applyTemplate(id, true)
     if (styleId) { const st = GLOBAL_STYLES.find(s => s.id === styleId); if (st) applyStyle(st) }
     setStarting(false); setShowStart(false); setStartStep("metier")
+    setTplOpen(true) // ouvrir la galerie : panneau interactif qui remplit le cote gauche + permet d'explorer d'autres modeles
   }
   const openMock = () => {
     const fc = fcRef.current; if (!fc) return
@@ -2647,7 +2648,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Modeles orientes objectif (flyout) */}
         {tplOpen && (
-          <div className="qr-scroll ps-fly" style={{ width: 290, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <div className="qr-scroll ps-fly" style={{ width: 330, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Modèles par objectif</span>
               <button type="button" onClick={() => setTplOpen(false)} aria-label="Fermer les modèles"
@@ -3114,7 +3115,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         )}
 
         {/* Zone canvas (heros) : panneaux flottants -> on recadre pour garder l'artboard centre dans le visible */}
-        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, paddingLeft: 24 + (tplOpen ? 290 : photoOpen ? 290 : compOpen ? 300 : libOpen ? 234 : side ? 250 : 0), paddingRight: 24 + (sel && showAdvanced ? 280 : 0), background: "#E5E8ED", position: "relative", transition: "padding .22s cubic-bezier(.2,.8,.2,1)" }}>
+        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, paddingLeft: 24 + (tplOpen ? 330 : photoOpen ? 290 : compOpen ? 300 : libOpen ? 234 : side ? 250 : 0), paddingRight: 24 + (sel && showAdvanced ? 280 : 0), background: "#E5E8ED", position: "relative", transition: "padding .22s cubic-bezier(.2,.8,.2,1)" }}>
           {loading && (
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: MUTED, zIndex: 5, pointerEvents: "none" }}>
               <Loader2 size={18} style={{ animation: "spin 0.8s linear infinite" }} /> Chargement…
@@ -3494,7 +3495,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               </div>
               <div style={{ display: "flex", gap: 20, marginTop: 24, alignItems: "center" }}>
                 <button type="button" onClick={() => { setShowStart(false); setTplOpen(true) }} style={{ background: "none", border: "none", color: INK, fontSize: 13, fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}>Parcourir tous les modèles</button>
-                <button type="button" onClick={() => setShowStart(false)} style={{ background: "none", border: "none", color: MUTED, fontSize: 13, cursor: "pointer" }}>Page vierge</button>
+                <button type="button" onClick={() => { setShowStart(false); setTplOpen(true) }} style={{ background: "none", border: "none", color: MUTED, fontSize: 13, cursor: "pointer" }}>Page vierge</button>
               </div>
             </>
           )}
