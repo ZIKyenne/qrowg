@@ -42,8 +42,8 @@ const FORMATS: Record<FormatId, { label: string; ratio: number; exportW: number 
   flyer:  { label: "Flyer",  ratio: 148 / 210,   exportW: 1748 }, // A5 portrait
   table:  { label: "Table",  ratio: 100 / 70,    exportW: 1181 }, // carte de table 10x7cm paysage
 }
-const EDIT_MAX_H = 620 // hauteur max du canvas d'edition a l'ecran
-const EDIT_MAX_W = 740 // largeur max (pour les formats paysage)
+const EDIT_MAX_H = 540 // hauteur max du canvas d'edition a l'ecran (laisse de l'air en haut/bas)
+const EDIT_MAX_W = 700 // largeur max (pour les formats paysage)
 
 function editDims(fmt: FormatId) {
   const { ratio } = FORMATS[fmt] // largeur / hauteur
@@ -2354,12 +2354,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const small = qb.width < W * 0.16
     let covered = false
     const qi = objs.indexOf(qr)
+    const qArea = qb.width * qb.height
     for (let i = qi + 1; i < objs.length; i++) {
-      const o = objs[i]; if ((o as any).isGuide || o.visible === false) continue
+      const o = objs[i]
+      if ((o as any).isGuide || o.visible === false || (o as any).isQrCard || o.type === "line") continue
       const b = o.getBoundingRect(true)
-      const ix = Math.min(b.left + b.width, qb.left + qb.width) - Math.max(b.left, qb.left)
-      const iy = Math.min(b.top + b.height, qb.top + qb.height) - Math.max(b.top, qb.top)
-      if (ix > qb.width * 0.15 && iy > qb.height * 0.15) { covered = true; break }
+      const ix = Math.max(0, Math.min(b.left + b.width, qb.left + qb.width) - Math.max(b.left, qb.left))
+      const iy = Math.max(0, Math.min(b.top + b.height, qb.top + qb.height) - Math.max(b.top, qb.top))
+      // alerte seulement si l'element recouvre vraiment une grande part du QR (un filet fin ne compte pas)
+      if (ix * iy > qArea * 0.22) { covered = true; break }
     }
     return small || covered ? { small, covered } : null
   })()
@@ -2438,14 +2441,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <Sparkles size={14} /> Régénérer
             </button>
           )}
-          <div style={{ display: "flex", background: "rgba(0,0,0,0.05)", borderRadius: 9, padding: 3, gap: 2 }}>
+          <div style={{ display: "flex", alignItems: "center", background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.35)", borderRadius: 999, padding: 3, gap: 3 }}>
             {([["Simple", false], ["Avancé", true]] as const).map(([l, v]) => (
               <button key={l} type="button" onClick={() => { setAdvanced(v); if (!v) { setShowAdvanced(false); if (side === "layers") setSide("") } }}
-                style={{ padding: "6px 11px", borderRadius: 7, border: "none", background: advanced === v ? SURFACE : "transparent", color: advanced === v ? INK : MUTED, fontSize: 11, fontWeight: advanced === v ? 700 : 500, cursor: "pointer", boxShadow: advanced === v ? "0 1px 3px rgba(0,0,0,0.12)" : "none" }}>{l}</button>
+                style={{ padding: "7px 16px", borderRadius: 999, border: "none", background: advanced === v ? G : "transparent", color: advanced === v ? "#080808" : "#8A6D14", fontSize: 12.5, fontWeight: advanced === v ? 800 : 600, cursor: "pointer", boxShadow: advanced === v ? "0 2px 6px rgba(201,168,76,0.4)" : "none", transition: "all .15s" }}>{l}</button>
             ))}
           </div>
           <button type="button" onClick={() => setShowHelp(true)} title="Aide & raccourcis" aria-label="Aide et raccourcis"
-            style={{ width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 9, color: INK, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>?</button>
+            style={{ display: "flex", alignItems: "center", gap: 5, height: 34, padding: "0 12px", background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 9, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>? Aide</button>
 
           <button type="button" onClick={openMock} title="Aperçu en situation"
             style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 9, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
