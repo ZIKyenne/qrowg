@@ -325,12 +325,12 @@ const COMPONENTS: { key: string; emoji: string; label: string; desc: string; cat
 
 // Ecran d'accueil : objectif -> pool des meilleurs modeles (rotation = effet "generer")
 const START_GOALS: { pool: string[]; emoji: string; label: string; desc: string }[] = [
-  { pool: ["avis-premium", "avis-photo", "avis-card", "avis-ornate"],            emoji: "⭐", label: "Obtenir plus d'avis",       desc: "Boostez vos avis clients" },
-  { pool: ["insta-premium", "insta-photo", "insta-card"],                        emoji: "📱", label: "Gagner des abonnés",        desc: "Réseaux sociaux" },
-  { pool: ["menu-premium", "menu-photo", "menu-split", "resto-footer"],          emoji: "🍽️", label: "Montrer mon menu",          desc: "Carte accessible au scan" },
-  { pool: ["reserver-premium", "reserver-photo", "reserver-split"],              emoji: "📅", label: "Prendre des réservations",  desc: "Réservez en un scan" },
-  { pool: ["contact-premium", "contact-photo", "contact-card", "immo-frame"],    emoji: "💳", label: "Partager mes coordonnées",  desc: "Carte de visite digitale" },
-  { pool: ["promo-premium", "decouvrir-photo", "event-ornate", "decouvrir-or"],  emoji: "🏷️", label: "Mettre en avant une offre", desc: "Promo, nouveauté…" },
+  { pool: ["avis-studio", "avis-premium", "avis-photo", "avis-card", "avis-ornate"],           emoji: "⭐", label: "Obtenir plus d'avis",       desc: "Boostez vos avis clients" },
+  { pool: ["insta-studio", "insta-premium", "insta-photo", "insta-card"],                      emoji: "📱", label: "Gagner des abonnés",        desc: "Réseaux sociaux" },
+  { pool: ["menu-studio", "cafe-studio", "menu-premium", "menu-photo", "menu-split"],          emoji: "🍽️", label: "Montrer mon menu",          desc: "Carte accessible au scan" },
+  { pool: ["reserver-studio", "coach-studio", "beaute-studio", "reserver-premium", "reserver-photo"], emoji: "📅", label: "Prendre des réservations", desc: "Réservez en un scan" },
+  { pool: ["contact-studio", "immo-studio", "contact-premium", "contact-photo", "contact-card"], emoji: "💳", label: "Partager mes coordonnées",  desc: "Carte de visite digitale" },
+  { pool: ["decouvrir-studio", "event-studio", "boutique-studio", "promo-premium", "decouvrir-photo"], emoji: "🏷️", label: "Mettre en avant une offre", desc: "Promo, nouveauté…" },
 ]
 
 // Photo representative par objectif (pour les vignettes de galerie) — 6 requetes max, mises en cache
