@@ -73,7 +73,7 @@ export default function DashboardClient() {
     if (ids.length) {
       const now = new Date()
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
-      const { count } = await supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("created_at", monthStart)
+      const { count } = await supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", monthStart)
       setMonthViews(count ?? 0)
     } else setMonthViews(0)
     setLoading(false)
