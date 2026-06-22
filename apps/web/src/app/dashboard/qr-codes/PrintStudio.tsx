@@ -248,6 +248,9 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"resto-footer",  label:"Restaurant — Ardoise",obj:"Menu",    emoji:"🍽️", desc:"Footer chaleureux, ardoise",            bg:"#1C1C1A", ink:"#F0E8D8", accent:"#C9A84C" },
   { id:"immo-frame",    label:"Immobilier — Carte", obj:"Contact",  emoji:"🏠", desc:"Cadre épuré, pro",                      bg:"#FFFFFF", ink:"#10243F", accent:"#1F6F8B" },
   { id:"event-ornate",  label:"Événement — Affiche",obj:"Page",     emoji:"🎉", desc:"Orné festif",                           bg:"#160726", ink:"#FBEAF6", accent:"#E0479E" },
+  { id:"avis-premium",  label:"Avis — Premium",     obj:"Avis",     emoji:"⭐", desc:"En-tête + badge, haut de gamme",        bg:"#0E0D0B", ink:"#F4ECD8", accent:"#C9A84C" },
+  { id:"menu-premium",  label:"Menu — Premium",     obj:"Menu",     emoji:"🍽️", desc:"En-tête + badge, terracotta",          bg:"#14110C", ink:"#F0E6CE", accent:"#B8472F" },
+  { id:"promo-premium", label:"Promo — Premium",    obj:"Page",     emoji:"🏷️", desc:"En-tête + badge promo",                 bg:"#0B1E2D", ink:"#EAF4FA", accent:"#F0A93B" },
 ]
 
 // Secteurs d'activite -> objectifs pertinents (pour filtrer la galerie)
@@ -263,9 +266,10 @@ const SECTORS: { id: string; label: string; emoji: string; objs: string[] }[] = 
 
 // Mini-apercu schematique d'un modele (fond + couleurs + disposition)
 function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
-  const isMenu = t.id.startsWith("menu") || t.id.endsWith("-band")
+  const isPremium = t.id.endsWith("-premium")
+  const isMenu = (t.id.startsWith("menu") || t.id.endsWith("-band")) && !isPremium
   const isContact = t.id === "contact" || t.id === "contact-clair"
-  const isAvis = t.id.startsWith("avis") && !t.id.endsWith("-band")
+  const isAvis = t.id.startsWith("avis") && !t.id.endsWith("-band") && !isPremium
   const isFrame = t.id.endsWith("-frame")
   const isFooter = t.id.endsWith("-footer")
   const isHero = t.id.endsWith("-hero")
@@ -273,11 +277,13 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }) {
   const isOrnate = t.id.endsWith("-ornate")
   const starClip = "polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)"
   return (
-    <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", background: t.bg, borderRadius: 6, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", gap: "6%", padding: isMenu ? "0 10% 12%" : "13% 10%", boxSizing: "border-box" }}>
+    <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", background: t.bg, borderRadius: 6, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", gap: "6%", padding: (isMenu || isPremium) ? "0 10% 12%" : "13% 10%", boxSizing: "border-box" }}>
       {isFrame && <div style={{ position: "absolute", inset: "7%", border: `1.5px solid ${t.accent}`, borderRadius: 4, pointerEvents: "none" }} />}
       {isDiag && <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "32%", background: t.accent, clipPath: "polygon(0 0,100% 0,100% 55%,0 100%)" }} />}
       {isOrnate && <><div style={{ position: "absolute", top: "9%", left: "12%", width: "11%", aspectRatio: "1", background: t.accent, clipPath: starClip }} /><div style={{ position: "absolute", bottom: "9%", right: "12%", width: "9%", aspectRatio: "1", background: t.accent, clipPath: starClip }} /></>}
       {isMenu && <div style={{ width: "100%", height: "18%", background: t.accent, marginBottom: "8%" }} />}
+      {isPremium && <div style={{ width: "100%", height: "17%", background: t.accent, marginBottom: "7%" }} />}
+      {isPremium && <div style={{ position: "absolute", top: "5%", right: "11%", width: "15%", aspectRatio: "1", borderRadius: "50%", background: t.ink }} />}
       <div style={{ width: "68%", height: 5, borderRadius: 3, background: t.ink, opacity: 0.92 }} />
       {isAvis ? (
         <div style={{ display: "flex", gap: "4%", width: "52%", justifyContent: "center" }}>
@@ -1483,6 +1489,22 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       addText(subtitle, H * 0.80, W * 0.034, { font: "Arial", role: "subtitle" })
       addText(cta, H * 0.87, W * 0.04, { weight: "bold", fill: accent })
     }
+    // Mise en page "premium" : en-tete colore + badge rond + hierarchie + QR + CTA
+    const premiumLayout = async (title: string, subtitle: string, cta: string, badge?: string) => {
+      const headH = Math.round(H * 0.17)
+      fc.add(new fabric.Rect({ left: 0, top: 0, width: W, height: headH, fill: accent }))
+      addText(title, H * 0.052, W * 0.07, { weight: "bold", fill: readableOn(accent), role: "title" })
+      addText(subtitle, H * 0.215, W * 0.034, { font: "Arial", role: "subtitle" })
+      rule(H * 0.265)
+      await placeQrT(H * 0.33, 0.46)
+      addCTA(cta, H * 0.82)
+      if (badge) {
+        const r = Math.round(W * 0.082)
+        const circ = new fabric.Circle({ radius: r, fill: ink, originX: "center", originY: "center" })
+        const txt = new fabric.Textbox(badge, { width: r * 1.9, fontSize: Math.round(r * 0.42), fontWeight: "bold", fill: readableOn(ink), textAlign: "center", originX: "center", originY: "center" })
+        fc.add(new fabric.Group([circ, txt], { originX: "center", originY: "center", left: W * 0.80, top: H * 0.135, angle: 12 }))
+      }
+    }
     // Mise en page "orne" : stack centre + etoiles decoratives en coins
     const ornateLayout = async (title: string, subtitle: string, cta: string) => {
       fc.add(new fabric.Polygon(starPts(4, W * 0.05, W * 0.016), { fill: accent, originX: "center", originY: "center", left: W * 0.16, top: H * 0.11 }))
@@ -1602,6 +1624,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "resto-footer":   await footerLayout(name || "Notre Carte", "Scannez pour la carte du jour", "Voir le menu"); break
       case "immo-frame":     await frameLayout(name || "Votre agent", "Scannez ma carte de visite", "Me contacter"); break
       case "event-ornate":   await ornateLayout("L'événement", "Scannez pour le programme", "J'y vais"); break
+      case "avis-premium":   await premiumLayout("Votre avis compte", "Scannez pour nous noter", "Donner mon avis", "AVIS"); break
+      case "menu-premium":   await premiumLayout(name || "Notre Carte", "Scannez pour découvrir", "Voir le menu", "MENU"); break
+      case "promo-premium":  await premiumLayout("Offre spéciale", "Scannez pour en profiter", "J'en profite", "-20%"); break
     }
 
     if (vG) fc.bringToFront(vG)
