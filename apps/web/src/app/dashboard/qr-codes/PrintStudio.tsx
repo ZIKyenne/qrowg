@@ -2485,9 +2485,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   })
   const layerBtn = {
     display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
-    padding: "8px", background: "rgba(0,0,0,0.03)",
-    border: "1px solid rgba(0,0,0,0.07)", borderRadius: 8, color: INK,
-    fontSize: 10, cursor: "pointer",
+    padding: "9px 8px", background: "#FFFFFF",
+    border: "1px solid rgba(31,36,48,0.1)", borderRadius: 9, color: INK,
+    fontSize: 10, fontWeight: 600, cursor: "pointer",
+    boxShadow: "0 1px 2px rgba(31,36,48,0.05)", transition: "all .14s ease",
   }
   const iconMini = {
     display: "flex", alignItems: "center", justifyContent: "center", width: 22, height: 22,
@@ -2546,7 +2547,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         .ps-root input, .ps-root select { transition: border-color .14s ease, box-shadow .14s ease; }
         .ps-root input:focus, .ps-root select:focus { border-color: ${G} !important; box-shadow: 0 0 0 2px rgba(201,168,76,0.18); }
         .ps-fly { animation: psSlide .18s cubic-bezier(.2,.8,.2,1); position: absolute; top: 0; bottom: 0; left: 92px; z-index: 30; box-shadow: 8px 0 28px rgba(0,0,0,0.08); }
-        .ps-fly-right { left: auto !important; right: 0 !important; box-shadow: -8px 0 28px rgba(0,0,0,0.08) !important; }
+        .ps-fly-right { left: auto !important; right: 0 !important; box-shadow: -8px 0 28px rgba(0,0,0,0.07) !important; }
+        .ps-fly-right button:hover:not(:disabled) { filter: none; border-color: rgba(201,168,76,0.6) !important; box-shadow: 0 3px 10px rgba(31,36,48,0.1) !important; transform: translateY(-1px); }
+        .ps-fly-right button:active:not(:disabled) { transform: translateY(0) scale(0.97); }
+        .ps-sec-label { display: flex; align-items: center; gap: 7px; color: ${MUTED}; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.3px; margin: 0 0 9px; }
+        .ps-sec-label::before { content: ""; width: 3px; height: 11px; border-radius: 3px; background: ${G}; flex-shrink: 0; }
         .ps-pop { animation: psPop .18s cubic-bezier(.2,.8,.2,1); }
         .ps-goal { transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease; animation: psRise .34s cubic-bezier(.2,.8,.2,1) both; }
         .ps-goal:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(0,0,0,0.12); border-color: ${G} !important; }
@@ -3349,7 +3354,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 )}
 
                 {/* Couleur (fond du groupe ou objet simple) */}
-                <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>{sel.isGroup ? "Couleur du fond" : "Couleur"}</label>
+                <p className="ps-sec-label">{sel.isGroup ? "Couleur du fond" : "Couleur"}</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
                   {SWATCHES.map(c => (
                     <button key={c} type="button" onClick={() => setFill(c)} title={c}
@@ -3373,7 +3378,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   style={{ width: "100%", accentColor: G, marginBottom: 12 }} />
 
                 {/* Degrade */}
-                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>Dégradé</p>
+                <p className="ps-sec-label">Dégradé</p>
                 <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
                   {GRADIENT_PRESETS.map(([a, b]) => (
                     <button key={a + b} type="button" onClick={() => setGradientFill(a, b)} title="Dégradé prêt à l'emploi"
@@ -3387,7 +3392,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <button type="button" onClick={() => setGradientFill(/^#/.test(sel.fill) ? sel.fill : "#C9A84C", gradC2)} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Linéaire</button>
                   <button type="button" onClick={() => setRadialFill(/^#/.test(sel.fill) ? sel.fill : "#C9A84C", gradC2)} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Radial</button>
                 </div>
-                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>Motif</p>
+                <p className="ps-sec-label">Motif</p>
                 <div style={{ display: "flex", gap: 5, marginBottom: 12 }}>
                   <button type="button" onClick={() => setPatternFill("dots")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Points</button>
                   <button type="button" onClick={() => setPatternFill("stripes")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Rayures</button>
@@ -3501,7 +3506,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
               {/* Effets */}
               <div>
-                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>Ombre</p>
+                <p className="ps-sec-label">Ombre</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 5, marginBottom: 6 }}>
                   {([["off", "Aucune"], ["soft", "Soft"], ["medium", "Medium"], ["strong", "Strong"], ["floating", "Floating"], ["luxury", "Luxe"]] as const).map(([k, label]) => (
                     <button key={k} type="button" onClick={() => setShadowPreset(k)} style={{ ...layerBtn, padding: "7px 2px", fontSize: 9.5 }}>{label}</button>
@@ -3531,7 +3536,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     </div>
                   </>
                 )}
-                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "10px 0 6px" }}>Halo</p>
+                <p className="ps-sec-label">Halo</p>
                 <div style={{ display: "flex", gap: 6 }}>
                   <button type="button" onClick={() => setGlow("soft")} style={{ ...layerBtn, flex: 1 }}>✨ Glow</button>
                   <button type="button" onClick={() => setGlow("neon")} style={{ ...layerBtn, flex: 1 }}>💡 Néon</button>
@@ -3540,7 +3545,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
               {/* Transformer : rotation + inclinaison */}
               <div>
-                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>Transformer</p>
+                <p className="ps-sec-label">Transformer</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 5, marginBottom: 6 }}>
                   <button type="button" title="Rotation −90°" onClick={() => rotateBy(-90)} style={{ ...layerBtn }}>⟲</button>
                   <button type="button" title="Rotation +90°" onClick={() => rotateBy(90)} style={{ ...layerBtn }}>⟳</button>
@@ -3557,7 +3562,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
               {/* Alignement sur le support */}
               <div>
-                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Aligner sur le support</p>
+                <p className="ps-sec-label">Aligner sur le support</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
                   {([
                     ["left", "Gauche", "v", 1.5], ["centerH", "Centre H", "v", 7], ["right", "Droite", "v", 12.5],
@@ -3578,7 +3583,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
               {/* Actions rapides */}
               <div>
-                <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Actions</p>
+                <p className="ps-sec-label">Actions</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                   <button type="button" onClick={() => layer("dup")}   style={layerBtn}><Copy size={12} /> Dupliquer</button>
                   <button type="button" onClick={() => layer("lock")}  style={{ ...layerBtn, color: sel.locked ? G : INK }}>
