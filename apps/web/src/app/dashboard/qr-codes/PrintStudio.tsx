@@ -21,6 +21,7 @@ import {
   Download, Printer, Loader2, Check, Save,
   Shapes, Star, Award, MousePointerClick, ArrowRight, LayoutTemplate,
   Undo2, Redo2, Sparkles, Image as ImageIcon, Palette, Eye, Search,
+  RotateCw, AlignCenterHorizontal,
 } from "lucide-react"
 
 // ---- Constantes design (Clair & aere, style Canva) -------------------------
@@ -3570,11 +3571,17 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               {/* Transformer : rotation + inclinaison */}
               <div>
                 <p className="ps-sec-label">Transformer</p>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 5, marginBottom: 6 }}>
-                  <button type="button" title="Rotation −90°" onClick={() => rotateBy(-90)} style={{ ...layerBtn }}>⟲</button>
-                  <button type="button" title="Rotation +90°" onClick={() => rotateBy(90)} style={{ ...layerBtn }}>⟳</button>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 5, marginBottom: 5 }}>
+                  <button type="button" title="Rotation −45°" onClick={() => rotateBy(-45)} style={{ ...layerBtn, fontSize: 9.5 }}>−45°</button>
+                  <button type="button" title="Rotation −90°" onClick={() => rotateBy(-90)} style={{ ...layerBtn, fontSize: 9.5 }}>−90°</button>
                   <button type="button" title="Rotation 180°" onClick={() => rotateBy(180)} style={{ ...layerBtn, fontSize: 9.5 }}>180°</button>
-                  <button type="button" title="Réinitialiser" onClick={resetTransform} style={{ ...layerBtn, fontSize: 9.5 }}>Reset</button>
+                  <button type="button" title="Rotation +45°" onClick={() => rotateBy(45)} style={{ ...layerBtn, fontSize: 9.5 }}>+45°</button>
+                  <button type="button" title="Rotation +90°" onClick={() => rotateBy(90)} style={{ ...layerBtn, fontSize: 9.5 }}>+90°</button>
+                  <button type="button" title="Réinitialiser rotation/inclinaison" onClick={resetTransform} style={{ ...layerBtn, fontSize: 9.5 }}>Reset</button>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 5, marginBottom: 6 }}>
+                  <button type="button" title="Miroir horizontal" onClick={() => flip("x")} style={{ ...layerBtn, fontSize: 10 }}>⇆ Miroir H</button>
+                  <button type="button" title="Miroir vertical" onClick={() => flip("y")} style={{ ...layerBtn, fontSize: 10 }}>⇅ Miroir V</button>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 5 }}>
                   <button type="button" title="Incliner ← (H)" onClick={() => skewBy("x", -8)} style={{ ...layerBtn, fontSize: 11 }}>⇤</button>
@@ -3695,6 +3702,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             </>)}
             <span style={{ width: 1, height: 20, background: "rgba(0,0,0,0.12)" }} />
             <button type="button" style={tb} title="Dupliquer" onClick={() => layer("dup")}><Copy size={14} /></button>
+            <button type="button" style={tb} title="Pivoter +90°" onClick={() => rotateBy(90)}><RotateCw size={14} /></button>
+            <button type="button" style={tb} title="Centrer sur le support" onClick={() => { align("centerH"); align("centerV") }}><AlignCenterHorizontal size={14} /></button>
             <button type="button" style={tb} title="Mettre devant" onClick={() => layer("front")}><ChevronUp size={14} /></button>
             <button type="button" style={tb} title="Mettre derrière" onClick={() => layer("back")}><ChevronDown size={14} /></button>
             <button type="button" style={{ ...tb, color: sel.locked ? G : INK }} title={sel.locked ? "Déverrouiller" : "Verrouiller"} onClick={() => layer("lock")}>{sel.locked ? <Unlock size={14} /> : <Lock size={14} />}</button>
