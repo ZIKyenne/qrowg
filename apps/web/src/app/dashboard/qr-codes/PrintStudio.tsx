@@ -301,6 +301,9 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"cocktail-noir", label:"Bar — Cocktails Noir", obj:"Menu",     emoji:"🍸", desc:"Lounge sombre & or, filets, serif",        bg:"#0E0B07", ink:"#F2E6CE", accent:"#C9A84C" },
   { id:"promo-burst",   label:"Commerce — Offre",    obj:"Page",      emoji:"🔥", desc:"Badge éclaté + offre, punchy",             bg:"#1A0E0A", ink:"#FFF3EA", accent:"#E8602C" },
   { id:"contact-card",  label:"Carte de visite",     obj:"Contact",   emoji:"💼", desc:"Panneau couleur + QR, corporate clean",    bg:"#F4F1EA", ink:"#1F2430", accent:"#1E5F8C" },
+  { id:"immo-fiche",    label:"Immobilier — Fiche",  obj:"Contact",   emoji:"🏠", desc:"Bandeau + specs + visite, pro",            bg:"#F2F4F1", ink:"#1E2A24", accent:"#2E6F5E" },
+  { id:"airbnb-welcome",label:"Airbnb — Bienvenue",  obj:"Page",      emoji:"🏡", desc:"Carte de bienvenue chaleureuse + guide",   bg:"#EFE3D2", ink:"#2A2419", accent:"#C56B3E" },
+  { id:"event-ticket",  label:"Événement — Ticket",  obj:"Page",      emoji:"🎉", desc:"Invitation style ticket + perforation",    bg:"#160726", ink:"#F3E9FF", accent:"#A855F7" },
 ]
 
 // Secteurs d'activite -> objectifs pertinents (pour filtrer la galerie)
@@ -459,6 +462,48 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }, ph
         </div>
         <div style={{ position: "absolute", top: "40%", left: "34%", width: "32%", aspectRatio: "1", background: "#fff", borderRadius: 3, boxShadow: "0 1px 5px rgba(0,0,0,0.15)" }} />
         <div style={{ position: "absolute", bottom: "8%", left: "27%", width: "46%", height: "7%", borderRadius: 20, background: t.accent }} />
+      </div>
+    )
+  }
+  if (t.id === "immo-fiche") {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: t.bg }}>
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "14%", background: t.accent }} />
+        <div style={{ position: "absolute", top: "18%", left: 0, right: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+          <div style={{ height: 6, width: "56%", borderRadius: 3, background: t.ink }} />
+          <div style={{ height: 6, width: "40%", borderRadius: 3, background: t.ink }} />
+        </div>
+        <div style={{ position: "absolute", top: "37%", left: "10%", right: "10%", display: "flex", gap: 4, justifyContent: "center" }}>
+          {[0, 1, 2].map(i => <div key={i} style={{ flex: 1, height: 14, borderRadius: 4, border: `1px solid ${t.accent}` }} />)}
+        </div>
+        <div style={{ position: "absolute", top: "50%", left: "34%", width: "32%", aspectRatio: "1", background: "#fff", borderRadius: 3, boxShadow: "0 1px 5px rgba(0,0,0,0.12)" }} />
+        <div style={{ position: "absolute", bottom: "9%", left: "26%", width: "48%", height: "7%", borderRadius: 20, background: t.accent }} />
+      </div>
+    )
+  }
+  if (t.id === "airbnb-welcome") {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: t.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ width: "80%", height: "76%", background: "#fff", borderRadius: 10, boxShadow: "0 4px 16px rgba(0,0,0,0.14)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, padding: "0 8%" }}>
+          <div style={{ fontSize: 14 }}>🏡</div>
+          <div style={{ color: t.accent, fontSize: 5.5, letterSpacing: 2, fontWeight: 700, marginTop: 2 }}>BIENVENUE</div>
+          <div style={{ height: 6, width: "70%", borderRadius: 3, background: "#2A2419" }} />
+          <div style={{ width: "40%", aspectRatio: "1", background: "#111", borderRadius: 3, marginTop: "5%" }} />
+          <div style={{ marginTop: "6%", height: 11, width: "62%", borderRadius: 20, background: t.accent }} />
+        </div>
+      </div>
+    )
+  }
+  if (t.id === "event-ticket") {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: t.bg }}>
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "30%", background: t.accent, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3 }}>
+          <div style={{ fontSize: 10 }}>🎉</div>
+          <div style={{ height: 6, width: "54%", borderRadius: 3, background: "#fff" }} />
+        </div>
+        <div style={{ position: "absolute", top: "40%", left: "6%", right: "6%", borderTop: `2px dashed ${t.accent}` }} />
+        <div style={{ position: "absolute", top: "47%", left: "34%", width: "32%", aspectRatio: "1", background: "#fff", borderRadius: 3 }} />
+        <div style={{ position: "absolute", bottom: "9%", left: "27%", width: "46%", height: "7%", borderRadius: 20, background: t.accent }} />
       </div>
     )
   }
@@ -2415,6 +2460,40 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       addText("Scannez pour enregistrer mes coordonnées", H * 0.815, W * 0.028, { font: "Arial", role: "subtitle" })
       addCTA("Ajouter à mes contacts", H * 0.875)
     }
+    // G) Immobilier — Fiche : bandeau + strip de specs (m²/pièces/quartier) + QR
+    const immoFiche = async () => {
+      fc.add(new fabric.Rect({ left: 0, top: 0, width: W, height: Math.round(H * 0.14), fill: accent }))
+      addText("🏠  À VISITER", H * 0.042, W * 0.044, { weight: "bold", fill: readableOn(accent), keepColor: true, role: "subtitle" })
+      addText(name || "Votre bien\nd'exception", H * 0.185, W * 0.076, { weight: "bold", role: "title" })
+      const chips = ["📐 Surface", "🛏 Pièces", "📍 Quartier"]
+      const cw = W * 0.27, gap = W * 0.02, total = cw * 3 + gap * 2, startX = (W - total) / 2
+      chips.forEach((c, i) => {
+        const x = startX + i * (cw + gap)
+        fc.add(new fabric.Rect({ left: x, top: H * 0.37, width: cw, height: Math.round(H * 0.058), rx: 8, ry: 8, fill: "transparent", stroke: accent, strokeWidth: 1, strokeUniform: true }))
+        fc.add(new fabric.Textbox(c, { left: x + cw / 2, top: H * 0.385, width: cw, fontSize: W * 0.025, fontFamily: "Arial", fill: ink, textAlign: "center", originX: "center" }))
+      })
+      await placeQrT(H * 0.47, 0.36)
+      addCTA("Réserver une visite", H * 0.86)
+    }
+    // H) Airbnb — Bienvenue : carte blanche arrondie centrale sur fond chaleureux
+    const airbnbWelcome = async () => {
+      fc.add(new fabric.Rect({ left: W * 0.10, top: H * 0.12, width: W * 0.80, height: H * 0.76, rx: 18, ry: 18, fill: "#FFFFFF", shadow: new fabric.Shadow({ color: "rgba(0,0,0,0.12)", blur: 24, offsetX: 0, offsetY: 10 }) }))
+      addText("🏡", H * 0.17, W * 0.085, { keepColor: true })
+      addText("B I E N V E N U E", H * 0.30, W * 0.03, { font: "Arial", weight: "bold", fill: accent, keepColor: true, role: "subtitle" })
+      addText(name || "Votre séjour\ncommence ici", H * 0.34, W * 0.07, { weight: "bold", fill: "#2A2419", keepColor: true, role: "title" })
+      await placeQrT(H * 0.50, 0.32)
+      addCTA("Ouvrir le guide", H * 0.79)
+    }
+    // I) Événement — Ticket : panneau invite + ligne de perforation + QR
+    const eventTicket = async () => {
+      fc.add(new fabric.Rect({ left: 0, top: 0, width: W, height: Math.round(H * 0.30), fill: accent }))
+      addText("🎉  VOUS ÊTES INVITÉ", H * 0.055, W * 0.04, { weight: "bold", fill: readableOn(accent), keepColor: true, role: "subtitle" })
+      addText(name || "Notre\nÉvénement", H * 0.115, W * 0.085, { weight: "bold", fill: readableOn(accent), keepColor: true, role: "title" })
+      fc.add(new fabric.Line([W * 0.06, H * 0.40, W * 0.94, H * 0.40], { stroke: accent, strokeWidth: 2, strokeDashArray: [8, 7] }))
+      addText("Date · Lieu · Horaire", H * 0.43, W * 0.032, { font: "Arial", role: "subtitle" })
+      await placeQrT(H * 0.50, 0.36)
+      addCTA("Voir l'événement", H * 0.87)
+    }
 
     switch (id) {
       case "avis-prestige": await avisHero(); break
@@ -2423,6 +2502,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "cocktail-noir": await cocktailNoir(); break
       case "promo-burst": await promoBurst(); break
       case "contact-card": await contactCard(); break
+      case "immo-fiche": await immoFiche(); break
+      case "airbnb-welcome": await airbnbWelcome(); break
+      case "event-ticket": await eventTicket(); break
       case "wifi-or": case "wifi-vert": case "wifi-bleu": await wifiLayout(); break
       case "fidelite-or": case "fidelite-rouge": await loyaltyLayout(); break
       case "avis-or":
