@@ -1504,7 +1504,7 @@ function HowItWorks() {
       <div style={{maxWidth:1140,margin:"0 auto 72px",textAlign:"center",
         opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(24px)",
         transition:"opacity 0.6s ease,transform 0.6s ease"}}>
-        <p style={{color:"#C9A84C",fontSize:11,letterSpacing:3.5,textTransform:"uppercase",fontWeight:600,marginBottom:16}}>Comment ca marche</p>
+        <p style={{color:"#C9A84C",fontSize:11,letterSpacing:3.5,textTransform:"uppercase",fontWeight:600,marginBottom:16}}>Comment ça marche</p>
         <h2 id="how-title" style={{fontFamily:"Cormorant Garamond, serif",fontSize:"clamp(28px,4vw,52px)",
           color:"#F5F0E8",fontWeight:700,margin:"0 auto",lineHeight:1.12,maxWidth:560,letterSpacing:"-0.02em"}}>
           De zéro à scannable{" "}<span style={{color:"#C9A84C"}}>en 5 minutes</span>
@@ -1625,7 +1625,7 @@ function BuilderSection(){
       <div style={{maxWidth:1140,margin:"0 auto"}}>
         <div style={{textAlign:"center",marginBottom:64,opacity:visible?1:0,
           transform:visible?"translateY(0)":"translateY(24px)",transition:"opacity 0.6s,transform 0.6s"}}>
-          <p style={{color:"#C9A84C",fontSize:11,letterSpacing:3.5,textTransform:"uppercase",fontWeight:600,marginBottom:16}}>Builder</p>
+          <p style={{color:"#C9A84C",fontSize:11,letterSpacing:3.5,textTransform:"uppercase",fontWeight:600,marginBottom:16}}>Éditeur</p>
           <h2 id="builder-title" style={{fontFamily:"Cormorant Garamond, serif",fontSize:"clamp(28px,4vw,52px)",
             color:"#F5F0E8",fontWeight:700,margin:"0 auto 20px",lineHeight:1.1,maxWidth:680,letterSpacing:"-0.02em"}}>
             Construis une page professionnelle{" "}<span style={{color:"#C9A84C"}}>en quelques minutes.</span>
@@ -2222,7 +2222,7 @@ function AnalyticsSection() {
             transition: "opacity 0.6s ease, transform 0.6s ease",
           }}>
             <p style={{ color: "#C9A84C", fontSize: 11, letterSpacing: 3.5,
-              textTransform: "uppercase", fontWeight: 600, marginBottom: 16 }}>Analytics</p>
+              textTransform: "uppercase", fontWeight: 600, marginBottom: 16 }}>Statistiques</p>
             <h2 id="analytics-title" style={{
               fontFamily: "Cormorant Garamond, serif",
               fontSize: "clamp(26px, 3.5vw, 46px)",
