@@ -488,7 +488,7 @@ function FeaturesSection() {
         @media (max-width: 640px) { #features { padding: 72px 24px !important; } }
       `}</style>
 
-      {/* Fenêtre explicative d'une fonctionnalité (Pb 6) */}
+      {/* Fenetre explicative d'une fonctionnalite (Pb 6) */}
       {fInfo && (
         <div onClick={() => setInfo(null)} style={{ position: "fixed", inset: 0, zIndex: 3000, background: "rgba(0,0,0,0.78)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "linear-gradient(180deg,#16140E,#0C0B08)", border: `1px solid ${fInfo.accent}40`, borderRadius: 20, padding: "30px 28px", position: "relative", boxShadow: `0 30px 90px rgba(0,0,0,0.7), 0 0 50px ${fInfo.accent}12`, fontFamily: "DM Sans, sans-serif" }}>
@@ -508,6 +508,96 @@ function FeaturesSection() {
             ))}
             <Link href="/auth/signup" style={{ display: "block", textAlign: "center", marginTop: 20, padding: "12px", borderRadius: 11, background: `linear-gradient(90deg, ${fInfo.accent}, ${fInfo.accent}cc)`, color: "#080808", textDecoration: "none", fontSize: 13.5, fontWeight: 800 }}>
               Essayer gratuitement
+            </Link>
+          </div>
+        </div>
+      )}
+    </section>
+  )
+}
+
+
+// ── Marque professionnelle (Pb 5) ──────────────────────────────────────────────
+function BrandProSection() {
+  const { ref, visible } = useInView(0.08)
+  const [open, setOpen] = useState(false)
+  const G = "#C9A84C"
+  const MiniPage = ({ pro }: { pro: boolean }) => (
+    <div style={{ flex: 1, minWidth: 0, background: "#0E0D0B", border: `1px solid ${pro ? G : "rgba(255,255,255,0.08)"}`, borderRadius: 16, overflow: "hidden", boxShadow: pro ? `0 12px 40px rgba(201,168,76,0.18)` : "none", position: "relative" }}>
+      {pro && <div style={{ position: "absolute", top: 12, right: 12, zIndex: 2, background: G, color: "#080808", fontSize: 9, fontWeight: 800, padding: "3px 9px", borderRadius: 20, letterSpacing: 0.5 }}>PRO</div>}
+      {/* barre d'URL */}
+      <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 12px", background: "rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+        <span style={{ width: 7, height: 7, borderRadius: "50%", background: pro ? "#39FF8F" : "rgba(138,132,120,0.5)" }} />
+        <span style={{ color: pro ? "#F5F0E8" : "rgba(138,132,120,0.7)", fontSize: 10.5, fontFamily: "monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{pro ? "carte.votremarque.fr" : "qrfolio.app/p/votre-page"}</span>
+      </div>
+      {/* contenu mock */}
+      <div style={{ padding: "22px 18px", display: "flex", flexDirection: "column", alignItems: "center", gap: 9 }}>
+        <div style={{ width: 46, height: 46, borderRadius: "50%", background: pro ? `${G}22` : "rgba(255,255,255,0.06)", border: `1px solid ${pro ? G + "55" : "rgba(255,255,255,0.1)"}` }} />
+        <div style={{ height: 7, width: "55%", borderRadius: 4, background: "rgba(245,240,232,0.85)" }} />
+        <div style={{ height: 5, width: "38%", borderRadius: 3, background: "rgba(138,132,120,0.5)" }} />
+        <div style={{ height: 30, width: "70%", borderRadius: 8, background: pro ? `linear-gradient(90deg,${G},#b8953f)` : "rgba(255,255,255,0.08)", marginTop: 4 }} />
+      </div>
+      {/* pied de page : mention QRfolio sur le gratuit, rien sur le Pro */}
+      <div style={{ padding: "9px 12px", borderTop: "1px solid rgba(255,255,255,0.06)", textAlign: "center", minHeight: 30 }}>
+        {pro
+          ? <span style={{ color: G, fontSize: 9.5, fontWeight: 700, letterSpacing: 0.5 }}>✓ 100 % votre marque</span>
+          : <span style={{ color: "rgba(138,132,120,0.65)", fontSize: 9.5 }}>✦ Propulsé par QRfolio</span>}
+      </div>
+    </div>
+  )
+  return (
+    <section ref={ref} aria-labelledby="brandpro-title" style={{ padding: "90px 48px", position: "relative", zIndex: 1 }}>
+      <div className="brandpro-wrap" style={{ maxWidth: 1000, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center", opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(24px)", transition: "opacity 0.6s ease, transform 0.6s ease" }}>
+        {/* Texte */}
+        <div>
+          <p style={{ color: G, fontSize: 11, letterSpacing: 3, textTransform: "uppercase", fontWeight: 600, marginBottom: 16 }}>Marque professionnelle</p>
+          <h2 id="brandpro-title" style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(30px,3.6vw,46px)", color: "#F5F0E8", fontWeight: 700, lineHeight: 1.08, margin: "0 0 18px", letterSpacing: "-0.02em" }}>
+            Votre marque.<br /><span style={{ color: G }}>Pas la nôtre.</span>
+          </h2>
+          <p style={{ color: "rgba(138,132,120,0.9)", fontSize: 16, lineHeight: 1.7, margin: "0 0 24px", maxWidth: 420 }}>
+            Sur les plans payants, votre page s'affiche sur <strong style={{ color: "#E8E6E0" }}>votre propre nom de domaine</strong>, <strong style={{ color: "#E8E6E0" }}>sans aucune mention QRfolio</strong>. Vos clients ne voient que vous.
+          </p>
+          <button type="button" onClick={() => setOpen(true)}
+            style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(201,168,76,0.1)", border: `1px solid ${G}55`, color: G, fontSize: 14, fontWeight: 700, padding: "12px 22px", borderRadius: 12, cursor: "pointer" }}>
+            Découvrir la marque professionnelle →
+          </button>
+        </div>
+        {/* Avant / Après */}
+        <div>
+          <div style={{ display: "flex", gap: 14, alignItems: "stretch" }}>
+            <MiniPage pro={false} />
+            <MiniPage pro={true} />
+          </div>
+          <div style={{ display: "flex", gap: 14, marginTop: 8 }}>
+            <span style={{ flex: 1, textAlign: "center", color: "rgba(138,132,120,0.7)", fontSize: 10.5, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>Plan gratuit</span>
+            <span style={{ flex: 1, textAlign: "center", color: G, fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Plan Pro</span>
+          </div>
+        </div>
+      </div>
+      <style>{`@media(max-width:820px){ .brandpro-wrap{ grid-template-columns:1fr!important; gap:32px!important; } } @media(max-width:640px){ section[aria-labelledby="brandpro-title"]{ padding:64px 22px!important; } }`}</style>
+
+      {/* Modale explicative */}
+      {open && (
+        <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 3000, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, background: "linear-gradient(180deg,#16140E,#0C0B08)", border: `1px solid ${G}40`, borderRadius: 20, padding: "30px 28px", position: "relative", boxShadow: `0 30px 90px rgba(0,0,0,0.7), 0 0 50px ${G}12`, fontFamily: "DM Sans, sans-serif" }}>
+            <button type="button" onClick={() => setOpen(false)} aria-label="Fermer" style={{ position: "absolute", top: 16, right: 16, width: 30, height: 30, borderRadius: 9, background: "rgba(255,255,255,0.06)", border: "none", color: "#8A8478", fontSize: 16, cursor: "pointer" }}>✕</button>
+            <p style={{ color: G, fontSize: 9.5, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", margin: 0 }}>Marque professionnelle</p>
+            <p style={{ color: "#F5F0E8", fontSize: 22, fontWeight: 800, margin: "4px 0 18px", fontFamily: "Cormorant Garamond, serif" }}>Une image 100 % à vous</p>
+            {([
+              ["🌐", "Votre nom de domaine", "Au lieu de qrfolio.app/p/…, votre page vit sur carte.votremarque.fr. Plus crédible, plus mémorisable."],
+              ["🚫", "Zéro mention QRfolio", "La mention « Propulsé par QRfolio » disparaît : vos visiteurs ne voient que votre marque."],
+              ["✨", "Design premium", "Polices, couleurs et finitions soignées pour une page qui inspire confiance dès le premier coup d'œil."],
+            ] as const).map(([emo, h, txt]) => (
+              <div key={h} style={{ display: "flex", gap: 12, marginBottom: 14 }}>
+                <span style={{ fontSize: 20, flexShrink: 0 }}>{emo}</span>
+                <div>
+                  <p style={{ color: "#F5F0E8", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>{h}</p>
+                  <p style={{ color: "rgba(138,132,120,0.9)", fontSize: 12.5, lineHeight: 1.55, margin: 0 }}>{txt}</p>
+                </div>
+              </div>
+            ))}
+            <Link href="/upgrade" style={{ display: "block", textAlign: "center", marginTop: 18, padding: "12px", borderRadius: 11, background: `linear-gradient(90deg,${G},#b8953f)`, color: "#080808", textDecoration: "none", fontSize: 13.5, fontWeight: 800 }}>
+              Activer ma marque (dès le plan Pro)
             </Link>
           </div>
         </div>
@@ -2803,6 +2893,9 @@ export default function HomePage() {
 
       {/* USE CASES */}
       <UseCasesSection />
+
+      {/* MARQUE PRO */}
+      <BrandProSection />
 
       {/* PRICING */}
       <PricingSection />
