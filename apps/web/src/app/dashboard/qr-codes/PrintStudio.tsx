@@ -307,6 +307,9 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"reserve-stripe",label:"Réserver — Élégant",  obj:"Réserver",  emoji:"📅", desc:"Bande latérale + RDV en ligne, chic",        bg:"#F5F2EC", ink:"#22282E", accent:"#3B6E8F" },
   { id:"creator-bio",   label:"Créateur — Link in bio", obj:"Abonnés", emoji:"✦", desc:"Avatar + chips réseaux, neon",               bg:"#120A1F", ink:"#F2E9FF", accent:"#9B5CF6" },
   { id:"portfolio-grid",label:"Portfolio — Grille",  obj:"Page",      emoji:"🖼️", desc:"Mini-grille déco + QR, créatif",            bg:"#15181C", ink:"#F0F2F4", accent:"#D9A441" },
+  { id:"soldes-mega",   label:"Soldes — Méga %",     obj:"Page",      emoji:"🏷️", desc:"Chiffre géant, offre punchy",              bg:"#0E1116", ink:"#FFFFFF", accent:"#FF4D4D" },
+  { id:"happyhour-diag",label:"Bar — Happy Hour",    obj:"Menu",      emoji:"🍹", desc:"Split diagonal + horaire, festif",         bg:"#0F0A14", ink:"#F3E9FF", accent:"#E0479E" },
+  { id:"guide-steps",   label:"Guide — Étapes 1·2·3",obj:"Page",      emoji:"📖", desc:"Étapes numérotées + QR, check-in/how-to",  bg:"#F3F0E9", ink:"#2A2419", accent:"#3FA796" },
 ]
 
 // Secteurs d'activite -> objectifs pertinents (pour filtrer la galerie)
@@ -548,6 +551,51 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }, ph
         <div style={{ height: 6, width: "48%", borderRadius: 3, background: t.ink, marginTop: 3 }} />
         <div style={{ width: "30%", aspectRatio: "1", background: "#fff", borderRadius: 3, marginTop: "5%" }} />
         <div style={{ marginTop: "5%", height: "7%", width: "50%", borderRadius: 20, background: t.accent }} />
+      </div>
+    )
+  }
+  if (t.id === "soldes-mega") {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: t.bg, display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "12%" }}>
+        <div style={{ color: t.accent, fontSize: 7, letterSpacing: 3, fontWeight: 800 }}>SOLDES</div>
+        <div style={{ color: t.ink, fontSize: 38, fontWeight: 800, lineHeight: 1, marginTop: 4 }}>-50%</div>
+        <div style={{ height: 5, width: "54%", borderRadius: 3, background: t.ink, opacity: 0.85, marginTop: "8%" }} />
+        <div style={{ width: "30%", aspectRatio: "1", background: "#fff", borderRadius: 3, marginTop: "6%" }} />
+        <div style={{ marginTop: "6%", height: "8%", width: "46%", borderRadius: 20, background: t.accent }} />
+      </div>
+    )
+  }
+  if (t.id === "happyhour-diag") {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: t.bg }}>
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "46%", background: t.accent, clipPath: "polygon(0 0, 100% 0, 100% 65%, 0 100%)" }} />
+        <div style={{ position: "absolute", top: "10%", left: 0, right: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+          <div style={{ height: 6, width: "56%", borderRadius: 3, background: "#fff" }} />
+          <div style={{ height: 3, width: "42%", borderRadius: 2, background: "rgba(255,255,255,0.82)" }} />
+        </div>
+        <div style={{ position: "absolute", top: "52%", left: 0, right: 0, textAlign: "center" }}>
+          <div style={{ display: "inline-block", height: 5, width: "50%", borderRadius: 3, background: t.ink }} />
+        </div>
+        <div style={{ position: "absolute", top: "60%", left: "33%", width: "34%", aspectRatio: "1", background: "#fff", borderRadius: 4 }} />
+        <div style={{ position: "absolute", bottom: "8%", left: "27%", width: "46%", height: "7%", borderRadius: 20, background: t.accent }} />
+      </div>
+    )
+  }
+  if (t.id === "guide-steps") {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: t.bg }}>
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "13%", background: t.accent }} />
+        <div style={{ position: "absolute", top: "16%", left: "10%", right: "10%", height: 5, borderRadius: 3, background: t.ink }} />
+        <div style={{ position: "absolute", top: "26%", left: "10%", right: "10%", display: "flex", flexDirection: "column", gap: 7 }}>
+          {[0, 1, 2].map(i => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <div style={{ width: 12, height: 12, borderRadius: "50%", background: t.accent, color: "#fff", fontSize: 7, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{i + 1}</div>
+              <div style={{ flex: 1, height: 4, borderRadius: 2, background: t.ink, opacity: 0.7 }} />
+            </div>
+          ))}
+        </div>
+        <div style={{ position: "absolute", top: "58%", left: "34%", width: "32%", aspectRatio: "1", background: "#fff", borderRadius: 3, boxShadow: "0 1px 4px rgba(0,0,0,0.12)" }} />
+        <div style={{ position: "absolute", bottom: "8%", left: "27%", width: "46%", height: "7%", borderRadius: 20, background: t.accent }} />
       </div>
     )
   }
@@ -2576,6 +2624,38 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       await placeQrT(H * 0.56, 0.34)
       addCTA("Voir mon portfolio", H * 0.88)
     }
+    // M) Soldes — Gros % : chiffre géant en hero (offre), punchy
+    const soldesMega = async () => {
+      addText("S O L D E S", H * 0.095, W * 0.05, { weight: "bold", fill: accent, keepColor: true, role: "subtitle" })
+      addText("-50%", H * 0.16, W * 0.26, { weight: "bold", role: "title" })
+      addText(name || "Profitez-en maintenant", H * 0.46, W * 0.04, { weight: "bold", role: "subtitle" })
+      await placeQrT(H * 0.53, 0.36)
+      addCTA("J'en profite", H * 0.87)
+    }
+    // N) Happy Hour — Split diagonal : bande inclinée colorée + horaire + QR
+    const happyDiag = async () => {
+      fc.add(new fabric.Polygon([{ x: 0, y: 0 }, { x: W, y: 0 }, { x: W, y: H * 0.30 }, { x: 0, y: H * 0.46 }], { fill: accent }))
+      addText("🍹  HAPPY HOUR", H * 0.075, W * 0.052, { weight: "bold", fill: readableOn(accent), keepColor: true, role: "title" })
+      addText("Tous les jours · 18h – 20h", H * 0.195, W * 0.034, { font: "Arial", fill: readableOn(accent), keepColor: true, role: "subtitle" })
+      addText(name || "−30% sur les cocktails", H * 0.52, W * 0.048, { weight: "bold", role: "subtitle" })
+      await placeQrT(H * 0.59, 0.34)
+      addCTA("Voir la carte", H * 0.88)
+    }
+    // O) Guide — Étapes 1·2·3 : pastilles numérotées + QR (check-in / how-to)
+    const guideSteps = async () => {
+      fc.add(new fabric.Rect({ left: 0, top: 0, width: W, height: Math.round(H * 0.13), fill: accent }))
+      addText("📖  GUIDE", H * 0.04, W * 0.044, { weight: "bold", fill: readableOn(accent), keepColor: true, role: "subtitle" })
+      addText(name || "Bienvenue chez nous", H * 0.165, W * 0.068, { weight: "bold", role: "title" })
+      const steps = ["Scannez le QR ci-dessous", "Accédez au guide complet", "Profitez de votre séjour"]
+      steps.forEach((s, i) => {
+        const y = H * (0.30 + i * 0.085)
+        fc.add(new fabric.Circle({ radius: W * 0.035, fill: accent, originX: "center", originY: "center", left: W * 0.17, top: y }))
+        fc.add(new fabric.Textbox(String(i + 1), { left: W * 0.17, top: y - W * 0.026, width: W * 0.07, fontSize: W * 0.04, fontWeight: "bold", fill: readableOn(accent), textAlign: "center", originX: "center" }))
+        fc.add(new fabric.Textbox(s, { left: W * 0.25, top: y - W * 0.028, width: W * 0.58, fontSize: W * 0.03, fontFamily: "Arial", fill: ink, textAlign: "left" }))
+      })
+      await placeQrT(H * 0.59, 0.32)
+      addCTA("Ouvrir le guide", H * 0.88)
+    }
 
     switch (id) {
       case "avis-prestige": await avisHero(); break
@@ -2590,6 +2670,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "reserve-stripe": await reserveStripe(); break
       case "creator-bio": await creatorBio(); break
       case "portfolio-grid": await portfolioGrid(); break
+      case "soldes-mega": await soldesMega(); break
+      case "happyhour-diag": await happyDiag(); break
+      case "guide-steps": await guideSteps(); break
       case "wifi-or": case "wifi-vert": case "wifi-bleu": await wifiLayout(); break
       case "fidelite-or": case "fidelite-rouge": await loyaltyLayout(); break
       case "avis-or":
