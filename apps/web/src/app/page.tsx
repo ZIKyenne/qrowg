@@ -1507,7 +1507,7 @@ function HowItWorks() {
         <p style={{color:"#C9A84C",fontSize:11,letterSpacing:3.5,textTransform:"uppercase",fontWeight:600,marginBottom:16}}>Comment ca marche</p>
         <h2 id="how-title" style={{fontFamily:"Cormorant Garamond, serif",fontSize:"clamp(28px,4vw,52px)",
           color:"#F5F0E8",fontWeight:700,margin:"0 auto",lineHeight:1.12,maxWidth:560,letterSpacing:"-0.02em"}}>
-          De zero a scannable{" "}<span style={{color:"#C9A84C"}}>en 5 minutes</span>
+          De zéro à scannable{" "}<span style={{color:"#C9A84C"}}>en 5 minutes</span>
         </h2>
       </div>
       <div style={{maxWidth:1140,margin:"0 auto",position:"relative"}}>
@@ -2695,7 +2695,7 @@ function FAQSection() {
         <div style={{ marginTop:48, textAlign:"center",
           borderTop:"1px solid rgba(255,255,255,0.06)", paddingTop:40 }}>
           <p style={{ color:"rgba(138,132,120,0.7)", fontSize:14, marginBottom:16 }}>
-            Tu as une autre question ?
+            Vous avez une autre question ?
           </p>
           <a href="/auth/signup" style={{ display:"inline-flex", alignItems:"center", gap:8,
             color:"#C9A84C", textDecoration:"none", fontSize:14, fontWeight:600,
@@ -2842,7 +2842,7 @@ export default function HomePage() {
                 }}>
                 Créer mon QRfolio gratuit
               </Link>
-              <Link href="#features" style={{
+              <Link href="#how" style={{
                 background: "transparent",
                 border: "1px solid rgba(201,168,76,0.2)",
                 color: "rgba(245,240,232,0.7)", textDecoration: "none", fontSize: 15,
