@@ -13,19 +13,22 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: "QRfolio — Cree ta page professionnelle avec QR code dynamique",
+    default: "QRfolio — Carte de visite numérique & QR code dynamique pro",
     template: "%s | QRfolio",
   },
   description:
-    "Cree une page mobile professionnelle, genere un QR code dynamique et analyse chaque scan. Ideal pour restaurants, freelances, createurs et commerces.",
+    "Créez une page de présentation professionnelle, générez un QR code dynamique et suivez chaque scan. Idéal pour restaurants (menu numérique), indépendants, créateurs (portfolio, lien en bio) et commerces.",
   keywords: [
+    "carte de visite numérique",
+    "QR code professionnel",
     "QR code dynamique",
-    "landing page professionnelle",
-    "page mobile",
-    "bio link",
-    "carte de visite numerique",
+    "page de présentation professionnelle",
+    "portfolio digital",
+    "menu numérique restaurant",
+    "lien en bio",
+    "page mobile professionnelle",
+    "générateur de QR code",
     "qrfolio",
-    "generateur QR code",
   ],
   authors: [{ name: "QRfolio", url: APP_URL }],
   creator: "QRfolio",
@@ -38,9 +41,9 @@ export const metadata: Metadata = {
     locale: "fr_FR",
     url: APP_URL,
     siteName: "QRfolio",
-    title: "QRfolio — Cree ta page professionnelle avec QR code dynamique",
+    title: "QRfolio — Carte de visite numérique & QR code dynamique pro",
     description:
-      "Cree une page mobile professionnelle, genere un QR code dynamique et analyse chaque scan. Ideal pour restaurants, freelances, createurs et commerces.",
+      "Créez une page de présentation professionnelle, générez un QR code dynamique et suivez chaque scan. Idéal pour restaurants (menu numérique), indépendants, créateurs (portfolio, lien en bio) et commerces.",
     images: [
       {
         url: `${APP_URL}/og-image.png`,
@@ -55,9 +58,9 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@qrfolio",
     creator: "@qrfolio",
-    title: "QRfolio — Cree ta page professionnelle avec QR code dynamique",
+    title: "QRfolio — Carte de visite numérique & QR code dynamique pro",
     description:
-      "Page mobile pro + QR code dynamique + analytics. En 5 minutes, sans coder.",
+      "Page mobile pro + QR code dynamique + statistiques. En 5 minutes, sans rien coder.",
     images: [`${APP_URL}/og-image.png`],
   },
   robots: {
@@ -93,7 +96,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               name: "QRfolio",
               url: APP_URL,
               description:
-                "Cree une page mobile professionnelle, genere un QR code dynamique et analyse chaque scan.",
+                "Créez une page mobile professionnelle, générez un QR code dynamique et suivez chaque scan.",
               applicationCategory: "BusinessApplication",
               operatingSystem: "Web",
               offers: [

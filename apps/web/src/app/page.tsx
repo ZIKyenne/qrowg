@@ -288,44 +288,44 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 const FEATURES = [
   {
     icon: "⚡",
-    tag: "Builder",
-    title: "Cree ta page sans coder",
-    desc: "Builder drag & drop, blocs prets a l'emploi, personnalisation rapide. En ligne en 5 minutes.",
+    tag: "Éditeur simple",
+    title: "Créez votre page sans rien coder",
+    desc: "Un éditeur en glisser-déposer, des blocs prêts à l'emploi : votre page est en ligne en 5 minutes.",
     accent: "#C9A84C",
   },
   {
     icon: "🔄",
-    tag: "QR Dynamique",
-    title: "Transforme ton QR en outil business",
-    desc: "Modifie ta destination, ton contenu, tes liens — sans jamais reimprimer ton QR code.",
+    tag: "QR dynamique",
+    title: "Un QR code que vous modifiez à volonté",
+    desc: "Changez la destination, le contenu et les liens quand vous voulez — sans jamais réimprimer votre QR code.",
     accent: "#38BDF8",
   },
   {
     icon: "📊",
-    tag: "Analytics",
-    title: "Mesure chaque scan",
-    desc: "Vues, scans, appareils, sources et performances. Tout en temps reel, tout inclus.",
+    tag: "Statistiques",
+    title: "Sachez exactement qui scanne",
+    desc: "Vues, scans, appareils et sources de trafic, en temps réel. Vous pilotez vos résultats.",
     accent: "#39FF8F",
   },
   {
     icon: "🎯",
     tag: "Conversion",
-    title: "Convertis tes visiteurs",
-    desc: "Boutons WhatsApp, reservation, paiement, formulaire de contact, CTA personnalises.",
+    title: "Transformez vos visiteurs en clients",
+    desc: "Boutons WhatsApp, réservation, paiement, formulaire de contact… toutes vos actions au même endroit.",
     accent: "#F97316",
   },
   {
     icon: "🎨",
-    tag: "Templates",
-    title: "Demarre avec un template metier",
-    desc: "Restaurant, freelance, coach, artiste, immobilier, commerce. Adapte a ton secteur.",
+    tag: "Modèles",
+    title: "Démarrez avec un modèle fait pour votre métier",
+    desc: "Restaurant, indépendant, coach, artiste, immobilier, commerce : un modèle adapté à votre activité.",
     accent: "#A78BFA",
   },
   {
     icon: "🏢",
-    tag: "Marque pro",
-    title: "Passe en marque pro",
-    desc: "Domaine personnalise, sans branding QRfolio, design premium. Une image irreprochable.",
+    tag: "Marque professionnelle",
+    title: "Affichez votre propre marque",
+    desc: "Votre domaine personnalisé, sans mention QRfolio, avec un design premium. Une image irréprochable.",
     accent: "#C9A84C",
   },
 ] as const
@@ -350,7 +350,7 @@ function FeaturesSection() {
         <p style={{
           color: "#C9A84C", fontSize: 11, letterSpacing: 3.5,
           textTransform: "uppercase", fontWeight: 600, marginBottom: 16,
-        }}>Fonctionnalites</p>
+        }}>Fonctionnalités</p>
         <h2 id="features-title" style={{
           fontFamily: "Cormorant Garamond, serif",
           fontSize: "clamp(28px, 4vw, 52px)",
@@ -1114,8 +1114,8 @@ function TemplatesSection() {
 
 // ── Navbar ────────────────────────────────────────────────────────────────────
 const NAV_LINKS = [
-  { label: "Fonctionnalites", href: "#features"  },
-  { label: "Templates",       href: "#templates" },
+  { label: "Fonctionnalités", href: "#features"  },
+  { label: "Modèles",         href: "#templates" },
   { label: "Exemples",        href: "#examples"  },
   { label: "Tarifs",          href: "#pricing"   },
   { label: "FAQ",             href: "#faq"       },
