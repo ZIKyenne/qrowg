@@ -460,8 +460,8 @@ function FeaturesSection() {
 // Pricing landing : derive de la source unique (lib/plans) -> 4 plans, Pro en avant
 const PLAN_LANDING_UI = {
   free:     { cta: "Commencer gratuitement",     href: "/auth/signup",                 badge: null,                note: null },
-  starter:  { cta: "Demarrer l essai gratuit",    href: "/auth/signup?plan=starter",  badge: "Meilleur rapport Q/P", note: null },
-  pro:      { cta: "Demarrer l essai gratuit",    href: "/auth/signup?plan=pro",      badge: "Le plus populaire",   note: "14 jours d essai - Sans engagement - Sans CB" },
+  starter:  { cta: "Démarrer l'essai gratuit",    href: "/auth/signup?plan=starter",  badge: "Meilleur rapport Q/P", note: null },
+  pro:      { cta: "Démarrer l'essai gratuit",    href: "/auth/signup?plan=pro",      badge: "Le plus populaire",   note: "14 jours d'essai · Sans engagement · Sans carte bancaire" },
   business: { cta: "Contacter l equipe",          href: "/auth/signup?plan=business", badge: null,                note: null },
 } as Record<string, { cta: string; href: string; badge: string | null; note: string | null }>
 
@@ -518,7 +518,7 @@ function PricingSection() {
         </h2>
         <p style={{ color:"rgba(138,132,120,0.8)", fontSize:16,
           maxWidth:440, margin:"0 auto", lineHeight:1.65 }}>
-          Commence gratuitement. Passe au Pro quand tu es pret.
+          Commencez gratuitement. Passez au Pro quand vous êtes prêt.
         </p>
       </div>
 
@@ -1060,7 +1060,7 @@ function TemplatesSection() {
           lineHeight: 1.1, maxWidth: 620, letterSpacing: "-0.02em",
         }}>
           Des templates prets{" "}
-          <span style={{ color: "#C9A84C" }}>pour ton metier.</span>
+          <span style={{ color: "#C9A84C" }}>pour votre métier.</span>
         </h2>
         <p style={{
           color: "rgba(138,132,120,0.85)", fontSize: 16,
@@ -1241,10 +1241,10 @@ function Navbar() {
 
 // ── How it works ──────────────────────────────────────────────────────────────
 const HOW_STEPS = [
-  {icon:"🎨",title:"Choisis un template",   desc:"Selectionne parmi nos modeles concus pour convertir. Adapte a ton secteur."},
-  {icon:"✏️", title:"Personnalise ta page",  desc:"Ajoute tes infos, liens, photo. Zero code, resultat professionnel en minutes."},
-  {icon:"📱",title:"Genere ton QR code",    desc:"Un QR dynamique est cree automatiquement. Change ta page sans le reimprimer."},
-  {icon:"🚀",title:"Partage partout",        desc:"Cartes de visite, reseaux, emails, en presentiel. Un seul QR, partout."},
+  {icon:"🎨",title:"Choisissez un modèle",   desc:"Parmi nos modèles conçus pour convertir, adaptés à votre secteur."},
+  {icon:"✏️", title:"Personnalisez votre page", desc:"Ajoutez vos infos, vos liens, vos photos. Sans code, résultat professionnel en minutes."},
+  {icon:"📱",title:"Générez votre QR code",  desc:"Un QR dynamique est créé automatiquement. Modifiez votre page sans le réimprimer."},
+  {icon:"🚀",title:"Partagez partout",       desc:"Cartes de visite, réseaux, e-mails, en présentiel. Un seul QR, partout."},
   {icon:"📊",title:"Analyse les resultats", desc:"Vois qui scanne, quand et depuis quel appareil. En temps reel."},
 ] as const
 function HowItWorks() {
@@ -1373,9 +1373,9 @@ function BuilderMockup(){
 function BuilderSection(){
   const {ref,visible}=useInView(0.07)
   const BEN=[
-    {icon:"🧱",title:"Blocs prets a l'emploi",desc:"Profil, liens, galerie, WhatsApp, paiement — tout y est."},
-    {icon:"🎨",title:"Templates metiers",desc:"Restaurant, freelance, artiste, coach — adapte des le depart."},
-    {icon:"📱",title:"Apercu mobile instantane",desc:"Vois le rendu en temps reel pendant que tu edites."},
+    {icon:"🧱",title:"Blocs prêts à l'emploi",desc:"Profil, liens, galerie, WhatsApp, paiement — tout y est."},
+    {icon:"🎨",title:"Modèles par métier",desc:"Restaurant, indépendant, artiste, coach — adaptés dès le départ."},
+    {icon:"📱",title:"Aperçu mobile instantané",desc:"Voyez le rendu en temps réel pendant que vous modifiez votre page."},
   ]
   return(
     <section id="builder" ref={ref} aria-labelledby="builder-title"
@@ -1395,7 +1395,7 @@ function BuilderSection(){
             Construis une page professionnelle{" "}<span style={{color:"#C9A84C"}}>en quelques minutes.</span>
           </h2>
           <p style={{color:"rgba(138,132,120,0.85)",fontSize:16,maxWidth:520,margin:"0 auto",lineHeight:1.7}}>
-            Ajoute des blocs, personnalise ton theme, publie et partage ton QR code.
+            Ajoutez des blocs, personnalisez votre thème, publiez et partagez votre QR code.
           </p>
         </div>
         <div style={{opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(32px)",
@@ -1593,7 +1593,7 @@ function QRDynamicSection() {
             </h2>
             <p style={{ color: "rgba(138,132,120,0.85)", fontSize: 16,
               lineHeight: 1.7, marginBottom: 36, maxWidth: 440 }}>
-              Modifie ta page ou ta destination sans jamais reimprimer ton QR code.
+              Modifiez votre page ou votre destination sans jamais réimprimer votre QR code.
             </p>
 
             {/* Bénéfices */}
@@ -1791,9 +1791,9 @@ const ANALYTICS_DEMO = {
 
 const ANALYTICS_BENEFITS = [
   { icon: "📍", text: "Savoir quels QR codes fonctionnent vraiment" },
-  { icon: "📱", text: "Comprendre les appareils de tes visiteurs" },
-  { icon: "🎯", text: "Optimiser tes CTA et pages de destination" },
-  { icon: "📈", text: "Suivre ta croissance semaine après semaine" },
+  { icon: "📱", text: "Comprendre les appareils de vos visiteurs" },
+  { icon: "🎯", text: "Optimiser vos boutons d'action et vos pages" },
+  { icon: "📈", text: "Suivre votre croissance semaine après semaine" },
 ]
 
 function AnalyticsMockup() {
@@ -2066,103 +2066,103 @@ const USE_CASES = [
     id: "restaurant",
     icon: "🍽️",
     label: "Restaurant",
-    title: "Transforme ta table en experience connectee.",
-    desc: "Tes clients scannent, voient ton menu a jour, reservent et laissent un avis en 2 taps.",
+    title: "Transformez votre table en expérience connectée.",
+    desc: "Vos clients scannent, consultent votre menu à jour, réservent et laissent un avis en 2 gestes.",
     color: "#F97316",
     blocks: [
-      { icon:"📋", label:"Menu interactif",   note:"Mis a jour sans reimprimer" },
-      { icon:"📅", label:"Reservations",      note:"Lien direct vers ton systeme" },
+      { icon:"📋", label:"Menu interactif",   note:"Mis à jour sans réimprimer" },
+      { icon:"📅", label:"Réservations",      note:"Lien direct vers votre système" },
       { icon:"⭐", label:"Avis Google",        note:"Redirection automatique" },
-      { icon:"🕐", label:"Horaires",          note:"Modifiables a tout moment" },
-      { icon:"📍", label:"Itineraire",         note:"Google Maps integre" },
-      { icon:"🎉", label:"Evenements speciaux",note:"Soirees, menus du jour" },
+      { icon:"🕐", label:"Horaires",          note:"Modifiables à tout moment" },
+      { icon:"📍", label:"Itinéraire",         note:"Google Maps intégré" },
+      { icon:"🎉", label:"Événements spéciaux",note:"Soirées, menus du jour" },
     ],
-    cta: "Creer ma page restaurant",
+    cta: "Créer ma page restaurant",
   },
   {
     id: "freelance",
     icon: "💼",
     label: "Freelance",
-    title: "Ta carte de visite devient une vitrine interactive.",
-    desc: "Un seul QR sur tes cartes pro. Le client arrive sur ton portfolio, tes services et ton contact.",
+    title: "Votre carte de visite devient une vitrine interactive.",
+    desc: "Un seul QR sur vos cartes pro. Le client arrive sur votre portfolio, vos services et votre contact.",
     color: "#38BDF8",
     blocks: [
       { icon:"🖼️",  label:"Portfolio",       note:"Galerie de projets" },
-      { icon:"🛠️",  label:"Services & tarifs",note:"Ce que tu proposes" },
-      { icon:"💬", label:"WhatsApp direct",   note:"CTA de prise de contact" },
-      { icon:"📄", label:"CV telechargeable", note:"PDF en un clic" },
-      { icon:"🔗", label:"Liens sociaux",     note:"LinkedIn, Behance..." },
-      { icon:"📅", label:"Calendly",          note:"Prise de RDV integree" },
+      { icon:"🛠️",  label:"Services & tarifs",note:"Vos prestations" },
+      { icon:"💬", label:"WhatsApp direct",   note:"Bouton de prise de contact" },
+      { icon:"📄", label:"CV téléchargeable", note:"PDF en un clic" },
+      { icon:"🔗", label:"Liens sociaux",     note:"LinkedIn, Behance…" },
+      { icon:"📅", label:"Calendly",          note:"Prise de RDV intégrée" },
     ],
-    cta: "Creer ma page freelance",
+    cta: "Créer ma page indépendant",
   },
   {
     id: "creator",
     icon: "🎵",
     label: "Createur",
-    title: "Un lien unique pour tous tes contenus.",
-    desc: "Centralise tes reseaux, musiques, videos et collaborations sur une page elegante.",
+    title: "Un lien unique pour tous vos contenus.",
+    desc: "Centralisez vos réseaux, musiques, vidéos et collaborations sur une page élégante.",
     color: "#A78BFA",
     blocks: [
-      { icon:"📸", label:"Instagram / TikTok", note:"Tes dernieres publications" },
-      { icon:"🎬", label:"YouTube / Twitch",   note:"Lien vers ta chaine" },
-      { icon:"🎵", label:"Streaming",          note:"Spotify, Apple Music..." },
-      { icon:"🤝", label:"Partenariats",       note:"Tes codes promo" },
+      { icon:"📸", label:"Instagram / TikTok", note:"Vos dernières publications" },
+      { icon:"🎬", label:"YouTube / Twitch",   note:"Lien vers votre chaîne" },
+      { icon:"🎵", label:"Streaming",          note:"Spotify, Apple Music…" },
+      { icon:"🤝", label:"Partenariats",       note:"Vos codes promo" },
       { icon:"💌", label:"Newsletter",         note:"Formulaire d'inscription" },
-      { icon:"🛍️",  label:"Boutique",          note:"Tes produits / merch" },
+      { icon:"🛍️",  label:"Boutique",          note:"Vos produits / merch" },
     ],
-    cta: "Creer ma page createur",
+    cta: "Créer ma page créateur",
   },
   {
     id: "immo",
     icon: "🏠",
     label: "Immobilier",
     title: "Chaque panneau devient un outil de vente.",
-    desc: "Colle ton QR sur tes panneaux et brochures. L'acheteur accede aux details en 1 scan.",
+    desc: "Collez votre QR sur vos panneaux et brochures. L'acheteur accède à tous les détails en 1 scan.",
     color: "#C9A84C",
     blocks: [
       { icon:"🏡", label:"Fiche du bien",      note:"Photos, surface, prix" },
       { icon:"📞", label:"Contact direct",     note:"Appel ou message" },
       { icon:"📅", label:"Visites",            note:"Demande de visite en ligne" },
-      { icon:"📄", label:"Brochure PDF",       note:"Telechargement instantane" },
+      { icon:"📄", label:"Brochure PDF",       note:"Téléchargement instantané" },
       { icon:"🗺️",  label:"Localisation",      note:"Plan interactif" },
-      { icon:"💶", label:"Financement",        note:"Simulateur de credit" },
+      { icon:"💶", label:"Financement",        note:"Simulateur de crédit" },
     ],
-    cta: "Creer ma page immobilier",
+    cta: "Créer ma page immobilier",
   },
   {
     id: "event",
     icon: "🎪",
     label: "Evenement",
-    title: "Tiens tes participants informes en temps reel.",
-    desc: "Programme, billets, acces et mises a jour — tout sur une page modifiable meme la veille.",
+    title: "Tenez vos participants informés en temps réel.",
+    desc: "Programme, billets, accès et mises à jour — tout sur une page modifiable même la veille.",
     color: "#39FF8F",
     blocks: [
-      { icon:"📋", label:"Programme",          note:"Mis a jour en direct" },
+      { icon:"📋", label:"Programme",          note:"Mis à jour en direct" },
       { icon:"🎫", label:"Billetterie",        note:"Lien d'achat direct" },
-      { icon:"⏳", label:"Countdown",          note:"Decompte automatique" },
-      { icon:"📍", label:"Lieu & acces",       note:"Plan et transport" },
-      { icon:"📸", label:"Galerie",            note:"Photos de l'edition passee" },
+      { icon:"⏳", label:"Compte à rebours",   note:"Décompte automatique" },
+      { icon:"📍", label:"Lieu & accès",       note:"Plan et transport" },
+      { icon:"📸", label:"Galerie",            note:"Photos de l'édition passée" },
       { icon:"📣", label:"Intervenants",       note:"Biographies et horaires" },
     ],
-    cta: "Creer ma page evenement",
+    cta: "Créer ma page événement",
   },
   {
     id: "commerce",
     icon: "🛍️",
     label: "Commerce local",
-    title: "Attire plus de clients avec un QR sur ta vitrine.",
-    desc: "Tes promo, tes produits et tes horaires toujours a jour. Un scan depuis la rue suffit.",
+    title: "Attirez plus de clients avec un QR sur votre vitrine.",
+    desc: "Vos promotions, vos produits et vos horaires toujours à jour. Un scan depuis la rue suffit.",
     color: "#F43F5E",
     blocks: [
       { icon:"🏷️",  label:"Promotions",        note:"Offres du moment" },
-      { icon:"📦", label:"Catalogue produits", note:"Mis a jour facilement" },
-      { icon:"🕐", label:"Horaires",           note:"Feries inclus" },
+      { icon:"📦", label:"Catalogue produits", note:"Mis à jour facilement" },
+      { icon:"🕐", label:"Horaires",           note:"Jours fériés inclus" },
       { icon:"⭐", label:"Avis clients",        note:"Lien Google / Tripadvisor" },
-      { icon:"📍", label:"Itineraire",          note:"Depuis n'importe ou" },
+      { icon:"📍", label:"Itinéraire",          note:"Depuis n'importe où" },
       { icon:"💬", label:"Contact rapide",      note:"WhatsApp ou appel" },
     ],
-    cta: "Creer ma page commerce",
+    cta: "Créer ma page commerce",
   },
 ] as const
 
@@ -2209,11 +2209,11 @@ function UseCasesSection() {
           margin: "0 auto 16px", lineHeight: 1.1,
           maxWidth: 600, letterSpacing: "-0.02em",
         }}>
-          Fait pour <span style={{ color: "#C9A84C" }}>ton metier.</span>
+          Fait pour <span style={{ color: "#C9A84C" }}>votre métier.</span>
         </h2>
         <p style={{ color: "rgba(138,132,120,0.8)", fontSize: 16,
           maxWidth: 480, margin: "0 auto", lineHeight: 1.65 }}>
-          Selectionne ton activite et vois exactement ce que QRfolio peut faire pour toi.
+          Sélectionnez votre activité et voyez exactement ce que QRfolio peut faire pour vous.
         </p>
       </div>
 
@@ -2718,7 +2718,7 @@ export default function HomePage() {
               margin:"0 0 20px", lineHeight:1.12,
               letterSpacing:"-0.02em",
             }}>
-              Pret a transformer ton QR code en{" "}
+              Prêt à transformer votre QR code en{" "}
               <span style={{ color:"#C9A84C" }}>vraie page professionnelle ?</span>
             </h2>
 
@@ -2727,7 +2727,7 @@ export default function HomePage() {
               lineHeight:1.7, margin:"0 0 44px", maxWidth:520,
               marginLeft:"auto", marginRight:"auto",
             }}>
-              Cree ton QRfolio gratuitement, personnalise ta page et commence a suivre tes scans en quelques minutes.
+              Créez votre QRfolio gratuitement, personnalisez votre page et commencez à suivre vos scans en quelques minutes.
             </p>
 
             <Link href="/auth/signup" style={{
