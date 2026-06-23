@@ -465,6 +465,42 @@ const PLAN_LANDING_UI = {
   business: { cta: "Contacter l equipe",          href: "/auth/signup?plan=business", badge: null,                note: null },
 } as Record<string, { cta: string; href: string; badge: string | null; note: string | null }>
 
+// Bénéfices orientés résultat (Pb 12) — on vend ce que ça apporte, pas une liste de specs
+const LANDING_BENEFITS: Record<string, { text: string; ok: boolean }[]> = {
+  free: [
+    { text: "Votre page en ligne en 5 minutes", ok: true },
+    { text: "Un QR code dynamique prêt à imprimer", ok: true },
+    { text: "Suivez vos premières visites", ok: true },
+    { text: "3 pages · 200 vues / mois", ok: true },
+    { text: "Sans la mention QRfolio", ok: false },
+    { text: "Votre nom de domaine", ok: false },
+  ],
+  starter: [
+    { text: "Votre marque, sans mention QRfolio", ok: true },
+    { text: "Votre propre nom de domaine", ok: true },
+    { text: "Des QR codes personnalisés à votre image", ok: true },
+    { text: "5 pages · 850 vues / mois", ok: true },
+    { text: "Téléchargement PNG prêt à imprimer", ok: true },
+    { text: "Génération assistée par IA", ok: false },
+  ],
+  pro: [
+    { text: "Créez des QR codes uniques et professionnels", ok: true },
+    { text: "Concevez vos supports imprimés (affiches, flyers, cartes)", ok: true },
+    { text: "Recevez des recommandations automatiques pour progresser", ok: true },
+    { text: "Lancez votre page avec tous les modèles premium", ok: true },
+    { text: "Téléchargement PNG · JPG · PDF haute définition", ok: true },
+    { text: "25 pages · 15 000 vues / mois", ok: true },
+  ],
+  business: [
+    { text: "Pages et vues illimitées", ok: true },
+    { text: "Travaillez à plusieurs (5 membres)", ok: true },
+    { text: "Votre marque uniquement (marque blanche)", ok: true },
+    { text: "Automatisez grâce à l'accès API", ok: true },
+    { text: "Tout le plan Pro inclus", ok: true },
+    { text: "Support prioritaire 24/7", ok: true },
+  ],
+}
+
 const PLANS = PLAN_LIST.map(p => ({
   id: p.id,
   name: p.label,
@@ -476,7 +512,7 @@ const PLANS = PLAN_LIST.map(p => ({
   color: p.color,
   cta: PLAN_LANDING_UI[p.id].cta,
   ctaHref: PLAN_LANDING_UI[p.id].href,
-  features: p.perks.slice(0, 6).map(k => ({ text: k.text, ok: k.included })),
+  features: LANDING_BENEFITS[p.id] ?? p.perks.slice(0, 6).map(k => ({ text: k.text, ok: k.included })),
   note: PLAN_LANDING_UI[p.id].note,
 }))
 
