@@ -1302,8 +1302,8 @@ function TemplatesSection() {
           color: "rgba(138,132,120,0.85)", fontSize: 16,
           maxWidth: 540, margin: "0 auto", lineHeight: 1.7,
         }}>
-          Restaurant, freelance, coach, artiste, immobilier, commerce :{" "}
-          commence avec une page deja structuree.
+          Restaurant, indépendant, coach, artiste, immobilier, commerce :{" "}
+          partez d'une page déjà structurée.
         </p>
       </div>
 
@@ -1481,7 +1481,7 @@ const HOW_STEPS = [
   {icon:"✏️", title:"Personnalisez votre page", desc:"Ajoutez vos infos, vos liens, vos photos. Sans code, résultat professionnel en minutes."},
   {icon:"📱",title:"Générez votre QR code",  desc:"Un QR dynamique est créé automatiquement. Modifiez votre page sans le réimprimer."},
   {icon:"🚀",title:"Partagez partout",       desc:"Cartes de visite, réseaux, e-mails, en présentiel. Un seul QR, partout."},
-  {icon:"📊",title:"Analyse les resultats", desc:"Vois qui scanne, quand et depuis quel appareil. En temps reel."},
+  {icon:"📊",title:"Analysez les résultats", desc:"Voyez qui scanne, quand et depuis quel appareil. En temps réel."},
 ] as const
 function HowItWorks() {
   const {ref,visible}=useInView(0.08)
@@ -1590,7 +1590,7 @@ function BuilderMockup(){
         </div>
       </div>
       <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:8}}>
-        <p style={{color:"rgba(201,168,76,0.5)",fontSize:9,letterSpacing:2,textTransform:"uppercase",fontWeight:700}}>Apercu</p>
+        <p style={{color:"rgba(201,168,76,0.5)",fontSize:9,letterSpacing:2,textTransform:"uppercase",fontWeight:700}}>Aperçu</p>
         <div style={{width:88,border:"2px solid rgba(201,168,76,0.25)",borderRadius:18,padding:"10px 6px",background:"rgba(8,8,8,0.8)",boxShadow:"0 0 24px rgba(201,168,76,0.08)",display:"flex",flexDirection:"column"}}>
           <div style={{width:24,height:4,borderRadius:2,background:"rgba(255,255,255,0.1)",margin:"0 auto 8px"}}/>
           <div style={{display:"flex",flexDirection:"column",gap:5,alignItems:"center"}}>
@@ -1878,7 +1878,7 @@ function QRDynamicSection() {
                   el.style.transform = "none"
                   el.style.boxShadow = "0 4px 20px rgba(201,168,76,0.35)"
                 }}>
-                Creer mon QR gratuit <span style={{ fontSize: 16 }}>→</span>
+                Créer mon QR gratuit <span style={{ fontSize: 16 }}>→</span>
               </a>
             </div>
           </div>
@@ -3005,7 +3005,7 @@ export default function HomePage() {
             }}
               onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="translateY(-3px) scale(1.03)";el.style.boxShadow="0 8px 40px rgba(201,168,76,0.55)"}}
               onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="none";el.style.boxShadow="0 4px 32px rgba(201,168,76,0.4)"}}>
-              Creer mon QRfolio gratuit
+              Créer mon QRfolio gratuit
               <span style={{ fontSize:18 }}>→</span>
             </Link>
 
