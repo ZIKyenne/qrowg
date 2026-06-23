@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
-import { PLAN_LIST, fmtPrice } from "@/lib/plans"
+import { PLAN_LIST, PLAN_COMPARISON, fmtPrice } from "@/lib/plans"
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function useInView(threshold = 0.15) {
@@ -667,23 +667,72 @@ function PricingSection() {
           ))}
         </div>
 
-        {/* Lien comparaison complète */}
-        <div style={{
-          textAlign:"center", marginTop:40,
-          opacity: visible ? 1 : 0,
-          transition:"opacity 0.6s ease 0.5s",
-        }}>
-          <Link href="/upgrade" style={{
-            color:"rgba(138,132,120,0.6)", fontSize:13,
-            textDecoration:"none", display:"inline-flex",
-            alignItems:"center", gap:6,
-            transition:"color 0.2s",
-          }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#C9A84C" }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "rgba(138,132,120,0.6)" }}>
-            Voir la comparaison complete des plans
-            <span style={{ fontSize:14 }}>→</span>
-          </Link>
+        {/* Comparaison détaillée des plans (Pb 13) */}
+        <div style={{ marginTop: 56, opacity: visible ? 1 : 0, transition: "opacity 0.6s ease 0.4s" }}>
+          <h3 style={{ fontFamily: "Cormorant Garamond, serif", color: "#F5F0E8", fontSize: "clamp(22px,2.6vw,32px)", fontWeight: 700, textAlign: "center", margin: "0 0 6px" }}>
+            Comparez les plans en détail
+          </h3>
+          <p style={{ color: "rgba(138,132,120,0.7)", fontSize: 13, textAlign: "center", margin: "0 0 26px" }}>
+            Survolez le <span style={{ color: "#C9A84C" }}>?</span> de chaque ligne pour plus d'explications.
+          </p>
+          {(() => {
+            const INFO: Record<string, string> = {
+              "Pages": "Nombre de pages publiables en même temps.",
+              "Vues / mois": "Nombre de visites comptabilisées chaque mois sur vos pages.",
+              "QR codes": "Nombre de QR codes que vous pouvez générer.",
+              "QR Studio": "Personnalisation avancée du QR : couleurs, formes des modules et des coins.",
+              "QR Print Studio": "Éditeur d'imprimables (affiches, flyers, cartes, stickers) façon Canva.",
+              "IA": "Génération de design et recommandations automatiques.",
+              "Export HD": "Formats de téléchargement haute définition pour l'impression.",
+              "Templates": "Bibliothèque de modèles prêts à l'emploi.",
+              "Branding QRfolio": "Mention QRfolio en bas de page (retirée dès le plan Starter).",
+              "Domaine perso": "Utiliser votre propre nom de domaine.",
+              "Analytics": "Niveau de détail des statistiques.",
+              "Equipe": "Nombre de membres pouvant collaborer sur le compte.",
+              "API": "Accès programmatique pour automatiser vos QR codes.",
+              "Marque blanche": "Aucune trace de QRfolio : votre marque uniquement.",
+              "Support": "Niveau et rapidité de l'assistance.",
+            }
+            const cell = (v: string, hl: boolean) => {
+              const ok = v === "✓" || v === "Oui"
+              const no = v === "❌" || v === "—" || v === "Non"
+              return (
+                <td style={{ padding: "12px 14px", textAlign: "center", fontSize: 12.5, fontWeight: hl ? 700 : 500, color: ok ? "#39FF8F" : no ? "rgba(138,132,120,0.45)" : hl ? "#C9A84C" : "#E8E6E0", borderBottom: "1px solid rgba(255,255,255,0.05)", background: hl ? "rgba(201,168,76,0.05)" : "transparent" }}>
+                  {ok ? "✓" : no ? "—" : v}
+                </td>
+              )
+            }
+            return (
+              <div style={{ overflowX: "auto", maxWidth: 960, margin: "0 auto", border: "1px solid rgba(201,168,76,0.14)", borderRadius: 16, background: "rgba(255,255,255,0.02)" }}>
+                <table style={{ width: "100%", minWidth: 620, borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      <th style={{ padding: "16px 14px", textAlign: "left", fontSize: 11, color: "rgba(138,132,120,0.8)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>Fonctionnalité</th>
+                      {PLAN_LIST.map(p => (
+                        <th key={p.id} style={{ padding: "16px 14px", textAlign: "center", fontSize: 13, fontWeight: 800, color: p.id === "pro" ? "#C9A84C" : "#F5F0E8", background: p.id === "pro" ? "rgba(201,168,76,0.06)" : "transparent" }}>
+                          {p.label}{p.id === "pro" && <div style={{ fontSize: 8.5, color: "#C9A84C", fontWeight: 700, letterSpacing: 0.5 }}>POPULAIRE</div>}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {PLAN_COMPARISON.map(row => (
+                      <tr key={row.feature}>
+                        <td style={{ padding: "12px 14px", textAlign: "left", fontSize: 12.5, color: "#E8E6E0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                          {row.feature}
+                          {INFO[row.feature] && <span title={INFO[row.feature]} style={{ marginLeft: 6, display: "inline-flex", alignItems: "center", justifyContent: "center", width: 14, height: 14, borderRadius: "50%", background: "rgba(201,168,76,0.15)", color: "#C9A84C", fontSize: 9, fontWeight: 800, cursor: "help" }}>?</span>}
+                        </td>
+                        {cell(row.free, false)}
+                        {cell(row.starter, false)}
+                        {cell(row.pro, true)}
+                        {cell(row.business, false)}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )
+          })()}
         </div>
       </div>
     </section>
