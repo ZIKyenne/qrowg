@@ -3421,9 +3421,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             <div style={{ padding: "10px 12px 0", flexShrink: 0 }}>
               <input value={tplSearch} onChange={e => setTplSearch(e.target.value)} placeholder="Rechercher un modèle…"
                 style={{ width: "100%", background: BG, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 8, padding: "8px 10px", color: INK, fontSize: 11, outline: "none", boxSizing: "border-box" }} />
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 9 }}>
+
+              {/* Filtre par métier */}
+              <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "11px 0 6px" }}>Métier</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {[{ id: "", label: "Tous", emoji: "✨" }, ...SECTORS].map(s => {
-                  const on = tplSector === s.id
+                  const on = tplSector === s.id && !tplColl
                   return (
                     <button key={s.id} type="button" onClick={() => { setTplSector(s.id); setTplColl("") }} title={s.label}
                       style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 9px", borderRadius: 999, cursor: "pointer", fontSize: 10.5, fontWeight: on ? 700 : 500, background: on ? "rgba(201,168,76,0.18)" : "rgba(0,0,0,0.04)", border: `1px solid ${on ? G : "rgba(0,0,0,0.1)"}`, color: on ? G : INK }}>
@@ -3432,13 +3435,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   )
                 })}
               </div>
-              {/* Collections (familles de style) */}
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 7 }}>
+
+              {/* Filtre par collection (style) — séparé visuellement */}
+              <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "12px 0 6px", paddingTop: 10, borderTop: "1px solid rgba(0,0,0,0.07)" }}>Collection · style</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {COLLECTIONS.map(col => {
                   const on = tplColl === col.id
                   return (
                     <button key={col.id} type="button" onClick={() => setTplColl(on ? "" : col.id)} title={`Collection ${col.label}`}
-                      style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: on ? 700 : 500, background: on ? "rgba(201,168,76,0.18)" : "rgba(0,0,0,0.03)", border: `1px solid ${on ? G : "rgba(0,0,0,0.08)"}`, color: on ? G : MUTED }}>
+                      style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: on ? 700 : 500, background: on ? `${G}` : "rgba(0,0,0,0.03)", border: `1px solid ${on ? G : "rgba(0,0,0,0.08)"}`, color: on ? "#fff" : MUTED }}>
                       <span>{col.emoji}</span>{col.label}
                     </button>
                   )
