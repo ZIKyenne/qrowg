@@ -313,6 +313,16 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"guide-steps",   label:"Guide — Étapes 1·2·3",obj:"Page",      emoji:"📖", desc:"Étapes numérotées + QR, check-in/how-to",  bg:"#F3F0E9", ink:"#2A2419", accent:"#3FA796" },
 ]
 
+// Collections : familles cohérentes (curées d'ids) pour parcourir par style
+const COLLECTIONS: { id: string; label: string; emoji: string; ids: string[] }[] = [
+  { id: "luxury",     label: "Luxury",     emoji: "💎", ids: ["avis-prestige", "resto-ornate", "cocktail-noir", "menu", "avis-or"] },
+  { id: "restaurant", label: "Restaurant", emoji: "🍽️", ids: ["resto-ornate", "cocktail-noir", "happyhour-diag", "cafe-studio", "menu"] },
+  { id: "corporate",  label: "Corporate",  emoji: "💼", ids: ["contact-card", "immo-fiche", "reserve-stripe", "contact-studio", "immo-studio"] },
+  { id: "event",      label: "Event",      emoji: "🎉", ids: ["event-ticket", "event-studio", "soldes-mega"] },
+  { id: "creator",    label: "Creator",    emoji: "🎨", ids: ["insta-block", "creator-bio", "portfolio-grid", "insta-studio"] },
+  { id: "business",   label: "Business",   emoji: "📈", ids: ["contact-card", "reserve-stripe", "portfolio-grid", "promo-burst", "soldes-mega"] },
+]
+
 // Secteurs d'activite -> objectifs pertinents (pour filtrer la galerie)
 const SECTORS: { id: string; label: string; emoji: string; objs: string[] }[] = [
   { id: "resto",   label: "Restaurant",  emoji: "🍽️", objs: ["Menu", "Réserver", "Avis", "Wifi", "Fidélité", "Page"] },
@@ -859,6 +869,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [tplOpen, setTplOpen] = useState(true) // menu Modeles deplie par defaut (vue globale)
   const [tplSearch, setTplSearch] = useState("")
   const [tplSector, setTplSector] = useState("")
+  const [tplColl, setTplColl] = useState("") // collection sélectionnée ("" = vue par objectif)
   const [compOpen, setCompOpen] = useState(false) // flyout composants metier
   const [thumbCache, setThumbCache] = useState<Record<string, string>>({}) // photo par objectif pour les vignettes
   const [photoOpen, setPhotoOpen] = useState(false) // flyout recherche photos (Unsplash)
@@ -3414,16 +3425,46 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 {[{ id: "", label: "Tous", emoji: "✨" }, ...SECTORS].map(s => {
                   const on = tplSector === s.id
                   return (
-                    <button key={s.id} type="button" onClick={() => setTplSector(s.id)} title={s.label}
+                    <button key={s.id} type="button" onClick={() => { setTplSector(s.id); setTplColl("") }} title={s.label}
                       style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 9px", borderRadius: 999, cursor: "pointer", fontSize: 10.5, fontWeight: on ? 700 : 500, background: on ? "rgba(201,168,76,0.18)" : "rgba(0,0,0,0.04)", border: `1px solid ${on ? G : "rgba(0,0,0,0.1)"}`, color: on ? G : INK }}>
                       <span>{s.emoji}</span>{s.label}
                     </button>
                   )
                 })}
               </div>
+              {/* Collections (familles de style) */}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 7 }}>
+                {COLLECTIONS.map(col => {
+                  const on = tplColl === col.id
+                  return (
+                    <button key={col.id} type="button" onClick={() => setTplColl(on ? "" : col.id)} title={`Collection ${col.label}`}
+                      style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: on ? 700 : 500, background: on ? "rgba(201,168,76,0.18)" : "rgba(0,0,0,0.03)", border: `1px solid ${on ? G : "rgba(0,0,0,0.08)"}`, color: on ? G : MUTED }}>
+                      <span>{col.emoji}</span>{col.label}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
             <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "10px 10px 16px" }}>
-              {(() => {
+              {/* Vue par COLLECTION (si une collection est sélectionnée) */}
+              {tplColl ? (() => {
+                const col = COLLECTIONS.find(c => c.id === tplColl)
+                const items = (col?.ids ?? []).map(id => PRINT_TEMPLATES.find(t => t.id === id)).filter(Boolean) as typeof PRINT_TEMPLATES
+                return (
+                  <div>
+                    <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>{col?.emoji} Collection {col?.label}</p>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                      {items.map(t => (
+                        <button key={t.id} type="button" onClick={() => applyTemplate(t.id)} title={t.desc}
+                          style={{ display: "flex", flexDirection: "column", gap: 5, padding: 6, background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: 10, cursor: "pointer" }}>
+                          {tplThumb(t, thumbCache[t.obj])}
+                          <span style={{ color: INK, fontSize: 10, fontWeight: 700, textAlign: "center", lineHeight: 1.2 }}>{t.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })() : (() => {
                 const sectorObjs = SECTORS.find(s => s.id === tplSector)?.objs ?? null
                 const visibleObjs = ["Avis", "Menu", "Réserver", "Abonnés", "Contact", "Wifi", "Fidélité", "Page"].filter(o => !sectorObjs || sectorObjs.includes(o))
                 return visibleObjs.map(obj => {
