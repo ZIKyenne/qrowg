@@ -176,7 +176,7 @@ function groupText(o: fabric.Object | undefined | null): fabric.Text | null {
 }
 
 const TOJSON_PROPS = [
-  "isQR", "name", "role", "isQrCard",
+  "isQR", "name", "role", "isQrCard", "isQrLabel",
   "lockMovementX", "lockMovementY",
   "lockScalingX", "lockScalingY",
   "lockRotation", "selectable", "evented",
@@ -1322,6 +1322,24 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     label.set({ originX: "center", originY: "top", left: c.x, top: c.y + fr / 2 + 12 })
     fc.add(frame); fc.add(label)
     fc.setActiveObject(label); fc.requestRenderAll(); pushHistorySoon(); setLayersVer(v => v + 1)
+  }
+  // Etiquette QR : pilule de texte sous le QR (remplace l'etiquette precedente)
+  const addQrLabel = (text: string) => {
+    const fc = fcRef.current; if (!fc) return
+    const img = fc.getObjects().find(o => (o as any).isQR) as fabric.Image | undefined; if (!img) return
+    fc.getObjects().filter(o => (o as any).isQrLabel).forEach(o => fc.remove(o)) // une seule etiquette
+    const card = fc.getObjects().find(o => (o as any).isQrCard) as fabric.Object | undefined
+    const ref = card || img
+    const c = ref.getCenterPoint(), w = ref.getScaledWidth(), h = ref.getScaledHeight()
+    const pill = buildPill(text, { rectFill: G, textFill: readableOn(G), height: Math.round(w * 0.17), fontSize: Math.round(w * 0.08) })
+    ;(pill as any).isQrLabel = true
+    pill.set({ originX: "center", originY: "top", left: c.x, top: c.y + h / 2 + Math.round(w * 0.06) })
+    fc.add(pill); fc.setActiveObject(pill); fc.requestRenderAll(); pushHistorySoon(); setLayersVer(v => v + 1)
+  }
+  const removeQrLabel = () => {
+    const fc = fcRef.current; if (!fc) return
+    fc.getObjects().filter(o => (o as any).isQrLabel).forEach(o => fc.remove(o))
+    fc.discardActiveObject(); setSel(null); fc.requestRenderAll(); pushHistorySoon(); setLayersVer(v => v + 1)
   }
   // Repartir d'une page vierge : on retire tout (sauf guides) et on replace le QR
   const resetCanvas = () => {
@@ -3904,6 +3922,22 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               </div>
               <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
+
+                {/* Etiquette QR (quand le QR est selectionne) */}
+                {sel.isQr && (
+                  <div style={{ marginBottom: 14 }}>
+                    <p className="ps-sec-label">Étiquette QR</p>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 6 }}>
+                      {["SCANNEZ-MOI", "★ AVIS GOOGLE", "VOIR LE MENU", "INSTAGRAM", "RÉSERVER", "WIFI GRATUIT", "SUIVEZ-NOUS"].map(l => (
+                        <button key={l} type="button" onClick={() => addQrLabel(l)} style={{ ...layerBtn, fontSize: 9.5, padding: "7px 9px", flex: "1 0 auto" }}>{l}</button>
+                      ))}
+                    </div>
+                    <div style={{ display: "flex", gap: 5 }}>
+                      <button type="button" onClick={dressQr} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }} title="Cadre + Scannez-moi">▢ Cadre + étiquette</button>
+                      <button type="button" onClick={removeQrLabel} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Retirer l'étiquette</button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Texte du bouton / badge (groupe avec texte) */}
                 {sel.label !== null && (
