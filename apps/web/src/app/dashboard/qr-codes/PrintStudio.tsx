@@ -146,6 +146,7 @@ type SelState = {
   bold: boolean
   italic: boolean
   underline: boolean
+  strike: boolean
   locked: boolean
   label: string | null    // libelle editable (groupe CTA/badge contenant un texte)
   isGroup: boolean        // true => "Couleur" recolore les formes du groupe
@@ -914,6 +915,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       bold: isText ? (t.fontWeight === "bold" || t.fontWeight === 700) : false,
       italic: isText ? (t.fontStyle === "italic") : false,
       underline: isText ? !!t.underline : false,
+      strike: isText ? !!(t as fabric.IText).linethrough : false,
       locked: !!o.lockMovementX,
       label: txtChild?.text ?? null,
       isGroup,
@@ -2018,6 +2020,32 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "bottom":  o.set("top",  (o.top ?? 0) + (H - (b.top + b.height))); break
     }
     o.setCoords(); fc.requestRenderAll(); pushHistorySoon()
+  }
+
+  // Distribuer : espacement régulier des objets d'une multi-sélection (≥ 3)
+  const distribute = (axis: "h" | "v") => {
+    const fc = fcRef.current; if (!fc) return
+    const sel = fc.getActiveObject()
+    if (!sel || sel.type !== "activeSelection") return
+    const objs = (sel as fabric.ActiveSelection).getObjects().slice()
+    if (objs.length < 3) return
+    // coords absolues (dans l'activeSelection, left/top sont relatifs au centre du groupe)
+    const rect = (o: fabric.Object) => o.getBoundingRect(true)
+    objs.sort((a, b) => axis === "h" ? rect(a).left - rect(b).left : rect(a).top - rect(b).top)
+    const first = rect(objs[0]), last = rect(objs[objs.length - 1])
+    const startC = axis === "h" ? first.left + first.width / 2 : first.top + first.height / 2
+    const endC = axis === "h" ? last.left + last.width / 2 : last.top + last.height / 2
+    const step = (endC - startC) / (objs.length - 1)
+    objs.forEach((o, i) => {
+      if (i === 0 || i === objs.length - 1) return
+      const r = rect(o)
+      const targetC = startC + step * i
+      const curC = axis === "h" ? r.left + r.width / 2 : r.top + r.height / 2
+      if (axis === "h") o.set("left", (o.left ?? 0) + (targetC - curC))
+      else o.set("top", (o.top ?? 0) + (targetC - curC))
+      o.setCoords()
+    })
+    fc.requestRenderAll(); pushHistorySoon()
   }
 
   // ---- Outils : miroir, grouper, degrouper, tout selectionner --------------
@@ -4064,6 +4092,25 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                       </button>
                     </div>
 
+                    {/* Barré + Casse (majuscules / minuscules) */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 10 }}>
+                      <button type="button" title="Barré"
+                        onClick={() => mutate(o => (o as fabric.IText).set("linethrough", !sel.strike))}
+                        style={{ ...layerBtn, background: sel.strike ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: sel.strike ? G : INK, textDecoration: "line-through", fontWeight: 700 }}>
+                        S
+                      </button>
+                      <button type="button" title="MAJUSCULES"
+                        onClick={() => mutate(o => { const t = o as fabric.IText; t.set("text", (t.text || "").toUpperCase()); (t as unknown as { initDimensions?: () => void }).initDimensions?.() })}
+                        style={{ ...layerBtn, fontWeight: 800, letterSpacing: 0.5 }}>
+                        AA
+                      </button>
+                      <button type="button" title="minuscules"
+                        onClick={() => mutate(o => { const t = o as fabric.IText; t.set("text", (t.text || "").toLowerCase()); (t as unknown as { initDimensions?: () => void }).initDimensions?.() })}
+                        style={{ ...layerBtn, fontWeight: 700, textTransform: "lowercase" }}>
+                        aa
+                      </button>
+                    </div>
+
                     {/* Alignement du texte */}
                     <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Alignement</label>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 10 }}>
@@ -4177,6 +4224,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     </button>
                   ))}
                 </div>
+                {sel.multi && (
+                  <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
+                    <button type="button" onClick={() => distribute("h")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }} title="Espacer régulièrement à l'horizontale">⇄ Distribuer H</button>
+                    <button type="button" onClick={() => distribute("v")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }} title="Espacer régulièrement à la verticale">⇅ Distribuer V</button>
+                  </div>
+                )}
               </div>
 
               {/* Actions rapides */}
@@ -4256,6 +4309,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 <button type="button" style={{ ...tb, color: sel.bold ? G : INK, fontWeight: 800 }} onClick={() => mutate(o => (o as fabric.IText).set("fontWeight", sel.bold ? "normal" : "bold"))}>B</button>
                 <button type="button" style={{ ...tb, color: sel.italic ? G : INK, fontStyle: "italic" }} onClick={() => mutate(o => (o as fabric.IText).set("fontStyle", sel.italic ? "normal" : "italic"))}>I</button>
                 <button type="button" style={{ ...tb, color: sel.underline ? G : INK, textDecoration: "underline" }} onClick={() => mutate(o => (o as fabric.IText).set("underline", !sel.underline))}>U</button>
+                <button type="button" style={{ ...tb, color: sel.strike ? G : INK, textDecoration: "line-through" }} title="Barré" onClick={() => mutate(o => (o as fabric.IText).set("linethrough", !sel.strike))}>S</button>
               </>
             ) : sel.label !== null ? (
               <>
