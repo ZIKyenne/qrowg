@@ -8,13 +8,21 @@ const PRICE_IDS: Record<string, string> = {
   pro: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "",
   business: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID || "",
 }
+// Prix annuels (optionnels) — à créer dans Stripe pour que le toggle "Annuel" facture vraiment l'annuel
+const ANNUAL_PRICE_IDS: Record<string, string> = {
+  starter: process.env.NEXT_PUBLIC_STRIPE_STARTER_ANNUAL_PRICE_ID || "",
+  pro: process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || "",
+  business: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_ANNUAL_PRICE_ID || "",
+}
 
 export async function POST(req: NextRequest) {
   try {
     const { plan, annual, userId } = await req.json()
 
-    const priceId = PRICE_IDS[plan]
+    // Annuel si demandé ET si un prix annuel est configuré, sinon mensuel
+    const priceId = (annual && ANNUAL_PRICE_IDS[plan]) ? ANNUAL_PRICE_IDS[plan] : PRICE_IDS[plan]
     if (!priceId) return NextResponse.json({ error: "Plan invalide" }, { status: 400 })
+    const billing = (annual && ANNUAL_PRICE_IDS[plan]) ? "annual" : "monthly"
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://qrfolio.app"
 
@@ -24,9 +32,9 @@ export async function POST(req: NextRequest) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${appUrl}/dashboard?upgraded=true`,
       cancel_url: `${appUrl}/upgrade?canceled=true`,
-      metadata: { userId, plan },
+      metadata: { userId, plan, priceId, billing },
       subscription_data: {
-        metadata: { userId, plan },
+        metadata: { userId, plan, priceId, billing },
         trial_period_days: 14,
       },
       allow_promotion_codes: true,

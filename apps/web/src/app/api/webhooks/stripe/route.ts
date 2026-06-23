@@ -13,7 +13,12 @@ const PLAN_FROM_PRICE: Record<string, string> = {
   [process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID || ""]: "starter",
   [process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || ""]: "pro",
   [process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID || ""]: "business",
+  // prix annuels (si configurés)
+  [process.env.NEXT_PUBLIC_STRIPE_STARTER_ANNUAL_PRICE_ID || "_na_starter"]: "starter",
+  [process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || "_na_pro"]: "pro",
+  [process.env.NEXT_PUBLIC_STRIPE_BUSINESS_ANNUAL_PRICE_ID || "_na_business"]: "business",
 }
+delete PLAN_FROM_PRICE[""] // ne pas mapper une cle vide si une env manque
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
