@@ -2353,16 +2353,17 @@ function UseCasesSection() {
 
 // ── FAQ section ───────────────────────────────────────────────────────────────
 const FAQ_ITEMS = [
-  { q:"Est-ce que le QR code reste le meme si je modifie ma page ?",       a:"Oui, c'est l'avantage cle d'un QR dynamique. Tu modifies ta page autant de fois que tu veux — le QR code imprime reste identique et continue de fonctionner." },
-  { q:"Puis-je utiliser QRfolio gratuitement ?",                           a:"Oui. Le plan Free donne acces a 3 pages, 200 vues par mois et 3 QR codes basiques. Aucune carte bancaire requise pour commencer." },
-  { q:"Est-ce que je peux connecter mon propre domaine ?",                 a:"Oui, a partir du plan Pro. Tu peux utiliser un sous-domaine personnalise (ex: carte.tonsite.fr) pour donner une image professionnelle." },
-  { q:"Est-ce que je vois les statistiques de scans ?",                   a:"Oui. Vues, scans, appareils, sources de trafic et pages les plus visitees. Analytics basiques inclus sur Free, analytics avances sur Pro." },
-  { q:"Puis-je retirer le branding QRfolio ?",                             a:"Oui, a partir du plan Pro. Sur le plan Free, une mention discrete apparait en bas de ta page." },
-  { q:"Est-ce adapte aux restaurants et commerces locaux ?",              a:"Oui. Des templates dedies sont disponibles : menu, horaires, reservation, avis Google, promotions. Prets a utiliser en 5 minutes." },
-  { q:"Puis-je telecharger mon QR code pour l'imprimer ?",                a:"Oui. Export disponible en PNG haute resolution, SVG et PDF — prets pour l'impression sur cartes de visite, flyers, menus ou affiches." },
-  { q:"Puis-je annuler mon abonnement ?",                                  a:"Oui, a tout moment depuis ton espace compte. Aucun engagement, aucun frais d'annulation. Ton acces reste actif jusqu'a la fin de la periode payee." },
-  { q:"QRfolio fonctionne-t-il bien sur mobile ?",                        a:"Oui. Toutes les pages sont concues mobile-first. La majorite des scans se faisant sur smartphone, le rendu est optimise pour les petits ecrans." },
-  { q:"Ai-je besoin de savoir coder ?",                                    a:"Non. QRfolio est entierement no-code. Tu ajoutes des blocs, tu personnalises, tu publies. Aucune competence technique requise." },
+  { q:"Le QR code reste-t-il le même si je modifie ma page ?",            a:"Oui, c'est tout l'intérêt d'un QR code dynamique : vous modifiez votre page autant de fois que vous voulez, et le QR code déjà imprimé reste identique et continue de fonctionner." },
+  { q:"Qu'est-ce qu'une carte de visite numérique QRfolio ?",             a:"Une page mobile professionnelle qui regroupe vos informations, vos liens et vos boutons d'action (appel, WhatsApp, réservation…). On y accède en scannant votre QR code ou via un simple lien." },
+  { q:"Puis-je utiliser QRfolio gratuitement ?",                          a:"Oui. Le plan gratuit donne accès à 3 pages, 200 vues par mois et 3 QR codes. Aucune carte bancaire n'est demandée pour commencer." },
+  { q:"Puis-je connecter mon propre nom de domaine ?",                    a:"Oui, à partir du plan Pro. Vous pouvez utiliser un sous-domaine personnalisé (ex. : carte.votresite.fr) pour une image vraiment professionnelle." },
+  { q:"Est-ce que je vois les statistiques de scans ?",                   a:"Oui. Vues, scans, appareils, sources de trafic et pages les plus consultées. Statistiques de base sur le plan gratuit, statistiques avancées sur Pro." },
+  { q:"Puis-je retirer la mention QRfolio de ma page ?",                  a:"Oui, à partir du plan Pro : votre page affiche uniquement votre marque. Sur le plan gratuit, une mention discrète apparaît en bas de page." },
+  { q:"Est-ce adapté aux restaurants et commerces locaux ?",             a:"Tout à fait. Des modèles prêts à l'emploi existent pour le menu numérique, les horaires, la réservation, les avis Google et les promotions — utilisables en 5 minutes." },
+  { q:"Puis-je télécharger mon QR code pour l'imprimer ?",               a:"Oui. Le téléchargement est disponible en PNG haute résolution, SVG et PDF — prêts à imprimer sur cartes de visite, flyers, menus ou affiches." },
+  { q:"Puis-je annuler mon abonnement à tout moment ?",                  a:"Oui, à tout moment depuis votre espace compte. Aucun engagement, aucun frais d'annulation : votre accès reste actif jusqu'à la fin de la période déjà payée." },
+  { q:"QRfolio fonctionne-t-il bien sur mobile ?",                       a:"Oui. Toutes les pages sont conçues pour le mobile en priorité. Comme la majorité des scans se font sur smartphone, l'affichage est optimisé pour les petits écrans." },
+  { q:"Faut-il savoir coder pour créer sa page ?",                       a:"Non, aucune compétence technique n'est requise. Vous ajoutez des blocs, vous personnalisez, vous publiez — c'est tout." },
 ] as const
 
 function FAQSection() {
@@ -2454,7 +2455,7 @@ function FAQSection() {
 export default function HomePage() {
   const [titleVisible, setTitleVisible] = useState(false)
   const [charIndex, setCharIndex] = useState(0)
-  const title = "Ton QR code mérite mieux qu'un simple lien."
+  const title = "Votre QR code mérite mieux qu'un simple lien."
 
   useEffect(() => {
     const t = setTimeout(() => setTitleVisible(true), 400)
@@ -2525,14 +2526,14 @@ export default function HomePage() {
               animation: "fadeUp 0.6s ease 0.1s both"
             }}>
               <span style={{ fontSize: 9, animation: "glowPulse 2s ease-in-out infinite", willChange: "opacity" }}>✦</span>
-              La page qui remplace ta carte de visite
+              La page qui remplace votre carte de visite
             </div>
 
             {/* Titre */}
             <h1 style={{
               fontFamily: "Cormorant Garamond, serif",
-              fontSize: "clamp(38px, 4.5vw, 68px)",
-              color: "#F5F0E8", fontWeight: 700, lineHeight: 1.08,
+              fontSize: "clamp(40px, 5vw, 76px)",
+              color: "#F5F0E8", fontWeight: 700, lineHeight: 1.06,
               margin: "0 0 28px", letterSpacing: "-0.02em",
               minHeight: "3em",
               animation: "fadeUp 0.6s ease 0.2s both"
@@ -2551,8 +2552,8 @@ export default function HomePage() {
               margin: "0 0 44px", maxWidth: 480,
               animation: "fadeUp 0.6s ease 0.35s both"
             }}>
-              Crée une page mobile professionnelle, génère un QR code dynamique
-              et analyse chaque scan en quelques minutes.
+              Créez une page mobile professionnelle, générez un QR code dynamique
+              et suivez chaque scan — en quelques minutes, sans rien coder.
             </p>
 
             {/* CTAs */}
