@@ -2516,7 +2516,31 @@ function UseCasesSection() {
             </div>
 
             <p style={{ color: "rgba(138,132,120,0.85)", fontSize: 13.5,
-              lineHeight: 1.65, marginBottom: 24 }}>{uc.desc}</p>
+              lineHeight: 1.65, marginBottom: 22 }}>{uc.desc}</p>
+
+            {/* Aperçu du rendu : mini-téléphone (Pb 9) */}
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 22 }}>
+              <div style={{ width: 168, borderRadius: 22, padding: 7, background: "#080705", border: "1px solid rgba(255,255,255,0.12)", boxShadow: `0 18px 50px rgba(0,0,0,0.5), 0 0 0 1px ${uc.color}14` }}>
+                <div style={{ borderRadius: 16, overflow: "hidden", background: "#0E0D0B" }}>
+                  {/* en-tête coloré + encoche */}
+                  <div style={{ position: "relative", height: 58, background: `linear-gradient(135deg, ${uc.color}, ${uc.color}99)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ position: "absolute", top: 6, left: "50%", transform: "translateX(-50%)", width: 36, height: 4, borderRadius: 3, background: "rgba(0,0,0,0.35)" }} />
+                    <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(255,255,255,0.92)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginTop: 6 }}>{uc.icon}</div>
+                  </div>
+                  {/* corps */}
+                  <div style={{ padding: "12px 13px 14px", display: "flex", flexDirection: "column", alignItems: "center", gap: 7 }}>
+                    <div style={{ height: 6, width: "62%", borderRadius: 4, background: "rgba(245,240,232,0.9)" }} />
+                    <div style={{ height: 4, width: "44%", borderRadius: 3, background: "rgba(138,132,120,0.55)" }} />
+                    {/* mini QR */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 1.5, width: 40, height: 40, marginTop: 4, padding: 4, background: "#fff", borderRadius: 5 }}>
+                      {Array.from({ length: 25 }).map((_, k) => <div key={k} style={{ background: (k * 7 + 3) % 3 === 0 ? "#0E0D0B" : "transparent", borderRadius: 1 }} />)}
+                    </div>
+                    {/* CTA */}
+                    <div style={{ marginTop: 6, height: 22, width: "82%", borderRadius: 7, background: uc.color, display: "flex", alignItems: "center", justifyContent: "center", color: "#080808", fontSize: 8.5, fontWeight: 800, padding: "0 4px", textAlign: "center", lineHeight: 1 }}>{uc.cta.replace(/^Créer ma page /i, "").replace(/^./, c => c.toUpperCase())}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Ligne d'accent */}
             <div style={{
