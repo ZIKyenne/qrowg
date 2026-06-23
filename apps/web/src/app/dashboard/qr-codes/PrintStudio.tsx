@@ -176,7 +176,7 @@ function groupText(o: fabric.Object | undefined | null): fabric.Text | null {
 }
 
 const TOJSON_PROPS = [
-  "isQR", "name", "role", "isQrCard", "isQrLabel",
+  "isQR", "name", "role", "isQrCard", "isQrLabel", "isQrFrame",
   "lockMovementX", "lockMovementY",
   "lockScalingX", "lockScalingY",
   "lockRotation", "selectable", "evented",
@@ -1340,6 +1340,31 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const fc = fcRef.current; if (!fc) return
     fc.getObjects().filter(o => (o as any).isQrLabel).forEach(o => fc.remove(o))
     fc.discardActiveObject(); setSel(null); fc.requestRenderAll(); pushHistorySoon(); setLayersVer(v => v + 1)
+  }
+  // Cadre QR nomme (Luxury / Corporate / Modern / Neon) autour du QR
+  const setQrFrame = (style: "luxury" | "corporate" | "modern" | "neon") => {
+    const fc = fcRef.current; if (!fc) return
+    const img = fc.getObjects().find(o => (o as any).isQR) as fabric.Image | undefined; if (!img) return
+    fc.getObjects().filter(o => (o as any).isQrFrame).forEach(o => fc.remove(o))
+    const card = fc.getObjects().find(o => (o as any).isQrCard) as fabric.Object | undefined
+    const ref = card || img
+    const c = ref.getCenterPoint(), sz = Math.max(ref.getScaledWidth(), ref.getScaledHeight())
+    const mk = (extra: number, sw: number, stroke: string, glow?: boolean) => {
+      const r = new fabric.Rect({ width: sz + extra, height: sz + extra, rx: Math.round(sz * 0.08), ry: Math.round(sz * 0.08), fill: "transparent", stroke, strokeWidth: sw, strokeUniform: true, originX: "center", originY: "center", left: c.x, top: c.y })
+      if (glow) r.set("shadow", new fabric.Shadow({ color: stroke, blur: 22, offsetX: 0, offsetY: 0 }))
+      ;(r as any).isQrFrame = true; (r as any).perPixelTargetFind = true
+      fc.add(r)
+    }
+    if (style === "luxury") { mk(sz * 0.22, Math.max(2, Math.round(sz * 0.012)), G); mk(sz * 0.30, 1, G) }
+    else if (style === "corporate") mk(sz * 0.24, Math.max(3, Math.round(sz * 0.02)), "#1F2430")
+    else if (style === "modern") mk(sz * 0.26, Math.max(5, Math.round(sz * 0.04)), "#1F2430")
+    else mk(sz * 0.24, Math.max(3, Math.round(sz * 0.02)), "#39FF8F", true) // neon
+    fc.requestRenderAll(); pushHistorySoon(); setLayersVer(v => v + 1)
+  }
+  const removeQrFrame = () => {
+    const fc = fcRef.current; if (!fc) return
+    fc.getObjects().filter(o => (o as any).isQrFrame).forEach(o => fc.remove(o))
+    fc.requestRenderAll(); pushHistorySoon(); setLayersVer(v => v + 1)
   }
   // Repartir d'une page vierge : on retire tout (sauf guides) et on replace le QR
   const resetCanvas = () => {
@@ -3932,9 +3957,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                         <button key={l} type="button" onClick={() => addQrLabel(l)} style={{ ...layerBtn, fontSize: 9.5, padding: "7px 9px", flex: "1 0 auto" }}>{l}</button>
                       ))}
                     </div>
+                    <p className="ps-sec-label" style={{ marginTop: 4 }}>Cadre</p>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 6 }}>
+                      {([["luxury", "Luxury"], ["corporate", "Corporate"], ["modern", "Modern"], ["neon", "Néon"]] as const).map(([k, l]) => (
+                        <button key={k} type="button" onClick={() => setQrFrame(k)} style={{ ...layerBtn, fontSize: 9.5, flex: "1 0 40%" }}>{l}</button>
+                      ))}
+                    </div>
                     <div style={{ display: "flex", gap: 5 }}>
-                      <button type="button" onClick={dressQr} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }} title="Cadre + Scannez-moi">▢ Cadre + étiquette</button>
-                      <button type="button" onClick={removeQrLabel} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Retirer l'étiquette</button>
+                      <button type="button" onClick={removeQrLabel} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Retirer étiquette</button>
+                      <button type="button" onClick={removeQrFrame} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Retirer cadre</button>
                     </div>
                   </div>
                 )}
