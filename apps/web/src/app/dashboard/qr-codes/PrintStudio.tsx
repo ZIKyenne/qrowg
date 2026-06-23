@@ -304,6 +304,9 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"immo-fiche",    label:"Immobilier — Fiche",  obj:"Contact",   emoji:"🏠", desc:"Bandeau + specs + visite, pro",            bg:"#F2F4F1", ink:"#1E2A24", accent:"#2E6F5E" },
   { id:"airbnb-welcome",label:"Airbnb — Bienvenue",  obj:"Page",      emoji:"🏡", desc:"Carte de bienvenue chaleureuse + guide",   bg:"#EFE3D2", ink:"#2A2419", accent:"#C56B3E" },
   { id:"event-ticket",  label:"Événement — Ticket",  obj:"Page",      emoji:"🎉", desc:"Invitation style ticket + perforation",    bg:"#160726", ink:"#F3E9FF", accent:"#A855F7" },
+  { id:"reserve-stripe",label:"Réserver — Élégant",  obj:"Réserver",  emoji:"📅", desc:"Bande latérale + RDV en ligne, chic",        bg:"#F5F2EC", ink:"#22282E", accent:"#3B6E8F" },
+  { id:"creator-bio",   label:"Créateur — Link in bio", obj:"Abonnés", emoji:"✦", desc:"Avatar + chips réseaux, neon",               bg:"#120A1F", ink:"#F2E9FF", accent:"#9B5CF6" },
+  { id:"portfolio-grid",label:"Portfolio — Grille",  obj:"Page",      emoji:"🖼️", desc:"Mini-grille déco + QR, créatif",            bg:"#15181C", ink:"#F0F2F4", accent:"#D9A441" },
 ]
 
 // Secteurs d'activite -> objectifs pertinents (pour filtrer la galerie)
@@ -504,6 +507,47 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }, ph
         <div style={{ position: "absolute", top: "40%", left: "6%", right: "6%", borderTop: `2px dashed ${t.accent}` }} />
         <div style={{ position: "absolute", top: "47%", left: "34%", width: "32%", aspectRatio: "1", background: "#fff", borderRadius: 3 }} />
         <div style={{ position: "absolute", bottom: "9%", left: "27%", width: "46%", height: "7%", borderRadius: 20, background: t.accent }} />
+      </div>
+    )
+  }
+  if (t.id === "reserve-stripe") {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: t.bg }}>
+        <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: "10%", background: t.accent }} />
+        <div style={{ position: "absolute", inset: 0, paddingLeft: "10%", display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "14%", gap: 4 }}>
+          <div style={{ fontSize: 12 }}>📅</div>
+          <div style={{ color: t.accent, fontSize: 5, letterSpacing: 1.5, fontWeight: 700, marginTop: 2 }}>SUR RÉSERVATION</div>
+          <div style={{ height: 6, width: "58%", borderRadius: 3, background: t.ink }} />
+          <div style={{ height: 6, width: "42%", borderRadius: 3, background: t.ink }} />
+          <div style={{ width: "30%", aspectRatio: "1", background: "#fff", borderRadius: 3, marginTop: "6%", boxShadow: "0 1px 4px rgba(0,0,0,0.12)" }} />
+          <div style={{ marginTop: "6%", height: "8%", width: "50%", borderRadius: 20, background: t.accent }} />
+        </div>
+      </div>
+    )
+  }
+  if (t.id === "creator-bio") {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: t.bg, display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "11%", gap: 4 }}>
+        <div style={{ width: "22%", aspectRatio: "1", borderRadius: "50%", background: t.accent, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11 }}>✦</div>
+        <div style={{ height: 6, width: "50%", borderRadius: 3, background: t.ink, marginTop: 4 }} />
+        <div style={{ display: "flex", gap: 3, marginTop: 2 }}>
+          {[0, 1, 2].map(i => <div key={i} style={{ width: 22, height: 9, borderRadius: 6, border: `1px solid ${t.accent}` }} />)}
+        </div>
+        <div style={{ width: "30%", aspectRatio: "1", background: "#fff", borderRadius: 3, marginTop: "6%" }} />
+        <div style={{ marginTop: "6%", height: "8%", width: "40%", borderRadius: 20, background: t.accent }} />
+      </div>
+    )
+  }
+  if (t.id === "portfolio-grid") {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: t.bg, display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "8%" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3, width: "52%" }}>
+          {[0.32, 0.24, 0.2, 0.34].map((op, i) => <div key={i} style={{ aspectRatio: "1", borderRadius: 4, background: t.accent, opacity: op }} />)}
+        </div>
+        <div style={{ color: t.accent, fontSize: 5.5, letterSpacing: 2, fontWeight: 700, marginTop: "7%" }}>PORTFOLIO</div>
+        <div style={{ height: 6, width: "48%", borderRadius: 3, background: t.ink, marginTop: 3 }} />
+        <div style={{ width: "30%", aspectRatio: "1", background: "#fff", borderRadius: 3, marginTop: "5%" }} />
+        <div style={{ marginTop: "5%", height: "7%", width: "50%", borderRadius: 20, background: t.accent }} />
       </div>
     )
   }
@@ -2494,6 +2538,44 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       await placeQrT(H * 0.50, 0.36)
       addCTA("Voir l'événement", H * 0.87)
     }
+    // J) Réserver — Bande latérale : bande d'accent pleine hauteur à gauche + RDV
+    const reserveStripe = async () => {
+      fc.add(new fabric.Rect({ left: 0, top: 0, width: Math.round(W * 0.10), height: H, fill: accent }))
+      addText("📅", H * 0.08, W * 0.07, { keepColor: true })
+      addText("S U R   R É S E R V A T I O N", H * 0.21, W * 0.028, { font: "Arial", weight: "bold", fill: accent, role: "subtitle" })
+      addText(name || "Réservez\nvotre moment", H * 0.25, W * 0.08, { weight: "bold", role: "title" })
+      rule(H * 0.43)
+      addText("Choisissez votre créneau en ligne", H * 0.46, W * 0.03, { font: "Arial", role: "subtitle" })
+      await placeQrT(H * 0.53, 0.36)
+      addCTA("Réserver maintenant", H * 0.87)
+    }
+    // K) Créateur — Link in bio : avatar rond + chips réseaux + QR
+    const creatorBio = async () => {
+      fc.add(new fabric.Circle({ radius: W * 0.11, fill: accent, originX: "center", originY: "center", left: W / 2, top: H * 0.15 }))
+      addText("✦", H * 0.115, W * 0.06, { keepColor: true, fill: readableOn(accent) })
+      addText(name ? `@${name.toLowerCase().replace(/\s+/g, "")}` : "@createur", H * 0.255, W * 0.06, { weight: "bold", role: "title" })
+      addText("Tout mon univers en un scan", H * 0.34, W * 0.03, { font: "Arial", role: "subtitle" })
+      const chips = ["▶ YouTube", "♪ TikTok", "◎ Insta"]
+      const cw = W * 0.26, gap = W * 0.02, total = cw * 3 + gap * 2, sx = (W - total) / 2
+      chips.forEach((c, i) => {
+        const x = sx + i * (cw + gap)
+        fc.add(new fabric.Rect({ left: x, top: H * 0.40, width: cw, height: Math.round(H * 0.05), rx: 14, ry: 14, fill: "transparent", stroke: accent, strokeWidth: 1, strokeUniform: true }))
+        fc.add(new fabric.Textbox(c, { left: x + cw / 2, top: H * 0.412, width: cw, fontSize: W * 0.024, fontFamily: "Arial", fill: ink, textAlign: "center", originX: "center" }))
+      })
+      await placeQrT(H * 0.49, 0.34)
+      addCTA("Tout voir", H * 0.86)
+    }
+    // L) Portfolio — Mini-grille décorative 2×2 + titre + QR
+    const portfolioGrid = async () => {
+      const cell = W * 0.24, gp = W * 0.02, gy = H * 0.06, gx = W / 2 - (cell * 2 + gp) / 2
+      for (let r = 0; r < 2; r++) for (let c = 0; c < 2; c++) {
+        fc.add(new fabric.Rect({ left: gx + c * (cell + gp), top: gy + r * (cell + gp), width: cell, height: cell, rx: 6, ry: 6, fill: accent, opacity: 0.20 + (r * 2 + c) * 0.06 }))
+      }
+      addText("P O R T F O L I O", H * 0.44, W * 0.03, { font: "Arial", weight: "bold", fill: accent, role: "subtitle" })
+      addText(name || "Mon travail", H * 0.48, W * 0.078, { weight: "bold", role: "title" })
+      await placeQrT(H * 0.56, 0.34)
+      addCTA("Voir mon portfolio", H * 0.88)
+    }
 
     switch (id) {
       case "avis-prestige": await avisHero(); break
@@ -2505,6 +2587,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "immo-fiche": await immoFiche(); break
       case "airbnb-welcome": await airbnbWelcome(); break
       case "event-ticket": await eventTicket(); break
+      case "reserve-stripe": await reserveStripe(); break
+      case "creator-bio": await creatorBio(); break
+      case "portfolio-grid": await portfolioGrid(); break
       case "wifi-or": case "wifi-vert": case "wifi-bleu": await wifiLayout(); break
       case "fidelite-or": case "fidelite-rouge": await loyaltyLayout(); break
       case "avis-or":
