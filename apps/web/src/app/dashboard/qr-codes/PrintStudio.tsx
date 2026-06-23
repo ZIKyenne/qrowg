@@ -298,6 +298,9 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
   { id:"avis-prestige", label:"Avis — Prestige",    obj:"Avis",     emoji:"⭐", desc:"Éditorial sombre & or, 5 étoiles, déco",   bg:"#0C0B08", ink:"#F4ECD8", accent:"#C9A84C" },
   { id:"resto-ornate",  label:"Menu — Ornement",    obj:"Menu",     emoji:"🍽️", desc:"Cadre ornemental crème & bronze, chic",    bg:"#FBF6EC", ink:"#2A2419", accent:"#9A6E3A" },
   { id:"insta-block",   label:"Instagram — Color-block", obj:"Abonnés", emoji:"📸", desc:"Bloc couleur + QR chevauchant, moderne", bg:"#140A1E", ink:"#FFFFFF", accent:"#E1306C" },
+  { id:"cocktail-noir", label:"Bar — Cocktails Noir", obj:"Menu",     emoji:"🍸", desc:"Lounge sombre & or, filets, serif",        bg:"#0E0B07", ink:"#F2E6CE", accent:"#C9A84C" },
+  { id:"promo-burst",   label:"Commerce — Offre",    obj:"Page",      emoji:"🔥", desc:"Badge éclaté + offre, punchy",             bg:"#1A0E0A", ink:"#FFF3EA", accent:"#E8602C" },
+  { id:"contact-card",  label:"Carte de visite",     obj:"Contact",   emoji:"💼", desc:"Panneau couleur + QR, corporate clean",    bg:"#F4F1EA", ink:"#1F2430", accent:"#1E5F8C" },
 ]
 
 // Secteurs d'activite -> objectifs pertinents (pour filtrer la galerie)
@@ -416,6 +419,46 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }, ph
         </div>
         <div style={{ position: "absolute", top: "37%", left: "34%", width: "32%", aspectRatio: "1", background: "#fff", borderRadius: 4, boxShadow: "0 2px 8px rgba(0,0,0,0.32)" }} />
         <div style={{ position: "absolute", bottom: "9%", left: "27%", width: "46%", height: "8%", borderRadius: 20, background: t.accent }} />
+      </div>
+    )
+  }
+  if (t.id === "cocktail-noir") {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: t.bg }}>
+        <div style={{ position: "absolute", top: "5%", left: 0, right: 0, height: 2, background: t.accent }} />
+        <div style={{ position: "absolute", bottom: "5%", left: 0, right: 0, height: 2, background: t.accent }} />
+        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "13%", gap: 4 }}>
+          <div style={{ fontSize: 13 }}>🍸</div>
+          <div style={{ color: t.accent, fontSize: 5.5, letterSpacing: 1.5, fontWeight: 700, marginTop: 3 }}>BAR · COCKTAILS</div>
+          <div style={{ height: 6, width: "52%", borderRadius: 3, background: t.ink, marginTop: 2 }} />
+          <div style={{ height: 6, width: "40%", borderRadius: 3, background: t.ink }} />
+          <div style={{ width: "30%", aspectRatio: "1", background: "#fff", borderRadius: 3, marginTop: "7%" }} />
+          <div style={{ marginTop: "7%", height: "8%", width: "48%", borderRadius: 20, background: t.accent }} />
+        </div>
+      </div>
+    )
+  }
+  if (t.id === "promo-burst") {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: t.bg, display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "10%", gap: 4 }}>
+        <div style={{ width: "40%", aspectRatio: "1", background: t.accent, display: "flex", alignItems: "center", justifyContent: "center", color: t.bg, fontSize: 8, fontWeight: 800, clipPath: "polygon(50% 0,61% 12%,76% 6%,78% 23%,94% 26%,86% 41%,100% 50%,86% 59%,94% 74%,78% 77%,76% 94%,61% 88%,50% 100%,39% 88%,24% 94%,22% 77%,6% 74%,14% 59%,0 50%,14% 41%,6% 26%,22% 23%,24% 6%,39% 12%)" }}>OFFRE</div>
+        <div style={{ height: 6, width: "56%", borderRadius: 3, background: t.ink, marginTop: "6%" }} />
+        <div style={{ height: 3, width: "44%", borderRadius: 2, background: t.ink, opacity: 0.6 }} />
+        <div style={{ width: "30%", aspectRatio: "1", background: "#fff", borderRadius: 3, marginTop: "5%" }} />
+        <div style={{ marginTop: "5%", height: "8%", width: "44%", borderRadius: 20, background: t.accent }} />
+      </div>
+    )
+  }
+  if (t.id === "contact-card") {
+    return (
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", borderRadius: 6, overflow: "hidden", background: t.bg }}>
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "32%", background: t.accent, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3 }}>
+          <div style={{ fontSize: 11 }}>💼</div>
+          <div style={{ height: 5, width: "52%", borderRadius: 3, background: "#fff" }} />
+          <div style={{ height: 3, width: "38%", borderRadius: 2, background: "rgba(255,255,255,0.8)" }} />
+        </div>
+        <div style={{ position: "absolute", top: "40%", left: "34%", width: "32%", aspectRatio: "1", background: "#fff", borderRadius: 3, boxShadow: "0 1px 5px rgba(0,0,0,0.15)" }} />
+        <div style={{ position: "absolute", bottom: "8%", left: "27%", width: "46%", height: "7%", borderRadius: 20, background: t.accent }} />
       </div>
     )
   }
@@ -2340,10 +2383,46 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       addCTA("S'abonner", H * 0.88)
     }
 
+    // D) Bar — Cocktails Noir : filets or haut/bas, emoji, serif (ambiance lounge)
+    const cocktailNoir = async () => {
+      fc.add(new fabric.Rect({ left: 0, top: H * 0.045, width: W, height: Math.max(2, Math.round(W * 0.006)), fill: accent }))
+      fc.add(new fabric.Rect({ left: 0, top: H * 0.95, width: W, height: Math.max(2, Math.round(W * 0.006)), fill: accent }))
+      addText("🍸", H * 0.10, W * 0.085, { keepColor: true })
+      addText("B A R   ·   C O C K T A I L S", H * 0.225, W * 0.028, { font: "Arial", weight: "bold", fill: accent, role: "subtitle" })
+      addText(name || "Carte des\nCocktails", H * 0.265, W * 0.082, { weight: "bold", role: "title" })
+      rule(H * 0.45)
+      addText("Nos signatures & créations maison", H * 0.48, W * 0.03, { font: "Arial", role: "subtitle" })
+      await placeQrT(H * 0.55, 0.36)
+      addCTA("Découvrir la carte", H * 0.87)
+    }
+    // E) Commerce — Offre : grand badge éclaté (starburst) + CTA punchy
+    const promoBurst = async () => {
+      const burst = new fabric.Polygon(starPts(16, W * 0.165, W * 0.125), { fill: accent, originX: "center", originY: "center", left: W / 2, top: H * 0.17 })
+      fc.add(burst)
+      addText("OFFRE", H * 0.142, W * 0.046, { weight: "bold", fill: readableOn(accent), keepColor: true })
+      addText(name || "Offre spéciale", H * 0.37, W * 0.085, { weight: "bold", role: "title" })
+      addText("Profitez d'un avantage exclusif en scannant", H * 0.475, W * 0.03, { font: "Arial", role: "subtitle" })
+      await placeQrT(H * 0.54, 0.36)
+      addCTA("J'en profite", H * 0.87)
+    }
+    // F) Carte de visite : panneau couleur en haut + QR + CTA contact (corporate)
+    const contactCard = async () => {
+      fc.add(new fabric.Rect({ left: 0, top: 0, width: W, height: Math.round(H * 0.32), fill: accent }))
+      addText("💼", H * 0.05, W * 0.06, { keepColor: true })
+      addText(name || "Votre Nom", H * 0.135, W * 0.072, { weight: "bold", fill: readableOn(accent), keepColor: true, role: "title" })
+      addText("Votre métier / entreprise", H * 0.235, W * 0.032, { font: "Arial", fill: readableOn(accent), keepColor: true, role: "subtitle" })
+      await placeQrT(H * 0.42, 0.40)
+      addText("Scannez pour enregistrer mes coordonnées", H * 0.815, W * 0.028, { font: "Arial", role: "subtitle" })
+      addCTA("Ajouter à mes contacts", H * 0.875)
+    }
+
     switch (id) {
       case "avis-prestige": await avisHero(); break
       case "resto-ornate": await restoOrnate(); break
       case "insta-block": await instaBlock(); break
+      case "cocktail-noir": await cocktailNoir(); break
+      case "promo-burst": await promoBurst(); break
+      case "contact-card": await contactCard(); break
       case "wifi-or": case "wifi-vert": case "wifi-bleu": await wifiLayout(); break
       case "fidelite-or": case "fidelite-rouge": await loyaltyLayout(); break
       case "avis-or":
