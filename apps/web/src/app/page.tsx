@@ -938,12 +938,12 @@ const PROOFS = [
   {
     icon: "🔄",
     value: "QR dynamique",
-    label: "Modifie le contenu sans changer le QR",
+    label: "Modifiez le contenu sans changer le QR",
     sub: "Le lien reste le même, toujours",
   },
   {
     icon: "📊",
-    value: "Analytics",
+    value: "Statistiques",
     label: "Scans, vues, appareils en temps réel",
     sub: "Inclus dans tous les plans",
   },
@@ -2909,8 +2909,8 @@ export default function HomePage() {
       {/* TEMPLATES */}
       <TemplatesSection />
 
-      {/* QR DYNAMIQUE */}
-      <QRDynamicSection />
+      {/* QR DYNAMIQUE — fusionné : concept déjà couvert (hero, key-points, fonctionnalités, FAQ).
+          Section retirée pour réduire la redondance (Pb 10). Réactivable : <QRDynamicSection /> */}
 
       {/* ANALYTICS */}
       <AnalyticsSection />
@@ -3076,7 +3076,7 @@ export default function HomePage() {
             <Link href="/#templates"        className="fl">Templates</Link>
             <Link href="/dashboard/builder" className="fl">Builder</Link>
             <Link href="/#analytics"        className="fl">Analytics</Link>
-            <Link href="/#qr-dynamique"     className="fl">QR Codes</Link>
+            <Link href="/#features"         className="fl">QR Codes</Link>
             <Link href="/#pricing"          className="fl">Tarifs</Link>
           </nav>
 
