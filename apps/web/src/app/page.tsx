@@ -292,6 +292,11 @@ const FEATURES = [
     title: "Créez votre page sans rien coder",
     desc: "Un éditeur en glisser-déposer, des blocs prêts à l'emploi : votre page est en ligne en 5 minutes.",
     accent: "#C9A84C",
+    detail: {
+      role: "Un éditeur visuel où vous assemblez votre page en glissant des blocs (titre, photo, liens, boutons) — aucune ligne de code.",
+      example: "Un coach ajoute sa photo, ses tarifs et un bouton « Réserver » en quelques clics, depuis son téléphone.",
+      benefit: "Vous êtes autonome : plus besoin d'un développeur ni d'attendre des semaines pour publier.",
+    },
   },
   {
     icon: "🔄",
@@ -299,6 +304,11 @@ const FEATURES = [
     title: "Un QR code que vous modifiez à volonté",
     desc: "Changez la destination, le contenu et les liens quand vous voulez — sans jamais réimprimer votre QR code.",
     accent: "#38BDF8",
+    detail: {
+      role: "Le QR code pointe vers votre page QRfolio. Vous modifiez la page, le QR code imprimé reste valable.",
+      example: "Un restaurant imprime le QR sur ses tables une seule fois, puis change son menu chaque semaine.",
+      benefit: "Vous économisez les réimpressions et vous corrigez une erreur en 30 secondes.",
+    },
   },
   {
     icon: "📊",
@@ -306,6 +316,11 @@ const FEATURES = [
     title: "Sachez exactement qui scanne",
     desc: "Vues, scans, appareils et sources de trafic, en temps réel. Vous pilotez vos résultats.",
     accent: "#39FF8F",
+    detail: {
+      role: "Un tableau de bord qui mesure les scans, les vues, les appareils utilisés et d'où viennent vos visiteurs.",
+      example: "Un commerce voit que 70 % des scans viennent de sa vitrine le week-end, et adapte ses promos.",
+      benefit: "Vous prenez des décisions sur des chiffres réels, pas au feeling.",
+    },
   },
   {
     icon: "🎯",
@@ -313,6 +328,11 @@ const FEATURES = [
     title: "Transformez vos visiteurs en clients",
     desc: "Boutons WhatsApp, réservation, paiement, formulaire de contact… toutes vos actions au même endroit.",
     accent: "#F97316",
+    detail: {
+      role: "Des boutons d'action prêts à l'emploi : appel, WhatsApp, réservation, paiement, formulaire de contact.",
+      example: "Un artisan place un bouton « Demander un devis » qui ouvre directement WhatsApp.",
+      benefit: "Chaque visite a une chance de devenir un contact ou une vente.",
+    },
   },
   {
     icon: "🎨",
@@ -320,6 +340,11 @@ const FEATURES = [
     title: "Démarrez avec un modèle fait pour votre métier",
     desc: "Restaurant, indépendant, coach, artiste, immobilier, commerce : un modèle adapté à votre activité.",
     accent: "#A78BFA",
+    detail: {
+      role: "Des modèles déjà conçus par métier, qu'il suffit de personnaliser avec vos informations.",
+      example: "Une agence immobilière part du modèle « fiche de bien » et publie une annonce en 5 minutes.",
+      benefit: "Vous ne partez jamais d'une page blanche et le résultat est pro dès le départ.",
+    },
   },
   {
     icon: "🏢",
@@ -327,12 +352,19 @@ const FEATURES = [
     title: "Affichez votre propre marque",
     desc: "Votre domaine personnalisé, sans mention QRfolio, avec un design premium. Une image irréprochable.",
     accent: "#C9A84C",
+    detail: {
+      role: "Votre page sur votre propre nom de domaine, sans aucune mention QRfolio.",
+      example: "Un cabinet utilise carte.soncabinet.fr : ses clients ne voient que sa marque.",
+      benefit: "Une image 100 % professionnelle qui inspire confiance et crédibilité.",
+    },
   },
 ] as const
 
 function FeaturesSection() {
   const { ref, visible } = useInView(0.06)
   const [hovered, setHovered] = useState<number | null>(null)
+  const [info, setInfo] = useState<number | null>(null)
+  const fInfo = info !== null ? FEATURES[info] : null
   return (
     <section
       id="features"
@@ -408,6 +440,10 @@ function FeaturesSection() {
                 transition: "background 0.3s ease",
               }} />
 
+              {/* Bouton info -> fenêtre explicative */}
+              <button type="button" onClick={() => setInfo(i)} aria-label={"En savoir plus : " + f.title}
+                style={{ position: "absolute", top: 16, right: 16, width: 22, height: 22, borderRadius: "50%", background: isHovered ? `${f.accent}22` : "rgba(255,255,255,0.05)", border: `1px solid ${isHovered ? f.accent + "55" : "rgba(255,255,255,0.12)"}`, color: isHovered ? f.accent : "rgba(138,132,120,0.8)", fontSize: 11, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s", zIndex: 2 }}>?</button>
+
               {/* Icon + tag row */}
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{
@@ -451,6 +487,31 @@ function FeaturesSection() {
         @media (max-width: 580px) { .feat-grid { grid-template-columns: 1fr !important; } }
         @media (max-width: 640px) { #features { padding: 72px 24px !important; } }
       `}</style>
+
+      {/* Fenêtre explicative d'une fonctionnalité (Pb 6) */}
+      {fInfo && (
+        <div onClick={() => setInfo(null)} style={{ position: "fixed", inset: 0, zIndex: 3000, background: "rgba(0,0,0,0.78)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "linear-gradient(180deg,#16140E,#0C0B08)", border: `1px solid ${fInfo.accent}40`, borderRadius: 20, padding: "30px 28px", position: "relative", boxShadow: `0 30px 90px rgba(0,0,0,0.7), 0 0 50px ${fInfo.accent}12`, fontFamily: "DM Sans, sans-serif" }}>
+            <button type="button" onClick={() => setInfo(null)} aria-label="Fermer" style={{ position: "absolute", top: 16, right: 16, width: 30, height: 30, borderRadius: 9, background: "rgba(255,255,255,0.06)", border: "none", color: "#8A8478", fontSize: 16, cursor: "pointer" }}>✕</button>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
+              <div style={{ width: 46, height: 46, borderRadius: 13, background: `${fInfo.accent}18`, border: `1px solid ${fInfo.accent}40`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{fInfo.icon}</div>
+              <div>
+                <p style={{ color: fInfo.accent, fontSize: 9.5, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", margin: 0 }}>{fInfo.tag}</p>
+                <p style={{ color: "#F5F0E8", fontSize: 17, fontWeight: 800, margin: "2px 0 0", fontFamily: "Cormorant Garamond, serif" }}>{fInfo.title}</p>
+              </div>
+            </div>
+            {([["À quoi ça sert", fInfo.detail.role], ["Exemple concret", fInfo.detail.example], ["Ce que ça vous apporte", fInfo.detail.benefit]] as const).map(([h, txt]) => (
+              <div key={h} style={{ marginBottom: 14 }}>
+                <p style={{ color: "rgba(138,132,120,0.7)", fontSize: 9.5, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 4px" }}>{h}</p>
+                <p style={{ color: "#E8E6E0", fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>{txt}</p>
+              </div>
+            ))}
+            <Link href="/auth/signup" style={{ display: "block", textAlign: "center", marginTop: 20, padding: "12px", borderRadius: 11, background: `linear-gradient(90deg, ${fInfo.accent}, ${fInfo.accent}cc)`, color: "#080808", textDecoration: "none", fontSize: 13.5, fontWeight: 800 }}>
+              Essayer gratuitement
+            </Link>
+          </div>
+        </div>
+      )}
     </section>
   )
 }
