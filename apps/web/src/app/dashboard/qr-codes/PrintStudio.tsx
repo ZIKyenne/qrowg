@@ -315,12 +315,17 @@ const PRINT_TEMPLATES: { id: string; label: string; obj: string; emoji: string; 
 
 // Collections : familles cohérentes (curées d'ids) pour parcourir par style
 const COLLECTIONS: { id: string; label: string; emoji: string; ids: string[] }[] = [
-  { id: "luxury",     label: "Luxury",     emoji: "💎", ids: ["avis-prestige", "resto-ornate", "cocktail-noir", "menu", "avis-or"] },
-  { id: "restaurant", label: "Restaurant", emoji: "🍽️", ids: ["resto-ornate", "cocktail-noir", "happyhour-diag", "cafe-studio", "menu"] },
-  { id: "corporate",  label: "Corporate",  emoji: "💼", ids: ["contact-card", "immo-fiche", "reserve-stripe", "contact-studio", "immo-studio"] },
-  { id: "event",      label: "Event",      emoji: "🎉", ids: ["event-ticket", "event-studio", "soldes-mega"] },
-  { id: "creator",    label: "Creator",    emoji: "🎨", ids: ["insta-block", "creator-bio", "portfolio-grid", "insta-studio"] },
-  { id: "business",   label: "Business",   emoji: "📈", ids: ["contact-card", "reserve-stripe", "portfolio-grid", "promo-burst", "soldes-mega"] },
+  { id: "luxury",     label: "Luxury",     emoji: "💎", ids: ["avis-prestige", "cocktail-noir", "resto-ornate", "avis-or", "menu", "avis-premium", "menu-premium", "contact-premium", "insta-premium", "reserver-premium", "decouvrir-or"] },
+  { id: "elegant",    label: "Élégant",    emoji: "🕊️", ids: ["avis-ornate", "menu-ornate", "contact-ornate", "insta-ornate", "event-ornate", "reserver-ornate", "decouvrir-ornate", "resto-ornate", "avis-clair", "menu-clair"] },
+  { id: "premium",    label: "Premium",    emoji: "✨", ids: ["avis-prestige", "avis-premium", "menu-premium", "contact-premium", "insta-premium", "reserver-premium", "promo-premium"] },
+  { id: "photo",      label: "Photo",      emoji: "📷", ids: ["avis-studio", "menu-studio", "insta-studio", "contact-studio", "reserver-studio", "decouvrir-studio", "event-studio", "cafe-studio", "coach-studio", "beaute-studio", "immo-studio", "boutique-studio", "avis-photo", "menu-photo", "insta-photo", "contact-photo", "reserver-photo", "decouvrir-photo"] },
+  { id: "modern",     label: "Modern",     emoji: "⬡", ids: ["insta-block", "soldes-mega", "portfolio-grid", "menu-diag", "avis-diag", "contact-diag", "insta-diag", "reserver-diag", "decouvrir-diag", "menu-split", "reserver-split", "decouvrir-split"] },
+  { id: "minimal",    label: "Minimal",    emoji: "◻️", ids: ["avis-clair", "menu-clair", "insta-clair", "contact-clair", "reserver-clair", "avis-band", "contact-band", "insta-band", "menu-footer", "avis-footer", "contact-footer", "reserver-footer"] },
+  { id: "neon",       label: "Neon",       emoji: "⚡", ids: ["insta-block", "creator-bio", "happyhour-diag", "event-ticket"] },
+  { id: "restaurant", label: "Restaurant", emoji: "🍽️", ids: ["resto-ornate", "cocktail-noir", "happyhour-diag", "cafe-studio", "menu", "menu-studio", "menu-premium", "menu-ornate", "menu-photo", "resto-footer", "menu-diag", "menu-split"] },
+  { id: "corporate",  label: "Corporate",  emoji: "💼", ids: ["contact-card", "immo-fiche", "reserve-stripe", "contact-studio", "immo-studio", "contact-premium", "immo-frame", "contact-frame", "reserver-studio"] },
+  { id: "event",      label: "Event",      emoji: "🎉", ids: ["event-ticket", "event-studio", "event-ornate", "soldes-mega", "promo-burst"] },
+  { id: "creator",    label: "Creator",    emoji: "🎨", ids: ["insta-block", "creator-bio", "portfolio-grid", "insta-studio", "insta-photo", "insta-premium", "decouvrir-studio", "decouvrir-photo"] },
 ]
 
 // Secteurs d'activite -> objectifs pertinents (pour filtrer la galerie)
@@ -3412,7 +3417,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {tplOpen && (
           <div className="qr-scroll ps-fly" style={{ width: 330, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
-              <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Modèles par objectif</span>
+              <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Modèles</span>
               <button type="button" onClick={() => setTplOpen(false)} aria-label="Fermer les modèles"
                 style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}>
                 <X size={13} />
@@ -3422,28 +3427,17 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <input value={tplSearch} onChange={e => setTplSearch(e.target.value)} placeholder="Rechercher un modèle…"
                 style={{ width: "100%", background: BG, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 8, padding: "8px 10px", color: INK, fontSize: 11, outline: "none", boxSizing: "border-box" }} />
 
-              {/* Filtre par métier */}
-              <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "11px 0 6px" }}>Métier</p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                {[{ id: "", label: "Tous", emoji: "✨" }, ...SECTORS].map(s => {
-                  const on = tplSector === s.id && !tplColl
-                  return (
-                    <button key={s.id} type="button" onClick={() => { setTplSector(s.id); setTplColl("") }} title={s.label}
-                      style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 9px", borderRadius: 999, cursor: "pointer", fontSize: 10.5, fontWeight: on ? 700 : 500, background: on ? "rgba(201,168,76,0.18)" : "rgba(0,0,0,0.04)", border: `1px solid ${on ? G : "rgba(0,0,0,0.1)"}`, color: on ? G : INK }}>
-                      <span>{s.emoji}</span>{s.label}
-                    </button>
-                  )
-                })}
+              {/* Filtre par collection (style) */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "11px 0 6px" }}>
+                <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: 0 }}>Collection · style</p>
+                {tplColl && <button type="button" onClick={() => setTplColl("")} style={{ background: "none", border: "none", color: G, fontSize: 9.5, fontWeight: 700, cursor: "pointer", padding: 0 }}>Tout voir ✕</button>}
               </div>
-
-              {/* Filtre par collection (style) — séparé visuellement */}
-              <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "12px 0 6px", paddingTop: 10, borderTop: "1px solid rgba(0,0,0,0.07)" }}>Collection · style</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {COLLECTIONS.map(col => {
                   const on = tplColl === col.id
                   return (
                     <button key={col.id} type="button" onClick={() => setTplColl(on ? "" : col.id)} title={`Collection ${col.label}`}
-                      style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: on ? 700 : 500, background: on ? `${G}` : "rgba(0,0,0,0.03)", border: `1px solid ${on ? G : "rgba(0,0,0,0.08)"}`, color: on ? "#fff" : MUTED }}>
+                      style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 10px", borderRadius: 8, cursor: "pointer", fontSize: 10.5, fontWeight: on ? 700 : 500, background: on ? `${G}` : "rgba(0,0,0,0.03)", border: `1px solid ${on ? G : "rgba(0,0,0,0.08)"}`, color: on ? "#fff" : INK }}>
                       <span>{col.emoji}</span>{col.label}
                     </button>
                   )
