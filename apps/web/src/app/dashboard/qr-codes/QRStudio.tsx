@@ -225,6 +225,9 @@ const EC_LEVELS = [
 ]
 
 // PLAN_RANK importé de lib/plans (free 0, starter 1, pro 2, business 3)
+// QR Studio à 3 niveaux : Free = styles de base | Starter = + styles "pro" (limité) | Pro/Business = + styles luxe (complet)
+const presetMinRank = (plan: string) => (plan === "business" ? 2 : plan === "pro" ? 1 : 0)
+const presetUpsellPlan = (plan: string) => (plan === "business" ? "pro" : "starter")
 
 // -- Statuts pages (pour l'affichage de la page liee)
 const STATUS_CFG: Record<string, { label: string; dot: string; badge: string; text: string }> = {
@@ -2044,8 +2047,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   }
 
   function applyPreset(preset: Preset) {
-    const canAccess = PLAN_RANK[userPlan] >= PLAN_RANK[preset.plan]
-    if (!canAccess) { setUpsell({ feature: `le style « ${preset.label} »`, plan: preset.plan }); return }
+    const canAccess = PLAN_RANK[userPlan] >= presetMinRank(preset.plan)
+    if (!canAccess) { setUpsell({ feature: `le style « ${preset.label} »`, plan: presetUpsellPlan(preset.plan) }); return }
     setFg(preset.fg)
     setBg(preset.bg)
     // Sync corner state legacy (utilise pour le clipping canvas)
@@ -2092,7 +2095,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   function pickPreset(cat: string): Preset | null {
     const inCat = PRESETS.filter(p => p.cat === cat)
     if (!inCat.length) return null
-    const accessible = inCat.filter(p => PLAN_RANK[userPlan] >= PLAN_RANK[p.plan])
+    const accessible = inCat.filter(p => PLAN_RANK[userPlan] >= presetMinRank(p.plan))
     const pool = accessible.length ? accessible : inCat
     // eviter de re-appliquer le style deja actif -> garantit un changement visible
     const different = pool.find(p => !(p.fg === fg && p.bg === bg))
@@ -3034,9 +3037,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     {/* Grille presets avec apercu QR realiste */}
                     <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:7 }}>
                       {PRESETS.filter(p => selectedCat==="all" || p.cat===selectedCat).map(preset => {
-                        const canAccess = PLAN_RANK[userPlan] >= PLAN_RANK[preset.plan]
+                        const canAccess = PLAN_RANK[userPlan] >= presetMinRank(preset.plan)
                         const isActive  = fg===preset.fg && bg===preset.bg
-                        const planLabel = preset.plan === "free" ? null : preset.plan === "pro" ? "PRO" : "BIZ"
+                        const planLabel = preset.plan === "free" ? null : preset.plan === "pro" ? "STARTER" : "PRO"
                         // forme des modules de l'apercu selon le style du preset
                         const dotR = preset.dotStyle === "dot" ? "50%" : preset.dotStyle === "rounded" ? "30%" : "2px"
                         const cornR = preset.cornerStyle === "circle" || preset.cornerStyle === "rounded" || preset.cornerStyle === "luxury" ? "30%" : "2px"
