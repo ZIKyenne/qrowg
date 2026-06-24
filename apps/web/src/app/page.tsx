@@ -1449,9 +1449,11 @@ function HowItWorks() {
       <style>{`
         .hsteps{display:grid;grid-template-columns:repeat(5,1fr);gap:20px;position:relative;}
         .hstep{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;}
-        .hline{position:absolute;top:44px;left:calc(10%+28px);right:calc(10%+28px);height:1px;
-          background:linear-gradient(90deg,transparent,rgba(201,168,76,0.25)10%,rgba(201,168,76,0.25)90%,transparent);
-          pointer-events:none;}
+        .hbadge{transition:transform 0.3s cubic-bezier(.34,1.56,.64,1),box-shadow 0.3s ease,border-color 0.3s ease;}
+        .hstep:hover .hbadge{transform:translateY(-6px) scale(1.05);border-color:rgba(201,168,76,0.6)!important;box-shadow:0 16px 38px rgba(201,168,76,0.3),0 0 0 7px rgba(8,8,8,0.92)!important;}
+        .hline{position:absolute;top:53px;left:calc(10% + 32px);right:calc(10% + 32px);height:2px;
+          background:linear-gradient(90deg,transparent,rgba(201,168,76,0.55) 8%,rgba(201,168,76,0.55) 92%,transparent);
+          box-shadow:0 0 14px rgba(201,168,76,0.3);pointer-events:none;}
         @media(max-width:900px){.hsteps{grid-template-columns:1fr!important;gap:0!important;}
           .hline{display:none!important;}
           .hstep{flex-direction:row!important;text-align:left!important;align-items:flex-start!important;
@@ -1476,16 +1478,17 @@ function HowItWorks() {
               style={{opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(28px)",
                 transition:`opacity 0.55s ease ${i*110}ms,transform 0.55s ease ${i*110}ms`}}>
               <div style={{position:"relative",flexShrink:0}}>
-                <span style={{position:"absolute",top:-6,right:-8,width:18,height:18,borderRadius:"50%",
-                  background:"linear-gradient(135deg,#C9A84C,#b8953f)",display:"flex",alignItems:"center",
-                  justifyContent:"center",fontSize:9,fontWeight:800,color:"#080808",zIndex:1,
-                  boxShadow:"0 0 0 2px #080808"}}>{i+1}</span>
-                <div style={{width:56,height:56,borderRadius:16,background:"rgba(201,168,76,0.07)",
-                  border:"1px solid rgba(201,168,76,0.18)",display:"flex",alignItems:"center",
-                  justifyContent:"center",fontSize:24,boxShadow:"0 0 0 6px rgba(8,8,8,0.9)"}}>{step.icon}</div>
+                <span style={{position:"absolute",top:-7,right:-9,width:23,height:23,borderRadius:"50%",
+                  background:"linear-gradient(135deg,#d4a843,#C9A84C,#b8953f)",display:"flex",alignItems:"center",
+                  justifyContent:"center",fontSize:11,fontWeight:800,color:"#080808",zIndex:2,
+                  boxShadow:"0 0 0 3px #080808, 0 3px 10px rgba(201,168,76,0.5)"}}>{i+1}</span>
+                <div className="hbadge" style={{width:64,height:64,borderRadius:18,
+                  background:"linear-gradient(135deg,rgba(201,168,76,0.16),rgba(201,168,76,0.05))",
+                  border:"1px solid rgba(201,168,76,0.35)",display:"flex",alignItems:"center",
+                  justifyContent:"center",fontSize:27,boxShadow:"0 8px 22px rgba(0,0,0,0.4), 0 0 0 6px rgba(8,8,8,0.92)"}}>{step.icon}</div>
               </div>
               <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                <h3 style={{color:"#F5F0E8",fontSize:14,fontWeight:700,margin:0,lineHeight:1.3}}>{step.title}</h3>
+                <h3 style={{color:"#F5F0E8",fontSize:15.5,fontWeight:700,margin:0,lineHeight:1.3,letterSpacing:"-0.01em"}}>{step.title}</h3>
                 <p style={{color:"rgba(138,132,120,0.85)",fontSize:12.5,margin:0,lineHeight:1.6}}>{step.desc}</p>
               </div>
             </div>
@@ -2851,8 +2854,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* PROOF STRIP */}
-      <ProofStrip />
+      {/* (roadmap doublon retirée — un seul parcours, voir HowItWorks #how) */}
 
       {/* HOW IT WORKS */}
       <HowItWorks />
