@@ -2105,23 +2105,22 @@ function AnalyticsMockup() {
               ))}
             </div>
           </div>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: chartH + 16 }}>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: chartH + 20 }}>
             {ANALYTICS_DEMO.chart.map((d, i) => (
-              <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, height: "100%" }}>
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end", gap: 2, width: "100%" }}>
-                  {/* Vues bar (derrière) */}
-                  <div style={{
-                    width: "100%", borderRadius: "3px 3px 0 0",
-                    background: "rgba(56,189,248,0.2)",
-                    height: Math.round((d.views / maxViews) * chartH) + "px",
+              <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 5, height: "100%" }}>
+                {/* deux barres groupées : Vues (bleu) + Scans (or), contenues */}
+                <div style={{ flex: 1, width: "100%", display: "flex", alignItems: "flex-end", justifyContent: "center", gap: 3 }}>
+                  <div title={d.views + " vues"} style={{
+                    width: "40%", maxWidth: 14, borderRadius: "3px 3px 0 0",
+                    background: "rgba(56,189,248,0.45)",
+                    height: Math.max(3, Math.round((d.views / maxViews) * chartH)) + "px",
+                    transition: "height 0.4s ease",
                   }}/>
-                  {/* Scans bar (devant, plus courte) */}
-                  <div style={{
-                    position: "absolute",
-                    width: "40%", borderRadius: "2px 2px 0 0",
+                  <div title={d.scans + " scans"} style={{
+                    width: "40%", maxWidth: 14, borderRadius: "3px 3px 0 0",
                     background: "linear-gradient(to top, #C9A84C, #d4a843)",
-                    height: Math.round((d.scans / maxScans) * chartH) + "px",
-                    alignSelf: "center",
+                    height: Math.max(3, Math.round((d.scans / maxScans) * chartH)) + "px",
+                    transition: "height 0.4s ease",
                   }}/>
                 </div>
                 <span style={{ color: "rgba(138,132,120,0.5)", fontSize: 8 }}>{d.day}</span>
@@ -2230,8 +2229,8 @@ function AnalyticsSection() {
               margin: "0 0 20px", lineHeight: 1.12,
               letterSpacing: "-0.02em",
             }}>
-              Comprends ce qui se passe{" "}
-              <span style={{ color: "#C9A84C" }}>apres chaque scan.</span>
+              Comprenez ce qui se passe{" "}
+              <span style={{ color: "#C9A84C" }}>après chaque scan.</span>
             </h2>
             <p style={{ color: "rgba(138,132,120,0.85)", fontSize: 15,
               lineHeight: 1.75, marginBottom: 36, maxWidth: 400 }}>
