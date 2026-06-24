@@ -928,31 +928,11 @@ function PricingSection() {
 
 
 // ── Proof strip ───────────────────────────────────────────────────────────────
-const PROOFS = [
-  {
-    icon: "⚡",
-    value: "5 min",
-    label: "pour créer une page complète",
-    sub: "Sans coder, sans designer",
-  },
-  {
-    icon: "🔄",
-    value: "QR dynamique",
-    label: "Modifiez le contenu sans changer le QR",
-    sub: "Le lien reste le même, toujours",
-  },
-  {
-    icon: "📊",
-    value: "Statistiques",
-    label: "Scans, vues, appareils en temps réel",
-    sub: "Inclus dans tous les plans",
-  },
-  {
-    icon: "🎨",
-    value: "Templates",
-    label: "Prêts à l'emploi, adaptés au mobile",
-    sub: "Personnalisables en un clic",
-  },
+const ROADMAP_STEPS = [
+  { icon: "🎨", title: "Choisissez un modèle", sub: "Un modèle adapté à votre métier, prêt à l'emploi." },
+  { icon: "✏️", title: "Personnalisez", sub: "Vos textes, photos, liens et boutons d'action." },
+  { icon: "📱", title: "Obtenez votre QR", sub: "Un QR code dynamique généré automatiquement." },
+  { icon: "📊", title: "Partagez & suivez", sub: "Diffusez partout et suivez chaque scan." },
 ] as const
 
 function ProofStrip() {
@@ -960,64 +940,42 @@ function ProofStrip() {
   return (
     <section
       ref={ref}
-      aria-label="Points clés"
-      style={{
-        padding: "0 48px 80px",
-        position: "relative", zIndex: 1,
-      }}
+      aria-label="Comment ça marche, en 4 étapes"
+      style={{ padding: "0 48px 80px", position: "relative", zIndex: 1 }}
     >
-      <div style={{
-        maxWidth: 1140, margin: "0 auto",
-        display: "grid",
-        gridTemplateColumns: "repeat(4, 1fr)",
-        gap: 16,
-      }} className="proof-grid">
-        {PROOFS.map((p, i) => (
-          <div
-            key={p.value}
-            style={{
-              background: "rgba(255,255,255,0.025)",
-              border: "1px solid rgba(201,168,76,0.12)",
-              borderRadius: 16,
-              padding: "24px 22px",
-              display: "flex", flexDirection: "column", gap: 10,
-              opacity: visible ? 1 : 0,
-              transform: visible ? "translateY(0)" : "translateY(20px)",
-              transition: `opacity 0.5s ease ${i * 90}ms, transform 0.5s ease ${i * 90}ms`,
-              position: "relative", overflow: "hidden",
-            }}
-          >
-            {/* Accent line top */}
-            <div style={{
-              position: "absolute", top: 0, left: 24, right: 24, height: 1,
-              background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent)",
-            }} />
-            {/* Icon */}
-            <span style={{ fontSize: 22, lineHeight: 1 }} aria-hidden="true">{p.icon}</span>
-            {/* Value */}
-            <p style={{
-              color: "#C9A84C",
-              fontSize: 18, fontWeight: 700,
-              margin: 0, letterSpacing: "-0.01em",
-              fontFamily: "Cormorant Garamond, serif",
-            }}>{p.value}</p>
-            {/* Label */}
-            <p style={{
-              color: "#F5F0E8", fontSize: 13, fontWeight: 500,
-              margin: 0, lineHeight: 1.45,
-            }}>{p.label}</p>
-            {/* Sub */}
-            <p style={{
-              color: "rgba(138,132,120,0.75)", fontSize: 11.5,
-              margin: 0, lineHeight: 1.4,
-            }}>{p.sub}</p>
-          </div>
-        ))}
+      <div style={{ maxWidth: 1140, margin: "0 auto" }}>
+        <p style={{ textAlign: "center", color: "rgba(138,132,120,0.75)", fontSize: 13, margin: "0 0 30px", letterSpacing: 0.2 }}>
+          De l'idée au QR code partagé — <span style={{ color: "#C9A84C", fontWeight: 600 }}>4 étapes, 5 minutes</span>.
+        </p>
+        <div className="rm-grid" style={{ position: "relative", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+          {/* ligne de liaison derrière les badges */}
+          <div aria-hidden className="rm-line" style={{ position: "absolute", top: 23, left: "12.5%", right: "12.5%", height: 2, background: "linear-gradient(90deg, rgba(201,168,76,0.35), rgba(201,168,76,0.18))", opacity: visible ? 1 : 0, transition: "opacity 0.7s ease 0.3s" }} />
+          {ROADMAP_STEPS.map((s, i) => (
+            <div key={s.title} style={{
+              position: "relative", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 10,
+              opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(20px)",
+              transition: `opacity 0.5s ease ${i * 110}ms, transform 0.5s ease ${i * 110}ms`,
+            }}>
+              {/* badge numéro */}
+              <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg, #14120C, #0C0B08)", border: "1px solid rgba(201,168,76,0.4)", boxShadow: "0 6px 20px rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, position: "relative", zIndex: 1 }}>
+                {s.icon}
+                <span style={{ position: "absolute", top: -6, right: -6, width: 20, height: 20, borderRadius: "50%", background: "linear-gradient(135deg,#C9A84C,#b8953f)", color: "#080808", fontSize: 11, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(201,168,76,0.4)" }}>{i + 1}</span>
+              </div>
+              <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0, lineHeight: 1.3 }}>{s.title}</p>
+              <p style={{ color: "rgba(138,132,120,0.8)", fontSize: 12.5, margin: 0, lineHeight: 1.5, maxWidth: 200 }}>{s.sub}</p>
+            </div>
+          ))}
+        </div>
       </div>
       <style>{`
-        @media (max-width: 900px) { .proof-grid { grid-template-columns: repeat(2,1fr) !important; } }
-        @media (max-width: 480px) { .proof-grid { grid-template-columns: 1fr !important; } }
-        @media (max-width: 640px) { .proof-grid { padding: 0 !important; } }
+        @media (max-width: 760px) {
+          .rm-grid { grid-template-columns: 1fr !important; gap: 0 !important; }
+          .rm-line { display: none !important; }
+          .rm-grid > div { flex-direction: row !important; text-align: left !important; align-items: flex-start !important; gap: 16px !important; padding: 18px 0 !important; border-bottom: 1px solid rgba(201,168,76,0.08) !important; max-width: 460px; margin: 0 auto; }
+          .rm-grid > div:last-child { border-bottom: none !important; }
+          .rm-grid > div p { max-width: none !important; }
+        }
+        @media (max-width: 640px) { section[aria-label="Comment ça marche, en 4 étapes"] { padding: 0 22px 64px !important; } }
       `}</style>
     </section>
   )
