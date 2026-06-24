@@ -176,7 +176,7 @@ function groupText(o: fabric.Object | undefined | null): fabric.Text | null {
 }
 
 const TOJSON_PROPS = [
-  "isQR", "name", "role", "isQrCard", "isQrLabel", "isQrFrame",
+  "isQR", "name", "role", "isQrCard", "isQrLabel", "isQrFrame", "isQrSticker",
   "lockMovementX", "lockMovementY",
   "lockScalingX", "lockScalingY",
   "lockRotation", "selectable", "evented",
@@ -1380,6 +1380,32 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const removeQrFrame = () => {
     const fc = fcRef.current; if (!fc) return
     fc.getObjects().filter(o => (o as any).isQrFrame).forEach(o => fc.remove(o))
+    fc.requestRenderAll(); pushHistorySoon(); setLayersVer(v => v + 1)
+  }
+  // Sticker QR : pastille décorative DERRIÈRE le QR (rond / badge crénelé / carré arrondi)
+  const setQrSticker = (kind: "round" | "badge" | "square") => {
+    const fc = fcRef.current; if (!fc) return
+    const img = fc.getObjects().find(o => (o as any).isQR) as fabric.Image | undefined; if (!img) return
+    fc.getObjects().filter(o => (o as any).isQrSticker).forEach(o => fc.remove(o))
+    const card = fc.getObjects().find(o => (o as any).isQrCard) as fabric.Object | undefined
+    const ref = card || img
+    const c = ref.getCenterPoint(), sz = Math.max(ref.getScaledWidth(), ref.getScaledHeight())
+    const r = sz * 0.72
+    const common = { fill: "#FFFFFF", originX: "center" as const, originY: "center" as const, left: c.x, top: c.y, stroke: G, strokeWidth: Math.max(3, Math.round(sz * 0.02)), strokeUniform: true, shadow: new fabric.Shadow({ color: "rgba(0,0,0,0.22)", blur: 26, offsetX: 0, offsetY: 10 }) }
+    let o: fabric.Object
+    if (kind === "round") o = new fabric.Circle({ ...common, radius: r })
+    else if (kind === "square") o = new fabric.Rect({ ...common, width: r * 2, height: r * 2, rx: Math.round(r * 0.22), ry: Math.round(r * 0.22) })
+    else o = new fabric.Polygon(starPts(28, r * 1.06, r * 0.9), common) // badge crénelé (sceau)
+    ;(o as any).isQrSticker = true
+    fc.add(o); fc.sendToBack(o)
+    // garder le fond (degrade/pattern) derriere et les guides devant
+    if (vGuideRef.current) fc.bringToFront(vGuideRef.current)
+    if (hGuideRef.current) fc.bringToFront(hGuideRef.current)
+    fc.setActiveObject(img); fc.requestRenderAll(); pushHistorySoon(); setLayersVer(v => v + 1)
+  }
+  const removeQrSticker = () => {
+    const fc = fcRef.current; if (!fc) return
+    fc.getObjects().filter(o => (o as any).isQrSticker).forEach(o => fc.remove(o))
     fc.requestRenderAll(); pushHistorySoon(); setLayersVer(v => v + 1)
   }
   // Repartir d'une page vierge : on retire tout (sauf guides) et on replace le QR
@@ -4003,9 +4029,16 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                         <button key={k} type="button" onClick={() => setQrFrame(k)} style={{ ...layerBtn, fontSize: 9.5, flex: "1 0 40%" }}>{l}</button>
                       ))}
                     </div>
-                    <div style={{ display: "flex", gap: 5 }}>
-                      <button type="button" onClick={removeQrLabel} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Retirer étiquette</button>
-                      <button type="button" onClick={removeQrFrame} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Retirer cadre</button>
+                    <p className="ps-sec-label" style={{ marginTop: 4 }}>Sticker</p>
+                    <div style={{ display: "flex", gap: 5, marginBottom: 6 }}>
+                      {([["round", "● Rond"], ["badge", "✸ Badge"], ["square", "▢ Carré"]] as const).map(([k, l]) => (
+                        <button key={k} type="button" onClick={() => setQrSticker(k)} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>{l}</button>
+                      ))}
+                    </div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                      <button type="button" onClick={removeQrLabel} style={{ ...layerBtn, flex: "1 0 30%", fontSize: 9 }}>Retirer étiquette</button>
+                      <button type="button" onClick={removeQrFrame} style={{ ...layerBtn, flex: "1 0 30%", fontSize: 9 }}>Retirer cadre</button>
+                      <button type="button" onClick={removeQrSticker} style={{ ...layerBtn, flex: "1 0 30%", fontSize: 9 }}>Retirer sticker</button>
                     </div>
                   </div>
                 )}
