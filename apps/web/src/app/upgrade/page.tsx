@@ -6,6 +6,7 @@ import { Check, Zap, Crown, Star, ArrowLeft, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { PLAN_LIST, PLAN_COMPARISON, fmtPrice } from "@/lib/plans"
 import { useAccent } from "@/lib/useAccent"
+import Particles from "@/components/Particles"
 
 // UI par plan (icône, CTA, mise en avant) ; les DONNÉES viennent de lib/plans
 const PLAN_UI = {
@@ -67,8 +68,17 @@ export default function UpgradePage() {
 
   const G = useAccent(); const MUTED = "#8A8478"
 
+  // Cette page est hors du layout dashboard : on applique l'accent au document
+  // (et on prévient les particules) pour qu'elles prennent la couleur de l'utilisateur.
+  useEffect(() => {
+    if (!G) return
+    document.documentElement.style.setProperty("--accent", G)
+    window.dispatchEvent(new CustomEvent("qrfolio-accent", { detail: G }))
+  }, [G])
+
   return (
-    <div style={{ minHeight: "100vh", background: "#080808", fontFamily: "DM Sans, sans-serif", padding: "0 24px 80px" }}>
+    <div style={{ minHeight: "100vh", background: "#080808", fontFamily: "DM Sans, sans-serif", padding: "0 24px 80px", position: "relative", isolation: "isolate" }}>
+      <Particles behind />
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}`}</style>
 
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
