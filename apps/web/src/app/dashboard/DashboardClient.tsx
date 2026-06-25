@@ -235,52 +235,64 @@ export default function DashboardClient() {
           </div>
         )}
 
-        {/* Prochaine meilleure action (parcours guidé tant qu'aucun scan) */}
-        {guide && (
-          <div className="dz" style={{ animationDelay: "40ms", marginBottom: 20, padding: "20px 22px", borderRadius: 16, position: "relative", overflow: "hidden",
-            background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, #100F0A), #100F0A)",
-            border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", boxShadow: "0 10px 34px rgba(0,0,0,0.3)" }}>
-            <div style={{ position: "absolute", top: -30, right: -20, width: 140, height: 140, borderRadius: "50%", background: "radial-gradient(circle, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%)" }} />
-            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 6 }}>
-              <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, background: "color-mix(in srgb, var(--accent) 18%, transparent)", color: G }}><Zap size={15} /></span>
-              <span style={{ color: G, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase" as const }}>Prochaine étape</span>
+        {/* Premiers pas : checklist d'onboarding (tant qu'aucun scan) */}
+        {guide && (() => {
+          const firstPage = pages[0]
+          const steps = [
+            { label: "Créer une page", desc: "Partez d'un modèle adapté à votre métier.", done: pages.length > 0, cta: { label: "Créer ma première page", href: "/dashboard/templates", Icon: Plus } },
+            { label: "Publier votre page", desc: "Rendez-la accessible via son lien et son QR.", done: publishedCount > 0, cta: firstPage ? { label: "Publier ma page", href: "/dashboard/builder/" + firstPage.id, Icon: Globe } : { label: "Créer une page", href: "/dashboard/templates", Icon: Plus } },
+            { label: "Obtenir un premier scan", desc: "Testez ou partagez votre QR pour démarrer le suivi.", done: totalScans > 0, cta: { label: "Tester mon QR code", href: "/dashboard/qr-codes", Icon: QrCode } },
+          ]
+          const doneN = steps.filter(s => s.done).length
+          const current = steps.find(s => !s.done)
+          return (
+            <div className="dz" style={{ animationDelay: "40ms", marginBottom: 20, padding: "20px 22px", borderRadius: 16, position: "relative", overflow: "hidden",
+              background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, #100F0A), #100F0A)",
+              border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", boxShadow: "0 10px 34px rgba(0,0,0,0.3)" }}>
+              <div style={{ position: "absolute", top: -30, right: -20, width: 150, height: 150, borderRadius: "50%", background: "radial-gradient(circle, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%)" }} />
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 12 }}>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
+                    <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, background: "color-mix(in srgb, var(--accent) 18%, transparent)", color: G }}><Zap size={15} /></span>
+                    <span style={{ color: G, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase" as const }}>Premiers pas</span>
+                  </div>
+                  <h2 style={{ color: "#F8F4EC", fontSize: 21, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif", letterSpacing: "-0.3px" }}>Lancez votre QRfolio en 3 étapes</h2>
+                </div>
+                <div style={{ textAlign: "right" as const, minWidth: 120 }}>
+                  <span style={{ color: "#F8F4EC", fontSize: 22, fontWeight: 700, fontFamily: "Cormorant Garamond, serif" }}>{doneN}<span style={{ color: MUTED, fontSize: 15 }}> / {steps.length}</span></span>
+                  <div style={{ height: 6, width: 120, borderRadius: 3, background: "rgba(255,255,255,0.08)", marginTop: 5, overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${(doneN / steps.length) * 100}%`, background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 3, transition: "width .5s ease" }} />
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {steps.map((s, i) => {
+                  const isCurrent = !s.done && current === s
+                  return (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 11,
+                      background: isCurrent ? "color-mix(in srgb, var(--accent) 9%, transparent)" : "rgba(255,255,255,0.02)",
+                      border: `1px solid ${isCurrent ? "color-mix(in srgb, var(--accent) 28%, transparent)" : "rgba(255,255,255,0.05)"}` }}>
+                      <span style={{ flexShrink: 0, width: 24, height: 24, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
+                        background: s.done ? "rgba(57,255,143,0.15)" : "transparent",
+                        border: s.done ? "1px solid rgba(57,255,143,0.4)" : `2px solid ${isCurrent ? G : "rgba(255,255,255,0.15)"}` }}>
+                        {s.done ? <Check size={13} color="#39FF8F" /> : <span style={{ color: isCurrent ? G : MUTED, fontSize: 11, fontWeight: 700 }}>{i + 1}</span>}
+                      </span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ color: s.done ? MUTED : "#F5F0E8", fontSize: 13.5, fontWeight: 600, margin: 0, textDecoration: s.done ? "line-through" : "none" }}>{s.label}</p>
+                        {!s.done && <p style={{ color: MUTED, fontSize: 11.5, margin: "1px 0 0" }}>{s.desc}</p>}
+                      </div>
+                      {isCurrent && (
+                        <Link href={s.cta.href} className="dz-cta" style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, padding: "8px 15px", borderRadius: 9, background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", color: "#080808", textDecoration: "none", fontSize: 12.5, fontWeight: 800, boxShadow: "0 5px 16px color-mix(in srgb, var(--accent) 25%, transparent)" }}>
+                          <s.cta.Icon size={14} strokeWidth={2.5} /> {s.cta.label}
+                        </Link>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-            <h2 style={{ color: "#F8F4EC", fontSize: 21, fontWeight: 700, margin: "0 0 4px", fontFamily: "Cormorant Garamond, serif", letterSpacing: "-0.3px" }}>
-              {guide === "nopage" ? "Créez votre première page" : "Obtenez votre premier scan"}
-            </h2>
-            <p style={{ color: "#C9C3B6", fontSize: 13, margin: "0 0 16px", lineHeight: 1.5, maxWidth: 560 }}>
-              {guide === "nopage"
-                ? "Partez d'un modèle adapté à votre métier, personnalisez-le et publiez votre page en quelques minutes."
-                : "Votre page est en ligne. Testez votre QR code, partagez-le ou créez un support imprimable pour commencer à mesurer vos scans."}
-            </p>
-            <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
-              {guide === "nopage" ? (
-                <>
-                  <Link href="/dashboard/templates" className="dz-cta" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", color: "#080808", textDecoration: "none", fontSize: 13, fontWeight: 800, boxShadow: "0 6px 20px color-mix(in srgb, var(--accent) 25%, transparent)" }}>
-                    <Plus size={15} strokeWidth={2.6} /> Créer ma première page
-                  </Link>
-                  <Link href="/dashboard/templates" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#F5F0E8", textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
-                    Découvrir les modèles
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link href="/dashboard/qr-codes" className="dz-cta" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", color: "#080808", textDecoration: "none", fontSize: 13, fontWeight: 800, boxShadow: "0 6px 20px color-mix(in srgb, var(--accent) 25%, transparent)" }}>
-                    <QrCode size={15} strokeWidth={2.4} /> Tester mon QR code
-                  </Link>
-                  {firstPub && (
-                    <a href={"/" + firstPub.slug} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#F5F0E8", textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
-                      <ExternalLink size={14} /> Partager ma page
-                    </a>
-                  )}
-                  <Link href="/dashboard/qr-codes" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#F5F0E8", textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
-                    <Globe size={14} /> Créer un support imprimable
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-        )}
+          )
+        })()}
 
         {/* KPI */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 13, marginBottom: 20 }}>
