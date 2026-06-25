@@ -188,6 +188,24 @@ function StatPill({ icon: Icon, label, value, color }: { icon: any; label: strin
   )
 }
 
+// Compteur animé (s'incrémente de 0 à la valeur au montage) — donne de la vie au Hero
+function CountUp({ value, duration = 900 }: { value: number; duration?: number }) {
+  const [n, setN] = useState(0)
+  useEffect(() => {
+    if (!value) { setN(0); return }
+    let raf = 0
+    const start = performance.now()
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - start) / duration)
+      setN(Math.round(value * (1 - Math.pow(1 - p, 3))))
+      if (p < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [value, duration])
+  return <>{n.toLocaleString("fr-FR")}</>
+}
+
 // -- Page principale -----------------------------------------------------------
 export default function ProfilePage() {
   const [profile, setProfile]           = useState<Profile | null>(null)
@@ -1057,6 +1075,15 @@ export default function ProfilePage() {
         @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
         @keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
         @keyframes pulse{0%,100%{opacity:0.3}50%{opacity:0.7}}
+        @keyframes heroFloat1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,30px) scale(1.12)}}
+        @keyframes heroFloat2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-50px,20px) scale(1.08)}}
+        @keyframes heroGlow{0%,100%{opacity:0.5}50%{opacity:0.9}}
+        @keyframes heroIn{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+        @keyframes ringPulse{0%{box-shadow:0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent)}70%{box-shadow:0 0 0 14px color-mix(in srgb, var(--accent) 0%, transparent)}100%{box-shadow:0 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent)}}
+        @keyframes badgeShine{0%{background-position:-120% 0}60%,100%{background-position:220% 0}}
+        .hero-in{animation:heroIn .6s cubic-bezier(.2,.8,.2,1) backwards}
+        .hero-tile{transition:transform .2s cubic-bezier(.2,.8,.2,1), border-color .2s, background .2s}
+        .hero-tile:hover{transform:translateY(-3px);border-color:color-mix(in srgb, var(--accent) 35%, transparent)!important}
         input:focus,textarea:focus,select:focus{border-color:color-mix(in srgb, var(--accent) 40%, transparent)!important}
         .section-card{animation:fadeIn 0.3s ease}
         * { box-sizing: border-box }
@@ -1079,104 +1106,128 @@ export default function ProfilePage() {
 
 
       {/* ====================== HERO — centre de contrôle ====================== */}
-      <div style={{ background: "radial-gradient(900px 360px at 80% -40%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 60%), linear-gradient(180deg,color-mix(in srgb, var(--accent) 5%, transparent) 0%,transparent 100%)", borderBottom: "1px solid color-mix(in srgb, var(--accent) 10%, transparent)", padding: "30px 28px 26px" }}>
-        <div className="dash-2col" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 18, alignItems: "stretch" }}>
+      <div style={{ position: "relative", overflow: "hidden", borderBottom: "1px solid color-mix(in srgb, var(--accent) 10%, transparent)", padding: "44px 28px 30px" }}>
+        {/* Couches de fond animées (profondeur : mesh + glow à la couleur d'accent) */}
+        <div aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: -130, right: -50, width: 440, height: 440, borderRadius: "50%", background: "radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent), transparent 65%)", filter: "blur(44px)", animation: "heroFloat1 22s ease-in-out infinite, heroGlow 9s ease-in-out infinite" }}/>
+          <div style={{ position: "absolute", bottom: -170, left: -50, width: 380, height: 380, borderRadius: "50%", background: "radial-gradient(circle, color-mix(in srgb, var(--accent) 13%, transparent), transparent 65%)", filter: "blur(50px)", animation: "heroFloat2 28s ease-in-out infinite, heroGlow 11s ease-in-out infinite" }}/>
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(720px 300px at 62% -10%, rgba(255,255,255,0.035), transparent 60%)" }}/>
+        </div>
 
-          {/* Carte identité */}
-          <div style={{ display: "flex", alignItems: "center", gap: 18, background: "linear-gradient(135deg,#15130C,#100F0A)", border: "1px solid color-mix(in srgb, var(--accent) 16%, transparent)", borderRadius: 18, padding: "20px 22px", boxShadow: "0 10px 34px rgba(0,0,0,0.28)" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", position: "relative", zIndex: 1 }}>
+
+          {/* Ligne 1 : avatar géant + identité + storytelling + actions */}
+          <div className="hero-in" style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap", marginBottom: 22 }}>
             <div style={{ position: "relative", flexShrink: 0 }}>
-              <div style={{ width: 78, height: 78, borderRadius: "50%", background: profile?.avatar_url ? "transparent" : `linear-gradient(135deg,${pc},${pc}80)`, border: `2px solid ${pc}55`, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 0 30px ${pc}25` }}>
+              <div style={{ width: 104, height: 104, borderRadius: "50%", background: profile?.avatar_url ? "transparent" : `linear-gradient(135deg,${pc},color-mix(in srgb, var(--accent) 55%, #000))`, border: `2px solid ${pc}66`, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", animation: "ringPulse 3.6s ease-in-out infinite" }}>
                 {profile?.avatar_url
                   ? <img src={profile.avatar_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
-                  : <span style={{ fontSize: 30, fontWeight: 700, color: "#080808", fontFamily: "Cormorant Garamond, serif" }}>{(form.full_name || profile?.email || "?")[0]?.toUpperCase()}</span>}
+                  : <span style={{ fontSize: 42, fontWeight: 700, color: "#080808", fontFamily: "Cormorant Garamond, serif" }}>{(form.full_name || profile?.email || "?")[0]?.toUpperCase()}</span>}
               </div>
               <button onClick={() => fileRef.current?.click()} disabled={uploadingAvatar} title="Changer la photo"
-                style={{ position: "absolute", bottom: 0, right: 0, width: 26, height: 26, borderRadius: "50%", background: G, border: "2px solid #100F0A", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                style={{ position: "absolute", bottom: 2, right: 2, width: 28, height: 28, borderRadius: "50%", background: G, border: "2px solid #0A0906", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>
                 {uploadingAvatar
                   ? <div style={{ width: 10, height: 10, border: "1.5px solid #080808", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.6s linear infinite" }}/>
-                  : <Camera size={11} color="#080808"/>}
+                  : <Camera size={12} color="#080808"/>}
               </button>
               <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) handleAvatarFile(f); e.target.value="" }}/>
             </div>
 
             <div style={{ minWidth: 0, flex: 1 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4, flexWrap: "wrap" }}>
-                <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(22px,3vw,30px)", color: "#F8F4EC", fontWeight: 700, margin: 0, lineHeight: 1, letterSpacing: "-0.4px" }}>
-                  {form.full_name || "Sans nom"}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 7, flexWrap: "wrap" }}>
+                <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(28px,4.5vw,46px)", color: "#F8F4EC", fontWeight: 700, margin: 0, lineHeight: 1, letterSpacing: "-0.6px" }}>
+                  Bonjour, {(form.full_name || "").trim().split(" ")[0] || profile?.email?.split("@")[0] || "vous"}
                 </h1>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: pc + "1c", border: `1px solid ${pc}40`, borderRadius: 999, padding: "3px 11px" }}>
-                  <PlanIcon size={11} color={pc}/>
-                  <span style={{ color: pc, fontSize: 10.5, fontWeight: 800 }}>{planCfg.label}</span>
+                <span style={{ position: "relative", overflow: "hidden", display: "inline-flex", alignItems: "center", gap: 5, background: currentPlan === "free" ? "rgba(255,255,255,0.06)" : `linear-gradient(135deg, ${pc}33, ${pc}1a)`, border: `1px solid ${pc}55`, borderRadius: 999, padding: "4px 12px" }}>
+                  <PlanIcon size={12} color={pc}/>
+                  <span style={{ color: pc, fontSize: 11, fontWeight: 800 }}>{planCfg.label}</span>
+                  {currentPlan !== "free" && <span aria-hidden style={{ position: "absolute", inset: 0, background: "linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.45) 50%, transparent 70%)", backgroundSize: "220% 100%", animation: "badgeShine 4.5s ease-in-out infinite" }}/>}
                 </span>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#39FF8F", fontSize: 11, fontWeight: 600 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#39FF8F", boxShadow: "0 0 7px #39FF8F" }}/> Actif
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#39FF8F", fontSize: 11.5, fontWeight: 600 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#39FF8F", boxShadow: "0 0 8px #39FF8F" }}/> Actif
                 </span>
+                {(profile?.total_scans || 0) >= 1000 && (
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(249,115,22,0.14)", border: "1px solid rgba(249,115,22,0.35)", borderRadius: 999, padding: "3px 10px", fontSize: 10.5, color: "#F97316", fontWeight: 800 }}>🔥 1000+ scans</span>
+                )}
               </div>
-              <p style={{ color: "#C9C3B6", fontSize: 12.5, margin: "0 0 12px" }}>
-                {profile?.email}{form.username ? ` · @${form.username}` : ""} · Membre depuis {memberMonths} mois
+              <p style={{ color: "#E8E2D6", fontSize: "clamp(13px,1.6vw,15.5px)", margin: "0 0 6px", lineHeight: 1.4, maxWidth: 620 }}>
+                {(profile?.total_scans || 0) > 0
+                  ? <>Vos QR codes ont déjà été scannés <strong style={{ color: pc }}>{(profile?.total_scans || 0).toLocaleString("fr-FR")} fois</strong>. Continuez sur votre lancée.</>
+                  : totalPages > 0
+                  ? <>Vous avez <strong style={{ color: pc }}>{totalPages} page{totalPages > 1 ? "s" : ""}</strong> prête{totalPages > 1 ? "s" : ""}. Partagez-les pour décoller.</>
+                  : <>Créez votre première page et lancez <strong style={{ color: pc }}>votre univers</strong> QRfolio.</>}
               </p>
-              <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
+              <p style={{ color: MUTED, fontSize: 11.5, margin: "0 0 14px" }}>
+                {profile?.email}{form.username ? ` · @${form.username}` : ""} · Membre {planCfg.label} depuis {memberMonths > 0 ? `${memberMonths} mois` : "aujourd'hui"}
+              </p>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 <button onClick={() => setPtab("identite")}
-                  style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: `linear-gradient(90deg,${G},color-mix(in srgb, var(--accent) 75%, #000))`, border: "none", borderRadius: 9, color: "#080808", fontSize: 12, fontWeight: 800, cursor: "pointer" }}>
-                  <FileEdit size={13}/> Modifier
+                  style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 16px", background: `linear-gradient(90deg,${G},color-mix(in srgb, var(--accent) 75%, #000))`, border: "none", borderRadius: 10, color: "#080808", fontSize: 12.5, fontWeight: 800, cursor: "pointer", boxShadow: `0 6px 20px ${pc}33` }}>
+                  <FileEdit size={13}/> Modifier mon profil
                 </button>
                 {publicUrl && (
                   <a href={publicUrl} target="_blank" rel="noopener noreferrer"
-                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: "#F5F0E8", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>
+                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 16px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, color: "#F5F0E8", fontSize: 12.5, fontWeight: 600, textDecoration: "none", backdropFilter: "blur(6px)" }}>
                     <Globe size={13}/> Voir ma page
                   </a>
                 )}
                 {publicUrl && (
                   <button onClick={() => { navigator.clipboard?.writeText(publicUrl); showToast("Lien copié", "ok") }}
-                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: "#F5F0E8", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 16px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, color: "#F5F0E8", fontSize: 12.5, fontWeight: 600, cursor: "pointer", backdropFilter: "blur(6px)" }}>
                     <Link2 size={13}/> Copier le lien
                   </button>
                 )}
                 <button onClick={signOut} title="Se déconnecter"
-                  style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 9, color: MUTED, fontSize: 12, cursor: "pointer" }}>
+                  style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 13px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, color: MUTED, fontSize: 12.5, cursor: "pointer" }}>
                   <LogOut size={13}/>
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Carte utilisation (jauges) */}
-          <div style={{ background: "linear-gradient(135deg,color-mix(in srgb, var(--accent) 10%, #100F0A),#100F0A)", border: `1px solid ${pc}33`, borderRadius: 18, padding: "18px 20px", boxShadow: "0 10px 34px rgba(0,0,0,0.28)", display: "flex", flexDirection: "column" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-              <span style={{ color: "#F8F4EC", fontSize: 13.5, fontWeight: 700 }}>Mon utilisation</span>
-              {profile?.plan !== "business" && (
-                <a href="/upgrade" style={{ display: "inline-flex", alignItems: "center", gap: 5, color: pc, fontSize: 11, fontWeight: 700, textDecoration: "none" }}>
-                  <Activity size={12}/> Améliorer
-                </a>
-              )}
+          {/* Ligne 2 : tuiles "ownership" (compteurs animés) + jauges en verre */}
+          <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 14 }}>
+
+            {/* Tuiles stats — tout ça m'appartient */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
+              {([
+                { icon: Calendar, label: "Jours membre", value: profile ? Math.max(0, Math.floor((Date.now() - new Date(profile.created_at).getTime()) / 86400000)) : 0, color: pc },
+                { icon: FileEdit, label: "Pages", value: totalPages, color: "#38BDF8" },
+                { icon: QrCode, label: "QR générés", value: activeQR, color: "#39FF8F" },
+                { icon: TrendingUp, label: "Scans", value: profile?.total_scans || 0, color: "#F97316" },
+              ] as const).map((s, i) => (
+                <div key={i} className="hero-in hero-tile" style={{ animationDelay: `${120 + i * 80}ms`, background: "rgba(255,255,255,0.04)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "13px 14px" }}>
+                  <span style={{ display: "inline-flex", width: 28, height: 28, borderRadius: 8, background: s.color + "1c", alignItems: "center", justifyContent: "center", marginBottom: 8 }}><s.icon size={14} color={s.color}/></span>
+                  <p style={{ color: "#F8F4EC", fontSize: 24, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}><CountUp value={s.value}/></p>
+                  <p style={{ color: MUTED, fontSize: 10.5, margin: "3px 0 0" }}>{s.label}</p>
+                </div>
+              ))}
             </div>
-            {([
-              { label: "Pages", used: totalPages, limit: planLimits.pages, pct: pagesUsagePct, near: isAtLimitPages },
-              { label: "Vues ce mois", used: totalViews, limit: planLimits.views, pct: viewsUsagePct, near: isAtLimitViews },
-            ] as const).map((g, i) => (
-              <div key={i} style={{ marginBottom: 12 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 5 }}>
-                  <span style={{ color: "#C9C3B6", fontSize: 11.5, fontWeight: 500 }}>{g.label}</span>
-                  <span style={{ color: g.near ? "#FF6B6B" : "#F5F0E8", fontSize: 11.5, fontWeight: 700 }}>
-                    {(g.used || 0).toLocaleString("fr-FR")}<span style={{ color: MUTED, fontWeight: 400 }}> / {g.limit == null ? "∞" : g.limit.toLocaleString("fr-FR")}</span>
-                  </span>
-                </div>
-                <div style={{ height: 7, borderRadius: 4, background: "rgba(255,255,255,0.07)", overflow: "hidden" }}>
-                  <div style={{ height: "100%", width: g.limit == null ? "12%" : `${Math.max(3, g.pct)}%`, borderRadius: 4, background: g.near ? "linear-gradient(90deg,#FF6B6B,#F97316)" : `linear-gradient(90deg,${pc},color-mix(in srgb, var(--accent) 70%, #000))`, transition: "width .6s cubic-bezier(.2,.8,.2,1)" }}/>
-                </div>
+
+            {/* Jauges utilisation (verre) */}
+            <div className="hero-in" style={{ animationDelay: "200ms", background: "rgba(255,255,255,0.04)", backdropFilter: "blur(10px)", border: `1px solid ${pc}2e`, borderRadius: 16, padding: "16px 18px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                <span style={{ color: "#F8F4EC", fontSize: 12.5, fontWeight: 700 }}>Mon utilisation</span>
+                {profile?.plan !== "business" && (
+                  <a href="/upgrade" style={{ display: "inline-flex", alignItems: "center", gap: 4, color: pc, fontSize: 11, fontWeight: 700, textDecoration: "none" }}>
+                    <Activity size={12}/> Améliorer
+                  </a>
+                )}
               </div>
-            ))}
-            <div style={{ display: "flex", gap: 8, marginTop: "auto", paddingTop: 8, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-              {[
-                { icon: QrCode, label: "QR actifs", value: activeQR, color: "#38BDF8" },
-                { icon: Users, label: "Filleuls", value: validatedRefs, color: "#7B61FF" },
-              ].map((s, i) => (
-                <div key={i} style={{ flex: 1, display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ width: 28, height: 28, borderRadius: 8, background: s.color + "1a", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><s.icon size={14} color={s.color}/></span>
-                  <span style={{ minWidth: 0 }}>
-                    <span style={{ display: "block", color: "#F5F0E8", fontSize: 15, fontWeight: 700, lineHeight: 1 }}>{s.value}</span>
-                    <span style={{ display: "block", color: MUTED, fontSize: 9.5 }}>{s.label}</span>
-                  </span>
+              {([
+                { label: "Pages", used: totalPages, limit: planLimits.pages, pct: pagesUsagePct, near: isAtLimitPages },
+                { label: "Vues ce mois", used: totalViews, limit: planLimits.views, pct: viewsUsagePct, near: isAtLimitViews },
+              ] as const).map((g, i) => (
+                <div key={i} style={{ marginBottom: i === 0 ? 11 : 0 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 5 }}>
+                    <span style={{ color: "#C9C3B6", fontSize: 11, fontWeight: 500 }}>{g.label}</span>
+                    <span style={{ color: g.near ? "#FF6B6B" : "#F5F0E8", fontSize: 11, fontWeight: 700 }}>
+                      {(g.used || 0).toLocaleString("fr-FR")}<span style={{ color: MUTED, fontWeight: 400 }}> / {g.limit == null ? "∞" : g.limit.toLocaleString("fr-FR")}</span>
+                    </span>
+                  </div>
+                  <div style={{ height: 7, borderRadius: 4, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: g.limit == null ? "12%" : `${Math.max(3, g.pct)}%`, borderRadius: 4, background: g.near ? "linear-gradient(90deg,#FF6B6B,#F97316)" : `linear-gradient(90deg,${pc},color-mix(in srgb, var(--accent) 70%, #000))`, transition: "width .8s cubic-bezier(.2,.8,.2,1)" }}/>
+                  </div>
                 </div>
               ))}
             </div>
