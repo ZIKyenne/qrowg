@@ -727,6 +727,7 @@ function PricingSection() {
                   ? "0 0 80px rgba(201,168,76,0.18), 0 0 0 1px rgba(201,168,76,0.12)"
                   : "none",
                 opacity: visible ? 1 : 0,
+                paddingTop: plan.badge ? 50 : undefined,
                 transform: visible
                   ? (plan.highlight ? "scale(1.04)" : "translateY(0)")
                   : "translateY(28px)",
@@ -745,12 +746,12 @@ function PricingSection() {
               {/* Badge */}
               {plan.badge && (
                 <div style={{
-                  position:"absolute", top:18, right:18,
+                  position:"absolute", top:14, left:"50%", transform:"translateX(-50%)",
                   background:"linear-gradient(90deg,#C9A84C,#b8953f)",
-                  borderRadius:20, padding:"4px 12px",
+                  borderRadius:20, padding:"4px 14px",
                   fontSize:10, fontWeight:800, color:"#080808",
-                  letterSpacing:0.5,
-                  boxShadow:"0 2px 12px rgba(201,168,76,0.4)",
+                  letterSpacing:0.5, whiteSpace:"nowrap", zIndex:3,
+                  boxShadow:"0 4px 14px rgba(201,168,76,0.45)",
                 }}>{plan.badge}</div>
               )}
 

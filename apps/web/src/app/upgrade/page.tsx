@@ -110,10 +110,10 @@ export default function UpgradePage() {
 
             return (
               <div key={plan.id}
-                style={{ background: plan.highlight ? `linear-gradient(135deg, ${pc}16, ${pc}05)` : "#111009", border: "1px solid " + (plan.highlight ? `${pc}88` : isCurrentPlan ? "rgba(57,255,143,0.3)" : "rgba(201,168,76,0.12)"), borderRadius: 20, padding: plan.highlight ? "34px 24px" : "28px 24px", position: "relative", overflow: "hidden", transform: plan.highlight ? "scale(1.04)" : "scale(1)", boxShadow: plan.highlight ? `0 0 60px ${pc}26` : "none", zIndex: plan.highlight ? 2 : 1 }}>
+                style={{ background: plan.highlight ? `linear-gradient(135deg, ${pc}16, ${pc}05)` : "#111009", border: "1px solid " + (plan.highlight ? `${pc}88` : isCurrentPlan ? "rgba(57,255,143,0.3)" : "rgba(201,168,76,0.12)"), borderRadius: 20, padding: plan.badge ? "50px 24px 28px" : (plan.highlight ? "34px 24px" : "28px 24px"), position: "relative", overflow: "hidden", transform: plan.highlight ? "scale(1.04)" : "scale(1)", boxShadow: plan.highlight ? `0 0 60px ${pc}26` : "none", zIndex: plan.highlight ? 2 : 1 }}>
 
                 {plan.badge && (
-                  <div style={{ position: "absolute", top: 16, right: 16, background: pc, borderRadius: 20, padding: "4px 12px", fontSize: 10, fontWeight: 800, color: "#080808", letterSpacing: 1 }}>{plan.badge}</div>
+                  <div style={{ position: "absolute", top: 14, left: "50%", transform: "translateX(-50%)", background: pc, borderRadius: 20, padding: "4px 14px", fontSize: 10, fontWeight: 800, color: "#080808", letterSpacing: 1, whiteSpace: "nowrap", zIndex: 3, boxShadow: "0 4px 14px rgba(0,0,0,0.35)" }}>{plan.badge}</div>
                 )}
                 {isCurrentPlan && (
                   <div style={{ position: "absolute", top: 16, right: 16, background: "rgba(57,255,143,0.15)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 20, padding: "4px 12px", fontSize: 10, fontWeight: 700, color: "#39FF8F" }}>ACTUEL</div>
