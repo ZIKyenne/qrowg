@@ -21,7 +21,7 @@ import {
   Download, Printer, Loader2, Check, Save,
   Shapes, Star, Award, MousePointerClick, ArrowRight, LayoutTemplate,
   Undo2, Redo2, Sparkles, Image as ImageIcon, Palette, Eye, Search,
-  RotateCw, AlignCenterHorizontal,
+  RotateCw, AlignCenterHorizontal, HelpCircle,
 } from "lucide-react"
 
 // ---- Constantes design (Clair & aere, style Canva) -------------------------
@@ -3156,11 +3156,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     boxShadow: "0 1px 2px rgba(31,36,48,0.04)", transition: "all .14s ease",
   }
   const topBtn = (primary = false) => ({
-    display: "flex", alignItems: "center", gap: 6, padding: "8px 13px",
-    background: primary ? "linear-gradient(90deg,#C9A84C,#b8953f)" : "rgba(0,0,0,0.05)",
+    display: "flex", alignItems: "center", gap: 6, height: 36, padding: primary ? "0 18px" : "0 14px",
+    background: primary ? "linear-gradient(135deg,#D9BC6A,#B8923A)" : "rgba(0,0,0,0.045)",
     border: primary ? "none" : "1px solid rgba(0,0,0,0.1)",
-    borderRadius: 9, color: primary ? "#080808" : INK, fontSize: 12,
-    fontWeight: primary ? 700 : 500, cursor: "pointer",
+    borderRadius: 10, color: primary ? "#1A1405" : INK, fontSize: 12.5,
+    fontWeight: primary ? 800 : 600, cursor: "pointer",
+    boxShadow: primary ? "0 5px 16px rgba(201,168,76,0.4)" : "none",
+    letterSpacing: primary ? 0.2 : 0,
   })
   const layerBtn = {
     display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
@@ -3209,10 +3211,16 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     return small || covered ? { small, covered } : null
   })()
   const histBtn = (enabled: boolean) => ({
-    display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32,
-    background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 8,
+    display: "flex", alignItems: "center", justifyContent: "center", width: 36, height: 36,
+    background: "rgba(0,0,0,0.045)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 10,
     color: enabled ? INK : MUTED, cursor: enabled ? "pointer" : "not-allowed", opacity: enabled ? 1 : 0.4,
   })
+  const ghostBtn = {
+    display: "flex", alignItems: "center", gap: 6, height: 36, padding: "0 13px",
+    background: "rgba(0,0,0,0.045)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 10,
+    color: INK, fontSize: 12.5, fontWeight: 600, cursor: "pointer",
+  } as const
+  const topDivider = <span style={{ width: 1, height: 24, background: "rgba(31,36,48,0.1)", margin: "0 4px" }} />
 
   return (
     <div className="ps-root" style={{
@@ -3277,13 +3285,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <Sparkles size={14} /> Régénérer
             </button>
           )}
-          <button type="button" onClick={() => setShowHelp(true)} title="Aide & raccourcis" aria-label="Aide et raccourcis"
-            style={{ display: "flex", alignItems: "center", gap: 5, height: 34, padding: "0 12px", background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 9, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>? Aide</button>
+          <button type="button" onClick={() => setShowHelp(true)} title="Aide & raccourcis" aria-label="Aide et raccourcis" style={ghostBtn}>
+            <HelpCircle size={14} /> Aide
+          </button>
 
-          <button type="button" onClick={openMock} title="Aperçu en situation"
-            style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 9, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+          <button type="button" onClick={openMock} title="Aperçu en situation" style={ghostBtn}>
             <Eye size={14} /> Aperçu
           </button>
+
+          {topDivider}
 
           <button type="button" onClick={undo} disabled={!canUndo} aria-label="Annuler" title="Annuler (Ctrl/⌘+Z)" style={histBtn(canUndo)}>
             <Undo2 size={15} />
