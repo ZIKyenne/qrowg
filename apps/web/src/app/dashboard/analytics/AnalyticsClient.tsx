@@ -45,6 +45,15 @@ function formatDay(dateStr: string) {
   return `${d.getDate()}/${d.getMonth() + 1}`
 }
 
+function formatAgo(iso: string) {
+  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
+  if (s < 5) return "à l'instant"
+  if (s < 60) return `il y a ${s}s`
+  if (s < 3600) return `il y a ${Math.floor(s / 60)} min`
+  if (s < 86400) return `il y a ${Math.floor(s / 3600)} h`
+  return `il y a ${Math.floor(s / 86400)} j`
+}
+
 function buildDailyData(scans: Scan[], views: View[]) {
   const map: Record<string, { date: string; scans: number; views: number }> = {}
   const now = new Date()
@@ -113,16 +122,49 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
   const totalScans30 = filteredScans.length
   const totalViews30 = filteredViews.length
 
+  // ── Temps réel : visiteurs actifs (10 min), aujourd'hui vs hier, dernier événement ──
+  const live = useMemo(() => {
+    const nowMs = Date.now()
+    const allT = [
+      ...filteredScans.map(s => ({ t: s.scanned_at, kind: "Scan QR" })),
+      ...filteredViews.map(v => ({ t: v.viewed_at, kind: "Vue page" })),
+    ].sort((a, b) => new Date(b.t).getTime() - new Date(a.t).getTime())
+    const active = filteredViews.filter(v => nowMs - new Date(v.viewed_at).getTime() < 10 * 60000).length
+    const startToday = new Date(); startToday.setHours(0, 0, 0, 0)
+    const startY = new Date(startToday); startY.setDate(startY.getDate() - 1)
+    const ms = (t: string) => new Date(t).getTime()
+    const times = [...filteredScans.map(s => s.scanned_at), ...filteredViews.map(v => v.viewed_at)]
+    const todayN = times.filter(t => ms(t) >= startToday.getTime()).length
+    const ydayN = times.filter(t => ms(t) >= startY.getTime() && ms(t) < startToday.getTime()).length
+    const evo = ydayN ? Math.round(((todayN - ydayN) / ydayN) * 100) : (todayN > 0 ? 100 : 0)
+    return { active, todayN, ydayN, evo, last: allT[0] as { t: string; kind: string } | undefined }
+  }, [filteredScans, filteredViews])
+
   return (
-    <div style={{ minHeight: "100vh", background: "#080808", padding: "32px 24px", fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "radial-gradient(1100px 520px at 75% -8%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%), #080808", padding: "30px 24px 48px", fontFamily: "DM Sans, sans-serif" }}>
+      <style>{`
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.85)}}
+        @keyframes ring{0%{box-shadow:0 0 0 0 rgba(57,255,143,0.5)}70%{box-shadow:0 0 0 8px rgba(57,255,143,0)}100%{box-shadow:0 0 0 0 rgba(57,255,143,0)}}
+        .az{animation:fadeUp .5s cubic-bezier(.2,.8,.2,1) backwards}
+        .az-card{transition:transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s, border-color .2s}
+        .az-card:hover{transform:translateY(-3px);box-shadow:0 16px 38px rgba(0,0,0,0.5)}
+      `}</style>
       {/* Header */}
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 32, flexWrap: "wrap", gap: 16 }}>
+        <div className="az" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 18, flexWrap: "wrap", gap: 16 }}>
           <div>
-            <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, color: "#F5F0E8", fontWeight: 700, margin: 0 }}>
-              Analytics
-            </h1>
-            <p style={{ color: "#8A8478", marginTop: 4, fontSize: 14 }}>30 derniers jours</p>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+              <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(30px,4.5vw,44px)", lineHeight: 1, color: "#F5F0E8", fontWeight: 700, margin: 0, letterSpacing: "-0.5px" }}>
+                Analytics
+              </h1>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(57,255,143,0.1)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 999, padding: "3px 10px" }}>
+                <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#39FF8F", animation: "pulse 1.8s ease-in-out infinite" }} />
+                <span style={{ color: "#39FF8F", fontSize: 11, fontWeight: 800, letterSpacing: 0.5 }}>EN DIRECT</span>
+              </span>
+            </div>
+            <p style={{ color: "#8A8478", margin: 0, fontSize: 13.5 }}>30 derniers jours · {live.last ? `dernier événement ${formatAgo(live.last.t)}` : "en attente de données"}</p>
           </div>
           {/* Filtre page */}
           <select
@@ -130,7 +172,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             onChange={e => setSelectedPage(e.target.value)}
             style={{
               background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)",
-              borderRadius: 8, color: "#F5F0E8", padding: "8px 14px", fontSize: 14, cursor: "pointer"
+              borderRadius: 10, color: "#F5F0E8", padding: "9px 14px", fontSize: 13.5, cursor: "pointer"
             }}
           >
             <option value="all">Toutes les pages</option>
@@ -138,37 +180,77 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
           </select>
         </div>
 
+        {/* ── Bandeau TEMPS RÉEL ─────────────────────────────────────────── */}
+        <div className="az" style={{ animationDelay: "60ms", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 13, marginBottom: 13 }}>
+          {/* Visiteurs actifs (hero live) */}
+          <div className="az-card" style={{ background: "linear-gradient(135deg, color-mix(in srgb,#39FF8F 11%,#0E0D09), #0E0D09)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 14, padding: "16px 18px", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: -16, right: -16, width: 80, height: 80, borderRadius: "50%", background: "radial-gradient(circle,rgba(57,255,143,0.16),transparent 70%)" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+              <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#39FF8F", animation: live.active ? "ring 1.6s infinite" : "pulse 2s infinite" }} />
+              <span style={{ color: "#39FF8F", fontSize: 11.5, fontWeight: 700 }}>Visiteurs actifs</span>
+            </div>
+            <p style={{ color: "#F8F4EC", fontSize: 38, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{live.active}</p>
+            <p style={{ color: "rgba(57,255,143,0.7)", fontSize: 10.5, margin: "2px 0 0" }}>sur les 10 dernières minutes</p>
+          </div>
+          {/* Aujourd'hui + évolution */}
+          <div className="az-card" style={{ background: "#100F0A", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius: 14, padding: "16px 18px", position: "relative", overflow: "hidden" }}>
+            <p style={{ color: "#8A8478", fontSize: 11.5, fontWeight: 600, margin: "0 0 8px" }}>Activité aujourd'hui</p>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+              <p style={{ color: "#F8F4EC", fontSize: 38, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{live.todayN}</p>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 3, color: live.evo >= 0 ? "#39FF8F" : "#FF6B6B", fontSize: 12.5, fontWeight: 700 }}>
+                <TrendingUp size={13} style={{ transform: live.evo >= 0 ? "none" : "scaleY(-1)" }} /> {live.evo >= 0 ? "+" : ""}{live.evo}%
+              </span>
+            </div>
+            <p style={{ color: MUTED, fontSize: 10.5, margin: "2px 0 0" }}>vs hier ({live.ydayN}) · scans + vues</p>
+          </div>
+          {/* Dernier événement */}
+          <div className="az-card" style={{ background: "#100F0A", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius: 14, padding: "16px 18px" }}>
+            <p style={{ color: "#8A8478", fontSize: 11.5, fontWeight: 600, margin: "0 0 8px" }}>Dernier événement</p>
+            {live.last ? (
+              <>
+                <p style={{ color: "#F8F4EC", fontSize: 19, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>{live.last.kind}</p>
+                <p style={{ color: GOLD, fontSize: 11.5, margin: "3px 0 0", fontWeight: 600 }}>{formatAgo(live.last.t)}</p>
+              </>
+            ) : (
+              <p style={{ color: MUTED, fontSize: 13, margin: "6px 0 0" }}>Aucun pour l'instant</p>
+            )}
+          </div>
+        </div>
+
         {/* KPI Cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 32 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 13, marginBottom: 22 }}>
           {[
-            { icon: <QrCode size={20} />, label: "Scans (30j)", value: totalScans30, color: GOLD },
-            { icon: <Eye size={20} />, label: "Vues (30j)", value: totalViews30, color: NEON },
-            { icon: <BarChart2 size={20} />, label: "Pages actives", value: pages.filter(p => p.status === "published").length, color: "#7B61FF" },
-            { icon: <TrendingUp size={20} />, label: "Total scans", value: profile?.total_scans || 0, color: "#FF6B6B" },
+            { icon: <QrCode size={18} />, label: "Scans (30j)", value: totalScans30, color: GOLD },
+            { icon: <Eye size={18} />, label: "Vues (30j)", value: totalViews30, color: NEON },
+            { icon: <BarChart2 size={18} />, label: "Pages actives", value: pages.filter(p => p.status === "published").length, color: "#7B61FF" },
+            { icon: <TrendingUp size={18} />, label: "Total scans", value: profile?.total_scans || 0, color: "#FF6B6B" },
           ].map((kpi, i) => (
-            <div key={i} style={{
-              background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)",
-              borderRadius: 12, padding: "20px 24px",
-              display: "flex", alignItems: "center", gap: 16
+            <div key={i} className="az az-card" style={{
+              animationDelay: `${120 + i * 60}ms`,
+              background: "#100F0A", border: "1px solid color-mix(in srgb, var(--accent) 13%, transparent)",
+              borderRadius: 13, padding: "16px 18px",
+              display: "flex", alignItems: "center", gap: 14, position: "relative", overflow: "hidden"
             }}>
-              <div style={{ color: kpi.color, background: `${kpi.color}18`, borderRadius: 8, padding: 10 }}>
+              <div style={{ position: "absolute", top: -12, right: -12, width: 60, height: 60, borderRadius: "50%", background: `radial-gradient(circle,${kpi.color}1c,transparent 70%)` }} />
+              <div style={{ color: kpi.color, background: `${kpi.color}1a`, borderRadius: 9, padding: 10, display: "flex" }}>
                 {kpi.icon}
               </div>
               <div>
-                <p style={{ color: "#8A8478", fontSize: 12, margin: 0 }}>{kpi.label}</p>
-                <p style={{ color: "#F5F0E8", fontSize: 24, fontWeight: 700, margin: 0 }}>{kpi.value}</p>
+                <p style={{ color: "#C9C3B6", fontSize: 11.5, margin: 0, fontWeight: 500 }}>{kpi.label}</p>
+                <p style={{ color: "#F8F4EC", fontSize: 28, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif", lineHeight: 1.1 }}>{(kpi.value as number).toLocaleString("fr-FR")}</p>
               </div>
             </div>
           ))}
         </div>
 
         {/* Graphique principal — scans + vues */}
-        <div style={{
-          background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)",
-          borderRadius: 12, padding: "24px", marginBottom: 24
+        <div className="az" style={{
+          animationDelay: "360ms",
+          background: "linear-gradient(180deg,#13110B,#100F0A)", border: "1px solid color-mix(in srgb, var(--accent) 18%, transparent)",
+          borderRadius: 16, padding: "22px 24px", marginBottom: 18, boxShadow: "0 8px 30px rgba(0,0,0,0.25)"
         }}>
-          <h2 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 600, marginBottom: 20, marginTop: 0 }}>
-            Scans & Vues — 30 jours
+          <h2 style={{ color: "#F8F4EC", fontSize: 18, fontWeight: 700, marginBottom: 18, marginTop: 0, letterSpacing: "-0.2px", display: "flex", alignItems: "center", gap: 9 }}>
+            <TrendingUp size={17} color={GOLD} /> Scans &amp; Vues <span style={{ color: MUTED, fontWeight: 500, fontSize: 14 }}>— 30 jours</span>
           </h2>
           <ResponsiveContainer width="100%" height={260}>
             <AreaChart data={dailyData}>
@@ -187,8 +269,8 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
               <YAxis tick={{ fill: MUTED, fontSize: 11 }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
               <Legend wrapperStyle={{ color: MUTED, fontSize: 13 }} />
-              <Area type="monotone" dataKey="scans" name="Scans QR" stroke={GOLD} strokeWidth={2} fill="url(#gScans)" />
-              <Area type="monotone" dataKey="views" name="Vues page" stroke={NEON} strokeWidth={2} fill="url(#gViews)" />
+              <Area type="monotone" dataKey="scans" name="Scans QR" stroke={GOLD} strokeWidth={2.4} fill="url(#gScans)" animationDuration={1100} dot={false} activeDot={{ r: 4, fill: GOLD }} />
+              <Area type="monotone" dataKey="views" name="Vues page" stroke={NEON} strokeWidth={2.4} fill="url(#gViews)" animationDuration={1100} animationBegin={200} dot={false} activeDot={{ r: 4, fill: NEON }} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
