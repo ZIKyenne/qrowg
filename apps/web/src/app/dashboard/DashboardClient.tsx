@@ -55,6 +55,8 @@ export default function DashboardClient() {
   const [deleting, setDeleting] = useState(false)
   const [hour] = useState(new Date().getHours())
   const [monthViews, setMonthViews] = useState(0) // vues du mois en cours (quota)
+  const [todayViews, setTodayViews] = useState(0) // vues aujourd'hui (vie du dashboard)
+  const [weekViews, setWeekViews] = useState<number[]>([]) // 7 derniers jours (mini-sparkline)
 
   const greeting = hour < 12 ? "Bonjour" : hour < 18 ? "Bon apres-midi" : "Bonsoir"
 
@@ -73,9 +75,24 @@ export default function DashboardClient() {
     if (ids.length) {
       const now = new Date()
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
-      const { count } = await supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", monthStart)
-      setMonthViews(count ?? 0)
-    } else setMonthViews(0)
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      const weekStart  = new Date(todayStart); weekStart.setDate(weekStart.getDate() - 6)
+      const [{ count: mCount }, { count: tCount }, { data: wRows }] = await Promise.all([
+        supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", monthStart),
+        supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", todayStart.toISOString()),
+        supabase.from("page_views").select("viewed_at").in("page_id", ids).gte("viewed_at", weekStart.toISOString()),
+      ])
+      setMonthViews(mCount ?? 0)
+      setTodayViews(tCount ?? 0)
+      // Répartition sur 7 jours pour la mini-courbe
+      const buckets = Array(7).fill(0)
+      for (const r of (wRows ?? [])) {
+        const d = new Date((r as any).viewed_at)
+        const idx = Math.floor((d.getTime() - weekStart.getTime()) / 86400000)
+        if (idx >= 0 && idx < 7) buckets[idx]++
+      }
+      setWeekViews(buckets)
+    } else { setMonthViews(0); setTodayViews(0); setWeekViews([]) }
     setLoading(false)
   }
 
@@ -116,9 +133,29 @@ export default function DashboardClient() {
     </div>
   )
 
+  // Hover lift réutilisable (anime + restaure l'ombre de repos)
+  const hov = (rest = "none") => ({
+    onMouseEnter: (e: any) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 16px 38px rgba(0,0,0,0.5)" },
+    onMouseLeave: (e: any) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = rest },
+  })
+  const maxToday = Math.max(1, ...weekViews)
+
   return (
-    <div style={{ minHeight: "100vh", background: "#080808", padding: "32px 28px", fontFamily: "DM Sans, sans-serif" }}>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}} @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}`}</style>
+    <div style={{ minHeight: "100vh", background: "radial-gradient(1200px 600px at 70% -10%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%), #080808", padding: "30px 28px 48px", fontFamily: "DM Sans, sans-serif" }}>
+      <style>{`
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+        .dz{animation:fadeUp .5s cubic-bezier(.2,.8,.2,1) backwards}
+        .dz-row{transition:background .15s, transform .15s}
+        .dz-row:hover{background:rgba(255,255,255,0.025)!important;transform:translateX(2px)}
+        .dz-card{transition:transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s, border-color .2s}
+        .dz-arrow{transition:transform .2s}
+        .dz-row:hover .dz-arrow,.dz-act:hover .dz-arrow{transform:translateX(3px)}
+        .dz-cta{transition:transform .18s, box-shadow .18s}
+        .dz-cta:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 10px 30px color-mix(in srgb, var(--accent) 40%, transparent)!important}
+        .dz-cta:active{transform:translateY(0) scale(.98)}
+      `}</style>
 
       {pageToDelete && (
         <DeleteModal
@@ -129,21 +166,26 @@ export default function DashboardClient() {
         />
       )}
 
-      <div style={{ maxWidth: 900, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1080, margin: "0 auto" }}>
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
+        <div className="dz" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 22, flexWrap: "wrap", gap: 14 }}>
           <div>
-            <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 30, color: "#F5F0E8", fontWeight: 700, margin: "0 0 4px" }}>
+            <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(30px,4.5vw,44px)", lineHeight: 1.05, color: "#F5F0E8", fontWeight: 700, margin: "0 0 8px", letterSpacing: "-0.5px" }}>
               {greeting}{profile?.full_name ? ", " + profile.full_name.split(" ")[0] : ""} !
             </h1>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ width: 6, height: 6, borderRadius: "50%", background: planCfg.color, boxShadow: "0 0 6px " + planCfg.color + "80" }} />
-              <span style={{ color: planCfg.color, fontSize: 12, fontWeight: 600 }}>Plan {planCfg.label}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: planCfg.color + "14", border: "1px solid " + planCfg.color + "33", borderRadius: 999, padding: "3px 11px" }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: planCfg.color, boxShadow: "0 0 7px " + planCfg.color, animation: "pulse 2.4s ease-in-out infinite" }} />
+                <span style={{ color: planCfg.color, fontSize: 12, fontWeight: 700 }}>Plan {planCfg.label}</span>
+              </span>
+              <span style={{ color: MUTED, fontSize: 12.5 }}>
+                <span style={{ color: "#39FF8F", fontWeight: 700 }}>{todayViews}</span> vue{todayViews > 1 ? "s" : ""} aujourd'hui
+              </span>
             </div>
           </div>
-          <Link href="/dashboard/templates"
-            style={{ display: "flex", alignItems: "center", gap: 8, background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 12, padding: "10px 20px", color: "#080808", textDecoration: "none", fontSize: 14, fontWeight: 700, boxShadow: "0 4px 20px color-mix(in srgb, var(--accent) 25%, transparent)", flexShrink: 0 }}>
-            <Plus size={16} /> Nouvelle page
+          <Link href="/dashboard/templates" className="dz-cta"
+            style={{ display: "flex", alignItems: "center", gap: 8, background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 12, padding: "11px 22px", color: "#080808", textDecoration: "none", fontSize: 14, fontWeight: 800, boxShadow: "0 6px 22px color-mix(in srgb, var(--accent) 28%, transparent)", flexShrink: 0 }}>
+            <Plus size={16} strokeWidth={2.6} /> Nouvelle page
           </Link>
         </div>
 
@@ -173,32 +215,45 @@ export default function DashboardClient() {
         )}
 
         {/* KPI */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 28 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 13, marginBottom: 20 }}>
           {[
-            { icon: <Eye size={18} />, label: "Pages creees", value: profile?.total_pages || 0, color: G, sub: publishedCount + " publiee" + (publishedCount > 1 ? "s" : "") },
-            { icon: <QrCode size={18} />, label: "Scans totaux", value: profile?.total_scans || 0, color: "#39FF8F", sub: "tous temps" },
-            { icon: <BarChart2 size={18} />, label: "Vues ce mois", value: monthViews, color: overViews ? "#FF6B6B" : "#7B61FF", sub: viewsLimit ? `/ ${viewsLimit.toLocaleString("fr-FR")} ce mois` : "illimitées" },
-            { icon: <Globe size={18} />, label: "Publiees", value: publishedCount, color: "#38BDF8", sub: "sur " + pages.length + " pages" },
+            { icon: <QrCode size={18} />, label: "Scans totaux", value: (profile?.total_scans || 0).toLocaleString("fr-FR"), color: "#39FF8F", sub: "tous temps", hero: true },
+            { icon: <BarChart2 size={18} />, label: "Vues ce mois", value: monthViews.toLocaleString("fr-FR"), color: overViews ? "#FF6B6B" : "#7B61FF", sub: viewsLimit ? `/ ${viewsLimit.toLocaleString("fr-FR")}` : "illimitées", spark: true },
+            { icon: <Eye size={18} />, label: "Pages créées", value: profile?.total_pages || 0, color: G, sub: publishedCount + " publiée" + (publishedCount > 1 ? "s" : "") },
+            { icon: <Globe size={18} />, label: "Publiées", value: publishedCount, color: "#38BDF8", sub: "sur " + pages.length + " pages" },
           ].map((kpi, i) => (
-            <div key={i} style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 14, padding: "18px 20px", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", top: -10, right: -10, width: 60, height: 60, borderRadius: "50%", background: "radial-gradient(circle," + kpi.color + "12,transparent 70%)" }} />
-              <div style={{ color: kpi.color, background: kpi.color + "15", borderRadius: 8, padding: 8, width: "fit-content", marginBottom: 10 }}>{kpi.icon}</div>
-              <p style={{ color: "#F5F0E8", fontSize: 28, fontWeight: 700, margin: "0 0 2px", fontFamily: "Cormorant Garamond, serif" }}>{kpi.value}</p>
-              <p style={{ color: MUTED, fontSize: 11, margin: "0 0 2px" }}>{kpi.label}</p>
-              <p style={{ color: kpi.color + "80", fontSize: 10, margin: 0 }}>{kpi.sub}</p>
+            <div key={i} className="dz dz-card" {...hov("none")}
+              style={{ animationDelay: `${i * 70}ms`, background: kpi.hero ? "linear-gradient(135deg, color-mix(in srgb,#39FF8F 9%,#111009), #100F0A)" : "#100F0A", border: "1px solid " + (kpi.hero ? "rgba(57,255,143,0.28)" : "color-mix(in srgb, var(--accent) 12%, transparent)"), borderRadius: 14, padding: "16px 18px", position: "relative", overflow: "hidden", cursor: "default" }}>
+              <div style={{ position: "absolute", top: -14, right: -14, width: 72, height: 72, borderRadius: "50%", background: "radial-gradient(circle," + kpi.color + "1f,transparent 70%)" }} />
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ color: kpi.color, background: kpi.color + "1a", borderRadius: 9, padding: 8, display: "flex" }}>{kpi.icon}</div>
+                {kpi.spark && weekViews.length === 7 && (
+                  <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 24 }}>
+                    {weekViews.map((v, j) => (
+                      <div key={j} style={{ width: 4, height: Math.max(3, Math.round((v / maxToday) * 24)), borderRadius: 2, background: j === 6 ? kpi.color : kpi.color + "55" }} />
+                    ))}
+                  </div>
+                )}
+              </div>
+              <p style={{ color: "#F8F4EC", fontSize: kpi.hero ? 36 : 30, fontWeight: 700, margin: "10px 0 1px", fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{kpi.value}</p>
+              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 6 }}>
+                <p style={{ color: "#C9C3B6", fontSize: 11.5, margin: 0, fontWeight: 500 }}>{kpi.label}</p>
+                <p style={{ color: kpi.color + "b0", fontSize: 10, margin: 0, whiteSpace: "nowrap" }}>{kpi.sub}</p>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Layout 2 colonnes */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 28 }}>
+        {/* Layout 2 colonnes — Mes pages = carte principale */}
+        <div className="dz" style={{ animationDelay: "180ms", display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 14 }}>
 
-          {/* Pages */}
-          <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, overflow: "hidden" }}>
-            <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: 0 }}>Mes pages ({pages.length})</p>
-              <Link href="/dashboard/templates" style={{ display: "flex", alignItems: "center", gap: 4, color: G, fontSize: 11, textDecoration: "none" }}>
-                <Plus size={11} /> Nouvelle
+          {/* Pages (PRINCIPAL) */}
+          <div style={{ background: "linear-gradient(180deg,#13110B,#100F0A)", border: "1px solid color-mix(in srgb, var(--accent) 22%, transparent)", borderRadius: 16, overflow: "hidden", boxShadow: "0 8px 30px rgba(0,0,0,0.25)", position: "relative" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent, var(--accent), transparent)" }} />
+            <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <p style={{ color: "#F8F4EC", fontSize: 15.5, fontWeight: 700, margin: 0, letterSpacing: "-0.2px" }}>Mes pages <span style={{ color: MUTED, fontWeight: 500 }}>({pages.length})</span></p>
+              <Link href="/dashboard/templates" className="dz-cta" style={{ display: "flex", alignItems: "center", gap: 5, color: "#080808", background: "color-mix(in srgb, var(--accent) 90%, #fff)", padding: "5px 11px", borderRadius: 8, fontSize: 11, fontWeight: 800, textDecoration: "none" }}>
+                <Plus size={11} strokeWidth={2.8} /> Nouvelle
               </Link>
             </div>
             {pages.length === 0 ? (
@@ -213,9 +268,7 @@ export default function DashboardClient() {
             ) : (
               <div>
                 {pages.map((page, i) => (
-                  <div key={page.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", borderBottom: i < pages.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none", transition: "background 0.15s" }}
-                    onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.02)"}
-                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                  <div key={page.id} className="dz-row" style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 16px", borderBottom: i < pages.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none" }}>
 
                     {/* Status dot cliquable pour publier/depublier */}
                     <button onClick={() => togglePublish(page)} title={page.status === "published" ? "Depublier" : "Publier"}
@@ -277,13 +330,11 @@ export default function DashboardClient() {
                 { icon: "🌐", label: "Domaines perso", href: "/dashboard/domains", color: "#39FF8F" },
                 { icon: "⚙️", label: "Parametres", href: "/dashboard/settings", color: MUTED },
               ].map((action, i, arr) => (
-                <Link key={i} href={action.href}
-                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 18px", textDecoration: "none", borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none", transition: "background 0.15s" }}
-                  onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.02)"}
-                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                  <span style={{ fontSize: 16 }}>{action.icon}</span>
-                  <span style={{ color: "#F5F0E8", fontSize: 13 }}>{action.label}</span>
-                  <ArrowRight size={12} color={MUTED} style={{ marginLeft: "auto" }} />
+                <Link key={i} href={action.href} className="dz-row dz-act"
+                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 18px", textDecoration: "none", borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none" }}>
+                  <span style={{ width: 30, height: 30, borderRadius: 8, background: action.color + "14", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}>{action.icon}</span>
+                  <span style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 500 }}>{action.label}</span>
+                  <ArrowRight className="dz-arrow" size={13} color={action.color} style={{ marginLeft: "auto" }} />
                 </Link>
               ))}
             </div>
