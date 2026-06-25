@@ -314,7 +314,7 @@ export default function TemplatesPage() {
             </button>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: 18 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(290px,100%), 1fr))", gap: 18 }}>
             <style>{`@keyframes tplUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}`}</style>
             {filtered.map((template: any, idx: number) => {
               const isSelected = selected === template.id
