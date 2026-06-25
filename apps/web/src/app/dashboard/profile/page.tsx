@@ -1161,10 +1161,10 @@ export default function ProfilePage() {
                 {profile?.email}{form.username ? ` · @${form.username}` : ""} · Membre {planCfg.label} depuis {memberMonths > 0 ? `${memberMonths} mois` : "aujourd'hui"}
               </p>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <button onClick={() => setPtab("identite")}
-                  style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 16px", background: `linear-gradient(90deg,${G},color-mix(in srgb, var(--accent) 75%, #000))`, border: "none", borderRadius: 10, color: "#080808", fontSize: 12.5, fontWeight: 800, cursor: "pointer", boxShadow: `0 6px 20px ${pc}33` }}>
-                  <FileEdit size={13}/> Modifier mon profil
-                </button>
+                <a href="/dashboard/avatar"
+                  style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 16px", background: `linear-gradient(90deg,${G},color-mix(in srgb, var(--accent) 75%, #000))`, border: "none", borderRadius: 10, color: "#080808", fontSize: 12.5, fontWeight: 800, cursor: "pointer", textDecoration: "none", boxShadow: `0 6px 20px ${pc}33` }}>
+                  <QrCode size={13}/> Créer mon avatar
+                </a>
                 {publicUrl && (
                   <a href={publicUrl} target="_blank" rel="noopener noreferrer"
                     style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 16px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, color: "#F5F0E8", fontSize: 12.5, fontWeight: 600, textDecoration: "none", backdropFilter: "blur(6px)" }}>
