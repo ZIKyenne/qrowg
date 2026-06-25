@@ -2250,14 +2250,38 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Features incluses */}
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
-                  {planCfg.features.map((f, i) => (
-                    <div key={i} style={{ display:"flex", alignItems:"center", gap:7 }}>
-                      <CheckCircle size={12} color="#39FF8F" style={{ flexShrink:0 }}/>
-                      <span style={{ color:MUTED, fontSize:11 }}>{f}</span>
-                    </div>
-                  ))}
+                <div>
+                  <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 8px" }}>Inclus dans votre plan</p>
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
+                    {planCfg.features.map((f, i) => (
+                      <div key={i} style={{ display:"flex", alignItems:"center", gap:7 }}>
+                        <CheckCircle size={12} color="#39FF8F" style={{ flexShrink:0 }}/>
+                        <span style={{ color:"#C9C3B6", fontSize:11 }}>{f}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+
+                {/* Fonctionnalités à débloquer (vend l'upgrade) */}
+                {currentPlan !== "business" && nextPlan && (() => {
+                  const locked = (nextPlan.features || []).filter((f: string) => !planCfg.features.includes(f)).slice(0, 4)
+                  if (!locked.length) return null
+                  return (
+                    <div style={{ background:`${nextPlan.color}0d`, border:`1px solid ${nextPlan.color}26`, borderRadius:12, padding:"13px 15px" }}>
+                      <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 8px" }}>
+                        Débloqué avec <span style={{ color:nextPlan.color }}>{nextPlan.label}</span>
+                      </p>
+                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
+                        {locked.map((f: string, i: number) => (
+                          <div key={i} style={{ display:"flex", alignItems:"center", gap:7, opacity:0.85 }}>
+                            <Lock size={11} color={nextPlan.color} style={{ flexShrink:0 }}/>
+                            <span style={{ color:MUTED, fontSize:11 }}>{f}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })()}
 
                 {/* Boutons action */}
                 <div style={{ display:"flex", gap:8 }}>
