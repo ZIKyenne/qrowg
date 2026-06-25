@@ -91,15 +91,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return pathname.startsWith(href)
   }
 
-  const W = collapsed ? 72 : 240
+  const W = isMobile ? 0 : (collapsed ? 72 : 240)
 
   return (
     <div style={{ display: "flex", height: "100vh", background: "#080808", fontFamily: "DM Sans, sans-serif", overflow: "hidden" }}>
-      {/* SIDEBAR */}
+      {/* SIDEBAR (masquée sur mobile : remplacée par la barre du bas) */}
       <div style={{
         width: W, minWidth: W, background: "#0A0A0A",
         borderRight: "1px solid rgba(201,168,76,0.1)",
-        display: "flex", flexDirection: "column",
+        display: isMobile ? "none" : "flex", flexDirection: "column",
         transition: "width 0.25s cubic-bezier(0.4,0,0.2,1), min-width 0.25s cubic-bezier(0.4,0,0.2,1)",
         overflow: "hidden", flexShrink: 0, position: "relative", zIndex: 30
       }}>
@@ -245,9 +245,35 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
 
       {/* MAIN CONTENT */}
-      <main style={{ flex: 1, overflow: "auto", minWidth: 0 }}>
+      <main style={{ flex: 1, overflow: "auto", minWidth: 0, paddingBottom: isMobile ? 64 : 0 }}>
         {children}
       </main>
+
+      {/* BARRE DE NAVIGATION MOBILE (bottom bar) */}
+      {isMobile && (
+        <nav style={{
+          position: "fixed", bottom: 0, left: 0, right: 0, height: 60, zIndex: 50,
+          display: "flex", alignItems: "stretch",
+          background: "rgba(10,10,10,0.96)", backdropFilter: "blur(12px)",
+          borderTop: "1px solid rgba(201,168,76,0.14)",
+          boxShadow: "0 -8px 24px rgba(0,0,0,0.4)",
+        }}>
+          {NAV_ITEMS.map(({ href, icon: Icon, label, exact }) => {
+            const active = isActive(href, exact)
+            return (
+              <Link key={href} href={href}
+                style={{
+                  flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3,
+                  textDecoration: "none", color: active ? G : MUTED, position: "relative", transition: "color .15s",
+                }}>
+                {active && <span style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 26, height: 3, borderRadius: "0 0 3px 3px", background: G }} />}
+                <Icon size={19} strokeWidth={active ? 2.4 : 2} />
+                <span style={{ fontSize: 9, fontWeight: active ? 700 : 500, letterSpacing: 0.1 }}>{label}</span>
+              </Link>
+            )
+          })}
+        </nav>
+      )}
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
