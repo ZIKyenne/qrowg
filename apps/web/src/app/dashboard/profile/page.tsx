@@ -1025,12 +1025,26 @@ export default function ProfilePage() {
 
   // -- Loading ------------------------------------------------------------------
   if (loading) return (
-    <div style={{ minHeight: "100vh", background: BG, display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ textAlign: "center" }}>
-        <div style={{ width: 40, height: 40, border: `2px solid color-mix(in srgb, var(--accent) 13%, transparent)`, borderTopColor: G, borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 12px" }}/>
-        <p style={{ color: MUTED, fontSize: 13 }}>Chargement du profil...</p>
+    <div style={{ minHeight: "100vh", background: BG, padding: "28px 28px 48px", fontFamily: "DM Sans, sans-serif" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        {/* Bandeau profil */}
+        <div style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 28 }}>
+          <div className="skeleton" style={{ width: 92, height: 92, borderRadius: "50%", flexShrink: 0 }} />
+          <div style={{ flex: 1 }}>
+            <div className="skeleton" style={{ width: 220, height: 30, marginBottom: 10 }} />
+            <div className="skeleton" style={{ width: 300, height: 16 }} />
+          </div>
+        </div>
+        {/* Stat pills */}
+        <div style={{ display: "flex", gap: 12, marginBottom: 26, flexWrap: "wrap" }}>
+          {[0, 1, 2, 3].map(i => <div key={i} className="skeleton" style={{ width: 150, height: 54, borderRadius: 12 }} />)}
+        </div>
+        {/* 2 colonnes */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+          <div className="skeleton" style={{ height: 420, borderRadius: 16 }} />
+          <div className="skeleton" style={{ height: 420, borderRadius: 16 }} />
+        </div>
       </div>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   )
 
