@@ -180,6 +180,36 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
           </select>
         </div>
 
+        {/* État vide pédagogique : aucune donnée encore */}
+        {totalScans30 === 0 && totalViews30 === 0 && (profile?.total_scans || 0) === 0 && (
+          <div className="az" style={{ marginBottom: 14, padding: "22px 24px", borderRadius: 16, position: "relative", overflow: "hidden",
+            background: "linear-gradient(135deg, color-mix(in srgb,#7B61FF 12%,#100F0A), #100F0A)",
+            border: "1px solid rgba(123,97,255,0.3)", boxShadow: "0 10px 34px rgba(0,0,0,0.3)" }}>
+            <div style={{ position: "absolute", top: -30, right: -20, width: 150, height: 150, borderRadius: "50%", background: "radial-gradient(circle, rgba(123,97,255,0.16), transparent 70%)" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 6 }}>
+              <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, background: "rgba(123,97,255,0.18)", color: "#A78BFA" }}><BarChart2 size={15} /></span>
+              <span style={{ color: "#A78BFA", fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase" as const }}>Bientôt vos données</span>
+            </div>
+            <h2 style={{ color: "#F8F4EC", fontSize: 21, fontWeight: 700, margin: "0 0 4px", fontFamily: "Cormorant Garamond, serif", letterSpacing: "-0.3px" }}>
+              Vos statistiques apparaîtront ici dès le premier scan
+            </h2>
+            <p style={{ color: "#C9C3B6", fontSize: 13, margin: "0 0 14px", lineHeight: 1.55, maxWidth: 620 }}>
+              Vous verrez en temps réel : <strong style={{ color: "#F5F0E8" }}>scans &amp; vues</strong>, <strong style={{ color: "#F5F0E8" }}>pays &amp; villes</strong>, <strong style={{ color: "#F5F0E8" }}>appareils</strong>, <strong style={{ color: "#F5F0E8" }}>sources de trafic</strong> et vos <strong style={{ color: "#F5F0E8" }}>pages les plus performantes</strong>. Lancez-vous pour activer le suivi.
+            </p>
+            <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
+              <a href="/dashboard/qr-codes" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", color: "#080808", textDecoration: "none", fontSize: 13, fontWeight: 800, boxShadow: "0 6px 20px color-mix(in srgb, var(--accent) 25%, transparent)" }}>
+                <QrCode size={15} strokeWidth={2.4} /> Tester mon QR code
+              </a>
+              {pages.find(p => p.status === "published") && (
+                <a href={"/" + pages.find(p => p.status === "published")!.slug} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#F5F0E8", textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
+                  <Globe size={14} /> Partager ma page
+                </a>
+              )}
+            </div>
+            <p style={{ color: "#6F6A60", fontSize: 11, margin: "12px 0 0" }}>Aperçu de démonstration ci-dessous — vos vraies données le remplaceront.</p>
+          </div>
+        )}
+
         {/* ── Bandeau TEMPS RÉEL ─────────────────────────────────────────── */}
         <div className="az" style={{ animationDelay: "60ms", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 13, marginBottom: 13 }}>
           {/* Visiteurs actifs (hero live) */}
