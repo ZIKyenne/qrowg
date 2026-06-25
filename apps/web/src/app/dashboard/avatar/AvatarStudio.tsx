@@ -117,6 +117,7 @@ export default function AvatarStudio({
   const [cfg, setCfg] = useState<AvatarConfig>(initialConfig);
   const [pending, startTransition] = useTransition();
   const [status, setStatus] = useState<string | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
   const set = (patch: Partial<AvatarConfig>) => setCfg((c) => ({ ...c, ...patch }));
 
   const previewGrid = useMemo(
@@ -151,6 +152,52 @@ export default function AvatarStudio({
   const onSvg = () => {
     const blob = new Blob([buildExportSvg(cfg)], { type: "image/svg+xml" });
     download("qrfolio-avatar.svg", URL.createObjectURL(blob));
+  };
+
+  // ── Partage (croissance : chaque partage met en avant QRfolio + son lien) ──
+  const SHARE_URL = "https://qrfolio.app";
+  const SHARE_TEXT = "J'ai créé mon avatar QR-art avec QRfolio ✨ Crée le tien gratuitement :";
+  const u = encodeURIComponent(SHARE_URL);
+  const t = encodeURIComponent(SHARE_TEXT);
+  const shareTargets: { label: string; href: string; color: string }[] = [
+    { label: "WhatsApp", href: `https://wa.me/?text=${t}%20${u}`, color: "#25D366" },
+    { label: "X", href: `https://twitter.com/intent/tweet?text=${t}&url=${u}`, color: "#F5F0E8" },
+    { label: "LinkedIn", href: `https://www.linkedin.com/sharing/share-offsite/?url=${u}`, color: "#0A66C2" },
+    { label: "Facebook", href: `https://www.facebook.com/sharer/sharer.php?u=${u}`, color: "#1877F2" },
+    { label: "E-mail", href: `mailto:?subject=${encodeURIComponent("Mon avatar QRfolio")}&body=${t}%20${u}`, color: "#8A8478" },
+  ];
+
+  function avatarPngFile(): Promise<File | null> {
+    return new Promise((resolve) => {
+      const blob = new Blob([buildExportSvg(cfg)], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => {
+        const c = document.createElement("canvas"); c.width = 1024; c.height = 1024;
+        c.getContext("2d")!.drawImage(img, 0, 0, 1024, 1024);
+        URL.revokeObjectURL(url);
+        c.toBlob((b) => resolve(b ? new File([b], "qrfolio-avatar.png", { type: "image/png" }) : null), "image/png");
+      };
+      img.onerror = () => resolve(null);
+      img.src = url;
+    });
+  }
+
+  const onShareNative = async () => {
+    const nav = navigator as Navigator & { canShare?: (d: unknown) => boolean };
+    if (!nav.share) { copyShareLink(); return; }
+    try {
+      const file = await avatarPngFile();
+      if (file && nav.canShare?.({ files: [file] })) {
+        await nav.share({ files: [file], title: "QRfolio — Avatar QR-art", text: `${SHARE_TEXT} ${SHARE_URL}` } as ShareData);
+      } else {
+        await nav.share({ title: "QRfolio — Avatar QR-art", text: SHARE_TEXT, url: SHARE_URL });
+      }
+    } catch { /* partage annulé */ }
+  };
+
+  const copyShareLink = async () => {
+    try { await navigator.clipboard.writeText(`${SHARE_TEXT} ${SHARE_URL}`); setStatus("Lien copié — partagez-le pour faire découvrir QRfolio !"); } catch { /* noop */ }
   };
 
   return (
@@ -193,6 +240,54 @@ export default function AvatarStudio({
             >
               ⤮
             </button>
+          </div>
+
+          {/* Partage — met en avant QRfolio (croissance / trafic) */}
+          <div className={styles.actions} style={{ position: "relative" }}>
+            <button
+              className={styles.btn}
+              onClick={() => setShareOpen((v) => !v)}
+              style={{ borderColor: "rgba(57,255,143,0.35)", background: "rgba(57,255,143,0.10)", color: "#39FF8F", fontWeight: 700 }}
+            >
+              🔗 Partager mon avatar
+            </button>
+
+            {shareOpen && (
+              <div
+                style={{ position: "absolute", left: 0, right: 0, top: "calc(100% + 8px)", zIndex: 20, background: "#15130b", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 14, padding: 12, boxShadow: "0 16px 40px rgba(0,0,0,0.55)" }}
+              >
+                <p style={{ margin: "0 0 4px", color: "#F5F0E8", fontSize: 13, fontWeight: 700 }}>Faites découvrir QRfolio</p>
+                <p style={{ margin: "0 0 10px", color: "#8A8478", fontSize: 11, lineHeight: 1.5 }}>Partagez votre avatar avec le lien — chaque partage fait grandir la communauté ✨</p>
+                <button
+                  type="button"
+                  onClick={() => { onShareNative(); setShareOpen(false); }}
+                  style={{ width: "100%", marginBottom: 8, padding: "10px", borderRadius: 10, border: "none", background: "linear-gradient(90deg,#C9A84C,#b8953f)", color: "#0b0b0b", fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}
+                >
+                  Partage rapide
+                </button>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7 }}>
+                  {shareTargets.map((s) => (
+                    <a
+                      key={s.label}
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setShareOpen(false)}
+                      style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", borderRadius: 9, background: "rgba(255,255,255,0.04)", border: `1px solid ${s.color}40`, color: s.color, fontSize: 12, fontWeight: 600, textDecoration: "none" }}
+                    >
+                      {s.label}
+                    </a>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => { copyShareLink(); setShareOpen(false); }}
+                    style={{ gridColumn: "1 / -1", padding: "9px", borderRadius: 9, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "#F5F0E8", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                  >
+                    Copier le lien
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
           {status && (
             <p className={styles.status}>
