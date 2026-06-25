@@ -84,11 +84,18 @@ export default function UpgradePage() {
             Choisissez votre plan
           </div>
           <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(32px,5vw,52px)", color: "#F5F0E8", fontWeight: 700, margin: "0 0 14px", lineHeight: 1.1 }}>
-            Simple, transparent, efficace
+            Choisissez le plan adapté à votre activité
           </h1>
-          <p style={{ color: MUTED, fontSize: 16, maxWidth: 500, margin: "0 auto 28px", lineHeight: 1.7 }}>
-            Sans engagement. Annulez a tout moment. Essai gratuit 14 jours sur les plans payes.
+          <p style={{ color: "#C9C3B6", fontSize: 16, maxWidth: 540, margin: "0 auto 18px", lineHeight: 1.7 }}>
+            Créez vos pages, personnalisez vos QR codes et suivez vos performances. Sans engagement, annulez à tout moment.
           </p>
+          <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap", marginBottom: 26 }}>
+            {["Essai gratuit 14 jours", "Sans carte pour le plan Gratuit", "Annulation en 1 clic"].map((r, i) => (
+              <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: MUTED, fontSize: 12.5 }}>
+                <Check size={13} color="#39FF8F" /> {r}
+              </span>
+            ))}
+          </div>
 
           {/* Toggle annuel */}
           <div style={{ display: "inline-flex", alignItems: "center", gap: 12, background: "#111009", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 30, padding: "8px 16px" }}>
@@ -134,7 +141,7 @@ export default function UpgradePage() {
 
                 {annual && price !== "0" && (
                   <p style={{ color: "#39FF8F", fontSize: 11, margin: "-14px 0 16px", fontWeight: 600 }}>
-                    Soit {(parseFloat(price) * 12).toFixed(0)}€/an — economisez {(parseFloat(plan.price.monthly) * 12 - parseFloat(price) * 12).toFixed(0)}€
+                    Soit {(parseFloat(price) * 12).toFixed(0)}€/an — économisez {(parseFloat(plan.price.monthly) * 12 - parseFloat(price) * 12).toFixed(0)}€
                   </p>
                 )}
 
