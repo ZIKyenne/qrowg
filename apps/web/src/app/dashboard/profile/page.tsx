@@ -1109,8 +1109,10 @@ export default function ProfilePage() {
 
       {/* ====================== HERO — centre de contrôle ====================== */}
       <div style={{ position: "relative", overflow: "hidden", padding: "44px 28px 30px" }}>
-        {/* Couches de fond animées (profondeur : mesh + glow à la couleur d'accent) */}
-        <div aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
+        {/* Couches de fond animées (profondeur : mesh + glow à la couleur d'accent).
+            Masque vertical : les halos s'estompent vers le haut et le bas pour
+            éviter toute arête nette (démarcation) à la limite du hero. */}
+        <div aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden", maskImage: "linear-gradient(to bottom, transparent 0%, #000 14%, #000 78%, transparent 100%)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, #000 14%, #000 78%, transparent 100%)" }}>
           <div style={{ position: "absolute", top: -130, right: -50, width: 440, height: 440, borderRadius: "50%", background: "radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent), transparent 65%)", filter: "blur(44px)", animation: "heroFloat1 22s ease-in-out infinite, heroGlow 9s ease-in-out infinite" }}/>
           <div style={{ position: "absolute", bottom: -170, left: -50, width: 380, height: 380, borderRadius: "50%", background: "radial-gradient(circle, color-mix(in srgb, var(--accent) 13%, transparent), transparent 65%)", filter: "blur(50px)", animation: "heroFloat2 28s ease-in-out infinite, heroGlow 11s ease-in-out infinite" }}/>
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(720px 300px at 62% -10%, rgba(255,255,255,0.035), transparent 60%)" }}/>
