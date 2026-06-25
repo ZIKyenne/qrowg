@@ -249,6 +249,7 @@ export default function ProfilePage() {
   const [subLoading,  setSubLoading]  = useState(true)
   // -- Securite ------------------------------------------
   const [authUser,       setAuthUser]       = useState<any>(null)
+  const [ptab,           setPtab]            = useState<"identite"|"abonnement"|"securite"|"donnees"|"preferences"|"parrainage">("identite") // onglets profil
   const [emailVerified,  setEmailVerified]  = useState(false)
   const [lastSignIn,     setLastSignIn]      = useState<string|null>(null)
   const [sessions,       setSessions]        = useState<any[]>([])
@@ -1149,13 +1150,37 @@ export default function ProfilePage() {
         </div>
       </div>
 
+      {/* -- Onglets profil ------------------------------------------------------ */}
+      <div className="qr-scroll" style={{ maxWidth: 1100, margin: "0 auto", padding: "4px 28px 0", display: "flex", gap: 6, overflowX: "auto" }}>
+        {([
+          ["identite", "Identité", User],
+          ["abonnement", "Abonnement", CreditCard],
+          ["securite", "Sécurité", Shield],
+          ["donnees", "Données", Download],
+          ["preferences", "Préférences", Settings],
+          ["parrainage", "Parrainage", Gift],
+        ] as const).map(([k, label, Icon]) => {
+          const on = ptab === k
+          return (
+            <button key={k} type="button" onClick={() => setPtab(k)}
+              style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 15px", borderRadius: 10, cursor: "pointer", whiteSpace: "nowrap" as const, flexShrink: 0,
+                background: on ? "color-mix(in srgb, var(--accent) 14%, transparent)" : "rgba(255,255,255,0.03)",
+                border: `1px solid ${on ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "rgba(255,255,255,0.07)"}`,
+                color: on ? G : MUTED, fontSize: 13, fontWeight: on ? 700 : 500 }}>
+              <Icon size={15} /> {label}
+            </button>
+          )
+        })}
+      </div>
+
       {/* -- Corps en 2 colonnes ------------------------------------------------ */}
-      <div className="dash-2col dash-pad" style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 28px 48px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, alignItems: "start" }}>
+      <div className="dash-2col dash-pad" style={{ maxWidth: 1100, margin: "0 auto", padding: "18px 28px 48px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, alignItems: "start" }}>
 
         {/* == COLONNE GAUCHE ================================================== */}
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
 
           {/* 1. IDENTITE */}
+          {ptab === "identite" && (
           <SectionCard title="Identite" icon={Settings} color={G}
             action={
               <div style={{ display:"flex", alignItems:"center", gap:6 }}>
@@ -1325,9 +1350,11 @@ export default function ProfilePage() {
               </button>
             </div>
           </SectionCard>
+          )}
 
 
           {/* 2. ACTIVITE RECENTE */}
+          {ptab === "identite" && (
           <SectionCard title="Activite recente" icon={Clock} color="#38BDF8"
             action={
               <a href="/dashboard/analytics" style={{ color:MUTED, fontSize:11, display:"flex", alignItems:"center", gap:3, textDecoration:"none" }}>
@@ -1475,9 +1502,11 @@ export default function ProfilePage() {
               )
             })()}
           </SectionCard>
+          )}
 
 
           {/* 3. PARRAINAGE */}
+          {ptab === "parrainage" && (
           <SectionCard title="Programme de parrainage" icon={Gift} color="#EC4899">
             <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
@@ -1624,9 +1653,11 @@ export default function ProfilePage() {
               )}
             </div>
           </SectionCard>
+          )}
 
 
           {/* STATISTIQUES */}
+          {ptab === "identite" && (
           <SectionCard title="Statistiques" icon={TrendingUp} color="#38BDF8"
             tag={statsLoading ? "..." : `${totalPages} pages`}
             action={
@@ -1755,9 +1786,11 @@ export default function ProfilePage() {
               </div>
             )}
           </SectionCard>
+          )}
 
 
           {/* 4. SECURITE */}
+          {ptab === "securite" && (
           <SectionCard title="Securite" icon={Shield} color="#FF6B6B">
             {secLoading ? (
               <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
@@ -1948,9 +1981,11 @@ export default function ProfilePage() {
               </div>
             )}
           </SectionCard>
+          )}
 
 
           {/* 5. EXPORT + DANGER */}
+          {ptab === "donnees" && (
           <SectionCard title="Donnees personnelles" icon={Download} color="#38BDF8">
             <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
@@ -2067,8 +2102,10 @@ export default function ProfilePage() {
               </div>
             </div>
           </SectionCard>
+          )}
 
           {/* -- Zone Danger ------------------------------------------- */}
+          {ptab === "securite" && (
           <SectionCard title="Zone danger" icon={AlertTriangle} color="#FF6B6B">
             <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
               <div style={{ padding:"12px 14px", background:"rgba(255,107,107,0.04)", border:"1px solid rgba(255,107,107,0.15)", borderRadius:9 }}>
@@ -2097,6 +2134,7 @@ export default function ProfilePage() {
               </div>
             </div>
           </SectionCard>
+          )}
 
         </div>
 
@@ -2104,6 +2142,7 @@ export default function ProfilePage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
 
           {/* 6. ABONNEMENT */}
+          {ptab === "abonnement" && (
           <SectionCard title="Abonnement" icon={CreditCard} color={pc}>
             {subLoading ? (
               <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
@@ -2205,8 +2244,10 @@ export default function ProfilePage() {
               </div>
             )}
           </SectionCard>
+          )}
 
           {/* CONSOMMATION */}
+          {ptab === "abonnement" && (
           <SectionCard title="Consommation" icon={TrendingUp} color="#38BDF8">
             {statsLoading ? (
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
@@ -2357,9 +2398,11 @@ export default function ProfilePage() {
               </div>
             )}
           </SectionCard>
+          )}
 
 
           {/* 7. RECOMPENSES */}
+          {ptab === "parrainage" && (
           <SectionCard title="Recompenses & Niveau" icon={Star} color="#F59E0B">
             {(() => {
               const badges  = computeBadges()
@@ -2493,9 +2536,11 @@ export default function ProfilePage() {
               )
             })()}
           </SectionCard>
+          )}
 
 
           {/* 8. API BUSINESS */}
+          {ptab === "abonnement" && (
           <SectionCard title="API Business" icon={Code} color="#7B61FF"
             tag={currentPlan==="business"?"Business":currentPlan==="pro"?"Pro":"Verrouille"}
             action={
@@ -2725,9 +2770,11 @@ export default function ProfilePage() {
               </div>
             )}
           </SectionCard>
+          )}
 
 
           {/* 9. DOMAINES */}
+          {ptab === "abonnement" && (
           <SectionCard title="Domaines personnalises" icon={Globe} color="#38BDF8"
             tag={domains.length > 0 ? `${domains.length}` : undefined}
             action={
@@ -2887,9 +2934,11 @@ export default function ProfilePage() {
               </div>
             )}
           </SectionCard>
+          )}
 
 
           {/* 10. PREFERENCES */}
+          {ptab === "preferences" && (
           <SectionCard title="Preferences" icon={Settings} color="#F97316"
             action={
               <div style={{ display:"flex", alignItems:"center", gap:8 }}>
@@ -3087,6 +3136,7 @@ export default function ProfilePage() {
               </div>
             </div>
           </SectionCard>
+          )}
 
         </div>
       </div>
