@@ -40,8 +40,8 @@ export default async function QRCodesPage() {
 
           {/* Identite */}
           <div style={{ display: "flex", alignItems: "center", gap: 13 }}>
-            <div style={{ width: 38, height: 38, borderRadius: 11, background: "linear-gradient(135deg, rgba(201,168,76,0.2), rgba(201,168,76,0.08))", border: "1px solid rgba(201,168,76,0.25)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 14px rgba(201,168,76,0.12)" }}>
-              <QrCode size={19} color="#C9A84C"/>
+            <div style={{ width: 38, height: 38, borderRadius: 11, background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, transparent), color-mix(in srgb, var(--accent) 8%, transparent))", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 14px color-mix(in srgb, var(--accent) 12%, transparent)" }}>
+              <QrCode size={19} color="var(--accent)"/>
             </div>
             <div>
               <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 22, color: "#F5F0E8", fontWeight: 700, margin: 0, lineHeight: 1.15 }}>
@@ -59,7 +59,7 @@ export default async function QRCodesPage() {
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               {[
                 { label: "QR actifs",   value: activeQR,                      icon: <Activity size={13} color="#39FF8F"/>,    color: "#39FF8F" },
-                { label: "Scans total", value: totalScans.toLocaleString("fr-FR"), icon: <TrendingUp size={13} color="#C9A84C"/>, color: "#C9A84C" },
+                { label: "Scans total", value: totalScans.toLocaleString("fr-FR"), icon: <TrendingUp size={13} color="var(--accent)"/>, color: "var(--accent)" },
               ].map((k, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "7px 13px" }}>
                   {k.icon}
@@ -71,7 +71,7 @@ export default async function QRCodesPage() {
               ))}
             </div>
 
-            <a href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 7, background: "linear-gradient(90deg,#C9A84C,#b8953f)", color: "#080808", textDecoration: "none", fontSize: 12.5, fontWeight: 700, padding: "10px 18px", borderRadius: 10, whiteSpace: "nowrap" as const, boxShadow: "0 4px 14px rgba(201,168,76,0.2)" }}>
+            <a href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 7, background: "linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 78%, #000))", color: "#080808", textDecoration: "none", fontSize: 12.5, fontWeight: 700, padding: "10px 18px", borderRadius: 10, whiteSpace: "nowrap" as const, boxShadow: "0 4px 14px color-mix(in srgb, var(--accent) 20%, transparent)" }}>
               <Plus size={14}/> Nouvelle page
             </a>
           </div>

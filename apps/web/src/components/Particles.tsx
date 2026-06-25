@@ -16,6 +16,29 @@ export default function Particles({ behind = false }: { behind?: boolean }) {
     if (!canvas) return
     const ctx = canvas.getContext("2d", { alpha: true })!
 
+    // ── Couleur d'accent dynamique ──────────────────────────────────────────
+    // Les particules suivent la couleur d'accent de l'utilisateur (--accent).
+    // On lit la variable CSS et on se met à jour quand elle change (event qrfolio-accent).
+    const hexToRgb = (hex: string) => {
+      const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec((hex || "").trim())
+      return m ? { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) } : { r: 201, g: 168, b: 76 }
+    }
+    const lighten = (c: { r: number; g: number; b: number }) => ({
+      r: Math.round(c.r + (255 - c.r) * 0.42),
+      g: Math.round(c.g + (255 - c.g) * 0.42),
+      b: Math.round(c.b + (255 - c.b) * 0.42),
+    })
+    let acc = hexToRgb(getComputedStyle(document.documentElement).getPropertyValue("--accent"))
+    let accLight = lighten(acc)
+    const onAccent = (e: Event) => {
+      const detail = (e as CustomEvent).detail
+      const hex = (typeof detail === "string" && detail)
+        || getComputedStyle(document.documentElement).getPropertyValue("--accent")
+      acc = hexToRgb(hex)
+      accLight = lighten(acc)
+    }
+    window.addEventListener("qrfolio-accent", onAccent)
+
     let W = canvas.width  = window.innerWidth
     let H = canvas.height = window.innerHeight
 
@@ -89,10 +112,10 @@ export default function Particles({ behind = false }: { behind?: boolean }) {
           }
 
           const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowRadius)
-          grad.addColorStop(0,    `rgba(201,168,76,${(alpha * 0.6).toFixed(3)})`)
-          grad.addColorStop(0.4,  `rgba(201,168,76,${(alpha * 0.18).toFixed(3)})`)
-          grad.addColorStop(0.75, `rgba(201,168,76,${(alpha * 0.04).toFixed(3)})`)
-          grad.addColorStop(1,    "rgba(201,168,76,0)")
+          grad.addColorStop(0,    `rgba(${acc.r},${acc.g},${acc.b},${(alpha * 0.6).toFixed(3)})`)
+          grad.addColorStop(0.4,  `rgba(${acc.r},${acc.g},${acc.b},${(alpha * 0.18).toFixed(3)})`)
+          grad.addColorStop(0.75, `rgba(${acc.r},${acc.g},${acc.b},${(alpha * 0.04).toFixed(3)})`)
+          grad.addColorStop(1,    `rgba(${acc.r},${acc.g},${acc.b},0)`)
           ctx.beginPath()
           ctx.arc(p.x, p.y, glowRadius, 0, Math.PI * 2)
           ctx.fillStyle = grad
@@ -101,7 +124,7 @@ export default function Particles({ behind = false }: { behind?: boolean }) {
           const coreR = p.r * (0.75 + pulse * 0.25)
           ctx.beginPath()
           ctx.arc(p.x, p.y, coreR, 0, Math.PI * 2)
-          ctx.fillStyle = `rgba(245,210,110,${(alpha * 0.9).toFixed(3)})`
+          ctx.fillStyle = `rgba(${accLight.r},${accLight.g},${accLight.b},${(alpha * 0.9).toFixed(3)})`
           ctx.fill()
 
           p.x += p.dx; p.y += p.dy
@@ -129,6 +152,7 @@ export default function Particles({ behind = false }: { behind?: boolean }) {
       cancelAnimationFrame(raf)
       clearTimeout(resizeTimer)
       window.removeEventListener("resize", onResize)
+      window.removeEventListener("qrfolio-accent", onAccent)
       document.removeEventListener("visibilitychange", onVisibility)
     }
   }, [])

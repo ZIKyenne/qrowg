@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Check, Zap, Crown, Star, ArrowLeft, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { PLAN_LIST, PLAN_COMPARISON, fmtPrice } from "@/lib/plans"
+import { useAccent } from "@/lib/useAccent"
 
 // UI par plan (icône, CTA, mise en avant) ; les DONNÉES viennent de lib/plans
 const PLAN_UI = {
@@ -64,7 +65,7 @@ export default function UpgradePage() {
     } catch { setLoading(null) }
   }
 
-  const G = "#C9A84C"; const MUTED = "#8A8478"
+  const G = useAccent(); const MUTED = "#8A8478"
 
   return (
     <div style={{ minHeight: "100vh", background: "#080808", fontFamily: "DM Sans, sans-serif", padding: "0 24px 80px" }}>
@@ -80,7 +81,7 @@ export default function UpgradePage() {
 
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 44 }}>
-          <div style={{ display: "inline-block", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 20, padding: "6px 16px", marginBottom: 18, fontSize: 12, color: G, letterSpacing: 2, textTransform: "uppercase" }}>
+          <div style={{ display: "inline-block", background: `${G}1a`, border: `1px solid ${G}4d`, borderRadius: 20, padding: "6px 16px", marginBottom: 18, fontSize: 12, color: G, letterSpacing: 2, textTransform: "uppercase" }}>
             Choisissez votre plan
           </div>
           <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(32px,5vw,52px)", color: "#F5F0E8", fontWeight: 700, margin: "0 0 14px", lineHeight: 1.1 }}>

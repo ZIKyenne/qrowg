@@ -1158,7 +1158,7 @@ export default function ProfilePage() {
                 {(profile?.total_scans || 0) > 0
                   ? <>Vos QR codes ont déjà été scannés <strong style={{ color: pc }}>{(profile?.total_scans || 0).toLocaleString("fr-FR")} fois</strong>. Continuez sur votre lancée.</>
                   : totalPages > 0
-                  ? <>Vous avez <strong style={{ color: pc }}>{totalPages} page{totalPages > 1 ? "s" : ""}</strong> prête{totalPages > 1 ? "s" : ""}. Partagez-les pour décoller.</>
+                  ? <>Vous avez <strong style={{ color: G }}>{totalPages} page{totalPages > 1 ? "s" : ""}</strong> prête{totalPages > 1 ? "s" : ""}. Partagez-les pour décoller.</>
                   : <>Créez votre première page et lancez <strong style={{ color: pc }}>votre univers</strong> QRfolio.</>}
               </p>
               <p style={{ color: MUTED, fontSize: 11.5, margin: "0 0 14px" }}>
@@ -1213,7 +1213,7 @@ export default function ProfilePage() {
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
                 <span style={{ color: "#F8F4EC", fontSize: 12.5, fontWeight: 700 }}>Mon utilisation</span>
                 {profile?.plan !== "business" && (
-                  <a href="/upgrade" style={{ display: "inline-flex", alignItems: "center", gap: 4, color: pc, fontSize: 11, fontWeight: 700, textDecoration: "none" }}>
+                  <a href="/upgrade" style={{ display: "inline-flex", alignItems: "center", gap: 4, color: G, fontSize: 11, fontWeight: 700, textDecoration: "none" }}>
                     <Activity size={12}/> Améliorer
                   </a>
                 )}
