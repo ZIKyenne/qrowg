@@ -69,6 +69,24 @@ html {
 a { cursor: pointer; }
 button { cursor: pointer; }
 
+/* ── Polish global : champs premium + micro-press boutons + skeleton ───────── */
+input, textarea, select { transition: border-color .15s ease, box-shadow .15s ease, background .15s ease; }
+input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: none;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent) !important;
+}
+button:not(:disabled) { transition: transform .12s ease, filter .15s ease, box-shadow .18s ease, background .15s ease; }
+button:not(:disabled):active { transform: scale(.97); }
+
+@keyframes shimmer { 0% { background-position: -420px 0 } 100% { background-position: 420px 0 } }
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.045) 25%, rgba(255,255,255,0.10) 37%, rgba(255,255,255,0.045) 63%);
+  background-size: 840px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 10px;
+}
+
 /* Scrollbar premium */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: #0d0b08; }

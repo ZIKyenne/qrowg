@@ -127,9 +127,26 @@ export default function DashboardClient() {
   const overViews  = viewsLimit != null && monthViews >= viewsLimit
 
   if (loading) return (
-    <div style={{ minHeight: "100vh", background: "#080808", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ width: 36, height: 36, border: "2px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderTopColor: G, borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+    <div style={{ minHeight: "100vh", background: "#080808", padding: "30px 28px 48px", fontFamily: "DM Sans, sans-serif" }}>
+      <div style={{ maxWidth: 1080, margin: "0 auto" }}>
+        {/* En-tête */}
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 22 }}>
+          <div>
+            <div className="skeleton" style={{ width: 280, height: 38, marginBottom: 10 }} />
+            <div className="skeleton" style={{ width: 150, height: 16 }} />
+          </div>
+          <div className="skeleton" style={{ width: 150, height: 44, borderRadius: 12 }} />
+        </div>
+        {/* KPI */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 13, marginBottom: 20 }}>
+          {[0, 1, 2, 3].map(i => <div key={i} className="skeleton" style={{ height: 104, borderRadius: 14 }} />)}
+        </div>
+        {/* Colonnes */}
+        <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 14 }}>
+          <div className="skeleton" style={{ height: 340, borderRadius: 16 }} />
+          <div className="skeleton" style={{ height: 340, borderRadius: 16 }} />
+        </div>
+      </div>
     </div>
   )
 
