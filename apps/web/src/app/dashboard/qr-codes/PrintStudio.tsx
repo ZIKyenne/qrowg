@@ -3225,8 +3225,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         .ps-root button:active:not(:disabled) { transform: scale(0.96); }
         .ps-root input, .ps-root select { transition: border-color .14s ease, box-shadow .14s ease; }
         .ps-root input:focus, .ps-root select:focus { border-color: ${G} !important; box-shadow: 0 0 0 2px rgba(201,168,76,0.18); }
-        .ps-fly { animation: psSlide .18s cubic-bezier(.2,.8,.2,1); position: absolute; top: 0; bottom: 0; left: 92px; z-index: 30; box-shadow: 8px 0 28px rgba(0,0,0,0.08); }
-        .ps-fly-right { left: auto !important; right: 0 !important; box-shadow: -8px 0 28px rgba(0,0,0,0.07) !important; }
+        .ps-fly { animation: psSlide .18s cubic-bezier(.2,.8,.2,1); box-shadow: 8px 0 28px rgba(0,0,0,0.06); }
+        .ps-fly-right { box-shadow: -8px 0 28px rgba(0,0,0,0.07) !important; }
         .ps-fly-right button:hover:not(:disabled) { filter: none; border-color: rgba(201,168,76,0.6) !important; box-shadow: 0 3px 10px rgba(31,36,48,0.1) !important; transform: translateY(-1px); }
         .ps-fly-right button:active:not(:disabled) { transform: translateY(0) scale(0.97); }
         .ps-sec-label { display: flex; align-items: center; gap: 7px; color: ${MUTED}; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.3px; margin: 0 0 9px; }
