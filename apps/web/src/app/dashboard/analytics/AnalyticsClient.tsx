@@ -13,6 +13,7 @@ import GeoPanel from "./GeoPanel"
 import DevicePanel from "./DevicePanel"
 import ExportPanel from "./ExportPanel"
 import ReportSubscriptionPanel from "./ReportSubscriptionPanel"
+import Particles from "@/components/Particles"
 
 type Profile = { total_pages: number; total_scans: number; plan: string; email?: string; full_name?: string } | null
 type Page = { id: string; title: string; slug: string; total_views: number; unique_views: number; status: string }
@@ -141,7 +142,8 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
   }, [filteredScans, filteredViews])
 
   return (
-    <div style={{ minHeight: "100vh", background: "radial-gradient(1100px 520px at 75% -8%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%), #080808", padding: "30px 24px 48px", fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "radial-gradient(1100px 520px at 75% -8%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%), #080808", padding: "30px 24px 48px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
+      <Particles />
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}
         @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
@@ -152,7 +154,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
         .az-card:hover{transform:translateY(-3px);box-shadow:0 16px 38px rgba(0,0,0,0.5)}
       `}</style>
       {/* Header */}
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", position: "relative", zIndex: 1 }}>
         <div className="az" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 18, flexWrap: "wrap", gap: 16 }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>

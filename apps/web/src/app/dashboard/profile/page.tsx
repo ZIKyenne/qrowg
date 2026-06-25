@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { PLAN_LIST, PLAN_ORDER, fmtPrice } from "@/lib/plans"
+import Particles from "@/components/Particles"
 import {
   Copy, Check, Gift, Star, TrendingUp, Users,
   QrCode, Eye, Crown, Camera, Save, ExternalLink,
@@ -1069,7 +1070,8 @@ export default function ProfilePage() {
 
   // -- RENDER -------------------------------------------------------------------
   return (
-    <div style={{ minHeight: "100vh", background: BG, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: BG, fontFamily: "DM Sans, sans-serif", position: "relative", isolation: "isolate" }}>
+      <Particles behind />
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}
         @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}

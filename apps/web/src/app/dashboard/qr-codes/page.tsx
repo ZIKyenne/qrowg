@@ -2,6 +2,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import type { Metadata } from "next"
 import QRStudio from "./QRStudio"
+import Particles from "@/components/Particles"
 import { Plus, QrCode, TrendingUp, Activity } from "lucide-react"
 
 export const metadata: Metadata = { title: "QR Studio - QRfolio" }
@@ -30,7 +31,8 @@ export default async function QRCodesPage() {
   const activeQR   = (qrCodes ?? []).filter((q: any) => (q.status ?? "active") === "active").length
 
   return (
-    <div style={{ minHeight: "100vh", background: "#080808", fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#080808", fontFamily: "DM Sans, sans-serif", position: "relative", isolation: "isolate" }}>
+      <Particles behind />
 
       {/* ===== Header ===== */}
       <div style={{ borderBottom: "1px solid rgba(201,168,76,0.1)", background: "rgba(15,14,11,0.85)", backdropFilter: "blur(14px)", position: "sticky", top: 0, zIndex: 50, padding: "0 24px" }}>

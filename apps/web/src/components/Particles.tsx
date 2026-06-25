@@ -7,7 +7,7 @@ import { useEffect, useRef } from "react"
  * dans la colonne de contenu). Identique à celui de la landing — à poser comme premier
  * enfant d'un conteneur `position:relative`, le contenu au-dessus en `zIndex:1`.
  */
-export default function Particles() {
+export default function Particles({ behind = false }: { behind?: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -134,7 +134,7 @@ export default function Particles() {
 
   return <canvas ref={canvasRef} style={{
     position: "fixed", inset: 0, pointerEvents: "none",
-    zIndex: 0, opacity: 1,
+    zIndex: behind ? -1 : 0, opacity: 1,
     transform: "translateZ(0)",
     willChange: "transform",
   }} />

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { PLAN_RANK } from "@/lib/plans"
 import { Sparkles, ArrowRight, Check, X, Lock, Search, Heart, Eye, Clock, Layers } from "lucide-react"
 import TemplatePreviewModal from "./TemplatePreviewModal"
+import Particles from "@/components/Particles"
 
 // ── Temps estimé ─────────────────────────────────────────────────────────────
 const SETUP_TIME: Record<string, string> = {
@@ -224,7 +225,8 @@ export default function TemplatesPage() {
   const activeCat = BUSINESS_CATEGORIES.find(c => c.id === activeMetier)
 
   return (
-    <div style={{ minHeight: "100vh", background: "#080808", paddingBottom: 120, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#080808", paddingBottom: 120, fontFamily: "DM Sans, sans-serif", position: "relative", isolation: "isolate" }}>
+      <Particles behind />
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
       <div style={{ padding: "40px 24px 0", textAlign: "center", maxWidth: 960, margin: "0 auto" }}>

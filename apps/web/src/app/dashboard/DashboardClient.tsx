@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import { Plus, QrCode, BarChart2, Eye, Zap, ArrowRight, Globe, Trash2, ExternalLink, Edit3, AlertTriangle, X, Check } from "lucide-react"
 import { getPlan, fmtPrice } from "@/lib/plans"
+import Particles from "@/components/Particles"
 
 type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string }
 type Profile = { full_name: string | null; plan: string; total_scans: number; total_pages: number; avatar_url: string | null }
@@ -132,7 +133,7 @@ export default function DashboardClient() {
 
   if (loading) return (
     <div style={{ minHeight: "100vh", background: "#080808", padding: "30px 28px 48px", fontFamily: "DM Sans, sans-serif" }}>
-      <div style={{ maxWidth: 1080, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1080, margin: "0 auto", position: "relative", zIndex: 1 }}>
         {/* En-tête */}
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 22 }}>
           <div>
@@ -162,7 +163,8 @@ export default function DashboardClient() {
   const maxToday = Math.max(1, ...weekViews)
 
   return (
-    <div style={{ minHeight: "100vh", background: "radial-gradient(1200px 600px at 70% -10%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%), #080808", padding: "30px 28px 48px", fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "radial-gradient(1200px 600px at 70% -10%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%), #080808", padding: "30px 28px 48px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
+      <Particles />
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}
         @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
@@ -187,7 +189,7 @@ export default function DashboardClient() {
         />
       )}
 
-      <div style={{ maxWidth: 1080, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1080, margin: "0 auto", position: "relative", zIndex: 1 }}>
         {/* Header */}
         <div className="dz" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 22, flexWrap: "wrap", gap: 14 }}>
           <div>
