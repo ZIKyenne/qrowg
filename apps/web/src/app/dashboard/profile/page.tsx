@@ -6,13 +6,13 @@ import { PLAN_LIST, PLAN_ORDER, fmtPrice } from "@/lib/plans"
 import {
   Copy, Check, Gift, Star, TrendingUp, Users,
   QrCode, Eye, Crown, Camera, Save, ExternalLink,
-  Shield, Key, Bell, Globe, Trash2, Download,
+  Shield, Key, Bell, Globe, Trash2, Download, User,
   ChevronRight, Lock, LogOut, AlertTriangle, Plus, X,
   RotateCcw, Activity, CreditCard, Code, Settings, CheckCircle,
   AtSign, Link, Link2, ImageOff, Crop, UserCheck,
   UserX, Clock, Filter, Calendar, FileEdit, ScanLine,
-  Tag, Award, Share2, MessageCircle, Mail, Twitter,
-  Linkedin, Smartphone, Monitor, Tablet, Wifi, ShieldCheck,
+  Tag, Award, Share2, MessageCircle, Mail, Hash as Twitter,
+  Briefcase as Linkedin, Smartphone, Monitor, Tablet, Wifi, ShieldCheck,
   ShieldOff, ImageIcon
 } from "lucide-react"
 
@@ -677,7 +677,7 @@ export default function ProfilePage() {
       const canvas = document.createElement("canvas")
       canvas.width = 400; canvas.height = 400
       const ctx = canvas.getContext("2d")!
-      const img = new ImageIcon(); img.src = src
+      const img = new Image(); img.src = src
       await new Promise<void>(r => { img.onload = () => r() })
       // Crop carre centree
       const size = Math.min(img.width, img.height)

@@ -5,7 +5,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell
 } from "recharts"
 import {
-  QrCode, Globe, Instagram, Facebook, Linkedin, Mail,
+  QrCode, Globe, Camera as Instagram, Users as Facebook, Briefcase as Linkedin, Mail,
   ArrowUpRight, MessageCircle, ExternalLink, TrendingUp
 } from "lucide-react"
 
