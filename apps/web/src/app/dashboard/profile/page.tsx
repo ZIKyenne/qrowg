@@ -1108,7 +1108,7 @@ export default function ProfilePage() {
 
 
       {/* ====================== HERO — centre de contrôle ====================== */}
-      <div style={{ position: "relative", overflow: "hidden", borderBottom: "1px solid color-mix(in srgb, var(--accent) 10%, transparent)", padding: "44px 28px 30px" }}>
+      <div style={{ position: "relative", overflow: "hidden", padding: "44px 28px 30px" }}>
         {/* Couches de fond animées (profondeur : mesh + glow à la couleur d'accent) */}
         <div aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: -130, right: -50, width: 440, height: 440, borderRadius: "50%", background: "radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent), transparent 65%)", filter: "blur(44px)", animation: "heroFloat1 22s ease-in-out infinite, heroGlow 9s ease-in-out infinite" }}/>
