@@ -1078,75 +1078,109 @@ export default function ProfilePage() {
       )}
 
 
-      {/* -- Hero header ------------------------------------------------------- */}
-      <div style={{ background: "linear-gradient(180deg,color-mix(in srgb, var(--accent) 5%, transparent) 0%,transparent 100%)", borderBottom: "1px solid color-mix(in srgb, var(--accent) 10%, transparent)", padding: "28px 28px 20px" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-            {/* Avatar */}
+      {/* ====================== HERO — centre de contrôle ====================== */}
+      <div style={{ background: "radial-gradient(900px 360px at 80% -40%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 60%), linear-gradient(180deg,color-mix(in srgb, var(--accent) 5%, transparent) 0%,transparent 100%)", borderBottom: "1px solid color-mix(in srgb, var(--accent) 10%, transparent)", padding: "30px 28px 26px" }}>
+        <div className="dash-2col" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 18, alignItems: "stretch" }}>
+
+          {/* Carte identité */}
+          <div style={{ display: "flex", alignItems: "center", gap: 18, background: "linear-gradient(135deg,#15130C,#100F0A)", border: "1px solid color-mix(in srgb, var(--accent) 16%, transparent)", borderRadius: 18, padding: "20px 22px", boxShadow: "0 10px 34px rgba(0,0,0,0.28)" }}>
             <div style={{ position: "relative", flexShrink: 0 }}>
-              <div style={{ width: 72, height: 72, borderRadius: "50%", background: profile?.avatar_url ? "transparent" : `linear-gradient(135deg,${pc},${pc}80)`, border: `2px solid ${pc}50`, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 0 28px ${pc}20` }}>
+              <div style={{ width: 78, height: 78, borderRadius: "50%", background: profile?.avatar_url ? "transparent" : `linear-gradient(135deg,${pc},${pc}80)`, border: `2px solid ${pc}55`, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 0 30px ${pc}25` }}>
                 {profile?.avatar_url
                   ? <img src={profile.avatar_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
-                  : <span style={{ fontSize: 26, fontWeight: 700, color: "#080808", fontFamily: "Cormorant Garamond, serif" }}>{(form.full_name || profile?.email || "?")[0]?.toUpperCase()}</span>}
+                  : <span style={{ fontSize: 30, fontWeight: 700, color: "#080808", fontFamily: "Cormorant Garamond, serif" }}>{(form.full_name || profile?.email || "?")[0]?.toUpperCase()}</span>}
               </div>
-              <button onClick={() => fileRef.current?.click()} disabled={uploadingAvatar}
-                style={{ position: "absolute", bottom: 0, right: 0, width: 24, height: 24, borderRadius: "50%", background: G, border: "2px solid #080808", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+              <button onClick={() => fileRef.current?.click()} disabled={uploadingAvatar} title="Changer la photo"
+                style={{ position: "absolute", bottom: 0, right: 0, width: 26, height: 26, borderRadius: "50%", background: G, border: "2px solid #100F0A", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
                 {uploadingAvatar
-                  ? <div style={{ width: 9, height: 9, border: "1.5px solid #080808", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.6s linear infinite" }}/>
-                  : <Camera size={10} color="#080808"/>}
+                  ? <div style={{ width: 10, height: 10, border: "1.5px solid #080808", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.6s linear infinite" }}/>
+                  : <Camera size={11} color="#080808"/>}
               </button>
               <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) handleAvatarFile(f); e.target.value="" }}/>
             </div>
 
-            {/* Infos */}
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 3 }}>
-                <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 26, color: "#F5F0E8", fontWeight: 700, margin: 0 }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4, flexWrap: "wrap" }}>
+                <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(22px,3vw,30px)", color: "#F8F4EC", fontWeight: 700, margin: 0, lineHeight: 1, letterSpacing: "-0.4px" }}>
                   {form.full_name || "Sans nom"}
                 </h1>
-                <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: pc + "15", border: `1px solid ${pc}30`, borderRadius: 12, padding: "3px 10px" }}>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: pc + "1c", border: `1px solid ${pc}40`, borderRadius: 999, padding: "3px 11px" }}>
                   <PlanIcon size={11} color={pc}/>
-                  <span style={{ color: pc, fontSize: 10, fontWeight: 700 }}>Plan {planCfg.label}</span>
+                  <span style={{ color: pc, fontSize: 10.5, fontWeight: 800 }}>{planCfg.label}</span>
+                </span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#39FF8F", fontSize: 11, fontWeight: 600 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#39FF8F", boxShadow: "0 0 7px #39FF8F" }}/> Actif
+                </span>
+              </div>
+              <p style={{ color: "#C9C3B6", fontSize: 12.5, margin: "0 0 12px" }}>
+                {profile?.email}{form.username ? ` · @${form.username}` : ""} · Membre depuis {memberMonths} mois
+              </p>
+              <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
+                <button onClick={() => setPtab("identite")}
+                  style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: `linear-gradient(90deg,${G},color-mix(in srgb, var(--accent) 75%, #000))`, border: "none", borderRadius: 9, color: "#080808", fontSize: 12, fontWeight: 800, cursor: "pointer" }}>
+                  <FileEdit size={13}/> Modifier
+                </button>
+                {publicUrl && (
+                  <a href={publicUrl} target="_blank" rel="noopener noreferrer"
+                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: "#F5F0E8", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>
+                    <Globe size={13}/> Voir ma page
+                  </a>
+                )}
+                {publicUrl && (
+                  <button onClick={() => { navigator.clipboard?.writeText(publicUrl); showToast("Lien copié", "ok") }}
+                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: "#F5F0E8", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                    <Link2 size={13}/> Copier le lien
+                  </button>
+                )}
+                <button onClick={signOut} title="Se déconnecter"
+                  style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 9, color: MUTED, fontSize: 12, cursor: "pointer" }}>
+                  <LogOut size={13}/>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Carte utilisation (jauges) */}
+          <div style={{ background: "linear-gradient(135deg,color-mix(in srgb, var(--accent) 10%, #100F0A),#100F0A)", border: `1px solid ${pc}33`, borderRadius: 18, padding: "18px 20px", boxShadow: "0 10px 34px rgba(0,0,0,0.28)", display: "flex", flexDirection: "column" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+              <span style={{ color: "#F8F4EC", fontSize: 13.5, fontWeight: 700 }}>Mon utilisation</span>
+              {profile?.plan !== "business" && (
+                <a href="/upgrade" style={{ display: "inline-flex", alignItems: "center", gap: 5, color: pc, fontSize: 11, fontWeight: 700, textDecoration: "none" }}>
+                  <Activity size={12}/> Améliorer
+                </a>
+              )}
+            </div>
+            {([
+              { label: "Pages", used: totalPages, limit: planLimits.pages, pct: pagesUsagePct, near: isAtLimitPages },
+              { label: "Vues ce mois", used: totalViews, limit: planLimits.views, pct: viewsUsagePct, near: isAtLimitViews },
+            ] as const).map((g, i) => (
+              <div key={i} style={{ marginBottom: 12 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 5 }}>
+                  <span style={{ color: "#C9C3B6", fontSize: 11.5, fontWeight: 500 }}>{g.label}</span>
+                  <span style={{ color: g.near ? "#FF6B6B" : "#F5F0E8", fontSize: 11.5, fontWeight: 700 }}>
+                    {(g.used || 0).toLocaleString("fr-FR")}<span style={{ color: MUTED, fontWeight: 400 }}> / {g.limit == null ? "∞" : g.limit.toLocaleString("fr-FR")}</span>
+                  </span>
+                </div>
+                <div style={{ height: 7, borderRadius: 4, background: "rgba(255,255,255,0.07)", overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: g.limit == null ? "12%" : `${Math.max(3, g.pct)}%`, borderRadius: 4, background: g.near ? "linear-gradient(90deg,#FF6B6B,#F97316)" : `linear-gradient(90deg,${pc},color-mix(in srgb, var(--accent) 70%, #000))`, transition: "width .6s cubic-bezier(.2,.8,.2,1)" }}/>
                 </div>
               </div>
-              {form.username && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 2px" }}>@{form.username}</p>}
-              <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>
-                {profile?.email} . Membre depuis {memberMonths} mois
-              </p>
+            ))}
+            <div style={{ display: "flex", gap: 8, marginTop: "auto", paddingTop: 8, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+              {[
+                { icon: QrCode, label: "QR actifs", value: activeQR, color: "#38BDF8" },
+                { icon: Users, label: "Filleuls", value: validatedRefs, color: "#7B61FF" },
+              ].map((s, i) => (
+                <div key={i} style={{ flex: 1, display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ width: 28, height: 28, borderRadius: 8, background: s.color + "1a", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><s.icon size={14} color={s.color}/></span>
+                  <span style={{ minWidth: 0 }}>
+                    <span style={{ display: "block", color: "#F5F0E8", fontSize: 15, fontWeight: 700, lineHeight: 1 }}>{s.value}</span>
+                    <span style={{ display: "block", color: MUTED, fontSize: 9.5 }}>{s.label}</span>
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
-
-          {/* Quick actions */}
-          <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-            <button onClick={signOut}
-              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 9, color: MUTED, fontSize: 12, cursor: "pointer" }}>
-              <LogOut size={13}/> Deconnexion
-            </button>
-            {profile?.plan !== "business" && (
-              <a href="/upgrade"
-                style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: `linear-gradient(90deg,${G},color-mix(in srgb, var(--accent) 75%, #000))`, border: "none", borderRadius: 9, color: "#080808", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
-                <Activity size={13}/> Upgrade
-              </a>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* -- Stats rapides ------------------------------------------------------ */}
-      <div style={{ background: "rgba(255,255,255,0.01)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "14px 28px" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", gap: 12, overflowX: "auto" }}>
-          {[
-            { icon: Eye,       label: "Pages",       value: totalPages || profile?.total_pages || 0,   color: G },
-            { icon: TrendingUp,label: "Vues",         value: totalViews > 0 ? totalViews.toLocaleString("fr-FR") : (profile?.total_scans || 0),   color: "#39FF8F" },
-            { icon: QrCode,    label: "QR actifs",    value: activeQR,                    color: "#38BDF8" },
-            { icon: Users,     label: "Parrainages",  value: validatedRefs,               color: "#7B61FF" },
-          ].map((s, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", background: SURF, border: "1px solid rgba(255,255,255,0.06)", borderRadius: 9, flexShrink: 0 }}>
-              <s.icon size={13} color={s.color}/>
-              <span style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700 }}>{s.value}</span>
-              <span style={{ color: MUTED, fontSize: 11 }}>{s.label}</span>
-            </div>
-          ))}
         </div>
       </div>
 
