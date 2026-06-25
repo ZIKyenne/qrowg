@@ -515,6 +515,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [copyQRId,   setCopyQRId]   = useState<string | null>(null)
   const [dupId,      setDupId]      = useState<string | null>(null)
   const [showModal,  setShowModal]  = useState(false)
+  const [scene,      setScene]      = useState<"none"|"phone"|"card"|"poster"|"sticker"|"tent">("none") // aperçu immersif
+  const [qrPng,      setQrPng]      = useState<string>("") // PNG du QR composé dans les scènes
   const [diagFg,     setDiagFg]     = useState("")
   const [diagBg,     setDiagBg]     = useState("")
   const [logoUploading, setLogoUploading] = useState(false)
@@ -562,6 +564,20 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       updateQR(qrInstRef.current, qrOpts(720))
     }
   }, [qrUrl, fg, bg, corner, ecLevel, styleConf])
+
+  // PNG du QR pour les scènes d'aperçu immersif (généré uniquement si une scène est active)
+  useEffect(() => {
+    if (scene === "none" || !qrUrl) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const blob = await getQRBlob({ data: qrUrl, fg, bg, ecc: effectiveEcc, style: styleConf, size: 600 }, "png")
+        const url = await blobToDataUrl(blob)
+        if (!cancelled) setQrPng(url)
+      } catch { /* ignore */ }
+    })()
+    return () => { cancelled = true }
+  }, [scene, qrUrl, fg, bg, ecLevel, styleConf])
 
   async function archiveQR(id: string) {
     setArchivingId(id)
@@ -2567,9 +2583,81 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             <div className="qr-scroll" style={{ display:"flex", flexDirection:"column", height:"100%", overflowY:"auto" }}>
 
               {/* QR Card */}
-              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"36px 24px 24px", gap:20, borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"30px 24px 24px", gap:16, borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+                {/* Sélecteur d'aperçu immersif */}
+                <div style={{ display:"flex", gap:5, flexWrap:"wrap", justifyContent:"center" }}>
+                  {([["none","QR","▦"],["phone","Mobile","📱"],["card","Carte","💳"],["poster","Affiche","🖼️"],["sticker","Sticker","⭕"],["tent","Chevalet","🍽️"]] as const).map(([k,l,e]) => (
+                    <button key={k} type="button" onClick={() => setScene(k)}
+                      style={{ display:"flex", alignItems:"center", gap:4, padding:"5px 10px", borderRadius:8, fontSize:10.5, fontWeight:scene===k?700:500, cursor:"pointer",
+                        background: scene===k ? "color-mix(in srgb, var(--accent) 16%, transparent)" : "rgba(255,255,255,0.04)",
+                        border: `1px solid ${scene===k ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "rgba(255,255,255,0.08)"}`,
+                        color: scene===k ? "#C9A84C" : "#8A8478" }}>
+                      <span style={{ fontSize:11 }}>{e}</span> {l}
+                    </button>
+                  ))}
+                </div>
                 <div style={{ position:"relative" }}>
-                  <div style={{ position:"relative", padding:28, borderRadius:28, background:bg, boxShadow:`0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent), 0 28px 80px rgba(0,0,0,0.85)`, transition:"background 0.3s", cursor:"pointer" }}
+                  {/* Scène immersive (produit fini) */}
+                  {scene !== "none" && (
+                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", width:"min(46vh,360px)", minHeight:"min(46vh,360px)", animation:"fadeUp .35s ease" }}>
+                      {!qrPng ? (
+                        <div className="skeleton" style={{ width:200, height:200 }} />
+                      ) : scene === "phone" ? (
+                        <div style={{ width:206, borderRadius:30, background:"#0b0b0d", padding:"12px 10px 16px", boxShadow:"0 30px 70px rgba(0,0,0,0.6), inset 0 0 0 2px rgba(255,255,255,0.06)", position:"relative" }}>
+                          <div style={{ width:46, height:5, background:"#222", borderRadius:3, margin:"2px auto 9px" }}/>
+                          <div style={{ borderRadius:18, overflow:"hidden", background:"#fff" }}>
+                            <div style={{ height:40, background:"linear-gradient(135deg,var(--accent),color-mix(in srgb, var(--accent) 70%, #000))", display:"flex", alignItems:"center", justifyContent:"center", color:"#080808", fontSize:11, fontWeight:800 }}>{active.pages?.title ?? "Ma page"}</div>
+                            <div style={{ padding:"16px 14px", display:"flex", flexDirection:"column", alignItems:"center", gap:9 }}>
+                              <img src={qrPng} alt="QR" style={{ width:130, height:130, borderRadius:8, display:"block" }}/>
+                              <p style={{ color:"#111", fontSize:10.5, fontWeight:700, margin:0 }}>Scannez pour ouvrir</p>
+                              <div style={{ width:"80%", height:9, borderRadius:5, background:"var(--accent)", opacity:0.9 }}/>
+                              <div style={{ width:"60%", height:7, borderRadius:5, background:"#e5e5e5" }}/>
+                            </div>
+                          </div>
+                        </div>
+                      ) : scene === "card" ? (
+                        <div style={{ width:320, height:188, borderRadius:14, background:"linear-gradient(135deg,#16140d,#0c0b08)", border:"1px solid color-mix(in srgb, var(--accent) 22%, transparent)", boxShadow:"0 24px 60px rgba(0,0,0,0.6)", display:"flex", overflow:"hidden" }}>
+                          <div style={{ flex:1, padding:"20px 18px", display:"flex", flexDirection:"column", justifyContent:"center", gap:7 }}>
+                            <div style={{ width:34, height:34, borderRadius:9, background:"linear-gradient(135deg,var(--accent),color-mix(in srgb, var(--accent) 70%, #000))", display:"flex", alignItems:"center", justifyContent:"center", color:"#080808", fontWeight:800, fontSize:15 }}>{(active.pages?.title ?? "Q")[0].toUpperCase()}</div>
+                            <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:700, margin:"4px 0 0" }}>{active.pages?.title ?? "Votre nom"}</p>
+                            <div style={{ width:90, height:6, background:"color-mix(in srgb, var(--accent) 40%, transparent)", borderRadius:4 }}/>
+                            <div style={{ width:120, height:5, background:"rgba(255,255,255,0.12)", borderRadius:4 }}/>
+                          </div>
+                          <div style={{ width:150, background:"#fff", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                            <img src={qrPng} alt="QR" style={{ width:116, height:116, display:"block" }}/>
+                          </div>
+                        </div>
+                      ) : scene === "poster" ? (
+                        <div style={{ width:236, height:318, borderRadius:12, background:"linear-gradient(160deg,#1a160c,#0a0906)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", boxShadow:"0 28px 70px rgba(0,0,0,0.6)", display:"flex", flexDirection:"column", alignItems:"center", padding:"26px 20px", gap:14 }}>
+                          <p style={{ color:"#C9A84C", fontSize:11, fontWeight:800, letterSpacing:2, margin:0 }}>SCANNEZ-MOI</p>
+                          <p style={{ color:"#F5F0E8", fontFamily:"Cormorant Garamond, serif", fontSize:24, fontWeight:700, textAlign:"center", lineHeight:1.1, margin:0 }}>{active.pages?.title ?? "Découvrez-nous"}</p>
+                          <div style={{ padding:14, background:"#fff", borderRadius:14, marginTop:"auto" }}>
+                            <img src={qrPng} alt="QR" style={{ width:128, height:128, display:"block" }}/>
+                          </div>
+                          <p style={{ color:"#8A8478", fontSize:10, margin:"auto 0 0" }}>qrfolio · /q/{active.short_code}</p>
+                        </div>
+                      ) : scene === "sticker" ? (
+                        <div style={{ width:244, height:244, borderRadius:"50%", background:"radial-gradient(circle at 50% 35%, #fff, #f1eee6)", boxShadow:"0 24px 60px rgba(0,0,0,0.5), inset 0 0 0 7px var(--accent), inset 0 0 0 9px rgba(0,0,0,0.08)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:6 }}>
+                          <p style={{ color:"color-mix(in srgb, var(--accent) 80%, #000)", fontSize:11, fontWeight:900, letterSpacing:3, margin:0 }}>▼ SCANNEZ ▼</p>
+                          <img src={qrPng} alt="QR" style={{ width:130, height:130, display:"block", borderRadius:6 }}/>
+                          <p style={{ color:"color-mix(in srgb, var(--accent) 80%, #000)", fontSize:10, fontWeight:800, letterSpacing:2, margin:0 }}>MERCI !</p>
+                        </div>
+                      ) : (
+                        // tent / chevalet
+                        <div style={{ display:"flex", flexDirection:"column", alignItems:"center" }}>
+                          <div style={{ width:210, borderRadius:"14px 14px 4px 4px", background:"linear-gradient(135deg,#16140d,#0c0b08)", border:"1px solid color-mix(in srgb, var(--accent) 22%, transparent)", padding:"18px 18px 20px", display:"flex", flexDirection:"column", alignItems:"center", gap:10, boxShadow:"0 20px 50px rgba(0,0,0,0.55)", transform:"perspective(700px) rotateX(6deg)" }}>
+                            <p style={{ color:"#C9A84C", fontSize:12, fontWeight:800, letterSpacing:1, margin:0 }}>VOIR LE MENU</p>
+                            <div style={{ padding:11, background:"#fff", borderRadius:12 }}>
+                              <img src={qrPng} alt="QR" style={{ width:120, height:120, display:"block" }}/>
+                            </div>
+                            <p style={{ color:"#8A8478", fontSize:9.5, margin:0 }}>Scannez avec votre téléphone</p>
+                          </div>
+                          <div style={{ width:150, height:14, background:"rgba(0,0,0,0.5)", filter:"blur(7px)", borderRadius:"50%", marginTop:-2 }}/>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <div style={{ display: scene==="none" ? "block" : "none", position:"relative", padding:28, borderRadius:28, background:bg, boxShadow:`0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent), 0 28px 80px rgba(0,0,0,0.85)`, transition:"background 0.3s", cursor:"pointer" }}
                     onClick={() => setShowModal(true)}>
                     {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h], i) => (
                       <div key={i} style={{ position:"absolute", [v]:10, [h]:10, width:18, height:18,
@@ -3738,7 +3826,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       </div>
 
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg) } } @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} } [data-qr-container] canvas, [data-qr-container] svg { width:100% !important; height:100% !important; display:block; } @media (max-width: 859px) { .qr-grid { display:flex !important; flex-direction:column !important; min-height:0 !important; overflow:visible !important; } .qr-col-preview { order:1 !important; width:100% !important; overflow:visible !important; } .qr-col-settings { order:2 !important; width:100% !important; overflow:visible !important; border-left:none !important; border-top:1px solid rgba(255,255,255,0.06) !important; } .qr-col-list { order:3 !important; width:100% !important; overflow:visible !important; border-right:none !important; border-top:1px solid rgba(255,255,255,0.06) !important; } .qr-scroll { flex:none !important; height:auto !important; max-height:none !important; overflow:visible !important; } } button { transition: transform 0.08s ease, opacity 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease; } button:active { transform: scale(0.97); } input:focus, select:focus, textarea:focus { border-color: color-mix(in srgb, var(--accent) 55%, transparent) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent) !important; } .qr-scroll::-webkit-scrollbar { width:8px; height:8px; } .qr-scroll::-webkit-scrollbar-track { background:transparent; } .qr-scroll::-webkit-scrollbar-thumb { background:color-mix(in srgb, var(--accent) 18%, transparent); border-radius:8px; } .qr-scroll::-webkit-scrollbar-thumb:hover { background:color-mix(in srgb, var(--accent) 35%, transparent); }`}</style>
+      <style>{`@keyframes spin { to { transform: rotate(360deg) } } @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} } @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} } [data-qr-container] canvas, [data-qr-container] svg { width:100% !important; height:100% !important; display:block; } @media (max-width: 859px) { .qr-grid { display:flex !important; flex-direction:column !important; min-height:0 !important; overflow:visible !important; } .qr-col-preview { order:1 !important; width:100% !important; overflow:visible !important; } .qr-col-settings { order:2 !important; width:100% !important; overflow:visible !important; border-left:none !important; border-top:1px solid rgba(255,255,255,0.06) !important; } .qr-col-list { order:3 !important; width:100% !important; overflow:visible !important; border-right:none !important; border-top:1px solid rgba(255,255,255,0.06) !important; } .qr-scroll { flex:none !important; height:auto !important; max-height:none !important; overflow:visible !important; } } button { transition: transform 0.08s ease, opacity 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease; } button:active { transform: scale(0.97); } input:focus, select:focus, textarea:focus { border-color: color-mix(in srgb, var(--accent) 55%, transparent) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent) !important; } .qr-scroll::-webkit-scrollbar { width:8px; height:8px; } .qr-scroll::-webkit-scrollbar-track { background:transparent; } .qr-scroll::-webkit-scrollbar-thumb { background:color-mix(in srgb, var(--accent) 18%, transparent); border-radius:8px; } .qr-scroll::-webkit-scrollbar-thumb:hover { background:color-mix(in srgb, var(--accent) 35%, transparent); }`}</style>
     </div>
   )
 }
