@@ -1040,7 +1040,7 @@ export default function ProfilePage() {
           {[0, 1, 2, 3].map(i => <div key={i} className="skeleton" style={{ width: 150, height: 54, borderRadius: 12 }} />)}
         </div>
         {/* 2 colonnes */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+        <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
           <div className="skeleton" style={{ height: 420, borderRadius: 16 }} />
           <div className="skeleton" style={{ height: 420, borderRadius: 16 }} />
         </div>
@@ -1150,7 +1150,7 @@ export default function ProfilePage() {
       </div>
 
       {/* -- Corps en 2 colonnes ------------------------------------------------ */}
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 28px 48px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, alignItems: "start" }}>
+      <div className="dash-2col dash-pad" style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 28px 48px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, alignItems: "start" }}>
 
         {/* == COLONNE GAUCHE ================================================== */}
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>

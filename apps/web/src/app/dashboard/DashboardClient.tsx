@@ -262,7 +262,7 @@ export default function DashboardClient() {
         </div>
 
         {/* Layout 2 colonnes — Mes pages = carte principale */}
-        <div className="dz" style={{ animationDelay: "180ms", display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 14 }}>
+        <div className="dz dash-2col" style={{ animationDelay: "180ms", display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 14 }}>
 
           {/* Pages (PRINCIPAL) */}
           <div style={{ background: "linear-gradient(180deg,#13110B,#100F0A)", border: "1px solid color-mix(in srgb, var(--accent) 22%, transparent)", borderRadius: 16, overflow: "hidden", boxShadow: "0 8px 30px rgba(0,0,0,0.25)", position: "relative" }}>

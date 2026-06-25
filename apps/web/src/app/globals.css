@@ -87,6 +87,14 @@ button:not(:disabled):active { transform: scale(.97); }
   border-radius: 10px;
 }
 
+/* ── Responsive mobile : grilles 2 colonnes qui s'empilent ─────────────────── */
+@media (max-width: 820px) {
+  .dash-2col { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 560px) {
+  .dash-pad { padding-left: 16px !important; padding-right: 16px !important; }
+}
+
 /* Scrollbar premium */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: #0d0b08; }

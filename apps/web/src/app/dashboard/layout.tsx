@@ -33,6 +33,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [profile, setProfile] = useState<any>(null)
   const [mounted, setMounted] = useState(false)
   const [accent, setAccent] = useState(DEFAULT_ACCENT) // couleur d'accent de l'utilisateur
+  const [isMobile, setIsMobile] = useState(false) // < 860px : menu replié d'office
   const G = accent
 
   useEffect(() => {
@@ -66,11 +67,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     document.documentElement.style.setProperty("--accent", accent)
   }, [accent])
 
+  // Responsive : sous 860px on replie d'office (sans écraser la préférence desktop)
   useEffect(() => {
-    if (mounted) {
+    const onResize = () => {
+      const mob = window.innerWidth < 860
+      setIsMobile(mob)
+      if (mob) setCollapsed(true)
+      else setCollapsed(localStorage.getItem("qrfolio_sidebar") === "collapsed")
+    }
+    onResize()
+    window.addEventListener("resize", onResize)
+    return () => window.removeEventListener("resize", onResize)
+  }, [])
+
+  useEffect(() => {
+    if (mounted && !isMobile) {
       localStorage.setItem("qrfolio_sidebar", collapsed ? "collapsed" : "expanded")
     }
-  }, [collapsed, mounted])
+  }, [collapsed, mounted, isMobile])
 
   const isActive = (href: string, exact = false) => {
     if (exact) return pathname === href

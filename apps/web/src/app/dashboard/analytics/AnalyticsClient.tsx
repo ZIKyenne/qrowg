@@ -276,7 +276,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
         </div>
 
         {/* Row : Device + Source */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
+        <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
           {/* Device */}
           <div style={{
             background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)",
