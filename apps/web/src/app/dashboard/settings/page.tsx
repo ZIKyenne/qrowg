@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Save, Check, AlertTriangle, Eye, EyeOff, Bell, Shield, Trash2, LogOut, Key, Globe, Palette, Moon, CreditCard, ArrowRight } from "lucide-react"
+import Particles from "@/components/Particles"
 
 type Profile = { id: string; email: string; full_name: string | null; plan: string }
 
@@ -122,10 +123,13 @@ export default function SettingsPage() {
   )
 
   return (
-    <div style={{ minHeight: "100vh", background: "#080808", padding: "32px 28px", fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#080808", padding: "32px 28px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}} input:focus,textarea:focus{border-color:color-mix(in srgb, var(--accent) 50%, transparent)!important;background:#111009!important}`}</style>
 
-      <div style={{ maxWidth: 680, margin: "0 auto" }}>
+      {/* Particules dorées en fond (comble le vide, comme la landing) */}
+      <Particles />
+
+      <div style={{ maxWidth: 680, margin: "0 auto", position: "relative", zIndex: 1 }}>
         <div style={{ marginBottom: 28 }}>
           <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, color: "#F5F0E8", fontWeight: 700, margin: 0 }}>Paramètres</h1>
           <p style={{ color: MUTED, fontSize: 14, margin: "4px 0 0" }}>Gère ton compte et tes préférences</p>
