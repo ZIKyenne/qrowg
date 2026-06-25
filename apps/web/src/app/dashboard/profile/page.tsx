@@ -1305,6 +1305,8 @@ export default function ProfilePage() {
                 </div>
               )}
 
+              {/* Champs identité — grille 2 colonnes pour limiter la hauteur */}
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:13 }}>
               {/* Nom complet */}
               <div>
                 <label style={{ color:"#8A8478", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>Nom complet</label>
@@ -1340,7 +1342,7 @@ export default function ProfilePage() {
 
               {/* URL publique */}
               {publicUrl && (
-                <div style={{ display:"flex", alignItems:"center", gap:7, padding:"9px 12px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius:9 }}>
+                <div style={{ gridColumn:"1 / -1", display:"flex", alignItems:"center", gap:7, padding:"9px 12px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius:9 }}>
                   <Link size={12} color={G} style={{ flexShrink:0 }}/>
                   <span style={{ flex:1, color:G, fontSize:11, fontFamily:"monospace", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
                     {publicUrl}
@@ -1376,12 +1378,13 @@ export default function ProfilePage() {
               {/* Bouton save */}
               <button onClick={saveProfile}
                 disabled={saving || !hasChanges || usernameStatus==="taken" || usernameStatus==="invalid" || usernameStatus==="checking"}
-                style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:7, background:saved?"rgba(57,255,143,0.1)":hasChanges?"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))":"rgba(255,255,255,0.04)", border:saved?"1px solid rgba(57,255,143,0.3)":"none", borderRadius:9, padding:"11px", color:saved?"#39FF8F":hasChanges?"#080808":"#8A8478", fontSize:13, fontWeight:700, cursor:saving||!hasChanges||usernameStatus==="taken"||usernameStatus==="invalid"||usernameStatus==="checking"?"not-allowed":"pointer", transition:"all 0.2s", opacity:saving?0.7:1 }}>
+                style={{ gridColumn:"1 / -1", display:"flex", alignItems:"center", justifyContent:"center", gap:7, background:saved?"rgba(57,255,143,0.1)":hasChanges?"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))":"rgba(255,255,255,0.04)", border:saved?"1px solid rgba(57,255,143,0.3)":"none", borderRadius:9, padding:"11px", color:saved?"#39FF8F":hasChanges?"#080808":"#8A8478", fontSize:13, fontWeight:700, cursor:saving||!hasChanges||usernameStatus==="taken"||usernameStatus==="invalid"||usernameStatus==="checking"?"not-allowed":"pointer", transition:"all 0.2s", opacity:saving?0.7:1 }}>
                 {saved ? <><Check size={13}/> Sauvegarde !</>
                   : saving ? "Sauvegarde..."
                   : !hasChanges ? "Aucune modification"
                   : <><Save size={13}/> Sauvegarder les modifications</>}
               </button>
+              </div>
             </div>
           </SectionCard>
           )}
