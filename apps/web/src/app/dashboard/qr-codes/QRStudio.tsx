@@ -622,7 +622,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const lMax = Math.max(l1,l2), lMin = Math.min(l1,l2)
     return (lMax+0.05)/(lMin+0.05)
   }
-  // -- Moteur de scannabilite complet ------------------------------------------
+  // -- Moteur de scannabilité complet ------------------------------------------
   type ScanIssue = {
     id:       string
     severity: "critical"|"warning"|"info"
@@ -799,7 +799,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
   useEffect(() => { setDiagFg(fg); setDiagBg(bg) }, [fg, bg])
 
-  // Score scannabilite calcule a chaque changement de config
+  // Score scannabilité calcule a chaque changement de config
   const scanScore = active ? computeScannability() : null
 
   // Charger stats QR au changement de selection ou periode
@@ -1029,7 +1029,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setMenuId(null)
   }
 
-  // -- Auto-fix scannabilite ----------------------------------------------------
+  // -- Auto-fix scannabilité ----------------------------------------------------
   function autoFix() {
     if (!scanScore) return
     let newFg = fg; let newBg = bg; let newEc = ecLevel
@@ -2704,7 +2704,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     )
                   })()}
 
-                  {/* Pastille score scannabilite (permanente) */}
+                  {/* Pastille score scannabilité (permanente) */}
                   {scanScore && (
                     <div
                       onClick={() => scanWidgetRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" })}
@@ -2713,7 +2713,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         {scanScore.score}
                       </span>
                       <span style={{ color:scanScore.gradeColor, fontSize:12, fontWeight:700 }}>{scanScore.grade}</span>
-                      <span style={{ color:MUTED, fontSize:10 }}>scannabilite</span>
+                      <span style={{ color:MUTED, fontSize:10 }}>scannabilité</span>
                     </div>
                   )}
                 </div>
@@ -2934,7 +2934,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               </div>
 
               
-{/* Diagnostic scannabilite premium */}
+{/* Diagnostic scannabilité premium */}
               {scanScore && (
                 <div ref={scanWidgetRef} style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"16px" }}>
 
@@ -3378,7 +3378,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     <div style={{ display:"flex", alignItems:"center", gap:7, padding:"9px 12px", background:"color-mix(in srgb, var(--accent) 7%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:9 }}>
                       <AlertTriangle size={13} color={G}/>
                       <p style={{ color:G, fontSize:11, margin:0, lineHeight:1.4 }}>
-                        Correction d&apos;erreur forcee a <strong>H</strong> automatiquement pour garantir la scannabilite.
+                        Correction d&apos;erreur forcée à <strong>H</strong> automatiquement pour garantir la scannabilité.
                       </p>
                     </div>
                   )}
@@ -3417,7 +3417,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         </div>
                         <div style={{ flex:1, minWidth:0 }}>
                           <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 2px" }}>Logo actif</p>
-                          <p style={{ color:MUTED, fontSize:10, margin:0 }}>ECC force H -- scannabilite optimale</p>
+                          <p style={{ color:MUTED, fontSize:10, margin:0 }}>ECC forcé H -- scannabilité optimale</p>
                         </div>
                         <button type="button" onClick={removeLogo}
                           style={{ width:30, height:30, background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#FF6B6B", flexShrink:0 }}>
