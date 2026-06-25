@@ -4020,7 +4020,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         )}
 
         {/* Zone canvas (heros) : panneaux flottants -> on recadre pour garder l'artboard centre dans le visible */}
-        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: 24, paddingLeft: 24 + ((tplOpen || photoOpen || compOpen || libOpen || side) ? leftW : 0), paddingRight: 24 + (sel ? rightW : 0), background: "#E5E8ED", position: "relative", transition: "padding .22s cubic-bezier(.2,.8,.2,1)" }}>
+        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: 16, background: "#E5E8ED", position: "relative", transition: "padding .22s cubic-bezier(.2,.8,.2,1)" }}>
           {loading && (
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: MUTED, zIndex: 5, pointerEvents: "none" }}>
               <Loader2 size={18} style={{ animation: "spin 0.8s linear infinite" }} /> Chargement…
