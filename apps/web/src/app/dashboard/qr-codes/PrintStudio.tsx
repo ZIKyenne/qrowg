@@ -875,8 +875,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [tplSearch, setTplSearch] = useState("")
   const [tplSector, setTplSector] = useState("")
   const [tplColl, setTplColl] = useState("") // collection sélectionnée ("" = vue par objectif)
-  const [rightW, setRightW] = useState(288)  // largeur du panneau Réglages (redimensionnable)
-  const [leftW, setLeftW]   = useState(300)  // largeur des panneaux de gauche (redimensionnable)
+  const [rightW, setRightW]   = useState(288) // largeur du panneau Réglages (redimensionnable)
+  const [leftW, setLeftW]     = useState(300) // largeur des flyouts de gauche (Modèles, Photos…)
+  const [railW, setRailW]     = useState(150) // largeur du rail d'outils tout à gauche
+  const [formatW, setFormatW] = useState(84)  // largeur du panneau Format (tout à droite)
   const [compOpen, setCompOpen] = useState(false) // flyout composants metier
   const [thumbCache, setThumbCache] = useState<Record<string, string>>({}) // photo par objectif pour les vignettes
   const [photoOpen, setPhotoOpen] = useState(false) // flyout recherche photos (Unsplash)
@@ -2206,17 +2208,26 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     fc.requestRenderAll()
     setZoom(nz)
   }
-  // Redimensionnement des panneaux (drag de la poignée). side="right" -> Réglages | "left" -> flyout
-  const startResize = (e: React.PointerEvent, which: "right" | "left") => {
+  // Redimensionnement des zones (drag de la poignée).
+  // "rail" = barre d'outils gauche | "left" = flyout | "right" = Réglages | "format" = panneau Format droit
+  type ResizeZone = "rail" | "left" | "right" | "format"
+  const RESIZE_CFG: Record<ResizeZone, { min: number; max: number; dir: 1 | -1 }> = {
+    rail:   { min: 116, max: 280, dir: 1 },   // à gauche : glisser à droite agrandit
+    left:   { min: 220, max: 480, dir: 1 },
+    right:  { min: 240, max: 560, dir: -1 },  // à droite : glisser à gauche agrandit
+    format: { min: 72,  max: 220, dir: -1 },
+  }
+  const startResize = (e: React.PointerEvent, zone: ResizeZone) => {
     e.preventDefault()
     const startX = e.clientX
-    const startW = which === "right" ? rightW : leftW
+    const cur = { rail: railW, left: leftW, right: rightW, format: formatW }[zone]
+    const setter = { rail: setRailW, left: setLeftW, right: setRightW, format: setFormatW }[zone]
+    const { min, max, dir } = RESIZE_CFG[zone]
     document.body.style.cursor = "col-resize"
     document.body.style.userSelect = "none"
     const onMove = (ev: PointerEvent) => {
       const dx = ev.clientX - startX
-      if (which === "right") setRightW(Math.max(240, Math.min(560, startW - dx)))
-      else setLeftW(Math.max(220, Math.min(480, startW + dx)))
+      setter(Math.max(min, Math.min(max, cur + dir * dx)))
     }
     const onUp = () => {
       window.removeEventListener("pointermove", onMove)
@@ -2228,15 +2239,18 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     window.addEventListener("pointermove", onMove)
     window.addEventListener("pointerup", onUp)
   }
-  // poignée réutilisable (bord interne du panneau, pleine hauteur, saisissable partout)
-  const ResizeHandle = ({ side }: { side: "right" | "left" }) => (
-    <div onPointerDown={e => startResize(e, side)} title="Glisser pour redimensionner"
-      onMouseEnter={e => { (e.currentTarget.firstChild as HTMLElement).style.background = G }}
-      onMouseLeave={e => { (e.currentTarget.firstChild as HTMLElement).style.background = "rgba(0,0,0,0.10)" }}
-      style={{ position: "absolute", top: 0, bottom: 0, [side === "right" ? "left" : "right"]: -4, width: 9, cursor: "col-resize", zIndex: 30, display: "flex", justifyContent: "center" }}>
-      <div style={{ width: 2, height: "100%", background: "rgba(0,0,0,0.10)", transition: "background .15s" }} />
-    </div>
-  )
+  // poignée réutilisable (bord interne de la zone, pleine hauteur, saisissable partout)
+  const ResizeHandle = ({ which }: { which: ResizeZone }) => {
+    const edge = which === "right" || which === "format" ? "left" : "right"
+    return (
+      <div onPointerDown={e => startResize(e, which)} title="Glisser pour redimensionner"
+        onMouseEnter={e => { (e.currentTarget.firstChild as HTMLElement).style.background = G }}
+        onMouseLeave={e => { (e.currentTarget.firstChild as HTMLElement).style.background = "rgba(0,0,0,0.10)" }}
+        style={{ position: "absolute", top: 0, bottom: 0, [edge]: -4, width: 9, cursor: "col-resize", zIndex: 30, display: "flex", justifyContent: "center" }}>
+        <div style={{ width: 2, height: "100%", background: "rgba(0,0,0,0.10)", transition: "background .15s" }} />
+      </div>
+    )
+  }
   // Ajuste automatiquement le zoom au chargement et a chaque changement de format (vue globale).
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (loading) return; const t = setTimeout(() => fitToScreen(), 90); return () => clearTimeout(t) }, [format, loading])
@@ -3323,7 +3337,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           const metier = METIERS.find(m => m.id === wizMetier)
           return (
             <div className="qr-scroll ps-fly" style={{ width: leftW, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
-            <ResizeHandle side="left" />
+            <ResizeHandle which="left" />
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
                 <span style={{ color: G, fontWeight: 800, fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}><Sparkles size={14} /> Création guidée</span>
                 <button type="button" onClick={() => setWizard(0)} aria-label="Fermer l'assistant"
@@ -3416,7 +3430,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Rail outils */}
         {wizard === 0 && (
-        <div className="qr-scroll ps-rail" style={{ width: 150, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", padding: "12px 10px", display: "flex", flexDirection: "column", gap: 6, background: "#FBFBFD", overflowY: "auto" }}>
+        <div className="qr-scroll ps-rail" style={{ width: railW, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", padding: "12px 10px", display: "flex", flexDirection: "column", gap: 6, background: "#FBFBFD", overflowY: "auto", position: "relative" }}>
+          <ResizeHandle which="rail" />
           <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 2px" }}>Créer</p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
           <button type="button" onClick={() => { setTplOpen(v => !v); setLibOpen(false); setSide(""); setCompOpen(false); setPhotoOpen(false); setWizard(0) }}
@@ -3482,7 +3497,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {/* Modeles orientes objectif (flyout) */}
         {tplOpen && (
           <div className="qr-scroll ps-fly" style={{ width: leftW, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
-            <ResizeHandle side="left" />
+            <ResizeHandle which="left" />
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Modèles</span>
               <button type="button" onClick={() => setTplOpen(false)} aria-label="Fermer les modèles"
@@ -3568,7 +3583,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {/* Ajouter : composants metier 1-clic, ranges par objectif (flyout) */}
         {compOpen && (
           <div className="qr-scroll ps-fly" style={{ width: leftW, flexShrink: 0, background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
-            <ResizeHandle side="left" />
+            <ResizeHandle which="left" />
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "13px 14px", borderBottom: "1px solid rgba(0,0,0,0.07)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 14 }}>➕ Ajouter</span>
               <button type="button" onClick={() => setCompOpen(false)} aria-label="Fermer"
@@ -3599,7 +3614,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {/* Recherche de photos (Unsplash) (flyout) */}
         {photoOpen && (
           <div className="qr-scroll ps-fly" style={{ width: leftW, flexShrink: 0, background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
-            <ResizeHandle side="left" />
+            <ResizeHandle which="left" />
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.07)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Photos</span>
               <button type="button" onClick={() => setPhotoOpen(false)} aria-label="Fermer"
@@ -3639,7 +3654,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {/* Bibliotheque d'elements (flyout) */}
         {libOpen && (
           <div className="qr-scroll ps-fly" style={{ width: leftW, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
-            <ResizeHandle side="left" />
+            <ResizeHandle which="left" />
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Bibliothèque</span>
               <button type="button" onClick={() => setLibOpen(false)} aria-label="Fermer la bibliothèque"
@@ -3840,7 +3855,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {/* Panneau Styles globaux (gauche) */}
         {side === "styles" && (
           <div className="qr-scroll ps-fly" style={{ width: leftW, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
-            <ResizeHandle side="left" />
+            <ResizeHandle which="left" />
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Styles</span>
               <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
@@ -3869,7 +3884,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {/* Panneau Calques (gauche) */}
         {side === "layers" && (
           <div className="qr-scroll ps-fly" style={{ width: leftW, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
-            <ResizeHandle side="left" />
+            <ResizeHandle which="left" />
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Calques</span>
               <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
@@ -3937,7 +3952,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {/* Panneau Fond + infos (gauche) */}
         {side === "bg" && (
           <div className="qr-scroll ps-fly" style={{ width: leftW, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: SURFACE, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
-            <ResizeHandle side="left" />
+            <ResizeHandle which="left" />
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
               <span style={{ color: INK, fontWeight: 800, fontSize: 12.5 }}>Fond &amp; infos</span>
               <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
@@ -4017,7 +4032,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         </div>
 
         {/* Rail droit : formats avec mini-apercu */}
-        <div className="qr-scroll" style={{ width: 84, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: "10px 7px", display: "flex", flexDirection: "column", gap: 5, background: SURFACE, overflowY: "auto" }}>
+        <div className="qr-scroll" style={{ width: formatW, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: "10px 7px", display: "flex", flexDirection: "column", gap: 5, background: SURFACE, overflowY: "auto", position: "relative" }}>
+          <ResizeHandle which="format" />
           <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 1px", textAlign: "center" }}>Format</p>
           {(Object.keys(FORMATS) as FormatId[]).map(f => {
             const r = FORMATS[f].ratio
@@ -4049,7 +4065,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {/* Panneau de reglages : toujours visible quand un element est selectionne */}
         {sel && (
         <div className="qr-scroll ps-fly ps-fly-right" style={{ width: rightW, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: 0, overflowY: "auto", background: SURFACE, display: "flex", flexDirection: "column", position: "relative" }}>
-          <ResizeHandle side="right" />
+          <ResizeHandle which="right" />
               {/* En-tete contextuel */}
               <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "13px 16px", borderBottom: "1px solid rgba(0,0,0,0.06)", position: "sticky", top: 0, background: SURFACE, zIndex: 2 }}>
                 <span style={{ width: 30, height: 30, borderRadius: 9, background: "rgba(201,168,76,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}>{sel.isQr ? "▦" : sel.isImage ? "🖼️" : sel.isText ? "T" : sel.label !== null ? "◉" : sel.isGroupObj ? "▣" : "◆"}</span>
