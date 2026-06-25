@@ -8,9 +8,9 @@ type Profile = { id: string; email: string; full_name: string | null; plan: stri
 
 function Section({ title, subtitle, icon, children }: { title: string; subtitle?: string; icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 16, overflow: "hidden", marginBottom: 20 }}>
+    <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, overflow: "hidden", marginBottom: 20 }}>
       <div style={{ padding: "18px 24px", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", alignItems: "center", gap: 12 }}>
-        <div style={{ color: "#C9A84C", background: "rgba(201,168,76,0.1)", borderRadius: 8, padding: 8 }}>{icon}</div>
+        <div style={{ color: "var(--accent)", background: "color-mix(in srgb, var(--accent) 10%, transparent)", borderRadius: 8, padding: 8 }}>{icon}</div>
         <div>
           <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0 }}>{title}</p>
           {subtitle && <p style={{ color: "#8A8478", fontSize: 12, margin: 0 }}>{subtitle}</p>}
@@ -29,7 +29,7 @@ function Toggle({ value, onChange, label, description }: { value: boolean; onCha
         {description && <p style={{ color: "#8A8478", fontSize: 11, margin: "2px 0 0" }}>{description}</p>}
       </div>
       <button onClick={() => onChange(!value)}
-        style={{ width: 44, height: 24, borderRadius: 12, background: value ? "#C9A84C" : "rgba(255,255,255,0.08)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s", flexShrink: 0 }}>
+        style={{ width: 44, height: 24, borderRadius: 12, background: value ? "var(--accent)" : "rgba(255,255,255,0.08)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s", flexShrink: 0 }}>
         <div style={{ position: "absolute", top: 3, left: value ? 23 : 3, width: 18, height: 18, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 4px rgba(0,0,0,0.3)" }} />
       </button>
     </div>
@@ -104,23 +104,23 @@ export default function SettingsPage() {
     setDeleting(false)
   }
 
-  const G = "#C9A84C"; const MUTED = "#8A8478"
+  const G = "var(--accent)"; const MUTED = "#8A8478"
   const inputStyle: React.CSSProperties = {
-    width: "100%", background: "#0d0c09", border: "1px solid rgba(201,168,76,0.2)",
+    width: "100%", background: "#0d0c09", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)",
     borderRadius: 10, padding: "11px 14px", color: "#F5F0E8", fontSize: 14,
     outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif"
   }
 
   if (loading) return (
     <div style={{ minHeight: "100vh", background: "#080808", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ width: 36, height: 36, border: "2px solid rgba(201,168,76,0.15)", borderTopColor: G, borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+      <div style={{ width: 36, height: 36, border: "2px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderTopColor: G, borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   )
 
   return (
     <div style={{ minHeight: "100vh", background: "#080808", padding: "32px 28px", fontFamily: "DM Sans, sans-serif" }}>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}} input:focus,textarea:focus{border-color:rgba(201,168,76,0.5)!important;background:#111009!important}`}</style>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}} input:focus,textarea:focus{border-color:color-mix(in srgb, var(--accent) 50%, transparent)!important;background:#111009!important}`}</style>
 
       <div style={{ maxWidth: 680, margin: "0 auto" }}>
         <div style={{ marginBottom: 28 }}>
@@ -142,7 +142,7 @@ export default function SettingsPage() {
             <div>
               <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5 }}>Plan actuel</label>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ background: G + "12", border: `1px solid ${G}25`, borderRadius: 8, padding: "6px 14px", color: G, fontSize: 13, fontWeight: 700, textTransform: "capitalize" }}>
+                <span style={{ background: "color-mix(in srgb, var(--accent) 7%, transparent)", border: `1px solid color-mix(in srgb, var(--accent) 15%, transparent)`, borderRadius: 8, padding: "6px 14px", color: G, fontSize: 13, fontWeight: 700, textTransform: "capitalize" }}>
                   {profile?.plan || "free"}
                 </span>
                 {profile?.plan !== "business" && (
@@ -161,8 +161,8 @@ export default function SettingsPage() {
               <div style={{ position: "relative" }}>
                 <input type={showPwd ? "text" : "password"} value={newPwd} onChange={e => setNewPwd(e.target.value)}
                   placeholder="Minimum 8 caracteres" style={{ ...inputStyle, paddingRight: 40 }}
-                  onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"}
-                  onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />
+                  onFocus={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)"}
+                  onBlur={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 20%, transparent)"} />
                 <button onClick={() => setShowPwd(s => !s)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: MUTED, cursor: "pointer" }}>
                   {showPwd ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
@@ -172,8 +172,8 @@ export default function SettingsPage() {
               <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5 }}>Confirmer le mot de passe</label>
               <input type={showPwd ? "text" : "password"} value={confirmPwd} onChange={e => setConfirmPwd(e.target.value)}
                 placeholder="Repete le mot de passe" style={inputStyle}
-                onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"}
-                onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />
+                onFocus={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)"}
+                onBlur={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 20%, transparent)"} />
             </div>
 
             {/* Strength indicator */}
@@ -196,7 +196,7 @@ export default function SettingsPage() {
             )}
 
             <button onClick={changePassword} disabled={pwdSaving || !newPwd || !confirmPwd}
-              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, background: pwdSaved ? "rgba(57,255,143,0.1)" : (pwdSaving || !newPwd) ? "rgba(201,168,76,0.2)" : `linear-gradient(90deg,${G},#b8953f)`, border: pwdSaved ? "1px solid rgba(57,255,143,0.3)" : "none", borderRadius: 10, padding: "12px", color: pwdSaved ? "#39FF8F" : (!newPwd || pwdSaving) ? MUTED : "#080808", fontSize: 14, fontWeight: 700, cursor: (pwdSaving || !newPwd) ? "not-allowed" : "pointer", transition: "all 0.2s" }}>
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, background: pwdSaved ? "rgba(57,255,143,0.1)" : (pwdSaving || !newPwd) ? "color-mix(in srgb, var(--accent) 20%, transparent)" : `linear-gradient(90deg,${G},color-mix(in srgb, var(--accent) 75%, #000))`, border: pwdSaved ? "1px solid rgba(57,255,143,0.3)" : "none", borderRadius: 10, padding: "12px", color: pwdSaved ? "#39FF8F" : (!newPwd || pwdSaving) ? MUTED : "#080808", fontSize: 14, fontWeight: 700, cursor: (pwdSaving || !newPwd) ? "not-allowed" : "pointer", transition: "all 0.2s" }}>
               {pwdSaved ? <><Check size={14} /> Mot de passe modifie !</> : pwdSaving ? "Modification..." : <><Key size={14} /> Changer le mot de passe</>}
             </button>
           </div>
@@ -215,7 +215,7 @@ export default function SettingsPage() {
               label="Offres et promotions" description="Reductions et offres speciales" />
             <div style={{ paddingTop: 14 }}>
               <button onClick={saveNotifications}
-                style={{ display: "flex", alignItems: "center", gap: 7, background: notifSaved ? "rgba(57,255,143,0.1)" : `${G}12`, border: `1px solid ${notifSaved ? "rgba(57,255,143,0.3)" : G + "25"}`, borderRadius: 9, padding: "9px 18px", color: notifSaved ? "#39FF8F" : G, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                style={{ display: "flex", alignItems: "center", gap: 7, background: notifSaved ? "rgba(57,255,143,0.1)" : `color-mix(in srgb, var(--accent) 7%, transparent)`, border: `1px solid ${notifSaved ? "rgba(57,255,143,0.3)" : "color-mix(in srgb, var(--accent) 15%, transparent)"}`, borderRadius: 9, padding: "9px 18px", color: notifSaved ? "#39FF8F" : G, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
                 {notifSaved ? <><Check size={12} /> Sauvegarde !</> : <><Save size={12} /> Sauvegarder les preferences</>}
               </button>
             </div>

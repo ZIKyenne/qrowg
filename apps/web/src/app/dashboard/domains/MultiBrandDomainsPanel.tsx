@@ -34,7 +34,7 @@ const PLAN_LIMITS: Record<string, { max: number; label: string }> = {
   business: { max: -1, label: "Illimité" },
 }
 
-const G     = "#C9A84C"
+const G     = "var(--accent)"
 const MUTED = "#8A8478"
 
 function StatusBadge({ status, verified }: { status: string; verified: boolean }) {
@@ -85,11 +85,11 @@ export default function MultiBrandDomainsPanel({ domains, plan, onSetPrimary, on
 
   function DomainCard({ rec, isPrimary, hasPrimary }: { rec: DomainRecord; isPrimary: boolean; hasPrimary: boolean }) {
     return (
-      <div style={{ background: isPrimary ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.02)", border: isPrimary ? "1px solid rgba(201,168,76,0.25)" : "1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"14px 16px", transition:"all 0.15s" }}>
+      <div style={{ background: isPrimary ? "color-mix(in srgb, var(--accent) 6%, transparent)" : "rgba(255,255,255,0.02)", border: isPrimary ? "1px solid color-mix(in srgb, var(--accent) 25%, transparent)" : "1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"14px 16px", transition:"all 0.15s" }}>
         <div style={{ display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>
 
           {/* Icône */}
-          <div style={{ width:38, height:38, background: isPrimary ? "rgba(201,168,76,0.12)" : rec.verified ? "rgba(57,255,143,0.08)" : "rgba(255,255,255,0.04)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+          <div style={{ width:38, height:38, background: isPrimary ? "color-mix(in srgb, var(--accent) 12%, transparent)" : rec.verified ? "rgba(57,255,143,0.08)" : "rgba(255,255,255,0.04)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
             {isPrimary ? <Star size={17} color={G}/> : <Globe size={17} color={rec.verified ? "#39FF8F" : MUTED}/>}
           </div>
 
@@ -98,7 +98,7 @@ export default function MultiBrandDomainsPanel({ domains, plan, onSetPrimary, on
             <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:3, flexWrap:"wrap" }}>
               <span style={{ color:"#F5F0E8", fontSize:13, fontWeight:700 }}>{rec.domain}</span>
               {isPrimary && (
-                <span style={{ background:"rgba(201,168,76,0.15)", border:"1px solid rgba(201,168,76,0.3)", borderRadius:6, padding:"2px 8px", fontSize:9, color:G, fontWeight:700, textTransform:"uppercase", letterSpacing:1 }}>
+                <span style={{ background:"color-mix(in srgb, var(--accent) 15%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:6, padding:"2px 8px", fontSize:9, color:G, fontWeight:700, textTransform:"uppercase", letterSpacing:1 }}>
                   ⭐ Principal
                 </span>
               )}
@@ -126,7 +126,7 @@ export default function MultiBrandDomainsPanel({ domains, plan, onSetPrimary, on
             {/* Définir comme principal (Business uniquement, si pas déjà principal) */}
             {isBusiness && !isPrimary && rec.verified && (
               <button type="button" onClick={() => handleSetPrimary(rec.domain)} disabled={settingPrimary === rec.domain}
-                style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 10px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:8, color:G, fontSize:11, fontWeight:600, cursor:settingPrimary===rec.domain?"wait":"pointer", opacity:settingPrimary===rec.domain?0.6:1 }}>
+                style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 10px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:8, color:G, fontSize:11, fontWeight:600, cursor:settingPrimary===rec.domain?"wait":"pointer", opacity:settingPrimary===rec.domain?0.6:1 }}>
                 {settingPrimary === rec.domain ? <Loader size={11} style={{ animation:"spin 0.8s linear infinite" }}/> : <Star size={11}/>}
                 Définir principal
               </button>
@@ -149,7 +149,7 @@ export default function MultiBrandDomainsPanel({ domains, plan, onSetPrimary, on
       {/* Header plan + compteur */}
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16, flexWrap:"wrap", gap:10 }}>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-          <div style={{ display:"flex", alignItems:"center", gap:6, padding:"5px 12px", background: isBusiness ? "rgba(201,168,76,0.1)" : "rgba(255,255,255,0.04)", border: isBusiness ? "1px solid rgba(201,168,76,0.25)" : "1px solid rgba(255,255,255,0.08)", borderRadius:8 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:6, padding:"5px 12px", background: isBusiness ? "color-mix(in srgb, var(--accent) 10%, transparent)" : "rgba(255,255,255,0.04)", border: isBusiness ? "1px solid color-mix(in srgb, var(--accent) 25%, transparent)" : "1px solid rgba(255,255,255,0.08)", borderRadius:8 }}>
             {isBusiness && <Crown size={12} color={G}/>}
             <span style={{ color: isBusiness ? G : MUTED, fontSize:11, fontWeight:700 }}>
               {plan?.toUpperCase()} — {planInfo.label}
@@ -163,7 +163,7 @@ export default function MultiBrandDomainsPanel({ domains, plan, onSetPrimary, on
 
         {canAdd && (
           <button type="button" onClick={onAddClick}
-            style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 14px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:9, color:"#080808", fontSize:12, fontWeight:700, cursor:"pointer" }}>
+            style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 14px", background:"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border:"none", borderRadius:9, color:"#080808", fontSize:12, fontWeight:700, cursor:"pointer" }}>
             <Plus size={13}/> Ajouter un domaine
           </button>
         )}
@@ -179,10 +179,10 @@ export default function MultiBrandDomainsPanel({ domains, plan, onSetPrimary, on
             </span>
           </div>
           <div style={{ height:5, background:"rgba(255,255,255,0.06)", borderRadius:3, overflow:"hidden" }}>
-            <div style={{ height:"100%", width:`${Math.min((domains.length/planInfo.max)*100, 100)}%`, background: atLimit ? "#FF6B6B" : "linear-gradient(90deg,#C9A84C,#39FF8F)", borderRadius:3, transition:"width 0.5s" }}/>
+            <div style={{ height:"100%", width:`${Math.min((domains.length/planInfo.max)*100, 100)}%`, background: atLimit ? "#FF6B6B" : "linear-gradient(90deg,var(--accent),#39FF8F)", borderRadius:3, transition:"width 0.5s" }}/>
           </div>
           {atLimit && (
-            <div style={{ marginTop:8, display:"flex", alignItems:"center", gap:7, padding:"8px 12px", background:"rgba(201,168,76,0.06)", border:"1px solid rgba(201,168,76,0.15)", borderRadius:8 }}>
+            <div style={{ marginTop:8, display:"flex", alignItems:"center", gap:7, padding:"8px 12px", background:"color-mix(in srgb, var(--accent) 6%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius:8 }}>
               <Crown size={13} color={G}/>
               <span style={{ color:MUTED, fontSize:11 }}>
                 Limite atteinte · <a href="/upgrade" style={{ color:G, textDecoration:"none", fontWeight:600 }}>Passer au Business pour des domaines illimités →</a>
@@ -249,7 +249,7 @@ export default function MultiBrandDomainsPanel({ domains, plan, onSetPrimary, on
           <p style={{ color:MUTED, fontSize:12, margin:"0 0 16px" }}>Ajoutez votre premier domaine personnalisé</p>
           {canAdd && (
             <button type="button" onClick={onAddClick}
-              style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"9px 18px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:9, color:"#080808", fontSize:12, fontWeight:700, cursor:"pointer" }}>
+              style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"9px 18px", background:"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border:"none", borderRadius:9, color:"#080808", fontSize:12, fontWeight:700, cursor:"pointer" }}>
               <Plus size={13}/> Ajouter un domaine
             </button>
           )}
@@ -258,7 +258,7 @@ export default function MultiBrandDomainsPanel({ domains, plan, onSetPrimary, on
 
       {/* CTA upgrade pour Business si plan Pro limité */}
       {!isBusiness && plan?.toLowerCase() === "pro" && domains.length > 0 && (
-        <div style={{ marginTop:14, padding:"12px 14px", background:"rgba(201,168,76,0.05)", border:"1px solid rgba(201,168,76,0.12)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, flexWrap:"wrap" }}>
+        <div style={{ marginTop:14, padding:"12px 14px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, flexWrap:"wrap" }}>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <Crown size={14} color={G}/>
             <span style={{ color:MUTED, fontSize:12 }}>
@@ -266,7 +266,7 @@ export default function MultiBrandDomainsPanel({ domains, plan, onSetPrimary, on
             </span>
           </div>
           <a href="/upgrade"
-            style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"6px 14px", background:"rgba(201,168,76,0.1)", border:"1px solid rgba(201,168,76,0.25)", borderRadius:8, color:G, fontSize:11, fontWeight:700, textDecoration:"none" }}>
+            style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"6px 14px", background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius:8, color:G, fontSize:11, fontWeight:700, textDecoration:"none" }}>
             Upgrade <ArrowUpRight size={11}/>
           </a>
         </div>

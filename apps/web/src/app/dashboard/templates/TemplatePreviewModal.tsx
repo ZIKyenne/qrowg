@@ -17,7 +17,7 @@ const SOCIAL_NETWORKS = [
   { key: "github",    icon: "💻", label: "GitHub",    color: "#F5F0E8" },
   { key: "spotify",   icon: "🎧", label: "Spotify",   color: "#1DB954" },
   { key: "pinterest", icon: "📌", label: "Pinterest", color: "#E60023" },
-  { key: "website",   icon: "🌐", label: "Site web",  color: "#C9A84C" },
+  { key: "website",   icon: "🌐", label: "Site web",  color: "var(--accent)" },
   { key: "phone",     icon: "📞", label: "Téléphone", color: "#39FF8F" },
   { key: "email",     icon: "✉️", label: "Email",     color: "#38BDF8" },
   { key: "whatsapp",  icon: "💬", label: "WhatsApp",  color: "#25D366" },
@@ -84,7 +84,7 @@ function computeBgStyle(theme: PageTheme, dayMode: boolean): React.CSSProperties
   if (t.bgMode === "pattern") {
     const patSize = t.pattern_size || 20
     const patOpacity = t.pattern_opacity || 0.15
-    const patColor = t.pattern_color || "#C9A84C"
+    const patColor = t.pattern_color || "var(--accent)"
     const alpha = Math.round(patOpacity * 255).toString(16).padStart(2, "0")
     const c = patColor + alpha
     let bgImg = ""
@@ -102,7 +102,7 @@ function computeBgStyle(theme: PageTheme, dayMode: boolean): React.CSSProperties
   } else if (t.bgMode === "radial") {
     return { background: t.bgGradient || `radial-gradient(circle at 50% 50%, ${theme.primary}, ${theme.bg})` }
   } else if (t.bgMode === "mesh") {
-    const c1 = t.mesh_c1 || "#C9A84C"; const c2 = t.mesh_c2 || "#39FF8F"; const c3 = t.mesh_c3 || "#7B2FBE"
+    const c1 = t.mesh_c1 || "var(--accent)"; const c2 = t.mesh_c2 || "#39FF8F"; const c3 = t.mesh_c3 || "#7B2FBE"
     const blurPx = Math.round((t.mesh_blur||40)/3)
     base = {
       background: `radial-gradient(ellipse at 10% 20%, ${c1}90, transparent 55%), radial-gradient(ellipse at 90% 80%, ${c2}90, transparent 55%), radial-gradient(ellipse at 80% 10%, ${c3}70, transparent 55%), ${theme.bg}`,
@@ -1642,7 +1642,7 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
         warning: { bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.3)", color: "#FBBF24" },
         info: { bg: "rgba(56,189,248,0.08)", border: "rgba(56,189,248,0.3)", color: "#38BDF8" },
         success: { bg: "rgba(57,255,143,0.08)", border: "rgba(57,255,143,0.3)", color: "#39FF8F" },
-        promo: { bg: "rgba(201,168,76,0.08)", border: "rgba(201,168,76,0.3)", color: "#C9A84C" },
+        promo: { bg: "color-mix(in srgb, var(--accent) 8%, transparent)", border: "color-mix(in srgb, var(--accent) 30%, transparent)", color: "var(--accent)" },
       }
       const ts = typeStyles[c.type||"warning"]
       return (
@@ -2451,7 +2451,7 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
               {c.title && <p style={{ color: muted, fontSize: 10, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: 1.5 }}>{c.title}</p>}
               <iframe src={c.url} width="100%" height={parseInt(c.height||"400")} style={{ border: "none", borderRadius: 12, display: "block" }} loading="lazy" />
             </div>
-          : <div style={{ background: "rgba(201,168,76,0.06)", border: "1.5px dashed rgba(201,168,76,0.25)", borderRadius: 12, padding: "30px", textAlign: "center" }}>
+          : <div style={{ background: "color-mix(in srgb, var(--accent) 6%, transparent)", border: "1.5px dashed color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 12, padding: "30px", textAlign: "center" }}>
               <span style={{ fontSize: 32, display: "block", marginBottom: 10 }}>🔗</span>
               <p style={{ color: text, fontSize: 13, fontWeight: 600, margin: "0 0 5px" }}>{c.title||"Embed externe"}</p>
               <p style={{ color: muted, fontSize: 11, margin: 0 }}>{c.type||"Google Forms, Typeform, Notion..."}</p>
@@ -2510,7 +2510,7 @@ function BlockPreview({ block, theme, dayMode }: { block: Block; theme: PageThem
         info: { bg: "rgba(56,189,248,0.08)", border: "rgba(56,189,248,0.3)", color: "#38BDF8" },
         warning: { bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.3)", color: "#FBBF24" },
         success: { bg: "rgba(57,255,143,0.08)", border: "rgba(57,255,143,0.3)", color: "#39FF8F" },
-        tip: { bg: "rgba(201,168,76,0.08)", border: "rgba(201,168,76,0.3)", color: "#C9A84C" },
+        tip: { bg: "color-mix(in srgb, var(--accent) 8%, transparent)", border: "color-mix(in srgb, var(--accent) 30%, transparent)", color: "var(--accent)" },
         important: { bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.3)", color: "#EF4444" },
       }
       const bs = boxStyles[c.type||"info"]
@@ -2552,7 +2552,7 @@ interface TemplatePreviewModalProps {
 
 const PLAN_LABELS: Record<string, string> = { free: "Gratuit", starter: "Starter", pro: "Pro", business: "Business" }
 const MUTED = "#8A8478"
-const G = "#C9A84C"
+const G = "var(--accent)"
 
 export default function TemplatePreviewModal({
   template, blocks, onClose, onUse, canUse, isCreating
@@ -2717,7 +2717,7 @@ export default function TemplatePreviewModal({
         {/* ── Panneau info ───────────────────────────────────────────────── */}
         <div style={{
           flex: 1, background: "#0F0E0B",
-          border: "1px solid rgba(201,168,76,0.15)",
+          border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)",
           borderRadius: 20, padding: "24px",
           display: "flex", flexDirection: "column", gap: 20,
           maxHeight: "90vh", overflowY: "auto",
@@ -2773,7 +2773,7 @@ export default function TemplatePreviewModal({
               })}
          </div>
             {!canUse && blocks.length > 3 && (
-              <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", marginTop: 5, background: "rgba(201,168,76,0.06)", border: "1px dashed rgba(201,168,76,0.3)", borderRadius: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", marginTop: 5, background: "color-mix(in srgb, var(--accent) 6%, transparent)", border: "1px dashed color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8 }}>
                 <Lock size={11} color={template.color} />
                 <span style={{ color: MUTED, fontSize: 11, fontWeight: 500, flex: 1 }}>+{blocks.length - 3} blocs reserves au plan superieur</span>
               </div>
@@ -2812,9 +2812,9 @@ export default function TemplatePreviewModal({
               <X size={12} /> Fermer
             </button>
             <button type="button" onClick={onUse} disabled={!!isCreating}
-              style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "12px", background: canUse ? "linear-gradient(90deg,#C9A84C,#b8953f)" : "rgba(255,255,255,0.05)", border: canUse ? "none" : "1px solid rgba(255,255,255,0.08)", borderRadius: 11, color: canUse ? "#080808" : MUTED, fontSize: 13, fontWeight: 700, cursor: isCreating ? "wait" : canUse ? "pointer" : "not-allowed", opacity: isCreating ? 0.7 : 1, transition: "all 0.15s" }}>
+              style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "12px", background: canUse ? "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))" : "rgba(255,255,255,0.05)", border: canUse ? "none" : "1px solid rgba(255,255,255,0.08)", borderRadius: 11, color: canUse ? "#080808" : MUTED, fontSize: 13, fontWeight: 700, cursor: isCreating ? "wait" : canUse ? "pointer" : "not-allowed", opacity: isCreating ? 0.7 : 1, transition: "all 0.15s" }}>
               {isCreating
-                ? <><div style={{ width: 12, height: 12, border: "2px solid #C9A84C", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Création...</>
+                ? <><div style={{ width: 12, height: 12, border: "2px solid var(--accent)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Création...</>
                 : canUse
                   ? <><ArrowRight size={14} /> Utiliser ce template</>
                   : <><Lock size={12} /> Plan {PLAN_LABELS[template.plan]} requis</>

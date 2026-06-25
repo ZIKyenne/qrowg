@@ -43,7 +43,7 @@ type PeriodId = typeof PERIODS[number]["id"]
 
 const PAID_PLANS = ["pro", "business"]
 
-const G     = "#C9A84C"
+const G     = "var(--accent)"
 const MUTED = "#8A8478"
 
 // ── CSV helpers ───────────────────────────────────────────────────────────────
@@ -222,7 +222,7 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
   }, [isPaid, selected, period, customFrom, customTo, views, scans, clicks, blocks, geoScans, pageMap])
 
   return (
-    <div style={{ background: "#0F0E0B", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ background: "#0F0E0B", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
@@ -231,7 +231,7 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
             <Download size={16} color={G} />
             <h3 style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0 }}>Export CSV</h3>
             {isPaid ? (
-              <span style={{ background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 6, padding: "2px 8px", fontSize: 10, color: G, fontWeight: 700 }}>
+              <span style={{ background: "color-mix(in srgb, var(--accent) 15%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 6, padding: "2px 8px", fontSize: 10, color: G, fontWeight: 700 }}>
                 {plan?.toUpperCase()}
               </span>
             ) : (
@@ -262,7 +262,7 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
           <p style={{ color: MUTED, fontSize: 12, margin: "0 0 20px" }}>
             Exportez visites, scans, liens, blocs et géographie en CSV
           </p>
-          <a href="/upgrade" style={{ display: "inline-block", background: "linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius: 10, padding: "10px 24px", color: "#080808", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
+          <a href="/upgrade" style={{ display: "inline-block", background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 10, padding: "10px 24px", color: "#080808", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
             Passer au Pro
           </a>
         </div>
@@ -279,7 +279,7 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
                 const active = selected.has(ds.id)
                 return (
                   <button key={ds.id} type="button" onClick={() => toggleDataset(ds.id)}
-                    style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "12px 14px", background: active ? "rgba(201,168,76,0.08)" : "rgba(255,255,255,0.02)", border: active ? "1px solid rgba(201,168,76,0.4)" : "1px solid rgba(255,255,255,0.07)", borderRadius: 10, cursor: "pointer", textAlign: "left", transition: "all 0.15s" }}>
+                    style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "12px 14px", background: active ? "color-mix(in srgb, var(--accent) 8%, transparent)" : "rgba(255,255,255,0.02)", border: active ? "1px solid color-mix(in srgb, var(--accent) 40%, transparent)" : "1px solid rgba(255,255,255,0.07)", borderRadius: 10, cursor: "pointer", textAlign: "left", transition: "all 0.15s" }}>
                     <div style={{ width: 18, height: 18, borderRadius: 5, background: active ? G : "rgba(255,255,255,0.08)", border: active ? "none" : "1px solid rgba(255,255,255,0.15)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 1 }}>
                       {active && <span style={{ color: "#080808", fontSize: 12, fontWeight: 900, lineHeight: 1 }}>✓</span>}
                     </div>
@@ -303,7 +303,7 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
               {PERIODS.map(p => (
                 <button key={p.id} type="button" onClick={() => setPeriod(p.id)}
-                  style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: period === p.id ? "rgba(201,168,76,0.12)" : "rgba(255,255,255,0.03)", border: period === p.id ? "1px solid rgba(201,168,76,0.4)" : "1px solid rgba(255,255,255,0.07)", borderRadius: 9, color: period === p.id ? G : MUTED, fontSize: 12, fontWeight: period === p.id ? 700 : 500, cursor: "pointer", transition: "all 0.15s" }}>
+                  style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: period === p.id ? "color-mix(in srgb, var(--accent) 12%, transparent)" : "rgba(255,255,255,0.03)", border: period === p.id ? "1px solid color-mix(in srgb, var(--accent) 40%, transparent)" : "1px solid rgba(255,255,255,0.07)", borderRadius: 9, color: period === p.id ? G : MUTED, fontSize: 12, fontWeight: period === p.id ? 700 : 500, cursor: "pointer", transition: "all 0.15s" }}>
                   {p.id === "custom" && <Calendar size={12} />}
                   {p.label}
                 </button>
@@ -315,19 +315,19 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   <label style={{ color: MUTED, fontSize: 10, fontWeight: 600 }}>Du</label>
                   <input type="date" value={customFrom} onChange={e => setCustomFrom(e.target.value)}
-                    style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, color: "#F5F0E8", padding: "7px 10px", fontSize: 12, outline: "none", cursor: "pointer" }} />
+                    style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, color: "#F5F0E8", padding: "7px 10px", fontSize: 12, outline: "none", cursor: "pointer" }} />
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   <label style={{ color: MUTED, fontSize: 10, fontWeight: 600 }}>Au</label>
                   <input type="date" value={customTo} onChange={e => setCustomTo(e.target.value)}
-                    style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, color: "#F5F0E8", padding: "7px 10px", fontSize: 12, outline: "none", cursor: "pointer" }} />
+                    style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, color: "#F5F0E8", padding: "7px 10px", fontSize: 12, outline: "none", cursor: "pointer" }} />
                 </div>
               </div>
             )}
           </div>
 
           {/* Résumé + bouton */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "16px 20px", background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 12, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "16px 20px", background: "color-mix(in srgb, var(--accent) 5%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius: 12, flexWrap: "wrap" }}>
             <div>
               <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 600, margin: "0 0 3px" }}>
                 {selected.size} fichier{selected.size > 1 ? "s" : ""} · {PERIODS.find(p => p.id === period)?.label}
@@ -337,7 +337,7 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
               </p>
             </div>
             <button type="button" onClick={doExport} disabled={exporting || selected.size === 0}
-              style={{ display: "flex", alignItems: "center", gap: 8, padding: "11px 22px", background: selected.size === 0 ? "rgba(255,255,255,0.05)" : "linear-gradient(90deg,#C9A84C,#b8953f)", border: "none", borderRadius: 10, color: selected.size === 0 ? MUTED : "#080808", fontSize: 13, fontWeight: 700, cursor: selected.size === 0 || exporting ? "not-allowed" : "pointer", opacity: exporting ? 0.7 : 1, transition: "all 0.15s" }}>
+              style={{ display: "flex", alignItems: "center", gap: 8, padding: "11px 22px", background: selected.size === 0 ? "rgba(255,255,255,0.05)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border: "none", borderRadius: 10, color: selected.size === 0 ? MUTED : "#080808", fontSize: 13, fontWeight: 700, cursor: selected.size === 0 || exporting ? "not-allowed" : "pointer", opacity: exporting ? 0.7 : 1, transition: "all 0.15s" }}>
               {exporting
                 ? <><Loader size={14} style={{ animation: "spin 0.8s linear infinite" }} /> Export...</>
                 : <><Download size={14} /> Télécharger</>

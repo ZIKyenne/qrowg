@@ -24,7 +24,7 @@ const FREQ_CONFIG = {
     desc:    "Chaque lundi — résumé de la semaine passée",
     emoji:   "📅",
     detail:  "Visites · Scans · Liens · Croissance",
-    color:   "#C9A84C",
+    color:   "var(--accent)",
   },
   monthly: {
     label:   "Mensuel",
@@ -35,7 +35,7 @@ const FREQ_CONFIG = {
   },
 } as const
 
-const G     = "#C9A84C"
+const G     = "var(--accent)"
 const MUTED = "#8A8478"
 
 export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
@@ -89,7 +89,7 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
   }
 
   return (
-    <div style={{ background: "#0F0E0B", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ background: "#0F0E0B", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 20 }}>
@@ -115,7 +115,7 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
             Visites, scans, top liens et croissance<br />directement dans votre boîte mail
           </p>
           <a href="/upgrade"
-            style={{ display: "inline-block", background: "linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius: 10, padding: "10px 24px", color: "#080808", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
+            style={{ display: "inline-block", background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 10, padding: "10px 24px", color: "#080808", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
             Passer au Pro
           </a>
         </div>
@@ -139,7 +139,7 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
               ) : (
                 <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                   <input value={email} onChange={e => setEmail(e.target.value)} type="email"
-                    style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 7, color: "#F5F0E8", padding: "5px 10px", fontSize: 12, outline: "none", width: 200 }} />
+                    style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 7, color: "#F5F0E8", padding: "5px 10px", fontSize: 12, outline: "none", width: 200 }} />
                   <button type="button" onClick={() => setEditEmail(false)}
                     style={{ background: G, border: "none", borderRadius: 7, color: "#080808", padding: "5px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                     OK

@@ -25,7 +25,7 @@ interface Props {
   userDomains: string[]
 }
 
-const G     = "#C9A84C"
+const G     = "var(--accent)"
 const MUTED = "#8A8478"
 
 const TYPE_CFG = {
@@ -145,7 +145,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
             </p>
           </div>
           <button type="button" onClick={() => setShowForm(true)}
-            style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 20px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:11, color:"#080808", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+            style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 20px", background:"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border:"none", borderRadius:11, color:"#080808", fontSize:13, fontWeight:700, cursor:"pointer" }}>
             <Plus size={15}/> Ajouter une redirection
           </button>
         </div>
@@ -159,7 +159,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
               { icon:<ToggleLeft size={14} color={MUTED}/>,        label:"Inactives",value:inactive },
               { icon:<MousePointerClick size={14} color="#818CF8"/>,label:"Clics total",value:redirects.reduce((a,r)=>a+r.hit_count,0).toLocaleString() },
             ].map((k,i) => (
-              <div key={i} style={{ background:"#0F0E0B", border:"1px solid rgba(201,168,76,0.1)", borderRadius:11, padding:"12px 14px", display:"flex", alignItems:"center", gap:9 }}>
+              <div key={i} style={{ background:"#0F0E0B", border:"1px solid color-mix(in srgb, var(--accent) 10%, transparent)", borderRadius:11, padding:"12px 14px", display:"flex", alignItems:"center", gap:9 }}>
                 {k.icon}
                 <div>
                   <p style={{ color:MUTED, fontSize:10, textTransform:"uppercase", letterSpacing:1, margin:"0 0 2px" }}>{k.label}</p>
@@ -172,7 +172,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
 
         {/* Formulaire */}
         {showForm && (
-          <div style={{ background:"#0F0E0B", border:"1px solid rgba(201,168,76,0.2)", borderRadius:14, padding:22, marginBottom:24 }}>
+          <div style={{ background:"#0F0E0B", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:14, padding:22, marginBottom:24 }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:18 }}>
               <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:700, margin:0 }}>
                 {editId ? "✏️ Modifier la redirection" : "➕ Nouvelle redirection"}
@@ -226,7 +226,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
               <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:7 }}>Destination</label>
               <input value={fTo} onChange={e => setFTo(e.target.value)}
                 placeholder="https://nouveau-site.fr ou /nouvelle-page"
-                style={{ width:"100%", background:"#111009", border:`1px solid ${fTo ? "rgba(201,168,76,0.3)" : "rgba(255,255,255,0.1)"}`, borderRadius:9, color:"#F5F0E8", padding:"9px 12px", fontSize:12, outline:"none", boxSizing:"border-box" as const, transition:"border-color 0.15s" }}/>
+                style={{ width:"100%", background:"#111009", border:`1px solid ${fTo ? "color-mix(in srgb, var(--accent) 30%, transparent)" : "rgba(255,255,255,0.1)"}`, borderRadius:9, color:"#F5F0E8", padding:"9px 12px", fontSize:12, outline:"none", boxSizing:"border-box" as const, transition:"border-color 0.15s" }}/>
               {fTo && (
                 <p style={{ color:MUTED, fontSize:10, margin:"5px 0 0" }}>
                   ↳ <code style={{ color:"#39FF8F" }}>{fTo}</code>
@@ -255,7 +255,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
                 Annuler
               </button>
               <button type="button" onClick={save} disabled={!fTo || saving}
-                style={{ display:"flex", alignItems:"center", gap:7, padding:"9px 20px", background:fTo?"linear-gradient(90deg,#C9A84C,#b8953f)":"rgba(255,255,255,0.05)", border:"none", borderRadius:9, color:fTo?"#080808":MUTED, fontSize:13, fontWeight:700, cursor:fTo&&!saving?"pointer":"not-allowed", opacity:saving?0.7:1 }}>
+                style={{ display:"flex", alignItems:"center", gap:7, padding:"9px 20px", background:fTo?"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))":"rgba(255,255,255,0.05)", border:"none", borderRadius:9, color:fTo?"#080808":MUTED, fontSize:13, fontWeight:700, cursor:fTo&&!saving?"pointer":"not-allowed", opacity:saving?0.7:1 }}>
                 {saving ? <><Loader size={13} style={{ animation:"spin 0.8s linear infinite" }}/> Enregistrement…</> : <><CheckCircle size={13}/> {editId ? "Modifier" : "Créer la redirection"}</>}
               </button>
             </div>
@@ -275,7 +275,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
               Redirigez ancien-site.fr → nouveau-site.fr<br/>ou /page-a → /page-b
             </p>
             <button type="button" onClick={() => setShowForm(true)}
-              style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"10px 20px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+              style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"10px 20px", background:"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:"pointer" }}>
               <Plus size={14}/> Créer une redirection
             </button>
           </div>
@@ -316,7 +316,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
                         {toggling === r.id ? <Loader size={12} style={{ animation:"spin 0.8s linear infinite" }}/> : r.enabled ? <ToggleRight size={13}/> : <ToggleLeft size={13}/>}
                       </button>
                       <button type="button" onClick={() => openEdit(r)}
-                        style={{ width:28, height:28, background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.15)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:G }}>
+                        style={{ width:28, height:28, background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:G }}>
                         <Pencil size={12}/>
                       </button>
                       <a href={`https://${r.from_domain}${r.from_path}`} target="_blank" rel="noopener noreferrer"

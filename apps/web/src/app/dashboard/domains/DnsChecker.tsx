@@ -63,7 +63,7 @@ const CHECK_ICONS: Record<string, string> = {
   http:    "🌐",
 }
 
-const G     = "#C9A84C"
+const G     = "var(--accent)"
 const MUTED = "#8A8478"
 
 export default function DnsChecker({ domain, onVerified }: Props) {
@@ -102,7 +102,7 @@ export default function DnsChecker({ domain, onVerified }: Props) {
 
       {/* Bouton lancer la vérification */}
       <button type="button" onClick={runCheck} disabled={loading}
-        style={{ display:"flex", alignItems:"center", gap:8, padding:"9px 18px", background: loading ? "rgba(201,168,76,0.08)" : "rgba(201,168,76,0.12)", border:`1px solid rgba(201,168,76,0.3)`, borderRadius:9, color:G, fontSize:12, fontWeight:700, cursor:loading?"wait":"pointer", opacity:loading?0.8:1, transition:"all 0.15s", marginBottom: result ? 16 : 0 }}>
+        style={{ display:"flex", alignItems:"center", gap:8, padding:"9px 18px", background: loading ? "color-mix(in srgb, var(--accent) 8%, transparent)" : "color-mix(in srgb, var(--accent) 12%, transparent)", border:`1px solid color-mix(in srgb, var(--accent) 30%, transparent)`, borderRadius:9, color:G, fontSize:12, fontWeight:700, cursor:loading?"wait":"pointer", opacity:loading?0.8:1, transition:"all 0.15s", marginBottom: result ? 16 : 0 }}>
         {loading
           ? <><Loader size={13} style={{ animation:"spin 0.8s linear infinite" }}/> Vérification en cours…</>
           : result

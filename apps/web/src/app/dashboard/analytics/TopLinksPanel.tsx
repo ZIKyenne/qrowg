@@ -69,12 +69,12 @@ const BLOCK_TYPE_EMOJI: Record<string, string> = {
 }
 
 const CLICK_COLORS = [
-  "#C9A84C", "#39FF8F", "#7B61FF", "#FF6B6B",
+  "var(--accent)", "#39FF8F", "#7B61FF", "#FF6B6B",
   "#4ECDC4", "#FFE66D", "#F97316", "#E1306C",
   "#26A5E4", "#A78BFA",
 ]
 
-const G = "#C9A84C"
+const G = "var(--accent)"
 const MUTED = "#8A8478"
 const SURFACE = "rgba(255,255,255,0.03)"
 const BORDER = "rgba(255,255,255,0.07)"
@@ -93,7 +93,7 @@ function CustomTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null
   const d = payload[0].payload
   return (
-    <div style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 8, padding: "10px 14px", maxWidth: 220 }}>
+    <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "10px 14px", maxWidth: 220 }}>
       <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 700, margin: "0 0 4px", wordBreak: "break-all" }}>
         {d.label}
       </p>
@@ -168,7 +168,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages }: Props) {
   const totalClicks = filteredClicks.length
 
   return (
-    <div style={{ background: "#0F0E0B", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ background: "#0F0E0B", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20, gap: 12, flexWrap: "wrap" }}>
@@ -186,7 +186,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages }: Props) {
           {/* Filtre page */}
           {pages.length > 1 && (
             <select value={pageFilter} onChange={e => setPageFilter(e.target.value)}
-              style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 9, color: "#F5F0E8", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
+              style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 9, color: "#F5F0E8", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
               <option value="all">Toutes les pages</option>
               {pages.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
             </select>
@@ -209,7 +209,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages }: Props) {
             {SORT_OPTIONS.map(opt => (
               <button key={opt.value} type="button" onClick={() => setSortBy(opt.value as any)}
                 style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s",
-                  background: sortBy === opt.value ? "rgba(201,168,76,0.15)" : "transparent",
+                  background: sortBy === opt.value ? "color-mix(in srgb, var(--accent) 15%, transparent)" : "transparent",
                   color:      sortBy === opt.value ? G : MUTED }}>
                 {opt.label}
               </button>
@@ -221,7 +221,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages }: Props) {
             {(["table","chart"] as const).map(v => (
               <button key={v} type="button" onClick={() => setView(v)}
                 style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s",
-                  background: view === v ? "rgba(201,168,76,0.15)" : "transparent",
+                  background: view === v ? "color-mix(in srgb, var(--accent) 15%, transparent)" : "transparent",
                   color:      view === v ? G : MUTED }}>
                 {v === "table" ? "Tableau" : "Graphique"}
               </button>
@@ -264,7 +264,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages }: Props) {
                 angle={-30} textAnchor="end" interval={0}
                 axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: MUTED, fontSize: 10 }} axisLine={false} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(201,168,76,0.05)" }} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: "color-mix(in srgb, var(--accent) 5%, transparent)" }} />
               <Bar dataKey="clicks" radius={[6,6,0,0]}>
                 {linkData.map((_, i) => (
                   <Cell key={i} fill={CLICK_COLORS[i % CLICK_COLORS.length]} fillOpacity={0.85} />

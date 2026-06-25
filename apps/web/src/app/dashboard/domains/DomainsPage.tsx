@@ -38,7 +38,7 @@ const STATUS_CFG: Record<string, { label: string; color: string; icon: React.Rea
   error:   { label: "Erreur",       color: "#FF6B6B", icon: <AlertCircle size={13}/> },
 }
 
-const G     = "#C9A84C"
+const G     = "var(--accent)"
 const MUTED = "#8A8478"
 
 export default function DomainsPage({ pages, plan }: Props) {
@@ -155,7 +155,7 @@ export default function DomainsPage({ pages, plan }: Props) {
               Connectez emilien.fr, monrestaurant.com…<br/>directement à vos pages QRfolio.
             </p>
             <a href="/upgrade"
-              style={{ display:"inline-block", background:"linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius:10, padding:"11px 26px", color:"#080808", fontSize:13, fontWeight:700, textDecoration:"none" }}>
+              style={{ display:"inline-block", background:"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius:10, padding:"11px 26px", color:"#080808", fontSize:13, fontWeight:700, textDecoration:"none" }}>
               Passer au Pro
             </a>
           </div>
@@ -174,7 +174,7 @@ export default function DomainsPage({ pages, plan }: Props) {
 
             {/* Formulaire ajout */}
             {showForm && (
-              <div style={{ background:"#0F0E0B", border:`1px solid rgba(201,168,76,0.2)`, borderRadius:14, padding:22, marginBottom:20 }}>
+              <div style={{ background:"#0F0E0B", border:`1px solid color-mix(in srgb, var(--accent) 20%, transparent)`, borderRadius:14, padding:22, marginBottom:20 }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:18 }}>
                   <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:700, margin:0, display:"flex", alignItems:"center", gap:8 }}>
                     <Plus size={14} color={G}/> Nouveau domaine
@@ -192,7 +192,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                       value={fDomain}
                       onChange={e => setFDomain(e.target.value)}
                       placeholder="mondomaine.fr"
-                      style={{ width:"100%", background:"#111009", border:"1px solid rgba(201,168,76,0.2)", borderRadius:9, color:"#F5F0E8", padding:"10px 14px", fontSize:13, outline:"none", boxSizing:"border-box" }}
+                      style={{ width:"100%", background:"#111009", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:9, color:"#F5F0E8", padding:"10px 14px", fontSize:13, outline:"none", boxSizing:"border-box" }}
                     />
                     <p style={{ color:MUTED, fontSize:11, margin:"5px 0 0" }}>
                       Sans www. ni https:// — ex: mondomaine.fr
@@ -219,7 +219,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                       Annuler
                     </button>
                     <button type="button" onClick={addDomain} disabled={!fDomain || saving}
-                      style={{ display:"flex", alignItems:"center", gap:8, padding:"9px 20px", background:fDomain?"linear-gradient(90deg,#C9A84C,#b8953f)":"rgba(255,255,255,0.05)", border:"none", borderRadius:9, color:fDomain?"#080808":MUTED, fontSize:13, fontWeight:700, cursor:fDomain?"pointer":"not-allowed", opacity:saving?0.7:1 }}>
+                      style={{ display:"flex", alignItems:"center", gap:8, padding:"9px 20px", background:fDomain?"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))":"rgba(255,255,255,0.05)", border:"none", borderRadius:9, color:fDomain?"#080808":MUTED, fontSize:13, fontWeight:700, cursor:fDomain?"pointer":"not-allowed", opacity:saving?0.7:1 }}>
                       {saving ? <><Loader size={13} style={{ animation:"spin 0.8s linear infinite" }}/> Ajout...</> : <><Globe size={13}/> Ajouter</>}
                     </button>
                   </div>
@@ -238,7 +238,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                 <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:600, margin:"0 0 6px" }}>Aucun domaine configuré</p>
                 <p style={{ color:MUTED, fontSize:12, margin:"0 0 20px" }}>Ajoutez votre premier domaine personnalisé</p>
                 <button type="button" onClick={() => setShowForm(true)}
-                  style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"10px 20px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                  style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"10px 20px", background:"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:"pointer" }}>
                   <Plus size={14}/> Ajouter un domaine
                 </button>
               </div>
@@ -277,7 +277,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                           )}
                           {!rec.verified && (
                             <button type="button" onClick={() => setShowChecker(showChecker === rec.id ? null : rec.id)}
-                              style={{ display:"flex", alignItems:"center", gap:5, padding:"6px 12px", background: showChecker===rec.id ? "rgba(201,168,76,0.2)" : "rgba(201,168,76,0.1)", border:`1px solid rgba(201,168,76,0.25)`, borderRadius:8, color:G, fontSize:11, fontWeight:700, cursor:"pointer" }}>
+                              style={{ display:"flex", alignItems:"center", gap:5, padding:"6px 12px", background: showChecker===rec.id ? "color-mix(in srgb, var(--accent) 20%, transparent)" : "color-mix(in srgb, var(--accent) 10%, transparent)", border:`1px solid color-mix(in srgb, var(--accent) 25%, transparent)`, borderRadius:8, color:G, fontSize:11, fontWeight:700, cursor:"pointer" }}>
                               <RefreshCw size={12}/>
                               {showChecker === rec.id ? "Fermer" : "Vérifier DNS"}
                             </button>
@@ -357,7 +357,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                                     <span style={{ color:"#F5F0E8", fontSize:12 }}>www</span>
                                     <span style={{ color:"#F5F0E8", fontSize:12 }}>3600</span>
                                     <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                                      <code style={{ color:G, fontSize:11, background:"rgba(201,168,76,0.08)", padding:"3px 7px", borderRadius:5 }}>
+                                      <code style={{ color:G, fontSize:11, background:"color-mix(in srgb, var(--accent) 8%, transparent)", padding:"3px 7px", borderRadius:5 }}>
                                         cname.vercel-dns.com
                                       </code>
                                       <button type="button" onClick={() => copyText("cname.vercel-dns.com", `cname-${rec.id}`)}
@@ -422,7 +422,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                   ["4", "Votre domaine redirige vers votre page QRfolio"],
                 ].map(([step, text]) => (
                   <div key={step} style={{ display:"flex", gap:10, alignItems:"flex-start" }}>
-                    <span style={{ background:"rgba(201,168,76,0.15)", color:G, fontSize:10, fontWeight:700, width:18, height:18, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{step}</span>
+                    <span style={{ background:"color-mix(in srgb, var(--accent) 15%, transparent)", color:G, fontSize:10, fontWeight:700, width:18, height:18, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{step}</span>
                     <span style={{ color:MUTED, fontSize:12, lineHeight:1.5 }}>{text}</span>
                   </div>
                 ))}

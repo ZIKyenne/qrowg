@@ -42,7 +42,7 @@ const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json"
 const PERIODS = [{ v: 7, l: "7j" }, { v: 30, l: "30j" }, { v: 90, l: "90j" }]
 const MODES   = [{ v: "table", l: "Tableau" }, { v: "map", l: "Carte" }]
 
-const G     = "#C9A84C"
+const G     = "var(--accent)"
 const MUTED = "#8A8478"
 
 // ── Gradient de chaleur ───────────────────────────────────────────────────────
@@ -52,7 +52,7 @@ function heatColor(ratio: number): string {
   if (ratio < 0.25) return "#4a3a14"
   if (ratio < 0.5) return "#7a5c1a"
   if (ratio < 0.75) return "#b08228"
-  return "#C9A84C"
+  return "var(--accent)"
 }
 
 export default function GeoPanel({ scans, pageViews, pages }: Props) {
@@ -127,7 +127,7 @@ export default function GeoPanel({ scans, pageViews, pages }: Props) {
   byCountry.forEach(c => { countryMap[c.code] = c.total })
 
   return (
-    <div style={{ background: "#0F0E0B", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ background: "#0F0E0B", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
@@ -147,7 +147,7 @@ export default function GeoPanel({ scans, pageViews, pages }: Props) {
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
           {pages.length > 1 && (
             <select value={pageId} onChange={e => setPageId(e.target.value)}
-              style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 9, color: "#F5F0E8", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
+              style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 9, color: "#F5F0E8", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
               <option value="all">Toutes les pages</option>
               {pages.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
             </select>
@@ -165,7 +165,7 @@ export default function GeoPanel({ scans, pageViews, pages }: Props) {
           <div style={{ display: "flex", background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 3, gap: 3 }}>
             {MODES.map(o => (
               <button key={o.v} type="button" onClick={() => setMode(o.v as any)}
-                style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", background: mode === o.v ? "rgba(201,168,76,0.15)" : "transparent", color: mode === o.v ? G : MUTED }}>
+                style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", background: mode === o.v ? "color-mix(in srgb, var(--accent) 15%, transparent)" : "transparent", color: mode === o.v ? G : MUTED }}>
                 {o.l}
               </button>
             ))}
@@ -272,7 +272,7 @@ export default function GeoPanel({ scans, pageViews, pages }: Props) {
                 { icon: <ZoomOut size={14} />, action: () => setZoom(z => Math.max(z - 0.5, 1)) },
               ].map((btn, i) => (
                 <button key={i} type="button" onClick={btn.action}
-                  style={{ width: 28, height: 28, background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, color: G, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  style={{ width: 28, height: 28, background: "color-mix(in srgb, var(--accent) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 7, color: G, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   {btn.icon}
                 </button>
               ))}
@@ -280,7 +280,7 @@ export default function GeoPanel({ scans, pageViews, pages }: Props) {
 
             {/* Tooltip hover */}
             {hover && countryMap[hover] !== undefined && (
-              <div style={{ position: "absolute", top: 10, left: 10, zIndex: 10, background: "#111009", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 8, padding: "8px 12px", pointerEvents: "none" }}>
+              <div style={{ position: "absolute", top: 10, left: 10, zIndex: 10, background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "8px 12px", pointerEvents: "none" }}>
                 <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 700, margin: "0 0 3px" }}>{getName(hover)}</p>
                 <p style={{ color: G, fontSize: 11, margin: 0 }}>{countryMap[hover].toLocaleString()} visites</p>
               </div>
@@ -312,7 +312,7 @@ export default function GeoPanel({ scans, pageViews, pages }: Props) {
                             },
                             hover: {
                               fill: total > 0 ? "#e8c060" : "#2a2a1a",
-                              stroke: "#C9A84C",
+                              stroke: "var(--accent)",
                               strokeWidth: 1,
                               outline: "none",
                               cursor: "pointer",
@@ -332,7 +332,7 @@ export default function GeoPanel({ scans, pageViews, pages }: Props) {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 12 }}>
             <span style={{ color: MUTED, fontSize: 10 }}>Aucune visite</span>
             <div style={{ display: "flex", gap: 2 }}>
-              {["#1a1a0e", "#2a2210", "#4a3a14", "#7a5c1a", "#b08228", "#C9A84C"].map((c, i) => (
+              {["#1a1a0e", "#2a2210", "#4a3a14", "#7a5c1a", "#b08228", "var(--accent)"].map((c, i) => (
                 <div key={i} style={{ width: 20, height: 10, background: c, borderRadius: 2 }} />
               ))}
             </div>

@@ -35,7 +35,7 @@ interface Props {
   userEmail?: string
 }
 
-const GOLD = "#C9A84C"
+const GOLD = "var(--accent)"
 const NEON = "#39FF8F"
 const MUTED = "#8A8478"
 const COLORS = [GOLD, NEON, "#7B61FF", "#FF6B6B", "#4ECDC4", "#FFE66D"]
@@ -83,7 +83,7 @@ function buildSourceData(views: View[]) {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null
   return (
-    <div style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 8, padding: "10px 14px" }}>
+    <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "10px 14px" }}>
       <p style={{ color: "#8A8478", fontSize: 12, marginBottom: 4 }}>{label}</p>
       {payload.map((p: any, i: number) => (
         <p key={i} style={{ color: p.color, fontSize: 13, fontWeight: 600 }}>
@@ -129,7 +129,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             value={selectedPage}
             onChange={e => setSelectedPage(e.target.value)}
             style={{
-              background: "#111009", border: "1px solid rgba(201,168,76,0.3)",
+              background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)",
               borderRadius: 8, color: "#F5F0E8", padding: "8px 14px", fontSize: 14, cursor: "pointer"
             }}
           >
@@ -147,7 +147,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             { icon: <TrendingUp size={20} />, label: "Total scans", value: profile?.total_scans || 0, color: "#FF6B6B" },
           ].map((kpi, i) => (
             <div key={i} style={{
-              background: "#111009", border: "1px solid rgba(201,168,76,0.15)",
+              background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)",
               borderRadius: 12, padding: "20px 24px",
               display: "flex", alignItems: "center", gap: 16
             }}>
@@ -164,7 +164,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
 
         {/* Graphique principal — scans + vues */}
         <div style={{
-          background: "#111009", border: "1px solid rgba(201,168,76,0.15)",
+          background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)",
           borderRadius: 12, padding: "24px", marginBottom: 24
         }}>
           <h2 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 600, marginBottom: 20, marginTop: 0 }}>
@@ -197,7 +197,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
           {/* Device */}
           <div style={{
-            background: "#111009", border: "1px solid rgba(201,168,76,0.15)",
+            background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)",
             borderRadius: 12, padding: "24px"
           }}>
             <h2 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 600, marginBottom: 20, marginTop: 0, display: "flex", alignItems: "center", gap: 8 }}>
@@ -211,7 +211,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
                   <Pie data={deviceData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
                     {deviceData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
-                  <Tooltip contentStyle={{ background: "#111009", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 8 }} />
+                  <Tooltip contentStyle={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8 }} />
                 </PieChart>
               </ResponsiveContainer>
             )}
@@ -219,7 +219,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
 
           {/* Source */}
           <div style={{
-            background: "#111009", border: "1px solid rgba(201,168,76,0.15)",
+            background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)",
             borderRadius: 12, padding: "24px"
           }}>
             <h2 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 600, marginBottom: 20, marginTop: 0, display: "flex", alignItems: "center", gap: 8 }}>
@@ -303,7 +303,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
 
         {/* Top pages */}
         <div style={{
-          background: "#111009", border: "1px solid rgba(201,168,76,0.15)",
+          background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)",
           borderRadius: 12, padding: "24px"
         }}>
           <h2 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 600, marginBottom: 20, marginTop: 0 }}>

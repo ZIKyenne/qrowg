@@ -12,7 +12,7 @@ type Profile = { full_name: string | null; plan: string; total_scans: number; to
 const PLAN_CONFIG: Record<string, { color: string; label: string }> = {
   free: { color: "#8A8478", label: "Free" },
   starter: { color: "#38BDF8", label: "Starter" },
-  pro: { color: "#C9A84C", label: "Pro" },
+  pro: { color: "var(--accent)", label: "Pro" },
   business: { color: "#39FF8F", label: "Business" },
 }
 
@@ -101,7 +101,7 @@ export default function DashboardClient() {
   }
 
   const planCfg = PLAN_CONFIG[profile?.plan || "free"]
-  const G = "#C9A84C"; const MUTED = "#8A8478"
+  const G = "var(--accent)"; const MUTED = "#8A8478"
   const publishedCount = pages.filter(p => p.status === "published").length
   // Quota de vues mensuel (soft-cap : on alerte, on ne bloque jamais les pages publiques)
   const viewsLimit = getPlan(profile?.plan).limits.views // null = illimité
@@ -111,7 +111,7 @@ export default function DashboardClient() {
 
   if (loading) return (
     <div style={{ minHeight: "100vh", background: "#080808", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ width: 36, height: 36, border: "2px solid rgba(201,168,76,0.15)", borderTopColor: G, borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+      <div style={{ width: 36, height: 36, border: "2px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderTopColor: G, borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   )
@@ -142,14 +142,14 @@ export default function DashboardClient() {
             </div>
           </div>
           <Link href="/dashboard/templates"
-            style={{ display: "flex", alignItems: "center", gap: 8, background: "linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius: 12, padding: "10px 20px", color: "#080808", textDecoration: "none", fontSize: 14, fontWeight: 700, boxShadow: "0 4px 20px rgba(201,168,76,0.25)", flexShrink: 0 }}>
+            style={{ display: "flex", alignItems: "center", gap: 8, background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 12, padding: "10px 20px", color: "#080808", textDecoration: "none", fontSize: 14, fontWeight: 700, boxShadow: "0 4px 20px color-mix(in srgb, var(--accent) 25%, transparent)", flexShrink: 0 }}>
             <Plus size={16} /> Nouvelle page
           </Link>
         </div>
 
         {/* Soft-cap quota de vues : alerte (jamais de blocage des pages publiques) */}
         {(nearViews || overViews) && (
-          <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", background: overViews ? "rgba(255,107,107,0.08)" : "rgba(201,168,76,0.08)", border: "1px solid " + (overViews ? "rgba(255,107,107,0.3)" : "rgba(201,168,76,0.3)"), borderRadius: 14, padding: "14px 18px", marginBottom: 22 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", background: overViews ? "rgba(255,107,107,0.08)" : "color-mix(in srgb, var(--accent) 8%, transparent)", border: "1px solid " + (overViews ? "rgba(255,107,107,0.3)" : "color-mix(in srgb, var(--accent) 30%, transparent)"), borderRadius: 14, padding: "14px 18px", marginBottom: 22 }}>
             <AlertTriangle size={18} color={overViews ? "#FF6B6B" : G} style={{ flexShrink: 0 }} />
             <div style={{ flex: 1, minWidth: 220 }}>
               <p style={{ color: "#F5F0E8", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>
@@ -163,10 +163,10 @@ export default function DashboardClient() {
                   : "Tes pages restent en ligne sans interruption. Pense à monter en plan pour ne pas être limité."}
               </p>
               <div style={{ height: 5, borderRadius: 3, background: "rgba(255,255,255,0.08)", marginTop: 8, overflow: "hidden" }}>
-                <div style={{ height: "100%", width: Math.min(viewsPct, 100) + "%", background: overViews ? "linear-gradient(90deg,#FF6B6B,#F97316)" : "linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius: 3 }} />
+                <div style={{ height: "100%", width: Math.min(viewsPct, 100) + "%", background: overViews ? "linear-gradient(90deg,#FF6B6B,#F97316)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 3 }} />
               </div>
             </div>
-            <Link href="/upgrade" style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, background: overViews ? "linear-gradient(90deg,#FF6B6B,#F97316)" : "linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius: 10, padding: "9px 16px", color: "#080808", textDecoration: "none", fontSize: 12.5, fontWeight: 800 }}>
+            <Link href="/upgrade" style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, background: overViews ? "linear-gradient(90deg,#FF6B6B,#F97316)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 10, padding: "9px 16px", color: "#080808", textDecoration: "none", fontSize: 12.5, fontWeight: 800 }}>
               <Zap size={13} /> Augmenter mon quota
             </Link>
           </div>
@@ -180,7 +180,7 @@ export default function DashboardClient() {
             { icon: <BarChart2 size={18} />, label: "Vues ce mois", value: monthViews, color: overViews ? "#FF6B6B" : "#7B61FF", sub: viewsLimit ? `/ ${viewsLimit.toLocaleString("fr-FR")} ce mois` : "illimitées" },
             { icon: <Globe size={18} />, label: "Publiees", value: publishedCount, color: "#38BDF8", sub: "sur " + pages.length + " pages" },
           ].map((kpi, i) => (
-            <div key={i} style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 14, padding: "18px 20px", position: "relative", overflow: "hidden" }}>
+            <div key={i} style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 14, padding: "18px 20px", position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", top: -10, right: -10, width: 60, height: 60, borderRadius: "50%", background: "radial-gradient(circle," + kpi.color + "12,transparent 70%)" }} />
               <div style={{ color: kpi.color, background: kpi.color + "15", borderRadius: 8, padding: 8, width: "fit-content", marginBottom: 10 }}>{kpi.icon}</div>
               <p style={{ color: "#F5F0E8", fontSize: 28, fontWeight: 700, margin: "0 0 2px", fontFamily: "Cormorant Garamond, serif" }}>{kpi.value}</p>
@@ -194,7 +194,7 @@ export default function DashboardClient() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 28 }}>
 
           {/* Pages */}
-          <div style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 16, overflow: "hidden" }}>
+          <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, overflow: "hidden" }}>
             <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: 0 }}>Mes pages ({pages.length})</p>
               <Link href="/dashboard/templates" style={{ display: "flex", alignItems: "center", gap: 4, color: G, fontSize: 11, textDecoration: "none" }}>
@@ -206,7 +206,7 @@ export default function DashboardClient() {
                 <p style={{ fontSize: 32, margin: "0 0 10px" }}>📄</p>
                 <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 600, margin: "0 0 6px" }}>Aucune page</p>
                 <p style={{ color: MUTED, fontSize: 12, margin: "0 0 16px" }}>Cree ta premiere page avec un template</p>
-                <Link href="/dashboard/templates" style={{ background: "linear-gradient(90deg," + G + ",#b8953f)", color: "#080808", textDecoration: "none", padding: "8px 16px", borderRadius: 8, fontSize: 12, fontWeight: 700 }}>
+                <Link href="/dashboard/templates" style={{ background: "linear-gradient(90deg," + G + ",color-mix(in srgb, var(--accent) 75%, #000))", color: "#080808", textDecoration: "none", padding: "8px 16px", borderRadius: 8, fontSize: 12, fontWeight: 700 }}>
                   Choisir un template
                 </Link>
               </div>
@@ -254,19 +254,19 @@ export default function DashboardClient() {
           {/* Actions rapides */}
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {profile?.plan === "free" && (
-              <div style={{ background: "linear-gradient(135deg,rgba(201,168,76,0.1),rgba(57,255,143,0.05))", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 14, padding: "16px 18px" }}>
+              <div style={{ background: "linear-gradient(135deg,color-mix(in srgb, var(--accent) 10%, transparent),rgba(57,255,143,0.05))", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 14, padding: "16px 18px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                   <Zap size={16} color={G} />
                   <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 700, margin: 0 }}>Passe a Starter — {fmtPrice(getPlan("starter").priceMonthly)}€/mois</p>
                 </div>
                 <p style={{ color: MUTED, fontSize: 12, margin: "0 0 12px", lineHeight: 1.5 }}>{getPlan("starter").limits.pages} pages, {getPlan("starter").limits.views!.toLocaleString("fr-FR")} vues/mois, QR personnalises, sans branding</p>
-                <Link href="/upgrade" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "linear-gradient(90deg," + G + ",#b8953f)", color: "#080808", textDecoration: "none", padding: "9px", borderRadius: 8, fontSize: 12, fontWeight: 700 }}>
+                <Link href="/upgrade" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "linear-gradient(90deg," + G + ",color-mix(in srgb, var(--accent) 75%, #000))", color: "#080808", textDecoration: "none", padding: "9px", borderRadius: 8, fontSize: 12, fontWeight: 700 }}>
                   Voir les offres <ArrowRight size={11} />
                 </Link>
               </div>
             )}
 
-            <div style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 14, overflow: "hidden" }}>
+            <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 14, overflow: "hidden" }}>
               <div style={{ padding: "14px 18px", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
                 <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: 0 }}>Actions rapides</p>
               </div>

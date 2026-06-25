@@ -60,6 +60,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return () => window.removeEventListener("qrfolio-accent", onAccent)
   }, [])
 
+  // Expose l'accent en variable CSS globale -> toutes les pages du dashboard (et portails) la suivent
+  useEffect(() => {
+    document.documentElement.style.setProperty("--accent", accent)
+  }, [accent])
+
   useEffect(() => {
     if (mounted) {
       localStorage.setItem("qrfolio_sidebar", collapsed ? "collapsed" : "expanded")
@@ -87,7 +92,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div style={{ height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", padding: collapsed ? "0 14px" : "0 16px 0 20px", borderBottom: "1px solid rgba(201,168,76,0.08)", flexShrink: 0 }}>
           {/* Logo */}
           <Link href="/dashboard" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 8, overflow: "hidden" }}>
-            <div style={{ width: 28, height: 28, borderRadius: 8, background: `linear-gradient(135deg, ${G}, #b8953f)`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: `0 2px 8px ${G}40` }}>
+            <div style={{ width: 28, height: 28, borderRadius: 8, background: `linear-gradient(135deg, ${G}, color-mix(in srgb, var(--accent) 75%, #000))`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: `0 2px 8px ${G}40` }}>
               <QrCode size={14} color="#080808" />
             </div>
             {!collapsed && (
@@ -194,7 +199,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 padding: collapsed ? "8px 0" : "8px 10px",
                 justifyContent: collapsed ? "center" : "flex-start",
                 borderRadius: 9, overflow: "hidden", cursor: "pointer" }}>
-                <div style={{ width: 28, height: 28, borderRadius: "50%", background: `linear-gradient(135deg, ${G}, #b8953f)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#080808", flexShrink: 0 }}>
+                <div style={{ width: 28, height: 28, borderRadius: "50%", background: `linear-gradient(135deg, ${G}, color-mix(in srgb, var(--accent) 75%, #000))`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#080808", flexShrink: 0 }}>
                   {(profile?.full_name || user.email || "?")[0].toUpperCase()}
                 </div>
                 {!collapsed && (

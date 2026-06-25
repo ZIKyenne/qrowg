@@ -43,14 +43,14 @@ const GOAL_TYPES: Record<string, {
   phone:          { label: "Appel téléphone",  emoji: "📞", color: "#4ADE80", icon: <Phone size={14} />,        matchHint: "tel:",                    autoMatch: "tel:" },
   email:          { label: "Clic Email",       emoji: "📧", color: "#A78BFA", icon: <Mail size={14} />,         matchHint: "mailto:",                 autoMatch: "mailto:" },
   stripe_product: { label: "Achat produit",    emoji: "🛍️", color: "#39FF8F", icon: <ShoppingBag size={14} />, matchHint: "stripe.com ou buy.",      autoMatch: "stripe.com" },
-  cta_button:     { label: "Bouton CTA",       emoji: "🔘", color: "#C9A84C", icon: <MousePointerClick size={14} />, matchHint: "URL ou laisser vide", autoMatch: "" },
+  cta_button:     { label: "Bouton CTA",       emoji: "🔘", color: "var(--accent)", icon: <MousePointerClick size={14} />, matchHint: "URL ou laisser vide", autoMatch: "" },
   contact_form:   { label: "Formulaire contact",emoji: "📬", color: "#38BDF8", icon: <Mail size={14} />,        matchHint: "contact",                 autoMatch: "contact" },
   custom:         { label: "Personnalisé",     emoji: "⚡", color: "#FF6B6B", icon: <Zap size={14} />,          matchHint: "URL ou mot-clé",          autoMatch: "" },
 }
 
 const PERIODS = [{ v: 7, l: "7j" }, { v: 30, l: "30j" }, { v: 90, l: "90j" }]
 
-const G     = "#C9A84C"
+const G     = "var(--accent)"
 const MUTED = "#8A8478"
 const BG    = "#0F0E0B"
 
@@ -107,7 +107,7 @@ function calcConversions(goal: Goal, clicks: ClickRow[], views: ViewRow[]) {
 function MiniTip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   return (
-    <div style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 7, padding: "6px 10px" }}>
+    <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 7, padding: "6px 10px" }}>
       <p style={{ color: MUTED, fontSize: 10, margin: "0 0 2px" }}>{label}</p>
       <p style={{ color: G, fontSize: 13, fontWeight: 700, margin: 0 }}>{payload[0].value} conv.</p>
     </div>
@@ -129,7 +129,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
   const [fMatch,       setFMatch]       = useState("")
   const [fTarget,      setFTarget]      = useState("")
   const [fPeriod,      setFPeriod]      = useState(30)
-  const [fColor,       setFColor]       = useState("#C9A84C")
+  const [fColor,       setFColor]       = useState("var(--accent)")
   const [fPageId,      setFPageId]      = useState("all")
 
   useEffect(() => {
@@ -158,7 +158,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
       setGoals(prev => [d.goal, ...prev])
       setShowForm(false)
       setFName(""); setFDesc(""); setFType("whatsapp"); setFMatch("")
-      setFTarget(""); setFPeriod(30); setFColor("#C9A84C"); setFPageId("all")
+      setFTarget(""); setFPeriod(30); setFColor("var(--accent)"); setFPageId("all")
     }
     setSaving(false)
   }
@@ -199,7 +199,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
           </p>
         </div>
         <button type="button" onClick={() => setShowForm(true)}
-          style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 20px", background: "linear-gradient(90deg,#C9A84C,#b8953f)", border: "none", borderRadius: 11, color: "#080808", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+          style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 20px", background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border: "none", borderRadius: 11, color: "#080808", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
           <Plus size={15} /> Nouvel objectif
         </button>
       </div>
@@ -213,7 +213,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
             { icon: <CheckCircle size={14} color="#39FF8F" />, label: "En bonne voie",      value: String(goalsOnTrack) },
             { icon: <Zap size={14} color="#FF6B6B" />,         label: "Meilleur objectif",  value: bestGoal?.name ?? "—" },
           ].map((k, i) => (
-            <div key={i} style={{ background: BG, border: "1px solid rgba(201,168,76,0.1)", borderRadius: 12, padding: "14px 16px", display: "flex", alignItems: "center", gap: 10 }}>
+            <div key={i} style={{ background: BG, border: "1px solid color-mix(in srgb, var(--accent) 10%, transparent)", borderRadius: 12, padding: "14px 16px", display: "flex", alignItems: "center", gap: 10 }}>
               {k.icon}
               <div style={{ minWidth: 0 }}>
                 <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 3px" }}>{k.label}</p>
@@ -226,7 +226,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
 
       {/* Formulaire création */}
       {showForm && (
-        <div style={{ background: BG, border: "1px solid rgba(201,168,76,0.2)", borderRadius: 16, padding: 24, marginBottom: 28 }}>
+        <div style={{ background: BG, border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 16, padding: 24, marginBottom: 28 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
             <h3 style={{ fontSize: 14, fontWeight: 700, margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
               <Plus size={15} color={G} /> Créer un objectif
@@ -242,7 +242,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
             <div style={{ gridColumn: "1 / -1" }}>
               <label style={{ color: MUTED, fontSize: 11, fontWeight: 600, display: "block", marginBottom: 6 }}>Nom de l'objectif *</label>
               <input value={fName} onChange={e => setFName(e.target.value)} placeholder="ex: Clics WhatsApp juillet"
-                style={{ width: "100%", background: "#111009", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 9, color: "#F5F0E8", padding: "9px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                style={{ width: "100%", background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 9, color: "#F5F0E8", padding: "9px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
             </div>
 
             {/* Type d'objectif */}
@@ -297,7 +297,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
                 <input type="color" value={fColor} onChange={e => setFColor(e.target.value)}
                   style={{ width: 36, height: 28, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, background: "none", cursor: "pointer" }} />
                 <div style={{ display: "flex", gap: 5 }}>
-                  {["#C9A84C","#39FF8F","#818CF8","#FF6B6B","#38BDF8","#25D366"].map(c => (
+                  {["var(--accent)","#39FF8F","#818CF8","#FF6B6B","#38BDF8","#25D366"].map(c => (
                     <button key={c} type="button" onClick={() => setFColor(c)}
                       style={{ width: 18, height: 18, borderRadius: "50%", background: c, border: fColor === c ? "2px solid white" : "2px solid transparent", cursor: "pointer" }} />
                   ))}
@@ -312,7 +312,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
               Annuler
             </button>
             <button type="button" onClick={saveGoal} disabled={!fName || saving}
-              style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 20px", background: fName ? "linear-gradient(90deg,#C9A84C,#b8953f)" : "rgba(255,255,255,0.05)", border: "none", borderRadius: 9, color: fName ? "#080808" : MUTED, fontSize: 13, fontWeight: 700, cursor: fName ? "pointer" : "not-allowed", opacity: saving ? 0.7 : 1 }}>
+              style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 20px", background: fName ? "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))" : "rgba(255,255,255,0.05)", border: "none", borderRadius: 9, color: fName ? "#080808" : MUTED, fontSize: 13, fontWeight: 700, cursor: fName ? "pointer" : "not-allowed", opacity: saving ? 0.7 : 1 }}>
               {saving ? <><Loader size={13} style={{ animation: "spin 0.8s linear infinite" }} /> Création...</> : <><CheckCircle size={13} /> Créer l'objectif</>}
             </button>
           </div>
@@ -330,7 +330,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
           <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 600, margin: "0 0 6px" }}>Aucun objectif défini</p>
           <p style={{ color: MUTED, fontSize: 12, margin: "0 0 20px" }}>Créez votre premier objectif pour suivre vos conversions</p>
           <button type="button" onClick={() => setShowForm(true)}
-            style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 20px", background: "linear-gradient(90deg,#C9A84C,#b8953f)", border: "none", borderRadius: 10, color: "#080808", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+            style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 20px", background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border: "none", borderRadius: 10, color: "#080808", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
             <Plus size={14} /> Créer un objectif
           </button>
         </div>

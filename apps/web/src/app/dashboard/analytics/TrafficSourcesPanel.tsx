@@ -28,7 +28,7 @@ const SOURCE_CONFIG: Record<string, {
   color: string
   icon: React.ReactNode
 }> = {
-  qr_scan:   { label: "QR Scan",    emoji: "◼",  color: "#C9A84C", icon: <QrCode size={13} /> },
+  qr_scan:   { label: "QR Scan",    emoji: "◼",  color: "var(--accent)", icon: <QrCode size={13} /> },
   direct:    { label: "Direct",     emoji: "🔗", color: "#39FF8F", icon: <Globe size={13} /> },
   instagram: { label: "Instagram",  emoji: "📸", color: "#E1306C", icon: <Instagram size={13} /> },
   tiktok:    { label: "TikTok",     emoji: "🎵", color: "#FF0050", icon: <span style={{ fontSize: 12, fontWeight: 700 }}>TT</span> },
@@ -48,7 +48,7 @@ const PERIOD_OPTIONS = [
   { label: "90j", value: 90 },
 ]
 
-const G = "#C9A84C"
+const G = "var(--accent)"
 const MUTED = "#8A8478"
 const BG = "#0F0E0B"
 const SURFACE = "rgba(255,255,255,0.03)"
@@ -58,7 +58,7 @@ function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   const cfg = SOURCE_CONFIG[label] || SOURCE_CONFIG.referral
   return (
-    <div style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 8, padding: "10px 14px" }}>
+    <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "10px 14px" }}>
       <p style={{ color: cfg.color, fontSize: 12, fontWeight: 700, marginBottom: 4 }}>
         {cfg.emoji} {cfg.label}
       </p>
@@ -102,7 +102,7 @@ export default function TrafficSourcesPanel({ views, period: defaultPeriod = 30 
   const topSource = sourceData[0]
 
   return (
-    <div style={{ background: BG, border: "1px solid rgba(201,168,76,0.12)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ background: BG, border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
 
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20, gap: 12, flexWrap: "wrap" }}>
@@ -136,7 +136,7 @@ export default function TrafficSourcesPanel({ views, period: defaultPeriod = 30 
             {(["chart", "table"] as const).map(v => (
               <button key={v} type="button" onClick={() => setView(v)}
                 style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s",
-                  background: view === v ? "rgba(201,168,76,0.15)" : "transparent",
+                  background: view === v ? "color-mix(in srgb, var(--accent) 15%, transparent)" : "transparent",
                   color: view === v ? G : MUTED }}>
                 {v === "chart" ? "Graphique" : "Tableau"}
               </button>
@@ -182,7 +182,7 @@ export default function TrafficSourcesPanel({ views, period: defaultPeriod = 30 
                 tick={{ fill: MUTED, fontSize: 16 }}
                 axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: MUTED, fontSize: 10 }} axisLine={false} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(201,168,76,0.05)" }} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: "color-mix(in srgb, var(--accent) 5%, transparent)" }} />
               <Bar dataKey="visits" radius={[6, 6, 0, 0]}>
                 {sourceData.map((entry, i) => (
                   <Cell key={i} fill={entry.cfg.color} fillOpacity={0.85} />

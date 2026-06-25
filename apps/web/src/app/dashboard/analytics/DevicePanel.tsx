@@ -20,14 +20,14 @@ interface Props {
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const DEVICE_CFG: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
-  mobile:  { label: "Mobile",  icon: <Smartphone size={14} />, color: "#C9A84C" },
+  mobile:  { label: "Mobile",  icon: <Smartphone size={14} />, color: "var(--accent)" },
   tablet:  { label: "Tablette",icon: <Tablet size={14} />,     color: "#7B61FF" },
   desktop: { label: "Desktop", icon: <Monitor size={14} />,    color: "#39FF8F" },
   unknown: { label: "Inconnu", icon: <Cpu size={14} />,        color: "#8A8478" },
 }
 
 const OS_COLORS: Record<string, string> = {
-  ios:       "#C9A84C",
+  ios:       "var(--accent)",
   android:   "#39FF8F",
   windows:   "#38BDF8",
   macos:     "#A78BFA",
@@ -40,13 +40,13 @@ const BROWSER_COLORS: Record<string, string> = {
   safari:  "#38BDF8",
   firefox: "#FF6B6B",
   edge:    "#4ADE80",
-  samsung: "#C9A84C",
+  samsung: "var(--accent)",
   other:   "#8A8478",
 }
 
 const PERIODS = [{ v: 7, l: "7j" }, { v: 30, l: "30j" }, { v: 90, l: "90j" }]
 
-const G     = "#C9A84C"
+const G     = "var(--accent)"
 const MUTED = "#8A8478"
 
 // Normalise OS/browser vers une clé propre
@@ -92,7 +92,7 @@ function PieTip({ active, payload }: any) {
   if (!active || !payload?.length) return null
   const d = payload[0]
   return (
-    <div style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 8, padding: "8px 12px" }}>
+    <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "8px 12px" }}>
       <p style={{ color: d.payload.color || G, fontSize: 12, fontWeight: 700, margin: "0 0 3px" }}>{d.name}</p>
       <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 700, margin: 0 }}>{d.value} · {d.payload.pct}%</p>
     </div>
@@ -102,7 +102,7 @@ function PieTip({ active, payload }: any) {
 function BarTip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   return (
-    <div style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 8, padding: "8px 12px" }}>
+    <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "8px 12px" }}>
       <p style={{ color: G, fontSize: 12, fontWeight: 700, margin: "0 0 3px" }}>{label}</p>
       {payload.map((p: any, i: number) => (
         <p key={i} style={{ color: p.color, fontSize: 12, fontWeight: 600, margin: "2px 0" }}>
@@ -192,7 +192,7 @@ export default function DevicePanel({ scans, pageViews, pages }: Props) {
   const topDevice = deviceData[0]
 
   return (
-    <div style={{ background: "#0F0E0B", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ background: "#0F0E0B", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
@@ -212,7 +212,7 @@ export default function DevicePanel({ scans, pageViews, pages }: Props) {
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
           {pages.length > 1 && (
             <select value={pageId} onChange={e => setPageId(e.target.value)}
-              style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 9, color: "#F5F0E8", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
+              style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 9, color: "#F5F0E8", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
               <option value="all">Toutes les pages</option>
               {pages.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
             </select>
@@ -237,7 +237,7 @@ export default function DevicePanel({ scans, pageViews, pages }: Props) {
           { v: "browser", l: "Navigateur", icon: <Globe size={12} /> },
         ] as const).map(o => (
           <button key={o.v} type="button" onClick={() => setTab(o.v)}
-            style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", background: tab === o.v ? "rgba(201,168,76,0.15)" : "transparent", color: tab === o.v ? G : MUTED }}>
+            style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", background: tab === o.v ? "color-mix(in srgb, var(--accent) 15%, transparent)" : "transparent", color: tab === o.v ? G : MUTED }}>
             {o.icon}{o.l}
           </button>
         ))}
@@ -296,7 +296,7 @@ export default function DevicePanel({ scans, pageViews, pages }: Props) {
                   margin={{ top: 0, right: 20, bottom: 0, left: 60 }}>
                   <XAxis type="number" tick={{ fill: MUTED, fontSize: 10 }} axisLine={false} tickLine={false} />
                   <YAxis type="category" dataKey="name" width={58} tick={{ fill: "#F5F0E8", fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <Tooltip content={<BarTip />} cursor={{ fill: "rgba(201,168,76,0.05)" }} />
+                  <Tooltip content={<BarTip />} cursor={{ fill: "color-mix(in srgb, var(--accent) 5%, transparent)" }} />
                   <Bar dataKey="Visites" radius={[0, 6, 6, 0]}>
                     {activeData.map((entry, i) => (
                       <Cell key={i} fill={entry.color} fillOpacity={0.82} />

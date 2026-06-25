@@ -13,7 +13,7 @@ interface Props {
 
 type AvailStatus = "idle" | "checking" | "available" | "taken" | "invalid" | "own"
 
-const G     = "#C9A84C"
+const G     = "var(--accent)"
 const MUTED = "#8A8478"
 const APP   = "qrfolio.app"
 
@@ -140,7 +140,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
   }
 
   return (
-    <div style={{ background:"#0F0E0B", border:"1px solid rgba(201,168,76,0.12)", borderRadius:16, padding:24, fontFamily:"DM Sans, sans-serif" }}>
+    <div style={{ background:"#0F0E0B", border:"1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius:16, padding:24, fontFamily:"DM Sans, sans-serif" }}>
 
       {/* Header */}
       <div style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:20 }}>
@@ -182,7 +182,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
                   {copied ? <Check size={13}/> : <Copy size={13}/>}
                 </button>
                 <button type="button" onClick={() => { setInput(currentUsername); setEditing(true) }}
-                  style={{ width:30, height:30, background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:G, cursor:"pointer" }}>
+                  style={{ width:30, height:30, background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:G, cursor:"pointer" }}>
                   <Pencil size={13}/>
                 </button>
                 <button type="button" onClick={release} disabled={deleting}
@@ -212,7 +212,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
             <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:6 }}>
               Choisissez votre sous-domaine
             </label>
-            <div style={{ display:"flex", alignItems:"center", gap:0, background:"#111009", border:`1px solid ${status==="available"?"rgba(57,255,143,0.4)":status==="taken"||status==="invalid"?"rgba(255,107,107,0.3)":"rgba(201,168,76,0.2)"}`, borderRadius:10, overflow:"hidden", transition:"border-color 0.15s" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:0, background:"#111009", border:`1px solid ${status==="available"?"rgba(57,255,143,0.4)":status==="taken"||status==="invalid"?"rgba(255,107,107,0.3)":"color-mix(in srgb, var(--accent) 20%, transparent)"}`, borderRadius:10, overflow:"hidden", transition:"border-color 0.15s" }}>
               {/* Préfixe */}
               <div style={{ display:"flex", alignItems:"center", padding:"10px 12px", borderRight:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
                 <Globe size={13} color={MUTED} style={{ marginRight:4 }}/>
@@ -253,7 +253,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
               <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                 {suggestions.map(s => (
                   <button key={s} type="button" onClick={() => setInput(s)}
-                    style={{ padding:"5px 12px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:8, color:G, fontSize:11, fontWeight:600, cursor:"pointer" }}>
+                    style={{ padding:"5px 12px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:8, color:G, fontSize:11, fontWeight:600, cursor:"pointer" }}>
                     {s}.{APP}
                   </button>
                 ))}
@@ -297,7 +297,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
             )}
             <button type="button" onClick={save}
               disabled={status !== "available" || saving}
-              style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"10px 20px", background: status==="available" ? "linear-gradient(90deg,#C9A84C,#b8953f)" : "rgba(255,255,255,0.05)", border:"none", borderRadius:9, color: status==="available" ? "#080808" : MUTED, fontSize:13, fontWeight:700, cursor: status==="available" && !saving ? "pointer" : "not-allowed", opacity:saving?0.7:1, transition:"all 0.15s" }}>
+              style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"10px 20px", background: status==="available" ? "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))" : "rgba(255,255,255,0.05)", border:"none", borderRadius:9, color: status==="available" ? "#080808" : MUTED, fontSize:13, fontWeight:700, cursor: status==="available" && !saving ? "pointer" : "not-allowed", opacity:saving?0.7:1, transition:"all 0.15s" }}>
               {saving
                 ? <><Loader size={13} style={{ animation:"spin 0.7s linear infinite" }}/> Réservation…</>
                 : <><Check size={13}/> {currentUsername ? "Modifier le sous-domaine" : "Réserver ce sous-domaine"}</>

@@ -22,11 +22,11 @@ const TEMPLATE_BLOCKS: Record<string, any[]> = {"createur":[{"type":"profile","c
 interface Category { id: string; label: string; emoji: string; color: string }
 
 const BUSINESS_CATEGORIES: Category[] = [
-  { id: "Tous",        label: "Tous",        emoji: "✦",  color: "#C9A84C" },
+  { id: "Tous",        label: "Tous",        emoji: "✦",  color: "var(--accent)" },
   { id: "Restaurant",  label: "Restaurant",  emoji: "🍽️", color: "#EF4444" },
   { id: "Bar",         label: "Bar",         emoji: "🍸", color: "#F97316" },
   { id: "Cafe",        label: "Café",        emoji: "☕", color: "#92400E" },
-  { id: "Freelance",   label: "Freelance",   emoji: "💼", color: "#C9A84C" },
+  { id: "Freelance",   label: "Freelance",   emoji: "💼", color: "var(--accent)" },
   { id: "Consultant",  label: "Consultant",  emoji: "🎯", color: "#38BDF8" },
   { id: "Coach",       label: "Coach",       emoji: "🧘", color: "#4ADE80" },
   { id: "Agence",      label: "Agence",      emoji: "🏢", color: "#A78BFA" },
@@ -62,7 +62,7 @@ const CATEGORY_MAP: Record<string, string[]> = {
 }
 
 const TEMPLATES: any[] = [
-  { id: "freelance", name: "Freelance Pro", category: "Business", plan: "free", description: "Portfolio, services, tarifs, prise de contact", emoji: "💼", color: "#C9A84C", accent: "#39FF8F", bg: "#080808", surface: "#111009", tags: ["Services", "Tarifs", "Contact", "Calendly"] },
+  { id: "freelance", name: "Freelance Pro", category: "Business", plan: "free", description: "Portfolio, services, tarifs, prise de contact", emoji: "💼", color: "var(--accent)", accent: "#39FF8F", bg: "#080808", surface: "#111009", tags: ["Services", "Tarifs", "Contact", "Calendly"] },
   { id: "restaurant", name: "Restaurant & Bar", category: "Food", plan: "free", description: "Menu, horaires, reservation, reseaux", emoji: "🍽️", color: "#EF4444", accent: "#F97316", bg: "#0D0505", surface: "#1A0A0A", tags: ["Menu", "Horaires", "Carte", "Reservation"] },
   { id: "artiste", name: "Artiste & Musicien", category: "Creatif", plan: "free", description: "Bio, musique, concerts, reseaux sociaux", emoji: "🎵", color: "#A78BFA", accent: "#F472B6", bg: "#0A0510", surface: "#130A20", tags: ["Spotify", "Concerts", "Reseaux", "Bio"] },
   { id: "coach", name: "Coach & Therapeute", category: "Bien-etre", plan: "free", description: "Presentation, methode, temoignages, RDV", emoji: "🧘", color: "#4ADE80", accent: "#86EFAC", bg: "#040D06", surface: "#081A0C", tags: ["Services", "Temoignages", "Tarifs", "RDV"] },
@@ -81,7 +81,7 @@ const TEMPLATES: any[] = [
 const PLAN_CONFIG: Record<string, { label: string; color: string; icon: string }> = {
   free:     { label: "Gratuit",  color: "#8A8478", icon: "✦"  },
   starter:  { label: "Starter",  color: "#38BDF8", icon: "⚡" },
-  pro:      { label: "Pro",      color: "#C9A84C", icon: "🔥" },
+  pro:      { label: "Pro",      color: "var(--accent)", icon: "🔥" },
   business: { label: "Business", color: "#39FF8F", icon: "👑" },
 }
 const FAV_KEY = "qrfolio_fav_templates"
@@ -155,7 +155,7 @@ export default function TemplatesPage() {
 
   // Thèmes complets par template (utilise les PRESET_THEMES officiels)
   const TEMPLATE_THEMES: Record<string, any> = {
-    freelance:      { name:"Midnight Gold",bg:"#080808",surface:"#111009",primary:"#C9A84C",accent:"#39FF8F",text:"#F5F0E8",muted:"#8A8478",fontDisplay:"Cormorant Garamond",fontBody:"DM Sans",bgMode:"solid",effect_glow:true,glow_color:"#C9A84C",glow_intensity:20,glow_size:350 },
+    freelance:      { name:"Midnight Gold",bg:"#080808",surface:"#111009",primary:"var(--accent)",accent:"#39FF8F",text:"#F5F0E8",muted:"#8A8478",fontDisplay:"Cormorant Garamond",fontBody:"DM Sans",bgMode:"solid",effect_glow:true,glow_color:"var(--accent)",glow_intensity:20,glow_size:350 },
     restaurant:     { name:"Sunset Fire",bg:"#120300",surface:"#200800",primary:"#FF6B00",accent:"#FF4500",text:"#FFF5EE",muted:"#9A5020",fontDisplay:"Playfair Display",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#120300,#1F0600)",effect_vignette:true,vignette_intensity:60 },
     artiste:        { name:"Velvet Noir",bg:"#070508",surface:"#0F0A12",primary:"#C4A6E8",accent:"#F472B6",text:"#F5F0FF",muted:"#7A6A9A",fontDisplay:"Cormorant Garamond",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#070508,#100818)",effect_glow:true,glow_color:"#A78BFA",glow_intensity:25,glow_size:350 },
     coach:          { name:"Zen Wellness",bg:"#F5FFF5",surface:"#EAFAEA",primary:"#059669",accent:"#34D399",text:"#064E3B",muted:"#407A60",fontDisplay:"DM Sans",fontBody:"DM Sans",bgMode:"solid" },
@@ -166,7 +166,7 @@ export default function TemplatesPage() {
     agence:         { name:"Deep Space",bg:"#020B16",surface:"#071828",primary:"#00D4FF",accent:"#7B2FBE",text:"#EEF8FF",muted:"#5A7A9A",fontDisplay:"Space Grotesk",fontBody:"Inter",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#020B16,#071828)" },
     medecin:        { name:"Zen Wellness",bg:"#F5FFF5",surface:"#EAFAEA",primary:"#059669",accent:"#34D399",text:"#064E3B",muted:"#407A60",fontDisplay:"DM Sans",fontBody:"DM Sans",bgMode:"solid" },
     vente_produits: { name:"Velvet Noir",bg:"#070508",surface:"#0F0A12",primary:"#C4A6E8",accent:"#F472B6",text:"#F5F0FF",muted:"#7A6A9A",fontDisplay:"Cormorant Garamond",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#070508,#100818)" },
-    immobilier:     { name:"Prestige Immo",bg:"#0C0C0C",surface:"#161616",primary:"#D4AF37",accent:"#C9A84C",text:"#F5F0E0",muted:"#8A7840",fontDisplay:"Cormorant Garamond",fontBody:"DM Sans",bgMode:"solid",effect_glow:true,glow_color:"#D4AF37",glow_intensity:15,glow_size:400 },
+    immobilier:     { name:"Prestige Immo",bg:"#0C0C0C",surface:"#161616",primary:"#D4AF37",accent:"var(--accent)",text:"#F5F0E0",muted:"#8A7840",fontDisplay:"Cormorant Garamond",fontBody:"DM Sans",bgMode:"solid",effect_glow:true,glow_color:"#D4AF37",glow_intensity:15,glow_size:400 },
     startup:        { name:"Aurora",bg:"#080E1E",surface:"#0E1830",primary:"#00FF9D",accent:"#00CFFF",text:"#E8FFF5",muted:"#409898",fontDisplay:"Space Grotesk",fontBody:"Inter",bgMode:"mesh",mesh_c1:"#00FF9D",mesh_c2:"#00CFFF",mesh_c3:"#7B2FBE",mesh_blur:100 },
     influenceur:    { name:"Golden Luxury",bg:"#060400",surface:"#120D00",primary:"#D4A843",accent:"#FFC940",text:"#FFF3D0",muted:"#8A7030",fontDisplay:"Cormorant Garamond",fontBody:"Lora",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#060400,#130E00,#060400)" },
   }
@@ -209,7 +209,7 @@ export default function TemplatesPage() {
       setCreating(null)
     }
   }
-  const G = "#C9A84C"
+  const G = "var(--accent)"
   const MUTED = "#8A8478"
   const previewTemplate  = TEMPLATES.find((t: any) => t.id === preview)
   const selectedTemplate = TEMPLATES.find((t: any) => t.id === selected)
@@ -220,7 +220,7 @@ export default function TemplatesPage() {
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
       <div style={{ padding: "40px 24px 0", textAlign: "center", maxWidth: 960, margin: "0 auto" }}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 20, padding: "5px 14px", marginBottom: 16 }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 20, padding: "5px 14px", marginBottom: 16 }}>
           <Sparkles size={13} color={G} />
           <span style={{ color: G, fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase" }}>Templates</span>
         </div>
@@ -235,7 +235,7 @@ export default function TemplatesPage() {
         <div style={{ position: "relative", maxWidth: 420, margin: "0 auto 24px", width: "100%" }}>
           <Search size={14} style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", color: MUTED, pointerEvents: "none" }} />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher un template, un secteur..."
-            style={{ width: "100%", background: "#111009", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 12, padding: "11px 14px 11px 38px", color: "#F5F0E8", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+            style={{ width: "100%", background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius: 12, padding: "11px 14px 11px 38px", color: "#F5F0E8", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
           {search && (
             <button type="button" onClick={() => setSearch("")} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: MUTED, padding: 4 }}>
               <X size={12} />
@@ -264,7 +264,7 @@ export default function TemplatesPage() {
 
         {/* ── Filtres Plan ────────────────────────────────────────────────── */}
         <div style={{ display: "flex", gap: 7, justifyContent: "center", flexWrap: "wrap", marginBottom: 32 }}>
-          {([["all", "Tous les plans", "#8A8478"], ["free", "Gratuit ✦", "#8A8478"], ["starter", "Starter ⚡", "#38BDF8"], ["pro", "Pro 🔥", "#C9A84C"]] as [string, string, string][]).map(([plan, label, color]) => (
+          {([["all", "Tous les plans", "#8A8478"], ["free", "Gratuit ✦", "#8A8478"], ["starter", "Starter ⚡", "#38BDF8"], ["pro", "Pro 🔥", "var(--accent)"]] as [string, string, string][]).map(([plan, label, color]) => (
             <button key={plan} type="button" onClick={() => setActivePlan(plan)}
               style={{ background: activePlan === plan ? color + "18" : "transparent", border: "1px solid " + (activePlan === plan ? color + "50" : "rgba(255,255,255,0.08)"), borderRadius: 20, padding: "6px 14px", color: activePlan === plan ? color : MUTED, fontSize: 12, fontWeight: activePlan === plan ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
               {label}
@@ -283,7 +283,7 @@ export default function TemplatesPage() {
             <span style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 600 }}>
               {activeMetier === "Tous" ? "Tous les templates" : activeCat?.label}
             </span>
-            <span style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 10, padding: "2px 9px", color: G, fontSize: 11, fontWeight: 700 }}>
+            <span style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 10, padding: "2px 9px", color: G, fontSize: 11, fontWeight: 700 }}>
               {filtered.length} résultat{filtered.length > 1 ? "s" : ""}
             </span>
           </div>
@@ -301,7 +301,7 @@ export default function TemplatesPage() {
             <p style={{ fontSize: 15, marginBottom: 8 }}>Aucun template trouvé</p>
             <p style={{ fontSize: 12, marginBottom: 20 }}>Essayez un autre secteur ou modifiez votre recherche</p>
             <button type="button" onClick={() => { setSearch(""); setActiveMetier("Tous"); setActivePlan("all") }}
-              style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 10, padding: "9px 18px", color: G, fontSize: 12, cursor: "pointer" }}>
+              style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 10, padding: "9px 18px", color: G, fontSize: 12, cursor: "pointer" }}>
               Voir tous les templates
             </button>
           </div>
@@ -322,12 +322,12 @@ export default function TemplatesPage() {
                   onMouseLeave={() => setHoveredCard(null)}
                   onClick={() => { if (!locked) setSelected(isSelected ? null : template.id) }}
                   style={{
-                    background: isSelected ? "rgba(201,168,76,0.05)" : "#0F0E0B",
-                    border: "1.5px solid " + (isSelected ? "rgba(201,168,76,0.5)" : isHovered ? "rgba(201,168,76,0.2)" : "rgba(255,255,255,0.06)"),
+                    background: isSelected ? "color-mix(in srgb, var(--accent) 5%, transparent)" : "#0F0E0B",
+                    border: "1.5px solid " + (isSelected ? "color-mix(in srgb, var(--accent) 50%, transparent)" : isHovered ? "color-mix(in srgb, var(--accent) 20%, transparent)" : "rgba(255,255,255,0.06)"),
                     borderRadius: 18, overflow: "hidden", cursor: locked ? "not-allowed" : "pointer",
                     transition: "all 0.2s", transform: isSelected ? "translateY(-2px)" : isHovered ? "translateY(-1px)" : "none",
                     opacity: locked ? 0.6 : 1, position: "relative",
-                    boxShadow: isSelected ? "0 8px 32px rgba(201,168,76,0.12)" : isHovered ? "0 4px 20px rgba(0,0,0,0.4)" : "0 2px 8px rgba(0,0,0,0.2)"
+                    boxShadow: isSelected ? "0 8px 32px color-mix(in srgb, var(--accent) 12%, transparent)" : isHovered ? "0 4px 20px rgba(0,0,0,0.4)" : "0 2px 8px rgba(0,0,0,0.2)"
                   }}>
 
                   {/* ── Aperçu visuel ──────────────────────────────────────── */}
@@ -435,8 +435,8 @@ export default function TemplatesPage() {
                       {/* Utiliser */}
                       <button type="button" onClick={(e) => { e.stopPropagation(); if (!locked) setNamingFor(template.id) }}
                         disabled={!!creating || locked}
-                        style={{ flex: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "8px 12px", background: locked ? "rgba(255,255,255,0.04)" : isCreating ? "rgba(201,168,76,0.2)" : "linear-gradient(90deg,#C9A84C,#b8953f)", border: locked ? "1px solid rgba(255,255,255,0.08)" : "none", borderRadius: 9, color: locked ? MUTED : "#080808", fontSize: 11, fontWeight: 700, cursor: locked || creating ? "not-allowed" : "pointer", opacity: creating && !isCreating ? 0.5 : 1, transition: "all 0.15s" }}>
-                        {isCreating ? <><div style={{ width: 10, height: 10, border: "1.5px solid #C9A84C", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Création...</> : locked ? <><Lock size={10} /> {PLAN_CONFIG[template.plan].label}</> : <>Utiliser <ArrowRight size={10} /></>}
+                        style={{ flex: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "8px 12px", background: locked ? "rgba(255,255,255,0.04)" : isCreating ? "color-mix(in srgb, var(--accent) 20%, transparent)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border: locked ? "1px solid rgba(255,255,255,0.08)" : "none", borderRadius: 9, color: locked ? MUTED : "#080808", fontSize: 11, fontWeight: 700, cursor: locked || creating ? "not-allowed" : "pointer", opacity: creating && !isCreating ? 0.5 : 1, transition: "all 0.15s" }}>
+                        {isCreating ? <><div style={{ width: 10, height: 10, border: "1.5px solid var(--accent)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Création...</> : locked ? <><Lock size={10} /> {PLAN_CONFIG[template.plan].label}</> : <>Utiliser <ArrowRight size={10} /></>}
                       </button>
                     </div>
                   </div>
@@ -474,7 +474,7 @@ export default function TemplatesPage() {
 
       {/* ── Barre de sélection fixe ───────────────────────────────────────── */}
       {selected && selectedTemplate && (
-        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 100, padding: "12px 20px", background: "rgba(8,8,8,0.95)", borderTop: "1px solid rgba(201,168,76,0.2)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
+        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 100, padding: "12px 20px", background: "rgba(8,8,8,0.95)", borderTop: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
           <span style={{ fontSize: 20 }}>{selectedTemplate.emoji}</span>
           <div style={{ flex: 1, maxWidth: 400 }}>
             <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 600, margin: 0 }}>{selectedTemplate.name}</p>
@@ -484,7 +484,7 @@ export default function TemplatesPage() {
             <X size={12} /> Annuler
           </button>
           <button type="button" onClick={() => setNamingFor(selected!)} disabled={!!creating}
-            style={{ display: "flex", alignItems: "center", gap: 7, background: creating ? "rgba(201,168,76,0.2)" : "linear-gradient(90deg,#C9A84C,#b8953f)", border: "none", borderRadius: 9, padding: "9px 20px", color: "#080808", fontSize: 13, fontWeight: 700, cursor: creating ? "wait" : "pointer", opacity: creating ? 0.7 : 1 }}>
+            style={{ display: "flex", alignItems: "center", gap: 7, background: creating ? "color-mix(in srgb, var(--accent) 20%, transparent)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border: "none", borderRadius: 9, padding: "9px 20px", color: "#080808", fontSize: 13, fontWeight: 700, cursor: creating ? "wait" : "pointer", opacity: creating ? 0.7 : 1 }}>
             {creating === selected ? "Création en cours..." : <><ArrowRight size={12} /> Utiliser ce template</>}
           </button>
         </div>
@@ -554,7 +554,7 @@ function NamingModal({ template, blockCount, onClose, onCreate }: {
   onClose: () => void
   onCreate: (name: string, slug: string, description: string) => Promise<{ ok?: boolean; error?: string }>
 }) {
-  const G = "#C9A84C"
+  const G = "var(--accent)"
   const MUTED = "#8A8478"
   const [name, setName] = useState(template.name || "")
   const [slug, setSlug] = useState("")
@@ -608,14 +608,14 @@ function NamingModal({ template, blockCount, onClose, onCreate }: {
   }
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)",
+    width: "100%", background: "#0A0A0A", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)",
     borderRadius: 8, padding: "10px 12px", color: "#F5F0E8", fontSize: 13,
     outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif",
   }
 
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 9998, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#0F0F0F", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 20, padding: 24, width: "100%", maxWidth: 440, boxShadow: "0 20px 60px rgba(0,0,0,0.8)", maxHeight: "90vh", overflowY: "auto" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0F0F0F", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 20, padding: 24, width: "100%", maxWidth: 440, boxShadow: "0 20px 60px rgba(0,0,0,0.8)", maxHeight: "90vh", overflowY: "auto" }}>
 
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
@@ -649,7 +649,7 @@ function NamingModal({ template, blockCount, onClose, onCreate }: {
           {(slugStatus === "taken") && suggestions.length > 0 && (
             <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 7 }}>
               {suggestions.map(s => (
-                <button key={s} onClick={() => { setSlugTouched(true); setSlug(s) }} style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 6, padding: "3px 8px", color: G, fontSize: 10, cursor: "pointer", fontFamily: "monospace" }}>{s}</button>
+                <button key={s} onClick={() => { setSlugTouched(true); setSlug(s) }} style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 6, padding: "3px 8px", color: G, fontSize: 10, cursor: "pointer", fontFamily: "monospace" }}>{s}</button>
               ))}
             </div>
           )}
@@ -668,7 +668,7 @@ function NamingModal({ template, blockCount, onClose, onCreate }: {
         <div style={{ display: "flex", gap: 9 }}>
           <button onClick={onClose} style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "11px", color: MUTED, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Annuler</button>
           <button onClick={handleCreate} disabled={!canSubmit}
-            style={{ flex: 2, background: canSubmit ? "linear-gradient(90deg,#C9A84C,#b8953f)" : "rgba(201,168,76,0.2)", border: "none", borderRadius: 10, padding: "11px", color: canSubmit ? "#080808" : MUTED, fontSize: 13, fontWeight: 700, cursor: canSubmit ? "pointer" : "not-allowed" }}>
+            style={{ flex: 2, background: canSubmit ? "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))" : "color-mix(in srgb, var(--accent) 20%, transparent)", border: "none", borderRadius: 10, padding: "11px", color: canSubmit ? "#080808" : MUTED, fontSize: 13, fontWeight: 700, cursor: canSubmit ? "pointer" : "not-allowed" }}>
             {submitting ? "Creation…" : "Creer ma page"}
           </button>
         </div>

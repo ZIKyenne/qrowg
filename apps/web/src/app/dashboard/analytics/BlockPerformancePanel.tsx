@@ -22,7 +22,7 @@ interface Props {
 
 // ── Config par type de bloc ───────────────────────────────────────────────────
 const CFG: Record<string, { label: string; emoji: string; color: string; interactive: boolean }> = {
-  cta_button:     { label: "Bouton CTA",    emoji: "🔘", color: "#C9A84C", interactive: true  },
+  cta_button:     { label: "Bouton CTA",    emoji: "🔘", color: "var(--accent)", interactive: true  },
   social_links:   { label: "Liens sociaux", emoji: "🔗", color: "#38BDF8", interactive: true  },
   whatsapp:       { label: "WhatsApp",      emoji: "💬", color: "#25D366", interactive: true  },
   stripe_product: { label: "Produit",       emoji: "📦", color: "#39FF8F", interactive: true  },
@@ -32,7 +32,7 @@ const CFG: Record<string, { label: string; emoji: string; color: string; interac
   google_maps:    { label: "Maps",          emoji: "📍", color: "#34D399", interactive: true  },
   instagram_feed: { label: "Instagram",     emoji: "📸", color: "#E1306C", interactive: true  },
   gallery:        { label: "Galerie",       emoji: "🖼️", color: "#A78BFA", interactive: true  },
-  profile:        { label: "Profil",        emoji: "👤", color: "#C9A84C", interactive: false },
+  profile:        { label: "Profil",        emoji: "👤", color: "var(--accent)", interactive: false },
   bio:            { label: "Bio",           emoji: "📝", color: "#8A8478", interactive: false },
   testimonials:   { label: "Avis",          emoji: "⭐", color: "#FFD700", interactive: false },
   visit_counter:  { label: "Compteur",      emoji: "📊", color: "#67E8F9", interactive: false },
@@ -42,12 +42,12 @@ const CFG: Record<string, { label: string; emoji: string; color: string; interac
   divider:        { label: "Séparateur",    emoji: "—",  color: "#444",    interactive: false },
 }
 
-const getCfg = (type: string) => CFG[type] ?? { label: type, emoji: "📦", color: "#C9A84C", interactive: true }
+const getCfg = (type: string) => CFG[type] ?? { label: type, emoji: "📦", color: "var(--accent)", interactive: true }
 
 const PERIODS = [{ v: 7, l: "7j" }, { v: 30, l: "30j" }, { v: 90, l: "90j" }]
 const SORTS   = [{ v: "clicks", l: "Clics" }, { v: "ctr", l: "CTR" }, { v: "count", l: "Blocs" }]
 
-const G     = "#C9A84C"
+const G     = "var(--accent)"
 const MUTED = "#8A8478"
 
 // ── Tooltip ───────────────────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ function Tip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   const cfg = getCfg(label)
   return (
-    <div style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 8, padding: "10px 14px" }}>
+    <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "10px 14px" }}>
       <p style={{ color: cfg.color, fontWeight: 700, fontSize: 12, margin: "0 0 6px" }}>
         {cfg.emoji} {cfg.label}
       </p>
@@ -143,7 +143,7 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
     }))
 
   return (
-    <div style={{ background: "#0F0E0B", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ background: "#0F0E0B", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
@@ -163,7 +163,7 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
           {pages.length > 1 && (
             <select value={pageId} onChange={e => setPageId(e.target.value)}
-              style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 9, color: "#F5F0E8", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
+              style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 9, color: "#F5F0E8", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
               <option value="all">Toutes les pages</option>
               {pages.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
             </select>
@@ -181,7 +181,7 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
           <div style={{ display: "flex", background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 3, gap: 3 }}>
             {SORTS.map(o => (
               <button key={o.v} type="button" onClick={() => setSortBy(o.v)}
-                style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", background: sortBy === o.v ? "rgba(201,168,76,0.15)" : "transparent", color: sortBy === o.v ? G : MUTED }}>
+                style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", background: sortBy === o.v ? "color-mix(in srgb, var(--accent) 15%, transparent)" : "transparent", color: sortBy === o.v ? G : MUTED }}>
                 {o.l}
               </button>
             ))}
@@ -190,7 +190,7 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
           <div style={{ display: "flex", background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 3, gap: 3 }}>
             {(["ranking", "radar"] as const).map(v => (
               <button key={v} type="button" onClick={() => setMode(v)}
-                style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", background: mode === v ? "rgba(201,168,76,0.15)" : "transparent", color: mode === v ? G : MUTED }}>
+                style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", background: mode === v ? "color-mix(in srgb, var(--accent) 15%, transparent)" : "transparent", color: mode === v ? G : MUTED }}>
                 {v === "ranking" ? "Classement" : "Radar"}
               </button>
             ))}
@@ -235,7 +235,7 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
                 <YAxis type="category" dataKey="name" width={80}
                   tickFormatter={n => { const c = getCfg(n); return c.emoji + " " + c.label }}
                   tick={{ fill: "#F5F0E8", fontSize: 11 }} axisLine={false} tickLine={false} />
-                <Tooltip content={<Tip />} cursor={{ fill: "rgba(201,168,76,0.05)" }} />
+                <Tooltip content={<Tip />} cursor={{ fill: "color-mix(in srgb, var(--accent) 5%, transparent)" }} />
                 <Bar dataKey="Clics" radius={[0, 6, 6, 0]}>
                   {sorted.slice(0, 8).map((s, i) => (
                     <Cell key={i} fill={s.cfg.color} fillOpacity={0.82} />

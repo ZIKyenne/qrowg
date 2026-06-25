@@ -57,13 +57,13 @@ const DEFAULT_LAYOUT: WidgetId[] = [
 const STORAGE_KEY = "qrfolio_dashboard_layout"
 
 // ── Couleurs ───────────────────────────────────────────────────────────────────
-const G     = "#C9A84C"
+const G     = "var(--accent)"
 const NEON  = "#39FF8F"
 const MUTED = "#8A8478"
 const SURF  = "#0F0E0B"
-const BORD  = "rgba(201,168,76,0.12)"
+const BORD  = "color-mix(in srgb, var(--accent) 12%, transparent)"
 
-const PALETTE = ["#C9A84C","#39FF8F","#7B61FF","#FF6B6B","#38BDF8","#F97316","#E1306C","#25D366","#818CF8","#67E8F9"]
+const PALETTE = ["var(--accent)","#39FF8F","#7B61FF","#FF6B6B","#38BDF8","#F97316","#E1306C","#25D366","#818CF8","#67E8F9"]
 
 const COUNTRY_NAMES: Record<string,string> = {
   FR:"France",US:"États-Unis",GB:"Royaume-Uni",DE:"Allemagne",
@@ -81,7 +81,7 @@ const BLOCK_LABELS: Record<string,string> = {
 function Tip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   return (
-    <div style={{ background:"#111009", border:"1px solid rgba(201,168,76,0.3)", borderRadius:8, padding:"8px 12px" }}>
+    <div style={{ background:"#111009", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:8, padding:"8px 12px" }}>
       <p style={{ color:MUTED, fontSize:11, margin:"0 0 4px" }}>{label}</p>
       {payload.map((p:any,i:number) => (
         <p key={i} style={{ color:p.color??G, fontSize:12, fontWeight:700, margin:"2px 0" }}>
@@ -467,7 +467,7 @@ export default function BusinessDashboard({ profile, pages, views, scans, clicks
 
             {/* Mode édition */}
             <button type="button" onClick={() => setEditMode(e => !e)}
-              style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 14px", background:editMode?"rgba(201,168,76,0.15)":"rgba(255,255,255,0.04)", border:editMode?`1px solid ${G}40`:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:editMode?G:MUTED, fontSize:12, fontWeight:600, cursor:"pointer", transition:"all 0.15s" }}>
+              style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 14px", background:editMode?"color-mix(in srgb, var(--accent) 15%, transparent)":"rgba(255,255,255,0.04)", border:editMode?`1px solid color-mix(in srgb, var(--accent) 25%, transparent)`:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:editMode?G:MUTED, fontSize:12, fontWeight:600, cursor:"pointer", transition:"all 0.15s" }}>
               <GripVertical size={13}/>{editMode ? "Terminer" : "Réorganiser"}
             </button>
 
@@ -482,7 +482,7 @@ export default function BusinessDashboard({ profile, pages, views, scans, clicks
 
         {/* Ajouter widgets masqués */}
         {editMode && hidden.length > 0 && (
-          <div style={{ marginBottom:16, padding:"12px 16px", background:"rgba(201,168,76,0.05)", border:"1px dashed rgba(201,168,76,0.2)", borderRadius:12, display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
+          <div style={{ marginBottom:16, padding:"12px 16px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px dashed color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:12, display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
             <span style={{ color:MUTED, fontSize:11, fontWeight:600 }}>Widgets masqués :</span>
             {hidden.map(w => (
               <button key={w.id} type="button" onClick={() => addWidget(w.id)}

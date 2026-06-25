@@ -8,6 +8,7 @@
   --bg: #080808;
   --surface: #111009;
   --gold: #C9A84C;
+  --accent: #C9A84C; /* couleur d'accent utilisateur (pilotee par le profil), defaut = or */
   --gold-light: #E8C96A;
   --gold-dim: rgba(201, 168, 76, 0.12);
   --gold-border: rgba(201, 168, 76, 0.25);
