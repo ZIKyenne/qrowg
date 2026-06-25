@@ -3702,6 +3702,32 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 </button>
               </div>
 
+              {/* -- Conseils selon l'usage (réglages en 1 clic) -------------- */}
+              <div style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:12, padding:"12px 14px" }}>
+                <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase" as const, letterSpacing:1.5, margin:"0 0 9px" }}>Quel format pour quel usage ?</p>
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7 }}>
+                  {([
+                    { emoji:"📸", label:"Réseaux sociaux", hint:"PNG · 1024px", fmt:"png",   size:1024, plan:"free" },
+                    { emoji:"🖨️", label:"Imprimeur",       hint:"PDF ou SVG",  fmt:"pdf",   size:2048, plan:"pro" },
+                    { emoji:"🏷️", label:"Sticker",         hint:"PNG transparent", fmt:"png-t", size:1024, plan:"pro" },
+                    { emoji:"🖼️", label:"Affiche HD",      hint:"SVG · 4096px", fmt:"svg",   size:4096, plan:"pro" },
+                  ] as const).map(r => {
+                    const ok = PLAN_RANK[userPlan] >= PLAN_RANK[r.plan]
+                    return (
+                      <button key={r.label} type="button"
+                        onClick={() => { if (!ok) { setUpsell({ feature: `l'export ${r.hint}`, plan: r.plan }); return } if (r.fmt === "png-t" || r.fmt === "webp") setShowMoreFmt(true); setExpFormat(r.fmt as any); setExpSize(r.size as any) }}
+                        style={{ display:"flex", alignItems:"center", gap:8, padding:"9px 10px", background:"rgba(255,255,255,0.025)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:9, cursor:"pointer", textAlign:"left" as const, opacity: ok ? 1 : 0.6 }}>
+                        <span style={{ fontSize:15, flexShrink:0 }}>{r.emoji}</span>
+                        <span style={{ minWidth:0 }}>
+                          <span style={{ display:"block", color:"#F5F0E8", fontSize:11, fontWeight:600, whiteSpace:"nowrap" as const, overflow:"hidden", textOverflow:"ellipsis" }}>{r.label}</span>
+                          <span style={{ display:"block", color: ok ? G : MUTED, fontSize:9.5, fontWeight:600 }}>{ok ? r.hint : (r.plan === "pro" ? "Pro" : "Business")}</span>
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
               {/* -- Taille --------------------------------------------------- */}
               <div>
                 <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Taille</p>
