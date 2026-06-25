@@ -120,6 +120,10 @@ export default function DashboardClient() {
   const planCfg = PLAN_CONFIG[profile?.plan || "free"]
   const G = "var(--accent)"; const MUTED = "#8A8478"
   const publishedCount = pages.filter(p => p.status === "published").length
+  // Parcours guidé : tant qu'aucun scan, on montre la prochaine meilleure action
+  const totalScans = profile?.total_scans || 0
+  const firstPub = pages.find(p => p.status === "published")
+  const guide: null | "nopage" | "noscan" = pages.length === 0 ? "nopage" : totalScans === 0 ? "noscan" : null
   // Quota de vues mensuel (soft-cap : on alerte, on ne bloque jamais les pages publiques)
   const viewsLimit = getPlan(profile?.plan).limits.views // null = illimité
   const viewsPct   = viewsLimit ? Math.min(Math.round((monthViews / viewsLimit) * 100), 999) : 0
@@ -228,6 +232,53 @@ export default function DashboardClient() {
             <Link href="/upgrade" style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, background: overViews ? "linear-gradient(90deg,#FF6B6B,#F97316)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 10, padding: "9px 16px", color: "#080808", textDecoration: "none", fontSize: 12.5, fontWeight: 800 }}>
               <Zap size={13} /> Augmenter mon quota
             </Link>
+          </div>
+        )}
+
+        {/* Prochaine meilleure action (parcours guidé tant qu'aucun scan) */}
+        {guide && (
+          <div className="dz" style={{ animationDelay: "40ms", marginBottom: 20, padding: "20px 22px", borderRadius: 16, position: "relative", overflow: "hidden",
+            background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, #100F0A), #100F0A)",
+            border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", boxShadow: "0 10px 34px rgba(0,0,0,0.3)" }}>
+            <div style={{ position: "absolute", top: -30, right: -20, width: 140, height: 140, borderRadius: "50%", background: "radial-gradient(circle, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%)" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 6 }}>
+              <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, background: "color-mix(in srgb, var(--accent) 18%, transparent)", color: G }}><Zap size={15} /></span>
+              <span style={{ color: G, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase" as const }}>Prochaine étape</span>
+            </div>
+            <h2 style={{ color: "#F8F4EC", fontSize: 21, fontWeight: 700, margin: "0 0 4px", fontFamily: "Cormorant Garamond, serif", letterSpacing: "-0.3px" }}>
+              {guide === "nopage" ? "Créez votre première page" : "Obtenez votre premier scan"}
+            </h2>
+            <p style={{ color: "#C9C3B6", fontSize: 13, margin: "0 0 16px", lineHeight: 1.5, maxWidth: 560 }}>
+              {guide === "nopage"
+                ? "Partez d'un modèle adapté à votre métier, personnalisez-le et publiez votre page en quelques minutes."
+                : "Votre page est en ligne. Testez votre QR code, partagez-le ou créez un support imprimable pour commencer à mesurer vos scans."}
+            </p>
+            <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
+              {guide === "nopage" ? (
+                <>
+                  <Link href="/dashboard/templates" className="dz-cta" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", color: "#080808", textDecoration: "none", fontSize: 13, fontWeight: 800, boxShadow: "0 6px 20px color-mix(in srgb, var(--accent) 25%, transparent)" }}>
+                    <Plus size={15} strokeWidth={2.6} /> Créer ma première page
+                  </Link>
+                  <Link href="/dashboard/templates" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#F5F0E8", textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
+                    Découvrir les modèles
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/dashboard/qr-codes" className="dz-cta" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", color: "#080808", textDecoration: "none", fontSize: 13, fontWeight: 800, boxShadow: "0 6px 20px color-mix(in srgb, var(--accent) 25%, transparent)" }}>
+                    <QrCode size={15} strokeWidth={2.4} /> Tester mon QR code
+                  </Link>
+                  {firstPub && (
+                    <a href={"/" + firstPub.slug} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#F5F0E8", textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
+                      <ExternalLink size={14} /> Partager ma page
+                    </a>
+                  )}
+                  <Link href="/dashboard/qr-codes" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#F5F0E8", textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
+                    <Globe size={14} /> Créer un support imprimable
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         )}
 
