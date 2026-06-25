@@ -1208,7 +1208,7 @@ export default function ProfilePage() {
       </div>
 
       {/* -- Corps en 2 colonnes ------------------------------------------------ */}
-      <div className="dash-2col dash-pad" style={{ maxWidth: 1100, margin: "0 auto", padding: "18px 28px 48px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, alignItems: "start" }}>
+      <div className="dash-pad" style={{ maxWidth: 1100, margin: "0 auto", padding: "18px 28px 48px", display: "flex", flexDirection: "column", gap: 18 }}>
 
         {/* == COLONNE GAUCHE ================================================== */}
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
