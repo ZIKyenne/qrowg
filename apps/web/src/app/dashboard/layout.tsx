@@ -9,7 +9,7 @@ import {
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
-const G = "#C9A84C"
+const DEFAULT_ACCENT = "#C9A84C"
 const MUTED = "#8A8478"
 
 const NAV_ITEMS = [
@@ -32,17 +32,32 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
   const [mounted, setMounted] = useState(false)
+  const [accent, setAccent] = useState(DEFAULT_ACCENT) // couleur d'accent de l'utilisateur
+  const G = accent
 
   useEffect(() => {
     setMounted(true)
+    // accent instantané depuis le cache local (évite le flash)
+    const cached = localStorage.getItem("qrfolio_accent")
+    if (cached) setAccent(cached)
     const supabase = createClient()
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) {
         setUser(data.user)
         supabase.from("profiles").select("*").eq("id", data.user.id).single()
-          .then(({ data: p }) => setProfile(p))
+          .then(({ data: p }) => {
+            setProfile(p)
+            if (p?.accent_color) { setAccent(p.accent_color); localStorage.setItem("qrfolio_accent", p.accent_color) }
+          })
       }
     })
+  }, [])
+
+  // Mise à jour live quand on change la couleur depuis la page Profil
+  useEffect(() => {
+    const onAccent = (e: Event) => { const c = (e as CustomEvent).detail; if (c) setAccent(c) }
+    window.addEventListener("qrfolio-accent", onAccent)
+    return () => window.removeEventListener("qrfolio-accent", onAccent)
   }, [])
 
   useEffect(() => {

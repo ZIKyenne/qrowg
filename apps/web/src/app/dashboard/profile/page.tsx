@@ -485,6 +485,11 @@ export default function ProfilePage() {
 
   function setPrefField<K extends keyof UserPreferences>(key: K, value: UserPreferences[K]) {
     savePrefs({ ...prefs, [key]: value })
+    // La couleur d'accent pilote le chrome du dashboard (sidebar, logo, états actifs) en direct
+    if (key === "accent_color" && typeof value === "string") {
+      localStorage.setItem("qrfolio_accent", value)
+      window.dispatchEvent(new CustomEvent("qrfolio-accent", { detail: value }))
+    }
   }
 
   // -- Fonctions domaines ----------------------------------------
@@ -3056,7 +3061,7 @@ export default function ProfilePage() {
                   <code style={{ color:prefs.accent_color, fontSize:10, fontFamily:"monospace", flexShrink:0 }}>{prefs.accent_color}</code>
                 </div>
                 <p style={{ color:MUTED, fontSize:9, margin:"6px 0 0" }}>
-                  La couleur d'accent sera appliquee dans une prochaine mise a jour de l'interface.
+                  S'applique immediatement au tableau de bord (menu lateral, logo, elements actifs).
                 </p>
               </div>
             </div>
