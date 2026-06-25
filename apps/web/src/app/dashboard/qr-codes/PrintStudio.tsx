@@ -2197,7 +2197,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const availW = sc.clientWidth - parseFloat(cs.paddingLeft || "24") - parseFloat(cs.paddingRight || "24")
     const availH = sc.clientHeight - parseFloat(cs.paddingTop || "24") - parseFloat(cs.paddingBottom || "24")
     if (availW <= 40 || availH <= 40) return
-    const z = Math.min(availW / base.w, availH / base.h) * 0.96
+    const z = Math.min(availW / base.w, availH / base.h) * 0.99
     const nz = Math.max(0.3, Math.min(1, z))
     fc.setZoom(nz)
     fc.setDimensions({ width: Math.round(base.w * nz), height: Math.round(base.h * nz) })
@@ -3382,8 +3382,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Rail outils */}
         {wizard === 0 && (
-        <div className="qr-scroll ps-rail" style={{ width: 92, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", padding: "12px 10px", display: "flex", flexDirection: "column", gap: 6, background: "#FBFBFD", overflowY: "auto" }}>
+        <div className="qr-scroll ps-rail" style={{ width: 150, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", padding: "12px 10px", display: "flex", flexDirection: "column", gap: 6, background: "#FBFBFD", overflowY: "auto" }}>
           <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 2px" }}>Créer</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
           <button type="button" onClick={() => { setTplOpen(v => !v); setLibOpen(false); setSide(""); setCompOpen(false); setPhotoOpen(false); setWizard(0) }}
             style={{ ...btnTool, background: tplOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.14),rgba(201,168,76,0.05))", border: `1px solid ${tplOpen ? G : "rgba(201,168,76,0.3)"}`, color: tplOpen ? G : INK, fontWeight: 700 }}>
             <LayoutTemplate size={16} /> Modèles
@@ -3392,7 +3393,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             style={{ ...btnTool, background: compOpen ? "rgba(201,168,76,0.16)" : "linear-gradient(180deg,rgba(201,168,76,0.12),rgba(201,168,76,0.04))", border: `1px solid ${compOpen ? G : "rgba(201,168,76,0.3)"}`, color: compOpen ? G : INK, fontWeight: 700 }}>
             <Sparkles size={16} /> Ajouter
           </button>
+          </div>
           <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "6px 0 2px" }}>Éléments</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
           {([
             ["text", "Texte", <TypeIcon size={16} key="i" />],
             ["shapes", "Formes", <Shapes size={16} key="i" />],
@@ -3422,8 +3425,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               </button>
             )
           })}
+          </div>
           <div style={{ flex: 1 }} />
           <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "2px 0" }}>Modifier</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
           <button type="button" onClick={() => openSide("styles")}
             style={{ ...btnTool, background: side === "styles" ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${side === "styles" ? G : "rgba(0,0,0,0.07)"}`, color: side === "styles" ? G : INK }}>
             <Palette size={16} /> Styles
@@ -3436,6 +3441,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             style={{ ...btnTool, background: side === "bg" ? "rgba(201,168,76,0.16)" : btnTool.background, border: `1px solid ${side === "bg" ? G : "rgba(0,0,0,0.07)"}`, color: side === "bg" ? G : INK }}>
             <Square size={16} /> Fond
           </button>
+          </div>
         </div>
         )}
 
