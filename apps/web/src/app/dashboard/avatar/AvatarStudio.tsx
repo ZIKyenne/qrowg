@@ -65,6 +65,48 @@ function download(filename: string, url: string) {
   a.remove();
 }
 
+/* HSL -> hex (#rrggbb) pour les couleurs aléatoires (compatible <input type=color>) */
+function hslToHex(h: number, s: number, l: number): string {
+  l /= 100;
+  const a = (s * Math.min(l, 1 - l)) / 100;
+  const f = (n: number) => {
+    const k = (n + h / 30) % 12;
+    const c = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    return Math.round(255 * c).toString(16).padStart(2, "0");
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+const pick = <T,>(arr: readonly T[]): T => arr[Math.floor(Math.random() * arr.length)];
+const rand = (min: number, max: number) => min + Math.random() * (max - min);
+
+/* Tirage 100% aléatoire de TOUS les paramètres (famille, modèle, formes, espacement, cadre, couleurs) */
+function randomAvatar(): AvatarConfig {
+  const family = pick(Object.keys(FAMILIES) as Family[]);
+  // Couleurs : soit un preset soigné, soit une paire générée à fort contraste
+  let fg: string, bg: string;
+  if (Math.random() < 0.45) {
+    const p = pick(PRESETS);
+    fg = p.fg;
+    bg = p.bg;
+  } else {
+    const hue = Math.floor(rand(0, 360));
+    fg = hslToHex(hue, rand(62, 92), rand(54, 72));
+    bg = Math.random() < 0.72
+      ? hslToHex((hue + Math.floor(rand(-20, 20)) + 360) % 360, rand(18, 42), rand(5, 11))   // fond sombre teinté
+      : hslToHex((hue + 180) % 360, rand(8, 18), rand(92, 97));                               // fond clair complémentaire
+  }
+  return {
+    family,
+    index: Math.floor(Math.random() * FAMILIES[family].count),
+    avatarShape: pick(["rounded", "circle"] as const),
+    moduleShape: pick(["square", "rounded", "dot"] as const),
+    gap: Math.round(rand(0, 0.32) / 0.02) * 0.02,
+    showFrame: family !== "patterns" && Math.random() < 0.6,
+    fg,
+    bg,
+  };
+}
+
 export default function AvatarStudio({
   initialConfig,
   signedIn,
@@ -145,9 +187,9 @@ export default function AvatarStudio({
             <button className={styles.btn} onClick={onSvg}>SVG</button>
             <button
               className={`${styles.btn} ${styles.ghost}`}
-              aria-label="Modèle aléatoire"
-              title="Modèle aléatoire"
-              onClick={() => set({ index: Math.floor(Math.random() * FAMILIES[cfg.family].count) })}
+              aria-label="Tout aléatoire (formes, couleurs, modèle)"
+              title="Surprends-moi — tout aléatoire"
+              onClick={() => setCfg(randomAvatar())}
             >
               ⤮
             </button>
