@@ -70,13 +70,14 @@ export default function Particles({ behind = false }: { behind?: boolean }) {
           const glowRadius = p.glowR * (0.45 + pulse * 0.55)
           let   alpha      = p.oMax * (0.5 + pulse * 0.5)
 
-          const inContentH = p.x > zone.x1 && p.x < zone.x2
-          if (inContentH) {
-            const relX   = (p.x - zone.x1) / (zone.x2 - zone.x1)
-            const dist   = Math.abs(relX - 0.5) * 2
-            const fade   = 0.12 + dist * 0.28
-            alpha        = alpha * fade
-          }
+          // Atténuation CONTINUE (smoothstep) du centre vers les bords :
+          // pas de frontière nette -> évite la "barre" verticale de particules
+          // là où la zone de contenu se termine.
+          const cx2   = (zone.x1 + zone.x2) / 2
+          const halfW = (zone.x2 - zone.x1) / 2
+          const d     = Math.min(1, Math.abs(p.x - cx2) / halfW) // 0 centre .. 1 bord (clamp au-delà)
+          const s     = d * d * (3 - 2 * d)                      // smoothstep
+          alpha       = alpha * (0.14 + 0.86 * s)                // 0.14 au centre -> 1 au bord (et au-delà)
 
           if (alpha < 0.005) {
             p.x += p.dx; p.y += p.dy
