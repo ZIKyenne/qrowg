@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: 'Créer un compte' }
 export default async function SignupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>
+  searchParams: Promise<{ error?: string; ref?: string }>
 }) {
   const sp = await searchParams
   return (
@@ -34,6 +34,7 @@ export default async function SignupPage({
           )}
 
           <form action={signUp}>
+            {sp.ref && <input type="hidden" name="ref" value={sp.ref} />}
             <div style={{ marginBottom: '14px' }}>
               <label style={{ display: 'block', fontSize: '11px', color: '#8A8478', marginBottom: '6px', letterSpacing: '1px', textTransform: 'uppercase' }}>Nom complet</label>
               <input type="text" name="full_name" placeholder="Emilien Lampson" required

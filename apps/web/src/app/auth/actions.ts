@@ -29,11 +29,14 @@ export async function signUp(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const full_name = formData.get('full_name') as string
+  const ref = (formData.get('ref') as string | null)?.trim().toLowerCase() || null
 
   const { error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name } },
+    // `referred_by_code` est lu par le trigger handle_new_user pour créer
+    // l'enregistrement de parrainage (affiliation via lien ?ref=CODE).
+    options: { data: ref ? { full_name, referred_by_code: ref } : { full_name } },
   })
 
   // Trigger welcome email

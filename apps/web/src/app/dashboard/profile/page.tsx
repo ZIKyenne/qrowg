@@ -320,7 +320,7 @@ export default function ProfilePage() {
         { data: qrData },
       ] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", user.id).single(),
-        supabase.from("referrals").select("id,status,reward_months,created_at,referee_id").eq("referrer_id", user.id).order("created_at", { ascending: false }),
+        supabase.from("referrals").select("id,status,reward_months,created_at,referred_id").eq("referrer_id", user.id).order("created_at", { ascending: false }),
         supabase.from("api_keys").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
         supabase.from("pages").select("id,title,slug,status,total_views,unique_views,updated_at,created_at").eq("user_id", user.id).order("updated_at", { ascending: false }).limit(5),
         supabase.from("pages").select("id,title,slug,status,total_views,unique_views,updated_at,created_at").eq("user_id", user.id),

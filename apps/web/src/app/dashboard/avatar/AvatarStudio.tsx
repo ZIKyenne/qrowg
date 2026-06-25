@@ -110,9 +110,11 @@ function randomAvatar(): AvatarConfig {
 export default function AvatarStudio({
   initialConfig,
   signedIn,
+  refCode = "",
 }: {
   initialConfig: AvatarConfig;
   signedIn: boolean;
+  refCode?: string;
 }) {
   const [cfg, setCfg] = useState<AvatarConfig>(initialConfig);
   const [pending, startTransition] = useTransition();
@@ -155,7 +157,9 @@ export default function AvatarStudio({
   };
 
   // ── Partage (croissance : chaque partage met en avant QRfolio + son lien) ──
-  const SHARE_URL = "https://qrfolio.app";
+  // Le lien porte le code d'affiliation (?ref=) : chaque inscription via ce lien
+  // devient un parrainage traçable (cf. onglet Parrainage du profil).
+  const SHARE_URL = refCode ? `https://qrfolio.app?ref=${refCode}` : "https://qrfolio.app";
   const SHARE_TEXT = "J'ai créé mon avatar QR-art avec QRfolio ✨ Crée le tien gratuitement :";
   const u = encodeURIComponent(SHARE_URL);
   const t = encodeURIComponent(SHARE_TEXT);

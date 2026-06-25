@@ -32,18 +32,22 @@ export default async function AvatarPage() {
   } = await supabase.auth.getUser();
 
   let initialConfig: AvatarConfig = DEFAULT_CONFIG;
+  let refCode = "";
 
   if (user) {
     const { data } = await supabase
       .from("profiles")
-      .select("avatar_config")
+      .select("avatar_config, ref_code")
       .eq("id", user.id)
       .single();
 
     if (data?.avatar_config) {
       initialConfig = { ...DEFAULT_CONFIG, ...(data.avatar_config as AvatarConfig) };
     }
+    // Code d'affiliation : porté par le lien de partage (?ref=) pour transformer
+    // chaque partage d'avatar en parrainage traçable.
+    refCode = (data?.ref_code as string | undefined) || user.id.slice(0, 8);
   }
 
-  return <AvatarStudio initialConfig={initialConfig} signedIn={!!user} />;
+  return <AvatarStudio initialConfig={initialConfig} signedIn={!!user} refCode={refCode} />;
 }
