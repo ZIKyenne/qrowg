@@ -250,7 +250,7 @@ const PLAN_BADGE: Record<string, { color: string; label: string } | null> = {
   free: null, pro: { color: "#C9A84C", label: "PRO" }, business: { color: "#39FF8F", label: "BIZ" },
 }
 
-const G     = "#C9A84C"
+const G     = "var(--accent)"
 const MUTED = "#8A8478"
 const SURF  = "#0F0E0B"
 const BG    = "#080808"
@@ -272,9 +272,9 @@ function AccSection({ id, title, icon, openId, setOpenId, children }: {
 }) {
   const open = openId === id
   return (
-    <div style={{ border:`1px solid ${open?"rgba(201,168,76,0.25)":"rgba(255,255,255,0.07)"}`, borderRadius:10, overflow:"hidden", background:"rgba(255,255,255,0.015)", transition:"border-color 0.2s" }}>
+    <div style={{ border:`1px solid ${open?"color-mix(in srgb, var(--accent) 25%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:10, overflow:"hidden", background:"rgba(255,255,255,0.015)", transition:"border-color 0.2s" }}>
       <button type="button" onClick={() => setOpenId(open ? "" : id)}
-        style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"11px 13px", background: open ? "rgba(201,168,76,0.06)" : "transparent", border:"none", cursor:"pointer" }}>
+        style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"11px 13px", background: open ? "color-mix(in srgb, var(--accent) 6%, transparent)" : "transparent", border:"none", cursor:"pointer" }}>
         <span style={{ display:"flex", alignItems:"center", gap:8, color: open ? "#C9A84C" : "#F5F0E8", fontSize:12, fontWeight:700 }}>
           {icon && <span style={{ fontSize:14 }}>{icon}</span>}{title}
         </span>
@@ -361,7 +361,7 @@ function ColorField({ label, value, onChange, onClear }: {
       </div>
 
       {open && (
-        <div style={{ padding:10, background:"rgba(255,255,255,0.02)", border:"1px solid rgba(201,168,76,0.25)", borderRadius:10, display:"flex", flexDirection:"column", gap:9 }}>
+        <div style={{ padding:10, background:"rgba(255,255,255,0.02)", border:"1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius:10, display:"flex", flexDirection:"column", gap:9 }}>
           {/* Carre saturation / valeur */}
           <div ref={svRef} onPointerDown={e => { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); onSV(e) }}
             onPointerMove={e => { if (e.buttons === 1) onSV(e) }}
@@ -813,8 +813,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const pts   = data.map((v, i) => [i * step, H - 4 - (v / max) * (H - 10)] as [number,number])
     // Zone de remplissage
     const grad  = ctx.createLinearGradient(0, 0, 0, H)
-    grad.addColorStop(0, "rgba(201,168,76,0.3)")
-    grad.addColorStop(1, "rgba(201,168,76,0)")
+    grad.addColorStop(0, "color-mix(in srgb, var(--accent) 30%, transparent)")
+    grad.addColorStop(1, "color-mix(in srgb, var(--accent) 0%, transparent)")
     ctx.beginPath()
     ctx.moveTo(pts[0][0], H)
     pts.forEach(([x,y]) => ctx.lineTo(x, y))
@@ -1416,7 +1416,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       ctx.fillStyle = fgColor; ctx.fillRect(0, 0, w, headerH)
       const qrSize  = Math.round(w * 0.62)
       drawTitle(opts.title || active?.pages?.title || "Notre Menu", w/2, Math.round(headerH * 0.55), Math.round(w * 0.055), bgColor, "center", w * 0.85)
-      drawSub(opts.subtitle, w/2, Math.round(headerH * 0.80), Math.round(w * 0.034), isDark ? "rgba(201,168,76,0.85)" : "rgba(255,255,255,0.75)", "center")
+      drawSub(opts.subtitle, w/2, Math.round(headerH * 0.80), Math.round(w * 0.034), isDark ? "color-mix(in srgb, var(--accent) 85%, transparent)" : "rgba(255,255,255,0.75)", "center")
       drawQR((w - qrSize)/2, Math.round(h * 0.3), qrSize)
       drawContact(w/2, Math.round(h * 0.86), Math.round(w * 0.026), accentCol, "center")
       drawSub(qrUrl, w/2, Math.round(h * 0.93), Math.round(w * 0.027), isDark ? "rgba(245,240,232,0.4)" : "rgba(26,26,26,0.35)", "center")
@@ -1432,9 +1432,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       ctx.fillStyle = bgColor
       const lx = Math.round(w * 0.19); const ly = Math.round(h * 0.3)
       drawTitle(opts.title || active?.pages?.title || "", lx, ly, Math.round(h * 0.11), isDark?"#F5F0E8":"#FFFFFF", "center", Math.round(w * 0.32))
-      ctx.fillStyle = isDark ? "rgba(201,168,76,0.8)" : "rgba(255,255,255,0.6)"
+      ctx.fillStyle = isDark ? "color-mix(in srgb, var(--accent) 80%, transparent)" : "rgba(255,255,255,0.6)"
       ctx.fillRect(lx - Math.round(w * 0.05), ly + Math.round(h*0.04), Math.round(w * 0.14), Math.round(h*0.007))
-      drawSub(opts.subtitle, lx, Math.round(h * 0.66), Math.round(h * 0.05), isDark?"rgba(201,168,76,0.9)":"rgba(255,255,255,0.85)", "center", Math.round(w * 0.30))
+      drawSub(opts.subtitle, lx, Math.round(h * 0.66), Math.round(h * 0.05), isDark?"color-mix(in srgb, var(--accent) 90%, transparent)":"rgba(255,255,255,0.85)", "center", Math.round(w * 0.30))
       drawContact(lx, Math.round(h * 0.80), Math.round(h * 0.036), isDark?"rgba(245,240,232,0.85)":"rgba(255,255,255,0.85)", "center", Math.round(w * 0.30))
       drawQR(qrX, qrY, qrSize)
     }
@@ -2191,13 +2191,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
   if (qrCodes.length === 0) {
     return (
-      <div style={{ textAlign:"center", padding:"80px 40px", border:"1px dashed rgba(201,168,76,0.2)", borderRadius:20 }}>
-        <div style={{ width:72, height:72, borderRadius:20, margin:"0 auto 20px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.15)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+      <div style={{ textAlign:"center", padding:"80px 40px", border:"1px dashed color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:20 }}>
+        <div style={{ width:72, height:72, borderRadius:20, margin:"0 auto 20px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 15%, transparent)", display:"flex", alignItems:"center", justifyContent:"center" }}>
           <QrCode size={32} color={G}/>
         </div>
         <h2 style={{ fontFamily:"Cormorant Garamond, serif", fontSize:24, color:"#F5F0E8", fontWeight:700, margin:"0 0 10px" }}>Aucun QR code</h2>
         <p style={{ color:MUTED, fontSize:14, lineHeight:1.7, margin:"0 0 28px" }}>Crée ta première page pour générer automatiquement un QR code.</p>
-        <a href="/dashboard" style={{ background:"linear-gradient(90deg,#C9A84C,#b8953f)", color:"#080808", textDecoration:"none", fontSize:14, fontWeight:700, padding:"14px 28px", borderRadius:10, display:"inline-block" }}>
+        <a href="/dashboard" style={{ background:"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", color:"#080808", textDecoration:"none", fontSize:14, fontWeight:700, padding:"14px 28px", borderRadius:10, display:"inline-block" }}>
           Créer ma première page
         </a>
       </div>
@@ -2205,7 +2205,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   }
 
   return (
-    <div className="qr-grid" style={{ display:"grid", gridTemplateColumns:"clamp(200px,15vw,260px) 2.5fr clamp(290px,21vw,340px)", gap:0, minHeight:"calc(100vh - 80px)", background:BG, borderRadius:16, border:"1px solid rgba(201,168,76,0.1)", overflow:"hidden", fontFamily:"DM Sans, sans-serif", position:"relative" }}>
+    <div className="qr-grid" style={{ display:"grid", gridTemplateColumns:"clamp(200px,15vw,260px) 2.5fr clamp(290px,21vw,340px)", gap:0, minHeight:"calc(100vh - 80px)", background:BG, borderRadius:16, border:"1px solid color-mix(in srgb, var(--accent) 10%, transparent)", overflow:"hidden", fontFamily:"DM Sans, sans-serif", position:"relative" }}>
 
 
       {/* -- Modal preview plein ecran ------------------------------------------- */}
@@ -2228,14 +2228,14 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             </div>
 
             {/* QR grand */}
-            <div style={{ padding:28, borderRadius:24, background:bg, boxShadow:"0 0 0 1px rgba(201,168,76,0.3), 0 32px 80px rgba(0,0,0,0.9)" }}>
+            <div style={{ padding:28, borderRadius:24, background:bg, boxShadow:"0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent), 0 32px 80px rgba(0,0,0,0.9)" }}>
               <div ref={canvasModalRef} data-qr-container style={{ display:"flex", width:320, height:320, alignItems:"center", justifyContent:"center" }}/>
             </div>
 
             {/* Actions */}
             <div style={{ display:"flex", gap:10, width:"100%", maxWidth:400 }}>
               <button type="button" onClick={() => downloadPNG(1200)}
-                style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"11px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"11px", background:"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:"pointer" }}>
                 <Download size={14}/> PNG HD
               </button>
               <button type="button" onClick={() => copy("short")}
@@ -2392,7 +2392,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               </p>
             </div>
             <div style={{ display:"flex", gap:5, alignItems:"center" }}>
-              <span style={{ background:"rgba(201,168,76,0.12)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:5, padding:"1px 7px", fontSize:10, color:G, fontWeight:700 }}>{filteredQR.length}/{qrCodes.length}</span>
+              <span style={{ background:"color-mix(in srgb, var(--accent) 12%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:5, padding:"1px 7px", fontSize:10, color:G, fontWeight:700 }}>{filteredQR.length}/{qrCodes.length}</span>
               <button type="button" onClick={() => setShowArchived(p => !p)}
                 style={{ padding:"1px 6px", background:showArchived?"rgba(107,114,128,0.2)":"transparent", border:"1px solid rgba(107,114,128,0.2)", borderRadius:5, color:MUTED, fontSize:8, cursor:"pointer" }}>
                 {showArchived?"- Archives":"+ Archives"}
@@ -2459,7 +2459,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             const pb   = PLAN_BADGE[userPlan]
             return (
               <div key={qr.id} onClick={() => { setActiveId(qr.id); setMenuId(null) }}
-                style={{ margin:"0 10px 8px", padding:"12px", cursor:"pointer", borderRadius:12, border:`1px solid ${isA?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, background:isA?"rgba(201,168,76,0.07)":"rgba(255,255,255,0.02)", boxShadow:isA?"0 4px 16px rgba(201,168,76,0.08)":"none", position:"relative", transition:"all 0.15s" }}
+                style={{ margin:"0 10px 8px", padding:"12px", cursor:"pointer", borderRadius:12, border:`1px solid ${isA?"color-mix(in srgb, var(--accent) 40%, transparent)":"rgba(255,255,255,0.07)"}`, background:isA?"color-mix(in srgb, var(--accent) 7%, transparent)":"rgba(255,255,255,0.02)", boxShadow:isA?"0 4px 16px color-mix(in srgb, var(--accent) 8%, transparent)":"none", position:"relative", transition:"all 0.15s" }}
                 onMouseEnter={e => { if (!isA) e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)" }}
                 onMouseLeave={e => { if (!isA) e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)" }}>
                 <div style={{ display:"flex", alignItems:"flex-start", gap:9 }}>
@@ -2502,7 +2502,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
                 {/* Menu contextuel */}
                 {isM && (
-                  <div style={{ position:"absolute", right:8, top:38, zIndex:200, background:"#1A1710", border:"1px solid rgba(201,168,76,0.2)", borderRadius:10, padding:"5px", boxShadow:"0 8px 32px rgba(0,0,0,0.7)", minWidth:158 }}
+                  <div style={{ position:"absolute", right:8, top:38, zIndex:200, background:"#1A1710", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:10, padding:"5px", boxShadow:"0 8px 32px rgba(0,0,0,0.7)", minWidth:158 }}
                     onClick={e => e.stopPropagation()}>
                     {([
                       { icon: <Pencil size={11}/>,  label: "Modifier",     action: () => { window.location.href = `/dashboard/builder/${page?.id}` }, color: "#F5F0E8", disabled: false },
@@ -2531,7 +2531,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   <div style={{ display:"flex", gap:5, marginTop:8, paddingTop:8, borderTop:"1px solid rgba(255,255,255,0.04)" }}
                     onClick={e => e.stopPropagation()}>
                     <a href={`/dashboard/builder/${page?.id}`}
-                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:4, padding:"5px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.15)", borderRadius:7, color:G, fontSize:10, fontWeight:600, textDecoration:"none" }}>
+                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:4, padding:"5px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius:7, color:G, fontSize:10, fontWeight:600, textDecoration:"none" }}>
                       <Pencil size={10}/> Modifier
                     </a>
                     <button type="button" onClick={() => copyQRLink(qr.id, url)}
@@ -2569,14 +2569,14 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               {/* QR Card */}
               <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"36px 24px 24px", gap:20, borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
                 <div style={{ position:"relative" }}>
-                  <div style={{ position:"relative", padding:28, borderRadius:28, background:bg, boxShadow:`0 0 0 1px rgba(201,168,76,0.25), 0 28px 80px rgba(0,0,0,0.85)`, transition:"background 0.3s", cursor:"pointer" }}
+                  <div style={{ position:"relative", padding:28, borderRadius:28, background:bg, boxShadow:`0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent), 0 28px 80px rgba(0,0,0,0.85)`, transition:"background 0.3s", cursor:"pointer" }}
                     onClick={() => setShowModal(true)}>
                     {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h], i) => (
                       <div key={i} style={{ position:"absolute", [v]:10, [h]:10, width:18, height:18,
-                        borderTop:    v==="top"    ? "2px solid rgba(201,168,76,0.7)" : "none",
-                        borderBottom: v==="bottom" ? "2px solid rgba(201,168,76,0.7)" : "none",
-                        borderLeft:   h==="left"   ? "2px solid rgba(201,168,76,0.7)" : "none",
-                        borderRight:  h==="right"  ? "2px solid rgba(201,168,76,0.7)" : "none",
+                        borderTop:    v==="top"    ? "2px solid color-mix(in srgb, var(--accent) 70%, transparent)" : "none",
+                        borderBottom: v==="bottom" ? "2px solid color-mix(in srgb, var(--accent) 70%, transparent)" : "none",
+                        borderLeft:   h==="left"   ? "2px solid color-mix(in srgb, var(--accent) 70%, transparent)" : "none",
+                        borderRight:  h==="right"  ? "2px solid color-mix(in srgb, var(--accent) 70%, transparent)" : "none",
                       }}/>
                     ))}
                     <div ref={canvasRef} data-qr-container style={{ display:"flex", width:"min(46vh, 360px)", height:"min(46vh, 360px)", alignItems:"center", justifyContent:"center" }}/>
@@ -2597,7 +2597,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 <div style={{ textAlign:"center", width:"100%" }}>
                   <p style={{ color:"#F5F0E8", fontSize:15, fontWeight:700, margin:"0 0 4px" }}>{active.pages?.title ?? "Sans titre"}</p>
                   <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, marginBottom:6 }}>
-                    <code style={{ color:"#C9A84C", fontSize:10, background:"rgba(201,168,76,0.08)", padding:"2px 8px", borderRadius:5 }}>
+                    <code style={{ color:"#C9A84C", fontSize:10, background:"color-mix(in srgb, var(--accent) 8%, transparent)", padding:"2px 8px", borderRadius:5 }}>
                       /q/{active.short_code}
                     </code>
                     <button type="button" onClick={() => copy("short")}
@@ -2632,7 +2632,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 {/* Actions rapides */}
                 <div style={{ display:"flex", flexDirection:"column", gap:7, width:"100%" }}>
                   <button type="button" onClick={() => downloadPNG(1024)}
-                    style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"11px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(201,168,76,0.2)" }}>
+                    style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"11px", background:"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px color-mix(in srgb, var(--accent) 20%, transparent)" }}>
                     <Download size={15}/> Télécharger
                   </button>
                   <div style={{ display:"flex", gap:6, width:"100%" }}>
@@ -2646,7 +2646,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       <ExternalLink size={12}/> Ouvrir
                     </a>
                     <button type="button" onClick={() => setShowModal(true)}
-                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"8px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:9, color:"#C9A84C", fontSize:11, cursor:"pointer" }}>
+                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"8px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:9, color:"#C9A84C", fontSize:11, cursor:"pointer" }}>
                       <Eye size={12}/> Tester
                     </button>
                   </div>
@@ -2741,7 +2741,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:4 }}>
                       {DEST_TYPES.map(dt => (
                         <button key={dt.id} type="button" onClick={() => { setDestType(dt.id as any); setDestValue(""); setDestError("") }}
-                          style={{ padding:"5px 4px", background:destType===dt.id?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${destType===dt.id?"rgba(201,168,76,0.35)":"rgba(255,255,255,0.07)"}`, borderRadius:7, cursor:"pointer", textAlign:"center" as const }}>
+                          style={{ padding:"5px 4px", background:destType===dt.id?"color-mix(in srgb, var(--accent) 10%, transparent)":"rgba(255,255,255,0.02)", border:`1px solid ${destType===dt.id?"color-mix(in srgb, var(--accent) 35%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:7, cursor:"pointer", textAlign:"center" as const }}>
                           <span style={{ fontSize:12, display:"block", marginBottom:1 }}>{dt.icon}</span>
                           <span style={{ color:destType===dt.id?G:"#8A8478", fontSize:8, fontWeight:destType===dt.id?700:400 }}>{dt.label}</span>
                         </button>
@@ -2771,7 +2771,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
                     {/* Warning changement critique */}
                     {destValue && !destConfirm && (
-                      <div style={{ display:"flex", alignItems:"flex-start", gap:6, padding:"7px 9px", background:"rgba(201,168,76,0.07)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:7 }}>
+                      <div style={{ display:"flex", alignItems:"flex-start", gap:6, padding:"7px 9px", background:"color-mix(in srgb, var(--accent) 7%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:7 }}>
                         <AlertTriangle size={10} color="#C9A84C" style={{ marginTop:1, flexShrink:0 }}/>
                         <p style={{ color:"#C9A84C", fontSize:9, margin:0, lineHeight:1.5 }}>
                           Les QR deja imprimes pointeront vers cette nouvelle destination.
@@ -2785,7 +2785,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         Annuler
                       </button>
                       <button type="button" onClick={() => destValue ? setDestConfirm(true) : null} disabled={!destValue || destLoading}
-                        style={{ flex:2, padding:"8px", background:destValue?"linear-gradient(90deg,#C9A84C,#b8953f)":"rgba(255,255,255,0.05)", border:"none", borderRadius:8, color:destValue?"#080808":"#8A8478", fontSize:11, fontWeight:700, cursor:destValue&&!destLoading?"pointer":"not-allowed", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                        style={{ flex:2, padding:"8px", background:destValue?"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))":"rgba(255,255,255,0.05)", border:"none", borderRadius:8, color:destValue?"#080808":"#8A8478", fontSize:11, fontWeight:700, cursor:destValue&&!destLoading?"pointer":"not-allowed", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
                         {destLoading ? <><Loader2 size={11} style={{ animation:"spin 0.8s linear infinite" }}/> Enregistrement...</> : destSaved ? <><Check size={11}/> Applique !</> : "Appliquer la destination"}
                       </button>
                     </div>
@@ -2828,12 +2828,12 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                               <p style={{ color:"#8A8478", fontSize:9, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
                                 {h.label || cfg?.label || h.type}
                               </p>
-                              <code style={{ color:"rgba(201,168,76,0.6)", fontSize:8, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, display:"block" }}>
+                              <code style={{ color:"color-mix(in srgb, var(--accent) 60%, transparent)", fontSize:8, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, display:"block" }}>
                                 {h.url || h.value}
                               </code>
                             </div>
                             <button type="button" onClick={() => restoreDest(i)} disabled={destLoading}
-                              style={{ padding:"3px 7px", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:5, color:"#C9A84C", fontSize:8, cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center" }}>
+                              style={{ padding:"3px 7px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:5, color:"#C9A84C", fontSize:8, cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center" }}>
                               <RotateCcw size={11}/>
                             </button>
                           </div>
@@ -2883,7 +2883,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 9px", fontSize:9, color:"#8A8478" }}>
                       Taille min {scanScore.minSize}
                     </span>
-                    <span style={{ background:`${ecLevel==="H"?"rgba(57,255,143,0.1)":ecLevel==="M"?"rgba(201,168,76,0.1)":"rgba(249,115,22,0.1)"}`, border:`1px solid ${ecLevel==="H"?"rgba(57,255,143,0.25)":ecLevel==="M"?"rgba(201,168,76,0.25)":"rgba(249,115,22,0.25)"}`, borderRadius:6, padding:"3px 9px", fontSize:9, color:ecLevel==="H"?"#39FF8F":ecLevel==="M"?G:"#F97316" }}>
+                    <span style={{ background:`${ecLevel==="H"?"rgba(57,255,143,0.1)":ecLevel==="M"?"color-mix(in srgb, var(--accent) 10%, transparent)":"rgba(249,115,22,0.1)"}`, border:`1px solid ${ecLevel==="H"?"rgba(57,255,143,0.25)":ecLevel==="M"?"color-mix(in srgb, var(--accent) 25%, transparent)":"rgba(249,115,22,0.25)"}`, borderRadius:6, padding:"3px 9px", fontSize:9, color:ecLevel==="H"?"#39FF8F":ecLevel==="M"?G:"#F97316" }}>
                       ECC {ecLevel}
                     </span>
                   </div>
@@ -2891,7 +2891,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   {/* Bouton corriger auto (proeminent) */}
                   {scanScore.canAutoFix && (
                     <button type="button" onClick={autoFix}
-                      style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"10px", marginBottom:12, background:"rgba(201,168,76,0.1)", border:"1px solid rgba(201,168,76,0.3)", borderRadius:9, color:G, fontSize:12, fontWeight:700, cursor:"pointer" }}>
+                      style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"10px", marginBottom:12, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:9, color:G, fontSize:12, fontWeight:700, cursor:"pointer" }}>
                       <Check size={13}/> Corriger automatiquement
                     </button>
                   )}
@@ -2940,8 +2940,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           )
         })() : (
           <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:"100%", gap:16, padding:32 }}>
-            <div style={{ width:72, height:72, borderRadius:20, background:"rgba(201,168,76,0.06)", border:"1px solid rgba(201,168,76,0.12)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-              <QrCode size={28} color="rgba(201,168,76,0.4)"/>
+            <div style={{ width:72, height:72, borderRadius:20, background:"color-mix(in srgb, var(--accent) 6%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 12%, transparent)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <QrCode size={28} color="color-mix(in srgb, var(--accent) 40%, transparent)"/>
             </div>
             {qrCodes.length === 0 ? (
               <>
@@ -2949,7 +2949,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   <p style={{ color:"#F5F0E8", fontSize:15, fontWeight:700, margin:"0 0 6px" }}>Bienvenue dans QR Studio</p>
                   <p style={{ color:MUTED, fontSize:12, margin:0, lineHeight:1.6 }}>Créez votre première page pour générer<br/>un QR Code personnalisable.</p>
                 </div>
-                <a href="/dashboard" style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"11px 20px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, textDecoration:"none", boxShadow:"0 4px 14px rgba(201,168,76,0.2)" }}>
+                <a href="/dashboard" style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"11px 20px", background:"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, textDecoration:"none", boxShadow:"0 4px 14px color-mix(in srgb, var(--accent) 20%, transparent)" }}>
                   <Plus size={15}/> Créer ma première page
                 </a>
               </>
@@ -2979,7 +2979,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         <div style={{ display:"flex", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
           {([["style","Style","🎨"],["supports","Imprimables","🖨️"],["export","Export","📤"]] as const).map(([id,label,emoji]) => (
             <button key={id} type="button" onClick={() => setActiveTab(id)}
-              style={{ flex:1, padding:"11px 8px", background:activeTab===id?"rgba(201,168,76,0.06)":"transparent", border:"none", borderBottom:activeTab===id?`2px solid ${G}`:"2px solid transparent", color:activeTab===id?G:MUTED, fontSize:12, fontWeight:600, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:5 }}>
+              style={{ flex:1, padding:"11px 8px", background:activeTab===id?"color-mix(in srgb, var(--accent) 6%, transparent)":"transparent", border:"none", borderBottom:activeTab===id?`2px solid ${G}`:"2px solid transparent", color:activeTab===id?G:MUTED, fontSize:12, fontWeight:600, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:5 }}>
               <span>{emoji}</span>{label}
             </button>
           ))}
@@ -3012,7 +3012,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   <AccSection id="presets" title="Choisir un style" icon="✨" openId={openAcc} setOpenId={setOpenAcc}>
                     {/* Bouton style automatique */}
                     <button type="button" onClick={autoStyle}
-                      style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, marginBottom:autoMsg?6:12, padding:"10px", background:"linear-gradient(90deg, rgba(201,168,76,0.18), rgba(201,168,76,0.08))", border:"1px solid rgba(201,168,76,0.35)", borderRadius:10, color:G, fontSize:12, fontWeight:700, cursor:"pointer" }}>
+                      style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, marginBottom:autoMsg?6:12, padding:"10px", background:"linear-gradient(90deg, color-mix(in srgb, var(--accent) 18%, transparent), color-mix(in srgb, var(--accent) 8%, transparent))", border:"1px solid color-mix(in srgb, var(--accent) 35%, transparent)", borderRadius:10, color:G, fontSize:12, fontWeight:700, cursor:"pointer" }}>
                       <Sparkles size={14}/> Générer un style automatiquement
                     </button>
                     {autoMsg && (
@@ -3027,7 +3027,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         const isReco = cat.id !== "all" && cat.id === detectCat()
                         return (
                         <button key={cat.id} type="button" onClick={() => setSelectedCat(cat.id)}
-                          style={{ position:"relative" as const, display:"inline-flex", alignItems:"center", gap:3, padding:"5px 10px", background:selectedCat===cat.id?"rgba(201,168,76,0.15)":"rgba(255,255,255,0.04)", border:`1px solid ${selectedCat===cat.id?"rgba(201,168,76,0.4)":isReco?"rgba(57,255,143,0.4)":"rgba(255,255,255,0.08)"}`, borderRadius:20, color:selectedCat===cat.id?G:MUTED, fontSize:10, fontWeight:selectedCat===cat.id?700:500, cursor:"pointer", whiteSpace:"nowrap" as const, flexShrink:0 }}>
+                          style={{ position:"relative" as const, display:"inline-flex", alignItems:"center", gap:3, padding:"5px 10px", background:selectedCat===cat.id?"color-mix(in srgb, var(--accent) 15%, transparent)":"rgba(255,255,255,0.04)", border:`1px solid ${selectedCat===cat.id?"color-mix(in srgb, var(--accent) 40%, transparent)":isReco?"rgba(57,255,143,0.4)":"rgba(255,255,255,0.08)"}`, borderRadius:20, color:selectedCat===cat.id?G:MUTED, fontSize:10, fontWeight:selectedCat===cat.id?700:500, cursor:"pointer", whiteSpace:"nowrap" as const, flexShrink:0 }}>
                           <span>{cat.emoji}</span>{cat.label}
                           {isReco && <span style={{ width:5, height:5, borderRadius:"50%", background:"#39FF8F", flexShrink:0 }}/>}
                         </button>
@@ -3045,9 +3045,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         const cornR = preset.cornerStyle === "circle" || preset.cornerStyle === "rounded" || preset.cornerStyle === "luxury" ? "30%" : "2px"
                         return (
                           <div key={preset.id} onClick={() => applyPreset(preset)}
-                            onMouseEnter={e => { if (!isActive) { e.currentTarget.style.borderColor = "rgba(201,168,76,0.45)"; e.currentTarget.style.transform = "translateY(-2px)" } }}
-                            onMouseLeave={e => { if (!isActive) { e.currentTarget.style.borderColor = canAccess?"rgba(255,255,255,0.08)":"rgba(201,168,76,0.28)"; e.currentTarget.style.transform = "translateY(0)" } }}
-                            style={{ position:"relative", cursor:"pointer", borderRadius:10, overflow:"hidden", border:`1.5px solid ${isActive?"#C9A84C":canAccess?"rgba(255,255,255,0.08)":"rgba(201,168,76,0.28)"}`, transition:"all 0.15s", opacity:1 }}>
+                            onMouseEnter={e => { if (!isActive) { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 45%, transparent)"; e.currentTarget.style.transform = "translateY(-2px)" } }}
+                            onMouseLeave={e => { if (!isActive) { e.currentTarget.style.borderColor = canAccess?"rgba(255,255,255,0.08)":"color-mix(in srgb, var(--accent) 28%, transparent)"; e.currentTarget.style.transform = "translateY(0)" } }}
+                            style={{ position:"relative", cursor:"pointer", borderRadius:10, overflow:"hidden", border:`1.5px solid ${isActive?"#C9A84C":canAccess?"rgba(255,255,255,0.08)":"color-mix(in srgb, var(--accent) 28%, transparent)"}`, transition:"all 0.15s", opacity:1 }}>
 
                             {/* Apercu QR miniature realiste */}
                             <div style={{ background:preset.bg, padding:"12px", display:"flex", alignItems:"center", justifyContent:"center", position:"relative", minHeight:64 }}>
@@ -3084,7 +3084,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                                 {preset.label}
                               </p>
                               {planLabel && (
-                                <span style={{ background:preset.plan==="pro"?"rgba(201,168,76,0.15)":"rgba(57,255,143,0.12)", borderRadius:3, padding:"1px 4px", fontSize:7, color:preset.plan==="pro"?G:"#39FF8F", fontWeight:700 }}>
+                                <span style={{ background:preset.plan==="pro"?"color-mix(in srgb, var(--accent) 15%, transparent)":"rgba(57,255,143,0.12)", borderRadius:3, padding:"1px 4px", fontSize:7, color:preset.plan==="pro"?G:"#39FF8F", fontWeight:700 }}>
                                   {planLabel}
                                 </span>
                               )}
@@ -3108,7 +3108,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   <AccSection id="couleurs" title="Couleurs" icon="🎨" openId={openAcc} setOpenId={setOpenAcc}>
                     {/* Generer une palette */}
                     <button type="button" onClick={genPalette}
-                      style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, marginBottom:10, padding:"9px", background:"linear-gradient(90deg, rgba(201,168,76,0.16), rgba(201,168,76,0.06))", border:"1px solid rgba(201,168,76,0.3)", borderRadius:9, color:G, fontSize:12, fontWeight:700, cursor:"pointer" }}>
+                      style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, marginBottom:10, padding:"9px", background:"linear-gradient(90deg, color-mix(in srgb, var(--accent) 16%, transparent), color-mix(in srgb, var(--accent) 6%, transparent))", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:9, color:G, fontSize:12, fontWeight:700, cursor:"pointer" }}>
                       <Sparkles size={13}/> Générer une palette
                     </button>
                     {/* Palettes en un clic */}
@@ -3128,7 +3128,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         const sel = fg.toUpperCase() === p.fg && bg.toUpperCase() === p.bg
                         return (
                           <button key={p.name} type="button" onClick={() => { setFg(p.fg); setBg(p.bg) }}
-                            style={{ display:"flex", alignItems:"center", gap:7, padding:"6px 8px", background:sel?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.02)", border:`1px solid ${sel?G:"rgba(255,255,255,0.07)"}`, borderRadius:8, cursor:"pointer", textAlign:"left" as const }}>
+                            style={{ display:"flex", alignItems:"center", gap:7, padding:"6px 8px", background:sel?"color-mix(in srgb, var(--accent) 12%, transparent)":"rgba(255,255,255,0.02)", border:`1px solid ${sel?G:"rgba(255,255,255,0.07)"}`, borderRadius:8, cursor:"pointer", textAlign:"left" as const }}>
                             <span style={{ width:22, height:22, borderRadius:5, background:p.bg, border:"1px solid rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                               <span style={{ width:11, height:11, borderRadius:2, background:p.fg }}/>
                             </span>
@@ -3166,7 +3166,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         const canAccess = !isPro || PLAN_RANK[userPlan] >= 2
                         return (
                           <button key={ds.id ?? "sq"} type="button" onClick={() => canAccess ? setStyleConf(p => ({ ...p, dotStyle: ds.id })) : setUpsell({ feature: `le style de modules « ${ds.label} »`, plan: "pro" })}
-                            style={{ position:"relative", padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:"pointer", opacity:canAccess?1:0.85, textAlign:"center" as const }}>
+                            style={{ position:"relative", padding:"10px 8px", background:isActive?"color-mix(in srgb, var(--accent) 10%, transparent)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"color-mix(in srgb, var(--accent) 40%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:"pointer", opacity:canAccess?1:0.85, textAlign:"center" as const }}>
                             <div style={{ fontSize:18, marginBottom:4 }}>{ds.emoji}</div>
                             <p style={{ color:isActive?G:"#F5F0E8", fontSize:10, fontWeight:isActive?700:500, margin:0 }}>{ds.label}</p>
                             {isPro && !canAccess && (
@@ -3193,7 +3193,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         else if (cs.id === "minimal") setCorner("dot")
                         else setCorner("square")
                       }}
-                            style={{ padding:"10px 8px", background:isActive?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:"pointer", opacity:canAccess?1:0.85, position:"relative" as const }}>
+                            style={{ padding:"10px 8px", background:isActive?"color-mix(in srgb, var(--accent) 10%, transparent)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"color-mix(in srgb, var(--accent) 40%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:"pointer", opacity:canAccess?1:0.85, position:"relative" as const }}>
                             <p style={{ color:isActive?G:"#F5F0E8", fontSize:11, fontWeight:isActive?700:500, margin:0, textAlign:"center" as const }}>{cs.label}</p>
                             {isPro && !canAccess && (
                               <span style={{ position:"absolute", top:4, right:4, display:"inline-flex", alignItems:"center", gap:1, background:G, borderRadius:4, padding:"1px 4px", fontSize:7, color:"#080808", fontWeight:800, boxShadow:"0 2px 6px rgba(0,0,0,0.4)" }}><Sparkles size={6} color="#080808"/>PRO</span>
@@ -3206,7 +3206,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     <div style={{ display:"flex", gap:6 }}>
                       {(["square","rounded","dot"] as const).map(c => (
                         <button key={c} type="button" onClick={() => setCorner(c)}
-                          style={{ flex:1, padding:"7px 6px", background:corner===c?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1px solid ${corner===c?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:corner===c?G:MUTED, fontSize:10, cursor:"pointer", fontWeight:corner===c?700:400 }}>
+                          style={{ flex:1, padding:"7px 6px", background:corner===c?"color-mix(in srgb, var(--accent) 12%, transparent)":"rgba(255,255,255,0.03)", border:`1px solid ${corner===c?"color-mix(in srgb, var(--accent) 40%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:corner===c?G:MUTED, fontSize:10, cursor:"pointer", fontWeight:corner===c?700:400 }}>
                           {c==="square"?"Carré":c==="rounded"?"Arrondi":"Dots"}
                         </button>
                       ))}
@@ -3237,7 +3237,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         <p style={{ color:MUTED, fontSize:10, margin:0 }}>PNG avec canal alpha</p>
                       </div>
                       <button type="button" onClick={() => setStyleConf(p => ({ ...p, transparent: !p.transparent }))}
-                        style={{ width:38, height:22, borderRadius:11, background:styleConf.transparent?"linear-gradient(90deg,#C9A84C,#b8953f)":"rgba(255,255,255,0.1)", border:"none", cursor:"pointer", position:"relative", transition:"background 0.2s" }}>
+                        style={{ width:38, height:22, borderRadius:11, background:styleConf.transparent?"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))":"rgba(255,255,255,0.1)", border:"none", cursor:"pointer", position:"relative", transition:"background 0.2s" }}>
                         <div style={{ position:"absolute", top:3, left:styleConf.transparent?18:3, width:16, height:16, borderRadius:"50%", background:"#F5F0E8", transition:"left 0.2s" }}/>
                       </button>
                     </div>
@@ -3246,7 +3246,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
                       {GRADIENT_OPTS.map(g => (
                         <button key={g.id ?? "none"} type="button" onClick={() => setStyleConf(p => ({ ...p, gradient: g.id ?? "none" }))}
-                          style={{ padding:"7px 8px", background:(styleConf.gradient??"none")===(g.id??"none")?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${(styleConf.gradient??"none")===(g.id??"none")?"rgba(201,168,76,0.35)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:(styleConf.gradient??"none")===(g.id??"none")?G:MUTED, fontSize:10, cursor:"pointer", fontWeight:(styleConf.gradient??"none")===(g.id??"none")?700:400 }}>
+                          style={{ padding:"7px 8px", background:(styleConf.gradient??"none")===(g.id??"none")?"color-mix(in srgb, var(--accent) 10%, transparent)":"rgba(255,255,255,0.02)", border:`1px solid ${(styleConf.gradient??"none")===(g.id??"none")?"color-mix(in srgb, var(--accent) 35%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:(styleConf.gradient??"none")===(g.id??"none")?G:MUTED, fontSize:10, cursor:"pointer", fontWeight:(styleConf.gradient??"none")===(g.id??"none")?700:400 }}>
                           {g.label}
                         </button>
                       ))}
@@ -3263,7 +3263,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
                   {/* ECC warning automatique */}
                   {styleConf.logoUrl && (
-                    <div style={{ display:"flex", alignItems:"center", gap:7, padding:"9px 12px", background:"rgba(201,168,76,0.07)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:9 }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:7, padding:"9px 12px", background:"color-mix(in srgb, var(--accent) 7%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:9 }}>
                       <AlertTriangle size={13} color={G}/>
                       <p style={{ color:G, fontSize:11, margin:0, lineHeight:1.4 }}>
                         Correction d&apos;erreur forcee a <strong>H</strong> automatiquement pour garantir la scannabilite.
@@ -3292,14 +3292,14 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           {logoUploading ? "Chargement..." : "Deposer votre logo"}
                         </p>
                         <p style={{ color:MUTED, fontSize:10, margin:"0 0 10px" }}>PNG, SVG, WEBP -- max 2 Mo</p>
-                        <span style={{ display:"inline-block", padding:"5px 14px", background:"rgba(201,168,76,0.1)", border:"1px solid rgba(201,168,76,0.25)", borderRadius:7, color:G, fontSize:11, fontWeight:600 }}>
+                        <span style={{ display:"inline-block", padding:"5px 14px", background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius:7, color:G, fontSize:11, fontWeight:600 }}>
                           Parcourir
                         </span>
                         <input ref={logoInputRef} type="file" accept="image/*" style={{ display:"none" }}
                           onChange={e => { const f = e.target.files?.[0]; if (f) handleLogoUpload(f); e.target.value = "" }}/>
                       </div>
                     ) : (
-                      <div style={{ display:"flex", gap:10, alignItems:"center", padding:"12px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:10 }}>
+                      <div style={{ display:"flex", gap:10, alignItems:"center", padding:"12px", background:"rgba(255,255,255,0.02)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:10 }}>
                         <div style={{ width:48, height:48, borderRadius:8, overflow:"hidden", flexShrink:0, background:"rgba(255,255,255,0.05)", display:"flex", alignItems:"center", justifyContent:"center", border:"1px solid rgba(255,255,255,0.1)" }}>
                           <img src={styleConf.logoUrl} alt="Logo" style={{ width:"100%", height:"100%", objectFit:"contain" }}/>
                         </div>
@@ -3352,7 +3352,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                             { id:"circle",  label:"Cercle",  icon:"⚫" },
                           ] as const).map(s => (
                             <button key={s.id} type="button" onClick={() => setStyleConf(p => ({ ...p, logoShape: s.id }))}
-                              style={{ flex:1, padding:"9px 6px", background:(styleConf.logoShape??"rounded")===s.id?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1px solid ${(styleConf.logoShape??"rounded")===s.id?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:"pointer", textAlign:"center" as const }}>
+                              style={{ flex:1, padding:"9px 6px", background:(styleConf.logoShape??"rounded")===s.id?"color-mix(in srgb, var(--accent) 12%, transparent)":"rgba(255,255,255,0.03)", border:`1px solid ${(styleConf.logoShape??"rounded")===s.id?"color-mix(in srgb, var(--accent) 40%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:"pointer", textAlign:"center" as const }}>
                               <div style={{ fontSize:16, marginBottom:3 }}>{s.icon}</div>
                               <p style={{ color:(styleConf.logoShape??"rounded")===s.id?G:MUTED, fontSize:9, margin:0, fontWeight:(styleConf.logoShape??"rounded")===s.id?700:400 }}>{s.label}</p>
                             </button>
@@ -3371,7 +3371,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                             { id:"custom",      label:"Personnalise" },
                           ] as const).map(b => (
                             <button key={b.id} type="button" onClick={() => setStyleConf(p => ({ ...p, logoBg: b.id }))}
-                              style={{ padding:"7px 8px", background:(styleConf.logoBg??"white")===b.id?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${(styleConf.logoBg??"white")===b.id?"rgba(201,168,76,0.35)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:(styleConf.logoBg??"white")===b.id?G:MUTED, fontSize:10, cursor:"pointer", fontWeight:(styleConf.logoBg??"white")===b.id?700:400 }}>
+                              style={{ padding:"7px 8px", background:(styleConf.logoBg??"white")===b.id?"color-mix(in srgb, var(--accent) 10%, transparent)":"rgba(255,255,255,0.02)", border:`1px solid ${(styleConf.logoBg??"white")===b.id?"color-mix(in srgb, var(--accent) 35%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:(styleConf.logoBg??"white")===b.id?G:MUTED, fontSize:10, cursor:"pointer", fontWeight:(styleConf.logoBg??"white")===b.id?700:400 }}>
                               {b.label}
                             </button>
                           ))}
@@ -3425,7 +3425,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         const locked = (ec.id==="Q"||ec.id==="H") && !canPro
                         return (
                           <button key={ec.id} type="button" onClick={() => locked ? setUpsell({ feature: `la correction d'erreur « ${ec.label} »`, plan: "pro" }) : setEcLevel(ec.id as any)}
-                            style={{ position:"relative", padding:"7px 8px", background:ecLevel===ec.id?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.02)", border:`1px solid ${ecLevel===ec.id?"rgba(201,168,76,0.35)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:locked?MUTED:ecLevel===ec.id?G:"#F5F0E8", fontSize:10, cursor:"pointer", opacity:locked?0.5:1, textAlign:"center" as const }}>
+                            style={{ position:"relative", padding:"7px 8px", background:ecLevel===ec.id?"color-mix(in srgb, var(--accent) 10%, transparent)":"rgba(255,255,255,0.02)", border:`1px solid ${ecLevel===ec.id?"color-mix(in srgb, var(--accent) 35%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:locked?MUTED:ecLevel===ec.id?G:"#F5F0E8", fontSize:10, cursor:"pointer", opacity:locked?0.5:1, textAlign:"center" as const }}>
                             <div style={{ fontWeight:700, marginBottom:1 }}>{ec.label}</div>
                             <div style={{ color:MUTED, fontSize:9 }}>{ec.desc}</div>
                             {locked && <Lock size={9} color={MUTED} style={{ position:"absolute", top:4, right:4 }}/>}
@@ -3440,7 +3440,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     La correction d&apos;erreur permet au QR de rester lisible meme abime, sale ou partiellement couvert (logo). Plus elle est elevee, plus le QR est robuste -- mais aussi plus dense.
                   </p>
                   {styleConf.logoUrl && (
-                    <div style={{ display:"flex", alignItems:"center", gap:7, padding:"8px 10px", background:"rgba(201,168,76,0.07)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:8 }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:7, padding:"8px 10px", background:"color-mix(in srgb, var(--accent) 7%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:8 }}>
                       <AlertTriangle size={12} color={G}/>
                       <p style={{ color:G, fontSize:10, margin:0, lineHeight:1.4 }}>Un logo est actif : correction forcee a H quel que soit le choix ci-dessus.</p>
                     </div>
@@ -3458,7 +3458,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             {/* Actions en bas */}
             <div style={{ padding:"12px 14px", borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", gap:7, flexShrink:0 }}>
               <button type="button" onClick={saveCustomization} disabled={saving}
-                style={{ padding:"10px", background:saved?"rgba(57,255,143,0.12)":"linear-gradient(90deg,#C9A84C,#b8953f)", border:saved?"1px solid rgba(57,255,143,0.3)":"none", borderRadius:9, color:saved?"#39FF8F":"#080808", fontSize:12, fontWeight:700, cursor:saving?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7, opacity:saving?0.7:1, transition:"all 0.2s" }}>
+                style={{ padding:"10px", background:saved?"rgba(57,255,143,0.12)":"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border:saved?"1px solid rgba(57,255,143,0.3)":"none", borderRadius:9, color:saved?"#39FF8F":"#080808", fontSize:12, fontWeight:700, cursor:saving?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7, opacity:saving?0.7:1, transition:"all 0.2s" }}>
                 {saving ? <><Loader2 size={12} style={{ animation:"spin 0.8s linear infinite" }}/> Enregistrement...</>
                   : saved ? <><Check size={12}/> Sauvegarde !</>
                   : <><Palette size={12}/> Enregistrer le style</>}
@@ -3481,7 +3481,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           <div className="qr-scroll" style={{ display:"flex", flexDirection:"column", flex:1, overflow:"auto", padding:"18px 16px", gap:14 }}>
             {/* CTA principal : ouvrir l'editeur QR Print Studio */}
             <button type="button" onClick={openEditor} disabled={editorLoading}
-              style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:9, padding:"15px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", border:"none", borderRadius:12, color:"#080808", fontSize:14, fontWeight:800, cursor:editorLoading?"wait":"pointer", boxShadow:"0 8px 26px rgba(201,168,76,0.3)", opacity:editorLoading?0.7:1 }}>
+              style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:9, padding:"15px", background:"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border:"none", borderRadius:12, color:"#080808", fontSize:14, fontWeight:800, cursor:editorLoading?"wait":"pointer", boxShadow:"0 8px 26px color-mix(in srgb, var(--accent) 30%, transparent)", opacity:editorLoading?0.7:1 }}>
               {editorLoading ? <Loader2 size={16} style={{ animation:"spin 0.8s linear infinite" }}/> : <Sparkles size={16}/>}
               {editorLoading ? "Ouverture..." : "Ouvrir QR Print Studio"}
             </button>
@@ -3600,7 +3600,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     return (
                       <button key={String(s)} type="button"
                         onClick={() => canHD && setExpSize(s as any)}
-                        style={{ padding:"5px 10px", background:expSize===s?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:`1px solid ${expSize===s?"rgba(201,168,76,0.4)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:expSize===s?G:canHD?"#F5F0E8":MUTED, fontSize:10, cursor:canHD?"pointer":"not-allowed", fontWeight:expSize===s?700:400, opacity:canHD?1:0.55 }}>
+                        style={{ padding:"5px 10px", background:expSize===s?"color-mix(in srgb, var(--accent) 12%, transparent)":"rgba(255,255,255,0.03)", border:`1px solid ${expSize===s?"color-mix(in srgb, var(--accent) 40%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:expSize===s?G:canHD?"#F5F0E8":MUTED, fontSize:10, cursor:canHD?"pointer":"not-allowed", fontWeight:expSize===s?700:400, opacity:canHD?1:0.55 }}>
                         {s === "custom" ? "Perso" : `${s}px`}
                         {isHD && !canHD && <Lock size={8} color={MUTED} style={{ marginLeft:3 }}/>}
                       </button>
@@ -3661,7 +3661,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           <div key={i} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", opacity:can?1:0.5 }}>
                             <span style={{ color:MUTED, fontSize:11 }}>{opt.label}{!can&&" (Pro)"}</span>
                             <button type="button" onClick={() => can && opt.set(!opt.state)}
-                              style={{ width:34, height:20, borderRadius:10, background:opt.state&&can?"linear-gradient(90deg,#C9A84C,#b8953f)":"rgba(255,255,255,0.1)", border:"none", cursor:can?"pointer":"not-allowed", position:"relative" as const, transition:"background 0.2s" }}>
+                              style={{ width:34, height:20, borderRadius:10, background:opt.state&&can?"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))":"rgba(255,255,255,0.1)", border:"none", cursor:can?"pointer":"not-allowed", position:"relative" as const, transition:"background 0.2s" }}>
                               <div style={{ position:"absolute", top:2, left:opt.state&&can?16:2, width:16, height:16, borderRadius:"50%", background:"#F5F0E8", transition:"left 0.2s" }}/>
                             </button>
                           </div>
@@ -3701,7 +3701,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
                 {/* Copier SVG */}
                 <button type="button" onClick={copySVG}
-                  style={{ padding:"9px", background:expCopied==="svg"?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.04)", border:`1px solid ${expCopied==="svg"?"rgba(201,168,76,0.3)":"rgba(255,255,255,0.08)"}`, borderRadius:9, color:expCopied==="svg"?G:MUTED, fontSize:11, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                  style={{ padding:"9px", background:expCopied==="svg"?"color-mix(in srgb, var(--accent) 10%, transparent)":"rgba(255,255,255,0.04)", border:`1px solid ${expCopied==="svg"?"color-mix(in srgb, var(--accent) 30%, transparent)":"rgba(255,255,255,0.08)"}`, borderRadius:9, color:expCopied==="svg"?G:MUTED, fontSize:11, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
                   {expCopied==="svg" ? <><Check size={12}/> SVG copie !</> : <><Copy size={12}/> Copier le SVG</>}
                 </button>
 
@@ -3721,10 +3721,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
               {/* Upsell */}
               {!canPro && (
-                <div style={{ padding:"12px 14px", background:"rgba(201,168,76,0.05)", border:"1px solid rgba(201,168,76,0.15)", borderRadius:10 }}>
+                <div style={{ padding:"12px 14px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius:10 }}>
                   <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 4px" }}>Formats HD + SVG + PDF</p>
                   <p style={{ color:MUTED, fontSize:10, margin:"0 0 8px" }}>Pro: PNG alpha, WEBP, SVG . Business: PDF A4</p>
-                  <a href="/upgrade" style={{ display:"block", textAlign:"center" as const, padding:"7px", background:"linear-gradient(90deg,#C9A84C,#b8953f)", borderRadius:7, color:"#080808", fontSize:11, fontWeight:700, textDecoration:"none" }}>
+                  <a href="/upgrade" style={{ display:"block", textAlign:"center" as const, padding:"7px", background:"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius:7, color:"#080808", fontSize:11, fontWeight:700, textDecoration:"none" }}>
                     Voir les plans
                   </a>
                 </div>
@@ -3738,7 +3738,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       </div>
 
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg) } } @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} } [data-qr-container] canvas, [data-qr-container] svg { width:100% !important; height:100% !important; display:block; } @media (max-width: 859px) { .qr-grid { display:flex !important; flex-direction:column !important; min-height:0 !important; overflow:visible !important; } .qr-col-preview { order:1 !important; width:100% !important; overflow:visible !important; } .qr-col-settings { order:2 !important; width:100% !important; overflow:visible !important; border-left:none !important; border-top:1px solid rgba(255,255,255,0.06) !important; } .qr-col-list { order:3 !important; width:100% !important; overflow:visible !important; border-right:none !important; border-top:1px solid rgba(255,255,255,0.06) !important; } .qr-scroll { flex:none !important; height:auto !important; max-height:none !important; overflow:visible !important; } } button { transition: transform 0.08s ease, opacity 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease; } button:active { transform: scale(0.97); } input:focus, select:focus, textarea:focus { border-color: rgba(201,168,76,0.55) !important; box-shadow: 0 0 0 3px rgba(201,168,76,0.12) !important; } .qr-scroll::-webkit-scrollbar { width:8px; height:8px; } .qr-scroll::-webkit-scrollbar-track { background:transparent; } .qr-scroll::-webkit-scrollbar-thumb { background:rgba(201,168,76,0.18); border-radius:8px; } .qr-scroll::-webkit-scrollbar-thumb:hover { background:rgba(201,168,76,0.35); }`}</style>
+      <style>{`@keyframes spin { to { transform: rotate(360deg) } } @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} } [data-qr-container] canvas, [data-qr-container] svg { width:100% !important; height:100% !important; display:block; } @media (max-width: 859px) { .qr-grid { display:flex !important; flex-direction:column !important; min-height:0 !important; overflow:visible !important; } .qr-col-preview { order:1 !important; width:100% !important; overflow:visible !important; } .qr-col-settings { order:2 !important; width:100% !important; overflow:visible !important; border-left:none !important; border-top:1px solid rgba(255,255,255,0.06) !important; } .qr-col-list { order:3 !important; width:100% !important; overflow:visible !important; border-right:none !important; border-top:1px solid rgba(255,255,255,0.06) !important; } .qr-scroll { flex:none !important; height:auto !important; max-height:none !important; overflow:visible !important; } } button { transition: transform 0.08s ease, opacity 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease; } button:active { transform: scale(0.97); } input:focus, select:focus, textarea:focus { border-color: color-mix(in srgb, var(--accent) 55%, transparent) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent) !important; } .qr-scroll::-webkit-scrollbar { width:8px; height:8px; } .qr-scroll::-webkit-scrollbar-track { background:transparent; } .qr-scroll::-webkit-scrollbar-thumb { background:color-mix(in srgb, var(--accent) 18%, transparent); border-radius:8px; } .qr-scroll::-webkit-scrollbar-thumb:hover { background:color-mix(in srgb, var(--accent) 35%, transparent); }`}</style>
     </div>
   )
 }

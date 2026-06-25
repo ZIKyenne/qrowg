@@ -47,7 +47,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         supabase.from("profiles").select("*").eq("id", data.user.id).single()
           .then(({ data: p }) => {
             setProfile(p)
-            if (p?.accent_color) { setAccent(p.accent_color); localStorage.setItem("qrfolio_accent", p.accent_color) }
+            const acc = p?.preferences?.accent_color || p?.accent_color
+            if (acc) { setAccent(acc); localStorage.setItem("qrfolio_accent", acc) }
           })
       }
     })

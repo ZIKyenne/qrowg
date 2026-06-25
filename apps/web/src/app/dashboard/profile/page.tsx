@@ -102,7 +102,7 @@ const DEFAULT_PREFS: UserPreferences = {
   time_format: "24h", currency: "EUR",
   notif_email: true, notif_scan: true, notif_security: true,
   report_weekly: false, report_monthly: false,
-  accent_color: "var(--accent)",
+  accent_color: "#C9A84C",
 }
 
 type DomainRecord = {
@@ -484,12 +484,19 @@ export default function ProfilePage() {
   }
 
   function setPrefField<K extends keyof UserPreferences>(key: K, value: UserPreferences[K]) {
-    savePrefs({ ...prefs, [key]: value })
-    // La couleur d'accent pilote le chrome du dashboard (sidebar, logo, états actifs) en direct
+    // La couleur d'accent : appliquée + persistée localement (fiable, hors-ligne),
+    // sync DB best-effort silencieuse -> pas de toast d'erreur même si la colonne manque.
     if (key === "accent_color" && typeof value === "string") {
+      const next = { ...prefs, accent_color: value }
+      setPrefs(next)
       localStorage.setItem("qrfolio_accent", value)
       window.dispatchEvent(new CustomEvent("qrfolio-accent", { detail: value }))
+      if (profile) {
+        createClient().from("profiles").update({ preferences: next }).eq("id", profile.id).then(() => {})
+      }
+      return
     }
+    savePrefs({ ...prefs, [key]: value })
   }
 
   // -- Fonctions domaines ----------------------------------------
@@ -3043,7 +3050,7 @@ export default function ProfilePage() {
                 <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                   <div style={{ display:"flex", gap:7, flexWrap:"wrap" as const }}>
                     {[
-                      "var(--accent)","#39FF8F","#38BDF8","#7B61FF",
+                      "#C9A84C","#39FF8F","#38BDF8","#7B61FF",
                       "#EC4899","#F97316","#FF6B6B","#F5F0E8",
                     ].map(color => (
                       <button key={color} type="button" onClick={() => setPrefField("accent_color", color)}
