@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
-import { Plus, QrCode, BarChart2, Eye, Zap, ArrowRight, Globe, Trash2, ExternalLink, Edit3, AlertTriangle, X } from "lucide-react"
+import { Plus, QrCode, BarChart2, Eye, Zap, ArrowRight, Globe, Trash2, ExternalLink, Edit3, AlertTriangle, X, Check } from "lucide-react"
 import { getPlan, fmtPrice } from "@/lib/plans"
 
 type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string }
