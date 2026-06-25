@@ -516,6 +516,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [dupId,      setDupId]      = useState<string | null>(null)
   const [showModal,  setShowModal]  = useState(false)
   const [scene,      setScene]      = useState<"none"|"phone"|"card"|"poster"|"sticker"|"tent">("none") // aperçu immersif
+  const [level,      setLevel]      = useState<"simple"|"inter"|"expert">("simple") // niveau de réglages (désencombre le panneau)
   const [qrPng,      setQrPng]      = useState<string>("") // PNG du QR composé dans les scènes
   const [diagFg,     setDiagFg]     = useState("")
   const [diagBg,     setDiagBg]     = useState("")
@@ -3096,6 +3097,21 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               {styleTab === "apparence" && (
                 <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
 
+                  {/* Niveau de réglages : désencombre le panneau (Simple → Expert) */}
+                  <div style={{ display:"flex", gap:4, padding:4, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:11, marginBottom:2 }}>
+                    {([["simple","Simple"],["inter","Intermédiaire"],["expert","Expert"]] as const).map(([k,l]) => (
+                      <button key={k} type="button" onClick={() => setLevel(k)}
+                        style={{ flex:1, padding:"7px 4px", borderRadius:8, border:"none", cursor:"pointer", fontSize:10.5, fontWeight:level===k?700:500,
+                          background: level===k ? "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))" : "transparent",
+                          color: level===k ? "#080808" : "#8A8478" }}>
+                        {l}
+                      </button>
+                    ))}
+                  </div>
+                  <p style={{ color:MUTED, fontSize:9.5, margin:"0 0 4px", lineHeight:1.4 }}>
+                    {level==="simple" ? "L'essentiel : choisir un style et les couleurs. Idéal pour aller vite." : level==="inter" ? "+ formes des modules et des coins." : "Tous les réglages : logo, dégradés, marge, correction d'erreur…"}
+                  </p>
+
                   {/* 1. Bibliotheque de presets (ouvert par defaut) */}
                   <AccSection id="presets" title="Choisir un style" icon="✨" openId={openAcc} setOpenId={setOpenAcc}>
                     {/* Bouton style automatique */}
@@ -3245,7 +3261,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     })()}
                   </AccSection>
 
-                  {/* 3. Style des modules (ferme) */}
+                  {/* 3. Style des modules (Intermédiaire+) */}
+                  {level !== "simple" && (
                   <AccSection id="modules" title="Style des modules" icon="🔲" openId={openAcc} setOpenId={setOpenAcc}>
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7 }}>
                       {DOT_STYLES.map(ds => {
@@ -3266,7 +3283,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </div>
                   </AccSection>
 
-                  {/* 4. Style des coins (ferme) */}
+                  )}
+
+                  {/* 4. Style des coins (Intermédiaire+) */}
+                  {level !== "simple" && (
                   <AccSection id="coins" title="Style des coins" icon="⬛" openId={openAcc} setOpenId={setOpenAcc}>
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7, marginBottom:14 }}>
                       {CORNER_STYLE_LIST.map(cs => {
@@ -3301,7 +3321,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </div>
                   </AccSection>
 
-                  {/* 5. Reglages avances (ferme) : couleurs avancees + degrade */}
+                  )}
+
+                  {/* 5. Reglages avances (Expert) : logo, couleurs avancees + degrade */}
+                  {level === "expert" && (
                   <AccSection id="avances" title="Réglages avancés" icon="⚙️" openId={openAcc} setOpenId={setOpenAcc}>
                     <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Couleurs avancees</p>
                     <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:14 }}>
@@ -3340,6 +3363,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       ))}
                     </div>
                   </AccSection>
+                  )}
 
                 </div>
               )}
