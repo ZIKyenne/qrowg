@@ -481,16 +481,14 @@ function FeaturesSection() {
                   {/* Icon + tag row */}
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <div style={{
-                      width: 42, height: 42, borderRadius: 12,
-                      background: `${f.accent}12`,
-                      border: `1px solid ${f.accent}28`,
+                      width: 44, height: 44, borderRadius: 13,
+                      background: `linear-gradient(135deg, ${f.accent}30, ${f.accent}0d)`,
+                      border: `1px solid ${f.accent}${isHovered ? "55" : "30"}`,
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 20, flexShrink: 0,
-                      transition: "background 0.25s ease, border-color 0.25s ease",
-                      ...(isHovered && {
-                        background: `${f.accent}20`,
-                        borderColor: `${f.accent}50`,
-                      }),
+                      fontSize: 21, flexShrink: 0,
+                      boxShadow: isHovered ? `0 0 22px ${f.accent}38` : `0 0 12px ${f.accent}14`,
+                      transform: isHovered ? "scale(1.08) rotate(-3deg)" : "scale(1)",
+                      transition: "all 0.28s cubic-bezier(0.34,1.56,0.64,1)",
                     }}>{f.icon}</div>
                     <span style={{
                       color: f.accent,
