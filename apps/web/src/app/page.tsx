@@ -716,7 +716,12 @@ function PricingSection() {
 
   return (
     <section id="pricing" ref={ref} aria-labelledby="pricing-title"
-      style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
+      style={{
+        padding: "100px 48px", position: "relative", zIndex: 1,
+        background: "linear-gradient(180deg, rgba(255,255,255,0.024), rgba(255,255,255,0.008)), radial-gradient(130% 60% at 50% 0%, rgba(201,168,76,0.06), transparent 60%)",
+        borderTop: "1px solid rgba(201,168,76,0.13)",
+        borderBottom: "1px solid rgba(201,168,76,0.13)",
+      }}>
       <style>{`
         .plans-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; align-items:center; }
         .plan-card  { border-radius:20px; padding:28px 22px; position:relative; overflow:hidden;
