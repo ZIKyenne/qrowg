@@ -1785,7 +1785,7 @@ function QRDynamicSection() {
 
   return (
     <section id="qr-dynamique" ref={ref} aria-labelledby="qr-dyn-title"
-      style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
+      style={{ padding: "100px 48px", position: "relative", zIndex: 1, overflow: "hidden" }}>
       <style>{`
         .qr-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; }
         .qr-card { display:flex; flex-direction:column; align-items:center; gap:14px;
@@ -1803,7 +1803,12 @@ function QRDynamicSection() {
         @keyframes qrGlow  { 0%,100%{opacity:0.4} 50%{opacity:1} }
       `}</style>
 
-      <div style={{ maxWidth: 1140, margin: "0 auto" }}>
+      {/* Ambiance dorée (impression / QR) — variation de fond par section */}
+      <div aria-hidden="true" style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none" }}>
+        <div style={{ position: "absolute", top: "0%", right: "-6%", width: "min(640px,72vw)", height: 560, borderRadius: "50%", background: "radial-gradient(circle, rgba(201,168,76,0.09), transparent 64%)", filter: "blur(54px)" }} />
+      </div>
+
+      <div style={{ maxWidth: 1140, margin: "0 auto", position: "relative", zIndex: 1 }}>
 
         {/* Header */}
         <div style={{
@@ -2206,14 +2211,19 @@ function AnalyticsSection() {
   const { ref, visible } = useInView(0.06)
   return (
     <section id="analytics" ref={ref} aria-labelledby="analytics-title"
-      style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
+      style={{ padding: "100px 48px", position: "relative", zIndex: 1, overflow: "hidden" }}>
       <style>{`
         .analytics-layout { display:grid; grid-template-columns:1fr 1.5fr; gap:72px; align-items:center; }
         @media(max-width:1024px){ .analytics-layout{ grid-template-columns:1fr!important; gap:48px!important; } }
         @media(max-width:640px){ #analytics{ padding:72px 20px!important; } }
       `}</style>
 
-      <div style={{ maxWidth: 1140, margin: "0 auto" }}>
+      {/* Ambiance bleutée (donnée / data) — variation de fond par section */}
+      <div aria-hidden="true" style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none" }}>
+        <div style={{ position: "absolute", top: "10%", left: "-6%", width: "min(620px,70vw)", height: 520, borderRadius: "50%", background: "radial-gradient(circle, rgba(56,189,248,0.08), transparent 64%)", filter: "blur(50px)" }} />
+      </div>
+
+      <div style={{ maxWidth: 1140, margin: "0 auto", position: "relative", zIndex: 1 }}>
         <div className="analytics-layout">
 
           {/* Left: texte + bénéfices */}
