@@ -168,7 +168,7 @@ function AnalyticsMockupSvg() {
         <span style={{ color:"rgba(201,168,76,0.4)",fontSize:9,letterSpacing:1.5,marginLeft:8 }}>ANALYTICS — QRfolio</span>
       </div>
       {/* KPI */}
-      <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,marginBottom:14 }}>
+      <div className="rcols-4" style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,marginBottom:14 }}>
         {[["📱","847","Scans","#39FF8F"],["👁","2 341","Vues","#38BDF8"],["🎯","36%","Clic","#C9A84C"],["✅","5","QR actifs","#A78BFA"]].map(([icon,val,lbl,c])=>(
           <div key={lbl as string} style={{ background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:9,padding:"8px 10px" }}>
             <span style={{fontSize:13}}>{icon}</span>
