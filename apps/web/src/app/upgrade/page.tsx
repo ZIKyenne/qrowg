@@ -185,8 +185,8 @@ export default function UpgradePage() {
         </div>
 
         {showComparison && (
-          <div style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 16, overflow: "hidden", marginBottom: 40 }}>
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+          <div className="cmp-table" style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 16, overflow: "hidden", marginBottom: 40 }}>
+            <div className="cmp-row" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
               <div style={{ padding: "14px 20px" }}><span style={{ color: MUTED, fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Fonctionnalite</span></div>
               {["Gratuit", "Starter", "Pro", "Business"].map((h, i) => (
                 <div key={i} style={{ padding: "14px 12px", textAlign: "center" }}>
@@ -195,7 +195,7 @@ export default function UpgradePage() {
               ))}
             </div>
             {COMPARISON.map((row, i) => (
-              <div key={i} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", borderBottom: i < COMPARISON.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none", background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)" }}>
+              <div key={i} className="cmp-row" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", borderBottom: i < COMPARISON.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none", background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)" }}>
                 <div style={{ padding: "11px 20px" }}><span style={{ color: "#F5F0E8", fontSize: 13 }}>{row.feature}</span></div>
                 {[row.free, row.starter, row.pro, row.business].map((val, j) => (
                   <div key={j} style={{ padding: "11px 12px", textAlign: "center" }}>

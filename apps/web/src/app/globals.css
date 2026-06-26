@@ -112,6 +112,13 @@ button:not(:disabled):active { transform: scale(.97); }
 @media (max-width: 600px) {
   .rpad { padding-left: 15px !important; padding-right: 15px !important; }
 }
+
+/* Tableau comparatif (Upgrade) : scroll horizontal sur mobile plutôt que d'écraser
+   les 5 colonnes. Les lignes gardent une largeur minimale lisible. */
+@media (max-width: 680px) {
+  .cmp-table { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+  .cmp-row { min-width: 580px; }
+}
 /* Empêche les débordements horizontaux globaux sur mobile */
 @media (max-width: 600px) {
   html, body { overflow-x: hidden; }
