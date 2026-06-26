@@ -193,7 +193,7 @@ function QRMockup() {
     <div ref={qrRef}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={{ position: "relative", width: 300, height: 300, margin: "0 auto",
+      style={{ position: "relative", width: "min(300px, 82vw)", aspectRatio: "1 / 1", margin: "0 auto",
         cursor: "default" }}
     >
       {/* Ambient glow outer */}
@@ -215,7 +215,7 @@ function QRMockup() {
       }} />
       {/* Card */}
       <div style={{
-        width: 300, height: 300,
+        width: "100%", height: "100%",
         background: "linear-gradient(145deg, #151210, #111009)",
         border: `1px solid ${hovered ? "rgba(201,168,76,0.6)" : pulse ? "rgba(201,168,76,0.45)" : "rgba(201,168,76,0.3)"}`,
         borderRadius: 22,
