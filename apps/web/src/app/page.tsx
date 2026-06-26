@@ -2726,6 +2726,22 @@ function FAQSection() {
   )
 }
 
+// ── Transition douce entre sections (hairline doré + glow) ────────────────────
+function SectionSeam() {
+  return (
+    <div aria-hidden="true" style={{
+      position: "relative", height: 1, maxWidth: 1140, margin: "0 auto", zIndex: 1,
+      background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.2) 32%, rgba(201,168,76,0.2) 68%, transparent)",
+    }}>
+      <div style={{
+        position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)",
+        width: "62%", height: 130, pointerEvents: "none",
+        background: "radial-gradient(ellipse at center, rgba(201,168,76,0.06), transparent 70%)",
+      }} />
+    </div>
+  )
+}
+
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [titleVisible, setTitleVisible] = useState(false)
@@ -2939,31 +2955,38 @@ export default function HomePage() {
 
       {/* HOW IT WORKS */}
       <HowItWorks />
+      <SectionSeam />
 
       {/* FEATURES */}
       <FeaturesSection />
+      <SectionSeam />
 
       {/* BUILDER */}
       <BuilderSection />
+      <SectionSeam />
 
       {/* TEMPLATES */}
       <TemplatesSection />
+      <SectionSeam />
 
       {/* QR DYNAMIQUE — fusionné : concept déjà couvert (hero, key-points, fonctionnalités, FAQ).
           Section retirée pour réduire la redondance (Pb 10). Réactivable : <QRDynamicSection /> */}
 
       {/* ANALYTICS */}
       <AnalyticsSection />
+      <SectionSeam />
 
       {/* USE CASES */}
       <UseCasesSection />
+      <SectionSeam />
 
       {/* MARQUE PRO */}
       <BrandProSection />
+      <SectionSeam />
 
       {/* PRICING */}
       <PricingSection />
-
+      <SectionSeam />
 
       {/* FAQ */}
       <FAQSection />
