@@ -21,8 +21,9 @@ import {
   Download, Printer, Loader2, Check, Save,
   Shapes, Star, Award, MousePointerClick, ArrowRight, LayoutTemplate,
   Undo2, Redo2, Sparkles, Image as ImageIcon, Palette, Eye, Search,
-  RotateCw, AlignCenterHorizontal, HelpCircle,
+  RotateCw, AlignCenterHorizontal, HelpCircle, Monitor,
 } from "lucide-react"
+import { useIsMobile } from "@/lib/useIsMobile"
 
 // ---- Constantes design (Clair & aere, style Canva) -------------------------
 const G       = "#C9A84C"   // accent (or de marque) : etats actifs, boutons primaires
@@ -836,6 +837,7 @@ const METIERS: { id: string; label: string; emoji: string; style: string; objs: 
 ]
 
 export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpsell, prefill, regenQr }: Props) {
+  const isMobile = useIsMobile(860) // éditeur canvas : écran d'invite sur mobile (voir return)
   const elRef   = useRef<HTMLCanvasElement>(null)
   const fcRef   = useRef<fabric.Canvas | null>(null)
   const qrUrlRef = useRef(qrDataUrl)
@@ -3221,6 +3223,31 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     color: INK, fontSize: 12.5, fontWeight: 600, cursor: "pointer",
   } as const
   const topDivider = <span style={{ width: 1, height: 24, background: "rgba(31,36,48,0.1)", margin: "0 4px" }} />
+
+  // Print Studio = éditeur canvas de précision (multi-panneaux, drag/resize) :
+  // impraticable sur petit écran tactile. On invite à passer sur ordinateur.
+  if (isMobile) {
+    return (
+      <div style={{
+        position: "fixed", inset: 0, zIndex: 3000, background: BG,
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        textAlign: "center" as const, padding: 28, fontFamily: "DM Sans, sans-serif",
+      }}>
+        <div style={{ width: 66, height: 66, borderRadius: 18, background: "rgba(201,168,76,0.14)", border: "1px solid rgba(201,168,76,0.35)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+          <Monitor size={30} color={G} />
+        </div>
+        <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 26, color: INK, fontWeight: 700, margin: "0 0 10px", maxWidth: 320 }}>
+          Print Studio s’utilise sur ordinateur
+        </h2>
+        <p style={{ color: MUTED, fontSize: 14, lineHeight: 1.6, margin: "0 0 24px", maxWidth: 340 }}>
+          L’éditeur d’imprimables (placement précis, calques, redimensionnement) nécessite un grand écran et une souris. Ouvrez QRfolio sur ordinateur pour créer vos supports.
+        </p>
+        <button onClick={onClose} style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 22px", background: `linear-gradient(90deg, ${G}, #b8953f)`, border: "none", borderRadius: 11, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+          <ArrowRight size={16} style={{ transform: "rotate(180deg)" }} /> Retour au QR Studio
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="ps-root" style={{
