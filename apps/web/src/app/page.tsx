@@ -415,19 +415,26 @@ function FeaturesSection() {
       >
         {FEATURES.map((f, i) => {
           const isHovered = hovered === i
+          const big = i === 0   // carte vedette pleine largeur
+          const wide = i === 5  // carte large secondaire
           return (
             <div
               key={f.tag}
+              className={big ? "feat-big" : wide ? "feat-wide" : undefined}
               onMouseEnter={() => setHovered(i)}
               onMouseLeave={() => setHovered(null)}
               style={{
-                background: isHovered
-                  ? "rgba(255,255,255,0.035)"
-                  : "rgba(255,255,255,0.018)",
-                border: `1px solid ${isHovered ? f.accent + "35" : "rgba(201,168,76,0.1)"}`,
-                borderRadius: 18,
-                padding: "28px 26px",
-                display: "flex", flexDirection: "column", gap: 14,
+                gridColumn: big ? "1 / -1" : wide ? "span 2" : "auto",
+                background: big
+                  ? `linear-gradient(135deg, ${f.accent}16, rgba(255,255,255,0.02))`
+                  : isHovered ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.018)",
+                border: `1px solid ${isHovered ? f.accent + "45" : big ? f.accent + "33" : "rgba(201,168,76,0.1)"}`,
+                borderRadius: big ? 22 : 18,
+                padding: big ? "38px 36px" : "28px 26px",
+                display: "flex",
+                flexDirection: big ? "row" : "column",
+                alignItems: big ? "center" : "stretch",
+                gap: big ? 30 : 14,
                 position: "relative", overflow: "hidden",
                 cursor: "default",
                 transform: visible
@@ -435,9 +442,9 @@ function FeaturesSection() {
                   : "translateY(28px)",
                 opacity: visible ? 1 : 0,
                 transition: `opacity 0.5s ease ${i * 80}ms, transform 0.35s cubic-bezier(0.34,1.56,0.64,1) ${visible ? "0ms" : i * 80 + "ms"}, border-color 0.25s ease, background 0.25s ease`,
-                boxShadow: isHovered
-                  ? `0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px ${f.accent}18`
-                  : "none",
+                boxShadow: big
+                  ? `0 14px 50px rgba(0,0,0,0.38), 0 0 70px ${f.accent}12`
+                  : isHovered ? `0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px ${f.accent}18` : "none",
               }}
             >
               {/* Top accent */}
@@ -453,39 +460,59 @@ function FeaturesSection() {
               <button type="button" onClick={() => setInfo(i)} aria-label={"En savoir plus : " + f.title}
                 style={{ position: "absolute", top: 16, right: 16, width: 22, height: 22, borderRadius: "50%", background: isHovered ? `${f.accent}22` : "rgba(255,255,255,0.05)", border: `1px solid ${isHovered ? f.accent + "55" : "rgba(255,255,255,0.12)"}`, color: isHovered ? f.accent : "rgba(138,132,120,0.8)", fontSize: 11, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s", zIndex: 2 }}>?</button>
 
-              {/* Icon + tag row */}
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{
-                  width: 42, height: 42, borderRadius: 12,
-                  background: `${f.accent}12`,
-                  border: `1px solid ${f.accent}28`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 20, flexShrink: 0,
-                  transition: "background 0.25s ease, border-color 0.25s ease",
-                  ...(isHovered && {
-                    background: `${f.accent}20`,
-                    borderColor: `${f.accent}50`,
-                  }),
-                }}>{f.icon}</div>
-                <span style={{
-                  color: f.accent,
-                  fontSize: 10, fontWeight: 700,
-                  letterSpacing: 2, textTransform: "uppercase",
-                  opacity: 0.8,
-                }}>{f.tag}</span>
-              </div>
+              {big ? (
+                <>
+                  {/* Icône vedette */}
+                  <div style={{
+                    width: 64, height: 64, borderRadius: 18,
+                    background: `${f.accent}1c`, border: `1px solid ${f.accent}45`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 32, flexShrink: 0,
+                    boxShadow: `0 0 30px ${f.accent}25`,
+                  }}>{f.icon}</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 9, flex: 1, minWidth: 0 }}>
+                    <span style={{ color: f.accent, fontSize: 10.5, fontWeight: 700, letterSpacing: 2.5, textTransform: "uppercase", opacity: 0.85 }}>{f.tag}</span>
+                    <h3 style={{ color: "#F8F4EC", fontSize: "clamp(20px,2.4vw,27px)", fontWeight: 700, margin: 0, lineHeight: 1.2, fontFamily: "Cormorant Garamond, serif", letterSpacing: "-0.01em" }}>{f.title}</h3>
+                    <p style={{ color: "rgba(200,194,182,0.82)", fontSize: 14.5, margin: 0, lineHeight: 1.6, maxWidth: 640 }}>{f.desc}</p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Icon + tag row */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{
+                      width: 42, height: 42, borderRadius: 12,
+                      background: `${f.accent}12`,
+                      border: `1px solid ${f.accent}28`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 20, flexShrink: 0,
+                      transition: "background 0.25s ease, border-color 0.25s ease",
+                      ...(isHovered && {
+                        background: `${f.accent}20`,
+                        borderColor: `${f.accent}50`,
+                      }),
+                    }}>{f.icon}</div>
+                    <span style={{
+                      color: f.accent,
+                      fontSize: 10, fontWeight: 700,
+                      letterSpacing: 2, textTransform: "uppercase",
+                      opacity: 0.8,
+                    }}>{f.tag}</span>
+                  </div>
 
-              {/* Title */}
-              <h3 style={{
-                color: "#F5F0E8", fontSize: 16, fontWeight: 700,
-                margin: 0, lineHeight: 1.3,
-              }}>{f.title}</h3>
+                  {/* Title */}
+                  <h3 style={{
+                    color: "#F5F0E8", fontSize: 16, fontWeight: 700,
+                    margin: 0, lineHeight: 1.3,
+                  }}>{f.title}</h3>
 
-              {/* Desc */}
-              <p style={{
-                color: "rgba(138,132,120,0.85)", fontSize: 13,
-                margin: 0, lineHeight: 1.65,
-              }}>{f.desc}</p>
+                  {/* Desc */}
+                  <p style={{
+                    color: "rgba(138,132,120,0.85)", fontSize: 13,
+                    margin: 0, lineHeight: 1.65,
+                  }}>{f.desc}</p>
+                </>
+              )}
             </div>
           )
         })}
@@ -493,7 +520,10 @@ function FeaturesSection() {
 
       <style>{`
         @media (max-width: 900px) { .feat-grid { grid-template-columns: repeat(2,1fr) !important; } }
-        @media (max-width: 580px) { .feat-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 580px) {
+          .feat-grid { grid-template-columns: 1fr !important; }
+          .feat-big { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; padding: 26px 22px !important; }
+        }
         @media (max-width: 640px) { #features { padding: 72px 24px !important; } }
       `}</style>
 
