@@ -1390,20 +1390,21 @@ function Navbar() {
             onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="none";el.style.boxShadow="0 2px 16px rgba(201,168,76,0.3)"}}>
             Commencer
           </Link>
-          <button onClick={()=>setMenuOpen(o=>!o)} aria-label={menuOpen?"Fermer":"Menu"}
-            aria-expanded={menuOpen} aria-controls="mobileMenu" className="brg"
-            style={{display:"none",background:"none",border:"none",cursor:"pointer",
-              padding:8,flexDirection:"column",gap:5,alignItems:"center",justifyContent:"center"}}>
-            {[
-              {tf:menuOpen?"rotate(45deg) translate(4.5px,4.5px)":"none",op:1},
-              {tf:"none",op:menuOpen?0:1},
-              {tf:menuOpen?"rotate(-45deg) translate(4.5px,-4.5px)":"none",op:1},
-            ].map((s,i)=>(
-              <span key={i} style={{display:"block",width:22,height:1.5,background:"#C9A84C",
-                borderRadius:2,transform:s.tf,opacity:s.op,transition:"transform 0.25s,opacity 0.2s"}}/>
-            ))}
-          </button>
         </div>
+        {/* Burger — sibling direct de <nav> (hors .dNav, sinon masqué par display:none parent en mobile) */}
+        <button onClick={()=>setMenuOpen(o=>!o)} aria-label={menuOpen?"Fermer le menu":"Ouvrir le menu"}
+          aria-expanded={menuOpen} aria-controls="mobileMenu" className="brg"
+          style={{display:"none",background:"none",border:"none",cursor:"pointer",
+            width:44,height:44,flexDirection:"column",gap:5,alignItems:"center",justifyContent:"center"}}>
+          {[
+            {tf:menuOpen?"rotate(45deg) translate(4.5px,4.5px)":"none",op:1},
+            {tf:"none",op:menuOpen?0:1},
+            {tf:menuOpen?"rotate(-45deg) translate(4.5px,-4.5px)":"none",op:1},
+          ].map((s,i)=>(
+            <span key={i} style={{display:"block",width:22,height:1.5,background:"#C9A84C",
+              borderRadius:2,transform:s.tf,opacity:s.op,transition:"transform 0.25s,opacity 0.2s"}}/>
+          ))}
+        </button>
       </nav>
       {menuOpen&&(
         <div id="mobileMenu" role="dialog" aria-label="Menu mobile" style={{
