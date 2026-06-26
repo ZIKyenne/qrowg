@@ -95,6 +95,28 @@ button:not(:disabled):active { transform: scale(.97); }
   .dash-pad { padding-left: 16px !important; padding-right: 16px !important; }
 }
 
+/* ── Grilles responsive génériques (surchargent les styles inline) ──────────
+   .rcols-2 / .rcols-3 / .rcols-4 = nb de colonnes en desktop, qui s'empilent
+   progressivement en tablette puis mobile. À poser sur tout grid inline. */
+@media (max-width: 720px) {
+  .rcols-2 { grid-template-columns: 1fr !important; }
+  .rcols-3 { grid-template-columns: repeat(2, 1fr) !important; }
+  .rcols-4 { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 420px) {
+  .rcols-3 { grid-template-columns: 1fr !important; }
+  .rcols-4 { grid-template-columns: 1fr 1fr !important; }
+}
+
+/* Réduit le padding horizontal des pages dashboard sur petit écran */
+@media (max-width: 600px) {
+  .rpad { padding-left: 15px !important; padding-right: 15px !important; }
+}
+/* Empêche les débordements horizontaux globaux sur mobile */
+@media (max-width: 600px) {
+  html, body { overflow-x: hidden; }
+}
+
 /* Scrollbar premium */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: #0d0b08; }

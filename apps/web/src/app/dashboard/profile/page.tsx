@@ -1193,7 +1193,7 @@ export default function ProfilePage() {
           <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 14 }}>
 
             {/* Tuiles stats — tout ça m'appartient */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
+            <div className="rcols-4" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
               {([
                 { icon: Calendar, label: "Jours membre", value: profile ? Math.max(0, Math.floor((Date.now() - new Date(profile.created_at).getTime()) / 86400000)) : 0, color: pc },
                 { icon: FileEdit, label: "Pages", value: totalPages, color: "#38BDF8" },
@@ -1361,7 +1361,7 @@ export default function ProfilePage() {
               )}
 
               {/* Champs identité — grille 2 colonnes pour limiter la hauteur */}
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:13 }}>
+              <div className="rcols-2" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:13 }}>
               {/* Nom complet */}
               <div>
                 <label style={{ color:"#8A8478", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>Nom complet</label>
@@ -1622,7 +1622,7 @@ export default function ProfilePage() {
               </div>
 
               {/* KPIs */}
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:7 }}>
+              <div className="rcols-4" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:7 }}>
                 {([
                   { value:referrals.length, label:"Invitations",  color:"#38BDF8" },
                   { value:pendingRefs,       label:"En attente",   color:"#F97316" },
@@ -1660,7 +1660,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Boutons de partage */}
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:6 }}>
+                <div className="rcols-4" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:6 }}>
                   {([
                     { id:"whatsapp" as const, label:"WhatsApp", color:"#25D366", emoji:"💬" },
                     { id:"email"    as const, label:"Email",    color:"#38BDF8", emoji:"✉" },
@@ -1761,7 +1761,7 @@ export default function ProfilePage() {
             {statsLoading ? (
               /* Skeleton */
               <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8 }}>
+                <div className="rcols-3" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8 }}>
                   {[...Array(6)].map((_,i) => (
                     <div key={i} style={{ height:60, borderRadius:9, background:"rgba(255,255,255,0.04)", animation:"pulse 1.5s ease-in-out infinite", animationDelay:`${i*0.1}s` }}/>
                   ))}
@@ -1779,7 +1779,7 @@ export default function ProfilePage() {
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
 
                 {/* Grille principale 3x2 */}
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8 }}>
+                <div className="rcols-3" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8 }}>
                   {[
                     { icon:Eye,        label:"Pages",        value:totalPages,              color:G,          tooltip:"Nombre total de pages creees" },
                     { icon:CheckCircle,label:"Publiees",      value:publishedPages,          color:"#39FF8F",  tooltip:"Pages avec statut Publie" },
@@ -1806,7 +1806,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Ligne de conversion */}
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                <div className="rcols-2" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
                   <div style={{ background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 12px" }}>
                     <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:0.8, margin:"0 0 5px" }}>Taux conversion</p>
                     <div style={{ display:"flex", alignItems:"flex-end", gap:6 }}>
@@ -2310,7 +2310,7 @@ export default function ProfilePage() {
                 {/* Features incluses */}
                 <div>
                   <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 8px" }}>Inclus dans votre plan</p>
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
+                  <div className="rcols-2" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
                     {planCfg.features.map((f, i) => (
                       <div key={i} style={{ display:"flex", alignItems:"center", gap:7 }}>
                         <CheckCircle size={12} color="#39FF8F" style={{ flexShrink:0 }}/>
