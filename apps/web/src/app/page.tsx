@@ -199,10 +199,17 @@ function QRMockup() {
       {/* Ambient glow outer */}
       <div style={{
         position: "absolute", inset: -40, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 65%)",
+        background: "radial-gradient(circle, rgba(201,168,76,0.18) 0%, transparent 65%)",
         transform: pulse ? "scale(1.15)" : "scale(1)",
         transition: "transform 2.4s ease-in-out",
         pointerEvents: "none"
+      }} />
+      {/* Reflet / halo au sol — ancre l'objet exposé */}
+      <div aria-hidden="true" style={{
+        position: "absolute", left: "50%", bottom: "-13%", transform: "translateX(-50%)",
+        width: "74%", height: "14%", borderRadius: "50%",
+        background: "radial-gradient(ellipse, rgba(201,168,76,0.22), transparent 70%)",
+        filter: "blur(13px)", pointerEvents: "none"
       }} />
       {/* Glow ring inner */}
       <div style={{
@@ -223,12 +230,14 @@ function QRMockup() {
         justifyContent: "center", gap: 18,
         position: "relative", overflow: "hidden",
         boxShadow: hovered
-          ? "0 0 80px rgba(201,168,76,0.35), 0 0 160px rgba(201,168,76,0.1), inset 0 1px 0 rgba(201,168,76,0.15)"
+          ? "0 30px 80px rgba(0,0,0,0.55), 0 0 80px rgba(201,168,76,0.35), 0 0 160px rgba(201,168,76,0.1), inset 0 1px 0 rgba(201,168,76,0.15)"
           : pulse
-          ? "0 0 50px rgba(201,168,76,0.2), 0 0 100px rgba(201,168,76,0.06)"
-          : "0 0 30px rgba(201,168,76,0.1)",
-        transform: hovered ? "translateY(-6px) scale(1.02)" : "translateY(0) scale(1)",
-        transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)"
+          ? "0 26px 60px rgba(0,0,0,0.5), 0 0 50px rgba(201,168,76,0.2), 0 0 100px rgba(201,168,76,0.06)"
+          : "0 24px 56px rgba(0,0,0,0.5), 0 0 30px rgba(201,168,76,0.1)",
+        transform: hovered
+          ? "perspective(1300px) rotateX(0deg) rotateY(0deg) translateY(-6px) scale(1.03)"
+          : "perspective(1300px) rotateX(4deg) rotateY(-7deg) scale(1)",
+        transition: "all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)"
       }}>
         {/* Shimmer */}
         <div style={{
