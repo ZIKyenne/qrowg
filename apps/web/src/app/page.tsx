@@ -2713,6 +2713,8 @@ export default function HomePage() {
         @keyframes gradientShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
         @keyframes glowPulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
+        @keyframes heroAura { 0%,100%{opacity:0.82;transform:translateX(-50%) scale(1)} 50%{opacity:1;transform:translateX(-50%) scale(1.06)} }
+        @keyframes ctaPulse { 0%,100%{box-shadow:0 4px 28px rgba(201,168,76,0.42)} 50%{box-shadow:0 6px 40px rgba(201,168,76,0.62),0 0 0 6px rgba(201,168,76,0.07)} }
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
         }
@@ -2737,10 +2739,25 @@ export default function HomePage() {
       {/* HERO */}
       <section style={{
         minHeight: "100vh", display: "flex", alignItems: "center",
-        padding: "120px 48px 80px", position: "relative", zIndex: 1
+        padding: "120px 48px 80px", position: "relative", zIndex: 1, overflow: "hidden"
       }}>
+        {/* Ambiance cinématographique — halo doré lumineux + profondeur + vignette */}
+        <div aria-hidden="true" style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden" }}>
+          <div style={{
+            position: "absolute", top: "-16%", left: "50%", transform: "translateX(-50%)",
+            width: "min(920px, 132vw)", height: "min(680px, 88vh)",
+            background: "radial-gradient(ellipse at center, rgba(201,168,76,0.17), rgba(201,168,76,0.05) 38%, transparent 68%)",
+            filter: "blur(16px)", animation: "heroAura 15s ease-in-out infinite", willChange: "transform, opacity",
+          }} />
+          <div style={{
+            position: "absolute", bottom: "-12%", right: "-10%",
+            width: "min(540px, 82vw)", height: 520, borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(120,150,255,0.06), transparent 62%)", filter: "blur(48px)",
+          }} />
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(125% 80% at 50% 2%, transparent 52%, rgba(0,0,0,0.55) 100%)" }} />
+        </div>
         <div className="hero-grid" style={{
-          maxWidth: 1140, width: "100%", margin: "0 auto",
+          maxWidth: 1140, width: "100%", margin: "0 auto", position: "relative", zIndex: 1,
           display: "grid", gridTemplateColumns: "1fr 1fr",
           gap: 64, alignItems: "center"
         }}>
@@ -2779,12 +2796,12 @@ export default function HomePage() {
 
             {/* Sous-titre */}
             <p style={{
-              color: "rgba(138,132,120,0.9)", fontSize: 17, lineHeight: 1.75,
-              margin: "0 0 44px", maxWidth: 480,
+              color: "rgba(138,132,120,0.92)", fontSize: 17.5, lineHeight: 1.7,
+              margin: "0 0 40px", maxWidth: 440,
               animation: "fadeUp 0.6s ease 0.35s both"
             }}>
-              Créez une page mobile professionnelle, générez un QR code dynamique
-              et suivez chaque scan — en quelques minutes, sans rien coder.
+              Une page pro, un QR code personnalisable, chaque scan mesuré.<br />
+              En quelques minutes, sans coder.
             </p>
 
             {/* CTAs */}
@@ -2794,7 +2811,7 @@ export default function HomePage() {
             }}>
               <Link href="/auth/signup" style={{
                 background: "linear-gradient(90deg, #C9A84C, #d4a843, #b8953f)",
-                backgroundSize: "200% 200%", animation: "gradientShift 3s ease infinite",
+                backgroundSize: "200% 200%", animation: "gradientShift 3s ease infinite, ctaPulse 3.4s ease-in-out infinite",
                 color: "#080808", textDecoration: "none", fontSize: 15, fontWeight: 700,
                 padding: "15px 32px", borderRadius: 12, display: "inline-block",
                 boxShadow: "0 4px 28px rgba(201,168,76,0.45), 0 0 0 0 rgba(201,168,76,0)",
