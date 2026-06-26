@@ -2691,6 +2691,15 @@ export default function HomePage() {
     }
   }, [titleVisible, charIndex, title.length])
 
+  // Barre CTA mobile : apparaît une fois le hero dépassé
+  const [showSticky, setShowSticky] = useState(false)
+  useEffect(() => {
+    const onScroll = () => setShowSticky(window.scrollY > 620)
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
 
 
   return (
@@ -3095,6 +3104,19 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* CTA mobile collant — apparaît après le hero, masqué sur desktop (CSS .m-sticky-cta) */}
+      <div className={`m-sticky-cta${showSticky ? " show" : ""}`} aria-hidden={!showSticky}>
+        <Link href="/auth/signup" style={{
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          width: "100%", padding: "14px", borderRadius: 12,
+          background: "linear-gradient(90deg, #C9A84C, #b8953f)",
+          color: "#080808", fontWeight: 800, fontSize: 15, textDecoration: "none",
+          boxShadow: "0 6px 22px rgba(201,168,76,0.4)",
+        }}>
+          Créer mon QR gratuit <span style={{ fontSize: 16 }}>→</span>
+        </Link>
+      </div>
     </div>
   )
 }

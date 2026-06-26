@@ -124,6 +124,32 @@ button:not(:disabled):active { transform: scale(.97); }
   html, body { overflow-x: hidden; }
 }
 
+/* ── Mobile-first landing : padding horizontal des sections resserré ─────────
+   Les sections desktop ont 48px de marge latérale -> trop sur petit écran.
+   On force 20px (22px ≥ 480px) sans toucher au padding vertical. */
+@media (max-width: 760px) {
+  section { padding-left: 22px !important; padding-right: 22px !important; }
+}
+@media (max-width: 400px) {
+  section { padding-left: 18px !important; padding-right: 18px !important; }
+}
+
+/* ── Barre CTA mobile collante (apparaît au scroll, masquée sur desktop) ───── */
+.m-sticky-cta {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 150;
+  display: none;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  background: rgba(10, 9, 7, 0.86);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+  transform: translateY(110%);
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.m-sticky-cta.show { transform: translateY(0); }
+@media (max-width: 820px) { .m-sticky-cta { display: block; } }
+
 /* Scrollbar premium */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: #0d0b08; }
