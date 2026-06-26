@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { saveBlocks, updatePage } from '../../../actions/pages'
+import { useIsMobile } from '@/lib/useIsMobile'
 import {
   PRESET_THEMES,
   CATEGORY_LABELS,
@@ -59,6 +60,7 @@ function matchThemeKey(raw: unknown): string {
 }
 
 export default function BuilderClient({ page, initialBlocks }: BuilderClientProps) {
+  const isMobile = useIsMobile(860) // éditeur 3 panneaux : écran d'invite sur mobile (voir return)
   const [blocks, setBlocks] = useState<Block[]>(initialBlocks)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [previewMode, setPreviewMode] = useState<'mobile' | 'desktop'>('mobile')
@@ -159,6 +161,31 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
   }
 
   const onPrimary = readableText(theme.primary)
+
+  // Le builder (panneaux outils + canvas + propriétés, drag-drop) nécessite un
+  // grand écran. Sur mobile on invite à passer sur ordinateur (la page créée,
+  // elle, reste parfaitement responsive côté public).
+  if (isMobile) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#080808', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 28, fontFamily: 'DM Sans, sans-serif' }}>
+        <div style={{ width: 66, height: 66, borderRadius: 18, background: 'color-mix(in srgb, var(--accent) 14%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 35%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20, fontSize: 30 }}>🖥️</div>
+        <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 26, color: '#F5F0E8', fontWeight: 700, margin: '0 0 10px', maxWidth: 330 }}>
+          L’éditeur s’utilise sur ordinateur
+        </h2>
+        <p style={{ color: '#8A8478', fontSize: 14, lineHeight: 1.6, margin: '0 0 24px', maxWidth: 340 }}>
+          La construction de page (blocs, glisser-déposer, propriétés) demande un grand écran. Ouvrez QRfolio sur ordinateur pour éditer « {pageName} ». Votre page publique, elle, reste 100 % responsive.
+        </p>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
+          <a href={`/${page.slug}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '12px 20px', background: 'linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 78%, #000))', borderRadius: 11, color: '#080808', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>
+            Voir ma page
+          </a>
+          <a href="/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '12px 20px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 11, color: '#F5F0E8', fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>
+            Tableau de bord
+          </a>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: '#080808', display: 'flex', flexDirection: 'column' }}>
