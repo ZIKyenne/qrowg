@@ -193,7 +193,7 @@ function QRMockup() {
     <div ref={qrRef}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={{ position: "relative", width: "min(300px, 82vw)", aspectRatio: "1 / 1", margin: "0 auto",
+      style={{ position: "relative", width: "min(380px, 88vw)", aspectRatio: "1 / 1", margin: "0 auto",
         cursor: "default" }}
     >
       {/* Ambient glow outer */}
@@ -257,11 +257,18 @@ function QRMockup() {
           borderBottom: "2px solid rgba(201,168,76,0.4)", borderRight: "2px solid rgba(201,168,76,0.4)",
           borderRadius: "0 0 22px 0", pointerEvents: "none"
         }} />
-        {/* QR grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 4, padding: 4, position: "relative", zIndex: 1 }}>
+        {/* Faisceau de scan — signature visuelle QRfolio */}
+        <div aria-hidden="true" style={{
+          position: "absolute", left: "10%", right: "10%", top: "12%", height: 2, borderRadius: 2,
+          background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.95), transparent)",
+          boxShadow: "0 0 18px 3px rgba(201,168,76,0.55)",
+          animation: "scanLine 3.4s ease-in-out infinite", pointerEvents: "none", zIndex: 3,
+        }} />
+        {/* QR grid (échelle relative -> grandit avec la carte) */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: "4.5%", width: "60%", aspectRatio: "1 / 1", position: "relative", zIndex: 1 }}>
           {Array.from({ length: 49 }, (_, i) => (
             <div key={i} style={{
-              width: 11, height: 11, borderRadius: 2.5,
+              aspectRatio: "1 / 1", borderRadius: "22%",
               background: goldCells.includes(i)
                 ? "#C9A84C"
                 : corners.includes(i)
@@ -273,7 +280,7 @@ function QRMockup() {
             }} />
           ))}
         </div>
-        <p style={{ color: "#C9A84C", fontSize: 10, letterSpacing: 4, textTransform: "uppercase", position: "relative", zIndex: 1, fontWeight: 600 }}>QRFOLIO.APP</p>
+        <p style={{ color: "#C9A84C", fontSize: 11, letterSpacing: 4, textTransform: "uppercase", position: "relative", zIndex: 1, fontWeight: 600 }}>QRFOLIO.APP</p>
       </div>
     </div>
   )
@@ -2726,18 +2733,23 @@ function FAQSection() {
   )
 }
 
-// ── Transition douce entre sections (hairline doré + glow) ────────────────────
+// ── Transition entre sections : signature QRfolio (glyphe QR doré + lignes) ───
 function SectionSeam() {
+  // Petit motif 3×3 façon QR — l'élément de marque que l'on retrouve partout.
+  const cells = [1, 0, 1, 0, 1, 0, 1, 0, 1]
   return (
     <div aria-hidden="true" style={{
-      position: "relative", height: 1, maxWidth: 1140, margin: "0 auto", zIndex: 1,
-      background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.2) 32%, rgba(201,168,76,0.2) 68%, transparent)",
+      position: "relative", maxWidth: 1140, margin: "0 auto", zIndex: 1,
+      display: "flex", alignItems: "center", justifyContent: "center", gap: 16, padding: "2px 24px",
     }}>
-      <div style={{
-        position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)",
-        width: "62%", height: 130, pointerEvents: "none",
-        background: "radial-gradient(ellipse at center, rgba(201,168,76,0.06), transparent 70%)",
-      }} />
+      <div style={{ flex: 1, maxWidth: 360, height: 1, background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.22))" }} />
+      <div style={{ position: "relative", display: "grid", gridTemplateColumns: "repeat(3, 5px)", gap: 2.5 }}>
+        <div style={{ position: "absolute", inset: -10, background: "radial-gradient(circle, rgba(201,168,76,0.14), transparent 70%)", pointerEvents: "none" }} />
+        {cells.map((on, idx) => (
+          <span key={idx} style={{ width: 5, height: 5, borderRadius: 1.5, position: "relative", background: on ? "rgba(201,168,76,0.85)" : "rgba(201,168,76,0.18)" }} />
+        ))}
+      </div>
+      <div style={{ flex: 1, maxWidth: 360, height: 1, background: "linear-gradient(90deg, rgba(201,168,76,0.22), transparent)" }} />
     </div>
   )
 }
@@ -2784,6 +2796,7 @@ export default function HomePage() {
         @keyframes glowPulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
         @keyframes heroAura { 0%,100%{opacity:0.82;transform:translateX(-50%) scale(1)} 50%{opacity:1;transform:translateX(-50%) scale(1.06)} }
         @keyframes ctaPulse { 0%,100%{box-shadow:0 4px 28px rgba(201,168,76,0.42)} 50%{box-shadow:0 6px 40px rgba(201,168,76,0.62),0 0 0 6px rgba(201,168,76,0.07)} }
+        @keyframes scanLine { 0%{top:12%;opacity:0} 12%{opacity:1} 50%{top:84%} 60%{opacity:1} 70%{opacity:0} 100%{top:84%;opacity:0} }
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
         }
