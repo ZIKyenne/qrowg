@@ -1495,10 +1495,15 @@ function HowItWorks() {
         .hline{position:absolute;top:31px;left:calc(10% + 34px);right:calc(10% + 34px);height:2px;
           background:linear-gradient(90deg,transparent,rgba(201,168,76,0.55) 6%,rgba(201,168,76,0.55) 94%,transparent);
           box-shadow:0 0 14px rgba(201,168,76,0.3);pointer-events:none;}
+        .hline-v{display:none;}
         @media(max-width:900px){.hsteps{grid-template-columns:1fr!important;gap:0!important;}
           .hline{display:none!important;}
+          .hline-v{display:block;position:absolute;top:40px;bottom:40px;left:31px;width:2px;z-index:0;
+            background:linear-gradient(180deg,transparent,rgba(201,168,76,0.5) 5%,rgba(201,168,76,0.5) 95%,transparent);
+            box-shadow:0 0 12px rgba(201,168,76,0.25);pointer-events:none;}
           .hstep{flex-direction:row!important;text-align:left!important;align-items:flex-start!important;
-            gap:20px!important;padding:24px 0!important;border-bottom:1px solid rgba(201,168,76,0.07)!important;}
+            gap:20px!important;padding:24px 0!important;border-bottom:1px solid rgba(201,168,76,0.07)!important;
+            position:relative!important;z-index:1!important;}
           .hstep:last-child{border-bottom:none!important;}}
         @media(max-width:640px){#how{padding:72px 24px!important;}}
       `}</style>
@@ -1513,6 +1518,7 @@ function HowItWorks() {
       </div>
       <div style={{maxWidth:1140,margin:"0 auto",position:"relative"}}>
         <div aria-hidden="true" className="hline" style={{opacity:visible?1:0,transition:"opacity 0.8s ease 0.3s"}}/>
+        <div aria-hidden="true" className="hline-v" style={{opacity:visible?1:0,transition:"opacity 0.8s ease 0.3s"}}/>
         <div className="hsteps">
           {HOW_STEPS.map((step,i)=>(
             <div key={step.title} className="hstep"
