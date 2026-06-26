@@ -2969,24 +2969,22 @@ export default function HomePage() {
       <FAQSection />
 
       {/* CTA FINAL */}
-      <section style={{ padding:"100px 48px 80px", position:"relative", zIndex:1 }}>
+      <section className="cta-final-section" style={{ padding:"110px 48px 90px", position:"relative", zIndex:1, overflow:"hidden" }}>
         <style>{`
           @keyframes ctaGlow{0%,100%{opacity:0.5}50%{opacity:1}}
-          @media(max-width:640px){ .cta-final-section{padding:72px 20px 60px!important;} }
+          @media(max-width:640px){ .cta-final-section{padding:80px 20px 70px!important;} }
         `}</style>
+        {/* Halo cinématographique du CTA final */}
+        <div aria-hidden="true" style={{
+          position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)",
+          width:"min(900px,120vw)", height:560,
+          background:"radial-gradient(ellipse at center, rgba(201,168,76,0.14), transparent 66%)",
+          animation:"ctaGlow 5s ease-in-out infinite", pointerEvents:"none", zIndex:0,
+        }}/>
         <div style={{
           maxWidth:720, margin:"0 auto", textAlign:"center",
-          position:"relative",
+          position:"relative", zIndex:1,
         }}>
-          {/* Glow orb */}
-          <div aria-hidden="true" style={{
-            position:"absolute", top:"50%", left:"50%",
-            transform:"translate(-50%,-50%)",
-            width:400, height:200,
-            background:"radial-gradient(ellipse, rgba(201,168,76,0.12) 0%, transparent 70%)",
-            animation:"ctaGlow 4s ease-in-out infinite",
-            pointerEvents:"none",
-          }}/>
 
           {/* Card */}
           <div style={{
@@ -3014,6 +3012,20 @@ export default function HomePage() {
               }}/>
             ))}
 
+            {/* QR flottant — l'objet de désir, en tête du CTA */}
+            <div style={{ display:"flex", justifyContent:"center", marginBottom:26 }}>
+              <div style={{
+                width:90, height:90, borderRadius:22,
+                background:"linear-gradient(145deg,#151210,#0d0c09)",
+                border:"1px solid rgba(201,168,76,0.42)",
+                display:"flex", alignItems:"center", justifyContent:"center",
+                boxShadow:"0 16px 44px rgba(0,0,0,0.55), 0 0 54px rgba(201,168,76,0.2)",
+                animation:"float 5s ease-in-out infinite",
+              }}>
+                <QRMiniSvg fg="#F5F0E8" bg="transparent" accent="#C9A84C" size={58} />
+              </div>
+            </div>
+
             <h2 style={{
               fontFamily:"Cormorant Garamond, serif",
               fontSize:"clamp(28px,4vw,48px)",
@@ -3039,12 +3051,12 @@ export default function HomePage() {
               color:"#080808", textDecoration:"none",
               fontSize:16, fontWeight:800,
               padding:"16px 40px", borderRadius:13,
-              boxShadow:"0 4px 32px rgba(201,168,76,0.4)",
               letterSpacing:0.2,
+              animation:"ctaPulse 3.4s ease-in-out infinite",
               transition:"transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s",
             }}
-              onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="translateY(-3px) scale(1.03)";el.style.boxShadow="0 8px 40px rgba(201,168,76,0.55)"}}
-              onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="none";el.style.boxShadow="0 4px 32px rgba(201,168,76,0.4)"}}>
+              onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="translateY(-3px) scale(1.03)";el.style.animation="none";el.style.boxShadow="0 8px 40px rgba(201,168,76,0.55)"}}
+              onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="none";el.style.animation="ctaPulse 3.4s ease-in-out infinite"}}>
               Créer mon QRfolio gratuit
               <span style={{ fontSize:18 }}>→</span>
             </Link>
