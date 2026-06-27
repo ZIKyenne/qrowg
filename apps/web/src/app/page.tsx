@@ -712,6 +712,7 @@ const PLANS = PLAN_LIST.map(p => ({
 
 function PricingSection() {
   const { ref, visible } = useInView(0.06)
+  const [showCmp, setShowCmp] = useState(false)
 
   return (
     <section id="pricing" ref={ref} aria-labelledby="pricing-title"
@@ -904,10 +905,15 @@ function PricingSection() {
 
         {/* Comparaison détaillée des plans (Pb 13) */}
         <div style={{ marginTop: 56, opacity: visible ? 1 : 0, transition: "opacity 0.6s ease 0.4s" }}>
-          <h3 style={{ fontFamily: "Cormorant Garamond, serif", color: "#F5F0E8", fontSize: "clamp(22px,2.6vw,32px)", fontWeight: 700, textAlign: "center", margin: "0 0 6px" }}>
-            Comparez les plans en détail
-          </h3>
-          <p style={{ color: "rgba(138,132,120,0.7)", fontSize: 13, textAlign: "center", margin: "0 0 26px" }}>
+          <div style={{ textAlign: "center" }}>
+            <button type="button" onClick={() => setShowCmp(v => !v)} aria-expanded={showCmp} style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: "13px 26px", borderRadius: 12, background: showCmp ? "rgba(201,168,76,0.06)" : "transparent", border: "1px solid rgba(201,168,76,0.3)", color: "#C9A84C", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "DM Sans, sans-serif" }}>
+              {showCmp ? "Masquer le comparatif" : "Comparer les plans en détail"}
+              <span style={{ fontSize: 12, transform: showCmp ? "rotate(180deg)" : "none", transition: "transform 0.25s" }}>▾</span>
+            </button>
+          </div>
+          {showCmp && (
+          <>
+          <p style={{ color: "rgba(138,132,120,0.7)", fontSize: 13, textAlign: "center", margin: "22px 0 26px" }}>
             Survolez le <span style={{ color: "#C9A84C" }}>?</span> de chaque ligne pour plus d'explications.
           </p>
           {(() => {
@@ -968,6 +974,8 @@ function PricingSection() {
               </div>
             )
           })()}
+          </>
+          )}
         </div>
       </div>
     </section>
@@ -3309,8 +3317,14 @@ export default function HomePage() {
           .fstatus-dot { width:6px; height:6px; border-radius:50%; background:#39FF8F; animation:fpulse 2s ease-in-out infinite; }
           @keyframes fpulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
           @media(max-width:1100px){ .fg{ grid-template-columns:1fr 1fr 1fr!important; gap:32px!important; } }
-          @media(max-width:700px){ .fg{ grid-template-columns:1fr 1fr!important; padding:40px 24px 32px!important; } .fb{ padding:16px 24px 20px!important; flex-direction:column!important; align-items:flex-start!important; } }
-          @media(max-width:420px){ .fg{ grid-template-columns:1fr!important; } }
+          @media(max-width:700px){
+            /* Footer compact sur mobile : 2 colonnes serrées, espacements réduits */
+            .fg{ grid-template-columns:1fr 1fr!important; gap:22px 18px!important; padding:34px 22px 26px!important; }
+            .fc-title{ margin-bottom:11px!important; }
+            .fl{ margin-bottom:8px!important; font-size:13px!important; }
+            .fsoc{ margin-top:14px!important; }
+            .fb{ padding:14px 22px 18px!important; flex-direction:column!important; align-items:flex-start!important; gap:10px!important; }
+          }
           @media(prefers-reduced-motion:reduce){ .fstatus-dot{ animation:none!important; } }
         `}</style>
 
