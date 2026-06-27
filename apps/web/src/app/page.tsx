@@ -1633,7 +1633,13 @@ function BuilderSection(){
   ]
   return(
     <section id="builder" ref={ref} aria-labelledby="builder-title"
-      style={{padding:"100px 48px",position:"relative",zIndex:1}}>
+      style={{
+        padding:"100px 48px",position:"relative",zIndex:1,
+        background:"radial-gradient(120% 70% at 50% 50%, rgba(201,168,76,0.05), transparent 60%), linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.25))",
+        borderTop:"1px solid rgba(255,255,255,0.04)",
+        borderBottom:"1px solid rgba(255,255,255,0.04)",
+        boxShadow:"inset 0 30px 60px -40px rgba(0,0,0,0.8), inset 0 -30px 60px -40px rgba(0,0,0,0.8)",
+      }}>
       <style>{`
         @keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.3)}}
         @media(max-width:900px){.bm{grid-template-columns:1fr 1fr!important;}}
