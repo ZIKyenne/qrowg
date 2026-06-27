@@ -2940,7 +2940,7 @@ function FooterCol({ title, children }: { title: string; children: React.ReactNo
   return (
     <nav aria-label={"Navigation " + title} style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
       <button type="button" onClick={() => setOpen(o => !o)} aria-expanded={open}
-        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: "none", border: "none", padding: "14px 0", cursor: "pointer", fontFamily: "inherit" }}>
+        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: "none", border: "none", padding: "10px 0", cursor: "pointer", fontFamily: "inherit" }}>
         <span className="fc-title" style={{ marginBottom: 0 }}>{title}</span>
         <span style={{ color: "#C9A84C", fontSize: 13, transform: open ? "rotate(180deg)" : "none", transition: "transform 0.25s" }}>▾</span>
       </button>
@@ -3345,11 +3345,14 @@ export default function HomePage() {
           @keyframes fpulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
           @media(max-width:1100px){ .fg{ grid-template-columns:1fr 1fr 1fr!important; gap:32px!important; } }
           @media(max-width:700px){
-            /* Footer compact sur mobile : 1 colonne, colonnes de liens en accordéons repliés */
-            .fg{ grid-template-columns:1fr!important; gap:4px!important; padding:32px 22px 22px!important; }
-            .fl{ margin-bottom:8px!important; font-size:13.5px!important; }
-            .fsoc{ margin-top:14px!important; margin-bottom:8px!important; }
-            .fb{ padding:14px 22px 18px!important; flex-direction:column!important; align-items:flex-start!important; gap:10px!important; }
+            /* Footer ultra compact sur mobile : 1 colonne, accordéons repliés, méta masquée */
+            .fg{ grid-template-columns:1fr!important; gap:0!important; padding:22px 22px 14px!important; }
+            .f-brand-desc{ display:none!important; }
+            .fl{ margin-bottom:7px!important; font-size:13.5px!important; }
+            .fsoc{ margin-top:12px!important; margin-bottom:6px!important; }
+            .fb{ padding:12px 22px 16px!important; flex-direction:column!important; align-items:flex-start!important; gap:8px!important; }
+            .fstatus{ display:none!important; }
+            .f-meta{ display:none!important; }
           }
           @media(prefers-reduced-motion:reduce){ .fstatus-dot{ animation:none!important; } }
         `}</style>
@@ -3362,7 +3365,7 @@ export default function HomePage() {
             <Link href="/" aria-label="QRfolio — Accueil" style={{ textDecoration:"none", display:"inline-block", marginBottom:12 }}>
               <span style={{ fontFamily:"Cormorant Garamond, serif", fontSize:24, color:"#C9A84C", fontWeight:700, letterSpacing:"-0.01em" }}>QRfolio</span>
             </Link>
-            <p style={{ color:"rgba(138,132,120,0.65)", fontSize:13, lineHeight:1.7, maxWidth:220, margin:0 }}>
+            <p className="f-brand-desc" style={{ color:"rgba(138,132,120,0.65)", fontSize:13, lineHeight:1.7, maxWidth:220, margin:0 }}>
               QRfolio transforme les QR codes en expériences interactives.
             </p>
             {/* Réseaux sociaux */}
@@ -3419,8 +3422,8 @@ export default function HomePage() {
             <p style={{ color:"rgba(138,132,120,0.45)",fontSize:12,margin:0 }}>
               © {new Date().getFullYear()} QRfolio. Tous droits réservés.
             </p>
-            <span style={{ color:"rgba(138,132,120,0.2)",fontSize:12 }} aria-hidden="true">·</span>
-            <span style={{ color:"rgba(138,132,120,0.35)",fontSize:11,fontFamily:"monospace" }}>
+            <span className="f-meta" style={{ color:"rgba(138,132,120,0.2)",fontSize:12 }} aria-hidden="true">·</span>
+            <span className="f-meta" style={{ color:"rgba(138,132,120,0.35)",fontSize:11,fontFamily:"monospace" }}>
               v1.0.0
             </span>
           </div>
