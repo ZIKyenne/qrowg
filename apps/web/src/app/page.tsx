@@ -2746,19 +2746,16 @@ function FAQSection() {
 
 // ── Transition entre sections : signature QRfolio (glyphe QR doré + lignes) ───
 function SectionSeam() {
-  // Petit motif 3×3 façon QR — l'élément de marque que l'on retrouve partout.
-  const cells = [1, 0, 1, 0, 1, 0, 1, 0, 1]
+  // Séparateur signature : le « finder pattern » d'un QR au centre, entre deux lignes.
   return (
     <div aria-hidden="true" style={{
       position: "relative", maxWidth: 1140, margin: "0 auto", zIndex: 1,
       display: "flex", alignItems: "center", justifyContent: "center", gap: 16, padding: "2px 24px",
     }}>
       <div style={{ flex: 1, maxWidth: 360, height: 1, background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.22))" }} />
-      <div style={{ position: "relative", display: "grid", gridTemplateColumns: "repeat(3, 5px)", gap: 2.5 }}>
-        <div style={{ position: "absolute", inset: -10, background: "radial-gradient(circle, rgba(201,168,76,0.14), transparent 70%)", pointerEvents: "none" }} />
-        {cells.map((on, idx) => (
-          <span key={idx} style={{ width: 5, height: 5, borderRadius: 1.5, position: "relative", background: on ? "rgba(201,168,76,0.85)" : "rgba(201,168,76,0.18)" }} />
-        ))}
+      <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ position: "absolute", inset: -12, background: "radial-gradient(circle, rgba(201,168,76,0.14), transparent 70%)", pointerEvents: "none" }} />
+        <QRFinder size={16} color="rgba(201,168,76,0.6)" style={{ position: "relative" }} />
       </div>
       <div style={{ flex: 1, maxWidth: 360, height: 1, background: "linear-gradient(90deg, rgba(201,168,76,0.22), transparent)" }} />
     </div>
