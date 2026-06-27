@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { PLAN_LIST, PLAN_COMPARISON, fmtPrice } from "@/lib/plans"
+import { useIsMobile } from "@/lib/useIsMobile"
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function useInView(threshold = 0.15) {
@@ -2924,6 +2925,32 @@ function QRFinder({ size = 46, color = "rgba(201,168,76,0.5)", style }: { size?:
   )
 }
 
+// ── Colonne de footer : accordéon repliable sur mobile, normale sur desktop ───
+function FooterCol({ title, children }: { title: string; children: React.ReactNode }) {
+  const isMobile = useIsMobile(700)
+  const [open, setOpen] = useState(false)
+  if (!isMobile) {
+    return (
+      <nav aria-label={"Navigation " + title}>
+        <p className="fc-title">{title}</p>
+        {children}
+      </nav>
+    )
+  }
+  return (
+    <nav aria-label={"Navigation " + title} style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+      <button type="button" onClick={() => setOpen(o => !o)} aria-expanded={open}
+        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: "none", border: "none", padding: "14px 0", cursor: "pointer", fontFamily: "inherit" }}>
+        <span className="fc-title" style={{ marginBottom: 0 }}>{title}</span>
+        <span style={{ color: "#C9A84C", fontSize: 13, transform: open ? "rotate(180deg)" : "none", transition: "transform 0.25s" }}>▾</span>
+      </button>
+      <div style={{ overflow: "hidden", maxHeight: open ? 400 : 0, opacity: open ? 1 : 0, transition: "max-height 0.32s ease, opacity 0.25s ease", paddingBottom: open ? 8 : 0 }}>
+        {children}
+      </div>
+    </nav>
+  )
+}
+
 // ── Eyebrow de section : motif finder QR + label (signature récurrente) ───────
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
@@ -3318,11 +3345,10 @@ export default function HomePage() {
           @keyframes fpulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
           @media(max-width:1100px){ .fg{ grid-template-columns:1fr 1fr 1fr!important; gap:32px!important; } }
           @media(max-width:700px){
-            /* Footer compact sur mobile : 2 colonnes serrées, espacements réduits */
-            .fg{ grid-template-columns:1fr 1fr!important; gap:22px 18px!important; padding:34px 22px 26px!important; }
-            .fc-title{ margin-bottom:11px!important; }
-            .fl{ margin-bottom:8px!important; font-size:13px!important; }
-            .fsoc{ margin-top:14px!important; }
+            /* Footer compact sur mobile : 1 colonne, colonnes de liens en accordéons repliés */
+            .fg{ grid-template-columns:1fr!important; gap:4px!important; padding:32px 22px 22px!important; }
+            .fl{ margin-bottom:8px!important; font-size:13.5px!important; }
+            .fsoc{ margin-top:14px!important; margin-bottom:8px!important; }
             .fb{ padding:14px 22px 18px!important; flex-direction:column!important; align-items:flex-start!important; gap:10px!important; }
           }
           @media(prefers-reduced-motion:reduce){ .fstatus-dot{ animation:none!important; } }
@@ -3354,40 +3380,36 @@ export default function HomePage() {
           </div>
 
           {/* Col 2: Produit */}
-          <nav aria-label="Navigation Produit">
-            <p className="fc-title">Produit</p>
+          <FooterCol title="Produit">
             <Link href="/features"          className="fl">Fonctionnalités</Link>
             <Link href="/#templates"        className="fl">Templates</Link>
             <Link href="/dashboard/builder" className="fl">Builder</Link>
             <Link href="/#analytics"        className="fl">Analytics</Link>
             <Link href="/#features"         className="fl">QR Codes</Link>
             <Link href="/#pricing"          className="fl">Tarifs</Link>
-          </nav>
+          </FooterCol>
 
           {/* Col 3: Ressources */}
-          <nav aria-label="Navigation Ressources">
-            <p className="fc-title">Ressources</p>
+          <FooterCol title="Ressources">
             <Link href="/#faq"     className="fl">FAQ</Link>
             <Link href="/examples" className="fl">Exemples</Link>
             <Link href="/contact"  className="fl">Contact</Link>
             <span className="fl fl-soon" aria-label="Blog — bientôt disponible">Blog</span>
-          </nav>
+          </FooterCol>
 
           {/* Col 4: Légal */}
-          <nav aria-label="Navigation Légal">
-            <p className="fc-title">Légal</p>
+          <FooterCol title="Légal">
             <Link href="/privacy" className="fl">Confidentialité</Link>
             <Link href="/terms"   className="fl">Conditions</Link>
             <Link href="/legal"   className="fl">Mentions légales</Link>
-          </nav>
+          </FooterCol>
 
           {/* Col 5: Entreprise */}
-          <nav aria-label="Navigation Entreprise">
-            <p className="fc-title">Entreprise</p>
+          <FooterCol title="Entreprise">
             <span className="fl fl-soon" aria-label="À propos — bientôt disponible">À propos</span>
             <span className="fl fl-soon" aria-label="Roadmap — bientôt disponible">Roadmap</span>
             <span className="fl fl-soon" aria-label="Changelog — bientôt disponible">Changelog</span>
-          </nav>
+          </FooterCol>
 
         </div>
 
