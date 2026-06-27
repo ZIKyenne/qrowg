@@ -2765,6 +2765,148 @@ function SectionSeam() {
   )
 }
 
+// ── Mockup narratif : le parcours animé Création → Scan → Analytics ───────────
+const STORY = [
+  { key: "Création",        icon: "🧱", desc: "Glissez vos blocs : profil, liens, galerie, boutons d'action." },
+  { key: "Personnalisation", icon: "🎨", desc: "Couleurs, thème, logo — votre page, votre identité." },
+  { key: "QR code",         icon: "⬛", desc: "Votre QR code est généré automatiquement, prêt à partager." },
+  { key: "Scan",            icon: "📲", desc: "Vos clients scannent et accèdent à tout, en un geste." },
+  { key: "Analytics",       icon: "📊", desc: "Chaque scan devient une donnée, mesurée en temps réel." },
+] as const
+
+function StoryPhone({ step }: { step: number }) {
+  // Contenu de l'écran selon l'étape (re-monté via key -> ré-animé)
+  const G = "#C9A84C"
+  if (step === 0 || step === 1) {
+    const colored = step === 1
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 11, padding: 16 }}>
+        {[42, 14, 34, 14, 30].map((h, i) => (
+          <div key={i} style={{
+            height: h, width: i === 1 || i === 3 ? "62%" : "100%", borderRadius: 9,
+            background: colored
+              ? (i === 0 ? `linear-gradient(90deg, ${G}, #b8953f)` : i === 2 ? "rgba(56,189,248,0.4)" : i === 4 ? "rgba(57,255,143,0.35)" : "rgba(255,255,255,0.14)")
+              : "rgba(255,255,255,0.07)",
+            border: colored ? "none" : "1px dashed rgba(201,168,76,0.28)",
+            animation: `fadeUp 0.45s ease ${i * 0.09}s both`,
+          }} />
+        ))}
+        {colored && (
+          <div style={{ display: "flex", gap: 7, marginTop: 4, animation: "fadeUp 0.4s ease 0.4s both" }}>
+            {[G, "#38BDF8", "#A78BFA", "#39FF8F"].map(c => (
+              <span key={c} style={{ width: 20, height: 20, borderRadius: "50%", background: c, boxShadow: `0 0 10px ${c}88` }} />
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  }
+  if (step === 2 || step === 3) {
+    return (
+      <div style={{ position: "relative", flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div style={{ position: "relative", animation: "fadeUp 0.5s ease both" }}>
+          <QRMiniSvg fg="#F5F0E8" bg="transparent" accent={G} size={140} />
+          {step === 3 && (
+            <div aria-hidden style={{ position: "absolute", left: "4%", right: "4%", top: "10%", height: 2, borderRadius: 2, background: `linear-gradient(90deg, transparent, ${G}, transparent)`, boxShadow: `0 0 16px 3px ${G}88`, animation: "scanLine 1.8s ease-in-out infinite" }} />
+          )}
+        </div>
+        {step === 3 && (
+          <div style={{ position: "absolute", bottom: 22, left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 100, background: "rgba(57,255,143,0.14)", border: "1px solid rgba(57,255,143,0.4)", color: "#39FF8F", fontSize: 12, fontWeight: 700, animation: "fadeUp 0.4s ease 0.3s both" }}>✓ Scanné</div>
+        )}
+      </div>
+    )
+  }
+  // step 4 : analytics
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12, padding: 16, height: "100%" }}>
+      <div style={{ display: "flex", gap: 8 }}>
+        {[["1 248", "Scans"], ["86%", "Mobile"]].map(([v, l], i) => (
+          <div key={l} style={{ flex: 1, padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,168,76,0.18)", animation: `fadeUp 0.4s ease ${i * 0.1}s both` }}>
+            <p style={{ margin: 0, color: G, fontSize: 17, fontWeight: 800 }}>{v}</p>
+            <p style={{ margin: 0, color: "#8A8478", fontSize: 9.5 }}>{l}</p>
+          </div>
+        ))}
+      </div>
+      <div style={{ flex: 1, display: "flex", alignItems: "flex-end", gap: 7, padding: "8px 4px 0" }}>
+        {[40, 65, 50, 80, 58, 92, 70].map((h, i) => (
+          <div key={i} style={{ flex: 1, height: `${h}%`, borderRadius: "5px 5px 0 0", background: `linear-gradient(180deg, ${G}, ${G}33)`, transformOrigin: "bottom", animation: `barGrow 0.5s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.07}s both` }} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function StoryFlow() {
+  const { ref, visible } = useInView(0.2)
+  const [step, setStep] = useState(0)
+  useEffect(() => {
+    if (!visible) return
+    const t = setInterval(() => setStep(s => (s + 1) % STORY.length), 2600)
+    return () => clearInterval(t)
+  }, [visible])
+  return (
+    <section ref={ref} aria-labelledby="story-title" style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
+      <style>{`
+        @keyframes barGrow { from{transform:scaleY(0)} to{transform:scaleY(1)} }
+        .story-grid { display:grid; grid-template-columns:1fr 0.9fr; gap:64px; align-items:center; max-width:1040px; margin:0 auto; }
+        @media(max-width:880px){ .story-grid{ grid-template-columns:1fr!important; gap:40px!important; } }
+        @media(max-width:640px){ #story{ padding:76px 22px!important; } }
+      `}</style>
+      <div id="story" style={{ maxWidth: 1140, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 56, opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(24px)", transition: "opacity 0.6s ease, transform 0.6s ease" }}>
+          <p style={{ color: "#C9A84C", fontSize: 11, letterSpacing: 3.5, textTransform: "uppercase", fontWeight: 600, marginBottom: 16 }}>Le parcours</p>
+          <h2 id="story-title" style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(28px,4vw,52px)", color: "#F5F0E8", fontWeight: 700, margin: "0 auto", lineHeight: 1.1, maxWidth: 580, letterSpacing: "-0.02em" }}>
+            De l'idée au{" "}<span style={{ color: "#C9A84C" }}>premier client.</span>
+          </h2>
+        </div>
+        <div className="story-grid">
+          {/* Étapes */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {STORY.map((s, i) => {
+              const active = step === i
+              return (
+                <button key={s.key} type="button" onClick={() => setStep(i)} style={{
+                  display: "flex", alignItems: "center", gap: 16, textAlign: "left", cursor: "pointer",
+                  padding: "16px 18px", borderRadius: 14,
+                  background: active ? "linear-gradient(135deg, rgba(201,168,76,0.12), rgba(255,255,255,0.02))" : "transparent",
+                  border: `1px solid ${active ? "rgba(201,168,76,0.35)" : "rgba(255,255,255,0.06)"}`,
+                  transition: "all 0.3s ease",
+                }}>
+                  <div style={{ position: "relative", width: 42, height: 42, flexShrink: 0, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, background: active ? "rgba(201,168,76,0.18)" : "rgba(255,255,255,0.04)", border: `1px solid ${active ? "rgba(201,168,76,0.5)" : "rgba(255,255,255,0.08)"}`, boxShadow: active ? "0 0 22px rgba(201,168,76,0.3)" : "none", transition: "all 0.3s ease" }}>
+                    {s.icon}
+                    <span style={{ position: "absolute", top: -6, right: -6, width: 18, height: 18, borderRadius: "50%", background: active ? "linear-gradient(135deg,#d4a843,#C9A84C)" : "rgba(255,255,255,0.1)", color: active ? "#080808" : "#8A8478", fontSize: 9.5, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{i + 1}</span>
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ margin: 0, color: active ? "#F5F0E8" : "#A8A29A", fontSize: 14.5, fontWeight: 700 }}>{s.key}</p>
+                    <p style={{ margin: "3px 0 0", color: "rgba(138,132,120,0.85)", fontSize: 12.5, lineHeight: 1.5, maxHeight: active ? 60 : 0, opacity: active ? 1 : 0, overflow: "hidden", transition: "all 0.35s ease" }}>{s.desc}</p>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+          {/* Téléphone */}
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <div style={{
+              position: "relative", width: "min(250px, 74vw)", aspectRatio: "9 / 18",
+              borderRadius: 32, padding: 10,
+              background: "linear-gradient(160deg, #1a1712, #0c0b08)",
+              border: "1px solid rgba(201,168,76,0.3)",
+              boxShadow: "0 30px 70px rgba(0,0,0,0.6), 0 0 60px rgba(201,168,76,0.12)",
+              animation: "float 6s ease-in-out infinite",
+            }}>
+              <div style={{ position: "relative", width: "100%", height: "100%", borderRadius: 24, overflow: "hidden", background: "#0A0907", display: "flex", flexDirection: "column" }}>
+                <div key={step} style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+                  <StoryPhone step={step} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [titleVisible, setTitleVisible] = useState(false)
@@ -2987,6 +3129,10 @@ export default function HomePage() {
 
       {/* BUILDER */}
       <BuilderSection />
+      <SectionSeam />
+
+      {/* PARCOURS NARRATIF (Création -> Scan -> Analytics) */}
+      <StoryFlow />
       <SectionSeam />
 
       {/* TEMPLATES */}
