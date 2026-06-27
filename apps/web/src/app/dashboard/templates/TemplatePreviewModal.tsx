@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react"
 import { X, ArrowRight, Lock, Check, Layers, Clock, ExternalLink } from "lucide-react"
 import { type Block, type PageTheme, BLOCK_DEFS } from "../builder/types"
+import { useIsMobile } from "@/lib/useIsMobile"
 
 const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%274%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E')"
 
@@ -2558,6 +2559,7 @@ export default function TemplatePreviewModal({
   template, blocks, onClose, onUse, canUse, isCreating
 }: TemplatePreviewModalProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
+  const isMobile = useIsMobile(768) // mobile : aperçu + panneau empilés et scrollables
 
   // Fermer avec Escape
   useEffect(() => {
@@ -2612,15 +2614,21 @@ export default function TemplatePreviewModal({
 
       {/* Conteneur central — stop propagation */}
       <div onClick={e => e.stopPropagation()} style={{
-        display: "flex", gap: 24, alignItems: "flex-start",
-        maxWidth: 820, width: "100%", maxHeight: "92vh",
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+        gap: isMobile ? 16 : 24,
+        alignItems: "center",
+        maxWidth: isMobile ? 420 : 820, width: "100%", maxHeight: "92vh",
+        overflowY: isMobile ? "auto" : "visible",
+        overflowX: "hidden",
+        WebkitOverflowScrolling: "touch",
       }}>
 
         {/* ── Simulation iPhone ──────────────────────────────────────────── */}
         <div style={{ flex: "0 0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
           {/* Coque iPhone */}
           <div style={{
-            width: 320, height: 640,
+            width: isMobile ? 264 : 320, height: isMobile ? 528 : 640,
             background: "#1A1A1A",
             border: "2px solid #333",
             borderRadius: 44,
@@ -2716,11 +2724,12 @@ export default function TemplatePreviewModal({
 
         {/* ── Panneau info ───────────────────────────────────────────────── */}
         <div style={{
-          flex: 1, background: "#0F0E0B",
+          flex: isMobile ? "0 0 auto" : 1, width: isMobile ? "100%" : "auto",
+          background: "#0F0E0B",
           border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)",
-          borderRadius: 20, padding: "24px",
+          borderRadius: 20, padding: isMobile ? "20px" : "24px",
           display: "flex", flexDirection: "column", gap: 20,
-          maxHeight: "90vh", overflowY: "auto",
+          maxHeight: isMobile ? "none" : "90vh", overflowY: isMobile ? "visible" : "auto",
           scrollbarWidth: "none",
         }}>
           {/* Header */}
