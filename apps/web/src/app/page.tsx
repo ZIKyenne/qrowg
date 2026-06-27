@@ -524,6 +524,8 @@ function FeaturesSection() {
         @media (max-width: 900px) { .feat-grid { grid-template-columns: repeat(2,1fr) !important; } }
         @media (max-width: 580px) {
           .feat-grid { grid-template-columns: 1fr !important; }
+          /* En mono-colonne, on annule les spans inline (sinon span 2 crée une 2e colonne implicite -> grille cassée) */
+          .feat-grid > * { grid-column: auto !important; }
           .feat-big { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; padding: 26px 22px !important; }
         }
         @media (max-width: 640px) { #features { padding: 72px 24px !important; } }
