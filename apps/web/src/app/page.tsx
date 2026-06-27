@@ -395,10 +395,7 @@ function FeaturesSection() {
         transform: visible ? "translateY(0)" : "translateY(24px)",
         transition: "opacity 0.6s ease, transform 0.6s ease",
       }}>
-        <p style={{
-          color: "#C9A84C", fontSize: 11, letterSpacing: 3.5,
-          textTransform: "uppercase", fontWeight: 600, marginBottom: 16,
-        }}>Fonctionnalités</p>
+        <Eyebrow>Fonctionnalités</Eyebrow>
         <h2 id="features-title" style={{
           fontFamily: "Cormorant Garamond, serif",
           fontSize: "clamp(28px, 4vw, 52px)",
@@ -740,8 +737,7 @@ function PricingSection() {
         transform: visible ? "translateY(0)" : "translateY(24px)",
         transition: "opacity 0.6s ease, transform 0.6s ease",
       }}>
-        <p style={{ color:"#C9A84C", fontSize:11, letterSpacing:3.5,
-          textTransform:"uppercase", fontWeight:600, marginBottom:16 }}>Tarifs</p>
+        <Eyebrow>Tarifs</Eyebrow>
         <h2 id="pricing-title" style={{
           fontFamily:"Cormorant Garamond, serif",
           fontSize:"clamp(28px,4vw,52px)",
@@ -1295,8 +1291,7 @@ function TemplatesSection() {
         opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(24px)",
         transition: "opacity 0.6s ease, transform 0.6s ease",
       }}>
-        <p style={{ color: "#C9A84C", fontSize: 11, letterSpacing: 3.5,
-          textTransform: "uppercase", fontWeight: 600, marginBottom: 16 }}>Templates</p>
+        <Eyebrow>Templates</Eyebrow>
         <h2 id="templates-title" style={{
           fontFamily: "Cormorant Garamond, serif",
           fontSize: "clamp(28px, 4vw, 52px)",
@@ -1520,7 +1515,7 @@ function HowItWorks() {
       <div style={{maxWidth:1140,margin:"0 auto 72px",textAlign:"center",
         opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(24px)",
         transition:"opacity 0.6s ease,transform 0.6s ease"}}>
-        <p style={{color:"#C9A84C",fontSize:11,letterSpacing:3.5,textTransform:"uppercase",fontWeight:600,marginBottom:16}}>Comment ça marche</p>
+        <Eyebrow>Comment ça marche</Eyebrow>
         <h2 id="how-title" style={{fontFamily:"Cormorant Garamond, serif",fontSize:"clamp(28px,4vw,52px)",
           color:"#F5F0E8",fontWeight:700,margin:"0 auto",lineHeight:1.12,maxWidth:560,letterSpacing:"-0.02em"}}>
           De zéro à scannable{" "}<span style={{color:"#C9A84C"}}>en 5 minutes</span>
@@ -2684,7 +2679,7 @@ function FAQSection() {
       <div style={{ maxWidth:720, margin:"0 auto 56px", textAlign:"center",
         opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(24px)",
         transition:"opacity 0.6s ease,transform 0.6s ease" }}>
-        <p style={{ color:"#C9A84C", fontSize:11, letterSpacing:3.5, textTransform:"uppercase", fontWeight:600, marginBottom:16 }}>FAQ</p>
+        <Eyebrow>FAQ</Eyebrow>
         <h2 id="faq-title" style={{ fontFamily:"Cormorant Garamond, serif",
           fontSize:"clamp(28px,4vw,52px)", color:"#F5F0E8", fontWeight:700,
           margin:"0 auto 16px", lineHeight:1.1, letterSpacing:"-0.02em" }}>
@@ -2853,7 +2848,7 @@ function StoryFlow() {
       `}</style>
       <div id="story" style={{ maxWidth: 1140, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 56, opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(24px)", transition: "opacity 0.6s ease, transform 0.6s ease" }}>
-          <p style={{ color: "#C9A84C", fontSize: 11, letterSpacing: 3.5, textTransform: "uppercase", fontWeight: 600, marginBottom: 16 }}>Le parcours</p>
+          <Eyebrow>Le parcours</Eyebrow>
           <h2 id="story-title" style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(28px,4vw,52px)", color: "#F5F0E8", fontWeight: 700, margin: "0 auto", lineHeight: 1.1, maxWidth: 580, letterSpacing: "-0.02em" }}>
             De l'idée au{" "}<span style={{ color: "#C9A84C" }}>premier client.</span>
           </h2>
@@ -2915,6 +2910,16 @@ function QRFinder({ size = 46, color = "rgba(201,168,76,0.5)", style }: { size?:
       padding: size * 0.17, ...style,
     }}>
       <div style={{ width: "100%", height: "100%", background: color, borderRadius: size * 0.14 }} />
+    </div>
+  )
+}
+
+// ── Eyebrow de section : motif finder QR + label (signature récurrente) ───────
+function Eyebrow({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 16 }}>
+      <QRFinder size={12} color="rgba(201,168,76,0.62)" />
+      <span style={{ color: "#C9A84C", fontSize: 11, letterSpacing: 3.5, textTransform: "uppercase", fontWeight: 600 }}>{children}</span>
     </div>
   )
 }
