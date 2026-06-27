@@ -2745,13 +2745,15 @@ function FAQSection() {
 }
 
 // ── Transition entre sections : signature QRfolio (glyphe QR doré + lignes) ───
-function SectionSeam() {
-  // Séparateur signature : le « finder pattern » d'un QR au centre, entre deux lignes.
+function SectionSeam({ delay = 0 }: { delay?: number }) {
+  // Séparateur signature : le « finder pattern » d'un QR au centre, balayé par un
+  // faisceau de scan (la transition signature de QRfolio).
   return (
     <div aria-hidden="true" style={{
-      position: "relative", maxWidth: 1140, margin: "0 auto", zIndex: 1,
+      position: "relative", overflow: "hidden", maxWidth: 1140, margin: "0 auto", zIndex: 1,
       display: "flex", alignItems: "center", justifyContent: "center", gap: 16, padding: "2px 24px",
     }}>
+      <span className="seam-beam" style={{ animationDelay: `${delay}s` }} />
       <div style={{ flex: 1, maxWidth: 360, height: 1, background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.22))" }} />
       <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ position: "absolute", inset: -12, background: "radial-gradient(circle, rgba(201,168,76,0.14), transparent 70%)", pointerEvents: "none" }} />
@@ -3137,42 +3139,42 @@ export default function HomePage() {
 
       {/* HOW IT WORKS */}
       <HowItWorks />
-      <SectionSeam />
+      <SectionSeam delay={0} />
 
       {/* FEATURES */}
       <FeaturesSection />
-      <SectionSeam />
+      <SectionSeam delay={0.7} />
 
       {/* BUILDER */}
       <BuilderSection />
-      <SectionSeam />
+      <SectionSeam delay={1.4} />
 
       {/* PARCOURS NARRATIF (Création -> Scan -> Analytics) */}
       <StoryFlow />
-      <SectionSeam />
+      <SectionSeam delay={2.1} />
 
       {/* TEMPLATES */}
       <TemplatesSection />
-      <SectionSeam />
+      <SectionSeam delay={2.8} />
 
       {/* QR DYNAMIQUE — fusionné : concept déjà couvert (hero, key-points, fonctionnalités, FAQ).
           Section retirée pour réduire la redondance (Pb 10). Réactivable : <QRDynamicSection /> */}
 
       {/* ANALYTICS */}
       <AnalyticsSection />
-      <SectionSeam />
+      <SectionSeam delay={3.5} />
 
       {/* USE CASES */}
       <UseCasesSection />
-      <SectionSeam />
+      <SectionSeam delay={1.0} />
 
       {/* MARQUE PRO */}
       <BrandProSection />
-      <SectionSeam />
+      <SectionSeam delay={1.8} />
 
       {/* PRICING */}
       <PricingSection />
-      <SectionSeam />
+      <SectionSeam delay={2.5} />
 
       {/* FAQ */}
       <FAQSection />
