@@ -2961,6 +2961,79 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   )
 }
 
+// ── Print Studio : supports imprimables (carrousel mobile) ────────────────────
+const SUPPORTS = [
+  { name: "Affiche",          emoji: "🖼️", accent: "#C9A84C", benefit: "Vitrine, événement, salle d'attente — visible de loin." },
+  { name: "Sticker vitrine",  emoji: "🪟", accent: "#38BDF8", benefit: "Instagram, avis Google ou Wi-Fi : collez, c'est prêt." },
+  { name: "Carte de visite",  emoji: "💳", accent: "#A78BFA", benefit: "Partagez tout votre profil en un seul scan." },
+  { name: "Chevalet de table", emoji: "🍽️", accent: "#39FF8F", benefit: "Menu, avis ou réservation, directement à table." },
+  { name: "Flyer",            emoji: "📄", accent: "#F97316", benefit: "Promo ou ouverture : distribuez, scannez, convertissez." },
+  { name: "Avis Google",      emoji: "⭐", accent: "#F5D24E", benefit: "Un scan, un avis en 10 secondes. Boostez votre note." },
+] as const
+
+function PrintStudioSection() {
+  const { ref, visible } = useInView(0.06)
+  return (
+    <section ref={ref} aria-labelledby="print-title" style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
+      <style>{`
+        .print-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; max-width:1040px; margin:0 auto; }
+        @media(max-width:900px){ .print-grid{ grid-template-columns:repeat(2,1fr)!important; } }
+        @media(max-width:560px){
+          .print-grid{ display:flex!important; gap:14px!important; overflow-x:auto!important; scroll-snap-type:x mandatory!important; padding-bottom:14px!important; -webkit-overflow-scrolling:touch!important; }
+          .print-grid > *{ min-width:240px!important; scroll-snap-align:start!important; }
+          #print{ padding:76px 22px!important; }
+        }
+        .print-grid::-webkit-scrollbar{ height:4px; }
+        .print-grid::-webkit-scrollbar-track{ background:rgba(255,255,255,0.04); border-radius:2px; }
+        .print-grid::-webkit-scrollbar-thumb{ background:rgba(201,168,76,0.3); border-radius:2px; }
+        .print-card{ transition:transform 0.3s cubic-bezier(.34,1.56,.64,1), border-color 0.25s, box-shadow 0.25s; }
+        .print-card:hover{ transform:translateY(-6px); }
+      `}</style>
+      <div id="print" style={{ maxWidth: 1140, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 52, opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(24px)", transition: "opacity 0.6s ease, transform 0.6s ease" }}>
+          <Eyebrow>Supports imprimables</Eyebrow>
+          <h2 id="print-title" style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(28px,4vw,52px)", color: "#F5F0E8", fontWeight: 700, margin: "0 auto 16px", lineHeight: 1.1, maxWidth: 620, letterSpacing: "-0.02em" }}>
+            Vos QR codes en{" "}<span style={{ color: "#C9A84C" }}>supports prêts à imprimer.</span>
+          </h2>
+          <p style={{ color: "rgba(138,132,120,0.85)", fontSize: 16, maxWidth: 520, margin: "0 auto", lineHeight: 1.7 }}>
+            Affiche, sticker, carte, chevalet, flyer… exportés en haute définition, prêts pour l'imprimeur.
+          </p>
+        </div>
+
+        <div className="print-grid">
+          {SUPPORTS.map((s, i) => (
+            <div key={s.name} className="print-card" style={{
+              background: "rgba(255,255,255,0.02)", border: "1px solid rgba(201,168,76,0.1)", borderRadius: 18, overflow: "hidden",
+              opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(26px)",
+              transition: `opacity 0.5s ease ${i * 80}ms, transform 0.45s cubic-bezier(.34,1.56,.64,1) ${i * 80}ms`,
+            }}>
+              {/* Aperçu du support */}
+              <div style={{ position: "relative", aspectRatio: "4 / 3", display: "flex", alignItems: "center", justifyContent: "center", background: `radial-gradient(120% 100% at 50% 0%, ${s.accent}14, transparent 65%), #0C0B08`, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                <div style={{ width: 92, aspectRatio: "1 / 1.3", borderRadius: 8, background: "linear-gradient(160deg,#17140d,#0c0b08)", border: `1px solid ${s.accent}40`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 7, boxShadow: `0 12px 30px rgba(0,0,0,0.5), 0 0 26px ${s.accent}18` }}>
+                  <QRMiniSvg fg="#F5F0E8" bg="transparent" accent={s.accent} size={40} />
+                  <span style={{ width: "62%", height: 3, borderRadius: 2, background: `${s.accent}66` }} />
+                </div>
+                <span style={{ position: "absolute", top: 12, right: 12, fontSize: 18 }}>{s.emoji}</span>
+              </div>
+              {/* Texte */}
+              <div style={{ padding: "16px 18px 20px" }}>
+                <h3 style={{ color: "#F5F0E8", fontSize: 15.5, fontWeight: 700, margin: "0 0 6px" }}>{s.name}</h3>
+                <p style={{ color: "rgba(138,132,120,0.85)", fontSize: 13, lineHeight: 1.55, margin: 0 }}>{s.benefit}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ textAlign: "center", marginTop: 44, opacity: visible ? 1 : 0, transition: "opacity 0.6s ease 0.5s" }}>
+          <Link href="/auth/signup" style={{ display: "inline-flex", alignItems: "center", gap: 9, background: "linear-gradient(90deg,#C9A84C,#b8953f)", color: "#080808", textDecoration: "none", fontSize: 14, fontWeight: 800, padding: "13px 28px", borderRadius: 11, boxShadow: "0 6px 22px rgba(201,168,76,0.3)" }}>
+            Créer mes supports <span style={{ fontSize: 16 }}>→</span>
+          </Link>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [titleVisible, setTitleVisible] = useState(false)
@@ -3205,6 +3278,10 @@ export default function HomePage() {
       {/* ANALYTICS */}
       <AnalyticsSection />
       <SectionSeam delay={3.5} />
+
+      {/* PRINT STUDIO — supports imprimables */}
+      <PrintStudioSection />
+      <SectionSeam delay={0.5} />
 
       {/* USE CASES */}
       <UseCasesSection />
