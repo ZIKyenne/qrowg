@@ -2297,6 +2297,24 @@ function AnalyticsSection() {
               ))}
             </div>
 
+            {/* Carte insight — l'analytics devient un conseiller */}
+            <div style={{
+              display: "flex", gap: 12, alignItems: "flex-start",
+              padding: "14px 16px", borderRadius: 14, marginBottom: 32,
+              background: "linear-gradient(135deg, rgba(201,168,76,0.1), rgba(255,255,255,0.02))",
+              border: "1px solid rgba(201,168,76,0.28)",
+              opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(16px)",
+              transition: "opacity 0.55s ease 0.5s, transform 0.55s ease 0.5s",
+            }}>
+              <span style={{ fontSize: 18, flexShrink: 0, lineHeight: 1.2 }}>💡</span>
+              <div>
+                <p style={{ color: "#C9A84C", fontSize: 9.5, fontWeight: 800, letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 4px" }}>Recommandation</p>
+                <p style={{ color: "#E8E6E0", fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>
+                  Votre QR <strong style={{ color: "#F5F0E8" }}>Restaurant</strong> performe mieux entre <strong style={{ color: "#F5F0E8" }}>18h et 21h</strong>. Partagez-le juste avant le service.
+                </p>
+              </div>
+            </div>
+
             <a href="/auth/signup" style={{
               display: "inline-flex", alignItems: "center", gap: 10,
               background: "transparent",
