@@ -2907,6 +2907,19 @@ function StoryFlow() {
   )
 }
 
+// ── Motif signature : « finder pattern » d'un QR code (carré niché) ───────────
+function QRFinder({ size = 46, color = "rgba(201,168,76,0.5)", style }: { size?: number; color?: string; style?: React.CSSProperties }) {
+  return (
+    <div aria-hidden="true" style={{
+      width: size, height: size, border: `${Math.max(2, size * 0.07)}px solid ${color}`,
+      borderRadius: size * 0.22, display: "flex", alignItems: "center", justifyContent: "center",
+      padding: size * 0.17, ...style,
+    }}>
+      <div style={{ width: "100%", height: "100%", background: color, borderRadius: size * 0.14 }} />
+    </div>
+  )
+}
+
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [titleVisible, setTitleVisible] = useState(false)
@@ -2963,6 +2976,7 @@ export default function HomePage() {
           nav { padding: 16px 24px !important; }
           .nav-links { gap: 20px !important; }
         }
+        @media (max-width: 760px) { .hero-finder { display: none !important; } }
         * { box-sizing: border-box; }
       `}</style>
 
@@ -2990,6 +3004,11 @@ export default function HomePage() {
             background: "radial-gradient(circle, rgba(120,150,255,0.06), transparent 62%)", filter: "blur(48px)",
           }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(125% 80% at 50% 2%, transparent 52%, rgba(0,0,0,0.55) 100%)" }} />
+          {/* Halo carré (signature : finder pattern QR, pas un cercle) */}
+          <div className="hero-finder" style={{ position: "absolute", top: "14%", right: "8%", width: 180, height: 180, borderRadius: 36, background: "radial-gradient(rgba(201,168,76,0.10), transparent 70%)", filter: "blur(26px)" }} />
+          {/* Accents finder QR */}
+          <div className="hero-finder" style={{ position: "absolute", top: "12%", left: "5%" }}><QRFinder size={56} color="rgba(201,168,76,0.16)" /></div>
+          <div className="hero-finder" style={{ position: "absolute", bottom: "16%", left: "9%" }}><QRFinder size={38} color="rgba(201,168,76,0.12)" /></div>
         </div>
         <div className="hero-grid" style={{
           maxWidth: 1140, width: "100%", margin: "0 auto", position: "relative", zIndex: 1,
