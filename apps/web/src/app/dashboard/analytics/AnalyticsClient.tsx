@@ -142,7 +142,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
   }, [filteredScans, filteredViews])
 
   return (
-    <div style={{ minHeight: "100vh", background: "radial-gradient(1100px 520px at 75% -8%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%), #080808", padding: "30px 24px 48px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
+    <div style={{ minHeight: "100vh", background: "radial-gradient(1100px 520px at 75% -8%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%)", padding: "30px 24px 48px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
       <Particles />
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}

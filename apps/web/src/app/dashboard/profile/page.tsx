@@ -1045,7 +1045,7 @@ export default function ProfilePage() {
 
   // -- Loading ------------------------------------------------------------------
   if (loading) return (
-    <div style={{ minHeight: "100vh", background: BG, padding: "28px 28px 48px", fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "transparent", padding: "28px 28px 48px", fontFamily: "DM Sans, sans-serif" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         {/* Bandeau profil */}
         <div style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 28 }}>
@@ -1070,7 +1070,7 @@ export default function ProfilePage() {
 
   // -- RENDER -------------------------------------------------------------------
   return (
-    <div style={{ minHeight: "100vh", background: BG, fontFamily: "DM Sans, sans-serif", position: "relative", isolation: "isolate" }}>
+    <div style={{ minHeight: "100vh", background: "transparent", fontFamily: "DM Sans, sans-serif", position: "relative", isolation: "isolate" }}>
       <Particles behind />
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}

@@ -132,7 +132,7 @@ export default function DashboardClient() {
   const overViews  = viewsLimit != null && monthViews >= viewsLimit
 
   if (loading) return (
-    <div style={{ minHeight: "100vh", background: "#080808", padding: "30px 28px 48px", fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "transparent", padding: "30px 28px 48px", fontFamily: "DM Sans, sans-serif" }}>
       <div style={{ maxWidth: 1080, margin: "0 auto", position: "relative", zIndex: 1 }}>
         {/* En-tête */}
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 22 }}>

@@ -113,7 +113,7 @@ export default function SettingsPage() {
   }
 
   if (loading) return (
-    <div style={{ minHeight: "100vh", background: "#080808", padding: "32px 28px", fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "transparent", padding: "32px 28px", fontFamily: "DM Sans, sans-serif" }}>
       <div style={{ maxWidth: 680, margin: "0 auto" }}>
         <div className="skeleton" style={{ width: 220, height: 34, marginBottom: 8 }} />
         <div className="skeleton" style={{ width: 280, height: 16, marginBottom: 28 }} />

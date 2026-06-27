@@ -94,7 +94,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const W = isMobile ? 0 : (collapsed ? 72 : 240)
 
   return (
-    <div style={{ display: "flex", height: "100vh", background: "#080808", fontFamily: "DM Sans, sans-serif", overflow: "hidden" }}>
+    <div style={{
+      display: "flex", height: "100vh", fontFamily: "DM Sans, sans-serif", overflow: "hidden",
+      // Signature QRfolio : socle doré + trame matrice QR (cellules carrées) partagée par toute l'app
+      background:
+        "radial-gradient(120% 80% at 50% -8%, rgba(201,168,76,0.05), transparent 55%)," +
+        "linear-gradient(rgba(201,168,76,0.022) 1px, transparent 1px) 0 0 / 24px 24px," +
+        "linear-gradient(90deg, rgba(201,168,76,0.022) 1px, transparent 1px) 0 0 / 24px 24px," +
+        "#070707",
+    }}>
       {/* SIDEBAR (masquée sur mobile : remplacée par la barre du bas) */}
       <div style={{
         width: W, minWidth: W, background: "#0A0A0A",

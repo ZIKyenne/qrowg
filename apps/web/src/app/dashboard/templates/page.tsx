@@ -225,7 +225,7 @@ export default function TemplatesPage() {
   const activeCat = BUSINESS_CATEGORIES.find(c => c.id === activeMetier)
 
   return (
-    <div style={{ minHeight: "100vh", background: "#080808", paddingBottom: 120, fontFamily: "DM Sans, sans-serif", position: "relative", isolation: "isolate" }}>
+    <div style={{ minHeight: "100vh", background: "transparent", paddingBottom: 120, fontFamily: "DM Sans, sans-serif", position: "relative", isolation: "isolate" }}>
       <Particles behind />
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
