@@ -30,6 +30,27 @@ body {
   min-height: 100vh;
 }
 
+/* ── Signature QRfolio : socle + texture matrice QR (cellules carrées) ─────────
+   Fond statique (visible derrière les particules sur les pages transparentes).
+   Donne une identité « QR » immédiate et fiabilise les captures plein écran. */
+body::before {
+  content: "";
+  position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background:
+    radial-gradient(130% 70% at 50% -8%, rgba(201,168,76,0.07), transparent 58%),
+    #070707;
+}
+body::after {
+  content: "";
+  position: fixed; inset: 0; z-index: -2; pointer-events: none; opacity: 0.6;
+  background-image:
+    linear-gradient(rgba(201,168,76,0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,0.028) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: radial-gradient(circle at 50% 22%, #000 0%, rgba(0,0,0,0.5) 45%, transparent 78%);
+  mask-image: radial-gradient(circle at 50% 22%, #000 0%, rgba(0,0,0,0.5) 45%, transparent 78%);
+}
+
 .bg-canvas { background: #080808; }
 
 ::selection {
