@@ -1,6 +1,7 @@
 
 import type { Metadata } from 'next'
 import { signIn } from '../actions'
+import Particles from '@/components/Particles'
 
 export const metadata: Metadata = { title: 'Connexion' }
 
@@ -14,10 +15,11 @@ export default async function LoginPage({
     <div style={{
       minHeight: '100vh', background: '#080808',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: '32px',
+      padding: '32px', position: 'relative', isolation: 'isolate', overflow: 'hidden',
       backgroundImage: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(201,168,76,0.06) 0%, transparent 70%)',
     }}>
-      <div style={{ width: '100%', maxWidth: '400px' }}>
+      <Particles behind />
+      <div style={{ width: '100%', maxWidth: '400px', position: 'relative', zIndex: 1 }}>
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
           <a href="/" style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '28px', fontWeight: 300, color: '#F5F0E8', textDecoration: 'none' }}>
             QR<span style={{ color: '#C9A84C', fontWeight: 600 }}>folio</span>
