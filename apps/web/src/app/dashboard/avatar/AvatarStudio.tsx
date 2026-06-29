@@ -207,6 +207,9 @@ export default function AvatarStudio({
   return (
     <div className={styles.wrap}>
       <header>
+        <a href="/dashboard/profile" style={{ display: "inline-flex", alignItems: "center", gap: 7, color: "#A8A29A", textDecoration: "none", fontSize: 13, fontWeight: 600, marginBottom: 16 }}>
+          <span style={{ fontSize: 16, lineHeight: 1 }}>←</span> Retour au profil
+        </a>
         <div className={styles.eyebrow}>QRfolio · Studio d&apos;avatar</div>
         <h1 className={styles.title}>
           Composez votre <em>photo de profil</em>.

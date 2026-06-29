@@ -54,6 +54,10 @@
   .grid {
     grid-template-columns: 1fr;
   }
+  /* Mobile : les réglages d'abord, l'aperçu (réduit) ensuite -> vrai éditeur */
+  .stage { order: 2; }
+  .preview { width: 200px; height: 200px; margin-bottom: 4px; }
+  .panel { padding: 20px; }
 }
 
 .panel {
