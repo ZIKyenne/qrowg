@@ -253,15 +253,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
 
       {/* MAIN CONTENT */}
-      <main style={{ flex: 1, overflow: "auto", minWidth: 0, paddingBottom: isMobile ? 64 : 0 }}>
+      <main style={{ flex: 1, overflow: "auto", minWidth: 0, paddingBottom: isMobile ? "calc(64px + env(safe-area-inset-bottom))" : 0 }}>
         {children}
       </main>
 
       {/* BARRE DE NAVIGATION MOBILE (bottom bar) */}
       {isMobile && (
         <nav style={{
-          position: "fixed", bottom: 0, left: 0, right: 0, height: 60, zIndex: 50,
+          position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50,
           display: "flex", alignItems: "stretch",
+          paddingBottom: "env(safe-area-inset-bottom)",
           background: "rgba(10,10,10,0.96)", backdropFilter: "blur(12px)",
           borderTop: "1px solid rgba(201,168,76,0.14)",
           boxShadow: "0 -8px 24px rgba(0,0,0,0.4)",
@@ -271,12 +272,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             return (
               <Link key={href} href={href}
                 style={{
-                  flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3,
+                  flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
+                  padding: "10px 4px",
                   textDecoration: "none", color: active ? G : MUTED, position: "relative", transition: "color .15s",
                 }}>
-                {active && <span style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 26, height: 3, borderRadius: "0 0 3px 3px", background: G }} />}
-                <Icon size={19} strokeWidth={active ? 2.4 : 2} />
-                <span style={{ fontSize: 9, fontWeight: active ? 700 : 500, letterSpacing: 0.1 }}>{label}</span>
+                {active && <span style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 28, height: 3, borderRadius: "0 0 3px 3px", background: G }} />}
+                <Icon size={21} strokeWidth={active ? 2.4 : 2} />
+                <span style={{ fontSize: 10.5, fontWeight: active ? 700 : 500, letterSpacing: 0.1 }}>{label}</span>
               </Link>
             )
           })}
