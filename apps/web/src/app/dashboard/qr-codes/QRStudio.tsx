@@ -2762,6 +2762,34 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       )}
                     </div>
                   )}
+
+                  {/* Assistant : prochaine étape contextuelle selon l'état du QR */}
+                  {(() => {
+                    const published = active.pages?.status === "published"
+                    const scans = active.total_scans ?? 0
+                    const recBtn = { flexShrink: 0, display: "inline-flex", alignItems: "center", padding: "7px 13px", borderRadius: 8, background: "color-mix(in srgb, var(--accent) 14%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 35%, transparent)", color: G, fontSize: 11.5, fontWeight: 700, cursor: "pointer", textDecoration: "none", whiteSpace: "nowrap" as const }
+                    let icon: string, text: ReactNode, cta: ReactNode
+                    if (!published) {
+                      icon = "🚀"; text = <>Publiez votre page pour activer ce QR.</>
+                      cta = <a href={`/dashboard/builder/${active.page_id}`} style={recBtn}>Publier</a>
+                    } else if (scans === 0) {
+                      icon = "📣"; text = <>Aucun scan pour l&apos;instant — testez-le ou partagez-le.</>
+                      cta = <button type="button" onClick={() => setShowModal(true)} style={recBtn}>Tester</button>
+                    } else if (PLAN_RANK[userPlan] < PLAN_RANK["pro"]) {
+                      icon = "🔥"; text = <><strong style={{ color: "#F5F0E8" }}>{scans}</strong> scan{scans > 1 ? "s" : ""} ! Passez Pro pour les stats avancées.</>
+                      cta = <a href="/upgrade" style={recBtn}>Passer Pro</a>
+                    } else {
+                      icon = "🖨️"; text = <><strong style={{ color: "#F5F0E8" }}>{scans}</strong> scan{scans > 1 ? "s" : ""} — créez un support imprimable.</>
+                      cta = <button type="button" onClick={() => setActiveTab("supports")} style={recBtn}>Créer un support</button>
+                    }
+                    return (
+                      <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 11, textAlign: "left", padding: "12px 14px", borderRadius: 13, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                        <span style={{ fontSize: 18, flexShrink: 0 }}>{icon}</span>
+                        <p style={{ flex: 1, minWidth: 0, margin: 0, color: "#C9C3B6", fontSize: 12.5, lineHeight: 1.45 }}>{text}</p>
+                        {cta}
+                      </div>
+                    )
+                  })()}
                 </div>
 
                 {/* Actions rapides */}
