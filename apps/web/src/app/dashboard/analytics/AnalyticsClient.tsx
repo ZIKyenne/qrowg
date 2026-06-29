@@ -122,6 +122,8 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
 
   const totalScans30 = filteredScans.length
   const totalViews30 = filteredViews.length
+  // Aucune donnée : on masque les sections détaillées (sinon = pile de cartes vides)
+  const noData = totalScans30 === 0 && totalViews30 === 0 && (profile?.total_scans || 0) === 0
 
   // ── Temps réel : visiteurs actifs (10 min), aujourd'hui vs hier, dernier événement ──
   const live = useMemo(() => {
@@ -183,7 +185,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
         </div>
 
         {/* État vide pédagogique : aucune donnée encore */}
-        {totalScans30 === 0 && totalViews30 === 0 && (profile?.total_scans || 0) === 0 && (
+        {noData && (
           <div className="az" style={{ marginBottom: 14, padding: "22px 24px", borderRadius: 16, position: "relative", overflow: "hidden",
             background: "linear-gradient(135deg, color-mix(in srgb,#7B61FF 12%,#100F0A), #100F0A)",
             border: "1px solid rgba(123,97,255,0.3)", boxShadow: "0 10px 34px rgba(0,0,0,0.3)" }}>
@@ -275,6 +277,8 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
           ))}
         </div>
 
+        {/* Sections détaillées — masquées tant qu'il n'y a aucune donnée */}
+        {!noData && (<>
         {/* Graphique principal — scans + vues */}
         <div className="az" style={{
           animationDelay: "360ms",
@@ -448,6 +452,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             </div>
           )}
         </div>
+        </>)}
 
       </div>
     </div>
