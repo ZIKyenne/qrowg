@@ -143,6 +143,18 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
     return { active, todayN, ydayN, evo, last: allT[0] as { t: string; kind: string } | undefined }
   }, [filteredScans, filteredViews])
 
+  // ── Storytelling : une phrase de synthèse plutôt qu'un tableau de chiffres ──
+  const story = useMemo(() => {
+    if (noData) return null
+    const topSource = sourceData[0]?.name || null
+    const topDevice = deviceData[0]?.name || null
+    const times = [...filteredScans.map(s => s.scanned_at), ...filteredViews.map(v => v.viewed_at)]
+    const hourCount: Record<number, number> = {}
+    times.forEach(t => { const h = new Date(t).getHours(); hourCount[h] = (hourCount[h] || 0) + 1 })
+    const peakEntry = Object.entries(hourCount).sort((a, b) => b[1] - a[1])[0]
+    return { topSource, topDevice, peakHour: peakEntry ? Number(peakEntry[0]) : null }
+  }, [noData, sourceData, deviceData, filteredScans, filteredViews])
+
   return (
     <div style={{ minHeight: "100vh", background: "radial-gradient(1100px 520px at 75% -8%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%)", padding: "30px 24px 48px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
       <Particles />
@@ -211,6 +223,29 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
               )}
             </div>
             <p style={{ color: "#6F6A60", fontSize: 11, margin: "12px 0 0" }}>Aperçu de démonstration ci-dessous — vos vraies données le remplaceront.</p>
+          </div>
+        )}
+
+        {/* ── Synthèse narrative (storytelling) ──────────────────────────── */}
+        {!noData && story && (
+          <div className="az" style={{ marginBottom: 14, padding: "18px 20px", borderRadius: 16, position: "relative", overflow: "hidden",
+            background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 11%, #100F0A), #100F0A)",
+            border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)" }}>
+            <div style={{ position: "absolute", top: -30, right: -20, width: 150, height: 150, borderRadius: "50%", background: "radial-gradient(circle, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%)" }} />
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 12, position: "relative" }}>
+              <span style={{ flexShrink: 0, fontSize: 20, lineHeight: 1.1 }}>{live.evo > 5 ? "📈" : live.evo < -5 ? "📉" : "📊"}</span>
+              <div style={{ minWidth: 0 }}>
+                <p style={{ color: "#F8F4EC", fontSize: 16, fontWeight: 700, margin: "0 0 3px", fontFamily: "Cormorant Garamond, serif", letterSpacing: "-0.2px" }}>
+                  {live.evo > 5 ? "Votre trafic augmente." : live.evo < -5 ? "Votre trafic ralentit un peu." : "Votre QR est suivi en temps réel."}
+                </p>
+                <p style={{ color: "#C9C3B6", fontSize: 13.5, margin: 0, lineHeight: 1.55 }}>
+                  {totalScans30} scan{totalScans30 > 1 ? "s" : ""} sur 30 jours
+                  {story.topSource ? <>, surtout via <strong style={{ color: "#F5F0E8" }}>{story.topSource}</strong></> : null}
+                  {story.topDevice ? <> sur <strong style={{ color: "#F5F0E8" }}>{story.topDevice}</strong></> : null}
+                  {story.peakHour != null ? <> · pic d&apos;activité vers <strong style={{ color: "#F5F0E8" }}>{story.peakHour}h</strong></> : null}.
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
