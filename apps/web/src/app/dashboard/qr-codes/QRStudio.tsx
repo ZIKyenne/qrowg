@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 import dynamic from "next/dynamic"
 import { createClient } from "@/lib/supabase/client"
+import { useIsMobile } from "@/lib/useIsMobile"
 import { PLAN_RANK, canPrintStudio, minPlanFor } from "@/lib/plans"
 import { createQR, updateQR, getQRBlob, downloadBlob, blobToDataUrl, buildAndDownloadPdf, type QROptions } from "./qrRender"
 import type QRCodeStyling from "qr-code-styling"
@@ -517,6 +518,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [showModal,  setShowModal]  = useState(false)
   const [scene,      setScene]      = useState<"none"|"phone"|"card"|"poster"|"sticker"|"tent">("none") // aperçu immersif
   const [level,      setLevel]      = useState<"simple"|"inter"|"expert">("simple") // niveau de réglages (désencombre le panneau)
+  const [expOptsOpen, setExpOptsOpen] = useState(false) // options export techniques repliées sur mobile
+  const isMobile = useIsMobile(859) // mobile : on désencombre le panneau export
   const [qrPng,      setQrPng]      = useState<string>("") // PNG du QR composé dans les scènes
   const [diagFg,     setDiagFg]     = useState("")
   const [diagBg,     setDiagBg]     = useState("")
@@ -3759,10 +3762,18 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 </p>
               </div>
 
-              {/* -- Options -------------------------------------------------- */}
+              {/* -- Options (repliées sur mobile pour désencombrer) ---------- */}
               <div>
-                <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Options</p>
-                <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+                {isMobile ? (
+                  <button type="button" onClick={() => setExpOptsOpen(o => !o)} aria-expanded={expOptsOpen}
+                    style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", background:"none", border:"none", padding:"2px 0 8px", cursor:"pointer" }}>
+                    <span style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5 }}>Options avancées</span>
+                    <span style={{ color:G, fontSize:12, transform:expOptsOpen?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▾</span>
+                  </button>
+                ) : (
+                  <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Options</p>
+                )}
+                <div style={{ display: (!isMobile || expOptsOpen) ? "flex" : "none", flexDirection:"column", gap:7 }}>
 
                   {/* Marge */}
                   <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
