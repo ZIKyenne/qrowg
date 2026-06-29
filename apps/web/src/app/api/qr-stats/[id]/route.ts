@@ -21,7 +21,12 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     .eq("user_id", user.id)
     .single()
 
-  if (!qr) return NextResponse.json({ error: "QR introuvable" }, { status: 404 })
+  // QR introuvable (ou pas encore en base / sans stats) : on renvoie un état vide
+  // en 200 plutôt qu'un 404 -> pas d'erreur rouge en console, le client affiche 0.
+  if (!qr) return NextResponse.json({
+    total: 0, current: 0, prev: 0, evolution: 0, last_scan: null,
+    top_device: null, top_country: null, sparkline: [], period: days, created_at: null, empty: true,
+  })
 
   const now      = new Date()
   const fromDate = new Date(now); fromDate.setDate(fromDate.getDate() - days)
