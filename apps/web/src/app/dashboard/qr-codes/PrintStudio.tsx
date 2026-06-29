@@ -3229,20 +3229,42 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   if (isMobile) {
     return (
       <div style={{
-        position: "fixed", inset: 0, zIndex: 3000, background: BG,
+        position: "fixed", inset: 0, zIndex: 3000,
+        background: "radial-gradient(120% 70% at 50% 2%, rgba(201,168,76,0.12), transparent 55%), #0A0A0A",
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
         textAlign: "center" as const, padding: 28, fontFamily: "DM Sans, sans-serif",
       }}>
-        <div style={{ width: 66, height: 66, borderRadius: 18, background: "rgba(201,168,76,0.14)", border: "1px solid rgba(201,168,76,0.35)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
-          <Monitor size={30} color={G} />
+        {/* Mini-mockup d'éditeur desktop */}
+        <div style={{ position: "relative", width: "min(264px, 78vw)", marginBottom: 28 }}>
+          <div aria-hidden style={{ position: "absolute", inset: -28, background: "radial-gradient(circle, rgba(201,168,76,0.2), transparent 70%)", filter: "blur(22px)", pointerEvents: "none" }} />
+          <div style={{ position: "relative", borderRadius: 14, overflow: "hidden", border: "1px solid rgba(201,168,76,0.32)", background: "#13110b", boxShadow: "0 26px 64px rgba(0,0,0,0.6)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "8px 11px", background: "rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+              {["#FF6B6B", "#F5D24E", "#39FF8F"].map(c => <span key={c} style={{ width: 8, height: 8, borderRadius: "50%", background: c }} />)}
+              <span style={{ marginLeft: "auto", color: "rgba(201,168,76,0.6)", fontSize: 9, letterSpacing: 1 }}>QR PRINT STUDIO</span>
+            </div>
+            <div style={{ display: "flex", height: 132 }}>
+              <div style={{ width: 36, borderRight: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "12px 0" }}>
+                {[0, 1, 2, 3].map(i => <span key={i} style={{ width: 16, height: 16, borderRadius: 5, background: "rgba(201,168,76,0.18)", border: "1px solid rgba(201,168,76,0.25)" }} />)}
+              </div>
+              <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ width: 70, height: 70, borderRadius: 10, background: "#fff", display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 3, padding: 12 }}>
+                  {[1, 0, 1, 0, 1, 0, 1, 0, 1].map((on, i) => <span key={i} style={{ borderRadius: 2, background: on ? "#0A0A0A" : "transparent" }} />)}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 26, color: INK, fontWeight: 700, margin: "0 0 10px", maxWidth: 320 }}>
-          Print Studio s’utilise sur ordinateur
+
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 13px", borderRadius: 100, background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.3)", color: G, fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" as const, marginBottom: 14 }}>
+          <Monitor size={13} /> Sur ordinateur
+        </span>
+        <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 27, color: "#F5F0E8", fontWeight: 700, margin: "0 0 10px", maxWidth: 320 }}>
+          Créez vos supports sur ordinateur
         </h2>
-        <p style={{ color: MUTED, fontSize: 14, lineHeight: 1.6, margin: "0 0 24px", maxWidth: 340 }}>
-          L’éditeur d’imprimables (placement précis, calques, redimensionnement) nécessite un grand écran et une souris. Ouvrez QRfolio sur ordinateur pour créer vos supports.
+        <p style={{ color: "rgba(245,240,232,0.6)", fontSize: 14, lineHeight: 1.6, margin: "0 0 26px", maxWidth: 320 }}>
+          L’éditeur d’affiches, flyers et stickers a besoin d’un grand écran et d’une souris.
         </p>
-        <button onClick={onClose} style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 22px", background: `linear-gradient(90deg, ${G}, #b8953f)`, border: "none", borderRadius: 11, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+        <button onClick={onClose} style={{ display: "flex", alignItems: "center", gap: 8, padding: "13px 24px", background: `linear-gradient(90deg, ${G}, #b8953f)`, border: "none", borderRadius: 12, color: "#0A0A0A", fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: `0 8px 24px rgba(201,168,76,0.3)` }}>
           <ArrowRight size={16} style={{ transform: "rotate(180deg)" }} /> Retour au QR Studio
         </button>
       </div>
