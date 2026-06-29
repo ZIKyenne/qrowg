@@ -69,7 +69,7 @@ Pour chaque écran : **Objectif** (la mission unique) · **Action primaire** · 
   - Parcours normal → ➕ *Créez une 2ᵉ page* / 🖨️ *X scans, créez un support*.
   - Quota proche/atteint → ⚠️ alerte vues + Passer Pro (rouge = alerte).
 - **Mobile** : onboarding réduit à l'étape en cours (barre X/3) ; CTA pleine largeur.
-- **Dette** : encore trop de cartes (Progression / Stats / Activité / Objectif). À fusionner en un cockpit calme.
+- **Cockpit** : les 4 KPI ont été fusionnés en un bloc unique (Scans totaux = héro 44px ; Vues / Pages / Publiées = stats secondaires). ✅
 
 ### Templates — `/dashboard/templates`
 - **Objectif** : choisir le bon modèle pour mon métier, vite.
@@ -145,7 +145,7 @@ Avant de livrer un écran, vérifier :
 
 ## 7. Dette UX connue (backlog)
 
-1. **Dashboard** : fusionner Progression + Stats + Activité + Objectif en un cockpit unique.
+1. ~~**Dashboard** : fusionner les KPI en un cockpit unique.~~ ✅ fait (cockpit 1 héro + 3 stats).
 2. **Analytics** : réduire la taille des graphes + « Voir l'analyse complète ».
 3. **Print Studio** : en faire un pilier produit (pas une extension).
 4. Réduire les hauteurs partout (-20 à -35 %).
