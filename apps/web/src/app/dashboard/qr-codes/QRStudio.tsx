@@ -8,7 +8,7 @@ import {
   RotateCcw, Loader2, Search, Trash2, Archive,
   MoreVertical, AlertTriangle, X,
   ImageIcon, FileText, Maximize2, ClipboardList, SlidersHorizontal,
-  Printer, LayoutGrid, TrendingUp, TrendingDown, BarChart, Sparkles
+  Printer, LayoutGrid, TrendingUp, TrendingDown, BarChart, Sparkles, ArrowRight
 } from "lucide-react"
 import dynamic from "next/dynamic"
 import { createClient } from "@/lib/supabase/client"
@@ -424,6 +424,7 @@ const SUPP_OBJECTIVES: SuppObjective[] = [
 export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: Props) {
   const [qrCodes,    setQRCodes]    = useState<QRCode[]>(initialQRCodes)
   const [activeId,   setActiveId]   = useState<string | null>(initialQRCodes[0]?.id ?? null)
+  const [mobileView, setMobileView] = useState<"list"|"editor">("list") // mobile : liste OU éditeur (pas les deux empilés)
   const [activeTab,  setActiveTab]  = useState<"style" | "supports" | "export">("style")
   const [showMoreFmt, setShowMoreFmt] = useState(false)
   const [fg,         setFg]         = useState("")
@@ -981,6 +982,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       }
       setQRCodes(prev => [d.qr, ...prev])
       setActiveId(d.qr.id)
+      setMobileView("editor")
     } catch {
       window.alert("Duplication impossible : erreur reseau")
     } finally {
@@ -2402,7 +2404,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       )}
 
       {/* -- COL 1 : Liste ------------------------------------------------------ */}
-      <div className="qr-col-list" style={{ borderRight:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", overflow:"hidden" }}>
+      <div className="qr-col-list" style={{ borderRight:"1px solid rgba(255,255,255,0.06)", display:(isMobile && mobileView==="editor") ? "none" : "flex", flexDirection:"column", overflow:"hidden" }}>
 
         {/* Header + filtres */}
         <div style={{ padding:"12px 12px 10px", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", gap:8 }}>
@@ -2480,7 +2482,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             const isC  = copyQRId === qr.id
             const pb   = PLAN_BADGE[userPlan]
             return (
-              <div key={qr.id} onClick={() => { setActiveId(qr.id); setMenuId(null) }}
+              <div key={qr.id} onClick={() => { setActiveId(qr.id); setMenuId(null); setMobileView("editor") }}
                 style={{ margin:"0 10px 8px", padding:"12px", cursor:"pointer", borderRadius:12, border:`1px solid ${isA?"color-mix(in srgb, var(--accent) 40%, transparent)":"rgba(255,255,255,0.07)"}`, background:isA?"color-mix(in srgb, var(--accent) 7%, transparent)":"rgba(255,255,255,0.02)", boxShadow:isA?"0 4px 16px color-mix(in srgb, var(--accent) 8%, transparent)":"none", position:"relative", transition:"all 0.15s" }}
                 onMouseEnter={e => { if (!isA) e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)" }}
                 onMouseLeave={e => { if (!isA) e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)" }}>
@@ -2573,7 +2575,14 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       </div>
 
       {/* -- COL 2 : Preview premium -------------------------------------------- */}
-      <div className="qr-col-preview" style={{ display:"flex", flexDirection:"column", overflow:"hidden", background:"#0A0907" }}>
+      <div className="qr-col-preview" style={{ display:(isMobile && mobileView==="list") ? "none" : "flex", flexDirection:"column", overflow:"hidden", background:"#0A0907" }}>
+        {/* Retour à la liste (mobile uniquement) */}
+        {isMobile && (
+          <button type="button" onClick={() => setMobileView("list")}
+            style={{ display:"flex", alignItems:"center", gap:7, width:"100%", padding:"12px 16px", background:"rgba(255,255,255,0.03)", border:"none", borderBottom:"1px solid rgba(255,255,255,0.06)", color:"#F5F0E8", fontSize:13, fontWeight:600, cursor:"pointer" }}>
+            <ArrowRight size={15} style={{ transform:"rotate(180deg)" }} /> Mes QR codes
+          </button>
+        )}
         {/* Section label */}
         <div style={{ padding:"10px 16px 8px", borderBottom:"1px solid rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Aperçu</p>
@@ -3077,7 +3086,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       </div>
 
       {/* -- COL 3 : Personnalisation premium ------------------------------------ */}
-      <div className="qr-col-settings" style={{ borderLeft:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", overflow:"hidden" }}>
+      <div className="qr-col-settings" style={{ borderLeft:"1px solid rgba(255,255,255,0.06)", display:(isMobile && mobileView==="list") ? "none" : "flex", flexDirection:"column", overflow:"hidden" }}>
         {/* Section label */}
         <div style={{ padding:"10px 16px 8px", borderBottom:"1px solid rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Personnalisation & Export</p>
