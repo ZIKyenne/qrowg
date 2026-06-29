@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Plus, QrCode, BarChart2, Eye, Zap, ArrowRight, Globe, Trash2, ExternalLink, Edit3, AlertTriangle, X, Check } from "lucide-react"
 import { getPlan, fmtPrice } from "@/lib/plans"
 import Particles from "@/components/Particles"
+import { useIsMobile } from "@/lib/useIsMobile"
 
 type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string }
 type Profile = { full_name: string | null; plan: string; total_scans: number; total_pages: number; avatar_url: string | null }
@@ -49,6 +50,7 @@ function DeleteModal({ page, onConfirm, onCancel, deleting }: { page: Page; onCo
 }
 
 export default function DashboardClient() {
+  const isMobile = useIsMobile()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [pages, setPages] = useState<Page[]>([])
   const [loading, setLoading] = useState(true)
@@ -270,8 +272,10 @@ export default function DashboardClient() {
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {steps.map((s, i) => {
                   const isCurrent = !s.done && current === s
+                  // Mobile : on ne montre que l'étape en cours (la barre indique déjà X/3) -> bloc compact
+                  if (isMobile && !isCurrent) return null
                   return (
-                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 11,
+                    <div key={i} style={{ display: "flex", alignItems: "center", flexWrap: isMobile ? "wrap" : "nowrap", gap: isMobile ? 10 : 12, padding: "10px 12px", borderRadius: 11,
                       background: isCurrent ? "color-mix(in srgb, var(--accent) 9%, transparent)" : "rgba(255,255,255,0.02)",
                       border: `1px solid ${isCurrent ? "color-mix(in srgb, var(--accent) 28%, transparent)" : "rgba(255,255,255,0.05)"}` }}>
                       <span style={{ flexShrink: 0, width: 24, height: 24, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
@@ -284,7 +288,7 @@ export default function DashboardClient() {
                         {!s.done && <p style={{ color: MUTED, fontSize: 11.5, margin: "1px 0 0" }}>{s.desc}</p>}
                       </div>
                       {isCurrent && (
-                        <Link href={s.cta.href} className="dz-cta" style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, padding: "8px 15px", borderRadius: 9, background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", color: "#080808", textDecoration: "none", fontSize: 12.5, fontWeight: 800, boxShadow: "0 5px 16px color-mix(in srgb, var(--accent) 25%, transparent)" }}>
+                        <Link href={s.cta.href} className="dz-cta" style={{ flexShrink: 0, width: isMobile ? "100%" : "auto", justifyContent: "center", display: "flex", alignItems: "center", gap: 6, padding: isMobile ? "11px 15px" : "8px 15px", borderRadius: 9, background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", color: "#080808", textDecoration: "none", fontSize: 12.5, fontWeight: 800, boxShadow: "0 5px 16px color-mix(in srgb, var(--accent) 25%, transparent)" }}>
                           <s.cta.Icon size={14} strokeWidth={2.5} /> {s.cta.label}
                         </Link>
                       )}
