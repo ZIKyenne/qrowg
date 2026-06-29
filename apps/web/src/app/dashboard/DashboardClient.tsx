@@ -318,34 +318,51 @@ export default function DashboardClient() {
           )
         })()}
 
-        {/* KPI */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 13, marginBottom: 20 }}>
-          {[
-            { icon: <QrCode size={18} />, label: "Scans totaux", value: (profile?.total_scans || 0).toLocaleString("fr-FR"), color: "#39FF8F", sub: "tous temps", hero: true },
-            { icon: <BarChart2 size={18} />, label: "Vues ce mois", value: monthViews.toLocaleString("fr-FR"), color: overViews ? "#FF6B6B" : "#7B61FF", sub: viewsLimit ? `/ ${viewsLimit.toLocaleString("fr-FR")}` : "illimitées", spark: true },
-            { icon: <Eye size={18} />, label: "Pages créées", value: profile?.total_pages || 0, color: G, sub: publishedCount + " publiée" + (publishedCount > 1 ? "s" : "") },
-            { icon: <Globe size={18} />, label: "Publiées", value: publishedCount, color: "#38BDF8", sub: "sur " + pages.length + " pages" },
-          ].map((kpi, i) => (
-            <div key={i} className="dz dz-card" {...hov("none")}
-              style={{ animationDelay: `${i * 70}ms`, background: kpi.hero ? "linear-gradient(135deg, color-mix(in srgb,#39FF8F 9%,#111009), #100F0A)" : "#100F0A", border: "1px solid " + (kpi.hero ? "rgba(57,255,143,0.28)" : "color-mix(in srgb, var(--accent) 12%, transparent)"), borderRadius: 14, padding: "16px 18px", position: "relative", overflow: "hidden", cursor: "default" }}>
-              <div style={{ position: "absolute", top: -14, right: -14, width: 72, height: 72, borderRadius: "50%", background: "radial-gradient(circle," + kpi.color + "1f,transparent 70%)" }} />
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div style={{ color: kpi.color, background: kpi.color + "1a", borderRadius: 9, padding: 8, display: "flex" }}>{kpi.icon}</div>
-                {kpi.spark && weekViews.length === 7 && (
-                  <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 24 }}>
-                    {weekViews.map((v, j) => (
-                      <div key={j} style={{ width: 4, height: Math.max(3, Math.round((v / maxToday) * 24)), borderRadius: 2, background: j === 6 ? kpi.color : kpi.color + "55" }} />
-                    ))}
-                  </div>
-                )}
+        {/* Cockpit : 1 métrique héro + stats secondaires (au lieu de 4 cartes concurrentes) */}
+        <div className="dz dz-card" style={{ animationDelay: "120ms", marginBottom: 20, background: "linear-gradient(135deg, color-mix(in srgb,#39FF8F 7%,#13110B), #100F0A)", border: "1px solid rgba(57,255,143,0.22)", borderRadius: 16, padding: "18px 22px", position: "relative", overflow: "hidden", boxShadow: "0 8px 30px rgba(0,0,0,0.25)" }}>
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent, #39FF8F, transparent)" }} />
+          <div aria-hidden style={{ position: "absolute", top: -30, right: -20, width: 170, height: 170, borderRadius: "50%", background: "radial-gradient(circle,#39FF8F18,transparent 70%)", pointerEvents: "none" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap", position: "relative" }}>
+
+            {/* HÉRO : scans totaux */}
+            <div style={{ flex: "1 1 190px", minWidth: 150 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ color: "#39FF8F", background: "#39FF8F1a", borderRadius: 9, padding: 8, display: "flex" }}><QrCode size={18} /></span>
+                <span style={{ color: "#C9C3B6", fontSize: 12.5, fontWeight: 600 }}>Scans totaux</span>
               </div>
-              <p style={{ color: "#F8F4EC", fontSize: kpi.hero ? 36 : 30, fontWeight: 700, margin: "10px 0 1px", fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{kpi.value}</p>
-              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 6 }}>
-                <p style={{ color: "#C9C3B6", fontSize: 11.5, margin: 0, fontWeight: 500 }}>{kpi.label}</p>
-                <p style={{ color: kpi.color + "b0", fontSize: 10, margin: 0, whiteSpace: "nowrap" }}>{kpi.sub}</p>
-              </div>
+              <p style={{ color: "#F8F4EC", fontSize: 44, fontWeight: 700, margin: "8px 0 0", fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{(profile?.total_scans || 0).toLocaleString("fr-FR")}</p>
+              <p style={{ color: "#39FF8Fb0", fontSize: 11, margin: "2px 0 0" }}>tous temps</p>
             </div>
-          ))}
+
+            {!isMobile && <div aria-hidden style={{ width: 1, alignSelf: "stretch", minHeight: 64, background: "rgba(255,255,255,0.07)" }} />}
+
+            {/* SECONDAIRES : vues / pages / publiées */}
+            <div style={{ display: "flex", gap: 24, flexWrap: "wrap", flex: "2 1 300px" }}>
+              {[
+                { icon: <BarChart2 size={15} />, label: "Vues ce mois", value: monthViews.toLocaleString("fr-FR"), sub: viewsLimit ? `/ ${viewsLimit.toLocaleString("fr-FR")}` : "illimitées", color: overViews ? "#FF6B6B" : "#7B61FF", spark: true },
+                { icon: <Eye size={15} />, label: "Pages créées", value: profile?.total_pages || 0, sub: publishedCount + " publiée" + (publishedCount > 1 ? "s" : ""), color: G, spark: false },
+                { icon: <Globe size={15} />, label: "Publiées", value: publishedCount, sub: "sur " + pages.length, color: "#38BDF8", spark: false },
+              ].map((s, i) => (
+                <div key={i} style={{ minWidth: 92 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ color: s.color, display: "flex" }}>{s.icon}</span>
+                      <span style={{ color: "#C9C3B6", fontSize: 11.5, fontWeight: 500 }}>{s.label}</span>
+                    </div>
+                    {s.spark && weekViews.length === 7 && (
+                      <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 18 }}>
+                        {weekViews.map((v, j) => (
+                          <div key={j} style={{ width: 3, height: Math.max(2, Math.round((v / maxToday) * 18)), borderRadius: 2, background: j === 6 ? s.color : s.color + "55" }} />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <p style={{ color: "#F8F4EC", fontSize: 26, fontWeight: 700, margin: "6px 0 0", fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{s.value}</p>
+                  <p style={{ color: s.color + "b0", fontSize: 10, margin: "2px 0 0", whiteSpace: "nowrap" }}>{s.sub}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Layout 2 colonnes — Mes pages = carte principale */}
