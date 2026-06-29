@@ -3089,7 +3089,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       <div className="qr-col-settings" style={{ borderLeft:"1px solid rgba(255,255,255,0.06)", display:(isMobile && mobileView==="list") ? "none" : "flex", flexDirection:"column", overflow:"hidden" }}>
         {/* Section label */}
         <div style={{ padding:"10px 16px 8px", borderBottom:"1px solid rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-          <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Personnalisation & Export</p>
+          <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>Personnaliser</p>
           {active && saved && (
             <span style={{ color:"#39FF8F", fontSize:9, display:"flex", alignItems:"center", gap:3 }}>
               <Check size={9}/> Sauvegarde
@@ -3099,13 +3099,39 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
         {/* Tabs principaux Style/Export */}
         <div style={{ display:"flex", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
-          {([["style","Style","🎨"],["supports","Imprimables","🖨️"],["export","Export","📤"]] as const).map(([id,label,emoji]) => (
+          {([["style","Style","🎨"],["supports","Supports","🖨️"],["export","Télécharger","📤"]] as const).map(([id,label,emoji]) => (
             <button key={id} type="button" onClick={() => setActiveTab(id)}
               style={{ flex:1, padding:"11px 8px", background:activeTab===id?"color-mix(in srgb, var(--accent) 6%, transparent)":"transparent", border:"none", borderBottom:activeTab===id?`2px solid ${G}`:"2px solid transparent", color:activeTab===id?G:MUTED, fontSize:12, fontWeight:600, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:5 }}>
               <span>{emoji}</span>{label}
             </button>
           ))}
         </div>
+
+        {/* Fil guidé (mobile) : étape courante + Suivant, sans bloquer les onglets */}
+        {isMobile && active && (() => {
+          const steps = ["style","supports","export"] as const
+          const labels: Record<string,string> = { style:"Style", supports:"Supports", export:"Télécharger" }
+          const idx = steps.indexOf(activeTab as any)
+          const next = steps[idx + 1]
+          return (
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, padding:"9px 14px", borderBottom:"1px solid rgba(255,255,255,0.05)", background:"rgba(255,255,255,0.015)" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+                {steps.map((_, i) => (
+                  <span key={i} style={{ width:i===idx?16:6, height:6, borderRadius:3, background:i<=idx?G:"rgba(255,255,255,0.15)", transition:"all 0.25s" }}/>
+                ))}
+                <span style={{ color:MUTED, fontSize:11, marginLeft:4 }}>Étape {idx+1}/3 · {labels[activeTab]}</span>
+              </div>
+              {next ? (
+                <button type="button" onClick={() => setActiveTab(next)}
+                  style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"6px 13px", borderRadius:8, background:"color-mix(in srgb, var(--accent) 14%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 35%, transparent)", color:G, fontSize:11.5, fontWeight:700, cursor:"pointer" }}>
+                  {labels[next]} <ArrowRight size={12}/>
+                </button>
+              ) : (
+                <span style={{ color:"#39FF8F", fontSize:11, fontWeight:600 }}>Dernière étape ✓</span>
+              )}
+            </div>
+          )
+        })()}
 
         {activeTab === "style" && active && (
           <div className="qr-scroll" style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
