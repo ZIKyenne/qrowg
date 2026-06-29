@@ -3198,7 +3198,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </div>
 
                     {/* Grille presets avec apercu QR realiste */}
-                    <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:7 }}>
+                    <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr 1fr":"repeat(3,1fr)", gap:isMobile?10:7 }}>
                       {PRESETS.filter(p => selectedCat==="all" || p.cat===selectedCat).map(preset => {
                         const canAccess = PLAN_RANK[userPlan] >= presetMinRank(preset.plan)
                         const isActive  = fg===preset.fg && bg===preset.bg
