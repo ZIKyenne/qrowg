@@ -1262,6 +1262,30 @@ export default function ProfilePage() {
         })}
       </div>
 
+      {/* -- Assistant : profil incomplet (prochaine étape) --------------------- */}
+      {(() => {
+        const m =
+          !profile?.avatar_url ? { icon: "🎨", text: <>Composez votre <strong style={{ color: "#F5F0E8" }}>avatar QR-art</strong> pour vous démarquer.</>, label: "Composer", href: "/dashboard/avatar" as string | null, onClick: null as (() => void) | null }
+          : !profile?.username ? { icon: "🔖", text: <>Choisissez votre <strong style={{ color: "#F5F0E8" }}>identifiant public</strong> (qrfolio.app/@vous).</>, href: null, onClick: () => setPtab("identite"), label: "Définir" }
+          : !profile?.bio ? { icon: "✍️", text: <>Ajoutez une <strong style={{ color: "#F5F0E8" }}>bio</strong> pour vous présenter en quelques mots.</>, href: null, onClick: () => setPtab("identite"), label: "Ajouter" }
+          : !profile?.website ? { icon: "🔗", text: <>Ajoutez votre <strong style={{ color: "#F5F0E8" }}>site web</strong> ou lien principal.</>, href: null, onClick: () => setPtab("identite"), label: "Ajouter" }
+          : null
+        if (!m) return null
+        const btnStyle = { flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 5, padding: "9px 15px", borderRadius: 10, border: "none", cursor: "pointer", fontSize: 12.5, fontWeight: 800, textDecoration: "none", color: "#080808", background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", whiteSpace: "nowrap" as const }
+        return (
+          <div style={{ maxWidth: 1100, margin: "14px auto 0", padding: "0 28px" }}>
+            <div className="section-card" style={{ display: "flex", alignItems: "center", gap: 13, flexWrap: "wrap", padding: "13px 18px", borderRadius: 14,
+              background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, #100F0A), #0D0C08)", border: "1px solid color-mix(in srgb, var(--accent) 26%, transparent)" }}>
+              <span style={{ fontSize: 19, flexShrink: 0 }}>{m.icon}</span>
+              <p style={{ flex: 1, minWidth: 160, margin: 0, color: "#C9C3B6", fontSize: 13.5, lineHeight: 1.5 }}>{m.text}</p>
+              {m.href
+                ? <a href={m.href} style={btnStyle}>{m.label} <ChevronRight size={14} strokeWidth={2.5} /></a>
+                : <button type="button" onClick={m.onClick!} style={btnStyle}>{m.label} <ChevronRight size={14} strokeWidth={2.5} /></button>}
+            </div>
+          </div>
+        )
+      })()}
+
       {/* -- Corps en 2 colonnes ------------------------------------------------ */}
       <div className="dash-pad" style={{ maxWidth: 1100, margin: "0 auto", padding: "18px 28px 48px", display: "flex", flexDirection: "column", gap: 18 }}>
 
