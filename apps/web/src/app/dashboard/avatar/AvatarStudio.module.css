@@ -51,13 +51,18 @@
   align-items: start;
 }
 @media (max-width: 880px) {
-  .grid {
-    grid-template-columns: 1fr;
+  /* Flux bloc (pas grille) pour que l'aperçu puisse être sticky */
+  .grid { display: block; }
+  /* Aperçu compact, collant en haut -> reste visible pendant l'édition */
+  .stage {
+    position: sticky; top: 0; z-index: 5;
+    margin-bottom: 18px; gap: 10px;
+    padding: 16px 18px;
+    border-radius: 18px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
   }
-  /* Mobile : les réglages d'abord, l'aperçu (réduit) ensuite -> vrai éditeur */
-  .stage { order: 2; }
-  .preview { width: 200px; height: 200px; margin-bottom: 4px; }
-  .panel { padding: 20px; }
+  .preview { width: 148px; height: 148px; margin-bottom: 2px; }
+  .panel { padding: 18px; }
 }
 
 .panel {
