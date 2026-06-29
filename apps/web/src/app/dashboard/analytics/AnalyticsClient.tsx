@@ -5,7 +5,7 @@ import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from "recharts"
-import { QrCode, Eye, TrendingUp, Smartphone, Globe, BarChart2 } from "lucide-react"
+import { QrCode, Eye, TrendingUp, Smartphone, Globe, BarChart2, ChevronDown } from "lucide-react"
 import TrafficSourcesPanel from "./TrafficSourcesPanel"
 import TopLinksPanel from "./TopLinksPanel"
 import BlockPerformancePanel from "./BlockPerformancePanel"
@@ -106,6 +106,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function AnalyticsClient({ profile, pages, recentScans, recentViews, clicks = [], blocks = [], geoScans = [], deviceScans = [], userEmail = "" }: Props) {
   const [selectedPage, setSelectedPage] = useState<string>("all")
+  const [showFull, setShowFull] = useState(false) // analyse détaillée repliée par défaut
 
   const filteredScans = useMemo(() =>
     selectedPage === "all" ? recentScans : recentScans.filter(s => s.page_id === selectedPage),
@@ -323,7 +324,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
           <h2 style={{ color: "#F8F4EC", fontSize: 18, fontWeight: 700, marginBottom: 18, marginTop: 0, letterSpacing: "-0.2px", display: "flex", alignItems: "center", gap: 9 }}>
             <TrendingUp size={17} color={GOLD} /> Scans &amp; Vues <span style={{ color: MUTED, fontWeight: 500, fontSize: 14 }}>— 30 jours</span>
           </h2>
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={dailyData}>
               <defs>
                 <linearGradient id="gScans" x1="0" y1="0" x2="0" y2="1">
@@ -346,6 +347,19 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
           </ResponsiveContainer>
         </div>
 
+        {/* Bascule : analyse détaillée repliée par défaut (page courte) */}
+        <div style={{ display: "flex", justifyContent: "center", margin: "4px 0 22px" }}>
+          <button type="button" onClick={() => setShowFull(v => !v)}
+            style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 22px", borderRadius: 24, cursor: "pointer", fontSize: 13, fontWeight: 700,
+              background: showFull ? "rgba(255,255,255,0.04)" : "color-mix(in srgb, var(--accent) 12%, transparent)",
+              border: "1px solid " + (showFull ? "rgba(255,255,255,0.1)" : "color-mix(in srgb, var(--accent) 32%, transparent)"),
+              color: showFull ? "#C9C3B6" : "var(--accent)" }}>
+            {showFull ? "Réduire l’analyse" : "Voir l’analyse complète"}
+            <ChevronDown size={15} style={{ transform: showFull ? "rotate(180deg)" : "none", transition: "transform .2s" }} />
+          </button>
+        </div>
+
+        {showFull && (<>
         {/* Row : Device + Source */}
         <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
           {/* Device */}
@@ -487,6 +501,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             </div>
           )}
         </div>
+        </>)}
         </>)}
 
       </div>
