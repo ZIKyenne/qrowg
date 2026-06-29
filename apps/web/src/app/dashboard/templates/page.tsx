@@ -7,6 +7,7 @@ import { PLAN_RANK } from "@/lib/plans"
 import { Sparkles, ArrowRight, Check, X, Lock, Search, Heart, Eye, Clock, Layers } from "lucide-react"
 import TemplatePreviewModal from "./TemplatePreviewModal"
 import Particles from "@/components/Particles"
+import { useIsMobile } from "@/lib/useIsMobile"
 
 // ── Temps estimé ─────────────────────────────────────────────────────────────
 const SETUP_TIME: Record<string, string> = {
@@ -100,6 +101,8 @@ export default function TemplatesPage() {
   const [activeMetier, setActiveMetier] = useState("Tous")
   const [activePlan,   setActivePlan]   = useState("all")
   const [search,       setSearch]       = useState("")
+  const [showAllCats,  setShowAllCats]  = useState(false) // mobile : secteurs repliés
+  const isMobile = useIsMobile()
   const [creating,     setCreating]     = useState<string | null>(null)
   const [userPlan,     setUserPlan]     = useState("free")
   const [favs,         setFavs]         = useState<string[]>([])
@@ -255,21 +258,34 @@ export default function TemplatesPage() {
 
         {/* ── Navigation métier ───────────────────────────────────────────── */}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", marginBottom: 20, scrollbarWidth: "none" as const }}>
-          {BUSINESS_CATEGORIES.map(cat => {
-            const isActive = activeMetier === cat.id
-            const count = countByMetier[cat.id] || 0
-            if (count === 0 && cat.id !== "Tous") return null
-            return (
-              <button key={cat.id} type="button" onClick={() => setActiveMetier(cat.id)}
-                style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", background: isActive ? cat.color + "18" : "rgba(255,255,255,0.03)", border: isActive ? "1px solid " + cat.color + "50" : "1px solid rgba(255,255,255,0.07)", borderRadius: 20, color: isActive ? cat.color : MUTED, fontSize: 12, fontWeight: isActive ? 700 : 500, cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap" as const }}>
-                <span style={{ fontSize: 13 }}>{cat.emoji}</span>
-                {cat.label}
-                <span style={{ background: isActive ? cat.color + "25" : "rgba(255,255,255,0.06)", color: isActive ? cat.color : "#555", borderRadius: 9, padding: "1px 6px", fontSize: 10, fontWeight: 700, minWidth: 18, textAlign: "center" as const }}>
-                  {count}
-                </span>
-              </button>
-            )
-          })}
+          {(() => {
+            const visible = BUSINESS_CATEGORIES.filter(c => c.id === "Tous" || (countByMetier[c.id] || 0) > 0)
+            const limit = 7
+            const collapsed = isMobile && !showAllCats && visible.length > limit
+            const shown = collapsed ? visible.filter((c, i) => i < limit || c.id === activeMetier) : visible
+            return (<>
+              {shown.map(cat => {
+                const isActive = activeMetier === cat.id
+                const count = countByMetier[cat.id] || 0
+                return (
+                  <button key={cat.id} type="button" onClick={() => setActiveMetier(cat.id)}
+                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", background: isActive ? cat.color + "18" : "rgba(255,255,255,0.03)", border: isActive ? "1px solid " + cat.color + "50" : "1px solid rgba(255,255,255,0.07)", borderRadius: 20, color: isActive ? cat.color : MUTED, fontSize: 12, fontWeight: isActive ? 700 : 500, cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap" as const }}>
+                    <span style={{ fontSize: 13 }}>{cat.emoji}</span>
+                    {cat.label}
+                    <span style={{ background: isActive ? cat.color + "25" : "rgba(255,255,255,0.06)", color: isActive ? cat.color : "#555", borderRadius: 9, padding: "1px 6px", fontSize: 10, fontWeight: 700, minWidth: 18, textAlign: "center" as const }}>
+                      {count}
+                    </span>
+                  </button>
+                )
+              })}
+              {isMobile && visible.length > limit && (
+                <button type="button" onClick={() => setShowAllCats(v => !v)}
+                  style={{ padding: "7px 14px", background: "transparent", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 20, color: "var(--accent)", fontSize: 12, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" as const }}>
+                  {showAllCats ? "Voir moins" : `+ ${visible.length - limit} secteurs`}
+                </button>
+              )}
+            </>)
+          })()}
         </div>
 
         {/* ── Filtres Plan ────────────────────────────────────────────────── */}
