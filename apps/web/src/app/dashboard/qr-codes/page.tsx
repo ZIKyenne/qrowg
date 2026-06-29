@@ -35,8 +35,21 @@ export default async function QRCodesPage() {
       <Particles behind />
 
       {/* ===== Header ===== */}
-      <div style={{ borderBottom: "1px solid rgba(201,168,76,0.1)", background: "rgba(15,14,11,0.85)", backdropFilter: "blur(14px)", position: "sticky", top: 0, zIndex: 50, padding: "0 24px" }}>
-        <div style={{ maxWidth: 1320, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 66 }}>
+      <style>{`
+        .qrh-inner { max-width:1320px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:66px; }
+        .qrh-actions { display:flex; align-items:center; gap:14px; }
+        @media (max-width:640px) {
+          .qrh-bar { padding:12px 16px !important; }
+          .qrh-inner { flex-direction:column; align-items:stretch; height:auto; gap:12px; }
+          .qrh-actions { flex-direction:column; align-items:stretch; gap:10px; width:100%; }
+          .qrh-kpis { width:100%; }
+          .qrh-kpis > div { flex:1; }
+          .qrh-cta { width:100%; justify-content:center; padding:13px !important; font-size:14px !important; }
+          .qrh-content { padding:16px 16px 90px !important; }
+        }
+      `}</style>
+      <div className="qrh-bar" style={{ borderBottom: "1px solid rgba(201,168,76,0.1)", background: "rgba(15,14,11,0.85)", backdropFilter: "blur(14px)", position: "sticky", top: 0, zIndex: 50, padding: "0 24px" }}>
+        <div className="qrh-inner">
 
           {/* Identite */}
           <div style={{ display: "flex", alignItems: "center", gap: 13 }}>
@@ -54,9 +67,9 @@ export default async function QRCodesPage() {
           </div>
 
           {/* Actions */}
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <div className="qrh-actions">
             {/* KPIs en pastilles */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div className="qrh-kpis" style={{ display: "flex", alignItems: "center", gap: 8 }}>
               {[
                 { label: "QR actifs",   value: activeQR,                      icon: <Activity size={13} color="#39FF8F"/>,    color: "#39FF8F" },
                 { label: "Scans total", value: totalScans.toLocaleString("fr-FR"), icon: <TrendingUp size={13} color="var(--accent)"/>, color: "var(--accent)" },
@@ -71,7 +84,7 @@ export default async function QRCodesPage() {
               ))}
             </div>
 
-            <a href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 7, background: "linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 78%, #000))", color: "#080808", textDecoration: "none", fontSize: 12.5, fontWeight: 700, padding: "10px 18px", borderRadius: 10, whiteSpace: "nowrap" as const, boxShadow: "0 4px 14px color-mix(in srgb, var(--accent) 20%, transparent)" }}>
+            <a href="/dashboard" className="qrh-cta" style={{ display: "flex", alignItems: "center", gap: 7, background: "linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 78%, #000))", color: "#080808", textDecoration: "none", fontSize: 12.5, fontWeight: 700, padding: "10px 18px", borderRadius: 10, whiteSpace: "nowrap" as const, boxShadow: "0 4px 14px color-mix(in srgb, var(--accent) 20%, transparent)" }}>
               <Plus size={14}/> Nouvelle page
             </a>
           </div>
@@ -79,7 +92,7 @@ export default async function QRCodesPage() {
       </div>
 
       {/* ===== Studio ===== */}
-      <div style={{ maxWidth: 1320, margin: "0 auto", padding: "20px 24px 40px" }}>
+      <div className="qrh-content" style={{ maxWidth: 1320, margin: "0 auto", padding: "20px 24px 40px" }}>
         <QRStudio
           qrCodes={(qrCodes ?? []) as any}
           userPlan={userPlan}
