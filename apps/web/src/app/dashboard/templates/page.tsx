@@ -113,7 +113,9 @@ export default function TemplatesPage() {
   const [namingFor,    setNamingFor]    = useState<string | null>(null)
   const router = useRouter()
 
-  // Fetch user plan
+  const [usedTemplateIds, setUsedTemplateIds] = useState<string[]>([])
+
+  // Fetch user plan + pages existantes (pour la recommandation)
   useEffect(() => {
     (async () => {
       try {
@@ -122,6 +124,8 @@ export default function TemplatesPage() {
         if (!user) return
         const { data: profile } = await sb.from("profiles").select("plan").eq("id", user.id).single()
         if (profile?.plan) setUserPlan(profile.plan)
+        const { data: userPages } = await sb.from("pages").select("template_id").eq("user_id", user.id)
+        if (userPages) setUsedTemplateIds(userPages.map((p: any) => p.template_id).filter(Boolean))
       } catch {}
     })()
   }, [])
@@ -164,6 +168,22 @@ export default function TemplatesPage() {
   }, [])
 
   function canUse(plan: string) { return PLAN_RANK[userPlan] >= PLAN_RANK[plan] }
+
+  // ── Recommandation (basée sur les pages existantes) ─────────────────────────
+  const reco = useMemo(() => {
+    const used = new Set(usedTemplateIds)
+    const notUsed = TEMPLATES.filter((t: any) => !used.has(t.id))
+    // priorité : un modèle populaire pas encore utilisé, sinon le 1er non utilisé
+    const popular = notUsed.find((t: any) => popTier(t.id)?.label === "Populaire")
+    if (used.size === 0) {
+      // Aucun page encore : on guide vers un démarrage simple (modèle gratuit)
+      const starter = TEMPLATES.find((t: any) => t.id === "freelance") || TEMPLATES[0]
+      return { t: starter, reason: "Le plus choisi pour bien démarrer", isStart: true }
+    }
+    const pick = popular || notUsed[0]
+    if (!pick) return null
+    return { t: pick, reason: `Vous avez déjà ${used.size} page${used.size > 1 ? "s" : ""} — variez les usages avec ce modèle`, isStart: false }
+  }, [usedTemplateIds])
 
   // Thèmes complets par template (utilise les PRESET_THEMES officiels)
   const TEMPLATE_THEMES: Record<string, any> = {
@@ -301,6 +321,42 @@ export default function TemplatesPage() {
 
       {/* ── Grille ────────────────────────────────────────────────────────── */}
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px" }}>
+
+        {/* ── Recommandé pour vous (assistant) ──────────────────────────────── */}
+        {reco && activeMetier === "Tous" && activePlan === "all" && !search && (() => {
+          const t = reco.t
+          const locked = !canUse(t.plan)
+          const pc = PLAN_CONFIG[t.plan]
+          return (
+            <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "stretch" : "center", gap: isMobile ? 16 : 22, marginBottom: 26, padding: isMobile ? 18 : "20px 24px", borderRadius: 18, position: "relative", overflow: "hidden",
+              background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, #100F0A), #0D0C08)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)" }}>
+              <div aria-hidden style={{ position: "absolute", top: -40, right: -20, width: 200, height: 200, borderRadius: "50%", background: `radial-gradient(circle, ${t.color}22, transparent 70%)`, pointerEvents: "none" }} />
+              {/* Vignette template */}
+              <div style={{ flexShrink: 0, width: isMobile ? "100%" : 88, height: isMobile ? 76 : 88, borderRadius: 14, background: `linear-gradient(140deg, ${t.surface}, ${t.bg})`, border: `1px solid ${t.color}40`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36 }}>
+                {t.emoji}
+              </div>
+              {/* Texte */}
+              <div style={{ flex: 1, minWidth: 0, position: "relative" }}>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6, color: G, fontSize: 10.5, fontWeight: 800, letterSpacing: 1.4, textTransform: "uppercase" }}>
+                  <Sparkles size={12} /> Recommandé pour vous
+                </span>
+                <h3 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 22, color: "#F8F4EC", fontWeight: 700, margin: "5px 0 3px" }}>{t.name}</h3>
+                <p style={{ color: "#C9C3B6", fontSize: 13, margin: 0, lineHeight: 1.45 }}>{reco.reason}{SETUP_TIME[t.id] ? <> · prêt en <strong style={{ color: "#F5F0E8" }}>{SETUP_TIME[t.id]}</strong></> : null}.</p>
+              </div>
+              {/* Actions */}
+              <div style={{ display: "flex", gap: 10, flexShrink: 0, position: "relative" }}>
+                <button type="button" onClick={() => setPreview(t.id)} style={{ flex: isMobile ? 1 : "0 0 auto", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px 16px", borderRadius: 11, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "#F5F0E8", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                  <Eye size={14} /> Aperçu
+                </button>
+                <button type="button" disabled={creating === t.id} onClick={() => locked ? router.push("/upgrade") : createFromTemplate(t.id)}
+                  style={{ flex: isMobile ? 1 : "0 0 auto", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "11px 18px", borderRadius: 11, border: "none", cursor: "pointer", fontSize: 13, fontWeight: 800, whiteSpace: "nowrap" as const,
+                    background: locked ? "rgba(255,255,255,0.08)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", color: locked ? pc?.color : "#080808" }}>
+                  {creating === t.id ? "Création…" : locked ? <><Lock size={13} /> {pc?.label}</> : <>Utiliser <ArrowRight size={14} strokeWidth={2.5} /></>}
+                </button>
+              </div>
+            </div>
+          )
+        })()}
 
         {/* Ligne de contexte */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, padding: "0 4px" }}>
