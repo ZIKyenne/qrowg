@@ -519,6 +519,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [scene,      setScene]      = useState<"none"|"phone"|"card"|"poster"|"sticker"|"tent">("none") // aperçu immersif
   const [level,      setLevel]      = useState<"simple"|"inter"|"expert">("simple") // niveau de réglages (désencombre le panneau)
   const [expOptsOpen, setExpOptsOpen] = useState(false) // options export techniques repliées sur mobile
+  const [sceneSelOpen, setSceneSelOpen] = useState(false) // sélecteur d'aperçu replié sur mobile
   const isMobile = useIsMobile(859) // mobile : on désencombre le panneau export
   const [qrPng,      setQrPng]      = useState<string>("") // PNG du QR composé dans les scènes
   const [diagFg,     setDiagFg]     = useState("")
@@ -2588,18 +2589,25 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
               {/* QR Card */}
               <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"30px 24px 24px", gap:16, borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
-                {/* Sélecteur d'aperçu immersif */}
-                <div style={{ display:"flex", gap:5, flexWrap:"wrap", justifyContent:"center" }}>
-                  {([["none","QR","▦"],["phone","Mobile","📱"],["card","Carte","💳"],["poster","Affiche","🖼️"],["sticker","Sticker","⭕"],["tent","Chevalet","🍽️"]] as const).map(([k,l,e]) => (
-                    <button key={k} type="button" onClick={() => setScene(k)}
-                      style={{ display:"flex", alignItems:"center", gap:4, padding:"5px 10px", borderRadius:8, fontSize:10.5, fontWeight:scene===k?700:500, cursor:"pointer",
-                        background: scene===k ? "color-mix(in srgb, var(--accent) 16%, transparent)" : "rgba(255,255,255,0.04)",
-                        border: `1px solid ${scene===k ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "rgba(255,255,255,0.08)"}`,
-                        color: scene===k ? "var(--accent)" : "#8A8478" }}>
-                      <span style={{ fontSize:11 }}>{e}</span> {l}
-                    </button>
-                  ))}
-                </div>
+                {/* Sélecteur d'aperçu immersif — replié sur mobile pour ne montrer que le QR par défaut */}
+                {isMobile && !sceneSelOpen ? (
+                  <button type="button" onClick={() => setSceneSelOpen(true)}
+                    style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 14px", borderRadius:8, fontSize:11, fontWeight:600, cursor:"pointer", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", color:"#8A8478" }}>
+                    Changer le format d&apos;aperçu <span style={{ color:"var(--accent)", fontSize:12 }}>▾</span>
+                  </button>
+                ) : (
+                  <div style={{ display:"flex", gap:5, flexWrap:"wrap", justifyContent:"center" }}>
+                    {([["none","QR","▦"],["phone","Mobile","📱"],["card","Carte","💳"],["poster","Affiche","🖼️"],["sticker","Sticker","⭕"],["tent","Chevalet","🍽️"]] as const).map(([k,l,e]) => (
+                      <button key={k} type="button" onClick={() => { setScene(k); if (isMobile) setSceneSelOpen(false) }}
+                        style={{ display:"flex", alignItems:"center", gap:4, padding:"5px 10px", borderRadius:8, fontSize:10.5, fontWeight:scene===k?700:500, cursor:"pointer",
+                          background: scene===k ? "color-mix(in srgb, var(--accent) 16%, transparent)" : "rgba(255,255,255,0.04)",
+                          border: `1px solid ${scene===k ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "rgba(255,255,255,0.08)"}`,
+                          color: scene===k ? "var(--accent)" : "#8A8478" }}>
+                        <span style={{ fontSize:11 }}>{e}</span> {l}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <div style={{ position:"relative" }}>
                   {/* Scène immersive (produit fini) */}
                   {scene !== "none" && (
