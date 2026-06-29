@@ -2598,7 +2598,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             <div className="qr-scroll" style={{ display:"flex", flexDirection:"column", height:"100%", overflowY:"auto" }}>
 
               {/* QR Card */}
-              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"30px 24px 24px", gap:16, borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:isMobile?"18px 18px 22px":"30px 24px 24px", gap:16, borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+                {/* Groupe visuel QR (sélecteur + QR + Agrandir) — placé APRÈS infos/actions sur mobile via order */}
+                <div style={{ order: isMobile ? 3 : 0, width:"100%", display:"flex", flexDirection:"column", alignItems:"center", gap:16 }}>
                 {/* Sélecteur d'aperçu immersif — replié sur mobile pour ne montrer que le QR par défaut */}
                 {isMobile && !sceneSelOpen ? (
                   <button type="button" onClick={() => setSceneSelOpen(true)}
@@ -2711,8 +2713,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   </button>
                 )}
 
+                </div>{/* fin groupe visuel QR */}
+
                 {/* Nom + URL + statut */}
-                <div style={{ textAlign:"center", width:"100%" }}>
+                <div style={{ order: isMobile ? 1 : 0, textAlign:"center", width:"100%" }}>
                   <p style={{ color:"#F5F0E8", fontSize:15, fontWeight:700, margin:"0 0 4px" }}>{active.pages?.title ?? "Sans titre"}</p>
                   <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, marginBottom:6 }}>
                     <code style={{ color:"var(--accent)", fontSize:10, background:"color-mix(in srgb, var(--accent) 8%, transparent)", padding:"2px 8px", borderRadius:5 }}>
@@ -2760,7 +2764,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 </div>
 
                 {/* Actions rapides */}
-                <div style={{ display:"flex", flexDirection:"column", gap:7, width:"100%" }}>
+                <div style={{ order: isMobile ? 2 : 0, display:"flex", flexDirection:"column", gap:7, width:"100%" }}>
                   <button type="button" onClick={() => downloadPNG(1024)}
                     style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"11px", background:"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px color-mix(in srgb, var(--accent) 20%, transparent)" }}>
                     <Download size={15}/> Télécharger
