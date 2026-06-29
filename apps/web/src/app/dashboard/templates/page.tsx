@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { PLAN_RANK } from "@/lib/plans"
-import { Sparkles, ArrowRight, Check, X, Lock, Search, Heart, Eye, Clock, Layers } from "lucide-react"
+import { Sparkles, ArrowRight, Check, X, Lock, Search, Heart, Eye, Clock, Layers, SlidersHorizontal } from "lucide-react"
 import TemplatePreviewModal from "./TemplatePreviewModal"
 import Particles from "@/components/Particles"
 import { useIsMobile } from "@/lib/useIsMobile"
@@ -101,7 +101,7 @@ export default function TemplatesPage() {
   const [activeMetier, setActiveMetier] = useState("Tous")
   const [activePlan,   setActivePlan]   = useState("all")
   const [search,       setSearch]       = useState("")
-  const [showAllCats,  setShowAllCats]  = useState(false) // mobile : secteurs repliés
+  const [filtersOpen,  setFiltersOpen]  = useState(false) // mobile : bottom sheet filtres
   const isMobile = useIsMobile()
   const [creating,     setCreating]     = useState<string | null>(null)
   const [userPlan,     setUserPlan]     = useState("free")
@@ -246,6 +246,29 @@ export default function TemplatesPage() {
   const previewTemplate  = TEMPLATES.find((t: any) => t.id === preview)
   const selectedTemplate = TEMPLATES.find((t: any) => t.id === selected)
   const activeCat = BUSINESS_CATEGORIES.find(c => c.id === activeMetier)
+  const hasFilters = activeMetier !== "Tous" || activePlan !== "all"
+
+  // Chips réutilisables (inline desktop + bottom sheet mobile)
+  const visibleCats = BUSINESS_CATEGORIES.filter(c => c.id === "Tous" || (countByMetier[c.id] || 0) > 0)
+  const PLAN_FILTERS: [string, string, string][] = [["all", "Tous les plans", "#8A8478"], ["free", "Gratuit ✦", "#8A8478"], ["starter", "Starter ⚡", "#38BDF8"], ["pro", "Pro 🔥", "var(--accent)"]]
+  const secteurChipEls = visibleCats.map(cat => {
+    const isActive = activeMetier === cat.id
+    const count = countByMetier[cat.id] || 0
+    return (
+      <button key={cat.id} type="button" onClick={() => setActiveMetier(cat.id)}
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", background: isActive ? cat.color + "18" : "rgba(255,255,255,0.03)", border: isActive ? "1px solid " + cat.color + "50" : "1px solid rgba(255,255,255,0.07)", borderRadius: 20, color: isActive ? cat.color : MUTED, fontSize: 12, fontWeight: isActive ? 700 : 500, cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap" as const }}>
+        <span style={{ fontSize: 13 }}>{cat.emoji}</span>
+        {cat.label}
+        <span style={{ background: isActive ? cat.color + "25" : "rgba(255,255,255,0.06)", color: isActive ? cat.color : "#555", borderRadius: 9, padding: "1px 6px", fontSize: 10, fontWeight: 700, minWidth: 18, textAlign: "center" as const }}>{count}</span>
+      </button>
+    )
+  })
+  const planChipEls = PLAN_FILTERS.map(([plan, label, color]) => (
+    <button key={plan} type="button" onClick={() => setActivePlan(plan)}
+      style={{ background: activePlan === plan ? color + "18" : "transparent", border: "1px solid " + (activePlan === plan ? color + "50" : "rgba(255,255,255,0.08)"), borderRadius: 20, padding: "6px 14px", color: activePlan === plan ? color : MUTED, fontSize: 12, fontWeight: activePlan === plan ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+      {label}
+    </button>
+  ))
 
   return (
     <div style={{ minHeight: "100vh", background: "transparent", paddingBottom: 120, fontFamily: "DM Sans, sans-serif", position: "relative" }}>
@@ -276,48 +299,59 @@ export default function TemplatesPage() {
           )}
         </div>
 
-        {/* ── Navigation métier ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", marginBottom: 20, scrollbarWidth: "none" as const }}>
-          {(() => {
-            const visible = BUSINESS_CATEGORIES.filter(c => c.id === "Tous" || (countByMetier[c.id] || 0) > 0)
-            const limit = 7
-            const collapsed = isMobile && !showAllCats && visible.length > limit
-            const shown = collapsed ? visible.filter((c, i) => i < limit || c.id === activeMetier) : visible
-            return (<>
-              {shown.map(cat => {
-                const isActive = activeMetier === cat.id
-                const count = countByMetier[cat.id] || 0
-                return (
-                  <button key={cat.id} type="button" onClick={() => setActiveMetier(cat.id)}
-                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", background: isActive ? cat.color + "18" : "rgba(255,255,255,0.03)", border: isActive ? "1px solid " + cat.color + "50" : "1px solid rgba(255,255,255,0.07)", borderRadius: 20, color: isActive ? cat.color : MUTED, fontSize: 12, fontWeight: isActive ? 700 : 500, cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap" as const }}>
-                    <span style={{ fontSize: 13 }}>{cat.emoji}</span>
-                    {cat.label}
-                    <span style={{ background: isActive ? cat.color + "25" : "rgba(255,255,255,0.06)", color: isActive ? cat.color : "#555", borderRadius: 9, padding: "1px 6px", fontSize: 10, fontWeight: 700, minWidth: 18, textAlign: "center" as const }}>
-                      {count}
-                    </span>
-                  </button>
-                )
-              })}
-              {isMobile && visible.length > limit && (
-                <button type="button" onClick={() => setShowAllCats(v => !v)}
-                  style={{ padding: "7px 14px", background: "transparent", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 20, color: "var(--accent)", fontSize: 12, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" as const }}>
-                  {showAllCats ? "Voir moins" : `+ ${visible.length - limit} secteurs`}
-                </button>
-              )}
-            </>)
-          })()}
-        </div>
-
-        {/* ── Filtres Plan ────────────────────────────────────────────────── */}
-        <div style={{ display: "flex", gap: 7, justifyContent: "center", flexWrap: "wrap", marginBottom: 32 }}>
-          {([["all", "Tous les plans", "#8A8478"], ["free", "Gratuit ✦", "#8A8478"], ["starter", "Starter ⚡", "#38BDF8"], ["pro", "Pro 🔥", "var(--accent)"]] as [string, string, string][]).map(([plan, label, color]) => (
-            <button key={plan} type="button" onClick={() => setActivePlan(plan)}
-              style={{ background: activePlan === plan ? color + "18" : "transparent", border: "1px solid " + (activePlan === plan ? color + "50" : "rgba(255,255,255,0.08)"), borderRadius: 20, padding: "6px 14px", color: activePlan === plan ? color : MUTED, fontSize: 12, fontWeight: activePlan === plan ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
-              {label}
+        {!isMobile ? (
+          <>
+            {/* ── Navigation métier (desktop) ─────────────────────────────── */}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", marginBottom: 20, scrollbarWidth: "none" as const }}>
+              {secteurChipEls}
+            </div>
+            {/* ── Filtres Plan (desktop) ──────────────────────────────────── */}
+            <div style={{ display: "flex", gap: 7, justifyContent: "center", flexWrap: "wrap", marginBottom: 32 }}>
+              {planChipEls}
+            </div>
+          </>
+        ) : (
+          /* ── Mobile : un seul bouton Filtrer (ouvre le bottom sheet) ────── */
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
+            <button type="button" onClick={() => setFiltersOpen(true)}
+              style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: "10px 18px", borderRadius: 22, cursor: "pointer", fontSize: 13, fontWeight: 700,
+                background: hasFilters ? "color-mix(in srgb, var(--accent) 14%, transparent)" : "rgba(255,255,255,0.04)",
+                border: "1px solid " + (hasFilters ? "color-mix(in srgb, var(--accent) 35%, transparent)" : "rgba(255,255,255,0.1)"),
+                color: hasFilters ? "var(--accent)" : "#F5F0E8" }}>
+              <SlidersHorizontal size={15} />
+              {hasFilters
+                ? <>{[activeCat && activeCat.id !== "Tous" ? `${activeCat.emoji} ${activeCat.label}` : null, activePlan !== "all" ? PLAN_CONFIG[activePlan]?.label : null].filter(Boolean).join(" · ")}</>
+                : "Filtrer"}
+              {hasFilters && <span onClick={(e) => { e.stopPropagation(); setActiveMetier("Tous"); setActivePlan("all") }} style={{ display: "inline-flex", marginLeft: 2 }}><X size={14} /></span>}
             </button>
-          ))}
-        </div>
+          </div>
+        )}
       </div>
+
+      {/* ── Bottom sheet filtres (mobile) ─────────────────────────────────── */}
+      {isMobile && filtersOpen && (
+        <div onClick={() => setFiltersOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(3px)", display: "flex", alignItems: "flex-end", animation: "tplFade .2s ease" }}>
+          <style>{`@keyframes tplFade{from{opacity:0}to{opacity:1}}@keyframes tplUp{from{transform:translateY(100%)}to{transform:translateY(0)}}`}</style>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxHeight: "82vh", overflowY: "auto", background: "#0E0D0A", borderTopLeftRadius: 22, borderTopRightRadius: 22, borderTop: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", padding: "10px 18px calc(20px + env(safe-area-inset-bottom))", animation: "tplUp .28s cubic-bezier(.2,.8,.2,1)" }}>
+            <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 16px" }} />
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
+              <h3 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 21, color: "#F5F0E8", fontWeight: 700, margin: 0 }}>Filtrer</h3>
+              {hasFilters && <button type="button" onClick={() => { setActiveMetier("Tous"); setActivePlan("all") }} style={{ background: "none", border: "none", color: "var(--accent)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Réinitialiser</button>}
+            </div>
+
+            <p style={{ color: MUTED, fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 12px" }}>Secteur</p>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 26 }}>{secteurChipEls}</div>
+
+            <p style={{ color: MUTED, fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 12px" }}>Plan</p>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 26 }}>{planChipEls}</div>
+
+            <button type="button" onClick={() => setFiltersOpen(false)}
+              style={{ width: "100%", padding: 14, borderRadius: 13, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 800, color: "#080808", background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))" }}>
+              Voir {filtered.length} template{filtered.length > 1 ? "s" : ""}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Grille ────────────────────────────────────────────────────────── */}
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px" }}>
