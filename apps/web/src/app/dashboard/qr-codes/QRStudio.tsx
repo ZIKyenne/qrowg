@@ -3841,9 +3841,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               {/* -- Actions -------------------------------------------------- */}
               <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
 
-                {/* Bouton principal Telecharger */}
+                {/* Bouton principal Telecharger — dominant sur mobile */}
                 <button type="button" onClick={runExport} disabled={expExporting}
-                  style={{ padding:"11px", background:`linear-gradient(90deg,${fmt.color},${fmt.color}cc)`, border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:expExporting?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7, opacity:expExporting?0.7:1 }}>
+                  style={{ padding:isMobile?"15px":"11px", background:`linear-gradient(90deg,${fmt.color},${fmt.color}cc)`, border:"none", borderRadius:isMobile?13:10, color:"#080808", fontSize:isMobile?15:13, fontWeight:800, cursor:expExporting?"wait":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7, opacity:expExporting?0.7:1, boxShadow:isMobile?`0 6px 20px ${fmt.color}40`:"none" }}>
                   {expExporting
                     ? <><Loader2 size={14} style={{ animation:"spin 0.8s linear infinite" }}/> Export en cours...</>
                     : <><Download size={14}/> Télécharger {fmt.label} {realPx}px</>}
