@@ -2679,7 +2679,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       )}
                     </div>
                   )}
-                  <div style={{ display: scene==="none" ? "block" : "none", position:"relative", padding:28, borderRadius:28, background:bg, boxShadow:`0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent), 0 28px 80px rgba(0,0,0,0.85)`, transition:"background 0.3s", cursor:"pointer" }}
+                  <div style={{ display: scene==="none" ? "block" : "none", position:"relative", padding:isMobile?16:28, borderRadius:isMobile?22:28, background:bg, boxShadow:`0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent), 0 28px 80px rgba(0,0,0,0.85)`, transition:"background 0.3s", cursor:"pointer" }}
                     onClick={() => setShowModal(true)}>
                     {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h], i) => (
                       <div key={i} style={{ position:"absolute", [v]:10, [h]:10, width:18, height:18,
@@ -2689,7 +2689,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         borderRight:  h==="right"  ? "2px solid color-mix(in srgb, var(--accent) 70%, transparent)" : "none",
                       }}/>
                     ))}
-                    <div ref={canvasRef} data-qr-container style={{ display:"flex", width:"min(46vh, 360px)", height:"min(46vh, 360px)", alignItems:"center", justifyContent:"center" }}/>
+                    <div ref={canvasRef} data-qr-container style={{ display:"flex", width:isMobile?"min(220px, 58vw)":"min(46vh, 360px)", height:isMobile?"min(220px, 58vw)":"min(46vh, 360px)", alignItems:"center", justifyContent:"center" }}/>
                     {/* Hover overlay */}
                     <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0)", display:"flex", alignItems:"center", justifyContent:"center", borderRadius:28, transition:"background 0.2s" }}
                       onMouseEnter={e => (e.currentTarget.style.background="rgba(0,0,0,0.4)")}
@@ -2702,6 +2702,14 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </div>
                   </div>
                 </div>
+
+                {/* Bouton Agrandir (mobile : le hover n'existe pas au doigt) */}
+                {isMobile && scene === "none" && (
+                  <button type="button" onClick={() => setShowModal(true)}
+                    style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, margin:"12px auto 0", padding:"8px 18px", borderRadius:9, background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.12)", color:"#A8A29A", fontSize:12, fontWeight:600, cursor:"pointer" }}>
+                    <Maximize2 size={13}/> Agrandir
+                  </button>
+                )}
 
                 {/* Nom + URL + statut */}
                 <div style={{ textAlign:"center", width:"100%" }}>
