@@ -2234,7 +2234,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
       {/* -- Modal preview plein ecran ------------------------------------------- */}
       {showModal && (
-        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.92)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:2000, padding:32 }}
+        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.92)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:2000, padding:isMobile?16:32 }}
           onClick={() => setShowModal(false)}>
           <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:20, maxWidth:600, width:"100%" }}
             onClick={e => e.stopPropagation()}>
@@ -2252,8 +2252,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             </div>
 
             {/* QR grand */}
-            <div style={{ padding:28, borderRadius:24, background:bg, boxShadow:"0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent), 0 32px 80px rgba(0,0,0,0.9)" }}>
-              <div ref={canvasModalRef} data-qr-container style={{ display:"flex", width:320, height:320, alignItems:"center", justifyContent:"center" }}/>
+            <div style={{ padding:isMobile?16:28, borderRadius:24, background:bg, boxShadow:"0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent), 0 32px 80px rgba(0,0,0,0.9)" }}>
+              <div ref={canvasModalRef} data-qr-container style={{ display:"flex", width:isMobile?"min(300px,64vw)":320, aspectRatio:"1 / 1", alignItems:"center", justifyContent:"center" }}/>
             </div>
 
             {/* Actions */}
