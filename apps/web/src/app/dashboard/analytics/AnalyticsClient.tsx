@@ -245,6 +245,18 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
                   {story.topDevice ? <> sur <strong style={{ color: "#F5F0E8" }}>{story.topDevice}</strong></> : null}
                   {story.peakHour != null ? <> · pic d&apos;activité vers <strong style={{ color: "#F5F0E8" }}>{story.peakHour}h</strong></> : null}.
                 </p>
+                {(() => {
+                  const advice =
+                    totalScans30 < 10 ? "Partagez votre QR sur vos réseaux et imprimez-le pour décoller."
+                    : story.peakHour != null ? `Publiez vos posts autour de ${story.peakHour}h, votre heure de pic.`
+                    : story.topSource ? `L’essentiel vient de ${story.topSource} — testez un autre canal pour diversifier.`
+                    : null
+                  return advice ? (
+                    <p style={{ display: "flex", alignItems: "baseline", gap: 7, color: "var(--accent)", fontSize: 12.5, fontWeight: 600, margin: "9px 0 0", lineHeight: 1.5 }}>
+                      <span style={{ flexShrink: 0 }}>💡</span> {advice}
+                    </p>
+                  ) : null
+                })()}
               </div>
             </div>
           </div>
