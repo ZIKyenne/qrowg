@@ -520,6 +520,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [level,      setLevel]      = useState<"simple"|"inter"|"expert">("simple") // niveau de réglages (désencombre le panneau)
   const [expOptsOpen, setExpOptsOpen] = useState(false) // options export techniques repliées sur mobile
   const [sceneSelOpen, setSceneSelOpen] = useState(false) // sélecteur d'aperçu replié sur mobile
+  const [expMoreOpen, setExpMoreOpen] = useState(false) // actions secondaires export repliées sur mobile
   const isMobile = useIsMobile(859) // mobile : on désencombre le panneau export
   const [qrPng,      setQrPng]      = useState<string>("") // PNG du QR composé dans les scènes
   const [diagFg,     setDiagFg]     = useState("")
@@ -3848,6 +3849,15 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     : <><Download size={14}/> Télécharger {fmt.label} {realPx}px</>}
                 </button>
 
+                {/* Actions secondaires — repliées sur mobile sous "Plus d'actions" */}
+                {isMobile && (
+                  <button type="button" onClick={() => setExpMoreOpen(o => !o)} aria-expanded={expMoreOpen}
+                    style={{ padding:"8px", background:"transparent", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:MUTED, fontSize:11, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                    Plus d&apos;actions <span style={{ color:G, fontSize:12, transform:expMoreOpen?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▾</span>
+                  </button>
+                )}
+                <div style={{ display: (!isMobile || expMoreOpen) ? "flex" : "none", flexDirection:"column", gap:7 }}>
+
                 {/* Copier image */}
                 <button type="button" onClick={copyImageToClipboard}
                   style={{ padding:"9px", background:expCopied==="img"?"rgba(57,255,143,0.1)":"rgba(255,255,255,0.04)", border:`1px solid ${expCopied==="img"?"rgba(57,255,143,0.3)":"rgba(255,255,255,0.08)"}`, borderRadius:9, color:expCopied==="img"?"#39FF8F":expCopied==="img-err"?"#FF6B6B":MUTED, fontSize:11, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
@@ -3873,6 +3883,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       {copied===l.key ? <Check size={10}/> : <Link size={10}/>} {l.label}
                     </button>
                   ))}
+                </div>
                 </div>
               </div>
 
