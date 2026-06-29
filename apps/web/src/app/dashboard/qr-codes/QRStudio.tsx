@@ -522,6 +522,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [expOptsOpen, setExpOptsOpen] = useState(false) // options export techniques repliées sur mobile
   const [sceneSelOpen, setSceneSelOpen] = useState(false) // sélecteur d'aperçu replié sur mobile
   const [expMoreOpen, setExpMoreOpen] = useState(false) // actions secondaires export repliées sur mobile
+  const [printDetailsOpen, setPrintDetailsOpen] = useState(false) // liste détaillée Print Studio repliée sur mobile
   const isMobile = useIsMobile(859) // mobile : on désencombre le panneau export
   const [qrPng,      setQrPng]      = useState<string>("") // PNG du QR composé dans les scènes
   const [diagFg,     setDiagFg]     = useState("")
@@ -3668,15 +3669,33 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               {editorLoading ? <Loader2 size={16} style={{ animation:"spin 0.8s linear infinite" }}/> : <Sparkles size={16}/>}
               {editorLoading ? "Ouverture..." : "Ouvrir QR Print Studio"}
             </button>
-            <p style={{ color:MUTED, fontSize:11, textAlign:"center" as const, margin:0, lineHeight:1.5 }}>
-              Transformez votre QR en support marketing prêt à imprimer — affiche, flyer, carte de visite, sticker, carte de table…
+            <p style={{ color:MUTED, fontSize:11.5, textAlign:"center" as const, margin:0, lineHeight:1.5 }}>
+              Créez une affiche, un flyer, une carte ou un sticker prêt à imprimer.
             </p>
 
-            {/* Explicatif : ce que QR Print Studio permet de faire */}
-            <div style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"15px 15px 5px" }}>
-              <p style={{ color:"#F5F0E8", fontSize:12.5, fontWeight:700, margin:"0 0 13px", display:"flex", alignItems:"center", gap:7 }}>
-                <span style={{ width:7, height:7, borderRadius:2, background:G }}/> Ce que vous pouvez créer
-              </p>
+            {/* Chips des supports (compact, toujours visible) */}
+            <div style={{ display:"flex", flexWrap:"wrap", gap:6, justifyContent:"center" }}>
+              {["Affiche","Flyer","Carte","Sticker","Menu","Avis"].map(s => (
+                <span key={s} style={{ padding:"5px 11px", borderRadius:100, background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 22%, transparent)", color:G, fontSize:11, fontWeight:600 }}>{s}</span>
+              ))}
+            </div>
+
+            {/* Explicatif détaillé : replié sur mobile, déplié sur desktop */}
+            <div style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"4px 15px" }}>
+              {isMobile ? (
+                <button type="button" onClick={() => setPrintDetailsOpen(o => !o)} aria-expanded={printDetailsOpen}
+                  style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", background:"none", border:"none", padding:"12px 0", cursor:"pointer" }}>
+                  <span style={{ color:"#F5F0E8", fontSize:12.5, fontWeight:700, display:"flex", alignItems:"center", gap:7 }}>
+                    <span style={{ width:7, height:7, borderRadius:2, background:G }}/> Tout ce qu'on peut créer
+                  </span>
+                  <span style={{ color:G, fontSize:12, transform:printDetailsOpen?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▾</span>
+                </button>
+              ) : (
+                <p style={{ color:"#F5F0E8", fontSize:12.5, fontWeight:700, margin:"11px 0 13px", display:"flex", alignItems:"center", gap:7 }}>
+                  <span style={{ width:7, height:7, borderRadius:2, background:G }}/> Ce que vous pouvez créer
+                </p>
+              )}
+              <div style={{ display:(!isMobile || printDetailsOpen) ? "block" : "none", paddingBottom:5 }}>
               {([
                 ["🎯","Création guidée en 30 s","Votre métier → votre objectif → un design pro généré automatiquement."],
                 ["🖼️","Modèles premium","Affiches, flyers, cartes, stickers, cartes de table — formats A4, carré, story, carte."],
@@ -3694,12 +3713,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   </div>
                 </div>
               ))}
+              </div>
             </div>
-
-            <button type="button" onClick={openEditor} disabled={editorLoading}
-              style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"11px", background:"rgba(255,255,255,0.03)", border:`1px solid ${G}`, borderRadius:10, color:G, fontSize:12, fontWeight:700, cursor:editorLoading?"wait":"pointer" }}>
-              <Sparkles size={13}/> Commencer maintenant
-            </button>
           </div>
         )}
 
