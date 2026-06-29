@@ -2716,16 +2716,28 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     )
                   })()}
 
-                  {/* Pastille score scannabilité (permanente) */}
+                  {/* Carte score scannabilité — pédagogique */}
                   {scanScore && (
-                    <div
-                      onClick={() => scanWidgetRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" })}
-                      style={{ display:"inline-flex", alignItems:"center", gap:8, marginTop:10, marginLeft:6, padding:"6px 12px", background:`${scanScore.gradeColor}12`, border:`1px solid ${scanScore.gradeColor}40`, borderRadius:20, cursor:"pointer", verticalAlign:"middle" }}>
-                      <span style={{ display:"flex", alignItems:"center", justifyContent:"center", width:22, height:22, borderRadius:"50%", background:scanScore.gradeColor, color:"#080808", fontSize:10, fontWeight:800 }}>
-                        {scanScore.score}
-                      </span>
-                      <span style={{ color:scanScore.gradeColor, fontSize:12, fontWeight:700 }}>{scanScore.grade}</span>
-                      <span style={{ color:MUTED, fontSize:10 }}>scannabilité</span>
+                    <div style={{ width:"100%", marginTop:12, padding:"12px 14px", background:`${scanScore.gradeColor}0e`, border:`1px solid ${scanScore.gradeColor}33`, borderRadius:14, display:"flex", flexDirection:"column", gap:9 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:11 }}>
+                        <span style={{ display:"flex", alignItems:"center", justifyContent:"center", width:36, height:36, borderRadius:"50%", background:scanScore.gradeColor, color:"#080808", fontSize:13, fontWeight:800, flexShrink:0 }}>
+                          {scanScore.score}
+                        </span>
+                        <div style={{ flex:1, minWidth:0, textAlign:"left" as const }}>
+                          <p style={{ color:scanScore.gradeColor, fontSize:13, fontWeight:800, margin:0 }}>{scanScore.grade} · scannabilité</p>
+                          <p style={{ color:MUTED, fontSize:11, margin:"2px 0 0", lineHeight:1.45 }}>
+                            {scanScore.grade === "Excellent"
+                              ? "Contraste élevé et marge suffisante : il se scanne sans souci."
+                              : (scanScore.issues[0]?.detail || scanScore.issues[0]?.title || "Quelques réglages amélioreraient la lisibilité.")}
+                          </p>
+                        </div>
+                      </div>
+                      {scanScore.grade !== "Excellent" && (
+                        <button type="button" onClick={autoFix}
+                          style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"9px", background:`${scanScore.gradeColor}1c`, border:`1px solid ${scanScore.gradeColor}55`, borderRadius:10, color:scanScore.gradeColor, fontSize:12, fontWeight:700, cursor:"pointer" }}>
+                          <Sparkles size={13}/> Optimiser automatiquement
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
@@ -2737,19 +2749,19 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     <Download size={15}/> Télécharger
                   </button>
                   <div style={{ display:"flex", gap:6, width:"100%" }}>
+                    <button type="button" onClick={() => setShowModal(true)}
+                      style={{ flex:1.3, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"9px", background:"color-mix(in srgb, var(--accent) 12%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 35%, transparent)", borderRadius:9, color:"#C9A84C", fontSize:11.5, fontWeight:700, cursor:"pointer" }}>
+                      <Eye size={13}/> Tester
+                    </button>
                     <button type="button" onClick={() => copy("link")}
-                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"8px", background:copied==="link"?"rgba(57,255,143,0.1)":"rgba(255,255,255,0.04)", border:`1px solid ${copied==="link"?"rgba(57,255,143,0.3)":"rgba(255,255,255,0.08)"}`, borderRadius:9, color:copied==="link"?"#39FF8F":"#8A8478", fontSize:11, cursor:"pointer", transition:"all 0.15s" }}>
+                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"9px", background:copied==="link"?"rgba(57,255,143,0.1)":"rgba(255,255,255,0.04)", border:`1px solid ${copied==="link"?"rgba(57,255,143,0.3)":"rgba(255,255,255,0.08)"}`, borderRadius:9, color:copied==="link"?"#39FF8F":"#8A8478", fontSize:11, cursor:"pointer", transition:"all 0.15s" }}>
                       {copied==="link" ? <Check size={12}/> : <Copy size={12}/>}
-                      {copied==="link" ? "Copie !" : "Copier"}
+                      {copied==="link" ? "Copié !" : "Copier"}
                     </button>
                     <a href={pageUrl} target="_blank" rel="noopener noreferrer"
-                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"8px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:"#8A8478", fontSize:11, textDecoration:"none" }}>
+                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"9px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:"#8A8478", fontSize:11, textDecoration:"none" }}>
                       <ExternalLink size={12}/> Ouvrir
                     </a>
-                    <button type="button" onClick={() => setShowModal(true)}
-                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"8px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:9, color:"#C9A84C", fontSize:11, cursor:"pointer" }}>
-                      <Eye size={12}/> Tester
-                    </button>
                   </div>
                 </div>
               </div>
