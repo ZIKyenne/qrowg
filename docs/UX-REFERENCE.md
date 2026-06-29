@@ -92,7 +92,7 @@ Pour chaque écran : **Objectif** (la mission unique) · **Action primaire** · 
 - **Secondaire** : graphes (devices, sources, évolution, top pays).
 - **Reco assistant** : **synthèse narrative** en tête — *Votre trafic augmente / ralentit · X scans sur 30j, surtout via SOURCE sur APPAREIL · pic vers Xh* (calculée des vraies données).
 - **État vide** : une seule carte pédagogique (pas de graphes vides). Aperçu de démo dessous.
-- **Dette** : graphes encore grands → réduire + « Voir l'analyse complète ».
+- **Repli** : par défaut synthèse + KPIs + graphe principal (220px) ; tout le détail derrière **« Voir l'analyse complète »**. ✅
 
 ### Profil — `/dashboard/profile`
 - **Objectif** : gérer mon identité et mon compte.
@@ -146,7 +146,7 @@ Avant de livrer un écran, vérifier :
 ## 7. Dette UX connue (backlog)
 
 1. ~~**Dashboard** : fusionner les KPI en un cockpit unique.~~ ✅ fait (cockpit 1 héro + 3 stats).
-2. **Analytics** : réduire la taille des graphes + « Voir l'analyse complète ».
+2. ~~**Analytics** : réduire les graphes + « Voir l'analyse complète ».~~ ✅ fait.
 3. **Print Studio** : en faire un pilier produit (pas une extension).
 4. Réduire les hauteurs partout (-20 à -35 %).
 5. Étendre l'IA contextuelle (suggestions de thème, d'horaire de partage, d'upsell intelligent).
