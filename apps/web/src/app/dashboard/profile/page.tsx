@@ -1108,7 +1108,7 @@ export default function ProfilePage() {
 
 
       {/* ====================== HERO — centre de contrôle ====================== */}
-      <div style={{ position: "relative", overflow: "hidden", padding: "44px 28px 30px" }}>
+      <div style={{ position: "relative", overflow: "hidden", padding: "30px 28px 20px" }}>
         {/* Couches de fond animées (profondeur : mesh + glow à la couleur d'accent).
             Masque vertical : les halos s'estompent vers le haut et le bas pour
             éviter toute arête nette (démarcation) à la limite du hero. */}
@@ -1121,12 +1121,12 @@ export default function ProfilePage() {
         <div style={{ maxWidth: 1100, margin: "0 auto", position: "relative", zIndex: 1 }}>
 
           {/* Ligne 1 : avatar géant + identité + storytelling + actions */}
-          <div className="hero-in" style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap", marginBottom: 22 }}>
+          <div className="hero-in" style={{ display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 14 }}>
             <div style={{ position: "relative", flexShrink: 0 }}>
-              <div style={{ width: 104, height: 104, borderRadius: "50%", background: profile?.avatar_url ? "transparent" : `linear-gradient(135deg,${pc},color-mix(in srgb, var(--accent) 55%, #000))`, border: `2px solid ${pc}66`, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", animation: "ringPulse 3.6s ease-in-out infinite" }}>
+              <div style={{ width: 84, height: 84, borderRadius: "50%", background: profile?.avatar_url ? "transparent" : `linear-gradient(135deg,${pc},color-mix(in srgb, var(--accent) 55%, #000))`, border: `2px solid ${pc}66`, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", animation: "ringPulse 3.6s ease-in-out infinite" }}>
                 {profile?.avatar_url
                   ? <img src={profile.avatar_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
-                  : <span style={{ fontSize: 42, fontWeight: 700, color: "#080808", fontFamily: "Cormorant Garamond, serif" }}>{(form.full_name || profile?.email || "?")[0]?.toUpperCase()}</span>}
+                  : <span style={{ fontSize: 34, fontWeight: 700, color: "#080808", fontFamily: "Cormorant Garamond, serif" }}>{(form.full_name || profile?.email || "?")[0]?.toUpperCase()}</span>}
               </div>
               <button onClick={() => fileRef.current?.click()} disabled={uploadingAvatar} title="Changer la photo"
                 style={{ position: "absolute", bottom: 2, right: 2, width: 28, height: 28, borderRadius: "50%", background: G, border: "2px solid #0A0906", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>
@@ -1139,7 +1139,7 @@ export default function ProfilePage() {
 
             <div style={{ minWidth: 0, flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 7, flexWrap: "wrap" }}>
-                <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(28px,4.5vw,46px)", color: "#F8F4EC", fontWeight: 700, margin: 0, lineHeight: 1, letterSpacing: "-0.6px" }}>
+                <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(25px,3.8vw,36px)", color: "#F8F4EC", fontWeight: 700, margin: 0, lineHeight: 1, letterSpacing: "-0.4px" }}>
                   Bonjour, {(form.full_name || "").trim().split(" ")[0] || profile?.email?.split("@")[0] || "vous"}
                 </h1>
                 <span style={{ position: "relative", overflow: "hidden", display: "inline-flex", alignItems: "center", gap: 5, background: currentPlan === "free" ? "rgba(255,255,255,0.06)" : `linear-gradient(135deg, ${pc}33, ${pc}1a)`, border: `1px solid ${pc}55`, borderRadius: 999, padding: "4px 12px" }}>
@@ -1161,7 +1161,7 @@ export default function ProfilePage() {
                   ? <>Vous avez <strong style={{ color: G }}>{totalPages} page{totalPages > 1 ? "s" : ""}</strong> prête{totalPages > 1 ? "s" : ""}. Partagez-les pour décoller.</>
                   : <>Créez votre première page et lancez <strong style={{ color: pc }}>votre univers</strong> QRfolio.</>}
               </p>
-              <p style={{ color: MUTED, fontSize: 11.5, margin: "0 0 14px" }}>
+              <p style={{ color: MUTED, fontSize: 11.5, margin: "0 0 11px" }}>
                 {profile?.email}{form.username ? ` · @${form.username}` : ""} · Membre {planCfg.label} depuis {memberMonths > 0 ? `${memberMonths} mois` : "aujourd'hui"}
               </p>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -1200,17 +1200,17 @@ export default function ProfilePage() {
                 { icon: QrCode, label: "QR générés", value: activeQR, color: "#39FF8F" },
                 { icon: TrendingUp, label: "Scans", value: profile?.total_scans || 0, color: "#F97316" },
               ] as const).map((s, i) => (
-                <div key={i} className="hero-in hero-tile" style={{ animationDelay: `${120 + i * 80}ms`, background: "rgba(255,255,255,0.04)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "13px 14px" }}>
-                  <span style={{ display: "inline-flex", width: 28, height: 28, borderRadius: 8, background: s.color + "1c", alignItems: "center", justifyContent: "center", marginBottom: 8 }}><s.icon size={14} color={s.color}/></span>
-                  <p style={{ color: "#F8F4EC", fontSize: 24, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}><CountUp value={s.value}/></p>
-                  <p style={{ color: MUTED, fontSize: 10.5, margin: "3px 0 0" }}>{s.label}</p>
+                <div key={i} className="hero-in hero-tile" style={{ animationDelay: `${120 + i * 80}ms`, background: "rgba(255,255,255,0.04)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "10px 13px" }}>
+                  <span style={{ display: "inline-flex", width: 26, height: 26, borderRadius: 8, background: s.color + "1c", alignItems: "center", justifyContent: "center", marginBottom: 6 }}><s.icon size={13} color={s.color}/></span>
+                  <p style={{ color: "#F8F4EC", fontSize: 21, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}><CountUp value={s.value}/></p>
+                  <p style={{ color: MUTED, fontSize: 10.5, margin: "2px 0 0" }}>{s.label}</p>
                 </div>
               ))}
             </div>
 
             {/* Jauges utilisation (verre) */}
-            <div className="hero-in" style={{ animationDelay: "200ms", background: "rgba(255,255,255,0.04)", backdropFilter: "blur(10px)", border: `1px solid ${pc}2e`, borderRadius: 16, padding: "16px 18px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+            <div className="hero-in" style={{ animationDelay: "200ms", background: "rgba(255,255,255,0.04)", backdropFilter: "blur(10px)", border: `1px solid ${pc}2e`, borderRadius: 16, padding: "13px 16px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                 <span style={{ color: "#F8F4EC", fontSize: 12.5, fontWeight: 700 }}>Mon utilisation</span>
                 {profile?.plan !== "business" && (
                   <a href="/upgrade" style={{ display: "inline-flex", alignItems: "center", gap: 4, color: G, fontSize: 11, fontWeight: 700, textDecoration: "none" }}>
