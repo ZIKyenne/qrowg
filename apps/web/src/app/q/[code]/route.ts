@@ -60,8 +60,8 @@ p{font-size:14px;line-height:1.7;color:#8A8478;margin-bottom:28px}
 </body></html>`
 }
 
-export async function GET(req: NextRequest, { params }: { params: { code: string } }) {
-  const { code } = params
+export async function GET(req: NextRequest, { params }: { params: Promise<{ code: string }> }) {
+  const { code } = await params
   if (!code) return NextResponse.redirect(new URL("/", req.url))
 
   const supabase = createAdminClient()
