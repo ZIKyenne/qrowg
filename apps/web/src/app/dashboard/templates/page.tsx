@@ -95,6 +95,7 @@ const PLAN_CONFIG: Record<string, { label: string; color: string; icon: string }
   business: { label: "Business", color: "#39FF8F", icon: "👑" },
 }
 const FAV_KEY = "qrfolio_fav_templates"
+const PLAN_FILTERS: [string, string, string][] = [["all", "Tous les plans", "#8A8478"], ["free", "Gratuit ✦", "#8A8478"], ["starter", "Starter ⚡", "#38BDF8"], ["pro", "Pro 🔥", "var(--accent)"]]
 
 export default function TemplatesPage() {
   const [selected,     setSelected]     = useState<string | null>(null)
@@ -122,9 +123,12 @@ export default function TemplatesPage() {
         const sb = createClient()
         const { data: { user } } = await sb.auth.getUser()
         if (!user) return
-        const { data: profile } = await sb.from("profiles").select("plan").eq("id", user.id).single()
+        // Profil + pages en parallèle (un seul aller-retour réseau)
+        const [{ data: profile }, { data: userPages }] = await Promise.all([
+          sb.from("profiles").select("plan").eq("id", user.id).single(),
+          sb.from("pages").select("template_id").eq("user_id", user.id),
+        ])
         if (profile?.plan) setUserPlan(profile.plan)
-        const { data: userPages } = await sb.from("pages").select("template_id").eq("user_id", user.id)
         if (userPages) setUsedTemplateIds(userPages.map((p: any) => p.template_id).filter(Boolean))
       } catch {}
     })()
@@ -248,10 +252,9 @@ export default function TemplatesPage() {
   const activeCat = BUSINESS_CATEGORIES.find(c => c.id === activeMetier)
   const hasFilters = activeMetier !== "Tous" || activePlan !== "all"
 
-  // Chips réutilisables (inline desktop + bottom sheet mobile)
-  const visibleCats = BUSINESS_CATEGORIES.filter(c => c.id === "Tous" || (countByMetier[c.id] || 0) > 0)
-  const PLAN_FILTERS: [string, string, string][] = [["all", "Tous les plans", "#8A8478"], ["free", "Gratuit ✦", "#8A8478"], ["starter", "Starter ⚡", "#38BDF8"], ["pro", "Pro 🔥", "var(--accent)"]]
-  const secteurChipEls = visibleCats.map(cat => {
+  // Chips réutilisables (inline desktop + bottom sheet mobile), mémoïsés
+  const visibleCats = useMemo(() => BUSINESS_CATEGORIES.filter(c => c.id === "Tous" || (countByMetier[c.id] || 0) > 0), [countByMetier])
+  const secteurChipEls = useMemo(() => visibleCats.map(cat => {
     const isActive = activeMetier === cat.id
     const count = countByMetier[cat.id] || 0
     return (
@@ -262,13 +265,13 @@ export default function TemplatesPage() {
         <span style={{ background: isActive ? cat.color + "25" : "rgba(255,255,255,0.06)", color: isActive ? cat.color : "#555", borderRadius: 9, padding: "1px 6px", fontSize: 10, fontWeight: 700, minWidth: 18, textAlign: "center" as const }}>{count}</span>
       </button>
     )
-  })
-  const planChipEls = PLAN_FILTERS.map(([plan, label, color]) => (
+  }), [visibleCats, activeMetier, countByMetier])
+  const planChipEls = useMemo(() => PLAN_FILTERS.map(([plan, label, color]) => (
     <button key={plan} type="button" onClick={() => setActivePlan(plan)}
       style={{ background: activePlan === plan ? color + "18" : "transparent", border: "1px solid " + (activePlan === plan ? color + "50" : "rgba(255,255,255,0.08)"), borderRadius: 20, padding: "6px 14px", color: activePlan === plan ? color : MUTED, fontSize: 12, fontWeight: activePlan === plan ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
       {label}
     </button>
-  ))
+  )), [activePlan])
 
   return (
     <div style={{ minHeight: "100vh", background: "transparent", paddingBottom: 120, fontFamily: "DM Sans, sans-serif", position: "relative" }}>

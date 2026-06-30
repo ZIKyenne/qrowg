@@ -816,7 +816,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setStatsLoading(true)
     fetch(`/api/qr-stats/${activeId}?period=${statsPeriod}`)
       .then(r => r.json())
-      .then(d => { if (!d.error) setStats(d) })
+      .then(d => { if (!d.error && !d.empty) setStats(d) }) // empty = QR introuvable/erreur -> on laisse l'état vide, pas des zéros
       .catch(() => {})
       .finally(() => setStatsLoading(false))
   }, [activeId, statsPeriod])
@@ -864,6 +864,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     try {
       const res  = await fetch(`/api/qr-stats/${activeId}?period=30`)
       const d    = await res.json()
+      if (d.empty || d.error) { setStatsExporting(false); return } // pas de CSV vide si QR introuvable/erreur
       const rows = d.sparkline?.map((v: number, i: number) => {
         const date = new Date(); date.setDate(date.getDate() - 30 + i)
         return `${date.toLocaleDateString("fr-FR")},${v}`
