@@ -157,7 +157,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
   }, [noData, sourceData, deviceData, filteredScans, filteredViews])
 
   return (
-    <div style={{ minHeight: "100vh", background: "radial-gradient(1100px 520px at 75% -8%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%)", padding: "30px 24px 48px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
+    <div style={{ minHeight: "100vh", background: "radial-gradient(1100px 520px at 75% -8%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%)", padding: "22px 24px 44px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
       <Particles />
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}
@@ -170,10 +170,10 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
       `}</style>
       {/* Header */}
       <div style={{ maxWidth: 1100, margin: "0 auto", position: "relative", zIndex: 1 }}>
-        <div className="az" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 18, flexWrap: "wrap", gap: 16 }}>
+        <div className="az" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 16 }}>
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-              <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(30px,4.5vw,44px)", lineHeight: 1, color: "#F5F0E8", fontWeight: 700, margin: 0, letterSpacing: "-0.5px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 5 }}>
+              <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(26px,3.6vw,36px)", lineHeight: 1, color: "#F5F0E8", fontWeight: 700, margin: 0, letterSpacing: "-0.4px" }}>
                 Analytics
               </h1>
               <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(57,255,143,0.1)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 999, padding: "3px 10px" }}>

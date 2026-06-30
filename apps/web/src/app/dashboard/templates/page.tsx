@@ -275,15 +275,15 @@ export default function TemplatesPage() {
       <Particles behind />
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
-      <div style={{ padding: "40px 24px 0", textAlign: "center", maxWidth: 960, margin: "0 auto" }}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 20, padding: "5px 14px", marginBottom: 16 }}>
+      <div style={{ padding: "26px 24px 0", textAlign: "center", maxWidth: 960, margin: "0 auto" }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 20, padding: "5px 14px", marginBottom: 12 }}>
           <Sparkles size={13} color={G} />
           <span style={{ color: G, fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase" }}>Templates</span>
         </div>
-        <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(28px,4vw,44px)", color: "#F5F0E8", margin: "0 0 10px", fontWeight: 700 }}>
+        <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(26px,3.4vw,36px)", color: "#F5F0E8", margin: "0 0 8px", fontWeight: 700 }}>
           Choisissez votre secteur
         </h1>
-        <p style={{ color: MUTED, fontSize: 15, margin: "0 0 28px" }}>
+        <p style={{ color: MUTED, fontSize: 14.5, margin: "0 0 22px" }}>
           {TEMPLATES.length} templates pré-configurés pour votre métier
         </p>
 
