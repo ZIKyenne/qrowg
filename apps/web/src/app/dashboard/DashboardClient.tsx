@@ -7,6 +7,7 @@ import { Plus, QrCode, BarChart2, Eye, Zap, ArrowRight, Globe, Trash2, ExternalL
 import { getPlan, fmtPrice } from "@/lib/plans"
 import Particles from "@/components/Particles"
 import { useIsMobile } from "@/lib/useIsMobile"
+import NextStepCard from "@/components/NextStepCard"
 
 type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string }
 type Profile = { full_name: string | null; plan: string; total_scans: number; total_pages: number; avatar_url: string | null }
@@ -246,13 +247,8 @@ export default function DashboardClient() {
             ? { icon: "➕", text: <>Créez une 2ᵉ page pour un autre usage (menu, événement, promo).</>, label: "Nouvelle page", href: "/dashboard/templates" }
             : { icon: "🖨️", text: <><strong style={{ color: "#F5F0E8" }}>{totalScans.toLocaleString("fr-FR")}</strong> scan{totalScans > 1 ? "s" : ""} — créez un support imprimable pour booster vos scans.</>, label: "Créer un support", href: "/dashboard/qr-codes" }
           return (
-            <div className="dz" style={{ animationDelay: "40ms", marginBottom: 20, display: "flex", alignItems: "center", gap: 13, flexWrap: "wrap", padding: "14px 18px", borderRadius: 14,
-              background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 9%, #100F0A), #100F0A)", border: "1px solid color-mix(in srgb, var(--accent) 26%, transparent)" }}>
-              <span style={{ fontSize: 20, flexShrink: 0 }}>{tip.icon}</span>
-              <p style={{ flex: 1, minWidth: 180, margin: 0, color: "#C9C3B6", fontSize: 13.5, lineHeight: 1.5 }}>{tip.text}</p>
-              <Link href={tip.href} className="dz-cta" style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, padding: "9px 16px", borderRadius: 10, background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", color: "#080808", textDecoration: "none", fontSize: 12.5, fontWeight: 800 }}>
-                {tip.label} <ArrowRight size={14} strokeWidth={2.5} />
-              </Link>
+            <div className="dz" style={{ marginBottom: 20 }}>
+              <NextStepCard icon={tip.icon} ctaLabel={tip.label} href={tip.href} animationDelay="40ms">{tip.text}</NextStepCard>
             </div>
           )
         })()}

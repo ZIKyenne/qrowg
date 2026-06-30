@@ -96,6 +96,7 @@ const PLAN_CONFIG: Record<string, { label: string; color: string; icon: string }
 }
 const FAV_KEY = "qrfolio_fav_templates"
 const PLAN_FILTERS: [string, string, string][] = [["all", "Tous les plans", "#8A8478"], ["free", "Gratuit ✦", "#8A8478"], ["starter", "Starter ⚡", "#38BDF8"], ["pro", "Pro 🔥", "var(--accent)"]]
+const STARTER_TEMPLATE_ID = "freelance" // modèle recommandé par défaut (nouvel utilisateur sans page)
 
 export default function TemplatesPage() {
   const [selected,     setSelected]     = useState<string | null>(null)
@@ -181,7 +182,7 @@ export default function TemplatesPage() {
     const popular = notUsed.find((t: any) => popTier(t.id)?.label === "Populaire")
     if (used.size === 0) {
       // Aucun page encore : on guide vers un démarrage simple (modèle gratuit)
-      const starter = TEMPLATES.find((t: any) => t.id === "freelance") || TEMPLATES[0]
+      const starter = TEMPLATES.find((t: any) => t.id === STARTER_TEMPLATE_ID) || TEMPLATES[0]
       return { t: starter, reason: "Le plus choisi pour bien démarrer", isStart: true }
     }
     const pick = popular || notUsed[0]
