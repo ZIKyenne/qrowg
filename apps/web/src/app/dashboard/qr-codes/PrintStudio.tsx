@@ -14,6 +14,7 @@
 // =============================================================================
 
 import { useEffect, useRef, useState, useCallback } from "react"
+import { useDeviceOrientation } from "@/lib/useDeviceOrientation"
 import { fabric } from "fabric"
 import {
   X, Type as TypeIcon, QrCode, Square, Circle as CircleIcon, Minus,
@@ -878,6 +879,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [rightW, setRightW]   = useState(288) // largeur du panneau Réglages (redimensionnable)
   const [leftW, setLeftW]     = useState(300) // largeur des flyouts de gauche (Modèles, Photos…)
   const [railW, setRailW]     = useState(150) // largeur du rail d'outils tout à gauche
+  // Phase 1 paysage mobile : rail compact (icônes) + top bar resserrée, canvas héros
+  const { isMobile: orMobile, isPortrait: orPortrait, isTouch: orTouch } = useDeviceOrientation()
+  const landscapeMobile = orMobile && orTouch && !orPortrait
+  const effRailW = landscapeMobile ? 56 : railW
   const [formatW, setFormatW] = useState(84)  // largeur du panneau Format (tout à droite)
   const [compOpen, setCompOpen] = useState(false) // flyout composants metier
   const [thumbCache, setThumbCache] = useState<Record<string, string>>({}) // photo par objectif pour les vignettes
@@ -3258,10 +3263,18 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         .ps-root .qr-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 8px; }
         .ps-root .qr-scroll::-webkit-scrollbar-thumb:hover { background: rgba(201,168,76,0.4); }
         .ps-root .qr-scroll::-webkit-scrollbar-track { background: transparent; }
+        /* Phase 1 — paysage mobile : rail compact icônes + top bar resserrée (canvas héros) */
+        .ps-rail.ps-compact { padding: 12px 4px !important; gap: 12px !important; align-items: center; }
+        .ps-rail.ps-compact p { display: none !important; }
+        .ps-rail.ps-compact > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; gap: 8px !important; width: 100%; }
+        .ps-rail.ps-compact button { font-size: 0 !important; letter-spacing: 0 !important; padding: 11px 0 !important; gap: 0 !important; justify-content: center !important; width: 100% !important; }
+        .ps-rail.ps-compact button svg { width: 19px !important; height: 19px !important; flex-shrink: 0; }
+        .ps-topbar-compact { padding: 6px 10px !important; }
+        .ps-topbar-compact button { padding-top: 7px !important; padding-bottom: 7px !important; }
       `}</style>
       <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} style={{ display: "none" }} />
       {/* ---- Barre du haut ---- */}
-      <div style={{
+      <div className={landscapeMobile ? "ps-topbar-compact" : ""} style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "10px 16px", borderBottom: "1px solid rgba(31,36,48,0.06)",
         background: SURFACE, flexShrink: 0, boxShadow: "0 1px 8px rgba(31,36,48,0.04)", zIndex: 5,
@@ -3446,8 +3459,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Rail outils */}
         {wizard === 0 && (
-        <div className="qr-scroll ps-rail" style={{ width: railW, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", padding: "12px 10px", display: "flex", flexDirection: "column", gap: 6, background: "#FBFBFD", overflowY: "auto", position: "relative" }}>
-          <ResizeHandle which="rail" />
+        <div className={"qr-scroll ps-rail" + (landscapeMobile ? " ps-compact" : "")} style={{ width: effRailW, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", padding: "12px 10px", display: "flex", flexDirection: "column", gap: 6, background: "#FBFBFD", overflowY: "auto", position: "relative" }}>
+          {!landscapeMobile && <ResizeHandle which="rail" />}
           <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 2px" }}>Créer</p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
           <button type="button" onClick={() => { setTplOpen(v => !v); setLibOpen(false); setSide(""); setCompOpen(false); setPhotoOpen(false); setWizard(0) }}
