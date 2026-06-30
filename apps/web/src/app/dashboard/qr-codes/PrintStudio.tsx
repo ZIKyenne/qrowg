@@ -3271,6 +3271,18 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         .ps-rail.ps-compact button svg { width: 19px !important; height: 19px !important; flex-shrink: 0; }
         .ps-topbar-compact { padding: 6px 10px !important; }
         .ps-topbar-compact button { padding-top: 7px !important; padding-bottom: 7px !important; }
+        /* Phase 2 — paysage mobile : panneau Réglages en bottom sheet, Format masqué */
+        .ps-hide-mobile { display: none !important; }
+        .ps-fly-right.ps-sheet {
+          position: fixed !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+          width: auto !important; max-height: 58vh !important;
+          border-left: none !important; border-top: 1px solid rgba(0,0,0,0.1) !important;
+          border-radius: 18px 18px 0 0 !important;
+          box-shadow: 0 -14px 44px rgba(0,0,0,0.28) !important;
+          z-index: 60 !important; animation: psSheetUp .26s cubic-bezier(.2,.8,.2,1);
+          padding-bottom: env(safe-area-inset-bottom) !important;
+        }
+        @keyframes psSheetUp { from { transform: translateY(100%); opacity: .6 } to { transform: translateY(0); opacity: 1 } }
       `}</style>
       <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} style={{ display: "none" }} />
       {/* ---- Barre du haut ---- */}
@@ -4060,9 +4072,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           </div>
         </div>
 
-        {/* Rail droit : formats avec mini-apercu */}
-        <div className="qr-scroll" style={{ width: formatW, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: "10px 7px", display: "flex", flexDirection: "column", gap: 5, background: SURFACE, overflowY: "auto", position: "relative" }}>
-          <ResizeHandle which="format" />
+        {/* Rail droit : formats avec mini-apercu (masqué en paysage mobile -> canvas héros) */}
+        <div className={"qr-scroll" + (landscapeMobile ? " ps-hide-mobile" : "")} style={{ width: formatW, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: "10px 7px", display: "flex", flexDirection: "column", gap: 5, background: SURFACE, overflowY: "auto", position: "relative" }}>
+          {!landscapeMobile && <ResizeHandle which="format" />}
           <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 1px", textAlign: "center" }}>Format</p>
           {(Object.keys(FORMATS) as FormatId[]).map(f => {
             const r = FORMATS[f].ratio
@@ -4093,8 +4105,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Panneau de reglages : toujours visible quand un element est selectionne */}
         {sel && (
-        <div className="qr-scroll ps-fly ps-fly-right" style={{ width: rightW, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: 0, overflowY: "auto", background: SURFACE, display: "flex", flexDirection: "column", position: "relative" }}>
-          <ResizeHandle which="right" />
+        <div className={"qr-scroll ps-fly ps-fly-right" + (landscapeMobile ? " ps-sheet" : "")} style={{ width: rightW, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: 0, overflowY: "auto", background: SURFACE, display: "flex", flexDirection: "column", position: "relative" }}>
+          {!landscapeMobile && <ResizeHandle which="right" />}
               {/* En-tete contextuel */}
               <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "13px 16px", borderBottom: "1px solid rgba(0,0,0,0.06)", position: "sticky", top: 0, background: SURFACE, zIndex: 2 }}>
                 <span style={{ width: 30, height: 30, borderRadius: 9, background: "rgba(201,168,76,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}>{sel.isQr ? "▦" : sel.isImage ? "🖼️" : sel.isText ? "T" : sel.label !== null ? "◉" : sel.isGroupObj ? "▣" : "◆"}</span>
