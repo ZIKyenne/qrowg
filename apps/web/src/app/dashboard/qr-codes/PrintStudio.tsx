@@ -1907,7 +1907,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     if (kind === "dots") { ctx.beginPath(); ctx.arc(11, 11, 3.2, 0, Math.PI * 2); ctx.fill() }
     else if (kind === "stripes") { ctx.beginPath(); ctx.moveTo(-4, 22); ctx.lineTo(22, -4); ctx.moveTo(6, 26); ctx.lineTo(26, 6); ctx.stroke() }
     else { ctx.strokeRect(0, 0, 22, 22) }
-    o.set("fill", new fabric.Pattern({ source: pc, repeat: "repeat" }) as unknown as string); o.dirty = true
+    o.set("fill", new fabric.Pattern({ source: pc as any, repeat: "repeat" }) as unknown as string); o.dirty = true
   })
   // Bordure degradee : le contour devient un degrade (Fabric accepte un Gradient sur stroke)
   const setBorderGradient = (c1: string, c2: string) => mutate(o => {
@@ -1956,7 +1956,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       if (c.strokeLineCap) o.set("strokeLineCap", c.strokeLineCap)
       if (c.paintFirst) o.set("paintFirst", c.paintFirst)
       o.set("shadow", c.shadow ? new fabric.Shadow(c.shadow) : null)
-      if (isTextObj(o)) o.set({ fontFamily: c.fontFamily, fontWeight: c.fontWeight, fontStyle: c.fontStyle, textAlign: c.textAlign, charSpacing: c.charSpacing, lineHeight: c.lineHeight })
+      if (isTextObj(o)) o.set({ fontFamily: c.fontFamily, fontWeight: c.fontWeight, fontStyle: c.fontStyle, textAlign: c.textAlign, charSpacing: c.charSpacing, lineHeight: c.lineHeight } as any)
       o.dirty = true
     })
   }
@@ -2325,7 +2325,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     else if (kind === "grid") { ctx.strokeRect(0, 0, 26, 26) }
     else { ctx.beginPath(); ctx.moveTo(13, 8); ctx.lineTo(13, 18); ctx.moveTo(8, 13); ctx.lineTo(18, 13); ctx.stroke() }
     setBgGrad(false)
-    fc.setBackgroundColor(new fabric.Pattern({ source: pc, repeat: "repeat" }) as unknown as string, fc.renderAll.bind(fc))
+    fc.setBackgroundColor(new fabric.Pattern({ source: pc as any, repeat: "repeat" }) as unknown as string, fc.renderAll.bind(fc))
     pushHistorySoon()
   }
   // Synchronise les controles de fond avec l'etat reel du canvas (apres chargement / undo)
