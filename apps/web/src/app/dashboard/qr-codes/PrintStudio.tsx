@@ -883,6 +883,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const { isMobile: orMobile, isPortrait: orPortrait, isTouch: orTouch } = useDeviceOrientation()
   const landscapeMobile = orMobile && orTouch && !orPortrait
   const effRailW = landscapeMobile ? 56 : railW
+  const [dropFx, setDropFx] = useState(0) // incrémenté à chaque pose de modèle -> effet « posé sur la feuille »
   const [formatW, setFormatW] = useState(84)  // largeur du panneau Format (tout à droite)
   const [compOpen, setCompOpen] = useState(false) // flyout composants metier
   const [thumbCache, setThumbCache] = useState<Record<string, string>>({}) // photo par objectif pour les vignettes
@@ -2971,6 +2972,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     pushHistory() // modele applique = une etape
     setTplOpen(false)
     applyingRef.current = false
+    setDropFx(n => n + 1) // animation de dépôt (overlay, ne touche pas le canvas)
   }
 
   // ---- Sauvegarde ----------------------------------------------------------
@@ -3283,6 +3285,19 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           padding-bottom: env(safe-area-inset-bottom) !important;
         }
         @keyframes psSheetUp { from { transform: translateY(100%); opacity: .6 } to { transform: translateY(0); opacity: 1 } }
+        /* Effet de dépôt d'un modèle : anneau accent qui se pose avec rebond, puis disparaît */
+        .ps-drop-ring { width: 44vmin; height: 44vmin; max-width: 360px; max-height: 360px; border-radius: 22px;
+          border: 2px solid color-mix(in srgb, var(--accent) 70%, transparent);
+          box-shadow: 0 0 60px color-mix(in srgb, var(--accent) 45%, transparent), inset 0 0 44px color-mix(in srgb, var(--accent) 20%, transparent);
+          animation: psDropRing .62s cubic-bezier(.2,.9,.25,1.2) forwards; }
+        @keyframes psDropRing {
+          0%   { transform: scale(1.18); opacity: 0; }
+          35%  { opacity: 1; }
+          70%  { transform: scale(0.97); opacity: .9; }
+          85%  { transform: scale(1.02); }
+          100% { transform: scale(1); opacity: 0; }
+        }
+        @media (prefers-reduced-motion: reduce) { .ps-drop-ring { animation-duration: .01s; } }
         /* Phase 3 — paysage mobile : tous les flyouts gauche (Modèles, Photos, Bibliothèque…) en bottom sheets */
         .ps-root.ps-landscape .ps-fly:not(.ps-fly-right) {
           position: fixed !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
@@ -3295,6 +3310,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         }
       `}</style>
       <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} style={{ display: "none" }} />
+      {/* Effet « posé sur la feuille » au dépôt d'un modèle (overlay pur, n'altère pas le canvas) */}
+      {dropFx > 0 && (
+        <div key={dropFx} aria-hidden style={{ position: "fixed", inset: 0, zIndex: 55, pointerEvents: "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div className="ps-drop-ring" />
+        </div>
+      )}
       {/* ---- Barre du haut ---- */}
       <div className={landscapeMobile ? "ps-topbar-compact" : ""} style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
