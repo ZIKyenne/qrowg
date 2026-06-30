@@ -880,8 +880,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [leftW, setLeftW]     = useState(300) // largeur des flyouts de gauche (Modèles, Photos…)
   const [railW, setRailW]     = useState(150) // largeur du rail d'outils tout à gauche
   // Phase 1 paysage mobile : rail compact (icônes) + top bar resserrée, canvas héros
-  const { isMobile: orMobile, isPortrait: orPortrait, isTouch: orTouch } = useDeviceOrientation()
-  const landscapeMobile = orMobile && orTouch && !orPortrait
+  const { isMobile: orMobile, isPortrait: orPortrait } = useDeviceOrientation()
+  const landscapeMobile = orMobile && !orPortrait
   const effRailW = landscapeMobile ? 56 : railW
   const [dropFx, setDropFx] = useState(0) // incrémenté à chaque pose de modèle -> effet « posé sur la feuille »
   const [formatW, setFormatW] = useState(84)  // largeur du panneau Format (tout à droite)

@@ -26,8 +26,11 @@ export default function RotateToLandscapeGate({
   title?: string
   subtitle?: string
 }) {
-  const { isMobile, isPortrait, isTouch } = useDeviceOrientation()
-  const shouldGate = isMobile && isTouch && isPortrait
+  const { isMobile, isPortrait } = useDeviceOrientation()
+  // Écran téléphone (plus petit côté < 768) en portrait. On n'exige PAS isTouch :
+  // l'émulation DevTools ne l'expose pas de façon fiable, et un desktop normal a
+  // toujours un côté ≥ 768px donc n'est jamais barré.
+  const shouldGate = isMobile && isPortrait
   const [continueAnyway, setContinueAnyway] = useState(false)
   const [state, setState] = useState<GateState>(shouldGate ? "locked" : "unlocked")
   const prev = useRef<GateState>(state)
