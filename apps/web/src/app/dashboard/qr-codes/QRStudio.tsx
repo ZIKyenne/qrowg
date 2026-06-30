@@ -3855,7 +3855,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     const ok = PLAN_RANK[userPlan] >= PLAN_RANK[r.plan]
                     return (
                       <button key={r.label} type="button"
-                        onClick={() => { if (!ok) { setUpsell({ feature: `l'export ${r.hint}`, plan: r.plan }); return } if (r.fmt === "png-t" || r.fmt === "webp") setShowMoreFmt(true); setExpFormat(r.fmt as any); setExpSize(r.size as any) }}
+                        onClick={() => { if (!ok) { setUpsell({ feature: `l'export ${r.hint}`, plan: r.plan }); return } if (r.fmt === "png-t") setShowMoreFmt(true); setExpFormat(r.fmt as any); setExpSize(r.size as any) }}
                         style={{ display:"flex", alignItems:"center", gap:8, padding:"9px 10px", background:"rgba(255,255,255,0.025)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:9, cursor:"pointer", textAlign:"left" as const, opacity: ok ? 1 : 0.6 }}>
                         <span style={{ fontSize:15, flexShrink:0 }}>{r.emoji}</span>
                         <span style={{ minWidth:0 }}>

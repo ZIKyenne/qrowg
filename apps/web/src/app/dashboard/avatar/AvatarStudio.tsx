@@ -131,7 +131,8 @@ export default function AvatarStudio({
     setStatus(null);
     startTransition(async () => {
       const res = await saveAvatar(buildExportSvg(cfg), cfg);
-      setStatus(res.ok ? "Avatar enregistré dans votre profil." : res.error);
+      if (res.ok) setStatus("Avatar enregistré dans votre profil.");
+      else setStatus((res as { error: string }).error);
     });
   };
 

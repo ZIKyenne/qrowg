@@ -181,7 +181,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
   )
 
   const totalConv  = allStats.reduce((a, s) => a + s.total, 0)
-  const bestGoal   = goals[allStats.indexOf(allStats.reduce((a, b) => b.total > a.total ? b : a, allStats[0] ?? { total: -1 }) )]
+  const bestGoal   = goals[allStats.indexOf(allStats.reduce((a, b) => b.total > a.total ? b : a, allStats[0] ?? { total: -1, ctr: 0, progress: 0, chartData: [], totalViews: 0 }) )]
   const goalsOnTrack = allStats.filter(s => s.progress !== null && s.progress >= 70).length
 
   return (

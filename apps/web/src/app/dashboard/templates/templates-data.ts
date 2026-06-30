@@ -1,5 +1,5 @@
 // QRfolio — Templates prêts à l'emploi
-import type { BlockContent } from "../builder/types"
+import type { BlockContent, PageTheme } from "../builder/types"
 
 export type Template = {
   id: string
@@ -10,11 +10,7 @@ export type Template = {
   color: string
   preview_blocks: string[]
   blocks: { type: string; content: BlockContent }[]
-  theme: {
-    name: string; bg: string; surface: string; primary: string
-    accent: string; text: string; muted: string
-    fontDisplay: string; fontBody: string; bgMode: string
-  }
+  theme: PageTheme
 }
 
 export const TEMPLATES: Template[] = [

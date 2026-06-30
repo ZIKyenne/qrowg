@@ -999,7 +999,7 @@ export default function ProfilePage() {
   // -- Consommation calculee --------------------------------------------------
   const currentPlan  = profile?.plan || "free"
   const planLimits   = PLAN_CFG[currentPlan]?.limits ?? { pages:1, views:500, qr:1, team:null }
-  const nextPlanKey  = PLAN_ORDER[Math.min(PLAN_ORDER.indexOf(currentPlan)+1, PLAN_ORDER.length-1)]
+  const nextPlanKey  = PLAN_ORDER[Math.min((PLAN_ORDER as readonly string[]).indexOf(currentPlan)+1, PLAN_ORDER.length-1)]
   const nextPlan     = PLAN_CFG[nextPlanKey]
   const pagesUsagePct  = planLimits.pages  ? Math.min((totalPages  / planLimits.pages)  * 100, 100) : 0
   const viewsUsagePct  = planLimits.views  ? Math.min((totalViews  / planLimits.views)  * 100, 100) : 0
