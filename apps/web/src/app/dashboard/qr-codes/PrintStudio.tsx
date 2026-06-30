@@ -4124,8 +4124,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           })}
         </div>
 
-        {/* Zoom flottant sur le rendu central (facon Canva) */}
-        <div style={{ position: "absolute", bottom: 16, right: 108, zIndex: 38, display: "flex", alignItems: "center", gap: 2, background: SURFACE, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 999, padding: 4, boxShadow: "0 4px 16px rgba(0,0,0,0.12)" }}>
+        {/* Zoom flottant sur le rendu central (facon Canva) — reste à gauche des panneaux visibles (ne recouvre plus Réglages) */}
+        <div style={{ position: "absolute", zIndex: 38, display: "flex", alignItems: "center", gap: 2, background: SURFACE, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 999, padding: 4, boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
+          bottom: landscapeMobile ? (sel ? "calc(58vh + 14px)" : 16) : 16,
+          right: landscapeMobile ? 16 : (formatW + (sel ? rightW : 0) + 16) }}>
           <button type="button" onClick={() => applyZoom(zoom / 1.2)} title="Dézoomer" aria-label="Dézoomer"
             style={{ width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 999, color: INK, fontSize: 18, cursor: "pointer" }}>−</button>
           <button type="button" onClick={() => fitToScreen()} title="Ajuster à l'écran"
