@@ -27,10 +27,26 @@ export interface PageTheme {
   fontDisplay: string
   fontBody: string
   // ── Fond ─────────────────────────────────────────────────────────────────
-  bgMode: "solid" | "gradient" | "pattern" | "image"
+  bgMode: "solid" | "gradient" | "pattern" | "image" | "mesh"
   bgGradient?: string
   bgPattern?: string
   bgImage?: string
+  // ── Effets visuels (optionnels, utilisés par les presets) ──────────────────
+  effect_glow?: boolean
+  effect_noise?: boolean
+  effect_vignette?: boolean
+  glow_color?: string
+  glow_intensity?: number
+  glow_size?: number
+  noise_opacity?: number
+  vignette_intensity?: number
+  mesh_c1?: string
+  mesh_c2?: string
+  mesh_c3?: string
+  mesh_blur?: number
+  pattern_color?: string
+  pattern_opacity?: number
+  pattern_size?: number
   // ── Preset metadata ───────────────────────────────────────────────────────
   category?: string
   emoji?: string

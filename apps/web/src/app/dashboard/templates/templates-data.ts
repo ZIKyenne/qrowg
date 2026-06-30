@@ -1,5 +1,5 @@
 // QRfolio — Templates prêts à l'emploi
-import type { BlockContent } from "../dashboard/builder/types"
+import type { BlockContent } from "../builder/types"
 
 export type Template = {
   id: string
