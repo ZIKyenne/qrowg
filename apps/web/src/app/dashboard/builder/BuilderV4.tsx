@@ -3145,7 +3145,7 @@
                 {bgMode==="mesh" && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     <label style={{ color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Dégradé Mesh</label>
-                    <div style={{ height: 60, borderRadius: 10, background: `radial-gradient(ellipse at 0% 0%, ${(theme as any).mesh_c1||"#C9A84C"}80, transparent 50%), radial-gradient(ellipse at 100% 100%, ${(theme as any).mesh_c2||"#39FF8F"}80, transparent 50%), radial-gradient(ellipse at 100% 0%, ${(theme as any).mesh_c3||"#7B2FBE"}60, transparent 50%), ${theme.bg}`, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, filter: `blur(${Math.round(((theme as any).mesh_blur||40)/5)}px)`, overflow: "hidden" }} />
+                    <div style={{ height: 60, borderRadius: 10, background: `radial-gradient(ellipse at 0% 0%, ${(theme as any).mesh_c1||"#C9A84C"}80, transparent 50%), radial-gradient(ellipse at 100% 100%, ${(theme as any).mesh_c2||"#39FF8F"}80, transparent 50%), radial-gradient(ellipse at 100% 0%, ${(theme as any).mesh_c3||"#7B2FBE"}60, transparent 50%), ${theme.bg}`, border: "1px solid rgba(255,255,255,0.1)", filter: `blur(${Math.round(((theme as any).mesh_blur||40)/5)}px)`, overflow: "hidden" }} />
                     {[
                       { label: "Couleur 1", key: "mesh_c1", default: "#C9A84C" },
                       { label: "Couleur 2", key: "mesh_c2", default: "#39FF8F" },
@@ -3536,7 +3536,7 @@
     const [aiInput, setAiInput] = useState("")
     const [aiLoading, setAiLoading] = useState(false)
     const messagesEnd = useRef<HTMLDivElement>(null)
-    const saveTimeout = useRef<ReturnType<typeof setTimeout>>()
+    const saveTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
     // ── États collapse panneaux ────────────────────────────────────────────────
     const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
@@ -3673,7 +3673,7 @@
     // ── Favoris ───────────────────────────────────────────────────────────────
     // ── Popover aperçu bloc ─────────────────────────────────────────────────
     const [popover, setPopover] = useState<{ type: string; x: number; y: number } | null>(null)
-    const popoverTimer = useRef<ReturnType<typeof setTimeout>>()
+    const popoverTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
     const showPopover = useCallback((type: string, e: React.MouseEvent) => {
       clearTimeout(popoverTimer.current)
