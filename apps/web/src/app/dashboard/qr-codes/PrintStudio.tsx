@@ -22,7 +22,7 @@ import {
   Download, Printer, Loader2, Check, Save,
   Shapes, Star, Award, MousePointerClick, ArrowRight, LayoutTemplate,
   Undo2, Redo2, Sparkles, Image as ImageIcon, Palette, Eye, Search,
-  RotateCw, AlignCenterHorizontal, HelpCircle,
+  RotateCw, AlignCenterHorizontal, HelpCircle, MoreHorizontal,
 } from "lucide-react"
 
 // ---- Constantes design (Clair & aere, style Canva) -------------------------
@@ -884,6 +884,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const landscapeMobile = orMobile && !orPortrait
   const effRailW = landscapeMobile ? 56 : railW
   const [dropFx, setDropFx] = useState(0) // incrémenté à chaque pose de modèle -> effet « posé sur la feuille »
+  const [moreOpen, setMoreOpen] = useState(false) // paysage mobile : menu ⋯ (actions secondaires)
   const [formatW, setFormatW] = useState(84)  // largeur du panneau Format (tout à droite)
   const [compOpen, setCompOpen] = useState(false) // flyout composants metier
   const [thumbCache, setThumbCache] = useState<Record<string, string>>({}) // photo par objectif pour les vignettes
@@ -3316,6 +3317,29 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           <div className="ps-drop-ring" />
         </div>
       )}
+      {/* Menu ⋯ (paysage mobile) : actions secondaires en bottom sheet */}
+      {moreOpen && (
+        <div onClick={() => setMoreOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 70, background: "rgba(0,0,0,0.42)", backdropFilter: "blur(2px)", display: "flex", alignItems: "flex-end" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", background: "#FFFFFF", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: "10px 14px calc(16px + env(safe-area-inset-bottom))", animation: "psSheetUp .26s cubic-bezier(.2,.8,.2,1)", boxShadow: "0 -14px 44px rgba(0,0,0,0.28)" }}>
+            <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(0,0,0,0.15)", margin: "0 auto 12px" }} />
+            {([
+              { icon: <Undo2 size={18} />, label: "Annuler", on: undo, disabled: !canUndo },
+              { icon: <Redo2 size={18} />, label: "Rétablir", on: redo, disabled: !canRedo },
+              { icon: <Save size={18} />, label: saved ? "Enregistré ✓" : "Enregistrer", on: () => save(), disabled: false },
+              { icon: <Eye size={18} />, label: "Aperçu en situation", on: openMock, disabled: false },
+              { icon: <Download size={18} />, label: "Exporter en PNG", on: () => exportImage("png"), disabled: false },
+              { icon: <Printer size={18} />, label: isPro ? "Exporter en PDF" : "Exporter en PDF 🔒", on: exportPdfPro, disabled: false },
+              { icon: <HelpCircle size={18} />, label: "Aide & raccourcis", on: () => setShowHelp(true), disabled: false },
+            ] as { icon: React.ReactNode; label: string; on: () => void; disabled: boolean }[]).map((a, i) => (
+              <button key={i} type="button" disabled={a.disabled} onClick={() => { a.on(); setMoreOpen(false) }}
+                style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "14px 12px", background: "none", border: "none", borderTop: i ? "1px solid rgba(0,0,0,0.05)" : "none", color: a.disabled ? "rgba(0,0,0,0.3)" : INK, fontSize: 15, fontWeight: 600, cursor: a.disabled ? "default" : "pointer", textAlign: "left" as const }}>
+                <span style={{ color: a.disabled ? "rgba(0,0,0,0.3)" : G, display: "flex" }}>{a.icon}</span> {a.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ---- Barre du haut ---- */}
       <div className={landscapeMobile ? "ps-topbar-compact" : ""} style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -3341,6 +3365,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 6, color: INK, fontSize: 15, cursor: "pointer" }}>+</button>
           </div>
 
+          {/* Actions secondaires : visibles desktop (display:contents), masquées en paysage mobile (-> menu ⋯) */}
+          <div style={{ display: landscapeMobile ? "none" : "contents" }}>
           {lastPool && (
             <button type="button" onClick={regenerate} title="Régénérer — une autre proposition"
               style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", background: "linear-gradient(90deg,rgba(201,168,76,0.16),rgba(201,168,76,0.06))", border: "1px solid rgba(201,168,76,0.4)", borderRadius: 9, color: "#8A6D14", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
@@ -3394,6 +3420,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               </div>
             )}
           </div>
+          </div>
+          {landscapeMobile && (
+            <button type="button" onClick={() => setMoreOpen(true)} aria-label="Plus d'actions" title="Plus d'actions" style={ghostBtn}>
+              <MoreHorizontal size={18} />
+            </button>
+          )}
           <button type="button" onClick={onClose} aria-label="Fermer"
             style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 9, color: MUTED, cursor: "pointer" }}>
             <X size={16} />
