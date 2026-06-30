@@ -3234,7 +3234,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // l'éditeur (desktop, tablette, ou téléphone en paysage).
 
   return (
-    <div className="ps-root" style={{
+    <div className={"ps-root" + (landscapeMobile ? " ps-landscape" : "")} style={{
       position: "fixed", inset: 0, zIndex: 3000, background: BG,
       display: "flex", flexDirection: "column", fontFamily: "DM Sans, sans-serif",
     }}>
@@ -3283,6 +3283,16 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           padding-bottom: env(safe-area-inset-bottom) !important;
         }
         @keyframes psSheetUp { from { transform: translateY(100%); opacity: .6 } to { transform: translateY(0); opacity: 1 } }
+        /* Phase 3 — paysage mobile : tous les flyouts gauche (Modèles, Photos, Bibliothèque…) en bottom sheets */
+        .ps-root.ps-landscape .ps-fly:not(.ps-fly-right) {
+          position: fixed !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+          width: auto !important; max-height: 62vh !important;
+          border-right: none !important; border-top: 1px solid rgba(0,0,0,0.1) !important;
+          border-radius: 18px 18px 0 0 !important;
+          box-shadow: 0 -14px 44px rgba(0,0,0,0.28) !important;
+          z-index: 58 !important; animation: psSheetUp .26s cubic-bezier(.2,.8,.2,1) !important;
+          padding-bottom: env(safe-area-inset-bottom) !important;
+        }
       `}</style>
       <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} style={{ display: "none" }} />
       {/* ---- Barre du haut ---- */}
