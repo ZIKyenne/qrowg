@@ -148,5 +148,5 @@ Avant de livrer un écran, vérifier :
 1. ~~**Dashboard** : fusionner les KPI en un cockpit unique.~~ ✅ fait (cockpit 1 héro + 3 stats).
 2. ~~**Analytics** : réduire les graphes + « Voir l'analyse complète ».~~ ✅ fait.
 3. **Print Studio** : en faire un pilier produit (pas une extension).
-4. Réduire les hauteurs partout (-20 à -35 %). 🟡 en cours — fait : cockpit Dashboard, Analytics replié, hero Profil (-28 %). Restent : headers Templates/Analytics si besoin.
+4. ~~Réduire les hauteurs partout (-20 à -35 %).~~ ✅ fait — cockpit Dashboard, Analytics replié, hero Profil (-28 %), headers Analytics + Templates resserrés.
 5. Étendre l'IA contextuelle (suggestions de thème, d'horaire de partage, d'upsell intelligent).
