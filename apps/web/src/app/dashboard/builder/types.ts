@@ -95,6 +95,40 @@ export function wcagLevel(ratio: number): "AAA" | "AA" | "fail" {
   return "fail"
 }
 
+// Style de fond d'une page selon son bgMode + effets.
+// Source unique partagée éditeur (aperçu) ↔ page publique pour garantir le WYSIWYG.
+export function themeBackgroundStyle(theme: PageTheme): Record<string, string | number> {
+  const t = theme as any
+  if (t.bgMode === "pattern") {
+    const patSize = t.pattern_size || 20
+    const patOpacity = t.pattern_opacity ?? 0.15
+    const patColor = t.pattern_color || "#C9A84C"
+    const c = patColor + Math.round(patOpacity * 255).toString(16).padStart(2, "0")
+    let bgImg: string
+    switch (t.bgPattern || "dots") {
+      case "grid":      bgImg = `linear-gradient(${c} 1px, transparent 1px), linear-gradient(90deg, ${c} 1px, transparent 1px)`; break
+      case "lines":     bgImg = `linear-gradient(0deg, ${c} 1px, transparent 1px)`; break
+      case "diagonals": bgImg = `linear-gradient(45deg, ${c} 1px, transparent 1px)`; break
+      case "hexagons":  bgImg = `radial-gradient(circle, ${c} 2px, transparent 2px)`; break
+      case "circles":   bgImg = `radial-gradient(circle, transparent ${patSize * 0.3}px, ${c} ${patSize * 0.3}px, ${c} ${patSize * 0.32}px, transparent ${patSize * 0.32}px)`; break
+      case "zigzag":    bgImg = `linear-gradient(135deg, ${c} 25%, transparent 25%), linear-gradient(225deg, ${c} 25%, transparent 25%)`; break
+      default:          bgImg = `radial-gradient(circle, ${c} 1px, transparent 1px)`
+    }
+    return { background: theme.bg, backgroundImage: bgImg, backgroundSize: `${patSize}px ${patSize}px` }
+  }
+  if (t.bgMode === "radial") {
+    return { background: t.bgGradient || `radial-gradient(circle at 50% 50%, ${theme.primary}, ${theme.bg})` }
+  }
+  if (t.bgMode === "mesh") {
+    const c1 = t.mesh_c1 || "#C9A84C", c2 = t.mesh_c2 || "#39FF8F", c3 = t.mesh_c3 || "#7B2FBE"
+    return { background: `radial-gradient(ellipse at 10% 20%, ${c1}90, transparent 55%), radial-gradient(ellipse at 90% 80%, ${c2}90, transparent 55%), radial-gradient(ellipse at 80% 10%, ${c3}70, transparent 55%), ${theme.bg}` }
+  }
+  if (t.bgMode === "image" && t.bgImage) {
+    return { backgroundImage: `url(${t.bgImage})`, backgroundSize: t.bgImageSize || "cover", backgroundPosition: "center" }
+  }
+  return { background: theme.bgGradient || theme.bg }
+}
+
 // ── Catégories de presets ─────────────────────────────────────────────────────
 export const PRESET_CATEGORIES = [
   { id: "Business",     icon: "💼", color: "#3B82F6" },

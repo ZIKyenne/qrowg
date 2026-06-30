@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react"
 import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
+import { themeBackgroundStyle } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -539,8 +540,8 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
         a:active { opacity: 0.75; }
       `}</style>
 
-      {/* Container */}
-      <div style={{ maxWidth: 480, margin: "0 auto", minHeight: "100vh", background: theme.bg, boxShadow: "0 0 80px rgba(0,0,0,0.6)", position: "relative" }}>
+      {/* Container — fond complet selon bgMode (mesh/radial/pattern/image/gradient/solid) pour matcher l'éditeur */}
+      <div style={{ maxWidth: 480, margin: "0 auto", minHeight: "100vh", ...themeBackgroundStyle(theme as any), boxShadow: "0 0 80px rgba(0,0,0,0.6)", position: "relative" }}>
 
         {/* Blocks with staggered animation */}
         {blocks.map((block, idx) => (
