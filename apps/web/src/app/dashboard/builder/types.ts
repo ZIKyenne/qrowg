@@ -27,7 +27,7 @@ export interface PageTheme {
   fontDisplay: string
   fontBody: string
   // ── Fond ─────────────────────────────────────────────────────────────────
-  bgMode: "solid" | "gradient" | "pattern" | "image" | "mesh"
+  bgMode: "solid" | "gradient" | "pattern" | "image" | "mesh" | "radial"
   bgGradient?: string
   bgPattern?: string
   bgImage?: string
