@@ -1081,6 +1081,17 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setFg(newFg); setBg(newBg); setEcLevel(newEc); setStyleConf(newStyleConf)
   }
 
+  // Thèmes prêts-à-l'emploi (haute lisibilité) — alternative créative à la correction mécanique
+  const THEME_SUGGESTIONS = [
+    { name: "Classique", fg: "#080808", bg: "#FFFFFF" },
+    { name: "Nuit",      fg: "#0B1F3A", bg: "#FFFFFF" },
+    { name: "Or",        fg: "#5A4410", bg: "#FFFDF5" },
+  ]
+  function applyTheme(t: { fg: string; bg: string }) {
+    setFg(t.fg); setBg(t.bg)
+    setStyleConf(s => ({ ...s, gradient: "none", fg2: "", transparent: false }))
+  }
+
   // -- Fonctions destination dynamique -----------------------------------------
   const DEST_TYPES = [
     { id:"page",     label:"Page QRfolio", icon:"📄", ph:"ID ou slug de la page" },
@@ -2754,12 +2765,27 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           </p>
                         </div>
                       </div>
-                      {scanScore.grade !== "Excellent" && (
+                      {scanScore.grade !== "Excellent" && (<>
                         <button type="button" onClick={autoFix}
                           style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"9px", background:`${scanScore.gradeColor}1c`, border:`1px solid ${scanScore.gradeColor}55`, borderRadius:10, color:scanScore.gradeColor, fontSize:12, fontWeight:700, cursor:"pointer" }}>
                           <Sparkles size={13}/> Optimiser automatiquement
                         </button>
-                      )}
+                        {/* … ou un thème lisible prêt-à-l'emploi */}
+                        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                          <span style={{ color:MUTED, fontSize:10.5, flexShrink:0 }}>ou un thème&nbsp;:</span>
+                          <div style={{ display:"flex", gap:6, flex:1 }}>
+                            {THEME_SUGGESTIONS.map(t => (
+                              <button key={t.name} type="button" onClick={() => applyTheme(t)} title={`Appliquer le thème ${t.name}`}
+                                style={{ flex:1, display:"flex", alignItems:"center", gap:6, padding:"5px 8px", background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, cursor:"pointer", color:"#C9C3B6", fontSize:10.5, fontWeight:600 }}>
+                                <span style={{ width:13, height:13, borderRadius:4, flexShrink:0, background:t.bg, border:"1px solid rgba(0,0,0,0.2)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                                  <span style={{ width:6, height:6, borderRadius:1.5, background:t.fg }}/>
+                                </span>
+                                {t.name}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </>)}
                     </div>
                   )}
 
