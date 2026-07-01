@@ -132,7 +132,59 @@ function AccordionPublic({ items, title, G, TEXT, MUTED, FONT_B }: { items: [str
   )
 }
 
-function RenderBlock({ block, theme, pageId }: { block: Block; theme: any; pageId: string }) {
+// ── RSVP interactif public (réponse trackée en analytics) ────────────────────
+function RsvpPublic({ block, pageId, TEXT, MUTED }: { block: Block; pageId: string; TEXT: string; MUTED: string }) {
+  const c = block.content
+  const [choice, setChoice] = useState<string | null>(null)
+  const pick = (val: string) => { setChoice(val); trackLinkClick(pageId, block.id, `rsvp:${val}`) }
+  return (
+    <div style={{ padding: "10px 24px 14px" }}>
+      <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{c.title || "Serez-vous présent ?"}</p>
+      {c.description && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 14px" }}>{c.description}</p>}
+      {choice ? (
+        <div style={{ background: "rgba(57,255,143,0.08)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 11, padding: "14px", textAlign: "center", color: "#39FF8F", fontSize: 13, fontWeight: 700 }}>✅ Merci, votre réponse est enregistrée !</div>
+      ) : (
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={() => pick("oui")} style={{ flex: 2, background: "rgba(57,255,143,0.1)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 11, padding: "13px 8px", color: "#39FF8F", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{c.yes_label || "✅ Oui, je viens"}</button>
+          <button onClick={() => pick("peut-etre")} style={{ flex: 1, background: "rgba(251,191,36,0.08)", border: "1.5px solid rgba(251,191,36,0.25)", borderRadius: 11, padding: "13px 8px", color: "#FBBF24", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>{c.maybe_label || "🤔 Peut-être"}</button>
+          <button onClick={() => pick("non")} style={{ flex: 1, background: "rgba(239,68,68,0.08)", border: "1.5px solid rgba(239,68,68,0.2)", borderRadius: 11, padding: "13px 8px", color: "#EF4444", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>{c.no_label || "❌ Non"}</button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Inscription événement public (email pré-rempli vers l'organisateur) ───────
+function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail }: { block: Block; pageId: string; TEXT: string; MUTED: string; ownerEmail?: string }) {
+  const c = block.content
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
+  const [company, setCompany] = useState("")
+  const inputStyle: any = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "11px 13px", color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box" }
+  const submit = () => {
+    trackLinkClick(pageId, block.id, "register")
+    const lines = [`Nom: ${name}`, `Email: ${email}`, c.show_phone === "yes" ? `Telephone: ${phone}` : "", c.show_company === "yes" ? `Societe: ${company}` : ""].filter(Boolean)
+    const body = encodeURIComponent(lines.join("\n"))
+    const subject = encodeURIComponent(`Inscription: ${c.title || "evenement"}`)
+    if (ownerEmail) window.location.href = `mailto:${ownerEmail}?subject=${subject}&body=${body}`
+  }
+  return (
+    <div style={{ padding: "10px 24px 14px" }}>
+      <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{c.title || "S'inscrire gratuitement"}</p>
+      {c.description && <p style={{ color: "#EC4899", fontSize: 12, margin: "0 0 13px", fontWeight: 600 }}>⚡ {c.description}</p>}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <input placeholder="Prénom & Nom" value={name} onChange={e => setName(e.target.value)} style={inputStyle} />
+        <input placeholder="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
+        {c.show_phone === "yes" && <input placeholder="Téléphone" value={phone} onChange={e => setPhone(e.target.value)} style={inputStyle} />}
+        {c.show_company === "yes" && <input placeholder="Société" value={company} onChange={e => setCompany(e.target.value)} style={inputStyle} />}
+        <button onClick={submit} disabled={!name || !email} style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 10, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", border: "none", cursor: name && email ? "pointer" : "not-allowed", opacity: name && email ? 1 : 0.55 }}>{c.button_label || "Je m'inscris"}</button>
+      </div>
+    </div>
+  )
+}
+
+function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme: any; pageId: string; ownerEmail?: string }) {
   const c = block.content
   const G = theme.primary || "#C9A84C"
   const MUTED = theme.muted || "#8A8478"
@@ -1366,6 +1418,174 @@ function RenderBlock({ block, theme, pageId }: { block: Block; theme: any; pageI
       ) : null
     }
 
+    case "event_program": {
+      const steps = [[c.s1_time, c.s1_title, c.s1_desc], [c.s2_time, c.s2_title, c.s2_desc], [c.s3_time, c.s3_title, c.s3_desc], [c.s4_time, c.s4_title, c.s4_desc], [c.s5_time, c.s5_title, c.s5_desc]].filter(([, t]) => t)
+      return steps.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {steps.map(([time, title, desc]: any[], i: number, arr: any[]) => (
+              <div key={i} style={{ display: "flex", gap: 15, paddingBottom: i < arr.length - 1 ? 15 : 0 }}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: "50%", background: "linear-gradient(135deg,#EC4899,#F472B6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{time}</div>
+                  {i < arr.length - 1 && <div style={{ width: 2, flex: 1, background: "rgba(236,72,153,0.2)", marginTop: 4 }} />}
+                </div>
+                <div style={{ flex: 1, paddingTop: 7 }}>
+                  <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{title}</p>
+                  {desc && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{desc}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "event_ticketing": return (c.event_name || c.url) ? (
+      <div style={{ padding: "10px 24px 14px" }}>
+        <div style={{ background: "rgba(236,72,153,0.08)", border: "1.5px solid rgba(236,72,153,0.3)", borderRadius: 15, padding: "17px" }}>
+          <div style={{ display: "flex", gap: 13, alignItems: "flex-start", marginBottom: 15 }}>
+            <span style={{ fontSize: 34, flexShrink: 0 }}>🎟️</span>
+            <div style={{ flex: 1 }}>
+              <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_B }}>{c.event_name || "Mon événement"}</p>
+              {c.date && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 2px" }}>📅 {c.date}</p>}
+              {c.location && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 2px" }}>📍 {c.location}</p>}
+              {c.price && <p style={{ color: "#EC4899", fontSize: 13, fontWeight: 700, margin: 0 }}>💶 {c.price}</p>}
+            </div>
+          </div>
+          <a href={c.url || "#"} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "ticket")} style={{ display: "block", background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 11, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.label || "Réserver ma place"}{c.platform && c.platform !== "URL personnalisée" ? ` — ${c.platform}` : ""}</a>
+        </div>
+      </div>
+    ) : null
+    case "event_guests": {
+      const guests = [[c.g1_photo, c.g1_name, c.g1_role, c.g1_desc], [c.g2_photo, c.g2_name, c.g2_role, c.g2_desc], [c.g3_photo, c.g3_name, c.g3_role, c.g3_desc], [c.g4_photo, c.g4_name, c.g4_role, c.g4_desc]].filter(([, n]) => n)
+      return guests.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 11 }}>
+            {guests.map(([photo, name, role, desc]: any[], i: number) => (
+              <div key={i} style={{ background: "rgba(236,72,153,0.06)", border: "1px solid rgba(236,72,153,0.15)", borderRadius: 13, padding: "14px 11px", textAlign: "center" }}>
+                {photo
+                  ? <img src={String(photo)} alt="" style={{ width: 58, height: 58, borderRadius: "50%", objectFit: "cover", margin: "0 auto 9px", display: "block", border: "2px solid rgba(236,72,153,0.4)" }} />
+                  : <div style={{ width: 58, height: 58, borderRadius: "50%", background: "linear-gradient(135deg,#EC4899,#F472B6)", margin: "0 auto 9px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 700, color: "#fff" }}>{String(name)[0]}</div>}
+                <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_B }}>{name}</p>
+                {role && <span style={{ background: "rgba(236,72,153,0.12)", border: "1px solid rgba(236,72,153,0.25)", borderRadius: 20, padding: "2px 9px", color: "#EC4899", fontSize: 10, fontWeight: 700 }}>{role}</span>}
+                {desc && <p style={{ color: MUTED, fontSize: 11, margin: "5px 0 0" }}>{desc}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "lineup": {
+      const artists = [[c.a1_name, c.a1_stage, c.a1_time, c.a1_headliner], [c.a2_name, c.a2_stage, c.a2_time, c.a2_headliner], [c.a3_name, c.a3_stage, c.a3_time, c.a3_headliner], [c.a4_name, c.a4_stage, c.a4_time, c.a4_headliner]].filter(([n]) => n)
+      return artists.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {artists.map(([name, stage, time, headliner]: any[], i: number) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, background: headliner === "yes" ? "rgba(236,72,153,0.1)" : "rgba(255,255,255,0.03)", border: `1.5px solid ${headliner === "yes" ? "rgba(236,72,153,0.4)" : "rgba(255,255,255,0.07)"}`, borderRadius: 13, padding: "12px 15px" }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <p style={{ color: headliner === "yes" ? "#EC4899" : TEXT, fontSize: headliner === "yes" ? 16 : 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{name}</p>
+                    {headliner === "yes" && <span style={{ background: "#EC4899", color: "#fff", borderRadius: 10, padding: "1px 8px", fontSize: 9, fontWeight: 700 }}>HEADLINER</span>}
+                  </div>
+                  {stage && <p style={{ color: MUTED, fontSize: 11, margin: "2px 0 0" }}>🎭 {stage}</p>}
+                </div>
+                {time && <span style={{ color: headliner === "yes" ? "#EC4899" : MUTED, fontSize: 13, fontWeight: 700, flexShrink: 0 }}>{time}</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "event_access": {
+      const transports = [[c.transport1_icon, c.transport1_label], [c.transport2_icon, c.transport2_label], [c.transport3_icon, c.transport3_label]].filter(([, l]) => l)
+      return (c.embed_url || c.address || transports.length > 0) ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
+          {c.embed_url
+            ? <iframe src={c.embed_url} width="100%" height={180} style={{ border: "none", borderRadius: 13, display: "block", marginBottom: 11 }} loading="lazy" />
+            : c.address ? <div style={{ background: "rgba(236,72,153,0.06)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 13, padding: "18px", display: "flex", flexDirection: "column", alignItems: "center", gap: 7, marginBottom: 11 }}><span style={{ fontSize: 30 }}>🗺️</span><p style={{ color: MUTED, fontSize: 12, margin: 0, textAlign: "center" }}>📍 {c.address}</p></div> : null}
+          {transports.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+              {transports.map(([icon, label]: any[], i: number) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "10px 13px" }}>
+                  <span style={{ fontSize: 19 }}>{icon}</span>
+                  <span style={{ color: TEXT, fontSize: 13, fontFamily: FONT_B }}>{label}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : null
+    }
+    case "event_register": return <EventRegisterPublic block={block} pageId={pageId} TEXT={TEXT} MUTED={MUTED} ownerEmail={ownerEmail} />
+    case "rsvp": return <RsvpPublic block={block} pageId={pageId} TEXT={TEXT} MUTED={MUTED} />
+    case "add_to_calendar": return (c.event_name || c.google_url) ? (
+      <div style={{ padding: "10px 24px 14px" }}>
+        <div style={{ background: "rgba(236,72,153,0.06)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 15, padding: "15px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: c.google_url ? 13 : 0 }}>
+            <div style={{ width: 44, height: 44, borderRadius: 11, background: "rgba(236,72,153,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 23, flexShrink: 0 }}>📅</div>
+            <div>
+              <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{c.event_name || "Mon événement"}</p>
+              {c.start_date && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>🕐 {c.start_date}</p>}
+              {c.location && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>📍 {c.location}</p>}
+            </div>
+          </div>
+          {c.google_url && <a href={c.google_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.google_url)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(66,133,244,0.12)", border: "1px solid rgba(66,133,244,0.3)", borderRadius: 10, padding: "13px", fontSize: 13, fontWeight: 700, color: "#4285F4", textDecoration: "none", fontFamily: FONT_B }}>📅 {c.cta_label || "Ajouter à Google Agenda"}</a>}
+        </div>
+      </div>
+    ) : null
+    case "participants_count": {
+      const total = parseInt(c.count || "0")
+      const max = parseInt(c.max || "0")
+      const pct = max > 0 ? Math.min(100, Math.round((total / max) * 100)) : 0
+      return c.count ? (
+        <div style={{ padding: "14px 24px", textAlign: "center" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 13, background: "rgba(236,72,153,0.08)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 15, padding: "17px 26px", marginBottom: (c.show_progress !== "no" && max > 0) ? 13 : 0 }}>
+            <span style={{ fontSize: 30 }}>{c.emoji || "👥"}</span>
+            <div style={{ textAlign: "left" }}>
+              <p style={{ color: "#EC4899", fontSize: 34, fontWeight: 700, margin: 0, fontFamily: FONT_D, lineHeight: 1 }}>{c.count}</p>
+              <p style={{ color: MUTED, fontSize: 12, margin: "3px 0 0" }}>{c.label || "participants inscrits"}</p>
+            </div>
+          </div>
+          {c.show_progress !== "no" && max > 0 && (
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                <span style={{ color: MUTED, fontSize: 11 }}>Inscriptions</span>
+                <span style={{ color: "#EC4899", fontSize: 11, fontWeight: 700 }}>{pct}% · {total}/{max}</span>
+              </div>
+              <div style={{ height: 7, background: "rgba(255,255,255,0.07)", borderRadius: 4, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 4 }} />
+              </div>
+            </div>
+          )}
+        </div>
+      ) : null
+    }
+    case "tickets_left": {
+      const urgencyStyles: Record<string, any> = {
+        high: { bg: "rgba(239,68,68,0.1)", border: "rgba(239,68,68,0.4)", color: "#EF4444" },
+        medium: { bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.3)", color: "#FBBF24" },
+        low: { bg: "rgba(57,255,143,0.08)", border: "rgba(57,255,143,0.25)", color: "#39FF8F" },
+      }
+      const us = urgencyStyles[c.urgency || "high"]
+      return c.count ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          <div style={{ background: us.bg, border: `1.5px solid ${us.border}`, borderRadius: 15, padding: "17px", textAlign: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 11, marginBottom: c.cta_label ? 13 : 0 }}>
+              <span style={{ fontSize: 30 }}>🎟️</span>
+              <div style={{ textAlign: "left" }}>
+                <p style={{ color: us.color, fontSize: 34, fontWeight: 700, margin: 0, fontFamily: FONT_D, lineHeight: 1 }}>{c.count}</p>
+                <p style={{ color: MUTED, fontSize: 12, margin: "3px 0 0" }}>{c.label || "places restantes"}</p>
+              </div>
+            </div>
+            {c.cta_label && <a href={c.cta_url || "#"} target={/^https?:/.test(c.cta_url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "tickets")} style={{ display: "block", background: us.color, borderRadius: 11, padding: "13px", fontSize: 14, fontWeight: 700, color: c.urgency === "medium" || c.urgency === "low" ? "#080808" : "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</a>}
+          </div>
+        </div>
+      ) : null
+    }
+
     default: return null
   }
 }
@@ -1423,7 +1643,7 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
         {/* Blocks with staggered animation */}
         {blocks.map((block, idx) => (
           <AnimatedBlock key={block.id} delay={idx < 3 ? idx * 80 : 0}>
-            <RenderBlock block={block} theme={theme} pageId={page.id} />
+            <RenderBlock block={block} theme={theme} pageId={page.id} ownerEmail={page.profiles?.contact_email || page.profiles?.email} />
           </AnimatedBlock>
         ))}
 
