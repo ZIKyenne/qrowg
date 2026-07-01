@@ -3682,7 +3682,7 @@
     function toggleRight() { setRightCollapsed(p => !p); setFocusMode(false) }
 
     // ── Resize panneaux ────────────────────────────────────────────────────
-    const blocksResize = useResize("blocks", 230, 180, 480)
+    const blocksResize = useResize("blocks", 300, 240, 520)
     const rightResize = useResize("right", 340, 280, 520)
 
     // ── Favoris ───────────────────────────────────────────────────────────────
