@@ -3846,6 +3846,15 @@
       pushRecent(type)
     }
 
+    // Génère une identité de base (curated, sans IA) : profil + bio + compétences + disponibilité
+    function generateBaseIdentity() {
+      const mk = (type: string, ov: Record<string, string>) => ({ ...(BLOCK_DEFS[type]?.defaultContent || {}), ...ov })
+      if (!blocks.some(b => b.type === "profile")) addBlock("profile", mk("profile", { name: "Votre nom", tagline: "Consultant freelance", badge: "Disponible" }))
+      addBlock("bio", mk("bio", { text: "Je vous accompagne dans vos projets avec expertise et proximité. Écrivez-moi pour en discuter.", align: "center" }))
+      addBlock("skills", mk("skills", { title: "Mes compétences", tags: "Conseil, Accompagnement, Stratégie" }))
+      addBlock("availability", mk("availability", { message: "Ouvert aux nouvelles missions" }))
+    }
+
     function deleteBlock(id: string) {
       if (blocks.find(b => b.id === id)?.locked) return
       setBlocks(p => p.filter(b => b.id !== id))
@@ -4520,6 +4529,10 @@
                                     const grouped = IDENTITY_GROUPS.flatMap(g => g.keys)
                                     const rest = catBlocks.filter(([t]) => !grouped.includes(t)) // blocs identité non classés -> "Autres"
                                     return (<>
+                                      <button type="button" onClick={generateBaseIdentity} title="Ajoute profil + bio + compétences + disponibilité, prêts à éditer"
+                                        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "10px", margin: "2px 0 8px", borderRadius: 9, border: "none", cursor: "pointer", background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", color: "#080808", fontSize: 12, fontWeight: 800 }}>
+                                        ✨ Générer une identité de base
+                                      </button>
                                       {IDENTITY_GROUPS.map(g => {
                                         const gb = g.keys.filter(k => (BLOCK_DEFS as any)[k])
                                         if (!gb.length) return null
