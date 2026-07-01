@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react"
 import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
+import { submitLead } from "@/lib/submitLead"
 import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
@@ -132,11 +133,15 @@ function AccordionPublic({ items, title, G, TEXT, MUTED, FONT_B }: { items: [str
   )
 }
 
-// ── RSVP interactif public (réponse trackée en analytics) ────────────────────
+// ── RSVP interactif public (réponse enregistrée en base + trackée) ───────────
 function RsvpPublic({ block, pageId, TEXT, MUTED }: { block: Block; pageId: string; TEXT: string; MUTED: string }) {
   const c = block.content
   const [choice, setChoice] = useState<string | null>(null)
-  const pick = (val: string) => { setChoice(val); trackLinkClick(pageId, block.id, `rsvp:${val}`) }
+  const pick = (val: string) => {
+    setChoice(val)
+    trackLinkClick(pageId, block.id, `rsvp:${val}`)
+    submitLead({ pageId, blockId: block.id, type: "rsvp", message: val, data: { question: c.title || "RSVP", reponse: val } })
+  }
   return (
     <div style={{ padding: "10px 24px 14px" }}>
       <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{c.title || "Serez-vous présent ?"}</p>
@@ -154,21 +159,35 @@ function RsvpPublic({ block, pageId, TEXT, MUTED }: { block: Block; pageId: stri
   )
 }
 
-// ── Inscription événement public (email pré-rempli vers l'organisateur) ───────
+// ── Inscription événement public (enregistrée en base) ───────────────────────
 function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail }: { block: Block; pageId: string; TEXT: string; MUTED: string; ownerEmail?: string }) {
   const c = block.content
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
   const [company, setCompany] = useState("")
-  const inputStyle: any = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "11px 13px", color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box" }
-  const submit = () => {
+  const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle")
+  const inputStyle: any = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "11px 13px", color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }
+  const submit = async () => {
+    setStatus("sending")
     trackLinkClick(pageId, block.id, "register")
-    const lines = [`Nom: ${name}`, `Email: ${email}`, c.show_phone === "yes" ? `Telephone: ${phone}` : "", c.show_company === "yes" ? `Societe: ${company}` : ""].filter(Boolean)
-    const body = encodeURIComponent(lines.join("\n"))
-    const subject = encodeURIComponent(`Inscription: ${c.title || "evenement"}`)
-    if (ownerEmail) window.location.href = `mailto:${ownerEmail}?subject=${subject}&body=${body}`
+    const data: Record<string, any> = { nom: name, email }
+    if (c.show_phone === "yes") data.telephone = phone
+    if (c.show_company === "yes") data.societe = company
+    const ok = await submitLead({ pageId, blockId: block.id, type: "register", name, email, phone: c.show_phone === "yes" ? phone : undefined, message: `Inscription: ${c.title || "événement"}`, data })
+    if (ok) { setStatus("done"); return }
+    // Repli mailto si l'enregistrement échoue
+    if (ownerEmail) {
+      const body = encodeURIComponent(Object.entries(data).map(([k, v]) => `${k}: ${v}`).join("\n"))
+      window.location.href = `mailto:${ownerEmail}?subject=${encodeURIComponent(`Inscription: ${c.title || "evenement"}`)}&body=${body}`
+      setStatus("done")
+    } else setStatus("error")
   }
+  if (status === "done") return (
+    <div style={{ padding: "10px 24px 14px" }}>
+      <div style={{ background: "rgba(57,255,143,0.08)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 12, padding: "16px", textAlign: "center", color: "#39FF8F", fontSize: 14, fontWeight: 700 }}>✅ Inscription enregistrée, merci !</div>
+    </div>
+  )
   return (
     <div style={{ padding: "10px 24px 14px" }}>
       <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{c.title || "S'inscrire gratuitement"}</p>
@@ -178,24 +197,39 @@ function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail }: { block
         <input placeholder="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
         {c.show_phone === "yes" && <input placeholder="Téléphone" value={phone} onChange={e => setPhone(e.target.value)} style={inputStyle} />}
         {c.show_company === "yes" && <input placeholder="Société" value={company} onChange={e => setCompany(e.target.value)} style={inputStyle} />}
-        <button onClick={submit} disabled={!name || !email} style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 10, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", border: "none", cursor: name && email ? "pointer" : "not-allowed", opacity: name && email ? 1 : 0.55 }}>{c.button_label || "Je m'inscris"}</button>
+        {status === "error" && <p style={{ color: "#EF4444", fontSize: 12, margin: 0 }}>Une erreur est survenue. Réessayez.</p>}
+        <button onClick={submit} disabled={!name || !email || status === "sending"} style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 10, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", border: "none", cursor: name && email && status !== "sending" ? "pointer" : "not-allowed", opacity: name && email && status !== "sending" ? 1 : 0.55 }}>{status === "sending" ? "Envoi…" : (c.button_label || "Je m'inscris")}</button>
       </div>
     </div>
   )
 }
 
-// ── Formulaire public générique (envoi par mailto vers l'organisateur) ───────
-function LeadFormPublic({ block, pageId, ownerEmail, title, description, descColor, fields, button, accent, subject, TEXT, MUTED }: { block: Block; pageId: string; ownerEmail?: string; title: string; description?: string; descColor?: string; fields: { key: string; label: string; area?: boolean }[]; button: string; accent: string; subject: string; TEXT: string; MUTED: string }) {
+// ── Formulaire public générique (enregistré en base, repli mailto) ───────────
+function LeadFormPublic({ block, pageId, ownerEmail, leadType, title, description, descColor, fields, button, accent, subject, TEXT, MUTED }: { block: Block; pageId: string; ownerEmail?: string; leadType: string; title: string; description?: string; descColor?: string; fields: { key: string; label: string; area?: boolean }[]; button: string; accent: string; subject: string; TEXT: string; MUTED: string }) {
   const [vals, setVals] = useState<Record<string, string>>({})
+  const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle")
   const set = (k: string, v: string) => setVals(p => ({ ...p, [k]: v }))
   const required = fields.slice(0, 2).map(f => f.key)
   const ready = required.every(k => (vals[k] || "").trim())
   const inputStyle: any = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "11px 13px", color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }
-  const submit = () => {
+  const submit = async () => {
+    setStatus("sending")
     trackLinkClick(pageId, block.id, "form")
-    const body = encodeURIComponent(fields.map(f => `${f.label}: ${vals[f.key] || ""}`).join("\n"))
-    if (ownerEmail) window.location.href = `mailto:${ownerEmail}?subject=${encodeURIComponent(subject)}&body=${body}`
+    const data: Record<string, any> = {}
+    fields.forEach(f => { if (vals[f.key]) data[f.label] = vals[f.key] })
+    const ok = await submitLead({ pageId, blockId: block.id, type: leadType, name: vals.name, email: vals.email, phone: vals.phone, message: vals.message || vals.project || subject, data })
+    if (ok) { setStatus("done"); return }
+    if (ownerEmail) {
+      const body = encodeURIComponent(fields.map(f => `${f.label}: ${vals[f.key] || ""}`).join("\n"))
+      window.location.href = `mailto:${ownerEmail}?subject=${encodeURIComponent(subject)}&body=${body}`
+      setStatus("done")
+    } else setStatus("error")
   }
+  if (status === "done") return (
+    <div style={{ padding: "10px 24px 14px" }}>
+      <div style={{ background: "rgba(57,255,143,0.08)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 12, padding: "16px", textAlign: "center", color: "#39FF8F", fontSize: 14, fontWeight: 700 }}>✅ Demande envoyée, merci ! Nous revenons vers vous rapidement.</div>
+    </div>
+  )
   return (
     <div style={{ padding: "10px 24px 14px" }}>
       <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{title}</p>
@@ -204,7 +238,8 @@ function LeadFormPublic({ block, pageId, ownerEmail, title, description, descCol
         {fields.map(f => f.area
           ? <textarea key={f.key} placeholder={f.label} value={vals[f.key] || ""} onChange={e => set(f.key, e.target.value)} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
           : <input key={f.key} placeholder={f.label} value={vals[f.key] || ""} onChange={e => set(f.key, e.target.value)} style={inputStyle} />)}
-        <button onClick={submit} disabled={!ready} style={{ background: accent, borderRadius: 10, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", border: "none", cursor: ready ? "pointer" : "not-allowed", opacity: ready ? 1 : 0.55 }}>{button}</button>
+        {status === "error" && <p style={{ color: "#EF4444", fontSize: 12, margin: 0 }}>Une erreur est survenue. Réessayez.</p>}
+        <button onClick={submit} disabled={!ready || status === "sending"} style={{ background: accent, borderRadius: 10, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", border: "none", cursor: ready && status !== "sending" ? "pointer" : "not-allowed", opacity: ready && status !== "sending" ? 1 : 0.55 }}>{status === "sending" ? "Envoi…" : button}</button>
       </div>
     </div>
   )
@@ -1672,9 +1707,9 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
         </a>
       </div>
     ) : null
-    case "reservation_form": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} title={c.title || "Réserver"} fields={[{ key: "name", label: "Nom" }, { key: "date", label: "Date souhaitée" }, { key: "people", label: "Nb personnes" }]} button={c.button_label || "Réserver"} accent="linear-gradient(90deg,#EF4444,#dc2626)" subject={`Réservation: ${c.title || ""}`} TEXT={TEXT} MUTED={MUTED} />
-    case "quote_form": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} title={c.title || "Demander un devis"} description={c.description} fields={[{ key: "name", label: "Nom complet" }, { key: "email", label: "Email" }, ...(c.show_phone !== "no" ? [{ key: "phone", label: "Téléphone" }] : []), ...(c.show_budget === "yes" ? [{ key: "budget", label: "Budget estimé" }] : []), { key: "project", label: "Description du projet", area: true }]} button={c.button_label || "Envoyer ma demande"} accent={`linear-gradient(90deg,${G},${G}cc)`} subject="Demande de devis" TEXT={TEXT} MUTED={MUTED} />
-    case "booking_request": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} title={c.title || "Réserver pour un événement"} description={c.description} fields={[{ key: "name", label: "Nom / Organisation" }, { key: "email", label: "Email" }, { key: "type", label: "Type d'événement" }, { key: "date", label: "Date souhaitée" }, { key: "message", label: "Message", area: true }]} button={c.button_label || "Envoyer ma demande"} accent="linear-gradient(90deg,#9146FF,#7B3FCC)" subject="Demande de réservation événement" TEXT={TEXT} MUTED={MUTED} />
+    case "reservation_form": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} leadType="reservation" title={c.title || "Réserver"} fields={[{ key: "name", label: "Nom" }, { key: "date", label: "Date souhaitée" }, { key: "people", label: "Nb personnes" }]} button={c.button_label || "Réserver"} accent="linear-gradient(90deg,#EF4444,#dc2626)" subject={`Réservation: ${c.title || ""}`} TEXT={TEXT} MUTED={MUTED} />
+    case "quote_form": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} leadType="quote" title={c.title || "Demander un devis"} description={c.description} fields={[{ key: "name", label: "Nom complet" }, { key: "email", label: "Email" }, ...(c.show_phone !== "no" ? [{ key: "phone", label: "Téléphone" }] : []), ...(c.show_budget === "yes" ? [{ key: "budget", label: "Budget estimé" }] : []), { key: "project", label: "Description du projet", area: true }]} button={c.button_label || "Envoyer ma demande"} accent={`linear-gradient(90deg,${G},${G}cc)`} subject="Demande de devis" TEXT={TEXT} MUTED={MUTED} />
+    case "booking_request": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} leadType="booking" title={c.title || "Réserver pour un événement"} description={c.description} fields={[{ key: "name", label: "Nom / Organisation" }, { key: "email", label: "Email" }, { key: "type", label: "Type d'événement" }, { key: "date", label: "Date souhaitée" }, { key: "message", label: "Message", area: true }]} button={c.button_label || "Envoyer ma demande"} accent="linear-gradient(90deg,#9146FF,#7B3FCC)" subject="Demande de réservation événement" TEXT={TEXT} MUTED={MUTED} />
     case "quick_contact": {
       const items = [[c.phone, "📞", "#39FF8F", c.phone ? `tel:${c.phone}` : null], [c.email, "✉️", "#38BDF8", c.email ? `mailto:${c.email}` : null], [c.whatsapp, "💬", "#25D366", c.whatsapp ? `https://wa.me/${String(c.whatsapp).replace(/[^0-9]/g, "")}` : null], [c.address, "📍", G, null], [c.hours, "🕐", MUTED, null]].filter(([v]) => v)
       return items.length > 0 ? (
