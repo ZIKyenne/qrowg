@@ -4032,8 +4032,20 @@
         setSaving(true)
         const supabase = createClient()
         await supabase.from("pages").update({ title: pageName, theme }).eq("id", pageId)
-        await supabase.from("blocks").delete().eq("page_id", pageId)
-        if (blocks.length > 0) await supabase.from("blocks").insert(blocks.map((b, i) => ({ page_id: pageId, type: b.type, position: i, content: b.content, is_visible: b.visible && !b.draft, is_draft: b.draft || false, is_locked: b.locked || false, styles: {} })))
+        const allUuid = blocks.every(b => UUID_RE.test(b.id))
+        if (allUuid) {
+          // Sauvegarde qui CONSERVE les IDs : upsert des blocs actuels + suppression des seuls blocs retirés.
+          // -> l'historique de clics (block_clicks.block_id) survit aux publications.
+          const rows = blocks.map((b, i) => ({ id: b.id, page_id: pageId, type: b.type, position: i, content: b.content, is_visible: b.visible && !b.draft, is_draft: b.draft || false, is_locked: b.locked || false, styles: {} }))
+          const ids = blocks.map(b => b.id)
+          if (ids.length) await supabase.from("blocks").delete().eq("page_id", pageId).not("id", "in", `(${ids.join(",")})`)
+          else await supabase.from("blocks").delete().eq("page_id", pageId)
+          if (rows.length) await supabase.from("blocks").upsert(rows, { onConflict: "id" })
+        } else {
+          // Repli (IDs legacy non-UUID en mémoire) : ancien comportement, sûr. Les IDs deviennent UUID au prochain chargement.
+          await supabase.from("blocks").delete().eq("page_id", pageId)
+          if (blocks.length > 0) await supabase.from("blocks").insert(blocks.map((b, i) => ({ page_id: pageId, type: b.type, position: i, content: b.content, is_visible: b.visible && !b.draft, is_draft: b.draft || false, is_locked: b.locked || false, styles: {} })))
+        }
         setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
       }, 800)
     }, [blocks, pageName, theme, pageId])
@@ -4058,9 +4070,17 @@
       }
     }
 
+    // ID de bloc = UUID valide (colonne uuid en base) -> IDs stables entre sauvegardes,
+    // ce qui préserve l'historique de clics (block_clicks.block_id) au lieu de le perdre à chaque publication.
+    function genId(): string {
+      try { if (typeof crypto !== "undefined" && (crypto as any).randomUUID) return (crypto as any).randomUUID() } catch {}
+      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, ch => { const r = Math.floor(Math.random() * 16); const v = ch === "x" ? r : (r & 0x3 | 0x8); return v.toString(16) })
+    }
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
     function addBlock(type: string, content?: BlockContent) {
       const def = BLOCK_DEFS[type]; if (!def) return
-      const id = Date.now().toString(36) + Math.random().toString(36).slice(2)
+      const id = genId()
       setBlocks(p => [...p, { id, type, content: content||{...def.defaultContent}, visible: true }])
       setSelectedId(id); setRightTab("edit")
       pushRecent(type)
@@ -4103,7 +4123,7 @@
 
     function duplicateBlock(id: string) {
       const block = blocks.find(b => b.id === id); if (!block) return
-      const newId = Date.now().toString(36) + Math.random().toString(36).slice(2)
+      const newId = genId()
       const idx = blocks.findIndex(b => b.id === id)
       setBlocks(p => [...p.slice(0, idx+1), { ...block, id: newId, content: {...block.content} }, ...p.slice(idx+1)])
       setSelectedId(newId)
@@ -4155,7 +4175,7 @@
         const lastIdx = Math.max(...ids.map(id => result.findIndex(b => b.id === id)))
         const clones = ids.map(id => {
           const orig = result.find(b => b.id === id)!
-          const newId = Date.now().toString(36) + Math.random().toString(36).slice(2)
+          const newId = genId()
           newIds.push(newId)
           return { ...orig, id: newId, content: { ...orig.content } }
         })
