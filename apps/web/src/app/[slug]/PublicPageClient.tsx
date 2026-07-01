@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -648,9 +648,12 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
     )
 
     case "cover_banner": {
-      const h = c.height === "xl" ? 340 : c.height === "lg" ? 260 : c.height === "sm" ? 120 : 180
+      const h = bannerHeight(c, "public")
       const btype = c.banner_type || (c.src ? "image" : "gradient")
       const pos = c.text_position || "bottom-left"
+      const anim = c.animation && c.animation !== "none" ? c.animation : null
+      const rad = parseInt(c.block_radius) || 0
+      const txtColor = c.text_color || "#fff"
       const bannerBg = bannerBackgroundStyle(c, G)
       const voile = c.overlay_gradient === "bottom" ? "linear-gradient(to top, rgba(0,0,0,0.55), transparent 65%)"
         : c.overlay_gradient === "full" ? "linear-gradient(to top, rgba(0,0,0,0.5), rgba(0,0,0,0.15))" : null
@@ -658,18 +661,21 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       const justifyContent = (pos === "bottom-center" || pos === "center") ? "center" : "flex-start"
       const textAlign: any = (pos === "bottom-center" || pos === "center") ? "center" : "left"
       return (
-        <div style={{ position: "relative", overflow: "hidden" }}>
+        <div className={anim ? `qfb qfb-${anim}` : undefined} style={{ position: "relative", overflow: "hidden", borderRadius: rad || undefined }}>
+          {anim && <style>{BANNER_ANIM_CSS}</style>}
           {btype === "image"
             ? (c.src
-              ? <img src={c.src} alt="" style={{ width: "100%", height: h, objectFit: "cover", display: "block" }} />
-              : <div style={{ width: "100%", height: h, background: `linear-gradient(135deg,${G}33,${theme.accent || "#39FF8F"}22)` }} />)
-            : <div style={{ width: "100%", height: h, ...bannerBg }} />}
+              ? <img className="qfb-media" src={c.src} alt="" style={{ width: "100%", height: h, objectFit: "cover", display: "block" }} />
+              : <div className="qfb-media" style={{ width: "100%", height: h, background: `linear-gradient(135deg,${G}33,${theme.accent || "#39FF8F"}22)` }} />)
+            : <div className="qfb-media" style={{ width: "100%", height: h, ...bannerBg }} />}
+          {anim === "shimmer" && <div className="qfb-shine" />}
           {voile && <div style={{ position: "absolute", inset: 0, background: voile }} />}
           {c.overlay_color && <div style={{ position: "absolute", inset: 0, background: c.overlay_color, opacity: parseFloat(c.overlay_opacity || "0.3") }} />}
-          {(c.cover_title || c.cover_subtitle) && (
-            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems, justifyContent, padding: "16px 22px", textAlign }}>
-              {c.cover_title && <p style={{ color: "#fff", fontSize: 24, fontWeight: 700, margin: 0, textShadow: "0 2px 10px rgba(0,0,0,0.55)", fontFamily: FONT_D }}>{c.cover_title}</p>}
-              {c.cover_subtitle && <p style={{ color: "rgba(255,255,255,0.9)", fontSize: 14, margin: "5px 0 0", textShadow: "0 1px 8px rgba(0,0,0,0.55)", fontFamily: FONT_B }}>{c.cover_subtitle}</p>}
+          {(c.cover_title || c.cover_subtitle || c.badge) && (
+            <div className="qfb-content" style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems, justifyContent, padding: "16px 22px", textAlign, gap: 6 }}>
+              {c.badge && <span style={{ alignSelf: pos === "bottom-left" ? "flex-start" : "center", background: "rgba(255,255,255,0.18)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", borderRadius: 20, padding: "3px 12px", fontSize: 11, fontWeight: 700 }}>{c.badge}</span>}
+              {c.cover_title && <p style={{ color: txtColor, fontSize: 24, fontWeight: 700, margin: 0, textShadow: "0 2px 10px rgba(0,0,0,0.55)", fontFamily: FONT_D }}>{c.cover_title}</p>}
+              {c.cover_subtitle && <p style={{ color: txtColor, opacity: 0.9, fontSize: 14, margin: 0, textShadow: "0 1px 8px rgba(0,0,0,0.55)", fontFamily: FONT_B }}>{c.cover_subtitle}</p>}
             </div>
           )}
         </div>

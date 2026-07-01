@@ -6,7 +6,8 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import { createClient } from "@/lib/supabase/client"
 
@@ -617,9 +618,12 @@
         </div>
       )
       case "cover_banner": {
-        const bh = c.height==="xl" ? 180 : c.height==="lg" ? 140 : c.height==="sm" ? 70 : 100
+        const bh = bannerHeight(c, "editor")
         const btype = c.banner_type || (c.src ? "image" : "gradient")
         const pos = c.text_position || "bottom-left"
+        const anim = c.animation && c.animation !== "none" ? c.animation : null
+        const rad = parseInt(c.block_radius) || 0
+        const txtColor = c.text_color || "#fff"
         const bannerBg = bannerBackgroundStyle(c, accent)
         const voile = c.overlay_gradient==="bottom" ? "linear-gradient(to top, rgba(0,0,0,0.55), transparent 65%)"
           : c.overlay_gradient==="full" ? "linear-gradient(to top, rgba(0,0,0,0.5), rgba(0,0,0,0.15))" : null
@@ -627,18 +631,21 @@
         const justifyContent = (pos==="bottom-center"||pos==="center") ? "center" : "flex-start"
         const textAlign = (pos==="bottom-center"||pos==="center") ? "center" : "left"
         return (
-          <div style={{ position: "relative", overflow: "hidden", borderRadius: "10px 10px 0 0" }}>
+          <div className={anim ? `qfb qfb-${anim}` : undefined} style={{ position: "relative", overflow: "hidden", borderRadius: rad ? rad : "10px 10px 0 0" }}>
+            {anim && <style>{BANNER_ANIM_CSS}</style>}
             {btype==="image"
               ? (c.src
-                ? <img src={c.src} alt="" style={{ width: "100%", height: bh, objectFit: "cover", display: "block" }} />
-                : <div style={{ width: "100%", height: bh, background: `linear-gradient(135deg,${primary}30,${accent}20)`, display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: muted, fontSize: 11 }}>Bannière / Cover</span></div>)
-              : <div style={{ width: "100%", height: bh, ...bannerBg }} />}
+                ? <img className="qfb-media" src={c.src} alt="" style={{ width: "100%", height: bh, objectFit: "cover", display: "block" }} />
+                : <div className="qfb-media" style={{ width: "100%", height: bh, background: `linear-gradient(135deg,${primary}30,${accent}20)`, display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: muted, fontSize: 11 }}>Bannière / Cover</span></div>)
+              : <div className="qfb-media" style={{ width: "100%", height: bh, ...bannerBg }} />}
+            {anim==="shimmer" && <div className="qfb-shine" />}
             {voile && <div style={{ position: "absolute", inset: 0, background: voile }} />}
             {c.overlay_color && <div style={{ position: "absolute", inset: 0, background: c.overlay_color, opacity: parseFloat(c.overlay_opacity||"0.3") }} />}
-            {(c.cover_title || c.cover_subtitle) && (
-              <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems, justifyContent, padding: "10px 14px", textAlign }}>
-                {c.cover_title && <p style={{ color: "#fff", fontSize: 16, fontWeight: 700, margin: 0, textShadow: "0 2px 8px rgba(0,0,0,0.5)", fontFamily: theme.fontDisplay }}>{c.cover_title}</p>}
-                {c.cover_subtitle && <p style={{ color: "rgba(255,255,255,0.9)", fontSize: 11, margin: "3px 0 0", textShadow: "0 1px 6px rgba(0,0,0,0.5)" }}>{c.cover_subtitle}</p>}
+            {(c.cover_title || c.cover_subtitle || c.badge) && (
+              <div className="qfb-content" style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems, justifyContent, padding: "10px 14px", textAlign, gap: 4 }}>
+                {c.badge && <span style={{ alignSelf: pos==="bottom-left" ? "flex-start" : "center", background: "rgba(255,255,255,0.18)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", borderRadius: 20, padding: "2px 9px", fontSize: 9, fontWeight: 700 }}>{c.badge}</span>}
+                {c.cover_title && <p style={{ color: txtColor, fontSize: 16, fontWeight: 700, margin: 0, textShadow: "0 2px 8px rgba(0,0,0,0.5)", fontFamily: theme.fontDisplay }}>{c.cover_title}</p>}
+                {c.cover_subtitle && <p style={{ color: txtColor, opacity: 0.9, fontSize: 11, margin: 0, textShadow: "0 1px 6px rgba(0,0,0,0.5)" }}>{c.cover_subtitle}</p>}
               </div>
             )}
           </div>
@@ -2577,6 +2584,10 @@
     const def = BLOCK_DEFS[block.type]
     if (!def) return null
     const inputStyle: React.CSSProperties = { width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: "#F5F0E8", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
+
+    if (block.type === "cover_banner") {
+      return <BannerStudio content={block.content} onChange={onChange} />
+    }
 
     if (block.type === "social_links") {
       return (

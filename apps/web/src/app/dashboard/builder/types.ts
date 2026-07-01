@@ -183,6 +183,47 @@ export function bannerBackgroundStyle(c: any, accent = "#C9A84C"): Record<string
   return {} // image géré par une balise <img> séparée
 }
 
+// Hauteur d'une bannière : slider en px prioritaire, sinon fallback sur les presets sm/md/lg/xl
+export function bannerHeight(c: any, base: "editor" | "public" = "public"): number {
+  const px = parseInt(c.height_px)
+  if (px && px >= 40) return px
+  const map: Record<string, [number, number]> = { sm: [70, 120], md: [100, 180], lg: [140, 260], xl: [180, 340] }
+  const [ed, pub] = map[c.height as string] || map.md
+  return base === "editor" ? ed : pub
+}
+
+// Animations de bannière (parité builder <-> public). Classe sur le conteneur : `qfb qfb-<anim>`.
+// Éléments enfants : .qfb-media (image/dégradé), .qfb-content (texte), .qfb-shine (reflet shimmer).
+export const BANNER_ANIM_CSS = `
+@keyframes qfbKen{0%{transform:scale(1) translate(0,0)}100%{transform:scale(1.14) translate(-2.5%,-2.5%)}}
+@keyframes qfbZoom{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+@keyframes qfbShimmer{0%{transform:translateX(-130%) skewX(-12deg)}100%{transform:translateX(130%) skewX(-12deg)}}
+@keyframes qfbFlow{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+@keyframes qfbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes qfbPulse{0%,100%{opacity:.82}50%{opacity:1}}
+.qfb-kenburns .qfb-media{animation:qfbKen 20s ease-in-out infinite alternate;transform-origin:center}
+.qfb-zoom .qfb-media{animation:qfbZoom 10s ease-in-out infinite}
+.qfb-gradient_flow .qfb-media{background-size:220% 220%!important;animation:qfbFlow 9s linear infinite}
+.qfb-shimmer .qfb-shine{position:absolute;top:0;bottom:0;left:0;width:60%;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,0.28) 50%,transparent 65%);animation:qfbShimmer 3.8s ease-in-out infinite;pointer-events:none}
+.qfb-floating .qfb-content{animation:qfbFloat 5.5s ease-in-out infinite}
+.qfb-pulse .qfb-content{animation:qfbPulse 3.2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.qfb-media,.qfb-content,.qfb-shine{animation:none!important}}
+`
+
+// Presets de bannière : un clic configure plusieurs champs d'un coup
+export const BANNER_PRESETS: { key: string; label: string; emoji: string; content: Record<string, any> }[] = [
+  { key: "luxury", label: "Luxe", emoji: "👑", content: { banner_type: "gradient", grad_preset: "or_nuit", height_px: 220, block_radius: 16, text_position: "bottom-left", overlay_gradient: "bottom", animation: "shimmer", text_color: "#F5EBD0" } },
+  { key: "spotify", label: "Spotify", emoji: "🎧", content: { banner_type: "gradient", grad_preset: "menthe", height_px: 200, block_radius: 14, text_position: "bottom-left", overlay_gradient: "bottom", animation: "gradient_flow", text_color: "#ffffff" } },
+  { key: "apple", label: "Apple", emoji: "🍎", content: { banner_type: "color", bg_color: "#0b0b0f", height_px: 220, block_radius: 20, text_position: "center", overlay_gradient: "none", animation: "none", text_color: "#f5f5f7" } },
+  { key: "gaming", label: "Gaming", emoji: "🎮", content: { banner_type: "gradient", grad_preset: "violet", height_px: 240, block_radius: 12, text_position: "bottom-center", overlay_gradient: "full", animation: "pulse", text_color: "#ffffff" } },
+  { key: "minimal", label: "Minimal", emoji: "⚪", content: { banner_type: "color", bg_color: "#141414", height_px: 150, block_radius: 14, text_position: "center", overlay_gradient: "none", animation: "none", text_color: "#F5F0E8" } },
+  { key: "creator", label: "Créateur", emoji: "✨", content: { banner_type: "gradient", grad_preset: "aurore", height_px: 220, block_radius: 18, text_position: "bottom-left", overlay_gradient: "bottom", animation: "floating", text_color: "#ffffff" } },
+  { key: "fashion", label: "Mode", emoji: "🖤", content: { banner_type: "color", bg_color: "#0a0a0a", height_px: 280, block_radius: 0, text_position: "bottom-center", overlay_gradient: "bottom", animation: "kenburns", text_color: "#ffffff" } },
+  { key: "ocean", label: "Océan", emoji: "🌊", content: { banner_type: "gradient", grad_preset: "ocean", height_px: 210, block_radius: 16, text_position: "bottom-left", overlay_gradient: "bottom", animation: "gradient_flow", text_color: "#ffffff" } },
+  { key: "sunset", label: "Sunset", emoji: "🌇", content: { banner_type: "gradient", grad_preset: "coucher", height_px: 220, block_radius: 16, text_position: "bottom-left", overlay_gradient: "bottom", animation: "floating", text_color: "#ffffff" } },
+  { key: "corail", label: "Corail", emoji: "🪸", content: { banner_type: "gradient", grad_preset: "corail", height_px: 200, block_radius: 18, text_position: "center", overlay_gradient: "full", animation: "pulse", text_color: "#ffffff" } },
+]
+
 export function themeBackgroundStyle(theme: PageTheme): Record<string, string | number> {
   const t = theme as any
   if (t.bgMode === "pattern") {
