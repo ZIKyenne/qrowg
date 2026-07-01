@@ -2619,6 +2619,19 @@
                 </div>
               )
             })()}
+            {/* Compteur X/max + score pour champs à longueur conseillée (accroche…) */}
+            {(field as any).maxRecommended && (() => {
+              const len = (block.content[field.key] || "").length
+              if (!len) return null
+              const max = (field as any).maxRecommended as number
+              const [txt, col] = len <= max * 0.9 ? ["Excellent ✓", "#39FF8F"] : len <= max ? ["Correct", "#F59E0B"] : ["Trop long", "#FF6B6B"]
+              return (
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
+                  <span style={{ color: col, fontSize: 9, fontWeight: 600 }}>{txt}</span>
+                  <span style={{ color: len > max ? "#FF6B6B" : MUTED, fontSize: 9 }}>{len}/{max}</span>
+                </div>
+              )
+            })()}
             {/* Suggestions curées — pour ne jamais partir d'un champ vide */}
             {(field as any).suggestions && (block.content[field.key] || "").trim() === "" && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 6 }}>

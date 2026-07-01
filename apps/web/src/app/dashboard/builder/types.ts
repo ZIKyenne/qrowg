@@ -1836,6 +1836,7 @@ export interface BlockField {
   options?: string[]
   hint?: string
   suggestions?: string[]   // exemples curés tappables (pour ne jamais partir d'un champ vide)
+  maxRecommended?: number  // longueur conseillée -> compteur + score (Excellent/Correct/Trop long)
 }
 
 export interface BlockDef {
@@ -1895,9 +1896,9 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     defaultContent: { name: "Mon Nom", tagline: "Mon activite", badge: "" },
     fields: [
       { key: "name", label: "Nom complet", type: "text", placeholder: "Jean Dupont" },
-      { key: "tagline", label: "Accroche", type: "text", placeholder: "Developpeur, artiste, coach...", suggestions: ["Photographe à Reims", "Coach sportif indépendant", "Consultant freelance", "Créateur de contenu", "Agent immobilier", "Restaurant & bar à cocktails"] },
+      { key: "tagline", label: "Accroche", type: "text", placeholder: "Developpeur, artiste, coach...", maxRecommended: 80, suggestions: ["Photographe à Reims", "Coach sportif indépendant", "Consultant freelance", "Créateur de contenu", "Agent immobilier", "Restaurant & bar à cocktails"] },
       { key: "avatar", label: "Photo de profil", type: "image" },
-      { key: "badge", label: "Badge (optionnel)", type: "text", placeholder: "Disponible, Nouveau, Pro...", suggestions: ["Disponible", "Nouveau", "Certifié", "Ouvert aujourd'hui", "Réponse rapide"] },
+      { key: "badge", label: "Badge (optionnel)", type: "text", placeholder: "Disponible, Nouveau, Pro...", suggestions: ["Disponible", "Ouvert aujourd'hui", "Sur RDV", "Certifié", "Vérifié", "Premium", "Depuis 2019", "+500 clients", "★★★★★", "Recommandé", "Expert"] },
     ],
   },
   bio: {
