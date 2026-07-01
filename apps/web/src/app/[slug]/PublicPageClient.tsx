@@ -93,6 +93,45 @@ const SOCIAL_NETWORKS: Record<string, { icon: string; color: string; label: stri
 }
 
 // ── Render Block ─────────────────────────────────────────────────────────────
+// ── Blocs interactifs publics (onglets / accordéon) ──────────────────────────
+function TabsPublic({ tabs, G, TEXT, MUTED, FONT_B }: { tabs: [string, string][]; G: string; TEXT: string; MUTED: string; FONT_B: string }) {
+  const [active, setActive] = useState(0)
+  return (
+    <div style={{ padding: "10px 24px 14px" }}>
+      <div style={{ display: "flex", gap: 0, borderBottom: "1px solid rgba(255,255,255,0.08)", marginBottom: 13, overflowX: "auto" }}>
+        {tabs.map(([label], i) => (
+          <button key={i} onClick={() => setActive(i)} style={{ padding: "9px 15px", background: "transparent", border: "none", borderBottom: `2px solid ${active === i ? G : "transparent"}`, color: active === i ? G : MUTED, fontSize: 13, fontWeight: active === i ? 700 : 400, cursor: "pointer", whiteSpace: "nowrap", fontFamily: FONT_B }}>{label}</button>
+        ))}
+      </div>
+      <p style={{ color: TEXT, fontSize: 14, margin: 0, lineHeight: 1.7, whiteSpace: "pre-wrap", fontFamily: FONT_B }}>{tabs[active]?.[1] || ""}</p>
+    </div>
+  )
+}
+
+function AccordionPublic({ items, title, G, TEXT, MUTED, FONT_B }: { items: [string, string][]; title?: string; G: string; TEXT: string; MUTED: string; FONT_B: string }) {
+  const [openIdx, setOpenIdx] = useState<number | null>(0)
+  return (
+    <div style={{ padding: "10px 24px 14px" }}>
+      {title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{title}</p>}
+      <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+        {items.map(([t, content], i) => (
+          <div key={i} style={{ border: `1px solid ${openIdx === i ? `${G}40` : "rgba(255,255,255,0.07)"}`, borderRadius: 11, overflow: "hidden" }}>
+            <button onClick={() => setOpenIdx(openIdx === i ? null : i)} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 15px", background: openIdx === i ? `${G}08` : "transparent", border: "none", color: openIdx === i ? G : TEXT, fontSize: 14, fontWeight: 600, cursor: "pointer", textAlign: "left", fontFamily: FONT_B }}>
+              {t}
+              <span style={{ color: G, fontSize: 18, lineHeight: 1, flexShrink: 0, marginLeft: 10 }}>{openIdx === i ? "−" : "+"}</span>
+            </button>
+            {openIdx === i && content && (
+              <div style={{ padding: "4px 15px 14px", background: "rgba(0,0,0,0.15)" }}>
+                <p style={{ color: MUTED, fontSize: 13, margin: 0, lineHeight: 1.6, whiteSpace: "pre-wrap", fontFamily: FONT_B }}>{content}</p>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function RenderBlock({ block, theme, pageId }: { block: Block; theme: any; pageId: string }) {
   const c = block.content
   const G = theme.primary || "#C9A84C"
@@ -964,6 +1003,120 @@ function RenderBlock({ block, theme, pageId }: { block: Block; theme: any; pageI
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(57,255,143,0.08)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 20, padding: "8px 15px" }}>
                 <span style={{ color: "#39FF8F", fontSize: 15, fontWeight: 700 }}>{icon}</span>
                 <span style={{ color: TEXT, fontSize: 13, fontWeight: 600, fontFamily: FONT_B }}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+
+    case "quote_block": return (c.quote || c.author) ? (
+      <div style={{ padding: "14px 24px" }}>
+        <div style={{ background: `${G}08`, border: `1px solid ${G}20`, borderRadius: 15, padding: "22px 20px", position: "relative" }}>
+          <span style={{ position: "absolute", top: 12, left: 16, color: G, fontSize: 44, fontFamily: "Georgia, serif", lineHeight: 1, opacity: 0.35 }}>&ldquo;</span>
+          <p style={{ color: TEXT, fontSize: 17, fontStyle: "italic", lineHeight: 1.7, margin: "0 0 12px", paddingTop: 14, fontFamily: FONT_D }}>{c.quote}</p>
+          {c.author && (
+            <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+              <div style={{ width: 26, height: 2, background: G, borderRadius: 1 }} />
+              <p style={{ color: G, fontSize: 13, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.author}{c.source ? <span style={{ color: MUTED, fontWeight: 400 }}> — {c.source}</span> : null}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    ) : null
+    case "timeline": {
+      const events = [[c.e1_date, c.e1_title, c.e1_desc], [c.e2_date, c.e2_title, c.e2_desc], [c.e3_date, c.e3_title, c.e3_desc], [c.e4_date, c.e4_title, c.e4_desc]].filter(([, t]) => t)
+      return events.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 16px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ position: "relative", paddingLeft: 22 }}>
+            <div style={{ position: "absolute", left: 6, top: 8, bottom: 8, width: 2, background: `linear-gradient(180deg,${G},${G}40)`, borderRadius: 1 }} />
+            {events.map(([date, title, desc]: any[], i: number) => (
+              <div key={i} style={{ position: "relative", marginBottom: i < events.length - 1 ? 18 : 0 }}>
+                <div style={{ position: "absolute", left: -19, top: 4, width: 11, height: 11, borderRadius: "50%", background: i === events.length - 1 ? "#39FF8F" : G, border: `2px solid ${i === events.length - 1 ? "#39FF8F40" : `${G}40`}` }} />
+                <p style={{ color: G, fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>{date}</p>
+                <p style={{ color: TEXT, fontSize: 14, fontWeight: 600, margin: "0 0 2px", fontFamily: FONT_B }}>{title}</p>
+                {desc && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{desc}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "two_columns": {
+      const cols = [[c.col1_icon, c.col1_title, c.col1_text], [c.col2_icon, c.col2_title, c.col2_text]].filter(([, t, txt]) => t || txt)
+      return cols.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 13 }}>
+            {cols.map(([icon, title, txt]: any[], i: number) => (
+              <div key={i} style={{ background: `${G}06`, border: `1px solid ${G}15`, borderRadius: 13, padding: "14px 13px" }}>
+                {icon && <span style={{ fontSize: 26, display: "block", marginBottom: 9 }}>{icon}</span>}
+                {title && <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 5px", fontFamily: FONT_B }}>{title}</p>}
+                {txt && <p style={{ color: MUTED, fontSize: 12, margin: 0, lineHeight: 1.6 }}>{txt}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "tabs_block": {
+      const tabs = [[c.tab1_label, c.tab1_content], [c.tab2_label, c.tab2_content], [c.tab3_label, c.tab3_content]].filter(([l]) => l) as [string, string][]
+      return tabs.length > 0 ? <TabsPublic tabs={tabs} G={G} TEXT={TEXT} MUTED={MUTED} FONT_B={FONT_B} /> : null
+    }
+    case "accordion_block": {
+      const items = [[c.a1_title, c.a1_content], [c.a2_title, c.a2_content], [c.a3_title, c.a3_content], [c.a4_title, c.a4_content]].filter(([t]) => t) as [string, string][]
+      return items.length > 0 ? <AccordionPublic items={items} title={c.title} G={G} TEXT={TEXT} MUTED={MUTED} FONT_B={FONT_B} /> : null
+    }
+    case "info_box": {
+      const boxStyles: Record<string, any> = {
+        info: { bg: "rgba(56,189,248,0.08)", border: "rgba(56,189,248,0.3)", color: "#38BDF8" },
+        warning: { bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.3)", color: "#FBBF24" },
+        success: { bg: "rgba(57,255,143,0.08)", border: "rgba(57,255,143,0.3)", color: "#39FF8F" },
+        tip: { bg: "rgba(201,168,76,0.08)", border: "rgba(201,168,76,0.3)", color: "#C9A84C" },
+        important: { bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.3)", color: "#EF4444" },
+      }
+      const bs = boxStyles[c.type || "info"]
+      return (c.message || c.title) ? (
+        <div style={{ padding: "8px 24px" }}>
+          <div style={{ background: bs.bg, border: `1.5px solid ${bs.border}`, borderRadius: 13, padding: "15px 17px" }}>
+            <div style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
+              <span style={{ fontSize: 22, flexShrink: 0 }}>{c.emoji || "💡"}</span>
+              <div>
+                {c.title && <p style={{ color: bs.color, fontSize: 13, fontWeight: 700, margin: "0 0 4px", fontFamily: FONT_B }}>{c.title}</p>}
+                {c.message && <p style={{ color: TEXT, fontSize: 13, margin: 0, lineHeight: 1.6, whiteSpace: "pre-wrap", fontFamily: FONT_B }}>{c.message}</p>}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null
+    }
+    case "values": {
+      const vals = [[c.v1_icon, c.v1_label, c.v1_desc], [c.v2_icon, c.v2_label, c.v2_desc], [c.v3_icon, c.v3_label, c.v3_desc], [c.v4_icon, c.v4_label, c.v4_desc]].filter(([, l]) => l)
+      return vals.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+            {vals.map(([icon, label, desc]: any[], i: number) => (
+              <div key={i} style={{ background: `${G}08`, border: `1px solid ${G}15`, borderRadius: 13, padding: "14px 11px", textAlign: "center" }}>
+                {icon && <span style={{ fontSize: 26, display: "block", marginBottom: 7 }}>{icon}</span>}
+                <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: desc ? "0 0 3px" : "0", fontFamily: FONT_B }}>{label}</p>
+                {desc && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{desc}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "stats_block": {
+      const stats = [[c.s1_icon, c.s1_value, c.s1_label], [c.s2_icon, c.s2_value, c.s2_label], [c.s3_icon, c.s3_value, c.s3_label], [c.s4_icon, c.s4_value, c.s4_label]].filter(([, v]) => v)
+      return stats.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: stats.length <= 2 ? "1fr 1fr" : stats.length === 3 ? "1fr 1fr 1fr" : "1fr 1fr", gap: 9 }}>
+            {stats.map(([icon, value, label]: any[], i: number) => (
+              <div key={i} style={{ background: `${G}08`, border: `1px solid ${G}15`, borderRadius: 13, padding: "16px 10px", textAlign: "center" }}>
+                {icon && <span style={{ fontSize: 22, display: "block", marginBottom: 5 }}>{icon}</span>}
+                <p style={{ color: G, fontSize: 24, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_D, lineHeight: 1 }}>{value}</p>
+                <p style={{ color: MUTED, fontSize: 11, margin: 0, fontFamily: FONT_B }}>{label}</p>
               </div>
             ))}
           </div>
