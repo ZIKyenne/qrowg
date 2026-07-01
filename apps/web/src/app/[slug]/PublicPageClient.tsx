@@ -675,6 +675,127 @@ function RenderBlock({ block, theme, pageId }: { block: Block; theme: any; pageI
       ) : null
     }
 
+    case "product_catalog": {
+      const products = [[c.p1_img, c.p1_name, c.p1_price, c.p1_desc, c.p1_url], [c.p2_img, c.p2_name, c.p2_price, c.p2_desc, c.p2_url], [c.p3_img, c.p3_name, c.p3_price, c.p3_desc, c.p3_url]].filter(([, n]) => n)
+      return products.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
+            {products.map(([img, name, price, desc, url]: any[], i: number) => (
+              <a key={i} href={url || "#"} target={/^https?:/.test(url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, url || "product")} style={{ display: "flex", gap: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, overflow: "hidden", textDecoration: "none" }}>
+                {img ? <img src={String(img)} alt="" style={{ width: 84, height: 84, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 84, height: 84, background: "rgba(249,115,22,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, flexShrink: 0 }}>🛍️</div>}
+                <div style={{ flex: 1, minWidth: 0, padding: "10px 12px 10px 0" }}>
+                  <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{name}</p>
+                  {desc && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 5px" }}>{desc}</p>}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                    <span style={{ color: G, fontSize: 16, fontWeight: 700 }}>{price}</span>
+                    {c.cta_label && <span style={{ background: G, color: "#080808", borderRadius: 7, padding: "4px 11px", fontSize: 11, fontWeight: 700 }}>{c.cta_label}</span>}
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "featured_product": return (c.name || c.image) ? (
+      <div style={{ padding: "10px 24px 14px" }}>
+        <div style={{ background: `linear-gradient(135deg,${G}12,${theme.accent || "#39FF8F"}0a)`, border: `1.5px solid ${G}30`, borderRadius: 16, overflow: "hidden" }}>
+          {c.badge && <div style={{ background: G, color: "#080808", padding: "7px 14px", fontSize: 12, fontWeight: 700, textAlign: "center" }}>{c.badge}</div>}
+          {c.image
+            ? <img src={c.image} alt="" style={{ width: "100%", height: 200, objectFit: "cover", display: "block" }} />
+            : <div style={{ height: 150, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(249,115,22,0.06)", fontSize: 48 }}>⭐</div>}
+          <div style={{ padding: "16px" }}>
+            <p style={{ color: TEXT, fontSize: 18, fontWeight: 700, margin: "0 0 6px", fontFamily: FONT_D }}>{c.name || "Mon produit phare"}</p>
+            {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 12px", lineHeight: 1.5, fontFamily: FONT_B }}>{c.description}</p>}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: c.cta_label ? 14 : 0 }}>
+              <span style={{ color: G, fontSize: 24, fontWeight: 700 }}>{c.price || "99€"}</span>
+              {c.old_price && <span style={{ color: MUTED, fontSize: 15, textDecoration: "line-through" }}>{c.old_price}</span>}
+              {c.old_price && <span style={{ background: "#EF4444", color: "#fff", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>Promo</span>}
+            </div>
+            {c.cta_label && <a href={c.cta_url || c.url || "#"} target={/^https?:/.test(c.cta_url || c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || c.url || "product")} style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 11, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 800, color: "#080808", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</a>}
+          </div>
+        </div>
+      </div>
+    ) : null
+    case "offer_comparison": {
+      const plans = [{ name: c.plan1_name, price: c.plan1_price, features: c.plan1_features, hl: false }, { name: c.plan2_name, price: c.plan2_price, features: c.plan2_features, hl: c.plan2_highlight === "yes" }, { name: c.plan3_name, price: c.plan3_price, features: c.plan3_features, hl: false }].filter(p => p.name)
+      return plans.length > 0 ? (
+        <div style={{ padding: "16px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 14px", textAlign: "center", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", gap: 8 }}>
+            {plans.map((p, i) => (
+              <div key={i} style={{ flex: 1, minWidth: 0, background: p.hl ? `${G}12` : "rgba(255,255,255,0.03)", border: `1.5px solid ${p.hl ? `${G}50` : "rgba(255,255,255,0.08)"}`, borderRadius: 13, padding: "14px 10px", position: "relative" }}>
+                {p.hl && <div style={{ position: "absolute", top: -9, left: "50%", transform: "translateX(-50%)", background: G, color: "#080808", borderRadius: 20, padding: "2px 10px", fontSize: 9, fontWeight: 700, whiteSpace: "nowrap" }}>⭐ Populaire</div>}
+                <p style={{ color: p.hl ? G : TEXT, fontSize: 12, fontWeight: 700, margin: "0 0 5px", textAlign: "center", fontFamily: FONT_B }}>{p.name}</p>
+                <p style={{ color: G, fontSize: 19, fontWeight: 700, margin: "0 0 9px", textAlign: "center", fontFamily: FONT_D }}>{p.price}</p>
+                {(p.features || "").split("\n").filter(Boolean).map((f: string, j: number) => (
+                  <p key={j} style={{ color: MUTED, fontSize: 10.5, margin: "0 0 4px", display: "flex", gap: 5 }}><span style={{ color: "#39FF8F" }}>✓</span> {f}</p>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "packs": {
+      const packs = [[c.pack1_icon, c.pack1_name, c.pack1_price, c.pack1_content, c.pack1_url], [c.pack2_icon, c.pack2_name, c.pack2_price, c.pack2_content, c.pack2_url], [c.pack3_icon, c.pack3_name, c.pack3_price, c.pack3_content, c.pack3_url]].filter(([, n]) => n)
+      return packs.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
+            {packs.map(([icon, name, price, content]: any[], i: number) => (
+              <div key={i} style={{ background: i === 1 ? `${G}10` : "rgba(255,255,255,0.03)", border: `1.5px solid ${i === 1 ? `${G}35` : "rgba(255,255,255,0.07)"}`, borderRadius: 13, padding: "14px 15px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 9 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 9 }}><span style={{ fontSize: 22 }}>{icon || "🚀"}</span><p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{name}</p></div>
+                  <span style={{ color: G, fontSize: 17, fontWeight: 700 }}>{price}</span>
+                </div>
+                {(content || "").split("\n").filter(Boolean).map((line: string, j: number) => (
+                  <p key={j} style={{ color: MUTED, fontSize: 12, margin: "0 0 4px", display: "flex", gap: 7 }}><span style={{ color: "#39FF8F" }}>✓</span> {line}</p>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "promo_code": return c.code ? (
+      <div style={{ padding: "6px 24px 12px" }}>
+        <div style={{ background: "rgba(249,115,22,0.08)", border: "2px dashed rgba(249,115,22,0.3)", borderRadius: 13, padding: "16px", textAlign: "center" }}>
+          {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 9px", fontFamily: FONT_B }}>{c.description}</p>}
+          <div style={{ display: "inline-block", background: "rgba(249,115,22,0.15)", border: "2px solid rgba(249,115,22,0.4)", borderRadius: 9, padding: "10px 18px", fontFamily: "monospace", fontSize: 20, fontWeight: 700, color: "#F97316", letterSpacing: 3 }}>{c.code}</div>
+          {c.expires && <p style={{ color: MUTED, fontSize: 11, margin: "7px 0 0" }}>Expire le {c.expires}</p>}
+        </div>
+      </div>
+    ) : null
+    case "limited_offer": return (c.title || c.description) ? (
+      <div style={{ padding: "6px 24px 12px" }}>
+        <div style={{ background: "rgba(239,68,68,0.08)", border: "1.5px solid rgba(239,68,68,0.3)", borderRadius: 13, padding: "14px 16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 6 }}><span style={{ color: "#EF4444" }}>⚡</span><p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.title || "Offre limitée"}</p></div>
+          {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 7px" }}>{c.description}</p>}
+          {c.expires && <p style={{ color: "#EF4444", fontSize: 12, margin: "0 0 10px", fontWeight: 600 }}>⏰ Expire le {c.expires}</p>}
+          {c.cta_label && <a href={c.cta_url || "#"} target={/^https?:/.test(c.cta_url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "offer")} style={{ display: "block", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 9, padding: "12px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#EF4444", textDecoration: "none" }}>{c.cta_label}</a>}
+        </div>
+      </div>
+    ) : null
+    case "order_online": return (
+      <div style={{ padding: "6px 24px 10px" }}>
+        <a href={c.url || "#"} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "order")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(249,115,22,0.12)", border: "1.5px solid rgba(249,115,22,0.3)", borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
+          <span style={{ fontSize: 17 }}>🛒</span>
+          <span style={{ color: "#F97316", fontSize: 15, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Commander maintenant"}</span>
+        </a>
+      </div>
+    )
+    case "free_gift": return (
+      <div style={{ padding: "6px 24px 12px" }}>
+        <div style={{ background: "rgba(236,72,153,0.08)", border: "1.5px solid rgba(236,72,153,0.25)", borderRadius: 13, padding: "16px", textAlign: "center" }}>
+          <span style={{ fontSize: 32, display: "block", marginBottom: 8 }}>{c.emoji || "🎁"}</span>
+          {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 11px", fontFamily: FONT_B }}>{c.description}</p>}
+          <a href={c.url || "#"} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "gift")} style={{ display: "block", background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 10, padding: "12px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.label || "Recevoir mon cadeau"}</a>
+        </div>
+      </div>
+    )
+
     default: return null
   }
 }
