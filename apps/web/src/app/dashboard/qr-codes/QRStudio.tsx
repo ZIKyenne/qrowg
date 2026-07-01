@@ -8,7 +8,7 @@ import {
   RotateCcw, Loader2, Search, Trash2, Archive,
   MoreVertical, AlertTriangle, X,
   ImageIcon, FileText, Maximize2, ClipboardList, SlidersHorizontal,
-  Printer, LayoutGrid, TrendingUp, TrendingDown, BarChart, Sparkles, ArrowRight
+  Printer, LayoutGrid, TrendingUp, TrendingDown, BarChart, Sparkles, ArrowRight, ChevronDown
 } from "lucide-react"
 import dynamic from "next/dynamic"
 import { createClient } from "@/lib/supabase/client"
@@ -520,6 +520,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [showModal,  setShowModal]  = useState(false)
   const [scene,      setScene]      = useState<"none"|"phone"|"card"|"poster"|"sticker"|"tent">("none") // aperçu immersif
   const [level,      setLevel]      = useState<"simple"|"inter"|"expert">("simple") // niveau de réglages (désencombre le panneau)
+  const [modeSheet,  setModeSheet]  = useState(false) // mobile : sélecteur de mode en bottom sheet
   const [expOptsOpen, setExpOptsOpen] = useState(false) // options export techniques repliées sur mobile
   const [sceneSelOpen, setSceneSelOpen] = useState(false) // sélecteur d'aperçu replié sur mobile
   const [expMoreOpen, setExpMoreOpen] = useState(false) // actions secondaires export repliées sur mobile
@@ -2247,6 +2248,30 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
 
       {/* -- Modal preview plein ecran ------------------------------------------- */}
+      {/* Sélecteur de mode (mobile) — bottom sheet (§10) */}
+      {modeSheet && (
+        <div onClick={() => setModeSheet(false)} style={{ position:"fixed", inset:0, zIndex:2050, background:"rgba(0,0,0,0.55)", backdropFilter:"blur(3px)", display:"flex", alignItems:"flex-end" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width:"100%", background:"#141109", borderTop:"1px solid color-mix(in srgb, var(--accent) 22%, transparent)", borderTopLeftRadius:22, borderTopRightRadius:22, padding:"10px 16px calc(18px + env(safe-area-inset-bottom))" }}>
+            <div style={{ width:40, height:4, borderRadius:4, background:"rgba(255,255,255,0.18)", margin:"0 auto 14px" }} />
+            <p style={{ color:"#F5F0E8", fontSize:16, fontWeight:700, margin:"0 0 12px", fontFamily:"Cormorant Garamond, serif" }}>Niveau de réglages</p>
+            {([["simple","Simple","L'essentiel : un style et les couleurs. Pour aller vite."],["inter","Intermédiaire","+ formes des modules et des coins."],["expert","Expert","Tous les réglages : logo, dégradés, marge, correction d'erreur…"]] as const).map(([k,l,d]) => (
+              <button key={k} type="button" onClick={() => { setLevel(k); setModeSheet(false) }}
+                style={{ display:"flex", alignItems:"flex-start", gap:11, width:"100%", textAlign:"left" as const, padding:"13px 12px", marginBottom:6, borderRadius:12, cursor:"pointer",
+                  background: level===k ? "color-mix(in srgb, var(--accent) 14%, transparent)" : "rgba(255,255,255,0.03)",
+                  border: "1px solid " + (level===k ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "rgba(255,255,255,0.08)") }}>
+                <span style={{ marginTop:1, flexShrink:0, width:18, height:18, borderRadius:"50%", border:"2px solid " + (level===k?"var(--accent)":"rgba(255,255,255,0.25)"), display:"flex", alignItems:"center", justifyContent:"center" }}>
+                  {level===k && <span style={{ width:8, height:8, borderRadius:"50%", background:"var(--accent)" }} />}
+                </span>
+                <span style={{ minWidth:0 }}>
+                  <span style={{ display:"block", color: level===k ? "var(--accent)" : "#F5F0E8", fontSize:14, fontWeight:700 }}>{l}</span>
+                  <span style={{ display:"block", color:"#8A8478", fontSize:12, lineHeight:1.4, marginTop:2 }}>{d}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {showModal && (
         <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.92)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:2000, padding:isMobile?16:32 }}
           onClick={() => setShowModal(false)}>
@@ -3228,19 +3253,28 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
 
                   {/* Niveau de réglages : désencombre le panneau (Simple → Expert) */}
-                  <div style={{ display:"flex", gap:4, padding:4, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:11, marginBottom:2 }}>
-                    {([["simple","Simple"],["inter","Intermédiaire"],["expert","Expert"]] as const).map(([k,l]) => (
-                      <button key={k} type="button" onClick={() => setLevel(k)}
-                        style={{ flex:1, padding:"7px 4px", borderRadius:8, border:"none", cursor:"pointer", fontSize:10.5, fontWeight:level===k?700:500,
-                          background: level===k ? "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))" : "transparent",
-                          color: level===k ? "#080808" : "#8A8478" }}>
-                        {l}
-                      </button>
-                    ))}
-                  </div>
-                  <p style={{ color:MUTED, fontSize:9.5, margin:"0 0 4px", lineHeight:1.4 }}>
-                    {level==="simple" ? "L'essentiel : choisir un style et les couleurs. Idéal pour aller vite." : level==="inter" ? "+ formes des modules et des coins." : "Tous les réglages : logo, dégradés, marge, correction d'erreur…"}
-                  </p>
+                  {isMobile ? (
+                    // Mobile : bouton compact -> bottom sheet (§10)
+                    <button type="button" onClick={() => setModeSheet(true)}
+                      style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:8, width:"100%", padding:"10px 14px", marginBottom:4, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.09)", borderRadius:11, color:"#F5F0E8", fontSize:13, fontWeight:600, cursor:"pointer" }}>
+                      <span>Mode : <strong style={{ color:"var(--accent)" }}>{level==="simple"?"Simple":level==="inter"?"Intermédiaire":"Expert"}</strong></span>
+                      <ChevronDown size={16} color="#8A8478" />
+                    </button>
+                  ) : (<>
+                    <div style={{ display:"flex", gap:4, padding:4, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:11, marginBottom:2 }}>
+                      {([["simple","Simple"],["inter","Intermédiaire"],["expert","Expert"]] as const).map(([k,l]) => (
+                        <button key={k} type="button" onClick={() => setLevel(k)}
+                          style={{ flex:1, padding:"7px 4px", borderRadius:8, border:"none", cursor:"pointer", fontSize:10.5, fontWeight:level===k?700:500,
+                            background: level===k ? "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))" : "transparent",
+                            color: level===k ? "#080808" : "#8A8478" }}>
+                          {l}
+                        </button>
+                      ))}
+                    </div>
+                    <p style={{ color:MUTED, fontSize:9.5, margin:"0 0 4px", lineHeight:1.4 }}>
+                      {level==="simple" ? "L'essentiel : choisir un style et les couleurs. Idéal pour aller vite." : level==="inter" ? "+ formes des modules et des coins." : "Tous les réglages : logo, dégradés, marge, correction d'erreur…"}
+                    </p>
+                  </>)}
 
                   {/* 1. Bibliotheque de presets (ouvert par defaut) */}
                   <AccSection id="presets" title="Choisir un style" icon="✨" openId={openAcc} setOpenId={setOpenAcc}>
