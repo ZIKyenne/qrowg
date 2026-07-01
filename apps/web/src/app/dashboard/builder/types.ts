@@ -100,6 +100,16 @@ export function isClipShape(shape?: string): boolean {
   return shape === "hexagone" || shape === "diamant"
 }
 
+// Fond de l'avatar quand il n'y a pas de photo (initiales). Partagé éditeur ↔ page publique.
+export function avatarBgStyle(kind: string | undefined, c1: string, c2: string): Record<string, string> {
+  switch (kind) {
+    case "uni":  return { background: c1 }
+    case "halo": return { background: `radial-gradient(circle at 50% 32%, ${c2}, ${c1})` }
+    case "mesh": return { background: `radial-gradient(circle at 18% 20%, ${c1}, transparent 60%), radial-gradient(circle at 82% 72%, ${c2}, transparent 60%), ${c1}` }
+    default:     return { background: `linear-gradient(135deg, ${c1}, ${c2})` } // dégradé
+  }
+}
+
 // Contour + glow d'un avatar (partagé éditeur ↔ page publique). Gère les formes clip-path via drop-shadow.
 export function avatarDecoStyle(shape: string | undefined, borderKind: string | undefined, accent: string): Record<string, string> {
   const clip = isClipShape(shape)
@@ -1931,6 +1941,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "avatar", label: "Photo de profil", type: "image" },
       { key: "avatar_shape", label: "Forme de l'avatar", type: "select", options: ["cercle", "arrondi", "squircle", "hexagone", "carré", "diamant"] },
       { key: "avatar_border", label: "Contour de l'avatar", type: "select", options: ["simple", "aucun", "or", "neon", "lumineux"] },
+      { key: "avatar_bg", label: "Fond de l'avatar (sans photo)", type: "select", options: ["dégradé", "uni", "halo", "mesh"] },
       { key: "badge", label: "Badges (jusqu'à 5)", type: "text", placeholder: "Disponible, Certifié, +500 clients", hint: "Séparez par des virgules — ou cliquez les exemples pour composer", suggestionsMode: "append", suggestions: ["Disponible", "Ouvert aujourd'hui", "Sur RDV", "Certifié", "Vérifié", "Premium", "Depuis 2019", "+500 clients", "★★★★★", "Recommandé", "Expert"] },
     ],
   },
