@@ -612,6 +612,69 @@ function RenderBlock({ block, theme, pageId }: { block: Block; theme: any; pageI
       ) : null
     }
 
+    case "call_button": return c.phone ? (
+      <div style={{ padding: "6px 24px 10px" }}>
+        <a href={`tel:${c.phone}`} onClick={() => trackLinkClick(pageId, block.id, "call")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(57,255,143,0.1)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
+          <span style={{ fontSize: 17 }}>{c.icon || "📞"}</span>
+          <span style={{ color: "#39FF8F", fontSize: 15, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Appeler maintenant"}</span>
+        </a>
+      </div>
+    ) : null
+    case "whatsapp_button": { const num = (c.phone || "").replace(/\D/g, ""); return num ? (
+      <div style={{ padding: "6px 24px 10px" }}>
+        <a href={`https://wa.me/${num}${c.message ? `?text=${encodeURIComponent(c.message)}` : ""}`} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, "whatsapp")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(37,211,102,0.12)", border: "1.5px solid rgba(37,211,102,0.35)", borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
+          <span style={{ fontSize: 17 }}>💬</span>
+          <span style={{ color: "#25D366", fontSize: 15, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Discuter sur WhatsApp"}</span>
+        </a>
+      </div>
+    ) : null }
+    case "email_button": return c.email ? (
+      <div style={{ padding: "6px 24px 10px" }}>
+        <a href={`mailto:${c.email}${c.subject ? `?subject=${encodeURIComponent(c.subject)}` : ""}`} onClick={() => trackLinkClick(pageId, block.id, "email")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(56,189,248,0.1)", border: "1.5px solid rgba(56,189,248,0.3)", borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
+          <span style={{ fontSize: 17 }}>✉️</span>
+          <span style={{ color: "#38BDF8", fontSize: 15, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Envoyer un email"}</span>
+        </a>
+      </div>
+    ) : null
+    case "payment_button": return c.url ? (
+      <div style={{ padding: "6px 24px 10px" }}>
+        <a href={c.url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, "payment")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 13, padding: "15px 18px", textDecoration: "none", color: "#080808", fontSize: 15, fontWeight: 800, fontFamily: FONT_B }}>
+          💳 {c.label || "Payer maintenant"}
+        </a>
+      </div>
+    ) : null
+    case "booking_button": return c.url ? (
+      <div style={{ padding: "6px 24px 10px" }}>
+        <a href={c.url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, "booking")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: `${G}12`, border: `1.5px solid ${G}35`, borderRadius: 13, padding: "15px 18px", textDecoration: "none", color: G, fontSize: 15, fontWeight: 700, fontFamily: FONT_B }}>
+          📅 {c.label || "Prendre rendez-vous"}
+        </a>
+      </div>
+    ) : null
+    case "download_file": return c.url ? (
+      <div style={{ padding: "6px 24px 10px" }}>
+        <a href={c.url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, "download")} style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(167,139,250,0.08)", border: "1.5px solid rgba(167,139,250,0.28)", borderRadius: 13, padding: "13px 16px", textDecoration: "none" }}>
+          <div style={{ width: 42, height: 42, background: "rgba(167,139,250,0.15)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{c.icon || "📄"}</div>
+          <div style={{ flex: 1, minWidth: 0 }}><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.label || "Télécharger"}</p>{c.type_doc && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.type_doc}</p>}</div>
+          <span style={{ color: "#A78BFA", fontSize: 20, flexShrink: 0 }}>↓</span>
+        </a>
+      </div>
+    ) : null
+    case "multi_cta": {
+      const btns = [[c.btn1_icon, c.btn1_label, c.btn1_url], [c.btn2_icon, c.btn2_label, c.btn2_url], [c.btn3_icon, c.btn3_label, c.btn3_url], [c.btn4_icon, c.btn4_label, c.btn4_url]].filter(([, l]) => l)
+      return btns.length > 0 ? (
+        <div style={{ padding: "6px 24px 10px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            {btns.map(([icon, label, url]: any[], i: number) => (
+              <a key={i} href={url || "#"} target={/^https?:/.test(url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, url || "cta")} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, background: `${G}10`, border: `1px solid ${G}22`, borderRadius: 12, padding: "13px 8px", textDecoration: "none" }}>
+                <span style={{ fontSize: 22 }}>{icon || "⚡"}</span>
+                <span style={{ color: TEXT, fontSize: 12, fontWeight: 600, textAlign: "center", fontFamily: FONT_B }}>{label}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+
     default: return null
   }
 }
