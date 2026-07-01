@@ -4044,6 +4044,12 @@
       if (selectedId === id) { setSelectedId(null); setRightTab("preview") }
     }
 
+    function resetBlock(id: string) {
+      const block = blocks.find(b => b.id === id); if (!block || block.locked) return
+      const def = BLOCK_DEFS[block.type]
+      setBlocks(p => p.map(b => b.id === id ? { ...b, content: { ...(def?.defaultContent || {}) } } : b))
+    }
+
     function duplicateBlock(id: string) {
       const block = blocks.find(b => b.id === id); if (!block) return
       const newId = Date.now().toString(36) + Math.random().toString(36).slice(2)
@@ -4973,7 +4979,8 @@
                       onClick={e => e.stopPropagation()}>
                       <button onClick={() => moveBlock(block.id, -1)} disabled={idx===0} style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: idx===0 ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: idx===0 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><ChevronUp size={10} /></button>
                       <button onClick={() => moveBlock(block.id, 1)} disabled={idx===blocks.length-1} style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: idx===blocks.length-1 ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: idx===blocks.length-1 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><ChevronDown size={10} /></button>
-                      <button onClick={() => duplicateBlock(block.id)} style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><Copy size={10} /></button>
+                      <button onClick={() => duplicateBlock(block.id)} title="Dupliquer" style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}><Copy size={10} /></button>
+                      {!block.locked && <button onClick={e => { e.stopPropagation(); resetBlock(block.id) }} title="Réinitialiser le bloc (annulable)" style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6, fontSize: 12, lineHeight: 1 }}>↺</button>}
                       <button onClick={() => toggleVisible(block.id)} title={block.visible ? "Masquer" : "Afficher"}
                         style={{ width: 24, height: 24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: block.visible ? MUTED : "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>
                         {block.visible ? <Eye size={10} /> : <EyeOff size={10} />}
