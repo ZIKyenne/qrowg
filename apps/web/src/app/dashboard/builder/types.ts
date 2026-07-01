@@ -131,6 +131,7 @@ export function themeBackgroundStyle(theme: PageTheme): Record<string, string | 
 
 // ── Catégories de presets ─────────────────────────────────────────────────────
 export const PRESET_CATEGORIES = [
+  { id: "Minimal",      icon: "◻️", color: "#8A8478" },
   { id: "Business",     icon: "💼", color: "#3B82F6" },
   { id: "Luxury",       icon: "💎", color: "#C9A84C" },
   { id: "Creator",      icon: "🎨", color: "#EC4899" },
@@ -167,6 +168,22 @@ export const GOOGLE_FONTS = [
 
 // ── Thèmes prédéfinis ─────────────────────────────────────────────────────────
 export const PRESET_THEMES: Record<string, PageTheme> = {
+
+  // ── MINIMAL ──────────────────────────────────────────────────────────────────
+  epure_clair: {
+    name: "Épuré Clair", category: "Minimal", emoji: "◻️", tags: ["minimal","clair","sobre"],
+    bg: "#FAFAF8", surface: "#FFFFFF", primary: "#141414", accent: "#C9A84C",
+    text: "#161616", muted: "#8A8478",
+    fontDisplay: "Space Grotesk", fontBody: "DM Sans",
+    bgMode: "solid",
+  },
+  sobre_nuit: {
+    name: "Sobre Nuit", category: "Minimal", emoji: "🌑", tags: ["minimal","sombre","sobre"],
+    bg: "#0C0C0D", surface: "#161617", primary: "#F5F5F3", accent: "#C9A84C",
+    text: "#F0F0EE", muted: "#8A8A88",
+    fontDisplay: "Space Grotesk", fontBody: "DM Sans",
+    bgMode: "solid",
+  },
 
   // ── BUSINESS ─────────────────────────────────────────────────────────────────
   midnight_gold: {
