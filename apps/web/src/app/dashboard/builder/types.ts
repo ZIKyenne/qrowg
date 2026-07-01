@@ -223,14 +223,36 @@ export const BANNER_ANIM_CSS = `
 @keyframes qfbFlow{0%{background-position:0% 50%}100%{background-position:200% 50%}}
 @keyframes qfbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 @keyframes qfbPulse{0%,100%{opacity:.82}50%{opacity:1}}
+@keyframes qfbAurora{0%{transform:translate(-8%,-6%) rotate(0deg) scale(1.1)}100%{transform:translate(8%,6%) rotate(24deg) scale(1.25)}}
+.qfb-aurora-layer{animation:qfbAurora 14s ease-in-out infinite alternate}
 .qfb-kenburns .qfb-media{animation:qfbKen 20s ease-in-out infinite alternate;transform-origin:center}
 .qfb-zoom .qfb-media{animation:qfbZoom 10s ease-in-out infinite}
 .qfb-gradient_flow .qfb-media{background-size:220% 220%!important;animation:qfbFlow 9s linear infinite}
 .qfb-shimmer .qfb-shine{position:absolute;top:0;bottom:0;left:0;width:60%;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,0.28) 50%,transparent 65%);animation:qfbShimmer 3.8s ease-in-out infinite;pointer-events:none}
 .qfb-floating .qfb-content{animation:qfbFloat 5.5s ease-in-out infinite}
 .qfb-pulse .qfb-content{animation:qfbPulse 3.2s ease-in-out infinite}
-@media (prefers-reduced-motion:reduce){.qfb-media,.qfb-content,.qfb-shine{animation:none!important}}
+@media (prefers-reduced-motion:reduce){.qfb-media,.qfb-content,.qfb-shine,.qfb-aurora-layer{animation:none!important}}
 `
+
+// Texture de grain cinématographique (SVG inline, aucune requête réseau)
+export const BANNER_NOISE_URL = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"
+
+// Calques d'overlay d'une bannière (parité builder <-> public). Empilés sur le média.
+// fx : verre / grain / mesh / aurora ; voile de lisibilité ; teinte couleur + mode de fusion.
+export function bannerOverlayLayers(c: any, accent = "#C9A84C"): { className?: string; style: Record<string, any> }[] {
+  const layers: { className?: string; style: Record<string, any> }[] = []
+  const abs = { position: "absolute" as const, inset: 0 }
+  const fx = c.fx_overlay
+  if (fx === "glass") layers.push({ style: { ...abs, backdropFilter: "blur(7px)", WebkitBackdropFilter: "blur(7px)", background: "linear-gradient(135deg,rgba(255,255,255,0.14),rgba(255,255,255,0.03))", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.28)" } })
+  else if (fx === "noise") layers.push({ style: { ...abs, backgroundImage: `url("${BANNER_NOISE_URL}")`, opacity: 0.14, mixBlendMode: "overlay" } })
+  else if (fx === "mesh") layers.push({ style: { ...abs, background: `radial-gradient(at 18% 20%, ${accent}66, transparent 48%),radial-gradient(at 82% 12%, #9146FF55, transparent 50%),radial-gradient(at 55% 92%, #38BDF855, transparent 55%)`, mixBlendMode: "screen" } })
+  else if (fx === "aurora") layers.push({ className: "qfb-aurora-layer", style: { position: "absolute", inset: "-35%", background: "linear-gradient(120deg,rgba(57,255,143,0.28),rgba(145,70,255,0.22),rgba(56,189,248,0.26))", filter: "blur(26px)", mixBlendMode: "screen" } })
+  const voile = c.overlay_gradient === "bottom" ? "linear-gradient(to top, rgba(0,0,0,0.55), transparent 65%)"
+    : c.overlay_gradient === "full" ? "linear-gradient(to top, rgba(0,0,0,0.5), rgba(0,0,0,0.15))" : null
+  if (voile) layers.push({ style: { ...abs, background: voile } })
+  if (c.overlay_color && parseFloat(c.overlay_opacity || "0") > 0) layers.push({ style: { ...abs, background: c.overlay_color, opacity: parseFloat(c.overlay_opacity || "0.3"), mixBlendMode: c.blend_mode && c.blend_mode !== "normal" ? c.blend_mode : undefined } })
+  return layers
+}
 
 // Presets de bannière : un clic configure plusieurs champs d'un coup
 export const BANNER_PRESETS: { key: string; label: string; emoji: string; content: Record<string, any> }[] = [

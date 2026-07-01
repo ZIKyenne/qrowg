@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerTitleStyle, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerTitleStyle, bannerOverlayLayers, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import { createClient } from "@/lib/supabase/client"
@@ -625,8 +625,7 @@
         const rad = parseInt(c.block_radius) || 0
         const txtColor = c.text_color || "#fff"
         const bannerBg = bannerBackgroundStyle(c, accent)
-        const voile = c.overlay_gradient==="bottom" ? "linear-gradient(to top, rgba(0,0,0,0.55), transparent 65%)"
-          : c.overlay_gradient==="full" ? "linear-gradient(to top, rgba(0,0,0,0.5), rgba(0,0,0,0.15))" : null
+        const ovLayers = bannerOverlayLayers(c, accent)
         const alignItems = pos==="center" ? "center" : "flex-end"
         const justifyContent = (pos==="bottom-center"||pos==="center") ? "center" : "flex-start"
         const textAlign = (pos==="bottom-center"||pos==="center") ? "center" : "left"
@@ -639,8 +638,7 @@
                 : <div className="qfb-media" style={{ width: "100%", height: bh, background: `linear-gradient(135deg,${primary}30,${accent}20)`, display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: muted, fontSize: 11 }}>Bannière / Cover</span></div>)
               : <div className="qfb-media" style={{ width: "100%", height: bh, ...bannerBg }} />}
             {anim==="shimmer" && <div className="qfb-shine" />}
-            {voile && <div style={{ position: "absolute", inset: 0, background: voile }} />}
-            {c.overlay_color && <div style={{ position: "absolute", inset: 0, background: c.overlay_color, opacity: parseFloat(c.overlay_opacity||"0.3") }} />}
+            {ovLayers.map((l, i) => <div key={i} className={l.className} style={l.style} />)}
             {(c.cover_title || c.cover_subtitle || c.badge) && (
               <div className="qfb-content" style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems, justifyContent, padding: "10px 14px", textAlign, gap: 4 }}>
                 {c.badge && <span style={{ alignSelf: pos==="bottom-left" ? "flex-start" : "center", background: "rgba(255,255,255,0.18)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", borderRadius: 20, padding: "2px 9px", fontSize: 9, fontWeight: 700 }}>{c.badge}</span>}

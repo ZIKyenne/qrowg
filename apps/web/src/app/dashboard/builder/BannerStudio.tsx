@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { ImageIcon, LayoutGrid, Type, Palette, Sparkles, Layers, ChevronDown, Wand2, MoveVertical, AArrowUp } from "lucide-react"
 import ImageUpload from "./ImageUpload"
-import { BANNER_GRADIENTS, BANNER_PRESETS, BANNER_ANIM_CSS, BANNER_FONTS, bannerBackgroundStyle } from "./types"
+import { BANNER_GRADIENTS, BANNER_PRESETS, BANNER_ANIM_CSS, BANNER_FONTS, BANNER_NOISE_URL as NOISE_URL, bannerBackgroundStyle } from "./types"
 
 const G = "#C9A84C"
 const MUTED = "#8A8478"
@@ -334,6 +334,35 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
         </div>
         <ColorStudio label="Couleur voile" value={c.overlay_color} fallback="#000000" onChange={v => set("overlay_color", v)} />
         <Slider label="Opacité voile" value={Math.round((parseFloat(c.overlay_opacity ?? "0") || 0) * 100)} min={0} max={90} unit=" %" def={0} onChange={v => set("overlay_opacity", (v / 100).toFixed(2))} />
+        {(parseFloat(c.overlay_opacity || "0") > 0) && (
+          <div>
+            <label style={{ color: MUTED, fontSize: 11, fontWeight: 500, display: "block", marginBottom: 6 }}>Mode de fusion de la teinte</label>
+            <select value={c.blend_mode || "normal"} onChange={e => set("blend_mode", e.target.value)} style={{ width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "8px 10px", color: TEXT, fontSize: 12, outline: "none" }}>
+              {["normal", "multiply", "screen", "overlay", "soft-light", "color-burn", "darken", "lighten"].map(m => <option key={m} value={m}>{m}</option>)}
+            </select>
+          </div>
+        )}
+        <div>
+          <label style={{ color: MUTED, fontSize: 11, fontWeight: 500, display: "block", marginBottom: 7 }}>Effet d'overlay</label>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 6 }}>
+            {[
+              { key: "none", label: "Aucun", prev: <div style={{ position: "absolute", inset: 0, background: "#2a2a2a" }} /> },
+              { key: "glass", label: "Verre", prev: <div style={{ position: "absolute", inset: 0, backdropFilter: "blur(3px)", background: "linear-gradient(135deg,rgba(255,255,255,0.25),rgba(255,255,255,0.05))" }} /> },
+              { key: "noise", label: "Grain", prev: <div style={{ position: "absolute", inset: 0, backgroundImage: `url("${NOISE_URL}")`, opacity: 0.35 }} /> },
+              { key: "mesh", label: "Mesh", prev: <div style={{ position: "absolute", inset: 0, background: `radial-gradient(at 20% 20%,${G}99,transparent 50%),radial-gradient(at 80% 80%,#9146FF99,transparent 50%)` }} /> },
+              { key: "aurora", label: "Aurora", prev: <div style={{ position: "absolute", inset: 0, background: "linear-gradient(120deg,rgba(57,255,143,0.6),rgba(145,70,255,0.5),rgba(56,189,248,0.6))", filter: "blur(3px)" }} /> },
+            ].map(o => {
+              const on = (c.fx_overlay || "none") === o.key
+              return (
+                <button key={o.key} onClick={() => set("fx_overlay", o.key)} style={{ borderRadius: 9, overflow: "hidden", border: `1.5px solid ${on ? G : "rgba(255,255,255,0.1)"}`, cursor: "pointer", background: "transparent", padding: 0 }}>
+                  <div style={{ height: 32, position: "relative", background: "#1a1a1a" }}>{o.prev}</div>
+                  <div style={{ fontSize: 9.5, color: on ? G : MUTED, fontWeight: on ? 700 : 500, padding: "3px 2px", textAlign: "center" }}>{o.label}</div>
+                </button>
+              )
+            })}
+          </div>
+          <p style={{ color: MUTED, fontSize: 9.5, margin: "6px 0 0" }}>Verre = flou dépoli · Grain = texture ciné · Mesh = halos colorés · Aurora = lueur animée.</p>
+        </div>
       </Section>
 
       {/* EFFETS & ANIMATION — galerie prévisualisée en direct */}
