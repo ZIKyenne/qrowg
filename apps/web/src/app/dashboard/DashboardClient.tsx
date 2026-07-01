@@ -8,6 +8,7 @@ import { getPlan, fmtPrice } from "@/lib/plans"
 import Particles from "@/components/Particles"
 import { useIsMobile } from "@/lib/useIsMobile"
 import NextStepCard from "@/components/NextStepCard"
+import RecentLeadsCard from "./RecentLeadsCard"
 
 type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string }
 type Profile = { full_name: string | null; plan: string; total_scans: number; total_pages: number; avatar_url: string | null }
@@ -360,6 +361,9 @@ export default function DashboardClient() {
             </div>
           </div>
         </div>
+
+        {/* Derniers messages reçus (masqué si aucun) */}
+        <RecentLeadsCard />
 
         {/* Layout 2 colonnes — Mes pages = carte principale */}
         <div className="dz dash-2col" style={{ animationDelay: "180ms", display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 14 }}>

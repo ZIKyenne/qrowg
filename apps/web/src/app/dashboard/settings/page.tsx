@@ -51,7 +51,7 @@ export default function SettingsPage() {
   const [pwdError, setPwdError] = useState("")
 
   // Notifications
-  const [notifs, setNotifs] = useState({ scan_alert: true, weekly_report: true, product_updates: false, marketing: false })
+  const [notifs, setNotifs] = useState({ email_leads: true, scan_alert: true, weekly_report: true, product_updates: false, marketing: false })
   const [notifSaved, setNotifSaved] = useState(false)
 
   // Apparence
@@ -66,8 +66,12 @@ export default function SettingsPage() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { window.location.href = "/auth/login"; return }
-      const { data } = await supabase.from("profiles").select("id,email,full_name,plan").eq("id", user.id).single()
-      if (data) setProfile(data)
+      const { data } = await supabase.from("profiles").select("id,email,full_name,plan,preferences").eq("id", user.id).single()
+      if (data) {
+        setProfile(data)
+        const p = (data as any).preferences || {}
+        setNotifs(n => ({ ...n, email_leads: p.email_leads !== false }))
+      }
       setLoading(false)
     }
     load()
@@ -86,8 +90,14 @@ export default function SettingsPage() {
   }
 
   async function saveNotifications() {
-    // Sauvegarder dans localStorage pour l'instant
     localStorage.setItem("qrfolio_notifs", JSON.stringify(notifs))
+    // email_leads est réellement persisté en base (pilote la notification /api/emails/new-lead)
+    if (profile) {
+      const supabase = createClient()
+      const { data: cur } = await supabase.from("profiles").select("preferences").eq("id", profile.id).single()
+      const prefs = { ...((cur as any)?.preferences || {}), email_leads: notifs.email_leads }
+      await supabase.from("profiles").update({ preferences: prefs }).eq("id", profile.id)
+    }
     setNotifSaved(true); setTimeout(() => setNotifSaved(false), 2000)
   }
 
@@ -225,6 +235,8 @@ export default function SettingsPage() {
         {/* Notifications */}
         <Section title="Notifications" subtitle="Gère les e-mails que tu reçois" icon={<Bell size={16} />}>
           <div style={{ display: "flex", flexDirection: "column" }}>
+            <Toggle value={notifs.email_leads} onChange={v => setNotifs(n => ({ ...n, email_leads: v }))}
+              label="Nouveaux messages" description="Reçois un e-mail à chaque demande (devis, réservation, inscription, RSVP...)" />
             <Toggle value={notifs.scan_alert} onChange={v => setNotifs(n => ({ ...n, scan_alert: v }))}
               label="Alertes de scans" description="Reçois un e-mail quand ton QR code est scanné" />
             <Toggle value={notifs.weekly_report} onChange={v => setNotifs(n => ({ ...n, weekly_report: v }))}
