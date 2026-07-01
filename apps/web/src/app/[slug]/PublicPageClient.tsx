@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, waLink, telLink, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -784,17 +784,20 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       ) : null
     }
 
-    case "call_button": return c.phone ? (
+    case "call_button": { const href = telLink(c.phone); return href ? (
       <div style={{ padding: "6px 24px 10px" }}>
-        <a href={`tel:${c.phone}`} onClick={() => trackLinkClick(pageId, block.id, "call")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(57,255,143,0.1)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
+        <a href={href} onClick={() => trackLinkClick(pageId, block.id, "call")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(57,255,143,0.1)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 13, padding: c.sub ? "12px 18px" : "15px 18px", textDecoration: "none" }}>
           <span style={{ fontSize: 17 }}>{c.icon || "📞"}</span>
-          <span style={{ color: "#39FF8F", fontSize: 15, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Appeler maintenant"}</span>
+          <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <span style={{ color: "#39FF8F", fontSize: 15, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Appeler maintenant"}</span>
+            {c.sub && <span style={{ color: "rgba(57,255,143,0.7)", fontSize: 11, fontFamily: FONT_B }}>{c.sub}</span>}
+          </span>
         </a>
       </div>
-    ) : null
-    case "whatsapp_button": { const num = (c.phone || "").replace(/\D/g, ""); return num ? (
+    ) : null }
+    case "whatsapp_button": { const href = waLink(c.phone, c.message, c.country_code); return href ? (
       <div style={{ padding: "6px 24px 10px" }}>
-        <a href={`https://wa.me/${num}${c.message ? `?text=${encodeURIComponent(c.message)}` : ""}`} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, "whatsapp")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(37,211,102,0.12)", border: "1.5px solid rgba(37,211,102,0.35)", borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
+        <a href={href} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, "whatsapp")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(37,211,102,0.12)", border: "1.5px solid rgba(37,211,102,0.35)", borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
           <span style={{ fontSize: 17 }}>💬</span>
           <span style={{ color: "#25D366", fontSize: 15, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Discuter sur WhatsApp"}</span>
         </a>
@@ -1715,7 +1718,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
     case "quote_form": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} leadType="quote" title={c.title || "Demander un devis"} description={c.description} fields={[{ key: "name", label: "Nom complet" }, { key: "email", label: "Email" }, ...(c.show_phone !== "no" ? [{ key: "phone", label: "Téléphone" }] : []), ...(c.show_budget === "yes" ? [{ key: "budget", label: "Budget estimé" }] : []), { key: "project", label: "Description du projet", area: true }]} button={c.button_label || "Envoyer ma demande"} accent={`linear-gradient(90deg,${G},${G}cc)`} subject="Demande de devis" TEXT={TEXT} MUTED={MUTED} />
     case "booking_request": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} leadType="booking" title={c.title || "Réserver pour un événement"} description={c.description} fields={[{ key: "name", label: "Nom / Organisation" }, { key: "email", label: "Email" }, { key: "type", label: "Type d'événement" }, { key: "date", label: "Date souhaitée" }, { key: "message", label: "Message", area: true }]} button={c.button_label || "Envoyer ma demande"} accent="linear-gradient(90deg,#9146FF,#7B3FCC)" subject="Demande de réservation événement" TEXT={TEXT} MUTED={MUTED} />
     case "quick_contact": {
-      const items = [[c.phone, "📞", "#39FF8F", c.phone ? `tel:${c.phone}` : null], [c.email, "✉️", "#38BDF8", c.email ? `mailto:${c.email}` : null], [c.whatsapp, "💬", "#25D366", c.whatsapp ? `https://wa.me/${String(c.whatsapp).replace(/[^0-9]/g, "")}` : null], [c.address, "📍", G, null], [c.hours, "🕐", MUTED, null]].filter(([v]) => v)
+      const items = [[c.phone, "📞", "#39FF8F", telLink(c.phone) || null], [c.email, "✉️", "#38BDF8", c.email ? `mailto:${c.email}` : null], [c.whatsapp, "💬", "#25D366", waLink(c.whatsapp) || null], [c.address, "📍", G, null], [c.hours, "🕐", MUTED, null]].filter(([v]) => v)
       return items.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}

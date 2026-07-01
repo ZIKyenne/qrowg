@@ -337,6 +337,34 @@ export function profileBadgeStyle(label: string, accent: string): { color: strin
   return { color, bg: `${color}16`, border: `${color}33`, icon }
 }
 
+// Téléphone : normalisation pour liens tel: et wa.me (parité builder <-> public, testé).
+// countryCode = indicatif pays saisi (ex "33"). Si le numéro est déjà international (+…) on le respecte.
+export function normalizePhoneDigits(raw?: string, countryCode?: string): string {
+  const src = (raw || "").trim()
+  if (!src) return ""
+  const hasPlus = src.startsWith("+")
+  const digits = src.replace(/\D/g, "")
+  if (!digits) return ""
+  if (hasPlus) return digits // l'utilisateur a saisi l'international complet
+  const cc = (countryCode || "").replace(/\D/g, "")
+  if (cc) {
+    if (digits.startsWith(cc)) return digits
+    return cc + digits.replace(/^0+/, "") // retire le 0 national avant l'indicatif
+  }
+  return digits
+}
+export function waLink(phone?: string, message?: string, countryCode?: string): string {
+  const d = normalizePhoneDigits(phone, countryCode)
+  if (!d) return ""
+  return `https://wa.me/${d}${message ? `?text=${encodeURIComponent(message)}` : ""}`
+}
+export function telLink(phone?: string): string {
+  const raw = (phone || "").trim()
+  const digits = raw.replace(/\D/g, "")
+  if (!digits) return ""
+  return `tel:${raw.startsWith("+") ? "+" : ""}${digits}`
+}
+
 // Statuts de disponibilité (parité builder <-> public). Couleur personnalisable via dot_color.
 export const AVAILABILITY_STATUSES: { key: string; label: string; color: string }[] = [
   { key: "available", label: "Disponible", color: "#39FF8F" },
@@ -4026,7 +4054,8 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     defaultContent: { label: "Appeler maintenant", phone: "" },
     fields: [
       { key: "label", label: "Texte", type: "text", placeholder: "Appeler maintenant" },
-      { key: "phone", label: "Numero de telephone", type: "text", placeholder: "+33 6 12 34 56 78" },
+      { key: "phone", label: "Numéro de téléphone", type: "text", placeholder: "+33 6 12 34 56 78", hint: "Les espaces sont nettoyés automatiquement" },
+      { key: "sub", label: "Sous-texte (optionnel)", type: "text", placeholder: "Du lundi au vendredi, 9h-18h" },
       { key: "icon", label: "Emoji", type: "text", placeholder: "📞" },
     ],
   },
@@ -4036,8 +4065,9 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     defaultContent: { label: "Discuter sur WhatsApp", phone: "", message: "" },
     fields: [
       { key: "label", label: "Texte", type: "text", placeholder: "Discuter sur WhatsApp" },
-      { key: "phone", label: "Numero (avec indicatif)", type: "text", placeholder: "33612345678" },
-      { key: "message", label: "Message pre-rempli", type: "text", placeholder: "Bonjour, j ai une question..." },
+      { key: "phone", label: "Numéro", type: "text", placeholder: "06 12 34 56 78", hint: "Les espaces sont nettoyés automatiquement" },
+      { key: "country_code", label: "Indicatif pays", type: "text", placeholder: "33 (France)", hint: "Ex : 33 France · 32 Belgique · 41 Suisse · 1 Canada. Laissez vide si le numéro commence par +" },
+      { key: "message", label: "Message pré-rempli", type: "text", placeholder: "Bonjour, j'ai une question...", suggestions: ["Bonjour, je viens depuis votre QRfolio.", "Bonjour, je souhaite réserver.", "Bonjour, je souhaite obtenir un devis.", "Bonjour, je suis intéressé(e) par votre service."] },
     ],
   },
   email_button: {

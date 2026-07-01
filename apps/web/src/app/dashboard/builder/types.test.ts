@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest"
 import {
   bannerImageStyle, bannerOverlayLayers, availabilityStatus, profileBadgeStyle,
   bannerTitleStyle, bannerFrame, bannerHeight, bannerBackgroundStyle,
+  normalizePhoneDigits, waLink, telLink,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -131,6 +132,43 @@ describe("bannerHeight", () => {
   it("xl public = 340", () => expect(bannerHeight({ height: "xl" }, "public")).toBe(340))
   it("hauteur px prioritaire", () => expect(bannerHeight({ height_px: "200" }, "public")).toBe(200))
   it("md éditeur = 100", () => expect(bannerHeight({}, "editor")).toBe(100))
+})
+
+describe("normalizePhoneDigits", () => {
+  it("nettoie les espaces/ponctuation", () => {
+    expect(normalizePhoneDigits("06 12 34 56 78")).toBe("0612345678")
+  })
+  it("indicatif ajouté + 0 national retiré", () => {
+    expect(normalizePhoneDigits("06 12 34 56 78", "33")).toBe("33612345678")
+  })
+  it("numéro déjà international (+) respecté", () => {
+    expect(normalizePhoneDigits("+33 6 12 34 56 78", "33")).toBe("33612345678")
+  })
+  it("n'ajoute pas deux fois l'indicatif", () => {
+    expect(normalizePhoneDigits("33612345678", "33")).toBe("33612345678")
+  })
+  it("vide -> vide", () => {
+    expect(normalizePhoneDigits("", "33")).toBe("")
+  })
+})
+
+describe("waLink / telLink", () => {
+  it("waLink construit wa.me + message encodé", () => {
+    const l = waLink("0612345678", "Bonjour !", "33")
+    expect(l).toBe("https://wa.me/33612345678?text=Bonjour%20!")
+  })
+  it("waLink sans numéro -> vide", () => {
+    expect(waLink("", "x")).toBe("")
+  })
+  it("telLink garde le + international", () => {
+    expect(telLink("+33 6 12 34 56 78")).toBe("tel:+33612345678")
+  })
+  it("telLink national", () => {
+    expect(telLink("06 12 34 56 78")).toBe("tel:0612345678")
+  })
+  it("telLink vide -> vide", () => {
+    expect(telLink("")).toBe("")
+  })
 })
 
 describe("bannerBackgroundStyle", () => {
