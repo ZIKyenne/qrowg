@@ -4447,6 +4447,36 @@
                           if (!cat) return null
                           const collapsed = isCatCollapsed(activeCategory)
                           const catBlocks = Object.entries(BLOCK_DEFS).filter(([, def]) => def.category === activeCategory)
+                          // Sous-groupes clairs pour la section Identité (Essentiel / Image / Présentation / Confiance)
+                          const IDENTITY_GROUPS: { label: string; keys: string[] }[] = [
+                            { label: "Essentiel",    keys: ["profile", "bio"] },
+                            { label: "Image",        keys: ["cover_banner"] },
+                            { label: "Présentation", keys: ["skills", "about", "expertise", "languages", "journey"] },
+                            { label: "Confiance",    keys: ["availability", "certifications"] },
+                          ]
+                          const RECO = new Set(["profile"])
+                          const blockBtn = (type: string, def: any) => (
+                            <button key={type} onClick={() => addBlock(type)}
+                              style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 2, transition: "all 0.15s" }}
+                              onMouseEnter={e => { const el = e.currentTarget; el.style.background = def.color+"10"; el.style.color = "#F5F0E8"; el.style.borderColor = def.color+"20"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0.5"; showPopover(type, e) }}
+                              onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = MUTED; el.style.borderColor = "transparent"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0"; hidePopover() }}>
+                              <div style={{ width: 30, height: 30, borderRadius: 8, background: def.color+"12", border: `1px solid ${def.color}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
+                                  <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "inherit", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.label}</p>
+                                  {RECO.has(type) && <span style={{ flexShrink: 0, background: "rgba(201,168,76,0.16)", border: "1px solid rgba(201,168,76,0.35)", color: G, fontSize: 8, fontWeight: 800, letterSpacing: 0.3, borderRadius: 6, padding: "1px 5px", textTransform: "uppercase" as const }}>★ Reco</span>}
+                                </div>
+                                <p style={{ margin: 0, fontSize: 9, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1.3 }}>{def.description}</p>
+                              </div>
+                              <button onClick={e => { e.stopPropagation(); toggleFav(type) }}
+                                title={isFav(type) ? "Retirer des favoris" : "Ajouter aux favoris"}
+                                style={{ width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", cursor: "pointer", flexShrink: 0, fontSize: 13, opacity: isFav(type) ? 1 : 0, transition: "opacity 0.15s", color: isFav(type) ? "#FFD700" : MUTED }}
+                                className="fav-star">
+                                {isFav(type) ? "⭐" : "☆"}
+                              </button>
+                            </button>
+                          )
+                          const subHeader = { color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 1.2, margin: "9px 6px 3px" }
                           return (
                             <div>
                               <button onClick={() => toggleCat(activeCategory)}
@@ -4456,24 +4486,26 @@
                                 <span style={{ color: MUTED, fontSize: 9, marginRight: 4 }}>{catBlocks.length}</span>
                                 <span style={{ color: MUTED, fontSize: 10, display: "inline-block", transform: collapsed ? "rotate(-90deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>▾</span>
                               </button>
-                              {!collapsed && catBlocks.map(([type, def]) => (
-                                <button key={type} onClick={() => addBlock(type)}
-                                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 2, transition: "all 0.15s" }}
-                                  onMouseEnter={e => { const el = e.currentTarget; el.style.background = def.color+"10"; el.style.color = "#F5F0E8"; el.style.borderColor = def.color+"20"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0.5"; showPopover(type, e) }}
-                                  onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = MUTED; el.style.borderColor = "transparent"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0"; hidePopover() }}>
-                                  <div style={{ width: 30, height: 30, borderRadius: 8, background: def.color+"12", border: `1px solid ${def.color}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
-                                  <div style={{ flex: 1, minWidth: 0 }}>
-                                    <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
-                                    <p style={{ margin: 0, fontSize: 9, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1.3 }}>{def.description}</p>
-                                  </div>
-                                  <button onClick={e => { e.stopPropagation(); toggleFav(type) }}
-                                    title={isFav(type) ? "Retirer des favoris" : "Ajouter aux favoris"}
-                                    style={{ width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", cursor: "pointer", flexShrink: 0, fontSize: 13, opacity: isFav(type) ? 1 : 0, transition: "opacity 0.15s", color: isFav(type) ? "#FFD700" : MUTED }}
-                                    className="fav-star">
-                                    {isFav(type) ? "⭐" : "☆"}
-                                  </button>
-                                </button>
-                              ))}
+                              {!collapsed && (activeCategory === "identity"
+                                ? (() => {
+                                    const grouped = IDENTITY_GROUPS.flatMap(g => g.keys)
+                                    const rest = catBlocks.filter(([t]) => !grouped.includes(t)) // blocs identité non classés -> "Autres"
+                                    return (<>
+                                      {IDENTITY_GROUPS.map(g => {
+                                        const gb = g.keys.filter(k => (BLOCK_DEFS as any)[k])
+                                        if (!gb.length) return null
+                                        return (
+                                          <div key={g.label}>
+                                            <p style={subHeader}>{g.label}</p>
+                                            {gb.map(k => blockBtn(k, (BLOCK_DEFS as any)[k]))}
+                                          </div>
+                                        )
+                                      })}
+                                      {rest.length > 0 && (<div><p style={subHeader}>Autres</p>{rest.map(([t, d]) => blockBtn(t, d))}</div>)}
+                                    </>)
+                                  })()
+                                : catBlocks.map(([type, def]) => blockBtn(type, def))
+                              )}
                             </div>
                           )
                         })()}
