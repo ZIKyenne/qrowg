@@ -1124,6 +1124,248 @@ function RenderBlock({ block, theme, pageId }: { block: Block; theme: any; pageI
       ) : null
     }
 
+    case "discord_server": return (c.server_name || c.cta_url) ? (
+      <div style={{ padding: "10px 24px 12px" }}>
+        <div style={{ background: "rgba(88,101,242,0.08)", border: "1.5px solid rgba(88,101,242,0.25)", borderRadius: 13, padding: "15px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 11 }}>
+            <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(88,101,242,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 23, flexShrink: 0 }}>🎮</div>
+            <div style={{ flex: 1 }}>
+              <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 1px", fontFamily: FONT_B }}>{c.server_name || "Mon Serveur"}</p>
+              {c.members && <p style={{ color: MUTED, fontSize: 11, margin: "0 0 1px" }}>👥 {c.members}</p>}
+              {c.description && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.description}</p>}
+            </div>
+          </div>
+          <a href={c.cta_url || "#"} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "discord")} style={{ display: "block", background: "#5865F2", color: "#fff", textAlign: "center", padding: "12px", borderRadius: 9, fontSize: 13, fontWeight: 700, textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label || "Rejoindre le Discord"}</a>
+        </div>
+      </div>
+    ) : null
+    case "telegram_channel": return (c.channel_name || c.cta_url) ? (
+      <div style={{ padding: "10px 24px 12px" }}>
+        <div style={{ background: "rgba(38,165,228,0.08)", border: "1.5px solid rgba(38,165,228,0.25)", borderRadius: 13, padding: "15px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 11 }}>
+            <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(38,165,228,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 23, flexShrink: 0 }}>✈️</div>
+            <div style={{ flex: 1 }}>
+              <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 1px", fontFamily: FONT_B }}>{c.channel_name || "Mon Canal"}</p>
+              {c.members && <p style={{ color: MUTED, fontSize: 11, margin: "0 0 1px" }}>👥 {c.members}</p>}
+              {c.description && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.description}</p>}
+            </div>
+          </div>
+          <a href={c.cta_url || "#"} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "telegram")} style={{ display: "block", background: "#26A5E4", color: "#fff", textAlign: "center", padding: "12px", borderRadius: 9, fontSize: 13, fontWeight: 700, textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label || "Rejoindre le canal"}</a>
+        </div>
+      </div>
+    ) : null
+    case "youtube_channel": return (c.channel_name || c.cta_url) ? (
+      <div style={{ padding: "10px 24px 12px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 13 }}>
+          <div style={{ width: 46, height: 46, borderRadius: "50%", background: "rgba(255,0,0,0.15)", border: "2px solid rgba(255,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 21, flexShrink: 0 }}>▶️</div>
+          <div style={{ flex: 1 }}>
+            <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{c.channel_name || "Ma Chaîne"}</p>
+            {c.subscribers && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.subscribers}</p>}
+          </div>
+        </div>
+        <a href={c.cta_url || "#"} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "youtube")} style={{ display: "block", background: "#FF0000", color: "#fff", textAlign: "center", padding: "12px", borderRadius: 9, fontSize: 13, fontWeight: 700, textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label || "S'abonner"}</a>
+      </div>
+    ) : null
+    case "twitch_live": {
+      const isLive = c.status === "live"
+      return (c.username || c.cta_url) ? (
+        <div style={{ padding: "10px 24px 12px" }}>
+          <div style={{ background: isLive ? "rgba(145,70,255,0.1)" : "rgba(255,255,255,0.03)", border: `1.5px solid ${isLive ? "rgba(145,70,255,0.4)" : "rgba(255,255,255,0.08)"}`, borderRadius: 13, padding: "15px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 11 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 10, background: "rgba(145,70,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 21, flexShrink: 0 }}>🎮</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                  <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.username || "monpseudo"}</p>
+                  {isLive && <span style={{ background: "#EF4444", color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 9, fontWeight: 700 }}>● LIVE</span>}
+                </div>
+                {c.game && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>🎯 {c.game}</p>}
+                {c.viewers && isLive && <p style={{ color: "#9146FF", fontSize: 11, margin: 0 }}>👁 {c.viewers}</p>}
+                {!isLive && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>Hors ligne</p>}
+              </div>
+            </div>
+            <a href={c.cta_url || "#"} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "twitch")} style={{ display: "block", background: "#9146FF", color: "#fff", textAlign: "center", padding: "11px", borderRadius: 9, fontSize: 13, fontWeight: 700, textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label || "Rejoindre le live"}</a>
+          </div>
+        </div>
+      ) : null
+    }
+    case "tiktok_feed": return (c.username || c.cta_url) ? (
+      <div style={{ padding: "10px 24px 12px" }}>
+        <div style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(245,240,232,0.12)", borderRadius: 13, padding: "15px", textAlign: "center" }}>
+          <span style={{ fontSize: 30, display: "block", marginBottom: 8 }}>🎵</span>
+          {c.username && <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 10px", fontFamily: FONT_B }}>{c.username}</p>}
+          <a href={c.cta_url || "#"} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "tiktok")} style={{ display: "block", background: "linear-gradient(90deg,#ff0050,#00f2ea)", color: "#fff", padding: "11px", borderRadius: 9, fontSize: 13, fontWeight: 700, textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label || "Voir sur TikTok"}</a>
+        </div>
+      </div>
+    ) : null
+    case "podcast_links": {
+      const platforms = [["spotify_url", "🟢", "#1DB954", "Spotify Podcasts"], ["apple_url", "🍎", "#B150E2", "Apple Podcasts"], ["pocket_url", "📻", "#F43E37", "Pocket Casts"], ["rss_url", "📡", "#F97316", "RSS Feed"]].filter(([k]) => c[k as string])
+      return (platforms.length > 0 || c.podcast_name) ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 13 }}>
+            {c.cover_url
+              ? <img src={c.cover_url} alt="" style={{ width: 54, height: 54, borderRadius: 11, objectFit: "cover", flexShrink: 0 }} />
+              : <div style={{ width: 54, height: 54, borderRadius: 11, background: "rgba(177,80,226,0.15)", border: "1px solid rgba(177,80,226,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 27, flexShrink: 0 }}>🎙️</div>}
+            <div>
+              <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{c.podcast_name || "Mon Podcast"}</p>
+              {c.description && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{c.description}</p>}
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+            {platforms.map(([k, icon, color, label]: any[]) => (
+              <a key={String(k)} href={c[k as string]} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c[k as string])} style={{ display: "flex", alignItems: "center", gap: 11, background: `${color}12`, border: `1px solid ${color}25`, borderRadius: 10, padding: "11px 13px", textDecoration: "none" }}>
+                <span style={{ fontSize: 17 }}>{icon}</span>
+                <span style={{ color: TEXT, fontSize: 13, fontWeight: 600, flex: 1, fontFamily: FONT_B }}>{label}</span>
+                <ExternalLink size={12} color={color as string} />
+              </a>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "favorite_links": {
+      const links = [[c.link_1_icon, c.link_1_label, c.link_1_url], [c.link_2_icon, c.link_2_label, c.link_2_url], [c.link_3_icon, c.link_3_label, c.link_3_url], [c.link_4_icon, c.link_4_label, c.link_4_url], [c.link_5_icon, c.link_5_label, c.link_5_url]].filter(([, l]) => l)
+      return links.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {links.map(([icon, label, url]: any[], i: number) => (
+              <a key={i} href={url || "#"} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, url || "link")} style={{ display: "flex", alignItems: "center", gap: 13, background: `${G}08`, border: `1px solid ${G}15`, borderRadius: 11, padding: "12px 13px", textDecoration: "none" }}>
+                <span style={{ fontSize: 21, flexShrink: 0 }}>{icon || "🔗"}</span>
+                <span style={{ color: TEXT, fontSize: 14, fontWeight: 600, flex: 1, fontFamily: FONT_B }}>{label}</span>
+                <ExternalLink size={12} color={G} />
+              </a>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "image_carousel": {
+      const imgs = [c.img1, c.img2, c.img3, c.img4, c.img5, c.img6].filter(Boolean)
+      return imgs.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", gap: 9, overflowX: "auto", paddingBottom: 4, scrollSnapType: "x mandatory" }}>
+            {imgs.map((img, i) => <img key={i} src={String(img)} alt="" style={{ width: 150, height: 150, flexShrink: 0, objectFit: "cover", borderRadius: 11, scrollSnapAlign: "start" }} />)}
+          </div>
+        </div>
+      ) : null
+    }
+    case "media_before_after": return (c.before_img || c.after_img) ? (
+      <div style={{ padding: "10px 24px 14px" }}>
+        {c.title && <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 11px", textAlign: "center", fontFamily: FONT_B }}>{c.title}</p>}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+          <div style={{ borderRadius: 11, overflow: "hidden" }}>
+            {c.before_img ? <img src={c.before_img} alt="Avant" style={{ width: "100%", height: 150, objectFit: "cover", display: "block" }} /> : <div style={{ height: 150, background: "rgba(239,68,68,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30 }}>📸</div>}
+            <div style={{ background: "rgba(239,68,68,0.15)", padding: "7px", textAlign: "center" }}><p style={{ color: "#EF4444", fontSize: 12, fontWeight: 700, margin: 0 }}>{c.before_label || "Avant"}</p></div>
+          </div>
+          <div style={{ borderRadius: 11, overflow: "hidden" }}>
+            {c.after_img ? <img src={c.after_img} alt="Après" style={{ width: "100%", height: 150, objectFit: "cover", display: "block" }} /> : <div style={{ height: 150, background: "rgba(57,255,143,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30 }}>✨</div>}
+            <div style={{ background: "rgba(57,255,143,0.15)", padding: "7px", textAlign: "center" }}><p style={{ color: "#39FF8F", fontSize: 12, fontWeight: 700, margin: 0 }}>{c.after_label || "Après"}</p></div>
+          </div>
+        </div>
+        {c.description && <p style={{ color: MUTED, fontSize: 12, textAlign: "center", margin: "9px 0 0" }}>{c.description}</p>}
+      </div>
+    ) : null
+    case "video_local": return c.src ? (
+      <div style={{ padding: "10px 24px 14px" }}>
+        <div style={{ borderRadius: 13, overflow: "hidden", background: "#000" }}>
+          <video src={c.src} poster={c.poster || undefined} controls style={{ width: "100%", maxHeight: 260, display: "block" }} autoPlay={c.autoplay === "yes"} loop={c.loop === "yes"} muted={c.muted !== "no"} playsInline />
+        </div>
+        {c.title && <p style={{ color: TEXT, fontSize: 14, fontWeight: 600, margin: "9px 0 0", textAlign: "center", fontFamily: FONT_B }}>{c.title}</p>}
+      </div>
+    ) : null
+    case "pdf_viewer": return (c.url || c.title) ? (
+      <div style={{ padding: "10px 24px 14px" }}>
+        <div style={{ background: "rgba(78,205,196,0.06)", border: "1.5px solid rgba(78,205,196,0.2)", borderRadius: 15, padding: "17px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: c.url ? 13 : 0 }}>
+            <div style={{ width: 46, height: 54, background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 23, flexShrink: 0 }}>📄</div>
+            <div style={{ flex: 1 }}>
+              <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{c.title || "Mon document PDF"}</p>
+              {c.description && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{c.description}</p>}
+            </div>
+          </div>
+          {c.url && (
+            <div style={{ display: "flex", gap: 8 }}>
+              <a href={c.url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url)} style={{ flex: 1, background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 9, padding: "11px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#080808", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label || "Consulter le PDF"}</a>
+              {c.show_download !== "no" && <a href={c.url} download onClick={() => trackLinkClick(pageId, block.id, c.url)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, padding: "11px 16px", fontSize: 13, fontWeight: 600, color: MUTED, textDecoration: "none" }}>↓ PDF</a>}
+            </div>
+          )}
+        </div>
+      </div>
+    ) : null
+    case "youtube_gallery": {
+      const videos = [[c.video1_url, c.video1_title], [c.video2_url, c.video2_title], [c.video3_url, c.video3_title]].filter(([u]) => u)
+      return videos.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
+            {videos.map(([url, title]: any[], i: number) => {
+              const videoId = String(url).match(/(?:v=|youtu\.be\/)([^&\s]+)/)?.[1]
+              return (
+                <a key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ display: "block", borderRadius: 11, overflow: "hidden", background: "#000", position: "relative", textDecoration: "none" }}>
+                  {videoId ? <img src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} alt="" style={{ width: "100%", height: 150, objectFit: "cover", display: "block" }} /> : <div style={{ height: 150, background: "rgba(255,0,0,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>▶️</div>}
+                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: 44, height: 44, background: "rgba(255,0,0,0.9)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: "#fff", fontSize: 16, marginLeft: 3 }}>▶</span></div>
+                  </div>
+                  {title && <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent,rgba(0,0,0,0.85))", padding: "24px 12px 10px" }}><p style={{ color: "#fff", fontSize: 12, margin: 0, fontFamily: FONT_B }}>{title}</p></div>}
+                </a>
+              )
+            })}
+          </div>
+          {c.cta_label && c.channel_url && <a href={c.channel_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.channel_url)} style={{ display: "block", marginTop: 11, background: "rgba(255,0,0,0.1)", border: "1px solid rgba(255,0,0,0.25)", borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#FF0000", textDecoration: "none" }}>{c.cta_label}</a>}
+        </div>
+      ) : null
+    }
+    case "tiktok_gallery": {
+      const vids = [c.video1_url, c.video2_url, c.video3_url].filter(Boolean)
+      return (vids.length > 0 || c.cta_url) ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
+          {c.username && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 10px", textAlign: "center" }}>{c.username}</p>}
+          {vids.length > 0 && (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 6 }}>
+              {[c.video1_url, c.video2_url, c.video3_url].map((url, i) => url ? (
+                <a key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ aspectRatio: "9/16", background: "linear-gradient(135deg,rgba(255,0,80,0.15),rgba(0,242,234,0.15))", border: "1px solid rgba(245,240,232,0.12)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, textDecoration: "none" }}>🎵</a>
+              ) : <div key={i} style={{ aspectRatio: "9/16", background: "rgba(245,240,232,0.06)", borderRadius: 9 }} />)}
+            </div>
+          )}
+          {c.cta_label && c.cta_url && <a href={c.cta_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url)} style={{ display: "block", marginTop: 11, background: "linear-gradient(90deg,#ff0050,#00f2ea)", borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</a>}
+        </div>
+      ) : null
+    }
+    case "video_testimonials": {
+      const testi = [[c.t1_video_url, c.t1_name, c.t1_company, c.t1_quote], [c.t2_video_url, c.t2_name, c.t2_company, c.t2_quote]].filter(([, n]) => n)
+      return testi.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
+            {testi.map(([url, name, company, quote]: any[], i: number) => {
+              const videoId = String(url || "").match(/(?:v=|youtu\.be\/)([^&\s]+)/)?.[1]
+              const inner = (
+                <>
+                  {videoId && (
+                    <div style={{ position: "relative" }}>
+                      <img src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} alt="" style={{ width: "100%", height: 130, objectFit: "cover", display: "block" }} />
+                      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ width: 40, height: 40, background: "rgba(0,0,0,0.7)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: "#fff", fontSize: 15, marginLeft: 3 }}>▶</span></div>
+                      </div>
+                    </div>
+                  )}
+                  <div style={{ padding: "12px 14px" }}>
+                    {quote && <p style={{ color: TEXT, fontSize: 13, fontStyle: "italic", margin: "0 0 7px", lineHeight: 1.5, fontFamily: FONT_B }}>&quot;{quote}&quot;</p>}
+                    <p style={{ color: G, fontSize: 13, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{name}{company ? <span style={{ color: MUTED, fontWeight: 400 }}> — {company}</span> : null}</p>
+                  </div>
+                </>
+              )
+              return videoId
+                ? <a key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ display: "block", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 13, overflow: "hidden", textDecoration: "none" }}>{inner}</a>
+                : <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 13, overflow: "hidden" }}>{inner}</div>
+            })}
+          </div>
+        </div>
+      ) : null
+    }
+
     default: return null
   }
 }
