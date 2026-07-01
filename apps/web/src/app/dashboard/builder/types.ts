@@ -158,6 +158,31 @@ export function avatarShapeStyle(shape?: string): Record<string, string | number
 
 // Style de fond d'une page selon son bgMode + effets.
 // Source unique partagée éditeur (aperçu) ↔ page publique pour garantir le WYSIWYG.
+// Dégradés nommés pour le studio de bannière (parité builder <-> public)
+export const BANNER_GRADIENTS: Record<string, [string, string, number]> = {
+  or_nuit: ["#C9A84C", "#1a1206", 135],
+  aurore: ["#7c3aed", "#ec4899", 135],
+  ocean: ["#0ea5e9", "#1e3a8a", 135],
+  coucher: ["#f97316", "#be123c", 135],
+  violet: ["#8b5cf6", "#4c1d95", 135],
+  menthe: ["#39FF8F", "#065f46", 135],
+  corail: ["#fb7185", "#f43f5e", 135],
+}
+
+// Style de fond d'une bannière (image / gradient / color) — partagé builder & public
+export function bannerBackgroundStyle(c: any, accent = "#C9A84C"): Record<string, string> {
+  const type = c.banner_type || (c.src ? "image" : "gradient")
+  if (type === "color") return { background: c.bg_color || "#1a1a1a" }
+  if (type === "gradient") {
+    if (c.grad_preset === "personnalise") {
+      return { background: `linear-gradient(135deg, ${c.grad_c1 || accent}, ${c.grad_c2 || "#1a1206"})` }
+    }
+    const g = BANNER_GRADIENTS[c.grad_preset as string] || BANNER_GRADIENTS.or_nuit
+    return { background: `linear-gradient(${g[2]}deg, ${g[0]}, ${g[1]})` }
+  }
+  return {} // image géré par une balise <img> séparée
+}
+
 export function themeBackgroundStyle(theme: PageTheme): Record<string, string | number> {
   const t = theme as any
   if (t.bgMode === "pattern") {
@@ -1899,6 +1924,7 @@ export interface BlockField {
   suggestions?: string[]   // exemples curés tappables (pour ne jamais partir d'un champ vide)
   suggestionsMode?: "append"  // "append" = sélecteur multiple (toggle, séparé par virgules) ; défaut = remplace
   maxRecommended?: number  // longueur conseillée -> compteur + score (Excellent/Correct/Trop long)
+  showIf?: { key: string; equals?: string; in?: string[] }  // n'affiche ce champ que si content[key] correspond
 }
 
 export interface BlockDef {
@@ -3865,13 +3891,21 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   cover_banner: {
     label: "Banniere / Cover", description: "Image de fond en haut de page",
     icon: "🖼️", color: "#C9A84C", category: "identity",
-    defaultContent: { height: "md", overlay_opacity: "0.2" },
+    defaultContent: { banner_type: "image", height: "md", overlay_opacity: "0.2", overlay_gradient: "none", text_position: "bottom-left", grad_preset: "or_nuit" },
     fields: [
-      { key: "src", label: "Image de banniere", type: "image" },
-      { key: "height", label: "Hauteur", type: "select", options: ["sm", "md", "lg"] },
-      { key: "overlay_color", label: "Couleur overlay", type: "color" },
-      { key: "overlay_opacity", label: "Opacite overlay (0 a 1)", type: "text", placeholder: "0.3" },
-      { key: "cover_title", label: "Titre sur la banniere", type: "text", placeholder: "Mon titre..." },
+      { key: "banner_type", label: "Type de banniere", type: "select", options: ["image", "gradient", "color"], hint: "Image, degrade ou couleur unie" },
+      { key: "src", label: "Image de banniere", type: "image", showIf: { key: "banner_type", equals: "image" } },
+      { key: "grad_preset", label: "Degrade", type: "select", options: ["or_nuit", "aurore", "ocean", "coucher", "violet", "menthe", "corail", "personnalise"], showIf: { key: "banner_type", equals: "gradient" } },
+      { key: "grad_c1", label: "Couleur 1 (perso)", type: "color", showIf: { key: "grad_preset", equals: "personnalise" } },
+      { key: "grad_c2", label: "Couleur 2 (perso)", type: "color", showIf: { key: "grad_preset", equals: "personnalise" } },
+      { key: "bg_color", label: "Couleur de fond", type: "color", showIf: { key: "banner_type", equals: "color" } },
+      { key: "height", label: "Hauteur", type: "select", options: ["sm", "md", "lg", "xl"] },
+      { key: "cover_title", label: "Titre sur la banniere", type: "text", placeholder: "Mon titre...", maxRecommended: 40 },
+      { key: "cover_subtitle", label: "Sous-titre", type: "text", placeholder: "Une phrase d accroche...", maxRecommended: 70 },
+      { key: "text_position", label: "Position du texte", type: "select", options: ["bottom-left", "bottom-center", "center"] },
+      { key: "overlay_gradient", label: "Voile pour lisibilite", type: "select", options: ["none", "bottom", "full"], hint: "Assombrit pour que le texte reste lisible" },
+      { key: "overlay_color", label: "Couleur voile", type: "color" },
+      { key: "overlay_opacity", label: "Opacite voile (0 a 1)", type: "text", placeholder: "0.3" },
     ],
   },
   about: {

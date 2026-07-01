@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, type Block, type BlockContent, type PageTheme } from "./types"
   import ImageUpload from "./ImageUpload"
   import { createClient } from "@/lib/supabase/client"
 
@@ -616,15 +616,34 @@
           </div>
         </div>
       )
-      case "cover_banner": return (
-        <div style={{ position: "relative", overflow: "hidden", borderRadius: "10px 10px 0 0" }}>
-          {c.src
-            ? <img src={c.src} alt="" style={{ width: "100%", height: c.height==="lg" ? 140 : c.height==="sm" ? 70 : 100, objectFit: "cover", display: "block" }} />
-            : <div style={{ width: "100%", height: c.height==="lg" ? 140 : c.height==="sm" ? 70 : 100, background: `linear-gradient(135deg,${primary}30,${accent}20)`, display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: muted, fontSize: 11 }}>Bannière / Cover</span></div>}
-          {c.overlay_color && <div style={{ position: "absolute", inset: 0, background: c.overlay_color, opacity: parseFloat(c.overlay_opacity||"0.3") }} />}
-          {c.cover_title && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "flex-end", padding: "10px 14px" }}><p style={{ color: "#fff", fontSize: 16, fontWeight: 700, margin: 0, textShadow: "0 2px 8px rgba(0,0,0,0.5)", fontFamily: theme.fontDisplay }}>{c.cover_title}</p></div>}
-        </div>
-      )
+      case "cover_banner": {
+        const bh = c.height==="xl" ? 180 : c.height==="lg" ? 140 : c.height==="sm" ? 70 : 100
+        const btype = c.banner_type || (c.src ? "image" : "gradient")
+        const pos = c.text_position || "bottom-left"
+        const bannerBg = bannerBackgroundStyle(c, accent)
+        const voile = c.overlay_gradient==="bottom" ? "linear-gradient(to top, rgba(0,0,0,0.55), transparent 65%)"
+          : c.overlay_gradient==="full" ? "linear-gradient(to top, rgba(0,0,0,0.5), rgba(0,0,0,0.15))" : null
+        const alignItems = pos==="center" ? "center" : "flex-end"
+        const justifyContent = (pos==="bottom-center"||pos==="center") ? "center" : "flex-start"
+        const textAlign = (pos==="bottom-center"||pos==="center") ? "center" : "left"
+        return (
+          <div style={{ position: "relative", overflow: "hidden", borderRadius: "10px 10px 0 0" }}>
+            {btype==="image"
+              ? (c.src
+                ? <img src={c.src} alt="" style={{ width: "100%", height: bh, objectFit: "cover", display: "block" }} />
+                : <div style={{ width: "100%", height: bh, background: `linear-gradient(135deg,${primary}30,${accent}20)`, display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: muted, fontSize: 11 }}>Bannière / Cover</span></div>)
+              : <div style={{ width: "100%", height: bh, ...bannerBg }} />}
+            {voile && <div style={{ position: "absolute", inset: 0, background: voile }} />}
+            {c.overlay_color && <div style={{ position: "absolute", inset: 0, background: c.overlay_color, opacity: parseFloat(c.overlay_opacity||"0.3") }} />}
+            {(c.cover_title || c.cover_subtitle) && (
+              <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems, justifyContent, padding: "10px 14px", textAlign }}>
+                {c.cover_title && <p style={{ color: "#fff", fontSize: 16, fontWeight: 700, margin: 0, textShadow: "0 2px 8px rgba(0,0,0,0.5)", fontFamily: theme.fontDisplay }}>{c.cover_title}</p>}
+                {c.cover_subtitle && <p style={{ color: "rgba(255,255,255,0.9)", fontSize: 11, margin: "3px 0 0", textShadow: "0 1px 6px rgba(0,0,0,0.5)" }}>{c.cover_subtitle}</p>}
+              </div>
+            )}
+          </div>
+        )
+      }
       case "about": return (
         <div style={{ padding: "10px 16px", ...s }}>
           {c.emoji && <span style={{ fontSize: 18, display: "block", marginBottom: 5 }}>{c.emoji}</span>}
@@ -2582,7 +2601,14 @@
 
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {def.fields.map(field => (
+        {def.fields.filter(field => {
+          const si = (field as any).showIf
+          if (!si) return true
+          const v = block.content[si.key]
+          if (si.equals !== undefined) return v === si.equals
+          if (Array.isArray(si.in)) return si.in.includes(v)
+          return true
+        }).map(field => (
           <div key={field.key}>
             <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>{field.label}</label>
             {field.type === "textarea"
