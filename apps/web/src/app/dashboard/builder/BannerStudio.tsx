@@ -333,6 +333,16 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
         <Field label="Titre" value={c.cover_title} placeholder="Mon titre…" max={40} onChange={v => set("cover_title", v)} />
         <Field label="Sous-titre" value={c.cover_subtitle} placeholder="Une phrase d'accroche…" max={70} onChange={v => set("cover_subtitle", v)} />
         <ColorStudio label="Couleur du texte" value={c.text_color} fallback="#ffffff" onChange={v => set("text_color", v)} />
+        <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 12 }}>
+          <Field label="🔗 Lien au clic (optionnel)" value={c.link_url} placeholder="https://… ou mailto: / tel:" onChange={v => set("link_url", v)} />
+          {c.link_url && (
+            <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, cursor: "pointer" }}>
+              <input type="checkbox" checked={c.link_blank !== "no"} onChange={e => set("link_blank", e.target.checked ? "yes" : "no")} style={{ accentColor: G, width: 15, height: 15 }} />
+              <span style={{ color: MUTED, fontSize: 11 }}>Ouvrir dans un nouvel onglet</span>
+            </label>
+          )}
+          {c.link_url && <p style={{ color: G, fontSize: 10, margin: "7px 0 0", display: "flex", gap: 5 }}><span>👆</span>Toute la bannière devient cliquable (clic tracké dans les stats).</p>}
+        </div>
       </Section>
 
       {/* TYPOGRAPHIE */}

@@ -660,7 +660,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       const alignItems = pos === "center" ? "center" : "flex-end"
       const justifyContent = (pos === "bottom-center" || pos === "center") ? "center" : "flex-start"
       const textAlign: any = (pos === "bottom-center" || pos === "center") ? "center" : "left"
-      return (
+      const inner = (
         <div className={anim ? `qfb qfb-${anim}` : undefined} style={{ position: "relative", overflow: "hidden", borderRadius: rad || undefined, boxShadow: frame.boxShadow }}>
           {anim && <style>{BANNER_ANIM_CSS}</style>}
           {btype === "image"
@@ -680,6 +680,9 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
           )}
         </div>
       )
+      return c.link_url
+        ? <a href={c.link_url} target={c.link_blank !== "no" && /^https?:/.test(c.link_url) ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.link_url)} style={{ display: "block", textDecoration: "none", cursor: "pointer" }}>{inner}</a>
+        : inner
     }
     case "about": return (c.text || c.title) ? (
       <div style={{ padding: "10px 24px 16px", textAlign: (c.align as any) || "left" }}>
