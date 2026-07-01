@@ -41,6 +41,15 @@ export async function submitLead(input: LeadInput): Promise<boolean> {
       }),
     }).catch(() => {})
 
+    // Accusé de réception au visiteur si son email est fourni (fire-and-forget)
+    if (input.email) {
+      fetch("/api/emails/lead-confirmation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pageId: input.pageId, type: input.type || "form", email: input.email, name: input.name }),
+      }).catch(() => {})
+    }
+
     return true
   } catch {
     return false
