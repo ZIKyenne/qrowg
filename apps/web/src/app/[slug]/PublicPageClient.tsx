@@ -2327,17 +2327,24 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
         @keyframes profilePulse { 0%,100% { box-shadow: 0 0 0 0 ${theme.primary}30; } 50% { box-shadow: 0 0 0 12px ${theme.primary}00; } }
         * { -webkit-tap-highlight-color: transparent; }
         a:active { opacity: 0.75; }
+        @media (max-width: 640px) { .qf-hide-mobile { display: none !important; } }
+        @media (min-width: 641px) { .qf-hide-desktop { display: none !important; } }
       `}</style>
 
       {/* Container — fond complet selon bgMode (mesh/radial/pattern/image/gradient/solid) pour matcher l'éditeur */}
       <div style={{ maxWidth: 480, margin: "0 auto", minHeight: "100vh", ...themeBackgroundStyle(theme as any), boxShadow: "0 0 80px rgba(0,0,0,0.6)", position: "relative" }}>
 
         {/* Blocks with staggered animation */}
-        {blocks.map((block, idx) => (
-          <AnimatedBlock key={block.id} delay={idx < 3 ? idx * 80 : 0}>
-            <RenderBlock block={block} theme={theme} pageId={page.id} ownerEmail={page.profiles?.contact_email || page.profiles?.email} />
-          </AnimatedBlock>
-        ))}
+        {blocks.map((block, idx) => {
+          const hideCls = [block.content?.hide_mobile === "yes" ? "qf-hide-mobile" : "", block.content?.hide_desktop === "yes" ? "qf-hide-desktop" : ""].filter(Boolean).join(" ")
+          return (
+            <AnimatedBlock key={block.id} delay={idx < 3 ? idx * 80 : 0}>
+              <div className={hideCls || undefined}>
+                <RenderBlock block={block} theme={theme} pageId={page.id} ownerEmail={page.profiles?.contact_email || page.profiles?.email} />
+              </div>
+            </AnimatedBlock>
+          )
+        })}
 
         {/* Footer branding */}
         <div style={{ padding: "20px 24px 32px", textAlign: "center", borderTop: `1px solid ${theme.primary}10`, marginTop: 8 }}>

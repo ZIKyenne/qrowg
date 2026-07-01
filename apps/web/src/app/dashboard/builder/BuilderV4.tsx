@@ -5358,6 +5358,28 @@
                         block={selectedBlock}
                         onChange={(key, val) => updateBlock(selectedBlock.id, key, val)}
                       />
+                      {/* Avancé — visibilité par appareil (universel, tous blocs) */}
+                      <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                        <p style={{ color: MUTED, fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 9px" }}>Avancé · Visibilité</p>
+                        {[
+                          { key: "hide_mobile", label: "Afficher sur mobile", icon: "📱" },
+                          { key: "hide_desktop", label: "Afficher sur ordinateur", icon: "🖥️" },
+                        ].map(o => {
+                          const shown = selectedBlock.content[o.key] !== "yes" // "yes" = masqué
+                          return (
+                            <div key={o.key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "7px 0" }}>
+                              <span style={{ color: "#F5F0E8", fontSize: 12, display: "flex", alignItems: "center", gap: 7 }}><span>{o.icon}</span>{o.label}</span>
+                              <button onClick={() => updateBlock(selectedBlock.id, o.key, shown ? "yes" : "")} title={shown ? "Cliquer pour masquer" : "Cliquer pour afficher"}
+                                style={{ width: 42, height: 24, borderRadius: 12, background: shown ? G : "rgba(255,255,255,0.12)", border: "none", cursor: "pointer", position: "relative", transition: "background .2s", flexShrink: 0 }}>
+                                <span style={{ position: "absolute", top: 3, left: shown ? 21 : 3, width: 18, height: 18, borderRadius: "50%", background: "#fff", transition: "left .2s", boxShadow: "0 1px 4px rgba(0,0,0,0.3)" }} />
+                              </button>
+                            </div>
+                          )
+                        })}
+                        {(selectedBlock.content.hide_mobile === "yes" || selectedBlock.content.hide_desktop === "yes") && (
+                          <p style={{ color: "#F59E0B", fontSize: 9.5, margin: "4px 0 0" }}>⚠ Ce bloc est masqué sur {selectedBlock.content.hide_mobile === "yes" ? "mobile" : ""}{selectedBlock.content.hide_mobile === "yes" && selectedBlock.content.hide_desktop === "yes" ? " et " : ""}{selectedBlock.content.hide_desktop === "yes" ? "ordinateur" : ""} (page publiée).</p>
+                        )}
+                      </div>
                     </>
                 }
               </div>
