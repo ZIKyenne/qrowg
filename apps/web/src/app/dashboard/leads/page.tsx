@@ -19,7 +19,7 @@ export default async function LeadsPage() {
   const { data: leads } = pageIds.length
     ? await supabase
         .from("leads")
-        .select("id, page_id, block_id, type, name, email, phone, message, data, is_read, created_at")
+        .select("id, page_id, block_id, type, name, email, phone, message, data, is_read, status, created_at")
         .in("page_id", pageIds)
         .order("created_at", { ascending: false })
         .limit(500)

@@ -11,9 +11,15 @@ const TEXT = "#F5F0E8"
 type Lead = {
   id: string; page_id: string; block_id: string | null; type: string
   name: string | null; email: string | null; phone: string | null
-  message: string | null; data: Record<string, any>; is_read: boolean; created_at: string
+  message: string | null; data: Record<string, any>; is_read: boolean; status?: string; created_at: string
 }
 type Page = { id: string; title: string; slug: string }
+
+const STATUSES: { key: string; label: string; color: string }[] = [
+  { key: "new", label: "Nouveau", color: "#38BDF8" },
+  { key: "in_progress", label: "En cours", color: "#FBBF24" },
+  { key: "done", label: "Traité", color: "#39FF8F" },
+]
 
 const TYPE_LABELS: Record<string, string> = {
   quote: "Devis", reservation: "Réservation", booking: "Réservation événement",
@@ -33,6 +39,7 @@ function fmtDate(iso: string) {
 export default function LeadsClient({ leads: initialLeads, pages }: { leads: Lead[]; pages: Page[] }) {
   const [leads, setLeads] = useState<Lead[]>(initialLeads)
   const [filter, setFilter] = useState<string>("all")
+  const [statusFilter, setStatusFilter] = useState<string>("all")
   const [query, setQuery] = useState("")
   const supabase = createClient()
 
@@ -44,6 +51,7 @@ export default function LeadsClient({ leads: initialLeads, pages }: { leads: Lea
     return leads.filter(l => {
       if (filter === "unread" && l.is_read) return false
       if (filter !== "all" && filter !== "unread" && l.type !== filter) return false
+      if (statusFilter !== "all" && (l.status || "new") !== statusFilter) return false
       if (query) {
         const q = query.toLowerCase()
         const hay = [l.name, l.email, l.phone, l.message, JSON.stringify(l.data)].join(" ").toLowerCase()
@@ -51,11 +59,13 @@ export default function LeadsClient({ leads: initialLeads, pages }: { leads: Lea
       }
       return true
     })
-  }, [leads, filter, query])
+  }, [leads, filter, statusFilter, query])
 
-  const markRead = async (id: string, is_read: boolean) => {
-    setLeads(prev => prev.map(l => l.id === id ? { ...l, is_read } : l))
-    await supabase.from("leads").update({ is_read }).eq("id", id)
+  const setStatus = async (id: string, status: string) => {
+    // Passer un lead hors de "nouveau" le marque aussi comme lu (il a été traité/vu)
+    const is_read = status !== "new"
+    setLeads(prev => prev.map(l => l.id === id ? { ...l, status, is_read: is_read || l.is_read } : l))
+    await supabase.from("leads").update({ status, ...(is_read ? { is_read: true } : {}) }).eq("id", id)
   }
   const remove = async (id: string) => {
     setLeads(prev => prev.filter(l => l.id !== id))
@@ -124,6 +134,24 @@ export default function LeadsClient({ leads: initialLeads, pages }: { leads: Lea
             </div>
           </div>
 
+          {/* Filtre par statut (pipeline) */}
+          <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+            {[{ key: "all", label: "Tous les statuts", color: MUTED }, ...STATUSES].map(s => {
+              const n = s.key === "all" ? leads.length : leads.filter(l => (l.status || "new") === s.key).length
+              return (
+                <button key={s.key} onClick={() => setStatusFilter(s.key)} style={{
+                  display: "inline-flex", alignItems: "center", gap: 6,
+                  background: statusFilter === s.key ? `color-mix(in srgb, ${s.color} 16%, transparent)` : "rgba(255,255,255,0.03)",
+                  border: `1px solid ${statusFilter === s.key ? `color-mix(in srgb, ${s.color} 40%, transparent)` : "rgba(255,255,255,0.07)"}`,
+                  borderRadius: 9, padding: "6px 12px", color: statusFilter === s.key ? s.color : MUTED, fontSize: 12, fontWeight: 600, cursor: "pointer",
+                }}>
+                  {s.key !== "all" && <span style={{ width: 7, height: 7, borderRadius: "50%", background: s.color }} />}
+                  {s.label} <span style={{ opacity: 0.7 }}>· {n}</span>
+                </button>
+              )
+            })}
+          </div>
+
           {/* Liste */}
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {filtered.map(l => {
@@ -143,9 +171,25 @@ export default function LeadsClient({ leads: initialLeads, pages }: { leads: Lea
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
                       <span style={{ color: MUTED, fontSize: 11 }}>{fmtDate(l.created_at)}</span>
-                      <button title={l.is_read ? "Marquer non lu" : "Marquer lu"} onClick={() => markRead(l.id, !l.is_read)} style={{ background: "transparent", border: "none", cursor: "pointer", color: l.is_read ? MUTED : "#39FF8F", padding: 2 }}><Check size={15} /></button>
                       <button title="Supprimer" onClick={() => remove(l.id)} style={{ background: "transparent", border: "none", cursor: "pointer", color: MUTED, padding: 2 }}><Trash2 size={14} /></button>
                     </div>
+                  </div>
+
+                  {/* Pipeline : statut du lead */}
+                  <div style={{ display: "flex", gap: 4, marginBottom: (l.name || l.message) ? 10 : 0 }}>
+                    {STATUSES.map(s => {
+                      const on = (l.status || "new") === s.key
+                      return (
+                        <button key={s.key} onClick={() => setStatus(l.id, s.key)} style={{
+                          display: "inline-flex", alignItems: "center", gap: 5,
+                          background: on ? `color-mix(in srgb, ${s.color} 18%, transparent)` : "rgba(255,255,255,0.03)",
+                          border: `1px solid ${on ? `color-mix(in srgb, ${s.color} 45%, transparent)` : "rgba(255,255,255,0.07)"}`,
+                          borderRadius: 8, padding: "5px 10px", color: on ? s.color : MUTED, fontSize: 11, fontWeight: on ? 700 : 500, cursor: "pointer",
+                        }}>
+                          {on && <Check size={11} />}{s.label}
+                        </button>
+                      )
+                    })}
                   </div>
 
                   {l.name && <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{l.name}</p>}

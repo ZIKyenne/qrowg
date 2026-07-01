@@ -12,6 +12,7 @@ create table if not exists public.leads (
   message    text,
   data       jsonb not null default '{}'::jsonb,     -- tous les champs saisis
   is_read    boolean not null default false,
+  status     text not null default 'new',            -- new | in_progress | done (pipeline)
   created_at timestamptz not null default now()
 );
 
