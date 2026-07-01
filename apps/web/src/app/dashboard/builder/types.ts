@@ -358,6 +358,16 @@ export function waLink(phone?: string, message?: string, countryCode?: string): 
   if (!d) return ""
   return `https://wa.me/${d}${message ? `?text=${encodeURIComponent(message)}` : ""}`
 }
+// Lien d'itinéraire vers une adresse (parité builder <-> public, testé).
+export function directionsLink(address?: string, provider?: string): string {
+  const enc = encodeURIComponent((address || "").trim())
+  if (!enc) return ""
+  switch (provider) {
+    case "apple": return `https://maps.apple.com/?daddr=${enc}`
+    case "waze": return `https://waze.com/ul?q=${enc}&navigate=yes`
+    default: return `https://www.google.com/maps/dir/?api=1&destination=${enc}` // google / auto
+  }
+}
 export function telLink(phone?: string): string {
   const raw = (phone || "").trim()
   const digits = raw.replace(/\D/g, "")
@@ -460,7 +470,7 @@ export const ACTION_PRESETS: { key: string; label: string; emoji: string; blocks
       { type: "table_booking", content: { label: "Réserver une table", platform: "TheFork" } },
       { type: "download_file", content: { label: "Voir le menu", type_doc: "Carte" } },
       { type: "call_button", content: { label: "Appeler" } },
-      { type: "whatsapp_button", content: { label: "Discuter sur WhatsApp", message: "Bonjour, je souhaite réserver." } },
+      { type: "directions_button", content: { label: "Itinéraire", provider: "auto" } },
       { type: "google_review", content: { label: "Laisser un avis", stars: "5" } },
     ],
   },
@@ -514,7 +524,7 @@ export const ACTION_PRESETS: { key: string; label: string; emoji: string; blocks
     blocks: [
       { type: "order_online", content: { label: "Commander en ligne", platform: "Site web" } },
       { type: "call_button", content: { label: "Appeler la boutique" } },
-      { type: "download_file", content: { label: "Voir le catalogue", type_doc: "Catalogue" } },
+      { type: "directions_button", content: { label: "Venir à la boutique", provider: "auto" } },
       { type: "google_review", content: { label: "Laisser un avis Google", stars: "5" } },
     ],
   },
@@ -4057,6 +4067,17 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "phone", label: "Numéro de téléphone", type: "text", placeholder: "+33 6 12 34 56 78", hint: "Les espaces sont nettoyés automatiquement" },
       { key: "sub", label: "Sous-texte (optionnel)", type: "text", placeholder: "Du lundi au vendredi, 9h-18h" },
       { key: "icon", label: "Emoji", type: "text", placeholder: "📞" },
+    ],
+  },
+  directions_button: {
+    label: "Itinéraire", description: "Ouvre l itineraire vers votre adresse",
+    icon: "🧭", color: "#4285F4", category: "actions",
+    defaultContent: { label: "Obtenir l'itinéraire", address: "", provider: "auto", show_copy: "yes" },
+    fields: [
+      { key: "label", label: "Texte", type: "text", placeholder: "Obtenir l'itinéraire" },
+      { key: "address", label: "Adresse complète", type: "text", placeholder: "12 rue de la Paix, 75002 Paris" },
+      { key: "provider", label: "Ouvrir avec", type: "select", options: ["auto", "google", "apple", "waze"], hint: "auto = Google Maps (universel)" },
+      { key: "show_copy", label: "Bouton copier l'adresse", type: "select", options: ["yes", "no"] },
     ],
   },
   whatsapp_button: {

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest"
 import {
   bannerImageStyle, bannerOverlayLayers, availabilityStatus, profileBadgeStyle,
   bannerTitleStyle, bannerFrame, bannerHeight, bannerBackgroundStyle,
-  normalizePhoneDigits, waLink, telLink,
+  normalizePhoneDigits, waLink, telLink, directionsLink,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -168,6 +168,21 @@ describe("waLink / telLink", () => {
   })
   it("telLink vide -> vide", () => {
     expect(telLink("")).toBe("")
+  })
+})
+
+describe("directionsLink", () => {
+  it("google/auto par défaut", () => {
+    expect(directionsLink("12 rue de la Paix, Paris")).toBe("https://www.google.com/maps/dir/?api=1&destination=12%20rue%20de%20la%20Paix%2C%20Paris")
+  })
+  it("apple plans", () => {
+    expect(directionsLink("Paris", "apple")).toBe("https://maps.apple.com/?daddr=Paris")
+  })
+  it("waze", () => {
+    expect(directionsLink("Paris", "waze")).toBe("https://waze.com/ul?q=Paris&navigate=yes")
+  })
+  it("adresse vide -> vide", () => {
+    expect(directionsLink("")).toBe("")
   })
 })
 

@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, waLink, telLink, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, waLink, telLink, directionsLink, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -801,6 +801,17 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
           <span style={{ fontSize: 17 }}>💬</span>
           <span style={{ color: "#25D366", fontSize: 15, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Discuter sur WhatsApp"}</span>
         </a>
+      </div>
+    ) : null }
+    case "directions_button": { const href = directionsLink(c.address, c.provider); return (c.address || c.label) ? (
+      <div style={{ padding: "6px 24px 10px" }}>
+        <a href={href || "#"} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, "directions")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(66,133,244,0.12)", border: "1.5px solid rgba(66,133,244,0.35)", borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
+          <span style={{ fontSize: 17 }}>🧭</span>
+          <span style={{ color: "#4285F4", fontSize: 15, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Obtenir l'itinéraire"}</span>
+        </a>
+        {c.show_copy !== "no" && c.address && (
+          <button onClick={() => { navigator.clipboard?.writeText(c.address); trackLinkClick(pageId, block.id, "copy-address") }} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%", marginTop: 7, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 11, padding: "10px", color: MUTED, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: FONT_B }}>📋 Copier l&apos;adresse</button>
+        )}
       </div>
     ) : null }
     case "email_button": return c.email ? (

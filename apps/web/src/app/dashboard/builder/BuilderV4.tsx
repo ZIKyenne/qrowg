@@ -513,6 +513,15 @@
           </div>
         </div>
       )
+      case "directions_button": return (
+        <div style={{ padding: "4px 16px 10px", ...s }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(66,133,244,0.1)", border: "1.5px solid rgba(66,133,244,0.25)", borderRadius: 12, padding: "13px 18px" }}>
+            <span style={{ fontSize: 16 }}>🧭</span>
+            <p style={{ color: "#4285F4", fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label||"Obtenir l'itinéraire"}</p>
+          </div>
+          {c.address && <p style={{ color: muted, fontSize: 10, margin: "6px 0 0", textAlign: "center" }}>📍 {c.address}</p>}
+        </div>
+      )
       case "table_booking": return (
         <div style={{ padding: "4px 16px 10px", ...s }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(239,68,68,0.1)", border: "1.5px solid rgba(239,68,68,0.25)", borderRadius: 12, padding: "13px 18px" }}>
