@@ -2608,7 +2608,7 @@
                   onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />}
             {field.hint && <p style={{ color: MUTED, fontSize: 9, margin: "3px 0 0" }}>{field.hint}</p>}
             {/* Compteur + score de lisibilité mobile pour les textes longs (bio, à propos…) */}
-            {field.type === "textarea" && (() => {
+            {field.type === "textarea" && !(field as any).maxRecommended && (() => {
               const len = (block.content[field.key] || "").length
               if (!len) return null
               const [txt, col] = len < 40 ? ["Un peu court", "#F59E0B"] : len <= 200 ? ["Bonne longueur ✓", "#39FF8F"] : ["Un peu long pour mobile", "#F59E0B"]
@@ -2624,7 +2624,8 @@
               const len = (block.content[field.key] || "").length
               if (!len) return null
               const max = (field as any).maxRecommended as number
-              const [txt, col] = len <= max * 0.9 ? ["Excellent ✓", "#39FF8F"] : len <= max ? ["Correct", "#F59E0B"] : ["Trop long", "#FF6B6B"]
+              const short = Math.max(12, Math.round(max * 0.15))
+              const [txt, col] = len < short ? ["Un peu court", "#F59E0B"] : len <= max * 0.9 ? ["Excellent ✓", "#39FF8F"] : len <= max ? ["Bonne longueur ✓", "#39FF8F"] : ["Trop long", "#FF6B6B"]
               return (
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
                   <span style={{ color: col, fontSize: 9, fontWeight: 600 }}>{txt}</span>

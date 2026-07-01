@@ -1970,9 +1970,9 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   bio: {
     label: "Bio", description: "Texte de presentation libre",
     icon: "✍️", color: "#C9A84C", category: "identity",
-    defaultContent: { text: "Bienvenue sur ma page !", align: "left" },
+    defaultContent: { text: "Bienvenue sur ma page !", align: "center" },
     fields: [
-      { key: "text", label: "Texte", type: "textarea", placeholder: "Decris-toi en quelques mots..." },
+      { key: "text", label: "Présentation", type: "textarea", placeholder: "Décrivez qui vous êtes en quelques phrases…", maxRecommended: 500, suggestions: ["Je capture les émotions au quotidien et j'en fais des souvenirs qui durent.", "Je vous accompagne pas à pas vers vos objectifs, avec méthode et bienveillance.", "Passionné(e) et créatif(ve), je conçois des contenus qui marquent les esprits.", "Notre équipe transforme vos idées en projets concrets, avec exigence et proximité."] },
       { key: "align", label: "Alignement", type: "select", options: ["left", "center", "right"] },
     ],
   },
