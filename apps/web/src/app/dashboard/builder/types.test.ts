@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest"
 import {
   bannerImageStyle, bannerOverlayLayers, availabilityStatus, profileBadgeStyle,
   bannerTitleStyle, bannerFrame, bannerHeight, bannerBackgroundStyle,
-  normalizePhoneDigits, waLink, telLink, directionsLink, ctaButtonStyle,
+  normalizePhoneDigits, waLink, telLink, directionsLink, ctaButtonStyle, stickyActionHref,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -204,6 +204,28 @@ describe("ctaButtonStyle", () => {
   })
   it("style inconnu -> gold", () => {
     expect(ctaButtonStyle("inconnu", opt).style.color).toBe("#080808")
+  })
+})
+
+describe("stickyActionHref", () => {
+  it("call -> tel", () => {
+    const a = stickyActionHref("call", "0612345678")
+    expect(a.href).toBe("tel:0612345678")
+    expect(a.icon).toBe("📞")
+  })
+  it("directions -> google maps", () => {
+    expect(stickyActionHref("directions", "Paris").href).toContain("google.com/maps/dir")
+  })
+  it("email -> mailto", () => {
+    expect(stickyActionHref("email", "a@b.com").href).toBe("mailto:a@b.com")
+  })
+  it("share -> flag share, pas de href", () => {
+    const a = stickyActionHref("share")
+    expect(a.share).toBe(true)
+    expect(a.href).toBeUndefined()
+  })
+  it("none -> icône vide", () => {
+    expect(stickyActionHref("none").icon).toBe("")
   })
 })
 

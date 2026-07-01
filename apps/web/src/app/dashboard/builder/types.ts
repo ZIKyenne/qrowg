@@ -378,6 +378,23 @@ export function ctaButtonStyle(style: string | undefined, opt: { G: string; acce
   return map[style || "gold"] || map.gold
 }
 
+// Résout une action de la barre flottante -> lien + icône + libellé (parité builder <-> public, testé).
+export function stickyActionHref(type?: string, value?: string): { href?: string; share?: boolean; icon: string; label: string; color: string } {
+  const v = (value || "").trim()
+  switch (type) {
+    case "call": return { href: telLink(v), icon: "📞", label: "Appeler", color: "#39FF8F" }
+    case "whatsapp": return { href: waLink(v), icon: "💬", label: "WhatsApp", color: "#25D366" }
+    case "directions": return { href: directionsLink(v), icon: "🧭", label: "Itinéraire", color: "#4285F4" }
+    case "email": return { href: v ? `mailto:${v}` : "", icon: "✉️", label: "Email", color: "#38BDF8" }
+    case "reserve": return { href: v, icon: "📅", label: "Réserver", color: "#C9A84C" }
+    case "menu": return { href: v, icon: "📖", label: "Menu", color: "#F97316" }
+    case "pay": return { href: v, icon: "💳", label: "Payer", color: "#39FF8F" }
+    case "link": return { href: v, icon: "🔗", label: "Lien", color: "#C9A84C" }
+    case "share": return { share: true, icon: "↗", label: "Partager", color: "#C9A84C" }
+    default: return { icon: "", label: "", color: "#C9A84C" }
+  }
+}
+
 // Lien d'itinéraire vers une adresse (parité builder <-> public, testé).
 export function directionsLink(address?: string, provider?: string): string {
   const enc = encodeURIComponent((address || "").trim())
@@ -4098,6 +4115,26 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "address", label: "Adresse complète", type: "text", placeholder: "12 rue de la Paix, 75002 Paris" },
       { key: "provider", label: "Ouvrir avec", type: "select", options: ["auto", "google", "apple", "waze"], hint: "auto = Google Maps (universel)" },
       { key: "show_copy", label: "Bouton copier l'adresse", type: "select", options: ["yes", "no"] },
+    ],
+  },
+  sticky_bar: {
+    label: "Barre d'actions (mobile)", description: "Barre fixe en bas de l ecran sur la page publiee",
+    icon: "📌", color: "#C9A84C", category: "actions",
+    defaultContent: { a1_type: "call", a1_value: "", a2_type: "whatsapp", a2_value: "", a3_type: "directions", a3_value: "", a4_type: "none", a4_value: "", a5_type: "none", a5_value: "", bar_style: "blur", show_labels: "yes", position: "bottom" },
+    fields: [
+      { key: "a1_type", label: "Action 1", type: "select", options: ["none", "call", "whatsapp", "directions", "email", "reserve", "menu", "pay", "link", "share"] },
+      { key: "a1_value", label: "Action 1 — valeur", type: "text", placeholder: "Numéro, adresse, lien ou email", hint: "Vide pour Partager" },
+      { key: "a2_type", label: "Action 2", type: "select", options: ["none", "call", "whatsapp", "directions", "email", "reserve", "menu", "pay", "link", "share"] },
+      { key: "a2_value", label: "Action 2 — valeur", type: "text", placeholder: "Numéro, adresse, lien ou email" },
+      { key: "a3_type", label: "Action 3", type: "select", options: ["none", "call", "whatsapp", "directions", "email", "reserve", "menu", "pay", "link", "share"] },
+      { key: "a3_value", label: "Action 3 — valeur", type: "text", placeholder: "Numéro, adresse, lien ou email" },
+      { key: "a4_type", label: "Action 4", type: "select", options: ["none", "call", "whatsapp", "directions", "email", "reserve", "menu", "pay", "link", "share"] },
+      { key: "a4_value", label: "Action 4 — valeur", type: "text", placeholder: "Numéro, adresse, lien ou email" },
+      { key: "a5_type", label: "Action 5", type: "select", options: ["none", "call", "whatsapp", "directions", "email", "reserve", "menu", "pay", "link", "share"] },
+      { key: "a5_value", label: "Action 5 — valeur", type: "text", placeholder: "Numéro, adresse, lien ou email" },
+      { key: "bar_style", label: "Style de la barre", type: "select", options: ["blur", "solid", "gold"] },
+      { key: "show_labels", label: "Afficher les libellés", type: "select", options: ["yes", "no"] },
+      { key: "position", label: "Position", type: "select", options: ["bottom", "top"] },
     ],
   },
   whatsapp_button: {

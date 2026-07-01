@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, ctaButtonStyle, CTA_ANIM_CSS, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import { createClient } from "@/lib/supabase/client"
@@ -508,6 +508,25 @@
           </div>
         </div>
       )
+      case "sticky_bar": {
+        const acts = [1,2,3,4,5].map(i => stickyActionHref(c[`a${i}_type`], c[`a${i}_value`])).filter(a => a.href !== undefined || a.share)
+        const showL = c.show_labels !== "no"
+        return (
+          <div style={{ padding: "8px 16px", ...s }}>
+            <div style={{ border: "1px dashed rgba(201,168,76,0.3)", borderRadius: 12, padding: "8px 10px", background: "rgba(201,168,76,0.04)" }}>
+              <p style={{ color: muted, fontSize: 9, margin: "0 0 7px", textTransform: "uppercase", letterSpacing: 1 }}>📌 Barre fixe · bas de l'écran (mobile)</p>
+              <div style={{ display: "flex", gap: 6, justifyContent: "space-around", background: c.bar_style==="gold" ? `linear-gradient(90deg,${primary},${primary}cc)` : "rgba(10,10,10,0.9)", borderRadius: 12, padding: "8px 6px" }}>
+                {(acts.length ? acts : [stickyActionHref("call"), stickyActionHref("whatsapp"), stickyActionHref("directions")]).slice(0,5).map((a, i) => (
+                  <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                    <span style={{ fontSize: 16 }}>{a.icon}</span>
+                    {showL && <span style={{ color: c.bar_style==="gold" ? "#080808" : a.color, fontSize: 8, fontWeight: 600 }}>{a.label}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )
+      }
       case "directions_button": return (
         <div style={{ padding: "4px 16px 10px", ...s }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(66,133,244,0.1)", border: "1.5px solid rgba(66,133,244,0.25)", borderRadius: 12, padding: "13px 18px" }}>

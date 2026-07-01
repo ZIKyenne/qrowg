@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, waLink, telLink, directionsLink, ctaButtonStyle, CTA_ANIM_CSS, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, waLink, telLink, directionsLink, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -797,6 +797,30 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
         </a>
       </div>
     ) : null }
+    case "sticky_bar": {
+      const acts = [1, 2, 3, 4, 5].map(i => ({ ...stickyActionHref(c[`a${i}_type`], c[`a${i}_value`]), t: c[`a${i}_type`] })).filter(a => a.t && a.t !== "none" && (a.href || a.share))
+      if (acts.length === 0) return null
+      const showL = c.show_labels !== "no"
+      const barBg = c.bar_style === "solid" ? "#0A0A0A" : c.bar_style === "gold" ? `linear-gradient(90deg,${G},${G}dd)` : "rgba(12,12,12,0.82)"
+      const goldStyle = c.bar_style === "gold"
+      const pos = c.position === "top" ? { top: 0 } : { bottom: 0 }
+      const doShare = () => { const u = typeof window !== "undefined" ? window.location.href : ""; if (navigator.share) navigator.share({ url: u }).catch(() => {}); else { navigator.clipboard?.writeText(u) } ; trackLinkClick(pageId, block.id, "share") }
+      return (
+        <>
+          <div style={{ height: 68 }} aria-hidden />
+          <div style={{ position: "fixed", ...pos, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, zIndex: 60, background: barBg, backdropFilter: c.bar_style === "blur" ? "blur(14px)" : undefined, WebkitBackdropFilter: c.bar_style === "blur" ? "blur(14px)" : undefined, borderTop: c.position === "top" ? "none" : "1px solid rgba(255,255,255,0.1)", borderBottom: c.position === "top" ? "1px solid rgba(255,255,255,0.1)" : "none", boxShadow: c.position === "top" ? "0 8px 24px rgba(0,0,0,0.4)" : "0 -8px 24px rgba(0,0,0,0.4)", display: "flex", justifyContent: "space-around", alignItems: "stretch", padding: `8px 6px calc(8px + env(safe-area-inset-bottom))` }}>
+            {acts.slice(0, 5).map((a, i) => {
+              const col = goldStyle ? "#080808" : a.color
+              const inner = <span style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}><span style={{ fontSize: 20 }}>{a.icon}</span>{showL && <span style={{ color: col, fontSize: 10, fontWeight: 700 }}>{a.label}</span>}</span>
+              const st: any = { flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "6px 4px", textDecoration: "none", background: "transparent", border: "none", cursor: "pointer" }
+              return a.share
+                ? <button key={i} onClick={doShare} style={st}>{inner}</button>
+                : <a key={i} href={a.href} target={/^https?:/.test(a.href || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, `bar:${a.t}`)} style={st}>{inner}</a>
+            })}
+          </div>
+        </>
+      )
+    }
     case "directions_button": { const href = directionsLink(c.address, c.provider); return (c.address || c.label) ? (
       <div style={{ padding: "6px 24px 10px" }}>
         <a href={href || "#"} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, "directions")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(66,133,244,0.12)", border: "1.5px solid rgba(66,133,244,0.35)", borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
