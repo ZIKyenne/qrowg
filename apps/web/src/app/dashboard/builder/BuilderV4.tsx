@@ -626,7 +626,7 @@
         const txtColor = c.text_color || "#fff"
         const bannerBg = bannerBackgroundStyle(c, accent)
         const ovLayers = bannerOverlayLayers(c, accent)
-        const bRadius = rad ? rad : "10px 10px 0 0"
+        const bRadius = rad || 0
         const frame = bannerFrame(c, accent, bRadius)
         const alignItems = pos==="center" ? "center" : "flex-end"
         const justifyContent = (pos==="bottom-center"||pos==="center") ? "center" : "flex-start"
