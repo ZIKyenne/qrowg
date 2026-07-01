@@ -10,7 +10,8 @@
         "dev": "turbo run dev",
         "build": "cd apps/web && node scripts/check-jsx-imports.mjs && npx next build",
         "check:imports": "cd apps/web && node scripts/check-jsx-imports.mjs",
-        "test": "turbo run test",
+        "test": "vitest run",
+        "test:watch": "vitest",
         "lint": "turbo run lint",
         "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
         "db:push": "supabase db push",
@@ -29,7 +30,8 @@
         "prettier": "^3.2.0",
         "prettier-plugin-tailwindcss": "^0.6.0",
         "turbo": "^2.0.0",
-        "typescript": "^5.9.3"
+        "typescript": "^5.9.3",
+        "vitest": "^4.1.9"
     },
     "lint-staged": {
         "*.{ts,tsx}": [
