@@ -1,6 +1,7 @@
 import { Resend } from "resend"
 import { NextRequest, NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase/server"
+import { EMAIL_FROM } from "@/lib/emailFrom"
 
 const TYPE_LABELS: Record<string, string> = {
   quote: "Demande de devis", reservation: "Réservation", booking: "Réservation événement",
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest) {
 </div></body></html>`
 
     const { data: sent, error } = await resend.emails.send({
-      from: "QRfolio <onboarding@resend.dev>",
+      from: EMAIL_FROM,
       to,
       replyTo: email || undefined,
       subject: `${label} — ${name || "nouveau contact"}`,

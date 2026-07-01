@@ -12,6 +12,7 @@
 import { createAdminClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { getPlan } from "@/lib/plans"
+import { EMAIL_FROM } from "@/lib/emailFrom"
 
 const CRON_SECRET = process.env.CRON_SECRET ?? ""
 
@@ -95,7 +96,7 @@ export async function GET(req: NextRequest) {
           method: "POST",
           headers: { "Authorization": `Bearer ${resendKey}`, "Content-Type": "application/json" },
           body: JSON.stringify({
-            from: "QRfolio <onboarding@resend.dev>",
+            from: EMAIL_FROM,
             to: [p.email],
             subject: threshold === "over" ? "⚠️ Quota de vues atteint — QRfolio" : "📊 Tu approches de ton quota de vues — QRfolio",
             html: alertHtml(p.full_name as string, views, limit, threshold === "over", appUrl),

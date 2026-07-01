@@ -1,6 +1,7 @@
 import { Resend } from "resend"
 import { NextRequest, NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase/server"
+import { EMAIL_FROM } from "@/lib/emailFrom"
 
 const TYPE_INTRO: Record<string, string> = {
   quote: "Votre demande de devis a bien été reçue.",
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
 </div></body></html>`
 
     const { data: sent, error } = await resend.emails.send({
-      from: "QRfolio <onboarding@resend.dev>",
+      from: EMAIL_FROM,
       to: email,
       replyTo: replyTo || undefined,
       subject: `Nous avons bien reçu votre demande — ${sender}`,
