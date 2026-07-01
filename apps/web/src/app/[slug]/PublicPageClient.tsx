@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -692,12 +692,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       </div>
     ) : null
     case "availability": {
-      const scMap: Record<string, { color: string; bg: string; border: string; label: string }> = {
-        available: { color: "#39FF8F", bg: "rgba(57,255,143,0.08)", border: "rgba(57,255,143,0.25)", label: "Disponible" },
-        busy: { color: "#F97316", bg: "rgba(249,115,22,0.08)", border: "rgba(249,115,22,0.25)", label: "En mission" },
-        closed: { color: "#EF4444", bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.25)", label: "Indisponible" },
-      }
-      const sc = scMap[c.status || "available"]
+      const sc = availabilityStatus(c.status, c.dot_color)
       return (
         <div style={{ padding: "8px 24px 12px" }}>
           <div style={{ background: sc.bg, border: `1px solid ${sc.border}`, borderRadius: 14, padding: "14px 16px" }}>

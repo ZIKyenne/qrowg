@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, AVAILABILITY_STATUSES, availabilityStatus, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import { createClient } from "@/lib/supabase/client"
@@ -661,12 +661,7 @@
         </div>
       )
       case "availability": {
-        const scMap: Record<string,any> = {
-          available: { color: "#39FF8F", bg: "rgba(57,255,143,0.08)", border: "rgba(57,255,143,0.25)", label: "Disponible" },
-          busy: { color: "#F97316", bg: "rgba(249,115,22,0.08)", border: "rgba(249,115,22,0.25)", label: "En mission" },
-          closed: { color: "#EF4444", bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.25)", label: "Indisponible" },
-        }
-        const sc = scMap[c.status||"available"]
+        const sc = availabilityStatus(c.status, c.dot_color)
         return (
           <div style={{ padding: "8px 16px", ...s }}>
             <div style={{ background: sc.bg, border: `1px solid ${sc.border}`, borderRadius: 12, padding: "12px 14px" }}>
@@ -2637,6 +2632,58 @@
     )
   }
 
+  function AvailabilityEditor({ content, onChange }: { content: BlockContent; onChange: (key: string, val: string) => void }) {
+    const M = "#8A8478", TXT = "#F5F0E8", GG = "var(--accent, #C9A84C)"
+    const cur = content.status || "available"
+    const sc = availabilityStatus(cur, content.dot_color)
+    const inputStyle: React.CSSProperties = { width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
+    const msgSuggestions = ["Ouvert aux nouvelles missions", "Disponible cette semaine", "Complet ce mois-ci", "Réponse en moins de 24h", "Sur réservation uniquement"]
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
+        <div>
+          <label style={{ color: M, fontSize: 11, display: "block", marginBottom: 7, fontWeight: 500 }}>Statut</label>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+            {AVAILABILITY_STATUSES.map(st => {
+              const on = cur === st.key
+              return (
+                <button key={st.key} type="button" onClick={() => onChange("status", st.key)}
+                  style={{ display: "flex", alignItems: "center", gap: 7, padding: "8px 10px", borderRadius: 8, cursor: "pointer", textAlign: "left" as const, background: on ? `${st.color}14` : "rgba(255,255,255,0.03)", border: `1px solid ${on ? `${st.color}66` : "rgba(255,255,255,0.08)"}`, color: on ? TXT : M, fontSize: 11, fontWeight: on ? 700 : 500 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: st.color, boxShadow: `0 0 6px ${st.color}80`, flexShrink: 0 }} />
+                  <span style={{ lineHeight: 1.2 }}>{st.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+          <label style={{ color: M, fontSize: 11, fontWeight: 500 }}>Couleur de la pastille</label>
+          <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+            {content.dot_color && <button type="button" onClick={() => onChange("dot_color", "")} title="Couleur auto" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, padding: "4px 8px", color: M, fontSize: 10, cursor: "pointer" }}>Auto</button>}
+            <label style={{ width: 26, height: 26, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: sc.color, cursor: "pointer", position: "relative", overflow: "hidden", flexShrink: 0 }}>
+              <input type="color" value={sc.color} onChange={e => onChange("dot_color", e.target.value)} style={{ position: "absolute", inset: -4, width: 40, height: 40, border: "none", padding: 0, cursor: "pointer", opacity: 0 }} />
+            </label>
+          </div>
+        </div>
+        <div>
+          <label style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>Message</label>
+          <input value={content.message || ""} placeholder="Ouvert aux nouvelles missions" onChange={e => onChange("message", e.target.value)} style={inputStyle} />
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 6 }}>
+            {msgSuggestions.map(m => <button key={m} type="button" onClick={() => onChange("message", m)} style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 20, padding: "4px 9px", color: GG, fontSize: 10, cursor: "pointer" }}>{m}</button>)}
+          </div>
+        </div>
+        <div>
+          <label style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>Disponible à partir de (optionnel)</label>
+          <input value={content.available_from || ""} placeholder="Janvier 2025" onChange={e => onChange("available_from", e.target.value)} style={inputStyle} />
+        </div>
+        <div>
+          <label style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>Bouton (optionnel)</label>
+          <input value={content.cta_label || ""} placeholder="Prendre contact" onChange={e => onChange("cta_label", e.target.value)} style={{ ...inputStyle, marginBottom: 6 }} />
+          <input value={content.cta_url || ""} placeholder="https://calendly.com/…" onChange={e => onChange("cta_url", e.target.value)} style={inputStyle} />
+        </div>
+      </div>
+    )
+  }
+
   function EditPanel({ block, onChange }: { block: Block; onChange: (key: string, val: string) => void }) {
     const def = BLOCK_DEFS[block.type]
     if (!def) return null
@@ -2648,6 +2695,10 @@
 
     if (block.type === "skills") {
       return <SkillsEditor content={block.content} onChange={onChange} />
+    }
+
+    if (block.type === "availability") {
+      return <AvailabilityEditor content={block.content} onChange={onChange} />
     }
 
     if (block.type === "social_links") {

@@ -309,6 +309,27 @@ export function bannerFrame(c: any, accent: string, radius: string | number): { 
   return { boxShadow, borderLayer }
 }
 
+// Statuts de disponibilité (parité builder <-> public). Couleur personnalisable via dot_color.
+export const AVAILABILITY_STATUSES: { key: string; label: string; color: string }[] = [
+  { key: "available", label: "Disponible", color: "#39FF8F" },
+  { key: "busy", label: "En mission", color: "#F97316" },
+  { key: "appointment", label: "Sur rendez-vous", color: "#38BDF8" },
+  { key: "full", label: "Complet ce mois-ci", color: "#F97316" },
+  { key: "hiring", label: "Je recrute", color: "#39FF8F" },
+  { key: "collab", label: "Ouvert aux collaborations", color: "#C9A84C" },
+  { key: "booking", label: "Ouvert aux réservations", color: "#39FF8F" },
+  { key: "tour", label: "En tournée", color: "#9146FF" },
+  { key: "works", label: "En travaux", color: "#FBBF24" },
+  { key: "fast_reply", label: "Réponse sous 24h", color: "#38BDF8" },
+  { key: "temp_closed", label: "Fermé temporairement", color: "#EF4444" },
+  { key: "closed", label: "Indisponible", color: "#EF4444" },
+]
+export function availabilityStatus(status?: string, customColor?: string): { color: string; label: string; bg: string; border: string } {
+  const found = AVAILABILITY_STATUSES.find(s => s.key === status) || AVAILABILITY_STATUSES[0]
+  const color = (customColor && /^#([0-9a-fA-F]{6})$/.test(customColor)) ? customColor : found.color
+  return { color, label: found.label, bg: `${color}14`, border: `${color}40` }
+}
+
 // Modèles d'identité par métier : un clic crée un ensemble de blocs pré-remplis adaptés.
 // Chaque bloc = { type, content } fusionné avec le defaultContent du bloc à la création.
 export const IDENTITY_PRESETS: { key: string; label: string; emoji: string; blocks: { type: string; content: Record<string, string> }[] }[] = [
