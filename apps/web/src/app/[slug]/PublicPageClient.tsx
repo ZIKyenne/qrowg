@@ -495,6 +495,123 @@ function RenderBlock({ block, theme, pageId }: { block: Block; theme: any; pageI
       </div>
     )
 
+    case "cover_banner": {
+      const h = c.height === "lg" ? 260 : c.height === "sm" ? 120 : 180
+      return (
+        <div style={{ position: "relative", overflow: "hidden" }}>
+          {c.src
+            ? <img src={c.src} alt="" style={{ width: "100%", height: h, objectFit: "cover", display: "block" }} />
+            : <div style={{ width: "100%", height: h, background: `linear-gradient(135deg,${G}33,${theme.accent || "#39FF8F"}22)` }} />}
+          {c.overlay_color && <div style={{ position: "absolute", inset: 0, background: c.overlay_color, opacity: parseFloat(c.overlay_opacity || "0.3") }} />}
+          {c.cover_title && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "flex-end", padding: "16px 20px" }}><p style={{ color: "#fff", fontSize: 22, fontWeight: 700, margin: 0, textShadow: "0 2px 10px rgba(0,0,0,0.55)", fontFamily: FONT_D }}>{c.cover_title}</p></div>}
+        </div>
+      )
+    }
+    case "about": return (c.text || c.title) ? (
+      <div style={{ padding: "10px 24px 16px", textAlign: (c.align as any) || "left" }}>
+        {c.emoji && <span style={{ fontSize: 22, display: "block", marginBottom: 6 }}>{c.emoji}</span>}
+        {c.title && <p style={{ color: G, fontSize: 11, fontWeight: 700, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: FONT_B }}>{c.title}</p>}
+        <p style={{ color: TEXT, fontSize: 15, lineHeight: 1.75, margin: 0, fontFamily: FONT_B, whiteSpace: "pre-wrap" }}>{c.text}</p>
+      </div>
+    ) : null
+    case "availability": {
+      const scMap: Record<string, { color: string; bg: string; border: string; label: string }> = {
+        available: { color: "#39FF8F", bg: "rgba(57,255,143,0.08)", border: "rgba(57,255,143,0.25)", label: "Disponible" },
+        busy: { color: "#F97316", bg: "rgba(249,115,22,0.08)", border: "rgba(249,115,22,0.25)", label: "En mission" },
+        closed: { color: "#EF4444", bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.25)", label: "Indisponible" },
+      }
+      const sc = scMap[c.status || "available"]
+      return (
+        <div style={{ padding: "8px 24px 12px" }}>
+          <div style={{ background: sc.bg, border: `1px solid ${sc.border}`, borderRadius: 14, padding: "14px 16px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: c.message ? 7 : 0 }}>
+              <div style={{ width: 9, height: 9, borderRadius: "50%", background: sc.color, boxShadow: `0 0 8px ${sc.color}80`, flexShrink: 0 }} />
+              <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{sc.label}</p>
+              {c.available_from && <span style={{ color: MUTED, fontSize: 12, marginLeft: "auto" }}>dès {c.available_from}</span>}
+            </div>
+            {c.message && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5, fontFamily: FONT_B }}>{c.message}</p>}
+            {c.cta_label && <a href={c.cta_url || "#"} onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "availability")} style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 10, padding: "11px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#080808", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</a>}
+          </div>
+        </div>
+      )
+    }
+    case "journey": {
+      const lines = [c.line_1, c.line_2, c.line_3, c.line_4].filter(Boolean)
+      return lines.length > 0 ? (
+        <div style={{ padding: "8px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 9px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+            {lines.map((line: string, i: number) => (
+              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 11, background: `${G}0a`, border: `1px solid ${G}18`, borderRadius: 11, padding: "11px 12px" }}>
+                <span style={{ fontSize: 17, flexShrink: 0 }}>{line.split(" ")[0]}</span>
+                <span style={{ color: TEXT, fontSize: 14, lineHeight: 1.5, fontFamily: FONT_B }}>{line.split(" ").slice(1).join(" ")}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "expertise": {
+      const skills = [[c.s1_name, c.s1_level, c.s1_icon], [c.s2_name, c.s2_level, c.s2_icon], [c.s3_name, c.s3_level, c.s3_icon], [c.s4_name, c.s4_level, c.s4_icon], [c.s5_name, c.s5_level, c.s5_icon]].filter(([n]) => n)
+      return skills.length > 0 ? (
+        <div style={{ padding: "8px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {skills.map(([name, level, icon]: any[], i: number) => {
+              const pct = Math.round((parseInt(String(level) || "3") / 5) * 100)
+              return (
+                <div key={i}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+                    <span style={{ color: TEXT, fontSize: 13, display: "flex", alignItems: "center", gap: 6, fontFamily: FONT_B }}>{icon && <span>{icon}</span>}{name}</span>
+                    <span style={{ color: G, fontSize: 11, fontWeight: 700 }}>{pct}%</span>
+                  </div>
+                  <div style={{ height: 5, background: "rgba(255,255,255,0.08)", borderRadius: 3, overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${pct}%`, background: `linear-gradient(90deg,${G},${theme.accent || "#39FF8F"})`, borderRadius: 3 }} />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      ) : null
+    }
+    case "languages": {
+      const langs = [[c.lang_1_flag, c.lang_1_name, c.lang_1_level], [c.lang_2_flag, c.lang_2_name, c.lang_2_level], [c.lang_3_flag, c.lang_3_name, c.lang_3_level], [c.lang_4_flag, c.lang_4_name, c.lang_4_level]].filter(([, n]) => n)
+      return langs.length > 0 ? (
+        <div style={{ padding: "8px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 9px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+            {langs.map(([flag, name, level]: any[], i: number) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, padding: "9px 12px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 11 }}>
+                <span style={{ fontSize: 20 }}>{flag || "🌐"}</span>
+                <span style={{ color: TEXT, fontSize: 14, fontWeight: 600, flex: 1, fontFamily: FONT_B }}>{name}</span>
+                <span style={{ background: `${G}18`, border: `1px solid ${G}28`, borderRadius: 20, padding: "3px 10px", color: G, fontSize: 11, fontWeight: 600 }}>{level || "Courant"}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "certifications": {
+      const certs = [[c.cert_1_icon, c.cert_1_name, c.cert_1_org, c.cert_1_year], [c.cert_2_icon, c.cert_2_name, c.cert_2_org, c.cert_2_year], [c.cert_3_icon, c.cert_3_name, c.cert_3_org, c.cert_3_year], [c.cert_4_icon, c.cert_4_name, c.cert_4_org, c.cert_4_year]].filter(([, n]) => n)
+      return certs.length > 0 ? (
+        <div style={{ padding: "8px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 9px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+            {certs.map(([icon, name, org, year]: any[], i: number) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, padding: "10px 12px", background: `${G}0a`, border: `1px solid ${G}18`, borderRadius: 12 }}>
+                <span style={{ fontSize: 20, flexShrink: 0 }}>{icon || "🏆"}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{name}</p>
+                  <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{org}{year ? ` · ${year}` : ""}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+
     default: return null
   }
 }
