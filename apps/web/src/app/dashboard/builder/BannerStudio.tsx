@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { ImageIcon, LayoutGrid, Type, Palette, Sparkles, Layers, ChevronDown, Wand2, Crop, Move, X, AArrowUp } from "lucide-react"
 import ImageUpload from "./ImageUpload"
-import { BANNER_GRADIENTS, BANNER_PRESETS, BANNER_ANIM_CSS, BANNER_FONTS, BANNER_NOISE_URL as NOISE_URL, bannerBackgroundStyle, bannerImageStyle } from "./types"
+import { BANNER_GRADIENTS, BANNER_PRESETS, BANNER_ANIM_CSS, BANNER_FONTS, BANNER_IMG_FILTERS, BANNER_NOISE_URL as NOISE_URL, bannerBackgroundStyle, bannerImageStyle } from "./types"
 
 const G = "#C9A84C"
 const MUTED = "#8A8478"
@@ -283,6 +283,27 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
                 onMouseEnter={e => e.currentTarget.style.background = "rgba(201,168,76,0.18)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(201,168,76,0.1)"}>
                 <Crop size={14} /> Recadrer &amp; Zoomer{(parseFloat(c.img_zoom) > 1 || (c.img_pos_x && c.img_pos_x !== "50")) ? " ✓" : ""}
               </button>
+            )}
+            {c.src && (
+              <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 12, display: "flex", flexDirection: "column", gap: 12 }}>
+                <div>
+                  <label style={{ color: MUTED, fontSize: 11, fontWeight: 500, display: "block", marginBottom: 7 }}>Filtres</label>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 6 }}>
+                    {BANNER_IMG_FILTERS.map(fl => {
+                      const on = (parseInt(c.img_grayscale) || 0) === (parseInt(fl.v.img_grayscale) || 0) && (parseInt(c.img_sepia) || 0) === (parseInt(fl.v.img_sepia) || 0) && (parseInt(c.img_saturate) || 100) === (parseInt(fl.v.img_saturate) || 100)
+                      return (
+                        <button key={fl.key} onClick={() => Object.entries(fl.v).forEach(([k, v]) => set(k, v))} style={{ borderRadius: 9, overflow: "hidden", border: `1.5px solid ${on ? G : "rgba(255,255,255,0.1)"}`, cursor: "pointer", background: "transparent", padding: 0 }}>
+                          <div style={{ height: 28, backgroundImage: `url(${c.src})`, backgroundSize: "cover", backgroundPosition: "center", filter: [fl.v.img_grayscale && +fl.v.img_grayscale ? `grayscale(${fl.v.img_grayscale}%)` : "", fl.v.img_sepia && +fl.v.img_sepia ? `sepia(${fl.v.img_sepia}%)` : "", fl.v.img_saturate ? `saturate(${fl.v.img_saturate}%)` : "", fl.v.img_contrast ? `contrast(${fl.v.img_contrast}%)` : "", fl.v.img_brightness ? `brightness(${fl.v.img_brightness}%)` : ""].filter(Boolean).join(" ") }} />
+                          <div style={{ fontSize: 9.5, color: on ? G : MUTED, fontWeight: on ? 700 : 500, padding: "3px 2px", textAlign: "center" }}>{fl.label}</div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+                <Slider label="Luminosité" value={parseInt(c.img_brightness) || 100} min={50} max={160} unit=" %" def={100} onChange={v => set("img_brightness", v)} />
+                <Slider label="Contraste" value={parseInt(c.img_contrast) || 100} min={50} max={160} unit=" %" def={100} onChange={v => set("img_contrast", v)} />
+                <Slider label="Saturation" value={parseInt(c.img_saturate) || 100} min={0} max={200} unit=" %" def={100} onChange={v => set("img_saturate", v)} />
+              </div>
             )}
           </>
         )}

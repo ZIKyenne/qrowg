@@ -207,8 +207,27 @@ export function bannerImageStyle(c: any): Record<string, any> {
     objectPosition = c.img_focus === "top" ? "center top" : c.img_focus === "bottom" ? "center bottom" : "center"
     py = c.img_focus === "top" ? 0 : c.img_focus === "bottom" ? 100 : 50
   }
-  return { objectFit: "cover", objectPosition, transform: zoom > 1 ? `scale(${zoom})` : undefined, transformOrigin: `${px}% ${py}%` }
+  const st: Record<string, any> = { objectFit: "cover", objectPosition, transform: zoom > 1 ? `scale(${zoom})` : undefined, transformOrigin: `${px}% ${py}%` }
+  const f: string[] = []
+  const br = parseInt(c.img_brightness); if (br && br !== 100) f.push(`brightness(${br}%)`)
+  const co = parseInt(c.img_contrast); if (co && co !== 100) f.push(`contrast(${co}%)`)
+  const sa = parseInt(c.img_saturate); if ((c.img_saturate !== undefined && c.img_saturate !== "") && sa !== 100) f.push(`saturate(${sa}%)`)
+  const gr = parseInt(c.img_grayscale); if (gr) f.push(`grayscale(${gr}%)`)
+  const se = parseInt(c.img_sepia); if (se) f.push(`sepia(${se}%)`)
+  const bl = parseFloat(c.img_blur); if (bl) f.push(`blur(${bl}px)`)
+  if (f.length) st.filter = f.join(" ")
+  return st
 }
+
+// Filtres image prédéfinis : appliquent plusieurs valeurs d'un coup
+export const BANNER_IMG_FILTERS: { key: string; label: string; v: Record<string, string> }[] = [
+  { key: "none", label: "Aucun", v: { img_brightness: "100", img_contrast: "100", img_saturate: "100", img_grayscale: "0", img_sepia: "0" } },
+  { key: "nb", label: "N&B", v: { img_grayscale: "100", img_contrast: "108", img_saturate: "100", img_sepia: "0", img_brightness: "100" } },
+  { key: "vintage", label: "Vintage", v: { img_sepia: "38", img_contrast: "110", img_saturate: "88", img_brightness: "104", img_grayscale: "0" } },
+  { key: "vif", label: "Vif", v: { img_saturate: "155", img_contrast: "116", img_brightness: "102", img_grayscale: "0", img_sepia: "0" } },
+  { key: "doux", label: "Doux", v: { img_saturate: "92", img_contrast: "94", img_brightness: "106", img_grayscale: "0", img_sepia: "8" } },
+  { key: "chaud", label: "Chaud", v: { img_sepia: "22", img_saturate: "120", img_brightness: "103", img_contrast: "104", img_grayscale: "0" } },
+]
 
 // Typographie du titre de bannière (parité builder <-> public). Polices déjà chargées côté public.
 export const BANNER_FONTS: Record<string, string> = {
