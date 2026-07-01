@@ -2815,8 +2815,9 @@ export default function TemplatePreviewModal({
             </div>
           </div>
 
-          {/* Action principale */}
-          <div style={{ marginTop: "auto", display: "flex", gap: 10 }}>
+          {/* Action principale — sticky en bas sur mobile (toujours accessible sans scroller) */}
+          <div style={{ marginTop: "auto", display: "flex", gap: 10,
+            ...(isMobile ? { position: "sticky" as const, bottom: 0, margin: "12px -20px 0", padding: "12px 20px calc(4px + env(safe-area-inset-bottom))", background: "rgba(16,15,10,0.92)", backdropFilter: "blur(8px)", borderTop: "1px solid rgba(255,255,255,0.08)", zIndex: 3 } : {}) }}>
             <button type="button" onClick={onClose} style={{ padding: "12px 16px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 11, color: MUTED, fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
               <X size={12} /> Fermer
             </button>
