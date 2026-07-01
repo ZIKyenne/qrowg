@@ -4898,6 +4898,47 @@
                   {pageSlug && <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 7, padding: "5px 10px", color: G, textDecoration: "none", fontSize: 10, fontWeight: 700 }}><ExternalLink size={10} /> Voir en direct</a>}
                 </div>
 
+                {/* Score de profil (lecture seule, non-IA) — complétude + suggestions cliquables */}
+                {(() => {
+                  const pb = blocks.find(b => b.type === "profile")
+                  const selPb = () => { if (pb) { setSelectedId(pb.id); setRightTab("edit") } else addBlock("profile") }
+                  const checks: { label: string; ok: boolean; act: () => void }[] = [
+                    { label: "Photo de profil", ok: !!pb?.content.avatar, act: selPb },
+                    { label: "Accroche", ok: !!(pb?.content.tagline || "").trim(), act: selPb },
+                    { label: "Bio", ok: blocks.some(b => (b.type === "bio" || b.type === "about") && (b.content.text || "").trim()), act: () => addBlock("bio") },
+                    { label: "Badge de confiance", ok: !!(pb?.content.badge || "").trim() || blocks.some(b => ["availability", "certifications", "business_stats", "google_reviews_block"].includes(b.type)), act: () => addBlock("availability") },
+                    { label: "Bouton d'action", ok: blocks.some(b => b.type === "cta_button"), act: () => addBlock("cta_button") },
+                    { label: "Réseaux sociaux", ok: blocks.some(b => b.type === "social_links"), act: () => addBlock("social_links") },
+                    { label: "Localisation", ok: blocks.some(b => b.type === "google_maps"), act: () => addBlock("google_maps") },
+                  ]
+                  const score = Math.round((checks.filter(c => c.ok).length / checks.length) * 100)
+                  const col = score >= 80 ? "#39FF8F" : score >= 50 ? "#F59E0B" : "#FF6B6B"
+                  const missing = checks.filter(c => !c.ok).slice(0, 3)
+                  return (
+                    <div style={{ marginBottom: 14, padding: "12px 13px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 7 }}>
+                        <span style={{ color: "#F5F0E8", fontSize: 11.5, fontWeight: 700 }}>Score de profil</span>
+                        <span style={{ color: col, fontSize: 15, fontWeight: 800, fontFamily: "Cormorant Garamond, serif" }}>{score}%</span>
+                      </div>
+                      <div style={{ height: 6, borderRadius: 4, background: "rgba(255,255,255,0.08)", overflow: "hidden", marginBottom: missing.length ? 10 : 0 }}>
+                        <div style={{ height: "100%", width: `${Math.max(4, score)}%`, borderRadius: 4, background: col, transition: "width .5s cubic-bezier(.2,.8,.2,1)" }} />
+                      </div>
+                      {missing.length > 0 && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                          {missing.map(c => (
+                            <button key={c.label} type="button" onClick={c.act}
+                              style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, width: "100%", padding: "7px 9px", borderRadius: 8, background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.18)", color: "#E8E2D6", fontSize: 10.5, cursor: "pointer", textAlign: "left" as const }}>
+                              <span>Ajoutez : <strong style={{ color: G }}>{c.label}</strong></span>
+                              <span style={{ color: G, flexShrink: 0, fontSize: 13, lineHeight: 1 }}>+</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {missing.length === 0 && <p style={{ color: "#39FF8F", fontSize: 10.5, margin: 0, fontWeight: 600 }}>Profil complet 🎉</p>}
+                    </div>
+                  )
+                })()}
+
                 <div style={{ display: "flex", justifyContent: "center" }}>
                   <div style={{ position: "relative", width: 220 }}>
                     <div style={{ width: 220, background: "linear-gradient(145deg,#2A2A2A,#1A1A1A)", borderRadius: 34, padding: "10px 8px", boxShadow: "0 0 0 1px #3A3A3A, 0 20px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.08)", position: "relative" }}>
