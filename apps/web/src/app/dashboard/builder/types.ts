@@ -95,6 +95,11 @@ export function wcagLevel(ratio: number): "AAA" | "AA" | "fail" {
   return "fail"
 }
 
+// Formes en découpe (clip-path) : le contour/glow doit passer par filter:drop-shadow, pas box-shadow.
+export function isClipShape(shape?: string): boolean {
+  return shape === "hexagone" || shape === "diamant"
+}
+
 // Forme d'un avatar (source unique partagée éditeur ↔ page publique).
 export function avatarShapeStyle(shape?: string): Record<string, string | number> {
   switch (shape) {
