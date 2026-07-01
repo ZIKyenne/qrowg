@@ -866,6 +866,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [expMarks, setExpMarks] = useState(false)
   const [mockOpen, setMockOpen] = useState(false)
   const [mockEnv, setMockEnv] = useState<"wall" | "table" | "window" | "desk" | "cadre" | "counter" | "main" | "carte">("wall")
+  const mockTouchX = useRef<number | null>(null) // swipe entre décors de l'aperçu
   const [mockUrl, setMockUrl] = useState("")
   const [mockBg, setMockBg] = useState("") // photo d'environnement (Unsplash) pour le mockup
   const [ctx, setCtx] = useState<{ x: number; y: number } | null>(null) // menu clic-droit
@@ -4777,19 +4778,24 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           carte:  { bg: "linear-gradient(160deg,#e8e2d6,#c9c0ad)", transform: "perspective(1500px) rotateX(50deg) rotateZ(2deg)", maxH: "40%" },
         }
         const s = scenes[mockEnv]
+        const ORDER = ["wall", "table", "window", "desk", "cadre", "counter", "main", "carte"] as const
+        const goScene = (d: number) => { const i = ORDER.indexOf(mockEnv); setMockEnv(ORDER[(i + d + ORDER.length) % ORDER.length]) }
         return (
           <div style={{ position: "fixed", inset: 0, zIndex: 4000, background: "rgba(0,0,0,0.88)", backdropFilter: "blur(4px)", display: "flex", flexDirection: "column", fontFamily: "DM Sans, sans-serif" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px" }}>
               <span style={{ color: "#F5F0E8", fontWeight: 800, fontSize: 14, display: "flex", alignItems: "center", gap: 7 }}><Eye size={15} /> Aperçu en situation</span>
               <button type="button" onClick={() => setMockOpen(false)} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 9, color: "#F5F0E8", cursor: "pointer" }}><X size={16} /></button>
             </div>
-            <div style={{ display: "flex", gap: 8, justifyContent: "center", paddingBottom: 12 }}>
+            <div className="qr-scroll" style={{ display: "flex", gap: 8, justifyContent: "flex-start", padding: "0 16px 12px", overflowX: "auto", scrollbarWidth: "none" as const, WebkitOverflowScrolling: "touch" }}>
               {([["wall", "Mur"], ["table", "Table"], ["window", "Vitrine"], ["desk", "Bureau"], ["cadre", "Cadre"], ["counter", "Comptoir"], ["main", "En main"], ["carte", "Carte de visite"]] as const).map(([id, l]) => (
                 <button key={id} type="button" onClick={() => setMockEnv(id)}
-                  style={{ padding: "7px 16px", borderRadius: 9, cursor: "pointer", fontSize: 12, fontWeight: mockEnv === id ? 700 : 500, background: mockEnv === id ? "rgba(201,168,76,0.22)" : "rgba(255,255,255,0.08)", border: `1px solid ${mockEnv === id ? G : "rgba(255,255,255,0.16)"}`, color: mockEnv === id ? G : "#E8E6E0" }}>{l}</button>
+                  style={{ flexShrink: 0, padding: "7px 16px", borderRadius: 9, cursor: "pointer", fontSize: 12, fontWeight: mockEnv === id ? 700 : 500, whiteSpace: "nowrap" as const, background: mockEnv === id ? "rgba(201,168,76,0.22)" : "rgba(255,255,255,0.08)", border: `1px solid ${mockEnv === id ? G : "rgba(255,255,255,0.16)"}`, color: mockEnv === id ? G : "#E8E6E0" }}>{l}</button>
               ))}
             </div>
-            <div style={{ flex: 1, margin: "0 16px 16px", borderRadius: 16, overflow: "hidden", position: "relative", background: mockBg ? `#222 url(${mockBg}) center/cover no-repeat` : s.bg, display: "flex", alignItems: "center", justifyContent: "center", perspective: "1400px" }}>
+            <div
+              onTouchStart={e => { mockTouchX.current = e.touches[0].clientX }}
+              onTouchEnd={e => { if (mockTouchX.current == null) return; const dx = e.changedTouches[0].clientX - mockTouchX.current; if (dx < -50) goScene(1); else if (dx > 50) goScene(-1); mockTouchX.current = null }}
+              style={{ flex: 1, margin: "0 16px 16px", borderRadius: 16, overflow: "hidden", position: "relative", background: mockBg ? `#222 url(${mockBg}) center/cover no-repeat` : s.bg, display: "flex", alignItems: "center", justifyContent: "center", perspective: "1400px" }}>
               {/* vignette : profondeur photo (bords assombris) */}
               <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(120% 95% at 50% 38%, transparent 52%, rgba(0,0,0,0.32) 100%)" }} />
               {mockUrl && (s.frame
@@ -4798,6 +4804,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   </div>
                 : <img src={mockUrl} alt="aperçu" style={{ maxHeight: s.maxH, maxWidth: "62%", transform: s.transform, transformOrigin: "center", boxShadow: "0 40px 70px rgba(0,0,0,0.45), 0 6px 14px rgba(0,0,0,0.3)", borderRadius: 3 }} />)}
               {s.glass && <div style={{ position: "absolute", inset: 0, background: "linear-gradient(115deg,rgba(255,255,255,0.28) 0%,transparent 28%,transparent 70%,rgba(255,255,255,0.18) 100%)", pointerEvents: "none" }} />}
+              {/* Points + indice de swipe */}
+              <div style={{ position: "absolute", bottom: 12, left: 0, right: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 7, pointerEvents: "none" }}>
+                <div style={{ display: "flex", gap: 6 }}>
+                  {ORDER.map(id => <span key={id} style={{ width: id === mockEnv ? 18 : 6, height: 6, borderRadius: 6, background: id === mockEnv ? G : "rgba(255,255,255,0.4)", transition: "width .2s" }} />)}
+                </div>
+                <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 10.5, fontWeight: 600, background: "rgba(0,0,0,0.35)", padding: "3px 10px", borderRadius: 999, backdropFilter: "blur(4px)" }}>‹ glissez pour changer de décor ›</span>
+              </div>
             </div>
           </div>
         )
