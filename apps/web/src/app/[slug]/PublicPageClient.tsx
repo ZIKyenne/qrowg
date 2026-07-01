@@ -796,6 +796,165 @@ function RenderBlock({ block, theme, pageId }: { block: Block; theme: any; pageI
       </div>
     )
 
+    case "business_stats": {
+      const stats = [[c.stat1_icon, c.stat1_value, c.stat1_label], [c.stat2_icon, c.stat2_value, c.stat2_label], [c.stat3_icon, c.stat3_value, c.stat3_label], [c.stat4_icon, c.stat4_value, c.stat4_label]].filter(([, v]) => v)
+      return stats.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: stats.length <= 2 ? "1fr 1fr" : stats.length === 3 ? "1fr 1fr 1fr" : "1fr 1fr", gap: 9 }}>
+            {stats.map(([icon, value, label]: any[], i: number) => (
+              <div key={i} style={{ background: `${G}08`, border: `1px solid ${G}15`, borderRadius: 13, padding: "16px 10px", textAlign: "center" }}>
+                {icon && <span style={{ fontSize: 22, display: "block", marginBottom: 6 }}>{icon}</span>}
+                <p style={{ color: G, fontSize: 24, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_D, lineHeight: 1 }}>{value}</p>
+                <p style={{ color: MUTED, fontSize: 11, margin: 0, fontFamily: FONT_B }}>{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "google_reviews_block": {
+      const reviews = [[c.r1_name, c.r1_text, c.r1_stars], [c.r2_name, c.r2_text, c.r2_stars], [c.r3_name, c.r3_text, c.r3_stars]].filter(([n]) => n)
+      return (reviews.length > 0 || c.avg_rating) ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {(c.avg_rating || c.title) && (
+            <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: 13, padding: "12px 14px", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.2)", borderRadius: 11 }}>
+              <div style={{ textAlign: "center" }}>
+                <p style={{ color: "#FBBF24", fontSize: 30, fontWeight: 700, margin: 0, fontFamily: FONT_D }}>{c.avg_rating || "5.0"}</p>
+                <div style={{ display: "flex", gap: 2 }}>{[1, 2, 3, 4, 5].map(i => <span key={i} style={{ color: "#FBBF24", fontSize: 11 }}>★</span>)}</div>
+              </div>
+              <div>
+                <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{c.title || "Avis clients"}</p>
+                {c.total_reviews && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.total_reviews} avis</p>}
+              </div>
+            </div>
+          )}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {reviews.map(([name, txt, stars]: any[], i: number) => (
+              <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "11px 13px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                  <p style={{ color: TEXT, fontSize: 12, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{name}</p>
+                  <p style={{ color: "#FBBF24", fontSize: 11, margin: 0 }}>{"★".repeat(parseInt(stars || "5"))}</p>
+                </div>
+                <p style={{ color: MUTED, fontSize: 12, margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>&quot;{txt}&quot;</p>
+              </div>
+            ))}
+          </div>
+          {c.google_url && <a href={c.google_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.google_url)} style={{ marginTop: 11, display: "flex", alignItems: "center", justifyContent: "center", gap: 7, color: "#4285F4", fontSize: 12, fontWeight: 600, textDecoration: "none" }}><span>📍</span> Voir sur Google</a>}
+        </div>
+      ) : null
+    }
+    case "portfolio_work": {
+      const works = [[c.work1_img, c.work1_title, c.work1_desc], [c.work2_img, c.work2_title, c.work2_desc], [c.work3_img, c.work3_title, c.work3_desc]].filter(([, t]) => t)
+      return works.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+            {works.map(([img, title, desc]: any[], i: number) => (
+              <div key={i} style={{ borderRadius: 11, overflow: "hidden", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                {img ? <img src={String(img)} alt="" style={{ width: "100%", height: 100, objectFit: "cover", display: "block" }} /> : <div style={{ height: 100, background: `${G}08`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>📂</div>}
+                <div style={{ padding: "9px 10px" }}>
+                  <p style={{ color: TEXT, fontSize: 12, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{title}</p>
+                  {desc && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{desc}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+          {c.cta_label && (c.cta_url
+            ? <a href={c.cta_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url)} style={{ display: "block", marginTop: 11, background: `${G}10`, border: `1px solid ${G}25`, borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: G, textDecoration: "none" }}>{c.cta_label}</a>
+            : <div style={{ marginTop: 11, background: `${G}10`, border: `1px solid ${G}25`, borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: G }}>{c.cta_label}</div>)}
+        </div>
+      ) : null
+    }
+    case "team": {
+      const accent = theme.accent || "#39FF8F"
+      const members = [[c.m1_photo, c.m1_name, c.m1_role, c.m1_bio], [c.m2_photo, c.m2_name, c.m2_role, c.m2_bio], [c.m3_photo, c.m3_name, c.m3_role, c.m3_bio]].filter(([, n]) => n)
+      return members.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {members.map(([photo, name, role, bio]: any[], i: number) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 13, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 13, padding: "13px 15px" }}>
+                {photo
+                  ? <img src={String(photo)} alt={String(name)} style={{ width: 48, height: 48, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${G}40` }} />
+                  : <div style={{ width: 48, height: 48, borderRadius: "50%", background: `linear-gradient(135deg,${G},${accent})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#080808", flexShrink: 0 }}>{String(name)[0]}</div>}
+                <div>
+                  <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{name}</p>
+                  {role && <p style={{ color: G, fontSize: 12, margin: "0 0 1px" }}>{role}</p>}
+                  {bio && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{bio}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "partners": {
+      const logos = [[c.logo1_img, c.logo1_name], [c.logo2_img, c.logo2_name], [c.logo3_img, c.logo3_name], [c.logo4_img, c.logo4_name], [c.logo5_img, c.logo5_name], [c.logo6_img, c.logo6_name]].filter(([, n]) => n)
+      return logos.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", textAlign: "center", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 9 }}>
+            {logos.map(([img, name]: any[], i: number) => (
+              <div key={i} style={{ height: 48, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                {img ? <img src={String(img)} alt={String(name)} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", padding: 5 }} /> : <p style={{ color: MUTED, fontSize: 11, margin: 0, textAlign: "center", padding: "0 5px" }}>{name}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "logo_wall": {
+      const logos = [[c.logo1, c.logo1_name], [c.logo2, c.logo2_name], [c.logo3, c.logo3_name], [c.logo4, c.logo4_name], [c.logo5, c.logo5_name], [c.logo6, c.logo6_name], [c.logo7, c.logo7_name], [c.logo8, c.logo8_name]].filter(([, n]) => n)
+      return logos.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", textAlign: "center", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 9 }}>
+            {logos.map(([img, name]: any[], i: number) => (
+              <div key={i} style={{ height: 40, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                {img ? <img src={String(img)} alt={String(name)} style={{ maxWidth: "90%", maxHeight: "90%", objectFit: "contain" }} /> : <p style={{ color: MUTED, fontSize: 9, margin: 0, textAlign: "center", padding: "0 4px", lineHeight: 1.2 }}>{name}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "process_steps": {
+      const accent = theme.accent || "#39FF8F"
+      const steps = [[c.s1_icon, c.s1_title, c.s1_desc], [c.s2_icon, c.s2_title, c.s2_desc], [c.s3_icon, c.s3_title, c.s3_desc], [c.s4_icon, c.s4_title, c.s4_desc]].filter(([, t]) => t)
+      return steps.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+            {steps.map(([icon, title, desc]: any[], i: number) => (
+              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 13 }}>
+                <div style={{ width: 34, height: 34, borderRadius: "50%", background: `linear-gradient(135deg,${G},${accent})`, color: "#080808", display: "flex", alignItems: "center", justifyContent: "center", fontSize: icon ? 17 : 14, fontWeight: 700, flexShrink: 0 }}>{icon || i + 1}</div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: "5px 0 2px", fontFamily: FONT_B }}>{title}</p>
+                  {desc && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{desc}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "trust_badge": {
+      const badges = [[c.b1_icon, c.b1_label], [c.b2_icon, c.b2_label], [c.b3_icon, c.b3_label], [c.b4_icon, c.b4_label]].filter(([, l]) => l)
+      return badges.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", textAlign: "center", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 9, justifyContent: "center" }}>
+            {badges.map(([icon, label]: any[], i: number) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(57,255,143,0.08)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 20, padding: "8px 15px" }}>
+                <span style={{ color: "#39FF8F", fontSize: 15, fontWeight: 700 }}>{icon}</span>
+                <span style={{ color: TEXT, fontSize: 13, fontWeight: 600, fontFamily: FONT_B }}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+
     default: return null
   }
 }
