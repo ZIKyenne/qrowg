@@ -35,6 +35,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [mounted, setMounted] = useState(false)
   const [accent, setAccent] = useState(DEFAULT_ACCENT) // couleur d'accent de l'utilisateur
   const [isMobile, setIsMobile] = useState(false) // < 860px : menu replié d'office
+  const [unreadLeads, setUnreadLeads] = useState(0) // messages non lus (badge nav)
   const G = accent
 
   useEffect(() => {
@@ -52,9 +53,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             const acc = p?.preferences?.accent_color || p?.accent_color
             if (acc) { setAccent(acc); localStorage.setItem("qrfolio_accent", acc) }
           })
+        // Compteur de messages non lus (RLS limite aux pages de l'utilisateur)
+        supabase.from("leads").select("id", { count: "exact", head: true }).eq("is_read", false)
+          .then(({ count }: any) => { if (typeof count === "number") setUnreadLeads(count) })
       }
     })
   }, [])
+
+  // Rafraîchit le compteur quand on quitte la page Messages (les lus y sont marqués)
+  useEffect(() => {
+    if (!user || pathname === "/dashboard/leads") return
+    const supabase = createClient()
+    supabase.from("leads").select("id", { count: "exact", head: true }).eq("is_read", false)
+      .then(({ count }: any) => { if (typeof count === "number") setUnreadLeads(count) })
+  }, [pathname, user])
 
   // Mise à jour live quand on change la couleur depuis la page Profil
   useEffect(() => {
@@ -157,9 +169,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   }}
                   onMouseEnter={e => { if (!active) { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.color = "#F5F0E8" } }}
                   onMouseLeave={e => { if (!active) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MUTED } }}>
-                    <Icon size={16} style={{ flexShrink: 0 }} />
+                    <div style={{ position: "relative", flexShrink: 0, display: "flex" }}>
+                      <Icon size={16} />
+                      {href === "/dashboard/leads" && unreadLeads > 0 && (
+                        <span style={{ position: "absolute", top: -5, right: collapsed ? -5 : -6, minWidth: 15, height: 15, padding: "0 4px", borderRadius: 8, background: "#EF4444", color: "#fff", fontSize: 9, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, boxShadow: "0 0 0 2px #0A0A0A" }}>{unreadLeads > 99 ? "99+" : unreadLeads}</span>
+                      )}
+                    </div>
                     {!collapsed && <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{label}</span>}
-                    {!collapsed && active && <div style={{ width: 4, height: 4, borderRadius: "50%", background: G, marginLeft: "auto", flexShrink: 0 }} />}
+                    {!collapsed && href === "/dashboard/leads" && unreadLeads > 0 && <span style={{ marginLeft: "auto", background: "#EF4444", color: "#fff", fontSize: 10, fontWeight: 700, borderRadius: 9, padding: "1px 7px", flexShrink: 0 }}>{unreadLeads > 99 ? "99+" : unreadLeads}</span>}
+                    {!collapsed && active && href !== "/dashboard/leads" && <div style={{ width: 4, height: 4, borderRadius: "50%", background: G, marginLeft: "auto", flexShrink: 0 }} />}
                   </div>
                 </Link>
                 {/* Tooltip en mode collapsed */}
@@ -278,7 +296,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   textDecoration: "none", color: active ? G : MUTED, position: "relative", transition: "color .15s",
                 }}>
                 {active && <span style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 28, height: 3, borderRadius: "0 0 3px 3px", background: G }} />}
-                <Icon size={21} strokeWidth={active ? 2.4 : 2} />
+                <div style={{ position: "relative", display: "flex" }}>
+                  <Icon size={21} strokeWidth={active ? 2.4 : 2} />
+                  {href === "/dashboard/leads" && unreadLeads > 0 && (
+                    <span style={{ position: "absolute", top: -6, right: -8, minWidth: 15, height: 15, padding: "0 4px", borderRadius: 8, background: "#EF4444", color: "#fff", fontSize: 9, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>{unreadLeads > 99 ? "99+" : unreadLeads}</span>
+                  )}
+                </div>
                 <span style={{ fontSize: 10.5, fontWeight: active ? 700 : 500, letterSpacing: 0.1 }}>{label}</span>
               </Link>
             )

@@ -28,7 +28,20 @@ export async function submitLead(input: LeadInput): Promise<boolean> {
       message:  input.message?.slice(0, 3000) || null,
       data:     input.data || {},
     })
-    return !error
+    if (error) return false
+
+    // Notifie le propriétaire par email (fire-and-forget, l'email est résolu côté serveur)
+    fetch("/api/emails/new-lead", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        pageId: input.pageId, type: input.type || "form",
+        name: input.name, email: input.email, phone: input.phone,
+        message: input.message, data: input.data || {},
+      }),
+    }).catch(() => {})
+
+    return true
   } catch {
     return false
   }
