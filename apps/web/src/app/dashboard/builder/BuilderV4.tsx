@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, ctaButtonStyle, CTA_ANIM_CSS, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import { createClient } from "@/lib/supabase/client"
@@ -181,16 +181,11 @@
         )
       }
       case "cta_button": {
-        const btnStyles: Record<string,any> = {
-          gold: { background: `linear-gradient(90deg,${primary},${primary}cc)`, color: "#080808", border: "none" },
-          neon: { background: accent+"15", border: `1.5px solid ${accent}`, color: accent },
-          outline: { background: "transparent", border: `1.5px solid ${primary}`, color: primary },
-          ghost: { background: "rgba(255,255,255,0.06)", color: text, border: "1px solid rgba(255,255,255,0.1)" },
-          red: { background: "rgba(239,68,68,0.15)", border: "1.5px solid #EF4444", color: "#EF4444" },
-        }
+        const { style: bs, className: ctaCls } = ctaButtonStyle(c.style, { G: primary, accent, text })
         return (
           <div style={{ padding: "10px 16px", ...s }}>
-            <div style={{ ...btnStyles[c.style||"gold"], display: "flex", alignItems: "center", justifyContent: "center", gap: 7, borderRadius: 12, padding: "13px 18px", fontSize: 14, fontWeight: 700 }}>
+            {ctaCls && <style>{CTA_ANIM_CSS}</style>}
+            <div className={ctaCls} style={{ ...bs, display: "flex", alignItems: "center", justifyContent: "center", gap: 7, borderRadius: 12, padding: "13px 18px", fontSize: 14, fontWeight: 700 }}>
               {c.icon && <span>{c.icon}</span>}{c.label||"Bouton"}
             </div>
           </div>

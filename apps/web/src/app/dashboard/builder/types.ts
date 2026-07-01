@@ -358,6 +358,26 @@ export function waLink(phone?: string, message?: string, countryCode?: string): 
   if (!d) return ""
   return `https://wa.me/${d}${message ? `?text=${encodeURIComponent(message)}` : ""}`
 }
+// Styles prédéfinis de bouton d'action (parité builder <-> public). Le dégradé animé utilise une classe.
+export const CTA_ANIM_CSS = "@keyframes qctaFlow{0%{background-position:0% 50%}100%{background-position:200% 50%}}.qcta-flow{background-size:220% 220%!important;animation:qctaFlow 4s linear infinite}@media (prefers-reduced-motion:reduce){.qcta-flow{animation:none!important}}"
+export const CTA_STYLE_OPTIONS = ["gold", "luxe", "neon", "glass", "gradient", "outline", "ghost", "dark", "white", "red"]
+export function ctaButtonStyle(style: string | undefined, opt: { G: string; accent?: string; text?: string }): { style: Record<string, any>; className?: string } {
+  const G = opt.G, acc = opt.accent || "#39FF8F", text = opt.text || "#F5F0E8"
+  const map: Record<string, { style: Record<string, any>; className?: string }> = {
+    gold: { style: { background: `linear-gradient(90deg,${G},${G}cc)`, color: "#080808", border: "none", boxShadow: `0 4px 20px ${G}35` } },
+    luxe: { style: { background: "#0b0b0f", color: G, border: `1.5px solid ${G}`, boxShadow: `inset 0 0 0 1px ${G}22, 0 4px 18px rgba(0,0,0,0.5)` } },
+    neon: { style: { background: `${acc}12`, border: `1.5px solid ${acc}`, color: acc, boxShadow: `0 0 18px ${acc}40` } },
+    glass: { style: { background: "rgba(255,255,255,0.08)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.2)", color: text } },
+    gradient: { className: "qcta-flow", style: { background: `linear-gradient(90deg,${G},${acc},${G})`, color: "#080808", border: "none", boxShadow: `0 4px 20px ${G}30` } },
+    outline: { style: { background: "transparent", border: `2px solid ${G}`, color: G } },
+    ghost: { style: { background: "rgba(255,255,255,0.06)", color: text, border: "1px solid rgba(255,255,255,0.1)" } },
+    dark: { style: { background: "#141414", color: text, border: "1px solid rgba(255,255,255,0.12)" } },
+    white: { style: { background: "#ffffff", color: "#080808", border: "none", boxShadow: "0 4px 18px rgba(0,0,0,0.3)" } },
+    red: { style: { background: "rgba(239,68,68,0.12)", border: "1.5px solid #EF4444", color: "#EF4444" } },
+  }
+  return map[style || "gold"] || map.gold
+}
+
 // Lien d'itinéraire vers une adresse (parité builder <-> public, testé).
 export function directionsLink(address?: string, provider?: string): string {
   const enc = encodeURIComponent((address || "").trim())
@@ -2381,7 +2401,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "label", label: "Texte du bouton", type: "text", placeholder: "Me contacter" },
       { key: "url", label: "Lien", type: "url", placeholder: "https://" },
       { key: "icon", label: "Emoji (optionnel)", type: "text", placeholder: "📞" },
-      { key: "style", label: "Style", type: "select", options: ["gold", "neon", "outline", "ghost", "red"] },
+      { key: "style", label: "Style", type: "select", options: ["gold", "luxe", "neon", "glass", "gradient", "outline", "ghost", "dark", "white", "red"], hint: "gradient = dégradé animé · glass = verre dépoli · luxe = noir & or" },
       { key: "full_width", label: "Pleine largeur", type: "select", options: ["yes", "no"] },
     ],
   },

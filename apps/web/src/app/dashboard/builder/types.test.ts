@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest"
 import {
   bannerImageStyle, bannerOverlayLayers, availabilityStatus, profileBadgeStyle,
   bannerTitleStyle, bannerFrame, bannerHeight, bannerBackgroundStyle,
-  normalizePhoneDigits, waLink, telLink, directionsLink,
+  normalizePhoneDigits, waLink, telLink, directionsLink, ctaButtonStyle,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -183,6 +183,27 @@ describe("directionsLink", () => {
   })
   it("adresse vide -> vide", () => {
     expect(directionsLink("")).toBe("")
+  })
+})
+
+describe("ctaButtonStyle", () => {
+  const opt = { G: "#C9A84C", accent: "#39FF8F", text: "#F5F0E8" }
+  it("gold : ombre dorée, pas de classe", () => {
+    const r = ctaButtonStyle("gold", opt)
+    expect(String(r.style.boxShadow)).toContain("#C9A84C")
+    expect(r.className).toBeUndefined()
+  })
+  it("gradient : classe animée", () => {
+    expect(ctaButtonStyle("gradient", opt).className).toBe("qcta-flow")
+  })
+  it("glass : backdropFilter", () => {
+    expect(String(ctaButtonStyle("glass", opt).style.backdropFilter)).toContain("blur")
+  })
+  it("luxe : bordure or", () => {
+    expect(String(ctaButtonStyle("luxe", opt).style.border)).toContain("#C9A84C")
+  })
+  it("style inconnu -> gold", () => {
+    expect(ctaButtonStyle("inconnu", opt).style.color).toBe("#080808")
   })
 })
 

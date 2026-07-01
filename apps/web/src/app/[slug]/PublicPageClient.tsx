@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, waLink, telLink, directionsLink, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, waLink, telLink, directionsLink, ctaButtonStyle, CTA_ANIM_CSS, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -293,17 +293,11 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
     }
 
     case "cta_button": {
-      const btnStyles: Record<string, React.CSSProperties> = {
-        gold: { background: `linear-gradient(90deg,${G},${G}cc)`, color: "#080808", border: "none", boxShadow: `0 4px 20px ${G}35` },
-        neon: { background: `${theme.accent || "#39FF8F"}12`, border: `1.5px solid ${theme.accent || "#39FF8F"}`, color: theme.accent || "#39FF8F" },
-        outline: { background: "transparent", border: `2px solid ${G}`, color: G },
-        ghost: { background: "rgba(255,255,255,0.06)", color: TEXT, border: "1px solid rgba(255,255,255,0.1)" },
-        red: { background: "rgba(239,68,68,0.12)", border: "1.5px solid #EF4444", color: "#EF4444" },
-      }
-      const s = btnStyles[c.style || "gold"]
+      const { style: s, className } = ctaButtonStyle(c.style, { G, accent: theme.accent, text: TEXT })
       return (
         <div style={{ padding: "6px 24px 12px" }}>
-          <a href={c.url || "#"} onClick={() => trackLinkClick(pageId, block.id, c.url || block.type)} style={{ ...s, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 14, padding: "15px 24px", textDecoration: "none", fontSize: 15, fontWeight: 700, cursor: "pointer", width: "100%", boxSizing: "border-box", fontFamily: FONT_B, transition: "transform 0.15s, box-shadow 0.15s" }}
+          {className && <style>{CTA_ANIM_CSS}</style>}
+          <a className={className} href={c.url || "#"} onClick={() => trackLinkClick(pageId, block.id, c.url || block.type)} style={{ ...s, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 14, padding: "15px 24px", textDecoration: "none", fontSize: 15, fontWeight: 700, cursor: "pointer", width: "100%", boxSizing: "border-box", fontFamily: FONT_B, transition: "transform 0.15s, box-shadow 0.15s" }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 30px ${G}30` }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLElement).style.boxShadow = s.boxShadow as string || "none" }}>
             {c.icon && <span style={{ fontSize: 16 }}>{c.icon}</span>}{c.label || "Bouton"}
