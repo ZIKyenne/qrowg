@@ -192,6 +192,28 @@ export function bannerHeight(c: any, base: "editor" | "public" = "public"): numb
   return base === "editor" ? ed : pub
 }
 
+// Typographie du titre de bannière (parité builder <-> public). Polices déjà chargées côté public.
+export const BANNER_FONTS: Record<string, string> = {
+  serif: "Cormorant Garamond, serif",
+  sans: "DM Sans, sans-serif",
+  display: "Georgia, 'Times New Roman', serif",
+  mono: "ui-monospace, SFMono-Regular, Menlo, monospace",
+}
+export function bannerTitleStyle(c: any, base: "editor" | "public", color: string, fontDisplay: string): Record<string, any> {
+  const fam = c.title_font && c.title_font !== "auto" ? (BANNER_FONTS[c.title_font as string] || fontDisplay) : fontDisplay
+  const size = parseInt(c.title_size) || (base === "editor" ? 16 : 24)
+  const weight = parseInt(c.title_weight) || 700
+  const track = (c.title_tracking !== undefined && c.title_tracking !== "") ? parseFloat(c.title_tracking) : 0
+  const st: Record<string, any> = { color, fontFamily: fam, fontSize: size, fontWeight: weight, letterSpacing: track, margin: 0, lineHeight: 1.15 }
+  if (c.title_transform && c.title_transform !== "none") st.textTransform = c.title_transform
+  const eff = c.title_effect
+  if (eff === "glow") st.textShadow = `0 0 16px ${color}, 0 2px 8px rgba(0,0,0,0.5)`
+  else if (eff === "outline") { st.WebkitTextStroke = "1px rgba(0,0,0,0.55)"; st.textShadow = "0 1px 3px rgba(0,0,0,0.4)" }
+  else if (eff === "none") st.textShadow = "none"
+  else st.textShadow = "0 2px 8px rgba(0,0,0,0.5)" // défaut : lisibilité
+  return st
+}
+
 // Animations de bannière (parité builder <-> public). Classe sur le conteneur : `qfb qfb-<anim>`.
 // Éléments enfants : .qfb-media (image/dégradé), .qfb-content (texte), .qfb-shine (reflet shimmer).
 export const BANNER_ANIM_CSS = `

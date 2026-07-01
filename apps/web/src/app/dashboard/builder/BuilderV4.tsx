@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerTitleStyle, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import { createClient } from "@/lib/supabase/client"
@@ -644,8 +644,8 @@
             {(c.cover_title || c.cover_subtitle || c.badge) && (
               <div className="qfb-content" style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems, justifyContent, padding: "10px 14px", textAlign, gap: 4 }}>
                 {c.badge && <span style={{ alignSelf: pos==="bottom-left" ? "flex-start" : "center", background: "rgba(255,255,255,0.18)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", borderRadius: 20, padding: "2px 9px", fontSize: 9, fontWeight: 700 }}>{c.badge}</span>}
-                {c.cover_title && <p style={{ color: txtColor, fontSize: 16, fontWeight: 700, margin: 0, textShadow: "0 2px 8px rgba(0,0,0,0.5)", fontFamily: theme.fontDisplay }}>{c.cover_title}</p>}
-                {c.cover_subtitle && <p style={{ color: txtColor, opacity: 0.9, fontSize: 11, margin: 0, textShadow: "0 1px 6px rgba(0,0,0,0.5)" }}>{c.cover_subtitle}</p>}
+                {c.cover_title && <p style={bannerTitleStyle(c, "editor", txtColor, theme.fontDisplay)}>{c.cover_title}</p>}
+                {c.cover_subtitle && <p style={{ color: txtColor, opacity: 0.9, fontSize: parseInt(c.subtitle_size) || 11, margin: 0, textShadow: "0 1px 6px rgba(0,0,0,0.5)" }}>{c.cover_subtitle}</p>}
               </div>
             )}
           </div>

@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ImageIcon, LayoutGrid, Type, Palette, Sparkles, Layers, ChevronDown, Wand2, Trash2, MoveVertical } from "lucide-react"
+import { ImageIcon, LayoutGrid, Type, Palette, Sparkles, Layers, ChevronDown, Wand2, MoveVertical, AArrowUp } from "lucide-react"
 import ImageUpload from "./ImageUpload"
-import { BANNER_GRADIENTS, BANNER_PRESETS, BANNER_ANIM_CSS, bannerBackgroundStyle } from "./types"
+import { BANNER_GRADIENTS, BANNER_PRESETS, BANNER_ANIM_CSS, BANNER_FONTS, bannerBackgroundStyle } from "./types"
 
 const G = "#C9A84C"
 const MUTED = "#8A8478"
@@ -266,6 +266,50 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
         <Field label="Titre" value={c.cover_title} placeholder="Mon titre…" max={40} onChange={v => set("cover_title", v)} />
         <Field label="Sous-titre" value={c.cover_subtitle} placeholder="Une phrase d'accroche…" max={70} onChange={v => set("cover_subtitle", v)} />
         <ColorStudio label="Couleur du texte" value={c.text_color} fallback="#ffffff" onChange={v => set("text_color", v)} />
+      </Section>
+
+      {/* TYPOGRAPHIE */}
+      <Section title="Typographie" icon={<AArrowUp size={15} />} open={open === "type"} onToggle={() => toggle("type")}>
+        <div>
+          <label style={{ color: MUTED, fontSize: 11, fontWeight: 500, display: "block", marginBottom: 7 }}>Police du titre</label>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 6 }}>
+            {[{ key: "auto", label: "Auto", ff: "inherit" }, { key: "serif", label: "Serif", ff: BANNER_FONTS.serif }, { key: "sans", label: "Sans", ff: BANNER_FONTS.sans }, { key: "display", label: "Display", ff: BANNER_FONTS.display }, { key: "mono", label: "Mono", ff: BANNER_FONTS.mono }].map(o => {
+              const on = (c.title_font || "auto") === o.key
+              return (
+                <button key={o.key} onClick={() => set("title_font", o.key)} style={{ borderRadius: 9, border: `1.5px solid ${on ? G : "rgba(255,255,255,0.1)"}`, background: on ? "rgba(201,168,76,0.1)" : "rgba(255,255,255,0.03)", cursor: "pointer", padding: "8px 4px" }}>
+                  <div style={{ fontFamily: o.ff, color: on ? G : TEXT, fontSize: 18, fontWeight: 700, lineHeight: 1 }}>Ag</div>
+                  <div style={{ fontSize: 9, color: on ? G : MUTED, marginTop: 3 }}>{o.label}</div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+        <Slider label="Taille du titre" value={parseInt(c.title_size) || 24} min={13} max={48} unit=" px" def={24} onChange={v => set("title_size", v)} />
+        <div>
+          <label style={{ color: MUTED, fontSize: 11, fontWeight: 500, display: "block", marginBottom: 7 }}>Graisse</label>
+          <Segmented value={String(parseInt(c.title_weight) || 700)} onChange={v => set("title_weight", v)} options={[{ key: "400", label: "Léger" }, { key: "600", label: "Semi" }, { key: "700", label: "Gras" }, { key: "800", label: "Black" }]} />
+        </div>
+        <Slider label="Interlettrage" value={parseFloat(c.title_tracking) || 0} min={-2} max={10} step={0.5} unit=" px" def={0} onChange={v => set("title_tracking", v)} />
+        <div>
+          <label style={{ color: MUTED, fontSize: 11, fontWeight: 500, display: "block", marginBottom: 7 }}>Casse</label>
+          <Segmented value={c.title_transform || "none"} onChange={v => set("title_transform", v)} options={[{ key: "none", label: "Aa" }, { key: "uppercase", label: "AA" }, { key: "capitalize", label: "Aa Bb" }]} />
+        </div>
+        <div>
+          <label style={{ color: MUTED, fontSize: 11, fontWeight: 500, display: "block", marginBottom: 7 }}>Effet de texte</label>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>
+            {[{ key: "shadow", label: "Ombre", sh: "0 2px 6px rgba(0,0,0,0.9)" }, { key: "glow", label: "Glow", sh: `0 0 10px ${G}` }, { key: "outline", label: "Contour", stroke: true }, { key: "none", label: "Aucun" }].map(o => {
+              const cur = c.title_effect || "shadow"
+              const on = cur === o.key
+              return (
+                <button key={o.key} onClick={() => set("title_effect", o.key)} style={{ borderRadius: 9, border: `1.5px solid ${on ? G : "rgba(255,255,255,0.1)"}`, background: on ? "rgba(201,168,76,0.1)" : "rgba(255,255,255,0.03)", cursor: "pointer", padding: "9px 2px" }}>
+                  <div style={{ color: "#fff", fontSize: 15, fontWeight: 800, lineHeight: 1, textShadow: (o as any).sh || "none", WebkitTextStroke: (o as any).stroke ? "0.8px rgba(0,0,0,0.7)" : undefined }}>Ag</div>
+                  <div style={{ fontSize: 8.5, color: on ? G : MUTED, marginTop: 4 }}>{o.label}</div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+        <Slider label="Taille du sous-titre" value={parseInt(c.subtitle_size) || 14} min={10} max={24} unit=" px" def={14} onChange={v => set("subtitle_size", v)} />
       </Section>
 
       {/* COULEURS & OVERLAY — cartes illustrées */}
