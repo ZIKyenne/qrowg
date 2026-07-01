@@ -2581,6 +2581,62 @@
     }
   }
 
+  function SkillsEditor({ content, onChange }: { content: BlockContent; onChange: (key: string, val: string) => void }) {
+    const M = "#8A8478", TXT = "#F5F0E8", GG = "var(--accent, #C9A84C)"
+    const tags: string[] = String(content.tags || "").split(",").map(t => t.trim()).filter(Boolean)
+    const [input, setInput] = useState("")
+    const commit = (arr: string[]) => onChange("tags", arr.join(", "))
+    const add = (v: string) => { const t = v.trim(); if (!t) return; if (!tags.some(x => x.toLowerCase() === t.toLowerCase())) commit([...tags, t]); setInput("") }
+    const remove = (i: number) => commit(tags.filter((_, j) => j !== i))
+    const move = (i: number, d: number) => { const j = i + d; if (j < 0 || j >= tags.length) return; const a = [...tags];[a[i], a[j]] = [a[j], a[i]]; commit(a) }
+    const PRESETS: { label: string; tags: string[] }[] = [
+      { label: "Créatif", tags: ["Photographie", "Retouche", "Direction artistique"] },
+      { label: "Dév / Tech", tags: ["React", "TypeScript", "UI/UX"] },
+      { label: "Coach", tags: ["Coaching", "Nutrition", "Motivation"] },
+      { label: "Marketing", tags: ["SEO", "Contenu", "Réseaux sociaux"] },
+      { label: "Resto / Bar", tags: ["Cuisine", "Cocktails", "Fait maison"] },
+      { label: "Business", tags: ["Conseil", "Stratégie", "Gestion"] },
+    ]
+    const inputStyle: React.CSSProperties = { width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
+        <div>
+          <label style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>Titre (optionnel)</label>
+          <input value={content.title || ""} placeholder="Mes compétences" onChange={e => onChange("title", e.target.value)} style={inputStyle} />
+        </div>
+        <div>
+          <label style={{ color: M, fontSize: 11, display: "flex", justifyContent: "space-between", marginBottom: 6, fontWeight: 500 }}><span>Compétences</span><span style={{ color: M, fontSize: 10 }}>{tags.length}</span></label>
+          {tags.length === 0 && <p style={{ color: M, fontSize: 11, margin: "0 0 8px", fontStyle: "italic" }}>Aucune compétence. Ajoutez-en ci-dessous ou via un modèle.</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+            {tags.map((t, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 8px" }}>
+                <span style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  <button type="button" onClick={() => move(i, -1)} disabled={i === 0} title="Monter" style={{ background: "none", border: "none", cursor: i === 0 ? "default" : "pointer", color: i === 0 ? "rgba(255,255,255,0.15)" : M, padding: 0, lineHeight: 0.7, fontSize: 10 }}>▲</button>
+                  <button type="button" onClick={() => move(i, 1)} disabled={i === tags.length - 1} title="Descendre" style={{ background: "none", border: "none", cursor: i === tags.length - 1 ? "default" : "pointer", color: i === tags.length - 1 ? "rgba(255,255,255,0.15)" : M, padding: 0, lineHeight: 0.7, fontSize: 10 }}>▼</button>
+                </span>
+                <span style={{ flex: 1, color: TXT, fontSize: 12.5, fontWeight: 600 }}>{t}</span>
+                <button type="button" onClick={() => remove(i)} title="Supprimer" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 6, width: 22, height: 22, cursor: "pointer", color: "#EF4444", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>×</button>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
+            <input value={input} placeholder="Ajouter une compétence…" onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); add(input) } }} style={inputStyle} />
+            <button type="button" onClick={() => add(input)} disabled={!input.trim()} style={{ flexShrink: 0, background: GG, border: "none", borderRadius: 8, padding: "0 14px", color: "#080808", fontSize: 13, fontWeight: 700, cursor: input.trim() ? "pointer" : "not-allowed", opacity: input.trim() ? 1 : 0.5 }}>+</button>
+          </div>
+        </div>
+        <div>
+          <label style={{ color: M, fontSize: 11, display: "block", marginBottom: 6, fontWeight: 500 }}>Modèles rapides (ajoute les compétences)</label>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {PRESETS.map(p => (
+              <button key={p.label} type="button" onClick={() => commit([...tags, ...p.tags.filter(t => !tags.some(x => x.toLowerCase() === t.toLowerCase()))])}
+                style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 20, padding: "5px 11px", color: GG, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>+ {p.label}</button>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   function EditPanel({ block, onChange }: { block: Block; onChange: (key: string, val: string) => void }) {
     const def = BLOCK_DEFS[block.type]
     if (!def) return null
@@ -2588,6 +2644,10 @@
 
     if (block.type === "cover_banner") {
       return <BannerStudio content={block.content} onChange={onChange} />
+    }
+
+    if (block.type === "skills") {
+      return <SkillsEditor content={block.content} onChange={onChange} />
     }
 
     if (block.type === "social_links") {
