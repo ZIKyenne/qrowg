@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, isClipShape, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, type Block, type BlockContent, type PageTheme } from "./types"
   import ImageUpload from "./ImageUpload"
   import { createClient } from "@/lib/supabase/client"
 
@@ -156,8 +156,8 @@
       case "profile": return (
         <div style={{ textAlign: "center", padding: "20px 16px", ...s }}>
           {c.avatar
-            ? <img src={c.avatar} alt="" style={{ width: 72, height: 72, ...avatarShapeStyle(c.avatar_shape), objectFit: "cover", margin: "0 auto 10px", display: "block", border: isClipShape(c.avatar_shape) ? "none" : `3px solid ${primary}60`, filter: isClipShape(c.avatar_shape) ? `drop-shadow(0 0 8px ${primary}66)` : undefined }} />
-            : <div style={{ width: 72, height: 72, ...avatarShapeStyle(c.avatar_shape), background: `linear-gradient(135deg,${primary},${accent})`, margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 700, color: "#080808", filter: isClipShape(c.avatar_shape) ? `drop-shadow(0 0 8px ${primary}66)` : undefined }}>{(c.name||"?")[0].toUpperCase()}</div>}
+            ? <img src={c.avatar} alt="" style={{ width: 72, height: 72, ...avatarShapeStyle(c.avatar_shape), ...avatarDecoStyle(c.avatar_shape, c.avatar_border, primary), objectFit: "cover", margin: "0 auto 10px", display: "block" }} />
+            : <div style={{ width: 72, height: 72, ...avatarShapeStyle(c.avatar_shape), ...avatarDecoStyle(c.avatar_shape, c.avatar_border, primary), background: `linear-gradient(135deg,${primary},${accent})`, margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 700, color: "#080808" }}>{(c.name||"?")[0].toUpperCase()}</div>}
           <p style={{ color: text, fontSize: 18, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay }}>{c.name || "Mon Nom"}</p>
           <p style={{ color: muted, fontSize: 13, margin: c.badge ? "0 0 7px" : "0" }}>{c.tagline}</p>
           {c.badge && <span style={{ display: "inline-flex", flexWrap: "wrap", gap: 5, justifyContent: "center" }}>{c.badge.split(/[,\n]/).map((b: string) => b.trim()).filter(Boolean).slice(0, 5).map((b: string, i: number) => (<span key={i} style={{ background: primary+"18", border: `1px solid ${primary}40`, borderRadius: 20, padding: "3px 10px", fontSize: 11, color: primary }}>{b}</span>))}</span>}

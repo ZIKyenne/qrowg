@@ -100,6 +100,19 @@ export function isClipShape(shape?: string): boolean {
   return shape === "hexagone" || shape === "diamant"
 }
 
+// Contour + glow d'un avatar (partagé éditeur ↔ page publique). Gère les formes clip-path via drop-shadow.
+export function avatarDecoStyle(shape: string | undefined, borderKind: string | undefined, accent: string): Record<string, string> {
+  const clip = isClipShape(shape)
+  const glow = (color: string, px: number) => clip ? { filter: `drop-shadow(0 0 ${px}px ${color})` } : { boxShadow: `0 0 ${px + 4}px ${color}` }
+  switch (borderKind) {
+    case "aucun":    return { border: "none" }
+    case "or":       return { ...(clip ? {} : { border: "3px solid #D4AF37" }), ...glow("rgba(212,175,55,0.45)", 10) }
+    case "neon":     return { ...(clip ? {} : { border: `2px solid ${accent}` }), ...glow(accent, 13) }
+    case "lumineux": return { ...(clip ? {} : { border: "2px solid rgba(255,255,255,0.55)" }), ...glow("rgba(255,255,255,0.5)", 11) }
+    default:         return { ...(clip ? {} : { border: `3px solid ${accent}55` }), ...glow(clip ? accent : `${accent}30`, 9) } // simple
+  }
+}
+
 // Forme d'un avatar (source unique partagée éditeur ↔ page publique).
 export function avatarShapeStyle(shape?: string): Record<string, string | number> {
   switch (shape) {
@@ -1917,6 +1930,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "tagline", label: "Accroche", type: "text", placeholder: "Developpeur, artiste, coach...", maxRecommended: 80, suggestions: ["Photographe à Reims", "Coach sportif indépendant", "Consultant freelance", "Créateur de contenu", "Agent immobilier", "Restaurant & bar à cocktails"] },
       { key: "avatar", label: "Photo de profil", type: "image" },
       { key: "avatar_shape", label: "Forme de l'avatar", type: "select", options: ["cercle", "arrondi", "squircle", "hexagone", "carré", "diamant"] },
+      { key: "avatar_border", label: "Contour de l'avatar", type: "select", options: ["simple", "aucun", "or", "neon", "lumineux"] },
       { key: "badge", label: "Badges (jusqu'à 5)", type: "text", placeholder: "Disponible, Certifié, +500 clients", hint: "Séparez par des virgules — ou cliquez les exemples pour composer", suggestionsMode: "append", suggestions: ["Disponible", "Ouvert aujourd'hui", "Sur RDV", "Certifié", "Vérifié", "Premium", "Depuis 2019", "+500 clients", "★★★★★", "Recommandé", "Expert"] },
     ],
   },
