@@ -254,6 +254,24 @@ export function bannerOverlayLayers(c: any, accent = "#C9A84C"): { className?: s
   return layers
 }
 
+// Cadre & ombre du bloc bannière (parité builder <-> public).
+// Retourne le boxShadow du conteneur + un calque de bordure (ligne/dégradé) posé par-dessus.
+export function bannerFrame(c: any, accent: string, radius: string | number): { boxShadow?: string; borderLayer?: { style: Record<string, any> } } {
+  const shadows: string[] = []
+  const bs = c.block_shadow
+  if (bs === "soft") shadows.push("0 10px 30px rgba(0,0,0,0.35)")
+  else if (bs === "strong") shadows.push("0 20px 50px rgba(0,0,0,0.55)")
+  else if (bs === "glow") shadows.push(`0 8px 40px ${accent}55`)
+  const bb = c.block_border
+  if (bb === "glow") shadows.push(`0 0 0 1.5px ${accent}, 0 0 22px ${accent}66`)
+  const boxShadow = shadows.length ? shadows.join(", ") : undefined
+  const bc = c.border_color || accent
+  let borderLayer: { style: Record<string, any> } | undefined
+  if (bb === "line") borderLayer = { style: { position: "absolute", inset: 0, border: `1.5px solid ${bc}`, borderRadius: radius, pointerEvents: "none" } }
+  else if (bb === "gradient") borderLayer = { style: { position: "absolute", inset: 0, borderRadius: radius, border: "2px solid transparent", background: `linear-gradient(#0000,#0000) padding-box, linear-gradient(135deg, ${bc}, ${accent}44) border-box`, pointerEvents: "none" } }
+  return { boxShadow, borderLayer }
+}
+
 // Presets de bannière : un clic configure plusieurs champs d'un coup
 export const BANNER_PRESETS: { key: string; label: string; emoji: string; content: Record<string, any> }[] = [
   { key: "luxury", label: "Luxe", emoji: "👑", content: { banner_type: "gradient", grad_preset: "or_nuit", height_px: 220, block_radius: 16, text_position: "bottom-left", overlay_gradient: "bottom", animation: "shimmer", text_color: "#F5EBD0" } },

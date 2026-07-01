@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerTitleStyle, bannerOverlayLayers, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -656,11 +656,12 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       const txtColor = c.text_color || "#fff"
       const bannerBg = bannerBackgroundStyle(c, G)
       const ovLayers = bannerOverlayLayers(c, G)
+      const frame = bannerFrame(c, G, rad || 0)
       const alignItems = pos === "center" ? "center" : "flex-end"
       const justifyContent = (pos === "bottom-center" || pos === "center") ? "center" : "flex-start"
       const textAlign: any = (pos === "bottom-center" || pos === "center") ? "center" : "left"
       return (
-        <div className={anim ? `qfb qfb-${anim}` : undefined} style={{ position: "relative", overflow: "hidden", borderRadius: rad || undefined }}>
+        <div className={anim ? `qfb qfb-${anim}` : undefined} style={{ position: "relative", overflow: "hidden", borderRadius: rad || undefined, boxShadow: frame.boxShadow }}>
           {anim && <style>{BANNER_ANIM_CSS}</style>}
           {btype === "image"
             ? (c.src
@@ -669,6 +670,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
             : <div className="qfb-media" style={{ width: "100%", height: h, ...bannerBg }} />}
           {anim === "shimmer" && <div className="qfb-shine" />}
           {ovLayers.map((l, i) => <div key={i} className={l.className} style={l.style} />)}
+          {frame.borderLayer && <div style={frame.borderLayer.style} />}
           {(c.cover_title || c.cover_subtitle || c.badge) && (
             <div className="qfb-content" style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems, justifyContent, padding: "16px 22px", textAlign, gap: 6 }}>
               {c.badge && <span style={{ alignSelf: pos === "bottom-left" ? "flex-start" : "center", background: "rgba(255,255,255,0.18)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", borderRadius: 20, padding: "3px 12px", fontSize: 11, fontWeight: 700 }}>{c.badge}</span>}

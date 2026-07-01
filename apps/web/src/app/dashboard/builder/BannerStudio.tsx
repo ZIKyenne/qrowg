@@ -258,6 +258,15 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
         <Slider label="Hauteur" value={heightPx} min={80} max={420} unit=" px" def={180} onChange={v => set("height_px", v)} />
         <Slider label="Coins arrondis" value={parseInt(c.block_radius) || 0} min={0} max={32} unit=" px" def={0} onChange={v => set("block_radius", v)} />
         <PositionGrid value={c.text_position || "bottom-left"} onChange={v => set("text_position", v)} />
+        <div>
+          <label style={{ color: MUTED, fontSize: 11, fontWeight: 500, display: "block", marginBottom: 7 }}>Ombre du bloc</label>
+          <Segmented value={c.block_shadow || "none"} onChange={v => set("block_shadow", v)} options={[{ key: "none", label: "Aucune" }, { key: "soft", label: "Douce" }, { key: "strong", label: "Forte" }, { key: "glow", label: "Glow" }]} />
+        </div>
+        <div>
+          <label style={{ color: MUTED, fontSize: 11, fontWeight: 500, display: "block", marginBottom: 7 }}>Bordure</label>
+          <Segmented value={c.block_border || "none"} onChange={v => set("block_border", v)} options={[{ key: "none", label: "Aucune" }, { key: "line", label: "Ligne" }, { key: "glow", label: "Lumineuse" }, { key: "gradient", label: "Dégradée" }]} />
+        </div>
+        {(c.block_border === "line" || c.block_border === "gradient") && <ColorStudio label="Couleur de bordure" value={c.border_color} fallback={G} onChange={v => set("border_color", v)} />}
       </Section>
 
       {/* CONTENU */}
