@@ -110,17 +110,38 @@ export function avatarBgStyle(kind: string | undefined, c1: string, c2: string):
   }
 }
 
-// Contour + glow d'un avatar (partagé éditeur ↔ page publique). Gère les formes clip-path via drop-shadow.
-export function avatarDecoStyle(shape: string | undefined, borderKind: string | undefined, accent: string): Record<string, string> {
+// Contour + glow + ombre d'un avatar (partagé éditeur ↔ page publique). Gère clip-path via drop-shadow.
+export function avatarDecoStyle(shape: string | undefined, borderKind: string | undefined, shadowKind: string | undefined, accent: string): Record<string, string> {
   const clip = isClipShape(shape)
-  const glow = (color: string, px: number) => clip ? { filter: `drop-shadow(0 0 ${px}px ${color})` } : { boxShadow: `0 0 ${px + 4}px ${color}` }
+  // 1) Contour + lueur
+  let border = clip ? "" : `3px solid ${accent}55`, glowColor = `${accent}30`, glowPx = 9
   switch (borderKind) {
-    case "aucun":    return { border: "none" }
-    case "or":       return { ...(clip ? {} : { border: "3px solid #D4AF37" }), ...glow("rgba(212,175,55,0.45)", 10) }
-    case "neon":     return { ...(clip ? {} : { border: `2px solid ${accent}` }), ...glow(accent, 13) }
-    case "lumineux": return { ...(clip ? {} : { border: "2px solid rgba(255,255,255,0.55)" }), ...glow("rgba(255,255,255,0.5)", 11) }
-    default:         return { ...(clip ? {} : { border: `3px solid ${accent}55` }), ...glow(clip ? accent : `${accent}30`, 9) } // simple
+    case "aucun":    border = "none"; glowColor = ""; break
+    case "or":       border = clip ? "" : "3px solid #D4AF37"; glowColor = "rgba(212,175,55,0.45)"; glowPx = 10; break
+    case "neon":     border = clip ? "" : `2px solid ${accent}`; glowColor = accent; glowPx = 13; break
+    case "lumineux": border = clip ? "" : "2px solid rgba(255,255,255,0.55)"; glowColor = "rgba(255,255,255,0.5)"; glowPx = 11; break
   }
+  if (clip && border !== "none") border = ""
+  if (!clip && glowColor) glowColor = borderKind === "neon" ? `${accent}66` : glowColor // glow un peu plus doux en box-shadow
+  // 2) Ombre de profondeur
+  const depth = shadowKind === "douce" ? "0 6px 16px rgba(0,0,0,0.25)"
+    : shadowKind === "profonde" ? "0 14px 30px rgba(0,0,0,0.5)"
+    : shadowKind === "flottante" ? "0 22px 40px rgba(0,0,0,0.45)" : ""
+  const out: Record<string, string> = {}
+  if (border) out.border = border
+  else if (borderKind === "aucun") out.border = "none"
+  if (clip) {
+    const f: string[] = []
+    if (glowColor) f.push(`drop-shadow(0 0 ${glowPx}px ${glowColor})`)
+    if (depth) f.push(`drop-shadow(${depth})`)
+    if (f.length) out.filter = f.join(" ")
+  } else {
+    const s: string[] = []
+    if (glowColor) s.push(`0 0 ${glowPx + 4}px ${glowColor}`)
+    if (depth) s.push(depth)
+    if (s.length) out.boxShadow = s.join(", ")
+  }
+  return out
 }
 
 // Forme d'un avatar (source unique partagée éditeur ↔ page publique).
@@ -1942,6 +1963,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "avatar_shape", label: "Forme de l'avatar", type: "select", options: ["cercle", "arrondi", "squircle", "hexagone", "carré", "diamant"] },
       { key: "avatar_border", label: "Contour de l'avatar", type: "select", options: ["simple", "aucun", "or", "neon", "lumineux"] },
       { key: "avatar_bg", label: "Fond de l'avatar (sans photo)", type: "select", options: ["dégradé", "uni", "halo", "mesh"] },
+      { key: "avatar_shadow", label: "Ombre de l'avatar", type: "select", options: ["aucune", "douce", "profonde", "flottante"] },
       { key: "badge", label: "Badges (jusqu'à 5)", type: "text", placeholder: "Disponible, Certifié, +500 clients", hint: "Séparez par des virgules — ou cliquez les exemples pour composer", suggestionsMode: "append", suggestions: ["Disponible", "Ouvert aujourd'hui", "Sur RDV", "Certifié", "Vérifié", "Premium", "Depuis 2019", "+500 clients", "★★★★★", "Recommandé", "Expert"] },
     ],
   },

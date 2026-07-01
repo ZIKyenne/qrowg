@@ -106,8 +106,8 @@ function RenderBlock({ block, theme, pageId }: { block: Block; theme: any; pageI
     case "profile": return (
       <div style={{ textAlign: "center", padding: "32px 20px 20px" }}>
         {c.avatar
-          ? <img src={c.avatar} alt="" style={{ width: 96, height: 96, ...avatarShapeStyle(c.avatar_shape), ...avatarDecoStyle(c.avatar_shape, c.avatar_border, G), objectFit: "cover", margin: "0 auto 14px", display: "block" }} />
-          : <div style={{ width: 96, height: 96, ...avatarShapeStyle(c.avatar_shape), ...avatarDecoStyle(c.avatar_shape, c.avatar_border, G), ...avatarBgStyle(c.avatar_bg, G, theme.accent || "#39FF8F"), margin: "0 auto 14px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 38, fontWeight: 700, color: "#080808", fontFamily: FONT_D }}>{(c.name || "?")[0]?.toUpperCase()}</div>}
+          ? <img src={c.avatar} alt="" style={{ width: 96, height: 96, ...avatarShapeStyle(c.avatar_shape), ...avatarDecoStyle(c.avatar_shape, c.avatar_border, c.avatar_shadow, G), objectFit: "cover", margin: "0 auto 14px", display: "block" }} />
+          : <div style={{ width: 96, height: 96, ...avatarShapeStyle(c.avatar_shape), ...avatarDecoStyle(c.avatar_shape, c.avatar_border, c.avatar_shadow, G), ...avatarBgStyle(c.avatar_bg, G, theme.accent || "#39FF8F"), margin: "0 auto 14px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 38, fontWeight: 700, color: "#080808", fontFamily: FONT_D }}>{(c.name || "?")[0]?.toUpperCase()}</div>}
         <h1 style={{ color: TEXT, fontSize: 26, fontWeight: 700, margin: "0 0 5px", fontFamily: FONT_D }}>{c.name || "Mon Nom"}</h1>
         <p style={{ color: MUTED, fontSize: 14, margin: c.badge ? "0 0 10px" : "0", fontFamily: FONT_B }}>{c.tagline}</p>
         {c.badge && (
