@@ -424,6 +424,74 @@ export const IDENTITY_PRESETS: { key: string; label: string; emoji: string; bloc
   },
 ]
 
+// Modèles d'actions par métier : un clic crée un ensemble de boutons d'action adaptés.
+export const ACTION_PRESETS: { key: string; label: string; emoji: string; blocks: { type: string; content: Record<string, string> }[] }[] = [
+  {
+    key: "restaurant", label: "Restaurant / Bar", emoji: "🍽️",
+    blocks: [
+      { type: "table_booking", content: { label: "Réserver une table", platform: "TheFork" } },
+      { type: "download_file", content: { label: "Voir le menu", type_doc: "Carte" } },
+      { type: "call_button", content: { label: "Appeler" } },
+      { type: "whatsapp_button", content: { label: "Discuter sur WhatsApp", message: "Bonjour, je souhaite réserver." } },
+      { type: "google_review", content: { label: "Laisser un avis", stars: "5" } },
+    ],
+  },
+  {
+    key: "artiste", label: "Artiste / Musicien", emoji: "🎤",
+    blocks: [
+      { type: "cta_button", content: { label: "Écouter sur Spotify", icon: "🎧", style: "gold" } },
+      { type: "booking_button", content: { label: "Booking / me contacter", platform: "URL personnalisee" } },
+      { type: "download_file", content: { label: "Télécharger le press kit", type_doc: "Brochure" } },
+      { type: "cta_button", content: { label: "Mes prochaines dates", icon: "📅", style: "outline" } },
+    ],
+  },
+  {
+    key: "immobilier", label: "Immobilier", emoji: "🏡",
+    blocks: [
+      { type: "call_button", content: { label: "Appeler l'agent" } },
+      { type: "whatsapp_button", content: { label: "WhatsApp", message: "Bonjour, je suis intéressé(e) par un bien." } },
+      { type: "quote_request", content: { label: "Demander une estimation", description: "Réponse sous 24h" } },
+      { type: "download_file", content: { label: "Télécharger la brochure", type_doc: "Brochure" } },
+    ],
+  },
+  {
+    key: "coach", label: "Coach / Formation", emoji: "🎓",
+    blocks: [
+      { type: "booking_button", content: { label: "Réserver un appel", platform: "URL personnalisee" } },
+      { type: "download_file", content: { label: "Voir le programme (PDF)", type_doc: "PDF" } },
+      { type: "payment_button", content: { label: "Payer / s'inscrire", platform: "Stripe" } },
+      { type: "cta_button", content: { label: "Voir les témoignages", icon: "⭐", style: "outline" } },
+    ],
+  },
+  {
+    key: "freelance", label: "Freelance / Entreprise", emoji: "💼",
+    blocks: [
+      { type: "quote_request", content: { label: "Demander un devis", description: "Réponse rapide" } },
+      { type: "booking_button", content: { label: "Prendre rendez-vous", platform: "URL personnalisee" } },
+      { type: "email_button", content: { label: "M'écrire", subject: "Demande de renseignements" } },
+      { type: "download_file", content: { label: "Télécharger la plaquette", type_doc: "Brochure" } },
+    ],
+  },
+  {
+    key: "evenement", label: "Événement", emoji: "🎫",
+    blocks: [
+      { type: "payment_button", content: { label: "Acheter un billet", platform: "Stripe" } },
+      { type: "download_file", content: { label: "Voir le programme", type_doc: "PDF" } },
+      { type: "booking_button", content: { label: "Ajouter à mon agenda", platform: "Google Calendar" } },
+      { type: "call_button", content: { label: "Contacter l'organisateur" } },
+    ],
+  },
+  {
+    key: "commerce", label: "Commerce local", emoji: "🛍️",
+    blocks: [
+      { type: "order_online", content: { label: "Commander en ligne", platform: "Site web" } },
+      { type: "call_button", content: { label: "Appeler la boutique" } },
+      { type: "download_file", content: { label: "Voir le catalogue", type_doc: "Catalogue" } },
+      { type: "google_review", content: { label: "Laisser un avis Google", stars: "5" } },
+    ],
+  },
+]
+
 // Presets de bannière : un clic configure plusieurs champs d'un coup
 export const BANNER_PRESETS: { key: string; label: string; emoji: string; content: Record<string, any> }[] = [
   { key: "luxury", label: "Luxe", emoji: "👑", content: { banner_type: "gradient", grad_preset: "or_nuit", height_px: 220, block_radius: 16, text_position: "bottom-left", overlay_gradient: "bottom", animation: "shimmer", text_color: "#F5EBD0" } },
