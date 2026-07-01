@@ -309,6 +309,72 @@ export function bannerFrame(c: any, accent: string, radius: string | number): { 
   return { boxShadow, borderLayer }
 }
 
+// Modèles d'identité par métier : un clic crée un ensemble de blocs pré-remplis adaptés.
+// Chaque bloc = { type, content } fusionné avec le defaultContent du bloc à la création.
+export const IDENTITY_PRESETS: { key: string; label: string; emoji: string; blocks: { type: string; content: Record<string, string> }[] }[] = [
+  {
+    key: "artiste", label: "Artiste / Musicien", emoji: "🎤",
+    blocks: [
+      { type: "profile", content: { name: "Nom d'artiste", tagline: "Artiste & Producteur", badge: "Disponible booking" } },
+      { type: "cover_banner", content: { banner_type: "gradient", grad_preset: "violet", overlay_gradient: "bottom", animation: "gradient_flow", cover_title: "En tournée 2025" } },
+      { type: "bio", content: { text: "Je crée des univers sonores qui font vibrer. Écoutez, ressentez, partagez.", align: "center" } },
+      { type: "business_stats", content: { stat1_icon: "🎧", stat1_value: "120k", stat1_label: "Écoutes", stat2_icon: "🎤", stat2_value: "45", stat2_label: "Concerts", stat3_icon: "👥", stat3_value: "12k", stat3_label: "Abonnés" } },
+      { type: "availability", content: { status: "available", message: "Ouvert aux bookings & collabs", cta_label: "Me booker" } },
+    ],
+  },
+  {
+    key: "restaurant", label: "Restaurant / Bar", emoji: "🍽️",
+    blocks: [
+      { type: "profile", content: { name: "Mon Établissement", tagline: "Cuisine & Bar à cocktails", badge: "Ouvert" } },
+      { type: "cover_banner", content: { banner_type: "gradient", grad_preset: "coucher", overlay_gradient: "bottom", cover_title: "Bienvenue" } },
+      { type: "bio", content: { text: "Une cuisine généreuse, des produits frais et une ambiance chaleureuse. À très vite !", align: "center" } },
+      { type: "availability", content: { status: "available", message: "Ouvert · service ce soir", cta_label: "Réserver une table" } },
+      { type: "business_stats", content: { stat1_icon: "⭐", stat1_value: "4.8", stat1_label: "Note", stat2_icon: "💬", stat2_value: "320", stat2_label: "Avis", stat3_icon: "📅", stat3_value: "8 ans", stat3_label: "À votre service" } },
+    ],
+  },
+  {
+    key: "immobilier", label: "Immobilier", emoji: "🏡",
+    blocks: [
+      { type: "profile", content: { name: "Votre nom", tagline: "Conseiller immobilier", badge: "Réponse sous 24h" } },
+      { type: "cover_banner", content: { banner_type: "gradient", grad_preset: "ocean", overlay_gradient: "bottom" } },
+      { type: "bio", content: { text: "J'accompagne acheteurs et vendeurs à chaque étape, avec expertise et transparence.", align: "center" } },
+      { type: "business_stats", content: { stat1_icon: "🏡", stat1_value: "85", stat1_label: "Biens vendus", stat2_icon: "👥", stat2_value: "200+", stat2_label: "Clients", stat3_icon: "⭐", stat3_value: "4.9", stat3_label: "Note" } },
+      { type: "availability", content: { status: "available", message: "Estimation offerte", cta_label: "Demander une estimation" } },
+    ],
+  },
+  {
+    key: "coach", label: "Coach / Formation", emoji: "🎓",
+    blocks: [
+      { type: "profile", content: { name: "Votre nom", tagline: "Coach & Formateur", badge: "Certifié" } },
+      { type: "bio", content: { text: "Je vous aide à atteindre vos objectifs avec méthode, énergie et bienveillance.", align: "center" } },
+      { type: "skills", content: { title: "Mes expertises", tags: "Coaching, Nutrition, Motivation, Bien-être" } },
+      { type: "business_stats", content: { stat1_icon: "🎓", stat1_value: "500+", stat1_label: "Élèves formés", stat2_icon: "⭐", stat2_value: "98%", stat2_label: "Satisfaction", stat3_icon: "🏆", stat3_value: "10 ans", stat3_label: "Expérience" } },
+      { type: "availability", content: { status: "available", message: "Places disponibles ce mois-ci", cta_label: "Réserver un appel" } },
+    ],
+  },
+  {
+    key: "entreprise", label: "Entreprise", emoji: "🏢",
+    blocks: [
+      { type: "company", content: { company_name: "Mon Entreprise", sector: "Agence digitale", founded_year: "2018" } },
+      { type: "bio", content: { text: "Notre mission : transformer vos idées en projets concrets, avec exigence et proximité.", align: "center" } },
+      { type: "values", content: { title: "Nos valeurs", v1_icon: "🤝", v1_label: "Proximité", v2_icon: "⚡", v2_label: "Réactivité", v3_icon: "🎯", v3_label: "Qualité" } },
+      { type: "business_stats", content: { stat1_icon: "👥", stat1_value: "500+", stat1_label: "Clients", stat2_icon: "🌍", stat2_value: "12", stat2_label: "Pays", stat3_icon: "⭐", stat3_value: "4.9", stat3_label: "Note" } },
+      { type: "availability", content: { status: "available", message: "Parlons de votre projet", cta_label: "Demander un devis" } },
+    ],
+  },
+  {
+    key: "createur", label: "Créateur de contenu", emoji: "✨",
+    blocks: [
+      { type: "profile", content: { name: "Votre nom", tagline: "Créateur de contenu", badge: "Créateur" } },
+      { type: "cover_banner", content: { banner_type: "gradient", grad_preset: "aurore", overlay_gradient: "bottom", animation: "floating" } },
+      { type: "bio", content: { text: "Je crée du contenu qui inspire, amuse et rassemble. Rejoins l'aventure !", align: "center" } },
+      { type: "business_stats", content: { stat1_icon: "👥", stat1_value: "50k", stat1_label: "Abonnés", stat2_icon: "❤️", stat2_value: "1.2M", stat2_label: "Likes", stat3_icon: "🎬", stat3_value: "300", stat3_label: "Vidéos" } },
+      { type: "social_links", content: {} },
+      { type: "availability", content: { status: "available", message: "Ouvert aux partenariats", cta_label: "Collaborer" } },
+    ],
+  },
+]
+
 // Presets de bannière : un clic configure plusieurs champs d'un coup
 export const BANNER_PRESETS: { key: string; label: string; emoji: string; content: Record<string, any> }[] = [
   { key: "luxury", label: "Luxe", emoji: "👑", content: { banner_type: "gradient", grad_preset: "or_nuit", height_px: 220, block_radius: 16, text_position: "bottom-left", overlay_gradient: "bottom", animation: "shimmer", text_color: "#F5EBD0" } },

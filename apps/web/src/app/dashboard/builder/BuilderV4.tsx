@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import { createClient } from "@/lib/supabase/client"
@@ -3918,6 +3918,15 @@
       addBlock("availability", mk("availability", { message: "Ouvert aux nouvelles missions" }))
     }
 
+    function generateIdentityPreset(preset: typeof IDENTITY_PRESETS[number]) {
+      const mk = (type: string, ov: Record<string, string>) => ({ ...(BLOCK_DEFS[type]?.defaultContent || {}), ...ov })
+      const hasProfile = blocks.some(b => b.type === "profile")
+      preset.blocks.forEach(b => {
+        if (b.type === "profile" && hasProfile) return // ne recrée pas un profil existant
+        addBlock(b.type, mk(b.type, b.content))
+      })
+    }
+
     function deleteBlock(id: string) {
       if (blocks.find(b => b.id === id)?.locked) return
       setBlocks(p => p.filter(b => b.id !== id))
@@ -4596,6 +4605,21 @@
                                         style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "10px", margin: "2px 0 8px", borderRadius: 9, border: "none", cursor: "pointer", background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", color: "#080808", fontSize: 12, fontWeight: 800 }}>
                                         ✨ Générer une identité de base
                                       </button>
+                                      {/* Modèles par métier : 1 clic crée une identité adaptée */}
+                                      <div style={{ margin: "0 0 10px" }}>
+                                        <p style={subHeader}>Modèles par métier</p>
+                                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                                          {IDENTITY_PRESETS.map(p => (
+                                            <button key={p.key} type="button" onClick={() => generateIdentityPreset(p)} title={`Crée : ${p.blocks.map(b => (BLOCK_DEFS as any)[b.type]?.label || b.type).join(", ")}`}
+                                              style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 10px", borderRadius: 9, border: "1px solid rgba(201,168,76,0.18)", cursor: "pointer", background: "rgba(201,168,76,0.05)", color: "#F5F0E8", fontSize: 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
+                                              onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.12)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)" }}
+                                              onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,168,76,0.05)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.18)" }}>
+                                              <span style={{ fontSize: 16 }}>{p.emoji}</span>
+                                              <span style={{ flex: 1, lineHeight: 1.2 }}>{p.label}</span>
+                                            </button>
+                                          ))}
+                                        </div>
+                                      </div>
                                       {IDENTITY_GROUPS.map(g => {
                                         const gb = g.keys.filter(k => (BLOCK_DEFS as any)[k])
                                         if (!gb.length) return null
