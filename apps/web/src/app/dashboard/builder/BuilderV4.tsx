@@ -3779,6 +3779,7 @@
     const [qrShortCode, setQrShortCode] = useState("")
     const [showQrPanel, setShowQrPanel] = useState(false)
     const [pageStats, setPageStats] = useState({ views: 0, scans: 0 })
+    const [clickCounts, setClickCounts] = useState<Record<string, number>>({}) // clics par bloc (90j) pour le compteur builder
     const [messages, setMessages] = useState<Message[]>([{ role: "assistant", content: "Salut ! 👋 Décris ton activité et je construis ta page." }])
     const [aiInput, setAiInput] = useState("")
     const [aiLoading, setAiLoading] = useState(false)
@@ -4020,6 +4021,14 @@
           const appUrl = typeof window !== "undefined" ? window.location.origin : ""
           setQrCodeUrl(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(appUrl+"/q/"+qr.short_code)}&color=C9A84C&bgcolor=080808&margin=10`)
           setPageStats(s => ({ ...s, scans: qr.total_scans||0 }))
+        }
+        // Compteur de clics par bloc (90 derniers jours) — lecture proprio via RLS
+        const since = new Date(); since.setDate(since.getDate() - 90)
+        const { data: clk } = await supabase.from("block_clicks").select("block_id").eq("page_id", pageId).gte("clicked_at", since.toISOString())
+        if (clk?.length) {
+          const counts: Record<string, number> = {}
+          for (const r of clk as any[]) { if (r.block_id) counts[r.block_id] = (counts[r.block_id] || 0) + 1 }
+          setClickCounts(counts)
         }
       }
       load()
@@ -5104,6 +5113,12 @@
                       <div style={{ position: "absolute", top: 6, right: 8, display: "flex", alignItems: "center", gap: 3, background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 5, padding: "2px 6px", zIndex: 10, pointerEvents: "none" }}>
                         <span style={{ fontSize: 8 }}>🔒</span>
                         <span style={{ color: "#818CF8", fontSize: 8, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" as const }}>Verrouillé</span>
+                      </div>
+                    )}
+                    {clickCounts[block.id] > 0 && (
+                      <div title={`${clickCounts[block.id]} clic${clickCounts[block.id] > 1 ? "s" : ""} sur 90 jours`} style={{ position: "absolute", bottom: 6, right: 8, display: "flex", alignItems: "center", gap: 3, background: "rgba(57,255,143,0.12)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 20, padding: "2px 8px", zIndex: 10, pointerEvents: "none" }}>
+                        <span style={{ fontSize: 9 }}>👆</span>
+                        <span style={{ color: "#39FF8F", fontSize: 9, fontWeight: 700 }}>{clickCounts[block.id]} clic{clickCounts[block.id] > 1 ? "s" : ""}</span>
                       </div>
                     )}
 
