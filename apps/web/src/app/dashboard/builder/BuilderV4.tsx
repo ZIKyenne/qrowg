@@ -2607,6 +2607,18 @@
                   onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"}
                   onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />}
             {field.hint && <p style={{ color: MUTED, fontSize: 9, margin: "3px 0 0" }}>{field.hint}</p>}
+            {/* Compteur + score de lisibilité mobile pour les textes longs (bio, à propos…) */}
+            {field.type === "textarea" && (() => {
+              const len = (block.content[field.key] || "").length
+              if (!len) return null
+              const [txt, col] = len < 40 ? ["Un peu court", "#F59E0B"] : len <= 200 ? ["Bonne longueur ✓", "#39FF8F"] : ["Un peu long pour mobile", "#F59E0B"]
+              return (
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
+                  <span style={{ color: col, fontSize: 9, fontWeight: 600 }}>{txt}</span>
+                  <span style={{ color: MUTED, fontSize: 9 }}>{len} car.</span>
+                </div>
+              )
+            })()}
             {/* Suggestions curées — pour ne jamais partir d'un champ vide */}
             {(field as any).suggestions && (block.content[field.key] || "").trim() === "" && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 6 }}>
