@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { ImageIcon, LayoutGrid, Type, Palette, Sparkles, Layers, ChevronDown, Wand2, MoveVertical, AArrowUp } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { ImageIcon, LayoutGrid, Type, Palette, Sparkles, Layers, ChevronDown, Wand2, Crop, Move, X, AArrowUp } from "lucide-react"
 import ImageUpload from "./ImageUpload"
-import { BANNER_GRADIENTS, BANNER_PRESETS, BANNER_ANIM_CSS, BANNER_FONTS, BANNER_NOISE_URL as NOISE_URL, bannerBackgroundStyle } from "./types"
+import { BANNER_GRADIENTS, BANNER_PRESETS, BANNER_ANIM_CSS, BANNER_FONTS, BANNER_NOISE_URL as NOISE_URL, bannerBackgroundStyle, bannerImageStyle } from "./types"
 
 const G = "#C9A84C"
 const MUTED = "#8A8478"
@@ -143,9 +143,66 @@ const ANIM_OPTS = [
   { key: "floating", label: "Flottant" }, { key: "kenburns", label: "Ken Burns" }, { key: "zoom", label: "Zoom" }, { key: "pulse", label: "Pulse" },
 ]
 
+// ── Éditeur de recadrage interactif (déplacement souris + zoom + presets) ────
+function CropEditor({ content, set, onClose }: { content: Record<string, any>; set: (k: string, v: any) => void; onClose: () => void }) {
+  const c = content
+  const boxRef = useRef<HTMLDivElement>(null)
+  const drag = useRef<{ x: number; y: number; px: number; py: number } | null>(null)
+  const zoom = Math.max(1, parseFloat(c.img_zoom) || 1)
+  const px = (c.img_pos_x !== undefined && c.img_pos_x !== "") ? parseFloat(c.img_pos_x) : 50
+  const py = (c.img_pos_y !== undefined && c.img_pos_y !== "") ? parseFloat(c.img_pos_y) : (c.img_focus === "top" ? 0 : c.img_focus === "bottom" ? 100 : 50)
+  const previewH = clamp(Math.round(300 * (parseInt(c.height_px) || 180) / 320), 130, 380)
+
+  const onDown = (e: React.PointerEvent) => { drag.current = { x: e.clientX, y: e.clientY, px, py }; e.currentTarget.setPointerCapture(e.pointerId) }
+  const onMove = (e: React.PointerEvent) => {
+    if (!drag.current || !boxRef.current) return
+    const b = boxRef.current.getBoundingClientRect()
+    const nx = clamp(drag.current.px - (e.clientX - drag.current.x) / b.width * 100, 0, 100)
+    const ny = clamp(drag.current.py - (e.clientY - drag.current.y) / b.height * 100, 0, 100)
+    set("img_pos_x", nx.toFixed(1)); set("img_pos_y", ny.toFixed(1))
+  }
+  const onUp = () => { drag.current = null }
+  const reset = () => { set("img_pos_x", "50"); set("img_pos_y", "50"); set("img_zoom", "1") }
+  const quick = (yy: number) => { set("img_pos_x", "50"); set("img_pos_y", String(yy)) }
+
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 16, padding: 18, width: 340, maxWidth: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+          <Crop size={16} color={G} />
+          <span style={{ color: G, fontSize: 13, fontWeight: 800, letterSpacing: 0.5, textTransform: "uppercase", flex: 1 }}>Recadrage</span>
+          <button onClick={onClose} style={{ background: "transparent", border: "none", cursor: "pointer", color: MUTED, display: "flex" }}><X size={17} /></button>
+        </div>
+        {/* Zone draggable */}
+        <div ref={boxRef} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}
+          style={{ position: "relative", width: "100%", height: previewH, borderRadius: 12, overflow: "hidden", cursor: drag.current ? "grabbing" : "grab", background: "#000", touchAction: "none", border: "1px solid rgba(255,255,255,0.1)" }}>
+          {c.src ? <img src={c.src} alt="" draggable={false} style={{ width: "100%", height: "100%", pointerEvents: "none", ...bannerImageStyle(c) }} /> : <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", color: MUTED, fontSize: 12 }}>Aucune image</div>}
+          {/* Repère grille (règle des tiers) */}
+          <div style={{ position: "absolute", inset: 0, pointerEvents: "none", backgroundImage: "linear-gradient(rgba(255,255,255,0.18) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.18) 1px,transparent 1px)", backgroundSize: "33.33% 33.33%" }} />
+          <div style={{ position: "absolute", top: 8, left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center", gap: 5, background: "rgba(0,0,0,0.5)", borderRadius: 20, padding: "4px 10px", color: "#fff", fontSize: 10, fontWeight: 600, pointerEvents: "none" }}><Move size={11} /> Glissez pour cadrer</div>
+        </div>
+        {/* Zoom */}
+        <div style={{ marginTop: 14 }}>
+          <Slider label="Zoom" value={Number(zoom.toFixed(2))} min={1} max={3} step={0.05} unit="×" def={1} onChange={v => set("img_zoom", String(v))} />
+        </div>
+        {/* Presets rapides + reset */}
+        <div style={{ display: "flex", gap: 6, marginTop: 12 }}>
+          <button onClick={() => quick(0)} style={miniBtn}>Haut</button>
+          <button onClick={() => quick(50)} style={miniBtn}>Centre</button>
+          <button onClick={() => quick(100)} style={miniBtn}>Bas</button>
+          <button onClick={reset} style={{ ...miniBtn, color: MUTED }}>Reset</button>
+        </div>
+        <button onClick={onClose} style={{ marginTop: 14, width: "100%", background: `linear-gradient(90deg,${G},${G}cc)`, border: "none", borderRadius: 10, padding: "11px", color: "#080808", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Terminé</button>
+      </div>
+    </div>
+  )
+}
+const miniBtn: React.CSSProperties = { flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "8px 4px", color: TEXT, fontSize: 11, fontWeight: 600, cursor: "pointer" }
+
 export default function BannerStudio({ content, onChange }: { content: Record<string, any>; onChange: (key: string, val: string) => void }) {
   const c = content
   const [open, setOpen] = useState<string>("image")
+  const [crop, setCrop] = useState(false)
   const toggle = (id: string) => setOpen(o => o === id ? "" : id)
   const set = (k: string, v: any) => onChange(k, String(v))
   const applyPreset = (preset: Record<string, any>) => Object.entries(preset).forEach(([k, v]) => onChange(k, String(v)))
@@ -186,6 +243,7 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
       <style>{BANNER_ANIM_CSS}</style>
+      {crop && <CropEditor content={c} set={set} onClose={() => setCrop(false)} />}
 
       {/* EN-TÊTE STUDIO */}
       <div style={{ background: "linear-gradient(135deg,rgba(201,168,76,0.14),rgba(201,168,76,0.03))", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 13, padding: "12px 14px" }}>
@@ -221,10 +279,10 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
           <>
             <ImageUpload value={c.src || ""} onChange={url => set("src", url)} hint="Glissez-déposez, collez ou importez une URL" />
             {c.src && (
-              <div>
-                <label style={{ color: MUTED, fontSize: 11, fontWeight: 500, display: "flex", alignItems: "center", gap: 5, marginBottom: 6 }}><MoveVertical size={12} /> Cadrage (focus)</label>
-                <Segmented value={c.img_focus || "center"} onChange={v => set("img_focus", v)} options={[{ key: "top", label: "Haut" }, { key: "center", label: "Centre" }, { key: "bottom", label: "Bas" }]} />
-              </div>
+              <button onClick={() => setCrop(true)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 9, padding: "10px", color: G, fontSize: 12, fontWeight: 700, cursor: "pointer", transition: "background .15s" }}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(201,168,76,0.18)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(201,168,76,0.1)"}>
+                <Crop size={14} /> Recadrer &amp; Zoomer{(parseFloat(c.img_zoom) > 1 || (c.img_pos_x && c.img_pos_x !== "50")) ? " ✓" : ""}
+              </button>
             )}
           </>
         )}

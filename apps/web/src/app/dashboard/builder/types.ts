@@ -192,6 +192,24 @@ export function bannerHeight(c: any, base: "editor" | "public" = "public"): numb
   return base === "editor" ? ed : pub
 }
 
+// Style de l'image de bannière : cadrage (focus rapide OU position précise x/y) + zoom.
+// Parité builder <-> public. Le conteneur doit être en overflow:hidden.
+export function bannerImageStyle(c: any): Record<string, any> {
+  const zoom = Math.max(1, parseFloat(c.img_zoom) || 1)
+  const hasPos = c.img_pos_x !== undefined && c.img_pos_x !== "" && c.img_pos_x !== null
+  let objectPosition: string
+  let px = 50, py = 50
+  if (hasPos) {
+    px = Math.min(100, Math.max(0, parseFloat(c.img_pos_x)))
+    py = (c.img_pos_y !== undefined && c.img_pos_y !== "" && c.img_pos_y !== null) ? Math.min(100, Math.max(0, parseFloat(c.img_pos_y))) : 50
+    objectPosition = `${px}% ${py}%`
+  } else {
+    objectPosition = c.img_focus === "top" ? "center top" : c.img_focus === "bottom" ? "center bottom" : "center"
+    py = c.img_focus === "top" ? 0 : c.img_focus === "bottom" ? 100 : 50
+  }
+  return { objectFit: "cover", objectPosition, transform: zoom > 1 ? `scale(${zoom})` : undefined, transformOrigin: `${px}% ${py}%` }
+}
+
 // Typographie du titre de bannière (parité builder <-> public). Polices déjà chargées côté public.
 export const BANNER_FONTS: Record<string, string> = {
   serif: "Cormorant Garamond, serif",

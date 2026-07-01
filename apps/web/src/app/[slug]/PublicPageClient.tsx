@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -665,7 +665,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
           {anim && <style>{BANNER_ANIM_CSS}</style>}
           {btype === "image"
             ? (c.src
-              ? <img className="qfb-media" src={c.src} alt="" style={{ width: "100%", height: h, objectFit: "cover", objectPosition: c.img_focus === "top" ? "center top" : c.img_focus === "bottom" ? "center bottom" : "center", display: "block" }} />
+              ? <img className="qfb-media" src={c.src} alt="" style={{ width: "100%", height: h, display: "block", ...bannerImageStyle(c) }} />
               : <div className="qfb-media" style={{ width: "100%", height: h, background: `linear-gradient(135deg,${G}33,${theme.accent || "#39FF8F"}22)` }} />)
             : <div className="qfb-media" style={{ width: "100%", height: h, ...bannerBg }} />}
           {anim === "shimmer" && <div className="qfb-shine" />}

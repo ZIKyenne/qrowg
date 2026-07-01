@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import { createClient } from "@/lib/supabase/client"
@@ -636,7 +636,7 @@
             {anim && <style>{BANNER_ANIM_CSS}</style>}
             {btype==="image"
               ? (c.src
-                ? <img className="qfb-media" src={c.src} alt="" style={{ width: "100%", height: bh, objectFit: "cover", objectPosition: c.img_focus==="top" ? "center top" : c.img_focus==="bottom" ? "center bottom" : "center", display: "block" }} />
+                ? <img className="qfb-media" src={c.src} alt="" style={{ width: "100%", height: bh, display: "block", ...bannerImageStyle(c) }} />
                 : <div className="qfb-media" style={{ width: "100%", height: bh, background: `linear-gradient(135deg,${primary}30,${accent}20)`, display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: muted, fontSize: 11 }}>Bannière / Cover</span></div>)
               : <div className="qfb-media" style={{ width: "100%", height: bh, ...bannerBg }} />}
             {anim==="shimmer" && <div className="qfb-shine" />}
