@@ -95,6 +95,18 @@ export function wcagLevel(ratio: number): "AAA" | "AA" | "fail" {
   return "fail"
 }
 
+// Forme d'un avatar (source unique partagée éditeur ↔ page publique).
+export function avatarShapeStyle(shape?: string): Record<string, string | number> {
+  switch (shape) {
+    case "carré":    return { borderRadius: "8%" }
+    case "arrondi":  return { borderRadius: "22%" }
+    case "squircle": return { borderRadius: "32%" }
+    case "hexagone": return { clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)", borderRadius: "0" }
+    case "diamant":  return { clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)", borderRadius: "0" }
+    default:         return { borderRadius: "50%" } // cercle
+  }
+}
+
 // Style de fond d'une page selon son bgMode + effets.
 // Source unique partagée éditeur (aperçu) ↔ page publique pour garantir le WYSIWYG.
 export function themeBackgroundStyle(theme: PageTheme): Record<string, string | number> {
@@ -1898,6 +1910,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "name", label: "Nom complet", type: "text", placeholder: "Jean Dupont" },
       { key: "tagline", label: "Accroche", type: "text", placeholder: "Developpeur, artiste, coach...", maxRecommended: 80, suggestions: ["Photographe à Reims", "Coach sportif indépendant", "Consultant freelance", "Créateur de contenu", "Agent immobilier", "Restaurant & bar à cocktails"] },
       { key: "avatar", label: "Photo de profil", type: "image" },
+      { key: "avatar_shape", label: "Forme de l'avatar", type: "select", options: ["cercle", "arrondi", "squircle", "hexagone", "carré", "diamant"] },
       { key: "badge", label: "Badge (optionnel)", type: "text", placeholder: "Disponible, Nouveau, Pro...", suggestions: ["Disponible", "Ouvert aujourd'hui", "Sur RDV", "Certifié", "Vérifié", "Premium", "Depuis 2019", "+500 clients", "★★★★★", "Recommandé", "Expert"] },
     ],
   },

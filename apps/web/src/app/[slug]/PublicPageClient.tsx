@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react"
 import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
-import { themeBackgroundStyle } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -106,8 +106,8 @@ function RenderBlock({ block, theme, pageId }: { block: Block; theme: any; pageI
     case "profile": return (
       <div style={{ textAlign: "center", padding: "32px 20px 20px" }}>
         {c.avatar
-          ? <img src={c.avatar} alt="" style={{ width: 96, height: 96, borderRadius: "50%", objectFit: "cover", margin: "0 auto 14px", display: "block", border: `3px solid ${G}50`, boxShadow: `0 0 30px ${G}25` }} />
-          : <div style={{ width: 96, height: 96, borderRadius: "50%", background: `linear-gradient(135deg,${G},${theme.accent || "#39FF8F"})`, margin: "0 auto 14px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 38, fontWeight: 700, color: "#080808", boxShadow: `0 0 30px ${G}30`, fontFamily: FONT_D }}>{(c.name || "?")[0]?.toUpperCase()}</div>}
+          ? <img src={c.avatar} alt="" style={{ width: 96, height: 96, ...avatarShapeStyle(c.avatar_shape), objectFit: "cover", margin: "0 auto 14px", display: "block", border: `3px solid ${G}50`, boxShadow: `0 0 30px ${G}25` }} />
+          : <div style={{ width: 96, height: 96, ...avatarShapeStyle(c.avatar_shape), background: `linear-gradient(135deg,${G},${theme.accent || "#39FF8F"})`, margin: "0 auto 14px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 38, fontWeight: 700, color: "#080808", boxShadow: `0 0 30px ${G}30`, fontFamily: FONT_D }}>{(c.name || "?")[0]?.toUpperCase()}</div>}
         <h1 style={{ color: TEXT, fontSize: 26, fontWeight: 700, margin: "0 0 5px", fontFamily: FONT_D }}>{c.name || "Mon Nom"}</h1>
         <p style={{ color: MUTED, fontSize: 14, margin: c.badge ? "0 0 10px" : "0", fontFamily: FONT_B }}>{c.tagline}</p>
         {c.badge && <span style={{ background: `${G}12`, border: `1px solid ${G}25`, borderRadius: 20, padding: "4px 14px", fontSize: 12, color: G, display: "inline-block", fontFamily: FONT_B }}>{c.badge}</span>}
