@@ -1818,6 +1818,7 @@ export interface BlockField {
   placeholder?: string
   options?: string[]
   hint?: string
+  suggestions?: string[]   // exemples curés tappables (pour ne jamais partir d'un champ vide)
 }
 
 export interface BlockDef {
@@ -1877,9 +1878,9 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     defaultContent: { name: "Mon Nom", tagline: "Mon activite", badge: "" },
     fields: [
       { key: "name", label: "Nom complet", type: "text", placeholder: "Jean Dupont" },
-      { key: "tagline", label: "Accroche", type: "text", placeholder: "Developpeur, artiste, coach..." },
+      { key: "tagline", label: "Accroche", type: "text", placeholder: "Developpeur, artiste, coach...", suggestions: ["Photographe à Reims", "Coach sportif indépendant", "Consultant freelance", "Créateur de contenu", "Agent immobilier", "Restaurant & bar à cocktails"] },
       { key: "avatar", label: "Photo de profil", type: "image" },
-      { key: "badge", label: "Badge (optionnel)", type: "text", placeholder: "Disponible, Nouveau, Pro..." },
+      { key: "badge", label: "Badge (optionnel)", type: "text", placeholder: "Disponible, Nouveau, Pro...", suggestions: ["Disponible", "Nouveau", "Certifié", "Ouvert aujourd'hui", "Réponse rapide"] },
     ],
   },
   bio: {
@@ -1897,7 +1898,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     defaultContent: { title: "Mes competences", tags: "React, Design, Marketing" },
     fields: [
       { key: "title", label: "Titre (optionnel)", type: "text", placeholder: "Mes competences" },
-      { key: "tags", label: "Tags (separes par virgule)", type: "text", placeholder: "React, Design, Marketing" },
+      { key: "tags", label: "Tags (separes par virgule)", type: "text", placeholder: "React, Design, Marketing", suggestions: ["React, Design, Marketing", "Photographie, Retouche, Studio", "Coaching, Nutrition, Bien-être", "SEO, Contenu, Réseaux sociaux"] },
     ],
   },
   // ── Actions ───────────────────────────────────────────────────────────────

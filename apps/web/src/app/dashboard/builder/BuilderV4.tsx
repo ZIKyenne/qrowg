@@ -2604,6 +2604,18 @@
                   onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"}
                   onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />}
             {field.hint && <p style={{ color: MUTED, fontSize: 9, margin: "3px 0 0" }}>{field.hint}</p>}
+            {/* Suggestions curées — pour ne jamais partir d'un champ vide */}
+            {(field as any).suggestions && (block.content[field.key] || "").trim() === "" && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 6 }}>
+                <span style={{ color: MUTED, fontSize: 9, alignSelf: "center", marginRight: 1 }}>Exemples&nbsp;:</span>
+                {((field as any).suggestions as string[]).map(sug => (
+                  <button key={sug} type="button" onClick={() => onChange(field.key, sug)} title={`Utiliser : ${sug}`}
+                    style={{ padding: "4px 9px", borderRadius: 999, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", color: G, fontSize: 10, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" as const, maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {sug}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>
