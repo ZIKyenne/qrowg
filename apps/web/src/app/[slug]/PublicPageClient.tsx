@@ -184,6 +184,32 @@ function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail }: { block
   )
 }
 
+// ── Formulaire public générique (envoi par mailto vers l'organisateur) ───────
+function LeadFormPublic({ block, pageId, ownerEmail, title, description, descColor, fields, button, accent, subject, TEXT, MUTED }: { block: Block; pageId: string; ownerEmail?: string; title: string; description?: string; descColor?: string; fields: { key: string; label: string; area?: boolean }[]; button: string; accent: string; subject: string; TEXT: string; MUTED: string }) {
+  const [vals, setVals] = useState<Record<string, string>>({})
+  const set = (k: string, v: string) => setVals(p => ({ ...p, [k]: v }))
+  const required = fields.slice(0, 2).map(f => f.key)
+  const ready = required.every(k => (vals[k] || "").trim())
+  const inputStyle: any = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "11px 13px", color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }
+  const submit = () => {
+    trackLinkClick(pageId, block.id, "form")
+    const body = encodeURIComponent(fields.map(f => `${f.label}: ${vals[f.key] || ""}`).join("\n"))
+    if (ownerEmail) window.location.href = `mailto:${ownerEmail}?subject=${encodeURIComponent(subject)}&body=${body}`
+  }
+  return (
+    <div style={{ padding: "10px 24px 14px" }}>
+      <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{title}</p>
+      {description && <p style={{ color: descColor || MUTED, fontSize: 12, margin: "0 0 13px" }}>{description}</p>}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {fields.map(f => f.area
+          ? <textarea key={f.key} placeholder={f.label} value={vals[f.key] || ""} onChange={e => set(f.key, e.target.value)} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
+          : <input key={f.key} placeholder={f.label} value={vals[f.key] || ""} onChange={e => set(f.key, e.target.value)} style={inputStyle} />)}
+        <button onClick={submit} disabled={!ready} style={{ background: accent, borderRadius: 10, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", border: "none", cursor: ready ? "pointer" : "not-allowed", opacity: ready ? 1 : 0.55 }}>{button}</button>
+      </div>
+    </div>
+  )
+}
+
 function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme: any; pageId: string; ownerEmail?: string }) {
   const c = block.content
   const G = theme.primary || "#C9A84C"
@@ -1585,6 +1611,601 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
         </div>
       ) : null
     }
+
+    case "vcard": {
+      const vcf = ["BEGIN:VCARD", "VERSION:3.0", c.name ? `FN:${c.name}` : "", c.company ? `ORG:${c.company}` : "", c.phone ? `TEL:${c.phone}` : "", c.email ? `EMAIL:${c.email}` : "", c.website ? `URL:${c.website}` : "", "END:VCARD"].filter(Boolean).join("\n")
+      const href = `data:text/vcard;charset=utf-8,${encodeURIComponent(vcf)}`
+      return (c.name || c.phone || c.email) ? (
+        <div style={{ padding: "6px 24px 12px" }}>
+          <div style={{ background: `${G}08`, border: `1.5px solid ${G}25`, borderRadius: 13, padding: "13px 15px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 10 }}>
+              <div style={{ width: 40, height: 40, borderRadius: "50%", background: `linear-gradient(135deg,${G},${G}80)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>👤</div>
+              <div>{c.name && <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.name}</p>}{c.company && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.company}</p>}</div>
+            </div>
+            <a href={href} download={`${(c.name || "contact").replace(/\s+/g, "_")}.vcf`} onClick={() => trackLinkClick(pageId, block.id, "vcard")} style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 9, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#080808", textDecoration: "none", fontFamily: FONT_B }}>{c.label || "Ajouter à mes contacts"}</a>
+          </div>
+        </div>
+      ) : null
+    }
+    case "google_review": return c.url ? (
+      <div style={{ padding: "6px 24px 12px" }}>
+        <a href={c.url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url)} style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(251,191,36,0.08)", border: "1.5px solid rgba(251,191,36,0.25)", borderRadius: 13, padding: "13px 15px", textDecoration: "none" }}>
+          <div style={{ display: "flex", gap: 1 }}>{Array.from({ length: parseInt(c.stars || "5") }).map((_, i) => <span key={i} style={{ color: "#FBBF24", fontSize: 13 }}>★</span>)}</div>
+          <div style={{ flex: 1 }}><p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.label || "Donner un avis"}</p><p style={{ color: MUTED, fontSize: 10, margin: 0 }}>Google Reviews</p></div>
+          <span style={{ fontSize: 19 }}>⭐</span>
+        </a>
+      </div>
+    ) : null
+    case "table_booking": return c.url ? (
+      <div style={{ padding: "6px 24px 12px" }}>
+        <a href={c.url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(239,68,68,0.1)", border: "1.5px solid rgba(239,68,68,0.3)", borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
+          <span style={{ fontSize: 17 }}>🍽️</span>
+          <span style={{ color: "#EF4444", fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Réserver une table"}</span>
+        </a>
+      </div>
+    ) : null
+    case "donation": {
+      const dc = ({ "Ko-fi": "#FF5E5B", "Buy Me A Coffee": "#FFDD00", "Patreon": "#FF424D", "PayPal": "#009CDE", "Tipeee": "#E55100" } as any)[c.platform || "Ko-fi"] || "#F59E0B"
+      return c.url ? (
+        <div style={{ padding: "6px 24px 12px" }}>
+          <a href={c.url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: `${dc}12`, border: `1.5px solid ${dc}30`, borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
+            <span style={{ fontSize: 19 }}>☕</span>
+            <span style={{ color: dc, fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Soutenir mon travail"}</span>
+          </a>
+        </div>
+      ) : null
+    }
+    case "app_download": return (c.ios_url || c.android_url) ? (
+      <div style={{ padding: "6px 24px 12px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {c.ios_url && <a href={c.ios_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.ios_url)} style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(0,0,0,0.25)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: "11px 15px", textDecoration: "none" }}><span style={{ fontSize: 24 }}>🍎</span><div><p style={{ color: MUTED, fontSize: 9, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>Disponible sur</p><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>App Store</p></div></a>}
+          {c.android_url && <a href={c.android_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.android_url)} style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(0,0,0,0.25)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: "11px 15px", textDecoration: "none" }}><span style={{ fontSize: 24 }}>🤖</span><div><p style={{ color: MUTED, fontSize: 9, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>Disponible sur</p><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>Google Play</p></div></a>}
+        </div>
+      </div>
+    ) : null
+    case "quote_request": return (c.label || c.url) ? (
+      <div style={{ padding: "6px 24px 12px" }}>
+        <a href={c.url || "#"} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "quote")} style={{ display: "flex", alignItems: "center", gap: 11, background: `${G}08`, border: `1.5px solid ${G}20`, borderRadius: 13, padding: "12px 15px", textDecoration: "none" }}>
+          <div style={{ width: 40, height: 40, background: `${G}12`, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19, flexShrink: 0 }}>📋</div>
+          <div style={{ flex: 1 }}><p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.label || "Demander un devis"}</p>{c.description && <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{c.description}</p>}</div>
+          <span style={{ color: G, fontSize: 15 }}>→</span>
+        </a>
+      </div>
+    ) : null
+    case "reservation_form": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} title={c.title || "Réserver"} fields={[{ key: "name", label: "Nom" }, { key: "date", label: "Date souhaitée" }, { key: "people", label: "Nb personnes" }]} button={c.button_label || "Réserver"} accent="linear-gradient(90deg,#EF4444,#dc2626)" subject={`Réservation: ${c.title || ""}`} TEXT={TEXT} MUTED={MUTED} />
+    case "quote_form": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} title={c.title || "Demander un devis"} description={c.description} fields={[{ key: "name", label: "Nom complet" }, { key: "email", label: "Email" }, ...(c.show_phone !== "no" ? [{ key: "phone", label: "Téléphone" }] : []), ...(c.show_budget === "yes" ? [{ key: "budget", label: "Budget estimé" }] : []), { key: "project", label: "Description du projet", area: true }]} button={c.button_label || "Envoyer ma demande"} accent={`linear-gradient(90deg,${G},${G}cc)`} subject="Demande de devis" TEXT={TEXT} MUTED={MUTED} />
+    case "booking_request": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} title={c.title || "Réserver pour un événement"} description={c.description} fields={[{ key: "name", label: "Nom / Organisation" }, { key: "email", label: "Email" }, { key: "type", label: "Type d'événement" }, { key: "date", label: "Date souhaitée" }, { key: "message", label: "Message", area: true }]} button={c.button_label || "Envoyer ma demande"} accent="linear-gradient(90deg,#9146FF,#7B3FCC)" subject="Demande de réservation événement" TEXT={TEXT} MUTED={MUTED} />
+    case "quick_contact": {
+      const items = [[c.phone, "📞", "#39FF8F", c.phone ? `tel:${c.phone}` : null], [c.email, "✉️", "#38BDF8", c.email ? `mailto:${c.email}` : null], [c.whatsapp, "💬", "#25D366", c.whatsapp ? `https://wa.me/${String(c.whatsapp).replace(/[^0-9]/g, "")}` : null], [c.address, "📍", G, null], [c.hours, "🕐", MUTED, null]].filter(([v]) => v)
+      return items.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {items.map(([value, icon, color, href]: any[], i: number) => {
+              const inner = <><span style={{ fontSize: 19, flexShrink: 0 }}>{icon}</span><span style={{ color: TEXT, fontSize: 13, fontWeight: 600, flex: 1, fontFamily: FONT_B }}>{value}</span>{href && <ExternalLink size={12} color={color} style={{ flexShrink: 0 }} />}</>
+              const st: any = { display: "flex", alignItems: "center", gap: 12, background: `${color}10`, border: `1px solid ${color}20`, borderRadius: 11, padding: "12px 15px", textDecoration: "none" }
+              return href ? <a key={i} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, href)} style={st}>{inner}</a> : <div key={i} style={st}>{inner}</div>
+            })}
+          </div>
+        </div>
+      ) : null
+    }
+    case "multi_contact": {
+      const contacts = [[c.c1_photo, c.c1_name, c.c1_role, c.c1_phone, c.c1_email], [c.c2_photo, c.c2_name, c.c2_role, c.c2_phone, c.c2_email], [c.c3_photo, c.c3_name, c.c3_role, c.c3_phone, c.c3_email]].filter(([, n]) => n)
+      const accent = theme.accent || "#39FF8F"
+      return contacts.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {contacts.map(([photo, name, role, phone, email]: any[], i: number) => (
+              <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 13, padding: "13px 15px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: (phone || email) ? 11 : 0 }}>
+                  {photo ? <img src={String(photo)} alt="" style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${G}40` }} /> : <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg,${G},${accent})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, fontWeight: 700, color: "#080808", flexShrink: 0 }}>{String(name)[0]}</div>}
+                  <div><p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{name}</p>{role && <p style={{ color: G, fontSize: 11, margin: 0 }}>{role}</p>}</div>
+                </div>
+                {(phone || email) && (
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {phone && <a href={`tel:${phone}`} onClick={() => trackLinkClick(pageId, block.id, "tel")} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "rgba(57,255,143,0.08)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 9, padding: "9px", color: "#39FF8F", textDecoration: "none", fontSize: 12, fontWeight: 600 }}>📞 Appeler</a>}
+                    {email && <a href={`mailto:${email}`} onClick={() => trackLinkClick(pageId, block.id, "email")} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "rgba(56,189,248,0.08)", border: "1px solid rgba(56,189,248,0.2)", borderRadius: 9, padding: "9px", color: "#38BDF8", textDecoration: "none", fontSize: 12, fontWeight: 600 }}>✉️ Email</a>}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "service_area": {
+      const cities = [c.city1, c.city2, c.city3, c.city4, c.city5, c.city6].filter(Boolean)
+      return (c.area || cities.length > 0) ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
+          {c.area && (
+            <div style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(66,133,244,0.08)", border: "1px solid rgba(66,133,244,0.2)", borderRadius: 11, padding: "12px 15px", marginBottom: cities.length > 0 ? 11 : 0 }}>
+              <span style={{ fontSize: 21 }}>📍</span>
+              <div><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{c.area}</p>{c.radius && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{c.radius}</p>}</div>
+            </div>
+          )}
+          {cities.length > 0 && <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>{cities.map((city: string, i: number) => <span key={i} style={{ background: "rgba(66,133,244,0.08)", border: "1px solid rgba(66,133,244,0.2)", borderRadius: 20, padding: "6px 13px", color: TEXT, fontSize: 13 }}>📍 {city}</span>)}</div>}
+          {c.note && <p style={{ color: MUTED, fontSize: 12, margin: "11px 0 0", fontStyle: "italic" }}>{c.note}</p>}
+        </div>
+      ) : null
+    }
+    case "legal_info": {
+      const rows = [["Société", c.company_name], ["SIRET", c.siret], ["N° TVA", c.tva], ["Siège social", c.address], ["Capital", c.capital], ["RCS", c.rcs], ["Email", c.email]].filter(([, v]) => v)
+      return rows.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 13, overflow: "hidden" }}>
+            {rows.map(([label, value]: any[], i: number) => (
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 15px", borderBottom: i < rows.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+                <span style={{ color: MUTED, fontSize: 12 }}>{label}</span>
+                <span style={{ color: TEXT, fontSize: 12, fontWeight: 600, maxWidth: "55%", textAlign: "right" }}>{value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "business_certifications": {
+      const certs = [[c.c1_icon, c.c1_name, c.c1_org, c.c1_year], [c.c2_icon, c.c2_name, c.c2_org, c.c2_year], [c.c3_icon, c.c3_name, c.c3_org, c.c3_year], [c.c4_icon, c.c4_name, c.c4_org, c.c4_year]].filter(([, n]) => n)
+      return certs.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {certs.map(([icon, name, org, year]: any[], i: number) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, background: `${G}06`, border: `1px solid ${G}15`, borderRadius: 12, padding: "11px 13px" }}>
+                <span style={{ fontSize: 21 }}>{icon || "🏅"}</span>
+                <div style={{ flex: 1 }}><p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{name}</p><p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{org}{year ? ` · ${year}` : ""}</p></div>
+                <span style={{ color: G, fontSize: 15 }}>✓</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "on_site_services": {
+      const svcs = [[c.s1_icon, c.s1_label], [c.s2_icon, c.s2_label], [c.s3_icon, c.s3_label], [c.s4_icon, c.s4_label], [c.s5_icon, c.s5_label], [c.s6_icon, c.s6_label], [c.s7_icon, c.s7_label], [c.s8_icon, c.s8_label]].filter(([, l]) => l)
+      return svcs.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+            {svcs.map(([icon, label]: any[], i: number) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(66,133,244,0.06)", border: "1px solid rgba(66,133,244,0.15)", borderRadius: 11, padding: "11px 13px" }}>
+                <span style={{ fontSize: 21, flexShrink: 0 }}>{icon}</span>
+                <span style={{ color: TEXT, fontSize: 12, fontWeight: 600, fontFamily: FONT_B }}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "google_maps_embed": return (c.embed_url || c.address) ? (
+      <div style={{ padding: "10px 24px 14px" }}>
+        {c.label && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.label}</p>}
+        {c.embed_url
+          ? <iframe src={c.embed_url} width="100%" height={c.height === "lg" ? 240 : c.height === "sm" ? 140 : 190} style={{ border: "none", borderRadius: 13, display: "block" }} loading="lazy" />
+          : <div style={{ height: 190, background: "rgba(66,133,244,0.06)", border: "1px solid rgba(66,133,244,0.2)", borderRadius: 13, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}><span style={{ fontSize: 34 }}>🗺️</span><p style={{ color: MUTED, fontSize: 12, margin: 0, textAlign: "center" }}>📍 {c.address}</p></div>}
+        {c.show_directions !== "no" && c.address && <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(c.address)}`} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, "directions")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 11, background: "rgba(66,133,244,0.1)", border: "1px solid rgba(66,133,244,0.25)", borderRadius: 10, padding: "12px", color: "#4285F4", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>🧭 Obtenir l&apos;itinéraire</a>}
+      </div>
+    ) : null
+    case "company": return (c.company_name || c.logo_url) ? (
+      <div style={{ padding: "8px 24px 12px" }}>
+        <div style={{ display: "flex", gap: 12, alignItems: "center", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 13, padding: "12px 13px" }}>
+          {c.logo_url ? <img src={c.logo_url} alt="" style={{ width: 44, height: 44, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 44, height: 44, borderRadius: 10, background: `${G}15`, border: `1px solid ${G}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 21, flexShrink: 0 }}>🏢</div>}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 1px", fontFamily: FONT_D }}>{c.company_name || "Mon Entreprise"}</p>
+            <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.sector}{c.founded_year ? ` · Depuis ${c.founded_year}` : ""}</p>
+          </div>
+        </div>
+      </div>
+    ) : null
+
+    case "before_after": return (c.before_img || c.after_img) ? (
+      <div style={{ padding: "10px 24px 14px" }}>
+        {c.title && <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 11px", textAlign: "center", fontFamily: FONT_B }}>{c.title}</p>}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+          <div style={{ borderRadius: 11, overflow: "hidden" }}>
+            {c.before_img ? <img src={c.before_img} alt="Avant" style={{ width: "100%", height: 150, objectFit: "cover", display: "block" }} /> : <div style={{ height: 150, background: "rgba(239,68,68,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30 }}>📸</div>}
+            <div style={{ background: "rgba(239,68,68,0.15)", padding: "7px", textAlign: "center" }}><p style={{ color: "#EF4444", fontSize: 12, fontWeight: 700, margin: 0 }}>{c.before_label || "Avant"}</p></div>
+          </div>
+          <div style={{ borderRadius: 11, overflow: "hidden" }}>
+            {c.after_img ? <img src={c.after_img} alt="Après" style={{ width: "100%", height: 150, objectFit: "cover", display: "block" }} /> : <div style={{ height: 150, background: "rgba(57,255,143,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30 }}>✨</div>}
+            <div style={{ background: "rgba(57,255,143,0.15)", padding: "7px", textAlign: "center" }}><p style={{ color: "#39FF8F", fontSize: 12, fontWeight: 700, margin: 0 }}>{c.after_label || "Après"}</p></div>
+          </div>
+        </div>
+        {c.description && <p style={{ color: MUTED, fontSize: 12, textAlign: "center", margin: "9px 0 0" }}>{c.description}</p>}
+      </div>
+    ) : null
+    case "brands": {
+      const brandList = [[c.brand1_icon, c.brand1_name], [c.brand2_icon, c.brand2_name], [c.brand3_icon, c.brand3_name], [c.brand4_icon, c.brand4_name], [c.brand5_icon, c.brand5_name], [c.brand6_icon, c.brand6_name]].filter(([, n]) => n)
+      return brandList.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {brandList.map(([icon, name]: any[], i: number) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 7, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: "6px 13px" }}>
+                {icon && <span style={{ fontSize: 16 }}>{icon}</span>}
+                <span style={{ color: TEXT, fontSize: 12, fontWeight: 600, fontFamily: FONT_B }}>{name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "gift_card": return (c.title || c.amount1) ? (
+      <div style={{ padding: "10px 24px 14px" }}>
+        <div style={{ background: "linear-gradient(135deg,#EC489915,#F472B610)", border: "1.5px solid rgba(236,72,153,0.3)", borderRadius: 15, padding: "17px" }}>
+          <div style={{ textAlign: "center", marginBottom: 13 }}>
+            <span style={{ fontSize: 34 }}>🎁</span>
+            <p style={{ color: TEXT, fontSize: 16, fontWeight: 700, margin: "6px 0 3px", fontFamily: FONT_B }}>{c.title || "Offrez une expérience"}</p>
+            {c.description && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{c.description}</p>}
+          </div>
+          <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: c.cta_label ? 13 : 0 }}>
+            {[c.amount1, c.amount2, c.amount3].filter(Boolean).map((amount, i) => (
+              <div key={i} style={{ background: i === 1 ? "rgba(236,72,153,0.2)" : "rgba(255,255,255,0.06)", border: `1.5px solid ${i === 1 ? "rgba(236,72,153,0.4)" : "rgba(255,255,255,0.1)"}`, borderRadius: 11, padding: "11px 16px", textAlign: "center" }}>
+                <p style={{ color: i === 1 ? "#EC4899" : TEXT, fontSize: 17, fontWeight: 700, margin: 0 }}>{amount}</p>
+              </div>
+            ))}
+          </div>
+          {c.cta_label && <a href={c.cta_url || "#"} target={/^https?:/.test(c.cta_url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "giftcard")} style={{ display: "block", background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 11, padding: "12px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</a>}
+        </div>
+      </div>
+    ) : null
+    case "services_pricing": {
+      const svcs = [[c.s1_name, c.s1_price, c.s1_duration, c.s1_desc], [c.s2_name, c.s2_price, c.s2_duration, c.s2_desc], [c.s3_name, c.s3_price, c.s3_duration, c.s3_desc], [c.s4_name, c.s4_price, c.s4_duration, c.s4_desc], [c.s5_name, c.s5_price, c.s5_duration, c.s5_desc]].filter(([n]) => n)
+      return svcs.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div>
+            {svcs.map(([name, price, duration, desc]: any[], i: number) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, padding: "11px 0", borderBottom: i < svcs.length - 1 ? "1px solid rgba(255,255,255,0.06)" : "none" }}>
+                <div style={{ flex: 1 }}><p style={{ color: TEXT, fontSize: 14, fontWeight: 600, margin: "0 0 1px", fontFamily: FONT_B }}>{name}</p>{desc && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{desc}</p>}</div>
+                <div style={{ textAlign: "right", flexShrink: 0 }}><p style={{ color: G, fontSize: 15, fontWeight: 700, margin: 0 }}>{price}</p>{duration && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{duration}</p>}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "external_shop": return (c.label || c.url) ? (
+      <div style={{ padding: "6px 24px 14px" }}>
+        {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 11px", textAlign: "center" }}>{c.description}</p>}
+        <a href={c.url || "#"} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "shop")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: `${G}10`, border: `1.5px solid ${G}30`, borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
+          <span style={{ fontSize: 21 }}>🛒</span>
+          <div><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.label || "Voir la boutique"}</p>{c.platform && <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>via {c.platform}</p>}</div>
+          <ExternalLink size={14} color={G} style={{ marginLeft: "auto" }} />
+        </a>
+      </div>
+    ) : null
+    case "advantages": {
+      const advList = [c.adv1, c.adv2, c.adv3, c.adv4, c.adv5, c.adv6].filter(Boolean)
+      return advList.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {advList.map((adv: string, i: number) => <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 13px", background: "rgba(57,255,143,0.05)", border: "1px solid rgba(57,255,143,0.15)", borderRadius: 10 }}><p style={{ color: TEXT, fontSize: 13, margin: 0, fontFamily: FONT_B }}>{adv}</p></div>)}
+          </div>
+        </div>
+      ) : null
+    }
+    case "reassurance": {
+      const guarantees = [[c.g1_icon, c.g1_label, c.g1_desc], [c.g2_icon, c.g2_label, c.g2_desc], [c.g3_icon, c.g3_label, c.g3_desc], [c.g4_icon, c.g4_label, c.g4_desc]].filter(([, l]) => l)
+      return guarantees.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+            {guarantees.map(([icon, label, desc]: any[], i: number) => (
+              <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, background: "rgba(57,255,143,0.05)", border: "1px solid rgba(57,255,143,0.12)", borderRadius: 12, padding: "13px 9px", textAlign: "center" }}>
+                <span style={{ fontSize: 26 }}>{icon || "✅"}</span>
+                <p style={{ color: TEXT, fontSize: 12, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{label}</p>
+                {desc && <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{desc}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "sales_counter": return c.count ? (
+      <div style={{ padding: "10px 24px 14px" }}>
+        <div style={{ background: "rgba(239,68,68,0.08)", border: "1.5px solid rgba(239,68,68,0.25)", borderRadius: 15, padding: "17px", textAlign: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 11, marginBottom: c.subtext ? 7 : 0 }}>
+            <span style={{ fontSize: 30 }}>{c.emoji || "🔥"}</span>
+            <div><p style={{ margin: 0, lineHeight: 1, fontFamily: FONT_D }}><span style={{ color: TEXT, fontSize: 30, fontWeight: 700 }}>{c.count}</span> <span style={{ color: "#EF4444", fontSize: 15, fontWeight: 700 }}>{c.label || "ventes"}</span></p>{c.period && <p style={{ color: MUTED, fontSize: 12, margin: "3px 0 0" }}>{c.period}</p>}</div>
+          </div>
+          {c.subtext && <p style={{ color: "#EF4444", fontSize: 13, fontWeight: 600, margin: 0 }}>{c.subtext}</p>}
+        </div>
+      </div>
+    ) : null
+    case "popular_products": {
+      const tops = [[c.p1_rank, c.p1_img, c.p1_name, c.p1_price, c.p1_sales, c.p1_url], [c.p2_rank, c.p2_img, c.p2_name, c.p2_price, c.p2_sales, c.p2_url], [c.p3_rank, null, c.p3_name, c.p3_price, c.p3_sales, c.p3_url]].filter(([, , n]) => n)
+      return tops.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {tops.map(([rank, img, name, price, sales, url]: any[], i: number) => {
+              const inner = <>
+                {rank && <span style={{ fontSize: 19, flexShrink: 0 }}>{String(rank).split(" ")[0]}</span>}
+                {img ? <img src={String(img)} alt="" style={{ width: 44, height: 44, objectFit: "cover", borderRadius: 8, flexShrink: 0 }} /> : <div style={{ width: 44, height: 44, background: `${G}10`, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 21, flexShrink: 0 }}>🏆</div>}
+                <div style={{ flex: 1, minWidth: 0 }}><p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: "0 0 1px", fontFamily: FONT_B }}>{name}</p>{sales && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{sales}</p>}</div>
+                {price && <span style={{ color: G, fontSize: 14, fontWeight: 700, flexShrink: 0 }}>{price}</span>}
+              </>
+              const st: any = { display: "flex", alignItems: "center", gap: 11, background: i === 0 ? `${G}08` : "rgba(255,255,255,0.03)", border: `1px solid ${i === 0 ? `${G}20` : "rgba(255,255,255,0.07)"}`, borderRadius: 11, padding: "11px 13px", textDecoration: "none" }
+              return url ? <a key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={st}>{inner}</a> : <div key={i} style={st}>{inner}</div>
+            })}
+          </div>
+        </div>
+      ) : null
+    }
+    case "scan_counter": return null
+    case "engagements": {
+      const engList = [c.e1, c.e2, c.e3, c.e4, c.e5, c.e6].filter(Boolean)
+      return engList.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {engList.map((eng: string, i: number) => <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 13px", background: "rgba(57,255,143,0.05)", border: "1px solid rgba(57,255,143,0.15)", borderRadius: 11 }}><p style={{ color: TEXT, fontSize: 13, margin: 0, lineHeight: 1.4, fontFamily: FONT_B }}>{eng}</p></div>)}
+          </div>
+        </div>
+      ) : null
+    }
+    case "announcement": {
+      const typeStyles: Record<string, any> = {
+        warning: { bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.3)", color: "#FBBF24" },
+        info: { bg: "rgba(56,189,248,0.08)", border: "rgba(56,189,248,0.3)", color: "#38BDF8" },
+        success: { bg: "rgba(57,255,143,0.08)", border: "rgba(57,255,143,0.3)", color: "#39FF8F" },
+        promo: { bg: "rgba(201,168,76,0.08)", border: "rgba(201,168,76,0.3)", color: "#C9A84C" },
+      }
+      const ts = typeStyles[c.type || "warning"]
+      return (c.title || c.message) ? (
+        <div style={{ padding: "8px 24px" }}>
+          <div style={{ background: ts.bg, border: `1.5px solid ${ts.border}`, borderRadius: 13, padding: "15px 17px" }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 11 }}>
+              <span style={{ fontSize: 23, flexShrink: 0 }}>{c.emoji || "⚠️"}</span>
+              <div>{c.title && <p style={{ color: ts.color, fontSize: 14, fontWeight: 700, margin: "0 0 4px", fontFamily: FONT_B }}>{c.title}</p>}{c.message && <p style={{ color: TEXT, fontSize: 13, margin: 0, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{c.message}</p>}</div>
+            </div>
+          </div>
+        </div>
+      ) : null
+    }
+    case "info_table": {
+      const rows = [[c.r1_label, c.r1_value], [c.r2_label, c.r2_value], [c.r3_label, c.r3_value], [c.r4_label, c.r4_value], [c.r5_label, c.r5_value], [c.r6_label, c.r6_value]].filter(([l]) => l)
+      return rows.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div>
+            {rows.map(([label, value]: any[], i: number) => (
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: i < rows.length - 1 ? "1px solid rgba(255,255,255,0.06)" : "none" }}>
+                <span style={{ color: MUTED, fontSize: 13 }}>{label}</span>
+                <span style={{ color: TEXT, fontSize: 13, fontWeight: 600, fontFamily: FONT_B }}>{value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "founder_message": {
+      const accent = theme.accent || "#39FF8F"
+      return (c.message || c.name) ? (
+        <div style={{ padding: "12px 24px 14px" }}>
+          <div style={{ background: `${G}06`, border: `1px solid ${G}15`, borderRadius: 15, padding: "17px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: 13 }}>
+              {c.photo ? <img src={c.photo} alt="" style={{ width: 52, height: 52, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${G}40` }} /> : <div style={{ width: 52, height: 52, borderRadius: "50%", background: `linear-gradient(135deg,${G},${accent})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 23, flexShrink: 0 }}>👤</div>}
+              <div><p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_D }}>{c.name || "Jean Dupont"}</p><p style={{ color: G, fontSize: 12, margin: 0 }}>{c.role || "Fondateur & CEO"}</p></div>
+            </div>
+            <p style={{ color: MUTED, fontSize: 13, lineHeight: 1.7, margin: c.signature ? "0 0 11px" : "0", fontStyle: "italic" }}>&quot;{c.message}&quot;</p>
+            {c.signature && <p style={{ color: G, fontSize: 15, fontFamily: "Georgia, serif", margin: 0, fontStyle: "italic" }}>{c.signature}</p>}
+          </div>
+        </div>
+      ) : null
+    }
+    case "spotify_embed": {
+      const embedType = c.type || "track"
+      const spotifyId = c.url ? (String(c.url).match(new RegExp(`spotify\\.com/${embedType}/([a-zA-Z0-9]+)`))?.[1] || null) : null
+      const height = c.size === "lg" ? 352 : c.size === "sm" ? 80 : 152
+      return spotifyId ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          <iframe src={`https://open.spotify.com/embed/${embedType}/${spotifyId}?utm_source=generator&theme=0`} width="100%" height={height} style={{ borderRadius: 13, border: "none", display: "block" }} allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" />
+        </div>
+      ) : null
+    }
+    case "latest_release": {
+      const platforms = [[c.spotify_url, "🎧 Spotify", "#1DB954", "#000"], [c.apple_url, "🍎 Apple", "#FC3C44", "#fff"], [c.youtube_url, "▶ YT", "#FF0000", "#fff"]].filter(([u]) => u)
+      return (c.title || c.cover || platforms.length > 0) ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          <div style={{ background: "linear-gradient(135deg,rgba(29,185,84,0.12),rgba(29,185,84,0.06))", border: "1.5px solid rgba(29,185,84,0.3)", borderRadius: 16, overflow: "hidden" }}>
+            {c.badge && <div style={{ background: "rgba(29,185,84,0.2)", padding: "7px 14px", fontSize: 12, fontWeight: 700, color: "#1DB954", textAlign: "center" }}>{c.badge}</div>}
+            <div style={{ display: "flex", gap: 14, padding: "15px" }}>
+              {c.cover ? <img src={c.cover} alt="" style={{ width: 84, height: 84, borderRadius: 11, objectFit: "cover", flexShrink: 0, boxShadow: "0 4px 16px rgba(0,0,0,0.4)" }} /> : <div style={{ width: 84, height: 84, borderRadius: 11, background: "rgba(29,185,84,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 34, flexShrink: 0 }}>🎵</div>}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ color: TEXT, fontSize: 17, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_D }}>{c.title || "Nouveau titre"}</p>
+                {c.artist && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 4px" }}>{c.artist}</p>}
+                {c.release_date && <p style={{ color: "#1DB954", fontSize: 12, margin: "0 0 10px", fontWeight: 600 }}>📅 {c.release_date}</p>}
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                  {platforms.map(([url, label, bg]: any[], i: number) => <a key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ background: `${bg}22`, border: `1px solid ${bg}44`, borderRadius: 7, padding: "5px 11px", fontSize: 11, fontWeight: 700, color: bg, textDecoration: "none" }}>{label}</a>)}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null
+    }
+    case "discography": {
+      const albums = [[c.a1_cover, c.a1_title, c.a1_year, c.a1_type, c.a1_url], [c.a2_cover, c.a2_title, c.a2_year, c.a2_type, c.a2_url], [c.a3_cover, c.a3_title, c.a3_year, c.a3_type, c.a3_url]].filter(([, t]) => t)
+      return albums.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {albums.map(([cover, title, year, type, url]: any[], i: number) => {
+              const inner = <>
+                {cover ? <img src={String(cover)} alt="" style={{ width: 54, height: 54, borderRadius: 9, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 54, height: 54, borderRadius: 9, background: "rgba(29,185,84,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 25, flexShrink: 0 }}>💿</div>}
+                <div style={{ flex: 1 }}><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_B }}>{title}</p><div style={{ display: "flex", alignItems: "center", gap: 7 }}>{type && <span style={{ background: "rgba(29,185,84,0.12)", border: "1px solid rgba(29,185,84,0.2)", borderRadius: 10, padding: "1px 8px", color: "#1DB954", fontSize: 10, fontWeight: 700 }}>{type}</span>}{year && <span style={{ color: MUTED, fontSize: 12 }}>{year}</span>}</div></div>
+                <span style={{ color: "#1DB954", fontSize: 19 }}>▶</span>
+              </>
+              const st: any = { display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }
+              return url ? <a key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={st}>{inner}</a> : <div key={i} style={st}>{inner}</div>
+            })}
+          </div>
+        </div>
+      ) : null
+    }
+    case "album_block": {
+      const platforms = [[c.spotify_url, "🎧 Spotify", "#1DB954"], [c.apple_url, "🍎 Apple", "#FC3C44"], [c.deezer_url, "🎶 Deezer", "#A238FF"]].filter(([u]) => u)
+      return (c.title || c.cover) ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          <div style={{ background: "rgba(29,185,84,0.06)", border: "1px solid rgba(29,185,84,0.2)", borderRadius: 15, overflow: "hidden" }}>
+            {c.cover ? <img src={c.cover} alt="" style={{ width: "100%", height: 200, objectFit: "cover", display: "block" }} /> : <div style={{ height: 150, background: "rgba(29,185,84,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 52 }}>💿</div>}
+            <div style={{ padding: "15px" }}>
+              <p style={{ color: TEXT, fontSize: 19, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_D }}>{c.title || "Mon Album"}</p>
+              {c.artist && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 3px" }}>{c.artist}</p>}
+              <div style={{ display: "flex", gap: 10, marginBottom: c.description ? 11 : 13 }}>{c.year && <span style={{ color: "#1DB954", fontSize: 12, fontWeight: 600 }}>{c.year}</span>}{c.tracks && <span style={{ color: MUTED, fontSize: 12 }}>· {c.tracks}</span>}</div>
+              {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 13px", lineHeight: 1.6 }}>{c.description}</p>}
+              {platforms.length > 0 && <div style={{ display: "flex", gap: 8 }}>{platforms.map(([url, label, color]: any[], i: number) => <a key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ flex: 1, background: `${color}18`, border: `1px solid ${color}33`, borderRadius: 9, padding: "9px", textAlign: "center", fontSize: 12, fontWeight: 700, color, textDecoration: "none" }}>{label}</a>)}</div>}
+            </div>
+          </div>
+        </div>
+      ) : null
+    }
+    case "playlist_block": {
+      const platforms = [[c.spotify_url, "🎧 Spotify", "#1DB954"], [c.apple_url, "🍎 Apple", "#FC3C44"], [c.deezer_url, "🎶 Deezer", "#A238FF"]].filter(([u]) => u)
+      return (c.title || platforms.length > 0) ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          <div style={{ display: "flex", gap: 13, alignItems: "center", marginBottom: 13 }}>
+            {c.cover ? <img src={c.cover} alt="" style={{ width: 62, height: 62, borderRadius: 11, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 62, height: 62, borderRadius: 11, background: "rgba(29,185,84,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 29, flexShrink: 0 }}>📋</div>}
+            <div style={{ flex: 1 }}><p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_B }}>{c.title || "Ma Playlist"}</p>{c.description && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 3px" }}>{c.description}</p>}{c.tracks_count && <p style={{ color: "#1DB954", fontSize: 12, margin: 0, fontWeight: 600 }}>🎵 {c.tracks_count}</p>}</div>
+          </div>
+          {platforms.length > 0 && <div style={{ display: "flex", gap: 8 }}>{platforms.map(([url, label, color]: any[], i: number) => <a key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ flex: 1, background: `${color}18`, border: `1px solid ${color}33`, borderRadius: 9, padding: "10px", textAlign: "center", fontSize: 12, fontWeight: 700, color, textDecoration: "none" }}>{label}</a>)}</div>}
+        </div>
+      ) : null
+    }
+    case "concerts": {
+      const shows = [[c.c1_date, c.c1_city, c.c1_venue, c.c1_url], [c.c2_date, c.c2_city, c.c2_venue, c.c2_url], [c.c3_date, c.c3_city, c.c3_venue, c.c3_url], [c.c4_date, c.c4_city, c.c4_venue, c.c4_url]].filter(([, city]) => city)
+      return shows.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {shows.map(([date, city, venue, url]: any[], i: number) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(145,70,255,0.06)", border: "1px solid rgba(145,70,255,0.2)", borderRadius: 13, padding: "12px 15px" }}>
+                <div style={{ textAlign: "center", flexShrink: 0, minWidth: 48 }}><p style={{ color: "#9146FF", fontSize: 13, fontWeight: 700, margin: 0, lineHeight: 1.2 }}>{date}</p></div>
+                <div style={{ flex: 1 }}><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{city}</p>{venue && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>🎭 {venue}</p>}</div>
+                {url && <a href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ background: "#9146FF", borderRadius: 8, padding: "7px 13px", fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0, textDecoration: "none" }}>Billets →</a>}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "ticketing": return (c.event_name || c.url) ? (
+      <div style={{ padding: "10px 24px 14px" }}>
+        <div style={{ background: "rgba(145,70,255,0.08)", border: "1.5px solid rgba(145,70,255,0.3)", borderRadius: 15, padding: "17px" }}>
+          <div style={{ display: "flex", gap: 13, alignItems: "flex-start", marginBottom: 15 }}>
+            <span style={{ fontSize: 34, flexShrink: 0 }}>🎟️</span>
+            <div><p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_B }}>{c.event_name || "Mon Concert"}</p>{c.date && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 2px" }}>📅 {c.date}</p>}{c.venue && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 2px" }}>📍 {c.venue}</p>}{c.price && <p style={{ color: "#9146FF", fontSize: 13, fontWeight: 700, margin: 0 }}>💶 {c.price}</p>}</div>
+          </div>
+          <a href={c.url || "#"} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "ticket")} style={{ display: "block", background: "#9146FF", borderRadius: 11, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.label || "Acheter mes billets"}{c.platform && c.platform !== "URL personnalisée" ? ` — ${c.platform}` : ""}</a>
+        </div>
+      </div>
+    ) : null
+    case "presave": {
+      const platforms = [[c.spotify_url, "💾 Pré-save Spotify", "#1DB954", "#000"], [c.apple_url, "🍎 Apple Music", "#FC3C44", "#fff"]].filter(([u]) => u)
+      return (c.release_name || platforms.length > 0) ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          <div style={{ background: "linear-gradient(135deg,rgba(29,185,84,0.1),rgba(29,185,84,0.05))", border: "1.5px solid rgba(29,185,84,0.3)", borderRadius: 16, padding: "17px", textAlign: "center" }}>
+            {c.cover ? <img src={c.cover} alt="" style={{ width: 110, height: 110, borderRadius: 13, objectFit: "cover", margin: "0 auto 13px", display: "block", boxShadow: "0 4px 20px rgba(0,0,0,0.4)" }} /> : <div style={{ width: 110, height: 110, borderRadius: 13, background: "rgba(29,185,84,0.15)", margin: "0 auto 13px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 44 }}>💾</div>}
+            <p style={{ color: TEXT, fontSize: 17, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_D }}>{c.release_name || "Mon prochain titre"}</p>
+            {c.release_date && <p style={{ color: "#1DB954", fontSize: 13, fontWeight: 600, margin: "0 0 15px" }}>📅 Sortie le {c.release_date}</p>}
+            {platforms.length > 0 && <div style={{ display: "flex", gap: 8 }}>{platforms.map(([url, label, bg, fg]: any[], i: number) => <a key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ flex: 1, background: bg, borderRadius: 10, padding: "12px", fontSize: 12, fontWeight: 700, color: fg, textDecoration: "none" }}>{label}</a>)}</div>}
+          </div>
+        </div>
+      ) : null
+    }
+    case "merch": {
+      const products = [[c.img1, c.name1, c.price1], [c.img2, c.name2, c.price2], [c.img3, c.name3, c.price3]].filter(([, n]) => n)
+      return products.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
+          {c.description && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 12px" }}>{c.description}</p>}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 9, marginBottom: c.cta_label ? 13 : 0 }}>
+            {products.map(([img, name, price]: any[], i: number) => (
+              <div key={i} style={{ background: "rgba(145,70,255,0.06)", border: "1px solid rgba(145,70,255,0.15)", borderRadius: 11, overflow: "hidden" }}>
+                {img ? <img src={String(img)} alt="" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", display: "block" }} /> : <div style={{ aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>👕</div>}
+                <div style={{ padding: "7px 9px" }}><p style={{ color: TEXT, fontSize: 11, fontWeight: 700, margin: "0 0 1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: FONT_B }}>{name}</p><p style={{ color: "#9146FF", fontSize: 12, fontWeight: 700, margin: 0 }}>{price}</p></div>
+              </div>
+            ))}
+          </div>
+          {c.cta_label && <a href={c.cta_url || "#"} target={/^https?:/.test(c.cta_url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "merch")} style={{ display: "block", background: "linear-gradient(90deg,#9146FF,#7B3FCC)", borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</a>}
+        </div>
+      ) : null
+    }
+    case "hero_banner": {
+      const accent = theme.accent || "#39FF8F"
+      const h = c.height === "lg" ? 280 : c.height === "sm" ? 170 : 220
+      const align = c.align === "left" ? "flex-start" : "center"
+      const ta: any = c.align === "left" ? "left" : "center"
+      return (c.title || c.bg_image) ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          <div style={{ position: "relative", overflow: "hidden", borderRadius: 14 }}>
+            {c.bg_image ? <img src={c.bg_image} alt="" style={{ width: "100%", height: h, objectFit: "cover", display: "block" }} /> : <div style={{ width: "100%", height: h, background: c.bg_color ? c.bg_color : `linear-gradient(135deg,${G}30,${accent}15,#080808)` }} />}
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,transparent 20%,rgba(0,0,0,0.7) 100%)" }} />
+            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: align, justifyContent: "flex-end", padding: "22px" }}>
+              {c.title && <h2 style={{ color: "#fff", fontSize: c.height === "lg" ? 28 : 22, fontWeight: 700, margin: "0 0 6px", fontFamily: FONT_D, textAlign: ta, textShadow: "0 2px 10px rgba(0,0,0,0.5)", lineHeight: 1.2 }}>{c.title}</h2>}
+              {c.subtitle && <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 14, margin: "0 0 15px", textAlign: ta }}>{c.subtitle}</p>}
+              <div style={{ display: "flex", gap: 9, flexWrap: "wrap", justifyContent: align === "center" ? "center" : "flex-start" }}>
+                {c.cta_label && <a href={c.cta_url || "#"} target={/^https?:/.test(c.cta_url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "hero")} style={{ background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 10, padding: "11px 20px", fontSize: 13, fontWeight: 700, color: "#080808", textDecoration: "none" }}>{c.cta_label}</a>}
+                {c.cta2_label && <a href={c.cta2_url || "#"} target={/^https?:/.test(c.cta2_url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta2_url || "hero2")} style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 10, padding: "11px 20px", fontSize: 13, fontWeight: 600, color: "#fff", textDecoration: "none" }}>{c.cta2_label}</a>}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null
+    }
+    case "section_banner": {
+      const col = c.color || G
+      const t = c.title || "SECTION"
+      const style = c.style || "lines"
+      return (
+        <div style={{ padding: "12px 24px" }}>
+          {style === "lines" && <div style={{ display: "flex", alignItems: "center", gap: 12 }}><div style={{ flex: 1, height: 1, background: `linear-gradient(90deg,transparent,${col}60)` }} /><span style={{ color: col, fontSize: 13, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", whiteSpace: "nowrap" }}>{t}</span><div style={{ flex: 1, height: 1, background: `linear-gradient(90deg,${col}60,transparent)` }} /></div>}
+          {style === "dots" && <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9 }}><div style={{ display: "flex", gap: 3 }}>{[0, 1, 2].map(i => <div key={i} style={{ width: 4, height: 4, borderRadius: "50%", background: col }} />)}</div><span style={{ color: col, fontSize: 13, fontWeight: 700, letterSpacing: 3 }}>{t}</span><div style={{ display: "flex", gap: 3 }}>{[0, 1, 2].map(i => <div key={i} style={{ width: 4, height: 4, borderRadius: "50%", background: col }} />)}</div></div>}
+          {style === "gradient" && <div style={{ background: `linear-gradient(90deg,${col}15,${col}08)`, borderRadius: 9, padding: "11px 16px", textAlign: "center" }}><span style={{ color: col, fontSize: 14, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase" }}>{t}</span></div>}
+          {style === "minimal" && <p style={{ color: col, fontSize: 14, fontWeight: 700, letterSpacing: 4, textTransform: "uppercase", textAlign: "center", margin: 0 }}>{t}</p>}
+          {style === "badge" && <div style={{ textAlign: "center" }}><span style={{ background: `${col}18`, border: `1px solid ${col}35`, borderRadius: 20, padding: "7px 19px", color: col, fontSize: 13, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase" }}>{t}</span></div>}
+        </div>
+      )
+    }
+    case "grid_section": {
+      const cols = parseInt(c.columns || "3")
+      const cards = [[c.c1_icon, c.c1_title, c.c1_text], [c.c2_icon, c.c2_title, c.c2_text], [c.c3_icon, c.c3_title, c.c3_text], [c.c4_icon, c.c4_title, c.c4_text], [c.c5_icon, c.c5_title, c.c5_text], [c.c6_icon, c.c6_title, c.c6_text]].filter(([, t]) => t)
+      return cards.length > 0 ? (
+        <div style={{ padding: "10px 24px 14px" }}>
+          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
+          <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols},1fr)`, gap: 9 }}>
+            {cards.map(([icon, title, txt]: any[], i: number) => (
+              <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 11, padding: "13px 10px", textAlign: "center" }}>
+                {icon && <span style={{ fontSize: 24, display: "block", marginBottom: 7 }}>{icon}</span>}
+                <p style={{ color: TEXT, fontSize: 12, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_B }}>{title}</p>
+                {txt && <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{txt}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null
+    }
+    case "section_block": return (c.title || c.subtitle) ? (
+      <div style={{ padding: "10px 24px" }}>
+        <div style={{ background: c.bg_style === "card" ? "rgba(255,255,255,0.03)" : c.bg_style === "highlight" ? `${G}08` : "transparent", border: c.bg_style === "card" ? "1px solid rgba(255,255,255,0.07)" : c.bg_style === "highlight" ? `1px solid ${G}20` : "none", borderRadius: c.bg_style !== "transparent" ? 13 : 0, padding: c.bg_style && c.bg_style !== "transparent" ? "15px" : "0" }}>
+          {c.title && <p style={{ color: G, fontSize: 16, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_D }}>{c.title}</p>}
+          {c.subtitle && <p style={{ color: MUTED, fontSize: 13, margin: c.show_divider !== "no" ? "0 0 11px" : "0" }}>{c.subtitle}</p>}
+          {c.show_divider !== "no" && <div style={{ height: 1, background: `linear-gradient(90deg,${G}50,transparent)`, marginTop: c.title && !c.subtitle ? 8 : 0 }} />}
+        </div>
+      </div>
+    ) : null
+    case "embed_block": return c.url ? (
+      <div style={{ padding: "10px 24px 14px" }}>
+        {c.title && <p style={{ color: MUTED, fontSize: 11, margin: "0 0 9px", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: FONT_B }}>{c.title}</p>}
+        <iframe src={c.url} width="100%" height={parseInt(c.height || "400")} style={{ border: "none", borderRadius: 13, display: "block" }} loading="lazy" />
+      </div>
+    ) : null
+    case "qr_code_block": return null
 
     default: return null
   }
