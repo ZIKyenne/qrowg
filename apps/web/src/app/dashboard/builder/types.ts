@@ -3808,7 +3808,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     fields: [
       { key: "status", label: "Statut", type: "select", options: ["available", "busy", "closed"] },
       { key: "available_from", label: "Disponible a partir de", type: "text", placeholder: "Janvier 2025" },
-      { key: "message", label: "Message", type: "text", placeholder: "Ouvert aux missions freelance" },
+      { key: "message", label: "Message", type: "text", placeholder: "Ouvert aux missions freelance", suggestions: ["Ouvert aux nouvelles missions", "Disponible cette semaine", "Complet ce mois-ci", "Réponse en moins de 24h"] },
       { key: "cta_label", label: "Bouton", type: "text", placeholder: "Prendre contact" },
       { key: "cta_url", label: "Lien", type: "url", placeholder: "https://calendly.com/..." },
     ],

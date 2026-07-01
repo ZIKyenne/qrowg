@@ -4465,6 +4465,8 @@
                             { label: "Image",        keys: ["cover_banner"] },
                             { label: "Présentation", keys: ["skills", "about", "expertise", "languages", "journey"] },
                             { label: "Confiance",    keys: ["availability", "certifications"] },
+                            // Preuve sociale : blocs existants (rendu déjà en place) rendus découvrables ici
+                            { label: "Preuve sociale", keys: ["business_stats", "google_reviews_block", "testimonials", "visit_counter"] },
                           ]
                           const RECO = new Set(["profile"])
                           const blockBtn = (type: string, def: any) => (
