@@ -2780,6 +2780,29 @@
                   onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"}
                   onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />}
             {field.hint && <p style={{ color: MUTED, fontSize: 9, margin: "3px 0 0" }}>{field.hint}</p>}
+            {/* Validation guidée : URL / email / téléphone (affichage seul) */}
+            {(() => {
+              const val = String(block.content[field.key] || "").trim()
+              if (!val) return null
+              const key = field.key.toLowerCase()
+              let valid: boolean | null = null, msg = ""
+              if (field.type === "url") {
+                if (/^(https?:\/\/|mailto:|tel:|\/|#)/i.test(val)) valid = true
+                else { valid = false; msg = "Ajoutez https:// au début du lien" }
+              } else if (key.includes("email")) {
+                valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val); if (!valid) msg = "Adresse email invalide"
+              } else if (key.includes("phone") || key.includes("numero") || key === "num") {
+                valid = val.replace(/\D/g, "").length >= 6; if (!valid) msg = "Numéro trop court"
+              }
+              if (valid === null) return null
+              const isTestable = field.type === "url" && valid && /^https?:\/\//i.test(val)
+              return (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: 4 }}>
+                  <span style={{ color: valid ? "#39FF8F" : "#F59E0B", fontSize: 9, fontWeight: 600 }}>{valid ? "✓ Format valide" : `⚠ ${msg}`}</span>
+                  {isTestable && <a href={val} target="_blank" rel="noopener noreferrer" style={{ color: G, fontSize: 9, fontWeight: 700, textDecoration: "none" }}>Tester ↗</a>}
+                </div>
+              )
+            })()}
             {/* Compteur + score de lisibilité mobile pour les textes longs (bio, à propos…) */}
             {field.type === "textarea" && !(field as any).maxRecommended && (() => {
               const len = (block.content[field.key] || "").length
