@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Inbox, Mail, Phone, Trash2, Check, Search } from "lucide-react"
+import Particles from "@/components/Particles"
 
 const G = "var(--accent, #C9A84C)"
 const MUTED = "#8A8478"
@@ -88,7 +89,10 @@ export default function LeadsClient({ leads: initialLeads, pages }: { leads: Lea
   const types = ["all", "unread", ...Array.from(new Set(leads.map(l => l.type)))]
 
   return (
-    <div style={{ padding: "28px 24px 60px", maxWidth: 900, margin: "0 auto", fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ minHeight: "100vh", position: "relative", fontFamily: "DM Sans, sans-serif" }}>
+      {/* Particules dorées en fond (comme les autres pages du dashboard) */}
+      <Particles />
+      <div style={{ padding: "28px 24px 60px", maxWidth: 900, margin: "0 auto", position: "relative", zIndex: 1 }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 6, flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -217,6 +221,7 @@ export default function LeadsClient({ leads: initialLeads, pages }: { leads: Lea
           </div>
         </>
       )}
+      </div>
     </div>
   )
 }
