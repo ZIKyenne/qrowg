@@ -160,7 +160,7 @@
             : <div style={{ width: 72, height: 72, ...avatarShapeStyle(c.avatar_shape), background: `linear-gradient(135deg,${primary},${accent})`, margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 700, color: "#080808", filter: isClipShape(c.avatar_shape) ? `drop-shadow(0 0 8px ${primary}66)` : undefined }}>{(c.name||"?")[0].toUpperCase()}</div>}
           <p style={{ color: text, fontSize: 18, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay }}>{c.name || "Mon Nom"}</p>
           <p style={{ color: muted, fontSize: 13, margin: c.badge ? "0 0 7px" : "0" }}>{c.tagline}</p>
-          {c.badge && <span style={{ background: primary+"18", border: `1px solid ${primary}40`, borderRadius: 20, padding: "3px 10px", fontSize: 11, color: primary }}>{c.badge}</span>}
+          {c.badge && <span style={{ display: "inline-flex", flexWrap: "wrap", gap: 5, justifyContent: "center" }}>{c.badge.split(/[,\n]/).map((b: string) => b.trim()).filter(Boolean).slice(0, 5).map((b: string, i: number) => (<span key={i} style={{ background: primary+"18", border: `1px solid ${primary}40`, borderRadius: 20, padding: "3px 10px", fontSize: 11, color: primary }}>{b}</span>))}</span>}
         </div>
       )
       case "bio": return (
@@ -2633,15 +2633,25 @@
               )
             })()}
             {/* Suggestions curées — pour ne jamais partir d'un champ vide */}
-            {(field as any).suggestions && (block.content[field.key] || "").trim() === "" && (
+            {(field as any).suggestions && ((field as any).suggestionsMode === "append" || (block.content[field.key] || "").trim() === "") && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 6 }}>
                 <span style={{ color: MUTED, fontSize: 9, alignSelf: "center", marginRight: 1 }}>Exemples&nbsp;:</span>
-                {((field as any).suggestions as string[]).map(sug => (
-                  <button key={sug} type="button" onClick={() => onChange(field.key, sug)} title={`Utiliser : ${sug}`}
-                    style={{ padding: "4px 9px", borderRadius: 999, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", color: G, fontSize: 10, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" as const, maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis" }}>
-                    {sug}
-                  </button>
-                ))}
+                {((field as any).suggestions as string[]).map(sug => {
+                  const append = (field as any).suggestionsMode === "append"
+                  const parts = (block.content[field.key] || "").split(/[,\n]/).map((s: string) => s.trim()).filter(Boolean)
+                  const active = append && parts.includes(sug)
+                  return (
+                    <button key={sug} type="button" title={active ? `Retirer : ${sug}` : `Ajouter : ${sug}`}
+                      onClick={() => {
+                        if (!append) { onChange(field.key, sug); return }
+                        if (active) onChange(field.key, parts.filter((p: string) => p !== sug).join(", "))
+                        else if (parts.length < 5) onChange(field.key, [...parts, sug].join(", "))
+                      }}
+                      style={{ padding: "4px 9px", borderRadius: 999, background: active ? G : "rgba(201,168,76,0.1)", border: `1px solid ${active ? G : "rgba(201,168,76,0.25)"}`, color: active ? "#080808" : G, fontSize: 10, fontWeight: active ? 800 : 600, cursor: "pointer", whiteSpace: "nowrap" as const, maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {active ? "✓ " : ""}{sug}
+                    </button>
+                  )
+                })}
               </div>
             )}
           </div>

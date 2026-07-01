@@ -1853,6 +1853,7 @@ export interface BlockField {
   options?: string[]
   hint?: string
   suggestions?: string[]   // exemples curés tappables (pour ne jamais partir d'un champ vide)
+  suggestionsMode?: "append"  // "append" = sélecteur multiple (toggle, séparé par virgules) ; défaut = remplace
   maxRecommended?: number  // longueur conseillée -> compteur + score (Excellent/Correct/Trop long)
 }
 
@@ -1916,7 +1917,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "tagline", label: "Accroche", type: "text", placeholder: "Developpeur, artiste, coach...", maxRecommended: 80, suggestions: ["Photographe à Reims", "Coach sportif indépendant", "Consultant freelance", "Créateur de contenu", "Agent immobilier", "Restaurant & bar à cocktails"] },
       { key: "avatar", label: "Photo de profil", type: "image" },
       { key: "avatar_shape", label: "Forme de l'avatar", type: "select", options: ["cercle", "arrondi", "squircle", "hexagone", "carré", "diamant"] },
-      { key: "badge", label: "Badge (optionnel)", type: "text", placeholder: "Disponible, Nouveau, Pro...", suggestions: ["Disponible", "Ouvert aujourd'hui", "Sur RDV", "Certifié", "Vérifié", "Premium", "Depuis 2019", "+500 clients", "★★★★★", "Recommandé", "Expert"] },
+      { key: "badge", label: "Badges (jusqu'à 5)", type: "text", placeholder: "Disponible, Certifié, +500 clients", hint: "Séparez par des virgules — ou cliquez les exemples pour composer", suggestionsMode: "append", suggestions: ["Disponible", "Ouvert aujourd'hui", "Sur RDV", "Certifié", "Vérifié", "Premium", "Depuis 2019", "+500 clients", "★★★★★", "Recommandé", "Expert"] },
     ],
   },
   bio: {
