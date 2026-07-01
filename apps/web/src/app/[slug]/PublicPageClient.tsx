@@ -665,7 +665,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
           {anim && <style>{BANNER_ANIM_CSS}</style>}
           {btype === "image"
             ? (c.src
-              ? <img className="qfb-media" src={c.src} alt="" style={{ width: "100%", height: h, objectFit: "cover", display: "block" }} />
+              ? <img className="qfb-media" src={c.src} alt="" style={{ width: "100%", height: h, objectFit: "cover", objectPosition: c.img_focus === "top" ? "center top" : c.img_focus === "bottom" ? "center bottom" : "center", display: "block" }} />
               : <div className="qfb-media" style={{ width: "100%", height: h, background: `linear-gradient(135deg,${G}33,${theme.accent || "#39FF8F"}22)` }} />)
             : <div className="qfb-media" style={{ width: "100%", height: h, ...bannerBg }} />}
           {anim === "shimmer" && <div className="qfb-shine" />}

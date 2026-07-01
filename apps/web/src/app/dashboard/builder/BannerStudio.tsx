@@ -1,134 +1,146 @@
 "use client"
 
-import { useState } from "react"
-import { ImageIcon, LayoutGrid, Type, Palette, Sparkles, Layers, ChevronDown } from "lucide-react"
+import { useState, useEffect } from "react"
+import { ImageIcon, LayoutGrid, Type, Palette, Sparkles, Layers, ChevronDown, Wand2, Trash2, MoveVertical } from "lucide-react"
 import ImageUpload from "./ImageUpload"
-import { BANNER_GRADIENTS, BANNER_PRESETS } from "./types"
+import { BANNER_GRADIENTS, BANNER_PRESETS, BANNER_ANIM_CSS, bannerBackgroundStyle } from "./types"
 
 const G = "#C9A84C"
 const MUTED = "#8A8478"
 const TEXT = "#F5F0E8"
 
-// ── Section repliable (accordéon, une seule ouverte à la fois) ───────────────
-function Section({ id, title, icon, open, onToggle, children }: { id: string; title: string; icon: React.ReactNode; open: boolean; onToggle: () => void; children: React.ReactNode }) {
+const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
+
+// ── Section repliable (accordéon) avec hiérarchie visuelle optionnelle ───────
+function Section({ title, icon, open, onToggle, children, hero }: { title: string; icon: React.ReactNode; open: boolean; onToggle: () => void; children: React.ReactNode; hero?: boolean }) {
   return (
-    <div style={{ border: `1px solid ${open ? "rgba(201,168,76,0.28)" : "rgba(255,255,255,0.07)"}`, borderRadius: 12, overflow: "hidden", background: open ? "rgba(201,168,76,0.04)" : "transparent", transition: "border-color .2s, background .2s" }}>
-      <button onClick={onToggle} style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "11px 13px", background: "transparent", border: "none", cursor: "pointer", color: open ? G : TEXT, textAlign: "left" }}>
-        <span style={{ display: "flex", color: open ? G : MUTED }}>{icon}</span>
+    <div style={{
+      border: `1px solid ${open ? "rgba(201,168,76,0.35)" : hero ? "rgba(201,168,76,0.2)" : "rgba(255,255,255,0.07)"}`,
+      borderRadius: 12, overflow: "hidden",
+      background: open ? "rgba(201,168,76,0.06)" : hero ? "rgba(201,168,76,0.03)" : "transparent",
+      transition: "border-color .2s, background .2s",
+      boxShadow: open ? "0 4px 18px rgba(0,0,0,0.25)" : "none",
+    }}>
+      <button onClick={onToggle} style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "12px 13px", background: "transparent", border: "none", cursor: "pointer", color: open || hero ? G : TEXT, textAlign: "left" }}>
+        <span style={{ display: "flex", color: open ? G : hero ? G : MUTED, transition: "color .2s" }}>{icon}</span>
         <span style={{ fontSize: 13, fontWeight: 700, flex: 1 }}>{title}</span>
-        <ChevronDown size={15} style={{ color: MUTED, transform: open ? "rotate(180deg)" : "none", transition: "transform .2s" }} />
+        {hero && !open && <span style={{ background: `${G}22`, color: G, fontSize: 8.5, fontWeight: 800, letterSpacing: 0.5, padding: "2px 7px", borderRadius: 20, textTransform: "uppercase" }}>Démarrer</span>}
+        <ChevronDown size={15} style={{ color: MUTED, transform: open ? "rotate(180deg)" : "none", transition: "transform .22s" }} />
       </button>
-      <div style={{ display: "grid", gridTemplateRows: open ? "1fr" : "0fr", transition: "grid-template-rows .22s ease" }}>
+      <div style={{ display: "grid", gridTemplateRows: open ? "1fr" : "0fr", transition: "grid-template-rows .24s ease" }}>
         <div style={{ overflow: "hidden" }}>
-          <div style={{ padding: "2px 13px 14px", display: "flex", flexDirection: "column", gap: 12 }}>{children}</div>
+          <div style={{ padding: "2px 13px 15px", display: "flex", flexDirection: "column", gap: 13 }}>{children}</div>
         </div>
       </div>
     </div>
   )
 }
 
-// ── Slider avec valeur live + double-clic = reset ────────────────────────────
+// ── Slider premium : molette (shift = ×10), double-clic = reset, valeur en chip ─
 function Slider({ label, value, min, max, step = 1, unit = "", def, onChange }: { label: string; value: number; min: number; max: number; step?: number; unit?: string; def: number; onChange: (v: number) => void }) {
+  const pct = ((value - min) / (max - min)) * 100
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 7 }}>
         <label style={{ color: MUTED, fontSize: 11, fontWeight: 500 }}>{label}</label>
-        <span style={{ color: G, fontSize: 11, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{value}{unit}</span>
+        <span style={{ color: G, fontSize: 11, fontWeight: 700, fontVariantNumeric: "tabular-nums", background: `${G}14`, border: `1px solid ${G}30`, borderRadius: 6, padding: "2px 8px" }}>{value}{unit}</span>
       </div>
-      <input type="range" min={min} max={max} step={step} value={value}
-        onChange={e => onChange(Number(e.target.value))}
+      <div
+        onWheel={e => { e.preventDefault(); const d = e.deltaY < 0 ? 1 : -1; const mult = e.shiftKey ? 10 : 1; onChange(clamp(value + d * step * mult, min, max)) }}
         onDoubleClick={() => onChange(def)}
-        title="Double-clic pour réinitialiser"
-        style={{ width: "100%", accentColor: G, cursor: "pointer" }} />
+        title="Molette pour ajuster · Shift = ×10 · Double-clic = réinitialiser"
+        style={{ position: "relative", height: 26, display: "flex", alignItems: "center", background: "rgba(255,255,255,0.04)", borderRadius: 8, padding: "0 10px", cursor: "ew-resize" }}>
+        <div style={{ position: "absolute", left: 10, right: 10, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.1)" }} />
+        <div style={{ position: "absolute", left: 10, width: `calc((100% - 20px) * ${pct / 100})`, height: 4, borderRadius: 2, background: `linear-gradient(90deg,${G},${G}bb)` }} />
+        <input type="range" min={min} max={max} step={step} value={value} onChange={e => onChange(Number(e.target.value))}
+          style={{ position: "relative", width: "100%", accentColor: G, cursor: "pointer", background: "transparent", zIndex: 1, margin: 0 }} />
+      </div>
     </div>
   )
 }
 
-// ── Grille de position 3×3 ───────────────────────────────────────────────────
-const POS_GRID = [
-  ["top-left", "top-center", "top-right"],
-  ["left", "center", "right"],
-  ["bottom-left", "bottom-center", "bottom-right"],
-]
+const POS_GRID = [["top-left", "top-center", "top-right"], ["left", "center", "right"], ["bottom-left", "bottom-center", "bottom-right"]]
 function PositionGrid({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  // On mappe la grille sur les 3 positions réellement supportées par le rendu
-  const norm = (p: string) => p.includes("center") && p !== "center" ? p : (p === "center" ? "center" : p.startsWith("bottom") ? (p === "bottom-center" ? "bottom-center" : "bottom-left") : p === "center" ? "center" : "bottom-left")
   return (
     <div>
-      <label style={{ color: MUTED, fontSize: 11, fontWeight: 500, display: "block", marginBottom: 6 }}>Position du texte</label>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 5, width: 96 }}>
+      <label style={{ color: MUTED, fontSize: 11, fontWeight: 500, display: "block", marginBottom: 7 }}>Position du texte</label>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 5, width: 108 }}>
         {POS_GRID.flat().map(p => {
-          const active = value === p || (value === "bottom-left" && p === "bottom-left") || (value === "bottom-center" && p === "bottom-center") || (value === "center" && p === "center")
+          const active = value === p
           return (
-            <button key={p} onClick={() => onChange(p)} title={p}
-              style={{ aspectRatio: "1", borderRadius: 6, background: active ? G : "rgba(255,255,255,0.05)", border: `1px solid ${active ? G : "rgba(255,255,255,0.1)"}`, cursor: "pointer", transition: "all .15s", position: "relative" }}>
+            <button key={p} onClick={() => onChange(p)} title={p} style={{ aspectRatio: "1", borderRadius: 6, background: active ? G : "rgba(255,255,255,0.05)", border: `1px solid ${active ? G : "rgba(255,255,255,0.1)"}`, cursor: "pointer", transition: "all .15s", position: "relative" }}>
               <span style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 5, height: 5, borderRadius: "50%", background: active ? "#080808" : "rgba(255,255,255,0.35)" }} />
             </button>
           )
         })}
       </div>
-      <p style={{ color: MUTED, fontSize: 9.5, margin: "5px 0 0" }}>Le rendu supporte : bas-gauche, bas-centre, centre.</p>
+      <p style={{ color: MUTED, fontSize: 9.5, margin: "6px 0 0" }}>Rendu optimisé : bas-gauche, bas-centre, centre.</p>
     </div>
   )
 }
 
-// ── Sélecteur segmenté ───────────────────────────────────────────────────────
 function Segmented({ options, value, onChange }: { options: { key: string; label: string }[]; value: string; onChange: (v: string) => void }) {
   return (
     <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
       {options.map(o => {
         const on = value === o.key
-        return (
-          <button key={o.key} onClick={() => onChange(o.key)} style={{ flex: 1, padding: "7px 4px", borderRadius: 7, background: on ? G : "transparent", border: "none", color: on ? "#080808" : MUTED, fontSize: 11, fontWeight: on ? 700 : 500, cursor: "pointer", transition: "all .15s", whiteSpace: "nowrap" }}>{o.label}</button>
-        )
+        return <button key={o.key} onClick={() => onChange(o.key)} style={{ flex: 1, padding: "8px 4px", borderRadius: 7, background: on ? G : "transparent", border: "none", color: on ? "#080808" : MUTED, fontSize: 11, fontWeight: on ? 700 : 500, cursor: "pointer", transition: "all .15s", whiteSpace: "nowrap" }}>{o.label}</button>
       })}
     </div>
   )
 }
 
-// ── Chips (choix multiple visuel, ex. animations / dégradés) ─────────────────
-function Chips({ options, value, onChange, cols = 3 }: { options: { key: string; label: string; emoji?: string }[]; value: string; onChange: (v: string) => void; cols?: number }) {
+// ── Color Studio (lite) : HEX + pipette + palette thème + couleurs récentes ──
+const PALETTE = ["#C9A84C", "#39FF8F", "#F5F0E8", "#ffffff", "#080808", "#0b0b0f", "#EC4899", "#9146FF", "#38BDF8", "#EF4444", "#FBBF24", "#1DB954"]
+function ColorStudio({ label, value, fallback, onChange }: { label: string; value?: string; fallback: string; onChange: (v: string) => void }) {
+  const [recent, setRecent] = useState<string[]>([])
+  const [open, setOpen] = useState(false)
+  useEffect(() => { try { setRecent(JSON.parse(localStorage.getItem("qfb_recent_colors") || "[]")) } catch {} }, [])
+  const commit = (v: string) => {
+    onChange(v)
+    try {
+      const next = [v, ...recent.filter(c => c.toLowerCase() !== v.toLowerCase())].slice(0, 8)
+      setRecent(next); localStorage.setItem("qfb_recent_colors", JSON.stringify(next))
+    } catch {}
+  }
   return (
-    <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols},1fr)`, gap: 6 }}>
-      {options.map(o => {
-        const on = value === o.key
-        return (
-          <button key={o.key} onClick={() => onChange(o.key)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "9px 4px", borderRadius: 9, background: on ? "rgba(201,168,76,0.16)" : "rgba(255,255,255,0.04)", border: `1px solid ${on ? "rgba(201,168,76,0.45)" : "rgba(255,255,255,0.08)"}`, color: on ? G : MUTED, fontSize: 10.5, fontWeight: on ? 700 : 500, cursor: "pointer", transition: "all .15s" }}>
-            {o.emoji && <span style={{ fontSize: 15 }}>{o.emoji}</span>}
-            {o.label}
-          </button>
-        )
-      })}
-    </div>
-  )
-}
-
-function ColorRow({ label, value, fallback, onChange }: { label: string; value?: string; fallback: string; onChange: (v: string) => void }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-      <label style={{ color: MUTED, fontSize: 11, fontWeight: 500 }}>{label}</label>
-      <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-        <input value={value || ""} placeholder={fallback} onChange={e => onChange(e.target.value)} style={{ width: 84, background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 7, padding: "6px 8px", color: TEXT, fontSize: 11, outline: "none", fontFamily: "monospace" }} />
-        <label style={{ width: 26, height: 26, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: value || fallback, cursor: "pointer", flexShrink: 0, position: "relative", overflow: "hidden" }}>
-          <input type="color" value={value || fallback} onChange={e => onChange(e.target.value)} style={{ position: "absolute", inset: -4, width: 40, height: 40, border: "none", padding: 0, cursor: "pointer", opacity: 0 }} />
-        </label>
+    <div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+        <label style={{ color: MUTED, fontSize: 11, fontWeight: 500 }}>{label}</label>
+        <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+          <input value={value || ""} placeholder={fallback} onChange={e => onChange(e.target.value)} onBlur={e => e.target.value && commit(e.target.value)} style={{ width: 82, background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 7, padding: "6px 8px", color: TEXT, fontSize: 11, outline: "none", fontFamily: "monospace" }} />
+          <label style={{ width: 26, height: 26, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: value || fallback, cursor: "pointer", flexShrink: 0, position: "relative", overflow: "hidden" }} title="Pipette / roue chromatique">
+            <input type="color" value={value || fallback} onChange={e => commit(e.target.value)} style={{ position: "absolute", inset: -4, width: 40, height: 40, border: "none", padding: 0, cursor: "pointer", opacity: 0 }} />
+          </label>
+          <button onClick={() => setOpen(o => !o)} title="Palette" style={{ width: 26, height: 26, borderRadius: 7, border: `1px solid ${open ? G : "rgba(255,255,255,0.15)"}`, background: open ? `${G}18` : "rgba(255,255,255,0.04)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: open ? G : MUTED }}><Palette size={13} /></button>
+        </div>
       </div>
+      {open && (
+        <div style={{ marginTop: 8, background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, padding: 10, display: "flex", flexDirection: "column", gap: 8 }}>
+          <div>
+            <p style={{ color: MUTED, fontSize: 9.5, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: 1 }}>Palette</p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+              {PALETTE.map(col => <button key={col} onClick={() => commit(col)} title={col} style={{ width: 22, height: 22, borderRadius: 6, background: col, border: (value || "").toLowerCase() === col.toLowerCase() ? `2px solid ${G}` : "1px solid rgba(255,255,255,0.12)", cursor: "pointer" }} />)}
+            </div>
+          </div>
+          {recent.length > 0 && (
+            <div>
+              <p style={{ color: MUTED, fontSize: 9.5, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: 1 }}>Récentes</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                {recent.map(col => <button key={col} onClick={() => commit(col)} title={col} style={{ width: 22, height: 22, borderRadius: 6, background: col, border: "1px solid rgba(255,255,255,0.12)", cursor: "pointer" }} />)}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
 
-const GRAD_OPTS = [
-  ...Object.keys(BANNER_GRADIENTS).map(k => ({ key: k, label: k.replace("_", " ") })),
-  { key: "personnalise", label: "perso" },
-]
+const GRAD_OPTS = [...Object.keys(BANNER_GRADIENTS).map(k => ({ key: k, label: k.replace("_", " ") })), { key: "personnalise", label: "perso" }]
 const ANIM_OPTS = [
-  { key: "none", label: "Aucune", emoji: "⏹" },
-  { key: "shimmer", label: "Shimmer", emoji: "✨" },
-  { key: "gradient_flow", label: "Flux", emoji: "🌈" },
-  { key: "floating", label: "Flottant", emoji: "🎈" },
-  { key: "kenburns", label: "Ken Burns", emoji: "🎬" },
-  { key: "zoom", label: "Zoom", emoji: "🔍" },
-  { key: "pulse", label: "Pulse", emoji: "💓" },
+  { key: "none", label: "Aucune" }, { key: "shimmer", label: "Shimmer" }, { key: "gradient_flow", label: "Flux" },
+  { key: "floating", label: "Flottant" }, { key: "kenburns", label: "Ken Burns" }, { key: "zoom", label: "Zoom" }, { key: "pulse", label: "Pulse" },
 ]
 
 export default function BannerStudio({ content, onChange }: { content: Record<string, any>; onChange: (key: string, val: string) => void }) {
@@ -136,84 +148,198 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
   const [open, setOpen] = useState<string>("image")
   const toggle = (id: string) => setOpen(o => o === id ? "" : id)
   const set = (k: string, v: any) => onChange(k, String(v))
-  const applyPreset = (preset: Record<string, any>) => { Object.entries(preset).forEach(([k, v]) => onChange(k, String(v))) }
+  const applyPreset = (preset: Record<string, any>) => Object.entries(preset).forEach(([k, v]) => onChange(k, String(v)))
 
   const type = c.banner_type || (c.src ? "image" : "gradient")
+  const anim = c.animation || "none"
+  const heightPx = parseInt(c.height_px) || 180
+
+  // ── Score de qualité visuelle + conseils ──────────────────────────────────
+  const hasBg = type === "image" ? !!c.src : true
+  const hasOverlayOnImage = type === "image" && (c.overlay_gradient && c.overlay_gradient !== "none")
+  let score = 0
+  if (hasBg) score += 30
+  if (c.cover_title) score += 22
+  if (c.cover_subtitle) score += 12
+  if (type !== "image" || hasOverlayOnImage) score += 16
+  if (anim !== "none") score += 12
+  if (c.badge) score += 8
+  score = Math.min(100, score)
+  const tips: string[] = []
+  if (type === "image" && !c.src) tips.push("Ajoutez une image de fond.")
+  if (type === "image" && c.src && !hasOverlayOnImage) tips.push("Ajoutez un voile pour la lisibilité du texte.")
+  if (!c.cover_title) tips.push("Ajoutez un titre percutant.")
+  if ((c.cover_title || "").length > 40) tips.push("Titre un peu long, raccourcissez pour l'impact.")
+  if (anim === "none") tips.push("Une animation légère renforce l'effet premium.")
+  const stars = Math.round(score / 20)
+
+  const typeLabel = type === "image" ? "Image" : type === "gradient" ? "Dégradé" : "Couleur"
+  const animLabel = ANIM_OPTS.find(a => a.key === anim)?.label || "Aucune"
+
+  // Mini-aperçu de fond (presets & preview d'en-tête)
+  const bgPreview = (cc: Record<string, any>): React.CSSProperties => {
+    const t = cc.banner_type || (cc.src ? "image" : "gradient")
+    if (t === "image" && cc.src) return { backgroundImage: `url(${cc.src})`, backgroundSize: "cover", backgroundPosition: "center" }
+    return bannerBackgroundStyle(cc, G) as React.CSSProperties
+  }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "2px 2px 6px" }}>
-        <Sparkles size={14} color={G} />
-        <span style={{ color: G, fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>Studio de bannière</span>
+    <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+      <style>{BANNER_ANIM_CSS}</style>
+
+      {/* EN-TÊTE STUDIO */}
+      <div style={{ background: "linear-gradient(135deg,rgba(201,168,76,0.14),rgba(201,168,76,0.03))", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 13, padding: "12px 14px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 10 }}>
+          <span style={{ display: "flex", color: G, animation: "qfbFloat 4s ease-in-out infinite" }}><Wand2 size={16} /></span>
+          <div style={{ flex: 1 }}>
+            <p style={{ color: G, fontSize: 12.5, fontWeight: 800, letterSpacing: 0.5, margin: 0, textTransform: "uppercase" }}>Banner Studio</p>
+            <p style={{ color: MUTED, fontSize: 10, margin: "1px 0 0" }}>{typeLabel} · {heightPx}px · {animLabel}</p>
+          </div>
+          {/* aperçu miniature live */}
+          <div className={anim !== "none" ? `qfb qfb-${anim}` : undefined} style={{ width: 58, height: 34, borderRadius: 7, overflow: "hidden", position: "relative", border: "1px solid rgba(255,255,255,0.12)", flexShrink: 0 }}>
+            <div className="qfb-media" style={{ position: "absolute", inset: 0, ...bgPreview(c) }} />
+            {anim === "shimmer" && <div className="qfb-shine" />}
+          </div>
+        </div>
+        {/* Score qualité */}
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+            <span style={{ color: MUTED, fontSize: 10, fontWeight: 600 }}>Qualité visuelle</span>
+            <span style={{ color: score >= 80 ? "#39FF8F" : score >= 55 ? G : "#FBBF24", fontSize: 11, fontWeight: 700 }}>{score}% · {"★".repeat(stars)}{"☆".repeat(5 - stars)}</span>
+          </div>
+          <div style={{ height: 5, background: "rgba(255,255,255,0.08)", borderRadius: 3, overflow: "hidden" }}>
+            <div style={{ height: "100%", width: `${score}%`, background: `linear-gradient(90deg,${G},#39FF8F)`, borderRadius: 3, transition: "width .3s ease" }} />
+          </div>
+          {tips[0] && <p style={{ color: MUTED, fontSize: 10, margin: "7px 0 0", display: "flex", gap: 5 }}><span style={{ color: G }}>💡</span>{tips[0]}</p>}
+        </div>
       </div>
 
-      {/* IMAGE / FOND */}
-      <Section id="image" title="Image & Fond" icon={<ImageIcon size={15} />} open={open === "image"} onToggle={() => toggle("image")}>
+      {/* IMAGE & FOND (héros) */}
+      <Section title="Image & Fond" icon={<ImageIcon size={15} />} open={open === "image"} onToggle={() => toggle("image")} hero>
         <Segmented value={type} onChange={v => set("banner_type", v)} options={[{ key: "image", label: "Image" }, { key: "gradient", label: "Dégradé" }, { key: "color", label: "Couleur" }]} />
-        {type === "image" && <ImageUpload value={c.src || ""} onChange={url => set("src", url)} hint="Glissez-déposez, collez ou importez une URL" />}
+        {type === "image" && (
+          <>
+            <ImageUpload value={c.src || ""} onChange={url => set("src", url)} hint="Glissez-déposez, collez ou importez une URL" />
+            {c.src && (
+              <div>
+                <label style={{ color: MUTED, fontSize: 11, fontWeight: 500, display: "flex", alignItems: "center", gap: 5, marginBottom: 6 }}><MoveVertical size={12} /> Cadrage (focus)</label>
+                <Segmented value={c.img_focus || "center"} onChange={v => set("img_focus", v)} options={[{ key: "top", label: "Haut" }, { key: "center", label: "Centre" }, { key: "bottom", label: "Bas" }]} />
+              </div>
+            )}
+          </>
+        )}
         {type === "gradient" && (
           <>
-            <Chips value={c.grad_preset || "or_nuit"} onChange={v => set("grad_preset", v)} cols={3} options={GRAD_OPTS} />
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 6 }}>
+              {GRAD_OPTS.map(o => {
+                const on = (c.grad_preset || "or_nuit") === o.key
+                const prevStyle = o.key === "personnalise" ? { background: `linear-gradient(135deg,${c.grad_c1 || G},${c.grad_c2 || "#1a1206"})` } : bannerBackgroundStyle({ banner_type: "gradient", grad_preset: o.key }, G) as React.CSSProperties
+                return (
+                  <button key={o.key} onClick={() => set("grad_preset", o.key)} style={{ borderRadius: 9, overflow: "hidden", border: `1.5px solid ${on ? G : "rgba(255,255,255,0.1)"}`, cursor: "pointer", background: "transparent", padding: 0 }}>
+                    <div style={{ height: 30, ...prevStyle }} />
+                    <div style={{ fontSize: 9.5, color: on ? G : MUTED, fontWeight: on ? 700 : 500, padding: "3px 2px", textAlign: "center" }}>{o.label}</div>
+                  </button>
+                )
+              })}
+            </div>
             {c.grad_preset === "personnalise" && (
               <>
-                <ColorRow label="Couleur 1" value={c.grad_c1} fallback={G} onChange={v => set("grad_c1", v)} />
-                <ColorRow label="Couleur 2" value={c.grad_c2} fallback="#1a1206" onChange={v => set("grad_c2", v)} />
+                <ColorStudio label="Couleur 1" value={c.grad_c1} fallback={G} onChange={v => set("grad_c1", v)} />
+                <ColorStudio label="Couleur 2" value={c.grad_c2} fallback="#1a1206" onChange={v => set("grad_c2", v)} />
               </>
             )}
           </>
         )}
-        {type === "color" && <ColorRow label="Couleur de fond" value={c.bg_color} fallback="#1a1a1a" onChange={v => set("bg_color", v)} />}
+        {type === "color" && <ColorStudio label="Couleur de fond" value={c.bg_color} fallback="#1a1a1a" onChange={v => set("bg_color", v)} />}
       </Section>
 
       {/* MISE EN PAGE */}
-      <Section id="layout" title="Mise en page" icon={<LayoutGrid size={15} />} open={open === "layout"} onToggle={() => toggle("layout")}>
-        <Slider label="Hauteur" value={parseInt(c.height_px) || 180} min={80} max={420} unit=" px" def={180} onChange={v => set("height_px", v)} />
+      <Section title="Mise en page" icon={<LayoutGrid size={15} />} open={open === "layout"} onToggle={() => toggle("layout")}>
+        <Slider label="Hauteur" value={heightPx} min={80} max={420} unit=" px" def={180} onChange={v => set("height_px", v)} />
         <Slider label="Coins arrondis" value={parseInt(c.block_radius) || 0} min={0} max={32} unit=" px" def={0} onChange={v => set("block_radius", v)} />
         <PositionGrid value={c.text_position || "bottom-left"} onChange={v => set("text_position", v)} />
       </Section>
 
       {/* CONTENU */}
-      <Section id="content" title="Contenu" icon={<Type size={15} />} open={open === "content"} onToggle={() => toggle("content")}>
+      <Section title="Contenu" icon={<Type size={15} />} open={open === "content"} onToggle={() => toggle("content")}>
         <Field label="Badge (optionnel)" value={c.badge} placeholder="Nouveau · Premium…" onChange={v => set("badge", v)} />
         <Field label="Titre" value={c.cover_title} placeholder="Mon titre…" max={40} onChange={v => set("cover_title", v)} />
         <Field label="Sous-titre" value={c.cover_subtitle} placeholder="Une phrase d'accroche…" max={70} onChange={v => set("cover_subtitle", v)} />
-        <ColorRow label="Couleur du texte" value={c.text_color} fallback="#ffffff" onChange={v => set("text_color", v)} />
+        <ColorStudio label="Couleur du texte" value={c.text_color} fallback="#ffffff" onChange={v => set("text_color", v)} />
       </Section>
 
-      {/* COULEURS & OVERLAY */}
-      <Section id="overlay" title="Couleurs & Overlay" icon={<Palette size={15} />} open={open === "overlay"} onToggle={() => toggle("overlay")}>
+      {/* COULEURS & OVERLAY — cartes illustrées */}
+      <Section title="Couleurs & Overlay" icon={<Palette size={15} />} open={open === "overlay"} onToggle={() => toggle("overlay")}>
         <div>
-          <label style={{ color: MUTED, fontSize: 11, fontWeight: 500, display: "block", marginBottom: 6 }}>Voile de lisibilité</label>
-          <Segmented value={c.overlay_gradient || "none"} onChange={v => set("overlay_gradient", v)} options={[{ key: "none", label: "Aucun" }, { key: "bottom", label: "Dégradé bas" }, { key: "full", label: "Plein" }]} />
+          <label style={{ color: MUTED, fontSize: 11, fontWeight: 500, display: "block", marginBottom: 7 }}>Voile de lisibilité</label>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 6 }}>
+            {[
+              { key: "none", label: "Aucun", grad: "linear-gradient(135deg,#3a3a3a,#555)" },
+              { key: "bottom", label: "Dégradé", grad: "linear-gradient(to top,rgba(0,0,0,0.7),#555 70%)" },
+              { key: "full", label: "Plein", grad: "linear-gradient(#333,#222)" },
+            ].map(o => {
+              const on = (c.overlay_gradient || "none") === o.key
+              return (
+                <button key={o.key} onClick={() => set("overlay_gradient", o.key)} style={{ borderRadius: 9, overflow: "hidden", border: `1.5px solid ${on ? G : "rgba(255,255,255,0.1)"}`, cursor: "pointer", background: "transparent", padding: 0 }}>
+                  <div style={{ height: 34, background: o.grad, position: "relative" }}><span style={{ position: "absolute", bottom: 4, left: 5, color: "#fff", fontSize: 8, fontWeight: 700, textShadow: "0 1px 2px #000" }}>Texte</span></div>
+                  <div style={{ fontSize: 10, color: on ? G : MUTED, fontWeight: on ? 700 : 500, padding: "4px 2px", textAlign: "center" }}>{o.label}</div>
+                </button>
+              )
+            })}
+          </div>
         </div>
-        <ColorRow label="Couleur voile" value={c.overlay_color} fallback="#000000" onChange={v => set("overlay_color", v)} />
+        <ColorStudio label="Couleur voile" value={c.overlay_color} fallback="#000000" onChange={v => set("overlay_color", v)} />
         <Slider label="Opacité voile" value={Math.round((parseFloat(c.overlay_opacity ?? "0") || 0) * 100)} min={0} max={90} unit=" %" def={0} onChange={v => set("overlay_opacity", (v / 100).toFixed(2))} />
       </Section>
 
-      {/* EFFETS & ANIMATION */}
-      <Section id="anim" title="Effets & Animation" icon={<Sparkles size={15} />} open={open === "anim"} onToggle={() => toggle("anim")}>
-        <Chips value={c.animation || "none"} onChange={v => set("animation", v)} cols={4} options={ANIM_OPTS} />
-        <p style={{ color: MUTED, fontSize: 10, margin: 0, lineHeight: 1.5 }}>L'animation s'affiche sur la page publiée. « Shimmer » ajoute un reflet, « Flux » anime le dégradé, « Ken Burns » fait vivre l'image.</p>
+      {/* EFFETS & ANIMATION — galerie prévisualisée en direct */}
+      <Section title="Effets & Animation" icon={<Sparkles size={15} />} open={open === "anim"} onToggle={() => toggle("anim")}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 7 }}>
+          {ANIM_OPTS.map(o => {
+            const on = anim === o.key
+            return (
+              <button key={o.key} onClick={() => set("animation", o.key)} style={{ borderRadius: 10, overflow: "hidden", border: `1.5px solid ${on ? "rgba(201,168,76,0.5)" : "rgba(255,255,255,0.09)"}`, background: on ? "rgba(201,168,76,0.08)" : "rgba(255,255,255,0.03)", cursor: "pointer", padding: 0 }}>
+                <div className={o.key !== "none" ? `qfb qfb-${o.key}` : undefined} style={{ height: 38, position: "relative", overflow: "hidden" }}>
+                  <div className="qfb-media" style={{ position: "absolute", inset: 0, background: `linear-gradient(135deg,${G},#1a1206)` }} />
+                  {o.key === "shimmer" && <div className="qfb-shine" />}
+                  <div className="qfb-content" style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span style={{ width: 16, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.7)" }} />
+                  </div>
+                </div>
+                <div style={{ fontSize: 10.5, color: on ? G : MUTED, fontWeight: on ? 700 : 500, padding: "5px 2px", textAlign: "center" }}>{o.label}</div>
+              </button>
+            )
+          })}
+        </div>
+        <p style={{ color: MUTED, fontSize: 10, margin: 0, lineHeight: 1.5 }}>Les animations s'affichent sur la page publiée (aperçu réel ci-dessus).</p>
       </Section>
 
-      {/* MODELES */}
-      <Section id="presets" title="Modèles" icon={<Layers size={15} />} open={open === "presets"} onToggle={() => toggle("presets")}>
-        <p style={{ color: MUTED, fontSize: 10.5, margin: 0 }}>Un clic configure toute la bannière. Ajoutez ensuite votre image ou vos couleurs.</p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 7 }}>
-          {BANNER_PRESETS.map(p => (
-            <button key={p.key} onClick={() => applyPreset(p.content)} style={{ display: "flex", alignItems: "center", gap: 9, padding: "10px 11px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: TEXT, fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all .15s", textAlign: "left" }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)"; e.currentTarget.style.background = "rgba(201,168,76,0.08)" }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; e.currentTarget.style.background = "rgba(255,255,255,0.04)" }}>
-              <span style={{ fontSize: 17 }}>{p.emoji}</span>{p.label}
-            </button>
-          ))}
+      {/* MODELES — galerie avec mini-aperçus */}
+      <Section title="Modèles" icon={<Layers size={15} />} open={open === "presets"} onToggle={() => toggle("presets")}>
+        <p style={{ color: MUTED, fontSize: 10.5, margin: 0 }}>Un clic configure toute la bannière. Ajoutez ensuite votre image.</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 8 }}>
+          {BANNER_PRESETS.map(p => {
+            const anim2 = p.content.animation && p.content.animation !== "none" ? p.content.animation : null
+            return (
+              <button key={p.key} onClick={() => applyPreset(p.content)} style={{ borderRadius: 11, overflow: "hidden", border: "1px solid rgba(255,255,255,0.09)", background: "rgba(255,255,255,0.03)", cursor: "pointer", padding: 0, transition: "border-color .15s, transform .15s" }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(201,168,76,0.45)"; e.currentTarget.style.transform = "translateY(-2px)" }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.09)"; e.currentTarget.style.transform = "none" }}>
+                <div className={anim2 ? `qfb qfb-${anim2}` : undefined} style={{ height: 46, position: "relative", overflow: "hidden" }}>
+                  <div className="qfb-media" style={{ position: "absolute", inset: 0, ...bgPreview(p.content) }} />
+                  {anim2 === "shimmer" && <div className="qfb-shine" />}
+                  {(p.content.overlay_gradient === "bottom" || p.content.overlay_gradient === "full") && <div style={{ position: "absolute", inset: 0, background: p.content.overlay_gradient === "full" ? "rgba(0,0,0,0.35)" : "linear-gradient(to top,rgba(0,0,0,0.6),transparent 70%)" }} />}
+                  <span style={{ position: "absolute", top: 5, left: 6, fontSize: 13 }}>{p.emoji}</span>
+                </div>
+                <div style={{ fontSize: 11, color: TEXT, fontWeight: 600, padding: "6px 8px", textAlign: "left" }}>{p.label}</div>
+              </button>
+            )
+          })}
         </div>
       </Section>
     </div>
   )
 }
 
-// Champ texte avec compteur optionnel
 function Field({ label, value, placeholder, max, onChange }: { label: string; value?: string; placeholder?: string; max?: number; onChange: (v: string) => void }) {
   const len = (value || "").length
   return (
@@ -222,8 +348,8 @@ function Field({ label, value, placeholder, max, onChange }: { label: string; va
         <label style={{ color: MUTED, fontSize: 11, fontWeight: 500 }}>{label}</label>
         {max && <span style={{ color: len > max ? "#EF4444" : MUTED, fontSize: 10, fontVariantNumeric: "tabular-nums" }}>{len}/{max}</span>}
       </div>
-      <input value={value || ""} placeholder={placeholder} onChange={e => onChange(e.target.value)}
-        style={{ width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: TEXT, fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }} />
+      <input value={value || ""} placeholder={placeholder} onChange={e => onChange(e.target.value)} style={{ width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: TEXT, fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif", transition: "border-color .15s" }}
+        onFocus={e => e.currentTarget.style.borderColor = "rgba(201,168,76,0.5)"} onBlur={e => e.currentTarget.style.borderColor = "rgba(201,168,76,0.2)"} />
     </div>
   )
 }

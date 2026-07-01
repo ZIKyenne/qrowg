@@ -635,7 +635,7 @@
             {anim && <style>{BANNER_ANIM_CSS}</style>}
             {btype==="image"
               ? (c.src
-                ? <img className="qfb-media" src={c.src} alt="" style={{ width: "100%", height: bh, objectFit: "cover", display: "block" }} />
+                ? <img className="qfb-media" src={c.src} alt="" style={{ width: "100%", height: bh, objectFit: "cover", objectPosition: c.img_focus==="top" ? "center top" : c.img_focus==="bottom" ? "center bottom" : "center", display: "block" }} />
                 : <div className="qfb-media" style={{ width: "100%", height: bh, background: `linear-gradient(135deg,${primary}30,${accent}20)`, display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: muted, fontSize: 11 }}>Bannière / Cover</span></div>)
               : <div className="qfb-media" style={{ width: "100%", height: bh, ...bannerBg }} />}
             {anim==="shimmer" && <div className="qfb-shine" />}
