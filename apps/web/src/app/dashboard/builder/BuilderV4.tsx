@@ -7,6 +7,7 @@
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
   import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, type Block, type BlockContent, type PageTheme } from "./types"
+  import ImageUpload from "./ImageUpload"
   import { createClient } from "@/lib/supabase/client"
 
   const G = "#C9A84C"
@@ -2598,6 +2599,8 @@
                   <input type="color" value={block.content[field.key]||"#C9A84C"} onChange={e => onChange(field.key, e.target.value)} style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }} />
                   <input type="text" value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)} placeholder={field.placeholder} style={{ ...inputStyle, flex: 1 }} onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"} onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />
                 </div>
+              : field.type === "image"
+              ? <ImageUpload value={block.content[field.key]||""} onChange={url => onChange(field.key, url)} hint={field.hint} />
               : <input type={field.type==="url" ? "url" : "text"} value={block.content[field.key]||""}
                   onChange={e => onChange(field.key, e.target.value)}
                   placeholder={field.placeholder} style={inputStyle}
