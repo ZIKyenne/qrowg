@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -264,9 +264,9 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
         <p style={{ color: MUTED, fontSize: 14, margin: c.badge ? "0 0 10px" : "0", fontFamily: FONT_B }}>{c.tagline}</p>
         {c.badge && (
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" }}>
-            {c.badge.split(/[,\n]/).map((b: string) => b.trim()).filter(Boolean).slice(0, 5).map((b: string, i: number) => (
-              <span key={i} style={{ background: `${G}12`, border: `1px solid ${G}25`, borderRadius: 20, padding: "4px 14px", fontSize: 12, color: G, fontFamily: FONT_B }}>{b}</span>
-            ))}
+            {c.badge.split(/[,\n]/).map((b: string) => b.trim()).filter(Boolean).slice(0, 5).map((b: string, i: number) => { const bs = profileBadgeStyle(b, G); return (
+              <span key={i} style={{ background: bs.bg, border: `1px solid ${bs.border}`, borderRadius: 20, padding: "4px 14px", fontSize: 12, color: bs.color, fontWeight: 600, fontFamily: FONT_B }}>{bs.icon ? bs.icon + " " : ""}{b}</span>
+            ) })}
           </div>
         )}
       </div>

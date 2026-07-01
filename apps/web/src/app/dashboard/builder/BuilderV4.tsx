@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, AVAILABILITY_STATUSES, availabilityStatus, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import { createClient } from "@/lib/supabase/client"
@@ -161,7 +161,7 @@
             : <div style={{ width: 72, height: 72, ...avatarShapeStyle(c.avatar_shape), ...avatarDecoStyle(c.avatar_shape, c.avatar_border, c.avatar_shadow, primary), ...avatarBgStyle(c.avatar_bg, primary, accent), margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 700, color: "#080808" }}>{(c.name||"?")[0].toUpperCase()}</div>}
           <p style={{ color: text, fontSize: 18, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay }}>{c.name || "Mon Nom"}</p>
           <p style={{ color: muted, fontSize: 13, margin: c.badge ? "0 0 7px" : "0" }}>{c.tagline}</p>
-          {c.badge && <span style={{ display: "inline-flex", flexWrap: "wrap", gap: 5, justifyContent: "center" }}>{c.badge.split(/[,\n]/).map((b: string) => b.trim()).filter(Boolean).slice(0, 5).map((b: string, i: number) => (<span key={i} style={{ background: primary+"18", border: `1px solid ${primary}40`, borderRadius: 20, padding: "3px 10px", fontSize: 11, color: primary }}>{b}</span>))}</span>}
+          {c.badge && <span style={{ display: "inline-flex", flexWrap: "wrap", gap: 5, justifyContent: "center" }}>{c.badge.split(/[,\n]/).map((b: string) => b.trim()).filter(Boolean).slice(0, 5).map((b: string, i: number) => { const bs = profileBadgeStyle(b, primary); return (<span key={i} style={{ background: bs.bg, border: `1px solid ${bs.border}`, borderRadius: 20, padding: "3px 10px", fontSize: 11, color: bs.color, fontWeight: 600 }}>{bs.icon ? bs.icon + " " : ""}{b}</span>) })}</span>}
         </div>
       )
       case "bio": return (

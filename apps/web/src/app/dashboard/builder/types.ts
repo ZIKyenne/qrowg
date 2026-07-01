@@ -309,6 +309,34 @@ export function bannerFrame(c: any, accent: string, radius: string | number): { 
   return { boxShadow, borderLayer }
 }
 
+// Style d'un badge de profil selon son libellé (parité builder <-> public).
+// Colore automatiquement les badges connus (Vérifié, Premium, Éco…) et ajoute une icône si absente.
+export function profileBadgeStyle(label: string, accent: string): { color: string; bg: string; border: string; icon: string } {
+  const l = (label || "").toLowerCase()
+  const map: { kw: string[]; color: string; icon: string }[] = [
+    { kw: ["vérifié", "verifie", "verified"], color: "#38BDF8", icon: "✓" },
+    { kw: ["premium"], color: "#C9A84C", icon: "👑" },
+    { kw: ["certifié", "certifie", "certified"], color: "#39FF8F", icon: "✓" },
+    { kw: ["éco", "eco-", "responsable"], color: "#39FF8F", icon: "🌿" },
+    { kw: ["france", "local"], color: "#EF4444", icon: "📍" },
+    { kw: ["populaire", "top "], color: "#F97316", icon: "🔥" },
+    { kw: ["nouveau", "new"], color: "#39FF8F", icon: "✨" },
+    { kw: ["rapide", "24h", "réponse", "reponse"], color: "#38BDF8", icon: "⚡" },
+    { kw: ["recommand"], color: "#C9A84C", icon: "★" },
+    { kw: ["partenaire", "partner"], color: "#9146FF", icon: "🤝" },
+    { kw: ["créateur", "createur", "creator"], color: "#EC4899", icon: "🎨" },
+    { kw: ["disponible", "ouvert"], color: "#39FF8F", icon: "🟢" },
+    { kw: ["expert"], color: "#C9A84C", icon: "🎯" },
+    { kw: ["pro"], color: "#C9A84C", icon: "" },
+  ]
+  const found = map.find(m => m.kw.some(k => l.includes(k)))
+  const color = found?.color || accent
+  const first = (label || "").trim().codePointAt(0) || 0
+  const hasSymbol = first > 0x2000 // le libellé commence déjà par une icône / symbole
+  const icon = (found?.icon && !hasSymbol) ? found.icon : ""
+  return { color, bg: `${color}16`, border: `${color}33`, icon }
+}
+
 // Statuts de disponibilité (parité builder <-> public). Couleur personnalisable via dot_color.
 export const AVAILABILITY_STATUSES: { key: string; label: string; color: string }[] = [
   { key: "available", label: "Disponible", color: "#39FF8F" },
@@ -2217,7 +2245,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "avatar_border", label: "Contour de l'avatar", type: "select", options: ["simple", "aucun", "or", "neon", "lumineux"] },
       { key: "avatar_bg", label: "Fond de l'avatar (sans photo)", type: "select", options: ["dégradé", "uni", "halo", "mesh"] },
       { key: "avatar_shadow", label: "Ombre de l'avatar", type: "select", options: ["aucune", "douce", "profonde", "flottante"] },
-      { key: "badge", label: "Badges (jusqu'à 5)", type: "text", placeholder: "Disponible, Certifié, +500 clients", hint: "Séparez par des virgules — ou cliquez les exemples pour composer", suggestionsMode: "append", suggestions: ["Disponible", "Ouvert aujourd'hui", "Sur RDV", "Certifié", "Vérifié", "Premium", "Depuis 2019", "+500 clients", "★★★★★", "Recommandé", "Expert"] },
+      { key: "badge", label: "Badges (jusqu'à 5)", type: "text", placeholder: "Disponible, Certifié, +500 clients", hint: "Cliquez les badges pour composer — ils se colorent automatiquement", suggestionsMode: "append", suggestions: ["Vérifié", "Pro", "Premium", "Certifié", "Recommandé", "Populaire", "Nouveau", "Réponse rapide", "Partenaire", "Créateur", "Local", "Made in France", "Éco-responsable", "Expert", "Disponible", "+500 clients", "★★★★★"] },
     ],
   },
   bio: {
