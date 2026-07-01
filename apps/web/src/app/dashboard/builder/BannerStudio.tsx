@@ -198,12 +198,29 @@ function CropEditor({ content, set, onClose }: { content: Record<string, any>; s
   )
 }
 const miniBtn: React.CSSProperties = { flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "8px 4px", color: TEXT, fontSize: 11, fontWeight: 600, cursor: "pointer" }
+const styleBtn: React.CSSProperties = { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 7, padding: "5px 10px", color: TEXT, fontSize: 10.5, fontWeight: 600, cursor: "pointer" }
+
+// Clés de "style" de la bannière (tout sauf le contenu réel : titre/sous-titre/badge/image/lien)
+const BANNER_STYLE_KEYS = [
+  "banner_type", "grad_preset", "grad_c1", "grad_c2", "bg_color", "height_px", "block_radius", "text_position", "text_color",
+  "overlay_gradient", "overlay_color", "overlay_opacity", "blend_mode", "fx_overlay", "animation",
+  "block_shadow", "block_border", "border_color",
+  "title_font", "title_size", "title_weight", "title_tracking", "title_transform", "title_effect", "subtitle_size",
+  "img_zoom", "img_focus", "img_pos_x", "img_pos_y", "img_brightness", "img_contrast", "img_saturate", "img_grayscale", "img_sepia", "img_blur",
+]
 
 export default function BannerStudio({ content, onChange }: { content: Record<string, any>; onChange: (key: string, val: string) => void }) {
   const c = content
   const [open, setOpen] = useState<string>("image")
   const [crop, setCrop] = useState(false)
+  const [hasClip, setHasClip] = useState(false)
+  const [flash, setFlash] = useState("")
   const toggle = (id: string) => setOpen(o => o === id ? "" : id)
+  useEffect(() => { try { setHasClip(!!localStorage.getItem("qfb_banner_style")) } catch {} }, [])
+  const notify = (m: string) => { setFlash(m); setTimeout(() => setFlash(""), 1600) }
+  const copyStyle = () => { try { const o: Record<string, string> = {}; BANNER_STYLE_KEYS.forEach(k => { if (c[k] !== undefined && c[k] !== "") o[k] = String(c[k]) }); localStorage.setItem("qfb_banner_style", JSON.stringify(o)); setHasClip(true); notify("Style copié") } catch {} }
+  const pasteStyle = () => { try { const o = JSON.parse(localStorage.getItem("qfb_banner_style") || "{}"); Object.entries(o).forEach(([k, v]) => onChange(k, String(v))); notify("Style appliqué") } catch {} }
+  const resetStyle = () => { BANNER_STYLE_KEYS.forEach(k => onChange(k, "")); notify("Style réinitialisé") }
   const set = (k: string, v: any) => onChange(k, String(v))
   const applyPreset = (preset: Record<string, any>) => Object.entries(preset).forEach(([k, v]) => onChange(k, String(v)))
 
@@ -269,6 +286,13 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
             <div style={{ height: "100%", width: `${score}%`, background: `linear-gradient(90deg,${G},#39FF8F)`, borderRadius: 3, transition: "width .3s ease" }} />
           </div>
           {tips[0] && <p style={{ color: MUTED, fontSize: 10, margin: "7px 0 0", display: "flex", gap: 5 }}><span style={{ color: G }}>💡</span>{tips[0]}</p>}
+        </div>
+        {/* Style : copier / coller / réinitialiser */}
+        <div style={{ display: "flex", gap: 6, marginTop: 11, alignItems: "center" }}>
+          <button onClick={copyStyle} title="Copier le style de cette bannière" style={styleBtn}>Copier</button>
+          <button onClick={pasteStyle} disabled={!hasClip} title={hasClip ? "Appliquer le style copié" : "Copiez d'abord un style"} style={{ ...styleBtn, opacity: hasClip ? 1 : 0.4, cursor: hasClip ? "pointer" : "not-allowed" }}>Coller</button>
+          <button onClick={resetStyle} title="Réinitialiser le style" style={{ ...styleBtn, color: MUTED }}>Réinitialiser</button>
+          {flash && <span style={{ marginLeft: "auto", color: "#39FF8F", fontSize: 10, fontWeight: 700 }}>✓ {flash}</span>}
         </div>
       </div>
 
