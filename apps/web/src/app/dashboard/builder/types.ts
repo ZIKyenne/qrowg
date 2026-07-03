@@ -521,6 +521,81 @@ export const SOCIAL_PRESETS: { key: string; label: string; emoji: string; networ
   { key: "evenement", label: "Événement", emoji: "🎫", networks: ["instagram", "tiktok", "facebook"] },
 ]
 
+// Modèles Commerce par métier : un clic crée un ensemble de blocs de vente adaptés.
+export const COMMERCE_PRESETS: { key: string; label: string; emoji: string; blocks: { type: string; content: Record<string, string> }[] }[] = [
+  {
+    key: "restaurant", label: "Restaurant", emoji: "🍽️",
+    blocks: [
+      { type: "product_catalog", content: { title: "Notre carte" } },
+      { type: "popular_products", content: { title: "Nos plats populaires" } },
+      { type: "table_booking", content: { label: "Réserver une table", platform: "TheFork" } },
+      { type: "download_file", content: { label: "Télécharger le menu (PDF)", type_doc: "Carte" } },
+    ],
+  },
+  {
+    key: "bar", label: "Bar / Cocktails", emoji: "🍹",
+    blocks: [
+      { type: "product_catalog", content: { title: "Carte des cocktails" } },
+      { type: "promo_code", content: { code: "HAPPY", description: "Happy hour tous les jours 18h-20h" } },
+      { type: "order_online", content: { label: "Commander", platform: "Site web" } },
+      { type: "call_button", content: { label: "Appeler" } },
+    ],
+  },
+  {
+    key: "beaute", label: "Beauté", emoji: "💅",
+    blocks: [
+      { type: "services_pricing", content: { title: "Mes prestations" } },
+      { type: "packs", content: { title: "Mes forfaits" } },
+      { type: "booking_button", content: { label: "Réserver un rendez-vous", platform: "URL personnalisee" } },
+      { type: "gift_card", content: { title: "Offrir un bon cadeau", cta_label: "Offrir" } },
+    ],
+  },
+  {
+    key: "coach", label: "Coach / Formation", emoji: "🎓",
+    blocks: [
+      { type: "packs", content: { title: "Mes offres" } },
+      { type: "offer_comparison", content: { title: "Comparez mes formules", plan2_highlight: "yes" } },
+      { type: "payment_button", content: { label: "Payer / s'inscrire", platform: "Stripe" } },
+      { type: "booking_button", content: { label: "Réserver un appel", platform: "URL personnalisee" } },
+    ],
+  },
+  {
+    key: "freelance", label: "Freelance / Artisan", emoji: "💼",
+    blocks: [
+      { type: "services_pricing", content: { title: "Mes tarifs" } },
+      { type: "quote_request", content: { label: "Demander un devis", description: "Réponse sous 24h" } },
+      { type: "download_file", content: { label: "Télécharger la plaquette", type_doc: "Brochure" } },
+    ],
+  },
+  {
+    key: "boutique", label: "Boutique locale", emoji: "🛍️",
+    blocks: [
+      { type: "product_catalog", content: { title: "Nos produits" } },
+      { type: "popular_products", content: { title: "Meilleures ventes" } },
+      { type: "promo_code", content: { code: "PROMO10", description: "-10% sur votre première commande" } },
+      { type: "order_online", content: { label: "Commander en ligne", platform: "Site web" } },
+    ],
+  },
+  {
+    key: "immobilier", label: "Immobilier", emoji: "🏡",
+    blocks: [
+      { type: "product_catalog", content: { title: "Nos biens" } },
+      { type: "quote_request", content: { label: "Demander une estimation", description: "Estimation offerte" } },
+      { type: "download_file", content: { label: "Télécharger la brochure", type_doc: "Brochure" } },
+      { type: "call_button", content: { label: "Appeler l'agence" } },
+    ],
+  },
+  {
+    key: "evenement", label: "Événement", emoji: "🎫",
+    blocks: [
+      { type: "payment_button", content: { label: "Acheter un billet", platform: "Stripe" } },
+      { type: "packs", content: { title: "Formules & VIP" } },
+      { type: "download_file", content: { label: "Programme (PDF)", type_doc: "PDF" } },
+      { type: "booking_button", content: { label: "Ajouter à mon agenda", platform: "Google Calendar" } },
+    ],
+  },
+]
+
 // Modèles d'actions par métier : un clic crée un ensemble de boutons d'action adaptés.
 export const ACTION_PRESETS: { key: string; label: string; emoji: string; blocks: { type: string; content: Record<string, string> }[] }[] = [
   {
