@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, waLink, telLink, directionsLink, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, waLink, telLink, directionsLink, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -74,23 +74,10 @@ function FAQItem({ q, a, theme }: { q: string; a: string; theme: any }) {
 }
 
 // ── Social Networks ──────────────────────────────────────────────────────────
+// Réseaux : map dérivée de l'éditeur (source unique) + repli pour d'éventuelles clés legacy.
 const SOCIAL_NETWORKS: Record<string, { icon: string; color: string; label: string }> = {
-  instagram: { icon: "📸", color: "#E1306C", label: "Instagram" },
-  facebook: { icon: "👥", color: "#1877F2", label: "Facebook" },
-  tiktok: { icon: "🎵", color: "#ffffff", label: "TikTok" },
-  linkedin: { icon: "💼", color: "#0A66C2", label: "LinkedIn" },
-  twitter: { icon: "🐦", color: "#1DA1F2", label: "Twitter / X" },
-  youtube: { icon: "▶️", color: "#FF0000", label: "YouTube" },
-  snapchat: { icon: "👻", color: "#FFFC00", label: "Snapchat" },
-  pinterest: { icon: "📌", color: "#E60023", label: "Pinterest" },
-  whatsapp: { icon: "💬", color: "#25D366", label: "WhatsApp" },
-  telegram: { icon: "✈️", color: "#26A5E4", label: "Telegram" },
-  discord: { icon: "🎮", color: "#5865F2", label: "Discord" },
-  github: { icon: "💻", color: "#ffffff", label: "GitHub" },
   website: { icon: "🌐", color: "#C9A84C", label: "Site web" },
-  email: { icon: "✉️", color: "#39FF8F", label: "Email" },
-  phone: { icon: "📞", color: "#4ADE80", label: "Téléphone" },
-  spotify: { icon: "🎧", color: "#1DB954", label: "Spotify" },
+  ...SOCIAL_NETWORKS_MAP,
 }
 
 // ── Render Block ─────────────────────────────────────────────────────────────

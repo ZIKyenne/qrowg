@@ -2297,6 +2297,11 @@ export const SOCIAL_NETWORKS = [
   { key: "phone", label: "Téléphone", icon: "📞", color: "#4ADE80", group: "generic" },
 ]
 
+// Map réseau -> { icon, color, label } dérivée de la liste ci-dessus.
+// Source unique de vérité : garantit que TOUS les réseaux de l'éditeur s'affichent aussi en public.
+export const SOCIAL_NETWORKS_MAP: Record<string, { icon: string; color: string; label: string }> =
+  Object.fromEntries(SOCIAL_NETWORKS.map(n => [n.key, { icon: n.icon, color: n.color, label: n.label }]))
+
 // ── Categories de blocs ───────────────────────────────────────────────────────
 export const BLOCK_CATEGORIES = [
   { id: "identity", label: "Identite", icon: "👤", color: "#C9A84C", desc: "Profil, bio, presentation" },

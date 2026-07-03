@@ -3,6 +3,7 @@ import {
   bannerImageStyle, bannerOverlayLayers, availabilityStatus, profileBadgeStyle,
   bannerTitleStyle, bannerFrame, bannerHeight, bannerBackgroundStyle,
   normalizePhoneDigits, waLink, telLink, directionsLink, ctaButtonStyle, stickyActionHref,
+  SOCIAL_NETWORKS, SOCIAL_NETWORKS_MAP,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -226,6 +227,24 @@ describe("stickyActionHref", () => {
   })
   it("none -> icône vide", () => {
     expect(stickyActionHref("none").icon).toBe("")
+  })
+})
+
+describe("SOCIAL_NETWORKS_MAP (parité éditeur <-> public)", () => {
+  it("contient une entrée pour chaque réseau de l'éditeur", () => {
+    for (const n of SOCIAL_NETWORKS) {
+      expect(SOCIAL_NETWORKS_MAP[n.key]).toBeTruthy()
+      expect(SOCIAL_NETWORKS_MAP[n.key].label).toBe(n.label)
+      expect(SOCIAL_NETWORKS_MAP[n.key].color).toBe(n.color)
+    }
+  })
+  it("couvre 30+ réseaux (bibliothèque riche)", () => {
+    expect(Object.keys(SOCIAL_NETWORKS_MAP).length).toBeGreaterThan(30)
+  })
+  it("inclut les réseaux clés", () => {
+    for (const k of ["instagram", "tiktok", "youtube", "spotify", "deezer", "twitch", "threads", "linkedin", "discord", "behance"]) {
+      expect(SOCIAL_NETWORKS_MAP[k]).toBeTruthy()
+    }
   })
 })
 
