@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, SOCIAL_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import { createClient } from "@/lib/supabase/client"
@@ -4118,6 +4118,12 @@
       preset.blocks.forEach(b => addBlock(b.type, mk(b.type, b.content)))
     }
 
+    function generateSocialPreset(preset: typeof SOCIAL_PRESETS[number]) {
+      const content: Record<string, string> = {}
+      preset.networks.forEach(k => { content[k] = SOCIAL_URL_TEMPLATES[k] || "https://" })
+      addBlock("social_links", content)
+    }
+
     function deleteBlock(id: string) {
       if (blocks.find(b => b.id === id)?.locked) return
       setBlocks(p => p.filter(b => b.id !== id))
@@ -4847,6 +4853,26 @@
                                       </div>
                                     </div>
                                     <p style={subHeader}>Toutes les actions</p>
+                                    {catBlocks.map(([type, def]) => blockBtn(type, def))}
+                                  </>)
+                                : activeCategory === "social"
+                                ? (<>
+                                    <div style={{ margin: "2px 0 10px" }}>
+                                      <p style={subHeader}>Modèles par métier</p>
+                                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                                        {SOCIAL_PRESETS.map(p => (
+                                          <button key={p.key} type="button" onClick={() => generateSocialPreset(p)} title={`Crée un bloc Liens sociaux : ${p.networks.join(", ")}`}
+                                            style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 10px", borderRadius: 9, border: "1px solid rgba(201,168,76,0.18)", cursor: "pointer", background: "rgba(201,168,76,0.05)", color: "#F5F0E8", fontSize: 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
+                                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.12)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)" }}
+                                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,168,76,0.05)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.18)" }}>
+                                            <span style={{ fontSize: 16 }}>{p.emoji}</span>
+                                            <span style={{ flex: 1, lineHeight: 1.2 }}>{p.label}</span>
+                                          </button>
+                                        ))}
+                                      </div>
+                                      <p style={{ color: MUTED, fontSize: 9, margin: "6px 0 0" }}>Les liens de base sont pré-remplis : complétez-les avec votre nom d&apos;utilisateur.</p>
+                                    </div>
+                                    <p style={subHeader}>Tous les réseaux</p>
                                     {catBlocks.map(([type, def]) => blockBtn(type, def))}
                                   </>)
                                 : catBlocks.map(([type, def]) => blockBtn(type, def))

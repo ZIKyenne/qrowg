@@ -499,6 +499,28 @@ export const IDENTITY_PRESETS: { key: string; label: string; emoji: string; bloc
   },
 ]
 
+// URL de base par réseau (point de départ pré-rempli dans les modèles Réseaux, à compléter par l'utilisateur).
+export const SOCIAL_URL_TEMPLATES: Record<string, string> = {
+  instagram: "https://instagram.com/", tiktok: "https://tiktok.com/@", youtube: "https://youtube.com/@",
+  twitch: "https://twitch.tv/", discord: "https://discord.gg/", facebook: "https://facebook.com/",
+  linkedin: "https://linkedin.com/in/", twitter: "https://x.com/", threads: "https://threads.net/@",
+  spotify: "https://open.spotify.com/artist/", apple_music: "https://music.apple.com/", deezer: "https://deezer.com/",
+  soundcloud: "https://soundcloud.com/", bandcamp: "https://bandcamp.com/", github: "https://github.com/",
+  behance: "https://behance.net/", dribbble: "https://dribbble.com/", whatsapp: "https://wa.me/", email: "mailto:",
+}
+
+// Modèles Réseaux par métier : un clic crée un bloc "Liens sociaux" pré-rempli.
+export const SOCIAL_PRESETS: { key: string; label: string; emoji: string; networks: string[] }[] = [
+  { key: "createur", label: "Créateur de contenu", emoji: "✨", networks: ["tiktok", "instagram", "youtube", "twitch", "discord"] },
+  { key: "artiste", label: "Artiste / Musicien", emoji: "🎤", networks: ["spotify", "apple_music", "deezer", "soundcloud", "youtube", "instagram"] },
+  { key: "restaurant", label: "Restaurant / Bar", emoji: "🍽️", networks: ["instagram", "tiktok", "facebook", "whatsapp"] },
+  { key: "immobilier", label: "Immobilier", emoji: "🏡", networks: ["linkedin", "instagram", "facebook", "whatsapp"] },
+  { key: "coach", label: "Coach / Formation", emoji: "🎓", networks: ["linkedin", "instagram", "youtube"] },
+  { key: "entreprise", label: "Entreprise", emoji: "🏢", networks: ["linkedin", "youtube", "email"] },
+  { key: "freelance", label: "Freelance / Portfolio", emoji: "💼", networks: ["linkedin", "github", "behance", "dribbble"] },
+  { key: "evenement", label: "Événement", emoji: "🎫", networks: ["instagram", "tiktok", "facebook"] },
+]
+
 // Modèles d'actions par métier : un clic crée un ensemble de boutons d'action adaptés.
 export const ACTION_PRESETS: { key: string; label: string; emoji: string; blocks: { type: string; content: Record<string, string> }[] }[] = [
   {
