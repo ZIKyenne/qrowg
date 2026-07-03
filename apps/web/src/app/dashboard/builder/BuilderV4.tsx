@@ -213,15 +213,31 @@
       )
       case "social_links": {
         const active = SOCIAL_NETWORKS.filter(n => c[n.key])
+        const disp = c.display || "list"
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {active.length === 0
               ? <p style={{ color: muted, fontSize: 11, textAlign: "center", margin: 0 }}>Aucun réseau configuré</p>
+              : disp === "icons"
+              ? <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center" }}>
+                  {active.map(n => (
+                    <div key={n.key} title={n.label} style={{ width: 40, height: 40, borderRadius: "50%", background: n.color+"18", border: `1px solid ${n.color}40`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{n.icon}</div>
+                  ))}
+                </div>
+              : disp === "grid"
+              ? <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7 }}>
+                  {active.map(n => (
+                    <div key={n.key} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, background: n.color+"10", border: `1px solid ${n.color}25`, borderRadius: 10, padding: "11px 6px", textAlign: "center" }}>
+                      <span style={{ fontSize: 20 }}>{n.icon}</span>
+                      <span style={{ color: text, fontSize: 11, fontWeight: 600 }}>{c[n.key+"__label"] || n.label}</span>
+                    </div>
+                  ))}
+                </div>
               : <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {active.map(n => (
                     <div key={n.key} style={{ display: "flex", alignItems: "center", gap: 10, background: n.color+"10", border: `1px solid ${n.color}25`, borderRadius: 10, padding: "9px 12px" }}>
                       <span style={{ fontSize: 15 }}>{n.icon}</span>
-                      <span style={{ color: text, fontSize: 12, fontWeight: 600, flex: 1 }}>{n.label}</span>
+                      <span style={{ color: text, fontSize: 12, fontWeight: 600, flex: 1 }}>{c[n.key+"__label"] || n.label}</span>
                       <ExternalLink size={11} color={n.color} />
                     </div>
                   ))}
@@ -2725,8 +2741,18 @@
     }
 
     if (block.type === "social_links") {
+      const disp = block.content.display || "list"
       return (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div>
+            <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 6, fontWeight: 500 }}>Affichage</label>
+            <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
+              {[{ k: "list", l: "Liste" }, { k: "grid", l: "Grille" }, { k: "icons", l: "Icônes" }].map(o => {
+                const on = disp === o.k
+                return <button key={o.k} type="button" onClick={() => onChange("display", o.k)} style={{ flex: 1, padding: "7px 4px", borderRadius: 7, background: on ? G : "transparent", border: "none", color: on ? "#080808" : MUTED, fontSize: 11, fontWeight: on ? 700 : 500, cursor: "pointer" }}>{o.l}</button>
+              })}
+            </div>
+          </div>
           <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>Laisse vide pour masquer le réseau.</p>
           {SOCIAL_NETWORKS.map(n => (
             <div key={n.key}>

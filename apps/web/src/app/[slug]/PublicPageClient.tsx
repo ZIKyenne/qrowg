@@ -295,6 +295,28 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
 
     case "social_links": {
       const active = Object.entries(SOCIAL_NETWORKS).filter(([key]) => c[key])
+      if (active.length === 0) return null
+      const disp = c.display || "list"
+      const lbl = (key: string, n: any) => c[`${key}__label`] || n.label
+      if (disp === "icons") return (
+        <div style={{ padding: "6px 24px 16px", display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
+          {active.map(([key, n]) => (
+            <a key={key} href={c[key]} onClick={() => trackLinkClick(pageId, block.id, c[key])} target="_blank" rel="noopener noreferrer" aria-label={lbl(key, n)} title={lbl(key, n)}
+              style={{ width: 48, height: 48, borderRadius: "50%", background: n.color + "1a", border: `1px solid ${n.color}40`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, textDecoration: "none" }}>{n.icon}</a>
+          ))}
+        </div>
+      )
+      if (disp === "grid") return (
+        <div style={{ padding: "6px 24px 16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+          {active.map(([key, n]) => (
+            <a key={key} href={c[key]} onClick={() => trackLinkClick(pageId, block.id, c[key])} target="_blank" rel="noopener noreferrer"
+              style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, background: n.color + "10", border: `1px solid ${n.color}25`, borderRadius: 13, padding: "16px 8px", textDecoration: "none", textAlign: "center" }}>
+              <span style={{ fontSize: 26 }}>{n.icon}</span>
+              <span style={{ color: TEXT, fontSize: 13, fontWeight: 600, fontFamily: FONT_B }}>{lbl(key, n)}</span>
+            </a>
+          ))}
+        </div>
+      )
       return (
         <div style={{ padding: "6px 24px 16px", display: "flex", flexDirection: "column", gap: 9 }}>
           {active.map(([key, n]) => (
@@ -303,7 +325,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = `0 6px 20px ${n.color}20` }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLElement).style.boxShadow = "none" }}>
               <div style={{ width: 38, height: 38, borderRadius: 10, background: n.color + "18", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{n.icon}</div>
-              <span style={{ color: TEXT, fontSize: 14, fontWeight: 600, flex: 1, fontFamily: FONT_B }}>{n.label}</span>
+              <span style={{ color: TEXT, fontSize: 14, fontWeight: 600, flex: 1, fontFamily: FONT_B }}>{lbl(key, n)}</span>
               <ExternalLink size={14} color={n.color} style={{ opacity: 0.7 }} />
             </a>
           ))}
