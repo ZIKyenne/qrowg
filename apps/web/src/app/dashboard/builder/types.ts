@@ -2468,6 +2468,20 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       key: n.key, label: n.label, type: "url" as const, placeholder: `https://${n.key}.com/monprofil`
     })),
   },
+  social_feature: {
+    label: "Réseau mis en avant", description: "Un réseau principal en grande carte",
+    icon: "⭐", color: "#E1306C", category: "social",
+    defaultContent: { network: "instagram", title: "Suivez-moi", cta_label: "Suivre" },
+    fields: [
+      { key: "network", label: "Réseau", type: "select", options: ["instagram", "tiktok", "youtube", "spotify", "twitch", "linkedin", "facebook", "discord", "pinterest", "soundcloud", "snapchat", "threads"] },
+      { key: "url", label: "Lien du profil", type: "url", placeholder: "https://instagram.com/votre_nom" },
+      { key: "title", label: "Titre", type: "text", placeholder: "Suivez mon actualité", maxRecommended: 40 },
+      { key: "description", label: "Description", type: "text", placeholder: "Du contenu exclusif chaque semaine", maxRecommended: 90 },
+      { key: "count", label: "Abonnés (optionnel)", type: "text", placeholder: "12,5k abonnés" },
+      { key: "cta_label", label: "Texte du bouton", type: "text", placeholder: "Suivre" },
+      { key: "image", label: "Bannière (optionnelle)", type: "image" },
+    ],
+  },
   instagram_feed: {
     label: "Instagram Feed", description: "Grille de photos Instagram",
     icon: "📸", color: "#E1306C", category: "social",

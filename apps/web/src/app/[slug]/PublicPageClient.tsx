@@ -337,6 +337,28 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       )
     }
 
+    case "social_feature": {
+      const n = SOCIAL_NETWORKS_MAP[c.network] || { icon: "🔗", color: G, label: "Réseau" }
+      const col = n.color
+      return (c.url || c.title) ? (
+        <div style={{ padding: "8px 24px 14px" }}>
+          <a href={c.url || "#"} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "social")} style={{ display: "block", background: `linear-gradient(135deg,${col}22,${col}0a)`, border: `1.5px solid ${col}45`, borderRadius: 18, overflow: "hidden", textDecoration: "none" }}>
+            {c.image && <img src={c.image} alt="" style={{ width: "100%", height: 130, objectFit: "cover", display: "block" }} />}
+            <div style={{ padding: "16px 18px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                <span style={{ fontSize: 28 }}>{n.icon}</span>
+                <span style={{ color: col, fontSize: 12, fontWeight: 700, fontFamily: FONT_B }}>{n.label}</span>
+                <span style={{ marginLeft: "auto", background: col, color: "#080808", borderRadius: 20, padding: "2px 10px", fontSize: 9, fontWeight: 700 }}>PRINCIPAL</span>
+              </div>
+              <p style={{ color: TEXT, fontSize: 18, fontWeight: 700, margin: "0 0 4px", fontFamily: FONT_D }}>{c.title || "Suivez-moi"}</p>
+              {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 6px", lineHeight: 1.5, fontFamily: FONT_B }}>{c.description}</p>}
+              {c.count && <p style={{ color: col, fontSize: 13, fontWeight: 700, margin: "0 0 12px", fontFamily: FONT_B }}>{c.count}</p>}
+              <div style={{ background: col, color: "#080808", borderRadius: 11, padding: "12px", textAlign: "center", fontSize: 14, fontWeight: 800, marginTop: c.count ? 0 : 12, fontFamily: FONT_B }}>{c.cta_label || "Suivre"}</div>
+            </div>
+          </a>
+        </div>
+      ) : null
+    }
     case "heading": {
       const sizes: Record<string, number> = { small: 18, medium: 24, large: 32, xl: 42 }
       const hColors: Record<string, string> = { default: TEXT, primary: G, accent: theme.accent || "#39FF8F", muted: MUTED }

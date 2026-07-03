@@ -249,6 +249,28 @@
           </div>
         )
       }
+      case "social_feature": {
+        const n = SOCIAL_NETWORKS.find(x => x.key === c.network) || { icon: "🔗", color: primary, label: "Réseau" }
+        const col = n.color
+        return (
+          <div style={{ padding: "8px 16px", ...s }}>
+            <div style={{ background: `linear-gradient(135deg,${col}22,${col}0a)`, border: `1.5px solid ${col}45`, borderRadius: 16, overflow: "hidden" }}>
+              {c.image && <img src={c.image} alt="" style={{ width: "100%", height: 90, objectFit: "cover", display: "block" }} />}
+              <div style={{ padding: "13px 15px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 6 }}>
+                  <span style={{ fontSize: 24 }}>{n.icon}</span>
+                  <span style={{ color: col, fontSize: 11, fontWeight: 700 }}>{n.label}</span>
+                  <span style={{ marginLeft: "auto", background: col, color: "#080808", borderRadius: 20, padding: "1px 8px", fontSize: 8, fontWeight: 700 }}>PRINCIPAL</span>
+                </div>
+                <p style={{ color: text, fontSize: 15, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay }}>{c.title||"Suivez-moi"}</p>
+                {c.description && <p style={{ color: muted, fontSize: 11, margin: "0 0 4px" }}>{c.description}</p>}
+                {c.count && <p style={{ color: col, fontSize: 11, fontWeight: 700, margin: "0 0 9px" }}>{c.count}</p>}
+                <div style={{ background: col, color: "#080808", borderRadius: 9, padding: "9px", textAlign: "center", fontSize: 12, fontWeight: 700, marginTop: c.count ? 0 : 8 }}>{c.cta_label||"Suivre"}</div>
+              </div>
+            </div>
+          </div>
+        )
+      }
       case "testimonials": {
         const reviews = [[c.name1,c.text1,c.stars1],[c.name2,c.text2,c.stars2],[c.name3,c.text3,c.stars3]].filter(([n])=>n)
         return (
