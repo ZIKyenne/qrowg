@@ -227,9 +227,10 @@
               : disp === "grid"
               ? <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7 }}>
                   {active.map(n => (
-                    <div key={n.key} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, background: n.color+"10", border: `1px solid ${n.color}25`, borderRadius: 10, padding: "11px 6px", textAlign: "center" }}>
+                    <div key={n.key} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, background: n.color+"10", border: `1px solid ${n.color}25`, borderRadius: 10, padding: "11px 6px", textAlign: "center" }}>
                       <span style={{ fontSize: 20 }}>{n.icon}</span>
                       <span style={{ color: text, fontSize: 11, fontWeight: 600 }}>{c[n.key+"__label"] || n.label}</span>
+                      {c[n.key+"__count"] && <span style={{ color: n.color, fontSize: 10, fontWeight: 700 }}>{c[n.key+"__count"]}</span>}
                     </div>
                   ))}
                 </div>
@@ -237,7 +238,10 @@
                   {active.map(n => (
                     <div key={n.key} style={{ display: "flex", alignItems: "center", gap: 10, background: n.color+"10", border: `1px solid ${n.color}25`, borderRadius: 10, padding: "9px 12px" }}>
                       <span style={{ fontSize: 15 }}>{n.icon}</span>
-                      <span style={{ color: text, fontSize: 12, fontWeight: 600, flex: 1 }}>{c[n.key+"__label"] || n.label}</span>
+                      <span style={{ flex: 1, minWidth: 0 }}>
+                        <span style={{ color: text, fontSize: 12, fontWeight: 600, display: "block" }}>{c[n.key+"__label"] || n.label}</span>
+                        {c[n.key+"__count"] && <span style={{ color: muted, fontSize: 10 }}>{c[n.key+"__count"]}</span>}
+                      </span>
                       <ExternalLink size={11} color={n.color} />
                     </div>
                   ))}
@@ -2765,6 +2769,12 @@
                 style={{ ...inputStyle, borderColor: block.content[n.key] ? n.color+"50" : "rgba(201,168,76,0.2)" }}
                 onFocus={e => e.target.style.borderColor = n.color+"80"}
                 onBlur={e => e.target.style.borderColor = block.content[n.key] ? n.color+"50" : "rgba(201,168,76,0.2)"} />
+              {block.content[n.key] && (
+                <div style={{ display: "flex", gap: 6, marginTop: 5 }}>
+                  <input value={block.content[n.key+"__label"]||""} onChange={e => onChange(n.key+"__label", e.target.value)} placeholder={`Libellé (${n.label})`} style={{ ...inputStyle, flex: 1, fontSize: 11, padding: "7px 9px" }} />
+                  <input value={block.content[n.key+"__count"]||""} onChange={e => onChange(n.key+"__count", e.target.value)} placeholder="Abonnés (ex : 12,5k)" style={{ ...inputStyle, width: 130, fontSize: 11, padding: "7px 9px" }} />
+                </div>
+              )}
             </div>
           ))}
         </div>
