@@ -4104,9 +4104,10 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   media_before_after: {
     label: "Avant / Après média", description: "Comparaison visuelle avant/après",
     icon: "🔄", color: "#4ECDC4", category: "media",
-    defaultContent: { before_label: "Avant", after_label: "Après" },
+    defaultContent: { before_label: "Avant", after_label: "Après", mode: "slider" },
     fields: [
       { key: "title", label: "Titre", type: "text", placeholder: "Transformation" },
+      { key: "mode", label: "Affichage", type: "select", options: ["slider", "split"], hint: "slider = curseur à glisser · split = côte à côte" },
       { key: "before_img", label: "Image Avant", type: "image" },
       { key: "before_label", label: "Label Avant", type: "text", placeholder: "Avant" },
       { key: "after_img", label: "Image Après", type: "image" },

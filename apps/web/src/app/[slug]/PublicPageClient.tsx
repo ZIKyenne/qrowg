@@ -82,6 +82,30 @@ const SOCIAL_NETWORKS: Record<string, { icon: string; color: string; label: stri
 
 // ── Render Block ─────────────────────────────────────────────────────────────
 // ── Blocs interactifs publics (onglets / accordéon) ──────────────────────────
+// ── Avant / Après interactif (curseur à glisser, clip-path) ──────────────────
+function BeforeAfterPublic({ before, after, beforeLabel, afterLabel }: { before: string; after: string; beforeLabel: string; afterLabel: string }) {
+  const [pos, setPos] = useState(50)
+  const boxRef = useRef<HTMLDivElement>(null)
+  const dragging = useRef(false)
+  const move = (clientX: number) => { const b = boxRef.current?.getBoundingClientRect(); if (!b) return; setPos(Math.min(100, Math.max(0, ((clientX - b.left) / b.width) * 100))) }
+  return (
+    <div ref={boxRef} role="slider" aria-valuenow={Math.round(pos)} aria-label="Comparateur avant / après"
+      onPointerDown={e => { dragging.current = true; e.currentTarget.setPointerCapture(e.pointerId); move(e.clientX) }}
+      onPointerMove={e => { if (dragging.current) move(e.clientX) }}
+      onPointerUp={() => dragging.current = false} onPointerCancel={() => dragging.current = false}
+      style={{ position: "relative", height: 260, borderRadius: 12, overflow: "hidden", touchAction: "none", userSelect: "none", cursor: "ew-resize" }}>
+      <img src={before} alt="Avant" draggable={false} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+      <img src={after} alt="Après" draggable={false} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", clipPath: `inset(0 ${100 - pos}% 0 0)` }} />
+      {/* Ligne + poignée */}
+      <div style={{ position: "absolute", top: 0, bottom: 0, left: `${pos}%`, width: 2, background: "#fff", transform: "translateX(-1px)", boxShadow: "0 0 8px rgba(0,0,0,0.5)" }} />
+      <div style={{ position: "absolute", top: "50%", left: `${pos}%`, transform: "translate(-50%,-50%)", width: 34, height: 34, borderRadius: "50%", background: "#fff", boxShadow: "0 2px 8px rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", color: "#080808", fontSize: 14, fontWeight: 700 }}>⇔</div>
+      {/* Labels */}
+      <span style={{ position: "absolute", bottom: 10, left: 10, background: "rgba(239,68,68,0.85)", color: "#fff", fontSize: 11, fontWeight: 700, borderRadius: 6, padding: "3px 9px" }}>{beforeLabel}</span>
+      <span style={{ position: "absolute", bottom: 10, right: 10, background: "rgba(57,255,143,0.85)", color: "#080808", fontSize: 11, fontWeight: 700, borderRadius: 6, padding: "3px 9px" }}>{afterLabel}</span>
+    </div>
+  )
+}
+
 // ── Carrousel plein largeur (autoplay + points + flèches + swipe) ────────────
 function CarouselPublic({ imgs, title, autoplay, MUTED, FONT_B }: { imgs: string[]; title?: string; autoplay: boolean; MUTED: string; FONT_B: string }) {
   const [idx, setIdx] = useState(0)
@@ -1526,7 +1550,9 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
     case "media_before_after": return (c.before_img || c.after_img) ? (
       <div style={{ padding: "10px 24px 14px" }}>
         {c.title && <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 11px", textAlign: "center", fontFamily: FONT_B }}>{c.title}</p>}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+        {c.mode === "slider" && c.before_img && c.after_img
+          ? <BeforeAfterPublic before={c.before_img} after={c.after_img} beforeLabel={c.before_label || "Avant"} afterLabel={c.after_label || "Après"} />
+          : <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
           <div style={{ borderRadius: 11, overflow: "hidden" }}>
             {c.before_img ? <img src={c.before_img} alt="Avant" style={{ width: "100%", height: 150, objectFit: "cover", display: "block" }} /> : <div style={{ height: 150, background: "rgba(239,68,68,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30 }}>📸</div>}
             <div style={{ background: "rgba(239,68,68,0.15)", padding: "7px", textAlign: "center" }}><p style={{ color: "#EF4444", fontSize: 12, fontWeight: 700, margin: 0 }}>{c.before_label || "Avant"}</p></div>
@@ -1535,7 +1561,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
             {c.after_img ? <img src={c.after_img} alt="Après" style={{ width: "100%", height: 150, objectFit: "cover", display: "block" }} /> : <div style={{ height: 150, background: "rgba(57,255,143,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30 }}>✨</div>}
             <div style={{ background: "rgba(57,255,143,0.15)", padding: "7px", textAlign: "center" }}><p style={{ color: "#39FF8F", fontSize: 12, fontWeight: 700, margin: 0 }}>{c.after_label || "Après"}</p></div>
           </div>
-        </div>
+        </div>}
         {c.description && <p style={{ color: MUTED, fontSize: 12, textAlign: "center", margin: "9px 0 0" }}>{c.description}</p>}
       </div>
     ) : null
