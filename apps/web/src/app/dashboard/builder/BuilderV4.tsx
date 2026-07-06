@@ -11,6 +11,9 @@
   import ImageUpload from "./ImageUpload"
   import { createClient } from "@/lib/supabase/client"
 
+  // Helper module-scope (evite la temporal-dead-zone du UUID_RE interne au composant).
+  const IS_UUID = (s?: string | null): boolean => !!s && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)
+
   const G = "#C9A84C"
   const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%274%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E')"
   const MUTED = "#8A8478"
@@ -3918,6 +3921,11 @@
     const [saving, setSaving] = useState(false)
     const [saved, setSaved] = useState(false)
     const [saveError, setSaveError] = useState(false)
+    // ID reel de la page en base. Si l'URL est /builder/new (pageId non-UUID),
+    // on cree d'abord la page puis on bascule sur son vrai UUID.
+    const [liveId, setLiveId] = useState<string | undefined>(() => (IS_UUID(pageId) ? pageId : undefined))
+    const [bootstrapError, setBootstrapError] = useState("")
+    const creatingRef = useRef(false)
     const [showPublishPopup, setShowPublishPopup] = useState(false)
     const [publishing, setPublishing] = useState(false)
     const [publishSuccess, setPublishSuccess] = useState(false)
@@ -4150,19 +4158,41 @@
       document.head.appendChild(link)
     }, [theme.fontDisplay, theme.fontBody])
 
+    // Bootstrap : URL /builder/new (ou tout pageId non-UUID) -> on cree la page en base,
+    // on recupere son vrai UUID, on met a jour l'URL sans rechargement, puis liveId prend le relais.
     useEffect(() => {
-      if (!pageId) return
+      if (!pageId || IS_UUID(pageId)) return
+      if (creatingRef.current) return
+      creatingRef.current = true
+      ;(async () => {
+        try {
+          const res = await fetch("/api/pages/create", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: pageName }) })
+          const json = await res.json().catch(() => ({}))
+          if (!res.ok || !json?.pageId) { setBootstrapError(json?.message || json?.error || "Impossible de creer la page."); return }
+          // Normalise les IDs de blocs par defaut (\"1\"/\"2\"/\"3\") en UUID -> chemin upsert propre.
+          setBlocksRaw(prev => prev.map(b => IS_UUID(b.id) ? b : { ...b, id: genId() }))
+          setLiveId(json.pageId)
+          if (json.slug) setPageSlug(json.slug)
+          try { window.history.replaceState(null, "", "/dashboard/builder/" + json.pageId) } catch {}
+        } catch (e: any) {
+          setBootstrapError(e?.message || "Impossible de creer la page.")
+        }
+      })()
+    }, [pageId])
+
+    useEffect(() => {
+      if (!IS_UUID(liveId)) return
       const supabase = createClient()
       async function load() {
-        const { data: pg } = await supabase.from("pages").select("title,slug,status,theme,total_views").eq("id", pageId).single()
+        const { data: pg } = await supabase.from("pages").select("title,slug,status,theme,total_views").eq("id", liveId).single()
         if (pg) { setPageName(pg.title); setPageSlug(pg.slug); setPageStatus(pg.status||"draft"); if (pg.theme) setTheme(pg.theme as PageTheme); setPageStats(s => ({ ...s, views: pg.total_views||0 })) }
-        const { data: blks } = await supabase.from("blocks").select("*").eq("page_id", pageId).order("position")
+        const { data: blks } = await supabase.from("blocks").select("*").eq("page_id", liveId).order("position")
         if (blks?.length) {
             const loaded = blks.map(b => { const c = b.content || {}; return { id: b.id, type: b.type, content: c, visible: c.__visible !== undefined ? c.__visible !== false : (b.is_visible !== false), draft: c.__draft || false, locked: c.__locked || false } })
             setBlocksRaw(loaded)
             undoRedo.push(loaded)
           }
-        const { data: qr } = await supabase.from("qr_codes").select("short_code,total_scans").eq("page_id", pageId).single()
+        const { data: qr } = await supabase.from("qr_codes").select("short_code,total_scans").eq("page_id", liveId).single()
         if (qr) {
           setQrShortCode(qr.short_code||"")
           const appUrl = typeof window !== "undefined" ? window.location.origin : ""
@@ -4171,7 +4201,7 @@
         }
         // Compteur de clics par bloc (90 derniers jours) — lecture proprio via RLS
         const since = new Date(); since.setDate(since.getDate() - 90)
-        const { data: clk } = await supabase.from("block_clicks").select("block_id").eq("page_id", pageId).gte("clicked_at", since.toISOString())
+        const { data: clk } = await supabase.from("block_clicks").select("block_id").eq("page_id", liveId).gte("clicked_at", since.toISOString())
         if (clk?.length) {
           const counts: Record<string, number> = {}
           for (const r of clk as any[]) { if (r.block_id) counts[r.block_id] = (counts[r.block_id] || 0) + 1 }
@@ -4179,33 +4209,33 @@
         }
       }
       load()
-    }, [pageId])
+    }, [liveId])
 
     useEffect(() => {
-      if (!pageId) return
+      if (!IS_UUID(liveId)) return
       clearTimeout(saveTimeout.current)
       saveTimeout.current = setTimeout(async () => {
         setSaving(true); setSaveError(false)
         try {
           const supabase = createClient()
-          await supabase.from("pages").update({ title: pageName, theme }).eq("id", pageId)
+          await supabase.from("pages").update({ title: pageName, theme }).eq("id", liveId)
           const allUuid = blocks.every(b => UUID_RE.test(b.id))
           if (allUuid) {
             // Sauvegarde qui CONSERVE les IDs : upsert D'ABORD (le contenu est toujours enregistré),
             // PUIS suppression des blocs retirés via une liste d'IDs explicite (fiable).
             // La table `blocks` n'a que : id, page_id, type, position, is_visible, content, styles.
             // draft/locked/visible n'ont PAS de colonne -> persistes dans content (cles reservees __).
-            const rows = blocks.map((b, i) => ({ id: b.id, page_id: pageId, type: b.type, position: i, content: { ...b.content, __draft: b.draft || false, __locked: b.locked || false, __visible: b.visible !== false }, is_visible: b.visible && !b.draft, styles: {} }))
+            const rows = blocks.map((b, i) => ({ id: b.id, page_id: liveId, type: b.type, position: i, content: { ...b.content, __draft: b.draft || false, __locked: b.locked || false, __visible: b.visible !== false }, is_visible: b.visible && !b.draft, styles: {} }))
             const keep = new Set(blocks.map(b => b.id))
             if (rows.length) { const { error } = await supabase.from("blocks").upsert(rows, { onConflict: "id" }); if (error) throw error }
-            const { data: existing } = await supabase.from("blocks").select("id").eq("page_id", pageId)
+            const { data: existing } = await supabase.from("blocks").select("id").eq("page_id", liveId)
             const toDelete = (existing || []).map((r: any) => r.id).filter((id: string) => !keep.has(id))
             if (toDelete.length) await supabase.from("blocks").delete().in("id", toDelete)
-            else if (!rows.length) await supabase.from("blocks").delete().eq("page_id", pageId)
+            else if (!rows.length) await supabase.from("blocks").delete().eq("page_id", liveId)
           } else {
             // Repli (IDs legacy non-UUID) : delete-all + insert. Les IDs deviennent UUID au prochain chargement.
-            await supabase.from("blocks").delete().eq("page_id", pageId)
-            if (blocks.length > 0) { const { error } = await supabase.from("blocks").insert(blocks.map((b, i) => ({ page_id: pageId, type: b.type, position: i, content: { ...b.content, __draft: b.draft || false, __locked: b.locked || false, __visible: b.visible !== false }, is_visible: b.visible && !b.draft, styles: {} }))); if (error) throw error }
+            await supabase.from("blocks").delete().eq("page_id", liveId)
+            if (blocks.length > 0) { const { error } = await supabase.from("blocks").insert(blocks.map((b, i) => ({ page_id: liveId, type: b.type, position: i, content: { ...b.content, __draft: b.draft || false, __locked: b.locked || false, __visible: b.visible !== false }, is_visible: b.visible && !b.draft, styles: {} }))); if (error) throw error }
           }
           setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
         } catch (e) {
@@ -4213,17 +4243,17 @@
           setSaving(false); setSaveError(true)
         }
       }, 800)
-    }, [blocks, pageName, theme, pageId])
+    }, [blocks, pageName, theme, liveId])
 
     async function handlePublish() {
-      if (!pageId) return
+      if (!IS_UUID(liveId)) return
       setPublishing(true)
       setPublishError("")
       try {
         const { error } = await createClient()
           .from("pages")
           .update({ status: "published", published_at: new Date().toISOString() })
-          .eq("id", pageId)
+          .eq("id", liveId)
         if (error) throw error
         setPageStatus("published")
         setPublishSuccess(true)
@@ -4564,6 +4594,8 @@
           {saving && <span style={{ color: MUTED, fontSize: 10 }}>Enregistrement...</span>}
           {saved && !saveError && <span style={{ color: "#39FF8F", fontSize: 10, display: "flex", alignItems: "center", gap: 3 }}><Check size={10} /> Enregistré</span>}
           {saveError && <button onClick={() => setBlocks(b => [...b])} title="Réessayer la sauvegarde" style={{ color: "#EF4444", fontSize: 10, display: "flex", alignItems: "center", gap: 3, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 6, padding: "3px 8px", cursor: "pointer" }}>⚠ Échec — Réessayer</button>}
+          {pageId && !IS_UUID(pageId) && !liveId && !bootstrapError && <span style={{ color: MUTED, fontSize: 10 }}>Création de la page…</span>}
+          {bootstrapError && <span style={{ color: "#EF4444", fontSize: 10, display: "flex", alignItems: "center", gap: 3 }} title={bootstrapError}>⚠ {bootstrapError}</span>}
           {!pageId && <span style={{ color: "#4A4640", fontSize: 9 }}>Mode démo</span>}
           <div style={{ flex: 1 }} />
 
