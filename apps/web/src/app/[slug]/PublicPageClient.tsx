@@ -175,7 +175,7 @@ function GalleryPublic({ imgs, layout, cols, colsMobile, title, MUTED, FONT_B }:
     <div style={{ padding: "6px 24px 16px" }}>
       {titleEl}
       <div className={`qf-cm-${colsMobile}`} style={{ columnCount: cols, columnGap: 8 }}>
-        {imgs.map((img, i) => <img key={i} src={img} alt="" loading="lazy" onClick={() => open(i)} style={{ width: "100%", borderRadius: 10, marginBottom: 8, display: "block", breakInside: "avoid", cursor: "zoom-in" }} />)}
+        {imgs.map((img, i) => <img key={i} src={img} alt="" loading="lazy" onClick={() => open(i)} onError={e => (e.currentTarget.style.display = "none")} style={{ width: "100%", borderRadius: 10, marginBottom: 8, display: "block", breakInside: "avoid", cursor: "zoom-in" }} />)}
       </div>
       {lightbox}
     </div>
@@ -189,7 +189,7 @@ function GalleryPublic({ imgs, layout, cols, colsMobile, title, MUTED, FONT_B }:
       <div className={`qf-gm-${colsMobile}`} style={{ display: "grid", gridTemplateColumns: `repeat(${effCols},1fr)`, gap }}>
         {imgs.map((img, i) => (
           <div key={i} onClick={() => open(i)} style={{ overflow: "hidden", borderRadius: rad, aspectRatio: "1", cursor: "zoom-in" }}>
-            <img src={img} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s" }}
+            <img src={img} alt="" loading="lazy" onError={e => { const p = e.currentTarget.parentElement; if (p) p.style.display = "none" }} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s" }}
               onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.08)")}
               onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")} />
           </div>
@@ -509,7 +509,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       const ar = isCircle ? "1" : ratioMap[c.ratio || "original"]
       const radius = isCircle ? "50%" : c.rounded === "rounded" ? 16 : 0
       const imgEl = (
-        <img src={c.src} alt={c.alt || c.caption || ""} loading="lazy"
+        <img src={c.src} alt={c.alt || c.caption || ""} loading="lazy" onError={e => (e.currentTarget.style.display = "none")}
           style={{ width: "100%", height: ar ? "100%" : undefined, maxHeight: ar ? undefined : 320, aspectRatio: ar, objectFit: "cover", display: "block", borderRadius: radius, transition: "transform 0.3s" }}
           onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.02)")}
           onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")} />
