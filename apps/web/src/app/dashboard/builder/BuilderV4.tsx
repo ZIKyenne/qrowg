@@ -4189,13 +4189,17 @@
         await supabase.from("pages").update({ title: pageName, theme }).eq("id", pageId)
         const allUuid = blocks.every(b => UUID_RE.test(b.id))
         if (allUuid) {
-          // Sauvegarde qui CONSERVE les IDs : upsert des blocs actuels + suppression des seuls blocs retirés.
+          // Sauvegarde qui CONSERVE les IDs : upsert D'ABORD (le contenu est toujours enregistré),
+          // PUIS suppression des blocs retirés via une liste d'IDs explicite (fiable).
           // -> l'historique de clics (block_clicks.block_id) survit aux publications.
           const rows = blocks.map((b, i) => ({ id: b.id, page_id: pageId, type: b.type, position: i, content: b.content, is_visible: b.visible && !b.draft, is_draft: b.draft || false, is_locked: b.locked || false, styles: {} }))
-          const ids = blocks.map(b => b.id)
-          if (ids.length) await supabase.from("blocks").delete().eq("page_id", pageId).not("id", "in", `(${ids.join(",")})`)
-          else await supabase.from("blocks").delete().eq("page_id", pageId)
+          const keep = new Set(blocks.map(b => b.id))
           if (rows.length) await supabase.from("blocks").upsert(rows, { onConflict: "id" })
+          // Retire de la base les blocs qui ne sont plus dans l'éditeur
+          const { data: existing } = await supabase.from("blocks").select("id").eq("page_id", pageId)
+          const toDelete = (existing || []).map((r: any) => r.id).filter((id: string) => !keep.has(id))
+          if (toDelete.length) await supabase.from("blocks").delete().in("id", toDelete)
+          else if (!rows.length) await supabase.from("blocks").delete().eq("page_id", pageId)
         } else {
           // Repli (IDs legacy non-UUID en mémoire) : ancien comportement, sûr. Les IDs deviennent UUID au prochain chargement.
           await supabase.from("blocks").delete().eq("page_id", pageId)
