@@ -448,6 +448,47 @@ export function productBadgeStyle(label: string, accent: string): { color: strin
   return { color, fg, icon }
 }
 
+// Extrait la valeur numerique d'un prix ecrit librement : "29,90 €", "$29", "1 299.00€",
+// "29.9", "gratuit" -> nombre ou null. Gere separateur decimal , ou . et espaces/milliers.
+export function parsePrice(raw?: string): number | null {
+  if (!raw) return null
+  const s = String(raw).trim().toLowerCase()
+  if (!s) return null
+  if (/(gratuit|offert|free|sur devis|nous consulter)/.test(s)) return null
+  // Retire tout sauf chiffres, virgule, point. On garde le dernier separateur comme decimal.
+  let cleaned = s.replace(/[^0-9.,]/g, "")
+  if (!cleaned) return null
+  const decPos = Math.max(cleaned.lastIndexOf(","), cleaned.lastIndexOf("."))
+  if (decPos >= 0) {
+    const intPart = cleaned.slice(0, decPos).replace(/[.,]/g, "")
+    const decPart = cleaned.slice(decPos + 1).replace(/[.,]/g, "")
+    // Un dernier separateur suivi de 3 chiffres = separateur de milliers (ex "1,299"),
+    // sinon c'est le separateur decimal (ex "29,90" ou "1 299,00").
+    cleaned = decPart.length === 3 ? intPart + decPart : intPart + "." + decPart
+  } else {
+    cleaned = cleaned.replace(/[.,]/g, "")
+  }
+  const n = parseFloat(cleaned)
+  return isFinite(n) ? n : null
+}
+
+// Calcule la reduction entre un prix courant et un ancien prix (tous deux ecrits librement).
+// Renvoie le pourcentage arrondi (-XX%) et l'economie formatee, ou null si non applicable
+// (ancien prix absent/<=  prix, valeurs non numeriques, devises differentes).
+export function priceDiscount(price?: string, oldPrice?: string): { percent: number; label: string; saved: string } | null {
+  const now = parsePrice(price)
+  const was = parsePrice(oldPrice)
+  if (now === null || was === null) return null
+  if (was <= now || now < 0) return null
+  const percent = Math.round((1 - now / was) * 100)
+  if (percent <= 0 || percent >= 100) return null
+  // Suffixe de devise repris de l'ancien prix (ex "€", "$", " USD") pour l'economie.
+  const suffix = (String(oldPrice).match(/[^\d\s.,]+\s*$/)?.[0] || "").trim()
+  const savedNum = Math.round((was - now) * 100) / 100
+  const savedStr = Number.isInteger(savedNum) ? String(savedNum) : savedNum.toFixed(2).replace(".", ",")
+  return { percent, label: `-${percent}%`, saved: suffix ? `${savedStr}${/^[€$£]/.test(suffix) ? "" : " "}${suffix}` : savedStr }
+}
+
 // Statuts de disponibilité (parité builder <-> public). Couleur personnalisable via dot_color.
 export const AVAILABILITY_STATUSES: { key: string; label: string; color: string }[] = [
   { key: "available", label: "Disponible", color: "#39FF8F" },

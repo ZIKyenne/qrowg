@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -641,6 +641,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 7 }}>
               <span style={{ color: G, fontSize: 20, fontWeight: 700, fontFamily: FONT_D }}>{c.price}</span>
               {c.old_price && <span style={{ color: MUTED, fontSize: 13, textDecoration: "line-through", fontFamily: FONT_B }}>{c.old_price}</span>}
+              {(() => { const d = priceDiscount(c.price, c.old_price); return d ? <span style={{ background: "#EF4444", color: "#fff", borderRadius: 5, padding: "2px 7px", fontSize: 11, fontWeight: 800, fontFamily: FONT_B }}>{d.label}</span> : null })()}
             </div>
             {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 10px", lineHeight: 1.6, fontFamily: FONT_B }}>{c.description}</p>}
             {c.cta_label && <a href={c.cta_url||"#"} onClick={() => trackLinkClick(pageId, block.id, c.cta_url||block.type)} style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, color: "#080808", textAlign: "center", padding: "12px", borderRadius: 9, textDecoration: "none", fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{c.cta_label}</a>}
@@ -1073,7 +1074,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: c.cta_label ? 14 : 0 }}>
               <span style={{ color: G, fontSize: 24, fontWeight: 700 }}>{c.price || "99€"}</span>
               {c.old_price && <span style={{ color: MUTED, fontSize: 15, textDecoration: "line-through" }}>{c.old_price}</span>}
-              {c.old_price && <span style={{ background: "#EF4444", color: "#fff", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>Promo</span>}
+              {(() => { const d = priceDiscount(c.price || "99€", c.old_price); return c.old_price ? <span style={{ background: "#EF4444", color: "#fff", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 800 }}>{d ? d.label : "Promo"}</span> : null })()}
             </div>
             {c.cta_label && <a href={c.cta_url || c.url || "#"} target={/^https?:/.test(c.cta_url || c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || c.url || "product")} style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 11, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 800, color: "#080808", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</a>}
           </div>

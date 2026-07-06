@@ -4,6 +4,7 @@ import {
   bannerTitleStyle, bannerFrame, bannerHeight, bannerBackgroundStyle,
   normalizePhoneDigits, waLink, telLink, directionsLink, ctaButtonStyle, stickyActionHref, embedVideoUrl,
   SOCIAL_NETWORKS, SOCIAL_NETWORKS_MAP, productBadgeStyle,
+  parsePrice, priceDiscount,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -303,5 +304,60 @@ describe("bannerBackgroundStyle", () => {
   })
   it("image -> style vide (géré par <img>)", () => {
     expect(Object.keys(bannerBackgroundStyle({ banner_type: "image", src: "x" }, "#C9A84C"))).toHaveLength(0)
+  })
+})
+
+describe("parsePrice", () => {
+  it("vide / gratuit / sur devis -> null", () => {
+    expect(parsePrice("")).toBeNull()
+    expect(parsePrice(undefined)).toBeNull()
+    expect(parsePrice("Gratuit")).toBeNull()
+    expect(parsePrice("Sur devis")).toBeNull()
+  })
+  it("entiers avec devise variée", () => {
+    expect(parsePrice("29€")).toBe(29)
+    expect(parsePrice("$29")).toBe(29)
+    expect(parsePrice("29 USD")).toBe(29)
+    expect(parsePrice("£19")).toBe(19)
+  })
+  it("décimale virgule ou point", () => {
+    expect(parsePrice("29,90 €")).toBeCloseTo(29.9)
+    expect(parsePrice("29.90€")).toBeCloseTo(29.9)
+    expect(parsePrice("9,5")).toBeCloseTo(9.5)
+  })
+  it("séparateur de milliers (3 chiffres) traité comme entier", () => {
+    expect(parsePrice("1,299€")).toBe(1299)
+    expect(parsePrice("1.299 €")).toBe(1299)
+    expect(parsePrice("1 299,00 €")).toBeCloseTo(1299)
+  })
+  it("texte non numérique -> null", () => {
+    expect(parsePrice("abc")).toBeNull()
+  })
+})
+
+describe("priceDiscount", () => {
+  it("ancien prix supérieur -> pourcentage arrondi", () => {
+    const d = priceDiscount("29€", "59€")
+    expect(d).not.toBeNull()
+    expect(d!.percent).toBe(51)
+    expect(d!.label).toBe("-51%")
+  })
+  it("économie formatée avec devise reprise de l'ancien prix", () => {
+    const d = priceDiscount("40€", "50€")
+    expect(d!.percent).toBe(20)
+    expect(d!.saved).toBe("10€")
+  })
+  it("pas de réduction si ancien <= prix", () => {
+    expect(priceDiscount("59€", "29€")).toBeNull()
+    expect(priceDiscount("29€", "29€")).toBeNull()
+  })
+  it("null si prix non numérique ou ancien absent", () => {
+    expect(priceDiscount("29€", undefined)).toBeNull()
+    expect(priceDiscount("Sur devis", "59€")).toBeNull()
+    expect(priceDiscount("29€", "Gratuit")).toBeNull()
+  })
+  it("décimales : 29,90 vs 59,90 ~ -50%", () => {
+    const d = priceDiscount("29,90€", "59,90€")
+    expect(d!.percent).toBe(50)
   })
 })
