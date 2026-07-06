@@ -518,6 +518,36 @@ export function stockStatus(raw?: string, lowThreshold = 5): { state: "out" | "l
   return { state: "in", label: "En stock", color: "#39FF8F", soldOut: false }
 }
 
+// Paiement direct : couleurs/icones de marque + mode de saisie (URL vs pseudo).
+// handleBased = l'utilisateur saisit juste son pseudo, on construit l'URL.
+export const PAYMENT_BRANDS: Record<string, { color: string; icon: string; label: string; handleBased: boolean }> = {
+  Stripe:  { color: "#635BFF", icon: "💳", label: "Stripe",  handleBased: false },
+  PayPal:  { color: "#009CDE", icon: "🅿️", label: "PayPal",  handleBased: true },
+  Lydia:   { color: "#0068FF", icon: "💸", label: "Lydia",   handleBased: false },
+  Revolut: { color: "#0666EB", icon: "🔷", label: "Revolut", handleBased: true },
+  SumUp:   { color: "#1E3A8A", icon: "🧾", label: "SumUp",   handleBased: false },
+}
+export function paymentBrand(platform?: string): { color: string; icon: string; label: string; handleBased: boolean } {
+  return PAYMENT_BRANDS[platform || "Stripe"] || PAYMENT_BRANDS.Stripe
+}
+
+// Construit le lien de paiement final. Priorite a l'URL collee ; sinon, pour les
+// plateformes a pseudo (PayPal.me, Revolut.me), on assemble l'URL depuis le handle
+// (+ montant pour PayPal). Renvoie "" si rien d'exploitable.
+export function paymentLink(c: { platform?: string; url?: string; handle?: string; amount?: string }): string {
+  const url = (c?.url || "").trim()
+  if (/^https?:\/\//i.test(url)) return url
+  const handle = (c?.handle || "").trim().replace(/^@/, "").replace(/\s+/g, "")
+  if (!handle) return ""
+  const platform = c?.platform || "Stripe"
+  if (platform === "PayPal") {
+    const amt = parsePrice(c?.amount)
+    return `https://paypal.me/${handle}${amt !== null ? "/" + amt : ""}`
+  }
+  if (platform === "Revolut") return `https://revolut.me/${handle}`
+  return ""
+}
+
 // Statuts de disponibilité (parité builder <-> public). Couleur personnalisable via dot_color.
 export const AVAILABILITY_STATUSES: { key: string; label: string; color: string }[] = [
   { key: "available", label: "Disponible", color: "#39FF8F" },
@@ -4621,8 +4651,9 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     defaultContent: { label: "Payer maintenant", platform: "Stripe" },
     fields: [
       { key: "label", label: "Texte", type: "text", placeholder: "Payer maintenant" },
-      { key: "url", label: "Lien de paiement", type: "url", placeholder: "https://buy.stripe.com/..." },
-      { key: "platform", label: "Plateforme", type: "select", options: ["Stripe","PayPal","Lydia","Revolut","SumUp"] },
+      { key: "platform", label: "Plateforme", type: "select", options: ["Stripe","PayPal","Lydia","Revolut","SumUp"], hint: "PayPal / Revolut : indiquez juste votre pseudo, le lien se construit tout seul" },
+      { key: "handle", label: "Votre pseudo", type: "text", placeholder: "votre-nom", hint: "Ex : paypal.me/votre-nom -> saisissez votre-nom", showIf: { key: "platform", in: ["PayPal","Revolut"] } },
+      { key: "url", label: "Lien de paiement", type: "url", placeholder: "https://buy.stripe.com/...", showIf: { key: "platform", in: ["Stripe","Lydia","SumUp"] } },
       { key: "amount", label: "Montant affiche", type: "text", placeholder: "29€" },
     ],
   },

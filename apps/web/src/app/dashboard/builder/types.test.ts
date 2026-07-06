@@ -4,7 +4,7 @@ import {
   bannerTitleStyle, bannerFrame, bannerHeight, bannerBackgroundStyle,
   normalizePhoneDigits, waLink, telLink, directionsLink, ctaButtonStyle, stickyActionHref, embedVideoUrl,
   SOCIAL_NETWORKS, SOCIAL_NETWORKS_MAP, productBadgeStyle,
-  parsePrice, priceDiscount, countdownParts, stockStatus,
+  parsePrice, priceDiscount, countdownParts, stockStatus, paymentLink, paymentBrand,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -425,5 +425,42 @@ describe("stockStatus", () => {
   })
   it("extrait l'entier d'un texte (ex '3 restants')", () => {
     expect(stockStatus("3 restants")!.label).toBe("Plus que 3 en stock")
+  })
+})
+
+describe("paymentLink", () => {
+  it("URL http collée = priorité absolue", () => {
+    expect(paymentLink({ platform: "Stripe", url: "https://buy.stripe.com/abc" })).toBe("https://buy.stripe.com/abc")
+    expect(paymentLink({ platform: "PayPal", url: "https://buy.stripe.com/abc", handle: "jean" })).toBe("https://buy.stripe.com/abc")
+  })
+  it("PayPal via pseudo -> paypal.me", () => {
+    expect(paymentLink({ platform: "PayPal", handle: "jean" })).toBe("https://paypal.me/jean")
+    expect(paymentLink({ platform: "PayPal", handle: "@jean" })).toBe("https://paypal.me/jean")
+  })
+  it("PayPal avec montant", () => {
+    expect(paymentLink({ platform: "PayPal", handle: "jean", amount: "29€" })).toBe("https://paypal.me/jean/29")
+  })
+  it("Revolut via pseudo -> revolut.me (sans montant)", () => {
+    expect(paymentLink({ platform: "Revolut", handle: "marie", amount: "10€" })).toBe("https://revolut.me/marie")
+  })
+  it("Stripe/Lydia/SumUp sans URL -> vide", () => {
+    expect(paymentLink({ platform: "Stripe", handle: "jean" })).toBe("")
+    expect(paymentLink({ platform: "Lydia" })).toBe("")
+  })
+  it("pseudo vide -> vide", () => {
+    expect(paymentLink({ platform: "PayPal", handle: "" })).toBe("")
+    expect(paymentLink({ platform: "PayPal" })).toBe("")
+  })
+})
+
+describe("paymentBrand", () => {
+  it("marque connue -> couleur + icône", () => {
+    expect(paymentBrand("PayPal").color).toBe("#009CDE")
+    expect(paymentBrand("PayPal").handleBased).toBe(true)
+    expect(paymentBrand("Stripe").handleBased).toBe(false)
+  })
+  it("inconnu / vide -> Stripe par défaut", () => {
+    expect(paymentBrand(undefined).label).toBe("Stripe")
+    expect(paymentBrand("Bidule").label).toBe("Stripe")
   })
 })
