@@ -295,7 +295,7 @@
         </div>
       )
       case "gallery": {
-        const imgs = [c.img1,c.img2,c.img3,c.img4,c.img5,c.img6].filter(Boolean)
+        const imgs = [c.img1,c.img2,c.img3,c.img4,c.img5,c.img6,c.img7,c.img8,c.img9,c.img10,c.img11,c.img12].filter(Boolean)
         const layout = c.layout || "grid"
         const cols = parseInt(c.columns||"3")
         const title = c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>{c.title}</p>
@@ -1389,7 +1389,7 @@
 
 
       case "image_carousel": {
-        const imgs = [c.img1,c.img2,c.img3,c.img4,c.img5,c.img6].filter(Boolean)
+        const imgs = [c.img1,c.img2,c.img3,c.img4,c.img5,c.img6,c.img7,c.img8,c.img9,c.img10,c.img11,c.img12].filter(Boolean)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
@@ -2678,12 +2678,13 @@
   function GalleryImagesEditor({ block, onChange }: { block: Block; onChange: (key: string, val: string) => void }) {
     const M = "#8A8478", TXT = "#F5F0E8", GG = "var(--accent, #C9A84C)"
     const isCarousel = block.type === "image_carousel"
-    const KEYS = ["img1", "img2", "img3", "img4", "img5", "img6"]
+    const KEYS = ["img1", "img2", "img3", "img4", "img5", "img6", "img7", "img8", "img9", "img10", "img11", "img12"]
+    const MAX = KEYS.length
     const imgs: string[] = KEYS.map(k => block.content[k]).filter(Boolean) as string[]
     const write = (arr: string[]) => KEYS.forEach((k, i) => onChange(k, arr[i] || ""))
     const move = (i: number, d: number) => { const j = i + d; if (j < 0 || j >= imgs.length) return; const a = [...imgs];[a[i], a[j]] = [a[j], a[i]]; write(a) }
     const replaceAt = (i: number, url: string) => { if (!url) { write(imgs.filter((_, j) => j !== i)); return } const a = [...imgs]; a[i] = url; write(a) }
-    const add = (url: string) => { if (url && imgs.length < 6) write([...imgs, url]) }
+    const add = (url: string) => { if (url && imgs.length < MAX) write([...imgs, url]) }
     const inputStyle: React.CSSProperties = { width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
     const Seg = ({ opts, val, k }: { opts: { k: string; l: string }[]; val: string; k: string }) => (
       <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
@@ -2704,7 +2705,7 @@
           <div><label style={{ color: M, fontSize: 11, display: "block", marginBottom: 6, fontWeight: 500 }}>Colonnes (mobile)</label><Seg k="columns_mobile" val={block.content.columns_mobile || "2"} opts={[{ k: "1", l: "1" }, { k: "2", l: "2" }, { k: "3", l: "3" }]} /></div>
         </>)}
         <div>
-          <label style={{ color: M, fontSize: 11, display: "flex", justifyContent: "space-between", marginBottom: 6, fontWeight: 500 }}><span>Images</span><span>{imgs.length}/6</span></label>
+          <label style={{ color: M, fontSize: 11, display: "flex", justifyContent: "space-between", marginBottom: 6, fontWeight: 500 }}><span>Images</span><span>{imgs.length}/{MAX}</span></label>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {imgs.map((img, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -2718,7 +2719,7 @@
               </div>
             ))}
           </div>
-          {imgs.length < 6 && <div style={{ marginTop: 8 }}><ImageUpload value="" onChange={add} hint="Ajouter une image" /></div>}
+          {imgs.length < MAX && <div style={{ marginTop: 8 }}><ImageUpload value="" onChange={add} hint="Ajouter une image" /></div>}
         </div>
       </div>
     )

@@ -526,7 +526,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
     }
 
     case "gallery": {
-      const imgs = [c.img1, c.img2, c.img3, c.img4, c.img5, c.img6].filter(Boolean)
+      const imgs = [c.img1, c.img2, c.img3, c.img4, c.img5, c.img6, c.img7, c.img8, c.img9, c.img10, c.img11, c.img12].filter(Boolean)
       if (imgs.length === 0) return null
       return <GalleryPublic imgs={imgs} layout={c.layout || "grid"} cols={parseInt(c.columns || "3")} colsMobile={parseInt(c.columns_mobile || "2")} title={c.title} MUTED={MUTED} FONT_B={FONT_B} />
     }
@@ -1547,7 +1547,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       ) : null
     }
     case "image_carousel": {
-      const imgs = [c.img1, c.img2, c.img3, c.img4, c.img5, c.img6].filter(Boolean)
+      const imgs = [c.img1, c.img2, c.img3, c.img4, c.img5, c.img6, c.img7, c.img8, c.img9, c.img10, c.img11, c.img12].filter(Boolean)
       return imgs.length > 0 ? <CarouselPublic imgs={imgs} title={c.title} autoplay={c.auto_play === "yes"} MUTED={MUTED} FONT_B={FONT_B} /> : null
     }
     case "media_before_after": return (c.before_img || c.after_img) ? (
