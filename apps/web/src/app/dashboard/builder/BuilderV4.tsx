@@ -3921,6 +3921,7 @@
     const [saving, setSaving] = useState(false)
     const [saved, setSaved] = useState(false)
     const [saveError, setSaveError] = useState(false)
+    const [saveErrorMsg, setSaveErrorMsg] = useState("")
     // ID reel de la page en base. Si l'URL est /builder/new (pageId non-UUID),
     // on cree d'abord la page puis on bascule sur son vrai UUID.
     const [liveId, setLiveId] = useState<string | undefined>(() => (IS_UUID(pageId) ? pageId : undefined))
@@ -4238,8 +4239,9 @@
             if (blocks.length > 0) { const { error } = await supabase.from("blocks").insert(blocks.map((b, i) => ({ page_id: liveId, type: b.type, position: i, content: { ...b.content, __draft: b.draft || false, __locked: b.locked || false, __visible: b.visible !== false }, is_visible: b.visible && !b.draft, styles: {} }))); if (error) throw error }
           }
           setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
-        } catch (e) {
+        } catch (e: any) {
           console.error("[QRfolio] Échec de sauvegarde des blocs :", e)
+          setSaveErrorMsg(e?.message || e?.hint || "Erreur inconnue")
           setSaving(false); setSaveError(true)
         }
       }, 800)
@@ -4593,7 +4595,7 @@
           <input value={pageName} onChange={e => setPageName(e.target.value)} style={{ background: "transparent", border: "none", color: "#F5F0E8", fontSize: 13, fontWeight: 600, outline: "none", width: 160 }} />
           {saving && <span style={{ color: MUTED, fontSize: 10 }}>Enregistrement...</span>}
           {saved && !saveError && <span style={{ color: "#39FF8F", fontSize: 10, display: "flex", alignItems: "center", gap: 3 }}><Check size={10} /> Enregistré</span>}
-          {saveError && <button onClick={() => setBlocks(b => [...b])} title="Réessayer la sauvegarde" style={{ color: "#EF4444", fontSize: 10, display: "flex", alignItems: "center", gap: 3, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 6, padding: "3px 8px", cursor: "pointer" }}>⚠ Échec — Réessayer</button>}
+          {saveError && <button onClick={() => { setSaveError(false); setBlocks(b => [...b]) }} title={saveErrorMsg ? `Erreur : ${saveErrorMsg} — cliquer pour réessayer` : "Réessayer la sauvegarde"} style={{ color: "#EF4444", fontSize: 10, display: "flex", alignItems: "center", gap: 3, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 6, padding: "3px 8px", cursor: "pointer", maxWidth: 340, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>⚠ {saveErrorMsg ? saveErrorMsg : "Échec"} — Réessayer</button>}
           {pageId && !IS_UUID(pageId) && !liveId && !bootstrapError && <span style={{ color: MUTED, fontSize: 10 }}>Création de la page…</span>}
           {bootstrapError && <span style={{ color: "#EF4444", fontSize: 10, display: "flex", alignItems: "center", gap: 3 }} title={bootstrapError}>⚠ {bootstrapError}</span>}
           {!pageId && <span style={{ color: "#4A4640", fontSize: 9 }}>Mode démo</span>}
