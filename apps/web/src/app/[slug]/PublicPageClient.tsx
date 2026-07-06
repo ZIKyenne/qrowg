@@ -82,6 +82,42 @@ const SOCIAL_NETWORKS: Record<string, { icon: string; color: string; label: stri
 
 // ── Render Block ─────────────────────────────────────────────────────────────
 // ── Blocs interactifs publics (onglets / accordéon) ──────────────────────────
+// ── Carrousel plein largeur (autoplay + points + flèches + swipe) ────────────
+function CarouselPublic({ imgs, title, autoplay, MUTED, FONT_B }: { imgs: string[]; title?: string; autoplay: boolean; MUTED: string; FONT_B: string }) {
+  const [idx, setIdx] = useState(0)
+  const paused = useRef(false)
+  const drag = useRef<{ x: number } | null>(null)
+  const go = (n: number) => setIdx(((n % imgs.length) + imgs.length) % imgs.length)
+  useEffect(() => {
+    if (!autoplay || imgs.length < 2) return
+    const t = setInterval(() => { if (!paused.current) setIdx(i => (i + 1) % imgs.length) }, 3500)
+    return () => clearInterval(t)
+  }, [autoplay, imgs.length])
+  const onDown = (e: React.PointerEvent) => { drag.current = { x: e.clientX }; paused.current = true }
+  const onUp = (e: React.PointerEvent) => {
+    if (drag.current) { const dx = e.clientX - drag.current.x; if (dx > 40) go(idx - 1); else if (dx < -40) go(idx + 1) }
+    drag.current = null; paused.current = false
+  }
+  return (
+    <div style={{ padding: "10px 24px 14px" }}>
+      {title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{title}</p>}
+      <div style={{ position: "relative", overflow: "hidden", borderRadius: 14, touchAction: "pan-y" }}
+        onPointerDown={onDown} onPointerUp={onUp} onMouseEnter={() => paused.current = true} onMouseLeave={() => paused.current = false}>
+        <div style={{ display: "flex", transition: "transform .45s cubic-bezier(.2,.8,.2,1)", transform: `translateX(-${idx * 100}%)` }}>
+          {imgs.map((img, i) => <img key={i} src={img} alt="" loading={i === 0 ? "eager" : "lazy"} draggable={false} style={{ width: "100%", height: 240, flexShrink: 0, objectFit: "cover", display: "block", userSelect: "none" }} />)}
+        </div>
+        {imgs.length > 1 && <>
+          <button onClick={() => go(idx - 1)} aria-label="Précédente" style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", width: 34, height: 34, borderRadius: "50%", background: "rgba(0,0,0,0.45)", border: "none", color: "#fff", fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>‹</button>
+          <button onClick={() => go(idx + 1)} aria-label="Suivante" style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", width: 34, height: 34, borderRadius: "50%", background: "rgba(0,0,0,0.45)", border: "none", color: "#fff", fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>›</button>
+          <div style={{ position: "absolute", bottom: 10, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 6 }}>
+            {imgs.map((_, i) => <button key={i} onClick={() => go(i)} aria-label={`Photo ${i + 1}`} style={{ width: i === idx ? 18 : 7, height: 7, borderRadius: 4, border: "none", background: i === idx ? "#fff" : "rgba(255,255,255,0.5)", cursor: "pointer", transition: "width .2s, background .2s", padding: 0 }} />)}
+          </div>
+        </>}
+      </div>
+    </div>
+  )
+}
+
 // ── Galerie publique avec lightbox plein écran (clic pour agrandir + navigation) ──
 function GalleryPublic({ imgs, layout, cols, title, MUTED, FONT_B }: { imgs: string[]; layout: string; cols: number; title?: string; MUTED: string; FONT_B: string }) {
   const [idx, setIdx] = useState<number | null>(null)
@@ -1485,14 +1521,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
     }
     case "image_carousel": {
       const imgs = [c.img1, c.img2, c.img3, c.img4, c.img5, c.img6].filter(Boolean)
-      return imgs.length > 0 ? (
-        <div style={{ padding: "10px 24px 14px" }}>
-          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
-          <div style={{ display: "flex", gap: 9, overflowX: "auto", paddingBottom: 4, scrollSnapType: "x mandatory" }}>
-            {imgs.map((img, i) => <img key={i} src={String(img)} alt="" style={{ width: 150, height: 150, flexShrink: 0, objectFit: "cover", borderRadius: 11, scrollSnapAlign: "start" }} />)}
-          </div>
-        </div>
-      ) : null
+      return imgs.length > 0 ? <CarouselPublic imgs={imgs} title={c.title} autoplay={c.auto_play === "yes"} MUTED={MUTED} FONT_B={FONT_B} /> : null
     }
     case "media_before_after": return (c.before_img || c.after_img) ? (
       <div style={{ padding: "10px 24px 14px" }}>
