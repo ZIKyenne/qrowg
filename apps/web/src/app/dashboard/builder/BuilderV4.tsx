@@ -296,10 +296,25 @@
       )
       case "gallery": {
         const imgs = [c.img1,c.img2,c.img3,c.img4,c.img5,c.img6].filter(Boolean)
+        const layout = c.layout || "grid"
+        const cols = parseInt(c.columns||"3")
+        const title = c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>{c.title}</p>
+        if (imgs.length>0 && layout==="masonry") return (
+          <div style={{ padding: "10px 14px", ...s }}>
+            {title}
+            <div style={{ columnCount: cols, columnGap: 4 }}>
+              {imgs.map((img,i) => <img key={i} src={img} alt="" style={{ width: "100%", borderRadius: 6, marginBottom: 4, display: "block", breakInside: "avoid" }} />)}
+            </div>
+          </div>
+        )
+        const effCols = layout==="compact" ? Math.max(cols,3) : cols
         return (
-          <div style={{ padding: "10px 14px", display: "grid", gridTemplateColumns: `repeat(${parseInt(c.columns||"3")},1fr)`, gap: 4, ...s }}>
-            {imgs.length>0 ? imgs.map((img,i) => <img key={i} src={img} alt="" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: 6 }} />)
-              : [0,1,2,3,4,5].map(i => <div key={i} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 6, aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: muted }}>🖼️</div>)}
+          <div style={{ padding: "10px 14px", ...s }}>
+            {title}
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${effCols},1fr)`, gap: 4 }}>
+              {imgs.length>0 ? imgs.map((img,i) => <img key={i} src={img} alt="" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: 6 }} />)
+                : [0,1,2,3,4,5].map(i => <div key={i} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 6, aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: muted }}>🖼️</div>)}
+            </div>
           </div>
         )
       }

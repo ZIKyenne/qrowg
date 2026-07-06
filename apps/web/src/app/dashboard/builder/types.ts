@@ -2753,9 +2753,11 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   gallery: {
     label: "Galerie photos", description: "Grille de 2 a 6 photos",
     icon: "🎨", color: "#A78BFA", category: "media",
-    defaultContent: { columns: "3" },
+    defaultContent: { columns: "3", layout: "grid" },
     fields: [
-      { key: "columns", label: "Colonnes", type: "select", options: ["2", "3"] },
+      { key: "title", label: "Titre (optionnel)", type: "text", placeholder: "Ma galerie" },
+      { key: "layout", label: "Affichage", type: "select", options: ["grid", "masonry", "compact"], hint: "grid = grille carrée · masonry = mosaïque · compact = petites vignettes" },
+      { key: "columns", label: "Colonnes", type: "select", options: ["2", "3", "4"] },
       { key: "img1", label: "Photo 1", type: "image" },
       { key: "img2", label: "Photo 2", type: "image" },
       { key: "img3", label: "Photo 3", type: "image" },

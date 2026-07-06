@@ -393,19 +393,36 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
     ) : null
 
     case "gallery": {
-      const imgs = [c.img1,c.img2,c.img3,c.img4,c.img5,c.img6].filter(Boolean)
+      const imgs = [c.img1, c.img2, c.img3, c.img4, c.img5, c.img6].filter(Boolean)
+      if (imgs.length === 0) return null
+      const layout = c.layout || "grid"
       const cols = parseInt(c.columns || "3")
-      return imgs.length > 0 ? (
-        <div style={{ padding: "6px 24px 16px", display: "grid", gridTemplateColumns: `repeat(${cols},1fr)`, gap: 7 }}>
-          {imgs.map((img: string, i: number) => (
-            <div key={i} style={{ overflow: "hidden", borderRadius: 10, aspectRatio: "1" }}>
-              <img src={img} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s" }}
-                onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.08)")}
-                onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")} />
-            </div>
-          ))}
+      const title = c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>
+      if (layout === "masonry") return (
+        <div style={{ padding: "6px 24px 16px" }}>
+          {title}
+          <div style={{ columnCount: cols, columnGap: 8 }}>
+            {imgs.map((img: string, i: number) => <img key={i} src={img} alt="" loading="lazy" style={{ width: "100%", borderRadius: 10, marginBottom: 8, display: "block", breakInside: "avoid" }} />)}
+          </div>
         </div>
-      ) : null
+      )
+      const effCols = layout === "compact" ? Math.max(cols, 3) : cols
+      const gap = layout === "compact" ? 5 : 7
+      const rad = layout === "compact" ? 8 : 10
+      return (
+        <div style={{ padding: "6px 24px 16px" }}>
+          {title}
+          <div style={{ display: "grid", gridTemplateColumns: `repeat(${effCols},1fr)`, gap }}>
+            {imgs.map((img: string, i: number) => (
+              <div key={i} style={{ overflow: "hidden", borderRadius: rad, aspectRatio: "1" }}>
+                <img src={img} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s" }}
+                  onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.08)")}
+                  onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )
     }
 
     case "video": return c.url ? (
