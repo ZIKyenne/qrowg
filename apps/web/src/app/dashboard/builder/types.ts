@@ -412,6 +412,30 @@ export function telLink(phone?: string): string {
   return `tel:${raw.startsWith("+") ? "+" : ""}${digits}`
 }
 
+// Style d'un badge produit (Nouveau, Promo, Signature, Épuisé…) selon son libellé. Parité builder <-> public.
+export function productBadgeStyle(label: string, accent: string): { color: string; fg: string; icon: string } {
+  const l = (label || "").toLowerCase()
+  const map: { kw: string[]; color: string; icon: string }[] = [
+    { kw: ["promo", "solde", "réduction", "reduction"], color: "#EF4444", icon: "🏷️" },
+    { kw: ["nouveau", "new "], color: "#39FF8F", icon: "✨" },
+    { kw: ["populaire", "best", "meilleur"], color: "#F97316", icon: "🔥" },
+    { kw: ["signature", "coup de c"], color: "#C9A84C", icon: "⭐" },
+    { kw: ["épuisé", "epuise", "rupture", "complet"], color: "#8A8478", icon: "⛔" },
+    { kw: ["bientôt", "bientot"], color: "#38BDF8", icon: "⏳" },
+    { kw: ["limité", "limite", "dernièr", "dernier", "stock"], color: "#F97316", icon: "⏰" },
+    { kw: ["fait maison", "maison"], color: "#FBBF24", icon: "🏠" },
+    { kw: ["local"], color: "#39FF8F", icon: "📍" },
+    { kw: ["bio", "vegan", "végan"], color: "#39FF8F", icon: "🌿" },
+    { kw: ["offre"], color: "#EF4444", icon: "⚡" },
+  ]
+  const found = map.find(m => m.kw.some(k => l.includes(k)))
+  const color = found?.color || accent
+  const first = (label || "").trim().codePointAt(0) || 0
+  const icon = (found?.icon && first < 0x2000) ? found.icon : ""
+  const fg = (color === "#8A8478" || color === "#EF4444") ? "#fff" : "#080808"
+  return { color, fg, icon }
+}
+
 // Statuts de disponibilité (parité builder <-> public). Couleur personnalisable via dot_color.
 export const AVAILABILITY_STATUSES: { key: string; label: string; color: string }[] = [
   { key: "available", label: "Disponible", color: "#39FF8F" },
@@ -2884,9 +2908,9 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   featured_product: {
     label: "Produit vedette", description: "Mettre en avant une offre principale",
     icon: "⭐", color: "#F97316", category: "commerce",
-    defaultContent: { badge: "⭐ Recommandé", cta_label: "Commander maintenant" },
+    defaultContent: { badge: "Signature", cta_label: "Commander maintenant" },
     fields: [
-      { key: "badge", label: "Badge", type: "text", placeholder: "⭐ Recommandé" },
+      { key: "badge", label: "Badge", type: "text", placeholder: "Nouveau, Promo, Signature…", hint: "Se colore automatiquement selon le mot", suggestions: ["Nouveau", "Populaire", "Promo", "Signature", "Fait maison", "Local", "Bio", "Offre limitée", "Bientôt disponible", "Épuisé"] },
       { key: "image", label: "Image produit", type: "image" },
       { key: "name", label: "Nom", type: "text", placeholder: "Mon produit phare" },
       { key: "price", label: "Prix", type: "text", placeholder: "99€" },

@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, waLink, telLink, directionsLink, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, waLink, telLink, directionsLink, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -940,7 +940,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
     case "featured_product": return (c.name || c.image) ? (
       <div style={{ padding: "10px 24px 14px" }}>
         <div style={{ background: `linear-gradient(135deg,${G}12,${theme.accent || "#39FF8F"}0a)`, border: `1.5px solid ${G}30`, borderRadius: 16, overflow: "hidden" }}>
-          {c.badge && <div style={{ background: G, color: "#080808", padding: "7px 14px", fontSize: 12, fontWeight: 700, textAlign: "center" }}>{c.badge}</div>}
+          {c.badge && (() => { const bs = productBadgeStyle(c.badge, G); return <div style={{ background: bs.color, color: bs.fg, padding: "7px 14px", fontSize: 12, fontWeight: 700, textAlign: "center" }}>{bs.icon ? bs.icon + " " : ""}{c.badge}</div> })()}
           {c.image
             ? <img src={c.image} alt="" style={{ width: "100%", height: 200, objectFit: "cover", display: "block" }} />
             : <div style={{ height: 150, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(249,115,22,0.06)", fontSize: 48 }}>⭐</div>}

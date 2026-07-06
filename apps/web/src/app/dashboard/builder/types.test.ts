@@ -3,7 +3,7 @@ import {
   bannerImageStyle, bannerOverlayLayers, availabilityStatus, profileBadgeStyle,
   bannerTitleStyle, bannerFrame, bannerHeight, bannerBackgroundStyle,
   normalizePhoneDigits, waLink, telLink, directionsLink, ctaButtonStyle, stickyActionHref,
-  SOCIAL_NETWORKS, SOCIAL_NETWORKS_MAP,
+  SOCIAL_NETWORKS, SOCIAL_NETWORKS_MAP, productBadgeStyle,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -245,6 +245,31 @@ describe("SOCIAL_NETWORKS_MAP (parité éditeur <-> public)", () => {
     for (const k of ["instagram", "tiktok", "youtube", "spotify", "deezer", "twitch", "threads", "linkedin", "discord", "behance"]) {
       expect(SOCIAL_NETWORKS_MAP[k]).toBeTruthy()
     }
+  })
+})
+
+describe("productBadgeStyle", () => {
+  it("Promo -> rouge + icône", () => {
+    const b = productBadgeStyle("Promo -30%", "#C9A84C")
+    expect(b.color).toBe("#EF4444")
+    expect(b.icon).toBe("🏷️")
+    expect(b.fg).toBe("#fff")
+  })
+  it("Nouveau -> vert", () => {
+    expect(productBadgeStyle("Nouveau", "#C9A84C").color).toBe("#39FF8F")
+  })
+  it("Épuisé -> gris + texte clair", () => {
+    const b = productBadgeStyle("Épuisé", "#C9A84C")
+    expect(b.color).toBe("#8A8478")
+    expect(b.fg).toBe("#fff")
+  })
+  it("inconnu -> accent, pas d'icône", () => {
+    const b = productBadgeStyle("MonBadge", "#C9A84C")
+    expect(b.color).toBe("#C9A84C")
+    expect(b.icon).toBe("")
+  })
+  it("libellé avec emoji -> pas de double icône", () => {
+    expect(productBadgeStyle("⭐ Signature", "#C9A84C").icon).toBe("")
   })
 })
 
