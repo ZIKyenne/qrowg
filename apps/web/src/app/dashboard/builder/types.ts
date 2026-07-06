@@ -545,6 +545,74 @@ export const SOCIAL_PRESETS: { key: string; label: string; emoji: string; networ
   { key: "evenement", label: "Événement", emoji: "🎫", networks: ["instagram", "tiktok", "facebook"] },
 ]
 
+// Modèles Médias par métier : un clic crée un ensemble de blocs média adaptés.
+export const MEDIA_PRESETS: { key: string; label: string; emoji: string; blocks: { type: string; content: Record<string, string> }[] }[] = [
+  {
+    key: "restaurant", label: "Restaurant / Bar", emoji: "🍽️",
+    blocks: [
+      { type: "gallery", content: { title: "Notre ambiance" } },
+      { type: "image_carousel", content: { title: "Nos plats & cocktails" } },
+      { type: "pdf_viewer", content: { title: "Notre menu (PDF)" } },
+    ],
+  },
+  {
+    key: "photographe", label: "Photographe", emoji: "📷",
+    blocks: [
+      { type: "gallery", content: { title: "Portfolio" } },
+      { type: "media_before_after", content: { title: "Avant / Après" } },
+      { type: "pdf_viewer", content: { title: "Mes tarifs (PDF)" } },
+    ],
+  },
+  {
+    key: "musicien", label: "Musicien / Artiste", emoji: "🎸",
+    blocks: [
+      { type: "youtube_gallery", content: { title: "Mes clips" } },
+      { type: "gallery", content: { title: "En concert" } },
+      { type: "pdf_viewer", content: { title: "Press kit" } },
+    ],
+  },
+  {
+    key: "immobilier", label: "Immobilier", emoji: "🏡",
+    blocks: [
+      { type: "gallery", content: { title: "Photos du bien" } },
+      { type: "media_before_after", content: { title: "Avant / Après rénovation" } },
+      { type: "pdf_viewer", content: { title: "Brochure du bien (PDF)" } },
+    ],
+  },
+  {
+    key: "coach", label: "Coach / Formation", emoji: "🎓",
+    blocks: [
+      { type: "video_local", content: { title: "Ma présentation" } },
+      { type: "video_testimonials", content: { title: "Témoignages" } },
+      { type: "pdf_viewer", content: { title: "Le programme (PDF)" } },
+    ],
+  },
+  {
+    key: "entreprise", label: "Entreprise", emoji: "🏢",
+    blocks: [
+      { type: "video_local", content: { title: "Vidéo de présentation" } },
+      { type: "logo_wall", content: { title: "Ils nous font confiance" } },
+      { type: "pdf_viewer", content: { title: "Notre brochure (PDF)" } },
+    ],
+  },
+  {
+    key: "evenement", label: "Événement", emoji: "🎫",
+    blocks: [
+      { type: "youtube_gallery", content: { title: "Teaser & aftermovie" } },
+      { type: "gallery", content: { title: "Édition précédente" } },
+      { type: "pdf_viewer", content: { title: "Le programme (PDF)" } },
+    ],
+  },
+  {
+    key: "createur", label: "Créateur de contenu", emoji: "✨",
+    blocks: [
+      { type: "tiktok_gallery", content: { title: "Mes vidéos" } },
+      { type: "youtube_gallery", content: { title: "Ma chaîne" } },
+      { type: "gallery", content: { title: "Mes contenus" } },
+    ],
+  },
+]
+
 // Modèles Commerce par métier : un clic crée un ensemble de blocs de vente adaptés.
 export const COMMERCE_PRESETS: { key: string; label: string; emoji: string; blocks: { type: string; content: Record<string, string> }[] }[] = [
   {
