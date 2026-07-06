@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, waLink, telLink, directionsLink, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -531,8 +531,8 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
     case "video": return c.url ? (
       <div style={{ padding: "6px 24px 16px" }}>
         <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, borderRadius: 14, overflow: "hidden", boxShadow: `0 8px 30px rgba(0,0,0,0.4)` }}>
-          <iframe src={c.url.replace("watch?v=","embed/").replace("youtu.be/","www.youtube.com/embed/")}
-            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }} allowFullScreen />
+          <iframe src={embedVideoUrl(c.url)} loading="lazy" title={c.title || "Vidéo"}
+            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
         </div>
         {c.title && <p style={{ color: MUTED, fontSize: 12, textAlign: "center", margin: "8px 0 0", fontFamily: FONT_B }}>{c.title}</p>}
       </div>
@@ -1565,14 +1565,22 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
         {c.description && <p style={{ color: MUTED, fontSize: 12, textAlign: "center", margin: "9px 0 0" }}>{c.description}</p>}
       </div>
     ) : null
-    case "video_local": return c.src ? (
-      <div style={{ padding: "10px 24px 14px" }}>
-        <div style={{ borderRadius: 13, overflow: "hidden", background: "#000" }}>
-          <video src={c.src} poster={c.poster || undefined} controls style={{ width: "100%", maxHeight: 260, display: "block" }} autoPlay={c.autoplay === "yes"} loop={c.loop === "yes"} muted={c.muted !== "no"} playsInline />
+    case "video_local": {
+      if (!c.src) return null
+      const arMap: Record<string, string | undefined> = { "16:9": "16/9", "9:16": "9/16", "1:1": "1" }
+      const ar = arMap[c.ratio || "16:9"]
+      const vertical = c.ratio === "9:16"
+      return (
+        <div style={{ padding: "10px 24px 14px" }}>
+          <div style={{ borderRadius: 13, overflow: "hidden", background: "#000", maxWidth: vertical ? 280 : undefined, margin: vertical ? "0 auto" : undefined }}>
+            <video src={c.src} poster={c.poster || undefined} controls
+              style={{ width: "100%", aspectRatio: ar, maxHeight: ar ? undefined : 260, objectFit: "cover", display: "block" }}
+              autoPlay={c.autoplay === "yes"} loop={c.loop === "yes"} muted={c.muted !== "no"} playsInline />
+          </div>
+          {c.title && <p style={{ color: TEXT, fontSize: 14, fontWeight: 600, margin: "9px 0 0", textAlign: "center", fontFamily: FONT_B }}>{c.title}</p>}
         </div>
-        {c.title && <p style={{ color: TEXT, fontSize: 14, fontWeight: 600, margin: "9px 0 0", textAlign: "center", fontFamily: FONT_B }}>{c.title}</p>}
-      </div>
-    ) : null
+      )
+    }
     case "pdf_viewer": return (c.url || c.title) ? (
       <div style={{ padding: "10px 24px 14px" }}>
         <div style={{ background: "rgba(78,205,196,0.06)", border: "1.5px solid rgba(78,205,196,0.2)", borderRadius: 15, padding: "17px" }}>

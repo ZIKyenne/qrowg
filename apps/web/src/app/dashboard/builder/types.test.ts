@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest"
 import {
   bannerImageStyle, bannerOverlayLayers, availabilityStatus, profileBadgeStyle,
   bannerTitleStyle, bannerFrame, bannerHeight, bannerBackgroundStyle,
-  normalizePhoneDigits, waLink, telLink, directionsLink, ctaButtonStyle, stickyActionHref,
+  normalizePhoneDigits, waLink, telLink, directionsLink, ctaButtonStyle, stickyActionHref, embedVideoUrl,
   SOCIAL_NETWORKS, SOCIAL_NETWORKS_MAP, productBadgeStyle,
 } from "./types"
 
@@ -169,6 +169,27 @@ describe("waLink / telLink", () => {
   })
   it("telLink vide -> vide", () => {
     expect(telLink("")).toBe("")
+  })
+})
+
+describe("embedVideoUrl", () => {
+  it("YouTube watch -> embed", () => {
+    expect(embedVideoUrl("https://youtube.com/watch?v=abc123&t=10")).toBe("https://www.youtube.com/embed/abc123")
+  })
+  it("youtu.be court -> embed", () => {
+    expect(embedVideoUrl("https://youtu.be/xyz789")).toBe("https://www.youtube.com/embed/xyz789")
+  })
+  it("YouTube Shorts -> embed", () => {
+    expect(embedVideoUrl("https://www.youtube.com/shorts/short01")).toBe("https://www.youtube.com/embed/short01")
+  })
+  it("Vimeo -> player", () => {
+    expect(embedVideoUrl("https://vimeo.com/123456789")).toBe("https://player.vimeo.com/video/123456789")
+  })
+  it("lien inconnu -> tel quel", () => {
+    expect(embedVideoUrl("https://exemple.com/video")).toBe("https://exemple.com/video")
+  })
+  it("vide -> vide", () => {
+    expect(embedVideoUrl("")).toBe("")
   })
 })
 

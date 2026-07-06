@@ -405,6 +405,18 @@ export function directionsLink(address?: string, provider?: string): string {
     default: return `https://www.google.com/maps/dir/?api=1&destination=${enc}` // google / auto
   }
 }
+// Transforme un lien vidéo (YouTube/Vimeo/Dailymotion, toutes formes) en URL d'intégration propre.
+export function embedVideoUrl(raw?: string): string {
+  const u = (raw || "").trim()
+  if (!u) return ""
+  let m = u.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([\w-]+)/)
+  if (m) return `https://www.youtube.com/embed/${m[1]}`
+  m = u.match(/vimeo\.com\/(?:video\/)?(\d+)/)
+  if (m) return `https://player.vimeo.com/video/${m[1]}`
+  m = u.match(/dailymotion\.com\/video\/([\w]+)/) || u.match(/dai\.ly\/([\w]+)/)
+  if (m) return `https://www.dailymotion.com/embed/video/${m[1]}`
+  return u
+}
 export function telLink(phone?: string): string {
   const raw = (phone || "").trim()
   const digits = raw.replace(/\D/g, "")
@@ -4122,6 +4134,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     fields: [
       { key: "src", label: "URL de la vidéo", type: "url", placeholder: "https://... (.mp4, .mov, .webm)" },
       { key: "poster", label: "Image de couverture", type: "image" },
+      { key: "ratio", label: "Format", type: "select", options: ["16:9", "9:16", "1:1", "original"], hint: "9:16 pour une vidéo verticale (TikTok, Reels)" },
       { key: "title", label: "Titre", type: "text", placeholder: "Ma vidéo" },
       { key: "autoplay", label: "Lecture auto", type: "select", options: ["no", "yes"] },
       { key: "loop", label: "Boucle", type: "select", options: ["no", "yes"] },
