@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import { createClient } from "@/lib/supabase/client"
@@ -401,7 +401,8 @@
                 {c.old_price && <span style={{ color: muted, fontSize: 12, textDecoration: "line-through" }}>{c.old_price}</span>}
                 {(() => { const d = priceDiscount(c.price, c.old_price); return d ? <span style={{ background: "#EF4444", color: "#fff", borderRadius: 5, padding: "1px 6px", fontSize: 10, fontWeight: 800 }}>{d.label}</span> : null })()}
               </div>
-              {c.cta_label && <div style={{ background: `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 7, padding: "8px", textAlign: "center", fontSize: 12, fontWeight: 700, color: "#080808" }}>{c.cta_label}</div>}
+              {(() => { const st = stockStatus(c.stock); return st ? <p style={{ color: st.color, fontSize: 10, fontWeight: 700, margin: "0 0 6px" }}>{st.state === "in" ? "✓ " : st.state === "out" ? "⛔ " : "🔥 "}{st.label}</p> : null })()}
+              {c.cta_label && (() => { const out = stockStatus(c.stock)?.soldOut; return <div style={{ background: out ? "rgba(255,255,255,0.08)" : `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 7, padding: "8px", textAlign: "center", fontSize: 12, fontWeight: 700, color: out ? muted : "#080808" }}>{out ? "Epuise" : c.cta_label}</div> })()}
             </div>
           </div>
         </div>
@@ -1043,7 +1044,8 @@
                 {c.old_price && <span style={{ color: muted, fontSize: 14, textDecoration: "line-through" }}>{c.old_price}</span>}
                 {(() => { const d = priceDiscount(c.price||"99€", c.old_price); return c.old_price ? <span style={{ background: "#EF4444", color: "#fff", borderRadius: 6, padding: "2px 7px", fontSize: 10, fontWeight: 800 }}>{d ? d.label : "Promo"}</span> : null })()}
               </div>
-              {c.cta_label && <div style={{ background: `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#080808" }}>{c.cta_label}</div>}
+              {(() => { const st = stockStatus(c.stock); return st ? <p style={{ color: st.color, fontSize: 11, fontWeight: 700, margin: "0 0 10px" }}>{st.state === "in" ? "✓ " : st.state === "out" ? "⛔ " : "🔥 "}{st.label}</p> : null })()}
+              {c.cta_label && (() => { const out = stockStatus(c.stock)?.soldOut; return <div style={{ background: out ? "rgba(255,255,255,0.08)" : `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: out ? muted : "#080808" }}>{out ? "Epuise" : c.cta_label}</div> })()}
             </div>
           </div>
         </div>

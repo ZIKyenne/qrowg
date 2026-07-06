@@ -507,6 +507,17 @@ export function countdownParts(targetMs: number, nowMs: number): { days: number;
   }
 }
 
+// Statut de stock a partir d'un champ libre (entier). Vide/non numerique -> null (rien affiche).
+// 0 ou moins -> epuise (CTA a griser). 1..seuil -> rarete (urgence). > seuil -> en stock (rassurance).
+export function stockStatus(raw?: string, lowThreshold = 5): { state: "out" | "low" | "in"; label: string; color: string; soldOut: boolean } | null {
+  if (raw === undefined || raw === null || String(raw).trim() === "") return null
+  const n = parseInt(String(raw).replace(/[^0-9-]/g, ""), 10)
+  if (!isFinite(n)) return null
+  if (n <= 0) return { state: "out", label: "Epuise", color: "#8A8478", soldOut: true }
+  if (n <= lowThreshold) return { state: "low", label: `Plus que ${n} en stock`, color: "#F97316", soldOut: false }
+  return { state: "in", label: "En stock", color: "#39FF8F", soldOut: false }
+}
+
 // Statuts de disponibilité (parité builder <-> public). Couleur personnalisable via dot_color.
 export const AVAILABILITY_STATUSES: { key: string; label: string; color: string }[] = [
   { key: "available", label: "Disponible", color: "#39FF8F" },
@@ -2741,6 +2752,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "old_price", label: "Ancien prix (optionnel)", type: "text", placeholder: "59€" },
       { key: "description", label: "Description", type: "textarea", placeholder: "Description du produit..." },
       { key: "image", label: "Image", type: "image" },
+      { key: "stock", label: "Stock restant (optionnel)", type: "text", placeholder: "3", hint: "Affiche la rarete. 0 = Epuise (bouton grise). Vide = rien" },
       { key: "cta_label", label: "Texte bouton", type: "text", placeholder: "Commander" },
       { key: "cta_url", label: "Lien", type: "url", placeholder: "https://" },
     ],
@@ -3065,6 +3077,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "price", label: "Prix", type: "text", placeholder: "99€" },
       { key: "old_price", label: "Ancien prix", type: "text", placeholder: "149€" },
       { key: "description", label: "Description", type: "textarea", placeholder: "Ce produit change tout..." },
+      { key: "stock", label: "Stock restant (optionnel)", type: "text", placeholder: "3", hint: "Affiche la rarete. 0 = Epuise (bouton grise). Vide = rien" },
       { key: "cta_label", label: "Bouton", type: "text", placeholder: "Commander maintenant" },
       { key: "cta_url", label: "Lien", type: "url", placeholder: "https://..." },
     ],

@@ -4,7 +4,7 @@ import {
   bannerTitleStyle, bannerFrame, bannerHeight, bannerBackgroundStyle,
   normalizePhoneDigits, waLink, telLink, directionsLink, ctaButtonStyle, stickyActionHref, embedVideoUrl,
   SOCIAL_NETWORKS, SOCIAL_NETWORKS_MAP, productBadgeStyle,
-  parsePrice, priceDiscount, countdownParts,
+  parsePrice, priceDiscount, countdownParts, stockStatus,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -394,5 +394,36 @@ describe("countdownParts", () => {
     expect(p.hours).toBe(0)
     expect(p.mins).toBe(0)
     expect(p.secs).toBe(45)
+  })
+})
+
+describe("stockStatus", () => {
+  it("vide / non numérique -> null (rien affiché)", () => {
+    expect(stockStatus("")).toBeNull()
+    expect(stockStatus(undefined)).toBeNull()
+    expect(stockStatus("beaucoup")).toBeNull()
+  })
+  it("0 ou négatif -> épuisé + soldOut", () => {
+    const s = stockStatus("0")
+    expect(s!.state).toBe("out")
+    expect(s!.soldOut).toBe(true)
+    expect(stockStatus("-3")!.state).toBe("out")
+  })
+  it("1..seuil -> rareté (urgence), pas soldOut", () => {
+    const s = stockStatus("3")
+    expect(s!.state).toBe("low")
+    expect(s!.label).toBe("Plus que 3 en stock")
+    expect(s!.soldOut).toBe(false)
+    expect(stockStatus("5")!.state).toBe("low")
+  })
+  it("au-dessus du seuil -> en stock", () => {
+    expect(stockStatus("42")!.state).toBe("in")
+    expect(stockStatus("6")!.state).toBe("in")
+  })
+  it("seuil personnalisable", () => {
+    expect(stockStatus("8", 10)!.state).toBe("low")
+  })
+  it("extrait l'entier d'un texte (ex '3 restants')", () => {
+    expect(stockStatus("3 restants")!.label).toBe("Plus que 3 en stock")
   })
 })
