@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -35,29 +35,6 @@ function AnimatedBlock({ children, delay = 0 }: { children: React.ReactNode; del
 }
 
 // ── Countdown ────────────────────────────────────────────────────────────────
-function CountdownTimer({ date, theme }: { date: string; theme: any }) {
-  const [time, setTime] = useState({ d: 0, h: 0, m: 0, s: 0 })
-  useEffect(() => {
-    function update() {
-      const diff = new Date(date).getTime() - Date.now()
-      if (diff <= 0) return
-      setTime({ d: Math.floor(diff / 86400000), h: Math.floor(diff / 3600000) % 24, m: Math.floor(diff / 60000) % 60, s: Math.floor(diff / 1000) % 60 })
-    }
-    update(); const t = setInterval(update, 1000); return () => clearInterval(t)
-  }, [date])
-  const G = theme.primary
-  return (
-    <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-      {[["d","Jours"],["h","Heures"],["m","Min"],["s","Sec"]].map(([k,l]) => (
-        <div key={k} style={{ textAlign: "center", background: `${G}12`, border: `1px solid ${G}25`, borderRadius: 12, padding: "12px 14px", minWidth: 56, transition: "transform 0.1s" }}>
-          <p style={{ color: G, fontSize: 26, fontWeight: 700, margin: 0, fontFamily: theme.fontDisplay }}>{String((time as any)[k]).padStart(2,"0")}</p>
-          <p style={{ color: theme.muted, fontSize: 10, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>{l}</p>
-        </div>
-      ))}
-    </div>
-  )
-}
-
 // ── FAQ Item ─────────────────────────────────────────────────────────────────
 function FAQItem({ q, a, theme }: { q: string; a: string; theme: any }) {
   const [open, setOpen] = useState(false)
@@ -102,6 +79,41 @@ function BeforeAfterPublic({ before, after, beforeLabel, afterLabel }: { before:
       {/* Labels */}
       <span style={{ position: "absolute", bottom: 10, left: 10, background: "rgba(239,68,68,0.85)", color: "#fff", fontSize: 11, fontWeight: 700, borderRadius: 6, padding: "3px 9px" }}>{beforeLabel}</span>
       <span style={{ position: "absolute", bottom: 10, right: 10, background: "rgba(57,255,143,0.85)", color: "#080808", fontSize: 11, fontWeight: 700, borderRadius: 6, padding: "3px 9px" }}>{afterLabel}</span>
+    </div>
+  )
+}
+
+// ── Compte à rebours d'offre (tick 1s, urgence) ──────────────────────────────
+function CountdownPublic({ c, TEXT, MUTED, FONT_D, FONT_B, pageId, blockId }: { c: any; TEXT: string; MUTED: string; FONT_D: string; FONT_B: string; pageId: string; blockId: string }) {
+  const accent = c.accent || "#EF4444"
+  const rawTarget = c.target || c.date  // rétrocompat : ancien bloc event utilisait `date`
+  const targetMs = rawTarget ? new Date(rawTarget).getTime() : NaN
+  const [now, setNow] = useState<number>(() => Date.now())
+  useEffect(() => {
+    if (!isFinite(targetMs)) return
+    const id = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [targetMs])
+  if (!isFinite(targetMs)) return null
+  const p = countdownParts(targetMs, now)
+  const units: [string, number][] = [["Jours", p.days], ["Heures", p.hours], ["Min", p.mins], ["Sec", p.secs]]
+  return (
+    <div style={{ padding: "14px 16px" }}>
+      <div style={{ background: `linear-gradient(135deg,${accent}22,${accent}0d)`, border: `1px solid ${accent}55`, borderRadius: 14, padding: "18px 16px", textAlign: "center" }}>
+        {c.title && <p style={{ color: TEXT, fontSize: 18, fontWeight: 800, margin: "0 0 4px", fontFamily: FONT_D }}>{c.title}</p>}
+        {c.subtitle && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 14px", fontFamily: FONT_B }}>{c.subtitle}</p>}
+        {p.expired
+          ? <p style={{ color: accent, fontSize: 17, fontWeight: 800, margin: "8px 0 0", fontFamily: FONT_D }}>{c.expired_text || "Offre terminée"}</p>
+          : <div style={{ display: "flex", justifyContent: "center", gap: 10 }} role="timer" aria-label="Compte à rebours">
+              {units.map(([lbl, val]) => (
+                <div key={lbl} style={{ minWidth: 62, background: "rgba(0,0,0,0.28)", border: `1px solid ${accent}33`, borderRadius: 11, padding: "10px 6px" }}>
+                  <div style={{ color: accent, fontSize: 26, fontWeight: 800, fontVariantNumeric: "tabular-nums", lineHeight: 1, fontFamily: FONT_D }}>{String(val).padStart(2, "0")}</div>
+                  <div style={{ color: MUTED, fontSize: 10, marginTop: 4, textTransform: "uppercase", letterSpacing: 0.6, fontFamily: FONT_B }}>{lbl}</div>
+                </div>
+              ))}
+            </div>}
+        {!p.expired && c.cta_label && <a href={c.cta_url || "#"} onClick={() => trackLinkClick(pageId, blockId, c.cta_url || "countdown")} style={{ display: "inline-block", marginTop: 16, background: accent, color: "#fff", padding: "11px 24px", borderRadius: 9, textDecoration: "none", fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{c.cta_label}</a>}
+      </div>
     </div>
   )
 }
@@ -650,6 +662,8 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       </div>
     )
 
+    case "countdown": return <CountdownPublic c={c} TEXT={TEXT} MUTED={MUTED} FONT_D={FONT_D} FONT_B={FONT_B} pageId={pageId} blockId={block.id} />
+
     case "promo_banner": return (
       <div style={{ padding: "6px 24px 16px" }}>
         <div style={{ background: "linear-gradient(135deg,rgba(249,115,22,0.12),rgba(249,115,22,0.06))", border: "1px solid rgba(249,115,22,0.25)", borderRadius: 14, padding: "18px 18px", textAlign: "center" }}>
@@ -697,14 +711,6 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
         </div>
       ) : null
     }
-
-    case "countdown": return (
-      <div style={{ padding: "16px 24px 20px", textAlign: "center" }}>
-        {c.title && <p style={{ color: MUTED, fontSize: 11, margin: "0 0 14px", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: FONT_B }}>{c.title}</p>}
-        <CountdownTimer date={c.date||"2025-12-31"} theme={theme} />
-        {c.subtitle && <p style={{ color: MUTED, fontSize: 13, margin: "12px 0 0", lineHeight: 1.6, fontFamily: FONT_B }}>{c.subtitle}</p>}
-      </div>
-    )
 
     case "event_info": return (
       <div style={{ padding: "6px 24px 16px" }}>

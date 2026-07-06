@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import { createClient } from "@/lib/supabase/client"
@@ -126,23 +126,37 @@
     )
   }
 
-  function CountdownDisplay({ date, theme }: { date: string; theme: PageTheme }) {
-    const [time, setTime] = useState({ d: 0, h: 0, m: 0, s: 0 })
+
+  // Compte a rebours vivant (tick 1s). Partage la logique pure countdownParts.
+  function CountdownBox({ c, text, muted }: { c: any; text: string; muted: string }) {
+    const accent = c.accent || "#EF4444"
+    const rawTarget = c.target || c.date  // retrocompat : ancien bloc event utilisait `date`
+    const targetMs = rawTarget ? new Date(rawTarget).getTime() : NaN
+    const [now, setNow] = useState<number>(() => (typeof Date !== "undefined" ? Date.now() : 0))
     useEffect(() => {
-      const update = () => {
-        const diff = new Date(date).getTime() - Date.now()
-        if (diff > 0) setTime({ d: Math.floor(diff/86400000), h: Math.floor(diff/3600000)%24, m: Math.floor(diff/60000)%60, s: Math.floor(diff/1000)%60 })
-      }
-      update(); const t = setInterval(update, 1000); return () => clearInterval(t)
-    }, [date])
+      if (!isFinite(targetMs)) return
+      const id = setInterval(() => setNow(Date.now()), 1000)
+      return () => clearInterval(id)
+    }, [targetMs])
+    const p = countdownParts(targetMs, now)
+    const units: [string, number][] = [["Jours", p.days], ["Heures", p.hours], ["Min", p.mins], ["Sec", p.secs]]
     return (
-      <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-        {[["d","J"],["h","H"],["m","M"],["s","S"]].map(([k,l]) => (
-          <div key={k} style={{ textAlign: "center", background: theme.primary+"15", border: `1px solid ${theme.primary}30`, borderRadius: 8, padding: "8px 10px", minWidth: 44 }}>
-            <p style={{ color: theme.primary, fontSize: 20, fontWeight: 700, margin: 0 }}>{String((time as any)[k]).padStart(2,"0")}</p>
-            <p style={{ color: theme.muted, fontSize: 9, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>{l}</p>
-          </div>
-        ))}
+      <div style={{ background: `linear-gradient(135deg,${accent}22,${accent}0d)`, border: `1px solid ${accent}55`, borderRadius: 12, padding: "14px", textAlign: "center" }}>
+        {c.title && <p style={{ color: text, fontSize: 15, fontWeight: 800, margin: "0 0 3px" }}>{c.title}</p>}
+        {c.subtitle && <p style={{ color: muted, fontSize: 11, margin: "0 0 10px" }}>{c.subtitle}</p>}
+        {!rawTarget
+          ? <p style={{ color: muted, fontSize: 11, margin: "6px 0 0" }}>Choisissez une date de fin ⏳</p>
+          : p.expired
+          ? <p style={{ color: accent, fontSize: 14, fontWeight: 800, margin: "6px 0 0" }}>{c.expired_text || "Offre terminee"}</p>
+          : <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
+              {units.map(([lbl, val]) => (
+                <div key={lbl} style={{ minWidth: 52, background: "rgba(0,0,0,0.25)", border: `1px solid ${accent}33`, borderRadius: 9, padding: "8px 4px" }}>
+                  <div style={{ color: accent, fontSize: 20, fontWeight: 800, fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{String(val).padStart(2, "0")}</div>
+                  <div style={{ color: muted, fontSize: 9, marginTop: 3, textTransform: "uppercase", letterSpacing: 0.5 }}>{lbl}</div>
+                </div>
+              ))}
+            </div>}
+        {!p.expired && rawTarget && c.cta_label && <div style={{ display: "inline-block", marginTop: 12, background: accent, color: "#fff", padding: "8px 18px", borderRadius: 8, fontSize: 13, fontWeight: 700 }}>{c.cta_label}</div>}
       </div>
     )
   }
@@ -402,6 +416,11 @@
           </div>
         </div>
       )
+      case "countdown": return (
+        <div style={{ padding: "10px 16px", ...s }}>
+          <CountdownBox c={c} text={text} muted={muted} />
+        </div>
+      )
       case "menu_section": return (
         <div style={{ padding: "10px 16px", ...s }}>
           {c.category && <p style={{ color: primary, fontSize: 12, fontWeight: 700, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: 1 }}>{c.category}</p>}
@@ -440,13 +459,6 @@
           </div>
         )
       }
-      case "countdown": return (
-        <div style={{ padding: "14px 16px", textAlign: "center", ...s }}>
-          {c.title && <p style={{ color: muted, fontSize: 11, margin: "0 0 12px", textTransform: "uppercase", letterSpacing: 1 }}>{c.title}</p>}
-          <CountdownDisplay date={c.date||"2026-12-31"} theme={theme} />
-          {c.subtitle && <p style={{ color: muted, fontSize: 11, margin: "10px 0 0" }}>{c.subtitle}</p>}
-        </div>
-      )
       case "event_info": return (
         <div style={{ padding: "10px 16px", ...s }}>
           <div style={{ background: "rgba(236,72,153,0.08)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 12, padding: "14px" }}>
@@ -2924,6 +2936,8 @@
                 </div>
               : field.type === "image"
               ? <ImageUpload value={block.content[field.key]||""} onChange={url => onChange(field.key, url)} hint={field.hint} />
+              : field.type === "datetime"
+              ? <input type="datetime-local" value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)} style={inputStyle} onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"} onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />
               : <input type={field.type==="url" ? "url" : "text"} value={block.content[field.key]||""}
                   onChange={e => onChange(field.key, e.target.value)}
                   placeholder={field.placeholder} style={inputStyle}

@@ -4,7 +4,7 @@ import {
   bannerTitleStyle, bannerFrame, bannerHeight, bannerBackgroundStyle,
   normalizePhoneDigits, waLink, telLink, directionsLink, ctaButtonStyle, stickyActionHref, embedVideoUrl,
   SOCIAL_NETWORKS, SOCIAL_NETWORKS_MAP, productBadgeStyle,
-  parsePrice, priceDiscount,
+  parsePrice, priceDiscount, countdownParts,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -359,5 +359,40 @@ describe("priceDiscount", () => {
   it("décimales : 29,90 vs 59,90 ~ -50%", () => {
     const d = priceDiscount("29,90€", "59,90€")
     expect(d!.percent).toBe(50)
+  })
+})
+
+describe("countdownParts", () => {
+  const DAY = 86400000, HOUR = 3600000, MIN = 60000, SEC = 1000
+  it("cible NaN (aucune date) -> non expiré, zéros", () => {
+    const p = countdownParts(NaN, 1000)
+    expect(p.expired).toBe(false)
+    expect(p.days).toBe(0)
+    expect(Number.isNaN(p.totalMs)).toBe(true)
+  })
+  it("cible dépassée -> expired", () => {
+    const p = countdownParts(1000, 5000)
+    expect(p.expired).toBe(true)
+    expect(p.totalMs).toBe(0)
+  })
+  it("cible = maintenant -> expired (diff 0)", () => {
+    expect(countdownParts(1000, 1000).expired).toBe(true)
+  })
+  it("décompose j/h/m/s correctement", () => {
+    const now = 0
+    const target = 2 * DAY + 3 * HOUR + 4 * MIN + 5 * SEC
+    const p = countdownParts(target, now)
+    expect(p.expired).toBe(false)
+    expect(p.days).toBe(2)
+    expect(p.hours).toBe(3)
+    expect(p.mins).toBe(4)
+    expect(p.secs).toBe(5)
+  })
+  it("moins d'une minute", () => {
+    const p = countdownParts(45 * SEC, 0)
+    expect(p.days).toBe(0)
+    expect(p.hours).toBe(0)
+    expect(p.mins).toBe(0)
+    expect(p.secs).toBe(45)
   })
 })

@@ -489,6 +489,24 @@ export function priceDiscount(price?: string, oldPrice?: string): { percent: num
   return { percent, label: `-${percent}%`, saved: suffix ? `${savedStr}${/^[€$£]/.test(suffix) ? "" : " "}${suffix}` : savedStr }
 }
 
+// Decompose le temps restant jusqu'a une echeance en jours/heures/minutes/secondes.
+// Pur et testable : le now est injecte par l'appelant (Date.now() cote UI).
+// targetMs NaN (aucune date) -> non expire, zeros. targetMs depasse -> expired.
+export function countdownParts(targetMs: number, nowMs: number): { days: number; hours: number; mins: number; secs: number; expired: boolean; totalMs: number } {
+  if (!isFinite(targetMs)) return { days: 0, hours: 0, mins: 0, secs: 0, expired: false, totalMs: NaN }
+  const diff = targetMs - nowMs
+  if (diff <= 0) return { days: 0, hours: 0, mins: 0, secs: 0, expired: true, totalMs: 0 }
+  const s = Math.floor(diff / 1000)
+  return {
+    days: Math.floor(s / 86400),
+    hours: Math.floor((s % 86400) / 3600),
+    mins: Math.floor((s % 3600) / 60),
+    secs: s % 60,
+    expired: false,
+    totalMs: diff,
+  }
+}
+
 // Statuts de disponibilité (parité builder <-> public). Couleur personnalisable via dot_color.
 export const AVAILABILITY_STATUSES: { key: string; label: string; color: string }[] = [
   { key: "available", label: "Disponible", color: "#39FF8F" },
@@ -2562,7 +2580,7 @@ export const BLOCK_CATEGORIES = [
 export interface BlockField {
   key: string
   label: string
-  type: "text" | "textarea" | "url" | "select" | "color" | "image" | "date"
+  type: "text" | "textarea" | "url" | "select" | "color" | "image" | "date" | "datetime"
   placeholder?: string
   options?: string[]
   hint?: string
@@ -2965,13 +2983,17 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   },
   // ── Event ─────────────────────────────────────────────────────────────────
   countdown: {
-    label: "Countdown", description: "Compte a rebours",
-    icon: "⏱️", color: "#F472B6", category: "event",
-    defaultContent: { title: "Dans combien de temps...", date: "2025-12-31", subtitle: "" },
+    label: "Compte a rebours", description: "Decompte live jusqu a une echeance (offre, lancement, evenement)",
+    icon: "⏳", color: "#EF4444", category: "event",
+    defaultContent: { title: "Offre limitee", subtitle: "Profitez-en avant la fin", target: "", expired_text: "C est termine", cta_label: "", cta_url: "", accent: "#EF4444" },
     fields: [
-      { key: "title", label: "Titre", type: "text", placeholder: "Le lancement arrive dans..." },
-      { key: "date", label: "Date cible", type: "date" },
-      { key: "subtitle", label: "Sous-titre", type: "text", placeholder: "Soyez au rendez-vous !" },
+      { key: "title", label: "Titre", type: "text", placeholder: "Offre limitee -30%" },
+      { key: "subtitle", label: "Sous-titre", type: "text", placeholder: "Profitez-en avant la fin" },
+      { key: "target", label: "Date et heure de fin", type: "datetime", hint: "Le decompte s arrete a cette date (jour + heure)" },
+      { key: "expired_text", label: "Message une fois termine", type: "text", placeholder: "Offre terminee" },
+      { key: "cta_label", label: "Bouton (optionnel)", type: "text", placeholder: "En profiter" },
+      { key: "cta_url", label: "Lien du bouton", type: "url", placeholder: "https://" },
+      { key: "accent", label: "Couleur d accent", type: "color", placeholder: "#EF4444" },
     ],
   },
   event_info: {
