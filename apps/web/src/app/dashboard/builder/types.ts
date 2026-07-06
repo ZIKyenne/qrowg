@@ -4133,8 +4133,11 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     defaultContent: { cta_label: "Voir en plein écran" },
     fields: [
       { key: "url", label: "URL du PDF", type: "url", placeholder: "https://...pdf" },
+      { key: "cover", label: "Image de couverture (optionnel)", type: "image", hint: "Aperçu affiché en haut de la carte" },
       { key: "title", label: "Titre", type: "text", placeholder: "Mon catalogue" },
       { key: "description", label: "Description", type: "text", placeholder: "Téléchargez notre brochure" },
+      { key: "pages", label: "Nombre de pages (optionnel)", type: "text", placeholder: "12" },
+      { key: "file_size", label: "Taille (optionnel)", type: "text", placeholder: "2,4 Mo" },
       { key: "cta_label", label: "Bouton", type: "text", placeholder: "Voir en plein écran" },
       { key: "show_download", label: "Bouton télécharger", type: "select", options: ["yes", "no"] },
     ],

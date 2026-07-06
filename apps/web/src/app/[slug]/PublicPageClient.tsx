@@ -1550,11 +1550,13 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
     case "pdf_viewer": return (c.url || c.title) ? (
       <div style={{ padding: "10px 24px 14px" }}>
         <div style={{ background: "rgba(78,205,196,0.06)", border: "1.5px solid rgba(78,205,196,0.2)", borderRadius: 15, padding: "17px" }}>
+          {c.cover && <div style={{ borderRadius: 11, overflow: "hidden", marginBottom: 13, boxShadow: "0 6px 20px rgba(0,0,0,0.35)" }}><img src={c.cover} alt={c.title || "Couverture du document"} loading="lazy" style={{ width: "100%", maxHeight: 260, objectFit: "cover", display: "block" }} /></div>}
           <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: c.url ? 13 : 0 }}>
-            <div style={{ width: 46, height: 54, background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 23, flexShrink: 0 }}>📄</div>
+            {!c.cover && <div style={{ width: 46, height: 54, background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 23, flexShrink: 0 }}>📄</div>}
             <div style={{ flex: 1 }}>
               <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{c.title || "Mon document PDF"}</p>
-              {c.description && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{c.description}</p>}
+              {c.description && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 2px" }}>{c.description}</p>}
+              {(c.pages || c.file_size) && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>📄 PDF{c.pages ? ` · ${c.pages} pages` : ""}{c.file_size ? ` · ${c.file_size}` : ""}</p>}
             </div>
           </div>
           {c.url && (

@@ -1449,11 +1449,13 @@
       case "pdf_viewer": return (
         <div style={{ padding: "10px 16px", ...s }}>
           <div style={{ background: "rgba(78,205,196,0.06)", border: "1.5px solid rgba(78,205,196,0.2)", borderRadius: 14, padding: "16px" }}>
+            {c.cover && <div style={{ borderRadius: 10, overflow: "hidden", marginBottom: 12 }}><img src={c.cover} alt="" style={{ width: "100%", maxHeight: 180, objectFit: "cover", display: "block" }} /></div>}
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: c.url ? 12 : 0 }}>
-              <div style={{ width: 44, height: 52, background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>📄</div>
+              {!c.cover && <div style={{ width: 44, height: 52, background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>📄</div>}
               <div style={{ flex: 1 }}>
                 <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{c.title||"Mon document PDF"}</p>
-                {c.description && <p style={{ color: muted, fontSize: 11, margin: 0 }}>{c.description}</p>}
+                {c.description && <p style={{ color: muted, fontSize: 11, margin: "0 0 2px" }}>{c.description}</p>}
+                {(c.pages || c.file_size) && <p style={{ color: muted, fontSize: 10, margin: 0 }}>📄 PDF{c.pages ? ` · ${c.pages} pages` : ""}{c.file_size ? ` · ${c.file_size}` : ""}</p>}
               </div>
             </div>
             {c.url && (
