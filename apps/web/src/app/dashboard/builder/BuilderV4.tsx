@@ -3917,6 +3917,7 @@
     const [dayMode, setDayMode] = useState(false)
     const [saving, setSaving] = useState(false)
     const [saved, setSaved] = useState(false)
+    const [saveError, setSaveError] = useState(false)
     const [showPublishPopup, setShowPublishPopup] = useState(false)
     const [publishing, setPublishing] = useState(false)
     const [publishSuccess, setPublishSuccess] = useState(false)
@@ -4184,28 +4185,31 @@
       if (!pageId) return
       clearTimeout(saveTimeout.current)
       saveTimeout.current = setTimeout(async () => {
-        setSaving(true)
-        const supabase = createClient()
-        await supabase.from("pages").update({ title: pageName, theme }).eq("id", pageId)
-        const allUuid = blocks.every(b => UUID_RE.test(b.id))
-        if (allUuid) {
-          // Sauvegarde qui CONSERVE les IDs : upsert D'ABORD (le contenu est toujours enregistré),
-          // PUIS suppression des blocs retirés via une liste d'IDs explicite (fiable).
-          // -> l'historique de clics (block_clicks.block_id) survit aux publications.
-          const rows = blocks.map((b, i) => ({ id: b.id, page_id: pageId, type: b.type, position: i, content: b.content, is_visible: b.visible && !b.draft, is_draft: b.draft || false, is_locked: b.locked || false, styles: {} }))
-          const keep = new Set(blocks.map(b => b.id))
-          if (rows.length) await supabase.from("blocks").upsert(rows, { onConflict: "id" })
-          // Retire de la base les blocs qui ne sont plus dans l'éditeur
-          const { data: existing } = await supabase.from("blocks").select("id").eq("page_id", pageId)
-          const toDelete = (existing || []).map((r: any) => r.id).filter((id: string) => !keep.has(id))
-          if (toDelete.length) await supabase.from("blocks").delete().in("id", toDelete)
-          else if (!rows.length) await supabase.from("blocks").delete().eq("page_id", pageId)
-        } else {
-          // Repli (IDs legacy non-UUID en mémoire) : ancien comportement, sûr. Les IDs deviennent UUID au prochain chargement.
-          await supabase.from("blocks").delete().eq("page_id", pageId)
-          if (blocks.length > 0) await supabase.from("blocks").insert(blocks.map((b, i) => ({ page_id: pageId, type: b.type, position: i, content: b.content, is_visible: b.visible && !b.draft, is_draft: b.draft || false, is_locked: b.locked || false, styles: {} })))
+        setSaving(true); setSaveError(false)
+        try {
+          const supabase = createClient()
+          await supabase.from("pages").update({ title: pageName, theme }).eq("id", pageId)
+          const allUuid = blocks.every(b => UUID_RE.test(b.id))
+          if (allUuid) {
+            // Sauvegarde qui CONSERVE les IDs : upsert D'ABORD (le contenu est toujours enregistré),
+            // PUIS suppression des blocs retirés via une liste d'IDs explicite (fiable).
+            const rows = blocks.map((b, i) => ({ id: b.id, page_id: pageId, type: b.type, position: i, content: b.content, is_visible: b.visible && !b.draft, is_draft: b.draft || false, is_locked: b.locked || false, styles: {} }))
+            const keep = new Set(blocks.map(b => b.id))
+            if (rows.length) { const { error } = await supabase.from("blocks").upsert(rows, { onConflict: "id" }); if (error) throw error }
+            const { data: existing } = await supabase.from("blocks").select("id").eq("page_id", pageId)
+            const toDelete = (existing || []).map((r: any) => r.id).filter((id: string) => !keep.has(id))
+            if (toDelete.length) await supabase.from("blocks").delete().in("id", toDelete)
+            else if (!rows.length) await supabase.from("blocks").delete().eq("page_id", pageId)
+          } else {
+            // Repli (IDs legacy non-UUID) : delete-all + insert. Les IDs deviennent UUID au prochain chargement.
+            await supabase.from("blocks").delete().eq("page_id", pageId)
+            if (blocks.length > 0) { const { error } = await supabase.from("blocks").insert(blocks.map((b, i) => ({ page_id: pageId, type: b.type, position: i, content: b.content, is_visible: b.visible && !b.draft, is_draft: b.draft || false, is_locked: b.locked || false, styles: {} }))); if (error) throw error }
+          }
+          setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
+        } catch (e) {
+          console.error("[QRfolio] Échec de sauvegarde des blocs :", e)
+          setSaving(false); setSaveError(true)
         }
-        setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
       }, 800)
     }, [blocks, pageName, theme, pageId])
 
@@ -4556,7 +4560,8 @@
           <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.08)" }} />
           <input value={pageName} onChange={e => setPageName(e.target.value)} style={{ background: "transparent", border: "none", color: "#F5F0E8", fontSize: 13, fontWeight: 600, outline: "none", width: 160 }} />
           {saving && <span style={{ color: MUTED, fontSize: 10 }}>Enregistrement...</span>}
-          {saved && <span style={{ color: "#39FF8F", fontSize: 10, display: "flex", alignItems: "center", gap: 3 }}><Check size={10} /> Enregistré</span>}
+          {saved && !saveError && <span style={{ color: "#39FF8F", fontSize: 10, display: "flex", alignItems: "center", gap: 3 }}><Check size={10} /> Enregistré</span>}
+          {saveError && <button onClick={() => setBlocks(b => [...b])} title="Réessayer la sauvegarde" style={{ color: "#EF4444", fontSize: 10, display: "flex", alignItems: "center", gap: 3, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 6, padding: "3px 8px", cursor: "pointer" }}>⚠ Échec — Réessayer</button>}
           {!pageId && <span style={{ color: "#4A4640", fontSize: 9 }}>Mode démo</span>}
           <div style={{ flex: 1 }} />
 
