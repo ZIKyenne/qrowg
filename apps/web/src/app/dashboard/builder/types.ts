@@ -4141,6 +4141,18 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "muted", label: "Muet", type: "select", options: ["yes", "no"] },
     ],
   },
+  audio_player: {
+    label: "Lecteur audio", description: "Écouter un fichier audio (MP3, WAV, M4A)",
+    icon: "🎧", color: "#A78BFA", category: "media",
+    defaultContent: { show_download: "no" },
+    fields: [
+      { key: "src", label: "URL du fichier audio", type: "url", placeholder: "https://... (.mp3, .wav, .m4a)" },
+      { key: "cover", label: "Pochette (optionnel)", type: "image" },
+      { key: "title", label: "Titre", type: "text", placeholder: "Nom du morceau / épisode" },
+      { key: "artist", label: "Artiste / auteur (optionnel)", type: "text", placeholder: "Votre nom" },
+      { key: "show_download", label: "Bouton télécharger", type: "select", options: ["no", "yes"] },
+    ],
+  },
   pdf_viewer: {
     label: "PDF Viewer", description: "Afficher un PDF directement sur la page",
     icon: "📄", color: "#4ECDC4", category: "media",

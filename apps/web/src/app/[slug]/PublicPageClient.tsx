@@ -1581,6 +1581,23 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
         </div>
       )
     }
+    case "audio_player": return c.src ? (
+      <div style={{ padding: "10px 24px 14px" }}>
+        <div style={{ background: "rgba(167,139,250,0.06)", border: "1.5px solid rgba(167,139,250,0.22)", borderRadius: 15, padding: "15px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: 13 }}>
+            {c.cover
+              ? <img src={c.cover} alt="" loading="lazy" style={{ width: 60, height: 60, borderRadius: 11, objectFit: "cover", flexShrink: 0 }} />
+              : <div style={{ width: 60, height: 60, borderRadius: 11, background: "rgba(167,139,250,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, flexShrink: 0 }}>🎧</div>}
+            <div style={{ minWidth: 0 }}>
+              <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.title || "Écouter"}</p>
+              {c.artist && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{c.artist}</p>}
+            </div>
+          </div>
+          <audio src={c.src} controls preload="none" style={{ width: "100%", display: "block" }} />
+          {c.show_download === "yes" && <a href={c.src} download onClick={() => trackLinkClick(pageId, block.id, "audio-download")} style={{ display: "inline-block", marginTop: 9, color: MUTED, fontSize: 12, fontWeight: 600, textDecoration: "none" }}>↓ Télécharger</a>}
+        </div>
+      </div>
+    ) : null
     case "pdf_viewer": return (c.url || c.title) ? (
       <div style={{ padding: "10px 24px 14px" }}>
         <div style={{ background: "rgba(78,205,196,0.06)", border: "1.5px solid rgba(78,205,196,0.2)", borderRadius: 15, padding: "17px" }}>
