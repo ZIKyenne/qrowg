@@ -2700,7 +2700,8 @@
           <div><label style={{ color: M, fontSize: 11, display: "block", marginBottom: 6, fontWeight: 500 }}>Défilement automatique</label><Seg k="auto_play" val={block.content.auto_play || "no"} opts={[{ k: "no", l: "Non" }, { k: "yes", l: "Oui" }]} /></div>
         ) : (<>
           <div><label style={{ color: M, fontSize: 11, display: "block", marginBottom: 6, fontWeight: 500 }}>Affichage</label><Seg k="layout" val={block.content.layout || "grid"} opts={[{ k: "grid", l: "Grille" }, { k: "masonry", l: "Mosaïque" }, { k: "compact", l: "Compact" }]} /></div>
-          <div><label style={{ color: M, fontSize: 11, display: "block", marginBottom: 6, fontWeight: 500 }}>Colonnes</label><Seg k="columns" val={block.content.columns || "3"} opts={[{ k: "2", l: "2" }, { k: "3", l: "3" }, { k: "4", l: "4" }]} /></div>
+          <div><label style={{ color: M, fontSize: 11, display: "block", marginBottom: 6, fontWeight: 500 }}>Colonnes (ordinateur)</label><Seg k="columns" val={block.content.columns || "3"} opts={[{ k: "2", l: "2" }, { k: "3", l: "3" }, { k: "4", l: "4" }]} /></div>
+          <div><label style={{ color: M, fontSize: 11, display: "block", marginBottom: 6, fontWeight: 500 }}>Colonnes (mobile)</label><Seg k="columns_mobile" val={block.content.columns_mobile || "2"} opts={[{ k: "1", l: "1" }, { k: "2", l: "2" }, { k: "3", l: "3" }]} /></div>
         </>)}
         <div>
           <label style={{ color: M, fontSize: 11, display: "flex", justifyContent: "space-between", marginBottom: 6, fontWeight: 500 }}><span>Images</span><span>{imgs.length}/6</span></label>

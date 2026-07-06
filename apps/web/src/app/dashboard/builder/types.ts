@@ -2772,7 +2772,8 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     fields: [
       { key: "title", label: "Titre (optionnel)", type: "text", placeholder: "Ma galerie" },
       { key: "layout", label: "Affichage", type: "select", options: ["grid", "masonry", "compact"], hint: "grid = grille carrée · masonry = mosaïque · compact = petites vignettes" },
-      { key: "columns", label: "Colonnes", type: "select", options: ["2", "3", "4"] },
+      { key: "columns", label: "Colonnes (ordinateur)", type: "select", options: ["2", "3", "4"] },
+      { key: "columns_mobile", label: "Colonnes (mobile)", type: "select", options: ["1", "2", "3"] },
       { key: "img1", label: "Photo 1", type: "image" },
       { key: "img2", label: "Photo 2", type: "image" },
       { key: "img3", label: "Photo 3", type: "image" },

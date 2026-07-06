@@ -143,7 +143,7 @@ function CarouselPublic({ imgs, title, autoplay, MUTED, FONT_B }: { imgs: string
 }
 
 // ── Galerie publique avec lightbox plein écran (clic pour agrandir + navigation) ──
-function GalleryPublic({ imgs, layout, cols, title, MUTED, FONT_B }: { imgs: string[]; layout: string; cols: number; title?: string; MUTED: string; FONT_B: string }) {
+function GalleryPublic({ imgs, layout, cols, colsMobile, title, MUTED, FONT_B }: { imgs: string[]; layout: string; cols: number; colsMobile: number; title?: string; MUTED: string; FONT_B: string }) {
   const [idx, setIdx] = useState<number | null>(null)
   useEffect(() => {
     if (idx === null) return
@@ -174,7 +174,7 @@ function GalleryPublic({ imgs, layout, cols, title, MUTED, FONT_B }: { imgs: str
   if (layout === "masonry") return (
     <div style={{ padding: "6px 24px 16px" }}>
       {titleEl}
-      <div style={{ columnCount: cols, columnGap: 8 }}>
+      <div className={`qf-cm-${colsMobile}`} style={{ columnCount: cols, columnGap: 8 }}>
         {imgs.map((img, i) => <img key={i} src={img} alt="" loading="lazy" onClick={() => open(i)} style={{ width: "100%", borderRadius: 10, marginBottom: 8, display: "block", breakInside: "avoid", cursor: "zoom-in" }} />)}
       </div>
       {lightbox}
@@ -186,7 +186,7 @@ function GalleryPublic({ imgs, layout, cols, title, MUTED, FONT_B }: { imgs: str
   return (
     <div style={{ padding: "6px 24px 16px" }}>
       {titleEl}
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(${effCols},1fr)`, gap }}>
+      <div className={`qf-gm-${colsMobile}`} style={{ display: "grid", gridTemplateColumns: `repeat(${effCols},1fr)`, gap }}>
         {imgs.map((img, i) => (
           <div key={i} onClick={() => open(i)} style={{ overflow: "hidden", borderRadius: rad, aspectRatio: "1", cursor: "zoom-in" }}>
             <img src={img} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s" }}
@@ -528,7 +528,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
     case "gallery": {
       const imgs = [c.img1, c.img2, c.img3, c.img4, c.img5, c.img6].filter(Boolean)
       if (imgs.length === 0) return null
-      return <GalleryPublic imgs={imgs} layout={c.layout || "grid"} cols={parseInt(c.columns || "3")} title={c.title} MUTED={MUTED} FONT_B={FONT_B} />
+      return <GalleryPublic imgs={imgs} layout={c.layout || "grid"} cols={parseInt(c.columns || "3")} colsMobile={parseInt(c.columns_mobile || "2")} title={c.title} MUTED={MUTED} FONT_B={FONT_B} />
     }
 
     case "video": return c.url ? (
@@ -2507,7 +2507,15 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
         @keyframes profilePulse { 0%,100% { box-shadow: 0 0 0 0 ${theme.primary}30; } 50% { box-shadow: 0 0 0 12px ${theme.primary}00; } }
         * { -webkit-tap-highlight-color: transparent; }
         a:active { opacity: 0.75; }
-        @media (max-width: 640px) { .qf-hide-mobile { display: none !important; } }
+        @media (max-width: 640px) {
+          .qf-hide-mobile { display: none !important; }
+          .qf-gm-1 { grid-template-columns: 1fr !important; }
+          .qf-gm-2 { grid-template-columns: 1fr 1fr !important; }
+          .qf-gm-3 { grid-template-columns: 1fr 1fr 1fr !important; }
+          .qf-cm-1 { column-count: 1 !important; }
+          .qf-cm-2 { column-count: 2 !important; }
+          .qf-cm-3 { column-count: 3 !important; }
+        }
         @media (min-width: 641px) { .qf-hide-desktop { display: none !important; } }
       `}</style>
 
