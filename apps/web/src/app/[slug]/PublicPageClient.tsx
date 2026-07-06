@@ -82,6 +82,64 @@ const SOCIAL_NETWORKS: Record<string, { icon: string; color: string; label: stri
 
 // ── Render Block ─────────────────────────────────────────────────────────────
 // ── Blocs interactifs publics (onglets / accordéon) ──────────────────────────
+// ── Galerie publique avec lightbox plein écran (clic pour agrandir + navigation) ──
+function GalleryPublic({ imgs, layout, cols, title, MUTED, FONT_B }: { imgs: string[]; layout: string; cols: number; title?: string; MUTED: string; FONT_B: string }) {
+  const [idx, setIdx] = useState<number | null>(null)
+  useEffect(() => {
+    if (idx === null) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIdx(null)
+      else if (e.key === "ArrowRight") setIdx(i => (i === null ? i : (i + 1) % imgs.length))
+      else if (e.key === "ArrowLeft") setIdx(i => (i === null ? i : (i - 1 + imgs.length) % imgs.length))
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [idx, imgs.length])
+
+  const titleEl = title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{title}</p>
+  const open = (i: number) => setIdx(i)
+
+  const lightbox = idx !== null && (
+    <div onClick={() => setIdx(null)} role="dialog" aria-modal="true" style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.92)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <button onClick={e => { e.stopPropagation(); setIdx(null) }} aria-label="Fermer" style={{ position: "absolute", top: 14, right: 16, width: 40, height: 40, borderRadius: "50%", background: "rgba(255,255,255,0.12)", border: "none", color: "#fff", fontSize: 22, cursor: "pointer" }}>×</button>
+      {imgs.length > 1 && <>
+        <button onClick={e => { e.stopPropagation(); setIdx(i => i === null ? i : (i - 1 + imgs.length) % imgs.length) }} aria-label="Précédente" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.12)", border: "none", color: "#fff", fontSize: 24, cursor: "pointer" }}>‹</button>
+        <button onClick={e => { e.stopPropagation(); setIdx(i => i === null ? i : (i + 1) % imgs.length) }} aria-label="Suivante" style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.12)", border: "none", color: "#fff", fontSize: 24, cursor: "pointer" }}>›</button>
+      </>}
+      <img src={imgs[idx]} alt="" onClick={e => e.stopPropagation()} style={{ maxWidth: "100%", maxHeight: "90vh", objectFit: "contain", borderRadius: 8 }} />
+      {imgs.length > 1 && <span style={{ position: "absolute", bottom: 16, left: "50%", transform: "translateX(-50%)", color: "rgba(255,255,255,0.8)", fontSize: 12, background: "rgba(0,0,0,0.4)", borderRadius: 20, padding: "4px 12px" }}>{idx + 1} / {imgs.length}</span>}
+    </div>
+  )
+
+  if (layout === "masonry") return (
+    <div style={{ padding: "6px 24px 16px" }}>
+      {titleEl}
+      <div style={{ columnCount: cols, columnGap: 8 }}>
+        {imgs.map((img, i) => <img key={i} src={img} alt="" loading="lazy" onClick={() => open(i)} style={{ width: "100%", borderRadius: 10, marginBottom: 8, display: "block", breakInside: "avoid", cursor: "zoom-in" }} />)}
+      </div>
+      {lightbox}
+    </div>
+  )
+  const effCols = layout === "compact" ? Math.max(cols, 3) : cols
+  const gap = layout === "compact" ? 5 : 7
+  const rad = layout === "compact" ? 8 : 10
+  return (
+    <div style={{ padding: "6px 24px 16px" }}>
+      {titleEl}
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${effCols},1fr)`, gap }}>
+        {imgs.map((img, i) => (
+          <div key={i} onClick={() => open(i)} style={{ overflow: "hidden", borderRadius: rad, aspectRatio: "1", cursor: "zoom-in" }}>
+            <img src={img} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s" }}
+              onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.08)")}
+              onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")} />
+          </div>
+        ))}
+      </div>
+      {lightbox}
+    </div>
+  )
+}
+
 function TabsPublic({ tabs, G, TEXT, MUTED, FONT_B }: { tabs: [string, string][]; G: string; TEXT: string; MUTED: string; FONT_B: string }) {
   const [active, setActive] = useState(0)
   return (
@@ -395,34 +453,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
     case "gallery": {
       const imgs = [c.img1, c.img2, c.img3, c.img4, c.img5, c.img6].filter(Boolean)
       if (imgs.length === 0) return null
-      const layout = c.layout || "grid"
-      const cols = parseInt(c.columns || "3")
-      const title = c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>
-      if (layout === "masonry") return (
-        <div style={{ padding: "6px 24px 16px" }}>
-          {title}
-          <div style={{ columnCount: cols, columnGap: 8 }}>
-            {imgs.map((img: string, i: number) => <img key={i} src={img} alt="" loading="lazy" style={{ width: "100%", borderRadius: 10, marginBottom: 8, display: "block", breakInside: "avoid" }} />)}
-          </div>
-        </div>
-      )
-      const effCols = layout === "compact" ? Math.max(cols, 3) : cols
-      const gap = layout === "compact" ? 5 : 7
-      const rad = layout === "compact" ? 8 : 10
-      return (
-        <div style={{ padding: "6px 24px 16px" }}>
-          {title}
-          <div style={{ display: "grid", gridTemplateColumns: `repeat(${effCols},1fr)`, gap }}>
-            {imgs.map((img: string, i: number) => (
-              <div key={i} style={{ overflow: "hidden", borderRadius: rad, aspectRatio: "1" }}>
-                <img src={img} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s" }}
-                  onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.08)")}
-                  onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")} />
-              </div>
-            ))}
-          </div>
-        </div>
-      )
+      return <GalleryPublic imgs={imgs} layout={c.layout || "grid"} cols={parseInt(c.columns || "3")} title={c.title} MUTED={MUTED} FONT_B={FONT_B} />
     }
 
     case "video": return c.url ? (
