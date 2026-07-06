@@ -2675,6 +2675,54 @@
     }
   }
 
+  function GalleryImagesEditor({ block, onChange }: { block: Block; onChange: (key: string, val: string) => void }) {
+    const M = "#8A8478", TXT = "#F5F0E8", GG = "var(--accent, #C9A84C)"
+    const isCarousel = block.type === "image_carousel"
+    const KEYS = ["img1", "img2", "img3", "img4", "img5", "img6"]
+    const imgs: string[] = KEYS.map(k => block.content[k]).filter(Boolean) as string[]
+    const write = (arr: string[]) => KEYS.forEach((k, i) => onChange(k, arr[i] || ""))
+    const move = (i: number, d: number) => { const j = i + d; if (j < 0 || j >= imgs.length) return; const a = [...imgs];[a[i], a[j]] = [a[j], a[i]]; write(a) }
+    const replaceAt = (i: number, url: string) => { if (!url) { write(imgs.filter((_, j) => j !== i)); return } const a = [...imgs]; a[i] = url; write(a) }
+    const add = (url: string) => { if (url && imgs.length < 6) write([...imgs, url]) }
+    const inputStyle: React.CSSProperties = { width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
+    const Seg = ({ opts, val, k }: { opts: { k: string; l: string }[]; val: string; k: string }) => (
+      <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
+        {opts.map(o => <button key={o.k} type="button" onClick={() => onChange(k, o.k)} style={{ flex: 1, padding: "7px 4px", borderRadius: 7, background: val === o.k ? GG : "transparent", border: "none", color: val === o.k ? "#080808" : M, fontSize: 11, fontWeight: val === o.k ? 700 : 500, cursor: "pointer" }}>{o.l}</button>)}
+      </div>
+    )
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
+        <div>
+          <label style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>Titre (optionnel)</label>
+          <input value={block.content.title || ""} placeholder={isCarousel ? "Mes photos" : "Ma galerie"} onChange={e => onChange("title", e.target.value)} style={inputStyle} />
+        </div>
+        {isCarousel ? (
+          <div><label style={{ color: M, fontSize: 11, display: "block", marginBottom: 6, fontWeight: 500 }}>Défilement automatique</label><Seg k="auto_play" val={block.content.auto_play || "no"} opts={[{ k: "no", l: "Non" }, { k: "yes", l: "Oui" }]} /></div>
+        ) : (<>
+          <div><label style={{ color: M, fontSize: 11, display: "block", marginBottom: 6, fontWeight: 500 }}>Affichage</label><Seg k="layout" val={block.content.layout || "grid"} opts={[{ k: "grid", l: "Grille" }, { k: "masonry", l: "Mosaïque" }, { k: "compact", l: "Compact" }]} /></div>
+          <div><label style={{ color: M, fontSize: 11, display: "block", marginBottom: 6, fontWeight: 500 }}>Colonnes</label><Seg k="columns" val={block.content.columns || "3"} opts={[{ k: "2", l: "2" }, { k: "3", l: "3" }, { k: "4", l: "4" }]} /></div>
+        </>)}
+        <div>
+          <label style={{ color: M, fontSize: 11, display: "flex", justifyContent: "space-between", marginBottom: 6, fontWeight: 500 }}><span>Images</span><span>{imgs.length}/6</span></label>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {imgs.map((img, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <button type="button" onClick={() => move(i, -1)} disabled={i === 0} title="Monter" style={{ background: "none", border: "none", cursor: i === 0 ? "default" : "pointer", color: i === 0 ? "rgba(255,255,255,0.15)" : M, padding: 0, lineHeight: 0.7, fontSize: 11 }}>▲</button>
+                  <button type="button" onClick={() => move(i, 1)} disabled={i === imgs.length - 1} title="Descendre" style={{ background: "none", border: "none", cursor: i === imgs.length - 1 ? "default" : "pointer", color: i === imgs.length - 1 ? "rgba(255,255,255,0.15)" : M, padding: 0, lineHeight: 0.7, fontSize: 11 }}>▼</button>
+                </span>
+                <img src={img} alt="" style={{ width: 44, height: 44, borderRadius: 8, objectFit: "cover", flexShrink: 0 }} />
+                <span style={{ flex: 1, color: M, fontSize: 11 }}>Image {i + 1}</span>
+                <button type="button" onClick={() => replaceAt(i, "")} title="Retirer" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 6, width: 24, height: 24, cursor: "pointer", color: "#EF4444", flexShrink: 0 }}>×</button>
+              </div>
+            ))}
+          </div>
+          {imgs.length < 6 && <div style={{ marginTop: 8 }}><ImageUpload value="" onChange={add} hint="Ajouter une image" /></div>}
+        </div>
+      </div>
+    )
+  }
+
   function SkillsEditor({ content, onChange }: { content: BlockContent; onChange: (key: string, val: string) => void }) {
     const M = "#8A8478", TXT = "#F5F0E8", GG = "var(--accent, #C9A84C)"
     const tags: string[] = String(content.tags || "").split(",").map(t => t.trim()).filter(Boolean)
@@ -2794,6 +2842,10 @@
 
     if (block.type === "skills") {
       return <SkillsEditor content={block.content} onChange={onChange} />
+    }
+
+    if (block.type === "gallery" || block.type === "image_carousel") {
+      return <GalleryImagesEditor block={block} onChange={onChange} />
     }
 
     if (block.type === "availability") {
