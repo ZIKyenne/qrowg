@@ -441,14 +441,26 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       </div>
     )
 
-    case "image": return c.src ? (
-      <div style={{ overflow: "hidden" }}>
-        <img src={c.src} alt={c.caption||""} style={{ width: "100%", maxHeight: 320, objectFit: "cover", display: "block", borderRadius: c.rounded === "circle" ? "50%" : c.rounded === "rounded" ? 16 : 0, transition: "transform 0.3s" }}
+    case "image": {
+      if (!c.src) return null
+      const ratioMap: Record<string, string | undefined> = { square: "1", "16:9": "16/9", "9:16": "9/16", "4:3": "4/3" }
+      const ar = ratioMap[c.ratio || "original"]
+      const radius = c.rounded === "circle" ? "50%" : c.rounded === "rounded" ? 16 : 0
+      const imgEl = (
+        <img src={c.src} alt={c.alt || c.caption || ""} loading="lazy"
+          style={{ width: "100%", height: ar ? "100%" : undefined, maxHeight: ar ? undefined : 320, aspectRatio: ar, objectFit: "cover", display: "block", borderRadius: radius, transition: "transform 0.3s" }}
           onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.02)")}
           onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")} />
-        {c.caption && <p style={{ color: MUTED, fontSize: 12, textAlign: "center", margin: "7px 24px", fontFamily: FONT_B }}>{c.caption}</p>}
-      </div>
-    ) : null
+      )
+      return (
+        <div style={{ overflow: "hidden" }}>
+          {c.link
+            ? <a href={c.link} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.link)} style={{ display: "block", textDecoration: "none" }}>{imgEl}</a>
+            : imgEl}
+          {c.caption && <p style={{ color: MUTED, fontSize: 12, textAlign: "center", margin: "7px 24px", fontFamily: FONT_B }}>{c.caption}</p>}
+        </div>
+      )
+    }
 
     case "gallery": {
       const imgs = [c.img1, c.img2, c.img3, c.img4, c.img5, c.img6].filter(Boolean)

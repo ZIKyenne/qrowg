@@ -290,7 +290,7 @@
       case "image": return (
         <div style={{ ...s }}>
           {c.src
-            ? <div><img src={c.src} alt={c.caption||""} style={{ width: "100%", maxHeight: 220, objectFit: "cover", display: "block", borderRadius: c.rounded==="circle" ? "50%" : c.rounded==="rounded" ? 10 : 0 }} />{c.caption && <p style={{ color: muted, fontSize: 10, textAlign: "center", margin: "6px 14px" }}>{c.caption}</p>}</div>
+            ? (() => { const arMap: Record<string,string|undefined> = { square:"1","16:9":"16/9","9:16":"9/16","4:3":"4/3" }; const ar = arMap[c.ratio||"original"]; return <div><img src={c.src} alt={c.alt||c.caption||""} style={{ width: "100%", height: ar?"auto":undefined, maxHeight: ar?undefined:220, aspectRatio: ar, objectFit: "cover", display: "block", borderRadius: c.rounded==="circle" ? "50%" : c.rounded==="rounded" ? 10 : 0 }} />{c.caption && <p style={{ color: muted, fontSize: 10, textAlign: "center", margin: "6px 14px" }}>{c.caption}</p>}</div> })()
             : <div style={{ background: "rgba(255,255,255,0.03)", border: "1px dashed rgba(255,255,255,0.1)", borderRadius: 8, padding: "28px", textAlign: "center", margin: "10px 16px" }}><span style={{ fontSize: 28 }}>🖼️</span><p style={{ color: muted, fontSize: 11, margin: "6px 0 0" }}>Aucune image</p></div>}
         </div>
       )

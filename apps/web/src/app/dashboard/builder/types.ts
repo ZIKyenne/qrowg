@@ -2743,11 +2743,14 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   image: {
     label: "Image", description: "Photo ou illustration",
     icon: "🖼️", color: "#A78BFA", category: "media",
-    defaultContent: { src: "", caption: "", rounded: "rounded" },
+    defaultContent: { src: "", caption: "", rounded: "rounded", ratio: "original" },
     fields: [
       { key: "src", label: "Image", type: "image" },
-      { key: "caption", label: "Legende (optionnel)", type: "text", placeholder: "Description de l image" },
-      { key: "rounded", label: "Forme", type: "select", options: ["rounded", "square", "circle"] },
+      { key: "ratio", label: "Format", type: "select", options: ["original", "square", "16:9", "9:16", "4:3"], hint: "Recadrage de l'image" },
+      { key: "rounded", label: "Coins", type: "select", options: ["rounded", "square", "circle"] },
+      { key: "caption", label: "Légende (optionnel)", type: "text", placeholder: "Texte affiché sous l'image" },
+      { key: "alt", label: "Texte alternatif", type: "text", placeholder: "Décrit l'image (accessibilité, SEO)", hint: "Lu par les lecteurs d'écran" },
+      { key: "link", label: "Lien au clic (optionnel)", type: "url", placeholder: "https://..." },
     ],
   },
   gallery: {
