@@ -4158,7 +4158,7 @@
         if (pg) { setPageName(pg.title); setPageSlug(pg.slug); setPageStatus(pg.status||"draft"); if (pg.theme) setTheme(pg.theme as PageTheme); setPageStats(s => ({ ...s, views: pg.total_views||0 })) }
         const { data: blks } = await supabase.from("blocks").select("*").eq("page_id", pageId).order("position")
         if (blks?.length) {
-            const loaded = blks.map(b => ({ id: b.id, type: b.type, content: b.content||{}, visible: b.is_visible!==false, draft: b.is_draft||false, locked: b.is_locked||false }))
+            const loaded = blks.map(b => { const c = b.content || {}; return { id: b.id, type: b.type, content: c, visible: c.__visible !== undefined ? c.__visible !== false : (b.is_visible !== false), draft: c.__draft || false, locked: c.__locked || false } })
             setBlocksRaw(loaded)
             undoRedo.push(loaded)
           }
@@ -4193,7 +4193,9 @@
           if (allUuid) {
             // Sauvegarde qui CONSERVE les IDs : upsert D'ABORD (le contenu est toujours enregistré),
             // PUIS suppression des blocs retirés via une liste d'IDs explicite (fiable).
-            const rows = blocks.map((b, i) => ({ id: b.id, page_id: pageId, type: b.type, position: i, content: b.content, is_visible: b.visible && !b.draft, is_draft: b.draft || false, is_locked: b.locked || false, styles: {} }))
+            // La table `blocks` n'a que : id, page_id, type, position, is_visible, content, styles.
+            // draft/locked/visible n'ont PAS de colonne -> persistes dans content (cles reservees __).
+            const rows = blocks.map((b, i) => ({ id: b.id, page_id: pageId, type: b.type, position: i, content: { ...b.content, __draft: b.draft || false, __locked: b.locked || false, __visible: b.visible !== false }, is_visible: b.visible && !b.draft, styles: {} }))
             const keep = new Set(blocks.map(b => b.id))
             if (rows.length) { const { error } = await supabase.from("blocks").upsert(rows, { onConflict: "id" }); if (error) throw error }
             const { data: existing } = await supabase.from("blocks").select("id").eq("page_id", pageId)
@@ -4203,7 +4205,7 @@
           } else {
             // Repli (IDs legacy non-UUID) : delete-all + insert. Les IDs deviennent UUID au prochain chargement.
             await supabase.from("blocks").delete().eq("page_id", pageId)
-            if (blocks.length > 0) { const { error } = await supabase.from("blocks").insert(blocks.map((b, i) => ({ page_id: pageId, type: b.type, position: i, content: b.content, is_visible: b.visible && !b.draft, is_draft: b.draft || false, is_locked: b.locked || false, styles: {} }))); if (error) throw error }
+            if (blocks.length > 0) { const { error } = await supabase.from("blocks").insert(blocks.map((b, i) => ({ page_id: pageId, type: b.type, position: i, content: { ...b.content, __draft: b.draft || false, __locked: b.locked || false, __visible: b.visible !== false }, is_visible: b.visible && !b.draft, styles: {} }))); if (error) throw error }
           }
           setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
         } catch (e) {
