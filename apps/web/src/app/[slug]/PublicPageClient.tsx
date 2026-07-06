@@ -503,20 +503,23 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
 
     case "image": {
       if (!c.src) return null
+      const isCircle = c.rounded === "circle"
       const ratioMap: Record<string, string | undefined> = { square: "1", "16:9": "16/9", "9:16": "9/16", "4:3": "4/3" }
-      const ar = ratioMap[c.ratio || "original"]
-      const radius = c.rounded === "circle" ? "50%" : c.rounded === "rounded" ? 16 : 0
+      // Cercle -> toujours carré et contenu (évite l'ellipse géante sur une image large)
+      const ar = isCircle ? "1" : ratioMap[c.ratio || "original"]
+      const radius = isCircle ? "50%" : c.rounded === "rounded" ? 16 : 0
       const imgEl = (
         <img src={c.src} alt={c.alt || c.caption || ""} loading="lazy"
           style={{ width: "100%", height: ar ? "100%" : undefined, maxHeight: ar ? undefined : 320, aspectRatio: ar, objectFit: "cover", display: "block", borderRadius: radius, transition: "transform 0.3s" }}
           onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.02)")}
           onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")} />
       )
+      const wrapped = c.link
+        ? <a href={c.link} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.link)} style={{ display: "block", textDecoration: "none" }}>{imgEl}</a>
+        : imgEl
       return (
-        <div style={{ overflow: "hidden" }}>
-          {c.link
-            ? <a href={c.link} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.link)} style={{ display: "block", textDecoration: "none" }}>{imgEl}</a>
-            : imgEl}
+        <div style={{ overflow: "hidden", padding: isCircle ? "8px 24px 0" : 0 }}>
+          {isCircle ? <div style={{ maxWidth: 240, margin: "0 auto" }}>{wrapped}</div> : wrapped}
           {c.caption && <p style={{ color: MUTED, fontSize: 12, textAlign: "center", margin: "7px 24px", fontFamily: FONT_B }}>{c.caption}</p>}
         </div>
       )
