@@ -2101,7 +2101,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
                 </div>
                 {(phone || email) && (
                   <div style={{ display: "flex", gap: 8 }}>
-                    {phone && <a href={`tel:${phone}`} onClick={() => trackLinkClick(pageId, block.id, "tel")} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "rgba(57,255,143,0.08)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 9, padding: "9px", color: "#39FF8F", textDecoration: "none", fontSize: 12, fontWeight: 600 }}>📞 Appeler</a>}
+                    {phone && <a href={telLink(String(phone)) || `tel:${phone}`} onClick={() => trackLinkClick(pageId, block.id, "tel")} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "rgba(57,255,143,0.08)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 9, padding: "9px", color: "#39FF8F", textDecoration: "none", fontSize: 12, fontWeight: 600 }}>📞 Appeler</a>}
                     {email && <a href={`mailto:${email}`} onClick={() => trackLinkClick(pageId, block.id, "email")} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "rgba(56,189,248,0.08)", border: "1px solid rgba(56,189,248,0.2)", borderRadius: 9, padding: "9px", color: "#38BDF8", textDecoration: "none", fontSize: 12, fontWeight: 600 }}>✉️ Email</a>}
                   </div>
                 )}
