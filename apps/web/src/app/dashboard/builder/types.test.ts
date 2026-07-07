@@ -58,6 +58,10 @@ describe("blockDecoration", () => {
     expect(blockDecoration({ __bg: "#123456", __intensity: "Moyen" }, theme).style.background).toBe("#123456d9")
     expect(blockDecoration({ __bg: "#123456" }, theme).style.background).toBe("#123456")
   })
+  it("intensité : hex court #abc étendu avant l'alpha (plus de no-op silencieux)", () => {
+    expect(blockDecoration({ __bg: "#0d0", __intensity: "Léger" }, theme).style.background).toBe("#00dd009e")
+    expect(blockDecoration({ __bg: "#0d0" }, theme).style.background).toBe("#0d0")
+  })
   it("verre (glass) : flou + fond translucide + bordure par défaut", () => {
     const r = blockDecoration({ __glass: "Oui" }, theme)
     expect(r.style.backdropFilter).toBe("blur(12px)")

@@ -1914,7 +1914,7 @@
 
       case "announcement": {
         const meta = announcementMeta(c.type)
-        const color = (typeof c.color === "string" && c.color.startsWith("#")) ? c.color : meta.color
+        const color = (typeof c.color === "string" && /^#[0-9a-fA-F]{6}$/.test(c.color.trim())) ? c.color.trim() : meta.color
         const icon = (c.emoji||"").trim() || meta.icon
         const compact = c.style === "Compact"
         return (
@@ -3096,7 +3096,8 @@
               ? (field.options && field.options.length <= 5
                   ? <div style={{ display: "flex", flexWrap: "wrap", gap: 4, background: "rgba(255,255,255,0.03)", borderRadius: 9, padding: 3 }}>
                       {field.options.map(o => {
-                        const on = (block.content[field.key] || field.options![0]) === o
+                        const stored = block.content[field.key] || field.options![0]
+                        const on = stored === o || optionLabel(stored) === o // gère les valeurs héritées (ex: "warning" -> "Attention")
                         return <button key={o} type="button" onClick={() => onChange(field.key, o)}
                           style={{ flex: "1 1 auto", minWidth: 0, padding: "6px 9px", borderRadius: 7, border: "none", cursor: "pointer", background: on ? "#C9A84C" : "transparent", color: on ? "#080808" : "#9A948A", fontSize: 11, fontWeight: on ? 700 : 500, whiteSpace: "nowrap", transition: "all .12s" }}>{optionLabel(o)}</button>
                       })}
@@ -4473,7 +4474,7 @@
       // ready.current : garde anti-ecrasement — on ne sauvegarde pas tant que la page n'est
       // pas chargee (existante) ou creee (nouvelle), pour ne jamais persister les blocs de demo.
       if (!IS_UUID(liveId) || !ready.current) return
-      dirty.current = true; setHasUnsaved(true)
+      dirty.current = true; setHasUnsaved(true); setSaved(false)
       clearTimeout(saveTimeout.current)
       saveTimeout.current = setTimeout(() => { doSave() }, 800)
     }, [blocks, pageName, theme, liveId, doSave])
@@ -5940,7 +5941,7 @@
                             </div>
                           )
                         }
-                        const active = STYLE_COPY_KEYS.some(k => bc[k] && !["Aucun", "Défaut", "Non", "Normale", "Aucune", ""].includes(bc[k]))
+                        const active = STYLE_COPY_KEYS.some(k => bc[k] && !["Aucun", "Défaut", "Non", "Normale", "Aucune", "Plein", ""].includes(bc[k]))
                         const applyPreset = (apply: Record<string, string>) => setBlocks(p => p.map(b => b.id === selectedBlock.id ? { ...b, content: { ...b.content, ...apply } } : b))
                         const TABS = [
                           { k: "contenu", label: "Contenu" },

@@ -589,20 +589,26 @@ function AnnouncementPublic({ c, theme, pageId, blockId }: { c: any; theme: any;
   const [dismissed, setDismissed] = useState(false)
   const [now, setNow] = useState<number | null>(null)
   useEffect(() => {
-    setNow(Date.now())
+    const tick = () => setNow(Date.now())
+    tick()
     try { if (c.dismissible === "Oui" && localStorage.getItem("qf-ann-" + blockId) === "1") setDismissed(true) } catch {}
-  }, [c.dismissible, blockId])
+    // Ré-évalue la fenêtre de dates sans rechargement (apparition/expiration en direct).
+    if (c.start_date || c.end_date) { const t = setInterval(tick, 60000); return () => clearInterval(t) }
+  }, [c.dismissible, c.start_date, c.end_date, blockId])
   const TEXT = theme.text || "#F5F0E8"
   const FONT_B = theme.fontBody || "DM Sans, sans-serif"
   if (!c.title && !c.message) return null
   // Fenêtre d'affichage : appliquée seulement après le montage (évite tout décalage SSR).
+  // Une date invalide (NaN) est ignorée plutôt que de masquer/afficher par erreur.
   if (now !== null) {
-    if (c.start_date && now < Date.parse(c.start_date)) return null
-    if (c.end_date && now > Date.parse(c.end_date)) return null
+    const s = c.start_date ? Date.parse(c.start_date) : NaN
+    const e = c.end_date ? Date.parse(c.end_date) : NaN
+    if (!isNaN(s) && now < s) return null
+    if (!isNaN(e) && now > e) return null
   }
   if (dismissed) return null
   const meta = announcementMeta(c.type)
-  const color = (typeof c.color === "string" && c.color.startsWith("#")) ? c.color : meta.color
+  const color = (typeof c.color === "string" && /^#[0-9a-fA-F]{6}$/.test(c.color.trim())) ? c.color.trim() : meta.color
   const icon = (c.emoji || "").trim() || meta.icon
   const compact = c.style === "Compact"
   const dismiss = () => { setDismissed(true); try { localStorage.setItem("qf-ann-" + blockId, "1") } catch {} }

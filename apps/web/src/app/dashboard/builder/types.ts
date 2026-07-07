@@ -1127,7 +1127,7 @@ export const INFO_PRESETS: { key: string; label: string; emoji: string; blocks: 
     key: "restaurant", label: "Restaurant / Bar", emoji: "🍽️",
     blocks: [
       { type: "heading", content: { text: "Bienvenue chez nous", subtitle: "Cuisine maison, produits frais" } },
-      { type: "announcement", content: { emoji: "📅", title: "Réservation conseillée", message: "Le week-end, pensez à réserver votre table.", type: "info" } },
+      { type: "announcement", content: { emoji: "📅", title: "Réservation conseillée", message: "Le week-end, pensez à réserver votre table.", type: "Information" } },
       { type: "stats_block", content: { s1_value: "4.8/5", s1_label: "Avis clients", s1_icon: "⭐", s2_value: "150+", s2_label: "Plats servis/jour", s2_icon: "🍽️", s3_value: "2012", s3_label: "Depuis", s3_icon: "🏆" } },
       { type: "faq", content: { title: "Questions fréquentes", q1: "Avez-vous des options végétariennes ?", q2: "Acceptez-vous les groupes ?", q3: "Y a-t-il un parking ?" } },
     ],
@@ -1191,7 +1191,7 @@ export const INFO_PRESETS: { key: string; label: string; emoji: string; blocks: 
     key: "evenement", label: "Événement", emoji: "🎉",
     blocks: [
       { type: "heading", content: { text: "À propos de l'événement", subtitle: "Tout ce qu'il faut savoir" } },
-      { type: "announcement", content: { emoji: "🎫", title: "Places limitées", message: "Réservez vite votre place !", type: "promo" } },
+      { type: "announcement", content: { emoji: "🎫", title: "Places limitées", message: "Réservez vite votre place !", type: "Promo" } },
       { type: "timeline", content: { title: "Le programme" } },
       { type: "faq", content: { title: "Infos pratiques" } },
     ],
@@ -3014,7 +3014,6 @@ export const BLOCK_GRADIENTS: Record<string, string> = {
   "Ardoise":    "linear-gradient(135deg,#1e293b,#0f172a)",
   "Charbon":    "linear-gradient(135deg,#1a1a1d,#0a0a0a)",
 }
-export const BLOCK_GRAD_OPTIONS = ["Aucun", ...Object.keys(BLOCK_GRADIENTS)]
 export const BLOCK_RADIUS_OPTIONS = ["Défaut", "S", "M", "L", "XL"]
 export const BLOCK_SHADOW_OPTIONS = ["Non", "Douce", "Forte"]
 export const BLOCK_SPACE_OPTIONS = ["Défaut", "Compact", "Aéré"]
@@ -3062,8 +3061,10 @@ export function blockDecoration(
     surface = true
   } else if (c.__bg && String(c.__bg).trim()) {
     const raw = String(c.__bg).trim()
+    // Normalise le hex court (#abc -> #aabbcc) pour que l'intensité s'applique aussi.
+    const hex6 = /^#[0-9a-fA-F]{3}$/.test(raw) ? "#" + raw.slice(1).split("").map(ch => ch + ch).join("") : raw
     const alphaHex = c.__intensity === "Léger" ? "9e" : c.__intensity === "Moyen" ? "d9" : ""
-    style.background = (alphaHex && /^#[0-9a-fA-F]{6}$/.test(raw)) ? raw + alphaHex : raw
+    style.background = (alphaHex && /^#[0-9a-fA-F]{6}$/.test(hex6)) ? hex6 + alphaHex : raw
     surface = true
   }
 
