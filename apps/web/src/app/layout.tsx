@@ -2,6 +2,11 @@ import type { Metadata, Viewport } from "next"
 import "./globals.css"
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://qrfolio.app"
+// Origine du stockage Supabase (avatars, galeries, produits) — preconnect pour eviter
+// le handshake DNS/TLS au premier chargement d'image sur les pages publiques.
+const SUPABASE_ORIGIN = (() => {
+  try { return process.env.NEXT_PUBLIC_SUPABASE_URL ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin : "" } catch { return "" }
+})()
 
 export const viewport: Viewport = {
   themeColor: "#C9A84C",
@@ -83,6 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {SUPABASE_ORIGIN && <link rel="preconnect" href={SUPABASE_ORIGIN} />}
         <link
           href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
           rel="stylesheet"
