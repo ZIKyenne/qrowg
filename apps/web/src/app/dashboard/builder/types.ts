@@ -556,6 +556,64 @@ export function starRow(score: number | string | undefined | null, max = 5): num
   return Array.from({ length: max }, (_, i) => Math.max(0, Math.min(1, val - i)))
 }
 
+// ── Horaires d'ouverture : statut "ouvert / ferme" calcule en direct ─────────
+// Minutes depuis minuit -> "9h" / "18h30". 0..1439.
+export function fmtMinutes(m: number): string {
+  const h = Math.floor(m / 60), mn = m % 60
+  return mn === 0 ? `${h}h` : `${h}h${String(mn).padStart(2, "0")}`
+}
+
+// Parse un horaire libre en minutes depuis minuit. "9h", "9h30", "9:30", "18h00", "9.30" -> nb.
+// Renvoie null si non exploitable.
+function parseTime(raw: string): number | null {
+  const m = raw.trim().match(/(\d{1,2})\s*[h:.]?\s*(\d{2})?/)
+  if (!m) return null
+  const h = parseInt(m[1], 10)
+  const mn = m[2] ? parseInt(m[2], 10) : 0
+  if (h > 23 || mn > 59) return null
+  return h * 60 + mn
+}
+
+// Parse un champ jour ("9h - 18h", "9h-12h, 14h-18h", "Ferme") en plages {start,end} (minutes).
+// Gere plusieurs plages (coupure) et separateurs -,–,à,to ; end<=start (nuit) -> +24h ignore ici.
+export function parseHourRanges(text?: string): { start: number; end: number }[] {
+  const s = (text || "").trim()
+  if (!s || /(ferm|closed|repos)/i.test(s)) return []
+  const ranges: { start: number; end: number }[] = []
+  for (const part of s.split(/[,;&]|\bet\b/i)) {
+    const seg = part.split(/\s*(?:-|–|—|à|to)\s*/i)
+    if (seg.length < 2) continue
+    const start = parseTime(seg[0]), end = parseTime(seg[1])
+    if (start === null || end === null || end <= start) continue
+    ranges.push({ start, end })
+  }
+  return ranges
+}
+
+// Statut d'ouverture au moment `now` a partir des champs mon_fri/saturday/sunday.
+// Renvoie { open, label, color }. `now` injectable pour la testabilite.
+export function openStatus(
+  c: { mon_fri?: string; saturday?: string; sunday?: string },
+  now: Date
+): { open: boolean; label: string; color: string } | null {
+  const day = now.getDay() // 0=dim, 6=sam
+  const field = day === 0 ? c.sunday : day === 6 ? c.saturday : c.mon_fri
+  if (!field || !field.trim()) return null // pas d'info pour aujourd'hui -> pas de badge
+  const ranges = parseHourRanges(field)
+  const mins = now.getHours() * 60 + now.getMinutes()
+
+  const current = ranges.find(r => mins >= r.start && mins < r.end)
+  if (current) {
+    return { open: true, label: `Ouvert · ferme à ${fmtMinutes(current.end)}`, color: "#39FF8F" }
+  }
+  // Ferme : prochaine ouverture aujourd'hui ?
+  const next = ranges.filter(r => r.start > mins).sort((a, b) => a.start - b.start)[0]
+  if (next) {
+    return { open: false, label: `Fermé · ouvre à ${fmtMinutes(next.start)}`, color: "#EF4444" }
+  }
+  return { open: false, label: "Fermé", color: "#EF4444" }
+}
+
 // Statuts de disponibilité (parité builder <-> public). Couleur personnalisable via dot_color.
 export const AVAILABILITY_STATUSES: { key: string; label: string; color: string }[] = [
   { key: "available", label: "Disponible", color: "#39FF8F" },

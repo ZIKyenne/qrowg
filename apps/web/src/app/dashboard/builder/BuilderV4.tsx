@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import QRCanvas from "../qr-codes/QRCanvas"
@@ -140,6 +140,18 @@
         ))}
       </div>
     )
+  }
+
+  // Badge "Ouvert / Ferme" calcule en direct (tick 60s). Rien affiche si pas d'info du jour.
+  // Calcul au montage (pas au SSR) -> aucun mismatch d'hydratation.
+  function OpenBadge({ c }: { c: any }) {
+    const [st, setSt] = useState<ReturnType<typeof openStatus>>(null)
+    useEffect(() => {
+      const upd = () => setSt(openStatus(c, new Date()))
+      upd(); const t = setInterval(upd, 60000); return () => clearInterval(t)
+    }, [c.mon_fri, c.saturday, c.sunday])
+    if (!st) return null
+    return <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: `${st.color}18`, border: `1px solid ${st.color}55`, color: st.color, borderRadius: 20, padding: "2px 9px", fontSize: 10, fontWeight: 700 }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: st.color }} />{st.label}</span>
   }
 
   // Compte a rebours vivant (tick 1s). Partage la logique pure countdownParts.
@@ -376,7 +388,10 @@
       )
       case "opening_hours": return (
         <div style={{ padding: "10px 16px", ...s }}>
-          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>{c.title}</p>}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, margin: "0 0 8px", flexWrap: "wrap" }}>
+            {c.title ? <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: 0 }}>{c.title}</p> : <span />}
+            <OpenBadge c={c} />
+          </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
             {[["Lun — Ven",c.mon_fri],["Samedi",c.saturday],["Dimanche",c.sunday]].filter(([,h])=>h).map(([d,h]) => (
               <div key={String(d)} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>

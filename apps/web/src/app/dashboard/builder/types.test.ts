@@ -5,6 +5,7 @@ import {
   normalizePhoneDigits, waLink, telLink, directionsLink, ctaButtonStyle, stickyActionHref, embedVideoUrl,
   SOCIAL_NETWORKS, SOCIAL_NETWORKS_MAP, productBadgeStyle,
   parsePrice, priceDiscount, countdownParts, stockStatus, paymentLink, paymentBrand, starRow,
+  parseHourRanges, fmtMinutes, openStatus,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -487,5 +488,67 @@ describe("starRow", () => {
   })
   it("max personnalisable", () => {
     expect(starRow(2, 3)).toEqual([1, 1, 0])
+  })
+})
+
+describe("fmtMinutes", () => {
+  it("heure pile -> '18h', sinon '9h30'", () => {
+    expect(fmtMinutes(540)).toBe("9h")
+    expect(fmtMinutes(1080)).toBe("18h")
+    expect(fmtMinutes(570)).toBe("9h30")
+    expect(fmtMinutes(0)).toBe("0h")
+  })
+})
+
+describe("parseHourRanges", () => {
+  it("plage simple", () => {
+    expect(parseHourRanges("9h - 18h")).toEqual([{ start: 540, end: 1080 }])
+  })
+  it("double plage (coupure midi)", () => {
+    expect(parseHourRanges("9h-12h, 14h-18h")).toEqual([{ start: 540, end: 720 }, { start: 840, end: 1080 }])
+  })
+  it("formats varies (: . et minutes)", () => {
+    expect(parseHourRanges("9:30 - 17:00")).toEqual([{ start: 570, end: 1020 }])
+    expect(parseHourRanges("10h30 – 16h")).toEqual([{ start: 630, end: 960 }])
+  })
+  it("ferme / vide -> []", () => {
+    expect(parseHourRanges("Fermé")).toEqual([])
+    expect(parseHourRanges("")).toEqual([])
+    expect(parseHourRanges(undefined)).toEqual([])
+  })
+  it("plage invalide (fin <= debut) ignoree", () => {
+    expect(parseHourRanges("18h - 9h")).toEqual([])
+  })
+})
+
+describe("openStatus", () => {
+  const uniform = { mon_fri: "9h - 18h", saturday: "9h - 18h", sunday: "9h - 18h" }
+  it("ouvert pendant les heures -> ferme a X", () => {
+    const r = openStatus(uniform, new Date(2026, 6, 8, 10, 30))
+    expect(r?.open).toBe(true)
+    expect(r?.label).toBe("Ouvert · ferme à 18h")
+    expect(r?.color).toBe("#39FF8F")
+  })
+  it("avant ouverture -> ouvre a X", () => {
+    const r = openStatus(uniform, new Date(2026, 6, 8, 8, 0))
+    expect(r?.open).toBe(false)
+    expect(r?.label).toBe("Fermé · ouvre à 9h")
+  })
+  it("apres fermeture -> Fermé", () => {
+    const r = openStatus(uniform, new Date(2026, 6, 8, 20, 0))
+    expect(r?.open).toBe(false)
+    expect(r?.label).toBe("Fermé")
+  })
+  it("selectionne le bon champ selon le jour", () => {
+    const c = { mon_fri: "9h - 18h", saturday: "10h - 16h", sunday: "" }
+    // 2026-07-04 = samedi, 2026-07-06 = lundi, 2026-07-05 = dimanche
+    expect(openStatus(c, new Date(2026, 6, 4, 11, 0))?.label).toBe("Ouvert · ferme à 16h")
+    expect(openStatus(c, new Date(2026, 6, 6, 11, 0))?.label).toBe("Ouvert · ferme à 18h")
+    expect(openStatus(c, new Date(2026, 6, 5, 11, 0))).toBeNull() // dimanche vide -> pas de badge
+  })
+  it("coupure midi : ferme entre les deux plages", () => {
+    const c = { mon_fri: "9h-12h, 14h-18h", saturday: "", sunday: "" }
+    expect(openStatus(c, new Date(2026, 6, 6, 13, 0))?.label).toBe("Fermé · ouvre à 14h")
+    expect(openStatus(c, new Date(2026, 6, 6, 15, 0))?.open).toBe(true)
   })
 })
