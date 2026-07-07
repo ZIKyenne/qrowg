@@ -1,6 +1,6 @@
   "use client"
 
-  import { useState, useRef, useEffect, useCallback } from "react"
+  import { useState, useRef, useEffect, useCallback, Component } from "react"
   import {
     X, ChevronUp, ChevronDown, Trash2,
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
@@ -15,6 +15,17 @@
 
   // Helper module-scope (evite la temporal-dead-zone du UUID_RE interne au composant).
   const IS_UUID = (s?: string | null): boolean => !!s && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)
+
+  // Frontiere d'erreur : isole un apercu de bloc qui planterait (contenu en cours d'edition
+  // malforme) pour ne pas crasher toute la session du builder.
+  class PreviewBoundary extends Component<{ children: React.ReactNode }, { failed: boolean }> {
+    constructor(props: { children: React.ReactNode }) { super(props); this.state = { failed: false } }
+    static getDerivedStateFromError() { return { failed: true } }
+    componentDidUpdate(prev: { children: React.ReactNode }) { if (prev.children !== this.props.children && this.state.failed) this.setState({ failed: false }) }
+    render() { return this.state.failed
+      ? <div style={{ padding: "12px 16px", textAlign: "center", color: "#8A8478", fontSize: 11 }}>⚠ Aperçu indisponible pour ce bloc</div>
+      : this.props.children }
+  }
 
   const G = "#C9A84C"
   const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%274%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E')"
@@ -5460,7 +5471,7 @@
                     )}
 
                     <div style={{ overflow: "hidden", minHeight: 36, position: "relative", zIndex: 2 }}>
-                      <BlockPreview block={block} theme={theme} dayMode={dayMode} />
+                      <PreviewBoundary><BlockPreview block={block} theme={theme} dayMode={dayMode} /></PreviewBoundary>
                     </div>
                   </div>
                 )
@@ -5605,7 +5616,7 @@
                               <div key={b.id} onClick={() => { setSelectedId(b.id); setRightTab("edit") }} style={{ cursor: "pointer" }}
                                 onMouseEnter={e => e.currentTarget.style.opacity="0.85"}
                                 onMouseLeave={e => e.currentTarget.style.opacity="1"}>
-                                <BlockPreview block={b} theme={theme} dayMode={dayMode} />
+                                <PreviewBoundary><BlockPreview block={b} theme={theme} dayMode={dayMode} /></PreviewBoundary>
                               </div>
                             ))}
                           <div style={{ padding: "8px", textAlign: "center", ...bgStyle() }}>
