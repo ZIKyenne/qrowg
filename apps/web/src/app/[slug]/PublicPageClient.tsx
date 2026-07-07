@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, buildVCard, mapEmbedUrl, shareLinks, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref, docTypeMeta, docActionLabel, blockDecoration, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, buildVCard, mapEmbedUrl, shareLinks, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref, docTypeMeta, docActionLabel, announcementMeta, blockDecoration, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -581,6 +581,54 @@ function ProfileAvatar({ src, name, shapeStyle, decoStyle, bgStyle, fontD }: { s
     return <div style={{ width: 96, height: 96, ...shapeStyle, ...decoStyle, ...bgStyle, margin: "0 auto 14px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 38, fontWeight: 700, color: "#080808", fontFamily: fontD }}>{(name || "?")[0]?.toUpperCase()}</div>
   }
   return <img loading="eager" fetchPriority="high" decoding="async" src={src} alt={name || ""} onError={() => setFailed(true)} style={{ width: 96, height: 96, ...shapeStyle, ...decoStyle, objectFit: "cover", margin: "0 auto 14px", display: "block" }} />
+}
+
+// Annonce / alerte : icône + couleur auto (ou personnalisée), fenêtre de dates optionnelle,
+// bouton optionnel, fermeture par le visiteur (mémorisée en localStorage). Couleurs douces.
+function AnnouncementPublic({ c, theme, pageId, blockId }: { c: any; theme: any; pageId: string; blockId: string }) {
+  const [dismissed, setDismissed] = useState(false)
+  const [now, setNow] = useState<number | null>(null)
+  useEffect(() => {
+    setNow(Date.now())
+    try { if (c.dismissible === "Oui" && localStorage.getItem("qf-ann-" + blockId) === "1") setDismissed(true) } catch {}
+  }, [c.dismissible, blockId])
+  const TEXT = theme.text || "#F5F0E8"
+  const FONT_B = theme.fontBody || "DM Sans, sans-serif"
+  if (!c.title && !c.message) return null
+  // Fenêtre d'affichage : appliquée seulement après le montage (évite tout décalage SSR).
+  if (now !== null) {
+    if (c.start_date && now < Date.parse(c.start_date)) return null
+    if (c.end_date && now > Date.parse(c.end_date)) return null
+  }
+  if (dismissed) return null
+  const meta = announcementMeta(c.type)
+  const color = (typeof c.color === "string" && c.color.startsWith("#")) ? c.color : meta.color
+  const icon = (c.emoji || "").trim() || meta.icon
+  const compact = c.style === "Compact"
+  const dismiss = () => { setDismissed(true); try { localStorage.setItem("qf-ann-" + blockId, "1") } catch {} }
+  return (
+    <div style={{ padding: compact ? "6px 24px" : "8px 24px" }}>
+      <div role="status" style={{ background: `${color}14`, border: `1.5px solid ${color}44`, borderRadius: 13, padding: compact ? "10px 13px" : "15px 17px", position: "relative" }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 11 }}>
+          <span style={{ fontSize: compact ? 18 : 23, flexShrink: 0, lineHeight: 1.2 }} aria-hidden>{icon}</span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {c.title && <p style={{ color, fontSize: compact ? 13 : 14, fontWeight: 700, margin: c.message || (c.cta_label && c.cta_url) ? "0 0 4px" : "0", fontFamily: FONT_B, paddingRight: c.dismissible === "Oui" ? 20 : 0 }}>{c.title}</p>}
+            {c.message && <p style={{ color: TEXT, fontSize: 13, margin: 0, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{c.message}</p>}
+            {c.cta_label && c.cta_url && (
+              <a href={extHref(c.cta_url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, blockId, extHref(c.cta_url))}
+                style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 9, color, fontSize: 12.5, fontWeight: 700, textDecoration: "none" }}>
+                {c.cta_label} <span aria-hidden>→</span>
+              </a>
+            )}
+          </div>
+          {c.dismissible === "Oui" && (
+            <button onClick={dismiss} aria-label="Fermer l'annonce"
+              style={{ position: "absolute", top: 8, right: 10, width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", color, opacity: 0.7, fontSize: 18, lineHeight: 1, cursor: "pointer" }}>×</button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
 }
 
 function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: Block; theme: any; pageId: string; ownerEmail?: string; totalViews?: number }) {
@@ -2491,25 +2539,8 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
         </div>
       ) : null
     }
-    case "announcement": {
-      const typeStyles: Record<string, any> = {
-        warning: { bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.3)", color: "#FBBF24" },
-        info: { bg: "rgba(56,189,248,0.08)", border: "rgba(56,189,248,0.3)", color: "#38BDF8" },
-        success: { bg: "rgba(57,255,143,0.08)", border: "rgba(57,255,143,0.3)", color: "#39FF8F" },
-        promo: { bg: "rgba(201,168,76,0.08)", border: "rgba(201,168,76,0.3)", color: "#C9A84C" },
-      }
-      const ts = typeStyles[c.type || "warning"]
-      return (c.title || c.message) ? (
-        <div style={{ padding: "8px 24px" }}>
-          <div style={{ background: ts.bg, border: `1.5px solid ${ts.border}`, borderRadius: 13, padding: "15px 17px" }}>
-            <div style={{ display: "flex", alignItems: "flex-start", gap: 11 }}>
-              <span style={{ fontSize: 23, flexShrink: 0 }}>{c.emoji || "⚠️"}</span>
-              <div>{c.title && <p style={{ color: ts.color, fontSize: 14, fontWeight: 700, margin: "0 0 4px", fontFamily: FONT_B }}>{c.title}</p>}{c.message && <p style={{ color: TEXT, fontSize: 13, margin: 0, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{c.message}</p>}</div>
-            </div>
-          </div>
-        </div>
-      ) : null
-    }
+    case "announcement": return <AnnouncementPublic c={c} theme={theme} pageId={pageId} blockId={block.id} />
+
     case "info_table": {
       const rows = [[c.r1_label, c.r1_value], [c.r2_label, c.r2_value], [c.r3_label, c.r3_value], [c.r4_label, c.r4_value], [c.r5_label, c.r5_value], [c.r6_label, c.r6_value]].filter(([l]) => l)
       return rows.length > 0 ? (

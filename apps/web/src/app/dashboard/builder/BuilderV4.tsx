@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, INFO_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, optionLabel, blockDecoration, BLOCK_GRAD_OPTIONS, BLOCK_RADIUS_OPTIONS, BLOCK_SHADOW_OPTIONS, BLOCK_SPACE_OPTIONS, BLOCK_WIDTH_OPTIONS, BLOCK_ANIM_OPTIONS, BLOCK_STYLE_PRESETS, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, INFO_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, announcementMeta, optionLabel, blockDecoration, BLOCK_GRAD_OPTIONS, BLOCK_RADIUS_OPTIONS, BLOCK_SHADOW_OPTIONS, BLOCK_SPACE_OPTIONS, BLOCK_WIDTH_OPTIONS, BLOCK_ANIM_OPTIONS, BLOCK_STYLE_PRESETS, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import QRCanvas from "../qr-codes/QRCanvas"
@@ -1913,22 +1913,21 @@
       )
 
       case "announcement": {
-        const typeStyles: Record<string,any> = {
-          warning: { bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.3)", color: "#FBBF24" },
-          info: { bg: "rgba(56,189,248,0.08)", border: "rgba(56,189,248,0.3)", color: "#38BDF8" },
-          success: { bg: "rgba(57,255,143,0.08)", border: "rgba(57,255,143,0.3)", color: "#39FF8F" },
-          promo: { bg: "rgba(201,168,76,0.08)", border: "rgba(201,168,76,0.3)", color: "#C9A84C" },
-        }
-        const ts = typeStyles[c.type||"warning"]
+        const meta = announcementMeta(c.type)
+        const color = (typeof c.color === "string" && c.color.startsWith("#")) ? c.color : meta.color
+        const icon = (c.emoji||"").trim() || meta.icon
+        const compact = c.style === "Compact"
         return (
           <div style={{ padding: "8px 16px", ...s }}>
-            <div style={{ background: ts.bg, border: `1.5px solid ${ts.border}`, borderRadius: 12, padding: "14px 16px" }}>
+            <div style={{ background: `${color}14`, border: `1.5px solid ${color}44`, borderRadius: 12, padding: compact ? "10px 13px" : "14px 16px", position: "relative" }}>
               <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                <span style={{ fontSize: 22, flexShrink: 0 }}>{c.emoji||"⚠️"}</span>
-                <div>
-                  {c.title && <p style={{ color: ts.color, fontSize: 13, fontWeight: 700, margin: "0 0 4px" }}>{c.title}</p>}
-                  {c.message && <p style={{ color: text, fontSize: 12, margin: 0, lineHeight: 1.5 }}>{c.message}</p>}
+                <span style={{ fontSize: compact ? 18 : 22, flexShrink: 0 }}>{icon}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  {c.title && <p style={{ color, fontSize: compact ? 12 : 13, fontWeight: 700, margin: "0 0 4px", paddingRight: c.dismissible==="Oui" ? 16 : 0 }}>{c.title}</p>}
+                  {c.message && <p style={{ color: text, fontSize: 12, margin: 0, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{c.message}</p>}
+                  {c.cta_label && c.cta_url && <span style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 8, color, fontSize: 11.5, fontWeight: 700 }}>{c.cta_label} →</span>}
                 </div>
+                {c.dismissible==="Oui" && <span style={{ position: "absolute", top: 7, right: 9, color, opacity: 0.6, fontSize: 16, lineHeight: 1 }}>×</span>}
               </div>
             </div>
           </div>
@@ -4107,6 +4106,7 @@
     const [saved, setSaved] = useState(false)
     const [saveError, setSaveError] = useState(false)
     const [saveErrorMsg, setSaveErrorMsg] = useState("")
+    const [hasUnsaved, setHasUnsaved] = useState(false)
     // ID reel de la page en base. Si l'URL est /builder/new (pageId non-UUID),
     // on cree d'abord la page puis on bascule sur son vrai UUID.
     const [liveId, setLiveId] = useState<string | undefined>(() => (IS_UUID(pageId) ? pageId : undefined))
@@ -4428,43 +4428,50 @@
       return () => window.removeEventListener("beforeunload", handler)
     }, [])
 
+    // Sauvegarde effective (partagée par le debounce ET le bouton « Enregistrer maintenant »).
+    const doSave = useCallback(async () => {
+      if (!IS_UUID(liveId) || !ready.current) return
+      setSaving(true); setSaveError(false)
+      try {
+        const supabase = createClient()
+        await supabase.from("pages").update({ title: pageName, theme }).eq("id", liveId)
+        const allUuid = blocks.every(b => UUID_RE.test(b.id))
+        if (allUuid) {
+          // Sauvegarde qui CONSERVE les IDs : upsert D'ABORD (le contenu est toujours enregistré),
+          // PUIS suppression des blocs retirés via une liste d'IDs explicite (fiable).
+          // La table `blocks` n'a que : id, page_id, type, position, is_visible, content, styles.
+          // draft/locked/visible n'ont PAS de colonne -> persistes dans content (cles reservees __).
+          const rows = blocks.map((b, i) => ({ id: b.id, page_id: liveId, type: b.type, position: i, content: { ...b.content, __draft: b.draft || false, __locked: b.locked || false, __visible: b.visible !== false }, is_visible: b.visible && !b.draft, styles: {} }))
+          const keep = new Set(blocks.map(b => b.id))
+          if (rows.length) { const { error } = await supabase.from("blocks").upsert(rows, { onConflict: "id" }); if (error) throw error }
+          const { data: existing } = await supabase.from("blocks").select("id").eq("page_id", liveId)
+          const toDelete = (existing || []).map((r: any) => r.id).filter((id: string) => !keep.has(id))
+          if (toDelete.length) await supabase.from("blocks").delete().in("id", toDelete)
+          else if (!rows.length) await supabase.from("blocks").delete().eq("page_id", liveId)
+        } else {
+          // Repli (IDs legacy non-UUID) : delete-all + insert. Les IDs deviennent UUID au prochain chargement.
+          await supabase.from("blocks").delete().eq("page_id", liveId)
+          if (blocks.length > 0) { const { error } = await supabase.from("blocks").insert(blocks.map((b, i) => ({ page_id: liveId, type: b.type, position: i, content: { ...b.content, __draft: b.draft || false, __locked: b.locked || false, __visible: b.visible !== false }, is_visible: b.visible && !b.draft, styles: {} }))); if (error) throw error }
+        }
+        dirty.current = false; setHasUnsaved(false); setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
+      } catch (e: any) {
+        console.error("[QRfolio] Échec de sauvegarde des blocs :", e)
+        setSaveErrorMsg(e?.message || e?.hint || "Erreur inconnue")
+        setSaving(false); setSaveError(true)
+      }
+    }, [blocks, pageName, theme, liveId])
+
     useEffect(() => {
       // ready.current : garde anti-ecrasement — on ne sauvegarde pas tant que la page n'est
       // pas chargee (existante) ou creee (nouvelle), pour ne jamais persister les blocs de demo.
       if (!IS_UUID(liveId) || !ready.current) return
-      dirty.current = true
+      dirty.current = true; setHasUnsaved(true)
       clearTimeout(saveTimeout.current)
-      saveTimeout.current = setTimeout(async () => {
-        setSaving(true); setSaveError(false)
-        try {
-          const supabase = createClient()
-          await supabase.from("pages").update({ title: pageName, theme }).eq("id", liveId)
-          const allUuid = blocks.every(b => UUID_RE.test(b.id))
-          if (allUuid) {
-            // Sauvegarde qui CONSERVE les IDs : upsert D'ABORD (le contenu est toujours enregistré),
-            // PUIS suppression des blocs retirés via une liste d'IDs explicite (fiable).
-            // La table `blocks` n'a que : id, page_id, type, position, is_visible, content, styles.
-            // draft/locked/visible n'ont PAS de colonne -> persistes dans content (cles reservees __).
-            const rows = blocks.map((b, i) => ({ id: b.id, page_id: liveId, type: b.type, position: i, content: { ...b.content, __draft: b.draft || false, __locked: b.locked || false, __visible: b.visible !== false }, is_visible: b.visible && !b.draft, styles: {} }))
-            const keep = new Set(blocks.map(b => b.id))
-            if (rows.length) { const { error } = await supabase.from("blocks").upsert(rows, { onConflict: "id" }); if (error) throw error }
-            const { data: existing } = await supabase.from("blocks").select("id").eq("page_id", liveId)
-            const toDelete = (existing || []).map((r: any) => r.id).filter((id: string) => !keep.has(id))
-            if (toDelete.length) await supabase.from("blocks").delete().in("id", toDelete)
-            else if (!rows.length) await supabase.from("blocks").delete().eq("page_id", liveId)
-          } else {
-            // Repli (IDs legacy non-UUID) : delete-all + insert. Les IDs deviennent UUID au prochain chargement.
-            await supabase.from("blocks").delete().eq("page_id", liveId)
-            if (blocks.length > 0) { const { error } = await supabase.from("blocks").insert(blocks.map((b, i) => ({ page_id: liveId, type: b.type, position: i, content: { ...b.content, __draft: b.draft || false, __locked: b.locked || false, __visible: b.visible !== false }, is_visible: b.visible && !b.draft, styles: {} }))); if (error) throw error }
-          }
-          dirty.current = false; setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
-        } catch (e: any) {
-          console.error("[QRfolio] Échec de sauvegarde des blocs :", e)
-          setSaveErrorMsg(e?.message || e?.hint || "Erreur inconnue")
-          setSaving(false); setSaveError(true)
-        }
-      }, 800)
-    }, [blocks, pageName, theme, liveId])
+      saveTimeout.current = setTimeout(() => { doSave() }, 800)
+    }, [blocks, pageName, theme, liveId, doSave])
+
+    // Déclenchement manuel immédiat (bouton « Enregistrer maintenant »).
+    function saveNow() { clearTimeout(saveTimeout.current); doSave() }
 
     async function handlePublish() {
       if (!IS_UUID(liveId)) return
@@ -4819,8 +4826,14 @@
           <a href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 4, textDecoration: "none", color: G, fontFamily: "Cormorant Garamond, serif", fontSize: 16, fontWeight: 700 }}>← QRfolio</a>
           <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.08)" }} />
           <input value={pageName} onChange={e => setPageName(e.target.value)} style={{ background: "transparent", border: "none", color: "#F5F0E8", fontSize: 13, fontWeight: 600, outline: "none", width: 160 }} />
-          {saving && <span style={{ color: MUTED, fontSize: 10 }}>Enregistrement...</span>}
-          {saved && !saveError && <span style={{ color: "#39FF8F", fontSize: 10, display: "flex", alignItems: "center", gap: 3 }}><Check size={10} /> Enregistré</span>}
+          {saving && <span style={{ color: MUTED, fontSize: 10 }}>Enregistrement…</span>}
+          {saved && !saveError && !saving && <span style={{ color: "#39FF8F", fontSize: 10, display: "flex", alignItems: "center", gap: 3 }}><Check size={10} /> Enregistré</span>}
+          {hasUnsaved && !saving && !saved && !saveError && (
+            <button onClick={saveNow} title="Enregistrer maintenant (sinon sauvegarde auto après ~1s)"
+              style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 6, padding: "3px 8px", color: "#FBBF24", fontSize: 10, cursor: "pointer" }}>
+              <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#FBBF24" }} /> Modifications non enregistrées · Enregistrer
+            </button>
+          )}
           {saveError && <button onClick={() => { setSaveError(false); setBlocks(b => [...b]) }} title={saveErrorMsg ? `Erreur : ${saveErrorMsg} — cliquer pour réessayer` : "Réessayer la sauvegarde"} style={{ color: "#EF4444", fontSize: 10, display: "flex", alignItems: "center", gap: 3, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 6, padding: "3px 8px", cursor: "pointer", maxWidth: 340, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>⚠ {saveErrorMsg ? saveErrorMsg : "Échec"} — Réessayer</button>}
           {pageId && !IS_UUID(pageId) && !liveId && !bootstrapError && <span style={{ color: MUTED, fontSize: 10 }}>Création de la page…</span>}
           {bootstrapError && <span style={{ color: "#EF4444", fontSize: 10, display: "flex", alignItems: "center", gap: 3 }} title={bootstrapError}>⚠ {bootstrapError}</span>}

@@ -7,7 +7,7 @@ import {
   parsePrice, priceDiscount, countdownParts, stockStatus, paymentLink, paymentBrand, starRow,
   parseHourRanges, fmtMinutes, openStatus, dayField,
   vcardEscape, splitName, buildVCard, mapEmbedUrl, shareLinks, toCalStamp, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref,
-  docTypeMeta, docActionLabel, blockDecoration,
+  docTypeMeta, docActionLabel, announcementMeta, blockDecoration,
 } from "./types"
 
 describe("blockDecoration", () => {
@@ -72,6 +72,23 @@ describe("docTypeMeta", () => {
   })
   it("retourne une couleur hex", () => {
     expect(docTypeMeta("Menu").color).toMatch(/^#[0-9A-Fa-f]{6}$/)
+  })
+})
+
+describe("announcementMeta", () => {
+  it("icône + couleur selon le type (accepte FR et EN)", () => {
+    expect(announcementMeta("Information").icon).toBe("ℹ️")
+    expect(announcementMeta("info").color).toBe("#38BDF8")
+    expect(announcementMeta("Succès").icon).toBe("✅")
+    expect(announcementMeta("success").label).toBe("Succès")
+    expect(announcementMeta("Urgent").icon).toBe("🚨")
+    expect(announcementMeta("urgence").color).toBe("#EF4444")
+    expect(announcementMeta("Promo").icon).toBe("🎉")
+  })
+  it("repli sur Attention pour type inconnu / vide", () => {
+    expect(announcementMeta("").icon).toBe("⚠️")
+    expect(announcementMeta(undefined).label).toBe("Attention")
+    expect(announcementMeta("bidon").color).toBe("#FBBF24")
   })
 })
 

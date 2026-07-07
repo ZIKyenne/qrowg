@@ -2985,6 +2985,19 @@ export function docActionLabel(type?: string): string {
   return (t === "menu" || t === "catalogue" || t === "autre") ? "Consulter" : "Télécharger"
 }
 
+// ── Annonce / Alerte : icône + couleur automatiques selon le type (pur, testé) ─
+// Couleurs lisibles mais volontairement douces (jamais agressives) — l'opacité est appliquée au rendu.
+export const ANNOUNCEMENT_TYPES = ["Information", "Succès", "Attention", "Urgent", "Promo"]
+export function announcementMeta(type?: string): { icon: string; color: string; label: string } {
+  switch ((type || "").trim().toLowerCase()) {
+    case "info": case "information":       return { icon: "ℹ️", color: "#38BDF8", label: "Information" }
+    case "success": case "succès": case "succes": return { icon: "✅", color: "#39FF8F", label: "Succès" }
+    case "urgent": case "urgence":         return { icon: "🚨", color: "#EF4444", label: "Urgent" }
+    case "promo":                          return { icon: "🎉", color: "#C9A84C", label: "Promo" }
+    case "warning": case "attention": default: return { icon: "⚠️", color: "#FBBF24", label: "Attention" }
+  }
+}
+
 // ── Apparence par bloc (système de style universel, opt-in) ───────────────────
 // Dégradés nommés réutilisables pour le fond d'un bloc.
 export const BLOCK_GRADIENTS: Record<string, string> = {
@@ -4739,14 +4752,21 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   announcement: {
-    label: "Annonce", description: "Message important à mettre en avant",
+    label: "Annonce / Alerte", description: "Message important, icône et couleur automatiques",
     icon: "📢", color: "#38BDF8", category: "info",
-    defaultContent: { emoji: "⚠️", title: "Information importante", message: "Nous serons fermés le 25 décembre.", type: "warning" },
+    defaultContent: { title: "Information importante", message: "Nous serons fermés le 25 décembre.", type: "Attention", style: "Détaillé", dismissible: "Non" },
     fields: [
-      { key: "emoji", label: "Emoji", type: "text", placeholder: "⚠️" },
+      { key: "type", label: "Type", type: "select", options: ANNOUNCEMENT_TYPES, hint: "Choisit l'icône et la couleur automatiquement" },
       { key: "title", label: "Titre", type: "text", placeholder: "Information importante" },
-      { key: "message", label: "Message", type: "textarea", placeholder: "Votre message ici..." },
-      { key: "type", label: "Style", type: "select", options: ["warning", "info", "success", "promo"] },
+      { key: "message", label: "Message", type: "textarea", placeholder: "Votre message ici…" },
+      { key: "emoji", label: "Emoji (auto si vide)", type: "text", placeholder: "Laisser vide = icône du type" },
+      { key: "color", label: "Couleur personnalisée (optionnel)", type: "color", placeholder: "#FBBF24", hint: "Remplace la couleur automatique du type" },
+      { key: "cta_label", label: "Bouton — texte (optionnel)", type: "text", placeholder: "En savoir plus" },
+      { key: "cta_url", label: "Bouton — lien", type: "url", placeholder: "https://…" },
+      { key: "dismissible", label: "Bouton fermer", type: "select", options: ["Non", "Oui"], hint: "Le visiteur peut masquer l'annonce" },
+      { key: "start_date", label: "Afficher à partir du (optionnel)", type: "datetime" },
+      { key: "end_date", label: "Masquer après le (optionnel)", type: "datetime" },
+      { key: "style", label: "Style", type: "select", options: ["Détaillé", "Compact"] },
     ],
   },
   info_table: {
