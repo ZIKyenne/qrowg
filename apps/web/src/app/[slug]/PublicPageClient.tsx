@@ -2852,6 +2852,7 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
         @keyframes profilePulse { 0%,100% { box-shadow: 0 0 0 0 ${theme.primary}30; } 50% { box-shadow: 0 0 0 12px ${theme.primary}00; } }
         * { -webkit-tap-highlight-color: transparent; }
         a:active { opacity: 0.75; }
+        a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, [role="slider"]:focus-visible { outline: 2px solid ${theme.primary}; outline-offset: 2px; border-radius: 4px; }
         @media (max-width: 640px) {
           .qf-hide-mobile { display: none !important; }
           .qf-gm-1 { grid-template-columns: 1fr !important; }

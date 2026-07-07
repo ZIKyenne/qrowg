@@ -6182,6 +6182,7 @@
           .block-handle:active{cursor:grabbing}
           .panel-collapse{transition:width 0.25s cubic-bezier(0.4,0,0.2,1)}
           .focus-mode .sidebar{width:64px!important}
+          button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible, [role="button"]:focus-visible { outline: 2px solid #C9A84C; outline-offset: 2px; border-radius: 4px; }
         `}</style>
       </div>
     )
