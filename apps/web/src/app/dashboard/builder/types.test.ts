@@ -7,7 +7,40 @@ import {
   parsePrice, priceDiscount, countdownParts, stockStatus, paymentLink, paymentBrand, starRow,
   parseHourRanges, fmtMinutes, openStatus,
   vcardEscape, splitName, buildVCard, mapEmbedUrl, shareLinks, toCalStamp, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref,
+  docTypeMeta, docActionLabel,
 } from "./types"
+
+describe("docTypeMeta", () => {
+  it("mappe les types connus (insensible à la casse et aux espaces)", () => {
+    expect(docTypeMeta("Menu").icon).toBe("🍽️")
+    expect(docTypeMeta("  brochure ").icon).toBe("📘")
+    expect(docTypeMeta("Catalogue").icon).toBe("📚")
+    expect(docTypeMeta("Contrat / CGV").icon).toBe("📝")
+    expect(docTypeMeta("cgv").icon).toBe("📝")
+  })
+  it("retombe sur PDF pour un type inconnu ou vide", () => {
+    expect(docTypeMeta("").icon).toBe("📄")
+    expect(docTypeMeta(undefined).icon).toBe("📄")
+    expect(docTypeMeta("n_importe_quoi").icon).toBe("📄")
+  })
+  it("retourne une couleur hex", () => {
+    expect(docTypeMeta("Menu").color).toMatch(/^#[0-9A-Fa-f]{6}$/)
+  })
+})
+
+describe("docActionLabel", () => {
+  it("Consulter pour menu / catalogue / autre", () => {
+    expect(docActionLabel("Menu")).toBe("Consulter")
+    expect(docActionLabel("Catalogue")).toBe("Consulter")
+    expect(docActionLabel("Autre")).toBe("Consulter")
+  })
+  it("Télécharger par défaut (PDF, brochure, inconnu, vide)", () => {
+    expect(docActionLabel("PDF")).toBe("Télécharger")
+    expect(docActionLabel("Brochure")).toBe("Télécharger")
+    expect(docActionLabel("")).toBe("Télécharger")
+    expect(docActionLabel(undefined)).toBe("Télécharger")
+  })
+})
 
 describe("bannerImageStyle", () => {
   it("défaut : cover / center / pas de zoom", () => {

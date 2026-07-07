@@ -2906,6 +2906,33 @@ export const SOCIAL_NETWORKS = [
 export const SOCIAL_NETWORKS_MAP: Record<string, { icon: string; color: string; label: string }> =
   Object.fromEntries(SOCIAL_NETWORKS.map(n => [n.key, { icon: n.icon, color: n.color, label: n.label }]))
 
+// ── Documents : types + icônes (bloc bibliothèque) ────────────────────────────
+export const DOC_TYPES = ["PDF", "Menu", "Brochure", "Notice", "Catalogue", "Guide", "Tarifs", "Contrat / CGV", "Autre"]
+
+// Icône + couleur associées à un type de document (pur, testé).
+export function docTypeMeta(type?: string): { icon: string; color: string } {
+  switch ((type || "").trim().toLowerCase()) {
+    case "menu":          return { icon: "🍽️", color: "#F97316" }
+    case "brochure":      return { icon: "📘", color: "#3B82F6" }
+    case "notice":        return { icon: "📋", color: "#8B5CF6" }
+    case "catalogue":     return { icon: "📚", color: "#EC4899" }
+    case "guide":         return { icon: "📖", color: "#10B981" }
+    case "tarifs":        return { icon: "💶", color: "#C9A84C" }
+    case "contrat / cgv":
+    case "contrat":
+    case "cgv":           return { icon: "📝", color: "#64748B" }
+    case "autre":         return { icon: "📎", color: "#8A8478" }
+    case "pdf":
+    default:              return { icon: "📄", color: "#EF4444" }
+  }
+}
+
+// Libellé du bouton d'action selon le type (consultation vs téléchargement).
+export function docActionLabel(type?: string): string {
+  const t = (type || "").trim().toLowerCase()
+  return (t === "menu" || t === "catalogue" || t === "autre") ? "Consulter" : "Télécharger"
+}
+
 // ── Categories de blocs ───────────────────────────────────────────────────────
 export const BLOCK_CATEGORIES = [
   { id: "identity", label: "Identite", icon: "👤", color: "#C9A84C", desc: "Profil, bio, presentation" },
@@ -3288,6 +3315,44 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     defaultContent: { label: "visiteurs" },
     fields: [
       { key: "label", label: "Label", type: "text", placeholder: "visiteurs ce mois" },
+    ],
+  },
+  documents: {
+    label: "Documents", description: "Bibliothèque de fichiers à télécharger",
+    icon: "📚", color: "#38BDF8", category: "info",
+    defaultContent: { title: "Documents à télécharger", d1_type: "PDF", d1_title: "Plaquette de présentation", d1_desc: "Tout savoir en 2 pages", d1_meta: "PDF · 2 Mo" },
+    fields: [
+      { key: "title", label: "Titre section", type: "text", placeholder: "Documents à télécharger" },
+      { key: "d1_type", label: "Doc 1 — Type", type: "select", options: DOC_TYPES },
+      { key: "d1_title", label: "Doc 1 — Titre", type: "text", placeholder: "Plaquette de présentation" },
+      { key: "d1_desc", label: "Doc 1 — Description", type: "text", placeholder: "Tout savoir en 2 pages" },
+      { key: "d1_url", label: "Doc 1 — Lien du fichier", type: "url", placeholder: "https://...", hint: "Collez le lien (PDF, Drive, Notion…) du document" },
+      { key: "d1_meta", label: "Doc 1 — Version / date", type: "text", placeholder: "Édition 2026 · janvier" },
+      { key: "d2_type", label: "Doc 2 — Type", type: "select", options: DOC_TYPES },
+      { key: "d2_title", label: "Doc 2 — Titre", type: "text", placeholder: "Notre menu" },
+      { key: "d2_desc", label: "Doc 2 — Description", type: "text", placeholder: "" },
+      { key: "d2_url", label: "Doc 2 — Lien du fichier", type: "url", placeholder: "https://..." },
+      { key: "d2_meta", label: "Doc 2 — Version / date", type: "text", placeholder: "" },
+      { key: "d3_type", label: "Doc 3 — Type", type: "select", options: DOC_TYPES },
+      { key: "d3_title", label: "Doc 3 — Titre", type: "text", placeholder: "" },
+      { key: "d3_desc", label: "Doc 3 — Description", type: "text", placeholder: "" },
+      { key: "d3_url", label: "Doc 3 — Lien du fichier", type: "url", placeholder: "https://..." },
+      { key: "d3_meta", label: "Doc 3 — Version / date", type: "text", placeholder: "" },
+      { key: "d4_type", label: "Doc 4 — Type", type: "select", options: DOC_TYPES },
+      { key: "d4_title", label: "Doc 4 — Titre", type: "text", placeholder: "" },
+      { key: "d4_desc", label: "Doc 4 — Description", type: "text", placeholder: "" },
+      { key: "d4_url", label: "Doc 4 — Lien du fichier", type: "url", placeholder: "https://..." },
+      { key: "d4_meta", label: "Doc 4 — Version / date", type: "text", placeholder: "" },
+      { key: "d5_type", label: "Doc 5 — Type", type: "select", options: DOC_TYPES },
+      { key: "d5_title", label: "Doc 5 — Titre", type: "text", placeholder: "" },
+      { key: "d5_desc", label: "Doc 5 — Description", type: "text", placeholder: "" },
+      { key: "d5_url", label: "Doc 5 — Lien du fichier", type: "url", placeholder: "https://..." },
+      { key: "d5_meta", label: "Doc 5 — Version / date", type: "text", placeholder: "" },
+      { key: "d6_type", label: "Doc 6 — Type", type: "select", options: DOC_TYPES },
+      { key: "d6_title", label: "Doc 6 — Titre", type: "text", placeholder: "" },
+      { key: "d6_desc", label: "Doc 6 — Description", type: "text", placeholder: "" },
+      { key: "d6_url", label: "Doc 6 — Lien du fichier", type: "url", placeholder: "https://..." },
+      { key: "d6_meta", label: "Doc 6 — Version / date", type: "text", placeholder: "" },
     ],
   },
   // ── Business ──────────────────────────────────────────────────────────────

@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, INFO_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, INFO_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import QRCanvas from "../qr-codes/QRCanvas"
@@ -1917,6 +1917,31 @@
         </div>
       )
 
+      case "documents": {
+        const docs = [1,2,3,4,5,6].map(i => ({ type: c[`d${i}_type`], title: c[`d${i}_title`], desc: c[`d${i}_desc`]||"", url: (c[`d${i}_url`]||"").trim(), meta: c[`d${i}_meta`]||"" })).filter(d => d.title)
+        const list = docs.length ? docs : [{ type: "PDF", title: "Plaquette de présentation", desc: "Tout savoir en 2 pages", url: "", meta: "PDF · 2 Mo" }]
+        return (
+          <div style={{ padding: "10px 16px", ...s }}>
+            {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+            <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+              {list.map((d,i) => {
+                const dm = docTypeMeta(d.type)
+                return (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, background: dayMode?"rgba(0,0,0,0.03)":"rgba(255,255,255,0.03)", border: `1px solid ${dayMode?"rgba(0,0,0,0.07)":"rgba(255,255,255,0.07)"}`, borderRadius: 11, padding: "10px 12px" }}>
+                    <div style={{ width: 38, height: 38, borderRadius: 9, background: `${dm.color}14`, border: `1px solid ${dm.color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{dm.icon}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 1px" }}>{d.title}</p>
+                      {d.desc && <p style={{ color: muted, fontSize: 11, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.desc}</p>}
+                      {d.meta && <p style={{ color: muted, fontSize: 10, margin: "2px 0 0", opacity: 0.8 }}>{d.type ? `${d.type} · ` : ""}{d.meta}</p>}
+                    </div>
+                    <span style={{ flexShrink: 0, color: primary, fontSize: 11, fontWeight: 700 }}>{docActionLabel(d.type)} ↓</span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )
+      }
 
       case "google_maps_embed": { const mapSrc = mapEmbedUrl(c.address, c.embed_url, c.zoom); return (
         <div style={{ padding: "10px 16px", ...s }}>
@@ -5253,7 +5278,7 @@
                                       { label: "Entreprise",              keys: ["team", "founder_message", "info_table"] },
                                       { label: "Informations pratiques",  keys: ["opening_hours", "google_maps_embed", "service_area", "on_site_services"] },
                                       { label: "Questions fréquentes",    keys: ["faq"] },
-                                      { label: "Documents",               keys: ["download_file"] },
+                                      { label: "Documents",               keys: ["documents", "download_file"] },
                                       { label: "Informations légales",    keys: ["legal_info", "business_certifications"] },
                                     ]
                                     const grouped = new Set(INFO_GROUPS.flatMap(g => g.keys))
