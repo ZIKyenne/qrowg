@@ -3008,6 +3008,20 @@
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
   const STYLE_COPY_KEYS = ["__grad", "__bg", "__intensity", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim"]
 
+  // Contrôle segmenté sombre (pastilles) — remplace les <select> natifs. `on` gère les valeurs
+  // héritées via optionLabel (ex: "warning" -> pastille "Attention").
+  function Segmented({ value, options, onChange, active = "#C9A84C", muted = "#9A948A" }: { value: string; options: string[]; onChange: (v: string) => void; active?: string; muted?: string }) {
+    return (
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
+        {options.map(o => {
+          const on = value === o || optionLabel(value) === o
+          return <button key={o} type="button" onClick={() => onChange(o)}
+            style={{ flex: "1 1 auto", minWidth: 0, padding: "6px 9px", borderRadius: 7, border: "none", cursor: "pointer", background: on ? active : "transparent", color: on ? "#080808" : muted, fontSize: 11, fontWeight: on ? 700 : 500, whiteSpace: "nowrap", transition: "all .12s" }}>{optionLabel(o)}</button>
+        })}
+      </div>
+    )
+  }
+
   function EditPanel({ block, onChange, only }: { block: Block; onChange: (key: string, val: string) => void; only?: "content" | "layout" }) {
     const def = BLOCK_DEFS[block.type]
     if (!def) return null
@@ -3094,14 +3108,7 @@
                   onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />
               : field.type === "select"
               ? (field.options && field.options.length <= 5
-                  ? <div style={{ display: "flex", flexWrap: "wrap", gap: 4, background: "rgba(255,255,255,0.03)", borderRadius: 9, padding: 3 }}>
-                      {field.options.map(o => {
-                        const stored = block.content[field.key] || field.options![0]
-                        const on = stored === o || optionLabel(stored) === o // gère les valeurs héritées (ex: "warning" -> "Attention")
-                        return <button key={o} type="button" onClick={() => onChange(field.key, o)}
-                          style={{ flex: "1 1 auto", minWidth: 0, padding: "6px 9px", borderRadius: 7, border: "none", cursor: "pointer", background: on ? "#C9A84C" : "transparent", color: on ? "#080808" : "#9A948A", fontSize: 11, fontWeight: on ? 700 : 500, whiteSpace: "nowrap", transition: "all .12s" }}>{optionLabel(o)}</button>
-                      })}
-                    </div>
+                  ? <Segmented value={block.content[field.key] || field.options[0]} options={field.options} onChange={v => onChange(field.key, v)} />
                   : <select value={block.content[field.key]||field.options?.[0]} onChange={e => onChange(field.key, e.target.value)} style={inputStyle}>
                       {field.options?.map(o => <option key={o} value={o}>{optionLabel(o)}</option>)}
                     </select>)
@@ -5917,19 +5924,14 @@
                         const selStyle: React.CSSProperties = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, color: "#F5F0E8", fontSize: 12, padding: "7px 9px", cursor: "pointer" }
                         const labelStyle: React.CSSProperties = { color: MUTED, fontSize: 11, display: "block", marginBottom: 4, fontWeight: 500 }
                         const secTitle: React.CSSProperties = { color: MUTED, fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 9px" }
-                        const Sel = ({ k, label, options, def }: { k: string; label: string; options: string[]; def: string }) => (
+                        // Helpers appelés en ligne (sel/toggle) au lieu de composants JSX — évite un remontage à chaque rendu.
+                        const sel = (k: string, label: string, options: string[], def: string) => (
                           <div>
                             <label style={labelStyle}>{label}</label>
-                            <div style={{ display: "flex", flexWrap: "wrap", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
-                              {options.map(o => {
-                                const on = (bc[k] || def) === o
-                                return <button key={o} type="button" onClick={() => set(k, o)}
-                                  style={{ flex: "1 1 auto", minWidth: 0, padding: "6px 9px", borderRadius: 7, border: "none", cursor: "pointer", background: on ? G : "transparent", color: on ? "#080808" : MUTED, fontSize: 11, fontWeight: on ? 700 : 500, whiteSpace: "nowrap", transition: "all .12s" }}>{optionLabel(o)}</button>
-                              })}
-                            </div>
+                            <Segmented value={bc[k] || def} options={options} onChange={v => set(k, v)} active={G} muted={MUTED} />
                           </div>
                         )
-                        const Toggle = ({ k, label, icon }: { k: string; label: string; icon: string }) => {
+                        const toggle = (k: string, label: string, icon: string) => {
                           const on = bc[k] === "Oui"
                           return (
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 0" }}>
@@ -5966,8 +5968,8 @@
                             {editTab === "layout" && (
                               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                                 <EditPanel key={selectedBlock.id+"-l"} block={selectedBlock} onChange={set} only="layout" />
-                                <Sel k="__width" label="Largeur du bloc" options={BLOCK_WIDTH_OPTIONS} def="Normale" />
-                                <Sel k="__space" label="Espacement vertical" options={BLOCK_SPACE_OPTIONS} def="Défaut" />
+                                {sel("__width", "Largeur du bloc", BLOCK_WIDTH_OPTIONS, "Normale")}
+                                {sel("__space", "Espacement vertical", BLOCK_SPACE_OPTIONS, "Défaut")}
                               </div>
                             )}
 
@@ -6031,23 +6033,15 @@
                                   {((bc.__grad && bc.__grad !== "Aucun") || (bc.__bg && bc.__bg.startsWith("#"))) && (
                                     <div>
                                       <label style={labelStyle}>Intensité du fond</label>
-                                      <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
-                                        {BLOCK_INTENSITY_OPTIONS.map(opt => {
-                                          const on = (bc.__intensity || "Plein") === opt
-                                          return (
-                                            <button key={opt} onClick={() => set("__intensity", opt)}
-                                              style={{ flex: 1, padding: "6px 4px", borderRadius: 7, border: "none", cursor: "pointer", background: on ? G : "transparent", color: on ? "#080808" : MUTED, fontSize: 11, fontWeight: on ? 700 : 500 }}>{opt}</button>
-                                          )
-                                        })}
-                                      </div>
+                                      <Segmented value={bc.__intensity || "Plein"} options={BLOCK_INTENSITY_OPTIONS} onChange={v => set("__intensity", v)} active={G} muted={MUTED} />
                                       <p style={{ color: MUTED, fontSize: 9.5, margin: "4px 0 0" }}>« Léger » laisse transparaître le fond de la page — plus doux, texte toujours lisible.</p>
                                     </div>
                                   )}
-                                  <Toggle k="__border" label="Bordure" icon="⬜" />
-                                  <Sel k="__radius" label="Coins arrondis" options={BLOCK_RADIUS_OPTIONS} def="Défaut" />
-                                  <Sel k="__shadow" label="Ombre" options={BLOCK_SHADOW_OPTIONS} def="Non" />
-                                  <Toggle k="__glow" label="Halo lumineux (glow)" icon="✨" />
-                                  <Toggle k="__glass" label="Effet verre (flou)" icon="🧊" />
+                                  {toggle("__border", "Bordure", "⬜")}
+                                  {sel("__radius", "Coins arrondis", BLOCK_RADIUS_OPTIONS, "Défaut")}
+                                  {sel("__shadow", "Ombre", BLOCK_SHADOW_OPTIONS, "Non")}
+                                  {toggle("__glow", "Halo lumineux (glow)", "✨")}
+                                  {toggle("__glass", "Effet verre (flou)", "🧊")}
                                 </div>
                               </div>
                             )}
@@ -6078,7 +6072,7 @@
                                 </div>
                                 <div>
                                   <p style={secTitle}>Animation</p>
-                                  <Sel k="__anim" label="Animation d'apparition" options={BLOCK_ANIM_OPTIONS} def="Aucune" />
+                                  {sel("__anim", "Animation d'apparition", BLOCK_ANIM_OPTIONS, "Aucune")}
                                 </div>
                                 <div>
                                   <p style={secTitle}>Nom interne</p>

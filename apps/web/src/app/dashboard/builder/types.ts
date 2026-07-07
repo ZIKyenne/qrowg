@@ -3050,14 +3050,18 @@ export function blockDecoration(
   let surface = false
 
   // Intensité : superpose une couche du fond de page pour adoucir le fond du bloc (jamais agressif),
-  // sans jamais toucher l'opacité du CONTENU (texte toujours lisible).
-  const bgRgb = hexToRgb(theme?.bg || "#080808") || { r: 8, g: 8, b: 8 }
+  // sans jamais toucher l'opacité du CONTENU. Calcul paresseux : rien pour un bloc inerte.
   const ovAlpha = c.__intensity === "Léger" ? 0.62 : c.__intensity === "Moyen" ? 0.34 : 0
-  const overlay = `rgba(${bgRgb.r},${bgRgb.g},${bgRgb.b},${ovAlpha})`
 
   const grad = c.__grad && c.__grad !== "Aucun" ? BLOCK_GRADIENTS[c.__grad] : null
   if (grad) {
-    style.background = ovAlpha > 0 ? `linear-gradient(0deg, ${overlay}, ${overlay}), ${grad}` : grad
+    if (ovAlpha > 0) {
+      const bgRgb = hexToRgb(theme?.bg || "#080808") || { r: 8, g: 8, b: 8 }
+      const overlay = `rgba(${bgRgb.r},${bgRgb.g},${bgRgb.b},${ovAlpha})`
+      style.background = `linear-gradient(0deg, ${overlay}, ${overlay}), ${grad}`
+    } else {
+      style.background = grad
+    }
     surface = true
   } else if (c.__bg && String(c.__bg).trim()) {
     const raw = String(c.__bg).trim()
