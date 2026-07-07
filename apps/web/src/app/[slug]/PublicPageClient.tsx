@@ -17,9 +17,14 @@ function useInView(threshold = 0.15) {
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setInView(true); obs.disconnect() } }, { threshold })
-    obs.observe(el)
-    return () => obs.disconnect()
+    // Repli : sans IntersectionObserver (ou en cas d'echec), on affiche le contenu
+    // immediatement -> jamais de bloc invisible de facon permanente (accessibilite).
+    if (typeof IntersectionObserver === "undefined") { setInView(true); return }
+    try {
+      const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setInView(true); obs.disconnect() } }, { threshold })
+      obs.observe(el)
+      return () => obs.disconnect()
+    } catch { setInView(true) }
   }, [])
   return { ref, inView }
 }
