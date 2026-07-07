@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, buildVCard, mapEmbedUrl, shareLinks, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref, docTypeMeta, docActionLabel, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, buildVCard, mapEmbedUrl, shareLinks, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref, docTypeMeta, docActionLabel, blockDecoration, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -2817,6 +2817,13 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
           .qf-cm-3 { column-count: 3 !important; }
         }
         @media (min-width: 641px) { .qf-hide-desktop { display: none !important; } }
+        @keyframes qfBFade { from { opacity:0; } to { opacity:1; } }
+        @keyframes qfBSlide { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+        @keyframes qfBZoom { from { opacity:0; transform:scale(.94); } to { opacity:1; transform:none; } }
+        .qf-b-fade { animation: qfBFade .6s ease both; }
+        .qf-b-slide { animation: qfBSlide .55s cubic-bezier(.22,1,.36,1) both; }
+        .qf-b-zoom { animation: qfBZoom .5s ease both; }
+        @media (prefers-reduced-motion: reduce) { .qf-b-fade,.qf-b-slide,.qf-b-zoom { animation: none; } }
       `}</style>
 
       {/* Container — fond complet selon bgMode (mesh/radial/pattern/image/gradient/solid) pour matcher l'éditeur */}
@@ -2824,10 +2831,15 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
 
         {/* Blocks with staggered animation */}
         {blocks.map((block, idx) => {
-          const hideCls = [block.content?.hide_mobile === "yes" ? "qf-hide-mobile" : "", block.content?.hide_desktop === "yes" ? "qf-hide-desktop" : ""].filter(Boolean).join(" ")
+          const deco = blockDecoration(block.content, theme)
+          const cls = [
+            block.content?.hide_mobile === "yes" ? "qf-hide-mobile" : "",
+            block.content?.hide_desktop === "yes" ? "qf-hide-desktop" : "",
+            deco.animClass,
+          ].filter(Boolean).join(" ")
           return (
             <AnimatedBlock key={block.id} delay={idx < 3 ? idx * 80 : 0}>
-              <div className={hideCls || undefined}>
+              <div className={cls || undefined} style={deco.style}>
                 <BlockBoundary>
                   <RenderBlock block={block} theme={theme} pageId={page.id} ownerEmail={page.profiles?.contact_email || page.profiles?.email} />
                 </BlockBoundary>

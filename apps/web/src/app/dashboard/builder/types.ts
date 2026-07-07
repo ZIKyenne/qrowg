@@ -2960,6 +2960,74 @@ export function docActionLabel(type?: string): string {
   return (t === "menu" || t === "catalogue" || t === "autre") ? "Consulter" : "Télécharger"
 }
 
+// ── Apparence par bloc (système de style universel, opt-in) ───────────────────
+// Dégradés nommés réutilisables pour le fond d'un bloc.
+export const BLOCK_GRADIENTS: Record<string, string> = {
+  "Or nuit":  "linear-gradient(135deg,#1c1608,#0a0a0a)",
+  "Océan":    "linear-gradient(135deg,#0c4a6e,#082f49)",
+  "Sunset":   "linear-gradient(135deg,#7c2d12,#431407)",
+  "Violet":   "linear-gradient(135deg,#4c1d95,#2e1065)",
+  "Menthe":   "linear-gradient(135deg,#065f46,#022c22)",
+  "Rose":     "linear-gradient(135deg,#831843,#4a044e)",
+  "Ardoise":  "linear-gradient(135deg,#1e293b,#0f172a)",
+}
+export const BLOCK_GRAD_OPTIONS = ["Aucun", ...Object.keys(BLOCK_GRADIENTS)]
+export const BLOCK_RADIUS_OPTIONS = ["Défaut", "S", "M", "L", "XL"]
+export const BLOCK_SHADOW_OPTIONS = ["Non", "Douce", "Forte"]
+export const BLOCK_SPACE_OPTIONS = ["Défaut", "Compact", "Aéré"]
+export const BLOCK_WIDTH_OPTIONS = ["Normale", "Étroite"]
+export const BLOCK_ANIM_OPTIONS = ["Aucune", "Fondu", "Glissé", "Zoom"]
+
+// Style universel appliqué au conteneur d'un bloc à partir de clés réservées (__bg, __grad, __border,
+// __radius, __shadow, __glow, __space, __width, __anim). PUR + par défaut INERTE : si aucune clé n'est
+// posée, renvoie { style: {}, animClass: "" } -> rendu identique à l'existant (zéro régression).
+export function blockDecoration(
+  content: any,
+  theme: { primary?: string; accent?: string }
+): { style: Record<string, any>; animClass: string } {
+  const c = content || {}
+  const g = theme?.primary || "#C9A84C"
+  const style: Record<string, any> = {}
+  let surface = false
+
+  const grad = c.__grad && c.__grad !== "Aucun" ? BLOCK_GRADIENTS[c.__grad] : null
+  if (grad) { style.background = grad; surface = true }
+  else if (c.__bg && String(c.__bg).trim()) { style.background = c.__bg; surface = true }
+
+  if (c.__border === "Oui") { style.border = `1px solid ${g}33`; surface = true }
+  else if (typeof c.__border === "string" && c.__border.startsWith("#")) { style.border = `1px solid ${c.__border}`; surface = true }
+
+  const radMap: Record<string, number> = { S: 10, M: 16, L: 22, XL: 30 }
+  if (c.__radius && radMap[c.__radius]) { style.borderRadius = radMap[c.__radius]; surface = true }
+
+  if (c.__shadow === "Douce") { style.boxShadow = "0 6px 22px rgba(0,0,0,0.28)"; surface = true }
+  else if (c.__shadow === "Forte") { style.boxShadow = "0 16px 44px rgba(0,0,0,0.48)"; surface = true }
+
+  if (c.__glow === "Oui") {
+    const glow = `0 0 26px ${g}44`
+    style.boxShadow = style.boxShadow ? `${style.boxShadow}, ${glow}` : glow
+    surface = true
+  }
+
+  // Dès qu'une surface est active : on insère le bloc (marge latérale) et on arrondit par défaut.
+  if (surface) {
+    style.marginLeft = 14
+    style.marginRight = 14
+    style.overflow = "hidden"
+    if (style.borderRadius === undefined) style.borderRadius = 16
+  }
+
+  const spaceMap: Record<string, number> = { Compact: 0, Aéré: 22 }
+  if (c.__space && spaceMap[c.__space] !== undefined) { style.marginTop = spaceMap[c.__space]; style.marginBottom = spaceMap[c.__space] }
+
+  if (c.__width === "Étroite") { style.maxWidth = 360; style.marginLeft = "auto"; style.marginRight = "auto" }
+
+  const animMap: Record<string, string> = { Fondu: "qf-b-fade", Glissé: "qf-b-slide", Zoom: "qf-b-zoom" }
+  const animClass = (c.__anim && animMap[c.__anim]) || ""
+
+  return { style, animClass }
+}
+
 // ── Categories de blocs ───────────────────────────────────────────────────────
 export const BLOCK_CATEGORIES = [
   { id: "identity", label: "Identite", icon: "👤", color: "#C9A84C", desc: "Profil, bio, presentation" },

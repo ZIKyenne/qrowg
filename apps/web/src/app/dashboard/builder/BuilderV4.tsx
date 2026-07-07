@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, INFO_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, INFO_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, blockDecoration, BLOCK_GRAD_OPTIONS, BLOCK_RADIUS_OPTIONS, BLOCK_SHADOW_OPTIONS, BLOCK_SPACE_OPTIONS, BLOCK_WIDTH_OPTIONS, BLOCK_ANIM_OPTIONS, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import QRCanvas from "../qr-codes/QRCanvas"
@@ -5626,7 +5626,7 @@
                       </div>
                     )}
 
-                    <div style={{ overflow: "hidden", minHeight: 36, position: "relative", zIndex: 2 }}>
+                    <div style={{ overflow: "hidden", minHeight: 36, position: "relative", zIndex: 2, ...blockDecoration(block.content, theme).style }}>
                       <PreviewBoundary><BlockPreview block={block} theme={theme} dayMode={dayMode} /></PreviewBoundary>
                     </div>
                   </div>
@@ -5884,6 +5884,64 @@
                           <p style={{ color: "#F59E0B", fontSize: 9.5, margin: "4px 0 0" }}>⚠ Ce bloc est masqué sur {selectedBlock.content.hide_mobile === "yes" ? "mobile" : ""}{selectedBlock.content.hide_mobile === "yes" && selectedBlock.content.hide_desktop === "yes" ? " et " : ""}{selectedBlock.content.hide_desktop === "yes" ? "ordinateur" : ""} (page publiée).</p>
                         )}
                       </div>
+                      {/* Style · Apparence — universel (tous blocs), stocké dans des clés réservées __ */}
+                      {(() => {
+                        const bc = selectedBlock.content as any
+                        const set = (k: string, v: string) => updateBlock(selectedBlock.id, k, v)
+                        const selStyle: React.CSSProperties = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, color: "#F5F0E8", fontSize: 12, padding: "7px 9px", cursor: "pointer" }
+                        const labelStyle: React.CSSProperties = { color: MUTED, fontSize: 11, display: "block", marginBottom: 4, fontWeight: 500 }
+                        const Sel = ({ k, label, options, def }: { k: string; label: string; options: string[]; def: string }) => (
+                          <div>
+                            <label style={labelStyle}>{label}</label>
+                            <select value={bc[k] || def} onChange={e => set(k, e.target.value)} style={selStyle}>
+                              {options.map(o => <option key={o} value={o}>{o}</option>)}
+                            </select>
+                          </div>
+                        )
+                        const Toggle = ({ k, label, icon }: { k: string; label: string; icon: string }) => {
+                          const on = bc[k] === "Oui"
+                          return (
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 0" }}>
+                              <span style={{ color: "#F5F0E8", fontSize: 12, display: "flex", alignItems: "center", gap: 7 }}><span>{icon}</span>{label}</span>
+                              <button onClick={() => set(k, on ? "" : "Oui")}
+                                style={{ width: 42, height: 24, borderRadius: 12, background: on ? G : "rgba(255,255,255,0.12)", border: "none", cursor: "pointer", position: "relative", transition: "background .2s", flexShrink: 0 }}>
+                                <span style={{ position: "absolute", top: 3, left: on ? 21 : 3, width: 18, height: 18, borderRadius: "50%", background: "#fff", transition: "left .2s", boxShadow: "0 1px 4px rgba(0,0,0,0.3)" }} />
+                              </button>
+                            </div>
+                          )
+                        }
+                        const STYLE_KEYS = ["__grad", "__bg", "__border", "__radius", "__shadow", "__glow", "__space", "__width", "__anim"]
+                        const active = STYLE_KEYS.some(k => bc[k] && !["Aucun", "Défaut", "Non", "Normale", "Aucune", ""].includes(bc[k]))
+                        return (
+                          <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 0 10px" }}>
+                              <p style={{ color: MUTED, fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: 0 }}>Style · Apparence</p>
+                              {active && <button onClick={() => STYLE_KEYS.forEach(k => set(k, ""))} title="Réinitialiser l'apparence de ce bloc"
+                                style={{ background: "none", border: "none", color: MUTED, fontSize: 10, cursor: "pointer", textDecoration: "underline" }}>Réinitialiser</button>}
+                            </div>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                              <Sel k="__grad" label="Fond dégradé" options={BLOCK_GRAD_OPTIONS} def="Aucun" />
+                              {(!bc.__grad || bc.__grad === "Aucun") && (
+                                <div>
+                                  <label style={labelStyle}>Fond (couleur unie)</label>
+                                  <div style={{ display: "flex", gap: 7 }}>
+                                    <input type="color" value={bc.__bg || "#111111"} onChange={e => set("__bg", e.target.value)} style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0, background: "none" }} />
+                                    <input type="text" value={bc.__bg || ""} onChange={e => set("__bg", e.target.value)} placeholder="Aucun (transparent)" style={{ ...selStyle, flex: 1 }} />
+                                    {bc.__bg && <button onClick={() => set("__bg", "")} title="Retirer le fond" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", padding: "0 9px", fontSize: 12 }}>✕</button>}
+                                  </div>
+                                </div>
+                              )}
+                              <Toggle k="__border" label="Bordure" icon="⬜" />
+                              <Sel k="__radius" label="Coins arrondis" options={BLOCK_RADIUS_OPTIONS} def="Défaut" />
+                              <Sel k="__shadow" label="Ombre" options={BLOCK_SHADOW_OPTIONS} def="Non" />
+                              <Toggle k="__glow" label="Halo lumineux (glow)" icon="✨" />
+                              <Sel k="__space" label="Espacement vertical" options={BLOCK_SPACE_OPTIONS} def="Défaut" />
+                              <Sel k="__width" label="Largeur" options={BLOCK_WIDTH_OPTIONS} def="Normale" />
+                              <Sel k="__anim" label="Animation d'apparition" options={BLOCK_ANIM_OPTIONS} def="Aucune" />
+                            </div>
+                          </div>
+                        )
+                      })()}
                     </>
                 }
               </div>

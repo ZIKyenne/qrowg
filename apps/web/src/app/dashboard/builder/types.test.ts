@@ -7,8 +7,48 @@ import {
   parsePrice, priceDiscount, countdownParts, stockStatus, paymentLink, paymentBrand, starRow,
   parseHourRanges, fmtMinutes, openStatus, dayField,
   vcardEscape, splitName, buildVCard, mapEmbedUrl, shareLinks, toCalStamp, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref,
-  docTypeMeta, docActionLabel,
+  docTypeMeta, docActionLabel, blockDecoration,
 } from "./types"
+
+describe("blockDecoration", () => {
+  const theme = { primary: "#C9A84C", accent: "#39FF8F" }
+  it("inerte par défaut (aucune clé __ posée)", () => {
+    const r = blockDecoration({ title: "x" }, theme)
+    expect(r.style).toEqual({})
+    expect(r.animClass).toBe("")
+  })
+  it("fond dégradé -> surface insérée + coins par défaut", () => {
+    const r = blockDecoration({ __grad: "Océan" }, theme)
+    expect(r.style.background).toContain("linear-gradient")
+    expect(r.style.marginLeft).toBe(14)
+    expect(r.style.borderRadius).toBe(16)
+    expect(r.style.overflow).toBe("hidden")
+  })
+  it("fond couleur unie", () => {
+    expect(blockDecoration({ __bg: "#123456" }, theme).style.background).toBe("#123456")
+  })
+  it("bordure Oui utilise la couleur primaire du thème", () => {
+    expect(blockDecoration({ __border: "Oui" }, theme).style.border).toBe("1px solid #C9A84C33")
+  })
+  it("coins explicites priment sur le défaut", () => {
+    expect(blockDecoration({ __grad: "Océan", __radius: "XL" }, theme).style.borderRadius).toBe(30)
+  })
+  it("ombre + glow se combinent", () => {
+    const r = blockDecoration({ __shadow: "Douce", __glow: "Oui" }, theme)
+    expect(r.style.boxShadow).toContain("rgba(0,0,0,0.28)")
+    expect(r.style.boxShadow).toContain("#C9A84C44")
+  })
+  it("largeur étroite -> maxWidth + centrage", () => {
+    const r = blockDecoration({ __width: "Étroite" }, theme)
+    expect(r.style.maxWidth).toBe(360)
+    expect(r.style.marginLeft).toBe("auto")
+  })
+  it("espacement + animation", () => {
+    const r = blockDecoration({ __space: "Aéré", __anim: "Zoom" }, theme)
+    expect(r.style.marginTop).toBe(22)
+    expect(r.animClass).toBe("qf-b-zoom")
+  })
+})
 
 describe("docTypeMeta", () => {
   it("mappe les types connus (insensible à la casse et aux espaces)", () => {
