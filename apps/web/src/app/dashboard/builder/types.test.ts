@@ -644,6 +644,15 @@ describe("shareLinks", () => {
   })
   it("sans texte -> pas de segment texte parasite", () => {
     const w = shareLinks("https://x.io").find(t => t.key === "whatsapp")!
-    expect(w.href).toBe("https://wa.me/?text=https%3A%2F%2Fx.io")
+    expect(w.href).toBe("https://wa.me/?text=https%3A%2F%2Fx.io%3Futm_source%3Dwhatsapp%26utm_medium%3Dshare")
+  })
+  it("attribution : chaque lien pose utm_source de son reseau", () => {
+    expect(by("whatsapp").href).toContain("utm_source%3Dwhatsapp")
+    expect(by("x").href).toContain("utm_source%3Dx")
+    expect(by("linkedin").href).toContain("utm_source%3Dlinkedin")
+  })
+  it("utm ajoute avec & si l'URL a deja des parametres", () => {
+    const w = shareLinks("https://qrfolio.app/jean?ref=1").find(t => t.key === "telegram")!
+    expect(w.href).toContain("jean%3Fref%3D1%26utm_source%3Dtelegram")
   })
 })

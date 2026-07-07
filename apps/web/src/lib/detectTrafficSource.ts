@@ -46,6 +46,15 @@ export function detectTrafficSource(): TrafficInfo {
     return { source: "qr_scan", referrer: null }
   }
 
+  // 1.5 utm_source explicite (campagne / partage) — prioritaire sur le référent.
+  // Indispensable pour WhatsApp/Telegram qui effacent le referrer -> sinon "direct".
+  const utm = (params.get("utm_source") || "").toLowerCase().trim()
+  if (utm) {
+    if (utm === "x") return { source: "twitter", referrer: null }
+    const KNOWN: TrafficSource[] = ["instagram", "tiktok", "facebook", "linkedin", "twitter", "whatsapp", "telegram", "email", "google"]
+    if ((KNOWN as string[]).includes(utm)) return { source: utm as TrafficSource, referrer: null }
+  }
+
   // 2. Référent HTTP
   const rawRef = document.referrer
   if (!rawRef) return { source: "direct", referrer: null }
