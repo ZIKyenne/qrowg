@@ -1720,30 +1720,38 @@
       )
 
       case "timeline": {
-        const events = [[c.e1_date,c.e1_title,c.e1_desc],[c.e2_date,c.e2_title,c.e2_desc],[c.e3_date,c.e3_title,c.e3_desc],[c.e4_date,c.e4_title,c.e4_desc]].filter(([,t])=>t)
+        const events = [1,2,3,4,5].map(i => ({ date: c[`e${i}_date`], title: c[`e${i}_title`], desc: c[`e${i}_desc`], icon: (c[`e${i}_icon`]||"").trim() })).filter(e => e.title || e.date)
+        const horizontal = c.layout === "Horizontale"
+        const list = events.length ? events : [0,1,2].map(i => ({ date: `202${i+2}`, title: `Étape ${i+1}`, desc: "Description", icon: "" }))
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 14px" }}>{c.title}</p>}
-            <div style={{ position: "relative", paddingLeft: 20 }}>
-              <div style={{ position: "absolute", left: 6, top: 8, bottom: 8, width: 2, background: `linear-gradient(180deg,${primary},${primary}40)`, borderRadius: 1 }} />
-              {events.length===0
-                ? [0,1,2].map(i => (
-                  <div key={i} style={{ position: "relative", marginBottom: 16 }}>
-                    <div style={{ position: "absolute", left: -17, top: 4, width: 10, height: 10, borderRadius: "50%", background: primary, border: `2px solid ${primary}40` }} />
-                    <p style={{ color: primary, fontSize: 11, fontWeight: 700, margin: "0 0 2px" }}>202{i+2}</p>
-                    <p style={{ color: text, fontSize: 12, fontWeight: 600, margin: "0 0 2px" }}>Étape {i+1}</p>
-                    <p style={{ color: muted, fontSize: 11, margin: 0 }}>Description</p>
-                  </div>
-                ))
-                : events.map(([date,title,desc],i) => (
-                  <div key={i} style={{ position: "relative", marginBottom: i<events.length-1 ? 16 : 0 }}>
-                    <div style={{ position: "absolute", left: -17, top: 4, width: 10, height: 10, borderRadius: "50%", background: i===events.length-1 ? "#39FF8F" : primary, border: `2px solid ${i===events.length-1 ? "#39FF8F40" : primary+"40"}` }} />
-                    <p style={{ color: primary, fontSize: 11, fontWeight: 700, margin: "0 0 2px" }}>{date}</p>
-                    <p style={{ color: text, fontSize: 12, fontWeight: 600, margin: "0 0 2px" }}>{title}</p>
-                    {desc && <p style={{ color: muted, fontSize: 11, margin: 0 }}>{desc}</p>}
+            {horizontal ? (
+              <div style={{ display: "flex", gap: 9, overflowX: "auto", padding: "2px 0 6px" }}>
+                {list.map((e,i) => (
+                  <div key={i} style={{ flexShrink: 0, width: 150, background: "rgba(255,255,255,0.03)", border: `1px solid ${i===list.length-1 ? "#39FF8F30" : "rgba(255,255,255,0.07)"}`, borderRadius: 12, padding: "12px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 6 }}>
+                      <div style={{ width: 26, height: 26, borderRadius: 7, background: `${primary}12`, border: `1px solid ${primary}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>{e.icon || "•"}</div>
+                      <p style={{ color: primary, fontSize: 11, fontWeight: 700, margin: 0 }}>{e.date}</p>
+                    </div>
+                    <p style={{ color: text, fontSize: 12, fontWeight: 600, margin: "0 0 2px" }}>{e.title}</p>
+                    {e.desc && <p style={{ color: muted, fontSize: 10.5, margin: 0 }}>{e.desc}</p>}
                   </div>
                 ))}
-            </div>
+              </div>
+            ) : (
+              <div style={{ position: "relative", paddingLeft: 20 }}>
+                <div style={{ position: "absolute", left: 6, top: 8, bottom: 8, width: 2, background: `linear-gradient(180deg,${primary},${primary}40)`, borderRadius: 1 }} />
+                {list.map((e,i) => (
+                  <div key={i} style={{ position: "relative", marginBottom: i<list.length-1 ? 16 : 0 }}>
+                    <div style={{ position: "absolute", left: -17, top: 4, width: 10, height: 10, borderRadius: "50%", background: i===list.length-1 ? "#39FF8F" : primary, border: `2px solid ${i===list.length-1 ? "#39FF8F40" : primary+"40"}` }} />
+                    <p style={{ color: primary, fontSize: 11, fontWeight: 700, margin: "0 0 2px" }}>{e.date}</p>
+                    <p style={{ color: text, fontSize: 12, fontWeight: 600, margin: "0 0 2px", display: "flex", alignItems: "center", gap: 5 }}>{e.icon && <span style={{ fontSize: 13 }}>{e.icon}</span>}{e.title}</p>
+                    {e.desc && <p style={{ color: muted, fontSize: 11, margin: 0 }}>{e.desc}</p>}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )
       }
@@ -1795,31 +1803,47 @@
       }
 
       case "team": {
-        const members = [[c.m1_photo,c.m1_name,c.m1_role,c.m1_bio],[c.m2_photo,c.m2_name,c.m2_role,c.m2_bio],[c.m3_photo,c.m3_name,c.m3_role,c.m3_bio]].filter(([,n])=>n)
+        const members = [1,2,3,4].map(i => ({ photo: c[`m${i}_photo`], name: c[`m${i}_name`], role: c[`m${i}_role`], bio: c[`m${i}_bio`], phone: (c[`m${i}_phone`]||"").trim(), email: (c[`m${i}_email`]||"").trim(), linkedin: (c[`m${i}_linkedin`]||"").trim() })).filter(m => m.name)
+        const grid = c.layout === "Grille"
+        const contactDots = (m: any) => {
+          const ic = [] as string[]
+          if (m.phone) ic.push("📞"); if (m.email) ic.push("✉️"); if (m.linkedin) ic.push("in")
+          return ic.length ? <div style={{ display: "flex", gap: 5, marginTop: 6, justifyContent: grid ? "center" : "flex-start" }}>{ic.map((x,k) => <span key={k} style={{ width: 22, height: 22, borderRadius: 6, background: `${primary}12`, border: `1px solid ${primary}25`, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 11 }}>{x}</span>)}</div> : null
+        }
+        const av = (m: any, size: number) => m.photo
+          ? <img src={String(m.photo)} alt={String(m.name)} style={{ width: size, height: size, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${primary}40` }} />
+          : <div style={{ width: size, height: size, borderRadius: "50%", background: `linear-gradient(135deg,${primary},${accent})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: size*0.4, fontWeight: 700, color: "#080808", flexShrink: 0 }}>{String(m.name)[0]}</div>
+        const list = members.length ? members : [{ name: "Prénom Nom", role: "Poste", bio: "", photo: "", phone: "", email: "", linkedin: "" }]
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {members.length===0
-                ? [0,1].map(i => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
-                    <div style={{ width: 44, height: 44, borderRadius: "50%", background: primary+"20", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>👤</div>
-                    <div><p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>Prénom Nom</p><p style={{ color: muted, fontSize: 11, margin: 0 }}>Poste</p></div>
+            {grid ? (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                {list.map((m,i) => (
+                  <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "13px 10px" }}>
+                    {av(m, 52)}
+                    <p style={{ color: text, fontSize: 12.5, fontWeight: 700, margin: "6px 0 1px" }}>{m.name}</p>
+                    {m.role && <p style={{ color: primary, fontSize: 11, margin: 0 }}>{m.role}</p>}
+                    {m.bio && <p style={{ color: muted, fontSize: 10, margin: "2px 0 0" }}>{m.bio}</p>}
+                    {contactDots(m)}
                   </div>
-                ))
-                : members.map(([photo,name,role,bio],i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
-                    {photo
-                      ? <img src={String(photo)} alt={String(name)} style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${primary}40` }} />
-                      : <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg,${primary},${accent})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 700, color: "#080808", flexShrink: 0 }}>{String(name)[0]}</div>}
-                    <div>
-                      <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{name}</p>
-                      <p style={{ color: primary, fontSize: 11, margin: "0 0 1px" }}>{role}</p>
-                      {bio && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{bio}</p>}
+                ))}
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {list.map((m,i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
+                    {av(m, 44)}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{m.name}</p>
+                      {m.role && <p style={{ color: primary, fontSize: 11, margin: "0 0 1px" }}>{m.role}</p>}
+                      {m.bio && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{m.bio}</p>}
+                      {contactDots(m)}
                     </div>
                   </div>
                 ))}
-            </div>
+              </div>
+            )}
           </div>
         )
       }

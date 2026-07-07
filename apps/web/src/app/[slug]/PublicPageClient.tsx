@@ -1454,26 +1454,57 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
     }
     case "team": {
       const accent = theme.accent || "#39FF8F"
-      const members = [[c.m1_photo, c.m1_name, c.m1_role, c.m1_bio], [c.m2_photo, c.m2_name, c.m2_role, c.m2_bio], [c.m3_photo, c.m3_name, c.m3_role, c.m3_bio]].filter(([, n]) => n)
-      return members.length > 0 ? (
+      const members = [1,2,3,4]
+        .map(i => ({ photo: c[`m${i}_photo`], name: c[`m${i}_name`], role: c[`m${i}_role`], bio: c[`m${i}_bio`], phone: (c[`m${i}_phone`]||"").trim(), email: (c[`m${i}_email`]||"").trim(), linkedin: (c[`m${i}_linkedin`]||"").trim() }))
+        .filter(m => m.name)
+      if (members.length === 0) return null
+      const grid = c.layout === "Grille"
+      const contactBtn = (icon: string, href: string, label: string) => (
+        <a href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" aria-label={label} onClick={() => trackLinkClick(pageId, block.id, href)}
+          style={{ width: 30, height: 30, borderRadius: 8, background: `${G}12`, border: `1px solid ${G}25`, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 14, textDecoration: "none", flexShrink: 0 }}>{icon}</a>
+      )
+      const contacts = (m: any, center?: boolean) => {
+        const links = [] as any[]
+        if (m.phone) links.push(contactBtn("📞", telLink(m.phone), `Appeler ${m.name}`))
+        if (m.email) links.push(contactBtn("✉️", `mailto:${m.email}`, `Écrire à ${m.name}`))
+        if (m.linkedin) links.push(contactBtn("in", socialHref("linkedin", m.linkedin), `LinkedIn de ${m.name}`))
+        return links.length ? <div style={{ display: "flex", gap: 7, marginTop: 8, justifyContent: center ? "center" : "flex-start" }}>{links.map((l, k) => <span key={k}>{l}</span>)}</div> : null
+      }
+      const avatar = (m: any, size: number) => m.photo
+        ? <img onError={e => { e.currentTarget.style.display = 'none' }} loading="lazy" decoding="async" src={String(m.photo)} alt={String(m.name)} style={{ width: size, height: size, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${G}40` }} />
+        : <div style={{ width: size, height: size, borderRadius: "50%", background: `linear-gradient(135deg,${G},${accent})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: size*0.42, fontWeight: 700, color: "#080808", flexShrink: 0 }}>{String(m.name)[0]}</div>
+      return (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {members.map(([photo, name, role, bio]: any[], i: number) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 13, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 13, padding: "13px 15px" }}>
-                {photo
-                  ? <img onError={e => { e.currentTarget.style.display = 'none' }} loading="lazy" decoding="async" src={String(photo)} alt={String(name)} style={{ width: 48, height: 48, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${G}40` }} />
-                  : <div style={{ width: 48, height: 48, borderRadius: "50%", background: `linear-gradient(135deg,${G},${accent})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#080808", flexShrink: 0 }}>{String(name)[0]}</div>}
-                <div>
-                  <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{name}</p>
-                  {role && <p style={{ color: G, fontSize: 12, margin: "0 0 1px" }}>{role}</p>}
-                  {bio && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{bio}</p>}
+          {grid ? (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+              {members.map((m, i) => (
+                <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 4, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 13, padding: "15px 12px" }}>
+                  {avatar(m, 60)}
+                  <p style={{ color: TEXT, fontSize: 13.5, fontWeight: 700, margin: "6px 0 0", fontFamily: FONT_B }}>{m.name}</p>
+                  {m.role && <p style={{ color: G, fontSize: 11.5, margin: 0 }}>{m.role}</p>}
+                  {m.bio && <p style={{ color: MUTED, fontSize: 11, margin: "2px 0 0", lineHeight: 1.4 }}>{m.bio}</p>}
+                  {contacts(m, true)}
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {members.map((m, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 13, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 13, padding: "13px 15px" }}>
+                  {avatar(m, 48)}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{m.name}</p>
+                    {m.role && <p style={{ color: G, fontSize: 12, margin: "0 0 1px" }}>{m.role}</p>}
+                    {m.bio && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{m.bio}</p>}
+                    {contacts(m)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      ) : null
+      )
     }
     case "partners": {
       const logos = [[c.logo1_img, c.logo1_name], [c.logo2_img, c.logo2_name], [c.logo3_img, c.logo3_name], [c.logo4_img, c.logo4_name], [c.logo5_img, c.logo5_name], [c.logo6_img, c.logo6_name]].filter(([, n]) => n)
@@ -1557,23 +1588,42 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       </div>
     ) : null
     case "timeline": {
-      const events = [[c.e1_date, c.e1_title, c.e1_desc], [c.e2_date, c.e2_title, c.e2_desc], [c.e3_date, c.e3_title, c.e3_desc], [c.e4_date, c.e4_title, c.e4_desc]].filter(([, t]) => t)
-      return events.length > 0 ? (
+      const events = [1,2,3,4,5]
+        .map(i => ({ date: c[`e${i}_date`], title: c[`e${i}_title`], desc: c[`e${i}_desc`], icon: (c[`e${i}_icon`]||"").trim() }))
+        .filter(e => e.title || e.date)
+      if (events.length === 0) return null
+      const horizontal = c.layout === "Horizontale"
+      return (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 16px", fontFamily: FONT_B }}>{c.title}</p>}
-          <div style={{ position: "relative", paddingLeft: 22 }}>
-            <div style={{ position: "absolute", left: 6, top: 8, bottom: 8, width: 2, background: `linear-gradient(180deg,${G},${G}40)`, borderRadius: 1 }} />
-            {events.map(([date, title, desc]: any[], i: number) => (
-              <div key={i} style={{ position: "relative", marginBottom: i < events.length - 1 ? 18 : 0 }}>
-                <div style={{ position: "absolute", left: -19, top: 4, width: 11, height: 11, borderRadius: "50%", background: i === events.length - 1 ? "#39FF8F" : G, border: `2px solid ${i === events.length - 1 ? "#39FF8F40" : `${G}40`}` }} />
-                <p style={{ color: G, fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>{date}</p>
-                <p style={{ color: TEXT, fontSize: 14, fontWeight: 600, margin: "0 0 2px", fontFamily: FONT_B }}>{title}</p>
-                {desc && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{desc}</p>}
-              </div>
-            ))}
-          </div>
+          {horizontal ? (
+            <div style={{ display: "flex", gap: 11, overflowX: "auto", padding: "2px 0 8px", WebkitOverflowScrolling: "touch", scrollSnapType: "x mandatory" }}>
+              {events.map((e, i) => (
+                <div key={i} style={{ scrollSnapAlign: "start", flexShrink: 0, width: 168, background: "rgba(255,255,255,0.03)", border: `1px solid ${i === events.length - 1 ? "#39FF8F30" : "rgba(255,255,255,0.07)"}`, borderRadius: 13, padding: "14px 14px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                    <div style={{ width: 30, height: 30, borderRadius: 8, background: `${G}12`, border: `1px solid ${G}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}>{e.icon || "•"}</div>
+                    <p style={{ color: G, fontSize: 12, fontWeight: 700, margin: 0 }}>{e.date}</p>
+                  </div>
+                  <p style={{ color: TEXT, fontSize: 13.5, fontWeight: 600, margin: "0 0 3px", fontFamily: FONT_B }}>{e.title}</p>
+                  {e.desc && <p style={{ color: MUTED, fontSize: 11.5, margin: 0, lineHeight: 1.5 }}>{e.desc}</p>}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ position: "relative", paddingLeft: 22 }}>
+              <div style={{ position: "absolute", left: 6, top: 8, bottom: 8, width: 2, background: `linear-gradient(180deg,${G},${G}40)`, borderRadius: 1 }} />
+              {events.map((e, i) => (
+                <div key={i} style={{ position: "relative", marginBottom: i < events.length - 1 ? 18 : 0 }}>
+                  <div style={{ position: "absolute", left: -19, top: 4, width: 11, height: 11, borderRadius: "50%", background: i === events.length - 1 ? "#39FF8F" : G, border: `2px solid ${i === events.length - 1 ? "#39FF8F40" : `${G}40`}` }} />
+                  <p style={{ color: G, fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>{e.date}</p>
+                  <p style={{ color: TEXT, fontSize: 14, fontWeight: 600, margin: "0 0 2px", fontFamily: FONT_B, display: "flex", alignItems: "center", gap: 6 }}>{e.icon && <span aria-hidden style={{ fontSize: 15 }}>{e.icon}</span>}{e.title}</p>
+                  {e.desc && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{e.desc}</p>}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      ) : null
+      )
     }
     case "two_columns": {
       const cols = [[c.col1_icon, c.col1_title, c.col1_text], [c.col2_icon, c.col2_title, c.col2_text]].filter(([, t, txt]) => t || txt)
