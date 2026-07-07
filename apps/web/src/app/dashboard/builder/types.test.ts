@@ -6,7 +6,7 @@ import {
   SOCIAL_NETWORKS, SOCIAL_NETWORKS_MAP, productBadgeStyle,
   parsePrice, priceDiscount, countdownParts, stockStatus, paymentLink, paymentBrand, starRow,
   parseHourRanges, fmtMinutes, openStatus,
-  vcardEscape, splitName, buildVCard, mapEmbedUrl, shareLinks, toCalStamp, calendarLinks,
+  vcardEscape, splitName, buildVCard, mapEmbedUrl, shareLinks, toCalStamp, calendarLinks, spotifyEmbedUrl,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -698,5 +698,32 @@ describe("calendarLinks", () => {
   })
   it("date de debut invalide -> null", () => {
     expect(calendarLinks({ name: "X", start: "" })).toBeNull()
+  })
+})
+
+describe("spotifyEmbedUrl", () => {
+  it("URL standard track -> embed", () => {
+    expect(spotifyEmbedUrl("https://open.spotify.com/track/6rqhFgbbKwnb9MLmUQDhG6"))
+      .toBe("https://open.spotify.com/embed/track/6rqhFgbbKwnb9MLmUQDhG6?utm_source=generator&theme=0")
+  })
+  it("URL LOCALISEE (/intl-fr/) -> embed (bug corrige)", () => {
+    expect(spotifyEmbedUrl("https://open.spotify.com/intl-fr/album/1DFixLWuPkv3KT3TnV35m3?si=abc"))
+      .toBe("https://open.spotify.com/embed/album/1DFixLWuPkv3KT3TnV35m3?utm_source=generator&theme=0")
+  })
+  it("type deduit de l'URL (playlist)", () => {
+    expect(spotifyEmbedUrl("https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M"))
+      .toContain("/embed/playlist/37i9dQZF1DXcBWIGoYBM5M")
+  })
+  it("URI spotify: -> embed", () => {
+    expect(spotifyEmbedUrl("spotify:track:6rqhFgbbKwnb9MLmUQDhG6"))
+      .toContain("/embed/track/6rqhFgbbKwnb9MLmUQDhG6")
+  })
+  it("URL d'embed deja prete -> inchangee", () => {
+    const e = "https://open.spotify.com/embed/track/xyz?utm_source=generator&theme=0"
+    expect(spotifyEmbedUrl(e)).toBe(e)
+  })
+  it("vide / non Spotify -> vide", () => {
+    expect(spotifyEmbedUrl("")).toBe("")
+    expect(spotifyEmbedUrl("https://exemple.com/x")).toBe("")
   })
 })

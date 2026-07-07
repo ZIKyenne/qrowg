@@ -660,6 +660,20 @@ export function mapEmbedUrl(address?: string, embedUrl?: string, zoom?: string):
   return `https://maps.google.com/maps?q=${enc}&z=${z}&output=embed`
 }
 
+// URL d'embed Spotify robuste : detecte type + id depuis une URL (gere le prefixe de
+// locale /intl-fr/ tres courant, les parametres, l'URI spotify:...) ou une URL d'embed deja
+// prete. Renvoie "" si rien d'exploitable. Le type est deduit de l'URL (pas d'un champ a part).
+export function spotifyEmbedUrl(url?: string): string {
+  const u = (url || "").trim()
+  if (!u) return ""
+  if (/open\.spotify\.com\/embed\//i.test(u)) return u // deja un embed
+  const web = u.match(/open\.spotify\.com\/(?:intl-[a-z-]+\/)?(track|album|playlist|artist|episode|show)\/([a-zA-Z0-9]+)/i)
+  if (web) return `https://open.spotify.com/embed/${web[1].toLowerCase()}/${web[2]}?utm_source=generator&theme=0`
+  const uri = u.match(/spotify:(track|album|playlist|artist|episode|show):([a-zA-Z0-9]+)/i)
+  if (uri) return `https://open.spotify.com/embed/${uri[1].toLowerCase()}/${uri[2]}?utm_source=generator&theme=0`
+  return ""
+}
+
 // ── Ajouter au calendrier : Google Agenda + fichier .ics (Apple/Outlook/tous) ──
 // Convertit "2025-06-15T19:00[:00]" (ou date seule) en tampon calendrier "20250615T190000"
 // en HEURE FLOTTANTE (aucun decalage de fuseau -> l'evenement s'affiche a l'heure saisie).
