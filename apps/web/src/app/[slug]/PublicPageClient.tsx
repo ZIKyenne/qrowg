@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, buildVCard, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, buildVCard, mapEmbedUrl, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -1834,9 +1834,9 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       return (c.embed_url || c.address || transports.length > 0) ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
-          {c.embed_url
-            ? <iframe src={c.embed_url} width="100%" height={180} style={{ border: "none", borderRadius: 13, display: "block", marginBottom: 11 }} loading="lazy" />
-            : c.address ? <div style={{ background: "rgba(236,72,153,0.06)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 13, padding: "18px", display: "flex", flexDirection: "column", alignItems: "center", gap: 7, marginBottom: 11 }}><span style={{ fontSize: 30 }}>🗺️</span><p style={{ color: MUTED, fontSize: 12, margin: 0, textAlign: "center" }}>📍 {c.address}</p></div> : null}
+          {(() => { const mapSrc = mapEmbedUrl(c.address, c.embed_url); return mapSrc
+            ? <iframe src={mapSrc} title={c.title || "Plan d'accès"} width="100%" height={180} style={{ border: "none", borderRadius: 13, display: "block", marginBottom: 11 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+            : c.address ? <div style={{ background: "rgba(236,72,153,0.06)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 13, padding: "18px", display: "flex", flexDirection: "column", alignItems: "center", gap: 7, marginBottom: 11 }}><span style={{ fontSize: 30 }}>🗺️</span><p style={{ color: MUTED, fontSize: 12, margin: 0, textAlign: "center" }}>📍 {c.address}</p></div> : null })()}
           {transports.length > 0 && (
             <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
               {transports.map(([icon, label]: any[], i: number) => (
@@ -2085,15 +2085,15 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
         </div>
       ) : null
     }
-    case "google_maps_embed": return (c.embed_url || c.address) ? (
+    case "google_maps_embed": { const mapSrc = mapEmbedUrl(c.address, c.embed_url, c.zoom); return (c.embed_url || c.address) ? (
       <div style={{ padding: "10px 24px 14px" }}>
         {c.label && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.label}</p>}
-        {c.embed_url
-          ? <iframe src={c.embed_url} width="100%" height={c.height === "lg" ? 240 : c.height === "sm" ? 140 : 190} style={{ border: "none", borderRadius: 13, display: "block" }} loading="lazy" />
+        {mapSrc
+          ? <iframe src={mapSrc} title={c.label || "Carte"} width="100%" height={c.height === "lg" ? 240 : c.height === "sm" ? 140 : 190} style={{ border: "none", borderRadius: 13, display: "block" }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
           : <div style={{ height: 190, background: "rgba(66,133,244,0.06)", border: "1px solid rgba(66,133,244,0.2)", borderRadius: 13, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}><span style={{ fontSize: 34 }}>🗺️</span><p style={{ color: MUTED, fontSize: 12, margin: 0, textAlign: "center" }}>📍 {c.address}</p></div>}
         {c.show_directions !== "no" && c.address && <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(c.address)}`} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, "directions")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 11, background: "rgba(66,133,244,0.1)", border: "1px solid rgba(66,133,244,0.25)", borderRadius: 10, padding: "12px", color: "#4285F4", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>🧭 Obtenir l&apos;itinéraire</a>}
       </div>
-    ) : null
+    ) : null }
     case "company": return (c.company_name || c.logo_url) ? (
       <div style={{ padding: "8px 24px 12px" }}>
         <div style={{ display: "flex", gap: 12, alignItems: "center", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 13, padding: "12px 13px" }}>

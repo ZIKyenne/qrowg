@@ -647,6 +647,18 @@ export function buildVCard(d: { name?: string; phone?: string; email?: string; c
   return lines.join("\r\n")
 }
 
+// URL d'iframe Google Maps. Priorite a une URL embed personnalisee (pb=...) ; sinon
+// on construit une carte interactive depuis l'adresse SANS cle API (output=embed).
+// Renvoie "" si rien d'exploitable.
+export function mapEmbedUrl(address?: string, embedUrl?: string, zoom?: string): string {
+  const custom = (embedUrl || "").trim()
+  if (/^https?:\/\//i.test(custom)) return custom
+  const enc = encodeURIComponent((address || "").trim())
+  if (!enc) return ""
+  const z = /^\d{1,2}$/.test(String(zoom || "")) ? String(zoom) : "15"
+  return `https://maps.google.com/maps?q=${enc}&z=${z}&output=embed`
+}
+
 // Statuts de disponibilité (parité builder <-> public). Couleur personnalisable via dot_color.
 export const AVAILABILITY_STATUSES: { key: string; label: string; color: string }[] = [
   { key: "available", label: "Disponible", color: "#39FF8F" },
@@ -3734,7 +3746,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     fields: [
       { key: "title", label: "Titre", type: "text", placeholder: "Comment venir" },
       { key: "address", label: "Adresse complète", type: "text", placeholder: "12 rue de la Paix, 75001 Paris" },
-      { key: "embed_url", label: "URL embed Google Maps", type: "url", placeholder: "https://www.google.com/maps/embed?pb=..." },
+      { key: "embed_url", label: "URL embed personnalisée (optionnel)", type: "url", placeholder: "https://www.google.com/maps/embed?pb=...", hint: "Laissez vide : la carte se construit automatiquement depuis l'adresse" },
       { key: "transport1_icon", label: "Transport 1 — Emoji", type: "text", placeholder: "🚇" },
       { key: "transport1_label", label: "Transport 1 — Info", type: "text", placeholder: "Métro ligne 1 — Châtelet" },
       { key: "transport2_icon", label: "Transport 2 — Emoji", type: "text", placeholder: "🚌" },
@@ -3980,7 +3992,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     fields: [
       { key: "label", label: "Titre", type: "text", placeholder: "Nous trouver" },
       { key: "address", label: "Adresse complète", type: "text", placeholder: "12 rue de la Paix, 75001 Paris" },
-      { key: "embed_url", label: "URL embed Google Maps", type: "url", placeholder: "https://www.google.com/maps/embed?pb=..." },
+      { key: "embed_url", label: "URL embed personnalisée (optionnel)", type: "url", placeholder: "https://www.google.com/maps/embed?pb=...", hint: "Laissez vide : la carte se construit automatiquement depuis l'adresse" },
       { key: "height", label: "Hauteur", type: "select", options: ["sm", "md", "lg"] },
       { key: "show_directions", label: "Bouton itinéraire", type: "select", options: ["yes", "no"] },
     ],

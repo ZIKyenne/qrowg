@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, mapEmbedUrl, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import QRCanvas from "../qr-codes/QRCanvas"
@@ -1893,14 +1893,14 @@
       )
 
 
-      case "google_maps_embed": return (
+      case "google_maps_embed": { const mapSrc = mapEmbedUrl(c.address, c.embed_url, c.zoom); return (
         <div style={{ padding: "10px 16px", ...s }}>
           {c.label && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.label}</p>}
-          {c.embed_url
-            ? <iframe src={c.embed_url} width="100%" height={c.height==="lg" ? 200 : c.height==="sm" ? 120 : 160} style={{ border: "none", borderRadius: 12, display: "block" }} loading="lazy" />
+          {mapSrc
+            ? <iframe src={mapSrc} title={c.label||"Carte"} width="100%" height={c.height==="lg" ? 200 : c.height==="sm" ? 120 : 160} style={{ border: "none", borderRadius: 12, display: "block" }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
             : <div style={{ height: 160, background: "rgba(66,133,244,0.06)", border: "1px solid rgba(66,133,244,0.2)", borderRadius: 12, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
                 <span style={{ fontSize: 32 }}>🗺️</span>
-                <p style={{ color: muted, fontSize: 11, margin: 0, textAlign: "center" }}>{c.address||"Ajoutez l URL embed Google Maps"}</p>
+                <p style={{ color: muted, fontSize: 11, margin: 0, textAlign: "center" }}>{c.address||"Ajoutez une adresse"}</p>
               </div>}
           {c.show_directions!=="no" && c.address && (
             <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(c.address)}`} target="_blank" rel="noopener noreferrer"
@@ -1909,7 +1909,7 @@
             </a>
           )}
         </div>
-      )
+      ) }
 
       case "quote_form": return (
         <div style={{ padding: "10px 16px", ...s }}>
@@ -2417,12 +2417,12 @@
       case "event_access": return (
         <div style={{ padding: "10px 16px", ...s }}>
           {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
-          {c.embed_url
-            ? <iframe src={c.embed_url} width="100%" height={150} style={{ border: "none", borderRadius: 12, display: "block", marginBottom: 10 }} loading="lazy" />
+          {(() => { const mapSrc = mapEmbedUrl(c.address, c.embed_url); return mapSrc
+            ? <iframe src={mapSrc} title={c.title||"Plan"} width="100%" height={150} style={{ border: "none", borderRadius: 12, display: "block", marginBottom: 10 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
             : <div style={{ height: 130, background: "rgba(236,72,153,0.06)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 12, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 10 }}>
                 <span style={{ fontSize: 28 }}>🗺️</span>
                 {c.address && <p style={{ color: muted, fontSize: 11, margin: 0, textAlign: "center", padding: "0 14px" }}>📍 {c.address}</p>}
-              </div>}
+              </div> })()}
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {[
               [c.transport1_icon, c.transport1_label],

@@ -6,7 +6,7 @@ import {
   SOCIAL_NETWORKS, SOCIAL_NETWORKS_MAP, productBadgeStyle,
   parsePrice, priceDiscount, countdownParts, stockStatus, paymentLink, paymentBrand, starRow,
   parseHourRanges, fmtMinutes, openStatus,
-  vcardEscape, splitName, buildVCard,
+  vcardEscape, splitName, buildVCard, mapEmbedUrl,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -602,5 +602,24 @@ describe("buildVCard", () => {
     const v = buildVCard({ name: "Jean" })
     expect(v).not.toContain("TEL")
     expect(v).not.toContain("ADR")
+  })
+})
+
+describe("mapEmbedUrl", () => {
+  it("construit une carte depuis l'adresse (sans cle API)", () => {
+    const u = mapEmbedUrl("12 rue de la Paix, Paris")
+    expect(u).toBe("https://maps.google.com/maps?q=12%20rue%20de%20la%20Paix%2C%20Paris&z=15&output=embed")
+  })
+  it("zoom personnalise valide (1-2 chiffres)", () => {
+    expect(mapEmbedUrl("Paris", "", "18")).toContain("&z=18&")
+    expect(mapEmbedUrl("Paris", "", "abc")).toContain("&z=15&") // invalide -> defaut
+  })
+  it("URL embed personnalisee prioritaire", () => {
+    const custom = "https://www.google.com/maps/embed?pb=xyz"
+    expect(mapEmbedUrl("Paris", custom)).toBe(custom)
+  })
+  it("rien d'exploitable -> vide", () => {
+    expect(mapEmbedUrl("")).toBe("")
+    expect(mapEmbedUrl(undefined, undefined)).toBe("")
   })
 })
