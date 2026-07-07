@@ -51,16 +51,62 @@ function AnimatedBlock({ children, delay = 0 }: { children: React.ReactNode; del
 
 // ── Countdown ────────────────────────────────────────────────────────────────
 // ── FAQ Item ─────────────────────────────────────────────────────────────────
-function FAQItem({ q, a, theme }: { q: string; a: string; theme: any }) {
+function FAQItem({ q, a, theme, link, linkLabel, compact, onLink }: { q: string; a: string; theme: any; link?: string; linkLabel?: string; compact?: boolean; onLink?: (url: string) => void }) {
   const [open, setOpen] = useState(false)
+  const pad = compact ? "10px 14px" : "13px 16px"
   return (
-    <div style={{ border: `1px solid ${open ? theme.primary + "30" : "rgba(255,255,255,0.06)"}`, borderRadius: 12, overflow: "hidden", marginBottom: 8, transition: "all 0.2s" }}>
-      <button onClick={() => setOpen(o => !o)} aria-expanded={open} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: open ? `${theme.primary}06` : "transparent", border: "none", color: theme.text, fontSize: 14, fontWeight: 600, cursor: "pointer", textAlign: "left" }}>
+    <div style={{ border: `1px solid ${open ? theme.primary + "30" : "rgba(255,255,255,0.06)"}`, borderRadius: compact ? 10 : 12, overflow: "hidden", marginBottom: compact ? 6 : 8, transition: "all 0.2s" }}>
+      <button onClick={() => setOpen(o => !o)} aria-expanded={open} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: pad, background: open ? `${theme.primary}06` : "transparent", border: "none", color: theme.text, fontSize: compact ? 13 : 14, fontWeight: 600, cursor: "pointer", textAlign: "left" }}>
         {q}<span style={{ color: theme.primary, fontSize: 20, flexShrink: 0, marginLeft: 12, transition: "transform 0.2s", transform: open ? "rotate(45deg)" : "rotate(0)" }}>+</span>
       </button>
       <div style={{ maxHeight: open ? 1500 : 0, overflow: "hidden", transition: "max-height 0.35s ease" }}>
-        <div style={{ padding: "0 16px 14px" }}><p style={{ color: theme.muted, fontSize: 13, margin: 0, lineHeight: 1.7 }}>{a}</p></div>
+        <div style={{ padding: compact ? "0 14px 12px" : "0 16px 14px" }}>
+          {a && <p style={{ color: theme.muted, fontSize: 13, margin: 0, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{a}</p>}
+          {link && <a href={extHref(link)} target="_blank" rel="noopener noreferrer" onClick={() => onLink?.(extHref(link))}
+            style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: a ? 10 : 0, color: theme.primary, fontSize: 12.5, fontWeight: 700, textDecoration: "none" }}>
+            {linkLabel || "En savoir plus"} <span aria-hidden>→</span>
+          </a>}
+        </div>
       </div>
+    </div>
+  )
+}
+
+// FAQ premium : recherche instantanée + filtres par catégorie + styles (accordéon / compact / cartes).
+function FAQPublic({ c, theme, pageId, blockId }: { c: any; theme: any; pageId: string; blockId: string }) {
+  const items = [1,2,3,4,5,6,7,8]
+    .map(i => ({ q: c[`q${i}`] as string, a: (c[`a${i}`] || "") as string, cat: (c[`q${i}_cat`] || "").trim() as string, link: (c[`q${i}_link`] || "").trim() as string, linkLabel: (c[`q${i}_link_label`] || "").trim() as string }))
+    .filter(it => it.q)
+  const [query, setQuery] = useState("")
+  const [cat, setCat] = useState("")
+  if (items.length === 0) return null
+  const compact = c.style === "Compact"
+  const cards = c.style === "Cartes"
+  const searchOn = c.search === "Oui"
+  const MUTED = theme.muted || "#8A8478"
+  const FONT_B = theme.fontBody || "DM Sans, sans-serif"
+  const cats = Array.from(new Set(items.map(it => it.cat).filter(Boolean)))
+  const q = query.trim().toLowerCase()
+  const filtered = items.filter(it => (!cat || it.cat === cat) && (!q || it.q.toLowerCase().includes(q) || it.a.toLowerCase().includes(q)))
+  const chip = (active: boolean): any => ({ padding: "6px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: "pointer", border: `1px solid ${active ? theme.primary + "60" : "rgba(255,255,255,0.1)"}`, background: active ? `${theme.primary}14` : "transparent", color: active ? theme.primary : MUTED, whiteSpace: "nowrap" })
+  return (
+    <div style={{ padding: "6px 24px 16px" }}>
+      {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 4px", fontFamily: FONT_B }}>{c.title}</p>}
+      {c.subtitle && <p style={{ color: theme.text, fontSize: 14, fontWeight: 600, margin: "0 0 12px", fontFamily: FONT_B }}>{c.subtitle}</p>}
+      {searchOn && (
+        <input value={query} onChange={e => setQuery(e.target.value)} type="search" inputMode="search" placeholder="Rechercher une question…" aria-label="Rechercher dans la FAQ"
+          style={{ width: "100%", boxSizing: "border-box", padding: "11px 14px", marginBottom: cats.length ? 10 : 12, borderRadius: 11, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: theme.text, fontSize: 13.5, outline: "none", fontFamily: FONT_B }} />
+      )}
+      {cats.length > 0 && (
+        <div style={{ display: "flex", gap: 7, overflowX: "auto", padding: "2px 0 12px", WebkitOverflowScrolling: "touch" }}>
+          <button onClick={() => setCat("")} style={chip(!cat)}>Tout</button>
+          {cats.map(cn => <button key={cn} onClick={() => setCat(cn)} style={chip(cat === cn)}>{cn}</button>)}
+        </div>
+      )}
+      {filtered.length > 0
+        ? filtered.map((it, i) => <FAQItem key={i} q={it.q} a={it.a} theme={theme} link={it.link || undefined} linkLabel={it.linkLabel || undefined} compact={compact || cards}
+            onLink={url => trackLinkClick(pageId, blockId, url)} />)
+        : <p style={{ color: theme.muted, fontSize: 13, textAlign: "center", padding: "18px 0", margin: 0 }}>Aucune question ne correspond à votre recherche.</p>}
     </div>
   )
 }
@@ -623,12 +669,8 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       </div>
     )
 
-    case "faq": return (
-      <div style={{ padding: "6px 24px 16px" }}>
-        {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
-        {[[c.q1,c.a1],[c.q2,c.a2],[c.q3,c.a3],[c.q4,c.a4],[c.q5,c.a5]].filter(([q]) => q).map(([q,a],i) => <FAQItem key={i} q={q!} a={a||""} theme={theme} />)}
-      </div>
-    )
+    case "faq": return <FAQPublic c={c} theme={theme} pageId={pageId} blockId={block.id} />
+
 
     case "image": {
       if (!c.src) return null

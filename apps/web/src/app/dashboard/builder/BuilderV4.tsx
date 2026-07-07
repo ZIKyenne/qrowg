@@ -127,14 +127,17 @@
   }
 
 
-  function FAQItem({ q, a, theme }: { q: string; a: string; theme: PageTheme }) {
+  function FAQItem({ q, a, theme, link, linkLabel, compact }: { q: string; a: string; theme: PageTheme; link?: string; linkLabel?: string; compact?: boolean }) {
     const [open, setOpen] = useState(false)
     return (
-      <div style={{ border: `1px solid ${theme.muted}20`, borderRadius: 8, overflow: "hidden", marginBottom: 5 }}>
-        <button onClick={() => setOpen(o => !o)} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: open ? theme.primary + "08" : "transparent", border: "none", color: theme.text, fontSize: 13, cursor: "pointer", textAlign: "left" }}>
+      <div style={{ border: `1px solid ${theme.muted}20`, borderRadius: compact ? 8 : 8, overflow: "hidden", marginBottom: compact ? 4 : 5 }}>
+        <button onClick={() => setOpen(o => !o)} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: compact ? "8px 11px" : "10px 12px", background: open ? theme.primary + "08" : "transparent", border: "none", color: theme.text, fontSize: compact ? 12 : 13, cursor: "pointer", textAlign: "left" }}>
           {q} <span style={{ color: theme.primary }}>{open ? "−" : "+"}</span>
         </button>
-        {open && <div style={{ padding: "8px 12px 12px" }}><p style={{ color: theme.muted, fontSize: 12, lineHeight: 1.6, margin: 0 }}>{a}</p></div>}
+        {open && <div style={{ padding: "8px 12px 12px" }}>
+          {a && <p style={{ color: theme.muted, fontSize: 12, lineHeight: 1.6, margin: 0, whiteSpace: "pre-wrap" }}>{a}</p>}
+          {link && <span style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: a ? 8 : 0, color: theme.primary, fontSize: 11.5, fontWeight: 700 }}>{linkLabel || "En savoir plus"} →</span>}
+        </div>}
       </div>
     )
   }
@@ -260,12 +263,23 @@
         const tSizes: Record<string,number> = { small: 11, normal: 13, large: 15 }
         return <div style={{ padding: "8px 16px", textAlign: (c.align as any)||"left", ...s }}><p style={{ color: muted, fontSize: tSizes[c.size||"normal"], lineHeight: 1.7, margin: 0 }}>{c.text}</p></div>
       }
-      case "faq": return (
-        <div style={{ padding: "10px 16px", ...s }}>
-          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
-          {[[c.q1,c.a1],[c.q2,c.a2],[c.q3,c.a3]].filter(([q])=>q).map(([q,a],i) => <FAQItem key={i} q={q!} a={a||""} theme={theme} />)}
-        </div>
-      )
+      case "faq": {
+        const items = [1,2,3,4,5,6,7,8].map(i => ({ q: c[`q${i}`], a: c[`a${i}`]||"", cat: (c[`q${i}_cat`]||"").trim(), link: (c[`q${i}_link`]||"").trim(), linkLabel: (c[`q${i}_link_label`]||"").trim() })).filter(it => it.q)
+        const compact = c.style === "Compact" || c.style === "Cartes"
+        const cats = Array.from(new Set(items.map(it => it.cat).filter(Boolean)))
+        return (
+          <div style={{ padding: "10px 16px", ...s }}>
+            {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 4px" }}>{c.title}</p>}
+            {c.subtitle && <p style={{ color: theme.text, fontSize: 13, fontWeight: 600, margin: "0 0 10px" }}>{c.subtitle}</p>}
+            {c.search === "Oui" && <div style={{ padding: "8px 12px", marginBottom: cats.length ? 8 : 10, borderRadius: 9, border: `1px solid ${theme.muted}25`, color: muted, fontSize: 12 }}>🔎 Rechercher une question…</div>}
+            {cats.length > 0 && <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
+              <span style={{ padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 600, border: `1px solid ${theme.primary}55`, background: `${theme.primary}14`, color: theme.primary }}>Tout</span>
+              {cats.map(cn => <span key={cn} style={{ padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 600, border: `1px solid ${theme.muted}25`, color: muted }}>{cn}</span>)}
+            </div>}
+            {items.map((it,i) => <FAQItem key={i} q={it.q} a={it.a} theme={theme} link={it.link||undefined} linkLabel={it.linkLabel||undefined} compact={compact} />)}
+          </div>
+        )
+      }
       case "social_links": {
         const active = SOCIAL_NETWORKS.filter(n => c[n.key])
         const disp = c.display || "list"
