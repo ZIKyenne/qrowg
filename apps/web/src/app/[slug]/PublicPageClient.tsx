@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, buildVCard, mapEmbedUrl, shareLinks, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref, docTypeMeta, docActionLabel, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, buildVCard, mapEmbedUrl, shareLinks, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref, docTypeMeta, docActionLabel, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -202,12 +202,68 @@ function OpenBadge({ c, FONT_B }: { c: any; FONT_B: string }) {
   useEffect(() => {
     const upd = () => setSt(openStatus(c, new Date()))
     upd(); const t = setInterval(upd, 60000); return () => clearInterval(t)
-  }, [c.mon_fri, c.saturday, c.sunday])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [c.mon_fri, c.saturday, c.sunday, c.mon, c.tue, c.wed, c.thu, c.fri, c.sat, c.sun, c.mode])
   if (!st) return null
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: `${st.color}18`, border: `1px solid ${st.color}55`, color: st.color, borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700, fontFamily: FONT_B }}>
       <span style={{ width: 7, height: 7, borderRadius: "50%", background: st.color, boxShadow: `0 0 6px ${st.color}` }} />{st.label}
     </span>
+  )
+}
+
+// Horaires publics : tableau (mode simple hérité OU jour-par-jour), jour actuel surligné,
+// bannière d'exception (congés), badge de statut en direct. `todayIdx` en effet -> pas de mismatch SSR.
+function HoursPublic({ c, theme }: { c: any; theme: any }) {
+  const [today, setToday] = useState(-1)
+  useEffect(() => { setToday(new Date().getDay()) }, [])
+  const MUTED = theme.muted || "#8A8478"
+  const TEXT = theme.text || "#F5F0E8"
+  const G = theme.primary || "#C9A84C"
+  const FONT_B = theme.fontBody || "DM Sans, sans-serif"
+  const perDayMode = c.mode === "Jour par jour" || DAY_KEYS.some(k => c[k] && String(c[k]).trim())
+  // Lignes { label, hours, dayIdx } — dayIdx sert au surlignage du jour courant (-1 = groupe hérité).
+  const DAY_FULL = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"]
+  let rows: { label: string; hours: string; dayIdx: number }[]
+  if (perDayMode) {
+    rows = [1,2,3,4,5,6,0].map(d => ({ label: DAY_FULL[d], hours: (c[DAY_KEYS[d]] || "").trim() || "Fermé", dayIdx: d }))
+  } else {
+    rows = [
+      { label: "Lundi — Vendredi", hours: c.mon_fri, dayIdx: -1 },
+      { label: "Samedi", hours: c.saturday, dayIdx: 6 },
+      { label: "Dimanche", hours: c.sunday, dayIdx: 0 },
+    ].filter(r => r.hours) as any
+  }
+  if (rows.length === 0 && !c.exception) return null
+  const isToday = (dayIdx: number) => dayIdx === today || (dayIdx === -1 && today >= 1 && today <= 5)
+  return (
+    <div style={{ padding: "6px 24px 16px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, margin: "0 0 10px", flexWrap: "wrap" }}>
+        {c.title ? <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: 0, fontFamily: FONT_B }}>{c.title}</p> : <span />}
+        <OpenBadge c={c} FONT_B={FONT_B} />
+      </div>
+      {c.exception && (
+        <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 11, padding: "10px 13px", marginBottom: 10 }}>
+          <span style={{ fontSize: 16, flexShrink: 0 }}>📅</span>
+          <p style={{ color: "#FBBF24", fontSize: 12.5, fontWeight: 600, margin: 0, fontFamily: FONT_B }}>{c.exception}</p>
+        </div>
+      )}
+      {rows.length > 0 && (
+        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 13, overflow: "hidden" }}>
+          {rows.map((r, i) => {
+            const highlight = isToday(r.dayIdx)
+            const closed = /^(fermé|ferme|closed|repos)/i.test(r.hours.trim())
+            return (
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 16px", background: highlight ? `${G}0c` : "transparent", borderBottom: i < rows.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+                <span style={{ color: highlight ? TEXT : MUTED, fontSize: 13, fontWeight: highlight ? 700 : 400, fontFamily: FONT_B }}>{r.label}{highlight && <span style={{ color: G, fontSize: 10, fontWeight: 700, marginLeft: 7, textTransform: "uppercase", letterSpacing: 0.5 }}>Aujourd&apos;hui</span>}</span>
+                <span style={{ color: closed ? MUTED : TEXT, fontSize: 13, fontWeight: 600, fontFamily: FONT_B, opacity: closed ? 0.65 : 1 }}>{r.hours}</span>
+              </div>
+            )
+          })}
+          {c.note && <div style={{ padding: "9px 16px", background: `${G}05` }}><p style={{ color: MUTED, fontSize: 11, margin: 0, fontStyle: "italic", fontFamily: FONT_B }}>{c.note}</p></div>}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -765,23 +821,8 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       </div>
     )
 
-    case "opening_hours": return (
-      <div style={{ padding: "6px 24px 16px" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, margin: "0 0 10px", flexWrap: "wrap" }}>
-          {c.title ? <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: 0, fontFamily: FONT_B }}>{c.title}</p> : <span />}
-          <OpenBadge c={c} FONT_B={FONT_B} />
-        </div>
-        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 13, overflow: "hidden" }}>
-          {[["Lun — Ven",c.mon_fri],["Samedi",c.saturday],["Dimanche",c.sunday]].filter(([,h]) => h).map(([d,h],i,arr) => (
-            <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "11px 16px", borderBottom: i < arr.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
-              <span style={{ color: MUTED, fontSize: 13, fontFamily: FONT_B }}>{d}</span>
-              <span style={{ color: TEXT, fontSize: 13, fontWeight: 600, fontFamily: FONT_B }}>{h}</span>
-            </div>
-          ))}
-          {c.note && <div style={{ padding: "9px 16px", background: `${G}05` }}><p style={{ color: MUTED, fontSize: 11, margin: 0, fontStyle: "italic", fontFamily: FONT_B }}>{c.note}</p></div>}
-        </div>
-      </div>
-    )
+    case "opening_hours": return <HoursPublic c={c} theme={theme} />
+
 
     case "pricing": {
       const plans = [[c.title1,c.price1,c.desc1,c.old_price1],[c.title2,c.price2,c.desc2,c.old_price2],[c.title3,c.price3,c.desc3,c.old_price3]].filter(([t]) => t)

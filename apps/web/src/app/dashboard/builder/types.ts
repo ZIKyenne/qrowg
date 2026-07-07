@@ -598,26 +598,53 @@ export function parseHourRanges(text?: string): { start: number; end: number }[]
   return ranges
 }
 
-// Statut d'ouverture au moment `now` a partir des champs mon_fri/saturday/sunday.
-// Renvoie { open, label, color }. `now` injectable pour la testabilite.
+// Clés jour par jour (index JS getDay : 0=dimanche) + libellés FR.
+export const DAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const
+export const DAY_LABELS_FR = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"]
+export const DAY_LABELS_FR_SHORT = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"]
+
+// Horaires bruts d'un jour donné (0=dim). Priorité au mode jour-par-jour (mon/tue/…),
+// repli sur le mode simple hérité (mon_fri / saturday / sunday). undefined = pas d'info.
+export function dayField(c: any, day: number): string | undefined {
+  const perDay = c?.[DAY_KEYS[day]]
+  const hasAnyPerDay = DAY_KEYS.some(k => c?.[k] && String(c[k]).trim())
+  if (hasAnyPerDay) return perDay && String(perDay).trim() ? String(perDay) : undefined
+  if (day === 0) return c?.sunday
+  if (day === 6) return c?.saturday
+  return c?.mon_fri
+}
+
+// Statut d'ouverture au moment `now`. Supporte le mode jour-par-jour ET le mode simple hérité.
+// Gère : ouvert, ferme bientôt (<= 30 min), fermé/ouvre à X aujourd'hui, ouvre demain / tel jour.
+// Renvoie { open, label, color } ou null si aucune info pour aujourd'hui. `now` injectable (testabilité).
 export function openStatus(
-  c: { mon_fri?: string; saturday?: string; sunday?: string },
+  c: { mon_fri?: string; saturday?: string; sunday?: string; mon?: string; tue?: string; wed?: string; thu?: string; fri?: string; sat?: string; sun?: string },
   now: Date
 ): { open: boolean; label: string; color: string } | null {
   const day = now.getDay() // 0=dim, 6=sam
-  const field = day === 0 ? c.sunday : day === 6 ? c.saturday : c.mon_fri
+  const field = dayField(c, day)
   if (!field || !field.trim()) return null // pas d'info pour aujourd'hui -> pas de badge
   const ranges = parseHourRanges(field)
   const mins = now.getHours() * 60 + now.getMinutes()
 
   const current = ranges.find(r => mins >= r.start && mins < r.end)
   if (current) {
+    if (current.end - mins <= 30) return { open: true, label: `Ferme bientôt · à ${fmtMinutes(current.end)}`, color: "#FBBF24" }
     return { open: true, label: `Ouvert · ferme à ${fmtMinutes(current.end)}`, color: "#39FF8F" }
   }
-  // Ferme : prochaine ouverture aujourd'hui ?
+  // Fermé : prochaine ouverture aujourd'hui ?
   const next = ranges.filter(r => r.start > mins).sort((a, b) => a.start - b.start)[0]
   if (next) {
     return { open: false, label: `Fermé · ouvre à ${fmtMinutes(next.start)}`, color: "#EF4444" }
+  }
+  // Sinon : chercher la prochaine ouverture sur les 7 jours suivants.
+  for (let i = 1; i <= 7; i++) {
+    const d2 = (day + i) % 7
+    const r2 = parseHourRanges(dayField(c, d2)).sort((a, b) => a.start - b.start)
+    if (r2.length) {
+      const when = i === 1 ? "demain" : DAY_LABELS_FR[d2]
+      return { open: false, label: `Fermé · ouvre ${when} à ${fmtMinutes(r2[0].start)}`, color: "#EF4444" }
+    }
   }
   return { open: false, label: "Fermé", color: "#EF4444" }
 }
@@ -3367,15 +3394,26 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   opening_hours: {
-    label: "Horaires", description: "Horaires d'ouverture",
+    label: "Horaires", description: "Horaires d'ouverture + statut en direct",
     icon: "🕐", color: "#EC4899", category: "business",
-    defaultContent: { title: "Horaires", mon_fri: "9h - 18h" },
+    defaultContent: { title: "Horaires", mode: "Simple (Lun-Ven / Sam / Dim)", mon_fri: "9h - 18h", saturday: "10h - 16h", sunday: "Fermé" },
     fields: [
       { key: "title", label: "Titre", type: "text", placeholder: "Nos horaires" },
-      { key: "mon_fri", label: "Lundi — Vendredi", type: "text", placeholder: "9h - 18h" },
-      { key: "saturday", label: "Samedi", type: "text", placeholder: "10h - 16h" },
-      { key: "sunday", label: "Dimanche", type: "text", placeholder: "Ferme" },
-      { key: "note", label: "Note (optionnel)", type: "text", placeholder: "Reservation recommandee" },
+      { key: "mode", label: "Niveau de détail", type: "select", options: ["Simple (Lun-Ven / Sam / Dim)", "Jour par jour"], hint: "« Jour par jour » : un horaire différent pour chaque jour + coupure déjeuner" },
+      // Mode simple (hérité) — utilisé si « Simple » est choisi
+      { key: "mon_fri", label: "Lundi — Vendredi", type: "text", placeholder: "9h - 18h", showIf: { key: "mode", equals: "Simple (Lun-Ven / Sam / Dim)" } },
+      { key: "saturday", label: "Samedi", type: "text", placeholder: "10h - 16h", showIf: { key: "mode", equals: "Simple (Lun-Ven / Sam / Dim)" } },
+      { key: "sunday", label: "Dimanche", type: "text", placeholder: "Fermé", showIf: { key: "mode", equals: "Simple (Lun-Ven / Sam / Dim)" } },
+      // Mode jour par jour — coupure déjeuner : « 9h-12h, 14h-19h »
+      { key: "mon", label: "Lundi", type: "text", placeholder: "9h - 12h, 14h - 19h", showIf: { key: "mode", equals: "Jour par jour" } },
+      { key: "tue", label: "Mardi", type: "text", placeholder: "9h - 12h, 14h - 19h", showIf: { key: "mode", equals: "Jour par jour" } },
+      { key: "wed", label: "Mercredi", type: "text", placeholder: "9h - 19h", showIf: { key: "mode", equals: "Jour par jour" } },
+      { key: "thu", label: "Jeudi", type: "text", placeholder: "9h - 19h", showIf: { key: "mode", equals: "Jour par jour" } },
+      { key: "fri", label: "Vendredi", type: "text", placeholder: "9h - 19h", showIf: { key: "mode", equals: "Jour par jour" } },
+      { key: "sat", label: "Samedi", type: "text", placeholder: "10h - 17h", showIf: { key: "mode", equals: "Jour par jour" } },
+      { key: "sun", label: "Dimanche", type: "text", placeholder: "Fermé", showIf: { key: "mode", equals: "Jour par jour" } },
+      { key: "exception", label: "Exception / congés (optionnel)", type: "text", placeholder: "Fermé du 1er au 15 août", hint: "Message mis en avant (congés, jour férié, ouverture exceptionnelle…)" },
+      { key: "note", label: "Note (optionnel)", type: "text", placeholder: "Réservation recommandée" },
     ],
   },
   contact_form: {

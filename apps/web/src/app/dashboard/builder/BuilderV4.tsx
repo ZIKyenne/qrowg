@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, INFO_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, INFO_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import QRCanvas from "../qr-codes/QRCanvas"
@@ -163,7 +163,8 @@
     useEffect(() => {
       const upd = () => setSt(openStatus(c, new Date()))
       upd(); const t = setInterval(upd, 60000); return () => clearInterval(t)
-    }, [c.mon_fri, c.saturday, c.sunday])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [c.mon_fri, c.saturday, c.sunday, c.mon, c.tue, c.wed, c.thu, c.fri, c.sat, c.sun, c.mode])
     if (!st) return null
     return <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: `${st.color}18`, border: `1px solid ${st.color}55`, color: st.color, borderRadius: 20, padding: "2px 9px", fontSize: 10, fontWeight: 700 }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: st.color }} />{st.label}</span>
   }
@@ -411,22 +412,34 @@
           </div>
         </div>
       )
-      case "opening_hours": return (
-        <div style={{ padding: "10px 16px", ...s }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, margin: "0 0 8px", flexWrap: "wrap" }}>
-            {c.title ? <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: 0 }}>{c.title}</p> : <span />}
-            <OpenBadge c={c} />
+      case "opening_hours": {
+        const perDayMode = c.mode === "Jour par jour" || DAY_KEYS.some(k => c[k] && String(c[k]).trim())
+        const DAY_FULL = ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"]
+        const hrows: [string,string][] = perDayMode
+          ? ([1,2,3,4,5,6,0] as number[]).map(d => [DAY_FULL[d], (c[DAY_KEYS[d]]||"").trim() || "Fermé"] as [string,string])
+          : ([["Lun — Ven",c.mon_fri],["Samedi",c.saturday],["Dimanche",c.sunday]] as [string,string][]).filter(([,h])=>h)
+        return (
+          <div style={{ padding: "10px 16px", ...s }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, margin: "0 0 8px", flexWrap: "wrap" }}>
+              {c.title ? <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: 0 }}>{c.title}</p> : <span />}
+              <OpenBadge c={c} />
+            </div>
+            {c.exception && <div style={{ display: "flex", alignItems: "center", gap: 7, background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 9, padding: "8px 11px", marginBottom: 8 }}><span style={{ fontSize: 14 }}>📅</span><span style={{ color: "#FBBF24", fontSize: 11.5, fontWeight: 600 }}>{c.exception}</span></div>}
+            <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+              {hrows.map(([d,h],i) => {
+                const closed = /^(fermé|ferme|closed|repos)/i.test(String(h).trim())
+                return (
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <span style={{ color: muted, fontSize: 12 }}>{d}</span>
+                    <span style={{ color: text, fontSize: 12, fontWeight: 600, opacity: closed ? 0.6 : 1 }}>{h}</span>
+                  </div>
+                )
+              })}
+            </div>
+            {c.note && <p style={{ color: muted, fontSize: 10, margin: "8px 0 0", fontStyle: "italic" }}>{c.note}</p>}
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-            {[["Lun — Ven",c.mon_fri],["Samedi",c.saturday],["Dimanche",c.sunday]].filter(([,h])=>h).map(([d,h]) => (
-              <div key={String(d)} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                <span style={{ color: muted, fontSize: 12 }}>{d}</span>
-                <span style={{ color: text, fontSize: 12, fontWeight: 600 }}>{h}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )
+        )
+      }
       case "pricing": {
         const plans = [[c.title1,c.price1,c.desc1,c.old_price1],[c.title2,c.price2,c.desc2,c.old_price2],[c.title3,c.price3,c.desc3,c.old_price3]].filter(([t])=>t)
         return (
@@ -3010,7 +3023,11 @@
         {def.fields.filter(field => {
           const si = (field as any).showIf
           if (!si) return true
-          const v = block.content[si.key]
+          // Valeur effective : si le champ contrôleur n'est pas encore défini, on retombe sur
+          // sa valeur par défaut (1re option d'un select) — sinon les pages existantes masqueraient
+          // à tort les champs dont le contrôleur n'a jamais été touché.
+          const ctrl = def.fields.find(f => f.key === si.key) as any
+          const v = block.content[si.key] ?? ctrl?.options?.[0]
           if (si.equals !== undefined) return v === si.equals
           if (Array.isArray(si.in)) return si.in.includes(v)
           return true
