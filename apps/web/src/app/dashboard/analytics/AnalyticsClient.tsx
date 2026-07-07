@@ -13,6 +13,7 @@ import GeoPanel from "./GeoPanel"
 import DevicePanel from "./DevicePanel"
 import ExportPanel from "./ExportPanel"
 import ReportSubscriptionPanel from "./ReportSubscriptionPanel"
+import { buildDailyData, buildDeviceData, buildSourceData } from "./analyticsAgg"
 import Particles from "@/components/Particles"
 
 type Profile = { total_pages: number; total_scans: number; plan: string; email?: string; full_name?: string } | null
@@ -41,11 +42,6 @@ const NEON = "#39FF8F"
 const MUTED = "#8A8478"
 const COLORS = [GOLD, NEON, "#7B61FF", "#FF6B6B", "#4ECDC4", "#FFE66D"]
 
-function formatDay(dateStr: string) {
-  const d = new Date(dateStr)
-  return `${d.getDate()}/${d.getMonth() + 1}`
-}
-
 function formatAgo(iso: string) {
   const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
   if (s < 5) return "à l'instant"
@@ -53,41 +49,6 @@ function formatAgo(iso: string) {
   if (s < 3600) return `il y a ${Math.floor(s / 60)} min`
   if (s < 86400) return `il y a ${Math.floor(s / 3600)} h`
   return `il y a ${Math.floor(s / 86400)} j`
-}
-
-function buildDailyData(scans: Scan[], views: View[]) {
-  const map: Record<string, { date: string; scans: number; views: number }> = {}
-  const now = new Date()
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date(now)
-    d.setDate(d.getDate() - i)
-    const key = d.toISOString().slice(0, 10)
-    map[key] = { date: formatDay(key), scans: 0, views: 0 }
-  }
-  scans.forEach(s => {
-    const key = s.scanned_at.slice(0, 10)
-    if (map[key]) map[key].scans++
-  })
-  views.forEach(v => {
-    const key = v.viewed_at.slice(0, 10)
-    if (map[key]) map[key].views++
-  })
-  return Object.values(map)
-}
-
-function buildDeviceData(scans: Scan[]) {
-  const counts: Record<string, number> = {}
-  scans.forEach(s => { counts[s.device] = (counts[s.device] || 0) + 1 })
-  return Object.entries(counts).map(([name, value]) => ({ name, value }))
-}
-
-function buildSourceData(views: View[]) {
-  const counts: Record<string, number> = {}
-  views.forEach(v => {
-    const src = v.source || "direct"
-    counts[src] = (counts[src] || 0) + 1
-  })
-  return Object.entries(counts).map(([name, value]) => ({ name, value }))
 }
 
 const CustomTooltip = ({ active, payload, label }: any) => {
