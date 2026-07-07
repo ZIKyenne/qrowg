@@ -37,7 +37,7 @@ function fmtDate(iso: string) {
     d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
 }
 
-export default function LeadsClient({ leads: initialLeads, pages }: { leads: Lead[]; pages: Page[] }) {
+export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }: { leads: Lead[]; pages: Page[]; setupNeeded?: boolean }) {
   const [leads, setLeads] = useState<Lead[]>(initialLeads)
   const [filter, setFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
@@ -108,6 +108,16 @@ export default function LeadsClient({ leads: initialLeads, pages }: { leads: Lea
           <button onClick={exportCsv} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, padding: "9px 14px", color: TEXT, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>↓ Exporter CSV</button>
         )}
       </div>
+
+      {setupNeeded && (
+        <div style={{ marginTop: 20, padding: "18px 20px", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 14 }}>
+          <p style={{ color: "#FBBF24", fontSize: 14, fontWeight: 700, margin: "0 0 6px" }}>⚙ Messagerie à activer</p>
+          <p style={{ color: MUTED, fontSize: 13, margin: "0 0 10px", lineHeight: 1.6 }}>
+            La table <code style={{ color: TEXT }}>leads</code> n&apos;existe pas encore en base. Exécutez la migration <code style={{ color: TEXT }}>016_leads</code> dans Supabase (SQL Editor) pour recevoir et stocker les messages de vos pages. Les notifications par email nécessitent en plus la variable <code style={{ color: TEXT }}>RESEND_API_KEY</code> sur Vercel.
+          </p>
+          <p style={{ color: "#4A4640", fontSize: 11, margin: 0 }}>Fichier : supabase/migrations/20260701_016_leads.sql</p>
+        </div>
+      )}
 
       {leads.length === 0 ? (
         <div style={{ marginTop: 40, textAlign: "center", padding: "50px 20px", background: "rgba(255,255,255,0.02)", border: "1px dashed rgba(255,255,255,0.1)", borderRadius: 16 }}>
