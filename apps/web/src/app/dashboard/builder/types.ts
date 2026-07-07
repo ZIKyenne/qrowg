@@ -1094,6 +1094,83 @@ export const ACTION_PRESETS: { key: string; label: string; emoji: string; blocks
   },
 ]
 
+// Presets Infos : un clic crée un set de blocs informatifs adaptés au métier.
+export const INFO_PRESETS: { key: string; label: string; emoji: string; blocks: { type: string; content: Record<string, string> }[] }[] = [
+  {
+    key: "restaurant", label: "Restaurant / Bar", emoji: "🍽️",
+    blocks: [
+      { type: "heading", content: { text: "Bienvenue chez nous", subtitle: "Cuisine maison, produits frais" } },
+      { type: "announcement", content: { emoji: "📅", title: "Réservation conseillée", message: "Le week-end, pensez à réserver votre table.", type: "info" } },
+      { type: "stats_block", content: { s1_value: "4.8/5", s1_label: "Avis clients", s1_icon: "⭐", s2_value: "150+", s2_label: "Plats servis/jour", s2_icon: "🍽️", s3_value: "2012", s3_label: "Depuis", s3_icon: "🏆" } },
+      { type: "faq", content: { title: "Questions fréquentes", q1: "Avez-vous des options végétariennes ?", q2: "Acceptez-vous les groupes ?", q3: "Y a-t-il un parking ?" } },
+    ],
+  },
+  {
+    key: "entreprise", label: "Entreprise", emoji: "🏢",
+    blocks: [
+      { type: "heading", content: { text: "Qui sommes-nous", subtitle: "Notre expertise à votre service" } },
+      { type: "values", content: { title: "Nos valeurs" } },
+      { type: "stats_block", content: {} },
+      { type: "team", content: { title: "Notre équipe" } },
+      { type: "faq", content: { title: "Questions fréquentes" } },
+    ],
+  },
+  {
+    key: "freelance", label: "Freelance", emoji: "💼",
+    blocks: [
+      { type: "heading", content: { text: "Mon approche", subtitle: "Un accompagnement sur mesure" } },
+      { type: "process_steps", content: { title: "Comment je travaille" } },
+      { type: "testimonials", content: {} },
+      { type: "faq", content: { title: "Questions fréquentes" } },
+    ],
+  },
+  {
+    key: "coach", label: "Coach / Formation", emoji: "🎓",
+    blocks: [
+      { type: "heading", content: { text: "Ma méthode", subtitle: "Des résultats concrets" } },
+      { type: "process_steps", content: { title: "Le déroulé" } },
+      { type: "engagements", content: { title: "Mes engagements" } },
+      { type: "testimonials", content: {} },
+    ],
+  },
+  {
+    key: "artisan", label: "Artisan", emoji: "🔨",
+    blocks: [
+      { type: "heading", content: { text: "Mon savoir-faire", subtitle: "La qualité avant tout" } },
+      { type: "process_steps", content: { title: "De l'idée à la réalisation" } },
+      { type: "trust_badge", content: { title: "Garanties & labels" } },
+      { type: "testimonials", content: {} },
+    ],
+  },
+  {
+    key: "association", label: "Association", emoji: "🤝",
+    blocks: [
+      { type: "heading", content: { text: "Notre mission", subtitle: "Agir ensemble" } },
+      { type: "values", content: { title: "Nos valeurs" } },
+      { type: "timeline", content: { title: "Notre histoire" } },
+      { type: "team", content: { title: "Le bureau" } },
+    ],
+  },
+  {
+    key: "immobilier", label: "Immobilier", emoji: "🏡",
+    blocks: [
+      { type: "heading", content: { text: "L'agence", subtitle: "Votre projet, notre priorité" } },
+      { type: "stats_block", content: { s1_value: "500+", s1_label: "Biens vendus", s1_icon: "🏠", s2_value: "4.9/5", s2_label: "Satisfaction", s2_icon: "⭐", s3_value: "15 ans", s3_label: "Expérience", s3_icon: "🏆" } },
+      { type: "process_steps", content: { title: "Notre accompagnement" } },
+      { type: "faq", content: { title: "Questions fréquentes" } },
+    ],
+  },
+  {
+    key: "evenement", label: "Événement", emoji: "🎉",
+    blocks: [
+      { type: "heading", content: { text: "À propos de l'événement", subtitle: "Tout ce qu'il faut savoir" } },
+      { type: "announcement", content: { emoji: "🎫", title: "Places limitées", message: "Réservez vite votre place !", type: "promo" } },
+      { type: "timeline", content: { title: "Le programme" } },
+      { type: "faq", content: { title: "Infos pratiques" } },
+    ],
+  },
+]
+
 // Presets de bannière : un clic configure plusieurs champs d'un coup
 export const BANNER_PRESETS: { key: string; label: string; emoji: string; content: Record<string, any> }[] = [
   { key: "luxury", label: "Luxe", emoji: "👑", content: { banner_type: "gradient", grad_preset: "or_nuit", height_px: 220, block_radius: 16, text_position: "bottom-left", overlay_gradient: "bottom", animation: "shimmer", text_color: "#F5EBD0" } },
@@ -4246,7 +4323,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   // ── Nouveaux blocs Infos ─────────────────────────────────────────────────
   stats_block: {
     label: "Statistiques", description: "Chiffres clés de ton activité",
-    icon: "📊", color: "#FF6B6B", category: "content",
+    icon: "📊", color: "#38BDF8", category: "info",
     defaultContent: { s1_value: "500+", s1_label: "Clients", s1_icon: "👥", s2_value: "4.9/5", s2_label: "Note moyenne", s2_icon: "⭐", s3_value: "10 ans", s3_label: "Expérience", s3_icon: "🏆" },
     fields: [
       { key: "s1_icon", label: "Stat 1 — Emoji", type: "text", placeholder: "👥" },
@@ -4274,7 +4351,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   },
   timeline: {
     label: "Timeline", description: "Étapes chronologiques",
-    icon: "📅", color: "#FF6B6B", category: "content",
+    icon: "📅", color: "#38BDF8", category: "info",
     defaultContent: { title: "Notre histoire", e1_date: "2020", e1_title: "Création", e1_desc: "Lancement de l activité" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Notre histoire" },
@@ -4294,7 +4371,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   },
   process_steps: {
     label: "Étapes / Processus", description: "Expliquer une méthode en étapes",
-    icon: "🔢", color: "#FF6B6B", category: "content",
+    icon: "🔢", color: "#38BDF8", category: "info",
     defaultContent: { title: "Comment ça marche" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Comment ça marche" },
@@ -4314,7 +4391,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   },
   values: {
     label: "Valeurs", description: "Les valeurs de la marque",
-    icon: "💎", color: "#FF6B6B", category: "content",
+    icon: "💎", color: "#38BDF8", category: "info",
     defaultContent: { title: "Nos valeurs", v1_icon: "🤝", v1_label: "Transparence", v2_icon: "⚡", v2_label: "Réactivité", v3_icon: "🎯", v3_label: "Qualité" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Nos valeurs" },
@@ -4334,7 +4411,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   },
   team: {
     label: "Équipe", description: "Présentation des membres de l équipe",
-    icon: "👥", color: "#FF6B6B", category: "content",
+    icon: "👥", color: "#38BDF8", category: "info",
     defaultContent: { title: "Notre équipe" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Notre équipe" },
@@ -4354,7 +4431,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   },
   engagements: {
     label: "Engagements", description: "Engagements qualité et promesses",
-    icon: "✅", color: "#39FF8F", category: "content",
+    icon: "✅", color: "#38BDF8", category: "info",
     defaultContent: { title: "Nos engagements", e1: "✅ Réponse sous 24h", e2: "✅ Satisfaction garantie", e3: "✅ Sans engagement" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Nos engagements" },
@@ -4368,7 +4445,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   },
   trust_badge: {
     label: "Badge de confiance", description: "Labels qualité et certifications",
-    icon: "🛡️", color: "#39FF8F", category: "content",
+    icon: "🛡️", color: "#38BDF8", category: "info",
     defaultContent: { title: "Certifié & Vérifié", b1_icon: "✔", b1_label: "Vérifié", b2_icon: "🏆", b2_label: "Certifié", b3_icon: "⭐", b3_label: "Partenaire officiel" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Certifié & Vérifié" },
@@ -4384,7 +4461,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   },
   quote_block: {
     label: "Citation", description: "Citation mise en avant",
-    icon: "💬", color: "#FF6B6B", category: "content",
+    icon: "💬", color: "#38BDF8", category: "info",
     defaultContent: { quote: "La qualité n est jamais un accident.", author: "", source: "" },
     fields: [
       { key: "quote", label: "Citation", type: "textarea", placeholder: "La qualité n est jamais un accident." },
@@ -4394,7 +4471,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   },
   announcement: {
     label: "Annonce", description: "Message important à mettre en avant",
-    icon: "📢", color: "#FBBF24", category: "content",
+    icon: "📢", color: "#38BDF8", category: "info",
     defaultContent: { emoji: "⚠️", title: "Information importante", message: "Nous serons fermés le 25 décembre.", type: "warning" },
     fields: [
       { key: "emoji", label: "Emoji", type: "text", placeholder: "⚠️" },
@@ -4405,7 +4482,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   },
   info_table: {
     label: "Tableau d infos", description: "Informations structurées en tableau",
-    icon: "📋", color: "#FF6B6B", category: "content",
+    icon: "📋", color: "#38BDF8", category: "info",
     defaultContent: { title: "Informations" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Informations" },
@@ -4425,7 +4502,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   },
   founder_message: {
     label: "Message du fondateur", description: "Mot du dirigeant ou fondateur",
-    icon: "✉️", color: "#FF6B6B", category: "content",
+    icon: "✉️", color: "#38BDF8", category: "info",
     defaultContent: { name: "Jean Dupont", role: "Fondateur & CEO", message: "Bienvenue ! Notre mission est de..." },
     fields: [
       { key: "photo", label: "Photo", type: "image" },

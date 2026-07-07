@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, INFO_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import QRCanvas from "../qr-codes/QRCanvas"
@@ -4430,6 +4430,11 @@
       preset.blocks.forEach(b => addBlock(b.type, mk(b.type, b.content)))
     }
 
+    function generateInfoPreset(preset: typeof INFO_PRESETS[number]) {
+      const mk = (type: string, ov: Record<string, string>) => ({ ...(BLOCK_DEFS[type]?.defaultContent || {}), ...ov })
+      preset.blocks.forEach(b => addBlock(b.type, mk(b.type, b.content)))
+    }
+
     function deleteBlock(id: string) {
       if (blocks.find(b => b.id === id)?.locked) return
       setBlocks(p => p.filter(b => b.id !== id))
@@ -5222,6 +5227,52 @@
                                     <p style={subHeader}>Tous les réseaux</p>
                                     {catBlocks.map(([type, def]) => blockBtn(type, def))}
                                   </>)
+                                : activeCategory === "info"
+                                ? (() => {
+                                    // Sous-catégories Infos : bibliothèque de contenu organisée façon Notion.
+                                    // Certains blocs sont "empruntés" à d'autres catégories (par clé) pour la découvrabilité,
+                                    // sans changer leur catégorie d'origine (ils restent aussi dans Business/Actions).
+                                    const INFO_GROUPS: { label: string; keys: string[] }[] = [
+                                      { label: "Présentation",           keys: ["heading", "rich_text", "quote_block", "about", "announcement"] },
+                                      { label: "Organisation",           keys: ["process_steps", "timeline", "values", "engagements"] },
+                                      { label: "Preuves & confiance",     keys: ["testimonials", "stats_block", "trust_badge", "visit_counter"] },
+                                      { label: "Entreprise",              keys: ["team", "founder_message", "info_table"] },
+                                      { label: "Informations pratiques",  keys: ["opening_hours", "google_maps_embed", "service_area", "on_site_services"] },
+                                      { label: "Questions fréquentes",    keys: ["faq"] },
+                                      { label: "Documents",               keys: ["download_file"] },
+                                      { label: "Informations légales",    keys: ["legal_info", "business_certifications"] },
+                                    ]
+                                    const grouped = new Set(INFO_GROUPS.flatMap(g => g.keys))
+                                    const rest = catBlocks.filter(([t]) => !grouped.has(t))
+                                    return (<>
+                                      {/* Modèles par métier : 1 clic crée une section informative complète */}
+                                      <div style={{ margin: "2px 0 10px" }}>
+                                        <p style={subHeader}>Modèles par métier</p>
+                                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                                          {INFO_PRESETS.map(p => (
+                                            <button key={p.key} type="button" onClick={() => generateInfoPreset(p)} title={`Crée : ${p.blocks.map(b => (BLOCK_DEFS as any)[b.type]?.label || b.type).join(", ")}`}
+                                              style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 10px", borderRadius: 9, border: "1px solid rgba(201,168,76,0.18)", cursor: "pointer", background: "rgba(201,168,76,0.05)", color: "#F5F0E8", fontSize: 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
+                                              onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.12)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)" }}
+                                              onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,168,76,0.05)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.18)" }}>
+                                              <span style={{ fontSize: 16 }}>{p.emoji}</span>
+                                              <span style={{ flex: 1, lineHeight: 1.2 }}>{p.label}</span>
+                                            </button>
+                                          ))}
+                                        </div>
+                                      </div>
+                                      {INFO_GROUPS.map(g => {
+                                        const gb = g.keys.filter(k => (BLOCK_DEFS as any)[k])
+                                        if (!gb.length) return null
+                                        return (
+                                          <div key={g.label}>
+                                            <p style={subHeader}>{g.label}</p>
+                                            {gb.map(k => blockBtn(k, (BLOCK_DEFS as any)[k]))}
+                                          </div>
+                                        )
+                                      })}
+                                      {rest.length > 0 && (<div><p style={subHeader}>Autres</p>{rest.map(([t, d]) => blockBtn(t, d))}</div>)}
+                                    </>)
+                                  })()
                                 : catBlocks.map(([type, def]) => blockBtn(type, def))
                               )}
                             </div>
