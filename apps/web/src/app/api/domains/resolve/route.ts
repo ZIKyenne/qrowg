@@ -57,8 +57,7 @@ export async function GET(req: NextRequest) {
         .from("domain_redirects")
         .update({ hit_count: supabase.rpc("domain_redirects_increment", { rid: redirect.id }), last_hit_at: new Date().toISOString() })
         .eq("id", redirect.id)
-        .then(() => {})
-        .catch(() => {})
+        .then(() => {}, () => {})
 
       const dest = redirect.to_url.startsWith("http")
         ? redirect.to_url

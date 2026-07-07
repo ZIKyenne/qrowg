@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import Stripe from "stripe"
 import { createClient } from "@supabase/supabase-js"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2024-06-20" })
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2024-06-20" as any })
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -70,8 +70,8 @@ export async function POST(req: NextRequest) {
           await supabase.from("subscriptions").update({
             plan,
             status: sub.status,
-            current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
-            current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
+            current_period_start: new Date((sub as any).current_period_start * 1000).toISOString(),
+            current_period_end: new Date((sub as any).current_period_end * 1000).toISOString(),
             cancel_at_period_end: sub.cancel_at_period_end,
           }).eq("stripe_subscription_id", sub.id)
         }
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
       case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice
         const customerId = invoice.customer as string
-        await supabase.from("subscriptions").update({ status: "past_due" }).eq("stripe_subscription_id", invoice.subscription as string)
+        await supabase.from("subscriptions").update({ status: "past_due" }).eq("stripe_subscription_id", (invoice as any).subscription as string)
         break
       }
     }

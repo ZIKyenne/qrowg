@@ -346,7 +346,8 @@ export default function ProfilePage() {
       if (keys)  setApiKeys(keys)
       if (pages)       setRecentPages(pages)
       if (allPagesData) setAllPages(allPagesData)
-      if (qrData)      setQrStats(qrData)
+      // postgrest infere pages en tableau ; au runtime c'est un objet (relation many-to-one)
+      if (qrData)      setQrStats(qrData as unknown as QRStat[])
       // Charger activity_logs (ou construire depuis donnees existantes)
       try {
         const { data: actData } = await supabase

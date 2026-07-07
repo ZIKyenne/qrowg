@@ -117,11 +117,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
     supabase.from("qr_codes").update({
       total_scans: supabase.rpc("increment_qr_scans", { qr_id: qr.id }) as any,
       last_scan_at: new Date().toISOString(),
-    }).eq("id", qr.id).then(() => {}).catch(() => {})
+    }).eq("id", qr.id).then(() => {}, () => {})
 
     supabase.from("scans").insert({
       qr_code_id: qr.id, page_id: qr.page_id, device,
-    }).then(() => {}).catch(() => {})
+    }).then(() => {}, () => {})
 
     // ── Résolution destination (override ou page) ─────────────────────────
     const override = qr.dest_override as any

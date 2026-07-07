@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr"
+import { createClient } from "@supabase/supabase-js"
 import { cookies } from "next/headers"
 import type { Database } from "./database.types"
 
@@ -22,8 +23,6 @@ export async function createServerSupabaseClient() {
 
 // Client ADMIN (webhooks, Edge Functions - jamais côté client)
 export function createAdminClient() {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { createClient } = require("@supabase/supabase-js")
   return createClient<Database>(
     supabaseUrl,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,

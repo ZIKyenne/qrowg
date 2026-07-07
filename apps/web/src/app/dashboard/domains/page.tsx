@@ -11,7 +11,7 @@ export default async function DomainsServerPage() {
 
   const [{ data: profile }, { data: pages }] = await Promise.all([
     supabase.from("profiles").select("plan").eq("id", user.id).single(),
-    supabase.from("pages").select("id, title, slug").eq("user_id", user.id).eq("status", "published").order("title"),
+    supabase.from("pages").select("id, title, slug, status").eq("user_id", user.id).eq("status", "published").order("title"),
   ])
 
   return (
