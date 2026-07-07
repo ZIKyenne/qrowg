@@ -2709,6 +2709,17 @@
         )
       }
 
+      case "calendly": return (
+        <div style={{ padding: "8px 16px", ...s }}>
+          <div style={{ background: `${primary}08`, border: `1px solid ${primary}20`, borderRadius: 12, padding: "12px 14px" }}>
+            <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
+              <div style={{ width: 36, height: 36, background: `${primary}14`, border: `1px solid ${primary}25`, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>📅</div>
+              <div><p style={{ color: text, fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label||"Reserver"}</p>{c.description && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{c.description}</p>}</div>
+            </div>
+            <div style={{ background: `linear-gradient(90deg,${primary},${primary}cc)`, color: "#080808", textAlign: "center", padding: "9px", borderRadius: 8, fontSize: 12, fontWeight: 700 }}>{c.label||"Reserver un creneau"}</div>
+          </div>
+        </div>
+      )
       default: {
         const def = BLOCK_DEFS[block.type]
         return <div style={{ padding: "12px 16px", textAlign: "center", ...s }}><span style={{ fontSize: 22 }}>{def?.icon||"📦"}</span><p style={{ color: muted, fontSize: 11, margin: "5px 0 0" }}>{def?.label||block.type}</p></div>
