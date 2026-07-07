@@ -9,6 +9,8 @@
   import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
+  import QRCanvas from "../qr-codes/QRCanvas"
+  import { getQRBlob, downloadBlob } from "../qr-codes/qrRender"
   import { createClient } from "@/lib/supabase/client"
 
   // Helper module-scope (evite la temporal-dead-zone du UUID_RE interne au composant).
@@ -3982,8 +3984,14 @@
     const [publishing, setPublishing] = useState(false)
     const [publishSuccess, setPublishSuccess] = useState(false)
     const [publishError, setPublishError] = useState("")
-    const [qrCodeUrl, setQrCodeUrl] = useState("")
     const [qrShortCode, setQrShortCode] = useState("")
+    // Cible du QR (lien de scan) + telechargement PNG genere en local (sans API externe).
+    const qrTarget = qrShortCode ? `${typeof window !== "undefined" ? window.location.origin : ""}/q/${qrShortCode}` : ""
+    const downloadQrPng = async () => {
+      if (!qrTarget) return
+      const b = await getQRBlob({ data: qrTarget, fg: "#080808", bg: "#FFFFFF", ecc: "M", style: {}, size: 512 }, "png")
+      if (b) downloadBlob(b, "qrcode.png")
+    }
     const [showQrPanel, setShowQrPanel] = useState(false)
     const [pageStats, setPageStats] = useState({ views: 0, scans: 0 })
     const [clickCounts, setClickCounts] = useState<Record<string, number>>({}) // clics par bloc (90j) pour le compteur builder
@@ -4247,8 +4255,6 @@
         const { data: qr } = await supabase.from("qr_codes").select("short_code,total_scans").eq("page_id", liveId).single()
         if (qr) {
           setQrShortCode(qr.short_code||"")
-          const appUrl = typeof window !== "undefined" ? window.location.origin : ""
-          setQrCodeUrl(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(appUrl+"/q/"+qr.short_code)}&color=C9A84C&bgcolor=080808&margin=10`)
           setPageStats(s => ({ ...s, scans: qr.total_scans||0 }))
         }
         // Compteur de clics par bloc (90 derniers jours) — lecture proprio via RLS
@@ -4707,7 +4713,7 @@
             <Palette size={11} /> Thème
           </button>
 
-          {qrCodeUrl && (
+          {qrTarget && (
             <div style={{ position: "relative" }}>
               <button onClick={() => setShowQrPanel(p => !p)} style={{ display: "flex", alignItems: "center", gap: 5, background: showQrPanel ? "rgba(201,168,76,0.12)" : "rgba(201,168,76,0.06)", border: `1px solid ${showQrPanel ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.2)"}`, borderRadius: 8, padding: "5px 11px", color: G, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
                 <QrCode size={11} /> QR Code
@@ -4718,14 +4724,14 @@
                   <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, background: "#161616", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 16, padding: "18px", zIndex: 200, boxShadow: "0 8px 40px rgba(0,0,0,0.6)", width: 200 }}>
                     <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 700, margin: "0 0 10px", textAlign: "center" }}>Mon QR Code</p>
                     <div style={{ background: "#FFFFFF", borderRadius: 10, padding: 8, marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <img src={qrCodeUrl} alt="QR" style={{ width: 120, height: 120, imageRendering: "pixelated", display: "block" }} />
+                      <QRCanvas value={qrTarget} size={120} />
                     </div>
                     <div style={{ background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 7, padding: "6px 9px", marginBottom: 8 }}>
                       <p style={{ color: MUTED, fontSize: 8, margin: "0 0 1px", textTransform: "uppercase", letterSpacing: 1 }}>URL de scan</p>
                       <p style={{ color: G, fontSize: 10, margin: 0, fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>/q/{qrShortCode}</p>
                     </div>
                     <div style={{ display: "flex", gap: 5 }}>
-                      <a href={qrCodeUrl} download="qrcode.png" style={{ flex: 1, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "7px", color: G, textDecoration: "none", fontSize: 10, fontWeight: 600, textAlign: "center" }}>↓ PNG</a>
+                      <button onClick={downloadQrPng} style={{ flex: 1, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "7px", color: G, cursor: "pointer", fontSize: 10, fontWeight: 600, textAlign: "center" }}>↓ PNG</button>
                       <a href="/dashboard/qr-codes" style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px", color: MUTED, textDecoration: "none", fontSize: 10, textAlign: "center" }}>Perso →</a>
                     </div>
                   </div>
@@ -5604,9 +5610,9 @@
                 <div style={{ marginTop: 22, display: "flex", flexDirection: "column", alignItems: "center", gap: 18 }}>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
                     <p style={{ color: MUTED, fontSize: 10, margin: 0, textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 600 }}>QR Code</p>
-                    {qrCodeUrl
+                    {qrTarget
                       ? <div style={{ background: "#FFFFFF", border: "3px solid rgba(201,168,76,0.3)", borderRadius: 14, padding: 9, boxShadow: "0 8px 30px rgba(0,0,0,0.5)" }}>
-                          <img src={qrCodeUrl} alt="QR" style={{ width: 130, height: 130, imageRendering: "pixelated", display: "block" }} />
+                          <QRCanvas value={qrTarget} size={130} />
                         </div>
                       : <div style={{ background: "#FFFFFF", border: "3px solid rgba(201,168,76,0.2)", borderRadius: 14, width: 130, height: 130, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 30px rgba(0,0,0,0.4)" }}>
                           <QrCode size={48} color="#C9A84C" />
