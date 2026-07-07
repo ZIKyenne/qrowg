@@ -375,6 +375,8 @@ function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail }: { block
   const [company, setCompany] = useState("")
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle")
   const inputStyle: any = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "11px 13px", color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }
+  const emailOk = !email.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+  const canSubmit = !!name && !!email && emailOk && status !== "sending"
   const submit = async () => {
     setStatus("sending")
     trackLinkClick(pageId, block.id, "register")
@@ -400,12 +402,13 @@ function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail }: { block
       <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{c.title || "S'inscrire gratuitement"}</p>
       {c.description && <p style={{ color: "#EC4899", fontSize: 12, margin: "0 0 13px", fontWeight: 600 }}>⚡ {c.description}</p>}
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        <input placeholder="Prénom & Nom" value={name} onChange={e => setName(e.target.value)} style={inputStyle} />
-        <input placeholder="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
-        {c.show_phone === "yes" && <input placeholder="Téléphone" value={phone} onChange={e => setPhone(e.target.value)} style={inputStyle} />}
-        {c.show_company === "yes" && <input placeholder="Société" value={company} onChange={e => setCompany(e.target.value)} style={inputStyle} />}
+        <input placeholder="Prénom & Nom" autoComplete="name" value={name} onChange={e => setName(e.target.value)} style={inputStyle} />
+        <input placeholder="Email" type="email" inputMode="email" autoComplete="email" autoCapitalize="off" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
+        {c.show_phone === "yes" && <input placeholder="Téléphone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={e => setPhone(e.target.value)} style={inputStyle} />}
+        {c.show_company === "yes" && <input placeholder="Société" autoComplete="organization" value={company} onChange={e => setCompany(e.target.value)} style={inputStyle} />}
+        {email.trim() && !emailOk && <p style={{ color: "#F59E0B", fontSize: 12, margin: 0 }}>Adresse email invalide.</p>}
         {status === "error" && <p style={{ color: "#EF4444", fontSize: 12, margin: 0 }}>Une erreur est survenue. Réessayez.</p>}
-        <button onClick={submit} disabled={!name || !email || status === "sending"} style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 10, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", border: "none", cursor: name && email && status !== "sending" ? "pointer" : "not-allowed", opacity: name && email && status !== "sending" ? 1 : 0.55 }}>{status === "sending" ? "Envoi…" : (c.button_label || "Je m'inscris")}</button>
+        <button onClick={submit} disabled={!canSubmit} style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 10, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", border: "none", cursor: canSubmit ? "pointer" : "not-allowed", opacity: canSubmit ? 1 : 0.55 }}>{status === "sending" ? "Envoi…" : (c.button_label || "Je m'inscris")}</button>
       </div>
     </div>
   )
@@ -417,7 +420,18 @@ function LeadFormPublic({ block, pageId, ownerEmail, leadType, title, descriptio
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle")
   const set = (k: string, v: string) => setVals(p => ({ ...p, [k]: v }))
   const required = fields.slice(0, 2).map(f => f.key)
-  const ready = required.every(k => (vals[k] || "").trim())
+  // Bon clavier mobile + autofill selon le type de champ (formulaire souvent scanne au telephone).
+  const fieldProps = (key: string): any => {
+    const k = key.toLowerCase()
+    if (/e?mail/.test(k)) return { type: "email", inputMode: "email", autoComplete: "email", autoCapitalize: "off" }
+    if (/phone|tel|mobile|whatsapp|numero/.test(k)) return { type: "tel", inputMode: "tel", autoComplete: "tel" }
+    if (/name|nom|prenom/.test(k)) return { type: "text", autoComplete: "name" }
+    return { type: "text" }
+  }
+  const emailKey = fields.find(f => /e?mail/i.test(f.key))?.key
+  const emailVal = emailKey ? (vals[emailKey] || "").trim() : ""
+  const emailOk = !emailVal || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)
+  const ready = required.every(k => (vals[k] || "").trim()) && emailOk
   const inputStyle: any = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "11px 13px", color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }
   const submit = async () => {
     setStatus("sending")
@@ -444,7 +458,8 @@ function LeadFormPublic({ block, pageId, ownerEmail, leadType, title, descriptio
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {fields.map(f => f.area
           ? <textarea key={f.key} placeholder={f.label} value={vals[f.key] || ""} onChange={e => set(f.key, e.target.value)} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
-          : <input key={f.key} placeholder={f.label} value={vals[f.key] || ""} onChange={e => set(f.key, e.target.value)} style={inputStyle} />)}
+          : <input key={f.key} {...fieldProps(f.key)} placeholder={f.label} value={vals[f.key] || ""} onChange={e => set(f.key, e.target.value)} style={inputStyle} />)}
+        {emailVal && !emailOk && <p style={{ color: "#F59E0B", fontSize: 12, margin: 0 }}>Adresse email invalide.</p>}
         {status === "error" && <p style={{ color: "#EF4444", fontSize: 12, margin: 0 }}>Une erreur est survenue. Réessayez.</p>}
         <button onClick={submit} disabled={!ready || status === "sending"} style={{ background: accent, borderRadius: 10, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", border: "none", cursor: ready && status !== "sending" ? "pointer" : "not-allowed", opacity: ready && status !== "sending" ? 1 : 0.55 }}>{status === "sending" ? "Envoi…" : button}</button>
       </div>
