@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, buildVCard, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -1918,7 +1918,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
     }
 
     case "vcard": {
-      const vcf = ["BEGIN:VCARD", "VERSION:3.0", c.name ? `FN:${c.name}` : "", c.company ? `ORG:${c.company}` : "", c.phone ? `TEL:${c.phone}` : "", c.email ? `EMAIL:${c.email}` : "", c.website ? `URL:${c.website}` : "", "END:VCARD"].filter(Boolean).join("\n")
+      const vcf = buildVCard(c)
       const href = `data:text/vcard;charset=utf-8,${encodeURIComponent(vcf)}`
       return (c.name || c.phone || c.email) ? (
         <div style={{ padding: "6px 24px 12px" }}>

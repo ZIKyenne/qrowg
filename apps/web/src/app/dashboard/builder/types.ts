@@ -614,6 +614,39 @@ export function openStatus(
   return { open: false, label: "Fermé", color: "#EF4444" }
 }
 
+// ── vCard (fiche contact .vcf) conforme RFC 6350 / 2426 ──────────────────────
+// Echappe les caracteres reserves d'une valeur vCard : \ , ; et retours ligne.
+export function vcardEscape(v: string): string {
+  return String(v ?? "").replace(/\\/g, "\\\\").replace(/\r?\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;")
+}
+
+// Separe un nom complet en prenom(s) / nom pour le champ structure N.
+export function splitName(full?: string): { given: string; family: string } {
+  const parts = (full || "").trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return { given: "", family: "" }
+  if (parts.length === 1) return { given: parts[0], family: "" }
+  return { given: parts.slice(0, -1).join(" "), family: parts[parts.length - 1] }
+}
+
+// Genere une vCard 3.0 valide (CRLF, FN obligatoire, N, ORG, TEL/EMAIL types, URL, ADR).
+export function buildVCard(d: { name?: string; phone?: string; email?: string; company?: string; website?: string; address?: string; title?: string }): string {
+  const name = (d.name || "").trim()
+  const fn = name || (d.company || "").trim() || "Contact"
+  const lines: string[] = ["BEGIN:VCARD", "VERSION:3.0", `FN:${vcardEscape(fn)}`]
+  if (name) {
+    const { given, family } = splitName(name)
+    lines.push(`N:${vcardEscape(family)};${vcardEscape(given)};;;`)
+  }
+  if (d.company) lines.push(`ORG:${vcardEscape(d.company)}`)
+  if (d.title)   lines.push(`TITLE:${vcardEscape(d.title)}`)
+  if (d.phone)   lines.push(`TEL;TYPE=CELL:${vcardEscape(d.phone)}`)
+  if (d.email)   lines.push(`EMAIL;TYPE=INTERNET:${vcardEscape(d.email)}`)
+  if (d.website) lines.push(`URL:${vcardEscape(d.website)}`)
+  if (d.address) lines.push(`ADR;TYPE=WORK:;;${vcardEscape(d.address)};;;;`)
+  lines.push("END:VCARD")
+  return lines.join("\r\n")
+}
+
 // Statuts de disponibilité (parité builder <-> public). Couleur personnalisable via dot_color.
 export const AVAILABILITY_STATUSES: { key: string; label: string; color: string }[] = [
   { key: "available", label: "Disponible", color: "#39FF8F" },
@@ -4600,6 +4633,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "phone", label: "Telephone", type: "text", placeholder: "+33 6 12 34 56 78" },
       { key: "email", label: "Email", type: "text", placeholder: "jean@email.com" },
       { key: "company", label: "Entreprise", type: "text", placeholder: "Studio PIXEL" },
+      { key: "title", label: "Fonction (optionnel)", type: "text", placeholder: "Directeur artistique" },
       { key: "website", label: "Site web", type: "url", placeholder: "https://monsite.com" },
       { key: "address", label: "Adresse", type: "text", placeholder: "Paris, France" },
     ],

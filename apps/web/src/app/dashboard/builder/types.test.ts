@@ -6,6 +6,7 @@ import {
   SOCIAL_NETWORKS, SOCIAL_NETWORKS_MAP, productBadgeStyle,
   parsePrice, priceDiscount, countdownParts, stockStatus, paymentLink, paymentBrand, starRow,
   parseHourRanges, fmtMinutes, openStatus,
+  vcardEscape, splitName, buildVCard,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -550,5 +551,56 @@ describe("openStatus", () => {
     const c = { mon_fri: "9h-12h, 14h-18h", saturday: "", sunday: "" }
     expect(openStatus(c, new Date(2026, 6, 6, 13, 0))?.label).toBe("Fermé · ouvre à 14h")
     expect(openStatus(c, new Date(2026, 6, 6, 15, 0))?.open).toBe(true)
+  })
+})
+
+describe("vcardEscape", () => {
+  it("echappe , ; \\ et retours ligne", () => {
+    expect(vcardEscape("Paris, France")).toBe("Paris\\, France")
+    expect(vcardEscape("a;b")).toBe("a\\;b")
+    expect(vcardEscape("a\\b")).toBe("a\\\\b")
+    expect(vcardEscape("l1\nl2")).toBe("l1\\nl2")
+  })
+})
+
+describe("splitName", () => {
+  it("prenom + nom", () => {
+    expect(splitName("Jean Dupont")).toEqual({ given: "Jean", family: "Dupont" })
+  })
+  it("prenom compose -> dernier mot = nom", () => {
+    expect(splitName("Jean Marie Dupont")).toEqual({ given: "Jean Marie", family: "Dupont" })
+  })
+  it("un seul mot / vide", () => {
+    expect(splitName("Madonna")).toEqual({ given: "Madonna", family: "" })
+    expect(splitName("")).toEqual({ given: "", family: "" })
+  })
+})
+
+describe("buildVCard", () => {
+  it("carte complete valide (BEGIN/END, FN, N, champs)", () => {
+    const v = buildVCard({ name: "Jean Dupont", phone: "+33612345678", email: "jean@ex.com", company: "Studio PIXEL", title: "DA", website: "https://x.com", address: "Paris, France" })
+    expect(v.startsWith("BEGIN:VCARD\r\nVERSION:3.0")).toBe(true)
+    expect(v.endsWith("END:VCARD")).toBe(true)
+    expect(v).toContain("FN:Jean Dupont")
+    expect(v).toContain("N:Dupont;Jean;;;")
+    expect(v).toContain("ORG:Studio PIXEL")
+    expect(v).toContain("TITLE:DA")
+    expect(v).toContain("TEL;TYPE=CELL:+33612345678")
+    expect(v).toContain("EMAIL;TYPE=INTERNET:jean@ex.com")
+    expect(v).toContain("URL:https://x.com")
+    expect(v).toContain("ADR;TYPE=WORK:;;Paris\\, France;;;;")
+  })
+  it("utilise CRLF entre les lignes", () => {
+    expect(buildVCard({ name: "A B" }).includes("\r\n")).toBe(true)
+  })
+  it("sans nom -> FN reprend l'entreprise", () => {
+    const v = buildVCard({ company: "ACME" })
+    expect(v).toContain("FN:ACME")
+    expect(v).not.toContain("\nN:")
+  })
+  it("champs vides omis", () => {
+    const v = buildVCard({ name: "Jean" })
+    expect(v).not.toContain("TEL")
+    expect(v).not.toContain("ADR")
   })
 })
