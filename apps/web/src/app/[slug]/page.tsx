@@ -21,7 +21,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const profile = page.profiles as any
   const title = page.seo_title || page.title
   const description = page.seo_description || `Decouvre la page de ${profile?.full_name || page.title} sur QRfolio`
-  const image = page.og_image_url || `${APP_URL}/og-image.png`
+  // Image OG : custom si definie, sinon image de marque generee dynamiquement par page.
+  const image = page.og_image_url || `${APP_URL}/${page.slug}/og`
   const url = `${APP_URL}/${page.slug}`
 
   return {
