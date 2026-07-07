@@ -2,11 +2,14 @@
 // Appelé côté client sur les pages publiques
 import { detectTrafficSource } from "./detectTrafficSource"
 
-let tracked = false  // une seule vue par chargement de page
+// Déduplication par pageId (et non par contexte JS) : une vue comptée une seule fois par
+// page, tout en supportant la navigation client-side entre plusieurs pages publiques et
+// en absorbant le double-appel de React StrictMode.
+const trackedPages = new Set<string>()
 
 export async function trackPageView(pageId: string) {
-  if (tracked || typeof window === "undefined") return
-  tracked = true
+  if (typeof window === "undefined" || !pageId || trackedPages.has(pageId)) return
+  trackedPages.add(pageId)
 
   try {
     const { source, referrer } = detectTrafficSource()
