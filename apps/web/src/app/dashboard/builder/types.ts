@@ -383,13 +383,13 @@ export function stickyActionHref(type?: string, value?: string): { href?: string
   const v = (value || "").trim()
   switch (type) {
     case "call": return { href: telLink(v), icon: "📞", label: "Appeler", color: "#39FF8F" }
-    case "whatsapp": return { href: waLink(v), icon: "💬", label: "WhatsApp", color: "#25D366" }
+    case "whatsapp": return { href: waLink(v, undefined, "33"), icon: "💬", label: "WhatsApp", color: "#25D366" }
     case "directions": return { href: directionsLink(v), icon: "🧭", label: "Itinéraire", color: "#4285F4" }
     case "email": return { href: v ? `mailto:${v}` : "", icon: "✉️", label: "Email", color: "#38BDF8" }
-    case "reserve": return { href: v, icon: "📅", label: "Réserver", color: "#C9A84C" }
-    case "menu": return { href: v, icon: "📖", label: "Menu", color: "#F97316" }
-    case "pay": return { href: v, icon: "💳", label: "Payer", color: "#39FF8F" }
-    case "link": return { href: v, icon: "🔗", label: "Lien", color: "#C9A84C" }
+    case "reserve": return { href: extHref(v), icon: "📅", label: "Réserver", color: "#C9A84C" }
+    case "menu": return { href: extHref(v), icon: "📖", label: "Menu", color: "#F97316" }
+    case "pay": return { href: extHref(v), icon: "💳", label: "Payer", color: "#39FF8F" }
+    case "link": return { href: extHref(v), icon: "🔗", label: "Lien", color: "#C9A84C" }
     case "share": return { share: true, icon: "↗", label: "Partager", color: "#C9A84C" }
     default: return { icon: "", label: "", color: "#C9A84C" }
   }
