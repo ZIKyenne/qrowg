@@ -5802,7 +5802,7 @@
                           {blocks.filter(b => b.visible).length===0
                             ? <div style={{ padding: "40px 14px", textAlign: "center", ...bgStyle() }}><p style={{ fontSize: 24, margin: "0 0 6px" }}>✦</p><p style={{ color: MUTED, fontSize: 10 }}>Ta page apparaîtra ici</p></div>
                             : blocks.filter(b => b.visible && !b.draft).map(b => (
-                              <div key={b.id} onClick={() => { setSelectedId(b.id); setRightTab("edit") }} style={{ cursor: "pointer" }}
+                              <div key={b.id} onClick={() => { setSelectedId(b.id); setRightTab("edit") }} style={{ cursor: "pointer", ...blockDecoration(b.content, theme).style }}
                                 onMouseEnter={e => e.currentTarget.style.opacity="0.85"}
                                 onMouseLeave={e => e.currentTarget.style.opacity="1"}>
                                 <PreviewBoundary><BlockPreview block={b} theme={theme} dayMode={dayMode} /></PreviewBoundary>
