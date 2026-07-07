@@ -660,6 +660,53 @@ export function mapEmbedUrl(address?: string, embedUrl?: string, zoom?: string):
   return `https://maps.google.com/maps?q=${enc}&z=${z}&output=embed`
 }
 
+// ── Ajouter au calendrier : Google Agenda + fichier .ics (Apple/Outlook/tous) ──
+// Convertit "2025-06-15T19:00[:00]" (ou date seule) en tampon calendrier "20250615T190000"
+// en HEURE FLOTTANTE (aucun decalage de fuseau -> l'evenement s'affiche a l'heure saisie).
+export function toCalStamp(raw?: string): string | null {
+  const t = (raw || "").trim()
+  const m = t.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{1,2}):(\d{2})(?::(\d{2}))?/)
+  if (m) return `${m[1]}${m[2]}${m[3]}T${m[4].padStart(2, "0")}${m[5]}${m[6] || "00"}`
+  const d = t.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (d) return `${d[1]}${d[2]}${d[3]}T090000` // date seule -> 9h par defaut
+  return null
+}
+
+// Ajoute des heures a un tampon calendrier (gere les debordements jour/mois). Reste flottant.
+function addHoursToStamp(stamp: string, hours: number): string {
+  const m = stamp.match(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/)
+  if (!m) return stamp
+  const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]))
+  d.setUTCHours(d.getUTCHours() + hours)
+  const p = (n: number) => String(n).padStart(2, "0")
+  return `${d.getUTCFullYear()}${p(d.getUTCMonth() + 1)}${p(d.getUTCDate())}T${p(d.getUTCHours())}${p(d.getUTCMinutes())}${p(d.getUTCSeconds())}`
+}
+
+// Renvoie un lien Google Agenda + un data-URI .ics a partir des champs d'evenement.
+// null si la date de debut n'est pas exploitable.
+export function calendarLinks(e: { name?: string; start?: string; end?: string; location?: string; description?: string }): { google: string; ics: string } | null {
+  const start = toCalStamp(e.start)
+  if (!start) return null
+  const end = toCalStamp(e.end) || addHoursToStamp(start, 1) // defaut : +1h
+  const name = (e.name || "Événement").trim()
+
+  const params = new URLSearchParams({ action: "TEMPLATE", text: name, dates: `${start}/${end}` })
+  if (e.location) params.set("location", e.location)
+  if (e.description) params.set("details", e.description)
+  const google = `https://calendar.google.com/calendar/render?${params.toString()}`
+
+  const lines = [
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//QRfolio//Calendar//FR", "CALSCALE:GREGORIAN",
+    "BEGIN:VEVENT", `UID:${start}-qrfolio@qrfolio.app`,
+    `DTSTART:${start}`, `DTEND:${end}`, `SUMMARY:${vcardEscape(name)}`,
+    e.location ? `LOCATION:${vcardEscape(e.location)}` : "",
+    e.description ? `DESCRIPTION:${vcardEscape(e.description)}` : "",
+    "END:VEVENT", "END:VCALENDAR",
+  ].filter(Boolean)
+  const ics = `data:text/calendar;charset=utf-8,${encodeURIComponent(lines.join("\r\n"))}`
+  return { google, ics }
+}
+
 // ── Partage : liens de partage par reseau a partir d'une URL (+ texte optionnel) ─
 export type ShareTarget = { key: string; label: string; icon: string; color: string; href: string }
 // Ajoute utm_source/utm_medium a l'URL partagee pour l'attribution analytics
@@ -3808,12 +3855,12 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     defaultContent: { event_name: "Mon événement", cta_label: "Ajouter à mon agenda" },
     fields: [
       { key: "event_name", label: "Nom de l événement", type: "text", placeholder: "Soirée de lancement" },
-      { key: "start_date", label: "Date et heure début", type: "text", placeholder: "2025-06-15T19:00:00" },
-      { key: "end_date", label: "Date et heure fin", type: "text", placeholder: "2025-06-15T23:00:00" },
+      { key: "start_date", label: "Date et heure de début", type: "datetime", hint: "Suffit à générer les liens Google Agenda + fichier .ics (Apple/Outlook)" },
+      { key: "end_date", label: "Date et heure de fin (optionnel)", type: "datetime", hint: "Par défaut : +1h" },
       { key: "location", label: "Lieu", type: "text", placeholder: "Paris, France" },
       { key: "description", label: "Description", type: "text", placeholder: "Rejoignez-nous pour..." },
-      { key: "google_url", label: "Lien Google Calendar", type: "url", placeholder: "https://calendar.google.com/..." },
       { key: "cta_label", label: "Bouton", type: "text", placeholder: "Ajouter à mon agenda" },
+      { key: "google_url", label: "Lien Google Calendar personnalisé (optionnel)", type: "url", placeholder: "https://calendar.google.com/...", hint: "Laissez vide : les liens se construisent depuis les dates" },
     ],
   },
   participants_count: {

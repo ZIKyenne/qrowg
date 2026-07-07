@@ -6,7 +6,7 @@ import {
   SOCIAL_NETWORKS, SOCIAL_NETWORKS_MAP, productBadgeStyle,
   parsePrice, priceDiscount, countdownParts, stockStatus, paymentLink, paymentBrand, starRow,
   parseHourRanges, fmtMinutes, openStatus,
-  vcardEscape, splitName, buildVCard, mapEmbedUrl, shareLinks,
+  vcardEscape, splitName, buildVCard, mapEmbedUrl, shareLinks, toCalStamp, calendarLinks,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -654,5 +654,49 @@ describe("shareLinks", () => {
   it("utm ajoute avec & si l'URL a deja des parametres", () => {
     const w = shareLinks("https://qrfolio.app/jean?ref=1").find(t => t.key === "telegram")!
     expect(w.href).toContain("jean%3Fref%3D1%26utm_source%3Dtelegram")
+  })
+})
+
+describe("toCalStamp", () => {
+  it("datetime -> tampon flottant (pas de decalage TZ)", () => {
+    expect(toCalStamp("2025-06-15T19:00")).toBe("20250615T190000")
+    expect(toCalStamp("2025-06-15T19:00:30")).toBe("20250615T190030")
+    expect(toCalStamp("2025-06-15 09:05")).toBe("20250615T090500")
+  })
+  it("date seule -> 9h par defaut", () => {
+    expect(toCalStamp("2025-12-31")).toBe("20251231T090000")
+  })
+  it("vide / invalide -> null", () => {
+    expect(toCalStamp("")).toBeNull()
+    expect(toCalStamp("bientot")).toBeNull()
+    expect(toCalStamp(undefined)).toBeNull()
+  })
+})
+
+describe("calendarLinks", () => {
+  it("construit Google + .ics depuis les champs", () => {
+    const r = calendarLinks({ name: "Soirée", start: "2025-06-15T19:00", end: "2025-06-15T23:00", location: "Paris, France", description: "Venez !" })!
+    expect(r.google).toContain("calendar.google.com/calendar/render")
+    expect(r.google).toContain("dates=20250615T190000%2F20250615T230000")
+    expect(r.google).toContain("action=TEMPLATE")
+    expect(r.ics.startsWith("data:text/calendar")).toBe(true)
+    const ics = decodeURIComponent(r.ics.split(",")[1])
+    expect(ics).toContain("BEGIN:VEVENT")
+    expect(ics).toContain("DTSTART:20250615T190000")
+    expect(ics).toContain("DTEND:20250615T230000")
+    expect(ics).toContain("SUMMARY:Soirée")
+    expect(ics).toContain("LOCATION:Paris\\, France") // virgule echappee
+    expect(ics.includes("\r\n")).toBe(true)
+  })
+  it("fin absente -> +1h", () => {
+    const r = calendarLinks({ name: "X", start: "2025-06-15T19:00" })!
+    expect(r.google).toContain("20250615T190000%2F20250615T200000")
+  })
+  it("debordement d heure (23h +1h -> lendemain 0h)", () => {
+    const r = calendarLinks({ name: "X", start: "2025-06-15T23:30" })!
+    expect(r.google).toContain("20250615T233000%2F20250616T003000")
+  })
+  it("date de debut invalide -> null", () => {
+    expect(calendarLinks({ name: "X", start: "" })).toBeNull()
   })
 })

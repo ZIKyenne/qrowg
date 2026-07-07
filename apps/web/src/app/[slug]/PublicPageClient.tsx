@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, buildVCard, mapEmbedUrl, shareLinks, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, buildVCard, mapEmbedUrl, shareLinks, calendarLinks, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -1940,21 +1940,24 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
     }
     case "event_register": return <EventRegisterPublic block={block} pageId={pageId} TEXT={TEXT} MUTED={MUTED} ownerEmail={ownerEmail} />
     case "rsvp": return <RsvpPublic block={block} pageId={pageId} TEXT={TEXT} MUTED={MUTED} />
-    case "add_to_calendar": return (c.event_name || c.google_url) ? (
+    case "add_to_calendar": { const cal = calendarLinks({ name: c.event_name, start: c.start_date, end: c.end_date, location: c.location, description: c.description }); const gUrl = c.google_url || cal?.google; return (c.event_name || gUrl) ? (
       <div style={{ padding: "10px 24px 14px" }}>
         <div style={{ background: "rgba(236,72,153,0.06)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 15, padding: "15px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: c.google_url ? 13 : 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: (gUrl || cal) ? 13 : 0 }}>
             <div style={{ width: 44, height: 44, borderRadius: 11, background: "rgba(236,72,153,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 23, flexShrink: 0 }}>📅</div>
             <div>
               <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{c.event_name || "Mon événement"}</p>
-              {c.start_date && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>🕐 {c.start_date}</p>}
+              {c.start_date && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>🕐 {c.start_date.replace("T", " à ")}</p>}
               {c.location && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>📍 {c.location}</p>}
             </div>
           </div>
-          {c.google_url && <a href={c.google_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.google_url)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(66,133,244,0.12)", border: "1px solid rgba(66,133,244,0.3)", borderRadius: 10, padding: "13px", fontSize: 13, fontWeight: 700, color: "#4285F4", textDecoration: "none", fontFamily: FONT_B }}>📅 {c.cta_label || "Ajouter à Google Agenda"}</a>}
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {gUrl && <a href={gUrl} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, "calendar:google")} style={{ flex: 1, minWidth: 130, display: "flex", alignItems: "center", justifyContent: "center", gap: 7, background: "rgba(66,133,244,0.12)", border: "1px solid rgba(66,133,244,0.3)", borderRadius: 10, padding: "13px", fontSize: 12.5, fontWeight: 700, color: "#4285F4", textDecoration: "none", fontFamily: FONT_B }}>📅 Google Agenda</a>}
+            {cal && <a href={cal.ics} download={`${(c.event_name || "evenement").replace(/[^\w-]+/g, "_")}.ics`} onClick={() => trackLinkClick(pageId, block.id, "calendar:ics")} style={{ flex: 1, minWidth: 130, display: "flex", alignItems: "center", justifyContent: "center", gap: 7, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "13px", fontSize: 12.5, fontWeight: 700, color: TEXT, textDecoration: "none", fontFamily: FONT_B }}>🍎 Apple / Outlook</a>}
+          </div>
         </div>
       </div>
-    ) : null
+    ) : null }
     case "participants_count": {
       const total = parseInt(c.count || "0")
       const max = parseInt(c.max || "0")
