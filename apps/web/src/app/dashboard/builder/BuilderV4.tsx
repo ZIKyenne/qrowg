@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, INFO_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, blockDecoration, BLOCK_GRAD_OPTIONS, BLOCK_RADIUS_OPTIONS, BLOCK_SHADOW_OPTIONS, BLOCK_SPACE_OPTIONS, BLOCK_WIDTH_OPTIONS, BLOCK_ANIM_OPTIONS, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, INFO_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, blockDecoration, BLOCK_GRAD_OPTIONS, BLOCK_RADIUS_OPTIONS, BLOCK_SHADOW_OPTIONS, BLOCK_SPACE_OPTIONS, BLOCK_WIDTH_OPTIONS, BLOCK_ANIM_OPTIONS, BLOCK_STYLE_PRESETS, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import QRCanvas from "../qr-codes/QRCanvas"
@@ -5910,14 +5910,26 @@
                             </div>
                           )
                         }
-                        const STYLE_KEYS = ["__grad", "__bg", "__border", "__radius", "__shadow", "__glow", "__space", "__width", "__anim"]
+                        const STYLE_KEYS = ["__grad", "__bg", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim"]
                         const active = STYLE_KEYS.some(k => bc[k] && !["Aucun", "Défaut", "Non", "Normale", "Aucune", ""].includes(bc[k]))
+                        const applyPreset = (apply: Record<string, string>) => setBlocks(p => p.map(b => b.id === selectedBlock.id ? { ...b, content: { ...b.content, ...apply } } : b))
                         return (
                           <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 0 10px" }}>
                               <p style={{ color: MUTED, fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: 0 }}>Style · Apparence</p>
                               {active && <button onClick={() => STYLE_KEYS.forEach(k => set(k, ""))} title="Réinitialiser l'apparence de ce bloc"
                                 style={{ background: "none", border: "none", color: MUTED, fontSize: 10, cursor: "pointer", textDecoration: "underline" }}>Réinitialiser</button>}
+                            </div>
+                            {/* Modèles d'apparence 1-clic */}
+                            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
+                              {BLOCK_STYLE_PRESETS.map(p => (
+                                <button key={p.key} onClick={() => applyPreset(p.apply)} title={`Appliquer le style ${p.label}`}
+                                  style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 10px", borderRadius: 8, border: "1px solid rgba(201,168,76,0.2)", background: "rgba(201,168,76,0.05)", color: "#F5F0E8", fontSize: 11, fontWeight: 600, cursor: "pointer" }}
+                                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.12)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)" }}
+                                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,168,76,0.05)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.2)" }}>
+                                  <span style={{ fontSize: 13 }}>{p.emoji}</span>{p.label}
+                                </button>
+                              ))}
                             </div>
                             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                               <Sel k="__grad" label="Fond dégradé" options={BLOCK_GRAD_OPTIONS} def="Aucun" />
@@ -5935,6 +5947,7 @@
                               <Sel k="__radius" label="Coins arrondis" options={BLOCK_RADIUS_OPTIONS} def="Défaut" />
                               <Sel k="__shadow" label="Ombre" options={BLOCK_SHADOW_OPTIONS} def="Non" />
                               <Toggle k="__glow" label="Halo lumineux (glow)" icon="✨" />
+                              <Toggle k="__glass" label="Effet verre (flou)" icon="🧊" />
                               <Sel k="__space" label="Espacement vertical" options={BLOCK_SPACE_OPTIONS} def="Défaut" />
                               <Sel k="__width" label="Largeur" options={BLOCK_WIDTH_OPTIONS} def="Normale" />
                               <Sel k="__anim" label="Animation d'apparition" options={BLOCK_ANIM_OPTIONS} def="Aucune" />

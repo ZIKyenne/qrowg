@@ -2978,6 +2978,17 @@ export const BLOCK_SPACE_OPTIONS = ["Défaut", "Compact", "Aéré"]
 export const BLOCK_WIDTH_OPTIONS = ["Normale", "Étroite"]
 export const BLOCK_ANIM_OPTIONS = ["Aucune", "Fondu", "Glissé", "Zoom"]
 
+// Modèles d'apparence 1-clic : appliquent un jeu cohérent de clés __ (les clés non listées d'un
+// preset sont remises à "" pour repartir d'un état propre).
+export const BLOCK_STYLE_PRESETS: { key: string; label: string; emoji: string; apply: Record<string, string> }[] = [
+  { key: "card",    label: "Carte",    emoji: "🃏", apply: { __border: "Oui", __radius: "M", __shadow: "Douce", __bg: "", __grad: "", __glow: "", __glass: "" } },
+  { key: "premium", label: "Premium",  emoji: "👑", apply: { __grad: "Or nuit", __radius: "L", __shadow: "Douce", __border: "Oui", __bg: "", __glow: "", __glass: "" } },
+  { key: "glass",   label: "Verre",    emoji: "🧊", apply: { __glass: "Oui", __radius: "L", __shadow: "Douce", __grad: "", __bg: "", __border: "", __glow: "" } },
+  { key: "neon",    label: "Néon",     emoji: "✨", apply: { __bg: "#0d0d10", __border: "Oui", __radius: "L", __glow: "Oui", __grad: "", __shadow: "", __glass: "" } },
+  { key: "ocean",   label: "Océan",    emoji: "🌊", apply: { __grad: "Océan", __radius: "L", __shadow: "Douce", __border: "", __bg: "", __glow: "", __glass: "" } },
+  { key: "minimal", label: "Minimal",  emoji: "▫️", apply: { __radius: "S", __space: "Aéré", __border: "", __bg: "", __grad: "", __shadow: "", __glow: "", __glass: "" } },
+]
+
 // Style universel appliqué au conteneur d'un bloc à partir de clés réservées (__bg, __grad, __border,
 // __radius, __shadow, __glow, __space, __width, __anim). PUR + par défaut INERTE : si aucune clé n'est
 // posée, renvoie { style: {}, animClass: "" } -> rendu identique à l'existant (zéro régression).
@@ -3006,6 +3017,14 @@ export function blockDecoration(
   if (c.__glow === "Oui") {
     const glow = `0 0 26px ${g}44`
     style.boxShadow = style.boxShadow ? `${style.boxShadow}, ${glow}` : glow
+    surface = true
+  }
+
+  if (c.__glass === "Oui") {
+    if (!style.background) style.background = "rgba(255,255,255,0.06)"
+    style.backdropFilter = "blur(12px)"
+    ;(style as any).WebkitBackdropFilter = "blur(12px)"
+    if (!style.border) style.border = "1px solid rgba(255,255,255,0.12)"
     surface = true
   }
 

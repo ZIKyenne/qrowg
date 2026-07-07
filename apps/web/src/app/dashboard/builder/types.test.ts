@@ -48,6 +48,13 @@ describe("blockDecoration", () => {
     expect(r.style.marginTop).toBe(22)
     expect(r.animClass).toBe("qf-b-zoom")
   })
+  it("verre (glass) : flou + fond translucide + bordure par défaut", () => {
+    const r = blockDecoration({ __glass: "Oui" }, theme)
+    expect(r.style.backdropFilter).toBe("blur(12px)")
+    expect(r.style.background).toBe("rgba(255,255,255,0.06)")
+    expect(r.style.border).toContain("rgba(255,255,255,0.12)")
+    expect(r.style.marginLeft).toBe(14)
+  })
 })
 
 describe("docTypeMeta", () => {
