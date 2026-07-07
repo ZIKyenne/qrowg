@@ -2590,18 +2590,28 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
   const [headerVisible, setHeaderVisible] = useState(true)
   const lastScrollY = useRef(0)
 
-  // Load Google Fonts
+  // Charge les polices Google du thème — uniquement les polices CUSTOM (Cormorant Garamond
+  // et DM Sans sont déjà chargées par le layout -> évite une requête redondante + le FOUT).
+  // Chaque famille reçoit son propre axe de poids (sinon seule la dernière chargeait 600/700,
+  // laissant le nom du profil en faux-gras).
   useEffect(() => {
-    const fonts = [theme.fontDisplay, theme.fontBody].filter(Boolean)
-      .map((f: string) => f.replace(/,.*/, "").trim().replace(/ /g, "+"))
-      .join("&family=")
-    if (fonts) {
-      const link = document.createElement("link")
-      link.rel = "stylesheet"
-      link.href = `https://fonts.googleapis.com/css2?family=${fonts}:wght@400;600;700&display=swap`
-      document.head.appendChild(link)
-    }
-  }, [])
+    const DEFAULTS = new Set(["Cormorant Garamond", "DM Sans"])
+    const custom = [...new Set(
+      [theme.fontDisplay, theme.fontBody]
+        .filter(Boolean)
+        .map((f: string) => f.replace(/,.*/, "").trim())
+        .filter((f: string) => f && !DEFAULTS.has(f))
+    )]
+    if (!custom.length) return
+    const families = custom.map(f => `family=${f.replace(/ /g, "+")}:wght@400;600;700`).join("&")
+    const href = `https://fonts.googleapis.com/css2?${families}&display=swap`
+    if (document.querySelector(`link[data-qf-font][href="${href}"]`)) return
+    const link = document.createElement("link")
+    link.rel = "stylesheet"
+    link.href = href
+    link.setAttribute("data-qf-font", "1")
+    document.head.appendChild(link)
+  }, [theme.fontDisplay, theme.fontBody])
 
   // Scroll handler
   useEffect(() => {

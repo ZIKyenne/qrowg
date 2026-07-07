@@ -4238,9 +4238,18 @@
     useEffect(() => { messagesEnd.current?.scrollIntoView({ behavior: "smooth" }) }, [messages])
 
     useEffect(() => {
-      const fonts = [theme.fontDisplay, theme.fontBody].filter(Boolean).map(f => f.replace(/ /g,"+")).join("&family=")
-      const link = document.createElement("link"); link.rel = "stylesheet"
-      link.href = `https://fonts.googleapis.com/css2?family=${fonts}&display=swap`
+      // Ne charge que les polices CUSTOM (Cormorant Garamond / DM Sans deja chargees par le
+      // layout) et donne a CHAQUE famille son axe de poids (sinon tout l apercu en faux-gras).
+      const DEFAULTS = new Set(["Cormorant Garamond", "DM Sans"])
+      const custom = [...new Set(
+        [theme.fontDisplay, theme.fontBody].filter(Boolean).map(f => f.replace(/,.*/, "").trim()).filter(f => f && !DEFAULTS.has(f))
+      )]
+      if (!custom.length) return
+      const families = custom.map(f => `family=${f.replace(/ /g, "+")}:wght@400;600;700`).join("&")
+      const href = `https://fonts.googleapis.com/css2?${families}&display=swap`
+      if (document.querySelector(`link[data-qf-font][href="${href}"]`)) return
+      const link = document.createElement("link"); link.rel = "stylesheet"; link.href = href
+      link.setAttribute("data-qf-font", "1")
       document.head.appendChild(link)
     }, [theme.fontDisplay, theme.fontBody])
 
