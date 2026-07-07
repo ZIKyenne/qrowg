@@ -4026,6 +4026,9 @@
     const [aiLoading, setAiLoading] = useState(false)
     const messagesEnd = useRef<HTMLDivElement>(null)
     const saveTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+    // Vrai s'il reste des modifications non encore sauvegardees (evite la perte de donnees
+    // si l'onglet est ferme/recharge pendant le debounce de sauvegarde).
+    const dirty = useRef(false)
 
     // ── États collapse panneaux ────────────────────────────────────────────────
     const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
@@ -4304,8 +4307,16 @@
       load()
     }, [liveId])
 
+    // Avertit avant de fermer/recharger l'onglet s'il reste des changements non sauvegardes.
+    useEffect(() => {
+      const handler = (e: BeforeUnloadEvent) => { if (dirty.current) { e.preventDefault(); e.returnValue = "" } }
+      window.addEventListener("beforeunload", handler)
+      return () => window.removeEventListener("beforeunload", handler)
+    }, [])
+
     useEffect(() => {
       if (!IS_UUID(liveId)) return
+      dirty.current = true
       clearTimeout(saveTimeout.current)
       saveTimeout.current = setTimeout(async () => {
         setSaving(true); setSaveError(false)
@@ -4330,7 +4341,7 @@
             await supabase.from("blocks").delete().eq("page_id", liveId)
             if (blocks.length > 0) { const { error } = await supabase.from("blocks").insert(blocks.map((b, i) => ({ page_id: liveId, type: b.type, position: i, content: { ...b.content, __draft: b.draft || false, __locked: b.locked || false, __visible: b.visible !== false }, is_visible: b.visible && !b.draft, styles: {} }))); if (error) throw error }
           }
-          setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
+          dirty.current = false; setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
         } catch (e: any) {
           console.error("[QRfolio] Échec de sauvegarde des blocs :", e)
           setSaveErrorMsg(e?.message || e?.hint || "Erreur inconnue")
