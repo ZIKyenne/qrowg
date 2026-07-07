@@ -1073,9 +1073,9 @@
 
       case "offer_comparison": {
         const plans = [
-          { name: c.plan1_name, price: c.plan1_price, features: c.plan1_features, highlight: false },
-          { name: c.plan2_name, price: c.plan2_price, features: c.plan2_features, highlight: c.plan2_highlight==="yes" },
-          { name: c.plan3_name, price: c.plan3_price, features: c.plan3_features, highlight: false },
+          { name: c.plan1_name, price: c.plan1_price, old_price: c.plan1_old_price, features: c.plan1_features, highlight: false },
+          { name: c.plan2_name, price: c.plan2_price, old_price: c.plan2_old_price, features: c.plan2_features, highlight: c.plan2_highlight==="yes" },
+          { name: c.plan3_name, price: c.plan3_price, old_price: c.plan3_old_price, features: c.plan3_features, highlight: false },
         ].filter(p => p.name)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
@@ -1085,7 +1085,10 @@
                 <div key={i} style={{ flex: 1, background: plan.highlight ? primary+"12" : "rgba(255,255,255,0.03)", border: `1.5px solid ${plan.highlight ? primary+"50" : "rgba(255,255,255,0.08)"}`, borderRadius: 12, padding: "12px 10px", position: "relative" }}>
                   {plan.highlight && <div style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", background: primary, color: "#080808", borderRadius: 20, padding: "2px 10px", fontSize: 9, fontWeight: 700, whiteSpace: "nowrap" }}>⭐ Populaire</div>}
                   <p style={{ color: plan.highlight ? primary : text, fontSize: 11, fontWeight: 700, margin: "0 0 4px", textAlign: "center" }}>{plan.name}</p>
-                  <p style={{ color: primary, fontSize: 18, fontWeight: 700, margin: "0 0 8px", textAlign: "center", fontFamily: theme.fontDisplay }}>{plan.price}</p>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", margin: "0 0 8px" }}>
+                    <p style={{ color: primary, fontSize: 18, fontWeight: 700, margin: 0, fontFamily: theme.fontDisplay }}>{plan.price}</p>
+                    {plan.old_price && (() => { const disc = priceDiscount(plan.price, plan.old_price); return <p style={{ margin: "1px 0 0", fontSize: 10 }}><span style={{ color: muted, textDecoration: "line-through" }}>{plan.old_price}</span>{disc && <span style={{ color: "#EF4444", fontWeight: 800, marginLeft: 4 }}>{disc.label}</span>}</p> })()}
+                  </div>
                   {plan.features && plan.features.split("\n").filter(Boolean).map((f: string, j: number) => (
                     <p key={j} style={{ color: muted, fontSize: 9, margin: "0 0 3px", display: "flex", alignItems: "center", gap: 4 }}>
                       <span style={{ color: "#39FF8F" }}>✓</span> {f}

@@ -1114,7 +1114,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       </div>
     ) : null
     case "offer_comparison": {
-      const plans = [{ name: c.plan1_name, price: c.plan1_price, features: c.plan1_features, hl: false }, { name: c.plan2_name, price: c.plan2_price, features: c.plan2_features, hl: c.plan2_highlight === "yes" }, { name: c.plan3_name, price: c.plan3_price, features: c.plan3_features, hl: false }].filter(p => p.name)
+      const plans = [{ name: c.plan1_name, price: c.plan1_price, old_price: c.plan1_old_price, features: c.plan1_features, hl: false }, { name: c.plan2_name, price: c.plan2_price, old_price: c.plan2_old_price, features: c.plan2_features, hl: c.plan2_highlight === "yes" }, { name: c.plan3_name, price: c.plan3_price, old_price: c.plan3_old_price, features: c.plan3_features, hl: false }].filter(p => p.name)
       return plans.length > 0 ? (
         <div style={{ padding: "16px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 14px", textAlign: "center", fontFamily: FONT_B }}>{c.title}</p>}
@@ -1123,7 +1123,10 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
               <div key={i} style={{ flex: 1, minWidth: 0, background: p.hl ? `${G}12` : "rgba(255,255,255,0.03)", border: `1.5px solid ${p.hl ? `${G}50` : "rgba(255,255,255,0.08)"}`, borderRadius: 13, padding: "14px 10px", position: "relative" }}>
                 {p.hl && <div style={{ position: "absolute", top: -9, left: "50%", transform: "translateX(-50%)", background: G, color: "#080808", borderRadius: 20, padding: "2px 10px", fontSize: 9, fontWeight: 700, whiteSpace: "nowrap" }}>⭐ Populaire</div>}
                 <p style={{ color: p.hl ? G : TEXT, fontSize: 12, fontWeight: 700, margin: "0 0 5px", textAlign: "center", fontFamily: FONT_B }}>{p.name}</p>
-                <p style={{ color: G, fontSize: 19, fontWeight: 700, margin: "0 0 9px", textAlign: "center", fontFamily: FONT_D }}>{p.price}</p>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", margin: "0 0 9px" }}>
+                  <p style={{ color: G, fontSize: 19, fontWeight: 700, margin: 0, textAlign: "center", fontFamily: FONT_D }}>{p.price}</p>
+                  {p.old_price && (() => { const disc = priceDiscount(p.price, p.old_price); return <p style={{ margin: "2px 0 0", fontSize: 11, fontFamily: FONT_B }}><span style={{ color: MUTED, textDecoration: "line-through" }}>{p.old_price}</span>{disc && <span style={{ color: "#EF4444", fontWeight: 800, marginLeft: 4 }}>{disc.label}</span>}</p> })()}
+                </div>
                 {(p.features || "").split("\n").filter(Boolean).map((f: string, j: number) => (
                   <p key={j} style={{ color: MUTED, fontSize: 10.5, margin: "0 0 4px", display: "flex", gap: 5 }}><span style={{ color: "#39FF8F" }}>✓</span> {f}</p>
                 ))}
