@@ -83,6 +83,15 @@ function BeforeAfterPublic({ before, after, beforeLabel, afterLabel }: { before:
   )
 }
 
+// ── Bouton Copier réutilisable (feedback visible, plus de copie silencieuse) ──
+function CopyButton({ value, label, copiedLabel = "Copié", track, style }: { value: string; label: React.ReactNode; copiedLabel?: string; track?: () => void; style: any }) {
+  const [copied, setCopied] = useState(false)
+  const onClick = async () => {
+    try { await navigator.clipboard?.writeText(value); setCopied(true); setTimeout(() => setCopied(false), 1800); track?.() } catch {}
+  }
+  return <button onClick={onClick} aria-live="polite" style={{ ...style, ...(copied ? { color: "#39FF8F", borderColor: "rgba(57,255,143,0.4)" } : null) }}>{copied ? `✓ ${copiedLabel}` : label}</button>
+}
+
 // ── Bouton Partager : partage natif (mobile) ou popover réseaux + copie (desktop) ─
 function ShareButton({ pageId, blockId, style, inner }: { pageId: string; blockId: string; style: any; inner: React.ReactNode }) {
   const [open, setOpen] = useState(false)
@@ -1071,7 +1080,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
           <span style={{ color: "#4285F4", fontSize: 15, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Obtenir l'itinéraire"}</span>
         </a>
         {c.show_copy !== "no" && c.address && (
-          <button onClick={() => { navigator.clipboard?.writeText(c.address); trackLinkClick(pageId, block.id, "copy-address") }} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%", marginTop: 7, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 11, padding: "10px", color: MUTED, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: FONT_B }}>📋 Copier l&apos;adresse</button>
+          <CopyButton value={c.address} copiedLabel="Adresse copiée" track={() => trackLinkClick(pageId, block.id, "copy-address")} label="📋 Copier l'adresse" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%", marginTop: 7, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 11, padding: "10px", color: MUTED, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: FONT_B }} />
         )}
       </div>
     ) : null }
