@@ -6,7 +6,7 @@ import {
   SOCIAL_NETWORKS, SOCIAL_NETWORKS_MAP, productBadgeStyle,
   parsePrice, priceDiscount, countdownParts, stockStatus, paymentLink, paymentBrand, starRow,
   parseHourRanges, fmtMinutes, openStatus,
-  vcardEscape, splitName, buildVCard, mapEmbedUrl,
+  vcardEscape, splitName, buildVCard, mapEmbedUrl, shareLinks,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -621,5 +621,26 @@ describe("mapEmbedUrl", () => {
   it("rien d'exploitable -> vide", () => {
     expect(mapEmbedUrl("")).toBe("")
     expect(mapEmbedUrl(undefined, undefined)).toBe("")
+  })
+})
+
+describe("shareLinks", () => {
+  const L = shareLinks("https://qrfolio.app/jean", "Jean Dupont")
+  const by = (k: string) => L.find(t => t.key === k)!
+  it("6 reseaux, encodage URL", () => {
+    expect(L.map(t => t.key)).toEqual(["whatsapp", "facebook", "x", "linkedin", "telegram", "email"])
+    expect(by("whatsapp").href).toContain("https%3A%2F%2Fqrfolio.app%2Fjean")
+  })
+  it("WhatsApp/X/Telegram incluent le texte, Facebook seulement l'URL", () => {
+    expect(by("whatsapp").href).toContain("Jean%20Dupont")
+    expect(by("x").href).toContain("&text=Jean%20Dupont")
+    expect(by("facebook").href).not.toContain("Jean")
+  })
+  it("email en mailto", () => {
+    expect(by("email").href.startsWith("mailto:?subject=Jean%20Dupont")).toBe(true)
+  })
+  it("sans texte -> pas de segment texte parasite", () => {
+    const w = shareLinks("https://x.io").find(t => t.key === "whatsapp")!
+    expect(w.href).toBe("https://wa.me/?text=https%3A%2F%2Fx.io")
   })
 })

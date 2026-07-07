@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, buildVCard, mapEmbedUrl, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, buildVCard, mapEmbedUrl, shareLinks, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -79,6 +79,49 @@ function BeforeAfterPublic({ before, after, beforeLabel, afterLabel }: { before:
       {/* Labels */}
       <span style={{ position: "absolute", bottom: 10, left: 10, background: "rgba(239,68,68,0.85)", color: "#fff", fontSize: 11, fontWeight: 700, borderRadius: 6, padding: "3px 9px" }}>{beforeLabel}</span>
       <span style={{ position: "absolute", bottom: 10, right: 10, background: "rgba(57,255,143,0.85)", color: "#080808", fontSize: 11, fontWeight: 700, borderRadius: 6, padding: "3px 9px" }}>{afterLabel}</span>
+    </div>
+  )
+}
+
+// ── Bouton Partager : partage natif (mobile) ou popover réseaux + copie (desktop) ─
+function ShareButton({ pageId, blockId, style, inner }: { pageId: string; blockId: string; style: any; inner: React.ReactNode }) {
+  const [open, setOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const url = () => (typeof window !== "undefined" ? window.location.href : "")
+  const title = () => (typeof document !== "undefined" ? document.title : "QRfolio")
+  const onClick = async () => {
+    trackLinkClick(pageId, blockId, "share")
+    const nav = typeof navigator !== "undefined" ? navigator : undefined
+    if (nav && (nav as any).share) {
+      try { await (nav as any).share({ title: title(), text: title(), url: url() }) } catch {}
+    } else {
+      setOpen(o => !o)
+    }
+  }
+  const copy = async () => {
+    try { await navigator.clipboard?.writeText(url()); setCopied(true); setTimeout(() => setCopied(false), 1800) } catch {}
+  }
+  const targets = shareLinks(url(), title())
+  return (
+    <div style={{ position: "relative", flex: 1, display: "flex" }}>
+      <button onClick={onClick} style={style} aria-haspopup="menu" aria-expanded={open}>{inner}</button>
+      {open && (
+        <>
+          <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 70 }} />
+          <div role="menu" style={{ position: "absolute", bottom: "calc(100% + 10px)", left: "50%", transform: "translateX(-50%)", zIndex: 71, background: "#141414", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 14, padding: 10, boxShadow: "0 12px 40px rgba(0,0,0,0.6)", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, width: 232 }}>
+            {targets.map(tgt => (
+              <a key={tgt.key} href={tgt.href} target="_blank" rel="noopener noreferrer" onClick={() => { setOpen(false); trackLinkClick(pageId, blockId, `share:${tgt.key}`) }}
+                style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "8px 4px", borderRadius: 9, textDecoration: "none", background: "rgba(255,255,255,0.04)" }}>
+                <span style={{ fontSize: 18 }}>{tgt.icon}</span>
+                <span style={{ color: "#F5F0E8", fontSize: 9, fontWeight: 600 }}>{tgt.label}</span>
+              </a>
+            ))}
+            <button onClick={copy} style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", borderRadius: 9, border: "none", cursor: "pointer", background: copied ? "rgba(57,255,143,0.14)" : "rgba(201,168,76,0.12)", color: copied ? "#39FF8F" : "#C9A84C", fontSize: 11, fontWeight: 700 }}>
+              {copied ? "✓ Lien copié" : "🔗 Copier le lien"}
+            </button>
+          </div>
+        </>
+      )}
     </div>
   )
 }
@@ -1005,7 +1048,6 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       const barBg = c.bar_style === "solid" ? "#0A0A0A" : c.bar_style === "gold" ? `linear-gradient(90deg,${G},${G}dd)` : "rgba(12,12,12,0.82)"
       const goldStyle = c.bar_style === "gold"
       const pos = c.position === "top" ? { top: 0 } : { bottom: 0 }
-      const doShare = () => { const u = typeof window !== "undefined" ? window.location.href : ""; if (navigator.share) navigator.share({ url: u }).catch(() => {}); else { navigator.clipboard?.writeText(u) } ; trackLinkClick(pageId, block.id, "share") }
       return (
         <>
           <div style={{ height: 68 }} aria-hidden />
@@ -1015,7 +1057,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
               const inner = <span style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}><span style={{ fontSize: 20 }}>{a.icon}</span>{showL && <span style={{ color: col, fontSize: 10, fontWeight: 700 }}>{a.label}</span>}</span>
               const st: any = { flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "6px 4px", textDecoration: "none", background: "transparent", border: "none", cursor: "pointer" }
               return a.share
-                ? <button key={i} onClick={doShare} style={st}>{inner}</button>
+                ? <ShareButton key={i} pageId={pageId} blockId={block.id} style={st} inner={inner} />
                 : <a key={i} href={a.href} target={/^https?:/.test(a.href || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, `bar:${a.t}`)} style={st}>{inner}</a>
             })}
           </div>

@@ -659,6 +659,21 @@ export function mapEmbedUrl(address?: string, embedUrl?: string, zoom?: string):
   return `https://maps.google.com/maps?q=${enc}&z=${z}&output=embed`
 }
 
+// ── Partage : liens de partage par reseau a partir d'une URL (+ texte optionnel) ─
+export type ShareTarget = { key: string; label: string; icon: string; color: string; href: string }
+export function shareLinks(url: string, text = ""): ShareTarget[] {
+  const u = encodeURIComponent(url || "")
+  const t = encodeURIComponent(text || "")
+  return [
+    { key: "whatsapp", label: "WhatsApp", icon: "🟢", color: "#25D366", href: `https://wa.me/?text=${t ? t + "%20" : ""}${u}` },
+    { key: "facebook", label: "Facebook", icon: "🔵", color: "#1877F2", href: `https://www.facebook.com/sharer/sharer.php?u=${u}` },
+    { key: "x",        label: "X",        icon: "✖️", color: "#000000", href: `https://twitter.com/intent/tweet?url=${u}${t ? "&text=" + t : ""}` },
+    { key: "linkedin", label: "LinkedIn", icon: "🔗", color: "#0A66C2", href: `https://www.linkedin.com/sharing/share-offsite/?url=${u}` },
+    { key: "telegram", label: "Telegram", icon: "✈️", color: "#26A5E4", href: `https://t.me/share/url?url=${u}${t ? "&text=" + t : ""}` },
+    { key: "email",    label: "Email",    icon: "✉️", color: "#8A8478", href: `mailto:?subject=${t}&body=${u}` },
+  ]
+}
+
 // Statuts de disponibilité (parité builder <-> public). Couleur personnalisable via dot_color.
 export const AVAILABILITY_STATUSES: { key: string; label: string; color: string }[] = [
   { key: "available", label: "Disponible", color: "#39FF8F" },
