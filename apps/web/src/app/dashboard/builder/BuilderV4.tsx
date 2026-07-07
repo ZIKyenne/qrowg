@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, INFO_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, blockDecoration, BLOCK_GRAD_OPTIONS, BLOCK_RADIUS_OPTIONS, BLOCK_SHADOW_OPTIONS, BLOCK_SPACE_OPTIONS, BLOCK_WIDTH_OPTIONS, BLOCK_ANIM_OPTIONS, BLOCK_STYLE_PRESETS, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, INFO_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, optionLabel, blockDecoration, BLOCK_GRAD_OPTIONS, BLOCK_RADIUS_OPTIONS, BLOCK_SHADOW_OPTIONS, BLOCK_SPACE_OPTIONS, BLOCK_WIDTH_OPTIONS, BLOCK_ANIM_OPTIONS, BLOCK_STYLE_PRESETS, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import QRCanvas from "../qr-codes/QRCanvas"
@@ -211,6 +211,13 @@
     const primary = theme.primary
     const accent = theme.accent
     const s = { background: bg, fontFamily: theme.fontBody || "DM Sans, sans-serif" }
+    // État vide harmonisé (aperçu builder) : invite claire quand un bloc n'a pas encore de contenu.
+    const emptyHint = (icon: string, label: string) => (
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "18px 12px", border: `1.5px dashed ${muted}40`, borderRadius: 12, color: muted, textAlign: "center" }}>
+        <span style={{ fontSize: 22, opacity: 0.7 }}>{icon}</span>
+        <span style={{ fontSize: 12, fontWeight: 600 }}>{label}</span>
+      </div>
+    )
 
     switch (block.type) {
       case "profile": return (
@@ -277,7 +284,9 @@
               <span style={{ padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 600, border: `1px solid ${theme.primary}55`, background: `${theme.primary}14`, color: theme.primary }}>Tout</span>
               {cats.map(cn => <span key={cn} style={{ padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 600, border: `1px solid ${theme.muted}25`, color: muted }}>{cn}</span>)}
             </div>}
-            {items.map((it,i) => <FAQItem key={i} q={it.q} a={it.a} theme={theme} link={it.link||undefined} linkLabel={it.linkLabel||undefined} compact={compact} />)}
+            {items.length > 0
+              ? items.map((it,i) => <FAQItem key={i} q={it.q} a={it.a} theme={theme} link={it.link||undefined} linkLabel={it.linkLabel||undefined} compact={compact} />)
+              : emptyHint("❓", "Ajoutez une question")}
           </div>
         )
       }
@@ -1722,7 +1731,13 @@
       case "timeline": {
         const events = [1,2,3,4,5].map(i => ({ date: c[`e${i}_date`], title: c[`e${i}_title`], desc: c[`e${i}_desc`], icon: (c[`e${i}_icon`]||"").trim() })).filter(e => e.title || e.date)
         const horizontal = c.layout === "Horizontale"
-        const list = events.length ? events : [0,1,2].map(i => ({ date: `202${i+2}`, title: `Étape ${i+1}`, desc: "Description", icon: "" }))
+        const list = events
+        if (list.length === 0) return (
+          <div style={{ padding: "10px 16px", ...s }}>
+            {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
+            {emptyHint("📅", "Ajoutez une étape")}
+          </div>
+        )
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 14px" }}>{c.title}</p>}
@@ -1813,10 +1828,11 @@
         const av = (m: any, size: number) => m.photo
           ? <img src={String(m.photo)} alt={String(m.name)} style={{ width: size, height: size, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${primary}40` }} />
           : <div style={{ width: size, height: size, borderRadius: "50%", background: `linear-gradient(135deg,${primary},${accent})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: size*0.4, fontWeight: 700, color: "#080808", flexShrink: 0 }}>{String(m.name)[0]}</div>
-        const list = members.length ? members : [{ name: "Prénom Nom", role: "Poste", bio: "", photo: "", phone: "", email: "", linkedin: "" }]
+        const list = members
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
+            {list.length === 0 && emptyHint("👥", "Ajoutez un membre")}
             {grid ? (
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                 {list.map((m,i) => (
@@ -1956,10 +1972,11 @@
 
       case "documents": {
         const docs = [1,2,3,4,5,6].map(i => ({ type: c[`d${i}_type`], title: c[`d${i}_title`], desc: c[`d${i}_desc`]||"", url: (c[`d${i}_url`]||"").trim(), meta: c[`d${i}_meta`]||"" })).filter(d => d.title)
-        const list = docs.length ? docs : [{ type: "PDF", title: "Plaquette de présentation", desc: "Tout savoir en 2 pages", url: "", meta: "PDF · 2 Mo" }]
+        const list = docs
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
+            {list.length === 0 && emptyHint("📄", "Ajoutez un document")}
             <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
               {list.map((d,i) => {
                 const dm = docTypeMeta(d.type)
@@ -3066,7 +3083,7 @@
                   onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />
               : field.type === "select"
               ? <select value={block.content[field.key]||field.options?.[0]} onChange={e => onChange(field.key, e.target.value)} style={inputStyle}>
-                  {field.options?.map(o => <option key={o} value={o}>{o}</option>)}
+                  {field.options?.map(o => <option key={o} value={o}>{optionLabel(o)}</option>)}
                 </select>
               : field.type === "color"
               ? <div style={{ display: "flex", gap: 7 }}>
@@ -4834,7 +4851,7 @@
               {[
                 ["Ctrl+B", "Bibliothèque"],
                 ["Ctrl+E", "Éditeur"],
-                ["Ctrl+P", "Preview"],
+                ["Ctrl+P", "Aperçu"],
                 ["Ctrl+F", "Mode Focus"],
               ].map(([k, v]) => (
                 <div key={k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
@@ -5681,7 +5698,7 @@
                     {(["preview","edit","theme"] as const).map(tab => (
                       <button key={tab} onClick={() => setRightTab(tab)}
                         style={{ flex: 1, padding: "11px 4px", background: "transparent", border: "none", borderBottom: `2px solid ${rightTab===tab ? G : "transparent"}`, color: rightTab===tab ? G : MUTED, fontSize: 12, fontWeight: rightTab===tab ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
-                        {tab==="preview" ? "Preview" : tab==="edit" ? "Éditer" : "Thème"}
+                        {tab==="preview" ? "Aperçu" : tab==="edit" ? "Éditer" : "Thème"}
                       </button>
                     ))}
                     <button onClick={toggleRight} title="Réduire" style={{ padding: "11px 8px", background: "none", border: "none", color: MUTED, cursor: "pointer", fontSize: 12 }}>‹</button>

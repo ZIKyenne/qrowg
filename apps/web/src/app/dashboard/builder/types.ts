@@ -2933,6 +2933,31 @@ export const SOCIAL_NETWORKS = [
 export const SOCIAL_NETWORKS_MAP: Record<string, { icon: string; color: string; label: string }> =
   Object.fromEntries(SOCIAL_NETWORKS.map(n => [n.key, { icon: n.icon, color: n.color, label: n.label }]))
 
+// Libellés FR affichés pour les valeurs de select techniques (héritées, en anglais).
+// AFFICHAGE UNIQUEMENT : la valeur stockée reste inchangée (aucune migration, aucune régression).
+export const OPTION_LABELS: Record<string, string> = {
+  // Tailles
+  xs: "Très petit", sm: "Petit", md: "Moyen", lg: "Grand", xl: "Très grand",
+  small: "Petit", medium: "Moyen", large: "Grand", normal: "Normal",
+  // Alignements
+  left: "Gauche", center: "Centré", right: "Droite", justify: "Justifié",
+  // Couleurs sémantiques
+  default: "Défaut", primary: "Principale", accent: "Accent", muted: "Discrète",
+  // Types d'annonce / statut
+  warning: "Attention", info: "Information", success: "Succès", promo: "Promo", error: "Erreur", danger: "Urgent",
+  // Oui / Non
+  yes: "Oui", no: "Non",
+  // Dispositions
+  list: "Liste", grid: "Grille", cards: "Cartes", carousel: "Carrousel", columns: "Colonnes",
+  // Styles de bouton / séparateur
+  outline: "Contour", solid: "Plein", ghost: "Discret", gold: "Or", line: "Ligne", dots: "Points", stars: "Étoiles",
+}
+
+// Libellé FR d'une option de select (repli sur la valeur brute si non traduite).
+export function optionLabel(value: string): string {
+  return OPTION_LABELS[value] ?? value
+}
+
 // ── Documents : types + icônes (bloc bibliothèque) ────────────────────────────
 export const DOC_TYPES = ["PDF", "Menu", "Brochure", "Notice", "Catalogue", "Guide", "Tarifs", "Contrat / CGV", "Autre"]
 
