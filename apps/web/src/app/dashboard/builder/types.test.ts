@@ -177,16 +177,19 @@ describe("waLink / telLink", () => {
 
 describe("embedVideoUrl", () => {
   it("YouTube watch -> embed", () => {
-    expect(embedVideoUrl("https://youtube.com/watch?v=abc123&t=10")).toBe("https://www.youtube.com/embed/abc123")
+    expect(embedVideoUrl("https://youtube.com/watch?v=abc123&t=10")).toBe("https://www.youtube-nocookie.com/embed/abc123")
   })
   it("youtu.be court -> embed", () => {
-    expect(embedVideoUrl("https://youtu.be/xyz789")).toBe("https://www.youtube.com/embed/xyz789")
+    expect(embedVideoUrl("https://youtu.be/xyz789")).toBe("https://www.youtube-nocookie.com/embed/xyz789")
   })
   it("YouTube Shorts -> embed", () => {
-    expect(embedVideoUrl("https://www.youtube.com/shorts/short01")).toBe("https://www.youtube.com/embed/short01")
+    expect(embedVideoUrl("https://www.youtube.com/shorts/short01")).toBe("https://www.youtube-nocookie.com/embed/short01")
   })
   it("Vimeo -> player", () => {
     expect(embedVideoUrl("https://vimeo.com/123456789")).toBe("https://player.vimeo.com/video/123456789")
+  })
+  it("URL nocookie deja collee -> reconnue (idempotent)", () => {
+    expect(embedVideoUrl("https://www.youtube-nocookie.com/embed/abc123")).toBe("https://www.youtube-nocookie.com/embed/abc123")
   })
   it("lien inconnu -> tel quel", () => {
     expect(embedVideoUrl("https://exemple.com/video")).toBe("https://exemple.com/video")

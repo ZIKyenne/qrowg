@@ -409,8 +409,9 @@ export function directionsLink(address?: string, provider?: string): string {
 export function embedVideoUrl(raw?: string): string {
   const u = (raw || "").trim()
   if (!u) return ""
-  let m = u.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([\w-]+)/)
-  if (m) return `https://www.youtube.com/embed/${m[1]}`
+  // youtube-nocookie.com : lecteur identique mais sans cookie de tracking avant lecture (RGPD).
+  let m = u.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube(?:-nocookie)?\.com\/embed\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([\w-]+)/)
+  if (m) return `https://www.youtube-nocookie.com/embed/${m[1]}`
   m = u.match(/vimeo\.com\/(?:video\/)?(\d+)/)
   if (m) return `https://player.vimeo.com/video/${m[1]}`
   m = u.match(/dailymotion\.com\/video\/([\w]+)/) || u.match(/dai\.ly\/([\w]+)/)
