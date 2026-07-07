@@ -4558,12 +4558,13 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   scan_counter: {
-    label: "Compteur de scans", description: "Nombre de scans du QR code",
-    icon: "📱", color: "#39FF8F", category: "content",
-    defaultContent: { label: "scans QR ce mois", emoji: "📱" },
+    label: "Compteur (preuve sociale)", description: "Un grand chiffre mis en avant",
+    icon: "📱", color: "#38BDF8", category: "info",
+    defaultContent: { count: "1 240", label: "scans ce mois", emoji: "📱" },
     fields: [
       { key: "emoji", label: "Emoji", type: "text", placeholder: "📱" },
-      { key: "label", label: "Label", type: "text", placeholder: "scans QR ce mois" },
+      { key: "count", label: "Chiffre à afficher", type: "text", placeholder: "1 240", hint: "Ex : 1 240 · 4.9/5 · 500+" },
+      { key: "label", label: "Label", type: "text", placeholder: "scans ce mois" },
     ],
   },
   timeline: {

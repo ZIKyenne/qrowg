@@ -583,7 +583,7 @@ function ProfileAvatar({ src, name, shapeStyle, decoStyle, bgStyle, fontD }: { s
   return <img loading="eager" fetchPriority="high" decoding="async" src={src} alt={name || ""} onError={() => setFailed(true)} style={{ width: 96, height: 96, ...shapeStyle, ...decoStyle, objectFit: "cover", margin: "0 auto 14px", display: "block" }} />
 }
 
-function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme: any; pageId: string; ownerEmail?: string }) {
+function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: Block; theme: any; pageId: string; ownerEmail?: string; totalViews?: number }) {
   const c = block.content
   const G = theme.primary || "#C9A84C"
   const MUTED = theme.muted || "#8A8478"
@@ -968,12 +968,16 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       ) : null
     }
 
-    case "visit_counter": return (
-      <div style={{ padding: "12px 24px 16px", textAlign: "center" }}>
-        <p style={{ fontFamily: FONT_D, fontSize: 44, color: G, fontWeight: 700, margin: "0 0 3px" }}>1 234</p>
-        <p style={{ color: MUTED, fontSize: 13, margin: 0, fontFamily: FONT_B }}>{c.label || "visiteurs"}</p>
-      </div>
-    )
+    case "visit_counter": {
+      const views = typeof totalViews === "number" && totalViews > 0 ? totalViews : 1234
+      const fmt = String(views).replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+      return (
+        <div style={{ padding: "12px 24px 16px", textAlign: "center" }}>
+          <p style={{ fontFamily: FONT_D, fontSize: 44, color: G, fontWeight: 700, margin: "0 0 3px" }}>{fmt}</p>
+          <p style={{ color: MUTED, fontSize: 13, margin: 0, fontFamily: FONT_B }}>{c.label || "visiteurs"}</p>
+        </div>
+      )
+    }
 
     case "divider": {
       const dvStyles: Record<string, React.ReactNode> = {
@@ -2465,7 +2469,17 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
         </div>
       ) : null
     }
-    case "scan_counter": return null
+    case "scan_counter": return (c.count || c.label) ? (
+      <div style={{ padding: "12px 24px 16px", textAlign: "center" }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 12, justifyContent: "center" }}>
+          {c.emoji && <span style={{ fontSize: 34 }}>{c.emoji}</span>}
+          <div style={{ textAlign: "left" }}>
+            <p style={{ fontFamily: FONT_D, fontSize: 40, color: G, fontWeight: 700, margin: "0 0 1px", lineHeight: 1 }}>{c.count || "1 240"}</p>
+            {c.label && <p style={{ color: MUTED, fontSize: 13, margin: 0, fontFamily: FONT_B }}>{c.label}</p>}
+          </div>
+        </div>
+      </div>
+    ) : null
     case "engagements": {
       const engList = [c.e1, c.e2, c.e3, c.e4, c.e5, c.e6].filter(Boolean)
       return engList.length > 0 ? (
@@ -2841,7 +2855,7 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
             <AnimatedBlock key={block.id} delay={idx < 3 ? idx * 80 : 0}>
               <div className={cls || undefined} style={deco.style}>
                 <BlockBoundary>
-                  <RenderBlock block={block} theme={theme} pageId={page.id} ownerEmail={page.profiles?.contact_email || page.profiles?.email} />
+                  <RenderBlock block={block} theme={theme} pageId={page.id} ownerEmail={page.profiles?.contact_email || page.profiles?.email} totalViews={page.total_views} />
                 </BlockBoundary>
               </div>
             </AnimatedBlock>

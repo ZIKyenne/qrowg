@@ -1712,8 +1712,8 @@
           <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(57,255,143,0.08)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 14, padding: "16px 24px" }}>
             <span style={{ fontSize: 28 }}>{c.emoji||"📱"}</span>
             <div>
-              <p style={{ color: "#39FF8F", fontSize: 32, fontWeight: 700, margin: 0, fontFamily: theme.fontDisplay, lineHeight: 1 }}>1 284</p>
-              <p style={{ color: muted, fontSize: 11, margin: "3px 0 0" }}>{c.label||"scans QR ce mois"}</p>
+              <p style={{ color: primary, fontSize: 32, fontWeight: 700, margin: 0, fontFamily: theme.fontDisplay, lineHeight: 1 }}>{c.count||"1 240"}</p>
+              <p style={{ color: muted, fontSize: 11, margin: "3px 0 0" }}>{c.label||"scans ce mois"}</p>
             </div>
           </div>
         </div>
@@ -5315,7 +5315,7 @@
                                     const INFO_GROUPS: { label: string; keys: string[] }[] = [
                                       { label: "Présentation",           keys: ["heading", "rich_text", "quote_block", "about", "announcement"] },
                                       { label: "Organisation",           keys: ["process_steps", "timeline", "values", "engagements"] },
-                                      { label: "Preuves & confiance",     keys: ["testimonials", "stats_block", "trust_badge", "visit_counter"] },
+                                      { label: "Preuves & confiance",     keys: ["testimonials", "stats_block", "trust_badge", "visit_counter", "scan_counter"] },
                                       { label: "Entreprise",              keys: ["team", "founder_message", "info_table"] },
                                       { label: "Informations pratiques",  keys: ["opening_hours", "google_maps_embed", "service_area", "on_site_services"] },
                                       { label: "Questions fréquentes",    keys: ["faq"] },
