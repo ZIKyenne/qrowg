@@ -6,7 +6,7 @@ import {
   SOCIAL_NETWORKS, SOCIAL_NETWORKS_MAP, productBadgeStyle,
   parsePrice, priceDiscount, countdownParts, stockStatus, paymentLink, paymentBrand, starRow,
   parseHourRanges, fmtMinutes, openStatus,
-  vcardEscape, splitName, buildVCard, mapEmbedUrl, shareLinks, toCalStamp, calendarLinks, spotifyEmbedUrl,
+  vcardEscape, splitName, buildVCard, mapEmbedUrl, shareLinks, toCalStamp, calendarLinks, spotifyEmbedUrl, youtubeId,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -725,5 +725,25 @@ describe("spotifyEmbedUrl", () => {
   it("vide / non Spotify -> vide", () => {
     expect(spotifyEmbedUrl("")).toBe("")
     expect(spotifyEmbedUrl("https://exemple.com/x")).toBe("")
+  })
+})
+
+describe("youtubeId", () => {
+  it("watch?v= (ignore &t=)", () => {
+    expect(youtubeId("https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10")).toBe("dQw4w9WgXcQ")
+  })
+  it("youtu.be avec parametres (?si=) -> id propre (bug corrige)", () => {
+    expect(youtubeId("https://youtu.be/dQw4w9WgXcQ?si=abc123")).toBe("dQw4w9WgXcQ")
+  })
+  it("Shorts (bug corrige)", () => {
+    expect(youtubeId("https://www.youtube.com/shorts/dQw4w9WgXcQ")).toBe("dQw4w9WgXcQ")
+  })
+  it("embed / live", () => {
+    expect(youtubeId("https://www.youtube.com/embed/dQw4w9WgXcQ")).toBe("dQw4w9WgXcQ")
+    expect(youtubeId("https://www.youtube.com/live/dQw4w9WgXcQ")).toBe("dQw4w9WgXcQ")
+  })
+  it("vide / non YouTube -> vide", () => {
+    expect(youtubeId("")).toBe("")
+    expect(youtubeId("https://exemple.com/x")).toBe("")
   })
 })

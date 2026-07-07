@@ -418,6 +418,13 @@ export function embedVideoUrl(raw?: string): string {
   if (m) return `https://www.dailymotion.com/embed/video/${m[1]}`
   return u
 }
+
+// Extrait l'ID d'une video YouTube (watch, youtu.be, shorts, embed, live) en ignorant les
+// parametres (?si=, &t=...). Pour les vignettes img.youtube.com/vi/ID/... -> "" si non trouve.
+export function youtubeId(url?: string): string {
+  const m = (url || "").match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube(?:-nocookie)?\.com\/embed\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([\w-]+)/)
+  return m ? m[1] : ""
+}
 export function telLink(phone?: string): string {
   const raw = (phone || "").trim()
   const digits = raw.replace(/\D/g, "")
