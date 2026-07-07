@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, Component } from "react"
 import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
@@ -22,6 +22,16 @@ function useInView(threshold = 0.15) {
     return () => obs.disconnect()
   }, [])
   return { ref, inView }
+}
+
+// ── Frontière d'erreur par bloc : isole un rendu de bloc qui planterait ──────
+// (contenu malformé) pour éviter l'écran blanc — le bloc fautif disparaît, le
+// reste de la page s'affiche normalement.
+class BlockBoundary extends Component<{ children: React.ReactNode }, { failed: boolean }> {
+  constructor(props: { children: React.ReactNode }) { super(props); this.state = { failed: false } }
+  static getDerivedStateFromError() { return { failed: true } }
+  componentDidCatch(err: unknown) { if (typeof console !== "undefined") console.error("[QRfolio] Bloc ignoré (erreur de rendu) :", err) }
+  render() { return this.state.failed ? null : this.props.children }
 }
 
 // ── Animated Block Wrapper ───────────────────────────────────────────────────
@@ -2633,7 +2643,9 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
           return (
             <AnimatedBlock key={block.id} delay={idx < 3 ? idx * 80 : 0}>
               <div className={hideCls || undefined}>
-                <RenderBlock block={block} theme={theme} pageId={page.id} ownerEmail={page.profiles?.contact_email || page.profiles?.email} />
+                <BlockBoundary>
+                  <RenderBlock block={block} theme={theme} pageId={page.id} ownerEmail={page.profiles?.contact_email || page.profiles?.email} />
+                </BlockBoundary>
               </div>
             </AnimatedBlock>
           )
