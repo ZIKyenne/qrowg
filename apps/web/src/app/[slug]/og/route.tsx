@@ -1,11 +1,30 @@
 import { ImageResponse } from "next/og"
+import { readFileSync } from "node:fs"
 import { createAdminClient } from "@/lib/supabase/server"
 
-// Image Open Graph generee dynamiquement par page (1200x630) — identite or/noir QRfolio.
-// Referencee par generateMetadata quand aucune og_image_url custom n'est definie.
+// Image Open Graph generee dynamiquement par page (1200x630) — identite or/noir QRfolio,
+// avec la police de marque Cormorant Garamond pour le nom. Referencee par generateMetadata
+// quand aucune og_image_url custom n'est definie.
 export const runtime = "nodejs"
 
 const SIZE = { width: 1200, height: 630 }
+
+// Polices de marque bundlees dans le repo (DM Sans = corps, Cormorant Garamond = titres).
+// Cache au niveau module : lues une seule fois par instance. Lecture synchrone via `fs`
+// (fetch(file://) n'est pas supporte en runtime nodejs) ; `new URL(..., import.meta.url)`
+// fait tracer/inclure les .ttf par le bundler Next. DM Sans est en 1er = police par defaut.
+let fontsCache: { name: string; data: Buffer; style: "normal"; weight: 400 | 600 }[] | null = null
+function loadFonts() {
+  if (fontsCache === null) {
+    const read = (f: string) => readFileSync(new URL(`./fonts/${f}`, import.meta.url))
+    fontsCache = [
+      { name: "DMSans", data: read("DMSans-400.woff"), style: "normal" as const, weight: 400 as const },
+      { name: "DMSans", data: read("DMSans-600.woff"), style: "normal" as const, weight: 600 as const },
+      { name: "Cormorant", data: read("Cormorant-600.woff"), style: "normal" as const, weight: 600 as const },
+    ]
+  }
+  return fontsCache
+}
 
 function initial(name: string): string {
   const t = (name || "").trim()
@@ -13,15 +32,16 @@ function initial(name: string): string {
 }
 
 // Rendu de secours (page introuvable ou erreur) : carte de marque generique.
-function fallback() {
+async function fallback() {
+  const fonts = loadFonts()
   return new ImageResponse(
     (
       <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#080808", color: "#C9A84C" }}>
-        <div style={{ fontSize: 96, fontWeight: 800, letterSpacing: -2 }}>QRfolio</div>
-        <div style={{ fontSize: 30, color: "#8A8478", marginTop: 12 }}>Une page. Un QR. Tout vous.</div>
+        <div style={{ fontSize: 110, fontWeight: 600, letterSpacing: -2, fontFamily: "Cormorant" }}>QRfolio</div>
+        <div style={{ fontSize: 30, color: "#8A8478", marginTop: 8 }}>Une page. Un QR. Tout vous.</div>
       </div>
     ),
-    { ...SIZE }
+    { ...SIZE, fonts }
   )
 }
 
@@ -60,27 +80,45 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
 
     const name = (pc.name || (page as any).seo_title || (page as any).title || prof.full_name || "QRfolio").toString().slice(0, 42)
     const tagline = (pc.tagline || (page as any).seo_description || "").toString().slice(0, 90)
-    const avatar = (pc.avatar || prof.avatar_url || "").toString()
-    const hasAvatar = /^https?:\/\//i.test(avatar)
+    const avatarUrl = (pc.avatar || prof.avatar_url || "").toString()
+
+    // Pre-chargement de l'avatar en data-URI : un <img src=http> serait charge par Satori
+    // PENDANT le streaming (hors de ce try/catch) -> un avatar casse ferait planter en 500.
+    // En data-URI, l'echec est gere ici et on retombe proprement sur l'initiale.
+    let avatarData: string | null = null
+    if (/^https?:\/\//i.test(avatarUrl)) {
+      try {
+        const r = await fetch(avatarUrl, { signal: AbortSignal.timeout(2500) })
+        const ct = r.headers.get("content-type") || ""
+        if (r.ok && ct.startsWith("image/")) {
+          const buf = Buffer.from(await r.arrayBuffer())
+          if (buf.length > 0 && buf.length < 3_000_000) avatarData = `data:${ct};base64,${buf.toString("base64")}`
+        }
+      } catch { /* avatar indisponible -> initiale */ }
+    }
+
+    const fonts = loadFonts()
 
     return new ImageResponse(
       (
-        <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", background: bg, position: "relative", padding: "72px 80px", justifyContent: "space-between" }}>
+        <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", background: bg, position: "relative", padding: "70px 80px", justifyContent: "space-between" }}>
+          {/* Halo d'accent en haut a gauche */}
+          <div style={{ position: "absolute", top: -160, left: -120, width: 460, height: 460, borderRadius: 460, background: `${primary}22`, display: "flex" }} />
           {/* Barre d'accent haute */}
           <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 10, background: `linear-gradient(90deg, ${primary}, ${primary}00)` }} />
 
           {/* Bloc central : avatar + nom + accroche */}
           <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "center" }}>
             <div style={{ display: "flex", alignItems: "center" }}>
-              {hasAvatar ? (
+              {avatarData ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={avatar} width={168} height={168} style={{ width: 168, height: 168, borderRadius: 168, objectFit: "cover", border: `4px solid ${primary}` }} alt="" />
+                <img src={avatarData} width={172} height={172} style={{ width: 172, height: 172, borderRadius: 172, objectFit: "cover", border: `4px solid ${primary}` }} alt="" />
               ) : (
-                <div style={{ display: "flex", width: 168, height: 168, borderRadius: 168, alignItems: "center", justifyContent: "center", background: `linear-gradient(135deg, ${primary}, ${primary}99)`, color: bg, fontSize: 88, fontWeight: 800 }}>{initial(name)}</div>
+                <div style={{ display: "flex", width: 172, height: 172, borderRadius: 172, alignItems: "center", justifyContent: "center", background: `linear-gradient(135deg, ${primary}, ${primary}99)`, color: bg, fontSize: 92, fontWeight: 600, fontFamily: "Cormorant" }}>{initial(name)}</div>
               )}
-              <div style={{ display: "flex", flexDirection: "column", marginLeft: 44, maxWidth: 780 }}>
-                <div style={{ fontSize: 76, fontWeight: 800, color: text, lineHeight: 1.05, letterSpacing: -1 }}>{name}</div>
-                {tagline ? <div style={{ fontSize: 36, color: muted, marginTop: 16, lineHeight: 1.25 }}>{tagline}</div> : null}
+              <div style={{ display: "flex", flexDirection: "column", marginLeft: 46, maxWidth: 780 }}>
+                <div style={{ fontSize: 86, fontWeight: 600, color: text, lineHeight: 1.02, letterSpacing: -1, fontFamily: "Cormorant" }}>{name}</div>
+                {tagline ? <div style={{ fontSize: 34, color: muted, marginTop: 18, lineHeight: 1.25 }}>{tagline}</div> : null}
               </div>
             </div>
           </div>
@@ -88,15 +126,16 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
           {/* Pied : marque + URL */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div style={{ display: "flex", alignItems: "center" }}>
-              <div style={{ display: "flex", width: 46, height: 46, borderRadius: 12, background: primary, color: bg, alignItems: "center", justifyContent: "center", fontSize: 30, fontWeight: 800 }}>Q</div>
-              <div style={{ fontSize: 34, fontWeight: 800, color: primary, marginLeft: 16, letterSpacing: -0.5 }}>QRfolio</div>
+              <div style={{ display: "flex", width: 48, height: 48, borderRadius: 13, background: primary, color: bg, alignItems: "center", justifyContent: "center", fontSize: 34, fontWeight: 600, fontFamily: "Cormorant" }}>Q</div>
+              <div style={{ fontSize: 40, fontWeight: 600, color: primary, marginLeft: 16, letterSpacing: -0.5, fontFamily: "Cormorant" }}>QRfolio</div>
             </div>
-            <div style={{ fontSize: 28, color: muted }}>qrfolio.app/{slug}</div>
+            <div style={{ fontSize: 27, color: muted }}>{`qrfolio.app/${slug}`}</div>
           </div>
         </div>
       ),
       {
         ...SIZE,
+        fonts,
         headers: {
           "Cache-Control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
         },
