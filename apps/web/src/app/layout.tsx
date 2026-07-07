@@ -38,6 +38,8 @@ export const metadata: Metadata = {
   authors: [{ name: "QRfolio", url: APP_URL }],
   creator: "QRfolio",
   publisher: "QRfolio",
+  // Experience "ajouter a l'ecran d'accueil" sur iOS (barre de statut sombre, titre court).
+  appleWebApp: { capable: true, title: "QRfolio", statusBarStyle: "black-translucent" },
   alternates: {
     canonical: APP_URL,
   },
