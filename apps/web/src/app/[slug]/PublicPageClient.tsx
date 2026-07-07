@@ -2601,10 +2601,6 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
     ...(page.theme || {}),
   }
 
-  const [scrollY, setScrollY] = useState(0)
-  const [headerVisible, setHeaderVisible] = useState(true)
-  const lastScrollY = useRef(0)
-
   // Charge les polices Google du thème — uniquement les polices CUSTOM (Cormorant Garamond
   // et DM Sans sont déjà chargées par le layout -> évite une requête redondante + le FOUT).
   // Chaque famille reçoit son propre axe de poids (sinon seule la dernière chargeait 600/700,
@@ -2627,18 +2623,6 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
     link.setAttribute("data-qf-font", "1")
     document.head.appendChild(link)
   }, [theme.fontDisplay, theme.fontBody])
-
-  // Scroll handler
-  useEffect(() => {
-    function onScroll() {
-      const y = window.scrollY
-      setScrollY(y)
-      setHeaderVisible(y < lastScrollY.current || y < 50)
-      lastScrollY.current = y
-    }
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => window.removeEventListener("scroll", onScroll)
-  }, [])
 
   return (
     <div style={{ minHeight: "100vh", background: theme.bgGradient || theme.bg, fontFamily: theme.fontBody }}>
