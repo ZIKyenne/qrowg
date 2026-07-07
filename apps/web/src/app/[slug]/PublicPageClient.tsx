@@ -50,10 +50,10 @@ function FAQItem({ q, a, theme }: { q: string; a: string; theme: any }) {
   const [open, setOpen] = useState(false)
   return (
     <div style={{ border: `1px solid ${open ? theme.primary + "30" : "rgba(255,255,255,0.06)"}`, borderRadius: 12, overflow: "hidden", marginBottom: 8, transition: "all 0.2s" }}>
-      <button onClick={() => setOpen(o => !o)} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: open ? `${theme.primary}06` : "transparent", border: "none", color: theme.text, fontSize: 14, fontWeight: 600, cursor: "pointer", textAlign: "left" }}>
+      <button onClick={() => setOpen(o => !o)} aria-expanded={open} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: open ? `${theme.primary}06` : "transparent", border: "none", color: theme.text, fontSize: 14, fontWeight: 600, cursor: "pointer", textAlign: "left" }}>
         {q}<span style={{ color: theme.primary, fontSize: 20, flexShrink: 0, marginLeft: 12, transition: "transform 0.2s", transform: open ? "rotate(45deg)" : "rotate(0)" }}>+</span>
       </button>
-      <div style={{ maxHeight: open ? 200 : 0, overflow: "hidden", transition: "max-height 0.3s ease" }}>
+      <div style={{ maxHeight: open ? 1500 : 0, overflow: "hidden", transition: "max-height 0.35s ease" }}>
         <div style={{ padding: "0 16px 14px" }}><p style={{ color: theme.muted, fontSize: 13, margin: 0, lineHeight: 1.7 }}>{a}</p></div>
       </div>
     </div>
@@ -306,12 +306,12 @@ function TabsPublic({ tabs, G, TEXT, MUTED, FONT_B }: { tabs: [string, string][]
   const [active, setActive] = useState(0)
   return (
     <div style={{ padding: "10px 24px 14px" }}>
-      <div style={{ display: "flex", gap: 0, borderBottom: "1px solid rgba(255,255,255,0.08)", marginBottom: 13, overflowX: "auto" }}>
+      <div role="tablist" style={{ display: "flex", gap: 0, borderBottom: "1px solid rgba(255,255,255,0.08)", marginBottom: 13, overflowX: "auto" }}>
         {tabs.map(([label], i) => (
-          <button key={i} onClick={() => setActive(i)} style={{ padding: "9px 15px", background: "transparent", border: "none", borderBottom: `2px solid ${active === i ? G : "transparent"}`, color: active === i ? G : MUTED, fontSize: 13, fontWeight: active === i ? 700 : 400, cursor: "pointer", whiteSpace: "nowrap", fontFamily: FONT_B }}>{label}</button>
+          <button key={i} role="tab" aria-selected={active === i} onClick={() => setActive(i)} style={{ padding: "9px 15px", background: "transparent", border: "none", borderBottom: `2px solid ${active === i ? G : "transparent"}`, color: active === i ? G : MUTED, fontSize: 13, fontWeight: active === i ? 700 : 400, cursor: "pointer", whiteSpace: "nowrap", fontFamily: FONT_B }}>{label}</button>
         ))}
       </div>
-      <p style={{ color: TEXT, fontSize: 14, margin: 0, lineHeight: 1.7, whiteSpace: "pre-wrap", fontFamily: FONT_B }}>{tabs[active]?.[1] || ""}</p>
+      <p role="tabpanel" style={{ color: TEXT, fontSize: 14, margin: 0, lineHeight: 1.7, whiteSpace: "pre-wrap", fontFamily: FONT_B }}>{tabs[active]?.[1] || ""}</p>
     </div>
   )
 }
@@ -324,7 +324,7 @@ function AccordionPublic({ items, title, G, TEXT, MUTED, FONT_B }: { items: [str
       <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
         {items.map(([t, content], i) => (
           <div key={i} style={{ border: `1px solid ${openIdx === i ? `${G}40` : "rgba(255,255,255,0.07)"}`, borderRadius: 11, overflow: "hidden" }}>
-            <button onClick={() => setOpenIdx(openIdx === i ? null : i)} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 15px", background: openIdx === i ? `${G}08` : "transparent", border: "none", color: openIdx === i ? G : TEXT, fontSize: 14, fontWeight: 600, cursor: "pointer", textAlign: "left", fontFamily: FONT_B }}>
+            <button onClick={() => setOpenIdx(openIdx === i ? null : i)} aria-expanded={openIdx === i} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 15px", background: openIdx === i ? `${G}08` : "transparent", border: "none", color: openIdx === i ? G : TEXT, fontSize: 14, fontWeight: 600, cursor: "pointer", textAlign: "left", fontFamily: FONT_B }}>
               {t}
               <span style={{ color: G, fontSize: 18, lineHeight: 1, flexShrink: 0, marginLeft: 10 }}>{openIdx === i ? "−" : "+"}</span>
             </button>
