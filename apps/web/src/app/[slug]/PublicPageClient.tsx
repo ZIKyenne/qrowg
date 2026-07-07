@@ -467,6 +467,15 @@ function LeadFormPublic({ block, pageId, ownerEmail, leadType, title, descriptio
   )
 }
 
+// ── Avatar du profil : image avec repli sur l'initiale si l'URL est cassée (404) ─
+function ProfileAvatar({ src, name, shapeStyle, decoStyle, bgStyle, fontD }: { src?: string; name?: string; shapeStyle: any; decoStyle: any; bgStyle: any; fontD: string }) {
+  const [failed, setFailed] = useState(false)
+  if (!src || failed) {
+    return <div style={{ width: 96, height: 96, ...shapeStyle, ...decoStyle, ...bgStyle, margin: "0 auto 14px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 38, fontWeight: 700, color: "#080808", fontFamily: fontD }}>{(name || "?")[0]?.toUpperCase()}</div>
+  }
+  return <img loading="eager" fetchPriority="high" decoding="async" src={src} alt={name || ""} onError={() => setFailed(true)} style={{ width: 96, height: 96, ...shapeStyle, ...decoStyle, objectFit: "cover", margin: "0 auto 14px", display: "block" }} />
+}
+
 function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme: any; pageId: string; ownerEmail?: string }) {
   const c = block.content
   const G = theme.primary || "#C9A84C"
@@ -479,9 +488,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
   switch (block.type) {
     case "profile": return (
       <div style={{ textAlign: "center", padding: "32px 20px 20px" }}>
-        {c.avatar
-          ? <img loading="eager" fetchPriority="high" decoding="async" src={c.avatar} alt={c.name || ""} style={{ width: 96, height: 96, ...avatarShapeStyle(c.avatar_shape), ...avatarDecoStyle(c.avatar_shape, c.avatar_border, c.avatar_shadow, G), objectFit: "cover", margin: "0 auto 14px", display: "block" }} />
-          : <div style={{ width: 96, height: 96, ...avatarShapeStyle(c.avatar_shape), ...avatarDecoStyle(c.avatar_shape, c.avatar_border, c.avatar_shadow, G), ...avatarBgStyle(c.avatar_bg, G, theme.accent || "#39FF8F"), margin: "0 auto 14px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 38, fontWeight: 700, color: "#080808", fontFamily: FONT_D }}>{(c.name || "?")[0]?.toUpperCase()}</div>}
+        <ProfileAvatar src={c.avatar} name={c.name} fontD={FONT_D} shapeStyle={avatarShapeStyle(c.avatar_shape)} decoStyle={avatarDecoStyle(c.avatar_shape, c.avatar_border, c.avatar_shadow, G)} bgStyle={avatarBgStyle(c.avatar_bg, G, theme.accent || "#39FF8F")} />
         <h1 style={{ color: TEXT, fontSize: 26, fontWeight: 700, margin: "0 0 5px", fontFamily: FONT_D }}>{c.name || "Mon Nom"}</h1>
         <p style={{ color: MUTED, fontSize: 14, margin: c.badge ? "0 0 10px" : "0", fontFamily: FONT_B }}>{c.tagline}</p>
         {c.badge && (
