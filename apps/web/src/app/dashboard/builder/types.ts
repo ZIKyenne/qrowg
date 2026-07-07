@@ -847,6 +847,16 @@ export const SOCIAL_URL_TEMPLATES: Record<string, string> = {
   behance: "https://behance.net/", dribbble: "https://dribbble.com/", whatsapp: "https://wa.me/", email: "mailto:",
 }
 
+// Garantit un lien externe cliquable : prefixe https:// si l'utilisateur a oublie le protocole
+// (ex "www.site.com", "site.com/x"). Laisse intacts http/mailto/tel, les ancres et les chemins
+// relatifs. Idempotent -> sans effet sur une URL deja valide. Evite les liens relatifs casses.
+export function extHref(url?: string): string {
+  const u = (url || "").trim()
+  if (!u || u === "#") return u
+  if (/^(https?:\/\/|mailto:|tel:|sms:|\/|#)/i.test(u)) return u
+  return `https://${u.replace(/^\/+/, "")}`
+}
+
 // Normalise ce que l'utilisateur saisit pour un reseau en URL cliquable valide :
 //  - URL complete (http/mailto/tel) -> telle quelle
 //  - domaine sans protocole ("instagram.com/jean", "www.x.com") -> prefixe https://

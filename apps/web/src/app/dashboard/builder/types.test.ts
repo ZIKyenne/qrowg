@@ -6,7 +6,7 @@ import {
   SOCIAL_NETWORKS, SOCIAL_NETWORKS_MAP, productBadgeStyle,
   parsePrice, priceDiscount, countdownParts, stockStatus, paymentLink, paymentBrand, starRow,
   parseHourRanges, fmtMinutes, openStatus,
-  vcardEscape, splitName, buildVCard, mapEmbedUrl, shareLinks, toCalStamp, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref,
+  vcardEscape, splitName, buildVCard, mapEmbedUrl, shareLinks, toCalStamp, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -770,5 +770,24 @@ describe("socialHref", () => {
   it("vide -> vide", () => {
     expect(socialHref("instagram", "")).toBe("")
     expect(socialHref("instagram", undefined)).toBe("")
+  })
+})
+
+describe("extHref", () => {
+  it("domaine sans protocole -> https://", () => {
+    expect(extHref("www.site.com")).toBe("https://www.site.com")
+    expect(extHref("site.com/page")).toBe("https://site.com/page")
+  })
+  it("URL/mailto/tel/ancre/relatif -> inchanges (idempotent)", () => {
+    expect(extHref("https://x.com")).toBe("https://x.com")
+    expect(extHref("http://x.com")).toBe("http://x.com")
+    expect(extHref("mailto:a@b.com")).toBe("mailto:a@b.com")
+    expect(extHref("tel:+33")).toBe("tel:+33")
+    expect(extHref("#")).toBe("#")
+    expect(extHref("/interne")).toBe("/interne")
+  })
+  it("vide -> vide", () => {
+    expect(extHref("")).toBe("")
+    expect(extHref(undefined)).toBe("")
   })
 })
