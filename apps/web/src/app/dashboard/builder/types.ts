@@ -4721,7 +4721,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   whatsapp_button: {
     label: "WhatsApp", description: "Ouvrir une conversation WhatsApp",
     icon: "💬", color: "#25D366", category: "actions",
-    defaultContent: { label: "Discuter sur WhatsApp", phone: "", message: "" },
+    defaultContent: { label: "Discuter sur WhatsApp", phone: "", message: "", country_code: "33" },
     fields: [
       { key: "label", label: "Texte", type: "text", placeholder: "Discuter sur WhatsApp" },
       { key: "phone", label: "Numéro", type: "text", placeholder: "06 12 34 56 78", hint: "Les espaces sont nettoyés automatiquement" },
