@@ -48,6 +48,16 @@ describe("blockDecoration", () => {
     expect(r.style.marginTop).toBe(22)
     expect(r.animClass).toBe("qf-b-zoom")
   })
+  it("intensité : dégradé plein par défaut, adouci si Moyen/Léger", () => {
+    expect(blockDecoration({ __grad: "Violet" }, theme).style.background).toBe("linear-gradient(135deg,#4c1d95,#2e1065)")
+    const soft = blockDecoration({ __grad: "Violet", __intensity: "Léger" }, { ...theme, bg: "#080808" }).style.background
+    expect(soft).toContain("rgba(8,8,8,0.62)")
+    expect(soft).toContain("#4c1d95")
+  })
+  it("intensité sur couleur unie : ajoute de la transparence (alpha)", () => {
+    expect(blockDecoration({ __bg: "#123456", __intensity: "Moyen" }, theme).style.background).toBe("#123456d9")
+    expect(blockDecoration({ __bg: "#123456" }, theme).style.background).toBe("#123456")
+  })
   it("verre (glass) : flou + fond translucide + bordure par défaut", () => {
     const r = blockDecoration({ __glass: "Oui" }, theme)
     expect(r.style.backdropFilter).toBe("blur(12px)")

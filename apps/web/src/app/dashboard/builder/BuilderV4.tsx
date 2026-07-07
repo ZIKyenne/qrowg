@@ -6,7 +6,7 @@
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
-  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, INFO_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, announcementMeta, optionLabel, blockDecoration, BLOCK_GRAD_OPTIONS, BLOCK_RADIUS_OPTIONS, BLOCK_SHADOW_OPTIONS, BLOCK_SPACE_OPTIONS, BLOCK_WIDTH_OPTIONS, BLOCK_ANIM_OPTIONS, BLOCK_STYLE_PRESETS, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, INFO_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, announcementMeta, optionLabel, blockDecoration, BLOCK_GRADIENTS, BLOCK_RADIUS_OPTIONS, BLOCK_SHADOW_OPTIONS, BLOCK_SPACE_OPTIONS, BLOCK_WIDTH_OPTIONS, BLOCK_ANIM_OPTIONS, BLOCK_INTENSITY_OPTIONS, BLOCK_STYLE_PRESETS, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import QRCanvas from "../qr-codes/QRCanvas"
@@ -3006,7 +3006,7 @@
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
   const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
-  const STYLE_COPY_KEYS = ["__grad", "__bg", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim"]
+  const STYLE_COPY_KEYS = ["__grad", "__bg", "__intensity", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim"]
 
   function EditPanel({ block, onChange, only }: { block: Block; onChange: (key: string, val: string) => void; only?: "content" | "layout" }) {
     const def = BLOCK_DEFS[block.type]
@@ -5987,8 +5987,23 @@
                                     </button>
                                   ))}
                                 </div>
-                                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                                  <Sel k="__grad" label="Fond dégradé" options={BLOCK_GRAD_OPTIONS} def="Aucun" />
+                                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                  {/* Fond dégradé — sélecteur visuel (swatches), fini le menu natif blanc */}
+                                  <div>
+                                    <label style={labelStyle}>Fond dégradé</label>
+                                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+                                      {[["Aucun", "transparent"] as const, ...Object.entries(BLOCK_GRADIENTS)].map(([name, val]) => {
+                                        const sel = (bc.__grad || "Aucun") === name
+                                        return (
+                                          <button key={name} onClick={() => set("__grad", name === "Aucun" ? "" : name)} title={name}
+                                            style={{ height: 34, borderRadius: 8, cursor: "pointer", border: sel ? `2px solid ${G}` : "1px solid rgba(255,255,255,0.12)", background: name === "Aucun" ? "repeating-conic-gradient(rgba(255,255,255,0.06) 0% 25%, transparent 0% 50%) 50% / 10px 10px" : val, position: "relative", padding: 0 }}>
+                                            {name === "Aucun" && <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, color: MUTED }}>Aucun</span>}
+                                            {sel && name !== "Aucun" && <span style={{ position: "absolute", top: 2, right: 3, color: "#fff", fontSize: 10, textShadow: "0 1px 2px rgba(0,0,0,0.6)" }}>✓</span>}
+                                          </button>
+                                        )
+                                      })}
+                                    </div>
+                                  </div>
                                   {(!bc.__grad || bc.__grad === "Aucun") && (
                                     <div>
                                       <label style={labelStyle}>Fond (couleur unie)</label>
@@ -5997,6 +6012,22 @@
                                         <input type="text" value={bc.__bg || ""} onChange={e => set("__bg", e.target.value)} placeholder="Aucun (transparent)" style={{ ...selStyle, flex: 1, cursor: "text" }} />
                                         {bc.__bg && <button onClick={() => set("__bg", "")} title="Retirer le fond" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", padding: "0 9px", fontSize: 12 }}>✕</button>}
                                       </div>
+                                    </div>
+                                  )}
+                                  {/* Intensité : n'a de sens que si un fond est actif */}
+                                  {((bc.__grad && bc.__grad !== "Aucun") || (bc.__bg && bc.__bg.startsWith("#"))) && (
+                                    <div>
+                                      <label style={labelStyle}>Intensité du fond</label>
+                                      <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
+                                        {BLOCK_INTENSITY_OPTIONS.map(opt => {
+                                          const on = (bc.__intensity || "Plein") === opt
+                                          return (
+                                            <button key={opt} onClick={() => set("__intensity", opt)}
+                                              style={{ flex: 1, padding: "6px 4px", borderRadius: 7, border: "none", cursor: "pointer", background: on ? G : "transparent", color: on ? "#080808" : MUTED, fontSize: 11, fontWeight: on ? 700 : 500 }}>{opt}</button>
+                                          )
+                                        })}
+                                      </div>
+                                      <p style={{ color: MUTED, fontSize: 9.5, margin: "4px 0 0" }}>« Léger » laisse transparaître le fond de la page — plus doux, texte toujours lisible.</p>
                                     </div>
                                   )}
                                   <Toggle k="__border" label="Bordure" icon="⬜" />

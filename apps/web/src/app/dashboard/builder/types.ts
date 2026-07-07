@@ -3030,18 +3030,33 @@ export const BLOCK_STYLE_PRESETS: { key: string; label: string; emoji: string; a
 // Style universel appliqué au conteneur d'un bloc à partir de clés réservées (__bg, __grad, __border,
 // __radius, __shadow, __glow, __space, __width, __anim). PUR + par défaut INERTE : si aucune clé n'est
 // posée, renvoie { style: {}, animClass: "" } -> rendu identique à l'existant (zéro régression).
+export const BLOCK_INTENSITY_OPTIONS = ["Plein", "Moyen", "Léger"]
+
 export function blockDecoration(
   content: any,
-  theme: { primary?: string; accent?: string }
+  theme: { primary?: string; accent?: string; bg?: string }
 ): { style: Record<string, any>; animClass: string } {
   const c = content || {}
   const g = theme?.primary || "#C9A84C"
   const style: Record<string, any> = {}
   let surface = false
 
+  // Intensité : superpose une couche du fond de page pour adoucir le fond du bloc (jamais agressif),
+  // sans jamais toucher l'opacité du CONTENU (texte toujours lisible).
+  const bgRgb = hexToRgb(theme?.bg || "#080808") || { r: 8, g: 8, b: 8 }
+  const ovAlpha = c.__intensity === "Léger" ? 0.62 : c.__intensity === "Moyen" ? 0.34 : 0
+  const overlay = `rgba(${bgRgb.r},${bgRgb.g},${bgRgb.b},${ovAlpha})`
+
   const grad = c.__grad && c.__grad !== "Aucun" ? BLOCK_GRADIENTS[c.__grad] : null
-  if (grad) { style.background = grad; surface = true }
-  else if (c.__bg && String(c.__bg).trim()) { style.background = c.__bg; surface = true }
+  if (grad) {
+    style.background = ovAlpha > 0 ? `linear-gradient(0deg, ${overlay}, ${overlay}), ${grad}` : grad
+    surface = true
+  } else if (c.__bg && String(c.__bg).trim()) {
+    const raw = String(c.__bg).trim()
+    const alphaHex = c.__intensity === "Léger" ? "9e" : c.__intensity === "Moyen" ? "d9" : ""
+    style.background = (alphaHex && /^#[0-9a-fA-F]{6}$/.test(raw)) ? raw + alphaHex : raw
+    surface = true
+  }
 
   if (c.__border === "Oui") { style.border = `1px solid ${g}33`; surface = true }
   else if (typeof c.__border === "string" && c.__border.startsWith("#")) { style.border = `1px solid ${c.__border}`; surface = true }
