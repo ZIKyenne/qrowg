@@ -4,6 +4,16 @@
 import { createAdminClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 
+// Redirection NON mise en cache : un QR est DYNAMIQUE (le proprietaire peut changer sa
+// destination apres impression) -> chaque scan doit re-resoudre cote serveur. Sans no-store,
+// un CDN/navigateur pourrait figer une ancienne destination.
+function redirectNoStore(url: string | URL, status = 302): NextResponse {
+  return new NextResponse(null, {
+    status,
+    headers: { Location: url.toString(), "Cache-Control": "no-store, must-revalidate" },
+  })
+}
+
 function pausedHtml(message: string, appUrl: string): string {
   return `<!DOCTYPE html>
 <html lang="fr"><head><meta charset="UTF-8">
@@ -62,7 +72,7 @@ p{font-size:14px;line-height:1.7;color:#8A8478;margin-bottom:28px}
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ code: string }> }) {
   const { code } = await params
-  if (!code) return NextResponse.redirect(new URL("/", req.url))
+  if (!code) return redirectNoStore(new URL("/", req.url))
 
   const supabase = createAdminClient()
   const appUrl   = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrfolio.app"
@@ -74,16 +84,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
       .eq("short_code", code)
       .single()
 
-    if (!qr) return NextResponse.redirect(new URL("/?qr=notfound", appUrl))
+    if (!qr) return redirectNoStore(new URL("/?qr=notfound", appUrl))
 
     const qrStatus = qr.status ?? "active"
 
     // ── Vérifier expiration automatique ───────────────────────────────────
     if (qr.expires_at && new Date(qr.expires_at) < new Date() && qrStatus === "active") {
       // Auto-expirer
-      supabase.from("qr_codes").update({ status: "expired" }).eq("id", qr.id).then(() => {})
+      supabase.from("qr_codes").update({ status: "expired" }).eq("id", qr.id).then(() => {}, () => {})
       return new NextResponse(expiredHtml(appUrl), {
-        status: 410, headers: { "Content-Type": "text/html;charset=utf-8" }
+        status: 410, headers: { "Content-Type": "text/html;charset=utf-8", "Cache-Control": "no-store, must-revalidate" }
       })
     }
 
@@ -91,20 +101,20 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
     switch (qrStatus) {
       case "paused":
         return new NextResponse(pausedHtml(qr.pause_message ?? "", appUrl), {
-          status: 503, headers: { "Content-Type": "text/html;charset=utf-8" }
+          status: 503, headers: { "Content-Type": "text/html;charset=utf-8", "Cache-Control": "no-store, must-revalidate" }
         })
       case "archived":
         return new NextResponse(expiredHtml(appUrl), {
-          status: 410, headers: { "Content-Type": "text/html;charset=utf-8" }
+          status: 410, headers: { "Content-Type": "text/html;charset=utf-8", "Cache-Control": "no-store, must-revalidate" }
         })
       case "expired":
         return new NextResponse(expiredHtml(appUrl), {
-          status: 410, headers: { "Content-Type": "text/html;charset=utf-8" }
+          status: 410, headers: { "Content-Type": "text/html;charset=utf-8", "Cache-Control": "no-store, must-revalidate" }
         })
       case "draft":
         // Draft accessible uniquement si paramètre preview (pour le dashboard)
         if (!req.nextUrl.searchParams.has("preview")) {
-          return NextResponse.redirect(new URL("/?qr=draft", appUrl))
+          return redirectNoStore(new URL("/?qr=draft", appUrl))
         }
         break
     }
@@ -129,27 +139,27 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
       const dest = override.url || override.value
       switch (override.type) {
         case "url": case "file":
-          return NextResponse.redirect(dest.startsWith("http") ? dest : `https://${dest}`, { status: 302 })
+          return redirectNoStore(dest.startsWith("http") ? dest : `https://${dest}`)
         case "email":
-          return NextResponse.redirect(dest.startsWith("mailto:") ? dest : `mailto:${dest}`, { status: 302 })
+          return redirectNoStore(dest.startsWith("mailto:") ? dest : `mailto:${dest}`)
         case "phone":
-          return NextResponse.redirect(dest.startsWith("tel:") ? dest : `tel:${dest}`, { status: 302 })
+          return redirectNoStore(dest.startsWith("tel:") ? dest : `tel:${dest}`)
         case "whatsapp":
-          return NextResponse.redirect(dest, { status: 302 })
+          return redirectNoStore(dest)
         case "page": {
           const { data: pg } = await supabase.from("pages").select("slug").eq("id", override.value).single()
-          if (pg) return NextResponse.redirect(`${appUrl}/${pg.slug}`, { status: 302 })
+          if (pg) return redirectNoStore(`${appUrl}/${pg.slug}`)
           break
         }
       }
     }
 
     const page = qr.pages as any
-    if (page?.slug) return NextResponse.redirect(`${appUrl}/${page.slug}`, { status: 302 })
+    if (page?.slug) return redirectNoStore(`${appUrl}/${page.slug}`)
 
-    return NextResponse.redirect(new URL("/?qr=error", appUrl))
+    return redirectNoStore(new URL("/?qr=error", appUrl))
   } catch (e) {
     console.error("[qr-redirect]", e)
-    return NextResponse.redirect(new URL("/?qr=error", appUrl))
+    return redirectNoStore(new URL("/?qr=error", appUrl))
   }
 }
