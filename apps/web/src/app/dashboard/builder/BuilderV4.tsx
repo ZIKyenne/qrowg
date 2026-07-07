@@ -3001,9 +3001,17 @@
     )
   }
 
-  function EditPanel({ block, onChange }: { block: Block; onChange: (key: string, val: string) => void }) {
+  // Clés de champs considérées comme « mise en page » (onglet dédié), le reste = « contenu ».
+  const LAYOUT_FIELD_KEYS = new Set(["align", "layout", "width", "height", "columns", "cols", "disposition", "orientation", "size"])
+  const isLayoutField = (key: string) => LAYOUT_FIELD_KEYS.has(key) || key.endsWith("_align")
+  // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
+  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links"])
+
+  function EditPanel({ block, onChange, only }: { block: Block; onChange: (key: string, val: string) => void; only?: "content" | "layout" }) {
     const def = BLOCK_DEFS[block.type]
     if (!def) return null
+    // Les éditeurs personnalisés ne s'affichent que côté Contenu (leur mise en page passe par les réglages universels).
+    if (only === "layout" && CUSTOM_EDITOR_TYPES.has(block.type)) return null
     const inputStyle: React.CSSProperties = { width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: "#F5F0E8", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
 
     if (block.type === "cover_banner") {
@@ -3059,9 +3067,11 @@
       )
     }
 
+    const scoped = def.fields.filter(f => only === "layout" ? isLayoutField(f.key) : only === "content" ? !isLayoutField(f.key) : true)
+    if (only === "layout" && scoped.length === 0) return null
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {def.fields.filter(field => {
+        {scoped.filter(field => {
           const si = (field as any).showIf
           if (!si) return true
           // Valeur effective : si le champ contrôleur n'est pas encore défini, on retombe sur
@@ -4086,6 +4096,7 @@
     const [pageStatus, setPageStatus] = useState("draft")
     const [theme, setTheme] = useState<PageTheme>(PRESET_THEMES.midnight_gold)
     const [rightTab, setRightTab] = useState<"preview"|"edit"|"theme">("preview")
+    const [editTab, setEditTab] = useState<"contenu"|"style"|"layout"|"avance">("contenu")
     const [activeCategory, setActiveCategory] = useState("identity")
     const [search, setSearch] = useState("")
     const [dayMode, setDayMode] = useState(false)
@@ -4738,6 +4749,8 @@
 
     // selectedBlock recalculé depuis blocks à chaque render — garantit fraîcheur
     const selectedBlock = blocks.find(b => b.id === selectedId)
+    // Revenir à l'onglet Contenu à chaque changement de bloc sélectionné.
+    useEffect(() => { setEditTab("contenu") }, [selectedId])
 
     // Fond du thème appliqué partout
     function bgStyle(): React.CSSProperties {
@@ -5873,45 +5886,17 @@
                           )}
                         </div>
                       </div>
-                      {/* key=selectedBlock.id force le remount quand on change de bloc */}
-                      <EditPanel
-                        key={selectedBlock.id}
-                        block={selectedBlock}
-                        onChange={(key, val) => updateBlock(selectedBlock.id, key, val)}
-                      />
-                      {/* Avancé — visibilité par appareil (universel, tous blocs) */}
-                      <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-                        <p style={{ color: MUTED, fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 9px" }}>Avancé · Visibilité</p>
-                        {[
-                          { key: "hide_mobile", label: "Afficher sur mobile", icon: "📱" },
-                          { key: "hide_desktop", label: "Afficher sur ordinateur", icon: "🖥️" },
-                        ].map(o => {
-                          const shown = selectedBlock.content[o.key] !== "yes" // "yes" = masqué
-                          return (
-                            <div key={o.key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "7px 0" }}>
-                              <span style={{ color: "#F5F0E8", fontSize: 12, display: "flex", alignItems: "center", gap: 7 }}><span>{o.icon}</span>{o.label}</span>
-                              <button onClick={() => updateBlock(selectedBlock.id, o.key, shown ? "yes" : "")} title={shown ? "Cliquer pour masquer" : "Cliquer pour afficher"}
-                                style={{ width: 42, height: 24, borderRadius: 12, background: shown ? G : "rgba(255,255,255,0.12)", border: "none", cursor: "pointer", position: "relative", transition: "background .2s", flexShrink: 0 }}>
-                                <span style={{ position: "absolute", top: 3, left: shown ? 21 : 3, width: 18, height: 18, borderRadius: "50%", background: "#fff", transition: "left .2s", boxShadow: "0 1px 4px rgba(0,0,0,0.3)" }} />
-                              </button>
-                            </div>
-                          )
-                        })}
-                        {(selectedBlock.content.hide_mobile === "yes" || selectedBlock.content.hide_desktop === "yes") && (
-                          <p style={{ color: "#F59E0B", fontSize: 9.5, margin: "4px 0 0" }}>⚠ Ce bloc est masqué sur {selectedBlock.content.hide_mobile === "yes" ? "mobile" : ""}{selectedBlock.content.hide_mobile === "yes" && selectedBlock.content.hide_desktop === "yes" ? " et " : ""}{selectedBlock.content.hide_desktop === "yes" ? "ordinateur" : ""} (page publiée).</p>
-                        )}
-                      </div>
-                      {/* Style · Apparence — universel (tous blocs), stocké dans des clés réservées __ */}
                       {(() => {
                         const bc = selectedBlock.content as any
                         const set = (k: string, v: string) => updateBlock(selectedBlock.id, k, v)
                         const selStyle: React.CSSProperties = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, color: "#F5F0E8", fontSize: 12, padding: "7px 9px", cursor: "pointer" }
                         const labelStyle: React.CSSProperties = { color: MUTED, fontSize: 11, display: "block", marginBottom: 4, fontWeight: 500 }
+                        const secTitle: React.CSSProperties = { color: MUTED, fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 9px" }
                         const Sel = ({ k, label, options, def }: { k: string; label: string; options: string[]; def: string }) => (
                           <div>
                             <label style={labelStyle}>{label}</label>
                             <select value={bc[k] || def} onChange={e => set(k, e.target.value)} style={selStyle}>
-                              {options.map(o => <option key={o} value={o}>{o}</option>)}
+                              {options.map(o => <option key={o} value={o}>{optionLabel(o)}</option>)}
                             </select>
                           </div>
                         )
@@ -5927,49 +5912,119 @@
                             </div>
                           )
                         }
-                        const STYLE_KEYS = ["__grad", "__bg", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim"]
-                        const active = STYLE_KEYS.some(k => bc[k] && !["Aucun", "Défaut", "Non", "Normale", "Aucune", ""].includes(bc[k]))
+                        const STYLE_KEYS = ["__grad", "__bg", "__border", "__radius", "__shadow", "__glow", "__glass"]
+                        const active = STYLE_KEYS.some(k => bc[k] && !["Aucun", "Défaut", "Non", ""].includes(bc[k]))
                         const applyPreset = (apply: Record<string, string>) => setBlocks(p => p.map(b => b.id === selectedBlock.id ? { ...b, content: { ...b.content, ...apply } } : b))
+                        const TABS = [
+                          { k: "contenu", label: "Contenu" },
+                          { k: "style", label: "Style" },
+                          { k: "layout", label: "Mise en page" },
+                          { k: "avance", label: "Avancé" },
+                        ] as const
                         return (
-                          <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 0 10px" }}>
-                              <p style={{ color: MUTED, fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: 0 }}>Style · Apparence</p>
-                              {active && <button onClick={() => STYLE_KEYS.forEach(k => set(k, ""))} title="Réinitialiser l'apparence de ce bloc"
-                                style={{ background: "none", border: "none", color: MUTED, fontSize: 10, cursor: "pointer", textDecoration: "underline" }}>Réinitialiser</button>}
-                            </div>
-                            {/* Modèles d'apparence 1-clic */}
-                            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
-                              {BLOCK_STYLE_PRESETS.map(p => (
-                                <button key={p.key} onClick={() => applyPreset(p.apply)} title={`Appliquer le style ${p.label}`}
-                                  style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 10px", borderRadius: 8, border: "1px solid rgba(201,168,76,0.2)", background: "rgba(201,168,76,0.05)", color: "#F5F0E8", fontSize: 11, fontWeight: 600, cursor: "pointer" }}
-                                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.12)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)" }}
-                                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,168,76,0.05)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.2)" }}>
-                                  <span style={{ fontSize: 13 }}>{p.emoji}</span>{p.label}
-                                </button>
+                          <>
+                            {/* Onglets d'édition du bloc */}
+                            <div style={{ display: "flex", gap: 3, background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: 3, margin: "0 0 14px" }}>
+                              {TABS.map(t => (
+                                <button key={t.k} onClick={() => setEditTab(t.k)}
+                                  style={{ flex: 1, padding: "7px 3px", borderRadius: 8, border: "none", cursor: "pointer", background: editTab===t.k ? G : "transparent", color: editTab===t.k ? "#080808" : MUTED, fontSize: 10, fontWeight: editTab===t.k ? 800 : 600, transition: "all .15s", whiteSpace: "nowrap" as const }}>{t.label}</button>
                               ))}
                             </div>
-                            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                              <Sel k="__grad" label="Fond dégradé" options={BLOCK_GRAD_OPTIONS} def="Aucun" />
-                              {(!bc.__grad || bc.__grad === "Aucun") && (
+
+                            {/* CONTENU */}
+                            {editTab === "contenu" && <EditPanel key={selectedBlock.id+"-c"} block={selectedBlock} onChange={set} only="content" />}
+
+                            {/* MISE EN PAGE */}
+                            {editTab === "layout" && (
+                              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                <EditPanel key={selectedBlock.id+"-l"} block={selectedBlock} onChange={set} only="layout" />
+                                <Sel k="__width" label="Largeur du bloc" options={BLOCK_WIDTH_OPTIONS} def="Normale" />
+                                <Sel k="__space" label="Espacement vertical" options={BLOCK_SPACE_OPTIONS} def="Défaut" />
+                              </div>
+                            )}
+
+                            {/* STYLE */}
+                            {editTab === "style" && (
+                              <div>
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 0 10px" }}>
+                                  <p style={secTitle}>Modèles d&apos;apparence</p>
+                                  {active && <button onClick={() => STYLE_KEYS.forEach(k => set(k, ""))} title="Réinitialiser l'apparence de ce bloc"
+                                    style={{ background: "none", border: "none", color: MUTED, fontSize: 10, cursor: "pointer", textDecoration: "underline" }}>Réinitialiser</button>}
+                                </div>
+                                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
+                                  {BLOCK_STYLE_PRESETS.map(p => (
+                                    <button key={p.key} onClick={() => applyPreset(p.apply)} title={`Appliquer le style ${p.label}`}
+                                      style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 10px", borderRadius: 8, border: "1px solid rgba(201,168,76,0.2)", background: "rgba(201,168,76,0.05)", color: "#F5F0E8", fontSize: 11, fontWeight: 600, cursor: "pointer" }}
+                                      onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.12)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)" }}
+                                      onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,168,76,0.05)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.2)" }}>
+                                      <span style={{ fontSize: 13 }}>{p.emoji}</span>{p.label}
+                                    </button>
+                                  ))}
+                                </div>
+                                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                                  <Sel k="__grad" label="Fond dégradé" options={BLOCK_GRAD_OPTIONS} def="Aucun" />
+                                  {(!bc.__grad || bc.__grad === "Aucun") && (
+                                    <div>
+                                      <label style={labelStyle}>Fond (couleur unie)</label>
+                                      <div style={{ display: "flex", gap: 7 }}>
+                                        <input type="color" value={bc.__bg || "#111111"} onChange={e => set("__bg", e.target.value)} style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0, background: "none" }} />
+                                        <input type="text" value={bc.__bg || ""} onChange={e => set("__bg", e.target.value)} placeholder="Aucun (transparent)" style={{ ...selStyle, flex: 1, cursor: "text" }} />
+                                        {bc.__bg && <button onClick={() => set("__bg", "")} title="Retirer le fond" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", padding: "0 9px", fontSize: 12 }}>✕</button>}
+                                      </div>
+                                    </div>
+                                  )}
+                                  <Toggle k="__border" label="Bordure" icon="⬜" />
+                                  <Sel k="__radius" label="Coins arrondis" options={BLOCK_RADIUS_OPTIONS} def="Défaut" />
+                                  <Sel k="__shadow" label="Ombre" options={BLOCK_SHADOW_OPTIONS} def="Non" />
+                                  <Toggle k="__glow" label="Halo lumineux (glow)" icon="✨" />
+                                  <Toggle k="__glass" label="Effet verre (flou)" icon="🧊" />
+                                </div>
+                              </div>
+                            )}
+
+                            {/* AVANCÉ */}
+                            {editTab === "avance" && (
+                              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                                 <div>
-                                  <label style={labelStyle}>Fond (couleur unie)</label>
-                                  <div style={{ display: "flex", gap: 7 }}>
-                                    <input type="color" value={bc.__bg || "#111111"} onChange={e => set("__bg", e.target.value)} style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0, background: "none" }} />
-                                    <input type="text" value={bc.__bg || ""} onChange={e => set("__bg", e.target.value)} placeholder="Aucun (transparent)" style={{ ...selStyle, flex: 1 }} />
-                                    {bc.__bg && <button onClick={() => set("__bg", "")} title="Retirer le fond" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", padding: "0 9px", fontSize: 12 }}>✕</button>}
+                                  <p style={secTitle}>Visibilité</p>
+                                  {[
+                                    { key: "hide_mobile", label: "Afficher sur mobile", icon: "📱" },
+                                    { key: "hide_desktop", label: "Afficher sur ordinateur", icon: "🖥️" },
+                                  ].map(o => {
+                                    const shown = bc[o.key] !== "yes" // "yes" = masqué
+                                    return (
+                                      <div key={o.key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "7px 0" }}>
+                                        <span style={{ color: "#F5F0E8", fontSize: 12, display: "flex", alignItems: "center", gap: 7 }}><span>{o.icon}</span>{o.label}</span>
+                                        <button onClick={() => set(o.key, shown ? "yes" : "")} title={shown ? "Cliquer pour masquer" : "Cliquer pour afficher"}
+                                          style={{ width: 42, height: 24, borderRadius: 12, background: shown ? G : "rgba(255,255,255,0.12)", border: "none", cursor: "pointer", position: "relative", transition: "background .2s", flexShrink: 0 }}>
+                                          <span style={{ position: "absolute", top: 3, left: shown ? 21 : 3, width: 18, height: 18, borderRadius: "50%", background: "#fff", transition: "left .2s", boxShadow: "0 1px 4px rgba(0,0,0,0.3)" }} />
+                                        </button>
+                                      </div>
+                                    )
+                                  })}
+                                  {(bc.hide_mobile === "yes" || bc.hide_desktop === "yes") && (
+                                    <p style={{ color: "#F59E0B", fontSize: 9.5, margin: "4px 0 0" }}>⚠ Ce bloc est masqué sur {bc.hide_mobile === "yes" ? "mobile" : ""}{bc.hide_mobile === "yes" && bc.hide_desktop === "yes" ? " et " : ""}{bc.hide_desktop === "yes" ? "ordinateur" : ""} (page publiée).</p>
+                                  )}
+                                </div>
+                                <div>
+                                  <p style={secTitle}>Animation</p>
+                                  <Sel k="__anim" label="Animation d'apparition" options={BLOCK_ANIM_OPTIONS} def="Aucune" />
+                                </div>
+                                <div>
+                                  <p style={secTitle}>Nom interne</p>
+                                  <input type="text" value={bc.__name || ""} onChange={e => set("__name", e.target.value)} placeholder="Ex : Section horaires (privé)" style={{ ...selStyle, cursor: "text" }} />
+                                  <p style={{ color: MUTED, fontSize: 9.5, margin: "4px 0 0" }}>Aide-mémoire visible uniquement par vous.</p>
+                                </div>
+                                <div>
+                                  <p style={secTitle}>Actions</p>
+                                  <div style={{ display: "flex", gap: 6 }}>
+                                    <button onClick={() => duplicateBlock(selectedBlock.id)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "#F5F0E8", fontSize: 12, cursor: "pointer" }}><Copy size={11} /> Dupliquer</button>
+                                    {!selectedBlock.locked && <button onClick={() => deleteBlock(selectedBlock.id)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", borderRadius: 8, border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.07)", color: "#EF4444", fontSize: 12, cursor: "pointer" }}><Trash2 size={11} /> Supprimer</button>}
                                   </div>
                                 </div>
-                              )}
-                              <Toggle k="__border" label="Bordure" icon="⬜" />
-                              <Sel k="__radius" label="Coins arrondis" options={BLOCK_RADIUS_OPTIONS} def="Défaut" />
-                              <Sel k="__shadow" label="Ombre" options={BLOCK_SHADOW_OPTIONS} def="Non" />
-                              <Toggle k="__glow" label="Halo lumineux (glow)" icon="✨" />
-                              <Toggle k="__glass" label="Effet verre (flou)" icon="🧊" />
-                              <Sel k="__space" label="Espacement vertical" options={BLOCK_SPACE_OPTIONS} def="Défaut" />
-                              <Sel k="__width" label="Largeur" options={BLOCK_WIDTH_OPTIONS} def="Normale" />
-                              <Sel k="__anim" label="Animation d'apparition" options={BLOCK_ANIM_OPTIONS} def="Aucune" />
-                            </div>
-                          </div>
+                              </div>
+                            )}
+                          </>
                         )
                       })()}
                     </>
