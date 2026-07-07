@@ -386,18 +386,20 @@
         </div>
       )
       case "pricing": {
-        const plans = [[c.title1,c.price1,c.desc1],[c.title2,c.price2,c.desc2],[c.title3,c.price3,c.desc3]].filter(([t])=>t)
+        const plans = [[c.title1,c.price1,c.desc1,c.old_price1],[c.title2,c.price2,c.desc2,c.old_price2],[c.title3,c.price3,c.desc3,c.old_price3]].filter(([t])=>t)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              {plans.map(([t,p,d],i) => (
-                <div key={i} style={{ flex: 1, minWidth: 70, background: i===1 ? primary+"12" : "rgba(255,255,255,0.04)", border: `1px solid ${i===1 ? primary+"40" : "rgba(255,255,255,0.08)"}`, borderRadius: 9, padding: "12px 8px", textAlign: "center" }}>
+              {plans.map(([t,p,d,op],i) => { const disc = priceDiscount(p, op); return (
+                <div key={i} style={{ flex: 1, minWidth: 70, position: "relative", background: i===1 ? primary+"12" : "rgba(255,255,255,0.04)", border: `1px solid ${i===1 ? primary+"40" : "rgba(255,255,255,0.08)"}`, borderRadius: 9, padding: "12px 8px", textAlign: "center" }}>
+                  {disc && <span style={{ position: "absolute", top: -7, right: 6, background: "#EF4444", color: "#fff", borderRadius: 5, padding: "1px 5px", fontSize: 9, fontWeight: 800 }}>{disc.label}</span>}
                   <p style={{ color: muted, fontSize: 9, margin: "0 0 3px", textTransform: "uppercase", letterSpacing: 1 }}>{t}</p>
                   <p style={{ color: primary, fontSize: 20, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay }}>{p}</p>
+                  {op && <p style={{ color: muted, fontSize: 11, margin: "0 0 3px", textDecoration: "line-through" }}>{op}</p>}
                   <p style={{ color: muted, fontSize: 9, margin: 0 }}>{d}</p>
                 </div>
-              ))}
+              ) })}
             </div>
           </div>
         )
