@@ -3093,9 +3093,17 @@
                   onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"}
                   onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />
               : field.type === "select"
-              ? <select value={block.content[field.key]||field.options?.[0]} onChange={e => onChange(field.key, e.target.value)} style={inputStyle}>
-                  {field.options?.map(o => <option key={o} value={o}>{optionLabel(o)}</option>)}
-                </select>
+              ? (field.options && field.options.length <= 5
+                  ? <div style={{ display: "flex", flexWrap: "wrap", gap: 4, background: "rgba(255,255,255,0.03)", borderRadius: 9, padding: 3 }}>
+                      {field.options.map(o => {
+                        const on = (block.content[field.key] || field.options![0]) === o
+                        return <button key={o} type="button" onClick={() => onChange(field.key, o)}
+                          style={{ flex: "1 1 auto", minWidth: 0, padding: "6px 9px", borderRadius: 7, border: "none", cursor: "pointer", background: on ? "#C9A84C" : "transparent", color: on ? "#080808" : "#9A948A", fontSize: 11, fontWeight: on ? 700 : 500, whiteSpace: "nowrap", transition: "all .12s" }}>{optionLabel(o)}</button>
+                      })}
+                    </div>
+                  : <select value={block.content[field.key]||field.options?.[0]} onChange={e => onChange(field.key, e.target.value)} style={inputStyle}>
+                      {field.options?.map(o => <option key={o} value={o}>{optionLabel(o)}</option>)}
+                    </select>)
               : field.type === "color"
               ? <div style={{ display: "flex", gap: 7 }}>
                   <input type="color" value={block.content[field.key]||"#C9A84C"} onChange={e => onChange(field.key, e.target.value)} style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }} />
@@ -5911,9 +5919,13 @@
                         const Sel = ({ k, label, options, def }: { k: string; label: string; options: string[]; def: string }) => (
                           <div>
                             <label style={labelStyle}>{label}</label>
-                            <select value={bc[k] || def} onChange={e => set(k, e.target.value)} style={selStyle}>
-                              {options.map(o => <option key={o} value={o}>{optionLabel(o)}</option>)}
-                            </select>
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
+                              {options.map(o => {
+                                const on = (bc[k] || def) === o
+                                return <button key={o} type="button" onClick={() => set(k, o)}
+                                  style={{ flex: "1 1 auto", minWidth: 0, padding: "6px 9px", borderRadius: 7, border: "none", cursor: "pointer", background: on ? G : "transparent", color: on ? "#080808" : MUTED, fontSize: 11, fontWeight: on ? 700 : 500, whiteSpace: "nowrap", transition: "all .12s" }}>{optionLabel(o)}</button>
+                              })}
+                            </div>
                           </div>
                         )
                         const Toggle = ({ k, label, icon }: { k: string; label: string; icon: string }) => {

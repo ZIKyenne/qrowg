@@ -3001,13 +3001,18 @@ export function announcementMeta(type?: string): { icon: string; color: string; 
 // ── Apparence par bloc (système de style universel, opt-in) ───────────────────
 // Dégradés nommés réutilisables pour le fond d'un bloc.
 export const BLOCK_GRADIENTS: Record<string, string> = {
-  "Or nuit":  "linear-gradient(135deg,#1c1608,#0a0a0a)",
-  "Océan":    "linear-gradient(135deg,#0c4a6e,#082f49)",
-  "Sunset":   "linear-gradient(135deg,#7c2d12,#431407)",
-  "Violet":   "linear-gradient(135deg,#4c1d95,#2e1065)",
-  "Menthe":   "linear-gradient(135deg,#065f46,#022c22)",
-  "Rose":     "linear-gradient(135deg,#831843,#4a044e)",
-  "Ardoise":  "linear-gradient(135deg,#1e293b,#0f172a)",
+  "Or nuit":    "linear-gradient(135deg,#1c1608,#0a0a0a)",
+  "Océan":      "linear-gradient(135deg,#0c4a6e,#082f49)",
+  "Nuit bleue": "linear-gradient(135deg,#0f172a,#020617)",
+  "Sunset":     "linear-gradient(135deg,#7c2d12,#431407)",
+  "Cuivre":     "linear-gradient(135deg,#3a2410,#170d04)",
+  "Violet":     "linear-gradient(135deg,#4c1d95,#2e1065)",
+  "Menthe":     "linear-gradient(135deg,#065f46,#022c22)",
+  "Émeraude":   "linear-gradient(135deg,#134e4a,#042f2e)",
+  "Rose":       "linear-gradient(135deg,#831843,#4a044e)",
+  "Bordeaux":   "linear-gradient(135deg,#4a0e1a,#1a0508)",
+  "Ardoise":    "linear-gradient(135deg,#1e293b,#0f172a)",
+  "Charbon":    "linear-gradient(135deg,#1a1a1d,#0a0a0a)",
 }
 export const BLOCK_GRAD_OPTIONS = ["Aucun", ...Object.keys(BLOCK_GRADIENTS)]
 export const BLOCK_RADIUS_OPTIONS = ["Défaut", "S", "M", "L", "XL"]
@@ -3019,12 +3024,16 @@ export const BLOCK_ANIM_OPTIONS = ["Aucune", "Fondu", "Glissé", "Zoom"]
 // Modèles d'apparence 1-clic : appliquent un jeu cohérent de clés __ (les clés non listées d'un
 // preset sont remises à "" pour repartir d'un état propre).
 export const BLOCK_STYLE_PRESETS: { key: string; label: string; emoji: string; apply: Record<string, string> }[] = [
-  { key: "card",    label: "Carte",    emoji: "🃏", apply: { __border: "Oui", __radius: "M", __shadow: "Douce", __bg: "", __grad: "", __glow: "", __glass: "" } },
-  { key: "premium", label: "Premium",  emoji: "👑", apply: { __grad: "Or nuit", __radius: "L", __shadow: "Douce", __border: "Oui", __bg: "", __glow: "", __glass: "" } },
-  { key: "glass",   label: "Verre",    emoji: "🧊", apply: { __glass: "Oui", __radius: "L", __shadow: "Douce", __grad: "", __bg: "", __border: "", __glow: "" } },
-  { key: "neon",    label: "Néon",     emoji: "✨", apply: { __bg: "#0d0d10", __border: "Oui", __radius: "L", __glow: "Oui", __grad: "", __shadow: "", __glass: "" } },
-  { key: "ocean",   label: "Océan",    emoji: "🌊", apply: { __grad: "Océan", __radius: "L", __shadow: "Douce", __border: "", __bg: "", __glow: "", __glass: "" } },
-  { key: "minimal", label: "Minimal",  emoji: "▫️", apply: { __radius: "S", __space: "Aéré", __border: "", __bg: "", __grad: "", __shadow: "", __glow: "", __glass: "" } },
+  { key: "card",       label: "Carte",      emoji: "🃏", apply: { __border: "Oui", __radius: "M", __shadow: "Douce", __bg: "", __grad: "", __glow: "", __glass: "", __intensity: "" } },
+  { key: "premium",    label: "Premium",    emoji: "👑", apply: { __grad: "Or nuit", __radius: "L", __shadow: "Douce", __border: "Oui", __intensity: "Moyen", __bg: "", __glow: "", __glass: "" } },
+  { key: "luxe",       label: "Luxe noir",  emoji: "🖤", apply: { __bg: "#0a0a0a", __border: "Oui", __radius: "L", __shadow: "Forte", __grad: "", __glow: "", __glass: "", __intensity: "" } },
+  { key: "corporate",  label: "Corporate",  emoji: "🏢", apply: { __grad: "Nuit bleue", __radius: "M", __border: "Oui", __shadow: "Douce", __intensity: "Moyen", __bg: "", __glow: "", __glass: "" } },
+  { key: "chaleureux", label: "Chaleureux", emoji: "🔥", apply: { __grad: "Cuivre", __radius: "L", __shadow: "Douce", __intensity: "Moyen", __border: "", __bg: "", __glow: "", __glass: "" } },
+  { key: "glass",      label: "Verre",      emoji: "🧊", apply: { __glass: "Oui", __radius: "L", __shadow: "Douce", __grad: "", __bg: "", __border: "", __glow: "", __intensity: "" } },
+  { key: "neon",       label: "Néon",       emoji: "✨", apply: { __bg: "#0d0d10", __border: "Oui", __radius: "L", __glow: "Oui", __grad: "", __shadow: "", __glass: "", __intensity: "" } },
+  { key: "ocean",      label: "Océan",      emoji: "🌊", apply: { __grad: "Océan", __radius: "L", __shadow: "Douce", __intensity: "Léger", __border: "", __bg: "", __glow: "", __glass: "" } },
+  { key: "sombre",     label: "Sombre",     emoji: "🌑", apply: { __bg: "#111114", __radius: "M", __border: "Oui", __grad: "", __shadow: "", __glow: "", __glass: "", __intensity: "" } },
+  { key: "minimal",    label: "Minimal",    emoji: "▫️", apply: { __radius: "S", __space: "Aéré", __border: "", __bg: "", __grad: "", __shadow: "", __glow: "", __glass: "", __intensity: "" } },
 ]
 
 // Style universel appliqué au conteneur d'un bloc à partir de clés réservées (__bg, __grad, __border,
