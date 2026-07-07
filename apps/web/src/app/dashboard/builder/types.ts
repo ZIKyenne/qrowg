@@ -847,6 +847,20 @@ export const SOCIAL_URL_TEMPLATES: Record<string, string> = {
   behance: "https://behance.net/", dribbble: "https://dribbble.com/", whatsapp: "https://wa.me/", email: "mailto:",
 }
 
+// Normalise ce que l'utilisateur saisit pour un reseau en URL cliquable valide :
+//  - URL complete (http/mailto/tel) -> telle quelle
+//  - domaine sans protocole ("instagram.com/jean", "www.x.com") -> prefixe https://
+//  - pseudo ("jean", "@jean") -> modele du reseau (SOCIAL_URL_TEMPLATES) + pseudo
+// Evite les liens casses quand l'utilisateur oublie https:// ou tape juste son pseudo.
+export function socialHref(key: string, value?: string): string {
+  const v = (value || "").trim()
+  if (!v) return ""
+  if (/^(https?:\/\/|mailto:|tel:)/i.test(v)) return v
+  if (/^www\./i.test(v) || /^[\w-]+(\.[\w-]+)+\//.test(v)) return `https://${v.replace(/^\/+/, "")}`
+  const tpl = SOCIAL_URL_TEMPLATES[key]
+  return tpl ? tpl + v.replace(/^@+/, "") : `https://${v}`
+}
+
 // Modèles Réseaux par métier : un clic crée un bloc "Liens sociaux" pré-rempli.
 export const SOCIAL_PRESETS: { key: string; label: string; emoji: string; networks: string[] }[] = [
   { key: "createur", label: "Créateur de contenu", emoji: "✨", networks: ["tiktok", "instagram", "youtube", "twitch", "discord"] },

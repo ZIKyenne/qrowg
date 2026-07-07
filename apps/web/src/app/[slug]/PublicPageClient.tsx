@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, buildVCard, mapEmbedUrl, shareLinks, calendarLinks, spotifyEmbedUrl, youtubeId, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, buildVCard, mapEmbedUrl, shareLinks, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -548,7 +548,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       if (disp === "icons") return (
         <div style={{ padding: "6px 24px 16px", display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
           {active.map(([key, n]) => (
-            <a key={key} href={c[key]} onClick={() => trackLinkClick(pageId, block.id, c[key])} target="_blank" rel="noopener noreferrer" aria-label={lbl(key, n)} title={lbl(key, n)}
+            <a key={key} href={socialHref(key, c[key])} onClick={() => trackLinkClick(pageId, block.id, c[key])} target="_blank" rel="noopener noreferrer" aria-label={lbl(key, n)} title={lbl(key, n)}
               style={{ width: 48, height: 48, borderRadius: "50%", background: n.color + "1a", border: `1px solid ${n.color}40`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, textDecoration: "none" }}>{n.icon}</a>
           ))}
         </div>
@@ -556,7 +556,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       if (disp === "grid") return (
         <div style={{ padding: "6px 24px 16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
           {active.map(([key, n]) => (
-            <a key={key} href={c[key]} onClick={() => trackLinkClick(pageId, block.id, c[key])} target="_blank" rel="noopener noreferrer"
+            <a key={key} href={socialHref(key, c[key])} onClick={() => trackLinkClick(pageId, block.id, c[key])} target="_blank" rel="noopener noreferrer"
               style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, background: n.color + "10", border: `1px solid ${n.color}25`, borderRadius: 13, padding: "16px 8px", textDecoration: "none", textAlign: "center" }}>
               <span style={{ fontSize: 26 }}>{n.icon}</span>
               <span style={{ color: TEXT, fontSize: 13, fontWeight: 600, fontFamily: FONT_B }}>{lbl(key, n)}</span>
@@ -568,7 +568,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       return (
         <div style={{ padding: "6px 24px 16px", display: "flex", flexDirection: "column", gap: 9 }}>
           {active.map(([key, n]) => (
-            <a key={key} href={c[key]} onClick={() => trackLinkClick(pageId, block.id, c[key])} target="_blank" rel="noopener noreferrer"
+            <a key={key} href={socialHref(key, c[key])} onClick={() => trackLinkClick(pageId, block.id, c[key])} target="_blank" rel="noopener noreferrer"
               style={{ display: "flex", alignItems: "center", gap: 13, background: n.color + "10", border: `1px solid ${n.color}22`, borderRadius: 13, padding: "13px 16px", textDecoration: "none", transition: "transform 0.15s, box-shadow 0.15s" }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = `0 6px 20px ${n.color}20` }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLElement).style.boxShadow = "none" }}>
@@ -589,7 +589,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail }: { block: Block; theme
       const col = n.color
       return (c.url || c.title) ? (
         <div style={{ padding: "8px 24px 14px" }}>
-          <a href={c.url || "#"} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "social")} style={{ display: "block", background: `linear-gradient(135deg,${col}22,${col}0a)`, border: `1.5px solid ${col}45`, borderRadius: 18, overflow: "hidden", textDecoration: "none" }}>
+          <a href={socialHref(c.network, c.url) || "#"} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "social")} style={{ display: "block", background: `linear-gradient(135deg,${col}22,${col}0a)`, border: `1.5px solid ${col}45`, borderRadius: 18, overflow: "hidden", textDecoration: "none" }}>
             {c.image && <img onError={e => { e.currentTarget.style.display = 'none' }} loading="lazy" decoding="async" src={c.image} alt="" style={{ width: "100%", height: 130, objectFit: "cover", display: "block" }} />}
             <div style={{ padding: "16px 18px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>

@@ -6,7 +6,7 @@ import {
   SOCIAL_NETWORKS, SOCIAL_NETWORKS_MAP, productBadgeStyle,
   parsePrice, priceDiscount, countdownParts, stockStatus, paymentLink, paymentBrand, starRow,
   parseHourRanges, fmtMinutes, openStatus,
-  vcardEscape, splitName, buildVCard, mapEmbedUrl, shareLinks, toCalStamp, calendarLinks, spotifyEmbedUrl, youtubeId,
+  vcardEscape, splitName, buildVCard, mapEmbedUrl, shareLinks, toCalStamp, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -745,5 +745,30 @@ describe("youtubeId", () => {
   it("vide / non YouTube -> vide", () => {
     expect(youtubeId("")).toBe("")
     expect(youtubeId("https://exemple.com/x")).toBe("")
+  })
+})
+
+describe("socialHref", () => {
+  it("URL complete -> telle quelle", () => {
+    expect(socialHref("instagram", "https://instagram.com/jean")).toBe("https://instagram.com/jean")
+  })
+  it("pseudo -> modele du reseau", () => {
+    expect(socialHref("instagram", "jean")).toBe("https://instagram.com/jean")
+    expect(socialHref("linkedin", "jean")).toBe("https://linkedin.com/in/jean")
+  })
+  it("pseudo avec @ et modele finissant par @ -> pas de double @", () => {
+    expect(socialHref("tiktok", "@jean")).toBe("https://tiktok.com/@jean")
+    expect(socialHref("tiktok", "jean")).toBe("https://tiktok.com/@jean")
+  })
+  it("domaine sans protocole -> https://", () => {
+    expect(socialHref("instagram", "instagram.com/jean")).toBe("https://instagram.com/jean")
+    expect(socialHref("instagram", "www.instagram.com/jean")).toBe("https://www.instagram.com/jean")
+  })
+  it("email -> mailto:", () => {
+    expect(socialHref("email", "jean@exemple.com")).toBe("mailto:jean@exemple.com")
+  })
+  it("vide -> vide", () => {
+    expect(socialHref("instagram", "")).toBe("")
+    expect(socialHref("instagram", undefined)).toBe("")
   })
 })
