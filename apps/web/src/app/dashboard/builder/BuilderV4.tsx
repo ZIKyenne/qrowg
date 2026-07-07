@@ -4029,6 +4029,10 @@
     // Vrai s'il reste des modifications non encore sauvegardees (evite la perte de donnees
     // si l'onglet est ferme/recharge pendant le debounce de sauvegarde).
     const dirty = useRef(false)
+    // Vrai seulement une fois la page CHARGEE (existante) ou CREEE (nouvelle). Empeche la
+    // sauvegarde de partir avec les blocs de demo par defaut avant que load() n'ait ramene
+    // les vrais blocs -> sinon, sur connexion lente, on ecraserait le contenu reel.
+    const ready = useRef(false)
 
     // ── États collapse panneaux ────────────────────────────────────────────────
     const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
@@ -4269,6 +4273,8 @@
           if (!res.ok || !json?.pageId) { setBootstrapError(json?.message || json?.error || "Impossible de creer la page."); return }
           // Normalise les IDs de blocs par defaut (\"1\"/\"2\"/\"3\") en UUID -> chemin upsert propre.
           setBlocksRaw(prev => prev.map(b => IS_UUID(b.id) ? b : { ...b, id: genId() }))
+          // Page neuve creee : la sauvegarde peut persister les blocs initiaux.
+          ready.current = true
           setLiveId(json.pageId)
           if (json.slug) setPageSlug(json.slug)
           try { window.history.replaceState(null, "", "/dashboard/builder/" + json.pageId) } catch {}
@@ -4303,6 +4309,8 @@
           for (const r of clk as any[]) { if (r.block_id) counts[r.block_id] = (counts[r.block_id] || 0) + 1 }
           setClickCounts(counts)
         }
+        // Page chargee : la sauvegarde peut desormais s'activer sans risque d'ecraser.
+        ready.current = true
       }
       load()
     }, [liveId])
@@ -4315,7 +4323,9 @@
     }, [])
 
     useEffect(() => {
-      if (!IS_UUID(liveId)) return
+      // ready.current : garde anti-ecrasement — on ne sauvegarde pas tant que la page n'est
+      // pas chargee (existante) ou creee (nouvelle), pour ne jamais persister les blocs de demo.
+      if (!IS_UUID(liveId) || !ready.current) return
       dirty.current = true
       clearTimeout(saveTimeout.current)
       saveTimeout.current = setTimeout(async () => {
