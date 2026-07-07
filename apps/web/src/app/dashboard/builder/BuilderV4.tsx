@@ -3006,6 +3006,8 @@
   const isLayoutField = (key: string) => LAYOUT_FIELD_KEYS.has(key) || key.endsWith("_align")
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
   const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links"])
+  // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
+  const STYLE_COPY_KEYS = ["__grad", "__bg", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim"]
 
   function EditPanel({ block, onChange, only }: { block: Block; onChange: (key: string, val: string) => void; only?: "content" | "layout" }) {
     const def = BLOCK_DEFS[block.type]
@@ -4097,6 +4099,7 @@
     const [theme, setTheme] = useState<PageTheme>(PRESET_THEMES.midnight_gold)
     const [rightTab, setRightTab] = useState<"preview"|"edit"|"theme">("preview")
     const [editTab, setEditTab] = useState<"contenu"|"style"|"layout"|"avance">("contenu")
+    const [styleClipboard, setStyleClipboard] = useState<Record<string, string> | null>(null)
     const [activeCategory, setActiveCategory] = useState("identity")
     const [search, setSearch] = useState("")
     const [dayMode, setDayMode] = useState(false)
@@ -5912,8 +5915,7 @@
                             </div>
                           )
                         }
-                        const STYLE_KEYS = ["__grad", "__bg", "__border", "__radius", "__shadow", "__glow", "__glass"]
-                        const active = STYLE_KEYS.some(k => bc[k] && !["Aucun", "Défaut", "Non", ""].includes(bc[k]))
+                        const active = STYLE_COPY_KEYS.some(k => bc[k] && !["Aucun", "Défaut", "Non", "Normale", "Aucune", ""].includes(bc[k]))
                         const applyPreset = (apply: Record<string, string>) => setBlocks(p => p.map(b => b.id === selectedBlock.id ? { ...b, content: { ...b.content, ...apply } } : b))
                         const TABS = [
                           { k: "contenu", label: "Contenu" },
@@ -5948,8 +5950,19 @@
                               <div>
                                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 0 10px" }}>
                                   <p style={secTitle}>Modèles d&apos;apparence</p>
-                                  {active && <button onClick={() => STYLE_KEYS.forEach(k => set(k, ""))} title="Réinitialiser l'apparence de ce bloc"
+                                  {active && <button onClick={() => STYLE_COPY_KEYS.forEach(k => set(k, ""))} title="Réinitialiser l'apparence de ce bloc"
                                     style={{ background: "none", border: "none", color: MUTED, fontSize: 10, cursor: "pointer", textDecoration: "underline" }}>Réinitialiser</button>}
+                                </div>
+                                {/* Copier / coller le style entre blocs */}
+                                <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+                                  <button onClick={() => setStyleClipboard(Object.fromEntries(STYLE_COPY_KEYS.map(k => [k, bc[k] || ""])))} title="Copier l'apparence de ce bloc"
+                                    style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "8px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "#F5F0E8", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
+                                    <Copy size={11} /> Copier le style
+                                  </button>
+                                  <button onClick={() => { if (styleClipboard) applyPreset(styleClipboard) }} disabled={!styleClipboard} title={styleClipboard ? "Appliquer l'apparence copiée" : "Copiez d'abord le style d'un bloc"}
+                                    style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "8px", borderRadius: 8, border: `1px solid ${styleClipboard ? "rgba(201,168,76,0.3)" : "rgba(255,255,255,0.07)"}`, background: styleClipboard ? "rgba(201,168,76,0.08)" : "rgba(255,255,255,0.02)", color: styleClipboard ? G : "rgba(255,255,255,0.25)", fontSize: 11, fontWeight: 600, cursor: styleClipboard ? "pointer" : "not-allowed" }}>
+                                    📋 Coller le style
+                                  </button>
                                 </div>
                                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
                                   {BLOCK_STYLE_PRESETS.map(p => (
