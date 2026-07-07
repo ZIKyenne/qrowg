@@ -548,6 +548,14 @@ export function paymentLink(c: { platform?: string; url?: string; handle?: strin
   return ""
 }
 
+// Rangee d'etoiles precise : renvoie `max` fractions de remplissage (0..1) par etoile.
+// Ex : starRow(4.9) -> [1,1,1,1,0.9] ; starRow("3,5") -> [1,1,1,0.5,0]. Accepte virgule ou point.
+export function starRow(score: number | string | undefined | null, max = 5): number[] {
+  const raw = typeof score === "number" ? score : parseFloat(String(score ?? "").replace(",", "."))
+  const val = isFinite(raw) ? Math.max(0, Math.min(max, raw)) : 0
+  return Array.from({ length: max }, (_, i) => Math.max(0, Math.min(1, val - i)))
+}
+
 // Statuts de disponibilité (parité builder <-> public). Couleur personnalisable via dot_color.
 export const AVAILABILITY_STATUSES: { key: string; label: string; color: string }[] = [
   { key: "available", label: "Disponible", color: "#39FF8F" },

@@ -4,7 +4,7 @@ import {
   bannerTitleStyle, bannerFrame, bannerHeight, bannerBackgroundStyle,
   normalizePhoneDigits, waLink, telLink, directionsLink, ctaButtonStyle, stickyActionHref, embedVideoUrl,
   SOCIAL_NETWORKS, SOCIAL_NETWORKS_MAP, productBadgeStyle,
-  parsePrice, priceDiscount, countdownParts, stockStatus, paymentLink, paymentBrand,
+  parsePrice, priceDiscount, countdownParts, stockStatus, paymentLink, paymentBrand, starRow,
 } from "./types"
 
 describe("bannerImageStyle", () => {
@@ -462,5 +462,30 @@ describe("paymentBrand", () => {
   it("inconnu / vide -> Stripe par défaut", () => {
     expect(paymentBrand(undefined).label).toBe("Stripe")
     expect(paymentBrand("Bidule").label).toBe("Stripe")
+  })
+})
+
+describe("starRow", () => {
+  it("note pleine -> 5 étoiles remplies", () => {
+    expect(starRow(5)).toEqual([1, 1, 1, 1, 1])
+  })
+  it("décimale : 4.9 -> 4 pleines + 1 quasi pleine", () => {
+    const r = starRow(4.9)
+    expect(r.slice(0, 4)).toEqual([1, 1, 1, 1])
+    expect(r[4]).toBeCloseTo(0.9)
+  })
+  it("demi-étoile : 3,5 (virgule) -> [1,1,1,0.5,0]", () => {
+    expect(starRow("3,5")).toEqual([1, 1, 1, 0.5, 0])
+  })
+  it("zéro / vide / non numérique -> tout vide", () => {
+    expect(starRow(0)).toEqual([0, 0, 0, 0, 0])
+    expect(starRow(undefined)).toEqual([0, 0, 0, 0, 0])
+    expect(starRow("abc")).toEqual([0, 0, 0, 0, 0])
+  })
+  it("borné : au-delà du max -> tout plein", () => {
+    expect(starRow(9)).toEqual([1, 1, 1, 1, 1])
+  })
+  it("max personnalisable", () => {
+    expect(starRow(2, 3)).toEqual([1, 1, 0])
   })
 })
