@@ -149,11 +149,9 @@ export async function GET(req: NextRequest) {
   // Vérifier le secret cron
   const auth = req.headers.get("authorization")
   const secret = req.nextUrl.searchParams.get("secret")
-  if (
-    auth !== `Bearer ${CRON_SECRET}` &&
-    secret !== CRON_SECRET &&
-    CRON_SECRET !== ""
-  ) {
+  // Fail-closed : sans CRON_SECRET configure, ou sans preuve valide, on refuse
+  // (evite tout envoi d'emails en masse non autorise).
+  if (CRON_SECRET === "" || (auth !== `Bearer ${CRON_SECRET}` && secret !== CRON_SECRET)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 

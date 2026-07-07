@@ -47,7 +47,9 @@ function alertHtml(name: string, views: number, limit: number, over: boolean, ap
 export async function GET(req: NextRequest) {
   const auth = req.headers.get("authorization")
   const secret = req.nextUrl.searchParams.get("secret")
-  if (CRON_SECRET !== "" && auth !== `Bearer ${CRON_SECRET}` && secret !== CRON_SECRET) {
+  // Fail-closed : sans CRON_SECRET configure, ou sans preuve valide, on refuse
+  // (coherent avec /api/emails/weekly ; empeche tout declenchement non autorise).
+  if (CRON_SECRET === "" || (auth !== `Bearer ${CRON_SECRET}` && secret !== CRON_SECRET)) {
     return NextResponse.json({ error: "Non autorise" }, { status: 401 })
   }
 
