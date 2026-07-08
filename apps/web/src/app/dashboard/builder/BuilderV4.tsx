@@ -7,6 +7,7 @@
     ExternalLink, Palette, GripVertical, QrCode
   } from "lucide-react"
   import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, INFO_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, announcementMeta, optionLabel, blockDecoration, BLOCK_GRADIENTS, BLOCK_RADIUS_OPTIONS, BLOCK_SHADOW_OPTIONS, BLOCK_SPACE_OPTIONS, BLOCK_WIDTH_OPTIONS, BLOCK_ANIM_OPTIONS, BLOCK_INTENSITY_OPTIONS, BLOCK_STYLE_PRESETS, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
+  import { PAGE_TEMPLATES, PAGE_TEMPLATE_GROUPS, type PageTemplate } from "./page-templates"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import QRCanvas from "../qr-codes/QRCanvas"
@@ -4115,6 +4116,8 @@
     const [rightTab, setRightTab] = useState<"preview"|"edit"|"theme">("preview")
     const [editTab, setEditTab] = useState<"contenu"|"style"|"layout"|"avance">("contenu")
     const [styleClipboard, setStyleClipboard] = useState<Record<string, string> | null>(null)
+    const [showTemplates, setShowTemplates] = useState(false)
+    const [templateGroup, setTemplateGroup] = useState<string>(PAGE_TEMPLATE_GROUPS[0])
     const [activeCategory, setActiveCategory] = useState("identity")
     const [search, setSearch] = useState("")
     const [dayMode, setDayMode] = useState(false)
@@ -4525,6 +4528,19 @@
       pushRecent(type)
     }
 
+    // Applique un MODÈLE DE PAGE complet : thème cohérent + jeu de blocs prêt à personnaliser.
+    // Remplace les blocs (réversible via Ctrl+Z / undo). Confirme si la page a déjà du contenu.
+    function applyPageTemplate(tpl: PageTemplate) {
+      const nonEmpty = blocks.filter(b => !(b.type === "profile" && !(b.content?.name))).length
+      if (blocks.length > 1 || nonEmpty > 0) {
+        if (!window.confirm(`Appliquer le modèle « ${tpl.label} » ?\n\nLes blocs actuels seront remplacés et le thème mis à jour. Réversible avec Annuler (Ctrl+Z).`)) return
+      }
+      setTheme(prev => ({ ...prev, ...tpl.theme }))
+      const next = tpl.blocks.map(b => ({ id: genId(), type: b.type, content: { ...(BLOCK_DEFS[b.type]?.defaultContent || {}), ...b.content }, visible: true }))
+      setBlocks(next)
+      setSelectedId(null); setRightTab("preview"); setShowTemplates(false)
+    }
+
     // Génère une identité de base (curated, sans IA) : profil + bio + compétences + disponibilité
     function generateBaseIdentity() {
       const mk = (type: string, ov: Record<string, string>) => ({ ...(BLOCK_DEFS[type]?.defaultContent || {}), ...ov })
@@ -4875,6 +4891,12 @@
               ↪
             </button>
           </div>
+
+          {/* Modèles de page complets */}
+          <button onClick={() => setShowTemplates(true)} title="Partir d'un modèle de page complet"
+            style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 7, padding: "5px 10px", color: G, fontSize: 10, fontWeight: 700, cursor: "pointer" }}>
+            ✨ Modèles
+          </button>
 
           {/* Bouton Focus Mode */}
           <button onClick={toggleFocus} title="Mode Focus — Ctrl+F"
@@ -5702,6 +5724,11 @@
                 <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}><Plus size={14} color={G} /></div>
                 Ajouter un nouveau bloc
               </button>
+              <button onClick={() => setShowTemplates(true)}
+                style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "transparent", border: "none", color: MUTED, fontSize: 12, cursor: "pointer", marginTop: 10 }}
+                onMouseEnter={e => e.currentTarget.style.color = G} onMouseLeave={e => e.currentTarget.style.color = MUTED}>
+                ✨ ou partir d&apos;un modèle de page complet
+              </button>
               </div>
             </div>
           </div>
@@ -6165,6 +6192,64 @@
             </div>
           )
         })()}
+
+        {/* MODALE — Modèles de page complets (par métier -> sous-variantes) */}
+        {showTemplates && (
+          <div onClick={() => setShowTemplates(false)}
+            style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+            <div onClick={e => e.stopPropagation()}
+              style={{ width: "100%", maxWidth: 860, maxHeight: "88vh", background: "#111", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 16, overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 24px 80px rgba(0,0,0,0.6)" }}>
+              {/* En-tête */}
+              <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 20 }}>✨</span>
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: 0, color: "#F5F0E8", fontSize: 15, fontWeight: 700 }}>Modèles de page</p>
+                  <p style={{ margin: 0, color: MUTED, fontSize: 11 }}>Une page complète et cohérente en un clic — personnalisable ensuite.</p>
+                </div>
+                <button onClick={() => setShowTemplates(false)} aria-label="Fermer" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", width: 30, height: 30, fontSize: 16 }}>×</button>
+              </div>
+              <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
+                {/* Colonne métiers */}
+                <div style={{ width: 190, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", overflowY: "auto", padding: 8 }} className="iphone-scroll">
+                  {PAGE_TEMPLATE_GROUPS.map(grp => {
+                    const on = templateGroup === grp
+                    const emoji = PAGE_TEMPLATES.find(t => t.group === grp)?.emoji || "📄"
+                    return (
+                      <button key={grp} onClick={() => setTemplateGroup(grp)}
+                        style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "9px 10px", marginBottom: 3, borderRadius: 9, border: "none", cursor: "pointer", background: on ? "rgba(201,168,76,0.12)" : "transparent", color: on ? G : "#C8C2B6", fontSize: 12, fontWeight: on ? 700 : 500, textAlign: "left" as const }}>
+                        <span style={{ fontSize: 15 }}>{emoji}</span>{grp}
+                      </button>
+                    )
+                  })}
+                </div>
+                {/* Variantes du métier */}
+                <div style={{ flex: 1, overflowY: "auto", padding: 14, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, alignContent: "start" }} className="iphone-scroll">
+                  {PAGE_TEMPLATES.filter(t => t.group === templateGroup).map(tpl => (
+                    <div key={tpl.key} style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: 13, overflow: "hidden", background: "rgba(255,255,255,0.02)", display: "flex", flexDirection: "column" }}>
+                      {/* Aperçu couleurs du thème */}
+                      <div style={{ height: 64, background: tpl.theme.bgGradient || tpl.theme.bg, position: "relative", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                        <span style={{ fontSize: 26 }}>{tpl.emoji}</span>
+                        <div style={{ position: "absolute", bottom: 8, right: 8, display: "flex", gap: 4 }}>
+                          <span style={{ width: 12, height: 12, borderRadius: "50%", background: tpl.theme.primary, border: "1px solid rgba(255,255,255,0.2)" }} />
+                          <span style={{ width: 12, height: 12, borderRadius: "50%", background: tpl.theme.accent, border: "1px solid rgba(255,255,255,0.2)" }} />
+                        </div>
+                      </div>
+                      <div style={{ padding: "11px 12px", flex: 1, display: "flex", flexDirection: "column" }}>
+                        <p style={{ margin: "0 0 2px", color: "#F5F0E8", fontSize: 13, fontWeight: 700 }}>{tpl.label}</p>
+                        <p style={{ margin: "0 0 8px", color: MUTED, fontSize: 10.5, lineHeight: 1.4 }}>{tpl.desc}</p>
+                        <p style={{ margin: "0 0 10px", color: "#6E685E", fontSize: 9.5 }}>{tpl.blocks.length} sections · {(BLOCK_DEFS[tpl.blocks[0]?.type]?.label) || ""}…</p>
+                        <button onClick={() => applyPageTemplate(tpl)}
+                          style={{ marginTop: "auto", width: "100%", padding: "8px", borderRadius: 8, border: "none", cursor: "pointer", background: G, color: "#080808", fontSize: 11.5, fontWeight: 700 }}>
+                          Utiliser ce modèle
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <style>{`
           @keyframes popoverIn { from { opacity: 0; transform: translateX(-4px) scale(0.97) } to { opacity: 1; transform: translateX(0) scale(1) } }
