@@ -25,6 +25,10 @@ const T = {
   navy:     { name: "Corporate Navy", bg: "#0A1628", surface: "#142240", primary: "#3B82F6", accent: "#60A5FA", text: "#EFF6FF", muted: "#7E93B8", fontDisplay: "Poppins", fontBody: "DM Sans", bgMode: "solid" } as PageTheme,
   slate:    { name: "Ardoise Pro",    bg: "#0B0F14", surface: "#141A22", primary: "#38BDF8", accent: "#39FF8F", text: "#F1F5F9", muted: "#8598AD", fontDisplay: "Poppins", fontBody: "DM Sans", bgMode: "solid" } as PageTheme,
   wood:     { name: "Atelier Bois",   bg: "#120C06", surface: "#1E140A", primary: "#D9A066", accent: "#39FF8F", text: "#FBF3E8", muted: "#A88C6E", fontDisplay: "Poppins", fontBody: "DM Sans", bgMode: "solid" } as PageTheme,
+  ink:      { name: "Encre Photo",    bg: "#0A0A0A", surface: "#141414", primary: "#E8E8E8", accent: "#C9A84C", text: "#FAFAFA", muted: "#8A8A8A", fontDisplay: "Cormorant Garamond", fontBody: "DM Sans", bgMode: "solid" } as PageTheme,
+  violet:   { name: "Créatif Violet", bg: "#0B0616", surface: "#170C28", primary: "#A78BFA", accent: "#39FF8F", text: "#F3EEFF", muted: "#9A8FB8", fontDisplay: "Poppins", fontBody: "DM Sans", bgMode: "solid" } as PageTheme,
+  coral:    { name: "Corail Créateur",bg: "#12070A", surface: "#200D12", primary: "#FB7185", accent: "#FBBF24", text: "#FFF1F2", muted: "#C08990", fontDisplay: "Poppins", fontBody: "DM Sans", bgMode: "solid" } as PageTheme,
+  forest:   { name: "Forêt Asso",     bg: "#04120B", surface: "#0A2016", primary: "#4ADE80", accent: "#FBBF24", text: "#ECFDF5", muted: "#7FA890", fontDisplay: "Poppins", fontBody: "DM Sans", bgMode: "solid" } as PageTheme,
 }
 
 // Petits helpers de contenu récurrents.
@@ -189,6 +193,153 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
       { type: "testimonials", content: { name1: "M. et Mme Blanc", text1: "Chantier propre, dans les temps, résultat parfait.", stars1: "5", name2: "Karim B.", text2: "Devis clair, équipe pro et à l'écoute.", stars2: "5" } },
       { type: "cta_button", content: { label: "Demander un devis gratuit", url: "#", style: "gold", icon: "📋", full_width: "yes" } },
       { type: "multi_contact", content: { title: "Nous joindre" } },
+    ],
+  },
+
+  // ── Freelance & Entreprise ───────────────────────────────────────────────────
+  {
+    key: "biz_freelance", group: "Freelance & Entreprise", label: "Freelance / Consultant", emoji: "💼",
+    desc: "Bio, expertises, services, tarifs, appel, avis",
+    theme: T.gold,
+    blocks: [
+      { type: "profile", content: { name: "Jean Dupont", tagline: "Développeur Full-Stack & Consultant", badge: "✅ Disponible" } },
+      { type: "bio", content: { text: "10 ans d'expérience. Je transforme vos idées en produits digitaux performants. Spécialisé React, Node.js et architecture cloud.", align: "left" } },
+      { type: "skills", content: { title: "Mes expertises", tags: "React, Next.js, Node.js, TypeScript, AWS, UX Design" } },
+      { type: "services_list", content: { title: "Mes services", s1_icon: "💻", s1_name: "Développement sur mesure", s1_desc: "Web & mobile performants", s2_icon: "🎨", s2_name: "Design & prototypage", s2_desc: "Figma, design system", s3_icon: "🚀", s3_name: "Conseil & architecture", s3_desc: "Audit, roadmap, stack" } },
+      { type: "pricing", content: { title: "Mes tarifs", title1: "Journée", price1: "650€", desc1: "TJM", title2: "Forfait site", price2: "3 500€", desc2: "Vitrine complet", title3: "Retainer", price3: "2 000€/m", desc3: "20h/mois" } },
+      { type: "testimonials", content: { name1: "Sarah M., CEO", text1: "MVP livré en 6 semaines. Code propre, communication parfaite.", stars1: "5", name2: "Thomas R., DSI", text2: "Vision claire et pragmatique. A su cadrer notre projet.", stars2: "5" } },
+      { type: "cta_button", content: { label: "Réserver un appel découverte", url: "https://calendly.com", style: "gold", icon: "📅", full_width: "yes" } },
+      { type: "social_links", content: social({ linkedin: "https://linkedin.com", github: "https://github.com" }) },
+    ],
+  },
+  {
+    key: "biz_agence", group: "Freelance & Entreprise", label: "Agence créative", emoji: "🎨",
+    desc: "Expertises, réalisations, offres, contact projet",
+    theme: T.violet,
+    blocks: [
+      { type: "profile", content: { name: "Studio PIXEL", tagline: "Agence créative · Web · Brand · Motion", badge: "🚀 50+ projets" } },
+      { type: "bio", content: { text: "Nous créons des expériences digitales mémorables, de la stratégie de marque au développement.", align: "center" } },
+      { type: "portfolio_work", content: { title: "Nos réalisations", w1_title: "Refonte e-commerce", w1_desc: "+120% de conversions", w2_title: "Identité de marque", w2_desc: "Startup fintech", w3_title: "App mobile", w3_desc: "50k téléchargements" } },
+      { type: "services_list", content: { title: "Nos expertises", s1_icon: "🎨", s1_name: "Branding & identité", s1_desc: "Logo, charte, guidelines", s2_icon: "💻", s2_name: "Développement web", s2_desc: "Sites, apps, e-commerce", s3_icon: "📱", s3_name: "Social & contenu", s3_desc: "Stratégie, création" } },
+      { type: "logo_wall", content: { title: "Ils nous font confiance" } },
+      { type: "contact_form", content: { title: "Parlons de votre projet", button_label: "Envoyer" } },
+      { type: "social_links", content: social({ linkedin: "https://linkedin.com", behance: "https://behance.net" }) },
+    ],
+  },
+  {
+    key: "biz_startup", group: "Freelance & Entreprise", label: "Startup / SaaS", emoji: "🚀",
+    desc: "Pitch, fonctionnalités, preuve, tarifs, essai gratuit",
+    theme: T.slate,
+    blocks: [
+      { type: "profile", content: { name: "TechVision AI", tagline: "Transformez vos données en décisions", badge: "🚀 Beta gratuite" } },
+      { type: "bio", content: { text: "TechVision utilise le machine learning pour générer des insights actionnables en temps réel. +500 entreprises nous font confiance.", align: "center" } },
+      { type: "stats_block", content: { s1_icon: "🏢", s1_value: "500+", s1_label: "Entreprises", s2_icon: "⚡", s2_value: "10x", s2_label: "Plus rapide", s3_icon: "⭐", s3_value: "4,8/5", s3_label: "Satisfaction" } },
+      { type: "services_list", content: { title: "Fonctionnalités clés", s1_icon: "🤖", s1_name: "Analyse prédictive", s1_desc: "Anticipez les tendances", s2_icon: "📊", s2_name: "Tableaux de bord IA", s2_desc: "Temps réel", s3_icon: "🔗", s3_name: "50+ intégrations", s3_desc: "Salesforce, Notion, HubSpot" } },
+      { type: "pricing", content: { title: "Tarifs simples", title1: "Starter", price1: "0€", desc1: "Pour tester", title2: "Growth", price2: "49€/m", desc2: "Pour les équipes", title3: "Enterprise", price3: "Sur devis", desc3: "Grands comptes" } },
+      { type: "cta_button", content: { label: "Commencer gratuitement", url: "#", style: "gold", icon: "🚀", full_width: "yes" } },
+      { type: "social_links", content: social({ linkedin: "https://linkedin.com", twitter: "https://twitter.com" }) },
+    ],
+  },
+
+  // ── Créatif & Média ──────────────────────────────────────────────────────────
+  {
+    key: "creatif_photo", group: "Créatif & Média", label: "Photographe", emoji: "📷",
+    desc: "Galerie, prestations, tarifs, réservation",
+    theme: T.ink,
+    blocks: [
+      { type: "profile", content: { name: "Studio Lumière", tagline: "Photographe portrait & mariage", badge: "📷 Book 2026 ouvert" } },
+      { type: "gallery", content: { title: "Portfolio" } },
+      { type: "services_pricing", content: { title: "Prestations", s1_name: "Séance portrait (1h)", s1_price: "180€", s2_name: "Reportage mariage", s2_price: "à partir de 1 400€", s3_name: "Shooting produit", s3_price: "sur devis" } },
+      { type: "process_steps", content: { title: "Comment ça se passe", s1_icon: "💬", s1_title: "Échange", s1_desc: "On cadre votre projet", s2_icon: "📸", s2_title: "Séance", s2_desc: "En studio ou extérieur", s3_icon: "🖼️", s3_title: "Retouche & livraison", s3_desc: "Galerie privée HD" } },
+      { type: "testimonials", content: { name1: "Julie & Marc", text1: "Des photos de mariage sublimes, un vrai talent !", stars1: "5", name2: "Léa P.", text2: "Séance super agréable, résultats magnifiques.", stars2: "5" } },
+      { type: "cta_button", content: { label: "Réserver une séance", url: "#", style: "gold", icon: "📅", full_width: "yes" } },
+      { type: "social_links", content: social() },
+    ],
+  },
+  {
+    key: "creatif_artiste", group: "Créatif & Média", label: "Artiste / Musicien", emoji: "🎤",
+    desc: "Écoute, plateformes, concerts, boutique, réseaux",
+    theme: T.violet,
+    blocks: [
+      { type: "profile", content: { name: "NOVA", tagline: "Artiste électro-pop · Paris", badge: "🔥 Nouvel EP" } },
+      { type: "spotify_embed", content: { title: "Mon dernier EP", url: "https://open.spotify.com" } },
+      { type: "music_links", content: { artist_name: "NOVA", spotify: "https://open.spotify.com", apple_music: "https://music.apple.com", deezer: "https://deezer.com" } },
+      { type: "concerts", content: { title: "Tournée 2026" } },
+      { type: "merch", content: { title: "Ma boutique" } },
+      { type: "cta_button", content: { label: "Me suivre sur Instagram", url: "https://instagram.com", style: "neon", icon: "📸", full_width: "yes" } },
+      { type: "social_links", content: social({ tiktok: "https://tiktok.com", youtube: "https://youtube.com", spotify: "https://open.spotify.com" }) },
+    ],
+  },
+  {
+    key: "creatif_createur", group: "Créatif & Média", label: "Créateur de contenu", emoji: "✨",
+    desc: "Réseaux, code promo, collab, media kit",
+    theme: T.coral,
+    blocks: [
+      { type: "profile", content: { name: "Alex Créa", tagline: "Créateur lifestyle & tech", badge: "✨ 500K abonnés" } },
+      { type: "bio", content: { text: "Je crée du contenu autour du lifestyle, de la tech et de la productivité. Rejoins ma communauté !", align: "center" } },
+      { type: "social_links", content: social({ tiktok: "https://tiktok.com", youtube: "https://youtube.com", twitter: "https://twitter.com" }) },
+      { type: "promo_banner", content: { emoji: "🎁", text: "Mon code promo -15%", subtext: "Code ALEX15 chez mes partenaires", cta_label: "En profiter", cta_url: "#" } },
+      { type: "cta_button", content: { label: "Télécharger mon media kit", url: "#", style: "neon", icon: "📋", full_width: "yes" } },
+      { type: "cta_button", content: { label: "Proposer une collaboration", url: "mailto:contact@alex.com", style: "gold", icon: "💌", full_width: "yes" } },
+    ],
+  },
+
+  // ── Événementiel ─────────────────────────────────────────────────────────────
+  {
+    key: "event_soiree", group: "Événementiel", label: "Soirée / Événement", emoji: "🎉",
+    desc: "Compte à rebours, infos, programme, billetterie",
+    theme: T.neon,
+    blocks: [
+      { type: "profile", content: { name: "GALA NIGHT 2026", tagline: "La soirée de l'année", badge: "🎟️ Dernières places" } },
+      { type: "countdown", content: { title: "La soirée commence dans", target_date: "2026-12-31T21:00", subtitle: "Soyez prêts !" } },
+      { type: "event_info", content: { name: "GALA NIGHT 2026", date: "31 décembre 2026", time: "21h - 06h", location: "Palais Brongniart, Paris 2e", price: "à partir de 80€" } },
+      { type: "event_program", content: { title: "Le programme" } },
+      { type: "cta_button", content: { label: "Réserver mes billets", url: "#", style: "gold", icon: "🎟️", full_width: "yes" } },
+      { type: "google_maps_embed", content: { label: "Palais Brongniart", address: "28 place de la Bourse, 75002 Paris", zoom: "16" } },
+      { type: "social_links", content: social({ facebook: "https://facebook.com" }) },
+    ],
+  },
+  {
+    key: "event_mariage", group: "Événementiel", label: "Mariage", emoji: "💍",
+    desc: "Le jour J, programme, RSVP, plan, liste",
+    theme: T.rose,
+    blocks: [
+      { type: "profile", content: { name: "Julie & Marc", tagline: "Se marient le 12 juin 2026", badge: "💍 Save the date" } },
+      { type: "countdown", content: { title: "Jour J dans", target_date: "2026-06-12T15:00", subtitle: "On a hâte de vous voir !" } },
+      { type: "timeline", content: { title: "Le programme", layout: "Verticale", e1_icon: "⛪", e1_date: "15h", e1_title: "Cérémonie", e2_icon: "🥂", e2_date: "17h", e2_title: "Cocktail", e3_icon: "🍽️", e3_date: "20h", e3_title: "Dîner", e4_icon: "🎉", e4_date: "23h", e4_title: "Soirée dansante" } },
+      { type: "rsvp", content: { title: "Confirmez votre présence" } },
+      { type: "google_maps_embed", content: { label: "Château de la Roseraie", address: "Domaine de la Roseraie, 78000 Versailles", zoom: "14" } },
+      { type: "cta_button", content: { label: "Voir la liste de mariage", url: "#", style: "gold", icon: "🎁", full_width: "yes" } },
+    ],
+  },
+
+  // ── Commerce & Association ───────────────────────────────────────────────────
+  {
+    key: "shop_boutique", group: "Commerce", label: "Boutique en ligne", emoji: "🛍️",
+    desc: "Promo, produits phares, avis, boutique",
+    theme: T.gold,
+    blocks: [
+      { type: "profile", content: { name: "Maison Lumière", tagline: "Décoration artisanale & objets de créateurs", badge: "🚚 Livraison offerte dès 60€" } },
+      { type: "promo_banner", content: { emoji: "🎉", text: "Soldes jusqu'à -40%", subtext: "Offre valable jusqu'au 31 juillet", cta_label: "Voir les offres", cta_url: "#" } },
+      { type: "popular_products", content: { title: "Nos best-sellers", p1_name: "Vase céramique", p1_price: "45€", p1_sales: "★ le plus vendu", p2_name: "Bougie parfumée", p2_price: "28€", p3_name: "Plaid laine", p3_price: "65€" } },
+      { type: "product", content: { name: "Vase céramique artisanal", price: "45€", old_price: "75€", description: "Fait main en France, collection printemps.", cta_label: "Commander", cta_url: "#" } },
+      { type: "cta_button", content: { label: "Voir toute la boutique", url: "#", style: "gold", icon: "🛍️", full_width: "yes" } },
+      { type: "testimonials", content: { name1: "Claire B.", text1: "Produits magnifiques, emballage soigné. Je recommande !", stars1: "5", name2: "Antoine L.", text2: "Livraison rapide, qualité au rendez-vous.", stars2: "5" } },
+      { type: "social_links", content: social({ pinterest: "https://pinterest.com" }) },
+    ],
+  },
+  {
+    key: "asso_ong", group: "Association", label: "Association / ONG", emoji: "🤝",
+    desc: "Mission, valeurs, actions, équipe, don",
+    theme: T.forest,
+    blocks: [
+      { type: "profile", content: { name: "Les Mains Solidaires", tagline: "Ensemble pour un impact durable", badge: "🌍 Depuis 2015" } },
+      { type: "bio", content: { text: "Notre association agit pour l'accès à l'éducation et à l'eau potable. Chaque don compte.", align: "center" } },
+      { type: "stats_block", content: { s1_icon: "🌍", s1_value: "12", s1_label: "Pays", s2_icon: "👥", s2_value: "8 000+", s2_label: "Bénéficiaires", s3_icon: "🤝", s3_value: "150", s3_label: "Bénévoles" } },
+      { type: "values", content: { title: "Nos valeurs", v1_icon: "🤝", v1_label: "Solidarité", v2_icon: "🔍", v2_label: "Transparence", v3_icon: "🌱", v3_label: "Durabilité" } },
+      { type: "timeline", content: { title: "Notre histoire", e1_date: "2015", e1_title: "Création", e2_date: "2019", e2_title: "1er programme international", e3_date: "2024", e3_title: "8 000 bénéficiaires" } },
+      { type: "cta_button", content: { label: "Faire un don", url: "#", style: "gold", icon: "❤️", full_width: "yes" } },
+      { type: "social_links", content: social({ facebook: "https://facebook.com", linkedin: "https://linkedin.com" }) },
     ],
   },
 ]
