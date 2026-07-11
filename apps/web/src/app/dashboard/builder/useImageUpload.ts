@@ -65,5 +65,22 @@ export function useImageUpload() {
     }
   }
 
-  return { uploadImage, uploading }
+  // Liste les images déjà uploadées par l'utilisateur (bibliothèque réutilisable, sans ré-upload).
+  async function listAssets(): Promise<{ name: string; url: string }[]> {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return []
+    const { data, error } = await supabase.storage
+      .from("page-assets")
+      .list(user.id, { limit: 200, sortBy: { column: "created_at", order: "desc" } })
+    if (error || !data) return []
+    return data
+      .filter(f => f.name && /\.(webp|jpe?g|png|gif|svg|avif)$/i.test(f.name))
+      .map(f => {
+        const { data: { publicUrl } } = supabase.storage.from("page-assets").getPublicUrl(`${user.id}/${f.name}`)
+        return { name: f.name, url: publicUrl }
+      })
+  }
+
+  return { uploadImage, uploading, listAssets }
 }
