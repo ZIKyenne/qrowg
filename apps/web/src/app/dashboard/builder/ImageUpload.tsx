@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { Upload, X, Image as ImageIcon, FolderOpen } from "lucide-react"
+import { Upload, X, Image as ImageIcon, FolderOpen, Trash2, Plus } from "lucide-react"
 import { useImageUpload } from "./useImageUpload"
 
 type Props = {
@@ -12,16 +12,36 @@ type Props = {
 }
 
 export default function ImageUpload({ value, onChange, label, hint }: Props) {
-  const { uploadImage, uploading, listAssets } = useImageUpload()
+  const { uploadImage, uploading, listAssets, deleteAsset } = useImageUpload()
   const inputRef = useRef<HTMLInputElement>(null)
+  const libInputRef = useRef<HTMLInputElement>(null)
   const [dragOver, setDragOver] = useState(false)
   const [error, setError] = useState("")
   const [libOpen, setLibOpen] = useState(false)
   const [libAssets, setLibAssets] = useState<{ name: string; url: string }[] | null>(null)
+  const [libBusy, setLibBusy] = useState(false)
 
   async function openLibrary() {
     setLibOpen(true)
     if (libAssets === null) setLibAssets(await listAssets())
+  }
+  async function refreshLibrary() { setLibAssets(await listAssets()) }
+
+  // Upload depuis la modale : ajoute à la bibliothèque puis rafraîchit (l'utilisateur clique pour choisir).
+  async function handleLibFile(file: File) {
+    if (!file.type.startsWith("image/")) { setError("Fichier invalide — image uniquement"); return }
+    if (file.size > 5 * 1024 * 1024) { setError("Fichier trop lourd — max 5MB"); return }
+    setLibBusy(true)
+    const url = await uploadImage(file, "blocks")
+    if (url) await refreshLibrary()
+    setLibBusy(false)
+  }
+  async function removeAsset(a: { name: string; url: string }) {
+    if (!window.confirm("Supprimer cette image de votre bibliothèque ?\n\nSi elle est utilisée sur une page publiée, elle n'y apparaîtra plus.")) return
+    setLibBusy(true)
+    const ok = await deleteAsset(a.name)
+    if (ok) { if (value === a.url) onChange(""); await refreshLibrary() }
+    setLibBusy(false)
   }
 
   async function handleFile(file: File) {
@@ -100,26 +120,40 @@ export default function ImageUpload({ value, onChange, label, hint }: Props) {
             style={{ width: "100%", maxWidth: 620, maxHeight: "80vh", background: "#141414", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column" }}>
             <div style={{ padding: "14px 18px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 9 }}>
               <FolderOpen size={16} color={G} />
-              <p style={{ margin: 0, color: "#F5F0E8", fontSize: 14, fontWeight: 700, flex: 1 }}>Ma bibliothèque d&apos;images</p>
+              <p style={{ margin: 0, color: "#F5F0E8", fontSize: 14, fontWeight: 700, flex: 1 }}>Ma bibliothèque{libAssets && libAssets.length > 0 ? <span style={{ color: MUTED, fontWeight: 400 }}> · {libAssets.length}</span> : ""}</p>
+              {libBusy && <div style={{ width: 15, height: 15, border: "2px solid rgba(201,168,76,0.25)", borderTopColor: G, borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />}
               <button onClick={() => setLibOpen(false)} aria-label="Fermer" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", width: 28, height: 28 }}><X size={14} /></button>
             </div>
             <div style={{ padding: 14, overflowY: "auto" }}>
               {libAssets === null
                 ? <p style={{ color: MUTED, fontSize: 12, textAlign: "center", padding: "30px 0" }}>Chargement…</p>
-                : libAssets.length === 0
-                ? <div style={{ textAlign: "center", padding: "34px 0" }}>
-                    <p style={{ fontSize: 26, margin: "0 0 6px" }}>🖼️</p>
-                    <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>Aucune image pour l&apos;instant. Uploadez-en une, elle apparaîtra ici.</p>
-                  </div>
                 : <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(96px, 1fr))", gap: 8 }}>
+                    {/* Tuile d'ajout : upload direct dans la bibliothèque */}
+                    <button onClick={() => libInputRef.current?.click()} title="Ajouter une image"
+                      style={{ aspectRatio: "1", border: "2px dashed rgba(201,168,76,0.3)", borderRadius: 9, background: "rgba(201,168,76,0.04)", color: G, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, fontSize: 10, fontWeight: 600 }}>
+                      <Plus size={18} /> Ajouter
+                    </button>
                     {libAssets.map(a => (
-                      <button key={a.url} onClick={() => { onChange(a.url); setLibOpen(false) }} title={a.name}
-                        style={{ padding: 0, border: value === a.url ? `2px solid ${G}` : "1px solid rgba(255,255,255,0.1)", borderRadius: 9, overflow: "hidden", cursor: "pointer", background: "#0A0A0A", aspectRatio: "1" }}>
-                        <img src={a.url} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                      </button>
+                      <div key={a.url} style={{ position: "relative", aspectRatio: "1" }}
+                        onMouseEnter={e => { const b = e.currentTarget.querySelector(".del") as HTMLElement; if (b) b.style.opacity = "1" }}
+                        onMouseLeave={e => { const b = e.currentTarget.querySelector(".del") as HTMLElement; if (b) b.style.opacity = "0" }}>
+                        <button onClick={() => { onChange(a.url); setLibOpen(false) }} title={a.name}
+                          style={{ width: "100%", height: "100%", padding: 0, border: value === a.url ? `2px solid ${G}` : "1px solid rgba(255,255,255,0.1)", borderRadius: 9, overflow: "hidden", cursor: "pointer", background: "#0A0A0A" }}>
+                          <img src={a.url} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                        </button>
+                        <button className="del" onClick={e => { e.stopPropagation(); removeAsset(a) }} aria-label="Supprimer"
+                          style={{ position: "absolute", top: 4, right: 4, opacity: 0, transition: "opacity .15s", background: "rgba(8,8,8,0.82)", border: "none", borderRadius: 6, width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#FF6B6B" }}>
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
                     ))}
+                    {libAssets.length === 0 && (
+                      <p style={{ gridColumn: "1 / -1", color: MUTED, fontSize: 12, textAlign: "center", padding: "18px 0 4px", margin: 0 }}>Aucune image encore — utilisez « Ajouter » ci-dessus.</p>
+                    )}
                   </div>}
             </div>
+            <input ref={libInputRef} type="file" accept="image/*" style={{ display: "none" }}
+              onChange={e => { const f = e.target.files?.[0]; if (f) handleLibFile(f); e.target.value = "" }} />
           </div>
         </div>
       )}

@@ -82,5 +82,14 @@ export function useImageUpload() {
       })
   }
 
-  return { uploadImage, uploading, listAssets }
+  // Supprime une image de la bibliothèque (storage). `name` = nom de fichier seul (sans le dossier userId).
+  async function deleteAsset(name: string): Promise<boolean> {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return false
+    const { error } = await supabase.storage.from("page-assets").remove([`${user.id}/${name}`])
+    return !error
+  }
+
+  return { uploadImage, uploading, listAssets, deleteAsset }
 }
