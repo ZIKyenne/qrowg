@@ -25,7 +25,7 @@ import {
   RotateCw, AlignCenterHorizontal, HelpCircle, MoreHorizontal, ShieldCheck,
 } from "lucide-react"
 import PrintCenterPanel from "./PrintCenterPanel"
-import { printPreflight, hexContrastRatio, type PreflightMetrics, type PreflightResult } from "./printPreflight"
+import { printPreflight, hexContrastRatio, quietZonePx, edgeMarginPx, type PreflightMetrics, type PreflightResult, type Rect } from "./printPreflight"
 
 // ---- Constantes design (Clair & aere, style Canva) -------------------------
 const G       = "#C9A84C"   // accent (or de marque) : etats actifs, boutons primaires
@@ -3130,22 +3130,33 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const fgHex = /^#[0-9a-fA-F]{6}$/.test(qrFg) ? qrFg : "#0A0A0A"
     let contrastBg = /^#[0-9a-fA-F]{6}$/.test(bgColor) ? bgColor : "#FFFFFF"
     let qrSizeMm: number | null = null
+    let quietZoneMm: number | null = null
+    let edgeMarginMm: number | null = null
     if (fc) {
       const objs = fc.getObjects()
       const qr = objs.find((o: any) => o.isQR)
       const card = objs.find((o: any) => o.isQrCard)
       const cw = fc.getWidth() || 1
+      const ch = fc.getHeight() || cw
       // Le QR est souvent posé sur une carte blanche : le vrai contraste se joue QR ↔ carte.
       const cf = (card as any)?.fill
       if (typeof cf === "string" && /^#[0-9a-fA-F]{6}$/.test(cf)) contrastBg = cf
       if (qr && widthMm > 0) {
         const qpx = ((qr as any).width || 0) * ((qr as any).scaleX || 1)  // espace-canvas (indépendant du zoom d'édition)
         if (qpx > 0) qrSizeMm = (qpx / cw) * widthMm
+        // Zone silencieuse & marges de sécurité (géométrie pure, testée). Best-effort : na si mesure impossible.
+        try {
+          const rectOf = (o: any): Rect => { const b = o.getBoundingRect(true, true); return { left: b.left, top: b.top, width: b.width, height: b.height } }
+          const qb = rectOf(qr)
+          const others = objs.filter((o: any) => o !== qr && o !== card).map(rectOf)
+          quietZoneMm = (quietZonePx(qb, others, cw, ch) / cw) * widthMm
+          edgeMarginMm = (edgeMarginPx(objs.map(rectOf), cw, ch) / cw) * widthMm
+        } catch { /* mesure indisponible -> na */ }
       }
     }
     const metrics: PreflightMetrics = {
       qrSizeMm, contrastRatio: hexContrastRatio(fgHex, contrastBg),
-      quietZoneMm: null, logoPct: 0, dpi: expDpi, edgeMarginMm: null, isScreen,
+      quietZoneMm, logoPct: 0, dpi: expDpi, edgeMarginMm, isScreen,
     }
     setPreflight(printPreflight(metrics))
   }

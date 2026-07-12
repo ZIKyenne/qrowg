@@ -52,6 +52,57 @@ export function hexContrastRatio(a: string, b: string): number | null {
   return Math.round(((hi + 0.05) / (lo + 0.05)) * 100) / 100
 }
 
+// ── Géométrie (pure) pour la zone silencieuse & les marges ────────────────────
+export type Rect = { left: number; top: number; width: number; height: number }
+
+// Espacement libre entre deux rectangles sur chaque axe (0 s'ils se chevauchent sur cet axe).
+function axisGaps(a: Rect, b: Rect): { gx: number; gy: number } {
+  const gx = Math.max(b.left - (a.left + a.width), a.left - (b.left + b.width), 0)
+  const gy = Math.max(b.top - (a.top + a.height), a.top - (b.top + b.height), 0)
+  return { gx, gy }
+}
+
+// Dégagement latéral de `b` autour de `a` : distance libre là où b longe un côté de a.
+// Se touchent (chevauchent sur X ET Y) -> 0 ; b au-dessus/dessous (chevauche en X) -> gy ;
+// b à gauche/droite (chevauche en Y) -> gx ; b en diagonale (aucun chevauchement) -> null.
+export function sideClearance(a: Rect, b: Rect): number | null {
+  const { gx, gy } = axisGaps(a, b)
+  if (gx === 0 && gy === 0) return 0
+  if (gx === 0) return gy
+  if (gy === 0) return gx
+  return null
+}
+
+// Un rectangle couvre-t-il quasi tout le support (fond plein cadre à ignorer) ?
+function isFullBleed(o: Rect, w: number, h: number): boolean {
+  return o.width >= w * 0.92 && o.height >= h * 0.92
+}
+
+// Zone silencieuse autour du QR (px) : plus petit dégagement latéral vers un autre élément,
+// borné par la distance du QR aux bords. `others` = tous les objets SAUF le QR et sa carte.
+export function quietZonePx(qr: Rect, others: Rect[], canvasW: number, canvasH: number): number {
+  const edge = Math.min(qr.left, qr.top, canvasW - (qr.left + qr.width), canvasH - (qr.top + qr.height))
+  let min = Math.max(0, edge)
+  for (const o of others) {
+    if (isFullBleed(o, canvasW, canvasH)) continue   // un fond plein cadre n'encombre pas le QR
+    const c = sideClearance(qr, o)
+    if (c != null && c < min) min = c
+  }
+  return min
+}
+
+// Marge de sécurité (px) : plus petite distance d'un élément « contenu » à un bord du canevas.
+// Les fonds plein cadre sont ignorés (ils touchent volontairement les bords).
+export function edgeMarginPx(objs: Rect[], canvasW: number, canvasH: number): number {
+  let min = Infinity
+  for (const o of objs) {
+    if (isFullBleed(o, canvasW, canvasH)) continue
+    const d = Math.min(o.left, o.top, canvasW - (o.left + o.width), canvasH - (o.top + o.height))
+    if (d < min) min = d
+  }
+  return min === Infinity ? canvasW : min   // aucun contenu -> pas de risque de rognage
+}
+
 // Distance de lecture ≈ 10 × la taille du QR (règle 10:1 largement admise).
 export function scanDistanceM(qrSizeMm?: number | null): number | null {
   if (typeof qrSizeMm !== "number" || !(qrSizeMm > 0)) return null

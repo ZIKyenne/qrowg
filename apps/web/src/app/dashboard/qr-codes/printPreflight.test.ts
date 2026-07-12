@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest"
-import { printPreflight, scanDistanceM, hexContrastRatio, type PreflightMetrics } from "./printPreflight"
+import { printPreflight, scanDistanceM, hexContrastRatio, sideClearance, quietZonePx, edgeMarginPx, type PreflightMetrics, type Rect } from "./printPreflight"
+
+const r = (left: number, top: number, width: number, height: number): Rect => ({ left, top, width, height })
 
 const perfect: PreflightMetrics = {
   qrSizeMm: 40, contrastRatio: 12, quietZoneMm: 6, logoPct: 0, dpi: 300, edgeMarginMm: 5,
@@ -37,6 +39,47 @@ describe("hexContrastRatio", () => {
   it("QR foncé sur fond clair = fort contraste (>7)", () => {
     expect(hexContrastRatio("#0A0A0A", "#FFFFFF")!).toBeGreaterThan(7)
     expect(hexContrastRatio("#1D4ED8", "#FFF8F0")!).toBeGreaterThan(3)
+  })
+})
+
+describe("géométrie — sideClearance", () => {
+  const qr = r(100, 100, 100, 100) // QR de 100×100 en (100,100)
+  it("élément au-dessus (chevauche en X) -> dégagement vertical", () => {
+    expect(sideClearance(qr, r(120, 40, 40, 30))).toBe(30) // bas de b à y=70, haut de qr à 100 -> 30
+  })
+  it("élément à droite (chevauche en Y) -> dégagement horizontal", () => {
+    expect(sideClearance(qr, r(230, 120, 20, 20))).toBe(30) // gauche de b à 230, droite de qr à 200 -> 30
+  })
+  it("élément qui se superpose au QR -> 0", () => {
+    expect(sideClearance(qr, r(150, 150, 40, 40))).toBe(0)
+  })
+  it("élément en diagonale (aucun chevauchement d'axe) -> null (n'encombre aucun côté)", () => {
+    expect(sideClearance(qr, r(230, 20, 20, 20))).toBeNull()
+  })
+})
+
+describe("géométrie — quietZonePx", () => {
+  const qr = r(100, 100, 100, 100)
+  it("rien autour -> borné par la distance aux bords", () => {
+    expect(quietZonePx(qr, [], 400, 400)).toBe(100) // min(100,100, 400-200, 400-200)
+  })
+  it("un texte collé au-dessus réduit la zone silencieuse", () => {
+    expect(quietZonePx(qr, [r(110, 88, 60, 6)], 400, 400)).toBe(6) // 100 - 94
+  })
+  it("ignore un fond plein cadre (n'encombre pas le QR)", () => {
+    expect(quietZonePx(qr, [r(0, 0, 400, 400)], 400, 400)).toBe(100)
+  })
+})
+
+describe("géométrie — edgeMarginPx", () => {
+  it("plus petite distance d'un élément au bord", () => {
+    expect(edgeMarginPx([r(20, 50, 30, 30), r(200, 200, 20, 20)], 400, 400)).toBe(20)
+  })
+  it("élément qui déborde -> marge négative (rognage)", () => {
+    expect(edgeMarginPx([r(-5, 100, 40, 40)], 400, 400)).toBe(-5)
+  })
+  it("ignore un fond plein cadre ; aucun contenu -> pas de risque", () => {
+    expect(edgeMarginPx([r(0, 0, 400, 400)], 400, 400)).toBe(400)
   })
 })
 
