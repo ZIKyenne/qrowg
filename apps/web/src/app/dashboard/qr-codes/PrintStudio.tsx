@@ -1063,6 +1063,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       cornerStyle: "circle", cornerSize: 11, transparentCorners: false,
       borderScaleFactor: 1.4, padding: 3,
     })
+    ;(fabric.Object.prototype as any).touchCornerSize = 40  // poignées plus grandes au doigt (non typé dans cette version)
 
     // Guides de centrage (dores), exclus de l'export
     const guideOpts = {
@@ -2309,6 +2310,27 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     fc.requestRenderAll()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showSafe, format, loading])
+
+  // Pincer pour zoomer (2 doigts) — le réflexe d'un éditeur mobile. Au niveau du conteneur de scroll
+  // (DOM natif) : n'altère pas Fabric ; Fabric ne déplace pas d'objet avec 2 doigts, donc pas de conflit.
+  useEffect(() => {
+    const sc = scrollRef.current; if (!sc) return
+    let startDist = 0, startZoom = 1
+    const dist = (t: TouchList) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY)
+    const onStart = (e: TouchEvent) => { if (e.touches.length === 2) { startDist = dist(e.touches); startZoom = fcRef.current?.getZoom() || 1 } }
+    const onMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && startDist > 0) {
+        e.preventDefault()
+        applyZoom(startZoom * (dist(e.touches) / startDist))
+      }
+    }
+    const onEnd = (e: TouchEvent) => { if (e.touches.length < 2) startDist = 0 }
+    sc.addEventListener("touchstart", onStart, { passive: true })
+    sc.addEventListener("touchmove", onMove, { passive: false })
+    sc.addEventListener("touchend", onEnd)
+    return () => { sc.removeEventListener("touchstart", onStart); sc.removeEventListener("touchmove", onMove); sc.removeEventListener("touchend", onEnd) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   // Execute fn() avec le canvas ramene a zoom 1 (pour un export propre), puis restaure.
   const withBaseZoom = <T,>(fc: fabric.Canvas, fn: (base: { w: number; h: number }) => T): T => {
     const z = fc.getZoom() || 1
@@ -3412,15 +3434,48 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       {/* Menu ⋯ (paysage mobile) : actions secondaires en bottom sheet */}
       {moreOpen && (
         <div onClick={() => setMoreOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 70, background: "rgba(0,0,0,0.42)", backdropFilter: "blur(2px)", display: "flex", alignItems: "flex-end" }}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", background: "#FFFFFF", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: "10px 14px calc(16px + env(safe-area-inset-bottom))", animation: "psSheetUp .26s cubic-bezier(.2,.8,.2,1)", boxShadow: "0 -14px 44px rgba(0,0,0,0.28)" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxHeight: "84vh", overflowY: "auto", background: "#FFFFFF", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: "10px 14px calc(16px + env(safe-area-inset-bottom))", animation: "psSheetUp .26s cubic-bezier(.2,.8,.2,1)", boxShadow: "0 -14px 44px rgba(0,0,0,0.28)" }}>
             <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(0,0,0,0.15)", margin: "0 auto 12px" }} />
+
+            {/* Format (masqué ailleurs en mobile -> seul point d'entrée au doigt) */}
+            <p className="ps-sec-label" style={{ marginTop: 0 }}>Format</p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
+              {(Object.keys(FORMATS) as FormatId[]).map(f => (
+                <button key={f} type="button" onClick={() => applyFormat(f)}
+                  style={{ padding: "9px 13px", borderRadius: 9, border: `1px solid ${format === f ? G : "rgba(0,0,0,0.12)"}`, background: format === f ? "rgba(201,168,76,0.15)" : "#fff", color: format === f ? G : INK, fontSize: 13, fontWeight: 700, cursor: "pointer", minHeight: 40 }}>
+                  {FORMATS[f].label}
+                </button>
+              ))}
+            </div>
+
+            {/* Qualité d'export (DPI + fond perdu) — sinon inaccessible au doigt */}
+            <p className="ps-sec-label">Qualité d'export</p>
+            <div style={{ display: "flex", gap: 6, marginBottom: 4 }}>
+              {[72, 150, 300].map(d => (
+                <button key={d} type="button" onClick={() => setExpDpi(d)}
+                  style={{ flex: 1, padding: "10px 0", borderRadius: 9, border: `1px solid ${expDpi === d ? G : "rgba(0,0,0,0.12)"}`, background: expDpi === d ? "rgba(201,168,76,0.15)" : "#fff", color: expDpi === d ? G : INK, fontSize: 13, fontWeight: 700, cursor: "pointer", minHeight: 42 }}>
+                  {d} DPI
+                </button>
+              ))}
+            </div>
+            <label style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 2px 14px", color: INK, fontSize: 13.5, cursor: "pointer" }}>
+              <input type="checkbox" checked={expMarks} onChange={e => setExpMarks(e.target.checked)} style={{ accentColor: G, width: 18, height: 18, flexShrink: 0 }} />
+              Traits de coupe + fond perdu <span style={{ color: MUTED }}>(PDF)</span>
+            </label>
+
+            {/* Actions */}
+            <p className="ps-sec-label">Actions</p>
             {([
+              { icon: <ShieldCheck size={18} />, label: "Contrôle qualité", on: openPreflight, disabled: false },
+              { icon: <Download size={18} />, label: "Exporter en PNG", on: () => exportImage("png"), disabled: false },
+              { icon: <Download size={18} />, label: "Exporter en JPG", on: () => exportImage("jpeg"), disabled: false },
+              { icon: <Printer size={18} />, label: isPro ? "Exporter en PDF" : "Exporter en PDF 🔒", on: exportPdfPro, disabled: false },
+              { icon: <Eye size={18} />, label: "Aperçu en situation", on: openMock, disabled: false },
+              { icon: <Square size={18} />, label: showSafe ? "Masquer les marges" : "Marges de sécurité", on: () => setShowSafe(v => !v), disabled: false },
+              { icon: <Sparkles size={18} />, label: "Régénérer une proposition", on: regenerate, disabled: !lastPool },
               { icon: <Undo2 size={18} />, label: "Annuler", on: undo, disabled: !canUndo },
               { icon: <Redo2 size={18} />, label: "Rétablir", on: redo, disabled: !canRedo },
               { icon: <Save size={18} />, label: saved ? "Enregistré ✓" : "Enregistrer", on: () => save(), disabled: false },
-              { icon: <Eye size={18} />, label: "Aperçu en situation", on: openMock, disabled: false },
-              { icon: <Download size={18} />, label: "Exporter en PNG", on: () => exportImage("png"), disabled: false },
-              { icon: <Printer size={18} />, label: isPro ? "Exporter en PDF" : "Exporter en PDF 🔒", on: exportPdfPro, disabled: false },
               { icon: <HelpCircle size={18} />, label: "Aide & raccourcis", on: () => setShowHelp(true), disabled: false },
             ] as { icon: React.ReactNode; label: string; on: () => void; disabled: boolean }[]).map((a, i) => (
               <button key={i} type="button" disabled={a.disabled} onClick={() => { a.on(); setMoreOpen(false) }}
