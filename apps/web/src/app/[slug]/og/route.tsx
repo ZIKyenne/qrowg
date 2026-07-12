@@ -74,9 +74,10 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
     const theme = (page as any).theme || {}
 
     const primary = theme.primary || "#C9A84C"
-    const bg = theme.background || "#080808"
+    const bg = theme.bg || "#080808"                 // couleur de fond RÉELLE (champ = bg, pas "background")
+    const bgFill = theme.bgGradient || bg            // parité page publique : dégradé si défini, sinon couleur unie
     const text = theme.text || "#F5F0E8"
-    const muted = "#8A8478"
+    const muted = theme.muted || "#8A8478"   // couleur secondaire du thème (lisible aussi sur fond clair)
 
     const name = (pc.name || (page as any).seo_title || (page as any).title || prof.full_name || "QRfolio").toString().slice(0, 42)
     const tagline = (pc.tagline || (page as any).seo_description || "").toString().slice(0, 90)
@@ -101,7 +102,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
 
     return new ImageResponse(
       (
-        <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", background: bg, position: "relative", padding: "70px 80px", justifyContent: "space-between" }}>
+        <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", background: bgFill, position: "relative", padding: "70px 80px", justifyContent: "space-between" }}>
           {/* Halo d'accent en haut a gauche */}
           <div style={{ position: "absolute", top: -160, left: -120, width: 460, height: 460, borderRadius: 460, background: `${primary}22`, display: "flex" }} />
           {/* Barre d'accent haute */}
