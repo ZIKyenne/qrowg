@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { formatDay, buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildBlockImpressions, blockCtr } from "./analyticsAgg"
+import { formatDay, buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildBlockImpressions, blockCtr, buildBlockDwell } from "./analyticsAgg"
 
 // now fixe pour des fenetres glissantes deterministes : 2026-07-07T12:00:00Z
 const NOW = Date.parse("2026-07-07T12:00:00Z")
@@ -108,5 +108,21 @@ describe("blockCtr", () => {
     expect(blockCtr(0, 10)).toBe(0)
     expect(blockCtr(5, 0)).toBeNull()
     expect(blockCtr(20, 10)).toBe(100) // borne
+  })
+})
+
+describe("buildBlockDwell", () => {
+  it("moyenne des durees par block_id (ignore autres kinds / valeurs nulles)", () => {
+    const avg = buildBlockDwell([
+      { kind: "dwell", ref: "b1", value: 10 },
+      { kind: "dwell", ref: "b1", value: 20 },
+      { kind: "dwell", ref: "b2", value: 5 },
+      { kind: "impression", ref: "b1" },
+      { kind: "dwell", ref: "b3", value: null },
+    ])
+    expect(avg).toEqual({ b1: 15, b2: 5 })
+  })
+  it("aucun dwell -> objet vide", () => {
+    expect(buildBlockDwell([{ kind: "scroll", ref: "50" }])).toEqual({})
   })
 })

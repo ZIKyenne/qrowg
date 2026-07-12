@@ -13,7 +13,7 @@ import GeoPanel from "./GeoPanel"
 import DevicePanel from "./DevicePanel"
 import ExportPanel from "./ExportPanel"
 import ReportSubscriptionPanel from "./ReportSubscriptionPanel"
-import { buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildBlockImpressions } from "./analyticsAgg"
+import { buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildBlockImpressions, buildBlockDwell } from "./analyticsAgg"
 import ScrollDepthPanel from "./ScrollDepthPanel"
 import Particles from "@/components/Particles"
 
@@ -25,7 +25,7 @@ type Click = { block_id: string; click_target: string | null; clicked_at: string
 type BRow    = { id: string; type: string; page_id: string; position: number; is_visible: boolean }
 type GeoScan    = { country: string | null; city: string | null; page_id: string; scanned_at: string }
 type DeviceScan = { device: string; os: string | null; browser: string | null; page_id: string; scanned_at: string }
-type PageEv     = { kind: "scroll" | "impression"; ref: string; page_id: string; created_at: string }
+type PageEv     = { kind: "scroll" | "impression" | "dwell"; ref: string; value?: number | null; page_id: string; created_at: string }
 
 interface Props {
   profile: Profile
@@ -92,6 +92,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
   )
   const scrollFunnel = useMemo(() => buildScrollFunnel(filteredEvents), [filteredEvents])
   const blockImpressions = useMemo(() => buildBlockImpressions(filteredEvents), [filteredEvents])
+  const blockDwell = useMemo(() => buildBlockDwell(filteredEvents), [filteredEvents])
 
   const totalScans30 = filteredScans.length
   const totalViews30 = filteredViews.length
@@ -411,6 +412,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             pageViews={filteredViews}
             pages={pages}
             impressions={blockImpressions}
+            dwell={blockDwell}
           />
         </div>
 

@@ -19,6 +19,7 @@ interface Props {
   pageViews: ViewRow[]
   pages:     PageRow[]
   impressions?: Record<string, number>  // block_id -> nb de fois réellement vu (page_events)
+  dwell?: Record<string, number>         // block_id -> temps d'attention moyen en secondes
 }
 
 // ── Config par type de bloc ───────────────────────────────────────────────────
@@ -69,7 +70,7 @@ function Tip({ active, payload, label }: any) {
   )
 }
 
-export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages, impressions = {} }: Props) {
+export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages, impressions = {}, dwell = {} }: Props) {
   const [period, setPeriod] = useState(30)
   const [sortBy, setSortBy] = useState("clicks")
   const [pageId, setPageId] = useState("all")
@@ -105,12 +106,13 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
       clicksByType[t] = (clicksByType[t] || 0) + 1
     })
 
-    const byType: Record<string, { count: number; directClicks: number; impr: number }> = {}
+    const byType: Record<string, { count: number; directClicks: number; impr: number; dwellSum: number; dwellN: number }> = {}
     fBlocks.forEach(b => {
-      if (!byType[b.type]) byType[b.type] = { count: 0, directClicks: 0, impr: 0 }
+      if (!byType[b.type]) byType[b.type] = { count: 0, directClicks: 0, impr: 0, dwellSum: 0, dwellN: 0 }
       byType[b.type].count++
       byType[b.type].directClicks += clicksById[b.id] || 0
       byType[b.type].impr += impressions[b.id] || 0
+      if (dwell[b.id]) { byType[b.type].dwellSum += dwell[b.id]; byType[b.type].dwellN++ }
     })
 
     return Object.entries(byType).map(([type, d]) => {
@@ -119,9 +121,10 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
       const ctr   = parseFloat(((clics / totalViews) * 100).toFixed(1))
       // CTR réel = clics / impressions (bloc réellement vu). null si pas encore d'impression.
       const realCtr = d.impr > 0 ? Math.min(100, parseFloat(((clics / d.impr) * 100).toFixed(1))) : null
-      return { type, cfg, count: d.count, clics, ctr, impr: d.impr, realCtr }
+      const dwellAvg = d.dwellN > 0 ? Math.round(d.dwellSum / d.dwellN) : null
+      return { type, cfg, count: d.count, clics, ctr, impr: d.impr, realCtr, dwellAvg }
     }).filter(s => s.cfg.interactive)
-  }, [fBlocks, fClicks, totalViews, impressions])
+  }, [fBlocks, fClicks, totalViews, impressions, dwell])
 
   const sorted = useMemo(() => {
     const arr = [...stats]
@@ -134,6 +137,7 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
   const totalClicks   = fClicks.length
   const interactCount = fBlocks.filter(b => getCfg(b.type).interactive).length
   const best          = sorted[0]
+  const mostRead      = [...stats].filter(s => s.dwellAvg != null).sort((a, b) => (b.dwellAvg || 0) - (a.dwellAvg || 0))[0]
 
   const maxClics = sorted[0]?.clics || 1
   const radarMax = Math.max(...stats.map(s => s.clics), 1)
@@ -161,6 +165,7 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
           <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>
             {interactCount} blocs interactifs
             {best && <span> · Top : <span style={{ color: best.cfg.color, fontWeight: 600 }}>{best.cfg.emoji} {best.cfg.label}</span>{best.realCtr != null && <span> ({best.realCtr}% de CTR réel)</span>}</span>}
+            {mostRead?.dwellAvg != null && <span> · Le plus lu : <span style={{ color: mostRead.cfg.color, fontWeight: 600 }}>{mostRead.cfg.emoji} {mostRead.cfg.label}</span> ({mostRead.dwellAvg}s)</span>}
           </p>
         </div>
 

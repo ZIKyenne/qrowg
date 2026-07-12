@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, Component } from "react"
 import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
-import { queueEngagement } from "@/lib/trackEngagement"
+import { queueEngagement, trackDwell } from "@/lib/trackEngagement"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
 import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, buildVCard, mapEmbedUrl, shareLinks, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref, docTypeMeta, docActionLabel, announcementMeta, blockDecoration, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
@@ -2852,17 +2852,28 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
     document.head.appendChild(link)
   }, [theme.fontDisplay, theme.fontBody])
 
-  // Engagement (RGPD, sans PII) : impressions des blocs réellement vus + profondeur de scroll.
+  // Engagement (RGPD, sans PII) : impressions + profondeur de scroll + temps d'attention par bloc.
   useEffect(() => {
     if (typeof window === "undefined" || typeof IntersectionObserver === "undefined") return
     const pageId = page.id
-    // 1) Impressions : un bloc est "vu" dès qu'il est visible à ~50%.
+    const seen = new Set<string>()                                   // impressions déjà envoyées
+    const dwell = new Map<string, { start: number | null; total: number }>()  // ms visibles par bloc
+    let dwellSent = false
+
+    // 1) Un bloc visible à ~50 % : impression (une fois) + démarrage du chrono de visibilité.
     const io = new IntersectionObserver((entries) => {
+      const now = performance.now()
       for (const e of entries) {
+        const id = (e.target as HTMLElement).getAttribute("data-qf-block")
+        if (!id) continue
         if (e.isIntersecting) {
-          const id = (e.target as HTMLElement).getAttribute("data-qf-block")
-          if (id) queueEngagement(pageId, "impression", id)
-          io.unobserve(e.target)
+          if (!seen.has(id)) { seen.add(id); queueEngagement(pageId, "impression", id) }
+          const d = dwell.get(id) || { start: null, total: 0 }
+          if (d.start == null) d.start = now
+          dwell.set(id, d)
+        } else {
+          const d = dwell.get(id)
+          if (d && d.start != null) { d.total += now - d.start; d.start = null }
         }
       }
     }, { threshold: 0.5 })
@@ -2881,9 +2892,32 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
         for (const m of [25, 50, 75, 100]) if (pct >= m) queueEngagement(pageId, "scroll", String(m))
       })
     }
-    onScroll() // capture l'état initial (page courte = 100 % direct)
+    onScroll()
     window.addEventListener("scroll", onScroll, { passive: true })
-    return () => { io.disconnect(); window.removeEventListener("scroll", onScroll) }
+
+    // 3) Temps d'attention : à la première mise en arrière-plan / fermeture, on envoie les totaux (>= 2 s).
+    const sendDwell = () => {
+      if (dwellSent) return
+      const now = performance.now()
+      const entries: { ref: string; value: number }[] = []
+      dwell.forEach((d, id) => {
+        let ms = d.total
+        if (d.start != null) { ms += now - d.start; d.start = now }
+        const sec = Math.round(ms / 1000)
+        if (sec >= 2) entries.push({ ref: id, value: sec })
+      })
+      if (entries.length) { dwellSent = true; trackDwell(pageId, entries) }
+    }
+    const onHidden = () => { if (document.visibilityState === "hidden") sendDwell() }
+    document.addEventListener("visibilitychange", onHidden)
+    window.addEventListener("pagehide", sendDwell)
+
+    return () => {
+      io.disconnect()
+      window.removeEventListener("scroll", onScroll)
+      document.removeEventListener("visibilitychange", onHidden)
+      window.removeEventListener("pagehide", sendDwell)
+    }
   }, [page.id])
 
   return (

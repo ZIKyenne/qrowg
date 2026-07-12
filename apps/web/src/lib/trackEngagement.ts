@@ -36,6 +36,14 @@ function bindFlushOnce() {
   window.addEventListener("pagehide", () => { flush() })
 }
 
+// Temps d'attention par bloc : envoi direct (fire-and-forget) des totaux à la fermeture/masquage.
+// entries = [{ ref: block_id, value: secondes }]. RGPD : aucune donnée personnelle.
+export function trackDwell(pageId: string, entries: { ref: string; value: number }[]) {
+  if (typeof window === "undefined" || !pageId || entries.length === 0) return
+  const rows = entries.map(e => ({ page_id: pageId, kind: "dwell" as const, ref: e.ref, value: e.value }))
+  getClient().then((sb: any) => sb.from("page_events").insert(rows)).catch(() => {})
+}
+
 // Met un événement en file (fire-and-forget). Dédup automatique.
 export function queueEngagement(pageId: string, kind: Kind, ref: string) {
   if (typeof window === "undefined" || !pageId || !ref) return

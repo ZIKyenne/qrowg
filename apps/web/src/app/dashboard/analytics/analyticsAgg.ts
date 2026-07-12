@@ -55,8 +55,8 @@ export function buildSourceData(views: AggView[]): NameValue[] {
   return Object.entries(counts).map(([name, value]) => ({ name, value }))
 }
 
-// ── Engagement (page_events : scroll + impressions de blocs) ──────────────────
-export type PageEvent = { kind: "scroll" | "impression"; ref: string; page_id?: string }
+// ── Engagement (page_events : scroll + impressions + temps par bloc) ──────────
+export type PageEvent = { kind: "scroll" | "impression" | "dwell"; ref: string; value?: number | null; page_id?: string }
 export type ScrollStep = { depth: string; count: number; pct: number }
 
 // Entonnoir de profondeur de scroll : jalons 25/50/75/100 %. Chaque visiteur qui atteint
@@ -88,4 +88,19 @@ export function buildBlockImpressions(events: PageEvent[]): Record<string, numbe
 export function blockCtr(clicks: number, impressions: number): number | null {
   if (!impressions) return null
   return Math.min(100, Math.round((clicks / impressions) * 100))
+}
+
+// Temps d'attention moyen (secondes) par block_id, a partir des evenements 'dwell'.
+export function buildBlockDwell(events: PageEvent[]): Record<string, number> {
+  const sum: Record<string, number> = {}
+  const n: Record<string, number> = {}
+  for (const e of events) {
+    if (e.kind === "dwell" && e.ref && typeof e.value === "number") {
+      sum[e.ref] = (sum[e.ref] || 0) + e.value
+      n[e.ref] = (n[e.ref] || 0) + 1
+    }
+  }
+  const avg: Record<string, number> = {}
+  for (const ref of Object.keys(sum)) avg[ref] = Math.round(sum[ref] / n[ref])
+  return avg
 }
