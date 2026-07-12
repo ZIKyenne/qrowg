@@ -55,6 +55,12 @@ describe("blockDecoration", () => {
     expect(blockDecoration({ __anim: "Fondu", __hover: "Lueur" }, theme).animClass).toBe("qf-reveal qf-hv-glow")
     expect(blockDecoration({ __anim: "Aucune", __hover: "Aucun" }, theme).animClass).toBe("")
   })
+  it("vitesse d'apparition (seulement si une anim est posée) + boucle", () => {
+    expect(blockDecoration({ __anim: "Fondu", __anim_speed: "Lent" }, theme).animClass).toBe("qf-reveal qf-sp-slow")
+    expect(blockDecoration({ __anim_speed: "Rapide" }, theme).animClass).toBe("") // pas d'anim -> vitesse ignorée
+    expect(blockDecoration({ __loop: "Flottement" }, theme).animClass).toBe("qf-loop-float")
+    expect(blockDecoration({ __anim: "Zoom avant", __anim_speed: "Rapide", __loop: "Pulsation" }, theme).animClass).toBe("qf-reveal qf-a-zoom qf-sp-fast qf-loop-pulse")
+  })
   it("intensité : dégradé plein par défaut, adouci si Moyen/Léger", () => {
     expect(blockDecoration({ __grad: "Violet" }, theme).style.background).toBe("linear-gradient(135deg,#4c1d95,#2e1065)")
     const soft = blockDecoration({ __grad: "Violet", __intensity: "Léger" }, { ...theme, bg: "#080808" }).style.background

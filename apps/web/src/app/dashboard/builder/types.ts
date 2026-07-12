@@ -3019,7 +3019,9 @@ export const BLOCK_SHADOW_OPTIONS = ["Non", "Douce", "Forte"]
 export const BLOCK_SPACE_OPTIONS = ["Défaut", "Compact", "Aéré"]
 export const BLOCK_WIDTH_OPTIONS = ["Normale", "Étroite"]
 export const BLOCK_ANIM_OPTIONS = ["Aucune", "Fondu", "Glissé ↑", "Glissé ↓", "Glissé ←", "Glissé →", "Zoom avant", "Zoom arrière", "Rotation", "Flou", "Bascule"]
+export const BLOCK_ANIM_SPEED_OPTIONS = ["Normal", "Lent", "Rapide"]
 export const BLOCK_HOVER_OPTIONS = ["Aucun", "Élévation", "Zoom", "Lueur"]
+export const BLOCK_LOOP_OPTIONS = ["Aucune", "Flottement", "Pulsation", "Battement"]
 
 // Modèles d'apparence 1-clic : appliquent un jeu cohérent de clés __ (les clés non listées d'un
 // preset sont remises à "" pour repartir d'un état propre).
@@ -3118,8 +3120,15 @@ export function blockDecoration(
     "Zoom": "qf-reveal qf-a-zoom", "Zoom avant": "qf-reveal qf-a-zoom", "Zoom arrière": "qf-reveal qf-a-zoomout",
     "Rotation": "qf-reveal qf-a-rotate", "Flou": "qf-reveal qf-a-blur", "Bascule": "qf-reveal qf-a-flip",
   }
+  const speedMap: Record<string, string> = { "Lent": "qf-sp-slow", "Rapide": "qf-sp-fast" }
   const hoverMap: Record<string, string> = { "Élévation": "qf-hv-lift", "Zoom": "qf-hv-zoom", "Lueur": "qf-hv-glow" }
-  const animClass = [c.__anim && animMap[c.__anim], c.__hover && hoverMap[c.__hover]].filter(Boolean).join(" ")
+  const loopMap: Record<string, string> = { "Flottement": "qf-loop-float", "Pulsation": "qf-loop-pulse", "Battement": "qf-loop-beat" }
+  const animClass = [
+    c.__anim && animMap[c.__anim],
+    c.__anim && animMap[c.__anim] && c.__anim_speed && speedMap[c.__anim_speed], // vitesse : seulement avec une anim d'apparition
+    c.__hover && hoverMap[c.__hover],
+    c.__loop && loopMap[c.__loop],
+  ].filter(Boolean).join(" ")
 
   return { style, animClass }
 }

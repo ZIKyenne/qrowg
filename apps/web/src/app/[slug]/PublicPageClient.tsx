@@ -2967,6 +2967,17 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
         .qf-anim-ready .qf-a-rotate { transform: rotate(-4deg) scale(.95); }
         .qf-anim-ready .qf-a-blur { filter: blur(9px); }
         .qf-anim-ready .qf-a-flip { transform: perspective(800px) rotateX(14deg); transform-origin: center bottom; }
+        /* Vitesse d'apparition */
+        .qf-anim-ready .qf-reveal.qf-sp-slow { transition-duration: .95s; }
+        .qf-anim-ready .qf-reveal.qf-sp-fast { transition-duration: .32s; }
+        /* Animations en boucle (emphase continue — ex. un CTA) */
+        @keyframes qfFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+        @keyframes qfPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+        @keyframes qfBeat { 0%,100% { box-shadow: 0 0 0 0 ${theme.primary}00; } 50% { box-shadow: 0 0 22px 0 ${theme.primary}55; } }
+        .qf-loop-float { animation: qfFloat 3.6s ease-in-out infinite; }
+        .qf-loop-pulse { animation: qfPulse 2.8s ease-in-out infinite; }
+        .qf-loop-beat { animation: qfBeat 2.2s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) { .qf-loop-float,.qf-loop-pulse,.qf-loop-beat { animation: none; } }
         /* Effets au survol (blocs interactifs) */
         .qf-hv-lift { transition: transform .22s ease, box-shadow .22s ease; }
         .qf-hv-lift:hover { transform: translateY(-5px); }
