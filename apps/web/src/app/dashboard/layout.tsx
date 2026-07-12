@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard, FileText, BarChart, QrCode, User,
-  Activity, ChevronRight, LogOut, Settings, Menu, X, Eye, Inbox
+  Activity, ChevronRight, LogOut, Settings, Menu, X, Eye, Inbox, Images
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
@@ -15,6 +15,7 @@ const MUTED = "#8A8478"
 const NAV_ITEMS = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard", exact: true },
   { href: "/dashboard/templates", icon: FileText, label: "Templates" },
+  { href: "/dashboard/assets", icon: Images, label: "Médias" },
   { href: "/dashboard/analytics", icon: BarChart, label: "Analytics" },
   { href: "/dashboard/leads", icon: Inbox, label: "Messages" },
   { href: "/dashboard/qr-codes", icon: QrCode, label: "QR Codes" },
