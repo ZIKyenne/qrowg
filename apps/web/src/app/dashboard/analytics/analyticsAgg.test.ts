@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { formatDay, buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildBlockImpressions, blockCtr, buildBlockDwell } from "./analyticsAgg"
+import { formatDay, buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildBlockImpressions, blockCtr, buildBlockDwell, buildFunnel } from "./analyticsAgg"
 
 // now fixe pour des fenetres glissantes deterministes : 2026-07-07T12:00:00Z
 const NOW = Date.parse("2026-07-07T12:00:00Z")
@@ -124,5 +124,28 @@ describe("buildBlockDwell", () => {
   })
   it("aucun dwell -> objet vide", () => {
     expect(buildBlockDwell([{ kind: "scroll", ref: "50" }])).toEqual({})
+  })
+})
+
+describe("buildFunnel", () => {
+  it("pct relatif au top + taux d'abandon par etape", () => {
+    const f = buildFunnel([
+      { label: "Vues", count: 100 },
+      { label: "Engages", count: 40 },
+      { label: "Clics", count: 10 },
+    ])
+    expect(f.map(s => s.pctOfTop)).toEqual([100, 40, 10])
+    expect(f[0].dropFromPrev).toBe(0)
+    expect(f[1].dropFromPrev).toBe(60) // 100 -> 40 = -60%
+    expect(f[2].dropFromPrev).toBe(75) // 40 -> 10 = -75%
+  })
+  it("clics > engages -> drop borne a 0, pct borne a 100 (pas de valeurs absurdes)", () => {
+    const f = buildFunnel([{ label: "Vues", count: 10 }, { label: "Engages", count: 3 }, { label: "Clics", count: 5 }])
+    expect(f[2].dropFromPrev).toBe(0)
+    expect(f[2].pctOfTop).toBe(50)
+  })
+  it("aucune vue -> tout a 0 (pas de division par zero)", () => {
+    const f = buildFunnel([{ label: "Vues", count: 0 }, { label: "Clics", count: 0 }])
+    expect(f.every(s => s.pctOfTop === 0 && s.dropFromPrev === 0)).toBe(true)
   })
 })

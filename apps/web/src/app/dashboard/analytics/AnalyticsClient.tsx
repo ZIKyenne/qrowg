@@ -13,8 +13,9 @@ import GeoPanel from "./GeoPanel"
 import DevicePanel from "./DevicePanel"
 import ExportPanel from "./ExportPanel"
 import ReportSubscriptionPanel from "./ReportSubscriptionPanel"
-import { buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildBlockImpressions, buildBlockDwell } from "./analyticsAgg"
+import { buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildBlockImpressions, buildBlockDwell, buildFunnel } from "./analyticsAgg"
 import ScrollDepthPanel from "./ScrollDepthPanel"
+import ConversionFunnelPanel from "./ConversionFunnelPanel"
 import Particles from "@/components/Particles"
 
 type Profile = { total_pages: number; total_scans: number; plan: string; email?: string; full_name?: string } | null
@@ -93,6 +94,24 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
   const scrollFunnel = useMemo(() => buildScrollFunnel(filteredEvents), [filteredEvents])
   const blockImpressions = useMemo(() => buildBlockImpressions(filteredEvents), [filteredEvents])
   const blockDwell = useMemo(() => buildBlockDwell(filteredEvents), [filteredEvents])
+
+  // Tunnel de conversion : Vues -> Engagés (défilement ≥50%) -> Actions (clics sur 30j, même page).
+  const funnel = useMemo(() => {
+    const views = filteredViews.length
+    const engaged = filteredEvents.filter(e => e.kind === "scroll" && e.ref === "50").length
+    const since30 = Date.now() - 30 * 864e5
+    const clicked = clicks.filter(c =>
+      (selectedPage === "all" || c.page_id === selectedPage) && new Date(c.clicked_at).getTime() >= since30
+    ).length
+    const steps = buildFunnel([
+      { label: "Vues de la page", count: views },
+      { label: "Ont fait défiler (≥50%)", count: engaged },
+      { label: "Ont cliqué (action)", count: clicked },
+    ])
+    const conversionRate = views > 0 ? Math.round((clicked / views) * 100) : 0
+    const hasEngagementData = filteredEvents.some(e => e.kind === "scroll")
+    return { steps, conversionRate, hasEngagementData }
+  }, [filteredViews, filteredEvents, clicks, selectedPage])
 
   const totalScans30 = filteredScans.length
   const totalViews30 = filteredViews.length
@@ -416,8 +435,9 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
           />
         </div>
 
-        {/* ── Profondeur de lecture (scroll) ────────────────────────────── */}
-        <div style={{ marginBottom: 24 }}>
+        {/* ── Tunnel de conversion + Profondeur de lecture ──────────────── */}
+        <div style={{ marginBottom: 24, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16 }}>
+          <ConversionFunnelPanel steps={funnel.steps} conversionRate={funnel.conversionRate} hasEngagementData={funnel.hasEngagementData} />
           <ScrollDepthPanel funnel={scrollFunnel} />
         </div>
 

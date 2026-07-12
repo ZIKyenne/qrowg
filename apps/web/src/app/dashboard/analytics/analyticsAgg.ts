@@ -90,6 +90,24 @@ export function blockCtr(clicks: number, impressions: number): number | null {
   return Math.min(100, Math.round((clicks / impressions) * 100))
 }
 
+// ── Tunnel de conversion ──────────────────────────────────────────────────────
+export type FunnelStep = { label: string; count: number; pctOfTop: number; dropFromPrev: number }
+
+// Transforme une suite d'etapes { label, count } en entonnoir : % relatif a la 1re etape
+// et taux d'abandon par rapport a l'etape precedente (borne a 0, jamais negatif).
+export function buildFunnel(stages: { label: string; count: number }[]): FunnelStep[] {
+  const top = stages[0]?.count || 0
+  return stages.map((s, i) => {
+    const prev = i > 0 ? (stages[i - 1].count || 0) : s.count
+    return {
+      label: s.label,
+      count: s.count,
+      pctOfTop: top > 0 ? Math.min(100, Math.round((s.count / top) * 100)) : 0,
+      dropFromPrev: i === 0 || prev <= 0 ? 0 : Math.max(0, Math.round((1 - s.count / prev) * 100)),
+    }
+  })
+}
+
 // Temps d'attention moyen (secondes) par block_id, a partir des evenements 'dwell'.
 export function buildBlockDwell(events: PageEvent[]): Record<string, number> {
   const sum: Record<string, number> = {}
