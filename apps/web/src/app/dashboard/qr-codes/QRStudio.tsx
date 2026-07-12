@@ -13,7 +13,6 @@ import {
 import dynamic from "next/dynamic"
 import { createClient } from "@/lib/supabase/client"
 import { useIsMobile } from "@/lib/useIsMobile"
-import RotateToLandscapeGate from "@/components/orientation/RotateToLandscapeGate"
 import { PLAN_RANK, canPrintStudio, minPlanFor } from "@/lib/plans"
 import { createQR, updateQR, getQRBlob, downloadBlob, blobToDataUrl, buildAndDownloadPdf, type QROptions } from "./qrRender"
 import type QRCodeStyling from "qr-code-styling"
@@ -2340,7 +2339,6 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       {/* -- Modale UPGRADE (conversion) ---------------------------------------- */}
       {/* -- Editeur libre (PrintStudio / Fabric) plein ecran ------------------ */}
       {editorOpen && editorQrUrl && active && (
-        <RotateToLandscapeGate onExit={() => setEditorOpen(false)}>
         <PrintStudio
           qrId={active.id}
           qrDataUrl={editorQrUrl}
@@ -2365,7 +2363,6 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             } catch { return null }
           }}
         />
-        </RotateToLandscapeGate>
       )}
 
       {upsell && (() => {

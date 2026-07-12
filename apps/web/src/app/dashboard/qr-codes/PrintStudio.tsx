@@ -25,6 +25,7 @@ import {
   RotateCw, AlignCenterHorizontal, HelpCircle, MoreHorizontal, ShieldCheck,
 } from "lucide-react"
 import PrintCenterPanel from "./PrintCenterPanel"
+import MobileDock, { type DockTool } from "@/components/mobile/MobileDock"
 import { printPreflight, hexContrastRatio, quietZonePx, edgeMarginPx, type PreflightMetrics, type PreflightResult, type Rect } from "./printPreflight"
 import { alignDeltas, type AlignMode, type Box } from "./alignDistribute"
 
@@ -890,7 +891,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [railW, setRailW]     = useState(150) // largeur du rail d'outils tout à gauche
   // Phase 1 paysage mobile : rail compact (icônes) + top bar resserrée, canvas héros
   const { isMobile: orMobile, isPortrait: orPortrait } = useDeviceOrientation()
-  const landscapeMobile = orMobile && !orPortrait
+  // Téléphone (toute orientation) : refonte mobile-first — rail remplacé par un dock en bas,
+  // panneaux en bottom-sheets, canvas plein écran. (orMobile exige déjà petit écran + pointeur grossier.)
+  const landscapeMobile = orMobile
   const effRailW = landscapeMobile ? 56 : railW
   const [dropFx, setDropFx] = useState(0) // incrémenté à chaque pose de modèle -> effet « posé sur la feuille »
   const [moreOpen, setMoreOpen] = useState(false) // paysage mobile : menu ⋯ (actions secondaires)
@@ -1614,6 +1617,38 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const openSide = (s: "layers" | "bg" | "styles") => { setSide(prev => prev === s ? "" : s); setLibOpen(false); setTplOpen(false); setCompOpen(false); setPhotoOpen(false) }
   // Ouvrir / fermer le flyout composants metier
   const openComp = () => { setCompOpen(v => !v); setTplOpen(false); setLibOpen(false); setSide(""); setPhotoOpen(false) }
+
+  // Dock mobile (barre du bas) : chaque outil ouvre le panneau correspondant (un seul à la fois).
+  const DOCK_TOOLS: DockTool[] = [
+    { id: "tpl", icon: <LayoutTemplate size={20} />, label: "Modèles" },
+    { id: "text", icon: <TypeIcon size={20} />, label: "Texte" },
+    { id: "qr", icon: <QrCode size={20} />, label: "QR" },
+    { id: "img", icon: <ImageIcon size={20} />, label: "Image" },
+    { id: "photo", icon: <Search size={20} />, label: "Photos" },
+    { id: "shape", icon: <Shapes size={20} />, label: "Formes" },
+    { id: "color", icon: <Palette size={20} />, label: "Couleurs" },
+    { id: "layers", icon: <Copy size={20} />, label: "Calques" },
+  ]
+  const dockActive =
+    tplOpen ? "tpl"
+    : libOpen && libCat === "text" ? "text"
+    : libOpen && libCat === "shapes" ? "shape"
+    : photoOpen ? "photo"
+    : side === "styles" ? "color"
+    : side === "layers" ? "layers"
+    : null
+  const onDock = (id: string) => {
+    switch (id) {
+      case "tpl": setTplOpen(v => !v); setLibOpen(false); setSide(""); setCompOpen(false); setPhotoOpen(false); break
+      case "text": openLib("text"); break
+      case "shape": openLib("shapes"); break
+      case "qr": addQr(); break
+      case "img": fileRef.current?.click(); break
+      case "photo": openPhoto(); break
+      case "color": openSide("styles"); break
+      case "layers": openSide("layers"); break
+    }
+  }
   // Ouvrir / fermer le flyout recherche de photos
   const openPhoto = () => {
     const opening = !photoOpen
@@ -3432,6 +3467,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           <div className="ps-drop-ring" />
         </div>
       )}
+      {/* Dock mobile (barre du bas type Canva) — remplace le rail sur téléphone */}
+      {landscapeMobile && (
+        <div style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 29 }}>
+          <MobileDock tools={DOCK_TOOLS} active={dockActive} onSelect={onDock} />
+        </div>
+      )}
+
       {/* Menu ⋯ (paysage mobile) : actions secondaires en bottom sheet */}
       {moreOpen && (
         <div onClick={() => setMoreOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 70, background: "rgba(0,0,0,0.42)", backdropFilter: "blur(2px)", display: "flex", alignItems: "flex-end" }}>
@@ -3691,7 +3733,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Rail outils */}
         {wizard === 0 && (
-        <div className={"qr-scroll ps-rail" + (landscapeMobile ? " ps-compact" : "")} style={{ width: effRailW, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", padding: "12px 10px", display: "flex", flexDirection: "column", gap: 6, background: "#FBFBFD", overflowY: "auto", position: "relative" }}>
+        <div className={"qr-scroll ps-rail" + (landscapeMobile ? " ps-compact" : "")} style={{ width: effRailW, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", padding: "12px 10px", display: landscapeMobile ? "none" : "flex", flexDirection: "column", gap: 6, background: "#FBFBFD", overflowY: "auto", position: "relative" }}>
           {!landscapeMobile && <ResizeHandle which="rail" />}
           <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 2px" }}>Créer</p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
@@ -4281,7 +4323,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         )}
 
         {/* Zone canvas (heros) : panneaux flottants -> on recadre pour garder l'artboard centre dans le visible */}
-        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: 16, background: "#E5E8ED", position: "relative", transition: "padding .22s cubic-bezier(.2,.8,.2,1)" }}>
+        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: landscapeMobile ? "16px 16px 92px" : 16, background: landscapeMobile ? "#0C0C0E" : "#E5E8ED", position: "relative", transition: "padding .22s cubic-bezier(.2,.8,.2,1)" }}>
           {loading && (
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: MUTED, zIndex: 5, pointerEvents: "none" }}>
               <Loader2 size={18} style={{ animation: "spin 0.8s linear infinite" }} /> Chargement…
