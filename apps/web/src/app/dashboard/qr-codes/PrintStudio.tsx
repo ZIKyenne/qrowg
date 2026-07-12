@@ -26,6 +26,7 @@ import {
 } from "lucide-react"
 import PrintCenterPanel from "./PrintCenterPanel"
 import { printPreflight, hexContrastRatio, quietZonePx, edgeMarginPx, type PreflightMetrics, type PreflightResult, type Rect } from "./printPreflight"
+import { alignDeltas, type AlignMode, type Box } from "./alignDistribute"
 
 // ---- Constantes design (Clair & aere, style Canva) -------------------------
 const G       = "#C9A84C"   // accent (or de marque) : etats actifs, boutons primaires
@@ -2127,6 +2128,21 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   }
 
   // Distribuer : espacement régulier des objets d'une multi-sélection (≥ 3)
+  // Aligner les objets d'une multi-sélection les uns sur les autres (bord/centre de la boîte commune).
+  const alignSelection = (mode: AlignMode) => {
+    const fc = fcRef.current; if (!fc) return
+    const sel = fc.getActiveObject()
+    if (!sel || sel.type !== "activeSelection") return
+    const objs = (sel as fabric.ActiveSelection).getObjects().slice()
+    if (objs.length < 2) return
+    // Boîtes absolues (dans l'activeSelection, left/top sont relatifs au centre — mais un delta reste un delta).
+    const boxes: Box[] = objs.map(o => { const b = o.getBoundingRect(true); return { left: b.left, top: b.top, width: b.width, height: b.height } })
+    const deltas = alignDeltas(boxes, mode)
+    objs.forEach((o, i) => { o.set({ left: (o.left ?? 0) + deltas[i].dx, top: (o.top ?? 0) + deltas[i].dy }); o.setCoords() })
+    ;(sel as fabric.ActiveSelection).setCoords()
+    fc.requestRenderAll(); pushHistorySoon()
+  }
+
   const distribute = (axis: "h" | "v") => {
     const fc = fcRef.current; if (!fc) return
     const sel = fc.getActiveObject()
@@ -4618,9 +4634,21 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   ))}
                 </div>
                 {sel.multi && (
-                  <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
-                    <button type="button" onClick={() => distribute("h")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }} title="Espacer régulièrement à l'horizontale">⇄ Distribuer H</button>
-                    <button type="button" onClick={() => distribute("v")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }} title="Espacer régulièrement à la verticale">⇅ Distribuer V</button>
+                  <div style={{ marginTop: 6 }}>
+                    <p className="ps-sec-label" style={{ marginTop: 4 }}>Aligner la sélection</p>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 5 }}>
+                      {([
+                        ["left", "Bords gauches", "⇤"], ["centerH", "Centres (H)", "⇔"], ["right", "Bords droits", "⇥"],
+                        ["top", "Bords hauts", "⤒"], ["middleV", "Centres (V)", "⇕"], ["bottom", "Bords bas", "⤓"],
+                      ] as [AlignMode, string, string][]).map(([m, t, g]) => (
+                        <button key={m} type="button" onClick={() => alignSelection(m)} title={t}
+                          style={{ ...layerBtn, padding: "7px 0", fontSize: 13, justifyContent: "center" }}>{g}</button>
+                      ))}
+                    </div>
+                    <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
+                      <button type="button" onClick={() => distribute("h")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }} title="Espacer régulièrement à l'horizontale (≥ 3 objets)">⇄ Distribuer H</button>
+                      <button type="button" onClick={() => distribute("v")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }} title="Espacer régulièrement à la verticale (≥ 3 objets)">⇅ Distribuer V</button>
+                    </div>
                   </div>
                 )}
               </div>
