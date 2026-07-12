@@ -846,6 +846,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const qrUrlRef = useRef(qrDataUrl)
   const vGuideRef = useRef<fabric.Line | null>(null)
   const hGuideRef = useRef<fabric.Line | null>(null)
+  const safeAreaRef = useRef<fabric.Rect | null>(null)   // repère de marge de sécurité (overlay)
   const clipRef = useRef<fabric.Object | null>(null) // presse-papier (copier/coller)
   const histRef = useRef<{ stack: string[]; i: number; lock: boolean }>({ stack: [], i: -1, lock: false })
   const pushTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
@@ -868,6 +869,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [expOpen, setExpOpen] = useState(false)
   const [expDpi, setExpDpi]   = useState(300)
   const [preflight, setPreflight] = useState<PreflightResult | null>(null)  // Print Center (contrôle qualité)
+  const [showSafe, setShowSafe]   = useState(false)  // repère « marge de sécurité » (zone où garder le contenu)
   const [expMarks, setExpMarks] = useState(false)
   const [mockOpen, setMockOpen] = useState(false)
   const [mockEnv, setMockEnv] = useState<"wall" | "table" | "window" | "desk" | "cadre" | "counter" | "main" | "carte">("wall")
@@ -2267,6 +2269,30 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // Ajuste automatiquement le zoom au chargement et a chaque changement de format (vue globale).
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (loading) return; const t = setTimeout(() => fitToScreen(), 90); return () => clearTimeout(t) }, [format, loading])
+
+  // Repère « marge de sécurité » : rectangle pointillé en retrait de 5 mm des bords (zone où garder le contenu).
+  // isGuide -> exclu partout (historique, calques, snapping, sélection, contrôle qualité) ; excludeFromExport -> hors export.
+  useEffect(() => {
+    const fc = fcRef.current; if (!fc || loading) return
+    const h = histRef.current; const wasLock = h.lock; h.lock = true
+    if (safeAreaRef.current) { fc.remove(safeAreaRef.current); safeAreaRef.current = null }
+    if (showSafe) {
+      const d = editDims(format)
+      const mm = FORMAT_MM[format] || 0
+      const inset = mm > 0 ? Math.round((5 / mm) * d.w) : Math.round(d.w * 0.04)  // 5 mm, ou 4 % en format écran
+      const rect = new fabric.Rect({
+        left: inset, top: inset, width: d.w - 2 * inset, height: d.h - 2 * inset,
+        fill: "transparent", stroke: G, strokeWidth: 1, strokeDashArray: [6, 5],
+        selectable: false, evented: false, excludeFromExport: true, hoverCursor: "default", objectCaching: false,
+      })
+      ;(rect as any).isGuide = true; (rect as any).isOverlay = true
+      fc.add(rect); fc.bringToFront(rect)
+      safeAreaRef.current = rect
+    }
+    h.lock = wasLock
+    fc.requestRenderAll()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showSafe, format, loading])
   // Execute fn() avec le canvas ramene a zoom 1 (pour un export propre), puis restaure.
   const withBaseZoom = <T,>(fc: fabric.Canvas, fn: (base: { w: number; h: number }) => T): T => {
     const z = fc.getZoom() || 1
@@ -3147,10 +3173,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         // Zone silencieuse & marges de sécurité (géométrie pure, testée). Best-effort : na si mesure impossible.
         try {
           const rectOf = (o: any): Rect => { const b = o.getBoundingRect(true, true); return { left: b.left, top: b.top, width: b.width, height: b.height } }
+          // Ne mesurer QUE le contenu réel : exclure les repères (guides, marge) et les objets masqués.
+          const isContent = (o: any) => !o.isGuide && !o.isOverlay && o.visible !== false
+          const content = objs.filter(isContent)
           const qb = rectOf(qr)
-          const others = objs.filter((o: any) => o !== qr && o !== card).map(rectOf)
+          const others = content.filter((o: any) => o !== qr && o !== card).map(rectOf)
           quietZoneMm = (quietZonePx(qb, others, cw, ch) / cw) * widthMm
-          edgeMarginMm = (edgeMarginPx(objs.map(rectOf), cw, ch) / cw) * widthMm
+          edgeMarginMm = (edgeMarginPx(content.map(rectOf), cw, ch) / cw) * widthMm
         } catch { /* mesure indisponible -> na */ }
       }
     }
@@ -3422,6 +3451,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           )}
           <button type="button" onClick={() => setShowHelp(true)} title="Aide & raccourcis" aria-label="Aide et raccourcis" style={ghostBtn}>
             <HelpCircle size={14} /> Aide
+          </button>
+
+          <button type="button" onClick={() => setShowSafe(v => !v)} title="Afficher la marge de sécurité d'impression"
+            aria-pressed={showSafe} style={{ ...ghostBtn, ...(showSafe ? { background: "rgba(201,168,76,0.16)", border: `1px solid ${G}`, color: G } : {}) }}>
+            <Square size={14} /> Marges
           </button>
 
           <button type="button" onClick={openMock} title="Aperçu en situation" style={ghostBtn}>
