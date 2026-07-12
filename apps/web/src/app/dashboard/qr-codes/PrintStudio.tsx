@@ -22,8 +22,10 @@ import {
   Download, Printer, Loader2, Check, Save,
   Shapes, Star, Award, MousePointerClick, ArrowRight, LayoutTemplate,
   Undo2, Redo2, Sparkles, Image as ImageIcon, Palette, Eye, Search,
-  RotateCw, AlignCenterHorizontal, HelpCircle, MoreHorizontal,
+  RotateCw, AlignCenterHorizontal, HelpCircle, MoreHorizontal, ShieldCheck,
 } from "lucide-react"
+import PrintCenterPanel from "./PrintCenterPanel"
+import { printPreflight, hexContrastRatio, type PreflightMetrics, type PreflightResult } from "./printPreflight"
 
 // ---- Constantes design (Clair & aere, style Canva) -------------------------
 const G       = "#C9A84C"   // accent (or de marque) : etats actifs, boutons primaires
@@ -46,6 +48,8 @@ const FORMATS: Record<FormatId, { label: string; ratio: number; exportW: number 
 }
 const EDIT_MAX_H = 600 // hauteur max du canvas d'edition a l'ecran
 const EDIT_MAX_W = 860 // largeur max (pour les formats paysage / carre -> remplit mieux)
+// Largeur physique reelle du support, en mm (pour estimer la taille du QR imprime). 0 = format ecran.
+const FORMAT_MM: Record<FormatId, number> = { a4: 210, square: 100, story: 0, carte: 85, flyer: 148, table: 100 }
 
 function editDims(fmt: FormatId) {
   const { ratio } = FORMATS[fmt] // largeur / hauteur
@@ -863,6 +867,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [exporting, setExporting] = useState(false)
   const [expOpen, setExpOpen] = useState(false)
   const [expDpi, setExpDpi]   = useState(300)
+  const [preflight, setPreflight] = useState<PreflightResult | null>(null)  // Print Center (contrôle qualité)
   const [expMarks, setExpMarks] = useState(false)
   const [mockOpen, setMockOpen] = useState(false)
   const [mockEnv, setMockEnv] = useState<"wall" | "table" | "window" | "desk" | "cadre" | "counter" | "main" | "carte">("wall")
@@ -3115,6 +3120,36 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mockOpen, mockEnv])
 
+  // ---- Contrôle qualité impression (Print Center) ---------------------------
+  // Mesure le design réel puis délègue la notation au moteur pur printPreflight (testé).
+  // v1 : contraste QR↔fond + taille physique du QR + résolution. Zone silencieuse / marges : à venir (na).
+  const openPreflight = () => {
+    const fc = fcRef.current
+    const isScreen = format === "story"
+    const widthMm = FORMAT_MM[format] || 0
+    const fgHex = /^#[0-9a-fA-F]{6}$/.test(qrFg) ? qrFg : "#0A0A0A"
+    let contrastBg = /^#[0-9a-fA-F]{6}$/.test(bgColor) ? bgColor : "#FFFFFF"
+    let qrSizeMm: number | null = null
+    if (fc) {
+      const objs = fc.getObjects()
+      const qr = objs.find((o: any) => o.isQR)
+      const card = objs.find((o: any) => o.isQrCard)
+      const cw = fc.getWidth() || 1
+      // Le QR est souvent posé sur une carte blanche : le vrai contraste se joue QR ↔ carte.
+      const cf = (card as any)?.fill
+      if (typeof cf === "string" && /^#[0-9a-fA-F]{6}$/.test(cf)) contrastBg = cf
+      if (qr && widthMm > 0) {
+        const qpx = ((qr as any).width || 0) * ((qr as any).scaleX || 1)  // espace-canvas (indépendant du zoom d'édition)
+        if (qpx > 0) qrSizeMm = (qpx / cw) * widthMm
+      }
+    }
+    const metrics: PreflightMetrics = {
+      qrSizeMm, contrastRatio: hexContrastRatio(fgHex, contrastBg),
+      quietZoneMm: null, logoPct: 0, dpi: expDpi, edgeMarginMm: null, isScreen,
+    }
+    setPreflight(printPreflight(metrics))
+  }
+
   // ---- Export pro (DPI + format + traits de coupe / fond perdu) -------------
   const targetWidth = () => Math.round(FORMATS[format].exportW * (expDpi / 300))
   const exportImage = (type: "png" | "jpeg") => {
@@ -3413,6 +3448,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <input type="checkbox" checked={expMarks} onChange={e => setExpMarks(e.target.checked)} style={{ accentColor: G, flexShrink: 0 }} />
                   Traits de coupe + fond perdu <span style={{ color: MUTED }}>(PDF)</span>
                 </label>
+                <button type="button" onClick={openPreflight} title="Vérifier la qualité avant d'imprimer"
+                  style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, width: "100%", marginBottom: 8, padding: "9px 11px", background: "rgba(201,168,76,0.12)", border: `1px solid ${G}`, borderRadius: 9, color: G, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                  <ShieldCheck size={14} /> Contrôle qualité
+                </button>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   <button type="button" onClick={() => exportImage("png")} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 11px", background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 9, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer" }}><Download size={13} /> PNG</button>
                   <button type="button" onClick={() => exportImage("jpeg")} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 11px", background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 9, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer" }}><Download size={13} /> JPG</button>
@@ -4726,6 +4765,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
           {starting && <div style={{ marginTop: 18, display: "flex", alignItems: "center", gap: 8, color: G, fontSize: 13, fontWeight: 600 }}><Loader2 size={15} style={{ animation: "spin 0.8s linear infinite" }} /> Création de votre design…</div>}
         </div>
+      )}
+
+      {/* Contrôle qualité avant impression (Print Center) */}
+      {preflight && (
+        <PrintCenterPanel result={preflight} onClose={() => setPreflight(null)} onExport={() => exportImage("png")} />
       )}
 
       {/* Aide & raccourcis */}
