@@ -2912,11 +2912,27 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
     document.addEventListener("visibilitychange", onHidden)
     window.addEventListener("pagehide", sendDwell)
 
+    // 4) Moteur d'animations : révélation au scroll. On active le mode animé (gate CSS) puis, après
+    // une frame (pour peindre l'état masqué), on observe les blocs .qf-reveal pour ajouter .qf-in.
+    document.documentElement.classList.add("qf-anim-ready")
+    let revealIo: IntersectionObserver | null = null
+    const rafId = requestAnimationFrame(() => {
+      revealIo = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) { (e.target as HTMLElement).classList.add("qf-in"); revealIo!.unobserve(e.target) }
+        }
+      }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" })
+      document.querySelectorAll(".qf-reveal").forEach(el => revealIo!.observe(el))
+    })
+
     return () => {
       io.disconnect()
       window.removeEventListener("scroll", onScroll)
       document.removeEventListener("visibilitychange", onHidden)
       window.removeEventListener("pagehide", sendDwell)
+      cancelAnimationFrame(rafId)
+      revealIo?.disconnect()
+      document.documentElement.classList.remove("qf-anim-ready")
     }
   }, [page.id])
 
@@ -2938,13 +2954,30 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
           .qf-cm-3 { column-count: 3 !important; }
         }
         @media (min-width: 641px) { .qf-hide-desktop { display: none !important; } }
-        @keyframes qfBFade { from { opacity:0; } to { opacity:1; } }
-        @keyframes qfBSlide { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
-        @keyframes qfBZoom { from { opacity:0; transform:scale(.94); } to { opacity:1; transform:none; } }
-        .qf-b-fade { animation: qfBFade .6s ease both; }
-        .qf-b-slide { animation: qfBSlide .55s cubic-bezier(.22,1,.36,1) both; }
-        .qf-b-zoom { animation: qfBZoom .5s ease both; }
-        @media (prefers-reduced-motion: reduce) { .qf-b-fade,.qf-b-slide,.qf-b-zoom { animation: none; } }
+        /* Moteur d'animations — révélation au scroll. Gaté par .qf-anim-ready (ajouté par JS)
+           pour que SANS JavaScript les blocs restent visibles (pas d'écran blanc). */
+        .qf-anim-ready .qf-reveal { opacity: 0; transition: opacity .6s ease, transform .6s cubic-bezier(.22,1,.36,1), filter .6s ease; will-change: opacity, transform; }
+        .qf-anim-ready .qf-reveal.qf-in { opacity: 1; transform: none; filter: none; }
+        .qf-anim-ready .qf-a-up { transform: translateY(30px); }
+        .qf-anim-ready .qf-a-down { transform: translateY(-30px); }
+        .qf-anim-ready .qf-a-left { transform: translateX(34px); }
+        .qf-anim-ready .qf-a-right { transform: translateX(-34px); }
+        .qf-anim-ready .qf-a-zoom { transform: scale(.9); }
+        .qf-anim-ready .qf-a-zoomout { transform: scale(1.07); }
+        .qf-anim-ready .qf-a-rotate { transform: rotate(-4deg) scale(.95); }
+        .qf-anim-ready .qf-a-blur { filter: blur(9px); }
+        .qf-anim-ready .qf-a-flip { transform: perspective(800px) rotateX(14deg); transform-origin: center bottom; }
+        /* Effets au survol (blocs interactifs) */
+        .qf-hv-lift { transition: transform .22s ease, box-shadow .22s ease; }
+        .qf-hv-lift:hover { transform: translateY(-5px); }
+        .qf-hv-zoom { transition: transform .22s ease; }
+        .qf-hv-zoom:hover { transform: scale(1.025); }
+        .qf-hv-glow { transition: box-shadow .25s ease; }
+        .qf-hv-glow:hover { box-shadow: 0 0 26px ${theme.primary}55; }
+        @media (prefers-reduced-motion: reduce) {
+          .qf-anim-ready .qf-reveal { opacity: 1 !important; transform: none !important; filter: none !important; }
+          .qf-hv-lift:hover, .qf-hv-zoom:hover { transform: none; }
+        }
       `}</style>
 
       {/* Container — fond complet selon bgMode (mesh/radial/pattern/image/gradient/solid) pour matcher l'éditeur */}

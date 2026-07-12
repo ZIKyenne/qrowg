@@ -43,10 +43,17 @@ describe("blockDecoration", () => {
     expect(r.style.maxWidth).toBe(360)
     expect(r.style.marginLeft).toBe("auto")
   })
-  it("espacement + animation", () => {
+  it("espacement + animation (révélation au scroll, rétrocompat anciennes valeurs)", () => {
     const r = blockDecoration({ __space: "Aéré", __anim: "Zoom" }, theme)
     expect(r.style.marginTop).toBe(22)
-    expect(r.animClass).toBe("qf-b-zoom")
+    expect(r.animClass).toBe("qf-reveal qf-a-zoom") // ancien "Zoom" -> nouvelle variante
+  })
+  it("animations étendues + effet au survol", () => {
+    expect(blockDecoration({ __anim: "Glissé ←" }, theme).animClass).toBe("qf-reveal qf-a-left")
+    expect(blockDecoration({ __anim: "Flou" }, theme).animClass).toBe("qf-reveal qf-a-blur")
+    expect(blockDecoration({ __hover: "Élévation" }, theme).animClass).toBe("qf-hv-lift")
+    expect(blockDecoration({ __anim: "Fondu", __hover: "Lueur" }, theme).animClass).toBe("qf-reveal qf-hv-glow")
+    expect(blockDecoration({ __anim: "Aucune", __hover: "Aucun" }, theme).animClass).toBe("")
   })
   it("intensité : dégradé plein par défaut, adouci si Moyen/Léger", () => {
     expect(blockDecoration({ __grad: "Violet" }, theme).style.background).toBe("linear-gradient(135deg,#4c1d95,#2e1065)")

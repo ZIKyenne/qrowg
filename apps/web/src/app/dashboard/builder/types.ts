@@ -3018,7 +3018,8 @@ export const BLOCK_RADIUS_OPTIONS = ["Défaut", "S", "M", "L", "XL"]
 export const BLOCK_SHADOW_OPTIONS = ["Non", "Douce", "Forte"]
 export const BLOCK_SPACE_OPTIONS = ["Défaut", "Compact", "Aéré"]
 export const BLOCK_WIDTH_OPTIONS = ["Normale", "Étroite"]
-export const BLOCK_ANIM_OPTIONS = ["Aucune", "Fondu", "Glissé", "Zoom"]
+export const BLOCK_ANIM_OPTIONS = ["Aucune", "Fondu", "Glissé ↑", "Glissé ↓", "Glissé ←", "Glissé →", "Zoom avant", "Zoom arrière", "Rotation", "Flou", "Bascule"]
+export const BLOCK_HOVER_OPTIONS = ["Aucun", "Élévation", "Zoom", "Lueur"]
 
 // Modèles d'apparence 1-clic : appliquent un jeu cohérent de clés __ (les clés non listées d'un
 // preset sont remises à "" pour repartir d'un état propre).
@@ -3108,8 +3109,17 @@ export function blockDecoration(
 
   if (c.__width === "Étroite") { style.maxWidth = 360; style.marginLeft = "auto"; style.marginRight = "auto" }
 
-  const animMap: Record<string, string> = { Fondu: "qf-b-fade", Glissé: "qf-b-slide", Zoom: "qf-b-zoom" }
-  const animClass = (c.__anim && animMap[c.__anim]) || ""
+  // Animation d'apparition = révélation au scroll (classe .qf-reveal + variante). Voir le CSS public.
+  // Rétrocompat : anciennes valeurs "Glissé"/"Zoom" mappées vers les nouvelles variantes.
+  const animMap: Record<string, string> = {
+    "Fondu": "qf-reveal",
+    "Glissé": "qf-reveal qf-a-up", "Glissé ↑": "qf-reveal qf-a-up", "Glissé ↓": "qf-reveal qf-a-down",
+    "Glissé ←": "qf-reveal qf-a-left", "Glissé →": "qf-reveal qf-a-right",
+    "Zoom": "qf-reveal qf-a-zoom", "Zoom avant": "qf-reveal qf-a-zoom", "Zoom arrière": "qf-reveal qf-a-zoomout",
+    "Rotation": "qf-reveal qf-a-rotate", "Flou": "qf-reveal qf-a-blur", "Bascule": "qf-reveal qf-a-flip",
+  }
+  const hoverMap: Record<string, string> = { "Élévation": "qf-hv-lift", "Zoom": "qf-hv-zoom", "Lueur": "qf-hv-glow" }
+  const animClass = [c.__anim && animMap[c.__anim], c.__hover && hoverMap[c.__hover]].filter(Boolean).join(" ")
 
   return { style, animClass }
 }
