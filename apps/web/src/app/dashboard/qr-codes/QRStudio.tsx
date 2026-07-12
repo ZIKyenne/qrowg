@@ -2560,8 +2560,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </div>
                   </div>
                   <button type="button" onClick={e => { e.stopPropagation(); setMenuId(isM ? null : qr.id) }}
-                    style={{ width:22, height:22, background:"none", border:"none", color:MUTED, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                    <MoreVertical size={13}/>
+                    style={{ width:isMobile?36:22, height:isMobile?36:22, background:"none", border:"none", color:MUTED, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    <MoreVertical size={isMobile?17:13}/>
                   </button>
                 </div>
 
@@ -2604,8 +2604,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       {isC ? <Check size={10}/> : <Copy size={10}/>} Lien
                     </button>
                     <button type="button" onClick={() => downloadPNG(400)}
-                      style={{ width:28, display:"flex", alignItems:"center", justifyContent:"center", padding:"5px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:7, color:MUTED, cursor:"pointer" }}>
-                      <Download size={10}/>
+                      style={{ width:isMobile?38:28, minHeight:isMobile?36:undefined, display:"flex", alignItems:"center", justifyContent:"center", padding:"5px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:7, color:MUTED, cursor:"pointer" }}>
+                      <Download size={isMobile?14:10}/>
                     </button>
                   </div>
                 )}
@@ -2620,7 +2620,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         {/* Retour à la liste (mobile uniquement) */}
         {isMobile && (
           <button type="button" onClick={() => setMobileView("list")}
-            style={{ display:"flex", alignItems:"center", gap:7, width:"100%", padding:"12px 16px", background:"rgba(255,255,255,0.03)", border:"none", borderBottom:"1px solid rgba(255,255,255,0.06)", color:"#F5F0E8", fontSize:13, fontWeight:600, cursor:"pointer" }}>
+            style={{ position:"sticky", top:0, zIndex:20, display:"flex", alignItems:"center", gap:7, width:"100%", padding:"12px 16px", background:"#0A0907", border:"none", borderBottom:"1px solid rgba(255,255,255,0.08)", color:"#F5F0E8", fontSize:13, fontWeight:600, cursor:"pointer" }}>
             <ArrowRight size={15} style={{ transform:"rotate(180deg)" }} /> Mes QR codes
           </button>
         )}
@@ -2664,7 +2664,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 <div style={{ position:"relative" }}>
                   {/* Scène immersive (produit fini) */}
                   {scene !== "none" && (
-                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", width:"min(46vh,360px)", minHeight:"min(46vh,360px)", animation:"fadeUp .35s ease" }}>
+                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", width:"min(46vh,360px,100%)", maxWidth:"100%", minHeight:"min(46vh,360px)", animation:"fadeUp .35s ease" }}>
                       {!qrPng ? (
                         <div className="skeleton" style={{ width:200, height:200 }} />
                       ) : scene === "phone" ? (
@@ -2681,7 +2681,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           </div>
                         </div>
                       ) : scene === "card" ? (
-                        <div style={{ width:320, height:188, borderRadius:14, background:"linear-gradient(135deg,#16140d,#0c0b08)", border:"1px solid color-mix(in srgb, var(--accent) 22%, transparent)", boxShadow:"0 24px 60px rgba(0,0,0,0.6)", display:"flex", overflow:"hidden" }}>
+                        <div style={{ width:isMobile?260:320, height:isMobile?153:188, borderRadius:14, background:"linear-gradient(135deg,#16140d,#0c0b08)", border:"1px solid color-mix(in srgb, var(--accent) 22%, transparent)", boxShadow:"0 24px 60px rgba(0,0,0,0.6)", display:"flex", overflow:"hidden" }}>
                           <div style={{ flex:1, padding:"20px 18px", display:"flex", flexDirection:"column", justifyContent:"center", gap:7 }}>
                             <div style={{ width:34, height:34, borderRadius:9, background:"linear-gradient(135deg,var(--accent),color-mix(in srgb, var(--accent) 70%, #000))", display:"flex", alignItems:"center", justifyContent:"center", color:"#080808", fontWeight:800, fontSize:15 }}>{(active.pages?.title ?? "Q")[0].toUpperCase()}</div>
                             <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:700, margin:"4px 0 0" }}>{active.pages?.title ?? "Votre nom"}</p>
@@ -2764,8 +2764,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       /q/{active.short_code}
                     </code>
                     <button type="button" onClick={() => copy("short")}
-                      style={{ width:20, height:20, background:"none", border:"none", cursor:"pointer", color:copied==="short"?"#39FF8F":"#8A8478", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                      {copied==="short" ? <Check size={11}/> : <Copy size={11}/>}
+                      style={{ width:isMobile?32:20, height:isMobile?32:20, background:"none", border:"none", cursor:"pointer", color:copied==="short"?"#39FF8F":"#8A8478", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      {copied==="short" ? <Check size={isMobile?14:11}/> : <Copy size={isMobile?14:11}/>}
                     </button>
                   </div>
                   {(() => {

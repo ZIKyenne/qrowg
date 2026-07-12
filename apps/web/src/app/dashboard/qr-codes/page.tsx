@@ -31,7 +31,7 @@ export default async function QRCodesPage() {
   const activeQR   = (qrCodes ?? []).filter((q: any) => (q.status ?? "active") === "active").length
 
   return (
-    <div style={{ minHeight: "100vh", background: "transparent", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
+    <div style={{ minHeight: "100dvh", background: "transparent", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
       <Particles behind />
 
       {/* ===== Header ===== */}
