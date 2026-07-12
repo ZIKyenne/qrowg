@@ -3384,10 +3384,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         .ps-rail.ps-compact { padding: 12px 4px !important; gap: 12px !important; align-items: center; }
         .ps-rail.ps-compact p { display: none !important; }
         .ps-rail.ps-compact > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; gap: 8px !important; width: 100%; }
-        .ps-rail.ps-compact button { font-size: 0 !important; letter-spacing: 0 !important; padding: 11px 0 !important; gap: 0 !important; justify-content: center !important; width: 100% !important; }
-        .ps-rail.ps-compact button svg { width: 19px !important; height: 19px !important; flex-shrink: 0; }
+        .ps-rail.ps-compact button { font-size: 0 !important; letter-spacing: 0 !important; padding: 0 !important; gap: 0 !important; justify-content: center !important; width: 100% !important; min-height: 48px !important; }
+        .ps-rail.ps-compact button svg { width: 22px !important; height: 22px !important; flex-shrink: 0; }
         .ps-topbar-compact { padding: 6px 10px !important; }
-        .ps-topbar-compact button { padding-top: 7px !important; padding-bottom: 7px !important; }
+        /* Cibles tactiles ≥ 42px sur la barre du haut en mobile (priorité UX #6) */
+        .ps-topbar-compact button { padding-top: 7px !important; padding-bottom: 7px !important; min-height: 42px !important; min-width: 42px !important; }
         /* Phase 2 — paysage mobile : panneau Réglages en bottom sheet, Format masqué */
         .ps-hide-mobile { display: none !important; }
         .ps-fly-right.ps-sheet {
