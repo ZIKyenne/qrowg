@@ -22,6 +22,8 @@ export default function AssetsPage() {
   const [files, setFiles] = useState<Asset[] | null>(null)
   const [copied, setCopied] = useState<string>("")
   const [busy, setBusy] = useState(false)
+  const [query, setQuery] = useState("")
+  const [dragOver, setDragOver] = useState(false)
 
   // Fonction simple (pas de useCallback) : listAssets a une identité instable, la mémoïser
   // ferait boucler l'effet. On charge au montage + après chaque upload/suppression.
@@ -32,12 +34,16 @@ export default function AssetsPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load() }, [])
 
-  const assets = tab === "image" ? images : files
+  const q = query.trim().toLowerCase()
+  const assets = (tab === "image" ? images : files)?.filter(a => !q || pretty(a.name).toLowerCase().includes(q)) ?? null
 
-  async function onUpload(file: File) {
+  async function onUploadFiles(list: File[]) {
+    if (!list.length) return
     setBusy(true)
-    if (file.type.startsWith("image/")) await uploadImage(file, "blocks")
-    else await uploadFile(file, "docs")
+    for (const file of list) {
+      if (file.type.startsWith("image/")) await uploadImage(file, "blocks")
+      else await uploadFile(file, "docs")
+    }
     await load(); setBusy(false)
   }
   async function onDelete(a: Asset) {
@@ -51,7 +57,17 @@ export default function AssetsPage() {
   const total = (images?.length || 0) + (files?.length || 0)
 
   return (
-    <div style={{ padding: "clamp(16px, 4vw, 34px)", maxWidth: 1100, margin: "0 auto" }}>
+    <div
+      onDragOver={e => { e.preventDefault(); if (!dragOver) setDragOver(true) }}
+      onDragLeave={e => { if (e.currentTarget === e.target) setDragOver(false) }}
+      onDrop={e => { e.preventDefault(); setDragOver(false); onUploadFiles(Array.from(e.dataTransfer.files || [])) }}
+      style={{ padding: "clamp(16px, 4vw, 34px)", maxWidth: 1100, margin: "0 auto", position: "relative" }}>
+      {dragOver && (
+        <div style={{ position: "absolute", inset: 12, zIndex: 20, background: "rgba(201,168,76,0.08)", border: `2px dashed ${G}`, borderRadius: 18, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, pointerEvents: "none" }}>
+          <Upload size={28} color={G} />
+          <p style={{ color: G, fontSize: 15, fontWeight: 700, margin: 0 }}>Déposez vos fichiers pour les importer</p>
+        </div>
+      )}
       <div style={{ display: "flex", alignItems: "flex-start", gap: 14, flexWrap: "wrap", marginBottom: 20 }}>
         <div style={{ flex: 1, minWidth: 220 }}>
           <h1 style={{ color: "#F5F0E8", fontSize: 24, fontWeight: 700, margin: "0 0 4px", display: "flex", alignItems: "center", gap: 10 }}>
@@ -61,29 +77,33 @@ export default function AssetsPage() {
         </div>
         <label style={{ display: "inline-flex", alignItems: "center", gap: 8, background: G, color: "#080808", fontSize: 13, fontWeight: 700, borderRadius: 10, padding: "10px 16px", cursor: uploading || busy ? "default" : "pointer", opacity: uploading || busy ? 0.6 : 1 }}>
           <Upload size={15} /> {uploading || busy ? "En cours…" : "Importer"}
-          <input type="file" accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv" style={{ display: "none" }}
+          <input type="file" multiple accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv" style={{ display: "none" }}
             disabled={uploading || busy}
-            onChange={e => { const f = e.target.files?.[0]; if (f) onUpload(f); e.target.value = "" }} />
+            onChange={e => { onUploadFiles(Array.from(e.target.files || [])); e.target.value = "" }} />
         </label>
       </div>
 
-      {/* Onglets */}
-      <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 11, padding: 4, marginBottom: 18, width: "fit-content" }}>
-        {([["image", "Images", images?.length], ["file", "Fichiers", files?.length]] as const).map(([k, l, n]) => (
-          <button key={k} onClick={() => setTab(k)}
-            style={{ display: "flex", alignItems: "center", gap: 7, padding: "8px 16px", borderRadius: 8, border: "none", cursor: "pointer", background: tab === k ? G : "transparent", color: tab === k ? "#080808" : MUTED, fontSize: 13, fontWeight: tab === k ? 700 : 500 }}>
-            {k === "image" ? <Images size={14} /> : <FileText size={14} />}{l}{typeof n === "number" ? ` · ${n}` : ""}
-          </button>
-        ))}
+      {/* Onglets + recherche */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 11, padding: 4, width: "fit-content" }}>
+          {([["image", "Images", images?.length], ["file", "Fichiers", files?.length]] as const).map(([k, l, n]) => (
+            <button key={k} onClick={() => setTab(k)}
+              style={{ display: "flex", alignItems: "center", gap: 7, padding: "8px 16px", borderRadius: 8, border: "none", cursor: "pointer", background: tab === k ? G : "transparent", color: tab === k ? "#080808" : MUTED, fontSize: 13, fontWeight: tab === k ? 700 : 500 }}>
+              {k === "image" ? <Images size={14} /> : <FileText size={14} />}{l}{typeof n === "number" ? ` · ${n}` : ""}
+            </button>
+          ))}
+        </div>
+        <input value={query} onChange={e => setQuery(e.target.value)} type="search" placeholder="Rechercher un média…"
+          style={{ flex: 1, minWidth: 180, boxSizing: "border-box", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "9px 13px", color: "#F5F0E8", fontSize: 13, outline: "none" }} />
       </div>
 
       {assets === null ? (
         <p style={{ color: MUTED, fontSize: 13, textAlign: "center", padding: "50px 0" }}>Chargement…</p>
       ) : assets.length === 0 ? (
         <div style={{ textAlign: "center", padding: "56px 0", border: "2px dashed rgba(201,168,76,0.15)", borderRadius: 16 }}>
-          <p style={{ fontSize: 34, margin: "0 0 8px" }}>{tab === "image" ? "🖼️" : "📄"}</p>
-          <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 600, margin: "0 0 4px" }}>Aucun {tab === "image" ? "média image" : "fichier"} pour l'instant</p>
-          <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>Cliquez sur « Importer » pour ajouter votre premier média.</p>
+          <p style={{ fontSize: 34, margin: "0 0 8px" }}>{q ? "🔍" : tab === "image" ? "🖼️" : "📄"}</p>
+          <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 600, margin: "0 0 4px" }}>{q ? "Aucun média ne correspond" : `Aucun ${tab === "image" ? "média image" : "fichier"} pour l'instant`}</p>
+          <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{q ? `Aucun résultat pour « ${query.trim()} ».` : "Cliquez sur « Importer » ou glissez-déposez vos fichiers ici."}</p>
         </div>
       ) : tab === "image" ? (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12 }}>
