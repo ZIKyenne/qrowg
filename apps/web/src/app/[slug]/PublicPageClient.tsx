@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, Component } from "react"
 import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
-import { queueEngagement, trackDwell } from "@/lib/trackEngagement"
+import { queueEngagement, trackDwell, queueTap } from "@/lib/trackEngagement"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
 import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, buildVCard, mapEmbedUrl, shareLinks, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref, docTypeMeta, docActionLabel, announcementMeta, blockDecoration, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
@@ -2912,6 +2912,23 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
     document.addEventListener("visibilitychange", onHidden)
     window.addEventListener("pagehide", sendDwell)
 
+    // 3bis) Carte de chaleur : position normalisée de chaque clic/tap (x = largeur, y = hauteur totale).
+    // On remonte au bloc touché (data-qf-block) pour le classement par bloc. RGPD : que des fractions d'écran.
+    const onTap = (ev: MouseEvent) => {
+      const fullH = Math.max(document.documentElement.scrollHeight, 1)
+      const x = ev.clientX / Math.max(window.innerWidth, 1)
+      const y = (window.scrollY + ev.clientY) / fullH
+      let el = ev.target as HTMLElement | null
+      let ref = "-"
+      while (el && el !== document.body) {
+        const id = el.getAttribute?.("data-qf-block")
+        if (id) { ref = id; break }
+        el = el.parentElement
+      }
+      queueTap(pageId, ref, x, y)
+    }
+    document.addEventListener("click", onTap, { capture: true })
+
     // 4) Moteur d'animations : révélation au scroll. On active le mode animé (gate CSS) puis, après
     // une frame (pour peindre l'état masqué), on observe les blocs .qf-reveal pour ajouter .qf-in.
     document.documentElement.classList.add("qf-anim-ready")
@@ -2930,6 +2947,7 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
       window.removeEventListener("scroll", onScroll)
       document.removeEventListener("visibilitychange", onHidden)
       window.removeEventListener("pagehide", sendDwell)
+      document.removeEventListener("click", onTap, { capture: true })
       cancelAnimationFrame(rafId)
       revealIo?.disconnect()
       document.documentElement.classList.remove("qf-anim-ready")

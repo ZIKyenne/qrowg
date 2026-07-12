@@ -55,8 +55,8 @@ export function buildSourceData(views: AggView[]): NameValue[] {
   return Object.entries(counts).map(([name, value]) => ({ name, value }))
 }
 
-// ── Engagement (page_events : scroll + impressions + temps par bloc) ──────────
-export type PageEvent = { kind: "scroll" | "impression" | "dwell"; ref: string; value?: number | null; page_id?: string }
+// ── Engagement (page_events : scroll + impressions + temps par bloc + clics) ───
+export type PageEvent = { kind: "scroll" | "impression" | "dwell" | "tap"; ref: string; value?: number | null; x?: number | null; y?: number | null; page_id?: string }
 export type ScrollStep = { depth: string; count: number; pct: number }
 
 // Entonnoir de profondeur de scroll : jalons 25/50/75/100 %. Chaque visiteur qui atteint
@@ -121,4 +121,45 @@ export function buildBlockDwell(events: PageEvent[]): Record<string, number> {
   const avg: Record<string, number> = {}
   for (const ref of Object.keys(sum)) avg[ref] = Math.round(sum[ref] / n[ref])
   return avg
+}
+
+// ── Carte de chaleur des clics (heatmap) ──────────────────────────────────────
+// Grille d'intensité normalisée 0..1 à partir des taps (x/y = fractions 0..1).
+// x = colonne (largeur), y = ligne (hauteur totale de la page). Ignore les taps
+// hors bornes / sans coordonnées. cols × rows cellules ; chaque cellule = part du max.
+export function buildTapGrid(events: PageEvent[], cols: number, rows: number): number[][] {
+  const c = Math.max(1, Math.floor(cols))
+  const r = Math.max(1, Math.floor(rows))
+  const grid: number[][] = Array.from({ length: r }, () => new Array(c).fill(0))
+  let max = 0
+  for (const e of events) {
+    if (e.kind !== "tap") continue
+    const x = e.x, y = e.y
+    if (typeof x !== "number" || typeof y !== "number") continue
+    if (x < 0 || x > 1 || y < 0 || y > 1 || Number.isNaN(x) || Number.isNaN(y)) continue
+    const ci = Math.min(c - 1, Math.floor(x * c))
+    const ri = Math.min(r - 1, Math.floor(y * r))
+    const v = grid[ri][ci] + 1
+    grid[ri][ci] = v
+    if (v > max) max = v
+  }
+  if (max === 0) return grid
+  for (let i = 0; i < r; i++) for (let j = 0; j < c; j++) grid[i][j] = grid[i][j] / max
+  return grid
+}
+
+// Nombre de clics (taps) par bloc touché. Ignore ref vide ou '-' (taps hors bloc).
+export function buildTapsByBlock(events: PageEvent[]): Record<string, number> {
+  const counts: Record<string, number> = {}
+  for (const e of events) {
+    if (e.kind === "tap" && e.ref && e.ref !== "-") counts[e.ref] = (counts[e.ref] || 0) + 1
+  }
+  return counts
+}
+
+// Nombre total de taps enregistrés (avec ou sans coordonnées valides).
+export function countTaps(events: PageEvent[]): number {
+  let n = 0
+  for (const e of events) if (e.kind === "tap") n++
+  return n
 }

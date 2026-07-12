@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { formatDay, buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildBlockImpressions, blockCtr, buildBlockDwell, buildFunnel } from "./analyticsAgg"
+import { formatDay, buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildBlockImpressions, blockCtr, buildBlockDwell, buildFunnel, buildTapGrid, buildTapsByBlock, countTaps, type PageEvent } from "./analyticsAgg"
 
 // now fixe pour des fenetres glissantes deterministes : 2026-07-07T12:00:00Z
 const NOW = Date.parse("2026-07-07T12:00:00Z")
@@ -147,5 +147,51 @@ describe("buildFunnel", () => {
   it("aucune vue -> tout a 0 (pas de division par zero)", () => {
     const f = buildFunnel([{ label: "Vues", count: 0 }, { label: "Clics", count: 0 }])
     expect(f.every(s => s.pctOfTop === 0 && s.dropFromPrev === 0)).toBe(true)
+  })
+})
+
+describe("buildTapGrid", () => {
+  const tap = (x: number, y: number): PageEvent => ({ kind: "tap", ref: "-", x, y })
+  it("normalise l'intensité par le max (cellule la plus dense = 1)", () => {
+    const g = buildTapGrid([tap(0.1, 0.1), tap(0.1, 0.1), tap(0.9, 0.9)], 2, 2)
+    expect(g[0][0]).toBe(1)      // 2 taps -> max
+    expect(g[1][1]).toBe(0.5)    // 1 tap -> moitié
+    expect(g[0][1]).toBe(0)
+  })
+  it("borne les coordonnées à la dernière cellule (x=1 -> dernière colonne)", () => {
+    const g = buildTapGrid([tap(1, 1)], 3, 3)
+    expect(g[2][2]).toBe(1)
+  })
+  it("ignore les taps hors bornes, NaN ou sans coordonnées", () => {
+    const g = buildTapGrid([
+      { kind: "tap", ref: "-", x: 1.5, y: 0.5 },
+      { kind: "tap", ref: "-", x: 0.5, y: -0.1 },
+      { kind: "tap", ref: "-", x: NaN, y: 0.5 },
+      { kind: "tap", ref: "-" },
+      { kind: "impression", ref: "b1", x: 0.5, y: 0.5 },
+    ], 2, 2)
+    expect(g.flat().every(v => v === 0)).toBe(true)
+  })
+  it("grille vide si aucun tap (que des zéros, dimensions respectées)", () => {
+    const g = buildTapGrid([], 4, 6)
+    expect(g.length).toBe(6)
+    expect(g[0].length).toBe(4)
+    expect(g.flat().every(v => v === 0)).toBe(true)
+  })
+})
+
+describe("buildTapsByBlock / countTaps", () => {
+  const evs: PageEvent[] = [
+    { kind: "tap", ref: "b1", x: 0.1, y: 0.1 },
+    { kind: "tap", ref: "b1", x: 0.2, y: 0.2 },
+    { kind: "tap", ref: "b2", x: 0.3, y: 0.3 },
+    { kind: "tap", ref: "-", x: 0.4, y: 0.4 },   // hors bloc -> ignoré par byBlock
+    { kind: "impression", ref: "b1" },
+  ]
+  it("compte les taps par bloc, ignore '-' et les non-taps", () => {
+    expect(buildTapsByBlock(evs)).toEqual({ b1: 2, b2: 1 })
+  })
+  it("countTaps compte tous les taps (y compris hors bloc)", () => {
+    expect(countTaps(evs)).toBe(4)
   })
 })

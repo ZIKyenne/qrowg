@@ -13,9 +13,10 @@ import GeoPanel from "./GeoPanel"
 import DevicePanel from "./DevicePanel"
 import ExportPanel from "./ExportPanel"
 import ReportSubscriptionPanel from "./ReportSubscriptionPanel"
-import { buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildBlockImpressions, buildBlockDwell, buildFunnel } from "./analyticsAgg"
+import { buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildBlockImpressions, buildBlockDwell, buildFunnel, buildTapGrid, buildTapsByBlock, countTaps } from "./analyticsAgg"
 import ScrollDepthPanel from "./ScrollDepthPanel"
 import ConversionFunnelPanel from "./ConversionFunnelPanel"
+import HeatmapPanel from "./HeatmapPanel"
 import Particles from "@/components/Particles"
 
 type Profile = { total_pages: number; total_scans: number; plan: string; email?: string; full_name?: string } | null
@@ -26,7 +27,7 @@ type Click = { block_id: string; click_target: string | null; clicked_at: string
 type BRow    = { id: string; type: string; page_id: string; position: number; is_visible: boolean }
 type GeoScan    = { country: string | null; city: string | null; page_id: string; scanned_at: string }
 type DeviceScan = { device: string; os: string | null; browser: string | null; page_id: string; scanned_at: string }
-type PageEv     = { kind: "scroll" | "impression" | "dwell"; ref: string; value?: number | null; page_id: string; created_at: string }
+type PageEv     = { kind: "scroll" | "impression" | "dwell" | "tap"; ref: string; value?: number | null; x?: number | null; y?: number | null; page_id: string; created_at: string }
 
 interface Props {
   profile: Profile
@@ -94,6 +95,9 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
   const scrollFunnel = useMemo(() => buildScrollFunnel(filteredEvents), [filteredEvents])
   const blockImpressions = useMemo(() => buildBlockImpressions(filteredEvents), [filteredEvents])
   const blockDwell = useMemo(() => buildBlockDwell(filteredEvents), [filteredEvents])
+  const tapGrid = useMemo(() => buildTapGrid(filteredEvents, 8, 16), [filteredEvents])
+  const tapsByBlock = useMemo(() => buildTapsByBlock(filteredEvents), [filteredEvents])
+  const tapTotal = useMemo(() => countTaps(filteredEvents), [filteredEvents])
 
   // Tunnel de conversion : Vues -> Engagés (défilement ≥50%) -> Actions (clics sur 30j, même page).
   const funnel = useMemo(() => {
@@ -439,6 +443,11 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
         <div style={{ marginBottom: 24, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16 }}>
           <ConversionFunnelPanel steps={funnel.steps} conversionRate={funnel.conversionRate} hasEngagementData={funnel.hasEngagementData} />
           <ScrollDepthPanel funnel={scrollFunnel} />
+        </div>
+
+        {/* ── Carte de chaleur des clics ────────────────────────────────── */}
+        <div style={{ marginBottom: 24 }}>
+          <HeatmapPanel grid={tapGrid} byBlock={tapsByBlock} total={tapTotal} blocks={blocks} />
         </div>
 
         {/* ── Géographie ──────────────────────────────────────────────────── */}
