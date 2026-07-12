@@ -8,6 +8,7 @@
   } from "lucide-react"
   import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, INFO_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, announcementMeta, optionLabel, blockDecoration, BLOCK_GRADIENTS, BLOCK_RADIUS_OPTIONS, BLOCK_SHADOW_OPTIONS, BLOCK_SPACE_OPTIONS, BLOCK_WIDTH_OPTIONS, BLOCK_ANIM_OPTIONS, BLOCK_ANIM_SPEED_OPTIONS, BLOCK_HOVER_OPTIONS, BLOCK_LOOP_OPTIONS, BLOCK_INTENSITY_OPTIONS, BLOCK_STYLE_PRESETS, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import { PAGE_TEMPLATES, PAGE_TEMPLATE_GROUPS, type PageTemplate } from "./page-templates"
+  import { useIsMobile } from "@/lib/useIsMobile"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
   import FileUpload from "./FileUpload"
@@ -4356,6 +4357,12 @@
     // ── Resize panneaux ────────────────────────────────────────────────────
     const blocksResize = useResize("blocks", 300, 240, 520)
     const rightResize = useResize("right", 340, 280, 520)
+    // Responsive : sous 1024px, les 3 colonnes (palette | page | réglages) ne tiennent plus côte à côte.
+    // On bascule en mode « un panneau à la fois » piloté par une barre d'onglets en bas.
+    const isMobile = useIsMobile(1024)
+    const [mobileTab, setMobileTab] = useState<"blocks"|"canvas"|"panel">("canvas")
+    // En mobile, les panneaux occupent 100% : on force l'état déplié (le mode réduit à icônes n'a plus de sens).
+    useEffect(() => { if (isMobile) { setBlocksCollapsed(false); setRightCollapsed(false) } }, [isMobile])
 
     // ── Favoris ───────────────────────────────────────────────────────────────
     // ── Popover aperçu bloc ─────────────────────────────────────────────────
@@ -4591,6 +4598,7 @@
       const id = genId()
       setBlocks(p => [...p, { id, type, content: content||{...def.defaultContent}, visible: true }])
       setSelectedId(id); setRightTab("edit")
+      if (isMobile) setMobileTab("panel")   // mobile : on ouvre direct l'éditeur du bloc ajouté
       pushRecent(type)
     }
 
@@ -4605,6 +4613,7 @@
       const next = tpl.blocks.map(b => ({ id: genId(), type: b.type, content: { ...(BLOCK_DEFS[b.type]?.defaultContent || {}), ...b.content }, visible: true }))
       setBlocks(next)
       setSelectedId(null); setRightTab("preview"); setShowTemplates(false)
+      if (isMobile) setMobileTab("canvas")   // mobile : on montre la page fraîchement générée
     }
 
     // Génère une identité de base (curated, sans IA) : profil + bio + compétences + disponibilité
@@ -4917,13 +4926,13 @@
     }
 
     return (
-      <div style={{ height: "100vh", background: "#080808", display: "flex", flexDirection: "column", fontFamily: "DM Sans, sans-serif", color: "#F5F0E8", overflow: "hidden" }}>
+      <div style={{ height: "100dvh", background: "#080808", display: "flex", flexDirection: "column", fontFamily: "DM Sans, sans-serif", color: "#F5F0E8", overflow: "hidden" }}>
 
         {/* TOPBAR */}
         <div style={{ height: 50, background: "#0D0D0D", borderBottom: "1px solid rgba(201,168,76,0.12)", display: "flex", alignItems: "center", padding: "0 14px", gap: 10, flexShrink: 0, zIndex: 20 }}>
           <a href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 4, textDecoration: "none", color: G, fontFamily: "Cormorant Garamond, serif", fontSize: 16, fontWeight: 700 }}>← QRfolio</a>
           <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.08)" }} />
-          <input value={pageName} onChange={e => setPageName(e.target.value)} style={{ background: "transparent", border: "none", color: "#F5F0E8", fontSize: 13, fontWeight: 600, outline: "none", width: 160 }} />
+          <input value={pageName} onChange={e => setPageName(e.target.value)} style={{ background: "transparent", border: "none", color: "#F5F0E8", fontSize: 13, fontWeight: 600, outline: "none", width: isMobile ? 96 : 160, minWidth: 0 }} />
           {saving && <span style={{ color: MUTED, fontSize: 10 }}>Enregistrement…</span>}
           {saved && !saveError && !saving && <span style={{ color: "#39FF8F", fontSize: 10, display: "flex", alignItems: "center", gap: 3 }}><Check size={10} /> Enregistré</span>}
           {hasUnsaved && !saving && !saved && !saveError && (
@@ -4964,14 +4973,14 @@
             ✨ Modèles
           </button>
 
-          {/* Bouton Focus Mode */}
-          <button onClick={toggleFocus} title="Mode Focus — Ctrl+F"
+          {/* Bouton Focus Mode (desktop uniquement — panneaux redimensionnables) */}
+          {!isMobile && <button onClick={toggleFocus} title="Mode Focus — Ctrl+F"
             style={{ display: "flex", alignItems: "center", gap: 5, background: focusMode ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.04)", border: `1px solid ${focusMode ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.08)"}`, borderRadius: 7, padding: "5px 10px", color: focusMode ? G : MUTED, fontSize: 10, fontWeight: focusMode ? 700 : 400, cursor: "pointer" }}>
             {focusMode ? "⊞" : "⊡"} Focus
-          </button>
+          </button>}
 
-          {/* Raccourcis clavier — tooltip */}
-          <div style={{ position: "relative" }}>
+          {/* Raccourcis clavier — tooltip (survol : desktop uniquement) */}
+          <div style={{ position: "relative", display: isMobile ? "none" : "block" }}>
             <button
               style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, cursor: "pointer", color: MUTED, fontSize: 11, fontWeight: 700 }}
               title="Raccourcis clavier"
@@ -5129,7 +5138,7 @@
         <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
 
           {/* SIDEBAR BLOCS */}
-          <div style={{ width: blocksCollapsed ? 64 : blocksResize.width, background: "#0A0A0A", borderRight: "none", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden", transition: blocksCollapsed ? "width 0.25s ease" : "none", position: "relative" }}>
+          <div style={{ width: isMobile ? "100%" : (blocksCollapsed ? 64 : blocksResize.width), background: "#0A0A0A", borderRight: "none", display: isMobile && mobileTab !== "blocks" ? "none" : "flex", flexDirection: "column", flexShrink: isMobile ? 1 : 0, overflow: "hidden", transition: blocksCollapsed ? "width 0.25s ease" : "none", position: "relative" }}>
             {/* Bouton collapse/expand */}
             <button onClick={toggleBlocks} title={blocksCollapsed ? "Ouvrir" : "Réduire"}
               style={{ position: "absolute", top: 8, right: 8, zIndex: 20, width: 22, height: 22, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10 }}>
@@ -5515,8 +5524,8 @@
             </div>}
           </div>
 
-          {/* POIGNÉE RESIZE sidebar blocs */}
-          {!blocksCollapsed && (
+          {/* POIGNÉE RESIZE sidebar blocs (souris uniquement -> masquée en mobile) */}
+          {!blocksCollapsed && !isMobile && (
             <div
               onMouseDown={blocksResize.onMouseDown}
               style={{
@@ -5578,7 +5587,7 @@
           )}
 
           {/* CANVAS */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "20px", background: "#0A0A0A" }}
+          <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "12px" : "20px", background: "#0A0A0A", display: isMobile && mobileTab !== "canvas" ? "none" : undefined }}
             onClick={e => { if (e.target === e.currentTarget) { setSelectedId(null); setMultiSelection([]) } }}>
             <div style={{ maxWidth: 640, margin: "0 auto" }}>
               {/* ── Toolbar flottante multi-sélection (≥2 blocs) ─────────────── */}
@@ -5800,8 +5809,8 @@
           </div>
 
           {/* PANEL DROIT */}
-          {/* POIGNÉE RESIZE panel droit */}
-          {!rightCollapsed && (
+          {/* POIGNÉE RESIZE panel droit (souris uniquement -> masquée en mobile) */}
+          {!rightCollapsed && !isMobile && (
             <div
               onMouseDown={rightResize.onMouseDown}
               style={{
@@ -5818,7 +5827,7 @@
               </div>
             </div>
           )}
-          <div style={{ width: rightCollapsed ? 48 : rightResize.width, background: "#161616", borderLeft: "none", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden", transition: rightCollapsed ? "width 0.25s ease" : "none", position: "relative" }}>
+          <div style={{ width: isMobile ? "100%" : (rightCollapsed ? 48 : rightResize.width), background: "#161616", borderLeft: "none", display: isMobile && mobileTab !== "panel" ? "none" : "flex", flexDirection: "column", flexShrink: isMobile ? 1 : 0, overflow: "hidden", transition: rightCollapsed ? "width 0.25s ease" : "none", position: "relative" }}>
             <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
               {rightCollapsed
                 ? /* Mode réduit: onglets verticaux */
@@ -6201,6 +6210,25 @@
 
           </div>
         </div>
+
+        {/* BARRE D'ONGLETS MOBILE — un panneau à la fois (palette | page | réglages) */}
+        {isMobile && (
+          <div style={{ flexShrink: 0, display: "flex", background: "#0C0C0C", borderTop: "1px solid rgba(255,255,255,0.08)", paddingBottom: "env(safe-area-inset-bottom)" }}>
+            {([
+              { id: "blocks", label: "Blocs", icon: "🧱" },
+              { id: "canvas", label: "Page", icon: "📄" },
+              { id: "panel", label: "Réglages", icon: "⚙️" },
+            ] as const).map(t => {
+              const on = mobileTab === t.id
+              return (
+                <button key={t.id} onClick={() => setMobileTab(t.id)}
+                  style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "9px 4px", background: on ? "rgba(201,168,76,0.12)" : "transparent", border: "none", borderTop: `2px solid ${on ? G : "transparent"}`, color: on ? G : MUTED, fontSize: 10, fontWeight: on ? 700 : 500, cursor: "pointer" }}>
+                  <span style={{ fontSize: 16 }}>{t.icon}</span>{t.label}
+                </button>
+              )
+            })}
+          </div>
+        )}
 
         {/* Popover aperçu bloc */}
         {popover && (() => {
