@@ -16,14 +16,17 @@ function compute(): DeviceOrientation {
   }
   const width = window.innerWidth
   const height = window.innerHeight
-  const isTouch =
-    (typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches) ||
-    (navigator.maxTouchPoints ?? 0) > 0
+  // Pointeur grossier = doigt (téléphone/tablette), pas une souris. Un desktop, même dans
+  // une fenêtre courte (hauteur < 768), garde une souris -> coarse = false.
+  const coarse = typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches
+  const isTouch = coarse || (navigator.maxTouchPoints ?? 0) > 0
   return {
     width,
     height,
     isPortrait: height >= width,
-    isMobile: Math.min(width, height) < 768,
+    // Téléphone/petite tablette : petit côté < 768px ET pointeur grossier.
+    // Le « ET coarse » évite qu'une fenêtre desktop courte (laptop, split-screen) soit prise pour un mobile.
+    isMobile: Math.min(width, height) < 768 && coarse,
     isTouch,
   }
 }
