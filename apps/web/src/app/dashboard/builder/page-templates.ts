@@ -349,3 +349,11 @@ export const PAGE_TEMPLATE_GROUPS: string[] = PAGE_TEMPLATES.reduce<string[]>((a
   if (!acc.includes(t.group)) acc.push(t.group)
   return acc
 }, [])
+
+// Ambiances réutilisables (clé -> thème premium), pour la génération par IA.
+// L'IA choisit une clé d'ambiance ; le mapper la traduit en thème réel cohérent.
+export const AMBIANCE_THEMES: Record<string, PageTheme> = T
+export const AMBIANCE_KEYS = Object.keys(T)
+export function themeForAmbiance(key: string): PageTheme {
+  return T[key as keyof typeof T] || T.gold
+}

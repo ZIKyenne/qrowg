@@ -4121,6 +4121,29 @@
     const [styleClipboard, setStyleClipboard] = useState<Record<string, string> | null>(null)
     const [showTemplates, setShowTemplates] = useState(false)
     const [templateGroup, setTemplateGroup] = useState<string>(PAGE_TEMPLATE_GROUPS[0])
+    const [aiGenPrompt, setAiGenPrompt] = useState("")
+    const [aiGenLoading, setAiGenLoading] = useState(false)
+    const [aiGenError, setAiGenError] = useState<string | null>(null)
+
+    async function generateWithAI() {
+      const description = aiGenPrompt.trim()
+      if (description.length < 5) { setAiGenError("Décrivez votre activité en quelques mots."); return }
+      setAiGenLoading(true); setAiGenError(null)
+      try {
+        const res = await fetch("/api/generate-page", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ description }),
+        })
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok) { setAiGenError(data?.error || "La génération a échoué."); return }
+        if (!data?.template?.blocks?.length) { setAiGenError("Aucun contenu généré. Réessayez."); return }
+        applyPageTemplate(data.template as PageTemplate) // applique + ferme la modale
+      } catch {
+        setAiGenError("Connexion impossible. Réessayez.")
+      } finally {
+        setAiGenLoading(false)
+      }
+    }
     const [activeCategory, setActiveCategory] = useState("identity")
     const [search, setSearch] = useState("")
     const [dayMode, setDayMode] = useState(false)
@@ -6214,6 +6237,31 @@
                   <p style={{ margin: 0, color: MUTED, fontSize: 11 }}>Une page complète et cohérente en un clic — personnalisable ensuite.</p>
                 </div>
                 <button onClick={() => setShowTemplates(false)} aria-label="Fermer" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", width: 30, height: 30, fontSize: 16 }}>×</button>
+              </div>
+              {/* Génération par IA — décris ton activité, l'IA construit la page */}
+              <div style={{ padding: "12px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)", background: "linear-gradient(120deg,rgba(201,168,76,0.09),rgba(57,255,143,0.05))" }}>
+                <p style={{ margin: "0 0 7px", color: "#F5F0E8", fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
+                  <span>🪄</span> Générer ma page avec l&apos;IA
+                  <span style={{ fontSize: 9.5, fontWeight: 500, color: MUTED }}>— décris ton activité, l&apos;IA fait le reste</span>
+                </p>
+                <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                  <textarea
+                    value={aiGenPrompt}
+                    onChange={e => { setAiGenPrompt(e.target.value); if (aiGenError) setAiGenError(null) }}
+                    disabled={aiGenLoading}
+                    placeholder="Ex : Salon de coiffure haut de gamme à Lyon, coupe, coloration, barbier. Réservation en ligne, ambiance chaleureuse."
+                    rows={2}
+                    style={{ flex: 1, resize: "vertical", minHeight: 44, background: "rgba(0,0,0,0.35)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 9, color: "#F5F0E8", fontSize: 11.5, padding: "8px 10px", lineHeight: 1.4, fontFamily: "inherit" }}
+                  />
+                  <button onClick={generateWithAI} disabled={aiGenLoading}
+                    style={{ flexShrink: 0, alignSelf: "stretch", minWidth: 104, padding: "0 14px", borderRadius: 9, border: "none", cursor: aiGenLoading ? "wait" : "pointer", background: aiGenLoading ? "rgba(201,168,76,0.4)" : G, color: "#080808", fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                    {aiGenLoading
+                      ? <><span style={{ width: 12, height: 12, border: "2px solid rgba(8,8,8,0.3)", borderTopColor: "#080808", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} /> …</>
+                      : <>✨ Générer</>}
+                  </button>
+                </div>
+                {aiGenError && <p style={{ margin: "7px 0 0", color: "#F87171", fontSize: 10.5 }}>{aiGenError}</p>}
+                {aiGenLoading && <p style={{ margin: "7px 0 0", color: MUTED, fontSize: 10 }}>L&apos;IA rédige votre page… (quelques secondes)</p>}
               </div>
               <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
                 {/* Colonne métiers */}
