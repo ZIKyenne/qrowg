@@ -60,14 +60,28 @@ export default async function AnalyticsPage() {
     .in("page_id", (pages || []).map(p => p.id))
     .eq("is_visible", true)
 
-  // Engagement (scroll + impressions de blocs) des 30 derniers jours.
-  // La table page_events peut ne pas exister encore (migration 019) -> on ignore l'erreur.
-  const { data: pageEventsRaw } = await supabase
+  // Engagement (scroll + impressions + dwell) des 30 derniers jours.
+  // Requête SANS x/y : indépendante de la migration 021 (si 021 absente, ces données restent OK).
+  const pageIds = (pages || []).map(p => p.id)
+  const { data: baseEventsRaw } = await supabase
     .from("page_events")
-    .select("kind, ref, value, x, y, page_id, created_at")
-    .in("page_id", (pages || []).map(p => p.id))
+    .select("kind, ref, value, page_id, created_at")
+    .in("kind", ["scroll", "impression", "dwell"])
+    .in("page_id", pageIds)
     .gte("created_at", since.toISOString())
-  const pageEvents = (pageEventsRaw || []) as { kind: "scroll" | "impression" | "dwell" | "tap"; ref: string; value: number | null; x: number | null; y: number | null; page_id: string; created_at: string }[]
+  // Taps (carte de chaleur) — requête SÉPARÉE : si la migration 021 n'est pas lancée,
+  // seule la heatmap dégrade (l'erreur est ignorée), le reste de l'engagement n'est pas affecté.
+  const { data: tapEventsRaw } = await supabase
+    .from("page_events")
+    .select("ref, x, y, page_id, created_at")
+    .eq("kind", "tap")
+    .in("page_id", pageIds)
+    .gte("created_at", since.toISOString())
+  type PageEvRow = { kind: "scroll" | "impression" | "dwell" | "tap"; ref: string; value: number | null; x: number | null; y: number | null; page_id: string; created_at: string }
+  const pageEvents: PageEvRow[] = [
+    ...((baseEventsRaw || []) as any[]).map(e => ({ ...e, x: null, y: null })),
+    ...((tapEventsRaw || []) as any[]).map(e => ({ ...e, kind: "tap" as const, value: null })),
+  ]
 
   // Normaliser les clics (joindre block_type depuis blocks)
   const clicks = (recentClicks || []).map((c: any) => ({

@@ -61,6 +61,17 @@ const nonEmpty = (v: string) => v.length > 0
 
 // Réseau social : normalise un libellé libre ("Instagram", "insta") vers une clé connue.
 const SOCIAL_KEYS = ["instagram", "facebook", "tiktok", "linkedin", "youtube", "twitter", "x", "whatsapp", "snapchat", "pinterest", "twitch", "telegram"]
+// URL d'accueil correcte par réseau (les domaines diffèrent : twitch.tv, t.me, wa.me…).
+const SOCIAL_FALLBACK: Record<string, string> = {
+  instagram: "https://instagram.com", facebook: "https://facebook.com", tiktok: "https://tiktok.com",
+  linkedin: "https://linkedin.com", youtube: "https://youtube.com", twitter: "https://twitter.com",
+  x: "https://x.com", whatsapp: "https://wa.me", snapchat: "https://snapchat.com",
+  pinterest: "https://pinterest.com", twitch: "https://twitch.tv", telegram: "https://t.me",
+}
+// Une chaîne ressemble-t-elle à une URL/lien (pas une phrase) ? (pas d'espace + un caractère d'URL)
+function looksLikeUrl(v: string): boolean {
+  return v.length > 0 && !/\s/.test(v) && /[.#/@:]/.test(v)
+}
 function socialKeyOf(label: string): string | null {
   const l = label.toLowerCase().replace(/[^a-z]/g, "")
   if (!l) return null
@@ -125,7 +136,7 @@ function mapSection(kind: string, title: string, text: string, rows: { label: st
     case "services": {
       if (!rows.length) return null
       const content: Record<string, string> = { title: title || "Mes services" }
-      rows.slice(0, 5).forEach((r, i) => {
+      rows.slice(0, 3).forEach((r, i) => {   // le rendu public de services_list ne lit que s1..s3
         const n = i + 1
         content[`s${n}_name`] = r.label
         content[`s${n}_desc`] = r.detail
@@ -187,7 +198,8 @@ function mapSection(kind: string, title: string, text: string, rows: { label: st
     }
     case "cta": {
       const label = title || rows[0]?.label || "Me contacter"
-      const url = text || rows[0]?.value || "#"
+      // N'utilise comme href que ce qui ressemble vraiment à une URL (jamais une phrase).
+      const url = [text, rows[0]?.value].find(v => v && looksLikeUrl(v)) || "#"
       return { type: "cta_button", content: { label, url, style: "gold", icon: "" } }
     }
     case "announcement": {
@@ -199,7 +211,7 @@ function mapSection(kind: string, title: string, text: string, rows: { label: st
       const content: Record<string, string> = {}
       rows.forEach(r => {
         const key = socialKeyOf(r.label)
-        if (key) content[key] = nonEmpty(r.value) ? r.value : `https://${key}.com`
+        if (key) content[key] = looksLikeUrl(r.value) ? r.value : (SOCIAL_FALLBACK[key] || `https://${key}.com`)
       })
       if (!Object.keys(content).length) content.instagram = "https://instagram.com"
       return { type: "social_links", content }
@@ -227,6 +239,6 @@ export function buildSystemPrompt(): string {
     "- sections : 4 à 7 sections pertinentes pour le métier, dans un ordre logique (présentation, offre, preuve sociale, infos pratiques, contact).",
     "- Types de section (kind) : about (texte), services, menu (restauration), pricing, testimonials, faq, hours (horaires), cta (bouton d'action), announcement (annonce), social (réseaux), map (adresse), skills (compétences).",
     "- items : lignes génériques {label, value, detail}. Selon le kind : services -> label=nom, value=emoji, detail=description ; menu -> label=plat, value=prix, detail=description ; pricing -> label=formule, value=prix, detail=détail ; testimonials -> label=auteur, value=note 1-5, detail=avis ; faq -> label=question, detail=réponse ; hours -> value=horaires (3 lignes : Lun-Ven, Samedi, Dimanche) ; social -> label=réseau, value=URL.",
-    "- Remplis chaque champ requis (mets une chaîne vide si non pertinent). Reste sobre : 3 items max pour menu/pricing/testimonials/faq, 5 pour services.",
+    "- Remplis chaque champ requis (mets une chaîne vide si non pertinent). Reste sobre : 3 items max par section (menu, services, pricing, testimonials, faq).",
   ].join("\n")
 }

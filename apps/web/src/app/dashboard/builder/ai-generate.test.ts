@@ -67,7 +67,7 @@ describe("aiBriefToTemplate", () => {
     expect(byType.google_maps_embed.address).toBe("12 rue de Paris")
   })
 
-  it("plafonne les listes (menu 3, services 5) et ignore les lignes vides", () => {
+  it("plafonne les listes à 3 (rendu public) et ignore les lignes vides", () => {
     const many = Array.from({ length: 8 }, (_, i) => ({ label: `P${i}`, value: `${i}€`, detail: "" }))
     const t = aiBriefToTemplate({ name: "X", ambiance: "gold", sections: [
       { kind: "menu", title: "Carte", text: "", items: [...many, { label: "", value: "", detail: "" }] },
@@ -77,8 +77,25 @@ describe("aiBriefToTemplate", () => {
     expect(menu.item3_name).toBe("P2")
     expect(menu.item4_name).toBeUndefined()
     const svc = t.blocks.find(b => b.type === "services_list")!.content
-    expect(svc.s5_name).toBe("P4")
-    expect(svc.s6_name).toBeUndefined()
+    expect(svc.s3_name).toBe("P2")   // le rendu public ne lit que s1..s3
+    expect(svc.s4_name).toBeUndefined()
+  })
+
+  it("cta : n'accepte comme URL que ce qui ressemble à un lien (jamais une phrase)", () => {
+    const phrase = aiBriefToTemplate({ ambiance: "gold", sections: [{ kind: "cta", title: "Réserver", text: "Contactez-nous vite", items: [] }] })
+    expect(phrase.blocks.find(b => b.type === "cta_button")!.content.url).toBe("#") // phrase -> pas de href cassé
+    const withUrl = aiBriefToTemplate({ ambiance: "gold", sections: [{ kind: "cta", title: "Réserver", text: "une phrase", items: [{ label: "", value: "calendly.com/x", detail: "" }] }] })
+    expect(withUrl.blocks.find(b => b.type === "cta_button")!.content.url).toBe("calendly.com/x") // repli sur l'item URL
+  })
+
+  it("social : domaines de secours corrects (twitch.tv, t.me)", () => {
+    const t = aiBriefToTemplate({ ambiance: "gold", sections: [{ kind: "social", title: "", text: "", items: [
+      { label: "Twitch", value: "", detail: "" },
+      { label: "Telegram", value: "", detail: "" },
+    ] }] })
+    const soc = t.blocks.find(b => b.type === "social_links")!.content
+    expect(soc.twitch).toBe("https://twitch.tv")
+    expect(soc.telegram).toBe("https://t.me")
   })
 
   it("kind inconnu ou section vide -> ignoré (pas de bloc parasite)", () => {
