@@ -13,7 +13,8 @@ import GeoPanel from "./GeoPanel"
 import DevicePanel from "./DevicePanel"
 import ExportPanel from "./ExportPanel"
 import ReportSubscriptionPanel from "./ReportSubscriptionPanel"
-import { buildDailyData, buildDeviceData, buildSourceData } from "./analyticsAgg"
+import { buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildBlockImpressions } from "./analyticsAgg"
+import ScrollDepthPanel from "./ScrollDepthPanel"
 import Particles from "@/components/Particles"
 
 type Profile = { total_pages: number; total_scans: number; plan: string; email?: string; full_name?: string } | null
@@ -24,6 +25,7 @@ type Click = { block_id: string; click_target: string | null; clicked_at: string
 type BRow    = { id: string; type: string; page_id: string; position: number; is_visible: boolean }
 type GeoScan    = { country: string | null; city: string | null; page_id: string; scanned_at: string }
 type DeviceScan = { device: string; os: string | null; browser: string | null; page_id: string; scanned_at: string }
+type PageEv     = { kind: "scroll" | "impression"; ref: string; page_id: string; created_at: string }
 
 interface Props {
   profile: Profile
@@ -34,6 +36,7 @@ interface Props {
   blocks?: BRow[]
   geoScans?: GeoScan[]
   deviceScans?: DeviceScan[]
+  pageEvents?: PageEv[]
   userEmail?: string
 }
 
@@ -65,7 +68,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   )
 }
 
-export default function AnalyticsClient({ profile, pages, recentScans, recentViews, clicks = [], blocks = [], geoScans = [], deviceScans = [], userEmail = "" }: Props) {
+export default function AnalyticsClient({ profile, pages, recentScans, recentViews, clicks = [], blocks = [], geoScans = [], deviceScans = [], pageEvents = [], userEmail = "" }: Props) {
   const [selectedPage, setSelectedPage] = useState<string>("all")
   const [showFull, setShowFull] = useState(false) // analyse détaillée repliée par défaut
 
@@ -81,6 +84,14 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
   const dailyData = useMemo(() => buildDailyData(filteredScans, filteredViews), [filteredScans, filteredViews])
   const deviceData = useMemo(() => buildDeviceData(filteredScans), [filteredScans])
   const sourceData = useMemo(() => buildSourceData(filteredViews), [filteredViews])
+
+  // Engagement (scroll + impressions de blocs) filtré par page sélectionnée.
+  const filteredEvents = useMemo(() =>
+    selectedPage === "all" ? pageEvents : pageEvents.filter(e => e.page_id === selectedPage),
+    [pageEvents, selectedPage]
+  )
+  const scrollFunnel = useMemo(() => buildScrollFunnel(filteredEvents), [filteredEvents])
+  const blockImpressions = useMemo(() => buildBlockImpressions(filteredEvents), [filteredEvents])
 
   const totalScans30 = filteredScans.length
   const totalViews30 = filteredViews.length
@@ -399,7 +410,13 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             clicks={clicks}
             pageViews={filteredViews}
             pages={pages}
+            impressions={blockImpressions}
           />
+        </div>
+
+        {/* ── Profondeur de lecture (scroll) ────────────────────────────── */}
+        <div style={{ marginBottom: 24 }}>
+          <ScrollDepthPanel funnel={scrollFunnel} />
         </div>
 
         {/* ── Géographie ──────────────────────────────────────────────────── */}

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { formatDay, buildDailyData, buildDeviceData, buildSourceData } from "./analyticsAgg"
+import { formatDay, buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildBlockImpressions, blockCtr } from "./analyticsAgg"
 
 // now fixe pour des fenetres glissantes deterministes : 2026-07-07T12:00:00Z
 const NOW = Date.parse("2026-07-07T12:00:00Z")
@@ -65,5 +65,48 @@ describe("buildSourceData", () => {
   it("source absente/vide -> 'direct'", () => {
     const r = buildSourceData([{ viewed_at: "x" }, { viewed_at: "x", source: "" }, { viewed_at: "x", source: null }])
     expect(r).toContainEqual({ name: "direct", value: 3 })
+  })
+})
+
+describe("buildScrollFunnel", () => {
+  const ev = (ref: string) => ({ kind: "scroll" as const, ref })
+  it("compte les jalons et calcule le pct relatif au 1er (25%)", () => {
+    // 4 sessions atteignent 25, 3 atteignent 50, 2 -> 75, 1 -> 100
+    const events = [
+      ev("25"), ev("50"), ev("75"), ev("100"),
+      ev("25"), ev("50"), ev("75"),
+      ev("25"), ev("50"),
+      ev("25"),
+    ]
+    const f = buildScrollFunnel(events)
+    expect(f.map(s => s.count)).toEqual([4, 3, 2, 1])
+    expect(f.map(s => s.depth)).toEqual(["25%", "50%", "75%", "100%"])
+    expect(f[0].pct).toBe(100)
+    expect(f[3].pct).toBe(25)
+  })
+  it("aucun scroll -> tout a 0 (pas de division par zero)", () => {
+    const f = buildScrollFunnel([{ kind: "impression", ref: "b1" }])
+    expect(f.every(s => s.count === 0 && s.pct === 0)).toBe(true)
+  })
+})
+
+describe("buildBlockImpressions", () => {
+  it("compte les impressions par block_id (ignore le scroll)", () => {
+    const counts = buildBlockImpressions([
+      { kind: "impression", ref: "b1" },
+      { kind: "impression", ref: "b1" },
+      { kind: "impression", ref: "b2" },
+      { kind: "scroll", ref: "50" },
+    ])
+    expect(counts).toEqual({ b1: 2, b2: 1 })
+  })
+})
+
+describe("blockCtr", () => {
+  it("clics/impressions en %, borne a 100, null si 0 impression", () => {
+    expect(blockCtr(3, 12)).toBe(25)
+    expect(blockCtr(0, 10)).toBe(0)
+    expect(blockCtr(5, 0)).toBeNull()
+    expect(blockCtr(20, 10)).toBe(100) // borne
   })
 })

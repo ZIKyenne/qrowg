@@ -54,3 +54,38 @@ export function buildSourceData(views: AggView[]): NameValue[] {
   }
   return Object.entries(counts).map(([name, value]) => ({ name, value }))
 }
+
+// ── Engagement (page_events : scroll + impressions de blocs) ──────────────────
+export type PageEvent = { kind: "scroll" | "impression"; ref: string; page_id?: string }
+export type ScrollStep = { depth: string; count: number; pct: number }
+
+// Entonnoir de profondeur de scroll : jalons 25/50/75/100 %. Chaque visiteur qui atteint
+// un jalon a aussi franchi les precedents (un evenement par jalon et par session), donc
+// count(25) >= count(50) >= ... Le pct est relatif au 1er jalon (base = a scrolle un minimum).
+export function buildScrollFunnel(events: PageEvent[]): ScrollStep[] {
+  const counts: Record<string, number> = { "25": 0, "50": 0, "75": 0, "100": 0 }
+  for (const e of events) {
+    if (e.kind === "scroll" && counts[e.ref] !== undefined) counts[e.ref]++
+  }
+  const base = counts["25"] || 0
+  return ["25", "50", "75", "100"].map(m => ({
+    depth: `${m}%`,
+    count: counts[m],
+    pct: base > 0 ? Math.round((counts[m] / base) * 100) : 0,
+  }))
+}
+
+// Nombre d'impressions (bloc reellement vu) par block_id.
+export function buildBlockImpressions(events: PageEvent[]): Record<string, number> {
+  const counts: Record<string, number> = {}
+  for (const e of events) {
+    if (e.kind === "impression" && e.ref) counts[e.ref] = (counts[e.ref] || 0) + 1
+  }
+  return counts
+}
+
+// CTR reel d'un bloc = clics / impressions (borne a 100 %). Renvoie null si aucune impression.
+export function blockCtr(clicks: number, impressions: number): number | null {
+  if (!impressions) return null
+  return Math.min(100, Math.round((clicks / impressions) * 100))
+}

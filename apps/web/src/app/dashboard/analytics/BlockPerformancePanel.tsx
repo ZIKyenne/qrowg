@@ -18,6 +18,7 @@ interface Props {
   clicks:    ClickRow[]
   pageViews: ViewRow[]
   pages:     PageRow[]
+  impressions?: Record<string, number>  // block_id -> nb de fois réellement vu (page_events)
 }
 
 // ── Config par type de bloc ───────────────────────────────────────────────────
@@ -68,7 +69,7 @@ function Tip({ active, payload, label }: any) {
   )
 }
 
-export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages }: Props) {
+export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages, impressions = {} }: Props) {
   const [period, setPeriod] = useState(30)
   const [sortBy, setSortBy] = useState("clicks")
   const [pageId, setPageId] = useState("all")
@@ -104,20 +105,23 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
       clicksByType[t] = (clicksByType[t] || 0) + 1
     })
 
-    const byType: Record<string, { count: number; directClicks: number }> = {}
+    const byType: Record<string, { count: number; directClicks: number; impr: number }> = {}
     fBlocks.forEach(b => {
-      if (!byType[b.type]) byType[b.type] = { count: 0, directClicks: 0 }
+      if (!byType[b.type]) byType[b.type] = { count: 0, directClicks: 0, impr: 0 }
       byType[b.type].count++
       byType[b.type].directClicks += clicksById[b.id] || 0
+      byType[b.type].impr += impressions[b.id] || 0
     })
 
     return Object.entries(byType).map(([type, d]) => {
       const cfg = getCfg(type)
       const clics = Math.max(d.directClicks, clicksByType[type] || 0)
       const ctr   = parseFloat(((clics / totalViews) * 100).toFixed(1))
-      return { type, cfg, count: d.count, clics, ctr }
+      // CTR réel = clics / impressions (bloc réellement vu). null si pas encore d'impression.
+      const realCtr = d.impr > 0 ? Math.min(100, parseFloat(((clics / d.impr) * 100).toFixed(1))) : null
+      return { type, cfg, count: d.count, clics, ctr, impr: d.impr, realCtr }
     }).filter(s => s.cfg.interactive)
-  }, [fBlocks, fClicks, totalViews])
+  }, [fBlocks, fClicks, totalViews, impressions])
 
   const sorted = useMemo(() => {
     const arr = [...stats]
@@ -156,7 +160,7 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
           </div>
           <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>
             {interactCount} blocs interactifs
-            {best && <span> · Top : <span style={{ color: best.cfg.color, fontWeight: 600 }}>{best.cfg.emoji} {best.cfg.label}</span></span>}
+            {best && <span> · Top : <span style={{ color: best.cfg.color, fontWeight: 600 }}>{best.cfg.emoji} {best.cfg.label}</span>{best.realCtr != null && <span> ({best.realCtr}% de CTR réel)</span>}</span>}
           </p>
         </div>
 

@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, Component } from "react"
 import { ExternalLink } from "lucide-react"
 import { trackPageView } from "@/lib/trackPageView"
+import { queueEngagement } from "@/lib/trackEngagement"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
 import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, buildVCard, mapEmbedUrl, shareLinks, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref, docTypeMeta, docActionLabel, announcementMeta, blockDecoration, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
@@ -2851,6 +2852,40 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
     document.head.appendChild(link)
   }, [theme.fontDisplay, theme.fontBody])
 
+  // Engagement (RGPD, sans PII) : impressions des blocs réellement vus + profondeur de scroll.
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof IntersectionObserver === "undefined") return
+    const pageId = page.id
+    // 1) Impressions : un bloc est "vu" dès qu'il est visible à ~50%.
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          const id = (e.target as HTMLElement).getAttribute("data-qf-block")
+          if (id) queueEngagement(pageId, "impression", id)
+          io.unobserve(e.target)
+        }
+      }
+    }, { threshold: 0.5 })
+    document.querySelectorAll("[data-qf-block]").forEach(el => io.observe(el))
+
+    // 2) Profondeur de scroll : jalons 25/50/75/100 %, une fois chacun.
+    let ticking = false
+    const onScroll = () => {
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        ticking = false
+        const doc = document.documentElement
+        const scrollable = doc.scrollHeight - window.innerHeight
+        const pct = scrollable <= 0 ? 100 : Math.round(((window.scrollY || doc.scrollTop) / scrollable) * 100)
+        for (const m of [25, 50, 75, 100]) if (pct >= m) queueEngagement(pageId, "scroll", String(m))
+      })
+    }
+    onScroll() // capture l'état initial (page courte = 100 % direct)
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => { io.disconnect(); window.removeEventListener("scroll", onScroll) }
+  }, [page.id])
+
   return (
     <div style={{ minHeight: "100vh", background: theme.bgGradient || theme.bg, fontFamily: theme.fontBody }}>
       <style>{`
@@ -2891,7 +2926,7 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
           ].filter(Boolean).join(" ")
           return (
             <AnimatedBlock key={block.id} delay={idx < 3 ? idx * 80 : 0}>
-              <div className={cls || undefined} style={deco.style}>
+              <div className={cls || undefined} style={deco.style} data-qf-block={block.id}>
                 <BlockBoundary>
                   <RenderBlock block={block} theme={theme} pageId={page.id} ownerEmail={page.profiles?.contact_email || page.profiles?.email} totalViews={page.total_views} />
                 </BlockBoundary>

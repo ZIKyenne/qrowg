@@ -60,6 +60,15 @@ export default async function AnalyticsPage() {
     .in("page_id", (pages || []).map(p => p.id))
     .eq("is_visible", true)
 
+  // Engagement (scroll + impressions de blocs) des 30 derniers jours.
+  // La table page_events peut ne pas exister encore (migration 019) -> on ignore l'erreur.
+  const { data: pageEventsRaw } = await supabase
+    .from("page_events")
+    .select("kind, ref, page_id, created_at")
+    .in("page_id", (pages || []).map(p => p.id))
+    .gte("created_at", since.toISOString())
+  const pageEvents = (pageEventsRaw || []) as { kind: "scroll" | "impression"; ref: string; page_id: string; created_at: string }[]
+
   // Normaliser les clics (joindre block_type depuis blocks)
   const clicks = (recentClicks || []).map((c: any) => ({
     block_id:     c.block_id,
@@ -96,6 +105,7 @@ export default async function AnalyticsPage() {
       blocks={allBlocks || []}
       geoScans={geoScans}
       deviceScans={deviceScans}
+      pageEvents={pageEvents}
       userEmail={profile?.email ?? ""}
     />
   )
