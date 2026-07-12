@@ -65,8 +65,10 @@ export function useImageUpload() {
     }
   }
 
-  // Liste les images déjà uploadées par l'utilisateur (bibliothèque réutilisable, sans ré-upload).
-  async function listAssets(): Promise<{ name: string; url: string }[]> {
+  // Liste les fichiers déjà uploadés par l'utilisateur (bibliothèque réutilisable, sans ré-upload).
+  // kind: "image" (défaut) = images ; "file" = documents (pdf, doc, csv…).
+  const IMAGE_RE = /\.(webp|jpe?g|png|gif|svg|avif)$/i
+  async function listAssets(kind: "image" | "file" = "image"): Promise<{ name: string; url: string }[]> {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return []
@@ -75,11 +77,32 @@ export function useImageUpload() {
       .list(user.id, { limit: 200, sortBy: { column: "created_at", order: "desc" } })
     if (error || !data) return []
     return data
-      .filter(f => f.name && /\.(webp|jpe?g|png|gif|svg|avif)$/i.test(f.name))
+      .filter(f => f.name && (kind === "image" ? IMAGE_RE.test(f.name) : !IMAGE_RE.test(f.name)))
       .map(f => {
         const { data: { publicUrl } } = supabase.storage.from("page-assets").getPublicUrl(`${user.id}/${f.name}`)
         return { name: f.name, url: publicUrl }
       })
+  }
+
+  // Upload d'un fichier NON-image (PDF, doc…) : pas de compression, nom d'origine préservé (slug) pour rester lisible.
+  async function uploadFile(file: File, path = "docs"): Promise<string | null> {
+    setUploading(true)
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return null
+      const ext = (file.name.split(".").pop() || "bin").toLowerCase()
+      const base = file.name.replace(/\.[^.]+$/, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "fichier"
+      const fileName = `${user.id}/${path}-${base}-${Date.now()}.${ext}`
+      const { error } = await supabase.storage
+        .from("page-assets")
+        .upload(fileName, file, { upsert: true, contentType: file.type || undefined })
+      if (error) { console.error("Upload error:", error); return null }
+      const { data: { publicUrl } } = supabase.storage.from("page-assets").getPublicUrl(fileName)
+      return publicUrl
+    } finally {
+      setUploading(false)
+    }
   }
 
   // Supprime une image de la bibliothèque (storage). `name` = nom de fichier seul (sans le dossier userId).
@@ -91,5 +114,5 @@ export function useImageUpload() {
     return !error
   }
 
-  return { uploadImage, uploading, listAssets, deleteAsset }
+  return { uploadImage, uploadFile, uploading, listAssets, deleteAsset }
 }

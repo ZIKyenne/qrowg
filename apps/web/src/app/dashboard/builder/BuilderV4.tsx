@@ -10,6 +10,7 @@
   import { PAGE_TEMPLATES, PAGE_TEMPLATE_GROUPS, type PageTemplate } from "./page-templates"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
+  import FileUpload from "./FileUpload"
   import QRCanvas from "../qr-codes/QRCanvas"
   import { getQRBlob, downloadBlob } from "../qr-codes/qrRender"
   import { createClient } from "@/lib/supabase/client"
@@ -3120,6 +3121,8 @@
                 </div>
               : field.type === "image"
               ? <ImageUpload value={block.content[field.key]||""} onChange={url => onChange(field.key, url)} hint={field.hint} />
+              : field.type === "file"
+              ? <FileUpload value={block.content[field.key]||""} onChange={url => onChange(field.key, url)} hint={field.hint} />
               : field.type === "datetime"
               ? <input type="datetime-local" value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)} style={inputStyle} onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"} onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />
               : <input type={field.type==="url" ? "url" : "text"} value={block.content[field.key]||""}
