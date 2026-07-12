@@ -3209,7 +3209,7 @@
   }
 
   function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange: (t: PageTheme) => void }) {
-    const [themeTab, setThemeTab] = useState<"themes"|"colors"|"fonts"|"bg">("themes")
+    const [themeTab, setThemeTab] = useState<"themes"|"colors"|"fonts"|"bg"|"blocks">("themes")
     const [bgMode, setBgMode] = useState<string>(theme.bgMode||"solid")
     const [bgSubTab, setBgSubTab] = useState<"type"|"effects"|"animation"|"presets"|"advanced">("presets")
     const [activeCat, setActiveCat] = useState<string>(PRESET_CATEGORIES[0].id)
@@ -3367,10 +3367,10 @@
       <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
         {/* Onglets principaux */}
         <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,0.06)", marginBottom: 14, flexShrink: 0 }}>
-          {(["themes","colors","fonts","bg"] as const).map(tab => (
+          {(["themes","colors","fonts","bg","blocks"] as const).map(tab => (
             <button key={tab} onClick={() => setThemeTab(tab)}
-              style={{ flex: 1, padding: "10px 2px", background: "transparent", border: "none", borderBottom: `2px solid ${themeTab===tab ? G : "transparent"}`, color: themeTab===tab ? G : MUTED, fontSize: 11, fontWeight: themeTab===tab ? 700 : 400, cursor: "pointer" }}>
-              {tab==="themes" ? "Thèmes" : tab==="colors" ? "Couleurs" : tab==="fonts" ? "Polices" : "Fond"}
+              style={{ flex: 1, padding: "10px 2px", background: "transparent", border: "none", borderBottom: `2px solid ${themeTab===tab ? G : "transparent"}`, color: themeTab===tab ? G : MUTED, fontSize: 10.5, fontWeight: themeTab===tab ? 700 : 400, cursor: "pointer" }}>
+              {tab==="themes" ? "Thèmes" : tab==="colors" ? "Couleurs" : tab==="fonts" ? "Polices" : tab==="bg" ? "Fond" : "Blocs"}
             </button>
           ))}
         </div>
@@ -4084,6 +4084,46 @@
             )}
           </div>
         )}
+
+        {/* ── ONGLET BLOCS (style global appliqué à tous les blocs) ── */}
+        {themeTab==="blocks" && (() => {
+          const bs = (theme.blockStyle || {}) as Record<string, any>
+          const setBS = (key: string, val: any) => onThemeChange({ ...theme, blockStyle: { ...bs, [key]: val } } as any)
+          const clearBS = () => { const t: any = { ...theme }; delete t.blockStyle; onThemeChange(t) }
+          const rows = [
+            { key: "__radius", label: "Coins arrondis", opts: BLOCK_RADIUS_OPTIONS, def: "Défaut" },
+            { key: "__shadow", label: "Ombre", opts: BLOCK_SHADOW_OPTIONS, def: "Non" },
+            { key: "__space",  label: "Espacement vertical", opts: BLOCK_SPACE_OPTIONS, def: "Défaut" },
+            { key: "__anim",   label: "Animation à l'apparition", opts: BLOCK_ANIM_OPTIONS, def: "Aucune" },
+          ]
+          const hasStyle = Object.keys(bs).length > 0
+          return (
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <p style={{ color: MUTED, fontSize: 11, margin: 0, lineHeight: 1.5 }}>
+                Un style appliqué à <strong style={{ color: "#F5F0E8" }}>tous les blocs</strong> d&apos;un coup. Chaque bloc peut le surcharger dans son onglet <strong style={{ color: "#F5F0E8" }}>Style</strong>.
+              </p>
+              {rows.map(r => (
+                <div key={r.key}>
+                  <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 6, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>{r.label}</label>
+                  <Segmented value={String(bs[r.key] ?? r.def)} options={r.opts} onChange={v => setBS(r.key, v)} />
+                </div>
+              ))}
+              <div>
+                <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 6, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Effet verre (flou)</label>
+                <Segmented value={bs.__glass ? "Oui" : "Non"} options={["Non", "Oui"]} onChange={v => setBS("__glass", v === "Oui")} />
+              </div>
+              {hasStyle && (
+                <button onClick={clearBS}
+                  style={{ marginTop: 2, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, padding: "9px", color: MUTED, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
+                  ↺ Réinitialiser le style des blocs
+                </button>
+              )}
+              <p style={{ color: "#6E685E", fontSize: 9.5, margin: 0, lineHeight: 1.5 }}>
+                Astuce : posez ici l&apos;ambiance générale (coins, ombre, animation), puis affinez au cas par cas dans chaque bloc.
+              </p>
+            </div>
+          )
+        })()}
       </div>
     )
   }

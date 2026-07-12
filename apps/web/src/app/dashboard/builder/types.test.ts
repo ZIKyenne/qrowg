@@ -17,6 +17,25 @@ describe("blockDecoration", () => {
     expect(r.style).toEqual({})
     expect(r.animClass).toBe("")
   })
+  it("style global des blocs : les défauts du thème remplissent les clés absentes", () => {
+    const t = { ...theme, blockStyle: { __radius: "L", __shadow: "Douce", __anim: "Fondu" } }
+    const r = blockDecoration({ title: "x" }, t)   // bloc sans style propre -> hérite du global
+    expect(r.style.borderRadius).toBe(22)          // L
+    expect(r.style.boxShadow).toContain("rgba")     // Douce
+    expect(r.animClass).toBe("qf-reveal")           // Fondu
+  })
+  it("style global : le style propre au bloc écrase le défaut global", () => {
+    const t = { ...theme, blockStyle: { __radius: "L" } }
+    expect(blockDecoration({ __radius: "S" }, t).style.borderRadius).toBe(10)   // le bloc gagne
+    expect(blockDecoration({ __radius: "Défaut" }, t).style.borderRadius).toBeUndefined() // opt-out explicite
+  })
+  it("style global : n'injecte QUE les clés réservées __ (ignore les clés parasites)", () => {
+    const t = { ...theme, blockStyle: { __radius: "M", title: "PIRATE" } as any }
+    const r = blockDecoration({ text: "x" }, t)
+    expect(r.style.borderRadius).toBe(16)
+    // la clé parasite ne casse rien : seule __radius est prise en compte
+    expect(r.style.background).toBeUndefined()
+  })
   it("fond dégradé -> surface insérée + coins par défaut", () => {
     const r = blockDecoration({ __grad: "Océan" }, theme)
     expect(r.style.background).toContain("linear-gradient")

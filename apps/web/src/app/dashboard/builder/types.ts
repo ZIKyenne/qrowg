@@ -47,6 +47,10 @@ export interface PageTheme {
   pattern_color?: string
   pattern_opacity?: number
   pattern_size?: number
+  // ── Style global des blocs ─────────────────────────────────────────────────
+  // Défauts hérités par TOUS les blocs (clés réservées __), écrasés par le style propre à chaque bloc.
+  // Ex : { __radius: "M", __shadow: "Douce", __glass: true, __anim: "Fondu" }. Absent = aucun style global.
+  blockStyle?: Record<string, string | boolean>
   // ── Preset metadata ───────────────────────────────────────────────────────
   category?: string
   emoji?: string
@@ -3045,9 +3049,18 @@ export const BLOCK_INTENSITY_OPTIONS = ["Plein", "Moyen", "Léger"]
 
 export function blockDecoration(
   content: any,
-  theme: { primary?: string; accent?: string; bg?: string }
+  theme: { primary?: string; accent?: string; bg?: string; blockStyle?: Record<string, any> }
 ): { style: Record<string, any>; animClass: string } {
-  const c = content || {}
+  // Style global des blocs : les défauts du thème remplissent les clés __ que le bloc ne définit pas.
+  // Le style propre au bloc prime toujours. Inerte si aucun défaut global n'est posé.
+  const own = content || {}
+  const gs = theme?.blockStyle && typeof theme.blockStyle === "object" ? theme.blockStyle : null
+  let c: any = own
+  if (gs) {
+    c = {}
+    for (const k in gs) if (k.charCodeAt(0) === 95 && k.charCodeAt(1) === 95) c[k] = gs[k]  // que les clés réservées __
+    for (const k in own) c[k] = own[k]
+  }
   const g = theme?.primary || "#C9A84C"
   const style: Record<string, any> = {}
   let surface = false
