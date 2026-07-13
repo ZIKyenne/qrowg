@@ -29,6 +29,7 @@ import MobileDock, { type DockTool } from "@/components/mobile/MobileDock"
 import { printPreflight, hexContrastRatio, quietZonePx, edgeMarginPx, type PreflightMetrics, type PreflightResult, type Rect } from "./printPreflight"
 import { alignDeltas, type AlignMode, type Box } from "./alignDistribute"
 import { qrScannability, scanLevelColor } from "./qrScannability"
+import { selKind, mobileContextTools } from "./mobileContextTools"
 
 // ---- Constantes design (Clair & aere, style Canva) -------------------------
 const G       = "#C9A84C"   // accent (or de marque) : etats actifs, boutons primaires
@@ -932,6 +933,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [qrBusy, setQrBusy] = useState(false)
   // Scannabilite estimee en direct depuis la config QR courante (moteur pur teste)
   const qrScan = qrScannability({ fg: qrFg || "#0A0A0A", bg: qrBg || "#FFFFFF", ecc: qrEcc, dotStyle: qrDot || undefined, hasLogo: qrHasLogo })
+  // Mobile : le panneau Reglages (58vh) ne s'ouvre plus automatiquement a la selection
+  // (ecrasait le canvas). Il s'ouvre a la demande via la barre contextuelle du bas.
+  const [regOpen, setRegOpen] = useState(false)
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
   const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
   const [dragOver, setDragOver] = useState<number | null>(null) // ligne survolee pendant un glisser
@@ -1073,13 +1077,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     })
     fcRef.current = fc
 
-    // Poignees & cadre de selection premium (cercles dores) — sensation soignee a chaque clic
+    // Poignees & cadre de selection premium (cercles dores) — sensation soignee a chaque clic.
+    // Sur ecran tactile : poignees nettement plus grosses (critique UX "poignees trop petites").
+    const coarse = typeof window !== "undefined" && !!window.matchMedia?.("(pointer: coarse)")?.matches
     fabric.Object.prototype.set({
       borderColor: G, cornerColor: "#FFFFFF", cornerStrokeColor: G,
-      cornerStyle: "circle", cornerSize: 11, transparentCorners: false,
-      borderScaleFactor: 1.4, padding: 3,
+      cornerStyle: "circle", cornerSize: coarse ? 18 : 11, transparentCorners: false,
+      borderScaleFactor: 1.4, padding: coarse ? 5 : 3,
     })
-    ;(fabric.Object.prototype as any).touchCornerSize = 40  // poignées plus grandes au doigt (non typé dans cette version)
+    ;(fabric.Object.prototype as any).touchCornerSize = coarse ? 50 : 40  // zone de prehension au doigt (non type dans cette version)
 
     // Guides de centrage (dores), exclus de l'export
     const guideOpts = {
@@ -2241,6 +2247,45 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     if (!a || a.type !== "group") return
     ;(a as fabric.Group).toActiveSelection()
     fc.requestRenderAll(); refreshSel(); setLayersVer(v => v + 1); pushHistorySoon()
+  }
+
+  // ---- Barre contextuelle mobile (facon Canva) : "que veux-tu faire ?" ------
+  // Deselectionner referme le panneau Reglages (sinon il se rouvrirait a la selection suivante).
+  useEffect(() => { if (!sel) setRegOpen(false) }, [sel])
+  const KIND_LABEL: Record<string, string> = { qr: "QR Code", text: "Texte", image: "Image", button: "Bouton", group: "Groupe", shape: "Forme", multi: "Sélection" }
+  const ctxIcon = (icon: string): React.ReactNode => {
+    switch (icon) {
+      case "copy":   return <Copy size={18} />
+      case "rotate": return <RotateCw size={18} />
+      case "trash":  return <Trash2 size={18} />
+      case "up":     return <ChevronUp size={18} />
+      case "down":   return <ChevronDown size={18} />
+      case "sliders": return <span style={{ fontSize: 17, lineHeight: 1 }}>⚙</span>
+      case "frame":  return <span style={{ fontSize: 15, lineHeight: 1 }}>🏷️</span>
+      case "minus":  return <span style={{ fontSize: 14, fontWeight: 800, lineHeight: 1 }}>A−</span>
+      case "plus":   return <span style={{ fontSize: 14, fontWeight: 800, lineHeight: 1 }}>A+</span>
+      case "ungroup": return <span style={{ fontSize: 16, lineHeight: 1 }}>⊟</span>
+      case "group":  return <span style={{ fontSize: 16, lineHeight: 1 }}>⊞</span>
+      case "align":  return <span style={{ fontSize: 16, lineHeight: 1 }}>⊹</span>
+      default:       return <span style={{ fontSize: 15, lineHeight: 1 }}>•</span>
+    }
+  }
+  const onCtx = (id: string) => {
+    try { (navigator as any).vibrate?.(8) } catch { /* pas de vibreur */ }
+    switch (id) {
+      case "settings": setRegOpen(true); break
+      case "dress":    dressQr(); break
+      case "sizeUp":   mutate(o => (o as fabric.IText).set("fontSize", (sel?.fontSize ?? 20) + 2)); break
+      case "sizeDown": mutate(o => (o as fabric.IText).set("fontSize", Math.max(8, (sel?.fontSize ?? 20) - 2))); break
+      case "front":    layer("front"); break
+      case "back":     layer("back"); break
+      case "ungroup":  ungroupSel(); break
+      case "align":    setRegOpen(true); break   // le panneau Reglages contient Aligner/Distribuer
+      case "group":    groupSel(); break
+      case "dup":      layer("dup"); break
+      case "rotate":   rotateBy(90); break
+      case "delete":   layer("del"); break
+    }
   }
   const onCanvasContext = (e: React.MouseEvent) => {
     const fc = fcRef.current; if (!fc) return
@@ -3513,12 +3558,43 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           <div className="ps-drop-ring" />
         </div>
       )}
-      {/* Dock mobile (barre du bas type Canva) — remplace le rail sur téléphone */}
-      {landscapeMobile && (
+      {/* Dock mobile (creation) — visible quand RIEN n'est selectionne. Sinon -> barre contextuelle. */}
+      {landscapeMobile && !sel && (
         <div style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 29 }}>
           <MobileDock tools={DOCK_TOOLS} active={dockActive} onSelect={onDock} />
         </div>
       )}
+
+      {/* Barre contextuelle mobile (facon Canva) : un objet selectionne -> ses actions, gros, en bas.
+          Le canvas reste visible ; le panneau complet ne s'ouvre que via "Modifier". */}
+      {landscapeMobile && sel && !regOpen && (() => {
+        const kind = selKind(sel)
+        const tools = mobileContextTools(kind)
+        return (
+          <div style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 41, display: "flex", alignItems: "stretch", gap: 6,
+            padding: "8px 10px calc(8px + env(safe-area-inset-bottom))", background: "#141417", borderTop: "1px solid rgba(255,255,255,0.09)",
+            boxShadow: "0 -12px 34px rgba(0,0,0,0.45)", overflowX: "auto", overflowY: "hidden", WebkitOverflowScrolling: "touch" }}>
+            <span style={{ display: "flex", flexDirection: "column", justifyContent: "center", paddingRight: 9, marginRight: 1, borderRight: "1px solid rgba(255,255,255,0.1)", flexShrink: 0 }}>
+              <span style={{ color: "#C9A84C", fontSize: 12, fontWeight: 800, whiteSpace: "nowrap" }}>{KIND_LABEL[kind]}</span>
+              <span style={{ color: "rgba(244,241,234,0.45)", fontSize: 8.5, letterSpacing: 0.4 }}>SÉLECTION</span>
+            </span>
+            {tools.map(t => {
+              const primary = t.id === "settings"
+              const danger = t.id === "delete"
+              return (
+                <button key={t.id} type="button" onClick={() => onCtx(t.id)}
+                  style={{ flexShrink: 0, minWidth: 58, minHeight: 52, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, padding: "6px 10px",
+                    background: primary ? "linear-gradient(180deg,#D9BC6A,#B8923A)" : "rgba(255,255,255,0.06)",
+                    border: primary ? "none" : "1px solid rgba(255,255,255,0.1)", borderRadius: 13,
+                    color: primary ? "#141417" : danger ? "#FF8B8B" : "#F4F1EA", fontSize: 10.5, fontWeight: 700, cursor: "pointer" }}>
+                  <span style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 20 }}>{ctxIcon(t.icon)}</span>
+                  {t.label}
+                </button>
+              )
+            })}
+          </div>
+        )
+      })()}
 
       {/* Menu ⋯ (paysage mobile) : actions secondaires en bottom sheet */}
       {moreOpen && (
@@ -4413,7 +4489,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Zoom flottant sur le rendu central (facon Canva) — reste à gauche des panneaux visibles (ne recouvre plus Réglages) */}
         <div style={{ position: "absolute", zIndex: 38, display: "flex", alignItems: "center", gap: 2, background: SURFACE, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 999, padding: 4, boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
-          bottom: landscapeMobile ? (sel ? "calc(58vh + 14px)" : 16) : 16,
+          bottom: landscapeMobile ? (regOpen ? "calc(58vh + 14px)" : (sel ? 80 : 16)) : 16,
           right: landscapeMobile ? 16 : (fmtW + (sel ? rightW : 0) + 16) }}>
           <button type="button" onClick={() => applyZoom(zoom / 1.2)} title="Dézoomer" aria-label="Dézoomer"
             style={{ width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 999, color: INK, fontSize: 18, cursor: "pointer" }}>−</button>
@@ -4423,8 +4499,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             style={{ width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 999, color: INK, fontSize: 17, cursor: "pointer" }}>+</button>
         </div>
 
-        {/* Panneau de reglages : toujours visible quand un element est selectionne */}
-        {sel && (
+        {/* Panneau de reglages : desktop -> visible a la selection ; mobile -> a la demande (barre contextuelle) */}
+        {sel && (!landscapeMobile || regOpen) && (
         <div className={"qr-scroll ps-fly ps-fly-right" + (landscapeMobile ? " ps-sheet" : "")} style={{ width: rightW, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: 0, overflowY: "auto", background: SURFACE, display: "flex", flexDirection: "column", position: "relative" }}>
           {!landscapeMobile && <ResizeHandle which="right" />}
               {/* En-tete contextuel */}
@@ -4434,7 +4510,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <span style={{ color: INK, fontSize: 13.5, fontWeight: 800 }}>{sel.isQr ? "QR Code" : sel.isImage ? "Image" : sel.isText ? "Texte" : sel.label !== null ? "Bouton" : sel.isGroupObj ? "Groupe" : "Forme"}</span>
                   <span style={{ color: MUTED, fontSize: 10 }}>Réglages</span>
                 </div>
-                <button type="button" onClick={() => { fcRef.current?.discardActiveObject(); fcRef.current?.requestRenderAll(); setSel(null) }} aria-label="Fermer" style={{ marginLeft: "auto", display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
+                <button type="button" onClick={() => { if (landscapeMobile) { setRegOpen(false) } else { fcRef.current?.discardActiveObject(); fcRef.current?.requestRenderAll(); setSel(null) } }} aria-label="Fermer" style={{ marginLeft: "auto", display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
               </div>
               <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
@@ -4917,8 +4993,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           </div>
         )}
 
-        {/* Barre contextuelle flottante (progressive disclosure) */}
-        {sel && (
+        {/* Barre contextuelle flottante DESKTOP (mobile -> barre contextuelle du bas dediee) */}
+        {sel && !landscapeMobile && (
           <div className="ps-pop" style={{ position: "absolute", top: 12, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.12)", borderRadius: 12, boxShadow: "0 10px 30px rgba(0,0,0,0.15)", maxWidth: "92%", flexWrap: "wrap" }}>
             {sel.isQr ? (
               regenQr ? (
