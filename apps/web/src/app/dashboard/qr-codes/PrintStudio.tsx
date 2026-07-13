@@ -14,6 +14,7 @@
 // =============================================================================
 
 import { useEffect, useRef, useState, useCallback } from "react"
+import { createPortal } from "react-dom"
 import { useDeviceOrientation } from "@/lib/useDeviceOrientation"
 import { fabric } from "fabric"
 import {
@@ -947,6 +948,29 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // Gestes tactiles (#8) : long-press -> dupliquer. Timer + point de depart.
   const lpTimerRef = useRef<number | null>(null)
   const lpStartRef = useRef<{ x: number; y: number } | null>(null)
+  // Immersion (#18) : reference stable vers onClose pour l'effet monte une seule fois.
+  const onCloseRef = useRef(onClose); onCloseRef.current = onClose
+
+  // Immersion "appli dans l'appli" : plein ecran (le rendu est porte vers <body>),
+  // scroll du fond verrouille, et le bouton RETOUR du telephone ferme le studio
+  // (comportement de page, plus de sensation de popup).
+  useEffect(() => {
+    if (typeof document === "undefined") return
+    const body = document.body
+    const prevOverflow = body.style.overflow
+    body.style.overflow = "hidden"
+    let closedByPop = false
+    let pushed = false
+    try { window.history.pushState({ qfPrintStudio: 1 }, ""); pushed = true } catch { /* historique indisponible */ }
+    const onPop = () => { closedByPop = true; onCloseRef.current() }
+    window.addEventListener("popstate", onPop)
+    return () => {
+      body.style.overflow = prevOverflow
+      window.removeEventListener("popstate", onPop)
+      // Ferme autrement que par "retour" -> retirer l'etat qu'on avait empile.
+      if (pushed && !closedByPop) { try { window.history.back() } catch { /* noop */ } }
+    }
+  }, [])
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
   const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
   const [dragOver, setDragOver] = useState<number | null>(null) // ligne survolee pendant un glisser
@@ -3548,7 +3572,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // Sur téléphone (landscapeMobile, toute orientation) : rail masqué, remplacé par
   // le MobileDock en bas + le menu ⋯ pour l'overflow. Sur desktop : rail + panneaux flottants.
 
-  return (
+  const root = (
     <div className={"ps-root" + (landscapeMobile ? " ps-landscape" : "")} style={{
       position: "fixed", inset: 0, zIndex: 3000, background: BG,
       display: "flex", flexDirection: "column", fontFamily: "DM Sans, sans-serif",
@@ -5461,4 +5485,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       )}
     </div>
   )
+  // Immersion (#18) : porte le studio directement dans <body> pour garantir un plein
+  // ecran reel (insensible a un ancetre transforme qui donnerait un effet "popup").
+  return typeof document !== "undefined" ? createPortal(root, document.body) : root
 }

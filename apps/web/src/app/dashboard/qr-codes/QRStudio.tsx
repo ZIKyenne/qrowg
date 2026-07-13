@@ -2388,7 +2388,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           ? ["QR Print Studio (imprimables)", "QR Studio (personnalisation)", "5 pages · 850 vues/mois", "Sans branding QRfolio", "Domaine personnalisé"]
           : ["Tous les presets premium", "Modules avances (pixel, neon...)", "Coins avances (diamond...)", "Export SVG et WEBP", "Correction d'erreur elevee (H)"]
         return (
-          <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.85)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:2100, padding:24 }}
+          <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.85)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:4300, padding:24 }}
             onClick={() => setUpsell(null)}>
             <div onClick={e => e.stopPropagation()}
               style={{ width:"100%", maxWidth:380, background:"linear-gradient(180deg,#14120C,#0C0B08)", border:`1px solid ${accent}40`, borderRadius:18, padding:"24px 22px", position:"relative", boxShadow:`0 24px 80px rgba(0,0,0,0.7), 0 0 40px ${accent}15` }}>
