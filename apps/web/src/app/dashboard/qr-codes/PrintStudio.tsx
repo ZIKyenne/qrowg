@@ -31,6 +31,7 @@ import { alignDeltas, type AlignMode, type Box } from "./alignDistribute"
 import { qrScannability, scanLevelColor } from "./qrScannability"
 import { selKind, mobileContextTools } from "./mobileContextTools"
 import { stackedAt, boxCenter, type LayerBox } from "./stackedObjects"
+import { exportPlan, type ExportType } from "./exportPlan"
 
 // ---- Constantes design (Clair & aere, style Canva) -------------------------
 const G       = "#C9A84C"   // accent (or de marque) : etats actifs, boutons primaires
@@ -879,6 +880,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [preflight, setPreflight] = useState<PreflightResult | null>(null)  // Print Center (contrôle qualité)
   const [showSafe, setShowSafe]   = useState(false)  // repère « marge de sécurité » (zone où garder le contenu)
   const [expMarks, setExpMarks] = useState(false)
+  const [expWiz, setExpWiz] = useState(-1)                 // assistant d'export : etape 0..2, -1 = ferme
+  const [wizType, setWizType] = useState<ExportType>("png") // type de fichier choisi dans l'assistant
   const [mockOpen, setMockOpen] = useState(false)
   const [mockEnv, setMockEnv] = useState<"wall" | "table" | "window" | "desk" | "cadre" | "counter" | "main" | "carte">("wall")
   const mockTouchX = useRef<number | null>(null) // swipe entre décors de l'aperçu
@@ -3418,6 +3421,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       pdf.save(`qrfolio-${format}-${expDpi}dpi.pdf`)
     } finally { setExporting(false); setExpOpen(false) }
   }
+  // Lance l'export choisi dans l'assistant (etape 3) puis referme l'assistant.
+  const runExport = () => {
+    if (wizType === "pdf") { void exportPdfPro() } else { exportImage(wizType) }
+    setExpWiz(-1)
+  }
 
   // ==========================================================================
   // UI
@@ -3589,6 +3597,104 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           <div className="ps-drop-ring" />
         </div>
       )}
+      {/* Assistant d'export (#15) : Format -> Qualite -> Telecharger. Coeur pur `exportPlan`. */}
+      {expWiz >= 0 && (() => {
+        const plan = exportPlan({ format, exportW: FORMATS[format].exportW, ratio: FORMATS[format].ratio, widthMm: FORMAT_MM[format] || 0, dpi: expDpi, type: wizType, isPro })
+        const steps = ["Format", "Qualité", "Télécharger"]
+        const chip = (active: boolean) => ({ padding: "9px 13px", borderRadius: 10, border: `1px solid ${active ? G : "rgba(255,255,255,0.16)"}`, background: active ? "rgba(201,168,76,0.18)" : "rgba(255,255,255,0.05)", color: active ? G : "#ECE8E0", fontSize: 13, fontWeight: 700, cursor: "pointer", minHeight: 44 }) as const
+        const recap: [string, string][] = [["Format", FORMATS[format].label], ["Fichier", plan.filename], ["Dimensions", `${plan.widthPx} × ${plan.heightPx} px`], ...(plan.widthMm ? [["Taille imprimée", `${plan.widthMm} × ${plan.heightMm} mm`] as [string, string]] : []), ["Qualité", plan.quality]]
+        return (
+          <div onClick={() => setExpWiz(-1)} style={{ position: "fixed", inset: 0, zIndex: 72, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(2px)", display: "flex", alignItems: landscapeMobile ? "flex-end" : "center", justifyContent: "center", padding: landscapeMobile ? 0 : 24 }}>
+            <div onClick={e => e.stopPropagation()} className="ps-msheet" style={{ width: "100%", maxWidth: landscapeMobile ? "none" : 460, maxHeight: "88vh", overflowY: "auto", background: "#17171B", border: "1px solid rgba(255,255,255,0.08)", borderRadius: landscapeMobile ? "22px 22px 0 0" : 20, padding: "16px 16px calc(16px + env(safe-area-inset-bottom))", boxShadow: "0 -14px 44px rgba(0,0,0,0.5)", animation: "psSheetUp .26s cubic-bezier(.2,.8,.2,1)" }}>
+              {/* Stepper */}
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
+                {steps.map((s, i) => (
+                  <div key={s} style={{ display: "flex", alignItems: "center", gap: 6, flex: i < steps.length - 1 ? 1 : "0 0 auto" }}>
+                    <span style={{ width: 24, height: 24, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, background: i <= expWiz ? "linear-gradient(180deg,#D9BC6A,#B8923A)" : "rgba(255,255,255,0.08)", color: i <= expWiz ? "#141417" : "rgba(244,241,234,0.5)" }}>{i + 1}</span>
+                    <span style={{ fontSize: 11.5, fontWeight: 700, color: i === expWiz ? "#F4F1EA" : "rgba(244,241,234,0.5)", whiteSpace: "nowrap" }}>{s}</span>
+                    {i < steps.length - 1 && <span style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)", marginLeft: 4 }} />}
+                  </div>
+                ))}
+              </div>
+
+              {expWiz === 0 && (
+                <div>
+                  <p className="ps-sec-label">Choisis le format</p>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {(Object.keys(FORMATS) as FormatId[]).map(f => (
+                      <button key={f} type="button" onClick={() => applyFormat(f)} style={chip(format === f)}>{FORMATS[f].label}</button>
+                    ))}
+                  </div>
+                  <p style={{ color: "#9A9384", fontSize: 11, marginTop: 10, lineHeight: 1.5 }}>Le format redimensionne la feuille — ton design s'y adapte.</p>
+                </div>
+              )}
+              {expWiz === 1 && (
+                <div>
+                  <p className="ps-sec-label">Type de fichier</p>
+                  <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+                    {([["png", "PNG"], ["jpeg", "JPG"], ["pdf", isPro ? "PDF" : "PDF 🔒"]] as [ExportType, string][]).map(([t, l]) => (
+                      <button key={t} type="button" onClick={() => setWizType(t)} style={{ ...chip(wizType === t), flex: 1 }}>{l}</button>
+                    ))}
+                  </div>
+                  <p className="ps-sec-label">Qualité (DPI)</p>
+                  <div style={{ display: "flex", gap: 8, marginBottom: wizType === "pdf" ? 12 : 4 }}>
+                    {[72, 150, 300].map(d => (
+                      <button key={d} type="button" onClick={() => setExpDpi(d)} style={{ ...chip(expDpi === d), flex: 1 }}>{d}</button>
+                    ))}
+                  </div>
+                  {wizType === "pdf" && (
+                    <label style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 2px", color: "#ECE8E0", fontSize: 13, cursor: "pointer" }}>
+                      <input type="checkbox" checked={expMarks} onChange={e => setExpMarks(e.target.checked)} style={{ accentColor: G, width: 18, height: 18, flexShrink: 0 }} />
+                      Traits de coupe + fond perdu
+                    </label>
+                  )}
+                  <div style={{ marginTop: 10, padding: "10px 12px", background: "rgba(255,255,255,0.05)", borderRadius: 10, border: "1px solid rgba(255,255,255,0.08)" }}>
+                    <span style={{ color: "#C9A84C", fontSize: 12, fontWeight: 800 }}>{plan.quality}</span>
+                    <span style={{ color: "#ECE8E0", fontSize: 12 }}> · {plan.widthPx} × {plan.heightPx} px{plan.widthMm ? ` · ${plan.widthMm} × ${plan.heightMm} mm` : ""}</span>
+                  </div>
+                </div>
+              )}
+              {expWiz === 2 && (
+                <div>
+                  <p className="ps-sec-label">Récapitulatif</p>
+                  {recap.map(([k, v]) => (
+                    <div key={k} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "9px 0", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                      <span style={{ color: "#9A9384", fontSize: 12 }}>{k}</span>
+                      <span style={{ color: "#ECE8E0", fontSize: 12.5, fontWeight: 700, textAlign: "right" }}>{v}</span>
+                    </div>
+                  ))}
+                  {plan.blockedReason && <p style={{ color: "#E8A33D", fontSize: 11.5, marginTop: 10, lineHeight: 1.5 }}>{plan.blockedReason}</p>}
+                </div>
+              )}
+
+              {/* Navigation */}
+              <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
+                <button type="button" onClick={() => (expWiz === 0 ? setExpWiz(-1) : setExpWiz(expWiz - 1))}
+                  style={{ flexShrink: 0, padding: "12px 18px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.05)", color: "#ECE8E0", fontSize: 13.5, fontWeight: 700, cursor: "pointer" }}>
+                  {expWiz === 0 ? "Annuler" : "Retour"}
+                </button>
+                {expWiz < 2 ? (
+                  <button type="button" onClick={() => setExpWiz(expWiz + 1)}
+                    style={{ flex: 1, padding: "12px 18px", borderRadius: 12, border: "none", background: "linear-gradient(180deg,#D9BC6A,#B8923A)", color: "#141417", fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}>
+                    Suivant
+                  </button>
+                ) : plan.allowed ? (
+                  <button type="button" onClick={runExport}
+                    style={{ flex: 1, padding: "12px 18px", borderRadius: 12, border: "none", background: "linear-gradient(180deg,#D9BC6A,#B8923A)", color: "#141417", fontSize: 13.5, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                    <Download size={16} /> Télécharger
+                  </button>
+                ) : (
+                  <button type="button" onClick={() => { setExpWiz(-1); onUpsell?.("l'export PDF pro (traits de coupe, fond perdu)", "pro") }}
+                    style={{ flex: 1, padding: "12px 18px", borderRadius: 12, border: "none", background: "linear-gradient(90deg,#C9A84C,#b8953f)", color: "#141417", fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}>
+                    Passer au Pro
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )
+      })()}
+
       {/* Dock mobile (creation) — visible quand RIEN n'est selectionne. Sinon -> barre contextuelle. */}
       {landscapeMobile && !sel && (
         <div style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 29 }}>
@@ -3688,9 +3794,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               { icon: <Sparkles size={18} />, label: "Ajouter un composant", on: openComp, disabled: false },
               { icon: <Square size={18} />, label: "Fond de la feuille", on: () => openSide("bg"), disabled: false },
               { icon: <ShieldCheck size={18} />, label: "Contrôle qualité", on: openPreflight, disabled: false },
-              { icon: <Download size={18} />, label: "Exporter en PNG", on: () => exportImage("png"), disabled: false },
-              { icon: <Download size={18} />, label: "Exporter en JPG", on: () => exportImage("jpeg"), disabled: false },
-              { icon: <Printer size={18} />, label: isPro ? "Exporter en PDF" : "Exporter en PDF 🔒", on: exportPdfPro, disabled: false },
+              { icon: <Download size={18} />, label: "Assistant d'export", on: () => { setMoreOpen(false); setExpWiz(0) }, disabled: false },
               { icon: <Eye size={18} />, label: "Aperçu en situation", on: openMock, disabled: false },
               { icon: <Square size={18} />, label: showSafe ? "Masquer les marges" : "Marges de sécurité", on: () => setShowSafe(v => !v), disabled: false },
               { icon: <Sparkles size={18} />, label: "Régénérer une proposition", on: regenerate, disabled: !lastPool },
