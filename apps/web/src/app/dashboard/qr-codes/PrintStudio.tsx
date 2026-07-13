@@ -35,6 +35,8 @@ import { stackedAt, boxCenter, type LayerBox } from "./stackedObjects"
 import { exportPlan, type ExportType } from "./exportPlan"
 import { dist as gDist, LONG_PRESS_MS, MOVE_TOLERANCE } from "./touchGestures"
 import { showSection, coerceMode, type UiMode } from "./uiComplexity"
+import { pushRecent } from "./colorTools"
+import ColorPicker from "./ColorPicker"
 
 // ---- Constantes design (Clair & aere, style Canva) -------------------------
 const G       = "#C9A84C"   // accent (or de marque) : etats actifs, boutons primaires
@@ -893,6 +895,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [ctx, setCtx] = useState<{ x: number; y: number } | null>(null) // menu clic-droit
   const [showAdvanced, setShowAdvanced] = useState(false) // panneau de reglages avances (progressive disclosure)
   const [uiMode, setUiMode] = useState<UiMode>("simple")   // mode Simple / Expert (#3) — persiste
+  const [pickerOpen, setPickerOpen] = useState(false)      // selecteur de couleurs avance (#14)
+  const [recentColors, setRecentColors] = useState<string[]>([]) // historique de couleurs (persiste)
   const [libOpen, setLibOpen] = useState(false)
   const [libCat, setLibCat]   = useState<"text" | "shapes" | "lines" | "frames" | "cta" | "icons" | "badges" | "arrows" | "deco">("text")
   const [tplOpen, setTplOpen] = useState(true) // menu Modeles deplie par defaut (vue globale)
@@ -979,6 +983,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // Mode Simple / Expert (#3) : chargement + persistance locale.
   useEffect(() => { try { setUiMode(coerceMode(localStorage.getItem("qf_ui_mode"))) } catch { /* noop */ } }, [])
   useEffect(() => { try { localStorage.setItem("qf_ui_mode", uiMode) } catch { /* noop */ } }, [uiMode])
+
+  // Historique de couleurs (#14) : chargement + persistance.
+  useEffect(() => {
+    try { const raw = localStorage.getItem("qf_recent_colors"); if (raw) setRecentColors(JSON.parse(raw)) } catch { /* noop */ }
+  }, [])
+  useEffect(() => { try { localStorage.setItem("qf_recent_colors", JSON.stringify(recentColors)) } catch { /* noop */ } }, [recentColors])
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
   const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
   const [dragOver, setDragOver] = useState<number | null>(null) // ligne survolee pendant un glisser
@@ -4912,6 +4922,20 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <input value={sel.fill} onChange={e => setFill(e.target.value)}
                     style={{ flex: 1, background: BG, border: "1px solid rgba(0,0,0,0.08)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, fontFamily: "monospace", outline: "none", boxSizing: "border-box" }} />
                 </div>
+                {/* Selecteur de couleurs avance (#14) : degrade H/S/L, hex, pipette, harmonies, recentes */}
+                <button type="button" onClick={() => setPickerOpen(v => !v)}
+                  style={{ ...layerBtn, width: "100%", fontSize: 10, marginBottom: pickerOpen ? 8 : 12, color: pickerOpen ? G : INK, borderColor: pickerOpen ? G : "rgba(0,0,0,0.1)" }}>
+                  🎨 Palette avancée {pickerOpen ? "▲" : "▾"}
+                </button>
+                {pickerOpen && (
+                  <ColorPicker
+                    value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"}
+                    onChange={setFill}
+                    onUseColor={c => setRecentColors(r => pushRecent(r, c))}
+                    recent={recentColors}
+                    brand={SWATCHES}
+                  />
+                )}
 
                 {/* Opacite */}
                 <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>
