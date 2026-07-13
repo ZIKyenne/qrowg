@@ -970,16 +970,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const body = document.body
     const prevOverflow = body.style.overflow
     body.style.overflow = "hidden"
-    let closedByPop = false
-    let pushed = false
-    try { window.history.pushState({ qfPrintStudio: 1 }, ""); pushed = true } catch { /* historique indisponible */ }
-    const onPop = () => { closedByPop = true; onCloseRef.current() }
+    // Bouton retour du telephone -> ferme le studio (comportement de page).
+    try { window.history.pushState({ qfPrintStudio: 1 }, "") } catch { /* historique indisponible */ }
+    const onPop = () => { onCloseRef.current() }
     window.addEventListener("popstate", onPop)
     return () => {
       body.style.overflow = prevOverflow
       window.removeEventListener("popstate", onPop)
-      // Ferme autrement que par "retour" -> retirer l'etat qu'on avait empile.
-      if (pushed && !closedByPop) { try { window.history.back() } catch { /* noop */ } }
+      // Pas de history.back() ici : en dev (StrictMode) le double-montage refermerait
+      // le studio a l'ouverture. L'entree empilee restante est inoffensive.
     }
   }, [])
 
@@ -1210,6 +1209,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         if (lpTimerRef.current) window.clearTimeout(lpTimerRef.current)
         lpTimerRef.current = window.setTimeout(() => {
           lpTimerRef.current = null; lpStartRef.current = null
+          if (!fcRef.current) return // canvas demonte pendant l'appui -> on abandonne
           fc.setActiveObject(t); layer("dup")
           try { (navigator as any).vibrate?.(15) } catch { /* pas de vibreur */ }
         }, LONG_PRESS_MS)
@@ -1285,7 +1285,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       setShowStart(true)
     })()
 
-    return () => { fc.dispose(); fcRef.current = null }
+    return () => { if (lpTimerRef.current) window.clearTimeout(lpTimerRef.current); fc.dispose(); fcRef.current = null }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
