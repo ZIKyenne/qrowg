@@ -948,6 +948,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // Gestes tactiles (#8) : long-press -> dupliquer. Timer + point de depart.
   const lpTimerRef = useRef<number | null>(null)
   const lpStartRef = useRef<{ x: number; y: number } | null>(null)
+  // Feedback (#16) : etat de magnetisme courant, pour un "tick" haptique a l'accroche.
+  const snapOnRef = useRef(false)
   // Immersion (#18) : reference stable vers onClose pour l'effet monte une seule fois.
   const onCloseRef = useRef(onClose); onCloseRef.current = onClose
 
@@ -1158,9 +1160,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       if (dy !== null) { o.set("top", (o.top ?? 0) + dy); hG.set({ x1: 0, y1: gy, x2: cw, y2: gy, visible: true }) } else hG.set({ visible: false })
       o.setCoords()
       fc.bringToFront(vG); fc.bringToFront(hG)
+      // Feedback (#16) : petit "tick" haptique quand un alignement vient de s'accrocher.
+      const snapNow = dx !== null || dy !== null
+      if (snapNow && !snapOnRef.current) { try { (navigator as any).vibrate?.(4) } catch { /* pas de vibreur */ } }
+      snapOnRef.current = snapNow
     })
-    fc.on("object:modified", () => { vG.set({ visible: false }); hG.set({ visible: false }); fc.requestRenderAll() })
-    fc.on("mouse:up",       () => { vG.set({ visible: false }); hG.set({ visible: false }); fc.requestRenderAll() })
+    fc.on("object:modified", () => { vG.set({ visible: false }); hG.set({ visible: false }); snapOnRef.current = false; fc.requestRenderAll() })
+    fc.on("mouse:up",       () => { vG.set({ visible: false }); hG.set({ visible: false }); snapOnRef.current = false; fc.requestRenderAll() })
 
     // Geste long-press (tactile) : appui maintenu sur un objet -> duplication (#8).
     if (coarse) {
@@ -2131,6 +2137,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const layer = (action: "front" | "back" | "fwd" | "bwd" | "dup" | "lock" | "del") => {
     const fc = fcRef.current; if (!fc) return
     const o = fc.getActiveObject(); if (!o) return
+    try { (navigator as any).vibrate?.(8) } catch { /* pas de vibreur (desktop) */ } // feedback (#16)
     switch (action) {
       case "front": fc.bringToFront(o); break
       case "back":  fc.sendToBack(o);   break
@@ -3630,6 +3637,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           padding-bottom: env(safe-area-inset-bottom) !important;
         }
         @keyframes psSheetUp { from { transform: translateY(100%); opacity: .6 } to { transform: translateY(0); opacity: 1 } }
+        /* Feedback (#16 / #23) : entree "ressort" (leger depassement) de la barre contextuelle du bas */
+        @keyframes psBar { 0% { transform: translateY(100%); opacity: .3 } 68% { transform: translateY(-3px) } 100% { transform: translateY(0); opacity: 1 } }
+        @media (prefers-reduced-motion: reduce) { .ps-ctxbar { animation: none !important; } }
         /* Effet de dépôt d'un modèle : anneau accent qui se pose avec rebond, puis disparaît */
         .ps-drop-ring { width: 44vmin; height: 44vmin; max-width: 360px; max-height: 360px; border-radius: 22px;
           border: 2px solid color-mix(in srgb, var(--accent) 70%, transparent);
@@ -3795,9 +3805,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         const kind = selKind(sel)
         const tools = mobileContextTools(kind)
         return (
-          <div style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 41, display: "flex", alignItems: "stretch", gap: 6,
+          <div className="ps-ctxbar" style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 41, display: "flex", alignItems: "stretch", gap: 6,
             padding: "8px 10px calc(8px + env(safe-area-inset-bottom))", background: "#141417", borderTop: "1px solid rgba(255,255,255,0.09)",
-            boxShadow: "0 -12px 34px rgba(0,0,0,0.45)", overflowX: "auto", overflowY: "hidden", WebkitOverflowScrolling: "touch" }}>
+            boxShadow: "0 -12px 34px rgba(0,0,0,0.45)", overflowX: "auto", overflowY: "hidden", WebkitOverflowScrolling: "touch",
+            animation: "psBar .3s cubic-bezier(.2,.8,.2,1)" }}>
             <span style={{ display: "flex", flexDirection: "column", justifyContent: "center", paddingRight: 9, marginRight: 1, borderRight: "1px solid rgba(255,255,255,0.1)", flexShrink: 0 }}>
               <span style={{ color: "#C9A84C", fontSize: 12, fontWeight: 800, whiteSpace: "nowrap" }}>{KIND_LABEL[kind]}</span>
               <span style={{ color: "rgba(244,241,234,0.45)", fontSize: 8.5, letterSpacing: 0.4 }}>SÉLECTION</span>
