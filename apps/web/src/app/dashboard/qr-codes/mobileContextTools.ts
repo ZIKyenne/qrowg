@@ -32,10 +32,12 @@ export function selKind(sel: SelLike): SelKind {
 }
 
 const EDIT: CtxTool = { id: "settings", label: "Modifier", icon: "sliders" }
+const STACK: CtxTool = { id: "stack", label: "Empilement", icon: "stack" }
 const DUP: CtxTool = { id: "dup", label: "Dupliquer", icon: "copy" }
 const ROTATE: CtxTool = { id: "rotate", label: "Pivoter", icon: "rotate" }
 const DELETE: CtxTool = { id: "delete", label: "Supprimer", icon: "trash" }
-const TAIL: CtxTool[] = [DUP, ROTATE, DELETE]
+// Fin commune des barres mono-objet : gerer l'empilement, dupliquer, pivoter, supprimer.
+const TAIL: CtxTool[] = [STACK, DUP, ROTATE, DELETE]
 
 // Actions contextuelles selon le type. Toujours au moins une action + Supprimer.
 export function mobileContextTools(kind: SelKind): CtxTool[] {

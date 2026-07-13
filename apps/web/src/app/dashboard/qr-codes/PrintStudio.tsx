@@ -30,6 +30,7 @@ import { printPreflight, hexContrastRatio, quietZonePx, edgeMarginPx, type Prefl
 import { alignDeltas, type AlignMode, type Box } from "./alignDistribute"
 import { qrScannability, scanLevelColor } from "./qrScannability"
 import { selKind, mobileContextTools } from "./mobileContextTools"
+import { stackedAt, boxCenter, type LayerBox } from "./stackedObjects"
 
 // ---- Constantes design (Clair & aere, style Canva) -------------------------
 const G       = "#C9A84C"   // accent (or de marque) : etats actifs, boutons primaires
@@ -936,6 +937,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // Mobile : le panneau Reglages (58vh) ne s'ouvre plus automatiquement a la selection
   // (ecrasait le canvas). Il s'ouvre a la demande via la barre contextuelle du bas.
   const [regOpen, setRegOpen] = useState(false)
+  // Selecteur d'objets superposes (critique #10) : liste des elements sous le point courant.
+  const [stackPick, setStackPick] = useState<{ id: string; name: string; active: boolean }[] | null>(null)
+  const stackRef = useRef<Record<string, fabric.Object>>({})
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
   const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
   const [dragOver, setDragOver] = useState<number | null>(null) // ligne survolee pendant un glisser
@@ -2250,8 +2254,33 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   }
 
   // ---- Barre contextuelle mobile (facon Canva) : "que veux-tu faire ?" ------
-  // Deselectionner referme le panneau Reglages (sinon il se rouvrirait a la selection suivante).
-  useEffect(() => { if (!sel) setRegOpen(false) }, [sel])
+  // Deselectionner referme le panneau Reglages + le selecteur d'empilement.
+  useEffect(() => { if (!sel) { setRegOpen(false); setStackPick(null) } }, [sel])
+
+  // Selecteur d'objets superposes (#10) : liste les elements sous le centre de la selection.
+  const openStackPicker = () => {
+    const fc = fcRef.current; if (!fc) return
+    const active = fc.getActiveObject(); if (!active) return
+    const objs = fc.getObjects().filter(o => !(o as any).isGuide)
+    const boxes: LayerBox[] = objs.map((o, i) => {
+      const r = o.getBoundingRect(true, true)
+      return { id: String(i), left: r.left, top: r.top, width: r.width, height: r.height }
+    })
+    const ar = active.getBoundingRect(true, true)
+    const c = boxCenter({ id: "sel", left: ar.left, top: ar.top, width: ar.width, height: ar.height })
+    const ids = stackedAt(c.x, c.y, boxes)          // du plus haut au plus bas
+    const map: Record<string, fabric.Object> = {}
+    const list = ids.map(id => {
+      const o = objs[Number(id)]; map[id] = o
+      return { id, name: layerName(o), active: o === active }
+    })
+    stackRef.current = map
+    setStackPick(list.length ? list : null)
+  }
+  const pickStack = (id: string) => {
+    const fc = fcRef.current; const o = stackRef.current[id]; if (!fc || !o) return
+    fc.setActiveObject(o); fc.requestRenderAll(); refreshSel(); setStackPick(null)
+  }
   const KIND_LABEL: Record<string, string> = { qr: "QR Code", text: "Texte", image: "Image", button: "Bouton", group: "Groupe", shape: "Forme", multi: "Sélection" }
   const ctxIcon = (icon: string): React.ReactNode => {
     switch (icon) {
@@ -2267,6 +2296,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "ungroup": return <span style={{ fontSize: 16, lineHeight: 1 }}>⊟</span>
       case "group":  return <span style={{ fontSize: 16, lineHeight: 1 }}>⊞</span>
       case "align":  return <span style={{ fontSize: 16, lineHeight: 1 }}>⊹</span>
+      case "stack":  return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="8" width="13" height="13" rx="2" /><path d="M8 8V6a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" /></svg>
       default:       return <span style={{ fontSize: 15, lineHeight: 1 }}>•</span>
     }
   }
@@ -2274,6 +2304,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     try { (navigator as any).vibrate?.(8) } catch { /* pas de vibreur */ }
     switch (id) {
       case "settings": setRegOpen(true); break
+      case "stack":    openStackPicker(); break
       case "dress":    dressQr(); break
       case "sizeUp":   mutate(o => (o as fabric.IText).set("fontSize", (sel?.fontSize ?? 20) + 2)); break
       case "sizeDown": mutate(o => (o as fabric.IText).set("fontSize", Math.max(8, (sel?.fontSize ?? 20) - 2))); break
@@ -3563,6 +3594,29 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         <div style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 29 }}>
           <MobileDock tools={DOCK_TOOLS} active={dockActive} onSelect={onDock} />
         </div>
+      )}
+
+      {/* Selecteur d'objets superposes (#10) : popover au-dessus de la barre contextuelle */}
+      {landscapeMobile && stackPick && stackPick.length > 0 && (
+        <>
+          <div onClick={() => setStackPick(null)} style={{ position: "fixed", inset: 0, zIndex: 42, background: "transparent" }} />
+          <div style={{ position: "fixed", left: 12, right: 12, bottom: 80, zIndex: 43, background: "#17171B", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, boxShadow: "0 -14px 44px rgba(0,0,0,0.5)", overflow: "hidden", maxHeight: "46vh", display: "flex", flexDirection: "column" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 14px", borderBottom: "1px solid rgba(255,255,255,0.08)", flexShrink: 0 }}>
+              <span style={{ color: "#C9A84C", fontSize: 12, fontWeight: 800 }}>Objets superposés ici · {stackPick.length}</span>
+              <button type="button" onClick={() => setStackPick(null)} aria-label="Fermer" style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 7, color: "#F4F1EA", cursor: "pointer" }}><X size={13} /></button>
+            </div>
+            <div style={{ overflowY: "auto" }}>
+              {stackPick.map((it, i) => (
+                <button key={it.id} type="button" onClick={() => pickStack(it.id)}
+                  style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "12px 14px", background: it.active ? "rgba(201,168,76,0.14)" : "none", border: "none", borderTop: i ? "1px solid rgba(255,255,255,0.05)" : "none", color: it.active ? "#C9A84C" : "#F4F1EA", fontSize: 13.5, fontWeight: 600, textAlign: "left" as const, cursor: "pointer" }}>
+                  <span style={{ width: 22, height: 22, borderRadius: 6, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 700, color: "#C9A84C", flexShrink: 0 }}>{i + 1}</span>
+                  {it.name}
+                  {it.active && <span style={{ marginLeft: "auto", fontSize: 10, color: "#C9A84C", flexShrink: 0 }}>sélectionné</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
       )}
 
       {/* Barre contextuelle mobile (facon Canva) : un objet selectionne -> ses actions, gros, en bas.

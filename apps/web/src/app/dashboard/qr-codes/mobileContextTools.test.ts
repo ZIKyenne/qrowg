@@ -62,6 +62,12 @@ describe("mobileContextTools — specifiques par type", () => {
     expect(ids).toContain("align")
     expect(ids).toContain("group")
   })
+  it("mono-objet expose 'stack' (empilement), pas multi", () => {
+    for (const k of ALL.filter(k => k !== "multi")) {
+      expect(mobileContextTools(k).some(t => t.id === "stack")).toBe(true)
+    }
+    expect(mobileContextTools("multi").some(t => t.id === "stack")).toBe(false)
+  })
   it("qr propose 'Habiller'", () => {
     expect(mobileContextTools("qr").some(t => t.id === "dress")).toBe(true)
   })
