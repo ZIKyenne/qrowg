@@ -34,6 +34,7 @@ import { selKind, mobileContextTools } from "./mobileContextTools"
 import { stackedAt, boxCenter, type LayerBox } from "./stackedObjects"
 import { exportPlan, type ExportType } from "./exportPlan"
 import { dist as gDist, LONG_PRESS_MS, MOVE_TOLERANCE } from "./touchGestures"
+import { showSection, coerceMode, type UiMode } from "./uiComplexity"
 
 // ---- Constantes design (Clair & aere, style Canva) -------------------------
 const G       = "#C9A84C"   // accent (or de marque) : etats actifs, boutons primaires
@@ -891,6 +892,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [mockBg, setMockBg] = useState("") // photo d'environnement (Unsplash) pour le mockup
   const [ctx, setCtx] = useState<{ x: number; y: number } | null>(null) // menu clic-droit
   const [showAdvanced, setShowAdvanced] = useState(false) // panneau de reglages avances (progressive disclosure)
+  const [uiMode, setUiMode] = useState<UiMode>("simple")   // mode Simple / Expert (#3) — persiste
   const [libOpen, setLibOpen] = useState(false)
   const [libCat, setLibCat]   = useState<"text" | "shapes" | "lines" | "frames" | "cta" | "icons" | "badges" | "arrows" | "deco">("text")
   const [tplOpen, setTplOpen] = useState(true) // menu Modeles deplie par defaut (vue globale)
@@ -973,6 +975,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       if (pushed && !closedByPop) { try { window.history.back() } catch { /* noop */ } }
     }
   }, [])
+
+  // Mode Simple / Expert (#3) : chargement + persistance locale.
+  useEffect(() => { try { setUiMode(coerceMode(localStorage.getItem("qf_ui_mode"))) } catch { /* noop */ } }, [])
+  useEffect(() => { try { localStorage.setItem("qf_ui_mode", uiMode) } catch { /* noop */ } }, [uiMode])
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
   const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
   const [dragOver, setDragOver] = useState<number | null>(null) // ligne survolee pendant un glisser
@@ -4743,7 +4749,16 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <span style={{ color: INK, fontSize: 13.5, fontWeight: 800 }}>{sel.isQr ? "QR Code" : sel.isImage ? "Image" : sel.isText ? "Texte" : sel.label !== null ? "Bouton" : sel.isGroupObj ? "Groupe" : "Forme"}</span>
                   <span style={{ color: MUTED, fontSize: 10 }}>Réglages</span>
                 </div>
-                <button type="button" onClick={() => { if (landscapeMobile) { setRegOpen(false) } else { fcRef.current?.discardActiveObject(); fcRef.current?.requestRenderAll(); setSel(null) } }} aria-label="Fermer" style={{ marginLeft: "auto", display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
+                {/* Mode Simple / Expert (#3) : masque les reglages avances quand Simple */}
+                <div style={{ marginLeft: "auto", display: "flex", background: "rgba(0,0,0,0.05)", borderRadius: 8, padding: 2, gap: 2 }}>
+                  {(["simple", "expert"] as UiMode[]).map(m => (
+                    <button key={m} type="button" onClick={() => setUiMode(m)} title={m === "simple" ? "Réglages essentiels" : "Tous les réglages"}
+                      style={{ padding: "5px 9px", borderRadius: 6, border: "none", background: uiMode === m ? "#fff" : "transparent", color: uiMode === m ? G : MUTED, fontSize: 10.5, fontWeight: 700, cursor: "pointer", boxShadow: uiMode === m ? "0 1px 3px rgba(0,0,0,0.12)" : "none" }}>
+                      {m === "simple" ? "Simple" : "Expert"}
+                    </button>
+                  ))}
+                </div>
+                <button type="button" onClick={() => { if (landscapeMobile) { setRegOpen(false) } else { fcRef.current?.discardActiveObject(); fcRef.current?.requestRenderAll(); setSel(null) } }} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
               </div>
               <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
@@ -4801,6 +4816,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                           ))}
                         </div>
 
+                        {showSection("qr-corners", uiMode) && (<>
                         <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Coins</label>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
                           {([["square", "Carré"], ["rounded", "Arrondi"], ["circle", "Rond"], ["diamond", "Losange"]] as const).map(([k, l]) => (
@@ -4808,7 +4824,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                               style={{ ...layerBtn, flex: "1 0 22%", fontSize: 9.5, color: qrCorner === k ? G : INK, borderColor: qrCorner === k ? G : "rgba(0,0,0,0.1)", opacity: qrBusy ? 0.5 : 1 }}>{l}</button>
                           ))}
                         </div>
+                        </>)}
 
+                        {showSection("qr-ecc", uiMode) && (<>
                         <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>
                           Correction d'erreur{qrHasLogo ? <span style={{ color: MUTED }}> · logo → H conseillé</span> : null}
                         </label>
@@ -4818,6 +4836,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                               style={{ ...layerBtn, flex: 1, fontWeight: 700, color: qrEcc === e ? G : INK, borderColor: qrEcc === e ? G : "rgba(0,0,0,0.1)", opacity: qrBusy ? 0.5 : 1 }}>{e}</button>
                           ))}
                         </div>
+                        </>)}
                         {qrBusy && <p style={{ margin: "6px 0 0", fontSize: 10, color: MUTED }}>Régénération du QR…</p>}
                       </>
                     ) : (
@@ -5078,6 +5097,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                       })}
                     </div>
 
+                    {showSection("text-spacing", uiMode) && (<>
                     {/* Espacement des lettres */}
                     <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Espacement — {Math.round(sel.charSpacing)}</label>
                     <input type="range" min={0} max={800} step={10} value={sel.charSpacing}
@@ -5089,11 +5109,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     <input type="range" min={0.8} max={2} step={0.05} value={sel.lineHeight}
                       onChange={e => mutate(o => (o as fabric.IText).set("lineHeight", parseFloat(e.target.value)))}
                       style={{ width: "100%", accentColor: G }} />
+                    </>)}
                   </>
                 )}
               </div>
 
-              {/* Effets */}
+              {/* Effets (avances -> masques en mode Simple) */}
+              {showSection("text-effects", uiMode) && (
               <div>
                 <p className="ps-sec-label">Ombre</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 5, marginBottom: 6 }}>
@@ -5131,6 +5153,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <button type="button" onClick={() => setGlow("neon")} style={{ ...layerBtn, flex: 1 }}>💡 Néon</button>
                 </div>
               </div>
+              )}
 
               {/* Transformer : rotation + inclinaison */}
               <div>
