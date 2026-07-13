@@ -3423,6 +3423,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
            du plan de travail au lieu de rétrécir l'aperçu -> le canvas garde toute sa largeur, le design reste grand. */
         .ps-root:not(.ps-landscape) .ps-fly:not(.ps-fly-right) { position: absolute !important; left: var(--ps-rail-w, 150px) !important; top: 0 !important; bottom: 0 !important; z-index: 22 !important; box-shadow: 12px 0 44px rgba(0,0,0,0.22) !important; }
         .ps-sec-label { display: flex; align-items: center; gap: 7px; color: ${MUTED}; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.3px; margin: 0 0 9px; }
+        /* Menu ... mobile en sombre premium : etiquettes de section eclaircies pour le contraste */
+        .ps-msheet .ps-sec-label { color: #BCB4A6; }
         .ps-sec-label::before { content: ""; width: 3px; height: 11px; border-radius: 3px; background: ${G}; flex-shrink: 0; }
         .ps-rail button:hover:not(:disabled) { filter: none; border-color: rgba(201,168,76,0.55) !important; box-shadow: 0 4px 12px rgba(31,36,48,0.1) !important; transform: translateY(-1px); }
         .ps-rail button:active:not(:disabled) { transform: translateY(0) scale(0.96); }
@@ -3501,15 +3503,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       {/* Menu ⋯ (paysage mobile) : actions secondaires en bottom sheet */}
       {moreOpen && (
         <div onClick={() => setMoreOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 70, background: "rgba(0,0,0,0.42)", backdropFilter: "blur(2px)", display: "flex", alignItems: "flex-end" }}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxHeight: "84vh", overflowY: "auto", background: "#FFFFFF", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: "10px 14px calc(16px + env(safe-area-inset-bottom))", animation: "psSheetUp .26s cubic-bezier(.2,.8,.2,1)", boxShadow: "0 -14px 44px rgba(0,0,0,0.28)" }}>
-            <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(0,0,0,0.15)", margin: "0 auto 12px" }} />
+          <div className="ps-msheet" onClick={e => e.stopPropagation()} style={{ width: "100%", maxHeight: "84vh", overflowY: "auto", background: "#17171B", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: "10px 14px calc(16px + env(safe-area-inset-bottom))", animation: "psSheetUp .26s cubic-bezier(.2,.8,.2,1)", boxShadow: "0 -14px 44px rgba(0,0,0,0.45)", border: "1px solid rgba(255,255,255,0.07)", borderBottom: "none" }}>
+            <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.2)", margin: "0 auto 12px" }} />
 
             {/* Format (masqué ailleurs en mobile -> seul point d'entrée au doigt) */}
             <p className="ps-sec-label" style={{ marginTop: 0 }}>Format</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
               {(Object.keys(FORMATS) as FormatId[]).map(f => (
                 <button key={f} type="button" onClick={() => applyFormat(f)}
-                  style={{ padding: "9px 13px", borderRadius: 9, border: `1px solid ${format === f ? G : "rgba(0,0,0,0.12)"}`, background: format === f ? "rgba(201,168,76,0.15)" : "#fff", color: format === f ? G : INK, fontSize: 13, fontWeight: 700, cursor: "pointer", minHeight: 40 }}>
+                  style={{ padding: "9px 13px", borderRadius: 9, border: `1px solid ${format === f ? G : "rgba(255,255,255,0.16)"}`, background: format === f ? "rgba(201,168,76,0.18)" : "rgba(255,255,255,0.05)", color: format === f ? G : "#ECE8E0", fontSize: 13, fontWeight: 700, cursor: "pointer", minHeight: 40 }}>
                   {FORMATS[f].label}
                 </button>
               ))}
@@ -3520,14 +3522,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             <div style={{ display: "flex", gap: 6, marginBottom: 4 }}>
               {[72, 150, 300].map(d => (
                 <button key={d} type="button" onClick={() => setExpDpi(d)}
-                  style={{ flex: 1, padding: "10px 0", borderRadius: 9, border: `1px solid ${expDpi === d ? G : "rgba(0,0,0,0.12)"}`, background: expDpi === d ? "rgba(201,168,76,0.15)" : "#fff", color: expDpi === d ? G : INK, fontSize: 13, fontWeight: 700, cursor: "pointer", minHeight: 42 }}>
+                  style={{ flex: 1, padding: "10px 0", borderRadius: 9, border: `1px solid ${expDpi === d ? G : "rgba(255,255,255,0.16)"}`, background: expDpi === d ? "rgba(201,168,76,0.18)" : "rgba(255,255,255,0.05)", color: expDpi === d ? G : "#ECE8E0", fontSize: 13, fontWeight: 700, cursor: "pointer", minHeight: 42 }}>
                   {d} DPI
                 </button>
               ))}
             </div>
-            <label style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 2px 14px", color: INK, fontSize: 13.5, cursor: "pointer" }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 2px 14px", color: "#ECE8E0", fontSize: 13.5, cursor: "pointer" }}>
               <input type="checkbox" checked={expMarks} onChange={e => setExpMarks(e.target.checked)} style={{ accentColor: G, width: 18, height: 18, flexShrink: 0 }} />
-              Traits de coupe + fond perdu <span style={{ color: MUTED }}>(PDF)</span>
+              Traits de coupe + fond perdu <span style={{ color: "#9A9384" }}>(PDF)</span>
             </label>
 
             {/* Actions */}
@@ -3548,8 +3550,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               { icon: <HelpCircle size={18} />, label: "Aide & raccourcis", on: () => setShowHelp(true), disabled: false },
             ] as { icon: React.ReactNode; label: string; on: () => void; disabled: boolean }[]).map((a, i) => (
               <button key={i} type="button" disabled={a.disabled} onClick={() => { a.on(); setMoreOpen(false) }}
-                style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "14px 12px", background: "none", border: "none", borderTop: i ? "1px solid rgba(0,0,0,0.05)" : "none", color: a.disabled ? "rgba(0,0,0,0.3)" : INK, fontSize: 15, fontWeight: 600, cursor: a.disabled ? "default" : "pointer", textAlign: "left" as const }}>
-                <span style={{ color: a.disabled ? "rgba(0,0,0,0.3)" : G, display: "flex" }}>{a.icon}</span> {a.label}
+                style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "14px 12px", background: "none", border: "none", borderTop: i ? "1px solid rgba(255,255,255,0.07)" : "none", color: a.disabled ? "rgba(255,255,255,0.28)" : "#ECE8E0", fontSize: 15, fontWeight: 600, cursor: a.disabled ? "default" : "pointer", textAlign: "left" as const }}>
+                <span style={{ color: a.disabled ? "rgba(255,255,255,0.28)" : G, display: "flex" }}>{a.icon}</span> {a.label}
               </button>
             ))}
           </div>
