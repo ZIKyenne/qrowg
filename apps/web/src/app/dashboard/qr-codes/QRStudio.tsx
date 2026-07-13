@@ -2352,15 +2352,27 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           }}
           regenQr={async (opts) => {
             try {
+              const mergedStyle: QRStyleConfig = {
+                ...styleConf,
+                ...(opts.dotStyle ? { dotStyle: opts.dotStyle as typeof styleConf.dotStyle } : {}),
+                ...(opts.cornerStyle ? { cornerStyle: opts.cornerStyle as typeof styleConf.cornerStyle } : {}),
+                ...(opts.eyeColor !== undefined ? { eyeColor: opts.eyeColor } : {}),
+                ...(opts.margin !== undefined ? { margin: opts.margin } : {}),
+              }
               const blob = await getQRBlob({
-                data: qrUrl, fg: opts.fg ?? fg, bg,
-                ecc: effectiveEcc,
-                style: opts.dotStyle ? { ...styleConf, dotStyle: opts.dotStyle as typeof styleConf.dotStyle } : styleConf,
+                data: qrUrl, fg: opts.fg ?? fg, bg: opts.bg ?? bg,
+                ecc: opts.ecc ?? effectiveEcc,
+                style: mergedStyle,
                 size: 1000,
               }, "png")
               if (!blob) return null
               return await blobToDataUrl(blob)
             } catch { return null }
+          }}
+          qrInit={{
+            fg: fg || "#0A0A0A", bg: bg || "#FFFFFF", ecc: effectiveEcc,
+            dotStyle: styleConf.dotStyle, cornerStyle: styleConf.cornerStyle,
+            eyeColor: styleConf.eyeColor, hasLogo: !!styleConf.logoUrl, margin: styleConf.margin,
           }}
         />
       )}

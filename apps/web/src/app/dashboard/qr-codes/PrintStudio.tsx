@@ -28,6 +28,7 @@ import PrintCenterPanel from "./PrintCenterPanel"
 import MobileDock, { type DockTool } from "@/components/mobile/MobileDock"
 import { printPreflight, hexContrastRatio, quietZonePx, edgeMarginPx, type PreflightMetrics, type PreflightResult, type Rect } from "./printPreflight"
 import { alignDeltas, type AlignMode, type Box } from "./alignDistribute"
+import { qrScannability, scanLevelColor } from "./qrScannability"
 
 // ---- Constantes design (Clair & aere, style Canva) -------------------------
 const G       = "#C9A84C"   // accent (or de marque) : etats actifs, boutons primaires
@@ -139,8 +140,10 @@ type Props = {
   onUpsell?: (feature: string, plan: string) => void
   // Donnees deja saisies cote QRStudio, pour pre-remplir les modeles
   prefill?: { name?: string; phone?: string; website?: string }
-  // Regenere le QR (couleur / style des modules) via le moteur qrRender de QRStudio
-  regenQr?: (opts: { fg?: string; dotStyle?: string }) => Promise<string | null>
+  // Regenere le QR (couleurs / style / correction / marge) via le moteur qrRender de QRStudio
+  regenQr?: (opts: { fg?: string; bg?: string; dotStyle?: string; cornerStyle?: string; eyeColor?: string; ecc?: "L" | "M" | "Q" | "H"; margin?: number }) => Promise<string | null>
+  // Config initiale du QR injecte, pour que l'editeur QR & la jauge de scannabilite soient exacts d'emblee
+  qrInit?: { fg?: string; bg?: string; ecc?: "L" | "M" | "Q" | "H"; dotStyle?: string; cornerStyle?: string; eyeColor?: string; hasLogo?: boolean; margin?: number }
 }
 
 // ---- Etat de selection (pour le panneau proprietes) ------------------------
@@ -720,6 +723,7 @@ const GRADIENT_PRESETS: [string, string][] = [
 ]
 // Couleurs de QR garanties scannables (foncees, fort contraste sur la carte blanche)
 const QR_FG = ["#0A0A0A", "#13243A", "#0F3D2E", "#3A1212", "#2A0A2E", "#5A3A12", "#1D4ED8", "#7C3AED"]
+const QR_BG = ["#FFFFFF", "#F8F8F8", "#FBF8F0", "#EAF2FF", "#0A0A0A"]
 // Styles de modules du QR (cle compatible qrRender)
 const QR_DOTS: { k: string; label: string; icon: string }[] = [
   { k: "square", label: "Carré", icon: "▦" },
@@ -842,7 +846,7 @@ const METIERS: { id: string; label: string; emoji: string; style: string; objs: 
   ] },
 ]
 
-export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpsell, prefill, regenQr }: Props) {
+export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpsell, prefill, regenQr, qrInit }: Props) {
   const elRef   = useRef<HTMLCanvasElement>(null)
   const fcRef   = useRef<fabric.Canvas | null>(null)
   const qrUrlRef = useRef(qrDataUrl)
@@ -918,9 +922,16 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const saveRef = useRef<(silent?: boolean) => void>(() => {}) // ref vers le save courant (evite closure perimee dans Ctrl+S)
   const applyingRef = useRef(false)                  // verrou anti-reentrance pendant l'application d'un modele (async photo)
   const [lastPool, setLastPool] = useState<string[] | null>(null) // dernier objectif (pour Régénérer)
-  const [qrFg, setQrFg] = useState("")      // couleur courante du QR (apres regeneration)
-  const [qrDot, setQrDot] = useState("")    // style de modules courant du QR
+  // Config courante du QR (initialisee depuis qrInit -> l'editeur & la jauge sont exacts d'emblee)
+  const [qrFg, setQrFg] = useState(qrInit?.fg ?? "")        // couleur des modules
+  const [qrDot, setQrDot] = useState(qrInit?.dotStyle ?? "")// style de modules
+  const [qrBg, setQrBg] = useState(qrInit?.bg ?? "")        // couleur de fond
+  const [qrCorner, setQrCorner] = useState(qrInit?.cornerStyle ?? "") // style des coins/yeux
+  const [qrEcc, setQrEcc] = useState<"L" | "M" | "Q" | "H">(qrInit?.ecc ?? "M") // correction d'erreur
+  const qrHasLogo = !!qrInit?.hasLogo
   const [qrBusy, setQrBusy] = useState(false)
+  // Scannabilite estimee en direct depuis la config QR courante (moteur pur teste)
+  const qrScan = qrScannability({ fg: qrFg || "#0A0A0A", bg: qrBg || "#FFFFFF", ecc: qrEcc, dotStyle: qrDot || undefined, hasLogo: qrHasLogo })
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
   const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
   const [dragOver, setDragOver] = useState<number | null>(null) // ligne survolee pendant un glisser
@@ -1307,14 +1318,20 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // ---- Outils d'ajout ------------------------------------------------------
   const addQr = () => { const fc = fcRef.current; if (fc) placeQr(fc) }
   // Regenere le QR (couleur / style) et remplace l'image en place (position/taille conservees)
-  const applyQrRender = async (opts: { fg?: string; dotStyle?: string }) => {
+  const applyQrRender = async (opts: { fg?: string; bg?: string; dotStyle?: string; cornerStyle?: string; ecc?: "L" | "M" | "Q" | "H" }) => {
     if (!regenQr || qrBusy) return
     const fc = fcRef.current; if (!fc) return
     const img = fc.getObjects().find(o => (o as any).isQR) as fabric.Image | undefined
     if (!img) return
     setQrBusy(true)
     try {
-      const url = await regenQr({ fg: opts.fg ?? (qrFg || undefined), dotStyle: opts.dotStyle ?? (qrDot || undefined) })
+      const url = await regenQr({
+        fg: opts.fg ?? (qrFg || undefined),
+        bg: opts.bg ?? (qrBg || undefined),
+        dotStyle: opts.dotStyle ?? (qrDot || undefined),
+        cornerStyle: opts.cornerStyle ?? (qrCorner || undefined),
+        ecc: opts.ecc ?? qrEcc,
+      })
       if (url) {
         // conserver largeur affichee + centre meme si le QR regenere a d'autres dimensions pixel
         const w = img.getScaledWidth(); const center = img.getCenterPoint()
@@ -1323,7 +1340,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           fc.requestRenderAll(); pushHistorySoon()
         }, { crossOrigin: "anonymous" } as fabric.IImageOptions)
         if (opts.fg) setQrFg(opts.fg)
+        if (opts.bg) setQrBg(opts.bg)
         if (opts.dotStyle) setQrDot(opts.dotStyle)
+        if (opts.cornerStyle) setQrCorner(opts.cornerStyle)
+        if (opts.ecc) setQrEcc(opts.ecc)
       }
     } catch { /* noop */ } finally { setQrBusy(false) }
   }
@@ -4418,6 +4438,84 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               </div>
               <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
+
+                {/* Editeur QR : apparence + jauge de scannabilite en direct */}
+                {sel.isQr && (
+                  <div style={{ marginBottom: 14 }}>
+                    <p className="ps-sec-label">Éditeur QR</p>
+
+                    {/* Jauge de scannabilite (moteur pur : contraste + correction + logo) */}
+                    <div style={{ background: BG, border: "1px solid rgba(0,0,0,0.08)", borderRadius: 10, padding: "9px 10px", marginBottom: 10 }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, gap: 8 }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: scanLevelColor(qrScan.level) }}>{qrScan.label}</span>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: MUTED, whiteSpace: "nowrap" }}>
+                          {qrScan.contrast != null ? `Contraste ${qrScan.contrast}:1` : "Contraste n/d"} · {qrScan.score}/100
+                        </span>
+                      </div>
+                      <div style={{ height: 6, borderRadius: 4, background: "rgba(0,0,0,0.08)", overflow: "hidden" }}>
+                        <div style={{ width: `${qrScan.score}%`, height: "100%", background: scanLevelColor(qrScan.level), transition: "width .2s ease" }} />
+                      </div>
+                      {qrScan.advices[0] && (
+                        <p style={{ margin: "7px 0 0", fontSize: 10.5, color: INK, lineHeight: 1.45 }}>💡 {qrScan.advices[0]}</p>
+                      )}
+                    </div>
+
+                    {regenQr ? (
+                      <>
+                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Couleur du QR</label>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
+                          {QR_FG.map(c => (
+                            <button key={c} type="button" disabled={qrBusy} onClick={() => applyQrRender({ fg: c })} title={c}
+                              style={{ width: 22, height: 22, borderRadius: "50%", cursor: "pointer", background: c, border: (qrFg || "#0A0A0A").toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.2)", padding: 0, opacity: qrBusy ? 0.5 : 1 }} />
+                          ))}
+                          <input type="color" value={/^#[0-9a-fA-F]{6}$/.test(qrFg) ? qrFg : "#0A0A0A"} disabled={qrBusy}
+                            onChange={e => applyQrRender({ fg: e.target.value })}
+                            style={{ width: 30, height: 22, borderRadius: 6, border: "1px solid rgba(0,0,0,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
+                        </div>
+
+                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Fond</label>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
+                          {QR_BG.map(c => (
+                            <button key={c} type="button" disabled={qrBusy} onClick={() => applyQrRender({ bg: c })} title={c}
+                              style={{ width: 22, height: 22, borderRadius: "50%", cursor: "pointer", background: c, border: (qrBg || "#FFFFFF").toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.2)", padding: 0, opacity: qrBusy ? 0.5 : 1 }} />
+                          ))}
+                          <input type="color" value={/^#[0-9a-fA-F]{6}$/.test(qrBg) ? qrBg : "#FFFFFF"} disabled={qrBusy}
+                            onChange={e => applyQrRender({ bg: e.target.value })}
+                            style={{ width: 30, height: 22, borderRadius: 6, border: "1px solid rgba(0,0,0,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
+                        </div>
+
+                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Modules</label>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
+                          {QR_DOTS.map(d => (
+                            <button key={d.k} type="button" disabled={qrBusy} onClick={() => applyQrRender({ dotStyle: d.k })} title={d.label}
+                              style={{ ...layerBtn, flex: "1 0 22%", fontSize: 14, color: qrDot === d.k ? G : INK, borderColor: qrDot === d.k ? G : "rgba(0,0,0,0.1)", opacity: qrBusy ? 0.5 : 1 }}>{d.icon}</button>
+                          ))}
+                        </div>
+
+                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Coins</label>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
+                          {([["square", "Carré"], ["rounded", "Arrondi"], ["circle", "Rond"], ["diamond", "Losange"]] as const).map(([k, l]) => (
+                            <button key={k} type="button" disabled={qrBusy} onClick={() => applyQrRender({ cornerStyle: k })}
+                              style={{ ...layerBtn, flex: "1 0 22%", fontSize: 9.5, color: qrCorner === k ? G : INK, borderColor: qrCorner === k ? G : "rgba(0,0,0,0.1)", opacity: qrBusy ? 0.5 : 1 }}>{l}</button>
+                          ))}
+                        </div>
+
+                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>
+                          Correction d'erreur{qrHasLogo ? <span style={{ color: MUTED }}> · logo → H conseillé</span> : null}
+                        </label>
+                        <div style={{ display: "flex", gap: 5 }}>
+                          {(["L", "M", "Q", "H"] as const).map(e => (
+                            <button key={e} type="button" disabled={qrBusy} onClick={() => applyQrRender({ ecc: e })} title={`Correction ${e}`}
+                              style={{ ...layerBtn, flex: 1, fontWeight: 700, color: qrEcc === e ? G : INK, borderColor: qrEcc === e ? G : "rgba(0,0,0,0.1)", opacity: qrBusy ? 0.5 : 1 }}>{e}</button>
+                          ))}
+                        </div>
+                        {qrBusy && <p style={{ margin: "6px 0 0", fontSize: 10, color: MUTED }}>Régénération du QR…</p>}
+                      </>
+                    ) : (
+                      <p style={{ fontSize: 10.5, color: MUTED, margin: "0 0 4px" }}>Personnalisation du QR indisponible ici.</p>
+                    )}
+                  </div>
+                )}
 
                 {/* Etiquette QR (quand le QR est selectionne) */}
                 {sel.isQr && (

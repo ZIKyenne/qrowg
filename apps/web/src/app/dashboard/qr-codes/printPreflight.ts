@@ -32,7 +32,7 @@ export type PreflightResult = {
 }
 
 // Luminance relative sRGB (WCAG) d'une couleur hex #rgb ou #rrggbb. null si invalide.
-function relLuminance(hex: string): number | null {
+export function relLuminance(hex: string): number | null {
   if (typeof hex !== "string") return null
   let h = hex.trim().replace(/^#/, "")
   if (h.length === 3) h = h.split("").map(c => c + c).join("")
