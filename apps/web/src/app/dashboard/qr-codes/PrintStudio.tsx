@@ -37,6 +37,7 @@ import { dist as gDist, LONG_PRESS_MS, MOVE_TOLERANCE } from "./touchGestures"
 import { showSection, coerceMode, type UiMode } from "./uiComplexity"
 import { pushRecent } from "./colorTools"
 import ColorPicker from "./ColorPicker"
+import { isFav, toggleFav, pushRecentTpl, keepValid } from "./templateGallery"
 
 // ---- Constantes design (Clair & aere, style Canva) -------------------------
 const G       = "#C9A84C"   // accent (or de marque) : etats actifs, boutons primaires
@@ -897,6 +898,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [uiMode, setUiMode] = useState<UiMode>("simple")   // mode Simple / Expert (#3) — persiste
   const [pickerOpen, setPickerOpen] = useState(false)      // selecteur de couleurs avance (#14)
   const [recentColors, setRecentColors] = useState<string[]>([]) // historique de couleurs (persiste)
+  const [favsTpl, setFavsTpl] = useState<string[]>([])     // modeles favoris (#13, persiste)
+  const [recentTpl, setRecentTpl] = useState<string[]>([]) // modeles recents (#13, persiste)
   const [libOpen, setLibOpen] = useState(false)
   const [libCat, setLibCat]   = useState<"text" | "shapes" | "lines" | "frames" | "cta" | "icons" | "badges" | "arrows" | "deco">("text")
   const [tplOpen, setTplOpen] = useState(true) // menu Modeles deplie par defaut (vue globale)
@@ -989,6 +992,19 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     try { const raw = localStorage.getItem("qf_recent_colors"); if (raw) setRecentColors(JSON.parse(raw)) } catch { /* noop */ }
   }, [])
   useEffect(() => { try { localStorage.setItem("qf_recent_colors", JSON.stringify(recentColors)) } catch { /* noop */ } }, [recentColors])
+
+  // Favoris / recents de modeles (#13) : chargement (filtre les ids disparus) + persistance.
+  useEffect(() => {
+    try {
+      const ids = new Set(PRINT_TEMPLATES.map(t => t.id))
+      const f = JSON.parse(localStorage.getItem("qf_fav_tpl") || "[]")
+      const r = JSON.parse(localStorage.getItem("qf_recent_tpl") || "[]")
+      setFavsTpl(keepValid(Array.isArray(f) ? f : [], ids))
+      setRecentTpl(keepValid(Array.isArray(r) ? r : [], ids))
+    } catch { /* noop */ }
+  }, [])
+  useEffect(() => { try { localStorage.setItem("qf_fav_tpl", JSON.stringify(favsTpl)) } catch { /* noop */ } }, [favsTpl])
+  useEffect(() => { try { localStorage.setItem("qf_recent_tpl", JSON.stringify(recentTpl)) } catch { /* noop */ } }, [recentTpl])
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
   const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
   const [dragOver, setDragOver] = useState<number | null>(null) // ligne survolee pendant un glisser
@@ -2723,6 +2739,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const hasContent = fc.getObjects().some(o => o !== vG && o !== hG && !(o as any).isQR && !(o as any).isQrCard)
     if (!skipConfirm && hasContent && !window.confirm("Remplacer le contenu actuel par ce modèle ?")) return
 
+    setRecentTpl(r => pushRecentTpl(r, id)) // memorise le modele applique (#13)
     applyingRef.current = true
     histRef.current.lock = true // tout le modele = une seule etape d'historique
     fc.getObjects().slice().forEach(o => { if (o !== vG && o !== hG) fc.remove(o) })
@@ -3595,6 +3612,23 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // Sur téléphone (landscapeMobile, toute orientation) : rail masqué, remplacé par
   // le MobileDock en bas + le menu ⋯ pour l'overflow. Sur desktop : rail + panneaux flottants.
 
+  // Carte de modele (galerie #13) : grande vignette + libelle + etoile favori.
+  const tplCard = (t: typeof PRINT_TEMPLATES[number]) => (
+    <div key={t.id} style={{ position: "relative" }}>
+      <button type="button" onClick={() => applyTemplate(t.id)} title={t.desc}
+        style={{ display: "flex", flexDirection: "column", gap: 5, padding: 6, width: "100%", background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: 10, cursor: "pointer" }}>
+        {tplThumb(t, thumbCache[t.obj])}
+        <span style={{ color: INK, fontSize: 10, fontWeight: 700, textAlign: "center", lineHeight: 1.2 }}>{t.label}</span>
+      </button>
+      <span role="button" tabIndex={0} aria-label={isFav(favsTpl, t.id) ? "Retirer des favoris" : "Ajouter aux favoris"}
+        onClick={e => { e.stopPropagation(); setFavsTpl(f => toggleFav(f, t.id)) }}
+        onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); setFavsTpl(f => toggleFav(f, t.id)) } }}
+        style={{ position: "absolute", top: 9, right: 9, width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%", background: "rgba(0,0,0,0.45)", color: isFav(favsTpl, t.id) ? "#FFD65A" : "#fff", fontSize: 13, cursor: "pointer", userSelect: "none" }}>
+        {isFav(favsTpl, t.id) ? "★" : "☆"}
+      </span>
+    </div>
+  )
+
   const root = (
     <div className={"ps-root" + (landscapeMobile ? " ps-landscape" : "")} style={{
       position: "fixed", inset: 0, zIndex: 3000, background: BG,
@@ -4203,6 +4237,27 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               </div>
             </div>
             <div className="qr-scroll" style={{ flex: 1, overflowY: "auto", padding: "10px 10px 16px" }}>
+              {/* Favoris / Recents (#13) : acces rapide, hors recherche/collection */}
+              {!tplColl && !tplSearch.trim() && (() => {
+                const byId = (id: string) => PRINT_TEMPLATES.find(t => t.id === id)
+                const favItems = favsTpl.map(byId).filter(Boolean) as typeof PRINT_TEMPLATES
+                const recItems = recentTpl.map(byId).filter(Boolean).filter(t => t && !favsTpl.includes(t.id)) as typeof PRINT_TEMPLATES
+                const secTitle = (txt: string) => <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>{txt}</p>
+                return (<>
+                  {favItems.length > 0 && (
+                    <div style={{ marginBottom: 12 }}>
+                      {secTitle("★ Favoris")}
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>{favItems.map(tplCard)}</div>
+                    </div>
+                  )}
+                  {recItems.length > 0 && (
+                    <div style={{ marginBottom: 12 }}>
+                      {secTitle("Récents")}
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>{recItems.map(tplCard)}</div>
+                    </div>
+                  )}
+                </>)
+              })()}
               {/* Vue par COLLECTION (si une collection est sélectionnée) */}
               {tplColl ? (() => {
                 const col = COLLECTIONS.find(c => c.id === tplColl)
@@ -4211,13 +4266,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <div>
                     <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>{col?.emoji} Collection {col?.label}</p>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                      {items.map(t => (
-                        <button key={t.id} type="button" onClick={() => applyTemplate(t.id)} title={t.desc}
-                          style={{ display: "flex", flexDirection: "column", gap: 5, padding: 6, background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: 10, cursor: "pointer" }}>
-                          {tplThumb(t, thumbCache[t.obj])}
-                          <span style={{ color: INK, fontSize: 10, fontWeight: 700, textAlign: "center", lineHeight: 1.2 }}>{t.label}</span>
-                        </button>
-                      ))}
+                      {items.map(tplCard)}
                     </div>
                   </div>
                 )
@@ -4233,13 +4282,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <div key={obj} style={{ marginBottom: 12 }}>
                     <p style={{ color: MUTED, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 6px" }}>{obj}</p>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                      {items.map(t => (
-                        <button key={t.id} type="button" onClick={() => applyTemplate(t.id)} title={t.desc}
-                          style={{ display: "flex", flexDirection: "column", gap: 5, padding: 6, background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.07)", borderRadius: 10, cursor: "pointer" }}>
-                          {tplThumb(t, thumbCache[obj])}
-                          <span style={{ color: INK, fontSize: 10, fontWeight: 700, textAlign: "center", lineHeight: 1.2 }}>{t.label}</span>
-                        </button>
-                      ))}
+                      {items.map(tplCard)}
                     </div>
                   </div>
                 )
