@@ -1642,8 +1642,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const onDock = (id: string) => {
     switch (id) {
       case "tpl": setTplOpen(v => !v); setLibOpen(false); setSide(""); setCompOpen(false); setPhotoOpen(false); break
-      case "text": openLib("text"); break
-      case "shape": openLib("shapes"); break
+      case "text": (libOpen && libCat === "text") ? setLibOpen(false) : openLib("text"); break
+      case "shape": (libOpen && libCat === "shapes") ? setLibOpen(false) : openLib("shapes"); break
       case "qr": addQr(); break
       case "img": fileRef.current?.click(); break
       case "photo": openPhoto(); break
@@ -3400,11 +3400,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   } as const
   const topDivider = <span style={{ width: 1, height: 24, background: "rgba(31,36,48,0.1)", margin: "0 4px" }} />
 
-  // Print Studio = éditeur canvas de précision (multi-panneaux, drag/resize) :
-  // impraticable sur petit écran tactile. On invite à passer sur ordinateur.
-  // Note : l'écran « tourne ton téléphone » (mobile portrait) est géré en amont
-  // par le composant RotateToLandscapeGate (cf. QRStudio). Ici, on rend toujours
-  // l'éditeur (desktop, tablette, ou téléphone en paysage).
+  // Print Studio = éditeur canvas rendu dans toutes les tailles d'écran.
+  // Sur téléphone (landscapeMobile, toute orientation) : rail masqué, remplacé par
+  // le MobileDock en bas + le menu ⋯ pour l'overflow. Sur desktop : rail + panneaux flottants.
 
   return (
     <div className={"ps-root" + (landscapeMobile ? " ps-landscape" : "")} style={{
@@ -3535,6 +3533,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             {/* Actions */}
             <p className="ps-sec-label">Actions</p>
             {([
+              { icon: <Sparkles size={18} />, label: "Ajouter un composant", on: openComp, disabled: false },
+              { icon: <Square size={18} />, label: "Fond de la feuille", on: () => openSide("bg"), disabled: false },
               { icon: <ShieldCheck size={18} />, label: "Contrôle qualité", on: openPreflight, disabled: false },
               { icon: <Download size={18} />, label: "Exporter en PNG", on: () => exportImage("png"), disabled: false },
               { icon: <Download size={18} />, label: "Exporter en JPG", on: () => exportImage("jpeg"), disabled: false },
