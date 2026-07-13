@@ -3421,9 +3421,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         .ps-rail.ps-compact > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; gap: 8px !important; width: 100%; }
         .ps-rail.ps-compact button { font-size: 0 !important; letter-spacing: 0 !important; padding: 0 !important; gap: 0 !important; justify-content: center !important; width: 100% !important; min-height: 48px !important; }
         .ps-rail.ps-compact button svg { width: 22px !important; height: 22px !important; flex-shrink: 0; }
-        .ps-topbar-compact { padding: 6px 10px !important; }
-        /* Cibles tactiles ≥ 42px sur la barre du haut en mobile (priorité UX #6) */
-        .ps-topbar-compact button { padding-top: 7px !important; padding-bottom: 7px !important; min-height: 42px !important; min-width: 42px !important; }
+        /* Barre du haut mobile : chrome sombre premium (l'export doré est masqué en compact -> pas de conflit) */
+        .ps-topbar-compact { padding: 6px 10px !important; background: #141417 !important; border-bottom: 1px solid rgba(255,255,255,0.08) !important; box-shadow: none !important; }
+        /* Cibles tactiles ≥ 42px + texte/icônes clairs sur fond sombre (priorité UX #6) */
+        .ps-topbar-compact button { padding-top: 7px !important; padding-bottom: 7px !important; min-height: 42px !important; min-width: 42px !important; color: #F4F1EA !important; }
+        .ps-topbar-compact button svg { color: #F4F1EA !important; }
         /* Phase 2 — paysage mobile : panneau Réglages en bottom sheet, Format masqué */
         .ps-hide-mobile { display: none !important; }
         .ps-fly-right.ps-sheet {
@@ -3540,13 +3542,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           <span style={{ width: 30, height: 30, borderRadius: 9, background: "linear-gradient(135deg,#D9BC6A,#B8923A)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 9px rgba(201,168,76,0.45)", flexShrink: 0 }}>
             <QrCode size={17} color="#fff" />
           </span>
-          <span style={{ color: INK, fontWeight: 800, fontSize: 15, letterSpacing: 0.2 }}>QR Print <span style={{ color: G }}>Studio</span></span>
+          <span style={{ color: landscapeMobile ? "#F4F1EA" : INK, fontWeight: 800, fontSize: 15, letterSpacing: 0.2 }}>QR Print <span style={{ color: G }}>Studio</span></span>
           <span style={{ color: "#8A6D14", fontSize: 9.5, background: "rgba(201,168,76,0.16)", border: "1px solid rgba(201,168,76,0.35)", borderRadius: 6, padding: "2px 7px", fontWeight: 700, letterSpacing: 0.5 }}>BÊTA</span>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {/* Zoom */}
-          <div style={{ display: "flex", alignItems: "center", gap: 2, background: "rgba(0,0,0,0.04)", borderRadius: 9, padding: 3 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 2, background: landscapeMobile ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.04)", borderRadius: 9, padding: 3 }}>
             <button type="button" onClick={() => applyZoom(zoom / 1.25)} title="Zoom arrière" aria-label="Zoom arrière"
               style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 6, color: INK, fontSize: 16, cursor: "pointer" }}>−</button>
             <button type="button" onClick={() => fitToScreen()} title="Ajuster à l'écran"
