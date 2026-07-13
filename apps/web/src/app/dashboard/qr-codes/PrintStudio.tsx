@@ -32,6 +32,7 @@ import { qrScannability, scanLevelColor } from "./qrScannability"
 import { selKind, mobileContextTools } from "./mobileContextTools"
 import { stackedAt, boxCenter, type LayerBox } from "./stackedObjects"
 import { exportPlan, type ExportType } from "./exportPlan"
+import { dist as gDist, LONG_PRESS_MS, MOVE_TOLERANCE } from "./touchGestures"
 
 // ---- Constantes design (Clair & aere, style Canva) -------------------------
 const G       = "#C9A84C"   // accent (or de marque) : etats actifs, boutons primaires
@@ -943,6 +944,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // Selecteur d'objets superposes (critique #10) : liste des elements sous le point courant.
   const [stackPick, setStackPick] = useState<{ id: string; name: string; active: boolean }[] | null>(null)
   const stackRef = useRef<Record<string, fabric.Object>>({})
+  // Gestes tactiles (#8) : long-press -> dupliquer. Timer + point de depart.
+  const lpTimerRef = useRef<number | null>(null)
+  const lpStartRef = useRef<{ x: number; y: number } | null>(null)
   const [histVer, setHistVer] = useState(0) // force le rafraichissement des boutons undo/redo
   const [layersVer, setLayersVer] = useState(0) // force le rafraichissement de la liste des calques
   const [dragOver, setDragOver] = useState<number | null>(null) // ligne survolee pendant un glisser
@@ -1134,13 +1138,49 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     fc.on("object:modified", () => { vG.set({ visible: false }); hG.set({ visible: false }); fc.requestRenderAll() })
     fc.on("mouse:up",       () => { vG.set({ visible: false }); hG.set({ visible: false }); fc.requestRenderAll() })
 
+    // Geste long-press (tactile) : appui maintenu sur un objet -> duplication (#8).
+    if (coarse) {
+      fc.on("mouse:down", (e) => {
+        const t = e.target
+        if (!t || (t as any).isGuide) { lpStartRef.current = null; return }
+        const p = fc.getPointer(e.e)
+        lpStartRef.current = { x: p.x, y: p.y }
+        if (lpTimerRef.current) window.clearTimeout(lpTimerRef.current)
+        lpTimerRef.current = window.setTimeout(() => {
+          lpTimerRef.current = null; lpStartRef.current = null
+          fc.setActiveObject(t); layer("dup")
+          try { (navigator as any).vibrate?.(15) } catch { /* pas de vibreur */ }
+        }, LONG_PRESS_MS)
+      })
+      fc.on("mouse:move", (e) => {
+        if (!lpStartRef.current || lpTimerRef.current == null) return
+        const p = fc.getPointer(e.e)
+        if (gDist(lpStartRef.current, { x: p.x, y: p.y }) > MOVE_TOLERANCE) {
+          window.clearTimeout(lpTimerRef.current); lpTimerRef.current = null
+        }
+      })
+      fc.on("mouse:up", () => {
+        if (lpTimerRef.current) { window.clearTimeout(lpTimerRef.current); lpTimerRef.current = null }
+        lpStartRef.current = null
+      })
+    }
+
     fc.on("selection:created", () => { refreshSel(); setShowAdvanced(false) })
     fc.on("selection:updated", () => { refreshSel(); setShowAdvanced(false) })
     fc.on("selection:cleared", () => { setSel(null); setShowAdvanced(false) })
 
-    // Double-clic sur une zone vide = ajouter un texte (reflexe type Canva)
+    // Double-tap / double-clic (#8) : sur un objet = editer ; sur le vide = ajouter un texte.
     fc.on("mouse:dblclick", (e) => {
-      if (e.target) return
+      if (e.target) {
+        const t = e.target
+        if ((t as any).isGuide) return
+        // Texte : Fabric entre deja en edition nativement -> ne rien faire de plus.
+        if (t.type === "i-text" || t.type === "textbox" || t.type === "text") return
+        // Autre objet : ouvrir ses reglages (edition). Sans effet visible cote desktop
+        // (le panneau y est deja affiche a la selection), ouvre la feuille sur mobile.
+        fc.setActiveObject(t); refreshSel(); setRegOpen(true)
+        return
+      }
       const p = (e as any).absolutePointer || fc.getPointer(e.e)
       const t = new fabric.IText("Votre texte", { left: p.x, top: p.y, originX: "center", originY: "center", fontFamily: "Georgia", fontWeight: "bold", fontSize: 38, fill: INK })
       fc.add(t); fc.setActiveObject(t)
