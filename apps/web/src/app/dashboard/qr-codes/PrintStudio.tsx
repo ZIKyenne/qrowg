@@ -898,6 +898,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [dropFx, setDropFx] = useState(0) // incrémenté à chaque pose de modèle -> effet « posé sur la feuille »
   const [moreOpen, setMoreOpen] = useState(false) // paysage mobile : menu ⋯ (actions secondaires)
   const [formatW, setFormatW] = useState(84)  // largeur du panneau Format (tout à droite)
+  const [formatCollapsed, setFormatCollapsed] = useState(false)  // desktop : replier le panneau Format pour agrandir l'aperçu
+  const fmtW = landscapeMobile ? formatW : (formatCollapsed ? 34 : formatW)  // largeur effective du panneau Format
   const [compOpen, setCompOpen] = useState(false) // flyout composants metier
   const [thumbCache, setThumbCache] = useState<Record<string, string>>({}) // photo par objectif pour les vignettes
   const [photoOpen, setPhotoOpen] = useState(false) // flyout recherche photos (Unsplash)
@@ -2366,6 +2368,25 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     return () => { sc.removeEventListener("touchstart", onStart); sc.removeEventListener("touchmove", onMove); sc.removeEventListener("touchend", onEnd) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Desktop : les panneaux gauche flottent au-dessus du plan de travail -> fermeture au clic HORS panneau
+  // (sur le canvas ou les panneaux de droite) + touche Échap. Fluide et simple, un seul panneau à la fois.
+  useEffect(() => {
+    if (landscapeMobile) return
+    const leftOpen = tplOpen || compOpen || photoOpen || libOpen || side !== ""
+    if (!leftOpen) return
+    const close = () => { setTplOpen(false); setCompOpen(false); setPhotoOpen(false); setLibOpen(false); setSide("") }
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as HTMLElement | null
+      if (t?.closest?.(".ps-fly:not(.ps-fly-right)") || t?.closest?.(".ps-rail")) return // clic dans le panneau ou le rail
+      close()
+    }
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") close() }
+    const id = window.setTimeout(() => document.addEventListener("mousedown", onDown), 0) // ignore le clic d'ouverture
+    document.addEventListener("keydown", onKey)
+    return () => { clearTimeout(id); document.removeEventListener("mousedown", onDown); document.removeEventListener("keydown", onKey) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [landscapeMobile, tplOpen, compOpen, photoOpen, libOpen, side])
   // Execute fn() avec le canvas ramene a zoom 1 (pour un export propre), puis restaure.
   const withBaseZoom = <T,>(fc: fabric.Canvas, fn: (base: { w: number; h: number }) => T): T => {
     const z = fc.getZoom() || 1
@@ -3400,6 +3421,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         .ps-fly-right { box-shadow: -8px 0 28px rgba(0,0,0,0.07) !important; }
         .ps-fly-right button:hover:not(:disabled) { filter: none; border-color: rgba(201,168,76,0.6) !important; box-shadow: 0 3px 10px rgba(31,36,48,0.1) !important; transform: translateY(-1px); }
         .ps-fly-right button:active:not(:disabled) { transform: translateY(0) scale(0.97); }
+        /* Desktop : les panneaux gauche (Modèles/Bibliothèque/Photos/Styles/Calques/Fond) FLOTTENT au-dessus
+           du plan de travail au lieu de rétrécir l'aperçu -> le canvas garde toute sa largeur, le design reste grand. */
+        .ps-root:not(.ps-landscape) .ps-fly:not(.ps-fly-right) { position: absolute !important; left: var(--ps-rail-w, 150px) !important; top: 0 !important; bottom: 0 !important; z-index: 22 !important; box-shadow: 12px 0 44px rgba(0,0,0,0.22) !important; }
         .ps-sec-label { display: flex; align-items: center; gap: 7px; color: ${MUTED}; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.3px; margin: 0 0 9px; }
         .ps-sec-label::before { content: ""; width: 3px; height: 11px; border-radius: 3px; background: ${G}; flex-shrink: 0; }
         .ps-rail button:hover:not(:disabled) { filter: none; border-color: rgba(201,168,76,0.55) !important; box-shadow: 0 4px 12px rgba(31,36,48,0.1) !important; transform: translateY(-1px); }
@@ -3635,7 +3659,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       </div>
 
       {/* ---- Corps : rail outils | canvas | proprietes ---- */}
-      <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
+      <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative", ["--ps-rail-w" as any]: `${effRailW}px` }}>
 
         {/* Assistant debutant (colonne guidee) */}
         {wizard > 0 && (() => {
@@ -4336,9 +4360,16 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           </div>
         </div>
 
-        {/* Rail droit : formats avec mini-apercu (masqué en paysage mobile -> canvas héros) */}
-        <div className={"qr-scroll" + (landscapeMobile ? " ps-hide-mobile" : "")} style={{ width: formatW, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: "10px 7px", display: "flex", flexDirection: "column", gap: 5, background: SURFACE, overflowY: "auto", position: "relative" }}>
-          {!landscapeMobile && <ResizeHandle which="format" />}
+        {/* Rail droit : formats avec mini-apercu (masqué en paysage mobile -> canvas héros ; repliable sur desktop) */}
+        <div className={"qr-scroll" + (landscapeMobile ? " ps-hide-mobile" : "")} style={{ width: fmtW, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: (formatCollapsed && !landscapeMobile) ? "8px 2px" : "10px 7px", display: "flex", flexDirection: "column", gap: 5, background: SURFACE, overflowY: "auto", position: "relative" }}>
+          {!landscapeMobile && !formatCollapsed && <ResizeHandle which="format" />}
+          {!landscapeMobile && (
+            <button type="button" onClick={() => setFormatCollapsed(v => !v)} title={formatCollapsed ? "Afficher les formats" : "Réduire le panneau"}
+              style={{ alignSelf: formatCollapsed ? "center" : "flex-end", width: 24, height: 24, borderRadius: 7, border: "1px solid rgba(0,0,0,0.1)", background: "rgba(0,0,0,0.03)", color: MUTED, cursor: "pointer", fontSize: 14, fontWeight: 700, lineHeight: 1, flexShrink: 0, marginBottom: 2 }}>
+              {formatCollapsed ? "‹" : "›"}
+            </button>
+          )}
+          {(formatCollapsed && !landscapeMobile) ? null : <>
           <p style={{ color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 1px", textAlign: "center" }}>Format</p>
           {(Object.keys(FORMATS) as FormatId[]).map(f => {
             const r = FORMATS[f].ratio
@@ -4355,12 +4386,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               </button>
             )
           })}
+          </>}
         </div>
 
         {/* Zoom flottant sur le rendu central (facon Canva) — reste à gauche des panneaux visibles (ne recouvre plus Réglages) */}
         <div style={{ position: "absolute", zIndex: 38, display: "flex", alignItems: "center", gap: 2, background: SURFACE, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 999, padding: 4, boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
           bottom: landscapeMobile ? (sel ? "calc(58vh + 14px)" : 16) : 16,
-          right: landscapeMobile ? 16 : (formatW + (sel ? rightW : 0) + 16) }}>
+          right: landscapeMobile ? 16 : (fmtW + (sel ? rightW : 0) + 16) }}>
           <button type="button" onClick={() => applyZoom(zoom / 1.2)} title="Dézoomer" aria-label="Dézoomer"
             style={{ width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 999, color: INK, fontSize: 18, cursor: "pointer" }}>−</button>
           <button type="button" onClick={() => fitToScreen()} title="Ajuster à l'écran"
