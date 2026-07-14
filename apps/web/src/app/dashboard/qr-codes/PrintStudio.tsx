@@ -4799,10 +4799,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           </>}
         </div>
 
-        {/* Zoom flottant sur le rendu central (facon Canva) — reste à gauche des panneaux visibles (ne recouvre plus Réglages) */}
+        {/* Zoom flottant (DESKTOP) — sur mobile la barre du haut porte deja le zoom, on evite le doublon + l'encombrement */}
+        {!landscapeMobile && (
         <div style={{ position: "absolute", zIndex: 38, display: "flex", alignItems: "center", gap: 2, background: SURFACE, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 999, padding: 4, boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
-          bottom: landscapeMobile ? (regOpen ? "calc(58vh + 14px)" : (sel ? 80 : 16)) : 16,
-          right: landscapeMobile ? 16 : (fmtW + (sel ? rightW : 0) + 16) }}>
+          bottom: 16, right: (fmtW + (sel ? rightW : 0) + 16) }}>
           <button type="button" onClick={() => applyZoom(zoom / 1.2)} title="Dézoomer" aria-label="Dézoomer"
             style={{ width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 999, color: INK, fontSize: 18, cursor: "pointer" }}>−</button>
           <button type="button" onClick={() => fitToScreen()} title="Ajuster à l'écran"
@@ -4810,6 +4810,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           <button type="button" onClick={() => applyZoom(zoom * 1.2)} title="Zoomer" aria-label="Zoomer"
             style={{ width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 999, color: INK, fontSize: 17, cursor: "pointer" }}>+</button>
         </div>
+        )}
 
         {/* Panneau de reglages : desktop -> visible a la selection ; mobile -> a la demande (barre contextuelle) */}
         {sel && (!landscapeMobile || regOpen) && (
@@ -5331,8 +5332,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Garde-fou scannabilite du QR */}
         {qrIssues && (
-          <div style={{ position: "absolute", bottom: 62, right: 108, zIndex: 39, display: "flex", alignItems: "center", gap: 7, padding: "7px 11px", background: "#FEF3E2", border: "1px solid rgba(217,160,40,0.5)", borderRadius: 10, color: "#92520E", fontSize: 11, fontWeight: 600, maxWidth: 240, boxShadow: "0 8px 22px rgba(0,0,0,0.14)" }}>
-            <span style={{ fontSize: 14 }}>⚠️</span>
+          <div style={landscapeMobile
+            ? { position: "absolute", left: 12, right: 12, bottom: sel && !regOpen ? 84 : 16, zIndex: 39, display: "flex", alignItems: "center", gap: 8, padding: "9px 12px", background: "#2A2410", border: "1px solid rgba(217,160,40,0.55)", borderRadius: 12, color: "#F0D89A", fontSize: 11.5, fontWeight: 600, boxShadow: "0 8px 26px rgba(0,0,0,0.5)" }
+            : { position: "absolute", bottom: 62, right: 108, zIndex: 39, display: "flex", alignItems: "center", gap: 7, padding: "7px 11px", background: "#FEF3E2", border: "1px solid rgba(217,160,40,0.5)", borderRadius: 10, color: "#92520E", fontSize: 11, fontWeight: 600, maxWidth: 240, boxShadow: "0 8px 22px rgba(0,0,0,0.14)" }}>
+            <span style={{ fontSize: 14, flexShrink: 0 }}>⚠️</span>
             <span>{qrIssues.covered ? "Un élément couvre le QR — il risque de ne pas se scanner." : "QR un peu petit : agrandis-le pour un scan fiable."}</span>
           </div>
         )}

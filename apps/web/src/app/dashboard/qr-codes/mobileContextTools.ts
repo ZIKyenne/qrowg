@@ -45,7 +45,7 @@ export function mobileContextTools(kind: SelKind): CtxTool[] {
     case "qr":
       return [EDIT, { id: "dress", label: "Habiller", icon: "frame" }, ...TAIL]
     case "text":
-      return [EDIT, { id: "sizeDown", label: "A−", icon: "minus" }, { id: "sizeUp", label: "A+", icon: "plus" }, ...TAIL]
+      return [EDIT, { id: "sizeDown", label: "Réduire", icon: "minus" }, { id: "sizeUp", label: "Agrandir", icon: "plus" }, ...TAIL]
     case "image":
       return [EDIT, { id: "front", label: "Devant", icon: "up" }, { id: "back", label: "Derrière", icon: "down" }, ...TAIL]
     case "group":
