@@ -915,6 +915,16 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // panneaux en bottom-sheets, canvas plein écran. (orMobile exige déjà petit écran + pointeur grossier.)
   const landscapeMobile = orMobile
   const effRailW = landscapeMobile ? 56 : railW
+  // Theme des PANNEAUX sur mobile (#22) : sombre premium pour coller au chrome.
+  // Desktop -> valeurs claires d'origine (aucun changement). Utilise dans le panneau
+  // Reglages + les styles partages btnTool/layerBtn.
+  const darkPanel = landscapeMobile
+  const pInk   = darkPanel ? "#ECE8E0" : INK
+  const pMuted = darkPanel ? "#9B9385" : MUTED
+  const pSurf  = darkPanel ? "#17171B" : SURFACE
+  const pField = darkPanel ? "rgba(255,255,255,0.06)" : BG
+  const pCard  = darkPanel ? "rgba(255,255,255,0.06)" : "#FFFFFF"
+  const pLine  = darkPanel ? "rgba(255,255,255,0.14)" : "rgba(31,36,48,0.1)"
   const [dropFx, setDropFx] = useState(0) // incrémenté à chaque pose de modèle -> effet « posé sur la feuille »
   const [moreOpen, setMoreOpen] = useState(false) // paysage mobile : menu ⋯ (actions secondaires)
   const [formatW, setFormatW] = useState(84)  // largeur du panneau Format (tout à droite)
@@ -3557,6 +3567,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     fontSize: 10, fontWeight: 600, cursor: "pointer",
     boxShadow: "0 1px 2px rgba(31,36,48,0.05)", transition: "all .14s ease",
   }
+  // Variante SOMBRE de layerBtn, reservee au panneau Reglages sur mobile (#22).
+  const panelBtn = {
+    display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
+    padding: "9px 8px", background: pCard,
+    border: `1px solid ${darkPanel ? "rgba(255,255,255,0.12)" : "rgba(31,36,48,0.1)"}`, borderRadius: 9, color: pInk,
+    fontSize: 10, fontWeight: 600, cursor: "pointer",
+    boxShadow: darkPanel ? "none" : "0 1px 2px rgba(31,36,48,0.05)", transition: "all .14s ease",
+  }
   const iconMini = {
     display: "flex", alignItems: "center", justifyContent: "center", width: 22, height: 22,
     background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 0, flexShrink: 0,
@@ -3650,6 +3668,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         .ps-sec-label { display: flex; align-items: center; gap: 7px; color: ${MUTED}; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.3px; margin: 0 0 9px; }
         /* Menu ... mobile en sombre premium : etiquettes de section eclaircies pour le contraste */
         .ps-msheet .ps-sec-label { color: #BCB4A6; }
+        /* Panneau Reglages sombre (mobile #22) : etiquettes de section eclaircies */
+        .ps-root.ps-landscape .ps-fly-right .ps-sec-label { color: #BCB4A6; }
         .ps-sec-label::before { content: ""; width: 3px; height: 11px; border-radius: 3px; background: ${G}; flex-shrink: 0; }
         .ps-rail button:hover:not(:disabled) { filter: none; border-color: rgba(201,168,76,0.55) !important; box-shadow: 0 4px 12px rgba(31,36,48,0.1) !important; transform: translateY(-1px); }
         .ps-rail button:active:not(:disabled) { transform: translateY(0) scale(0.96); }
@@ -4793,25 +4813,25 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
         {/* Panneau de reglages : desktop -> visible a la selection ; mobile -> a la demande (barre contextuelle) */}
         {sel && (!landscapeMobile || regOpen) && (
-        <div className={"qr-scroll ps-fly ps-fly-right" + (landscapeMobile ? " ps-sheet" : "")} style={{ width: rightW, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: 0, overflowY: "auto", background: SURFACE, display: "flex", flexDirection: "column", position: "relative" }}>
+        <div className={"qr-scroll ps-fly ps-fly-right" + (landscapeMobile ? " ps-sheet" : "")} style={{ width: rightW, flexShrink: 0, borderLeft: "1px solid rgba(0,0,0,0.07)", padding: 0, overflowY: "auto", background: pSurf, display: "flex", flexDirection: "column", position: "relative" }}>
           {!landscapeMobile && <ResizeHandle which="right" />}
               {/* En-tete contextuel */}
-              <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "13px 16px", borderBottom: "1px solid rgba(0,0,0,0.06)", position: "sticky", top: 0, background: SURFACE, zIndex: 2 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "13px 16px", borderBottom: "1px solid rgba(0,0,0,0.06)", position: "sticky", top: 0, background: pSurf, zIndex: 2 }}>
                 <span style={{ width: 30, height: 30, borderRadius: 9, background: "rgba(201,168,76,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}>{sel.isQr ? "▦" : sel.isImage ? "🖼️" : sel.isText ? "T" : sel.label !== null ? "◉" : sel.isGroupObj ? "▣" : "◆"}</span>
                 <div style={{ display: "flex", flexDirection: "column" }}>
-                  <span style={{ color: INK, fontSize: 13.5, fontWeight: 800 }}>{sel.isQr ? "QR Code" : sel.isImage ? "Image" : sel.isText ? "Texte" : sel.label !== null ? "Bouton" : sel.isGroupObj ? "Groupe" : "Forme"}</span>
-                  <span style={{ color: MUTED, fontSize: 10 }}>Réglages</span>
+                  <span style={{ color: pInk, fontSize: 13.5, fontWeight: 800 }}>{sel.isQr ? "QR Code" : sel.isImage ? "Image" : sel.isText ? "Texte" : sel.label !== null ? "Bouton" : sel.isGroupObj ? "Groupe" : "Forme"}</span>
+                  <span style={{ color: pMuted, fontSize: 10 }}>Réglages</span>
                 </div>
                 {/* Mode Simple / Expert (#3) : masque les reglages avances quand Simple */}
                 <div style={{ marginLeft: "auto", display: "flex", background: "rgba(0,0,0,0.05)", borderRadius: 8, padding: 2, gap: 2 }}>
                   {(["simple", "expert"] as UiMode[]).map(m => (
                     <button key={m} type="button" onClick={() => setUiMode(m)} title={m === "simple" ? "Réglages essentiels" : "Tous les réglages"}
-                      style={{ padding: "5px 9px", borderRadius: 6, border: "none", background: uiMode === m ? "#fff" : "transparent", color: uiMode === m ? G : MUTED, fontSize: 10.5, fontWeight: 700, cursor: "pointer", boxShadow: uiMode === m ? "0 1px 3px rgba(0,0,0,0.12)" : "none" }}>
+                      style={{ padding: "5px 9px", borderRadius: 6, border: "none", background: uiMode === m ? "#fff" : "transparent", color: uiMode === m ? G : pMuted, fontSize: 10.5, fontWeight: 700, cursor: "pointer", boxShadow: uiMode === m ? "0 1px 3px rgba(0,0,0,0.12)" : "none" }}>
                       {m === "simple" ? "Simple" : "Expert"}
                     </button>
                   ))}
                 </div>
-                <button type="button" onClick={() => { if (landscapeMobile) { setRegOpen(false) } else { fcRef.current?.discardActiveObject(); fcRef.current?.requestRenderAll(); setSel(null) } }} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: MUTED, cursor: "pointer" }}><X size={13} /></button>
+                <button type="button" onClick={() => { if (landscapeMobile) { setRegOpen(false) } else { fcRef.current?.discardActiveObject(); fcRef.current?.requestRenderAll(); setSel(null) } }} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: pMuted, cursor: "pointer" }}><X size={13} /></button>
               </div>
               <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
@@ -4822,10 +4842,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     <p className="ps-sec-label">Éditeur QR</p>
 
                     {/* Jauge de scannabilite (moteur pur : contraste + correction + logo) */}
-                    <div style={{ background: BG, border: "1px solid rgba(0,0,0,0.08)", borderRadius: 10, padding: "9px 10px", marginBottom: 10 }}>
+                    <div style={{ background: pField, border: "1px solid rgba(0,0,0,0.08)", borderRadius: 10, padding: "9px 10px", marginBottom: 10 }}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, gap: 8 }}>
                         <span style={{ fontSize: 11, fontWeight: 800, color: scanLevelColor(qrScan.level) }}>{qrScan.label}</span>
-                        <span style={{ fontSize: 10, fontWeight: 700, color: MUTED, whiteSpace: "nowrap" }}>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: pMuted, whiteSpace: "nowrap" }}>
                           {qrScan.contrast != null ? `Contraste ${qrScan.contrast}:1` : "Contraste n/d"} · {qrScan.score}/100
                         </span>
                       </div>
@@ -4833,13 +4853,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                         <div style={{ width: `${qrScan.score}%`, height: "100%", background: scanLevelColor(qrScan.level), transition: "width .2s ease" }} />
                       </div>
                       {qrScan.advices[0] && (
-                        <p style={{ margin: "7px 0 0", fontSize: 10.5, color: INK, lineHeight: 1.45 }}>💡 {qrScan.advices[0]}</p>
+                        <p style={{ margin: "7px 0 0", fontSize: 10.5, color: pInk, lineHeight: 1.45 }}>💡 {qrScan.advices[0]}</p>
                       )}
                     </div>
 
                     {regenQr ? (
                       <>
-                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Couleur du QR</label>
+                        <label style={{ color: pMuted, fontSize: 10, display: "block", marginBottom: 4 }}>Couleur du QR</label>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
                           {QR_FG.map(c => (
                             <button key={c} type="button" disabled={qrBusy} onClick={() => applyQrRender({ fg: c })} title={c}
@@ -4850,7 +4870,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                             style={{ width: 30, height: 22, borderRadius: 6, border: "1px solid rgba(0,0,0,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
                         </div>
 
-                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Fond</label>
+                        <label style={{ color: pMuted, fontSize: 10, display: "block", marginBottom: 4 }}>Fond</label>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
                           {QR_BG.map(c => (
                             <button key={c} type="button" disabled={qrBusy} onClick={() => applyQrRender({ bg: c })} title={c}
@@ -4861,39 +4881,39 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                             style={{ width: 30, height: 22, borderRadius: 6, border: "1px solid rgba(0,0,0,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
                         </div>
 
-                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Modules</label>
+                        <label style={{ color: pMuted, fontSize: 10, display: "block", marginBottom: 4 }}>Modules</label>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
                           {QR_DOTS.map(d => (
                             <button key={d.k} type="button" disabled={qrBusy} onClick={() => applyQrRender({ dotStyle: d.k })} title={d.label}
-                              style={{ ...layerBtn, flex: "1 0 22%", fontSize: 14, color: qrDot === d.k ? G : INK, borderColor: qrDot === d.k ? G : "rgba(0,0,0,0.1)", opacity: qrBusy ? 0.5 : 1 }}>{d.icon}</button>
+                              style={{ ...panelBtn, flex: "1 0 22%", fontSize: 14, color: qrDot === d.k ? G : pInk, borderColor: qrDot === d.k ? G : "rgba(0,0,0,0.1)", opacity: qrBusy ? 0.5 : 1 }}>{d.icon}</button>
                           ))}
                         </div>
 
                         {showSection("qr-corners", uiMode) && (<>
-                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Coins</label>
+                        <label style={{ color: pMuted, fontSize: 10, display: "block", marginBottom: 4 }}>Coins</label>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
                           {([["square", "Carré"], ["rounded", "Arrondi"], ["circle", "Rond"], ["diamond", "Losange"]] as const).map(([k, l]) => (
                             <button key={k} type="button" disabled={qrBusy} onClick={() => applyQrRender({ cornerStyle: k })}
-                              style={{ ...layerBtn, flex: "1 0 22%", fontSize: 9.5, color: qrCorner === k ? G : INK, borderColor: qrCorner === k ? G : "rgba(0,0,0,0.1)", opacity: qrBusy ? 0.5 : 1 }}>{l}</button>
+                              style={{ ...panelBtn, flex: "1 0 22%", fontSize: 9.5, color: qrCorner === k ? G : pInk, borderColor: qrCorner === k ? G : "rgba(0,0,0,0.1)", opacity: qrBusy ? 0.5 : 1 }}>{l}</button>
                           ))}
                         </div>
                         </>)}
 
                         {showSection("qr-ecc", uiMode) && (<>
-                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>
-                          Correction d'erreur{qrHasLogo ? <span style={{ color: MUTED }}> · logo → H conseillé</span> : null}
+                        <label style={{ color: pMuted, fontSize: 10, display: "block", marginBottom: 4 }}>
+                          Correction d'erreur{qrHasLogo ? <span style={{ color: pMuted }}> · logo → H conseillé</span> : null}
                         </label>
                         <div style={{ display: "flex", gap: 5 }}>
                           {(["L", "M", "Q", "H"] as const).map(e => (
                             <button key={e} type="button" disabled={qrBusy} onClick={() => applyQrRender({ ecc: e })} title={`Correction ${e}`}
-                              style={{ ...layerBtn, flex: 1, fontWeight: 700, color: qrEcc === e ? G : INK, borderColor: qrEcc === e ? G : "rgba(0,0,0,0.1)", opacity: qrBusy ? 0.5 : 1 }}>{e}</button>
+                              style={{ ...panelBtn, flex: 1, fontWeight: 700, color: qrEcc === e ? G : pInk, borderColor: qrEcc === e ? G : "rgba(0,0,0,0.1)", opacity: qrBusy ? 0.5 : 1 }}>{e}</button>
                           ))}
                         </div>
                         </>)}
-                        {qrBusy && <p style={{ margin: "6px 0 0", fontSize: 10, color: MUTED }}>Régénération du QR…</p>}
+                        {qrBusy && <p style={{ margin: "6px 0 0", fontSize: 10, color: pMuted }}>Régénération du QR…</p>}
                       </>
                     ) : (
-                      <p style={{ fontSize: 10.5, color: MUTED, margin: "0 0 4px" }}>Personnalisation du QR indisponible ici.</p>
+                      <p style={{ fontSize: 10.5, color: pMuted, margin: "0 0 4px" }}>Personnalisation du QR indisponible ici.</p>
                     )}
                   </div>
                 )}
@@ -4904,25 +4924,25 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     <p className="ps-sec-label">Étiquette QR</p>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 6 }}>
                       {["SCANNEZ-MOI", "★ AVIS GOOGLE", "VOIR LE MENU", "INSTAGRAM", "RÉSERVER", "WIFI GRATUIT", "SUIVEZ-NOUS"].map(l => (
-                        <button key={l} type="button" onClick={() => addQrLabel(l)} style={{ ...layerBtn, fontSize: 9.5, padding: "7px 9px", flex: "1 0 auto" }}>{l}</button>
+                        <button key={l} type="button" onClick={() => addQrLabel(l)} style={{ ...panelBtn, fontSize: 9.5, padding: "7px 9px", flex: "1 0 auto" }}>{l}</button>
                       ))}
                     </div>
                     <p className="ps-sec-label" style={{ marginTop: 4 }}>Cadre</p>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 6 }}>
                       {([["luxury", "Luxury"], ["corporate", "Corporate"], ["modern", "Modern"], ["neon", "Néon"]] as const).map(([k, l]) => (
-                        <button key={k} type="button" onClick={() => setQrFrame(k)} style={{ ...layerBtn, fontSize: 9.5, flex: "1 0 40%" }}>{l}</button>
+                        <button key={k} type="button" onClick={() => setQrFrame(k)} style={{ ...panelBtn, fontSize: 9.5, flex: "1 0 40%" }}>{l}</button>
                       ))}
                     </div>
                     <p className="ps-sec-label" style={{ marginTop: 4 }}>Sticker</p>
                     <div style={{ display: "flex", gap: 5, marginBottom: 6 }}>
                       {([["round", "● Rond"], ["badge", "✸ Badge"], ["square", "▢ Carré"]] as const).map(([k, l]) => (
-                        <button key={k} type="button" onClick={() => setQrSticker(k)} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>{l}</button>
+                        <button key={k} type="button" onClick={() => setQrSticker(k)} style={{ ...panelBtn, flex: 1, fontSize: 9.5 }}>{l}</button>
                       ))}
                     </div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                      <button type="button" onClick={removeQrLabel} style={{ ...layerBtn, flex: "1 0 30%", fontSize: 9 }}>Retirer étiquette</button>
-                      <button type="button" onClick={removeQrFrame} style={{ ...layerBtn, flex: "1 0 30%", fontSize: 9 }}>Retirer cadre</button>
-                      <button type="button" onClick={removeQrSticker} style={{ ...layerBtn, flex: "1 0 30%", fontSize: 9 }}>Retirer sticker</button>
+                      <button type="button" onClick={removeQrLabel} style={{ ...panelBtn, flex: "1 0 30%", fontSize: 9 }}>Retirer étiquette</button>
+                      <button type="button" onClick={removeQrFrame} style={{ ...panelBtn, flex: "1 0 30%", fontSize: 9 }}>Retirer cadre</button>
+                      <button type="button" onClick={removeQrSticker} style={{ ...panelBtn, flex: "1 0 30%", fontSize: 9 }}>Retirer sticker</button>
                     </div>
                   </div>
                 )}
@@ -4930,12 +4950,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 {/* Texte du bouton / badge (groupe avec texte) */}
                 {sel.label !== null && (
                   <div style={{ marginBottom: 12 }}>
-                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Texte du bouton</label>
+                    <label style={{ color: pMuted, fontSize: 10, display: "block", marginBottom: 4 }}>Texte du bouton</label>
                     <input value={sel.label} onChange={e => setLabel(e.target.value)} placeholder="Votre texte"
-                      style={{ width: "100%", background: BG, border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, outline: "none", boxSizing: "border-box", marginBottom: 8 }} />
+                      style={{ width: "100%", background: pField, border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "7px 9px", color: pInk, fontSize: 11, outline: "none", boxSizing: "border-box", marginBottom: 8 }} />
                     {sel.textFill !== null && (
                       <>
-                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Couleur du texte</label>
+                        <label style={{ color: pMuted, fontSize: 10, display: "block", marginBottom: 4 }}>Couleur du texte</label>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
                           {SWATCHES.map(c => (
                             <button key={c} type="button" onClick={() => setTextColor(c)} title={c}
@@ -4963,11 +4983,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     onChange={e => setFill(e.target.value)}
                     style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(0,0,0,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
                   <input value={sel.fill} onChange={e => setFill(e.target.value)}
-                    style={{ flex: 1, background: BG, border: "1px solid rgba(0,0,0,0.08)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, fontFamily: "monospace", outline: "none", boxSizing: "border-box" }} />
+                    style={{ flex: 1, background: pField, border: "1px solid rgba(0,0,0,0.08)", borderRadius: 7, padding: "7px 9px", color: pInk, fontSize: 11, fontFamily: "monospace", outline: "none", boxSizing: "border-box" }} />
                 </div>
                 {/* Selecteur de couleurs avance (#14) : degrade H/S/L, hex, pipette, harmonies, recentes */}
                 <button type="button" onClick={() => setPickerOpen(v => !v)}
-                  style={{ ...layerBtn, width: "100%", fontSize: 10, marginBottom: pickerOpen ? 8 : 12, color: pickerOpen ? G : INK, borderColor: pickerOpen ? G : "rgba(0,0,0,0.1)" }}>
+                  style={{ ...panelBtn, width: "100%", fontSize: 10, marginBottom: pickerOpen ? 8 : 12, color: pickerOpen ? G : pInk, borderColor: pickerOpen ? G : "rgba(0,0,0,0.1)" }}>
                   🎨 Palette avancée {pickerOpen ? "▲" : "▾"}
                 </button>
                 {pickerOpen && (
@@ -4981,7 +5001,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 )}
 
                 {/* Opacite */}
-                <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>
+                <label style={{ color: pMuted, fontSize: 10, display: "block", marginBottom: 4 }}>
                   Opacité — {Math.round(sel.opacity * 100)}%
                 </label>
                 <input type="range" min={0} max={1} step={0.05} value={sel.opacity}
@@ -5000,7 +5020,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                         const v = imgAdjustVal(ao, k)
                         return (
                           <div key={k} style={{ marginBottom: 8 }}>
-                            <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 3 }}>{label} — {Math.round(v * 100)}</label>
+                            <label style={{ color: pMuted, fontSize: 10, display: "block", marginBottom: 3 }}>{label} — {Math.round(v * 100)}</label>
                             <input type="range" min={-1} max={1} step={0.05} value={v}
                               onChange={e => setImageAdjust(k, parseFloat(e.target.value))}
                               style={{ width: "100%", accentColor: G }} />
@@ -5008,7 +5028,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                         )
                       })}
                       <button type="button" onClick={() => { setImageAdjust("brightness", 0); setImageAdjust("contrast", 0); setImageAdjust("saturation", 0); setImageAdjust("hue", 0) }}
-                        style={{ ...layerBtn, width: "100%", fontSize: 9.5 }}>Réinitialiser les ajustements</button>
+                        style={{ ...panelBtn, width: "100%", fontSize: 9.5 }}>Réinitialiser les ajustements</button>
                     </div>
                   )
                 })()}
@@ -5023,22 +5043,22 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                   <input type="color" value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"} onChange={e => setFill(e.target.value)} title="Couleur 1" style={{ width: 30, height: 28, borderRadius: 6, border: "1px solid rgba(0,0,0,0.15)", cursor: "pointer", padding: 0 }} />
-                  <span style={{ color: MUTED, fontSize: 14 }}>→</span>
+                  <span style={{ color: pMuted, fontSize: 14 }}>→</span>
                   <input type="color" value={gradC2} onChange={e => setGradC2(e.target.value)} title="Couleur 2" style={{ width: 30, height: 28, borderRadius: 6, border: "1px solid rgba(0,0,0,0.15)", cursor: "pointer", padding: 0 }} />
-                  <button type="button" onClick={() => setGradientFill(/^#/.test(sel.fill) ? sel.fill : "#C9A84C", gradC2)} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Linéaire</button>
-                  <button type="button" onClick={() => setRadialFill(/^#/.test(sel.fill) ? sel.fill : "#C9A84C", gradC2)} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Radial</button>
+                  <button type="button" onClick={() => setGradientFill(/^#/.test(sel.fill) ? sel.fill : "#C9A84C", gradC2)} style={{ ...panelBtn, flex: 1, fontSize: 9.5 }}>Linéaire</button>
+                  <button type="button" onClick={() => setRadialFill(/^#/.test(sel.fill) ? sel.fill : "#C9A84C", gradC2)} style={{ ...panelBtn, flex: 1, fontSize: 9.5 }}>Radial</button>
                 </div>
                 <p className="ps-sec-label">Motif</p>
                 <div style={{ display: "flex", gap: 5, marginBottom: 12 }}>
-                  <button type="button" onClick={() => setPatternFill("dots")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Points</button>
-                  <button type="button" onClick={() => setPatternFill("stripes")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Rayures</button>
-                  <button type="button" onClick={() => setPatternFill("grid")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>Grille</button>
+                  <button type="button" onClick={() => setPatternFill("dots")} style={{ ...panelBtn, flex: 1, fontSize: 9.5 }}>Points</button>
+                  <button type="button" onClick={() => setPatternFill("stripes")} style={{ ...panelBtn, flex: 1, fontSize: 9.5 }}>Rayures</button>
+                  <button type="button" onClick={() => setPatternFill("grid")} style={{ ...panelBtn, flex: 1, fontSize: 9.5 }}>Grille</button>
                 </div>
-                <button type="button" onClick={makeOutline} style={{ ...layerBtn, width: "100%", fontSize: 9.5, marginBottom: 12 }} title="Forme creuse : contour seul, remplissage transparent">◯ Contour seul (creuse)</button>
+                <button type="button" onClick={makeOutline} style={{ ...panelBtn, width: "100%", fontSize: 9.5, marginBottom: 12 }} title="Forme creuse : contour seul, remplissage transparent">◯ Contour seul (creuse)</button>
 
                 {/* Bordure / contour */}
                 <button type="button" onClick={() => setBorder(!sel.border)}
-                  style={{ ...layerBtn, width: "100%", background: sel.border ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: sel.border ? G : INK, fontWeight: 700, marginBottom: sel.border ? 8 : 12 }}>
+                  style={{ ...panelBtn, width: "100%", background: sel.border ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: sel.border ? G : pInk, fontWeight: 700, marginBottom: sel.border ? 8 : 12 }}>
                   Bordure {sel.border ? "✓" : ""}
                 </button>
                 {sel.border && (
@@ -5047,24 +5067,24 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                       <input type="color" value={/^#/.test(sel.strokeColor) ? sel.strokeColor : "#C9A84C"}
                         onChange={e => setBorderColor(e.target.value)}
                         style={{ width: 34, height: 30, borderRadius: 7, border: "1px solid rgba(0,0,0,0.15)", background: "transparent", cursor: "pointer", padding: 0 }} />
-                      <span style={{ color: MUTED, fontSize: 10 }}>Épaisseur — {Math.round(sel.strokeWidth)}px</span>
+                      <span style={{ color: pMuted, fontSize: 10 }}>Épaisseur — {Math.round(sel.strokeWidth)}px</span>
                     </div>
                     <input type="range" min={1} max={30} step={1} value={sel.strokeWidth || 4}
                       onChange={e => setBorderWidth(parseInt(e.target.value))}
                       style={{ width: "100%", accentColor: G }} />
                     <div style={{ display: "flex", gap: 5, marginTop: 8 }}>
                       {([["solid", "Pleine", null], ["dashed", "Tirets", [12, 8]], ["dotted", "Pointillée", [2, 8]]] as const).map(([k, label, dash]) => (
-                        <button key={k} type="button" onClick={() => mutate(o => { o.set({ strokeDashArray: dash as number[] | null, strokeLineCap: k === "dotted" ? "round" : "butt" }); o.dirty = true })} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }}>{label}</button>
+                        <button key={k} type="button" onClick={() => mutate(o => { o.set({ strokeDashArray: dash as number[] | null, strokeLineCap: k === "dotted" ? "round" : "butt" }); o.dirty = true })} style={{ ...panelBtn, flex: 1, fontSize: 9.5 }}>{label}</button>
                       ))}
                     </div>
-                    <button type="button" onClick={() => setBorderGradient(/^#/.test(sel.strokeColor) ? sel.strokeColor : "#C9A84C", gradC2)} style={{ ...layerBtn, width: "100%", marginTop: 5, fontSize: 9.5 }} title="Contour en dégradé (utilise la 2e couleur du dégradé)">Bordure dégradée</button>
+                    <button type="button" onClick={() => setBorderGradient(/^#/.test(sel.strokeColor) ? sel.strokeColor : "#C9A84C", gradC2)} style={{ ...panelBtn, width: "100%", marginTop: 5, fontSize: 9.5 }} title="Contour en dégradé (utilise la 2e couleur du dégradé)">Bordure dégradée</button>
                   </div>
                 )}
 
                 {/* Coins arrondis (rectangles) */}
                 {sel.radius !== null && (
                   <div style={{ marginBottom: 12 }}>
-                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Coins arrondis — {Math.round(sel.radius)}px</label>
+                    <label style={{ color: pMuted, fontSize: 10, display: "block", marginBottom: 4 }}>Coins arrondis — {Math.round(sel.radius)}px</label>
                     <input type="range" min={0} max={80} step={1} value={sel.radius}
                       onChange={e => setRadius(parseInt(e.target.value))}
                       style={{ width: "100%", accentColor: G }} />
@@ -5078,12 +5098,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   return (
                     <div style={{ marginBottom: 12 }}>
                       <p className="ps-sec-label">Taille</p>
-                      <button type="button" onClick={toggleRatioLock} style={{ ...layerBtn, width: "100%", fontSize: 9.5, marginBottom: 5, color: ratioOn ? G : INK, borderColor: ratioOn ? G : "rgba(31,36,48,0.1)" }}>
+                      <button type="button" onClick={toggleRatioLock} style={{ ...panelBtn, width: "100%", fontSize: 9.5, marginBottom: 5, color: ratioOn ? G : pInk, borderColor: ratioOn ? G : "rgba(31,36,48,0.1)" }}>
                         {ratioOn ? "🔒 Ratio verrouillé" : "🔓 Verrouiller le ratio"}
                       </button>
                       <div style={{ display: "flex", gap: 5 }}>
-                        <button type="button" onClick={() => sizeToCanvas("fit")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }} title="Ajuster entièrement dans le support">Ajuster</button>
-                        <button type="button" onClick={() => sizeToCanvas("fill")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }} title="Remplir tout le support">Remplir</button>
+                        <button type="button" onClick={() => sizeToCanvas("fit")} style={{ ...panelBtn, flex: 1, fontSize: 9.5 }} title="Ajuster entièrement dans le support">Ajuster</button>
+                        <button type="button" onClick={() => sizeToCanvas("fill")} style={{ ...panelBtn, flex: 1, fontSize: 9.5 }} title="Remplir tout le support">Remplir</button>
                       </div>
                     </div>
                   )
@@ -5092,10 +5112,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 {/* Texte uniquement */}
                 {sel.isText && (
                   <>
-                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Police</label>
+                    <label style={{ color: pMuted, fontSize: 10, display: "block", marginBottom: 4 }}>Police</label>
                     <select value={sel.fontFamily}
                       onChange={e => setFont(e.target.value)}
-                      style={{ width: "100%", background: BG, border: "1px solid rgba(0,0,0,0.08)", borderRadius: 7, padding: "7px 9px", color: INK, fontSize: 11, outline: "none", cursor: "pointer", marginBottom: 10, boxSizing: "border-box" }}>
+                      style={{ width: "100%", background: pField, border: "1px solid rgba(0,0,0,0.08)", borderRadius: 7, padding: "7px 9px", color: pInk, fontSize: 11, outline: "none", cursor: "pointer", marginBottom: 10, boxSizing: "border-box" }}>
                       {FONT_GROUPS.map(g => (
                         <optgroup key={g.label} label={g.label}>
                           {g.fonts.map(f => <option key={f} value={f} style={{ fontFamily: f }}>{f}</option>)}
@@ -5103,7 +5123,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                       ))}
                     </select>
 
-                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>
+                    <label style={{ color: pMuted, fontSize: 10, display: "block", marginBottom: 4 }}>
                       Taille — {sel.fontSize}px
                     </label>
                     <input type="range" min={10} max={140} step={1} value={sel.fontSize}
@@ -5113,17 +5133,17 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 10 }}>
                       <button type="button" title="Gras"
                         onClick={() => mutate(o => (o as fabric.IText).set("fontWeight", sel.bold ? "normal" : "bold"))}
-                        style={{ ...layerBtn, background: sel.bold ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: sel.bold ? G : INK, fontWeight: 800 }}>
+                        style={{ ...panelBtn, background: sel.bold ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: sel.bold ? G : pInk, fontWeight: 800 }}>
                         B
                       </button>
                       <button type="button" title="Italique"
                         onClick={() => mutate(o => (o as fabric.IText).set("fontStyle", sel.italic ? "normal" : "italic"))}
-                        style={{ ...layerBtn, background: sel.italic ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: sel.italic ? G : INK, fontStyle: "italic", fontWeight: 700 }}>
+                        style={{ ...panelBtn, background: sel.italic ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: sel.italic ? G : pInk, fontStyle: "italic", fontWeight: 700 }}>
                         I
                       </button>
                       <button type="button" title="Souligné"
                         onClick={() => mutate(o => (o as fabric.IText).set("underline", !sel.underline))}
-                        style={{ ...layerBtn, background: sel.underline ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: sel.underline ? G : INK, textDecoration: "underline", fontWeight: 700 }}>
+                        style={{ ...panelBtn, background: sel.underline ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: sel.underline ? G : pInk, textDecoration: "underline", fontWeight: 700 }}>
                         U
                       </button>
                     </div>
@@ -5132,32 +5152,32 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 10 }}>
                       <button type="button" title="Barré"
                         onClick={() => mutate(o => (o as fabric.IText).set("linethrough", !sel.strike))}
-                        style={{ ...layerBtn, background: sel.strike ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: sel.strike ? G : INK, textDecoration: "line-through", fontWeight: 700 }}>
+                        style={{ ...panelBtn, background: sel.strike ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)", color: sel.strike ? G : pInk, textDecoration: "line-through", fontWeight: 700 }}>
                         S
                       </button>
                       <button type="button" title="MAJUSCULES"
                         onClick={() => mutate(o => { const t = o as fabric.IText; t.set("text", (t.text || "").toUpperCase()); (t as unknown as { initDimensions?: () => void }).initDimensions?.() })}
-                        style={{ ...layerBtn, fontWeight: 800, letterSpacing: 0.5 }}>
+                        style={{ ...panelBtn, fontWeight: 800, letterSpacing: 0.5 }}>
                         AA
                       </button>
                       <button type="button" title="minuscules"
                         onClick={() => mutate(o => { const t = o as fabric.IText; t.set("text", (t.text || "").toLowerCase()); (t as unknown as { initDimensions?: () => void }).initDimensions?.() })}
-                        style={{ ...layerBtn, fontWeight: 700, textTransform: "lowercase" }}>
+                        style={{ ...panelBtn, fontWeight: 700, textTransform: "lowercase" }}>
                         aa
                       </button>
                     </div>
 
                     {/* Alignement du texte */}
-                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Alignement</label>
+                    <label style={{ color: pMuted, fontSize: 10, display: "block", marginBottom: 4 }}>Alignement</label>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 10 }}>
                       {(["left", "center", "right"] as const).map(a => {
                         const on = sel.textAlign === a
                         const bars = a === "left" ? [[1, 14], [1, 9], [1, 12]] : a === "center" ? [[1, 14], [4, 8], [2.5, 11]] : [[1, 14], [6, 9], [3, 12]]
                         return (
                           <button key={a} type="button" onClick={() => mutate(o => (o as fabric.IText).set("textAlign", a))} title={a}
-                            style={{ ...layerBtn, padding: "7px", background: on ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)" }}>
+                            style={{ ...panelBtn, padding: "7px", background: on ? "rgba(201,168,76,0.15)" : "rgba(0,0,0,0.03)" }}>
                             <svg width="16" height="16" viewBox="0 0 16 16">
-                              {bars.map(([x, w], i) => <rect key={i} x={x} y={3 + i * 4} width={w} height="2" rx="1" fill={on ? G : MUTED} />)}
+                              {bars.map(([x, w], i) => <rect key={i} x={x} y={3 + i * 4} width={w} height="2" rx="1" fill={on ? G : pMuted} />)}
                             </svg>
                           </button>
                         )
@@ -5166,13 +5186,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
                     {showSection("text-spacing", uiMode) && (<>
                     {/* Espacement des lettres */}
-                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Espacement — {Math.round(sel.charSpacing)}</label>
+                    <label style={{ color: pMuted, fontSize: 10, display: "block", marginBottom: 4 }}>Espacement — {Math.round(sel.charSpacing)}</label>
                     <input type="range" min={0} max={800} step={10} value={sel.charSpacing}
                       onChange={e => mutate(o => (o as fabric.IText).set("charSpacing", parseInt(e.target.value)))}
                       style={{ width: "100%", accentColor: G, marginBottom: 10 }} />
 
                     {/* Interligne */}
-                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Interligne — {sel.lineHeight.toFixed(2)}</label>
+                    <label style={{ color: pMuted, fontSize: 10, display: "block", marginBottom: 4 }}>Interligne — {sel.lineHeight.toFixed(2)}</label>
                     <input type="range" min={0.8} max={2} step={0.05} value={sel.lineHeight}
                       onChange={e => mutate(o => (o as fabric.IText).set("lineHeight", parseFloat(e.target.value)))}
                       style={{ width: "100%", accentColor: G }} />
@@ -5187,25 +5207,25 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 <p className="ps-sec-label">Ombre</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 5, marginBottom: 6 }}>
                   {([["off", "Aucune"], ["soft", "Soft"], ["medium", "Medium"], ["strong", "Strong"], ["floating", "Floating"], ["luxury", "Luxe"]] as const).map(([k, label]) => (
-                    <button key={k} type="button" onClick={() => setShadowPreset(k)} style={{ ...layerBtn, padding: "7px 2px", fontSize: 9.5 }}>{label}</button>
+                    <button key={k} type="button" onClick={() => setShadowPreset(k)} style={{ ...panelBtn, padding: "7px 2px", fontSize: 9.5 }}>{label}</button>
                   ))}
                 </div>
                 {sel.shadow && (
                   <>
-                    <label style={{ color: MUTED, fontSize: 10, display: "block", margin: "4px 0 4px" }}>Flou — {Math.round(sel.shadowBlur)}px</label>
+                    <label style={{ color: pMuted, fontSize: 10, display: "block", margin: "4px 0 4px" }}>Flou — {Math.round(sel.shadowBlur)}px</label>
                     <input type="range" min={0} max={60} step={1} value={sel.shadowBlur}
                       onChange={e => setShadowBlur(parseInt(e.target.value))}
                       style={{ width: "100%", accentColor: G }} />
-                    <label style={{ color: MUTED, fontSize: 10, display: "block", margin: "6px 0 4px" }}>Décalage X — {Math.round(sel.shadowX)}px</label>
+                    <label style={{ color: pMuted, fontSize: 10, display: "block", margin: "6px 0 4px" }}>Décalage X — {Math.round(sel.shadowX)}px</label>
                     <input type="range" min={-30} max={30} step={1} value={sel.shadowX}
                       onChange={e => setShadowOffset("x", parseInt(e.target.value))}
                       style={{ width: "100%", accentColor: G }} />
-                    <label style={{ color: MUTED, fontSize: 10, display: "block", margin: "6px 0 4px" }}>Décalage Y — {Math.round(sel.shadowY)}px</label>
+                    <label style={{ color: pMuted, fontSize: 10, display: "block", margin: "6px 0 4px" }}>Décalage Y — {Math.round(sel.shadowY)}px</label>
                     <input type="range" min={-30} max={30} step={1} value={sel.shadowY}
                       onChange={e => setShadowOffset("y", parseInt(e.target.value))}
                       style={{ width: "100%", accentColor: G }} />
                     <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 6 }}>
-                      <span style={{ color: MUTED, fontSize: 10 }}>Couleur :</span>
+                      <span style={{ color: pMuted, fontSize: 10 }}>Couleur :</span>
                       {["rgba(0,0,0,0.4)", G, "#C0392B", "#1D4ED8", "#0E7A5F", "#E1306C"].map(c => (
                         <button key={c} type="button" onClick={() => setShadowColor(c)} title="Couleur de l'ombre"
                           style={{ width: 18, height: 18, borderRadius: "50%", background: c, border: "1px solid rgba(0,0,0,0.2)", cursor: "pointer", padding: 0, flexShrink: 0 }} />
@@ -5216,8 +5236,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 )}
                 <p className="ps-sec-label">Halo</p>
                 <div style={{ display: "flex", gap: 6 }}>
-                  <button type="button" onClick={() => setGlow("soft")} style={{ ...layerBtn, flex: 1 }}>✨ Glow</button>
-                  <button type="button" onClick={() => setGlow("neon")} style={{ ...layerBtn, flex: 1 }}>💡 Néon</button>
+                  <button type="button" onClick={() => setGlow("soft")} style={{ ...panelBtn, flex: 1 }}>✨ Glow</button>
+                  <button type="button" onClick={() => setGlow("neon")} style={{ ...panelBtn, flex: 1 }}>💡 Néon</button>
                 </div>
               </div>
               )}
@@ -5226,22 +5246,22 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <div>
                 <p className="ps-sec-label">Transformer</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 5, marginBottom: 5 }}>
-                  <button type="button" title="Rotation −45°" onClick={() => rotateBy(-45)} style={{ ...layerBtn, fontSize: 9.5 }}>−45°</button>
-                  <button type="button" title="Rotation −90°" onClick={() => rotateBy(-90)} style={{ ...layerBtn, fontSize: 9.5 }}>−90°</button>
-                  <button type="button" title="Rotation 180°" onClick={() => rotateBy(180)} style={{ ...layerBtn, fontSize: 9.5 }}>180°</button>
-                  <button type="button" title="Rotation +45°" onClick={() => rotateBy(45)} style={{ ...layerBtn, fontSize: 9.5 }}>+45°</button>
-                  <button type="button" title="Rotation +90°" onClick={() => rotateBy(90)} style={{ ...layerBtn, fontSize: 9.5 }}>+90°</button>
-                  <button type="button" title="Réinitialiser rotation/inclinaison" onClick={resetTransform} style={{ ...layerBtn, fontSize: 9.5 }}>Reset</button>
+                  <button type="button" title="Rotation −45°" onClick={() => rotateBy(-45)} style={{ ...panelBtn, fontSize: 9.5 }}>−45°</button>
+                  <button type="button" title="Rotation −90°" onClick={() => rotateBy(-90)} style={{ ...panelBtn, fontSize: 9.5 }}>−90°</button>
+                  <button type="button" title="Rotation 180°" onClick={() => rotateBy(180)} style={{ ...panelBtn, fontSize: 9.5 }}>180°</button>
+                  <button type="button" title="Rotation +45°" onClick={() => rotateBy(45)} style={{ ...panelBtn, fontSize: 9.5 }}>+45°</button>
+                  <button type="button" title="Rotation +90°" onClick={() => rotateBy(90)} style={{ ...panelBtn, fontSize: 9.5 }}>+90°</button>
+                  <button type="button" title="Réinitialiser rotation/inclinaison" onClick={resetTransform} style={{ ...panelBtn, fontSize: 9.5 }}>Reset</button>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 5, marginBottom: 6 }}>
-                  <button type="button" title="Miroir horizontal" onClick={() => flip("x")} style={{ ...layerBtn, fontSize: 10 }}>⇆ Miroir H</button>
-                  <button type="button" title="Miroir vertical" onClick={() => flip("y")} style={{ ...layerBtn, fontSize: 10 }}>⇅ Miroir V</button>
+                  <button type="button" title="Miroir horizontal" onClick={() => flip("x")} style={{ ...panelBtn, fontSize: 10 }}>⇆ Miroir H</button>
+                  <button type="button" title="Miroir vertical" onClick={() => flip("y")} style={{ ...panelBtn, fontSize: 10 }}>⇅ Miroir V</button>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 5 }}>
-                  <button type="button" title="Incliner ← (H)" onClick={() => skewBy("x", -8)} style={{ ...layerBtn, fontSize: 11 }}>⇤</button>
-                  <button type="button" title="Incliner → (H)" onClick={() => skewBy("x", 8)} style={{ ...layerBtn, fontSize: 11 }}>⇥</button>
-                  <button type="button" title="Incliner ↑ (V)" onClick={() => skewBy("y", -8)} style={{ ...layerBtn, fontSize: 11 }}>⤒</button>
-                  <button type="button" title="Incliner ↓ (V)" onClick={() => skewBy("y", 8)} style={{ ...layerBtn, fontSize: 11 }}>⤓</button>
+                  <button type="button" title="Incliner ← (H)" onClick={() => skewBy("x", -8)} style={{ ...panelBtn, fontSize: 11 }}>⇤</button>
+                  <button type="button" title="Incliner → (H)" onClick={() => skewBy("x", 8)} style={{ ...panelBtn, fontSize: 11 }}>⇥</button>
+                  <button type="button" title="Incliner ↑ (V)" onClick={() => skewBy("y", -8)} style={{ ...panelBtn, fontSize: 11 }}>⤒</button>
+                  <button type="button" title="Incliner ↓ (V)" onClick={() => skewBy("y", 8)} style={{ ...panelBtn, fontSize: 11 }}>⤓</button>
                 </div>
               </div>
 
@@ -5254,9 +5274,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     ["top", "Haut", "h", 1.5], ["centerV", "Centre V", "h", 7], ["bottom", "Bas", "h", 12.5],
                   ] as const).map(([action, label, axis, pos]) => (
                     <button key={action} type="button" onClick={() => align(action)} title={label}
-                      style={{ ...layerBtn, padding: "7px" }}>
+                      style={{ ...panelBtn, padding: "7px" }}>
                       <svg width="16" height="16" viewBox="0 0 16 16">
-                        <rect x="0.5" y="0.5" width="15" height="15" rx="2" fill="none" stroke={MUTED} strokeWidth="1" />
+                        <rect x="0.5" y="0.5" width="15" height="15" rx="2" fill="none" stroke={pMuted} strokeWidth="1" />
                         {axis === "v"
                           ? <rect x={pos} y="3" width="2" height="10" rx="1" fill={G} />
                           : <rect x="3" y={pos} width="10" height="2" rx="1" fill={G} />}
@@ -5273,12 +5293,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                         ["top", "Bords hauts", "⤒"], ["middleV", "Centres (V)", "⇕"], ["bottom", "Bords bas", "⤓"],
                       ] as [AlignMode, string, string][]).map(([m, t, g]) => (
                         <button key={m} type="button" onClick={() => alignSelection(m)} title={t}
-                          style={{ ...layerBtn, padding: "7px 0", fontSize: 13, justifyContent: "center" }}>{g}</button>
+                          style={{ ...panelBtn, padding: "7px 0", fontSize: 13, justifyContent: "center" }}>{g}</button>
                       ))}
                     </div>
                     <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
-                      <button type="button" onClick={() => distribute("h")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }} title="Espacer régulièrement à l'horizontale (≥ 3 objets)">⇄ Distribuer H</button>
-                      <button type="button" onClick={() => distribute("v")} style={{ ...layerBtn, flex: 1, fontSize: 9.5 }} title="Espacer régulièrement à la verticale (≥ 3 objets)">⇅ Distribuer V</button>
+                      <button type="button" onClick={() => distribute("h")} style={{ ...panelBtn, flex: 1, fontSize: 9.5 }} title="Espacer régulièrement à l'horizontale (≥ 3 objets)">⇄ Distribuer H</button>
+                      <button type="button" onClick={() => distribute("v")} style={{ ...panelBtn, flex: 1, fontSize: 9.5 }} title="Espacer régulièrement à la verticale (≥ 3 objets)">⇅ Distribuer V</button>
                     </div>
                   </div>
                 )}
@@ -5288,19 +5308,19 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <div>
                 <p className="ps-sec-label">Actions</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-                  <button type="button" onClick={() => layer("dup")}   style={layerBtn}><Copy size={12} /> Dupliquer</button>
-                  <button type="button" onClick={() => layer("lock")}  style={{ ...layerBtn, color: sel.locked ? G : INK }}>
+                  <button type="button" onClick={() => layer("dup")}   style={panelBtn}><Copy size={12} /> Dupliquer</button>
+                  <button type="button" onClick={() => layer("lock")}  style={{ ...panelBtn, color: sel.locked ? G : pInk }}>
                     {sel.locked ? <Lock size={12} /> : <Unlock size={12} />} {sel.locked ? "Verr." : "Libre"}
                   </button>
-                  <button type="button" onClick={() => flip("x")} style={layerBtn} title="Miroir horizontal">⇆ Miroir H</button>
-                  <button type="button" onClick={() => flip("y")} style={layerBtn} title="Miroir vertical">⇅ Miroir V</button>
-                  <button type="button" onClick={copyStyle} style={{ ...layerBtn, gridColumn: hasStyleClip ? "auto" : "1 / 3" }} title="Copier l'apparence">🎨 Copier le style</button>
-                  {hasStyleClip && <button type="button" onClick={pasteStyle} style={{ ...layerBtn, color: G }} title="Appliquer le style copié">Coller le style</button>}
-                  {sel.multi && <button type="button" onClick={groupSel} style={{ ...layerBtn, gridColumn: "1 / 3", color: G }}>⊞ Grouper</button>}
-                  {sel.isGroupObj && <button type="button" onClick={ungroupSel} style={{ ...layerBtn, gridColumn: "1 / 3" }}>⊟ Dégrouper</button>}
+                  <button type="button" onClick={() => flip("x")} style={panelBtn} title="Miroir horizontal">⇆ Miroir H</button>
+                  <button type="button" onClick={() => flip("y")} style={panelBtn} title="Miroir vertical">⇅ Miroir V</button>
+                  <button type="button" onClick={copyStyle} style={{ ...panelBtn, gridColumn: hasStyleClip ? "auto" : "1 / 3" }} title="Copier l'apparence">🎨 Copier le style</button>
+                  {hasStyleClip && <button type="button" onClick={pasteStyle} style={{ ...panelBtn, color: G }} title="Appliquer le style copié">Coller le style</button>}
+                  {sel.multi && <button type="button" onClick={groupSel} style={{ ...panelBtn, gridColumn: "1 / 3", color: G }}>⊞ Grouper</button>}
+                  {sel.isGroupObj && <button type="button" onClick={ungroupSel} style={{ ...panelBtn, gridColumn: "1 / 3" }}>⊟ Dégrouper</button>}
                 </div>
                 <button type="button" onClick={() => layer("del")}
-                  style={{ ...layerBtn, width: "100%", marginTop: 6, background: "rgba(255,107,107,0.1)", border: "1px solid rgba(255,107,107,0.2)", color: "#FF6B6B" }}>
+                  style={{ ...panelBtn, width: "100%", marginTop: 6, background: "rgba(255,107,107,0.1)", border: "1px solid rgba(255,107,107,0.2)", color: "#FF6B6B" }}>
                   <Trash2 size={12} /> Supprimer
                 </button>
               </div>
