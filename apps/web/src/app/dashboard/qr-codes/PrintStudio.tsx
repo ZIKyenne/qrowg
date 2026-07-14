@@ -3844,7 +3844,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         /* Bottom-sheets gauche (Modeles/Bibliotheque/Photos/Composants) : la zone de contenu
            DOIT defiler. Bug flexbox classique : un enfant flex:1 avec overflow ne defile
            pas tant qu'il n'a pas min-height:0 (sinon il deborde sous la hauteur bornee 62vh). */
-        .ps-root.ps-landscape .ps-fly:not(.ps-fly-right) .qr-scroll { min-height: 0 !important; overflow-y: auto !important; touch-action: pan-y; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
+        /* SCROLL DES BOTTOM-SHEETS GAUCHE (Modeles/Bibliotheque/Photos/Composants) :
+           iOS Safari refuse souvent de scroller un enfant flex:1 (meme avec min-height:0).
+           -> on fait du SHEET ENTIER l'unique conteneur scrollable, et on neutralise le
+           scroll de l'enfant. Header devient sticky pour rester visible. */
+        .ps-root.ps-landscape .ps-fly:not(.ps-fly-right) { display: block !important; overflow-y: auto !important; overflow-x: hidden !important; -webkit-overflow-scrolling: touch !important; touch-action: pan-y !important; overscroll-behavior: contain !important; }
+        .ps-root.ps-landscape .ps-fly:not(.ps-fly-right) > .qr-scroll { overflow: visible !important; min-height: 0 !important; display: block !important; }
         /* Sheets focalises + Reglages + menu ... : contenu scrollable au doigt (pan-y), sans fuite vers le fond */
         .ps-root.ps-landscape .ps-fly-right.ps-sheet, .ps-msheet { touch-action: pan-y; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
       `}</style>
