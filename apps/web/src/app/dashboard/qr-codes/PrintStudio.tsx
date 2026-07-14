@@ -4451,6 +4451,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               style={{ minWidth: 42, height: 26, background: "none", border: "none", color: MUTED, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>{Math.round(zoom * 100)}%</button>
             <button type="button" onClick={() => applyZoom(zoom * 1.25)} title="Zoom avant" aria-label="Zoom avant"
               style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 6, color: INK, fontSize: 15, cursor: "pointer" }}>+</button>
+            <button type="button" onClick={() => fitToScreen()} title="Ajuster à l'écran" aria-label="Ajuster à l'écran"
+              style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 6, color: INK, cursor: "pointer" }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3" /></svg>
+            </button>
           </div>
 
           {/* Actions secondaires : visibles desktop (display:contents), masquées en paysage mobile (-> menu ⋯) */}
