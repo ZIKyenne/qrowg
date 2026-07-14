@@ -60,9 +60,10 @@ export default function BigSlider({ label, value, min, max, step, onChange, rese
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <button type="button" onClick={() => bump(-1)} aria-label="Diminuer" style={btn}>−</button>
-        <input type="range" min={min} max={max} step={step} value={value}
+        {/* hitbox tactile 44px ; touch-action:none -> pas de scroll de page pendant le reglage */}
+        <input type="range" min={min} max={max} step={step} value={Number.isFinite(value) ? value : min}
           onChange={e => set(parseFloat(e.target.value))}
-          style={{ flex: 1, height: 30, accentColor: GOLD, cursor: "pointer" }} />
+          style={{ flex: 1, height: 44, accentColor: GOLD, cursor: "pointer", touchAction: "none" }} />
         <button type="button" onClick={() => bump(1)} aria-label="Augmenter" style={btn}>+</button>
       </div>
     </div>

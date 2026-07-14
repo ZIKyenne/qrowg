@@ -2429,8 +2429,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // Deselectionner referme le panneau Reglages + le selecteur d'empilement.
   const isShapeSel = !!sel && !sel.isQr && !sel.isText && !sel.isImage && sel.label === null && !sel.isGroupObj && !sel.multi
   useEffect(() => { if (!sel) { setRegOpen(false); setStackPick(null) } if (!sel?.isQr) setQrSheet(""); if (!sel?.isText) setTxtSheet(""); if (!sel?.isImage) setImgSheet(""); if (!isShapeSel) setShapeSheet(""); if (sel?.label == null) setBtnSheet("") }, [sel, isShapeSel])
+  // Un bottom-sheet partiel est ouvert (couvre le bas) -> on remonte le canvas (P1 : objet visible).
+  const anyBottomSheet = regOpen || !!qrSheet || !!txtSheet || !!imgSheet || !!shapeSheet || !!btnSheet
   // Etat des overlays (pour l'interception du bouton Retour telephone).
-  overlayOpenRef.current = !!(qrSheet || txtSheet || imgSheet || shapeSheet || btnSheet || regOpen || stackPick || moreOpen || expWiz >= 0)
+  overlayOpenRef.current = !!(anyBottomSheet || stackPick || moreOpen || expWiz >= 0)
   closeOverlaysRef.current = () => { setQrSheet(""); setTxtSheet(""); setImgSheet(""); setShapeSheet(""); setBtnSheet(""); setRegOpen(false); setStackPick(null); setMoreOpen(false); setExpWiz(-1) }
 
   // Selecteur d'objets superposes (#10) : liste les elements sous le centre de la selection.
@@ -5146,7 +5148,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         )}
 
         {/* Zone canvas (heros) : panneaux flottants -> on recadre pour garder l'artboard centre dans le visible */}
-        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: landscapeMobile ? "16px 16px 92px" : 16, background: landscapeMobile ? "#0C0C0E" : "#E5E8ED", position: "relative", transition: "padding .22s cubic-bezier(.2,.8,.2,1)" }}>
+        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: landscapeMobile ? `16px 16px ${anyBottomSheet ? (regOpen ? "60vh" : "48vh") : "92px"}` : 16, background: landscapeMobile ? "#0C0C0E" : "#E5E8ED", position: "relative", transition: "padding .22s cubic-bezier(.2,.8,.2,1)" }}>
           {loading && (
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: pMuted, zIndex: 5, pointerEvents: "none" }}>
               <Loader2 size={18} style={{ animation: "spin 0.8s linear infinite" }} /> Chargement…
