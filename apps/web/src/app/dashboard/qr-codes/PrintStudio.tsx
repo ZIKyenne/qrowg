@@ -992,9 +992,19 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // (comportement de page, plus de sensation de popup).
   useEffect(() => {
     if (typeof document === "undefined") return
-    const body = document.body
-    const prevOverflow = body.style.overflow
-    body.style.overflow = "hidden"
+    const body = document.body, html = document.documentElement
+    // Verrou de scroll ROBUSTE (iOS ignore overflow:hidden pour le tactile) :
+    // on fige le body en position:fixed en memorisant le scroll, on coupe le
+    // chainage de scroll (overscroll-behavior), puis on restaure a la fermeture.
+    const scrollY = window.scrollY || window.pageYOffset || 0
+    const prev = {
+      bOverflow: body.style.overflow, bPosition: body.style.position, bTop: body.style.top,
+      bWidth: body.style.width, bOver: body.style.overscrollBehavior,
+      hOverflow: html.style.overflow, hOver: html.style.overscrollBehavior,
+    }
+    body.style.overflow = "hidden"; body.style.position = "fixed"; body.style.top = `-${scrollY}px`
+    body.style.width = "100%"; body.style.overscrollBehavior = "none"
+    html.style.overflow = "hidden"; html.style.overscrollBehavior = "none"
     // Bouton retour du telephone : ferme d'abord l'overlay ouvert (sheet/menu/panneau),
     // sinon ferme le studio. On re-empile un etat pour que le "retour" suivant fonctionne.
     try { window.history.pushState({ qfPrintStudio: 1 }, "") } catch { /* historique indisponible */ }
@@ -1008,7 +1018,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     }
     window.addEventListener("popstate", onPop)
     return () => {
-      body.style.overflow = prevOverflow
+      body.style.overflow = prev.bOverflow; body.style.position = prev.bPosition; body.style.top = prev.bTop
+      body.style.width = prev.bWidth; body.style.overscrollBehavior = prev.bOver
+      html.style.overflow = prev.hOverflow; html.style.overscrollBehavior = prev.hOver
+      window.scrollTo(0, scrollY) // restaure la position de scroll du dashboard
       window.removeEventListener("popstate", onPop)
       // Pas de history.back() ici : en dev (StrictMode) le double-montage refermerait
       // le studio a l'ouverture. L'entree empilee restante est inoffensive.
@@ -3730,6 +3743,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       display: "flex", flexDirection: "column", fontFamily: "DM Sans, sans-serif",
     }}>
       <style>{`
+        /* Coupe le chainage de scroll : le geste ne "fuit" jamais vers la page du dashboard derriere. */
+        .ps-root { overscroll-behavior: contain; }
+        .ps-root .qr-scroll, .ps-root .ps-fly, .ps-root .ps-msheet, .ps-root .ps-sheet { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
         .ps-root button { transition: background .14s ease, border-color .14s ease, color .14s ease, transform .07s ease, filter .14s ease; }
         .ps-root button:hover:not(:disabled) { filter: brightness(0.96); }
         .ps-root button:active:not(:disabled) { transform: scale(0.96); }
