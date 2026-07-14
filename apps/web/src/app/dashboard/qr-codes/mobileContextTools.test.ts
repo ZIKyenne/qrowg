@@ -51,10 +51,15 @@ describe("mobileContextTools — invariants", () => {
 })
 
 describe("mobileContextTools — specifiques par type", () => {
-  it("non-multi (hors QR) commencent par 'settings' (Modifier)", () => {
-    for (const k of ALL.filter(k => k !== "multi" && k !== "qr")) {
+  it("types generiques (image/bouton/groupe/forme) commencent par 'settings'", () => {
+    for (const k of ["image", "button", "group", "shape"] as SelKind[]) {
       expect(mobileContextTools(k)[0].id).toBe("settings")
     }
+  })
+  it("texte expose des intentions directes (police/couleur/taille/effets/aligner)", () => {
+    const ids = mobileContextTools("text").map(t => t.id)
+    expect(ids).not.toContain("settings")
+    for (const id of ["font", "textcolor", "textsize", "effects", "textalign"]) expect(ids).toContain(id)
   })
   it("QR expose des intentions directes (couleurs/modules/coins/correction), pas 'settings'", () => {
     const ids = mobileContextTools("qr").map(t => t.id)
@@ -76,10 +81,8 @@ describe("mobileContextTools — specifiques par type", () => {
   it("qr propose 'Habiller'", () => {
     expect(mobileContextTools("qr").some(t => t.id === "dress")).toBe(true)
   })
-  it("texte propose les tailles A- / A+", () => {
-    const ids = mobileContextTools("text").map(t => t.id)
-    expect(ids).toContain("sizeUp")
-    expect(ids).toContain("sizeDown")
+  it("texte propose une intention Taille", () => {
+    expect(mobileContextTools("text").some(t => t.id === "textsize")).toBe(true)
   })
   it("image propose l'ordre devant/derriere", () => {
     const ids = mobileContextTools("image").map(t => t.id)

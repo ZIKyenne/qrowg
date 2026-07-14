@@ -54,7 +54,15 @@ export function mobileContextTools(kind: SelKind): CtxTool[] {
         STACK, DUP, DELETE,
       ]
     case "text":
-      return [EDIT, { id: "sizeDown", label: "Réduire", icon: "minus" }, { id: "sizeUp", label: "Agrandir", icon: "plus" }, ...TAIL]
+      // Intentions texte directes -> sheets focalises (Police/Couleur/Taille/Effets/Aligner).
+      return [
+        { id: "font", label: "Police", icon: "font" },
+        { id: "textcolor", label: "Couleur", icon: "colors" },
+        { id: "textsize", label: "Taille", icon: "size" },
+        { id: "effects", label: "Effets", icon: "effects" },
+        { id: "textalign", label: "Aligner", icon: "align" },
+        STACK, DUP, DELETE,
+      ]
     case "image":
       return [EDIT, { id: "front", label: "Devant", icon: "up" }, { id: "back", label: "Derrière", icon: "down" }, ...TAIL]
     case "group":

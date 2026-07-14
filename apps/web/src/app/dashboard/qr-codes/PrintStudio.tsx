@@ -35,6 +35,7 @@ import { stackedAt, boxCenter, type LayerBox } from "./stackedObjects"
 import { exportPlan, type ExportType } from "./exportPlan"
 import { dist as gDist, LONG_PRESS_MS, MOVE_TOLERANCE } from "./touchGestures"
 import { showSection, coerceMode, type UiMode } from "./uiComplexity"
+import BigSlider from "./BigSlider"
 import { pushRecent } from "./colorTools"
 import ColorPicker from "./ColorPicker"
 import { isFav, toggleFav, pushRecentTpl, keepValid } from "./templateGallery"
@@ -966,6 +967,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const stackRef = useRef<Record<string, fabric.Object>>({})
   // Sheets QR focalises (#4/#5) : un seul aspect a la fois (couleurs/modules/coins/correction).
   const [qrSheet, setQrSheet] = useState<"" | "colors" | "modules" | "corners" | "ecc">("")
+  // Sheets Texte focalises : police / couleur / taille / effets / alignement.
+  const [txtSheet, setTxtSheet] = useState<"" | "font" | "color" | "size" | "effects" | "align">("")
   // Gestes tactiles (#8) : long-press -> dupliquer. Timer + point de depart.
   const lpTimerRef = useRef<number | null>(null)
   const lpStartRef = useRef<{ x: number; y: number } | null>(null)
@@ -2373,7 +2376,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
   // ---- Barre contextuelle mobile (facon Canva) : "que veux-tu faire ?" ------
   // Deselectionner referme le panneau Reglages + le selecteur d'empilement.
-  useEffect(() => { if (!sel) { setRegOpen(false); setStackPick(null) } if (!sel?.isQr) setQrSheet("") }, [sel])
+  useEffect(() => { if (!sel) { setRegOpen(false); setStackPick(null) } if (!sel?.isQr) setQrSheet(""); if (!sel?.isText) setTxtSheet("") }, [sel])
 
   // Selecteur d'objets superposes (#10) : liste les elements sous le centre de la selection.
   const openStackPicker = () => {
@@ -2419,6 +2422,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "modules": return <span style={{ fontSize: 15, lineHeight: 1, letterSpacing: -2 }}>▪▪</span>
       case "corners": return <span style={{ fontSize: 15, lineHeight: 1 }}>◱</span>
       case "ecc":    return <span style={{ fontSize: 15, lineHeight: 1 }}>🛡</span>
+      case "font":   return <span style={{ fontSize: 15, fontWeight: 800, lineHeight: 1, fontFamily: "Georgia, serif" }}>Aa</span>
+      case "size":   return <span style={{ fontSize: 15, fontWeight: 800, lineHeight: 1 }}>T↕</span>
+      case "effects": return <span style={{ fontSize: 15, lineHeight: 1 }}>✦</span>
       default:       return <span style={{ fontSize: 15, lineHeight: 1 }}>•</span>
     }
   }
@@ -2430,6 +2436,11 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "modules":  setQrSheet("modules"); break
       case "corners":  setQrSheet("corners"); break
       case "ecc":      setQrSheet("ecc"); break
+      case "font":       setTxtSheet("font"); break
+      case "textcolor":  setTxtSheet("color"); break
+      case "textsize":   setTxtSheet("size"); break
+      case "effects":    setTxtSheet("effects"); break
+      case "textalign":  setTxtSheet("align"); break
       case "stack":    openStackPicker(); break
       case "dress":    dressQr(); break
       case "sizeUp":   mutate(o => (o as fabric.IText).set("fontSize", (sel?.fontSize ?? 20) + 2)); break
@@ -3952,9 +3963,81 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         )
       })()}
 
+      {/* Sheets Texte focalises : police / couleur / taille / effets / alignement. */}
+      {landscapeMobile && sel?.isText && txtSheet && (() => {
+        const title = txtSheet === "font" ? "Police" : txtSheet === "color" ? "Couleur du texte" : txtSheet === "size" ? "Taille" : txtSheet === "effects" ? "Effets" : "Alignement"
+        const tChip = (label: React.ReactNode, active: boolean, on: () => void, key: string, style: React.CSSProperties = {}) => (
+          <button key={key} type="button" onClick={on}
+            style={{ flex: "1 0 22%", minHeight: 52, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 12, cursor: "pointer", fontSize: 14, fontWeight: 700,
+              background: active ? "rgba(201,168,76,0.2)" : "rgba(255,255,255,0.06)", border: `1px solid ${active ? G : "rgba(255,255,255,0.14)"}`, color: active ? G : "#ECE8E0", ...style }}>{label}</button>
+        )
+        return (
+          <div className="ps-msheet" style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 59, background: "#17171B", borderTop: "1px solid rgba(255,255,255,0.09)", borderRadius: "18px 18px 0 0", boxShadow: "0 -14px 44px rgba(0,0,0,0.55)", padding: "10px 14px calc(14px + env(safe-area-inset-bottom))", maxHeight: "74vh", overflowY: "auto", animation: "psSheetUp .26s cubic-bezier(.2,.8,.2,1)" }}>
+            <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.2)", margin: "0 auto 10px" }} />
+            <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
+              <span style={{ color: "#F4F1EA", fontSize: 14, fontWeight: 800 }}>{title}</span>
+              <button type="button" onClick={() => setTxtSheet("")} aria-label="Fermer" style={{ marginLeft: "auto", width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 9, color: "#F4F1EA", cursor: "pointer" }}><X size={15} /></button>
+            </div>
+
+            {txtSheet === "font" && FONT_GROUPS.map(grp => (
+              <div key={grp.label} style={{ marginBottom: 12 }}>
+                <p className="ps-sec-label">{grp.label}</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  {grp.fonts.map(f => (
+                    <button key={f} type="button" onClick={() => setFont(f)}
+                      style={{ padding: "10px 12px", minHeight: 46, borderRadius: 10, cursor: "pointer", fontSize: 15, fontFamily: `'${f}', sans-serif`,
+                        background: sel.fontFamily === f ? "rgba(201,168,76,0.2)" : "rgba(255,255,255,0.06)", border: `1px solid ${sel.fontFamily === f ? G : "rgba(255,255,255,0.14)"}`, color: sel.fontFamily === f ? G : "#ECE8E0" }}>{f}</button>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            {txtSheet === "color" && (<>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+                {SWATCHES.map(c => (
+                  <button key={c} type="button" onClick={() => setFill(c)} title={c}
+                    style={{ width: 34, height: 34, borderRadius: "50%", cursor: "pointer", background: c, border: (sel.fill || "").toUpperCase() === c.toUpperCase() ? `3px solid ${G}` : "1px solid rgba(255,255,255,0.25)", padding: 0, flexShrink: 0 }} />
+                ))}
+              </div>
+              <ColorPicker value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"} onChange={setFill} onUseColor={c => setRecentColors(r => pushRecent(r, c))} recent={recentColors} brand={SWATCHES} dark />
+            </>)}
+
+            {txtSheet === "size" && (
+              <BigSlider label="Taille du texte" value={sel.fontSize} min={8} max={200} step={2} resetTo={38} format={v => `${Math.round(v)} px`} dark
+                onChange={v => mutate(o => (o as fabric.IText).set("fontSize", v))} />
+            )}
+
+            {txtSheet === "effects" && (<>
+              <p className="ps-sec-label">Style</p>
+              <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+                {tChip(<b>B</b>, sel.bold, () => mutate(o => (o as fabric.IText).set("fontWeight", sel.bold ? "normal" : "bold")), "b")}
+                {tChip(<i>I</i>, sel.italic, () => mutate(o => (o as fabric.IText).set("fontStyle", sel.italic ? "normal" : "italic")), "i")}
+                {tChip(<span style={{ textDecoration: "underline" }}>U</span>, sel.underline, () => mutate(o => (o as fabric.IText).set("underline", !sel.underline)), "u")}
+                {tChip(<span style={{ textDecoration: "line-through" }}>S</span>, sel.strike, () => mutate(o => (o as fabric.IText).set("linethrough", !sel.strike)), "s")}
+              </div>
+              <p className="ps-sec-label">Ombre</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {([["off", "Aucune"], ["soft", "Douce"], ["medium", "Moyenne"], ["strong", "Forte"], ["floating", "Flottante"], ["luxury", "Luxe"]] as const).map(([k, l]) => tChip(l, false, () => setShadowPreset(k), k, { fontSize: 12 }))}
+              </div>
+            </>)}
+
+            {txtSheet === "align" && (<>
+              <p className="ps-sec-label">Alignement</p>
+              <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+                {([["left", "⯇"], ["center", "≡"], ["right", "⯈"]] as const).map(([k, l]) => tChip(l, sel.textAlign === k, () => mutate(o => (o as fabric.IText).set("textAlign", k)), k, { fontSize: 18 }))}
+              </div>
+              <BigSlider label="Espacement des lettres" value={sel.charSpacing} min={0} max={800} step={10} resetTo={0} dark
+                onChange={v => mutate(o => (o as fabric.IText).set("charSpacing", v))} />
+              <BigSlider label="Interligne" value={sel.lineHeight} min={0.8} max={2} step={0.05} resetTo={1.16} format={v => v.toFixed(2)} dark
+                onChange={v => mutate(o => (o as fabric.IText).set("lineHeight", v))} />
+            </>)}
+          </div>
+        )
+      })()}
+
       {/* Barre contextuelle mobile (facon Canva) : un objet selectionne -> ses actions, gros, en bas.
           Le canvas reste visible ; le panneau complet ne s'ouvre que via "Modifier". */}
-      {landscapeMobile && sel && !regOpen && !qrSheet && (() => {
+      {landscapeMobile && sel && !regOpen && !qrSheet && !txtSheet && (() => {
         const kind = selKind(sel)
         const tools = mobileContextTools(kind)
         return (
