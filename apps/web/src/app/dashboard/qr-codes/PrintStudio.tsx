@@ -964,6 +964,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // Selecteur d'objets superposes (critique #10) : liste des elements sous le point courant.
   const [stackPick, setStackPick] = useState<{ id: string; name: string; active: boolean }[] | null>(null)
   const stackRef = useRef<Record<string, fabric.Object>>({})
+  // Sheets QR focalises (#4/#5) : un seul aspect a la fois (couleurs/modules/coins/correction).
+  const [qrSheet, setQrSheet] = useState<"" | "colors" | "modules" | "corners" | "ecc">("")
   // Gestes tactiles (#8) : long-press -> dupliquer. Timer + point de depart.
   const lpTimerRef = useRef<number | null>(null)
   const lpStartRef = useRef<{ x: number; y: number } | null>(null)
@@ -2371,7 +2373,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
   // ---- Barre contextuelle mobile (facon Canva) : "que veux-tu faire ?" ------
   // Deselectionner referme le panneau Reglages + le selecteur d'empilement.
-  useEffect(() => { if (!sel) { setRegOpen(false); setStackPick(null) } }, [sel])
+  useEffect(() => { if (!sel) { setRegOpen(false); setStackPick(null) } if (!sel?.isQr) setQrSheet("") }, [sel])
 
   // Selecteur d'objets superposes (#10) : liste les elements sous le centre de la selection.
   const openStackPicker = () => {
@@ -2413,6 +2415,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "group":  return <span style={{ fontSize: 16, lineHeight: 1 }}>⊞</span>
       case "align":  return <span style={{ fontSize: 16, lineHeight: 1 }}>⊹</span>
       case "stack":  return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="8" width="13" height="13" rx="2" /><path d="M8 8V6a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" /></svg>
+      case "colors": return <span style={{ fontSize: 16, lineHeight: 1 }}>🎨</span>
+      case "modules": return <span style={{ fontSize: 15, lineHeight: 1, letterSpacing: -2 }}>▪▪</span>
+      case "corners": return <span style={{ fontSize: 15, lineHeight: 1 }}>◱</span>
+      case "ecc":    return <span style={{ fontSize: 15, lineHeight: 1 }}>🛡</span>
       default:       return <span style={{ fontSize: 15, lineHeight: 1 }}>•</span>
     }
   }
@@ -2420,6 +2426,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     try { (navigator as any).vibrate?.(8) } catch { /* pas de vibreur */ }
     switch (id) {
       case "settings": setRegOpen(true); break
+      case "colors":   setQrSheet("colors"); break
+      case "modules":  setQrSheet("modules"); break
+      case "corners":  setQrSheet("corners"); break
+      case "ecc":      setQrSheet("ecc"); break
       case "stack":    openStackPicker(); break
       case "dress":    dressQr(); break
       case "sizeUp":   mutate(o => (o as fabric.IText).set("fontSize", (sel?.fontSize ?? 20) + 2)); break
@@ -3869,9 +3879,82 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         </>
       )}
 
+      {/* Sheets QR focalises (#4/#5) : un seul aspect, gros controles, jauge live. */}
+      {landscapeMobile && sel?.isQr && qrSheet && (() => {
+        const title = qrSheet === "colors" ? "Couleurs du QR" : qrSheet === "modules" ? "Modules" : qrSheet === "corners" ? "Coins & yeux" : "Correction d'erreur"
+        const bigSwatch = (c: string, active: boolean, on: () => void) => (
+          <button key={c} type="button" disabled={qrBusy} onClick={on} title={c}
+            style={{ width: 34, height: 34, borderRadius: "50%", cursor: "pointer", background: c, border: active ? `3px solid ${G}` : "1px solid rgba(255,255,255,0.25)", padding: 0, opacity: qrBusy ? 0.5 : 1, flexShrink: 0 }} />
+        )
+        const bigChip = (label: React.ReactNode, active: boolean, on: () => void, key: string) => (
+          <button key={key} type="button" disabled={qrBusy} onClick={on}
+            style={{ flex: "1 0 28%", minHeight: 52, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, borderRadius: 12, cursor: "pointer", fontSize: 12, fontWeight: 700, padding: "8px 6px",
+              background: active ? "rgba(201,168,76,0.2)" : "rgba(255,255,255,0.06)", border: `1px solid ${active ? G : "rgba(255,255,255,0.14)"}`, color: active ? G : "#ECE8E0", opacity: qrBusy ? 0.5 : 1 }}>{label}</button>
+        )
+        return (
+          <div className="ps-msheet" style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 59, background: "#17171B", borderTop: "1px solid rgba(255,255,255,0.09)", borderRadius: "18px 18px 0 0", boxShadow: "0 -14px 44px rgba(0,0,0,0.55)", padding: "10px 14px calc(14px + env(safe-area-inset-bottom))", maxHeight: "72vh", overflowY: "auto", animation: "psSheetUp .26s cubic-bezier(.2,.8,.2,1)" }}>
+            <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.2)", margin: "0 auto 10px" }} />
+            <div style={{ display: "flex", alignItems: "center", marginBottom: 10 }}>
+              <span style={{ color: "#F4F1EA", fontSize: 14, fontWeight: 800 }}>{title}</span>
+              <button type="button" onClick={() => setQrSheet("")} aria-label="Fermer" style={{ marginLeft: "auto", width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 9, color: "#F4F1EA", cursor: "pointer" }}><X size={15} /></button>
+            </div>
+            {/* Jauge de scannabilite (toujours visible) */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "8px 11px", marginBottom: 12 }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                  <span style={{ fontSize: 11.5, fontWeight: 800, color: scanLevelColor(qrScan.level) }}>{qrScan.label}</span>
+                  <span style={{ fontSize: 10.5, fontWeight: 700, color: "#9B9385" }}>{qrScan.contrast != null ? `${qrScan.contrast}:1` : "n/d"} · {qrScan.score}/100</span>
+                </div>
+                <div style={{ height: 6, borderRadius: 4, background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
+                  <div style={{ width: `${qrScan.score}%`, height: "100%", background: scanLevelColor(qrScan.level), transition: "width .2s" }} />
+                </div>
+              </div>
+            </div>
+
+            {qrSheet === "colors" && (<>
+              <p className="ps-sec-label">Modules</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
+                {QR_FG.map(c => bigSwatch(c, (qrFg || "#0A0A0A").toUpperCase() === c.toUpperCase(), () => applyQrRender({ fg: c })))}
+                <label style={{ width: 34, height: 34, borderRadius: "50%", border: "1px dashed rgba(255,255,255,0.3)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#ECE8E0", fontSize: 16, flexShrink: 0, position: "relative" }}>+
+                  <input type="color" value={/^#[0-9a-fA-F]{6}$/.test(qrFg) ? qrFg : "#0A0A0A"} disabled={qrBusy} onChange={e => applyQrRender({ fg: e.target.value })} style={{ position: "absolute", inset: 0, opacity: 0, cursor: "pointer" }} />
+                </label>
+              </div>
+              <p className="ps-sec-label">Fond</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {QR_BG.map(c => bigSwatch(c, (qrBg || "#FFFFFF").toUpperCase() === c.toUpperCase(), () => applyQrRender({ bg: c })))}
+                <label style={{ width: 34, height: 34, borderRadius: "50%", border: "1px dashed rgba(255,255,255,0.3)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#ECE8E0", fontSize: 16, flexShrink: 0, position: "relative" }}>+
+                  <input type="color" value={/^#[0-9a-fA-F]{6}$/.test(qrBg) ? qrBg : "#FFFFFF"} disabled={qrBusy} onChange={e => applyQrRender({ bg: e.target.value })} style={{ position: "absolute", inset: 0, opacity: 0, cursor: "pointer" }} />
+                </label>
+              </div>
+            </>)}
+
+            {qrSheet === "modules" && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {QR_DOTS.map(d => bigChip(<><span style={{ fontSize: 16 }}>{d.icon}</span>{d.label}</>, qrDot === d.k, () => applyQrRender({ dotStyle: d.k }), d.k))}
+              </div>
+            )}
+
+            {qrSheet === "corners" && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {([["square", "Carré"], ["rounded", "Arrondi"], ["circle", "Rond"], ["diamond", "Losange"]] as const).map(([k, l]) => bigChip(l, qrCorner === k, () => applyQrRender({ cornerStyle: k }), k))}
+              </div>
+            )}
+
+            {qrSheet === "ecc" && (<>
+              <div style={{ display: "flex", gap: 8 }}>
+                {(["L", "M", "Q", "H"] as const).map(e => bigChip(e, qrEcc === e, () => applyQrRender({ ecc: e }), e))}
+              </div>
+              <p style={{ color: "#9B9385", fontSize: 11, margin: "10px 2px 0", lineHeight: 1.5 }}>Plus haut = plus robuste (recommandé H si un logo couvre le centre), mais QR un peu plus dense.</p>
+            </>)}
+
+            {qrBusy && <p style={{ color: "#9B9385", fontSize: 11, margin: "10px 0 0" }}>Régénération du QR…</p>}
+          </div>
+        )
+      })()}
+
       {/* Barre contextuelle mobile (facon Canva) : un objet selectionne -> ses actions, gros, en bas.
           Le canvas reste visible ; le panneau complet ne s'ouvre que via "Modifier". */}
-      {landscapeMobile && sel && !regOpen && (() => {
+      {landscapeMobile && sel && !regOpen && !qrSheet && (() => {
         const kind = selKind(sel)
         const tools = mobileContextTools(kind)
         return (

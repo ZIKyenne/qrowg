@@ -43,7 +43,16 @@ const TAIL: CtxTool[] = [STACK, DUP, ROTATE, DELETE]
 export function mobileContextTools(kind: SelKind): CtxTool[] {
   switch (kind) {
     case "qr":
-      return [EDIT, { id: "dress", label: "Habiller", icon: "frame" }, ...TAIL]
+      // Barre QR = intentions d'edition DIRECTES (chacune ouvre un sheet focalise),
+      // pas un "Modifier" fourre-tout (critique #4/#5/#20).
+      return [
+        { id: "colors", label: "Couleurs", icon: "colors" },
+        { id: "modules", label: "Modules", icon: "modules" },
+        { id: "corners", label: "Coins", icon: "corners" },
+        { id: "ecc", label: "Correction", icon: "ecc" },
+        { id: "dress", label: "Habiller", icon: "frame" },
+        STACK, DUP, DELETE,
+      ]
     case "text":
       return [EDIT, { id: "sizeDown", label: "Réduire", icon: "minus" }, { id: "sizeUp", label: "Agrandir", icon: "plus" }, ...TAIL]
     case "image":

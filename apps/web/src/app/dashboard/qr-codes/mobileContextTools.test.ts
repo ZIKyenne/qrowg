@@ -51,10 +51,15 @@ describe("mobileContextTools — invariants", () => {
 })
 
 describe("mobileContextTools — specifiques par type", () => {
-  it("non-multi commencent par 'settings' (Modifier)", () => {
-    for (const k of ALL.filter(k => k !== "multi")) {
+  it("non-multi (hors QR) commencent par 'settings' (Modifier)", () => {
+    for (const k of ALL.filter(k => k !== "multi" && k !== "qr")) {
       expect(mobileContextTools(k)[0].id).toBe("settings")
     }
+  })
+  it("QR expose des intentions directes (couleurs/modules/coins/correction), pas 'settings'", () => {
+    const ids = mobileContextTools("qr").map(t => t.id)
+    expect(ids).not.toContain("settings")
+    for (const id of ["colors", "modules", "corners", "ecc"]) expect(ids).toContain(id)
   })
   it("multi n'a PAS 'settings' mais a align + group", () => {
     const ids = mobileContextTools("multi").map(t => t.id)
