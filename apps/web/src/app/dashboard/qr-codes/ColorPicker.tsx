@@ -18,9 +18,13 @@ type Props = {
   onUseColor?: (hex: string) => void        // choix "valide" -> a pousser dans les recentes
   recent?: string[]
   brand?: string[]
+  dark?: boolean                            // thème sombre (panneau Réglages mobile)
 }
 
-export default function ColorPicker({ value, onChange, onUseColor, recent = [], brand = [] }: Props) {
+export default function ColorPicker({ value, onChange, onUseColor, recent = [], brand = [], dark = false }: Props) {
+  const T = dark
+    ? { bg: "#1C1C20", field: "rgba(255,255,255,0.06)", ink: "#ECE8E0", line: "rgba(255,255,255,0.14)", sub: "#9B9385", dot: "rgba(255,255,255,0.25)" }
+    : { bg: "#fff", field: "#F4F6F8", ink: "#1F2430", line: "rgba(0,0,0,0.1)", sub: "#6B7280", dot: "rgba(0,0,0,0.18)" }
   const [hsl, setHsl] = useState<HSL>(() => hexToHsl(value) ?? { h: 45, s: 60, l: 45 })
   const [hex, setHex] = useState(normalizeHex(value) ?? "#C9A84C")
 
@@ -49,20 +53,20 @@ export default function ColorPicker({ value, onChange, onUseColor, recent = [], 
   const harm = harmonies(hex)
   const sw = (c: string, onClick: () => void, active = false) => (
     <button type="button" onClick={onClick} title={c}
-      style={{ width: 22, height: 22, borderRadius: "50%", cursor: "pointer", background: c, border: active ? `2px solid ${GOLD}` : "1px solid rgba(0,0,0,0.18)", padding: 0, flexShrink: 0 }} />
+      style={{ width: 22, height: 22, borderRadius: "50%", cursor: "pointer", background: c, border: active ? `2px solid ${GOLD}` : `1px solid ${T.dot}`, padding: 0, flexShrink: 0 }} />
   )
-  const label = (t: string) => <p style={{ color: "#6B7280", fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "10px 0 5px" }}>{t}</p>
+  const label = (t: string) => <p style={{ color: T.sub, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "10px 0 5px" }}>{t}</p>
 
   return (
-    <div style={{ background: "#fff", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 12, padding: 12, marginBottom: 12 }}>
+    <div style={{ background: T.bg, border: `1px solid ${T.line}`, borderRadius: 12, padding: 12, marginBottom: 12 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span style={{ width: 34, height: 34, borderRadius: 8, background: hex, border: "1px solid rgba(0,0,0,0.15)", flexShrink: 0 }} />
+        <span style={{ width: 34, height: 34, borderRadius: 8, background: hex, border: `1px solid ${T.line}`, flexShrink: 0 }} />
         <input value={hex} onChange={e => setHex(e.target.value)} onBlur={() => commit(hex)} onKeyDown={e => { if (e.key === "Enter") commit(hex) }}
           aria-label="Code couleur hexadecimal"
-          style={{ flex: 1, minWidth: 0, background: "#F4F6F8", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 7, padding: "8px 9px", color: "#1F2430", fontSize: 12, fontFamily: "monospace", outline: "none", boxSizing: "border-box" }} />
+          style={{ flex: 1, minWidth: 0, background: T.field, border: `1px solid ${T.line}`, borderRadius: 7, padding: "8px 9px", color: T.ink, fontSize: 12, fontFamily: "monospace", outline: "none", boxSizing: "border-box" }} />
         {canEyedrop && (
           <button type="button" onClick={eyedrop} title="Pipette (prelever une couleur a l'ecran)" aria-label="Pipette"
-            style={{ width: 34, height: 34, borderRadius: 8, border: "1px solid rgba(0,0,0,0.12)", background: "#F4F6F8", cursor: "pointer", fontSize: 15, flexShrink: 0 }}>🖊️</button>
+            style={{ width: 34, height: 34, borderRadius: 8, border: `1px solid ${T.line}`, background: T.field, color: T.ink, cursor: "pointer", fontSize: 15, flexShrink: 0 }}>🖊️</button>
         )}
       </div>
 
