@@ -1565,7 +1565,7 @@ function HowItWorks() {
           padding:"12px 28px",borderRadius:10,transition:"all 0.2s ease"}}
           onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.background="rgba(201,168,76,0.08)";el.style.borderColor="rgba(201,168,76,0.55)"}}
           onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.background="transparent";el.style.borderColor="rgba(201,168,76,0.3)"}}>
-          Essayer maintenant — c'est gratuit <span style={{fontSize:16}}>→</span>
+          Choisir mon modèle <span style={{fontSize:16}}>→</span>
         </a>
       </div>
     </section>
@@ -1913,7 +1913,7 @@ function QRDynamicSection() {
                   el.style.transform = "none"
                   el.style.boxShadow = "0 4px 20px rgba(201,168,76,0.35)"
                 }}>
-                Créer mon QR gratuit <span style={{ fontSize: 16 }}>→</span>
+                Personnaliser mon QR code <span style={{ fontSize: 16 }}>→</span>
               </a>
             </div>
           </div>
@@ -3213,7 +3213,7 @@ export default function HomePage() {
                   el.style.transform = "translateY(0) scale(1)"
                   el.style.boxShadow = "0 4px 28px rgba(201,168,76,0.45)"
                 }}>
-                Créer mon QRfolio gratuit
+                Créer ma page gratuitement
               </Link>
               <Link href="#how" style={{
                 background: "transparent",
@@ -3404,7 +3404,7 @@ export default function HomePage() {
             }}
               onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="translateY(-3px) scale(1.03)";el.style.animation="none";el.style.boxShadow="0 8px 40px rgba(201,168,76,0.55)"}}
               onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="none";el.style.animation="ctaPulse 3.4s ease-in-out infinite"}}>
-              Créer mon QRfolio gratuit
+              Commencer gratuitement
               <span style={{ fontSize:18 }}>→</span>
             </Link>
 
@@ -3553,7 +3553,7 @@ export default function HomePage() {
           color: "#080808", fontWeight: 800, fontSize: 15, textDecoration: "none",
           boxShadow: "0 6px 22px rgba(201,168,76,0.4)",
         }}>
-          Créer mon QR gratuit <span style={{ fontSize: 16 }}>→</span>
+          Créer ma page gratuitement <span style={{ fontSize: 16 }}>→</span>
         </Link>
       </div>
     </div>
