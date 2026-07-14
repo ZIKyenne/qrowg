@@ -983,6 +983,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const snapOnRef = useRef(false)
   // Immersion (#18) : reference stable vers onClose pour l'effet monte une seule fois.
   const onCloseRef = useRef(onClose); onCloseRef.current = onClose
+  // Bouton Retour : etat courant des overlays + fonction de fermeture (refs stables pour l'effet monte une fois).
+  const overlayOpenRef = useRef(false)
+  const closeOverlaysRef = useRef<() => void>(() => {})
 
   // Immersion "appli dans l'appli" : plein ecran (le rendu est porte vers <body>),
   // scroll du fond verrouille, et le bouton RETOUR du telephone ferme le studio
@@ -992,9 +995,17 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const body = document.body
     const prevOverflow = body.style.overflow
     body.style.overflow = "hidden"
-    // Bouton retour du telephone -> ferme le studio (comportement de page).
+    // Bouton retour du telephone : ferme d'abord l'overlay ouvert (sheet/menu/panneau),
+    // sinon ferme le studio. On re-empile un etat pour que le "retour" suivant fonctionne.
     try { window.history.pushState({ qfPrintStudio: 1 }, "") } catch { /* historique indisponible */ }
-    const onPop = () => { onCloseRef.current() }
+    const onPop = () => {
+      if (overlayOpenRef.current) {
+        closeOverlaysRef.current()
+        try { window.history.pushState({ qfPrintStudio: 1 }, "") } catch { /* noop */ }
+      } else {
+        onCloseRef.current()
+      }
+    }
     window.addEventListener("popstate", onPop)
     return () => {
       body.style.overflow = prevOverflow
@@ -1520,7 +1531,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const label = buildPill("SCANNEZ-MOI", { rectFill: G, textFill: "#080808", height: Math.round(w * 0.2), fontSize: Math.round(w * 0.1) })
     label.set({ originX: "center", originY: "top", left: c.x, top: c.y + fr / 2 + 12 })
     fc.add(frame); fc.add(label)
-    fc.setActiveObject(label); fc.requestRenderAll(); pushHistorySoon(); setLayersVer(v => v + 1)
+    fc.setActiveObject(label); refreshSel(); fc.requestRenderAll(); pushHistorySoon(); setLayersVer(v => v + 1)
   }
   // Etiquette QR : pilule de texte sous le QR (remplace l'etiquette precedente)
   const addQrLabel = (text: string) => {
@@ -1533,12 +1544,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     const pill = buildPill(text, { rectFill: G, textFill: readableOn(G), height: Math.round(w * 0.17), fontSize: Math.round(w * 0.08) })
     ;(pill as any).isQrLabel = true
     pill.set({ originX: "center", originY: "top", left: c.x, top: c.y + h / 2 + Math.round(w * 0.06) })
-    fc.add(pill); fc.setActiveObject(pill); fc.requestRenderAll(); pushHistorySoon(); setLayersVer(v => v + 1)
+    fc.add(pill); fc.setActiveObject(pill); refreshSel(); fc.requestRenderAll(); pushHistorySoon(); setLayersVer(v => v + 1)
   }
   const removeQrLabel = () => {
     const fc = fcRef.current; if (!fc) return
     fc.getObjects().filter(o => (o as any).isQrLabel).forEach(o => fc.remove(o))
-    fc.discardActiveObject(); setSel(null); fc.requestRenderAll(); pushHistorySoon(); setLayersVer(v => v + 1)
+    // On garde le QR selectionne (coherent avec Retirer cadre/sticker ; ne ferme pas le sheet).
+    const img = fc.getObjects().find(o => (o as any).isQR)
+    if (img) { fc.setActiveObject(img); refreshSel() } else { fc.discardActiveObject(); setSel(null) }
+    fc.requestRenderAll(); pushHistorySoon(); setLayersVer(v => v + 1)
   }
   // Cadre QR nomme (Luxury / Corporate / Modern / Neon) autour du QR
   const setQrFrame = (style: "luxury" | "corporate" | "modern" | "neon") => {
@@ -1622,7 +1636,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     if (!file) return
     const fc = fcRef.current; if (!fc) return
     const img = fc.getActiveObject() as fabric.Image | undefined
-    if (!img || img.type !== "image") return
+    if (!img || img.type !== "image" || (img as any).isQR) return // jamais ecraser un QR
     const reader = new FileReader()
     reader.onload = () => {
       const w = img.getScaledWidth(); const center = img.getCenterPoint()
@@ -2402,6 +2416,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // Deselectionner referme le panneau Reglages + le selecteur d'empilement.
   const isShapeSel = !!sel && !sel.isQr && !sel.isText && !sel.isImage && sel.label === null && !sel.isGroupObj && !sel.multi
   useEffect(() => { if (!sel) { setRegOpen(false); setStackPick(null) } if (!sel?.isQr) setQrSheet(""); if (!sel?.isText) setTxtSheet(""); if (!sel?.isImage) setImgSheet(""); if (!isShapeSel) setShapeSheet(""); if (sel?.label == null) setBtnSheet("") }, [sel, isShapeSel])
+  // Etat des overlays (pour l'interception du bouton Retour telephone).
+  overlayOpenRef.current = !!(qrSheet || txtSheet || imgSheet || shapeSheet || btnSheet || regOpen || stackPick || moreOpen || expWiz >= 0)
+  closeOverlaysRef.current = () => { setQrSheet(""); setTxtSheet(""); setImgSheet(""); setShapeSheet(""); setBtnSheet(""); setRegOpen(false); setStackPick(null); setMoreOpen(false); setExpWiz(-1) }
 
   // Selecteur d'objets superposes (#10) : liste les elements sous le centre de la selection.
   const openStackPicker = () => {
