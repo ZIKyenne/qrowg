@@ -4688,16 +4688,18 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {tplOpen && (
           <div className="qr-scroll ps-fly" style={{ width: leftW, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: pSurf, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
             <ResizeHandle which="left" />
-            <div className="ps-fly-head" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
-              <span style={{ color: pInk, fontWeight: 800, fontSize: 12.5 }}>Modèles</span>
-              <button type="button" onClick={() => setTplOpen(false)} aria-label="Fermer les modèles"
-                style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: pMuted, cursor: "pointer" }}>
-                <X size={13} />
-              </button>
-            </div>
-            <div style={{ padding: "10px 12px 0", flexShrink: 0 }}>
+            <div className="ps-fly-head" style={{ padding: "11px 12px 10px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 9 }}>
+                <span style={{ color: pInk, fontWeight: 800, fontSize: 12.5 }}>Modèles</span>
+                <button type="button" onClick={() => setTplOpen(false)} aria-label="Fermer les modèles"
+                  style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: pMuted, cursor: "pointer" }}>
+                  <X size={13} />
+                </button>
+              </div>
               <input value={tplSearch} onChange={e => setTplSearch(e.target.value)} placeholder="Rechercher un modèle…"
                 style={{ width: "100%", background: pField, border: "1px solid rgba(0,0,0,0.1)", borderRadius: 8, padding: "8px 10px", color: pInk, fontSize: 11, outline: "none", boxSizing: "border-box" }} />
+            </div>
+            <div style={{ padding: "10px 12px 0", flexShrink: 0 }}>
 
               {/* Filtre par collection (style) */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "11px 0 6px" }}>
