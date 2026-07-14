@@ -869,6 +869,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const dragIdxRef = useRef<number | null>(null) // index du calque en cours de glissement
   const scrollRef = useRef<HTMLDivElement>(null) // zone scrollable autour du canvas
   const fileRef = useRef<HTMLInputElement>(null) // import d'image / logo
+  const replaceRef = useRef<HTMLInputElement>(null) // remplacement de l'image selectionnee
 
   const [format, setFormat]   = useState<FormatId>("a4")
   const [sel, setSel]         = useState<SelState>(null)
@@ -973,6 +974,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [imgSheet, setImgSheet] = useState<"" | "filters" | "opacity">("")
   // Sheets Forme focalises : couleur / bordure / ombre.
   const [shapeSheet, setShapeSheet] = useState<"" | "color" | "border" | "shadow">("")
+  // Sheets Bouton (CTA/badge) focalises : texte / couleur.
+  const [btnSheet, setBtnSheet] = useState<"" | "text" | "color">("")
   // Gestes tactiles (#8) : long-press -> dupliquer. Timer + point de depart.
   const lpTimerRef = useRef<number | null>(null)
   const lpStartRef = useRef<{ x: number; y: number } | null>(null)
@@ -1610,6 +1613,23 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         ;(img as any).name = "Image"
         centerObj(img)
       })
+    }
+    reader.readAsDataURL(file)
+  }
+  // Remplacer l'image selectionnee : on echange sa source en conservant taille + position.
+  const onReplaceImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]; e.target.value = ""
+    if (!file) return
+    const fc = fcRef.current; if (!fc) return
+    const img = fc.getActiveObject() as fabric.Image | undefined
+    if (!img || img.type !== "image") return
+    const reader = new FileReader()
+    reader.onload = () => {
+      const w = img.getScaledWidth(); const center = img.getCenterPoint()
+      img.setSrc(String(reader.result), () => {
+        img.scaleToWidth(w); img.setPositionByOrigin(center, "center", "center"); img.setCoords()
+        fc.requestRenderAll(); pushHistorySoon()
+      }, { crossOrigin: "anonymous" } as fabric.IImageOptions)
     }
     reader.readAsDataURL(file)
   }
@@ -2381,7 +2401,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // ---- Barre contextuelle mobile (facon Canva) : "que veux-tu faire ?" ------
   // Deselectionner referme le panneau Reglages + le selecteur d'empilement.
   const isShapeSel = !!sel && !sel.isQr && !sel.isText && !sel.isImage && sel.label === null && !sel.isGroupObj && !sel.multi
-  useEffect(() => { if (!sel) { setRegOpen(false); setStackPick(null) } if (!sel?.isQr) setQrSheet(""); if (!sel?.isText) setTxtSheet(""); if (!sel?.isImage) setImgSheet(""); if (!isShapeSel) setShapeSheet("") }, [sel, isShapeSel])
+  useEffect(() => { if (!sel) { setRegOpen(false); setStackPick(null) } if (!sel?.isQr) setQrSheet(""); if (!sel?.isText) setTxtSheet(""); if (!sel?.isImage) setImgSheet(""); if (!isShapeSel) setShapeSheet(""); if (sel?.label == null) setBtnSheet("") }, [sel, isShapeSel])
 
   // Selecteur d'objets superposes (#10) : liste les elements sous le centre de la selection.
   const openStackPicker = () => {
@@ -2434,6 +2454,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "opacity": return <span style={{ fontSize: 16, lineHeight: 1 }}>◔</span>
       case "border": return <span style={{ fontSize: 16, lineHeight: 1 }}>▢</span>
       case "shadow": return <span style={{ fontSize: 16, lineHeight: 1 }}>◗</span>
+      case "replace": return <span style={{ fontSize: 16, lineHeight: 1 }}>⇄</span>
       default:       return <span style={{ fontSize: 15, lineHeight: 1 }}>•</span>
     }
   }
@@ -2451,6 +2472,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "shadow":   setShapeSheet("shadow"); break
       case "filters":    setImgSheet("filters"); break
       case "opacity":    setImgSheet("opacity"); break
+      case "replace":    replaceRef.current?.click(); break
+      case "btntext":    setBtnSheet("text"); break
+      case "btncolor":   setBtnSheet("color"); break
       case "font":       setTxtSheet("font"); break
       case "textcolor":  setTxtSheet("color"); break
       case "textsize":   setTxtSheet("size"); break
@@ -3771,6 +3795,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         }
       `}</style>
       <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} style={{ display: "none" }} />
+      <input ref={replaceRef} type="file" accept="image/*" onChange={onReplaceImage} style={{ display: "none" }} />
       {/* Effet « posé sur la feuille » au dépôt d'un modèle (overlay pur, n'altère pas le canvas) */}
       {dropFx > 0 && (
         <div key={dropFx} aria-hidden style={{ position: "fixed", inset: 0, zIndex: 55, pointerEvents: "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -4154,9 +4179,44 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         </div>
       )}
 
+      {/* Sheet Bouton (CTA/badge) focalise : texte / couleur du fond. */}
+      {landscapeMobile && sel?.label != null && btnSheet && (
+        <div className="ps-msheet" style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 59, background: "#17171B", borderTop: "1px solid rgba(255,255,255,0.09)", borderRadius: "18px 18px 0 0", boxShadow: "0 -14px 44px rgba(0,0,0,0.55)", padding: "10px 14px calc(14px + env(safe-area-inset-bottom))", maxHeight: "72vh", overflowY: "auto", animation: "psSheetUp .26s cubic-bezier(.2,.8,.2,1)" }}>
+          <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.2)", margin: "0 auto 10px" }} />
+          <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
+            <span style={{ color: "#F4F1EA", fontSize: 14, fontWeight: 800 }}>{btnSheet === "text" ? "Texte du bouton" : "Couleur du fond"}</span>
+            <button type="button" onClick={() => setBtnSheet("")} aria-label="Fermer" style={{ marginLeft: "auto", width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 9, color: "#F4F1EA", cursor: "pointer" }}><X size={15} /></button>
+          </div>
+
+          {btnSheet === "text" && (<>
+            <input value={sel.label} onChange={e => setLabel(e.target.value)} placeholder="Texte du bouton"
+              style={{ width: "100%", minHeight: 48, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, padding: "12px 14px", color: "#ECE8E0", fontSize: 15, outline: "none", boxSizing: "border-box", marginBottom: 14 }} />
+            {sel.textFill !== null && (<>
+              <p className="ps-sec-label">Couleur du texte</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {SWATCHES.map(c => (
+                  <button key={c} type="button" onClick={() => setTextColor(c)} title={c}
+                    style={{ width: 34, height: 34, borderRadius: "50%", cursor: "pointer", background: c, border: (sel.textFill ?? "").toUpperCase() === c.toUpperCase() ? `3px solid ${G}` : "1px solid rgba(255,255,255,0.25)", padding: 0, flexShrink: 0 }} />
+                ))}
+              </div>
+            </>)}
+          </>)}
+
+          {btnSheet === "color" && (<>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+              {SWATCHES.map(c => (
+                <button key={c} type="button" onClick={() => setFill(c)} title={c}
+                  style={{ width: 34, height: 34, borderRadius: "50%", cursor: "pointer", background: c, border: (sel.fill || "").toUpperCase() === c.toUpperCase() ? `3px solid ${G}` : "1px solid rgba(255,255,255,0.25)", padding: 0, flexShrink: 0 }} />
+              ))}
+            </div>
+            <ColorPicker value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"} onChange={setFill} onUseColor={c => setRecentColors(r => pushRecent(r, c))} recent={recentColors} brand={SWATCHES} dark />
+          </>)}
+        </div>
+      )}
+
       {/* Barre contextuelle mobile (facon Canva) : un objet selectionne -> ses actions, gros, en bas.
           Le canvas reste visible ; le panneau complet ne s'ouvre que via "Modifier". */}
-      {landscapeMobile && sel && !regOpen && !qrSheet && !txtSheet && !imgSheet && !shapeSheet && (() => {
+      {landscapeMobile && sel && !regOpen && !qrSheet && !txtSheet && !imgSheet && !shapeSheet && !btnSheet && (() => {
         const kind = selKind(sel)
         const tools = mobileContextTools(kind)
         return (

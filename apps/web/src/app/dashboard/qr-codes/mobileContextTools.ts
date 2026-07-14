@@ -68,6 +68,7 @@ export function mobileContextTools(kind: SelKind): CtxTool[] {
       return [
         { id: "filters", label: "Filtres", icon: "filters" },
         { id: "opacity", label: "Opacité", icon: "opacity" },
+        { id: "replace", label: "Remplacer", icon: "replace" },
         ROTATE,
         STACK, DUP, DELETE,
       ]
@@ -85,6 +86,12 @@ export function mobileContextTools(kind: SelKind): CtxTool[] {
         STACK, DUP, DELETE,
       ]
     case "button":
+      // Bouton / badge (contient un texte) : editer le texte, la couleur du fond.
+      return [
+        { id: "btntext", label: "Texte", icon: "font" },
+        { id: "btncolor", label: "Couleur", icon: "colors" },
+        STACK, DUP, DELETE,
+      ]
     default:
       return [EDIT, ...TAIL]
   }

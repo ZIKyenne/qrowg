@@ -51,10 +51,17 @@ describe("mobileContextTools — invariants", () => {
 })
 
 describe("mobileContextTools — specifiques par type", () => {
-  it("types generiques (bouton/groupe) commencent par 'settings'", () => {
-    for (const k of ["button", "group"] as SelKind[]) {
-      expect(mobileContextTools(k)[0].id).toBe("settings")
-    }
+  it("groupe commence par 'settings'", () => {
+    expect(mobileContextTools("group")[0].id).toBe("settings")
+  })
+  it("bouton expose Texte + Couleur (pas 'settings')", () => {
+    const ids = mobileContextTools("button").map(t => t.id)
+    expect(ids).not.toContain("settings")
+    expect(ids).toContain("btntext")
+    expect(ids).toContain("btncolor")
+  })
+  it("image propose Remplacer", () => {
+    expect(mobileContextTools("image").some(t => t.id === "replace")).toBe(true)
   })
   it("forme expose des intentions directes (couleur/bordure/ombre)", () => {
     const ids = mobileContextTools("shape").map(t => t.id)
