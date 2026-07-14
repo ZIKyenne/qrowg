@@ -16,10 +16,11 @@ type Lead = {
 }
 type Page = { id: string; title: string; slug: string }
 
+// Statuts = états sémantiques -> tokens du design system (action / alerte / succès)
 const STATUSES: { key: string; label: string; color: string }[] = [
-  { key: "new", label: "Nouveau", color: "#38BDF8" },
-  { key: "in_progress", label: "En cours", color: "#FBBF24" },
-  { key: "done", label: "Traité", color: "#39FF8F" },
+  { key: "new", label: "Nouveau", color: "var(--action)" },
+  { key: "in_progress", label: "En cours", color: "var(--warning)" },
+  { key: "done", label: "Traité", color: "var(--success)" },
 ]
 
 const TYPE_LABELS: Record<string, string> = {
@@ -112,8 +113,8 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
       </div>
 
       {setupNeeded && (
-        <div style={{ marginTop: 20, padding: "18px 20px", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 14 }}>
-          <p style={{ color: "#FBBF24", fontSize: 14, fontWeight: 700, margin: "0 0 6px" }}>⚙ Messagerie à activer</p>
+        <div style={{ marginTop: 20, padding: "18px 20px", background: "var(--warning-bg)", border: "1px solid var(--warning-border)", borderRadius: 14 }}>
+          <p style={{ color: "var(--warning)", fontSize: 14, fontWeight: 700, margin: "0 0 6px" }}>⚙ Messagerie à activer</p>
           <p style={{ color: MUTED, fontSize: 13, margin: "0 0 10px", lineHeight: 1.6 }}>
             La table <code style={{ color: TEXT }}>leads</code> n&apos;existe pas encore en base. Exécutez la migration <code style={{ color: TEXT }}>016_leads</code> dans Supabase (SQL Editor) pour recevoir et stocker les messages de vos pages. Les notifications par email nécessitent en plus la variable <code style={{ color: TEXT }}>RESEND_API_KEY</code> sur Vercel.
           </p>
@@ -212,8 +213,8 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
                   {l.message && <p style={{ color: TEXT, fontSize: 13, margin: "0 0 8px", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{l.message}</p>}
 
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: extra.length ? 8 : 0 }}>
-                    {l.email && <a href={`mailto:${l.email}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.25)", borderRadius: 8, padding: "6px 11px", color: "#38BDF8", textDecoration: "none", fontSize: 12, fontWeight: 600 }}><Mail size={12} /> {l.email}</a>}
-                    {l.phone && <a href={`tel:${l.phone}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(57,255,143,0.1)", border: "1px solid rgba(57,255,143,0.25)", borderRadius: 8, padding: "6px 11px", color: "#39FF8F", textDecoration: "none", fontSize: 12, fontWeight: 600 }}><Phone size={12} /> {l.phone}</a>}
+                    {l.email && <a href={`mailto:${l.email}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--action-bg)", border: "1px solid var(--action-border)", borderRadius: 8, padding: "6px 11px", color: "var(--action)", textDecoration: "none", fontSize: 12, fontWeight: 600 }}><Mail size={12} /> {l.email}</a>}
+                    {l.phone && <a href={`tel:${l.phone}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--success-bg)", border: "1px solid var(--success-border)", borderRadius: 8, padding: "6px 11px", color: "var(--success)", textDecoration: "none", fontSize: 12, fontWeight: 600 }}><Phone size={12} /> {l.phone}</a>}
                   </div>
 
                   {extra.length > 0 && (

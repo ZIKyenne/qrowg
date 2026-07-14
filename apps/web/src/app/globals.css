@@ -16,6 +16,25 @@
   --ink: #F5F0E8;
   --muted: #8A8478;
   --faint: #4A4640;
+
+  /* ── Palette sémantique canonique (design system QRfolio) ───────────────────
+     Un rôle = une couleur, partout. Les valeurs reprennent l'existant (aucune
+     régression). Règle : action=bleu · premium=accent · succès=vert ·
+     alerte=ambre · danger=rouge · contenu/neutre=gris.
+     Réutiliser ces tokens au lieu de recoder des hex arbitraires. */
+  --action: #38BDF8;              /* liens/CTA secondaires, éléments cliquables neutres */
+  --action-bg: rgba(56,189,248,0.10);
+  --action-border: rgba(56,189,248,0.28);
+  --premium: var(--accent);       /* offres payantes, badges plan, mise en avant */
+  --success: #39FF8F;             /* validé, actif, en ligne */
+  --success-bg: rgba(57,255,143,0.10);
+  --success-border: rgba(57,255,143,0.28);
+  --warning: #FBBF24;             /* en attente, en cours, à activer */
+  --warning-bg: rgba(251,191,36,0.10);
+  --warning-border: rgba(251,191,36,0.30);
+  --danger: #FF6B6B;              /* suppression, erreur, limite atteinte */
+  --danger-bg: rgba(255,107,107,0.10);
+  --danger-border: rgba(255,107,107,0.28);
 }
 
 html {
