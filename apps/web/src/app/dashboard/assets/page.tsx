@@ -62,6 +62,8 @@ export default function AssetsPage() {
       onDragLeave={e => { if (e.currentTarget === e.target) setDragOver(false) }}
       onDrop={e => { e.preventDefault(); setDragOver(false); onUploadFiles(Array.from(e.dataTransfer.files || [])) }}
       style={{ padding: "clamp(16px, 4vw, 34px)", maxWidth: 1100, margin: "0 auto", position: "relative" }}>
+      {/* Sur appareil tactile (pas de survol), les actions sur images doivent rester visibles et assez grandes */}
+      <style>{`@media (hover: none) { .ov { opacity: 1 !important } .ov > button, .ov > a { width: 40px !important; height: 40px !important } }`}</style>
       {dragOver && (
         <div style={{ position: "absolute", inset: 12, zIndex: 20, background: "rgba(201,168,76,0.08)", border: `2px dashed ${G}`, borderRadius: 18, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, pointerEvents: "none" }}>
           <Upload size={28} color={G} />
