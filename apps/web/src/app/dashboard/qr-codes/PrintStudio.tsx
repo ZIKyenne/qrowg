@@ -1350,7 +1350,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       setShowStart(true)
     })()
 
-    return () => { if (lpTimerRef.current) window.clearTimeout(lpTimerRef.current); fc.dispose(); fcRef.current = null }
+    return () => { if (lpTimerRef.current) window.clearTimeout(lpTimerRef.current); if (toastTimer.current) window.clearTimeout(toastTimer.current); if (pushTimerRef.current) clearTimeout(pushTimerRef.current); fc.dispose(); fcRef.current = null }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -2260,13 +2260,31 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "back":  fc.sendToBack(o);   break
       case "fwd":   fc.bringForward(o); break
       case "bwd":   fc.sendBackwards(o); break
-      case "dup":
+      case "dup": {
+        const actives = fc.getActiveObjects()
+        if (actives.length > 1) {
+          // Selection multiple : discard restaure les coords absolues, on clone chacun puis on re-selectionne.
+          fc.discardActiveObject()
+          const clones: fabric.Object[] = []
+          let remaining = actives.length
+          actives.forEach(src => src.clone((c: fabric.Object) => {
+            c.set({ left: (src.left ?? 0) + 20, top: (src.top ?? 0) + 20 })
+            ;(c as any).isQR = (src as any).isQR
+            fc.add(c); clones.push(c)
+            if (--remaining === 0) {
+              const nsel = new fabric.ActiveSelection(clones, { canvas: fc })
+              fc.setActiveObject(nsel); fc.requestRenderAll(); refreshSel()
+            }
+          }, TOJSON_PROPS))
+          return
+        }
         o.clone((c: fabric.Object) => {
           c.set({ left: (o.left ?? 0) + 20, top: (o.top ?? 0) + 20 })
           ;(c as any).isQR = (o as any).isQR
           fc.add(c); fc.setActiveObject(c); fc.requestRenderAll(); refreshSel()
         }, TOJSON_PROPS)
         return
+      }
       case "lock": {
         const locked = !o.lockMovementX
         o.set({
@@ -2276,10 +2294,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         })
         break
       }
-      case "del":
-        fc.remove(o); fc.discardActiveObject(); setSel(null); fc.requestRenderAll()
-        showToast("Élément supprimé") // toast avec Annuler
+      case "del": {
+        // getActiveObjects gere la selection MULTIPLE (getActiveObject renvoie le wrapper, non supprimable).
+        const objs = fc.getActiveObjects()
+        fc.discardActiveObject()
+        objs.forEach(x => fc.remove(x))
+        setSel(null); fc.requestRenderAll()
+        showToast(objs.length > 1 ? `${objs.length} éléments supprimés` : "Élément supprimé") // toast avec Annuler
         return
+      }
     }
     // garder les guides au sommet
     if (vGuideRef.current) fc.bringToFront(vGuideRef.current)
