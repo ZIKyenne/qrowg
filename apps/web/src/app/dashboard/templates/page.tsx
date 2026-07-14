@@ -117,7 +117,7 @@ export default function TemplatesPage() {
   const [activePlan,   setActivePlan]   = useState("all")
   const [search,       setSearch]       = useState("")
   const [filtersOpen,  setFiltersOpen]  = useState(false) // mobile : bottom sheet filtres
-  const isMobile = useIsMobile()
+  const isMobile = useIsMobile(860) // aligné sur le shell (barre de nav mobile <860) pour éviter deux barres fixes empilées
   const [creating,     setCreating]     = useState<string | null>(null)
   const [userPlan,     setUserPlan]     = useState("free")
   const [favs,         setFavs]         = useState<string[]>([])
@@ -457,7 +457,7 @@ export default function TemplatesPage() {
                   className="tpl-card"
                   onMouseEnter={() => setHoveredCard(template.id)}
                   onMouseLeave={() => setHoveredCard(null)}
-                  onClick={() => { if (locked) return; if (isMobile) setPreview(template.id); else setSelected(isSelected ? null : template.id) }}
+                  onClick={() => { if (isMobile) { setPreview(template.id); return } if (!locked) setSelected(isSelected ? null : template.id) }}
                   style={{
                     background: isSelected ? "color-mix(in srgb, var(--accent) 5%, transparent)" : "#0F0E0B",
                     border: "1.5px solid " + (isSelected ? "color-mix(in srgb, var(--accent) 50%, transparent)" : isHovered ? "color-mix(in srgb, var(--accent) 20%, transparent)" : "rgba(255,255,255,0.06)"),
@@ -474,7 +474,7 @@ export default function TemplatesPage() {
                     <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 0%, " + template.color + "25, transparent 65%)" }} />
 
                     {/* Mini page mockup */}
-                    <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%) scale(" + (isHovered ? 1.06 : 1) + ")", transition: "transform .3s cubic-bezier(.2,.8,.2,1)", width: 138, background: template.bg, border: "1px solid " + template.color + "20", borderRadius: 10, overflow: "hidden", zIndex: 1, boxShadow: isHovered ? "0 10px 30px rgba(0,0,0,0.45)" : "0 4px 14px rgba(0,0,0,0.3)" }}>
+                    <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%) scale(" + (isHovered ? 1.06 : 1) + ")", transition: "transform .3s cubic-bezier(.2,.8,.2,1)", width: "90%", maxWidth: 138, background: template.bg, border: "1px solid " + template.color + "20", borderRadius: 10, overflow: "hidden", zIndex: 1, boxShadow: isHovered ? "0 10px 30px rgba(0,0,0,0.45)" : "0 4px 14px rgba(0,0,0,0.3)" }}>
                       {/* Barre de couleur */}
                       <div style={{ height: 4, background: "linear-gradient(90deg," + template.color + "," + template.accent + ")" }} />
                       {/* Contenu simulé */}
@@ -498,7 +498,7 @@ export default function TemplatesPage() {
 
                     {/* Favori (haut droit) */}
                     <button type="button" onClick={(e) => toggleFav(template.id, e)}
-                      style={{ position: "absolute", top: 8, right: 8, width: 28, height: 28, borderRadius: "50%", background: isFav ? "rgba(239,68,68,0.15)" : "rgba(0,0,0,0.4)", border: "1px solid " + (isFav ? "rgba(239,68,68,0.4)" : "rgba(255,255,255,0.1)"), display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.15s", zIndex: 2 }}>
+                      style={{ position: "absolute", top: 8, right: 8, width: isMobile ? 38 : 28, height: isMobile ? 38 : 28, borderRadius: "50%", background: isFav ? "rgba(239,68,68,0.15)" : "rgba(0,0,0,0.4)", border: "1px solid " + (isFav ? "rgba(239,68,68,0.4)" : "rgba(255,255,255,0.1)"), display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.15s", zIndex: 2 }}>
                       <Heart size={12} fill={isFav ? "#EF4444" : "none"} color={isFav ? "#EF4444" : "#888"} />
                     </button>
 
@@ -580,10 +580,10 @@ export default function TemplatesPage() {
                       </button>}
 
                       {/* Utiliser */}
-                      <button type="button" onClick={(e) => { e.stopPropagation(); if (!locked) setNamingFor(template.id) }}
-                        disabled={!!creating || locked}
-                        style={{ flex: isMobile ? 1 : 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: isMobile ? "9px 10px" : "8px 12px", background: locked ? "rgba(255,255,255,0.04)" : isCreating ? "color-mix(in srgb, var(--accent) 20%, transparent)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border: locked ? "1px solid rgba(255,255,255,0.08)" : "none", borderRadius: 9, color: locked ? MUTED : "#080808", fontSize: 11, fontWeight: 700, cursor: locked || creating ? "not-allowed" : "pointer", opacity: creating && !isCreating ? 0.5 : 1, transition: "all 0.15s" }}>
-                        {isCreating ? <><div style={{ width: 10, height: 10, border: "1.5px solid var(--accent)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Création...</> : locked ? <><Lock size={10} /> {PLAN_CONFIG[template.plan].label}</> : <>Utiliser <ArrowRight size={10} /></>}
+                      <button type="button" onClick={(e) => { e.stopPropagation(); if (locked) { router.push("/upgrade"); return } setNamingFor(template.id) }}
+                        disabled={!!creating}
+                        style={{ flex: isMobile ? 1 : 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: isMobile ? "11px 10px" : "8px 12px", background: locked ? "rgba(255,255,255,0.04)" : isCreating ? "color-mix(in srgb, var(--accent) 20%, transparent)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border: locked ? "1px solid rgba(255,255,255,0.08)" : "none", borderRadius: 9, color: locked ? MUTED : "#080808", fontSize: 11, fontWeight: 700, cursor: creating ? "not-allowed" : "pointer", opacity: creating && !isCreating ? 0.5 : 1, transition: "all 0.15s" }}>
+                        {isCreating ? <><div style={{ width: 10, height: 10, border: "1.5px solid var(--accent)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Création...</> : locked ? <><Lock size={10} /> Débloquer</> : <>Utiliser <ArrowRight size={10} /></>}
                       </button>
                     </div>
                   </div>

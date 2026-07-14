@@ -130,7 +130,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div style={{
-      display: "flex", height: "100vh", fontFamily: "DM Sans, sans-serif", overflow: "hidden",
+      display: "flex", height: "100dvh", fontFamily: "DM Sans, sans-serif", overflow: "hidden",
       // Signature QRfolio : socle doré + trame matrice QR (cellules carrées) partagée par toute l'app
       background:
         "radial-gradient(120% 80% at 50% -8%, rgba(201,168,76,0.05), transparent 55%)," +
