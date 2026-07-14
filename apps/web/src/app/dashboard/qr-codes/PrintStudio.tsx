@@ -965,12 +965,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // Selecteur d'objets superposes (critique #10) : liste des elements sous le point courant.
   const [stackPick, setStackPick] = useState<{ id: string; name: string; active: boolean }[] | null>(null)
   const stackRef = useRef<Record<string, fabric.Object>>({})
-  // Sheets QR focalises (#4/#5) : un seul aspect a la fois (couleurs/modules/coins/correction).
-  const [qrSheet, setQrSheet] = useState<"" | "colors" | "modules" | "corners" | "ecc">("")
+  // Sheets QR focalises (#4/#5) : un seul aspect a la fois (couleurs/modules/coins/correction/cadre).
+  const [qrSheet, setQrSheet] = useState<"" | "colors" | "modules" | "corners" | "ecc" | "frame">("")
   // Sheets Texte focalises : police / couleur / taille / effets / alignement.
   const [txtSheet, setTxtSheet] = useState<"" | "font" | "color" | "size" | "effects" | "align">("")
   // Sheets Image focalises : filtres / opacite.
   const [imgSheet, setImgSheet] = useState<"" | "filters" | "opacity">("")
+  // Sheets Forme focalises : couleur / bordure / ombre.
+  const [shapeSheet, setShapeSheet] = useState<"" | "color" | "border" | "shadow">("")
   // Gestes tactiles (#8) : long-press -> dupliquer. Timer + point de depart.
   const lpTimerRef = useRef<number | null>(null)
   const lpStartRef = useRef<{ x: number; y: number } | null>(null)
@@ -2378,7 +2380,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
   // ---- Barre contextuelle mobile (facon Canva) : "que veux-tu faire ?" ------
   // Deselectionner referme le panneau Reglages + le selecteur d'empilement.
-  useEffect(() => { if (!sel) { setRegOpen(false); setStackPick(null) } if (!sel?.isQr) setQrSheet(""); if (!sel?.isText) setTxtSheet(""); if (!sel?.isImage) setImgSheet("") }, [sel])
+  const isShapeSel = !!sel && !sel.isQr && !sel.isText && !sel.isImage && sel.label === null && !sel.isGroupObj && !sel.multi
+  useEffect(() => { if (!sel) { setRegOpen(false); setStackPick(null) } if (!sel?.isQr) setQrSheet(""); if (!sel?.isText) setTxtSheet(""); if (!sel?.isImage) setImgSheet(""); if (!isShapeSel) setShapeSheet("") }, [sel, isShapeSel])
 
   // Selecteur d'objets superposes (#10) : liste les elements sous le centre de la selection.
   const openStackPicker = () => {
@@ -2429,6 +2432,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "effects": return <span style={{ fontSize: 15, lineHeight: 1 }}>✦</span>
       case "filters": return <span style={{ fontSize: 16, lineHeight: 1 }}>◑</span>
       case "opacity": return <span style={{ fontSize: 16, lineHeight: 1 }}>◔</span>
+      case "border": return <span style={{ fontSize: 16, lineHeight: 1 }}>▢</span>
+      case "shadow": return <span style={{ fontSize: 16, lineHeight: 1 }}>◗</span>
       default:       return <span style={{ fontSize: 15, lineHeight: 1 }}>•</span>
     }
   }
@@ -2440,6 +2445,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "modules":  setQrSheet("modules"); break
       case "corners":  setQrSheet("corners"); break
       case "ecc":      setQrSheet("ecc"); break
+      case "frame":    setQrSheet("frame"); break
+      case "shapecolor": setShapeSheet("color"); break
+      case "border":   setShapeSheet("border"); break
+      case "shadow":   setShapeSheet("shadow"); break
       case "filters":    setImgSheet("filters"); break
       case "opacity":    setImgSheet("opacity"); break
       case "font":       setTxtSheet("font"); break
@@ -3898,7 +3907,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
       {/* Sheets QR focalises (#4/#5) : un seul aspect, gros controles, jauge live. */}
       {landscapeMobile && sel?.isQr && qrSheet && (() => {
-        const title = qrSheet === "colors" ? "Couleurs du QR" : qrSheet === "modules" ? "Modules" : qrSheet === "corners" ? "Coins & yeux" : "Correction d'erreur"
+        const title = qrSheet === "colors" ? "Couleurs du QR" : qrSheet === "modules" ? "Modules" : qrSheet === "corners" ? "Coins & yeux" : qrSheet === "frame" ? "Cadre & habillage" : "Correction d'erreur"
         const bigSwatch = (c: string, active: boolean, on: () => void) => (
           <button key={c} type="button" disabled={qrBusy} onClick={on} title={c}
             style={{ width: 34, height: 34, borderRadius: "50%", cursor: "pointer", background: c, border: active ? `3px solid ${G}` : "1px solid rgba(255,255,255,0.25)", padding: 0, opacity: qrBusy ? 0.5 : 1, flexShrink: 0 }} />
@@ -3962,6 +3971,33 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 {(["L", "M", "Q", "H"] as const).map(e => bigChip(e, qrEcc === e, () => applyQrRender({ ecc: e }), e))}
               </div>
               <p style={{ color: "#9B9385", fontSize: 11, margin: "10px 2px 0", lineHeight: 1.5 }}>Plus haut = plus robuste (recommandé H si un logo couvre le centre), mais QR un peu plus dense.</p>
+            </>)}
+
+            {qrSheet === "frame" && (<>
+              <button type="button" onClick={dressQr} style={{ width: "100%", minHeight: 48, borderRadius: 12, border: "none", background: "linear-gradient(180deg,#D9BC6A,#B8923A)", color: "#141417", fontSize: 13.5, fontWeight: 800, cursor: "pointer", marginBottom: 14 }}>🏷️ Habiller en un tap (cadre + « Scannez-moi »)</button>
+              <p className="ps-sec-label">Étiquette</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
+                {["SCANNEZ-MOI", "★ AVIS GOOGLE", "VOIR LE MENU", "INSTAGRAM", "RÉSERVER", "WIFI GRATUIT"].map(l => (
+                  <button key={l} type="button" onClick={() => addQrLabel(l)} style={{ flex: "1 0 30%", minHeight: 44, borderRadius: 10, cursor: "pointer", fontSize: 10.5, fontWeight: 700, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)", color: "#ECE8E0" }}>{l}</button>
+                ))}
+              </div>
+              <p className="ps-sec-label">Cadre</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
+                {([["luxury", "Luxe"], ["corporate", "Corporate"], ["modern", "Moderne"], ["neon", "Néon"]] as const).map(([k, l]) => (
+                  <button key={k} type="button" onClick={() => setQrFrame(k)} style={{ flex: "1 0 22%", minHeight: 46, borderRadius: 10, cursor: "pointer", fontSize: 11, fontWeight: 700, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)", color: "#ECE8E0" }}>{l}</button>
+                ))}
+              </div>
+              <p className="ps-sec-label">Sticker</p>
+              <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+                {([["round", "● Rond"], ["badge", "✸ Badge"], ["square", "▢ Carré"]] as const).map(([k, l]) => (
+                  <button key={k} type="button" onClick={() => setQrSticker(k)} style={{ flex: 1, minHeight: 46, borderRadius: 10, cursor: "pointer", fontSize: 11, fontWeight: 700, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)", color: "#ECE8E0" }}>{l}</button>
+                ))}
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {([["Retirer étiquette", removeQrLabel], ["Retirer cadre", removeQrFrame], ["Retirer sticker", removeQrSticker]] as const).map(([l, fn]) => (
+                  <button key={l} type="button" onClick={fn} style={{ flex: "1 0 30%", minHeight: 40, borderRadius: 10, cursor: "pointer", fontSize: 10, fontWeight: 600, background: "none", border: "1px solid rgba(255,255,255,0.12)", color: "#9B9385" }}>{l}</button>
+                ))}
+              </div>
             </>)}
 
             {qrBusy && <p style={{ color: "#9B9385", fontSize: 11, margin: "10px 0 0" }}>Régénération du QR…</p>}
@@ -4066,9 +4102,61 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         </div>
       )}
 
+      {/* Sheets Forme focalises : couleur / bordure / ombre. */}
+      {landscapeMobile && sel && isShapeSel && shapeSheet && (
+        <div className="ps-msheet" style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 59, background: "#17171B", borderTop: "1px solid rgba(255,255,255,0.09)", borderRadius: "18px 18px 0 0", boxShadow: "0 -14px 44px rgba(0,0,0,0.55)", padding: "10px 14px calc(14px + env(safe-area-inset-bottom))", maxHeight: "74vh", overflowY: "auto", animation: "psSheetUp .26s cubic-bezier(.2,.8,.2,1)" }}>
+          <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.2)", margin: "0 auto 10px" }} />
+          <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
+            <span style={{ color: "#F4F1EA", fontSize: 14, fontWeight: 800 }}>{shapeSheet === "color" ? "Couleur" : shapeSheet === "border" ? "Bordure" : "Ombre"}</span>
+            <button type="button" onClick={() => setShapeSheet("")} aria-label="Fermer" style={{ marginLeft: "auto", width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 9, color: "#F4F1EA", cursor: "pointer" }}><X size={15} /></button>
+          </div>
+
+          {shapeSheet === "color" && (<>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+              {SWATCHES.map(c => (
+                <button key={c} type="button" onClick={() => setFill(c)} title={c}
+                  style={{ width: 34, height: 34, borderRadius: "50%", cursor: "pointer", background: c, border: (sel.fill || "").toUpperCase() === c.toUpperCase() ? `3px solid ${G}` : "1px solid rgba(255,255,255,0.25)", padding: 0, flexShrink: 0 }} />
+              ))}
+            </div>
+            <ColorPicker value={/^#/.test(sel.fill) ? sel.fill : "#C9A84C"} onChange={setFill} onUseColor={c => setRecentColors(r => pushRecent(r, c))} recent={recentColors} brand={SWATCHES} dark />
+            {sel.radius !== null && (
+              <BigSlider label="Coins arrondis" value={sel.radius} min={0} max={120} step={2} resetTo={0} format={v => `${Math.round(v)} px`} dark onChange={setRadius} />
+            )}
+          </>)}
+
+          {shapeSheet === "border" && (<>
+            <button type="button" onClick={() => setBorder(!sel.border)} style={{ width: "100%", minHeight: 48, borderRadius: 12, cursor: "pointer", fontSize: 13, fontWeight: 700, marginBottom: 12, background: sel.border ? "rgba(201,168,76,0.2)" : "rgba(255,255,255,0.06)", border: `1px solid ${sel.border ? G : "rgba(255,255,255,0.14)"}`, color: sel.border ? G : "#ECE8E0" }}>{sel.border ? "Bordure activée ✓" : "Activer la bordure"}</button>
+            {sel.border && (<>
+              <p className="ps-sec-label">Couleur du contour</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+                {SWATCHES.map(c => (
+                  <button key={c} type="button" onClick={() => setBorderColor(c)} title={c}
+                    style={{ width: 32, height: 32, borderRadius: "50%", cursor: "pointer", background: c, border: (sel.strokeColor || "").toUpperCase() === c.toUpperCase() ? `3px solid ${G}` : "1px solid rgba(255,255,255,0.25)", padding: 0, flexShrink: 0 }} />
+                ))}
+              </div>
+              <BigSlider label="Épaisseur" value={sel.strokeWidth} min={1} max={40} step={1} resetTo={4} format={v => `${Math.round(v)} px`} dark onChange={setBorderWidth} />
+            </>)}
+          </>)}
+
+          {shapeSheet === "shadow" && (<>
+            <p className="ps-sec-label">Style</p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+              {([["off", "Aucune"], ["soft", "Douce"], ["medium", "Moyenne"], ["strong", "Forte"], ["floating", "Flottante"], ["luxury", "Luxe"]] as const).map(([k, l]) => (
+                <button key={k} type="button" onClick={() => setShadowPreset(k)} style={{ flex: "1 0 28%", minHeight: 48, borderRadius: 12, cursor: "pointer", fontSize: 12, fontWeight: 700, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)", color: "#ECE8E0" }}>{l}</button>
+              ))}
+            </div>
+            {sel.shadow && (<>
+              <BigSlider label="Flou" value={sel.shadowBlur} min={0} max={60} step={1} resetTo={12} format={v => `${Math.round(v)} px`} dark onChange={setShadowBlur} />
+              <BigSlider label="Décalage X" value={sel.shadowX} min={-30} max={30} step={1} resetTo={0} format={v => `${Math.round(v)} px`} dark onChange={v => setShadowOffset("x", v)} />
+              <BigSlider label="Décalage Y" value={sel.shadowY} min={-30} max={30} step={1} resetTo={6} format={v => `${Math.round(v)} px`} dark onChange={v => setShadowOffset("y", v)} />
+            </>)}
+          </>)}
+        </div>
+      )}
+
       {/* Barre contextuelle mobile (facon Canva) : un objet selectionne -> ses actions, gros, en bas.
           Le canvas reste visible ; le panneau complet ne s'ouvre que via "Modifier". */}
-      {landscapeMobile && sel && !regOpen && !qrSheet && !txtSheet && !imgSheet && (() => {
+      {landscapeMobile && sel && !regOpen && !qrSheet && !txtSheet && !imgSheet && !shapeSheet && (() => {
         const kind = selKind(sel)
         const tools = mobileContextTools(kind)
         return (

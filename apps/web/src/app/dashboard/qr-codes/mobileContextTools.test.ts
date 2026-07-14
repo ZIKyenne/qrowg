@@ -51,10 +51,15 @@ describe("mobileContextTools — invariants", () => {
 })
 
 describe("mobileContextTools — specifiques par type", () => {
-  it("types generiques (bouton/groupe/forme) commencent par 'settings'", () => {
-    for (const k of ["button", "group", "shape"] as SelKind[]) {
+  it("types generiques (bouton/groupe) commencent par 'settings'", () => {
+    for (const k of ["button", "group"] as SelKind[]) {
       expect(mobileContextTools(k)[0].id).toBe("settings")
     }
+  })
+  it("forme expose des intentions directes (couleur/bordure/ombre)", () => {
+    const ids = mobileContextTools("shape").map(t => t.id)
+    expect(ids).not.toContain("settings")
+    for (const id of ["shapecolor", "border", "shadow"]) expect(ids).toContain(id)
   })
   it("image expose des intentions directes (filtres/opacite)", () => {
     const ids = mobileContextTools("image").map(t => t.id)
@@ -84,8 +89,8 @@ describe("mobileContextTools — specifiques par type", () => {
     }
     expect(mobileContextTools("multi").some(t => t.id === "stack")).toBe(false)
   })
-  it("qr propose 'Habiller'", () => {
-    expect(mobileContextTools("qr").some(t => t.id === "dress")).toBe(true)
+  it("qr propose 'Cadre'", () => {
+    expect(mobileContextTools("qr").some(t => t.id === "frame")).toBe(true)
   })
   it("texte propose une intention Taille", () => {
     expect(mobileContextTools("text").some(t => t.id === "textsize")).toBe(true)

@@ -50,7 +50,7 @@ export function mobileContextTools(kind: SelKind): CtxTool[] {
         { id: "modules", label: "Modules", icon: "modules" },
         { id: "corners", label: "Coins", icon: "corners" },
         { id: "ecc", label: "Correction", icon: "ecc" },
-        { id: "dress", label: "Habiller", icon: "frame" },
+        { id: "frame", label: "Cadre", icon: "frame" },
         STACK, DUP, DELETE,
       ]
     case "text":
@@ -75,8 +75,16 @@ export function mobileContextTools(kind: SelKind): CtxTool[] {
       return [EDIT, { id: "ungroup", label: "Dégrouper", icon: "ungroup" }, ...TAIL]
     case "multi":
       return [{ id: "align", label: "Aligner", icon: "align" }, { id: "group", label: "Grouper", icon: "group" }, DUP, DELETE]
-    case "button":
     case "shape":
+      // Intentions forme directes -> sheets focalises (Couleur/Bordure/Ombre) + Pivoter.
+      return [
+        { id: "shapecolor", label: "Couleur", icon: "colors" },
+        { id: "border", label: "Bordure", icon: "border" },
+        { id: "shadow", label: "Ombre", icon: "shadow" },
+        ROTATE,
+        STACK, DUP, DELETE,
+      ]
+    case "button":
     default:
       return [EDIT, ...TAIL]
   }
