@@ -978,6 +978,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [btnSheet, setBtnSheet] = useState<"" | "text" | "color">("")
   // Sheet "Plus" : actions secondaires de l'objet (empilement/ordre/verrou/supprimer...).
   const [moreSel, setMoreSel] = useState(false)
+  // Toast (avec Annuler) : feedback des actions destructives (#15 audit).
+  const [toast, setToast] = useState<string | null>(null)
+  const toastTimer = useRef<number | null>(null)
+  const showToast = (msg: string) => {
+    setToast(msg)
+    if (toastTimer.current) window.clearTimeout(toastTimer.current)
+    toastTimer.current = window.setTimeout(() => setToast(null), 4500)
+  }
   // Gestes tactiles (#8) : long-press -> dupliquer. Timer + point de depart.
   const lpTimerRef = useRef<number | null>(null)
   const lpStartRef = useRef<{ x: number; y: number } | null>(null)
@@ -2261,6 +2269,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       }
       case "del":
         fc.remove(o); fc.discardActiveObject(); setSel(null); fc.requestRenderAll()
+        showToast("Élément supprimé") // toast avec Annuler
         return
     }
     // garder les guides au sommet
@@ -4261,6 +4270,22 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
       {/* Barre contextuelle mobile (facon Canva) : un objet selectionne -> ses actions, gros, en bas.
           Le canvas reste visible ; le panneau complet ne s'ouvre que via "Modifier". */}
+      {/* Toast avec Annuler (feedback destructif) */}
+      {toast && (
+        <div style={{ position: "fixed", left: 16, right: 16, zIndex: 80,
+          bottom: landscapeMobile ? "calc(90px + env(safe-area-inset-bottom))" : 24,
+          display: "flex", alignItems: "center", gap: 12, padding: "11px 12px 11px 15px",
+          background: "#26262B", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 13,
+          boxShadow: "0 12px 34px rgba(0,0,0,0.55)", color: "#F4F1EA", fontSize: 13.5, fontWeight: 600,
+          maxWidth: 460, margin: "0 auto", animation: "psBar .26s cubic-bezier(.2,.8,.2,1)" }}>
+          <span style={{ flex: 1 }}>{toast}</span>
+          <button type="button" onClick={() => { undo(); setToast(null) }}
+            style={{ minHeight: 40, padding: "0 16px", borderRadius: 10, border: "none", background: "linear-gradient(180deg,#D9BC6A,#B8923A)", color: "#141417", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Annuler</button>
+          <button type="button" onClick={() => setToast(null)} aria-label="Fermer"
+            style={{ width: 34, height: 34, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 9, color: "#F4F1EA", cursor: "pointer" }}><X size={15} /></button>
+        </div>
+      )}
+
       {/* Sheet "Plus" : actions secondaires de l'objet selectionne (barre courte -> le reste ici). */}
       {landscapeMobile && sel && moreSel && (() => {
         const act = (fn: () => void) => () => { fn(); setMoreSel(false) }
@@ -4296,31 +4321,35 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         const kind = selKind(sel)
         const tools = mobileContextTools(kind)
         return (
-          <div className="ps-ctxbar" style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 41, display: "flex", alignItems: "stretch", gap: 6,
-            padding: "10px 10px calc(10px + env(safe-area-inset-bottom))", background: "#141417", borderTop: "1px solid rgba(255,255,255,0.09)",
-            boxShadow: "0 -12px 34px rgba(0,0,0,0.45)", overflowX: "auto", overflowY: "hidden", WebkitOverflowScrolling: "touch",
-            touchAction: "pan-x", overscrollBehaviorX: "contain",
-            animation: "psBar .3s cubic-bezier(.2,.8,.2,1)" }}>
-            <span style={{ display: "flex", flexDirection: "column", justifyContent: "center", paddingRight: 9, marginRight: 1, borderRight: "1px solid rgba(255,255,255,0.1)", flexShrink: 0 }}>
-              <span style={{ color: "#C9A84C", fontSize: 12, fontWeight: 800, whiteSpace: "nowrap" }}>{KIND_LABEL[kind]}</span>
-              <span style={{ color: "rgba(244,241,234,0.45)", fontSize: 8.5, letterSpacing: 0.4 }}>SÉLECTION</span>
-            </span>
-            {tools.map(t => {
-              const primary = t.id === "settings"
-              const danger = t.id === "delete"
-              return (
-                <button key={t.id} type="button" onClick={() => onCtx(t.id)}
-                  style={{ flexShrink: 0, minWidth: 58, minHeight: 52, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, padding: "6px 10px",
-                    background: primary ? "linear-gradient(180deg,#D9BC6A,#B8923A)" : "rgba(255,255,255,0.06)",
-                    border: primary ? "none" : "1px solid rgba(255,255,255,0.1)", borderRadius: 13,
-                    color: primary ? "#141417" : danger ? "#FF8B8B" : "#F4F1EA", fontSize: 10.5, fontWeight: 700, cursor: "pointer" }}>
-                  <span style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 20 }}>{ctxIcon(t.icon)}</span>
-                  {t.label}
-                </button>
-              )
-            })}
-            {/* Espace final : le dernier outil ne colle pas au bord (zone de geste systeme). */}
-            <span aria-hidden style={{ flex: "0 0 20px" }} />
+          <div className="ps-ctxbar" style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 41,
+            padding: "10px 0 calc(10px + env(safe-area-inset-bottom))", background: "#141417", borderTop: "1px solid rgba(255,255,255,0.09)",
+            boxShadow: "0 -12px 34px rgba(0,0,0,0.45)", animation: "psBar .3s cubic-bezier(.2,.8,.2,1)" }}>
+            {/* Rangee scrollante (scroll horizontal natif) */}
+            <div style={{ display: "flex", alignItems: "stretch", gap: 6, padding: "0 10px", overflowX: "auto", overflowY: "hidden",
+              WebkitOverflowScrolling: "touch", touchAction: "pan-x", overscrollBehaviorX: "contain", scrollbarWidth: "none" as any }}>
+              <span style={{ display: "flex", flexDirection: "column", justifyContent: "center", paddingRight: 9, marginRight: 1, borderRight: "1px solid rgba(255,255,255,0.1)", flexShrink: 0 }}>
+                <span style={{ color: "#C9A84C", fontSize: 12, fontWeight: 800, whiteSpace: "nowrap" }}>{KIND_LABEL[kind]}</span>
+                <span style={{ color: "rgba(244,241,234,0.45)", fontSize: 8.5, letterSpacing: 0.4 }}>SÉLECTION</span>
+              </span>
+              {tools.map(t => {
+                const primary = t.id === "settings"
+                const danger = t.id === "delete"
+                return (
+                  <button key={t.id} type="button" onClick={() => onCtx(t.id)}
+                    style={{ flexShrink: 0, minWidth: 58, minHeight: 52, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, padding: "6px 10px",
+                      background: primary ? "linear-gradient(180deg,#D9BC6A,#B8923A)" : "rgba(255,255,255,0.06)",
+                      border: primary ? "none" : "1px solid rgba(255,255,255,0.1)", borderRadius: 13,
+                      color: primary ? "#141417" : danger ? "#FF8B8B" : "#F4F1EA", fontSize: 10.5, fontWeight: 700, cursor: "pointer" }}>
+                    <span style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 20 }}>{ctxIcon(t.icon)}</span>
+                    {t.label}
+                  </button>
+                )
+              })}
+              {/* Espace final : le dernier outil ne colle pas au bord (zone de geste systeme). */}
+              <span aria-hidden style={{ flex: "0 0 20px" }} />
+            </div>
+            {/* Degrade droit : indique qu'il reste des outils a droite (defilement). */}
+            {tools.length > 4 && <span aria-hidden style={{ position: "absolute", right: 0, top: 1, bottom: "calc(env(safe-area-inset-bottom))", width: 30, background: "linear-gradient(90deg, rgba(20,20,23,0), #141417 72%)", pointerEvents: "none" }} />}
           </div>
         )
       })()}
