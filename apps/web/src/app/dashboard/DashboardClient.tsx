@@ -167,7 +167,7 @@ export default function DashboardClient() {
   const maxToday = Math.max(1, ...weekViews)
 
   return (
-    <div style={{ minHeight: "100vh", background: "radial-gradient(1200px 600px at 70% -10%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%), #080808", padding: "30px 28px 48px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
+    <div style={{ minHeight: "100dvh", background: "radial-gradient(1200px 600px at 70% -10%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%), #080808", padding: isMobile ? "22px 16px 40px" : "30px 28px 48px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
       <Particles />
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}
@@ -182,6 +182,8 @@ export default function DashboardClient() {
         .dz-cta{transition:transform .18s, box-shadow .18s}
         .dz-cta:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 10px 30px color-mix(in srgb, var(--accent) 40%, transparent)!important}
         .dz-cta:active{transform:translateY(0) scale(.98)}
+        /* Mobile : la grille "Pages recentes + Raccourcis" s'empile (au lieu de 2 colonnes serrees) */
+        @media (max-width: 760px){ .dash-2col{ grid-template-columns:1fr !important; } }
       `}</style>
 
       {pageToDelete && (
