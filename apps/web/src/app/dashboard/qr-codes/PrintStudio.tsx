@@ -3829,7 +3829,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         /* Bottom-sheets gauche (Modeles/Bibliotheque/Photos/Composants) : la zone de contenu
            DOIT defiler. Bug flexbox classique : un enfant flex:1 avec overflow ne defile
            pas tant qu'il n'a pas min-height:0 (sinon il deborde sous la hauteur bornee 62vh). */
-        .ps-root.ps-landscape .ps-fly:not(.ps-fly-right) .qr-scroll { min-height: 0 !important; -webkit-overflow-scrolling: touch; }
+        .ps-root.ps-landscape .ps-fly:not(.ps-fly-right) .qr-scroll { min-height: 0 !important; overflow-y: auto !important; touch-action: pan-y; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
+        /* Sheets focalises + Reglages + menu ... : contenu scrollable au doigt (pan-y), sans fuite vers le fond */
+        .ps-root.ps-landscape .ps-fly-right.ps-sheet, .ps-msheet { touch-action: pan-y; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
       `}</style>
       <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} style={{ display: "none" }} />
       <input ref={replaceRef} type="file" accept="image/*" onChange={onReplaceImage} style={{ display: "none" }} />
@@ -4258,8 +4260,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         const tools = mobileContextTools(kind)
         return (
           <div className="ps-ctxbar" style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 41, display: "flex", alignItems: "stretch", gap: 6,
-            padding: "8px 10px calc(8px + env(safe-area-inset-bottom))", background: "#141417", borderTop: "1px solid rgba(255,255,255,0.09)",
+            padding: "10px 10px calc(10px + env(safe-area-inset-bottom))", background: "#141417", borderTop: "1px solid rgba(255,255,255,0.09)",
             boxShadow: "0 -12px 34px rgba(0,0,0,0.45)", overflowX: "auto", overflowY: "hidden", WebkitOverflowScrolling: "touch",
+            touchAction: "pan-x", overscrollBehaviorX: "contain",
             animation: "psBar .3s cubic-bezier(.2,.8,.2,1)" }}>
             <span style={{ display: "flex", flexDirection: "column", justifyContent: "center", paddingRight: 9, marginRight: 1, borderRight: "1px solid rgba(255,255,255,0.1)", flexShrink: 0 }}>
               <span style={{ color: "#C9A84C", fontSize: 12, fontWeight: 800, whiteSpace: "nowrap" }}>{KIND_LABEL[kind]}</span>
@@ -4279,6 +4282,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 </button>
               )
             })}
+            {/* Espace final : le dernier outil ne colle pas au bord (zone de geste systeme). */}
+            <span aria-hidden style={{ flex: "0 0 20px" }} />
           </div>
         )
       })()}

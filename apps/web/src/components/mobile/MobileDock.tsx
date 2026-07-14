@@ -22,7 +22,7 @@ export default function MobileDock({ tools, active, onSelect }: {
       padding: `${T.space.sm}px 6px calc(${T.space.sm}px + env(safe-area-inset-bottom))`,
       zIndex: T.z.dock,
     }}>
-      <div style={{ display: "flex", gap: 2, overflowX: "auto", scrollbarWidth: "none" as any }}>
+      <div style={{ display: "flex", gap: 2, overflowX: "auto", overflowY: "hidden", scrollbarWidth: "none" as any, touchAction: "pan-x", overscrollBehaviorX: "contain", WebkitOverflowScrolling: "touch" }}>
         {tools.map(t => {
           const on = active === t.id
           return (
@@ -42,6 +42,7 @@ export default function MobileDock({ tools, active, onSelect }: {
             </button>
           )
         })}
+        <span aria-hidden style={{ flex: "0 0 20px" }} />
       </div>
     </div>
   )
