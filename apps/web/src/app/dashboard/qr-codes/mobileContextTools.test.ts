@@ -51,10 +51,16 @@ describe("mobileContextTools — invariants", () => {
 })
 
 describe("mobileContextTools — specifiques par type", () => {
-  it("types generiques (image/bouton/groupe/forme) commencent par 'settings'", () => {
-    for (const k of ["image", "button", "group", "shape"] as SelKind[]) {
+  it("types generiques (bouton/groupe/forme) commencent par 'settings'", () => {
+    for (const k of ["button", "group", "shape"] as SelKind[]) {
       expect(mobileContextTools(k)[0].id).toBe("settings")
     }
+  })
+  it("image expose des intentions directes (filtres/opacite)", () => {
+    const ids = mobileContextTools("image").map(t => t.id)
+    expect(ids).not.toContain("settings")
+    expect(ids).toContain("filters")
+    expect(ids).toContain("opacity")
   })
   it("texte expose des intentions directes (police/couleur/taille/effets/aligner)", () => {
     const ids = mobileContextTools("text").map(t => t.id)
@@ -84,10 +90,10 @@ describe("mobileContextTools — specifiques par type", () => {
   it("texte propose une intention Taille", () => {
     expect(mobileContextTools("text").some(t => t.id === "textsize")).toBe(true)
   })
-  it("image propose l'ordre devant/derriere", () => {
+  it("image propose Filtres + Opacité", () => {
     const ids = mobileContextTools("image").map(t => t.id)
-    expect(ids).toContain("front")
-    expect(ids).toContain("back")
+    expect(ids).toContain("filters")
+    expect(ids).toContain("opacity")
   })
   it("groupe propose 'Dégrouper'", () => {
     expect(mobileContextTools("group").some(t => t.id === "ungroup")).toBe(true)

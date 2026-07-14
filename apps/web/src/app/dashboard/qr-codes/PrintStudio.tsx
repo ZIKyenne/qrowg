@@ -969,6 +969,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [qrSheet, setQrSheet] = useState<"" | "colors" | "modules" | "corners" | "ecc">("")
   // Sheets Texte focalises : police / couleur / taille / effets / alignement.
   const [txtSheet, setTxtSheet] = useState<"" | "font" | "color" | "size" | "effects" | "align">("")
+  // Sheets Image focalises : filtres / opacite.
+  const [imgSheet, setImgSheet] = useState<"" | "filters" | "opacity">("")
   // Gestes tactiles (#8) : long-press -> dupliquer. Timer + point de depart.
   const lpTimerRef = useRef<number | null>(null)
   const lpStartRef = useRef<{ x: number; y: number } | null>(null)
@@ -2376,7 +2378,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
   // ---- Barre contextuelle mobile (facon Canva) : "que veux-tu faire ?" ------
   // Deselectionner referme le panneau Reglages + le selecteur d'empilement.
-  useEffect(() => { if (!sel) { setRegOpen(false); setStackPick(null) } if (!sel?.isQr) setQrSheet(""); if (!sel?.isText) setTxtSheet("") }, [sel])
+  useEffect(() => { if (!sel) { setRegOpen(false); setStackPick(null) } if (!sel?.isQr) setQrSheet(""); if (!sel?.isText) setTxtSheet(""); if (!sel?.isImage) setImgSheet("") }, [sel])
 
   // Selecteur d'objets superposes (#10) : liste les elements sous le centre de la selection.
   const openStackPicker = () => {
@@ -2425,6 +2427,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "font":   return <span style={{ fontSize: 15, fontWeight: 800, lineHeight: 1, fontFamily: "Georgia, serif" }}>Aa</span>
       case "size":   return <span style={{ fontSize: 15, fontWeight: 800, lineHeight: 1 }}>T↕</span>
       case "effects": return <span style={{ fontSize: 15, lineHeight: 1 }}>✦</span>
+      case "filters": return <span style={{ fontSize: 16, lineHeight: 1 }}>◑</span>
+      case "opacity": return <span style={{ fontSize: 16, lineHeight: 1 }}>◔</span>
       default:       return <span style={{ fontSize: 15, lineHeight: 1 }}>•</span>
     }
   }
@@ -2436,6 +2440,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "modules":  setQrSheet("modules"); break
       case "corners":  setQrSheet("corners"); break
       case "ecc":      setQrSheet("ecc"); break
+      case "filters":    setImgSheet("filters"); break
+      case "opacity":    setImgSheet("opacity"); break
       case "font":       setTxtSheet("font"); break
       case "textcolor":  setTxtSheet("color"); break
       case "textsize":   setTxtSheet("size"); break
@@ -4037,7 +4043,32 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
       {/* Barre contextuelle mobile (facon Canva) : un objet selectionne -> ses actions, gros, en bas.
           Le canvas reste visible ; le panneau complet ne s'ouvre que via "Modifier". */}
-      {landscapeMobile && sel && !regOpen && !qrSheet && !txtSheet && (() => {
+      {/* Sheets Image focalises : filtres / opacite. */}
+      {landscapeMobile && sel?.isImage && imgSheet && (
+        <div className="ps-msheet" style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 59, background: "#17171B", borderTop: "1px solid rgba(255,255,255,0.09)", borderRadius: "18px 18px 0 0", boxShadow: "0 -14px 44px rgba(0,0,0,0.55)", padding: "10px 14px calc(14px + env(safe-area-inset-bottom))", maxHeight: "72vh", overflowY: "auto", animation: "psSheetUp .26s cubic-bezier(.2,.8,.2,1)" }}>
+          <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.2)", margin: "0 auto 10px" }} />
+          <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
+            <span style={{ color: "#F4F1EA", fontSize: 14, fontWeight: 800 }}>{imgSheet === "filters" ? "Filtres" : "Opacité"}</span>
+            <button type="button" onClick={() => setImgSheet("")} aria-label="Fermer" style={{ marginLeft: "auto", width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 9, color: "#F4F1EA", cursor: "pointer" }}><X size={15} /></button>
+          </div>
+          {imgSheet === "filters" && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {([["none", "Aucun"], ["dark", "Foncé"], ["gray", "N&B"], ["vintage", "Vintage"], ["luxe", "Luxe"], ["blur", "Flou"], ["duo", "Teinte"]] as const).map(([k, l]) => (
+                <button key={k} type="button" onClick={() => toggleFilter(k)}
+                  style={{ flex: "1 0 28%", minHeight: 52, borderRadius: 12, cursor: "pointer", fontSize: 12.5, fontWeight: 700, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)", color: "#ECE8E0" }}>{l}</button>
+              ))}
+            </div>
+          )}
+          {imgSheet === "opacity" && (
+            <BigSlider label="Opacité" value={sel.opacity} min={0} max={1} step={0.05} resetTo={1} format={v => `${Math.round(v * 100)} %`} dark
+              onChange={v => mutate(o => o.set("opacity", v))} />
+          )}
+        </div>
+      )}
+
+      {/* Barre contextuelle mobile (facon Canva) : un objet selectionne -> ses actions, gros, en bas.
+          Le canvas reste visible ; le panneau complet ne s'ouvre que via "Modifier". */}
+      {landscapeMobile && sel && !regOpen && !qrSheet && !txtSheet && !imgSheet && (() => {
         const kind = selKind(sel)
         const tools = mobileContextTools(kind)
         return (

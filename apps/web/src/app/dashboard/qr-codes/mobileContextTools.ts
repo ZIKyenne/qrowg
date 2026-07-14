@@ -64,7 +64,13 @@ export function mobileContextTools(kind: SelKind): CtxTool[] {
         STACK, DUP, DELETE,
       ]
     case "image":
-      return [EDIT, { id: "front", label: "Devant", icon: "up" }, { id: "back", label: "Derrière", icon: "down" }, ...TAIL]
+      // Intentions image directes -> sheets focalises (Filtres/Opacite) + Pivoter direct.
+      return [
+        { id: "filters", label: "Filtres", icon: "filters" },
+        { id: "opacity", label: "Opacité", icon: "opacity" },
+        ROTATE,
+        STACK, DUP, DELETE,
+      ]
     case "group":
       return [EDIT, { id: "ungroup", label: "Dégrouper", icon: "ungroup" }, ...TAIL]
     case "multi":
