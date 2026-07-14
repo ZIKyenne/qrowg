@@ -1072,7 +1072,7 @@ export default function ProfilePage() {
 
   // -- RENDER -------------------------------------------------------------------
   return (
-    <div style={{ minHeight: "100vh", background: "transparent", fontFamily: "DM Sans, sans-serif", position: "relative", isolation: "isolate" }}>
+    <div style={{ minHeight: "100dvh", background: "transparent", fontFamily: "DM Sans, sans-serif", position: "relative", isolation: "isolate" }}>
       <Particles behind />
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}
@@ -1110,7 +1110,7 @@ export default function ProfilePage() {
 
 
       {/* ====================== HERO — centre de contrôle ====================== */}
-      <div style={{ position: "relative", overflow: "hidden", padding: "30px 28px 20px" }}>
+      <div className="rpad" style={{ position: "relative", overflow: "hidden", padding: "30px 28px 20px" }}>
         {/* Couches de fond animées (profondeur : mesh + glow à la couleur d'accent).
             Masque vertical : les halos s'estompent vers le haut et le bas pour
             éviter toute arête nette (démarcation) à la limite du hero. */}
@@ -1242,7 +1242,7 @@ export default function ProfilePage() {
       </div>
 
       {/* -- Onglets profil ------------------------------------------------------ */}
-      <div className="qr-scroll" style={{ maxWidth: 1100, margin: "0 auto", padding: "4px 28px 0", display: "flex", gap: 6, overflowX: "auto" }}>
+      <div className="qr-scroll rpad" style={{ maxWidth: 1100, margin: "0 auto", padding: "4px 28px 0", display: "flex", gap: 6, overflowX: "auto" }}>
         {([
           ["identite", "Identité", User],
           ["abonnement", "Abonnement", CreditCard],
