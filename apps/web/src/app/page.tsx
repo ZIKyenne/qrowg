@@ -1407,14 +1407,14 @@ function Navbar() {
         @keyframes slideMenu{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
         @media(max-width:900px){.dNav{display:none !important;}.brg{display:flex !important;}}
         @media(min-width:901px){.brg{display:none !important;}#mobileMenu{display:none !important;}}
-        @media(max-width:640px){.navWrap{padding:0 20px !important;}}
+        @media(max-width:640px){.navWrap{padding:env(safe-area-inset-top) 20px 0 !important;}}
         @media(prefers-reduced-motion:reduce){.nl::after{transition:none;}}
       `}</style>
       <nav aria-label="Navigation principale" className="navWrap" style={{
         position:"fixed",top:0,left:0,right:0,zIndex:200,
         display:"flex",alignItems:"center",justifyContent:"space-between",
-        padding:"0 48px",height:68,
-        background:scrolled?"rgba(8,8,8,0.93)":"rgba(8,8,8,0.65)",
+        padding:"env(safe-area-inset-top) 48px 0",height:"calc(68px + env(safe-area-inset-top))",
+        background:scrolled?"rgba(8,8,8,0.97)":"rgba(8,8,8,0.9)",
         backdropFilter:"blur(28px)",WebkitBackdropFilter:"blur(28px)",
         borderBottom:scrolled?"1px solid rgba(201,168,76,0.2)":"1px solid rgba(201,168,76,0.07)",
         boxShadow:scrolled?"0 4px 32px rgba(0,0,0,0.5)":"none",
@@ -1465,7 +1465,7 @@ function Navbar() {
       </nav>
       {menuOpen&&(
         <div id="mobileMenu" role="dialog" aria-label="Menu mobile" style={{
-          position:"fixed",top:68,left:0,right:0,bottom:0,zIndex:199,
+          position:"fixed",top:"calc(68px + env(safe-area-inset-top))",left:0,right:0,bottom:0,zIndex:199,
           background:"rgba(8,8,8,0.97)",backdropFilter:"blur(20px)",
           padding:"32px",display:"flex",flexDirection:"column",
           animation:"slideMenu 0.25s ease",overflowY:"auto",
