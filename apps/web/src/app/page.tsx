@@ -1494,11 +1494,9 @@ function Navbar() {
 
 // ── How it works ──────────────────────────────────────────────────────────────
 const HOW_STEPS = [
-  {icon:"🎨",title:"Choisissez un modèle",   desc:"Un modèle adapté à votre métier, conçu pour convertir."},
-  {icon:"✏️", title:"Personnalisez votre page", desc:"Vos infos, vos liens, vos photos — sans aucun code."},
-  {icon:"📱",title:"Générez votre QR code",  desc:"Généré automatiquement, modifiable sans le réimprimer."},
-  {icon:"🚀",title:"Partagez partout",       desc:"Cartes, réseaux, e-mails, en présentiel — un seul QR."},
-  {icon:"📊",title:"Analysez les résultats", desc:"Qui scanne, quand et depuis quel appareil, en temps réel."},
+  {icon:"🎨",title:"Choisissez un modèle",     desc:"Un modèle adapté à votre métier, prêt à personnaliser."},
+  {icon:"✏️", title:"Personnalisez votre page", desc:"Vos infos, liens, photos et votre QR code — sans coder."},
+  {icon:"🚀",title:"Partagez et suivez",       desc:"Un seul QR à diffuser partout, chaque scan mesuré en temps réel."},
 ] as const
 function HowItWorks() {
   const {ref,visible}=useInView(0.08)
@@ -1506,11 +1504,11 @@ function HowItWorks() {
     <section id="how" ref={ref} aria-labelledby="how-title"
       style={{padding:"100px 48px",position:"relative",zIndex:1}}>
       <style>{`
-        .hsteps{display:grid;grid-template-columns:repeat(5,1fr);gap:20px;position:relative;}
+        .hsteps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;position:relative;}
         .hstep{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;}
         .hbadge{transition:transform 0.3s cubic-bezier(.34,1.56,.64,1),box-shadow 0.3s ease,border-color 0.3s ease;}
         .hstep:hover .hbadge{transform:translateY(-6px) scale(1.05);border-color:rgba(201,168,76,0.6)!important;box-shadow:0 16px 38px rgba(201,168,76,0.3),0 0 0 7px rgba(8,8,8,0.92)!important;}
-        .hline{position:absolute;top:31px;left:calc(10% + 34px);right:calc(10% + 34px);height:2px;
+        .hline{position:absolute;top:31px;left:calc(16.66% + 36px);right:calc(16.66% + 36px);height:2px;
           background:linear-gradient(90deg,transparent,rgba(201,168,76,0.55) 6%,rgba(201,168,76,0.55) 94%,transparent);
           box-shadow:0 0 14px rgba(201,168,76,0.3);pointer-events:none;}
         .hline-v{display:none;}
