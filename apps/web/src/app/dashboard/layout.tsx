@@ -301,13 +301,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Sheet "Créer" (bouton central de la barre mobile) */}
       {isMobile && !hideMobileNav && createOpen && (
         <div onClick={() => setCreateOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(3px)", display: "flex", alignItems: "flex-end" }}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", background: "#141210", borderTopLeftRadius: 22, borderTopRightRadius: 22, border: "1px solid rgba(201,168,76,0.16)", borderBottom: "none", padding: "10px 14px calc(16px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)", animation: "sheetUp .24s cubic-bezier(.2,.8,.2,1)" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", background: "#141210", borderTopLeftRadius: 22, borderTopRightRadius: 22, border: `1px solid color-mix(in srgb, ${G} 16%, transparent)`, borderBottom: "none", padding: "10px 14px calc(16px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)", animation: "sheetUp .24s cubic-bezier(.2,.8,.2,1)" }}>
             <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 12px" }} />
             <p style={{ margin: "0 4px 10px", color: "#F5F0E8", fontSize: 15, fontWeight: 800 }}>Créer</p>
             {CREATE_ACTIONS.map(({ href, icon: Icon, label, sub }, i) => (
               <Link key={i} href={href} onClick={() => setCreateOpen(false)}
                 style={{ display: "flex", alignItems: "center", gap: 14, padding: "13px 10px", textDecoration: "none", borderTop: i ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-                <span style={{ width: 42, height: 42, flexShrink: 0, borderRadius: 12, background: "rgba(201,168,76,0.14)", border: "1px solid rgba(201,168,76,0.28)", display: "flex", alignItems: "center", justifyContent: "center", color: G }}><Icon size={20} /></span>
+                <span style={{ width: 42, height: 42, flexShrink: 0, borderRadius: 12, background: `color-mix(in srgb, ${G} 14%, transparent)`, border: `1px solid color-mix(in srgb, ${G} 28%, transparent)`, display: "flex", alignItems: "center", justifyContent: "center", color: G }}><Icon size={20} /></span>
                 <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   <span style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700 }}>{label}</span>
                   <span style={{ color: MUTED, fontSize: 12.5 }}>{sub}</span>
@@ -336,7 +336,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               return (
                 <button key="create" type="button" onClick={() => setCreateOpen(true)} aria-label="Créer"
                   style={{ flex: 1, minWidth: 48, minHeight: 48, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-                  <span style={{ width: 46, height: 46, marginTop: -14, borderRadius: "50%", background: `linear-gradient(180deg,#D9BC6A,${G})`, display: "flex", alignItems: "center", justifyContent: "center", color: "#141210", boxShadow: "0 6px 18px rgba(201,168,76,0.5)" }}><Icon size={24} strokeWidth={2.6} /></span>
+                  <span style={{ width: 46, height: 46, marginTop: -14, borderRadius: "50%", background: `linear-gradient(180deg, color-mix(in srgb, ${G} 82%, #fff), ${G})`, display: "flex", alignItems: "center", justifyContent: "center", color: "#141210", boxShadow: `0 6px 18px color-mix(in srgb, ${G} 50%, transparent)` }}><Icon size={24} strokeWidth={2.6} /></span>
                   <span style={{ fontSize: 11, fontWeight: 700, color: G }}>{item.label}</span>
                 </button>
               )
