@@ -3826,6 +3826,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           z-index: 58 !important; animation: psSheetUp .26s cubic-bezier(.2,.8,.2,1) !important;
           padding-bottom: env(safe-area-inset-bottom) !important;
         }
+        /* Bottom-sheets gauche (Modeles/Bibliotheque/Photos/Composants) : la zone de contenu
+           DOIT defiler. Bug flexbox classique : un enfant flex:1 avec overflow ne defile
+           pas tant qu'il n'a pas min-height:0 (sinon il deborde sous la hauteur bornee 62vh). */
+        .ps-root.ps-landscape .ps-fly:not(.ps-fly-right) .qr-scroll { min-height: 0 !important; -webkit-overflow-scrolling: touch; }
       `}</style>
       <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} style={{ display: "none" }} />
       <input ref={replaceRef} type="file" accept="image/*" onChange={onReplaceImage} style={{ display: "none" }} />
