@@ -993,6 +993,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const snapOnRef = useRef(false)
   // Immersion (#18) : reference stable vers onClose pour l'effet monte une seule fois.
   const onCloseRef = useRef(onClose); onCloseRef.current = onClose
+  const mobileRef = useRef(false) // etat "mobile" courant (evite une closure perimee dans les handlers Fabric)
   // Bouton Retour : etat courant des overlays + fonction de fermeture (refs stables pour l'effet monte une fois).
   const overlayOpenRef = useRef(false)
   const closeOverlaysRef = useRef<() => void>(() => {})
@@ -1307,7 +1308,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     })
 
     // Historique : capter ajout / suppression / modification (drag, scale, rotate)
-    fc.on("object:added", () => { pushHistory(); setLayersVer(v => v + 1) })
+    fc.on("object:added", (e) => {
+      pushHistory(); setLayersVer(v => v + 1)
+      // Ajout par l'utilisateur (hors chargement/modele en masse, hors guides/QR initial)
+      // -> on ferme le panneau gauche ouvert pour REVELER le canvas + l'element ajoute.
+      const o = e?.target as any
+      if (mobileRef.current && !histRef.current.lock && o && !o.isGuide && !o.isOverlay && !o.isQR && !o.isQrCard) {
+        setTplOpen(false); setLibOpen(false); setCompOpen(false); setPhotoOpen(false); setSide("")
+      }
+    })
     fc.on("object:removed", () => { pushHistory(); setLayersVer(v => v + 1) })
     fc.on("object:modified", pushHistory)
 
@@ -2440,6 +2449,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // Deselectionner referme le panneau Reglages + le selecteur d'empilement.
   const isShapeSel = !!sel && !sel.isQr && !sel.isText && !sel.isImage && sel.label === null && !sel.isGroupObj && !sel.multi
   useEffect(() => { if (!sel) { setRegOpen(false); setStackPick(null); setMoreSel(false) } if (!sel?.isQr) setQrSheet(""); if (!sel?.isText) setTxtSheet(""); if (!sel?.isImage) setImgSheet(""); if (!isShapeSel) setShapeSheet(""); if (sel?.label == null) setBtnSheet("") }, [sel, isShapeSel])
+  mobileRef.current = landscapeMobile
   // Un bottom-sheet partiel est ouvert (couvre le bas) -> on remonte le canvas (P1 : objet visible).
   const anyBottomSheet = regOpen || !!qrSheet || !!txtSheet || !!imgSheet || !!shapeSheet || !!btnSheet || moreSel
   // Etat des overlays (pour l'interception du bouton Retour telephone).
@@ -2855,6 +2865,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
     if (!skipConfirm && hasContent && !window.confirm("Remplacer le contenu actuel par ce modèle ?")) return
 
     setRecentTpl(r => pushRecentTpl(r, id)) // memorise le modele applique (#13)
+    if (landscapeMobile) setTplOpen(false) // mobile : fermer la galerie pour voir le modele applique
     applyingRef.current = true
     histRef.current.lock = true // tout le modele = une seule etape d'historique
     fc.getObjects().slice().forEach(o => { if (o !== vG && o !== hG) fc.remove(o) })
