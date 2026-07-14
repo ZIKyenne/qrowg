@@ -5,7 +5,8 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard, FileText, BarChart, QrCode, User,
-  Activity, ChevronRight, LogOut, Settings, Menu, X, Eye, Inbox, Images
+  Activity, ChevronRight, LogOut, Settings, Menu, X, Eye, Inbox, Images,
+  Plus, Printer, Upload, Sparkles
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
@@ -23,6 +24,23 @@ const NAV_ITEMS = [
   { href: "/dashboard/settings", icon: Settings, label: "Parametres" },
 ]
 
+// Barre mobile : EXACTEMENT 5 destinations (le bouton central "Créer" ouvre un sheet).
+const MOBILE_NAV = [
+  { href: "/dashboard", icon: LayoutDashboard, label: "Accueil", exact: true },
+  { href: "/dashboard/qr-codes", icon: QrCode, label: "Pages" },
+  { create: true as const, icon: Plus, label: "Créer" },
+  { href: "/dashboard/analytics", icon: BarChart, label: "Stats" },
+  { href: "/dashboard/profile", icon: User, label: "Profil" },
+]
+// Actions du bouton central "Créer".
+const CREATE_ACTIONS = [
+  { href: "/dashboard/builder", icon: FileText, label: "Créer une page", sub: "Une page pro éditable" },
+  { href: "/dashboard/qr-codes", icon: QrCode, label: "Créer un QR code", sub: "Dynamique, modifiable" },
+  { href: "/dashboard/qr-codes", icon: Printer, label: "QR Print Studio", sub: "Affiche prête à imprimer" },
+  { href: "/dashboard/templates", icon: Sparkles, label: "Utiliser un modèle", sub: "Partir d'un design" },
+  { href: "/dashboard/assets", icon: Upload, label: "Importer un média", sub: "Photos, logos…" },
+]
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(() => {
@@ -37,7 +55,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [accent, setAccent] = useState(DEFAULT_ACCENT) // couleur d'accent de l'utilisateur
   const [isMobile, setIsMobile] = useState(false) // < 860px : menu replié d'office
   const [unreadLeads, setUnreadLeads] = useState(0) // messages non lus (badge nav)
+  const [createOpen, setCreateOpen] = useState(false) // sheet "Créer" (bouton central mobile)
   const G = accent
+  // Masquer la barre mobile dans les editeurs plein ecran (le Print Studio se porte deja au-dessus).
+  const hideMobileNav = pathname.startsWith("/dashboard/builder")
 
   useEffect(() => {
     setMounted(true)
@@ -273,37 +294,66 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
 
       {/* MAIN CONTENT */}
-      <main style={{ flex: 1, overflow: "auto", minWidth: 0, paddingBottom: isMobile ? "calc(64px + env(safe-area-inset-bottom))" : 0 }}>
+      <main style={{ flex: 1, overflow: "auto", minWidth: 0, paddingBottom: (isMobile && !hideMobileNav) ? "calc(84px + env(safe-area-inset-bottom))" : 0 }}>
         {children}
       </main>
 
-      {/* BARRE DE NAVIGATION MOBILE (bottom bar) */}
-      {isMobile && (
-        <nav style={{
+      {/* Sheet "Créer" (bouton central de la barre mobile) */}
+      {isMobile && !hideMobileNav && createOpen && (
+        <div onClick={() => setCreateOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(3px)", display: "flex", alignItems: "flex-end" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", background: "#141210", borderTopLeftRadius: 22, borderTopRightRadius: 22, border: "1px solid rgba(201,168,76,0.16)", borderBottom: "none", padding: "10px 14px calc(16px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)", animation: "sheetUp .24s cubic-bezier(.2,.8,.2,1)" }}>
+            <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 12px" }} />
+            <p style={{ margin: "0 4px 10px", color: "#F5F0E8", fontSize: 15, fontWeight: 800 }}>Créer</p>
+            {CREATE_ACTIONS.map(({ href, icon: Icon, label, sub }, i) => (
+              <Link key={i} href={href} onClick={() => setCreateOpen(false)}
+                style={{ display: "flex", alignItems: "center", gap: 14, padding: "13px 10px", textDecoration: "none", borderTop: i ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+                <span style={{ width: 42, height: 42, flexShrink: 0, borderRadius: 12, background: "rgba(201,168,76,0.14)", border: "1px solid rgba(201,168,76,0.28)", display: "flex", alignItems: "center", justifyContent: "center", color: G }}><Icon size={20} /></span>
+                <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <span style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700 }}>{label}</span>
+                  <span style={{ color: MUTED, fontSize: 12.5 }}>{sub}</span>
+                </span>
+                <ChevronRight size={18} color={MUTED} style={{ marginLeft: "auto", flexShrink: 0 }} />
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* BARRE DE NAVIGATION MOBILE — 5 entrees, safe-area, bouton central "Créer" */}
+      {isMobile && !hideMobileNav && (
+        <nav aria-label="Navigation" style={{
           position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50,
-          display: "flex", alignItems: "stretch",
-          paddingBottom: "env(safe-area-inset-bottom)",
-          background: "rgba(10,10,10,0.96)", backdropFilter: "blur(12px)",
-          borderTop: "1px solid rgba(201,168,76,0.14)",
-          boxShadow: "0 -8px 24px rgba(0,0,0,0.4)",
+          display: "flex", alignItems: "stretch", justifyContent: "space-around",
+          minHeight: "calc(64px + env(safe-area-inset-bottom))",
+          padding: "7px 12px calc(7px + env(safe-area-inset-bottom))",
+          background: "rgba(12,11,9,0.97)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
+          borderTop: "1px solid rgba(201,168,76,0.16)",
+          boxShadow: "0 -6px 22px rgba(0,0,0,0.45)",
         }}>
-          {NAV_ITEMS.map(({ href, icon: Icon, label, exact }) => {
-            const active = isActive(href, exact)
+          {MOBILE_NAV.map((item) => {
+            if ("create" in item) {
+              const Icon = item.icon
+              return (
+                <button key="create" type="button" onClick={() => setCreateOpen(true)} aria-label="Créer"
+                  style={{ flex: 1, minWidth: 48, minHeight: 48, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                  <span style={{ width: 46, height: 46, marginTop: -14, borderRadius: "50%", background: `linear-gradient(180deg,#D9BC6A,${G})`, display: "flex", alignItems: "center", justifyContent: "center", color: "#141210", boxShadow: "0 6px 18px rgba(201,168,76,0.5)" }}><Icon size={24} strokeWidth={2.6} /></span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: G }}>{item.label}</span>
+                </button>
+              )
+            }
+            const { href, icon: Icon, label, exact } = item
+            const active = isActive(href, (exact as boolean) || false)
             return (
               <Link key={href} href={href}
-                style={{
-                  flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
-                  padding: "10px 4px",
-                  textDecoration: "none", color: active ? G : MUTED, position: "relative", transition: "color .15s",
-                }}>
-                {active && <span style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 28, height: 3, borderRadius: "0 0 3px 3px", background: G }} />}
+                style={{ flex: 1, minWidth: 48, minHeight: 48, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, padding: "4px 2px", textDecoration: "none", color: active ? G : MUTED, position: "relative", transition: "color .15s" }}>
+                {active && <span style={{ position: "absolute", top: -7, left: "50%", transform: "translateX(-50%)", width: 26, height: 3, borderRadius: "0 0 3px 3px", background: G }} />}
                 <div style={{ position: "relative", display: "flex" }}>
-                  <Icon size={21} strokeWidth={active ? 2.4 : 2} />
-                  {href === "/dashboard/leads" && unreadLeads > 0 && (
+                  <Icon size={23} strokeWidth={active ? 2.4 : 2} />
+                  {href === "/dashboard" && unreadLeads > 0 && (
                     <span style={{ position: "absolute", top: -6, right: -8, minWidth: 15, height: 15, padding: "0 4px", borderRadius: 8, background: "#EF4444", color: "#fff", fontSize: 9, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>{unreadLeads > 99 ? "99+" : unreadLeads}</span>
                   )}
                 </div>
-                <span style={{ fontSize: 10.5, fontWeight: active ? 700 : 500, letterSpacing: 0.1 }}>{label}</span>
+                <span style={{ fontSize: 11, fontWeight: active ? 700 : 500, letterSpacing: 0.1 }}>{label}</span>
               </Link>
             )
           })}
@@ -314,6 +364,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
         .sidebar-nav::-webkit-scrollbar { display: none }
         .sidebar-item:hover .sidebar-tooltip { opacity: 1 !important }
+        @keyframes sheetUp { from { transform: translateY(100%) } to { transform: translateY(0) } }
         * { box-sizing: border-box; }
       `}</style>
     </div>
