@@ -463,7 +463,7 @@ function FeaturesSection() {
 
               {/* Bouton info -> fenêtre explicative */}
               <button type="button" onClick={() => setInfo(i)} aria-label={"En savoir plus : " + f.title}
-                style={{ position: "absolute", top: 16, right: 16, width: 22, height: 22, borderRadius: "50%", background: isHovered ? `${f.accent}22` : "rgba(255,255,255,0.05)", border: `1px solid ${isHovered ? f.accent + "55" : "rgba(255,255,255,0.12)"}`, color: isHovered ? f.accent : "rgba(138,132,120,0.8)", fontSize: 11, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s", zIndex: 2 }}>?</button>
+                style={{ position: "absolute", top: 16, right: 16, width: 22, height: 22, borderRadius: "50%", background: isHovered ? `${f.accent}22` : "rgba(255,255,255,0.05)", border: `1px solid ${isHovered ? f.accent + "55" : "rgba(255,255,255,0.12)"}`, color: isHovered ? f.accent : "rgba(188,182,166,0.8)", fontSize: 11, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s", zIndex: 2 }}>?</button>
 
               {big ? (
                 <>
@@ -511,7 +511,7 @@ function FeaturesSection() {
 
                   {/* Desc */}
                   <p style={{
-                    color: "rgba(138,132,120,0.85)", fontSize: 13,
+                    color: "rgba(188,182,166,0.85)", fontSize: 13,
                     margin: 0, lineHeight: 1.65,
                   }}>{f.desc}</p>
                 </>
@@ -536,7 +536,7 @@ function FeaturesSection() {
       {fInfo && (
         <div onClick={() => setInfo(null)} style={{ position: "fixed", inset: 0, zIndex: 3000, background: "rgba(0,0,0,0.78)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "linear-gradient(180deg,#16140E,#0C0B08)", border: `1px solid ${fInfo.accent}40`, borderRadius: 20, padding: "30px 28px", position: "relative", boxShadow: `0 30px 90px rgba(0,0,0,0.7), 0 0 50px ${fInfo.accent}12`, fontFamily: "DM Sans, sans-serif" }}>
-            <button type="button" onClick={() => setInfo(null)} aria-label="Fermer" style={{ position: "absolute", top: 16, right: 16, width: 30, height: 30, borderRadius: 9, background: "rgba(255,255,255,0.06)", border: "none", color: "#8A8478", fontSize: 16, cursor: "pointer" }}>✕</button>
+            <button type="button" onClick={() => setInfo(null)} aria-label="Fermer" style={{ position: "absolute", top: 16, right: 16, width: 30, height: 30, borderRadius: 9, background: "rgba(255,255,255,0.06)", border: "none", color: "#BCB6A6", fontSize: 16, cursor: "pointer" }}>✕</button>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
               <div style={{ width: 46, height: 46, borderRadius: 13, background: `${fInfo.accent}18`, border: `1px solid ${fInfo.accent}40`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{fInfo.icon}</div>
               <div>
@@ -546,7 +546,7 @@ function FeaturesSection() {
             </div>
             {([["À quoi ça sert", fInfo.detail.role], ["Exemple concret", fInfo.detail.example], ["Ce que ça vous apporte", fInfo.detail.benefit]] as const).map(([h, txt]) => (
               <div key={h} style={{ marginBottom: 14 }}>
-                <p style={{ color: "rgba(138,132,120,0.7)", fontSize: 9.5, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 4px" }}>{h}</p>
+                <p style={{ color: "rgba(188,182,166,0.7)", fontSize: 9.5, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 4px" }}>{h}</p>
                 <p style={{ color: "#E8E6E0", fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>{txt}</p>
               </div>
             ))}
@@ -571,21 +571,21 @@ function BrandProSection() {
       {pro && <div style={{ position: "absolute", top: 12, right: 12, zIndex: 2, background: G, color: "#080808", fontSize: 9, fontWeight: 800, padding: "3px 9px", borderRadius: 20, letterSpacing: 0.5 }}>PRO</div>}
       {/* barre d'URL */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 12px", background: "rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-        <span style={{ width: 7, height: 7, borderRadius: "50%", background: pro ? "#39FF8F" : "rgba(138,132,120,0.5)" }} />
-        <span style={{ color: pro ? "#F5F0E8" : "rgba(138,132,120,0.7)", fontSize: 10.5, fontFamily: "monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{pro ? "carte.votremarque.fr" : "qrfolio.app/p/votre-page"}</span>
+        <span style={{ width: 7, height: 7, borderRadius: "50%", background: pro ? "#39FF8F" : "rgba(188,182,166,0.5)" }} />
+        <span style={{ color: pro ? "#F5F0E8" : "rgba(188,182,166,0.7)", fontSize: 10.5, fontFamily: "monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{pro ? "carte.votremarque.fr" : "qrfolio.app/p/votre-page"}</span>
       </div>
       {/* contenu mock */}
       <div style={{ padding: "22px 18px", display: "flex", flexDirection: "column", alignItems: "center", gap: 9 }}>
         <div style={{ width: 46, height: 46, borderRadius: "50%", background: pro ? `${G}22` : "rgba(255,255,255,0.06)", border: `1px solid ${pro ? G + "55" : "rgba(255,255,255,0.1)"}` }} />
         <div style={{ height: 7, width: "55%", borderRadius: 4, background: "rgba(245,240,232,0.85)" }} />
-        <div style={{ height: 5, width: "38%", borderRadius: 3, background: "rgba(138,132,120,0.5)" }} />
+        <div style={{ height: 5, width: "38%", borderRadius: 3, background: "rgba(188,182,166,0.5)" }} />
         <div style={{ height: 30, width: "70%", borderRadius: 8, background: pro ? `linear-gradient(90deg,${G},#b8953f)` : "rgba(255,255,255,0.08)", marginTop: 4 }} />
       </div>
       {/* pied de page : mention QRfolio sur le gratuit, rien sur le Pro */}
       <div style={{ padding: "9px 12px", borderTop: "1px solid rgba(255,255,255,0.06)", textAlign: "center", minHeight: 30 }}>
         {pro
           ? <span style={{ color: G, fontSize: 9.5, fontWeight: 700, letterSpacing: 0.5 }}>✓ 100 % votre marque</span>
-          : <span style={{ color: "rgba(138,132,120,0.65)", fontSize: 9.5 }}>✦ Propulsé par QRfolio</span>}
+          : <span style={{ color: "rgba(188,182,166,0.65)", fontSize: 9.5 }}>✦ Propulsé par QRfolio</span>}
       </div>
     </div>
   )
@@ -598,7 +598,7 @@ function BrandProSection() {
           <h2 id="brandpro-title" style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(30px,3.6vw,46px)", color: "#F5F0E8", fontWeight: 700, lineHeight: 1.08, margin: "0 0 18px", letterSpacing: "-0.02em" }}>
             Votre marque.<br /><span style={{ color: G }}>Pas la nôtre.</span>
           </h2>
-          <p style={{ color: "rgba(138,132,120,0.9)", fontSize: 16, lineHeight: 1.7, margin: "0 0 24px", maxWidth: 420 }}>
+          <p style={{ color: "rgba(188,182,166,0.9)", fontSize: 16, lineHeight: 1.7, margin: "0 0 24px", maxWidth: 420 }}>
             Sur les plans payants, votre page s'affiche sur <strong style={{ color: "#E8E6E0" }}>votre propre nom de domaine</strong>, <strong style={{ color: "#E8E6E0" }}>sans aucune mention QRfolio</strong>. Vos clients ne voient que vous.
           </p>
           <button type="button" onClick={() => setOpen(true)}
@@ -613,7 +613,7 @@ function BrandProSection() {
             <MiniPage pro={true} />
           </div>
           <div style={{ display: "flex", gap: 14, marginTop: 8 }}>
-            <span style={{ flex: 1, textAlign: "center", color: "rgba(138,132,120,0.7)", fontSize: 10.5, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>Plan gratuit</span>
+            <span style={{ flex: 1, textAlign: "center", color: "rgba(188,182,166,0.7)", fontSize: 10.5, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>Plan gratuit</span>
             <span style={{ flex: 1, textAlign: "center", color: G, fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Plan Pro</span>
           </div>
         </div>
@@ -624,7 +624,7 @@ function BrandProSection() {
       {open && (
         <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 3000, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, background: "linear-gradient(180deg,#16140E,#0C0B08)", border: `1px solid ${G}40`, borderRadius: 20, padding: "30px 28px", position: "relative", boxShadow: `0 30px 90px rgba(0,0,0,0.7), 0 0 50px ${G}12`, fontFamily: "DM Sans, sans-serif" }}>
-            <button type="button" onClick={() => setOpen(false)} aria-label="Fermer" style={{ position: "absolute", top: 16, right: 16, width: 30, height: 30, borderRadius: 9, background: "rgba(255,255,255,0.06)", border: "none", color: "#8A8478", fontSize: 16, cursor: "pointer" }}>✕</button>
+            <button type="button" onClick={() => setOpen(false)} aria-label="Fermer" style={{ position: "absolute", top: 16, right: 16, width: 30, height: 30, borderRadius: 9, background: "rgba(255,255,255,0.06)", border: "none", color: "#BCB6A6", fontSize: 16, cursor: "pointer" }}>✕</button>
             <p style={{ color: G, fontSize: 9.5, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", margin: 0 }}>Marque professionnelle</p>
             <p style={{ color: "#F5F0E8", fontSize: 22, fontWeight: 800, margin: "4px 0 18px", fontFamily: "Cormorant Garamond, serif" }}>Une image 100 % à vous</p>
             {([
@@ -636,7 +636,7 @@ function BrandProSection() {
                 <span style={{ fontSize: 20, flexShrink: 0 }}>{emo}</span>
                 <div>
                   <p style={{ color: "#F5F0E8", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>{h}</p>
-                  <p style={{ color: "rgba(138,132,120,0.9)", fontSize: 12.5, lineHeight: 1.55, margin: 0 }}>{txt}</p>
+                  <p style={{ color: "rgba(188,182,166,0.9)", fontSize: 12.5, lineHeight: 1.55, margin: 0 }}>{txt}</p>
                 </div>
               </div>
             ))}
@@ -752,7 +752,7 @@ function PricingSection() {
           Simple, transparent,{" "}
           <span style={{ color:"#C9A84C" }}>sans surprise.</span>
         </h2>
-        <p style={{ color:"rgba(138,132,120,0.8)", fontSize:16,
+        <p style={{ color:"rgba(188,182,166,0.8)", fontSize:16,
           maxWidth:440, margin:"0 auto", lineHeight:1.65 }}>
           Commencez gratuitement. Passez au Pro quand vous êtes prêt.
         </p>
@@ -810,7 +810,7 @@ function PricingSection() {
                 letterSpacing:2.5, textTransform:"uppercase",
                 margin:"0 0 4px",
               }}>{plan.name}</p>
-              <p style={{ color:"rgba(138,132,120,0.7)", fontSize:12,
+              <p style={{ color:"rgba(188,182,166,0.7)", fontSize:12,
                 margin:"0 0 20px", lineHeight:1.4 }}>{plan.tagline}</p>
 
               {/* Prix */}
@@ -821,7 +821,7 @@ function PricingSection() {
                 }}>{plan.price}</span>
                 <span style={{ color:"rgba(201,168,76,0.7)", fontSize:15, fontWeight:600 }}>€</span>
                 {plan.period && (
-                  <span style={{ color:"rgba(138,132,120,0.6)", fontSize:13, marginLeft:2 }}>
+                  <span style={{ color:"rgba(188,182,166,0.6)", fontSize:13, marginLeft:2 }}>
                     {plan.period}
                   </span>
                 )}
@@ -845,11 +845,11 @@ function PricingSection() {
                       fontSize:9,
                       background: f.ok
                         ? "rgba(57,255,143,0.15)"
-                        : "rgba(138,132,120,0.08)",
-                      color: f.ok ? "#39FF8F" : "rgba(138,132,120,0.4)",
+                        : "rgba(188,182,166,0.08)",
+                      color: f.ok ? "#39FF8F" : "rgba(188,182,166,0.4)",
                     }}>{f.ok ? "✓" : "✕"}</span>
                     <span style={{
-                      color: f.ok ? "rgba(245,240,232,0.85)" : "rgba(138,132,120,0.45)",
+                      color: f.ok ? "rgba(245,240,232,0.85)" : "rgba(188,182,166,0.45)",
                       fontSize:13.5,
                       textDecoration: f.ok ? "none" : "none",
                     }}>{f.text}</span>
@@ -896,7 +896,7 @@ function PricingSection() {
               {/* Note sous le CTA */}
               {plan.note && (
                 <p style={{
-                  color:"rgba(138,132,120,0.6)", fontSize:11,
+                  color:"rgba(188,182,166,0.6)", fontSize:11,
                   textAlign:"center", margin:"12px 0 0", lineHeight:1.5,
                 }}>{plan.note}</p>
               )}
@@ -914,7 +914,7 @@ function PricingSection() {
           </div>
           {showCmp && (
           <>
-          <p style={{ color: "rgba(138,132,120,0.7)", fontSize: 13, textAlign: "center", margin: "22px 0 26px" }}>
+          <p style={{ color: "rgba(188,182,166,0.7)", fontSize: 13, textAlign: "center", margin: "22px 0 26px" }}>
             Survolez le <span style={{ color: "#C9A84C" }}>?</span> de chaque ligne pour plus d'explications.
           </p>
           {(() => {
@@ -939,7 +939,7 @@ function PricingSection() {
               const ok = v === "✓" || v === "Oui"
               const no = v === "❌" || v === "—" || v === "Non"
               return (
-                <td style={{ padding: "12px 14px", textAlign: "center", fontSize: 12.5, fontWeight: hl ? 700 : 500, color: ok ? "#39FF8F" : no ? "rgba(138,132,120,0.45)" : hl ? "#C9A84C" : "#E8E6E0", borderBottom: "1px solid rgba(255,255,255,0.05)", background: hl ? "rgba(201,168,76,0.05)" : "transparent" }}>
+                <td style={{ padding: "12px 14px", textAlign: "center", fontSize: 12.5, fontWeight: hl ? 700 : 500, color: ok ? "#39FF8F" : no ? "rgba(188,182,166,0.45)" : hl ? "#C9A84C" : "#E8E6E0", borderBottom: "1px solid rgba(255,255,255,0.05)", background: hl ? "rgba(201,168,76,0.05)" : "transparent" }}>
                   {ok ? "✓" : no ? "—" : v}
                 </td>
               )
@@ -949,7 +949,7 @@ function PricingSection() {
                 <table style={{ width: "100%", minWidth: 620, borderCollapse: "collapse" }}>
                   <thead>
                     <tr>
-                      <th style={{ padding: "16px 14px", textAlign: "left", fontSize: 11, color: "rgba(138,132,120,0.8)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>Fonctionnalité</th>
+                      <th style={{ padding: "16px 14px", textAlign: "left", fontSize: 11, color: "rgba(188,182,166,0.8)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>Fonctionnalité</th>
                       {PLAN_LIST.map(p => (
                         <th key={p.id} style={{ padding: "16px 14px", textAlign: "center", fontSize: 13, fontWeight: 800, color: p.id === "pro" ? "#C9A84C" : "#F5F0E8", background: p.id === "pro" ? "rgba(201,168,76,0.06)" : "transparent" }}>
                           {p.label}{p.id === "pro" && <div style={{ fontSize: 8.5, color: "#C9A84C", fontWeight: 700, letterSpacing: 0.5 }}>POPULAIRE</div>}
@@ -1001,7 +1001,7 @@ function ProofStrip() {
       style={{ padding: "0 48px 80px", position: "relative", zIndex: 1 }}
     >
       <div style={{ maxWidth: 1140, margin: "0 auto" }}>
-        <p style={{ textAlign: "center", color: "rgba(138,132,120,0.75)", fontSize: 13, margin: "0 0 30px", letterSpacing: 0.2 }}>
+        <p style={{ textAlign: "center", color: "rgba(188,182,166,0.75)", fontSize: 13, margin: "0 0 30px", letterSpacing: 0.2 }}>
           De l'idée au QR code partagé — <span style={{ color: "#C9A84C", fontWeight: 600 }}>4 étapes, 5 minutes</span>.
         </p>
         <div className="rm-grid" style={{ position: "relative", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
@@ -1019,7 +1019,7 @@ function ProofStrip() {
                 <span style={{ position: "absolute", top: -6, right: -6, width: 20, height: 20, borderRadius: "50%", background: "linear-gradient(135deg,#C9A84C,#b8953f)", color: "#080808", fontSize: 11, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(201,168,76,0.4)" }}>{i + 1}</span>
               </div>
               <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0, lineHeight: 1.3 }}>{s.title}</p>
-              <p style={{ color: "rgba(138,132,120,0.8)", fontSize: 12.5, margin: 0, lineHeight: 1.5, maxWidth: 200 }}>{s.sub}</p>
+              <p style={{ color: "rgba(188,182,166,0.8)", fontSize: 12.5, margin: 0, lineHeight: 1.5, maxWidth: 200 }}>{s.sub}</p>
             </div>
           ))}
         </div>
@@ -1260,7 +1260,7 @@ function TemplateCard({ tpl, i, visible }: { tpl: typeof TEMPLATE_DATA[number]; 
 
       {/* Footer */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span style={{ color: "rgba(138,132,120,0.6)", fontSize: 11 }}>
+        <span style={{ color: "rgba(188,182,166,0.6)", fontSize: 11 }}>
           {tpl.blocks} blocs inclus
         </span>
         <a href="/dashboard/templates" style={{
@@ -1313,7 +1313,7 @@ function TemplatesSection() {
           <span style={{ color: "#C9A84C" }}>pour votre métier.</span>
         </h2>
         <p style={{
-          color: "rgba(138,132,120,0.85)", fontSize: 16,
+          color: "rgba(188,182,166,0.85)", fontSize: 16,
           maxWidth: 540, margin: "0 auto", lineHeight: 1.7,
         }}>
           Restaurant, indépendant, coach, artiste, immobilier, commerce :{" "}
@@ -1401,7 +1401,7 @@ function Navbar() {
         .nl:hover::after,.nl.act::after{transform:scaleX(1);}
         .nl:hover{color:#F5F0E8 !important;}
         .nl:focus-visible,.nct:focus-visible{outline:2px solid rgba(201,168,76,0.6);outline-offset:4px;border-radius:4px;}
-        .ml{display:block;color:#8A8478;text-decoration:none;font-size:18px;padding:16px 0;
+        .ml{display:block;color:#BCB6A6;text-decoration:none;font-size:18px;padding:16px 0;
           border-bottom:1px solid rgba(201,168,76,0.08);transition:color 0.2s;}
         .ml:hover,.ml.act{color:#F5F0E8;}
         @keyframes slideMenu{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
@@ -1428,13 +1428,13 @@ function Navbar() {
             const id=href.replace("#",""); const isAct=active===id
             return(<Link key={href} href={href} role="menuitem" aria-current={isAct?"page":undefined}
               className={"nl"+(isAct?" act":"")}
-              style={{color:isAct?"#F5F0E8":"#8A8478",textDecoration:"none",fontSize:14,
+              style={{color:isAct?"#F5F0E8":"#BCB6A6",textDecoration:"none",fontSize:14,
                 fontWeight:isAct?600:400,position:"relative",paddingBottom:2,transition:"color 0.2s"}}>{label}</Link>)
           })}
         </div>
         <div className="dNav" style={{display:"flex",alignItems:"center",gap:16}}>
           <Link href="/auth/login" className="nl"
-            style={{color:"#8A8478",textDecoration:"none",fontSize:14,position:"relative",paddingBottom:2,transition:"color 0.2s"}}>Connexion</Link>
+            style={{color:"#BCB6A6",textDecoration:"none",fontSize:14,position:"relative",paddingBottom:2,transition:"color 0.2s"}}>Connexion</Link>
           <Link href="/auth/signup" className="nct" style={{
             background:"linear-gradient(90deg,#C9A84C,#b8953f)",color:"#080808",
             textDecoration:"none",fontSize:14,fontWeight:700,padding:"9px 22px",borderRadius:10,
@@ -1477,7 +1477,7 @@ function Navbar() {
           ))}
           <div style={{marginTop:32,display:"flex",flexDirection:"column",gap:12}}>
             <Link href="/auth/login" onClick={()=>setMenuOpen(false)} style={{
-              display:"block",textAlign:"center",color:"#8A8478",textDecoration:"none",
+              display:"block",textAlign:"center",color:"#BCB6A6",textDecoration:"none",
               fontSize:16,padding:"14px",border:"1px solid rgba(201,168,76,0.15)",borderRadius:12}}>Connexion</Link>
             <Link href="/auth/signup" onClick={()=>setMenuOpen(false)} style={{
               display:"block",textAlign:"center",
@@ -1554,7 +1554,7 @@ function HowItWorks() {
               </div>
               <div style={{display:"flex",flexDirection:"column",gap:8}}>
                 <h3 style={{color:"#F5F0E8",fontSize:15.5,fontWeight:700,margin:0,lineHeight:1.3,letterSpacing:"-0.01em"}}>{step.title}</h3>
-                <p style={{color:"rgba(138,132,120,0.85)",fontSize:12.5,margin:0,lineHeight:1.6}}>{step.desc}</p>
+                <p style={{color:"rgba(188,182,166,0.85)",fontSize:12.5,margin:0,lineHeight:1.6}}>{step.desc}</p>
               </div>
             </div>
           ))}
@@ -1662,7 +1662,7 @@ function BuilderSection(){
             color:"#F5F0E8",fontWeight:700,margin:"0 auto 20px",lineHeight:1.1,maxWidth:680,letterSpacing:"-0.02em"}}>
             Construis une page professionnelle{" "}<span style={{color:"#C9A84C"}}>en quelques minutes.</span>
           </h2>
-          <p style={{color:"rgba(138,132,120,0.85)",fontSize:16,maxWidth:520,margin:"0 auto",lineHeight:1.7}}>
+          <p style={{color:"rgba(188,182,166,0.85)",fontSize:16,maxWidth:520,margin:"0 auto",lineHeight:1.7}}>
             Ajoutez des blocs, personnalisez votre thème, publiez et partagez votre QR code.
           </p>
         </div>
@@ -1678,7 +1678,7 @@ function BuilderSection(){
               transition:`opacity 0.5s ease ${0.35+i*0.1}s,transform 0.5s ease ${0.35+i*0.1}s`}}>
               <span style={{fontSize:22}}>{b.icon}</span>
               <h3 style={{color:"#F5F0E8",fontSize:14,fontWeight:700,margin:0}}>{b.title}</h3>
-              <p style={{color:"rgba(138,132,120,0.8)",fontSize:12.5,margin:0,lineHeight:1.6}}>{b.desc}</p>
+              <p style={{color:"rgba(188,182,166,0.8)",fontSize:12.5,margin:0,lineHeight:1.6}}>{b.desc}</p>
             </div>
           ))}
         </div>
@@ -1761,7 +1761,7 @@ const QR_STYLES = [
     fg: "#1a1a1a", bg: "#ffffff", accent: "#C9A84C",
     cardBg: "rgba(255,255,255,0.04)",
     border: "rgba(255,255,255,0.1)",
-    tag: "#8A8478",
+    tag: "#BCB6A6",
   },
   {
     id: "gold",
@@ -1864,7 +1864,7 @@ function QRDynamicSection() {
               Un QR code dynamique,{" "}
               <span style={{ color: "#C9A84C" }}>pas une image figée.</span>
             </h2>
-            <p style={{ color: "rgba(138,132,120,0.85)", fontSize: 16,
+            <p style={{ color: "rgba(188,182,166,0.85)", fontSize: 16,
               lineHeight: 1.7, marginBottom: 36, maxWidth: 440 }}>
               Modifiez votre page ou votre destination sans jamais réimprimer votre QR code.
             </p>
@@ -1980,7 +1980,7 @@ function QRDynamicSection() {
           transform: visible ? "translateY(0)" : "translateY(24px)",
           transition: "opacity 0.6s ease 0.35s, transform 0.6s ease 0.35s",
         }}>
-          <p style={{ color: "rgba(138,132,120,0.6)", fontSize: 11,
+          <p style={{ color: "rgba(188,182,166,0.6)", fontSize: 11,
             letterSpacing: 2, textTransform: "uppercase", textAlign: "center",
             marginBottom: 20 }}>Choisir un style</p>
 
@@ -2005,7 +2005,7 @@ function QRDynamicSection() {
                     fontSize: 13, fontWeight: 700, margin: "0 0 2px",
                     transition: "color 0.25s",
                   }}>{style.name}</p>
-                  <p style={{ color: "rgba(138,132,120,0.7)", fontSize: 10, margin: 0 }}>
+                  <p style={{ color: "rgba(188,182,166,0.7)", fontSize: 10, margin: 0 }}>
                     {style.desc}
                   </p>
                 </div>
@@ -2058,7 +2058,7 @@ const ANALYTICS_DEMO = {
     { label: "Direct QR",    pct: 58, color: "#C9A84C" },
     { label: "Réseaux soc.", pct: 24, color: "#F97316" },
     { label: "Email",        pct: 11, color: "#38BDF8" },
-    { label: "Autre",        pct: 7,  color: "#8A8478" },
+    { label: "Autre",        pct: 7,  color: "#BCB6A6" },
   ],
 }
 
@@ -2117,7 +2117,7 @@ function AnalyticsMockup() {
             }}>
               <span style={{ fontSize: 14 }}>{s.icon}</span>
               <p style={{ color: s.color, fontSize: 16, fontWeight: 800, margin: 0, lineHeight: 1 }}>{s.value}</p>
-              <p style={{ color: "rgba(138,132,120,0.7)", fontSize: 9, margin: 0, lineHeight: 1.3 }}>{s.label}</p>
+              <p style={{ color: "rgba(188,182,166,0.7)", fontSize: 9, margin: 0, lineHeight: 1.3 }}>{s.label}</p>
               {s.delta && (
                 <span style={{ color: "#39FF8F", fontSize: 8, fontWeight: 700 }}>{s.delta}</span>
               )}
@@ -2137,7 +2137,7 @@ function AnalyticsMockup() {
               {[["#C9A84C","Scans"],["#38BDF8","Vues"]].map(([c,l]) => (
                 <div key={l as string} style={{ display:"flex", alignItems:"center", gap:4 }}>
                   <div style={{ width:6, height:6, borderRadius:2, background:c as string }}/>
-                  <span style={{ color:"rgba(138,132,120,0.7)", fontSize:9 }}>{l}</span>
+                  <span style={{ color:"rgba(188,182,166,0.7)", fontSize:9 }}>{l}</span>
                 </div>
               ))}
             </div>
@@ -2160,7 +2160,7 @@ function AnalyticsMockup() {
                     transition: "height 0.4s ease",
                   }}/>
                 </div>
-                <span style={{ color: "rgba(138,132,120,0.5)", fontSize: 8 }}>{d.day}</span>
+                <span style={{ color: "rgba(188,182,166,0.5)", fontSize: 8 }}>{d.day}</span>
               </div>
             ))}
           </div>
@@ -2274,7 +2274,7 @@ function AnalyticsSection() {
               Comprenez ce qui se passe{" "}
               <span style={{ color: "#C9A84C" }}>après chaque scan.</span>
             </h2>
-            <p style={{ color: "rgba(138,132,120,0.85)", fontSize: 15,
+            <p style={{ color: "rgba(188,182,166,0.85)", fontSize: 15,
               lineHeight: 1.75, marginBottom: 36, maxWidth: 400 }}>
               Suivi des vues, scans, appareils, sources et pages les plus performantes.
             </p>
@@ -2506,7 +2506,7 @@ function UseCasesSection() {
         }}>
           Fait pour <span style={{ color: "#C9A84C" }}>votre métier.</span>
         </h2>
-        <p style={{ color: "rgba(138,132,120,0.8)", fontSize: 16,
+        <p style={{ color: "rgba(188,182,166,0.8)", fontSize: 16,
           maxWidth: 480, margin: "0 auto", lineHeight: 1.65 }}>
           Sélectionnez votre activité et voyez exactement ce que QRfolio peut faire pour vous.
         </p>
@@ -2574,7 +2574,7 @@ function UseCasesSection() {
               </div>
             </div>
 
-            <p style={{ color: "rgba(138,132,120,0.85)", fontSize: 13.5,
+            <p style={{ color: "rgba(188,182,166,0.85)", fontSize: 13.5,
               lineHeight: 1.65, marginBottom: 22 }}>{uc.desc}</p>
 
             {/* Aperçu du rendu : mini-téléphone (Pb 9) */}
@@ -2589,7 +2589,7 @@ function UseCasesSection() {
                   {/* corps */}
                   <div style={{ padding: "12px 13px 14px", display: "flex", flexDirection: "column", alignItems: "center", gap: 7 }}>
                     <div style={{ height: 6, width: "62%", borderRadius: 4, background: "rgba(245,240,232,0.9)" }} />
-                    <div style={{ height: 4, width: "44%", borderRadius: 3, background: "rgba(138,132,120,0.55)" }} />
+                    <div style={{ height: 4, width: "44%", borderRadius: 3, background: "rgba(188,182,166,0.55)" }} />
                     {/* mini QR */}
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 1.5, width: 40, height: 40, marginTop: 4, padding: 4, background: "#fff", borderRadius: 5 }}>
                       {Array.from({ length: 25 }).map((_, k) => <div key={k} style={{ background: (k * 7 + 3) % 3 === 0 ? "#0E0D0B" : "transparent", borderRadius: 1 }} />)}
@@ -2631,7 +2631,7 @@ function UseCasesSection() {
 
           {/* Grille de blocs droite */}
           <div>
-            <p style={{ color: "rgba(138,132,120,0.55)", fontSize: 10,
+            <p style={{ color: "rgba(188,182,166,0.55)", fontSize: 10,
               letterSpacing: 2, textTransform: "uppercase", marginBottom: 16 }}>
               Blocs inclus dans ce template
             </p>
@@ -2658,7 +2658,7 @@ function UseCasesSection() {
                   }}>
                   <span style={{ fontSize: 18 }}>{block.icon}</span>
                   <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 700, margin: 0 }}>{block.label}</p>
-                  <p style={{ color: "rgba(138,132,120,0.7)", fontSize: 11, margin: 0, lineHeight: 1.4 }}>{block.note}</p>
+                  <p style={{ color: "rgba(188,182,166,0.7)", fontSize: 11, margin: 0, lineHeight: 1.4 }}>{block.note}</p>
                 </div>
               ))}
             </div>
@@ -2716,7 +2716,7 @@ function FAQSection() {
           margin:"0 auto 16px", lineHeight:1.1, letterSpacing:"-0.02em" }}>
           Les questions{" "}<span style={{ color:"#C9A84C" }}>les plus frequentes.</span>
         </h2>
-        <p style={{ color:"rgba(138,132,120,0.8)", fontSize:16, lineHeight:1.65, margin:0 }}>
+        <p style={{ color:"rgba(188,182,166,0.8)", fontSize:16, lineHeight:1.65, margin:0 }}>
           Une question sans reponse ? Ecris-nous, on est la.
         </p>
       </div>
@@ -2745,7 +2745,7 @@ function FAQSection() {
               <div id={"fa-" + i} role="region" aria-labelledby={"fb-" + i}
                 className="faq-ans"
                 style={{ maxHeight:isOpen?"500px":"0px", opacity:isOpen?1:0 }}>
-                <p style={{ color:"rgba(138,132,120,0.85)", fontSize:14.5,
+                <p style={{ color:"rgba(188,182,166,0.85)", fontSize:14.5,
                   lineHeight:1.75, margin:"0 0 20px", paddingRight:40 }}>{item.a}</p>
               </div>
             </div>
@@ -2753,7 +2753,7 @@ function FAQSection() {
         })}
         <div style={{ marginTop:48, textAlign:"center",
           borderTop:"1px solid rgba(255,255,255,0.06)", paddingTop:40 }}>
-          <p style={{ color:"rgba(138,132,120,0.7)", fontSize:14, marginBottom:16 }}>
+          <p style={{ color:"rgba(188,182,166,0.7)", fontSize:14, marginBottom:16 }}>
             Vous avez une autre question ?
           </p>
           <a href="/auth/signup" style={{ display:"inline-flex", alignItems:"center", gap:8,
@@ -2848,7 +2848,7 @@ function StoryPhone({ step }: { step: number }) {
         {[["1 248", "Scans"], ["86%", "Mobile"]].map(([v, l], i) => (
           <div key={l} style={{ flex: 1, padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,168,76,0.18)", animation: `fadeUp 0.4s ease ${i * 0.1}s both` }}>
             <p style={{ margin: 0, color: G, fontSize: 17, fontWeight: 800 }}>{v}</p>
-            <p style={{ margin: 0, color: "#8A8478", fontSize: 9.5 }}>{l}</p>
+            <p style={{ margin: 0, color: "#BCB6A6", fontSize: 9.5 }}>{l}</p>
           </div>
         ))}
       </div>
@@ -2899,11 +2899,11 @@ function StoryFlow() {
                 }}>
                   <div style={{ position: "relative", width: 42, height: 42, flexShrink: 0, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, background: active ? "rgba(201,168,76,0.18)" : "rgba(255,255,255,0.04)", border: `1px solid ${active ? "rgba(201,168,76,0.5)" : "rgba(255,255,255,0.08)"}`, boxShadow: active ? "0 0 22px rgba(201,168,76,0.3)" : "none", transition: "all 0.3s ease" }}>
                     {s.icon}
-                    <span style={{ position: "absolute", top: -6, right: -6, width: 18, height: 18, borderRadius: "50%", background: active ? "linear-gradient(135deg,#d4a843,#C9A84C)" : "rgba(255,255,255,0.1)", color: active ? "#080808" : "#8A8478", fontSize: 9.5, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{i + 1}</span>
+                    <span style={{ position: "absolute", top: -6, right: -6, width: 18, height: 18, borderRadius: "50%", background: active ? "linear-gradient(135deg,#d4a843,#C9A84C)" : "rgba(255,255,255,0.1)", color: active ? "#080808" : "#BCB6A6", fontSize: 9.5, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{i + 1}</span>
                   </div>
                   <div style={{ minWidth: 0 }}>
                     <p style={{ margin: 0, color: active ? "#F5F0E8" : "#A8A29A", fontSize: 14.5, fontWeight: 700 }}>{s.key}</p>
-                    <p style={{ margin: "3px 0 0", color: "rgba(138,132,120,0.85)", fontSize: 12.5, lineHeight: 1.5, maxHeight: active ? 60 : 0, opacity: active ? 1 : 0, overflow: "hidden", transition: "all 0.35s ease" }}>{s.desc}</p>
+                    <p style={{ margin: "3px 0 0", color: "rgba(188,182,166,0.85)", fontSize: 12.5, lineHeight: 1.5, maxHeight: active ? 60 : 0, opacity: active ? 1 : 0, overflow: "hidden", transition: "all 0.35s ease" }}>{s.desc}</p>
                   </div>
                 </button>
               )
@@ -3015,7 +3015,7 @@ function PrintStudioSection() {
           <h2 id="print-title" style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(28px,4vw,52px)", color: "#F5F0E8", fontWeight: 700, margin: "0 auto 16px", lineHeight: 1.1, maxWidth: 620, letterSpacing: "-0.02em" }}>
             Vos QR codes en{" "}<span style={{ color: "#C9A84C" }}>supports prêts à imprimer.</span>
           </h2>
-          <p style={{ color: "rgba(138,132,120,0.85)", fontSize: 16, maxWidth: 520, margin: "0 auto", lineHeight: 1.7 }}>
+          <p style={{ color: "rgba(188,182,166,0.85)", fontSize: 16, maxWidth: 520, margin: "0 auto", lineHeight: 1.7 }}>
             Affiche, sticker, carte, chevalet, flyer… exportés en haute définition, prêts pour l'imprimeur.
           </p>
         </div>
@@ -3038,7 +3038,7 @@ function PrintStudioSection() {
               {/* Texte */}
               <div style={{ padding: "16px 18px 20px" }}>
                 <h3 style={{ color: "#F5F0E8", fontSize: 15.5, fontWeight: 700, margin: "0 0 6px" }}>{s.name}</h3>
-                <p style={{ color: "rgba(138,132,120,0.85)", fontSize: 13, lineHeight: 1.55, margin: 0 }}>{s.benefit}</p>
+                <p style={{ color: "rgba(188,182,166,0.85)", fontSize: 13, lineHeight: 1.55, margin: 0 }}>{s.benefit}</p>
               </div>
             </div>
           ))}
@@ -3250,7 +3250,7 @@ export default function HomePage() {
               {["Gratuit", "Sans carte bancaire", "Prêt en 5 min"].map((item) => (
                 <span key={item} style={{
                   display: "inline-flex", alignItems: "center", gap: 6,
-                  color: "#8A8478", fontSize: 12.5
+                  color: "#BCB6A6", fontSize: 12.5
                 }}>
                   <span style={{ color: "#39FF8F", fontSize: 11 }}>✓</span>
                   {item}
@@ -3387,7 +3387,7 @@ export default function HomePage() {
             </h2>
 
             <p style={{
-              color:"rgba(138,132,120,0.85)", fontSize:17,
+              color:"rgba(188,182,166,0.85)", fontSize:17,
               lineHeight:1.7, margin:"0 0 44px", maxWidth:520,
               marginLeft:"auto", marginRight:"auto",
             }}>
@@ -3411,7 +3411,7 @@ export default function HomePage() {
             </Link>
 
             <p style={{
-              color:"rgba(138,132,120,0.5)", fontSize:12.5,
+              color:"rgba(188,182,166,0.5)", fontSize:12.5,
               margin:"20px 0 0", letterSpacing:0.3,
             }}>
               Gratuit · Sans carte bancaire · Annulation a tout moment
@@ -3425,14 +3425,14 @@ export default function HomePage() {
         <style>{`
           .fg { display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:40px; padding:56px 48px 48px; }
           .fc-title { color:#C9A84C; font-size:10px; letter-spacing:2.5px; text-transform:uppercase; font-weight:700; margin-bottom:18px; }
-          .fl { display:block; color:rgba(138,132,120,0.72); text-decoration:none; font-size:13.5px; margin-bottom:11px; line-height:1.4; transition:color 0.2s; }
+          .fl { display:block; color:rgba(188,182,166,0.72); text-decoration:none; font-size:13.5px; margin-bottom:11px; line-height:1.4; transition:color 0.2s; }
           .fl:hover { color:#F5F0E8; }
           .fl:focus-visible { outline:2px solid rgba(201,168,76,0.5); outline-offset:3px; border-radius:3px; }
-          .fl-soon { color:rgba(138,132,120,0.35) !important; cursor:default; pointer-events:none; }
+          .fl-soon { color:rgba(188,182,166,0.35) !important; cursor:default; pointer-events:none; }
           .fl-soon::after { content:" (bientôt)"; font-size:10px; }
           .fb { padding:16px 48px 24px; border-top:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
           .fsoc { display:flex; align-items:center; gap:8px; margin-top:20px; }
-          .fsoc a { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); color:rgba(138,132,120,0.65); text-decoration:none; font-size:14px; transition:all 0.2s; }
+          .fsoc a { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); color:rgba(188,182,166,0.65); text-decoration:none; font-size:14px; transition:all 0.2s; }
           .fsoc a:hover { border-color:rgba(201,168,76,0.4); color:#C9A84C; background:rgba(201,168,76,0.07); }
           .fsoc a:focus-visible { outline:2px solid rgba(201,168,76,0.5); outline-offset:3px; }
           .fstatus { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:20px; background:rgba(57,255,143,0.07); border:1px solid rgba(57,255,143,0.18); color:rgba(57,255,143,0.8); font-size:11px; font-weight:600; text-decoration:none; transition:all 0.2s; }
@@ -3464,7 +3464,7 @@ export default function HomePage() {
             <Link href="/" aria-label="QRfolio — Accueil" className="f-brand-link" style={{ textDecoration:"none", display:"inline-block", marginBottom:12 }}>
               <span style={{ fontFamily:"Cormorant Garamond, serif", fontSize:24, color:"#C9A84C", fontWeight:700, letterSpacing:"-0.01em" }}>QRfolio</span>
             </Link>
-            <p className="f-brand-desc" style={{ color:"rgba(138,132,120,0.65)", fontSize:13, lineHeight:1.7, maxWidth:220, margin:0 }}>
+            <p className="f-brand-desc" style={{ color:"rgba(188,182,166,0.65)", fontSize:13, lineHeight:1.7, maxWidth:220, margin:0 }}>
               QRfolio transforme les QR codes en expériences interactives.
             </p>
             {/* Réseaux sociaux */}
@@ -3518,11 +3518,11 @@ export default function HomePage() {
         {/* Barre bas */}
         <div className="fb" role="contentinfo">
           <div style={{ display:"flex",alignItems:"center",gap:20,flexWrap:"wrap" }}>
-            <p style={{ color:"rgba(138,132,120,0.45)",fontSize:12,margin:0 }}>
+            <p style={{ color:"rgba(188,182,166,0.45)",fontSize:12,margin:0 }}>
               © {new Date().getFullYear()} QRfolio. Tous droits réservés.
             </p>
-            <span className="f-meta" style={{ color:"rgba(138,132,120,0.2)",fontSize:12 }} aria-hidden="true">·</span>
-            <span className="f-meta" style={{ color:"rgba(138,132,120,0.35)",fontSize:11,fontFamily:"monospace" }}>
+            <span className="f-meta" style={{ color:"rgba(188,182,166,0.2)",fontSize:12 }} aria-hidden="true">·</span>
+            <span className="f-meta" style={{ color:"rgba(188,182,166,0.35)",fontSize:11,fontFamily:"monospace" }}>
               v1.0.0
             </span>
           </div>
@@ -3533,9 +3533,9 @@ export default function HomePage() {
             </a>
             <div style={{ display:"flex",gap:14 }}>
               {([["Confidentialité","/privacy"],["Conditions","/terms"]] as const).map(([lbl,href])=>(
-                <Link key={href} href={href} style={{ color:"rgba(138,132,120,0.4)",fontSize:12,textDecoration:"none",transition:"color 0.2s" }}
+                <Link key={href} href={href} style={{ color:"rgba(188,182,166,0.4)",fontSize:12,textDecoration:"none",transition:"color 0.2s" }}
                   onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color="#C9A84C"}}
-                  onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color="rgba(138,132,120,0.4)"}}>
+                  onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color="rgba(188,182,166,0.4)"}}>
                   {lbl}
                 </Link>
               ))}
