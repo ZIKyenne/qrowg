@@ -69,6 +69,8 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
     await supabase.from("leads").update({ status, ...(is_read ? { is_read: true } : {}) }).eq("id", id)
   }
   const remove = async (id: string) => {
+    const lead = leads.find(l => l.id === id)
+    if (!window.confirm(`Supprimer définitivement ce message${lead?.name ? ` de ${lead.name}` : ""} ?\n\nCette action est irréversible.`)) return
     setLeads(prev => prev.filter(l => l.id !== id))
     await supabase.from("leads").delete().eq("id", id)
   }
@@ -89,10 +91,10 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
   const types = ["all", "unread", ...Array.from(new Set(leads.map(l => l.type)))]
 
   return (
-    <div style={{ minHeight: "100vh", position: "relative", fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ minHeight: "100dvh", position: "relative", fontFamily: "DM Sans, sans-serif" }}>
       {/* Particules dorées en fond (comme les autres pages du dashboard) */}
       <Particles />
-      <div style={{ padding: "28px 24px 60px", maxWidth: 900, margin: "0 auto", position: "relative", zIndex: 1 }}>
+      <div className="rpad" style={{ padding: "28px 24px 60px", maxWidth: 900, margin: "0 auto", position: "relative", zIndex: 1 }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 6, flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -185,7 +187,7 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
                       <span style={{ color: MUTED, fontSize: 11 }}>{fmtDate(l.created_at)}</span>
-                      <button title="Supprimer" onClick={() => remove(l.id)} style={{ background: "transparent", border: "none", cursor: "pointer", color: MUTED, padding: 2 }}><Trash2 size={14} /></button>
+                      <button title="Supprimer" onClick={() => remove(l.id)} style={{ background: "transparent", border: "none", cursor: "pointer", color: MUTED, width: 32, height: 32, display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: 8, flexShrink: 0 }}><Trash2 size={15} /></button>
                     </div>
                   </div>
 
