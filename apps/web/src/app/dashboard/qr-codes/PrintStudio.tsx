@@ -976,6 +976,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [shapeSheet, setShapeSheet] = useState<"" | "color" | "border" | "shadow">("")
   // Sheets Bouton (CTA/badge) focalises : texte / couleur.
   const [btnSheet, setBtnSheet] = useState<"" | "text" | "color">("")
+  // Sheet "Plus" : actions secondaires de l'objet (empilement/ordre/verrou/supprimer...).
+  const [moreSel, setMoreSel] = useState(false)
   // Gestes tactiles (#8) : long-press -> dupliquer. Timer + point de depart.
   const lpTimerRef = useRef<number | null>(null)
   const lpStartRef = useRef<{ x: number; y: number } | null>(null)
@@ -2428,9 +2430,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   // ---- Barre contextuelle mobile (facon Canva) : "que veux-tu faire ?" ------
   // Deselectionner referme le panneau Reglages + le selecteur d'empilement.
   const isShapeSel = !!sel && !sel.isQr && !sel.isText && !sel.isImage && sel.label === null && !sel.isGroupObj && !sel.multi
-  useEffect(() => { if (!sel) { setRegOpen(false); setStackPick(null) } if (!sel?.isQr) setQrSheet(""); if (!sel?.isText) setTxtSheet(""); if (!sel?.isImage) setImgSheet(""); if (!isShapeSel) setShapeSheet(""); if (sel?.label == null) setBtnSheet("") }, [sel, isShapeSel])
+  useEffect(() => { if (!sel) { setRegOpen(false); setStackPick(null); setMoreSel(false) } if (!sel?.isQr) setQrSheet(""); if (!sel?.isText) setTxtSheet(""); if (!sel?.isImage) setImgSheet(""); if (!isShapeSel) setShapeSheet(""); if (sel?.label == null) setBtnSheet("") }, [sel, isShapeSel])
   // Un bottom-sheet partiel est ouvert (couvre le bas) -> on remonte le canvas (P1 : objet visible).
-  const anyBottomSheet = regOpen || !!qrSheet || !!txtSheet || !!imgSheet || !!shapeSheet || !!btnSheet
+  const anyBottomSheet = regOpen || !!qrSheet || !!txtSheet || !!imgSheet || !!shapeSheet || !!btnSheet || moreSel
   // Etat des overlays (pour l'interception du bouton Retour telephone).
   overlayOpenRef.current = !!(anyBottomSheet || stackPick || moreOpen || expWiz >= 0)
   closeOverlaysRef.current = () => { setQrSheet(""); setTxtSheet(""); setImgSheet(""); setShapeSheet(""); setBtnSheet(""); setRegOpen(false); setStackPick(null); setMoreOpen(false); setExpWiz(-1) }
@@ -2487,6 +2489,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "border": return <span style={{ fontSize: 16, lineHeight: 1 }}>▢</span>
       case "shadow": return <span style={{ fontSize: 16, lineHeight: 1 }}>◗</span>
       case "replace": return <span style={{ fontSize: 16, lineHeight: 1 }}>⇄</span>
+      case "more":   return <MoreHorizontal size={19} />
       default:       return <span style={{ fontSize: 15, lineHeight: 1 }}>•</span>
     }
   }
@@ -2502,6 +2505,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       case "shapecolor": setShapeSheet("color"); break
       case "border":   setShapeSheet("border"); break
       case "shadow":   setShapeSheet("shadow"); break
+      case "more":     setMoreSel(true); break
       case "filters":    setImgSheet("filters"); break
       case "opacity":    setImgSheet("opacity"); break
       case "replace":    replaceRef.current?.click(); break
@@ -4257,7 +4261,38 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
       {/* Barre contextuelle mobile (facon Canva) : un objet selectionne -> ses actions, gros, en bas.
           Le canvas reste visible ; le panneau complet ne s'ouvre que via "Modifier". */}
-      {landscapeMobile && sel && !regOpen && !qrSheet && !txtSheet && !imgSheet && !shapeSheet && !btnSheet && (() => {
+      {/* Sheet "Plus" : actions secondaires de l'objet selectionne (barre courte -> le reste ici). */}
+      {landscapeMobile && sel && moreSel && (() => {
+        const act = (fn: () => void) => () => { fn(); setMoreSel(false) }
+        const row = (label: string, icon: React.ReactNode, onClick: () => void, danger = false, i = 0) => (
+          <button key={label} type="button" onClick={onClick}
+            style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", minHeight: 52, padding: "0 12px", background: "none", border: "none", borderTop: i ? "1px solid rgba(255,255,255,0.06)" : "none", color: danger ? "#FF8B8B" : "#ECE8E0", fontSize: 15, fontWeight: 600, cursor: "pointer", textAlign: "left" as const }}>
+            <span style={{ display: "flex", width: 22, justifyContent: "center", color: danger ? "#FF8B8B" : "#C9A84C" }}>{icon}</span>{label}
+          </button>
+        )
+        return (
+          <div className="ps-msheet" style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 59, background: "#17171B", borderTop: "1px solid rgba(255,255,255,0.09)", borderRadius: "18px 18px 0 0", boxShadow: "0 -14px 44px rgba(0,0,0,0.55)", padding: "10px 14px calc(14px + env(safe-area-inset-bottom))", maxHeight: "72vh", overflowY: "auto", animation: "psSheetUp .26s cubic-bezier(.2,.8,.2,1)" }}>
+            <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.2)", margin: "0 auto 10px" }} />
+            <div style={{ display: "flex", alignItems: "center", marginBottom: 6 }}>
+              <span style={{ color: "#F4F1EA", fontSize: 14, fontWeight: 800 }}>Plus d'actions</span>
+              <button type="button" onClick={() => setMoreSel(false)} aria-label="Fermer" style={{ marginLeft: "auto", width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 9, color: "#F4F1EA", cursor: "pointer" }}><X size={15} /></button>
+            </div>
+            {[
+              !sel.multi && row("Empilement (objets superposés)", ctxIcon("stack"), act(openStackPicker), false, 0),
+              row("Dupliquer", <Copy size={17} />, act(() => layer("dup")), false, 1),
+              row("Pivoter +90°", <RotateCw size={17} />, act(() => rotateBy(90)), false, 1),
+              row("Mettre devant", <ChevronUp size={17} />, act(() => layer("front")), false, 1),
+              row("Mettre derrière", <ChevronDown size={17} />, act(() => layer("back")), false, 1),
+              row(sel.locked ? "Déverrouiller" : "Verrouiller", sel.locked ? <Unlock size={17} /> : <Lock size={17} />, act(() => layer("lock")), false, 1),
+              row("Réglages complets", <span style={{ fontSize: 16 }}>⚙</span>, act(() => setRegOpen(true)), false, 1),
+            ].filter(Boolean)}
+            <div style={{ height: 1, background: "rgba(255,255,255,0.1)", margin: "8px 0" }} />
+            {row("Supprimer", <Trash2 size={17} />, act(() => layer("del")), true, 0)}
+          </div>
+        )
+      })()}
+
+      {landscapeMobile && sel && !regOpen && !qrSheet && !txtSheet && !imgSheet && !shapeSheet && !btnSheet && !moreSel && (() => {
         const kind = selKind(sel)
         const tools = mobileContextTools(kind)
         return (

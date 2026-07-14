@@ -26,12 +26,18 @@ describe("selKind — priorite de deduction", () => {
 const ALL: SelKind[] = ["qr", "text", "image", "button", "group", "shape", "multi"]
 
 describe("mobileContextTools — invariants", () => {
-  it("chaque type renvoie au moins 2 actions dont Supprimer", () => {
+  it("chaque type : au moins 2 actions et max 6 visibles (barre courte)", () => {
     for (const k of ALL) {
       const tools = mobileContextTools(k)
       expect(tools.length).toBeGreaterThanOrEqual(2)
-      expect(tools.some(t => t.id === "delete")).toBe(true)
+      expect(tools.length).toBeLessThanOrEqual(6)
     }
+  })
+  it("les actions secondaires (Supprimer...) sont accessibles : 'more' pour mono-objet, direct pour multi", () => {
+    for (const k of ALL.filter(k => k !== "multi")) {
+      expect(mobileContextTools(k).some(t => t.id === "more")).toBe(true)
+    }
+    expect(mobileContextTools("multi").some(t => t.id === "delete")).toBe(true)
   })
   it("tous les outils ont id + label + icon non vides", () => {
     for (const k of ALL) {
@@ -90,11 +96,11 @@ describe("mobileContextTools — specifiques par type", () => {
     expect(ids).toContain("align")
     expect(ids).toContain("group")
   })
-  it("mono-objet expose 'stack' (empilement), pas multi", () => {
+  it("mono-objet expose 'more' (empilement/suppr y sont regroupes), pas multi", () => {
     for (const k of ALL.filter(k => k !== "multi")) {
-      expect(mobileContextTools(k).some(t => t.id === "stack")).toBe(true)
+      expect(mobileContextTools(k).some(t => t.id === "more")).toBe(true)
     }
-    expect(mobileContextTools("multi").some(t => t.id === "stack")).toBe(false)
+    expect(mobileContextTools("multi").some(t => t.id === "more")).toBe(false)
   })
   it("qr propose 'Cadre'", () => {
     expect(mobileContextTools("qr").some(t => t.id === "frame")).toBe(true)

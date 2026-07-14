@@ -32,67 +32,61 @@ export function selKind(sel: SelLike): SelKind {
 }
 
 const EDIT: CtxTool = { id: "settings", label: "Modifier", icon: "sliders" }
-const STACK: CtxTool = { id: "stack", label: "Empilement", icon: "stack" }
 const DUP: CtxTool = { id: "dup", label: "Dupliquer", icon: "copy" }
 const ROTATE: CtxTool = { id: "rotate", label: "Pivoter", icon: "rotate" }
 const DELETE: CtxTool = { id: "delete", label: "Supprimer", icon: "trash" }
-// Fin commune des barres mono-objet : gerer l'empilement, dupliquer, pivoter, supprimer.
-const TAIL: CtxTool[] = [STACK, DUP, ROTATE, DELETE]
+// "Plus" : ouvre un sheet avec les actions secondaires (empilement, calques, dupliquer,
+// pivoter, verrouiller, supprimer...). Garde la barre a ~5 intentions max (audit iOS).
+const MORE: CtxTool = { id: "more", label: "Plus", icon: "more" }
 
-// Actions contextuelles selon le type. Toujours au moins une action + Supprimer.
+// Actions contextuelles VISIBLES selon le type : max 5 intentions directes + "Plus".
 export function mobileContextTools(kind: SelKind): CtxTool[] {
   switch (kind) {
     case "qr":
-      // Barre QR = intentions d'edition DIRECTES (chacune ouvre un sheet focalise),
-      // pas un "Modifier" fourre-tout (critique #4/#5/#20).
       return [
         { id: "colors", label: "Couleurs", icon: "colors" },
         { id: "modules", label: "Modules", icon: "modules" },
         { id: "corners", label: "Coins", icon: "corners" },
         { id: "ecc", label: "Correction", icon: "ecc" },
         { id: "frame", label: "Cadre", icon: "frame" },
-        STACK, DUP, DELETE,
+        MORE,
       ]
     case "text":
-      // Intentions texte directes -> sheets focalises (Police/Couleur/Taille/Effets/Aligner).
       return [
         { id: "font", label: "Police", icon: "font" },
         { id: "textcolor", label: "Couleur", icon: "colors" },
         { id: "textsize", label: "Taille", icon: "size" },
         { id: "effects", label: "Effets", icon: "effects" },
         { id: "textalign", label: "Aligner", icon: "align" },
-        STACK, DUP, DELETE,
+        MORE,
       ]
     case "image":
-      // Intentions image directes -> sheets focalises (Filtres/Opacite) + Pivoter direct.
       return [
         { id: "filters", label: "Filtres", icon: "filters" },
         { id: "opacity", label: "Opacité", icon: "opacity" },
         { id: "replace", label: "Remplacer", icon: "replace" },
         ROTATE,
-        STACK, DUP, DELETE,
+        MORE,
       ]
     case "group":
-      return [EDIT, { id: "ungroup", label: "Dégrouper", icon: "ungroup" }, ...TAIL]
+      return [EDIT, { id: "ungroup", label: "Dégrouper", icon: "ungroup" }, MORE]
     case "multi":
       return [{ id: "align", label: "Aligner", icon: "align" }, { id: "group", label: "Grouper", icon: "group" }, DUP, DELETE]
     case "shape":
-      // Intentions forme directes -> sheets focalises (Couleur/Bordure/Ombre) + Pivoter.
       return [
         { id: "shapecolor", label: "Couleur", icon: "colors" },
         { id: "border", label: "Bordure", icon: "border" },
         { id: "shadow", label: "Ombre", icon: "shadow" },
         ROTATE,
-        STACK, DUP, DELETE,
+        MORE,
       ]
     case "button":
-      // Bouton / badge (contient un texte) : editer le texte, la couleur du fond.
       return [
         { id: "btntext", label: "Texte", icon: "font" },
         { id: "btncolor", label: "Couleur", icon: "colors" },
-        STACK, DUP, DELETE,
+        MORE,
       ]
     default:
-      return [EDIT, ...TAIL]
+      return [EDIT, MORE]
   }
 }
