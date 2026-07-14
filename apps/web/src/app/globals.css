@@ -170,6 +170,9 @@ button:not(:disabled):active { transform: scale(.97); }
 }
 .m-sticky-cta.show { transform: translateY(0); }
 @media (max-width: 820px) { .m-sticky-cta { display: block; } }
+/* Reserve d'espace pour que la barre CTA collante ne masque pas le contenu (mobile uniquement) */
+.m-sticky-cta-spacer { display: none; }
+@media (max-width: 820px) { .m-sticky-cta-spacer.show { display: block; height: calc(74px + env(safe-area-inset-bottom)); } }
 
 /* ── Transition signature : faisceau de scan qui balaie les séparateurs ──────── */
 @keyframes seamScan {

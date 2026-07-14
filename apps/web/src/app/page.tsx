@@ -1449,14 +1449,16 @@ function Navbar() {
         {/* Burger — sibling direct de <nav> (hors .dNav, sinon masqué par display:none parent en mobile) */}
         <button onClick={()=>setMenuOpen(o=>!o)} aria-label={menuOpen?"Fermer le menu":"Ouvrir le menu"}
           aria-expanded={menuOpen} aria-controls="mobileMenu" className="brg"
-          style={{display:"none",background:"none",border:"none",cursor:"pointer",
-            width:44,height:44,flexDirection:"column",gap:5,alignItems:"center",justifyContent:"center"}}>
+          style={{display:"none",background:menuOpen?"rgba(201,168,76,0.14)":"rgba(255,255,255,0.05)",
+            border:"1px solid rgba(201,168,76,0.28)",borderRadius:11,cursor:"pointer",
+            width:44,height:44,flexDirection:"column",gap:5,alignItems:"center",justifyContent:"center",
+            transition:"background 0.2s,border-color 0.2s"}}>
           {[
-            {tf:menuOpen?"rotate(45deg) translate(4.5px,4.5px)":"none",op:1},
+            {tf:menuOpen?"rotate(45deg) translate(5px,5px)":"none",op:1},
             {tf:"none",op:menuOpen?0:1},
-            {tf:menuOpen?"rotate(-45deg) translate(4.5px,-4.5px)":"none",op:1},
+            {tf:menuOpen?"rotate(-45deg) translate(5px,-5px)":"none",op:1},
           ].map((s,i)=>(
-            <span key={i} style={{display:"block",width:22,height:1.5,background:"#C9A84C",
+            <span key={i} style={{display:"block",width:22,height:2,background:"#C9A84C",
               borderRadius:2,transform:s.tf,opacity:s.op,transition:"transform 0.25s,opacity 0.2s"}}/>
           ))}
         </button>
@@ -3056,7 +3058,7 @@ function PrintStudioSection() {
 export default function HomePage() {
   const [titleVisible, setTitleVisible] = useState(false)
   const [charIndex, setCharIndex] = useState(0)
-  const title = "Votre QR code mérite mieux qu'un simple lien."
+  const title = "Créez votre page pro et votre QR code en quelques minutes."
 
   useEffect(() => {
     const t = setTimeout(() => setTitleVisible(true), 400)
@@ -3182,12 +3184,11 @@ export default function HomePage() {
 
             {/* Sous-titre */}
             <p style={{
-              color: "rgba(138,132,120,0.92)", fontSize: 17.5, lineHeight: 1.7,
-              margin: "0 0 40px", maxWidth: 440,
+              color: "rgba(226,220,206,0.9)", fontSize: 18, lineHeight: 1.65,
+              margin: "0 0 40px", maxWidth: 460,
               animation: "fadeUp 0.6s ease 0.35s both"
             }}>
-              Une page pro, un QR code personnalisable, chaque scan mesuré.<br />
-              En quelques minutes, sans coder.
+              Partagez vos coordonnées, réseaux, menu et services depuis une page unique — modifiable à tout moment, sans réimprimer votre QR code.
             </p>
 
             {/* CTAs */}
@@ -3543,6 +3544,8 @@ export default function HomePage() {
         </div>
       </footer>
 
+      {/* Reserve d'espace en bas quand la barre CTA collante est visible (mobile) -> ne masque plus le contenu */}
+      <div aria-hidden className={`m-sticky-cta-spacer${showSticky ? " show" : ""}`} />
       {/* CTA mobile collant — apparaît après le hero, masqué sur desktop (CSS .m-sticky-cta) */}
       <div className={`m-sticky-cta${showSticky ? " show" : ""}`} aria-hidden={!showSticky}>
         <Link href="/auth/signup" style={{
