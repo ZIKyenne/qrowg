@@ -1833,14 +1833,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
 
   // Dock mobile (barre du bas) : chaque outil ouvre le panneau correspondant (un seul à la fois).
   const DOCK_TOOLS: DockTool[] = [
-    { id: "tpl", icon: <LayoutTemplate size={20} />, label: "Modèles" },
-    { id: "text", icon: <TypeIcon size={20} />, label: "Texte" },
-    { id: "qr", icon: <QrCode size={20} />, label: "QR" },
-    { id: "img", icon: <ImageIcon size={20} />, label: "Image" },
-    { id: "photo", icon: <Search size={20} />, label: "Photos" },
-    { id: "shape", icon: <Shapes size={20} />, label: "Formes" },
-    { id: "color", icon: <Palette size={20} />, label: "Couleurs" },
-    { id: "layers", icon: <Copy size={20} />, label: "Calques" },
+    { id: "tpl", icon: <LayoutTemplate size={23} />, label: "Modèles" },
+    { id: "text", icon: <TypeIcon size={23} />, label: "Texte" },
+    { id: "qr", icon: <QrCode size={23} />, label: "QR" },
+    { id: "img", icon: <ImageIcon size={23} />, label: "Image" },
+    { id: "photo", icon: <Search size={23} />, label: "Photos" },
+    { id: "shape", icon: <Shapes size={23} />, label: "Formes" },
+    { id: "color", icon: <Palette size={23} />, label: "Couleurs" },
+    { id: "layers", icon: <Copy size={23} />, label: "Calques" },
   ]
   const dockActive =
     tplOpen ? "tpl"
@@ -3850,6 +3850,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
            scroll de l'enfant. Header devient sticky pour rester visible. */
         .ps-root.ps-landscape .ps-fly:not(.ps-fly-right) { display: block !important; overflow-y: auto !important; overflow-x: hidden !important; -webkit-overflow-scrolling: touch !important; touch-action: pan-y !important; overscroll-behavior: contain !important; }
         .ps-root.ps-landscape .ps-fly:not(.ps-fly-right) > .qr-scroll { overflow: visible !important; min-height: 0 !important; display: block !important; }
+        /* En-tete (titre + croix) COLLANT en haut du sheet -> toujours accessible pendant le scroll. */
+        .ps-root.ps-landscape .ps-fly:not(.ps-fly-right) .ps-fly-head { position: sticky; top: 0; z-index: 4; background: #17171B; }
         /* Sheets focalises + Reglages + menu ... : contenu scrollable au doigt (pan-y), sans fuite vers le fond */
         .ps-root.ps-landscape .ps-fly-right.ps-sheet, .ps-msheet { touch-action: pan-y; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
       `}</style>
@@ -4686,7 +4688,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {tplOpen && (
           <div className="qr-scroll ps-fly" style={{ width: leftW, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: pSurf, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
             <ResizeHandle which="left" />
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
+            <div className="ps-fly-head" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
               <span style={{ color: pInk, fontWeight: 800, fontSize: 12.5 }}>Modèles</span>
               <button type="button" onClick={() => setTplOpen(false)} aria-label="Fermer les modèles"
                 style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: pMuted, cursor: "pointer" }}>
@@ -4852,7 +4854,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {libOpen && (
           <div className="qr-scroll ps-fly" style={{ width: leftW, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: pSurf, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
             <ResizeHandle which="left" />
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
+            <div className="ps-fly-head" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
               <span style={{ color: pInk, fontWeight: 800, fontSize: 12.5 }}>Bibliothèque</span>
               <button type="button" onClick={() => setLibOpen(false)} aria-label="Fermer la bibliothèque"
                 style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: pMuted, cursor: "pointer" }}>
@@ -5053,7 +5055,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {side === "styles" && (
           <div className="qr-scroll ps-fly" style={{ width: leftW, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: pSurf, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
             <ResizeHandle which="left" />
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
+            <div className="ps-fly-head" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
               <span style={{ color: pInk, fontWeight: 800, fontSize: 12.5 }}>Styles</span>
               <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: pMuted, cursor: "pointer" }}><X size={13} /></button>
             </div>
@@ -5082,7 +5084,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {side === "layers" && (
           <div className="qr-scroll ps-fly" style={{ width: leftW, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: pSurf, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
             <ResizeHandle which="left" />
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
+            <div className="ps-fly-head" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
               <span style={{ color: pInk, fontWeight: 800, fontSize: 12.5 }}>Calques</span>
               <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: pMuted, cursor: "pointer" }}><X size={13} /></button>
             </div>
@@ -5150,7 +5152,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         {side === "bg" && (
           <div className="qr-scroll ps-fly" style={{ width: leftW, flexShrink: 0, borderRight: "1px solid rgba(0,0,0,0.07)", background: pSurf, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
             <ResizeHandle which="left" />
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
+            <div className="ps-fly-head" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderBottom: "1px solid rgba(0,0,0,0.06)", flexShrink: 0 }}>
               <span style={{ color: pInk, fontWeight: 800, fontSize: 12.5 }}>Fond &amp; infos</span>
               <button type="button" onClick={() => setSide("")} aria-label="Fermer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "rgba(0,0,0,0.05)", border: "none", borderRadius: 7, color: pMuted, cursor: "pointer" }}><X size={13} /></button>
             </div>

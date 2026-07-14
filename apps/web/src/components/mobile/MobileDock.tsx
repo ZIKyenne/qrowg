@@ -19,7 +19,7 @@ export default function MobileDock({ tools, active, onSelect }: {
   return (
     <div style={{
       flexShrink: 0, background: T.color.chrome, borderTop: `1px solid ${T.color.line}`,
-      padding: `${T.space.sm}px 6px calc(${T.space.sm}px + env(safe-area-inset-bottom))`,
+      padding: `10px 6px calc(10px + env(safe-area-inset-bottom))`,
       zIndex: T.z.dock,
     }}>
       <div style={{ display: "flex", gap: 2, overflowX: "auto", overflowY: "hidden", scrollbarWidth: "none" as any, touchAction: "pan-x", overscrollBehaviorX: "contain", WebkitOverflowScrolling: "touch" }}>
@@ -29,16 +29,16 @@ export default function MobileDock({ tools, active, onSelect }: {
             <button key={t.id} type="button" aria-pressed={on}
               onClick={() => { haptic(); onSelect(t.id) }}
               style={{
-                flex: "0 0 auto", minWidth: 66, minHeight: 60, border: "none", background: on ? T.color.goldSoft : "transparent",
+                flex: "0 0 auto", minWidth: 78, minHeight: 66, border: "none", background: on ? T.color.goldSoft : "transparent",
                 borderRadius: T.radius.md, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                gap: 5, cursor: "pointer", color: on ? T.color.gold : T.color.inkDim,
+                gap: 6, cursor: "pointer", color: on ? T.color.gold : T.color.inkDim,
                 transition: `transform ${T.motion.fast}ms, background .15s, color .15s`,
                 fontFamily: "DM Sans, system-ui, sans-serif",
               }}
               onTouchStart={e => { (e.currentTarget as HTMLButtonElement).style.transform = "scale(0.92)" }}
               onTouchEnd={e => { (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)" }}>
-              <span style={{ fontSize: 21, lineHeight: 1 }} aria-hidden>{t.icon}</span>
-              <span style={{ fontSize: 10.5, fontWeight: 600, letterSpacing: 0.2 }}>{t.label}</span>
+              <span style={{ fontSize: 24, lineHeight: 1 }} aria-hidden>{t.icon}</span>
+              <span style={{ fontSize: 11.5, fontWeight: 600, letterSpacing: 0.2 }}>{t.label}</span>
             </button>
           )
         })}
