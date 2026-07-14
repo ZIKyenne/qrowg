@@ -440,7 +440,7 @@ export default function TemplatesPage() {
             </button>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(290px,100%), 1fr))", gap: 18 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(min(290px,100%), 1fr))", gap: isMobile ? 11 : 18 }}>
             <style>{`@keyframes tplUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}`}</style>
             {filtered.map((template: any, idx: number) => {
               const isSelected = selected === template.id
@@ -457,7 +457,7 @@ export default function TemplatesPage() {
                   className="tpl-card"
                   onMouseEnter={() => setHoveredCard(template.id)}
                   onMouseLeave={() => setHoveredCard(null)}
-                  onClick={() => { if (!locked) setSelected(isSelected ? null : template.id) }}
+                  onClick={() => { if (locked) return; if (isMobile) setPreview(template.id); else setSelected(isSelected ? null : template.id) }}
                   style={{
                     background: isSelected ? "color-mix(in srgb, var(--accent) 5%, transparent)" : "#0F0E0B",
                     border: "1.5px solid " + (isSelected ? "color-mix(in srgb, var(--accent) 50%, transparent)" : isHovered ? "color-mix(in srgb, var(--accent) 20%, transparent)" : "rgba(255,255,255,0.06)"),
@@ -469,7 +469,7 @@ export default function TemplatesPage() {
                   }}>
 
                   {/* ── Aperçu visuel ──────────────────────────────────────── */}
-                  <div style={{ height: 190, background: "linear-gradient(145deg, " + template.bg + " 0%, " + template.surface + " 100%)", position: "relative", overflow: "hidden" }}>
+                  <div style={{ height: isMobile ? 128 : 190, background: "linear-gradient(145deg, " + template.bg + " 0%, " + template.surface + " 100%)", position: "relative", overflow: "hidden" }}>
                     {/* Ambient glow */}
                     <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 0%, " + template.color + "25, transparent 65%)" }} />
 
@@ -522,65 +522,67 @@ export default function TemplatesPage() {
                   </div>
 
                   {/* ── Infos ─────────────────────────────────────────────── */}
-                  <div style={{ padding: "14px 16px" }}>
+                  <div style={{ padding: isMobile ? "9px 10px 11px" : "14px 16px" }}>
                     {/* Nom + catégorie */}
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 6 }}>
-                      <div style={{ flex: 1 }}>
-                        <h3 style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: "0 0 5px", letterSpacing: "-0.2px" }}>{template.name}</h3>
-                        <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: isMobile ? 8 : 6 }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <h3 style={{ color: "#F5F0E8", fontSize: isMobile ? 12.5 : 15, fontWeight: 700, margin: isMobile ? 0 : "0 0 5px", letterSpacing: "-0.2px", whiteSpace: isMobile ? "nowrap" as const : "normal", overflow: "hidden", textOverflow: "ellipsis" }}>{template.name}</h3>
+                        {!isMobile && <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
                           <span style={{ background: template.color + "12", border: "1px solid " + template.color + "22", borderRadius: 6, padding: "1px 7px", fontSize: 9, color: template.color, fontWeight: 600 }}>{template.category}</span>
                           {tier && (
                             <span style={{ display: "inline-flex", alignItems: "center", gap: 3, background: tier.color + "16", border: "1px solid " + tier.color + "33", borderRadius: 6, padding: "1px 7px", fontSize: 9, color: tier.color, fontWeight: 700 }}>
                               {tier.emoji} {tier.label}
                             </span>
                           )}
+                        </div>}
+                      </div>
+                    </div>
+
+                    {!isMobile && <>
+                      {/* Description */}
+                      <p style={{ color: MUTED, fontSize: 11, margin: "0 0 8px", lineHeight: 1.5 }}>{template.description}</p>
+
+                      {/* Highlight */}
+                      {template.highlight && (
+                        <div style={{ background: template.color + "08", border: "1px solid " + template.color + "15", borderRadius: 6, padding: "4px 8px", marginBottom: 10 }}>
+                          <span style={{ color: template.color, fontSize: 9, fontWeight: 600 }}>✦ {template.highlight}</span>
+                        </div>
+                      )}
+
+                      {/* Métadonnées : blocs + temps */}
+                      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                          <Layers size={11} color={MUTED} />
+                          <span style={{ color: MUTED, fontSize: 10 }}>{blockCount} blocs</span>
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                          <Clock size={11} color={MUTED} />
+                          <span style={{ color: MUTED, fontSize: 10 }}>≈ {SETUP_TIME[template.id] || "5 min"}</span>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Description */}
-                    <p style={{ color: MUTED, fontSize: 11, margin: "0 0 8px", lineHeight: 1.5 }}>{template.description}</p>
-
-                    {/* Highlight */}
-                    {template.highlight && (
-                      <div style={{ background: template.color + "08", border: "1px solid " + template.color + "15", borderRadius: 6, padding: "4px 8px", marginBottom: 10 }}>
-                        <span style={{ color: template.color, fontSize: 9, fontWeight: 600 }}>✦ {template.highlight}</span>
+                      {/* Tags */}
+                      <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 14 }}>
+                        {template.tags.slice(0, 4).map((tag: string, i: number) => (
+                          <span key={i} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 4, padding: "2px 6px", fontSize: 9, color: MUTED }}>{tag}</span>
+                        ))}
                       </div>
-                    )}
-
-                    {/* Métadonnées : blocs + temps */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                        <Layers size={11} color={MUTED} />
-                        <span style={{ color: MUTED, fontSize: 10 }}>{blockCount} blocs</span>
-                      </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                        <Clock size={11} color={MUTED} />
-                        <span style={{ color: MUTED, fontSize: 10 }}>≈ {SETUP_TIME[template.id] || "5 min"}</span>
-                      </div>
-                    </div>
-
-                    {/* Tags */}
-                    <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 14 }}>
-                      {template.tags.slice(0, 4).map((tag: string, i: number) => (
-                        <span key={i} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 4, padding: "2px 6px", fontSize: 9, color: MUTED }}>{tag}</span>
-                      ))}
-                    </div>
+                    </>}
 
                     {/* Actions */}
                     <div style={{ display: "flex", gap: 7 }}>
-                      {/* Aperçu */}
-                      <button type="button" onClick={(e) => { e.stopPropagation(); setPreview(template.id) }}
+                      {/* Aperçu (masqué sur mobile : tap sur la carte = aperçu) */}
+                      {!isMobile && <button type="button" onClick={(e) => { e.stopPropagation(); setPreview(template.id) }}
                         style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: "8px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 9, color: MUTED, fontSize: 11, cursor: "pointer", transition: "all 0.15s" }}
                         onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.color = "#F5F0E8" }}
                         onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.color = MUTED }}>
                         <Eye size={11} /> Aperçu
-                      </button>
+                      </button>}
 
                       {/* Utiliser */}
                       <button type="button" onClick={(e) => { e.stopPropagation(); if (!locked) setNamingFor(template.id) }}
                         disabled={!!creating || locked}
-                        style={{ flex: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "8px 12px", background: locked ? "rgba(255,255,255,0.04)" : isCreating ? "color-mix(in srgb, var(--accent) 20%, transparent)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border: locked ? "1px solid rgba(255,255,255,0.08)" : "none", borderRadius: 9, color: locked ? MUTED : "#080808", fontSize: 11, fontWeight: 700, cursor: locked || creating ? "not-allowed" : "pointer", opacity: creating && !isCreating ? 0.5 : 1, transition: "all 0.15s" }}>
+                        style={{ flex: isMobile ? 1 : 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: isMobile ? "9px 10px" : "8px 12px", background: locked ? "rgba(255,255,255,0.04)" : isCreating ? "color-mix(in srgb, var(--accent) 20%, transparent)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border: locked ? "1px solid rgba(255,255,255,0.08)" : "none", borderRadius: 9, color: locked ? MUTED : "#080808", fontSize: 11, fontWeight: 700, cursor: locked || creating ? "not-allowed" : "pointer", opacity: creating && !isCreating ? 0.5 : 1, transition: "all 0.15s" }}>
                         {isCreating ? <><div style={{ width: 10, height: 10, border: "1.5px solid var(--accent)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Création...</> : locked ? <><Lock size={10} /> {PLAN_CONFIG[template.plan].label}</> : <>Utiliser <ArrowRight size={10} /></>}
                       </button>
                     </div>
