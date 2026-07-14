@@ -547,7 +547,7 @@ function FeaturesSection() {
             {([["À quoi ça sert", fInfo.detail.role], ["Exemple concret", fInfo.detail.example], ["Ce que ça vous apporte", fInfo.detail.benefit]] as const).map(([h, txt]) => (
               <div key={h} style={{ marginBottom: 14 }}>
                 <p style={{ color: "rgba(188,182,166,0.7)", fontSize: 9.5, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 4px" }}>{h}</p>
-                <p style={{ color: "#E8E6E0", fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>{txt}</p>
+                <p style={{ color: "#EDEBE4", fontSize: 15, lineHeight: 1.65, margin: 0 }}>{txt}</p>
               </div>
             ))}
             <Link href="/auth/signup" style={{ display: "block", textAlign: "center", marginTop: 20, padding: "12px", borderRadius: 11, background: `linear-gradient(90deg, ${fInfo.accent}, ${fInfo.accent}cc)`, color: "#080808", textDecoration: "none", fontSize: 13.5, fontWeight: 800 }}>
@@ -914,7 +914,7 @@ function PricingSection() {
           </div>
           {showCmp && (
           <>
-          <p style={{ color: "rgba(188,182,166,0.7)", fontSize: 13, textAlign: "center", margin: "22px 0 26px" }}>
+          <p style={{ color: "rgba(200,194,178,0.88)", fontSize: 14.5, textAlign: "center", margin: "22px 0 26px", lineHeight: 1.6 }}>
             Survolez le <span style={{ color: "#C9A84C" }}>?</span> de chaque ligne pour plus d'explications.
           </p>
           {(() => {
@@ -1001,7 +1001,7 @@ function ProofStrip() {
       style={{ padding: "0 48px 80px", position: "relative", zIndex: 1 }}
     >
       <div style={{ maxWidth: 1140, margin: "0 auto" }}>
-        <p style={{ textAlign: "center", color: "rgba(188,182,166,0.75)", fontSize: 13, margin: "0 0 30px", letterSpacing: 0.2 }}>
+        <p style={{ textAlign: "center", color: "rgba(200,194,178,0.88)", fontSize: 14.5, margin: "0 0 30px", letterSpacing: 0.2, lineHeight: 1.6 }}>
           De l'idée au QR code partagé — <span style={{ color: "#C9A84C", fontWeight: 600 }}>4 étapes, 5 minutes</span>.
         </p>
         <div className="rm-grid" style={{ position: "relative", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
@@ -1553,8 +1553,8 @@ function HowItWorks() {
                   justifyContent:"center",fontSize:27,boxShadow:"0 8px 22px rgba(0,0,0,0.4), 0 0 0 6px rgba(8,8,8,0.92)"}}>{step.icon}</div>
               </div>
               <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                <h3 style={{color:"#F5F0E8",fontSize:15.5,fontWeight:700,margin:0,lineHeight:1.3,letterSpacing:"-0.01em"}}>{step.title}</h3>
-                <p style={{color:"rgba(188,182,166,0.85)",fontSize:12.5,margin:0,lineHeight:1.6}}>{step.desc}</p>
+                <h3 style={{color:"#F5F0E8",fontSize:16.5,fontWeight:700,margin:0,lineHeight:1.3,letterSpacing:"-0.01em"}}>{step.title}</h3>
+                <p style={{color:"rgba(200,194,178,0.9)",fontSize:14.5,margin:0,lineHeight:1.6}}>{step.desc}</p>
               </div>
             </div>
           ))}
@@ -1678,7 +1678,7 @@ function BuilderSection(){
               transition:`opacity 0.5s ease ${0.35+i*0.1}s,transform 0.5s ease ${0.35+i*0.1}s`}}>
               <span style={{fontSize:22}}>{b.icon}</span>
               <h3 style={{color:"#F5F0E8",fontSize:14,fontWeight:700,margin:0}}>{b.title}</h3>
-              <p style={{color:"rgba(188,182,166,0.8)",fontSize:12.5,margin:0,lineHeight:1.6}}>{b.desc}</p>
+              <p style={{color:"rgba(200,194,178,0.9)",fontSize:14,margin:0,lineHeight:1.6}}>{b.desc}</p>
             </div>
           ))}
         </div>
@@ -3038,7 +3038,7 @@ function PrintStudioSection() {
               {/* Texte */}
               <div style={{ padding: "16px 18px 20px" }}>
                 <h3 style={{ color: "#F5F0E8", fontSize: 15.5, fontWeight: 700, margin: "0 0 6px" }}>{s.name}</h3>
-                <p style={{ color: "rgba(188,182,166,0.85)", fontSize: 13, lineHeight: 1.55, margin: 0 }}>{s.benefit}</p>
+                <p style={{ color: "rgba(200,194,178,0.9)", fontSize: 14, lineHeight: 1.6, margin: 0 }}>{s.benefit}</p>
               </div>
             </div>
           ))}
