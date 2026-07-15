@@ -1102,9 +1102,9 @@ export default function ProfilePage() {
 
       {/* Toast */}
       {toast && (
-        <div style={{ position:"fixed", bottom:24, left:"50%", transform:"translateX(-50%)", zIndex:9999, display:"flex", alignItems:"center", gap:9, padding:"11px 20px", background:toast.type==="ok"?"rgba(57,255,143,0.12)":"rgba(255,107,107,0.12)", border:`1px solid ${toast.type==="ok"?"rgba(57,255,143,0.3)":"rgba(255,107,107,0.3)"}`, borderRadius:12, backdropFilter:"blur(12px)", boxShadow:"0 8px 32px rgba(0,0,0,0.5)", whiteSpace:"nowrap" as const }}>
-          {toast.type==="ok" ? <Check size={14} color="#39FF8F"/> : <AlertTriangle size={14} color="#FF6B6B"/>}
-          <span style={{ color:toast.type==="ok"?"#39FF8F":"#FF6B6B", fontSize:13, fontWeight:600 }}>{toast.msg}</span>
+        <div style={{ position:"fixed", bottom:24, left:"50%", transform:"translateX(-50%)", zIndex:9999, display:"flex", alignItems:"center", gap:9, padding:"11px 20px", background:toast.type==="ok"?"var(--success-bg)":"var(--danger-bg)", border:`1px solid ${toast.type==="ok"?"var(--success-border)":"var(--danger-border)"}`, borderRadius:12, backdropFilter:"blur(12px)", boxShadow:"0 8px 32px rgba(0,0,0,0.5)", whiteSpace:"nowrap" as const }}>
+          {toast.type==="ok" ? <Check size={14} color="var(--success)"/> : <AlertTriangle size={14} color="var(--danger)"/>}
+          <span style={{ color:toast.type==="ok"?"var(--success)":"var(--danger)", fontSize:13, fontWeight:600 }}>{toast.msg}</span>
         </div>
       )}
 
@@ -1149,8 +1149,8 @@ export default function ProfilePage() {
                   <span style={{ color: pc, fontSize: 11, fontWeight: 800 }}>{planCfg.label}</span>
                   {currentPlan !== "free" && <span aria-hidden style={{ position: "absolute", inset: 0, background: "linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.45) 50%, transparent 70%)", backgroundSize: "220% 100%", animation: "badgeShine 4.5s ease-in-out infinite" }}/>}
                 </span>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#39FF8F", fontSize: 11.5, fontWeight: 600 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#39FF8F", boxShadow: "0 0 8px #39FF8F" }}/> Actif
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "var(--success)", fontSize: 11.5, fontWeight: 600 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--success)", boxShadow: "0 0 8px var(--success)" }}/> Actif
                 </span>
                 {(profile?.total_scans || 0) >= 1000 && (
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(249,115,22,0.14)", border: "1px solid rgba(249,115,22,0.35)", borderRadius: 999, padding: "3px 10px", fontSize: 10.5, color: "#F97316", fontWeight: 800 }}>🔥 1000+ scans</span>
@@ -1227,12 +1227,12 @@ export default function ProfilePage() {
                 <div key={i} style={{ marginBottom: i === 0 ? 11 : 0 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 5 }}>
                     <span style={{ color: "#C9C3B6", fontSize: 11, fontWeight: 500 }}>{g.label}</span>
-                    <span style={{ color: g.near ? "#FF6B6B" : "#F5F0E8", fontSize: 11, fontWeight: 700 }}>
+                    <span style={{ color: g.near ? "var(--danger)" : "#F5F0E8", fontSize: 11, fontWeight: 700 }}>
                       {(g.used || 0).toLocaleString("fr-FR")}<span style={{ color: MUTED, fontWeight: 400 }}> / {g.limit == null ? "∞" : g.limit.toLocaleString("fr-FR")}</span>
                     </span>
                   </div>
                   <div style={{ height: 7, borderRadius: 4, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: g.limit == null ? "12%" : `${Math.max(3, g.pct)}%`, borderRadius: 4, background: g.near ? "linear-gradient(90deg,#FF6B6B,#F97316)" : `linear-gradient(90deg,${pc},color-mix(in srgb, var(--accent) 70%, #000))`, transition: "width .8s cubic-bezier(.2,.8,.2,1)" }}/>
+                    <div style={{ height: "100%", width: g.limit == null ? "12%" : `${Math.max(3, g.pct)}%`, borderRadius: 4, background: g.near ? "linear-gradient(90deg,var(--danger),#F97316)" : `linear-gradient(90deg,${pc},color-mix(in srgb, var(--accent) 70%, #000))`, transition: "width .8s cubic-bezier(.2,.8,.2,1)" }}/>
                   </div>
                 </div>
               ))}
@@ -1400,13 +1400,13 @@ export default function ProfilePage() {
                   {/* Icone statut */}
                   <div style={{ position:"absolute", right:11, top:"50%", transform:"translateY(-50%)" }}>
                     {usernameStatus==="checking" && <div style={{ width:13, height:13, border:"1.5px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderTopColor:"var(--accent)", borderRadius:"50%", animation:"spin 0.7s linear infinite" }}/>}
-                    {usernameStatus==="ok"      && <UserCheck size={14} color="#39FF8F"/>}
-                    {(usernameStatus==="taken"||usernameStatus==="invalid") && <UserX size={14} color="#FF6B6B"/>}
+                    {usernameStatus==="ok"      && <UserCheck size={14} color="var(--success)"/>}
+                    {(usernameStatus==="taken"||usernameStatus==="invalid") && <UserX size={14} color="var(--danger)"/>}
                   </div>
                 </div>
                 {/* Message validation */}
                 {usernameMsg && (
-                  <p style={{ color:usernameStatus==="ok"?"#39FF8F":usernameStatus==="checking"?"#8A8478":"#FF6B6B", fontSize:10, margin:"4px 0 0", display:"flex", alignItems:"center", gap:4 }}>
+                  <p style={{ color:usernameStatus==="ok"?"var(--success)":usernameStatus==="checking"?"#8A8478":"var(--danger)", fontSize:10, margin:"4px 0 0", display:"flex", alignItems:"center", gap:4 }}>
                     {usernameMsg}
                   </p>
                 )}
