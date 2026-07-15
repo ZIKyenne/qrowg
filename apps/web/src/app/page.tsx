@@ -3071,13 +3071,19 @@ export default function HomePage() {
     }
   }, [titleVisible, charIndex, title.length])
 
-  // Barre CTA mobile : apparaît une fois le hero dépassé
+  // Barre CTA mobile : apparaît une fois le hero dépassé, MAIS se masque pres du
+  // bas de page pour ne pas doublonner le CTA final (#01).
   const [showSticky, setShowSticky] = useState(false)
   useEffect(() => {
-    const onScroll = () => setShowSticky(window.scrollY > 620)
+    const onScroll = () => {
+      const y = window.scrollY
+      const nearBottom = y + window.innerHeight >= document.documentElement.scrollHeight - 260
+      setShowSticky(y > 620 && !nearBottom)
+    }
     onScroll()
     window.addEventListener("scroll", onScroll, { passive: true })
-    return () => window.removeEventListener("scroll", onScroll)
+    window.addEventListener("resize", onScroll, { passive: true })
+    return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll) }
   }, [])
 
 
