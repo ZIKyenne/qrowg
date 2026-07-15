@@ -84,8 +84,9 @@ export default async function QRCodesPage() {
               ))}
             </div>
 
-            <a href="/dashboard" className="qrh-cta" style={{ display: "flex", alignItems: "center", gap: 7, background: "linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 78%, #000))", color: "#080808", textDecoration: "none", fontSize: 12.5, fontWeight: 700, padding: "10px 18px", borderRadius: 10, whiteSpace: "nowrap" as const, boxShadow: "0 4px 14px color-mix(in srgb, var(--accent) 20%, transparent)" }}>
-              <Plus size={14}/> Nouvelle page
+            {/* Un QR = une page dans QRfolio : la creation part donc d'une page (templates). */}
+            <a href="/dashboard/templates" className="qrh-cta" style={{ display: "flex", alignItems: "center", gap: 7, background: "linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 78%, #000))", color: "#080808", textDecoration: "none", fontSize: 12.5, fontWeight: 700, padding: "10px 18px", borderRadius: 10, whiteSpace: "nowrap" as const, boxShadow: "0 4px 14px color-mix(in srgb, var(--accent) 20%, transparent)" }}>
+              <Plus size={14}/> Nouvelle page + QR
             </a>
           </div>
         </div>

@@ -3206,7 +3206,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         <div style={{ display:"flex", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
           {([["style","Style","🎨"],["supports","Supports","🖨️"],["export","Télécharger","📤"]] as const).map(([id,label,emoji]) => (
             <button key={id} type="button" onClick={() => setActiveTab(id)}
-              style={{ flex:1, padding:"11px 8px", background:activeTab===id?"color-mix(in srgb, var(--accent) 6%, transparent)":"transparent", border:"none", borderBottom:activeTab===id?`2px solid ${G}`:"2px solid transparent", color:activeTab===id?G:MUTED, fontSize:12, fontWeight:600, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:5 }}>
+              style={{ flex:1, minHeight:isMobile?48:undefined, padding:isMobile?"14px 8px":"11px 8px", background:activeTab===id?"color-mix(in srgb, var(--accent) 14%, transparent)":"transparent", border:"none", borderBottom:activeTab===id?`3px solid ${G}`:"3px solid transparent", color:activeTab===id?G:MUTED, fontSize:isMobile?13.5:12, fontWeight:activeTab===id?800:600, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:5 }}>
               <span>{emoji}</span>{label}
             </button>
           ))}
