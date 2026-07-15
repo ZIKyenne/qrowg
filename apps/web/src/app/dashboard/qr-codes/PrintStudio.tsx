@@ -5966,12 +5966,12 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
             <>
               <h2 style={{ color: INK, fontSize: 26, fontWeight: 800, margin: "0 0 6px", textAlign: "center" }}>Vous êtes…</h2>
               <p style={{ color: MUTED, fontSize: 13.5, margin: "0 0 24px", textAlign: "center", maxWidth: 440, lineHeight: 1.5 }}>On vous prépare un design pro en 3 choix, sans réglage technique.</p>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(120px, 150px))", gap: 12, maxWidth: "100%" }}>
+              <div style={{ display: "grid", gridTemplateColumns: orMobile ? "repeat(2, 1fr)" : "repeat(4, minmax(120px, 150px))", gap: 12, width: "100%", maxWidth: orMobile ? 420 : "100%" }}>
                 {GUIDE_METIERS.map(m => (
                   <button key={m.id} className="ps-goal" type="button" onClick={() => { setGuideMetier(m); setStartStep("objectif") }}
-                    style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "20px 12px", background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 16, cursor: "pointer" }}>
-                    <span style={{ fontSize: 32 }}>{m.emoji}</span>
-                    <span style={{ color: INK, fontSize: 13, fontWeight: 700, textAlign: "center" }}>{m.label}</span>
+                    style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: orMobile ? "22px 12px" : "20px 12px", background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.14)", borderRadius: 16, cursor: "pointer", boxShadow: "0 2px 10px rgba(0,0,0,0.06)" }}>
+                    <span style={{ fontSize: orMobile ? 36 : 32 }}>{m.emoji}</span>
+                    <span style={{ color: INK, fontSize: orMobile ? 14 : 13, fontWeight: 700, textAlign: "center" }}>{m.label}</span>
                   </button>
                 ))}
               </div>
@@ -5987,10 +5987,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <button type="button" onClick={() => setStartStep("metier")} style={{ background: "none", border: "none", color: MUTED, fontSize: 12.5, cursor: "pointer", marginBottom: 8 }}>← {guideMetier.emoji} {guideMetier.label}</button>
               <h2 style={{ color: INK, fontSize: 26, fontWeight: 800, margin: "0 0 6px", textAlign: "center" }}>Votre objectif ?</h2>
               <p style={{ color: MUTED, fontSize: 13.5, margin: "0 0 24px", textAlign: "center" }}>Que doit faire votre support ?</p>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(180px, 220px))", gap: 12, maxWidth: "100%" }}>
+              <div style={{ display: "grid", gridTemplateColumns: orMobile ? "repeat(2, 1fr)" : "repeat(2, minmax(180px, 220px))", gap: 12, width: "100%", maxWidth: orMobile ? 440 : "100%" }}>
                 {guideMetier.objs.map(obj => OBJ_META[obj] && (
                   <button key={obj} className="ps-goal" type="button" onClick={() => { setGuideObj(obj); setStartStep("design") }}
-                    style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 16px", background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 14, cursor: "pointer", textAlign: "left" }}>
+                    style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 16px", background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.14)", borderRadius: 14, cursor: "pointer", textAlign: "left", boxShadow: "0 2px 10px rgba(0,0,0,0.06)" }}>
                     <span style={{ fontSize: 26 }}>{OBJ_META[obj].emoji}</span>
                     <span style={{ color: INK, fontSize: 13.5, fontWeight: 700 }}>{OBJ_META[obj].label}</span>
                   </button>
@@ -6004,7 +6004,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <button type="button" onClick={() => setStartStep("objectif")} style={{ background: "none", border: "none", color: MUTED, fontSize: 12.5, cursor: "pointer", marginBottom: 8 }}>← Objectif</button>
               <h2 style={{ color: INK, fontSize: 26, fontWeight: 800, margin: "0 0 6px", textAlign: "center" }}>Choisissez un design</h2>
               <p style={{ color: MUTED, fontSize: 13.5, margin: "0 0 22px", textAlign: "center" }}>Cliquez — c'est prêt à exporter. Tout reste modifiable.</p>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(120px, 150px))", gap: 14, maxWidth: "100%" }}>
+              <div style={{ display: "grid", gridTemplateColumns: orMobile ? "repeat(2, 1fr)" : "repeat(4, minmax(120px, 150px))", gap: 14, width: "100%", maxWidth: orMobile ? 440 : "100%" }}>
                 {(OBJ_META[guideObj]?.pool ?? []).map(id => {
                   const t = PRINT_TEMPLATES.find(x => x.id === id); if (!t) return null
                   return (
