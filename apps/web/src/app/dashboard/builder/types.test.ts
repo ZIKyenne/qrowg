@@ -430,7 +430,7 @@ describe("productBadgeStyle", () => {
   })
   it("Épuisé -> gris + texte clair", () => {
     const b = productBadgeStyle("Épuisé", "#C9A84C")
-    expect(b.color).toBe("#8A8478")
+    expect(b.color).toBe("#A8A190")
     expect(b.fg).toBe("#fff")
   })
   it("inconnu -> accent, pas d'icône", () => {

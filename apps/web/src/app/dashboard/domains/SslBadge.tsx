@@ -48,7 +48,7 @@ const STATUS_CFG: Record<SslStatus, {
   },
 }
 
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 
 function formatCheckedAt(iso: string): string {
   const d = new Date(iso)

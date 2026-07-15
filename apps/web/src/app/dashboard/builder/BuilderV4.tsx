@@ -26,13 +26,13 @@
     static getDerivedStateFromError() { return { failed: true } }
     componentDidUpdate(prev: { children: React.ReactNode }) { if (prev.children !== this.props.children && this.state.failed) this.setState({ failed: false }) }
     render() { return this.state.failed
-      ? <div style={{ padding: "12px 16px", textAlign: "center", color: "#8A8478", fontSize: 11 }}>⚠ Aperçu indisponible pour ce bloc</div>
+      ? <div style={{ padding: "12px 16px", textAlign: "center", color: "#A8A190", fontSize: 11 }}>⚠ Aperçu indisponible pour ce bloc</div>
       : this.props.children }
   }
 
   const G = "#C9A84C"
   const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%274%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E')"
-  const MUTED = "#8A8478"
+  const MUTED = "#A8A190"
   type Message = { role: "user" | "assistant"; content: string }
 
   // ── Historique Undo/Redo ─────────────────────────────────────────────────
@@ -2846,7 +2846,7 @@
   }
 
   function GalleryImagesEditor({ block, onChange }: { block: Block; onChange: (key: string, val: string) => void }) {
-    const M = "#8A8478", TXT = "#F5F0E8", GG = "var(--accent, #C9A84C)"
+    const M = "#A8A190", TXT = "#F5F0E8", GG = "var(--accent, #C9A84C)"
     const isCarousel = block.type === "image_carousel"
     const KEYS = ["img1", "img2", "img3", "img4", "img5", "img6", "img7", "img8", "img9", "img10", "img11", "img12"]
     const MAX = KEYS.length
@@ -2896,7 +2896,7 @@
   }
 
   function SkillsEditor({ content, onChange }: { content: BlockContent; onChange: (key: string, val: string) => void }) {
-    const M = "#8A8478", TXT = "#F5F0E8", GG = "var(--accent, #C9A84C)"
+    const M = "#A8A190", TXT = "#F5F0E8", GG = "var(--accent, #C9A84C)"
     const tags: string[] = String(content.tags || "").split(",").map(t => t.trim()).filter(Boolean)
     const [input, setInput] = useState("")
     const commit = (arr: string[]) => onChange("tags", arr.join(", "))
@@ -2952,7 +2952,7 @@
   }
 
   function AvailabilityEditor({ content, onChange }: { content: BlockContent; onChange: (key: string, val: string) => void }) {
-    const M = "#8A8478", TXT = "#F5F0E8", GG = "var(--accent, #C9A84C)"
+    const M = "#A8A190", TXT = "#F5F0E8", GG = "var(--accent, #C9A84C)"
     const cur = content.status || "available"
     const sc = availabilityStatus(cur, content.dot_color)
     const inputStyle: React.CSSProperties = { width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
@@ -3255,7 +3255,7 @@
 
     const G = "#C9A84C"
   const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%274%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E')"
-    const MUTED = "#8A8478"
+    const MUTED = "#A8A190"
 
     const inputStyle: React.CSSProperties = {
       width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)",
@@ -3267,16 +3267,16 @@
     const PRESETS = [
       // Business
       { name: "Executive Blue", group: "Business", bg: "#0A1628", primary: "#1E88E5", accent: "#42A5F5", text: "#F5F0E8", muted: "#8A9BA8", gradient: "linear-gradient(135deg,#0A1628 0%,#1A2A4A 100%)" },
-      { name: "Corporate Black", group: "Business", bg: "#080808", primary: "#C9A84C", accent: "#39FF8F", text: "#F5F0E8", muted: "#8A8478", gradient: "linear-gradient(135deg,#080808 0%,#111111 100%)" },
+      { name: "Corporate Black", group: "Business", bg: "#080808", primary: "#C9A84C", accent: "#39FF8F", text: "#F5F0E8", muted: "#A8A190", gradient: "linear-gradient(135deg,#080808 0%,#111111 100%)" },
       { name: "Premium Navy", group: "Business", bg: "#0D1B2A", primary: "#C9A84C", accent: "#E8C96A", text: "#F5F0E8", muted: "#7A8B9A", gradient: "linear-gradient(135deg,#0D1B2A 0%,#1A3050 100%)" },
-      { name: "Midnight Gold", group: "Business", bg: "#080808", primary: "#C9A84C", accent: "#39FF8F", text: "#F5F0E8", muted: "#8A8478", gradient: "linear-gradient(135deg,#080808,#1a1a08)" },
+      { name: "Midnight Gold", group: "Business", bg: "#080808", primary: "#C9A84C", accent: "#39FF8F", text: "#F5F0E8", muted: "#A8A190", gradient: "linear-gradient(135deg,#080808,#1a1a08)" },
       { name: "Boardroom", group: "Business", bg: "#1A1A1A", primary: "#E0E0E0", accent: "#C9A84C", text: "#F5F0E8", muted: "#888888", gradient: "linear-gradient(160deg,#1A1A1A,#2D2D2D)" },
       // Luxury
       { name: "Velvet Noir", group: "Luxury", bg: "#0D0A1A", primary: "#9B59B6", accent: "#E056FD", text: "#F5F0E8", muted: "#8A7A9A", gradient: "linear-gradient(135deg,#0D0A1A 0%,#1A0D2E 100%)" },
       { name: "Golden Luxury", group: "Luxury", bg: "#0A0800", primary: "#FFD700", accent: "#FFA500", text: "#F5EDD0", muted: "#9A8A70", gradient: "linear-gradient(135deg,#0A0800,#1A1200)" },
       { name: "Royal Purple", group: "Luxury", bg: "#0A0015", primary: "#8B00FF", accent: "#DA70D6", text: "#F5F0E8", muted: "#8A7A9A", gradient: "linear-gradient(135deg,#0A0015,#150020)" },
       { name: "Diamond White", group: "Luxury", bg: "#FAFAFA", primary: "#1A1A1A", accent: "#C9A84C", text: "#1A1A1A", muted: "#6B7280", gradient: "linear-gradient(135deg,#FAFAFA,#F0F0F5)" },
-      { name: "Prestige", group: "Luxury", bg: "#0C0C0C", primary: "#C9A84C", accent: "#FFD700", text: "#F5EDD0", muted: "#8A8478", gradient: "linear-gradient(160deg,#0C0C0C,#1A1500)" },
+      { name: "Prestige", group: "Luxury", bg: "#0C0C0C", primary: "#C9A84C", accent: "#FFD700", text: "#F5EDD0", muted: "#A8A190", gradient: "linear-gradient(160deg,#0C0C0C,#1A1500)" },
       // SaaS
       { name: "Deep Space", group: "SaaS", bg: "#020B18", primary: "#00D4FF", accent: "#7B2FBE", text: "#F5F0E8", muted: "#8A9BA8", gradient: "linear-gradient(135deg,#020B18,#0A1628)" },
       { name: "Aurora", group: "SaaS", bg: "#0A0F1E", primary: "#00FF9D", accent: "#FF6B6B", text: "#F5F0E8", muted: "#8A8FA0", gradient: "linear-gradient(135deg,#0A0F1E,#0D1628)" },
@@ -3299,7 +3299,7 @@
       { name: "Pure White", group: "Minimal", bg: "#FFFFFF", primary: "#1A1A1A", accent: "#C9A84C", text: "#1A1A1A", muted: "#6B7280", gradient: "linear-gradient(135deg,#FFFFFF,#F8F8F8)" },
       { name: "Minimal Cream", group: "Minimal", bg: "#FAF7F2", primary: "#1A1A1A", accent: "#C9A84C", text: "#2D2D2D", muted: "#7A7060", gradient: "linear-gradient(135deg,#FAF7F2,#F0EDE8)" },
       { name: "Graphite", group: "Minimal", bg: "#1C1C1E", primary: "#AEAEB2", accent: "#C9A84C", text: "#F5F0E8", muted: "#8E8E93", gradient: "linear-gradient(135deg,#1C1C1E,#2C2C2E)" },
-      { name: "Stone", group: "Minimal", bg: "#F5F5F0", primary: "#5A5A5A", accent: "#8A8478", text: "#2D2D2D", muted: "#8A8A8A", gradient: "linear-gradient(135deg,#F5F5F0,#EDEDEA)" },
+      { name: "Stone", group: "Minimal", bg: "#F5F5F0", primary: "#5A5A5A", accent: "#A8A190", text: "#2D2D2D", muted: "#8A8A8A", gradient: "linear-gradient(135deg,#F5F5F0,#EDEDEA)" },
       { name: "Soft Grey", group: "Minimal", bg: "#F0F0F0", primary: "#333333", accent: "#666666", text: "#1A1A1A", muted: "#888888", gradient: "linear-gradient(135deg,#F0F0F0,#E8E8E8)" },
       // Nature
       { name: "Forest Zen", group: "Nature", bg: "#0A1A0E", primary: "#2ECC71", accent: "#27AE60", text: "#F5F0E8", muted: "#6A8A6A", gradient: "linear-gradient(135deg,#0A1A0E,#0F2414)" },

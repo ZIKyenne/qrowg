@@ -5,7 +5,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { Inbox, ArrowRight } from "lucide-react"
 
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 
 type Lead = { id: string; type: string; name: string | null; message: string | null; is_read: boolean; created_at: string }
 

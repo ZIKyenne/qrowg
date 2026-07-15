@@ -8,7 +8,7 @@ const DEVICE_CONFIG: Record<string, { icon: string; color: string; label: string
   mobile:  { icon: "📱", color: "#C9A84C", label: "Mobile" },
   desktop: { icon: "💻", color: "#39FF8F", label: "Desktop" },
   tablet:  { icon: "📟", color: "#7B61FF", label: "Tablette" },
-  unknown: { icon: "❓", color: "#8A8478", label: "Inconnu" },
+  unknown: { icon: "❓", color: "#A8A190", label: "Inconnu" },
 }
 
 function ProgressRing({ value, max, color, size = 64 }: { value: number; max: number; color: string; size?: number }) {
@@ -64,7 +64,7 @@ export default function DeviceChart({ data }: { data: DeviceData[] }) {
   if (total === 0) {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 160 }}>
-        <p style={{ color: "#8A8478", fontSize: 14 }}>Pas encore de données</p>
+        <p style={{ color: "#A8A190", fontSize: 14 }}>Pas encore de données</p>
       </div>
     )
   }
@@ -95,7 +95,7 @@ export default function DeviceChart({ data }: { data: DeviceData[] }) {
                 <span style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 600 }}>{cfg.label}</span>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   <span style={{ color: cfg.color, fontSize: 13, fontWeight: 700 }}>{pct}%</span>
-                  <span style={{ color: "#8A8478", fontSize: 12 }}>{d.value} scans</span>
+                  <span style={{ color: "#A8A190", fontSize: 12 }}>{d.value} scans</span>
                 </div>
               </div>
               <div style={{ height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden" }}>
@@ -119,7 +119,7 @@ export default function DeviceChart({ data }: { data: DeviceData[] }) {
         borderTop: "1px solid rgba(255,255,255,0.06)",
         display: "flex", justifyContent: "space-between", alignItems: "center"
       }}>
-        <span style={{ color: "#8A8478", fontSize: 12 }}>Total scans trackés</span>
+        <span style={{ color: "#A8A190", fontSize: 12 }}>Total scans trackés</span>
         <span style={{ color: "#C9A84C", fontSize: 16, fontWeight: 700, fontFamily: "Cormorant Garamond, serif" }}>{total}</span>
       </div>
     </div>

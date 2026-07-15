@@ -5,7 +5,7 @@ import { Images, FileText, Upload, Trash2, Link2, Check, ExternalLink } from "lu
 import { useImageUpload } from "../builder/useImageUpload"
 
 const G = "#C9A84C"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 
 type Asset = { name: string; url: string }
 

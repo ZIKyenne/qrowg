@@ -6,7 +6,7 @@ import ImageUpload from "./ImageUpload"
 import { BANNER_GRADIENTS, BANNER_PRESETS, BANNER_ANIM_CSS, BANNER_FONTS, BANNER_IMG_FILTERS, BANNER_NOISE_URL as NOISE_URL, bannerBackgroundStyle, bannerImageStyle } from "./types"
 
 const G = "#C9A84C"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 const TEXT = "#F5F0E8"
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))

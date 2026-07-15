@@ -14,7 +14,7 @@ interface Props {
 type AvailStatus = "idle" | "checking" | "available" | "taken" | "invalid" | "own"
 
 const G     = "var(--accent)"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 const APP   = "qrfolio.app"
 
 // Suggestions basées sur le nom saisi

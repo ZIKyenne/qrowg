@@ -44,7 +44,7 @@ interface Props {
 
 const GOLD = "var(--accent)"
 const NEON = "#39FF8F"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 const COLORS = [GOLD, NEON, "#7B61FF", "#FF6B6B", "#4ECDC4", "#FFE66D"]
 
 function formatAgo(iso: string) {
@@ -60,7 +60,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null
   return (
     <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "10px 14px" }}>
-      <p style={{ color: "#8A8478", fontSize: 12, marginBottom: 4 }}>{label}</p>
+      <p style={{ color: "#A8A190", fontSize: 12, marginBottom: 4 }}>{label}</p>
       {payload.map((p: any, i: number) => (
         <p key={i} style={{ color: p.color, fontSize: 13, fontWeight: 600 }}>
           {p.name} : {p.value}
@@ -177,7 +177,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
                 <span style={{ color: "#39FF8F", fontSize: 11, fontWeight: 800, letterSpacing: 0.5 }}>EN DIRECT</span>
               </span>
             </div>
-            <p style={{ color: "#8A8478", margin: 0, fontSize: 13.5 }}>30 derniers jours · {live.last ? `dernier événement ${formatAgo(live.last.t)}` : "en attente de données"}</p>
+            <p style={{ color: "#A8A190", margin: 0, fontSize: 13.5 }}>30 derniers jours · {live.last ? `dernier événement ${formatAgo(live.last.t)}` : "en attente de données"}</p>
           </div>
           {/* Filtre page */}
           <select
@@ -272,7 +272,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
           </div>
           {/* Aujourd'hui + évolution */}
           <div className="az-card" style={{ background: "#100F0A", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius: 14, padding: "16px 18px", position: "relative", overflow: "hidden" }}>
-            <p style={{ color: "#8A8478", fontSize: 11.5, fontWeight: 600, margin: "0 0 8px" }}>Activité aujourd'hui</p>
+            <p style={{ color: "#A8A190", fontSize: 11.5, fontWeight: 600, margin: "0 0 8px" }}>Activité aujourd'hui</p>
             <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
               <p style={{ color: "#F8F4EC", fontSize: 38, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{live.todayN}</p>
               <span style={{ display: "inline-flex", alignItems: "center", gap: 3, color: live.evo >= 0 ? "#39FF8F" : "#FF6B6B", fontSize: 12.5, fontWeight: 700 }}>
@@ -283,7 +283,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
           </div>
           {/* Dernier événement */}
           <div className="az-card" style={{ background: "#100F0A", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius: 14, padding: "16px 18px" }}>
-            <p style={{ color: "#8A8478", fontSize: 11.5, fontWeight: 600, margin: "0 0 8px" }}>Dernier événement</p>
+            <p style={{ color: "#A8A190", fontSize: 11.5, fontWeight: 600, margin: "0 0 8px" }}>Dernier événement</p>
             {live.last ? (
               <>
                 <p style={{ color: "#F8F4EC", fontSize: 19, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>{live.last.kind}</p>

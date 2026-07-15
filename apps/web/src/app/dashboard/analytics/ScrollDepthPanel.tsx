@@ -3,7 +3,7 @@
 import type { ScrollStep } from "./analyticsAgg"
 
 const GOLD = "var(--accent)"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 
 type Props = { funnel: ScrollStep[] }
 

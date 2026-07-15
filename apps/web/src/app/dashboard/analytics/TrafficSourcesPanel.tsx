@@ -39,7 +39,7 @@ const SOURCE_CONFIG: Record<string, {
   telegram:  { label: "Telegram",   emoji: "✈️", color: "#26A5E4", icon: <MessageCircle size={13} /> },
   email:     { label: "Email",      emoji: "📧", color: "#A78BFA", icon: <Mail size={13} /> },
   google:    { label: "Google",     emoji: "🔍", color: "#4285F4", icon: <Globe size={13} /> },
-  referral:  { label: "Référent",   emoji: "🌐", color: "#8A8478", icon: <ExternalLink size={13} /> },
+  referral:  { label: "Référent",   emoji: "🌐", color: "#A8A190", icon: <ExternalLink size={13} /> },
 }
 
 const PERIOD_OPTIONS = [
@@ -49,7 +49,7 @@ const PERIOD_OPTIONS = [
 ]
 
 const G = "var(--accent)"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 const BG = "#0F0E0B"
 const SURFACE = "rgba(255,255,255,0.03)"
 const BORDER = "rgba(255,255,255,0.07)"

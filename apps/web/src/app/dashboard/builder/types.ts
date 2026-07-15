@@ -444,7 +444,7 @@ export function productBadgeStyle(label: string, accent: string): { color: strin
     { kw: ["nouveau", "new "], color: "#39FF8F", icon: "✨" },
     { kw: ["populaire", "best", "meilleur"], color: "#F97316", icon: "🔥" },
     { kw: ["signature", "coup de c"], color: "#C9A84C", icon: "⭐" },
-    { kw: ["épuisé", "epuise", "rupture", "complet"], color: "#8A8478", icon: "⛔" },
+    { kw: ["épuisé", "epuise", "rupture", "complet"], color: "#A8A190", icon: "⛔" },
     { kw: ["bientôt", "bientot"], color: "#38BDF8", icon: "⏳" },
     { kw: ["limité", "limite", "dernièr", "dernier", "stock"], color: "#F97316", icon: "⏰" },
     { kw: ["fait maison", "maison"], color: "#FBBF24", icon: "🏠" },
@@ -456,7 +456,7 @@ export function productBadgeStyle(label: string, accent: string): { color: strin
   const color = found?.color || accent
   const first = (label || "").trim().codePointAt(0) || 0
   const icon = (found?.icon && first < 0x2000) ? found.icon : ""
-  const fg = (color === "#8A8478" || color === "#EF4444") ? "#fff" : "#080808"
+  const fg = (color === "#A8A190" || color === "#EF4444") ? "#fff" : "#080808"
   return { color, fg, icon }
 }
 
@@ -525,7 +525,7 @@ export function stockStatus(raw?: string, lowThreshold = 5): { state: "out" | "l
   if (raw === undefined || raw === null || String(raw).trim() === "") return null
   const n = parseInt(String(raw).replace(/[^0-9-]/g, ""), 10)
   if (!isFinite(n)) return null
-  if (n <= 0) return { state: "out", label: "Epuise", color: "#8A8478", soldOut: true }
+  if (n <= 0) return { state: "out", label: "Epuise", color: "#A8A190", soldOut: true }
   if (n <= lowThreshold) return { state: "low", label: `Plus que ${n} en stock`, color: "#F97316", soldOut: false }
   return { state: "in", label: "En stock", color: "#39FF8F", soldOut: false }
 }
@@ -777,7 +777,7 @@ export function shareLinks(url: string, text = ""): ShareTarget[] {
     { key: "x",        label: "X",        icon: "✖️", color: "#000000", href: `https://twitter.com/intent/tweet?url=${enc("x")}${t ? "&text=" + t : ""}` },
     { key: "linkedin", label: "LinkedIn", icon: "🔗", color: "#0A66C2", href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc("linkedin")}` },
     { key: "telegram", label: "Telegram", icon: "✈️", color: "#26A5E4", href: `https://t.me/share/url?url=${enc("telegram")}${t ? "&text=" + t : ""}` },
-    { key: "email",    label: "Email",    icon: "✉️", color: "#8A8478", href: `mailto:?subject=${t}&body=${enc("email")}` },
+    { key: "email",    label: "Email",    icon: "✉️", color: "#A8A190", href: `mailto:?subject=${t}&body=${enc("email")}` },
   ]
 }
 
@@ -1250,7 +1250,7 @@ export function themeBackgroundStyle(theme: PageTheme): Record<string, string | 
 
 // ── Catégories de presets ─────────────────────────────────────────────────────
 export const PRESET_CATEGORIES = [
-  { id: "Minimal",      icon: "◻️", color: "#8A8478" },
+  { id: "Minimal",      icon: "◻️", color: "#A8A190" },
   { id: "Business",     icon: "💼", color: "#3B82F6" },
   { id: "Luxury",       icon: "💎", color: "#C9A84C" },
   { id: "Creator",      icon: "🎨", color: "#EC4899" },
@@ -1292,7 +1292,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   epure_clair: {
     name: "Épuré Clair", category: "Minimal", emoji: "◻️", tags: ["minimal","clair","sobre"],
     bg: "#FAFAF8", surface: "#FFFFFF", primary: "#141414", accent: "#C9A84C",
-    text: "#161616", muted: "#8A8478",
+    text: "#161616", muted: "#A8A190",
     fontDisplay: "Space Grotesk", fontBody: "DM Sans",
     bgMode: "solid",
   },
@@ -1308,7 +1308,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   midnight_gold: {
     name: "Midnight Gold", category: "Business", emoji: "💼", tags: ["premium","sombre","or"],
     bg: "#080808", surface: "#111009", primary: "#C9A84C", accent: "#39FF8F",
-    text: "#F5F0E8", muted: "#8A8478",
+    text: "#F5F0E8", muted: "#A8A190",
     fontDisplay: "Cormorant Garamond", fontBody: "DM Sans",
     bgMode: "solid",
     effect_noise: true, noise_opacity: 4,
@@ -2977,7 +2977,7 @@ export function docTypeMeta(type?: string): { icon: string; color: string } {
     case "contrat / cgv":
     case "contrat":
     case "cgv":           return { icon: "📝", color: "#64748B" }
-    case "autre":         return { icon: "📎", color: "#8A8478" }
+    case "autre":         return { icon: "📎", color: "#A8A190" }
     case "pdf":
     default:              return { icon: "📄", color: "#EF4444" }
   }
@@ -3157,7 +3157,7 @@ export const BLOCK_CATEGORIES = [
   { id: "business", label: "Business", icon: "🏢", color: "#EC4899", desc: "Maps, horaires, contact" },
   { id: "music", label: "Musique", icon: "🎵", color: "#1DB954", desc: "Spotify, plateformes" },
   { id: "event", label: "Event", icon: "🎉", color: "#F472B6", desc: "Countdown, evenements" },
-  { id: "layout", label: "Mise en page", icon: "📐", color: "#8A8478", desc: "Espaceurs, separateurs" },
+  { id: "layout", label: "Mise en page", icon: "📐", color: "#A8A190", desc: "Espaceurs, separateurs" },
 ]
 
 // ── Definitions des blocs ─────────────────────────────────────────────────────
@@ -3677,7 +3677,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   // ── Mise en page ──────────────────────────────────────────────────────────
   divider: {
     label: "Separateur", description: "Ligne decorative de separation",
-    icon: "➖", color: "#8A8478", category: "layout",
+    icon: "➖", color: "#A8A190", category: "layout",
     defaultContent: { style: "gold" },
     fields: [
       { key: "style", label: "Style", type: "select", options: ["gold", "line", "dots", "stars"] },
@@ -3685,7 +3685,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   },
   spacer: {
     label: "Espacement", description: "Espace vide entre les blocs",
-    icon: "↕️", color: "#8A8478", category: "layout",
+    icon: "↕️", color: "#A8A190", category: "layout",
     defaultContent: { size: "md" },
     fields: [
       { key: "size", label: "Taille", type: "select", options: ["xs", "sm", "md", "lg", "xl"] },

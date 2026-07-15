@@ -26,7 +26,7 @@ interface Props {
 }
 
 const G     = "var(--accent)"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 
 const TYPE_CFG = {
   301: { color: "#39FF8F", bg: "rgba(57,255,143,0.1)",  border: "rgba(57,255,143,0.25)",  label: "301 Permanent",  desc: "SEO transféré vers la destination" },

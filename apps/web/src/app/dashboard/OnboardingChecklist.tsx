@@ -111,7 +111,7 @@ export default function OnboardingChecklist() {
         <div style={{ width: 48, height: 48, borderRadius: "50%", background: "rgba(57,255,143,0.15)", border: "1px solid rgba(57,255,143,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>🎉</div>
         <div style={{ flex: 1 }}>
           <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: "0 0 2px", fontFamily: "Cormorant Garamond, serif" }}>Configuration terminée !</p>
-          <p style={{ color: "#8A8478", fontSize: 13, margin: 0 }}>Tu as complété toutes les étapes. QRfolio est prêt à être utilisé.</p>
+          <p style={{ color: "#A8A190", fontSize: 13, margin: 0 }}>Tu as complété toutes les étapes. QRfolio est prêt à être utilisé.</p>
         </div>
         <button onClick={dismiss} style={{ background: "rgba(57,255,143,0.1)", border: "1px solid rgba(57,255,143,0.25)", borderRadius: 8, padding: "8px 16px", color: "#39FF8F", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
           Masquer ✓
@@ -137,10 +137,10 @@ export default function OnboardingChecklist() {
             <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>
               Bienvenue sur QRfolio ! 👋
             </p>
-            <p style={{ color: "#8A8478", fontSize: 12, margin: 0 }}>{progress}/{total} étapes complétées</p>
+            <p style={{ color: "#A8A190", fontSize: 12, margin: 0 }}>{progress}/{total} étapes complétées</p>
           </div>
         </div>
-        <button onClick={dismiss} title="Masquer" style={{ background: "transparent", border: "none", color: "#8A8478", cursor: "pointer", padding: 4, borderRadius: 4 }}>
+        <button onClick={dismiss} title="Masquer" style={{ background: "transparent", border: "none", color: "#A8A190", cursor: "pointer", padding: 4, borderRadius: 4 }}>
           <X size={16} />
         </button>
       </div>
@@ -151,7 +151,7 @@ export default function OnboardingChecklist() {
           <div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg,#C9A84C,#39FF8F)", borderRadius: 3, transition: "width 0.5s ease" }} />
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 5 }}>
-          <span style={{ color: "#8A8478", fontSize: 10 }}>Progression</span>
+          <span style={{ color: "#A8A190", fontSize: 10 }}>Progression</span>
           <span style={{ color: "#C9A84C", fontSize: 10, fontWeight: 700 }}>{pct}%</span>
         </div>
       </div>
@@ -170,14 +170,14 @@ export default function OnboardingChecklist() {
 
               {/* Status icon */}
               <div style={{ width: 28, height: 28, borderRadius: "50%", background: done ? "rgba(57,255,143,0.15)" : isNext ? "rgba(201,168,76,0.12)" : "rgba(255,255,255,0.05)", border: `1px solid ${done ? "rgba(57,255,143,0.3)" : isNext ? "rgba(201,168,76,0.25)" : "rgba(255,255,255,0.08)"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s" }}>
-                {done ? <Check size={13} color="#39FF8F" /> : <span style={{ color: done ? "#39FF8F" : isNext ? "#C9A84C" : "#8A8478", fontSize: 14 }}>{step.emoji}</span>}
+                {done ? <Check size={13} color="#39FF8F" /> : <span style={{ color: done ? "#39FF8F" : isNext ? "#C9A84C" : "#A8A190", fontSize: 14 }}>{step.emoji}</span>}
               </div>
 
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ color: done ? "#8A8478" : "#F5F0E8", fontSize: 13, fontWeight: done ? 400 : 600, margin: 0, textDecoration: done ? "line-through" : "none", opacity: done ? 0.6 : 1 }}>
+                <p style={{ color: done ? "#A8A190" : "#F5F0E8", fontSize: 13, fontWeight: done ? 400 : 600, margin: 0, textDecoration: done ? "line-through" : "none", opacity: done ? 0.6 : 1 }}>
                   {step.label}
                 </p>
-                {!done && <p style={{ color: "#8A8478", fontSize: 11, margin: 0, marginTop: 1 }}>{step.description}</p>}
+                {!done && <p style={{ color: "#A8A190", fontSize: 11, margin: 0, marginTop: 1 }}>{step.description}</p>}
               </div>
 
               {!done && isNext && (
@@ -186,7 +186,7 @@ export default function OnboardingChecklist() {
                 </Link>
               )}
               {!done && !isNext && (
-                <ChevronRight size={14} color="#8A8478" style={{ opacity: 0.4, flexShrink: 0 }} />
+                <ChevronRight size={14} color="#A8A190" style={{ opacity: 0.4, flexShrink: 0 }} />
               )}
               {done && (
                 <span style={{ color: "#39FF8F", fontSize: 10, flexShrink: 0 }}>✓ Fait</span>
@@ -198,10 +198,10 @@ export default function OnboardingChecklist() {
 
       {/* Bottom CTA */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.04)" }}>
-        <p style={{ color: "#8A8478", fontSize: 11, margin: 0 }}>
+        <p style={{ color: "#A8A190", fontSize: 11, margin: 0 }}>
           Plus que {total - progress} étape{total - progress > 1 ? "s" : ""} pour démarrer
         </p>
-        <button onClick={dismiss} style={{ background: "transparent", border: "none", color: "#8A8478", fontSize: 11, cursor: "pointer", textDecoration: "underline" }}>
+        <button onClick={dismiss} style={{ background: "transparent", border: "none", color: "#A8A190", fontSize: 11, cursor: "pointer", textDecoration: "underline" }}>
           Masquer pour l'instant
         </button>
       </div>

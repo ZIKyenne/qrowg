@@ -27,7 +27,7 @@ export default function NewPagePage() {
         alignItems: 'center',
         gap: '16px',
       }}>
-        <a href="/dashboard" style={{ color: '#8A8478', textDecoration: 'none', fontSize: '13px' }}>
+        <a href="/dashboard" style={{ color: '#A8A190', textDecoration: 'none', fontSize: '13px' }}>
           ← Dashboard
         </a>
         <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
@@ -52,7 +52,7 @@ export default function NewPagePage() {
           }}>
             Choisissez un <span style={{ color: '#C9A84C' }}>template</span>
           </h1>
-          <p style={{ color: '#8A8478', fontSize: '14px' }}>
+          <p style={{ color: '#A8A190', fontSize: '14px' }}>
             Vous pourrez tout personnaliser après
           </p>
         </div>
@@ -92,7 +92,7 @@ export default function NewPagePage() {
                 <span style={{ fontSize: '24px' }}>{t.icon}</span>
                 <div>
                   <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '2px' }}>{t.name}</div>
-                  <div style={{ fontSize: '12px', color: '#8A8478' }}>{t.desc}</div>
+                  <div style={{ fontSize: '12px', color: '#A8A190' }}>{t.desc}</div>
                 </div>
               </label>
             ))}
@@ -102,7 +102,7 @@ export default function NewPagePage() {
           <div style={{ marginBottom: '24px' }}>
             <label style={{
               display: 'block', fontSize: '11px', letterSpacing: '1.5px',
-              textTransform: 'uppercase', color: '#8A8478', marginBottom: '8px',
+              textTransform: 'uppercase', color: '#A8A190', marginBottom: '8px',
             }}>
               Nom de la page
             </label>

@@ -60,7 +60,7 @@ export default async function QRCodesPage() {
               <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 22, color: "#F5F0E8", fontWeight: 700, margin: 0, lineHeight: 1.15 }}>
                 QR Studio
               </h1>
-              <p style={{ color: "#8A8478", fontSize: 11, margin: 0 }}>
+              <p style={{ color: "#A8A190", fontSize: 11, margin: 0 }}>
                 Créez, personnalisez et exportez vos QR Codes
               </p>
             </div>
@@ -78,7 +78,7 @@ export default async function QRCodesPage() {
                   {k.icon}
                   <div>
                     <p style={{ color: k.color, fontSize: 14, fontWeight: 700, margin: 0, lineHeight: 1 }}>{k.value}</p>
-                    <p style={{ color: "#8A8478", fontSize: 9, margin: "1px 0 0", textTransform: "uppercase", letterSpacing: 0.8 }}>{k.label}</p>
+                    <p style={{ color: "#A8A190", fontSize: 9, margin: "1px 0 0", textTransform: "uppercase", letterSpacing: 0.8 }}>{k.label}</p>
                   </div>
                 </div>
               ))}

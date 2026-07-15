@@ -172,7 +172,7 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
         <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 26, color: '#F5F0E8', fontWeight: 700, margin: '0 0 10px', maxWidth: 330 }}>
           L’éditeur s’utilise sur ordinateur
         </h2>
-        <p style={{ color: '#8A8478', fontSize: 14, lineHeight: 1.6, margin: '0 0 24px', maxWidth: 340 }}>
+        <p style={{ color: '#A8A190', fontSize: 14, lineHeight: 1.6, margin: '0 0 24px', maxWidth: 340 }}>
           La construction de page (blocs, glisser-déposer, propriétés) demande un grand écran. Ouvrez QRfolio sur ordinateur pour éditer « {pageName} ». Votre page publique, elle, reste 100 % responsive.
         </p>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -218,7 +218,7 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
         />
 
         {/* Save status */}
-        <div style={{ fontSize: '12px', color: saveStatus === 'saved' ? '#39FF8F' : saveStatus === 'saving' ? '#C9A84C' : '#8A8478' }}>
+        <div style={{ fontSize: '12px', color: saveStatus === 'saved' ? '#39FF8F' : saveStatus === 'saving' ? '#C9A84C' : '#A8A190' }}>
           {saveStatus === 'saved' ? '✓ Sauvegardé' : saveStatus === 'saving' ? '⏳ Sauvegarde...' : '● Modifications non sauvegardées'}
         </div>
 
@@ -232,7 +232,7 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
           {(['mobile', 'desktop'] as const).map(mode => (
             <button key={mode} onClick={() => setPreviewMode(mode)} style={{
               background: previewMode === mode ? 'rgba(201,168,76,0.15)' : 'transparent',
-              border: 'none', color: previewMode === mode ? '#C9A84C' : '#8A8478',
+              border: 'none', color: previewMode === mode ? '#C9A84C' : '#A8A190',
               padding: '6px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
             }}>
               {mode === 'mobile' ? '📱' : '🖥️'}
@@ -275,7 +275,7 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
             {(['blocks', 'themes'] as const).map(tab => (
               <button key={tab} onClick={() => setLeftTab(tab)} style={{
                 flex: 1, background: leftTab === tab ? 'rgba(201,168,76,0.15)' : 'transparent',
-                border: 'none', color: leftTab === tab ? '#C9A84C' : '#8A8478',
+                border: 'none', color: leftTab === tab ? '#C9A84C' : '#A8A190',
                 padding: '7px 8px', fontSize: '12px', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
               }}>
                 {tab === 'blocks' ? 'Blocs' : 'Thèmes'}
@@ -289,7 +289,7 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
                 <button key={block.type} onClick={() => addBlock(block.type)} style={{
                   width: '100%', display: 'flex', alignItems: 'center', gap: '8px',
                   padding: '8px 10px', background: 'transparent', border: '1px solid transparent',
-                  borderRadius: '4px', color: '#8A8478', fontSize: '13px', cursor: 'pointer',
+                  borderRadius: '4px', color: '#A8A190', fontSize: '13px', cursor: 'pointer',
                   fontFamily: 'DM Sans, sans-serif', textAlign: 'left', marginBottom: '2px',
                 }}>
                   <span style={{ fontSize: '15px' }}>{block.icon}</span>
@@ -386,12 +386,12 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
               <div style={{ display: 'flex', gap: '3px' }} onClick={e => e.stopPropagation()}>
                 <button onClick={() => moveBlock(block.id, 'up')} disabled={idx === 0} style={{
                   background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
-                  borderRadius: '3px', width: '24px', height: '24px', color: '#8A8478',
+                  borderRadius: '3px', width: '24px', height: '24px', color: '#A8A190',
                   cursor: 'pointer', fontSize: '11px',
                 }}>↑</button>
                 <button onClick={() => moveBlock(block.id, 'down')} disabled={idx === blocks.length - 1} style={{
                   background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
-                  borderRadius: '3px', width: '24px', height: '24px', color: '#8A8478',
+                  borderRadius: '3px', width: '24px', height: '24px', color: '#A8A190',
                   cursor: 'pointer', fontSize: '11px',
                 }}>↓</button>
                 <button onClick={() => removeBlock(block.id)} style={{
@@ -467,7 +467,7 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
           <div style={{
             marginTop: '12px', background: 'rgba(0,0,0,0.3)',
             border: '1px solid rgba(255,255,255,0.06)', borderRadius: '3px',
-            padding: '6px 10px', fontSize: '10px', color: '#8A8478',
+            padding: '6px 10px', fontSize: '10px', color: '#A8A190',
             fontFamily: 'JetBrains Mono, monospace', width: '100%', textAlign: 'center',
           }}>
             {appUrl}/{page.slug}

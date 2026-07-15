@@ -75,7 +75,7 @@ const CLICK_COLORS = [
 ]
 
 const G = "var(--accent)"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 const SURFACE = "rgba(255,255,255,0.03)"
 const BORDER = "rgba(255,255,255,0.07)"
 

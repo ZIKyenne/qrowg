@@ -14,7 +14,7 @@ function Section({ title, subtitle, icon, children }: { title: string; subtitle?
         <div style={{ color: "var(--accent)", background: "color-mix(in srgb, var(--accent) 10%, transparent)", borderRadius: 8, padding: 8 }}>{icon}</div>
         <div>
           <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0 }}>{title}</p>
-          {subtitle && <p style={{ color: "#8A8478", fontSize: 12, margin: 0 }}>{subtitle}</p>}
+          {subtitle && <p style={{ color: "#A8A190", fontSize: 12, margin: 0 }}>{subtitle}</p>}
         </div>
       </div>
       <div style={{ padding: "20px 24px" }}>{children}</div>
@@ -27,7 +27,7 @@ function Toggle({ value, onChange, label, description }: { value: boolean; onCha
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
       <div>
         <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 600, margin: 0 }}>{label}</p>
-        {description && <p style={{ color: "#8A8478", fontSize: 11, margin: "2px 0 0" }}>{description}</p>}
+        {description && <p style={{ color: "#A8A190", fontSize: 11, margin: "2px 0 0" }}>{description}</p>}
       </div>
       <button onClick={() => onChange(!value)}
         style={{ width: 44, height: 24, borderRadius: 12, background: value ? "var(--accent)" : "rgba(255,255,255,0.08)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s", flexShrink: 0 }}>
@@ -115,7 +115,7 @@ export default function SettingsPage() {
     setDeleting(false)
   }
 
-  const G = "var(--accent)"; const MUTED = "#8A8478"
+  const G = "var(--accent)"; const MUTED = "#A8A190"
   const inputStyle: React.CSSProperties = {
     width: "100%", background: "#0d0c09", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)",
     borderRadius: 10, padding: "11px 14px", color: "#F5F0E8", fontSize: 14,
@@ -288,7 +288,7 @@ export default function SettingsPage() {
             <div style={{ color: "#EF4444", background: "rgba(239,68,68,0.1)", borderRadius: 8, padding: 8 }}><AlertTriangle size={16} /></div>
             <div>
               <p style={{ color: "#EF4444", fontSize: 15, fontWeight: 700, margin: 0 }}>Zone de danger</p>
-              <p style={{ color: "#8A8478", fontSize: 12, margin: 0 }}>Actions irréversibles</p>
+              <p style={{ color: "#A8A190", fontSize: 12, margin: 0 }}>Actions irréversibles</p>
             </div>
           </div>
           <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 14 }}>

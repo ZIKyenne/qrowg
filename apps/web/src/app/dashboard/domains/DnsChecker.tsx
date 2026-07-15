@@ -64,7 +64,7 @@ const CHECK_ICONS: Record<string, string> = {
 }
 
 const G     = "var(--accent)"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 
 export default function DnsChecker({ domain, onVerified }: Props) {
   const [result,   setResult]   = useState<CheckResult | null>(null)

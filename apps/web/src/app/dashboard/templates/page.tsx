@@ -102,13 +102,13 @@ const TEMPLATES: any[] = [
 ]
 
 const PLAN_CONFIG: Record<string, { label: string; color: string; icon: string }> = {
-  free:     { label: "Gratuit",  color: "#8A8478", icon: "✦"  },
+  free:     { label: "Gratuit",  color: "#A8A190", icon: "✦"  },
   starter:  { label: "Starter",  color: "#38BDF8", icon: "⚡" },
   pro:      { label: "Pro",      color: "var(--accent)", icon: "🔥" },
   business: { label: "Business", color: "#39FF8F", icon: "👑" },
 }
 const FAV_KEY = "qrfolio_fav_templates"
-const PLAN_FILTERS: [string, string, string][] = [["all", "Tous les plans", "#8A8478"], ["free", "Gratuit ✦", "#8A8478"], ["starter", "Starter ⚡", "#38BDF8"], ["pro", "Pro 🔥", "var(--accent)"]]
+const PLAN_FILTERS: [string, string, string][] = [["all", "Tous les plans", "#A8A190"], ["free", "Gratuit ✦", "#A8A190"], ["starter", "Starter ⚡", "#38BDF8"], ["pro", "Pro 🔥", "var(--accent)"]]
 const STARTER_TEMPLATE_ID = "freelance" // modèle recommandé par défaut (nouvel utilisateur sans page)
 
 export default function TemplatesPage() {
@@ -206,7 +206,7 @@ export default function TemplatesPage() {
   // Thèmes complets par template (utilise les PRESET_THEMES officiels)
   const TEMPLATE_THEMES: Record<string, any> = {
     ...SHARED_THEMES,
-    freelance:      { name:"Midnight Gold",bg:"#080808",surface:"#111009",primary:"var(--accent)",accent:"#39FF8F",text:"#F5F0E8",muted:"#8A8478",fontDisplay:"Cormorant Garamond",fontBody:"DM Sans",bgMode:"solid",effect_glow:true,glow_color:"var(--accent)",glow_intensity:20,glow_size:350 },
+    freelance:      { name:"Midnight Gold",bg:"#080808",surface:"#111009",primary:"var(--accent)",accent:"#39FF8F",text:"#F5F0E8",muted:"#A8A190",fontDisplay:"Cormorant Garamond",fontBody:"DM Sans",bgMode:"solid",effect_glow:true,glow_color:"var(--accent)",glow_intensity:20,glow_size:350 },
     restaurant:     { name:"Sunset Fire",bg:"#120300",surface:"#200800",primary:"#FF6B00",accent:"#FF4500",text:"#FFF5EE",muted:"#9A5020",fontDisplay:"Playfair Display",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#120300,#1F0600)",effect_vignette:true,vignette_intensity:60 },
     artiste:        { name:"Velvet Noir",bg:"#070508",surface:"#0F0A12",primary:"#C4A6E8",accent:"#F472B6",text:"#F5F0FF",muted:"#7A6A9A",fontDisplay:"Cormorant Garamond",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#070508,#100818)",effect_glow:true,glow_color:"#A78BFA",glow_intensity:25,glow_size:350 },
     coach:          { name:"Zen Wellness",bg:"#F5FFF5",surface:"#EAFAEA",primary:"#059669",accent:"#34D399",text:"#064E3B",muted:"#407A60",fontDisplay:"DM Sans",fontBody:"DM Sans",bgMode:"solid" },
@@ -261,7 +261,7 @@ export default function TemplatesPage() {
     }
   }
   const G = "var(--accent)"
-  const MUTED = "#8A8478"
+  const MUTED = "#A8A190"
   const previewTemplate  = TEMPLATES.find((t: any) => t.id === preview)
   const selectedTemplate = TEMPLATES.find((t: any) => t.id === selected)
   const activeCat = BUSINESS_CATEGORIES.find(c => c.id === activeMetier)
@@ -702,7 +702,7 @@ function NamingModal({ template, blockCount, onClose, onCreate }: {
   onCreate: (name: string, slug: string, description: string) => Promise<{ ok?: boolean; error?: string }>
 }) {
   const G = "var(--accent)"
-  const MUTED = "#8A8478"
+  const MUTED = "#A8A190"
   const [name, setName] = useState(template.name || "")
   const [slug, setSlug] = useState("")
   const [slugTouched, setSlugTouched] = useState(false)

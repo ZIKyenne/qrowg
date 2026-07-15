@@ -169,7 +169,7 @@ export default function AvatarStudio({
     { label: "X", href: `https://twitter.com/intent/tweet?text=${t}&url=${u}`, color: "#F5F0E8" },
     { label: "LinkedIn", href: `https://www.linkedin.com/sharing/share-offsite/?url=${u}`, color: "#0A66C2" },
     { label: "Facebook", href: `https://www.facebook.com/sharer/sharer.php?u=${u}`, color: "#1877F2" },
-    { label: "E-mail", href: `mailto:?subject=${encodeURIComponent("Mon avatar QRfolio")}&body=${t}%20${u}`, color: "#8A8478" },
+    { label: "E-mail", href: `mailto:?subject=${encodeURIComponent("Mon avatar QRfolio")}&body=${t}%20${u}`, color: "#A8A190" },
   ];
 
   function avatarPngFile(): Promise<File | null> {
@@ -265,7 +265,7 @@ export default function AvatarStudio({
                 style={{ position: "absolute", left: 0, right: 0, top: "calc(100% + 8px)", zIndex: 20, background: "#15130b", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 14, padding: 12, boxShadow: "0 16px 40px rgba(0,0,0,0.55)" }}
               >
                 <p style={{ margin: "0 0 4px", color: "#F5F0E8", fontSize: 13, fontWeight: 700 }}>Faites découvrir QRfolio</p>
-                <p style={{ margin: "0 0 10px", color: "#8A8478", fontSize: 11, lineHeight: 1.5 }}>Partagez votre avatar avec le lien — chaque partage fait grandir la communauté ✨</p>
+                <p style={{ margin: "0 0 10px", color: "#A8A190", fontSize: 11, lineHeight: 1.5 }}>Partagez votre avatar avec le lien — chaque partage fait grandir la communauté ✨</p>
                 <button
                   type="button"
                   onClick={() => { onShareNative(); setShareOpen(false); }}

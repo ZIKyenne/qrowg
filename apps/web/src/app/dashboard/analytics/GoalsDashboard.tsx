@@ -51,7 +51,7 @@ const GOAL_TYPES: Record<string, {
 const PERIODS = [{ v: 7, l: "7j" }, { v: 30, l: "30j" }, { v: 90, l: "90j" }]
 
 const G     = "var(--accent)"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 const BG    = "#0F0E0B"
 
 // ── Calculer les conversions d'un objectif ────────────────────────────────────

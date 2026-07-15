@@ -14,7 +14,7 @@ type Page = { id: string; title: string; slug: string; status: string; total_vie
 type Profile = { full_name: string | null; plan: string; total_scans: number; total_pages: number; avatar_url: string | null }
 
 const PLAN_CONFIG: Record<string, { color: string; label: string }> = {
-  free: { color: "#8A8478", label: "Free" },
+  free: { color: "#A8A190", label: "Free" },
   starter: { color: "#38BDF8", label: "Starter" },
   pro: { color: "var(--accent)", label: "Pro" },
   business: { color: "#39FF8F", label: "Business" },
@@ -30,15 +30,15 @@ function DeleteModal({ page, onConfirm, onCancel, deleting }: { page: Page; onCo
           </div>
           <h3 style={{ color: "#F5F0E8", fontSize: 17, fontWeight: 700, margin: 0 }}>Supprimer cette page ?</h3>
         </div>
-        <p style={{ color: "#8A8478", fontSize: 14, lineHeight: 1.6, margin: "0 0 8px" }}>
+        <p style={{ color: "#A8A190", fontSize: 14, lineHeight: 1.6, margin: "0 0 8px" }}>
           Tu es sur le point de supprimer <span style={{ color: "#F5F0E8", fontWeight: 600 }}>"{page.title}"</span>.
         </p>
-        <p style={{ color: "#8A8478", fontSize: 13, lineHeight: 1.6, margin: "0 0 24px" }}>
+        <p style={{ color: "#A8A190", fontSize: 13, lineHeight: 1.6, margin: "0 0 24px" }}>
           Cette action supprimera aussi les blocs, le QR code et toutes les donnees analytics associees. Elle est irreversible.
         </p>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={onCancel} disabled={deleting}
-            style={{ flex: 1, background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "11px", color: "#8A8478", fontSize: 14, cursor: "pointer", fontFamily: "DM Sans, sans-serif" }}>
+            style={{ flex: 1, background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "11px", color: "#A8A190", fontSize: 14, cursor: "pointer", fontFamily: "DM Sans, sans-serif" }}>
             Annuler
           </button>
           <button onClick={onConfirm} disabled={deleting}
@@ -123,7 +123,7 @@ export default function DashboardClient() {
   }
 
   const planCfg = PLAN_CONFIG[profile?.plan || "free"]
-  const G = "var(--accent)"; const MUTED = "#8A8478"
+  const G = "var(--accent)"; const MUTED = "#A8A190"
   const publishedCount = pages.filter(p => p.status === "published").length
   // Parcours guidé : tant qu'aucun scan, on montre la prochaine meilleure action
   const totalScans = profile?.total_scans || 0

@@ -39,7 +39,7 @@ const STATUS_CFG: Record<string, { label: string; color: string; icon: React.Rea
 }
 
 const G     = "var(--accent)"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 
 export default function DomainsPage({ pages, plan }: Props) {
   const [domains,    setDomains]    = useState<DomainRecord[]>([])

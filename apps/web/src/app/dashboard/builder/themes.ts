@@ -74,7 +74,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
     primary: '#C9A84C',
     accent: '#39FF8F',
     text: '#F5F0E8',
-    muted: '#8A8478',
+    muted: '#A8A190',
     font_display: 'Cormorant Garamond',
     font_body: 'DM Sans',
     bg_mode: 'solid',

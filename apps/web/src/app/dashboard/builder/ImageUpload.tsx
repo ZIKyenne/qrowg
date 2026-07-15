@@ -60,7 +60,7 @@ export default function ImageUpload({ value, onChange, label, hint }: Props) {
   }
 
   const G = "#C9A84C"
-  const MUTED = "#8A8478"
+  const MUTED = "#A8A190"
 
   return (
     <div>

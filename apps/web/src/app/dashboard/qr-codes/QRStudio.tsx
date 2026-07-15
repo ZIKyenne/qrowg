@@ -175,7 +175,7 @@ const PRESETS: Preset[] = [
   { id:"luxury-gold",       label:"Luxury Gold",     cat:"luxury", fg:"#C9A84C", bg:"#0A0700", dotStyle:"luxury",  cornerStyle:"luxury",  eyeColor:"#E8C766", ecc:"H", density:"high", margin:16, plan:"business" },
   { id:"royal-black",       label:"Royal Black",     cat:"luxury", fg:"#E5E5E5", bg:"#050505", dotStyle:"luxury",  cornerStyle:"diamond", ecc:"H", density:"high", margin:14, plan:"business" },
   { id:"diamond-elite",     label:"Diamond Elite",   cat:"luxury", fg:"#BFD7EA", bg:"#0A0F14", dotStyle:"luxury",  cornerStyle:"diamond", gradient:"linear", fg2:"#7FA8C9", ecc:"H", density:"high", plan:"business" },
-  { id:"platinum-white",    label:"Platinum White",  cat:"luxury", fg:"#8A8478", bg:"#FAFAF7", dotStyle:"luxury",  cornerStyle:"luxury",  ecc:"H", margin:14, plan:"business" },
+  { id:"platinum-white",    label:"Platinum White",  cat:"luxury", fg:"#A8A190", bg:"#FAFAF7", dotStyle:"luxury",  cornerStyle:"luxury",  ecc:"H", margin:14, plan:"business" },
   { id:"luxury-emerald",    label:"Luxury Emerald",  cat:"luxury", fg:"#0FB37A", bg:"#021410", dotStyle:"luxury",  cornerStyle:"luxury",  eyeColor:"#34D399", ecc:"H", density:"high", plan:"business" },
   { id:"midnight-prestige", label:"Midnight Prestige",cat:"luxury",fg:"#C0A062", bg:"#0A0A12", dotStyle:"luxury",  cornerStyle:"diamond", gradient:"radial", fg2:"#8A6E3A", ecc:"H", density:"high", plan:"business" },
   { id:"black-velvet",      label:"Black Velvet",    cat:"luxury", fg:"#D4AF37", bg:"#0D0A05", dotStyle:"luxury",  cornerStyle:"luxury",  ecc:"H", density:"high", margin:16, plan:"business" },
@@ -233,7 +233,7 @@ const presetUpsellPlan = (plan: string) => (plan === "business" ? "pro" : "start
 // -- Statuts pages (pour l'affichage de la page liee)
 const STATUS_CFG: Record<string, { label: string; dot: string; badge: string; text: string }> = {
   published: { label: "Publié",    dot: "#39FF8F", badge: "rgba(57,255,143,0.12)",  text: "#39FF8F" },
-  draft:     { label: "Brouillon", dot: "#8A8478", badge: "rgba(138,132,120,0.12)", text: "#8A8478" },
+  draft:     { label: "Brouillon", dot: "#A8A190", badge: "rgba(138,132,120,0.12)", text: "#A8A190" },
   archived:  { label: "Archivé",   dot: "#F97316", badge: "rgba(249,115,22,0.12)",  text: "#F97316" },
   paused:    { label: "En pause",  dot: "#FF6B6B", badge: "rgba(255,107,107,0.12)", text: "#FF6B6B" },
 }
@@ -241,7 +241,7 @@ const STATUS_CFG: Record<string, { label: string; dot: string; badge: string; te
 // -- Statuts QR Code
 const QR_STATUS_CFG: Record<string, { label: string; dot: string; badge: string; text: string; desc: string }> = {
   active:   { label: "Actif",     dot: "#39FF8F", badge: "rgba(57,255,143,0.12)",  text: "#39FF8F", desc: "Redirection normale" },
-  draft:    { label: "Brouillon", dot: "#8A8478", badge: "rgba(138,132,120,0.12)", text: "#8A8478", desc: "Visible dans le dashboard uniquement" },
+  draft:    { label: "Brouillon", dot: "#A8A190", badge: "rgba(138,132,120,0.12)", text: "#A8A190", desc: "Visible dans le dashboard uniquement" },
   paused:   { label: "En pause",  dot: "#F97316", badge: "rgba(249,115,22,0.12)",  text: "#F97316", desc: "Page indisponible affichee" },
   archived: { label: "Archivé",   dot: "#6B7280", badge: "rgba(107,114,128,0.12)", text: "#6B7280", desc: "Masque et bloque" },
   expired:  { label: "Expire",    dot: "#FF6B6B", badge: "rgba(255,107,107,0.12)", text: "#FF6B6B", desc: "Acces expire" },
@@ -252,7 +252,7 @@ const PLAN_BADGE: Record<string, { color: string; label: string } | null> = {
 }
 
 const G     = "var(--accent)"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 const SURF  = "#0F0E0B"
 const BG    = "#080808"
 
@@ -279,7 +279,7 @@ function AccSection({ id, title, icon, openId, setOpenId, children }: {
         <span style={{ display:"flex", alignItems:"center", gap:8, color: open ? "var(--accent)" : "#F5F0E8", fontSize:12, fontWeight:700 }}>
           {icon && <span style={{ fontSize:14 }}>{icon}</span>}{title}
         </span>
-        <ChevronRight size={15} color={open ? "var(--accent)" : "#8A8478"} style={{ transform: open ? "rotate(90deg)" : "rotate(0deg)", transition:"transform 0.2s" }}/>
+        <ChevronRight size={15} color={open ? "var(--accent)" : "#A8A190"} style={{ transform: open ? "rotate(90deg)" : "rotate(0deg)", transition:"transform 0.2s" }}/>
       </button>
       {open && (
         <div style={{ padding:"6px 13px 14px" }}>
@@ -348,16 +348,16 @@ function ColorField({ label, value, onChange, onClear }: {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
       <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-        <label style={{ color:"#8A8478", fontSize:11, flex:1 }}>{label}</label>
+        <label style={{ color:"#A8A190", fontSize:11, flex:1 }}>{label}</label>
         <button type="button" onClick={() => setOpen(o => !o)}
           style={{ width:28, height:28, borderRadius:6, border:`1px solid ${open?"#C9A84C":"rgba(255,255,255,0.15)"}`, background: valid ? safe : "transparent", cursor:"pointer", flexShrink:0, position:"relative", overflow:"hidden", padding:0 }}>
           {!valid && <span style={{ position:"absolute", inset:0, background:"repeating-linear-gradient(45deg,#222,#222 3px,#444 3px,#444 6px)" }}/>}
         </button>
         <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder="#----"
-          style={{ width:72, background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"5px 7px", color:valid?"#F5F0E8":"#8A8478", fontSize:10, fontFamily:"monospace", outline:"none" }}/>
+          style={{ width:72, background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"5px 7px", color:valid?"#F5F0E8":"#A8A190", fontSize:10, fontFamily:"monospace", outline:"none" }}/>
         {onClear && (
           <button type="button" onClick={onClear} title="Effacer"
-            style={{ width:24, height:24, borderRadius:6, border:"1px solid rgba(255,255,255,0.08)", background:"rgba(255,255,255,0.03)", color:"#8A8478", cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, padding:0 }}>×</button>
+            style={{ width:24, height:24, borderRadius:6, border:"1px solid rgba(255,255,255,0.08)", background:"rgba(255,255,255,0.03)", color:"#A8A190", cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, padding:0 }}>×</button>
         )}
       </div>
 
@@ -1110,7 +1110,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     return e.label || cfg?.label || e.type
   }
   function getDestStatusColor(e: DestEntry | null): string {
-    if (!e) return active?.pages?.status === "published" ? "#39FF8F" : "#8A8478"
+    if (!e) return active?.pages?.status === "published" ? "#39FF8F" : "#A8A190"
     return e.type === "page" ? (active?.pages?.status === "published" ? "#39FF8F" : "#F97316") : "#38BDF8"
   }
   async function saveDest() {
@@ -2263,7 +2263,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 </span>
                 <span style={{ minWidth:0 }}>
                   <span style={{ display:"block", color: level===k ? "var(--accent)" : "#F5F0E8", fontSize:14, fontWeight:700 }}>{l}</span>
-                  <span style={{ display:"block", color:"#8A8478", fontSize:12, lineHeight:1.4, marginTop:2 }}>{d}</span>
+                  <span style={{ display:"block", color:"#A8A190", fontSize:12, lineHeight:1.4, marginTop:2 }}>{d}</span>
                 </span>
               </button>
             ))}
@@ -2281,10 +2281,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", width:"100%" }}>
               <div>
                 <p style={{ color:"#F5F0E8", fontSize:16, fontWeight:700, margin:"0 0 3px" }}>{active?.pages?.title}</p>
-                <p style={{ color:"#8A8478", fontSize:11, margin:0 }}>Scannez pour tester * {appUrl}/q/{active?.short_code}</p>
+                <p style={{ color:"#A8A190", fontSize:11, margin:0 }}>Scannez pour tester * {appUrl}/q/{active?.short_code}</p>
               </div>
               <button type="button" onClick={() => setShowModal(false)}
-                style={{ width:36, height:36, background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#8A8478" }}>
+                style={{ width:36, height:36, background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#A8A190" }}>
                 <X size={16}/>
               </button>
             </div>
@@ -2320,7 +2320,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   {[
                     { label: diag.readability, color: diag.readColor },
                     { label: `Contraste ${diag.ratio}:1`, color: diag.warnContrast?"#FF6B6B":diag.warnLow?"#F97316":"#39FF8F" },
-                    { label: `Min ${diag.minSize}`, color: "#8A8478" },
+                    { label: `Min ${diag.minSize}`, color: "#A8A190" },
                     { label: `ECC ${ecLevel}`, color: "#C9A84C" },
                   ].map((b,i) => (
                     <span key={i} style={{ background:`${b.color}12`, border:`1px solid ${b.color}35`, borderRadius:7, padding:"4px 12px", fontSize:11, color:b.color, fontWeight:600 }}>{b.label}</span>
@@ -2654,7 +2654,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 {/* Sélecteur d'aperçu immersif — replié sur mobile pour ne montrer que le QR par défaut */}
                 {isMobile && !sceneSelOpen ? (
                   <button type="button" onClick={() => setSceneSelOpen(true)}
-                    style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 14px", borderRadius:8, fontSize:11, fontWeight:600, cursor:"pointer", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", color:"#8A8478" }}>
+                    style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 14px", borderRadius:8, fontSize:11, fontWeight:600, cursor:"pointer", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", color:"#A8A190" }}>
                     Changer le format d&apos;aperçu <span style={{ color:"var(--accent)", fontSize:12 }}>▾</span>
                   </button>
                 ) : (
@@ -2664,7 +2664,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         style={{ display:"flex", alignItems:"center", gap:4, padding:"5px 10px", borderRadius:8, fontSize:10.5, fontWeight:scene===k?700:500, cursor:"pointer",
                           background: scene===k ? "color-mix(in srgb, var(--accent) 16%, transparent)" : "rgba(255,255,255,0.04)",
                           border: `1px solid ${scene===k ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "rgba(255,255,255,0.08)"}`,
-                          color: scene===k ? "var(--accent)" : "#8A8478" }}>
+                          color: scene===k ? "var(--accent)" : "#A8A190" }}>
                         <span style={{ fontSize:11 }}>{e}</span> {l}
                       </button>
                     ))}
@@ -2708,7 +2708,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           <div style={{ padding:14, background:"#fff", borderRadius:14, marginTop:"auto" }}>
                             <img src={qrPng} alt="QR" style={{ width:128, height:128, display:"block" }}/>
                           </div>
-                          <p style={{ color:"#8A8478", fontSize:10, margin:"auto 0 0" }}>qrfolio · /q/{active.short_code}</p>
+                          <p style={{ color:"#A8A190", fontSize:10, margin:"auto 0 0" }}>qrfolio · /q/{active.short_code}</p>
                         </div>
                       ) : scene === "sticker" ? (
                         <div style={{ width:244, height:244, borderRadius:"50%", background:"radial-gradient(circle at 50% 35%, #fff, #f1eee6)", boxShadow:"0 24px 60px rgba(0,0,0,0.5), inset 0 0 0 7px var(--accent), inset 0 0 0 9px rgba(0,0,0,0.08)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:6 }}>
@@ -2724,7 +2724,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                             <div style={{ padding:11, background:"#fff", borderRadius:12 }}>
                               <img src={qrPng} alt="QR" style={{ width:120, height:120, display:"block" }}/>
                             </div>
-                            <p style={{ color:"#8A8478", fontSize:9.5, margin:0 }}>Scannez avec votre téléphone</p>
+                            <p style={{ color:"#A8A190", fontSize:9.5, margin:0 }}>Scannez avec votre téléphone</p>
                           </div>
                           <div style={{ width:150, height:14, background:"rgba(0,0,0,0.5)", filter:"blur(7px)", borderRadius:"50%", marginTop:-2 }}/>
                         </div>
@@ -2773,13 +2773,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       /q/{active.short_code}
                     </code>
                     <button type="button" onClick={() => copy("short")}
-                      style={{ width:isMobile?32:20, height:isMobile?32:20, background:"none", border:"none", cursor:"pointer", color:copied==="short"?"#39FF8F":"#8A8478", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      style={{ width:isMobile?32:20, height:isMobile?32:20, background:"none", border:"none", cursor:"pointer", color:copied==="short"?"#39FF8F":"#A8A190", display:"flex", alignItems:"center", justifyContent:"center" }}>
                       {copied==="short" ? <Check size={isMobile?14:11}/> : <Copy size={isMobile?14:11}/>}
                     </button>
                   </div>
                   {(() => {
                     const st   = active.pages?.status ?? "draft"
-                    const sCfg = ({ published:{dot:"#39FF8F",label:"Publié"}, draft:{dot:"#8A8478",label:"Brouillon"}, archived:{dot:"#F97316",label:"Archivé"}, paused:{dot:"#FF6B6B",label:"En pause"} } as any)[st] ?? {dot:"#8A8478",label:"Inconnu"}
+                    const sCfg = ({ published:{dot:"#39FF8F",label:"Publié"}, draft:{dot:"#A8A190",label:"Brouillon"}, archived:{dot:"#F97316",label:"Archivé"}, paused:{dot:"#FF6B6B",label:"En pause"} } as any)[st] ?? {dot:"#A8A190",label:"Inconnu"}
                     return (
                       <span style={{ display:"inline-flex", alignItems:"center", gap:4, fontSize:10, color:sCfg.dot, background:`${sCfg.dot}15`, border:`1px solid ${sCfg.dot}40`, borderRadius:6, padding:"2px 8px", fontWeight:600 }}>
                         <div style={{ width:5, height:5, borderRadius:"50%", background:sCfg.dot }}/>{sCfg.label}
@@ -2868,12 +2868,12 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       <Eye size={13}/> Tester
                     </button>
                     <button type="button" onClick={() => copy("link")}
-                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"9px", background:copied==="link"?"rgba(57,255,143,0.1)":"rgba(255,255,255,0.04)", border:`1px solid ${copied==="link"?"rgba(57,255,143,0.3)":"rgba(255,255,255,0.08)"}`, borderRadius:9, color:copied==="link"?"#39FF8F":"#8A8478", fontSize:11, cursor:"pointer", transition:"all 0.15s" }}>
+                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"9px", background:copied==="link"?"rgba(57,255,143,0.1)":"rgba(255,255,255,0.04)", border:`1px solid ${copied==="link"?"rgba(57,255,143,0.3)":"rgba(255,255,255,0.08)"}`, borderRadius:9, color:copied==="link"?"#39FF8F":"#A8A190", fontSize:11, cursor:"pointer", transition:"all 0.15s" }}>
                       {copied==="link" ? <Check size={12}/> : <Copy size={12}/>}
                       {copied==="link" ? "Copié !" : "Copier"}
                     </button>
                     <a href={pageUrl} target="_blank" rel="noopener noreferrer"
-                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"9px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:"#8A8478", fontSize:11, textDecoration:"none" }}>
+                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"9px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:"#A8A190", fontSize:11, textDecoration:"none" }}>
                       <ExternalLink size={12}/> Ouvrir
                     </a>
                   </div>
@@ -2886,11 +2886,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 {[
                   { label:"Scans total",   value:active.total_scans.toLocaleString(),               color:"var(--accent)", icon:"📡" },
                   { label:"Vues page",     value:(active.pages?.total_views ?? 0).toLocaleString(),  color:"#39FF8F", icon:"👁" },
-                  { label:"Dernier scan",  value:formatDate(active.last_scan_at),                   color:"#8A8478", icon:"🕐" },
-                  { label:"Créé le",       value:new Date(active.created_at).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"}), color:"#8A8478", icon:"📅" },
+                  { label:"Dernier scan",  value:formatDate(active.last_scan_at),                   color:"#A8A190", icon:"🕐" },
+                  { label:"Créé le",       value:new Date(active.created_at).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"}), color:"#A8A190", icon:"📅" },
                 ].map((s,i) => (
                   <div key={i} style={{ background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.06)", borderRadius:9, padding:"10px 12px" }}>
-                    <p style={{ color:"#8A8478", fontSize:9, textTransform:"uppercase", letterSpacing:1.2, margin:"0 0 4px" }}>{s.icon} {s.label}</p>
+                    <p style={{ color:"#A8A190", fontSize:9, textTransform:"uppercase", letterSpacing:1.2, margin:"0 0 4px" }}>{s.icon} {s.label}</p>
                     <p style={{ color:s.color, fontSize:12, fontWeight:700, margin:0 }}>{s.value}</p>
                   </div>
                 ))}
@@ -2903,17 +2903,17 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 <div style={{ padding:"12px 16px 10px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
                   <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                     <div style={{ width:7, height:7, borderRadius:"50%", background:getDestStatusColor(destOverride) }}/>
-                    <p style={{ color:"#8A8478", fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:0 }}>
+                    <p style={{ color:"#A8A190", fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:0 }}>
                       Destination {destOverride ? "* Modifiee" : "* Page par defaut"}
                     </p>
                   </div>
                   <div style={{ display:"flex", gap:4 }}>
                     <button type="button" onClick={copyDest}
-                      style={{ width:22, height:22, background:"none", border:"none", cursor:"pointer", color:destCopied?"#39FF8F":"#8A8478", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      style={{ width:22, height:22, background:"none", border:"none", cursor:"pointer", color:destCopied?"#39FF8F":"#A8A190", display:"flex", alignItems:"center", justifyContent:"center" }}>
                       {destCopied ? <Check size={11}/> : <Copy size={11}/>}
                     </button>
                     <a href={getDestUrl(destOverride)} target="_blank" rel="noopener noreferrer"
-                      style={{ width:22, height:22, background:"none", border:"none", color:"#8A8478", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      style={{ width:22, height:22, background:"none", border:"none", color:"#A8A190", display:"flex", alignItems:"center", justifyContent:"center" }}>
                       <ExternalLink size={11}/>
                     </a>
                     {destMode === "view" ? (
@@ -2923,7 +2923,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       </button>
                     ) : (
                       <button type="button" onClick={() => setDestMode("view")}
-                        style={{ width:22, height:22, background:"none", border:"none", cursor:"pointer", color:"#8A8478", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                        style={{ width:22, height:22, background:"none", border:"none", cursor:"pointer", color:"#A8A190", display:"flex", alignItems:"center", justifyContent:"center" }}>
                         <X size={11}/>
                       </button>
                     )}
@@ -2937,7 +2937,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       {DEST_TYPES.find(d => d.id === (destOverride?.type ?? "page"))?.icon ?? "📄"}
                     </span>
                     <div style={{ flex:1, minWidth:0 }}>
-                      <p style={{ color:"#8A8478", fontSize:8, textTransform:"uppercase", letterSpacing:1, margin:"0 0 1px" }}>
+                      <p style={{ color:"#A8A190", fontSize:8, textTransform:"uppercase", letterSpacing:1, margin:"0 0 1px" }}>
                         {getDestLabel(destOverride)}
                       </p>
                       <code style={{ color:"var(--accent)", fontSize:9, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, display:"block" }}>
@@ -2970,7 +2970,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         <button key={dt.id} type="button" onClick={() => { setDestType(dt.id as any); setDestValue(""); setDestError("") }}
                           style={{ padding:"5px 4px", background:destType===dt.id?"color-mix(in srgb, var(--accent) 10%, transparent)":"rgba(255,255,255,0.02)", border:`1px solid ${destType===dt.id?"color-mix(in srgb, var(--accent) 35%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:7, cursor:"pointer", textAlign:"center" as const }}>
                           <span style={{ fontSize:12, display:"block", marginBottom:1 }}>{dt.icon}</span>
-                          <span style={{ color:destType===dt.id?G:"#8A8478", fontSize:8, fontWeight:destType===dt.id?700:400 }}>{dt.label}</span>
+                          <span style={{ color:destType===dt.id?G:"#A8A190", fontSize:8, fontWeight:destType===dt.id?700:400 }}>{dt.label}</span>
                         </button>
                       ))}
                     </div>
@@ -3008,11 +3008,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
                     <div style={{ display:"flex", gap:6 }}>
                       <button type="button" onClick={() => setDestMode("view")}
-                        style={{ flex:1, padding:"8px", background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, color:"#8A8478", fontSize:11, cursor:"pointer" }}>
+                        style={{ flex:1, padding:"8px", background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, color:"#A8A190", fontSize:11, cursor:"pointer" }}>
                         Annuler
                       </button>
                       <button type="button" onClick={() => destValue ? setDestConfirm(true) : null} disabled={!destValue || destLoading}
-                        style={{ flex:2, padding:"8px", background:destValue?"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))":"rgba(255,255,255,0.05)", border:"none", borderRadius:8, color:destValue?"#080808":"#8A8478", fontSize:11, fontWeight:700, cursor:destValue&&!destLoading?"pointer":"not-allowed", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                        style={{ flex:2, padding:"8px", background:destValue?"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))":"rgba(255,255,255,0.05)", border:"none", borderRadius:8, color:destValue?"#080808":"#A8A190", fontSize:11, fontWeight:700, cursor:destValue&&!destLoading?"pointer":"not-allowed", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
                         {destLoading ? <><Loader2 size={11} style={{ animation:"spin 0.8s linear infinite" }}/> Enregistrement...</> : destSaved ? <><Check size={11}/> Applique !</> : "Appliquer la destination"}
                       </button>
                     </div>
@@ -3021,12 +3021,12 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     {destConfirm && (
                       <div style={{ padding:"10px 12px", background:"rgba(255,107,107,0.07)", border:"1px solid rgba(255,107,107,0.25)", borderRadius:9 }}>
                         <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:700, margin:"0 0 6px" }}>Confirmer le changement</p>
-                        <p style={{ color:"#8A8478", fontSize:10, margin:"0 0 10px", lineHeight:1.5 }}>
+                        <p style={{ color:"#A8A190", fontSize:10, margin:"0 0 10px", lineHeight:1.5 }}>
                           Tous les QR codes imprimes pointeront vers <strong style={{ color:"#F5F0E8" }}>{destValue}</strong>. Cette action est immediate.
                         </p>
                         <div style={{ display:"flex", gap:6 }}>
                           <button type="button" onClick={() => setDestConfirm(false)}
-                            style={{ flex:1, padding:"7px", background:"transparent", border:"1px solid rgba(255,255,255,0.1)", borderRadius:7, color:"#8A8478", fontSize:11, cursor:"pointer" }}>
+                            style={{ flex:1, padding:"7px", background:"transparent", border:"1px solid rgba(255,255,255,0.1)", borderRadius:7, color:"#A8A190", fontSize:11, cursor:"pointer" }}>
                             Annuler
                           </button>
                           <button type="button" onClick={saveDest} disabled={destLoading}
@@ -3042,7 +3042,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 {/* Historique */}
                 {destMode === "view" && destHistory.length > 0 && (
                   <div style={{ padding:"0 16px 12px" }}>
-                    <p style={{ color:"#8A8478", fontSize:8, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:"0 0 6px" }}>
+                    <p style={{ color:"#A8A190", fontSize:8, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:"0 0 6px" }}>
                       Historique ({destHistory.length})
                     </p>
                     <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
@@ -3052,7 +3052,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           <div key={i} style={{ display:"flex", alignItems:"center", gap:7, padding:"5px 8px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.05)", borderRadius:7 }}>
                             <span style={{ fontSize:11, flexShrink:0 }}>{cfg?.icon ?? "📄"}</span>
                             <div style={{ flex:1, minWidth:0 }}>
-                              <p style={{ color:"#8A8478", fontSize:9, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
+                              <p style={{ color:"#A8A190", fontSize:9, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
                                 {h.label || cfg?.label || h.type}
                               </p>
                               <code style={{ color:"color-mix(in srgb, var(--accent) 60%, transparent)", fontSize:8, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, display:"block" }}>
@@ -3077,7 +3077,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 <div ref={scanWidgetRef} style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"16px" }}>
 
                   {/* Header */}
-                  <p style={{ color:"#8A8478", fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:"0 0 14px" }}>
+                  <p style={{ color:"#A8A190", fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:"0 0 14px" }}>
                     Scannabilite
                   </p>
 
@@ -3094,7 +3094,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       </svg>
                       <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
                         <span style={{ color:scanScore.gradeColor, fontSize:28, fontWeight:800, lineHeight:1 }}>{scanScore.score}</span>
-                        <span style={{ color:"#8A8478", fontSize:9, marginTop:2 }}>/ 100</span>
+                        <span style={{ color:"#A8A190", fontSize:9, marginTop:2 }}>/ 100</span>
                       </div>
                     </div>
                     <span style={{ background:`${scanScore.gradeColor}15`, border:`1px solid ${scanScore.gradeColor}40`, borderRadius:8, padding:"4px 14px", fontSize:13, color:scanScore.gradeColor, fontWeight:700 }}>
@@ -3104,10 +3104,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
                   {/* Chips infos */}
                   <div style={{ display:"flex", gap:6, flexWrap:"wrap" as const, justifyContent:"center", marginBottom:14 }}>
-                    <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 9px", fontSize:9, color:"#8A8478" }}>
+                    <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 9px", fontSize:9, color:"#A8A190" }}>
                       Contraste {scanScore.ratio}:1
                     </span>
-                    <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 9px", fontSize:9, color:"#8A8478" }}>
+                    <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 9px", fontSize:9, color:"#A8A190" }}>
                       Taille min {scanScore.minSize}
                     </span>
                     <span style={{ background:`${ecLevel==="H"?"rgba(57,255,143,0.1)":ecLevel==="M"?"color-mix(in srgb, var(--accent) 10%, transparent)":"rgba(249,115,22,0.1)"}`, border:`1px solid ${ecLevel==="H"?"rgba(57,255,143,0.25)":ecLevel==="M"?"color-mix(in srgb, var(--accent) 25%, transparent)":"rgba(249,115,22,0.25)"}`, borderRadius:6, padding:"3px 9px", fontSize:9, color:ecLevel==="H"?"#39FF8F":ecLevel==="M"?G:"#F97316" }}>
@@ -3147,7 +3147,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           </span>
                           <div style={{ flex:1, minWidth:0 }}>
                             <p style={{ color:"#F5F0E8", fontSize:11, fontWeight:600, margin:"0 0 2px" }}>{issue.title}</p>
-                            <p style={{ color:"#8A8478", fontSize:9, margin:0, lineHeight:1.5 }}>{issue.detail}</p>
+                            <p style={{ color:"#A8A190", fontSize:9, margin:0, lineHeight:1.5 }}>{issue.detail}</p>
                             {issue.fix && (
                               <p style={{ color:`${issue.severity==="critical"?"#FF6B6B":"#F97316"}`, fontSize:9, margin:"3px 0 0", fontWeight:600 }}>
                                 {issue.fix}
@@ -3267,7 +3267,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     <button type="button" onClick={() => setModeSheet(true)}
                       style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:8, width:"100%", padding:"10px 14px", marginBottom:4, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.09)", borderRadius:11, color:"#F5F0E8", fontSize:13, fontWeight:600, cursor:"pointer" }}>
                       <span>Mode : <strong style={{ color:"var(--accent)" }}>{level==="simple"?"Simple":level==="inter"?"Intermédiaire":"Expert"}</strong></span>
-                      <ChevronDown size={16} color="#8A8478" />
+                      <ChevronDown size={16} color="#A8A190" />
                     </button>
                   ) : (<>
                     <div style={{ display:"flex", gap:4, padding:4, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:11, marginBottom:2 }}>
@@ -3275,7 +3275,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         <button key={k} type="button" onClick={() => setLevel(k)}
                           style={{ flex:1, padding:"7px 4px", borderRadius:8, border:"none", cursor:"pointer", fontSize:10.5, fontWeight:level===k?700:500,
                             background: level===k ? "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))" : "transparent",
-                            color: level===k ? "#080808" : "#8A8478" }}>
+                            color: level===k ? "#080808" : "#A8A190" }}>
                           {l}
                         </button>
                       ))}

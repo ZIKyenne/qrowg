@@ -724,7 +724,7 @@ function tplThumb(t: { id: string; bg: string; ink: string; accent: string }, ph
 }
 
 // Palette de couleurs rapides (pastilles cliquables)
-const SWATCHES = ["#C9A84C", "#0A0A0A", "#FFFFFF", "#F5F0E8", "#8A8478", "#C0392B", "#EA580C", "#E0B84C", "#16A34A", "#0E7490", "#1D4ED8", "#7C3AED", "#E1306C", "#6B3F2A"]
+const SWATCHES = ["#C9A84C", "#0A0A0A", "#FFFFFF", "#F5F0E8", "#A8A190", "#C0392B", "#EA580C", "#E0B84C", "#16A34A", "#0E7490", "#1D4ED8", "#7C3AED", "#E1306C", "#6B3F2A"]
 
 // Degrades prets a l'emploi (1 clic) pour les elements
 const GRADIENT_PRESETS: [string, string][] = [
@@ -3108,9 +3108,9 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       addText("📶  Wifi gratuit", H * 0.045, W * 0.072, { weight: "bold", fill: readableOn(accent), role: "title" })
       const cw = Math.round(W * 0.82), ch = Math.round(H * 0.215)
       fc.add(new fabric.Rect({ width: cw, height: ch, rx: 16, ry: 16, fill: "#FFFFFF", originX: "center", originY: "top", left: W / 2, top: H * 0.225, shadow: new fabric.Shadow({ color: "rgba(0,0,0,0.16)", blur: 20, offsetX: 0, offsetY: 8 }) }))
-      addText("RÉSEAU", H * 0.255, W * 0.028, { font: "Arial", fill: "#8A8478" })
+      addText("RÉSEAU", H * 0.255, W * 0.028, { font: "Arial", fill: "#A8A190" })
       addText("MonReseau", H * 0.29, W * 0.052, { weight: "bold", fill: "#1A1A1A" })
-      addText("MOT DE PASSE", H * 0.355, W * 0.028, { font: "Arial", fill: "#8A8478" })
+      addText("MOT DE PASSE", H * 0.355, W * 0.028, { font: "Arial", fill: "#A8A190" })
       addText("••••••••", H * 0.39, W * 0.052, { weight: "bold", fill: "#1A1A1A" })
       await placeQrT(H * 0.50, 0.40)
       addText("Scannez pour vous connecter", H * 0.88, W * 0.032, { font: "Arial", role: "subtitle" })

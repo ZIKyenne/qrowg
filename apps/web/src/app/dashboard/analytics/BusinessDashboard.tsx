@@ -59,7 +59,7 @@ const STORAGE_KEY = "qrfolio_dashboard_layout"
 // ── Couleurs ───────────────────────────────────────────────────────────────────
 const G     = "var(--accent)"
 const NEON  = "#39FF8F"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 const SURF  = "#0F0E0B"
 const BORD  = "color-mix(in srgb, var(--accent) 12%, transparent)"
 

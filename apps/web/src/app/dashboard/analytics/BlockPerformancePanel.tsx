@@ -35,11 +35,11 @@ const CFG: Record<string, { label: string; emoji: string; color: string; interac
   instagram_feed: { label: "Instagram",     emoji: "📸", color: "#E1306C", interactive: true  },
   gallery:        { label: "Galerie",       emoji: "🖼️", color: "#A78BFA", interactive: true  },
   profile:        { label: "Profil",        emoji: "👤", color: "var(--accent)", interactive: false },
-  bio:            { label: "Bio",           emoji: "📝", color: "#8A8478", interactive: false },
+  bio:            { label: "Bio",           emoji: "📝", color: "#A8A190", interactive: false },
   testimonials:   { label: "Avis",          emoji: "⭐", color: "#FFD700", interactive: false },
   visit_counter:  { label: "Compteur",      emoji: "📊", color: "#67E8F9", interactive: false },
-  heading:        { label: "Titre",         emoji: "🔤", color: "#8A8478", interactive: false },
-  rich_text:      { label: "Texte",         emoji: "📄", color: "#8A8478", interactive: false },
+  heading:        { label: "Titre",         emoji: "🔤", color: "#A8A190", interactive: false },
+  rich_text:      { label: "Texte",         emoji: "📄", color: "#A8A190", interactive: false },
   spacer:         { label: "Espaceur",      emoji: "↕️", color: "#333",    interactive: false },
   divider:        { label: "Séparateur",    emoji: "—",  color: "#444",    interactive: false },
 }
@@ -50,7 +50,7 @@ const PERIODS = [{ v: 7, l: "7j" }, { v: 30, l: "30j" }, { v: 90, l: "90j" }]
 const SORTS   = [{ v: "clicks", l: "Clics" }, { v: "ctr", l: "CTR" }, { v: "count", l: "Blocs" }]
 
 const G     = "var(--accent)"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 
 // ── Tooltip ───────────────────────────────────────────────────────────────────
 function Tip({ active, payload, label }: any) {

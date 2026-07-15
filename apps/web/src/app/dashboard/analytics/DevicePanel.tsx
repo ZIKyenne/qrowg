@@ -23,7 +23,7 @@ const DEVICE_CFG: Record<string, { label: string; icon: React.ReactNode; color: 
   mobile:  { label: "Mobile",  icon: <Smartphone size={14} />, color: "var(--accent)" },
   tablet:  { label: "Tablette",icon: <Tablet size={14} />,     color: "#7B61FF" },
   desktop: { label: "Desktop", icon: <Monitor size={14} />,    color: "#39FF8F" },
-  unknown: { label: "Inconnu", icon: <Cpu size={14} />,        color: "#8A8478" },
+  unknown: { label: "Inconnu", icon: <Cpu size={14} />,        color: "#A8A190" },
 }
 
 const OS_COLORS: Record<string, string> = {
@@ -32,7 +32,7 @@ const OS_COLORS: Record<string, string> = {
   windows:   "#38BDF8",
   macos:     "#A78BFA",
   linux:     "#F97316",
-  other:     "#8A8478",
+  other:     "#A8A190",
 }
 
 const BROWSER_COLORS: Record<string, string> = {
@@ -41,13 +41,13 @@ const BROWSER_COLORS: Record<string, string> = {
   firefox: "#FF6B6B",
   edge:    "#4ADE80",
   samsung: "var(--accent)",
-  other:   "#8A8478",
+  other:   "#A8A190",
 }
 
 const PERIODS = [{ v: 7, l: "7j" }, { v: 30, l: "30j" }, { v: 90, l: "90j" }]
 
 const G     = "var(--accent)"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 
 // Normalise OS/browser vers une clé propre
 function normalizeOs(raw: string | null): string {

@@ -36,7 +36,7 @@ const FREQ_CONFIG = {
 } as const
 
 const G     = "var(--accent)"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 
 export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
   const [subs,    setSubs]    = useState<Subscription[]>([])

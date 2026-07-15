@@ -6,7 +6,7 @@ import { Inbox, Mail, Phone, Trash2, Check, Search } from "lucide-react"
 import Particles from "@/components/Particles"
 
 const G = "var(--accent, #C9A84C)"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 const TEXT = "#F5F0E8"
 
 type Lead = {

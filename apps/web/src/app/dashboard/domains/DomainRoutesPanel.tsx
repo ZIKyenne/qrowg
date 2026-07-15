@@ -41,7 +41,7 @@ const SUBDOMAIN_LABELS: Record<string, string> = {
 }
 
 const G     = "var(--accent)"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 
 export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
   const [routes,     setRoutes]     = useState<Route[]>([])

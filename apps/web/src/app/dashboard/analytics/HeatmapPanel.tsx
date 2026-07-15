@@ -5,7 +5,7 @@
 // Le rendu de la vraie page n'est pas reproduit ici : on montre l'intensité par zone (haut/milieu/bas × gauche/droite).
 
 const GOLD = "var(--accent)"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 
 type BRow = { id: string; type: string }
 type Props = {

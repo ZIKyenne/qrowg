@@ -11,7 +11,7 @@ import {
 import { createClient } from "@/lib/supabase/client"
 
 const DEFAULT_ACCENT = "#C9A84C"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 
 const NAV_ITEMS = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard", exact: true },

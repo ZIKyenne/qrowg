@@ -20,7 +20,7 @@ function nameFromUrl(url: string): string {
 }
 
 const G = "#C9A84C"
-const MUTED = "#8A8478"
+const MUTED = "#A8A190"
 
 export default function FileUpload({ value, onChange, hint }: Props) {
   const { uploadFile, uploading, listAssets, deleteAsset } = useImageUpload()
