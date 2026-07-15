@@ -27,7 +27,7 @@ function Toggle({ value, onChange, label, description }: { value: boolean; onCha
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
       <div>
         <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 600, margin: 0 }}>{label}</p>
-        {description && <p style={{ color: "#A8A190", fontSize: 11, margin: "2px 0 0" }}>{description}</p>}
+        {description && <p style={{ color: "#A8A190", fontSize: 12.5, margin: "2px 0 0" }}>{description}</p>}
       </div>
       <button onClick={() => onChange(!value)}
         style={{ width: 44, height: 24, borderRadius: 12, background: value ? "var(--accent)" : "rgba(255,255,255,0.08)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s", flexShrink: 0 }}>
@@ -123,7 +123,7 @@ export default function SettingsPage() {
   }
 
   if (loading) return (
-    <div style={{ minHeight: "100vh", background: "transparent", padding: "32px 28px", fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ minHeight: "100dvh", background: "transparent", padding: "32px 28px", fontFamily: "DM Sans, sans-serif" }}>
       <div style={{ maxWidth: 680, margin: "0 auto" }}>
         <div className="skeleton" style={{ width: 220, height: 34, marginBottom: 8 }} />
         <div className="skeleton" style={{ width: 280, height: 16, marginBottom: 28 }} />
@@ -133,7 +133,7 @@ export default function SettingsPage() {
   )
 
   return (
-    <div style={{ minHeight: "100vh", background: "#080808", padding: "32px 28px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
+    <div style={{ minHeight: "100dvh", background: "#080808", padding: "32px 28px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}} input:focus,textarea:focus{border-color:color-mix(in srgb, var(--accent) 50%, transparent)!important;background:#111009!important}`}</style>
 
       {/* Particules dorées en fond (comble le vide, comme la landing) */}
@@ -149,15 +149,15 @@ export default function SettingsPage() {
         <Section title="Informations du compte" subtitle="Email et identifiant" icon={<Shield size={16} />}>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div>
-              <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5 }}>Email</label>
+              <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 5 }}>Email</label>
               <div style={{ ...inputStyle, opacity: 0.6, cursor: "not-allowed", display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ color: "#F5F0E8" }}>{profile?.email}</span>
                 <span style={{ marginLeft: "auto", color: "#39FF8F", fontSize: 10, background: "rgba(57,255,143,0.1)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 6, padding: "2px 7px" }}>Vérifié</span>
               </div>
-              <p style={{ color: MUTED, fontSize: 10, margin: "4px 0 0" }}>L'e-mail ne peut pas être modifié pour des raisons de sécurité.</p>
+              <p style={{ color: MUTED, fontSize: 12, margin: "4px 0 0" }}>L'e-mail ne peut pas être modifié pour des raisons de sécurité.</p>
             </div>
             <div>
-              <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5 }}>Plan actuel</label>
+              <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 5 }}>Plan actuel</label>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{ background: "color-mix(in srgb, var(--accent) 7%, transparent)", border: `1px solid color-mix(in srgb, var(--accent) 15%, transparent)`, borderRadius: 8, padding: "6px 14px", color: G, fontSize: 13, fontWeight: 700, textTransform: "capitalize" }}>
                   {profile?.plan || "free"}
@@ -187,7 +187,7 @@ export default function SettingsPage() {
         <Section title="Sécurité" subtitle="Mot de passe et authentification" icon={<Key size={16} />}>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div>
-              <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5 }}>Nouveau mot de passe</label>
+              <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 5 }}>Nouveau mot de passe</label>
               <div style={{ position: "relative" }}>
                 <input type={showPwd ? "text" : "password"} value={newPwd} onChange={e => setNewPwd(e.target.value)}
                   placeholder="Minimum 8 caractères" style={{ ...inputStyle, paddingRight: 40 }}
@@ -199,7 +199,7 @@ export default function SettingsPage() {
               </div>
             </div>
             <div>
-              <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5 }}>Confirmer le mot de passe</label>
+              <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 5 }}>Confirmer le mot de passe</label>
               <input type={showPwd ? "text" : "password"} value={confirmPwd} onChange={e => setConfirmPwd(e.target.value)}
                 placeholder="Repete le mot de passe" style={inputStyle}
                 onFocus={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)"}
@@ -214,7 +214,7 @@ export default function SettingsPage() {
                     <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i <= (newPwd.length >= 12 && /[A-Z]/.test(newPwd) && /[0-9]/.test(newPwd) ? 4 : newPwd.length >= 10 ? 3 : newPwd.length >= 8 ? 2 : 1) ? (newPwd.length >= 12 ? "#39FF8F" : newPwd.length >= 10 ? G : newPwd.length >= 8 ? "#F97316" : "#EF4444") : "rgba(255,255,255,0.06)" }} />
                   ))}
                 </div>
-                <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{newPwd.length < 8 ? "Trop court" : newPwd.length < 10 ? "Acceptable" : newPwd.length < 12 ? "Bon" : "Excellent"}</p>
+                <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{newPwd.length < 8 ? "Trop court" : newPwd.length < 10 ? "Acceptable" : newPwd.length < 12 ? "Bon" : "Excellent"}</p>
               </div>
             )}
 
@@ -274,16 +274,17 @@ export default function SettingsPage() {
                 <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{profile?.email}</p>
               </div>
             </div>
+            {/* Deconnexion = action reversible -> neutre (le rouge reste reserve au destructif, #05) */}
             <button onClick={handleLogout}
-              style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "12px 18px", color: "#EF4444", fontSize: 14, fontWeight: 600, cursor: "pointer", width: "fit-content" }}>
+              style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "12px 18px", color: "#F5F0E8", fontSize: 14, fontWeight: 600, cursor: "pointer", width: "fit-content" }}>
               <LogOut size={15} /> Se déconnecter
             </button>
           </div>
           <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}`}</style>
         </Section>
 
-        {/* Danger zone */}
-        <div style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 16, overflow: "hidden" }}>
+        {/* Danger zone — isolee en fin de page, davantage d'espace (#05) */}
+        <div style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 16, overflow: "hidden", marginTop: 16 }}>
           <div style={{ padding: "18px 24px", borderBottom: "1px solid rgba(239,68,68,0.1)", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ color: "#EF4444", background: "rgba(239,68,68,0.1)", borderRadius: 8, padding: 8 }}><AlertTriangle size={16} /></div>
             <div>
@@ -296,7 +297,7 @@ export default function SettingsPage() {
               La suppression de ton compte effacera définitivement toutes tes pages, QR codes et données analytics. Cette action est irréversible.
             </p>
             <div>
-              <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5 }}>Confirme en tapant ton e-mail : <span style={{ color: "#EF4444" }}>{profile?.email}</span></label>
+              <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 5 }}>Confirme en tapant ton e-mail : <span style={{ color: "#EF4444" }}>{profile?.email}</span></label>
               <input value={deleteConfirm} onChange={e => setDeleteConfirm(e.target.value)}
                 placeholder={profile?.email || "ton@email.com"}
                 style={{ ...inputStyle, borderColor: deleteConfirm === profile?.email ? "rgba(239,68,68,0.4)" : "rgba(239,68,68,0.15)", background: "rgba(239,68,68,0.04)" }}
