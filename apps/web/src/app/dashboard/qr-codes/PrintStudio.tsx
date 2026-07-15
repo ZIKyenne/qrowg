@@ -979,6 +979,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [btnSheet, setBtnSheet] = useState<"" | "text" | "color">("")
   // Sheet "Plus" : actions secondaires de l'objet (empilement/ordre/verrou/supprimer...).
   const [moreSel, setMoreSel] = useState(false)
+  const [shadowAdv, setShadowAdv] = useState(false) // #20 : flou/decalages caches derriere "Avance" en mode simple
   // Toast (avec Annuler) : feedback des actions destructives (#15 audit).
   const [toast, setToast] = useState<string | null>(null)
   const toastTimer = useRef<number | null>(null)
@@ -4277,9 +4278,16 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               ))}
             </div>
             {sel.shadow && (<>
-              <BigSlider label="Flou" value={sel.shadowBlur} min={0} max={60} step={1} resetTo={12} format={v => `${Math.round(v)} px`} dark onChange={setShadowBlur} />
-              <BigSlider label="Décalage X" value={sel.shadowX} min={-30} max={30} step={1} resetTo={0} format={v => `${Math.round(v)} px`} dark onChange={v => setShadowOffset("x", v)} />
-              <BigSlider label="Décalage Y" value={sel.shadowY} min={-30} max={30} step={1} resetTo={6} format={v => `${Math.round(v)} px`} dark onChange={v => setShadowOffset("y", v)} />
+              {/* Reglages fins caches derriere "Avance" (#20) : le mode simple reste simple */}
+              <button type="button" onClick={() => setShadowAdv(v => !v)}
+                style={{ width: "100%", minHeight: 44, marginTop: 4, borderRadius: 12, cursor: "pointer", fontSize: 12.5, fontWeight: 700, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", color: shadowAdv ? G : "#ECE8E0" }}>
+                Réglages avancés {shadowAdv ? "▲" : "▾"}
+              </button>
+              {shadowAdv && (<>
+                <BigSlider label="Flou" value={sel.shadowBlur} min={0} max={60} step={1} resetTo={12} format={v => `${Math.round(v)} px`} dark onChange={setShadowBlur} />
+                <BigSlider label="Décalage X" value={sel.shadowX} min={-30} max={30} step={1} resetTo={0} format={v => `${Math.round(v)} px`} dark onChange={v => setShadowOffset("x", v)} />
+                <BigSlider label="Décalage Y" value={sel.shadowY} min={-30} max={30} step={1} resetTo={6} format={v => `${Math.round(v)} px`} dark onChange={v => setShadowOffset("y", v)} />
+              </>)}
             </>)}
           </>)}
         </div>
