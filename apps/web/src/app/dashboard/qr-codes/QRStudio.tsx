@@ -434,6 +434,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [styleConf,  setStyleConf]  = useState<QRStyleConfig>({ ...DEFAULT_STYLE })
   const [styleTab,   setStyleTab]   = useState<"apparence"|"branding"|"qualite">("apparence")
   const [openAcc,    setOpenAcc]    = useState<string>("presets")
+  const [morePresets, setMorePresets] = useState(false) // #12 : n'affiche que les premiers styles, "Voir plus" pour le reste
   const [autoMsg,    setAutoMsg]    = useState<string>("")
   const [applyAllOk,   setApplyAllOk]   = useState(false)
   const [selectedCat,  setSelectedCat]  = useState("classic")
@@ -3303,7 +3304,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       {PRESET_CATS.map(cat => {
                         const isReco = cat.id !== "all" && cat.id === detectCat()
                         return (
-                        <button key={cat.id} type="button" onClick={() => setSelectedCat(cat.id)}
+                        <button key={cat.id} type="button" onClick={() => { setSelectedCat(cat.id); setMorePresets(false) }}
                           style={{ position:"relative" as const, display:"inline-flex", alignItems:"center", gap:3, padding:"5px 10px", background:selectedCat===cat.id?"color-mix(in srgb, var(--accent) 15%, transparent)":"rgba(255,255,255,0.04)", border:`1px solid ${selectedCat===cat.id?"color-mix(in srgb, var(--accent) 40%, transparent)":isReco?"rgba(57,255,143,0.4)":"rgba(255,255,255,0.08)"}`, borderRadius:20, color:selectedCat===cat.id?G:MUTED, fontSize:10, fontWeight:selectedCat===cat.id?700:500, cursor:"pointer", whiteSpace:"nowrap" as const, flexShrink:0 }}>
                           <span>{cat.emoji}</span>{cat.label}
                           {isReco && <span style={{ width:5, height:5, borderRadius:"50%", background:"#39FF8F", flexShrink:0 }}/>}
@@ -3311,9 +3312,15 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       )})}
                     </div>
 
-                    {/* Grille presets avec apercu QR realiste */}
+                    {/* Grille presets (limitee a 6/9 + "Voir plus" pour ne pas tout deverser, #12) */}
+                    {(() => {
+                    const _list = PRESETS.filter(p => selectedCat==="all" || p.cat===selectedCat)
+                    const _cap = isMobile ? 6 : 9
+                    const _shown = morePresets ? _list : _list.slice(0, _cap)
+                    const _hidden = _list.length - _shown.length
+                    return (<>
                     <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr 1fr":"repeat(3,1fr)", gap:isMobile?10:7 }}>
-                      {PRESETS.filter(p => selectedCat==="all" || p.cat===selectedCat).map(preset => {
+                      {_shown.map(preset => {
                         const canAccess = PLAN_RANK[userPlan] >= presetMinRank(preset.plan)
                         const isActive  = fg===preset.fg && bg===preset.bg
                         const planLabel = preset.plan === "free" ? null : preset.plan === "pro" ? "STARTER" : "PRO"
@@ -3327,11 +3334,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                             style={{ position:"relative", cursor:"pointer", borderRadius:10, overflow:"hidden", border:`1.5px solid ${isActive?"var(--accent)":canAccess?"rgba(255,255,255,0.08)":"color-mix(in srgb, var(--accent) 28%, transparent)"}`, transition:"all 0.15s", opacity:1 }}>
 
                             {/* Apercu QR miniature realiste */}
-                            <div style={{ background:preset.bg, padding:"12px", display:"flex", alignItems:"center", justifyContent:"center", position:"relative", minHeight:64 }}>
+                            <div style={{ background:preset.bg, padding:"12px", display:"flex", alignItems:"center", justifyContent:"center", position:"relative", minHeight:isMobile?80:64 }}>
                               {preset.gradient && preset.gradient !== "none" && preset.fg2 && (
                                 <div style={{ position:"absolute", inset:0, background:`linear-gradient(135deg,${preset.fg}25,${preset.fg2}25)` }}/>
                               )}
-                              <div style={{ position:"relative", display:"grid", gridTemplateColumns:"repeat(5,1fr)", gridTemplateRows:"repeat(5,1fr)", gap:2, width:38, height:38 }}>
+                              <div style={{ position:"relative", display:"grid", gridTemplateColumns:"repeat(5,1fr)", gridTemplateRows:"repeat(5,1fr)", gap:2, width:isMobile?48:38, height:isMobile?48:38 }}>
                                 {/* 3 coins (finder patterns) + modules pseudo-aleatoires */}
                                 {Array.from({ length: 25 }).map((_, i) => {
                                   const row = Math.floor(i/5), col = i%5
@@ -3357,7 +3364,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
                             {/* Nom + badge plan */}
                             <div style={{ background:"#0F0E0B", padding:"6px 5px 7px", textAlign:"center" as const }}>
-                              <p style={{ color:isActive?G:"#F5F0E8", fontSize:9, fontWeight:isActive?700:500, margin:"0 0 2px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
+                              <p style={{ color:isActive?G:"#F5F0E8", fontSize:isMobile?11:9, fontWeight:isActive?700:500, margin:"0 0 2px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
                                 {preset.label}
                               </p>
                               {planLabel && (
@@ -3377,6 +3384,14 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         )
                       })}
                     </div>
+                    {!morePresets && _hidden > 0 && (
+                      <button type="button" onClick={() => setMorePresets(true)}
+                        style={{ width:"100%", marginTop:10, padding:"11px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:10, color:G, fontSize:12.5, fontWeight:700, cursor:"pointer" }}>
+                        Voir plus de styles ({_hidden})
+                      </button>
+                    )}
+                    </>)
+                    })()}
 
                     {/* Upsell modal inline */}
                   </AccSection>
