@@ -5486,7 +5486,20 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <input value={sel.fill} onChange={e => setFill(e.target.value)}
                     style={{ flex: 1, background: pField, border: "1px solid rgba(0,0,0,0.08)", borderRadius: 7, padding: "7px 9px", color: pInk, fontSize: 11, fontFamily: "monospace", outline: "none", boxSizing: "border-box" }} />
                 </div>
-                {/* Selecteur de couleurs avance (#14) : degrade H/S/L, hex, pipette, harmonies, recentes */}
+                {/* Couleurs recentes : utiles aussi en mode Simple */}
+                {recentColors.length > 0 && (
+                  <div style={{ marginBottom: 12 }}>
+                    <label style={{ color: pMuted, fontSize: 10, display: "block", marginBottom: 4 }}>Récentes</label>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                      {recentColors.map(c => (
+                        <button key={"rc" + c} type="button" onClick={() => setFill(c)} title={c}
+                          style={{ width: 22, height: 22, borderRadius: "50%", cursor: "pointer", background: c, border: sel.fill.toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.2)", padding: 0 }} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {/* Reglages couleur avances (HSL, pipette, harmonies) -> mode Expert uniquement (#3, #13) */}
+                {uiMode === "expert" && (<>
                 <button type="button" onClick={() => setPickerOpen(v => !v)}
                   style={{ ...panelBtn, width: "100%", fontSize: 10, marginBottom: pickerOpen ? 8 : 12, color: pickerOpen ? G : pInk, borderColor: pickerOpen ? G : "rgba(0,0,0,0.1)" }}>
                   🎨 Palette avancée {pickerOpen ? "▲" : "▾"}
@@ -5501,6 +5514,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     dark={darkPanel}
                   />
                 )}
+                </>)}
 
                 {/* Opacite */}
                 <label style={{ color: pMuted, fontSize: 10, display: "block", marginBottom: 4 }}>
@@ -5535,7 +5549,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   )
                 })()}
 
-                {/* Degrade */}
+                {/* Degrade / Motif / Contour : reglages avances -> mode Expert uniquement (#3, #13) */}
+                {uiMode === "expert" && (<>
                 <p className="ps-sec-label">Dégradé</p>
                 <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
                   {GRADIENT_PRESETS.map(([a, b]) => (
@@ -5557,6 +5572,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                   <button type="button" onClick={() => setPatternFill("grid")} style={{ ...panelBtn, flex: 1, fontSize: 9.5 }}>Grille</button>
                 </div>
                 <button type="button" onClick={makeOutline} style={{ ...panelBtn, width: "100%", fontSize: 9.5, marginBottom: 12 }} title="Forme creuse : contour seul, remplissage transparent">◯ Contour seul (creuse)</button>
+                </>)}
 
                 {/* Bordure / contour */}
                 <button type="button" onClick={() => setBorder(!sel.border)}
