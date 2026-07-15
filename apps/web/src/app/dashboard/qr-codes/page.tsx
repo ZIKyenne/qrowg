@@ -38,14 +38,17 @@ export default async function QRCodesPage() {
       <style>{`
         .qrh-inner { max-width:1320px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:66px; }
         .qrh-actions { display:flex; align-items:center; gap:14px; }
-        @media (max-width:640px) {
-          .qrh-bar { padding:12px 16px !important; }
+        @media (max-width:860px) {
+          /* En-tete NON sticky sur mobile : il defile au lieu d'occuper l'ecran en
+             permanence -> la personnalisation commence plus haut et le bas des
+             reglages devient atteignable au scroll (fix scroll bloque). */
+          .qrh-bar { padding:12px 16px !important; position: static !important; }
           .qrh-inner { flex-direction:column; align-items:stretch; height:auto; gap:12px; }
           .qrh-actions { flex-direction:column; align-items:stretch; gap:10px; width:100%; }
           .qrh-kpis { width:100%; }
           .qrh-kpis > div { flex:1; }
           .qrh-cta { width:100%; justify-content:center; padding:13px !important; font-size:14px !important; }
-          .qrh-content { padding:16px 16px 90px !important; }
+          .qrh-content { padding:16px 16px 130px !important; }
         }
       `}</style>
       <div className="qrh-bar" style={{ borderBottom: "1px solid rgba(201,168,76,0.1)", background: "rgba(15,14,11,0.85)", backdropFilter: "blur(14px)", position: "sticky", top: 0, zIndex: 50, padding: "0 24px" }}>
