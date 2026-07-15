@@ -940,7 +940,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
   const [photoLoading, setPhotoLoading] = useState(false)
   const [photoErr, setPhotoErr] = useState("")
   const [showHelp, setShowHelp] = useState(false)
-  const [hintOff, setHintOff] = useState(false)
+  const [hintOff, setHintOff] = useState(() => typeof window !== "undefined" && localStorage.getItem("ps_hint_seen") === "1")
+  const dismissHint = useCallback(() => { setHintOff(true); try { localStorage.setItem("ps_hint_seen", "1") } catch {} }, [])
   const [showStart, setShowStart] = useState(false) // ecran d'accueil guide (metier -> objectif -> style)
   const [startStep, setStartStep] = useState<"metier" | "objectif" | "design">("metier")
   const [guideMetier, setGuideMetier] = useState<typeof GUIDE_METIERS[number] | null>(null)
@@ -1284,13 +1285,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       })
     }
 
-    // Bruit de poignees (#12) : groupes / multi-selection / QR -> 4 coins + rotation
-    // seulement (on masque les poignees de milieu). Pour le QR c'est aussi une
-    // securite : plus d'etirement non uniforme qui casserait la scannabilite.
+    // Bruit de poignees (#17) : TOUT objet selectionne -> 4 coins + rotation
+    // seulement (poignees de milieu masquees). Moins de bruit sur les petits
+    // objets + scale uniforme (pas de deformation, protege la scannabilite du QR).
     const tuneControls = (o?: fabric.Object | null) => {
       if (!o) return
-      const compact = o.type === "group" || o.type === "activeSelection" || !!(o as any).isQR || !!(o as any).isQrCard
-      if (compact) { o.setControlsVisibility({ ml: false, mr: false, mt: false, mb: false }); fc.requestRenderAll() }
+      o.setControlsVisibility({ ml: false, mr: false, mt: false, mb: false })
+      fc.requestRenderAll()
     }
     fc.on("selection:created", () => { refreshSel(); setShowAdvanced(false); tuneControls(fc.getActiveObject()) })
     fc.on("selection:updated", () => { refreshSel(); setShowAdvanced(false); tuneControls(fc.getActiveObject()) })
@@ -1321,8 +1322,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       // Ajout par l'utilisateur (hors chargement/modele en masse, hors guides/QR initial)
       // -> on ferme le panneau gauche ouvert pour REVELER le canvas + l'element ajoute.
       const o = e?.target as any
-      if (mobileRef.current && !histRef.current.lock && o && !o.isGuide && !o.isOverlay && !o.isQR && !o.isQrCard) {
-        setTplOpen(false); setLibOpen(false); setCompOpen(false); setPhotoOpen(false); setSide("")
+      if (!histRef.current.lock && o && !o.isGuide && !o.isOverlay && !o.isQR && !o.isQrCard) {
+        // Premiere vraie interaction -> l'astuce d'accueil ne doit plus revenir (#16)
+        dismissHint()
+        if (mobileRef.current) { setTplOpen(false); setLibOpen(false); setCompOpen(false); setPhotoOpen(false); setSide("") }
       }
     })
     fc.on("object:removed", () => { pushHistory(); setLayersVer(v => v + 1) })
@@ -5932,13 +5935,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           </div>
         )}
 
-        {/* Astuce d'accueil (masquable) : guide le debutant quand rien n'est selectionne */}
+        {/* Astuce d'accueil (masquable, une seule fois) : guide le debutant quand rien
+            n'est selectionne. Positionnee AU-DESSUS de la barre mobile pour ne pas
+            masquer le canvas (#16), croix a cible tactile 30px, fermeture persistee. */}
         {!sel && !hintOff && (
-          <div style={{ position: "absolute", bottom: 14, left: "50%", transform: "translateX(-50%)", zIndex: 35, display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "#FFFFFF", border: "1px solid rgba(201,168,76,0.45)", borderRadius: 999, boxShadow: "0 8px 24px rgba(0,0,0,0.14)", maxWidth: "90%" }}>
+          <div style={{ position: "absolute", bottom: landscapeMobile ? "calc(104px + env(safe-area-inset-bottom))" : 14, left: "50%", transform: "translateX(-50%)", zIndex: 35, display: "flex", alignItems: "center", gap: 8, padding: "7px 8px 7px 13px", background: "#FFFFFF", border: "1px solid rgba(201,168,76,0.45)", borderRadius: 999, boxShadow: "0 8px 24px rgba(0,0,0,0.18)", maxWidth: "92%" }}>
             <Sparkles size={13} color={G} style={{ flexShrink: 0 }} />
-            <span style={{ color: INK, fontSize: 11.5 }}>Choisis un <b>modèle</b> à gauche, ou <b>double-clique</b> ici pour ajouter du texte.</span>
-            <button type="button" onClick={() => setHintOff(true)} aria-label="Masquer l'astuce"
-              style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, background: "rgba(0,0,0,0.06)", border: "none", borderRadius: 6, color: MUTED, cursor: "pointer", flexShrink: 0 }}><X size={11} /></button>
+            <span style={{ color: INK, fontSize: 11.5 }}>Choisis un <b>modèle</b>, ou <b>double-clique</b> pour ajouter du texte.</span>
+            <button type="button" onClick={dismissHint} aria-label="Masquer l'astuce"
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, background: "rgba(0,0,0,0.06)", border: "none", borderRadius: 999, color: MUTED, cursor: "pointer", flexShrink: 0 }}><X size={14} /></button>
           </div>
         )}
       </div>
