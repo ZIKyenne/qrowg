@@ -4190,7 +4190,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               </div>
               <p className="ps-sec-label">Ombre</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {([["off", "Aucune"], ["soft", "Douce"], ["medium", "Moyenne"], ["strong", "Forte"], ["floating", "Flottante"], ["luxury", "Luxe"]] as const).map(([k, l]) => tChip(l, false, () => setShadowPreset(k), k, { fontSize: 12 }))}
+                {([["off", "Aucune"], ["soft", "Douce"], ["medium", "Moyenne"], ["strong", "Forte"], ["floating", "Flottante"], ["luxury", "Diffuse"]] as const).map(([k, l]) => tChip(l, false, () => setShadowPreset(k), k, { fontSize: 12 }))}
               </div>
             </>)}
 
@@ -4272,7 +4272,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           {shapeSheet === "shadow" && (<>
             <p className="ps-sec-label">Style</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
-              {([["off", "Aucune"], ["soft", "Douce"], ["medium", "Moyenne"], ["strong", "Forte"], ["floating", "Flottante"], ["luxury", "Luxe"]] as const).map(([k, l]) => (
+              {([["off", "Aucune"], ["soft", "Douce"], ["medium", "Moyenne"], ["strong", "Forte"], ["floating", "Flottante"], ["luxury", "Diffuse"]] as const).map(([k, l]) => (
                 <button key={k} type="button" onClick={() => setShadowPreset(k)} style={{ flex: "1 0 28%", minHeight: 48, borderRadius: 12, cursor: "pointer", fontSize: 12, fontWeight: 700, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)", color: "#ECE8E0" }}>{l}</button>
               ))}
             </div>
@@ -5375,7 +5375,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
                           {QR_FG.map(c => (
                             <button key={c} type="button" disabled={qrBusy} onClick={() => applyQrRender({ fg: c })} title={c}
-                              style={{ width: 22, height: 22, borderRadius: "50%", cursor: "pointer", background: c, border: (qrFg || "#0A0A0A").toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.2)", padding: 0, opacity: qrBusy ? 0.5 : 1 }} />
+                              style={{ width: landscapeMobile ? 30 : 22, height: landscapeMobile ? 30 : 22, borderRadius: "50%", cursor: "pointer", background: c, border: (qrFg || "#0A0A0A").toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.2)", padding: 0, opacity: qrBusy ? 0.5 : 1 }} />
                           ))}
                           <input type="color" value={/^#[0-9a-fA-F]{6}$/.test(qrFg) ? qrFg : "#0A0A0A"} disabled={qrBusy}
                             onChange={e => applyQrRender({ fg: e.target.value })}
@@ -5386,7 +5386,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
                           {QR_BG.map(c => (
                             <button key={c} type="button" disabled={qrBusy} onClick={() => applyQrRender({ bg: c })} title={c}
-                              style={{ width: 22, height: 22, borderRadius: "50%", cursor: "pointer", background: c, border: (qrBg || "#FFFFFF").toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.2)", padding: 0, opacity: qrBusy ? 0.5 : 1 }} />
+                              style={{ width: landscapeMobile ? 30 : 22, height: landscapeMobile ? 30 : 22, borderRadius: "50%", cursor: "pointer", background: c, border: (qrBg || "#FFFFFF").toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.2)", padding: 0, opacity: qrBusy ? 0.5 : 1 }} />
                           ))}
                           <input type="color" value={/^#[0-9a-fA-F]{6}$/.test(qrBg) ? qrBg : "#FFFFFF"} disabled={qrBusy}
                             onChange={e => applyQrRender({ bg: e.target.value })}
@@ -5471,7 +5471,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
                           {SWATCHES.map(c => (
                             <button key={c} type="button" onClick={() => setTextColor(c)} title={c}
-                              style={{ width: 22, height: 22, borderRadius: "50%", cursor: "pointer", background: c, border: (sel.textFill ?? "").toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.2)", padding: 0 }} />
+                              style={{ width: landscapeMobile ? 30 : 22, height: landscapeMobile ? 30 : 22, borderRadius: "50%", cursor: "pointer", background: c, border: (sel.textFill ?? "").toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.2)", padding: 0 }} />
                           ))}
                         </div>
                         <input type="color" value={/^#/.test(sel.textFill) ? sel.textFill : "#080808"}
@@ -5487,7 +5487,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
                   {SWATCHES.map(c => (
                     <button key={c} type="button" onClick={() => setFill(c)} title={c}
-                      style={{ width: 22, height: 22, borderRadius: "50%", cursor: "pointer", background: c, border: sel.fill.toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.2)", padding: 0 }} />
+                      style={{ width: landscapeMobile ? 30 : 22, height: landscapeMobile ? 30 : 22, borderRadius: "50%", cursor: "pointer", background: c, border: sel.fill.toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.2)", padding: 0 }} />
                   ))}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
@@ -5504,7 +5504,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                       {recentColors.map(c => (
                         <button key={"rc" + c} type="button" onClick={() => setFill(c)} title={c}
-                          style={{ width: 22, height: 22, borderRadius: "50%", cursor: "pointer", background: c, border: sel.fill.toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.2)", padding: 0 }} />
+                          style={{ width: landscapeMobile ? 30 : 22, height: landscapeMobile ? 30 : 22, borderRadius: "50%", cursor: "pointer", background: c, border: sel.fill.toUpperCase() === c.toUpperCase() ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.2)", padding: 0 }} />
                       ))}
                     </div>
                   </div>
@@ -5735,7 +5735,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <div>
                 <p className="ps-sec-label">Ombre</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 5, marginBottom: 6 }}>
-                  {([["off", "Aucune"], ["soft", "Soft"], ["medium", "Medium"], ["strong", "Strong"], ["floating", "Floating"], ["luxury", "Luxe"]] as const).map(([k, label]) => (
+                  {([["off", "Aucune"], ["soft", "Soft"], ["medium", "Medium"], ["strong", "Strong"], ["floating", "Floating"], ["luxury", "Diffuse"]] as const).map(([k, label]) => (
                     <button key={k} type="button" onClick={() => setShadowPreset(k)} style={{ ...panelBtn, padding: "7px 2px", fontSize: 9.5 }}>{label}</button>
                   ))}
                 </div>
