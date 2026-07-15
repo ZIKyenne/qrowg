@@ -5609,12 +5609,15 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                     <input type="range" min={1} max={30} step={1} value={sel.strokeWidth || 4}
                       onChange={e => setBorderWidth(parseInt(e.target.value))}
                       style={{ width: "100%", accentColor: G }} />
+                    {/* Style de trait + bordure degradee = avance -> Expert seulement (#20) */}
+                    {uiMode === "expert" && (<>
                     <div style={{ display: "flex", gap: 5, marginTop: 8 }}>
                       {([["solid", "Pleine", null], ["dashed", "Tirets", [12, 8]], ["dotted", "Pointillée", [2, 8]]] as const).map(([k, label, dash]) => (
                         <button key={k} type="button" onClick={() => mutate(o => { o.set({ strokeDashArray: dash as number[] | null, strokeLineCap: k === "dotted" ? "round" : "butt" }); o.dirty = true })} style={{ ...panelBtn, flex: 1, fontSize: 9.5 }}>{label}</button>
                       ))}
                     </div>
                     <button type="button" onClick={() => setBorderGradient(/^#/.test(sel.strokeColor) ? sel.strokeColor : "#C9A84C", gradC2)} style={{ ...panelBtn, width: "100%", marginTop: 5, fontSize: 9.5 }} title="Contour en dégradé (utilise la 2e couleur du dégradé)">Bordure dégradée</button>
+                    </>)}
                   </div>
                 )}
 
