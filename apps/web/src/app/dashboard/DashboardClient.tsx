@@ -136,7 +136,7 @@ export default function DashboardClient() {
   const overViews  = viewsLimit != null && monthViews >= viewsLimit
 
   if (loading) return (
-    <div style={{ minHeight: "100vh", background: "transparent", padding: "30px 28px 48px", fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ minHeight: "100dvh", background: "transparent", padding: "30px 28px 48px", fontFamily: "DM Sans, sans-serif" }}>
       <div style={{ maxWidth: 1080, margin: "0 auto", position: "relative", zIndex: 1 }}>
         {/* En-tête */}
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 22 }}>
@@ -393,13 +393,15 @@ export default function DashboardClient() {
                 {pages.map((page, i) => (
                   <div key={page.id} className="dz-row" style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 16px", borderBottom: i < pages.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none" }}>
 
-                    {/* Status dot cliquable pour publier/depublier */}
+                    {/* Status dot cliquable pour publier/depublier (cible tactile elargie) */}
                     <button onClick={() => togglePublish(page)} title={page.status === "published" ? "Depublier" : "Publier"}
-                      style={{ width: 10, height: 10, borderRadius: "50%", background: page.status === "published" ? "#39FF8F" : MUTED, border: "none", cursor: "pointer", flexShrink: 0, boxShadow: page.status === "published" ? "0 0 6px #39FF8F60" : "none", padding: 0 }} />
+                      style={{ width: isMobile ? 34 : 18, height: isMobile ? 34 : 18, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", cursor: "pointer", flexShrink: 0, padding: 0 }}>
+                      <span style={{ width: 10, height: 10, borderRadius: "50%", background: page.status === "published" ? "#39FF8F" : MUTED, boxShadow: page.status === "published" ? "0 0 6px #39FF8F60" : "none", display: "block" }} />
+                    </button>
 
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{page.title}</p>
-                      <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>/{page.slug}</p>
+                      <p style={{ color: "#F5F0E8", fontSize: 13.5, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{page.title}</p>
+                      <p style={{ color: MUTED, fontSize: 11.5, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>/{page.slug}</p>
                     </div>
 
                     <span style={{ color: G, fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{page.total_views} vues</span>
@@ -407,18 +409,18 @@ export default function DashboardClient() {
                     {/* Actions */}
                     <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
                       <Link href={"/dashboard/builder/" + page.id} title="Editer"
-                        style={{ width: 26, height: 26, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color: MUTED }}>
-                        <Edit3 size={11} />
+                        style={{ width: isMobile ? 36 : 26, height: isMobile ? 36 : 26, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color: MUTED }}>
+                        <Edit3 size={isMobile ? 15 : 11} />
                       </Link>
                       {page.status === "published" && (
                         <a href={"/" + page.slug} target="_blank" rel="noopener noreferrer" title="Voir"
-                          style={{ width: 26, height: 26, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color: MUTED }}>
-                          <ExternalLink size={11} />
+                          style={{ width: isMobile ? 36 : 26, height: isMobile ? 36 : 26, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color: MUTED }}>
+                          <ExternalLink size={isMobile ? 15 : 11} />
                         </a>
                       )}
                       <button onClick={() => setPageToDelete(page)} title="Supprimer"
-                        style={{ width: 26, height: 26, background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#EF4444" }}>
-                        <Trash2 size={11} />
+                        style={{ width: isMobile ? 36 : 26, height: isMobile ? 36 : 26, background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#EF4444" }}>
+                        <Trash2 size={isMobile ? 15 : 11} />
                       </button>
                     </div>
                   </div>
@@ -442,22 +444,21 @@ export default function DashboardClient() {
               </div>
             )}
 
+            {/* Raccourcis : uniquement les destinations PAS deja dans la nav / le sheet Creer
+                (Templates, Analytics, QR y sont deja -> on ne les duplique plus ici). */}
             <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 14, overflow: "hidden" }}>
               <div style={{ padding: "14px 18px", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: 0 }}>Actions rapides</p>
+                <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: 0 }}>Raccourcis</p>
               </div>
               {[
-                { icon: "📋", label: "Choisir un template", href: "/dashboard/templates", color: G },
-                { icon: "📊", label: "Voir les analytics", href: "/dashboard/analytics", color: "#7B61FF" },
-                { icon: "🎨", label: "Mes QR codes", href: "/dashboard/qr-codes", color: "#38BDF8" },
                 { icon: "🌐", label: "Domaines perso", href: "/dashboard/domains", color: "#39FF8F" },
                 { icon: "⚙️", label: "Parametres", href: "/dashboard/settings", color: MUTED },
               ].map((action, i, arr) => (
                 <Link key={i} href={action.href} className="dz-row dz-act"
-                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 18px", textDecoration: "none", borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none" }}>
-                  <span style={{ width: 30, height: 30, borderRadius: 8, background: action.color + "14", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}>{action.icon}</span>
-                  <span style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 500 }}>{action.label}</span>
-                  <ArrowRight className="dz-arrow" size={13} color={action.color} style={{ marginLeft: "auto" }} />
+                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 18px", textDecoration: "none", borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none" }}>
+                  <span style={{ width: 32, height: 32, borderRadius: 8, background: action.color + "14", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}>{action.icon}</span>
+                  <span style={{ color: "#F5F0E8", fontSize: 13.5, fontWeight: 500 }}>{action.label}</span>
+                  <ArrowRight className="dz-arrow" size={14} color={action.color} style={{ marginLeft: "auto" }} />
                 </Link>
               ))}
             </div>
