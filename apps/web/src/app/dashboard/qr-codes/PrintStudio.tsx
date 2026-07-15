@@ -4478,8 +4478,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
           <div style={{ display: "flex", alignItems: "center", gap: 2, background: landscapeMobile ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.04)", borderRadius: 9, padding: 3 }}>
             <button type="button" onClick={() => applyZoom(zoom / 1.25)} title="Zoom arrière" aria-label="Zoom arrière"
               style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 6, color: INK, fontSize: 16, cursor: "pointer" }}>−</button>
-            <button type="button" onClick={() => fitToScreen()} title="Ajuster à l'écran"
-              style={{ minWidth: 42, height: 26, background: "none", border: "none", color: MUTED, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>{Math.round(zoom * 100)}%</button>
+            <button type="button" onClick={() => applyZoom(1)} title="Zoom 100 %" aria-label="Zoom 100 pour cent"
+              style={{ minWidth: 42, height: 26, background: "none", border: "none", color: Math.round(zoom * 100) === 100 ? G : MUTED, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>{Math.round(zoom * 100)}%</button>
             <button type="button" onClick={() => applyZoom(zoom * 1.25)} title="Zoom avant" aria-label="Zoom avant"
               style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 6, color: INK, fontSize: 15, cursor: "pointer" }}>+</button>
             <button type="button" onClick={() => fitToScreen()} title="Ajuster à l'écran" aria-label="Ajuster à l'écran"
@@ -5267,7 +5267,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         )}
 
         {/* Zone canvas (heros) : panneaux flottants -> on recadre pour garder l'artboard centre dans le visible */}
-        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", padding: landscapeMobile ? `16px 16px ${anyBottomSheet ? (regOpen ? "60vh" : "48vh") : "92px"}` : 16, background: landscapeMobile ? "#0C0C0E" : "#E5E8ED", position: "relative", transition: "padding .22s cubic-bezier(.2,.8,.2,1)" }}>
+        <div ref={scrollRef} onContextMenu={onCanvasContext} style={{ flex: 1, overflow: "auto", display: "flex", alignItems: "safe center", justifyContent: "safe center", padding: landscapeMobile ? `16px 16px ${anyBottomSheet ? (regOpen ? "60vh" : "48vh") : "92px"}` : 16, background: landscapeMobile ? "#0C0C0E" : "#E5E8ED", position: "relative", transition: "padding .22s cubic-bezier(.2,.8,.2,1)" }}>
           {loading && (
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: pMuted, zIndex: 5, pointerEvents: "none" }}>
               <Loader2 size={18} style={{ animation: "spin 0.8s linear infinite" }} /> Chargement…
