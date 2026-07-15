@@ -121,7 +121,8 @@ button:not(:disabled):active { transform: scale(.97); }
 
 @keyframes shimmer { 0% { background-position: -420px 0 } 100% { background-position: 420px 0 } }
 .skeleton {
-  background: linear-gradient(90deg, rgba(255,255,255,0.045) 25%, rgba(255,255,255,0.10) 37%, rgba(255,255,255,0.045) 63%);
+  /* Plus visible sur fond noir : le chargement doit se lire comme "en cours", pas "vide" (#10) */
+  background: linear-gradient(90deg, rgba(255,255,255,0.07) 25%, rgba(255,255,255,0.15) 37%, rgba(255,255,255,0.07) 63%);
   background-size: 840px 100%;
   animation: shimmer 1.4s infinite linear;
   border-radius: 10px;
