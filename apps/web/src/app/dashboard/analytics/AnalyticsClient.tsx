@@ -153,7 +153,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
   }, [noData, sourceData, deviceData, filteredScans, filteredViews])
 
   return (
-    <div style={{ minHeight: "100vh", background: "radial-gradient(1100px 520px at 75% -8%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%)", padding: "22px 24px 44px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
+    <div style={{ minHeight: "100dvh", background: "radial-gradient(1100px 520px at 75% -8%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%)", padding: "22px 24px 44px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
       <Particles />
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}
@@ -172,10 +172,13 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
               <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(26px,3.6vw,36px)", lineHeight: 1, color: "#F5F0E8", fontWeight: 700, margin: 0, letterSpacing: "-0.4px" }}>
                 Analytics
               </h1>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(57,255,143,0.1)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 999, padding: "3px 10px" }}>
-                <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#39FF8F", animation: "pulse 1.8s ease-in-out infinite" }} />
-                <span style={{ color: "#39FF8F", fontSize: 11, fontWeight: 800, letterSpacing: 0.5 }}>EN DIRECT</span>
-              </span>
+              {/* Badge EN DIRECT masque tant qu'aucune donnee (audit #04 : pas de "live" trompeur) */}
+              {!noData && (
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(57,255,143,0.1)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 999, padding: "3px 10px" }}>
+                  <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#39FF8F", animation: "pulse 1.8s ease-in-out infinite" }} />
+                  <span style={{ color: "#39FF8F", fontSize: 11, fontWeight: 800, letterSpacing: 0.5 }}>EN DIRECT</span>
+                </span>
+              )}
             </div>
             <p style={{ color: "#A8A190", margin: 0, fontSize: 13.5 }}>30 derniers jours · {live.last ? `dernier événement ${formatAgo(live.last.t)}` : "en attente de données"}</p>
           </div>
@@ -218,8 +221,10 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
                   <Globe size={14} /> Partager ma page
                 </a>
               )}
+              <a href="/examples" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#F5F0E8", textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
+                <Eye size={14} /> Voir un exemple
+              </a>
             </div>
-            <p style={{ color: "#6F6A60", fontSize: 11, margin: "12px 0 0" }}>Aperçu de démonstration ci-dessous — vos vraies données le remplaceront.</p>
           </div>
         )}
 
@@ -258,7 +263,8 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
           </div>
         )}
 
-        {/* ── Bandeau TEMPS RÉEL ─────────────────────────────────────────── */}
+        {/* ── Bandeau TEMPS RÉEL (masque tant qu'aucune donnee : pas de zeros — audit #04) ── */}
+        {!noData && (
         <div className="az" style={{ animationDelay: "60ms", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 13, marginBottom: 13 }}>
           {/* Visiteurs actifs (hero live) */}
           <div className="az-card" style={{ background: "linear-gradient(135deg, color-mix(in srgb,#39FF8F 11%,#0E0D09), #0E0D09)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 14, padding: "16px 18px", position: "relative", overflow: "hidden" }}>
@@ -294,8 +300,10 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             )}
           </div>
         </div>
+        )}
 
-        {/* KPI Cards */}
+        {/* KPI Cards (masques tant qu'aucune donnee : audit #04) */}
+        {!noData && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 13, marginBottom: 22 }}>
           {[
             { icon: <QrCode size={18} />, label: "Scans (30j)", value: totalScans30, color: GOLD },
@@ -320,6 +328,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             </div>
           ))}
         </div>
+        )}
 
         {/* Sections détaillées — masquées tant qu'il n'y a aucune donnée */}
         {!noData && (<>
