@@ -1284,8 +1284,16 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
       })
     }
 
-    fc.on("selection:created", () => { refreshSel(); setShowAdvanced(false) })
-    fc.on("selection:updated", () => { refreshSel(); setShowAdvanced(false) })
+    // Bruit de poignees (#12) : groupes / multi-selection / QR -> 4 coins + rotation
+    // seulement (on masque les poignees de milieu). Pour le QR c'est aussi une
+    // securite : plus d'etirement non uniforme qui casserait la scannabilite.
+    const tuneControls = (o?: fabric.Object | null) => {
+      if (!o) return
+      const compact = o.type === "group" || o.type === "activeSelection" || !!(o as any).isQR || !!(o as any).isQrCard
+      if (compact) { o.setControlsVisibility({ ml: false, mr: false, mt: false, mb: false }); fc.requestRenderAll() }
+    }
+    fc.on("selection:created", () => { refreshSel(); setShowAdvanced(false); tuneControls(fc.getActiveObject()) })
+    fc.on("selection:updated", () => { refreshSel(); setShowAdvanced(false); tuneControls(fc.getActiveObject()) })
     fc.on("selection:cleared", () => { setSel(null); setShowAdvanced(false) })
 
     // Double-tap / double-clic (#8) : sur un objet = editer ; sur le vide = ajouter un texte.
