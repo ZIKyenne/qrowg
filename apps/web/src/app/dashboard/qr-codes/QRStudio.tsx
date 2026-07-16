@@ -3242,7 +3242,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         {activeTab === "style" && active && (
           <div className="qr-scroll" style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
 
-            {/* Sous-tabs Apparence/Branding/Qualite */}
+            {/* Sous-tabs Apparence/Branding/Qualite — etat actif plus contraste (#13) */}
             <div style={{ display:"flex", borderBottom:"1px solid rgba(255,255,255,0.05)", padding:"0 8px", flexShrink:0, overflowX:"auto" }}>
               {([
                 ["apparence", "Apparence", "🎨"],
@@ -3250,7 +3250,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 ["qualite",   "Qualité",   "🛡"],
               ] as const).map(([id,label,emoji]) => (
                 <button key={id} type="button" onClick={() => setStyleTab(id)}
-                  style={{ flex:1, padding:"10px 10px", background:"none", border:"none", borderBottom:styleTab===id?`2px solid ${G}`:"2px solid transparent", color:styleTab===id?G:MUTED, fontSize:11, fontWeight:styleTab===id?700:500, cursor:"pointer", whiteSpace:"nowrap" as const, display:"flex", alignItems:"center", justifyContent:"center", gap:5 }}>
+                  style={{ flex:1, minHeight:isMobile?44:undefined, padding:isMobile?"11px 10px":"10px 10px", background:styleTab===id?"color-mix(in srgb, var(--accent) 10%, transparent)":"none", border:"none", borderBottom:styleTab===id?`3px solid ${G}`:"3px solid transparent", color:styleTab===id?G:MUTED, fontSize:isMobile?12.5:11, fontWeight:styleTab===id?800:500, cursor:"pointer", whiteSpace:"nowrap" as const, display:"flex", alignItems:"center", justifyContent:"center", gap:5 }}>
                   <span style={{ fontSize:12 }}>{emoji}</span>{label}
                 </button>
               ))}
