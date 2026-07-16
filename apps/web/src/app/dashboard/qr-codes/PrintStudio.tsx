@@ -3904,6 +3904,8 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
            il etait en display:flex -> iOS refusait de scroller. On en fait un conteneur
            block scrollable ; l'en-tete contextuel (position:sticky inline) reste colle. */
         .ps-root.ps-landscape .ps-fly-right.ps-sheet { display: block !important; overflow-y: auto !important; overflow-x: hidden !important; -webkit-overflow-scrolling: touch !important; touch-action: pan-y !important; overscroll-behavior: contain !important; }
+        /* Marge basse : le dernier reglage (opacite, taille...) se degage bien au-dessus du bord/nav. */
+        .ps-root.ps-landscape .ps-fly-right.ps-sheet > div:last-child { padding-bottom: calc(28px + env(safe-area-inset-bottom)) !important; }
       `}</style>
       <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} style={{ display: "none" }} />
       <input ref={replaceRef} type="file" accept="image/*" onChange={onReplaceImage} style={{ display: "none" }} />
