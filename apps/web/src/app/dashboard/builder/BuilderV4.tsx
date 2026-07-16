@@ -6222,8 +6222,8 @@
               const on = mobileTab === t.id
               return (
                 <button key={t.id} onClick={() => setMobileTab(t.id)}
-                  style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "9px 4px", background: on ? "rgba(201,168,76,0.12)" : "transparent", border: "none", borderTop: `2px solid ${on ? G : "transparent"}`, color: on ? G : MUTED, fontSize: 10, fontWeight: on ? 700 : 500, cursor: "pointer" }}>
-                  <span style={{ fontSize: 16 }}>{t.icon}</span>{t.label}
+                  style={{ flex: 1, minHeight: 52, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, padding: "8px 4px", background: on ? "rgba(201,168,76,0.12)" : "transparent", border: "none", borderTop: `3px solid ${on ? G : "transparent"}`, color: on ? G : MUTED, fontSize: 11, fontWeight: on ? 800 : 500, cursor: "pointer" }}>
+                  <span style={{ fontSize: 17 }}>{t.icon}</span>{t.label}
                 </button>
               )
             })}
