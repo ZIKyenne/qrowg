@@ -435,6 +435,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [styleTab,   setStyleTab]   = useState<"apparence"|"branding"|"qualite">("apparence")
   const [openAcc,    setOpenAcc]    = useState<string>("presets")
   const [morePresets, setMorePresets] = useState(false) // #12 : n'affiche que les premiers styles, "Voir plus" pour le reste
+  const [scanOpen, setScanOpen] = useState(false) // diagnostic scannabilite : repli par defaut (ne mange plus l'ecran)
   const [autoMsg,    setAutoMsg]    = useState<string>("")
   const [applyAllOk,   setApplyAllOk]   = useState(false)
   const [selectedCat,  setSelectedCat]  = useState("classic")
@@ -3075,12 +3076,20 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               
 {/* Diagnostic scannabilité premium */}
               {scanScore && (
-                <div ref={scanWidgetRef} style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"16px" }}>
+                <div ref={scanWidgetRef} style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"12px 16px" }}>
 
-                  {/* Header */}
-                  <p style={{ color:"#A8A190", fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:1.2, margin:"0 0 14px" }}>
-                    Scannabilite
-                  </p>
+                  {/* Resume compact (repli par defaut si tout est bon) — ne mange plus l'ecran */}
+                  <button type="button" onClick={() => setScanOpen(o => !o)}
+                    style={{ width:"100%", display:"flex", alignItems:"center", gap:10, padding:"9px 11px", background:`${scanScore.gradeColor}0e`, border:`1px solid ${scanScore.gradeColor}33`, borderRadius:12, cursor: scanScore.issues.length ? "default" : "pointer", textAlign:"left" as const }}>
+                    <span style={{ width:30, height:30, borderRadius:"50%", background:scanScore.gradeColor, color:"#080808", fontSize:12, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{scanScore.score}</span>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <p style={{ color:scanScore.gradeColor, fontSize:12.5, fontWeight:800, margin:0 }}>{scanScore.grade} · scannabilité</p>
+                      <p style={{ color:"#A8A190", fontSize:10, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>Contraste {scanScore.ratio}:1 · ECC {ecLevel}</p>
+                    </div>
+                    {scanScore.issues.length === 0 && <ChevronDown size={16} color="#A8A190" style={{ transform: scanOpen ? "rotate(180deg)" : "none", transition:"transform .2s", flexShrink:0 }}/>}
+                  </button>
+
+                  {(scanOpen || scanScore.issues.length > 0) && (<div style={{ marginTop:14 }}>
 
                   {/* Score central premium */}
                   <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:8, marginBottom:14 }}>
@@ -3159,6 +3168,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       ))}
                     </div>
                   )}
+                  </div>)}
 
                 </div>
               )}
