@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
-import { Plus, QrCode, BarChart2, Eye, Zap, ArrowRight, Globe, Trash2, ExternalLink, Edit3, AlertTriangle, X, Check } from "lucide-react"
+import { Plus, QrCode, BarChart2, Eye, Zap, ArrowRight, Globe, Trash2, ExternalLink, Edit3, AlertTriangle, X, Check, MoreHorizontal } from "lucide-react"
 import { getPlan, fmtPrice } from "@/lib/plans"
 import Particles from "@/components/Particles"
 import { useIsMobile } from "@/lib/useIsMobile"
@@ -62,6 +62,8 @@ export default function DashboardClient() {
   const [monthViews, setMonthViews] = useState(0) // vues du mois en cours (quota)
   const [todayViews, setTodayViews] = useState(0) // vues aujourd'hui (vie du dashboard)
   const [weekViews, setWeekViews] = useState<number[]>([]) // 7 derniers jours (mini-sparkline)
+  const [menuPage, setMenuPage] = useState<Page | null>(null) // ligne "..." -> bottom sheet d'actions (echappe l'overflow de la carte)
+  const [copiedId, setCopiedId] = useState<string | null>(null) // feedback "Lien copie"
 
   const greeting = hour < 12 ? "Bonjour" : hour < 18 ? "Bon apres-midi" : "Bonsoir"
 
@@ -120,6 +122,24 @@ export default function DashboardClient() {
     const newStatus = page.status === "published" ? "draft" : "published"
     await supabase.from("pages").update({ status: newStatus }).eq("id", page.id)
     setPages(p => p.map(pg => pg.id === page.id ? { ...pg, status: newStatus } : pg))
+    setMenuPage(m => m && m.id === page.id ? { ...m, status: newStatus } : m)
+  }
+
+  // Miniature deterministe (pas de theme stocke) : degrade + initiale, teinte derivee du titre.
+  function pageHue(s: string) { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return h }
+  // Temps relatif court (fr) a partir d'une date ISO.
+  function relTime(iso?: string) {
+    if (!iso) return ""
+    const d = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
+    if (d < 60) return "à l'instant"
+    if (d < 3600) return `il y a ${Math.floor(d / 60)} min`
+    if (d < 86400) return `il y a ${Math.floor(d / 3600)} h`
+    if (d < 2592000) return `il y a ${Math.floor(d / 86400)} j`
+    return `il y a ${Math.floor(d / 2592000)} mois`
+  }
+  function copyLink(page: Page) {
+    try { navigator.clipboard?.writeText(window.location.origin + "/" + page.slug) } catch {}
+    setCopiedId(page.id); setTimeout(() => setCopiedId(null), 1600)
   }
 
   const planCfg = PLAN_CONFIG[profile?.plan || "free"]
@@ -193,6 +213,27 @@ export default function DashboardClient() {
           onCancel={() => setPageToDelete(null)}
           deleting={deleting}
         />
+      )}
+
+      {/* Menu secondaire d'une page (bottom sheet) — rendu hors de la carte pour ne pas etre clippe */}
+      {menuPage && (
+        <div onClick={() => setMenuPage(null)} style={{ position: "fixed", inset: 0, zIndex: 1100, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(3px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "#141210", borderTopLeftRadius: 20, borderTopRightRadius: 20, border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", padding: "10px 12px calc(14px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)" }}>
+            <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 10px" }} />
+            <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: "0 6px 6px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{menuPage.title}</p>
+            {([
+              ...(menuPage.status === "published" ? [{ icon: <ExternalLink size={17} />, label: "Voir la page", onClick: () => { window.open("/" + menuPage.slug, "_blank"); setMenuPage(null) } }] : []),
+              { icon: copiedId === menuPage.id ? <Check size={17} color="#39FF8F" /> : <Globe size={17} />, label: copiedId === menuPage.id ? "Lien copié !" : "Copier le lien", onClick: () => copyLink(menuPage) },
+              { icon: <Eye size={17} />, label: menuPage.status === "published" ? "Dépublier" : "Publier", onClick: () => { togglePublish(menuPage); setMenuPage(null) } },
+              { icon: <Trash2 size={17} color="#EF4444" />, label: "Supprimer", danger: true, onClick: () => { setPageToDelete(menuPage); setMenuPage(null) } },
+            ] as { icon: React.ReactNode; label: string; onClick: () => void; danger?: boolean }[]).map((a, i) => (
+              <button key={i} onClick={a.onClick}
+                style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "13px 12px", background: "none", border: "none", borderTop: i ? "1px solid rgba(255,255,255,0.05)" : "none", color: a.danger ? "#EF4444" : "#F5F0E8", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
+                <span style={{ width: 24, display: "flex", justifyContent: "center", flexShrink: 0 }}>{a.icon}</span> {a.label}
+              </button>
+            ))}
+          </div>
+        </div>
       )}
 
       <div style={{ maxWidth: 1080, margin: "0 auto", position: "relative", zIndex: 1 }}>
@@ -390,41 +431,41 @@ export default function DashboardClient() {
               </div>
             ) : (
               <div>
-                {pages.map((page, i) => (
-                  <div key={page.id} className="dz-row" style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 16px", borderBottom: i < pages.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none" }}>
+                {pages.map((page, i) => {
+                  const pub = page.status === "published"
+                  const hue = pageHue(page.title || page.slug)
+                  return (
+                  <div key={page.id} className="dz-row" style={{ display: "flex", alignItems: "center", gap: 11, padding: "10px 14px", borderBottom: i < pages.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none" }}>
 
-                    {/* Status dot cliquable pour publier/depublier (cible tactile elargie) */}
-                    <button onClick={() => togglePublish(page)} title={page.status === "published" ? "Depublier" : "Publier"}
-                      style={{ width: isMobile ? 34 : 18, height: isMobile ? 34 : 18, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", cursor: "pointer", flexShrink: 0, padding: 0 }}>
-                      <span style={{ width: 10, height: 10, borderRadius: "50%", background: page.status === "published" ? "#39FF8F" : MUTED, boxShadow: page.status === "published" ? "0 0 6px #39FF8F60" : "none", display: "block" }} />
-                    </button>
+                    {/* Miniature (degrade + initiale ; anneau vert = en ligne) */}
+                    <div style={{ width: isMobile ? 42 : 38, height: isMobile ? 42 : 38, flexShrink: 0, borderRadius: 10, background: `linear-gradient(135deg, hsl(${hue} 52% 44%), hsl(${(hue + 42) % 360} 52% 26%))`, border: `1.5px solid ${pub ? "#39FF8F" : "rgba(255,255,255,0.14)"}`, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 17, fontFamily: "Cormorant Garamond, serif" }}>
+                      {(page.title || page.slug || "?").trim()[0]?.toUpperCase() || "?"}
+                    </div>
 
+                    {/* Titre + statut / vues / date */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ color: "#F5F0E8", fontSize: 13.5, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{page.title}</p>
-                      <p style={{ color: MUTED, fontSize: 11.5, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>/{page.slug}</p>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2, overflow: "hidden", whiteSpace: "nowrap" }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 10.5, fontWeight: 700, color: pub ? "#39FF8F" : MUTED, flexShrink: 0 }}>
+                          <span style={{ width: 5, height: 5, borderRadius: "50%", background: pub ? "#39FF8F" : MUTED }} />{pub ? "En ligne" : "Brouillon"}
+                        </span>
+                        <span style={{ color: MUTED, fontSize: 10.5, flexShrink: 0 }}>· {page.total_views} vues</span>
+                        {relTime(page.created_at) && <span style={{ color: MUTED, fontSize: 10.5, overflow: "hidden", textOverflow: "ellipsis" }}>· {relTime(page.created_at)}</span>}
+                      </div>
                     </div>
 
-                    <span style={{ color: G, fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{page.total_views} vues</span>
+                    {/* Action principale : Modifier */}
+                    <Link href={"/dashboard/builder/" + page.id} className="dz-cta" style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 5, padding: isMobile ? "9px 12px" : "7px 12px", background: "color-mix(in srgb, var(--accent) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 9, color: G, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
+                      <Edit3 size={13} />{!isMobile && " Modifier"}
+                    </Link>
 
-                    {/* Actions */}
-                    <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
-                      <Link href={"/dashboard/builder/" + page.id} title="Editer"
-                        style={{ width: isMobile ? 36 : 26, height: isMobile ? 36 : 26, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color: MUTED }}>
-                        <Edit3 size={isMobile ? 15 : 11} />
-                      </Link>
-                      {page.status === "published" && (
-                        <a href={"/" + page.slug} target="_blank" rel="noopener noreferrer" title="Voir"
-                          style={{ width: isMobile ? 36 : 26, height: isMobile ? 36 : 26, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color: MUTED }}>
-                          <ExternalLink size={isMobile ? 15 : 11} />
-                        </a>
-                      )}
-                      <button onClick={() => setPageToDelete(page)} title="Supprimer"
-                        style={{ width: isMobile ? 36 : 26, height: isMobile ? 36 : 26, background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#EF4444" }}>
-                        <Trash2 size={isMobile ? 15 : 11} />
-                      </button>
-                    </div>
+                    {/* Menu secondaire (bottom sheet -> echappe l'overflow de la carte) */}
+                    <button onClick={() => setMenuPage(page)} aria-label="Plus d'actions"
+                      style={{ flexShrink: 0, width: isMobile ? 40 : 32, height: isMobile ? 40 : 32, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 9, color: MUTED, cursor: "pointer" }}>
+                      <MoreHorizontal size={17} />
+                    </button>
                   </div>
-                ))}
+                )})}
               </div>
             )}
           </div>
