@@ -1194,17 +1194,17 @@ export default function ProfilePage() {
           {/* Ligne 2 : tuiles "ownership" (compteurs animés) + jauges en verre */}
           <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 14 }}>
 
-            {/* Tuiles stats — tout ça m'appartient */}
-            <div className="rcols-4" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
+            {/* Tuiles stats sur UNE ligne (#11) : libelles courts + padding resserre pour tenir sur mobile */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 7 }}>
               {([
-                { icon: Calendar, label: "Jours membre", value: profile ? Math.max(0, Math.floor((Date.now() - new Date(profile.created_at).getTime()) / 86400000)) : 0, color: pc },
+                { icon: Calendar, label: "Jours", value: profile ? Math.max(0, Math.floor((Date.now() - new Date(profile.created_at).getTime()) / 86400000)) : 0, color: pc },
                 { icon: FileEdit, label: "Pages", value: totalPages, color: "#38BDF8" },
-                { icon: QrCode, label: "QR générés", value: activeQR, color: "#39FF8F" },
+                { icon: QrCode, label: "QR", value: activeQR, color: "#39FF8F" },
                 { icon: TrendingUp, label: "Scans", value: profile?.total_scans || 0, color: "#F97316" },
               ] as const).map((s, i) => (
-                <div key={i} className="hero-in hero-tile" style={{ animationDelay: `${120 + i * 80}ms`, background: "rgba(255,255,255,0.04)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "10px 13px" }}>
-                  <span style={{ display: "inline-flex", width: 26, height: 26, borderRadius: 8, background: s.color + "1c", alignItems: "center", justifyContent: "center", marginBottom: 6 }}><s.icon size={13} color={s.color}/></span>
-                  <p style={{ color: "#F8F4EC", fontSize: 21, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}><CountUp value={s.value}/></p>
+                <div key={i} className="hero-in hero-tile" style={{ animationDelay: `${120 + i * 80}ms`, background: "rgba(255,255,255,0.04)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "9px 7px", textAlign: "center" as const }}>
+                  <span style={{ display: "inline-flex", width: 24, height: 24, borderRadius: 7, background: s.color + "1c", alignItems: "center", justifyContent: "center", marginBottom: 5 }}><s.icon size={12} color={s.color}/></span>
+                  <p style={{ color: "#F8F4EC", fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}><CountUp value={s.value}/></p>
                   <p style={{ color: MUTED, fontSize: 10.5, margin: "2px 0 0" }}>{s.label}</p>
                 </div>
               ))}
