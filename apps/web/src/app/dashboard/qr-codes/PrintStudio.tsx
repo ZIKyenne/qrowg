@@ -21,7 +21,7 @@ import {
   X, Type as TypeIcon, QrCode, Square, Circle as CircleIcon, Minus,
   Copy, Trash2, Lock, Unlock, ChevronUp, ChevronDown,
   Download, Printer, Loader2, Check, Save,
-  Shapes, Star, Award, MousePointerClick, ArrowRight, LayoutTemplate,
+  Shapes, Star, Award, MousePointerClick, ArrowRight, ArrowLeft, LayoutTemplate,
   Undo2, Redo2, Sparkles, Image as ImageIcon, Palette, Eye, Search,
   RotateCw, AlignCenterHorizontal, HelpCircle, MoreHorizontal, ShieldCheck,
 } from "lucide-react"
@@ -4482,12 +4482,20 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         padding: "10px 16px", borderBottom: "1px solid rgba(31,36,48,0.06)",
         background: SURFACE, flexShrink: 0, boxShadow: "0 1px 8px rgba(31,36,48,0.04)", zIndex: 5,
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ width: 30, height: 30, borderRadius: 9, background: "linear-gradient(135deg,#D9BC6A,#B8923A)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 9px rgba(201,168,76,0.45)", flexShrink: 0 }}>
-            <QrCode size={17} color="#fff" />
-          </span>
-          <span style={{ color: landscapeMobile ? "#F4F1EA" : INK, fontWeight: 800, fontSize: 15, letterSpacing: 0.2 }}>QR Print <span style={{ color: G }}>Studio</span></span>
-          <span style={{ color: "#8A6D14", fontSize: 9.5, background: "rgba(201,168,76,0.16)", border: "1px solid rgba(201,168,76,0.35)", borderRadius: 6, padding: "2px 7px", fontWeight: 700, letterSpacing: 0.5 }}>BÊTA</span>
+        <div style={{ display: "flex", alignItems: "center", gap: landscapeMobile ? 8 : 10, minWidth: 0 }}>
+          {landscapeMobile ? (
+            /* Mobile : bouton "Quitter" clair a gauche ; titre/logo/BETA masques -> barre bien plus courte */
+            <button type="button" onClick={onClose} aria-label="Quitter l'éditeur" title="Quitter l'éditeur"
+              style={{ display: "flex", alignItems: "center", gap: 5, height: 38, padding: "0 13px 0 10px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.16)", borderRadius: 10, color: "#F4F1EA", fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}>
+              <ArrowLeft size={18} /> Quitter
+            </button>
+          ) : (<>
+            <span style={{ width: 30, height: 30, borderRadius: 9, background: "linear-gradient(135deg,#D9BC6A,#B8923A)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 9px rgba(201,168,76,0.45)", flexShrink: 0 }}>
+              <QrCode size={17} color="#fff" />
+            </span>
+            <span style={{ color: INK, fontWeight: 800, fontSize: 15, letterSpacing: 0.2 }}>QR Print <span style={{ color: G }}>Studio</span></span>
+            <span style={{ color: "#8A6D14", fontSize: 9.5, background: "rgba(201,168,76,0.16)", border: "1px solid rgba(201,168,76,0.35)", borderRadius: 6, padding: "2px 7px", fontWeight: 700, letterSpacing: 0.5 }}>BÊTA</span>
+          </>)}
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -4575,10 +4583,13 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <MoreHorizontal size={18} />
             </button>
           )}
-          <button type="button" onClick={onClose} aria-label="Fermer"
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 9, color: MUTED, cursor: "pointer" }}>
-            <X size={16} />
-          </button>
+          {/* X de fermeture (desktop) : sur mobile le bouton "Quitter" a gauche s'en charge */}
+          {!landscapeMobile && (
+            <button type="button" onClick={onClose} aria-label="Fermer"
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)", borderRadius: 9, color: MUTED, cursor: "pointer" }}>
+              <X size={16} />
+            </button>
+          )}
         </div>
       </div>
 
