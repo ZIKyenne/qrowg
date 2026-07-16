@@ -233,14 +233,23 @@ export default function DomainsPage({ pages, plan }: Props) {
                 <Loader size={22} color={MUTED} style={{ animation:"spin 0.8s linear infinite" }}/>
               </div>
             ) : domains.length === 0 ? (
-              <div style={{ textAlign:"center", padding:"48px 20px", background:"#0F0E0B", border:"1px dashed rgba(255,255,255,0.1)", borderRadius:14 }}>
-                <Globe size={36} color={MUTED} style={{ marginBottom:12 }}/>
-                <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:600, margin:"0 0 6px" }}>Aucun domaine configuré</p>
-                <p style={{ color:MUTED, fontSize:12, margin:"0 0 20px" }}>Ajoutez votre premier domaine personnalisé</p>
-                <button type="button" onClick={() => setShowForm(true)}
-                  style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"10px 20px", background:"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:"pointer" }}>
-                  <Plus size={14}/> Ajouter un domaine
-                </button>
+              <div style={{ textAlign:"center", padding:"30px 20px", background:"#0F0E0B", border:"1px dashed rgba(255,255,255,0.1)", borderRadius:14 }}>
+                <Globe size={30} color={MUTED} style={{ marginBottom:10 }}/>
+                <p style={{ color:"#F5F0E8", fontSize:14.5, fontWeight:700, margin:"0 0 6px" }}>Utilisez votre propre nom de domaine</p>
+                <p style={{ color:MUTED, fontSize:12.5, margin:"0 auto 14px", lineHeight:1.55, maxWidth:330 }}>
+                  Remplacez l'adresse <span style={{ color:"#C9C3B6", fontFamily:"monospace" }}>qrfolio.app</span> par la vôtre — vos clients ne voient que votre marque.
+                </p>
+                {/* Exemple concret */}
+                <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"7px 14px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:9, marginBottom:18 }}>
+                  <span style={{ width:6, height:6, borderRadius:"50%", background:"#39FF8F", flexShrink:0 }}/>
+                  <span style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, fontFamily:"monospace" }}>votreentreprise.fr</span>
+                </div>
+                <div>
+                  <button type="button" onClick={() => setShowForm(true)}
+                    style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"11px 20px", background:"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", border:"none", borderRadius:10, color:"#080808", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                    <Plus size={14}/> Ajouter mon domaine
+                  </button>
+                </div>
               </div>
             ) : (
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
