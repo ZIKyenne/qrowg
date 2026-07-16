@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Images, FileText, Upload, Trash2, Link2, Check, ExternalLink } from "lucide-react"
+import { Images, FileText, Upload, Trash2, Link2, Check, ExternalLink, MoreHorizontal } from "lucide-react"
 import { useImageUpload } from "../builder/useImageUpload"
 
 const G = "#C9A84C"
@@ -24,6 +24,7 @@ export default function AssetsPage() {
   const [busy, setBusy] = useState(false)
   const [query, setQuery] = useState("")
   const [dragOver, setDragOver] = useState(false)
+  const [menuAsset, setMenuAsset] = useState<Asset | null>(null) // vignette -> menu "..." (bottom sheet)
 
   // Fonction simple (pas de useCallback) : listAssets a une identité instable, la mémoïser
   // ferait boucler l'effet. On charge au montage + après chaque upload/suppression.
@@ -62,8 +63,6 @@ export default function AssetsPage() {
       onDragLeave={e => { if (e.currentTarget === e.target) setDragOver(false) }}
       onDrop={e => { e.preventDefault(); setDragOver(false); onUploadFiles(Array.from(e.dataTransfer.files || [])) }}
       style={{ padding: "clamp(16px, 4vw, 34px)", maxWidth: 1100, margin: "0 auto", position: "relative" }}>
-      {/* Sur appareil tactile (pas de survol), les actions sur images doivent rester visibles et assez grandes */}
-      <style>{`@media (hover: none) { .ov { opacity: 1 !important } .ov > button, .ov > a { width: 40px !important; height: 40px !important } }`}</style>
       {dragOver && (
         <div style={{ position: "absolute", inset: 12, zIndex: 20, background: "rgba(201,168,76,0.08)", border: `2px dashed ${G}`, borderRadius: 18, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, pointerEvents: "none" }}>
           <Upload size={28} color={G} />
@@ -110,15 +109,13 @@ export default function AssetsPage() {
       ) : tab === "image" ? (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12 }}>
           {assets.map(a => (
-            <div key={a.url} style={{ position: "relative", borderRadius: 12, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", background: "#0A0A0A", aspectRatio: "1" }}
-              onMouseEnter={e => { const o = e.currentTarget.querySelector(".ov") as HTMLElement; if (o) o.style.opacity = "1" }}
-              onMouseLeave={e => { const o = e.currentTarget.querySelector(".ov") as HTMLElement; if (o) o.style.opacity = "0" }}>
+            <div key={a.url} style={{ position: "relative", borderRadius: 12, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", background: "#0A0A0A", aspectRatio: "1" }}>
               <img src={a.url} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-              <div className="ov" style={{ position: "absolute", inset: 0, background: "linear-gradient(0deg, rgba(0,0,0,0.7), transparent 55%)", opacity: 0, transition: "opacity .15s", display: "flex", alignItems: "flex-end", justifyContent: "flex-end", gap: 6, padding: 8 }}>
-                <button onClick={() => copy(a.url)} title="Copier le lien" style={btn}>{copied === a.url ? <Check size={13} color="#39FF8F" /> : <Link2 size={13} />}</button>
-                <a href={a.url} target="_blank" rel="noopener noreferrer" title="Ouvrir" style={btn}><ExternalLink size={13} /></a>
-                <button onClick={() => onDelete(a)} title="Supprimer" style={{ ...btn, color: "#FF6B6B" }}><Trash2 size={13} /></button>
-              </div>
+              {/* Une seule action visible : le menu "..." (miniature epuree, #09) */}
+              <button onClick={() => setMenuAsset(a)} aria-label="Actions du média"
+                style={{ position: "absolute", top: 6, right: 6, width: 34, height: 34, borderRadius: 9, background: "rgba(8,8,8,0.6)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,0.16)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", cursor: "pointer" }}>
+                <MoreHorizontal size={17} />
+              </button>
             </div>
           ))}
         </div>
@@ -128,16 +125,33 @@ export default function AssetsPage() {
             <div key={a.url} style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 11, padding: "11px 14px" }}>
               <FileText size={17} color={G} style={{ flexShrink: 0 }} />
               <span style={{ flex: 1, color: "#F5F0E8", fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pretty(a.name)}</span>
-              <button onClick={() => copy(a.url)} title="Copier le lien" style={rowBtn}>{copied === a.url ? <Check size={14} color="#39FF8F" /> : <Link2 size={14} />}</button>
-              <a href={a.url} target="_blank" rel="noopener noreferrer" title="Ouvrir" style={rowBtn}><ExternalLink size={14} /></a>
-              <button onClick={() => onDelete(a)} title="Supprimer" style={{ ...rowBtn, color: "#FF6B6B" }}><Trash2 size={14} /></button>
+              <button onClick={() => setMenuAsset(a)} aria-label="Actions du fichier" style={{ ...rowBtn, width: 38, height: 38 }}><MoreHorizontal size={16} /></button>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Menu d'un média (bottom sheet) : cibles tactiles pleines, une seule action visible sur la vignette */}
+      {menuAsset && (
+        <div onClick={() => setMenuAsset(null)} style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(3px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "#141210", borderTopLeftRadius: 20, borderTopRightRadius: 20, border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", padding: "10px 12px calc(14px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)" }}>
+            <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 10px" }} />
+            <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: "0 6px 6px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pretty(menuAsset.name)}</p>
+            {([
+              { icon: copied === menuAsset.url ? <Check size={17} color="#39FF8F" /> : <Link2 size={17} />, label: copied === menuAsset.url ? "Lien copié !" : "Copier le lien", onClick: () => copy(menuAsset.url) },
+              { icon: <ExternalLink size={17} />, label: "Ouvrir", onClick: () => { window.open(menuAsset.url, "_blank"); setMenuAsset(null) } },
+              { icon: <Trash2 size={17} color="#FF6B6B" />, label: "Supprimer", danger: true, onClick: () => { const x = menuAsset; setMenuAsset(null); onDelete(x) } },
+            ] as { icon: React.ReactNode; label: string; onClick: () => void; danger?: boolean }[]).map((it, i) => (
+              <button key={i} onClick={it.onClick}
+                style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "13px 12px", background: "none", border: "none", borderTop: i ? "1px solid rgba(255,255,255,0.05)" : "none", color: it.danger ? "#FF6B6B" : "#F5F0E8", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
+                <span style={{ width: 24, display: "flex", justifyContent: "center", flexShrink: 0 }}>{it.icon}</span> {it.label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>
   )
 }
 
-const btn: any = { width: 30, height: 30, borderRadius: 8, background: "rgba(8,8,8,0.85)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#F5F0E8" }
 const rowBtn: any = { width: 30, height: 30, borderRadius: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: MUTED, flexShrink: 0, textDecoration: "none" }
