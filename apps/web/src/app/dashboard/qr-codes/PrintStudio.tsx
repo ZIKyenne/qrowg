@@ -3900,6 +3900,10 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
         .ps-root.ps-landscape .ps-fly:not(.ps-fly-right) .ps-fly-head { position: sticky; top: 0; z-index: 4; background: #17171B; }
         /* Sheets focalises + Reglages + menu ... : contenu scrollable au doigt (pan-y), sans fuite vers le fond */
         .ps-root.ps-landscape .ps-fly-right.ps-sheet, .ps-msheet { touch-action: pan-y; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
+        /* MEME CORRECTIF QUE LES FLYOUTS GAUCHE pour le panneau Reglages (ps-fly-right) :
+           il etait en display:flex -> iOS refusait de scroller. On en fait un conteneur
+           block scrollable ; l'en-tete contextuel (position:sticky inline) reste colle. */
+        .ps-root.ps-landscape .ps-fly-right.ps-sheet { display: block !important; overflow-y: auto !important; overflow-x: hidden !important; -webkit-overflow-scrolling: touch !important; touch-action: pan-y !important; overscroll-behavior: contain !important; }
       `}</style>
       <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} style={{ display: "none" }} />
       <input ref={replaceRef} type="file" accept="image/*" onChange={onReplaceImage} style={{ display: "none" }} />
