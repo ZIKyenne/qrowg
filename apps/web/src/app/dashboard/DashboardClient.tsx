@@ -431,11 +431,12 @@ export default function DashboardClient() {
               </div>
             ) : (
               <div>
-                {pages.map((page, i) => {
+                {/* Accueil = apercu : 3 pages recentes max, le reste via "Voir toutes" (#03) */}
+                {pages.slice(0, 3).map((page, i, arr) => {
                   const pub = page.status === "published"
                   const hue = pageHue(page.title || page.slug)
                   return (
-                  <div key={page.id} className="dz-row" style={{ display: "flex", alignItems: "center", gap: 11, padding: "10px 14px", borderBottom: i < pages.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none" }}>
+                  <div key={page.id} className="dz-row" style={{ display: "flex", alignItems: "center", gap: 11, padding: "10px 14px", borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none" }}>
 
                     {/* Miniature (degrade + initiale ; anneau vert = en ligne) */}
                     <div style={{ width: isMobile ? 42 : 38, height: isMobile ? 42 : 38, flexShrink: 0, borderRadius: 10, background: `linear-gradient(135deg, hsl(${hue} 52% 44%), hsl(${(hue + 42) % 360} 52% 26%))`, border: `1.5px solid ${pub ? "#39FF8F" : "rgba(255,255,255,0.14)"}`, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 17, fontFamily: "Cormorant Garamond, serif" }}>
@@ -466,6 +467,11 @@ export default function DashboardClient() {
                     </button>
                   </div>
                 )})}
+                {pages.length > 3 && (
+                  <Link href="/dashboard/qr-codes" className="dz-row" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "12px", textDecoration: "none", color: G, fontSize: 12.5, fontWeight: 700, borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                    Voir toutes mes pages ({pages.length}) <ArrowRight className="dz-arrow" size={13} />
+                  </Link>
+                )}
               </div>
             )}
           </div>
