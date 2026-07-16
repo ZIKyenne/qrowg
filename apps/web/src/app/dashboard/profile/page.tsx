@@ -1339,10 +1339,11 @@ export default function ProfilePage() {
                       style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 10px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:7, color:G, fontSize:11, cursor:"pointer" }}>
                       <Camera size={11}/> Changer
                     </button>
+                    {/* Action secondaire discrete (#11) : pas de rouge (reversible), moins prioritaire que "Changer" */}
                     {profile?.avatar_url && (
-                      <button onClick={deleteAvatar} disabled={deletingAvatar}
-                        style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 10px", background:"rgba(255,107,107,0.06)", border:"1px solid rgba(255,107,107,0.15)", borderRadius:7, color:"#FF6B6B", fontSize:11, cursor:"pointer" }}>
-                        <ImageOff size={11}/> Supprimer
+                      <button onClick={deleteAvatar} disabled={deletingAvatar} title="Retirer la photo de profil"
+                        style={{ display:"flex", alignItems:"center", gap:4, padding:"5px 8px", background:"none", border:"none", color:"#A8A190", fontSize:11, cursor:"pointer" }}>
+                        <ImageOff size={11}/> Retirer
                       </button>
                     )}
                   </div>
