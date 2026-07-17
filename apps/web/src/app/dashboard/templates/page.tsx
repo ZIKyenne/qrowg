@@ -222,44 +222,8 @@ export default function TemplatesPage() {
     influenceur:    { name:"Golden Luxury",bg:"#060400",surface:"#120D00",primary:"#D4A843",accent:"#FFC940",text:"#FFF3D0",muted:"#8A7030",fontDisplay:"Cormorant Garamond",fontBody:"Lora",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#060400,#130E00,#060400)" },
   }
 
-  async function createFromTemplate(templateId: string) {
-    const template = TEMPLATES.find((t: any) => t.id === templateId)
-    if (!template) {
-      setToast({ type: "error", msg: "Template introuvable." })
-      return
-    }
-    if (!canUse(template.plan)) {
-      router.push("/upgrade")
-      return
-    }
-    setCreating(templateId)
-    try {
-      const slug = templateId + "-" + Date.now().toString(36)
-      const theme = TEMPLATE_THEMES[templateId] || TEMPLATE_THEMES["freelance"]
-      const blocks = TEMPLATE_BLOCKS[templateId] || []
-
-      const res = await fetch("/api/templates/use", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ templateId, templateName: template.name, slug, theme, blocks }),
-      })
-      const json = await res.json()
-
-      if (!res.ok || !json.pageId) {
-        setToast({ type: "error", msg: json.message || json.error || "Erreur creation page." })
-        setCreating(null)
-        return
-      }
-
-      setToast({ type: "success", msg: "Page creee !" })
-      setTimeout(() => router.push("/dashboard/builder/" + json.pageId), 600)
-
-    } catch (err: any) {
-      setToast({ type: "error", msg: (err as any)?.message || "Erreur reseau." })
-      setCreating(null)
-    }
-  }
+  // (createFromTemplate retiree avec la carte "Recommande" : la creation passe par
+  //  le modal de nommage -> /api/templates/use.)
   const G = "var(--accent)"
   const MUTED = "#A8A190"
   const previewTemplate  = TEMPLATES.find((t: any) => t.id === preview)
@@ -374,41 +338,7 @@ export default function TemplatesPage() {
       {/* ── Grille ────────────────────────────────────────────────────────── */}
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px" }}>
 
-        {/* ── Recommandé pour vous (assistant) ──────────────────────────────── */}
-        {reco && activeMetier === "Tous" && activePlan === "all" && !search && (() => {
-          const t = reco.t
-          const locked = !canUse(t.plan)
-          const pc = PLAN_CONFIG[t.plan]
-          return (
-            <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "stretch" : "center", gap: isMobile ? 16 : 22, marginBottom: 26, padding: isMobile ? 18 : "20px 24px", borderRadius: 18, position: "relative", overflow: "hidden",
-              background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, #100F0A), #0D0C08)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)" }}>
-              <div aria-hidden style={{ position: "absolute", top: -40, right: -20, width: 200, height: 200, borderRadius: "50%", background: `radial-gradient(circle, ${t.color}22, transparent 70%)`, pointerEvents: "none" }} />
-              {/* Vignette template */}
-              <div style={{ flexShrink: 0, width: isMobile ? "100%" : 88, height: isMobile ? 76 : 88, borderRadius: 14, background: `linear-gradient(140deg, ${t.surface}, ${t.bg})`, border: `1px solid ${t.color}40`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36 }}>
-                {t.emoji}
-              </div>
-              {/* Texte */}
-              <div style={{ flex: 1, minWidth: 0, position: "relative" }}>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 6, color: G, fontSize: 10.5, fontWeight: 800, letterSpacing: 1.4, textTransform: "uppercase" }}>
-                  <Sparkles size={12} /> Recommandé pour vous
-                </span>
-                <h3 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 22, color: "#F8F4EC", fontWeight: 700, margin: "5px 0 3px" }}>{t.name}</h3>
-                <p style={{ color: "#C9C3B6", fontSize: 13, margin: 0, lineHeight: 1.45 }}>{reco.reason}{SETUP_TIME[t.id] ? <> · prêt en <strong style={{ color: "#F5F0E8" }}>{SETUP_TIME[t.id]}</strong></> : null}.</p>
-              </div>
-              {/* Actions */}
-              <div style={{ display: "flex", gap: 10, flexShrink: 0, position: "relative" }}>
-                <button type="button" onClick={() => setPreview(t.id)} style={{ flex: isMobile ? 1 : "0 0 auto", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px 16px", borderRadius: 11, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "#F5F0E8", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-                  <Eye size={14} /> Aperçu
-                </button>
-                <button type="button" disabled={creating === t.id} onClick={() => locked ? router.push("/upgrade") : createFromTemplate(t.id)}
-                  style={{ flex: isMobile ? 1 : "0 0 auto", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "11px 18px", borderRadius: 11, border: "none", cursor: "pointer", fontSize: 13, fontWeight: 800, whiteSpace: "nowrap" as const,
-                    background: locked ? "rgba(255,255,255,0.08)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", color: locked ? pc?.color : "#080808" }}>
-                  {creating === t.id ? "Création…" : locked ? <><Lock size={13} /> {pc?.label}</> : <>Utiliser <ArrowRight size={14} strokeWidth={2.5} /></>}
-                </button>
-              </div>
-            </div>
-          )
-        })()}
+        {/* Carte "Recommandé pour vous" retiree (redondante avec la grille, prenait trop de place) */}
 
         {/* Ligne de contexte */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, padding: "0 4px" }}>
