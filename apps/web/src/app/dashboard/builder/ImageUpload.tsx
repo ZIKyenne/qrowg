@@ -126,7 +126,12 @@ export default function ImageUpload({ value, onChange, label, hint }: Props) {
             </div>
             <div style={{ padding: 14, overflowY: "auto" }}>
               {libAssets === null
-                ? <p style={{ color: MUTED, fontSize: 12, textAlign: "center", padding: "30px 0" }}>Chargement…</p>
+                ? <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(96px, 1fr))", gap: 8 }}>
+                    {/* Skeletons realistes immediatement (au lieu d'un texte "Chargement") — #06 */}
+                    {Array.from({ length: 9 }).map((_, i) => (
+                      <div key={i} className="skeleton" style={{ aspectRatio: "1", borderRadius: 9 }} />
+                    ))}
+                  </div>
                 : <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(96px, 1fr))", gap: 8 }}>
                     {/* Tuile d'ajout : upload direct dans la bibliothèque */}
                     <button onClick={() => libInputRef.current?.click()} title="Ajouter une image"

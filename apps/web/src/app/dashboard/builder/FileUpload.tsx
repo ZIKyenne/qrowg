@@ -93,7 +93,12 @@ export default function FileUpload({ value, onChange, hint }: Props) {
                 <Plus size={15} /> Ajouter un fichier
               </button>
               {libAssets === null
-                ? <p style={{ color: MUTED, fontSize: 12, textAlign: "center", padding: "20px 0" }}>Chargement…</p>
+                ? <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {/* Skeletons realistes immediatement (#06) */}
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="skeleton" style={{ height: 44, borderRadius: 9 }} />
+                    ))}
+                  </div>
                 : libAssets.length === 0
                 ? <p style={{ color: MUTED, fontSize: 12, textAlign: "center", padding: "14px 0" }}>Aucun fichier encore — utilisez « Ajouter ».</p>
                 : libAssets.map(a => (
