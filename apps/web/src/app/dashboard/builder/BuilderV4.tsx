@@ -4940,11 +4940,11 @@
           {saved && !saveError && !saving && <span style={{ color: "#39FF8F", fontSize: 10, display: "flex", alignItems: "center", gap: 3 }}><Check size={10} /> Enregistré</span>}
           {hasUnsaved && !saving && !saved && !saveError && (
             <button onClick={saveNow} title="Enregistrer maintenant (sinon sauvegarde auto après ~1s)"
-              style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 6, padding: "3px 8px", color: "#FBBF24", fontSize: 10, cursor: "pointer" }}>
-              <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#FBBF24" }} /> Modifications non enregistrées · Enregistrer
+              style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 6, padding: "3px 8px", color: "#FBBF24", fontSize: 10, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>
+              <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#FBBF24" }} /> {isMobile ? "Enregistrer" : "Modifications non enregistrées · Enregistrer"}
             </button>
           )}
-          {saveError && <button onClick={() => { setSaveError(false); setBlocks(b => [...b]) }} title={saveErrorMsg ? `Erreur : ${saveErrorMsg} — cliquer pour réessayer` : "Réessayer la sauvegarde"} style={{ color: "#EF4444", fontSize: 10, display: "flex", alignItems: "center", gap: 3, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 6, padding: "3px 8px", cursor: "pointer", maxWidth: 340, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>⚠ {saveErrorMsg ? saveErrorMsg : "Échec"} — Réessayer</button>}
+          {saveError && <button onClick={() => { setSaveError(false); setBlocks(b => [...b]) }} title={saveErrorMsg ? `Erreur : ${saveErrorMsg} — cliquer pour réessayer` : "Réessayer la sauvegarde"} style={{ color: "#EF4444", fontSize: 10, display: "flex", alignItems: "center", gap: 3, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 6, padding: "3px 8px", cursor: "pointer", maxWidth: isMobile ? 130 : 340, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis", flexShrink: 0 }}>⚠ {isMobile ? "Réessayer" : `${saveErrorMsg ? saveErrorMsg : "Échec"} — Réessayer`}</button>}
           {pageId && !IS_UUID(pageId) && !liveId && !bootstrapError && <span style={{ color: MUTED, fontSize: 10 }}>Création de la page…</span>}
           {bootstrapError && <span style={{ color: "#EF4444", fontSize: 10, display: "flex", alignItems: "center", gap: 3 }} title={bootstrapError}>⚠ {bootstrapError}</span>}
           {!pageId && <span style={{ color: "#4A4640", fontSize: 9 }}>Mode démo</span>}
@@ -4970,10 +4970,10 @@
             </button>
           </div>
 
-          {/* Modèles de page complets */}
+          {/* Modèles de page complets (icone seule sur mobile pour degager la barre) */}
           <button onClick={() => setShowTemplates(true)} title="Partir d'un modèle de page complet"
-            style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 7, padding: "5px 10px", color: G, fontSize: 10, fontWeight: 700, cursor: "pointer" }}>
-            ✨ Modèles
+            style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 7, padding: isMobile ? "5px 9px" : "5px 10px", color: G, fontSize: 10, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}>
+            ✨{!isMobile && " Modèles"}
           </button>
 
           {/* Bouton Focus Mode (desktop uniquement — panneaux redimensionnables) */}
