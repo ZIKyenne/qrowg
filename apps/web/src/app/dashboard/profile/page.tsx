@@ -1122,73 +1122,69 @@ export default function ProfilePage() {
 
         <div style={{ maxWidth: 1100, margin: "0 auto", position: "relative", zIndex: 1 }}>
 
-          {/* Ligne 1 : avatar géant + identité + storytelling + actions */}
-          <div className="hero-in" style={{ display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 14 }}>
+          {/* Ligne 1 : avatar + identite compacte (avatar aligne en haut, pas de vide) */}
+          <div className="hero-in" style={{ display: "flex", alignItems: "flex-start", gap: 13, marginBottom: 12 }}>
             <div style={{ position: "relative", flexShrink: 0 }}>
-              <div style={{ width: 84, height: 84, borderRadius: "50%", background: profile?.avatar_url ? "transparent" : `linear-gradient(135deg,${pc},color-mix(in srgb, var(--accent) 55%, #000))`, border: `2px solid ${pc}66`, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", animation: "ringPulse 3.6s ease-in-out infinite" }}>
+              <div style={{ width: 62, height: 62, borderRadius: "50%", background: profile?.avatar_url ? "transparent" : `linear-gradient(135deg,${pc},color-mix(in srgb, var(--accent) 55%, #000))`, border: `2px solid ${pc}66`, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", animation: "ringPulse 3.6s ease-in-out infinite" }}>
                 {profile?.avatar_url
                   ? <img src={profile.avatar_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
-                  : <span style={{ fontSize: 34, fontWeight: 700, color: "#080808", fontFamily: "Cormorant Garamond, serif" }}>{(form.full_name || profile?.email || "?")[0]?.toUpperCase()}</span>}
+                  : <span style={{ fontSize: 26, fontWeight: 700, color: "#080808", fontFamily: "Cormorant Garamond, serif" }}>{(form.full_name || profile?.email || "?")[0]?.toUpperCase()}</span>}
               </div>
               <button onClick={() => fileRef.current?.click()} disabled={uploadingAvatar} title="Changer la photo"
-                style={{ position: "absolute", bottom: 2, right: 2, width: 28, height: 28, borderRadius: "50%", background: G, border: "2px solid #0A0906", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>
+                style={{ position: "absolute", bottom: 0, right: 0, width: 24, height: 24, borderRadius: "50%", background: G, border: "2px solid #0A0906", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>
                 {uploadingAvatar
-                  ? <div style={{ width: 10, height: 10, border: "1.5px solid #080808", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.6s linear infinite" }}/>
-                  : <Camera size={12} color="#080808"/>}
+                  ? <div style={{ width: 9, height: 9, border: "1.5px solid #080808", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.6s linear infinite" }}/>
+                  : <Camera size={11} color="#080808"/>}
               </button>
               <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) handleAvatarFile(f); e.target.value="" }}/>
             </div>
 
             <div style={{ minWidth: 0, flex: 1 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 7, flexWrap: "wrap" }}>
-                <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(25px,3.8vw,36px)", color: "#F8F4EC", fontWeight: 700, margin: 0, lineHeight: 1, letterSpacing: "-0.4px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
+                <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(21px,3vw,30px)", color: "#F8F4EC", fontWeight: 700, margin: 0, lineHeight: 1.05, letterSpacing: "-0.3px" }}>
                   Bonjour, {(form.full_name || "").trim().split(" ")[0] || profile?.email?.split("@")[0] || "vous"}
                 </h1>
-                <span style={{ position: "relative", overflow: "hidden", display: "inline-flex", alignItems: "center", gap: 5, background: currentPlan === "free" ? "rgba(255,255,255,0.06)" : `linear-gradient(135deg, ${pc}33, ${pc}1a)`, border: `1px solid ${pc}55`, borderRadius: 999, padding: "4px 12px" }}>
-                  <PlanIcon size={12} color={pc}/>
-                  <span style={{ color: pc, fontSize: 11, fontWeight: 800 }}>{planCfg.label}</span>
+                <span style={{ position: "relative", overflow: "hidden", display: "inline-flex", alignItems: "center", gap: 5, background: currentPlan === "free" ? "rgba(255,255,255,0.06)" : `linear-gradient(135deg, ${pc}33, ${pc}1a)`, border: `1px solid ${pc}55`, borderRadius: 999, padding: "3px 10px" }}>
+                  <PlanIcon size={11} color={pc}/>
+                  <span style={{ color: pc, fontSize: 10.5, fontWeight: 800 }}>{planCfg.label}</span>
                   {currentPlan !== "free" && <span aria-hidden style={{ position: "absolute", inset: 0, background: "linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.45) 50%, transparent 70%)", backgroundSize: "220% 100%", animation: "badgeShine 4.5s ease-in-out infinite" }}/>}
                 </span>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "var(--success)", fontSize: 11.5, fontWeight: 600 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--success)", boxShadow: "0 0 8px var(--success)" }}/> Actif
-                </span>
-                {(profile?.total_scans || 0) >= 1000 && (
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(249,115,22,0.14)", border: "1px solid rgba(249,115,22,0.35)", borderRadius: 999, padding: "3px 10px", fontSize: 10.5, color: "#F97316", fontWeight: 800 }}>🔥 1000+ scans</span>
-                )}
               </div>
-              <p style={{ color: "#E8E2D6", fontSize: "clamp(13px,1.6vw,15.5px)", margin: "0 0 6px", lineHeight: 1.4, maxWidth: 620 }}>
+              <p style={{ color: "#C9C3B6", fontSize: 12.5, margin: "0 0 3px", lineHeight: 1.4 }}>
                 {(profile?.total_scans || 0) > 0
-                  ? <>Vos QR codes ont déjà été scannés <strong style={{ color: pc }}>{(profile?.total_scans || 0).toLocaleString("fr-FR")} fois</strong>. Continuez sur votre lancée.</>
+                  ? <><strong style={{ color: pc }}>{(profile?.total_scans || 0).toLocaleString("fr-FR")} scans</strong> — continuez sur votre lancée.</>
                   : totalPages > 0
-                  ? <>Vous avez <strong style={{ color: G }}>{totalPages} page{totalPages > 1 ? "s" : ""}</strong> prête{totalPages > 1 ? "s" : ""}. Partagez-les pour décoller.</>
-                  : <>Créez votre première page et lancez <strong style={{ color: pc }}>votre univers</strong> QRfolio.</>}
+                  ? <><strong style={{ color: G }}>{totalPages} page{totalPages > 1 ? "s" : ""}</strong> prête{totalPages > 1 ? "s" : ""} — partagez pour décoller.</>
+                  : <>Créez votre première page pour démarrer.</>}
               </p>
-              <p style={{ color: MUTED, fontSize: 11.5, margin: "0 0 11px" }}>
-                {profile?.email}{form.username ? ` · @${form.username}` : ""} · Membre {planCfg.label} depuis {memberMonths > 0 ? `${memberMonths} mois` : "aujourd'hui"}
+              <p style={{ color: MUTED, fontSize: 11, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {profile?.email}{form.username ? ` · @${form.username}` : ""} · Membre depuis {memberMonths > 0 ? `${memberMonths} mois` : "auj."}
               </p>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <a href="/dashboard/avatar"
-                  style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 16px", background: `linear-gradient(90deg,${G},color-mix(in srgb, var(--accent) 75%, #000))`, border: "none", borderRadius: 10, color: "#080808", fontSize: 12.5, fontWeight: 800, cursor: "pointer", textDecoration: "none", boxShadow: `0 6px 20px ${pc}33` }}>
-                  <QrCode size={13}/> Créer mon avatar
-                </a>
-                {publicUrl && (
-                  <a href={publicUrl} target="_blank" rel="noopener noreferrer"
-                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 16px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, color: "#F5F0E8", fontSize: 12.5, fontWeight: 600, textDecoration: "none", backdropFilter: "blur(6px)" }}>
-                    <Globe size={13}/> Voir ma page
-                  </a>
-                )}
-                {publicUrl && (
-                  <button onClick={() => { navigator.clipboard?.writeText(publicUrl); showToast("Lien copié", "ok") }}
-                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 16px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, color: "#F5F0E8", fontSize: 12.5, fontWeight: 600, cursor: "pointer", backdropFilter: "blur(6px)" }}>
-                    <Link2 size={13}/> Copier le lien
-                  </button>
-                )}
-                <button onClick={signOut} title="Se déconnecter"
-                  style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 13px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, color: MUTED, fontSize: 12.5, cursor: "pointer" }}>
-                  <LogOut size={13}/>
-                </button>
-              </div>
             </div>
+          </div>
+
+          {/* Ligne 2 : actions sur une seule ligne, pleine largeur */}
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
+            <a href="/dashboard/avatar"
+              style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 15px", background: `linear-gradient(90deg,${G},color-mix(in srgb, var(--accent) 75%, #000))`, border: "none", borderRadius: 10, color: "#080808", fontSize: 12.5, fontWeight: 800, cursor: "pointer", textDecoration: "none", boxShadow: `0 6px 20px ${pc}33` }}>
+              <QrCode size={13}/> Créer mon avatar
+            </a>
+            {publicUrl && (
+              <a href={publicUrl} target="_blank" rel="noopener noreferrer"
+                style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 15px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, color: "#F5F0E8", fontSize: 12.5, fontWeight: 600, textDecoration: "none" }}>
+                <Globe size={13}/> Voir ma page
+              </a>
+            )}
+            {publicUrl && (
+              <button onClick={() => { navigator.clipboard?.writeText(publicUrl); showToast("Lien copié", "ok") }}
+                style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 15px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, color: "#F5F0E8", fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>
+                <Link2 size={13}/> Copier
+              </button>
+            )}
+            <button onClick={signOut} title="Se déconnecter" aria-label="Se déconnecter"
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 40, padding: "9px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, color: MUTED, cursor: "pointer", marginLeft: "auto" }}>
+              <LogOut size={14}/>
+            </button>
           </div>
 
           {/* Ligne 2 : tuiles "ownership" (compteurs animés) + jauges en verre */}
