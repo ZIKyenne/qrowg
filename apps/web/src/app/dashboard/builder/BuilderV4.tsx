@@ -4363,6 +4363,7 @@
     const [mobileTab, setMobileTab] = useState<"blocks"|"canvas"|"panel">("canvas")
     const [blockMenu, setBlockMenu] = useState<string | null>(null) // #10 : actions secondaires d'un bloc en bottom sheet
     const [scoreOpen, setScoreOpen] = useState(false) // #16 : score de profil replie en pastille par defaut
+    const [blockSearchFocus, setBlockSearchFocus] = useState(false) // #13 : recherche de bloc focus -> on masque la barre du bas pour degager les resultats
     // En mobile, les panneaux occupent 100% : on force l'état déplié (le mode réduit à icônes n'a plus de sens).
     useEffect(() => { if (isMobile) { setBlocksCollapsed(false); setRightCollapsed(false) } }, [isMobile])
 
@@ -5150,12 +5151,12 @@
             {!blocksCollapsed && (
               <div style={{ padding: "10px 8px 10px 10px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
                 <div style={{ position: "relative" }}>
-                  <Search size={11} style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", color: MUTED }} />
+                  <Search size={isMobile ? 15 : 11} style={{ position: "absolute", left: isMobile ? 12 : 8, top: "50%", transform: "translateY(-50%)", color: MUTED }} />
                   <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher un bloc..."
-                    style={{ width: "100%", background: "#111", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 7, padding: "7px 7px 7px 24px", color: "#F5F0E8", fontSize: 11, outline: "none", boxSizing: "border-box" }}
-                    onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.4)"}
-                    onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.15)"} />
-                  {search && <button onClick={() => setSearch("")} style={{ position: "absolute", right: 7, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 0 }}><X size={10} /></button>}
+                    style={{ width: "100%", height: isMobile ? 46 : undefined, background: "#111", border: "1px solid rgba(201,168,76,0.15)", borderRadius: isMobile ? 11 : 7, padding: isMobile ? "0 34px 0 36px" : "7px 7px 7px 24px", color: "#F5F0E8", fontSize: isMobile ? 15 : 11, outline: "none", boxSizing: "border-box" }}
+                    onFocus={e => { e.target.style.borderColor = "rgba(201,168,76,0.4)"; setBlockSearchFocus(true) }}
+                    onBlur={e => { e.target.style.borderColor = "rgba(201,168,76,0.15)"; setBlockSearchFocus(false) }} />
+                  {search && <button onClick={() => setSearch("")} aria-label="Effacer" style={{ position: "absolute", right: isMobile ? 8 : 7, top: "50%", transform: "translateY(-50%)", width: isMobile ? 30 : undefined, height: isMobile ? 30 : undefined, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 0 }}><X size={isMobile ? 15 : 10} /></button>}
                 </div>
               </div>
             )}
@@ -6204,7 +6205,8 @@
         </div>
 
         {/* BARRE D'ONGLETS MOBILE — un panneau à la fois (palette | page | réglages) */}
-        {isMobile && (
+        {/* #13 : pendant la recherche de bloc, on masque la barre du bas -> les resultats prennent toute la hauteur au-dessus du clavier */}
+        {isMobile && !(blockSearchFocus && mobileTab === "blocks") && (
           <div style={{ flexShrink: 0, display: "flex", background: "#0C0C0C", borderTop: "1px solid rgba(255,255,255,0.08)", paddingBottom: "env(safe-area-inset-bottom)" }}>
             {([
               { id: "blocks", label: "Blocs", icon: "🧱" },
