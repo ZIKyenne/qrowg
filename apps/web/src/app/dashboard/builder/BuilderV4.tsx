@@ -4362,6 +4362,7 @@
     const isMobile = useIsMobile(1024)
     const [mobileTab, setMobileTab] = useState<"blocks"|"canvas"|"panel">("canvas")
     const [blockMenu, setBlockMenu] = useState<string | null>(null) // #10 : actions secondaires d'un bloc en bottom sheet
+    const [scoreOpen, setScoreOpen] = useState(false) // #16 : score de profil replie en pastille par defaut
     // En mobile, les panneaux occupent 100% : on force l'état déplié (le mode réduit à icônes n'a plus de sens).
     useEffect(() => { if (isMobile) { setBlocksCollapsed(false); setRightCollapsed(false) } }, [isMobile])
 
@@ -5866,26 +5867,31 @@
                   const col = score >= 80 ? "#39FF8F" : score >= 50 ? "#F59E0B" : "#FF6B6B"
                   const missing = checks.filter(c => !c.ok).slice(0, 3)
                   return (
-                    <div style={{ marginBottom: 14, padding: "12px 13px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 7 }}>
-                        <span style={{ color: "#F5F0E8", fontSize: 11.5, fontWeight: 700 }}>Score de profil</span>
-                        <span style={{ color: col, fontSize: 15, fontWeight: 800, fontFamily: "Cormorant Garamond, serif" }}>{score}%</span>
-                      </div>
-                      <div style={{ height: 6, borderRadius: 4, background: "rgba(255,255,255,0.08)", overflow: "hidden", marginBottom: missing.length ? 10 : 0 }}>
-                        <div style={{ height: "100%", width: `${Math.max(4, score)}%`, borderRadius: 4, background: col, transition: "width .5s cubic-bezier(.2,.8,.2,1)" }} />
-                      </div>
-                      {missing.length > 0 && (
-                        <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <div style={{ marginBottom: 14, borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", overflow: "hidden" }}>
+                      {/* Pastille compacte (repli par defaut) — ne prend plus l'aperçu en otage (#16) */}
+                      <button type="button" onClick={() => setScoreOpen(o => !o)}
+                        style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", background: "none", border: "none", cursor: missing.length ? "pointer" : "default", textAlign: "left" as const }}>
+                        <span style={{ width: 34, height: 34, borderRadius: "50%", flexShrink: 0, background: col + "1e", border: `1.5px solid ${col}66`, display: "flex", alignItems: "center", justifyContent: "center", color: col, fontSize: 11, fontWeight: 800 }}>{score}%</span>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ color: "#F5F0E8", fontSize: 12.5, fontWeight: 700, margin: 0 }}>Qualité du profil</p>
+                          <p style={{ color: MUTED, fontSize: 10.5, margin: 0 }}>{missing.length ? `${missing.length} amélioration${missing.length > 1 ? "s" : ""} possible${missing.length > 1 ? "s" : ""}` : "Profil complet 🎉"}</p>
+                        </div>
+                        {missing.length > 0 && <ChevronDown size={16} color={MUTED} style={{ transform: scoreOpen ? "rotate(180deg)" : "none", transition: "transform .2s", flexShrink: 0 }} />}
+                      </button>
+                      {scoreOpen && missing.length > 0 && (
+                        <div style={{ padding: "0 12px 12px", display: "flex", flexDirection: "column", gap: 5 }}>
+                          <div style={{ height: 6, borderRadius: 4, background: "rgba(255,255,255,0.08)", overflow: "hidden", marginBottom: 3 }}>
+                            <div style={{ height: "100%", width: `${Math.max(4, score)}%`, borderRadius: 4, background: col, transition: "width .5s cubic-bezier(.2,.8,.2,1)" }} />
+                          </div>
                           {missing.map(c => (
                             <button key={c.label} type="button" onClick={c.act}
-                              style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, width: "100%", padding: "7px 9px", borderRadius: 8, background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.18)", color: "#E8E2D6", fontSize: 10.5, cursor: "pointer", textAlign: "left" as const }}>
+                              style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, width: "100%", padding: "9px 10px", borderRadius: 8, background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.18)", color: "#E8E2D6", fontSize: 11.5, cursor: "pointer", textAlign: "left" as const }}>
                               <span>Ajoutez : <strong style={{ color: G }}>{c.label}</strong></span>
-                              <span style={{ color: G, flexShrink: 0, fontSize: 13, lineHeight: 1 }}>+</span>
+                              <span style={{ color: G, flexShrink: 0, fontSize: 14, lineHeight: 1 }}>+</span>
                             </button>
                           ))}
                         </div>
                       )}
-                      {missing.length === 0 && <p style={{ color: "#39FF8F", fontSize: 10.5, margin: 0, fontWeight: 600 }}>Profil complet 🎉</p>}
                     </div>
                   )
                 })()}
