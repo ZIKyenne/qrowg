@@ -1490,7 +1490,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "portfolio_work": {
-      const works = [[c.work1_img, c.work1_title, c.work1_desc], [c.work2_img, c.work2_title, c.work2_desc], [c.work3_img, c.work3_title, c.work3_desc]].filter(([, t]) => t)
+      const works = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`work${i}_img`], (c as any)[`work${i}_title`], (c as any)[`work${i}_desc`]] }).filter(([, t]) => t)
       return works.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
@@ -1566,7 +1566,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       )
     }
     case "partners": {
-      const logos = [[c.logo1_img, c.logo1_name], [c.logo2_img, c.logo2_name], [c.logo3_img, c.logo3_name], [c.logo4_img, c.logo4_name], [c.logo5_img, c.logo5_name], [c.logo6_img, c.logo6_name]].filter(([, n]) => n)
+      const logos = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`logo${i}_img`], (c as any)[`logo${i}_name`]] }).filter(([, n]) => n)
       return logos.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", textAlign: "center", fontFamily: FONT_B }}>{c.title}</p>}
@@ -1597,7 +1597,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
     }
     case "process_steps": {
       const accent = theme.accent || "#39FF8F"
-      const steps = [[c.s1_icon, c.s1_title, c.s1_desc], [c.s2_icon, c.s2_title, c.s2_desc], [c.s3_icon, c.s3_title, c.s3_desc], [c.s4_icon, c.s4_title, c.s4_desc]].filter(([, t]) => t)
+      const steps = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`s${i}_icon`], (c as any)[`s${i}_title`], (c as any)[`s${i}_desc`]] }).filter(([, t]) => t)
       return steps.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
@@ -1647,7 +1647,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       </div>
     ) : null
     case "timeline": {
-      const events = [1,2,3,4,5]
+      const events = Array.from({ length: 50 }, (_, k) => k + 1)
         .map(i => ({ date: c[`e${i}_date`], title: c[`e${i}_title`], desc: c[`e${i}_desc`], icon: (c[`e${i}_icon`]||"").trim() }))
         .filter(e => e.title || e.date)
       if (events.length === 0) return null
@@ -1701,11 +1701,11 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "tabs_block": {
-      const tabs = [[c.tab1_label, c.tab1_content], [c.tab2_label, c.tab2_content], [c.tab3_label, c.tab3_content]].filter(([l]) => l) as [string, string][]
+      const tabs = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`tab${i}_label`], (c as any)[`tab${i}_content`]] }).filter(([l]) => l) as [string, string][]
       return tabs.length > 0 ? <TabsPublic tabs={tabs} G={G} TEXT={TEXT} MUTED={MUTED} FONT_B={FONT_B} /> : null
     }
     case "accordion_block": {
-      const items = [[c.a1_title, c.a1_content], [c.a2_title, c.a2_content], [c.a3_title, c.a3_content], [c.a4_title, c.a4_content]].filter(([t]) => t) as [string, string][]
+      const items = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`a${i}_title`], (c as any)[`a${i}_content`]] }).filter(([t]) => t) as [string, string][]
       return items.length > 0 ? <AccordionPublic items={items} title={c.title} G={G} TEXT={TEXT} MUTED={MUTED} FONT_B={FONT_B} /> : null
     }
     case "info_box": {
@@ -1864,7 +1864,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "favorite_links": {
-      const links = [[c.link_1_icon, c.link_1_label, c.link_1_url], [c.link_2_icon, c.link_2_label, c.link_2_url], [c.link_3_icon, c.link_3_label, c.link_3_url], [c.link_4_icon, c.link_4_label, c.link_4_url], [c.link_5_icon, c.link_5_label, c.link_5_url]].filter(([, l]) => l)
+      const links = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`link_${i}_icon`], (c as any)[`link_${i}_label`], (c as any)[`link_${i}_url`]] }).filter(([, l]) => l)
       return links.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
@@ -1997,7 +1997,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "video_testimonials": {
-      const testi = [[c.t1_video_url, c.t1_name, c.t1_company, c.t1_quote], [c.t2_video_url, c.t2_name, c.t2_company, c.t2_quote]].filter(([, n]) => n)
+      const testi = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`t${i}_video_url`], (c as any)[`t${i}_name`], (c as any)[`t${i}_company`], (c as any)[`t${i}_quote`]] }).filter(([, n]) => n)
       return testi.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
@@ -2030,7 +2030,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
     }
 
     case "event_program": {
-      const steps = [[c.s1_time, c.s1_title, c.s1_desc], [c.s2_time, c.s2_title, c.s2_desc], [c.s3_time, c.s3_title, c.s3_desc], [c.s4_time, c.s4_title, c.s4_desc], [c.s5_time, c.s5_title, c.s5_desc]].filter(([, t]) => t)
+      const steps = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`s${i}_time`], (c as any)[`s${i}_title`], (c as any)[`s${i}_desc`]] }).filter(([, t]) => t)
       return steps.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
@@ -2505,7 +2505,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       </div>
     ) : null
     case "popular_products": {
-      const tops = [[c.p1_rank, c.p1_img, c.p1_name, c.p1_price, c.p1_sales, c.p1_url], [c.p2_rank, c.p2_img, c.p2_name, c.p2_price, c.p2_sales, c.p2_url], [c.p3_rank, null, c.p3_name, c.p3_price, c.p3_sales, c.p3_url]].filter(([, , n]) => n)
+      const tops = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`p${i}_rank`], (c as any)[`p${i}_img`], (c as any)[`p${i}_name`], (c as any)[`p${i}_price`], (c as any)[`p${i}_sales`], (c as any)[`p${i}_url`]] }).filter(([, , n]) => n)
       return tops.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
@@ -2565,7 +2565,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "documents": {
-      const docs = [1,2,3,4,5,6]
+      const docs = Array.from({ length: 50 }, (_, k) => k + 1)
         .map(i => ({ type: c[`d${i}_type`] as string, title: c[`d${i}_title`] as string, desc: (c[`d${i}_desc`] || "") as string, url: (c[`d${i}_url`] || "").trim() as string, meta: (c[`d${i}_meta`] || "") as string }))
         .filter(d => d.title)
       if (docs.length === 0) return null
@@ -2639,7 +2639,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "discography": {
-      const albums = [[c.a1_cover, c.a1_title, c.a1_year, c.a1_type, c.a1_url], [c.a2_cover, c.a2_title, c.a2_year, c.a2_type, c.a2_url], [c.a3_cover, c.a3_title, c.a3_year, c.a3_type, c.a3_url]].filter(([, t]) => t)
+      const albums = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`a${i}_cover`], (c as any)[`a${i}_title`], (c as any)[`a${i}_year`], (c as any)[`a${i}_type`], (c as any)[`a${i}_url`]] }).filter(([, t]) => t)
       return albums.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}

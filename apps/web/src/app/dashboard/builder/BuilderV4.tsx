@@ -3007,7 +3007,7 @@
   const LAYOUT_FIELD_KEYS = new Set(["align", "layout", "width", "height", "columns", "cols", "disposition", "orientation", "size"])
   const isLayoutField = (key: string) => LAYOUT_FIELD_KEYS.has(key) || key.endsWith("_align")
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
-  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts"])
+  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
   const STYLE_COPY_KEYS = ["__grad", "__bg", "__intensity", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim", "__anim_speed", "__hover", "__loop"]
 
@@ -3151,7 +3151,7 @@
   function RepeaterEditor({ block, onChange, prefix, noun, fields, addLabel, topFields = [], bottomFields = [] }: {
     block: Block; onChange: (key: string, val: string) => void
     prefix: string; noun: string; addLabel: string
-    fields: { suffix: string; kind?: "text" | "url" | "image"; placeholder?: string }[]
+    fields: { suffix: string; kind?: "text" | "url" | "image" | "file"; placeholder?: string }[]
     topFields?: { key: string; label: string; placeholder?: string; options?: string[] }[]
     bottomFields?: { key: string; label: string; placeholder?: string; options?: string[] }[]
   }) {
@@ -3197,6 +3197,8 @@
                 </div>
                 {fields.map(f => f.kind === "image"
                   ? <ImageUpload key={f.suffix} value={it[f.suffix]} onChange={url => onChange(key(i, f.suffix), url)} />
+                  : f.kind === "file"
+                  ? <FileUpload key={f.suffix} value={it[f.suffix]} onChange={url => onChange(key(i, f.suffix), url)} />
                   : <input key={f.suffix} type={f.kind === "url" ? "url" : "text"} value={it[f.suffix]} onChange={e => onChange(key(i, f.suffix), e.target.value)} placeholder={f.placeholder} style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />
                 )}
               </div>
@@ -3304,6 +3306,78 @@
       return <RepeaterEditor block={block} onChange={onChange} prefix="c" noun="Date" addLabel="Ajouter une date"
         topFields={[{ key: "title", label: "Titre de la section", placeholder: "Prochaines dates" }]}
         fields={[{ suffix: "date", placeholder: "Date (ex : 12 JUIN)" }, { suffix: "city", placeholder: "Ville" }, { suffix: "venue", placeholder: "Salle / lieu (optionnel)" }, { suffix: "url", kind: "url", placeholder: "Lien billetterie (optionnel)" }]} />
+    }
+
+    if (block.type === "portfolio_work") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="work" noun="Réalisation" addLabel="Ajouter une réalisation"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Mes réalisations" }]}
+        bottomFields={[{ key: "cta_label", label: "Bouton (optionnel)", placeholder: "Voir plus" }, { key: "cta_url", label: "Lien du bouton", placeholder: "https://…" }]}
+        fields={[{ suffix: "img", kind: "image" }, { suffix: "title", placeholder: "Titre" }, { suffix: "desc", placeholder: "Description (optionnel)" }]} />
+    }
+
+    if (block.type === "partners") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="logo" noun="Partenaire" addLabel="Ajouter un partenaire"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Ils nous font confiance" }]}
+        fields={[{ suffix: "img", kind: "image" }, { suffix: "name", placeholder: "Nom (affiché si pas de logo)" }]} />
+    }
+
+    if (block.type === "process_steps") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="s" noun="Étape" addLabel="Ajouter une étape"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Comment ça marche" }]}
+        fields={[{ suffix: "icon", placeholder: "Emoji (ex : 1️⃣)" }, { suffix: "title", placeholder: "Titre de l'étape" }, { suffix: "desc", placeholder: "Description" }]} />
+    }
+
+    if (block.type === "tabs_block") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="tab" noun="Onglet" addLabel="Ajouter un onglet"
+        fields={[{ suffix: "label", placeholder: "Titre de l'onglet" }, { suffix: "content", placeholder: "Contenu" }]} />
+    }
+
+    if (block.type === "accordion_block") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="a" noun="Question" addLabel="Ajouter une question"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Questions fréquentes" }]}
+        fields={[{ suffix: "title", placeholder: "Question" }, { suffix: "content", placeholder: "Réponse" }]} />
+    }
+
+    if (block.type === "favorite_links") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="link_" noun="Lien" addLabel="Ajouter un lien"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Mes liens favoris" }]}
+        fields={[{ suffix: "icon", placeholder: "Emoji (ex : 🔗)" }, { suffix: "label", placeholder: "Libellé" }, { suffix: "url", kind: "url", placeholder: "https://…" }]} />
+    }
+
+    if (block.type === "video_testimonials") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="t" noun="Témoignage" addLabel="Ajouter un témoignage"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Ils témoignent" }]}
+        fields={[{ suffix: "video_url", kind: "url", placeholder: "Lien vidéo YouTube" }, { suffix: "name", placeholder: "Nom" }, { suffix: "company", placeholder: "Entreprise (optionnel)" }, { suffix: "quote", placeholder: "Citation (optionnel)" }]} />
+    }
+
+    if (block.type === "event_program") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="s" noun="Créneau" addLabel="Ajouter un créneau"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Programme" }]}
+        fields={[{ suffix: "time", placeholder: "Heure (ex : 14h)" }, { suffix: "title", placeholder: "Titre" }, { suffix: "desc", placeholder: "Description (optionnel)" }]} />
+    }
+
+    if (block.type === "popular_products") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="p" noun="Produit" addLabel="Ajouter un produit"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Nos best-sellers" }]}
+        fields={[{ suffix: "rank", placeholder: "Badge (ex : 🥇 Best-seller)" }, { suffix: "img", kind: "image" }, { suffix: "name", placeholder: "Nom du produit" }, { suffix: "price", placeholder: "Prix" }, { suffix: "sales", placeholder: "Ventes (ex : 1200 vendus)" }, { suffix: "url", kind: "url", placeholder: "Lien (optionnel)" }]} />
+    }
+
+    if (block.type === "discography") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="a" noun="Sortie" addLabel="Ajouter une sortie"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Discographie" }]}
+        fields={[{ suffix: "cover", kind: "image" }, { suffix: "title", placeholder: "Titre de l'album" }, { suffix: "year", placeholder: "Année" }, { suffix: "type", placeholder: "Type (Album, EP, Single)" }, { suffix: "url", kind: "url", placeholder: "Lien d'écoute" }]} />
+    }
+
+    if (block.type === "timeline") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="e" noun="Événement" addLabel="Ajouter un événement"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Mon parcours" }, { key: "layout", label: "Disposition", options: ["Verticale", "Horizontale"] }]}
+        fields={[{ suffix: "icon", placeholder: "Emoji (optionnel)" }, { suffix: "date", placeholder: "Date (ex : 2024)" }, { suffix: "title", placeholder: "Titre" }, { suffix: "desc", placeholder: "Description (optionnel)" }]} />
+    }
+
+    if (block.type === "documents") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="d" noun="Document" addLabel="Ajouter un document"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Mes documents" }]}
+        fields={[{ suffix: "title", placeholder: "Nom du document" }, { suffix: "desc", placeholder: "Description (optionnel)" }, { suffix: "url", kind: "file" }, { suffix: "type", placeholder: "Type (PDF, Contrat…)" }, { suffix: "meta", placeholder: "Info (ex : 2 Mo)" }]} />
     }
 
     if (block.type === "social_links") {
