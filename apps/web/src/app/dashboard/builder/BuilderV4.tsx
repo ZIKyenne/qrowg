@@ -4364,6 +4364,8 @@
     const [blockMenu, setBlockMenu] = useState<string | null>(null) // #10 : actions secondaires d'un bloc en bottom sheet
     const [scoreOpen, setScoreOpen] = useState(false) // #16 : score de profil replie en pastille par defaut
     const [blockSearchFocus, setBlockSearchFocus] = useState(false) // #13 : recherche de bloc focus -> on masque la barre du bas pour degager les resultats
+    const [preview, setPreview] = useState(false) // #02 : mode Apercu plein ecran (masque tout le chrome d'edition)
+    const enterPreview = () => { setPreview(true); setMobileTab("canvas"); setSelectedId(null) }
     // En mobile, les panneaux occupent 100% : on force l'état déplié (le mode réduit à icônes n'a plus de sens).
     useEffect(() => { if (isMobile) { setBlocksCollapsed(false); setRightCollapsed(false) } }, [isMobile])
 
@@ -4689,6 +4691,7 @@
 
     // ── Sélection multiple ────────────────────────────────────────────────────
     function handleBlockClick(e: React.MouseEvent, blockId: string, blockIdx: number) {
+      if (preview) return // #02 : en mode Apercu, aucun clic d'edition
       if (e.ctrlKey || e.metaKey) {
         // Ctrl/Cmd+clic : toggle dans la sélection multiple
         e.preventDefault()
@@ -4931,8 +4934,8 @@
     return (
       <div style={{ height: "100dvh", background: "#080808", display: "flex", flexDirection: "column", fontFamily: "DM Sans, sans-serif", color: "#F5F0E8", overflow: "hidden" }}>
 
-        {/* TOPBAR */}
-        <div style={{ height: 50, background: "#0D0D0D", borderBottom: "1px solid rgba(201,168,76,0.12)", display: "flex", alignItems: "center", padding: "0 14px", gap: 10, flexShrink: 0, zIndex: 20 }}>
+        {/* TOPBAR (masquee en mode Apercu plein ecran sur mobile) */}
+        <div style={{ height: 50, background: "#0D0D0D", borderBottom: "1px solid rgba(201,168,76,0.12)", display: (preview && isMobile) ? "none" : "flex", alignItems: "center", padding: "0 14px", gap: 10, flexShrink: 0, zIndex: 20 }}>
           <a href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 4, textDecoration: "none", color: G, fontFamily: "Cormorant Garamond, serif", fontSize: 16, fontWeight: 700 }}>← QRfolio</a>
           <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.08)" }} />
           <input value={pageName} onChange={e => setPageName(e.target.value)} style={{ background: "transparent", border: "none", color: "#F5F0E8", fontSize: 13, fontWeight: 600, outline: "none", width: isMobile ? 96 : 160, minWidth: 0 }} />
@@ -5007,7 +5010,11 @@
             </div>
           </div>
 
-          <button onClick={() => setRightTab(t => t==="theme" ? "preview" : "theme")} style={{ display: "flex", alignItems: "center", gap: 5, background: rightTab==="theme" ? "rgba(201,168,76,0.12)" : "transparent", border: `1px solid ${rightTab==="theme" ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.2)"}`, borderRadius: 7, padding: "5px 11px", color: rightTab==="theme" ? G : MUTED, fontSize: 11, cursor: "pointer" }}>
+          {/* Apercu plein ecran (#02) */}
+          <button onClick={enterPreview} title="Aperçu plein écran" style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.35)", borderRadius: 7, padding: "5px 11px", color: G, fontSize: 11, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}>
+            <Eye size={12} /> Aperçu
+          </button>
+          <button onClick={() => setRightTab(t => t==="theme" ? "preview" : "theme")} style={{ display: isMobile ? "none" : "flex", alignItems: "center", gap: 5, background: rightTab==="theme" ? "rgba(201,168,76,0.12)" : "transparent", border: `1px solid ${rightTab==="theme" ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.2)"}`, borderRadius: 7, padding: "5px 11px", color: rightTab==="theme" ? G : MUTED, fontSize: 11, cursor: "pointer" }}>
             <Palette size={11} /> Thème
           </button>
 
@@ -5590,7 +5597,7 @@
           )}
 
           {/* CANVAS */}
-          <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "12px" : "20px", background: "#0A0A0A", display: isMobile && mobileTab !== "canvas" ? "none" : undefined }}
+          <div style={{ flex: 1, overflowY: "auto", padding: preview && isMobile ? "0 0 96px" : isMobile ? "12px" : "20px", background: "#0A0A0A", display: isMobile && mobileTab !== "canvas" ? "none" : undefined }}
             onClick={e => { if (e.target === e.currentTarget) { setSelectedId(null); setMultiSelection([]) } }}>
             <div style={{ maxWidth: 640, margin: "0 auto" }}>
               {/* ── Toolbar flottante multi-sélection (≥2 blocs) ─────────────── */}
@@ -5684,7 +5691,7 @@
                   </button>
                 </div>
               )}
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, padding: "6px 12px", background: "rgba(10,10,10,0.8)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 9, backdropFilter: "blur(10px)", position: "sticky", top: 0, zIndex: 10 }}>
+              {!preview && <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, padding: "6px 12px", background: "rgba(10,10,10,0.8)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 9, backdropFilter: "blur(10px)", position: "sticky", top: 0, zIndex: 10 }}>
                 <span style={{ fontSize: 9, letterSpacing: 2, textTransform: "uppercase", color: "#4A4640" }}>CANVAS</span>
                 <span style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 6, padding: "1px 6px", fontSize: 10, color: G }}>{blocks.length} bloc{blocks.length!==1?"s":""}</span>
                 {blocks.filter(b => b.draft).length > 0 && (
@@ -5693,7 +5700,7 @@
                   </span>
                 )}
                 {!pageId && <span style={{ color: "#4A4640", fontSize: 9, marginLeft: "auto" }}>Mode démo</span>}
-              </div>
+              </div>}
 
               <div style={{ ...bgStyle(), borderRadius: 20, overflow: "hidden", minHeight: 200, position: "relative", boxShadow: "0 8px 60px rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.05)" }}>
               {/* Effets overlay */}
@@ -5734,21 +5741,21 @@
                       if (handle) handle.style.opacity = "0"
                     }}>
 
-                    <div className="block-handle" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 18, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0, transition: "opacity 0.15s", cursor: block.locked ? "not-allowed" : "grab", zIndex: 10 }}>
+                    {!preview && <div className="block-handle" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 18, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0, transition: "opacity 0.15s", cursor: block.locked ? "not-allowed" : "grab", zIndex: 10 }}>
                       <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                         {[0,1,2,3,4,5].map(i => <div key={i} style={{ width: 3, height: 3, borderRadius: "50%", background: "rgba(201,168,76,0.5)" }} />)}
                       </div>
-                    </div>
+                    </div>}
 
-                    <div className="block-overlay" style={{ position: "absolute", top: 6, right: 6, display: "flex", gap: isMobile ? 6 : 3, opacity: (isMobile && isSelected) ? 1 : 0, transition: "opacity 0.15s", zIndex: 10 }}
+                    {!preview && <div className="block-overlay" style={{ position: "absolute", top: 6, right: 6, display: "flex", gap: isMobile ? 6 : 3, opacity: (isMobile && isSelected) ? 1 : 0, transition: "opacity 0.15s", zIndex: 10 }}
                       onClick={e => e.stopPropagation()}>
                       {/* #10 : uniquement Monter/Descendre + "..." ; le reste dans un bottom sheet (cibles 34px mobile) */}
                       <button onClick={() => moveBlock(block.id, -1)} disabled={idx===0} title="Monter" aria-label="Monter le bloc" style={{ width: isMobile?34:24, height: isMobile?34:24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: idx===0 ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: idx===0 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 7 }}><ChevronUp size={isMobile?17:10} /></button>
                       <button onClick={() => moveBlock(block.id, 1)} disabled={idx===blocks.length-1} title="Descendre" aria-label="Descendre le bloc" style={{ width: isMobile?34:24, height: isMobile?34:24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: idx===blocks.length-1 ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: idx===blocks.length-1 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 7 }}><ChevronDown size={isMobile?17:10} /></button>
                       <button onClick={e => { e.stopPropagation(); setBlockMenu(block.id) }} title="Plus d'actions" aria-label="Plus d'actions" style={{ width: isMobile?34:24, height: isMobile?34:24, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: "#F5F0E8", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 7 }}><MoreHorizontal size={isMobile?17:12} /></button>
-                    </div>
+                    </div>}
 
-                    {isSelected && (
+                    {!preview && isSelected && (
                       <div style={{ position: "absolute", bottom: 6, left: 22, display: "flex", alignItems: "center", gap: 4, background: "rgba(8,8,8,0.88)", backdropFilter: "blur(4px)", border: `1px solid ${G}25`, borderRadius: 6, padding: "2px 7px", zIndex: 10 }}>
                         <span style={{ fontSize: 10 }}>{def?.icon}</span>
                         <span style={{ color: G, fontSize: 9, fontWeight: 700 }}>{def?.label}</span>
@@ -5780,18 +5787,18 @@
                 )
               })}
 
-              <button onClick={() => { setActiveCategory("identity"); setSearch("") }}
+              {!preview && <button onClick={() => { setActiveCategory("identity"); setSearch("") }}
                 style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: "rgba(201,168,76,0.04)", border: "2px dashed rgba(201,168,76,0.2)", borderRadius: 14, padding: "18px", color: MUTED, fontSize: 14, fontWeight: 600, cursor: "pointer", marginTop: 8, transition: "all 0.2s" }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(201,168,76,0.5)"; e.currentTarget.style.color=G; e.currentTarget.style.background="rgba(201,168,76,0.08)"; e.currentTarget.style.transform="translateY(-1px)" }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor="rgba(201,168,76,0.2)"; e.currentTarget.style.color=MUTED; e.currentTarget.style.background="rgba(201,168,76,0.04)"; e.currentTarget.style.transform="translateY(0)" }}>
                 <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}><Plus size={14} color={G} /></div>
                 Ajouter un nouveau bloc
-              </button>
-              <button onClick={() => setShowTemplates(true)}
+              </button>}
+              {!preview && <button onClick={() => setShowTemplates(true)}
                 style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "transparent", border: "none", color: MUTED, fontSize: 12, cursor: "pointer", marginTop: 10 }}
                 onMouseEnter={e => e.currentTarget.style.color = G} onMouseLeave={e => e.currentTarget.style.color = MUTED}>
                 ✨ ou partir d&apos;un modèle de page complet
-              </button>
+              </button>}
               </div>
             </div>
           </div>
@@ -6195,8 +6202,18 @@
         </div>
 
         {/* BARRE D'ONGLETS MOBILE — un panneau à la fois (palette | page | réglages) */}
+        {/* Barre flottante en mode Apercu : sortir + voir en direct (#02) */}
+        {isMobile && preview && (
+          <div style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 60, display: "flex", gap: 10, padding: "10px 14px calc(10px + env(safe-area-inset-bottom))", background: "rgba(12,11,9,0.9)", backdropFilter: "blur(14px)", borderTop: "1px solid rgba(201,168,76,0.2)" }}>
+            <button onClick={() => setPreview(false)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 7, minHeight: 48, background: "linear-gradient(90deg,var(--accent,#C9A84C),color-mix(in srgb, var(--accent,#C9A84C) 75%, #000))", border: "none", borderRadius: 12, color: "#080808", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>
+              <ChevronDown size={16} style={{ transform: "rotate(90deg)" }} /> Modifier
+            </button>
+            {pageSlug && <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, minHeight: 48, padding: "0 16px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "#F5F0E8", fontSize: 13, fontWeight: 700, textDecoration: "none" }}><ExternalLink size={14} /> Voir en direct</a>}
+          </div>
+        )}
+
         {/* #13 : pendant la recherche de bloc, on masque la barre du bas -> les resultats prennent toute la hauteur au-dessus du clavier */}
-        {isMobile && !(blockSearchFocus && mobileTab === "blocks") && (
+        {isMobile && !preview && !(blockSearchFocus && mobileTab === "blocks") && (
           <div style={{ flexShrink: 0, display: "flex", background: "#0C0C0C", borderTop: "1px solid rgba(255,255,255,0.08)", paddingBottom: "env(safe-area-inset-bottom)" }}>
             {([
               { id: "blocks", label: "Blocs", icon: "🧱" },
