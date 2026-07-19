@@ -1443,7 +1443,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
     )
 
     case "business_stats": {
-      const stats = [[c.stat1_icon, c.stat1_value, c.stat1_label], [c.stat2_icon, c.stat2_value, c.stat2_label], [c.stat3_icon, c.stat3_value, c.stat3_label], [c.stat4_icon, c.stat4_value, c.stat4_label]].filter(([, v]) => v)
+      const stats = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`stat${i}_icon`], (c as any)[`stat${i}_value`], (c as any)[`stat${i}_label`]] }).filter(([, v]) => v)
       return stats.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           <div style={{ display: "grid", gridTemplateColumns: stats.length <= 2 ? "1fr 1fr" : stats.length === 3 ? "1fr 1fr 1fr" : "1fr 1fr", gap: 9 }}>

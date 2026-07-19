@@ -1269,12 +1269,7 @@
       }
 
       case "business_stats": {
-        const stats = [
-          [c.stat1_icon, c.stat1_value, c.stat1_label],
-          [c.stat2_icon, c.stat2_value, c.stat2_label],
-          [c.stat3_icon, c.stat3_value, c.stat3_label],
-          [c.stat4_icon, c.stat4_value, c.stat4_label],
-        ].filter(([,v])=>v)
+        const stats = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`stat${i}_icon`],c[`stat${i}_value`],c[`stat${i}_label`]]}).filter(([,v])=>v)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             <div style={{ display: "grid", gridTemplateColumns: stats.length<=2 ? "1fr 1fr" : stats.length===3 ? "1fr 1fr 1fr" : "1fr 1fr", gap: 8 }}>
@@ -2951,7 +2946,7 @@
   const LAYOUT_FIELD_KEYS = new Set(["align", "layout", "width", "height", "columns", "cols", "disposition", "orientation", "size"])
   const isLayoutField = (key: string) => LAYOUT_FIELD_KEYS.has(key) || key.endsWith("_align")
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
-  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages", "expertise", "trust_badge", "on_site_services", "advantages", "logo_wall", "multi_cta"])
+  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages", "expertise", "trust_badge", "on_site_services", "advantages", "logo_wall", "multi_cta", "business_stats"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
   const STYLE_COPY_KEYS = ["__grad", "__bg", "__intensity", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim", "__anim_speed", "__hover", "__loop"]
 
@@ -3287,6 +3282,11 @@
     if (block.type === "multi_cta") {
       return <RepeaterEditor block={block} onChange={onChange} prefix="btn" noun="Bouton" addLabel="Ajouter un bouton"
         fields={[{ suffix: "icon", placeholder: "Emoji (ex : 📞)" }, { suffix: "label", placeholder: "Texte du bouton" }, { suffix: "url", kind: "url", placeholder: "Lien (https://, tel:, mailto:)" }]} />
+    }
+
+    if (block.type === "business_stats") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="stat" noun="Chiffre clé" addLabel="Ajouter un chiffre"
+        fields={[{ suffix: "icon", placeholder: "Emoji (ex : 📈)" }, { suffix: "value", placeholder: "Valeur (ex : 500+)" }, { suffix: "label", placeholder: "Libellé (ex : clients)" }]} />
     }
 
     if (block.type === "social_links") {
