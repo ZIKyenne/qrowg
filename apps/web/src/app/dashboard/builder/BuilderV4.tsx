@@ -5683,6 +5683,8 @@
                                     const grouped = IDENTITY_GROUPS.flatMap(g => g.keys)
                                     const rest = catBlocks.filter(([t]) => !grouped.includes(t)) // blocs identité non classés -> "Autres"
                                     return (<>
+                                      {/* Onboarding (générer / modèles métier) seulement tant que la page est peu remplie -> palette moins dense ensuite (audit #1) */}
+                                      {blocks.length <= 5 && (<>
                                       <button type="button" onClick={generateBaseIdentity} title="Ajoute profil + bio + compétences + disponibilité, prêts à éditer"
                                         style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "10px", margin: "2px 0 8px", borderRadius: 9, border: "none", cursor: "pointer", background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", color: "#080808", fontSize: 12, fontWeight: 800 }}>
                                         ✨ Générer une identité de base
@@ -5702,6 +5704,7 @@
                                           ))}
                                         </div>
                                       </div>
+                                      </>)}
                                       {IDENTITY_GROUPS.map(g => {
                                         const gb = g.keys.filter(k => (BLOCK_DEFS as any)[k])
                                         if (!gb.length) return null
