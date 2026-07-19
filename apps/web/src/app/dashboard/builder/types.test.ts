@@ -8,8 +8,27 @@ import {
   parseHourRanges, fmtMinutes, openStatus, dayField,
   vcardEscape, splitName, buildVCard, mapEmbedUrl, shareLinks, toCalStamp, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref,
   docTypeMeta, docActionLabel, announcementMeta, blockDecoration,
-  hexToRgb, rgbToHsl, contrastRatio, wcagLevel, isClipShape, optionLabel,
+  hexToRgb, rgbToHsl, contrastRatio, wcagLevel, isClipShape, optionLabel, avatarBgStyle,
 } from "./types"
+
+describe("avatarBgStyle (partagé éditeur ↔ page publique)", () => {
+  it("uni : fond plein de la 1re couleur", () => {
+    expect(avatarBgStyle("uni", "#111111", "#222222")).toEqual({ background: "#111111" })
+  })
+  it("halo : radial c2 -> c1", () => {
+    expect(avatarBgStyle("halo", "#111111", "#222222")).toEqual({ background: "radial-gradient(circle at 50% 32%, #222222, #111111)" })
+  })
+  it("mesh : contient les deux couleurs", () => {
+    const r = avatarBgStyle("mesh", "#111111", "#222222").background
+    expect(r).toContain("#111111")
+    expect(r).toContain("#222222")
+    expect(r).toContain("radial-gradient")
+  })
+  it("défaut (dégradé) pour une valeur inconnue ou absente", () => {
+    expect(avatarBgStyle(undefined, "#111111", "#222222")).toEqual({ background: "linear-gradient(135deg, #111111, #222222)" })
+    expect(avatarBgStyle("autre", "#111111", "#222222")).toEqual({ background: "linear-gradient(135deg, #111111, #222222)" })
+  })
+})
 
 describe("hexToRgb", () => {
   it("convertit les hex 6 chiffres (avec ou sans #)", () => {
