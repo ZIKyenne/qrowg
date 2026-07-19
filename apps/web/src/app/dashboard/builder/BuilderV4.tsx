@@ -508,7 +508,7 @@
         <div style={{ padding: "10px 16px", ...s }}>
           {c.category && <p style={{ color: primary, fontSize: 12, fontWeight: 700, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: 1 }}>{c.category}</p>}
           <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-            {[[c.item1_name,c.item1_price,c.item1_desc],[c.item2_name,c.item2_price,c.item2_desc],[c.item3_name,c.item3_price,c.item3_desc]].filter(([n])=>n).map(([n,p,d],i) => (
+            {Array.from({length:50},(_,k)=>{const i=k+1;return [c[`item${i}_name`],c[`item${i}_price`],c[`item${i}_desc`]]}).filter(([n])=>n).map(([n,p,d],i) => (
               <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 7, padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                 <div style={{ flex: 1 }}><p style={{ color: text, fontSize: 13, fontWeight: 600, margin: "0 0 1px" }}>{n}</p>{d && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{d}</p>}</div>
                 <span style={{ color: primary, fontSize: 13, fontWeight: 700, flexShrink: 0 }}>{p}</span>
@@ -527,7 +527,7 @@
         </div>
       )
       case "services_list": {
-        const services = [[c.s1_icon,c.s1_name,c.s1_desc],[c.s2_icon,c.s2_name,c.s2_desc],[c.s3_icon,c.s3_name,c.s3_desc]].filter(([,n])=>n)
+        const services = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`s${i}_icon`],c[`s${i}_name`],c[`s${i}_desc`]]}).filter(([,n])=>n)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
@@ -1058,13 +1058,7 @@
       }
 
       case "favorite_links": {
-        const links = [
-          [c.link_1_icon, c.link_1_label, c.link_1_url],
-          [c.link_2_icon, c.link_2_label, c.link_2_url],
-          [c.link_3_icon, c.link_3_label, c.link_3_url],
-          [c.link_4_icon, c.link_4_label, c.link_4_url],
-          [c.link_5_icon, c.link_5_label, c.link_5_url],
-        ].filter(([,l])=>l)
+        const links = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`link_${i}_icon`],c[`link_${i}_label`],c[`link_${i}_url`]]}).filter(([,l])=>l)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
@@ -1085,11 +1079,7 @@
 
 
       case "product_catalog": {
-        const products = [
-          [c.p1_img, c.p1_name, c.p1_price, c.p1_desc, c.p1_url],
-          [c.p2_img, c.p2_name, c.p2_price, c.p2_desc, c.p2_url],
-          [c.p3_img, c.p3_name, c.p3_price, c.p3_desc, c.p3_url],
-        ].filter(([,n])=>n)
+        const products = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`p${i}_img`],c[`p${i}_name`],c[`p${i}_price`],c[`p${i}_desc`],c[`p${i}_url`]]}).filter(([,n])=>n)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
@@ -1226,7 +1216,7 @@
       )
 
       case "portfolio_work": {
-        const works = [[c.work1_img,c.work1_title,c.work1_desc],[c.work2_img,c.work2_title,c.work2_desc],[c.work3_img,c.work3_title,c.work3_desc]].filter(([,t])=>t)
+        const works = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`work${i}_img`],c[`work${i}_title`],c[`work${i}_desc`]]}).filter(([,t])=>t)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
@@ -1249,7 +1239,7 @@
       }
 
       case "google_reviews_block": {
-        const reviews = [[c.r1_name,c.r1_text,c.r1_stars],[c.r2_name,c.r2_text,c.r2_stars],[c.r3_name,c.r3_text,c.r3_stars]].filter(([n])=>n)
+        const reviews = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`r${i}_name`],c[`r${i}_text`],c[`r${i}_stars`]]}).filter(([n])=>n)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {(c.avg_rating || c.title) && (
@@ -1305,10 +1295,7 @@
       }
 
       case "partners": {
-        const logos = [
-          [c.logo1_img, c.logo1_name],[c.logo2_img, c.logo2_name],[c.logo3_img, c.logo3_name],
-          [c.logo4_img, c.logo4_name],[c.logo5_img, c.logo5_name],[c.logo6_img, c.logo6_name],
-        ].filter(([,n])=>n)
+        const logos = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`logo${i}_img`],c[`logo${i}_name`]]}).filter(([,n])=>n)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", textAlign: "center" }}>{c.title}</p>}
@@ -1429,12 +1416,7 @@
       }
 
       case "reassurance": {
-        const guarantees = [
-          [c.g1_icon, c.g1_label, c.g1_desc],
-          [c.g2_icon, c.g2_label, c.g2_desc],
-          [c.g3_icon, c.g3_label, c.g3_desc],
-          [c.g4_icon, c.g4_label, c.g4_desc],
-        ].filter(([,l])=>l)
+        const guarantees = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`g${i}_icon`],c[`g${i}_label`],c[`g${i}_desc`]]}).filter(([,l])=>l)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             <div style={{ display: "grid", gridTemplateColumns: guarantees.length<=2 ? "1fr 1fr" : "1fr 1fr", gap: 8 }}>
@@ -1468,11 +1450,7 @@
       )
 
       case "popular_products": {
-        const tops = [
-          [c.p1_rank, c.p1_img, c.p1_name, c.p1_price, c.p1_sales, c.p1_url],
-          [c.p2_rank, c.p2_img, c.p2_name, c.p2_price, c.p2_sales, c.p2_url],
-          [c.p3_rank, null, c.p3_name, c.p3_price, c.p3_sales, c.p3_url],
-        ].filter(([,, n])=>n)
+        const tops = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`p${i}_rank`],c[`p${i}_img`],c[`p${i}_name`],c[`p${i}_price`],c[`p${i}_sales`],c[`p${i}_url`]]}).filter(([,, n])=>n)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
@@ -1642,7 +1620,7 @@
       )
 
       case "video_testimonials": {
-        const testi = [[c.t1_video_url,c.t1_name,c.t1_company,c.t1_quote],[c.t2_video_url,c.t2_name,c.t2_company,c.t2_quote]].filter(([,n])=>n)
+        const testi = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`t${i}_video_url`],c[`t${i}_name`],c[`t${i}_company`],c[`t${i}_quote`]]}).filter(([,n])=>n)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
@@ -1701,7 +1679,7 @@
 
 
       case "stats_block": {
-        const stats = [[c.s1_icon,c.s1_value,c.s1_label],[c.s2_icon,c.s2_value,c.s2_label],[c.s3_icon,c.s3_value,c.s3_label],[c.s4_icon,c.s4_value,c.s4_label]].filter(([,v])=>v)
+        const stats = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`s${i}_icon`],c[`s${i}_value`],c[`s${i}_label`]]}).filter(([,v])=>v)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             <div style={{ display: "grid", gridTemplateColumns: stats.length<=2 ? "1fr 1fr" : stats.length===3 ? "1fr 1fr 1fr" : "1fr 1fr", gap: 8 }}>
@@ -1732,7 +1710,7 @@
       )
 
       case "timeline": {
-        const events = [1,2,3,4,5].map(i => ({ date: c[`e${i}_date`], title: c[`e${i}_title`], desc: c[`e${i}_desc`], icon: (c[`e${i}_icon`]||"").trim() })).filter(e => e.title || e.date)
+        const events = Array.from({length:50},(_,k)=>k+1).map(i => ({ date: c[`e${i}_date`], title: c[`e${i}_title`], desc: c[`e${i}_desc`], icon: (c[`e${i}_icon`]||"").trim() })).filter(e => e.title || e.date)
         const horizontal = c.layout === "Horizontale"
         const list = events
         if (list.length === 0) return (
@@ -1775,7 +1753,7 @@
       }
 
       case "process_steps": {
-        const steps = [[c.s1_icon,c.s1_title,c.s1_desc],[c.s2_icon,c.s2_title,c.s2_desc],[c.s3_icon,c.s3_title,c.s3_desc],[c.s4_icon,c.s4_title,c.s4_desc]].filter(([,t])=>t)
+        const steps = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`s${i}_icon`],c[`s${i}_title`],c[`s${i}_desc`]]}).filter(([,t])=>t)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
@@ -1821,7 +1799,7 @@
       }
 
       case "team": {
-        const members = [1,2,3,4].map(i => ({ photo: c[`m${i}_photo`], name: c[`m${i}_name`], role: c[`m${i}_role`], bio: c[`m${i}_bio`], phone: (c[`m${i}_phone`]||"").trim(), email: (c[`m${i}_email`]||"").trim(), linkedin: (c[`m${i}_linkedin`]||"").trim() })).filter(m => m.name)
+        const members = Array.from({length:50},(_,k)=>k+1).map(i => ({ photo: c[`m${i}_photo`], name: c[`m${i}_name`], role: c[`m${i}_role`], bio: c[`m${i}_bio`], phone: (c[`m${i}_phone`]||"").trim(), email: (c[`m${i}_email`]||"").trim(), linkedin: (c[`m${i}_linkedin`]||"").trim() })).filter(m => m.name)
         const grid = c.layout === "Grille"
         const contactDots = (m: any) => {
           const ic = [] as string[]
@@ -1938,7 +1916,7 @@
       }
 
       case "info_table": {
-        const rows = [[c.r1_label,c.r1_value],[c.r2_label,c.r2_value],[c.r3_label,c.r3_value],[c.r4_label,c.r4_value],[c.r5_label,c.r5_value],[c.r6_label,c.r6_value]].filter(([l])=>l)
+        const rows = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`r${i}_label`],c[`r${i}_value`]]}).filter(([l])=>l)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
@@ -1973,7 +1951,7 @@
       )
 
       case "documents": {
-        const docs = [1,2,3,4,5,6].map(i => ({ type: c[`d${i}_type`], title: c[`d${i}_title`], desc: c[`d${i}_desc`]||"", url: (c[`d${i}_url`]||"").trim(), meta: c[`d${i}_meta`]||"" })).filter(d => d.title)
+        const docs = Array.from({length:50},(_,k)=>k+1).map(i => ({ type: c[`d${i}_type`], title: c[`d${i}_title`], desc: c[`d${i}_desc`]||"", url: (c[`d${i}_url`]||"").trim(), meta: c[`d${i}_meta`]||"" })).filter(d => d.title)
         const list = docs
         return (
           <div style={{ padding: "10px 16px", ...s }}>
@@ -2053,11 +2031,7 @@
       )
 
       case "multi_contact": {
-        const contacts = [
-          [c.c1_photo, c.c1_name, c.c1_role, c.c1_phone, c.c1_email],
-          [c.c2_photo, c.c2_name, c.c2_role, c.c2_phone, c.c2_email],
-          [c.c3_photo, c.c3_name, c.c3_role, c.c3_phone, c.c3_email],
-        ].filter(([,n])=>n)
+        const contacts = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`c${i}_photo`],c[`c${i}_name`],c[`c${i}_role`],c[`c${i}_phone`],c[`c${i}_email`]]}).filter(([,n])=>n)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
@@ -2143,12 +2117,7 @@
       }
 
       case "business_certifications": {
-        const certs = [
-          [c.c1_icon,c.c1_name,c.c1_org,c.c1_year],
-          [c.c2_icon,c.c2_name,c.c2_org,c.c2_year],
-          [c.c3_icon,c.c3_name,c.c3_org,c.c3_year],
-          [c.c4_icon,c.c4_name,c.c4_org,c.c4_year],
-        ].filter(([,n])=>n)
+        const certs = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`c${i}_icon`],c[`c${i}_name`],c[`c${i}_org`],c[`c${i}_year`]]}).filter(([,n])=>n)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
@@ -2237,7 +2206,7 @@
       )
 
       case "discography": {
-        const albums = [[c.a1_cover,c.a1_title,c.a1_year,c.a1_type,c.a1_url],[c.a2_cover,c.a2_title,c.a2_year,c.a2_type,c.a2_url],[c.a3_cover,c.a3_title,c.a3_year,c.a3_type,c.a3_url]].filter(([,t])=>t)
+        const albums = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`a${i}_cover`],c[`a${i}_title`],c[`a${i}_year`],c[`a${i}_type`],c[`a${i}_url`]]}).filter(([,t])=>t)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
@@ -2321,7 +2290,7 @@
       )
 
       case "concerts": {
-        const shows = [[c.c1_date,c.c1_city,c.c1_venue,c.c1_url],[c.c2_date,c.c2_city,c.c2_venue,c.c2_url],[c.c3_date,c.c3_city,c.c3_venue,c.c3_url],[c.c4_date,c.c4_city,c.c4_venue,c.c4_url]].filter(([,city])=>city)
+        const shows = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`c${i}_date`],c[`c${i}_city`],c[`c${i}_venue`],c[`c${i}_url`]]}).filter(([,city])=>city)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
@@ -2424,13 +2393,7 @@
 
 
       case "event_program": {
-        const steps = [
-          [c.s1_time, c.s1_title, c.s1_desc],
-          [c.s2_time, c.s2_title, c.s2_desc],
-          [c.s3_time, c.s3_title, c.s3_desc],
-          [c.s4_time, c.s4_title, c.s4_desc],
-          [c.s5_time, c.s5_title, c.s5_desc],
-        ].filter(([,t])=>t)
+        const steps = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`s${i}_time`],c[`s${i}_title`],c[`s${i}_desc`]]}).filter(([,t])=>t)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
@@ -2472,7 +2435,7 @@
       )
 
       case "event_guests": {
-        const guests = [[c.g1_photo,c.g1_name,c.g1_role,c.g1_desc],[c.g2_photo,c.g2_name,c.g2_role,c.g2_desc],[c.g3_photo,c.g3_name,c.g3_role,c.g3_desc],[c.g4_photo,c.g4_name,c.g4_role,c.g4_desc]].filter(([,n])=>n)
+        const guests = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`g${i}_photo`],c[`g${i}_name`],c[`g${i}_role`],c[`g${i}_desc`]]}).filter(([,n])=>n)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
@@ -2758,7 +2721,7 @@
       )
 
       case "tabs_block": { const [activeTab, setActiveTab] = [0, (_:number) => {}] as const
-        const tabs = [[c.tab1_label,c.tab1_content],[c.tab2_label,c.tab2_content],[c.tab3_label,c.tab3_content]].filter(([l])=>l)
+        const tabs = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`tab${i}_label`],c[`tab${i}_content`]]}).filter(([l])=>l)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             <div style={{ display: "flex", gap: 0, borderBottom: "1px solid rgba(255,255,255,0.08)", marginBottom: 12 }}>
@@ -2779,7 +2742,7 @@
       }
 
       case "accordion_block": { const [openIdx, setOpenIdx] = [null as number|null, (_:number|null) => {}] as const
-        const items = [[c.a1_title,c.a1_content],[c.a2_title,c.a2_content],[c.a3_title,c.a3_content],[c.a4_title,c.a4_content]].filter(([t])=>t)
+        const items = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`a${i}_title`],c[`a${i}_content`]]}).filter(([t])=>t)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
