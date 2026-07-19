@@ -6710,12 +6710,15 @@
                 <div style={{ flex: 1, overflowY: "auto", padding: 14, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, alignContent: "start" }} className="iphone-scroll">
                   {PAGE_TEMPLATES.filter(t => t.group === templateGroup).map(tpl => (
                     <div key={tpl.key} style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: 13, overflow: "hidden", background: "rgba(255,255,255,0.02)", display: "flex", flexDirection: "column" }}>
-                      {/* Aperçu couleurs du thème */}
-                      <div style={{ height: 64, background: tpl.theme.bgGradient || tpl.theme.bg, position: "relative", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                        <span style={{ fontSize: 26 }}>{tpl.emoji}</span>
-                        <div style={{ position: "absolute", bottom: 8, right: 8, display: "flex", gap: 4 }}>
-                          <span style={{ width: 12, height: 12, borderRadius: "50%", background: tpl.theme.primary, border: "1px solid rgba(255,255,255,0.2)" }} />
-                          <span style={{ width: 12, height: 12, borderRadius: "50%", background: tpl.theme.accent, border: "1px solid rgba(255,255,255,0.2)" }} />
+                      {/* Mini-apercu de page (avatar + titre + CTA aux couleurs du theme) — plus visuel (#16) */}
+                      <div style={{ height: 148, background: tpl.theme.bgGradient || tpl.theme.bg, position: "relative", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 7, padding: "16px" }}>
+                        <div style={{ width: 38, height: 38, borderRadius: "50%", background: `linear-gradient(135deg, ${tpl.theme.primary}, ${tpl.theme.accent})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, boxShadow: "0 2px 8px rgba(0,0,0,0.25)" }}>{tpl.emoji}</div>
+                        <div style={{ width: "56%", height: 6, borderRadius: 3, background: (tpl.theme as any).text || "#F5F0E8", opacity: 0.9 }} />
+                        <div style={{ width: "40%", height: 4, borderRadius: 2, background: (tpl.theme as any).muted || "#9A948A", opacity: 0.7 }} />
+                        <div style={{ width: "74%", height: 15, borderRadius: 8, background: tpl.theme.accent || tpl.theme.primary, marginTop: 3, boxShadow: "0 2px 6px rgba(0,0,0,0.2)" }} />
+                        <div style={{ position: "absolute", bottom: 7, right: 7, display: "flex", gap: 3 }}>
+                          <span style={{ width: 10, height: 10, borderRadius: "50%", background: tpl.theme.primary, border: "1px solid rgba(255,255,255,0.25)" }} />
+                          <span style={{ width: 10, height: 10, borderRadius: "50%", background: tpl.theme.accent, border: "1px solid rgba(255,255,255,0.25)" }} />
                         </div>
                       </div>
                       <div style={{ padding: "11px 12px", flex: 1, display: "flex", flexDirection: "column" }}>
