@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { Upload, X, Image as ImageIcon, FolderOpen, Trash2, Plus, Search } from "lucide-react"
+import { Upload, X, Image as ImageIcon, FolderOpen, Trash2, Plus, Search, Star } from "lucide-react"
 import { useImageUpload } from "./useImageUpload"
 
 type Props = {
@@ -22,6 +22,9 @@ export default function ImageUpload({ value, onChange, label, hint }: Props) {
   const [libBusy, setLibBusy] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false) // #05 : bottom sheet de choix de source
   const [libQuery, setLibQuery] = useState("") // #07 : recherche dans la bibliotheque
+  // #07 : favoris (persistes par URL). Les images favorites remontent en tete.
+  const [favs, setFavs] = useState<Set<string>>(() => { try { return new Set(JSON.parse(localStorage.getItem("qrfolio_media_favs") || "[]")) } catch { return new Set() } })
+  const toggleFav = (url: string) => setFavs(prev => { const n = new Set(prev); if (n.has(url)) n.delete(url); else n.add(url); try { localStorage.setItem("qrfolio_media_favs", JSON.stringify([...n])) } catch {} return n })
 
   async function openLibrary() {
     setLibOpen(true)
@@ -174,13 +177,19 @@ export default function ImageUpload({ value, onChange, label, hint }: Props) {
                       style={{ aspectRatio: "1", border: "2px dashed rgba(201,168,76,0.3)", borderRadius: 9, background: "rgba(201,168,76,0.04)", color: G, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, fontSize: 10, fontWeight: 600 }}>
                       <Plus size={18} /> Ajouter
                     </button>}
-                    {libAssets.filter(a => !libQuery || a.name.toLowerCase().includes(libQuery.toLowerCase())).map(a => (
+                    {libAssets.filter(a => !libQuery || a.name.toLowerCase().includes(libQuery.toLowerCase()))
+                      .slice().sort((a, b) => (favs.has(b.url) ? 1 : 0) - (favs.has(a.url) ? 1 : 0))
+                      .map(a => (
                       <div key={a.url} style={{ position: "relative", aspectRatio: "1" }}
                         onMouseEnter={e => { const b = e.currentTarget.querySelector(".del") as HTMLElement; if (b) b.style.opacity = "1" }}
                         onMouseLeave={e => { const b = e.currentTarget.querySelector(".del") as HTMLElement; if (b) b.style.opacity = "0" }}>
                         <button onClick={() => { onChange(a.url); setLibOpen(false) }} title={a.name}
                           style={{ width: "100%", height: "100%", padding: 0, border: value === a.url ? `2px solid ${G}` : "1px solid rgba(255,255,255,0.1)", borderRadius: 9, overflow: "hidden", cursor: "pointer", background: "#0A0A0A" }}>
                           <img src={a.url} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                        </button>
+                        <button onClick={e => { e.stopPropagation(); toggleFav(a.url) }} aria-label={favs.has(a.url) ? "Retirer des favoris" : "Ajouter aux favoris"} title={favs.has(a.url) ? "Retirer des favoris" : "Favori"}
+                          style={{ position: "absolute", top: 4, left: 4, background: "rgba(8,8,8,0.82)", border: "none", borderRadius: 6, width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: favs.has(a.url) ? "#FFD700" : "rgba(255,255,255,0.6)" }}>
+                          <Star size={12} fill={favs.has(a.url) ? "#FFD700" : "none"} />
                         </button>
                         <button className="del" onClick={e => { e.stopPropagation(); removeAsset(a) }} aria-label="Supprimer"
                           style={{ position: "absolute", top: 4, right: 4, opacity: 0, transition: "opacity .15s", background: "rgba(8,8,8,0.82)", border: "none", borderRadius: 6, width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#FF6B6B" }}>
