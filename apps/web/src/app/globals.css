@@ -217,6 +217,19 @@ button:not(:disabled):active { transform: scale(.97); }
 ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.25); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(201,168,76,0.5); }
 
+/* Editeur de page : sur mobile, les champs texte a >=16px empechent le zoom
+   automatique d'iOS Safari au focus (qui casse le layout de l'editeur). */
+@media (max-width: 1024px) {
+  .builder-root input:not([type]),
+  .builder-root input[type="text"],
+  .builder-root input[type="url"],
+  .builder-root input[type="email"],
+  .builder-root input[type="search"],
+  .builder-root input[type="tel"],
+  .builder-root input[type="number"],
+  .builder-root textarea { font-size: 16px !important; }
+}
+
 /* Prevent layout shift */
 img, video, canvas { max-width: 100%; }
 
