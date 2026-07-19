@@ -5999,18 +5999,8 @@
                           <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{BLOCK_DEFS[selectedBlock.type]?.description}</p>
                         </div>
                         <div style={{ marginLeft: "auto", display: "flex", gap: 4 }}>
-                          <button onClick={() => duplicateBlock(selectedBlock.id)} title="Dupliquer" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: MUTED, display: "flex", alignItems: "center", justifyContent: "center" }}><Copy size={10} /></button>
-                          <button onClick={() => toggleDraft(selectedBlock.id)} title={selectedBlock.draft ? "Retirer du brouillon" : "Mettre en brouillon"}
-                            style={{ background: selectedBlock.draft ? "rgba(251,191,36,0.1)" : "rgba(255,255,255,0.04)", border: `1px solid ${selectedBlock.draft ? "rgba(251,191,36,0.35)" : "rgba(255,255,255,0.07)"}`, borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: selectedBlock.draft ? "#FBBF24" : MUTED, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>
-                            ✏
-                          </button>
-                          <button onClick={() => toggleLock(selectedBlock.id)} title={selectedBlock.locked ? "Déverrouiller" : "Verrouiller"}
-                            style={{ background: selectedBlock.locked ? "rgba(99,102,241,0.1)" : "rgba(255,255,255,0.04)", border: `1px solid ${selectedBlock.locked ? "rgba(99,102,241,0.35)" : "rgba(255,255,255,0.07)"}`, borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: selectedBlock.locked ? "#818CF8" : MUTED, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>
-                            {selectedBlock.locked ? "🔒" : "🔓"}
-                          </button>
-                          {!selectedBlock.locked && (
-                            <button onClick={() => deleteBlock(selectedBlock.id)} title="Supprimer" style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 6, width: 26, height: 26, cursor: "pointer", color: "#EF4444", display: "flex", alignItems: "center", justifyContent: "center" }}><Trash2 size={10} /></button>
-                          )}
+                          {/* #11 : une seule action "..." -> meme bottom sheet que l'overlay (dup/masquer/verrouiller/brouillon/supprimer) */}
+                          <button onClick={() => setBlockMenu(selectedBlock.id)} title="Plus d'actions" aria-label="Plus d'actions" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, width: isMobile ? 34 : 26, height: isMobile ? 34 : 26, cursor: "pointer", color: "#F5F0E8", display: "flex", alignItems: "center", justifyContent: "center" }}><MoreHorizontal size={isMobile ? 17 : 13} /></button>
                         </div>
                       </div>
                       {(() => {
@@ -6233,6 +6223,7 @@
             { icon: <Copy size={17} />, label: "Dupliquer", onClick: () => { duplicateBlock(b.id); setBlockMenu(null) } },
             { icon: b.visible ? <EyeOff size={17} /> : <Eye size={17} />, label: b.visible ? "Masquer" : "Afficher", onClick: () => { toggleVisible(b.id); setBlockMenu(null) } },
             { icon: <span style={{ fontSize: 15 }}>{b.locked ? "🔓" : "🔒"}</span>, label: b.locked ? "Déverrouiller" : "Verrouiller", onClick: () => { toggleLock(b.id); setBlockMenu(null) } },
+            ...(b.locked ? [] : [{ icon: <span style={{ fontSize: 15 }}>✏</span>, label: b.draft ? "Retirer du brouillon" : "Mettre en brouillon", onClick: () => { toggleDraft(b.id); setBlockMenu(null) } }]),
             ...(b.locked ? [] : [{ icon: <span style={{ fontSize: 15 }}>↺</span>, label: "Réinitialiser", onClick: () => { resetBlock(b.id); setBlockMenu(null) } }]),
             ...(b.locked ? [] : [{ icon: <Trash2 size={17} color="#EF4444" />, label: "Supprimer", danger: true, onClick: () => { deleteBlock(b.id); setBlockMenu(null) } }]),
           ]
