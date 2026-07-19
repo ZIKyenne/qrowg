@@ -5494,7 +5494,7 @@
 
             {!search && !blocksCollapsed && (
               <div style={{ padding: "8px 10px 6px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
-                <div className={isMobile ? "iphone-scroll" : undefined} style={{ display: isMobile ? "flex" : "grid", gridTemplateColumns: isMobile ? undefined : "1fr 1fr", overflowX: isMobile ? "auto" : undefined, gap: 6, paddingBottom: isMobile ? 2 : 0 }}>
+                <div style={{ display: isMobile ? "flex" : "grid", flexWrap: isMobile ? "wrap" as const : undefined, gridTemplateColumns: isMobile ? undefined : "1fr 1fr", gap: isMobile ? 5 : 6 }}>
                   {/* Catégorie Récents — visible seulement si au moins 1 récent */}
                   {recentBlocks.length > 0 && (
                     <button onClick={() => setActiveCategory("recents")} title="Blocs récemment utilisés"
@@ -5683,8 +5683,6 @@
                                     const grouped = IDENTITY_GROUPS.flatMap(g => g.keys)
                                     const rest = catBlocks.filter(([t]) => !grouped.includes(t)) // blocs identité non classés -> "Autres"
                                     return (<>
-                                      {/* Onboarding (générer / modèles métier) seulement tant que la page est peu remplie -> palette moins dense ensuite (audit #1) */}
-                                      {blocks.length <= 5 && (<>
                                       <button type="button" onClick={generateBaseIdentity} title="Ajoute profil + bio + compétences + disponibilité, prêts à éditer"
                                         style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "10px", margin: "2px 0 8px", borderRadius: 9, border: "none", cursor: "pointer", background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", color: "#080808", fontSize: 12, fontWeight: 800 }}>
                                         ✨ Générer une identité de base
@@ -5704,7 +5702,6 @@
                                           ))}
                                         </div>
                                       </div>
-                                      </>)}
                                       {IDENTITY_GROUPS.map(g => {
                                         const gb = g.keys.filter(k => (BLOCK_DEFS as any)[k])
                                         if (!gb.length) return null
