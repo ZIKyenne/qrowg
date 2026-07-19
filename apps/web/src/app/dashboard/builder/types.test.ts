@@ -9,7 +9,50 @@ import {
   vcardEscape, splitName, buildVCard, mapEmbedUrl, shareLinks, toCalStamp, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref,
   docTypeMeta, docActionLabel, announcementMeta, blockDecoration,
   hexToRgb, rgbToHsl, contrastRatio, wcagLevel, isClipShape, optionLabel, avatarBgStyle,
+  avatarShapeStyle, themeBackgroundStyle,
 } from "./types"
+
+describe("avatarShapeStyle (partagé éditeur ↔ public)", () => {
+  it("formes standard -> borderRadius", () => {
+    expect(avatarShapeStyle("carré")).toEqual({ borderRadius: "8%" })
+    expect(avatarShapeStyle("arrondi")).toEqual({ borderRadius: "22%" })
+    expect(avatarShapeStyle("squircle")).toEqual({ borderRadius: "32%" })
+    expect(avatarShapeStyle(undefined)).toEqual({ borderRadius: "50%" })
+  })
+  it("formes en découpe -> clipPath + borderRadius 0", () => {
+    expect(String(avatarShapeStyle("hexagone").clipPath)).toContain("polygon")
+    expect(avatarShapeStyle("hexagone").borderRadius).toBe("0")
+    expect(String(avatarShapeStyle("diamant").clipPath)).toContain("polygon")
+    expect(avatarShapeStyle("diamant").borderRadius).toBe("0")
+  })
+  it("invariant : isClipShape(s) ⟺ avatarShapeStyle(s) a un clipPath", () => {
+    for (const s of ["cercle", "carré", "arrondi", "squircle", "hexagone", "diamant"]) {
+      expect(isClipShape(s)).toBe("clipPath" in avatarShapeStyle(s))
+    }
+  })
+})
+
+describe("themeBackgroundStyle (source unique éditeur ↔ public)", () => {
+  it("défaut = fond uni (bgGradient sinon bg)", () => {
+    expect(themeBackgroundStyle({ bg: "#080808" } as any)).toEqual({ background: "#080808" })
+    expect(themeBackgroundStyle({ bg: "#080808", bgGradient: "linear-gradient(x)" } as any)).toEqual({ background: "linear-gradient(x)" })
+  })
+  it("image : url + cover", () => {
+    const r = themeBackgroundStyle({ bg: "#080808", bgMode: "image", bgImage: "photo.jpg" } as any)
+    expect(r.backgroundImage).toBe("url(photo.jpg)")
+    expect(r.backgroundSize).toBe("cover")
+  })
+  it("pattern grid : backgroundImage + size, fond = bg", () => {
+    const r = themeBackgroundStyle({ bg: "#080808", bgMode: "pattern", bgPattern: "grid", pattern_size: 24 } as any)
+    expect(r.background).toBe("#080808")
+    expect(String(r.backgroundImage)).toContain("linear-gradient")
+    expect(r.backgroundSize).toBe("24px 24px")
+  })
+  it("radial / mesh : dégradés", () => {
+    expect(String(themeBackgroundStyle({ bg: "#080808", primary: "#C9A84C", bgMode: "radial" } as any).background)).toContain("radial-gradient")
+    expect(String(themeBackgroundStyle({ bg: "#080808", bgMode: "mesh" } as any).background)).toContain("radial-gradient")
+  })
+})
 
 describe("avatarBgStyle (partagé éditeur ↔ page publique)", () => {
   it("uni : fond plein de la 1re couleur", () => {
