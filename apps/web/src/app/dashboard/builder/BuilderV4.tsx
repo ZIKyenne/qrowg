@@ -5494,30 +5494,30 @@
 
             {!search && !blocksCollapsed && (
               <div style={{ padding: "8px 10px 6px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
-                <div style={{ display: isMobile ? "flex" : "grid", flexWrap: isMobile ? "wrap" as const : undefined, gridTemplateColumns: isMobile ? undefined : "1fr 1fr", gap: isMobile ? 5 : 6 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(3, minmax(0, 1fr))" : "1fr 1fr", gap: isMobile ? 5 : 6 }}>
                   {/* Catégorie Récents — visible seulement si au moins 1 récent */}
                   {recentBlocks.length > 0 && (
                     <button onClick={() => setActiveCategory("recents")} title="Blocs récemment utilisés"
-                      style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0, background: activeCategory==="recents" ? "#38BDF818" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory==="recents" ? "#38BDF850" : "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: isMobile ? "9px 13px" : "9px 11px", flexShrink: isMobile ? 0 : undefined, color: activeCategory==="recents" ? "#38BDF8" : MUTED, fontSize: 12, fontWeight: activeCategory==="recents" ? 700 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
+                      style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0, background: activeCategory==="recents" ? "#38BDF818" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory==="recents" ? "#38BDF850" : "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: isMobile ? "7px 7px" : "9px 11px", color: activeCategory==="recents" ? "#38BDF8" : MUTED, fontSize: 12, fontWeight: activeCategory==="recents" ? 700 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
                       <span style={{ fontSize: 15, flexShrink: 0 }}>🕐</span>
-                      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Récents</span>
+                      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: isMobile ? 11.5 : undefined }}>Récents</span>
                     </button>
                   )}
                   {/* Catégorie Favoris — visible seulement si au moins 1 favori */}
                   {favorites.length > 0 && (
                     <button onClick={() => setActiveCategory("favorites")} title="Vos blocs favoris"
-                      style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0, background: activeCategory==="favorites" ? "#FFD70018" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory==="favorites" ? "#FFD70050" : "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: isMobile ? "9px 13px" : "9px 11px", flexShrink: isMobile ? 0 : undefined, color: activeCategory==="favorites" ? "#FFD700" : MUTED, fontSize: 12, fontWeight: activeCategory==="favorites" ? 700 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
+                      style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0, background: activeCategory==="favorites" ? "#FFD70018" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory==="favorites" ? "#FFD70050" : "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: isMobile ? "7px 7px" : "9px 11px", color: activeCategory==="favorites" ? "#FFD700" : MUTED, fontSize: 12, fontWeight: activeCategory==="favorites" ? 700 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
                       <span style={{ fontSize: 15, flexShrink: 0 }}>⭐</span>
-                      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Favoris</span>
-                      <span style={{ marginLeft: isMobile ? 4 : "auto", flexShrink: 0, background: "rgba(255,215,0,0.15)", borderRadius: 10, padding: "0px 6px", fontSize: 9.5, fontWeight: 700 }}>{favorites.length}</span>
+                      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: isMobile ? 11.5 : undefined }}>Favoris</span>
+                      <span style={{ display: isMobile ? "none" : undefined, marginLeft: "auto", flexShrink: 0, background: "rgba(255,215,0,0.15)", borderRadius: 10, padding: "0px 6px", fontSize: 9.5, fontWeight: 700 }}>{favorites.length}</span>
                     </button>
                   )}
                   {BLOCK_CATEGORIES.map(cat => (
                     <button key={cat.id} onClick={() => setActiveCategory(cat.id)} title={cat.desc}
-                      style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0, background: activeCategory===cat.id ? cat.color+"18" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory===cat.id ? cat.color+"50" : "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: isMobile ? "9px 13px" : "9px 11px", flexShrink: isMobile ? 0 : undefined, color: activeCategory===cat.id ? cat.color : MUTED, fontSize: 12, fontWeight: activeCategory===cat.id ? 700 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
+                      style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0, background: activeCategory===cat.id ? cat.color+"18" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory===cat.id ? cat.color+"50" : "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: isMobile ? "7px 7px" : "9px 11px", color: activeCategory===cat.id ? cat.color : MUTED, fontSize: 12, fontWeight: activeCategory===cat.id ? 700 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
                       <span style={{ fontSize: 15, flexShrink: 0 }}>{cat.icon}</span>
-                      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cat.label}</span>
-                      <span style={{ marginLeft: isMobile ? 4 : "auto", flexShrink: 0, background: activeCategory===cat.id ? cat.color+"20" : "rgba(255,255,255,0.06)", color: activeCategory===cat.id ? cat.color : MUTED, borderRadius: 10, padding: "0px 6px", fontSize: 9.5, fontWeight: 700, lineHeight: "17px" }}>
+                      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: isMobile ? 11.5 : undefined }}>{cat.label}</span>
+                      <span style={{ display: isMobile ? "none" : undefined, marginLeft: "auto", flexShrink: 0, background: activeCategory===cat.id ? cat.color+"20" : "rgba(255,255,255,0.06)", color: activeCategory===cat.id ? cat.color : MUTED, borderRadius: 10, padding: "0px 6px", fontSize: 9.5, fontWeight: 700, lineHeight: "17px" }}>
                         {search && searchCounts ? (searchCounts[cat.id] || 0) : (catCounts[cat.id] || 0)}
                       </span>
                     </button>
