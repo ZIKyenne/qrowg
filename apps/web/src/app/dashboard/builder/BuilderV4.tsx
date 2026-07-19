@@ -729,7 +729,7 @@
         )
       }
       case "multi_cta": {
-        const btns = [[c.btn1_icon,c.btn1_label],[c.btn2_icon,c.btn2_label],[c.btn3_icon,c.btn3_label],[c.btn4_icon,c.btn4_label]].filter(([,l])=>l)
+        const btns = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`btn${i}_icon`],c[`btn${i}_label`]]}).filter(([,l])=>l)
         return (
           <div style={{ padding: "4px 16px 10px", ...s }}>
             <div style={{ display: "grid", gridTemplateColumns: btns.length<=2 ? "1fr 1fr" : "1fr 1fr", gap: 6 }}>
@@ -2951,7 +2951,7 @@
   const LAYOUT_FIELD_KEYS = new Set(["align", "layout", "width", "height", "columns", "cols", "disposition", "orientation", "size"])
   const isLayoutField = (key: string) => LAYOUT_FIELD_KEYS.has(key) || key.endsWith("_align")
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
-  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages", "expertise", "trust_badge", "on_site_services", "advantages", "logo_wall"])
+  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages", "expertise", "trust_badge", "on_site_services", "advantages", "logo_wall", "multi_cta"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
   const STYLE_COPY_KEYS = ["__grad", "__bg", "__intensity", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim", "__anim_speed", "__hover", "__loop"]
 
@@ -3282,6 +3282,11 @@
       return <RepeaterEditor block={block} onChange={onChange} prefix="logo" noun="Logo" addLabel="Ajouter un logo"
         topFields={[{ key: "title", label: "Titre de la section", placeholder: "Ils nous font confiance" }]}
         fields={[{ suffix: "", kind: "image" }, { suffix: "name", placeholder: "Nom (affiché si pas de logo)" }]} />
+    }
+
+    if (block.type === "multi_cta") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="btn" noun="Bouton" addLabel="Ajouter un bouton"
+        fields={[{ suffix: "icon", placeholder: "Emoji (ex : 📞)" }, { suffix: "label", placeholder: "Texte du bouton" }, { suffix: "url", kind: "url", placeholder: "Lien (https://, tel:, mailto:)" }]} />
     }
 
     if (block.type === "social_links") {

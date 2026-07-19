@@ -1300,7 +1300,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       </div>
     ) : null
     case "multi_cta": {
-      const btns = [[c.btn1_icon, c.btn1_label, c.btn1_url], [c.btn2_icon, c.btn2_label, c.btn2_url], [c.btn3_icon, c.btn3_label, c.btn3_url], [c.btn4_icon, c.btn4_label, c.btn4_url]].filter(([, l]) => l)
+      const btns = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`btn${i}_icon`], (c as any)[`btn${i}_label`], (c as any)[`btn${i}_url`]] }).filter(([, l]) => l)
       return btns.length > 0 ? (
         <div style={{ padding: "6px 24px 10px" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
