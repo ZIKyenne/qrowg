@@ -3421,7 +3421,7 @@
                   placeholder={field.placeholder} style={inputStyle}
                   onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"}
                   onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />}
-            {field.hint && <p style={{ color: MUTED, fontSize: 9, margin: "3px 0 0" }}>{field.hint}</p>}
+            {field.hint && <p style={{ color: MUTED, fontSize: 11, margin: "3px 0 0", lineHeight: 1.4 }}>{field.hint}</p>}
             {/* Validation guidée : URL / email / téléphone (affichage seul) */}
             {(() => {
               const val = String(block.content[field.key] || "").trim()
@@ -5523,7 +5523,7 @@
                     </button>
                   ))}
                 </div>
-                <p style={{ color: MUTED, fontSize: 10, margin: "6px 0 0", paddingLeft: 2 }}>
+                <p style={{ color: MUTED, fontSize: 11.5, margin: "6px 0 0", paddingLeft: 2 }}>
                   {activeCategory==="recents" ? `${recentBlocks.length} bloc${recentBlocks.length>1?"s":""} récent${recentBlocks.length>1?"s":""}` : activeCategory==="favorites" ? `${favorites.length} bloc${favorites.length>1?"s":""} favori${favorites.length>1?"s":""}` : BLOCK_CATEGORIES.find(c => c.id===activeCategory)?.desc}
                 </p>
               </div>
