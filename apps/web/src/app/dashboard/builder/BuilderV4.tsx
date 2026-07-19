@@ -5377,7 +5377,7 @@
                                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                                           {IDENTITY_PRESETS.map(p => (
                                             <button key={p.key} type="button" onClick={() => generateIdentityPreset(p)} title={`Crée : ${p.blocks.map(b => (BLOCK_DEFS as any)[b.type]?.label || b.type).join(", ")}`}
-                                              style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 10px", borderRadius: 9, border: "1px solid rgba(201,168,76,0.18)", cursor: "pointer", background: "rgba(201,168,76,0.05)", color: "#F5F0E8", fontSize: 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
+                                              style={{ display: "flex", alignItems: "center", gap: 7, minHeight: isMobile ? 46 : undefined, padding: isMobile ? "11px 11px" : "9px 10px", borderRadius: 10, border: "1px solid rgba(201,168,76,0.18)", cursor: "pointer", background: "rgba(201,168,76,0.05)", color: "#F5F0E8", fontSize: isMobile ? 12 : 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
                                               onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.12)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)" }}
                                               onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,168,76,0.05)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.18)" }}>
                                               <span style={{ fontSize: 16 }}>{p.emoji}</span>
@@ -5500,7 +5500,7 @@
                                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                                           {INFO_PRESETS.map(p => (
                                             <button key={p.key} type="button" onClick={() => generateInfoPreset(p)} title={`Crée : ${p.blocks.map(b => (BLOCK_DEFS as any)[b.type]?.label || b.type).join(", ")}`}
-                                              style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 10px", borderRadius: 9, border: "1px solid rgba(201,168,76,0.18)", cursor: "pointer", background: "rgba(201,168,76,0.05)", color: "#F5F0E8", fontSize: 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
+                                              style={{ display: "flex", alignItems: "center", gap: 7, minHeight: isMobile ? 46 : undefined, padding: isMobile ? "11px 11px" : "9px 10px", borderRadius: 10, border: "1px solid rgba(201,168,76,0.18)", cursor: "pointer", background: "rgba(201,168,76,0.05)", color: "#F5F0E8", fontSize: isMobile ? 12 : 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
                                               onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.12)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)" }}
                                               onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,168,76,0.05)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.18)" }}>
                                               <span style={{ fontSize: 16 }}>{p.emoji}</span>
