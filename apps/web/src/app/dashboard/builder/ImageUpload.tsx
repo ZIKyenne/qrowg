@@ -20,6 +20,7 @@ export default function ImageUpload({ value, onChange, label, hint }: Props) {
   const [libOpen, setLibOpen] = useState(false)
   const [libAssets, setLibAssets] = useState<{ name: string; url: string }[] | null>(null)
   const [libBusy, setLibBusy] = useState(false)
+  const [pickerOpen, setPickerOpen] = useState(false) // #05 : bottom sheet de choix de source
 
   async function openLibrary() {
     setLibOpen(true)
@@ -73,14 +74,14 @@ export default function ImageUpload({ value, onChange, label, hint }: Props) {
             style={{ position: "absolute", top: 8, right: 8, background: "rgba(8,8,8,0.8)", border: "none", borderRadius: "50%", width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#FF6B6B" }}>
             <X size={14} />
           </button>
-          <button onClick={() => inputRef.current?.click()}
+          <button onClick={() => setPickerOpen(true)}
             style={{ position: "absolute", bottom: 8, right: 8, background: "rgba(201,168,76,0.9)", border: "none", borderRadius: 6, padding: "5px 10px", cursor: "pointer", color: "#080808", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
             <Upload size={11} /> Changer
           </button>
         </div>
       ) : (
         <div
-          onClick={() => inputRef.current?.click()}
+          onClick={() => setPickerOpen(true)}
           onDragOver={e => { e.preventDefault(); setDragOver(true) }}
           onDragLeave={() => setDragOver(false)}
           onDrop={onDrop}
@@ -102,11 +103,37 @@ export default function ImageUpload({ value, onChange, label, hint }: Props) {
         </div>
       )}
 
-      <button type="button" onClick={openLibrary}
+      <button type="button" onClick={() => setPickerOpen(true)}
         style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 7, background: "none", border: "none", color: MUTED, fontSize: 11, cursor: "pointer", padding: 0 }}
         onMouseEnter={e => e.currentTarget.style.color = G} onMouseLeave={e => e.currentTarget.style.color = MUTED}>
-        <FolderOpen size={12} /> Choisir dans ma bibliothèque
+        <FolderOpen size={12} /> Changer d'image…
       </button>
+
+      {/* Bottom sheet : choix de la source (#05) */}
+      {pickerOpen && (
+        <div onClick={() => setPickerOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 420, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "#141210", borderTopLeftRadius: 20, borderTopRightRadius: 20, border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", padding: "10px 12px calc(14px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)" }}>
+            <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 10px" }} />
+            <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: "0 6px 6px" }}>Ajouter une image</p>
+            <button type="button" onClick={() => { setPickerOpen(false); inputRef.current?.click() }}
+              style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "14px 12px", background: "none", border: "none", color: "#F5F0E8", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
+              <span style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 11, background: "rgba(201,168,76,0.14)", border: "1px solid rgba(201,168,76,0.28)", display: "flex", alignItems: "center", justifyContent: "center", color: G }}><Upload size={19} /></span>
+              <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <span>Depuis mon téléphone</span>
+                <span style={{ color: MUTED, fontSize: 12 }}>Photo, photothèque ou fichier</span>
+              </span>
+            </button>
+            <button type="button" onClick={() => { setPickerOpen(false); openLibrary() }}
+              style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "14px 12px", background: "none", border: "none", borderTop: "1px solid rgba(255,255,255,0.05)", color: "#F5F0E8", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
+              <span style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 11, background: "rgba(201,168,76,0.14)", border: "1px solid rgba(201,168,76,0.28)", display: "flex", alignItems: "center", justifyContent: "center", color: G }}><FolderOpen size={19} /></span>
+              <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <span>Ma bibliothèque QRfolio</span>
+                <span style={{ color: MUTED, fontSize: 12 }}>Images déjà importées</span>
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {error && <p style={{ color: "#FF6B6B", fontSize: 11, margin: "6px 0 0" }}>{error}</p>}
       <input ref={inputRef} type="file" accept="image/*" style={{ display: "none" }}
