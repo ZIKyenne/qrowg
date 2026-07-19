@@ -227,7 +227,13 @@ button:not(:disabled):active { transform: scale(.97); }
   .builder-root input[type="search"],
   .builder-root input[type="tel"],
   .builder-root input[type="number"],
-  .builder-root textarea { font-size: 16px !important; }
+  .builder-root textarea,
+  .ps-root input:not([type]),
+  .ps-root input[type="text"],
+  .ps-root input[type="url"],
+  .ps-root input[type="search"],
+  .ps-root input[type="number"],
+  .ps-root textarea { font-size: 16px !important; }
 }
 
 /* Prevent layout shift */
