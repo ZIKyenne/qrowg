@@ -1191,7 +1191,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "certifications": {
-      const certs = [[c.cert_1_icon, c.cert_1_name, c.cert_1_org, c.cert_1_year], [c.cert_2_icon, c.cert_2_name, c.cert_2_org, c.cert_2_year], [c.cert_3_icon, c.cert_3_name, c.cert_3_org, c.cert_3_year], [c.cert_4_icon, c.cert_4_name, c.cert_4_org, c.cert_4_year]].filter(([, n]) => n)
+      const certs = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`cert_${i}_icon`], (c as any)[`cert_${i}_name`], (c as any)[`cert_${i}_org`], (c as any)[`cert_${i}_year`]] }).filter(([, n]) => n)
       return certs.length > 0 ? (
         <div style={{ padding: "8px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 9px", fontFamily: FONT_B }}>{c.title}</p>}
@@ -1957,7 +1957,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       </div>
     ) : null
     case "youtube_gallery": {
-      const videos = [[c.video1_url, c.video1_title], [c.video2_url, c.video2_title], [c.video3_url, c.video3_title]].filter(([u]) => u)
+      const videos = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`video${i}_url`], (c as any)[`video${i}_title`]] }).filter(([u]) => u)
       return videos.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}

@@ -918,7 +918,7 @@
         ) : <div style={{ padding: "14px", textAlign: "center", color: muted, fontSize: 11, ...s }}>Ajoutez vos langues</div>
       }
       case "certifications": {
-        const certs = [[c.cert_1_icon,c.cert_1_name,c.cert_1_org,c.cert_1_year],[c.cert_2_icon,c.cert_2_name,c.cert_2_org,c.cert_2_year],[c.cert_3_icon,c.cert_3_name,c.cert_3_org,c.cert_3_year],[c.cert_4_icon,c.cert_4_name,c.cert_4_org,c.cert_4_year]].filter(([,n])=>n)
+        const certs = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`cert_${i}_icon`],c[`cert_${i}_name`],c[`cert_${i}_org`],c[`cert_${i}_year`]]}).filter(([,n])=>n)
         return certs.length>0 ? (
           <div style={{ padding: "8px 16px 12px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>{c.title}</p>}
@@ -1562,7 +1562,7 @@
       )
 
       case "youtube_gallery": {
-        const videos = [[c.video1_url,c.video1_title],[c.video2_url,c.video2_title],[c.video3_url,c.video3_title]].filter(([u])=>u)
+        const videos = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`video${i}_url`],c[`video${i}_title`]]}).filter(([u])=>u)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
@@ -2957,7 +2957,7 @@
   const LAYOUT_FIELD_KEYS = new Set(["align", "layout", "width", "height", "columns", "cols", "disposition", "orientation", "size"])
   const isLayoutField = (key: string) => LAYOUT_FIELD_KEYS.has(key) || key.endsWith("_align")
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
-  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values"])
+  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
   const STYLE_COPY_KEYS = ["__grad", "__bg", "__intensity", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim", "__anim_speed", "__hover", "__loop"]
 
@@ -3237,6 +3237,18 @@
       return <RepeaterEditor block={block} onChange={onChange} prefix="v" noun="Valeur" addLabel="Ajouter une valeur"
         topFields={[{ key: "title", label: "Titre de la section", placeholder: "Nos valeurs" }]}
         fields={[{ suffix: "icon", placeholder: "Emoji (ex : ⭐)" }, { suffix: "label", placeholder: "Titre" }, { suffix: "desc", placeholder: "Description (optionnel)" }]} />
+    }
+
+    if (block.type === "certifications") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="cert_" noun="Certification" addLabel="Ajouter une certification"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Mes certifications" }]}
+        fields={[{ suffix: "icon", placeholder: "Emoji (ex : 🏆)" }, { suffix: "name", placeholder: "Nom de la certification" }, { suffix: "org", placeholder: "Organisme (optionnel)" }, { suffix: "year", placeholder: "Année (optionnel)" }]} />
+    }
+
+    if (block.type === "youtube_gallery") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="video" noun="Vidéo" addLabel="Ajouter une vidéo"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Mes vidéos" }]}
+        fields={[{ suffix: "url", kind: "url", placeholder: "Lien YouTube" }, { suffix: "title", placeholder: "Titre de la vidéo (optionnel)" }]} />
     }
 
     if (block.type === "social_links") {
