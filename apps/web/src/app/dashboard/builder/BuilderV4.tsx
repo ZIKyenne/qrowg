@@ -3026,6 +3026,8 @@
   }
 
   function EditPanel({ block, onChange, only }: { block: Block; onChange: (key: string, val: string) => void; only?: "content" | "layout" }) {
+    // Accordeon de l'editeur social_links : un groupe de reseaux ouvert a la fois (evite 78 champs empiles).
+    const [openNetGroup, setOpenNetGroup] = useState<string | null>(null)
     const def = BLOCK_DEFS[block.type]
     if (!def) return null
     // Les éditeurs personnalisés ne s'affichent que côté Contenu (leur mise en page passe par les réglages universels).
@@ -3061,26 +3063,64 @@
               })}
             </div>
           </div>
-          <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>Laisse vide pour masquer le réseau.</p>
-          {SOCIAL_NETWORKS.map(n => (
-            <div key={n.key}>
-              <label style={{ color: MUTED, fontSize: 11, display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
-                <span style={{ fontSize: 14 }}>{n.icon}</span>
-                <span style={{ color: n.color, fontWeight: 600 }}>{n.label}</span>
-              </label>
-              <input type="url" value={block.content[n.key]||""} onChange={e => onChange(n.key, e.target.value)}
-                placeholder={`https://${n.key}.com/...`}
-                style={{ ...inputStyle, borderColor: block.content[n.key] ? n.color+"50" : "rgba(201,168,76,0.2)" }}
-                onFocus={e => e.target.style.borderColor = n.color+"80"}
-                onBlur={e => e.target.style.borderColor = block.content[n.key] ? n.color+"50" : "rgba(201,168,76,0.2)"} />
-              {block.content[n.key] && (
-                <div style={{ display: "flex", gap: 6, marginTop: 5 }}>
-                  <input value={block.content[n.key+"__label"]||""} onChange={e => onChange(n.key+"__label", e.target.value)} placeholder={`Libellé (${n.label})`} style={{ ...inputStyle, flex: 1, fontSize: 11, padding: "7px 9px" }} />
-                  <input value={block.content[n.key+"__count"]||""} onChange={e => onChange(n.key+"__count", e.target.value)} placeholder="Abonnés (ex : 12,5k)" style={{ ...inputStyle, width: 130, fontSize: 11, padding: "7px 9px" }} />
+          {(() => {
+            const GROUP_LABELS: Record<string, string> = { social: "Réseaux sociaux", messaging: "Messagerie", video: "Vidéo", music: "Musique", podcast: "Podcast", creative: "Créatif & portfolio", ecommerce: "Boutique", freelance: "Freelance & pro", payment: "Paiement & pourboire", local: "Local & avis", dev: "Développeur", generic: "Autres liens" }
+            const GROUP_ORDER = ["social", "messaging", "video", "music", "podcast", "creative", "ecommerce", "freelance", "payment", "local", "dev", "generic"]
+            const filled = SOCIAL_NETWORKS.filter(n => block.content[n.key])
+            const renderNet = (n: typeof SOCIAL_NETWORKS[number]) => (
+              <div key={n.key}>
+                <label style={{ color: MUTED, fontSize: 11, display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
+                  <span style={{ fontSize: 14 }}>{n.icon}</span>
+                  <span style={{ color: n.color, fontWeight: 600 }}>{n.label}</span>
+                </label>
+                <input type="url" value={block.content[n.key]||""} onChange={e => onChange(n.key, e.target.value)}
+                  placeholder={`https://${n.key}.com/...`}
+                  style={{ ...inputStyle, borderColor: block.content[n.key] ? n.color+"50" : "rgba(201,168,76,0.2)" }}
+                  onFocus={e => e.target.style.borderColor = n.color+"80"}
+                  onBlur={e => e.target.style.borderColor = block.content[n.key] ? n.color+"50" : "rgba(201,168,76,0.2)"} />
+                {block.content[n.key] && (
+                  <div style={{ display: "flex", gap: 6, marginTop: 5 }}>
+                    <input value={block.content[n.key+"__label"]||""} onChange={e => onChange(n.key+"__label", e.target.value)} placeholder={`Libellé (${n.label})`} style={{ ...inputStyle, flex: 1, fontSize: 11, padding: "7px 9px" }} />
+                    <input value={block.content[n.key+"__count"]||""} onChange={e => onChange(n.key+"__count", e.target.value)} placeholder="Abonnés (ex : 12,5k)" style={{ ...inputStyle, width: 130, fontSize: 11, padding: "7px 9px" }} />
+                  </div>
+                )}
+              </div>
+            )
+            const grpHeader: React.CSSProperties = { color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "2px 2px 6px" }
+            return (
+              <>
+                {filled.length > 0 && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    <p style={grpHeader}>Réseaux ajoutés · {filled.length}</p>
+                    {filled.map(renderNet)}
+                  </div>
+                )}
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <p style={grpHeader}>{filled.length ? "Ajouter un autre réseau" : "Choisir un réseau"}</p>
+                  {GROUP_ORDER.map(g => {
+                    const nets = SOCIAL_NETWORKS.filter(n => (n as any).group === g && !block.content[n.key])
+                    if (!nets.length) return null
+                    const open = openNetGroup === g
+                    return (
+                      <div key={g}>
+                        <button type="button" onClick={() => setOpenNetGroup(open ? null : g)}
+                          style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, minHeight: 46, padding: "10px 12px", borderRadius: 10, border: `1px solid ${open ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.08)"}`, background: open ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.02)", color: "#F5F0E8", cursor: "pointer", textAlign: "left" }}>
+                          <span style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>{GROUP_LABELS[g] || g}</span>
+                          <span style={{ fontSize: 11, color: MUTED }}>{nets.length}</span>
+                          <ChevronDown size={16} color={MUTED} style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform .2s", flexShrink: 0 }} />
+                        </button>
+                        {open && (
+                          <div style={{ display: "flex", flexDirection: "column", gap: 10, padding: "10px 2px 6px" }}>
+                            {nets.map(renderNet)}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
-              )}
-            </div>
-          ))}
+              </>
+            )
+          })()}
         </div>
       )
     }
