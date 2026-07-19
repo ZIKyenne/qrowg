@@ -6049,7 +6049,7 @@
                             <div style={{ display: "flex", gap: 3, background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: 3, margin: "0 0 14px" }}>
                               {TABS.map(t => (
                                 <button key={t.k} onClick={() => setEditTab(t.k)}
-                                  style={{ flex: 1, padding: "7px 3px", borderRadius: 8, border: "none", cursor: "pointer", background: editTab===t.k ? G : "transparent", color: editTab===t.k ? "#080808" : MUTED, fontSize: 10, fontWeight: editTab===t.k ? 800 : 600, transition: "all .15s", whiteSpace: "nowrap" as const }}>{t.label}</button>
+                                  style={{ flex: 1, minHeight: isMobile ? 42 : undefined, padding: isMobile ? "10px 3px" : "7px 3px", borderRadius: 8, border: "none", cursor: "pointer", background: editTab===t.k ? G : "transparent", color: editTab===t.k ? "#080808" : MUTED, fontSize: isMobile ? 11.5 : 10, fontWeight: editTab===t.k ? 800 : 600, transition: "all .15s", whiteSpace: "nowrap" as const }}>{t.label}</button>
                               ))}
                             </div>
 
