@@ -4472,6 +4472,9 @@
     const [theme, setTheme] = useState<PageTheme>(PRESET_THEMES.midnight_gold)
     const [rightTab, setRightTab] = useState<"preview"|"edit"|"theme">("preview")
     const [editTab, setEditTab] = useState<"contenu"|"style"|"layout"|"avance">("contenu")
+    // Mode Simple (defaut) = un seul contexte "Contenu" (audit #10/#14 "montrer moins"). Expert = 4 onglets.
+    const [expertMode, setExpertMode] = useState<boolean>(() => { try { return localStorage.getItem("qrfolio_expert_mode") === "1" } catch { return false } })
+    useEffect(() => { try { localStorage.setItem("qrfolio_expert_mode", expertMode ? "1" : "0") } catch {} }, [expertMode])
     const [styleClipboard, setStyleClipboard] = useState<Record<string, string> | null>(null)
     const [showTemplates, setShowTemplates] = useState(false)
     const [templateGroup, setTemplateGroup] = useState<string>(PAGE_TEMPLATE_GROUPS[0])
@@ -6358,19 +6361,21 @@
                         ] as const
                         return (
                           <>
-                            {/* Onglets d'édition du bloc */}
+                            {/* Onglets d'édition du bloc — visibles seulement en mode Expert (audit #10 : un seul contexte) */}
+                            {expertMode && (
                             <div style={{ display: "flex", gap: 3, background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: 3, margin: "0 0 14px" }}>
                               {TABS.map(t => (
                                 <button key={t.k} onClick={() => setEditTab(t.k)}
                                   style={{ flex: 1, minHeight: isMobile ? 42 : undefined, padding: isMobile ? "10px 3px" : "7px 3px", borderRadius: 8, border: "none", cursor: "pointer", background: editTab===t.k ? G : "transparent", color: editTab===t.k ? "#080808" : MUTED, fontSize: isMobile ? 11.5 : 10, fontWeight: editTab===t.k ? 800 : 600, transition: "all .15s", whiteSpace: "nowrap" as const }}>{t.label}</button>
                               ))}
                             </div>
+                            )}
 
-                            {/* CONTENU */}
-                            {editTab === "contenu" && <EditPanel key={selectedBlock.id+"-c"} block={selectedBlock} onChange={set} only="content" />}
+                            {/* CONTENU — toujours affiché en mode Simple, ou sous l'onglet Contenu en Expert */}
+                            {(!expertMode || editTab === "contenu") && <EditPanel key={selectedBlock.id+"-c"} block={selectedBlock} onChange={set} only="content" />}
 
                             {/* MISE EN PAGE */}
-                            {editTab === "layout" && (
+                            {expertMode && editTab === "layout" && (
                               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                                 <EditPanel key={selectedBlock.id+"-l"} block={selectedBlock} onChange={set} only="layout" />
                                 {sel("__width", "Largeur du bloc", BLOCK_WIDTH_OPTIONS, "Normale")}
@@ -6379,7 +6384,7 @@
                             )}
 
                             {/* STYLE */}
-                            {editTab === "style" && (
+                            {expertMode && editTab === "style" && (
                               <div>
                                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 0 10px" }}>
                                   <p style={secTitle}>Modèles d&apos;apparence</p>
@@ -6452,7 +6457,7 @@
                             )}
 
                             {/* AVANCÉ */}
-                            {editTab === "avance" && (
+                            {expertMode && editTab === "avance" && (
                               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                                 <div>
                                   <p style={secTitle}>Visibilité</p>
@@ -6496,6 +6501,19 @@
                                   </div>
                                 </div>
                               </div>
+                            )}
+
+                            {/* Bascule Simple <-> Expert (audit #10/#14 : options avancees masquees par defaut) */}
+                            {!expertMode ? (
+                              <button type="button" onClick={() => { setExpertMode(true); setEditTab("style") }}
+                                style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, minHeight: 46, marginTop: 16, border: "1px dashed rgba(255,255,255,0.14)", borderRadius: 11, background: "rgba(255,255,255,0.02)", color: MUTED, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>
+                                <Settings size={15} /> Style &amp; options avancées
+                              </button>
+                            ) : (
+                              <button type="button" onClick={() => { setExpertMode(false); setEditTab("contenu") }}
+                                style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, minHeight: 42, marginTop: 16, border: "none", background: "none", color: MUTED, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                                ← Revenir au mode simple
+                              </button>
                             )}
                           </>
                         )
