@@ -1150,7 +1150,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "expertise": {
-      const skills = [[c.s1_name, c.s1_level, c.s1_icon], [c.s2_name, c.s2_level, c.s2_icon], [c.s3_name, c.s3_level, c.s3_icon], [c.s4_name, c.s4_level, c.s4_icon], [c.s5_name, c.s5_level, c.s5_icon]].filter(([n]) => n)
+      const skills = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`s${i}_name`], (c as any)[`s${i}_level`], (c as any)[`s${i}_icon`]] }).filter(([n]) => n)
       return skills.length > 0 ? (
         <div style={{ padding: "8px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
@@ -1616,7 +1616,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "trust_badge": {
-      const badges = [[c.b1_icon, c.b1_label], [c.b2_icon, c.b2_label], [c.b3_icon, c.b3_label], [c.b4_icon, c.b4_label]].filter(([, l]) => l)
+      const badges = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`b${i}_icon`], (c as any)[`b${i}_label`]] }).filter(([, l]) => l)
       return badges.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", textAlign: "center", fontFamily: FONT_B }}>{c.title}</p>}
@@ -2353,7 +2353,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "on_site_services": {
-      const svcs = [[c.s1_icon, c.s1_label], [c.s2_icon, c.s2_label], [c.s3_icon, c.s3_label], [c.s4_icon, c.s4_label], [c.s5_icon, c.s5_label], [c.s6_icon, c.s6_label], [c.s7_icon, c.s7_label], [c.s8_icon, c.s8_label]].filter(([, l]) => l)
+      const svcs = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`s${i}_icon`], (c as any)[`s${i}_label`]] }).filter(([, l]) => l)
       return svcs.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}

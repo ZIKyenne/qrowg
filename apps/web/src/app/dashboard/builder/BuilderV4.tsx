@@ -877,7 +877,7 @@
         ) : <div style={{ padding: "14px", textAlign: "center", color: muted, fontSize: 11, ...s }}>Ajoutez vos chiffres clés</div>
       }
       case "expertise": {
-        const skills = [[c.s1_name,c.s1_level,c.s1_icon],[c.s2_name,c.s2_level,c.s2_icon],[c.s3_name,c.s3_level,c.s3_icon],[c.s4_name,c.s4_level,c.s4_icon],[c.s5_name,c.s5_level,c.s5_icon]].filter(([n])=>n)
+        const skills = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`s${i}_name`],c[`s${i}_level`],c[`s${i}_icon`]]}).filter(([n])=>n)
         return skills.length>0 ? (
           <div style={{ padding: "8px 16px 12px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
@@ -1849,7 +1849,7 @@
       }
 
       case "trust_badge": {
-        const badges = [[c.b1_icon,c.b1_label],[c.b2_icon,c.b2_label],[c.b3_icon,c.b3_label],[c.b4_icon,c.b4_label]].filter(([,l])=>l)
+        const badges = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`b${i}_icon`],c[`b${i}_label`]]}).filter(([,l])=>l)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", textAlign: "center" }}>{c.title}</p>}
@@ -2130,10 +2130,7 @@
       }
 
       case "on_site_services": {
-        const svcs = [
-          [c.s1_icon,c.s1_label],[c.s2_icon,c.s2_label],[c.s3_icon,c.s3_label],[c.s4_icon,c.s4_label],
-          [c.s5_icon,c.s5_label],[c.s6_icon,c.s6_label],[c.s7_icon,c.s7_label],[c.s8_icon,c.s8_label],
-        ].filter(([,l])=>l)
+        const svcs = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`s${i}_icon`],c[`s${i}_label`]]}).filter(([,l])=>l)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
@@ -2957,7 +2954,7 @@
   const LAYOUT_FIELD_KEYS = new Set(["align", "layout", "width", "height", "columns", "cols", "disposition", "orientation", "size"])
   const isLayoutField = (key: string) => LAYOUT_FIELD_KEYS.has(key) || key.endsWith("_align")
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
-  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages"])
+  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages", "expertise", "trust_badge", "on_site_services"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
   const STYLE_COPY_KEYS = ["__grad", "__bg", "__intensity", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim", "__anim_speed", "__hover", "__loop"]
 
@@ -3257,6 +3254,24 @@
       return <RepeaterEditor block={block} onChange={onChange} prefix="lang_" noun="Langue" addLabel="Ajouter une langue"
         topFields={[{ key: "title", label: "Titre de la section", placeholder: "Langues" }]}
         fields={[{ suffix: "flag", placeholder: "Drapeau emoji (ex : 🇫🇷)" }, { suffix: "name", placeholder: "Langue" }, { suffix: "level", placeholder: "Niveau", options: ["Natif", "Courant", "Avance", "Intermediaire", "Debutant"] }]} />
+    }
+
+    if (block.type === "expertise") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="s" noun="Expertise" addLabel="Ajouter une expertise"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Mes expertises" }]}
+        fields={[{ suffix: "icon", placeholder: "Emoji (ex : 💻)" }, { suffix: "name", placeholder: "Compétence" }, { suffix: "level", placeholder: "Niveau (1 à 5)", options: ["1", "2", "3", "4", "5"] }]} />
+    }
+
+    if (block.type === "trust_badge") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="b" noun="Badge" addLabel="Ajouter un badge"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Garanties" }]}
+        fields={[{ suffix: "icon", placeholder: "Emoji (ex : ✔)" }, { suffix: "label", placeholder: "Libellé" }]} />
+    }
+
+    if (block.type === "on_site_services") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="s" noun="Service" addLabel="Ajouter un service"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Sur place" }]}
+        fields={[{ suffix: "icon", placeholder: "Emoji (ex : 📶)" }, { suffix: "label", placeholder: "Service (ex : Wi-Fi gratuit)" }]} />
     }
 
     if (block.type === "social_links") {
