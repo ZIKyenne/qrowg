@@ -9,8 +9,28 @@ import {
   vcardEscape, splitName, buildVCard, mapEmbedUrl, shareLinks, toCalStamp, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref,
   docTypeMeta, docActionLabel, announcementMeta, blockDecoration,
   hexToRgb, rgbToHsl, contrastRatio, wcagLevel, isClipShape, optionLabel, avatarBgStyle,
-  avatarShapeStyle, themeBackgroundStyle,
+  avatarShapeStyle, themeBackgroundStyle, avatarDecoStyle,
 } from "./types"
+
+describe("avatarDecoStyle (contour/ombre : clip-path vs box-shadow)", () => {
+  it("forme en découpe : lueur/ombre via filter drop-shadow, jamais boxShadow ni border", () => {
+    const r = avatarDecoStyle("hexagone", "or", "douce", "#C9A84C")
+    expect(String(r.filter)).toContain("drop-shadow")
+    expect(r.boxShadow).toBeUndefined()
+    expect(r.border).toBeUndefined()
+  })
+  it("forme standard : lueur/ombre via boxShadow + bordure visible", () => {
+    const r = avatarDecoStyle("cercle", "or", "douce", "#C9A84C")
+    expect(r.boxShadow).toBeTruthy()
+    expect(r.filter).toBeUndefined()
+    expect(String(r.border)).toContain("solid")
+  })
+  it("bordure 'aucun' : border none et aucune lueur", () => {
+    const r = avatarDecoStyle("cercle", "aucun", undefined, "#C9A84C")
+    expect(r.border).toBe("none")
+    expect(r.boxShadow).toBeUndefined()
+  })
+})
 
 describe("avatarShapeStyle (partagé éditeur ↔ public)", () => {
   it("formes standard -> borderRadius", () => {
