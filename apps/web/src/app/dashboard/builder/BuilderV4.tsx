@@ -901,7 +901,7 @@
         ) : <div style={{ padding: "14px", textAlign: "center", color: muted, fontSize: 11, ...s }}>Ajoutez vos expertises</div>
       }
       case "languages": {
-        const langs = [[c.lang_1_flag,c.lang_1_name,c.lang_1_level],[c.lang_2_flag,c.lang_2_name,c.lang_2_level],[c.lang_3_flag,c.lang_3_name,c.lang_3_level],[c.lang_4_flag,c.lang_4_name,c.lang_4_level]].filter(([,n])=>n)
+        const langs = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`lang_${i}_flag`],c[`lang_${i}_name`],c[`lang_${i}_level`]]}).filter(([,n])=>n)
         return langs.length>0 ? (
           <div style={{ padding: "8px 16px 12px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>{c.title}</p>}
@@ -2957,7 +2957,7 @@
   const LAYOUT_FIELD_KEYS = new Set(["align", "layout", "width", "height", "columns", "cols", "disposition", "orientation", "size"])
   const isLayoutField = (key: string) => LAYOUT_FIELD_KEYS.has(key) || key.endsWith("_align")
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
-  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery"])
+  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
   const STYLE_COPY_KEYS = ["__grad", "__bg", "__intensity", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim", "__anim_speed", "__hover", "__loop"]
 
@@ -2981,7 +2981,7 @@
   function RepeaterEditor({ block, onChange, prefix, noun, fields, addLabel, topFields = [], bottomFields = [] }: {
     block: Block; onChange: (key: string, val: string) => void
     prefix: string; noun: string; addLabel: string
-    fields: { suffix: string; kind?: "text" | "url" | "image" | "file"; placeholder?: string }[]
+    fields: { suffix: string; kind?: "text" | "url" | "image" | "file"; placeholder?: string; options?: string[] }[]
     topFields?: { key: string; label: string; placeholder?: string; options?: string[] }[]
     bottomFields?: { key: string; label: string; placeholder?: string; options?: string[] }[]
   }) {
@@ -3029,6 +3029,8 @@
                   ? <ImageUpload key={f.suffix} value={it[f.suffix]} onChange={url => onChange(key(i, f.suffix), url)} />
                   : f.kind === "file"
                   ? <FileUpload key={f.suffix} value={it[f.suffix]} onChange={url => onChange(key(i, f.suffix), url)} />
+                  : f.options
+                  ? <div key={f.suffix}>{f.placeholder && <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4, fontWeight: 500 }}>{f.placeholder}</label>}<Segmented value={it[f.suffix]} options={f.options} onChange={v => onChange(key(i, f.suffix), v)} /></div>
                   : <input key={f.suffix} type={f.kind === "url" ? "url" : "text"} value={it[f.suffix]} onChange={e => onChange(key(i, f.suffix), e.target.value)} placeholder={f.placeholder} style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />
                 )}
               </div>
@@ -3249,6 +3251,12 @@
       return <RepeaterEditor block={block} onChange={onChange} prefix="video" noun="Vidéo" addLabel="Ajouter une vidéo"
         topFields={[{ key: "title", label: "Titre de la section", placeholder: "Mes vidéos" }]}
         fields={[{ suffix: "url", kind: "url", placeholder: "Lien YouTube" }, { suffix: "title", placeholder: "Titre de la vidéo (optionnel)" }]} />
+    }
+
+    if (block.type === "languages") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="lang_" noun="Langue" addLabel="Ajouter une langue"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Langues" }]}
+        fields={[{ suffix: "flag", placeholder: "Drapeau emoji (ex : 🇫🇷)" }, { suffix: "name", placeholder: "Langue" }, { suffix: "level", placeholder: "Niveau", options: ["Natif", "Courant", "Avance", "Intermediaire", "Debutant"] }]} />
     }
 
     if (block.type === "social_links") {

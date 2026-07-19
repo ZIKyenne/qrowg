@@ -1174,7 +1174,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "languages": {
-      const langs = [[c.lang_1_flag, c.lang_1_name, c.lang_1_level], [c.lang_2_flag, c.lang_2_name, c.lang_2_level], [c.lang_3_flag, c.lang_3_name, c.lang_3_level], [c.lang_4_flag, c.lang_4_name, c.lang_4_level]].filter(([, n]) => n)
+      const langs = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`lang_${i}_flag`], (c as any)[`lang_${i}_name`], (c as any)[`lang_${i}_level`]] }).filter(([, n]) => n)
       return langs.length > 0 ? (
         <div style={{ padding: "8px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 9px", fontFamily: FONT_B }}>{c.title}</p>}
