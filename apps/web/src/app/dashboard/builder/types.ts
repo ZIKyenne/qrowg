@@ -3147,17 +3147,19 @@ export function blockDecoration(
 }
 
 // ── Categories de blocs ───────────────────────────────────────────────────────
+// Categories de blocs. `desc` = OBJECTIF utilisateur (pas une liste de features) pour guider
+// le choix ("Je veux…"), cf audit #8. `id` reste la cle technique (matching), ne pas la changer.
 export const BLOCK_CATEGORIES = [
-  { id: "identity", label: "Identite", icon: "👤", color: "#C9A84C", desc: "Profil, bio, presentation" },
-  { id: "actions", label: "Actions", icon: "⚡", color: "#39FF8F", desc: "Boutons, liens, CTA" },
-  { id: "social", label: "Reseaux", icon: "📲", color: "#1DA1F2", desc: "Liens reseaux sociaux" },
-  { id: "commerce", label: "Commerce", icon: "🛍️", color: "#F97316", desc: "Produits, tarifs, promo" },
-  { id: "media", label: "Medias", icon: "🎬", color: "#A78BFA", desc: "Images, videos, galeries" },
-  { id: "info", label: "Infos", icon: "📋", color: "#38BDF8", desc: "Texte, FAQ, temoignages" },
-  { id: "business", label: "Business", icon: "🏢", color: "#EC4899", desc: "Maps, horaires, contact" },
-  { id: "music", label: "Musique", icon: "🎵", color: "#1DB954", desc: "Spotify, plateformes" },
-  { id: "event", label: "Event", icon: "🎉", color: "#F472B6", desc: "Countdown, evenements" },
-  { id: "layout", label: "Mise en page", icon: "📐", color: "#A8A190", desc: "Espaceurs, separateurs" },
+  { id: "identity", label: "Identité", icon: "👤", color: "#C9A84C", desc: "Me présenter" },
+  { id: "actions", label: "Actions", icon: "⚡", color: "#39FF8F", desc: "Être contacté et passer à l'action" },
+  { id: "social", label: "Réseaux", icon: "📲", color: "#1DA1F2", desc: "Relier mes réseaux sociaux" },
+  { id: "commerce", label: "Commerce", icon: "🛍️", color: "#F97316", desc: "Vendre mes produits et services" },
+  { id: "media", label: "Médias", icon: "🎬", color: "#A78BFA", desc: "Montrer mon travail" },
+  { id: "info", label: "Infos", icon: "📋", color: "#38BDF8", desc: "Informer et rassurer" },
+  { id: "business", label: "Business", icon: "🏢", color: "#EC4899", desc: "Infos pratiques : adresse, horaires" },
+  { id: "music", label: "Musique", icon: "🎵", color: "#1DB954", desc: "Partager ma musique" },
+  { id: "event", label: "Event", icon: "🎉", color: "#F472B6", desc: "Annoncer un événement" },
+  { id: "layout", label: "Mise en page", icon: "📐", color: "#A8A190", desc: "Structurer ma page" },
 ]
 
 // ── Definitions des blocs ─────────────────────────────────────────────────────
