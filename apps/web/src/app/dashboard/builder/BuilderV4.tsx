@@ -1385,7 +1385,7 @@
       )
 
       case "advantages": {
-        const advList = [c.adv1, c.adv2, c.adv3, c.adv4, c.adv5, c.adv6].filter(Boolean)
+        const advList = Array.from({length:50},(_,k)=>c[`adv${k+1}`]).filter(Boolean)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
@@ -1642,10 +1642,7 @@
       }
 
       case "logo_wall": {
-        const logos = [
-          [c.logo1,c.logo1_name],[c.logo2,c.logo2_name],[c.logo3,c.logo3_name],[c.logo4,c.logo4_name],
-          [c.logo5,c.logo5_name],[c.logo6,c.logo6_name],[c.logo7,c.logo7_name],[c.logo8,c.logo8_name],
-        ].filter(([,n])=>n)
+        const logos = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`logo${i}`],c[`logo${i}_name`]]}).filter(([,n])=>n)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", textAlign: "center" }}>{c.title}</p>}
@@ -2954,7 +2951,7 @@
   const LAYOUT_FIELD_KEYS = new Set(["align", "layout", "width", "height", "columns", "cols", "disposition", "orientation", "size"])
   const isLayoutField = (key: string) => LAYOUT_FIELD_KEYS.has(key) || key.endsWith("_align")
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
-  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages", "expertise", "trust_badge", "on_site_services"])
+  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages", "expertise", "trust_badge", "on_site_services", "advantages", "logo_wall"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
   const STYLE_COPY_KEYS = ["__grad", "__bg", "__intensity", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim", "__anim_speed", "__hover", "__loop"]
 
@@ -2983,7 +2980,8 @@
     bottomFields?: { key: string; label: string; placeholder?: string; options?: string[] }[]
   }) {
     const c = block.content
-    const key = (i: number, s: string) => `${prefix}${i}_${s}`
+    // Cle plate : <prefix><i>_<suffix>, ou <prefix><i> si le suffixe est vide (ex : adv1, logo1).
+    const key = (i: number, s: string) => s ? `${prefix}${i}_${s}` : `${prefix}${i}`
     const item = (i: number) => Object.fromEntries(fields.map(f => [f.suffix, c[key(i, f.suffix)] || ""])) as Record<string, string>
     const writeItem = (i: number, v: Record<string, string>) => fields.forEach(f => onChange(key(i, f.suffix), v[f.suffix] || ""))
     let derived = 0
@@ -3272,6 +3270,18 @@
       return <RepeaterEditor block={block} onChange={onChange} prefix="s" noun="Service" addLabel="Ajouter un service"
         topFields={[{ key: "title", label: "Titre de la section", placeholder: "Sur place" }]}
         fields={[{ suffix: "icon", placeholder: "Emoji (ex : 📶)" }, { suffix: "label", placeholder: "Service (ex : Wi-Fi gratuit)" }]} />
+    }
+
+    if (block.type === "advantages") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="adv" noun="Avantage" addLabel="Ajouter un avantage"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Nos avantages" }]}
+        fields={[{ suffix: "", placeholder: "Avantage (ex : Livraison en 24h)" }]} />
+    }
+
+    if (block.type === "logo_wall") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="logo" noun="Logo" addLabel="Ajouter un logo"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Ils nous font confiance" }]}
+        fields={[{ suffix: "", kind: "image" }, { suffix: "name", placeholder: "Nom (affiché si pas de logo)" }]} />
     }
 
     if (block.type === "social_links") {

@@ -1581,7 +1581,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "logo_wall": {
-      const logos = [[c.logo1, c.logo1_name], [c.logo2, c.logo2_name], [c.logo3, c.logo3_name], [c.logo4, c.logo4_name], [c.logo5, c.logo5_name], [c.logo6, c.logo6_name], [c.logo7, c.logo7_name], [c.logo8, c.logo8_name]].filter(([, n]) => n)
+      const logos = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`logo${i}`], (c as any)[`logo${i}_name`]] }).filter(([, n]) => n)
       return logos.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", textAlign: "center", fontFamily: FONT_B }}>{c.title}</p>}
@@ -2467,7 +2467,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       </div>
     ) : null
     case "advantages": {
-      const advList = [c.adv1, c.adv2, c.adv3, c.adv4, c.adv5, c.adv6].filter(Boolean)
+      const advList = Array.from({ length: 50 }, (_, k) => (c as any)[`adv${k + 1}`]).filter(Boolean)
       return advList.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
