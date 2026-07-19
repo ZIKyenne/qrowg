@@ -8,7 +8,76 @@ import {
   parseHourRanges, fmtMinutes, openStatus, dayField,
   vcardEscape, splitName, buildVCard, mapEmbedUrl, shareLinks, toCalStamp, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref,
   docTypeMeta, docActionLabel, announcementMeta, blockDecoration,
+  hexToRgb, rgbToHsl, contrastRatio, wcagLevel, isClipShape, optionLabel,
 } from "./types"
+
+describe("hexToRgb", () => {
+  it("convertit les hex 6 chiffres (avec ou sans #)", () => {
+    expect(hexToRgb("#FFFFFF")).toEqual({ r: 255, g: 255, b: 255 })
+    expect(hexToRgb("000000")).toEqual({ r: 0, g: 0, b: 0 })
+    expect(hexToRgb("#C9A84C")).toEqual({ r: 201, g: 168, b: 76 })
+    expect(hexToRgb("#FF8800")).toEqual({ r: 255, g: 136, b: 0 })
+  })
+  it("renvoie null pour un hex trop court / invalide (le raccourci 3 chiffres n'est pas géré)", () => {
+    expect(hexToRgb("#FFF")).toBeNull()
+    expect(hexToRgb("xy")).toBeNull()
+    expect(hexToRgb("")).toBeNull()
+  })
+})
+
+describe("rgbToHsl", () => {
+  it("noir / blanc -> saturation 0", () => {
+    expect(rgbToHsl(255, 255, 255)).toEqual({ h: 0, s: 0, l: 100 })
+    expect(rgbToHsl(0, 0, 0)).toEqual({ h: 0, s: 0, l: 0 })
+  })
+  it("primaires -> teintes 0 / 120 / 240 à saturation pleine", () => {
+    expect(rgbToHsl(255, 0, 0)).toEqual({ h: 0, s: 100, l: 50 })
+    expect(rgbToHsl(0, 255, 0)).toEqual({ h: 120, s: 100, l: 50 })
+    expect(rgbToHsl(0, 0, 255)).toEqual({ h: 240, s: 100, l: 50 })
+  })
+})
+
+describe("contrastRatio + wcagLevel", () => {
+  it("noir vs blanc = 21 (contraste maximal)", () => {
+    expect(contrastRatio("#000000", "#FFFFFF")).toBeCloseTo(21, 5)
+  })
+  it("deux couleurs identiques = 1", () => {
+    expect(contrastRatio("#C9A84C", "#C9A84C")).toBeCloseTo(1, 5)
+  })
+  it("est symétrique", () => {
+    expect(contrastRatio("#000000", "#FFFFFF")).toBeCloseTo(contrastRatio("#FFFFFF", "#000000"), 5)
+  })
+  it("wcagLevel respecte les seuils 7 (AAA) et 4.5 (AA)", () => {
+    expect(wcagLevel(21)).toBe("AAA")
+    expect(wcagLevel(7)).toBe("AAA")
+    expect(wcagLevel(6.9)).toBe("AA")
+    expect(wcagLevel(4.5)).toBe("AA")
+    expect(wcagLevel(4.49)).toBe("fail")
+    expect(wcagLevel(1)).toBe("fail")
+  })
+  it("noir/blanc atteint le niveau AAA", () => {
+    expect(wcagLevel(contrastRatio("#000000", "#FFFFFF"))).toBe("AAA")
+  })
+})
+
+describe("isClipShape", () => {
+  it("hexagone et diamant sont des formes en découpe (clip-path)", () => {
+    expect(isClipShape("hexagone")).toBe(true)
+    expect(isClipShape("diamant")).toBe(true)
+  })
+  it("cercle / carré / undefined ne le sont pas", () => {
+    expect(isClipShape("cercle")).toBe(false)
+    expect(isClipShape("carre")).toBe(false)
+    expect(isClipShape(undefined)).toBe(false)
+  })
+})
+
+describe("optionLabel", () => {
+  it("renvoie la valeur inchangée si elle n'est pas mappée", () => {
+    expect(optionLabel("valeur-inconnue-xyz")).toBe("valeur-inconnue-xyz")
+    expect(optionLabel("")).toBe("")
+  })
+})
 
 describe("blockDecoration", () => {
   const theme = { primary: "#C9A84C", accent: "#39FF8F" }
