@@ -3440,7 +3440,7 @@
               const isTestable = field.type === "url" && valid && /^https?:\/\//i.test(val)
               return (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: 4 }}>
-                  <span style={{ color: valid ? "#39FF8F" : "#F59E0B", fontSize: 9, fontWeight: 600 }}>{valid ? "✓ Format valide" : `⚠ ${msg}`}</span>
+                  <span style={{ color: valid ? "#39FF8F" : "#F59E0B", fontSize: 10.5, fontWeight: 600 }}>{valid ? "✓ Format valide" : `⚠ ${msg}`}</span>
                   {isTestable && <a href={val} target="_blank" rel="noopener noreferrer" style={{ color: G, fontSize: 9, fontWeight: 700, textDecoration: "none" }}>Tester ↗</a>}
                 </div>
               )
@@ -3452,8 +3452,8 @@
               const [txt, col] = len < 40 ? ["Un peu court", "#F59E0B"] : len <= 200 ? ["Bonne longueur ✓", "#39FF8F"] : ["Un peu long pour mobile", "#F59E0B"]
               return (
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
-                  <span style={{ color: col, fontSize: 9, fontWeight: 600 }}>{txt}</span>
-                  <span style={{ color: MUTED, fontSize: 9 }}>{len} car.</span>
+                  <span style={{ color: col, fontSize: 10.5, fontWeight: 600 }}>{txt}</span>
+                  <span style={{ color: MUTED, fontSize: 10.5 }}>{len} car.</span>
                 </div>
               )
             })()}
@@ -3466,8 +3466,8 @@
               const [txt, col] = len < short ? ["Un peu court", "#F59E0B"] : len <= max * 0.9 ? ["Excellent ✓", "#39FF8F"] : len <= max ? ["Bonne longueur ✓", "#39FF8F"] : ["Trop long", "#FF6B6B"]
               return (
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
-                  <span style={{ color: col, fontSize: 9, fontWeight: 600 }}>{txt}</span>
-                  <span style={{ color: len > max ? "#FF6B6B" : MUTED, fontSize: 9 }}>{len}/{max}</span>
+                  <span style={{ color: col, fontSize: 10.5, fontWeight: 600 }}>{txt}</span>
+                  <span style={{ color: len > max ? "#FF6B6B" : MUTED, fontSize: 10.5 }}>{len}/{max}</span>
                 </div>
               )
             })()}
