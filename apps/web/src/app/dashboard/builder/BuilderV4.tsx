@@ -3007,7 +3007,7 @@
   const LAYOUT_FIELD_KEYS = new Set(["align", "layout", "width", "height", "columns", "cols", "disposition", "orientation", "size"])
   const isLayoutField = (key: string) => LAYOUT_FIELD_KEYS.has(key) || key.endsWith("_align")
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
-  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section"])
+  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
   const STYLE_COPY_KEYS = ["__grad", "__bg", "__intensity", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim", "__anim_speed", "__hover", "__loop"]
 
@@ -3082,6 +3082,69 @@
     )
   }
 
+  // Editeur Catalogue produits : repeteur dynamique (image + nom + prix + desc + lien) au-dela des 3
+  // produits fixes. Meme recette que MenuEditor : cles plates p{i}_* conservees (aucune migration),
+  // renderer public product_catalog lit desormais p1..pN dynamiquement.
+  function ProductEditor({ block, onChange }: { block: Block; onChange: (key: string, val: string) => void }) {
+    const c = block.content
+    const FS = ["img", "name", "price", "desc", "url"] as const
+    const key = (i: number, f: string) => `p${i}_${f}`
+    const item = (i: number) => ({ img: c[key(i,"img")]||"", name: c[key(i,"name")]||"", price: c[key(i,"price")]||"", desc: c[key(i,"desc")]||"", url: c[key(i,"url")]||"" })
+    const writeItem = (i: number, v: Record<string,string>) => FS.forEach(f => onChange(key(i,f), v[f] || ""))
+    let derived = 0
+    for (let i = 1; i <= 50; i++) { if (FS.some(f => c[key(i,f)])) derived = i }
+    const [rows, setRows] = useState(() => Math.max(1, derived))
+    const count = Math.max(rows, derived)
+    const inputStyle: React.CSSProperties = { width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: "#F5F0E8", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
+    const foc = (on: boolean) => (e: React.FocusEvent<HTMLInputElement>) => { e.target.style.borderColor = on ? "rgba(201,168,76,0.5)" : "rgba(201,168,76,0.2)" }
+    const iconBtn = (disabled: boolean): React.CSSProperties => ({ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", color: disabled ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: disabled ? "default" : "pointer", flexShrink: 0 })
+    const deleteItem = (idx: number) => {
+      for (let j = idx; j < count; j++) writeItem(j, item(j + 1))
+      writeItem(count, { img: "", name: "", price: "", desc: "", url: "" })
+      setRows(Math.max(1, count - 1))
+    }
+    const moveItem = (idx: number, dir: -1 | 1) => { const a = item(idx), b = item(idx + dir); writeItem(idx, b); writeItem(idx + dir, a) }
+    const lbl: React.CSSProperties = { color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div>
+          <label style={lbl}>Titre de la section</label>
+          <input value={c.title || ""} onChange={e => onChange("title", e.target.value)} placeholder="Nos produits" style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {Array.from({ length: count }, (_, k) => k + 1).map(i => {
+            const it = item(i)
+            return (
+              <div key={i} style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: 11, background: "rgba(255,255,255,0.02)", display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ flex: 1, color: MUTED, fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Produit {i}</span>
+                  <button type="button" onClick={() => moveItem(i, -1)} disabled={i === 1} aria-label="Monter" style={iconBtn(i === 1)}><ChevronUp size={16} /></button>
+                  <button type="button" onClick={() => moveItem(i, 1)} disabled={i === count} aria-label="Descendre" style={iconBtn(i === count)}><ChevronDown size={16} /></button>
+                  <button type="button" onClick={() => deleteItem(i)} aria-label="Supprimer" style={{ ...iconBtn(false), color: "#FF6B6B" }}><Trash2 size={15} /></button>
+                </div>
+                <ImageUpload value={it.img} onChange={url => onChange(key(i,"img"), url)} />
+                <input value={it.name} onChange={e => onChange(key(i,"name"), e.target.value)} placeholder="Nom du produit" style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />
+                <div style={{ display: "flex", gap: 7 }}>
+                  <input value={it.price} onChange={e => onChange(key(i,"price"), e.target.value)} placeholder="29€" style={{ ...inputStyle, width: 88, flexShrink: 0 }} onFocus={foc(true)} onBlur={foc(false)} />
+                  <input value={it.desc} onChange={e => onChange(key(i,"desc"), e.target.value)} placeholder="Description courte" style={{ ...inputStyle, flex: 1 }} onFocus={foc(true)} onBlur={foc(false)} />
+                </div>
+                <input type="url" value={it.url} onChange={e => onChange(key(i,"url"), e.target.value)} placeholder="https://… (lien d'achat)" style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />
+              </div>
+            )
+          })}
+        </div>
+        <button type="button" onClick={() => setRows(count + 1)}
+          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, minHeight: 46, border: "2px dashed rgba(201,168,76,0.3)", borderRadius: 11, background: "rgba(201,168,76,0.04)", color: G, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+          <Plus size={16} /> Ajouter un produit
+        </button>
+        <div>
+          <label style={lbl}>Texte du bouton</label>
+          <input value={c.cta_label || ""} onChange={e => onChange("cta_label", e.target.value)} placeholder="Acheter" style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />
+        </div>
+      </div>
+    )
+  }
+
   function EditPanel({ block, onChange, only }: { block: Block; onChange: (key: string, val: string) => void; only?: "content" | "layout" }) {
     // Accordeon de l'editeur social_links : un groupe de reseaux ouvert a la fois (evite 78 champs empiles).
     const [openNetGroup, setOpenNetGroup] = useState<string | null>(null)
@@ -3111,6 +3174,10 @@
 
     if (block.type === "menu_section") {
       return <MenuEditor block={block} onChange={onChange} />
+    }
+
+    if (block.type === "product_catalog") {
+      return <ProductEditor block={block} onChange={onChange} />
     }
 
     if (block.type === "social_links") {

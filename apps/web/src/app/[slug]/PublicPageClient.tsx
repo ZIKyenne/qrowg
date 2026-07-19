@@ -1316,7 +1316,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
     }
 
     case "product_catalog": {
-      const products = [[c.p1_img, c.p1_name, c.p1_price, c.p1_desc, c.p1_url], [c.p2_img, c.p2_name, c.p2_price, c.p2_desc, c.p2_url], [c.p3_img, c.p3_name, c.p3_price, c.p3_desc, c.p3_url]].filter(([, n]) => n)
+      const products = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`p${i}_img`], (c as any)[`p${i}_name`], (c as any)[`p${i}_price`], (c as any)[`p${i}_desc`], (c as any)[`p${i}_url`]] }).filter(([, n]) => n)
       return products.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
