@@ -1160,11 +1160,7 @@
       }
 
       case "packs": {
-        const packs = [
-          [c.pack1_icon, c.pack1_name, c.pack1_price, c.pack1_content, c.pack1_url],
-          [c.pack2_icon, c.pack2_name, c.pack2_price, c.pack2_content, c.pack2_url],
-          [c.pack3_icon, c.pack3_name, c.pack3_price, c.pack3_content, c.pack3_url],
-        ].filter(([,n])=>n)
+        const packs = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`pack${i}_icon`],c[`pack${i}_name`],c[`pack${i}_price`],c[`pack${i}_content`],c[`pack${i}_url`]]}).filter(([,n])=>n)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
@@ -1315,10 +1311,7 @@
       }
 
       case "brands": {
-        const brandList = [
-          [c.brand1_icon, c.brand1_name],[c.brand2_icon, c.brand2_name],[c.brand3_icon, c.brand3_name],
-          [c.brand4_icon, c.brand4_name],[c.brand5_icon, c.brand5_name],[c.brand6_icon, c.brand6_name],
-        ].filter(([,n])=>n)
+        const brandList = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`brand${i}_icon`],c[`brand${i}_name`]]}).filter(([,n])=>n)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
@@ -1355,13 +1348,7 @@
       )
 
       case "services_pricing": {
-        const svcs = [
-          [c.s1_name, c.s1_price, c.s1_duration, c.s1_desc],
-          [c.s2_name, c.s2_price, c.s2_duration, c.s2_desc],
-          [c.s3_name, c.s3_price, c.s3_duration, c.s3_desc],
-          [c.s4_name, c.s4_price, c.s4_duration, c.s4_desc],
-          [c.s5_name, c.s5_price, c.s5_duration, c.s5_desc],
-        ].filter(([n])=>n)
+        const svcs = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`s${i}_name`],c[`s${i}_price`],c[`s${i}_duration`],c[`s${i}_desc`]]}).filter(([n])=>n)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
@@ -1781,7 +1768,7 @@
       }
 
       case "values": {
-        const vals = [[c.v1_icon,c.v1_label,c.v1_desc],[c.v2_icon,c.v2_label,c.v2_desc],[c.v3_icon,c.v3_label,c.v3_desc],[c.v4_icon,c.v4_label,c.v4_desc]].filter(([,l])=>l)
+        const vals = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`v${i}_icon`],c[`v${i}_label`],c[`v${i}_desc`]]}).filter(([,l])=>l)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
             {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
@@ -2970,7 +2957,7 @@
   const LAYOUT_FIELD_KEYS = new Set(["align", "layout", "width", "height", "columns", "cols", "disposition", "orientation", "size"])
   const isLayoutField = (key: string) => LAYOUT_FIELD_KEYS.has(key) || key.endsWith("_align")
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
-  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents"])
+  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
   const STYLE_COPY_KEYS = ["__grad", "__bg", "__intensity", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim", "__anim_speed", "__hover", "__loop"]
 
@@ -3226,6 +3213,30 @@
       return <RepeaterEditor block={block} onChange={onChange} prefix="d" noun="Document" addLabel="Ajouter un document"
         topFields={[{ key: "title", label: "Titre de la section", placeholder: "Mes documents" }]}
         fields={[{ suffix: "title", placeholder: "Nom du document" }, { suffix: "desc", placeholder: "Description (optionnel)" }, { suffix: "url", kind: "file" }, { suffix: "type", placeholder: "Type (PDF, Contrat…)" }, { suffix: "meta", placeholder: "Info (ex : 2 Mo)" }]} />
+    }
+
+    if (block.type === "packs") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="pack" noun="Formule" addLabel="Ajouter une formule"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Nos formules" }]}
+        fields={[{ suffix: "icon", placeholder: "Emoji (ex : 📦)" }, { suffix: "name", placeholder: "Nom de la formule" }, { suffix: "price", placeholder: "Prix" }, { suffix: "content", placeholder: "Ce qui est inclus" }, { suffix: "url", kind: "url", placeholder: "Lien (optionnel)" }]} />
+    }
+
+    if (block.type === "brands") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="brand" noun="Marque" addLabel="Ajouter une marque"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Nos marques" }]}
+        fields={[{ suffix: "icon", placeholder: "Emoji / initiale (si pas de logo)" }, { suffix: "name", placeholder: "Nom de la marque" }]} />
+    }
+
+    if (block.type === "services_pricing") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="s" noun="Tarif" addLabel="Ajouter un tarif"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Nos tarifs" }]}
+        fields={[{ suffix: "name", placeholder: "Prestation" }, { suffix: "price", placeholder: "Prix" }, { suffix: "duration", placeholder: "Durée (optionnel)" }, { suffix: "desc", placeholder: "Description (optionnel)" }]} />
+    }
+
+    if (block.type === "values") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="v" noun="Valeur" addLabel="Ajouter une valeur"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Nos valeurs" }]}
+        fields={[{ suffix: "icon", placeholder: "Emoji (ex : ⭐)" }, { suffix: "label", placeholder: "Titre" }, { suffix: "desc", placeholder: "Description (optionnel)" }]} />
     }
 
     if (block.type === "social_links") {

@@ -1385,7 +1385,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "packs": {
-      const packs = [[c.pack1_icon, c.pack1_name, c.pack1_price, c.pack1_content, c.pack1_url], [c.pack2_icon, c.pack2_name, c.pack2_price, c.pack2_content, c.pack2_url], [c.pack3_icon, c.pack3_name, c.pack3_price, c.pack3_content, c.pack3_url]].filter(([, n]) => n)
+      const packs = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`pack${i}_icon`], (c as any)[`pack${i}_name`], (c as any)[`pack${i}_price`], (c as any)[`pack${i}_content`], (c as any)[`pack${i}_url`]] }).filter(([, n]) => n)
       return packs.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
@@ -1732,7 +1732,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "values": {
-      const vals = [[c.v1_icon, c.v1_label, c.v1_desc], [c.v2_icon, c.v2_label, c.v2_desc], [c.v3_icon, c.v3_label, c.v3_desc], [c.v4_icon, c.v4_label, c.v4_desc]].filter(([, l]) => l)
+      const vals = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`v${i}_icon`], (c as any)[`v${i}_label`], (c as any)[`v${i}_desc`]] }).filter(([, l]) => l)
       return vals.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
@@ -2406,7 +2406,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       </div>
     ) : null
     case "brands": {
-      const brandList = [[c.brand1_icon, c.brand1_name], [c.brand2_icon, c.brand2_name], [c.brand3_icon, c.brand3_name], [c.brand4_icon, c.brand4_name], [c.brand5_icon, c.brand5_name], [c.brand6_icon, c.brand6_name]].filter(([, n]) => n)
+      const brandList = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`brand${i}_icon`], (c as any)[`brand${i}_name`]] }).filter(([, n]) => n)
       return brandList.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
@@ -2441,7 +2441,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       </div>
     ) : null
     case "services_pricing": {
-      const svcs = [[c.s1_name, c.s1_price, c.s1_duration, c.s1_desc], [c.s2_name, c.s2_price, c.s2_duration, c.s2_desc], [c.s3_name, c.s3_price, c.s3_duration, c.s3_desc], [c.s4_name, c.s4_price, c.s4_duration, c.s4_desc], [c.s5_name, c.s5_price, c.s5_duration, c.s5_desc]].filter(([n]) => n)
+      const svcs = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`s${i}_name`], (c as any)[`s${i}_price`], (c as any)[`s${i}_duration`], (c as any)[`s${i}_desc`]] }).filter(([n]) => n)
       return svcs.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
