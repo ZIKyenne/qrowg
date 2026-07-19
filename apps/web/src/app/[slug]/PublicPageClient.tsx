@@ -1459,7 +1459,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "google_reviews_block": {
-      const reviews = [[c.r1_name, c.r1_text, c.r1_stars], [c.r2_name, c.r2_text, c.r2_stars], [c.r3_name, c.r3_text, c.r3_stars]].filter(([n]) => n)
+      const reviews = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`r${i}_name`], (c as any)[`r${i}_text`], (c as any)[`r${i}_stars`]] }).filter(([n]) => n)
       return (reviews.length > 0 || c.avg_rating) ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {(c.avg_rating || c.title) && (
@@ -1749,7 +1749,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "stats_block": {
-      const stats = [[c.s1_icon, c.s1_value, c.s1_label], [c.s2_icon, c.s2_value, c.s2_label], [c.s3_icon, c.s3_value, c.s3_label], [c.s4_icon, c.s4_value, c.s4_label]].filter(([, v]) => v)
+      const stats = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`s${i}_icon`], (c as any)[`s${i}_value`], (c as any)[`s${i}_label`]] }).filter(([, v]) => v)
       return stats.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           <div style={{ display: "grid", gridTemplateColumns: stats.length <= 2 ? "1fr 1fr" : stats.length === 3 ? "1fr 1fr 1fr" : "1fr 1fr", gap: 9 }}>
@@ -2068,7 +2068,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       </div>
     ) : null
     case "event_guests": {
-      const guests = [[c.g1_photo, c.g1_name, c.g1_role, c.g1_desc], [c.g2_photo, c.g2_name, c.g2_role, c.g2_desc], [c.g3_photo, c.g3_name, c.g3_role, c.g3_desc], [c.g4_photo, c.g4_name, c.g4_role, c.g4_desc]].filter(([, n]) => n)
+      const guests = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`g${i}_photo`], (c as any)[`g${i}_name`], (c as any)[`g${i}_role`], (c as any)[`g${i}_desc`]] }).filter(([, n]) => n)
       return guests.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
@@ -2279,7 +2279,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "multi_contact": {
-      const contacts = [[c.c1_photo, c.c1_name, c.c1_role, c.c1_phone, c.c1_email], [c.c2_photo, c.c2_name, c.c2_role, c.c2_phone, c.c2_email], [c.c3_photo, c.c3_name, c.c3_role, c.c3_phone, c.c3_email]].filter(([, n]) => n)
+      const contacts = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`c${i}_photo`], (c as any)[`c${i}_name`], (c as any)[`c${i}_role`], (c as any)[`c${i}_phone`], (c as any)[`c${i}_email`]] }).filter(([, n]) => n)
       const accent = theme.accent || "#39FF8F"
       return contacts.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
@@ -2336,7 +2336,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "business_certifications": {
-      const certs = [[c.c1_icon, c.c1_name, c.c1_org, c.c1_year], [c.c2_icon, c.c2_name, c.c2_org, c.c2_year], [c.c3_icon, c.c3_name, c.c3_org, c.c3_year], [c.c4_icon, c.c4_name, c.c4_org, c.c4_year]].filter(([, n]) => n)
+      const certs = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`c${i}_icon`], (c as any)[`c${i}_name`], (c as any)[`c${i}_org`], (c as any)[`c${i}_year`]] }).filter(([, n]) => n)
       return certs.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
@@ -2478,7 +2478,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "reassurance": {
-      const guarantees = [[c.g1_icon, c.g1_label, c.g1_desc], [c.g2_icon, c.g2_label, c.g2_desc], [c.g3_icon, c.g3_label, c.g3_desc], [c.g4_icon, c.g4_label, c.g4_desc]].filter(([, l]) => l)
+      const guarantees = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`g${i}_icon`], (c as any)[`g${i}_label`], (c as any)[`g${i}_desc`]] }).filter(([, l]) => l)
       return guarantees.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
@@ -2549,7 +2549,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
     case "announcement": return <AnnouncementPublic c={c} theme={theme} pageId={pageId} blockId={block.id} />
 
     case "info_table": {
-      const rows = [[c.r1_label, c.r1_value], [c.r2_label, c.r2_value], [c.r3_label, c.r3_value], [c.r4_label, c.r4_value], [c.r5_label, c.r5_value], [c.r6_label, c.r6_value]].filter(([l]) => l)
+      const rows = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`r${i}_label`], (c as any)[`r${i}_value`]] }).filter(([l]) => l)
       return rows.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
@@ -2687,7 +2687,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       ) : null
     }
     case "concerts": {
-      const shows = [[c.c1_date, c.c1_city, c.c1_venue, c.c1_url], [c.c2_date, c.c2_city, c.c2_venue, c.c2_url], [c.c3_date, c.c3_city, c.c3_venue, c.c3_url], [c.c4_date, c.c4_city, c.c4_venue, c.c4_url]].filter(([, city]) => city)
+      const shows = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`c${i}_date`], (c as any)[`c${i}_city`], (c as any)[`c${i}_venue`], (c as any)[`c${i}_url`]] }).filter(([, city]) => city)
       return shows.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}

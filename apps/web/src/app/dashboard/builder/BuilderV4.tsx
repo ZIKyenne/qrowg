@@ -3007,7 +3007,7 @@
   const LAYOUT_FIELD_KEYS = new Set(["align", "layout", "width", "height", "columns", "cols", "disposition", "orientation", "size"])
   const isLayoutField = (key: string) => LAYOUT_FIELD_KEYS.has(key) || key.endsWith("_align")
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
-  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team"])
+  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
   const STYLE_COPY_KEYS = ["__grad", "__bg", "__intensity", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim", "__anim_speed", "__hover", "__loop"]
 
@@ -3257,6 +3257,53 @@
       return <RepeaterEditor block={block} onChange={onChange} prefix="m" noun="Membre" addLabel="Ajouter un membre"
         topFields={[{ key: "title", label: "Titre de la section", placeholder: "Notre équipe" }, { key: "layout", label: "Disposition", options: ["Liste", "Grille"] }]}
         fields={[{ suffix: "photo", kind: "image" }, { suffix: "name", placeholder: "Nom" }, { suffix: "role", placeholder: "Rôle / poste" }, { suffix: "bio", placeholder: "Bio courte" }, { suffix: "phone", placeholder: "Téléphone (optionnel)" }, { suffix: "email", placeholder: "Email (optionnel)" }, { suffix: "linkedin", placeholder: "LinkedIn URL (optionnel)" }]} />
+    }
+
+    if (block.type === "google_reviews_block") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="r" noun="Avis" addLabel="Ajouter un avis"
+        topFields={[{ key: "title", label: "Titre", placeholder: "Avis clients" }, { key: "avg_rating", label: "Note moyenne", placeholder: "4.8" }, { key: "total_reviews", label: "Nombre d'avis affiché", placeholder: "127" }]}
+        bottomFields={[{ key: "google_url", label: "Lien « Voir sur Google »", placeholder: "https://…" }]}
+        fields={[{ suffix: "name", placeholder: "Nom du client" }, { suffix: "text", placeholder: "Son avis" }, { suffix: "stars", placeholder: "Note sur 5 (ex : 5)" }]} />
+    }
+
+    if (block.type === "stats_block") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="s" noun="Statistique" addLabel="Ajouter une statistique"
+        fields={[{ suffix: "icon", placeholder: "Emoji (ex : 🚀)" }, { suffix: "value", placeholder: "Valeur (ex : 10k+)" }, { suffix: "label", placeholder: "Libellé (ex : clients)" }]} />
+    }
+
+    if (block.type === "event_guests") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="g" noun="Invité" addLabel="Ajouter un invité"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Nos invités" }]}
+        fields={[{ suffix: "photo", kind: "image" }, { suffix: "name", placeholder: "Nom" }, { suffix: "role", placeholder: "Rôle / titre (optionnel)" }, { suffix: "desc", placeholder: "Description (optionnel)" }]} />
+    }
+
+    if (block.type === "multi_contact") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="c" noun="Contact" addLabel="Ajouter un contact"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Nous contacter" }]}
+        fields={[{ suffix: "photo", kind: "image" }, { suffix: "name", placeholder: "Nom" }, { suffix: "role", placeholder: "Rôle / poste (optionnel)" }, { suffix: "phone", placeholder: "Téléphone (optionnel)" }, { suffix: "email", placeholder: "Email (optionnel)" }]} />
+    }
+
+    if (block.type === "business_certifications") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="c" noun="Certification" addLabel="Ajouter une certification"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Nos certifications" }]}
+        fields={[{ suffix: "icon", placeholder: "Emoji (ex : 🏅)" }, { suffix: "name", placeholder: "Nom de la certification" }, { suffix: "org", placeholder: "Organisme (optionnel)" }, { suffix: "year", placeholder: "Année (optionnel)" }]} />
+    }
+
+    if (block.type === "reassurance") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="g" noun="Garantie" addLabel="Ajouter une garantie"
+        fields={[{ suffix: "icon", placeholder: "Emoji (ex : ✅)" }, { suffix: "label", placeholder: "Titre (ex : Livraison offerte)" }, { suffix: "desc", placeholder: "Détail (optionnel)" }]} />
+    }
+
+    if (block.type === "info_table") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="r" noun="Ligne" addLabel="Ajouter une ligne"
+        topFields={[{ key: "title", label: "Titre du tableau", placeholder: "Informations" }]}
+        fields={[{ suffix: "label", placeholder: "Intitulé (ex : Horaires)" }, { suffix: "value", placeholder: "Valeur (ex : 9h – 18h)" }]} />
+    }
+
+    if (block.type === "concerts") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="c" noun="Date" addLabel="Ajouter une date"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Prochaines dates" }]}
+        fields={[{ suffix: "date", placeholder: "Date (ex : 12 JUIN)" }, { suffix: "city", placeholder: "Ville" }, { suffix: "venue", placeholder: "Salle / lieu (optionnel)" }, { suffix: "url", kind: "url", placeholder: "Lien billetterie (optionnel)" }]} />
     }
 
     if (block.type === "social_links") {
