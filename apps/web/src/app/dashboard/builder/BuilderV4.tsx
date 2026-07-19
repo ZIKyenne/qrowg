@@ -3007,7 +3007,7 @@
   const LAYOUT_FIELD_KEYS = new Set(["align", "layout", "width", "height", "columns", "cols", "disposition", "orientation", "size"])
   const isLayoutField = (key: string) => LAYOUT_FIELD_KEYS.has(key) || key.endsWith("_align")
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
-  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list"])
+  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
   const STYLE_COPY_KEYS = ["__grad", "__bg", "__intensity", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim", "__anim_speed", "__hover", "__loop"]
 
@@ -3152,8 +3152,8 @@
     block: Block; onChange: (key: string, val: string) => void
     prefix: string; noun: string; addLabel: string
     fields: { suffix: string; kind?: "text" | "url" | "image"; placeholder?: string }[]
-    topFields?: { key: string; label: string; placeholder?: string }[]
-    bottomFields?: { key: string; label: string; placeholder?: string }[]
+    topFields?: { key: string; label: string; placeholder?: string; options?: string[] }[]
+    bottomFields?: { key: string; label: string; placeholder?: string; options?: string[] }[]
   }) {
     const c = block.content
     const key = (i: number, s: string) => `${prefix}${i}_${s}`
@@ -3173,14 +3173,17 @@
       setRows(Math.max(1, count - 1))
     }
     const moveItem = (idx: number, dir: -1 | 1) => { const a = item(idx), b = item(idx + dir); writeItem(idx, b); writeItem(idx + dir, a) }
+    const renderLone = (t: { key: string; label: string; placeholder?: string; options?: string[] }) => (
+      <div key={t.key}>
+        <label style={lbl}>{t.label}</label>
+        {t.options
+          ? <Segmented value={c[t.key] || t.options[0]} options={t.options} onChange={v => onChange(t.key, v)} />
+          : <input value={c[t.key] || ""} onChange={e => onChange(t.key, e.target.value)} placeholder={t.placeholder} style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />}
+      </div>
+    )
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {topFields.map(t => (
-          <div key={t.key}>
-            <label style={lbl}>{t.label}</label>
-            <input value={c[t.key] || ""} onChange={e => onChange(t.key, e.target.value)} placeholder={t.placeholder} style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />
-          </div>
-        ))}
+        {topFields.map(renderLone)}
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {Array.from({ length: count }, (_, k) => k + 1).map(i => {
             const it = item(i)
@@ -3204,12 +3207,7 @@
           style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, minHeight: 46, border: "2px dashed rgba(201,168,76,0.3)", borderRadius: 11, background: "rgba(201,168,76,0.04)", color: G, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
           <Plus size={16} /> {addLabel}
         </button>
-        {bottomFields.map(t => (
-          <div key={t.key}>
-            <label style={lbl}>{t.label}</label>
-            <input value={c[t.key] || ""} onChange={e => onChange(t.key, e.target.value)} placeholder={t.placeholder} style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />
-          </div>
-        ))}
+        {bottomFields.map(renderLone)}
       </div>
     )
   }
@@ -3253,6 +3251,12 @@
       return <RepeaterEditor block={block} onChange={onChange} prefix="s" noun="Service" addLabel="Ajouter un service"
         topFields={[{ key: "title", label: "Titre de la section", placeholder: "Mes services" }]}
         fields={[{ suffix: "icon", placeholder: "Emoji (ex : 💻)" }, { suffix: "name", placeholder: "Nom du service" }, { suffix: "desc", placeholder: "Description courte" }]} />
+    }
+
+    if (block.type === "team") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="m" noun="Membre" addLabel="Ajouter un membre"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Notre équipe" }, { key: "layout", label: "Disposition", options: ["Liste", "Grille"] }]}
+        fields={[{ suffix: "photo", kind: "image" }, { suffix: "name", placeholder: "Nom" }, { suffix: "role", placeholder: "Rôle / poste" }, { suffix: "bio", placeholder: "Bio courte" }, { suffix: "phone", placeholder: "Téléphone (optionnel)" }, { suffix: "email", placeholder: "Email (optionnel)" }, { suffix: "linkedin", placeholder: "LinkedIn URL (optionnel)" }]} />
     }
 
     if (block.type === "social_links") {

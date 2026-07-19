@@ -1513,7 +1513,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
     }
     case "team": {
       const accent = theme.accent || "#39FF8F"
-      const members = [1,2,3,4]
+      const members = Array.from({ length: 50 }, (_, k) => k + 1)
         .map(i => ({ photo: c[`m${i}_photo`], name: c[`m${i}_name`], role: c[`m${i}_role`], bio: c[`m${i}_bio`], phone: (c[`m${i}_phone`]||"").trim(), email: (c[`m${i}_email`]||"").trim(), linkedin: (c[`m${i}_linkedin`]||"").trim() }))
         .filter(m => m.name)
       if (members.length === 0) return null
