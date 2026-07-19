@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { Upload, X, Image as ImageIcon, FolderOpen, Trash2, Plus } from "lucide-react"
+import { Upload, X, Image as ImageIcon, FolderOpen, Trash2, Plus, Search } from "lucide-react"
 import { useImageUpload } from "./useImageUpload"
 
 type Props = {
@@ -21,6 +21,7 @@ export default function ImageUpload({ value, onChange, label, hint }: Props) {
   const [libAssets, setLibAssets] = useState<{ name: string; url: string }[] | null>(null)
   const [libBusy, setLibBusy] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false) // #05 : bottom sheet de choix de source
+  const [libQuery, setLibQuery] = useState("") // #07 : recherche dans la bibliotheque
 
   async function openLibrary() {
     setLibOpen(true)
@@ -151,7 +152,15 @@ export default function ImageUpload({ value, onChange, label, hint }: Props) {
               {libBusy && <div style={{ width: 15, height: 15, border: "2px solid rgba(201,168,76,0.25)", borderTopColor: G, borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />}
               <button onClick={() => setLibOpen(false)} aria-label="Fermer" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", width: 28, height: 28 }}><X size={14} /></button>
             </div>
-            <div style={{ padding: 14, overflowY: "auto" }}>
+            {/* Recherche (#07) — visible des qu'il y a des images */}
+            {libAssets && libAssets.length > 0 && (
+              <div style={{ padding: "0 14px 10px", position: "relative" }}>
+                <Search size={14} color={MUTED} style={{ position: "absolute", left: 25, top: "50%", transform: "translateY(-50%)" }} />
+                <input value={libQuery} onChange={e => setLibQuery(e.target.value)} placeholder="Rechercher une image…"
+                  style={{ width: "100%", height: 42, boxSizing: "border-box", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "0 12px 0 34px", color: "#F5F0E8", fontSize: 14, outline: "none" }} />
+              </div>
+            )}
+            <div style={{ padding: 14, paddingTop: 0, overflowY: "auto" }}>
               {libAssets === null
                 ? <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(96px, 1fr))", gap: 8 }}>
                     {/* Skeletons realistes immediatement (au lieu d'un texte "Chargement") — #06 */}
@@ -161,11 +170,11 @@ export default function ImageUpload({ value, onChange, label, hint }: Props) {
                   </div>
                 : <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(96px, 1fr))", gap: 8 }}>
                     {/* Tuile d'ajout : upload direct dans la bibliothèque */}
-                    <button onClick={() => libInputRef.current?.click()} title="Ajouter une image"
+                    {!libQuery && <button onClick={() => libInputRef.current?.click()} title="Ajouter une image"
                       style={{ aspectRatio: "1", border: "2px dashed rgba(201,168,76,0.3)", borderRadius: 9, background: "rgba(201,168,76,0.04)", color: G, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, fontSize: 10, fontWeight: 600 }}>
                       <Plus size={18} /> Ajouter
-                    </button>
-                    {libAssets.map(a => (
+                    </button>}
+                    {libAssets.filter(a => !libQuery || a.name.toLowerCase().includes(libQuery.toLowerCase())).map(a => (
                       <div key={a.url} style={{ position: "relative", aspectRatio: "1" }}
                         onMouseEnter={e => { const b = e.currentTarget.querySelector(".del") as HTMLElement; if (b) b.style.opacity = "1" }}
                         onMouseLeave={e => { const b = e.currentTarget.querySelector(".del") as HTMLElement; if (b) b.style.opacity = "0" }}>
@@ -181,6 +190,9 @@ export default function ImageUpload({ value, onChange, label, hint }: Props) {
                     ))}
                     {libAssets.length === 0 && (
                       <p style={{ gridColumn: "1 / -1", color: MUTED, fontSize: 12, textAlign: "center", padding: "18px 0 4px", margin: 0 }}>Aucune image encore — utilisez « Ajouter » ci-dessus.</p>
+                    )}
+                    {libAssets.length > 0 && libQuery && libAssets.filter(a => a.name.toLowerCase().includes(libQuery.toLowerCase())).length === 0 && (
+                      <p style={{ gridColumn: "1 / -1", color: MUTED, fontSize: 12, textAlign: "center", padding: "18px 0 4px", margin: 0 }}>Aucun résultat pour « {libQuery} ».</p>
                     )}
                   </div>}
             </div>
