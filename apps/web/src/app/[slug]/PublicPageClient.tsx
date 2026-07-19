@@ -956,7 +956,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
     )
 
     case "services_list": {
-      const svcs = [[c.s1_icon,c.s1_name,c.s1_desc],[c.s2_icon,c.s2_name,c.s2_desc],[c.s3_icon,c.s3_name,c.s3_desc]].filter(([,n]) => n)
+      const svcs = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`s${i}_icon`], (c as any)[`s${i}_name`], (c as any)[`s${i}_desc`]] }).filter(([,n]) => n)
       return svcs.length > 0 ? (
         <div style={{ padding: "6px 24px 16px", display: "flex", flexDirection: "column", gap: 9 }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 4px", fontFamily: FONT_B }}>{c.title}</p>}

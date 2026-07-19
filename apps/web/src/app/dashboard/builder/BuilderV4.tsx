@@ -3007,7 +3007,7 @@
   const LAYOUT_FIELD_KEYS = new Set(["align", "layout", "width", "height", "columns", "cols", "disposition", "orientation", "size"])
   const isLayoutField = (key: string) => LAYOUT_FIELD_KEYS.has(key) || key.endsWith("_align")
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
-  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog"])
+  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
   const STYLE_COPY_KEYS = ["__grad", "__bg", "__intensity", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim", "__anim_speed", "__hover", "__loop"]
 
@@ -3145,6 +3145,75 @@
     )
   }
 
+  // Repeteur generique config-driven : liste dynamique d'items (ajouter/supprimer/reordonner) au-dela
+  // des champs numerotes fixes. Conserve les cles plates <prefix><i>_<suffix> (aucune migration ; le
+  // renderer public de chaque bloc doit lire <prefix>1..<prefix>N dynamiquement, cf Menu/Produits).
+  function RepeaterEditor({ block, onChange, prefix, noun, fields, addLabel, topFields = [], bottomFields = [] }: {
+    block: Block; onChange: (key: string, val: string) => void
+    prefix: string; noun: string; addLabel: string
+    fields: { suffix: string; kind?: "text" | "url" | "image"; placeholder?: string }[]
+    topFields?: { key: string; label: string; placeholder?: string }[]
+    bottomFields?: { key: string; label: string; placeholder?: string }[]
+  }) {
+    const c = block.content
+    const key = (i: number, s: string) => `${prefix}${i}_${s}`
+    const item = (i: number) => Object.fromEntries(fields.map(f => [f.suffix, c[key(i, f.suffix)] || ""])) as Record<string, string>
+    const writeItem = (i: number, v: Record<string, string>) => fields.forEach(f => onChange(key(i, f.suffix), v[f.suffix] || ""))
+    let derived = 0
+    for (let i = 1; i <= 50; i++) { if (fields.some(f => c[key(i, f.suffix)])) derived = i }
+    const [rows, setRows] = useState(() => Math.max(1, derived))
+    const count = Math.max(rows, derived)
+    const inputStyle: React.CSSProperties = { width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: "#F5F0E8", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
+    const foc = (on: boolean) => (e: React.FocusEvent<HTMLInputElement>) => { e.target.style.borderColor = on ? "rgba(201,168,76,0.5)" : "rgba(201,168,76,0.2)" }
+    const iconBtn = (disabled: boolean): React.CSSProperties => ({ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", color: disabled ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: disabled ? "default" : "pointer", flexShrink: 0 })
+    const lbl: React.CSSProperties = { color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }
+    const deleteItem = (idx: number) => {
+      for (let j = idx; j < count; j++) writeItem(j, item(j + 1))
+      writeItem(count, {})
+      setRows(Math.max(1, count - 1))
+    }
+    const moveItem = (idx: number, dir: -1 | 1) => { const a = item(idx), b = item(idx + dir); writeItem(idx, b); writeItem(idx + dir, a) }
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {topFields.map(t => (
+          <div key={t.key}>
+            <label style={lbl}>{t.label}</label>
+            <input value={c[t.key] || ""} onChange={e => onChange(t.key, e.target.value)} placeholder={t.placeholder} style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />
+          </div>
+        ))}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {Array.from({ length: count }, (_, k) => k + 1).map(i => {
+            const it = item(i)
+            return (
+              <div key={i} style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: 11, background: "rgba(255,255,255,0.02)", display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ flex: 1, color: MUTED, fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>{noun} {i}</span>
+                  <button type="button" onClick={() => moveItem(i, -1)} disabled={i === 1} aria-label="Monter" style={iconBtn(i === 1)}><ChevronUp size={16} /></button>
+                  <button type="button" onClick={() => moveItem(i, 1)} disabled={i === count} aria-label="Descendre" style={iconBtn(i === count)}><ChevronDown size={16} /></button>
+                  <button type="button" onClick={() => deleteItem(i)} aria-label="Supprimer" style={{ ...iconBtn(false), color: "#FF6B6B" }}><Trash2 size={15} /></button>
+                </div>
+                {fields.map(f => f.kind === "image"
+                  ? <ImageUpload key={f.suffix} value={it[f.suffix]} onChange={url => onChange(key(i, f.suffix), url)} />
+                  : <input key={f.suffix} type={f.kind === "url" ? "url" : "text"} value={it[f.suffix]} onChange={e => onChange(key(i, f.suffix), e.target.value)} placeholder={f.placeholder} style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />
+                )}
+              </div>
+            )
+          })}
+        </div>
+        <button type="button" onClick={() => setRows(count + 1)}
+          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, minHeight: 46, border: "2px dashed rgba(201,168,76,0.3)", borderRadius: 11, background: "rgba(201,168,76,0.04)", color: G, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+          <Plus size={16} /> {addLabel}
+        </button>
+        {bottomFields.map(t => (
+          <div key={t.key}>
+            <label style={lbl}>{t.label}</label>
+            <input value={c[t.key] || ""} onChange={e => onChange(t.key, e.target.value)} placeholder={t.placeholder} style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />
+          </div>
+        ))}
+      </div>
+    )
+  }
+
   function EditPanel({ block, onChange, only }: { block: Block; onChange: (key: string, val: string) => void; only?: "content" | "layout" }) {
     // Accordeon de l'editeur social_links : un groupe de reseaux ouvert a la fois (evite 78 champs empiles).
     const [openNetGroup, setOpenNetGroup] = useState<string | null>(null)
@@ -3178,6 +3247,12 @@
 
     if (block.type === "product_catalog") {
       return <ProductEditor block={block} onChange={onChange} />
+    }
+
+    if (block.type === "services_list") {
+      return <RepeaterEditor block={block} onChange={onChange} prefix="s" noun="Service" addLabel="Ajouter un service"
+        topFields={[{ key: "title", label: "Titre de la section", placeholder: "Mes services" }]}
+        fields={[{ suffix: "icon", placeholder: "Emoji (ex : 💻)" }, { suffix: "name", placeholder: "Nom du service" }, { suffix: "desc", placeholder: "Description courte" }]} />
     }
 
     if (block.type === "social_links") {
