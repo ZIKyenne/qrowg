@@ -942,7 +942,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
       <div style={{ padding: "6px 24px 16px" }}>
         {c.category && <p style={{ color: G, fontSize: 12, fontWeight: 700, margin: "0 0 10px", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: FONT_B }}>{c.category}</p>}
         <div>
-          {[[c.item1_name,c.item1_price,c.item1_desc],[c.item2_name,c.item2_price,c.item2_desc],[c.item3_name,c.item3_price,c.item3_desc]].filter(([n]) => n).map(([n,p,d],i,arr) => (
+          {Array.from({ length: 50 }, (_, k) => [(c as any)[`item${k+1}_name`], (c as any)[`item${k+1}_price`], (c as any)[`item${k+1}_desc`]]).filter(([n]) => n).map(([n,p,d],i,arr) => (
             <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, padding: "11px 0", borderBottom: i<arr.length-1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
               <div style={{ flex: 1 }}>
                 <p style={{ color: TEXT, fontSize: 14, fontWeight: 600, margin: "0 0 2px", fontFamily: FONT_B }}>{n}</p>
