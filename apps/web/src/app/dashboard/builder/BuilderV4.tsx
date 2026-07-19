@@ -3028,6 +3028,8 @@
   function EditPanel({ block, onChange, only }: { block: Block; onChange: (key: string, val: string) => void; only?: "content" | "layout" }) {
     // Accordeon de l'editeur social_links : un groupe de reseaux ouvert a la fois (evite 78 champs empiles).
     const [openNetGroup, setOpenNetGroup] = useState<string | null>(null)
+    // Cartes repliables pour les champs numerotes ("Plat 1 — Nom" -> carte "Plat 1"). Presentation seule.
+    const [openCards, setOpenCards] = useState<Set<string>>(() => new Set())
     const def = BLOCK_DEFS[block.type]
     if (!def) return null
     // Les éditeurs personnalisés ne s'affichent que côté Contenu (leur mise en page passe par les réglages universels).
@@ -3127,22 +3129,33 @@
 
     const scoped = def.fields.filter(f => only === "layout" ? isLayoutField(f.key) : only === "content" ? !isLayoutField(f.key) : true)
     if (only === "layout" && scoped.length === 0) return null
-    return (
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {scoped.filter(field => {
-          const si = (field as any).showIf
-          if (!si) return true
-          // Valeur effective : si le champ contrôleur n'est pas encore défini, on retombe sur
-          // sa valeur par défaut (1re option d'un select) — sinon les pages existantes masqueraient
-          // à tort les champs dont le contrôleur n'a jamais été touché.
-          const ctrl = def.fields.find(f => f.key === si.key) as any
-          const v = block.content[si.key] ?? ctrl?.options?.[0]
-          if (si.equals !== undefined) return v === si.equals
-          if (Array.isArray(si.in)) return si.in.includes(v)
-          return true
-        }).map(field => (
+    const visibleFields = scoped.filter(field => {
+      const si = (field as any).showIf
+      if (!si) return true
+      // Valeur effective : si le champ contrôleur n'est pas encore défini, on retombe sur
+      // sa valeur par défaut (1re option d'un select) — sinon les pages existantes masqueraient
+      // à tort les champs dont le contrôleur n'a jamais été touché.
+      const ctrl = def.fields.find(f => f.key === si.key) as any
+      const v = block.content[si.key] ?? ctrl?.options?.[0]
+      if (si.equals !== undefined) return v === si.equals
+      if (Array.isArray(si.in)) return si.in.includes(v)
+      return true
+    })
+    // Regroupe les champs numerotes ("Plat 1 — Nom", "Produit 2 — Prix"...) en cartes repliables.
+    // Presentation seule : meme content/onChange, aucun changement de data-model ni de rendu public.
+    const DASH = " — "
+    const cardOrder: string[] = []
+    const cardMap: Record<string, typeof visibleFields> = {}
+    const loneFields: typeof visibleFields = []
+    for (const f of visibleFields) {
+      const di = f.label.indexOf(DASH)
+      if (di > 0) { const g = f.label.slice(0, di); if (!cardMap[g]) { cardMap[g] = []; cardOrder.push(g) } cardMap[g].push(f) }
+      else loneFields.push(f)
+    }
+    const useCards = cardOrder.length >= 2
+    const renderField = (field: typeof scoped[number], labelOverride?: string) => (
           <div key={field.key}>
-            <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>{field.label}</label>
+            <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>{labelOverride ?? field.label}</label>
             {field.type === "textarea"
               ? <textarea value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)}
                   placeholder={field.placeholder} rows={3}
@@ -3244,7 +3257,31 @@
               </div>
             )}
           </div>
-        ))}
+    )
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {(useCards ? loneFields : visibleFields).map(f => renderField(f))}
+        {useCards && cardOrder.map(g => {
+          const fields = cardMap[g]
+          const open = openCards.has(g)
+          const filled = fields.filter(f => String(block.content[f.key] ?? "").trim()).length
+          return (
+            <div key={g}>
+              <button type="button" onClick={() => setOpenCards(prev => { const n = new Set(prev); if (n.has(g)) n.delete(g); else n.add(g); return n })}
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, minHeight: 46, padding: "10px 12px", borderRadius: 10, border: `1px solid ${open ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.08)"}`, background: open ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.02)", color: "#F5F0E8", cursor: "pointer", textAlign: "left" }}>
+                <span style={{ width: 7, height: 7, borderRadius: "50%", background: filled ? "#39FF8F" : "rgba(255,255,255,0.18)", flexShrink: 0 }} />
+                <span style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>{g}</span>
+                <span style={{ fontSize: 10.5, color: MUTED }}>{filled ? `${filled}/${fields.length}` : "vide"}</span>
+                <ChevronDown size={16} color={MUTED} style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform .2s", flexShrink: 0 }} />
+              </button>
+              {open && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 12, padding: "12px 2px 6px" }}>
+                  {fields.map(f => renderField(f, f.label.slice(f.label.indexOf(DASH) + DASH.length)))}
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
     )
   }
