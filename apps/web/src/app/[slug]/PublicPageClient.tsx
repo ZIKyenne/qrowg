@@ -481,11 +481,13 @@ function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail }: { block
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
   const [company, setCompany] = useState("")
+  const [hp, setHp] = useState("") // honeypot anti-spam
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle")
   const inputStyle: any = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "11px 13px", color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }
   const emailOk = !email.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
   const canSubmit = !!name && !!email && emailOk && status !== "sending"
   const submit = async () => {
+    if (hp) { setStatus("done"); return } // honeypot rempli = bot
     setStatus("sending")
     trackLinkClick(pageId, block.id, "register")
     const data: Record<string, any> = { nom: name, email }
@@ -510,6 +512,7 @@ function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail }: { block
       <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{c.title || "S'inscrire gratuitement"}</p>
       {c.description && <p style={{ color: "#EC4899", fontSize: 12, margin: "0 0 13px", fontWeight: 600 }}>⚡ {c.description}</p>}
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" value={hp} onChange={e => setHp(e.target.value)} style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0, pointerEvents: "none" }} />
         <input placeholder="Prénom & Nom" autoComplete="name" value={name} onChange={e => setName(e.target.value)} style={inputStyle} />
         <input placeholder="Email" type="email" inputMode="email" autoComplete="email" autoCapitalize="off" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
         {c.show_phone === "yes" && <input placeholder="Téléphone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={e => setPhone(e.target.value)} style={inputStyle} />}
