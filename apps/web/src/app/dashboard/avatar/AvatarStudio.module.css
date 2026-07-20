@@ -308,8 +308,13 @@
 @media (max-width: 880px) {
   /* Colonne : aperçu compact collant EN HAUT, réglages juste dessous,
      export/partage tout en bas -> la création reste "vue d'ensemble". */
-  .wrap { padding: 14px 16px calc(120px + env(safe-area-inset-bottom)); }
+  .wrap { padding: 14px 16px calc(120px + env(safe-area-inset-bottom)); overflow-x: clip; }
   .grid { display: flex; flex-direction: column; gap: 14px; margin-top: 14px; }
+  /* CRUCIAL : sans min-width:0, la galerie horizontale (largeur intrinsèque
+     ~1000px) élargit le panneau et fait déborder toute la page. Avec, le
+     panneau reste à la largeur de l'écran et la galerie scrolle en interne. */
+  .grid > * { min-width: 0; max-width: 100%; }
+  .settings .block { min-width: 0; }
 
   /* En-tête compact (le grand titre serif mangeait un écran entier) */
   .eyebrow { font-size: 10px; letter-spacing: 0.18em; }
