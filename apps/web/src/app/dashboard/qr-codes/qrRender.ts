@@ -98,7 +98,7 @@ export function buildOptions(o: QROptions): any {
     width:  size,
     height: size,
     type:   "canvas",
-    data:   o.data || "https://qrfolio.app",
+    data:   o.data || "https://qrowg.com",
     margin,
     qrOptions: { errorCorrectionLevel: o.ecc },
     dotsOptions: {

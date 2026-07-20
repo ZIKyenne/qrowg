@@ -160,7 +160,7 @@ export default function AvatarStudio({
   // ── Partage (croissance : chaque partage met en avant QRowg + son lien) ──
   // Le lien porte le code d'affiliation (?ref=) : chaque inscription via ce lien
   // devient un parrainage traçable (cf. onglet Parrainage du profil).
-  const SHARE_URL = refCode ? `https://qrfolio.app?ref=${refCode}` : "https://qrfolio.app";
+  const SHARE_URL = refCode ? `https://qrowg.com?ref=${refCode}` : "https://qrowg.com";
   const SHARE_TEXT = "J'ai créé mon avatar QR-art avec QRowg ✨ Crée le tien gratuitement :";
   const u = encodeURIComponent(SHARE_URL);
   const t = encodeURIComponent(SHARE_TEXT);

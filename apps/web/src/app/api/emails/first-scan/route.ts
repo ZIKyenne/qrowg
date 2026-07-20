@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       from: EMAIL_FROM,
       to: email,
       subject: "Ton premier scan QRowg !",
-      html: `<h1>Ton premier scan !</h1><p>Salut ${escapeHtml(name)},</p><p>Quelqu'un vient de scanner ton QR code sur la page "${escapeHtml(page_title)}".</p><p><a href="https://qrfolio.app/dashboard/analytics">Voir mes analytics</a></p>`,
+      html: `<h1>Ton premier scan !</h1><p>Salut ${escapeHtml(name)},</p><p>Quelqu'un vient de scanner ton QR code sur la page "${escapeHtml(page_title)}".</p><p><a href="https://qrowg.com/dashboard/analytics">Voir mes analytics</a></p>`,
     })
 
     if (error) return NextResponse.json({ error }, { status: 500 })

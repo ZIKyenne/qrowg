@@ -2,7 +2,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 
 export default async function sitemap() {
   const supabase = await createServerSupabaseClient()
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://qrfolio.app"
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 
   // Pages statiques
   const staticPages = [

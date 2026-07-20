@@ -6,7 +6,7 @@ import type { Metadata } from "next"
 
 interface Props { params: Promise<{ slug: string }> }
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://qrfolio.app"
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params

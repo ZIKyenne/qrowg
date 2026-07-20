@@ -1014,7 +1014,7 @@ export default function ProfilePage() {
     || form.username !== formOriginal.username
     || form.bio !== formOriginal.bio
     || form.website !== formOriginal.website
-  const publicUrl  = form.username ? `https://qrfolio.app/@${form.username}` : null
+  const publicUrl  = form.username ? `https://qrowg.com/@${form.username}` : null
 
   const planCfg       = PLAN_CFG[profile?.plan || "free"] || PLAN_CFG["free"]
   const PlanIcon      = planCfg.icon
@@ -1023,7 +1023,7 @@ export default function ProfilePage() {
   const validatedRefs = referrals.filter(r => r.status === "validated" || r.status === "rewarded").length
   const expiredRefs   = referrals.filter(r => r.status === "expired").length
   const totalMonths   = referrals.reduce((s, r) => s + (r.reward_months || 0), 0)
-  const referralLink  = `https://qrfolio.app?ref=${profile?.ref_code || profile?.id?.slice(0, 8) || ""}`
+  const referralLink  = `https://qrowg.com?ref=${profile?.ref_code || profile?.id?.slice(0, 8) || ""}`
   const filteredRefs  = refFilter === "all" ? referrals
     : referrals.filter(r => refFilter === "validated"
       ? (r.status === "validated" || r.status === "rewarded")
@@ -1264,7 +1264,7 @@ export default function ProfilePage() {
       {(() => {
         const m =
           !profile?.avatar_url ? { icon: "🎨", text: <>Composez votre <strong style={{ color: "#F5F0E8" }}>avatar QR-art</strong> pour vous démarquer.</>, label: "Composer", href: "/dashboard/avatar" as string | null, onClick: null as (() => void) | null }
-          : !profile?.username ? { icon: "🔖", text: <>Choisissez votre <strong style={{ color: "#F5F0E8" }}>identifiant public</strong> (qrfolio.app/@vous).</>, href: null, onClick: () => setPtab("identite"), label: "Définir" }
+          : !profile?.username ? { icon: "🔖", text: <>Choisissez votre <strong style={{ color: "#F5F0E8" }}>identifiant public</strong> (qrowg.com/@vous).</>, href: null, onClick: () => setPtab("identite"), label: "Définir" }
           : !profile?.bio ? { icon: "✍️", text: <>Ajoutez une <strong style={{ color: "#F5F0E8" }}>bio</strong> pour vous présenter en quelques mots.</>, href: null, onClick: () => setPtab("identite"), label: "Ajouter" }
           : !profile?.website ? { icon: "🔗", text: <>Ajoutez votre <strong style={{ color: "#F5F0E8" }}>site web</strong> ou lien principal.</>, href: null, onClick: () => setPtab("identite"), label: "Ajouter" }
           : null
@@ -2675,7 +2675,7 @@ export default function ProfilePage() {
           <SectionCard title="API Business" icon={Code} color="#7B61FF"
             tag={currentPlan==="business"?"Business":currentPlan==="pro"?"Pro":"Verrouille"}
             action={
-              <a href="https://docs.qrfolio.app" target="_blank" rel="noopener noreferrer"
+              <a href="https://docs.qrowg.com" target="_blank" rel="noopener noreferrer"
                 style={{ display:"flex", alignItems:"center", gap:4, color:MUTED, fontSize:11, textDecoration:"none" }}>
                 Docs <ExternalLink size={11}/>
               </a>

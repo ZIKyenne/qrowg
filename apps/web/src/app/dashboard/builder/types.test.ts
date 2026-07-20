@@ -958,11 +958,11 @@ describe("mapEmbedUrl", () => {
 })
 
 describe("shareLinks", () => {
-  const L = shareLinks("https://qrfolio.app/jean", "Jean Dupont")
+  const L = shareLinks("https://qrowg.com/jean", "Jean Dupont")
   const by = (k: string) => L.find(t => t.key === k)!
   it("6 reseaux, encodage URL", () => {
     expect(L.map(t => t.key)).toEqual(["whatsapp", "facebook", "x", "linkedin", "telegram", "email"])
-    expect(by("whatsapp").href).toContain("https%3A%2F%2Fqrfolio.app%2Fjean")
+    expect(by("whatsapp").href).toContain("https%3A%2F%2Fqrowg.com%2Fjean")
   })
   it("WhatsApp/X/Telegram incluent le texte, Facebook seulement l'URL", () => {
     expect(by("whatsapp").href).toContain("Jean%20Dupont")
@@ -982,7 +982,7 @@ describe("shareLinks", () => {
     expect(by("linkedin").href).toContain("utm_source%3Dlinkedin")
   })
   it("utm ajoute avec & si l'URL a deja des parametres", () => {
-    const w = shareLinks("https://qrfolio.app/jean?ref=1").find(t => t.key === "telegram")!
+    const w = shareLinks("https://qrowg.com/jean?ref=1").find(t => t.key === "telegram")!
     expect(w.href).toContain("jean%3Fref%3D1%26utm_source%3Dtelegram")
   })
 })

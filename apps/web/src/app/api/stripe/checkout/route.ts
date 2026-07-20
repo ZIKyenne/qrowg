@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     if (!priceId) return NextResponse.json({ error: "Plan invalide" }, { status: 400 })
     const billing = (annual && ANNUAL_PRICE_IDS[plan]) ? "annual" : "monthly"
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://qrfolio.app"
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",

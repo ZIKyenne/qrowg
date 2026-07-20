@@ -275,9 +275,9 @@ export default function ContactPage() {
                 <p style={{ color:MUT.replace("0.8","0.55"),fontSize:10,letterSpacing:2.5,textTransform:"uppercase",fontWeight:700,marginBottom:14 }}>Contacts directs</p>
                 <div className="card-row">
                   {[
-                    { icon:"🛠", label:"Support",       email:"support@qrfolio.app",  color:"#38BDF8" },
-                    { icon:"🤝", label:"Partenariat",   email:"partners@qrfolio.app", color:"#A78BFA" },
-                    { icon:"👋", label:"Business",      email:"hello@qrfolio.app",    color:"#C9A84C" },
+                    { icon:"🛠", label:"Support",       email:"support@qrowg.com",  color:"#38BDF8" },
+                    { icon:"🤝", label:"Partenariat",   email:"partners@qrowg.com", color:"#A78BFA" },
+                    { icon:"👋", label:"Business",      email:"hello@qrowg.com",    color:"#C9A84C" },
                   ].map(c => (
                     <a key={c.label} href={"mailto:"+c.email} style={{
                       display:"flex",flexDirection:"column",gap:8,padding:"14px 14px",

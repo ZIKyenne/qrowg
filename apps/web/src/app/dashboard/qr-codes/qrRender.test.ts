@@ -55,7 +55,7 @@ describe("buildOptions — base", () => {
     expect(o.margin).toBe(2)
   })
   it("repli sur l'URL de marque si data vide", () => {
-    expect(buildOptions(base({}, { data: "" })).data).toBe("https://qrfolio.app")
+    expect(buildOptions(base({}, { data: "" })).data).toBe("https://qrowg.com")
     expect(buildOptions(base({}, { data: "abc" })).data).toBe("abc")
   })
   it("passe le niveau de correction d'erreur", () => {

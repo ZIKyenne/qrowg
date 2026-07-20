@@ -15,7 +15,7 @@ type AvailStatus = "idle" | "checking" | "available" | "taken" | "invalid" | "ow
 
 const G     = "var(--accent)"
 const MUTED = "#A8A190"
-const APP   = "qrfolio.app"
+const APP   = "qrowg.com"
 
 // Suggestions basées sur le nom saisi
 function getSuggestions(base: string): string[] {

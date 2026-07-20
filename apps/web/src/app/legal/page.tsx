@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Mentions légales",
   description: "Mentions légales du service QRowg.",
   robots: { index: true, follow: true },
-  alternates: { canonical: "https://qrfolio.app/legal" },
+  alternates: { canonical: "https://qrowg.com/legal" },
 }
 
 export default function LegalPage() {
@@ -24,9 +24,9 @@ export default function LegalPage() {
       <div className="ls">
         <h2>Contact</h2>
         <p>
-          <strong>E-mail :</strong> <a href="mailto:contact@qrfolio.app">contact@qrfolio.app</a><br />
-          <strong>Support :</strong> <a href="mailto:support@qrfolio.app">support@qrfolio.app</a><br />
-          <strong>RGPD :</strong> <a href="mailto:privacy@qrfolio.app">privacy@qrfolio.app</a>
+          <strong>E-mail :</strong> <a href="mailto:contact@qrowg.com">contact@qrowg.com</a><br />
+          <strong>Support :</strong> <a href="mailto:support@qrowg.com">support@qrowg.com</a><br />
+          <strong>RGPD :</strong> <a href="mailto:privacy@qrowg.com">privacy@qrowg.com</a>
         </p>
       </div>
       <div className="ls">
@@ -45,7 +45,7 @@ export default function LegalPage() {
       </div>
       <div className="ls">
         <h2>Médiation</h2>
-        <p>En cas de litige non résolu : <a href="mailto:contact@qrfolio.app">contact@qrfolio.app</a></p>
+        <p>En cas de litige non résolu : <a href="mailto:contact@qrowg.com">contact@qrowg.com</a></p>
         <p>Plateforme européenne : <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a></p>
       </div>
     </LegalLayout>

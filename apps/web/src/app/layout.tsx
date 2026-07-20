@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import "./globals.css"
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://qrfolio.app"
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 // Origine du stockage Supabase (avatars, galeries, produits) — preconnect pour eviter
 // le handshake DNS/TLS au premier chargement d'image sur les pages publiques.
 const SUPABASE_ORIGIN = (() => {

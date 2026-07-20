@@ -62,11 +62,11 @@ export async function POST(req: NextRequest) {
     ${message ? `<div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:14px 16px;margin-bottom:16px"><p style="font-size:14px;color:#F5F0E8;margin:0;line-height:1.6;white-space:pre-wrap">${esc(message)}</p></div>` : ""}
     <table style="width:100%;border-collapse:collapse;font-size:13px">${rows.join("")}</table>
     <p style="text-align:center;margin:26px 0 0">
-      <a href="https://qrfolio.app/dashboard/leads" style="display:inline-block;background:linear-gradient(90deg,#C9A84C,#b8953f);color:#080808;text-decoration:none;font-weight:700;font-size:14px;padding:13px 28px;border-radius:12px">Voir dans mes messages →</a>
+      <a href="https://qrowg.com/dashboard/leads" style="display:inline-block;background:linear-gradient(90deg,#C9A84C,#b8953f);color:#080808;text-decoration:none;font-weight:700;font-size:14px;padding:13px 28px;border-radius:12px">Voir dans mes messages →</a>
     </p>
   </div>
   <div style="padding:18px 40px 30px;text-align:center;border-top:1px solid rgba(255,255,255,0.06)">
-    <p style="font-size:12px;color:#4A4640;margin:0">QRowg · <a href="https://qrfolio.app/dashboard/settings" style="color:#4A4640">Gérer les notifications</a></p>
+    <p style="font-size:12px;color:#4A4640;margin:0">QRowg · <a href="https://qrowg.com/dashboard/settings" style="color:#4A4640">Gérer les notifications</a></p>
   </div>
 </div></body></html>`
 

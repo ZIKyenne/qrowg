@@ -130,7 +130,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
               <div style={{ display: "flex", width: 48, height: 48, borderRadius: 13, background: primary, color: bg, alignItems: "center", justifyContent: "center", fontSize: 34, fontWeight: 600, fontFamily: "Cormorant" }}>Q</div>
               <div style={{ fontSize: 40, fontWeight: 600, color: primary, marginLeft: 16, letterSpacing: -0.5, fontFamily: "Cormorant" }}>QRowg</div>
             </div>
-            <div style={{ fontSize: 27, color: muted }}>{`qrfolio.app/${slug}`}</div>
+            <div style={{ fontSize: 27, color: muted }}>{`qrowg.com/${slug}`}</div>
           </div>
         </div>
       ),

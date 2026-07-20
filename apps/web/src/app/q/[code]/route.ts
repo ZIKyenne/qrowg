@@ -76,7 +76,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
   if (!code) return redirectNoStore(new URL("/", req.url))
 
   const supabase = createAdminClient()
-  const appUrl   = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrfolio.app"
+  const appUrl   = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrowg.com"
 
   try {
     const { data: qr } = await supabase

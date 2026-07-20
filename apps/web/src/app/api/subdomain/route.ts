@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ available: false, reason: "Ce sous-domaine est déjà pris" })
   }
 
-  return NextResponse.json({ available: true, subdomain: `${username}.qrfolio.app` })
+  return NextResponse.json({ available: true, subdomain: `${username}.qrowg.com` })
 }
 
 // POST — réserver ou modifier le sous-domaine
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     ok:        true,
     username:  data.username,
-    subdomain: `${data.username}.qrfolio.app`,
+    subdomain: `${data.username}.qrowg.com`,
   })
 }
 

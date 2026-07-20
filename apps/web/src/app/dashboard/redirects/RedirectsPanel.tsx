@@ -209,7 +209,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
                   <select value={fDomain} onChange={e => setFDomain(e.target.value)}
                     style={{ flex:2, background:"#111009", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, color:"#F5F0E8", padding:"9px 12px", fontSize:12, outline:"none", cursor:"pointer" }}>
                     {userDomains.map(d => <option key={d} value={d}>{d}</option>)}
-                    <option value="qrfolio.app">qrfolio.app (sous-domaine)</option>
+                    <option value="qrowg.com">qrowg.com (sous-domaine)</option>
                   </select>
                   <input value={fPath} onChange={e => setFPath(e.target.value.startsWith("/") ? e.target.value : "/" + e.target.value)}
                     placeholder="/chemin"

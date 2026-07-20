@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const supabase = createAdminClient()
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrfolio.app"
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrowg.com"
     const now = new Date()
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
     const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`

@@ -1,5 +1,5 @@
 ﻿// app/api/subdomain/resolve/route.ts
-// Résout un sous-domaine username.qrfolio.app → page principale de l'utilisateur
+// Résout un sous-domaine username.qrowg.com → page principale de l'utilisateur
 
 import { createAdminClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const supabase = createAdminClient()
-    const appUrl   = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrfolio.app"
+    const appUrl   = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrowg.com"
 
     // Trouver l'utilisateur par username
     const { data: profile } = await supabase
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 <div>
   <div style="font-size:48px;margin-bottom:16px">🔍</div>
   <h1 style="color:#C9A84C;font-size:24px;margin:0 0 8px">Sous-domaine introuvable</h1>
-  <p style="color:#8A8478;margin:0 0 24px">${username}.qrfolio.app n'est associé à aucun compte</p>
+  <p style="color:#8A8478;margin:0 0 24px">${username}.qrowg.com n'est associé à aucun compte</p>
   <a href="${appUrl}" style="color:#C9A84C;text-decoration:none;font-size:14px">← Retour à QRowg</a>
 </div>
 </body></html>`,
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
       )
     }
 
-    // Réécriture interne → /{slug} sur qrfolio.app
+    // Réécriture interne → /{slug} sur qrowg.com
     return NextResponse.redirect(new URL(`/${page.slug}`, appUrl), {
       headers: { "X-Subdomain": username },
     })

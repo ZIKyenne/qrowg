@@ -24,7 +24,7 @@ export default async function QRCodesPage() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
 
-  const appUrl   = process.env.NEXT_PUBLIC_APP_URL || "https://qrfolio.app"
+  const appUrl   = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
   const userPlan = profile?.plan || "free"
 
   const totalScans = (qrCodes ?? []).reduce((a, q) => a + (q.total_scans ?? 0), 0)

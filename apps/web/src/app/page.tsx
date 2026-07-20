@@ -572,7 +572,7 @@ function BrandProSection() {
       {/* barre d'URL */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 12px", background: "rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <span style={{ width: 7, height: 7, borderRadius: "50%", background: pro ? "#39FF8F" : "rgba(188,182,166,0.5)" }} />
-        <span style={{ color: pro ? "#F5F0E8" : "rgba(188,182,166,0.7)", fontSize: 10.5, fontFamily: "monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{pro ? "carte.votremarque.fr" : "qrfolio.app/p/votre-page"}</span>
+        <span style={{ color: pro ? "#F5F0E8" : "rgba(188,182,166,0.7)", fontSize: 10.5, fontFamily: "monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{pro ? "carte.votremarque.fr" : "qrowg.com/p/votre-page"}</span>
       </div>
       {/* contenu mock */}
       <div style={{ padding: "22px 18px", display: "flex", flexDirection: "column", alignItems: "center", gap: 9 }}>
@@ -628,7 +628,7 @@ function BrandProSection() {
             <p style={{ color: G, fontSize: 9.5, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", margin: 0 }}>Marque professionnelle</p>
             <p style={{ color: "#F5F0E8", fontSize: 22, fontWeight: 800, margin: "4px 0 18px", fontFamily: "Cormorant Garamond, serif" }}>Une image 100 % à vous</p>
             {([
-              ["🌐", "Votre nom de domaine", "Au lieu de qrfolio.app/p/…, votre page vit sur carte.votremarque.fr. Plus crédible, plus mémorisable."],
+              ["🌐", "Votre nom de domaine", "Au lieu de qrowg.com/p/…, votre page vit sur carte.votremarque.fr. Plus crédible, plus mémorisable."],
               ["🚫", "Zéro mention QRowg", "La mention « Propulsé par QRowg » disparaît : vos visiteurs ne voient que votre marque."],
               ["✨", "Design premium", "Polices, couleurs et finitions soignées pour une page qui inspire confiance dès le premier coup d'œil."],
             ] as const).map(([emo, h, txt]) => (
@@ -3531,7 +3531,7 @@ export default function HomePage() {
             </span>
           </div>
           <div style={{ display:"flex",alignItems:"center",gap:16,flexWrap:"wrap" }}>
-            <a href="https://status.qrfolio.app" target="_blank" rel="noopener noreferrer" className="fstatus" aria-label="Statut de la plateforme — Tous les systèmes opérationnels">
+            <a href="https://status.qrowg.com" target="_blank" rel="noopener noreferrer" className="fstatus" aria-label="Statut de la plateforme — Tous les systèmes opérationnels">
               <span className="fstatus-dot" aria-hidden="true"/>
               Tous les systèmes opérationnels
             </a>

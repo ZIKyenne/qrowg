@@ -159,7 +159,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const supabase = createAdminClient()
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrfolio.app"
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrowg.com"
 
     // 1. Récupérer les abonnements actifs à traiter
     const now = new Date()
@@ -288,7 +288,7 @@ export async function GET(req: NextRequest) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from:    "QRowg Reports <reports@qrfolio.app>",
+            from:    "QRowg Reports <reports@qrowg.com>",
             to:      [sub.email],
             subject: `📊 Votre rapport ${sub.frequency === "weekly" ? "hebdomadaire" : "mensuel"} QRowg`,
             html,

@@ -3044,7 +3044,7 @@ export default function PublicPageClient({ page, blocks, showBranding = true }: 
         {/* Footer branding — retire sur les plans payants ("Sans branding") */}
         {showBranding && (
           <div style={{ padding: "20px 24px 32px", textAlign: "center", borderTop: `1px solid ${theme.primary}10`, marginTop: 8 }}>
-            <a href="https://qrfolio.app" target="_blank" rel="noopener noreferrer"
+            <a href="https://qrowg.com" target="_blank" rel="noopener noreferrer"
               style={{ color: theme.muted, fontSize: 11, textDecoration: "none", opacity: 0.5, letterSpacing: 1, fontFamily: theme.fontBody }}>
               Cree avec QRowg
             </a>

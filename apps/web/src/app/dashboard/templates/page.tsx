@@ -720,7 +720,7 @@ function NamingModal({ template, blockCount, onClose, onCreate }: {
             {slugStatus === "reserved" && <span style={{ color: "#F87171", fontSize: 10, fontWeight: 600 }}>✗ Slug reserve</span>}
             {slugStatus === "invalid" && <span style={{ color: "#FBBF24", fontSize: 10, fontWeight: 600 }}>2-60 caracteres, minuscules, chiffres, tirets</span>}
           </div>
-          <p style={{ color: MUTED, fontSize: 10, margin: "4px 0 0", fontFamily: "monospace" }}>qrfolio.app/{slug || "..."}</p>
+          <p style={{ color: MUTED, fontSize: 10, margin: "4px 0 0", fontFamily: "monospace" }}>qrowg.com/{slug || "..."}</p>
           {(slugStatus === "taken") && suggestions.length > 0 && (
             <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 7 }}>
               {suggestions.map(s => (

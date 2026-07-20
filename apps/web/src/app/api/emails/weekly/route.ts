@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
     let sent = 0
     for (const profile of profiles) {
-      const html = `<h1>Rapport hebdo</h1><p>Salut ${escapeHtml(profile.full_name)},</p><p>Tu as ${profile.total_scans} scans et ${profile.total_pages} pages.</p><p><a href="https://qrfolio.app/dashboard/analytics">Voir mes analytics</a></p>`
+      const html = `<h1>Rapport hebdo</h1><p>Salut ${escapeHtml(profile.full_name)},</p><p>Tu as ${profile.total_scans} scans et ${profile.total_pages} pages.</p><p><a href="https://qrowg.com/dashboard/analytics">Voir mes analytics</a></p>`
       
       await resend.emails.send({
         from: EMAIL_FROM,

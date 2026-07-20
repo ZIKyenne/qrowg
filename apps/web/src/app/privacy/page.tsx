@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "Politique de confidentialité",
   description: "Comment QRowg collecte, utilise et protège vos données personnelles.",
   robots: { index: true, follow: true },
-  alternates: { canonical: "https://qrfolio.app/privacy" },
+  alternates: { canonical: "https://qrowg.com/privacy" },
 }
 
 export default function PrivacyPage() {
@@ -54,12 +54,12 @@ export default function PrivacyPage() {
       </div>
       <div className="ls">
         <h2>6. Vos droits (RGPD)</h2>
-        <p>Conformément au RGPD, vous disposez des droits d’accès, rectification, effacement, portabilité et d’opposition. Pour les exercer : <a href="mailto:privacy@qrfolio.app">privacy@qrfolio.app</a></p>
+        <p>Conformément au RGPD, vous disposez des droits d’accès, rectification, effacement, portabilité et d’opposition. Pour les exercer : <a href="mailto:privacy@qrowg.com">privacy@qrowg.com</a></p>
         <p>Vous pouvez également saisir la CNIL (<a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">cnil.fr</a>) en cas de litige.</p>
       </div>
       <div className="ls">
         <h2>7. Contact</h2>
-        <p>Responsable du traitement : QRowg<br />E-mail : <a href="mailto:privacy@qrfolio.app">privacy@qrfolio.app</a></p>
+        <p>Responsable du traitement : QRowg<br />E-mail : <a href="mailto:privacy@qrowg.com">privacy@qrowg.com</a></p>
       </div>
     </LegalLayout>
   )

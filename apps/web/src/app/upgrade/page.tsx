@@ -48,7 +48,7 @@ export default function UpgradePage() {
   async function handleUpgrade(plan: typeof PLANS[0]) {
     if (plan.ctaDisabled || currentPlan === plan.id) return
     if (plan.id === "business") {
-      window.location.href = "mailto:hello@qrfolio.app?subject=Plan Business QRowg"
+      window.location.href = "mailto:hello@qrowg.com?subject=Plan Business QRowg"
       return
     }
     setLoading(plan.id)
@@ -210,7 +210,7 @@ export default function UpgradePage() {
         {/* Footer */}
         <div style={{ textAlign: "center" }}>
           <p style={{ color: MUTED, fontSize: 13, margin: "0 0 6px" }}>
-            Des questions ? <a href="mailto:hello@qrfolio.app" style={{ color: G, textDecoration: "none" }}>Contactez-nous</a>
+            Des questions ? <a href="mailto:hello@qrowg.com" style={{ color: G, textDecoration: "none" }}>Contactez-nous</a>
           </p>
           <p style={{ color: "#4A4640", fontSize: 12, margin: 0 }}>
             Paiement securise par Stripe · Annulation a tout moment · Remboursement 14 jours · Sans engagement

@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Aucun abonnement actif" }, { status: 400 })
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://qrfolio.app"
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 
     const session = await stripe.billingPortal.sessions.create({
       customer: profile.stripe_customer_id,

@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const supabase = createAdminClient()
-    const appUrl   = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrfolio.app"
+    const appUrl   = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrowg.com"
 
     // ── Étape -1: domaine secondaire → redirection vers principal ──────────────
     // Si ce domaine n'est pas principal et qu'un principal existe, rediriger

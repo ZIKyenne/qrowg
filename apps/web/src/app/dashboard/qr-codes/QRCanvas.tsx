@@ -24,7 +24,7 @@ export default function QRCanvas({
   const qr = useRef<ReturnType<typeof createQR> | null>(null)
 
   useEffect(() => {
-    const opts: QROptions = { data: value || "https://qrfolio.app", fg, bg, ecc, style: style || {}, size }
+    const opts: QROptions = { data: value || "https://qrowg.com", fg, bg, ecc, style: style || {}, size }
     if (!qr.current) {
       qr.current = createQR(opts)
       if (holder.current) {

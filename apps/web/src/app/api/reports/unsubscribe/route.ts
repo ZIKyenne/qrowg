@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
       .eq("id", sub.id)
 
     // Rediriger vers une page de confirmation
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrfolio.app"
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrowg.com"
     return NextResponse.redirect(`${appUrl}/unsubscribed?type=report`)
   } catch (err: any) {
     return new NextResponse("Erreur serveur", { status: 500 })

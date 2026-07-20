@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Conditions d’utilisation",
   description: "Conditions générales d’utilisation du service QRowg.",
   robots: { index: true, follow: true },
-  alternates: { canonical: "https://qrfolio.app/terms" },
+  alternates: { canonical: "https://qrowg.com/terms" },
 }
 
 export default function TermsPage() {

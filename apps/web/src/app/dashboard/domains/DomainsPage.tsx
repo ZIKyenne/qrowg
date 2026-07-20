@@ -237,7 +237,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                 <Globe size={30} color={MUTED} style={{ marginBottom:10 }}/>
                 <p style={{ color:"#F5F0E8", fontSize:14.5, fontWeight:700, margin:"0 0 6px" }}>Utilisez votre propre nom de domaine</p>
                 <p style={{ color:MUTED, fontSize:12.5, margin:"0 auto 14px", lineHeight:1.55, maxWidth:330 }}>
-                  Remplacez l'adresse <span style={{ color:"#C9C3B6", fontFamily:"monospace" }}>qrfolio.app</span> par la vôtre — vos clients ne voient que votre marque.
+                  Remplacez l'adresse <span style={{ color:"#C9C3B6", fontFamily:"monospace" }}>qrowg.com</span> par la vôtre — vos clients ne voient que votre marque.
                 </p>
                 {/* Exemple concret */}
                 <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"7px 14px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:9, marginBottom:18 }}>

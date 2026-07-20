@@ -1,9 +1,9 @@
-﻿// middleware.ts — Routing domaines custom + sous-domaines *.qrfolio.app
+﻿// middleware.ts — Routing domaines custom + sous-domaines *.qrowg.com
 
 import { NextRequest, NextResponse } from "next/server"
 
-const APP_DOMAIN     = process.env.NEXT_PUBLIC_APP_URL?.replace(/^https?:\/\//, "") ?? "qrfolio.app"
-const QROWG_HOSTS  = new Set(["qrfolio.app", "www.qrfolio.app", "localhost"])
+const APP_DOMAIN     = process.env.NEXT_PUBLIC_APP_URL?.replace(/^https?:\/\//, "") ?? "qrowg.com"
+const QROWG_HOSTS  = new Set(["qrowg.com", "www.qrowg.com", "localhost"])
 
 export async function middleware(req: NextRequest) {
   const hostname = (req.headers.get("host") ?? "").replace(/:\d+$/, "")
@@ -21,7 +21,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
-  // ── Cas 1 : sous-domaine *.qrfolio.app ────────────────────────────────────
+  // ── Cas 1 : sous-domaine *.qrowg.com ────────────────────────────────────
   const isSubdomain = hostname.endsWith(`.${APP_DOMAIN}`) && !QROWG_HOSTS.has(hostname)
 
   if (isSubdomain) {

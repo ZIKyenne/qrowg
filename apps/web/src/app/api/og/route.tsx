@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
         {/* QRowg badge */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, background: `${color}15`, border: `1px solid ${color}30`, borderRadius: 20, padding: "8px 20px", marginTop: 8 }}>
           <div style={{ width: 8, height: 8, borderRadius: "50%", background: color, display: "flex" }} />
-          <span style={{ color: color, fontSize: 16, fontWeight: 600, display: "flex" }}>qrfolio.app/{name?.toLowerCase().replace(/ /g, "-") || "page"}</span>
+          <span style={{ color: color, fontSize: 16, fontWeight: 600, display: "flex" }}>qrowg.com/{name?.toLowerCase().replace(/ /g, "-") || "page"}</span>
         </div>
       </div>
     ),

@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     <p style="font-size:13px;color:#8A8478;margin:0;text-align:center">Cet e-mail confirme la bonne réception de votre demande auprès de <strong style="color:#F5F0E8">${esc(sender)}</strong>.${replyTo ? " Vous pouvez répondre directement à cet e-mail." : ""}</p>
   </div>
   <div style="padding:18px 40px 30px;text-align:center;border-top:1px solid rgba(255,255,255,0.06)">
-    <p style="font-size:12px;color:#4A4640;margin:0">Propulsé par <a href="https://qrfolio.app" style="color:#4A4640">QRowg</a></p>
+    <p style="font-size:12px;color:#4A4640;margin:0">Propulsé par <a href="https://qrowg.com" style="color:#4A4640">QRowg</a></p>
   </div>
 </div></body></html>`
 
