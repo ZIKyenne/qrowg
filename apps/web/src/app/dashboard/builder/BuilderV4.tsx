@@ -4488,8 +4488,15 @@
     const [rightTab, setRightTab] = useState<"preview"|"edit"|"theme">("preview")
     const [editTab, setEditTab] = useState<"contenu"|"style"|"layout"|"avance">("contenu")
     // Mode Simple (defaut) = un seul contexte "Contenu" (audit #10/#14 "montrer moins"). Expert = 4 onglets.
-    const [expertMode, setExpertMode] = useState<boolean>(() => { try { return localStorage.getItem("qrfolio_expert_mode") === "1" } catch { return false } })
-    useEffect(() => { try { localStorage.setItem("qrfolio_expert_mode", expertMode ? "1" : "0") } catch {} }, [expertMode])
+    // Defaut false = ce que rend le SSR ; on lit localStorage APRES montage (pas de mismatch d'hydratation),
+    // et on persiste DANS le setter (pas dans un effet -> pas d'ecrasement au montage). Cf review #2.
+    const [expertMode, setExpertModeRaw] = useState(false)
+    useEffect(() => { try { if (localStorage.getItem("qrfolio_expert_mode") === "1") setExpertModeRaw(true) } catch {} }, [])
+    const setExpertMode = (v: boolean | ((p: boolean) => boolean)) => setExpertModeRaw(prev => {
+      const next = typeof v === "function" ? v(prev) : v
+      try { localStorage.setItem("qrfolio_expert_mode", next ? "1" : "0") } catch {}
+      return next
+    })
     // Modeles par metier : menu deplie a la demande (replie par defaut) pour alleger la palette.
     const [metierOpen, setMetierOpen] = useState(false)
     const [styleClipboard, setStyleClipboard] = useState<Record<string, string> | null>(null)
