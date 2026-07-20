@@ -8,7 +8,7 @@ import Link from "next/link"
 import { ArrowLeft, Download, Check, QrCode as QrIcon, ShieldCheck, AlertTriangle, Upload, X, Link2, Wifi, Type, Contact, Phone, Mail } from "lucide-react"
 import QRCanvas from "../qr-codes/QRCanvas"
 import { getQRBlob, type QROptions, type QRStyleConfig } from "../qr-codes/qrRender"
-import { contrast, normalizeUrl, buildWifi, buildVCard, buildTel, buildEmail, type VCardFields } from "./qrLinkUtils"
+import { contrast, isInverted, normalizeUrl, buildWifi, buildVCard, buildTel, buildEmail, type VCardFields } from "./qrLinkUtils"
 
 const G = "#C9A84C"
 const MUTED = "#A8A190"
@@ -81,6 +81,7 @@ export default function QrLinkPage() {
   const data = useMemo(() => payload({ type: qrType, url, ssid, wifiPass, wifiEnc, text, vc, phone, em }), [qrType, url, ssid, wifiPass, wifiEnc, text, vc, phone, em])
   const ready = data.length > 0
   const ratio = contrast(fg, bg)
+  const inverted = isInverted(fg, bg)
 
   const [history, setHistory] = useState<QrHistEntry[]>([])
   useEffect(() => { try { const h = JSON.parse(localStorage.getItem("qrfolio_qr_history") || "[]"); if (Array.isArray(h)) setHistory(h.slice(0, 8)) } catch {} }, [])
@@ -261,6 +262,11 @@ export default function QrLinkPage() {
                 style={{ display: "flex", alignItems: "center", gap: 7, color: "#FF6B6B", fontSize: 12, fontWeight: 600, background: "rgba(255,107,107,0.1)", border: "1px solid rgba(255,107,107,0.3)", borderRadius: 999, padding: "6px 14px", cursor: "pointer" }}>
                 <AlertTriangle size={14} /> Risque de non-scan — <span style={{ textDecoration: "underline" }}>corriger</span>
               </button>
+            : inverted
+              ? <button onClick={() => { const f = fg; setFg(bg); setBg(f) }} title="Inverser les couleurs (modules sombres sur fond clair)"
+                  style={{ display: "flex", alignItems: "center", gap: 7, color: "#FBBF24", fontSize: 12, fontWeight: 600, background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 999, padding: "6px 14px", cursor: "pointer" }}>
+                  <AlertTriangle size={14} /> Clair sur fond sombre — <span style={{ textDecoration: "underline" }}>inverser</span>
+                </button>
             : ratio < 4.5
               ? <div style={{ display: "flex", alignItems: "center", gap: 7, color: "#FBBF24", fontSize: 12, fontWeight: 600, background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 999, padding: "6px 14px" }}>
                   <AlertTriangle size={14} /> Contraste limite — testez avant d&apos;imprimer

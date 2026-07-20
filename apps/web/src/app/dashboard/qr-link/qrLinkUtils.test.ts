@@ -1,5 +1,16 @@
 import { describe, it, expect } from "vitest"
-import { lum, contrast, normalizeUrl, escapeWifi, buildWifi, escapeVCard, buildVCard, buildTel, buildEmail } from "./qrLinkUtils"
+import { lum, contrast, normalizeUrl, escapeWifi, buildWifi, escapeVCard, buildVCard, buildTel, buildEmail, isInverted } from "./qrLinkUtils"
+
+describe("isInverted", () => {
+  it("clair sur fond sombre = inverse (a eviter)", () => {
+    expect(isInverted("#FFFFFF", "#000000")).toBe(true)
+    expect(isInverted("#F5F0E8", "#111111")).toBe(true)
+  })
+  it("sombre sur fond clair = normal", () => {
+    expect(isInverted("#080808", "#FFFFFF")).toBe(false)
+    expect(isInverted("#1D4ED8", "#FEF3C7")).toBe(false)
+  })
+})
 
 describe("buildTel", () => {
   it("prefixe tel: et ne garde que chiffres et +", () => {

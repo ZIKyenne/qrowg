@@ -18,6 +18,13 @@ export function contrast(a: string, b: string): number {
   return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)
 }
 
+// Un QR se lit de maniere fiable quand les modules sont plus SOMBRES que le fond.
+// Inverse (clair sur fond sombre), certains scanners et impressions echouent —
+// meme si le ratio de contraste (symetrique) reste eleve.
+export function isInverted(fg: string, bg: string): boolean {
+  return lum(fg) > lum(bg)
+}
+
 // Ajoute https:// si aucun schema reconnu (site tape sans protocole).
 export function normalizeUrl(v: string): string {
   const s = v.trim()
