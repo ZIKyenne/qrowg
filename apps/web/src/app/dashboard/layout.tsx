@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation"
 import {
   LayoutDashboard, FileText, BarChart, QrCode, User,
   Activity, ChevronRight, LogOut, Settings, Menu, X, Eye, Inbox, Images,
-  Plus, Printer, Upload, Sparkles
+  Plus, Printer, Upload, Sparkles, Link2
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
@@ -36,6 +36,7 @@ const MOBILE_NAV = [
 const CREATE_ACTIONS = [
   { href: "/dashboard/builder", icon: FileText, label: "Créer une page", sub: "Une page pro éditable" },
   { href: "/dashboard/qr-codes", icon: QrCode, label: "Créer un QR code", sub: "Dynamique, modifiable" },
+  { href: "/dashboard/qr-link", icon: Link2, label: "QR d'un lien", sub: "Pour n'importe quel site" },
   { href: "/dashboard/qr-codes", icon: Printer, label: "QR Print Studio", sub: "Affiche prête à imprimer" },
   { href: "/dashboard/templates", icon: Sparkles, label: "Utiliser un modèle", sub: "Partir d'un design" },
   { href: "/dashboard/assets", icon: Upload, label: "Importer un média", sub: "Photos, logos…" },
