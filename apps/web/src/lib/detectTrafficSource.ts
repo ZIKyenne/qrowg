@@ -33,11 +33,12 @@ const SOURCE_MAP: [RegExp, TrafficSource][] = [
   [/google\.|bing\.com|duckduckgo\.com|yahoo\.com|qwant\.com/i, "google"],
 ]
 
-export function detectTrafficSource(): TrafficInfo {
-  if (typeof window === "undefined") return { source: "direct", referrer: null }
-
+// Coeur PUR (testable) : classe la source à partir de la query string et du
+// référent, sans dépendre de `window`. detectTrafficSource() n'est qu'un
+// adaptateur qui lui passe les valeurs du navigateur.
+export function classifyTraffic(search: string, referrer: string): TrafficInfo {
   // 1. QR scan — paramètre UTM ou flag dans l'URL
-  const params = new URLSearchParams(window.location.search)
+  const params = new URLSearchParams(search)
   if (
     params.get("utm_medium") === "qr" ||
     params.get("qr") === "1" ||
@@ -56,13 +57,12 @@ export function detectTrafficSource(): TrafficInfo {
   }
 
   // 2. Référent HTTP
-  const rawRef = document.referrer
-  if (!rawRef) return { source: "direct", referrer: null }
+  if (!referrer) return { source: "direct", referrer: null }
 
   // Extraire uniquement le domaine (jamais le chemin complet — RGPD)
   let domain: string | null = null
   try {
-    domain = new URL(rawRef).hostname.replace(/^www\./, "")
+    domain = new URL(referrer).hostname.replace(/^www\./, "")
   } catch {
     domain = null
   }
@@ -78,4 +78,9 @@ export function detectTrafficSource(): TrafficInfo {
 
   // 4. Référent inconnu = référral externe
   return { source: "referral", referrer: domain }
+}
+
+export function detectTrafficSource(): TrafficInfo {
+  if (typeof window === "undefined") return { source: "direct", referrer: null }
+  return classifyTraffic(window.location.search, document.referrer)
 }
