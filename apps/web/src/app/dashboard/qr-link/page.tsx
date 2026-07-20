@@ -143,9 +143,10 @@ export default function QrLinkPage() {
         {!ready
           ? <p style={{ color: MUTED, fontSize: 12.5, margin: 0, textAlign: "center" }}>Entrez un lien ci-dessus pour générer votre QR code.</p>
           : ratio < 3
-            ? <div style={{ display: "flex", alignItems: "center", gap: 7, color: "#FF6B6B", fontSize: 12, fontWeight: 600, background: "rgba(255,107,107,0.1)", border: "1px solid rgba(255,107,107,0.3)", borderRadius: 999, padding: "6px 14px" }}>
-                <AlertTriangle size={14} /> Risque de non-scan — augmentez le contraste
-              </div>
+            ? <button onClick={() => { setFg("#080808"); setBg("#FFFFFF") }} title="Rétablir noir sur blanc"
+                style={{ display: "flex", alignItems: "center", gap: 7, color: "#FF6B6B", fontSize: 12, fontWeight: 600, background: "rgba(255,107,107,0.1)", border: "1px solid rgba(255,107,107,0.3)", borderRadius: 999, padding: "6px 14px", cursor: "pointer" }}>
+                <AlertTriangle size={14} /> Risque de non-scan — <span style={{ textDecoration: "underline" }}>corriger</span>
+              </button>
             : ratio < 4.5
               ? <div style={{ display: "flex", alignItems: "center", gap: 7, color: "#FBBF24", fontSize: 12, fontWeight: 600, background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 999, padding: "6px 14px" }}>
                   <AlertTriangle size={14} /> Contraste limite — testez avant d&apos;imprimer
