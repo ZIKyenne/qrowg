@@ -6671,24 +6671,25 @@
               </div>
               {/* Génération par IA — décris ton activité, l'IA construit la page */}
               <div style={{ padding: "12px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)", background: "linear-gradient(120deg,rgba(201,168,76,0.09),rgba(57,255,143,0.05))" }}>
-                <p style={{ margin: "0 0 7px", color: "#F5F0E8", fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
-                  <span>🪄</span> Générer ma page avec l&apos;IA
-                  <span style={{ fontSize: 9.5, fontWeight: 500, color: MUTED }}>— décris ton activité, l&apos;IA fait le reste</span>
-                </p>
-                <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
+                  <span style={{ fontSize: 17 }}>🪄</span>
+                  <p style={{ margin: 0, color: "#F5F0E8", fontSize: 13.5, fontWeight: 800 }}>Générer ma page avec l&apos;IA</p>
+                </div>
+                <p style={{ margin: "0 0 10px", color: MUTED, fontSize: 11.5, lineHeight: 1.4 }}>Décris ton activité en une phrase — l&apos;IA construit une page complète, prête à personnaliser.</p>
+                <div style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, gap: 8, alignItems: isMobile ? "stretch" : "flex-start" }}>
                   <textarea
                     value={aiGenPrompt}
                     onChange={e => { setAiGenPrompt(e.target.value); if (aiGenError) setAiGenError(null) }}
                     disabled={aiGenLoading}
                     placeholder="Ex : Salon de coiffure haut de gamme à Lyon, coupe, coloration, barbier. Réservation en ligne, ambiance chaleureuse."
-                    rows={2}
-                    style={{ flex: 1, resize: "vertical", minHeight: 44, background: "rgba(0,0,0,0.35)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 9, color: "#F5F0E8", fontSize: 11.5, padding: "8px 10px", lineHeight: 1.4, fontFamily: "inherit" }}
+                    rows={3}
+                    style={{ flex: 1, resize: "vertical", minHeight: isMobile ? 76 : 60, background: "rgba(0,0,0,0.35)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 10, color: "#F5F0E8", fontSize: 12.5, padding: "10px 12px", lineHeight: 1.45, fontFamily: "inherit", width: "100%", boxSizing: "border-box" as const }}
                   />
                   <button onClick={generateWithAI} disabled={aiGenLoading}
-                    style={{ flexShrink: 0, alignSelf: "stretch", minWidth: 104, padding: "0 14px", borderRadius: 9, border: "none", cursor: aiGenLoading ? "wait" : "pointer", background: aiGenLoading ? "rgba(201,168,76,0.4)" : G, color: "#080808", fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                    style={{ flexShrink: 0, alignSelf: "stretch", minHeight: isMobile ? 48 : undefined, minWidth: isMobile ? undefined : 120, padding: "0 18px", borderRadius: 10, border: "none", cursor: aiGenLoading ? "wait" : "pointer", background: aiGenLoading ? "rgba(201,168,76,0.4)" : `linear-gradient(90deg,${G},#b8953f)`, color: "#080808", fontSize: 13, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", gap: 7, boxShadow: aiGenLoading ? "none" : "0 4px 14px rgba(201,168,76,0.3)" }}>
                     {aiGenLoading
-                      ? <><span style={{ width: 12, height: 12, border: "2px solid rgba(8,8,8,0.3)", borderTopColor: "#080808", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} /> …</>
-                      : <>✨ Générer</>}
+                      ? <><span style={{ width: 13, height: 13, border: "2px solid rgba(8,8,8,0.3)", borderTopColor: "#080808", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} /> Génération…</>
+                      : <>✨ Générer ma page</>}
                   </button>
                 </div>
                 {aiGenError && <p style={{ margin: "7px 0 0", color: "#F87171", fontSize: 10.5 }}>{aiGenError}</p>}
