@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import {
   PLANS, PLAN_ORDER, PLAN_LIST, PLAN_RANK, PLAN_COMPARISON,
-  getPlan, pageLimit, caps, canPrintStudio, canQrAdvanced, canAI, canExport,
+  getPlan, pageLimit, caps, canPrintStudio, canQrAdvanced, canAI, canRemoveBranding, canExport,
   minPlanFor, minPlanForFormat, fmtPrice,
   type PlanId, type ExportFormat,
 } from "./plans"
@@ -36,7 +36,14 @@ describe("gating des capacites", () => {
     expect(canPrintStudio("free")).toBe(false)
     expect(canQrAdvanced("free")).toBe(false)
     expect(canAI("free")).toBe(false)
+    expect(canRemoveBranding("free")).toBe(false)
     expect(caps("free").exportFormats).toEqual(["png"])
+  })
+  it("le branding est retire des le plan Starter", () => {
+    expect(canRemoveBranding("free")).toBe(false)
+    expect(canRemoveBranding("starter")).toBe(true)
+    expect(canRemoveBranding("pro")).toBe(true)
+    expect(canRemoveBranding("business")).toBe(true)
   })
   it("starter debloque Print/QR avance mais pas l'IA", () => {
     expect(canPrintStudio("starter")).toBe(true)
@@ -131,7 +138,7 @@ describe("coherence de l'echelle des plans", () => {
   })
 
   it("une capacite acquise n'est jamais reperdue en montant de gamme", () => {
-    for (const cap of ["printStudio", "qrStudioAdvanced", "ai"] as const) {
+    for (const cap of ["printStudio", "qrStudioAdvanced", "ai", "removeBranding"] as const) {
       let seen = false
       for (const p of PLAN_LIST) {
         if (p.caps[cap]) seen = true

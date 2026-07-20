@@ -2821,7 +2821,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
 }
 
 // ── Main Component ────────────────────────────────────────────────────────────
-export default function PublicPageClient({ page, blocks }: { page: Page; blocks: Block[] }) {
+export default function PublicPageClient({ page, blocks, showBranding = true }: { page: Page; blocks: Block[]; showBranding?: boolean }) {
   const theme = {
     bg: "#080808", surface: "#111009", primary: "#C9A84C", accent: "#39FF8F",
     text: "#F5F0E8", muted: "#8A8478",
@@ -3031,13 +3031,15 @@ export default function PublicPageClient({ page, blocks }: { page: Page; blocks:
           )
         })}
 
-        {/* Footer branding */}
-        <div style={{ padding: "20px 24px 32px", textAlign: "center", borderTop: `1px solid ${theme.primary}10`, marginTop: 8 }}>
-          <a href="https://qrfolio.app" target="_blank" rel="noopener noreferrer"
-            style={{ color: theme.muted, fontSize: 11, textDecoration: "none", opacity: 0.5, letterSpacing: 1, fontFamily: theme.fontBody }}>
-            Cree avec QRfolio
-          </a>
-        </div>
+        {/* Footer branding — retire sur les plans payants ("Sans branding") */}
+        {showBranding && (
+          <div style={{ padding: "20px 24px 32px", textAlign: "center", borderTop: `1px solid ${theme.primary}10`, marginTop: 8 }}>
+            <a href="https://qrfolio.app" target="_blank" rel="noopener noreferrer"
+              style={{ color: theme.muted, fontSize: 11, textDecoration: "none", opacity: 0.5, letterSpacing: 1, fontFamily: theme.fontBody }}>
+              Cree avec QRfolio
+            </a>
+          </div>
+        )}
       </div>
     </div>
   )

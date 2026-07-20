@@ -1,6 +1,7 @@
 ﻿import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import PublicPageClient from "./PublicPageClient"
+import { canRemoveBranding } from "@/lib/plans"
 import type { Metadata } from "next"
 
 interface Props { params: Promise<{ slug: string }> }
@@ -48,12 +49,16 @@ export default async function PublicPage({ params }: Props) {
 
   const { data: page } = await supabase
     .from("pages")
-    .select("*, profiles(full_name, username, avatar_url)")
+    .select("*, profiles(full_name, username, avatar_url, plan)")
     .eq("slug", slug)
     .eq("status", "published")
     .single()
 
   if (!page) notFound()
+
+  // "Sans branding" est un avantage payant : on n'affiche le footer QRfolio que
+  // si le plan du proprietaire ne retire pas le branding (free).
+  const showBranding = !canRemoveBranding((page.profiles as any)?.plan)
 
   const { data: blocks } = await supabase
     .from("blocks")
@@ -84,7 +89,7 @@ export default async function PublicPage({ params }: Props) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <PublicPageClient page={page} blocks={blocks || []} />
+      <PublicPageClient page={page} blocks={blocks || []} showBranding={showBranding} />
     </>
   )
 }
