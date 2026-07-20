@@ -46,23 +46,44 @@
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 420px) 1fr;
+  grid-template-rows: min-content 1fr;
+  grid-template-areas:
+    "preview settings"
+    "actions settings";
   gap: 36px;
   margin-top: 44px;
   align-items: start;
 }
+.stage { grid-area: preview; }
+.settings { grid-area: settings; }
+.secondaryActions {
+  grid-area: actions;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 @media (max-width: 880px) {
-  /* Flux bloc (pas grille) pour que l'aperçu puisse être sticky */
-  .grid { display: block; }
-  /* Aperçu compact, collant en haut -> reste visible pendant l'édition */
+  /* Colonne : aperçu compact collant EN HAUT, réglages juste dessous,
+     export/partage tout en bas -> la création reste "vue d'ensemble". */
+  .wrap { padding: 14px 16px calc(120px + env(safe-area-inset-bottom)); }
+  .grid { display: flex; flex-direction: column; gap: 14px; margin-top: 16px; }
+
+  /* En-tête compact (le grand titre serif mangeait un écran entier) */
+  .eyebrow { font-size: 10px; letter-spacing: 0.18em; }
+  .title { font-size: 23px; line-height: 1.1; margin: 8px 0 6px; }
+  .lede { display: none; }
+
+  /* Aperçu compact + collant -> visible pendant tous les réglages */
   .stage {
     position: sticky; top: 0; z-index: 5;
-    margin-bottom: 18px; gap: 10px;
-    padding: 16px 18px;
+    gap: 12px;
+    padding: 14px 16px;
     border-radius: 18px;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
   }
-  .preview { width: 148px; height: 148px; margin-bottom: 2px; }
-  .panel { padding: 18px; }
+  .preview { width: 128px; height: 128px; margin-bottom: 0; }
+  .panel { padding: 16px; }
 }
 
 .panel {

@@ -236,10 +236,6 @@ export default function AvatarStudio({
             <button className={`${styles.btn} ${styles.primary}`} onClick={onSave} disabled={pending}>
               {pending ? "Enregistrement…" : "Enregistrer sur mon profil"}
             </button>
-          </div>
-          <div className={styles.actions}>
-            <button className={styles.btn} onClick={onPng}>Télécharger PNG</button>
-            <button className={styles.btn} onClick={onSvg}>SVG</button>
             <button
               className={`${styles.btn} ${styles.ghost}`}
               aria-label="Tout aléatoire (formes, couleurs, modèle)"
@@ -249,54 +245,6 @@ export default function AvatarStudio({
               ⤮
             </button>
           </div>
-
-          {/* Partage — met en avant QRfolio (croissance / trafic) */}
-          <div className={styles.actions} style={{ position: "relative" }}>
-            <button
-              className={styles.btn}
-              onClick={() => setShareOpen((v) => !v)}
-              style={{ borderColor: "rgba(57,255,143,0.35)", background: "rgba(57,255,143,0.10)", color: "#39FF8F", fontWeight: 700 }}
-            >
-              🔗 Partager mon avatar
-            </button>
-
-            {shareOpen && (
-              <div
-                style={{ position: "absolute", left: 0, right: 0, top: "calc(100% + 8px)", zIndex: 20, background: "#15130b", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 14, padding: 12, boxShadow: "0 16px 40px rgba(0,0,0,0.55)" }}
-              >
-                <p style={{ margin: "0 0 4px", color: "#F5F0E8", fontSize: 13, fontWeight: 700 }}>Faites découvrir QRfolio</p>
-                <p style={{ margin: "0 0 10px", color: "#A8A190", fontSize: 11, lineHeight: 1.5 }}>Partagez votre avatar avec le lien — chaque partage fait grandir la communauté ✨</p>
-                <button
-                  type="button"
-                  onClick={() => { onShareNative(); setShareOpen(false); }}
-                  style={{ width: "100%", marginBottom: 8, padding: "10px", borderRadius: 10, border: "none", background: "linear-gradient(90deg,#C9A84C,#b8953f)", color: "#0b0b0b", fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}
-                >
-                  Partage rapide
-                </button>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7 }}>
-                  {shareTargets.map((s) => (
-                    <a
-                      key={s.label}
-                      href={s.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => setShareOpen(false)}
-                      style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", borderRadius: 9, background: "rgba(255,255,255,0.04)", border: `1px solid ${s.color}40`, color: s.color, fontSize: 12, fontWeight: 600, textDecoration: "none" }}
-                    >
-                      {s.label}
-                    </a>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => { copyShareLink(); setShareOpen(false); }}
-                    style={{ gridColumn: "1 / -1", padding: "9px", borderRadius: 9, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "#F5F0E8", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
-                  >
-                    Copier le lien
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
           {status && (
             <p className={styles.status}>
               {signedIn ? status : "Connectez-vous pour enregistrer. Le téléchargement reste disponible."}
@@ -305,7 +253,7 @@ export default function AvatarStudio({
         </div>
 
         {/* Réglages */}
-        <div className={styles.panel}>
+        <div className={`${styles.panel} ${styles.settings}`}>
           <div className={styles.block}>
             <span className={styles.label}>Famille</span>
             <div className={styles.tabs} role="tablist">
@@ -431,6 +379,62 @@ export default function AvatarStudio({
                 </div>
               </label>
             </div>
+          </div>
+        </div>
+
+        {/* Export + partage — en bas sur mobile (l'aperçu et les réglages passent avant) */}
+        <div className={`${styles.panel} ${styles.secondaryActions}`}>
+          <div className={styles.actions}>
+            <button className={styles.btn} onClick={onPng}>Télécharger PNG</button>
+            <button className={styles.btn} onClick={onSvg}>SVG</button>
+          </div>
+
+          {/* Partage — met en avant QRfolio (croissance / trafic) */}
+          <div className={styles.actions} style={{ position: "relative" }}>
+            <button
+              className={styles.btn}
+              onClick={() => setShareOpen((v) => !v)}
+              style={{ borderColor: "rgba(57,255,143,0.35)", background: "rgba(57,255,143,0.10)", color: "#39FF8F", fontWeight: 700 }}
+            >
+              🔗 Partager mon avatar
+            </button>
+
+            {shareOpen && (
+              <div
+                style={{ position: "absolute", left: 0, right: 0, bottom: "calc(100% + 8px)", zIndex: 20, background: "#15130b", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 14, padding: 12, boxShadow: "0 16px 40px rgba(0,0,0,0.55)" }}
+              >
+                <p style={{ margin: "0 0 4px", color: "#F5F0E8", fontSize: 13, fontWeight: 700 }}>Faites découvrir QRfolio</p>
+                <p style={{ margin: "0 0 10px", color: "#A8A190", fontSize: 11, lineHeight: 1.5 }}>Partagez votre avatar avec le lien — chaque partage fait grandir la communauté ✨</p>
+                <button
+                  type="button"
+                  onClick={() => { onShareNative(); setShareOpen(false); }}
+                  style={{ width: "100%", marginBottom: 8, padding: "10px", borderRadius: 10, border: "none", background: "linear-gradient(90deg,#C9A84C,#b8953f)", color: "#0b0b0b", fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}
+                >
+                  Partage rapide
+                </button>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7 }}>
+                  {shareTargets.map((s) => (
+                    <a
+                      key={s.label}
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setShareOpen(false)}
+                      style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", borderRadius: 9, background: "rgba(255,255,255,0.04)", border: `1px solid ${s.color}40`, color: s.color, fontSize: 12, fontWeight: 600, textDecoration: "none" }}
+                    >
+                      {s.label}
+                    </a>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => { copyShareLink(); setShareOpen(false); }}
+                    style={{ gridColumn: "1 / -1", padding: "9px", borderRadius: 9, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "#F5F0E8", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                  >
+                    Copier le lien
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
