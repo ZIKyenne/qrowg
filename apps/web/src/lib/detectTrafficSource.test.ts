@@ -44,6 +44,11 @@ describe("classifyTraffic — référent", () => {
     expect(classifyTraffic("", "https://unblog.example.fr/article")).toEqual({ source: "referral", referrer: "unblog.example.fr" })
     expect(classifyTraffic("", "https://www.example.fr/x").referrer).toBe("example.fr")
   })
+  it("yahoo : mail.yahoo -> email, mais yahoo/recherche -> referral (plus de faux 'email')", () => {
+    expect(classifyTraffic("", "https://mail.yahoo.com/").source).toBe("email")
+    expect(classifyTraffic("", "https://fr.search.yahoo.com/search?q=x").source).toBe("referral")
+    expect(classifyTraffic("", "https://yahoo.com/").source).toBe("referral")
+  })
   it("pas de référent -> direct", () => {
     expect(classifyTraffic("", "")).toEqual({ source: "direct", referrer: null })
   })

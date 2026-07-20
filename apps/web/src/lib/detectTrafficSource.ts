@@ -29,8 +29,8 @@ const SOURCE_MAP: [RegExp, TrafficSource][] = [
   [/x\.com|twitter\.com|t\.co/i,                 "twitter"],
   [/whatsapp\.com|wa\.me/i,                        "whatsapp"],
   [/t\.me|telegram\.me|telegram\.org/i,           "telegram"],
-  [/mail\.|gmail\.com|outlook\.com|yahoo\.com|hotmail\.com|substack\.com|mailchimp\.com/i, "email"],
-  [/google\.|bing\.com|duckduckgo\.com|yahoo\.com|qwant\.com/i, "google"],
+  [/mail\.|gmail\.com|outlook\.com|hotmail\.com|substack\.com|mailchimp\.com/i, "email"],
+  [/google\.|bing\.com|duckduckgo\.com|qwant\.com/i, "google"],
 ]
 
 // Coeur PUR (testable) : classe la source à partir de la query string et du
