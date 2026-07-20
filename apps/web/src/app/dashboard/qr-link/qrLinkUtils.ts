@@ -38,3 +38,32 @@ export function buildWifi(ssid: string, password: string, enc: "WPA" | "WEP" | "
   const p = enc === "nopass" ? "" : password
   return `WIFI:T:${enc};S:${escapeWifi(s)};P:${escapeWifi(p)};;`
 }
+
+// Echappe les caracteres speciaux du format vCard (\ , ; et retours ligne).
+export function escapeVCard(s: string): string {
+  return s.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;")
+}
+
+export type VCardFields = {
+  firstName?: string; lastName?: string; phone?: string
+  email?: string; org?: string; title?: string; url?: string
+}
+
+// Construit une carte de visite vCard 3.0 (scan -> propose d'ajouter le contact).
+// Au moins un nom est requis (FN obligatoire), sinon chaine vide.
+export function buildVCard(v: VCardFields): string {
+  const first = (v.firstName ?? "").trim()
+  const last = (v.lastName ?? "").trim()
+  const fn = [first, last].filter(Boolean).join(" ")
+  if (!fn) return ""
+  const lines = ["BEGIN:VCARD", "VERSION:3.0"]
+  lines.push(`N:${escapeVCard(last)};${escapeVCard(first)};;;`)
+  lines.push(`FN:${escapeVCard(fn)}`)
+  if (v.org?.trim()) lines.push(`ORG:${escapeVCard(v.org.trim())}`)
+  if (v.title?.trim()) lines.push(`TITLE:${escapeVCard(v.title.trim())}`)
+  if (v.phone?.trim()) lines.push(`TEL;TYPE=CELL:${escapeVCard(v.phone.trim())}`)
+  if (v.email?.trim()) lines.push(`EMAIL;TYPE=INTERNET:${escapeVCard(v.email.trim())}`)
+  if (v.url?.trim()) lines.push(`URL:${escapeVCard(normalizeUrl(v.url.trim()))}`)
+  lines.push("END:VCARD")
+  return lines.join("\n")
+}

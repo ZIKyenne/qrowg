@@ -1,13 +1,14 @@
 "use client"
 
-// Generateur de QR code — Lien / WiFi / Texte. 100% local (qr-code-styling via
-// qrRender), sans API. Styles, logo, correction, export PNG/SVG, historique.
+// Generateur de QR code — Lien / WiFi / Texte / Contact. 100% local (qr-code-
+// styling via qrRender), sans API. Styles, logo, correction, export PNG/SVG,
+// historique.
 import { useMemo, useRef, useState, useEffect } from "react"
 import Link from "next/link"
-import { ArrowLeft, Download, Check, QrCode as QrIcon, ShieldCheck, AlertTriangle, Upload, X, Link2, Wifi, Type } from "lucide-react"
+import { ArrowLeft, Download, Check, QrCode as QrIcon, ShieldCheck, AlertTriangle, Upload, X, Link2, Wifi, Type, Contact } from "lucide-react"
 import QRCanvas from "../qr-codes/QRCanvas"
 import { getQRBlob, type QROptions, type QRStyleConfig } from "../qr-codes/qrRender"
-import { contrast, normalizeUrl, buildWifi } from "./qrLinkUtils"
+import { contrast, normalizeUrl, buildWifi, buildVCard, type VCardFields } from "./qrLinkUtils"
 
 const G = "#C9A84C"
 const MUTED = "#A8A190"
@@ -28,20 +29,27 @@ const TYPES = [
   { k: "link" as const, label: "Lien", icon: Link2 },
   { k: "wifi" as const, label: "WiFi", icon: Wifi },
   { k: "text" as const, label: "Texte", icon: Type },
+  { k: "contact" as const, label: "Contact", icon: Contact },
 ]
-type QrType = "link" | "wifi" | "text"
+type QrType = "link" | "wifi" | "text" | "contact"
 type WifiEnc = "WPA" | "WEP" | "nopass"
 
-type QrHistEntry = {
-  type: QrType; url: string; ssid: string; wifiPass: string; wifiEnc: WifiEnc; text: string
+const EMPTY_VC: VCardFields = { firstName: "", lastName: "", phone: "", email: "", org: "", title: "", url: "" }
+
+// Champs qui determinent la charge utile du QR (partages entre l'etat live et l'historique).
+type QrSource = {
+  type: QrType; url: string; ssid: string; wifiPass: string; wifiEnc: WifiEnc; text: string; vc: VCardFields
+}
+type QrHistEntry = QrSource & {
   fg: string; bg: string; ecc: "L" | "M" | "Q" | "H"; styleKey: string
 }
 
 // Charge utile encodee dans le QR selon le type.
-function payload(type: QrType, url: string, ssid: string, wifiPass: string, wifiEnc: WifiEnc, text: string): string {
-  if (type === "wifi") return buildWifi(ssid, wifiPass, wifiEnc)
-  if (type === "text") return text.trim()
-  return normalizeUrl(url)
+function payload(s: QrSource): string {
+  if (s.type === "wifi") return buildWifi(s.ssid, s.wifiPass, s.wifiEnc)
+  if (s.type === "text") return s.text.trim()
+  if (s.type === "contact") return buildVCard(s.vc)
+  return normalizeUrl(s.url)
 }
 
 export default function QrLinkPage() {
@@ -51,6 +59,7 @@ export default function QrLinkPage() {
   const [wifiPass, setWifiPass] = useState("")
   const [wifiEnc, setWifiEnc] = useState<WifiEnc>("WPA")
   const [text, setText] = useState("")
+  const [vc, setVc] = useState<VCardFields>(EMPTY_VC)
   const [fg, setFg] = useState("#080808")
   const [bg, setBg] = useState("#FFFFFF")
   const [ecc, setEcc] = useState<"L" | "M" | "Q" | "H">("M")
@@ -60,24 +69,30 @@ export default function QrLinkPage() {
   const [done, setDone] = useState(false)
   const logoInput = useRef<HTMLInputElement>(null)
 
-  const data = useMemo(() => payload(qrType, url, ssid, wifiPass, wifiEnc, text), [qrType, url, ssid, wifiPass, wifiEnc, text])
+  const data = useMemo(() => payload({ type: qrType, url, ssid, wifiPass, wifiEnc, text, vc }), [qrType, url, ssid, wifiPass, wifiEnc, text, vc])
   const ready = data.length > 0
   const ratio = contrast(fg, bg)
 
   const [history, setHistory] = useState<QrHistEntry[]>([])
   useEffect(() => { try { const h = JSON.parse(localStorage.getItem("qrfolio_qr_history") || "[]"); if (Array.isArray(h)) setHistory(h.slice(0, 8)) } catch {} }, [])
   const saveToHistory = () => setHistory(prev => {
-    const entry: QrHistEntry = { type: qrType, url: url.trim(), ssid, wifiPass, wifiEnc, text: text.trim(), fg, bg, ecc, styleKey }
-    const next = [entry, ...prev.filter(e => payload(e.type, e.url, e.ssid, e.wifiPass, e.wifiEnc, e.text) !== data)].slice(0, 8)
+    const entry: QrHistEntry = { type: qrType, url: url.trim(), ssid, wifiPass, wifiEnc, text: text.trim(), vc, fg, bg, ecc, styleKey }
+    const next = [entry, ...prev.filter(e => payload(e) !== data)].slice(0, 8)
     try { localStorage.setItem("qrfolio_qr_history", JSON.stringify(next)) } catch {}
     return next
   })
   const loadEntry = (h: QrHistEntry) => {
     setQrType(h.type); setUrl(h.url); setSsid(h.ssid); setWifiPass(h.wifiPass); setWifiEnc(h.wifiEnc); setText(h.text)
+    setVc({ ...EMPTY_VC, ...(h.vc || {}) })
     setFg(h.fg); setBg(h.bg); setEcc(h.ecc); setStyleKey(h.styleKey); setLogo(null)
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" })
   }
-  const histLabel = (h: QrHistEntry) => h.type === "wifi" ? `📶 ${h.ssid}` : h.type === "text" ? h.text : normalizeUrl(h.url).replace(/^https?:\/\//, "")
+  const vcName = (v: VCardFields) => [v.firstName, v.lastName].filter(Boolean).join(" ").trim()
+  const histLabel = (h: QrHistEntry) =>
+    h.type === "wifi" ? `📶 ${h.ssid}`
+    : h.type === "text" ? h.text
+    : h.type === "contact" ? `👤 ${vcName(h.vc || {})}`
+    : normalizeUrl(h.url).replace(/^https?:\/\//, "")
 
   const preset = STYLE_PRESETS.find(p => p.k === styleKey) || STYLE_PRESETS[0]
   const effectiveEcc: "L" | "M" | "Q" | "H" = logo ? "H" : ecc
@@ -116,7 +131,11 @@ export default function QrLinkPage() {
       style={{ width: 38, height: 38, borderRadius: 11, background: c, border: on ? `2.5px solid ${G}` : "2px solid rgba(255,255,255,0.14)", boxShadow: on ? `0 0 0 3px ${G}22` : "none", cursor: "pointer", flexShrink: 0, transition: "all .15s" }} />
   )
 
-  const previewLabel = qrType === "wifi" ? (ssid ? `📶 ${ssid}` : "") : qrType === "text" ? text.trim() : normalizeUrl(url).replace(/^https?:\/\//, "")
+  const previewLabel =
+    qrType === "wifi" ? (ssid ? `📶 ${ssid}` : "")
+    : qrType === "text" ? text.trim()
+    : qrType === "contact" ? (vcName(vc) ? `👤 ${vcName(vc)}` : "")
+    : normalizeUrl(url).replace(/^https?:\/\//, "")
 
   return (
     <div className="rpad" style={{ minHeight: "100dvh", maxWidth: 640, margin: "0 auto", padding: "18px 18px calc(30px + env(safe-area-inset-bottom))" }}>
@@ -130,7 +149,7 @@ export default function QrLinkPage() {
         </div>
         <div>
           <h1 style={{ color: "#F5F0E8", fontSize: 23, fontWeight: 800, margin: 0, letterSpacing: -0.3 }}>Créer un QR code</h1>
-          <p style={{ color: MUTED, fontSize: 13, margin: "2px 0 0", lineHeight: 1.4 }}>Lien, réseau WiFi ou texte — prêt à imprimer en 3 secondes.</p>
+          <p style={{ color: MUTED, fontSize: 13, margin: "2px 0 0", lineHeight: 1.4 }}>Lien, WiFi, texte ou carte de visite — prêt à imprimer en 3 secondes.</p>
         </div>
       </div>
 
@@ -179,6 +198,21 @@ export default function QrLinkPage() {
           <textarea value={text} onChange={e => setText(e.target.value)} rows={3} placeholder="N'importe quel texte à encoder…"
             style={{ width: "100%", boxSizing: "border-box", resize: "vertical", minHeight: 76, background: "#0A0A0A", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "#F5F0E8", fontSize: 15, padding: "12px 14px", lineHeight: 1.45, fontFamily: "inherit", outline: "none" }} />
         </>)}
+
+        {qrType === "contact" && (<>
+          <p style={secTitle}>{accentBar} Carte de visite</p>
+          <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
+            <input value={vc.firstName} onChange={e => setVc(v => ({ ...v, firstName: e.target.value }))} placeholder="Prénom" autoComplete="given-name"
+              style={{ ...field, borderColor: vcName(vc) ? G + "80" : "rgba(255,255,255,0.14)" }} />
+            <input value={vc.lastName} onChange={e => setVc(v => ({ ...v, lastName: e.target.value }))} placeholder="Nom" autoComplete="family-name" style={field} />
+          </div>
+          <input value={vc.phone} onChange={e => setVc(v => ({ ...v, phone: e.target.value }))} inputMode="tel" autoComplete="tel" placeholder="Téléphone" style={{ ...field, marginBottom: 10 }} />
+          <input value={vc.email} onChange={e => setVc(v => ({ ...v, email: e.target.value }))} inputMode="email" autoComplete="email" placeholder="Email" style={{ ...field, marginBottom: 10 }} />
+          <input value={vc.org} onChange={e => setVc(v => ({ ...v, org: e.target.value }))} autoComplete="organization" placeholder="Entreprise" style={{ ...field, marginBottom: 10 }} />
+          <input value={vc.title} onChange={e => setVc(v => ({ ...v, title: e.target.value }))} autoComplete="organization-title" placeholder="Fonction (ex : Gérant)" style={{ ...field, marginBottom: 10 }} />
+          <input value={vc.url} onChange={e => setVc(v => ({ ...v, url: e.target.value }))} inputMode="url" autoComplete="url" placeholder="Site web" style={field} />
+          <p style={{ color: MUTED, fontSize: 11, margin: "9px 2px 0", lineHeight: 1.45 }}>Scanné, ce QR propose d&apos;enregistrer le contact. Seul un nom (ou prénom) est requis.</p>
+        </>)}
       </div>
 
       {/* Aperçu — poster QR */}
@@ -191,7 +225,7 @@ export default function QrLinkPage() {
         </div>
 
         {!ready
-          ? <p style={{ color: MUTED, fontSize: 12.5, margin: 0, textAlign: "center" }}>{qrType === "wifi" ? "Entrez le nom du réseau pour générer le QR." : "Renseignez le contenu ci-dessus pour générer votre QR code."}</p>
+          ? <p style={{ color: MUTED, fontSize: 12.5, margin: 0, textAlign: "center" }}>{qrType === "wifi" ? "Entrez le nom du réseau pour générer le QR." : qrType === "contact" ? "Entrez au moins un nom pour générer la carte." : "Renseignez le contenu ci-dessus pour générer votre QR code."}</p>
           : ratio < 3
             ? <button onClick={() => { setFg("#080808"); setBg("#FFFFFF") }} title="Rétablir noir sur blanc"
                 style={{ display: "flex", alignItems: "center", gap: 7, color: "#FF6B6B", fontSize: 12, fontWeight: 600, background: "rgba(255,107,107,0.1)", border: "1px solid rgba(255,107,107,0.3)", borderRadius: 999, padding: "6px 14px", cursor: "pointer" }}>
@@ -281,7 +315,7 @@ export default function QrLinkPage() {
               <button key={i} title={`Réutiliser : ${histLabel(h)}`} onClick={() => loadEntry(h)}
                 style={{ flexShrink: 0, width: 98, display: "flex", flexDirection: "column", alignItems: "center", gap: 7, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 13, padding: 9, cursor: "pointer" }}>
                 <div style={{ background: h.bg, borderRadius: 8, padding: 5, lineHeight: 0 }}>
-                  <QRCanvas value={payload(h.type, h.url, h.ssid, h.wifiPass, h.wifiEnc, h.text) || "https://qrfolio.app"} size={58} fg={h.fg} bg={h.bg} />
+                  <QRCanvas value={payload(h) || "https://qrfolio.app"} size={58} fg={h.fg} bg={h.bg} />
                 </div>
                 <span style={{ color: MUTED, fontSize: 9.5, maxWidth: 86, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{histLabel(h)}</span>
               </button>

@@ -1,5 +1,36 @@
 import { describe, it, expect } from "vitest"
-import { lum, contrast, normalizeUrl, escapeWifi, buildWifi } from "./qrLinkUtils"
+import { lum, contrast, normalizeUrl, escapeWifi, buildWifi, escapeVCard, buildVCard } from "./qrLinkUtils"
+
+describe("buildVCard", () => {
+  it("construit une vCard 3.0 complete", () => {
+    const out = buildVCard({ firstName: "Marie", lastName: "Durand", phone: "+33600000000", email: "marie@resto.fr", org: "Le Resto", title: "Gerante", url: "resto.fr" })
+    expect(out).toContain("BEGIN:VCARD")
+    expect(out).toContain("VERSION:3.0")
+    expect(out).toContain("N:Durand;Marie;;;")
+    expect(out).toContain("FN:Marie Durand")
+    expect(out).toContain("ORG:Le Resto")
+    expect(out).toContain("TITLE:Gerante")
+    expect(out).toContain("TEL;TYPE=CELL:+33600000000")
+    expect(out).toContain("EMAIL;TYPE=INTERNET:marie@resto.fr")
+    expect(out).toContain("URL:https://resto.fr")
+    expect(out.endsWith("END:VCARD")).toBe(true)
+  })
+  it("omet les champs vides", () => {
+    const out = buildVCard({ firstName: "Marie" })
+    expect(out).toContain("FN:Marie")
+    expect(out).not.toContain("ORG:")
+    expect(out).not.toContain("TEL")
+    expect(out).not.toContain("EMAIL")
+  })
+  it("nom requis : sans prenom ni nom -> chaine vide", () => {
+    expect(buildVCard({ phone: "+33600000000", email: "x@y.fr" })).toBe("")
+    expect(buildVCard({})).toBe("")
+  })
+  it("echappe les caracteres speciaux", () => {
+    expect(escapeVCard("Durand, Marie; SARL")).toBe("Durand\\, Marie\\; SARL")
+    expect(buildVCard({ firstName: "Jean", org: "Dupont; Fils" })).toContain("ORG:Dupont\\; Fils")
+  })
+})
 
 describe("buildWifi", () => {
   it("construit une charge WIFI standard (WPA)", () => {
