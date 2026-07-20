@@ -336,6 +336,22 @@
   .stage .status { flex-basis: 100%; margin: 0; }
 
   .panel { padding: 16px; }
-  /* Galerie de modèles : vignettes plus grandes (4 colonnes au lieu de 5) */
-  .gallery { grid-template-columns: repeat(4, 1fr); max-height: 220px; }
+  /* Galerie de modèles : 2 rangées, défilement HORIZONTAL uniquement.
+     grid-auto-flow: column remplit colonne par colonne (2 vignettes) puis
+     déborde à droite -> on scrolle de gauche à droite. */
+  .gallery {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(2, 84px);
+    grid-auto-columns: 84px;
+    gap: 10px;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 0 8px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+  .gallery::-webkit-scrollbar { height: 6px; width: auto; }
+  .swatch { scroll-snap-align: start; }
 }
