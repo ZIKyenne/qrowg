@@ -2,22 +2,11 @@ import { NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import { pageLimit } from "@/lib/plans"
+import { slugifyUnique } from "@/lib/slug"
 
 // Cree une page VIERGE (brouillon) et renvoie son id. Utilise par le builder
 // quand l'URL est /dashboard/builder/new (aucune page en base a ce stade).
 // Respecte la contrainte slug_format : ^[a-z0-9_-]{2,60}$
-function slugify(input: string): string {
-  const base = (input || "page")
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 50)
-  const safeBase = base.length >= 2 ? base : "page"
-  const suffix = Math.random().toString(36).slice(2, 8)
-  return `${safeBase}-${suffix}`
-}
 
 const DEFAULT_THEME = {
   name: "midnight_gold",
@@ -72,7 +61,7 @@ export async function POST(req: NextRequest) {
     let newPage: any = null
     let pageError: any = null
     for (let attempt = 0; attempt < 5 && !newPage; attempt++) {
-      const cleanSlug = slugify(title)
+      const cleanSlug = slugifyUnique(title)
       const res = await supabaseAdmin
         .from("pages")
         .insert({ user_id: user.id, title, slug: cleanSlug, status: "draft", theme: DEFAULT_THEME })

@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { PLAN_RANK } from "@/lib/plans"
+import { slugifyBase } from "@/lib/slug"
 import { Sparkles, ArrowRight, Check, X, Lock, Search, Heart, Eye, Clock, Layers, SlidersHorizontal } from "lucide-react"
 import TemplatePreviewModal from "./TemplatePreviewModal"
 import Particles from "@/components/Particles"
@@ -642,11 +643,8 @@ function NamingModal({ template, blockCount, onClose, onCreate }: {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState("")
 
-  function slugify(input: string): string {
-    return (input || "")
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60)
-  }
+  // Slug d'affichage (sans suffixe, cap 60) via le coeur pur partage @/lib/slug.
+  const slugify = (input: string) => slugifyBase(input, 60)
 
   // Auto-slug depuis le nom tant que l'utilisateur n'a pas touche le slug
   useEffect(() => {

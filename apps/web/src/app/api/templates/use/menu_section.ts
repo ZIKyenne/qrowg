@@ -1,23 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
+import { slugifyUnique } from "@/lib/slug"
 
-// Transforme un texte en slug valide : minuscules, accents retires,
-// tout ce qui n'est pas lettre/chiffre devient "-", + suffixe aleatoire.
-// Respecte la contrainte slug_format : ^[a-z0-9_-]{2,60}$
-function slugify(input: string): string {
-  const base = (input || "page")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")   // retire les accents
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")        // tout le reste -> "-"
-    .replace(/^-+|-+$/g, "")            // pas de "-" au debut/fin
-    .slice(0, 50)                       // garde de la place pour le suffixe
-
-  const safeBase = base.length >= 2 ? base : "page"
-  const suffix = Math.random().toString(36).slice(2, 8)
-  return `${safeBase}-${suffix}`
-}
+// Slug valide via @/lib/slug. Respecte slug_format : ^[a-z0-9_-]{2,60}$
 
 export async function POST(req: NextRequest) {
   try {
@@ -49,7 +35,7 @@ export async function POST(req: NextRequest) {
     const { templateId, templateName, theme, blocks } = body
 
     // On IGNORE le slug recu du navigateur et on le fabrique proprement.
-    const cleanSlug = slugify(templateName || templateId || "page")
+    const cleanSlug = slugifyUnique(templateName || templateId || "page")
 
     const { data: newPage, error: pageError } = await supabaseAdmin
       .from("pages")
