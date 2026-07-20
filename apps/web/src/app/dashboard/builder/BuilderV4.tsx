@@ -3525,6 +3525,7 @@
 
   function ThemePanel({ theme, onThemeChange }: { theme: PageTheme; onThemeChange: (t: PageTheme) => void }) {
     const [themeTab, setThemeTab] = useState<"themes"|"colors"|"fonts"|"bg"|"blocks">("themes")
+    const [themeBlocksAdv, setThemeBlocksAdv] = useState(false) // Avance masque par defaut (animation, effet verre) — review #4
     const [bgMode, setBgMode] = useState<string>(theme.bgMode||"solid")
     const [bgSubTab, setBgSubTab] = useState<"type"|"effects"|"animation"|"presets"|"advanced">("presets")
     const [activeCat, setActiveCat] = useState<string>(PRESET_CATEGORIES[0].id)
@@ -4408,7 +4409,6 @@
             { key: "__radius", label: "Coins arrondis", opts: BLOCK_RADIUS_OPTIONS, def: "Défaut" },
             { key: "__shadow", label: "Ombre", opts: BLOCK_SHADOW_OPTIONS, def: "Non" },
             { key: "__space",  label: "Espacement vertical", opts: BLOCK_SPACE_OPTIONS, def: "Défaut" },
-            { key: "__anim",   label: "Animation à l'apparition", opts: BLOCK_ANIM_OPTIONS, def: "Aucune" },
           ]
           const hasStyle = Object.keys(bs).length > 0
           return (
@@ -4422,10 +4422,22 @@
                   <Segmented value={String(bs[r.key] ?? r.def)} options={r.opts} onChange={v => setBS(r.key, v)} />
                 </div>
               ))}
-              <div>
-                <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 6, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Effet verre (flou)</label>
-                <Segmented value={bs.__glass ? "Oui" : "Non"} options={["Non", "Oui"]} onChange={v => setBS("__glass", v === "Oui")} />
-              </div>
+              {/* Avance masque par defaut : animation + effet verre (review #4 "options avancees trop tot") */}
+              <button type="button" onClick={() => setThemeBlocksAdv(o => !o)}
+                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", cursor: "pointer", padding: "2px 0", color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5, fontWeight: 700 }}>
+                Avancé
+                <ChevronDown size={14} style={{ transform: themeBlocksAdv ? "rotate(180deg)" : "none", transition: "transform .2s" }} />
+              </button>
+              {themeBlocksAdv && (<>
+                <div>
+                  <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 6, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Animation à l&apos;apparition</label>
+                  <Segmented value={String(bs.__anim ?? "Aucune")} options={BLOCK_ANIM_OPTIONS} onChange={v => setBS("__anim", v)} />
+                </div>
+                <div>
+                  <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 6, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Effet verre (flou)</label>
+                  <Segmented value={bs.__glass ? "Oui" : "Non"} options={["Non", "Oui"]} onChange={v => setBS("__glass", v === "Oui")} />
+                </div>
+              </>)}
               {hasStyle && (
                 <button onClick={clearBS}
                   style={{ marginTop: 2, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, padding: "9px", color: MUTED, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
