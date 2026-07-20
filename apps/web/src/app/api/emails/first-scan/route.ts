@@ -1,6 +1,7 @@
 import { Resend } from "resend"
 import { NextRequest, NextResponse } from "next/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
+import { escapeHtml } from "@/lib/escapeHtml"
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,7 +16,7 @@ export async function POST(req: NextRequest) {
       from: EMAIL_FROM,
       to: email,
       subject: "Ton premier scan QRfolio !",
-      html: `<h1>Ton premier scan !</h1><p>Salut ${name || ""},</p><p>Quelqu'un vient de scanner ton QR code sur la page "${page_title}".</p><p><a href="https://qrfolio.app/dashboard/analytics">Voir mes analytics</a></p>`,
+      html: `<h1>Ton premier scan !</h1><p>Salut ${escapeHtml(name)},</p><p>Quelqu'un vient de scanner ton QR code sur la page "${escapeHtml(page_title)}".</p><p><a href="https://qrfolio.app/dashboard/analytics">Voir mes analytics</a></p>`,
     })
 
     if (error) return NextResponse.json({ error }, { status: 500 })

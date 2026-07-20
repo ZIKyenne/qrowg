@@ -2,6 +2,7 @@ import { Resend } from "resend"
 import { NextRequest, NextResponse } from "next/server"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
+import { escapeHtml } from "@/lib/escapeHtml"
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest) {
 
     let sent = 0
     for (const profile of profiles) {
-      const html = `<h1>Rapport hebdo</h1><p>Salut ${profile.full_name || ""},</p><p>Tu as ${profile.total_scans} scans et ${profile.total_pages} pages.</p><p><a href="https://qrfolio.app/dashboard/analytics">Voir mes analytics</a></p>`
+      const html = `<h1>Rapport hebdo</h1><p>Salut ${escapeHtml(profile.full_name)},</p><p>Tu as ${profile.total_scans} scans et ${profile.total_pages} pages.</p><p><a href="https://qrfolio.app/dashboard/analytics">Voir mes analytics</a></p>`
       
       await resend.emails.send({
         from: EMAIL_FROM,
