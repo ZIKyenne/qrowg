@@ -9,6 +9,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { AI_BRIEF_SCHEMA, aiBriefToTemplate, buildSystemPrompt, type AiBrief } from "@/app/dashboard/builder/ai-generate"
+import { canAI } from "@/lib/plans"
 
 export const runtime = "nodejs"
 
@@ -27,6 +28,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: "La génération par IA arrive très bientôt ✨ En attendant, choisissez un modèle de page ci-dessous — c'est tout aussi rapide.", soon: true },
         { status: 503 },
+      )
+    }
+
+    // Gating SERVEUR : la generation IA est reservee aux plans Pro/Business.
+    // Le gating cote UI ne suffit pas — cette route (qui consomme des credits
+    // Anthropic) est appelable directement. Place apres le check de cle pour
+    // ne pas changer l'UX quand l'IA est dormante (tout le monde voit "bientot").
+    const { data: profile } = await supabase.from("profiles").select("plan").eq("id", user.id).single()
+    if (!canAI(profile?.plan)) {
+      return NextResponse.json(
+        { error: "La génération par IA est réservée aux plans Pro et Business.", upgrade: true },
+        { status: 403 },
       )
     }
 
