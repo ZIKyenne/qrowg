@@ -3,22 +3,7 @@
 
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
-
-type QRStatusAction =
-  | "activate"
-  | "pause"
-  | "archive"
-  | "restore"
-  | "expire"
-  | "set_pause_message"
-
-const ALLOWED_TRANSITIONS: Record<string, string[]> = {
-  active:   ["pause", "archive", "expire"],
-  draft:    ["activate", "archive"],
-  paused:   ["activate", "archive"],
-  archived: ["restore"],
-  expired:  ["activate", "archive"],
-}
+import { ALLOWED_TRANSITIONS, ACTION_TO_STATUS, canTransition, type QRStatus } from "./qrStatus"
 
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabaseClient()
@@ -53,39 +38,36 @@ export async function POST(req: NextRequest) {
   }
 
   // Vérifier la transition
-  const allowed = ALLOWED_TRANSITIONS[currentStatus] ?? []
-  if (!allowed.includes(action)) {
+  if (!canTransition(currentStatus, action)) {
     return NextResponse.json({
       error: `Transition "${action}" non autorisée depuis "${currentStatus}"`,
-      allowed,
+      allowed: ALLOWED_TRANSITIONS[currentStatus as QRStatus] ?? [],
     }, { status: 400 })
   }
 
-  // Calculer le nouveau statut et les timestamps
+  // Nouveau statut (mapping teste) + timestamps propres a chaque action.
   const now = new Date().toISOString()
-  const updates: Record<string, any> = { updated_at: now }
+  const updates: Record<string, any> = {
+    updated_at: now,
+    status: ACTION_TO_STATUS[action as keyof typeof ACTION_TO_STATUS],
+  }
 
   switch (action) {
     case "activate":
-      updates.status     = "active"
       updates.paused_at  = null
       break
     case "pause":
-      updates.status     = "paused"
       updates.paused_at  = now
       if (pause_message !== undefined) updates.pause_message = pause_message
       break
     case "archive":
-      updates.status      = "archived"
       updates.archived_at = now
       break
     case "restore":
-      updates.status      = "active"
       updates.archived_at = null
       updates.paused_at   = null
       break
     case "expire":
-      updates.status = "expired"
       break
   }
 
