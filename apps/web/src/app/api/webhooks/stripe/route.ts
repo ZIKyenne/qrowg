@@ -32,12 +32,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: e.message }, { status: 400 })
   }
 
+  // Deux chemins de checkout coexistent avec des conventions de metadonnees
+  // differentes (api/stripe/checkout -> `userId` ; actions/stripe.ts ->
+  // `supabase_user_id`). On accepte les DEUX pour resoudre l'utilisateur, quel
+  // que soit le chemin ayant cree la session/abonnement.
+  const metaUser = (m?: Stripe.Metadata | null): string | undefined =>
+    (m?.userId || m?.supabase_user_id) || undefined
+
   try {
     switch (event.type) {
 
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session
-        const userId = session.metadata?.userId
+        const userId = metaUser(session.metadata)
         const plan = session.metadata?.plan
         const customerId = session.customer as string
         const subscriptionId = session.subscription as string
@@ -61,7 +68,7 @@ export async function POST(req: NextRequest) {
 
       case "customer.subscription.updated": {
         const sub = event.data.object as Stripe.Subscription
-        const userId = sub.metadata?.userId
+        const userId = metaUser(sub.metadata)
         const priceId = sub.items.data[0]?.price.id
         const plan = PLAN_FROM_PRICE[priceId] || "free"
 
@@ -80,7 +87,7 @@ export async function POST(req: NextRequest) {
 
       case "customer.subscription.deleted": {
         const sub = event.data.object as Stripe.Subscription
-        const userId = sub.metadata?.userId
+        const userId = metaUser(sub.metadata)
 
         if (userId) {
           await supabase.from("profiles").update({ plan: "free" }).eq("id", userId)
