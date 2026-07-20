@@ -4483,18 +4483,19 @@
     const [aiGenPrompt, setAiGenPrompt] = useState("")
     const [aiGenLoading, setAiGenLoading] = useState(false)
     const [aiGenError, setAiGenError] = useState<string | null>(null)
+    const [aiGenSoon, setAiGenSoon] = useState(false) // true = IA pas encore activee (ton info, pas erreur)
 
     async function generateWithAI() {
       const description = aiGenPrompt.trim()
       if (description.length < 5) { setAiGenError("Décrivez votre activité en quelques mots."); return }
-      setAiGenLoading(true); setAiGenError(null)
+      setAiGenLoading(true); setAiGenError(null); setAiGenSoon(false)
       try {
         const res = await fetch("/api/generate-page", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ description }),
         })
         const data = await res.json().catch(() => ({}))
-        if (!res.ok) { setAiGenError(data?.error || "La génération a échoué."); return }
+        if (!res.ok) { setAiGenSoon(!!data?.soon); setAiGenError(data?.error || "La génération a échoué."); return }
         if (!data?.template?.blocks?.length) { setAiGenError("Aucun contenu généré. Réessayez."); return }
         applyPageTemplate(data.template as PageTemplate) // applique + ferme la modale
       } catch {
@@ -6679,7 +6680,7 @@
                 <div style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, gap: 8, alignItems: isMobile ? "stretch" : "flex-start" }}>
                   <textarea
                     value={aiGenPrompt}
-                    onChange={e => { setAiGenPrompt(e.target.value); if (aiGenError) setAiGenError(null) }}
+                    onChange={e => { setAiGenPrompt(e.target.value); if (aiGenError) { setAiGenError(null); setAiGenSoon(false) } }}
                     disabled={aiGenLoading}
                     placeholder="Ex : Salon de coiffure haut de gamme à Lyon, coupe, coloration, barbier. Réservation en ligne, ambiance chaleureuse."
                     rows={3}
@@ -6692,7 +6693,9 @@
                       : <>✨ Générer ma page</>}
                   </button>
                 </div>
-                {aiGenError && <p style={{ margin: "7px 0 0", color: "#F87171", fontSize: 10.5 }}>{aiGenError}</p>}
+                {aiGenError && (aiGenSoon
+                  ? <div style={{ margin: "9px 0 0", padding: "9px 11px", borderRadius: 9, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.28)", color: "#E8D9A8", fontSize: 11.5, lineHeight: 1.45, display: "flex", gap: 7 }}><span style={{ flexShrink: 0 }}>⏳</span><span>{aiGenError}</span></div>
+                  : <p style={{ margin: "7px 0 0", color: "#F87171", fontSize: 10.5 }}>{aiGenError}</p>)}
                 {aiGenLoading && <p style={{ margin: "7px 0 0", color: MUTED, fontSize: 10 }}>L&apos;IA rédige votre page… (quelques secondes)</p>}
               </div>
               <div style={{ display: "flex", flex: 1, minHeight: 0 }}>

@@ -21,8 +21,11 @@ export async function POST(req: NextRequest) {
     }
 
     if (!process.env.ANTHROPIC_API_KEY) {
+      // Message utilisateur volontairement rassurant (pas de detail technique). Cote dev : definir
+      // ANTHROPIC_API_KEY pour activer. `soon: true` permet au client d'afficher un ton "info" (or) et non "erreur".
+      console.warn("[generate-page] ANTHROPIC_API_KEY manquante — generation IA desactivee (503).")
       return NextResponse.json(
-        { error: "La génération par IA n'est pas encore activée. Ajoutez la clé ANTHROPIC_API_KEY dans les variables d'environnement." },
+        { error: "La génération par IA arrive très bientôt ✨ En attendant, choisissez un modèle de page ci-dessous — c'est tout aussi rapide.", soon: true },
         { status: 503 },
       )
     }
