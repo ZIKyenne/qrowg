@@ -48,7 +48,7 @@ export default function UpgradePage() {
   async function handleUpgrade(plan: typeof PLANS[0]) {
     if (plan.ctaDisabled || currentPlan === plan.id) return
     if (plan.id === "business") {
-      window.location.href = "mailto:hello@qrfolio.app?subject=Plan Business QRfolio"
+      window.location.href = "mailto:hello@qrfolio.app?subject=Plan Business QRowg"
       return
     }
     setLoading(plan.id)

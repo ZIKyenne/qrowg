@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 
-// Couleur d'accent par défaut (or signature QRfolio)
+// Couleur d'accent par défaut (or signature QRowg)
 export const DEFAULT_ACCENT = "#C9A84C"
 
 /**

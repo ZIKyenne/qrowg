@@ -3,7 +3,7 @@ import { LegalLayout } from "@/components/legal-layout"
 
 export const metadata: Metadata = {
   title: "Mentions légales",
-  description: "Mentions légales du service QRfolio.",
+  description: "Mentions légales du service QRowg.",
   robots: { index: true, follow: true },
   alternates: { canonical: "https://qrfolio.app/legal" },
 }
@@ -37,11 +37,11 @@ export default function LegalPage() {
       </div>
       <div className="ls">
         <h2>Propriété intellectuelle</h2>
-        <p>L’ensemble du contenu de QRfolio est protégé par le droit de la propriété intellectuelle. Toute reproduction sans autorisation écrite est interdite.</p>
+        <p>L’ensemble du contenu de QRowg est protégé par le droit de la propriété intellectuelle. Toute reproduction sans autorisation écrite est interdite.</p>
       </div>
       <div className="ls">
         <h2>Cookies</h2>
-        <p>QRfolio utilise des cookies nécessaires au fonctionnement. Voir notre <a href="/privacy">Politique de confidentialité</a>.</p>
+        <p>QRowg utilise des cookies nécessaires au fonctionnement. Voir notre <a href="/privacy">Politique de confidentialité</a>.</p>
       </div>
       <div className="ls">
         <h2>Médiation</h2>

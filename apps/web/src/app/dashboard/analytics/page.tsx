@@ -2,7 +2,7 @@
 import { redirect } from "next/navigation"
 import AnalyticsClient from "./AnalyticsClient"
 
-export const metadata = { title: "Analytics — QRfolio" }
+export const metadata = { title: "Analytics — QRowg" }
 
 export default async function AnalyticsPage() {
   const supabase = await createServerSupabaseClient()

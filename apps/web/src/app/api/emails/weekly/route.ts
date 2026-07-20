@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       await resend.emails.send({
         from: EMAIL_FROM,
         to: profile.email,
-        subject: `Ton rapport QRfolio — ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}`,
+        subject: `Ton rapport QRowg — ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}`,
         html,
       })
       sent++

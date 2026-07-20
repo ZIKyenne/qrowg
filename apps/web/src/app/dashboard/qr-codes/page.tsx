@@ -5,7 +5,7 @@ import QRStudio from "./QRStudio"
 import Particles from "@/components/Particles"
 import { Plus, QrCode, TrendingUp, Activity, Link2 } from "lucide-react"
 
-export const metadata: Metadata = { title: "QR Studio - QRfolio" }
+export const metadata: Metadata = { title: "QR Studio - QRowg" }
 
 export default async function QRCodesPage() {
   const supabase = await createServerSupabaseClient()
@@ -92,7 +92,7 @@ export default async function QRCodesPage() {
               <Link2 size={14}/> QR instantané
             </a>
 
-            {/* Un QR = une page dans QRfolio : la creation part donc d'une page (templates). */}
+            {/* Un QR = une page dans QRowg : la creation part donc d'une page (templates). */}
             <a href="/dashboard/templates" className="qrh-cta" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, background: "linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 78%, #000))", color: "#080808", textDecoration: "none", fontSize: 12.5, fontWeight: 700, padding: "10px 18px", borderRadius: 10, whiteSpace: "nowrap" as const, boxShadow: "0 4px 14px color-mix(in srgb, var(--accent) 20%, transparent)" }}>
               <Plus size={14}/> Nouvelle page + QR
             </a>

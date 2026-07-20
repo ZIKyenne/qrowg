@@ -1,4 +1,4 @@
-// QRfolio Builder — Types & Definitions
+// QRowg Builder — Types & Definitions
 
 // ── Types de base ─────────────────────────────────────────────────────────────
 export type BlockContent = Record<string, string>
@@ -748,7 +748,7 @@ export function calendarLinks(e: { name?: string; start?: string; end?: string; 
   const google = `https://calendar.google.com/calendar/render?${params.toString()}`
 
   const lines = [
-    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//QRfolio//Calendar//FR", "CALSCALE:GREGORIAN",
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//QRowg//Calendar//FR", "CALSCALE:GREGORIAN",
     "BEGIN:VEVENT", `UID:${start}-qrfolio@qrfolio.app`,
     `DTSTART:${start}`, `DTEND:${end}`, `SUMMARY:${vcardEscape(name)}`,
     e.location ? `LOCATION:${vcardEscape(e.location)}` : "",
@@ -1261,7 +1261,7 @@ export const PRESET_CATEGORIES = [
   { id: "Event",        icon: "🎉", color: "#F59E0B" },
   { id: "Music",        icon: "🎵", color: "#1DB954" },
   { id: "Portfolio",        icon: "📐", color: "#6366F1" },
-  { id: "QRfolio Signature", icon: "✦",  color: "#C9A84C" },
+  { id: "QRowg Signature", icon: "✦",  color: "#C9A84C" },
 ] as const
 
 // ── 50+ Google Fonts ──────────────────────────────────────────────────────────
@@ -2720,9 +2720,9 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
     effect_glow: true, glow_color: "#FF00FF", glow_intensity: 25, glow_size: 350,
   },
 
-  // ── QRFOLIO SIGNATURE ────────────────────────────────────────────────────────
+  // ── QROWG SIGNATURE ────────────────────────────────────────────────────────
   qrf_obsidian_gold: {
-    name: "QRf Obsidian Gold", category: "QRfolio Signature", emoji: "✦", tags: ["signature","or","obsidien"],
+    name: "QRf Obsidian Gold", category: "QRowg Signature", emoji: "✦", tags: ["signature","or","obsidien"],
     bg: "#030203", surface: "#080608", primary: "#C9A84C", accent: "#F0D880",
     text: "#FFF8E8", muted: "#8A7840",
     border: "rgba(201,168,76,0.18)",
@@ -2735,7 +2735,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   },
 
   qrf_aurora_night: {
-    name: "QRf Aurora Night", category: "QRfolio Signature", emoji: "🌌", tags: ["signature","aurora","nuit"],
+    name: "QRf Aurora Night", category: "QRowg Signature", emoji: "🌌", tags: ["signature","aurora","nuit"],
     bg: "#020512", surface: "#050A20", primary: "#00FFB3", accent: "#7B5EA7",
     text: "#E8F8FF", muted: "#506890",
     fontDisplay: "Space Grotesk", fontBody: "Inter",
@@ -2746,7 +2746,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   },
 
   qrf_crimson_silk: {
-    name: "QRf Crimson Silk", category: "QRfolio Signature", emoji: "🩸", tags: ["signature","rouge","soie"],
+    name: "QRf Crimson Silk", category: "QRowg Signature", emoji: "🩸", tags: ["signature","rouge","soie"],
     bg: "#0A0000", surface: "#160000", primary: "#DC143C", accent: "#FF6B6B",
     text: "#FFF0F0", muted: "#9A3040",
     fontDisplay: "Cormorant Garamond", fontBody: "Lora",
@@ -2758,7 +2758,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   },
 
   qrf_ivory_noir: {
-    name: "QRf Ivory Noir", category: "QRfolio Signature", emoji: "🤍", tags: ["signature","ivoire","noir"],
+    name: "QRf Ivory Noir", category: "QRowg Signature", emoji: "🤍", tags: ["signature","ivoire","noir"],
     bg: "#FAF8F5", surface: "#F0EDE8", primary: "#0A0808", accent: "#C9A84C",
     text: "#0A0808", muted: "#7A7060",
     border: "rgba(10,8,8,0.08)",
@@ -2768,7 +2768,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   },
 
   qrf_deep_ocean: {
-    name: "QRf Deep Ocean", category: "QRfolio Signature", emoji: "🌊", tags: ["signature","ocean","abyssal"],
+    name: "QRf Deep Ocean", category: "QRowg Signature", emoji: "🌊", tags: ["signature","ocean","abyssal"],
     bg: "#000E18", surface: "#001525", primary: "#00C8E8", accent: "#0080FF",
     text: "#E0F8FF", muted: "#305878",
     fontDisplay: "Space Grotesk", fontBody: "Inter",
@@ -2779,7 +2779,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   },
 
   qrf_sunset_mesh: {
-    name: "QRf Sunset Mesh", category: "QRfolio Signature", emoji: "🌅", tags: ["signature","sunset","dégradé"],
+    name: "QRf Sunset Mesh", category: "QRowg Signature", emoji: "🌅", tags: ["signature","sunset","dégradé"],
     bg: "#0A0308", surface: "#140610", primary: "#FF6B9D", accent: "#FF8C00",
     text: "#FFF0F5", muted: "#906070",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
@@ -2790,7 +2790,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   },
 
   qrf_matrix_gold: {
-    name: "QRf Matrix Gold", category: "QRfolio Signature", emoji: "🔢", tags: ["signature","matrice","or"],
+    name: "QRf Matrix Gold", category: "QRowg Signature", emoji: "🔢", tags: ["signature","matrice","or"],
     bg: "#010501", surface: "#020A02", primary: "#C9A84C", accent: "#39FF8F",
     text: "#F0FFE0", muted: "#608040",
     fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
@@ -2801,7 +2801,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   },
 
   qrf_void_purple: {
-    name: "QRf Void Purple", category: "QRfolio Signature", emoji: "🔮", tags: ["signature","vide","violet"],
+    name: "QRf Void Purple", category: "QRowg Signature", emoji: "🔮", tags: ["signature","vide","violet"],
     bg: "#030008", surface: "#060010", primary: "#9B59B6", accent: "#DDD6FE",
     text: "#F0E8FF", muted: "#6050A0",
     fontDisplay: "Cormorant Garamond", fontBody: "DM Sans",
@@ -2814,7 +2814,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   },
 
   qrf_paper_ink: {
-    name: "QRf Paper Ink", category: "QRfolio Signature", emoji: "✒️", tags: ["signature","papier","encre"],
+    name: "QRf Paper Ink", category: "QRowg Signature", emoji: "✒️", tags: ["signature","papier","encre"],
     bg: "#F5F0E8", surface: "#EDE5D8", primary: "#1A1208", accent: "#8B5E3C",
     text: "#1A1208", muted: "#9A7860",
     border: "rgba(26,18,8,0.1)",
@@ -2824,7 +2824,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   },
 
   qrf_neon_future: {
-    name: "QRf Neon Future", category: "QRfolio Signature", emoji: "🚀", tags: ["signature","neon","futur"],
+    name: "QRf Neon Future", category: "QRowg Signature", emoji: "🚀", tags: ["signature","neon","futur"],
     bg: "#020208", surface: "#04040F", primary: "#00FFFF", accent: "#FF00FF",
     text: "#F0FFFF", muted: "#408080",
     fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
@@ -5155,7 +5155,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "label", label: "Texte", type: "text", placeholder: "Discuter sur WhatsApp" },
       { key: "phone", label: "Numéro", type: "text", placeholder: "06 12 34 56 78", hint: "Les espaces sont nettoyés automatiquement" },
       { key: "country_code", label: "Indicatif pays", type: "text", placeholder: "33 (France)", hint: "Ex : 33 France · 32 Belgique · 41 Suisse · 1 Canada. Laissez vide si le numéro commence par +" },
-      { key: "message", label: "Message pré-rempli", type: "text", placeholder: "Bonjour, j'ai une question...", suggestions: ["Bonjour, je viens depuis votre QRfolio.", "Bonjour, je souhaite réserver.", "Bonjour, je souhaite obtenir un devis.", "Bonjour, je suis intéressé(e) par votre service."] },
+      { key: "message", label: "Message pré-rempli", type: "text", placeholder: "Bonjour, j'ai une question...", suggestions: ["Bonjour, je viens depuis votre QRowg.", "Bonjour, je souhaite réserver.", "Bonjour, je souhaite obtenir un devis.", "Bonjour, je suis intéressé(e) par votre service."] },
     ],
   },
   email_button: {
@@ -5277,9 +5277,9 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   promo_code: {
     label: "Coupon promo", description: "Afficher un code promotionnel",
     icon: "🎟️", color: "#F97316", category: "actions",
-    defaultContent: { code: "QRFOLIO10", description: "-10% sur votre commande" },
+    defaultContent: { code: "QROWG10", description: "-10% sur votre commande" },
     fields: [
-      { key: "code", label: "Code promo", type: "text", placeholder: "QRFOLIO10" },
+      { key: "code", label: "Code promo", type: "text", placeholder: "QROWG10" },
       { key: "description", label: "Description", type: "text", placeholder: "-10% sur votre commande" },
       { key: "expires", label: "Date expiration", type: "text", placeholder: "30 juin 2025" },
     ],

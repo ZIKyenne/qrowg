@@ -150,7 +150,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
             Sous-domaine personnalisé
           </h3>
           <p style={{ color:MUTED, fontSize:12, margin:0 }}>
-            Votre adresse unique sur QRfolio — <strong style={{ color:"#F5F0E8" }}>vous.{APP}</strong>
+            Votre adresse unique sur QRowg — <strong style={{ color:"#F5F0E8" }}>vous.{APP}</strong>
           </p>
         </div>
       </div>

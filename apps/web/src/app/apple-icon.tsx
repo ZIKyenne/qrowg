@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og"
 
 // Icone "ajouter a l'ecran d'accueil" iOS (Safari ignore le SVG pour l'apple-touch-icon).
-// Genere un vrai PNG a partir du logo QRfolio (cadre QR dore + centre plein sur fond sombre).
+// Genere un vrai PNG a partir du logo QRowg (cadre QR dore + centre plein sur fond sombre).
 // Fond plein-cadre : iOS applique lui-meme le masque arrondi.
 export const size = { width: 180, height: 180 }
 export const contentType = "image/png"

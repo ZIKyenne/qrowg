@@ -2,7 +2,7 @@
 import { redirect } from "next/navigation"
 import GoalsDashboard from "../analytics/GoalsDashboard"
 
-export const metadata = { title: "Objectifs — QRfolio" }
+export const metadata = { title: "Objectifs — QRowg" }
 
 export default async function GoalsPage() {
   const supabase = await createServerSupabaseClient()

@@ -157,11 +157,11 @@ export default function AvatarStudio({
     download("qrfolio-avatar.svg", URL.createObjectURL(blob));
   };
 
-  // ── Partage (croissance : chaque partage met en avant QRfolio + son lien) ──
+  // ── Partage (croissance : chaque partage met en avant QRowg + son lien) ──
   // Le lien porte le code d'affiliation (?ref=) : chaque inscription via ce lien
   // devient un parrainage traçable (cf. onglet Parrainage du profil).
   const SHARE_URL = refCode ? `https://qrfolio.app?ref=${refCode}` : "https://qrfolio.app";
-  const SHARE_TEXT = "J'ai créé mon avatar QR-art avec QRfolio ✨ Crée le tien gratuitement :";
+  const SHARE_TEXT = "J'ai créé mon avatar QR-art avec QRowg ✨ Crée le tien gratuitement :";
   const u = encodeURIComponent(SHARE_URL);
   const t = encodeURIComponent(SHARE_TEXT);
   const shareTargets: { label: string; href: string; color: string }[] = [
@@ -169,7 +169,7 @@ export default function AvatarStudio({
     { label: "X", href: `https://twitter.com/intent/tweet?text=${t}&url=${u}`, color: "#F5F0E8" },
     { label: "LinkedIn", href: `https://www.linkedin.com/sharing/share-offsite/?url=${u}`, color: "#0A66C2" },
     { label: "Facebook", href: `https://www.facebook.com/sharer/sharer.php?u=${u}`, color: "#1877F2" },
-    { label: "E-mail", href: `mailto:?subject=${encodeURIComponent("Mon avatar QRfolio")}&body=${t}%20${u}`, color: "#A8A190" },
+    { label: "E-mail", href: `mailto:?subject=${encodeURIComponent("Mon avatar QRowg")}&body=${t}%20${u}`, color: "#A8A190" },
   ];
 
   function avatarPngFile(): Promise<File | null> {
@@ -194,15 +194,15 @@ export default function AvatarStudio({
     try {
       const file = await avatarPngFile();
       if (file && nav.canShare?.({ files: [file] })) {
-        await nav.share({ files: [file], title: "QRfolio — Avatar QR-art", text: `${SHARE_TEXT} ${SHARE_URL}` } as ShareData);
+        await nav.share({ files: [file], title: "QRowg — Avatar QR-art", text: `${SHARE_TEXT} ${SHARE_URL}` } as ShareData);
       } else {
-        await nav.share({ title: "QRfolio — Avatar QR-art", text: SHARE_TEXT, url: SHARE_URL });
+        await nav.share({ title: "QRowg — Avatar QR-art", text: SHARE_TEXT, url: SHARE_URL });
       }
     } catch { /* partage annulé */ }
   };
 
   const copyShareLink = async () => {
-    try { await navigator.clipboard.writeText(`${SHARE_TEXT} ${SHARE_URL}`); setStatus("Lien copié — partagez-le pour faire découvrir QRfolio !"); } catch { /* noop */ }
+    try { await navigator.clipboard.writeText(`${SHARE_TEXT} ${SHARE_URL}`); setStatus("Lien copié — partagez-le pour faire découvrir QRowg !"); } catch { /* noop */ }
   };
 
   return (
@@ -211,7 +211,7 @@ export default function AvatarStudio({
         <a href="/dashboard/profile" style={{ display: "inline-flex", alignItems: "center", gap: 7, color: "#A8A29A", textDecoration: "none", fontSize: 13, fontWeight: 600, marginBottom: 16 }}>
           <span style={{ fontSize: 16, lineHeight: 1 }}>←</span> Retour au profil
         </a>
-        <div className={styles.eyebrow}>QRfolio · Studio d&apos;avatar</div>
+        <div className={styles.eyebrow}>QRowg · Studio d&apos;avatar</div>
         <h1 className={styles.title}>
           Composez votre <em>photo de profil</em>.
         </h1>
@@ -389,7 +389,7 @@ export default function AvatarStudio({
             <button className={styles.btn} onClick={onSvg}>SVG</button>
           </div>
 
-          {/* Partage — met en avant QRfolio (croissance / trafic) */}
+          {/* Partage — met en avant QRowg (croissance / trafic) */}
           <div className={styles.actions} style={{ position: "relative" }}>
             <button
               className={styles.btn}
@@ -403,7 +403,7 @@ export default function AvatarStudio({
               <div
                 style={{ position: "absolute", left: 0, right: 0, bottom: "calc(100% + 8px)", zIndex: 20, background: "#15130b", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 14, padding: 12, boxShadow: "0 16px 40px rgba(0,0,0,0.55)" }}
               >
-                <p style={{ margin: "0 0 4px", color: "#F5F0E8", fontSize: 13, fontWeight: 700 }}>Faites découvrir QRfolio</p>
+                <p style={{ margin: "0 0 4px", color: "#F5F0E8", fontSize: 13, fontWeight: 700 }}>Faites découvrir QRowg</p>
                 <p style={{ margin: "0 0 10px", color: "#A8A190", fontSize: 11, lineHeight: 1.5 }}>Partagez votre avatar avec le lien — chaque partage fait grandir la communauté ✨</p>
                 <button
                   type="button"

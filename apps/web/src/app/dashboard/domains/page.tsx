@@ -2,7 +2,7 @@
 import { redirect } from "next/navigation"
 import DomainsPage from "./DomainsPage"
 
-export const metadata = { title: "Domaines — QRfolio" }
+export const metadata = { title: "Domaines — QRowg" }
 
 export default async function DomainsServerPage() {
   const supabase = await createServerSupabaseClient()

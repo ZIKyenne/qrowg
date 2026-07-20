@@ -2,7 +2,7 @@
 import { redirect } from "next/navigation"
 import BusinessDashboard from "../analytics/BusinessDashboard"
 
-export const metadata = { title: "Dashboard — QRfolio" }
+export const metadata = { title: "Dashboard — QRowg" }
 
 export default async function OverviewPage() {
   const supabase = await createServerSupabaseClient()

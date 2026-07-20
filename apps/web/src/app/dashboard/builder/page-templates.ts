@@ -1,4 +1,4 @@
-// QRfolio — Modèles de PAGE complets (multi-sections) par métier + sous-variantes.
+// QRowg — Modèles de PAGE complets (multi-sections) par métier + sous-variantes.
 // Appliqué depuis le builder : pose un thème cohérent + un jeu de blocs prêts à personnaliser.
 // N'utilise QUE des types de blocs existants et des clés de contenu réelles (mêmes clés que le rendu).
 import type { PageTheme } from "./types"

@@ -3,7 +3,7 @@ import { LegalLayout } from "@/components/legal-layout"
 
 export const metadata: Metadata = {
   title: "Conditions d’utilisation",
-  description: "Conditions générales d’utilisation du service QRfolio.",
+  description: "Conditions générales d’utilisation du service QRowg.",
   robots: { index: true, follow: true },
   alternates: { canonical: "https://qrfolio.app/terms" },
 }
@@ -12,11 +12,11 @@ export default function TermsPage() {
   return (
     <LegalLayout title="Conditions d’utilisation" updated="15 juin 2026">
       <div className="ls">
-        <p>Les présentes conditions générales régissent l’accès et l’utilisation du service QRfolio. En utilisant QRfolio, vous les acceptez intégralement.</p>
+        <p>Les présentes conditions générales régissent l’accès et l’utilisation du service QRowg. En utilisant QRowg, vous les acceptez intégralement.</p>
       </div>
       <div className="ls">
         <h2>1. Description du service</h2>
-        <p>QRfolio est un service permettant de créer des pages mobiles professionnelles associées à des QR codes dynamiques, et d’en suivre les performances.</p>
+        <p>QRowg est un service permettant de créer des pages mobiles professionnelles associées à des QR codes dynamiques, et d’en suivre les performances.</p>
       </div>
       <div className="ls">
         <h2>2. Utilisation acceptable</h2>
@@ -45,15 +45,15 @@ export default function TermsPage() {
       </div>
       <div className="ls">
         <h2>5. Propriété intellectuelle</h2>
-        <p>Le service QRfolio et son interface sont la propriété exclusive de QRfolio. Vous conservez la propriété des contenus que vous publiez.</p>
+        <p>Le service QRowg et son interface sont la propriété exclusive de QRowg. Vous conservez la propriété des contenus que vous publiez.</p>
       </div>
       <div className="ls">
         <h2>6. Disponibilité</h2>
-        <p>QRfolio s’efforce de maintenir une disponibilité maximale. Des interruptions pour maintenance peuvent survenir. QRfolio ne saurait être tenu responsable des pertes liées à une indisponibilité.</p>
+        <p>QRowg s’efforce de maintenir une disponibilité maximale. Des interruptions pour maintenance peuvent survenir. QRowg ne saurait être tenu responsable des pertes liées à une indisponibilité.</p>
       </div>
       <div className="ls">
         <h2>7. Limitation de responsabilité</h2>
-        <p>La responsabilité de QRfolio est limitée au montant payé sur les 3 derniers mois. QRfolio n’est pas responsable des dommages indirects ou pertes de données.</p>
+        <p>La responsabilité de QRowg est limitée au montant payé sur les 3 derniers mois. QRowg n’est pas responsable des dommages indirects ou pertes de données.</p>
       </div>
       <div className="ls">
         <h2>8. Droit applicable</h2>

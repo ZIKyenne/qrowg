@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from "next/server"
 
 const APP_DOMAIN     = process.env.NEXT_PUBLIC_APP_URL?.replace(/^https?:\/\//, "") ?? "qrfolio.app"
-const QRFOLIO_HOSTS  = new Set(["qrfolio.app", "www.qrfolio.app", "localhost"])
+const QROWG_HOSTS  = new Set(["qrfolio.app", "www.qrfolio.app", "localhost"])
 
 export async function middleware(req: NextRequest) {
   const hostname = (req.headers.get("host") ?? "").replace(/:\d+$/, "")
@@ -22,7 +22,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // ── Cas 1 : sous-domaine *.qrfolio.app ────────────────────────────────────
-  const isSubdomain = hostname.endsWith(`.${APP_DOMAIN}`) && !QRFOLIO_HOSTS.has(hostname)
+  const isSubdomain = hostname.endsWith(`.${APP_DOMAIN}`) && !QROWG_HOSTS.has(hostname)
 
   if (isSubdomain) {
     const subdomain = hostname.replace(`.${APP_DOMAIN}`, "")
@@ -35,8 +35,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.rewrite(url)
   }
 
-  // ── Cas 2 : domaine racine QRfolio ────────────────────────────────────────
-  if (QRFOLIO_HOSTS.has(hostname) || hostname.endsWith(".vercel.app")) {
+  // ── Cas 2 : domaine racine QRowg ────────────────────────────────────────
+  if (QROWG_HOSTS.has(hostname) || hostname.endsWith(".vercel.app")) {
     return NextResponse.next()
   }
 

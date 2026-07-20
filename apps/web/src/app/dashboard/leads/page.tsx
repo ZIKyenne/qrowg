@@ -2,7 +2,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import LeadsClient from "./LeadsClient"
 
-export const metadata = { title: "Messages — QRfolio" }
+export const metadata = { title: "Messages — QRowg" }
 
 export default async function LeadsPage() {
   const supabase = await createServerSupabaseClient()

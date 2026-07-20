@@ -59,7 +59,7 @@ function buildEmailHtml(params: {
     <!-- Header -->
     <div style="text-align:center;margin-bottom:32px">
       <div style="display:inline-block;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);border-radius:12px;padding:8px 20px;margin-bottom:16px">
-        <span style="color:#C9A84C;font-size:13px;font-weight:700;letter-spacing:2px">QRFOLIO REPORT</span>
+        <span style="color:#C9A84C;font-size:13px;font-weight:700;letter-spacing:2px">QROWG REPORT</span>
       </div>
       <h1 style="color:#F5F0E8;font-size:24px;font-weight:300;margin:0 0 6px;font-family:'Cormorant Garamond',Georgia,serif">
         Bonjour ${params.userName} 👋
@@ -136,7 +136,7 @@ function buildEmailHtml(params: {
     <!-- Footer -->
     <div style="text-align:center;border-top:1px solid rgba(255,255,255,0.06);padding-top:20px">
       <p style="color:#555;font-size:11px;margin:0 0 8px">
-        Vous recevez ce rapport car vous êtes abonné aux notifications QRfolio.
+        Vous recevez ce rapport car vous êtes abonné aux notifications QRowg.
       </p>
       <a href="${params.unsubUrl}" style="color:#8A8478;font-size:11px">Se désabonner</a>
     </div>
@@ -288,9 +288,9 @@ export async function GET(req: NextRequest) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from:    "QRfolio Reports <reports@qrfolio.app>",
+            from:    "QRowg Reports <reports@qrfolio.app>",
             to:      [sub.email],
-            subject: `📊 Votre rapport ${sub.frequency === "weekly" ? "hebdomadaire" : "mensuel"} QRfolio`,
+            subject: `📊 Votre rapport ${sub.frequency === "weekly" ? "hebdomadaire" : "mensuel"} QRowg`,
             html,
           }),
         })

@@ -66,7 +66,7 @@ function QR404() {
         <p style={{
           color: G, fontSize: 8, letterSpacing: 2.5,
           fontWeight: 700, textTransform: "uppercase",
-        }}>QRFOLIO.APP</p>
+        }}>QROWG.APP</p>
       </div>
       {/* Badge 404 */}
       <div style={{
@@ -126,7 +126,7 @@ export default function NotFound() {
         borderBottom: "1px solid rgba(201,168,76,0.1)",
       }}>
         <Link href="/" style={{ textDecoration: "none" }}>
-          <span style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 20, color: G, fontWeight: 700 }}>QRfolio</span>
+          <span style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 20, color: G, fontWeight: 700 }}>QRowg</span>
         </Link>
         <Link href="/auth/signup" style={{
           background: "linear-gradient(90deg,#C9A84C,#b8953f)",
@@ -159,13 +159,13 @@ export default function NotFound() {
           color: MUT, fontSize: 17, lineHeight: 1.7,
           margin: "0 0 40px", maxWidth: 440, marginLeft: "auto", marginRight: "auto",
         }} className="au3">
-          Mais ton prochain QRfolio peut exister dans moins de 5 minutes.
+          Mais ton prochain QRowg peut exister dans moins de 5 minutes.
         </p>
 
         {/* CTAs */}
         <div className="au4 ctas" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 48 }}>
           <Link href="/" className="cta-sec">← Retour à l'accueil</Link>
-          <Link href="/auth/signup" className="cta-main">Créer mon QRfolio gratuit →</Link>
+          <Link href="/auth/signup" className="cta-main">Créer mon QRowg gratuit →</Link>
         </div>
 
         {/* Séparateur */}
@@ -195,7 +195,7 @@ export default function NotFound() {
 
       {/* Footer minimaliste */}
       <div style={{ position: "absolute", bottom: 24, color: MUT.replace("0.8","0.35"), fontSize: 12 }}>
-        © {new Date().getFullYear()} QRfolio
+        © {new Date().getFullYear()} QRowg
       </div>
     </div>
   )

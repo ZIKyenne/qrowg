@@ -36,7 +36,7 @@ function useInView(threshold = 0.15) {
 class BlockBoundary extends Component<{ children: React.ReactNode }, { failed: boolean }> {
   constructor(props: { children: React.ReactNode }) { super(props); this.state = { failed: false } }
   static getDerivedStateFromError() { return { failed: true } }
-  componentDidCatch(err: unknown) { if (typeof console !== "undefined") console.error("[QRfolio] Bloc ignoré (erreur de rendu) :", err) }
+  componentDidCatch(err: unknown) { if (typeof console !== "undefined") console.error("[QRowg] Bloc ignoré (erreur de rendu) :", err) }
   render() { return this.state.failed ? null : this.props.children }
 }
 
@@ -159,7 +159,7 @@ function ShareButton({ pageId, blockId, style, inner }: { pageId: string; blockI
   const [open, setOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const url = () => (typeof window !== "undefined" ? window.location.href : "")
-  const title = () => (typeof document !== "undefined" ? document.title : "QRfolio")
+  const title = () => (typeof document !== "undefined" ? document.title : "QRowg")
   const onClick = async () => {
     trackLinkClick(pageId, blockId, "share")
     const nav = typeof navigator !== "undefined" ? navigator : undefined
@@ -3046,7 +3046,7 @@ export default function PublicPageClient({ page, blocks, showBranding = true }: 
           <div style={{ padding: "20px 24px 32px", textAlign: "center", borderTop: `1px solid ${theme.primary}10`, marginTop: 8 }}>
             <a href="https://qrfolio.app" target="_blank" rel="noopener noreferrer"
               style={{ color: theme.muted, fontSize: 11, textDecoration: "none", opacity: 0.5, letterSpacing: 1, fontFamily: theme.fontBody }}>
-              Cree avec QRfolio
+              Cree avec QRowg
             </a>
           </div>
         )}

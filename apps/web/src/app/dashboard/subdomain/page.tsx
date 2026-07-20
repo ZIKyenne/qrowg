@@ -2,7 +2,7 @@
 import { redirect } from "next/navigation"
 import SubdomainPanel from "./SubdomainPanel"
 
-export const metadata = { title: "Sous-domaine — QRfolio" }
+export const metadata = { title: "Sous-domaine — QRowg" }
 
 export default async function SubdomainServerPage() {
   const supabase = await createServerSupabaseClient()

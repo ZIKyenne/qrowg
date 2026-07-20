@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
     type:  "page",
     value: current.page_id,
     url:   null,
-    label: (current.pages as any)?.title ?? "Page QRfolio",
+    label: (current.pages as any)?.title ?? "Page QRowg",
     set_at: null,
     set_by: null,
   }
@@ -136,7 +136,7 @@ export async function PATCH(req: NextRequest) {
   return NextResponse.json({ ok: true, restored })
 }
 
-// DELETE — supprimer l'override (retour à la page QRfolio)
+// DELETE — supprimer l'override (retour à la page QRowg)
 export async function DELETE(req: NextRequest) {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()

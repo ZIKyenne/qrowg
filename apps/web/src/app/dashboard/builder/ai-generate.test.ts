@@ -131,6 +131,6 @@ describe("aiBriefToTemplate", () => {
   it("schéma : enum ambiance/kind cohérent avec les constantes", () => {
     expect((AI_BRIEF_SCHEMA.properties.ambiance as any).enum).toEqual(AMBIANCE_KEYS)
     expect((AI_BRIEF_SCHEMA.properties.sections.items.properties.kind as any).enum).toEqual([...AI_SECTION_KINDS])
-    expect(buildSystemPrompt()).toContain("QRfolio")
+    expect(buildSystemPrompt()).toContain("QRowg")
   })
 })

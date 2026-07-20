@@ -173,10 +173,10 @@ function notFoundHtml(domain: string, appUrl: string): string {
 <div>
   <div style="font-size:48px;margin-bottom:16px">🔍</div>
   <h1 style="color:#C9A84C;font-size:28px;margin:0 0 8px;font-weight:300">Domaine non configuré</h1>
-  <p style="color:#8A8478;margin:0 0 24px;font-size:14px">${domain} n'est associé à aucune page QRfolio</p>
+  <p style="color:#8A8478;margin:0 0 24px;font-size:14px">${domain} n'est associé à aucune page QRowg</p>
   <a href="${appUrl}" style="display:inline-block;background:linear-gradient(90deg,#C9A84C,#b8953f);
     color:#080808;text-decoration:none;padding:11px 24px;border-radius:10px;font-weight:700;font-size:14px">
-    Créer ma page sur QRfolio
+    Créer ma page sur QRowg
   </a>
 </div>
 </body></html>`

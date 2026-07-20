@@ -140,7 +140,7 @@ export default function DomainsPage({ pages, plan }: Props) {
               <h1 style={{ fontSize:22, fontWeight:700, color:"#F5F0E8", margin:0 }}>Domaines personnalisés</h1>
             </div>
             <p style={{ color:MUTED, fontSize:13, margin:0 }}>
-              Connectez votre propre domaine à vos pages QRfolio
+              Connectez votre propre domaine à vos pages QRowg
             </p>
           </div>
 
@@ -152,7 +152,7 @@ export default function DomainsPage({ pages, plan }: Props) {
             <Globe size={40} color={MUTED} style={{ marginBottom:14 }}/>
             <p style={{ color:"#F5F0E8", fontSize:15, fontWeight:600, margin:"0 0 6px" }}>Domaines personnalisés — Pro & Business</p>
             <p style={{ color:MUTED, fontSize:13, margin:"0 0 24px", lineHeight:1.6 }}>
-              Connectez emilien.fr, monrestaurant.com…<br/>directement à vos pages QRfolio.
+              Connectez emilien.fr, monrestaurant.com…<br/>directement à vos pages QRowg.
             </p>
             <a href="/upgrade"
               style={{ display:"inline-block", background:"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius:10, padding:"11px 26px", color:"#080808", fontSize:13, fontWeight:700, textDecoration:"none" }}>
@@ -428,7 +428,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                   ["1", "Ajoutez votre domaine et sélectionnez la page à associer"],
                   ["2", "Copiez les enregistrements DNS dans votre registrar (OVH, Gandi, Namecheap…)"],
                   ["3", "Cliquez Vérifier — la validation est automatique"],
-                  ["4", "Votre domaine redirige vers votre page QRfolio"],
+                  ["4", "Votre domaine redirige vers votre page QRowg"],
                 ].map(([step, text]) => (
                   <div key={step} style={{ display:"flex", gap:10, alignItems:"flex-start" }}>
                     <span style={{ background:"color-mix(in srgb, var(--accent) 15%, transparent)", color:G, fontSize:10, fontWeight:700, width:18, height:18, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{step}</span>

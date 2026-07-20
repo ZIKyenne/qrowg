@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og"
 import { readFileSync } from "node:fs"
 import { createAdminClient } from "@/lib/supabase/server"
 
-// Image Open Graph generee dynamiquement par page (1200x630) — identite or/noir QRfolio,
+// Image Open Graph generee dynamiquement par page (1200x630) — identite or/noir QRowg,
 // avec la police de marque Cormorant Garamond pour le nom. Referencee par generateMetadata
 // quand aucune og_image_url custom n'est definie.
 export const runtime = "nodejs"
@@ -37,7 +37,7 @@ async function fallback() {
   return new ImageResponse(
     (
       <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#080808", color: "#C9A84C" }}>
-        <div style={{ fontSize: 110, fontWeight: 600, letterSpacing: -2, fontFamily: "Cormorant" }}>QRfolio</div>
+        <div style={{ fontSize: 110, fontWeight: 600, letterSpacing: -2, fontFamily: "Cormorant" }}>QRowg</div>
         <div style={{ fontSize: 30, color: "#8A8478", marginTop: 8 }}>Une page. Un QR. Tout vous.</div>
       </div>
     ),
@@ -79,7 +79,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
     const text = theme.text || "#F5F0E8"
     const muted = theme.muted || "#8A8478"   // couleur secondaire du thème (lisible aussi sur fond clair)
 
-    const name = (pc.name || (page as any).seo_title || (page as any).title || prof.full_name || "QRfolio").toString().slice(0, 42)
+    const name = (pc.name || (page as any).seo_title || (page as any).title || prof.full_name || "QRowg").toString().slice(0, 42)
     const tagline = (pc.tagline || (page as any).seo_description || "").toString().slice(0, 90)
     const avatarUrl = (pc.avatar || prof.avatar_url || "").toString()
 
@@ -128,7 +128,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div style={{ display: "flex", alignItems: "center" }}>
               <div style={{ display: "flex", width: 48, height: 48, borderRadius: 13, background: primary, color: bg, alignItems: "center", justifyContent: "center", fontSize: 34, fontWeight: 600, fontFamily: "Cormorant" }}>Q</div>
-              <div style={{ fontSize: 40, fontWeight: 600, color: primary, marginLeft: 16, letterSpacing: -0.5, fontFamily: "Cormorant" }}>QRfolio</div>
+              <div style={{ fontSize: 40, fontWeight: 600, color: primary, marginLeft: 16, letterSpacing: -0.5, fontFamily: "Cormorant" }}>QRowg</div>
             </div>
             <div style={{ fontSize: 27, color: muted }}>{`qrfolio.app/${slug}`}</div>
           </div>

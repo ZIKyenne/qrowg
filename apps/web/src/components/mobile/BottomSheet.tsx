@@ -1,7 +1,7 @@
 "use client"
 
 // BottomSheet — panneau mobile qui remonte du bas (un seul ouvert à la fois, géré par l'appelant).
-// Scrim, poignée, glisser-pour-fermer, safe-area, prefers-reduced-motion. Style tokens QRfolio.
+// Scrim, poignée, glisser-pour-fermer, safe-area, prefers-reduced-motion. Style tokens QRowg.
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { T } from "./designTokens"
 

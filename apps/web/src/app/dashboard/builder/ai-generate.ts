@@ -1,4 +1,4 @@
-// QRfolio — Génération de page par IA.
+// QRowg — Génération de page par IA.
 // L'IA ne produit qu'un BRIEF structuré et simple (nom, accroche, ambiance, sections en texte).
 // Le mapper PUR ci-dessous transforme ce brief en un PageTemplate valide (types + clés de blocs réels),
 // donc l'IA ne peut jamais émettre de bloc malformé. Fichier sans React -> testable (ai-generate.test.ts).
@@ -226,10 +226,10 @@ function mapSection(kind: string, title: string, text: string, rows: { label: st
   }
 }
 
-// Prompt système (FR) — QRfolio, ambiances, ton premium. Exporté pour la route API.
+// Prompt système (FR) — QRowg, ambiances, ton premium. Exporté pour la route API.
 export function buildSystemPrompt(): string {
   return [
-    "Tu es le générateur de pages QRfolio : une page mobile « link in bio » premium, en français.",
+    "Tu es le générateur de pages QRowg : une page mobile « link in bio » premium, en français.",
     "À partir de la description d'une activité, tu produis un BRIEF structuré (JSON) pour construire la page.",
     "",
     "Règles :",

@@ -17,7 +17,7 @@
   --muted: #8A8478;
   --faint: #4A4640;
 
-  /* ── Palette sémantique canonique (design system QRfolio) ───────────────────
+  /* ── Palette sémantique canonique (design system QRowg) ───────────────────
      Un rôle = une couleur, partout. Les valeurs reprennent l'existant (aucune
      régression). Règle : action=bleu · premium=accent · succès=vert ·
      alerte=ambre · danger=rouge · contenu/neutre=gris.
@@ -49,7 +49,7 @@ body {
   min-height: 100vh;
 }
 
-/* ── Signature QRfolio : socle + texture matrice QR (cellules carrées) ─────────
+/* ── Signature QRowg : socle + texture matrice QR (cellules carrées) ─────────
    Fond statique (visible derrière les particules sur les pages transparentes).
    Donne une identité « QR » immédiate et fiabilise les captures plein écran. */
 body::before {
@@ -85,7 +85,7 @@ body::after {
 a { transition: opacity 0.2s; }
 a:hover { opacity: 0.8; }
 
-/* === Polish global QRfolio === */
+/* === Polish global QRowg === */
 
 html {
   scroll-behavior: smooth;

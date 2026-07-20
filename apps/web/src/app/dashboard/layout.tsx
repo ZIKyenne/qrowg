@@ -132,7 +132,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div style={{
       display: "flex", height: "100dvh", fontFamily: "DM Sans, sans-serif", overflow: "hidden",
-      // Signature QRfolio : socle doré + trame matrice QR (cellules carrées) partagée par toute l'app
+      // Signature QRowg : socle doré + trame matrice QR (cellules carrées) partagée par toute l'app
       background:
         "radial-gradient(120% 80% at 50% -8%, rgba(201,168,76,0.05), transparent 55%)," +
         "linear-gradient(rgba(201,168,76,0.022) 1px, transparent 1px) 0 0 / 24px 24px," +
@@ -156,7 +156,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
             {!collapsed && (
               <span style={{ color: G, fontFamily: "Cormorant Garamond, serif", fontSize: 18, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden" }}>
-                QRfolio
+                QRowg
               </span>
             )}
           </Link>

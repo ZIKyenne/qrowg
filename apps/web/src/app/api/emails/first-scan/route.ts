@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     const { data, error } = await resend.emails.send({
       from: EMAIL_FROM,
       to: email,
-      subject: "Ton premier scan QRfolio !",
+      subject: "Ton premier scan QRowg !",
       html: `<h1>Ton premier scan !</h1><p>Salut ${escapeHtml(name)},</p><p>Quelqu'un vient de scanner ton QR code sur la page "${escapeHtml(page_title)}".</p><p><a href="https://qrfolio.app/dashboard/analytics">Voir mes analytics</a></p>`,
     })
 

@@ -49,7 +49,7 @@ export default function RotateInstructionScreen({
       {/* Logo discret */}
       <div style={{ position: "absolute", top: "calc(18px + env(safe-area-inset-top))", left: 0, right: 0, display: "flex", justifyContent: "center", zIndex: 2 }}>
         <span style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "rgba(255,255,255,0.45)", fontSize: 11, letterSpacing: 2, textTransform: "uppercase", fontWeight: 700 }}>
-          <span style={{ width: 8, height: 8, borderRadius: 2, background: "var(--accent)", boxShadow: "0 0 10px var(--accent)" }} /> QRfolio · Print Studio
+          <span style={{ width: 8, height: 8, borderRadius: 2, background: "var(--accent)", boxShadow: "0 0 10px var(--accent)" }} /> QRowg · Print Studio
         </span>
       </div>
 

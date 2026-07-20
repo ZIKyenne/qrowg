@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const profile = page.profiles as any
   const title = page.seo_title || page.title
-  const description = page.seo_description || `Decouvre la page de ${profile?.full_name || page.title} sur QRfolio`
+  const description = page.seo_description || `Decouvre la page de ${profile?.full_name || page.title} sur QRowg`
   // Image OG : custom si definie, sinon image de marque generee dynamiquement par page.
   const image = page.og_image_url || `${APP_URL}/${page.slug}/og`
   const url = `${APP_URL}/${page.slug}`
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       images: [{ url: image, width: 1200, height: 630, alt: title }],
-      siteName: "QRfolio",
+      siteName: "QRowg",
     },
     twitter: { card: "summary_large_image", title, description, images: [image] },
     alternates: { canonical: url },
@@ -56,7 +56,7 @@ export default async function PublicPage({ params }: Props) {
 
   if (!page) notFound()
 
-  // "Sans branding" est un avantage payant : on n'affiche le footer QRfolio que
+  // "Sans branding" est un avantage payant : on n'affiche le footer QRowg que
   // si le plan du proprietaire ne retire pas le branding (free).
   const showBranding = !canRemoveBranding((page.profiles as any)?.plan)
 

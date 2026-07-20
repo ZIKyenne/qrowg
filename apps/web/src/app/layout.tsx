@@ -18,8 +18,8 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: "QRfolio — Carte de visite numérique & QR code dynamique pro",
-    template: "%s | QRfolio",
+    default: "QRowg — Carte de visite numérique & QR code dynamique pro",
+    template: "%s | QRowg",
   },
   description:
     "Créez une page de présentation professionnelle, générez un QR code dynamique et suivez chaque scan. Idéal pour restaurants (menu numérique), indépendants, créateurs (portfolio, lien en bio) et commerces.",
@@ -35,11 +35,11 @@ export const metadata: Metadata = {
     "générateur de QR code",
     "qrfolio",
   ],
-  authors: [{ name: "QRfolio", url: APP_URL }],
-  creator: "QRfolio",
-  publisher: "QRfolio",
+  authors: [{ name: "QRowg", url: APP_URL }],
+  creator: "QRowg",
+  publisher: "QRowg",
   // Experience "ajouter a l'ecran d'accueil" sur iOS (barre de statut sombre, titre court).
-  appleWebApp: { capable: true, title: "QRfolio", statusBarStyle: "black-translucent" },
+  appleWebApp: { capable: true, title: "QRowg", statusBarStyle: "black-translucent" },
   alternates: {
     canonical: APP_URL,
   },
@@ -47,8 +47,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_FR",
     url: APP_URL,
-    siteName: "QRfolio",
-    title: "QRfolio — Carte de visite numérique & QR code dynamique pro",
+    siteName: "QRowg",
+    title: "QRowg — Carte de visite numérique & QR code dynamique pro",
     description:
       "Créez une page de présentation professionnelle, générez un QR code dynamique et suivez chaque scan. Idéal pour restaurants (menu numérique), indépendants, créateurs (portfolio, lien en bio) et commerces.",
     images: [
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
         url: `${APP_URL}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: "QRfolio — Page professionnelle avec QR code dynamique",
+        alt: "QRowg — Page professionnelle avec QR code dynamique",
         type: "image/png",
       },
     ],
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@qrfolio",
     creator: "@qrfolio",
-    title: "QRfolio — Carte de visite numérique & QR code dynamique pro",
+    title: "QRowg — Carte de visite numérique & QR code dynamique pro",
     description:
       "Page mobile pro + QR code dynamique + statistiques. En 5 minutes, sans rien coder.",
     images: [`${APP_URL}/og-image.png`],
@@ -101,7 +101,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebApplication",
-              name: "QRfolio",
+              name: "QRowg",
               url: APP_URL,
               description:
                 "Créez une page mobile professionnelle, générez un QR code dynamique et suivez chaque scan.",

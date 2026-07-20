@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────
-// QRfolio — Catalogue de thèmes
+// QRowg — Catalogue de thèmes
 // Source de vérité des thèmes prédéfinis (presets) + helpers de rendu.
 // Importé par le builder (BuilderClient) et la page publique [slug]/page.tsx.
 // ─────────────────────────────────────────────────────────────

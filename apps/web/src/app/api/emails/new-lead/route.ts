@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 <body style="margin:0;padding:0;background:#080808;font-family:'DM Sans',Arial,sans-serif;color:#F5F0E8">
 <div style="max-width:560px;margin:0 auto;background:#080808">
   <div style="padding:28px 40px 20px;text-align:center;border-bottom:1px solid rgba(201,168,76,0.15)">
-    <span style="font-size:24px;font-weight:700;color:#C9A84C;font-family:Georgia,serif">QRfolio</span>
+    <span style="font-size:24px;font-weight:700;color:#C9A84C;font-family:Georgia,serif">QRowg</span>
   </div>
   <div style="padding:28px 40px">
     <div style="display:inline-block;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);border-radius:20px;padding:5px 14px;color:#C9A84C;font-size:12px;font-weight:700;margin-bottom:14px">${esc(label)}</div>
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     </p>
   </div>
   <div style="padding:18px 40px 30px;text-align:center;border-top:1px solid rgba(255,255,255,0.06)">
-    <p style="font-size:12px;color:#4A4640;margin:0">QRfolio · <a href="https://qrfolio.app/dashboard/settings" style="color:#4A4640">Gérer les notifications</a></p>
+    <p style="font-size:12px;color:#4A4640;margin:0">QRowg · <a href="https://qrfolio.app/dashboard/settings" style="color:#4A4640">Gérer les notifications</a></p>
   </div>
 </div></body></html>`
 

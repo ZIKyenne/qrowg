@@ -133,7 +133,7 @@ export default function ImageUpload({ value, onChange, label, hint }: Props) {
               style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "14px 12px", background: "none", border: "none", borderTop: "1px solid rgba(255,255,255,0.05)", color: "#F5F0E8", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
               <span style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 11, background: "rgba(201,168,76,0.14)", border: "1px solid rgba(201,168,76,0.28)", display: "flex", alignItems: "center", justifyContent: "center", color: G }}><FolderOpen size={19} /></span>
               <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                <span>Ma bibliothèque QRfolio</span>
+                <span>Ma bibliothèque QRowg</span>
                 <span style={{ color: MUTED, fontSize: 12 }}>Images déjà importées</span>
               </span>
             </button>

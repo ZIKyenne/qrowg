@@ -258,7 +258,7 @@ function QRMockup() {
           borderBottom: "2px solid rgba(201,168,76,0.4)", borderRight: "2px solid rgba(201,168,76,0.4)",
           borderRadius: "0 0 22px 0", pointerEvents: "none"
         }} />
-        {/* Faisceau de scan — signature visuelle QRfolio */}
+        {/* Faisceau de scan — signature visuelle QRowg */}
         <div aria-hidden="true" style={{
           position: "absolute", left: "10%", right: "10%", top: "12%", height: 2, borderRadius: 2,
           background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.95), transparent)",
@@ -281,7 +281,7 @@ function QRMockup() {
             }} />
           ))}
         </div>
-        <p style={{ color: "#C9A84C", fontSize: 11, letterSpacing: 4, textTransform: "uppercase", position: "relative", zIndex: 1, fontWeight: 600 }}>QRFOLIO.APP</p>
+        <p style={{ color: "#C9A84C", fontSize: 11, letterSpacing: 4, textTransform: "uppercase", position: "relative", zIndex: 1, fontWeight: 600 }}>QROWG.APP</p>
       </div>
     </div>
   )
@@ -322,7 +322,7 @@ const FEATURES = [
     desc: "Changez la destination, le contenu et les liens quand vous voulez — sans jamais réimprimer votre QR code.",
     accent: "#38BDF8",
     detail: {
-      role: "Le QR code pointe vers votre page QRfolio. Vous modifiez la page, le QR code imprimé reste valable.",
+      role: "Le QR code pointe vers votre page QRowg. Vous modifiez la page, le QR code imprimé reste valable.",
       example: "Un restaurant imprime le QR sur ses tables une seule fois, puis change son menu chaque semaine.",
       benefit: "Vous économisez les réimpressions et vous corrigez une erreur en 30 secondes.",
     },
@@ -367,10 +367,10 @@ const FEATURES = [
     icon: "🏢",
     tag: "Marque professionnelle",
     title: "Affichez votre propre marque",
-    desc: "Votre domaine personnalisé, sans mention QRfolio, avec un design premium. Une image irréprochable.",
+    desc: "Votre domaine personnalisé, sans mention QRowg, avec un design premium. Une image irréprochable.",
     accent: "#C9A84C",
     detail: {
-      role: "Votre page sur votre propre nom de domaine, sans aucune mention QRfolio.",
+      role: "Votre page sur votre propre nom de domaine, sans aucune mention QRowg.",
       example: "Un cabinet utilise carte.soncabinet.fr : ses clients ne voient que sa marque.",
       benefit: "Une image 100 % professionnelle qui inspire confiance et crédibilité.",
     },
@@ -581,11 +581,11 @@ function BrandProSection() {
         <div style={{ height: 5, width: "38%", borderRadius: 3, background: "rgba(188,182,166,0.5)" }} />
         <div style={{ height: 30, width: "70%", borderRadius: 8, background: pro ? `linear-gradient(90deg,${G},#b8953f)` : "rgba(255,255,255,0.08)", marginTop: 4 }} />
       </div>
-      {/* pied de page : mention QRfolio sur le gratuit, rien sur le Pro */}
+      {/* pied de page : mention QRowg sur le gratuit, rien sur le Pro */}
       <div style={{ padding: "9px 12px", borderTop: "1px solid rgba(255,255,255,0.06)", textAlign: "center", minHeight: 30 }}>
         {pro
           ? <span style={{ color: G, fontSize: 9.5, fontWeight: 700, letterSpacing: 0.5 }}>✓ 100 % votre marque</span>
-          : <span style={{ color: "rgba(188,182,166,0.65)", fontSize: 9.5 }}>✦ Propulsé par QRfolio</span>}
+          : <span style={{ color: "rgba(188,182,166,0.65)", fontSize: 9.5 }}>✦ Propulsé par QRowg</span>}
       </div>
     </div>
   )
@@ -599,7 +599,7 @@ function BrandProSection() {
             Votre marque.<br /><span style={{ color: G }}>Pas la nôtre.</span>
           </h2>
           <p style={{ color: "rgba(188,182,166,0.9)", fontSize: 16, lineHeight: 1.7, margin: "0 0 24px", maxWidth: 420 }}>
-            Sur les plans payants, votre page s'affiche sur <strong style={{ color: "#E8E6E0" }}>votre propre nom de domaine</strong>, <strong style={{ color: "#E8E6E0" }}>sans aucune mention QRfolio</strong>. Vos clients ne voient que vous.
+            Sur les plans payants, votre page s'affiche sur <strong style={{ color: "#E8E6E0" }}>votre propre nom de domaine</strong>, <strong style={{ color: "#E8E6E0" }}>sans aucune mention QRowg</strong>. Vos clients ne voient que vous.
           </p>
           <button type="button" onClick={() => setOpen(true)}
             style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(201,168,76,0.1)", border: `1px solid ${G}55`, color: G, fontSize: 14, fontWeight: 700, padding: "12px 22px", borderRadius: 12, cursor: "pointer" }}>
@@ -629,7 +629,7 @@ function BrandProSection() {
             <p style={{ color: "#F5F0E8", fontSize: 22, fontWeight: 800, margin: "4px 0 18px", fontFamily: "Cormorant Garamond, serif" }}>Une image 100 % à vous</p>
             {([
               ["🌐", "Votre nom de domaine", "Au lieu de qrfolio.app/p/…, votre page vit sur carte.votremarque.fr. Plus crédible, plus mémorisable."],
-              ["🚫", "Zéro mention QRfolio", "La mention « Propulsé par QRfolio » disparaît : vos visiteurs ne voient que votre marque."],
+              ["🚫", "Zéro mention QRowg", "La mention « Propulsé par QRowg » disparaît : vos visiteurs ne voient que votre marque."],
               ["✨", "Design premium", "Polices, couleurs et finitions soignées pour une page qui inspire confiance dès le premier coup d'œil."],
             ] as const).map(([emo, h, txt]) => (
               <div key={h} style={{ display: "flex", gap: 12, marginBottom: 14 }}>
@@ -667,11 +667,11 @@ const LANDING_BENEFITS: Record<string, { text: string; ok: boolean }[]> = {
     { text: "Un QR code dynamique prêt à imprimer", ok: true },
     { text: "Suivez vos premières visites", ok: true },
     { text: "3 pages · 200 vues / mois", ok: true },
-    { text: "Sans la mention QRfolio", ok: false },
+    { text: "Sans la mention QRowg", ok: false },
     { text: "Votre nom de domaine", ok: false },
   ],
   starter: [
-    { text: "Votre marque, sans mention QRfolio", ok: true },
+    { text: "Votre marque, sans mention QRowg", ok: true },
     { text: "Votre propre nom de domaine", ok: true },
     { text: "Des QR codes personnalisés à votre image", ok: true },
     { text: "5 pages · 850 vues / mois", ok: true },
@@ -927,12 +927,12 @@ function PricingSection() {
               "IA": "Génération de design et recommandations automatiques.",
               "Export HD": "Formats de téléchargement haute définition pour l'impression.",
               "Templates": "Bibliothèque de modèles prêts à l'emploi.",
-              "Branding QRfolio": "Mention QRfolio en bas de page (retirée dès le plan Starter).",
+              "Branding QRowg": "Mention QRowg en bas de page (retirée dès le plan Starter).",
               "Domaine perso": "Utiliser votre propre nom de domaine.",
               "Analytics": "Niveau de détail des statistiques.",
               "Equipe": "Nombre de membres pouvant collaborer sur le compte.",
               "API": "Accès programmatique pour automatiser vos QR codes.",
-              "Marque blanche": "Aucune trace de QRfolio : votre marque uniquement.",
+              "Marque blanche": "Aucune trace de QRowg : votre marque uniquement.",
               "Support": "Niveau et rapidité de l'assistance.",
             }
             const cell = (v: string, hl: boolean) => {
@@ -1421,7 +1421,7 @@ function Navbar() {
         transition:"background 0.3s,border-color 0.3s,box-shadow 0.3s",
       }}>
         <Link href="/" style={{textDecoration:"none"}}>
-          <span style={{fontFamily:"Cormorant Garamond, serif",fontSize:22,color:"#C9A84C",fontWeight:700}}>QRfolio</span>
+          <span style={{fontFamily:"Cormorant Garamond, serif",fontSize:22,color:"#C9A84C",fontWeight:700}}>QRowg</span>
         </Link>
         <div className="dNav" role="menubar" style={{display:"flex",alignItems:"center",gap:32}}>
           {NAV_LINKS.map(({label,href})=>{
@@ -1958,7 +1958,7 @@ function QRDynamicSection() {
                   color: QR_STYLES[active].tag,
                   fontSize: 10, letterSpacing: 2.5,
                   textTransform: "uppercase", fontWeight: 700,
-                }}>QRFOLIO.APP</span>
+                }}>QROWG.APP</span>
               </div>
               {/* Badge style */}
               <div style={{
@@ -2506,7 +2506,7 @@ function UseCasesSection() {
         </h2>
         <p style={{ color: "rgba(188,182,166,0.8)", fontSize: 16,
           maxWidth: 480, margin: "0 auto", lineHeight: 1.65 }}>
-          Sélectionnez votre activité et voyez exactement ce que QRfolio peut faire pour vous.
+          Sélectionnez votre activité et voyez exactement ce que QRowg peut faire pour vous.
         </p>
       </div>
 
@@ -2671,15 +2671,15 @@ function UseCasesSection() {
 // ── FAQ section ───────────────────────────────────────────────────────────────
 const FAQ_ITEMS = [
   { q:"Le QR code reste-t-il le même si je modifie ma page ?",            a:"Oui, c'est tout l'intérêt d'un QR code dynamique : vous modifiez votre page autant de fois que vous voulez, et le QR code déjà imprimé reste identique et continue de fonctionner." },
-  { q:"Qu'est-ce qu'une carte de visite numérique QRfolio ?",             a:"Une page mobile professionnelle qui regroupe vos informations, vos liens et vos boutons d'action (appel, WhatsApp, réservation…). On y accède en scannant votre QR code ou via un simple lien." },
-  { q:"Puis-je utiliser QRfolio gratuitement ?",                          a:"Oui. Le plan gratuit donne accès à 3 pages, 200 vues par mois et 3 QR codes. Aucune carte bancaire n'est demandée pour commencer." },
+  { q:"Qu'est-ce qu'une carte de visite numérique QRowg ?",             a:"Une page mobile professionnelle qui regroupe vos informations, vos liens et vos boutons d'action (appel, WhatsApp, réservation…). On y accède en scannant votre QR code ou via un simple lien." },
+  { q:"Puis-je utiliser QRowg gratuitement ?",                          a:"Oui. Le plan gratuit donne accès à 3 pages, 200 vues par mois et 3 QR codes. Aucune carte bancaire n'est demandée pour commencer." },
   { q:"Puis-je connecter mon propre nom de domaine ?",                    a:"Oui, à partir du plan Pro. Vous pouvez utiliser un sous-domaine personnalisé (ex. : carte.votresite.fr) pour une image vraiment professionnelle." },
   { q:"Est-ce que je vois les statistiques de scans ?",                   a:"Oui. Vues, scans, appareils, sources de trafic et pages les plus consultées. Statistiques de base sur le plan gratuit, statistiques avancées sur Pro." },
-  { q:"Puis-je retirer la mention QRfolio de ma page ?",                  a:"Oui, à partir du plan Pro : votre page affiche uniquement votre marque. Sur le plan gratuit, une mention discrète apparaît en bas de page." },
+  { q:"Puis-je retirer la mention QRowg de ma page ?",                  a:"Oui, à partir du plan Pro : votre page affiche uniquement votre marque. Sur le plan gratuit, une mention discrète apparaît en bas de page." },
   { q:"Est-ce adapté aux restaurants et commerces locaux ?",             a:"Tout à fait. Des modèles prêts à l'emploi existent pour le menu numérique, les horaires, la réservation, les avis Google et les promotions — utilisables en 5 minutes." },
   { q:"Puis-je télécharger mon QR code pour l'imprimer ?",               a:"Oui. Le téléchargement est disponible en PNG haute résolution, SVG et PDF — prêts à imprimer sur cartes de visite, flyers, menus ou affiches." },
   { q:"Puis-je annuler mon abonnement à tout moment ?",                  a:"Oui, à tout moment depuis votre espace compte. Aucun engagement, aucun frais d'annulation : votre accès reste actif jusqu'à la fin de la période déjà payée." },
-  { q:"QRfolio fonctionne-t-il bien sur mobile ?",                       a:"Oui. Toutes les pages sont conçues pour le mobile en priorité. Comme la majorité des scans se font sur smartphone, l'affichage est optimisé pour les petits écrans." },
+  { q:"QRowg fonctionne-t-il bien sur mobile ?",                       a:"Oui. Toutes les pages sont conçues pour le mobile en priorité. Comme la majorité des scans se font sur smartphone, l'affichage est optimisé pour les petits écrans." },
   { q:"Faut-il savoir coder pour créer sa page ?",                       a:"Non, aucune compétence technique n'est requise. Vous ajoutez des blocs, vous personnalisez, vous publiez — c'est tout." },
 ] as const
 
@@ -2768,10 +2768,10 @@ function FAQSection() {
   )
 }
 
-// ── Transition entre sections : signature QRfolio (glyphe QR doré + lignes) ───
+// ── Transition entre sections : signature QRowg (glyphe QR doré + lignes) ───
 function SectionSeam({ delay = 0 }: { delay?: number }) {
   // Séparateur signature : le « finder pattern » d'un QR au centre, balayé par un
-  // faisceau de scan (la transition signature de QRfolio).
+  // faisceau de scan (la transition signature de QRowg).
   return (
     <div aria-hidden="true" style={{
       position: "relative", overflow: "hidden", maxWidth: 1140, margin: "0 auto", zIndex: 1,
@@ -3395,7 +3395,7 @@ export default function HomePage() {
               lineHeight:1.7, margin:"0 0 44px", maxWidth:520,
               marginLeft:"auto", marginRight:"auto",
             }}>
-              Créez votre QRfolio gratuitement, personnalisez votre page et commencez à suivre vos scans en quelques minutes.
+              Créez votre QRowg gratuitement, personnalisez votre page et commencez à suivre vos scans en quelques minutes.
             </p>
 
             <Link href="/auth/signup" style={{
@@ -3465,21 +3465,21 @@ export default function HomePage() {
 
           {/* Col 1: Brand */}
           <div>
-            <Link href="/" aria-label="QRfolio — Accueil" className="f-brand-link" style={{ textDecoration:"none", display:"inline-block", marginBottom:12 }}>
-              <span style={{ fontFamily:"Cormorant Garamond, serif", fontSize:24, color:"#C9A84C", fontWeight:700, letterSpacing:"-0.01em" }}>QRfolio</span>
+            <Link href="/" aria-label="QRowg — Accueil" className="f-brand-link" style={{ textDecoration:"none", display:"inline-block", marginBottom:12 }}>
+              <span style={{ fontFamily:"Cormorant Garamond, serif", fontSize:24, color:"#C9A84C", fontWeight:700, letterSpacing:"-0.01em" }}>QRowg</span>
             </Link>
             <p className="f-brand-desc" style={{ color:"rgba(188,182,166,0.65)", fontSize:13, lineHeight:1.7, maxWidth:220, margin:0 }}>
-              QRfolio transforme les QR codes en expériences interactives.
+              QRowg transforme les QR codes en expériences interactives.
             </p>
             {/* Réseaux sociaux */}
             <div className="fsoc" role="list" aria-label="Réseaux sociaux">
-              <a href="https://x.com/qrfolio" target="_blank" rel="noopener noreferrer" aria-label="QRfolio sur X (Twitter)" role="listitem">
+              <a href="https://x.com/qrfolio" target="_blank" rel="noopener noreferrer" aria-label="QRowg sur X (Twitter)" role="listitem">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
               </a>
-              <a href="https://linkedin.com/company/qrfolio" target="_blank" rel="noopener noreferrer" aria-label="QRfolio sur LinkedIn" role="listitem">
+              <a href="https://linkedin.com/company/qrfolio" target="_blank" rel="noopener noreferrer" aria-label="QRowg sur LinkedIn" role="listitem">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
               </a>
-              <a href="https://instagram.com/qrfolio" target="_blank" rel="noopener noreferrer" aria-label="QRfolio sur Instagram" role="listitem">
+              <a href="https://instagram.com/qrfolio" target="_blank" rel="noopener noreferrer" aria-label="QRowg sur Instagram" role="listitem">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
               </a>
             </div>
@@ -3523,7 +3523,7 @@ export default function HomePage() {
         <div className="fb" role="contentinfo">
           <div style={{ display:"flex",alignItems:"center",gap:20,flexWrap:"wrap" }}>
             <p style={{ color:"rgba(188,182,166,0.45)",fontSize:12,margin:0 }}>
-              © {new Date().getFullYear()} QRfolio. Tous droits réservés.
+              © {new Date().getFullYear()} QRowg. Tous droits réservés.
             </p>
             <span className="f-meta" style={{ color:"rgba(188,182,166,0.2)",fontSize:12 }} aria-hidden="true">·</span>
             <span className="f-meta" style={{ color:"rgba(188,182,166,0.35)",fontSize:11,fontFamily:"monospace" }}>

@@ -4893,7 +4893,7 @@
         }
         dirty.current = false; setHasUnsaved(false); setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000)
       } catch (e: any) {
-        console.error("[QRfolio] Échec de sauvegarde des blocs :", e)
+        console.error("[QRowg] Échec de sauvegarde des blocs :", e)
         setSaveErrorMsg(e?.message || e?.hint || "Erreur inconnue")
         setSaving(false); setSaveError(true)
       }
@@ -5277,7 +5277,7 @@
 
         {/* TOPBAR (masquee en mode Apercu plein ecran sur mobile) */}
         <div style={{ height: 50, background: "#0D0D0D", borderBottom: "1px solid rgba(201,168,76,0.12)", display: (preview && isMobile) ? "none" : "flex", alignItems: "center", padding: isMobile ? "0 9px" : "0 14px", gap: isMobile ? 6 : 10, flexShrink: 0, zIndex: 20 }}>
-          <a href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 4, textDecoration: "none", color: G, fontFamily: "Cormorant Garamond, serif", fontSize: 16, fontWeight: 700 }}>← QRfolio</a>
+          <a href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 4, textDecoration: "none", color: G, fontFamily: "Cormorant Garamond, serif", fontSize: 16, fontWeight: 700 }}>← QRowg</a>
           <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.08)" }} />
           <input value={pageName} onChange={e => setPageName(e.target.value)} style={{ background: "transparent", border: "none", color: "#F5F0E8", fontSize: 13, fontWeight: 600, outline: "none", width: isMobile ? 96 : 160, minWidth: 0 }} />
           {saving && <span style={{ color: MUTED, fontSize: 10 }}>Enregistrement…</span>}
@@ -6281,7 +6281,7 @@
                               </div>
                             ))}
                           <div style={{ padding: "8px", textAlign: "center", ...bgStyle() }}>
-                            <p style={{ color: MUTED, fontSize: 7, margin: 0, opacity: 0.4 }}>Créé avec QRfolio</p>
+                            <p style={{ color: MUTED, fontSize: 7, margin: 0, opacity: 0.4 }}>Créé avec QRowg</p>
                           </div>
                         </div>
 

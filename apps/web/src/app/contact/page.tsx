@@ -67,7 +67,7 @@ const SUBJECTS = [
 
 const FAQ = [
   {
-    q: "Puis-je utiliser QRfolio gratuitement ?",
+    q: "Puis-je utiliser QRowg gratuitement ?",
     a: "Oui. Le plan Free donne accès à 3 pages, 200 vues/mois et 3 QR codes basiques — sans carte bancaire.",
   },
   {
@@ -146,7 +146,7 @@ export default function ContactPage() {
       {/* NAV */}
       <nav style={{ position:"fixed",top:0,left:0,right:0,zIndex:100,height:64,background:"rgba(8,8,8,0.93)",backdropFilter:"blur(24px)",borderBottom:"1px solid rgba(201,168,76,0.12)",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 48px" }}>
         <Link href="/" style={{ textDecoration:"none" }}>
-          <span style={{ fontFamily:"Cormorant Garamond,serif",fontSize:20,color:G,fontWeight:700 }}>QRfolio</span>
+          <span style={{ fontFamily:"Cormorant Garamond,serif",fontSize:20,color:G,fontWeight:700 }}>QRowg</span>
         </Link>
         <div style={{ display:"flex",gap:20,alignItems:"center" }}>
           <Link href="/" style={{ color:MUT,textDecoration:"none",fontSize:13,display:"flex",alignItems:"center",gap:6,transition:"color 0.2s" }}
@@ -342,7 +342,7 @@ export default function ContactPage() {
 
               {/* CTA */}
               <div style={{ background:"linear-gradient(145deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03))",border:BOR,borderRadius:14,padding:"22px 20px",textAlign:"center" }}>
-                <p style={{color:INK,fontSize:14,fontWeight:600,margin:"0 0 8px"}}>Pas encore sur QRfolio ?</p>
+                <p style={{color:INK,fontSize:14,fontWeight:600,margin:"0 0 8px"}}>Pas encore sur QRowg ?</p>
                 <p style={{color:MUT.replace("0.8","0.65"),fontSize:12.5,margin:"0 0 16px",lineHeight:1.5}}>Crée ta page gratuitement en 5 minutes.</p>
                 <Link href="/auth/signup" style={{
                   display:"block",textAlign:"center",
@@ -351,7 +351,7 @@ export default function ContactPage() {
                   padding:"11px 20px",borderRadius:9,
                   boxShadow:"0 3px 16px rgba(201,168,76,0.3)",
                 }}>
-                  Créer mon QRfolio →
+                  Créer mon QRowg →
                 </Link>
               </div>
 

@@ -1,5 +1,5 @@
 'use client'
-// QRfolio builder — sélecteur de thèmes intégré
+// QRowg builder — sélecteur de thèmes intégré
 
 import { useState, useEffect, useCallback } from 'react'
 import { saveBlocks, updatePage } from '../../../actions/pages'
@@ -173,7 +173,7 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
           L’éditeur s’utilise sur ordinateur
         </h2>
         <p style={{ color: '#A8A190', fontSize: 14, lineHeight: 1.6, margin: '0 0 24px', maxWidth: 340 }}>
-          La construction de page (blocs, glisser-déposer, propriétés) demande un grand écran. Ouvrez QRfolio sur ordinateur pour éditer « {pageName} ». Votre page publique, elle, reste 100 % responsive.
+          La construction de page (blocs, glisser-déposer, propriétés) demande un grand écran. Ouvrez QRowg sur ordinateur pour éditer « {pageName} ». Votre page publique, elle, reste 100 % responsive.
         </p>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
           <a href={`/${page.slug}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '12px 20px', background: 'linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 78%, #000))', borderRadius: 11, color: '#080808', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>
@@ -459,7 +459,7 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
                 </div>
               ))}
               <div style={{ textAlign: 'center', marginTop: '12px' }}>
-                <div style={{ fontSize: '8px', color: theme.muted, letterSpacing: '0.5px' }}>Créé avec QRfolio</div>
+                <div style={{ fontSize: '8px', color: theme.muted, letterSpacing: '0.5px' }}>Créé avec QRowg</div>
               </div>
             </div>
           </div>

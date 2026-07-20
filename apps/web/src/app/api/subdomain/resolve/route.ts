@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
   <div style="font-size:48px;margin-bottom:16px">🔍</div>
   <h1 style="color:#C9A84C;font-size:24px;margin:0 0 8px">Sous-domaine introuvable</h1>
   <p style="color:#8A8478;margin:0 0 24px">${username}.qrfolio.app n'est associé à aucun compte</p>
-  <a href="${appUrl}" style="color:#C9A84C;text-decoration:none;font-size:14px">← Retour à QRfolio</a>
+  <a href="${appUrl}" style="color:#C9A84C;text-decoration:none;font-size:14px">← Retour à QRowg</a>
 </div>
 </body></html>`,
         { status: 404, headers: { "Content-Type": "text/html;charset=utf-8" } }
@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
   <div style="font-size:48px;margin-bottom:16px">📄</div>
   <h1 style="color:#C9A84C;font-size:24px;margin:0 0 8px">Aucune page publiée</h1>
   <p style="color:#8A8478;margin:0 0 24px">Ce profil n'a pas encore de page publique</p>
-  <a href="${appUrl}" style="color:#C9A84C;text-decoration:none;font-size:14px">← Retour à QRfolio</a>
+  <a href="${appUrl}" style="color:#C9A84C;text-decoration:none;font-size:14px">← Retour à QRowg</a>
 </div>
 </body></html>`,
         { status: 404, headers: { "Content-Type": "text/html;charset=utf-8" } }

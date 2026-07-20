@@ -183,7 +183,7 @@ async function checkHttp(domain: string): Promise<DnsCheck> {
         method:   "HEAD",
         redirect: "follow",
         signal:   controller.signal,
-        headers:  { "User-Agent": "QRfolio-DomainCheck/1.0" },
+        headers:  { "User-Agent": "QRowg-DomainCheck/1.0" },
       })
       clearTimeout(timer)
 

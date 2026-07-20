@@ -111,7 +111,7 @@ export default function OnboardingChecklist() {
         <div style={{ width: 48, height: 48, borderRadius: "50%", background: "rgba(57,255,143,0.15)", border: "1px solid rgba(57,255,143,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>🎉</div>
         <div style={{ flex: 1 }}>
           <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: "0 0 2px", fontFamily: "Cormorant Garamond, serif" }}>Configuration terminée !</p>
-          <p style={{ color: "#A8A190", fontSize: 13, margin: 0 }}>Tu as complété toutes les étapes. QRfolio est prêt à être utilisé.</p>
+          <p style={{ color: "#A8A190", fontSize: 13, margin: 0 }}>Tu as complété toutes les étapes. QRowg est prêt à être utilisé.</p>
         </div>
         <button onClick={dismiss} style={{ background: "rgba(57,255,143,0.1)", border: "1px solid rgba(57,255,143,0.25)", borderRadius: 8, padding: "8px 16px", color: "#39FF8F", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
           Masquer ✓
@@ -135,7 +135,7 @@ export default function OnboardingChecklist() {
           </div>
           <div>
             <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>
-              Bienvenue sur QRfolio ! 👋
+              Bienvenue sur QRowg ! 👋
             </p>
             <p style={{ color: "#A8A190", fontSize: 12, margin: 0 }}>{progress}/{total} étapes complétées</p>
           </div>

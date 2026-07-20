@@ -1,5 +1,5 @@
 // =============================================================================
-// lib/plans.ts — SOURCE DE VÉRITÉ UNIQUE des plans QRfolio
+// lib/plans.ts — SOURCE DE VÉRITÉ UNIQUE des plans QRowg
 // -----------------------------------------------------------------------------
 // Tout ce qui concerne les plans (prix, limites, features) vit ICI.
 // Les pages (dashboard/profil, /upgrade, landing) et l'enforcement (création de
@@ -28,7 +28,7 @@ export type PlanCaps = {
   printStudio: boolean      // accès à QR Print Studio (éditeur imprimables)
   qrStudioAdvanced: boolean // personnalisation QR avancée (couleurs / modules / coins)
   ai: boolean               // génération + rapports IA
-  removeBranding: boolean   // retire le "Créé avec QRfolio" des pages publiques
+  removeBranding: boolean   // retire le "Créé avec QRowg" des pages publiques
   exportFormats: ExportFormat[]
 }
 
@@ -51,13 +51,13 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "free",
     label: "Gratuit",
     color: "#8A8478",
-    description: "Pour decouvrir QRfolio",
+    description: "Pour decouvrir QRowg",
     priceMonthly: 0,
     priceAnnual: 0,
     badge: null,
     limits: { pages: 3, views: 200, qr: 3, team: null },
     caps: { printStudio: false, qrStudioAdvanced: false, ai: false, removeBranding: false, exportFormats: ["png"] },
-    features: ["3 pages", "200 vues/mois", "3 QR codes basiques", "Branding QRfolio visible", "Analytics de base", "6 templates gratuits"],
+    features: ["3 pages", "200 vues/mois", "3 QR codes basiques", "Branding QRowg visible", "Analytics de base", "6 templates gratuits"],
     perks: [
       { text: "3 pages", included: true },
       { text: "200 vues / mois", included: true },
@@ -65,7 +65,7 @@ export const PLANS: Record<PlanId, Plan> = {
       { text: "Hébergement inclus", included: true },
       { text: "Analytics de base", included: true },
       { text: "6 templates gratuits", included: true },
-      { text: "Branding QRfolio visible", included: true },
+      { text: "Branding QRowg visible", included: true },
       { text: "QR Studio", included: false },
       { text: "QR Print Studio", included: false },
       { text: "Génération IA", included: false },
@@ -86,7 +86,7 @@ export const PLANS: Record<PlanId, Plan> = {
       { text: "5 pages", included: true },
       { text: "850 vues / mois", included: true },
       { text: "7 QR codes personnalisés", included: true },
-      { text: "Branding QRfolio retiré", included: true },
+      { text: "Branding QRowg retiré", included: true },
       { text: "Domaine personnalisé", included: false },
       { text: "Analytics standards", included: true },
       { text: "10 templates premium", included: true },
@@ -101,7 +101,7 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "pro",
     label: "Pro",
     color: "#C9A84C",
-    description: "Le plan principal de QRfolio",
+    description: "Le plan principal de QRowg",
     priceMonthly: 9.99,
     priceAnnual: 7.99,
     badge: "POPULAIRE",
@@ -170,7 +170,7 @@ export const caps = (id?: string | null): PlanCaps => getPlan(id).caps
 export const canPrintStudio = (id?: string | null): boolean => getPlan(id).caps.printStudio
 export const canQrAdvanced = (id?: string | null): boolean => getPlan(id).caps.qrStudioAdvanced
 export const canAI = (id?: string | null): boolean => getPlan(id).caps.ai
-// true = le plan retire le branding "Créé avec QRfolio" des pages publiques
+// true = le plan retire le branding "Créé avec QRowg" des pages publiques
 export const canRemoveBranding = (id?: string | null): boolean => getPlan(id).caps.removeBranding
 export const canExport = (id: string | null | undefined, fmt: ExportFormat): boolean => getPlan(id).caps.exportFormats.includes(fmt)
 // Plan minimum requis pour une capacité (pour les messages d'upsell)
@@ -196,7 +196,7 @@ export const PLAN_COMPARISON: { feature: string; free: string; starter: string; 
   { feature: "IA", free: "❌", starter: "❌", pro: "✓", business: "✓ illimité" },
   { feature: "Export HD", free: "❌", starter: "PNG", pro: "PNG + JPG + PDF HD", business: "PNG + JPG + PDF HD" },
   { feature: "Templates", free: "6", starter: "10", pro: "Tous", business: "Tous" },
-  { feature: "Branding QRfolio", free: "Oui", starter: "Non", pro: "Non", business: "Non" },
+  { feature: "Branding QRowg", free: "Oui", starter: "Non", pro: "Non", business: "Non" },
   { feature: "Domaine perso", free: "❌", starter: "❌", pro: "✓", business: "✓" },
   { feature: "Analytics", free: "De base", starter: "Standard", pro: "Avancés + export", business: "Avancés + export" },
   { feature: "Équipe", free: "—", starter: "—", pro: "—", business: "5 membres" },

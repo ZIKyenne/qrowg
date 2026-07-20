@@ -1,4 +1,4 @@
-// designTokens.ts — Design System QRfolio (mobile-first). Source UNIQUE de vérité pour
+// designTokens.ts — Design System QRowg (mobile-first). Source UNIQUE de vérité pour
 // espacements, rayons, cibles tactiles, couleurs (chrome or/noir), élévations, motion.
 // But : cohérence stricte (priorité UX #9). Pur -> testable (designTokens.test.ts).
 

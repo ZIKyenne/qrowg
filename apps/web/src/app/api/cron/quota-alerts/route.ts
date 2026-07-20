@@ -22,7 +22,7 @@ function alertHtml(name: string, views: number, limit: number, over: boolean, ap
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"></head>
 <body style="margin:0;background:#080808;font-family:Arial,sans-serif">
   <div style="max-width:520px;margin:0 auto;padding:32px 24px">
-    <p style="color:#C9A84C;font-size:22px;font-weight:700;margin:0 0 4px">QRfolio</p>
+    <p style="color:#C9A84C;font-size:22px;font-weight:700;margin:0 0 4px">QRowg</p>
     <div style="background:#111009;border:1px solid ${accent}40;border-radius:16px;padding:28px 24px;margin-top:16px">
       <p style="color:#F5F0E8;font-size:18px;font-weight:700;margin:0 0 10px">
         ${over ? "Quota de vues atteint ce mois-ci" : "Tu approches de ton quota de vues"}
@@ -39,7 +39,7 @@ function alertHtml(name: string, views: number, limit: number, over: boolean, ap
         Augmenter mon quota →
       </a>
     </div>
-    <p style="color:#5a574f;font-size:11px;margin:20px 0 0;text-align:center">QRfolio — alerte automatique de quota</p>
+    <p style="color:#5a574f;font-size:11px;margin:20px 0 0;text-align:center">QRowg — alerte automatique de quota</p>
   </div>
 </body></html>`
 }
@@ -100,7 +100,7 @@ export async function GET(req: NextRequest) {
           body: JSON.stringify({
             from: EMAIL_FROM,
             to: [p.email],
-            subject: threshold === "over" ? "⚠️ Quota de vues atteint — QRfolio" : "📊 Tu approches de ton quota de vues — QRfolio",
+            subject: threshold === "over" ? "⚠️ Quota de vues atteint — QRowg" : "📊 Tu approches de ton quota de vues — QRowg",
             html: alertHtml(p.full_name as string, views, limit, threshold === "over", appUrl),
           }),
         })

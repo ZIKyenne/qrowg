@@ -101,7 +101,7 @@ function BuilderMockupSvg() {
         {["#FF6B6B", "#F97316", "#39FF8F"].map((c, i) => (
           <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: c, opacity: 0.65 }} />
         ))}
-        <span style={{ color: "rgba(201,168,76,0.4)", fontSize: 9, letterSpacing: 1.5, marginLeft: 8 }}>BUILDER — QRfolio</span>
+        <span style={{ color: "rgba(201,168,76,0.4)", fontSize: 9, letterSpacing: 1.5, marginLeft: 8 }}>BUILDER — QRowg</span>
         <div style={{
           marginLeft: "auto", padding: "3px 10px", borderRadius: 5,
           background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.25)",
@@ -165,7 +165,7 @@ function AnalyticsMockupSvg() {
     <div style={{ background: "linear-gradient(145deg, #0e0c08, #111009)", border: "1px solid " + BOR, borderRadius: 20, padding: 20, boxShadow: "0 24px 80px rgba(0,0,0,0.5)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
         {["#FF6B6B","#F97316","#39FF8F"].map((c,i) => <div key={i} style={{ width:8,height:8,borderRadius:"50%",background:c,opacity:0.65 }}/>)}
-        <span style={{ color:"rgba(201,168,76,0.4)",fontSize:9,letterSpacing:1.5,marginLeft:8 }}>ANALYTICS — QRfolio</span>
+        <span style={{ color:"rgba(201,168,76,0.4)",fontSize:9,letterSpacing:1.5,marginLeft:8 }}>ANALYTICS — QRowg</span>
       </div>
       {/* KPI */}
       <div className="rcols-4" style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,marginBottom:14 }}>
@@ -220,7 +220,7 @@ function QRMockupSvg() {
             <div key={i} style={{ aspectRatio:"1",borderRadius:1.5,background:goldIdx.has(Math.floor(i/21)*7+(i%7)) ? s.acc : s.fg,transition:"background 0.4s" }}/>
           ))}
         </div>
-        <p style={{color:s.acc,fontSize:8,letterSpacing:2.5,fontWeight:700}}>QRFOLIO.APP</p>
+        <p style={{color:s.acc,fontSize:8,letterSpacing:2.5,fontWeight:700}}>QROWG.APP</p>
       </div>
       {/* Sélecteur de style */}
       <div style={{display:"flex",gap:8}}>
@@ -265,7 +265,7 @@ export default function FeaturesPage() {
         padding:"0 48px",
       }}>
         <Link href="/" style={{textDecoration:"none"}}>
-          <span style={{fontFamily:"Cormorant Garamond,serif",fontSize:20,color:G,fontWeight:700}}>QRfolio</span>
+          <span style={{fontFamily:"Cormorant Garamond,serif",fontSize:20,color:G,fontWeight:700}}>QRowg</span>
         </Link>
         <div style={{display:"flex",alignItems:"center",gap:24}}>
           <Link href="/#pricing" style={{color:MUT,textDecoration:"none",fontSize:13,transition:"color 0.2s"}}
@@ -466,7 +466,7 @@ export default function FeaturesPage() {
             <style>{`@media(max-width:700px){.other-grid{grid-template-columns:1fr !important;}}`}</style>
             {[
               { icon:"🌐", color:"#38BDF8", title:"Domaine personnalisé",   desc:"Connecte ton sous-domaine (carte.tonsite.fr). Ton image, pas la nôtre.", tag:"Pro" },
-              { icon:"✨", color:"#A78BFA", title:"Branding personnalisé",   desc:"Retire le branding QRfolio. Ta page, tes couleurs, ton identité.", tag:"Pro" },
+              { icon:"✨", color:"#A78BFA", title:"Branding personnalisé",   desc:"Retire le branding QRowg. Ta page, tes couleurs, ton identité.", tag:"Pro" },
               { icon:"👥", color:"#39FF8F", title:"Collaboration équipe",     desc:"Gérez vos pages à plusieurs avec des rôles et permissions.", tag:"Business" },
             ].map(f => (
               <div key={f.title} style={{
@@ -515,7 +515,7 @@ export default function FeaturesPage() {
           <p style={{color:MUT,fontSize:16,lineHeight:1.7,margin:"0 0 36px",maxWidth:420,marginLeft:"auto",marginRight:"auto"}}>
             Commence gratuitement. Pas de carte bancaire. Prêt en 5 minutes.
           </p>
-          <CtaInline label="Créer mon QRfolio gratuit" />
+          <CtaInline label="Créer mon QRowg gratuit" />
           <p style={{color:"rgba(138,132,120,0.45)",fontSize:11.5,margin:"18px 0 0"}}>Gratuit · Sans carte bancaire · Annulation à tout moment</p>
         </div>
       </section>

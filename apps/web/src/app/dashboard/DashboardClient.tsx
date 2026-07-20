@@ -318,7 +318,7 @@ export default function DashboardClient() {
                     <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, background: "color-mix(in srgb, var(--accent) 18%, transparent)", color: G }}><Zap size={15} /></span>
                     <span style={{ color: G, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase" as const }}>Premiers pas</span>
                   </div>
-                  <h2 style={{ color: "#F8F4EC", fontSize: 21, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif", letterSpacing: "-0.3px" }}>Lancez votre QRfolio en 3 étapes</h2>
+                  <h2 style={{ color: "#F8F4EC", fontSize: 21, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif", letterSpacing: "-0.3px" }}>Lancez votre QRowg en 3 étapes</h2>
                 </div>
                 <div style={{ textAlign: "right" as const, minWidth: 120 }}>
                   <span style={{ color: "#F8F4EC", fontSize: 22, fontWeight: 700, fontFamily: "Cormorant Garamond, serif" }}>{doneN}<span style={{ color: MUTED, fontSize: 15 }}> / {steps.length}</span></span>

@@ -4,8 +4,8 @@ import type { MetadataRoute } from "next"
 // icone et couleurs de marque. Next injecte automatiquement <link rel="manifest">.
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "QRfolio",
-    short_name: "QRfolio",
+    name: "QRowg",
+    short_name: "QRowg",
     description: "Une page. Un QR. Tout vous.",
     start_url: "/",
     scope: "/",

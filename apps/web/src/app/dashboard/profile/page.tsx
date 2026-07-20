@@ -734,10 +734,10 @@ export default function ProfilePage() {
 
   // Partage vers les reseaux
   function shareRef(platform: "whatsapp"|"email"|"twitter"|"linkedin") {
-    const msg = `Rejoins QRfolio, la plateforme de QR codes dynamiques professionnels ! Cree ta premiere page gratuitement : ${referralLink}`
+    const msg = `Rejoins QRowg, la plateforme de QR codes dynamiques professionnels ! Cree ta premiere page gratuitement : ${referralLink}`
     const urls: Record<string, string> = {
       whatsapp:  `https://wa.me/?text=${encodeURIComponent(msg)}`,
-      email:     `mailto:?subject=${encodeURIComponent("Rejoins QRfolio !")}&body=${encodeURIComponent(msg)}`,
+      email:     `mailto:?subject=${encodeURIComponent("Rejoins QRowg !")}&body=${encodeURIComponent(msg)}`,
       twitter:   `https://twitter.com/intent/tweet?text=${encodeURIComponent(msg)}`,
       linkedin:  `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(referralLink)}`,
     }
@@ -944,7 +944,7 @@ export default function ProfilePage() {
   const convRate       = totalViews > 0 ? Math.round((totalScansQR / totalViews) * 100) : 0
   const avgViews       = totalPages > 0 ? Math.round(totalViews / totalPages) : 0
 
-  // -- Badges + Niveau QRfolio -----------------------------------
+  // -- Badges + Niveau QRowg -----------------------------------
   type Badge = {
     id: string; emoji: string; label: string; desc: string
     category: "pages"|"scans"|"referrals"|"plan"|"milestone"
@@ -2150,7 +2150,7 @@ export default function ProfilePage() {
                             : job.id==="pages"      ? "Titre, slug, statut, vues par page"
                             : job.id==="qrcodes"    ? "Short code, scans, statut par QR"
                             : job.id==="analytics"  ? "Vues et visiteurs uniques par page"
-                            : "Historique de vos actions sur QRfolio"
+                            : "Historique de vos actions sur QRowg"
                           }
                         </p>
                       </div>
@@ -2563,7 +2563,7 @@ export default function ProfilePage() {
                             <span style={{ color:MUTED, fontSize:10 }}>{"-> "}{lvl.nextLvl.label}</span>
                           )}
                         </div>
-                        <p style={{ color:MUTED, fontSize:11, margin:0 }}>Score QRfolio : <span style={{ color:lvl.current.color, fontWeight:700 }}>{lvl.score}/100</span></p>
+                        <p style={{ color:MUTED, fontSize:11, margin:0 }}>Score QRowg : <span style={{ color:lvl.current.color, fontWeight:700 }}>{lvl.score}/100</span></p>
                       </div>
                       {/* Score cercle */}
                       <div style={{ position:"relative" as const, width:48, height:48, flexShrink:0 }}>
@@ -2688,7 +2688,7 @@ export default function ProfilePage() {
                 </div>
                 <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 5px" }}>Acces API</p>
                 <p style={{ color:MUTED, fontSize:11, margin:"0 0 14px", lineHeight:1.5 }}>
-                  Integrez QRfolio dans vos applications<br/>avec notre API RESTful.
+                  Integrez QRowg dans vos applications<br/>avec notre API RESTful.
                 </p>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:16, textAlign:"left" as const }}>
                   {["1 000 appels/mois (Pro)","10 000 appels/mois (Business)","Gestion QR via API","Webhooks","Analytics en temps reel","SDK officiel"].map((f,i) => (
@@ -2920,7 +2920,7 @@ export default function ProfilePage() {
                 <Globe size={28} color={MUTED} style={{ marginBottom:10 }}/>
                 <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 5px" }}>Domaines personnalises</p>
                 <p style={{ color:MUTED, fontSize:11, margin:"0 0 14px", lineHeight:1.5 }}>
-                  Connectez votre propre domaine<br/>a vos pages QRfolio.
+                  Connectez votre propre domaine<br/>a vos pages QRowg.
                 </p>
                 <a href="/upgrade"
                   style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"9px 18px", background:`linear-gradient(90deg,${G},color-mix(in srgb, var(--accent) 75%, #000))`, border:"none", borderRadius:9, color:"#080808", textDecoration:"none", fontSize:12, fontWeight:700 }}>
@@ -2940,7 +2940,7 @@ export default function ProfilePage() {
                 <Globe size={26} color={MUTED} style={{ marginBottom:9 }}/>
                 <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 4px" }}>Aucun domaine connecte</p>
                 <p style={{ color:MUTED, fontSize:11, margin:"0 0 14px", lineHeight:1.5 }}>
-                  Utilisez votre propre domaine pour<br/>toutes vos pages QRfolio.
+                  Utilisez votre propre domaine pour<br/>toutes vos pages QRowg.
                 </p>
                 <a href="/dashboard/domains"
                   style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"9px 18px", background:"rgba(56,189,248,0.1)", border:"1px solid rgba(56,189,248,0.25)", borderRadius:9, color:"#38BDF8", textDecoration:"none", fontSize:12, fontWeight:700 }}>

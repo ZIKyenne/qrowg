@@ -2,7 +2,7 @@
 import { redirect } from "next/navigation"
 import RedirectsPanel from "./RedirectsPanel"
 
-export const metadata = { title: "Redirections — QRfolio" }
+export const metadata = { title: "Redirections — QRowg" }
 
 export default async function RedirectsServerPage() {
   const supabase = await createServerSupabaseClient()

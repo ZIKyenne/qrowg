@@ -1098,7 +1098,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
   // -- Fonctions destination dynamique -----------------------------------------
   const DEST_TYPES = [
-    { id:"page",     label:"Page QRfolio", icon:"📄", ph:"ID ou slug de la page" },
+    { id:"page",     label:"Page QRowg", icon:"📄", ph:"ID ou slug de la page" },
     { id:"url",      label:"URL externe",  icon:"🌐", ph:"https://mon-site.com"  },
     { id:"file",     label:"Fichier",      icon:"📎", ph:"https://drive.google.com/..." },
     { id:"email",    label:"Email",        icon:"✉️",  ph:"contact@mon-site.com" },
@@ -1107,7 +1107,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   ]
   function getDestUrl(e: DestEntry | null): string { return e ? (e.url || e.value || pageUrl) : pageUrl }
   function getDestLabel(e: DestEntry | null): string {
-    if (!e) return active?.pages?.title ?? "Page QRfolio"
+    if (!e) return active?.pages?.title ?? "Page QRowg"
     const cfg = DEST_TYPES.find(d => d.id === e.type)
     return e.label || cfg?.label || e.type
   }
@@ -2387,7 +2387,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         const benefits = isBiz
           ? ["Tous les presets premium ET luxe", "Modules & coins luxe", "Export PDF, SVG et WEBP", "Correction d'erreur maximale", "Logo central + branding complet"]
           : isStarter
-          ? ["QR Print Studio (imprimables)", "QR Studio (personnalisation)", "5 pages · 850 vues/mois", "Sans branding QRfolio", "Domaine personnalisé"]
+          ? ["QR Print Studio (imprimables)", "QR Studio (personnalisation)", "5 pages · 850 vues/mois", "Sans branding QRowg", "Domaine personnalisé"]
           : ["Tous les presets premium", "Modules avances (pixel, neon...)", "Coins avances (diamond...)", "Export SVG et WEBP", "Correction d'erreur elevee (H)"]
         return (
           <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.85)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:4300, padding:24 }}

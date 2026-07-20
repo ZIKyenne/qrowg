@@ -1,5 +1,5 @@
 // =============================================================================
-// /api/generate-page — Génération d'une page QRfolio par IA (Claude).
+// /api/generate-page — Génération d'une page QRowg par IA (Claude).
 // L'IA renvoie un BRIEF structuré (schéma imposé) ; le mapper PUR aiBriefToTemplate
 // le transforme en PageTemplate valide (types/clés de blocs réels) appliqué depuis le builder.
 // Nécessite la variable d'environnement ANTHROPIC_API_KEY (sinon 503 avec message clair).
