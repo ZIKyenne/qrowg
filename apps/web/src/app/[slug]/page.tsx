@@ -3,16 +3,17 @@ import { notFound } from "next/navigation"
 import PublicPageClient from "./PublicPageClient"
 import type { Metadata } from "next"
 
-interface Props { params: { slug: string } }
+interface Props { params: Promise<{ slug: string }> }
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://qrfolio.app"
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params
   const supabase = await createServerSupabaseClient()
   const { data: page } = await supabase
     .from("pages")
     .select("title, seo_title, seo_description, og_image_url, slug, profiles(full_name, username)")
-    .eq("slug", params.slug)
+    .eq("slug", slug)
     .eq("status", "published")
     .single()
 
@@ -42,12 +43,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function PublicPage({ params }: Props) {
+  const { slug } = await params
   const supabase = await createServerSupabaseClient()
 
   const { data: page } = await supabase
     .from("pages")
     .select("*, profiles(full_name, username, avatar_url)")
-    .eq("slug", params.slug)
+    .eq("slug", slug)
     .eq("status", "published")
     .single()
 
