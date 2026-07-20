@@ -327,9 +327,11 @@
     border-radius: 16px;
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
   }
-  .preview { width: 72px; height: 72px; margin-bottom: 0; flex: 0 0 auto; }
-  .preview.rounded { border-radius: 16px; }
-  .preview.rounded .ring { border-radius: 20px; }
+  /* Taille intermédiaire (ni 280px qui masque tout, ni 72px illisible) +
+     padding réduit pour que le QR-art remplisse le carré (moins "mal cadré"). */
+  .preview { width: 108px; height: 108px; padding: 5%; margin-bottom: 0; flex: 0 0 auto; }
+  .preview.rounded { border-radius: 22px; }
+  .preview.rounded .ring { border-radius: 26px; }
   .ring { inset: -6px; }
   /* Enregistrer + aléatoire à droite de l'aperçu (barre compacte) */
   .stage .actions { flex: 1 1 140px; width: auto; gap: 8px; }
