@@ -2,7 +2,7 @@
 
 // QR d'un lien — genere un QR code pour n'importe quelle URL (site, reseau, PDF...).
 // 100% local (qr-code-styling via qrRender), sans API. Export PNG haute def + SVG.
-import { useMemo, useRef, useState } from "react"
+import { useMemo, useRef, useState, useEffect } from "react"
 import Link from "next/link"
 import { ArrowLeft, Download, Check, QrCode as QrIcon, ShieldCheck, AlertTriangle, Upload, X } from "lucide-react"
 import QRCanvas from "../qr-codes/QRCanvas"
@@ -25,6 +25,16 @@ function contrast(a: string, b: string): number {
   const l1 = lum(a), l2 = lum(b)
   return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)
 }
+
+// Ajoute https:// si aucun schema reconnu (site tape sans protocole).
+function normalizeUrl(v: string): string {
+  const s = v.trim()
+  if (!s) return ""
+  if (/^(https?:\/\/|mailto:|tel:|sms:|geo:|wifi:)/i.test(s)) return s
+  return "https://" + s
+}
+
+type QrHistEntry = { url: string; fg: string; bg: string; ecc: "L" | "M" | "Q" | "H"; styleKey: string }
 
 const ECC_OPTS: { k: "L" | "M" | "Q" | "H"; label: string }[] = [
   { k: "L", label: "Faible" },
@@ -55,12 +65,17 @@ export default function QrLinkPage() {
   const [done, setDone] = useState(false)
   const logoInput = useRef<HTMLInputElement>(null)
 
-  const normalized = useMemo(() => {
-    const v = url.trim()
-    if (!v) return ""
-    if (/^(https?:\/\/|mailto:|tel:|sms:|geo:|wifi:)/i.test(v)) return v
-    return "https://" + v
-  }, [url])
+  const normalized = useMemo(() => normalizeUrl(url), [url])
+
+  // Historique local (defaut vide = SSR, lecture apres montage -> pas de mismatch d'hydratation).
+  const [history, setHistory] = useState<QrHistEntry[]>([])
+  useEffect(() => { try { const h = JSON.parse(localStorage.getItem("qrfolio_qr_history") || "[]"); if (Array.isArray(h)) setHistory(h.slice(0, 8)) } catch {} }, [])
+  const saveToHistory = () => setHistory(prev => {
+    const entry: QrHistEntry = { url: url.trim(), fg, bg, ecc, styleKey }
+    const next = [entry, ...prev.filter(e => normalizeUrl(e.url) !== normalized)].slice(0, 8)
+    try { localStorage.setItem("qrfolio_qr_history", JSON.stringify(next)) } catch {}
+    return next
+  })
 
   const ratio = contrast(fg, bg)
   const ready = normalized.length > 0
@@ -93,6 +108,7 @@ export default function QrLinkPage() {
         a.download = `qrcode.${ext}`
         a.click()
         URL.revokeObjectURL(a.href)
+        saveToHistory()
         setDone(true); setTimeout(() => setDone(false), 1800)
       }
     } finally { setBusy(null) }
@@ -223,6 +239,24 @@ export default function QrLinkPage() {
           {busy === "svg" ? "…" : "SVG"}
         </button>
       </div>
+
+      {history.length > 0 && (
+        <div style={{ marginTop: 24 }}>
+          <p style={secTitle}>{accentBar} Mes QR récents</p>
+          <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 6 }}>
+            {history.map((h, i) => (
+              <button key={i} title={`Réutiliser : ${normalizeUrl(h.url)}`}
+                onClick={() => { setUrl(h.url); setFg(h.fg); setBg(h.bg); setEcc(h.ecc); setStyleKey(h.styleKey); setLogo(null); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }) }}
+                style={{ flexShrink: 0, width: 98, display: "flex", flexDirection: "column", alignItems: "center", gap: 7, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 13, padding: 9, cursor: "pointer" }}>
+                <div style={{ background: h.bg, borderRadius: 8, padding: 5, lineHeight: 0 }}>
+                  <QRCanvas value={normalizeUrl(h.url) || "https://qrfolio.app"} size={58} fg={h.fg} bg={h.bg} />
+                </div>
+                <span style={{ color: MUTED, fontSize: 9.5, maxWidth: 86, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{normalizeUrl(h.url).replace(/^https?:\/\//, "")}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <p style={{ color: "#6E685E", fontSize: 11.5, margin: "18px 0 0", lineHeight: 1.55, textAlign: "center" }}>
         Ce QR pointe directement vers le lien. Pour pouvoir <strong style={{ color: MUTED }}>changer la destination sans réimprimer</strong>, créez plutôt un <Link href="/dashboard/qr-codes" style={{ color: G, fontWeight: 600 }}>QR code dynamique</Link>.
