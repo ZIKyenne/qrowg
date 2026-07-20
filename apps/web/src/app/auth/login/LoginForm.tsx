@@ -57,6 +57,11 @@ export default function LoginForm() {
             {show ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
+        <div style={{ textAlign: "right", marginTop: 8 }}>
+          <a href="/auth/forgot-password" style={{ color: "#C9A84C", textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
+            Mot de passe oublié ?
+          </a>
+        </div>
       </div>
 
       <SubmitButton />
