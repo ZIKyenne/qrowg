@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Save, Check, AlertTriangle, Eye, EyeOff, Bell, Shield, Trash2, LogOut, Key, Globe, Palette, Moon, CreditCard, ArrowRight, Loader2 } from "lucide-react"
+import { Save, Check, AlertTriangle, Eye, EyeOff, Bell, Shield, Trash2, LogOut, Key, Globe, Palette, Moon, CreditCard, ArrowRight, Loader2, Download, DatabaseBackup } from "lucide-react"
 import Particles from "@/components/Particles"
 
 type Profile = { id: string; email: string; full_name: string | null; plan: string }
@@ -57,6 +57,10 @@ export default function SettingsPage() {
   // Apparence
   const [appearance, setAppearance] = useState({ compact_mode: false, animations: true })
 
+  // Export RGPD
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState("")
+
   // Danger zone
   const [deleteConfirm, setDeleteConfirm] = useState("")
   const [deleting, setDeleting] = useState(false)
@@ -100,6 +104,24 @@ export default function SettingsPage() {
       await supabase.from("profiles").update({ preferences: prefs }).eq("id", profile.id)
     }
     setNotifSaved(true); setTimeout(() => setNotifSaved(false), 2000)
+  }
+
+  async function exportData() {
+    if (exporting) return
+    setExporting(true); setExportError("")
+    try {
+      const res = await fetch("/api/account/export")
+      if (!res.ok) { setExportError("L'export a échoué. Réessayez."); setExporting(false); return }
+      const blob = await res.blob()
+      const a = document.createElement("a")
+      a.href = URL.createObjectURL(blob)
+      a.download = `qrfolio-export-${new Date().toISOString().slice(0, 10)}.json`
+      a.click()
+      URL.revokeObjectURL(a.href)
+    } catch {
+      setExportError("L'export a échoué. Vérifiez votre connexion.")
+    }
+    setExporting(false)
   }
 
   async function handleLogout() {
@@ -276,6 +298,27 @@ export default function SettingsPage() {
               label="Mode compact" description="Interface plus dense, moins d'espacement" />
             <Toggle value={appearance.animations} onChange={v => setAppearance(a => ({ ...a, animations: v }))}
               label="Animations" description="Transitions et effets visuels dans l'interface" />
+          </div>
+        </Section>
+
+        {/* Mes donnees — droit RGPD a la portabilite */}
+        <Section title="Mes données" subtitle="Exporte une copie de tes données" icon={<DatabaseBackup size={16} />}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <p style={{ color: MUTED, fontSize: 13, margin: 0, lineHeight: 1.6 }}>
+              Télécharge l&apos;ensemble de tes données (profil, pages, blocs, QR codes et messages reçus) dans un fichier JSON lisible et réutilisable.
+            </p>
+            {exportError && (
+              <div style={{ display: "flex", gap: 7, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "9px 12px" }}>
+                <AlertTriangle size={14} color="#EF4444" style={{ flexShrink: 0, marginTop: 1 }} />
+                <p style={{ color: "#EF4444", fontSize: 12, margin: 0 }}>{exportError}</p>
+              </div>
+            )}
+            <button onClick={exportData} disabled={exporting}
+              style={{ display: "flex", alignItems: "center", gap: 8, background: "color-mix(in srgb, var(--accent) 7%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius: 10, padding: "12px 18px", color: G, fontSize: 14, fontWeight: 600, cursor: exporting ? "not-allowed" : "pointer", width: "fit-content" }}>
+              {exporting
+                ? <><Loader2 size={15} style={{ animation: "spin 0.7s linear infinite" }} /> Préparation…</>
+                : <><Download size={15} /> Télécharger mes données</>}
+            </button>
           </div>
         </Section>
 
