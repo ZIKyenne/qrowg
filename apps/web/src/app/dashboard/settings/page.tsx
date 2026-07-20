@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Save, Check, AlertTriangle, Eye, EyeOff, Bell, Shield, Trash2, LogOut, Key, Globe, Palette, Moon, CreditCard, ArrowRight } from "lucide-react"
+import { Save, Check, AlertTriangle, Eye, EyeOff, Bell, Shield, Trash2, LogOut, Key, Globe, Palette, Moon, CreditCard, ArrowRight, Loader2 } from "lucide-react"
 import Particles from "@/components/Particles"
 
 type Profile = { id: string; email: string; full_name: string | null; plan: string }
@@ -60,6 +60,7 @@ export default function SettingsPage() {
   // Danger zone
   const [deleteConfirm, setDeleteConfirm] = useState("")
   const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState("")
 
   useEffect(() => {
     const supabase = createClient()
@@ -108,10 +109,24 @@ export default function SettingsPage() {
   }
 
   async function deleteAccount() {
-    if (deleteConfirm !== profile?.email) return
-    setDeleting(true)
-    // Dans une vraie app on appellerait une API route sécurisée
-    alert("Fonctionnalité en cours de déploiement. Contactez support@qrfolio.app")
+    if (deleteConfirm !== profile?.email || deleting) return
+    setDeleting(true); setDeleteError("")
+    try {
+      const res = await fetch("/api/account/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: deleteConfirm.trim() }),
+      })
+      if (res.ok) {
+        // Compte supprime : la session est invalidee cote serveur -> retour accueil.
+        window.location.href = "/?deleted=1"
+        return
+      }
+      const j = await res.json().catch(() => ({}))
+      setDeleteError(j.error || "La suppression a échoué. Réessayez.")
+    } catch {
+      setDeleteError("La suppression a échoué. Vérifiez votre connexion.")
+    }
     setDeleting(false)
   }
 
@@ -304,9 +319,17 @@ export default function SettingsPage() {
                 onFocus={e => e.target.style.borderColor = "rgba(239,68,68,0.5)"}
                 onBlur={e => e.target.style.borderColor = deleteConfirm === profile?.email ? "rgba(239,68,68,0.4)" : "rgba(239,68,68,0.15)"} />
             </div>
+            {deleteError && (
+              <div style={{ display: "flex", gap: 7, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "9px 12px" }}>
+                <AlertTriangle size={14} color="#EF4444" style={{ flexShrink: 0, marginTop: 1 }} />
+                <p style={{ color: "#EF4444", fontSize: 12, margin: 0 }}>{deleteError}</p>
+              </div>
+            )}
             <button onClick={deleteAccount} disabled={deleteConfirm !== profile?.email || deleting}
-              style={{ display: "flex", alignItems: "center", gap: 8, background: deleteConfirm === profile?.email ? "rgba(239,68,68,0.15)" : "rgba(239,68,68,0.05)", border: `1px solid ${deleteConfirm === profile?.email ? "rgba(239,68,68,0.4)" : "rgba(239,68,68,0.15)"}`, borderRadius: 10, padding: "12px 18px", color: deleteConfirm === profile?.email ? "#EF4444" : "rgba(239,68,68,0.4)", fontSize: 14, fontWeight: 700, cursor: deleteConfirm === profile?.email ? "pointer" : "not-allowed", width: "fit-content", transition: "all 0.2s" }}>
-              <Trash2 size={15} /> Supprimer définitivement mon compte
+              style={{ display: "flex", alignItems: "center", gap: 8, background: deleteConfirm === profile?.email ? "rgba(239,68,68,0.15)" : "rgba(239,68,68,0.05)", border: `1px solid ${deleteConfirm === profile?.email ? "rgba(239,68,68,0.4)" : "rgba(239,68,68,0.15)"}`, borderRadius: 10, padding: "12px 18px", color: deleteConfirm === profile?.email ? "#EF4444" : "rgba(239,68,68,0.4)", fontSize: 14, fontWeight: 700, cursor: deleteConfirm === profile?.email && !deleting ? "pointer" : "not-allowed", width: "fit-content", transition: "all 0.2s" }}>
+              {deleting
+                ? <><Loader2 size={15} style={{ animation: "spin 0.7s linear infinite" }} /> Suppression…</>
+                : <><Trash2 size={15} /> Supprimer définitivement mon compte</>}
             </button>
           </div>
         </div>
