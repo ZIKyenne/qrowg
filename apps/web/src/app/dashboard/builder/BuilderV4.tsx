@@ -4,7 +4,7 @@
   import {
     X, ChevronUp, ChevronDown, Trash2,
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
-    ExternalLink, Palette, GripVertical, QrCode, MoreHorizontal
+    ExternalLink, Palette, GripVertical, QrCode, MoreHorizontal, Undo2, Redo2
   } from "lucide-react"
   import { BLOCK_DEFS, BLOCK_CATEGORIES, BLOCK_HINTS, PRESET_CATEGORIES, SOCIAL_NETWORKS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, SOCIAL_PRESETS, INFO_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, announcementMeta, optionLabel, blockDecoration, BLOCK_GRADIENTS, BLOCK_RADIUS_OPTIONS, BLOCK_SHADOW_OPTIONS, BLOCK_SPACE_OPTIONS, BLOCK_WIDTH_OPTIONS, BLOCK_ANIM_OPTIONS, BLOCK_ANIM_SPEED_OPTIONS, BLOCK_HOVER_OPTIONS, BLOCK_LOOP_OPTIONS, BLOCK_INTENSITY_OPTIONS, BLOCK_STYLE_PRESETS, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type BlockContent, type PageTheme } from "./types"
   import { PAGE_TEMPLATES, PAGE_TEMPLATE_GROUPS, type PageTemplate } from "./page-templates"
@@ -5266,7 +5266,7 @@
           {saveError && <button onClick={() => { setSaveError(false); setBlocks(b => [...b]) }} title={saveErrorMsg ? `Erreur : ${saveErrorMsg} — cliquer pour réessayer` : "Réessayer la sauvegarde"} style={{ color: "#EF4444", fontSize: 10, display: "flex", alignItems: "center", gap: 3, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 6, padding: "3px 8px", cursor: "pointer", maxWidth: isMobile ? 130 : 340, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis", flexShrink: 0 }}>⚠ {isMobile ? "Réessayer" : `${saveErrorMsg ? saveErrorMsg : "Échec"} — Réessayer`}</button>}
           {pageId && !IS_UUID(pageId) && !liveId && !bootstrapError && <span style={{ color: MUTED, fontSize: 10 }}>Création de la page…</span>}
           {bootstrapError && <span style={{ color: "#EF4444", fontSize: 10, display: "flex", alignItems: "center", gap: 3 }} title={bootstrapError}>⚠ {bootstrapError}</span>}
-          {!pageId && <span style={{ color: "#4A4640", fontSize: 9 }}>Mode démo</span>}
+          {!pageId && !isMobile && <span style={{ color: "#4A4640", fontSize: 9 }}>Mode démo</span>}
           <div style={{ flex: 1 }} />
 
           {/* Boutons Undo / Redo */}
@@ -5277,7 +5277,7 @@
               style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, cursor: undoRedo.canUndo() ? "pointer" : "default", color: undoRedo.canUndo() ? "#F5F0E8" : "rgba(255,255,255,0.2)", fontSize: 13, transition: "all 0.15s" }}
               onMouseEnter={e => { if(undoRedo.canUndo()) { e.currentTarget.style.background="rgba(201,168,76,0.1)"; e.currentTarget.style.borderColor="rgba(201,168,76,0.3)" }}}
               onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor="rgba(255,255,255,0.08)" }}>
-              ↩
+              <Undo2 size={15} />
             </button>
             <button onClick={() => { const n = undoRedo.redo(); if(n) setBlocksRaw(n) }}
               disabled={!undoRedo.canRedo()}
@@ -5285,7 +5285,7 @@
               style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, cursor: undoRedo.canRedo() ? "pointer" : "default", color: undoRedo.canRedo() ? "#F5F0E8" : "rgba(255,255,255,0.2)", fontSize: 13, transition: "all 0.15s" }}
               onMouseEnter={e => { if(undoRedo.canRedo()) { e.currentTarget.style.background="rgba(201,168,76,0.1)"; e.currentTarget.style.borderColor="rgba(201,168,76,0.3)" }}}
               onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor="rgba(255,255,255,0.08)" }}>
-              ↪
+              <Redo2 size={15} />
             </button>
           </div>
 
@@ -5327,8 +5327,8 @@
           </div>
 
           {/* Apercu plein ecran (#02) */}
-          <button onClick={enterPreview} title="Aperçu plein écran" style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.35)", borderRadius: 7, padding: "5px 11px", color: G, fontSize: 11, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}>
-            <Eye size={12} /> Aperçu
+          <button onClick={enterPreview} title="Aperçu plein écran" style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.35)", borderRadius: 7, padding: isMobile ? "6px 9px" : "5px 11px", color: G, fontSize: 11, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}>
+            <Eye size={13} />{!isMobile && " Aperçu"}
           </button>
           <button onClick={() => setRightTab(t => t==="theme" ? "preview" : "theme")} style={{ display: isMobile ? "none" : "flex", alignItems: "center", gap: 5, background: rightTab==="theme" ? "rgba(201,168,76,0.12)" : "transparent", border: `1px solid ${rightTab==="theme" ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.2)"}`, borderRadius: 7, padding: "5px 11px", color: rightTab==="theme" ? G : MUTED, fontSize: 11, cursor: "pointer" }}>
             <Palette size={11} /> Thème
@@ -5498,24 +5498,24 @@
                   {/* Catégorie Récents — visible seulement si au moins 1 récent */}
                   {recentBlocks.length > 0 && (
                     <button onClick={() => setActiveCategory("recents")} title="Blocs récemment utilisés"
-                      style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0, background: activeCategory==="recents" ? "#38BDF818" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory==="recents" ? "#38BDF850" : "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: isMobile ? "7px 7px" : "9px 11px", color: activeCategory==="recents" ? "#38BDF8" : MUTED, fontSize: 12, fontWeight: activeCategory==="recents" ? 700 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
-                      <span style={{ fontSize: 15, flexShrink: 0 }}>🕐</span>
+                      style={{ display: "flex", alignItems: "center", gap: isMobile ? 5 : 7, minWidth: 0, background: activeCategory==="recents" ? "#38BDF818" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory==="recents" ? "#38BDF850" : "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: isMobile ? "6px 6px" : "9px 11px", color: activeCategory==="recents" ? "#38BDF8" : MUTED, fontSize: 12, fontWeight: activeCategory==="recents" ? 700 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
+                      <span style={{ fontSize: isMobile ? 13 : 15, flexShrink: 0 }}>🕐</span>
                       <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: isMobile ? 11.5 : undefined }}>Récents</span>
                     </button>
                   )}
                   {/* Catégorie Favoris — visible seulement si au moins 1 favori */}
                   {favorites.length > 0 && (
                     <button onClick={() => setActiveCategory("favorites")} title="Vos blocs favoris"
-                      style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0, background: activeCategory==="favorites" ? "#FFD70018" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory==="favorites" ? "#FFD70050" : "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: isMobile ? "7px 7px" : "9px 11px", color: activeCategory==="favorites" ? "#FFD700" : MUTED, fontSize: 12, fontWeight: activeCategory==="favorites" ? 700 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
-                      <span style={{ fontSize: 15, flexShrink: 0 }}>⭐</span>
+                      style={{ display: "flex", alignItems: "center", gap: isMobile ? 5 : 7, minWidth: 0, background: activeCategory==="favorites" ? "#FFD70018" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory==="favorites" ? "#FFD70050" : "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: isMobile ? "6px 6px" : "9px 11px", color: activeCategory==="favorites" ? "#FFD700" : MUTED, fontSize: 12, fontWeight: activeCategory==="favorites" ? 700 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
+                      <span style={{ fontSize: isMobile ? 13 : 15, flexShrink: 0 }}>⭐</span>
                       <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: isMobile ? 11.5 : undefined }}>Favoris</span>
                       <span style={{ display: isMobile ? "none" : undefined, marginLeft: "auto", flexShrink: 0, background: "rgba(255,215,0,0.15)", borderRadius: 10, padding: "0px 6px", fontSize: 9.5, fontWeight: 700 }}>{favorites.length}</span>
                     </button>
                   )}
                   {BLOCK_CATEGORIES.map(cat => (
                     <button key={cat.id} onClick={() => setActiveCategory(cat.id)} title={cat.desc}
-                      style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0, background: activeCategory===cat.id ? cat.color+"18" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory===cat.id ? cat.color+"50" : "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: isMobile ? "7px 7px" : "9px 11px", color: activeCategory===cat.id ? cat.color : MUTED, fontSize: 12, fontWeight: activeCategory===cat.id ? 700 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
-                      <span style={{ fontSize: 15, flexShrink: 0 }}>{cat.icon}</span>
+                      style={{ display: "flex", alignItems: "center", gap: isMobile ? 5 : 7, minWidth: 0, background: activeCategory===cat.id ? cat.color+"18" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory===cat.id ? cat.color+"50" : "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: isMobile ? "6px 6px" : "9px 11px", color: activeCategory===cat.id ? cat.color : MUTED, fontSize: 12, fontWeight: activeCategory===cat.id ? 700 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
+                      <span style={{ fontSize: isMobile ? 13 : 15, flexShrink: 0 }}>{cat.icon}</span>
                       <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: isMobile ? 11.5 : undefined }}>{cat.label}</span>
                       <span style={{ display: isMobile ? "none" : undefined, marginLeft: "auto", flexShrink: 0, background: activeCategory===cat.id ? cat.color+"20" : "rgba(255,255,255,0.06)", color: activeCategory===cat.id ? cat.color : MUTED, borderRadius: 10, padding: "0px 6px", fontSize: 9.5, fontWeight: 700, lineHeight: "17px" }}>
                         {search && searchCounts ? (searchCounts[cat.id] || 0) : (catCounts[cat.id] || 0)}
