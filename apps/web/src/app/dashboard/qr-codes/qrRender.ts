@@ -38,7 +38,7 @@ export type QROptions = {
   size?:  number
 }
 
-function mapDotType(s?: string): DotType {
+export function mapDotType(s?: string): DotType {
   switch (s) {
     case "dot":        return "dots"
     case "rounded":    return "rounded"
@@ -51,7 +51,7 @@ function mapDotType(s?: string): DotType {
   }
 }
 
-function mapCornerSquareType(s?: string): CornerSquareType {
+export function mapCornerSquareType(s?: string): CornerSquareType {
   switch (s) {
     case "rounded":  return "extra-rounded"
     case "circle":   return "dot"
@@ -62,7 +62,7 @@ function mapCornerSquareType(s?: string): CornerSquareType {
   }
 }
 
-function mapCornerDotType(s?: string): CornerDotType {
+export function mapCornerDotType(s?: string): CornerDotType {
   switch (s) {
     case "circle":
     case "luxury":
@@ -71,7 +71,9 @@ function mapCornerDotType(s?: string): CornerDotType {
   }
 }
 
-function buildOptions(o: QROptions): any {
+// Exporte pour les tests : mapping pur QROptions -> options qr-code-styling
+// (ne construit aucune instance, aucun canvas requis).
+export function buildOptions(o: QROptions): any {
   const size   = o.size ?? 400
   const margin = o.style.margin ?? 10
 
