@@ -7,32 +7,10 @@ import Link from "next/link"
 import { ArrowLeft, Download, Check, QrCode as QrIcon, ShieldCheck, AlertTriangle, Upload, X } from "lucide-react"
 import QRCanvas from "../qr-codes/QRCanvas"
 import { getQRBlob, type QROptions, type QRStyleConfig } from "../qr-codes/qrRender"
+import { contrast, normalizeUrl } from "./qrLinkUtils"
 
 const G = "#C9A84C"
 const MUTED = "#A8A190"
-
-// Contraste relatif (WCAG-like) pour prevenir un QR peu/pas scannable.
-function lum(hex: string): number {
-  const m = hex.replace("#", "").match(/.{2}/g)
-  if (!m || m.length < 3) return 1
-  const [r, g, b] = m.map(h => {
-    const v = parseInt(h, 16) / 255
-    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)
-  })
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b
-}
-function contrast(a: string, b: string): number {
-  const l1 = lum(a), l2 = lum(b)
-  return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)
-}
-
-// Ajoute https:// si aucun schema reconnu (site tape sans protocole).
-function normalizeUrl(v: string): string {
-  const s = v.trim()
-  if (!s) return ""
-  if (/^(https?:\/\/|mailto:|tel:|sms:|geo:|wifi:)/i.test(s)) return s
-  return "https://" + s
-}
 
 type QrHistEntry = { url: string; fg: string; bg: string; ecc: "L" | "M" | "Q" | "H"; styleKey: string }
 
