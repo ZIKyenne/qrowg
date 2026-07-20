@@ -11,15 +11,14 @@ import { BLOCK_DEFS } from "../dashboard/builder/types"
 // CHAQUE type de BLOCK_DEFS possede un `case "<type>"`. Si tu ajoutes un bloc,
 // ce test echoue tant que son rendu public n'existe pas.
 
-const PUBLIC_SRC = readFileSync(
-  fileURLToPath(new URL("./PublicPageClient.tsx", import.meta.url)),
-  "utf8",
-)
+const casesOf = (relUrl: string) => {
+  const src = readFileSync(fileURLToPath(new URL(relUrl, import.meta.url)), "utf8")
+  return new Set([...src.matchAll(/case\s+"([a-z0-9_]+)"/g)].map(m => m[1]))
+}
 
-// Tous les labels `case "xxx"` presents dans le renderer public.
-const publicCases = new Set(
-  [...PUBLIC_SRC.matchAll(/case\s+"([a-z0-9_]+)"/g)].map(m => m[1]),
-)
+// Labels `case "xxx"` des deux renderers.
+const publicCases = casesOf("./PublicPageClient.tsx")
+const builderCases = casesOf("../dashboard/builder/BuilderV4.tsx")
 
 const blockTypes = Object.keys(BLOCK_DEFS)
 
@@ -32,5 +31,10 @@ describe("parite des renderers (builder <-> page publique)", () => {
   it("chaque type de bloc a un rendu public (case)", () => {
     const missing = blockTypes.filter(t => !publicCases.has(t))
     expect(missing, `Blocs sans rendu public (invisibles une fois publies) : ${missing.join(", ")}`).toEqual([])
+  })
+
+  it("chaque type de bloc a un rendu canvas builder (case)", () => {
+    const missing = blockTypes.filter(t => !builderCases.has(t))
+    expect(missing, `Blocs sans rendu canvas builder (placeholder generique dans l'editeur) : ${missing.join(", ")}`).toEqual([])
   })
 })
