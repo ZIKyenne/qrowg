@@ -5,6 +5,7 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { pageLimit } from "@/lib/plans"
+import { slugifyBase } from "@/lib/slug"
 
 function randCode(len = 8): string {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789"
@@ -59,7 +60,9 @@ export async function POST(req: NextRequest) {
       delete p.created_at
       delete p.updated_at
       setIfPresent(p, "title", `${page.title ?? "Sans titre"} (copie)`)
-      setIfPresent(p, "slug", `${(page.slug ?? "page")}-${randCode(5)}`)
+      // Base bornee a 50 pour rester sous la contrainte slug_format (<= 60)
+      // meme quand le slug original est proche de la limite.
+      setIfPresent(p, "slug", `${slugifyBase(page.slug ?? "page", 50) || "page"}-${randCode(5)}`)
       setIfPresent(p, "status", "draft")
       setIfPresent(p, "total_views", 0)
 
