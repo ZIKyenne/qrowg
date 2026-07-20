@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useRef, useState, useEffect } from "react"
 import { Upload, X, Image as ImageIcon, FolderOpen, Trash2, Plus, Search, Star } from "lucide-react"
 import { useImageUpload } from "./useImageUpload"
 
@@ -23,7 +23,9 @@ export default function ImageUpload({ value, onChange, label, hint }: Props) {
   const [pickerOpen, setPickerOpen] = useState(false) // #05 : bottom sheet de choix de source
   const [libQuery, setLibQuery] = useState("") // #07 : recherche dans la bibliotheque
   // #07 : favoris (persistes par URL). Les images favorites remontent en tete.
-  const [favs, setFavs] = useState<Set<string>>(() => { try { return new Set(JSON.parse(localStorage.getItem("qrfolio_media_favs") || "[]")) } catch { return new Set() } })
+  // Defaut vide (= SSR) puis lecture apres montage -> pas de mismatch d'hydratation (cf review #2).
+  const [favs, setFavs] = useState<Set<string>>(new Set())
+  useEffect(() => { try { const s = JSON.parse(localStorage.getItem("qrfolio_media_favs") || "[]"); if (Array.isArray(s) && s.length) setFavs(new Set(s)) } catch {} }, [])
   const toggleFav = (url: string) => setFavs(prev => { const n = new Set(prev); if (n.has(url)) n.delete(url); else n.add(url); try { localStorage.setItem("qrfolio_media_favs", JSON.stringify([...n])) } catch {} return n })
 
   async function openLibrary() {
