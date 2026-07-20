@@ -39,6 +39,23 @@ export function buildWifi(ssid: string, password: string, enc: "WPA" | "WEP" | "
   return `WIFI:T:${enc};S:${escapeWifi(s)};P:${escapeWifi(p)};;`
 }
 
+// Construit un QR d'appel telephonique (scan -> propose d'appeler).
+// Ne garde que les chiffres et le prefixe international +.
+export function buildTel(phone: string): string {
+  const p = phone.replace(/[^\d+]/g, "")
+  return p ? `tel:${p}` : ""
+}
+
+// Construit un QR email mailto: (scan -> ouvre un brouillon pre-rempli, RFC 6068).
+export function buildEmail(to: string, subject?: string, body?: string): string {
+  const t = to.trim()
+  if (!t) return ""
+  const params: string[] = []
+  if (subject?.trim()) params.push(`subject=${encodeURIComponent(subject.trim())}`)
+  if (body?.trim()) params.push(`body=${encodeURIComponent(body.trim())}`)
+  return `mailto:${t}${params.length ? "?" + params.join("&") : ""}`
+}
+
 // Echappe les caracteres speciaux du format vCard (\ , ; et retours ligne).
 export function escapeVCard(s: string): string {
   return s.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;")

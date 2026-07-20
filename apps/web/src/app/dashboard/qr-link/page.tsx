@@ -5,10 +5,10 @@
 // historique.
 import { useMemo, useRef, useState, useEffect } from "react"
 import Link from "next/link"
-import { ArrowLeft, Download, Check, QrCode as QrIcon, ShieldCheck, AlertTriangle, Upload, X, Link2, Wifi, Type, Contact } from "lucide-react"
+import { ArrowLeft, Download, Check, QrCode as QrIcon, ShieldCheck, AlertTriangle, Upload, X, Link2, Wifi, Type, Contact, Phone, Mail } from "lucide-react"
 import QRCanvas from "../qr-codes/QRCanvas"
 import { getQRBlob, type QROptions, type QRStyleConfig } from "../qr-codes/qrRender"
-import { contrast, normalizeUrl, buildWifi, buildVCard, type VCardFields } from "./qrLinkUtils"
+import { contrast, normalizeUrl, buildWifi, buildVCard, buildTel, buildEmail, type VCardFields } from "./qrLinkUtils"
 
 const G = "#C9A84C"
 const MUTED = "#A8A190"
@@ -30,15 +30,20 @@ const TYPES = [
   { k: "wifi" as const, label: "WiFi", icon: Wifi },
   { k: "text" as const, label: "Texte", icon: Type },
   { k: "contact" as const, label: "Contact", icon: Contact },
+  { k: "phone" as const, label: "Appel", icon: Phone },
+  { k: "email" as const, label: "Email", icon: Mail },
 ]
-type QrType = "link" | "wifi" | "text" | "contact"
+type QrType = "link" | "wifi" | "text" | "contact" | "phone" | "email"
 type WifiEnc = "WPA" | "WEP" | "nopass"
+type EmailFields = { to?: string; subject?: string; body?: string }
 
 const EMPTY_VC: VCardFields = { firstName: "", lastName: "", phone: "", email: "", org: "", title: "", url: "" }
+const EMPTY_EM: EmailFields = { to: "", subject: "", body: "" }
 
 // Champs qui determinent la charge utile du QR (partages entre l'etat live et l'historique).
 type QrSource = {
-  type: QrType; url: string; ssid: string; wifiPass: string; wifiEnc: WifiEnc; text: string; vc: VCardFields
+  type: QrType; url: string; ssid: string; wifiPass: string; wifiEnc: WifiEnc; text: string
+  vc: VCardFields; phone: string; em: EmailFields
 }
 type QrHistEntry = QrSource & {
   fg: string; bg: string; ecc: "L" | "M" | "Q" | "H"; styleKey: string
@@ -49,6 +54,8 @@ function payload(s: QrSource): string {
   if (s.type === "wifi") return buildWifi(s.ssid, s.wifiPass, s.wifiEnc)
   if (s.type === "text") return s.text.trim()
   if (s.type === "contact") return buildVCard(s.vc)
+  if (s.type === "phone") return buildTel(s.phone)
+  if (s.type === "email") return buildEmail(s.em.to ?? "", s.em.subject, s.em.body)
   return normalizeUrl(s.url)
 }
 
@@ -60,6 +67,8 @@ export default function QrLinkPage() {
   const [wifiEnc, setWifiEnc] = useState<WifiEnc>("WPA")
   const [text, setText] = useState("")
   const [vc, setVc] = useState<VCardFields>(EMPTY_VC)
+  const [phone, setPhone] = useState("")
+  const [em, setEm] = useState<EmailFields>(EMPTY_EM)
   const [fg, setFg] = useState("#080808")
   const [bg, setBg] = useState("#FFFFFF")
   const [ecc, setEcc] = useState<"L" | "M" | "Q" | "H">("M")
@@ -69,21 +78,21 @@ export default function QrLinkPage() {
   const [done, setDone] = useState(false)
   const logoInput = useRef<HTMLInputElement>(null)
 
-  const data = useMemo(() => payload({ type: qrType, url, ssid, wifiPass, wifiEnc, text, vc }), [qrType, url, ssid, wifiPass, wifiEnc, text, vc])
+  const data = useMemo(() => payload({ type: qrType, url, ssid, wifiPass, wifiEnc, text, vc, phone, em }), [qrType, url, ssid, wifiPass, wifiEnc, text, vc, phone, em])
   const ready = data.length > 0
   const ratio = contrast(fg, bg)
 
   const [history, setHistory] = useState<QrHistEntry[]>([])
   useEffect(() => { try { const h = JSON.parse(localStorage.getItem("qrfolio_qr_history") || "[]"); if (Array.isArray(h)) setHistory(h.slice(0, 8)) } catch {} }, [])
   const saveToHistory = () => setHistory(prev => {
-    const entry: QrHistEntry = { type: qrType, url: url.trim(), ssid, wifiPass, wifiEnc, text: text.trim(), vc, fg, bg, ecc, styleKey }
+    const entry: QrHistEntry = { type: qrType, url: url.trim(), ssid, wifiPass, wifiEnc, text: text.trim(), vc, phone, em, fg, bg, ecc, styleKey }
     const next = [entry, ...prev.filter(e => payload(e) !== data)].slice(0, 8)
     try { localStorage.setItem("qrfolio_qr_history", JSON.stringify(next)) } catch {}
     return next
   })
   const loadEntry = (h: QrHistEntry) => {
     setQrType(h.type); setUrl(h.url); setSsid(h.ssid); setWifiPass(h.wifiPass); setWifiEnc(h.wifiEnc); setText(h.text)
-    setVc({ ...EMPTY_VC, ...(h.vc || {}) })
+    setVc({ ...EMPTY_VC, ...(h.vc || {}) }); setPhone(h.phone || ""); setEm({ ...EMPTY_EM, ...(h.em || {}) })
     setFg(h.fg); setBg(h.bg); setEcc(h.ecc); setStyleKey(h.styleKey); setLogo(null)
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" })
   }
@@ -92,6 +101,8 @@ export default function QrLinkPage() {
     h.type === "wifi" ? `📶 ${h.ssid}`
     : h.type === "text" ? h.text
     : h.type === "contact" ? `👤 ${vcName(h.vc || {})}`
+    : h.type === "phone" ? `📞 ${h.phone}`
+    : h.type === "email" ? `✉️ ${h.em?.to || ""}`
     : normalizeUrl(h.url).replace(/^https?:\/\//, "")
 
   const preset = STYLE_PRESETS.find(p => p.k === styleKey) || STYLE_PRESETS[0]
@@ -135,6 +146,8 @@ export default function QrLinkPage() {
     qrType === "wifi" ? (ssid ? `📶 ${ssid}` : "")
     : qrType === "text" ? text.trim()
     : qrType === "contact" ? (vcName(vc) ? `👤 ${vcName(vc)}` : "")
+    : qrType === "phone" ? (phone.trim() ? `📞 ${phone.trim()}` : "")
+    : qrType === "email" ? (em.to?.trim() ? `✉️ ${em.to.trim()}` : "")
     : normalizeUrl(url).replace(/^https?:\/\//, "")
 
   return (
@@ -149,18 +162,18 @@ export default function QrLinkPage() {
         </div>
         <div>
           <h1 style={{ color: "#F5F0E8", fontSize: 23, fontWeight: 800, margin: 0, letterSpacing: -0.3 }}>Créer un QR code</h1>
-          <p style={{ color: MUTED, fontSize: 13, margin: "2px 0 0", lineHeight: 1.4 }}>Lien, WiFi, texte ou carte de visite — prêt à imprimer en 3 secondes.</p>
+          <p style={{ color: MUTED, fontSize: 13, margin: "2px 0 0", lineHeight: 1.4 }}>Lien, WiFi, contact, appel, email — prêt à imprimer en 3 secondes.</p>
         </div>
       </div>
 
       {/* Type de QR */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 14 }}>
         {TYPES.map(t => {
           const on = qrType === t.k
           const Icon = t.icon
           return (
             <button key={t.k} onClick={() => setQrType(t.k)}
-              style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 5, minHeight: 62, borderRadius: 13, cursor: "pointer", background: on ? "rgba(201,168,76,0.14)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? G + "66" : "rgba(255,255,255,0.09)"}`, color: on ? G : MUTED, fontSize: 12.5, fontWeight: on ? 800 : 600, transition: "all .15s" }}>
+              style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, minHeight: 60, borderRadius: 13, cursor: "pointer", background: on ? "rgba(201,168,76,0.14)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? G + "66" : "rgba(255,255,255,0.09)"}`, color: on ? G : MUTED, fontSize: 12.5, fontWeight: on ? 800 : 600, transition: "all .15s" }}>
               <Icon size={19} /> {t.label}
             </button>
           )
@@ -213,6 +226,23 @@ export default function QrLinkPage() {
           <input value={vc.url} onChange={e => setVc(v => ({ ...v, url: e.target.value }))} inputMode="url" autoComplete="url" placeholder="Site web" style={field} />
           <p style={{ color: MUTED, fontSize: 11, margin: "9px 2px 0", lineHeight: 1.45 }}>Scanné, ce QR propose d&apos;enregistrer le contact. Seul un nom (ou prénom) est requis.</p>
         </>)}
+
+        {qrType === "phone" && (<>
+          <p style={secTitle}>{accentBar} Numéro à appeler</p>
+          <input value={phone} onChange={e => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" type="tel"
+            placeholder="ex : +33 6 12 34 56 78" style={{ ...field, borderColor: phone.trim() ? G + "80" : "rgba(255,255,255,0.14)" }} />
+          <p style={{ color: MUTED, fontSize: 11, margin: "9px 2px 0", lineHeight: 1.45 }}>Scanné, ce QR propose de composer le numéro directement.</p>
+        </>)}
+
+        {qrType === "email" && (<>
+          <p style={secTitle}>{accentBar} Email à contacter</p>
+          <input value={em.to} onChange={e => setEm(v => ({ ...v, to: e.target.value }))} inputMode="email" autoComplete="email" type="email"
+            placeholder="contact@monentreprise.fr" style={{ ...field, marginBottom: 10, borderColor: (em.to ?? "").trim() ? G + "80" : "rgba(255,255,255,0.14)" }} />
+          <input value={em.subject} onChange={e => setEm(v => ({ ...v, subject: e.target.value }))} placeholder="Objet (optionnel)" style={{ ...field, marginBottom: 10 }} />
+          <textarea value={em.body} onChange={e => setEm(v => ({ ...v, body: e.target.value }))} rows={2} placeholder="Message pré-rempli (optionnel)"
+            style={{ width: "100%", boxSizing: "border-box", resize: "vertical", minHeight: 60, background: "#0A0A0A", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "#F5F0E8", fontSize: 15, padding: "12px 14px", lineHeight: 1.45, fontFamily: "inherit", outline: "none" }} />
+          <p style={{ color: MUTED, fontSize: 11, margin: "9px 2px 0", lineHeight: 1.45 }}>Scanné, ce QR ouvre un brouillon d&apos;email pré-rempli vers cette adresse.</p>
+        </>)}
       </div>
 
       {/* Aperçu — poster QR */}
@@ -225,7 +255,7 @@ export default function QrLinkPage() {
         </div>
 
         {!ready
-          ? <p style={{ color: MUTED, fontSize: 12.5, margin: 0, textAlign: "center" }}>{qrType === "wifi" ? "Entrez le nom du réseau pour générer le QR." : qrType === "contact" ? "Entrez au moins un nom pour générer la carte." : "Renseignez le contenu ci-dessus pour générer votre QR code."}</p>
+          ? <p style={{ color: MUTED, fontSize: 12.5, margin: 0, textAlign: "center" }}>{qrType === "wifi" ? "Entrez le nom du réseau pour générer le QR." : qrType === "contact" ? "Entrez au moins un nom pour générer la carte." : qrType === "phone" ? "Entrez un numéro pour générer le QR." : qrType === "email" ? "Entrez une adresse email pour générer le QR." : "Renseignez le contenu ci-dessus pour générer votre QR code."}</p>
           : ratio < 3
             ? <button onClick={() => { setFg("#080808"); setBg("#FFFFFF") }} title="Rétablir noir sur blanc"
                 style={{ display: "flex", alignItems: "center", gap: 7, color: "#FF6B6B", fontSize: 12, fontWeight: 600, background: "rgba(255,107,107,0.1)", border: "1px solid rgba(255,107,107,0.3)", borderRadius: 999, padding: "6px 14px", cursor: "pointer" }}>

@@ -1,5 +1,32 @@
 import { describe, it, expect } from "vitest"
-import { lum, contrast, normalizeUrl, escapeWifi, buildWifi, escapeVCard, buildVCard } from "./qrLinkUtils"
+import { lum, contrast, normalizeUrl, escapeWifi, buildWifi, escapeVCard, buildVCard, buildTel, buildEmail } from "./qrLinkUtils"
+
+describe("buildTel", () => {
+  it("prefixe tel: et ne garde que chiffres et +", () => {
+    expect(buildTel("+33 6 00 00 00 00")).toBe("tel:+33600000000")
+    expect(buildTel("01.23.45.67.89")).toBe("tel:0123456789")
+  })
+  it("vide -> chaine vide", () => {
+    expect(buildTel("")).toBe("")
+    expect(buildTel("   ")).toBe("")
+  })
+})
+
+describe("buildEmail", () => {
+  it("mailto simple", () => {
+    expect(buildEmail("contact@resto.fr")).toBe("mailto:contact@resto.fr")
+  })
+  it("ajoute sujet et corps encodes", () => {
+    expect(buildEmail("a@b.fr", "Réservation", "Bonjour, une table ?"))
+      .toBe("mailto:a@b.fr?subject=R%C3%A9servation&body=Bonjour%2C%20une%20table%20%3F")
+  })
+  it("n'ajoute que les params fournis", () => {
+    expect(buildEmail("a@b.fr", "", "Salut")).toBe("mailto:a@b.fr?body=Salut")
+  })
+  it("adresse vide -> chaine vide", () => {
+    expect(buildEmail("", "x", "y")).toBe("")
+  })
+})
 
 describe("buildVCard", () => {
   it("construit une vCard 3.0 complete", () => {
