@@ -72,6 +72,14 @@ export async function PATCH(req: NextRequest) {
   const allowed = ["to_url", "redirect_type", "label", "enabled"]
   const filtered = Object.fromEntries(Object.entries(updates).filter(([k]) => allowed.includes(k)))
 
+  // Memes validations qu'a la creation (l'entree PATCH est tout aussi non fiable).
+  if ("redirect_type" in filtered && ![301, 302].includes(filtered.redirect_type as number)) {
+    return NextResponse.json({ error: "Type doit être 301 ou 302" }, { status: 400 })
+  }
+  if ("to_url" in filtered && !String(filtered.to_url ?? "").trim()) {
+    return NextResponse.json({ error: "to_url ne peut pas être vide" }, { status: 400 })
+  }
+
   const { data, error } = await supabase
     .from("domain_redirects")
     .update(filtered)
