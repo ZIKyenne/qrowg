@@ -3,46 +3,7 @@
 
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
-
-type DestType = "page" | "url" | "file" | "email" | "phone" | "whatsapp"
-
-function buildDestUrl(type: DestType, value: string): string {
-  switch (type) {
-    case "email":     return value.startsWith("mailto:") ? value : `mailto:${value}`
-    case "phone":     return value.startsWith("tel:") ? value : `tel:${value.replace(/\s/g,"")}`
-    case "whatsapp":  {
-      const num = value.replace(/[^\d+]/g, "").replace(/^\+/, "")
-      return `https://wa.me/${num}`
-    }
-    default: return value
-  }
-}
-
-function validateDest(type: DestType, value: string): string | null {
-  if (!value.trim()) return "La valeur est requise"
-  switch (type) {
-    case "url":
-    case "file":
-      try { new URL(value.startsWith("http") ? value : `https://${value}`) }
-      catch { return "URL invalide" }
-      return null
-    case "email":
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.replace("mailto:","")))
-        return "Email invalide"
-      return null
-    case "phone":
-      if (!/^[\d\s\+\-\(\)]{6,20}$/.test(value.replace("tel:","")))
-        return "Numéro invalide"
-      return null
-    case "whatsapp":
-      if (!/^[\d\s\+\-]{7,20}$/.test(value))
-        return "Numéro WhatsApp invalide"
-      return null
-    case "page":
-      if (!value.match(/^[0-9a-f-]{36}$/)) return "ID de page invalide"
-      return null
-  }
-}
+import { buildDestUrl, validateDest, type DestType } from "./qrDestination"
 
 // GET ?qr_id=xxx — récupérer destination + historique
 export async function GET(req: NextRequest) {
