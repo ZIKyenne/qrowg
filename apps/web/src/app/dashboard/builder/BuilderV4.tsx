@@ -6236,8 +6236,8 @@
                 })()}
 
                 <div style={{ display: "flex", justifyContent: "center" }}>
-                  <div style={{ position: "relative", width: 220 }}>
-                    <div style={{ width: 220, background: "linear-gradient(145deg,#2A2A2A,#1A1A1A)", borderRadius: 34, padding: "10px 8px", boxShadow: "0 0 0 1px #3A3A3A, 0 20px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.08)", position: "relative" }}>
+                  <div style={{ position: "relative", width: isMobile ? 302 : 220 }}>
+                    <div style={{ width: isMobile ? 302 : 220, background: "linear-gradient(145deg,#2A2A2A,#1A1A1A)", borderRadius: isMobile ? 40 : 34, padding: "10px 8px", boxShadow: "0 0 0 1px #3A3A3A, 0 20px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.08)", position: "relative" }}>
                       <div style={{ position: "absolute", left: -3, top: 68, width: 3, height: 24, background: "#2A2A2A", borderRadius: "2px 0 0 2px" }} />
                       <div style={{ position: "absolute", left: -3, top: 100, width: 3, height: 38, background: "#2A2A2A", borderRadius: "2px 0 0 2px" }} />
                       <div style={{ position: "absolute", left: -3, top: 146, width: 3, height: 38, background: "#2A2A2A", borderRadius: "2px 0 0 2px" }} />
@@ -6260,7 +6260,7 @@
                           </div>
                         </div>
 
-                        <div style={{ maxHeight: 420, overflowY: "auto", ...bgStyle() }} className="iphone-scroll">
+                        <div style={{ maxHeight: isMobile ? 560 : 420, overflowY: "auto", ...bgStyle() }} className="iphone-scroll">
                           {blocks.filter(b => b.visible).length===0
                             ? <div style={{ padding: "40px 14px", textAlign: "center", ...bgStyle() }}><p style={{ fontSize: 24, margin: "0 0 6px" }}>✦</p><p style={{ color: MUTED, fontSize: 10 }}>Ta page apparaîtra ici</p></div>
                             : blocks.filter(b => b.visible && !b.draft).map(b => (
