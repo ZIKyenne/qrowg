@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import Stripe from "stripe"
 import { createClient } from "@supabase/supabase-js"
+import { planFromPriceId } from "@/lib/stripePlan"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2024-06-20" as any })
 
@@ -8,17 +9,6 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
-
-const PLAN_FROM_PRICE: Record<string, string> = {
-  [process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID || ""]: "starter",
-  [process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || ""]: "pro",
-  [process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID || ""]: "business",
-  // prix annuels (si configurés)
-  [process.env.NEXT_PUBLIC_STRIPE_STARTER_ANNUAL_PRICE_ID || "_na_starter"]: "starter",
-  [process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || "_na_pro"]: "pro",
-  [process.env.NEXT_PUBLIC_STRIPE_BUSINESS_ANNUAL_PRICE_ID || "_na_business"]: "business",
-}
-delete PLAN_FROM_PRICE[""] // ne pas mapper une cle vide si une env manque
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
@@ -70,12 +60,16 @@ export async function POST(req: NextRequest) {
         const sub = event.data.object as Stripe.Subscription
         const userId = metaUser(sub.metadata)
         const priceId = sub.items.data[0]?.price.id
-        const plan = PLAN_FROM_PRICE[priceId] || "free"
+        // Prix inconnu (absent de la config env) -> plan = null : on NE
+        // retrograde PAS l'abonne (une vraie annulation passe par
+        // subscription.deleted). On met tout de meme a jour statut/periode.
+        const plan = planFromPriceId(priceId)
+        if (!plan) console.warn(`[stripe webhook] price non mappe, plan inchange: ${priceId}`)
 
         if (userId) {
-          await supabase.from("profiles").update({ plan }).eq("id", userId)
+          if (plan) await supabase.from("profiles").update({ plan }).eq("id", userId)
           await supabase.from("subscriptions").update({
-            plan,
+            ...(plan ? { plan } : {}),
             status: sub.status,
             current_period_start: new Date((sub as any).current_period_start * 1000).toISOString(),
             current_period_end: new Date((sub as any).current_period_end * 1000).toISOString(),

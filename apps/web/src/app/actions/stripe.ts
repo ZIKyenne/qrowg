@@ -4,6 +4,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Stripe from 'stripe'
+import { planFromPriceId } from '@/lib/stripePlan'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-06-20' as any,
@@ -57,6 +58,11 @@ export async function createCheckoutSession(priceId: string) {
       .eq('id', user.id)
   }
 
+  // Metadonnees consommees par le webhook : `userId` + `plan` (comme
+  // /api/stripe/checkout). `supabase_user_id` conserve pour compat.
+  const plan = planFromPriceId(priceId)
+  const meta = { userId: user.id, supabase_user_id: user.id, ...(plan ? { plan } : {}) }
+
   // Créer la session Checkout
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
@@ -68,9 +74,9 @@ export async function createCheckoutSession(priceId: string) {
     allow_promotion_codes: true,
     subscription_data: {
       trial_period_days: 14,
-      metadata: { supabase_user_id: user.id },
+      metadata: meta,
     },
-    metadata: { supabase_user_id: user.id },
+    metadata: meta,
   })
 
   redirect(session.url!)
