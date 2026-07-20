@@ -25,3 +25,16 @@ export function normalizeUrl(v: string): string {
   if (/^(https?:\/\/|mailto:|tel:|sms:|geo:|wifi:)/i.test(s)) return s
   return "https://" + s
 }
+
+// Echappe les caracteres speciaux du format WIFI (\ ; , : ").
+export function escapeWifi(s: string): string {
+  return s.replace(/([\\;,":])/g, "\\$1")
+}
+
+// Construit la charge utile d'un QR WiFi standard (scan -> propose de rejoindre le reseau).
+export function buildWifi(ssid: string, password: string, enc: "WPA" | "WEP" | "nopass"): string {
+  const s = ssid.trim()
+  if (!s) return ""
+  const p = enc === "nopass" ? "" : password
+  return `WIFI:T:${enc};S:${escapeWifi(s)};P:${escapeWifi(p)};;`
+}

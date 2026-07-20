@@ -1,5 +1,22 @@
 import { describe, it, expect } from "vitest"
-import { lum, contrast, normalizeUrl } from "./qrLinkUtils"
+import { lum, contrast, normalizeUrl, escapeWifi, buildWifi } from "./qrLinkUtils"
+
+describe("buildWifi", () => {
+  it("construit une charge WIFI standard (WPA)", () => {
+    expect(buildWifi("MonResto", "secret123", "WPA")).toBe("WIFI:T:WPA;S:MonResto;P:secret123;;")
+  })
+  it("reseau ouvert : type nopass, mot de passe vide", () => {
+    expect(buildWifi("FreeWifi", "ignore", "nopass")).toBe("WIFI:T:nopass;S:FreeWifi;P:;;")
+  })
+  it("echappe les caracteres speciaux", () => {
+    expect(escapeWifi('a;b,c:d"e\\f')).toBe('a\\;b\\,c\\:d\\"e\\\\f')
+    expect(buildWifi("Cafe;Bar", "p:w", "WPA")).toBe("WIFI:T:WPA;S:Cafe\\;Bar;P:p\\:w;;")
+  })
+  it("SSID vide -> chaine vide", () => {
+    expect(buildWifi("", "x", "WPA")).toBe("")
+    expect(buildWifi("   ", "x", "WPA")).toBe("")
+  })
+})
 
 describe("normalizeUrl", () => {
   it("ajoute https:// quand aucun schema", () => {
