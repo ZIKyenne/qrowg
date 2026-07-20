@@ -526,6 +526,7 @@ function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail }: { block
 function LeadFormPublic({ block, pageId, ownerEmail, leadType, title, description, descColor, fields, button, accent, subject, TEXT, MUTED }: { block: Block; pageId: string; ownerEmail?: string; leadType: string; title: string; description?: string; descColor?: string; fields: { key: string; label: string; area?: boolean }[]; button: string; accent: string; subject: string; TEXT: string; MUTED: string }) {
   const [vals, setVals] = useState<Record<string, string>>({})
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle")
+  const [hp, setHp] = useState("") // honeypot anti-spam (invisible pour un humain)
   const set = (k: string, v: string) => setVals(p => ({ ...p, [k]: v }))
   const required = fields.slice(0, 2).map(f => f.key)
   // Bon clavier mobile + autofill selon le type de champ (formulaire souvent scanne au telephone).
@@ -542,6 +543,8 @@ function LeadFormPublic({ block, pageId, ownerEmail, leadType, title, descriptio
   const ready = required.every(k => (vals[k] || "").trim()) && emailOk
   const inputStyle: any = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "11px 13px", color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }
   const submit = async () => {
+    // Honeypot rempli = bot -> on simule un envoi reussi sans rien enregistrer.
+    if (hp) { setStatus("done"); return }
     setStatus("sending")
     trackLinkClick(pageId, block.id, "form")
     const data: Record<string, any> = {}
@@ -564,6 +567,10 @@ function LeadFormPublic({ block, pageId, ownerEmail, leadType, title, descriptio
       <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{title}</p>
       {description && <p style={{ color: descColor || MUTED, fontSize: 12, margin: "0 0 13px" }}>{description}</p>}
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {/* Honeypot : hors ecran, ignore par les humains, rempli par les bots */}
+        <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true"
+          value={hp} onChange={e => setHp(e.target.value)}
+          style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0, pointerEvents: "none" }} />
         {fields.map(f => f.area
           ? <textarea key={f.key} placeholder={f.label} value={vals[f.key] || ""} onChange={e => set(f.key, e.target.value)} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
           : <input key={f.key} {...fieldProps(f.key)} placeholder={f.label} value={vals[f.key] || ""} onChange={e => set(f.key, e.target.value)} style={inputStyle} />)}
