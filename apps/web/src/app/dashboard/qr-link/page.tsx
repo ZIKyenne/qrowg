@@ -2,11 +2,11 @@
 
 // QR d'un lien — genere un QR code pour n'importe quelle URL (site, reseau, PDF...).
 // 100% local (qr-code-styling via qrRender), sans API. Export PNG haute def + SVG.
-import { useMemo, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 import Link from "next/link"
-import { ArrowLeft, Download, Check, QrCode as QrIcon, ShieldCheck, AlertTriangle } from "lucide-react"
+import { ArrowLeft, Download, Check, QrCode as QrIcon, ShieldCheck, AlertTriangle, Upload, X } from "lucide-react"
 import QRCanvas from "../qr-codes/QRCanvas"
-import { getQRBlob, type QROptions } from "../qr-codes/qrRender"
+import { getQRBlob, type QROptions, type QRStyleConfig } from "../qr-codes/qrRender"
 
 const G = "#C9A84C"
 const MUTED = "#A8A190"
@@ -36,13 +36,24 @@ const ECC_OPTS: { k: "L" | "M" | "Q" | "H"; label: string }[] = [
 const FG_SWATCHES = ["#080808", "#C9A84C", "#1D4ED8", "#059669", "#DB2777", "#DC2626", "#7C3AED", "#0F766E"]
 const BG_SWATCHES = ["#FFFFFF", "#F5F0E8", "#FEF3C7", "#E0F2FE", "#F0FDF4", "#111111"]
 
+const STYLE_PRESETS: { k: string; label: string; emoji: string; dotStyle: QRStyleConfig["dotStyle"]; cornerStyle: QRStyleConfig["cornerStyle"] }[] = [
+  { k: "carre", label: "Carré", emoji: "⬛", dotStyle: "square", cornerStyle: "square" },
+  { k: "arrondi", label: "Arrondi", emoji: "🔲", dotStyle: "rounded", cornerStyle: "rounded" },
+  { k: "points", label: "Points", emoji: "⚫", dotStyle: "dot", cornerStyle: "circle" },
+  { k: "doux", label: "Doux", emoji: "🟦", dotStyle: "softSquare", cornerStyle: "rounded" },
+  { k: "luxe", label: "Luxe", emoji: "💎", dotStyle: "luxury", cornerStyle: "luxury" },
+]
+
 export default function QrLinkPage() {
   const [url, setUrl] = useState("")
   const [fg, setFg] = useState("#080808")
   const [bg, setBg] = useState("#FFFFFF")
   const [ecc, setEcc] = useState<"L" | "M" | "Q" | "H">("M")
+  const [styleKey, setStyleKey] = useState("carre")
+  const [logo, setLogo] = useState<string | null>(null) // data URI
   const [busy, setBusy] = useState<null | "png" | "svg">(null)
   const [done, setDone] = useState(false)
+  const logoInput = useRef<HTMLInputElement>(null)
 
   const normalized = useMemo(() => {
     const v = url.trim()
@@ -54,11 +65,27 @@ export default function QrLinkPage() {
   const ratio = contrast(fg, bg)
   const ready = normalized.length > 0
 
+  // Style du QR (forme + logo). Avec un logo, on force une correction elevee pour rester scannable.
+  const preset = STYLE_PRESETS.find(p => p.k === styleKey) || STYLE_PRESETS[0]
+  const effectiveEcc: "L" | "M" | "Q" | "H" = logo ? "H" : ecc
+  const qrStyle: QRStyleConfig = {
+    dotStyle: preset.dotStyle,
+    cornerStyle: preset.cornerStyle,
+    ...(logo ? { logoUrl: logo, logoSize: 22, logoShape: "rounded" as const, logoBg: "white" as const, logoPadding: 5 } : {}),
+  }
+
+  function onLogoFile(file: File) {
+    if (!file.type.startsWith("image/")) return
+    const reader = new FileReader()
+    reader.onload = () => setLogo(String(reader.result))
+    reader.readAsDataURL(file)
+  }
+
   async function download(ext: "png" | "svg") {
     if (!ready) return
     setBusy(ext)
     try {
-      const opts: QROptions = { data: normalized, fg, bg, ecc, style: {}, size: 1024 }
+      const opts: QROptions = { data: normalized, fg, bg, ecc: effectiveEcc, style: qrStyle, size: 1024 }
       const blob = await getQRBlob(opts, ext)
       if (blob) {
         const a = document.createElement("a")
@@ -111,7 +138,7 @@ export default function QrLinkPage() {
       <div style={{ position: "relative", borderRadius: 20, padding: "26px 18px", marginBottom: 14, overflow: "hidden", background: "radial-gradient(120% 90% at 50% 0%, rgba(201,168,76,0.12), transparent 60%), rgba(255,255,255,0.02)", border: "1px solid rgba(201,168,76,0.16)", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
         {/* La "carte" QR (surface = couleur de fond choisie) */}
         <div style={{ background: bg, borderRadius: 20, padding: 20, boxShadow: "0 14px 40px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(0,0,0,0.06)", display: "flex", flexDirection: "column", alignItems: "center", gap: 12, transition: "background .2s", maxWidth: "100%" }}>
-          <QRCanvas value={normalized || "https://qrfolio.app"} size={210} fg={fg} bg={bg} />
+          <QRCanvas value={normalized || "https://qrfolio.app"} size={210} fg={fg} bg={bg} style={qrStyle} ecc={effectiveEcc} />
           {ready && (
             <p style={{ margin: 0, maxWidth: 210, color: fg, opacity: 0.85, fontSize: 10.5, fontWeight: 600, textAlign: "center", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", letterSpacing: 0.2 }}>
               {normalized.replace(/^https?:\/\//, "")}
@@ -132,7 +159,18 @@ export default function QrLinkPage() {
 
       {/* Personnalisation */}
       <div style={{ ...card, marginBottom: 14 }}>
-        <p style={secTitle}>{accentBar} Couleur du QR</p>
+        <p style={secTitle}>{accentBar} Style</p>
+        <div style={{ display: "flex", gap: 7, marginBottom: 4 }}>
+          {STYLE_PRESETS.map(p => {
+            const on = styleKey === p.k
+            return (
+              <button key={p.k} onClick={() => setStyleKey(p.k)}
+                style={{ flex: "1 1 0", minWidth: 0, minHeight: 42, borderRadius: 10, cursor: "pointer", background: on ? "rgba(201,168,76,0.14)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? G + "66" : "rgba(255,255,255,0.1)"}`, color: on ? G : MUTED, fontSize: 11.5, fontWeight: on ? 800 : 600, transition: "all .15s" }}>{p.label}</button>
+            )
+          })}
+        </div>
+
+        <p style={{ ...secTitle, marginTop: 20 }}>{accentBar} Couleur du QR</p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 9, marginBottom: 4 }}>
           {FG_SWATCHES.map(c => swatch(c, fg === c, () => setFg(c), `Couleur ${c}`))}
           <label style={{ width: 38, height: 38, borderRadius: 11, border: "2px solid rgba(255,255,255,0.14)", cursor: "pointer", overflow: "hidden", position: "relative", flexShrink: 0, background: "conic-gradient(from 0deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)" }}>
@@ -156,6 +194,22 @@ export default function QrLinkPage() {
           ))}
         </div>
         <p style={{ color: MUTED, fontSize: 11, margin: "9px 2px 0", lineHeight: 1.45 }}>Plus la correction est élevée, plus le QR reste lisible s&apos;il est abîmé (utile pour l&apos;impression).</p>
+
+        <p style={{ ...secTitle, marginTop: 20 }}>{accentBar} Logo au centre <span style={{ fontWeight: 500, textTransform: "none", letterSpacing: 0, color: "#6E685E" }}>· optionnel</span></p>
+        {logo ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 46, height: 46, borderRadius: 10, background: "#fff", overflow: "hidden", flexShrink: 0, border: "1px solid rgba(255,255,255,0.12)" }}>
+              <img src={logo} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+            </div>
+            <span style={{ flex: 1, color: MUTED, fontSize: 11.5, lineHeight: 1.4 }}>Logo ajouté — correction d&apos;erreur portée au maximum pour rester scannable.</span>
+            <button onClick={() => setLogo(null)} aria-label="Retirer le logo" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 9, width: 38, height: 38, color: "#FF6B6B", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><X size={16} /></button>
+          </div>
+        ) : (
+          <button onClick={() => logoInput.current?.click()} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, minHeight: 46, borderRadius: 11, border: "1.5px dashed rgba(201,168,76,0.3)", background: "rgba(201,168,76,0.04)", color: G, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+            <Upload size={16} /> Ajouter un logo
+          </button>
+        )}
+        <input ref={logoInput} type="file" accept="image/*" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) onLogoFile(f); e.target.value = "" }} />
       </div>
 
       {/* Téléchargement */}
