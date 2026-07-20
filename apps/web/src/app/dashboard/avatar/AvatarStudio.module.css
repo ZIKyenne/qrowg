@@ -63,29 +63,6 @@
   gap: 12px;
 }
 
-@media (max-width: 880px) {
-  /* Colonne : aperçu compact collant EN HAUT, réglages juste dessous,
-     export/partage tout en bas -> la création reste "vue d'ensemble". */
-  .wrap { padding: 14px 16px calc(120px + env(safe-area-inset-bottom)); }
-  .grid { display: flex; flex-direction: column; gap: 14px; margin-top: 16px; }
-
-  /* En-tête compact (le grand titre serif mangeait un écran entier) */
-  .eyebrow { font-size: 10px; letter-spacing: 0.18em; }
-  .title { font-size: 23px; line-height: 1.1; margin: 8px 0 6px; }
-  .lede { display: none; }
-
-  /* Aperçu compact + collant -> visible pendant tous les réglages */
-  .stage {
-    position: sticky; top: 0; z-index: 5;
-    gap: 12px;
-    padding: 14px 16px;
-    border-radius: 18px;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
-  }
-  .preview { width: 128px; height: 128px; margin-bottom: 0; }
-  .panel { padding: 16px; }
-}
-
 .panel {
   background: linear-gradient(180deg, var(--surface, #111009), var(--bg, #080808));
   border: 1px solid var(--gold-border, rgba(201, 168, 76, 0.25));
@@ -322,4 +299,43 @@
 
 @media (prefers-reduced-motion: reduce) {
   .preview, .btn, .tab, .seg button, .switch, .switch::after, .swatch, .preset { transition: none; }
+}
+
+/* ── Mobile — PLACÉ EN FIN DE FICHIER À DESSEIN ──────────────────────────────
+   Les surcharges mobiles doivent venir APRÈS les règles de base (.preview,
+   .panel, .stage) : à spécificité égale, la dernière règle gagne. Placé plus
+   haut, l'aperçu restait à 280px (règle de base plus tardive). Ne pas remonter. */
+@media (max-width: 880px) {
+  /* Colonne : aperçu compact collant EN HAUT, réglages juste dessous,
+     export/partage tout en bas -> la création reste "vue d'ensemble". */
+  .wrap { padding: 14px 16px calc(120px + env(safe-area-inset-bottom)); }
+  .grid { display: flex; flex-direction: column; gap: 14px; margin-top: 14px; }
+
+  /* En-tête compact (le grand titre serif mangeait un écran entier) */
+  .eyebrow { font-size: 10px; letter-spacing: 0.18em; }
+  .title { font-size: 22px; line-height: 1.1; margin: 8px 0 6px; }
+  .lede { display: none; }
+
+  /* Aperçu compact + collant : reste visible pendant tous les réglages sans
+     masquer la galerie de modèles / les couleurs (aperçu ~4x plus petit). */
+  .stage {
+    position: sticky; top: 0; z-index: 5;
+    flex-direction: row; align-items: center; justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
+  }
+  .preview { width: 72px; height: 72px; margin-bottom: 0; flex: 0 0 auto; }
+  .preview.rounded { border-radius: 16px; }
+  .preview.rounded .ring { border-radius: 20px; }
+  .ring { inset: -6px; }
+  /* Enregistrer + aléatoire à droite de l'aperçu (barre compacte) */
+  .stage .actions { flex: 1 1 140px; width: auto; gap: 8px; }
+  .stage .status { flex-basis: 100%; margin: 0; }
+
+  .panel { padding: 16px; }
+  /* Galerie de modèles : vignettes plus grandes (4 colonnes au lieu de 5) */
+  .gallery { grid-template-columns: repeat(4, 1fr); max-height: 220px; }
 }
