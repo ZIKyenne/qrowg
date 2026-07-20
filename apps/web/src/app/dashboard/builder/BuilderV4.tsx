@@ -2975,12 +2975,13 @@
     bottomFields?: { key: string; label: string; placeholder?: string; options?: string[] }[]
   }) {
     const c = block.content
+    const MAX = 50 // plafond aligne sur les renderers (Array.from({length:50})) -> aucun item cree mais non rendu
     // Cle plate : <prefix><i>_<suffix>, ou <prefix><i> si le suffixe est vide (ex : adv1, logo1).
     const key = (i: number, s: string) => s ? `${prefix}${i}_${s}` : `${prefix}${i}`
     const item = (i: number) => Object.fromEntries(fields.map(f => [f.suffix, c[key(i, f.suffix)] || ""])) as Record<string, string>
     const writeItem = (i: number, v: Record<string, string>) => fields.forEach(f => onChange(key(i, f.suffix), v[f.suffix] || ""))
     let derived = 0
-    for (let i = 1; i <= 50; i++) { if (fields.some(f => c[key(i, f.suffix)])) derived = i }
+    for (let i = 1; i <= MAX; i++) { if (fields.some(f => c[key(i, f.suffix)])) derived = i }
     const [rows, setRows] = useState(() => Math.max(1, derived))
     const count = Math.max(rows, derived)
     const inputStyle: React.CSSProperties = { width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: "#F5F0E8", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
@@ -3027,10 +3028,12 @@
             )
           })}
         </div>
-        <button type="button" onClick={() => setRows(count + 1)}
-          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, minHeight: 46, border: "2px dashed rgba(201,168,76,0.3)", borderRadius: 11, background: "rgba(201,168,76,0.04)", color: G, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-          <Plus size={16} /> {addLabel}
-        </button>
+        {count < MAX
+          ? <button type="button" onClick={() => setRows(Math.min(MAX, count + 1))}
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, minHeight: 46, border: "2px dashed rgba(201,168,76,0.3)", borderRadius: 11, background: "rgba(201,168,76,0.04)", color: G, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+              <Plus size={16} /> {addLabel}
+            </button>
+          : <p style={{ textAlign: "center", color: MUTED, fontSize: 11.5, margin: 0, padding: "11px", border: "1px dashed rgba(255,255,255,0.12)", borderRadius: 11 }}>Maximum de {MAX} éléments atteint.</p>}
         {bottomFields.map(renderLone)}
       </div>
     )
