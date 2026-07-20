@@ -3,6 +3,7 @@
 
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
+import { normalizeDomain } from "@/lib/domain"
 
 export async function GET() {
   const supabase = await createServerSupabaseClient()
@@ -35,10 +36,10 @@ export async function POST(req: NextRequest) {
 
   // Normaliser les chemins
   const cleanPath = (from_path ?? "/").startsWith("/") ? (from_path ?? "/") : "/" + (from_path ?? "")
-  const cleanDomain = from_domain.toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/$/, "")
+  const cleanDomain = normalizeDomain(from_domain)
 
-  // Éviter les redirections en boucle
-  const destDomain = to_url.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0]
+  // Éviter les redirections en boucle (comparaison normalisee, insensible a la casse)
+  const destDomain = normalizeDomain(to_url)
   if (destDomain === cleanDomain) {
     return NextResponse.json({ error: "La destination ne peut pas être identique à la source" }, { status: 400 })
   }

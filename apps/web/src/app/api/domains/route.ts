@@ -5,6 +5,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { randomBytes } from "crypto"
 import dns from "dns/promises"
+import { normalizeDomain, isValidDomain } from "@/lib/domain"
 
 const VERCEL_TOKEN      = process.env.VERCEL_TOKEN ?? ""
 const VERCEL_PROJECT_ID = process.env.VERCEL_PROJECT_ID ?? ""
@@ -220,16 +221,9 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Normaliser le domaine
-  const cleanDomain = domain
-    .toLowerCase()
-    .replace(/^https?:\/\//, "")
-    .replace(/^www\./, "")
-    .replace(/\/$/, "")
-    .trim()
-
-  // Vérifier format basique
-  if (!/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/.test(cleanDomain)) {
+  // Normaliser + valider le domaine (helper partage @/lib/domain)
+  const cleanDomain = normalizeDomain(domain)
+  if (!isValidDomain(cleanDomain)) {
     return NextResponse.json({ error: "Format de domaine invalide" }, { status: 400 })
   }
 
