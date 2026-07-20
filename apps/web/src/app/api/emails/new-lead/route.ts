@@ -2,14 +2,11 @@ import { Resend } from "resend"
 import { NextRequest, NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
+import { escapeHtml as esc } from "@/lib/escapeHtml"
 
 const TYPE_LABELS: Record<string, string> = {
   quote: "Demande de devis", reservation: "Réservation", booking: "Réservation événement",
   register: "Inscription événement", rsvp: "Réponse RSVP", form: "Nouveau message",
-}
-
-function esc(s: string) {
-  return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
 }
 
 export async function POST(req: NextRequest) {
