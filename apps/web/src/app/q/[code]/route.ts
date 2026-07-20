@@ -3,6 +3,7 @@
 
 import { createAdminClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
+import { resolveOverrideDest, detectDevice, type OverrideDest } from "./qrResolve"
 
 // Redirection NON mise en cache : un QR est DYNAMIQUE (le proprietaire peut changer sa
 // destination apres impression) -> chaque scan doit re-resoudre cote serveur. Sans no-store,
@@ -121,8 +122,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
 
     // ── Enregistrer le scan (fire-and-forget) ─────────────────────────────
     const ua     = req.headers.get("user-agent") ?? ""
-    const device = /Mobile|Android|iPhone/i.test(ua) ? "mobile"
-      : /Tablet|iPad/i.test(ua) ? "tablet" : "desktop"
+    const device = detectDevice(ua)
 
     supabase.from("qr_codes").update({
       total_scans: supabase.rpc("increment_qr_scans", { qr_id: qr.id }) as any,
@@ -134,23 +134,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
     }).then(() => {}, () => {})
 
     // ── Résolution destination (override ou page) ─────────────────────────
-    const override = qr.dest_override as any
+    const override = qr.dest_override as OverrideDest
     if (override) {
-      const dest = override.url || override.value
-      switch (override.type) {
-        case "url": case "file":
-          return redirectNoStore(dest.startsWith("http") ? dest : `https://${dest}`)
-        case "email":
-          return redirectNoStore(dest.startsWith("mailto:") ? dest : `mailto:${dest}`)
-        case "phone":
-          return redirectNoStore(dest.startsWith("tel:") ? dest : `tel:${dest}`)
-        case "whatsapp":
-          return redirectNoStore(dest)
-        case "page": {
-          const { data: pg } = await supabase.from("pages").select("slug").eq("id", override.value).single()
-          if (pg) return redirectNoStore(`${appUrl}/${pg.slug}`)
-          break
-        }
+      if (override.type === "page") {
+        // Type "page" : resolution du slug via la DB (hors helper pur).
+        const { data: pg } = await supabase.from("pages").select("slug").eq("id", override.value).single()
+        if (pg) return redirectNoStore(`${appUrl}/${pg.slug}`)
+      } else {
+        const dest = resolveOverrideDest(override)
+        if (dest) return redirectNoStore(dest)
       }
     }
 
