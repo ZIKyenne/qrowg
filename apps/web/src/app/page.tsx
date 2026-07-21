@@ -1419,6 +1419,29 @@ const NAV_LINKS = [
   { label: "Tarifs",          href: "#pricing"   },
   { label: "FAQ",             href: "#faq"       },
 ]
+// ── Logo QRowg — "QR" en capsule (badge or) + "owg" (wordmark). Source unique,
+//    reutilise en navbar + footer pour une identite coherente. ────────────────
+function QrowgLogo({ size = 22 }: { size?: number }) {
+  return (
+    <span style={{
+      display: "inline-flex", alignItems: "center", gap: Math.round(size * 0.26),
+      fontFamily: "'DM Sans', system-ui, sans-serif", lineHeight: 1, userSelect: "none",
+    }}>
+      <span aria-hidden="true" style={{
+        display: "inline-flex", alignItems: "center", justifyContent: "center",
+        padding: `${Math.round(size * 0.16)}px ${Math.round(size * 0.3)}px`,
+        borderRadius: Math.round(size * 0.4),
+        background: "linear-gradient(135deg, #EBCE72 0%, #C9A84C 55%, #b0893a 100%)",
+        color: "#0A0A0A", fontWeight: 800, fontSize: Math.round(size * 0.82),
+        letterSpacing: "-0.02em",
+        boxShadow: "0 2px 12px rgba(201,168,76,0.35), inset 0 1px 0 rgba(255,255,255,0.4)",
+      }}>QR</span>
+      <span style={{ color: "#F5F0E8", fontWeight: 700, fontSize: size, letterSpacing: "-0.01em" }}>owg</span>
+      {/* Nom complet accessible aux lecteurs d'ecran / SEO */}
+      <span style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>QRowg</span>
+    </span>
+  )
+}
 function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -1469,8 +1492,10 @@ function Navbar() {
         boxShadow:scrolled?"0 4px 32px rgba(0,0,0,0.5)":"none",
         transition:"background 0.3s,border-color 0.3s,box-shadow 0.3s",
       }}>
-        <Link href="/" style={{textDecoration:"none"}}>
-          <span style={{fontFamily:"Fraunces, serif",fontSize:22,color:"#C9A84C",fontWeight:700}}>QRowg</span>
+        <Link href="/" aria-label="QRowg — accueil" style={{textDecoration:"none",display:"inline-flex",transition:"transform 0.2s cubic-bezier(0.34,1.56,0.64,1)"}}
+          onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.transform="scale(1.04)"}}
+          onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.transform="none"}}>
+          <QrowgLogo size={22} />
         </Link>
         <div className="dNav" role="menubar" style={{display:"flex",alignItems:"center",gap:32}}>
           {NAV_LINKS.map(({label,href})=>{
@@ -3181,9 +3206,6 @@ export default function HomePage() {
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(125% 80% at 50% 2%, transparent 52%, rgba(0,0,0,0.55) 100%)" }} />
           {/* Halo carré (signature : finder pattern QR, pas un cercle) */}
           <div className="hero-finder" style={{ position: "absolute", top: "14%", right: "8%", width: 180, height: 180, borderRadius: 36, background: "radial-gradient(rgba(201,168,76,0.10), transparent 70%)", filter: "blur(26px)" }} />
-          {/* Accents finder QR */}
-          <div className="hero-finder" style={{ position: "absolute", top: "12%", left: "5%" }}><QRFinder size={56} color="rgba(201,168,76,0.16)" /></div>
-          <div className="hero-finder" style={{ position: "absolute", bottom: "16%", left: "9%" }}><QRFinder size={38} color="rgba(201,168,76,0.12)" /></div>
         </div>
         <div className="hero-grid" style={{
           maxWidth: 1140, width: "100%", margin: "0 auto", position: "relative", zIndex: 1,
@@ -3549,7 +3571,7 @@ export default function HomePage() {
           {/* Col 1: Brand */}
           <div>
             <Link href="/" aria-label="QRowg — Accueil" className="f-brand-link" style={{ textDecoration:"none", display:"inline-block", marginBottom:12 }}>
-              <span style={{ fontFamily:"Fraunces, serif", fontSize:24, color:"#C9A84C", fontWeight:700, letterSpacing:"-0.01em" }}>QRowg</span>
+              <QrowgLogo size={24} />
             </Link>
             <p className="f-brand-desc" style={{ color:"rgba(188,182,166,0.65)", fontSize:13, lineHeight:1.7, maxWidth:220, margin:0 }}>
               QRowg transforme les QR codes en expériences interactives.
