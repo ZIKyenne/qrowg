@@ -13,13 +13,15 @@ const PLAN_UI = {
   free:     { icon: <Star size={20} />,     cta: "Plan actuel",                 ctaDisabled: true,  highlight: false, priceId: undefined },
   starter:  { icon: <Zap size={20} />,      cta: "Commencer l essai gratuit",   ctaDisabled: false, highlight: false, priceId: "starter"  },
   pro:      { icon: <Sparkles size={20} />, cta: "Passer a Pro",                ctaDisabled: false, highlight: true,  priceId: "pro"      },
-  business: { icon: <Crown size={20} />,    cta: "Contacter l equipe",          ctaDisabled: false, highlight: false, priceId: "business" },
+  business: { icon: <Crown size={20} />,    cta: "Passer a Business",           ctaDisabled: false, highlight: false, priceId: "business" },
 } as Record<string, any>
 
 const PLANS = PLAN_LIST.map(p => ({
   id: p.id,
   name: p.label,
   price: { monthly: fmtPrice(p.priceMonthly), annual: fmtPrice(p.priceAnnual) },
+  rawMonthly: p.priceMonthly,
+  rawAnnual: p.priceAnnual,
   color: p.color,
   description: p.description,
   badge: p.badge,
@@ -152,7 +154,7 @@ export default function UpgradePage() {
 
                 {annual && price !== "0" && (
                   <p style={{ color: "#39FF8F", fontSize: 11, margin: "-14px 0 16px", fontWeight: 600 }}>
-                    Soit {(parseFloat(price) * 12).toFixed(0)}€/an — économisez {(parseFloat(plan.price.monthly) * 12 - parseFloat(price) * 12).toFixed(0)}€
+                    Soit {(plan.rawAnnual * 12).toLocaleString("fr-FR", { maximumFractionDigits: 0 })}€/an — économisez {((plan.rawMonthly - plan.rawAnnual) * 12).toLocaleString("fr-FR", { maximumFractionDigits: 0 })}€
                   </p>
                 )}
 
@@ -163,6 +165,9 @@ export default function UpgradePage() {
                         {perk.included ? <Check size={9} color={pc} /> : <span style={{ color: MUTED, fontSize: 8 }}>—</span>}
                       </div>
                       <span style={{ color: perk.included ? "#F5F0E8" : MUTED, fontSize: 13 }}>{perk.text}</span>
+                      {perk.soon && (
+                        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.4, textTransform: "uppercase", color: "#C9A84C", background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.28)", borderRadius: 6, padding: "1px 6px", whiteSpace: "nowrap" }}>Bientôt</span>
+                      )}
                     </div>
                   ))}
                 </div>

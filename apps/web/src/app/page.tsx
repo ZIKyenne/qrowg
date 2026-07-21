@@ -706,7 +706,7 @@ const PLAN_LANDING_UI = {
   free:     { cta: "Commencer gratuitement",     href: "/auth/signup",                 badge: null,                note: null },
   starter:  { cta: "Démarrer l'essai gratuit",    href: "/auth/signup?plan=starter",  badge: "Meilleur rapport Q/P", note: null },
   pro:      { cta: "Démarrer l'essai gratuit",    href: "/auth/signup?plan=pro",      badge: "Le plus populaire",   note: "14 jours d'essai · Sans engagement · Sans carte bancaire" },
-  business: { cta: "Contacter l equipe",          href: "/auth/signup?plan=business", badge: null,                note: null },
+  business: { cta: "Démarrer l'essai gratuit",     href: "/auth/signup?plan=business", badge: null,                note: null },
 } as Record<string, { cta: string; href: string; badge: string | null; note: string | null }>
 
 // Bénéfices orientés résultat (Pb 12) — on vend ce que ça apporte, pas une liste de specs
@@ -737,11 +737,11 @@ const LANDING_BENEFITS: Record<string, { text: string; ok: boolean }[]> = {
   ],
   business: [
     { text: "Pages et vues illimitées", ok: true },
-    { text: "Travaillez à plusieurs (5 membres)", ok: true },
-    { text: "Votre marque uniquement (marque blanche)", ok: true },
-    { text: "Automatisez grâce à l'accès API", ok: true },
     { text: "Tout le plan Pro inclus", ok: true },
     { text: "Support prioritaire 24/7", ok: true },
+    { text: "Travaillez à plusieurs · 5 membres (bientôt)", ok: true },
+    { text: "Marque blanche (bientôt)", ok: true },
+    { text: "Accès API (bientôt)", ok: true },
   ],
 }
 
@@ -749,8 +749,11 @@ const PLANS = PLAN_LIST.map(p => ({
   id: p.id,
   name: p.label,
   tagline: p.description,
-  price: fmtPrice(p.priceMonthly),
-  period: p.priceMonthly === 0 ? "" : "/ mois",
+  isFree: p.priceMonthly === 0,
+  priceMonthly: fmtPrice(p.priceMonthly),
+  priceAnnual: fmtPrice(p.priceAnnual),
+  rawMonthly: p.priceMonthly,
+  rawAnnual: p.priceAnnual,
   highlight: p.id === "pro",
   badge: PLAN_LANDING_UI[p.id].badge,
   color: p.color,
@@ -763,6 +766,7 @@ const PLANS = PLAN_LIST.map(p => ({
 function PricingSection() {
   const { ref, visible } = useInView(0.06)
   const [showCmp, setShowCmp] = useState(false)
+  const [annual, setAnnual] = useState(false)
 
   return (
     <section id="pricing" ref={ref} aria-labelledby="pricing-title"
@@ -805,6 +809,24 @@ function PricingSection() {
           maxWidth:440, margin:"0 auto", lineHeight:1.65 }}>
           Commencez gratuitement. Passez au Pro quand vous êtes prêt.
         </p>
+
+        {/* Toggle mensuel / annuel */}
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:14, marginTop:28, flexWrap:"wrap" }}>
+          <span style={{ color: !annual ? "#F5F0E8" : "rgba(188,182,166,0.6)", fontSize:14, fontWeight: !annual ? 600 : 400, transition:"color 0.2s" }}>Mensuel</span>
+          <button type="button" onClick={() => setAnnual(a => !a)} role="switch" aria-checked={annual}
+            aria-label="Basculer facturation annuelle"
+            style={{ width:48, height:26, borderRadius:13, background: annual ? "linear-gradient(90deg,#C9A84C,#b8953f)" : "rgba(255,255,255,0.12)",
+              border:"none", cursor:"pointer", position:"relative", transition:"background 0.25s", flexShrink:0 }}>
+            <span style={{ position:"absolute", top:3, left: annual ? 25 : 3, width:20, height:20, borderRadius:"50%",
+              background:"#fff", transition:"left 0.25s cubic-bezier(0.34,1.56,0.64,1)", boxShadow:"0 1px 4px rgba(0,0,0,0.3)" }}/>
+          </button>
+          <span style={{ color: annual ? "#F5F0E8" : "rgba(188,182,166,0.6)", fontSize:14, fontWeight: annual ? 600 : 400, transition:"color 0.2s" }}>Annuel</span>
+          <span style={{ display:"inline-flex", alignItems:"center", gap:5, background:"rgba(57,255,143,0.12)", border:"1px solid rgba(57,255,143,0.3)",
+            color:"#39FF8F", fontSize:11.5, fontWeight:700, padding:"3px 10px", borderRadius:20, letterSpacing:0.2 }}>
+            Jusqu'à 2 mois offerts
+          </span>
+        </div>
+        <p style={{ color:"rgba(188,182,166,0.5)", fontSize:12, marginTop:12 }}>Prix TTC · Sans engagement · Annulable à tout moment</p>
       </div>
 
       {/* Cards */}
@@ -863,17 +885,28 @@ function PricingSection() {
                 margin:"0 0 20px", lineHeight:1.4 }}>{plan.tagline}</p>
 
               {/* Prix */}
-              <div style={{ display:"flex", alignItems:"baseline", gap:4, marginBottom:24 }}>
-                <span style={{
-                  fontFamily:"Fraunces, serif",
-                  color:"#F5F0E8", fontSize:48, fontWeight:700, lineHeight:1,
-                }}>{plan.price}</span>
-                <span style={{ color:"rgba(201,168,76,0.7)", fontSize:15, fontWeight:600 }}>€</span>
-                {plan.period && (
-                  <span style={{ color:"rgba(188,182,166,0.6)", fontSize:13, marginLeft:2 }}>
-                    {plan.period}
-                  </span>
-                )}
+              <div style={{ marginBottom:24 }}>
+                <div style={{ display:"flex", alignItems:"baseline", gap:4 }}>
+                  <span style={{
+                    fontFamily:"Fraunces, serif",
+                    color:"#F5F0E8", fontSize:48, fontWeight:700, lineHeight:1,
+                  }}>{annual ? plan.priceAnnual : plan.priceMonthly}</span>
+                  <span style={{ color:"rgba(201,168,76,0.7)", fontSize:15, fontWeight:600 }}>€</span>
+                  {!plan.isFree && (
+                    <span style={{ color:"rgba(188,182,166,0.6)", fontSize:13, marginLeft:2 }}>/ mois</span>
+                  )}
+                </div>
+                {/* Sous-ligne : facturation annuelle / prix barre */}
+                <div style={{ minHeight:18, marginTop:6 }}>
+                  {!plan.isFree && annual && (
+                    <span style={{ color:"rgba(188,182,166,0.6)", fontSize:12 }}>
+                      soit {(plan.rawAnnual * 12).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} € / an
+                    </span>
+                  )}
+                  {!plan.isFree && !annual && (
+                    <span style={{ color:"rgba(188,182,166,0.45)", fontSize:12 }}>ou {plan.priceAnnual} € / mois en annuel</span>
+                  )}
+                </div>
               </div>
 
               {/* Séparateur */}

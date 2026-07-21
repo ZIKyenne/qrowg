@@ -43,7 +43,7 @@ export interface Plan {
   limits: PlanLimits
   caps: PlanCaps
   features: string[] // liste courte (carte plan du dashboard)
-  perks: { text: string; included: boolean }[] // liste détaillée (page /upgrade)
+  perks: { text: string; included: boolean; soon?: boolean }[] // liste détaillée (page /upgrade) ; soon = feature promise mais pas encore construite
 }
 
 export const PLANS: Record<PlanId, Plan> = {
@@ -76,8 +76,8 @@ export const PLANS: Record<PlanId, Plan> = {
     label: "Starter",
     color: "#38BDF8",
     description: "Pour indépendants, artisans et créateurs",
-    priceMonthly: 2.99,
-    priceAnnual: 2.39,
+    priceMonthly: 4.90,
+    priceAnnual: 3.90,
     badge: "MEILLEUR RAPPORT Q/P",
     limits: { pages: 5, views: 850, qr: 7, team: null },
     caps: { printStudio: true, qrStudioAdvanced: true, ai: false, removeBranding: true, exportFormats: ["png"] },
@@ -102,8 +102,8 @@ export const PLANS: Record<PlanId, Plan> = {
     label: "Pro",
     color: "#C9A84C",
     description: "Le plan principal de QRowg",
-    priceMonthly: 9.99,
-    priceAnnual: 7.99,
+    priceMonthly: 12.90,
+    priceAnnual: 9.90,
     badge: "POPULAIRE",
     limits: { pages: 25, views: 15000, qr: 35, team: null },
     caps: { printStudio: true, qrStudioAdvanced: true, ai: true, removeBranding: true, exportFormats: ["png", "jpg", "pdf", "svg"] },
@@ -130,12 +130,12 @@ export const PLANS: Record<PlanId, Plan> = {
     label: "Business",
     color: "#39FF8F",
     description: "Agences, franchises et entreprises",
-    priceMonthly: 24.99,
-    priceAnnual: 19.99,
+    priceMonthly: 29.90,
+    priceAnnual: 24.90,
     badge: null,
     limits: { pages: null, views: null, qr: null, team: 5 },
     caps: { printStudio: true, qrStudioAdvanced: true, ai: true, removeBranding: true, exportFormats: ["png", "jpg", "pdf", "svg"] },
-    features: ["Pages illimitées", "Vues illimitées", "QR codes illimités", "Génération IA illimitée", "5 membres d'équipe", "API + marque blanche"],
+    features: ["Pages illimitées", "Vues illimitées", "QR codes illimités", "Génération IA illimitée", "Équipe · 5 membres (bientôt)", "API + marque blanche (bientôt)"],
     perks: [
       { text: "Pages illimitées", included: true },
       { text: "Vues illimitées", included: true },
@@ -147,9 +147,9 @@ export const PLANS: Record<PlanId, Plan> = {
       { text: "QR Studio complet", included: true },
       { text: "QR Print Studio complet", included: true },
       { text: "Génération IA illimitée + rapports", included: true },
-      { text: "5 membres d'équipe", included: true },
-      { text: "Accès API", included: true },
-      { text: "Marque blanche", included: true },
+      { text: "5 membres d'équipe", included: true, soon: true },
+      { text: "Accès API", included: true, soon: true },
+      { text: "Marque blanche", included: true, soon: true },
       { text: "Support 24/7 prioritaire", included: true },
     ],
   },
@@ -183,8 +183,10 @@ export const minPlanForFormat = (fmt: ExportFormat): PlanId => {
   return (found?.id ?? "pro")
 }
 
-// Formatte un prix pour l'affichage : 0 -> "0", 2.99 -> "2.99", 8 -> "8"
-export const fmtPrice = (n: number): string => (n === 0 ? "0" : String(n))
+// Formatte un prix TTC pour l'affichage FR : 0 -> "0", 4.9 -> "4,90", 12.9 -> "12,90".
+// Les prix affiches sont TTC (cible B2C : indispensable legalement en France).
+export const fmtPrice = (n: number): string =>
+  n === 0 ? "0" : n.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
 // Tableau comparatif (page /upgrade + comparaisons)
 export const PLAN_COMPARISON: { feature: string; free: string; starter: string; pro: string; business: string }[] = [
@@ -199,8 +201,8 @@ export const PLAN_COMPARISON: { feature: string; free: string; starter: string; 
   { feature: "Branding QRowg", free: "Oui", starter: "Non", pro: "Non", business: "Non" },
   { feature: "Domaine perso", free: "❌", starter: "❌", pro: "✓", business: "✓" },
   { feature: "Analytics", free: "De base", starter: "Standard", pro: "Avancés + export", business: "Avancés + export" },
-  { feature: "Équipe", free: "—", starter: "—", pro: "—", business: "5 membres" },
-  { feature: "API", free: "—", starter: "—", pro: "—", business: "✓" },
-  { feature: "Marque blanche", free: "—", starter: "—", pro: "—", business: "✓" },
+  { feature: "Équipe", free: "—", starter: "—", pro: "—", business: "5 membres (bientôt)" },
+  { feature: "API", free: "—", starter: "—", pro: "—", business: "Bientôt" },
+  { feature: "Marque blanche", free: "—", starter: "—", pro: "—", business: "Bientôt" },
   { feature: "Support", free: "Communauté", starter: "Standard", pro: "Prioritaire", business: "24/7 VIP" },
 ]

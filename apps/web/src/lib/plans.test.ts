@@ -99,9 +99,9 @@ describe("minPlanFor / minPlanForFormat", () => {
 describe("fmtPrice", () => {
   it("formate les prix d'affichage", () => {
     expect(fmtPrice(0)).toBe("0")
-    expect(fmtPrice(2.99)).toBe("2.99")
-    expect(fmtPrice(8)).toBe("8")
-    expect(fmtPrice(24.99)).toBe("24.99")
+    expect(fmtPrice(4.9)).toBe("4,90")
+    expect(fmtPrice(12.9)).toBe("12,90")
+    expect(fmtPrice(29.9)).toBe("29,90")
   })
 })
 

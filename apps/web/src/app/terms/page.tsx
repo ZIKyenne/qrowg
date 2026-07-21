@@ -32,7 +32,7 @@ export default function TermsPage() {
       <div className="ls">
         <h2>3. Abonnements et facturation</h2>
         <h3>Plans disponibles</h3>
-        <p>Free (0€), Starter (2,99€/mois), Pro (9,99€/mois), Business (24,99€/mois). Prix en euros, hors taxes applicables.</p>
+        <p>Free (0€), Starter (4,90€/mois), Pro (12,90€/mois), Business (29,90€/mois). Prix en euros TTC. Un tarif annuel réduit est proposé (facturation à l'année).</p>
         <h3>Paiement</h3>
         <p>Les paiements sont traités par Stripe. En souscrivant, vous autorisez le débit automatique à chaque période de facturation.</p>
         <h3>Essai gratuit</h3>

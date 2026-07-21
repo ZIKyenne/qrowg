@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import "./globals.css"
+import { PLAN_LIST } from "@/lib/plans"
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 // Origine du stockage Supabase (avatars, galeries, produits) — preconnect pour eviter
@@ -107,11 +108,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 "Créez une page mobile professionnelle, générez un QR code dynamique et suivez chaque scan.",
               applicationCategory: "BusinessApplication",
               operatingSystem: "Web",
-              offers: [
-                { "@type": "Offer", name: "Free",     price: "0",     priceCurrency: "EUR" },
-                { "@type": "Offer", name: "Pro",      price: "9.90",  priceCurrency: "EUR" },
-                { "@type": "Offer", name: "Business", price: "24.90", priceCurrency: "EUR" },
-              ],
+              // Offres derivees de la source unique lib/plans (prix TTC mensuels) -> jamais de drift.
+              offers: PLAN_LIST.map(p => ({
+                "@type": "Offer",
+                name: p.label,
+                price: p.priceMonthly.toFixed(2),
+                priceCurrency: "EUR",
+              })),
               featureList: [
                 "QR code dynamique",
                 "Page mobile professionnelle",
