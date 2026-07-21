@@ -1,5 +1,5 @@
 {
-    "name": "qrfolio",
+    "name": "qrowg",
     "version": "0.0.1",
     "private": true,
     "workspaces": [
@@ -10,6 +10,7 @@
         "dev": "turbo run dev",
         "build": "cd apps/web && node scripts/check-jsx-imports.mjs && npx next build",
         "check:imports": "cd apps/web && node scripts/check-jsx-imports.mjs",
+        "type-check": "cd apps/web && npx tsc --noEmit -p tsconfig.json",
         "test": "vitest run",
         "test:watch": "vitest",
         "lint": "turbo run lint",
