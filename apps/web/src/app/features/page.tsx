@@ -220,7 +220,7 @@ function QRMockupSvg() {
             <div key={i} style={{ aspectRatio:"1",borderRadius:1.5,background:goldIdx.has(Math.floor(i/21)*7+(i%7)) ? s.acc : s.fg,transition:"background 0.4s" }}/>
           ))}
         </div>
-        <p style={{color:s.acc,fontSize:8,letterSpacing:2.5,fontWeight:700}}>QROWG.APP</p>
+        <p style={{color:s.acc,fontSize:8,letterSpacing:2.5,fontWeight:700}}>QROWG.COM</p>
       </div>
       {/* Sélecteur de style */}
       <div style={{display:"flex",gap:8}}>

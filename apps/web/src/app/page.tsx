@@ -281,7 +281,7 @@ function QRMockup() {
             }} />
           ))}
         </div>
-        <p style={{ color: "#C9A84C", fontSize: 11, letterSpacing: 4, textTransform: "uppercase", position: "relative", zIndex: 1, fontWeight: 600 }}>QROWG.APP</p>
+        <p style={{ color: "#C9A84C", fontSize: 11, letterSpacing: 4, textTransform: "uppercase", position: "relative", zIndex: 1, fontWeight: 600 }}>QROWG.COM</p>
       </div>
     </div>
   )
@@ -1958,7 +1958,7 @@ function QRDynamicSection() {
                   color: QR_STYLES[active].tag,
                   fontSize: 10, letterSpacing: 2.5,
                   textTransform: "uppercase", fontWeight: 700,
-                }}>QROWG.APP</span>
+                }}>QROWG.COM</span>
               </div>
               {/* Badge style */}
               <div style={{

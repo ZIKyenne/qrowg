@@ -66,7 +66,7 @@ function QR404() {
         <p style={{
           color: G, fontSize: 8, letterSpacing: 2.5,
           fontWeight: 700, textTransform: "uppercase",
-        }}>QROWG.APP</p>
+        }}>QROWG.COM</p>
       </div>
       {/* Badge 404 */}
       <div style={{
