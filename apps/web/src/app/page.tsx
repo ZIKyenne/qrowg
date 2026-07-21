@@ -3053,6 +3053,115 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   )
 }
 
+// ── Comparaison Qrowg vs Linktree vs carte papier ────────────────────────────
+// Contenu factuel et defendable : Linktree recoit du credit la ou il le merite
+// (editable, analytics/domaine en payant = "partiel"). On ne surclaime pas.
+type CmpCell = readonly [status: "yes" | "partial" | "no", note?: string]
+const COMPARE_ROWS: { label: string; q: CmpCell; l: CmpCell; p: CmpCell }[] = [
+  { label: "Page pro sur-mesure (blocs, menu, portfolio)", q: ["yes"], l: ["partial", "Liste de liens"], p: ["no"] },
+  { label: "QR code dynamique repointable",                 q: ["yes"], l: ["partial", "Vers la page"],  p: ["no"] },
+  { label: "Studio QR — design du code (couleurs, logo)",   q: ["yes"], l: ["no"],                        p: ["no"] },
+  { label: "Modifiable sans réimprimer",                    q: ["yes"], l: ["yes"],                       p: ["no"] },
+  { label: "Statistiques de scans & visites",               q: ["yes", "Détaillées"], l: ["partial", "Payant"], p: ["no"] },
+  { label: "Modèles par métier (resto, immo, créateur…)",   q: ["yes"], l: ["no"],                        p: ["no"] },
+  { label: "Supports imprimables générés (sticker, PDF)",   q: ["yes"], l: ["no"],                        p: ["no"] },
+  { label: "Domaine personnalisé",                          q: ["yes"], l: ["partial", "Payant"],         p: ["no"] },
+]
+
+function CmpMark({ cell, strong = false }: { cell: CmpCell; strong?: boolean }) {
+  const [status, note] = cell
+  const cfg = status === "yes"
+    ? { ic: "✓", fg: strong ? "#0A0A0A" : "#C9A84C", bg: strong ? "linear-gradient(135deg,#EBCE72,#C9A84C)" : "rgba(201,168,76,0.14)", bd: strong ? "transparent" : "rgba(201,168,76,0.4)" }
+    : status === "partial"
+    ? { ic: "–", fg: "#B9B2A0", bg: "rgba(255,255,255,0.05)", bd: "rgba(255,255,255,0.14)" }
+    : { ic: "✕", fg: "#7C766B", bg: "rgba(255,255,255,0.03)", bd: "rgba(255,255,255,0.08)" }
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5 }}>
+      <span aria-label={status === "yes" ? "oui" : status === "partial" ? "partiel" : "non"} style={{
+        width: 26, height: 26, borderRadius: "50%", display: "inline-flex", alignItems: "center", justifyContent: "center",
+        fontSize: 14, fontWeight: 800, color: cfg.fg, background: cfg.bg, border: `1px solid ${cfg.bd}`,
+        boxShadow: strong && status === "yes" ? "0 2px 10px rgba(201,168,76,0.35)" : "none",
+      }}>{cfg.ic}</span>
+      {note && <span style={{ fontSize: 10.5, color: "#8A8478", lineHeight: 1.1, textAlign: "center" }}>{note}</span>}
+    </div>
+  )
+}
+
+function ComparisonSection() {
+  const { ref, visible } = useInView()
+  return (
+    <section id="comparaison" ref={ref} aria-labelledby="cmp-title" style={{ padding: "96px 48px", position: "relative", zIndex: 1 }}>
+      <style>{`
+        .cmp-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;align-items:stretch;}
+        .cmp-cell{padding:16px 14px;display:flex;align-items:center;justify-content:center;border-top:1px solid rgba(255,255,255,0.05);}
+        .cmp-lab{justify-content:flex-start;text-align:left;color:#D8D2C4;font-size:14px;font-weight:500;line-height:1.3;}
+        .cmp-hl{background:linear-gradient(180deg,rgba(201,168,76,0.09),rgba(201,168,76,0.04));}
+        @media(max-width:760px){
+          .cmp-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -20px;padding:0 20px;}
+          .cmp-grid{min-width:640px;}
+          section[aria-labelledby="cmp-title"]{padding:70px 20px!important;}
+        }
+      `}</style>
+      <div style={{ maxWidth: 980, margin: "0 auto", textAlign: "center" }}>
+        <Eyebrow>Pourquoi Qrowg</Eyebrow>
+        <h2 id="cmp-title" style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(28px,4vw,48px)", color: "#F5F0E8", fontWeight: 700, margin: "0 auto 14px", lineHeight: 1.1, maxWidth: 640, letterSpacing: "-0.02em" }}>
+          Une carte de visite, mais vivante.
+        </h2>
+        <p style={{ color: "rgba(226,220,206,0.8)", fontSize: 17, lineHeight: 1.6, margin: "0 auto 40px", maxWidth: 520 }}>
+          Ce que Qrowg fait — et que les autres solutions laissent de côté.
+        </p>
+
+        <div className="cmp-scroll" style={{
+          opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(26px)",
+          transition: "opacity 0.7s ease, transform 0.7s ease",
+        }}>
+          <div style={{
+            border: "1px solid rgba(201,168,76,0.16)", borderRadius: 20, overflow: "hidden",
+            background: "linear-gradient(180deg, rgba(20,18,14,0.7), rgba(12,11,8,0.7))",
+            boxShadow: "0 30px 80px rgba(0,0,0,0.45)",
+          }}>
+            {/* En-tetes */}
+            <div className="cmp-grid">
+              <div className="cmp-cell cmp-lab" style={{ borderTop: "none" }} />
+              <div className="cmp-cell cmp-hl" style={{ borderTop: "none", flexDirection: "column", gap: 8, position: "relative" }}>
+                <span style={{
+                  position: "absolute", top: 8, left: "50%", transform: "translateX(-50%)",
+                  fontSize: 8.5, letterSpacing: 1.5, textTransform: "uppercase", fontWeight: 700, color: "#C9A84C",
+                  background: "rgba(201,168,76,0.14)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 20, padding: "2px 9px", whiteSpace: "nowrap",
+                }}>Recommandé</span>
+                <span style={{ marginTop: 18 }}><QrowgLogo size={18} /></span>
+              </div>
+              <div className="cmp-cell" style={{ borderTop: "none", color: "#B9B2A0", fontSize: 15, fontWeight: 600 }}>Linktree</div>
+              <div className="cmp-cell" style={{ borderTop: "none", color: "#B9B2A0", fontSize: 15, fontWeight: 600 }}>Carte papier</div>
+            </div>
+            {/* Lignes */}
+            {COMPARE_ROWS.map((row) => (
+              <div className="cmp-grid" key={row.label}>
+                <div className="cmp-cell cmp-lab">{row.label}</div>
+                <div className="cmp-cell cmp-hl"><CmpMark cell={row.q} strong /></div>
+                <div className="cmp-cell"><CmpMark cell={row.l} /></div>
+                <div className="cmp-cell"><CmpMark cell={row.p} /></div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ marginTop: 34, display: "flex", justifyContent: "center" }}>
+          <Link href="/auth/signup" style={{
+            background: "linear-gradient(90deg, #C9A84C, #b8953f)", color: "#080808", textDecoration: "none",
+            fontSize: 15, fontWeight: 700, padding: "14px 30px", borderRadius: 12, display: "inline-flex", alignItems: "center", gap: 9,
+            boxShadow: "0 4px 24px rgba(201,168,76,0.4)", transition: "transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s",
+          }}
+            onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform = "translateY(-2px) scale(1.02)"; el.style.boxShadow = "0 8px 34px rgba(201,168,76,0.5)" }}
+            onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform = "none"; el.style.boxShadow = "0 4px 24px rgba(201,168,76,0.4)" }}>
+            Créer ma page gratuitement <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // ── Print Studio : supports imprimables (carrousel mobile) ────────────────────
 const SUPPORTS = [
   { name: "Affiche",          emoji: "🖼️", accent: "#C9A84C", benefit: "Vitrine, événement, salle d'attente — visible de loin." },
@@ -3418,6 +3527,10 @@ export default function HomePage() {
       {/* MARQUE PRO */}
       <BrandProSection />
       <SectionSeam delay={1.8} />
+
+      {/* COMPARAISON — Qrowg vs Linktree vs carte papier */}
+      <ComparisonSection />
+      <SectionSeam delay={2.2} />
 
       {/* PRICING */}
       <PricingSection />
