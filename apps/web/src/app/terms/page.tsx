@@ -36,7 +36,7 @@ export default function TermsPage() {
         <h3>Paiement</h3>
         <p>Les paiements sont traités par Stripe. En souscrivant, vous autorisez le débit automatique à chaque période de facturation.</p>
         <h3>Essai gratuit</h3>
-        <p>Les nouveaux abonnements Pro bénéficient de 14 jours d’essai gratuit. Aucun paiement n’est prélevé pendant cette période.</p>
+        <p>Les nouveaux abonnements payants bénéficient de 7 jours d’essai gratuit. Aucun paiement n’est prélevé pendant cette période ; l’abonnement se poursuit automatiquement à l’issue de l’essai, sauf annulation.</p>
       </div>
       <div className="ls">
         <h2>4. Résiliation</h2>

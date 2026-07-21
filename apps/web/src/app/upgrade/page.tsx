@@ -103,7 +103,7 @@ export default function UpgradePage() {
             Créez vos pages, personnalisez vos QR codes et suivez vos performances. Sans engagement, annulez à tout moment.
           </p>
           <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap", marginBottom: 26 }}>
-            {["Essai gratuit 14 jours", "Sans carte pour le plan Gratuit", "Annulation en 1 clic"].map((r, i) => (
+            {["Essai gratuit 7 jours", "Sans carte pour le plan Gratuit", "Annulation en 1 clic"].map((r, i) => (
               <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: MUTED, fontSize: 12.5 }}>
                 <Check size={13} color="#39FF8F" /> {r}
               </span>

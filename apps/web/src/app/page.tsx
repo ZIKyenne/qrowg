@@ -705,7 +705,7 @@ function BrandProSection() {
 const PLAN_LANDING_UI = {
   free:     { cta: "Commencer gratuitement",     href: "/auth/signup",                 badge: null,                note: null },
   starter:  { cta: "Démarrer l'essai gratuit",    href: "/auth/signup?plan=starter",  badge: "Meilleur rapport Q/P", note: null },
-  pro:      { cta: "Démarrer l'essai gratuit",    href: "/auth/signup?plan=pro",      badge: "Le plus populaire",   note: "14 jours d'essai · Sans engagement · Sans carte bancaire" },
+  pro:      { cta: "Démarrer l'essai gratuit",    href: "/auth/signup?plan=pro",      badge: "Le plus populaire",   note: "7 jours d'essai gratuit · Sans engagement · Annulable en 1 clic" },
   business: { cta: "Démarrer l'essai gratuit",     href: "/auth/signup?plan=business", badge: null,                note: null },
 } as Record<string, { cta: string; href: string; badge: string | null; note: string | null }>
 

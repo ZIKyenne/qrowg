@@ -73,7 +73,7 @@ export async function createCheckoutSession(priceId: string) {
     cancel_url: `${appUrl}/upgrade?canceled=true`,
     allow_promotion_codes: true,
     subscription_data: {
-      trial_period_days: 14,
+      trial_period_days: 7,
       metadata: meta,
     },
     metadata: meta,
