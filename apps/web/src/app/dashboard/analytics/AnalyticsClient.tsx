@@ -169,7 +169,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
         <div className="az" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 16 }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 5 }}>
-              <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(26px,3.6vw,36px)", lineHeight: 1, color: "#F5F0E8", fontWeight: 700, margin: 0, letterSpacing: "-0.4px" }}>
+              <h1 style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(26px,3.6vw,36px)", lineHeight: 1, color: "#F5F0E8", fontWeight: 700, margin: 0, letterSpacing: "-0.4px" }}>
                 Analytics
               </h1>
               {/* Badge EN DIRECT masque tant qu'aucune donnee (audit #04 : pas de "live" trompeur) */}
@@ -206,7 +206,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
               <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, background: "rgba(123,97,255,0.18)", color: "#A78BFA" }}><BarChart2 size={15} /></span>
               <span style={{ color: "#A78BFA", fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase" as const }}>Bientôt vos données</span>
             </div>
-            <h2 style={{ color: "#F8F4EC", fontSize: 21, fontWeight: 700, margin: "0 0 4px", fontFamily: "Cormorant Garamond, serif", letterSpacing: "-0.3px" }}>
+            <h2 style={{ color: "#F8F4EC", fontSize: 21, fontWeight: 700, margin: "0 0 4px", fontFamily: "Fraunces, serif", letterSpacing: "-0.3px" }}>
               Vos statistiques apparaîtront ici dès le premier scan
             </h2>
             <p style={{ color: "#C9C3B6", fontSize: 13, margin: "0 0 14px", lineHeight: 1.55, maxWidth: 620 }}>
@@ -237,7 +237,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             <div style={{ display: "flex", alignItems: "flex-start", gap: 12, position: "relative" }}>
               <span style={{ flexShrink: 0, fontSize: 20, lineHeight: 1.1 }}>{live.evo > 5 ? "📈" : live.evo < -5 ? "📉" : "📊"}</span>
               <div style={{ minWidth: 0 }}>
-                <p style={{ color: "#F8F4EC", fontSize: 16, fontWeight: 700, margin: "0 0 3px", fontFamily: "Cormorant Garamond, serif", letterSpacing: "-0.2px" }}>
+                <p style={{ color: "#F8F4EC", fontSize: 16, fontWeight: 700, margin: "0 0 3px", fontFamily: "Fraunces, serif", letterSpacing: "-0.2px" }}>
                   {live.evo > 5 ? "Votre trafic augmente." : live.evo < -5 ? "Votre trafic ralentit un peu." : "Votre QR est suivi en temps réel."}
                 </p>
                 <p style={{ color: "#C9C3B6", fontSize: 13.5, margin: 0, lineHeight: 1.55 }}>
@@ -273,14 +273,14 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
               <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#39FF8F", animation: live.active ? "ring 1.6s infinite" : "pulse 2s infinite" }} />
               <span style={{ color: "#39FF8F", fontSize: 11.5, fontWeight: 700 }}>Visiteurs actifs</span>
             </div>
-            <p style={{ color: "#F8F4EC", fontSize: 38, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{live.active}</p>
+            <p style={{ color: "#F8F4EC", fontSize: 38, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif", lineHeight: 1 }}>{live.active}</p>
             <p style={{ color: "rgba(57,255,143,0.7)", fontSize: 10.5, margin: "2px 0 0" }}>sur les 10 dernières minutes</p>
           </div>
           {/* Aujourd'hui + évolution */}
           <div className="az-card" style={{ background: "#100F0A", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius: 14, padding: "16px 18px", position: "relative", overflow: "hidden" }}>
             <p style={{ color: "#A8A190", fontSize: 11.5, fontWeight: 600, margin: "0 0 8px" }}>Activité aujourd'hui</p>
             <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-              <p style={{ color: "#F8F4EC", fontSize: 38, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{live.todayN}</p>
+              <p style={{ color: "#F8F4EC", fontSize: 38, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif", lineHeight: 1 }}>{live.todayN}</p>
               <span style={{ display: "inline-flex", alignItems: "center", gap: 3, color: live.evo >= 0 ? "#39FF8F" : "#FF6B6B", fontSize: 12.5, fontWeight: 700 }}>
                 <TrendingUp size={13} style={{ transform: live.evo >= 0 ? "none" : "scaleY(-1)" }} /> {live.evo >= 0 ? "+" : ""}{live.evo}%
               </span>
@@ -292,7 +292,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             <p style={{ color: "#A8A190", fontSize: 11.5, fontWeight: 600, margin: "0 0 8px" }}>Dernier événement</p>
             {live.last ? (
               <>
-                <p style={{ color: "#F8F4EC", fontSize: 19, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>{live.last.kind}</p>
+                <p style={{ color: "#F8F4EC", fontSize: 19, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif" }}>{live.last.kind}</p>
                 <p style={{ color: GOLD, fontSize: 11.5, margin: "3px 0 0", fontWeight: 600 }}>{formatAgo(live.last.t)}</p>
               </>
             ) : (
@@ -323,7 +323,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
               </div>
               <div>
                 <p style={{ color: "#C9C3B6", fontSize: 11.5, margin: 0, fontWeight: 500 }}>{kpi.label}</p>
-                <p style={{ color: "#F8F4EC", fontSize: 28, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif", lineHeight: 1.1 }}>{(kpi.value as number).toLocaleString("fr-FR")}</p>
+                <p style={{ color: "#F8F4EC", fontSize: 28, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif", lineHeight: 1.1 }}>{(kpi.value as number).toLocaleString("fr-FR")}</p>
               </div>
             </div>
           ))}

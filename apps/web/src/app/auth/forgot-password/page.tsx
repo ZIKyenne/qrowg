@@ -22,10 +22,10 @@ export default async function ForgotPasswordPage({
       <Particles behind />
       <div style={{ width: '100%', maxWidth: 400, position: 'relative', zIndex: 1 }}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <a href="/" style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 26, fontWeight: 300, color: '#F5F0E8', textDecoration: 'none' }}>
+          <a href="/" style={{ fontFamily: 'Fraunces, serif', fontSize: 26, fontWeight: 300, color: '#F5F0E8', textDecoration: 'none' }}>
             QR<span style={{ color: '#C9A84C', fontWeight: 600 }}>folio</span>
           </a>
-          <h1 style={{ color: '#F8F4EC', fontSize: 23, fontWeight: 700, margin: '18px 0 6px', fontFamily: 'Cormorant Garamond, serif' }}>Mot de passe oublié</h1>
+          <h1 style={{ color: '#F8F4EC', fontSize: 23, fontWeight: 700, margin: '18px 0 6px', fontFamily: 'Fraunces, serif' }}>Mot de passe oublié</h1>
           <p style={{ color: '#C9C3B6', fontSize: 14.5, margin: 0 }}>Entrez votre email : nous vous enverrons un lien pour en choisir un nouveau.</p>
         </div>
 

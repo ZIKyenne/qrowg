@@ -146,7 +146,7 @@ export default function ContactPage() {
       {/* NAV */}
       <nav style={{ position:"fixed",top:0,left:0,right:0,zIndex:100,height:64,background:"rgba(8,8,8,0.93)",backdropFilter:"blur(24px)",borderBottom:"1px solid rgba(201,168,76,0.12)",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 48px" }}>
         <Link href="/" style={{ textDecoration:"none" }}>
-          <span style={{ fontFamily:"Cormorant Garamond,serif",fontSize:20,color:G,fontWeight:700 }}>QRowg</span>
+          <span style={{ fontFamily:"Fraunces,serif",fontSize:20,color:G,fontWeight:700 }}>QRowg</span>
         </Link>
         <div style={{ display:"flex",gap:20,alignItems:"center" }}>
           <Link href="/" style={{ color:MUT,textDecoration:"none",fontSize:13,display:"flex",alignItems:"center",gap:6,transition:"color 0.2s" }}
@@ -163,7 +163,7 @@ export default function ContactPage() {
       {/* HERO */}
       <section style={{ padding:"120px 48px 64px",textAlign:"center" }} className="contact-hero">
         <div style={{ maxWidth:600,margin:"0 auto" }}>
-          <h1 style={{ fontFamily:"Cormorant Garamond,serif",fontSize:"clamp(32px,4vw,56px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing:"-0.02em",margin:"0 0 18px" }} className="au1">
+          <h1 style={{ fontFamily:"Fraunces,serif",fontSize:"clamp(32px,4vw,56px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing:"-0.02em",margin:"0 0 18px" }} className="au1">
             Une question ?<br /><span style={{color:G}}>Parlons-en.</span>
           </h1>
           <p style={{ color:MUT,fontSize:17,lineHeight:1.7,margin:0 }} className="au2">
@@ -186,7 +186,7 @@ export default function ContactPage() {
                   borderRadius:18,padding:"48px 40px",textAlign:"center",
                 }}>
                   <div style={{ fontSize:40,marginBottom:20 }}>✅</div>
-                  <h2 style={{ fontFamily:"Cormorant Garamond,serif",fontSize:28,color:INK,fontWeight:700,margin:"0 0 12px" }}>
+                  <h2 style={{ fontFamily:"Fraunces,serif",fontSize:28,color:INK,fontWeight:700,margin:"0 0 12px" }}>
                     Message envoyé !
                   </h2>
                   <p style={{ color:MUT,fontSize:15,lineHeight:1.7,margin:"0 0 28px" }}>

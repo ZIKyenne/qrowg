@@ -61,7 +61,7 @@ function buildEmailHtml(params: {
       <div style="display:inline-block;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);border-radius:12px;padding:8px 20px;margin-bottom:16px">
         <span style="color:#C9A84C;font-size:13px;font-weight:700;letter-spacing:2px">QROWG REPORT</span>
       </div>
-      <h1 style="color:#F5F0E8;font-size:24px;font-weight:300;margin:0 0 6px;font-family:'Cormorant Garamond',Georgia,serif">
+      <h1 style="color:#F5F0E8;font-size:24px;font-weight:300;margin:0 0 6px;font-family:'Fraunces',Georgia,serif">
         Bonjour ${params.userName} 👋
       </h1>
       <p style="color:#8A8478;font-size:13px;margin:0">Voici vos performances · ${params.period}</p>

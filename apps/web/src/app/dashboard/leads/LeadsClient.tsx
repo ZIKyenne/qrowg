@@ -103,7 +103,7 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
             <Inbox size={20} color={G as string} />
           </div>
           <div>
-            <h1 style={{ color: TEXT, fontSize: 24, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>Messages</h1>
+            <h1 style={{ color: TEXT, fontSize: 24, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif" }}>Messages</h1>
             <p style={{ color: MUTED, fontSize: 13, margin: 0 }}>{leads.length} reçu{leads.length > 1 ? "s" : ""}{unreadCount > 0 ? ` · ${unreadCount} non lu${unreadCount > 1 ? "s" : ""}` : ""}</p>
           </div>
         </div>

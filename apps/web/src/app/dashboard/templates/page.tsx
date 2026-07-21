@@ -207,9 +207,9 @@ export default function TemplatesPage() {
   // Thèmes complets par template (utilise les PRESET_THEMES officiels)
   const TEMPLATE_THEMES: Record<string, any> = {
     ...SHARED_THEMES,
-    freelance:      { name:"Midnight Gold",bg:"#080808",surface:"#111009",primary:"var(--accent)",accent:"#39FF8F",text:"#F5F0E8",muted:"#A8A190",fontDisplay:"Cormorant Garamond",fontBody:"DM Sans",bgMode:"solid",effect_glow:true,glow_color:"var(--accent)",glow_intensity:20,glow_size:350 },
+    freelance:      { name:"Midnight Gold",bg:"#080808",surface:"#111009",primary:"var(--accent)",accent:"#39FF8F",text:"#F5F0E8",muted:"#A8A190",fontDisplay:"Fraunces",fontBody:"DM Sans",bgMode:"solid",effect_glow:true,glow_color:"var(--accent)",glow_intensity:20,glow_size:350 },
     restaurant:     { name:"Sunset Fire",bg:"#120300",surface:"#200800",primary:"#FF6B00",accent:"#FF4500",text:"#FFF5EE",muted:"#9A5020",fontDisplay:"Playfair Display",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#120300,#1F0600)",effect_vignette:true,vignette_intensity:60 },
-    artiste:        { name:"Velvet Noir",bg:"#070508",surface:"#0F0A12",primary:"#C4A6E8",accent:"#F472B6",text:"#F5F0FF",muted:"#7A6A9A",fontDisplay:"Cormorant Garamond",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#070508,#100818)",effect_glow:true,glow_color:"#A78BFA",glow_intensity:25,glow_size:350 },
+    artiste:        { name:"Velvet Noir",bg:"#070508",surface:"#0F0A12",primary:"#C4A6E8",accent:"#F472B6",text:"#F5F0FF",muted:"#7A6A9A",fontDisplay:"Fraunces",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#070508,#100818)",effect_glow:true,glow_color:"#A78BFA",glow_intensity:25,glow_size:350 },
     coach:          { name:"Zen Wellness",bg:"#F5FFF5",surface:"#EAFAEA",primary:"#059669",accent:"#34D399",text:"#064E3B",muted:"#407A60",fontDisplay:"DM Sans",fontBody:"DM Sans",bgMode:"solid" },
     createur:       { name:"Neon Creator",bg:"#030303",surface:"#0A0A0A",primary:"#FF0080",accent:"#00FFFF",text:"#F8F0FF",muted:"#808080",fontDisplay:"Space Grotesk",fontBody:"Space Grotesk",bgMode:"solid",effect_glow:true,glow_color:"#FF0080",glow_intensity:30,glow_size:300 },
     event:          { name:"Festival Night",bg:"#020008",surface:"#060012",primary:"#FF6B35",accent:"#FFD700",text:"#FFF5F0",muted:"#806050",fontDisplay:"Space Grotesk",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#020008,#08001A)",effect_glow:true,glow_color:"#FF6B35",glow_intensity:25,glow_size:350 },
@@ -217,10 +217,10 @@ export default function TemplatesPage() {
     coiffeur:       { name:"Rose Luxe",bg:"#0A0008",surface:"#150010",primary:"#EC4899",accent:"#F9A8D4",text:"#FFF0F8",muted:"#9060A0",fontDisplay:"DM Sans",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#0A0008,#180018)",effect_glow:true,glow_color:"#EC4899",glow_intensity:25,glow_size:350 },
     agence:         { name:"Deep Space",bg:"#020B16",surface:"#071828",primary:"#00D4FF",accent:"#7B2FBE",text:"#EEF8FF",muted:"#5A7A9A",fontDisplay:"Space Grotesk",fontBody:"Inter",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#020B16,#071828)" },
     medecin:        { name:"Zen Wellness",bg:"#F5FFF5",surface:"#EAFAEA",primary:"#059669",accent:"#34D399",text:"#064E3B",muted:"#407A60",fontDisplay:"DM Sans",fontBody:"DM Sans",bgMode:"solid" },
-    vente_produits: { name:"Velvet Noir",bg:"#070508",surface:"#0F0A12",primary:"#C4A6E8",accent:"#F472B6",text:"#F5F0FF",muted:"#7A6A9A",fontDisplay:"Cormorant Garamond",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#070508,#100818)" },
-    immobilier:     { name:"Prestige Immo",bg:"#0C0C0C",surface:"#161616",primary:"#D4AF37",accent:"var(--accent)",text:"#F5F0E0",muted:"#8A7840",fontDisplay:"Cormorant Garamond",fontBody:"DM Sans",bgMode:"solid",effect_glow:true,glow_color:"#D4AF37",glow_intensity:15,glow_size:400 },
+    vente_produits: { name:"Velvet Noir",bg:"#070508",surface:"#0F0A12",primary:"#C4A6E8",accent:"#F472B6",text:"#F5F0FF",muted:"#7A6A9A",fontDisplay:"Fraunces",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#070508,#100818)" },
+    immobilier:     { name:"Prestige Immo",bg:"#0C0C0C",surface:"#161616",primary:"#D4AF37",accent:"var(--accent)",text:"#F5F0E0",muted:"#8A7840",fontDisplay:"Fraunces",fontBody:"DM Sans",bgMode:"solid",effect_glow:true,glow_color:"#D4AF37",glow_intensity:15,glow_size:400 },
     startup:        { name:"Aurora",bg:"#080E1E",surface:"#0E1830",primary:"#00FF9D",accent:"#00CFFF",text:"#E8FFF5",muted:"#409898",fontDisplay:"Space Grotesk",fontBody:"Inter",bgMode:"mesh",mesh_c1:"#00FF9D",mesh_c2:"#00CFFF",mesh_c3:"#7B2FBE",mesh_blur:100 },
-    influenceur:    { name:"Golden Luxury",bg:"#060400",surface:"#120D00",primary:"#D4A843",accent:"#FFC940",text:"#FFF3D0",muted:"#8A7030",fontDisplay:"Cormorant Garamond",fontBody:"Lora",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#060400,#130E00,#060400)" },
+    influenceur:    { name:"Golden Luxury",bg:"#060400",surface:"#120D00",primary:"#D4A843",accent:"#FFC940",text:"#FFF3D0",muted:"#8A7030",fontDisplay:"Fraunces",fontBody:"Lora",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#060400,#130E00,#060400)" },
   }
 
   // (createFromTemplate retiree avec la carte "Recommande" : la creation passe par
@@ -263,7 +263,7 @@ export default function TemplatesPage() {
           <Sparkles size={13} color={G} />
           <span style={{ color: G, fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase" }}>Templates</span>
         </div>
-        <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(26px,3.4vw,36px)", color: "#F5F0E8", margin: "0 0 8px", fontWeight: 700 }}>
+        <h1 style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(26px,3.4vw,36px)", color: "#F5F0E8", margin: "0 0 8px", fontWeight: 700 }}>
           Choisissez votre secteur
         </h1>
         <p style={{ color: MUTED, fontSize: 14.5, margin: "0 0 22px" }}>
@@ -318,7 +318,7 @@ export default function TemplatesPage() {
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxHeight: "82vh", overflowY: "auto", background: "#0E0D0A", borderTopLeftRadius: 22, borderTopRightRadius: 22, borderTop: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", padding: "10px 18px calc(20px + env(safe-area-inset-bottom))", animation: "tplUp .28s cubic-bezier(.2,.8,.2,1)" }}>
             <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 16px" }} />
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-              <h3 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 21, color: "#F5F0E8", fontWeight: 700, margin: 0 }}>Filtrer</h3>
+              <h3 style={{ fontFamily: "Fraunces, serif", fontSize: 21, color: "#F5F0E8", fontWeight: 700, margin: 0 }}>Filtrer</h3>
               {hasFilters && <button type="button" onClick={() => { setActiveMetier("Tous"); setActivePlan("all") }} style={{ background: "none", border: "none", color: "var(--accent)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Réinitialiser</button>}
             </div>
 

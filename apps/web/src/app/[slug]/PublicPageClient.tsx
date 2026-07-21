@@ -654,7 +654,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews }: { block: 
   const MUTED = theme.muted || "#8A8478"
   const TEXT = theme.text || "#F5F0E8"
   const SURFACE = theme.surface || "#111009"
-  const FONT_D = theme.fontDisplay || "Cormorant Garamond, serif"
+  const FONT_D = theme.fontDisplay || "Fraunces, serif"
   const FONT_B = theme.fontBody || "DM Sans, sans-serif"
 
   switch (block.type) {
@@ -2835,16 +2835,16 @@ export default function PublicPageClient({ page, blocks, showBranding = true }: 
   const theme = {
     bg: "#080808", surface: "#111009", primary: "#C9A84C", accent: "#39FF8F",
     text: "#F5F0E8", muted: "#8A8478",
-    fontDisplay: "Cormorant Garamond, serif", fontBody: "DM Sans, sans-serif",
+    fontDisplay: "Fraunces, serif", fontBody: "DM Sans, sans-serif",
     ...(page.theme || {}),
   }
 
-  // Charge les polices Google du thème — uniquement les polices CUSTOM (Cormorant Garamond
+  // Charge les polices Google du thème — uniquement les polices CUSTOM (Fraunces
   // et DM Sans sont déjà chargées par le layout -> évite une requête redondante + le FOUT).
   // Chaque famille reçoit son propre axe de poids (sinon seule la dernière chargeait 600/700,
   // laissant le nom du profil en faux-gras).
   useEffect(() => {
-    const DEFAULTS = new Set(["Cormorant Garamond", "DM Sans"])
+    const DEFAULTS = new Set(["Fraunces", "DM Sans"])
     const custom = [...new Set(
       [theme.fontDisplay, theme.fontBody]
         .filter(Boolean)

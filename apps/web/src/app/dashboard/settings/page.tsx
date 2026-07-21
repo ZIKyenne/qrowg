@@ -178,7 +178,7 @@ export default function SettingsPage() {
 
       <div style={{ maxWidth: 680, margin: "0 auto", position: "relative", zIndex: 1 }}>
         <div style={{ marginBottom: 28 }}>
-          <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, color: "#F5F0E8", fontWeight: 700, margin: 0 }}>Paramètres</h1>
+          <h1 style={{ fontFamily: "Fraunces, serif", fontSize: 32, color: "#F5F0E8", fontWeight: 700, margin: 0 }}>Paramètres</h1>
           <p style={{ color: MUTED, fontSize: 14, margin: "4px 0 0" }}>Gère ton compte et tes préférences</p>
         </div>
 

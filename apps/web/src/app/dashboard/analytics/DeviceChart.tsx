@@ -120,7 +120,7 @@ export default function DeviceChart({ data }: { data: DeviceData[] }) {
         display: "flex", justifyContent: "space-between", alignItems: "center"
       }}>
         <span style={{ color: "#A8A190", fontSize: 12 }}>Total scans trackés</span>
-        <span style={{ color: "#C9A84C", fontSize: 16, fontWeight: 700, fontFamily: "Cormorant Garamond, serif" }}>{total}</span>
+        <span style={{ color: "#C9A84C", fontSize: 16, fontWeight: 700, fontFamily: "Fraunces, serif" }}>{total}</span>
       </div>
     </div>
   )

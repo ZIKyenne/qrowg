@@ -60,7 +60,7 @@ export default async function QRCodesPage() {
               <QrCode size={19} color="var(--accent)"/>
             </div>
             <div>
-              <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 22, color: "#F5F0E8", fontWeight: 700, margin: 0, lineHeight: 1.15 }}>
+              <h1 style={{ fontFamily: "Fraunces, serif", fontSize: 22, color: "#F5F0E8", fontWeight: 700, margin: 0, lineHeight: 1.15 }}>
                 QR Studio
               </h1>
               <p style={{ color: "#A8A190", fontSize: 11, margin: 0 }}>

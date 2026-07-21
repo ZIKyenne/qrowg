@@ -240,7 +240,7 @@ export default function DashboardClient() {
         {/* Header */}
         <div className="dz" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 22, flexWrap: "wrap", gap: 14 }}>
           <div>
-            <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(30px,4.5vw,44px)", lineHeight: 1.05, color: "#F5F0E8", fontWeight: 700, margin: "0 0 8px", letterSpacing: "-0.5px" }}>
+            <h1 style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(30px,4.5vw,44px)", lineHeight: 1.05, color: "#F5F0E8", fontWeight: 700, margin: "0 0 8px", letterSpacing: "-0.5px" }}>
               {greeting}{profile?.full_name ? ", " + profile.full_name.split(" ")[0] : ""} !
             </h1>
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
@@ -318,10 +318,10 @@ export default function DashboardClient() {
                     <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, background: "color-mix(in srgb, var(--accent) 18%, transparent)", color: G }}><Zap size={15} /></span>
                     <span style={{ color: G, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase" as const }}>Premiers pas</span>
                   </div>
-                  <h2 style={{ color: "#F8F4EC", fontSize: 21, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif", letterSpacing: "-0.3px" }}>Lancez votre QRowg en 3 étapes</h2>
+                  <h2 style={{ color: "#F8F4EC", fontSize: 21, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif", letterSpacing: "-0.3px" }}>Lancez votre QRowg en 3 étapes</h2>
                 </div>
                 <div style={{ textAlign: "right" as const, minWidth: 120 }}>
-                  <span style={{ color: "#F8F4EC", fontSize: 22, fontWeight: 700, fontFamily: "Cormorant Garamond, serif" }}>{doneN}<span style={{ color: MUTED, fontSize: 15 }}> / {steps.length}</span></span>
+                  <span style={{ color: "#F8F4EC", fontSize: 22, fontWeight: 700, fontFamily: "Fraunces, serif" }}>{doneN}<span style={{ color: MUTED, fontSize: 15 }}> / {steps.length}</span></span>
                   <div style={{ height: 6, width: 120, borderRadius: 3, background: "rgba(255,255,255,0.08)", marginTop: 5, overflow: "hidden" }}>
                     <div style={{ height: "100%", width: `${(doneN / steps.length) * 100}%`, background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 3, transition: "width .5s ease" }} />
                   </div>
@@ -370,7 +370,7 @@ export default function DashboardClient() {
                 <span style={{ color: "#39FF8F", background: "#39FF8F1a", borderRadius: 9, padding: 8, display: "flex" }}><QrCode size={18} /></span>
                 <span style={{ color: "#C9C3B6", fontSize: 12.5, fontWeight: 600 }}>Scans totaux</span>
               </div>
-              <p style={{ color: "#F8F4EC", fontSize: 44, fontWeight: 700, margin: "8px 0 0", fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{(profile?.total_scans || 0).toLocaleString("fr-FR")}</p>
+              <p style={{ color: "#F8F4EC", fontSize: 44, fontWeight: 700, margin: "8px 0 0", fontFamily: "Fraunces, serif", lineHeight: 1 }}>{(profile?.total_scans || 0).toLocaleString("fr-FR")}</p>
               <p style={{ color: "#39FF8Fb0", fontSize: 11, margin: "2px 0 0" }}>tous temps</p>
             </div>
 
@@ -397,7 +397,7 @@ export default function DashboardClient() {
                       </div>
                     )}
                   </div>
-                  <p style={{ color: "#F8F4EC", fontSize: 26, fontWeight: 700, margin: "6px 0 0", fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{s.value}</p>
+                  <p style={{ color: "#F8F4EC", fontSize: 26, fontWeight: 700, margin: "6px 0 0", fontFamily: "Fraunces, serif", lineHeight: 1 }}>{s.value}</p>
                   <p style={{ color: s.color + "b0", fontSize: 10, margin: "2px 0 0", whiteSpace: "nowrap" }}>{s.sub}</p>
                 </div>
               ))}
@@ -439,7 +439,7 @@ export default function DashboardClient() {
                   <div key={page.id} className="dz-row" style={{ display: "flex", alignItems: "center", gap: 11, padding: "10px 14px", borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none" }}>
 
                     {/* Miniature (degrade + initiale ; anneau vert = en ligne) */}
-                    <div style={{ width: isMobile ? 42 : 38, height: isMobile ? 42 : 38, flexShrink: 0, borderRadius: 10, background: `linear-gradient(135deg, hsl(${hue} 52% 44%), hsl(${(hue + 42) % 360} 52% 26%))`, border: `1.5px solid ${pub ? "#39FF8F" : "rgba(255,255,255,0.14)"}`, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 17, fontFamily: "Cormorant Garamond, serif" }}>
+                    <div style={{ width: isMobile ? 42 : 38, height: isMobile ? 42 : 38, flexShrink: 0, borderRadius: 10, background: `linear-gradient(135deg, hsl(${hue} 52% 44%), hsl(${(hue + 42) % 360} 52% 26%))`, border: `1.5px solid ${pub ? "#39FF8F" : "rgba(255,255,255,0.14)"}`, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 17, fontFamily: "Fraunces, serif" }}>
                       {(page.title || page.slug || "?").trim()[0]?.toUpperCase() || "?"}
                     </div>
 

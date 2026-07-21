@@ -343,7 +343,7 @@ export default function ExamplesPage() {
       {/* NAV */}
       <nav style={{ position:"fixed",top:0,left:0,right:0,zIndex:100,height:64,background:"rgba(8,8,8,0.93)",backdropFilter:"blur(24px)",borderBottom:"1px solid rgba(201,168,76,0.12)",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 48px" }}>
         <Link href="/" style={{ textDecoration:"none" }}>
-          <span style={{ fontFamily:"Cormorant Garamond,serif",fontSize:20,color:G,fontWeight:700 }}>QRowg</span>
+          <span style={{ fontFamily:"Fraunces,serif",fontSize:20,color:G,fontWeight:700 }}>QRowg</span>
         </Link>
         <div style={{ display:"flex",alignItems:"center",gap:20 }}>
           <Link href="/" style={{ color:MUT,textDecoration:"none",fontSize:13,display:"flex",alignItems:"center",gap:6,transition:"color 0.2s" }}
@@ -363,7 +363,7 @@ export default function ExamplesPage() {
           <div style={{ display:"inline-flex",alignItems:"center",gap:7,background:"rgba(201,168,76,0.08)",border:"1px solid rgba(201,168,76,0.22)",borderRadius:100,padding:"5px 16px",marginBottom:20,color:G,fontSize:11,fontWeight:700,letterSpacing:2.5,textTransform:"uppercase" }} className="au1">
             <span style={{ fontSize:9 }}>✦</span> Galerie d'exemples
           </div>
-          <h1 style={{ fontFamily:"Cormorant Garamond,serif",fontSize:"clamp(30px,4vw,58px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing:"-0.02em",margin:"0 0 20px" }} className="au2">
+          <h1 style={{ fontFamily:"Fraunces,serif",fontSize:"clamp(30px,4vw,58px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing:"-0.02em",margin:"0 0 20px" }} className="au2">
             Ce que tu peux créer<br/><span style={{color:G}}>avec QRowg.</span>
           </h1>
           <p style={{ color:MUT,fontSize:17,lineHeight:1.7,margin:"0 0 16px" }} className="au3">
@@ -463,7 +463,7 @@ export default function ExamplesPage() {
               <div style={{ display:"inline-flex",alignItems:"center",gap:7,background:"rgba(57,255,143,0.08)",border:"1px solid rgba(57,255,143,0.2)",borderRadius:100,padding:"5px 14px",marginBottom:20,color:"#39FF8F",fontSize:11,fontWeight:700,letterSpacing:2,textTransform:"uppercase" }}>
                 ⚡ 5 minutes chrono
               </div>
-              <h2 style={{ fontFamily:"Cormorant Garamond,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing:"-0.02em",margin:"0 0 18px" }}>
+              <h2 style={{ fontFamily:"Fraunces,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing:"-0.02em",margin:"0 0 18px" }}>
                 Créé en moins de<br/><span style={{color:G}}>5 minutes.</span>
               </h2>
               <p style={{ color:MUT,fontSize:16,lineHeight:1.7,margin:"0 0 36px" }}>

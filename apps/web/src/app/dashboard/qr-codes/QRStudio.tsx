@@ -494,7 +494,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [suppSubtitle,setSuppSubtitle]= useState("Scannez pour voir le menu")
   const [suppPhone,   setSuppPhone]   = useState("")
   const [suppWebsite, setSuppWebsite] = useState("")
-  const [suppFont,     setSuppFont]     = useState("Cormorant Garamond")
+  const [suppFont,     setSuppFont]     = useState("Fraunces")
   const [suppSubFont,  setSuppSubFont]  = useState("Arial")
   const [suppTracking, setSuppTracking] = useState(0)
   const [suppTitleSize, setSuppTitleSize] = useState(1)
@@ -1277,7 +1277,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
     const offX = Math.round((opts.offX ?? 0) / 100 * w)
     const offY = Math.round((opts.offY ?? 0) / 100 * h)
-    const titleFont = opts.font && opts.font.trim() ? opts.font : "Cormorant Garamond"
+    const titleFont = opts.font && opts.font.trim() ? opts.font : "Fraunces"
     const subFont   = opts.subFont && opts.subFont.trim() ? opts.subFont : "Arial"
     const trk       = Math.max(0, opts.tracking ?? 0)
     const tScale    = opts.titleScale ?? 1
@@ -2235,7 +2235,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         <div style={{ width:72, height:72, borderRadius:20, margin:"0 auto 20px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 15%, transparent)", display:"flex", alignItems:"center", justifyContent:"center" }}>
           <QrCode size={32} color={G}/>
         </div>
-        <h2 style={{ fontFamily:"Cormorant Garamond, serif", fontSize:24, color:"#F5F0E8", fontWeight:700, margin:"0 0 10px" }}>Aucun QR code</h2>
+        <h2 style={{ fontFamily:"Fraunces, serif", fontSize:24, color:"#F5F0E8", fontWeight:700, margin:"0 0 10px" }}>Aucun QR code</h2>
         <p style={{ color:MUTED, fontSize:14, lineHeight:1.7, margin:"0 0 28px" }}>Crée ta première page pour générer automatiquement un QR code.</p>
         <a href="/dashboard" style={{ background:"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", color:"#080808", textDecoration:"none", fontSize:14, fontWeight:700, padding:"14px 28px", borderRadius:10, display:"inline-block" }}>
           Créer ma première page
@@ -2254,7 +2254,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         <div onClick={() => setModeSheet(false)} style={{ position:"fixed", inset:0, zIndex:2050, background:"rgba(0,0,0,0.55)", backdropFilter:"blur(3px)", display:"flex", alignItems:"flex-end" }}>
           <div onClick={e => e.stopPropagation()} style={{ width:"100%", background:"#141109", borderTop:"1px solid color-mix(in srgb, var(--accent) 22%, transparent)", borderTopLeftRadius:22, borderTopRightRadius:22, padding:"10px 16px calc(18px + env(safe-area-inset-bottom))" }}>
             <div style={{ width:40, height:4, borderRadius:4, background:"rgba(255,255,255,0.18)", margin:"0 auto 14px" }} />
-            <p style={{ color:"#F5F0E8", fontSize:16, fontWeight:700, margin:"0 0 12px", fontFamily:"Cormorant Garamond, serif" }}>Niveau de réglages</p>
+            <p style={{ color:"#F5F0E8", fontSize:16, fontWeight:700, margin:"0 0 12px", fontFamily:"Fraunces, serif" }}>Niveau de réglages</p>
             {([["simple","Simple","L'essentiel : un style et les couleurs. Pour aller vite."],["inter","Intermédiaire","+ formes des modules et des coins."],["expert","Expert","Tous les réglages : logo, dégradés, marge, correction d'erreur…"]] as const).map(([k,l,d]) => (
               <button key={k} type="button" onClick={() => { setLevel(k); setModeSheet(false) }}
                 style={{ display:"flex", alignItems:"flex-start", gap:11, width:"100%", textAlign:"left" as const, padding:"13px 12px", marginBottom:6, borderRadius:12, cursor:"pointer",
@@ -2403,7 +2403,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 <div style={{ width:52, height:52, borderRadius:14, background:`${accent}18`, border:`1px solid ${accent}40`, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:4 }}>
                   <Sparkles size={24} color={accent}/>
                 </div>
-                <p style={{ color:"#F5F0E8", fontSize:18, fontWeight:800, margin:0, fontFamily:"Cormorant Garamond, serif" }}>Passez à {planName}</p>
+                <p style={{ color:"#F5F0E8", fontSize:18, fontWeight:800, margin:0, fontFamily:"Fraunces, serif" }}>Passez à {planName}</p>
                 <p style={{ color:MUTED, fontSize:12, margin:0, lineHeight:1.5 }}>Pour débloquer {upsell.feature} et bien plus.</p>
               </div>
 
@@ -2706,7 +2706,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       ) : scene === "poster" ? (
                         <div style={{ width:236, height:318, borderRadius:12, background:"linear-gradient(160deg,#1a160c,#0a0906)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", boxShadow:"0 28px 70px rgba(0,0,0,0.6)", display:"flex", flexDirection:"column", alignItems:"center", padding:"26px 20px", gap:14 }}>
                           <p style={{ color:"#C9A84C", fontSize:11, fontWeight:800, letterSpacing:2, margin:0 }}>SCANNEZ-MOI</p>
-                          <p style={{ color:"#F5F0E8", fontFamily:"Cormorant Garamond, serif", fontSize:24, fontWeight:700, textAlign:"center", lineHeight:1.1, margin:0 }}>{active.pages?.title ?? "Découvrez-nous"}</p>
+                          <p style={{ color:"#F5F0E8", fontFamily:"Fraunces, serif", fontSize:24, fontWeight:700, textAlign:"center", lineHeight:1.1, margin:0 }}>{active.pages?.title ?? "Découvrez-nous"}</p>
                           <div style={{ padding:14, background:"#fff", borderRadius:14, marginTop:"auto" }}>
                             <img src={qrPng} alt="QR" style={{ width:128, height:128, display:"block" }}/>
                           </div>

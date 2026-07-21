@@ -65,7 +65,7 @@ export default function RotateInstructionScreen({
       </div>
 
       {/* Textes */}
-      <h1 style={{ position: "relative", zIndex: 2, fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(26px, 7vw, 34px)", fontWeight: 700, color: "#F8F4EC", margin: "0 0 10px", letterSpacing: "-0.3px" }}>
+      <h1 style={{ position: "relative", zIndex: 2, fontFamily: "Fraunces, serif", fontSize: "clamp(26px, 7vw, 34px)", fontWeight: 700, color: "#F8F4EC", margin: "0 0 10px", letterSpacing: "-0.3px" }}>
         {title}
       </h1>
       <p style={{ position: "relative", zIndex: 2, color: "#C9C3B6", fontSize: 15, lineHeight: 1.55, margin: "0 0 8px", maxWidth: 360 }}>

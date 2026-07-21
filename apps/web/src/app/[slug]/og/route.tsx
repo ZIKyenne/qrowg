@@ -2,14 +2,16 @@ import { ImageResponse } from "next/og"
 import { readFileSync } from "node:fs"
 import { createAdminClient } from "@/lib/supabase/server"
 
-// Image Open Graph generee dynamiquement par page (1200x630) — identite or/noir QRowg,
-// avec la police de marque Cormorant Garamond pour le nom. Referencee par generateMetadata
-// quand aucune og_image_url custom n'est definie.
+// Image Open Graph generee dynamiquement par page (1200x630) — identite or/noir QRowg.
+// Referencee par generateMetadata quand aucune og_image_url custom n'est definie.
+// NB : le nom utilise Cormorant (serif) pour l'OG uniquement — Satori (next/og) ne peut
+// pas instancier proprement le Fraunces variable (l'optical-sizing resterait au minimum),
+// donc on garde ce woff statique bundlé. Le site visible, lui, est 100 % Fraunces.
 export const runtime = "nodejs"
 
 const SIZE = { width: 1200, height: 630 }
 
-// Polices de marque bundlees dans le repo (DM Sans = corps, Cormorant Garamond = titres).
+// Polices de marque bundlees dans le repo (DM Sans = corps, Cormorant = serif OG).
 // Cache au niveau module : lues une seule fois par instance. Lecture synchrone via `fs`
 // (fetch(file://) n'est pas supporte en runtime nodejs) ; `new URL(..., import.meta.url)`
 // fait tracer/inclure les .ttf par le bundler Next. DM Sans est en 1er = police par defaut.

@@ -155,7 +155,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <QrCode size={14} color="#080808" />
             </div>
             {!collapsed && (
-              <span style={{ color: G, fontFamily: "Cormorant Garamond, serif", fontSize: 18, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden" }}>
+              <span style={{ color: G, fontFamily: "Fraunces, serif", fontSize: 18, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden" }}>
                 QRowg
               </span>
             )}
@@ -362,7 +362,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       )}
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..800&family=DM+Sans:wght@400;500;600;700&display=swap');
         .sidebar-nav::-webkit-scrollbar { display: none }
         .sidebar-item:hover .sidebar-tooltip { opacity: 1 !important }
         @keyframes sheetUp { from { transform: translateY(100%) } to { transform: translateY(0) } }

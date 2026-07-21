@@ -92,7 +92,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {SUPABASE_ORIGIN && <link rel="preconnect" href={SUPABASE_ORIGIN} />}
         <link
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..700&family=JetBrains+Mono:wght@400;500&display=swap"
           rel="stylesheet"
         />
         <script

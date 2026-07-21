@@ -43,7 +43,7 @@ function SectionHeader({ chip, title, sub }: { chip: string; title: React.ReactN
     <div style={{ maxWidth: 600, marginBottom: 56 }}>
       <div style={{ marginBottom: 16 }}><Chip label={chip} /></div>
       <h2 style={{
-        fontFamily: "Cormorant Garamond, serif",
+        fontFamily: "Fraunces, serif",
         fontSize: "clamp(26px, 3.5vw, 44px)",
         color: INK, fontWeight: 700,
         lineHeight: 1.1, letterSpacing: "-0.02em",
@@ -265,7 +265,7 @@ export default function FeaturesPage() {
         padding:"0 48px",
       }}>
         <Link href="/" style={{textDecoration:"none"}}>
-          <span style={{fontFamily:"Cormorant Garamond,serif",fontSize:20,color:G,fontWeight:700}}>QRowg</span>
+          <span style={{fontFamily:"Fraunces,serif",fontSize:20,color:G,fontWeight:700}}>QRowg</span>
         </Link>
         <div style={{display:"flex",alignItems:"center",gap:24}}>
           <Link href="/#pricing" style={{color:MUT,textDecoration:"none",fontSize:13,transition:"color 0.2s"}}
@@ -291,7 +291,7 @@ export default function FeaturesPage() {
         <div style={{maxWidth:780,margin:"0 auto"}}>
           <div style={{marginBottom:20}} className="au1"><Chip label="Fonctionnalités" /></div>
           <h1 style={{
-            fontFamily:"Cormorant Garamond, serif",
+            fontFamily:"Fraunces, serif",
             fontSize:"clamp(32px,4.5vw,64px)",
             color:INK,fontWeight:700,lineHeight:1.08,
             letterSpacing:"-0.02em",margin:"0 0 24px",
@@ -412,7 +412,7 @@ export default function FeaturesPage() {
         <div style={{maxWidth:1100,margin:"0 auto"}}>
           <div style={{textAlign:"center",marginBottom:56}}>
             <div style={{marginBottom:16}}><Chip label="Templates" /></div>
-            <h2 style={{fontFamily:"Cormorant Garamond,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing:"-0.02em",margin:"0 auto 16px",maxWidth:560}}>
+            <h2 style={{fontFamily:"Fraunces,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing:"-0.02em",margin:"0 auto 16px",maxWidth:560}}>
               Démarre avec un template <span style={{color:G}}>fait pour ton métier.</span>
             </h2>
             <p style={{color:MUT,fontSize:16,lineHeight:1.7,margin:"0 auto",maxWidth:480}}>
@@ -458,7 +458,7 @@ export default function FeaturesPage() {
         <div style={{maxWidth:1100,margin:"0 auto"}}>
           <div style={{textAlign:"center",marginBottom:56}}>
             <div style={{marginBottom:16}}><Chip label="Et aussi" /></div>
-            <h2 style={{fontFamily:"Cormorant Garamond,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing:"-0.02em",margin:"0 auto",maxWidth:480}}>
+            <h2 style={{fontFamily:"Fraunces,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing:"-0.02em",margin:"0 auto",maxWidth:480}}>
               Tout le reste pour une <span style={{color:G}}>image pro.</span>
             </h2>
           </div>
@@ -509,7 +509,7 @@ export default function FeaturesPage() {
           borderRadius:24,padding:"56px 48px",position:"relative",overflow:"hidden",
         }}>
           <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(90deg,transparent,#C9A84C,transparent)"}}/>
-          <h2 style={{fontFamily:"Cormorant Garamond,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.12,margin:"0 0 18px",letterSpacing:"-0.02em"}}>
+          <h2 style={{fontFamily:"Fraunces,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.12,margin:"0 0 18px",letterSpacing:"-0.02em"}}>
             Prêt à créer ta page <span style={{color:G}}>professionnelle ?</span>
           </h2>
           <p style={{color:MUT,fontSize:16,lineHeight:1.7,margin:"0 0 36px",maxWidth:420,marginLeft:"auto",marginRight:"auto"}}>

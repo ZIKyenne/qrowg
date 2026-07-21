@@ -14,7 +14,7 @@ const DEFAULT_THEME = {
   primary: "#C9A84C",
   secondary: "#39FF8F",
   text: "#F5F0E8",
-  font_display: "Cormorant Garamond",
+  font_display: "Fraunces",
   font_body: "DM Sans",
 }
 

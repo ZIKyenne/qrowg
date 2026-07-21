@@ -47,6 +47,9 @@ body {
   color: #F5F0E8;
   font-family: 'DM Sans', system-ui, sans-serif;
   min-height: 100vh;
+  /* Fraunces (titres) est une variable font a axe opsz : l'optical-sizing auto
+     affine les lettres a grande taille et les epaissit en petit -> titres nets. */
+  font-optical-sizing: auto;
 }
 
 /* ── Signature QRowg : socle + texture matrice QR (cellules carrées) ─────────

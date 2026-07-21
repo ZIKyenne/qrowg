@@ -94,7 +94,7 @@ export default function UpgradePage() {
           <div style={{ display: "inline-block", background: `${G}1a`, border: `1px solid ${G}4d`, borderRadius: 20, padding: "6px 16px", marginBottom: 18, fontSize: 12, color: G, letterSpacing: 2, textTransform: "uppercase" }}>
             Choisissez votre plan
           </div>
-          <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(32px,5vw,52px)", color: "#F5F0E8", fontWeight: 700, margin: "0 0 14px", lineHeight: 1.1 }}>
+          <h1 style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(32px,5vw,52px)", color: "#F5F0E8", fontWeight: 700, margin: "0 0 14px", lineHeight: 1.1 }}>
             Choisissez le plan adapté à votre activité
           </h1>
           <p style={{ color: "#C9C3B6", fontSize: 16, maxWidth: 540, margin: "0 auto 18px", lineHeight: 1.7 }}>
@@ -146,7 +146,7 @@ export default function UpgradePage() {
                 </div>
 
                 <div style={{ display: "flex", alignItems: "baseline", gap: 4, margin: "18px 0 20px" }}>
-                  <span style={{ color: pc, fontSize: 40, fontWeight: 700, fontFamily: "Cormorant Garamond, serif" }}>{price === "0" ? "Gratuit" : price + "€"}</span>
+                  <span style={{ color: pc, fontSize: 40, fontWeight: 700, fontFamily: "Fraunces, serif" }}>{price === "0" ? "Gratuit" : price + "€"}</span>
                   {price !== "0" && <span style={{ color: MUTED, fontSize: 13 }}>/mois</span>}
                 </div>
 

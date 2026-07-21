@@ -398,7 +398,7 @@ function FeaturesSection() {
       }}>
         <Eyebrow>Fonctionnalités</Eyebrow>
         <h2 id="features-title" style={{
-          fontFamily: "Cormorant Garamond, serif",
+          fontFamily: "Fraunces, serif",
           fontSize: "clamp(28px, 4vw, 52px)",
           color: "#F5F0E8", fontWeight: 700, margin: "0 auto",
           lineHeight: 1.1, maxWidth: 560, letterSpacing: "-0.02em",
@@ -477,7 +477,7 @@ function FeaturesSection() {
                   }}>{f.icon}</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 9, flex: 1, minWidth: 0 }}>
                     <span style={{ color: f.accent, fontSize: 10.5, fontWeight: 700, letterSpacing: 2.5, textTransform: "uppercase", opacity: 0.85 }}>{f.tag}</span>
-                    <h3 style={{ color: "#F8F4EC", fontSize: "clamp(20px,2.4vw,27px)", fontWeight: 700, margin: 0, lineHeight: 1.2, fontFamily: "Cormorant Garamond, serif", letterSpacing: "-0.01em" }}>{f.title}</h3>
+                    <h3 style={{ color: "#F8F4EC", fontSize: "clamp(20px,2.4vw,27px)", fontWeight: 700, margin: 0, lineHeight: 1.2, fontFamily: "Fraunces, serif", letterSpacing: "-0.01em" }}>{f.title}</h3>
                     <p style={{ color: "rgba(200,194,182,0.82)", fontSize: 14.5, margin: 0, lineHeight: 1.6, maxWidth: 640 }}>{f.desc}</p>
                   </div>
                 </>
@@ -541,7 +541,7 @@ function FeaturesSection() {
               <div style={{ width: 46, height: 46, borderRadius: 13, background: `${fInfo.accent}18`, border: `1px solid ${fInfo.accent}40`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{fInfo.icon}</div>
               <div>
                 <p style={{ color: fInfo.accent, fontSize: 9.5, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", margin: 0 }}>{fInfo.tag}</p>
-                <p style={{ color: "#F5F0E8", fontSize: 17, fontWeight: 800, margin: "2px 0 0", fontFamily: "Cormorant Garamond, serif" }}>{fInfo.title}</p>
+                <p style={{ color: "#F5F0E8", fontSize: 17, fontWeight: 800, margin: "2px 0 0", fontFamily: "Fraunces, serif" }}>{fInfo.title}</p>
               </div>
             </div>
             {([["À quoi ça sert", fInfo.detail.role], ["Exemple concret", fInfo.detail.example], ["Ce que ça vous apporte", fInfo.detail.benefit]] as const).map(([h, txt]) => (
@@ -595,7 +595,7 @@ function BrandProSection() {
         {/* Texte */}
         <div>
           <p style={{ color: G, fontSize: 11, letterSpacing: 3, textTransform: "uppercase", fontWeight: 600, marginBottom: 16 }}>Marque professionnelle</p>
-          <h2 id="brandpro-title" style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(30px,3.6vw,46px)", color: "#F5F0E8", fontWeight: 700, lineHeight: 1.08, margin: "0 0 18px", letterSpacing: "-0.02em" }}>
+          <h2 id="brandpro-title" style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(30px,3.6vw,46px)", color: "#F5F0E8", fontWeight: 700, lineHeight: 1.08, margin: "0 0 18px", letterSpacing: "-0.02em" }}>
             Votre marque.<br /><span style={{ color: G }}>Pas la nôtre.</span>
           </h2>
           <p style={{ color: "rgba(188,182,166,0.9)", fontSize: 16, lineHeight: 1.7, margin: "0 0 24px", maxWidth: 420 }}>
@@ -626,7 +626,7 @@ function BrandProSection() {
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, background: "linear-gradient(180deg,#16140E,#0C0B08)", border: `1px solid ${G}40`, borderRadius: 20, padding: "30px 28px", position: "relative", boxShadow: `0 30px 90px rgba(0,0,0,0.7), 0 0 50px ${G}12`, fontFamily: "DM Sans, sans-serif" }}>
             <button type="button" onClick={() => setOpen(false)} aria-label="Fermer" style={{ position: "absolute", top: 16, right: 16, width: 30, height: 30, borderRadius: 9, background: "rgba(255,255,255,0.06)", border: "none", color: "#BCB6A6", fontSize: 16, cursor: "pointer" }}>✕</button>
             <p style={{ color: G, fontSize: 9.5, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", margin: 0 }}>Marque professionnelle</p>
-            <p style={{ color: "#F5F0E8", fontSize: 22, fontWeight: 800, margin: "4px 0 18px", fontFamily: "Cormorant Garamond, serif" }}>Une image 100 % à vous</p>
+            <p style={{ color: "#F5F0E8", fontSize: 22, fontWeight: 800, margin: "4px 0 18px", fontFamily: "Fraunces, serif" }}>Une image 100 % à vous</p>
             {([
               ["🌐", "Votre nom de domaine", "Au lieu de qrowg.com/p/…, votre page vit sur carte.votremarque.fr. Plus crédible, plus mémorisable."],
               ["🚫", "Zéro mention QRowg", "La mention « Propulsé par QRowg » disparaît : vos visiteurs ne voient que votre marque."],
@@ -743,7 +743,7 @@ function PricingSection() {
       }}>
         <Eyebrow>Tarifs</Eyebrow>
         <h2 id="pricing-title" style={{
-          fontFamily:"Cormorant Garamond, serif",
+          fontFamily:"Fraunces, serif",
           fontSize:"clamp(28px,4vw,52px)",
           color:"#F5F0E8", fontWeight:700,
           margin:"0 auto 16px", lineHeight:1.1,
@@ -816,7 +816,7 @@ function PricingSection() {
               {/* Prix */}
               <div style={{ display:"flex", alignItems:"baseline", gap:4, marginBottom:24 }}>
                 <span style={{
-                  fontFamily:"Cormorant Garamond, serif",
+                  fontFamily:"Fraunces, serif",
                   color:"#F5F0E8", fontSize:48, fontWeight:700, lineHeight:1,
                 }}>{plan.price}</span>
                 <span style={{ color:"rgba(201,168,76,0.7)", fontSize:15, fontWeight:600 }}>€</span>
@@ -1304,7 +1304,7 @@ function TemplatesSection() {
       }}>
         <Eyebrow>Templates</Eyebrow>
         <h2 id="templates-title" style={{
-          fontFamily: "Cormorant Garamond, serif",
+          fontFamily: "Fraunces, serif",
           fontSize: "clamp(28px, 4vw, 52px)",
           color: "#F5F0E8", fontWeight: 700, margin: "0 auto 20px",
           lineHeight: 1.1, maxWidth: 620, letterSpacing: "-0.02em",
@@ -1421,7 +1421,7 @@ function Navbar() {
         transition:"background 0.3s,border-color 0.3s,box-shadow 0.3s",
       }}>
         <Link href="/" style={{textDecoration:"none"}}>
-          <span style={{fontFamily:"Cormorant Garamond, serif",fontSize:22,color:"#C9A84C",fontWeight:700}}>QRowg</span>
+          <span style={{fontFamily:"Fraunces, serif",fontSize:22,color:"#C9A84C",fontWeight:700}}>QRowg</span>
         </Link>
         <div className="dNav" role="menubar" style={{display:"flex",alignItems:"center",gap:32}}>
           {NAV_LINKS.map(({label,href})=>{
@@ -1527,7 +1527,7 @@ function HowItWorks() {
         opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(24px)",
         transition:"opacity 0.6s ease,transform 0.6s ease"}}>
         <Eyebrow>Comment ça marche</Eyebrow>
-        <h2 id="how-title" style={{fontFamily:"Cormorant Garamond, serif",fontSize:"clamp(28px,4vw,52px)",
+        <h2 id="how-title" style={{fontFamily:"Fraunces, serif",fontSize:"clamp(28px,4vw,52px)",
           color:"#F5F0E8",fontWeight:700,margin:"0 auto",lineHeight:1.12,maxWidth:560,letterSpacing:"-0.02em"}}>
           De zéro à scannable{" "}<span style={{color:"#C9A84C"}}>en 5 minutes</span>
         </h2>
@@ -1656,7 +1656,7 @@ function BuilderSection(){
         <div style={{textAlign:"center",marginBottom:64,opacity:visible?1:0,
           transform:visible?"translateY(0)":"translateY(24px)",transition:"opacity 0.6s,transform 0.6s"}}>
           <p style={{color:"#C9A84C",fontSize:11,letterSpacing:3.5,textTransform:"uppercase",fontWeight:600,marginBottom:16}}>Éditeur</p>
-          <h2 id="builder-title" style={{fontFamily:"Cormorant Garamond, serif",fontSize:"clamp(28px,4vw,52px)",
+          <h2 id="builder-title" style={{fontFamily:"Fraunces, serif",fontSize:"clamp(28px,4vw,52px)",
             color:"#F5F0E8",fontWeight:700,margin:"0 auto 20px",lineHeight:1.1,maxWidth:680,letterSpacing:"-0.02em"}}>
             Construis une page professionnelle{" "}<span style={{color:"#C9A84C"}}>en quelques minutes.</span>
           </h2>
@@ -1853,7 +1853,7 @@ function QRDynamicSection() {
               QR Codes dynamiques
             </p>
             <h2 id="qr-dyn-title" style={{
-              fontFamily: "Cormorant Garamond, serif",
+              fontFamily: "Fraunces, serif",
               fontSize: "clamp(28px, 3.5vw, 48px)",
               color: "#F5F0E8", fontWeight: 700,
               margin: "0 0 20px", lineHeight: 1.1,
@@ -2263,7 +2263,7 @@ function AnalyticsSection() {
             <p style={{ color: "#C9A84C", fontSize: 11, letterSpacing: 3.5,
               textTransform: "uppercase", fontWeight: 600, marginBottom: 16 }}>Statistiques</p>
             <h2 id="analytics-title" style={{
-              fontFamily: "Cormorant Garamond, serif",
+              fontFamily: "Fraunces, serif",
               fontSize: "clamp(26px, 3.5vw, 46px)",
               color: "#F5F0E8", fontWeight: 700,
               margin: "0 0 20px", lineHeight: 1.12,
@@ -2496,7 +2496,7 @@ function UseCasesSection() {
         <p style={{ color: "#C9A84C", fontSize: 11, letterSpacing: 3.5,
           textTransform: "uppercase", fontWeight: 600, marginBottom: 16 }}>Cas d'usage</p>
         <h2 id="uc-title" style={{
-          fontFamily: "Cormorant Garamond, serif",
+          fontFamily: "Fraunces, serif",
           fontSize: "clamp(28px, 4vw, 52px)",
           color: "#F5F0E8", fontWeight: 700,
           margin: "0 auto 16px", lineHeight: 1.1,
@@ -2709,7 +2709,7 @@ function FAQSection() {
         opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(24px)",
         transition:"opacity 0.6s ease,transform 0.6s ease" }}>
         <Eyebrow>FAQ</Eyebrow>
-        <h2 id="faq-title" style={{ fontFamily:"Cormorant Garamond, serif",
+        <h2 id="faq-title" style={{ fontFamily:"Fraunces, serif",
           fontSize:"clamp(28px,4vw,52px)", color:"#F5F0E8", fontWeight:700,
           margin:"0 auto 16px", lineHeight:1.1, letterSpacing:"-0.02em" }}>
           Les questions{" "}<span style={{ color:"#C9A84C" }}>les plus frequentes.</span>
@@ -2878,7 +2878,7 @@ function StoryFlow() {
       <div id="story" style={{ maxWidth: 1140, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 56, opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(24px)", transition: "opacity 0.6s ease, transform 0.6s ease" }}>
           <Eyebrow>Le parcours</Eyebrow>
-          <h2 id="story-title" style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(28px,4vw,52px)", color: "#F5F0E8", fontWeight: 700, margin: "0 auto", lineHeight: 1.1, maxWidth: 580, letterSpacing: "-0.02em" }}>
+          <h2 id="story-title" style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(28px,4vw,52px)", color: "#F5F0E8", fontWeight: 700, margin: "0 auto", lineHeight: 1.1, maxWidth: 580, letterSpacing: "-0.02em" }}>
             De l'idée au{" "}<span style={{ color: "#C9A84C" }}>premier client.</span>
           </h2>
         </div>
@@ -3010,7 +3010,7 @@ function PrintStudioSection() {
       <div id="print" style={{ maxWidth: 1140, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 52, opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(24px)", transition: "opacity 0.6s ease, transform 0.6s ease" }}>
           <Eyebrow>Supports imprimables</Eyebrow>
-          <h2 id="print-title" style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(28px,4vw,52px)", color: "#F5F0E8", fontWeight: 700, margin: "0 auto 16px", lineHeight: 1.1, maxWidth: 620, letterSpacing: "-0.02em" }}>
+          <h2 id="print-title" style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(28px,4vw,52px)", color: "#F5F0E8", fontWeight: 700, margin: "0 auto 16px", lineHeight: 1.1, maxWidth: 620, letterSpacing: "-0.02em" }}>
             Vos QR codes en{" "}<span style={{ color: "#C9A84C" }}>supports prêts à imprimer.</span>
           </h2>
           <p style={{ color: "rgba(188,182,166,0.85)", fontSize: 16, maxWidth: 520, margin: "0 auto", lineHeight: 1.7 }}>
@@ -3171,7 +3171,7 @@ export default function HomePage() {
 
             {/* Titre */}
             <h1 style={{
-              fontFamily: "Cormorant Garamond, serif",
+              fontFamily: "Fraunces, serif",
               fontSize: "clamp(40px, 5vw, 76px)",
               color: "#F5F0E8", fontWeight: 700, lineHeight: 1.06,
               margin: "0 0 28px", letterSpacing: "-0.02em",
@@ -3380,7 +3380,7 @@ export default function HomePage() {
             </div>
 
             <h2 style={{
-              fontFamily:"Cormorant Garamond, serif",
+              fontFamily:"Fraunces, serif",
               fontSize:"clamp(28px,4vw,48px)",
               color:"#F5F0E8", fontWeight:700,
               margin:"0 0 20px", lineHeight:1.12,
@@ -3466,7 +3466,7 @@ export default function HomePage() {
           {/* Col 1: Brand */}
           <div>
             <Link href="/" aria-label="QRowg — Accueil" className="f-brand-link" style={{ textDecoration:"none", display:"inline-block", marginBottom:12 }}>
-              <span style={{ fontFamily:"Cormorant Garamond, serif", fontSize:24, color:"#C9A84C", fontWeight:700, letterSpacing:"-0.01em" }}>QRowg</span>
+              <span style={{ fontFamily:"Fraunces, serif", fontSize:24, color:"#C9A84C", fontWeight:700, letterSpacing:"-0.01em" }}>QRowg</span>
             </Link>
             <p className="f-brand-desc" style={{ color:"rgba(188,182,166,0.65)", fontSize:13, lineHeight:1.7, maxWidth:220, margin:0 }}>
               QRowg transforme les QR codes en expériences interactives.

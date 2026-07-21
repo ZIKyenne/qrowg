@@ -2591,7 +2591,7 @@ export default function TemplatePreviewModal({
     accent: template.accent,
     text: "#F5F0E8",
     muted: "#A8A190",
-    fontDisplay: "Cormorant Garamond",
+    fontDisplay: "Fraunces",
     fontBody: "DM Sans",
     bgMode: "solid",
   }

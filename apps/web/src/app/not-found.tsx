@@ -92,7 +92,7 @@ export default function NotFound() {
       position: "relative", overflow: "hidden",
     }}>
       <style>{`
-        @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap");
+        @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..800&family=DM+Sans:wght@400;500;600;700&display=swap");
         * { box-sizing:border-box; }
         body { background:${BG}; }
         @keyframes float404 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
@@ -126,7 +126,7 @@ export default function NotFound() {
         borderBottom: "1px solid rgba(201,168,76,0.1)",
       }}>
         <Link href="/" style={{ textDecoration: "none" }}>
-          <span style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 20, color: G, fontWeight: 700 }}>QRowg</span>
+          <span style={{ fontFamily: "Fraunces, serif", fontSize: 20, color: G, fontWeight: 700 }}>QRowg</span>
         </Link>
         <Link href="/auth/signup" style={{
           background: "linear-gradient(90deg,#C9A84C,#b8953f)",
@@ -148,7 +148,7 @@ export default function NotFound() {
           Erreur 404
         </p>
         <h1 style={{
-          fontFamily: "Cormorant Garamond, serif",
+          fontFamily: "Fraunces, serif",
           fontSize: "clamp(28px, 5vw, 52px)",
           color: INK, fontWeight: 700, lineHeight: 1.1,
           letterSpacing: "-0.02em", margin: "0 0 18px",

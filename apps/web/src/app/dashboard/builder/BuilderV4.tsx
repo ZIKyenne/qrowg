@@ -4789,9 +4789,9 @@
     useEffect(() => { messagesEnd.current?.scrollIntoView({ behavior: "smooth" }) }, [messages])
 
     useEffect(() => {
-      // Ne charge que les polices CUSTOM (Cormorant Garamond / DM Sans deja chargees par le
+      // Ne charge que les polices CUSTOM (Fraunces / DM Sans deja chargees par le
       // layout) et donne a CHAQUE famille son axe de poids (sinon tout l apercu en faux-gras).
-      const DEFAULTS = new Set(["Cormorant Garamond", "DM Sans"])
+      const DEFAULTS = new Set(["Fraunces", "DM Sans"])
       const custom = [...new Set(
         [theme.fontDisplay, theme.fontBody].filter(Boolean).map(f => f.replace(/,.*/, "").trim()).filter(f => f && !DEFAULTS.has(f))
       )]
@@ -5277,7 +5277,7 @@
 
         {/* TOPBAR (masquee en mode Apercu plein ecran sur mobile) */}
         <div style={{ height: 50, background: "#0D0D0D", borderBottom: "1px solid rgba(201,168,76,0.12)", display: (preview && isMobile) ? "none" : "flex", alignItems: "center", padding: isMobile ? "0 9px" : "0 14px", gap: isMobile ? 6 : 10, flexShrink: 0, zIndex: 20 }}>
-          <a href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 4, textDecoration: "none", color: G, fontFamily: "Cormorant Garamond, serif", fontSize: 16, fontWeight: 700 }}>← QRowg</a>
+          <a href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 4, textDecoration: "none", color: G, fontFamily: "Fraunces, serif", fontSize: 16, fontWeight: 700 }}>← QRowg</a>
           <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.08)" }} />
           <input value={pageName} onChange={e => setPageName(e.target.value)} style={{ background: "transparent", border: "none", color: "#F5F0E8", fontSize: 13, fontWeight: 600, outline: "none", width: isMobile ? 96 : 160, minWidth: 0 }} />
           {saving && <span style={{ color: MUTED, fontSize: 10 }}>Enregistrement…</span>}
@@ -5440,11 +5440,11 @@
                   {/* Stats rapides */}
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
                     <div style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 10, padding: "10px", textAlign: "center" }}>
-                      <p style={{ color: G, fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>{pageStats.views}</p>
+                      <p style={{ color: G, fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif" }}>{pageStats.views}</p>
                       <p style={{ color: MUTED, fontSize: 9, margin: 0 }}>👁 Vues</p>
                     </div>
                     <div style={{ background: "rgba(57,255,143,0.06)", border: "1px solid rgba(57,255,143,0.15)", borderRadius: 10, padding: "10px", textAlign: "center" }}>
-                      <p style={{ color: "#39FF8F", fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>{pageStats.scans}</p>
+                      <p style={{ color: "#39FF8F", fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif" }}>{pageStats.scans}</p>
                       <p style={{ color: MUTED, fontSize: 9, margin: 0 }}>📱 Scans</p>
                     </div>
                   </div>
@@ -6312,11 +6312,11 @@
 
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9, width: "100%" }}>
                     <div style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 11, padding: "12px 10px", textAlign: "center" }}>
-                      <p style={{ color: G, fontSize: 24, fontWeight: 700, margin: "0 0 2px", fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{pageStats.views.toLocaleString("fr-FR")}</p>
+                      <p style={{ color: G, fontSize: 24, fontWeight: 700, margin: "0 0 2px", fontFamily: "Fraunces, serif", lineHeight: 1 }}>{pageStats.views.toLocaleString("fr-FR")}</p>
                       <p style={{ color: MUTED, fontSize: 9, margin: 0 }}>👁 Vues</p>
                     </div>
                     <div style={{ background: "rgba(57,255,143,0.06)", border: "1px solid rgba(57,255,143,0.18)", borderRadius: 11, padding: "12px 10px", textAlign: "center" }}>
-                      <p style={{ color: "#39FF8F", fontSize: 24, fontWeight: 700, margin: "0 0 2px", fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}>{pageStats.scans.toLocaleString("fr-FR")}</p>
+                      <p style={{ color: "#39FF8F", fontSize: 24, fontWeight: 700, margin: "0 0 2px", fontFamily: "Fraunces, serif", lineHeight: 1 }}>{pageStats.scans.toLocaleString("fr-FR")}</p>
                       <p style={{ color: MUTED, fontSize: 9, margin: 0 }}>📱 Scans</p>
                     </div>
                   </div>

@@ -33,7 +33,7 @@ export default function PrintCenterPanel({ result, onClose, onExport }: {
         <div style={{ display: "flex", gap: 18, padding: "22px 24px", borderBottom: "1px solid rgba(0,0,0,0.07)", alignItems: "center" }}>
           <div style={{ flexShrink: 0, width: 108, textAlign: "center" }}>
             <div style={{ fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase", color: MUTED, fontWeight: 700 }}>Qualité</div>
-            <div style={{ fontFamily: "Cormorant Garamond, Georgia, serif", fontSize: 52, fontWeight: 700, lineHeight: 1, color: scoreColor, fontVariantNumeric: "tabular-nums" }}>
+            <div style={{ fontFamily: "Fraunces, Georgia, serif", fontSize: 52, fontWeight: 700, lineHeight: 1, color: scoreColor, fontVariantNumeric: "tabular-nums" }}>
               {applicable === 0 ? "—" : `${score}%`}
             </div>
             <div style={{ color: G, fontSize: 16, letterSpacing: 2 }} aria-hidden>

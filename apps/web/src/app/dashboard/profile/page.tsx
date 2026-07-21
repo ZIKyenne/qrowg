@@ -183,7 +183,7 @@ function StatPill({ icon: Icon, label, value, color }: { icon: any; label: strin
         <Icon size={15} color={color}/>
       </div>
       <div>
-        <p style={{ color: "#F5F0E8", fontSize: 20, fontWeight: 800, margin: 0, lineHeight: 1, fontFamily: "Cormorant Garamond, serif" }}>{value}</p>
+        <p style={{ color: "#F5F0E8", fontSize: 20, fontWeight: 800, margin: 0, lineHeight: 1, fontFamily: "Fraunces, serif" }}>{value}</p>
         <p style={{ color: MUTED, fontSize: 10, margin: "2px 0 0", textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</p>
       </div>
     </div>
@@ -1128,7 +1128,7 @@ export default function ProfilePage() {
               <div style={{ width: 62, height: 62, borderRadius: "50%", background: profile?.avatar_url ? "transparent" : `linear-gradient(135deg,${pc},color-mix(in srgb, var(--accent) 55%, #000))`, border: `2px solid ${pc}66`, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", animation: "ringPulse 3.6s ease-in-out infinite" }}>
                 {profile?.avatar_url
                   ? <img src={profile.avatar_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
-                  : <span style={{ fontSize: 26, fontWeight: 700, color: "#080808", fontFamily: "Cormorant Garamond, serif" }}>{(form.full_name || profile?.email || "?")[0]?.toUpperCase()}</span>}
+                  : <span style={{ fontSize: 26, fontWeight: 700, color: "#080808", fontFamily: "Fraunces, serif" }}>{(form.full_name || profile?.email || "?")[0]?.toUpperCase()}</span>}
               </div>
               <button onClick={() => fileRef.current?.click()} disabled={uploadingAvatar} title="Changer la photo"
                 style={{ position: "absolute", bottom: 0, right: 0, width: 24, height: 24, borderRadius: "50%", background: G, border: "2px solid #0A0906", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>
@@ -1141,7 +1141,7 @@ export default function ProfilePage() {
 
             <div style={{ minWidth: 0, flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
-                <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(21px,3vw,30px)", color: "#F8F4EC", fontWeight: 700, margin: 0, lineHeight: 1.05, letterSpacing: "-0.3px" }}>
+                <h1 style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(21px,3vw,30px)", color: "#F8F4EC", fontWeight: 700, margin: 0, lineHeight: 1.05, letterSpacing: "-0.3px" }}>
                   Bonjour, {(form.full_name || "").trim().split(" ")[0] || profile?.email?.split("@")[0] || "vous"}
                 </h1>
                 <span style={{ position: "relative", overflow: "hidden", display: "inline-flex", alignItems: "center", gap: 5, background: currentPlan === "free" ? "rgba(255,255,255,0.06)" : `linear-gradient(135deg, ${pc}33, ${pc}1a)`, border: `1px solid ${pc}55`, borderRadius: 999, padding: "3px 10px" }}>
@@ -1200,7 +1200,7 @@ export default function ProfilePage() {
               ] as const).map((s, i) => (
                 <div key={i} className="hero-in hero-tile" style={{ animationDelay: `${120 + i * 80}ms`, background: "rgba(255,255,255,0.04)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "9px 7px", textAlign: "center" as const }}>
                   <span style={{ display: "inline-flex", width: 24, height: 24, borderRadius: 7, background: s.color + "1c", alignItems: "center", justifyContent: "center", marginBottom: 5 }}><s.icon size={12} color={s.color}/></span>
-                  <p style={{ color: "#F8F4EC", fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif", lineHeight: 1 }}><CountUp value={s.value}/></p>
+                  <p style={{ color: "#F8F4EC", fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif", lineHeight: 1 }}><CountUp value={s.value}/></p>
                   <p style={{ color: MUTED, fontSize: 10.5, margin: "2px 0 0" }}>{s.label}</p>
                 </div>
               ))}
@@ -1309,7 +1309,7 @@ export default function ProfilePage() {
                     ) : profile?.avatar_url ? (
                       <img src={profile.avatar_url} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
                     ) : (
-                      <span style={{ fontSize:26, fontWeight:700, color:"#080808", fontFamily:"Cormorant Garamond, serif" }}>
+                      <span style={{ fontSize:26, fontWeight:700, color:"#080808", fontFamily:"Fraunces, serif" }}>
                         {(form.full_name || profile?.email || "?")[0]?.toUpperCase()}
                       </span>
                     )}
@@ -1324,7 +1324,7 @@ export default function ProfilePage() {
                 </div>
                 {/* Infos preview + actions */}
                 <div style={{ flex:1, minWidth:0 }}>
-                  <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:700, margin:"0 0 2px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, fontFamily:"Cormorant Garamond, serif" }}>
+                  <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:700, margin:"0 0 2px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, fontFamily:"Fraunces, serif" }}>
                     {form.full_name || "Sans nom"}
                   </p>
                   {form.username && (
@@ -1645,7 +1645,7 @@ export default function ProfilePage() {
                   { value:totalMonths,       label:"Mois Pro",     color:"#39FF8F" },
                 ] as const).map((k, i) => (
                   <div key={i} style={{ background:SURF2, border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 8px", textAlign:"center" as const }}>
-                    <p style={{ color:k.color, fontSize:20, fontWeight:800, margin:0, fontFamily:"Cormorant Garamond, serif", lineHeight:1 }}>{k.value}</p>
+                    <p style={{ color:k.color, fontSize:20, fontWeight:800, margin:0, fontFamily:"Fraunces, serif", lineHeight:1 }}>{k.value}</p>
                     <p style={{ color:MUTED, fontSize:9, margin:"3px 0 0", lineHeight:1.3 }}>{k.label}</p>
                   </div>
                 ))}
@@ -1813,7 +1813,7 @@ export default function ProfilePage() {
                         </div>
                         <span style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:0.8, lineHeight:1.2 }}>{s.label}</span>
                       </div>
-                      <p style={{ color:"#F5F0E8", fontSize:18, fontWeight:800, margin:0, fontFamily:"Cormorant Garamond, serif", lineHeight:1 }}>
+                      <p style={{ color:"#F5F0E8", fontSize:18, fontWeight:800, margin:0, fontFamily:"Fraunces, serif", lineHeight:1 }}>
                         {s.value}
                       </p>
                     </div>
@@ -1825,7 +1825,7 @@ export default function ProfilePage() {
                   <div style={{ background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 12px" }}>
                     <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:0.8, margin:"0 0 5px" }}>Taux conversion</p>
                     <div style={{ display:"flex", alignItems:"flex-end", gap:6 }}>
-                      <p style={{ color:convRate > 10 ? "#39FF8F" : convRate > 5 ? G : MUTED, fontSize:22, fontWeight:800, margin:0, fontFamily:"Cormorant Garamond, serif", lineHeight:1 }}>
+                      <p style={{ color:convRate > 10 ? "#39FF8F" : convRate > 5 ? G : MUTED, fontSize:22, fontWeight:800, margin:0, fontFamily:"Fraunces, serif", lineHeight:1 }}>
                         {convRate}%
                       </p>
                       <span style={{ color:MUTED, fontSize:9, paddingBottom:2 }}>scans / vues</span>
@@ -1837,7 +1837,7 @@ export default function ProfilePage() {
                   </div>
                   <div style={{ background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 12px" }}>
                     <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:0.8, margin:"0 0 5px" }}>Vues / page moy.</p>
-                    <p style={{ color:"#F5F0E8", fontSize:22, fontWeight:800, margin:0, fontFamily:"Cormorant Garamond, serif", lineHeight:1 }}>
+                    <p style={{ color:"#F5F0E8", fontSize:22, fontWeight:800, margin:0, fontFamily:"Fraunces, serif", lineHeight:1 }}>
                       {avgViews.toLocaleString("fr-FR")}
                     </p>
                   </div>
@@ -2292,7 +2292,7 @@ export default function ProfilePage() {
                         <p style={{ color:MUTED, fontSize:14, fontWeight:700, margin:0 }}>Gratuit</p>
                       ) : (
                         <>
-                          <p style={{ color:"#F5F0E8", fontSize:18, fontWeight:800, margin:0, fontFamily:"Cormorant Garamond, serif", lineHeight:1 }}>
+                          <p style={{ color:"#F5F0E8", fontSize:18, fontWeight:800, margin:0, fontFamily:"Fraunces, serif", lineHeight:1 }}>
                             {subCycle==="annual" ? planCfg.price_annual : planCfg.price_monthly}.
                           </p>
                           <p style={{ color:MUTED, fontSize:9, margin:"2px 0 0" }}>/ mois</p>
@@ -2653,11 +2653,11 @@ export default function ProfilePage() {
                     <div style={{ padding:"12px 14px", background:"rgba(236,72,153,0.05)", border:"1px solid rgba(236,72,153,0.12)", borderRadius:10 }}>
                       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, textAlign:"center" as const }}>
                         <div>
-                          <p style={{ color:"#EC4899", fontSize:20, fontWeight:800, margin:0, fontFamily:"Cormorant Garamond, serif" }}>{totalMonths}</p>
+                          <p style={{ color:"#EC4899", fontSize:20, fontWeight:800, margin:0, fontFamily:"Fraunces, serif" }}>{totalMonths}</p>
                           <p style={{ color:MUTED, fontSize:10, margin:0 }}>Mois Pro gagnes</p>
                         </div>
                         <div>
-                          <p style={{ color:"#7B61FF", fontSize:20, fontWeight:800, margin:0, fontFamily:"Cormorant Garamond, serif" }}>{validatedRefs}</p>
+                          <p style={{ color:"#7B61FF", fontSize:20, fontWeight:800, margin:0, fontFamily:"Fraunces, serif" }}>{validatedRefs}</p>
                           <p style={{ color:MUTED, fontSize:10, margin:0 }}>Parrainages valides</p>
                         </div>
                       </div>
@@ -2959,7 +2959,7 @@ export default function ProfilePage() {
                     { label:"En attente",value:domains.filter(d=>d.vercel_status==="pending").length,      color:"#F97316" },
                   ] as const).map((k,i) => (
                     <div key={i} style={{ background:SURF2, border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"9px 10px", textAlign:"center" as const }}>
-                      <p style={{ color:k.color, fontSize:18, fontWeight:800, margin:0, fontFamily:"Cormorant Garamond, serif", lineHeight:1 }}>{k.value}</p>
+                      <p style={{ color:k.color, fontSize:18, fontWeight:800, margin:0, fontFamily:"Fraunces, serif", lineHeight:1 }}>{k.value}</p>
                       <p style={{ color:MUTED, fontSize:9, margin:"3px 0 0" }}>{k.label}</p>
                     </div>
                   ))}

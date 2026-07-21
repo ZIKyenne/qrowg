@@ -169,7 +169,7 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
     return (
       <div style={{ minHeight: '100vh', background: '#080808', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 28, fontFamily: 'DM Sans, sans-serif' }}>
         <div style={{ width: 66, height: 66, borderRadius: 18, background: 'color-mix(in srgb, var(--accent) 14%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 35%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20, fontSize: 30 }}>🖥️</div>
-        <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 26, color: '#F5F0E8', fontWeight: 700, margin: '0 0 10px', maxWidth: 330 }}>
+        <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: 26, color: '#F5F0E8', fontWeight: 700, margin: '0 0 10px', maxWidth: 330 }}>
           L’éditeur s’utilise sur ordinateur
         </h2>
         <p style={{ color: '#A8A190', fontSize: 14, lineHeight: 1.6, margin: '0 0 24px', maxWidth: 340 }}>
@@ -200,7 +200,7 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
         display: 'flex', alignItems: 'center', padding: '0 20px', gap: '12px', flexShrink: 0,
       }}>
         <a href="/dashboard" style={{
-          fontFamily: 'Cormorant Garamond, serif', fontSize: '20px', fontWeight: 300,
+          fontFamily: 'Fraunces, serif', fontSize: '20px', fontWeight: 300,
           color: '#F5F0E8', textDecoration: 'none',
         }}>
           QR<span style={{ color: '#C9A84C', fontWeight: 600 }}>folio</span>

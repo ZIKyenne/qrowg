@@ -25,7 +25,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
   return (
     <div style={{ minHeight: "100dvh", background: "#080808", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "DM Sans, sans-serif", padding: 24, textAlign: "center" }}>
       <div style={{ fontSize: 52, marginBottom: 12 }}>⚠️</div>
-      <p style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 30, color: "#C9A84C", fontWeight: 700, margin: "0 0 8px", lineHeight: 1 }}>{chunk ? "Mise à jour de l'application" : "Une erreur est survenue"}</p>
+      <p style={{ fontFamily: "Fraunces, serif", fontSize: 30, color: "#C9A84C", fontWeight: 700, margin: "0 0 8px", lineHeight: 1 }}>{chunk ? "Mise à jour de l'application" : "Une erreur est survenue"}</p>
       <p style={{ color: "#A8A190", fontSize: 14, margin: "0 0 28px", maxWidth: 360, lineHeight: 1.6 }}>
         {chunk
           ? "Une nouvelle version vient d'être publiée. Rechargement en cours… Si rien ne se passe, touchez Recharger."

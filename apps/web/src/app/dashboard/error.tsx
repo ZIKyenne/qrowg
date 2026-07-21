@@ -37,7 +37,7 @@ export default function DashboardError({ error, reset }: { error: Error & { dige
         <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(255,107,107,0.12)", border: "1px solid rgba(255,107,107,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
           <AlertTriangle size={24} color="#FF6B6B" />
         </div>
-        <h1 style={{ color: "#F8F4EC", fontSize: 22, fontWeight: 700, margin: "0 0 8px", fontFamily: "Cormorant Garamond, serif" }}>{chunk ? "Mise à jour de l'application" : "Oups, un souci est survenu"}</h1>
+        <h1 style={{ color: "#F8F4EC", fontSize: 22, fontWeight: 700, margin: "0 0 8px", fontFamily: "Fraunces, serif" }}>{chunk ? "Mise à jour de l'application" : "Oups, un souci est survenu"}</h1>
         <p style={{ color: "#C9C3B6", fontSize: 13.5, margin: "0 0 20px", lineHeight: 1.6 }}>
           {chunk
             ? "Une nouvelle version vient d'être publiée. Rechargement en cours… Si rien ne se passe, touchez Recharger."

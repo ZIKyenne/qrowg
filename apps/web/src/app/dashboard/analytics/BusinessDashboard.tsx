@@ -438,7 +438,7 @@ export default function BusinessDashboard({ profile, pages, views, scans, clicks
           <div>
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:4 }}>
               <LayoutGrid size={20} color={G}/>
-              <h1 style={{ fontFamily:"Cormorant Garamond, serif", fontSize:26, color:"#F5F0E8", fontWeight:700, margin:0 }}>
+              <h1 style={{ fontFamily:"Fraunces, serif", fontSize:26, color:"#F5F0E8", fontWeight:700, margin:0 }}>
                 Dashboard
               </h1>
             </div>

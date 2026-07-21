@@ -110,7 +110,7 @@ export default function OnboardingChecklist() {
       <div style={{ background: "linear-gradient(135deg,rgba(57,255,143,0.08),rgba(201,168,76,0.06))", border: "1px solid rgba(57,255,143,0.25)", borderRadius: 16, padding: "20px 24px", marginBottom: 24, display: "flex", alignItems: "center", gap: 16, fontFamily: "DM Sans, sans-serif" }}>
         <div style={{ width: 48, height: 48, borderRadius: "50%", background: "rgba(57,255,143,0.15)", border: "1px solid rgba(57,255,143,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>🎉</div>
         <div style={{ flex: 1 }}>
-          <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: "0 0 2px", fontFamily: "Cormorant Garamond, serif" }}>Configuration terminée !</p>
+          <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: "0 0 2px", fontFamily: "Fraunces, serif" }}>Configuration terminée !</p>
           <p style={{ color: "#A8A190", fontSize: 13, margin: 0 }}>Tu as complété toutes les étapes. QRowg est prêt à être utilisé.</p>
         </div>
         <button onClick={dismiss} style={{ background: "rgba(57,255,143,0.1)", border: "1px solid rgba(57,255,143,0.25)", borderRadius: 8, padding: "8px 16px", color: "#39FF8F", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
@@ -134,7 +134,7 @@ export default function OnboardingChecklist() {
             <Sparkles size={18} color="#C9A84C" />
           </div>
           <div>
-            <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0, fontFamily: "Cormorant Garamond, serif" }}>
+            <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif" }}>
               Bienvenue sur QRowg ! 👋
             </p>
             <p style={{ color: "#A8A190", fontSize: 12, margin: 0 }}>{progress}/{total} étapes complétées</p>

@@ -74,7 +74,7 @@ function editDims(fmt: FormatId) {
 // ---- Polices web-safe (rendu canvas fiable) --------------------------------
 // Polices : web-safe + Google (injectees par QRStudio et par PrintStudio)
 const FONT_GROUPS: { label: string; fonts: string[] }[] = [
-  { label: "Luxe & raffinées", fonts: ["Cinzel", "Marcellus", "Italiana", "Cormorant Garamond", "Playfair Display", "Fraunces", "DM Serif Display", "EB Garamond", "Libre Baskerville", "Abril Fatface"] },
+  { label: "Luxe & raffinées", fonts: ["Cinzel", "Marcellus", "Italiana", "Fraunces", "Playfair Display", "Fraunces", "DM Serif Display", "EB Garamond", "Libre Baskerville", "Abril Fatface"] },
   { label: "Élégantes",  fonts: ["Lora", "Merriweather", "Georgia", "Times New Roman"] },
   { label: "Modernes",   fonts: ["Inter", "Manrope", "Outfit", "Space Grotesk", "Sora", "Archivo", "Poppins", "Montserrat", "Raleway", "Josefin Sans"] },
   { label: "Impact & display", fonts: ["Bebas Neue", "Anton", "Oswald", "Syne", "Unbounded", "Bricolage Grotesque", "Impact"] },
@@ -788,13 +788,13 @@ const BG_PRESETS: { id: string; type: "solid" | "grad" | "mesh"; c1: string; c2?
 
 // Styles globaux : un clic recolore + retypographie tout le design
 const GLOBAL_STYLES: { id: string; label: string; bg: string; ink: string; accent: string; titleFont: string; bodyFont: string }[] = [
-  { id: "luxgold",     label: "Luxury Gold",      bg: "#0B0805", ink: "#F4E7C4", accent: "#D4AF37", titleFont: "Cormorant Garamond", bodyFont: "Montserrat" },
+  { id: "luxgold",     label: "Luxury Gold",      bg: "#0B0805", ink: "#F4E7C4", accent: "#D4AF37", titleFont: "Fraunces", bodyFont: "Montserrat" },
   { id: "modernblack", label: "Modern Black",     bg: "#0E0E10", ink: "#FFFFFF", accent: "#FFFFFF", titleFont: "Bebas Neue",         bodyFont: "Montserrat" },
   { id: "restofresh",  label: "Restaurant Fresh", bg: "#FFF8EE", ink: "#2A2419", accent: "#C0392B", titleFont: "Playfair Display",   bodyFont: "Poppins" },
   { id: "corporate",   label: "Corporate Blue",   bg: "#F4F8FC", ink: "#0F2540", accent: "#1D4ED8", titleFont: "Montserrat",         bodyFont: "Arial" },
   { id: "neon",        label: "Neon Creator",     bg: "#0A0A14", ink: "#EAEAFF", accent: "#FF3D9A", titleFont: "Bebas Neue",         bodyFont: "Poppins" },
   { id: "minimal",     label: "Minimal White",    bg: "#FFFFFF", ink: "#1A1A1A", accent: "#1A1A1A", titleFont: "Raleway",            bodyFont: "Arial" },
-  { id: "premiumdark", label: "Premium Dark",     bg: "#101010", ink: "#F5F0E8", accent: "#C9A84C", titleFont: "Cormorant Garamond", bodyFont: "Montserrat" },
+  { id: "premiumdark", label: "Premium Dark",     bg: "#101010", ink: "#F5F0E8", accent: "#C9A84C", titleFont: "Fraunces", bodyFont: "Montserrat" },
   { id: "sunset",      label: "Bold Sunset",      bg: "#1A0E14", ink: "#FFE8D6", accent: "#FF7A4D", titleFont: "Bebas Neue",         bodyFont: "Poppins" },
   { id: "sage",        label: "Sage Natural",     bg: "#F2F4EE", ink: "#2B3326", accent: "#6B8E5A", titleFont: "Lora",               bodyFont: "Raleway" },
   { id: "editorial",   label: "Ink Editorial",    bg: "#FBFAF7", ink: "#1A1A1A", accent: "#1A1A1A", titleFont: "Playfair Display",   bodyFont: "Montserrat" },
@@ -4944,14 +4944,14 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
                 <p style={{ color: pMuted, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 8px" }}>Texte</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                   {([
-                    { text: "Titre", size: 54, weight: "bold", font: "Cormorant Garamond", label: "Titre", pv: 22 },
+                    { text: "Titre", size: 54, weight: "bold", font: "Fraunces", label: "Titre", pv: 22 },
                     { text: "Sous-titre", size: 30, weight: "normal", font: "Montserrat", label: "Sous-titre", pv: 15 },
                     { text: "Votre texte ici", size: 20, weight: "normal", font: "Arial", label: "Corps de texte", pv: 12 },
                     { text: "TITRE", size: 62, weight: "bold", font: "Bebas Neue", label: "Titre impact", pv: 20 },
                     { text: "Merci", size: 46, weight: "normal", font: "Pacifico", label: "Manuscrit", pv: 20 },
                     { text: "Élégance", size: 50, weight: "bold", font: "Playfair Display", label: "Titre chic", pv: 21 },
                     { text: "Nouveauté", size: 34, weight: "bold", font: "Oswald", label: "Accroche condensée", pv: 17 },
-                    { text: "« Citation »", size: 28, weight: "normal", font: "Cormorant Garamond", label: "Citation", pv: 16 },
+                    { text: "« Citation »", size: 28, weight: "normal", font: "Fraunces", label: "Citation", pv: 16 },
                     { text: "Bienvenue", size: 40, weight: "normal", font: "Dancing Script", label: "Script élégant", pv: 20 },
                   ] as const).map((p, i) => (
                     <button key={i} type="button" onClick={() => addTextPreset(p)}

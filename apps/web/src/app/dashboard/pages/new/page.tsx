@@ -46,7 +46,7 @@ export default function NewPagePage() {
             Étape 1 sur 2
           </div>
           <h1 style={{
-            fontFamily: 'Cormorant Garamond, serif',
+            fontFamily: 'Fraunces, serif',
             fontSize: '36px', fontWeight: 300, letterSpacing: '-0.5px',
             marginBottom: '8px',
           }}>
