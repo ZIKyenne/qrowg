@@ -197,6 +197,38 @@ function QRMockup() {
       style={{ position: "relative", width: "min(380px, 88vw)", aspectRatio: "1 / 1", margin: "0 auto",
         cursor: "default" }}
     >
+      {/* Ecosysteme — cartes de metiers flottantes derriere le QR (donne l'impression
+          d'une plateforme, pas d'un simple generateur). Purement decoratif. */}
+      {[
+        { label: "Restaurant", emoji: "🍽", pos: { top: "-6%",  left: "-33%"  }, rot: -9, dur: 6.5, delay: 0   },
+        { label: "Portfolio",  emoji: "🎨", pos: { top: "8%",   right: "-35%" }, rot: 8,  dur: 7.5, delay: 0.9 },
+        { label: "Immobilier", emoji: "🏠", pos: { bottom: "14%", left: "-38%" }, rot: -6, dur: 8,   delay: 1.6 },
+        { label: "Bar",        emoji: "🍸", pos: { bottom: "-2%",  right: "-30%" }, rot: 10, dur: 6.8, delay: 0.5 },
+      ].map((c) => (
+        <div key={c.label} className="eco-card" aria-hidden="true" style={{
+          position: "absolute", ...c.pos, zIndex: 0, pointerEvents: "none",
+          transform: `rotate(${c.rot}deg)`, filter: "blur(0.4px)",
+          animation: inView ? "revealUp 0.8s ease 0.4s both" : "none",
+        }}>
+          <div style={{ animation: `floatCard ${c.dur}s ease-in-out ${c.delay}s infinite`, willChange: "transform" }}>
+            <div style={{
+              display: "flex", alignItems: "center", gap: 9,
+              padding: "10px 14px", borderRadius: 14,
+              background: "linear-gradient(145deg, rgba(28,25,19,0.92), rgba(16,15,11,0.92))",
+              border: "1px solid rgba(201,168,76,0.22)",
+              boxShadow: "0 18px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(201,168,76,0.1)",
+              backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)",
+            }}>
+              <span style={{
+                width: 28, height: 28, borderRadius: 9, flexShrink: 0,
+                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15,
+                background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.2)",
+              }}>{c.emoji}</span>
+              <span style={{ color: "#E8E2D4", fontSize: 12.5, fontWeight: 600, whiteSpace: "nowrap" }}>{c.label}</span>
+            </div>
+          </div>
+        </div>
+      ))}
       {/* Ambient glow outer */}
       <div style={{
         position: "absolute", inset: -40, borderRadius: "50%",
@@ -265,21 +297,38 @@ function QRMockup() {
           boxShadow: "0 0 18px 3px rgba(201,168,76,0.55)",
           animation: "scanLine 3.4s ease-in-out infinite", pointerEvents: "none", zIndex: 3,
         }} />
-        {/* QR grid (échelle relative -> grandit avec la carte) */}
+        {/* Balayage lumineux — une lumiere traverse doucement le QR (boucle infinie discrete) */}
+        <div aria-hidden="true" style={{
+          position: "absolute", top: "18%", bottom: "18%", left: "18%", right: "18%",
+          overflow: "hidden", borderRadius: 8, zIndex: 2, pointerEvents: "none",
+        }}>
+          <div style={{
+            position: "absolute", top: 0, bottom: 0, width: "45%",
+            background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.32), transparent)",
+            animation: "sweepLight 5.2s ease-in-out 1.6s infinite", willChange: "transform, opacity",
+          }} />
+        </div>
+        {/* QR grid (échelle relative -> grandit avec la carte). Construction progressive
+            module par module a l'apparition (stagger sequentiel = effet "assemblage"). */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: "4.5%", width: "60%", aspectRatio: "1 / 1", position: "relative", zIndex: 1 }}>
-          {Array.from({ length: 49 }, (_, i) => (
-            <div key={i} style={{
-              aspectRatio: "1 / 1", borderRadius: "22%",
-              background: goldCells.includes(i)
-                ? "#C9A84C"
-                : corners.includes(i)
-                ? "#F5F0E8"
-                : "rgba(245,240,232,0.15)",
-              opacity: goldCells.includes(i) ? 1 : corners.includes(i) ? 0.92 : 0.5,
-              boxShadow: goldCells.includes(i) ? "0 0 6px rgba(201,168,76,0.6)" : "none",
-              transition: "all 0.3s ease"
-            }} />
-          ))}
+          {Array.from({ length: 49 }, (_, i) => {
+            const o = goldCells.includes(i) ? 1 : corners.includes(i) ? 0.92 : 0.5
+            return (
+              <div key={i} style={{
+                aspectRatio: "1 / 1", borderRadius: "22%",
+                background: goldCells.includes(i)
+                  ? "#C9A84C"
+                  : corners.includes(i)
+                  ? "#F5F0E8"
+                  : "rgba(245,240,232,0.15)",
+                opacity: o,
+                ["--o" as string]: o,
+                boxShadow: goldCells.includes(i) ? "0 0 6px rgba(201,168,76,0.6)" : "none",
+                animation: inView ? `qrReveal 0.5s cubic-bezier(0.34,1.56,0.64,1) ${i * 12}ms both` : "none",
+                willChange: "transform, opacity",
+              } as React.CSSProperties} />
+            )
+          })}
         </div>
         <p style={{ color: "#C9A84C", fontSize: 11, letterSpacing: 4, textTransform: "uppercase", position: "relative", zIndex: 1, fontWeight: 600 }}>QROWG.COM</p>
       </div>
@@ -3054,23 +3103,6 @@ function PrintStudioSection() {
 
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
-  const [titleVisible, setTitleVisible] = useState(false)
-  const [charIndex, setCharIndex] = useState(0)
-  const title = "Créez votre page pro et votre QR code en quelques minutes."
-
-  useEffect(() => {
-    const t = setTimeout(() => setTitleVisible(true), 400)
-    return () => clearTimeout(t)
-  }, [])
-
-  useEffect(() => {
-    if (!titleVisible) return
-    if (charIndex < title.length) {
-      const t = setTimeout(() => setCharIndex(i => i + 1), 38)
-      return () => clearTimeout(t)
-    }
-  }, [titleVisible, charIndex, title.length])
-
   // Barre CTA mobile : apparaît une fois le hero dépassé, MAIS se masque pres du
   // bas de page pour ne pas doublonner le CTA final (#01).
   const [showSticky, setShowSticky] = useState(false)
@@ -3095,6 +3127,10 @@ export default function HomePage() {
         @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
         @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;}}
         @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+        @keyframes floatCard { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+        @keyframes qrReveal { from{opacity:0;transform:scale(0.25)} to{opacity:var(--o,1);transform:scale(1)} }
+        @keyframes revealUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes sweepLight { 0%{transform:translateX(-140%) skewX(-18deg);opacity:0} 12%{opacity:0.9} 30%{opacity:0} 100%{transform:translateX(140%) skewX(-18deg);opacity:0} }
         @keyframes gradientShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
         @keyframes glowPulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
@@ -3115,6 +3151,7 @@ export default function HomePage() {
           .nav-links { gap: 20px !important; }
         }
         @media (max-width: 760px) { .hero-finder { display: none !important; } }
+        @media (max-width: 900px) { .eco-card { display: none !important; } }
         * { box-sizing: border-box; }
       `}</style>
 
@@ -3169,36 +3206,44 @@ export default function HomePage() {
               La page qui remplace votre carte de visite
             </div>
 
-            {/* Titre */}
+            {/* Titre — hierarchie forte, reveal ligne par ligne (aucun effet flashy).
+                Les 2 premieres lignes posent le produit, la 3e (or) porte le differenciateur. */}
             <h1 style={{
               fontFamily: "Fraunces, serif",
-              fontSize: "clamp(40px, 5vw, 76px)",
-              color: "#F5F0E8", fontWeight: 700, lineHeight: 1.06,
-              margin: "0 0 28px", letterSpacing: "-0.02em",
-              minHeight: "3em",
-              animation: "fadeUp 0.6s ease 0.2s both"
+              fontSize: "clamp(42px, 5.2vw, 78px)",
+              color: "#F5F0E8", fontWeight: 700, lineHeight: 1.02,
+              margin: "0 0 26px", letterSpacing: "-0.025em",
             }}>
-              {title.slice(0, charIndex)}
+              <span style={{ display: "block", animation: "fadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.15s both" }}>
+                Une page pro.
+              </span>
+              <span style={{ display: "block", animation: "fadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.30s both" }}>
+                Un QR&nbsp;code dynamique.
+              </span>
               <span style={{
-                borderRight: "2px solid #C9A84C",
-                animation: charIndex < title.length ? "none" : "glowPulse 1s ease-in-out infinite",
-                opacity: charIndex < title.length ? 1 : 0.7
-              }} />
+                display: "block", animation: "fadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.45s both",
+                background: "linear-gradient(100deg, #E9CB6E 0%, #C9A84C 45%, #a98a3c 100%)",
+                backgroundSize: "200% 100%", WebkitBackgroundClip: "text", backgroundClip: "text",
+                WebkitTextFillColor: "transparent", color: "transparent",
+              }}>
+                Zéro réimpression.
+              </span>
             </h1>
 
-            {/* Sous-titre */}
+            {/* Sous-titre — benefice d'abord, phrases courtes, tres lisible */}
             <p style={{
-              color: "rgba(226,220,206,0.9)", fontSize: 18, lineHeight: 1.65,
-              margin: "0 0 40px", maxWidth: 460,
-              animation: "fadeUp 0.6s ease 0.35s both"
+              color: "rgba(226,220,206,0.92)", fontSize: 18.5, lineHeight: 1.6,
+              margin: "0 0 38px", maxWidth: 468, fontWeight: 400,
+              animation: "fadeUp 0.7s ease 0.6s both"
             }}>
-              Partagez vos coordonnées, réseaux, menu et services depuis une page unique — modifiable à tout moment, sans réimprimer votre QR code.
+              Regroupez tout ce que vous êtes sur <strong style={{ color: "#F5F0E8", fontWeight: 600 }}>une seule page</strong> — coordonnées, réseaux, menu, portfolio.
+              Modifiez-la quand vous voulez : <strong style={{ color: "#F5F0E8", fontWeight: 600 }}>votre QR&nbsp;code ne change jamais</strong>.
             </p>
 
             {/* CTAs */}
             <div className="hero-ctas" style={{
               display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center",
-              animation: "fadeUp 0.6s ease 0.5s both"
+              animation: "fadeUp 0.7s ease 0.75s both"
             }}>
               <Link href="/auth/signup" style={{
                 background: "linear-gradient(90deg, #C9A84C, #d4a843, #b8953f)",
@@ -3241,15 +3286,18 @@ export default function HomePage() {
                   el.style.color = "rgba(245,240,232,0.7)"
                   el.style.background = "transparent"
                 }}>
-                Voir comment ça marche
-                <span style={{ fontSize: 16, transition: "transform 0.2s" }}>→</span>
+                <span aria-hidden="true" style={{
+                  fontSize: 11, display: "inline-flex", alignItems: "center", justifyContent: "center",
+                  width: 20, height: 20, borderRadius: "50%", border: "1px solid currentColor",
+                }}>▶</span>
+                Voir la démo
               </Link>
             </div>
 
             {/* Micro-réassurance */}
             <div className="hero-reassurance" style={{
-              display: "flex", gap: 20, marginTop: 28, flexWrap: "wrap",
-              animation: "fadeUp 0.6s ease 0.65s both"
+              display: "flex", gap: 20, marginTop: 26, flexWrap: "wrap",
+              animation: "fadeUp 0.7s ease 0.9s both"
             }}>
               {["Gratuit", "Sans carte bancaire", "Prêt en 5 min"].map((item) => (
                 <span key={item} style={{
@@ -3273,7 +3321,42 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* (roadmap doublon retirée — un seul parcours, voir HowItWorks #how) */}
+      {/* BANDE DE REASSURANCE — signaux de confiance VRAIS, sous le hero.
+          NB : pas de faux chiffres/avis inventes ici. Quand tu auras des vraies
+          donnees (nb de pages creees, note moyenne, logos clients), remplace le
+          bloc ci-dessous par : "★★★★★ 4,9/5 · +X pages creees · +X QR generes". */}
+      <FadeIn>
+        <section aria-label="Garanties" style={{
+          padding: "8px 48px 28px", position: "relative", zIndex: 1,
+        }}>
+          <div style={{
+            maxWidth: 1140, margin: "0 auto",
+            display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center",
+            gap: "14px 34px",
+            paddingTop: 26, borderTop: "1px solid rgba(201,168,76,0.1)",
+          }}>
+            {[
+              { ic: "🔒", label: "Chiffré de bout en bout" },
+              { ic: "🇪🇺", label: "Hébergé en Europe · RGPD" },
+              { ic: "∞",  label: "QR code dynamique illimité" },
+              { ic: "✓",  label: "Sans engagement, sans carte" },
+            ].map((t) => (
+              <span key={t.label} style={{
+                display: "inline-flex", alignItems: "center", gap: 9,
+                color: "#9E9887", fontSize: 13.5, fontWeight: 500,
+              }}>
+                <span aria-hidden="true" style={{
+                  width: 26, height: 26, borderRadius: 8, flexShrink: 0,
+                  display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 13,
+                  background: "rgba(201,168,76,0.09)", border: "1px solid rgba(201,168,76,0.18)",
+                  color: "#C9A84C",
+                }}>{t.ic}</span>
+                {t.label}
+              </span>
+            ))}
+          </div>
+        </section>
+      </FadeIn>
 
       {/* HOW IT WORKS */}
       <HowItWorks />
