@@ -3,9 +3,11 @@ import { NextRequest, NextResponse } from "next/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
 import { escapeHtml } from "@/lib/escapeHtml"
 import { emailShell, emailH1, emailP, emailButton } from "@/lib/emailLayout"
+import { hasInternalToken } from "@/lib/rateLimit"
 
 export async function POST(req: NextRequest) {
   try {
+    if (!hasInternalToken(req)) return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
     const apiKey = process.env.RESEND_API_KEY
     if (!apiKey) return NextResponse.json({ error: "Service email non configuré" }, { status: 503 })
     const resend = new Resend(apiKey)

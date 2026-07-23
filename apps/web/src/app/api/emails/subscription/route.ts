@@ -2,11 +2,13 @@ import { Resend } from "resend"
 import { NextRequest, NextResponse } from "next/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
 import { buildSubscriptionEmail } from "@/lib/subscriptionEmail"
+import { hasInternalToken } from "@/lib/rateLimit"
 
-// Email de bienvenue abonnement. Declenche par le webhook Stripe (voir
-// api/webhooks/stripe). Cette route permet aussi un envoi manuel / test.
+// Email de bienvenue abonnement. Le webhook Stripe envoie directement (via
+// buildSubscriptionEmail) ; cette route sert d'envoi manuel/test -> secret requis.
 export async function POST(req: NextRequest) {
   try {
+    if (!hasInternalToken(req)) return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
     const apiKey = process.env.RESEND_API_KEY
     if (!apiKey) return NextResponse.json({ error: "Service email non configuré" }, { status: 503 })
     const resend = new Resend(apiKey)

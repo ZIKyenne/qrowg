@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
 import { escapeHtml as esc } from "@/lib/escapeHtml"
 import { emailShell, emailH1, emailButton } from "@/lib/emailLayout"
+import { rateLimit, ipOf } from "@/lib/rateLimit"
 
 const TYPE_LABELS: Record<string, string> = {
   quote: "Demande de devis", reservation: "Réservation", booking: "Réservation événement",
@@ -12,6 +13,8 @@ const TYPE_LABELS: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   try {
+    // Route appelée par des visiteurs anonymes (soumission de lead) -> rate-limit.
+    if (!rateLimit("new-lead:" + ipOf(req), 10, 600_000)) return NextResponse.json({ error: "Trop de requêtes" }, { status: 429 })
     const { pageId, type, name, email, phone, message, data } = await req.json()
     if (!pageId) return NextResponse.json({ error: "pageId requis" }, { status: 400 })
 

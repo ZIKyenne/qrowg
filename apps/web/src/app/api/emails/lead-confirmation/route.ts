@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
 import { escapeHtml as esc } from "@/lib/escapeHtml"
 import { emailShell } from "@/lib/emailLayout"
+import { rateLimit, ipOf } from "@/lib/rateLimit"
 
 const TYPE_INTRO: Record<string, string> = {
   quote: "Votre demande de devis a bien été reçue.",
@@ -20,12 +21,21 @@ function isEmail(s: string) {
 
 export async function POST(req: NextRequest) {
   try {
+    if (!rateLimit("lead-confirm:" + ipOf(req), 10, 600_000)) return NextResponse.json({ error: "Trop de requêtes" }, { status: 429 })
     const { pageId, email, name, type } = await req.json()
     if (!pageId || !isEmail(email)) return NextResponse.json({ error: "Paramètres invalides" }, { status: 200 })
 
     const admin = createAdminClient()
     const { data: page } = await admin.from("pages").select("title, user_id").eq("id", pageId).single()
     if (!page) return NextResponse.json({ error: "Page introuvable" }, { status: 404 })
+
+    // Anti-relais : n'envoie l'accusé que si un vrai lead vient d'être créé pour
+    // ce (pageId, email). Empêche l'envoi d'emails à des adresses arbitraires.
+    const { data: recentLead } = await admin.from("leads").select("id")
+      .eq("page_id", pageId).eq("email", email)
+      .gte("created_at", new Date(Date.now() - 15 * 60_000).toISOString())
+      .limit(1).maybeSingle()
+    if (!recentLead) return NextResponse.json({ success: true, skipped: true })
 
     const { data: profile } = await admin.from("profiles").select("email, full_name").eq("id", page.user_id).single()
     const replyTo = profile?.email

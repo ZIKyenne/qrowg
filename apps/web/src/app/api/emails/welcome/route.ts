@@ -2,6 +2,7 @@ import { Resend } from "resend"
 import { NextRequest, NextResponse } from "next/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
 import { escapeHtml } from "@/lib/escapeHtml"
+import { hasInternalToken } from "@/lib/rateLimit"
 
 // Email d'accueil — HTML "bulletproof" : layout en tables + styles 100% inline
 // (Gmail & co strippent le <style> du <head>, donc on ne s'appuie JAMAIS dessus).
@@ -108,6 +109,9 @@ const WELCOME_HTML = `<!DOCTYPE html>
 
 export async function POST(req: NextRequest) {
   try {
+    // Route interne (appelée uniquement côté serveur au signup) : secret requis
+    // pour empêcher le relais email ouvert (spam/phishing signé @qrowg.com).
+    if (!hasInternalToken(req)) return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
     const apiKey = process.env.RESEND_API_KEY
     if (!apiKey) return NextResponse.json({ error: "Service email non configuré" }, { status: 503 })
     const resend = new Resend(apiKey)

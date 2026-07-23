@@ -44,7 +44,10 @@ export async function signUp(formData: FormData) {
     try {
       await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/emails/welcome`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-internal-token': process.env.CRON_SECRET || '',
+        },
         body: JSON.stringify({ email, name: full_name }),
       })
     } catch {}
