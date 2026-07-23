@@ -2366,10 +2366,18 @@ export default function ProfilePage() {
                     </a>
                   )}
                   {currentPlan !== "free" && (
-                    <a href="https://billing.stripe.com/p/login/test" target="_blank" rel="noopener noreferrer"
-                      style={{ flex:currentPlan==="business"?1:0, display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding:"10px 14px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:MUTED, textDecoration:"none", fontSize:12, cursor:"pointer", whiteSpace:"nowrap" as const }}>
+                    <button type="button"
+                      onClick={async () => {
+                        try {
+                          const res = await fetch("/api/stripe/portal", { method: "POST" })
+                          const data = await res.json()
+                          if (data.url) window.location.href = data.url
+                          else alert(data.error || "Portail de facturation indisponible pour le moment.")
+                        } catch { alert("Impossible d'ouvrir le portail de facturation.") }
+                      }}
+                      style={{ flex:currentPlan==="business"?1:0, display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding:"10px 14px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:MUTED, fontFamily:"inherit", fontSize:12, cursor:"pointer", whiteSpace:"nowrap" as const }}>
                       <CreditCard size={13}/> Gerer la facturation
-                    </a>
+                    </button>
                   )}
                 </div>
               </div>
