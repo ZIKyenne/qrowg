@@ -9,6 +9,8 @@
 -- profiles.id = auth.users.id, donc l'avatar est bien nommé par l'uid.
 -- -----------------------------------------------------------------------------
 drop policy if exists "Authenticated users can upload" on storage.objects;
+drop policy if exists "Upload dans son espace" on storage.objects;
+drop policy if exists "Update de ses propres fichiers" on storage.objects;
 
 create policy "Upload dans son espace" on storage.objects
   for insert with check (

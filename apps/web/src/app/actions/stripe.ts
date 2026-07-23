@@ -3,12 +3,8 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import Stripe from 'stripe'
 import { planFromPriceId } from '@/lib/stripePlan'
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20' as any,
-})
+import { stripe } from '@/lib/stripe'
 
 async function createClient() {
   const cookieStore = await cookies()

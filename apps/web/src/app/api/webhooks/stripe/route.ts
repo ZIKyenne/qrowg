@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import Stripe from "stripe"
+import { stripe } from "@/lib/stripe"
 import { createClient } from "@supabase/supabase-js"
 import { Resend } from "resend"
 import { planFromPriceId } from "@/lib/stripePlan"
@@ -19,8 +20,6 @@ async function sendSubscriptionEmail(userId: string, plan: string, billing?: str
     console.warn("[stripe webhook] email abonnement non envoye:", (e as any)?.message)
   }
 }
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2024-06-20" as any })
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,

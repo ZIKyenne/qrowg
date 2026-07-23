@@ -16,6 +16,16 @@ const nextConfig = {
   // imports casses (qui crashaient au runtime). Le code typecheck a 0 erreur (2026-07-07).
   typescript: { ignoreBuildErrors: false },
   eslint: { ignoreDuringBuilds: true },
+  // Optimisation d'images : autorise l'optimisation Next des assets Supabase Storage
+  // (prepare la migration <img> -> next/image sur les pages publiques).
+  images: {
+    remotePatterns: [{ protocol: "https", hostname: "*.supabase.co" }],
+    formats: ["image/avif", "image/webp"],
+  },
+  // Tree-shaking cible des gros barrels (bundle par-route allege).
+  experimental: {
+    optimizePackageImports: ["lucide-react", "recharts", "react-simple-maps"],
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }]
   },
