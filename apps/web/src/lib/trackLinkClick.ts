@@ -1,28 +1,22 @@
-﻿// trackLinkClick.ts — tracker un clic sur un lien, fire-and-forget
-// RGPD : on stocke uniquement l'URL cible et le label, pas d'IP
-
-let _supabase: any = null
-
-async function getClient() {
-  if (!_supabase) {
-    const { createClient } = await import("@/lib/supabase/client")
-    _supabase = createClient()
-  }
-  return _supabase
-}
+// trackLinkClick.ts — tracker un clic sur un lien, fire-and-forget.
+// Passe par l'endpoint serveur /api/track (service role) : plus d'insert anonyme
+// direct. RGPD : on stocke uniquement l'URL cible et le label, pas d'IP.
 
 export function trackLinkClick(
   pageId: string,
   blockId: string,
   clickTarget: string  // URL ou label — max 500 chars
 ) {
-  if (typeof window === "undefined") return
+  if (typeof window === "undefined" || !pageId) return
   // Fire-and-forget : ne bloque jamais la navigation
-  getClient().then((sb: any) => {
-    sb.from("block_clicks").insert({
-      page_id:      pageId,
-      block_id:     blockId,
-      click_target: clickTarget.slice(0, 500),
-    })
-  }).catch(() => {}) // silencieux
+  try {
+    fetch("/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      keepalive: true,
+      body: JSON.stringify({ type: "click", pageId, blockId, clickTarget: clickTarget.slice(0, 500) }),
+    }).catch(() => {})
+  } catch {
+    // silencieux
+  }
 }

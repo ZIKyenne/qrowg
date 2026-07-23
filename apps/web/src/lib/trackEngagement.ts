@@ -1,53 +1,53 @@
-// trackEngagement.ts — profondeur de scroll + impressions de blocs (blocs réellement vus).
-// RGPD : aucune IP ni donnée personnelle — seulement page_id, un type d'événement et une référence.
-// Envoi GROUPÉ (une seule requête) : on met en file, on déduplique, on flush au départ / après un délai.
-
-let _supabase: any = null
-async function getClient() {
-  if (!_supabase) {
-    const { createClient } = await import("@/lib/supabase/client")
-    _supabase = createClient()
-  }
-  return _supabase
-}
+// trackEngagement.ts — profondeur de scroll + impressions de blocs + taps + dwell.
+// Passe par l'endpoint serveur /api/track (service role) : plus d'insert anonyme
+// direct (fermeture de l'empoisonnement analytics). RGPD : aucune IP ni donnée
+// personnelle — seulement page_id, un type d'événement et une référence.
+// Envoi GROUPÉ (une requête) : mise en file, dédup, flush au départ / après délai.
 
 type Kind = "scroll" | "impression"
 type Ev = { page_id: string; kind: Kind; ref: string }
 type Tap = { page_id: string; kind: "tap"; ref: string; x: number; y: number }
 
 let buffer: Ev[] = []
-let tapBuffer: Tap[] = []   // taps : jamais dédupliqués (chaque clic compte), colonnes x/y propres
-const seen = new Set<string>()   // dédup : une impression par bloc / un jalon de scroll par session
+let tapBuffer: Tap[] = []   // taps : jamais dédupliqués (chaque clic compte)
+const seen = new Set<string>()   // dédup : une impression par bloc / un jalon de scroll
 let bound = false
 let flushTimer: ReturnType<typeof setTimeout> | null = null
 
-async function flush() {
-  if (buffer.length === 0 && tapBuffer.length === 0) return
+function post(pageId: string, rows: unknown[]) {
+  if (!rows.length) return
   try {
-    const sb = await getClient()
-    if (buffer.length) { const batch = buffer.splice(0, buffer.length); await sb.from("page_events").insert(batch) }
-    if (tapBuffer.length) { const taps = tapBuffer.splice(0, tapBuffer.length); await sb.from("page_events").insert(taps) }
+    fetch("/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      keepalive: true,
+      body: JSON.stringify({ type: "events", pageId, rows }),
+    }).catch(() => {})
   } catch { /* silencieux : ne jamais perturber la page publique */ }
+}
+
+function flush() {
+  if (buffer.length === 0 && tapBuffer.length === 0) return
+  const rows = [...buffer.splice(0, buffer.length), ...tapBuffer.splice(0, tapBuffer.length)]
+  if (rows.length) post((rows[0] as Ev | Tap).page_id, rows)
 }
 
 function bindFlushOnce() {
   if (bound || typeof window === "undefined") return
   bound = true
-  const onHidden = () => { if (document.visibilityState === "hidden") flush() }
-  document.addEventListener("visibilitychange", onHidden)
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") flush() })
   window.addEventListener("pagehide", () => { flush() })
 }
 
-// Temps d'attention par bloc : envoi direct (fire-and-forget) des totaux à la fermeture/masquage.
+// Temps d'attention par bloc : envoi direct (fire-and-forget) à la fermeture/masquage.
 // entries = [{ ref: block_id, value: secondes }]. RGPD : aucune donnée personnelle.
 export function trackDwell(pageId: string, entries: { ref: string; value: number }[]) {
   if (typeof window === "undefined" || !pageId || entries.length === 0) return
   const rows = entries.map(e => ({ page_id: pageId, kind: "dwell" as const, ref: e.ref, value: e.value }))
-  getClient().then((sb: any) => sb.from("page_events").insert(rows)).catch(() => {})
+  post(pageId, rows)
 }
 
-// Enregistre un clic/tap avec sa position (fractions 0..1). RGPD : aucune donnée personnelle,
-// seulement la position relative à l'écran. Pas de dédup (chaque tap compte). Garde-fou anti-spam.
+// Enregistre un clic/tap avec sa position (fractions 0..1). Pas de dédup. Garde-fou anti-spam.
 export function queueTap(pageId: string, ref: string, x: number, y: number) {
   if (typeof window === "undefined" || !pageId) return
   if (!(x >= 0 && x <= 1 && y >= 0 && y <= 1)) return
@@ -66,7 +66,6 @@ export function queueEngagement(pageId: string, kind: Kind, ref: string) {
   seen.add(key)
   buffer.push({ page_id: pageId, kind, ref })
   bindFlushOnce()
-  // Flush différé : regroupe les impressions initiales en une requête + garde-fou si l'onglet reste ouvert.
   if (flushTimer) clearTimeout(flushTimer)
   flushTimer = setTimeout(() => { flush() }, 4000)
 }

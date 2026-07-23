@@ -25,14 +25,12 @@ export async function trackPageView(pageId: string) {
     const ua = navigator.userAgent
     const device = /Mobi|Android/i.test(ua) ? "mobile" : /Tablet|iPad/i.test(ua) ? "tablet" : "desktop"
 
-    const { createClient } = await import("@/lib/supabase/client")
-    const supabase = createClient()
-    await supabase.from("page_views").insert({
-      page_id:    pageId,
-      source,
-      referrer,   // domaine uniquement, pas l'URL complète
-      device,
-      session_id: sessionId,
+    // Passe par l'endpoint serveur (service role) : plus d'insert anonyme direct.
+    await fetch("/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      keepalive: true,
+      body: JSON.stringify({ type: "view", pageId, source, referrer, device, session_id: sessionId }),
     })
   } catch {
     // Silencieux — le tracking ne doit jamais casser la page
