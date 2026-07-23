@@ -9,9 +9,9 @@ import { escapeHtml } from "@/lib/escapeHtml"
 const APP = "https://qrowg.com"
 
 const STEPS: [string, string][] = [
-  ["1", "Choisis un modèle adapté à ton métier"],
-  ["2", "Personnalise ta page avec tes contenus"],
-  ["3", "Génère ton QR code et partage-le"],
+  ["1", "Choisissez un modèle adapté à votre activité"],
+  ["2", "Personnalisez votre page avec vos contenus"],
+  ["3", "Générez votre QR code et partagez-le"],
 ]
 
 const stepRows = STEPS.map(([n, txt], i) => `
@@ -38,7 +38,7 @@ const WELCOME_HTML = `<!DOCTYPE html>
 </style>
 </head>
 <body style="margin:0;padding:0;background:#080808;">
-<div style="display:none;font-size:1px;color:#080808;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">Ton compte est prêt — crée ta première page en 5 minutes.</div>
+<div style="display:none;font-size:1px;color:#080808;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">Votre compte est prêt — créez votre première page en 5 minutes.</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#080808;">
   <tr>
     <td align="center" style="padding:32px 12px;">
@@ -54,9 +54,9 @@ const WELCOME_HTML = `<!DOCTYPE html>
         <!-- Intro -->
         <tr>
           <td class="px" style="padding:38px 40px 6px;">
-            <h1 class="h1" style="margin:0 0 10px;font-family:Georgia,'Times New Roman',serif;font-size:30px;font-weight:700;color:#F5F0E8;line-height:1.15;">Bienvenue sur QRowg&nbsp;🎉</h1>
-            <p style="margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.65;color:#B8B2A4;">Salut <strong style="color:#F5F0E8;">{{name}}</strong>,</p>
-            <p style="margin:0 0 28px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.65;color:#B8B2A4;">Ton compte est prêt. En quelques minutes, tu crées ta page pro, tu génères ton <strong style="color:#F5F0E8;">QR code dynamique</strong> et tu partages tout ce que tu es depuis un seul lien.</p>
+            <h1 class="h1" style="margin:0 0 10px;font-family:Georgia,'Times New Roman',serif;font-size:30px;font-weight:700;color:#F5F0E8;line-height:1.15;">Bienvenue chez QRowg</h1>
+            <p style="margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.65;color:#B8B2A4;">Bonjour<strong style="color:#F5F0E8;">{{name}}</strong>,</p>
+            <p style="margin:0 0 28px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.65;color:#B8B2A4;">Votre compte est prêt. En quelques minutes, créez votre page professionnelle, générez votre <strong style="color:#F5F0E8;">QR code dynamique</strong> et rassemblez tout votre univers derrière un seul lien.</p>
           </td>
         </tr>
         <!-- Steps box -->
@@ -89,14 +89,14 @@ const WELCOME_HTML = `<!DOCTYPE html>
         <tr>
           <td class="px" style="padding:26px 40px 0;">
             <div style="height:1px;line-height:1px;font-size:0;background:rgba(201,168,76,0.16);margin:0 0 22px;">&nbsp;</div>
-            <p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#B8B2A4;">Une question&nbsp;? Réponds simplement à cet email — on est là pour t'aider.</p>
+            <p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#B8B2A4;">Une question&nbsp;? Répondez directement à cet email, nous sommes là pour vous aider.</p>
             <p style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#8A8478;">— L'équipe QRowg</p>
           </td>
         </tr>
         <!-- Footer -->
         <tr>
           <td align="center" style="padding:28px 40px 32px;border-top:1px solid rgba(255,255,255,0.06);">
-            <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.7;color:#6E6A60;">QRowg · Ta page, ton QR code, tes statistiques<br><a href="${APP}/dashboard/settings" style="color:#8A8478;text-decoration:underline;">Se désabonner</a></p>
+            <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.7;color:#6E6A60;">QRowg · Votre page, votre QR code, vos statistiques<br><a href="${APP}/dashboard/settings" style="color:#8A8478;text-decoration:underline;">Se désabonner</a></p>
           </td>
         </tr>
       </table>
@@ -115,8 +115,9 @@ export async function POST(req: NextRequest) {
     const { email, name } = await req.json()
     if (!email) return NextResponse.json({ error: "Email requis" }, { status: 400 })
 
-    const display = name && String(name).trim() ? escapeHtml(String(name).trim()) : "toi"
-    const html = WELCOME_HTML.replace(/{{name}}/g, display)
+    // "Bonjour Prenom," si prenom fourni, sinon "Bonjour," (espace insecable inclus dans le strong)
+    const clean = name && String(name).trim() ? escapeHtml(String(name).trim()) : ""
+    const html = WELCOME_HTML.replace(/{{name}}/g, clean ? `&nbsp;${clean}` : "")
 
     const { data, error } = await resend.emails.send({
       from: EMAIL_FROM,
