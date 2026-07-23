@@ -1,7 +1,24 @@
 import { NextRequest, NextResponse } from "next/server"
 import Stripe from "stripe"
 import { createClient } from "@supabase/supabase-js"
+import { Resend } from "resend"
 import { planFromPriceId } from "@/lib/stripePlan"
+import { buildSubscriptionEmail } from "@/lib/subscriptionEmail"
+import { EMAIL_FROM } from "@/lib/emailFrom"
+
+// Email de bienvenue abonnement (essai/achat) — fire-and-forget, n'echoue jamais.
+async function sendSubscriptionEmail(userId: string, plan: string, billing?: string | null) {
+  try {
+    if (!process.env.RESEND_API_KEY) return
+    const { data: prof } = await supabase.from("profiles").select("email, full_name").eq("id", userId).single()
+    if (!prof?.email) return
+    const { subject, html } = buildSubscriptionEmail({ name: prof.full_name, plan, billing, trialDays: 7 })
+    const resend = new Resend(process.env.RESEND_API_KEY)
+    await resend.emails.send({ from: EMAIL_FROM, to: prof.email, subject, html })
+  } catch (e) {
+    console.warn("[stripe webhook] email abonnement non envoye:", (e as any)?.message)
+  }
+}
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2024-06-20" as any })
 
@@ -52,6 +69,9 @@ export async function POST(req: NextRequest) {
             plan,
             status: "trialing",
           }, { onConflict: "user_id" })
+
+          // Email de bienvenue (essai/achat) — ne bloque pas la reponse au webhook
+          await sendSubscriptionEmail(userId, plan, session.metadata?.billing)
         }
         break
       }
