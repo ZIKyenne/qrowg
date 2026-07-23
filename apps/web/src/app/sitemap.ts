@@ -4,12 +4,17 @@ export default async function sitemap() {
   const supabase = await createServerSupabaseClient()
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 
-  // Pages statiques
+  // Pages statiques indexables (les pages /auth/* sont volontairement exclues :
+  // elles sont bloquees par robots.txt, les lister ici serait contradictoire).
   const staticPages = [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
-    { url: `${baseUrl}/auth/login`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
-    { url: `${baseUrl}/auth/signup`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
-    { url: `${baseUrl}/upgrade`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
+    { url: baseUrl,               lastModified: new Date(), changeFrequency: "weekly",  priority: 1   },
+    { url: `${baseUrl}/features`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
+    { url: `${baseUrl}/examples`, lastModified: new Date(), changeFrequency: "weekly",  priority: 0.7 },
+    { url: `${baseUrl}/upgrade`,  lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
+    { url: `${baseUrl}/contact`,  lastModified: new Date(), changeFrequency: "yearly",  priority: 0.4 },
+    { url: `${baseUrl}/legal`,    lastModified: new Date(), changeFrequency: "yearly",  priority: 0.2 },
+    { url: `${baseUrl}/terms`,    lastModified: new Date(), changeFrequency: "yearly",  priority: 0.2 },
+    { url: `${baseUrl}/privacy`,  lastModified: new Date(), changeFrequency: "yearly",  priority: 0.2 },
   ]
 
   // Pages publiques des utilisateurs

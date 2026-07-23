@@ -34,16 +34,15 @@ export const metadata: Metadata = {
     "lien en bio",
     "page mobile professionnelle",
     "générateur de QR code",
-    "qrfolio",
   ],
   authors: [{ name: "QRowg", url: APP_URL }],
   creator: "QRowg",
   publisher: "QRowg",
   // Experience "ajouter a l'ecran d'accueil" sur iOS (barre de statut sombre, titre court).
   appleWebApp: { capable: true, title: "QRowg", statusBarStyle: "black-translucent" },
-  alternates: {
-    canonical: APP_URL,
-  },
+  // Pas de canonical global ici : en App Router il serait HERITE par toutes les
+  // pages enfants (features, examples, contact, upgrade) qui se canoniseraient
+  // alors vers la home -> desindexation. Chaque page definit son propre canonical.
   openGraph: {
     type: "website",
     locale: "fr_FR",
@@ -64,8 +63,6 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@qrfolio",
-    creator: "@qrfolio",
     title: "QRowg — Carte de visite numérique & QR code dynamique pro",
     description:
       "Page mobile pro + QR code dynamique + statistiques. En 5 minutes, sans rien coder.",
