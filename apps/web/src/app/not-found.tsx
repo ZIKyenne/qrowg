@@ -92,7 +92,6 @@ export default function NotFound() {
       position: "relative", overflow: "hidden",
     }}>
       <style>{`
-        @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..800&family=DM+Sans:wght@400;500;600;700&display=swap");
         * { box-sizing:border-box; }
         body { background:${BG}; }
         @keyframes float404 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }

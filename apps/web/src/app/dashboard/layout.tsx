@@ -362,7 +362,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       )}
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..800&family=DM+Sans:wght@400;500;600;700&display=swap');
         .sidebar-nav::-webkit-scrollbar { display: none }
         .sidebar-item:hover .sidebar-tooltip { opacity: 1 !important }
         @keyframes sheetUp { from { transform: translateY(100%) } to { transform: translateY(0) } }
