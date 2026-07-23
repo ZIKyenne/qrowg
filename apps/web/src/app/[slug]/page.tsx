@@ -1,4 +1,4 @@
-﻿import { createServerSupabaseClient } from "@/lib/supabase/server"
+﻿import { createAdminClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import PublicPageClient from "./PublicPageClient"
 import { canRemoveBranding } from "@/lib/plans"
@@ -10,7 +10,8 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const supabase = await createServerSupabaseClient()
+  // Service role : lecture publique contrôlée côté serveur (RLS anon retirée sur profiles).
+  const supabase = createAdminClient()
   const { data: page } = await supabase
     .from("pages")
     .select("title, seo_title, seo_description, og_image_url, slug, profiles(full_name, username)")
@@ -45,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PublicPage({ params }: Props) {
   const { slug } = await params
-  const supabase = await createServerSupabaseClient()
+  const supabase = createAdminClient()
 
   const { data: page } = await supabase
     .from("pages")

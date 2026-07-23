@@ -124,11 +124,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
     const ua     = req.headers.get("user-agent") ?? ""
     const device = detectDevice(ua)
 
-    supabase.from("qr_codes").update({
-      total_scans: supabase.rpc("increment_qr_scans", { qr_id: qr.id }) as any,
-      last_scan_at: new Date().toISOString(),
-    }).eq("id", qr.id).then(() => {}, () => {})
-
+    // Le comptage (qr_codes.total_scans + last_scan_at, pages.total_views,
+    // profiles.total_scans) est fait par le trigger `increment_scan_counters`
+    // sur l'INSERT de scan ci-dessous. L'ancien UPDATE manuel etait casse
+    // (rpc imbrique comme valeur de colonne -> rejete par Postgres, avale
+    // silencieusement) et redondant : retire.
     supabase.from("scans").insert({
       qr_code_id: qr.id, page_id: qr.page_id, device,
     }).then(() => {}, () => {})
