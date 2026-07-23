@@ -6,6 +6,12 @@ import type { Metadata } from "next"
 
 interface Props { params: Promise<{ slug: string }> }
 
+// ISR : la page publique est identique pour tous (lue via service role, sans
+// cookie) -> on la met en cache et on la régénère au plus toutes les 60s. Réduit
+// le TTFB (cache CDN) et la charge Supabase (2 requêtes -> 1 fois / 60s / slug).
+// Le tracking reste temps réel (client, dans PublicPageClient).
+export const revalidate = 60
+
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
