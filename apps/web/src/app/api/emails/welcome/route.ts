@@ -3,7 +3,108 @@ import { NextRequest, NextResponse } from "next/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
 import { escapeHtml } from "@/lib/escapeHtml"
 
-const WELCOME_HTML = Buffer.from("PCFET0NUWVBFIGh0bWw+CjxodG1sPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij48bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoIj48dGl0bGU+UVJvd2c8L3RpdGxlPgo8c3R5bGU+CiAgYm9keXttYXJnaW46MDtwYWRkaW5nOjA7YmFja2dyb3VuZDojMDgwODA4O2ZvbnQtZmFtaWx5OidETSBTYW5zJyxBcmlhbCxzYW5zLXNlcmlmO2NvbG9yOiNGNUYwRTh9CiAgLmNvbnRhaW5lcnttYXgtd2lkdGg6NTYwcHg7bWFyZ2luOjAgYXV0bztiYWNrZ3JvdW5kOiMwODA4MDh9CiAgLmhlYWRlcntwYWRkaW5nOjMycHggNDBweCAyNHB4O3RleHQtYWxpZ246Y2VudGVyO2JvcmRlci1ib3R0b206MXB4IHNvbGlkIHJnYmEoMjAxLDE2OCw3NiwwLjE1KX0KICAubG9nb3tmb250LXNpemU6MjhweDtmb250LXdlaWdodDo3MDA7Y29sb3I6I0M5QTg0Qztmb250LWZhbWlseTpHZW9yZ2lhLHNlcmlmO3RleHQtZGVjb3JhdGlvbjpub25lfQogIC5ib2R5e3BhZGRpbmc6MzJweCA0MHB4fQogIC5mb290ZXJ7cGFkZGluZzoyMHB4IDQwcHggMzJweDt0ZXh0LWFsaWduOmNlbnRlcjtib3JkZXItdG9wOjFweCBzb2xpZCByZ2JhKDI1NSwyNTUsMjU1LDAuMDYpfQogIGgxe2ZvbnQtZmFtaWx5Okdlb3JnaWEsc2VyaWY7Zm9udC1zaXplOjI2cHg7Zm9udC13ZWlnaHQ6NzAwO2NvbG9yOiNGNUYwRTg7bWFyZ2luOjAgMCAxMnB4fQogIHB7Zm9udC1zaXplOjE1cHg7bGluZS1oZWlnaHQ6MS43O2NvbG9yOiM4QTg0Nzg7bWFyZ2luOjAgMCAxNnB4fQogIC5idG57ZGlzcGxheTppbmxpbmUtYmxvY2s7YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoOTBkZWcsI0M5QTg0QywjYjg5NTNmKTtjb2xvcjojMDgwODA4O3RleHQtZGVjb3JhdGlvbjpub25lO2ZvbnQtd2VpZ2h0OjcwMDtmb250LXNpemU6MTVweDtwYWRkaW5nOjE0cHggMzJweDtib3JkZXItcmFkaXVzOjEycHg7bWFyZ2luOjhweCAwfQogIC5zdGF0LWNhcmR7ZGlzcGxheTppbmxpbmUtYmxvY2s7YmFja2dyb3VuZDojMTExMDA5O2JvcmRlcjoxcHggc29saWQgcmdiYSgyMDEsMTY4LDc2LDAuMTUpO2JvcmRlci1yYWRpdXM6MTJweDtwYWRkaW5nOjE2cHggMjBweDttYXJnaW46NnB4O3RleHQtYWxpZ246Y2VudGVyO21pbi13aWR0aDoxMDBweH0KICAuc3RhdC12YWx1ZXtmb250LWZhbWlseTpHZW9yZ2lhLHNlcmlmO2ZvbnQtc2l6ZToyOHB4O2ZvbnQtd2VpZ2h0OjcwMDtjb2xvcjojQzlBODRDO2Rpc3BsYXk6YmxvY2t9CiAgLnN0YXQtbGFiZWx7Zm9udC1zaXplOjExcHg7Y29sb3I6IzhBODQ3ODt0ZXh0LXRyYW5zZm9ybTp1cHBlcmNhc2U7bGV0dGVyLXNwYWNpbmc6MXB4fQogIC5kaXZpZGVye2hlaWdodDoxcHg7YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoOTBkZWcsdHJhbnNwYXJlbnQscmdiYSgyMDEsMTY4LDc2LDAuMyksdHJhbnNwYXJlbnQpO21hcmdpbjoyNHB4IDB9CiAgLmhpZ2hsaWdodHtiYWNrZ3JvdW5kOnJnYmEoMjAxLDE2OCw3NiwwLjA4KTtib3JkZXI6MXB4IHNvbGlkIHJnYmEoMjAxLDE2OCw3NiwwLjIpO2JvcmRlci1yYWRpdXM6MTBweDtwYWRkaW5nOjE2cHggMjBweDttYXJnaW46MTZweCAwfQo8L3N0eWxlPjwvaGVhZD4KPGJvZHk+CjxkaXYgc3R5bGU9ImRpc3BsYXk6bm9uZTtmb250LXNpemU6MXB4O2NvbG9yOiMwODA4MDg7bGluZS1oZWlnaHQ6MXB4O21heC1oZWlnaHQ6MDtvdmVyZmxvdzpoaWRkZW4iPlRvbiBjb21wdGUgZXN0IHByZXQg4oCUIGNyZWUgdGEgcHJlbWllcmUgcGFnZSBlbiA1IG1pbnV0ZXM8L2Rpdj4KPGRpdiBjbGFzcz0iY29udGFpbmVyIj4KICA8ZGl2IGNsYXNzPSJoZWFkZXIiPgogICAgPGEgaHJlZj0iaHR0cHM6Ly9xcm93Zy5jb20iIGNsYXNzPSJsb2dvIj5RUm93ZzwvYT4KICA8L2Rpdj4KICA8ZGl2IGNsYXNzPSJib2R5Ij4KPGgxPkJpZW52ZW51ZSBzdXIgUVJvd2cgISDwn46JPC9oMT4KPHA+U2FsdXQge3tuYW1lfX0sPC9wPgo8cD5Ub24gY29tcHRlIGVzdCBwcmV0LiBFbiBxdWVscXVlcyBtaW51dGVzLCB0dSBwZXV4IGNyZWVyIHRhIHByZW1pZXJlIHBhZ2UsIGdlbmVyZXIgdG9uIFFSIGNvZGUgZXQgcGFydGFnZXIgdG9uIHVuaXZlcnMgYXZlYyBsZSBtb25kZS48L3A+CjxkaXYgY2xhc3M9ImhpZ2hsaWdodCI+CiAgPHAgc3R5bGU9ImNvbG9yOiNGNUYwRTg7Zm9udC13ZWlnaHQ6NzAwO21hcmdpbjowIDAgOHB4Ij4zIGV0YXBlcyBwb3VyIGRlbWFycmVyIDo8L3A+CiAgPHAgc3R5bGU9Im1hcmdpbjowO2NvbG9yOiM4QTg0NzgiPuKcpiBDaG9pc2lzIHVuIHRlbXBsYXRlIGFkYXB0ZSBhIHRvbiBhY3Rpdml0ZTxicj7inKYgUGVyc29ubmFsaXNlIHRhIHBhZ2UgYXZlYyB0ZXMgY29udGVudXM8YnI+4pymIEdlbmVyZSBldCBwYXJ0YWdlIHRvbiBRUiBjb2RlPC9wPgo8L2Rpdj4KPHAgc3R5bGU9InRleHQtYWxpZ246Y2VudGVyO21hcmdpbjoyNHB4IDAiPgogIDxhIGhyZWY9Imh0dHBzOi8vcXJvd2cuY29tL2Rhc2hib2FyZC90ZW1wbGF0ZXMiIGNsYXNzPSJidG4iPkNyZWVyIG1hIHByZW1pZXJlIHBhZ2Ug4oaSPC9hPgo8L3A+CjxkaXYgY2xhc3M9ImRpdmlkZXIiPjwvZGl2Pgo8cCBzdHlsZT0iZm9udC1zaXplOjEzcHgiPkRlcyBxdWVzdGlvbnMgPyBSZXBvbmRzIGRpcmVjdGVtZW50IGEgY2V0IGVtYWlsLCBqZSBzdWlzIGxhIHBvdXIgdCdhaWRlci48L3A+CjxwIHN0eWxlPSJmb250LXNpemU6MTNweDtjb2xvcjojNEE0NjQwIj5MJ2VxdWlwZSBRUm93ZzwvcD4KPC9kaXY+CiAgPGRpdiBjbGFzcz0iZm9vdGVyIj4KICAgIDxwIHN0eWxlPSJmb250LXNpemU6MTJweDtjb2xvcjojNEE0NjQwO21hcmdpbjowIj5RUm93ZyDCtyBUYSBwYWdlLCB0b24gUVIgY29kZSwgdGVzIHN0YXRzPGJyPgogICAgPGEgaHJlZj0iaHR0cHM6Ly9xcm93Zy5jb20vZGFzaGJvYXJkL3NldHRpbmdzIiBzdHlsZT0iY29sb3I6IzRBNDY0MCI+U2UgZGVzYWJvbm5lcjwvYT48L3A+CiAgPC9kaXY+CjwvZGl2Pgo8L2JvZHk+PC9odG1sPg==", "base64").toString("utf-8")
+// Email d'accueil — HTML "bulletproof" : layout en tables + styles 100% inline
+// (Gmail & co strippent le <style> du <head>, donc on ne s'appuie JAMAIS dessus).
+// Palette unique noir/or/creme. Le <style> ne sert que d'ameliorations (mobile).
+const APP = "https://qrowg.com"
+
+const STEPS: [string, string][] = [
+  ["1", "Choisis un modèle adapté à ton métier"],
+  ["2", "Personnalise ta page avec tes contenus"],
+  ["3", "Génère ton QR code et partage-le"],
+]
+
+const stepRows = STEPS.map(([n, txt], i) => `
+              <tr>
+                <td width="26" valign="top" style="padding:0 0 ${i === STEPS.length - 1 ? 0 : 14}px;">
+                  <span style="display:inline-block;width:24px;height:24px;background:#C9A84C;color:#0A0A0A;border-radius:12px;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:12px;text-align:center;line-height:24px;">${n}</span>
+                </td>
+                <td valign="middle" style="padding:0 0 ${i === STEPS.length - 1 ? 0 : 14}px 12px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.45;color:#E4DED0;">${txt}</td>
+              </tr>`).join("")
+
+const WELCOME_HTML = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<meta name="supported-color-schemes" content="dark light">
+<title>Bienvenue sur QRowg</title>
+<style>
+  @media (max-width:600px){
+    .px{padding-left:24px!important;padding-right:24px!important}
+    .h1{font-size:26px!important}
+  }
+</style>
+</head>
+<body style="margin:0;padding:0;background:#080808;">
+<div style="display:none;font-size:1px;color:#080808;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">Ton compte est prêt — crée ta première page en 5 minutes.</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#080808;">
+  <tr>
+    <td align="center" style="padding:32px 12px;">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background:#0C0B08;border:1px solid rgba(201,168,76,0.14);border-radius:16px;">
+        <!-- Header -->
+        <tr>
+          <td align="center" class="px" style="padding:34px 40px 26px;border-bottom:1px solid rgba(201,168,76,0.14);">
+            <a href="${APP}" style="text-decoration:none;">
+              <span style="display:inline-block;background:#C9A84C;color:#0A0A0A;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:19px;line-height:1;padding:7px 9px;border-radius:8px;">QR</span><span style="color:#F5F0E8;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:23px;">&nbsp;owg</span>
+            </a>
+          </td>
+        </tr>
+        <!-- Intro -->
+        <tr>
+          <td class="px" style="padding:38px 40px 6px;">
+            <h1 class="h1" style="margin:0 0 10px;font-family:Georgia,'Times New Roman',serif;font-size:30px;font-weight:700;color:#F5F0E8;line-height:1.15;">Bienvenue sur QRowg&nbsp;🎉</h1>
+            <p style="margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.65;color:#B8B2A4;">Salut <strong style="color:#F5F0E8;">{{name}}</strong>,</p>
+            <p style="margin:0 0 28px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.65;color:#B8B2A4;">Ton compte est prêt. En quelques minutes, tu crées ta page pro, tu génères ton <strong style="color:#F5F0E8;">QR code dynamique</strong> et tu partages tout ce que tu es depuis un seul lien.</p>
+          </td>
+        </tr>
+        <!-- Steps box -->
+        <tr>
+          <td class="px" style="padding:0 40px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.18);border-radius:12px;">
+              <tr>
+                <td style="padding:22px 24px;">
+                  <p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#C9A84C;">3 étapes pour démarrer</p>
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${stepRows}
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <!-- CTA -->
+        <tr>
+          <td align="center" class="px" style="padding:32px 40px 4px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="center" bgcolor="#C9A84C" style="border-radius:12px;">
+                  <a href="${APP}/dashboard/templates" style="display:inline-block;padding:15px 36px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:700;color:#0A0A0A;text-decoration:none;border-radius:12px;">Créer ma première page&nbsp;→</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <!-- Reassurance -->
+        <tr>
+          <td class="px" style="padding:26px 40px 0;">
+            <div style="height:1px;line-height:1px;font-size:0;background:rgba(201,168,76,0.16);margin:0 0 22px;">&nbsp;</div>
+            <p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#B8B2A4;">Une question&nbsp;? Réponds simplement à cet email — on est là pour t'aider.</p>
+            <p style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#8A8478;">— L'équipe QRowg</p>
+          </td>
+        </tr>
+        <!-- Footer -->
+        <tr>
+          <td align="center" style="padding:28px 40px 32px;border-top:1px solid rgba(255,255,255,0.06);">
+            <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.7;color:#6E6A60;">QRowg · Ta page, ton QR code, tes statistiques<br><a href="${APP}/dashboard/settings" style="color:#8A8478;text-decoration:underline;">Se désabonner</a></p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>`
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,7 +115,8 @@ export async function POST(req: NextRequest) {
     const { email, name } = await req.json()
     if (!email) return NextResponse.json({ error: "Email requis" }, { status: 400 })
 
-    const html = WELCOME_HTML.replace(/{{name}}/g, escapeHtml(name))
+    const display = name && String(name).trim() ? escapeHtml(String(name).trim()) : "toi"
+    const html = WELCOME_HTML.replace(/{{name}}/g, display)
 
     const { data, error } = await resend.emails.send({
       from: EMAIL_FROM,
