@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
 import { escapeHtml as esc } from "@/lib/escapeHtml"
+import { emailShell, emailH1, emailButton } from "@/lib/emailLayout"
 
 const TYPE_LABELS: Record<string, string> = {
   quote: "Demande de devis", reservation: "Réservation", booking: "Réservation événement",
@@ -49,26 +50,15 @@ export async function POST(req: NextRequest) {
       rows.push(`<tr><td style="color:#8A8478;padding:4px 0">${esc(k)}</td><td style="color:#F5F0E8;text-align:right;font-weight:500">${esc(String(v))}</td></tr>`)
     })
 
-    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
-<body style="margin:0;padding:0;background:#080808;font-family:'DM Sans',Arial,sans-serif;color:#F5F0E8">
-<div style="max-width:560px;margin:0 auto;background:#080808">
-  <div style="padding:28px 40px 20px;text-align:center;border-bottom:1px solid rgba(201,168,76,0.15)">
-    <span style="font-size:24px;font-weight:700;color:#C9A84C;font-family:Georgia,serif">QRowg</span>
-  </div>
-  <div style="padding:28px 40px">
-    <div style="display:inline-block;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);border-radius:20px;padding:5px 14px;color:#C9A84C;font-size:12px;font-weight:700;margin-bottom:14px">${esc(label)}</div>
-    <h1 style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#F5F0E8;margin:0 0 6px">Nouveau message reçu</h1>
-    <p style="font-size:14px;color:#8A8478;margin:0 0 20px">Depuis votre page « ${esc(page.title)} »</p>
-    ${message ? `<div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:14px 16px;margin-bottom:16px"><p style="font-size:14px;color:#F5F0E8;margin:0;line-height:1.6;white-space:pre-wrap">${esc(message)}</p></div>` : ""}
-    <table style="width:100%;border-collapse:collapse;font-size:13px">${rows.join("")}</table>
-    <p style="text-align:center;margin:26px 0 0">
-      <a href="https://qrowg.com/dashboard/leads" style="display:inline-block;background:linear-gradient(90deg,#C9A84C,#b8953f);color:#080808;text-decoration:none;font-weight:700;font-size:14px;padding:13px 28px;border-radius:12px">Voir dans mes messages →</a>
-    </p>
-  </div>
-  <div style="padding:18px 40px 30px;text-align:center;border-top:1px solid rgba(255,255,255,0.06)">
-    <p style="font-size:12px;color:#4A4640;margin:0">QRowg · <a href="https://qrowg.com/dashboard/settings" style="color:#4A4640">Gérer les notifications</a></p>
-  </div>
-</div></body></html>`
+    const content = `
+      <div style="display:inline-block;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);border-radius:20px;padding:5px 14px;color:#C9A84C;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px;">${esc(label)}</div>
+      ${emailH1("Nouveau message reçu")}
+      <p style="margin:0 0 22px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#8A8478;">Depuis votre page <strong style="color:#B8B2A4;">« ${esc(page.title)} »</strong></p>
+      ${message ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:12px;margin:0 0 18px;"><tr><td style="padding:16px 18px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#F5F0E8;line-height:1.6;white-space:pre-wrap;">${esc(message)}</td></tr></table>` : ""}
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;margin:0 0 28px;">${rows.join("")}</table>
+      ${emailButton("Voir dans mes messages →", "https://qrowg.com/dashboard/leads")}
+    `
+    const html = emailShell({ preheader: `${label} sur votre page « ${esc(page.title)} »`, content })
 
     const { data: sent, error } = await resend.emails.send({
       from: EMAIL_FROM,

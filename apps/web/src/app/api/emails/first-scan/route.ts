@@ -2,6 +2,7 @@ import { Resend } from "resend"
 import { NextRequest, NextResponse } from "next/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
 import { escapeHtml } from "@/lib/escapeHtml"
+import { emailShell, emailH1, emailP, emailButton } from "@/lib/emailLayout"
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,11 +13,23 @@ export async function POST(req: NextRequest) {
     const { email, name, page_title } = await req.json()
     if (!email) return NextResponse.json({ error: "Email requis" }, { status: 400 })
 
+    const clean = name && String(name).trim() ? escapeHtml(String(name).trim()) : ""
+    const greeting = clean ? `Bonjour ${clean},` : "Bonjour,"
+    const pt = page_title ? `<strong style="color:#F5F0E8;">« ${escapeHtml(page_title)} »</strong>` : "votre page"
+
+    const content = `
+      <div style="display:inline-block;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);border-radius:20px;padding:5px 14px;color:#C9A84C;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:18px;">Premier scan</div>
+      ${emailH1("Votre tout premier scan")}
+      ${emailP(greeting)}
+      ${emailP(`Quelqu'un vient de scanner le QR code de ${pt}. Votre suivi démarre : chaque scan est désormais comptabilisé dans vos statistiques.`, 28)}
+      ${emailButton("Voir mes statistiques →", "https://qrowg.com/dashboard/analytics")}
+    `
+
     const { data, error } = await resend.emails.send({
       from: EMAIL_FROM,
       to: email,
-      subject: "Ton premier scan QRowg !",
-      html: `<h1>Ton premier scan !</h1><p>Salut ${escapeHtml(name)},</p><p>Quelqu'un vient de scanner ton QR code sur la page "${escapeHtml(page_title)}".</p><p><a href="https://qrowg.com/dashboard/analytics">Voir mes analytics</a></p>`,
+      subject: "Votre premier scan sur QRowg",
+      html: emailShell({ preheader: "Votre QR code vient d'être scanné pour la première fois.", content }),
     })
 
     if (error) return NextResponse.json({ error }, { status: 500 })

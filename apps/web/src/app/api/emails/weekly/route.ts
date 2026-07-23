@@ -3,6 +3,18 @@ import { NextRequest, NextResponse } from "next/server"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
 import { escapeHtml } from "@/lib/escapeHtml"
+import { emailShell, emailH1, emailP, emailButton } from "@/lib/emailLayout"
+
+// Carte de statistique (nombre dore + libelle). Cellule d'une rangee a 2 colonnes.
+function statCard(value: string, label: string, side: "left" | "right"): string {
+  const pad = side === "left" ? "0 6px 0 0" : "0 0 0 6px"
+  return `<td width="50%" valign="top" style="padding:${pad};">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.18);border-radius:12px;"><tr><td align="center" style="padding:20px 12px;">
+      <div style="font-family:Georgia,'Times New Roman',serif;font-size:32px;font-weight:700;color:#C9A84C;line-height:1;">${value}</div>
+      <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#8A8478;text-transform:uppercase;letter-spacing:1px;margin-top:7px;">${label}</div>
+    </td></tr></table>
+  </td>`
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,7 +27,7 @@ export async function POST(req: NextRequest) {
     if (secret !== process.env.CRON_SECRET) return NextResponse.json({ error: "Non autorise" }, { status: 401 })
 
     const supabase = await createServerSupabaseClient()
-    
+
     // Recuperer tous les users actifs
     const { data: profiles } = await supabase
       .from("profiles")
@@ -24,15 +36,31 @@ export async function POST(req: NextRequest) {
 
     if (!profiles?.length) return NextResponse.json({ sent: 0 })
 
+    const dateLabel = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })
+
     let sent = 0
     for (const profile of profiles) {
-      const html = `<h1>Rapport hebdo</h1><p>Salut ${escapeHtml(profile.full_name)},</p><p>Tu as ${profile.total_scans} scans et ${profile.total_pages} pages.</p><p><a href="https://qrowg.com/dashboard/analytics">Voir mes analytics</a></p>`
-      
+      const clean = profile.full_name && String(profile.full_name).trim() ? escapeHtml(String(profile.full_name).trim()) : ""
+      const greeting = clean ? `Bonjour ${clean},` : "Bonjour,"
+      const scans = (profile.total_scans ?? 0).toLocaleString("fr-FR")
+      const pages = (profile.total_pages ?? 0).toLocaleString("fr-FR")
+
+      const content = `
+        ${emailH1("Votre rapport QRowg")}
+        ${emailP(greeting)}
+        ${emailP("Voici votre activité en un coup d'œil.", 22)}
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px;"><tr>
+          ${statCard(scans, "Scans au total", "left")}
+          ${statCard(pages, "Pages publiées", "right")}
+        </tr></table>
+        ${emailButton("Voir mes statistiques →", "https://qrowg.com/dashboard/analytics")}
+      `
+
       await resend.emails.send({
         from: EMAIL_FROM,
         to: profile.email,
-        subject: `Ton rapport QRowg — ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}`,
-        html,
+        subject: `Votre rapport QRowg — ${dateLabel}`,
+        html: emailShell({ preheader: "Votre activité QRowg en un coup d'œil.", content }),
       })
       sent++
     }
