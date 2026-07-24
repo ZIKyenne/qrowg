@@ -14,16 +14,14 @@ export default async function LeadsPage() {
     .select("id, title, slug")
     .eq("user_id", user.id)
 
-  const pageIds = (pages || []).map(p => p.id)
-
-  const { data: leads, error } = pageIds.length
-    ? await supabase
-        .from("leads")
-        .select("id, page_id, block_id, type, name, email, phone, message, data, is_read, status, created_at")
-        .in("page_id", pageIds)
-        .order("created_at", { ascending: false })
-        .limit(500)
-    : { data: [], error: null }
+  // Requete directe via leads.user_id (denormalise, migration 20260726) : plus
+  // besoin de recuperer les pages puis .in(pageIds).
+  const { data: leads, error } = await supabase
+    .from("leads")
+    .select("id, page_id, block_id, type, name, email, phone, message, data, is_read, status, created_at")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(500)
 
   // Table absente (migration 016 non appliquee) -> on signale la config a faire au lieu d'un vide muet.
   const setupNeeded = !!error && (error.code === "42P01" || error.code === "PGRST205" || /relation .*leads.* does not exist|could not find the table/i.test(error.message || ""))
