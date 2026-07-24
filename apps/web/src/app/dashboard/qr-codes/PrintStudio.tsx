@@ -16,6 +16,7 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import { createPortal } from "react-dom"
 import { useDeviceOrientation } from "@/lib/useDeviceOrientation"
+import { onEnterSpace } from "@/lib/a11y"
 import { fabric } from "fabric"
 import {
   X, Type as TypeIcon, QrCode, Square, Circle as CircleIcon, Minus,
@@ -4915,7 +4916,7 @@ export default function PrintStudio({ qrId, qrDataUrl, userPlan, onClose, onUpse
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                 {photoResults.map(p => (
                   <div key={p.id} style={{ position: "relative", aspectRatio: "1", borderRadius: 8, overflow: "hidden", border: "1px solid rgba(0,0,0,0.1)", background: pField }}>
-                    <img src={p.thumb} alt="" onClick={() => addPhoto(p.regular)} title={`Ajouter l'image — ${p.author}`} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", cursor: "pointer" }} />
+                    <img src={p.thumb} alt="" role="button" tabIndex={0} aria-label={`Ajouter l'image de ${p.author}`} onKeyDown={onEnterSpace(() => addPhoto(p.regular))} onClick={() => addPhoto(p.regular)} title={`Ajouter l'image — ${p.author}`} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", cursor: "pointer" }} />
                     <button type="button" onClick={() => setPhotoBg(p.regular)} title="Définir comme fond plein cadre"
                       style={{ position: "absolute", bottom: 5, right: 5, padding: "3px 8px", background: "rgba(0,0,0,0.62)", color: "#fff", border: "none", borderRadius: 999, fontSize: 9, fontWeight: 700, cursor: "pointer", backdropFilter: "blur(2px)" }}>Fond</button>
                   </div>
