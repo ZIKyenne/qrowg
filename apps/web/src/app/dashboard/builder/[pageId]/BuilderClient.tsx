@@ -331,7 +331,7 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
                         </span>
                         <span style={{ flex: 1, minWidth: 0 }}>
                           <span style={{ display: 'block', fontSize: '12px', color: '#F5F0E8', fontFamily: 'DM Sans, sans-serif' }}>{t.name}</span>
-                          <span style={{ display: 'block', fontSize: '10px', color: '#6E6A60' }}>{t.font_display}</span>
+                          <span style={{ display: 'block', fontSize: '10px', color: '#8A8478' }}>{t.font_display}</span>
                         </span>
                         {active && <span style={{ color: '#39FF8F', fontSize: '13px' }}>✓</span>}
                       </button>
@@ -339,7 +339,7 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
                   })}
                 </div>
               ))}
-              <div style={{ fontSize: '10px', color: '#4A4640', lineHeight: 1.5, padding: '4px 4px 0' }}>
+              <div style={{ fontSize: '10px', color: '#8A8478', lineHeight: 1.5, padding: '4px 4px 0' }}>
                 Le thème s'applique à l'aperçu et à ta page publiée. Pense à republier pour le voir en ligne.
               </div>
             </>
@@ -351,7 +351,7 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
           flex: 1, background: '#0A0908', display: 'flex', flexDirection: 'column',
           alignItems: 'center', padding: '24px 16px', overflowY: 'auto', gap: '3px',
         }}>
-          <div style={{ fontSize: '11px', letterSpacing: '2px', textTransform: 'uppercase', color: '#4A4640', marginBottom: '12px' }}>
+          <div style={{ fontSize: '11px', letterSpacing: '2px', textTransform: 'uppercase', color: '#8A8478', marginBottom: '12px' }}>
             {blocks.length} bloc{blocks.length > 1 ? 's' : ''}
             {page.status === 'published' && (
               <a href={'/' + page.slug} target="_blank" style={{ marginLeft: '12px', color: '#39FF8F', textDecoration: 'none' }}>
@@ -363,7 +363,7 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
           {blocks.length === 0 && (
             <div style={{
               border: '1px dashed rgba(201,168,76,0.15)', borderRadius: '8px',
-              padding: '60px 40px', textAlign: 'center', color: '#4A4640', fontSize: '14px',
+              padding: '60px 40px', textAlign: 'center', color: '#8A8478', fontSize: '14px',
             }}>
               <div style={{ fontSize: '32px', marginBottom: '12px', opacity: 0.4 }}>+</div>
               Ajoutez des blocs depuis le panneau gauche
@@ -381,7 +381,7 @@ export default function BuilderClient({ page, initialBlocks }: BuilderClientProp
               <span style={{ fontSize: '18px', flexShrink: 0 }}>{block.icon}</span>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: '13px', fontWeight: 500, color: '#F5F0E8' }}>{block.label}</div>
-                <div style={{ fontSize: '10px', color: '#4A4640', marginTop: '1px' }}>Bloc #{idx + 1}</div>
+                <div style={{ fontSize: '10px', color: '#8A8478', marginTop: '1px' }}>Bloc #{idx + 1}</div>
               </div>
               <div style={{ display: 'flex', gap: '3px' }} onClick={e => e.stopPropagation()}>
                 <button onClick={() => moveBlock(block.id, 'up')} disabled={idx === 0} style={{

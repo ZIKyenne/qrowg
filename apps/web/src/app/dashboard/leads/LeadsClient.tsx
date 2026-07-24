@@ -118,7 +118,7 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
           <p style={{ color: MUTED, fontSize: 13, margin: "0 0 10px", lineHeight: 1.6 }}>
             La table <code style={{ color: TEXT }}>leads</code> n&apos;existe pas encore en base. Exécutez la migration <code style={{ color: TEXT }}>016_leads</code> dans Supabase (SQL Editor) pour recevoir et stocker les messages de vos pages. Les notifications par email nécessitent en plus la variable <code style={{ color: TEXT }}>RESEND_API_KEY</code> sur Vercel.
           </p>
-          <p style={{ color: "#4A4640", fontSize: 11, margin: 0 }}>Fichier : supabase/migrations/20260701_016_leads.sql</p>
+          <p style={{ color: "#8A8478", fontSize: 11, margin: 0 }}>Fichier : supabase/migrations/20260701_016_leads.sql</p>
         </div>
       )}
 

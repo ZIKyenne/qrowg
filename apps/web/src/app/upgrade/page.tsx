@@ -217,7 +217,7 @@ export default function UpgradePage() {
           <p style={{ color: MUTED, fontSize: 13, margin: "0 0 6px" }}>
             Des questions ? <a href="mailto:hello@qrowg.com" style={{ color: G, textDecoration: "none" }}>Contactez-nous</a>
           </p>
-          <p style={{ color: "#4A4640", fontSize: 12, margin: 0 }}>
+          <p style={{ color: "#8A8478", fontSize: 12, margin: 0 }}>
             Paiement securise par Stripe · Annulation a tout moment · Remboursement 14 jours · Sans engagement
           </p>
         </div>
