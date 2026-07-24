@@ -13,6 +13,7 @@ import {
 import dynamic from "next/dynamic"
 import { createClient } from "@/lib/supabase/client"
 import { useIsMobile } from "@/lib/useIsMobile"
+import { onEnterSpace } from "@/lib/a11y"
 import { PLAN_RANK, canPrintStudio, minPlanFor } from "@/lib/plans"
 import { createQR, updateQR, getQRBlob, downloadBlob, blobToDataUrl, buildAndDownloadPdf, type QROptions } from "./qrRender"
 import type QRCodeStyling from "qr-code-styling"
@@ -2534,7 +2535,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             const isC  = copyQRId === qr.id
             const pb   = PLAN_BADGE[userPlan]
             return (
-              <div key={qr.id} onClick={() => { setActiveId(qr.id); setMenuId(null); setMobileView("editor") }}
+              <div key={qr.id} role="button" tabIndex={0} onKeyDown={onEnterSpace(() => { setActiveId(qr.id); setMenuId(null); setMobileView("editor") })} onClick={() => { setActiveId(qr.id); setMenuId(null); setMobileView("editor") }}
                 style={{ margin:"0 10px 8px", padding:"12px", cursor:"pointer", borderRadius:12, border:`1px solid ${isA?"color-mix(in srgb, var(--accent) 40%, transparent)":"rgba(255,255,255,0.07)"}`, background:isA?"color-mix(in srgb, var(--accent) 7%, transparent)":"rgba(255,255,255,0.02)", boxShadow:isA?"0 4px 16px color-mix(in srgb, var(--accent) 8%, transparent)":"none", position:"relative", transition:"all 0.15s" }}
                 onMouseEnter={e => { if (!isA) e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)" }}
                 onMouseLeave={e => { if (!isA) e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)" }}>
@@ -2734,7 +2735,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </div>
                   )}
                   <div style={{ display: scene==="none" ? "block" : "none", position:"relative", padding:isMobile?16:28, borderRadius:isMobile?22:28, background:bg, boxShadow:`0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent), 0 28px 80px rgba(0,0,0,0.85)`, transition:"background 0.3s", cursor:"pointer" }}
-                    onClick={() => setShowModal(true)}>
+                    role="button" tabIndex={0} aria-label="Ouvrir l'aperçu" onKeyDown={onEnterSpace(() => setShowModal(true))} onClick={() => setShowModal(true)}>
                     {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h], i) => (
                       <div key={i} style={{ position:"absolute", [v]:10, [h]:10, width:18, height:18,
                         borderTop:    v==="top"    ? "2px solid color-mix(in srgb, var(--accent) 70%, transparent)" : "none",
@@ -3338,7 +3339,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         const dotR = preset.dotStyle === "dot" ? "50%" : preset.dotStyle === "rounded" ? "30%" : "2px"
                         const cornR = preset.cornerStyle === "circle" || preset.cornerStyle === "rounded" || preset.cornerStyle === "luxury" ? "30%" : "2px"
                         return (
-                          <div key={preset.id} onClick={() => applyPreset(preset)}
+                          <div key={preset.id} role="button" tabIndex={0} onKeyDown={onEnterSpace(() => applyPreset(preset))} onClick={() => applyPreset(preset)}
                             onMouseEnter={e => { if (!isActive) { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 45%, transparent)"; e.currentTarget.style.transform = "translateY(-2px)" } }}
                             onMouseLeave={e => { if (!isActive) { e.currentTarget.style.borderColor = canAccess?"rgba(255,255,255,0.08)":"color-mix(in srgb, var(--accent) 28%, transparent)"; e.currentTarget.style.transform = "translateY(0)" } }}
                             style={{ position:"relative", cursor:"pointer", borderRadius:10, overflow:"hidden", border:`1.5px solid ${isActive?"var(--accent)":canAccess?"rgba(255,255,255,0.08)":"color-mix(in srgb, var(--accent) 28%, transparent)"}`, transition:"all 0.15s", opacity:1 }}>
@@ -3587,7 +3588,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
                     {!styleConf.logoUrl ? (
                       <div
-                        onClick={() => logoInputRef.current?.click()}
+                        role="button" tabIndex={0} onKeyDown={onEnterSpace(() => logoInputRef.current?.click())} onClick={() => logoInputRef.current?.click()}
                         onDragOver={e => { e.preventDefault(); (e.currentTarget as HTMLElement).style.borderColor = G }}
                         onDragLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.1)" }}
                         onDrop={e => {
@@ -3877,7 +3878,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     const isA    = expFormat === f.id
                     return (
                       <button key={f.id} type="button"
-                        onClick={() => canFmt ? setExpFormat(f.id as any) : setUpsell({ feature: `l'export ${cfg.label}`, plan: cfg.plan })}
+                        role="button" tabIndex={0} onKeyDown={onEnterSpace(() => canFmt ? setExpFormat(f.id as any) : setUpsell({ feature: `l'export ${cfg.label}`, plan: cfg.plan }))} onClick={() => canFmt ? setExpFormat(f.id as any) : setUpsell({ feature: `l'export ${cfg.label}`, plan: cfg.plan })}
                         style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 14px", background:isA?`${cfg.color}14`:"rgba(255,255,255,0.02)", border:`1.5px solid ${isA?cfg.color+"66":"rgba(255,255,255,0.07)"}`, borderRadius:12, cursor:"pointer", opacity:canFmt?1:0.5, textAlign:"left" as const, position:"relative" as const, transition:"all 0.15s" }}>
                         <div style={{ width:38, height:38, borderRadius:10, background:isA?`${cfg.color}22`:"rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>
                           {f.emoji}
@@ -3927,7 +3928,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     const ok = PLAN_RANK[userPlan] >= PLAN_RANK[r.plan]
                     return (
                       <button key={r.label} type="button"
-                        onClick={() => { if (!ok) { setUpsell({ feature: `l'export ${r.hint}`, plan: r.plan }); return } if (r.fmt === "png-t") setShowMoreFmt(true); setExpFormat(r.fmt as any); setExpSize(r.size as any) }}
+                        role="button" tabIndex={0} onKeyDown={onEnterSpace(() => { if (!ok) { setUpsell({ feature: `l'export ${r.hint}`, plan: r.plan }); return } if (r.fmt === "png-t") setShowMoreFmt(true); setExpFormat(r.fmt as any); setExpSize(r.size as any) })} onClick={() => { if (!ok) { setUpsell({ feature: `l'export ${r.hint}`, plan: r.plan }); return } if (r.fmt === "png-t") setShowMoreFmt(true); setExpFormat(r.fmt as any); setExpSize(r.size as any) }}
                         style={{ display:"flex", alignItems:"center", gap:8, padding:"9px 10px", background:"rgba(255,255,255,0.025)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:9, cursor:"pointer", textAlign:"left" as const, opacity: ok ? 1 : 0.6 }}>
                         <span style={{ fontSize:15, flexShrink:0 }}>{r.emoji}</span>
                         <span style={{ minWidth:0 }}>
@@ -3949,7 +3950,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     const canHD = !isHD || canPro
                     return (
                       <button key={String(s)} type="button"
-                        onClick={() => canHD && setExpSize(s as any)}
+                        role="button" tabIndex={0} onKeyDown={onEnterSpace(() => { if (canHD) setExpSize(s as any) })} onClick={() => canHD && setExpSize(s as any)}
                         style={{ padding:"5px 10px", background:expSize===s?"color-mix(in srgb, var(--accent) 12%, transparent)":"rgba(255,255,255,0.03)", border:`1px solid ${expSize===s?"color-mix(in srgb, var(--accent) 40%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:expSize===s?G:canHD?"#F5F0E8":MUTED, fontSize:10, cursor:canHD?"pointer":"not-allowed", fontWeight:expSize===s?700:400, opacity:canHD?1:0.55 }}>
                         {s === "custom" ? "Perso" : `${s}px`}
                         {isHD && !canHD && <Lock size={8} color={MUTED} style={{ marginLeft:3 }}/>}
