@@ -17,6 +17,8 @@ export default function BottomSheet({
 }) {
   const [drag, setDrag] = useState(0)          // translation verticale pendant le glisser
   const startY = useRef<number | null>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const restoreRef = useRef<HTMLElement | null>(null)   // élément à re-focaliser à la fermeture
 
   // Fermer sur Échap (clavier / accessibilité).
   useEffect(() => {
@@ -25,6 +27,32 @@ export default function BottomSheet({
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
   }, [open, onClose])
+
+  // Piège de focus (WCAG 2.4.3) : à l'ouverture, on mémorise le déclencheur et on
+  // déplace le focus dans la modale ; Tab boucle à l'intérieur ; à la fermeture,
+  // le focus revient au déclencheur.
+  useEffect(() => {
+    if (!open) return
+    restoreRef.current = (document.activeElement as HTMLElement | null)
+    const dialog = dialogRef.current
+    const SEL = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'
+    const focusables = () => Array.from(dialog?.querySelectorAll<HTMLElement>(SEL) ?? []).filter(el => el.offsetParent !== null)
+    const t = setTimeout(() => { (focusables()[0] ?? dialog)?.focus() }, 0)
+    const onTab = (e: KeyboardEvent) => {
+      if (e.key !== "Tab" || !dialog) return
+      const f = focusables()
+      if (!f.length) { e.preventDefault(); return }
+      const first = f[0], last = f[f.length - 1]
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
+    }
+    document.addEventListener("keydown", onTab)
+    return () => {
+      clearTimeout(t)
+      document.removeEventListener("keydown", onTab)
+      restoreRef.current?.focus?.()
+    }
+  }, [open])
 
   const onTouchStart = (e: React.TouchEvent) => { startY.current = e.touches[0].clientY }
   const onTouchMove = (e: React.TouchEvent) => {
@@ -48,7 +76,7 @@ export default function BottomSheet({
           opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none",
           transition: `opacity ${T.motion.base}ms ease`,
         }} />
-      <div className="qf-bs" role="dialog" aria-modal="true"
+      <div className="qf-bs" role="dialog" aria-modal="true" ref={dialogRef} tabIndex={-1}
         style={{
           position: "absolute", left: 0, right: 0, bottom: 0, zIndex: T.z.sheet,
           background: T.color.chrome, borderTopLeftRadius: T.radius.xl, borderTopRightRadius: T.radius.xl,
