@@ -57,6 +57,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [isMobile, setIsMobile] = useState(false) // < 860px : menu replié d'office
   const [unreadLeads, setUnreadLeads] = useState(0) // messages non lus (badge nav)
   const [createOpen, setCreateOpen] = useState(false) // sheet "Créer" (bouton central mobile)
+
+  // Fermer le sheet "Créer" sur Échap (a11y clavier).
+  useEffect(() => {
+    if (!createOpen) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setCreateOpen(false) }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [createOpen])
   const G = accent
   // Masquer la barre mobile dans les editeurs plein ecran (le Print Studio se porte deja au-dessus).
   const hideMobileNav = pathname.startsWith("/dashboard/builder")
@@ -302,7 +310,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Sheet "Créer" (bouton central de la barre mobile) */}
       {isMobile && !hideMobileNav && createOpen && (
         <div onClick={() => setCreateOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(3px)", display: "flex", alignItems: "flex-end" }}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", background: "#141210", borderTopLeftRadius: 22, borderTopRightRadius: 22, border: `1px solid color-mix(in srgb, ${G} 16%, transparent)`, borderBottom: "none", padding: "10px 14px calc(16px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)", animation: "sheetUp .24s cubic-bezier(.2,.8,.2,1)" }}>
+          <div role="dialog" aria-modal="true" aria-label="Créer" onClick={e => e.stopPropagation()} style={{ width: "100%", background: "#141210", borderTopLeftRadius: 22, borderTopRightRadius: 22, border: `1px solid color-mix(in srgb, ${G} 16%, transparent)`, borderBottom: "none", padding: "10px 14px calc(16px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)", animation: "sheetUp .24s cubic-bezier(.2,.8,.2,1)" }}>
             <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 12px" }} />
             <p style={{ margin: "0 4px 10px", color: "#F5F0E8", fontSize: 15, fontWeight: 800 }}>Créer</p>
             {CREATE_ACTIONS.map(({ href, icon: Icon, label, sub }, i) => (
