@@ -67,7 +67,6 @@ export default function OnboardingChecklist() {
   const [data, setData] = useState<any>(null)
   const [dismissed, setDismissed] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [activeStep, setActiveStep] = useState<string | null>(null)
 
   useEffect(() => {
     // Check if already dismissed
@@ -161,12 +160,10 @@ export default function OnboardingChecklist() {
         {STEPS.map((step, i) => {
           const done = step.check(data)
           const isNext = step.id === nextStep?.id
-          const isActive = activeStep === step.id
 
           return (
             <div key={step.id}
-              onClick={() => !done && setActiveStep(isActive ? null : step.id)}
-              style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", background: isNext ? "rgba(201,168,76,0.05)" : done ? "rgba(57,255,143,0.04)" : "rgba(255,255,255,0.02)", border: `1px solid ${isNext ? "rgba(201,168,76,0.2)" : done ? "rgba(57,255,143,0.15)" : "rgba(255,255,255,0.05)"}`, borderRadius: 10, cursor: done ? "default" : "pointer", transition: "all 0.15s" }}>
+              style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", background: isNext ? "rgba(201,168,76,0.05)" : done ? "rgba(57,255,143,0.04)" : "rgba(255,255,255,0.02)", border: `1px solid ${isNext ? "rgba(201,168,76,0.2)" : done ? "rgba(57,255,143,0.15)" : "rgba(255,255,255,0.05)"}`, borderRadius: 10, transition: "all 0.15s" }}>
 
               {/* Status icon */}
               <div style={{ width: 28, height: 28, borderRadius: "50%", background: done ? "rgba(57,255,143,0.15)" : isNext ? "rgba(201,168,76,0.12)" : "rgba(255,255,255,0.05)", border: `1px solid ${done ? "rgba(57,255,143,0.3)" : isNext ? "rgba(201,168,76,0.25)" : "rgba(255,255,255,0.08)"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s" }}>

@@ -386,9 +386,13 @@ export default function TemplatesPage() {
               return (
                 <div key={template.id}
                   className="tpl-card"
+                  role="button"
+                  tabIndex={locked ? -1 : 0}
+                  aria-label="Ouvrir le modèle"
                   onMouseEnter={() => setHoveredCard(template.id)}
                   onMouseLeave={() => setHoveredCard(null)}
                   onClick={() => { if (isMobile) { setPreview(template.id); return } if (!locked) setSelected(isSelected ? null : template.id) }}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (isMobile) { setPreview(template.id); return } if (!locked) setSelected(isSelected ? null : template.id) } }}
                   style={{
                     background: isSelected ? "color-mix(in srgb, var(--accent) 5%, transparent)" : "#0F0E0B",
                     border: "1.5px solid " + (isSelected ? "color-mix(in srgb, var(--accent) 50%, transparent)" : isHovered ? "color-mix(in srgb, var(--accent) 20%, transparent)" : "rgba(255,255,255,0.06)"),
