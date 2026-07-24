@@ -1100,9 +1100,10 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* Toast */}
+      {/* Toast — role/aria-live pour annonce lecteur d'écran ; wrap (fini le
+          nowrap qui débordait sur mobile pour les messages longs). */}
       {toast && (
-        <div style={{ position:"fixed", bottom:24, left:"50%", transform:"translateX(-50%)", zIndex:9999, display:"flex", alignItems:"center", gap:9, padding:"11px 20px", background:toast.type==="ok"?"var(--success-bg)":"var(--danger-bg)", border:`1px solid ${toast.type==="ok"?"var(--success-border)":"var(--danger-border)"}`, borderRadius:12, backdropFilter:"blur(12px)", boxShadow:"0 8px 32px rgba(0,0,0,0.5)", whiteSpace:"nowrap" as const }}>
+        <div role="status" aria-live="polite" style={{ position:"fixed", bottom:24, left:"50%", transform:"translateX(-50%)", zIndex:9999, display:"flex", alignItems:"center", gap:9, padding:"11px 20px", background:toast.type==="ok"?"var(--success-bg)":"var(--danger-bg)", border:`1px solid ${toast.type==="ok"?"var(--success-border)":"var(--danger-border)"}`, borderRadius:12, backdropFilter:"blur(12px)", boxShadow:"0 8px 32px rgba(0,0,0,0.5)", maxWidth:"calc(100vw - 32px)" }}>
           {toast.type==="ok" ? <Check size={14} color="var(--success)"/> : <AlertTriangle size={14} color="var(--danger)"/>}
           <span style={{ color:toast.type==="ok"?"var(--success)":"var(--danger)", fontSize:13, fontWeight:600 }}>{toast.msg}</span>
         </div>
