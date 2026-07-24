@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Particles from '@/components/Particles'
+import QrowgLogo from '@/components/QrowgLogo'
 import ResetPasswordForm from './ResetPasswordForm'
 
 export const metadata: Metadata = { title: 'Nouveau mot de passe' }
@@ -16,8 +17,8 @@ export default function ResetPasswordPage() {
       <Particles behind />
       <div style={{ width: '100%', maxWidth: 400, position: 'relative', zIndex: 1 }}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <a href="/" style={{ fontFamily: 'Fraunces, serif', fontSize: 26, fontWeight: 300, color: '#F5F0E8', textDecoration: 'none' }}>
-            QR<span style={{ color: '#C9A84C', fontWeight: 600 }}>folio</span>
+          <a href="/" aria-label="QRowg — accueil" style={{ display: 'inline-flex', textDecoration: 'none' }}>
+            <QrowgLogo size={26} />
           </a>
           <h1 style={{ color: '#F8F4EC', fontSize: 23, fontWeight: 700, margin: '18px 0 6px', fontFamily: 'Fraunces, serif' }}>Nouveau mot de passe</h1>
           <p style={{ color: '#C9C3B6', fontSize: 14.5, margin: 0 }}>Choisissez un mot de passe pour sécuriser votre compte.</p>

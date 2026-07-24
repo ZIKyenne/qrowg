@@ -42,7 +42,7 @@ export default function SignupForm({ refCode }: { refCode?: string }) {
       {refCode && <input type="hidden" name="ref" value={refCode} />}
       <div>
         <label htmlFor="full_name" style={LABEL}>Nom complet</label>
-        <input id="full_name" type="text" name="full_name" placeholder="Emilien Lampson" required
+        <input id="full_name" type="text" name="full_name" placeholder="Jean Dupont" required
           autoComplete="name" style={FIELD} />
       </div>
 
