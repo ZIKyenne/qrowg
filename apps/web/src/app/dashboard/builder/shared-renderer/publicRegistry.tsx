@@ -149,6 +149,10 @@ const PublicRichText = dynamic(() => import("./blocks/rich_text").then(m => m.Pu
 const PublicOpeningHours = dynamic(() => import("./blocks/opening_hours").then(m => m.PublicOpeningHours))
 const PublicGallery = dynamic(() => import("./blocks/gallery").then(m => m.PublicGallery))
 const PublicSocialLinks = dynamic(() => import("./blocks/social_links").then(m => m.PublicSocialLinks))
+const PublicAbout = dynamic(() => import("./blocks/about").then(m => m.PublicAbout))
+const PublicAvailability = dynamic(() => import("./blocks/availability").then(m => m.PublicAvailability))
+const PublicAnnouncement = dynamic(() => import("./blocks/announcement").then(m => m.PublicAnnouncement))
+const PublicFaq = dynamic(() => import("./blocks/faq").then(m => m.PublicFaq))
 
 const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   heading: PublicHeading,
@@ -270,6 +274,10 @@ const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   opening_hours: PublicOpeningHours,
   gallery: PublicGallery,
   social_links: PublicSocialLinks,
+  about: PublicAbout,
+  availability: PublicAvailability,
+  announcement: PublicAnnouncement,
+  faq: PublicFaq,
 }
 
 // Renvoie l'adapter public partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

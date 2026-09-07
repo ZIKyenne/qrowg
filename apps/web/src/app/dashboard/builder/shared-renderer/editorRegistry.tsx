@@ -89,6 +89,10 @@ import { EditorRichText } from "./blocks/rich_text"
 import { EditorOpeningHours } from "./blocks/opening_hours"
 import { EditorGallery } from "./blocks/gallery"
 import { EditorSocialLinks } from "./blocks/social_links"
+import { EditorAbout } from "./blocks/about"
+import { EditorAvailability } from "./blocks/availability"
+import { EditorAnnouncement } from "./blocks/announcement"
+import { EditorFaq } from "./blocks/faq"
 import { EditorFreeSection } from "./blocks/free_section"
 import { EditorImageText } from "./blocks/image_text"
 import { EditorSplitPanel } from "./blocks/split_panel"
@@ -252,6 +256,10 @@ const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   opening_hours: EditorOpeningHours,
   gallery: EditorGallery,
   social_links: EditorSocialLinks,
+  about: EditorAbout,
+  availability: EditorAvailability,
+  announcement: EditorAnnouncement,
+  faq: EditorFaq,
 }
 
 // Renvoie l'adapter éditeur partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

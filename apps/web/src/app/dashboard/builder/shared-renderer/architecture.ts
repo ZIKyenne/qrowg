@@ -148,6 +148,13 @@ export const SHARED_RENDERER_BLOCKS: ReadonlySet<string> = new Set<string>([
   // avait qu'une exception ; les reseaux ignoraient une cle heritee que la page
   // publiait quand meme.
   "opening_hours", "gallery", "social_links",
+  // ── Vague 17 — information et annonces (4 blocs) ──
+  // `about` inventait « Votre histoire ici... » dans l'apercu ; `availability`
+  // annoncait « Disponible » sans que personne l'ait choisi ; `announcement`
+  // dessinait un cadre vide et cachait sa fenetre de dates a l'auteur ; `faq`
+  // montrait un en-tete pour un bloc qui ne publiait rien, et son style
+  // « Cartes » rendait exactement comme « Compact ».
+  "about", "availability", "announcement", "faq",
 ])
 
 // Blocs prévus comme pilotes en B09.2 (déclaratif, NON activé). Voir SHARED-RENDERER-PILOT.md.

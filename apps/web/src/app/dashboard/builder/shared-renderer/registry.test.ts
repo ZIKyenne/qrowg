@@ -7,6 +7,11 @@ import { BLOCK_DEFS } from "../blockDefs"
 
 const ACTIVE = new Set(BLOCS_ACTIFS_ATTENDUS)
 
+/** Ce qui n'est pas encore migré, dans l'ordre du catalogue. Sert d'exemple de
+ *  bloc « hors périmètre » sans avoir à en nommer un, donc sans le corriger à
+ *  chaque vague. */
+const ENCORE_LEGACY = Object.keys(BLOCK_DEFS).filter(t => !SHARED_RENDERER_BLOCKS.has(t))
+
 
 // Un adapter public est désormais chargé à la demande (`next/dynamic`) : ce n'est
 // plus une fonction mais un objet composant React. « Rendu possible » se vérifie
@@ -35,11 +40,12 @@ describe("résolution éditeur/public (flag actif = recensement blocs)", () => {
       expect(typeof resolveEditorBlock(t)).toBe("function")
       expect(estComposant(resolvePublicBlock(t))).toBe(true)
     }
-    // Deux blocs encore legacy : ils doivent rester non résolus. Chaque vague
-    // rattrape l'exemple précédent — « profile » à la vague 15, « gallery » et
-    // « opening_hours » à la 16 : d'où la garde ci-dessous, qui dit lequel
-    // remplacer au lieu d'échouer sans expliquer.
-    for (const t of ["faq", "countdown"]) {
+    // Des blocs encore legacy doivent rester non résolus. Ils étaient nommés en
+    // dur, et chaque vague rattrapait l'exemple de la précédente — « profile »
+    // à la 15, « gallery » et « opening_hours » à la 16, « faq » à la 17. Trois
+    // corrections de suite sur un test qui n'avait rien trouvé : l'exemple se
+    // choisit maintenant tout seul parmi ce qui reste.
+    for (const t of ENCORE_LEGACY.slice(0, 2)) {
       expect(SHARED_RENDERER_BLOCKS.has(t), `${t} est migré : choisir un autre exemple`).toBe(false)
       expect(resolveEditorBlock(t)).toBeNull()
       expect(resolvePublicBlock(t)).toBeNull()
@@ -52,9 +58,9 @@ describe("résolution éditeur/public (flag actif = recensement blocs)", () => {
   it("bloc hors périmètre activé → null (adapter absent)", () => {
     // Activer de force un type qui n'a pas d'adapter ne doit rien casser : on
     // retombe sur le legacy.
-    expect(SHARED_RENDERER_BLOCKS.has("faq"), "faq est migré : choisir un autre exemple").toBe(false)
-    expect(resolveEditorBlock("faq", new Set(["faq"]))).toBeNull()
-    expect(resolvePublicBlock("faq", new Set(["faq"]))).toBeNull()
+    const t = ENCORE_LEGACY[0]
+    expect(resolveEditorBlock(t, new Set([t])), t).toBeNull()
+    expect(resolvePublicBlock(t, new Set([t])), t).toBeNull()
   })
 })
 

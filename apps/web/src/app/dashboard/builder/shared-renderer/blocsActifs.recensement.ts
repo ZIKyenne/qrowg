@@ -130,4 +130,8 @@ export const BLOCS_ACTIFS_ATTENDUS: readonly string[] = [
   "opening_hours",
   "gallery",
   "social_links",
+  "about",
+  "availability",
+  "announcement",
+  "faq",
 ]
