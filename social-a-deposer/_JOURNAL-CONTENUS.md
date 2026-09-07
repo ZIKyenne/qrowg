@@ -56,6 +56,11 @@
 | Salon / coiffeur | Tarifs et durées des prestations affichés au miroir | 06/09 |
 | Traiteur | Formules buffet et demande de devis | 06/09 |
 | Commerce / boutique | Carte cadeau dématérialisée | 06/09 |
+| Food truck | Le camion privatisé pour un événement (carrousel) | 07/09 |
+| Boulangerie | Horaires de fournée / pain chaud annoncé en vitrine | 07/09 |
+| Marché / producteur | Calendrier des marchés du mois | 07/09 |
+| Food truck | Carte de la semaine par thème | 07/09 |
+| Hôtel / chambre d'hôtes | Arrivée tardive en autonomie (code, étage) | 07/09 |
 
 ## Angles NEUFS disponibles (piocher ici en priorité)
 - Restaurant : plat à emporter du soir · anniversaire / privatisation ·
@@ -64,13 +69,15 @@
 - Bar : carte des cocktails saisonnière · quiz / jeu de table ·
   happy hour qui change selon l'heure · la carte des softs maison · le programme du dimanche sport.
 - Boulangerie : commande de galette / bûche selon la saison · liste d'allergènes ·
-  la commande de gâteau d'anniversaire · les horaires de fournée.
-- Food truck : le camion privatisé pour un événement · la carte de la semaine par thème.
-- Marché / producteur : la recette du produit de saison · le calendrier des marchés du mois.
+  la commande de gâteau d'anniversaire · le pain sur commande pour la semaine.
+- Food truck : la fiche « où se garer » pour les entreprises · les moyens de paiement acceptés ·
+  le camion en tournée de festival (dates et scène).
+- Marché / producteur : la recette du produit de saison · la fiche conservation du produit ·
+  la vente à la ferme hors marché.
 - Commerce : inscription newsletter en caisse · parrainage · la notice du produit sans papier ·
   le mode d'emploi de l'article en cabine · les horaires exceptionnels affichés en vitrine.
-- Hôtel / chambre d'hôtes : l'arrivée tardive en autonomie (code, étage, marche à suivre —
-  **visuel déjà produit et contrôlé, en réserve**) · le plan des transports depuis la gare.
+- Hôtel / chambre d'hôtes : le plan des transports depuis la gare ·
+  les bonnes adresses du quartier tenues à jour · le petit-déjeuner commandé la veille.
 - Salon / coiffeur : le créneau libéré à la dernière minute · la routine d'entretien
   après un balayage · la carte cadeau du salon.
 - Transverse : « ton QR imprimé en 2024 marche encore » (QR dynamique) ·
@@ -146,7 +153,11 @@
 - « Le prix, personne n'ose le demander. »
 - « Le devis part par mail. La réponse, jamais. »
 - « Offrir sans emballer, ni imprimer. »
-- « Il arrive à 23 h. Toi, tu dors. » *(en réserve, non publiée)*
+- « Il arrive à 23 h. Toi, tu dors. » *(sortie de réserve le 07/09)*
+- « Vous faites les événements ? »
+- « Le pain sort à 16 h. Personne ne le sait. »
+- « Le calendrier du mois, sur ton étal. »
+- « Cette semaine, c'est mexicain. »
 
 | 05/09 | commerce / boutique (100 % inédit) | qr-code-stock-disponible-magasin-boutique (carrousel IG + TikTok + reel 32,2 s), qr-code-retours-garantie-ticket-caisse-boutique, qr-code-carte-sandwichs-du-midi-boulangerie, qr-code-carte-bieres-pression-du-moment-bar | Pinterest, IG, TikTok, X |
 
@@ -202,4 +213,38 @@
 > moyen contre 12,82 s le 04/09**. Le pic du 04/09 (restaurant · liste d'attente du
 > samedi soir) tenait au sujet, pas au format : on garde donc la **restauration en
 > tension de service** et on change l'angle — d'où la carte enfants aujourd'hui.
+> Instagram : toujours 0 vue, 0 reach sur les carrousels.
+
+| 07/09 | food truck (100 % inédit) | qr-code-camion-privatise-evenement-food-truck (carrousel IG + TikTok), qr-code-horaires-fournee-pain-chaud-boulangerie, qr-code-calendrier-marches-du-mois-producteur, qr-code-carte-de-la-semaine-par-theme-food-truck, qr-code-arrivee-tardive-check-in-autonome-hotel *(sortie de réserve)* | Pinterest, IG, TikTok, LinkedIn |
+
+> **Note 07/09 — file Buffer trouvée à 1/10** : seul reste le carrousel photo TikTok du
+> 06/09 (programmé le 07/09 à 06 h 40 UTC). 9 places libres.
+> **Étape 0 respectée** : la réserve contenait un seul contenu `dispo`, l'épingle
+> **hôtel · arrivée tardive**, sortie aujourd'hui (unique épingle hors-food du jour,
+> règle du pont d'audience tenue). Elle a été **re-rendue** avec le slug de campagne du
+> jour : son QR portait encore `20260906-restaurant`, ce qui aurait faussé l'attribution.
+> Secteur du jour : **food truck**, angle « le camion privatisé pour un événement »,
+> jamais traité. Rotation respectée (06/09 = restaurant). Lundi = problème métier dans
+> la rotation de la charte.
+> 4 épingles, **4 angles distincts**, **4 gabarits distincts (layouts 0, 1, 2, 3)** et
+> **4 tableaux distincts** — QR code boutique commerce, QR code food truck,
+> Templates gratuits, QR code hôtel (premier épinglage sur ce dernier).
+> Contrôle qualité : **16 visuels, 0 alerte**, chaque QR décodé vers son lien tracké.
+> Pas de vidéo (lundi n'est pas un jour vidéo).
+> **Dépôt NON effectué à la fin du run** : `QRowg-Depot.cmd` est un exécutable Windows
+> hors du dossier connecté, l'agent ne peut pas le lancer, et Buffer refuse une image
+> dont l'URL n'est pas déjà accessible. Rien n'a donc été mis en file. Les 16 PNG sont
+> copiés dans le dossier `outputs` de la session et dans `_STOCK` en statut `dispo` :
+> après dépôt, les 6 posts (IG, TikTok, 4 épingles) portent la file à 7/10.
+> **Apprentissage Buffer.** Pinterest : **0 impression sur toutes les épingles publiées
+> depuis le 02/09**, sans une seule exception, tableaux historiques compris. Le test de
+> placement du 03/09 est tranché avant sa date de lecture : **le placement n'est pas la
+> cause**. Il ne reste que la cause n°2 du diagnostic — `qrowg.com` non revendiqué /
+> compte déclassé. Produire davantage d'épingles ne changera rien tant que ce point
+> n'est pas réglé ; le volume reste donc plafonné à 4 et l'action prioritaire est
+> Paramètres Pinterest → Comptes connectés → revendiquer le site.
+> TikTok reste le seul canal distribué (267 vues le 05/09, 276 le 04/09), mais le
+> visionnage moyen retombe à **4,44 s** contre 12,82 s le 04/09 : le pic tenait au sujet
+> (restaurant · liste d'attente du samedi soir), pas au format. D'où un angle de
+> **tension de service** aujourd'hui encore — la demande d'événement qui meurt en DM.
 > Instagram : toujours 0 vue, 0 reach sur les carrousels.

@@ -2,7 +2,7 @@
 // Éditeur et public ont des contextes distincts → aucune capacité éditeur ne peut fuiter
 // dans le rendu public.
 
-import type { CSSProperties } from "react"
+import type { CSSProperties, ReactNode } from "react"
 import type { PageTheme } from "../types"
 import { isLightTheme, surfaceTokens } from "./models/layoutStyle"
 
@@ -98,6 +98,32 @@ export function publicCtx(ctx: PublicRenderCtx): UnifiedCtx {
     ...themeSurfaces(ctx.theme),
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TEXTE ÉDITABLE — sans faire entrer l'éditeur dans le bundle public.
+//
+// Quatre blocs laissent le commerçant corriger un texte directement dans
+// l'aperçu (profile, rich_text, team, announcement). Jusqu'ici, la seule façon
+// de garder cette capacité en migrant un bloc était d'écrire DEUX adapters qui
+// recopient la même géométrie — c'est-à-dire de réintroduire exactement la
+// divergence que le renderer partagé existe pour supprimer.
+//
+// La vue partagée reçoit donc un rendu de texte en paramètre : l'adapter éditeur
+// en fournit un qui s'appuie sur InlineEditable, l'adapter public un qui rend un
+// élément ordinaire. Une seule géométrie, aucun import croisé — un bloc partagé
+// ne tire jamais InlineEditable, qui vit du côté éditeur.
+export type RenduTexte = (p: {
+  valeur: string
+  /** Clé du champ à écrire quand le commerçant corrige le texte. */
+  cle: string
+  style: CSSProperties
+  multiligne?: boolean
+  balise?: "p" | "span"
+  placeholder?: string
+}) => ReactNode
+
+// L'implémentation figée (celle du public) vit dans primitives/TexteInline.tsx :
+// ce fichier ne contient que des types, il ne doit pas devenir un module JSX.
 
 // Échelle : arrondit une taille de référence (pensée pour le public) au contexte.
 export function sz(u: UnifiedCtx, n: number): number {

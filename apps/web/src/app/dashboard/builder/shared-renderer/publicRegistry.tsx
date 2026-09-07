@@ -139,6 +139,10 @@ const PublicGoogleMaps = dynamic(() => import("./blocks/google_maps").then(m => 
 const PublicQuickContact = dynamic(() => import("./blocks/quick_contact").then(m => m.PublicQuickContact))
 const PublicCtaButton = dynamic(() => import("./blocks/cta_button").then(m => m.PublicCtaButton))
 
+// Vague 14 — equipe et interlocuteurs.
+const PublicTeam = dynamic(() => import("./blocks/team").then(m => m.PublicTeam))
+const PublicMultiContact = dynamic(() => import("./blocks/multi_contact").then(m => m.PublicMultiContact))
+
 const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   heading: PublicHeading,
   values: PublicValues,
@@ -252,6 +256,8 @@ const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   google_maps: PublicGoogleMaps,
   quick_contact: PublicQuickContact,
   cta_button: PublicCtaButton,
+  team: PublicTeam,
+  multi_contact: PublicMultiContact,
 }
 
 // Renvoie l'adapter public partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

@@ -133,6 +133,10 @@ export const SHARED_RENDERER_BLOCKS: ReadonlySet<string> = new Set<string>([
   // obtenir l'itineraire, cliquer. Chaque bloc migre est aussi un bloc de moins
   // qui fait descendre le module legacy chez le visiteur.
   "call_button", "directions_button", "google_maps", "quick_contact", "cta_button",
+  // ── Vague 14 — equipe et interlocuteurs (2 blocs) ──
+  // Premier bloc migre qui garde l'edition en ligne : la vue partagee recoit le
+  // rendu du texte en parametre, au lieu de deux vues qui se recopient.
+  "team", "multi_contact",
 ])
 
 // Blocs prévus comme pilotes en B09.2 (déclaratif, NON activé). Voir SHARED-RENDERER-PILOT.md.

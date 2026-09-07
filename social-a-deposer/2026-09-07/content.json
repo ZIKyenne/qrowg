@@ -1,0 +1,86 @@
+{
+ "carousels": [
+  {
+   "slug": "qr-code-camion-privatise-evenement-food-truck",
+   "url": "https://qrowg.com/qr-code/food-truck?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260907-foodtruck",
+   "slides": [
+    {
+     "kind": "cover",
+     "tag": "Food truck",
+     "title": "Vous faites les [[événements]] ?",
+     "body": "La question qu'on te pose. Le devis, lui, ne part jamais."
+    },
+    {
+     "kind": "body",
+     "kicker": "Le problème",
+     "title": "La demande meurt en [[DM]]",
+     "body": "Un numéro griffonné, une promesse de rappeler. Trois jours plus tard, ils ont pris un traiteur."
+    },
+    {
+     "kind": "qr",
+     "kicker": "En direct",
+     "title": "Un QR sur le [[camion]]",
+     "body": "Formules, capacité, zone, dates libres — et le formulaire de demande."
+    },
+    {
+     "kind": "body",
+     "kicker": "Le geste",
+     "title": "Tu réponds une fois. Pas [[dix]]",
+     "body": "La page dit tout ce qu'on te demande au téléphone pendant le coup de feu."
+    },
+    {
+     "kind": "metric",
+     "kicker": "Preuve",
+     "number": "2 min",
+     "title": "pour créer ta page [[événement]]",
+     "body": "Une fois. Elle répond ensuite toute la saison."
+    },
+    {
+     "kind": "cta",
+     "title": "Crée ton QR food truck en 2 [[minutes]]",
+     "body": "Prêt à imprimer. À ta marque.",
+     "cta": "qrowg.com",
+     "qr": true
+    }
+   ]
+  }
+ ],
+ "pins": [
+  {
+   "slug": "qr-code-horaires-fournee-pain-chaud-boulangerie",
+   "url": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260907-foodtruck",
+   "tag": "Boulangerie",
+   "title": "Le pain sort à 16 h. Personne ne le [[sait]].",
+   "subtitle": "Les horaires de fournée, à jour derrière un QR en vitrine.",
+   "layout": 0,
+   "qr": true
+  },
+  {
+   "slug": "qr-code-calendrier-marches-du-mois-producteur",
+   "url": "https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260907-foodtruck",
+   "tag": "Producteur",
+   "title": "Le calendrier du mois, sur ton [[étal]]",
+   "subtitle": "Les marchés, les horaires, les changements de dernière minute.",
+   "layout": 2,
+   "qr": true
+  },
+  {
+   "slug": "qr-code-carte-de-la-semaine-par-theme-food-truck",
+   "url": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260907-foodtruck",
+   "tag": "Food truck",
+   "title": "Cette semaine, c'est [[mexicain]].",
+   "subtitle": "La carte change chaque lundi. L'autocollant du camion, jamais.",
+   "layout": 3,
+   "qr": true
+  },
+  {
+   "slug": "qr-code-arrivee-tardive-check-in-autonome-hotel",
+   "url": "https://qrowg.com/qr-code/hotel?utm_source=pinterest&utm_medium=pin&utm_campaign=20260907-foodtruck",
+   "tag": "Hôtel",
+   "title": "Il arrive à 23 h. Toi, tu [[dors]].",
+   "subtitle": "Code d'entrée, étage, marche à suivre : tout sur un QR à la porte.",
+   "layout": 1,
+   "qr": true
+  }
+ ]
+}

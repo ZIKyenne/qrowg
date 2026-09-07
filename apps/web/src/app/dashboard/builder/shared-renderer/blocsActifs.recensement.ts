@@ -121,4 +121,7 @@ export const BLOCS_ACTIFS_ATTENDUS: readonly string[] = [
   "google_maps",
   "quick_contact",
   "cta_button",
+  // Vague 14 — equipe et interlocuteurs.
+  "team",
+  "multi_contact",
 ]

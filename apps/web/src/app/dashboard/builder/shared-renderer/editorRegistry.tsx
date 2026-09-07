@@ -82,6 +82,8 @@ import { EditorDirectionsButton } from "./blocks/directions_button"
 import { EditorGoogleMaps } from "./blocks/google_maps"
 import { EditorQuickContact } from "./blocks/quick_contact"
 import { EditorCtaButton } from "./blocks/cta_button"
+import { EditorTeam } from "./blocks/team"
+import { EditorMultiContact } from "./blocks/multi_contact"
 import { EditorFreeSection } from "./blocks/free_section"
 import { EditorImageText } from "./blocks/image_text"
 import { EditorSplitPanel } from "./blocks/split_panel"
@@ -236,6 +238,9 @@ const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   google_maps: EditorGoogleMaps,
   quick_contact: EditorQuickContact,
   cta_button: EditorCtaButton,
+  // Vague 14 — equipe et interlocuteurs.
+  team: EditorTeam,
+  multi_contact: EditorMultiContact,
 }
 
 // Renvoie l'adapter éditeur partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

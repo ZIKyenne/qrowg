@@ -1,0 +1,118 @@
+{
+  "total": 16,
+  "avec_alerte": 0,
+  "details": [
+    {
+      "fichier": "qr-code-arrivee-tardive-check-in-autonome-hotel.png",
+      "fond_sombre_pct": 90.2,
+      "or_pct": 5.0,
+      "qr": "https://qrowg.com/qr-code/hotel?utm_source=pinterest&utm_medium=pin&utm_campaign=20260907-foodtruck",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-calendrier-marches-du-mois-producteur.png",
+      "fond_sombre_pct": 89.3,
+      "or_pct": 4.3,
+      "qr": "https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260907-foodtruck",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-camion-privatise-evenement-food-truck-01.png",
+      "fond_sombre_pct": 92.3,
+      "or_pct": 3.0,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-camion-privatise-evenement-food-truck-02.png",
+      "fond_sombre_pct": 94.4,
+      "or_pct": 0.7,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-camion-privatise-evenement-food-truck-03.png",
+      "fond_sombre_pct": 87.3,
+      "or_pct": 8.9,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260907-foodtruck",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-camion-privatise-evenement-food-truck-04.png",
+      "fond_sombre_pct": 94.3,
+      "or_pct": 0.7,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-camion-privatise-evenement-food-truck-05.png",
+      "fond_sombre_pct": 90.4,
+      "or_pct": 6.7,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-camion-privatise-evenement-food-truck-06.png",
+      "fond_sombre_pct": 84.1,
+      "or_pct": 9.6,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260907-foodtruck",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-carte-de-la-semaine-par-theme-food-truck.png",
+      "fond_sombre_pct": 90.1,
+      "or_pct": 5.0,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260907-foodtruck",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-horaires-fournee-pain-chaud-boulangerie.png",
+      "fond_sombre_pct": 90.4,
+      "or_pct": 4.2,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260907-foodtruck",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-camion-privatise-evenement-food-truck-01.png",
+      "fond_sombre_pct": 92.3,
+      "or_pct": 3.0,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-camion-privatise-evenement-food-truck-02.png",
+      "fond_sombre_pct": 94.4,
+      "or_pct": 0.7,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-camion-privatise-evenement-food-truck-03.png",
+      "fond_sombre_pct": 87.3,
+      "or_pct": 8.9,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260907-foodtruck",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-camion-privatise-evenement-food-truck-04.png",
+      "fond_sombre_pct": 94.3,
+      "or_pct": 0.7,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-camion-privatise-evenement-food-truck-05.png",
+      "fond_sombre_pct": 90.4,
+      "or_pct": 6.7,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-camion-privatise-evenement-food-truck-06.png",
+      "fond_sombre_pct": 84.1,
+      "or_pct": 9.7,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260907-foodtruck",
+      "alertes": []
+    }
+  ]
+}
