@@ -53,7 +53,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   cta_button: {
     label: "Bouton CTA", description: "Bouton d'appel à l'action",
     icon: "⚡", color: "#39FF8F", category: "actions",
-    defaultContent: { label: "Me contacter", url: "#", style: "gold", icon: "" },
+    defaultContent: { label: "Me contacter", style: "gold", icon: "" },
     fields: [
       { key: "label", label: "Texte du bouton", type: "text", placeholder: "Me contacter" },
       { key: "url", label: "Lien", type: "url", placeholder: "https://" },
@@ -65,7 +65,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   calendly: {
     label: "Calendly", description: "Bouton de prise de RDV",
     icon: "📅", color: "#39FF8F", category: "actions",
-    defaultContent: { label: "Réserver un creneau", url: "https://calendly.com", description: "" },
+    defaultContent: { label: "Réserver un creneau", description: "" },
     fields: [
       { key: "label", label: "Titre", type: "text", placeholder: "Réserver un appel" },
       { key: "url", label: "Lien Calendly", type: "url", placeholder: "https://calendly.com/monnom" },
@@ -98,7 +98,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   instagram_feed: {
     label: "Instagram Feed", description: "Grille de photos Instagram",
     icon: "📸", color: "#E1306C", category: "social",
-    defaultContent: { username: "@moncompte", cta_label: "Me suivre", cta_url: "https://instagram.com" },
+    defaultContent: { cta_label: "Me suivre" },
     fields: [
       { key: "username", label: "Username Instagram", type: "text", placeholder: "@moncompte" },
       { key: "cta_label", label: "Texte du bouton", type: "text", placeholder: "Me suivre" },
@@ -109,7 +109,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   product: {
     label: "Produit", description: "Fiche produit avec prix et CTA",
     icon: "📦", color: "#F97316", category: "commerce",
-    defaultContent: { name: "Mon produit", price: "29€", description: "", cta_label: "Commander", cta_url: "#" },
+    defaultContent: { description: "", cta_label: "Commander" },
     fields: [
       { key: "name", label: "Nom du produit", type: "text", placeholder: "Formation Marketing" },
       { key: "price", label: "Prix", type: "text", placeholder: "29€" },
@@ -124,7 +124,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   pricing: {
     label: "Tarifs", description: "Grille de prix / abonnements",
     icon: "💰", color: "#F97316", category: "commerce",
-    defaultContent: { title: "Mes tarifs", title1: "Essentiel", price1: "49€", desc1: "Par mois" },
+    defaultContent: { title: "Mes tarifs" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Mes tarifs" },
       { key: "title1", label: "Plan 1 — Nom", type: "text", placeholder: "Essentiel" },
@@ -146,7 +146,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   promo_banner: {
     label: "Banniere promo", description: "Offre speciale ou reduction",
     icon: "🎁", color: "#F97316", category: "commerce",
-    defaultContent: { emoji: "🎉", text: "Offre speciale", subtext: "Valable ce mois", cta_label: "Profiter", cta_url: "#" },
+    defaultContent: { emoji: "🎉", cta_label: "Profiter" },
     fields: [
       { key: "emoji", label: "Emoji", type: "text", placeholder: "🎉" },
       { key: "text", label: "Titre", type: "text", placeholder: "Offre speciale -50%" },
@@ -158,7 +158,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   menu_section: {
     label: "Menu / Carte", description: "Section de menu restaurant",
     icon: "🍽️", color: "#EF4444", category: "commerce",
-    defaultContent: { category: "Entrees" },
+    defaultContent: {},
     fields: [
       { key: "category", label: "Catégorie", type: "text", placeholder: "Entrées, Plats, Desserts..." },
       { key: "item1_name", label: "Plat 1 — Nom", type: "text", placeholder: "Salade cesar" },
@@ -175,11 +175,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   menu_tabs: {
     label: "Grande carte (onglets)", description: "Gros menu multi-sections en onglets",
     icon: "🍽️", color: "#EF4444", category: "commerce",
-    defaultContent: {
-      title: "Notre carte", text_size: "Normal", row_density: "Normal",
-      sec1_title: "Cocktails", sec1_items: "Mojito;10€;Havana, menthe, citron vert\nPina Colada;10€;Ananas, coco",
-      sec2_title: "Soft", sec2_items: "Coca;4€;\nPerrier;3€;",
-    },
+    defaultContent: { title: "Notre carte", text_size: "Normal", row_density: "Normal", },
     fields: [
       { key: "title", label: "Titre (optionnel)", type: "text", placeholder: "Notre carte" },
       { key: "menu_collapsible", label: "Repliable (titre = bouton, fermé par défaut)", type: "select", options: ["Oui", "Non"] },
@@ -193,7 +189,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   services_list: {
     label: "Liste de services", description: "3 services avec icones",
     icon: "⚙️", color: "#7B61FF", category: "commerce",
-    defaultContent: { title: "Mes services", s1_icon: "💻", s1_name: "Service 1", s1_desc: "Description" },
+    defaultContent: { title: "Mes services", s1_icon: "💻" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Mes services" },
       { key: "s1_icon", label: "Service 1 — Emoji", type: "text", placeholder: "💻" },
@@ -279,7 +275,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   faq: {
     label: "FAQ", description: "Questions / réponses : recherche, catégories, liens",
     icon: "❓", color: "#38BDF8", category: "info",
-    defaultContent: { title: "Questions fréquentes", style: "Accordéon", search: "Non", q1: "Comment ça fonctionne ?", a1: "Décrivez votre réponse ici.", q2: "Quel est votre délai ?", a2: "", q3: "Acceptez-vous les acomptes ?", a3: "" },
+    defaultContent: { title: "Questions fréquentes", style: "Accordéon", search: "Non", a2: "", a3: "" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Questions fréquentes" },
       { key: "subtitle", label: "Sous-titre", type: "text", placeholder: "Tout ce que vous devez savoir" },
@@ -348,7 +344,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   documents: {
     label: "Documents", description: "Bibliothèque de fichiers à télécharger",
     icon: "📚", color: "#38BDF8", category: "info",
-    defaultContent: { title: "Documents à télécharger", d1_type: "PDF", d1_title: "Plaquette de présentation", d1_desc: "Tout savoir en 2 pages", d1_meta: "PDF · 2 Mo" },
+    defaultContent: { title: "Documents à télécharger", d1_type: "PDF" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Documents à télécharger" },
       { key: "d1_type", label: "Doc 1 — Type", type: "select", options: DOC_TYPES },
@@ -387,7 +383,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   google_maps: {
     label: "Adresse / Maps", description: "Lien vers Google Maps",
     icon: "📍", color: "#EC4899", category: "business",
-    defaultContent: { label: "Mon adresse", address: "Paris, France" },
+    defaultContent: { label: "Mon adresse" },
     fields: [
       { key: "label", label: "Nom du lieu", type: "text", placeholder: "Mon restaurant" },
       { key: "address", label: "Adresse", type: "text", placeholder: "12 rue de la Paix, 75001 Paris" },
@@ -397,7 +393,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   opening_hours: {
     label: "Horaires", description: "Horaires d'ouverture + statut en direct",
     icon: "🕐", color: "#EC4899", category: "business",
-    defaultContent: { title: "Horaires", mode: "Simple (Lun-Ven / Sam / Dim)", mon_fri: "9h - 18h", saturday: "10h - 16h", sunday: "Fermé" },
+    defaultContent: { title: "Horaires", mode: "Simple (Lun-Ven / Sam / Dim)" },
     fields: [
       { key: "title", label: "Titre", type: "text", placeholder: "Nos horaires" },
       { key: "mode", label: "Niveau de détail", type: "select", options: ["Simple (Lun-Ven / Sam / Dim)", "Jour par jour"], hint: "« Jour par jour » : un horaire différent pour chaque jour + coupure déjeuner" },
@@ -478,7 +474,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   event_info: {
     label: "Infos événement", description: "Details d'un événement",
     icon: "🎉", color: "#EC4899", category: "event",
-    defaultContent: { name: "Mon événement" },
+    defaultContent: {},
     fields: [
       { key: "name", label: "Nom", type: "text", placeholder: "Soiree de lancement" },
       { key: "date", label: "Date", type: "text", placeholder: "Samedi 28 juin 2025" },
@@ -536,7 +532,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   featured_product: {
     label: "Produit vedette", description: "Mettre en avant une offre principale",
     icon: "⭐", color: "#F97316", category: "commerce",
-    defaultContent: { badge: "Signature", cta_label: "Commander maintenant" },
+    defaultContent: { cta_label: "Commander maintenant" },
     fields: [
       { key: "badge", label: "Badge", type: "text", placeholder: "Nouveau, Promo, Signature…", hint: "Se colore automatiquement selon le mot", suggestions: ["Nouveau", "Populaire", "Promo", "Signature", "Fait maison", "Local", "Bio", "Offre limitée", "Bientôt disponible", "Épuisé"] },
       { key: "image", label: "Image produit", type: "image" },
@@ -552,7 +548,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   offer_comparison: {
     label: "Comparatif offres", description: "Comparer plusieurs formules",
     icon: "📊", color: "#F97316", category: "commerce",
-    defaultContent: { title: "Nos formules", plan1_name: "Basic", plan1_price: "0€", plan2_name: "Pro", plan2_price: "29€", plan3_name: "Business", plan3_price: "99€" },
+    defaultContent: { title: "Nos formules" },
     fields: [
       { key: "title", label: "Titre", type: "text", placeholder: "Nos formules" },
       { key: "plan1_name", label: "Formule 1 — Nom", type: "text", placeholder: "Basic" },
@@ -630,7 +626,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   google_reviews_block: {
     label: "Avis clients", description: "Affichage avis clients avec notes",
     icon: "⭐", color: "#FBBF24", category: "commerce",
-    defaultContent: { title: "Ce que disent nos clients", avg_rating: "4.9", total_reviews: "127" },
+    defaultContent: { title: "Ce que disent nos clients" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Ce que disent nos clients" },
       { key: "avg_rating", label: "Note moyenne (ex: 4.9)", type: "text", placeholder: "4.9" },
@@ -650,7 +646,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   business_stats: {
     label: "Statistiques business", description: "Chiffres clés et preuves sociales",
     icon: "📈", color: "#F97316", category: "commerce",
-    defaultContent: { stat1_value: "500+", stat1_label: "Clients", stat2_value: "4.9/5", stat2_label: "Note moyenne", stat3_value: "10 ans", stat3_label: "Expérience" },
+    defaultContent: {},
     fields: [
       { key: "stat1_value", label: "Stat 1 — Chiffre", type: "text", placeholder: "500+" },
       { key: "stat1_label", label: "Stat 1 — Label", type: "text", placeholder: "Clients" },
@@ -709,7 +705,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   gift_card: {
     label: "Bon cadeau", description: "Vente de cartes cadeaux",
     icon: "🎁", color: "#EC4899", category: "commerce",
-    defaultContent: { title: "Offrez une expérience", description: "Le cadeau parfait pour vos proches", cta_label: "Acheter un bon cadeau" },
+    defaultContent: { title: "Offrez une expérience", cta_label: "Acheter un bon cadeau" },
     fields: [
       { key: "title", label: "Titre", type: "text", placeholder: "Offrez une expérience" },
       { key: "description", label: "Description", type: "text", placeholder: "Le cadeau parfait pour vos proches" },
@@ -762,7 +758,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   advantages: {
     label: "Liste des avantages", description: "Arguments de vente avec coches",
     icon: "✅", color: "#39FF8F", category: "commerce",
-    defaultContent: { title: "Pourquoi nous choisir", adv1: "✅ Sans engagement", adv2: "🚚 Livraison rapide", adv3: "💬 Support 24/7" },
+    defaultContent: { title: "Pourquoi nous choisir" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Pourquoi nous choisir" },
       { key: "adv1", label: "Avantage 1", type: "text", placeholder: "✅ Sans engagement" },
@@ -776,7 +772,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   reassurance: {
     label: "Garantie / Réassurance", description: "Rassurer avant l achat",
     icon: "🔒", color: "#39FF8F", category: "commerce",
-    defaultContent: { g1_icon: "🔒", g1_label: "Paiement sécurisé", g2_icon: "↩️", g2_label: "Satisfait ou remboursé", g3_icon: "🚚", g3_label: "Livraison offerte", g4_icon: "⭐", g4_label: "Qualité garantie" },
+    defaultContent: { g1_icon: "🔒", g2_icon: "↩️", g3_icon: "🚚", g4_icon: "⭐" },
     fields: [
       { key: "g1_icon", label: "Garantie 1 — Emoji", type: "text", placeholder: "🔒" },
       { key: "g1_label", label: "Garantie 1 — Texte", type: "text", placeholder: "Paiement sécurisé" },
@@ -795,7 +791,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   sales_counter: {
     label: "Compteur de ventes", description: "Preuve sociale en temps réel",
     icon: "🔥", color: "#EF4444", category: "commerce",
-    defaultContent: { count: "127", period: "ce mois-ci", label: "ventes", emoji: "🔥" },
+    defaultContent: { label: "ventes", emoji: "🔥" },
     fields: [
       { key: "emoji", label: "Emoji", type: "text", placeholder: "🔥" },
       { key: "count", label: "Nombre", type: "text", placeholder: "127" },
@@ -877,7 +873,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   two_columns: {
     label: "Colonnes", description: "Mise en page 2 colonnes côte à côte",
     icon: "▐", color: "#C9A84C", category: "layout",
-    defaultContent: { col1_title: "Colonne 1", col2_title: "Colonne 2" },
+    defaultContent: {},
     fields: [
       { key: "col1_title", label: "Colonne 1 — Titre", type: "text", placeholder: "Colonne 1" },
       { key: "col1_text", label: "Colonne 1 — Texte", type: "textarea", placeholder: "Votre contenu..." },
@@ -938,7 +934,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   tabs_block: {
     label: "Onglets", description: "Contenu organisé par tabs",
     icon: "📑", color: "#C9A84C", category: "layout",
-    defaultContent: { tab1_label: "Présentation", tab2_label: "Tarifs", tab3_label: "FAQ" },
+    defaultContent: {},
     fields: [
       { key: "tab1_label", label: "Onglet 1 — Titre", type: "text", placeholder: "Présentation" },
       { key: "tab1_content", label: "Onglet 1 — Contenu", type: "textarea", placeholder: "Contenu de l onglet 1..." },
@@ -967,7 +963,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   info_box: {
     label: "Encadré info", description: "Mettre un texte important en avant",
     icon: "💡", color: "#C9A84C", category: "layout",
-    defaultContent: { type: "info", emoji: "💡", message: "Information importante à retenir." },
+    defaultContent: { type: "info", emoji: "💡" },
     fields: [
       { key: "type", label: "Style", type: "select", options: ["info", "warning", "success", "tip", "important"] },
       { key: "emoji", label: "Emoji", type: "text", placeholder: "💡" },
@@ -1104,7 +1100,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   add_to_calendar: {
     label: "Ajouter au calendrier", description: "Sauvegarder l événement dans son agenda",
     icon: "📅", color: "#EC4899", category: "event",
-    defaultContent: { event_name: "Mon événement", cta_label: "Ajouter à mon agenda" },
+    defaultContent: { cta_label: "Ajouter à mon agenda" },
     fields: [
       { key: "event_name", label: "Nom de l événement", type: "text", placeholder: "Soirée de lancement" },
       { key: "start_date", label: "Date et heure de début", type: "datetime", hint: "Suffit à générer les liens Google Agenda + fichier .ics (Apple/Outlook)" },
@@ -1117,7 +1113,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   participants_count: {
     label: "Nombre de participants", description: "Compteur d inscrits en temps réel",
     icon: "👥", color: "#EC4899", category: "event",
-    defaultContent: { count: "287", label: "participants inscrits", emoji: "👥", show_progress: "yes", max: "500" },
+    defaultContent: { label: "participants inscrits", emoji: "👥", show_progress: "yes" },
     fields: [
       { key: "emoji", label: "Emoji", type: "text", placeholder: "👥" },
       { key: "count", label: "Nombre", type: "text", placeholder: "287" },
@@ -1129,7 +1125,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   tickets_left: {
     label: "Places restantes", description: "Compteur d urgence de billets restants",
     icon: "🎟️", color: "#EF4444", category: "event",
-    defaultContent: { count: "14", label: "places restantes", urgency: "high", cta_label: "Réserver maintenant" },
+    defaultContent: { label: "places restantes", urgency: "high", cta_label: "Réserver maintenant" },
     fields: [
       { key: "count", label: "Nombre de places restantes", type: "text", placeholder: "14" },
       { key: "label", label: "Label", type: "text", placeholder: "places restantes" },
@@ -1153,7 +1149,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   latest_release: {
     label: "Dernière sortie", description: "Mettre en avant le dernier morceau ou album",
     icon: "🔥", color: "#1DB954", category: "music",
-    defaultContent: { badge: "🔥 Nouveau single", cta_label: "Écouter maintenant" },
+    defaultContent: { cta_label: "Écouter maintenant" },
     fields: [
       { key: "badge", label: "Badge", type: "text", placeholder: "🔥 Nouveau single" },
       { key: "cover", label: "Pochette", type: "image" },
@@ -1306,7 +1302,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   google_maps_embed: {
     label: "Carte Google Maps", description: "Carte interactive intégrée",
     icon: "🗺️", color: "#4285F4", category: "business",
-    defaultContent: { label: "Nous trouver", address: "Paris, France", zoom: "15" },
+    defaultContent: { label: "Nous trouver", zoom: "15" },
     fields: [
       { key: "label", label: "Titre", type: "text", placeholder: "Nous trouver" },
       { key: "address", label: "Adresse complète", type: "text", placeholder: "12 rue de la Paix, 75001 Paris" },
@@ -1368,7 +1364,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   service_area: {
     label: "Zone d intervention", description: "Zones géographiques couvertes",
     icon: "📍", color: "#4285F4", category: "business",
-    defaultContent: { title: "Zone d intervention", area: "France entière", radius: "" },
+    defaultContent: { title: "Zone d intervention", radius: "" },
     fields: [
       { key: "title", label: "Titre", type: "text", placeholder: "Zone d intervention" },
       { key: "area", label: "Zone principale", type: "text", placeholder: "France entière" },
@@ -1450,7 +1446,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   stats_block: {
     label: "Statistiques", description: "Chiffres clés de votre activité",
     icon: "📊", color: "#38BDF8", category: "info",
-    defaultContent: { s1_value: "500+", s1_label: "Clients", s1_icon: "👥", s2_value: "4.9/5", s2_label: "Note moyenne", s2_icon: "⭐", s3_value: "10 ans", s3_label: "Expérience", s3_icon: "🏆" },
+    defaultContent: { s1_icon: "👥", s2_icon: "⭐", s3_icon: "🏆" },
     fields: [
       { key: "s1_icon", label: "Stat 1 — Emoji", type: "text", placeholder: "👥" },
       { key: "s1_value", label: "Stat 1 — Valeur", type: "text", placeholder: "500+" },
@@ -1469,7 +1465,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   scan_counter: {
     label: "Compteur (preuve sociale)", description: "Un grand chiffre mis en avant",
     icon: "📱", color: "#38BDF8", category: "info",
-    defaultContent: { count: "1 240", label: "scans ce mois", emoji: "📱" },
+    defaultContent: { label: "scans ce mois", emoji: "📱" },
     fields: [
       { key: "emoji", label: "Emoji", type: "text", placeholder: "📱" },
       { key: "count", label: "Chiffre à afficher", type: "text", placeholder: "1 240", hint: "Ex : 1 240 · 4.9/5 · 500+" },
@@ -1479,7 +1475,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   timeline: {
     label: "Timeline", description: "Étapes chronologiques",
     icon: "📅", color: "#38BDF8", category: "info",
-    defaultContent: { title: "Notre histoire", layout: "Verticale", e1_date: "2020", e1_title: "Création", e1_desc: "Lancement de l activité", e1_icon: "🚀" },
+    defaultContent: { title: "Notre histoire", layout: "Verticale", e1_icon: "🚀" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Notre histoire" },
       { key: "layout", label: "Disposition", type: "select", options: ["Verticale", "Horizontale"], hint: "Horizontale : défilement latéral de cartes" },
@@ -1528,7 +1524,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   values: {
     label: "Valeurs", description: "Les valeurs de la marque",
     icon: "💎", color: "#38BDF8", category: "info",
-    defaultContent: { title: "Nos valeurs", v1_icon: "🤝", v1_label: "Transparence", v2_icon: "⚡", v2_label: "Réactivité", v3_icon: "🎯", v3_label: "Qualité" },
+    defaultContent: { title: "Nos valeurs", v1_icon: "🤝", v2_icon: "⚡", v3_icon: "🎯" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Nos valeurs" },
       { key: "v1_icon", label: "Valeur 1 — Emoji", type: "text", placeholder: "🤝" },
@@ -1585,7 +1581,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   engagements: {
     label: "Engagements", description: "Engagements qualité et promesses",
     icon: "✅", color: "#38BDF8", category: "info",
-    defaultContent: { title: "Nos engagements", e1: "✅ Réponse sous 24 heures", e2: "✅ Satisfaction garantie", e3: "✅ Sans engagement" },
+    defaultContent: { title: "Nos engagements" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Nos engagements" },
       { key: "e1", label: "Engagement 1", type: "text", placeholder: "✅ Réponse sous 24 heures" },
@@ -1599,7 +1595,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   trust_badge: {
     label: "Badge de confiance", description: "Labels qualité et certifications",
     icon: "🛡️", color: "#38BDF8", category: "info",
-    defaultContent: { title: "Certifié & Vérifié", b1_icon: "✔", b1_label: "Vérifié", b2_icon: "🏆", b2_label: "Certifié", b3_icon: "⭐", b3_label: "Partenaire officiel" },
+    defaultContent: { title: "Certifié & Vérifié", b1_icon: "✔", b2_icon: "🏆", b3_icon: "⭐" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Certifié & Vérifié" },
       { key: "b1_icon", label: "Badge 1 — Emoji", type: "text", placeholder: "✔" },
@@ -1615,7 +1611,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   quote_block: {
     label: "Citation", description: "Citation mise en avant",
     icon: "💬", color: "#38BDF8", category: "info",
-    defaultContent: { quote: "La qualité n est jamais un accident.", author: "", source: "" },
+    defaultContent: { author: "", source: "" },
     fields: [
       { key: "quote", label: "Citation", type: "textarea", placeholder: "La qualité n est jamais un accident." },
       { key: "author", label: "Auteur", type: "text", placeholder: "Steve Jobs" },
@@ -1625,7 +1621,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   announcement: {
     label: "Annonce / Alerte", description: "Message important, icône et couleur automatiques",
     icon: "📢", color: "#38BDF8", category: "info",
-    defaultContent: { title: "Information importante", message: "Nous serons fermés le 25 décembre.", type: "Attention", style: "Détaillé", dismissible: "Non" },
+    defaultContent: { title: "Information importante", type: "Attention", style: "Détaillé", dismissible: "Non" },
     fields: [
       { key: "type", label: "Type", type: "select", options: ANNOUNCEMENT_TYPES, hint: "Choisit l'icône et la couleur automatiquement" },
       { key: "title", label: "Titre", type: "text", placeholder: "Information importante" },
@@ -1763,7 +1759,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   tiktok_gallery: {
     label: "Galerie TikTok", description: "Vidéos TikTok en grille verticale",
     icon: "🎵", color: "#F5F0E8", category: "media",
-    defaultContent: { title: "Mes TikToks", username: "@monpseudo" },
+    defaultContent: { title: "Mes TikToks" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Mes TikToks" },
       { key: "username", label: "Nom d utilisateur", type: "text", placeholder: "@monpseudo" },
@@ -1819,7 +1815,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   tiktok_feed: {
     label: "TikTok Feed", description: "Dernières vidéos TikTok",
     icon: "🎵", color: "#F5F0E8", category: "social",
-    defaultContent: { username: "@monpseudo", cta_label: "Me suivre sur TikTok" },
+    defaultContent: { cta_label: "Me suivre sur TikTok" },
     fields: [
       { key: "username", label: "Nom d utilisateur", type: "text", placeholder: "@monpseudo" },
       { key: "cta_label", label: "Texte bouton", type: "text", placeholder: "Me suivre sur TikTok" },
@@ -1829,7 +1825,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   youtube_channel: {
     label: "Chaîne YouTube", description: "Dernières vidéos YouTube",
     icon: "▶️", color: "#FF0000", category: "social",
-    defaultContent: { channel_name: "Ma Chaîne", cta_label: "S abonner" },
+    defaultContent: { cta_label: "S abonner" },
     fields: [
       { key: "channel_name", label: "Nom de la chaîne", type: "text", placeholder: "Ma Chaîne" },
       { key: "subscribers", label: "Abonnés (affiché)", type: "text", placeholder: "12K abonnés" },
@@ -1840,7 +1836,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   twitch_live: {
     label: "Twitch Live", description: "Statut live Twitch",
     icon: "🎮", color: "#9146FF", category: "social",
-    defaultContent: { username: "monpseudo", status: "offline", game: "", cta_label: "Rejoindre le live" },
+    defaultContent: { status: "offline", game: "", cta_label: "Rejoindre le live" },
     fields: [
       { key: "username", label: "Pseudo Twitch", type: "text", placeholder: "monpseudo" },
       { key: "status", label: "Statut", type: "select", options: ["live", "offline"] },
@@ -1853,7 +1849,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   discord_server: {
     label: "Discord", description: "Bouton rejoindre serveur Discord",
     icon: "🎮", color: "#5865F2", category: "social",
-    defaultContent: { server_name: "Mon Serveur", cta_label: "Rejoindre le Discord", members: "" },
+    defaultContent: { cta_label: "Rejoindre le Discord", members: "" },
     fields: [
       { key: "server_name", label: "Nom du serveur", type: "text", placeholder: "Mon Serveur" },
       { key: "members", label: "Membres (affiché)", type: "text", placeholder: "250 membres" },
@@ -1865,7 +1861,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   telegram_channel: {
     label: "Telegram", description: "Bouton rejoindre canal Telegram",
     icon: "✈️", color: "#26A5E4", category: "social",
-    defaultContent: { channel_name: "Mon Canal", cta_label: "Rejoindre le canal", members: "" },
+    defaultContent: { cta_label: "Rejoindre le canal", members: "" },
     fields: [
       { key: "channel_name", label: "Nom du canal", type: "text", placeholder: "Mon Canal" },
       { key: "members", label: "Membres (affiché)", type: "text", placeholder: "5K membres" },
@@ -1877,7 +1873,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   podcast_links: {
     label: "Podcast", description: "Liens d écoute multi-plateformes",
     icon: "🎙️", color: "#B150E2", category: "social",
-    defaultContent: { podcast_name: "Mon Podcast", description: "" },
+    defaultContent: { description: "" },
     fields: [
       { key: "podcast_name", label: "Nom du podcast", type: "text", placeholder: "Mon Podcast" },
       { key: "description", label: "Description courte", type: "text", placeholder: "Le podcast sur le business" },
@@ -2056,7 +2052,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   multi_cta: {
     label: "Multi CTA", description: "Plusieurs actions dans un seul bloc",
     icon: "⚡", color: "#39FF8F", category: "actions",
-    defaultContent: { btn1_label: "Appeler", btn1_icon: "📞", btn1_url: "tel:", btn2_label: "WhatsApp", btn2_icon: "💬", btn2_url: "https://wa.me/" },
+    defaultContent: { btn1_icon: "📞", btn2_icon: "💬" },
     fields: [
       { key: "btn1_icon", label: "Btn 1 — Emoji", type: "text", placeholder: "📞" },
       { key: "btn1_label", label: "Btn 1 — Texte", type: "text", placeholder: "Appeler" },
@@ -2085,7 +2081,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   promo_code: {
     label: "Coupon promo", description: "Afficher un code promotionnel",
     icon: "🎟️", color: "#F97316", category: "actions",
-    defaultContent: { code: "QROWG10", description: "-10% sur votre commande" },
+    defaultContent: {},
     fields: [
       { key: "code", label: "Code promo", type: "text", placeholder: "QROWG10" },
       { key: "description", label: "Description", type: "text", placeholder: "-10% sur votre commande" },
@@ -2095,7 +2091,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   limited_offer: {
     label: "Offre limitee", description: "Promotion temporaire urgente",
     icon: "⚡", color: "#EF4444", category: "actions",
-    defaultContent: { title: "Offre limitee", description: "Valable jusqu au 30 juin", cta_label: "Profiter de l offre", cta_url: "#" },
+    defaultContent: { title: "Offre limitee", cta_label: "Profiter de l offre" },
     fields: [
       { key: "title", label: "Titre", type: "text", placeholder: "Offre speciale -30%" },
       { key: "description", label: "Description", type: "text", placeholder: "Valable jusqu au 30 juin" },
@@ -2130,7 +2126,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   quote_request: {
     label: "Demander un devis", description: "Redirection vers formulaire devis",
     icon: "📋", color: "#C9A84C", category: "actions",
-    defaultContent: { label: "Demander un devis", url: "#" },
+    defaultContent: { label: "Demander un devis" },
     fields: [
       { key: "label", label: "Texte", type: "text", placeholder: "Demander un devis" },
       { key: "url", label: "Lien formulaire", type: "url", placeholder: "https://..." },
@@ -2172,7 +2168,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   availability: {
     label: "Disponibilite", description: "Statut de disponibilite pour freelances",
     icon: "🟢", color: "#39FF8F", category: "identity",
-    defaultContent: { status: "available", message: "Ouvert aux nouvelles missions", cta_label: "Prendre contact", cta_url: "#" },
+    defaultContent: { status: "available", cta_label: "Prendre contact" },
     fields: [
       { key: "status", label: "Statut", type: "select", options: ["available", "busy", "closed"] },
       { key: "available_from", label: "Disponible a partir de", type: "text", placeholder: "Janvier 2025" },
@@ -2184,7 +2180,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   journey: {
     label: "Parcours", description: "Chiffres clés et faits marquants",
     icon: "🚀", color: "#C9A84C", category: "identity",
-    defaultContent: { title: "Mon parcours", line_1: "🚀 5 ans d expérience", line_2: "💼 20+ projets realises" },
+    defaultContent: { title: "Mon parcours" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Mon parcours" },
       { key: "line_1", label: "Ligne 1", type: "text", placeholder: "🚀 5 ans d expérience en SaaS" },
@@ -2263,7 +2259,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   company: {
     label: "Entreprise", description: "Logo, nom et infos de l entreprise",
     icon: "🏢", color: "#38BDF8", category: "identity",
-    defaultContent: { company_name: "Mon Entreprise" },
+    defaultContent: {},
     fields: [
       { key: "logo_url", label: "Logo", type: "image" },
       { key: "company_name", label: "Nom de l entreprise", type: "text", placeholder: "Studio PIXEL" },

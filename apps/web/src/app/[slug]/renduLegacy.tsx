@@ -565,7 +565,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               {c.available_from && <span style={{ color: MUTED, fontSize: 12, marginLeft: "auto" }}>dès {c.available_from}</span>}
             </div>
             {c.message && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5, fontFamily: FONT_B }}>{c.message}</p>}
-            {c.cta_label && <a href={extHref(c.cta_url) || "#"} onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "availability")} style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 10, padding: "11px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#080808", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</a>}
+            {c.cta_label && extHref(c.cta_url) && <a href={extHref(c.cta_url)} onClick={() => trackLinkClick(pageId, block.id, c.cta_url)} style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 10, padding: "11px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#080808", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</a>}
           </div>
         </div>
       )
