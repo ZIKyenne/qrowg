@@ -161,6 +161,14 @@ export const SHARED_RENDERER_BLOCKS: ReadonlySet<string> = new Set<string>([
   // inventait un prix de « 99€ » PUIS calculait la remise contre ce faux prix ;
   // `offer_comparison` dessinait trois boutons la ou la page en publie un.
   "product", "featured_product", "offer_comparison",
+  // ── Vague 19 — chaines et reseaux (7 blocs) ──
+  // Sept blocs de meme forme, donc sept fois la meme derive. L'apercu de
+  // `tiktok_feed` dessinait six fausses vignettes video que la page ne publie
+  // pas ; deux blocs dessinaient toujours leur bouton, deux autres le cachaient
+  // alors que la page le publiait ; cinq se publiaient sans adresse, donc en
+  // carte inerte depuis que le rendu ne publie plus de lien mort.
+  "instagram_feed", "tiktok_feed", "youtube_channel", "twitch_live",
+  "discord_server", "telegram_channel", "social_feature",
 ])
 
 // Blocs prévus comme pilotes en B09.2 (déclaratif, NON activé). Voir SHARED-RENDERER-PILOT.md.

@@ -156,6 +156,13 @@ const PublicFaq = dynamic(() => import("./blocks/faq").then(m => m.PublicFaq))
 const PublicProduct = dynamic(() => import("./blocks/product").then(m => m.PublicProduct))
 const PublicFeaturedProduct = dynamic(() => import("./blocks/featured_product").then(m => m.PublicFeaturedProduct))
 const PublicOfferComparison = dynamic(() => import("./blocks/offer_comparison").then(m => m.PublicOfferComparison))
+const PublicInstagramFeed = dynamic(() => import("./blocks/instagram_feed").then(m => m.PublicInstagramFeed))
+const PublicTiktokFeed = dynamic(() => import("./blocks/tiktok_feed").then(m => m.PublicTiktokFeed))
+const PublicYoutubeChannel = dynamic(() => import("./blocks/youtube_channel").then(m => m.PublicYoutubeChannel))
+const PublicTwitchLive = dynamic(() => import("./blocks/twitch_live").then(m => m.PublicTwitchLive))
+const PublicDiscordServer = dynamic(() => import("./blocks/discord_server").then(m => m.PublicDiscordServer))
+const PublicTelegramChannel = dynamic(() => import("./blocks/telegram_channel").then(m => m.PublicTelegramChannel))
+const PublicSocialFeature = dynamic(() => import("./blocks/social_feature").then(m => m.PublicSocialFeature))
 
 const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   heading: PublicHeading,
@@ -284,6 +291,13 @@ const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   product: PublicProduct,
   featured_product: PublicFeaturedProduct,
   offer_comparison: PublicOfferComparison,
+  instagram_feed: PublicInstagramFeed,
+  tiktok_feed: PublicTiktokFeed,
+  youtube_channel: PublicYoutubeChannel,
+  twitch_live: PublicTwitchLive,
+  discord_server: PublicDiscordServer,
+  telegram_channel: PublicTelegramChannel,
+  social_feature: PublicSocialFeature,
 }
 
 // Renvoie l'adapter public partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

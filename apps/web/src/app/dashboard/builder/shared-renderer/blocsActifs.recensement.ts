@@ -137,4 +137,11 @@ export const BLOCS_ACTIFS_ATTENDUS: readonly string[] = [
   "product",
   "featured_product",
   "offer_comparison",
+  "instagram_feed",
+  "tiktok_feed",
+  "youtube_channel",
+  "twitch_live",
+  "discord_server",
+  "telegram_channel",
+  "social_feature",
 ]

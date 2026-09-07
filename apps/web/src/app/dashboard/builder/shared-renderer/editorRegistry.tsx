@@ -96,6 +96,13 @@ import { EditorFaq } from "./blocks/faq"
 import { EditorProduct } from "./blocks/product"
 import { EditorFeaturedProduct } from "./blocks/featured_product"
 import { EditorOfferComparison } from "./blocks/offer_comparison"
+import { EditorInstagramFeed } from "./blocks/instagram_feed"
+import { EditorTiktokFeed } from "./blocks/tiktok_feed"
+import { EditorYoutubeChannel } from "./blocks/youtube_channel"
+import { EditorTwitchLive } from "./blocks/twitch_live"
+import { EditorDiscordServer } from "./blocks/discord_server"
+import { EditorTelegramChannel } from "./blocks/telegram_channel"
+import { EditorSocialFeature } from "./blocks/social_feature"
 import { EditorFreeSection } from "./blocks/free_section"
 import { EditorImageText } from "./blocks/image_text"
 import { EditorSplitPanel } from "./blocks/split_panel"
@@ -266,6 +273,13 @@ const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   product: EditorProduct,
   featured_product: EditorFeaturedProduct,
   offer_comparison: EditorOfferComparison,
+  instagram_feed: EditorInstagramFeed,
+  tiktok_feed: EditorTiktokFeed,
+  youtube_channel: EditorYoutubeChannel,
+  twitch_live: EditorTwitchLive,
+  discord_server: EditorDiscordServer,
+  telegram_channel: EditorTelegramChannel,
+  social_feature: EditorSocialFeature,
 }
 
 // Renvoie l'adapter éditeur partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

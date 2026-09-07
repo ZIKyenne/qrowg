@@ -116,7 +116,9 @@ const ECARTS_CONNUS: Record<string, string[]> = {
   // dans l'aperçu pour que le commerçant se repère, mais la page publiée n'affiche
   // que le vrai bouton « Me suivre » — QRowg refuse de publier de fausses vignettes
   // de feed, qui feraient croire à une intégration qui n'existe pas.
-  instagram_feed: ["username"],
+  // (`instagram_feed.username` figurait ici : le pseudo s'affichait dans
+  //  l'aperçu et pas sur la page. La vague 19 le montre des deux côtés —
+  //  c'est une information que le commerçant a saisie exprès.)
 }
 // Réglés le 6 septembre, après arbitrage :
 //  · offer_comparison — le bouton existe maintenant sur la page publiée, avec son
