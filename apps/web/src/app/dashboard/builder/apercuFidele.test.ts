@@ -202,9 +202,10 @@ const LOGIQUE_PUBLIQUE = new Set(["start_date", "end_date", "show_deadline"])
 
 // Écarts inverses connus, chacun un choix assumé et non un oubli.
 const ECARTS_INVERSES_CONNUS: Record<string, string[]> = {
-  // La description part dans le fichier d'agenda que le visiteur télécharge ;
-  // elle ne s'affiche nulle part, donc l'aperçu n'a rien à en montrer.
-  add_to_calendar: ["description"],
+  // (`add_to_calendar.description` figurait ici : elle part dans le fichier
+  //  d'agenda et ne s'affiche nulle part. La vague 20 a mis les deux côtés sur
+  //  le même modèle, qui construit le lien une seule fois — la question ne se
+  //  pose plus, il n'y a plus deux codes à comparer.)
   // Un carrousel qui défile tout seul pendant qu'on compose la page serait
   // insupportable : l'aperçu montre la première image, fixe.
   image_carousel: ["auto_play"],

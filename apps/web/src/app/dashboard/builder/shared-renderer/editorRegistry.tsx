@@ -103,6 +103,10 @@ import { EditorTwitchLive } from "./blocks/twitch_live"
 import { EditorDiscordServer } from "./blocks/discord_server"
 import { EditorTelegramChannel } from "./blocks/telegram_channel"
 import { EditorSocialFeature } from "./blocks/social_feature"
+import { EditorEventGuests } from "./blocks/event_guests"
+import { EditorEventAccess } from "./blocks/event_access"
+import { EditorAddToCalendar } from "./blocks/add_to_calendar"
+import { EditorTicketing } from "./blocks/ticketing"
 import { EditorFreeSection } from "./blocks/free_section"
 import { EditorImageText } from "./blocks/image_text"
 import { EditorSplitPanel } from "./blocks/split_panel"
@@ -280,6 +284,10 @@ const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   discord_server: EditorDiscordServer,
   telegram_channel: EditorTelegramChannel,
   social_feature: EditorSocialFeature,
+  event_guests: EditorEventGuests,
+  event_access: EditorEventAccess,
+  add_to_calendar: EditorAddToCalendar,
+  ticketing: EditorTicketing,
 }
 
 // Renvoie l'adapter éditeur partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

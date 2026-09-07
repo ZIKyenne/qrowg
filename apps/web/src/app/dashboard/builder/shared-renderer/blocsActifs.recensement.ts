@@ -144,4 +144,8 @@ export const BLOCS_ACTIFS_ATTENDUS: readonly string[] = [
   "discord_server",
   "telegram_channel",
   "social_feature",
+  "event_guests",
+  "event_access",
+  "add_to_calendar",
+  "ticketing",
 ]

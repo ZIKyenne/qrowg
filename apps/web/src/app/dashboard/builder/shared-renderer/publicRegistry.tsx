@@ -163,6 +163,10 @@ const PublicTwitchLive = dynamic(() => import("./blocks/twitch_live").then(m => 
 const PublicDiscordServer = dynamic(() => import("./blocks/discord_server").then(m => m.PublicDiscordServer))
 const PublicTelegramChannel = dynamic(() => import("./blocks/telegram_channel").then(m => m.PublicTelegramChannel))
 const PublicSocialFeature = dynamic(() => import("./blocks/social_feature").then(m => m.PublicSocialFeature))
+const PublicEventGuests = dynamic(() => import("./blocks/event_guests").then(m => m.PublicEventGuests))
+const PublicEventAccess = dynamic(() => import("./blocks/event_access").then(m => m.PublicEventAccess))
+const PublicAddToCalendar = dynamic(() => import("./blocks/add_to_calendar").then(m => m.PublicAddToCalendar))
+const PublicTicketing = dynamic(() => import("./blocks/ticketing").then(m => m.PublicTicketing))
 
 const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   heading: PublicHeading,
@@ -298,6 +302,10 @@ const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   discord_server: PublicDiscordServer,
   telegram_channel: PublicTelegramChannel,
   social_feature: PublicSocialFeature,
+  event_guests: PublicEventGuests,
+  event_access: PublicEventAccess,
+  add_to_calendar: PublicAddToCalendar,
+  ticketing: PublicTicketing,
 }
 
 // Renvoie l'adapter public partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

@@ -169,6 +169,12 @@ export const SHARED_RENDERER_BLOCKS: ReadonlySet<string> = new Set<string>([
   // carte inerte depuis que le rendu ne publie plus de lien mort.
   "instagram_feed", "tiktok_feed", "youtube_channel", "twitch_live",
   "discord_server", "telegram_channel", "social_feature",
+  // ── Vague 20 — evenement (4 blocs) ──
+  // `add_to_calendar` dessinait TROIS boutons la ou la page en publie DEUX (le
+  // fichier .ics sert a la fois a Apple et a Outlook) ; `ticketing` dessinait
+  // sa carte complete meme vide ; `event_access` un cadre de carte sans carte ;
+  // `event_guests` ecrasait role et description bien au-dela de son echelle.
+  "event_guests", "event_access", "add_to_calendar", "ticketing",
 ])
 
 // Blocs prévus comme pilotes en B09.2 (déclaratif, NON activé). Voir SHARED-RENDERER-PILOT.md.
