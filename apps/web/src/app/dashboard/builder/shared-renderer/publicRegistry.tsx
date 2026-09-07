@@ -143,6 +143,13 @@ const PublicCtaButton = dynamic(() => import("./blocks/cta_button").then(m => m.
 const PublicTeam = dynamic(() => import("./blocks/team").then(m => m.PublicTeam))
 const PublicMultiContact = dynamic(() => import("./blocks/multi_contact").then(m => m.PublicMultiContact))
 
+// Vague 15 — profil et texte libre.
+const PublicProfile = dynamic(() => import("./blocks/profile").then(m => m.PublicProfile))
+const PublicRichText = dynamic(() => import("./blocks/rich_text").then(m => m.PublicRichText))
+const PublicOpeningHours = dynamic(() => import("./blocks/opening_hours").then(m => m.PublicOpeningHours))
+const PublicGallery = dynamic(() => import("./blocks/gallery").then(m => m.PublicGallery))
+const PublicSocialLinks = dynamic(() => import("./blocks/social_links").then(m => m.PublicSocialLinks))
+
 const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   heading: PublicHeading,
   values: PublicValues,
@@ -258,6 +265,11 @@ const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   cta_button: PublicCtaButton,
   team: PublicTeam,
   multi_contact: PublicMultiContact,
+  profile: PublicProfile,
+  rich_text: PublicRichText,
+  opening_hours: PublicOpeningHours,
+  gallery: PublicGallery,
+  social_links: PublicSocialLinks,
 }
 
 // Renvoie l'adapter public partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

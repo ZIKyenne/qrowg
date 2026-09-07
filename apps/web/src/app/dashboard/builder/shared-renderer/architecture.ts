@@ -137,6 +137,17 @@ export const SHARED_RENDERER_BLOCKS: ReadonlySet<string> = new Set<string>([
   // Premier bloc migre qui garde l'edition en ligne : la vue partagee recoit le
   // rendu du texte en parametre, au lieu de deux vues qui se recopient.
   "team", "multi_contact",
+  // ── Vague 15 — le profil et le texte libre (2 blocs) ──
+  // `profile` est le bloc le plus pose de toutes les pages, et le seul a porter
+  // le <h1> : le contexte public le lui dit desormais (titrePrincipal).
+  "profile", "rich_text",
+  // ── Vague 16 — horaires, galerie et reseaux (3 blocs) ──
+  // Les trois derniers gros blocs presents sur presque toutes les pages.
+  // L'apercu de la galerie retelechargeait douze photos en pleine taille a
+  // chaque ouverture ; les horaires perdaient leur note en ligne quand il n'y
+  // avait qu'une exception ; les reseaux ignoraient une cle heritee que la page
+  // publiait quand meme.
+  "opening_hours", "gallery", "social_links",
 ])
 
 // Blocs prévus comme pilotes en B09.2 (déclaratif, NON activé). Voir SHARED-RENDERER-PILOT.md.

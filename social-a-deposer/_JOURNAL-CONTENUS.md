@@ -231,11 +231,12 @@
 > Templates gratuits, QR code hôtel (premier épinglage sur ce dernier).
 > Contrôle qualité : **16 visuels, 0 alerte**, chaque QR décodé vers son lien tracké.
 > Pas de vidéo (lundi n'est pas un jour vidéo).
-> **Dépôt NON effectué à la fin du run** : `QRowg-Depot.cmd` est un exécutable Windows
-> hors du dossier connecté, l'agent ne peut pas le lancer, et Buffer refuse une image
-> dont l'URL n'est pas déjà accessible. Rien n'a donc été mis en file. Les 16 PNG sont
-> copiés dans le dossier `outputs` de la session et dans `_STOCK` en statut `dispo` :
-> après dépôt, les 6 posts (IG, TikTok, 4 épingles) portent la file à 7/10.
+> **Dépôt fait** (16 PNG via `QRowg-Depot.cmd`), puis **6 posts mis en file** :
+> épingle boulangerie · QR code boutique commerce (12 h 18 UTC), épingle producteur ·
+> QR code food truck (14 h 13), carrousel Instagram (16 h 49), épingle food truck ·
+> Templates gratuits (18 h 47), épingle hôtel · QR code hôtel (19 h 03) et carrousel
+> photo TikTok (08/09, 04 h 40). **File à 6/10**, aucune erreur — le carrousel TikTok
+> du 06/09 est parti pendant le run. Le stock repasse à vide (`en-file` partout).
 > **Apprentissage Buffer.** Pinterest : **0 impression sur toutes les épingles publiées
 > depuis le 02/09**, sans une seule exception, tableaux historiques compris. Le test de
 > placement du 03/09 est tranché avant sa date de lecture : **le placement n'est pas la

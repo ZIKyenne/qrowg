@@ -84,6 +84,11 @@ import { EditorQuickContact } from "./blocks/quick_contact"
 import { EditorCtaButton } from "./blocks/cta_button"
 import { EditorTeam } from "./blocks/team"
 import { EditorMultiContact } from "./blocks/multi_contact"
+import { EditorProfile } from "./blocks/profile"
+import { EditorRichText } from "./blocks/rich_text"
+import { EditorOpeningHours } from "./blocks/opening_hours"
+import { EditorGallery } from "./blocks/gallery"
+import { EditorSocialLinks } from "./blocks/social_links"
 import { EditorFreeSection } from "./blocks/free_section"
 import { EditorImageText } from "./blocks/image_text"
 import { EditorSplitPanel } from "./blocks/split_panel"
@@ -241,6 +246,12 @@ const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   // Vague 14 — equipe et interlocuteurs.
   team: EditorTeam,
   multi_contact: EditorMultiContact,
+  // Vague 15 — profil et texte libre.
+  profile: EditorProfile,
+  rich_text: EditorRichText,
+  opening_hours: EditorOpeningHours,
+  gallery: EditorGallery,
+  social_links: EditorSocialLinks,
 }
 
 // Renvoie l'adapter éditeur partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

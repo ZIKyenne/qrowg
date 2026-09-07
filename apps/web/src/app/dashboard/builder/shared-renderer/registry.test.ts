@@ -35,7 +35,12 @@ describe("résolution éditeur/public (flag actif = recensement blocs)", () => {
       expect(typeof resolveEditorBlock(t)).toBe("function")
       expect(estComposant(resolvePublicBlock(t))).toBe(true)
     }
-    for (const t of ["profile", "gallery"]) {
+    // Deux blocs encore legacy : ils doivent rester non résolus. Chaque vague
+    // rattrape l'exemple précédent — « profile » à la vague 15, « gallery » et
+    // « opening_hours » à la 16 : d'où la garde ci-dessous, qui dit lequel
+    // remplacer au lieu d'échouer sans expliquer.
+    for (const t of ["faq", "countdown"]) {
+      expect(SHARED_RENDERER_BLOCKS.has(t), `${t} est migré : choisir un autre exemple`).toBe(false)
       expect(resolveEditorBlock(t)).toBeNull()
       expect(resolvePublicBlock(t)).toBeNull()
     }
@@ -45,8 +50,11 @@ describe("résolution éditeur/public (flag actif = recensement blocs)", () => {
     expect(resolvePublicBlock("inconnu", new Set(["inconnu"]))).toBeNull()
   })
   it("bloc hors périmètre activé → null (adapter absent)", () => {
-    expect(resolveEditorBlock("profile", new Set(["profile"]))).toBeNull()
-    expect(resolvePublicBlock("profile", new Set(["profile"]))).toBeNull()
+    // Activer de force un type qui n'a pas d'adapter ne doit rien casser : on
+    // retombe sur le legacy.
+    expect(SHARED_RENDERER_BLOCKS.has("faq"), "faq est migré : choisir un autre exemple").toBe(false)
+    expect(resolveEditorBlock("faq", new Set(["faq"]))).toBeNull()
+    expect(resolvePublicBlock("faq", new Set(["faq"]))).toBeNull()
   })
 })
 

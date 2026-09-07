@@ -241,22 +241,41 @@ describe("pages publiques des utilisateurs", () => {
     expect(client).toContain("h1Owner === block.id")
     // Repli quand aucun bloc profil n'est nommé : le titre de la page.
     expect(client).toContain("{!h1Owner &&")
+    // La page transmet la propriété du <h1> au renderer partagé, qui rend
+    // désormais le bloc `profile`. Sans cette ligne, le nom du commerçant
+    // arriverait en <p> et la page perdrait son titre principal.
+    expect(client).toContain("titrePrincipal: h1Owner === block.id")
+    // Deux : celui du repli, et celui du `case "profile"` legacy — conservé pour
+    // que retirer `profile` de SHARED_RENDERER_BLOCKS rende encore le titre.
+    // Un seul des deux s'exécute sur une page donnée.
     const h1s = client.match(/<h1 /g) || []   // les « <h1> » des commentaires ne comptent pas
-    expect(h1s.length, "un h1 pour le profil, un pour le repli").toBe(2)
+    expect(h1s.length, "un h1 pour le repli, un pour le profil legacy").toBe(2)
   })
 
-  it("aucun bloc du rendu partagé n'émet de <h1> concurrent", () => {
+  it("un bloc du rendu partagé n'émet un <h1> que si la page le lui demande", () => {
+    // Le contrôle disait « aucun <h1> nulle part » : c'était juste tant qu'aucun
+    // bloc partagé ne pouvait porter le titre de la page. Depuis que `profile`
+    // est migré, la règle exacte est : un <h1> est permis, mais UNIQUEMENT sous
+    // la condition `titrePrincipal`, que seule la page publiée met à vrai — et
+    // sur un seul bloc. Un <h1> inconditionnel resterait un titre concurrent.
     const dir = join(__dirname, "dashboard/builder/shared-renderer/blocks")
     const fautifs: string[] = []
+    const porteurs: string[] = []
     const walk = (d: string) => {
       for (const e of readdirSync(d, { withFileTypes: true }).sort()) {
         const p = join(d, e.name)
-        if (e.isDirectory()) walk(p)
-        else if (/\.tsx$/.test(e.name) && !/\.test\./.test(e.name) && /<h1[ >]/.test(readFileSync(p, "utf8"))) fautifs.push(e.name)
+        if (e.isDirectory()) { walk(p); continue }
+        if (!/\.tsx$/.test(e.name) || /\.test\./.test(e.name)) continue
+        const src = readFileSync(p, "utf8")
+        if (!/<h1[ >]/.test(src)) continue
+        porteurs.push(p.split("blocks/")[1])
+        // Le <h1> doit être gardé par titrePrincipal, dans le même fichier.
+        if (!/u\.titrePrincipal/.test(src)) fautifs.push(p.split("blocks/")[1])
       }
     }
     if (existsSync(dir)) walk(dir)
-    expect(fautifs).toEqual([])
+    expect(fautifs, "un <h1> sans garde titrePrincipal").toEqual([])
+    expect(porteurs, "un seul bloc partagé peut porter le titre").toEqual(["profile/index.tsx"])
   })
 })
 

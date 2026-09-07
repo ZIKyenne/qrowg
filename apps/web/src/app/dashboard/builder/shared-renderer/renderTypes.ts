@@ -29,6 +29,11 @@ export type PublicRenderCtx = {
   pageId: string
   blockId: string
   trackClick: (target: string) => void
+  /** Ce bloc porte-t-il le <h1> de la page ? Une page n'en a qu'un, et c'est le
+   *  premier `profile` qui a un nom. L'aperçu de l'éditeur, lui, n'en rend
+   *  jamais : un <h1> dans un canvas de tableau de bord serait un titre de plus
+   *  dans la page du tableau de bord. */
+  titrePrincipal?: boolean
 }
 
 export type EditorAdapterProps = { content: Record<string, any>; ctx: EditorRenderCtx }
@@ -59,6 +64,8 @@ export type UnifiedCtx = {
   FILL: string        // fond de carte discret
   LINE: string        // bordure / filet
   LINE_STRONG: string // pointillés, séparateurs marqués
+  /** Vrai seulement en public, sur le bloc qui porte le <h1> de la page. */
+  titrePrincipal: boolean
 }
 
 export function editorCtx(ctx: EditorRenderCtx): UnifiedCtx {
@@ -73,6 +80,7 @@ export function editorCtx(ctx: EditorRenderCtx): UnifiedCtx {
     FONT_B: ctx.theme.fontBody || "inherit",
     scale: 0.86,
     trackClick: () => {},
+    titrePrincipal: false,
     ...themeSurfaces(ctx.theme),
   }
 }
@@ -95,6 +103,7 @@ export function publicCtx(ctx: PublicRenderCtx): UnifiedCtx {
     FONT_B: ctx.FONT_B,
     scale: 1,
     trackClick: ctx.trackClick,
+    titrePrincipal: ctx.titrePrincipal === true,
     ...themeSurfaces(ctx.theme),
   }
 }

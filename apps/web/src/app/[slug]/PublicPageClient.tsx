@@ -43,6 +43,8 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews, h1Owner }: 
     FONT_B: theme.fontBody || "DM Sans, sans-serif",
     pageId, blockId: block.id,
     trackClick: (cible: string) => trackLinkClick(pageId, block.id, cible),
+    // Une page n'a qu'un <h1>, et c'est le premier `profile` qui a un nom.
+    titrePrincipal: h1Owner === block.id,
   }} />
 }
 

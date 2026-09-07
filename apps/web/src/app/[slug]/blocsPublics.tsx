@@ -9,6 +9,7 @@
 import { useEffect, useState, useRef, Component } from "react"
 import SmartImage from "@/components/SmartImage"
 import { altGalerie } from "@/lib/texteAlternatif"
+import { sizesGrille } from "../dashboard/builder/shared-renderer/models/horairesGalerieReseaux"
 import { adresseEmailValide } from "@/lib/destinataireLead"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
@@ -381,18 +382,9 @@ export const SIZES_PLEINE = "(max-width: 520px) 100vw, 520px"
 /** Idem pour une image posée dans une grille de deux colonnes. */
 export const SIZES_DEMI = "(max-width: 520px) 50vw, 260px"
 
-/**
- * Largeur d'affichage d'une vignette de galerie, en CSS.
- *
- * Sans `sizes`, le navigateur suppose la pleine largeur et prend la plus grosse
- * variante : mesuré, une photo de 1600 px pour une vignette de 168 px. La page
- * publiée fait au plus 520 px de large ; en dessous, chaque vignette occupe
- * 100/colonnes pour cent de l'écran.
- */
-export function sizesGrille(colonnesMobile: number, colonnes: number): string {
-  const m = Math.max(1, colonnesMobile), d = Math.max(1, colonnes)
-  return `(max-width: 520px) ${Math.round(100 / m)}vw, ${Math.round(520 / d)}px`
-}
+// Largeur d'affichage d'une vignette de galerie : definie une seule fois, dans
+// le modele pur du bloc, pour que les deux renderers la partagent.
+export { sizesGrille }
 
 export function GalleryPublic({ imgs, legendes = [], layout, cols, colsMobile, title, MUTED, FONT_B }: { imgs: string[]; legendes?: string[]; layout: string; cols: number; colsMobile: number; title?: string; MUTED: string; FONT_B: string }) {
   const [idx, setIdx] = useState<number | null>(null)

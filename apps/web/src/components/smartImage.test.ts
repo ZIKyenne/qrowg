@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest"
+import { sizesGrille } from "@/app/dashboard/builder/shared-renderer/models/horairesGalerieReseaux"
 import { readFileSync } from "node:fs"
 import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
@@ -91,14 +92,11 @@ describe("les images de la page publiée", () => {
 })
 
 describe("sizesGrille", () => {
-  // Import direct impossible (le module est un composant client lourd) : on
-  // rejoue la formule, et on vérifie qu'elle est bien celle du source.
-  const sizesGrille = (m: number, d: number) =>
-    `(max-width: 520px) ${Math.round(100 / Math.max(1, m))}vw, ${Math.round(520 / Math.max(1, d))}px`
-
-  it("la formule du source est bien celle-ci", () => {
-    expect(publique).toContain("return `(max-width: 520px) ${Math.round(100 / m)}vw, ${Math.round(520 / d)}px`")
-  })
+  // La formule vivait dans le module des blocs publics, un composant client
+  // lourd : ce test la RECOPIAIT et vérifiait la copie contre le texte du
+  // source — un contrôle qui tenait à une chaîne de caractères. Depuis la
+  // vague 16 elle est dans le modèle pur de la galerie, partagé par les deux
+  // renderers : on peut l'importer et l'éprouver pour de bon.
 
   it("deux colonnes sur téléphone = la moitié de l'écran", () => {
     expect(sizesGrille(2, 3)).toBe("(max-width: 520px) 50vw, 173px")

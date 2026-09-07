@@ -170,26 +170,23 @@ Aucun post en statut `error` ni `draft` sur Buffer au 03/09.
 
 ---
 
-## 07/09 — production du jour, EN ATTENTE DE DÉPÔT
+## 07/09 — production du jour
 
-> Le dépôt n'a pas pu être fait pendant le run : `QRowg-Depot.cmd` est un exécutable
-> Windows situé hors du dossier connecté, l'agent ne peut pas le lancer, et Buffer
-> refuse une image dont l'URL n'est pas déjà accessible. **Rien n'a été mis en file.**
-> Les 16 PNG sont dans le dossier `outputs` de la session (c'est celui que scanne
-> `QRowg-Depot.cmd`) et archivés dans `social-a-deposer\2026-09-07\`.
-> **Action attendue** : lancer `QRowg-Depot.cmd`, attendre les URLs, puis mettre en file
-> dans cet ordre — carrousel Instagram · carrousel photo TikTok (copies `tiktok-`) ·
-> les 4 épingles. La file passera alors de 1/10 à 7/10.
+> **Dépôt fait** (16 PNG via `QRowg-Depot.cmd`), puis **6 posts mis en file** :
+> épingle boulangerie (12 h 18 UTC), épingle producteur (14 h 13), carrousel Instagram
+> (16 h 49), épingle food truck (18 h 47), épingle hôtel (19 h 03) et carrousel photo
+> TikTok (08/09, 04 h 40). **File à 6/10**, aucune erreur. Le stock repasse à vide.
 > Contrôle qualité : **16 visuels, 0 alerte**, chaque QR décodé vers son lien tracké.
+> Pas de vidéo (lundi n'est pas un jour vidéo).
 
 | statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
 |---|---|---|---|---|---|---|
-| dispo | qr-code-camion-privatise-evenement-food-truck-01..06.png | Instagram (carrousel) | — | food truck · camion privatisé pour un événement · la demande arrive écrite au lieu de mourir en DM | https://qrowg.com/qr-code/food-truck?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260907-foodtruck | 2026-09-07 |
-| dispo | tiktok-qr-code-camion-privatise-evenement-food-truck-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 | https://qrowg.com/qr-code/food-truck?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260907-foodtruck | 2026-09-07 |
-| dispo | qr-code-horaires-fournee-pain-chaud-boulangerie.png | Pinterest | QR code boutique commerce (726416683586817655) — gabarit 0 | boulangerie · horaires de fournée · le pain chaud annoncé à l'heure juste | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260907-foodtruck | 2026-09-07 |
-| dispo | qr-code-calendrier-marches-du-mois-producteur.png | Pinterest | QR code food truck (726416683586817654) — gabarit 2 | marché/producteur · calendrier des marchés du mois · le client fidèle sait où te trouver | https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260907-foodtruck | 2026-09-07 |
-| dispo | qr-code-carte-de-la-semaine-par-theme-food-truck.png | Pinterest | Templates gratuits (726416683586787015) — gabarit 3 | food truck · carte de la semaine par thème · l'autocollant du camion ne bouge jamais | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260907-foodtruck | 2026-09-07 |
-| dispo | qr-code-arrivee-tardive-check-in-autonome-hotel.png | Pinterest | QR code hôtel (726416683586817656) — gabarit 1 | hôtel · arrivée tardive en autonomie · le check-in se fait sans toi — *re-rendue avec le slug de campagne du jour* | https://qrowg.com/qr-code/hotel?utm_source=pinterest&utm_medium=pin&utm_campaign=20260907-foodtruck | 2026-09-07 |
+| en-file | qr-code-camion-privatise-evenement-food-truck-01..06.png | Instagram (carrousel) | — | food truck · camion privatisé pour un événement · la demande arrive écrite au lieu de mourir en DM | https://qrowg.com/qr-code/food-truck?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260907-foodtruck | 2026-09-07 |
+| en-file | tiktok-qr-code-camion-privatise-evenement-food-truck-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 | https://qrowg.com/qr-code/food-truck?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260907-foodtruck | 2026-09-07 |
+| en-file | qr-code-horaires-fournee-pain-chaud-boulangerie.png | Pinterest | QR code boutique commerce (726416683586817655) — gabarit 0 | boulangerie · horaires de fournée · le pain chaud annoncé à l'heure juste | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260907-foodtruck | 2026-09-07 |
+| en-file | qr-code-calendrier-marches-du-mois-producteur.png | Pinterest | QR code food truck (726416683586817654) — gabarit 2 | marché/producteur · calendrier des marchés du mois · le client fidèle sait où te trouver | https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260907-foodtruck | 2026-09-07 |
+| en-file | qr-code-carte-de-la-semaine-par-theme-food-truck.png | Pinterest | Templates gratuits (726416683586787015) — gabarit 3 | food truck · carte de la semaine par thème · l'autocollant du camion ne bouge jamais | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260907-foodtruck | 2026-09-07 |
+| en-file | qr-code-arrivee-tardive-check-in-autonome-hotel.png | Pinterest | QR code hôtel (726416683586817656) — gabarit 1 | hôtel · arrivée tardive en autonomie · le check-in se fait sans toi — *re-rendue avec le slug de campagne du jour* | https://qrowg.com/qr-code/hotel?utm_source=pinterest&utm_medium=pin&utm_campaign=20260907-foodtruck | 2026-09-07 |
 
 ## Textes prêts — 07/09
 

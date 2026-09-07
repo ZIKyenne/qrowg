@@ -124,4 +124,10 @@ export const BLOCS_ACTIFS_ATTENDUS: readonly string[] = [
   // Vague 14 — equipe et interlocuteurs.
   "team",
   "multi_contact",
+  // Vague 15 — profil et texte libre.
+  "profile",
+  "rich_text",
+  "opening_hours",
+  "gallery",
+  "social_links",
 ]
