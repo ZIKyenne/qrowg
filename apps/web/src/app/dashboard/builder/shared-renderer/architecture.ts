@@ -175,6 +175,12 @@ export const SHARED_RENDERER_BLOCKS: ReadonlySet<string> = new Set<string>([
   // sa carte complete meme vide ; `event_access` un cadre de carte sans carte ;
   // `event_guests` ecrasait role et description bien au-dela de son echelle.
   "event_guests", "event_access", "add_to_calendar", "ticketing",
+  // ── Vague 21 — structure de page (5 blocs) ──
+  // `hero_banner` n'avait aucune garde de vide et rendait un <img> brut ;
+  // `section_banner` n'appliquait la couleur choisie qu'au texte, pas aux
+  // filets ; `grid_section` coupait la grille a « colonnes x 2 » cartes cote
+  // apercu ; `section_block` posait 14 px de marge la ou la page n'en met pas.
+  "hero_banner", "section_banner", "two_columns", "grid_section", "section_block",
 ])
 
 // Blocs prévus comme pilotes en B09.2 (déclaratif, NON activé). Voir SHARED-RENDERER-PILOT.md.

@@ -107,6 +107,11 @@ import { EditorEventGuests } from "./blocks/event_guests"
 import { EditorEventAccess } from "./blocks/event_access"
 import { EditorAddToCalendar } from "./blocks/add_to_calendar"
 import { EditorTicketing } from "./blocks/ticketing"
+import { EditorHeroBanner } from "./blocks/hero_banner"
+import { EditorSectionBanner } from "./blocks/section_banner"
+import { EditorTwoColumns } from "./blocks/two_columns"
+import { EditorGridSection } from "./blocks/grid_section"
+import { EditorSectionBlock } from "./blocks/section_block"
 import { EditorFreeSection } from "./blocks/free_section"
 import { EditorImageText } from "./blocks/image_text"
 import { EditorSplitPanel } from "./blocks/split_panel"
@@ -288,6 +293,11 @@ const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   event_access: EditorEventAccess,
   add_to_calendar: EditorAddToCalendar,
   ticketing: EditorTicketing,
+  hero_banner: EditorHeroBanner,
+  section_banner: EditorSectionBanner,
+  two_columns: EditorTwoColumns,
+  grid_section: EditorGridSection,
+  section_block: EditorSectionBlock,
 }
 
 // Renvoie l'adapter éditeur partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

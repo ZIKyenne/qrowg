@@ -148,4 +148,9 @@ export const BLOCS_ACTIFS_ATTENDUS: readonly string[] = [
   "event_access",
   "add_to_calendar",
   "ticketing",
+  "hero_banner",
+  "section_banner",
+  "two_columns",
+  "grid_section",
+  "section_block",
 ]

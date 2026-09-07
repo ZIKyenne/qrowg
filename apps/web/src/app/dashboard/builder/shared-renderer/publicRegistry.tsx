@@ -167,6 +167,11 @@ const PublicEventGuests = dynamic(() => import("./blocks/event_guests").then(m =
 const PublicEventAccess = dynamic(() => import("./blocks/event_access").then(m => m.PublicEventAccess))
 const PublicAddToCalendar = dynamic(() => import("./blocks/add_to_calendar").then(m => m.PublicAddToCalendar))
 const PublicTicketing = dynamic(() => import("./blocks/ticketing").then(m => m.PublicTicketing))
+const PublicHeroBanner = dynamic(() => import("./blocks/hero_banner").then(m => m.PublicHeroBanner))
+const PublicSectionBanner = dynamic(() => import("./blocks/section_banner").then(m => m.PublicSectionBanner))
+const PublicTwoColumns = dynamic(() => import("./blocks/two_columns").then(m => m.PublicTwoColumns))
+const PublicGridSection = dynamic(() => import("./blocks/grid_section").then(m => m.PublicGridSection))
+const PublicSectionBlock = dynamic(() => import("./blocks/section_block").then(m => m.PublicSectionBlock))
 
 const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   heading: PublicHeading,
@@ -306,6 +311,11 @@ const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   event_access: PublicEventAccess,
   add_to_calendar: PublicAddToCalendar,
   ticketing: PublicTicketing,
+  hero_banner: PublicHeroBanner,
+  section_banner: PublicSectionBanner,
+  two_columns: PublicTwoColumns,
+  grid_section: PublicGridSection,
+  section_block: PublicSectionBlock,
 }
 
 // Renvoie l'adapter public partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null
