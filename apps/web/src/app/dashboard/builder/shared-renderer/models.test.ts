@@ -68,8 +68,8 @@ describe("pricingViewModel (parité filtre plans + pricingCtaModel)", () => {
     expect(vm.cta).toEqual(pricingCtaModel(BLOCK_FIXTURES.pricing.complete))
     expect((vm.cta as any).href).toBe("https://ex.com/pay")
   })
-  it("CTA javascript: neutralisé (via le modèle partagé)", () => {
-    expect(((pricingViewModel(BLOCK_FIXTURES.pricing.invalidUrl).cta) as any).href.startsWith("javascript:")).toBe(false)
+  it("CTA javascript: refusé (via le modèle partagé)", () => {
+    expect(((pricingViewModel(BLOCK_FIXTURES.pricing.invalidUrl).cta) as any).href).toBeNull()
   })
   it("plafond 3 offres (title1..3)", () => {
     const c = { title1: "A", price1: "1", title2: "B", price2: "2", title3: "C", price3: "3", title4: "D" }

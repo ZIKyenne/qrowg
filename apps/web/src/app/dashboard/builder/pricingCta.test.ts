@@ -56,12 +56,14 @@ describe("pricingCtaModel — sécurité de l'URL (extHref réutilisé)", () => 
     const m = pricingCtaModel({ cta_label: "X", cta_url: "tel:+33600000000" }) as any
     expect(m.href).toBe("tel:+33600000000"); expect(m.external).toBe(false)
   })
-  it("11. javascript: neutralisé (jamais de schéma exécutable dans href)", () => {
+  it("11. javascript: refusé — et plus seulement neutralisé", () => {
+    // Il ressortait en « https://javascript:alert(1) » : inoffensif, mais un
+    // bouton qui ne mène nulle part. Depuis le 7 septembre, aucune adresse
+    // inutilisable ne produit de destination — donc plus de bouton du tout.
     const m = pricingCtaModel({ cta_label: "X", cta_url: "javascript:alert(1)" }) as any
-    expect(m.href.startsWith("javascript:")).toBe(false)
-    expect(m.href).toBe("https://javascript:alert(1)")
+    expect(m.href).toBeNull()
   })
-  it("12. href '#' seul → traité comme absence (href null → '#' au rendu)", () => {
+  it("12. href '#' seul → traité comme absence, et le rendu ne publie rien", () => {
     expect((pricingCtaModel({ cta_label: "X", cta_url: "#" }) as any).href).toBeNull()
   })
 })

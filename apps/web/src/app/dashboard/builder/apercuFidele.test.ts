@@ -206,9 +206,9 @@ const ECARTS_INVERSES_CONNUS: Record<string, string[]> = {
   // Un carrousel qui défile tout seul pendant qu'on compose la page serait
   // insupportable : l'aperçu montre la première image, fixe.
   image_carousel: ["auto_play"],
-  // La fiche produit publique affiche la description sous le prix ; l'aperçu
-  // n'en a pas la place et s'arrête au nom et au prix.
-  product: ["description"],
+  // (`product.description` figurait ici — « l'aperçu n'en a pas la place ».
+  //  C'était une excuse : le commerçant écrivait un texte que le visiteur lisait
+  //  et qu'il ne voyait jamais. La vague 18 l'affiche des deux côtés.)
   // Ces deux champs ne s'AFFICHENT pas : ils décident si la fiche de contact a
   // quelque chose à enregistrer. L'aperçu applique la même règle depuis ce soir
   // (voir hasPublishableContent("vcard")), il ne les dessine simplement pas.

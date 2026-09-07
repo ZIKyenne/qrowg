@@ -134,4 +134,7 @@ export const BLOCS_ACTIFS_ATTENDUS: readonly string[] = [
   "availability",
   "announcement",
   "faq",
+  "product",
+  "featured_product",
+  "offer_comparison",
 ]

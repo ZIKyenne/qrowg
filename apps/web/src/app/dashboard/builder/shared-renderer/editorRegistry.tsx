@@ -93,6 +93,9 @@ import { EditorAbout } from "./blocks/about"
 import { EditorAvailability } from "./blocks/availability"
 import { EditorAnnouncement } from "./blocks/announcement"
 import { EditorFaq } from "./blocks/faq"
+import { EditorProduct } from "./blocks/product"
+import { EditorFeaturedProduct } from "./blocks/featured_product"
+import { EditorOfferComparison } from "./blocks/offer_comparison"
 import { EditorFreeSection } from "./blocks/free_section"
 import { EditorImageText } from "./blocks/image_text"
 import { EditorSplitPanel } from "./blocks/split_panel"
@@ -260,6 +263,9 @@ const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   availability: EditorAvailability,
   announcement: EditorAnnouncement,
   faq: EditorFaq,
+  product: EditorProduct,
+  featured_product: EditorFeaturedProduct,
+  offer_comparison: EditorOfferComparison,
 }
 
 // Renvoie l'adapter éditeur partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

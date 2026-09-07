@@ -97,13 +97,20 @@ describe("parité rendu — pricing", () => {
     expect(out).toContain('<a href="https://ex.com/pay"')
     expect(out).toContain("Choisir")
   })
-  it("public : CTA sans URL → href=# ; CTA absent si pas de libellé", () => {
-    expect(html(createElement(PublicPricing, { content: { title1: "P", price1: "1€", cta_label: "Go" }, ctx: publicCtx }))).toContain('<a href="#"')
+  it("public : un CTA sans adresse n'est pas publié du tout", () => {
+    // Il rendait `<a href="#">` : un bouton bien visible qui recharge la page
+    // sans rien faire. Contrat changé le 7 septembre, ici comme ailleurs.
+    expect(html(createElement(PublicPricing, { content: { title1: "P", price1: "1€", cta_label: "Go" }, ctx: publicCtx }))).not.toContain("<a ")
     expect(html(createElement(PublicPricing, { content: { title1: "P", price1: "1€" }, ctx: publicCtx }))).not.toContain("<a ")
+    expect(html(createElement(PublicPricing, { content: { title1: "P", price1: "1€", cta_label: "Go", cta_url: "pay.fr" }, ctx: publicCtx }))).toContain('<a href="https://pay.fr"')
   })
-  it("public : javascript: neutralisé dans le href", () => {
+  it("public : une adresse inutilisable ne produit aucun bouton", () => {
+    // « javascript:alert(1) » ressortait en « https://javascript:alert(1) » —
+    // inoffensif, mais un bouton qui ne mène nulle part.
     const out = html(createElement(PublicPricing, { content: { title1: "P", price1: "1€", cta_label: "X", cta_url: "javascript:alert(1)" }, ctx: publicCtx }))
-    expect(out).not.toContain('href="javascript:')
+    expect(out).not.toContain("javascript:")
+    expect(out).not.toContain("<a ")
+    expect(out).toContain("1€")
   })
   it("éditeur : CTA NON navigable (aria-disabled), aucun <a>, radius 9 + padding éditeur", () => {
     const out = html(createElement(EditorPricing, { content: plans, ctx: editorCtx }))

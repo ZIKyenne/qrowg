@@ -115,8 +115,10 @@ describe("view models — pricing CTA", () => {
   it("ctaNoUrl → visible, href null", () => {
     expect((pricingCtaModel(BLOCK_FIXTURES.pricing.ctaNoUrl) as any).href).toBeNull()
   })
-  it("invalidUrl (javascript:) → neutralisé", () => {
-    expect((pricingCtaModel(BLOCK_FIXTURES.pricing.invalidUrl) as any).href.startsWith("javascript:")).toBe(false)
+  it("invalidUrl (javascript:) → aucune destination", () => {
+    // Neutralisée en https:// jusqu'au 7 septembre ; désormais refusée, parce
+    // qu'une adresse neutralisée reste un bouton qui ne mène nulle part.
+    expect((pricingCtaModel(BLOCK_FIXTURES.pricing.invalidUrl) as any).href).toBeNull()
   })
 })
 

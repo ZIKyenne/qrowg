@@ -155,6 +155,12 @@ export const SHARED_RENDERER_BLOCKS: ReadonlySet<string> = new Set<string>([
   // montrait un en-tete pour un bloc qui ne publiait rien, et son style
   // « Cartes » rendait exactement comme « Compact ».
   "about", "availability", "announcement", "faq",
+  // ── Vague 18 — les blocs qui affichent un PRIX (3 blocs) ──
+  // Ceux qui rapportent de l'argent, et ou l'apercu mentait le plus :
+  // `product` ecrivait « Produit » et cachait la description ; `featured_product`
+  // inventait un prix de « 99€ » PUIS calculait la remise contre ce faux prix ;
+  // `offer_comparison` dessinait trois boutons la ou la page en publie un.
+  "product", "featured_product", "offer_comparison",
 ])
 
 // Blocs prévus comme pilotes en B09.2 (déclaratif, NON activé). Voir SHARED-RENDERER-PILOT.md.

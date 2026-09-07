@@ -153,6 +153,9 @@ const PublicAbout = dynamic(() => import("./blocks/about").then(m => m.PublicAbo
 const PublicAvailability = dynamic(() => import("./blocks/availability").then(m => m.PublicAvailability))
 const PublicAnnouncement = dynamic(() => import("./blocks/announcement").then(m => m.PublicAnnouncement))
 const PublicFaq = dynamic(() => import("./blocks/faq").then(m => m.PublicFaq))
+const PublicProduct = dynamic(() => import("./blocks/product").then(m => m.PublicProduct))
+const PublicFeaturedProduct = dynamic(() => import("./blocks/featured_product").then(m => m.PublicFeaturedProduct))
+const PublicOfferComparison = dynamic(() => import("./blocks/offer_comparison").then(m => m.PublicOfferComparison))
 
 const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   heading: PublicHeading,
@@ -278,6 +281,9 @@ const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   availability: PublicAvailability,
   announcement: PublicAnnouncement,
   faq: PublicFaq,
+  product: PublicProduct,
+  featured_product: PublicFeaturedProduct,
+  offer_comparison: PublicOfferComparison,
 }
 
 // Renvoie l'adapter public partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null
