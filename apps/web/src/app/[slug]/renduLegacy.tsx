@@ -33,7 +33,7 @@ import { trackPageView } from "@/lib/trackPageView"
 import { queueEngagement, trackDwell, queueTap } from "@/lib/trackEngagement"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { contactFormFields } from "@/lib/leadForms"
+import { contactFormFields, reservationFormFields, quoteFormFields, bookingRequestFields, telephoneDirect } from "@/lib/leadForms"
 import { pricingCtaModel } from "../dashboard/builder/pricingCta"
 import { normalizePageTheme, destinationUtile } from "../dashboard/builder/types"
 import { albumBlockCtaModel } from "../dashboard/builder/shared-renderer/models/albumBlockCta"
@@ -1734,9 +1734,26 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         </LienPublic>
       </div>
     ) : null
-    case "reservation_form": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} leadType="reservation" title={c.title || "Réserver"} fields={[{ key: "name", label: "Nom" }, { key: "phone", label: "Téléphone" }, { key: "date", label: "Date souhaitée" }, { key: "people", label: "Nb personnes" }]} button={c.button_label || "Réserver"} accent="linear-gradient(90deg,#EF4444,#dc2626)" subject={`Réservation: ${c.title || ""}`} TEXT={TEXT} MUTED={MUTED} />
-    case "quote_form": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} leadType="quote" title={c.title || "Demander un devis"} description={c.description} fields={[{ key: "name", label: "Nom complet" }, { key: "email", label: "Email" }, ...(c.show_phone !== "no" ? [{ key: "phone", label: "Téléphone" }] : []), ...(c.show_budget === "yes" ? [{ key: "budget", label: "Budget estimé" }] : []), ...(c.show_deadline === "yes" ? [{ key: "deadline", label: "Délai souhaité" }] : []), { key: "project", label: "Description du projet", area: true }]} button={c.button_label || "Envoyer ma demande"} accent={`linear-gradient(90deg,${G},${G}cc)`} buttonTextColor="#080808" subject="Demande de devis" TEXT={TEXT} MUTED={MUTED} />
-    case "booking_request": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} leadType="booking" title={c.title || "Réserver pour un événement"} description={c.description} fields={[{ key: "name", label: "Nom / Organisation" }, { key: "email", label: "Email" }, { key: "type", label: "Type d'événement" }, { key: "date", label: "Date souhaitée" }, { key: "message", label: "Message", area: true }]} button={c.button_label || "Envoyer ma demande"} accent="linear-gradient(90deg,#9146FF,#7B3FCC)" subject="Demande de réservation événement" TEXT={TEXT} MUTED={MUTED} />
+    case "reservation_form": {
+      // Le « Téléphone direct » du panneau : un restaurant qui le renseigne veut
+      // qu'on l'appelle. Il était réglable et rendu nulle part (vague 23).
+      const ligneDirecte = telephoneDirect(c)
+      const appel = telLink(ligneDirecte)
+      return (
+        <>
+          <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} leadType="reservation" title={c.title || "Réserver"} fields={reservationFormFields(c)} button={c.button_label || "Réserver"} accent="linear-gradient(90deg,#EF4444,#dc2626)" subject={`Réservation: ${c.title || ""}`} TEXT={TEXT} MUTED={MUTED} />
+          {appel && (
+            <p style={{ textAlign: "center", margin: "8px 0 0", fontSize: 13 }}>
+              <a href={appel} onClick={() => trackLinkClick(pageId, block.id, appel)} style={{ color: MUTED, textDecoration: "none" }}>
+                ou appelez directement le <strong style={{ color: TEXT }}>{ligneDirecte}</strong>
+              </a>
+            </p>
+          )}
+        </>
+      )
+    }
+    case "quote_form": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} leadType="quote" title={c.title || "Demander un devis"} description={c.description} fields={quoteFormFields(c)} button={c.button_label || "Envoyer ma demande"} accent={`linear-gradient(90deg,${G},${G}cc)`} buttonTextColor="#080808" subject="Demande de devis" TEXT={TEXT} MUTED={MUTED} />
+    case "booking_request": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} leadType="booking" title={c.title || "Réserver pour un événement"} description={c.description} fields={bookingRequestFields(c)} button={c.button_label || "Envoyer ma demande"} accent="linear-gradient(90deg,#9146FF,#7B3FCC)" subject="Demande de réservation événement" TEXT={TEXT} MUTED={MUTED} />
     case "quick_contact": {
       const items = [[c.phone, "📞", "var(--success)", telLink(c.phone) || null], [c.email, "✉️", "var(--action)", c.email ? `mailto:${c.email}` : null], [c.whatsapp, "💬", "#25D366", waLink(c.whatsapp, undefined, c.whatsapp_cc || "33") || null], [c.address, "📍", G, null], [c.hours, "🕐", MUTED, null]].filter(([v]) => v)
       return items.length > 0 ? (

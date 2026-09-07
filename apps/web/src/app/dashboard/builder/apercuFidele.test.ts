@@ -195,10 +195,15 @@ describe("un bloc proposé dans la bibliothèque arrive sur la page publiée", (
 //  · les destinations de lien (`url`, `cta_url`, `channel_url`…) : l'aperçu rend
 //    des boutons inertes, il n'a donc aucune raison de lire l'adresse ;
 //  · la logique propre à la page en ligne (`start_date`/`end_date` d'une annonce
-//    programmée, `show_deadline` d'un formulaire) : elle n'a pas de sens dans un
-//    canvas d'édition.
+//    programmée) : elle n'a pas de sens dans un canvas d'édition.
+//
+// `show_deadline` figurait dans cette seconde liste — « un réglage de formulaire
+// n'a pas de sens dans un canvas d'édition ». C'était une excuse : le réglage
+// AJOUTE un champ, et le commerçant l'activait sans rien voir bouger. La vague 23
+// met les deux côtés sur la même liste de champs (lib/leadForms.ts) ; l'exclusion
+// n'a plus d'objet.
 const DESTINATION_DE_LIEN = /(?:^|_)url$|^url$/
-const LOGIQUE_PUBLIQUE = new Set(["start_date", "end_date", "show_deadline"])
+const LOGIQUE_PUBLIQUE = new Set(["start_date", "end_date"])
 
 // Écarts inverses connus, chacun un choix assumé et non un oubli.
 const ECARTS_INVERSES_CONNUS: Record<string, string[]> = {

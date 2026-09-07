@@ -13,7 +13,7 @@ import { sizesGrille } from "../dashboard/builder/shared-renderer/models/horaire
 import { adresseEmailValide } from "@/lib/destinataireLead"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
-import { contactFormFields } from "@/lib/leadForms"
+import { contactFormFields, registerFormFields } from "@/lib/leadForms"
 import { openStatus, DAY_KEYS, countdownParts, shareLinks, calendarLinks, extHref, announcementMeta, SOCIAL_NETWORKS_MAP, destinationUtile } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
@@ -517,6 +517,12 @@ export function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail }: 
   const [hp, setHp] = useState("") // honeypot anti-spam
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle")
   const inputStyle: any = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "11px 13px", color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }
+  // Quels champs ce formulaire demande, et sous quel libellé : une seule liste,
+  // celle que lit aussi l'aperçu du builder. Les états restent nommés un par un —
+  // c'est l'AFFICHAGE qui est mis en commun, pas le chemin de soumission.
+  const champs = registerFormFields(c)
+  const demande = (cle: string) => champs.some(f => f.key === cle)
+  const libelle = (cle: string) => champs.find(f => f.key === cle)?.label ?? cle
   const emailOk = !email.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
   const canSubmit = !!name && !!email && emailOk && status !== "sending"
   const submit = async () => {
@@ -524,9 +530,9 @@ export function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail }: 
     setStatus("sending")
     trackLinkClick(pageId, block.id, "register")
     const data: Record<string, any> = { nom: name, email }
-    if (c.show_phone === "yes") data.telephone = phone
-    if (c.show_company === "yes") data.societe = company
-    const ok = await submitLead({ pageId, blockId: block.id, type: "register", name, email, phone: c.show_phone === "yes" ? phone : undefined, message: `Inscription: ${c.title || "événement"}`, data })
+    if (demande("phone")) data.telephone = phone
+    if (demande("company")) data.societe = company
+    const ok = await submitLead({ pageId, blockId: block.id, type: "register", name, email, phone: demande("phone") ? phone : undefined, message: `Inscription: ${c.title || "événement"}`, data })
     if (ok) { setStatus("done"); return }
     // Repli mailto si l'enregistrement échoue
     if (ownerEmail) {
@@ -546,10 +552,10 @@ export function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail }: 
       {c.description && <p style={{ color: "#EC4899", fontSize: 12, margin: "0 0 13px", fontWeight: 600 }}>⚡ {c.description}</p>}
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" value={hp} onChange={e => setHp(e.target.value)} style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0, pointerEvents: "none" }} />
-        <input placeholder="Prénom & Nom" aria-label="Prénom & Nom" autoComplete="name" value={name} onChange={e => setName(e.target.value)} style={inputStyle} />
-        <input placeholder="Email" aria-label="Email" type="email" inputMode="email" autoComplete="email" autoCapitalize="off" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
-        {c.show_phone === "yes" && <input placeholder="Téléphone" aria-label="Téléphone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={e => setPhone(e.target.value)} style={inputStyle} />}
-        {c.show_company === "yes" && <input placeholder="Société" aria-label="Société" autoComplete="organization" value={company} onChange={e => setCompany(e.target.value)} style={inputStyle} />}
+        <input placeholder={libelle("name")} aria-label={libelle("name")} autoComplete="name" value={name} onChange={e => setName(e.target.value)} style={inputStyle} />
+        <input placeholder={libelle("email")} aria-label={libelle("email")} type="email" inputMode="email" autoComplete="email" autoCapitalize="off" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
+        {demande("phone") && <input placeholder={libelle("phone")} aria-label={libelle("phone")} type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={e => setPhone(e.target.value)} style={inputStyle} />}
+        {demande("company") && <input placeholder={libelle("company")} aria-label={libelle("company")} autoComplete="organization" value={company} onChange={e => setCompany(e.target.value)} style={inputStyle} />}
         {email.trim() && !emailOk && <p style={{ color: "#F59E0B", fontSize: 12, margin: 0 }}>Adresse email invalide.</p>}
         {status === "error" && <p style={{ color: "#EF4444", fontSize: 12, margin: 0 }}>Une erreur est survenue. Réessayez.</p>}
         <button onClick={submit} disabled={!canSubmit} style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 10, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", border: "none", cursor: canSubmit ? "pointer" : "not-allowed", opacity: canSubmit ? 1 : 0.55 }}>{status === "sending" ? "Envoi…" : (c.button_label || "Je m'inscris")}</button>

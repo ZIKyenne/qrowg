@@ -10,6 +10,15 @@ import { InlineEditable } from "./InlineEditable"
 import { hasPublishableContent, HIDDEN_WHEN_EMPTY_NOTE } from "./blockEmptyState"
 import { pricingCtaModel } from "./pricingCta"
 import { boutonsSansLien, mentionBoutonSansLien } from "./boutonSansLien"
+import { CHAMPS_FORMULAIRE, telephoneDirect, type LeadField } from "@/lib/leadForms"
+
+// Les cases grises d'un formulaire dans l'aperçu. Elles étaient écrites en toutes
+// lettres, bloc par bloc, et avaient dérivé de la page publiée (vague 23) : le
+// commerçant activait « Champ téléphone » ou « Délai souhaité » et l'aperçu ne
+// bougeait pas. Une seule liste, partagée avec le rendu public.
+function champsDe(type: string, c: Record<string, any>): LeadField[] {
+  return (CHAMPS_FORMULAIRE[type] ?? (() => []))(c)
+}
 import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
 
   function FAQItem({ q, a, theme, link, linkLabel, compact }: { q: string; a: string; theme: PageTheme; link?: string; linkLabel?: string; compact?: boolean }) {
@@ -435,15 +444,16 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
           </div>
         </div>
       )
-      case "reservation_form": return (
+      case "reservation_form": { const ligneDirecte = telephoneDirect(c); return (
         <div style={{ padding: "10px 16px", ...s }}>
           <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 10px" }}>{c.title||"Réserver"}</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {["Nom","Date souhaitée","Nb personnes"].map(f => <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 7, padding: "7px 10px", color: muted, fontSize: 11 }}>{f}</div>)}
+            {champsDe("reservation_form", c).map(f => <div key={f.key} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 7, padding: "7px 10px", color: muted, fontSize: 11 }}>{f.label}</div>)}
             <div style={{ background: "linear-gradient(90deg,#EF4444,#dc2626)", borderRadius: 7, padding: "9px", textAlign: "center", color: "#fff", fontSize: 12, fontWeight: 700 }}>{c.button_label||"Réserver"}</div>
           </div>
+          {ligneDirecte && <p style={{ textAlign: "center", margin: "8px 0 0", color: muted, fontSize: 11 }}>ou appelez directement le <strong style={{ color: text }}>{ligneDirecte}</strong></p>}
         </div>
-      )
+      ) }
       case "services_list": {
         const services = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`s${i}_icon`],c[`s${i}_name`],c[`s${i}_desc`]]}).filter(([,n])=>n)
         return (
@@ -513,7 +523,7 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
         <div style={{ padding: "10px 16px", ...s }}>
           <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 10px" }}>{c.title||"Contact"}</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {["Nom","Email","Message"].map(f => <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 7, padding: f==="Message" ? "7px 10px 32px" : "7px 10px", color: muted, fontSize: 11 }}>{f}</div>)}
+            {champsDe("contact_form", c).map(f => <div key={f.key} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 7, padding: f.area ? "7px 10px 32px" : "7px 10px", color: muted, fontSize: 11 }}>{f.label}</div>)}
             <div style={{ background: `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 7, padding: "9px", textAlign: "center", color: "#080808", fontSize: 12, fontWeight: 700 }}>{c.button_label||"Envoyer"}</div>
           </div>
         </div>
@@ -977,7 +987,7 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {platforms.length===0
-                ? <p style={{ color: muted, fontSize: 11, textAlign: "center", margin: 0 }}>Ajoutez vos plateformes d écoute</p>
+                ? <p style={{ color: muted, fontSize: 11, textAlign: "center", margin: 0 }}>Ajoutez vos plateformes d'écoute</p>
                 : platforms.map(([k,icon,color,label]) => (
                   <div key={String(k)} style={{ display: "flex", alignItems: "center", gap: 10, background: (color as string)+"12", border: `1px solid ${color}25`, borderRadius: 9, padding: "9px 12px" }}>
                     <span style={{ fontSize: 16 }}>{icon}</span>
@@ -1925,10 +1935,7 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
           <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>{c.title||"Demander un devis"}</p>
           {c.description && <p style={{ color: muted, fontSize: 11, margin: "0 0 12px" }}>{c.description}</p>}
           <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-            {["Nom complet","Email"].map(f => <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>{f}</div>)}
-            {c.show_phone!=="no" && <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>Téléphone</div>}
-            {c.show_budget==="yes" && <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>Budget estimé</div>}
-            <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px 36px", color: muted, fontSize: 11 }}>Description du projet</div>
+            {champsDe("quote_form", c).map(f => <div key={f.key} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: f.area ? "8px 11px 36px" : "8px 11px", color: muted, fontSize: 11 }}>{f.label}</div>)}
             <div style={{ background: `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 9, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#080808" }}>{c.button_label||"Envoyer ma demande"}</div>
           </div>
         </div>
@@ -2263,10 +2270,9 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
           <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>{c.title||"Réserver pour un événement"}</p>
           {c.description && <p style={{ color: muted, fontSize: 11, margin: "0 0 12px" }}>{c.description}</p>}
           <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-            {["Nom / Organisation","Email","Type d événement","Date souhaitée"].map(f => (
-              <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>{f}</div>
+            {champsDe("booking_request", c).map(f => (
+              <div key={f.key} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: f.area ? "8px 11px 32px" : "8px 11px", color: muted, fontSize: 11 }}>{f.label}</div>
             ))}
-            <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px 32px", color: muted, fontSize: 11 }}>Message</div>
             <div style={{ background: "linear-gradient(90deg,#9146FF,#7B3FCC)", borderRadius: 9, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff" }}>{c.button_label||"Envoyer ma demande"}</div>
           </div>
         </div>
@@ -2413,13 +2419,11 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
 
       case "event_register": return (
         <div style={{ padding: "10px 16px", ...s }}>
-          <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>{c.title||"S inscrire gratuitement"}</p>
+          <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>{c.title||"S'inscrire gratuitement"}</p>
           {c.description && <p style={{ color: "#EC4899", fontSize: 11, margin: "0 0 12px", fontWeight: 600 }}>⚡ {c.description}</p>}
           <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-            {["Prénom & Nom","Email"].map(f => <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>{f}</div>)}
-            {c.show_phone==="yes" && <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>Téléphone</div>}
-            {c.show_company==="yes" && <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>Société</div>}
-            <div style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 9, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff" }}>{c.button_label||"Je m inscris"}</div>
+            {champsDe("event_register", c).map(f => <div key={f.key} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>{f.label}</div>)}
+            <div style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 9, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff" }}>{c.button_label||"Je m'inscris"}</div>
           </div>
         </div>
       )

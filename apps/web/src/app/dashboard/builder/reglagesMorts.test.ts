@@ -158,7 +158,12 @@ describe("les réglages redressés le 6 septembre restent branchés", () => {
   })
 
   it("le champ « délai souhaité » du devis apparaît quand il est activé", () => {
-    expect(lire("[slug]/renduLegacy.tsx")).toContain('c.show_deadline === "yes"')
+    // La règle a déménagé : depuis la vague 23, la liste des champs de chaque
+    // formulaire vit dans lib/leadForms.ts — une seule copie, lue par la page
+    // publiée ET par l'aperçu du builder, qui l'ignorait.
+    expect(lire("../lib/leadForms.ts")).toContain('c?.show_deadline === "yes"')
+    expect(lire("[slug]/renduLegacy.tsx"), "la page doit lire cette liste").toContain("quoteFormFields(c)")
+    expect(lire("dashboard/builder/builderPreview.tsx"), "l'aperçu aussi").toContain('champsDe("quote_form", c)')
   })
 
   it("« pleine largeur » change vraiment la largeur du bouton, des deux côtés", () => {

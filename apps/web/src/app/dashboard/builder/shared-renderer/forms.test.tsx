@@ -32,13 +32,21 @@ describe("B09.13 — modèles de formulaires", () => {
     expect(m.fields.find(f => f.key === "project")?.type).toBe("textarea")
     expect(quoteFormModel({ show_phone: "no" }).fields.map(f => f.key)).toEqual(["name", "email", "project"])
     expect(quoteFormModel({ show_budget: "yes" }).fields.map(f => f.key)).toContain("budget")
+    // « Délai souhaité » : rebranché sur la page le 6 septembre, absent de ce
+    // modèle jusqu'à la vague 23 — troisième copie de la même liste.
+    expect(quoteFormModel({ show_deadline: "yes" }).fields.map(f => f.key)).toContain("deadline")
     expect(m.leadType).toBe("quote")
   })
-  it("reservation_form : name/date/people (aucun email), phone orphelin NON inclus", () => {
+  it("reservation_form : name/phone/date/people (aucun email)", () => {
+    // Ce test figeait trois champs et affirmait que `phone` était « orphelin ».
+    // C'était faux depuis le début : la page publiée demande bien un téléphone au
+    // visiteur — c'est par là qu'un restaurant rappelle — et c'est son DEUXIÈME
+    // champ, donc un champ requis. Le modèle, lui, n'en demandait pas. Corrigé
+    // vague 23, en même temps que l'aperçu qui n'en montrait que trois.
+    // Le réglage `phone` du PANNEAU est un autre numéro : celui du restaurant.
     const m = reservationFormModel({})
-    expect(m.fields.map(f => f.key)).toEqual(["name", "date", "people"])
-    expect(m.fields.find(f => f.key === "phone")).toBeUndefined()
-    expect(m.fields.slice(0, 2).map(f => f.key)).toEqual(["name", "date"]) // 2 premiers requis
+    expect(m.fields.map(f => f.key)).toEqual(["name", "phone", "date", "people"])
+    expect(m.fields.slice(0, 2).map(f => f.key)).toEqual(["name", "phone"]) // 2 premiers requis
     expect(m.leadType).toBe("reservation")
   })
   it("booking_request : name/email/type/date/message ; leadType booking", () => {

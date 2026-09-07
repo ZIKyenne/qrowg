@@ -426,11 +426,11 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   reservation_form: {
     label: "Formulaire réservation", description: "Formulaire pour restaurants",
     icon: "📋", color: "#EF4444", category: "business",
-    defaultContent: { title: "Réserver une table", button_label: "Reserver" },
+    defaultContent: { title: "Réserver une table", button_label: "Réserver" },
     fields: [
       { key: "title", label: "Titre", type: "text", placeholder: "Réserver une table" },
-      { key: "phone", label: "Telephone direct", type: "text", placeholder: "+33 1 23 45 67 89" },
-      { key: "button_label", label: "Texte bouton", type: "text", placeholder: "Reserver" },
+      { key: "phone", label: "Téléphone direct", type: "text", placeholder: "+33 1 23 45 67 89", hint: "Affiché sous le formulaire : le visiteur peut appeler au lieu de le remplir" },
+      { key: "button_label", label: "Texte bouton", type: "text", placeholder: "Réserver" },
     ],
   },
   // ── Musique ───────────────────────────────────────────────────────────────
