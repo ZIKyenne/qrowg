@@ -26,7 +26,15 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
-  verification: { google: "j0SKDePzohMoahiN7B09kpx5RGpZaNMdW1N-s-M1IPg" },
+  verification: {
+    google: "j0SKDePzohMoahiN7B09kpx5RGpZaNMdW1N-s-M1IPg",
+    // Revendication du domaine chez Pinterest (Paramètres -> Lien vers Pinterest).
+    // Sans elle, les liens sortants du compte sont déclassés et aucune statistique
+    // de destination ne remonte : c'est la cause identifiée des 0 impression sur
+    // toutes les épingles depuis le 02/09 (voir marketing-design/DIAGNOSTIC-PINTEREST.md).
+    // Rend <meta name="p:domain_verify" content="..."/> dans le <head> de chaque page.
+    other: { "p:domain_verify": "85533213da91edb14d8ea4644fde93a1" },
+  },
   title: {
     default: "QRowg — Carte de visite numérique & QR code dynamique pro",
     template: "%s | QRowg",
