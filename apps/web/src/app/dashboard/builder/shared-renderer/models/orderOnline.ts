@@ -1,4 +1,5 @@
-// Modèle pur du bloc `order_online`. TOUJOURS visible (le public rend href||"#").
+// Modèle pur du bloc `order_online`. Le bouton n'est publié que s'il mène
+// quelque part (7 septembre) : le rendu public repliait auparavant sur « # ».
 // external seulement si l'URL est http(s), comme le legacy. Aucun React.
 import { extHref } from "../../types"
 import type { CtaLink } from "./ctaLink"

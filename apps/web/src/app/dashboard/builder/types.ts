@@ -954,6 +954,36 @@ export const SOCIAL_URL_TEMPLATES: Record<string, string> = {
 // Garantit un lien externe cliquable : prefixe https:// si l'utilisateur a oublie le protocole
 // (ex "www.site.com", "site.com/x"). Laisse intacts http/mailto/tel, les ancres et les chemins
 // relatifs. Idempotent -> sans effet sur une URL deja valide. Evite les liens relatifs casses.
+/**
+ * L'adresse vers laquelle un bouton mène VRAIMENT, ou `null`.
+ *
+ * `extHref` normalise mais ne juge pas : elle laisse « # » passer tel quel et
+ * préfixe tout le reste en https://, si bien que « javascript:alert(1) »
+ * devient « https://javascript:alert(1) » — inoffensif, mais qui ne mène nulle
+ * part. Un bouton construit sur l'une de ces valeurs se clique et ne fait rien,
+ * et le visiteur en conclut que le commerce ne fonctionne pas.
+ *
+ * Une seule règle, partagée par le rendu public et par la mention de l'éditeur :
+ * deux copies d'une règle de ce genre finissent toujours par diverger.
+ */
+const SCHEMA_ECRIT = /^[a-z][a-z0-9+.-]*:/i
+const SCHEMAS_ADMIS = /^(https?:|mailto:|tel:|sms:)/i
+export function destinationUtile(url?: string | null): string | null {
+  const u = (url || "").trim()
+  if (!u) return null
+  if (SCHEMA_ECRIT.test(u) && !SCHEMAS_ADMIS.test(u)) return null
+  const h = extHref(u)
+  if (!h || /^#+$/.test(h)) return null
+  // « javascript:alert(1) » ressort de extHref en « https://javascript:alert(1) » :
+  // une adresse https dont l'hôte contient un « : ». Elle ne mène nulle part.
+  // Ce contrôle ne vaut QUE pour http(s) — mailto: et tel: portent légitimement
+  // un deux-points, et les refuser supprimerait les boutons « Écrire » et
+  // « Appeler ». (Relevé par les tests des vagues 2 et 5.)
+  const apresSchema = h.replace(/^https?:\/\//i, "")
+  if (/^https?:\/\//i.test(h) && SCHEMA_ECRIT.test(apresSchema)) return null
+  return h
+}
+
 export function extHref(url?: string): string {
   const u = (url || "").trim()
   if (!u || u === "#") return u

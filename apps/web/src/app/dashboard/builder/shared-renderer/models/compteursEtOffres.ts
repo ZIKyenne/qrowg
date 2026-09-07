@@ -9,22 +9,18 @@
 // Regle appliquee partout ici : un compteur sans chiffre ne s'affiche pas. Ni en
 // ligne, ni dans l'apercu — ou une invite explique qu'il restera invisible.
 
-import { extHref } from "../../types"
+import { extHref, destinationUtile } from "../../types"
 import type { CtaLink } from "./ctaLink"
 
 const txt = (v: unknown): string => (typeof v === "string" ? v.trim() : typeof v === "number" ? String(v) : "")
 
-// Un schema d'adresse que le produit n'utilise pas est refuse avant meme extHref.
-// Sans ce filtre, « javascript:alert(1) » ressortait en « https://javascript:alert(1) » :
-// inoffensif — le navigateur n'y voit qu'une adresse https invalide — mais c'est un
-// lien mort presente comme un bouton. Mieux vaut un bouton inerte qu'un lien casse.
-const SCHEMA_INCONNU = /^[a-z][a-z0-9+.-]*:/i
-const SCHEMAS_ADMIS = /^(https?|mailto|tel|sms):/i
-export function adresseSure(url: string): string | null {
-  if (!url) return null
-  if (SCHEMA_INCONNU.test(url) && !SCHEMAS_ADMIS.test(url)) return null
-  return extHref(url) || null
-}
+// Une seule regle pour « ce lien mene-t-il quelque part ? », partagee avec le
+// rendu legacy et avec la mention de l'editeur : trois copies d'une regle de ce
+// genre finissent toujours par diverger. Elle refuse les schemas que le produit
+// n'utilise pas — sans quoi « javascript:alert(1) » ressort en
+// « https://javascript:alert(1) » — et les ancres « # », qui se cliquent sans
+// rien faire.
+export const adresseSure = destinationUtile
 
 // Bouton d'appel a l'action optionnel. `cleParDefaut` conserve la cle de suivi
 // historique quand aucune adresse n'est saisie (« tickets », « offer »).

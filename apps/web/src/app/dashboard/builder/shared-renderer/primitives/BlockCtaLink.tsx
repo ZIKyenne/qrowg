@@ -5,6 +5,7 @@
 //   tracking échoue (onClick synchrone, sans await).
 // - EditorCtaShell : conteneur NON navigable (aucun href, aucun tracking), aria-disabled.
 import type { CSSProperties, ReactNode } from "react"
+import { destinationUtile } from "../../types"
 
 /**
  * Plancher de cible tactile pour TOUS les appels à l'action d'une page publiée.
@@ -46,9 +47,13 @@ export function PublicCtaLink({ href, external, trackTarget, trackClick, style, 
   style: CSSProperties
   children: ReactNode
 }) {
+  // Un bouton sans destination n'est pas publie : un controle qui se clique et
+  // ne fait rien fait croire au visiteur que le commerce ne fonctionne pas.
+  const cible = destinationUtile(href)
+  if (!cible) return null
   return (
     <a
-      href={href || "#"}
+      href={cible}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
       onClick={() => { try { trackClick(trackTarget) } catch {} }}

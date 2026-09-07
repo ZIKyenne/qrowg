@@ -1,6 +1,6 @@
 // Modèle pur `podcast_links`. Carte podcast (couverture via SharedImageModel) + liens plateformes
 // (durcis extHref). Public visible si (une plateforme || podcast_name). Aucun lecteur audio.
-import { extHref } from "../../types"
+import { extHref, destinationUtile } from "../../types"
 import { sharedImageModel, type SharedImageModel } from "./sharedImage"
 
 export type PodcastPlatform = { key: string; icon: string; color: string; label: string; href: string; trackTarget: string }
@@ -15,10 +15,12 @@ const PLATS: [string, string, string, string][] = [
 
 export function podcastLinksViewModel(content: Record<string, any> | null | undefined): PodcastLinksViewModel {
   const c = content || {}
-  const platforms = PLATS.filter(([k]) => c[k]).map(([k, icon, color, label]) => {
+  // Idem : une plateforme sans adresse utilisable disparait de la liste.
+  const platforms = PLATS.map(([k, icon, color, label]) => {
     const url = typeof c[k] === "string" ? c[k] : ""
-    return { key: k, icon, color, label, href: extHref(url) || "#", trackTarget: url }
-  })
+    const href = destinationUtile(url)
+    return href ? { key: k, icon, color, label, href, trackTarget: url } : null
+  }).filter((p): p is NonNullable<typeof p> => p !== null)
   return {
     visible: platforms.length > 0 || !!c.podcast_name,
     cover: sharedImageModel(c.cover_url, { decorative: true }),

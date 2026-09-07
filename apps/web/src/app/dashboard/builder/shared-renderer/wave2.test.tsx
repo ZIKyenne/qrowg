@@ -114,8 +114,12 @@ describe("wave2 — parité de rendu PUBLIC (lien + null)", () => {
     expect(H(createElement(PublicDownloadFile, { content: { url: "ex.com/f.pdf", label: "Guide" }, ctx: pCtx }))).toContain('href="https://ex.com/f.pdf"')
     expect(H(createElement(PublicDownloadFile, { content: {}, ctx: pCtx }))).toBe("")
   })
-  it("order_online : TOUJOURS un <a> (href=# si vide)", () => {
-    expect(H(createElement(PublicOrderOnline, { content: {}, ctx: pCtx }))).toContain('href="#"')
+  it("order_online : un bouton seulement s'il mene quelque part", () => {
+    // Contrat change le 7 septembre. Ce test exigeait « TOUJOURS un <a>, href=#
+    // si vide » — fidelite au legacy. Mais un bouton « Commander en ligne » qui
+    // recharge la page fait croire au visiteur que le commerce ne fonctionne
+    // pas : c'est pire que pas de bouton. Sans adresse, plus de bouton.
+    expect(H(createElement(PublicOrderOnline, { content: {}, ctx: pCtx }))).not.toContain("href=")
     expect(H(createElement(PublicOrderOnline, { content: { url: "https://ex.com" }, ctx: pCtx }))).toContain('href="https://ex.com"')
   })
   it("donation : <a> couleur plateforme, null sans url", () => {
@@ -130,9 +134,15 @@ describe("wave2 — parité de rendu PUBLIC (lien + null)", () => {
 })
 
 describe("wave2 — sécurité & tracking du lien", () => {
-  it("PublicCtaLink : href=# si null, jamais de schéma exécutable", () => {
-    const out = H(createElement(PublicCtaLink, { href: null, external: false, trackTarget: "x", trackClick: () => {}, style: {}, children: "T" }))
-    expect(out).toContain('href="#"')
+  it("PublicCtaLink : sans destination, aucun lien du tout", () => {
+    // Il rendait `href="#"`. Un lien vers « # » se clique, recharge la page et
+    // ne fait rien ; une ancre sans href se clique tout autant. La seule
+    // reponse honnete est de ne rien publier.
+    for (const href of [null, "", "#", "javascript:alert(1)"]) {
+      const out = H(createElement(PublicCtaLink, { href, external: false, trackTarget: "x", trackClick: () => {}, style: {}, children: "T" }))
+      expect(out, String(href)).toBe("")
+    }
+    expect(H(createElement(PublicCtaLink, { href: "https://x.com", external: true, trackTarget: "x", trackClick: () => {}, style: {}, children: "T" }))).toContain('href="https://x.com"')
   })
   it("PublicCtaLink : un tracking qui échoue ne casse pas le rendu (try/catch)", () => {
     const boom = () => { throw new Error("net") }

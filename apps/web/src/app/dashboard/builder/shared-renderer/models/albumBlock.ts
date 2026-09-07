@@ -1,7 +1,7 @@
 // Modèle pur `album_block`. Couverture via SharedImageModel (décorative), plateformes
 // (spotify/apple/deezer → liens durcis extHref), CTA via albumBlockCtaModel (libellé non
 // navigable, faute de champ cta_url — parité éditeur/public établie en B09.11).
-import { extHref } from "../../types"
+import { extHref, destinationUtile } from "../../types"
 import { sharedImageModel, type SharedImageModel } from "./sharedImage"
 import { albumBlockCtaModel, type AlbumBlockCtaModel } from "./albumBlockCta"
 
@@ -15,10 +15,13 @@ const PLATS: [string, string, string][] = [["spotify_url", "🎧 Spotify", "#1DB
 
 export function albumBlockViewModel(content: Record<string, any> | null | undefined): AlbumBlockViewModel {
   const c = content || {}
-  const platforms = PLATS.filter(([k]) => c[k]).map(([k, label, color]) => {
+  // Une plateforme dont l'adresse ne mene nulle part n'est pas listee : un
+  // bouton « Spotify » qui ne fait rien vaut moins que pas de bouton du tout.
+  const platforms = PLATS.map(([k, label, color]) => {
     const url = typeof c[k] === "string" ? c[k] : ""
-    return { key: k, href: extHref(url) || "#", label, color, trackTarget: url }
-  })
+    const href = destinationUtile(url)
+    return href ? { key: k, href, label, color, trackTarget: url } : null
+  }).filter((p): p is NonNullable<typeof p> => p !== null)
   return {
     visible: !!(c.title || c.cover), cover: sharedImageModel(c.cover, { decorative: true }),
     title: c.title || "Mon Album", artist: c.artist || undefined, year: c.year || undefined,

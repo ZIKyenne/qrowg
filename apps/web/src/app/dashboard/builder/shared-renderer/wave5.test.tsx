@@ -173,10 +173,17 @@ describe("wave5 — parité public (null / items / lien réel)", () => {
     expect(H(createElement(PublicPromoBanner, { content: { text: "T", cta_label: "X", cta_url: "https://x.co" }, ctx: pCtx }))).not.toContain('target="_blank"')
     expect(H(createElement(PublicEventInfo, { content: { name: "N", cta_label: "X", cta_url: "https://x.co" }, ctx: pCtx }))).not.toContain('target="_blank"')
   })
-  it("URL dangereuse neutralisée dans le rendu public (schéma non exécutable)", () => {
+  it("URL dangereuse : plus de schema executable, et plus de lien mort non plus", () => {
+    // Ce test figeait la fidelite au legacy : « javascript:alert(1) » ressortait
+    // en « https://javascript:alert(1) ». Inoffensif — le navigateur n'y voit
+    // qu'une adresse https invalide — mais c'est un bouton qui ne mene nulle
+    // part, presente au visiteur comme s'il fonctionnait. Depuis le 7 septembre
+    // une adresse inutilisable ne produit plus de bouton du tout.
     const out = H(createElement(PublicPromoBanner, { content: { text: "T", cta_label: "X", cta_url: "javascript:alert(1)" }, ctx: pCtx }))
-    expect(out).not.toContain('href="javascript:')  // schéma exécutable absent
-    expect(out).toContain('href="https://javascript:alert(1)"')  // neutralisé en https (fidèle legacy)
+    expect(out).not.toContain("javascript:alert")
+    expect(out).toContain("T")
+    const bon = H(createElement(PublicPromoBanner, { content: { text: "T", cta_label: "X", cta_url: "promo.fr" }, ctx: pCtx }))
+    expect(bon).toContain('href="https://promo.fr"')
   })
 })
 

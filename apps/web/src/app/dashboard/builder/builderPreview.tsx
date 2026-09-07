@@ -9,6 +9,7 @@ import { G, MUTED } from "./builderConstants"
 import { InlineEditable } from "./InlineEditable"
 import { hasPublishableContent, HIDDEN_WHEN_EMPTY_NOTE } from "./blockEmptyState"
 import { pricingCtaModel } from "./pricingCta"
+import { boutonsSansLien, mentionBoutonSansLien } from "./boutonSansLien"
 import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
 
   function FAQItem({ q, a, theme, link, linkLabel, compact }: { q: string; a: string; theme: PageTheme; link?: string; linkLabel?: string; compact?: boolean }) {
@@ -114,6 +115,13 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
     const SharedEditor = resolveEditorBlock(block.type)
     if (SharedEditor) return <SharedEditor content={c} ctx={{ theme, primary, text, muted, accent, surfaceStyle: s, canEdit, edit }} />
 
+    // Un bouton sans destination n'est plus publié : la page le retire. L'aperçu
+    // le garde — le commerçant doit pouvoir le composer — mais il le dit.
+    const mention = mentionBoutonSansLien(boutonsSansLien(block.type, c))
+    const avecMention = (contenu: any) => mention
+      ? <>{contenu}<p role="note" style={{ margin: "0 16px 8px", padding: "6px 9px", borderRadius: 8, border: `1px dashed ${muted}40`, color: muted, fontSize: 10, textAlign: "center" }}>⚠︎ {mention}</p></>
+      : contenu
+    return avecMention((() => {
     switch (block.type) {
       case "profile": {
         const pName = (c.name || "").trim()
@@ -2725,5 +2733,6 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
         return <div style={{ padding: "12px 16px", textAlign: "center", ...s }}><span style={{ fontSize: 22 }}>{def?.icon||"📦"}</span><p style={{ color: muted, fontSize: 11, margin: "5px 0 0" }}>{def?.label||block.type}</p></div>
       }
     }
+    })())
   }
 

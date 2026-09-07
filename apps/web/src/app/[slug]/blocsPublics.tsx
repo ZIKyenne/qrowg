@@ -14,7 +14,7 @@ import { adresseEmailValide } from "@/lib/destinataireLead"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
 import { contactFormFields } from "@/lib/leadForms"
-import { openStatus, DAY_KEYS, countdownParts, shareLinks, calendarLinks, extHref, announcementMeta, SOCIAL_NETWORKS_MAP } from "../dashboard/builder/types"
+import { openStatus, DAY_KEYS, countdownParts, shareLinks, calendarLinks, extHref, announcementMeta, SOCIAL_NETWORKS_MAP, destinationUtile } from "../dashboard/builder/types"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 
@@ -327,7 +327,7 @@ export function CountdownPublic({ c, TEXT, MUTED, FONT_D, FONT_B, pageId, blockI
                 </div>
               ))}
             </div>}
-        {!p?.expired && c.cta_label && <a href={extHref(c.cta_url) || "#"} onClick={() => trackLinkClick(pageId, blockId, c.cta_url || "countdown")} style={{ display: "inline-block", marginTop: 16, background: accent, color: "#fff", padding: "11px 24px", borderRadius: 9, textDecoration: "none", fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{c.cta_label}</a>}
+        {!p?.expired && c.cta_label && destinationUtile(c.cta_url) && <a href={destinationUtile(c.cta_url)!} onClick={() => trackLinkClick(pageId, blockId, c.cta_url || "countdown")} style={{ display: "inline-block", marginTop: 16, background: accent, color: "#fff", padding: "11px 24px", borderRadius: 9, textDecoration: "none", fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{c.cta_label}</a>}
       </div>
     </div>
   )

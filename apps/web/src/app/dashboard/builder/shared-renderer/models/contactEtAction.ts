@@ -12,7 +12,7 @@
 //   • quick_contact : l'apercu fabriquait « tel:… » et « wa.me/… » a la main,
 //     sans passer par les fonctions qui nettoient le numero, et ignorait
 //     l'indicatif pays du WhatsApp.
-import { extHref, telLink, waLink, directionsLink } from "../../types"
+import { extHref, telLink, waLink, directionsLink, destinationUtile } from "../../types"
 import type { CtaLink } from "./ctaLink"
 
 const txt = (v: unknown): string => (typeof v === "string" ? v.trim() : "")
@@ -82,6 +82,6 @@ export function boutonAction(c: Record<string, any> | null | undefined): BoutonA
     style: txt(src.style),
     // « Pleine largeur » etait propose dans les reglages et n'avait aucun effet.
     pleineLargeur: txt(src.full_width) !== "no",
-    lien: { href: extHref(url) || "#", external: false, trackTarget: url || "cta_button", visible: true },
+    lien: { href: destinationUtile(url), external: false, trackTarget: url || "cta_button", visible: true },
   }
 }

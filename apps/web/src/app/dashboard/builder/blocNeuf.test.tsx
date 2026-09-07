@@ -118,34 +118,3 @@ describe("les liens livrés mènent quelque part, ou n'existent pas", () => {
     expect(morts).toEqual([])
   })
 })
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// DETTE NOMMÉE — les boutons qui retombent sur « # ».
-//
-// En vidant les `cta_url` inventés, un motif plus large est apparu : le rendu
-// public écrit `href={extHref(c.cta_url) || "#"}` à une vingtaine d'endroits.
-// Un bouton sans destination est donc publié quand même, et un clic recharge la
-// page sans rien faire. C'est la même famille que le lien de formule jeté
-// (vague 12) et que la carte menant à une recherche Google vide (vague 13).
-//
-// Je ne corrige pas les vingt sites dans le même changement : ce sont vingt
-// conditions JSX différentes dans un fichier de 2 270 lignes, et un lot qui
-// mêle deux refontes est un lot qu'on ne peut plus annuler proprement. Le
-// compte est donc figé ici et ne doit que DESCENDRE : 31 avant ce changement,
-// 30 après. `availability`, le seul dont le défaut était livré à la création,
-// est traité tout de suite ; les 30 autres attendent leur propre lot.
-// ═══════════════════════════════════════════════════════════════════════════════
-describe("dette : les boutons publiés sans destination", () => {
-  const src = readFileSync(fileURLToPath(new URL("../../[slug]/renduLegacy.tsx", import.meta.url)), "utf8")
-  const sites = src.match(/href=\{[^}]*\|\|\s*"#"\}/g) ?? []
-
-  it("le compte est connu et ne remonte pas", () => {
-    expect(sites.length, "un bouton de plus qui ne mène nulle part").toBeLessThanOrEqual(30)
-  })
-
-  it("availability ne publie plus de bouton sans adresse", () => {
-    // Il naissait avec « Prendre contact » vers « # » : le défaut le plus visible
-    // de la famille, puisqu'il était livré à tout nouveau bloc.
-    expect(src).toMatch(/c\.cta_label && extHref\(c\.cta_url\) &&/)
-  })
-})
