@@ -181,6 +181,12 @@ export const SHARED_RENDERER_BLOCKS: ReadonlySet<string> = new Set<string>([
   // filets ; `grid_section` coupait la grille a « colonnes x 2 » cartes cote
   // apercu ; `section_block` posait 14 px de marge la ou la page n'en met pas.
   "hero_banner", "section_banner", "two_columns", "grid_section", "section_block",
+  // ── Vague 22 — musique (4 blocs) ──
+  // `music_links` publiait cinq liens et n'en tracait AUCUN — l'artiste voyait
+  // zero statistique sur le bloc dont c'est tout l'objet. `presave` dessinait un
+  // bouton « Pre-sauvegarder sur Spotify » sans aucune adresse. Le bouton
+  // Spotify etait vert plein dans l'apercu, translucide en ligne.
+  "latest_release", "playlist_block", "presave", "music_links",
 ])
 
 // Blocs prévus comme pilotes en B09.2 (déclaratif, NON activé). Voir SHARED-RENDERER-PILOT.md.

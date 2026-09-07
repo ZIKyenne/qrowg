@@ -13,10 +13,10 @@ legacy conservés ; aucun format de données modifié ; aucune dépendance ajout
 | `mapEmbedUrl` | iframe (google_maps_embed / event_access) | idem | **iframe arbitraire** | `if (/^https?:/) return custom` (tout http) | allowlist domaine Google Maps |
 | `google_maps_embed` | iframe | iframe | élevé | dépend de `mapEmbedUrl` | débloqué (non migré) |
 | `embed_block` | iframe `c.url` | iframe `c.url` | **élevé** | iframe d'URL totalement arbitraire, aucun provider | **reste bloqué** (hors périmètre) |
-| `latest_release` | `<img>` cover | **SmartImage** cover | moyen | composant image divergent | contrat `SharedImageModel` (aligné, non migré) |
+| `latest_release` | — | — | résolu | composant image divergent | **migré en vague 22** via `SharedImageModel` |
 | `discography` | `<img>` | **SmartImage** | moyen | idem | contrat image |
-| `playlist_block` | `<img>` | **SmartImage** | moyen | idem | contrat image |
-| `presave` | `<img>` | **SmartImage** | moyen | idem | contrat image |
+| `playlist_block` | — | — | résolu | idem | **migré en vague 22** |
+| `presave` | — | — | résolu | idem | **migré en vague 22** |
 | `podcast_links` | `<img>` | **SmartImage** | moyen | idem | contrat image |
 | `product_catalog` | `<img>` | **SmartImage** | moyen | idem | contrat image |
 | `album_block` | CTA `cta_label` (div) si aucune plateforme | **rien** | moyen | champ éditable non rendu en public (§7) | parité via `albumBlockCtaModel` (public patché) |

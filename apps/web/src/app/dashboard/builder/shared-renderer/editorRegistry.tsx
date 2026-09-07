@@ -112,6 +112,10 @@ import { EditorSectionBanner } from "./blocks/section_banner"
 import { EditorTwoColumns } from "./blocks/two_columns"
 import { EditorGridSection } from "./blocks/grid_section"
 import { EditorSectionBlock } from "./blocks/section_block"
+import { EditorLatestRelease } from "./blocks/latest_release"
+import { EditorPlaylistBlock } from "./blocks/playlist_block"
+import { EditorPresave } from "./blocks/presave"
+import { EditorMusicLinks } from "./blocks/music_links"
 import { EditorFreeSection } from "./blocks/free_section"
 import { EditorImageText } from "./blocks/image_text"
 import { EditorSplitPanel } from "./blocks/split_panel"
@@ -298,6 +302,10 @@ const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   two_columns: EditorTwoColumns,
   grid_section: EditorGridSection,
   section_block: EditorSectionBlock,
+  latest_release: EditorLatestRelease,
+  playlist_block: EditorPlaylistBlock,
+  presave: EditorPresave,
+  music_links: EditorMusicLinks,
 }
 
 // Renvoie l'adapter éditeur partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

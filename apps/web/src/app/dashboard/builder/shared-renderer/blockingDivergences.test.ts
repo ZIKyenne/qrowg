@@ -175,9 +175,21 @@ describe("B09.11 — fondations (les corrections restent valides après B09.12)"
       expect(SHARED_RENDERER_BLOCKS.has(t)).toBe(true)
     }
   })
-  it("blocs encore bloqués restent LEGACY", () => {
-    for (const t of ["embed_block", "media_before_after", "latest_release", "playlist_block", "presave"]) {
-      expect(SHARED_RENDERER_BLOCKS.has(t)).toBe(false)
+  it("les deux blocs réellement bloqués restent LEGACY", () => {
+    // `embed_block` insère une adresse arbitraire dans un <iframe> sans aucun
+    // fournisseur déclaré ; `media_before_after` demande des tests DOM (curseur
+    // à glisser, tactile) que le pipeline actuel n'a pas. Ces deux-là attendent.
+    for (const t of ["embed_block", "media_before_after"]) {
+      expect(SHARED_RENDERER_BLOCKS.has(t), t).toBe(false)
+    }
+  })
+  it("les trois blocs musique n'étaient pas bloqués, mais « prêts » — ils sont migrés", () => {
+    // Le tableau des divergences les donnait « prêts » (§ Blocs image
+    // caractérisés) : leur seule cause était le composant image divergent,
+    // <img> côté éditeur contre SmartImage côté public, et le correctif
+    // prescrit était le contrat SharedImageModel. C'est celui qu'ils utilisent.
+    for (const t of ["latest_release", "playlist_block", "presave"]) {
+      expect(SHARED_RENDERER_BLOCKS.has(t), t).toBe(true)
     }
   })
   it("before_after (shared v7) reste actif", () => {

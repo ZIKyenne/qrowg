@@ -142,9 +142,13 @@ describe("wave8 — méta : blocs shared au recensement, aucun bloc exclu activ�
       expect(SHARED_RENDERER_BLOCKS.has(t)).toBe(true)
     }
   })
-  it("les blocs exclus restent legacy", () => {
-    for (const t of ["embed_block", "media_before_after", "latest_release", "playlist_block", "presave"]) {
-      expect(SHARED_RENDERER_BLOCKS.has(t)).toBe(false)
+  it("les blocs exclus de CETTE vague restent legacy", () => {
+    // La liste comptait aussi latest_release, playlist_block et presave : ils
+    // ont été migrés en vague 22, avec le contrat d'image que le tableau des
+    // divergences prescrivait. Restent les deux vrais blocages : une adresse
+    // arbitraire dans un <iframe>, et un curseur à glisser sans tests DOM.
+    for (const t of ["embed_block", "media_before_after"]) {
+      expect(SHARED_RENDERER_BLOCKS.has(t), t).toBe(false)
     }
   })
 })

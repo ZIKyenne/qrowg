@@ -153,4 +153,8 @@ export const BLOCS_ACTIFS_ATTENDUS: readonly string[] = [
   "two_columns",
   "grid_section",
   "section_block",
+  "latest_release",
+  "playlist_block",
+  "presave",
+  "music_links",
 ]

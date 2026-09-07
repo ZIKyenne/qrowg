@@ -172,6 +172,10 @@ const PublicSectionBanner = dynamic(() => import("./blocks/section_banner").then
 const PublicTwoColumns = dynamic(() => import("./blocks/two_columns").then(m => m.PublicTwoColumns))
 const PublicGridSection = dynamic(() => import("./blocks/grid_section").then(m => m.PublicGridSection))
 const PublicSectionBlock = dynamic(() => import("./blocks/section_block").then(m => m.PublicSectionBlock))
+const PublicLatestRelease = dynamic(() => import("./blocks/latest_release").then(m => m.PublicLatestRelease))
+const PublicPlaylistBlock = dynamic(() => import("./blocks/playlist_block").then(m => m.PublicPlaylistBlock))
+const PublicPresave = dynamic(() => import("./blocks/presave").then(m => m.PublicPresave))
+const PublicMusicLinks = dynamic(() => import("./blocks/music_links").then(m => m.PublicMusicLinks))
 
 const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   heading: PublicHeading,
@@ -316,6 +320,10 @@ const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   two_columns: PublicTwoColumns,
   grid_section: PublicGridSection,
   section_block: PublicSectionBlock,
+  latest_release: PublicLatestRelease,
+  playlist_block: PublicPlaylistBlock,
+  presave: PublicPresave,
+  music_links: PublicMusicLinks,
 }
 
 // Renvoie l'adapter public partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null
