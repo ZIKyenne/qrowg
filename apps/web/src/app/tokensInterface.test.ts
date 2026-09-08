@@ -2,7 +2,7 @@
  * Palette « Calme » (8 septembre) — garde-fou de contraste.
  *
  * Le dashboard écrit son texte avec --ink / --muted / --faint sur --bg,
- * --surface et --surface-2 ; les boutons primaires écrivent #15150F sur
+ * --surface et --surface-2 ; les boutons primaires écrivent --ink-on-accent sur
  * --accent (= --gold par défaut). Ces couples doivent rester lisibles
  * (WCAG AA : 4,5:1 pour le texte, 3:1 pour les contours et les grands
  * éléments). Le test lit globals.css, le seul fichier CSS importé.
@@ -76,10 +76,9 @@ describe("palette « Calme » — contraste", () => {
   })
 
   it("l'encre des boutons primaires (#15150F) lit AA sur l'or et sur l'accent par défaut", () => {
-    const encre = hex("#15150F")
+    const encre = hex(token("ink-on-accent"))
     expect(ratio(encre, gold)).toBeGreaterThanOrEqual(4.5)
     expect(ratio(encre, accent)).toBeGreaterThanOrEqual(4.5)
-    expect(CSS).toContain("#15150F")
   })
 
   it("les contours restent perceptibles : --line-strong ≥ 1,3:1 sur --surface, --line en dessous", () => {
@@ -108,7 +107,7 @@ describe("couche « Calme » — plus d'effets perpétuels", () => {
   it("les boutons primaires sont plats : fond accent, encre sombre, sans ombre ni translation", () => {
     const bloc = calme.match(/\n\.da-btn-primary,[^{]*\{[^}]*\}/)?.[0] ?? ""
     expect(bloc).toContain("background: var(--accent)")
-    expect(bloc).toContain("#15150F")
+    expect(bloc).toContain("var(--ink-on-accent)")
     expect(bloc).toMatch(/box-shadow:\s*none/)
   })
 

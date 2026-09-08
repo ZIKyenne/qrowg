@@ -95,7 +95,7 @@ export default function Dialogue({
         onClick={e => e.stopPropagation()}
         style={{ width: "100%", maxWidth: 420, background: "#111010", border: "1px solid rgba(201,168,76,0.24)", borderRadius: 18, padding: "22px 20px 18px", boxSizing: "border-box", boxShadow: "0 24px 70px rgba(0,0,0,0.6)", outline: "none" }}
       >
-        <h2 id={idTitre} style={{ color: "#F5F0E8", fontSize: 16.5, fontWeight: 800, margin: 0, letterSpacing: -0.2 }}>{titre}</h2>
+        <h2 id={idTitre} style={{ color: "var(--ink)", fontSize: 16.5, fontWeight: 800, margin: 0, letterSpacing: -0.2 }}>{titre}</h2>
         {description && (
           <p id={idDescription} style={{ color: MUTED, fontSize: 12.5, lineHeight: 1.5, margin: "8px 0 0" }}>{description}</p>
         )}

@@ -23,7 +23,7 @@ const DEVICE_CFG: Record<string, { label: string; icon: React.ReactNode; color: 
   mobile:  { label: "Mobile",  icon: <Smartphone size={14} />, color: "var(--accent)" },
   tablet:  { label: "Tablette",icon: <Tablet size={14} />,     color: "#7B61FF" },
   desktop: { label: "Desktop", icon: <Monitor size={14} />,    color: "var(--success)" },
-  unknown: { label: "Inconnu", icon: <Cpu size={14} />,        color: "#A8A190" },
+  unknown: { label: "Inconnu", icon: <Cpu size={14} />,        color: "var(--muted)" },
 }
 
 const OS_COLORS: Record<string, string> = {
@@ -82,7 +82,7 @@ function PieLabel({ cx, cy, midAngle, innerRadius, outerRadius, pct }: any) {
   const x = cx + r * Math.cos(-midAngle * RADIAN)
   const y = cy + r * Math.sin(-midAngle * RADIAN)
   return (
-    <text x={x} y={y} fill="#080808" fontSize={11} fontWeight={700} textAnchor="middle" dominantBaseline="central">
+    <text x={x} y={y} fill="var(--ink-on-accent)" fontSize={11} fontWeight={700} textAnchor="middle" dominantBaseline="central">
       {pct}%
     </text>
   )
@@ -92,9 +92,9 @@ function PieTip({ active, payload }: any) {
   if (!active || !payload?.length) return null
   const d = payload[0]
   return (
-    <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "8px 12px" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "8px 12px" }}>
       <p style={{ color: d.payload.color || G, fontSize: 12, fontWeight: 700, margin: "0 0 3px" }}>{d.name}</p>
-      <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 700, margin: 0 }}>{d.value} · {d.payload.pct}%</p>
+      <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 700, margin: 0 }}>{d.value} · {d.payload.pct}%</p>
     </div>
   )
 }
@@ -102,7 +102,7 @@ function PieTip({ active, payload }: any) {
 function BarTip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   return (
-    <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "8px 12px" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "8px 12px" }}>
       <p style={{ color: G, fontSize: 12, fontWeight: 700, margin: "0 0 3px" }}>{label}</p>
       {payload.map((p: any, i: number) => (
         <p key={i} style={{ color: p.color, fontSize: 12, fontWeight: 600, margin: "2px 0" }}>
@@ -194,14 +194,14 @@ export default function DevicePanel({ scans, pageViews, pages, page, periodDays 
   const topDevice = deviceData[0]
 
   return (
-    <div style={{ background: "#0F0E0B", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
             <Smartphone size={16} color={G} />
-            <h3 style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0 }}>Appareils</h3>
+            <h3 style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>Appareils</h3>
           </div>
           <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>
             {total.toLocaleString()} visites
@@ -214,7 +214,7 @@ export default function DevicePanel({ scans, pageViews, pages, page, periodDays 
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
           {pages.length > 1 && page == null && (
             <select aria-label="Filtrer par page" value={pageId} onChange={e => setPageId(e.target.value)}
-              style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 9, color: "#F5F0E8", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
+              style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 9, color: "var(--ink)", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
               <option value="all">Toutes les pages</option>
               {pages.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
             </select>
@@ -249,7 +249,7 @@ export default function DevicePanel({ scans, pageViews, pages, page, periodDays 
 
       {activeData.length === 0 ? (
         <div style={{ textAlign: "center", padding: "48px 20px", color: MUTED }}>
-          <div style={{ marginBottom: 10, color: "#5c554b" }}><Smartphone size={34} /></div>
+          <div style={{ marginBottom: 10, color: "var(--faint)" }}><Smartphone size={34} /></div>
           <p style={{ margin: 0, fontSize: 14 }}>Aucune donnée sur cette période</p>
         </div>
       ) : (
@@ -282,7 +282,7 @@ export default function DevicePanel({ scans, pageViews, pages, page, periodDays 
               {activeData.map(d => (
                 <div key={d.key} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <div style={{ width: 10, height: 10, borderRadius: "50%", background: d.color, flexShrink: 0 }} />
-                  <span style={{ color: "#F5F0E8", fontSize: 12, flex: 1 }}>{d.name}</span>
+                  <span style={{ color: "var(--ink)", fontSize: 12, flex: 1 }}>{d.name}</span>
                   <span style={{ color: d.color, fontSize: 12, fontWeight: 700 }}>{d.pct}%</span>
                   <span style={{ color: MUTED, fontSize: 11 }}>{d.count.toLocaleString()}</span>
                 </div>
@@ -299,7 +299,7 @@ export default function DevicePanel({ scans, pageViews, pages, page, periodDays 
                   layout="vertical"
                   margin={{ top: 0, right: 20, bottom: 0, left: 60 }}>
                   <XAxis type="number" tick={{ fill: MUTED, fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <YAxis type="category" dataKey="name" width={58} tick={{ fill: "#F5F0E8", fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="name" width={58} tick={{ fill: "var(--ink)", fontSize: 11 }} axisLine={false} tickLine={false} />
                   <Tooltip content={<BarTip />} cursor={{ fill: "color-mix(in srgb, var(--accent) 5%, transparent)" }} />
                   <Bar dataKey="Visites" radius={[0, 6, 6, 0]}>
                     {activeData.map((entry, i) => (

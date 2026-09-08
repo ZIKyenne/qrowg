@@ -19,7 +19,7 @@ type Page = { id: string; title: string; slug: string; status: string; total_vie
 type Profile = { full_name: string | null; plan: string; total_scans: number; total_pages: number; avatar_url: string | null }
 
 const PLAN_CONFIG: Record<string, { color: string; label: string }> = {
-  free: { color: "#A8A190", label: "Free" },
+  free: { color: "var(--muted)", label: "Free" },
   starter: { color: "var(--action)", label: "Starter" },
   pro: { color: "var(--accent)", label: "Pro" },
   business: { color: "var(--success)", label: "Business" },
@@ -32,7 +32,7 @@ function DeleteModal({ page, onConfirm, onCancel, deleting }: { page: Page; onCo
         <Button variant="ghost" onClick={onCancel} disabled={deleting}>Annuler</Button>
         <Button variant="danger" onClick={onConfirm} loading={deleting} leftIcon={<Trash2 size={15} />}>Supprimer définitivement</Button>
       </>}>
-      Vous êtes sur le point de supprimer <strong style={{ color: "#F5F0E8" }}>« {page.title} »</strong>. Cette action supprimera aussi les blocs, le QR code et toutes les données analytics associées. Elle est irréversible.
+      Vous êtes sur le point de supprimer <strong style={{ color: "var(--ink)" }}>« {page.title} »</strong>. Cette action supprimera aussi les blocs, le QR code et toutes les données analytics associées. Elle est irréversible.
     </Modal>
   )
 }
@@ -204,7 +204,7 @@ export default function DashboardClient({
   const maxToday = Math.max(1, ...weekViews)
 
   return (
-    <div style={{ minHeight: "100dvh", background: "radial-gradient(1200px 600px at 70% -10%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%), #080808", padding: isMobile ? "22px 16px 40px" : "30px 28px 48px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
+    <div style={{ minHeight: "100dvh", background: "radial-gradient(1200px 600px at 70% -10%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%), var(--bg)", padding: isMobile ? "22px 16px 40px" : "30px 28px 48px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
       <PostCheckoutBanner param="upgraded" message="Bienvenue ! Votre abonnement est actif. 🎉" />
       <style>{`
         .dz{animation:mo-fade-up .5s var(--mo-ease-standard) backwards}
@@ -234,14 +234,14 @@ export default function DashboardClient({
       {/* Menu secondaire d'une page (bottom sheet) — rendu hors de la carte pour ne pas etre clippe */}
       {menuPage && (
         <div onClick={() => setMenuPage(null)} style={{ position: "fixed", inset: 0, zIndex: 1100, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(3px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "#141210", borderTopLeftRadius: 20, borderTopRightRadius: 20, border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", padding: "10px 12px calc(14px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "var(--surface)", borderTopLeftRadius: 20, borderTopRightRadius: 20, border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", padding: "10px 12px calc(14px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)" }}>
             <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 10px" }} />
-            <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: "0 6px 6px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{menuPage.title}</p>
+            <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: "0 6px 6px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{menuPage.title}</p>
             {([
               ...(menuPage.status === "published" ? [{ icon: <ExternalLink size={17} />, label: "Voir la page", onClick: () => { window.open("/" + menuPage.slug, "_blank"); setMenuPage(null) } }] : []),
               { icon: copiedId === menuPage.id ? <Check size={17} color="var(--success)" /> : <Globe size={17} />, label: copiedId === menuPage.id ? "Lien copié !" : "Copier le lien", onClick: () => copyLink(menuPage) },
               { icon: <Eye size={17} />, label: menuPage.status === "published" ? "Dépublier" : "Publier", onClick: () => { togglePublish(menuPage); setMenuPage(null) } },
-              { icon: <Trash2 size={17} color="#EF4444" />, label: "Supprimer", danger: true, onClick: () => { setPageToDelete(menuPage); setMenuPage(null) } },
+              { icon: <Trash2 size={17} color="var(--danger)" />, label: "Supprimer", danger: true, onClick: () => { setPageToDelete(menuPage); setMenuPage(null) } },
             ] as { icon: React.ReactNode; label: string; onClick: () => void; danger?: boolean }[]).map((a, i) => (
               <button key={i} onClick={a.onClick}
                 style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "13px 12px", background: "none", border: "none", borderTop: i ? "1px solid rgba(255,255,255,0.05)" : "none", color: a.danger ? "#EF4444" : "#F5F0E8", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
@@ -256,7 +256,7 @@ export default function DashboardClient({
         {/* Header */}
         <div className="dz" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 22, flexWrap: "wrap", gap: 14 }}>
           <div>
-            <h1 style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(30px,4.5vw,44px)", lineHeight: 1.05, color: "#F5F0E8", fontWeight: 700, margin: "0 0 8px", letterSpacing: "-0.5px" }}>
+            <h1 style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(30px,4.5vw,44px)", lineHeight: 1.05, color: "var(--ink)", fontWeight: 700, margin: "0 0 8px", letterSpacing: "-0.5px" }}>
               {greeting}{profile?.full_name ? ", " + profile.full_name.split(" ")[0] : ""} !
             </h1>
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
@@ -281,7 +281,7 @@ export default function DashboardClient({
           <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", background: overViews ? "rgba(255,107,107,0.08)" : "color-mix(in srgb, var(--accent) 8%, transparent)", border: "1px solid " + (overViews ? "rgba(255,107,107,0.3)" : "color-mix(in srgb, var(--accent) 30%, transparent)"), borderRadius: 14, padding: "14px 18px", marginBottom: 22 }}>
             <AlertTriangle size={18} color={overViews ? "var(--danger)" : G} style={{ flexShrink: 0 }} />
             <div style={{ flex: 1, minWidth: 220 }}>
-              <p style={{ color: "#F5F0E8", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>
+              <p style={{ color: "var(--ink)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>
                 {overViews
                   ? `Quota de vues atteint (${monthViews.toLocaleString("fr-FR")} / ${viewsLimit!.toLocaleString("fr-FR")} ce mois-ci)`
                   : `Bientôt à court de vues : ${monthViews.toLocaleString("fr-FR")} / ${viewsLimit!.toLocaleString("fr-FR")} (${viewsPct}%)`}
@@ -295,7 +295,7 @@ export default function DashboardClient({
                 <div style={{ height: "100%", width: Math.min(viewsPct, 100) + "%", background: overViews ? "linear-gradient(90deg,var(--danger),#F97316)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 3 }} />
               </div>
             </div>
-            <Link href="/upgrade" style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, background: overViews ? "linear-gradient(90deg,var(--danger),#F97316)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 10, padding: "9px 16px", color: "#080808", textDecoration: "none", fontSize: 12.5, fontWeight: 800 }}>
+            <Link href="/upgrade" style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, background: overViews ? "linear-gradient(90deg,var(--danger),#F97316)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 10, padding: "9px 16px", color: "var(--ink-on-accent)", textDecoration: "none", fontSize: 12.5, fontWeight: 800 }}>
               <Zap size={13} /> Augmenter mon quota
             </Link>
           </div>
@@ -306,7 +306,7 @@ export default function DashboardClient({
           const onePage = pages.length === 1
           const tip = onePage
             ? { icon: <Plus size={17} />, text: <>Créez une 2ᵉ page pour un autre usage (menu, événement, promo).</>, label: "Nouvelle page", href: "/dashboard/templates" }
-            : { icon: <Printer size={17} />, text: <><strong style={{ color: "#F5F0E8" }}>{totalScans.toLocaleString("fr-FR")}</strong> scan{totalScans > 1 ? "s" : ""} — créez un support imprimable pour booster vos scans.</>, label: "Créer un support", href: "/dashboard/qr-codes" }
+            : { icon: <Printer size={17} />, text: <><strong style={{ color: "var(--ink)" }}>{totalScans.toLocaleString("fr-FR")}</strong> scan{totalScans > 1 ? "s" : ""} — créez un support imprimable pour booster vos scans.</>, label: "Créer un support", href: "/dashboard/qr-codes" }
           return (
             <div className="dz" style={{ marginBottom: 20 }}>
               <NextStepCard icon={tip.icon} ctaLabel={tip.label} href={tip.href} animationDelay="40ms">{tip.text}</NextStepCard>
@@ -437,7 +437,7 @@ export default function DashboardClient({
             {pages.length === 0 ? (
               <div style={{ padding: "32px 20px", textAlign: "center" }}>
                 <span style={{ width: 44, height: 44, margin: "0 auto 12px", borderRadius: 12, background: "color-mix(in srgb, var(--accent) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 26%, transparent)", display: "flex", alignItems: "center", justifyContent: "center" }}><FileText size={20} color={G} /></span>
-                <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 600, margin: "0 0 6px" }}>Aucune page</p>
+                <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600, margin: "0 0 6px" }}>Aucune page</p>
                 <p style={{ color: MUTED, fontSize: 12, margin: "0 0 16px" }}>Créez votre première page avec un modèle</p>
                 <Link href="/dashboard/templates" className="da-btn-primary da-btn-primary--sm">
                   <span>Choisir un modèle</span>
@@ -459,7 +459,7 @@ export default function DashboardClient({
 
                     {/* Titre + statut / vues / date */}
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ color: "#F5F0E8", fontSize: 13.5, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{page.title}</p>
+                      <p style={{ color: "var(--ink)", fontSize: 13.5, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{page.title}</p>
                       <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2, overflow: "hidden", whiteSpace: "nowrap" }}>
                         <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 10.5, fontWeight: 700, color: pub ? "var(--success)" : MUTED, flexShrink: 0 }}>
                           <span style={{ width: 5, height: 5, borderRadius: "50%", background: pub ? "var(--success)" : MUTED }} />{pub ? "En ligne" : "Brouillon"}
@@ -494,10 +494,10 @@ export default function DashboardClient({
           {/* Actions rapides */}
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {profile?.plan === "free" && (
-              <div style={{ background: CARD, border: "1px solid color-mix(in srgb, var(--accent) 22%, #221f1b)", borderRadius: 14, padding: "16px 18px" }}>
+              <div style={{ background: CARD, border: "1px solid color-mix(in srgb, var(--accent) 22%, var(--surface-2))", borderRadius: 14, padding: "16px 18px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                   <Zap size={16} color={G} />
-                  <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 700, margin: 0 }}>Passez à Starter — {fmtPrice(getPlan("starter").priceMonthly)}€/mois</p>
+                  <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 700, margin: 0 }}>Passez à Starter — {fmtPrice(getPlan("starter").priceMonthly)}€/mois</p>
                 </div>
                 <p style={{ color: MUTED, fontSize: 12, margin: "0 0 12px", lineHeight: 1.5 }}>{getPlan("starter").limits.pages} pages, {getPlan("starter").limits.views!.toLocaleString("fr-FR")} vues/mois, QR personnalisés, sans branding</p>
                 <Link href="/upgrade" className="da-btn-primary da-btn-primary--sm" style={{ width: "100%", justifyContent: "center" }}>
@@ -510,7 +510,7 @@ export default function DashboardClient({
                 (Templates, Analytics, QR y sont deja -> on ne les duplique plus ici). */}
             <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, overflow: "hidden" }}>
               <div style={{ padding: "14px 18px", borderBottom: `1px solid ${HAIR}` }}>
-                <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: 0 }}>Raccourcis</p>
+                <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: 0 }}>Raccourcis</p>
               </div>
               {[
                 { icon: <Globe size={16} />, label: "Domaines perso", href: "/dashboard/domains", color: "var(--success)" },
@@ -519,7 +519,7 @@ export default function DashboardClient({
                 <Link key={i} href={action.href} className="dz-row dz-act"
                   style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 18px", textDecoration: "none", borderBottom: i < arr.length - 1 ? `1px solid ${HAIR}` : "none" }}>
                   <span style={{ width: 32, height: 32, borderRadius: 9, background: `color-mix(in srgb, ${action.color} 14%, transparent)`, border: `1px solid color-mix(in srgb, ${action.color} 26%, transparent)`, display: "flex", alignItems: "center", justifyContent: "center", color: action.color, flexShrink: 0 }}>{action.icon}</span>
-                  <span style={{ color: "#F5F0E8", fontSize: 13.5, fontWeight: 500 }}>{action.label}</span>
+                  <span style={{ color: "var(--ink)", fontSize: 13.5, fontWeight: 500 }}>{action.label}</span>
                   <ArrowRight className="dz-arrow" size={14} color={action.color} style={{ marginLeft: "auto" }} />
                 </Link>
               ))}

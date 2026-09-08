@@ -53,7 +53,7 @@ interface Category { id: string; label: string; emoji: string; color: string }
 
 const BUSINESS_CATEGORIES: Category[] = [
   { id: "Tous",        label: "Tous",        emoji: "✦",  color: "var(--accent)" },
-  { id: "Restaurant",  label: "Restaurant",  emoji: "🍽️", color: "#EF4444" },
+  { id: "Restaurant",  label: "Restaurant",  emoji: "🍽️", color: "var(--danger)" },
   { id: "Bar",         label: "Bar",         emoji: "🍸", color: "#F97316" },
   { id: "Cafe",        label: "Café",        emoji: "☕", color: "#92400E" },
   { id: "Freelance",   label: "Freelance",   emoji: "💼", color: "var(--accent)" },
@@ -113,7 +113,7 @@ const CATEGORY_MAP: Record<string, string[]> = {
 
 const TEMPLATES: any[] = [
   { id: "freelance", name: "Freelance Pro", category: "Business", plan: "free", description: "Portfolio, services, tarifs, prise de contact", emoji: "💼", color: "var(--accent)", accent: "var(--success)", bg: "#080808", surface: "#111009", tags: ["Services", "Tarifs", "Contact", "Calendly"] },
-  { id: "restaurant", name: "Restaurant & Bar", category: "Food", plan: "free", description: "Menu, horaires, réservation, réseaux", emoji: "🍽️", color: "#EF4444", accent: "#F97316", bg: "#0D0505", surface: "#1A0A0A", tags: ["Menu", "Horaires", "Carte", "Réservation"] },
+  { id: "restaurant", name: "Restaurant & Bar", category: "Food", plan: "free", description: "Menu, horaires, réservation, réseaux", emoji: "🍽️", color: "var(--danger)", accent: "#F97316", bg: "#0D0505", surface: "#1A0A0A", tags: ["Menu", "Horaires", "Carte", "Réservation"] },
   { id: "artiste", name: "Artiste & Musicien", category: "Creatif", plan: "free", description: "Bio, musique, concerts, réseaux sociaux", emoji: "🎵", color: "#A78BFA", accent: "#F472B6", bg: "#0A0510", surface: "#130A20", tags: ["Spotify", "Concerts", "Réseaux", "Bio"] },
   { id: "coach", name: "Coach & Thérapeute", category: "Bien-etre", plan: "free", description: "Présentation, methode, témoignages, RDV", emoji: "🧘", color: "#4ADE80", accent: "#86EFAC", bg: "#040D06", surface: "#081A0C", tags: ["Services", "Témoignages", "Tarifs", "RDV"] },
   { id: "createur", name: "Créateur de contenu", category: "Creatif", plan: "free", description: "Liens réseaux, partenariats, stats", emoji: "📱", color: "var(--danger)", accent: "#FFD93D", bg: "#080810", surface: "#10101E", tags: ["Réseaux", "Stats", "Partenariats", "Feed"] },
@@ -123,14 +123,14 @@ const TEMPLATES: any[] = [
   { id: "agence", name: "Agence & Studio", category: "Business", plan: "starter", description: "Portfolio, services, tarifs, contact pro", emoji: "🏢", color: "var(--action)", accent: "#818CF8", bg: "#020C18", surface: "#041828", tags: ["Portfolio", "Services", "Tarifs", "Contact"], highlight: "Portfolio + tunnel de conversion" },
   { id: "medecin", name: "Médecin & Praticien", category: "Sante", plan: "starter", description: "Cabinet, specialites, horaires, RDV", emoji: "🏥", color: "#34D399", accent: "#6EE7B7", bg: "#020D08", surface: "#041A10", tags: ["Cabinet", "Spécialités", "Horaires", "RDV"], highlight: "Integration Doctolib + infos cabinet" },
   { id: "vente_produits", name: "Vente Produits Digitaux", category: "Commerce", plan: "pro", description: "Formations, ebooks, templates, accès membres", emoji: "📦", color: "#A78BFA", accent: "#F472B6", bg: "#060410", surface: "#0E0820", tags: ["Formations", "Produits", "Témoignages", "Accès"], highlight: "Tunnel de vente complet" },
-  { id: "immobilier", name: "Agent Immobilier", category: "Immobilier", plan: "pro", description: "Biens, expertises, contact, avis clients", emoji: "🏠", color: "#FBBF24", accent: "#F59E0B", bg: "#0A0800", surface: "#171200", tags: ["Biens", "Expertise", "Avis", "Contact"], highlight: "Vitrine biens + avis Google" },
+  { id: "immobilier", name: "Agent Immobilier", category: "Immobilier", plan: "pro", description: "Biens, expertises, contact, avis clients", emoji: "🏠", color: "var(--warning)", accent: "#F59E0B", bg: "#0A0800", surface: "#171200", tags: ["Biens", "Expertise", "Avis", "Contact"], highlight: "Vitrine biens + avis Google" },
   { id: "startup", name: "Startup & SaaS", category: "Tech", plan: "pro", description: "Pitch, features, pricing, waitlist", emoji: "🚀", color: "#22D3EE", accent: "#818CF8", bg: "#030A14", surface: "#06152A", tags: ["Features", "Pricing", "Waitlist", "Stats"], highlight: "Landing page SaaS avec waitlist" },
   { id: "influenceur", name: "Influenceur & Personal Brand", category: "Creatif", plan: "pro", description: "Media kit, statistiques, partenariats premium", emoji: "⭐", color: "#F59E0B", accent: "#EF4444", bg: "#0A0500", surface: "#150B00", tags: ["Media Kit", "Stats", "Partenariats", "Feed"], highlight: "Media kit professionnel" },
   ...SHARED_META,
 ]
 
 const PLAN_CONFIG: Record<string, { label: string; color: string; icon: string }> = {
-  free:     { label: "Gratuit",  color: "#A8A190", icon: "✦"  },
+  free:     { label: "Gratuit",  color: "var(--muted)", icon: "✦"  },
   starter:  { label: "Starter",  color: "var(--action)", icon: "⚡" },
   pro:      { label: "Pro",      color: "var(--accent)", icon: "🔥" },
   business: { label: "Business", color: "var(--success)", icon: "👑" },
@@ -378,7 +378,7 @@ export default function TemplatesPage() {
           <Sparkles size={13} color={G} />
           <span style={{ color: G, fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase" }}>Modèles</span>
         </div>
-        <h1 style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(26px,3.4vw,36px)", color: "#F5F0E8", margin: "0 0 8px", fontWeight: 700 }}>
+        <h1 style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(26px,3.4vw,36px)", color: "var(--ink)", margin: "0 0 8px", fontWeight: 700 }}>
           {fromEntry ? "Vos modèles sont prêts" : "Choisissez votre secteur"}
         </h1>
         {/* On dit d'où l'on vient et pourquoi la liste est déjà réduite — sinon le
@@ -447,7 +447,7 @@ export default function TemplatesPage() {
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxHeight: "82vh", overflowY: "auto", background: "#0E0D0A", borderTopLeftRadius: 22, borderTopRightRadius: 22, borderTop: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", padding: "10px 18px calc(20px + env(safe-area-inset-bottom))", animation: "tplUp .28s var(--mo-ease-standard)" }}>
             <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 16px" }} />
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-              <h2 style={{ fontFamily: "Fraunces, serif", fontSize: 21, color: "#F5F0E8", fontWeight: 700, margin: 0 }}>Filtrer</h2>
+              <h2 style={{ fontFamily: "Fraunces, serif", fontSize: 21, color: "var(--ink)", fontWeight: 700, margin: 0 }}>Filtrer</h2>
               {hasFilters && <button type="button" onClick={() => { setActiveMetier("Tous"); setActivePlan("all") }} style={{ background: "none", border: "none", color: "var(--accent)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Réinitialiser</button>}
             </div>
 
@@ -473,7 +473,7 @@ export default function TemplatesPage() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, padding: "0 4px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             {activeCat && activeCat.id !== "Tous" && <span style={{ fontSize: 18 }}>{activeCat.emoji}</span>}
-            <span style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 600 }}>
+            <span style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600 }}>
               {activeMetier === "Tous" ? "Tous les modèles" : activeCat?.label}
             </span>
             <span style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 10, padding: "2px 9px", color: G, fontSize: 11, fontWeight: 700 }}>
@@ -569,7 +569,7 @@ export default function TemplatesPage() {
                     {/* Check si sélectionné */}
                     {isSelected && (
                       <div style={{ position: "absolute", bottom: 10, right: 10, background: G, borderRadius: "50%", width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2 }}>
-                        <Check size={12} color="#080808" />
+                        <Check size={12} color="var(--ink-on-accent)" />
                       </div>
                     )}
 
@@ -590,7 +590,7 @@ export default function TemplatesPage() {
                     {/* Nom + catégorie */}
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: isMobile ? 8 : 6 }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <h2 style={{ color: "#F5F0E8", fontSize: isMobile ? 12.5 : 15, fontWeight: 700, margin: isMobile ? 0 : "0 0 5px", letterSpacing: "-0.2px", whiteSpace: isMobile ? "nowrap" as const : "normal", overflow: "hidden", textOverflow: "ellipsis" }}>{template.name}</h2>
+                        <h2 style={{ color: "var(--ink)", fontSize: isMobile ? 12.5 : 15, fontWeight: 700, margin: isMobile ? 0 : "0 0 5px", letterSpacing: "-0.2px", whiteSpace: isMobile ? "nowrap" as const : "normal", overflow: "hidden", textOverflow: "ellipsis" }}>{template.name}</h2>
                         {!isMobile && <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
                           <span style={{ background: template.color + "12", border: "1px solid " + template.color + "22", borderRadius: 6, padding: "1px 7px", fontSize: 9, color: template.color, fontWeight: 600 }}>{template.category}</span>
                           {tier && (
@@ -741,7 +741,7 @@ export default function TemplatesPage() {
         <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 100, padding: "12px 20px", background: "rgba(8,8,8,0.95)", borderTop: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
           <span style={{ fontSize: 20 }}>{selectedTemplate.emoji}</span>
           <div style={{ flex: 1, maxWidth: 400 }}>
-            <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 600, margin: 0 }}>{selectedTemplate.name}</p>
+            <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600, margin: 0 }}>{selectedTemplate.name}</p>
             <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{(TEMPLATE_BLOCKS[selected] || []).length} blocs · {SETUP_TIME[selected] || "5 min"}</p>
           </div>
           <button type="button" onClick={() => setSelected(null)} className="da-btn-neutral da-btn-neutral--sm">
@@ -889,8 +889,8 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
   }
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", background: "#0A0A0A", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)",
-    borderRadius: 8, padding: "10px 12px", color: "#F5F0E8", fontSize: 13,
+    width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)",
+    borderRadius: 8, padding: "10px 12px", color: "var(--ink)", fontSize: 13,
     outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif",
   }
 
@@ -902,7 +902,7 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
           <div style={{ width: 44, height: 44, borderRadius: 12, background: template.color + "18", border: "1px solid " + template.color + "35", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{template.emoji}</div>
           <div style={{ flex: 1 }}>
-            <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0 }}>Créer une page depuis ce modèle</p>
+            <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>Créer une page depuis ce modèle</p>
             <p style={{ color: MUTED, fontSize: 12.5, margin: 0 }}>{template.name} · {template.category} · {blockCount} blocs</p>
           </div>
           <button onClick={onClose} aria-label="Fermer" style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 4 }}><X size={18} /></button>
@@ -981,7 +981,7 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
             {slugStatus === "available" && <span style={{ color: "var(--success)", fontSize: 10, fontWeight: 600 }}>✓ Disponible</span>}
             {slugStatus === "taken" && <span style={{ color: "#F87171", fontSize: 10, fontWeight: 600 }}>✗ Déjà pris</span>}
             {slugStatus === "reserved" && <span style={{ color: "#F87171", fontSize: 10, fontWeight: 600 }}>✗ Adresse réservée</span>}
-            {slugStatus === "invalid" && <span style={{ color: "#FBBF24", fontSize: 10, fontWeight: 600 }}>2 à 60 caractères : minuscules, chiffres et tirets</span>}
+            {slugStatus === "invalid" && <span style={{ color: "var(--warning)", fontSize: 10, fontWeight: 600 }}>2 à 60 caractères : minuscules, chiffres et tirets</span>}
           </div>
           <p style={{ color: MUTED, fontSize: 10, margin: "4px 0 0", fontFamily: "monospace" }}>qrowg.com/{slug || "..."}</p>
           {(slugStatus === "taken") && suggestions.length > 0 && (

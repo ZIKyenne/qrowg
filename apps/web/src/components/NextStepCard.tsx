@@ -22,8 +22,8 @@ export default function NextStepCard({
     <div style={{
       display: "flex", alignItems: "center", gap: 13, flexWrap: "wrap",
       padding: "14px 18px", borderRadius: 14, animationDelay,
-      background: "#141210",
-      border: "1px solid color-mix(in srgb, var(--accent) 22%, #221f1b)",
+      background: "var(--surface)",
+      border: "1px solid color-mix(in srgb, var(--accent) 22%, var(--surface-2))",
     }}>
       <span style={{ width: 36, height: 36, flexShrink: 0, borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 17, color: "var(--accent)", background: "color-mix(in srgb, var(--accent) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 26%, transparent)" }}>{icon}</span>
       <p style={{ flex: 1, minWidth: 160, margin: 0, color: "#C9C3B6", fontSize: 13.5, lineHeight: 1.5 }}>{children}</p>

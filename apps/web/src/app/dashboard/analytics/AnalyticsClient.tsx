@@ -65,8 +65,8 @@ function formatAgo(iso: string) {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null
   return (
-    <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "10px 14px" }}>
-      <p style={{ color: "#A8A190", fontSize: 12, marginBottom: 4 }}>{label}</p>
+    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "10px 14px" }}>
+      <p style={{ color: "var(--muted)", fontSize: 12, marginBottom: 4 }}>{label}</p>
       {payload.map((p: any, i: number) => (
         <p key={i} style={{ color: p.color, fontSize: 13, fontWeight: 600 }}>
           {p.name} : {p.value}
@@ -202,7 +202,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
         <div className="az" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 16 }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 5 }}>
-              <h1 style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(26px,3.6vw,36px)", lineHeight: 1, color: "#F5F0E8", fontWeight: 700, margin: 0, letterSpacing: "-0.4px" }}>
+              <h1 style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(26px,3.6vw,36px)", lineHeight: 1, color: "var(--ink)", fontWeight: 700, margin: 0, letterSpacing: "-0.4px" }}>
                 Analytics
               </h1>
               {/* Badge EN DIRECT masque tant qu'aucune donnee (audit #04 : pas de "live" trompeur) */}
@@ -213,22 +213,22 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
                 </span>
               )}
             </div>
-            <p style={{ color: "#A8A190", margin: 0, fontSize: 13.5 }}>30 derniers jours · {live.last ? `dernier événement ${formatAgo(live.last.t)}` : "en attente de données"}</p>
+            <p style={{ color: "var(--muted)", margin: 0, fontSize: 13.5 }}>30 derniers jours · {live.last ? `dernier événement ${formatAgo(live.last.t)}` : "en attente de données"}</p>
           </div>
           {/* Filtre page */}
           <select
             aria-label="Filtrer par page" value={selectedPage}
             onChange={e => setSelectedPage(e.target.value)}
             style={{
-              background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)",
-              borderRadius: 10, color: "#F5F0E8", padding: "9px 14px", fontSize: 13.5, cursor: "pointer"
+              background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)",
+              borderRadius: 10, color: "var(--ink)", padding: "9px 14px", fontSize: 13.5, cursor: "pointer"
             }}
           >
             <option value="all">Toutes les pages</option>
             {pages.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
           </select>
           {/* Période unique : pilote tous les panneaux (dedup #2) */}
-          <div role="group" aria-label="Période" style={{ display: "flex", gap: 3, background: "#141210", border: "1px solid #221f1b", borderRadius: 10, padding: 3 }}>
+          <div role="group" aria-label="Période" style={{ display: "flex", gap: 3, background: "var(--surface)", border: "1px solid var(--surface-2)", borderRadius: 10, padding: 3 }}>
             {[7, 30, 90].map(d => (
               <button key={d} type="button" aria-pressed={period === d} onClick={() => setPeriod(d)}
                 style={{ padding: "7px 13px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 12.5, fontWeight: period === d ? 700 : 500, background: period === d ? "var(--accent)" : "transparent", color: period === d ? "#1a1408" : MUTED }}>{d}j</button>
@@ -250,7 +250,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
               return (
                 <button key={t.id} role="tab" aria-selected={on} onClick={() => setTab(t.id)} style={{ position: "relative", display: "flex", alignItems: "center", gap: 9, padding: "11px 16px 13px", cursor: "pointer", fontSize: 13.5, fontWeight: on ? 700 : 500, color: on ? "#e8c877" : "#8a8177", background: "none", border: "none", fontFamily: "inherit", transition: "color .2s ease", whiteSpace: "nowrap" }}>
                   {t.icon} {t.label}
-                  {on && <span aria-hidden style={{ position: "absolute", left: 10, right: 10, bottom: -1, height: 2, borderRadius: 2, background: "linear-gradient(90deg,#e8c877,#c9a24d)" }} />}
+                  {on && <span aria-hidden style={{ position: "absolute", left: 10, right: 10, bottom: -1, height: 2, borderRadius: 2, background: "linear-gradient(90deg,var(--gold-light),var(--accent))" }} />}
                 </button>
               )
             })}
@@ -271,18 +271,18 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
               Vos statistiques apparaîtront ici dès le premier scan
             </h2>
             <p style={{ color: "#C9C3B6", fontSize: 13, margin: "0 0 14px", lineHeight: 1.55, maxWidth: 620 }}>
-              Vous verrez en temps réel : <strong style={{ color: "#F5F0E8" }}>scans &amp; vues</strong>, <strong style={{ color: "#F5F0E8" }}>pays &amp; villes</strong>, <strong style={{ color: "#F5F0E8" }}>appareils</strong>, <strong style={{ color: "#F5F0E8" }}>sources de trafic</strong> et vos <strong style={{ color: "#F5F0E8" }}>pages les plus performantes</strong>. Lancez-vous pour activer le suivi.
+              Vous verrez en temps réel : <strong style={{ color: "var(--ink)" }}>scans &amp; vues</strong>, <strong style={{ color: "var(--ink)" }}>pays &amp; villes</strong>, <strong style={{ color: "var(--ink)" }}>appareils</strong>, <strong style={{ color: "var(--ink)" }}>sources de trafic</strong> et vos <strong style={{ color: "var(--ink)" }}>pages les plus performantes</strong>. Lancez-vous pour activer le suivi.
             </p>
             <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
               <a href="/dashboard/qr-codes" className="da-btn-primary da-btn-primary--sm">
                 <QrCode className="da-ic" size={15} strokeWidth={2.4} /> <span>Tester mon QR code</span>
               </a>
               {pages.find(p => p.status === "published") && (
-                <a href={"/" + pages.find(p => p.status === "published")!.slug} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#F5F0E8", textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
+                <a href={"/" + pages.find(p => p.status === "published")!.slug} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--ink)", textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
                   <Globe size={14} /> Partager ma page
                 </a>
               )}
-              <a href="/examples" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#F5F0E8", textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
+              <a href="/examples" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--ink)", textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
                 <Eye size={14} /> Voir un exemple
               </a>
             </div>
@@ -303,9 +303,9 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
                 </p>
                 <p style={{ color: "#C9C3B6", fontSize: 13.5, margin: 0, lineHeight: 1.55 }}>
                   {totalScans30} scan{totalScans30 > 1 ? "s" : ""} sur 30 jours
-                  {story.topSource ? <>, surtout via <strong style={{ color: "#F5F0E8" }}>{story.topSource}</strong></> : null}
-                  {story.topDevice ? <> sur <strong style={{ color: "#F5F0E8" }}>{story.topDevice}</strong></> : null}
-                  {story.peakHour != null ? <> · pic d&apos;activité vers <strong style={{ color: "#F5F0E8" }}>{story.peakHour}h</strong></> : null}.
+                  {story.topSource ? <>, surtout via <strong style={{ color: "var(--ink)" }}>{story.topSource}</strong></> : null}
+                  {story.topDevice ? <> sur <strong style={{ color: "var(--ink)" }}>{story.topDevice}</strong></> : null}
+                  {story.peakHour != null ? <> · pic d&apos;activité vers <strong style={{ color: "var(--ink)" }}>{story.peakHour}h</strong></> : null}.
                 </p>
                 {(() => {
                   const advice =
@@ -339,7 +339,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
           </div>
           {/* Aujourd'hui + évolution */}
           <div className="az-card" style={{ background: "#100F0A", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius: 14, padding: "16px 18px", position: "relative", overflow: "hidden" }}>
-            <p style={{ color: "#A8A190", fontSize: 11.5, fontWeight: 600, margin: "0 0 8px" }}>Activité aujourd'hui</p>
+            <p style={{ color: "var(--muted)", fontSize: 11.5, fontWeight: 600, margin: "0 0 8px" }}>Activité aujourd'hui</p>
             <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
               <p style={{ color: "#F8F4EC", fontSize: 38, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif", lineHeight: 1 }}>{live.todayN}</p>
               <span style={{ display: "inline-flex", alignItems: "center", gap: 3, color: live.evo >= 0 ? "var(--success)" : "var(--danger)", fontSize: 12.5, fontWeight: 700 }}>
@@ -350,7 +350,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
           </div>
           {/* Dernier événement */}
           <div className="az-card" style={{ background: "#100F0A", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius: 14, padding: "16px 18px" }}>
-            <p style={{ color: "#A8A190", fontSize: 11.5, fontWeight: 600, margin: "0 0 8px" }}>Dernier événement</p>
+            <p style={{ color: "var(--muted)", fontSize: 11.5, fontWeight: 600, margin: "0 0 8px" }}>Dernier événement</p>
             {live.last ? (
               <>
                 <p style={{ color: "#F8F4EC", fontSize: 19, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif" }}>{live.last.kind}</p>
@@ -415,10 +415,10 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
         <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
           {/* Device */}
           <div style={{
-            background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)",
+            background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)",
             borderRadius: 12, padding: "24px"
           }}>
-            <h2 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 600, marginBottom: 20, marginTop: 0, display: "flex", alignItems: "center", gap: 8 }}>
+            <h2 style={{ color: "var(--ink)", fontSize: 16, fontWeight: 600, marginBottom: 20, marginTop: 0, display: "flex", alignItems: "center", gap: 8 }}>
               <Smartphone size={16} color={GOLD} /> Appareils
             </h2>
             {deviceData.length === 0 ? (
@@ -436,7 +436,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
                         <div key={d.name} style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                             <span style={{ width: 9, height: 9, borderRadius: "50%", background: col, flexShrink: 0 }} />
-                            <span style={{ flex: 1, color: "#F5F0E8", fontSize: 13.5, fontWeight: 600 }}>{d.name}</span>
+                            <span style={{ flex: 1, color: "var(--ink)", fontSize: 13.5, fontWeight: 600 }}>{d.name}</span>
                             <span style={{ color: GOLD, fontSize: 13, fontWeight: 700 }}>{pct}%</span>
                             <span style={{ width: 34, textAlign: "right", color: MUTED, fontSize: 12.5, fontVariantNumeric: "tabular-nums" }}>{d.value}</span>
                           </div>
@@ -454,10 +454,10 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
 
           {/* Source */}
           <div style={{
-            background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)",
+            background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)",
             borderRadius: 12, padding: "24px"
           }}>
-            <h2 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 600, marginBottom: 20, marginTop: 0, display: "flex", alignItems: "center", gap: 8 }}>
+            <h2 style={{ color: "var(--ink)", fontSize: 16, fontWeight: 600, marginBottom: 20, marginTop: 0, display: "flex", alignItems: "center", gap: 8 }}>
               <Globe size={16} color={NEON} /> Sources de trafic
             </h2>
             {sourceData.length === 0 ? (

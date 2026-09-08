@@ -17,8 +17,8 @@ export interface SettingsFieldRendererProps {
 }
 
 const inputStyle = (mobile?: boolean): React.CSSProperties => ({
-  width: "100%", boxSizing: "border-box", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)",
-  borderRadius: 8, padding: mobile ? "11px 12px" : "9px 11px", color: "var(--ink, #F5F0E8)",
+  width: "100%", boxSizing: "border-box", background: "var(--field)", border: "1px solid rgba(201,168,76,0.2)",
+  borderRadius: 8, padding: mobile ? "11px 12px" : "9px 11px", color: "var(--ink, var(--ink))",
   fontSize: mobile ? 15 : 12.5, outline: "none", fontFamily: "DM Sans, sans-serif",
 })
 

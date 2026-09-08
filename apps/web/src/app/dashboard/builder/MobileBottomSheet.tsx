@@ -56,7 +56,7 @@ export function MobileBottomSheet({ open, title, snap, onSnap, onClose, safeArea
         onKeyDown={e => { if (e.key === "Escape") { e.stopPropagation(); onClose() } }}
         style={{
           ...panelStyle, boxSizing: "border-box", width: side ? panelStyle.width : "100%", maxWidth: side ? undefined : 640, margin: side ? undefined : "0 auto",
-          display: "flex", flexDirection: "column", background: "#141210", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)",
+          display: "flex", flexDirection: "column", background: "var(--surface)", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)",
           paddingBottom: safeAreaBottom ? "env(safe-area-inset-bottom)" : undefined, overflow: "hidden",
         }}>
         {/* Drag handle (décoratif) */}
@@ -64,7 +64,7 @@ export function MobileBottomSheet({ open, title, snap, onSnap, onClose, safeArea
 
         {/* Header : titre + snaps + fermer */}
         <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 8, padding: "6px 12px 10px" }}>
-          <h2 style={{ flex: 1, margin: 0, fontSize: 15, fontWeight: 800, color: "var(--ink, #F5F0E8)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title}</h2>
+          <h2 style={{ flex: 1, margin: 0, fontSize: 15, fontWeight: 800, color: "var(--ink, var(--ink))", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title}</h2>
           {!side && (
             <div role="group" aria-label="Taille du panneau" style={{ display: "flex", gap: 2, background: "rgba(255,255,255,0.05)", borderRadius: 8, padding: 2 }}>
               {SNAPS.map(s => (

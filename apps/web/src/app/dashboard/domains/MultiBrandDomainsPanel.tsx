@@ -97,7 +97,7 @@ export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrim
           {/* Infos */}
           <div style={{ flex:1, minWidth:0 }}>
             <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:3, flexWrap:"wrap" }}>
-              <span style={{ color:"#F5F0E8", fontSize:13, fontWeight:700 }}>{rec.domain}</span>
+              <span style={{ color:"var(--ink)", fontSize:13, fontWeight:700 }}>{rec.domain}</span>
               {isPrimary && (
                 <span style={{ background:"color-mix(in srgb, var(--accent) 15%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:6, padding:"2px 8px", fontSize:9, color:G, fontWeight:700, textTransform:"uppercase", letterSpacing:1 }}>
                   ⭐ Principal
@@ -247,7 +247,7 @@ export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrim
       {domains.length === 0 && (
         <div style={{ textAlign:"center", padding:"32px 20px", background:"rgba(255,255,255,0.01)", border:"1px dashed rgba(255,255,255,0.08)", borderRadius:12 }}>
           <Globe size={32} color={MUTED} style={{ marginBottom:12 }}/>
-          <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 5px" }}>Aucun domaine</p>
+          <p style={{ color:"var(--ink)", fontSize:13, fontWeight:600, margin:"0 0 5px" }}>Aucun domaine</p>
           <p style={{ color:MUTED, fontSize:12, margin:"0 0 16px" }}>Ajoutez votre premier domaine personnalisé</p>
           {canAdd && (
             <span className="da-halo-wrap">
@@ -263,7 +263,7 @@ export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrim
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <Crown size={14} color={G}/>
             <span style={{ color:MUTED, fontSize:12 }}>
-              Domaines illimités + multi-marques avec le plan <strong style={{ color:"#F5F0E8" }}>Business</strong>
+              Domaines illimités + multi-marques avec le plan <strong style={{ color:"var(--ink)" }}>Business</strong>
             </span>
           </div>
           <a href="/upgrade"

@@ -127,7 +127,7 @@ export function CommandPalette({ open, onClose, commands, blockDefs, onInsertBlo
           role="combobox"
           aria-expanded={items.length > 0}
           style={{
-            width: "100%", boxSizing: "border-box", background: "#0A0A0A",
+            width: "100%", boxSizing: "border-box", background: "var(--field)",
             border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "var(--ink)",
             fontSize: 16, height: 48, padding: "0 14px", outline: "none", marginBottom: 12,
           }}

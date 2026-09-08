@@ -107,7 +107,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
             <X size={14} />
           </button>
           <button onClick={() => setPickerOpen(true)}
-            style={{ position: "absolute", bottom: 8, right: 8, background: "rgba(201,168,76,0.9)", border: "none", borderRadius: 6, padding: "5px 10px", cursor: "pointer", color: "#080808", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
+            style={{ position: "absolute", bottom: 8, right: 8, background: "rgba(201,168,76,0.9)", border: "none", borderRadius: 6, padding: "5px 10px", cursor: "pointer", color: "var(--ink-on-accent)", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
             <Upload size={11} /> Changer
           </button>
         </div>
@@ -128,7 +128,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
               <div style={{ width: 40, height: 40, background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 10px" }}>
                 <ImageIcon size={18} color={G} />
               </div>
-              <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 600, margin: "0 0 4px" }}>Cliquez ou déposez une image</p>
+              <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600, margin: "0 0 4px" }}>Cliquez ou déposez une image</p>
               <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{hint || "JPG, PNG, WebP — max 5MB"}</p>
             </>
           )}
@@ -144,11 +144,11 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
       {/* Bottom sheet : choix de la source (#05) */}
       {pickerOpen && (
         <div onClick={() => setPickerOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 420, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "#141210", borderTopLeftRadius: 20, borderTopRightRadius: 20, border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", padding: "10px 12px calc(14px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "var(--surface)", borderTopLeftRadius: 20, borderTopRightRadius: 20, border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", padding: "10px 12px calc(14px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)" }}>
             <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 10px" }} />
-            <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: "0 6px 6px" }}>Ajouter une image</p>
+            <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: "0 6px 6px" }}>Ajouter une image</p>
             <button type="button" onClick={() => { setPickerOpen(false); inputRef.current?.click() }}
-              style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "14px 12px", background: "none", border: "none", color: "#F5F0E8", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
+              style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "14px 12px", background: "none", border: "none", color: "var(--ink)", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
               <span style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 11, background: "rgba(201,168,76,0.14)", border: "1px solid rgba(201,168,76,0.28)", display: "flex", alignItems: "center", justifyContent: "center", color: G }}><Upload size={19} /></span>
               <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <span>Depuis mon téléphone</span>
@@ -156,7 +156,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
               </span>
             </button>
             <button type="button" onClick={() => { setPickerOpen(false); openLibrary() }}
-              style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "14px 12px", background: "none", border: "none", borderTop: "1px solid rgba(255,255,255,0.05)", color: "#F5F0E8", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
+              style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "14px 12px", background: "none", border: "none", borderTop: "1px solid rgba(255,255,255,0.05)", color: "var(--ink)", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
               <span style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 11, background: "rgba(201,168,76,0.14)", border: "1px solid rgba(201,168,76,0.28)", display: "flex", alignItems: "center", justifyContent: "center", color: G }}><FolderOpen size={19} /></span>
               <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <span>Ma bibliothèque QRowg</span>
@@ -179,7 +179,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
             style={{ width: "100%", maxWidth: 620, maxHeight: "80vh", background: "#141414", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column" }}>
             <div style={{ padding: "14px 18px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 9 }}>
               <FolderOpen size={16} color={G} />
-              <p style={{ margin: 0, color: "#F5F0E8", fontSize: 14, fontWeight: 700, flex: 1 }}>Ma bibliothèque{libAssets && libAssets.length > 0 ? <span style={{ color: MUTED, fontWeight: 400 }}> · {libAssets.length}</span> : ""}</p>
+              <p style={{ margin: 0, color: "var(--ink)", fontSize: 14, fontWeight: 700, flex: 1 }}>Ma bibliothèque{libAssets && libAssets.length > 0 ? <span style={{ color: MUTED, fontWeight: 400 }}> · {libAssets.length}</span> : ""}</p>
               {libBusy && <div style={{ width: 15, height: 15, border: "2px solid rgba(201,168,76,0.25)", borderTopColor: G, borderRadius: "50%", animation: "mo-spin 0.8s linear infinite" }} />}
               <button onClick={() => setLibOpen(false)} aria-label="Fermer" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", width: 28, height: 28 }}><X size={14} /></button>
             </div>
@@ -188,7 +188,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
               <div style={{ padding: "0 14px 10px", position: "relative" }}>
                 <Search size={14} color={MUTED} style={{ position: "absolute", left: 25, top: "50%", transform: "translateY(-50%)" }} />
                 <input value={libQuery} onChange={e => setLibQuery(e.target.value)} placeholder="Rechercher une image…"
-                  style={{ width: "100%", height: 42, boxSizing: "border-box", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "0 12px 0 34px", color: "#F5F0E8", fontSize: 14, outline: "none" }} />
+                  style={{ width: "100%", height: 42, boxSizing: "border-box", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "0 12px 0 34px", color: "var(--ink)", fontSize: 14, outline: "none" }} />
               </div>
             )}
             <div style={{ padding: 14, paddingTop: 0, overflowY: "auto" }}>
@@ -212,7 +212,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
                         onMouseEnter={e => { const b = e.currentTarget.querySelector(".del") as HTMLElement; if (b) b.style.opacity = "1" }}
                         onMouseLeave={e => { const b = e.currentTarget.querySelector(".del") as HTMLElement; if (b) b.style.opacity = "0" }}>
                         <button onClick={() => { onChange(a.url); setLibOpen(false) }} title={a.name}
-                          style={{ width: "100%", height: "100%", padding: 0, border: value === a.url ? `2px solid ${G}` : "1px solid rgba(255,255,255,0.1)", borderRadius: 9, overflow: "hidden", cursor: "pointer", background: "#0A0A0A" }}>
+                          style={{ width: "100%", height: "100%", padding: 0, border: value === a.url ? `2px solid ${G}` : "1px solid rgba(255,255,255,0.1)", borderRadius: 9, overflow: "hidden", cursor: "pointer", background: "var(--field)" }}>
                           <img src={a.url} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                         </button>
                         <button onClick={e => { e.stopPropagation(); toggleFav(a.url) }} aria-label={favs.has(a.url) ? "Retirer des favoris" : "Ajouter aux favoris"} title={favs.has(a.url) ? "Retirer des favoris" : "Favori"}

@@ -58,24 +58,24 @@ export default function ImportEnMasse({ ouvert, onFermer, onCrees }: {
 
   return (
         <div onClick={onFermer} style={{ position: "fixed", inset: 0, zIndex: 320, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-    <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, maxHeight: "90vh", overflowY: "auto", background: "#141210", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 20, padding: 20, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }}>
+    <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, maxHeight: "90vh", overflowY: "auto", background: "var(--surface)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 20, padding: 20, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 6 }}>
         <Upload size={17} color={G} />
-        <p style={{ flex: 1, color: "#F5F0E8", fontSize: 16, fontWeight: 800, margin: 0 }}>Importer en masse</p>
+        <p style={{ flex: 1, color: "var(--ink)", fontSize: 16, fontWeight: 800, margin: 0 }}>Importer en masse</p>
         <button onClick={onFermer} aria-label="Fermer l'import" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", width: 30, height: 30 }}><X size={15} /></button>
       </div>
       <p style={{ color: MUTED, fontSize: 12, margin: "0 0 14px", lineHeight: 1.55 }}>
-        Une ligne par lien : <code style={{ color: "#F5F0E8" }}>destination</code> ou <code style={{ color: "#F5F0E8" }}>libellé,destination</code>. En-tête (<code style={{ color: "#F5F0E8" }}>label,url</code>) et point-virgule acceptés. Jusqu'à 100 liens.
+        Une ligne par lien : <code style={{ color: "var(--ink)" }}>destination</code> ou <code style={{ color: "var(--ink)" }}>libellé,destination</code>. En-tête (<code style={{ color: "var(--ink)" }}>label,url</code>) et point-virgule acceptés. Jusqu'à 100 liens.
       </p>
 
       <div style={{ display: "flex", gap: 9, marginBottom: 10 }}>
-        <button onClick={() => champFichier.current?.click()} style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 10, color: "#F5F0E8", fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: "9px 13px" }}><Upload size={14} /> Charger un .csv</button>
+        <button onClick={() => champFichier.current?.click()} style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 10, color: "var(--ink)", fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: "9px 13px" }}><Upload size={14} /> Charger un .csv</button>
         {texte && <button onClick={() => { setTexte(""); setMessage(null) }} style={{ background: "transparent", border: "none", color: MUTED, fontSize: 12.5, cursor: "pointer" }}>Effacer</button>}
         <input ref={champFichier} type="file" aria-label="Choisir un fichier CSV" accept=".csv,text/csv,text/plain" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) chargerFichier(f); e.target.value = "" }} />
       </div>
 
       <textarea value={texte} onChange={e => setTexte(e.target.value)} rows={7} placeholder={"label,url\nMa boutique,maboutique.fr\nInstagram,instagram.com/moncompte"}
-        style={{ width: "100%", boxSizing: "border-box", resize: "vertical", minHeight: 130, background: "#0A0A0A", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "#F5F0E8", fontSize: 13, padding: "12px 14px", lineHeight: 1.5, fontFamily: "monospace", outline: "none" }} />
+        style={{ width: "100%", boxSizing: "border-box", resize: "vertical", minHeight: 130, background: "var(--field)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "var(--ink)", fontSize: 13, padding: "12px 14px", lineHeight: 1.5, fontFamily: "monospace", outline: "none" }} />
 
       {texte.trim() && (
         <div style={{ marginTop: 12 }}>

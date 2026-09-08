@@ -85,10 +85,10 @@ export default async function QRCodesPage() {
               </span>
             </span>
             <div>
-              <h1 style={{ fontFamily: "Fraunces, serif", fontSize: 22, color: "#F5F0E8", fontWeight: 700, margin: 0, lineHeight: 1.15 }}>
+              <h1 style={{ fontFamily: "Fraunces, serif", fontSize: 22, color: "var(--ink)", fontWeight: 700, margin: 0, lineHeight: 1.15 }}>
                 QR de mes pages
               </h1>
-              <p style={{ color: "#A8A190", fontSize: 11, margin: 0 }}>
+              <p style={{ color: "var(--muted)", fontSize: 11, margin: 0 }}>
                 Le QR code de chacune de vos pages QRowg — personnalisez-le et exportez-le
               </p>
             </div>
@@ -106,12 +106,12 @@ export default async function QRCodesPage() {
                   <span className="kpi-dotcore" style={{ position: "absolute", inset: 1, borderRadius: "50%", background: dotColor, boxShadow: `0 0 12px ${dotColor}b3` }} />
                 </span>
                 <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                  <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-.01em", color: "#e8c877", lineHeight: 1 }}>{activeQR}{activeLimit != null && <span style={{ color: "#6b6258", fontWeight: 500 }}> / {activeLimit}</span>}</div>
-                  <div style={{ fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", color: "#8a8177", fontWeight: 600 }}>QR actifs</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-.01em", color: "var(--gold-light)", lineHeight: 1 }}>{activeQR}{activeLimit != null && <span style={{ color: "#6b6258", fontWeight: 500 }}> / {activeLimit}</span>}</div>
+                  <div style={{ fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 600 }}>QR actifs</div>
                 </div>
                 {activeLimit != null && (
-                  <div aria-hidden="true" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 2, background: "#221f1b" }}>
-                    <div style={{ position: "relative", overflow: "hidden", height: "100%", width: `${quotaPct}%`, background: "linear-gradient(90deg,#c9a24d,#e8c877)", transition: "width .6s cubic-bezier(.2,.8,.2,1)" }}>
+                  <div aria-hidden="true" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 2, background: "var(--surface-2)" }}>
+                    <div style={{ position: "relative", overflow: "hidden", height: "100%", width: `${quotaPct}%`, background: "linear-gradient(90deg,var(--accent),var(--gold-light))", transition: "width .6s cubic-bezier(.2,.8,.2,1)" }}>
                       <div className="kpi-barshine" style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: "40%", background: "linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.85), rgba(255,255,255,0))" }} />
                     </div>
                   </div>
@@ -129,8 +129,8 @@ export default async function QRCodesPage() {
                   <span className="kpi-scanline" style={{ position: "absolute", left: 2, right: 2, top: 3, height: 1.5, borderRadius: 2, background: "linear-gradient(90deg, rgba(232,200,119,0), #f0d590, rgba(232,200,119,0))", boxShadow: "0 0 8px rgba(232,200,119,.8)" }} />
                 </span>
                 <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                  <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-.01em", color: "#e8c877", lineHeight: 1 }}>{totalScans.toLocaleString("fr-FR")}</div>
-                  <div style={{ fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", color: "#8a8177", fontWeight: 600 }}>Scans total</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-.01em", color: "var(--gold-light)", lineHeight: 1 }}>{totalScans.toLocaleString("fr-FR")}</div>
+                  <div style={{ fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 600 }}>Scans total</div>
                 </div>
               </div>
             </div>

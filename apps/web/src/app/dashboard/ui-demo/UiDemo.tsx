@@ -25,14 +25,14 @@ export default function UiDemoPage() {
   const [sw2, setSw2] = useState(false)
 
   const section: React.CSSProperties = { marginBottom: 40 }
-  const h2: React.CSSProperties = { fontFamily: "Fraunces, serif", color: "#F5F0E8", fontSize: 20, fontWeight: 700, margin: "0 0 14px" }
-  const lbl: React.CSSProperties = { color: "#8A8478", fontSize: 11, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px", fontWeight: 700 }
+  const h2: React.CSSProperties = { fontFamily: "Fraunces, serif", color: "var(--ink)", fontSize: 20, fontWeight: 700, margin: "0 0 14px" }
+  const lbl: React.CSSProperties = { color: "var(--muted)", fontSize: 11, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px", fontWeight: 700 }
   const row: React.CSSProperties = { display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12, marginBottom: 18 }
 
   return (
     <div style={{ minHeight: "100dvh", padding: "28px 24px 80px", maxWidth: 900, margin: "0 auto", fontFamily: "Inter, system-ui, sans-serif" }}>
-      <h1 style={{ fontFamily: "Fraunces, serif", color: "#F5F0E8", fontSize: 30, fontWeight: 800, margin: "0 0 6px" }}>Design System — Primitives</h1>
-      <p style={{ color: "#8A8478", fontSize: 14, margin: "0 0 32px" }}>Revue visuelle des composants réutilisables. Astuce : changez la couleur d'accent dans Profil — les éléments « accent/primary » la suivent.</p>
+      <h1 style={{ fontFamily: "Fraunces, serif", color: "var(--ink)", fontSize: 30, fontWeight: 800, margin: "0 0 6px" }}>Design System — Primitives</h1>
+      <p style={{ color: "var(--muted)", fontSize: 14, margin: "0 0 32px" }}>Revue visuelle des composants réutilisables. Astuce : changez la couleur d'accent dans Profil — les éléments « accent/primary » la suivent.</p>
 
       {/* BUTTON */}
       <div style={section}>
@@ -144,7 +144,7 @@ export default function UiDemoPage() {
         <h2 style={h2}>ActionRow</h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 480 }}>
           <ActionRow icon={<ShieldCheck size={15} />} tone="success" tinted title="Email vérifié" subtitle="emilien@exemple.fr" right={<Badge tone="success">OK</Badge>} />
-          <ActionRow icon={<Bell size={15} />} tone="neutral" title="Notifications" subtitle="Gérer les alertes email" right={<ChevronRight size={16} color="#8A8478" />} onClick={() => {}} />
+          <ActionRow icon={<Bell size={15} />} tone="neutral" title="Notifications" subtitle="Gérer les alertes email" right={<ChevronRight size={16} color="var(--muted)" />} onClick={() => {}} />
           <ActionRow icon={<LogOut size={15} />} tone="danger" title="Déconnecter tous les appareils" subtitle="Met fin à toutes les sessions actives" onClick={() => {}} />
         </div>
       </div>

@@ -793,7 +793,7 @@ export default function ProfilePage() {
 
       {/* Tooltip stats */}
       {statsTooltip && (
-        <div style={{ position:"fixed", bottom:70, left:"50%", transform:"translateX(-50%)", zIndex:9998, padding:"7px 14px", background:"rgba(20,18,12,0.95)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:8, color:"#A8A190", fontSize:11, whiteSpace:"nowrap" as const, backdropFilter:"blur(8px)", pointerEvents:"none" }}>
+        <div style={{ position:"fixed", bottom:70, left:"50%", transform:"translateX(-50%)", zIndex:9998, padding:"7px 14px", background:"rgba(20,18,12,0.95)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:8, color:"var(--muted)", fontSize:11, whiteSpace:"nowrap" as const, backdropFilter:"blur(8px)", pointerEvents:"none" }}>
           {statsTooltip}
         </div>
       )}
@@ -820,13 +820,13 @@ export default function ProfilePage() {
               <div style={{ width: 62, height: 62, borderRadius: "50%", background: profile?.avatar_url ? "transparent" : `linear-gradient(135deg,${pc},color-mix(in srgb, var(--accent) 55%, #000))`, border: `2px solid ${pc}66`, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", animation: "ringPulse 3.6s ease-in-out infinite" }}>
                 {profile?.avatar_url
                   ? <img src={profile.avatar_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
-                  : <span style={{ fontSize: 26, fontWeight: 700, color: "#080808", fontFamily: "Fraunces, serif" }}>{(form.full_name || profile?.email || "?")[0]?.toUpperCase()}</span>}
+                  : <span style={{ fontSize: 26, fontWeight: 700, color: "var(--ink-on-accent)", fontFamily: "Fraunces, serif" }}>{(form.full_name || profile?.email || "?")[0]?.toUpperCase()}</span>}
               </div>
               <button onClick={() => fileRef.current?.click()} disabled={uploadingAvatar} title="Changer la photo"
                 style={{ position: "absolute", bottom: 0, right: 0, width: 24, height: 24, borderRadius: "50%", background: G, border: "2px solid #0A0906", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>
                 {uploadingAvatar
-                  ? <div style={{ width: 9, height: 9, border: "1.5px solid #080808", borderTopColor: "transparent", borderRadius: "50%", animation: "mo-spin 0.6s linear infinite" }}/>
-                  : <Camera size={11} color="#080808"/>}
+                  ? <div style={{ width: 9, height: 9, border: "1.5px solid var(--bg)", borderTopColor: "transparent", borderRadius: "50%", animation: "mo-spin 0.6s linear infinite" }}/>
+                  : <Camera size={11} color="var(--ink-on-accent)"/>}
               </button>
               <input ref={fileRef} type="file" aria-label="Choisir une photo" accept="image/*" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) handleAvatarFile(f); e.target.value="" }}/>
             </div>
@@ -953,10 +953,10 @@ export default function ProfilePage() {
       {/* -- Assistant : profil incomplet (prochaine étape) --------------------- */}
       {(() => {
         const m =
-          !profile?.avatar_url ? { icon: "🎨", text: <>Composez votre <strong style={{ color: "#F5F0E8" }}>avatar QR-art</strong> pour vous démarquer.</>, label: "Composer", href: "/dashboard/avatar" as string | null, onClick: null as (() => void) | null }
-          : !profile?.username ? { icon: "🔖", text: <>Choisissez votre <strong style={{ color: "#F5F0E8" }}>identifiant public</strong> (qrowg.com/@vous).</>, href: null, onClick: () => setPtab("identite"), label: "Définir" }
-          : !profile?.bio ? { icon: "✍️", text: <>Ajoutez une <strong style={{ color: "#F5F0E8" }}>bio</strong> pour vous présenter en quelques mots.</>, href: null, onClick: () => setPtab("identite"), label: "Ajouter" }
-          : !profile?.website ? { icon: "🔗", text: <>Ajoutez votre <strong style={{ color: "#F5F0E8" }}>site web</strong> ou lien principal.</>, href: null, onClick: () => setPtab("identite"), label: "Ajouter" }
+          !profile?.avatar_url ? { icon: "🎨", text: <>Composez votre <strong style={{ color: "var(--ink)" }}>avatar QR-art</strong> pour vous démarquer.</>, label: "Composer", href: "/dashboard/avatar" as string | null, onClick: null as (() => void) | null }
+          : !profile?.username ? { icon: "🔖", text: <>Choisissez votre <strong style={{ color: "var(--ink)" }}>identifiant public</strong> (qrowg.com/@vous).</>, href: null, onClick: () => setPtab("identite"), label: "Définir" }
+          : !profile?.bio ? { icon: "✍️", text: <>Ajoutez une <strong style={{ color: "var(--ink)" }}>bio</strong> pour vous présenter en quelques mots.</>, href: null, onClick: () => setPtab("identite"), label: "Ajouter" }
+          : !profile?.website ? { icon: "🔗", text: <>Ajoutez votre <strong style={{ color: "var(--ink)" }}>site web</strong> ou lien principal.</>, href: null, onClick: () => setPtab("identite"), label: "Ajouter" }
           : null
         if (!m) return null
         return (
@@ -990,7 +990,7 @@ export default function ProfilePage() {
             <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
               {/* Avatar premium */}
-              <div style={{ display:"flex", alignItems:"center", gap:14, padding:"14px", background:"#0F0E0B", borderRadius:12, border:"1px solid rgba(255,255,255,0.06)" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:14, padding:"14px", background:"var(--surface)", borderRadius:12, border:"1px solid rgba(255,255,255,0.06)" }}>
                 {/* Avatar */}
                 <div style={{ position:"relative", flexShrink:0 }}>
                   <div style={{ width:72, height:72, borderRadius:"50%", background:profile?.avatar_url?"transparent":`linear-gradient(135deg,${pc},${pc}80)`, border:`2px solid ${pc}40`, overflow:"hidden", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:`0 0 20px ${pc}15` }}>
@@ -999,26 +999,26 @@ export default function ProfilePage() {
                     ) : profile?.avatar_url ? (
                       <img src={profile.avatar_url} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
                     ) : (
-                      <span style={{ fontSize:26, fontWeight:700, color:"#080808", fontFamily:"Fraunces, serif" }}>
+                      <span style={{ fontSize:26, fontWeight:700, color:"var(--ink-on-accent)", fontFamily:"Fraunces, serif" }}>
                         {(form.full_name || profile?.email || "?")[0]?.toUpperCase()}
                       </span>
                     )}
                   </div>
                   {/* Bouton camera */}
                   <button onClick={() => fileRef.current?.click()} disabled={uploadingAvatar}
-                    style={{ position:"absolute", bottom:0, right:0, width:24, height:24, borderRadius:"50%", background:G, border:"2px solid #080808", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", boxShadow:"0 2px 8px rgba(0,0,0,0.4)" }}>
-                    <Camera size={10} color="#080808"/>
+                    style={{ position:"absolute", bottom:0, right:0, width:24, height:24, borderRadius:"50%", background:G, border:"2px solid var(--bg)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", boxShadow:"0 2px 8px rgba(0,0,0,0.4)" }}>
+                    <Camera size={10} color="var(--ink-on-accent)"/>
                   </button>
                   <input ref={fileRef} type="file" aria-label="Choisir une photo" accept="image/*" style={{ display:"none" }}
                     onChange={e => { const f = e.target.files?.[0]; if (f) handleAvatarFile(f); e.target.value="" }}/>
                 </div>
                 {/* Infos preview + actions */}
                 <div style={{ flex:1, minWidth:0 }}>
-                  <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:700, margin:"0 0 2px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, fontFamily:"Fraunces, serif" }}>
+                  <p style={{ color:"var(--ink)", fontSize:14, fontWeight:700, margin:"0 0 2px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, fontFamily:"Fraunces, serif" }}>
                     {form.full_name || "Sans nom"}
                   </p>
                   {form.username && (
-                    <p style={{ color:"#A8A190", fontSize:12, margin:"0 0 8px", fontFamily:"monospace" }}>@{form.username}</p>
+                    <p style={{ color:"var(--muted)", fontSize:12, margin:"0 0 8px", fontFamily:"monospace" }}>@{form.username}</p>
                   )}
                   <div style={{ display:"flex", gap:6 }}>
                     <button onClick={() => fileRef.current?.click()}
@@ -1028,12 +1028,12 @@ export default function ProfilePage() {
                     {/* Action secondaire discrete (#11) : pas de rouge (reversible), moins prioritaire que "Changer" */}
                     {profile?.avatar_url && (
                       <button onClick={deleteAvatar} disabled={deletingAvatar} title="Retirer la photo de profil"
-                        style={{ display:"flex", alignItems:"center", gap:4, padding:"5px 8px", background:"none", border:"none", color:"#A8A190", fontSize:11, cursor:"pointer" }}>
+                        style={{ display:"flex", alignItems:"center", gap:4, padding:"5px 8px", background:"none", border:"none", color:"var(--muted)", fontSize:11, cursor:"pointer" }}>
                         <ImageOff size={11}/> Retirer
                       </button>
                     )}
                   </div>
-                  <p style={{ color:"#A8A190", fontSize:9, margin:"6px 0 0" }}>PNG, JPG, WEBP -- max 5 Mo -- recadrage automatique 400x400</p>
+                  <p style={{ color:"var(--muted)", fontSize:9, margin:"6px 0 0" }}>PNG, JPG, WEBP -- max 5 Mo -- recadrage automatique 400x400</p>
                 </div>
               </div>
 
@@ -1041,14 +1041,14 @@ export default function ProfilePage() {
               {cropMode && cropSrc && (
                 <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.85)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:2000, padding:24 }}
                   onClick={() => { setCropMode(false); setCropSrc(null) }}>
-                  <div style={{ background:"#111009", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:16, padding:24, maxWidth:440, width:"100%" }}
+                  <div style={{ background:"var(--surface)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:16, padding:24, maxWidth:440, width:"100%" }}
                     onClick={e => e.stopPropagation()}>
-                    <p style={{ color:"#F5F0E8", fontSize:15, fontWeight:700, margin:"0 0 14px" }}>Aperçu de l'avatar</p>
+                    <p style={{ color:"var(--ink)", fontSize:15, fontWeight:700, margin:"0 0 14px" }}>Aperçu de l'avatar</p>
                     <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:16, marginBottom:18 }}>
                       <img src={cropSrc} alt="preview" style={{ width:120, height:120, objectFit:"cover", borderRadius:"50%", border:"2px solid color-mix(in srgb, var(--accent) 30%, transparent)" }}/>
                       <div>
-                        <p style={{ color:"#A8A190", fontSize:11, margin:"0 0 6px" }}>L'image sera recadree<br/>en carre 400x400 px.</p>
-                        <p style={{ color:"#A8A190", fontSize:10, margin:0 }}>Format: JPEG 92%</p>
+                        <p style={{ color:"var(--muted)", fontSize:11, margin:"0 0 6px" }}>L'image sera recadree<br/>en carre 400x400 px.</p>
+                        <p style={{ color:"var(--muted)", fontSize:10, margin:0 }}>Format: JPEG 92%</p>
                       </div>
                     </div>
                     <div style={{ display:"flex", gap:8 }}>
@@ -1067,21 +1067,21 @@ export default function ProfilePage() {
               <div className="rcols-2" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:13 }}>
               {/* Nom complet */}
               <div>
-                <label style={{ color:"#A8A190", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>Nom complet</label>
+                <label style={{ color:"var(--muted)", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>Nom complet</label>
                 <input value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))}
                   placeholder="Jean Dupont"
-                  style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 13px", color:"#F5F0E8", fontSize:13, outline:"none", boxSizing:"border-box" as const }}/>
+                  style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 13px", color:"var(--ink)", fontSize:13, outline:"none", boxSizing:"border-box" as const }}/>
               </div>
 
               {/* Username avec validation live */}
               <div>
-                <label style={{ color:"#A8A190", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>Nom d'utilisateur</label>
+                <label style={{ color:"var(--muted)", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>Nom d'utilisateur</label>
                 <div style={{ position:"relative" }}>
-                  <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", color:"#A8A190", fontSize:13 }}>@</span>
+                  <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", color:"var(--muted)", fontSize:13 }}>@</span>
                   <input value={form.username}
                     onChange={e => handleUsernameChange(e.target.value)}
                     placeholder="jean-dupont"
-                    style={{ width:"100%", background:"#0F0E0B", border:`1px solid ${usernameStatus==="ok"?"rgba(57,255,143,0.3)":usernameStatus==="taken"||usernameStatus==="invalid"?"rgba(255,107,107,0.3)":"rgba(255,255,255,0.08)"}`, borderRadius:9, padding:"10px 36px 10px 26px", color:"#F5F0E8", fontSize:13, outline:"none", boxSizing:"border-box" as const }}/>
+                    style={{ width:"100%", background:"var(--surface)", border:`1px solid ${usernameStatus==="ok"?"rgba(57,255,143,0.3)":usernameStatus==="taken"||usernameStatus==="invalid"?"rgba(255,107,107,0.3)":"rgba(255,255,255,0.08)"}`, borderRadius:9, padding:"10px 36px 10px 26px", color:"var(--ink)", fontSize:13, outline:"none", boxSizing:"border-box" as const }}/>
                   {/* Icone statut */}
                   <div style={{ position:"absolute", right:11, top:"50%", transform:"translateY(-50%)" }}>
                     {usernameStatus==="checking" && <div style={{ width:13, height:13, border:"1.5px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderTopColor:"var(--accent)", borderRadius:"50%", animation:"mo-spin 0.7s linear infinite" }}/>}
@@ -1095,7 +1095,7 @@ export default function ProfilePage() {
                     {usernameMsg}
                   </p>
                 )}
-                <p style={{ color:"#A8A190", fontSize:10, margin:"3px 0 0" }}>3-30 caracteres -- lettres, chiffres, _ et -</p>
+                <p style={{ color:"var(--muted)", fontSize:10, margin:"3px 0 0" }}>3-30 caracteres -- lettres, chiffres, _ et -</p>
               </div>
 
               {/* URL publique */}
@@ -1110,7 +1110,7 @@ export default function ProfilePage() {
                     {copiedUrl ? <Check size={12}/> : <Copy size={12}/>}
                   </button>
                   <a href={publicUrl} target="_blank" rel="noopener noreferrer"
-                    style={{ width:26, height:26, background:"none", border:"none", display:"flex", alignItems:"center", justifyContent:"center", color:"#A8A190", flexShrink:0 }}>
+                    style={{ width:26, height:26, background:"none", border:"none", display:"flex", alignItems:"center", justifyContent:"center", color:"var(--muted)", flexShrink:0 }}>
                     <ExternalLink size={12}/>
                   </a>
                 </div>
@@ -1118,19 +1118,19 @@ export default function ProfilePage() {
 
               {/* Bio */}
               <div>
-                <label style={{ color:"#A8A190", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>Bio</label>
+                <label style={{ color:"var(--muted)", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>Bio</label>
                 <textarea value={form.bio} onChange={e => setForm(f => ({ ...f, bio: e.target.value }))}
                   placeholder="Décrivez-vous en quelques mots…" rows={2}
-                  style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 13px", color:"#F5F0E8", fontSize:13, outline:"none", boxSizing:"border-box" as const, resize:"vertical" as const, lineHeight:1.6 }}/>
-                <p style={{ color:"#A8A190", fontSize:10, margin:"3px 0 0" }}>{form.bio.length}/160</p>
+                  style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 13px", color:"var(--ink)", fontSize:13, outline:"none", boxSizing:"border-box" as const, resize:"vertical" as const, lineHeight:1.6 }}/>
+                <p style={{ color:"var(--muted)", fontSize:10, margin:"3px 0 0" }}>{form.bio.length}/160</p>
               </div>
 
               {/* Site web */}
               <div>
-                <label style={{ color:"#A8A190", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>Site web</label>
+                <label style={{ color:"var(--muted)", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>Site web</label>
                 <input value={form.website} onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
                   placeholder="https://mon-site.com"
-                  style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 13px", color:"#F5F0E8", fontSize:13, outline:"none", boxSizing:"border-box" as const }}/>
+                  style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 13px", color:"var(--ink)", fontSize:13, outline:"none", boxSizing:"border-box" as const }}/>
               </div>
 
               {/* Bouton save — DÉSACTIVÉ ≠ DORÉ : l'or annonce une action possible.
@@ -1218,7 +1218,7 @@ export default function ProfilePage() {
                     /* Empty state */
                     <div style={{ textAlign:"center" as const, padding:"24px 0" }}>
                       <Clock size={28} color={MUTED} style={{ marginBottom:10 }}/>
-                      <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 4px" }}>Aucune activite</p>
+                      <p style={{ color:"var(--ink)", fontSize:13, fontWeight:600, margin:"0 0 4px" }}>Aucune activite</p>
                       <p style={{ color:MUTED, fontSize:11, margin:0, lineHeight:1.5 }}>
                         {activityFilter === "all"
                           ? "Vos actions apparaitront ici au fur et a mesure"
@@ -1263,7 +1263,7 @@ export default function ProfilePage() {
                                   <div style={{ flex:1, paddingTop:6, paddingBottom:isLast?0:10 }}>
                                     <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:8 }}>
                                       <div style={{ flex:1, minWidth:0 }}>
-                                        <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 2px", display:"flex", alignItems:"center", gap:6 }}>
+                                        <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:"0 0 2px", display:"flex", alignItems:"center", gap:6 }}>
                                           {evt.title}
                                           {evt.entity_label && (
                                             <span style={{ color:cfg.color, fontSize:10, fontWeight:400, background:cfg.bg, padding:"1px 6px", borderRadius:4, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, maxWidth:120 }}>
@@ -1324,7 +1324,7 @@ export default function ProfilePage() {
                     <div style={{ flex:1, background:"rgba(201,162,77,0.06)", border:"1px solid rgba(201,162,77,0.14)", borderRadius:9, padding:"10px 8px", textAlign:"center" as const, position:"relative" as const }}>
                       <div style={{ position:"absolute" as const, top:-8, left:"50%", transform:"translateX(-50%)", background:"rgba(201,162,77,0.15)", border:"1px solid rgba(201,162,77,0.3)", borderRadius:20, padding:"1px 7px", fontSize:8, color:"var(--accent)", fontWeight:800 }}>{s.step}</div>
                       <span style={{ fontSize:20, display:"block", margin:"4px 0 5px" }}>{s.emoji}</span>
-                      <p style={{ color:"#F5F0E8", fontSize:10, fontWeight:700, margin:"0 0 2px" }}>{s.label}</p>
+                      <p style={{ color:"var(--ink)", fontSize:10, fontWeight:700, margin:"0 0 2px" }}>{s.label}</p>
                       <p style={{ color:MUTED, fontSize:9, margin:0, lineHeight:1.4 }}>{s.desc}</p>
                     </div>
                     {i < 2 && <div style={{ width:16, height:1, background:"rgba(201,162,77,0.25)", flexShrink:0 }}/>}
@@ -1353,7 +1353,7 @@ export default function ProfilePage() {
                   Comment gagner un mois Pro ?
                 </p>
                 <p style={{ color:MUTED, fontSize:10, margin:0, lineHeight:1.6 }}>
-                  Votre filleul doit s'inscrire via votre lien et <strong style={{ color:"#F5F0E8" }}>souscrire a un plan payant</strong> dans les 30 jours. La recompense est creditee automatiquement.
+                  Votre filleul doit s'inscrire via votre lien et <strong style={{ color:"var(--ink)" }}>souscrire a un plan payant</strong> dans les 30 jours. La recompense est creditee automatiquement.
                 </p>
               </div>
 
@@ -1391,7 +1391,7 @@ export default function ProfilePage() {
               {referrals.length === 0 ? (
                 <div style={{ textAlign:"center" as const, padding:"20px 0" }}>
                   <Gift size={28} color={MUTED} style={{ marginBottom:8 }}/>
-                  <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 5px" }}>Aucun filleul pour l'instant</p>
+                  <p style={{ color:"var(--ink)", fontSize:13, fontWeight:600, margin:"0 0 5px" }}>Aucun filleul pour l'instant</p>
                   <p style={{ color:MUTED, fontSize:11, margin:"0 0 12px", lineHeight:1.5 }}>
                     Partagez votre lien et gagnez 1 mois Pro<br/>pour chaque ami qui s'abonne.
                   </p>
@@ -1437,7 +1437,7 @@ export default function ProfilePage() {
                             👤
                           </div>
                           <div style={{ flex:1, minWidth:0 }}>
-                            <p style={{ color:"#F5F0E8", fontSize:11, fontWeight:600, margin:"0 0 1px" }}>Filleul #{i+1}</p>
+                            <p style={{ color:"var(--ink)", fontSize:11, fontWeight:600, margin:"0 0 1px" }}>Filleul #{i+1}</p>
                             <p style={{ color:MUTED, fontSize:9, margin:0 }}>{formatDate(r.created_at)}{r.reward_months ? ` . +${r.reward_months} mois Pro` : ""}</p>
                           </div>
                           <span style={{ background:scfg.bg, border:`1px solid ${scfg.color}30`, borderRadius:5, padding:"2px 8px", fontSize:9, color:scfg.color, fontWeight:700, flexShrink:0 }}>
@@ -1483,7 +1483,7 @@ export default function ProfilePage() {
               /* Empty state */
               <div style={{ textAlign:"center" as const, padding:"20px 0" }}>
                 <TrendingUp size={28} color={MUTED} style={{ marginBottom:8 }}/>
-                <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 4px" }}>Aucune donnee</p>
+                <p style={{ color:"var(--ink)", fontSize:13, fontWeight:600, margin:"0 0 4px" }}>Aucune donnee</p>
                 <p style={{ color:MUTED, fontSize:11, margin:"0 0 12px" }}>Creez votre première page pour voir vos stats</p>
                 <a href="/dashboard" style={{ color:G, fontSize:11, display:"inline-block" }}>Créer une page</a>
               </div>
@@ -1503,14 +1503,14 @@ export default function ProfilePage() {
                     <div key={i}
                       onMouseEnter={() => setStatsTooltip(s.tooltip)}
                       onMouseLeave={() => setStatsTooltip(null)}
-                      style={{ position:"relative" as const, background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 11px", cursor:"default" }}>
+                      style={{ position:"relative" as const, background:"var(--surface)", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 11px", cursor:"default" }}>
                       <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:5 }}>
                         <div style={{ width:22, height:22, borderRadius:6, background:s.color+"15", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                           <s.icon size={11} color={s.color}/>
                         </div>
                         <span style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:0.8, lineHeight:1.2 }}>{s.label}</span>
                       </div>
-                      <p style={{ color:"#F5F0E8", fontSize:18, fontWeight:800, margin:0, fontFamily:"Fraunces, serif", lineHeight:1 }}>
+                      <p style={{ color:"var(--ink)", fontSize:18, fontWeight:800, margin:0, fontFamily:"Fraunces, serif", lineHeight:1 }}>
                         {s.value}
                       </p>
                     </div>
@@ -1519,7 +1519,7 @@ export default function ProfilePage() {
 
                 {/* Ligne de conversion */}
                 <div className="rcols-2" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-                  <div style={{ background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 12px" }}>
+                  <div style={{ background:"var(--surface)", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 12px" }}>
                     <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:0.8, margin:"0 0 5px" }}>Taux conversion</p>
                     <div style={{ display:"flex", alignItems:"flex-end", gap:6 }}>
                       <p style={{ color:convRate > 10 ? "var(--success)" : convRate > 5 ? G : MUTED, fontSize:22, fontWeight:800, margin:0, fontFamily:"Fraunces, serif", lineHeight:1 }}>
@@ -1532,9 +1532,9 @@ export default function ProfilePage() {
                       <div style={{ height:"100%", width:`${Math.min(convRate*5, 100)}%`, background:`linear-gradient(90deg,${G},var(--success))`, borderRadius:2, transition:"width 0.6s ease" }}/>
                     </div>
                   </div>
-                  <div style={{ background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 12px" }}>
+                  <div style={{ background:"var(--surface)", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 12px" }}>
                     <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:0.8, margin:"0 0 5px" }}>Vues / page moy.</p>
-                    <p style={{ color:"#F5F0E8", fontSize:22, fontWeight:800, margin:0, fontFamily:"Fraunces, serif", lineHeight:1 }}>
+                    <p style={{ color:"var(--ink)", fontSize:22, fontWeight:800, margin:0, fontFamily:"Fraunces, serif", lineHeight:1 }}>
                       {avgViews.toLocaleString("fr-FR")}
                     </p>
                   </div>
@@ -1550,7 +1550,7 @@ export default function ProfilePage() {
                           <Eye size={13} color={G}/>
                         </div>
                         <div style={{ flex:1, minWidth:0 }}>
-                          <p style={{ color:"#F5F0E8", fontSize:11, fontWeight:600, margin:"0 0 1px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
+                          <p style={{ color:"var(--ink)", fontSize:11, fontWeight:600, margin:"0 0 1px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
                             {topPage.title}
                           </p>
                           <p style={{ color:MUTED, fontSize:10, margin:0 }}>{topPage.total_views.toLocaleString("fr-FR")} vues</p>
@@ -1564,7 +1564,7 @@ export default function ProfilePage() {
                           <QrCode size={13} color="var(--accent)"/>
                         </div>
                         <div style={{ flex:1, minWidth:0 }}>
-                          <p style={{ color:"#F5F0E8", fontSize:11, fontWeight:600, margin:"0 0 1px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
+                          <p style={{ color:"var(--ink)", fontSize:11, fontWeight:600, margin:"0 0 1px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
                             {(topQR.pages as any)?.title || topQR.short_code}
                           </p>
                           <p style={{ color:MUTED, fontSize:10, margin:0 }}>/{topQR.short_code} . {topQR.total_scans.toLocaleString("fr-FR")} scans</p>
@@ -1579,7 +1579,7 @@ export default function ProfilePage() {
                 {profile?.plan === "free" && (
                   <div style={{ padding:"10px 12px", background:"color-mix(in srgb, var(--accent) 4%, transparent)", border:"1px dashed color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"space-between", gap:10 }}>
                     <div>
-                      <p style={{ color:"#F5F0E8", fontSize:11, fontWeight:600, margin:"0 0 2px" }}>Top page & Top QR</p>
+                      <p style={{ color:"var(--ink)", fontSize:11, fontWeight:600, margin:"0 0 2px" }}>Top page & Top QR</p>
                       <p style={{ color:MUTED, fontSize:10, margin:0 }}>Disponible en plan Pro</p>
                     </div>
                     <a href="/upgrade" className="da-btn-primary da-btn-primary--sm" style={{ flexShrink:0 }}>
@@ -1633,7 +1633,7 @@ export default function ProfilePage() {
                         : <ShieldOff   size={15} color="var(--accent)"/>}
                     </div>
                     <div>
-                      <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:"0 0 1px" }}>
+                      <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:"0 0 1px" }}>
                         {authUser?.email || profile?.email}
                       </p>
                       <div style={{ display:"flex", alignItems:"center", gap:5 }}>
@@ -1647,7 +1647,7 @@ export default function ProfilePage() {
                   {lastSignIn && (
                     <div style={{ textAlign:"right" as const }}>
                       <p style={{ color:MUTED, fontSize:9, margin:0 }}>Dernière connexion</p>
-                      <p style={{ color:"#F5F0E8", fontSize:10, fontWeight:600, margin:0 }}>
+                      <p style={{ color:"var(--ink)", fontSize:10, fontWeight:600, margin:0 }}>
                         {new Date(lastSignIn).toLocaleDateString("fr-FR", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" })}
                       </p>
                     </div>
@@ -1662,7 +1662,7 @@ export default function ProfilePage() {
                       <Lock size={14} color="var(--danger)"/>
                     </div>
                     <div style={{ flex:1 }}>
-                      <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:0 }}>Mot de passe</p>
+                      <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>Mot de passe</p>
                       <p style={{ color:MUTED, fontSize:10, margin:0 }}>Modifier ou reinitialiser votre mot de passe</p>
                     </div>
                     <ChevronRight size={14} color={MUTED} style={{ transform:showPwdChange?"rotate(90deg)":"none", transition:"transform 0.2s" }}/>
@@ -1684,7 +1684,7 @@ export default function ProfilePage() {
                         <input type="password" value={newPwd}
                           onChange={e => { setNewPwd(e.target.value); setPwdStrength(computePwdStrength(e.target.value)) }}
                           placeholder="Nouveau mot de passe"
-                          style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"9px 12px", color:"#F5F0E8", fontSize:12, outline:"none", boxSizing:"border-box" as const, marginBottom:6 }}/>
+                          style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"9px 12px", color:"var(--ink)", fontSize:12, outline:"none", boxSizing:"border-box" as const, marginBottom:6 }}/>
                         {newPwd && (
                           <div>
                             <div style={{ height:4, background:"rgba(255,255,255,0.06)", borderRadius:2, overflow:"hidden", marginBottom:3 }}>
@@ -1699,7 +1699,7 @@ export default function ProfilePage() {
                       <input type="password" value={newPwdConfirm}
                         onChange={e => setNewPwdConfirm(e.target.value)}
                         placeholder="Confirmer le mot de passe"
-                        style={{ width:"100%", background:"#0F0E0B", border:`1px solid ${newPwdConfirm && newPwd !== newPwdConfirm?"rgba(255,107,107,0.4)":"rgba(255,255,255,0.08)"}`, borderRadius:8, padding:"9px 12px", color:"#F5F0E8", fontSize:12, outline:"none", boxSizing:"border-box" as const }}/>
+                        style={{ width:"100%", background:"var(--surface)", border:`1px solid ${newPwdConfirm && newPwd !== newPwdConfirm?"rgba(255,107,107,0.4)":"rgba(255,255,255,0.08)"}`, borderRadius:8, padding:"9px 12px", color:"var(--ink)", fontSize:12, outline:"none", boxSizing:"border-box" as const }}/>
                       {newPwdConfirm && newPwd !== newPwdConfirm && (
                         <p style={{ color:"var(--danger)", fontSize:10, margin:"0" }}>Les mots de passe ne correspondent pas</p>
                       )}
@@ -1724,7 +1724,7 @@ export default function ProfilePage() {
                           </div>
                           <div style={{ flex:1, minWidth:0 }}>
                             <div style={{ display:"flex", alignItems:"center", gap:7 }}>
-                              <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:0 }}>{sess.browser}</p>
+                              <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{sess.browser}</p>
                               {sess.current && (
                                 <span style={{ background:"rgba(57,255,143,0.1)", border:"1px solid rgba(57,255,143,0.2)", borderRadius:4, padding:"1px 6px", fontSize:8, color:"var(--success)", fontWeight:700 }}>
                                   Session actuelle
@@ -1793,7 +1793,7 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:2 }}>
-                    <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:700, margin:0 }}>Vos droits RGPD</p>
+                    <p style={{ color:"var(--ink)", fontSize:12, fontWeight:700, margin:0 }}>Vos droits RGPD</p>
                     <span style={{ background:"rgba(201,162,77,0.12)", border:"1px solid rgba(201,162,77,0.25)", borderRadius:4, padding:"1px 7px", fontSize:8, color:"var(--accent)", fontWeight:800 }}>
                       RGPD
                     </span>
@@ -1826,7 +1826,7 @@ export default function ProfilePage() {
                       </div>
                       <div style={{ flex:1, minWidth:0 }}>
                         <div style={{ display:"flex", alignItems:"center", gap:7 }}>
-                          <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:0 }}>{job.label}</p>
+                          <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{job.label}</p>
                           <span style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:4, padding:"1px 6px", fontSize:8, color:MUTED, fontFamily:"monospace" }}>
                             {fmt}
                           </span>
@@ -1944,7 +1944,7 @@ export default function ProfilePage() {
                     </div>
                     <div style={{ flex:1 }}>
                       <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:3 }}>
-                        <p style={{ color:"#F5F0E8", fontSize:16, fontWeight:700, margin:0 }}>
+                        <p style={{ color:"var(--ink)", fontSize:16, fontWeight:700, margin:0 }}>
                           Plan {planCfg.label}
                         </p>
                         {planCfg.badge && (
@@ -1967,7 +1967,7 @@ export default function ProfilePage() {
                         <p style={{ color:MUTED, fontSize:14, fontWeight:700, margin:0 }}>Gratuit</p>
                       ) : (
                         <>
-                          <p style={{ color:"#F5F0E8", fontSize:18, fontWeight:800, margin:0, fontFamily:"Fraunces, serif", lineHeight:1 }}>
+                          <p style={{ color:"var(--ink)", fontSize:18, fontWeight:800, margin:0, fontFamily:"Fraunces, serif", lineHeight:1 }}>
                             {cycleDe(abonnement)==="annual" ? planCfg.price_annual : planCfg.price_monthly}.
                           </p>
                           <p style={{ color:MUTED, fontSize:9, margin:"2px 0 0" }}>/ mois</p>
@@ -1983,7 +1983,7 @@ export default function ProfilePage() {
                     return (
                       <div style={{ display:"flex", alignItems:"center", flexWrap:"wrap", gap:8, marginTop:12, paddingTop:12, borderTop:"1px solid rgba(255,255,255,0.06)" }}>
                         <p style={{ color:MUTED, fontSize:11, margin:0 }}>
-                          Facturation : <strong style={{ color:"#F5F0E8" }}>{cycle==="annual" ? "annuelle" : cycle==="monthly" ? "mensuelle" : "—"}</strong>
+                          Facturation : <strong style={{ color:"var(--ink)" }}>{cycle==="annual" ? "annuelle" : cycle==="monthly" ? "mensuelle" : "—"}</strong>
                           {cycle==="monthly" && planCfg.price_annual && <span> · l'annuel revient à {planCfg.price_annual}/mois</span>}
                         </p>
                         {ech && (
@@ -2104,7 +2104,7 @@ export default function ProfilePage() {
                       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6 }}>
                         <div style={{ display:"flex", alignItems:"center", gap:7 }}>
                           <Eye size={12} color="var(--accent)"/>
-                          <span style={{ color:"#F5F0E8", fontSize:12, fontWeight:600 }}>Pages</span>
+                          <span style={{ color:"var(--ink)", fontSize:12, fontWeight:600 }}>Pages</span>
                           {isNear && !isAt && <span style={{ color:"var(--accent)", fontSize:9, fontWeight:700, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid rgba(201,162,77,0.2)", borderRadius:4, padding:"1px 5px" }}>Bientot plein</span>}
                           {isAt && <span style={{ color:"var(--danger)", fontSize:9, fontWeight:700, background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:4, padding:"1px 5px" }}>Limite atteinte</span>}
                         </div>
@@ -2136,7 +2136,7 @@ export default function ProfilePage() {
                       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6 }}>
                         <div style={{ display:"flex", alignItems:"center", gap:7 }}>
                           <TrendingUp size={12} color={G}/>
-                          <span style={{ color:"#F5F0E8", fontSize:12, fontWeight:600 }}>Vues ce mois</span>
+                          <span style={{ color:"var(--ink)", fontSize:12, fontWeight:600 }}>Vues ce mois</span>
                           {isNear && !isAt && <span style={{ color:"var(--accent)", fontSize:9, fontWeight:700, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid rgba(201,162,77,0.2)", borderRadius:4, padding:"1px 5px" }}>Bientot plein</span>}
                           {isAt && <span style={{ color:"var(--danger)", fontSize:9, fontWeight:700, background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:4, padding:"1px 5px" }}>Limite atteinte</span>}
                         </div>
@@ -2160,7 +2160,7 @@ export default function ProfilePage() {
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6 }}>
                     <div style={{ display:"flex", alignItems:"center", gap:7 }}>
                       <QrCode size={12} color="var(--accent)"/>
-                      <span style={{ color:"#F5F0E8", fontSize:12, fontWeight:600 }}>QR Codes actifs</span>
+                      <span style={{ color:"var(--ink)", fontSize:12, fontWeight:600 }}>QR Codes actifs</span>
                     </div>
                     <span style={{ color:MUTED, fontSize:11, fontWeight:600 }}>
                       {activeQR} {planLimits.qr ? `/ ${planLimits.qr}` : "/ illimite"}
@@ -2181,7 +2181,7 @@ export default function ProfilePage() {
                     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6 }}>
                       <div style={{ display:"flex", alignItems:"center", gap:7 }}>
                         <Users size={12} color="var(--accent)"/>
-                        <span style={{ color:"#F5F0E8", fontSize:12, fontWeight:600 }}>Membres equipe</span>
+                        <span style={{ color:"var(--ink)", fontSize:12, fontWeight:600 }}>Membres equipe</span>
                       </div>
                       <span style={{ color:MUTED, fontSize:11, fontWeight:600 }}>1 / {planLimits.team}</span>
                     </div>
@@ -2196,7 +2196,7 @@ export default function ProfilePage() {
                   <div style={{ padding:"12px 14px", background:`${nextPlan?.color || G}06`, border:`1px solid ${nextPlan?.color || G}20`, borderRadius:10 }}>
                     <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10 }}>
                       <div>
-                        <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:700, margin:"0 0 3px" }}>
+                        <p style={{ color:"var(--ink)", fontSize:12, fontWeight:700, margin:"0 0 3px" }}>
                           Passez a {nextPlan?.label}
                         </p>
                         <p style={{ color:MUTED, fontSize:11, margin:0 }}>
@@ -2242,7 +2242,7 @@ export default function ProfilePage() {
                       </div>
                       <div style={{ flex:1 }}>
                         <div style={{ display:"flex", alignItems:"baseline", gap:8, marginBottom:2 }}>
-                          <p style={{ color:"#F5F0E8", fontSize:15, fontWeight:800, margin:0 }}>{lvl.current.label}</p>
+                          <p style={{ color:"var(--ink)", fontSize:15, fontWeight:800, margin:0 }}>{lvl.current.label}</p>
                           {lvl.nextLvl && (
                             <span style={{ color:MUTED, fontSize:10 }}>{"-> "}{lvl.nextLvl.label}</span>
                           )}
@@ -2292,7 +2292,7 @@ export default function ProfilePage() {
                     <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:0 }}>
                       Badges debloques
                     </p>
-                    <span style={{ color:"#F5F0E8", fontSize:11, fontWeight:700 }}>
+                    <span style={{ color:"var(--ink)", fontSize:11, fontWeight:700 }}>
                       {earned.length} / {badges.length}
                     </span>
                   </div>
@@ -2321,8 +2321,8 @@ export default function ProfilePage() {
                                 {badge.label}
                               </p>
                               {badge.unlocked && (
-                                <div style={{ position:"absolute" as const, top:-4, right:-4, width:14, height:14, borderRadius:"50%", background:"var(--success)", border:"2px solid #080808", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                                  <span style={{ fontSize:7, color:"#080808", fontWeight:900 }}>v</span>
+                                <div style={{ position:"absolute" as const, top:-4, right:-4, width:14, height:14, borderRadius:"50%", background:"var(--success)", border:"2px solid var(--bg)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                                  <span style={{ fontSize:7, color:"var(--ink-on-accent)", fontWeight:900 }}>v</span>
                                 </div>
                               )}
                             </div>
@@ -2370,7 +2370,7 @@ export default function ProfilePage() {
                 <div style={{ width:48, height:48, borderRadius:14, background:"rgba(201,162,77,0.08)", border:"1px solid rgba(201,162,77,0.15)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 12px" }}>
                   <Lock size={20} color="var(--accent)"/>
                 </div>
-                <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 5px" }}>Accès API</p>
+                <p style={{ color:"var(--ink)", fontSize:13, fontWeight:600, margin:"0 0 5px" }}>Accès API</p>
                 <p style={{ color:MUTED, fontSize:11, margin:"0 0 14px", lineHeight:1.5 }}>
                   Pilotez vos pages et vos QR codes depuis<br/>votre propre logiciel.
                 </p>
@@ -2403,11 +2403,11 @@ export default function ProfilePage() {
                 {(confirmRegen || confirmRevoke) && (
                   <div style={{ position:"fixed" as const, inset:0, background:"rgba(0,0,0,0.75)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:2000, padding:20 }}
                     onClick={() => { setConfirmRegen(null); setConfirmRevoke(null) }}>
-                    <div style={{ background:"#111009", border:`1px solid ${confirmRevoke?"rgba(255,107,107,0.3)":"color-mix(in srgb, var(--accent) 25%, transparent)"}`, borderRadius:16, padding:28, maxWidth:360, width:"100%" }}
+                    <div style={{ background:"var(--surface)", border:`1px solid ${confirmRevoke?"rgba(255,107,107,0.3)":"color-mix(in srgb, var(--accent) 25%, transparent)"}`, borderRadius:16, padding:28, maxWidth:360, width:"100%" }}
                       onClick={e => e.stopPropagation()}>
                       <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
                         <AlertTriangle size={18} color={confirmRevoke?"var(--danger)":"var(--accent)"}/>
-                        <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:700, margin:0 }}>
+                        <p style={{ color:"var(--ink)", fontSize:14, fontWeight:700, margin:0 }}>
                           {confirmRevoke ? "Revoquer la clé ?" : "Regenerer la clé ?"}
                         </p>
                       </div>
@@ -2424,9 +2424,9 @@ export default function ProfilePage() {
                         <button type="button" disabled={!!regenKeyId || !!deletingKey}
                           onClick={() => confirmRegen ? regenerateApiKey(confirmRegen) : confirmRevoke ? revokeApiKey(confirmRevoke) : null}
                           className={confirmRevoke ? undefined : "da-btn-primary da-btn-primary--sm"}
-                          style={confirmRevoke ? { flex:2, padding:"9px", background:"linear-gradient(90deg,var(--danger),#e05555)", border:"none", borderRadius:9, color:"#F5F0E8", fontSize:12, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7 } : { flex:2, justifyContent:"center", fontSize:12 }}>
+                          style={confirmRevoke ? { flex:2, padding:"9px", background:"linear-gradient(90deg,var(--danger),#e05555)", border:"none", borderRadius:9, color:"var(--ink)", fontSize:12, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7 } : { flex:2, justifyContent:"center", fontSize:12 }}>
                           {regenKeyId || deletingKey
-                            ? <><div style={{ width:13, height:13, border:"2px solid rgba(255,255,255,0.3)", borderTopColor:"#F5F0E8", borderRadius:"50%", animation:"mo-spin 0.7s linear infinite" }}/> Traitement...</>
+                            ? <><div style={{ width:13, height:13, border:"2px solid rgba(255,255,255,0.3)", borderTopColor:"var(--ink)", borderRadius:"50%", animation:"mo-spin 0.7s linear infinite" }}/> Traitement...</>
                             : confirmRevoke ? "Revoquer" : "Regenerer"}
                         </button>
                       </div>
@@ -2444,7 +2444,7 @@ export default function ProfilePage() {
                       </p>
                     </div>
                     <div style={{ display:"flex", alignItems:"center", gap:8, background:SURF2, borderRadius:8, padding:"8px 11px", marginBottom:8 }}>
-                      <code style={{ flex:1, color:"#F5F0E8", fontSize:10, wordBreak:"break-all" as const, fontFamily:"monospace" }}>
+                      <code style={{ flex:1, color:"var(--ink)", fontSize:10, wordBreak:"break-all" as const, fontFamily:"monospace" }}>
                         {newKeyCreated}
                       </code>
                     </div>
@@ -2498,7 +2498,7 @@ export default function ProfilePage() {
                           <div style={{ width:8, height:8, borderRadius:"50%", background:key.is_active?"var(--success)":MUTED, flexShrink:0 }}/>
                           <div style={{ flex:1, minWidth:0 }}>
                             <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:2 }}>
-                              <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:0 }}>{key.name}</p>
+                              <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{key.name}</p>
                               {!key.is_active && (
                                 <span style={{ background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:4, padding:"1px 6px", fontSize:8, color:"var(--danger)", fontWeight:700 }}>
                                   REVOQUEE
@@ -2559,7 +2559,7 @@ export default function ProfilePage() {
                   <div style={{ display:"flex", gap:7 }}>
                     <input value={newKeyName} onChange={e => setNewKeyName(e.target.value)}
                       placeholder="Nom de la clé (ex: Production App)"
-                      style={{ flex:1, background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 12px", color:"#F5F0E8", fontSize:12, outline:"none", boxSizing:"border-box" as const }}
+                      style={{ flex:1, background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 12px", color:"var(--ink)", fontSize:12, outline:"none", boxSizing:"border-box" as const }}
                       onKeyDown={e => e.key==="Enter" && createApiKey()}/>
                     <button type="button" onClick={createApiKey} disabled={!newKeyName.trim()} className="da-btn-primary da-btn-primary--sm" style={{ flexShrink:0 }}>
                       <span>Creer</span>
@@ -2592,7 +2592,7 @@ export default function ProfilePage() {
 
                 {/* Documentation API — exemples pour développeurs */}
                 <div style={{ padding:"14px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:9 }}>
-                  <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:700, margin:"0 0 4px" }}>Documentation API</p>
+                  <p style={{ color:"var(--ink)", fontSize:12, fontWeight:700, margin:"0 0 4px" }}>Documentation API</p>
                   <p style={{ color:MUTED, fontSize:10.5, margin:"0 0 12px", lineHeight:1.6 }}>
                     Base <code style={{ color:"#C9C3B6" }}>https://qrowg.com/api/v1</code> · en-tête <code style={{ color:"#C9C3B6" }}>Authorization: Bearer &lt;clé&gt;</code> · 120 req/min par clé.
                   </p>
@@ -2604,7 +2604,7 @@ export default function ProfilePage() {
                     <div key={i} style={{ marginBottom:11 }}>
                       <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:5, flexWrap:"wrap" }}>
                         <span style={{ fontSize:9, fontWeight:800, color:e.m==="GET"?"var(--success)":"var(--accent)", background:e.m==="GET"?"rgba(57,255,143,0.1)":"color-mix(in srgb, var(--accent) 10%, transparent)", border:`1px solid ${e.m==="GET"?"rgba(57,255,143,0.25)":"rgba(201,162,77,0.25)"}`, borderRadius:4, padding:"1px 6px" }}>{e.m}</span>
-                        <code style={{ color:"#F5F0E8", fontSize:11 }}>{e.p}</code>
+                        <code style={{ color:"var(--ink)", fontSize:11 }}>{e.p}</code>
                         <span style={{ color:MUTED, fontSize:10 }}>· {e.d}</span>
                       </div>
                       <pre style={{ margin:0, padding:"8px 10px", background:"#0A0908", border:"1px solid rgba(255,255,255,0.06)", borderRadius:7, color:"#B8B2A4", fontSize:9.5, lineHeight:1.6, overflowX:"auto", whiteSpace:"pre" }}>{e.cmd}</pre>
@@ -2631,7 +2631,7 @@ export default function ProfilePage() {
               /* CTA upgrade plan insuffisant */
               <div style={{ textAlign:"center" as const, padding:"20px 0" }}>
                 <Globe size={28} color={MUTED} style={{ marginBottom:10 }}/>
-                <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 5px" }}>Domaines personnalises</p>
+                <p style={{ color:"var(--ink)", fontSize:13, fontWeight:600, margin:"0 0 5px" }}>Domaines personnalises</p>
                 <p style={{ color:MUTED, fontSize:11, margin:"0 0 14px", lineHeight:1.5 }}>
                   Connectez votre propre domaine<br/>a vos pages QRowg.
                 </p>
@@ -2650,7 +2650,7 @@ export default function ProfilePage() {
               /* Empty state Pro */
               <div style={{ textAlign:"center" as const, padding:"16px 0" }}>
                 <Globe size={26} color={MUTED} style={{ marginBottom:9 }}/>
-                <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 4px" }}>Aucun domaine connecte</p>
+                <p style={{ color:"var(--ink)", fontSize:13, fontWeight:600, margin:"0 0 4px" }}>Aucun domaine connecte</p>
                 <p style={{ color:MUTED, fontSize:11, margin:"0 0 14px", lineHeight:1.5 }}>
                   Utilisez votre propre domaine pour<br/>toutes vos pages QRowg.
                 </p>
@@ -2694,7 +2694,7 @@ export default function ProfilePage() {
                         <div style={{ flex:1, minWidth:0 }}>
                           <div style={{ display:"flex", alignItems:"center", gap:7 }}>
                             <a href={`https://${dm.domain}`} target="_blank" rel="noopener noreferrer"
-                              style={{ color:"#F5F0E8", fontSize:12, fontWeight:700, textDecoration:"none", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
+                              style={{ color:"var(--ink)", fontSize:12, fontWeight:700, textDecoration:"none", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
                               {dm.domain}
                             </a>
                             {dm.is_primary && (
@@ -2809,7 +2809,7 @@ export default function ProfilePage() {
                   <div>
                     <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:5, fontWeight:500 }}>Langue</label>
                     <select aria-label="Langue" value={prefs.locale} onChange={e => setPrefField("locale", e.target.value)}
-                      style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"#F5F0E8", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
+                      style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"var(--ink)", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                       <option value="fr">Francais</option>
                       <option value="en">English</option>
                       <option value="es">Espanol</option>
@@ -2822,7 +2822,7 @@ export default function ProfilePage() {
                   <div>
                     <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:5, fontWeight:500 }}>Devise</label>
                     <select aria-label="Devise" value={prefs.currency} onChange={e => setPrefField("currency", e.target.value)}
-                      style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"#F5F0E8", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
+                      style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"var(--ink)", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                       <option value="EUR">EUR (Euro)</option>
                       <option value="USD">USD (Dollar)</option>
                       <option value="GBP">GBP (Livre)</option>
@@ -2842,7 +2842,7 @@ export default function ProfilePage() {
                       </button>
                     </div>
                     <select aria-label="Fuseau horaire" value={prefs.timezone} onChange={e => setPrefField("timezone", e.target.value)}
-                      style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"#F5F0E8", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
+                      style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"var(--ink)", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                       {[
                         "Europe/Paris","Europe/London","Europe/Berlin","Europe/Madrid","Europe/Rome",
                         "America/New_York","America/Chicago","America/Denver","America/Los_Angeles",
@@ -2857,7 +2857,7 @@ export default function ProfilePage() {
                   <div>
                     <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:5, fontWeight:500 }}>Format date</label>
                     <select aria-label="Format de date" value={prefs.date_format} onChange={e => setPrefField("date_format", e.target.value)}
-                      style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"#F5F0E8", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
+                      style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"var(--ink)", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                       <option value="DD/MM/YYYY">DD/MM/YYYY</option>
                       <option value="MM/DD/YYYY">MM/DD/YYYY</option>
                       <option value="YYYY-MM-DD">YYYY-MM-DD</option>
@@ -2869,7 +2869,7 @@ export default function ProfilePage() {
                   <div>
                     <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:5, fontWeight:500 }}>Format heure</label>
                     <select aria-label="Format d'heure" value={prefs.time_format} onChange={e => setPrefField("time_format", e.target.value)}
-                      style={{ width:"100%", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"#F5F0E8", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
+                      style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"var(--ink)", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                       <option value="24 heures">24h (14:30)</option>
                       <option value="12h">12h (2:30 PM)</option>
                     </select>
@@ -2911,12 +2911,12 @@ export default function ProfilePage() {
                   ]).map(item => (
                     <div key={item.key} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 12px", background:SURF2, border:"1px solid rgba(255,255,255,0.05)", borderRadius:9 }}>
                       <div>
-                        <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:0 }}>{item.label}</p>
+                        <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{item.label}</p>
                         <p style={{ color:MUTED, fontSize:10, margin:"2px 0 0" }}>{item.desc}</p>
                       </div>
                       <button type="button" onClick={() => togglePref(item.key, !prefs[item.key])}
                         style={{ width:38, height:21, borderRadius:11, background:prefs[item.key]?`linear-gradient(90deg,${G},color-mix(in srgb, var(--accent) 75%, #000))`:"rgba(255,255,255,0.08)", border:"none", cursor:"pointer", position:"relative" as const, transition:"background 0.2s", flexShrink:0 }}>
-                        <div style={{ position:"absolute" as const, top:2.5, left:prefs[item.key]?20:3, width:16, height:16, borderRadius:"50%", background:"#F5F0E8", transition:"left 0.2s", boxShadow:"0 1px 3px rgba(0,0,0,0.3)" }}/>
+                        <div style={{ position:"absolute" as const, top:2.5, left:prefs[item.key]?20:3, width:16, height:16, borderRadius:"50%", background:"var(--ink)", transition:"left 0.2s", boxShadow:"0 1px 3px rgba(0,0,0,0.3)" }}/>
                       </button>
                     </div>
                   ))}
@@ -2936,7 +2936,7 @@ export default function ProfilePage() {
                       <div key={item.key} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 12px", background:SURF2, border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, opacity:locked?0.6:1 }}>
                         <div>
                           <div style={{ display:"flex", alignItems:"center", gap:7 }}>
-                            <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:0 }}>{item.label}</p>
+                            <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{item.label}</p>
                             {locked && <span style={{ background:`color-mix(in srgb, var(--accent) 7%, transparent)`, border:`1px solid color-mix(in srgb, var(--accent) 15%, transparent)`, borderRadius:4, padding:"1px 6px", fontSize:8, color:G, fontWeight:700 }}>Pro</span>}
                           </div>
                           <p style={{ color:MUTED, fontSize:10, margin:"2px 0 0" }}>{item.desc}</p>
@@ -2945,7 +2945,7 @@ export default function ProfilePage() {
                           disabled={locked}
                           onClick={() => !locked && togglePref(item.key, !prefs[item.key])}
                           style={{ width:38, height:21, borderRadius:11, background:!locked&&prefs[item.key]?`linear-gradient(90deg,${G},color-mix(in srgb, var(--accent) 75%, #000))`:"rgba(255,255,255,0.08)", border:"none", cursor:locked?"not-allowed":"pointer", position:"relative" as const, transition:"background 0.2s", flexShrink:0 }}>
-                          <div style={{ position:"absolute" as const, top:2.5, left:!locked&&prefs[item.key]?20:3, width:16, height:16, borderRadius:"50%", background:"#F5F0E8", transition:"left 0.2s", boxShadow:"0 1px 3px rgba(0,0,0,0.3)" }}/>
+                          <div style={{ position:"absolute" as const, top:2.5, left:!locked&&prefs[item.key]?20:3, width:16, height:16, borderRadius:"50%", background:"var(--ink)", transition:"left 0.2s", boxShadow:"0 1px 3px rgba(0,0,0,0.3)" }}/>
                         </button>
                       </div>
                     )

@@ -36,7 +36,7 @@ const DEVICES: { id: CanvasDevice; icon: string }[] = [
 const ctrl = (mobile?: boolean): React.CSSProperties => ({
   minWidth: mobile ? 40 : 30, height: mobile ? 40 : 30, display: "inline-flex", alignItems: "center",
   justifyContent: "center", gap: 4, padding: "0 8px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)",
-  background: "rgba(255,255,255,0.04)", color: "var(--ink, #F5F0E8)", fontSize: mobile ? 13 : 12, cursor: "pointer",
+  background: "rgba(255,255,255,0.04)", color: "var(--ink, var(--ink))", fontSize: mobile ? 13 : 12, cursor: "pointer",
 })
 
 export function CanvasToolbar(p: CanvasToolbarProps) {
@@ -75,7 +75,7 @@ export function CanvasToolbar(p: CanvasToolbarProps) {
       {p.showZoom && (
         <div role="group" aria-label="Zoom" style={{ display: "flex", alignItems: "center", gap: 3 }}>
           <button type="button" data-testid="zoom-out" aria-label="Dézoomer" title="Zoom − (Ctrl −)" onClick={p.onZoomOut} style={ctrl(p.mobile)}>−</button>
-          <span data-testid="zoom-value" aria-live="polite" style={{ fontSize: 11, color: "var(--ink, #F5F0E8)", fontWeight: 700, minWidth: 40, textAlign: "center" }}>{zoomPercent(p.zoom)} %</span>
+          <span data-testid="zoom-value" aria-live="polite" style={{ fontSize: 11, color: "var(--ink, var(--ink))", fontWeight: 700, minWidth: 40, textAlign: "center" }}>{zoomPercent(p.zoom)} %</span>
           <button type="button" data-testid="zoom-in" aria-label="Zoomer" title="Zoom + (Ctrl +)" onClick={p.onZoomIn} style={ctrl(p.mobile)}>+</button>
           <button type="button" data-testid="zoom-fit" aria-label="Ajuster à la largeur" title="Ajuster" onClick={p.onFit} style={ctrl(p.mobile)}>Ajuster</button>
           <button type="button" data-testid="zoom-reset" aria-label="Zoom 100 %" title="100 % (Ctrl 0)" onClick={p.onReset} style={ctrl(p.mobile)}>100 %</button>

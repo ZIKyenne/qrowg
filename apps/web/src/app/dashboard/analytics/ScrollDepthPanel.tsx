@@ -13,10 +13,10 @@ type Props = { funnel: ScrollStep[] }
 export default function ScrollDepthPanel({ funnel }: Props) {
   const base = funnel[0]?.count || 0
   return (
-    <div style={{ background: "#141210", border: "1px solid #221f1b", borderRadius: 16, padding: "20px 22px" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid var(--surface-2)", borderRadius: 16, padding: "20px 22px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
         <AlignLeft size={16} color={GOLD} />
-        <h3 style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0 }}>Profondeur de lecture</h3>
+        <h3 style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>Profondeur de lecture</h3>
       </div>
       <p style={{ color: MUTED, fontSize: 12, margin: "0 0 16px" }}>Jusqu&apos;où vos visiteurs font défiler la page.</p>
 
@@ -29,7 +29,7 @@ export default function ScrollDepthPanel({ funnel }: Props) {
           {funnel.map((s, i) => (
             <div key={s.depth}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
-                <span style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 600 }}>{s.depth} de la page</span>
+                <span style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600 }}>{s.depth} de la page</span>
                 <span style={{ color: MUTED, fontSize: 12 }}>
                   <span style={{ color: GOLD, fontWeight: 700 }}>{s.pct}%</span> · {s.count} visite{s.count > 1 ? "s" : ""}
                 </span>
@@ -42,7 +42,7 @@ export default function ScrollDepthPanel({ funnel }: Props) {
           {(() => {
             const drop = base > 0 ? Math.round((1 - (funnel[3]?.count || 0) / base) * 100) : 0
             return drop >= 40 ? (
-              <p style={{ color: "#FBBF24", fontSize: 11.5, margin: "4px 0 0", lineHeight: 1.5 }}>
+              <p style={{ color: "var(--warning)", fontSize: 11.5, margin: "4px 0 0", lineHeight: 1.5 }}>
 <AlignLeft size={12} style={{ verticalAlign: "-1px", marginRight: 4, opacity: .8 }} />{drop}% des visiteurs n&apos;atteignent pas le bas de page — placez vos blocs importants (CTA, contact) plus haut.
               </p>
             ) : null

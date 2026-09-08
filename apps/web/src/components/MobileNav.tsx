@@ -180,9 +180,9 @@ export default function MobileNav({ onCreate, unread = 0, guest = false }: { onC
   return (
     <nav aria-label="Navigation principale" style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 50, pointerEvents: 'none' }}>
       {/* dégradé de fond : le contenu se fond sous la barre */}
-      <div style={{ height: 80, width: '100%', background: 'linear-gradient(180deg, rgba(8,8,8,0) 0%, rgba(8,8,8,0.85) 55%, #080808 100%)' }} />
+      <div style={{ height: 80, width: '100%', background: 'linear-gradient(180deg, rgba(8,8,8,0) 0%, rgba(8,8,8,0.85) 55%, var(--bg) 100%)' }} />
 
-      <div style={{ pointerEvents: 'auto', padding: '0 12px', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', background: '#080808' }}>
+      <div style={{ pointerEvents: 'auto', padding: '0 12px', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', background: 'var(--bg)' }}>
         <div style={{ position: 'relative', height: 54 }}>
           {/* filtre "goo" : fait fusionner la bulle et ses gouttes */}
           <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden>
@@ -273,7 +273,7 @@ export default function MobileNav({ onCreate, unread = 0, guest = false }: { onC
                   <span style={iconWrap}>
                     <TabIcon />
                     {(tab.href === '/dashboard' || tab.more) && unread > 0 && (
-                      <span style={{ position: 'absolute', top: -5, right: -7, minWidth: 14, height: 14, padding: '0 3px', borderRadius: 7, background: '#EF4444', color: '#fff', fontSize: 9, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>{unread > 99 ? '99+' : unread}</span>
+                      <span style={{ position: 'absolute', top: -5, right: -7, minWidth: 14, height: 14, padding: '0 3px', borderRadius: 7, background: 'var(--danger)', color: '#fff', fontSize: 9, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>{unread > 99 ? '99+' : unread}</span>
                     )}
                   </span>
                   <span style={labelStyle}>{tab.label}</span>
@@ -308,9 +308,9 @@ export default function MobileNav({ onCreate, unread = 0, guest = false }: { onC
       {moreOpen && (
         <div onClick={() => setMoreOpen(false)} style={{ pointerEvents: 'auto', position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(3px)', display: 'flex', alignItems: 'flex-end' }}>
           <div role="dialog" aria-modal="true" aria-label="Toutes les sections" onClick={e => e.stopPropagation()}
-            style={{ width: '100%', maxHeight: '78dvh', overflowY: 'auto', background: '#141210', borderTopLeftRadius: 22, borderTopRightRadius: 22, border: `1px solid color-mix(in srgb, ${GOLD} 16%, transparent)`, borderBottom: 'none', padding: '10px 14px calc(16px + env(safe-area-inset-bottom))', boxShadow: '0 -16px 44px rgba(0,0,0,0.55)', animation: 'sheetUp .24s var(--mo-ease-standard, ease)' }}>
+            style={{ width: '100%', maxHeight: '78dvh', overflowY: 'auto', background: 'var(--surface)', borderTopLeftRadius: 22, borderTopRightRadius: 22, border: `1px solid color-mix(in srgb, ${GOLD} 16%, transparent)`, borderBottom: 'none', padding: '10px 14px calc(16px + env(safe-area-inset-bottom))', boxShadow: '0 -16px 44px rgba(0,0,0,0.55)', animation: 'sheetUp .24s var(--mo-ease-standard, ease)' }}>
             <div style={{ width: 40, height: 4, borderRadius: 4, background: 'rgba(255,255,255,0.18)', margin: '0 auto 12px' }} />
-            <p style={{ margin: '0 4px 6px', color: '#F5F0E8', fontSize: 15, fontWeight: 800 }}>Toutes les sections</p>
+            <p style={{ margin: '0 4px 6px', color: 'var(--ink)', fontSize: 15, fontWeight: 800 }}>Toutes les sections</p>
             {MORE_ITEMS.map((it, i) => {
               const courant = pathname === it.href || pathname.startsWith(it.href + '/')
               const badge = it.href === '/dashboard/leads' && unread > 0
@@ -321,7 +321,7 @@ export default function MobileNav({ onCreate, unread = 0, guest = false }: { onC
                     <span style={{ color: courant ? GOLD : '#F5F0E8', fontSize: 15, fontWeight: 700 }}>{it.label}</span>
                     <span style={{ color: MUTED, fontSize: 12.5, lineHeight: 1.35 }}>{it.sub}</span>
                   </span>
-                  {badge && <span style={{ minWidth: 22, height: 22, padding: '0 7px', borderRadius: 11, background: '#EF4444', color: '#fff', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{unread > 99 ? '99+' : unread}</span>}
+                  {badge && <span style={{ minWidth: 22, height: 22, padding: '0 7px', borderRadius: 11, background: 'var(--danger)', color: '#fff', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{unread > 99 ? '99+' : unread}</span>}
                   <span aria-hidden style={{ color: MUTED, fontSize: 18, flexShrink: 0 }}>›</span>
                 </Link>
               )

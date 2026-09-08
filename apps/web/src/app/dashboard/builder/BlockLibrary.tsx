@@ -119,12 +119,12 @@ export function BlockLibrary(props: BlockLibraryProps) {
 
   return (
     <div data-testid="block-library" onKeyDown={onKeyDown}
-      style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0, background: "#0A0A0A" }}>
+      style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0, background: "var(--field)" }}>
 
       {/* HEADER — masqué quand le conteneur en fournit déjà un (bottom sheet mobile). */}
       {!props.hideHeader && (
       <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 8, padding: mobile ? "calc(env(safe-area-inset-top) + 10px) 12px 10px" : "12px 12px 8px" }}>
-        <h2 style={{ margin: 0, fontSize: mobile ? 16 : 13, fontWeight: 800, color: "var(--ink, #F5F0E8)", flex: 1 }}>{props.title ?? "Ajouter un bloc"}</h2>
+        <h2 style={{ margin: 0, fontSize: mobile ? 16 : 13, fontWeight: 800, color: "var(--ink, var(--ink))", flex: 1 }}>{props.title ?? "Ajouter un bloc"}</h2>
         {onRequestClose && (
           <button type="button" onClick={onRequestClose} aria-label="Fermer la bibliothèque"
             style={{ width: mobile ? 40 : 30, height: mobile ? 40 : 30, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, cursor: "pointer", color: MUTED, fontSize: 15 }}>✕</button>
@@ -141,7 +141,7 @@ export function BlockLibrary(props: BlockLibraryProps) {
           placeholder="Rechercher un bloc…"
           aria-label="Rechercher un bloc"
           type="search"
-          style={{ width: "100%", boxSizing: "border-box", height: mobile ? 46 : 36, background: "#111", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 10, padding: "0 36px 0 12px", color: "var(--ink, #F5F0E8)", fontSize: mobile ? 15 : 12.5, outline: "none" }}
+          style={{ width: "100%", boxSizing: "border-box", height: mobile ? 46 : 36, background: "#111", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 10, padding: "0 36px 0 12px", color: "var(--ink, var(--ink))", fontSize: mobile ? 15 : 12.5, outline: "none" }}
         />
         {query && (
           <button type="button" onClick={() => { setQuery(""); searchRef.current?.focus() }} aria-label="Effacer la recherche"
@@ -170,12 +170,12 @@ export function BlockLibrary(props: BlockLibraryProps) {
         {visible.length === 0 && (
           <div role="status" aria-live="polite" data-testid="library-empty"
             style={{ gridColumn: "1 / -1", textAlign: "center", padding: "28px 16px", color: MUTED }}>
-            <p style={{ margin: "0 0 6px", fontSize: 14, fontWeight: 700, color: "var(--ink, #F5F0E8)" }}>Aucun bloc trouvé</p>
+            <p style={{ margin: "0 0 6px", fontSize: 14, fontWeight: 700, color: "var(--ink, var(--ink))" }}>Aucun bloc trouvé</p>
             <p style={{ margin: "0 0 14px", fontSize: 12 }}>Essayez un autre mot, ou parcourez une catégorie proche.</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginBottom: 14 }}>
               {nearbyCategories(items, query || "blocs").map(c => (
                 <button key={c.id} type="button" onClick={() => { setQuery(""); setTab(c.id) }}
-                  style={{ padding: "6px 11px", borderRadius: 9, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "var(--ink, #F5F0E8)", fontSize: 12, cursor: "pointer" }}>
+                  style={{ padding: "6px 11px", borderRadius: 9, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "var(--ink, var(--ink))", fontSize: 12, cursor: "pointer" }}>
                   {c.icon} {c.label}
                 </button>
               ))}
@@ -197,15 +197,15 @@ export function BlockLibrary(props: BlockLibraryProps) {
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
             <span aria-hidden="true" style={{ width: 44, height: 44, borderRadius: 11, background: detailItem.color + "1c", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{detailItem.icon}</span>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--ink, #F5F0E8)" }}>{detailItem.title}</p>
+              <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--ink, var(--ink))" }}>{detailItem.title}</p>
               <p style={{ margin: 0, fontSize: 12, color: MUTED }}>{detailItem.categoryLabel}{detailItem.isPremium ? " · 👑 Premium" : ""}</p>
             </div>
             <button type="button" onClick={() => setDetail(null)} aria-label="Fermer les détails"
               style={{ width: 34, height: 34, borderRadius: 9, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", cursor: "pointer", color: MUTED, fontSize: 16 }}>✕</button>
           </div>
-          <p style={{ margin: "0 0 12px", fontSize: 13.5, lineHeight: 1.5, color: "var(--ink, #F5F0E8)" }}>{detailItem.description}</p>
+          <p style={{ margin: "0 0 12px", fontSize: 13.5, lineHeight: 1.5, color: "var(--ink, var(--ink))" }}>{detailItem.description}</p>
           {detailItem.useCases.length > 0 && (
-            <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "color-mix(in srgb, var(--accent) 80%, #8A8478)" }}>💡 {detailItem.useCases.join(" · ")}</p>
+            <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "color-mix(in srgb, var(--accent) 80%, var(--muted))" }}>💡 {detailItem.useCases.join(" · ")}</p>
           )}
           {detailItem.isPremium && (
             <p style={{ margin: "0 0 12px", fontSize: 12, color: MUTED }}>
@@ -214,7 +214,7 @@ export function BlockLibrary(props: BlockLibraryProps) {
           )}
           <div style={{ flex: 1 }} />
           <button type="button" data-detail-add={detailItem.type} onClick={() => { onAdd(detailItem.type); setDetail(null) }}
-            style={{ minHeight: 48, borderRadius: 12, background: "var(--accent)", border: "none", color: "#080808", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>
+            style={{ minHeight: 48, borderRadius: 12, background: "var(--accent)", border: "none", color: "var(--ink-on-accent)", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>
             Ajouter ce bloc
           </button>
         </div>

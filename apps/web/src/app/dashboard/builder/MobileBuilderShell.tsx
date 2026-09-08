@@ -138,7 +138,7 @@ export function MobileBuilderShell(p: MobileBuilderShellProps) {
   return (
     <div data-testid="mobile-shell" data-preview={preview ? "1" : "0"} data-keyboard={keyboardOpen ? "1" : "0"}
       onKeyDown={e => { if (e.key === "Escape") { e.stopPropagation(); handleBack() } }}
-      style={{ position: "absolute", inset: 0, zIndex: 50, display: "flex", flexDirection: "column", background: "#080808", overflow: "hidden" }}>
+      style={{ position: "absolute", inset: 0, zIndex: 50, display: "flex", flexDirection: "column", background: "var(--bg)", overflow: "hidden" }}>
 
       {!preview && (
         <MobileBuilderHeader
@@ -154,7 +154,7 @@ export function MobileBuilderShell(p: MobileBuilderShellProps) {
           <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 12px 10px" }}>
             <span style={{ fontSize: 12, color: "var(--accent)", fontWeight: 700 }} data-testid="mobile-preview-banner">Aperçu</span>
             <div style={{ flex: 1 }} />
-            <button type="button" data-testid="mobile-exit-preview" onClick={() => setPreview(false)} style={{ padding: "8px 14px", minHeight: 40, borderRadius: 9, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "#F5F0E8", fontSize: 13, cursor: "pointer" }}>Éditer</button>
+            <button type="button" data-testid="mobile-exit-preview" onClick={() => setPreview(false)} style={{ padding: "8px 14px", minHeight: 40, borderRadius: 9, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "var(--ink)", fontSize: 13, cursor: "pointer" }}>Éditer</button>
           </div>
         )}
         {p.renderCanvas()}
@@ -207,7 +207,7 @@ export function MobileBuilderShell(p: MobileBuilderShellProps) {
           <div style={{ padding: "0 12px 16px" }}>
             <input value={structureQuery} onChange={e => setStructureQuery(e.target.value)} type="search"
               aria-label="Rechercher un bloc" placeholder="Rechercher un bloc…"
-              style={{ width: "100%", boxSizing: "border-box", height: 44, background: "#111", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 10, padding: "0 12px", color: "var(--ink, #F5F0E8)", fontSize: 15, outline: "none", marginBottom: 10 }} />
+              style={{ width: "100%", boxSizing: "border-box", height: 44, background: "#111", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 10, padding: "0 12px", color: "var(--ink, var(--ink))", fontSize: 15, outline: "none", marginBottom: 10 }} />
             {filteredStructure.length === 0 && <p style={{ color: MUTED, fontSize: 13, textAlign: "center", padding: "16px 0" }}>Aucun bloc.</p>}
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {filteredStructure.map((b) => {
@@ -218,7 +218,7 @@ export function MobileBuilderShell(p: MobileBuilderShellProps) {
                     style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 10, border: `1px solid ${b.id === p.selectedId ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "rgba(255,255,255,0.07)"}`, background: b.id === p.selectedId ? "color-mix(in srgb, var(--accent) 10%, transparent)" : "rgba(255,255,255,0.02)", opacity: b.visible ? 1 : 0.5 }}>
                     <span style={{ width: 22, textAlign: "center", color: MUTED, fontSize: 10, fontWeight: 700 }}>{idx + 1}</span>
                     <button type="button" data-structure-select={b.id} onClick={() => selectAndEdit(b.id)}
-                      style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", color: "var(--ink, #F5F0E8)", textAlign: "left", padding: 0, minHeight: 40 }}>
+                      style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", color: "var(--ink, var(--ink))", textAlign: "left", padding: 0, minHeight: 40 }}>
                       <span aria-hidden="true" style={{ fontSize: 15 }}>{def?.icon}</span>
                       <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 13.5 }}>{def?.label ?? b.type}</span>
                       {b.draft && <span aria-label="Brouillon" style={{ fontSize: 11 }}>✏</span>}
@@ -251,7 +251,7 @@ export function MobileBuilderShell(p: MobileBuilderShellProps) {
         {effectiveSheet.open && effectiveSheet.tab === "publish" && (
           <div style={{ padding: "0 14px 18px", display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", borderRadius: 10, background: p.pageStatus === "published" ? "color-mix(in srgb, var(--success) 10%, transparent)" : "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-              <span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink, #F5F0E8)" }}>{p.pageStatus === "published" ? "Page en ligne" : "Brouillon (non publié)"}</span>
+              <span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink, var(--ink))" }}>{p.pageStatus === "published" ? "Page en ligne" : "Brouillon (non publié)"}</span>
             </div>
             <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 6 }}>
               <li style={{ fontSize: 12.5, color: MUTED }}>📦 {summary.blocks} bloc{summary.blocks > 1 ? "s" : ""}</li>
@@ -259,7 +259,7 @@ export function MobileBuilderShell(p: MobileBuilderShellProps) {
               {p.saveError && <li data-testid="publish-save-error" style={{ fontSize: 12.5, color: "var(--danger)" }}>⚠ Sauvegarde en erreur — réessayez avant de publier.</li>}
             </ul>
             <button type="button" data-testid="mobile-publish" disabled={!p.onPublish || p.publishing || p.saveError} onClick={() => p.onPublish?.()}
-              style={{ minHeight: 48, borderRadius: 12, border: "none", background: "var(--accent)", color: "#080808", fontSize: 14, fontWeight: 800, cursor: p.onPublish && !p.publishing && !p.saveError ? "pointer" : "not-allowed", opacity: p.onPublish && !p.saveError ? 1 : 0.5 }}>
+              style={{ minHeight: 48, borderRadius: 12, border: "none", background: "var(--accent)", color: "var(--ink-on-accent)", fontSize: 14, fontWeight: 800, cursor: p.onPublish && !p.publishing && !p.saveError ? "pointer" : "not-allowed", opacity: p.onPublish && !p.saveError ? 1 : 0.5 }}>
               {p.publishing ? "Publication…" : p.pageStatus === "published" ? "Mettre à jour la page" : "Publier maintenant"}
             </button>
             {p.publishError && <p data-testid="publish-error" style={{ margin: 0, fontSize: 12, color: "var(--danger)" }}>{p.publishError}</p>}

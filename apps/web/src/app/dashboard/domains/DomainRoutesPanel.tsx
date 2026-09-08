@@ -127,14 +127,14 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
 
   if (verifiedDomains.length === 0) {
     return (
-      <div style={{ background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.07)", borderRadius:14, padding:24, fontFamily:"DM Sans, sans-serif" }}>
+      <div style={{ background:"var(--surface)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:14, padding:24, fontFamily:"DM Sans, sans-serif" }}>
         <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
           <Layers size={16} color={MUTED}/>
-          <h3 style={{ color:"#F5F0E8", fontSize:14, fontWeight:700, margin:0 }}>Routing multi-pages</h3>
+          <h3 style={{ color:"var(--ink)", fontSize:14, fontWeight:700, margin:0 }}>Routing multi-pages</h3>
         </div>
         <div style={{ textAlign:"center", padding:"24px 0", color:MUTED }}>
           <Globe size={28} color={MUTED} style={{ marginBottom:10 }}/>
-          <p style={{ margin:"0 0 4px", fontSize:13, color:"#F5F0E8" }}>Aucun domaine vérifié</p>
+          <p style={{ margin:"0 0 4px", fontSize:13, color:"var(--ink)" }}>Aucun domaine vérifié</p>
           <p style={{ margin:0, fontSize:12 }}>Vérifiez un domaine pour configurer les routes</p>
         </div>
       </div>
@@ -142,14 +142,14 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
   }
 
   return (
-    <div style={{ background:"#0F0E0B", border:"1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius:14, padding:24, fontFamily:"DM Sans, sans-serif" }}>
+    <div style={{ background:"var(--surface)", border:"1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius:14, padding:24, fontFamily:"DM Sans, sans-serif" }}>
 
       {/* Header */}
       <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:20, gap:12, flexWrap:"wrap" }}>
         <div>
           <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
             <Layers size={16} color={G}/>
-            <h3 style={{ color:"#F5F0E8", fontSize:14, fontWeight:700, margin:0 }}>Routing multi-pages</h3>
+            <h3 style={{ color:"var(--ink)", fontSize:14, fontWeight:700, margin:0 }}>Routing multi-pages</h3>
           </div>
           <p style={{ color:MUTED, fontSize:12, margin:0 }}>
             Associez chaque sous-domaine à une page différente
@@ -176,7 +176,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
               <span style={{ fontSize:14 }}>{ex.icon}</span>
               <code style={{ color:G, fontSize:11, flex:1 }}>{ex.url}</code>
               <ArrowRight size={11} color={MUTED}/>
-              <span style={{ color:"#F5F0E8", fontSize:11 }}>{ex.page}</span>
+              <span style={{ color:"var(--ink)", fontSize:11 }}>{ex.page}</span>
               {ex.special === "wildcard" && (
                 <span style={{ background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:5, padding:"1px 6px", fontSize:9, color:G }}>wildcard</span>
               )}
@@ -189,7 +189,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
       {showForm && (
         <div style={{ background:"rgba(255,255,255,0.02)", border:"1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius:11, padding:18, marginBottom:18 }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
-            <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:700, margin:0 }}>Nouvelle route</p>
+            <p style={{ color:"var(--ink)", fontSize:13, fontWeight:700, margin:0 }}>Nouvelle route</p>
             <button type="button" onClick={() => { setShowForm(false); setError("") }}
               style={{ background:"none", border:"none", color:MUTED, cursor:"pointer" }}>
               <X size={15}/>
@@ -201,7 +201,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
             <div>
               <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:5 }}>Domaine racine</label>
               <select aria-label="Domaine" value={fDomain} onChange={e => setFDomain(e.target.value)}
-                style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, color:"#F5F0E8", padding:"9px 12px", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
+                style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                 {verifiedDomains.map(d => (
                   <option key={d.id} value={d.domain}>{d.domain}</option>
                 ))}
@@ -212,7 +212,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
             <div>
               <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:5 }}>Sous-domaine</label>
               <select aria-label="Sous-domaine" value={fSub} onChange={e => setFSub(e.target.value)}
-                style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, color:"#F5F0E8", padding:"9px 12px", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const, marginBottom:6 }}>
+                style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const, marginBottom:6 }}>
                 <option value="">Domaine racine ({fDomain})</option>
                 <option value="www">www.{fDomain}</option>
                 <option value="booking">booking.{fDomain}</option>
@@ -225,10 +225,10 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
                 <option value="__custom__">Autre (saisie libre)</option>
               </select>
               {fSub === "__custom__" && (
-                <div style={{ display:"flex", alignItems:"center", gap:0, background:"#111009", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:8, overflow:"hidden" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:0, background:"var(--surface)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:8, overflow:"hidden" }}>
                   <input value={fCustomSub} onChange={e => setFCustomSub(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g,""))}
                     placeholder="mon-sous-domaine"
-                    style={{ flex:1, background:"transparent", border:"none", color:"#F5F0E8", padding:"9px 10px", fontSize:12, outline:"none" }}/>
+                    style={{ flex:1, background:"transparent", border:"none", color:"var(--ink)", padding:"9px 10px", fontSize:12, outline:"none" }}/>
                   <span style={{ color:MUTED, fontSize:11, padding:"0 10px", whiteSpace:"nowrap" }}>.{fDomain}</span>
                 </div>
               )}
@@ -244,7 +244,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
             <div>
               <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:5 }}>Page cible</label>
               <select aria-label="Page de destination" value={fPageId} onChange={e => setFPageId(e.target.value)}
-                style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, color:"#F5F0E8", padding:"9px 12px", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
+                style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                 {pages.map(p => (
                   <option key={p.id} value={p.id}>
                     {p.title} {p.status !== "published" ? "(brouillon)" : ""}
@@ -325,7 +325,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
 
                         {/* Page cible */}
                         <div style={{ minWidth:0, maxWidth:160 }}>
-                          <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+                          <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
                             {route.pages?.title ?? "Page inconnue"}
                           </p>
                           <p style={{ color:MUTED, fontSize:10, margin:"2px 0 0" }}>/{route.pages?.slug}</p>

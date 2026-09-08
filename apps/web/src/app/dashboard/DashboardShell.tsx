@@ -1,13 +1,9 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { Fragment, useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import {
-  QrCode, User,
-  Activity, ChevronRight, LogOut, Menu, X, Eye,
-  Plus, Printer, Sparkles, Link2, LayoutTemplate, Image as ImageIcon
-} from "lucide-react"
+import { QrCode, ChevronRight, Printer, Sparkles, Link2, LayoutTemplate, Image as ImageIcon } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { ToastProvider } from "@/components/Toast"
 import { ConfirmProvider } from "@/components/ui/Confirm"
@@ -17,12 +13,12 @@ import { accessibleOwnerIds } from "@/lib/team"
 import { pageLimit } from "@/lib/plans"
 
 const DEFAULT_ACCENT = "#C9A84C"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 
 // Jeu de glyphes filaires de la nav (DA §10) : 16×16, traits 1.4px, dessinés en `currentColor` → ils s'éclairent
-// avec le libellé (actif or / survol clair / repos muté). Fond des masques = #0A0A0A (fond réel de la sidebar).
+// avec le libellé (actif or / survol clair / repos muté). Fond des masques = le fond réel de la coquille.
 const S16 = { position: "relative" as const, display: "inline-block" as const, width: 16, height: 16, flexShrink: 0 }
-const SB  = "#0A0A0A"
+const SB  = "var(--bg)"
 
 // Glyphe QR partagé (même dessin que la tuile du header, à l'échelle nav) : 3 repères + matrice de données.
 function QRNavGlyph() {
@@ -123,33 +119,42 @@ function NavGlyph({ name }: { name: string }) {
   }
 }
 
-// Navigation groupée en 4 familles étiquetées (DA §10) — glyphes filaires maison (voir NavGlyph).
-const NAV_GROUPS = [
-  { label: "Principal", items: [
+// Navigation en MODULES (8 septembre, d'après la maquette « nouvelle direction ») :
+// un rail d'icônes à gauche — Accueil · Pages · QR codes · Impression ·
+// Statistiques · Réglages — et, quand le module a plusieurs écrans, une colonne
+// qui les liste. Aucune route n'a disparu : les 13 écrans de l'ancienne barre
+// latérale sont tous là, simplement rangés par ce qu'on vient y faire.
+// Le rail montre toujours l'icône ET le nom du module (pas d'icône muette).
+type NavItem = { href: string; glyph: string; label: string; exact?: boolean }
+type NavGroup = { key: string; label: string; kicker: string; glyph: string; items: NavItem[] }
+const NAV_GROUPS: NavGroup[] = [
+  { key: "accueil", label: "Accueil", kicker: "Votre espace", glyph: "dashboard", items: [
     { href: "/dashboard", glyph: "dashboard", label: "Accueil", exact: true },
+  ] },
+  { key: "pages", label: "Pages", kicker: "Construire", glyph: "templates", items: [
     { href: "/dashboard/templates", glyph: "templates", label: "Modèles" },
     { href: "/dashboard/assets", glyph: "media", label: "Médias" },
   ] },
-  // Deux entrées fabriquent des QR codes. Elles s'appelaient « QR Codes » et
-  // « QR Dynamique », et toutes deux se décrivaient comme « créez un QR code » :
-  // aucun moyen de choisir. Elles portent maintenant le nom de ce vers quoi le QR
-  // mène — la seule question que se pose vraiment un commerçant.
-  { label: "QR & impression", items: [
+  // Deux entrées fabriquent des QR codes. Elles portent le nom de ce vers quoi
+  // le QR mène — la seule question que se pose vraiment un commerçant.
+  { key: "qr", label: "QR codes", kicker: "Mes QR codes", glyph: "qr", items: [
     { href: "/dashboard/qr-codes", glyph: "qr", label: "QR de pages" },
-    { href: "/dashboard/print-studio", glyph: "print", label: "Atelier d'impression" },
     { href: "/dashboard/qr-link", glyph: "dynamic", label: "QR vers un lien" },
   ] },
-  { label: "Mesure", items: [
+  { key: "print", label: "Impression", kicker: "Imprimer", glyph: "print", items: [
+    { href: "/dashboard/print-studio", glyph: "print", label: "Atelier d'impression" },
+  ] },
+  { key: "stats", label: "Statistiques", kicker: "Mesurer", glyph: "analytics", items: [
     { href: "/dashboard/analytics", glyph: "analytics", label: "Statistiques" },
-    // « Objectifs » n'est plus une page : la section vit en bas du Dashboard (#objectifs).
+    // « Objectifs » n'est plus une page : la section vit en bas de l'Accueil (#objectifs).
     { href: "/dashboard/leads", glyph: "messages", label: "Messages" },
   ] },
-  { label: "Compte", items: [
+  { key: "reglages", label: "Réglages", kicker: "Espace", glyph: "settings", items: [
+    { href: "/dashboard/profile", glyph: "profile", label: "Profil" },
+    { href: "/dashboard/settings", glyph: "settings", label: "Paramètres" },
     { href: "/dashboard/team", glyph: "team", label: "Équipe" },
     { href: "/dashboard/domains", glyph: "domains", label: "Domaines" },
     { href: "/dashboard/redirects", glyph: "redirects", label: "Redirections" },
-    { href: "/dashboard/profile", glyph: "profile", label: "Profil" },
-    { href: "/dashboard/settings", glyph: "settings", label: "Paramètres" },
   ] },
 ]
 
@@ -157,10 +162,14 @@ const NAV_GROUPS = [
 // personne atterrit ici avant même d'avoir un compte : lui montrer Analytics,
 // Messages, Équipe, Domaines ou Facturation revient à lui présenter douze portes
 // dont neuf sont fermées à clé. On ne garde que ce qui marche vraiment sans session.
-const GUEST_NAV: { label: string; items: { href: string; glyph: string; label: string; exact?: boolean }[] }[] = [
-  { label: "", items: [
+const GUEST_NAV: NavGroup[] = [
+  { key: "modeles", label: "Modèles", kicker: "Construire", glyph: "templates", items: [
     { href: "/dashboard/templates", glyph: "templates", label: "Modèles" },
+  ] },
+  { key: "page", label: "Ma page", kicker: "Construire", glyph: "dashboard", items: [
     { href: "/dashboard/builder", glyph: "dashboard", label: "Ma page" },
+  ] },
+  { key: "qr", label: "QR codes", kicker: "Mes QR codes", glyph: "qr", items: [
     { href: "/dashboard/qr-link", glyph: "dynamic", label: "QR vers un lien" },
   ] },
 ]
@@ -331,266 +340,193 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
     return pathname.startsWith(href)
   }
 
-  const W = isMobile ? 0 : (collapsed ? 72 : 240)
+  // Module et écran courants : le rail éclaire le module, la colonne liste ses
+  // écrans, la barre du haut écrit « Module › Écran ».
+  const groups = guest ? GUEST_NAV : NAV_GROUPS
+  const moduleActif = groups.find(g => g.items.some(it => isActive(it.href, it.exact)))
+  const ecranActif = moduleActif?.items.find(it => isActive(it.href, it.exact))
+  // La colonne n'existe que si le module a plusieurs écrans ; « collapsed » (préférence
+  // utilisateur, cookie) la replie — ses écrans restent joignables par le survol du rail.
+  const colonne = !!moduleActif && moduleActif.items.length > 1 && !collapsed
+  // Studios immersifs : ils portent leur propre barre du haut.
+  const immersif = hideMobileNav
+
+  const initiale = (profile?.full_name || user?.email || "?")[0].toUpperCase()
+
+  // Replier / déployer la colonne des écrans (préférence gardée par cookie) ; calé
+  // en bas du rail, juste au-dessus de Réglages.
+  const bouton = !guest && moduleActif && moduleActif.items.length > 1 ? (
+      <button type="button" onClick={() => setCollapsed(p => !p)} aria-label={collapsed ? "Déployer le menu" : "Replier le menu"} aria-expanded={!collapsed}
+        className="qf-tile"
+        style={{ width: 32, height: 32, marginTop: 6, display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "1px solid var(--line)", borderRadius: 8, cursor: "pointer", color: MUTED, flexShrink: 0 }}>
+        <ChevronRight size={13} style={{ transform: collapsed ? "rotate(0deg)" : "rotate(180deg)", transition: "transform .2s" }} />
+      </button>
+    
+  ) : null
 
   return (
     <div style={{
-      display: "flex", height: "100dvh", fontFamily: "DM Sans, sans-serif", overflow: "hidden",
+      display: "flex", flexDirection: "column", height: "100dvh", fontFamily: "DM Sans, sans-serif", overflow: "hidden",
       // Aplat : la trame QR et la lueur qui couvraient toute l'application sont
       // retirées (couche « Calme », 8 septembre) — la trame ne sert plus qu'aux
       // scènes de travail.
       background: "var(--bg)",
     }}>
-      {/* SIDEBAR (masquée sur mobile : remplacée par la barre du bas). La classe
-          porte la media query qui la cache dès le HTML serveur, avant tout JS. */}
-      <div className="qf-sidebar" style={{
-        width: W, minWidth: W, background: "var(--bg)",
-        borderRight: "1px solid var(--line)",
-        display: isMobile ? "none" : "flex", flexDirection: "column",
-        transition: "width 0.25s var(--mo-ease-emphasized), min-width 0.25s var(--mo-ease-emphasized)",
-        overflow: "hidden", flexShrink: 0, position: "relative", zIndex: 30
-      }}>
-        {/* Header: Logo + Toggle */}
-        <div style={{ height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", padding: collapsed ? "0 14px" : "0 16px 0 20px", borderBottom: "1px solid rgba(201,168,76,0.08)", flexShrink: 0 }}>
-          {/* Logo — lockup 1b (handoff « Logo QROWG ») : repère à contour transparent + mot IVOIRE,
-              l'or ne reste que sur le Q ; lueur diagonale confinée au repère. Anime au montage. */}
-          <Link href="/dashboard" aria-label="QROWG — tableau de bord" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 11, overflow: "hidden" }}>
-            {/* Repère QR (30×30) : la lueur est masquée par l'overflow arrondi du repère. */}
-            <span style={{ position: "relative", overflow: "hidden", display: "inline-flex", flexShrink: 0, width: 30, height: 30, borderRadius: 9 }}>
-              <span aria-hidden="true" className="qlogo-glow" style={{ position: "absolute", top: "-60%", bottom: "-60%", left: 0, width: "34%", zIndex: 1, pointerEvents: "none", background: "linear-gradient(90deg, rgba(251,240,207,0), rgba(251,240,207,.4), rgba(251,240,207,0))", transform: "translateX(-170%) rotate(18deg)" }} />
-              <svg viewBox="0 0 32 32" width="30" height="30" style={{ flex: "none" }}>
-                <rect className="qlogo-frame" x=".9" y=".9" width="30.2" height="30.2" rx="9" fill="none" stroke="rgba(232,200,119,.26)" strokeWidth="1.4" style={{ transformBox: "fill-box", transformOrigin: "center" }} />
-                <g className="qlogo-pop" style={{ transformBox: "fill-box", transformOrigin: "center", animationDelay: ".1s" }}><rect x="7" y="7" width="7" height="7" rx="2" fill="none" stroke="#e8c877" strokeWidth="1.5" /><rect x="10" y="10" width="1.9" height="1.9" fill="#e8c877" /></g>
-                <g className="qlogo-pop" style={{ transformBox: "fill-box", transformOrigin: "center", animationDelay: ".18s" }}><rect x="18" y="7" width="7" height="7" rx="2" fill="none" stroke="rgba(244,239,230,.55)" strokeWidth="1.5" /><rect x="21" y="10" width="1.9" height="1.9" fill="rgba(244,239,230,.55)" /></g>
-                <g className="qlogo-pop" style={{ transformBox: "fill-box", transformOrigin: "center", animationDelay: ".26s" }}><rect x="7" y="18" width="7" height="7" rx="2" fill="none" stroke="rgba(244,239,230,.55)" strokeWidth="1.5" /><rect x="10" y="21" width="1.9" height="1.9" fill="rgba(244,239,230,.55)" /></g>
-                <rect className="qlogo-blink" x="19.5" y="19.5" width="2.6" height="2.6" fill="#e8c877" />
-                <rect x="23.4" y="23.4" width="2.6" height="2.6" fill="rgba(244,239,230,.3)" />
+      {/* BARRE DU HAUT (PC) : logo · Module › Écran · compte. Cachée sur téléphone par le
+          CSS (.qf-topbar) et dans les studios immersifs qui ont la leur. */}
+      {!immersif && (
+        <header className="qf-topbar" style={{ height: 56, flexShrink: 0, display: "flex", alignItems: "center", gap: 18, padding: "0 18px 0 16px", borderBottom: "1px solid var(--line)" }}>
+          <Link href="/dashboard" aria-label="QROWG — tableau de bord" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+            <span style={{ display: "inline-flex", width: 28, height: 28, borderRadius: 8 }}>
+              <svg viewBox="0 0 32 32" width="28" height="28" style={{ flex: "none" }} aria-hidden="true">
+                <rect x=".9" y=".9" width="30.2" height="30.2" rx="9" fill="none" stroke="rgba(212,175,69,.35)" strokeWidth="1.4" />
+                <rect x="7" y="7" width="7" height="7" rx="2" fill="none" stroke="var(--gold)" strokeWidth="1.5" /><rect x="10" y="10" width="1.9" height="1.9" fill="var(--gold)" />
+                <rect x="18" y="7" width="7" height="7" rx="2" fill="none" stroke="rgba(244,241,232,.55)" strokeWidth="1.5" /><rect x="21" y="10" width="1.9" height="1.9" fill="rgba(244,241,232,.55)" />
+                <rect x="7" y="18" width="7" height="7" rx="2" fill="none" stroke="rgba(244,241,232,.55)" strokeWidth="1.5" /><rect x="10" y="21" width="1.9" height="1.9" fill="rgba(244,241,232,.55)" />
+                <rect x="19.5" y="19.5" width="2.6" height="2.6" fill="var(--gold)" /><rect x="23.4" y="23.4" width="2.6" height="2.6" fill="rgba(244,241,232,.3)" />
               </svg>
             </span>
-            {!collapsed && (
-              <span style={{ position: "relative", display: "inline-block", fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 600, letterSpacing: ".035em", lineHeight: 1.15, whiteSpace: "nowrap" }}>
-                {/* Couche IVOIRE lisible (une seule pour les lecteurs d'écran) — les lettres montent une à une. */}
-                <span style={{ display: "inline-block", overflow: "hidden", padding: "3px 0", color: "#f4efe6", verticalAlign: "top" }}>
-                  {["Q", "R", "O", "W", "G"].map((ch, i) => (
-                    <span key={i} className="qlogo-rise" style={{ display: "inline-block", animationDelay: `${(0.22 + i * 0.055).toFixed(3)}s` }}>{ch}</span>
-                  ))}
-                </span>
-                {/* Calque OR (décoratif) clipé sur le Q — s'écoule dans le mot puis se retire (omGoldSettle). */}
-                <span aria-hidden="true" className="qlogo-gold" style={{ position: "absolute", left: 0, top: 3, whiteSpace: "nowrap", clipPath: "inset(0 79% 0 0)", background: "linear-gradient(100deg, #c09a45 0%, #fbf0cf 26%, #e8c877 52%, #c09a45 76%, #fbf0cf 100%)", backgroundSize: "220% 100%", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent", color: "transparent" }}>QROWG</span>
-              </span>
-            )}
+            <span style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 15, fontWeight: 700, letterSpacing: ".16em", color: "var(--ink)" }}>QROWG</span>
           </Link>
-          {/* Bouton toggle */}
-          <button onClick={() => setCollapsed(p => !p)} aria-label={collapsed ? "Déployer le menu" : "Replier le menu"} aria-expanded={!collapsed}
-            style={{ width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, cursor: "pointer", color: MUTED, flexShrink: 0, transition: "all 0.2s" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.1)"; e.currentTarget.style.color = G; e.currentTarget.style.borderColor = "rgba(201,168,76,0.3)" }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.color = MUTED; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)" }}>
-            <ChevronRight size={13} style={{ transform: collapsed ? "rotate(0deg)" : "rotate(180deg)", transition: "transform 0.25s" }} />
-          </button>
-        </div>
 
-        {/* Navigation */}
-        <nav aria-label="Navigation principale" style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: "10px 8px" }} className="sidebar-nav">
-          {(guest ? GUEST_NAV : NAV_GROUPS).map((group, gi) => (
-            <div key={group.label}>
-              {/* Étiquette de famille (DA §10) — masquée repliée ; un filet sépare les groupes en mode réduit. */}
-              {!collapsed && group.label
-                ? <div style={{ padding: gi === 0 ? "2px 8px 5px" : "12px 8px 5px", fontSize: 9.5, letterSpacing: ".2em", textTransform: "uppercase", color: "#5c554b", fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden" }}>{group.label}</div>
-                : gi > 0 && <div aria-hidden="true" style={{ margin: "8px 12px", height: 1, background: "rgba(255,255,255,0.05)" }} />}
-              {group.items.map(({ href, glyph, label, exact }) => {
+          {/* Fil : Module › Écran */}
+          {moduleActif && (
+            <nav aria-label="Vous êtes ici" style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, fontSize: 13.5 }}>
+              <span style={{ color: MUTED }}>{moduleActif.label}</span>
+              {ecranActif && ecranActif.label !== moduleActif.label && <>
+                <span aria-hidden="true" style={{ color: "var(--faint)" }}>›</span>
+                <span style={{ color: "var(--ink)", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{ecranActif.label}</span>
+              </>}
+            </nav>
+          )}
+
+          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+            {/* Visiteur sans compte : « Passer au Pro » et sa jauge n'ont aucun sens — il
+                n'a même pas de plan. On lui dit plutôt ce qu'un compte apporte. */}
+            {guest && (
+              <Link href="/auth/signup" className="da-btn-primary--sm" title="Pour publier votre page, obtenir son QR code et suivre les scans. Gratuit."
+                style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", height: 34, padding: "0 14px", fontSize: 12.5, fontWeight: 700, background: "var(--accent)", color: "var(--ink-on-accent)", borderRadius: 9 }}>
+                Créer mon compte
+              </Link>
+            )}
+
+            {/* Puce du plan (DA §10) : nom du plan + jauge de quota RÉELLE (pages publiées / limite). */}
+            {!guest && (() => {
+              const plan = profile?.plan || "free"
+              const isPaid = plan === "pro" || plan === "business" || plan === "starter"
+              const planLabel = plan === "business" ? "Business" : plan === "pro" ? "Plan Pro" : plan === "starter" ? "Starter" : "Passer au Pro"
+              // Une page = un QR de page : la jauge parle donc de pages, et le dit.
+              const planLimit = pageLimit(plan)
+              const pct = planLimit && qrActive != null ? Math.min(100, Math.round((qrActive / planLimit) * 100)) : 0
+              const quota = planLimit && qrActive != null ? `${qrActive} / ${planLimit}` : planLimit == null && qrActive != null ? `${qrActive} · illimité` : null
+              return (
+                <Link href="/upgrade" className="qf-chip" aria-label="Voir les offres"
+                  title={quota ? `Pages publiées : ${quota}` : isPaid ? "Abonnement actif" : "Débloquez tout QRowg"}
+                  style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10, height: 34, padding: "0 12px", borderRadius: 9, border: "1px solid var(--line-strong)", background: "var(--surface)" }}>
+                  <span style={{ fontSize: 12.5, fontWeight: 600, color: isPaid ? "var(--ink)" : "var(--accent)", whiteSpace: "nowrap" }}>{planLabel}</span>
+                  {quota && <>
+                    <span style={{ fontSize: 11.5, color: MUTED, whiteSpace: "nowrap" }}>Pages publiées {quota}</span>
+                    {planLimit && <span aria-hidden="true" style={{ width: 44, height: 3, borderRadius: 2, background: "var(--surface-2)", overflow: "hidden" }}>
+                      <span style={{ display: "block", width: `${pct}%`, height: "100%", background: "var(--accent)", transition: "width .6s cubic-bezier(.2,.8,.2,1)" }} />
+                    </span>}
+                  </>}
+                </Link>
+              )
+            })()}
+
+            {/* Compte : avatar → profil. */}
+            {user && (
+              <Link href="/dashboard/profile" aria-label="Mon profil" title={profile?.full_name || user.email || "Mon profil"}
+                style={{ textDecoration: "none", width: 34, height: 34, borderRadius: "50%", background: "var(--accent)", color: "var(--ink-on-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>
+                {initiale}
+              </Link>
+            )}
+          </div>
+        </header>
+      )}
+
+      <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
+        {/* RAIL + COLONNE (masqués sur mobile : remplacés par la barre du bas). La classe
+            porte la media query qui les cache dès le HTML serveur, avant tout JS. */}
+        <div className="qf-sidebar" style={{ display: isMobile ? "none" : "flex", flexShrink: 0, position: "relative", zIndex: 30 }}>
+          {/* Rail : un module = une tuile (icône + nom). Réglages est calé en bas. */}
+          <nav aria-label="Navigation principale" className="sidebar-nav" style={{ width: 76, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "10px 8px 12px", borderRight: "1px solid var(--line)", overflowY: "auto", overflowX: "visible" }}>
+            {groups.map((g, gi) => {
+              const actif = moduleActif?.key === g.key
+              const cible = g.items[0]
+              const dernier = gi === groups.length - 1 && !guest
+              const badge = g.items.some(it => it.href === "/dashboard/leads") && unreadLeads > 0
+              return (<Fragment key={g.key}>
+                {dernier && <div style={{ marginTop: "auto", display: "flex", justifyContent: "center", width: "100%" }}>
+                  {bouton}
+                </div>}
+                <div className="sidebar-item" style={{ position: "relative", width: "100%" }}>
+                  <Link href={cible.href} className="qf-tile" aria-current={actif ? "page" : undefined}
+                    style={{
+                      textDecoration: "none", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5,
+                      height: 58, borderRadius: 10,
+                      background: actif ? "var(--surface-2)" : "transparent",
+                      border: actif ? "1px solid color-mix(in srgb, var(--accent) 45%, transparent)" : "1px solid transparent",
+                      color: actif ? "var(--accent)" : MUTED,
+                      transition: "background .15s, color .15s, border-color .15s",
+                    }}>
+                    <span style={{ position: "relative", display: "flex" }}>
+                      <NavGlyph name={g.glyph} />
+                      {badge && <span style={{ position: "absolute", top: -5, right: -7, minWidth: 15, height: 15, padding: "0 4px", borderRadius: 8, background: "var(--danger)", color: "#fff", fontSize: 9, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, boxShadow: "0 0 0 2px var(--bg)" }}>{unreadLeads > 99 ? "99+" : unreadLeads}</span>}
+                    </span>
+                    <span style={{ fontSize: 10.5, fontWeight: actif ? 600 : 500, letterSpacing: ".01em", whiteSpace: "nowrap" }}>{g.label}</span>
+                  </Link>
+                  {/* Survol : les écrans du module, quand la colonne est repliée ou que le module n'est pas ouvert. */}
+                  {g.items.length > 1 && (!colonne || !actif) && (
+                    <div className="sidebar-tooltip" role="group" aria-label={g.label} style={{
+                      position: "absolute", left: "calc(100% + 8px)", top: 0, minWidth: 190,
+                      background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 10,
+                      padding: 6, zIndex: 100, opacity: 0, pointerEvents: "none", transition: "opacity .15s", boxShadow: "0 12px 32px rgba(0,0,0,.45)"
+                    }}>
+                      <div style={{ padding: "6px 10px 4px", fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700 }}>{g.label}</div>
+                      {g.items.map(it => (
+                        <Link key={it.href} href={it.href} className="qf-row" aria-current={isActive(it.href, it.exact) ? "page" : undefined}
+                          style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 7, fontSize: 12.5, color: isActive(it.href, it.exact) ? "var(--accent)" : "var(--ink)", whiteSpace: "nowrap" }}>
+                          {it.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </Fragment>)
+            })}
+          </nav>
+
+          {/* Colonne : les écrans du module ouvert. */}
+          {colonne && moduleActif && (
+            <nav aria-label={`Écrans — ${moduleActif.label}`} style={{ width: 232, display: "flex", flexDirection: "column", padding: "18px 12px 12px", borderRight: "1px solid var(--line)", overflowY: "auto" }}>
+              <div style={{ padding: "0 8px 12px" }}>
+                <div style={{ fontSize: 10, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700 }}>{moduleActif.kicker}</div>
+                <div style={{ fontSize: 18, fontWeight: 600, color: "var(--ink)", letterSpacing: "-.01em", marginTop: 4 }}>{moduleActif.label}</div>
+              </div>
+              {moduleActif.items.map(({ href, label, exact }) => {
                 const active = isActive(href, exact)
+                const nonLus = href === "/dashboard/leads" && unreadLeads > 0
                 return (
-                  <div key={href} style={{ position: "relative" }} className="sidebar-item">
-                    <Link href={href} style={{ textDecoration: "none" }} aria-label={collapsed ? label : undefined} aria-current={active ? "page" : undefined}>
-                      <div style={{
-                        position: "relative",
-                        display: "flex", alignItems: "center", gap: 11,
-                        padding: collapsed ? "10px 0" : "9px 12px",
-                        justifyContent: collapsed ? "center" : "flex-start",
-                        borderRadius: 9,
-                        background: active ? "linear-gradient(90deg, color-mix(in srgb, var(--accent) 10%, transparent), color-mix(in srgb, var(--accent) 2%, transparent))" : "transparent",
-                        border: "1px solid transparent",
-                        color: active ? G : MUTED,
-                        fontSize: 13, fontWeight: active ? 600 : 400,
-                        cursor: "pointer",
-                        transition: "all 0.15s",
-                        marginBottom: 2,
-                        whiteSpace: "nowrap", overflow: "hidden",
-                      }}
-                      onMouseEnter={e => { if (!active) { e.currentTarget.style.background = "rgba(255,255,255,0.035)"; e.currentTarget.style.color = "#e8e3da" } }}
-                      onMouseLeave={e => { if (!active) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MUTED } }}>
-                        {/* Filet doré à gauche de l'item actif (DA §08/§10) */}
-                        {active && !collapsed && <span aria-hidden="true" style={{ position: "absolute", left: 0, top: 8, bottom: 8, width: 2, borderRadius: 2, background: `linear-gradient(180deg, ${G}, color-mix(in srgb, var(--accent) 70%, #000))` }} />}
-                        <div style={{ position: "relative", flexShrink: 0, display: "flex" }}>
-                          <NavGlyph name={glyph} />
-                          {href === "/dashboard/leads" && unreadLeads > 0 && (
-                            <span style={{ position: "absolute", top: -5, right: collapsed ? -5 : -6, minWidth: 15, height: 15, padding: "0 4px", borderRadius: 8, background: "#EF4444", color: "#fff", fontSize: 9, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, boxShadow: "0 0 0 2px #0A0A0A" }}>{unreadLeads > 99 ? "99+" : unreadLeads}</span>
-                          )}
-                        </div>
-                        {!collapsed && <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{label}</span>}
-                        {!collapsed && href === "/dashboard/leads" && unreadLeads > 0 && <span style={{ marginLeft: "auto", background: "#EF4444", color: "#fff", fontSize: 10, fontWeight: 700, borderRadius: 9, padding: "1px 7px", flexShrink: 0 }}>{unreadLeads > 99 ? "99+" : unreadLeads}</span>}
-                        {!collapsed && active && href !== "/dashboard/leads" && <div style={{ width: 7, height: 7, borderRadius: "50%", background: G, marginLeft: "auto", flexShrink: 0, boxShadow: "0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent)" }} />}
-                      </div>
-                    </Link>
-                    {/* Tooltip en mode collapsed */}
-                    {collapsed && (
-                      <div className="sidebar-tooltip" style={{
-                        position: "absolute", left: "calc(100% + 10px)", top: "50%", transform: "translateY(-50%)",
-                        background: "#1A1A1A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8,
-                        padding: "6px 12px", color: "#F5F0E8", fontSize: 12, fontWeight: 600,
-                        whiteSpace: "nowrap", pointerEvents: "none", zIndex: 100,
-                        opacity: 0, transition: "opacity 0.15s", boxShadow: "0 4px 16px rgba(0,0,0,0.4)"
-                      }}>
-                        {label}
-                      </div>
-                    )}
-                  </div>
+                  <Link key={href} href={href} className="qf-row" aria-current={active ? "page" : undefined}
+                    style={{
+                      position: "relative", textDecoration: "none", display: "flex", alignItems: "center", gap: 10,
+                      minHeight: 44, padding: "0 12px", borderRadius: 9, marginBottom: 2,
+                      background: active ? "var(--surface-2)" : "transparent",
+                      border: active ? "1px solid var(--line-strong)" : "1px solid transparent",
+                      color: active ? "var(--ink)" : MUTED, fontSize: 13.5, fontWeight: active ? 600 : 400,
+                      transition: "background .15s, color .15s",
+                    }}>
+                    {active && <span aria-hidden="true" style={{ position: "absolute", left: -1, top: 10, bottom: 10, width: 2, borderRadius: 2, background: "var(--accent)" }} />}
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
+                    {nonLus && <span style={{ marginLeft: "auto", background: "var(--danger)", color: "#fff", fontSize: 10, fontWeight: 700, borderRadius: 9, padding: "1px 7px", flexShrink: 0 }}>{unreadLeads > 99 ? "99+" : unreadLeads}</span>}
+                    {!nonLus && <ChevronRight size={14} aria-hidden="true" style={{ marginLeft: "auto", flexShrink: 0, opacity: active ? .9 : .45 }} />}
+                  </Link>
                 )
               })}
-            </div>
-          ))}
-        </nav>
-
-        {/* Section bas: Upgrade + User */}
-        <div style={{ padding: "8px", borderTop: "1px solid rgba(255,255,255,0.05)", flexShrink: 0 }}>
-          {/* Visiteur sans compte : « Passer au Pro » et sa jauge de quota n'ont aucun
-              sens — il n'a même pas de plan. On lui dit plutôt ce qu'un compte apporte. */}
-          {guest && (
-            <div className="sidebar-item" style={{ position: "relative" }}>
-              <Link href="/auth/signup" style={{ textDecoration: "none" }} aria-label={collapsed ? "Créer mon compte" : undefined}>
-                <div style={{
-                  display: "flex", flexDirection: collapsed ? "row" : "column",
-                  alignItems: collapsed ? "center" : "stretch", justifyContent: "center", gap: 6,
-                  padding: collapsed ? "10px 0" : "12px 13px", marginBottom: 8,
-                  borderRadius: 11, cursor: "pointer", overflow: "hidden",
-                  background: "color-mix(in srgb, var(--accent) 8%, transparent)",
-                  border: "1px solid color-mix(in srgb, var(--accent) 32%, transparent)",
-                }}>
-                  {collapsed ? <Sparkles size={16} color={G} style={{ flexShrink: 0 }} /> : <>
-                    <span style={{ color: G, fontSize: 12.5, fontWeight: 700 }}>Créer mon compte</span>
-                    <span style={{ color: "#8A8478", fontSize: 11, lineHeight: 1.35 }}>
-                      Pour publier votre page, obtenir son QR code et suivre les scans. Gratuit.
-                    </span>
-                  </>}
-                </div>
-              </Link>
-              {collapsed && (
-                <div className="sidebar-tooltip" style={{
-                  position: "absolute", left: "calc(100% + 10px)", top: "50%", transform: "translateY(-50%)",
-                  background: "#1A1A1A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8,
-                  padding: "6px 12px", color: "#F5F0E8", fontSize: 12, fontWeight: 600,
-                  whiteSpace: "nowrap", pointerEvents: "none", zIndex: 100,
-                  opacity: 0, transition: "opacity 0.15s", boxShadow: "0 4px 16px rgba(0,0,0,0.4)"
-                }}>Créer mon compte</div>
-              )}
-            </div>
-          )}
-
-          {/* Carte plan (DA §10) : bordure bronze, pastille « Actif », jauge de quota RÉELLE (QR actifs / limite du plan). */}
-          {!guest && (() => {
-            const plan = profile?.plan || "free"
-            const isPaid = plan === "pro" || plan === "business" || plan === "starter"
-            const planLabel = plan === "business" ? "Business" : plan === "pro" ? "Plan Pro" : plan === "starter" ? "Starter" : "Passer au Pro"
-            // La jauge annonçait « QR utilisés N / 25 » : elle comptait bien des QR
-            // de page, mais divisait par la limite de PAGES. Sur Pro, la vraie limite
-            // de QR autonomes est 35 — trois nombres appelés « QR » sur le même écran.
-            // Une page = un QR de page : la jauge parle donc de pages, et le dit.
-            const planLimit = pageLimit(plan)
-            const pct = planLimit && qrActive != null ? Math.min(100, Math.round((qrActive / planLimit) * 100)) : 0
-            return (
-              <div style={{ position: "relative" }} className="sidebar-item">
-                <Link href="/upgrade" style={{ textDecoration: "none" }} aria-label={collapsed ? "Voir les offres" : undefined}>
-                  <div style={{
-                    display: "flex", flexDirection: collapsed ? "row" : "column", alignItems: collapsed ? "center" : "stretch", gap: 8,
-                    padding: collapsed ? "10px 0" : "12px 13px",
-                    justifyContent: "center",
-                    borderRadius: 11, cursor: "pointer",
-                    background: "color-mix(in srgb, var(--accent) 4%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 26%, transparent)",
-                    marginBottom: 8, transition: "border-color 0.26s", overflow: "hidden",
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)" }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 26%, transparent)" }}>
-                    {collapsed ? (
-                      <Activity size={16} color={G} style={{ flexShrink: 0 }} />
-                    ) : (
-                      <>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                          <span style={{ fontSize: 12.5, fontWeight: 700, color: G, letterSpacing: "-.01em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{planLabel}</span>
-                          {isPaid && <span style={{ padding: "2px 8px", borderRadius: 999, border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", fontSize: 9.5, letterSpacing: ".1em", textTransform: "uppercase", color: "#c9a24d", fontWeight: 700, flexShrink: 0 }}>Actif</span>}
-                        </div>
-                        {planLimit && qrActive != null ? (
-                          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
-                              <span style={{ fontSize: 11, color: MUTED }}>Pages publiées</span>
-                              <span style={{ fontSize: 11, color: "#b8b1a6" }}>{qrActive} / {planLimit}</span>
-                            </div>
-                            <div style={{ height: 2, borderRadius: 2, background: "#221f1b", overflow: "hidden" }}>
-                              <div style={{ width: `${pct}%`, height: "100%", background: "linear-gradient(90deg, #c9a24d, #e8c877)", transition: "width .6s cubic-bezier(.2,.8,.2,1)" }} />
-                            </div>
-                          </div>
-                        ) : planLimit == null && qrActive != null ? (
-                          <span style={{ fontSize: 11, color: MUTED }}>{qrActive} pages · illimité</span>
-                        ) : (
-                          <span style={{ fontSize: 11, color: MUTED }}>{isPaid ? "Abonnement actif" : "Débloquez tout QRowg"}</span>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </Link>
-                {collapsed && (
-                  <div className="sidebar-tooltip" style={{
-                    position: "absolute", left: "calc(100% + 10px)", top: "50%", transform: "translateY(-50%)",
-                    background: "#1A1A1A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8,
-                    padding: "6px 12px", color: G, fontSize: 12, fontWeight: 600,
-                    whiteSpace: "nowrap", pointerEvents: "none", zIndex: 100,
-                    opacity: 0, transition: "opacity 0.15s", boxShadow: "0 4px 16px rgba(0,0,0,0.4)"
-                  }}>
-                    {planLabel}
-                  </div>
-                )}
-              </div>
-            )
-          })()}
-
-          {/* Ligne compte (DA §10) : avatar + nom + e-mail (au lieu du plan, redondant avec la carte). */}
-          {user && (
-            <div style={{ position: "relative" }} className="sidebar-item">
-              <Link href="/dashboard/profile" aria-label={collapsed ? "Mon profil" : undefined} style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10,
-                padding: collapsed ? "8px 0" : "8px 9px",
-                justifyContent: collapsed ? "center" : "flex-start",
-                borderRadius: 10, overflow: "hidden", cursor: "pointer", transition: "background 0.2s" }}
-                onMouseEnter={e => { if (!collapsed) e.currentTarget.style.background = "rgba(255,255,255,0.035)" }}
-                onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}>
-                <div style={{ width: 28, height: 28, borderRadius: "50%", background: `linear-gradient(135deg, ${G}, color-mix(in srgb, var(--accent) 75%, #000))`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#080808", flexShrink: 0 }}>
-                  {(profile?.full_name || user.email || "?")[0].toUpperCase()}
-                </div>
-                {!collapsed && (
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ color: "#e8e3da", fontSize: 12.5, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {profile?.full_name || user.email?.split("@")[0] || "Utilisateur"}
-                    </p>
-                    <p style={{ color: MUTED, fontSize: 10.5, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {user.email || "—"}
-                    </p>
-                  </div>
-                )}
-                {!collapsed && <span aria-hidden="true" style={{ marginLeft: "auto", width: 6, height: 6, borderRight: "1.5px solid #7d766c", borderTop: "1.5px solid #7d766c", transform: "rotate(45deg)", flexShrink: 0 }} />}
-              </Link>
-              {collapsed && (
-                <div className="sidebar-tooltip" style={{
-                  position: "absolute", left: "calc(100% + 10px)", top: "50%", transform: "translateY(-50%)",
-                  background: "#1A1A1A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8,
-                  padding: "6px 12px", color: "#F5F0E8", fontSize: 12, fontWeight: 600,
-                  whiteSpace: "nowrap", pointerEvents: "none", zIndex: 100,
-                  opacity: 0, transition: "opacity 0.15s", boxShadow: "0 4px 16px rgba(0,0,0,0.4)"
-                }}>
-                  {profile?.full_name || user.email?.split("@")[0] || "Compte"}
-                </div>
-              )}
-            </div>
+            </nav>
           )}
         </div>
-      </div>
 
       {/* MAIN CONTENT */}
       <main className={hideMobileNav ? undefined : "qf-main-nav"} style={{ flex: 1, overflow: "auto", minWidth: 0 }}>
@@ -598,13 +534,14 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
           <ToastProvider><ConfirmProvider>{children}</ConfirmProvider></ToastProvider>
         </SessionShellContext.Provider>
       </main>
+      </div>
 
       {/* Sheet "Créer" (bouton central de la barre mobile) */}
       {isMobile && !hideMobileNav && createOpen && (
         <div onClick={() => setCreateOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(3px)", display: "flex", alignItems: "flex-end" }}>
-          <div role="dialog" aria-modal="true" aria-label="Créer" onClick={e => e.stopPropagation()} style={{ width: "100%", background: "#141210", borderTopLeftRadius: 22, borderTopRightRadius: 22, border: `1px solid color-mix(in srgb, ${G} 16%, transparent)`, borderBottom: "none", padding: "10px 14px calc(16px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)", animation: "sheetUp .24s var(--mo-ease-standard)" }}>
+          <div role="dialog" aria-modal="true" aria-label="Créer" onClick={e => e.stopPropagation()} style={{ width: "100%", background: "var(--surface)", borderTopLeftRadius: 22, borderTopRightRadius: 22, border: `1px solid color-mix(in srgb, ${G} 16%, transparent)`, borderBottom: "none", padding: "10px 14px calc(16px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)", animation: "sheetUp .24s var(--mo-ease-standard)" }}>
             <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 12px" }} />
-            <p style={{ margin: "0 4px 10px", color: "#F5F0E8", fontSize: 15, fontWeight: 800 }}>Créer</p>
+            <p style={{ margin: "0 4px 10px", color: "var(--ink)", fontSize: 15, fontWeight: 800 }}>Créer</p>
             {(guest ? GUEST_CREATE_ACTIONS : CREATE_ACTIONS).map(({ href, icon: Icon, label, sub }, i) => (
               <Link key={i} href={href} onClick={() => setCreateOpen(false)}
                 style={{ display: "flex", alignItems: "center", gap: 14, padding: "13px 10px", textDecoration: "none", borderTop: i ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
@@ -612,7 +549,7 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
                 {/* `minWidth: 0` : sans lui, un libellé long pousse le chevron
                     hors de l'écran au lieu de se replier. */}
                 <span style={{ display: "flex", flexDirection: "column", gap: 2, flex: 1, minWidth: 0 }}>
-                  <span style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700 }}>{label}</span>
+                  <span style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700 }}>{label}</span>
                   <span style={{ color: MUTED, fontSize: 12.5, lineHeight: 1.35 }}>{sub}</span>
                 </span>
                 <ChevronRight size={18} color={MUTED} style={{ marginLeft: "auto", flexShrink: 0 }} />
@@ -632,7 +569,7 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
 
       <style>{`
         .sidebar-nav::-webkit-scrollbar { display: none }
-        .sidebar-item:hover .sidebar-tooltip { opacity: 1 !important }
+        .sidebar-item:hover .sidebar-tooltip, .sidebar-item:focus-within .sidebar-tooltip { opacity: 1 !important; pointer-events: auto !important }
         @keyframes sheetUp { from { transform: translateY(100%) } to { transform: translateY(0) } }
         * { box-sizing: border-box; }
       `}</style>

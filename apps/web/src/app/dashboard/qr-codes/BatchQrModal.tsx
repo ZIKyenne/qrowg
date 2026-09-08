@@ -128,7 +128,7 @@ export function BatchQrModal({ open, onClose, genBlob, isPro, onUpsell, max = 50
         onChange={e => setText(e.target.value)}
         placeholder={"https://exemple.com/t1, Table 1\nhttps://exemple.com/t2, Table 2\nhttps://exemple.com/t3, Table 3"}
         rows={8}
-        style={{ width: "100%", boxSizing: "border-box", background: "#0A0A0A", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "var(--ink)", fontSize: 14, padding: 12, resize: "vertical", outline: "none", fontFamily: "monospace" }}
+        style={{ width: "100%", boxSizing: "border-box", background: "var(--field)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "var(--ink)", fontSize: 14, padding: 12, resize: "vertical", outline: "none", fontFamily: "monospace" }}
       />
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 12 }}>
         <span style={{ color: MUTED, fontSize: 12.5, minWidth: 46 }}>Sortie</span>

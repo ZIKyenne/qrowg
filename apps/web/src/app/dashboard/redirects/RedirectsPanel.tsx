@@ -156,7 +156,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
   const inactive = redirects.filter(r => !r.enabled).length
 
   return (
-    <div style={{ minHeight:"100vh", background:"#080808", padding:"32px 24px 80px", fontFamily:"DM Sans, sans-serif" }}>
+    <div style={{ minHeight:"100vh", background:"var(--bg)", padding:"32px 24px 80px", fontFamily:"DM Sans, sans-serif" }}>
       <div style={{ maxWidth:860, margin:"0 auto" }}>
 
         {/* Header */}
@@ -164,7 +164,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
           <div>
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:6 }}>
               <ArrowRight size={22} color={G}/>
-              <h1 style={{ fontSize:22, fontWeight:700, color:"#F5F0E8", margin:0 }}>Redirections</h1>
+              <h1 style={{ fontSize:22, fontWeight:700, color:"var(--ink)", margin:0 }}>Redirections</h1>
             </div>
             <p style={{ color:MUTED, fontSize:13, margin:0 }}>
               Redirigez des domaines ou chemins vers de nouvelles destinations
@@ -185,11 +185,11 @@ export default function RedirectsPanel({ userDomains }: Props) {
               { icon:<ToggleLeft size={14} color={MUTED}/>,        label:"Inactives",value:inactive },
               { icon:<MousePointerClick size={14} color={G}/>,label:"Clics total",value:redirects.reduce((a,r)=>a+r.hit_count,0).toLocaleString() },
             ].map((k,i) => (
-              <div key={i} style={{ background:"#0F0E0B", border:"1px solid color-mix(in srgb, var(--accent) 10%, transparent)", borderRadius:11, padding:"12px 14px", display:"flex", alignItems:"center", gap:9 }}>
+              <div key={i} style={{ background:"var(--surface)", border:"1px solid color-mix(in srgb, var(--accent) 10%, transparent)", borderRadius:11, padding:"12px 14px", display:"flex", alignItems:"center", gap:9 }}>
                 {k.icon}
                 <div>
                   <p style={{ color:MUTED, fontSize:10, textTransform:"uppercase", letterSpacing:1, margin:"0 0 2px" }}>{k.label}</p>
-                  <p style={{ color:"#F5F0E8", fontSize:16, fontWeight:800, margin:0 }}>{k.value}</p>
+                  <p style={{ color:"var(--ink)", fontSize:16, fontWeight:800, margin:0 }}>{k.value}</p>
                 </div>
               </div>
             ))}
@@ -198,9 +198,9 @@ export default function RedirectsPanel({ userDomains }: Props) {
 
         {/* Formulaire */}
         {showForm && (
-          <div style={{ background:"#0F0E0B", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:14, padding:22, marginBottom:24 }}>
+          <div style={{ background:"var(--surface)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:14, padding:22, marginBottom:24 }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:18 }}>
-              <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:700, margin:0, display:"flex", alignItems:"center", gap:8 }}>
+              <p style={{ color:"var(--ink)", fontSize:14, fontWeight:700, margin:0, display:"flex", alignItems:"center", gap:8 }}>
                 {editId ? <Pencil size={15} color={G}/> : <Plus size={15} color={G}/>}
                 {editId ? "Modifier la redirection" : "Nouvelle redirection"}
               </p>
@@ -233,13 +233,13 @@ export default function RedirectsPanel({ userDomains }: Props) {
                 <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:7 }}>Source</label>
                 <div style={{ display:"flex", gap:8, alignItems:"center" }}>
                   <select aria-label="Domaine de départ" value={fDomain} onChange={e => setFDomain(e.target.value)}
-                    style={{ flex:2, background:"#111009", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, color:"#F5F0E8", padding:"9px 12px", fontSize:12, outline:"none", cursor:"pointer" }}>
+                    style={{ flex:2, background:"var(--surface)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none", cursor:"pointer" }}>
                     {userDomains.map(d => <option key={d} value={d}>{d}</option>)}
                     <option value="qrowg.com">qrowg.com (sous-domaine)</option>
                   </select>
                   <input value={fPath} onChange={e => setFPath(e.target.value.startsWith("/") ? e.target.value : "/" + e.target.value)}
                     placeholder="/chemin"
-                    style={{ flex:1, background:"#111009", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, color:"#F5F0E8", padding:"9px 12px", fontSize:12, outline:"none" }}/>
+                    style={{ flex:1, background:"var(--surface)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none" }}/>
                 </div>
                 <p style={{ color:MUTED, fontSize:10, margin:"5px 0 0" }}>
                   → URL source : <code style={{ color:G }}>{fDomain}{fPath}</code>
@@ -252,7 +252,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
               <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:7 }}>Destination</label>
               <input value={fTo} onChange={e => setFTo(e.target.value)}
                 placeholder="https://nouveau-site.fr ou /nouvelle-page"
-                style={{ width:"100%", background:"#111009", border:`1px solid ${fTo ? "color-mix(in srgb, var(--accent) 30%, transparent)" : "rgba(255,255,255,0.1)"}`, borderRadius:9, color:"#F5F0E8", padding:"9px 12px", fontSize:12, outline:"none", boxSizing:"border-box" as const, transition:"border-color 0.15s" }}/>
+                style={{ width:"100%", background:"var(--surface)", border:`1px solid ${fTo ? "color-mix(in srgb, var(--accent) 30%, transparent)" : "rgba(255,255,255,0.1)"}`, borderRadius:9, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none", boxSizing:"border-box" as const, transition:"border-color 0.15s" }}/>
               {fTo && (
                 <p style={{ color:MUTED, fontSize:10, margin:"5px 0 0" }}>
                   ↳ <code style={{ color:"var(--success)" }}>{fTo}</code>
@@ -265,7 +265,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
               <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:7 }}>Note interne (optionnel)</label>
               <input value={fLabel} onChange={e => setFLabel(e.target.value)}
                 placeholder="ex: Ancien site migré vers nouveau domaine"
-                style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.07)", borderRadius:9, color:"#F5F0E8", padding:"9px 12px", fontSize:12, outline:"none", boxSizing:"border-box" as const }}/>
+                style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:9, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none", boxSizing:"border-box" as const }}/>
             </div>
 
             {error && (
@@ -290,9 +290,9 @@ export default function RedirectsPanel({ userDomains }: Props) {
             <Loader size={22} color={MUTED} style={{ animation:"mo-spin 0.8s linear infinite" }}/>
           </div>
         ) : redirects.length === 0 ? (
-          <div style={{ textAlign:"center", padding:"56px 20px", background:"#0F0E0B", border:"1px dashed rgba(255,255,255,0.1)", borderRadius:14 }}>
+          <div style={{ textAlign:"center", padding:"56px 20px", background:"var(--surface)", border:"1px dashed rgba(255,255,255,0.1)", borderRadius:14 }}>
             <ArrowRight size={36} color={MUTED} style={{ marginBottom:14 }}/>
-            <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:600, margin:"0 0 6px" }}>Aucune redirection</p>
+            <p style={{ color:"var(--ink)", fontSize:14, fontWeight:600, margin:"0 0 6px" }}>Aucune redirection</p>
             <p style={{ color:MUTED, fontSize:12, margin:"0 0 20px", lineHeight:1.6 }}>
               Redirigez ancien-site.fr → nouveau-site.fr<br/>ou /page-a → /page-b
             </p>
@@ -305,7 +305,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
             {redirects.map(r => {
               const typeCfg = TYPE_CFG[r.redirect_type]
               return (
-                <div key={r.id} style={{ background:"#0F0E0B", border:`1px solid ${r.enabled ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)"}`, borderRadius:12, padding:"14px 16px", opacity:r.enabled ? 1 : 0.55, transition:"all 0.2s" }}>
+                <div key={r.id} style={{ background:"var(--surface)", border:`1px solid ${r.enabled ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)"}`, borderRadius:12, padding:"14px 16px", opacity:r.enabled ? 1 : 0.55, transition:"all 0.2s" }}>
                   <div style={{ display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>
 
                     {/* Badge type */}
@@ -315,7 +315,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
 
                     {/* Source → Destination */}
                     <div style={{ flex:1, minWidth:0, display:"flex", alignItems:"center", gap:8, flexWrap:"wrap" }}>
-                      <code style={{ color:"#F5F0E8", fontSize:12, fontWeight:600, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", maxWidth:220 }}>
+                      <code style={{ color:"var(--ink)", fontSize:12, fontWeight:600, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", maxWidth:220 }}>
                         {r.from_domain}{r.from_path !== "/" ? r.from_path : ""}
                       </code>
                       <ArrowRight size={13} color={MUTED}/>
@@ -366,11 +366,11 @@ export default function RedirectsPanel({ userDomains }: Props) {
         )}
 
         {/* Guide SEO */}
-        <div style={{ marginTop:24, padding:"14px 18px", background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12 }}>
+        <div style={{ marginTop:24, padding:"14px 18px", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12 }}>
           <div style={{ display:"flex", gap:8, alignItems:"flex-start" }}>
             <Info size={14} color={G} style={{ flexShrink:0, marginTop:1 }}/>
             <div>
-              <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:700, margin:"0 0 6px" }}>301 vs 302 — Lequel choisir ?</p>
+              <p style={{ color:"var(--ink)", fontSize:12, fontWeight:700, margin:"0 0 6px" }}>301 vs 302 — Lequel choisir ?</p>
               <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
                 <p style={{ color:MUTED, fontSize:11, margin:0 }}>
                   <strong style={{ color:"var(--accent)" }}>301 Permanent</strong> — Le domaine/page a définitivement changé. Google transfère le PageRank vers la nouvelle URL. À utiliser pour les migrations définitives.

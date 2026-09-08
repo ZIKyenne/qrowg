@@ -17,7 +17,7 @@ export function SegTabs({ items, value, onChange, ariaLabel, width, fontSize = 1
 }) {
   const n = Math.max(1, items.length)
   return (
-    <div role="tablist" aria-label={ariaLabel} style={{ position: "relative", display: "grid", gridAutoFlow: "column", gridAutoColumns: "1fr", width, flexShrink: 0, padding: 4, borderRadius: 12, background: "#100e0c", border: "1px solid #221f1b", boxShadow: "0 1px 0 rgba(255,255,255,.03) inset, 0 -1px 0 rgba(0,0,0,.5) inset", isolation: "isolate" }}>
+    <div role="tablist" aria-label={ariaLabel} style={{ position: "relative", display: "grid", gridAutoFlow: "column", gridAutoColumns: "1fr", width, flexShrink: 0, padding: 4, borderRadius: 12, background: "#100e0c", border: "1px solid var(--surface-2)", boxShadow: "0 1px 0 rgba(255,255,255,.03) inset, 0 -1px 0 rgba(0,0,0,.5) inset", isolation: "isolate" }}>
       <div aria-hidden="true" className="qv-ind" style={{ position: "absolute", top: 4, bottom: 4, left: 4, width: `calc((100% - 8px) / ${n})`, transform: `translateX(calc(${value} * 100%))`, transition: "transform .38s cubic-bezier(.2,.85,.2,1)", borderRadius: 9, background: "rgba(232,200,119,.07)", border: "1px solid rgba(232,200,119,.34)", boxShadow: "0 0 0 1px rgba(0,0,0,.25)", pointerEvents: "none" }} />
       {items.map((it, i) => {
         const on = i === value

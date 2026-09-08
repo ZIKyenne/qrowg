@@ -32,7 +32,7 @@ export default function DashboardError({ error, reset }: { error: Error & { dige
   const retry = () => { if (chunk && typeof window !== "undefined") window.location.reload(); else reset() }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#080808", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "DM Sans, sans-serif" }}>
       <div style={{ maxWidth: 460, width: "100%", textAlign: "center", background: "#100F0A", border: "1px solid rgba(255,107,107,0.25)", borderRadius: 18, padding: "36px 28px", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}>
         <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(255,107,107,0.12)", border: "1px solid rgba(255,107,107,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
           <AlertTriangle size={24} color="var(--danger)" />
@@ -45,11 +45,11 @@ export default function DashboardError({ error, reset }: { error: Error & { dige
         </p>
         <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
           <button type="button" onClick={retry}
-            style={{ display: "flex", alignItems: "center", gap: 7, padding: "11px 20px", borderRadius: 11, background: "linear-gradient(90deg,var(--accent,#C9A84C),#b8953f)", color: "#080808", border: "none", fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}>
+            style={{ display: "flex", alignItems: "center", gap: 7, padding: "11px 20px", borderRadius: 11, background: "linear-gradient(90deg,var(--accent,var(--accent)),#b8953f)", color: "var(--ink-on-accent)", border: "none", fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}>
             <RotateCw size={15} /> {chunk ? "Recharger" : "Réessayer"}
           </button>
           <a href="/dashboard"
-            style={{ display: "flex", alignItems: "center", gap: 7, padding: "11px 20px", borderRadius: 11, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#F5F0E8", textDecoration: "none", fontSize: 13.5, fontWeight: 600 }}>
+            style={{ display: "flex", alignItems: "center", gap: 7, padding: "11px 20px", borderRadius: 11, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--ink)", textDecoration: "none", fontSize: 13.5, fontWeight: 600 }}>
             <ArrowLeft size={15} /> Tableau de bord
           </a>
         </div>

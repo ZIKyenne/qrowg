@@ -48,19 +48,19 @@ Tiramisu;6,50€;Fait maison`
         </button>
         {helpOpen && (
           <div onClick={() => setHelpOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 520, background: "rgba(0,0,0,0.72)", backdropFilter: "blur(5px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-            <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, maxHeight: "88vh", overflowY: "auto", background: "#141210", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 18, padding: 18, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }}>
+            <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, maxHeight: "88vh", overflowY: "auto", background: "var(--surface)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 18, padding: 18, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                 <span style={{ width: 30, height: 30, borderRadius: 9, background: "rgba(201,168,76,0.14)", border: "1px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", color: G }}><Sparkles size={16} /></span>
-                <p style={{ flex: 1, color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0 }}>Remplir le menu avec une photo (IA)</p>
+                <p style={{ flex: 1, color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>Remplir le menu avec une photo (IA)</p>
                 <button onClick={() => setHelpOpen(false)} aria-label="Fermer" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", width: 28, height: 28 }}><X size={14} /></button>
               </div>
-              <ol style={{ color: "#F5F0E8", fontSize: 12.5, lineHeight: 1.6, margin: "0 0 12px", paddingLeft: 18, display: "flex", flexDirection: "column", gap: 4 }}>
+              <ol style={{ color: "var(--ink)", fontSize: 12.5, lineHeight: 1.6, margin: "0 0 12px", paddingLeft: 18, display: "flex", flexDirection: "column", gap: 4 }}>
                 <li>Copiez le prompt ci-dessous.</li>
                 <li>Ouvrez ChatGPT, collez le prompt et <b>ajoutez une photo</b> de votre carte.</li>
                 <li>Copiez la réponse de ChatGPT.</li>
                 <li>Collez-la dans le champ d'import de la section, puis validez.</li>
               </ol>
-              <div style={{ position: "relative", background: "#0A0A0A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 12px", marginBottom: 10 }}>
+              <div style={{ position: "relative", background: "var(--field)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 12px", marginBottom: 10 }}>
                 <pre style={{ color: "#D8D2C4", fontSize: 11, lineHeight: 1.5, margin: 0, whiteSpace: "pre-wrap", fontFamily: "monospace", maxHeight: 220, overflowY: "auto" }}>{MENU_AI_PROMPT}</pre>
               </div>
               <div style={{ display: "flex", gap: 9 }}>
@@ -70,7 +70,7 @@ Tiramisu;6,50€;Fait maison`
                   {copied ? <><Check size={15} /> Copié !</> : <><Copy size={15} /> <span>Copier le prompt</span></>}
                 </button>
                 <a href="https://chatgpt.com" target="_blank" rel="noopener noreferrer"
-                  style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", color: "#F5F0E8", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
+                  style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", color: "var(--ink)", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
                   Ouvrir ChatGPT ↗
                 </a>
               </div>
@@ -111,7 +111,7 @@ Tiramisu;6,50€;Fait maison`
       setMsg(`${items.length} plat${items.length > 1 ? "s" : ""} importé${items.length > 1 ? "s" : ""} ✓`)
       setText("")
     }
-    const inputStyle: React.CSSProperties = { width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: "#F5F0E8", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
+    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: "var(--ink)", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
     return (
       <div style={{ border: "1px solid rgba(201,168,76,0.25)", borderRadius: 12, background: "rgba(201,168,76,0.04)", overflow: "hidden" }}>
         <button type="button" onClick={() => setOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "11px 12px", background: "transparent", border: "none", color: G, fontSize: 12.5, fontWeight: 700, cursor: "pointer", textAlign: "left" }}>
@@ -150,7 +150,7 @@ Tiramisu;6,50€;Fait maison`
     const move = (i: number, d: number) => { const j = i + d; if (j < 0 || j >= imgs.length) return; const a = [...imgs];[a[i], a[j]] = [a[j], a[i]]; write(a) }
     const replaceAt = (i: number, url: string) => { if (!url) { write(imgs.filter((_, j) => j !== i)); return } const a = [...imgs]; a[i] = url; write(a) }
     const add = (url: string) => { if (url && imgs.length < MAX) write([...imgs, url]) }
-    const inputStyle: React.CSSProperties = { width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
+    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
     const Seg = ({ opts, val, k }: { opts: { k: string; l: string }[]; val: string; k: string }) => (
       <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
         {opts.map(o => <button key={o.k} type="button" onClick={() => onChange(k, o.k)} style={{ flex: 1, padding: "7px 4px", borderRadius: 7, background: val === o.k ? GG : "transparent", border: "none", color: val === o.k ? "#080808" : M, fontSize: 11, fontWeight: val === o.k ? 700 : 500, cursor: "pointer" }}>{o.l}</button>)}
@@ -180,7 +180,7 @@ Tiramisu;6,50€;Fait maison`
                 </span>
                 <img src={img} alt="" style={{ width: 44, height: 44, borderRadius: 8, objectFit: "cover", flexShrink: 0 }} />
                 <span style={{ flex: 1, color: M, fontSize: 11 }}>Image {i + 1}</span>
-                <button type="button" onClick={() => replaceAt(i, "")} title="Retirer" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 6, width: 24, height: 24, cursor: "pointer", color: "#EF4444", flexShrink: 0 }}>×</button>
+                <button type="button" onClick={() => replaceAt(i, "")} title="Retirer" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 6, width: 24, height: 24, cursor: "pointer", color: "var(--danger)", flexShrink: 0 }}>×</button>
               </div>
             ))}
           </div>
@@ -206,7 +206,7 @@ Tiramisu;6,50€;Fait maison`
       { label: "Resto / Bar", tags: ["Cuisine", "Cocktails", "Fait maison"] },
       { label: "Business", tags: ["Conseil", "Stratégie", "Gestion"] },
     ]
-    const inputStyle: React.CSSProperties = { width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
+    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
         <div>
@@ -224,13 +224,13 @@ Tiramisu;6,50€;Fait maison`
                   <button type="button" onClick={() => move(i, 1)} disabled={i === tags.length - 1} title="Descendre" style={{ background: "none", border: "none", cursor: i === tags.length - 1 ? "default" : "pointer", color: i === tags.length - 1 ? "rgba(255,255,255,0.15)" : M, padding: 0, lineHeight: 0.7, fontSize: 10 }}>▼</button>
                 </span>
                 <span style={{ flex: 1, color: TXT, fontSize: 12.5, fontWeight: 600 }}>{t}</span>
-                <button type="button" onClick={() => remove(i)} title="Supprimer" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 6, width: 22, height: 22, cursor: "pointer", color: "#EF4444", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>×</button>
+                <button type="button" onClick={() => remove(i)} title="Supprimer" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 6, width: 22, height: 22, cursor: "pointer", color: "var(--danger)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>×</button>
               </div>
             ))}
           </div>
           <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
             <input value={input} placeholder="Ajouter une compétence…" onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); add(input) } }} style={inputStyle} />
-            <button type="button" onClick={() => add(input)} disabled={!input.trim()} style={{ flexShrink: 0, background: GG, border: "none", borderRadius: 8, padding: "0 14px", color: "#080808", fontSize: 13, fontWeight: 700, cursor: input.trim() ? "pointer" : "not-allowed", opacity: input.trim() ? 1 : 0.5 }}>+</button>
+            <button type="button" onClick={() => add(input)} disabled={!input.trim()} style={{ flexShrink: 0, background: GG, border: "none", borderRadius: 8, padding: "0 14px", color: "var(--ink-on-accent)", fontSize: 13, fontWeight: 700, cursor: input.trim() ? "pointer" : "not-allowed", opacity: input.trim() ? 1 : 0.5 }}>+</button>
           </div>
         </div>
         <div>
@@ -250,7 +250,7 @@ Tiramisu;6,50€;Fait maison`
     const M = "#A8A190", TXT = "#F5F0E8", GG = "var(--accent, #C9A84C)"
     const cur = content.status || "available"
     const sc = availabilityStatus(cur, content.dot_color)
-    const inputStyle: React.CSSProperties = { width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
+    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
     const msgSuggestions = ["Ouvert aux nouvelles missions", "Disponible cette semaine", "Complet ce mois-ci", "Réponse en moins de 24 heures", "Sur réservation uniquement"]
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
@@ -342,7 +342,7 @@ Tiramisu;6,50€;Fait maison`
     for (let i = 1; i <= MAX; i++) { if (fields.some(f => c[key(i, f.suffix)])) derived = i }
     const [rows, setRows] = useState(() => Math.max(1, derived))
     const count = Math.max(rows, derived)
-    const inputStyle: React.CSSProperties = { width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: "#F5F0E8", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
+    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: "var(--ink)", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
     const foc = (on: boolean) => (e: React.FocusEvent<HTMLInputElement>) => { e.target.style.borderColor = on ? "rgba(201,168,76,0.5)" : "rgba(201,168,76,0.2)" }
     const iconBtn = (disabled: boolean): React.CSSProperties => ({ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", color: disabled ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: disabled ? "default" : "pointer", flexShrink: 0 })
     const lbl: React.CSSProperties = { color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }
@@ -408,7 +408,7 @@ Tiramisu;6,50€;Fait maison`
     if (!def) return null
     // Les éditeurs personnalisés ne s'affichent que côté Contenu (leur mise en page passe par les réglages universels).
     if (only === "layout" && CUSTOM_EDITOR_TYPES.has(block.type)) return null
-    const inputStyle: React.CSSProperties = { width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: "#F5F0E8", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
+    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: "var(--ink)", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
 
     if (block.type === "cover_banner") {
       return <BannerStudio content={block.content} onChange={onChange} />
@@ -737,7 +737,7 @@ Tiramisu;6,50€;Fait maison`
                     return (
                       <div key={g}>
                         <button type="button" onClick={() => setOpenNetGroup(open ? null : g)}
-                          style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, minHeight: 46, padding: "10px 12px", borderRadius: 10, border: `1px solid ${open ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.08)"}`, background: open ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.02)", color: "#F5F0E8", cursor: "pointer", textAlign: "left" }}>
+                          style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, minHeight: 46, padding: "10px 12px", borderRadius: 10, border: `1px solid ${open ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.08)"}`, background: open ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.02)", color: "var(--ink)", cursor: "pointer", textAlign: "left" }}>
                           <span style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>{GROUP_LABELS[g] || g}</span>
                           <span style={{ fontSize: 11, color: MUTED }}>{nets.length}</span>
                           <ChevronDown size={16} color={MUTED} style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform .2s", flexShrink: 0 }} />
@@ -899,7 +899,7 @@ Tiramisu;6,50€;Fait maison`
           return (
             <div key={g}>
               <button type="button" onClick={() => setOpenCards(prev => { const n = new Set(prev); if (n.has(g)) n.delete(g); else n.add(g); return n })}
-                style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, minHeight: 46, padding: "10px 12px", borderRadius: 10, border: `1px solid ${open ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.08)"}`, background: open ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.02)", color: "#F5F0E8", cursor: "pointer", textAlign: "left" }}>
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, minHeight: 46, padding: "10px 12px", borderRadius: 10, border: `1px solid ${open ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.08)"}`, background: open ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.02)", color: "var(--ink)", cursor: "pointer", textAlign: "left" }}>
                 <span style={{ width: 7, height: 7, borderRadius: "50%", background: filled ? "var(--success)" : "rgba(255,255,255,0.18)", flexShrink: 0 }} />
                 <span style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>{g}</span>
                 <span style={{ fontSize: 10.5, color: MUTED }}>{filled ? `${filled}/${fields.length}` : "vide"}</span>
@@ -970,8 +970,8 @@ Tiramisu;6,50€;Fait maison`
     const MUTED = "#A8A190"
 
     const inputStyle: React.CSSProperties = {
-      width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)",
-      borderRadius: 8, padding: "8px 10px", color: "#F5F0E8", fontSize: 12,
+      width: "100%", background: "var(--field)", border: "1px solid rgba(201,168,76,0.2)",
+      borderRadius: 8, padding: "8px 10px", color: "var(--ink)", fontSize: 12,
       outline: "none", boxSizing: "border-box" as const, fontFamily: "monospace"
     }
 
@@ -1138,7 +1138,7 @@ Tiramisu;6,50€;Fait maison`
                 <div key={key} style={{ marginBottom: 12 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}>
                     <span style={{ fontSize: 12, width: 18, textAlign: "center" as const }}>{icon}</span>
-                    <label style={{ color: "#F5F0E8", fontSize: 11, fontWeight: 600, flex: 1 }}>{label}</label>
+                    <label style={{ color: "var(--ink)", fontSize: 11, fontWeight: 600, flex: 1 }}>{label}</label>
                     <span style={{ fontSize: 9, color: MUTED }}>{hint}</span>
                     {/* Badge contraste */}
                     {(key === "text" || key === "muted") && (
@@ -1568,7 +1568,7 @@ Tiramisu;6,50€;Fait maison`
                 {/* Noise */}
                 <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_noise ? 10 : 0 }}>
-                    <label style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600 }}>🌫️ Noise</label>
+                    <label style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600 }}>🌫️ Noise</label>
                     <button onClick={() => onThemeChange({...theme, effect_noise: !(theme as any).effect_noise} as any)} style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_noise ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
                       <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_noise ? 18 : 2, transition: "left 0.2s" }} />
                     </button>
@@ -1584,7 +1584,7 @@ Tiramisu;6,50€;Fait maison`
                 {/* Glow */}
                 <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_glow ? 10 : 0 }}>
-                    <label style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600 }}>✨ Glow</label>
+                    <label style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600 }}>✨ Glow</label>
                     <button onClick={() => onThemeChange({...theme, effect_glow: !(theme as any).effect_glow} as any)} style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_glow ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
                       <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_glow ? 18 : 2, transition: "left 0.2s" }} />
                     </button>
@@ -1610,7 +1610,7 @@ Tiramisu;6,50€;Fait maison`
                 {/* Vignette */}
                 <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_vignette ? 10 : 0 }}>
-                    <label style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600 }}>🌑 Vignette</label>
+                    <label style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600 }}>🌑 Vignette</label>
                     <button onClick={() => onThemeChange({...theme, effect_vignette: !(theme as any).effect_vignette} as any)} style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_vignette ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
                       <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_vignette ? 18 : 2, transition: "left 0.2s" }} />
                     </button>
@@ -1626,7 +1626,7 @@ Tiramisu;6,50€;Fait maison`
                 {/* Overlay couleur */}
                 <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_overlay ? 10 : 0 }}>
-                    <label style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600 }}>🎨 Overlay</label>
+                    <label style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600 }}>🎨 Overlay</label>
                     <button onClick={() => onThemeChange({...theme, effect_overlay: !(theme as any).effect_overlay} as any)}
                       style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_overlay ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
                       <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_overlay ? 18 : 2, transition: "left 0.2s" }} />
@@ -1653,7 +1653,7 @@ Tiramisu;6,50€;Fait maison`
                 {/* Blur global */}
                 <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_blur ? 10 : 0 }}>
-                    <label style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600 }}>💧 Blur</label>
+                    <label style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600 }}>💧 Blur</label>
                     <button onClick={() => onThemeChange({...theme, effect_blur: !(theme as any).effect_blur} as any)}
                       style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_blur ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
                       <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_blur ? 18 : 2, transition: "left 0.2s" }} />
@@ -1797,7 +1797,7 @@ Tiramisu;6,50€;Fait maison`
           return (
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <p style={{ color: MUTED, fontSize: 11, margin: 0, lineHeight: 1.5 }}>
-                Un style appliqué à <strong style={{ color: "#F5F0E8" }}>tous les blocs</strong> d&apos;un coup. Chaque bloc peut le surcharger dans son onglet <strong style={{ color: "#F5F0E8" }}>Style</strong>.
+                Un style appliqué à <strong style={{ color: "var(--ink)" }}>tous les blocs</strong> d&apos;un coup. Chaque bloc peut le surcharger dans son onglet <strong style={{ color: "var(--ink)" }}>Style</strong>.
               </p>
               {rows.map(r => (
                 <div key={r.key}>
@@ -1847,15 +1847,15 @@ Tiramisu;6,50€;Fait maison`
           if (!canIntro) return (
             <div style={{ padding: "22px 16px", textAlign: "center", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 12, background: "rgba(201,168,76,0.05)" }}>
               <div style={{ fontSize: 26, marginBottom: 8 }}>✨</div>
-              <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 700, margin: "0 0 5px" }}>Animation d&apos;entrée</p>
+              <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 700, margin: "0 0 5px" }}>Animation d&apos;entrée</p>
               <p style={{ color: MUTED, fontSize: 11.5, margin: "0 0 14px", lineHeight: 1.5 }}>Une courte animation aux couleurs de votre page accueille vos visiteurs. Réservé au plan <b style={{ color: G }}>Pro</b> et plus.</p>
-              <a href="/upgrade" style={{ display: "inline-block", background: G, color: "#080808", fontSize: 12, fontWeight: 700, padding: "9px 20px", borderRadius: 9, textDecoration: "none" }}>Passer Pro</a>
+              <a href="/upgrade" style={{ display: "inline-block", background: G, color: "var(--ink-on-accent)", fontSize: 12, fontWeight: 700, padding: "9px 20px", borderRadius: 9, textDecoration: "none" }}>Passer Pro</a>
             </div>
           )
           return (
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, cursor: "pointer" }}>
-                <span style={{ color: "#F5F0E8", fontSize: 12.5, fontWeight: 600 }}>Activer l&apos;animation d&apos;entrée</span>
+                <span style={{ color: "var(--ink)", fontSize: 12.5, fontWeight: 600 }}>Activer l&apos;animation d&apos;entrée</span>
                 <button onClick={() => setIntro({ intro_enabled: !enabled })}
                   style={{ width: 40, height: 23, borderRadius: 12, border: "none", cursor: "pointer", background: enabled ? G : "rgba(255,255,255,0.12)", position: "relative", transition: "background 0.2s", flexShrink: 0 }}>
                   <span style={{ position: "absolute", top: 3, left: enabled ? 20 : 3, width: 17, height: 17, borderRadius: "50%", background: "#fff", transition: "left 0.2s" }} />

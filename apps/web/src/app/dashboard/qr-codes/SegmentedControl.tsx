@@ -45,10 +45,10 @@ export function SegmentedControl({
       <div aria-hidden="true" className="sc-halo" style={{ position: "absolute", inset: -10, borderRadius: 999, background: "radial-gradient(58% 118% at 50% 50%, rgba(201,162,77,.20), rgba(201,162,77,0) 70%)", filter: "blur(16px)", pointerEvents: "none", willChange: "transform, opacity" }} />
 
       {/* Rail */}
-      <div role="tablist" aria-label={ariaLabel} onKeyDown={onKey} style={{ position: "relative", display: "grid", gridAutoFlow: "column", gridAutoColumns: "1fr", width: "100%", padding: 5, borderRadius: 999, background: "#100e0c", border: "1px solid #221f1b", boxShadow: "0 1px 0 rgba(255,255,255,.04) inset, 0 -1px 0 rgba(0,0,0,.6) inset", isolation: "isolate" }}>
+      <div role="tablist" aria-label={ariaLabel} onKeyDown={onKey} style={{ position: "relative", display: "grid", gridAutoFlow: "column", gridAutoColumns: "1fr", width: "100%", padding: 5, borderRadius: 999, background: "#100e0c", border: "1px solid var(--surface-2)", boxShadow: "0 1px 0 rgba(255,255,255,.04) inset, 0 -1px 0 rgba(0,0,0,.6) inset", isolation: "isolate" }}>
 
         {/* Indicateur glissant + reflet */}
-        <div aria-hidden="true" className="sc-thumb" style={{ position: "absolute", top: 5, bottom: 5, left: 5, width: `calc((100% - 10px) / ${n})`, transform: `translateX(calc(${value} * 100%))`, transition: "transform .42s cubic-bezier(.2,.85,.2,1)", borderRadius: 999, overflow: "hidden", background: "linear-gradient(135deg, #e8c877, #c9a24d)", boxShadow: "0 1px 0 rgba(255,255,255,.45) inset, 0 -2px 6px rgba(90,62,20,.4) inset, 0 6px 18px -8px rgba(201,162,77,.5)", pointerEvents: "none" }}>
+        <div aria-hidden="true" className="sc-thumb" style={{ position: "absolute", top: 5, bottom: 5, left: 5, width: `calc((100% - 10px) / ${n})`, transform: `translateX(calc(${value} * 100%))`, transition: "transform .42s cubic-bezier(.2,.85,.2,1)", borderRadius: 999, overflow: "hidden", background: "linear-gradient(135deg, var(--gold-light), var(--accent))", boxShadow: "0 1px 0 rgba(255,255,255,.45) inset, 0 -2px 6px rgba(90,62,20,.4) inset, 0 6px 18px -8px rgba(201,162,77,.5)", pointerEvents: "none" }}>
           <div key={moves} className="sc-sheen" style={{ position: "absolute", top: "-20%", bottom: "-20%", left: 0, width: "34%", background: "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.7) 50%, rgba(255,255,255,0) 100%)" }} />
         </div>
 

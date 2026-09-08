@@ -144,17 +144,17 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
   }
 
   return (
-    <div style={{ background:"#0F0E0B", border:"1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius:16, padding:24, fontFamily:"DM Sans, sans-serif" }}>
+    <div style={{ background:"var(--surface)", border:"1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius:16, padding:24, fontFamily:"DM Sans, sans-serif" }}>
 
       {/* Header */}
       <div style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:20 }}>
         <Globe size={16} color={G} style={{ marginTop:2, flexShrink:0 }}/>
         <div>
-          <h3 style={{ color:"#F5F0E8", fontSize:15, fontWeight:700, margin:"0 0 3px" }}>
+          <h3 style={{ color:"var(--ink)", fontSize:15, fontWeight:700, margin:"0 0 3px" }}>
             Sous-domaine personnalisé
           </h3>
           <p style={{ color:MUTED, fontSize:12, margin:0 }}>
-            Votre adresse unique sur QRowg — <strong style={{ color:"#F5F0E8" }}>vous.{APP}</strong>
+            Votre adresse unique sur QRowg — <strong style={{ color:"var(--ink)" }}>vous.{APP}</strong>
           </p>
         </div>
       </div>
@@ -170,7 +170,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
                   <CheckCircle size={18} color="var(--success)"/>
                 </div>
                 <div>
-                  <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:700, margin:"0 0 2px" }}>
+                  <p style={{ color:"var(--ink)", fontSize:14, fontWeight:700, margin:"0 0 2px" }}>
                     {currentUsername}.{APP}
                   </p>
                   <p style={{ color:MUTED, fontSize:11, margin:0 }}>Sous-domaine actif</p>
@@ -216,7 +216,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
             <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:6 }}>
               Choisissez votre sous-domaine
             </label>
-            <div style={{ display:"flex", alignItems:"center", gap:0, background:"#111009", border:`1px solid ${status==="available"?"rgba(57,255,143,0.4)":status==="taken"||status==="invalid"?"rgba(255,107,107,0.3)":"color-mix(in srgb, var(--accent) 20%, transparent)"}`, borderRadius:10, overflow:"hidden", transition:"border-color 0.15s" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:0, background:"var(--surface)", border:`1px solid ${status==="available"?"rgba(57,255,143,0.4)":status==="taken"||status==="invalid"?"rgba(255,107,107,0.3)":"color-mix(in srgb, var(--accent) 20%, transparent)"}`, borderRadius:10, overflow:"hidden", transition:"border-color 0.15s" }}>
               {/* Préfixe */}
               <div style={{ display:"flex", alignItems:"center", padding:"10px 12px", borderRight:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
                 <Globe size={13} color={MUTED} style={{ marginRight:4 }}/>
@@ -229,7 +229,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
                 placeholder="votre-nom"
                 maxLength={30}
                 autoFocus
-                style={{ flex:1, background:"transparent", border:"none", color:"#F5F0E8", padding:"10px 10px", fontSize:13, fontWeight:600, outline:"none", minWidth:0 }}
+                style={{ flex:1, background:"transparent", border:"none", color:"var(--ink)", padding:"10px 10px", fontSize:13, fontWeight:600, outline:"none", minWidth:0 }}
               />
               {/* Suffixe */}
               <div style={{ padding:"10px 12px", borderLeft:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
@@ -311,7 +311,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
 
           {/* Info SEO */}
           <p style={{ color:MUTED, fontSize:11, margin:"12px 0 0", lineHeight:1.5 }}>
-            🔍 Votre sous-domaine est <strong style={{ color:"#F5F0E8" }}>indexable par Google</strong> et partageable. Il pointe automatiquement vers votre page la plus visitée.
+            🔍 Votre sous-domaine est <strong style={{ color:"var(--ink)" }}>indexable par Google</strong> et partageable. Il pointe automatiquement vers votre page la plus visitée.
           </p>
         </div>
       )}

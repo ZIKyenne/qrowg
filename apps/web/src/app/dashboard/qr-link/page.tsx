@@ -375,7 +375,7 @@ export default function QrLinkPage() {
   const subLabel: React.CSSProperties = { color: "#6E685E", fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 9px 2px" }
   const accentBar = <span style={{ width: 3, height: 13, borderRadius: 2, background: G, flexShrink: 0 }} />
   const card: React.CSSProperties = { background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 18, padding: 18 }
-  const field: React.CSSProperties = { width: "100%", boxSizing: "border-box", height: 50, background: "#0A0A0A", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "#F5F0E8", fontSize: 16, padding: "0 15px", outline: "none" }
+  const field: React.CSSProperties = { width: "100%", boxSizing: "border-box", height: 50, background: "var(--field)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "var(--ink)", fontSize: 16, padding: "0 15px", outline: "none" }
   const dot = (c: string): React.CSSProperties => ({ width: 15, height: 15, borderRadius: 5, background: c, border: "1px solid rgba(255,255,255,0.22)", flexShrink: 0 })
   // Couleur d'avant-plan sûre pour les MINI-vignettes (toujours sur fond blanc) : si le QR enregistré
   // est trop clair/peu contrasté (ex. blanc sur fond sombre), on retombe sur du noir pour rester net.
@@ -383,7 +383,7 @@ export default function QrLinkPage() {
   // Lignes de la section « Sécurité » (fiche détaillée d'un lien dynamique, Pro+).
   const secRow: React.CSSProperties = { display: "flex", alignItems: "center", gap: 10 }
   const secRowLabel: React.CSSProperties = { display: "inline-flex", alignItems: "center", gap: 6, color: "#D8D2C6", fontSize: 12.5, width: 110, flexShrink: 0 }
-  const secBtn: React.CSSProperties = { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 8, color: "#F5F0E8", fontSize: 11.5, fontWeight: 600, cursor: "pointer", padding: "6px 10px", flexShrink: 0 }
+  const secBtn: React.CSSProperties = { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 8, color: "var(--ink)", fontSize: 11.5, fontWeight: 600, cursor: "pointer", padding: "6px 10px", flexShrink: 0 }
   const swatch = (c: string, on: boolean, onClick: () => void, aria: string) => (
     <button key={c} onClick={onClick} aria-label={aria} aria-pressed={on} title={aria} className={`da-swatch${on ? " on" : ""}`}
       style={{ width: 44, height: 44, background: c, flexShrink: 0 }} />
@@ -433,7 +433,7 @@ export default function QrLinkPage() {
           <QrIcon size={24} color={G} />
         </div>
         <div>
-          <h1 style={{ color: "#F5F0E8", fontSize: 24, fontWeight: 800, margin: 0, letterSpacing: -0.4 }}>Créer un QR code</h1>
+          <h1 style={{ color: "var(--ink)", fontSize: 24, fontWeight: 800, margin: 0, letterSpacing: -0.4 }}>Créer un QR code</h1>
           <p style={{ color: MUTED, fontSize: 13, margin: "2px 0 0", lineHeight: 1.4 }}>Vers un lien, votre Wi-Fi, un contact, un numéro. Modifiable après impression si vous voulez.</p>
         </div>
       </div>
@@ -485,7 +485,7 @@ export default function QrLinkPage() {
         {qrType === "text" && (<>
           <p style={secTitle}>{accentBar} Texte</p>
           <textarea value={text} onChange={e => setText(e.target.value)} rows={3} placeholder="N'importe quel texte à encoder…"
-            style={{ width: "100%", boxSizing: "border-box", resize: "vertical", minHeight: 76, background: "#0A0A0A", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "#F5F0E8", fontSize: 15, padding: "12px 14px", lineHeight: 1.45, fontFamily: "inherit", outline: "none" }} />
+            style={{ width: "100%", boxSizing: "border-box", resize: "vertical", minHeight: 76, background: "var(--field)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "var(--ink)", fontSize: 15, padding: "12px 14px", lineHeight: 1.45, fontFamily: "inherit", outline: "none" }} />
         </>)}
 
         {qrType === "contact" && (<>
@@ -516,7 +516,7 @@ export default function QrLinkPage() {
             placeholder="contact@monentreprise.fr" style={{ ...field, marginBottom: 10, borderColor: (em.to ?? "").trim() ? G + "80" : "rgba(255,255,255,0.14)" }} />
           <input value={em.subject} onChange={e => setEm(v => ({ ...v, subject: e.target.value }))} placeholder="Objet (optionnel)" style={{ ...field, marginBottom: 10 }} />
           <textarea value={em.body} onChange={e => setEm(v => ({ ...v, body: e.target.value }))} rows={2} placeholder="Message pré-rempli (optionnel)"
-            style={{ width: "100%", boxSizing: "border-box", resize: "vertical", minHeight: 60, background: "#0A0A0A", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "#F5F0E8", fontSize: 15, padding: "12px 14px", lineHeight: 1.45, fontFamily: "inherit", outline: "none" }} />
+            style={{ width: "100%", boxSizing: "border-box", resize: "vertical", minHeight: 60, background: "var(--field)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "var(--ink)", fontSize: 15, padding: "12px 14px", lineHeight: 1.45, fontFamily: "inherit", outline: "none" }} />
           <p style={{ color: MUTED, fontSize: 11, margin: "9px 2px 0", lineHeight: 1.45 }}>Scanné, ce QR ouvre un brouillon d&apos;email pré-rempli vers cette adresse.</p>
         </>)}
       </div>
@@ -610,7 +610,7 @@ export default function QrLinkPage() {
               ? <QRCanvas value={previewBlocked ? "https://qrowg.com" : data} size={210} fg={fg} bg={bg} style={qrStyle} ecc={effectiveEcc} />
               : <div aria-hidden style={{ width: 210, height: 210, borderRadius: 8, background: "rgba(127,127,127,0.09)", border: "1px dashed rgba(127,127,127,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}><QrIcon size={40} color="rgba(127,127,127,0.45)" /></div>}
             {ready && (previewBlocked
-              ? <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, background: "rgba(8,8,8,0.82)", backdropFilter: "blur(3px)", WebkitBackdropFilter: "blur(3px)", color: "#F5F0E8", textAlign: "center", padding: 10 }}><Lock size={22} color={G} /><span style={{ fontSize: 11.5, fontWeight: 700, lineHeight: 1.3 }}>Limite atteinte</span></div>
+              ? <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, background: "rgba(8,8,8,0.82)", backdropFilter: "blur(3px)", WebkitBackdropFilter: "blur(3px)", color: "var(--ink)", textAlign: "center", padding: 10 }}><Lock size={22} color={G} /><span style={{ fontSize: 11.5, fontWeight: 700, lineHeight: 1.3 }}>Limite atteinte</span></div>
               : <QrWatermark />)}
           </div>
           {ready && previewLabel && (
@@ -627,11 +627,11 @@ export default function QrLinkPage() {
               </button>
             : inverted
               ? <button onClick={() => { const f = fg; setFg(bg); setBg(f) }} title="Inverser les couleurs (modules sombres sur fond clair)"
-                  style={{ display: "flex", alignItems: "center", gap: 7, color: "#FBBF24", fontSize: 12, fontWeight: 600, background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 999, padding: "6px 14px", cursor: "pointer" }}>
+                  style={{ display: "flex", alignItems: "center", gap: 7, color: "var(--warning)", fontSize: 12, fontWeight: 600, background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 999, padding: "6px 14px", cursor: "pointer" }}>
                   <AlertTriangle size={14} /> Clair sur fond sombre — <span style={{ textDecoration: "underline" }}>inverser</span>
                 </button>
             : ratio < 4.5
-              ? <div style={{ display: "flex", alignItems: "center", gap: 7, color: "#FBBF24", fontSize: 12, fontWeight: 600, background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 999, padding: "6px 14px" }}>
+              ? <div style={{ display: "flex", alignItems: "center", gap: 7, color: "var(--warning)", fontSize: 12, fontWeight: 600, background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 999, padding: "6px 14px" }}>
                   <AlertTriangle size={14} /> Contraste limite — testez avant d&apos;imprimer
                 </div>
               : <div style={{ display: "flex", alignItems: "center", gap: 7, color: "var(--success)", fontSize: 12, fontWeight: 600, background: "rgba(57,255,143,0.09)", border: "1px solid rgba(57,255,143,0.28)", borderRadius: 999, padding: "6px 14px" }}>
@@ -655,7 +655,7 @@ export default function QrLinkPage() {
           <p style={{ color: MUTED, fontSize: 11.5, margin: "9px 2px 0", lineHeight: 1.5 }}>
             {dynBlocked
               ? <>{quota.raisonModifiable} <Link href="/upgrade" style={{ color: G, fontWeight: 700, textDecoration: "none" }}>Voir les plans →</Link></>
-              : <>Vous changerez la destination après l&apos;impression, et vous verrez les scans. Sans expiration.{quota.restantsModifiables !== null && <> Il vous en reste <strong style={{ color: "#F5F0E8" }}>{quota.restantsModifiables}</strong> sur ce plan.</>}</>}
+              : <>Vous changerez la destination après l&apos;impression, et vous verrez les scans. Sans expiration.{quota.restantsModifiables !== null && <> Il vous en reste <strong style={{ color: "var(--ink)" }}>{quota.restantsModifiables}</strong> sur ce plan.</>}</>}
             {qrType === "text" && <span style={{ display: "block", color: "#6E685E", fontSize: 11, marginTop: 3 }}>Ouvre une page au scan (Internet requis).</span>}
           </p>
           <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "15px 0 13px" }}>
@@ -707,7 +707,7 @@ export default function QrLinkPage() {
                     <QRCanvas value={s.payload || "https://qrowg.com"} size={92} fg={safeFg(s.style?.fg)} bg="#FFFFFF" />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ color: "#F5F0E8", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.label || (s.dest_url || "").replace(/^https?:\/\//, "")}</p>
+                    <p style={{ color: "var(--ink)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.label || (s.dest_url || "").replace(/^https?:\/\//, "")}</p>
                     <p style={{ color: MUTED, fontSize: 11, margin: "0 0 5px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>→ {s.dest_url}</p>
                     <div style={{ display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap" }}>
                       <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: st.couleur, fontSize: 10.5, fontWeight: 700, background: `${st.couleur}18`, borderRadius: 999, padding: "3px 8px" }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: st.couleur }} />{st.badge}</span>
@@ -766,9 +766,9 @@ export default function QrLinkPage() {
       {/* Aperçu détaillé d'un QR enregistré (clic) : grand QR + infos + décompte d'expiration */}
       {detail && (() => { const ex = etatLien(detail); return (
         <div onClick={fermerDetail} style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 400, maxHeight: "90vh", overflowY: "auto", background: "#141210", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 20, padding: 20, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 400, maxHeight: "90vh", overflowY: "auto", background: "var(--surface)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 20, padding: 20, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-              <p style={{ flex: 1, color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{detail.label || (detail.dynamic ? "Lien dynamique" : libelleTypeQr(detail.kind))}</p>
+              <p style={{ flex: 1, color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{detail.label || (detail.dynamic ? "Lien dynamique" : libelleTypeQr(detail.kind))}</p>
               <button onClick={fermerDetail} aria-label="Fermer la fiche" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", width: 30, height: 30 }}><X size={15} /></button>
             </div>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
@@ -792,12 +792,12 @@ export default function QrLinkPage() {
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <div>
                   <p style={{ color: MUTED, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 4px" }}>Lien court (le QR pointe ici)</p>
-                  <p style={{ color: "#F5F0E8", fontSize: 12.5, margin: 0, wordBreak: "break-all", fontFamily: "monospace" }}>{detail.payload}</p>
+                  <p style={{ color: "var(--ink)", fontSize: 12.5, margin: 0, wordBreak: "break-all", fontFamily: "monospace" }}>{detail.payload}</p>
                 </div>
                 <div>
                   <p style={{ color: MUTED, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 4px" }}>Destination (modifiable)</p>
-                  <p style={{ color: "#F5F0E8", fontSize: 12.5, margin: "0 0 6px", wordBreak: "break-all" }}>{detail.dest_url}</p>
-                  <button onClick={() => demanderDestination(detail)} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, color: "#F5F0E8", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: "8px 12px" }}>Modifier la destination</button>
+                  <p style={{ color: "var(--ink)", fontSize: 12.5, margin: "0 0 6px", wordBreak: "break-all" }}>{detail.dest_url}</p>
+                  <button onClick={() => demanderDestination(detail)} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, color: "var(--ink)", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: "8px 12px" }}>Modifier la destination</button>
                 </div>
                 <button onClick={() => setStats(detail)}
                   style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, alignSelf: "flex-start", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 10, color: G, fontSize: 12.5, fontWeight: 700, cursor: "pointer", padding: "9px 14px" }}>
@@ -827,14 +827,14 @@ export default function QrLinkPage() {
                 ) : (
                   <a href="/upgrade" style={{ display: "block", borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 13, textDecoration: "none" }}>
                     <p style={{ color: G, fontSize: 12.5, fontWeight: 700, margin: "0 0 3px", display: "flex", alignItems: "center", gap: 6 }}><ShieldCheck size={14} /> Sécurité du lien</p>
-                    <p style={{ color: MUTED, fontSize: 11.5, margin: 0, lineHeight: 1.5 }}>Mot de passe, expiration programmée et pause à partir du plan <strong style={{ color: "#F5F0E8" }}>Pro</strong> →</p>
+                    <p style={{ color: MUTED, fontSize: 11.5, margin: 0, lineHeight: 1.5 }}>Mot de passe, expiration programmée et pause à partir du plan <strong style={{ color: "var(--ink)" }}>Pro</strong> →</p>
                   </a>
                 )}
               </div>
             ) : (
               <div>
                 <p style={{ color: MUTED, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 4px" }}>Contenu encodé</p>
-                <p style={{ color: "#F5F0E8", fontSize: 12.5, margin: 0, wordBreak: "break-all", fontFamily: "monospace" }}>{detail.payload}</p>
+                <p style={{ color: "var(--ink)", fontSize: 12.5, margin: 0, wordBreak: "break-all", fontFamily: "monospace" }}>{detail.payload}</p>
               </div>
             )}
 
@@ -842,7 +842,7 @@ export default function QrLinkPage() {
               <button onClick={copyDetail} style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", color: detailCopied ? "var(--success)" : "#F5F0E8", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
                 {detailCopied ? <><Check size={15} /> Copié !</> : <><Link2 size={15} /> Copier</>}
               </button>
-              <button onClick={downloadDetail} style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 10, border: "none", background: G, color: "#080808", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+              <button onClick={downloadDetail} style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 10, border: "none", background: G, color: "var(--ink-on-accent)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
                 <Download size={15} /> PNG
               </button>
             </div>
@@ -939,7 +939,7 @@ export default function QrLinkPage() {
           </label>
         )}
         {demande?.type === "supprimer" && demande.qr.label && (
-          <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 700, margin: 0, wordBreak: "break-word" }}>{demande.qr.label}</p>
+          <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 700, margin: 0, wordBreak: "break-word" }}>{demande.qr.label}</p>
         )}
       </Dialogue>
     </div>

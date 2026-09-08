@@ -24,7 +24,7 @@ export function MobileContextBar({ block, index, total, handlers, onMore }: Mobi
         <BlockContextToolbar block={block} index={index} total={total} mobile handlers={handlers} only={MOBILE_PRIMARY_ACTIONS} />
       </div>
       <button type="button" data-testid="context-more" onClick={onMore} aria-label="Plus d'actions"
-        style={{ minWidth: 44, height: 44, borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "var(--ink, #F5F0E8)", fontSize: 16, cursor: "pointer", flexShrink: 0 }}>⋯</button>
+        style={{ minWidth: 44, height: 44, borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "var(--ink, var(--ink))", fontSize: 16, cursor: "pointer", flexShrink: 0 }}>⋯</button>
     </div>
   )
 }

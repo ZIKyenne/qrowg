@@ -43,7 +43,7 @@ export default function PublishedScreen({
   return (
     <div role="dialog" aria-modal="true" aria-label="Votre page est en ligne"
       style={{ position: "fixed", inset: 0, zIndex: 500, background: "rgba(0,0,0,0.78)", backdropFilter: "blur(8px)", overflowY: "auto", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: mobile ? "16px 12px 40px" : "40px 20px" }}>
-      <div style={{ width: "100%", maxWidth: 460, background: "#0F0E0B", border: `1px solid ${G}38`, borderRadius: 20, padding: mobile ? "22px 18px" : "28px 26px", boxShadow: "0 30px 90px rgba(0,0,0,0.6)" }}>
+      <div style={{ width: "100%", maxWidth: 460, background: "var(--surface)", border: `1px solid ${G}38`, borderRadius: 20, padding: mobile ? "22px 18px" : "28px 26px", boxShadow: "0 30px 90px rgba(0,0,0,0.6)" }}>
 
         {/* Le moment mérite d'être marqué : c'est là que le travail devient utile. */}
         <div style={{ textAlign: "center", marginBottom: 20 }}>
@@ -55,7 +55,7 @@ export default function PublishedScreen({
         </div>
 
         {/* L'adresse, lisible et copiable — c'est ce qu'on dicte au téléphone. */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#0A0A0A", border: `1px solid ${G}33`, borderRadius: 11, padding: "10px 12px", marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--field)", border: `1px solid ${G}33`, borderRadius: 11, padding: "10px 12px", marginBottom: 20 }}>
           <span style={{ flex: 1, minWidth: 0, color: G, fontSize: 12.5, fontFamily: "JetBrains Mono, monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{adresseLisible(pageUrl)}</span>
           <button type="button" onClick={copier} aria-label="Copier l'adresse"
             style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 5, background: `${G}1A`, border: `1px solid ${G}40`, borderRadius: 8, padding: "5px 9px", color: G, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
@@ -111,7 +111,7 @@ export default function PublishedScreen({
 
 const boutonPrincipal: React.CSSProperties = {
   display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%",
-  minHeight: 46, borderRadius: 11, background: G, color: "#080808",
+  minHeight: 46, borderRadius: 11, background: G, color: "var(--ink-on-accent)",
   fontSize: 14, fontWeight: 800, textDecoration: "none", boxSizing: "border-box",
 }
 const boutonSecondaire: React.CSSProperties = {

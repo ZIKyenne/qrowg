@@ -119,33 +119,33 @@ export default function TeamPage() {
     } catch (e) { toast.error(erreurLisible(e, "Impossible de quitter l'équipe pour le moment.")) }
   }
 
-  const card: React.CSSProperties = { background: "#0F0E0B", border: "1px solid rgba(201,168,76,0.14)", borderRadius: 16, padding: 22 }
+  const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid rgba(201,168,76,0.14)", borderRadius: 16, padding: 22 }
   const rowStyle: React.CSSProperties = { display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,0.06)" }
 
   return (
     <div style={{ maxWidth: 760, margin: "0 auto", padding: "clamp(20px,4vw,40px) clamp(16px,4vw,28px)", fontFamily: "DM Sans, sans-serif" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
         <Users size={22} color={GOLD} />
-        <h1 style={{ fontFamily: "Fraunces, serif", fontSize: 28, fontWeight: 700, color: "#F5F0E8", margin: 0 }}>Équipe</h1>
+        <h1 style={{ fontFamily: "Fraunces, serif", fontSize: 28, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Équipe</h1>
       </div>
-      <p style={{ color: "#8A8478", fontSize: 14.5, margin: "0 0 28px" }}>
+      <p style={{ color: "var(--muted)", fontSize: 14.5, margin: "0 0 28px" }}>
         Invitez des collaborateurs à gérer vos pages et QR codes. <strong style={{ color: "#B8B2A4" }}>Éditeur</strong> : modifie ; <strong style={{ color: "#B8B2A4" }}>Admin</strong> : gère aussi les membres.
       </p>
 
       {loading ? (
-        <div style={{ display: "flex", alignItems: "center", gap: 10, color: "#8A8478", padding: 40, justifyContent: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--muted)", padding: 40, justifyContent: "center" }}>
           <Loader2 size={18} className="qf-spin" /> Chargement…
           <style>{`.qf-spin{animation:qfspin 1s linear infinite}@keyframes qfspin{to{transform:rotate(360deg)}}`}</style>
         </div>
       ) : !data ? (
-        <div style={{ ...card, color: "#8A8478" }}>Impossible de charger l'équipe.</div>
+        <div style={{ ...card, color: "var(--muted)" }}>Impossible de charger l'équipe.</div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
           {/* Upsell si le plan du propriétaire n'inclut pas l'Équipe */}
           {data.myRole === "owner" && !data.teamEnabled && (
             <div style={{ ...card, borderColor: "rgba(201,168,76,0.35)", background: "linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.02))" }}>
-              <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: "0 0 8px", display: "flex", alignItems: "center", gap: 8 }}><Sparkles size={16} color={GOLD} /> Invitez votre équipe</p>
+              <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: "0 0 8px", display: "flex", alignItems: "center", gap: 8 }}><Sparkles size={16} color={GOLD} /> Invitez votre équipe</p>
               <p style={{ color: "#B8B2A4", fontSize: 14, margin: "0 0 16px", lineHeight: 1.6 }}>La collaboration en équipe est incluse dans le plan <strong style={{ color: GOLD }}>Business</strong> (jusqu'à 5 membres). Passez à Business pour inviter des éditeurs et admins.</p>
               <span className="da-halo-wrap">
                 <Link href="/upgrade?reason=team" className="da-btn-primary da-btn-primary--sm">
@@ -158,12 +158,12 @@ export default function TeamPage() {
           {/* Invitation */}
           {canManage && data.teamEnabled && (
             <form onSubmit={invite} style={card}>
-              <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: "0 0 14px", display: "flex", alignItems: "center", gap: 8 }}><Mail size={15} color={GOLD} /> Inviter un membre</p>
+              <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: "0 0 14px", display: "flex", alignItems: "center", gap: 8 }}><Mail size={15} color={GOLD} /> Inviter un membre</p>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                 <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="adresse@email.com"
-                  style={{ flex: "1 1 220px", minWidth: 0, padding: "11px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.12)", background: "#0A0908", color: "#F5F0E8", fontSize: 14 }} />
+                  style={{ flex: "1 1 220px", minWidth: 0, padding: "11px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.12)", background: "#0A0908", color: "var(--ink)", fontSize: 14 }} />
                 <select aria-label="Rôle de la personne invitée" value={role} onChange={e => setRole(e.target.value as "editor" | "admin")}
-                  style={{ padding: "11px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.12)", background: "#0A0908", color: "#F5F0E8", fontSize: 14, cursor: "pointer" }}>
+                  style={{ padding: "11px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.12)", background: "#0A0908", color: "var(--ink)", fontSize: 14, cursor: "pointer" }}>
                   <option value="editor">Éditeur</option>
                   <option value="admin">Admin</option>
                 </select>
@@ -175,8 +175,8 @@ export default function TeamPage() {
           {/* Membres */}
           <div style={card}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, gap: 10, flexWrap: "wrap" }}>
-              <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: 0 }}>
-                Membres{data.teamLimit ? <span style={{ color: "#8A8478", fontWeight: 600, marginLeft: 8, fontSize: 12.5 }}>{data.seatsUsed} / {data.teamLimit}</span> : null}
+              <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: 0 }}>
+                Membres{data.teamLimit ? <span style={{ color: "var(--muted)", fontWeight: 600, marginLeft: 8, fontSize: 12.5 }}>{data.seatsUsed} / {data.teamLimit}</span> : null}
               </p>
               {data.myRole && data.myRole !== "owner" && (
                 <button type="button" onClick={leaveTeam} className="da-btn-danger da-btn-danger--sm"><LogOut size={13} /> Quitter l'équipe</button>
@@ -185,8 +185,8 @@ export default function TeamPage() {
             {/* Propriétaire */}
             <div style={rowStyle}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 600 }}>{data.owner.name || data.owner.email || "Propriétaire"}{data.myRole === "owner" ? " (vous)" : ""}</div>
-                <div style={{ color: "#8A8478", fontSize: 12.5, overflow: "hidden", textOverflow: "ellipsis" }}>{data.owner.email}</div>
+                <div style={{ color: "var(--ink)", fontSize: 14, fontWeight: 600 }}>{data.owner.name || data.owner.email || "Propriétaire"}{data.myRole === "owner" ? " (vous)" : ""}</div>
+                <div style={{ color: "var(--muted)", fontSize: 12.5, overflow: "hidden", textOverflow: "ellipsis" }}>{data.owner.email}</div>
               </div>
               <RoleBadge role="owner" />
             </div>
@@ -196,12 +196,12 @@ export default function TeamPage() {
               return (
                 <div key={m.id} style={rowStyle}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 600 }}>{label}</div>
-                    <div style={{ color: "#8A8478", fontSize: 12.5, overflow: "hidden", textOverflow: "ellipsis" }}>{m.profiles?.email}</div>
+                    <div style={{ color: "var(--ink)", fontSize: 14, fontWeight: 600 }}>{label}</div>
+                    <div style={{ color: "var(--muted)", fontSize: 12.5, overflow: "hidden", textOverflow: "ellipsis" }}>{m.profiles?.email}</div>
                   </div>
                   {canManage && (m.role === "editor" || m.role === "admin") ? (
                     <select aria-label={`Rôle de ${m.profiles?.full_name || m.profiles?.email || "ce membre"}`} value={m.role} onChange={e => changeRole(m.id, e.target.value as "editor" | "admin")}
-                      style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.14)", background: "#0A0908", color: "#F5F0E8", fontSize: 12.5, cursor: "pointer" }}>
+                      style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.14)", background: "#0A0908", color: "var(--ink)", fontSize: 12.5, cursor: "pointer" }}>
                       <option value="editor">Éditeur</option>
                       <option value="admin">Admin</option>
                     </select>
@@ -216,20 +216,20 @@ export default function TeamPage() {
               )
             })}
             {data.members.length === 0 && (
-              <p style={{ color: "#8A8478", fontSize: 13, margin: "14px 0 2px" }}>Aucun membre pour l'instant. Invitez quelqu'un ci-dessus.</p>
+              <p style={{ color: "var(--muted)", fontSize: 13, margin: "14px 0 2px" }}>Aucun membre pour l'instant. Invitez quelqu'un ci-dessus.</p>
             )}
           </div>
 
           {/* Invitations en attente */}
           {data.invitations.length > 0 && (
             <div style={card}>
-              <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: "0 0 6px" }}>Invitations en attente</p>
+              <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: "0 0 6px" }}>Invitations en attente</p>
               {data.invitations.map(inv => (
                 <div key={inv.id} style={rowStyle}>
-                  <Mail size={15} color="#8A8478" />
+                  <Mail size={15} color="var(--muted)" />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ color: "#F5F0E8", fontSize: 14, overflow: "hidden", textOverflow: "ellipsis" }}>{inv.email}</div>
-                    <div style={{ color: "#8A8478", fontSize: 12 }}>Invité·e comme {ROLE_LABEL[inv.role]}</div>
+                    <div style={{ color: "var(--ink)", fontSize: 14, overflow: "hidden", textOverflow: "ellipsis" }}>{inv.email}</div>
+                    <div style={{ color: "var(--muted)", fontSize: 12 }}>Invité·e comme {ROLE_LABEL[inv.role]}</div>
                   </div>
                   {canManage && (
                     <button type="button" onClick={() => cancelInvite(inv.id)} className="da-btn-neutral da-btn-neutral--sm">

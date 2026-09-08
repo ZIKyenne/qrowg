@@ -22,7 +22,7 @@ export function SectionCard({ title, icon: Icon, color = G, children, action, ta
             <Icon size={14} color={color}/>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-            <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 700, margin: 0 }}>{title}</p>
+            <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 700, margin: 0 }}>{title}</p>
             {tag && <span style={{ background: "color-mix(in srgb, var(--accent) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 4, padding: "1px 6px", fontSize: 9, color: G, fontWeight: 700 }}>{tag}</span>}
           </div>
         </div>
@@ -40,7 +40,7 @@ export function StatPill({ icon: Icon, label, value, color }: { icon: any; label
         <Icon size={15} color={color}/>
       </div>
       <div>
-        <p style={{ color: "#F5F0E8", fontSize: 20, fontWeight: 800, margin: 0, lineHeight: 1, fontFamily: "Fraunces, serif" }}>{value}</p>
+        <p style={{ color: "var(--ink)", fontSize: 20, fontWeight: 800, margin: 0, lineHeight: 1, fontFamily: "Fraunces, serif" }}>{value}</p>
         <p style={{ color: MUTED, fontSize: 10, margin: "2px 0 0", textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</p>
       </div>
     </div>
@@ -70,7 +70,7 @@ export function CountUp({ value, duration = 900 }: { value: number; duration?: n
 /** Le style commun des champs de saisie et de leurs étiquettes. */
 export const inputStyle: React.CSSProperties = {
   width: "100%", background: SURF2, border: "1px solid rgba(255,255,255,0.08)",
-  borderRadius: 9, padding: "10px 13px", color: "#F5F0E8", fontSize: 13,
+  borderRadius: 9, padding: "10px 13px", color: "var(--ink)", fontSize: 13,
   outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif",
   transition: "border-color 0.15s",
 }

@@ -38,7 +38,7 @@ export function BlockLibraryCard({ item, mobile, onAdd, onToggleFavorite, onOpen
         aria-label={`Ajouter le bloc ${item.title}`}
         style={{
           display: "flex", alignItems: "flex-start", gap: 10, textAlign: "left",
-          background: "transparent", border: "none", cursor: "pointer", color: "var(--ink, #F5F0E8)",
+          background: "transparent", border: "none", cursor: "pointer", color: "var(--ink, var(--ink))",
           padding: mobile ? "12px 46px 12px 12px" : "10px 40px 10px 11px", width: "100%", minHeight: tap + 12,
         }}
       >
@@ -52,7 +52,7 @@ export function BlockLibraryCard({ item, mobile, onAdd, onToggleFavorite, onOpen
           </span>
           <span style={{ fontSize: mobile ? 12 : 10.5, color: MUTED, lineHeight: 1.35, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const }}>{item.description}</span>
           {item.useCases[0] && (
-            <span style={{ fontSize: 10, color: "color-mix(in srgb, var(--accent) 75%, #8A8478)", marginTop: 1 }}>💡 {item.useCases[0]}</span>
+            <span style={{ fontSize: 10, color: "color-mix(in srgb, var(--accent) 75%, var(--muted))", marginTop: 1 }}>💡 {item.useCases[0]}</span>
           )}
         </span>
       </button>

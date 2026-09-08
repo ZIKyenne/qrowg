@@ -166,7 +166,7 @@ export default function DomainsPage({ pages, plan }: Props) {
   }
 
   return (
-    <div style={{ minHeight:"100vh", background:"#080808", padding:"32px 24px 80px", fontFamily:"DM Sans, sans-serif" }}>
+    <div style={{ minHeight:"100vh", background:"var(--bg)", padding:"32px 24px 80px", fontFamily:"DM Sans, sans-serif" }}>
       <div style={{ maxWidth:800, margin:"0 auto" }}>
 
         {/* Header */}
@@ -174,7 +174,7 @@ export default function DomainsPage({ pages, plan }: Props) {
           <div>
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:6 }}>
               <Globe size={22} color={G}/>
-              <h1 style={{ fontSize:22, fontWeight:700, color:"#F5F0E8", margin:0 }}>Domaines personnalisés</h1>
+              <h1 style={{ fontSize:22, fontWeight:700, color:"var(--ink)", margin:0 }}>Domaines personnalisés</h1>
             </div>
             <p style={{ color:MUTED, fontSize:13, margin:0 }}>
               Connectez votre propre domaine à vos pages QRowg
@@ -185,9 +185,9 @@ export default function DomainsPage({ pages, plan }: Props) {
 
         {!isPaid ? (
           /* Paywall */
-          <div style={{ textAlign:"center", padding:"48px 20px", background:"#0F0E0B", border:"1px dashed rgba(255,255,255,0.1)", borderRadius:16 }}>
+          <div style={{ textAlign:"center", padding:"48px 20px", background:"var(--surface)", border:"1px dashed rgba(255,255,255,0.1)", borderRadius:16 }}>
             <Globe size={40} color={MUTED} style={{ marginBottom:14 }}/>
-            <p style={{ color:"#F5F0E8", fontSize:15, fontWeight:600, margin:"0 0 6px" }}>Domaines personnalisés — Pro & Business</p>
+            <p style={{ color:"var(--ink)", fontSize:15, fontWeight:600, margin:"0 0 6px" }}>Domaines personnalisés — Pro & Business</p>
             <p style={{ color:MUTED, fontSize:13, margin:"0 0 24px", lineHeight:1.6 }}>
               Connectez emilien.fr, monrestaurant.com…<br/>directement à vos pages QRowg.
             </p>
@@ -211,9 +211,9 @@ export default function DomainsPage({ pages, plan }: Props) {
 
             {/* Formulaire ajout */}
             {showForm && (
-              <div style={{ background:"#0F0E0B", border:`1px solid color-mix(in srgb, var(--accent) 20%, transparent)`, borderRadius:14, padding:22, marginBottom:20 }}>
+              <div style={{ background:"var(--surface)", border:`1px solid color-mix(in srgb, var(--accent) 20%, transparent)`, borderRadius:14, padding:22, marginBottom:20 }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:18 }}>
-                  <p style={{ color:"#F5F0E8", fontSize:14, fontWeight:700, margin:0, display:"flex", alignItems:"center", gap:8 }}>
+                  <p style={{ color:"var(--ink)", fontSize:14, fontWeight:700, margin:0, display:"flex", alignItems:"center", gap:8 }}>
                     <Plus size={14} color={G}/> Nouveau domaine
                   </p>
                   <button type="button" onClick={() => { setShowForm(false); setError("") }}
@@ -229,7 +229,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                       value={fDomain}
                       onChange={e => setFDomain(e.target.value)}
                       placeholder="mondomaine.fr"
-                      style={{ width:"100%", background:"#111009", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:9, color:"#F5F0E8", padding:"10px 14px", fontSize:13, outline:"none", boxSizing:"border-box" }}
+                      style={{ width:"100%", background:"var(--surface)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:9, color:"var(--ink)", padding:"10px 14px", fontSize:13, outline:"none", boxSizing:"border-box" }}
                     />
                     <p style={{ color:MUTED, fontSize:11, margin:"5px 0 0" }}>
                       Sans www. ni https:// — ex: mondomaine.fr
@@ -239,7 +239,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                   <div>
                     <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:6 }}>Page associée</label>
                     <select aria-label="Page à rattacher au domaine" value={fPageId} onChange={e => setFPageId(e.target.value)}
-                      style={{ width:"100%", background:"#111009", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, color:"#F5F0E8", padding:"10px 14px", fontSize:13, outline:"none", cursor:"pointer" }}>
+                      style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, color:"var(--ink)", padding:"10px 14px", fontSize:13, outline:"none", cursor:"pointer" }}>
                       {pages.map(p => <option key={p.id} value={p.id}>{p.title} (/{p.slug})</option>)}
                     </select>
                   </div>
@@ -266,16 +266,16 @@ export default function DomainsPage({ pages, plan }: Props) {
                 <Loader size={22} color={MUTED} style={{ animation:"mo-spin 0.8s linear infinite" }}/>
               </div>
             ) : domains.length === 0 ? (
-              <div style={{ textAlign:"center", padding:"30px 20px", background:"#0F0E0B", border:"1px dashed rgba(255,255,255,0.1)", borderRadius:14 }}>
+              <div style={{ textAlign:"center", padding:"30px 20px", background:"var(--surface)", border:"1px dashed rgba(255,255,255,0.1)", borderRadius:14 }}>
                 <Globe size={30} color={MUTED} style={{ marginBottom:10 }}/>
-                <p style={{ color:"#F5F0E8", fontSize:14.5, fontWeight:700, margin:"0 0 6px" }}>Utilisez votre propre nom de domaine</p>
+                <p style={{ color:"var(--ink)", fontSize:14.5, fontWeight:700, margin:"0 0 6px" }}>Utilisez votre propre nom de domaine</p>
                 <p style={{ color:MUTED, fontSize:12.5, margin:"0 auto 14px", lineHeight:1.55, maxWidth:330 }}>
                   Remplacez l'adresse <span style={{ color:"#C9C3B6", fontFamily:"monospace" }}>qrowg.com</span> par la vôtre — vos clients ne voient que votre marque.
                 </p>
                 {/* Exemple concret */}
                 <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"7px 14px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:9, marginBottom:18 }}>
                   <span style={{ width:6, height:6, borderRadius:"50%", background:"var(--success)", flexShrink:0 }}/>
-                  <span style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, fontFamily:"monospace" }}>votreentreprise.fr</span>
+                  <span style={{ color:"var(--ink)", fontSize:13, fontWeight:600, fontFamily:"monospace" }}>votreentreprise.fr</span>
                 </div>
                 <span className="da-halo-wrap">
                   <button type="button" onClick={() => setShowForm(true)} className="da-btn-primary da-btn-primary--sm"><Plus className="da-ic da-ic-plus" size={14} /> <span>Ajouter mon domaine</span></button>
@@ -289,7 +289,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                   const isBusy    = verifying === rec.id || deleting === rec.id
 
                   return (
-                    <div key={rec.id} style={{ background:"#0F0E0B", border:`1px solid ${rec.verified ? "rgba(57,255,143,0.15)" : "rgba(255,255,255,0.07)"}`, borderRadius:14, overflow:"hidden" }}>
+                    <div key={rec.id} style={{ background:"var(--surface)", border:`1px solid ${rec.verified ? "rgba(57,255,143,0.15)" : "rgba(255,255,255,0.07)"}`, borderRadius:14, overflow:"hidden" }}>
 
                       {/* Ligne principale */}
                       <div style={{ display:"flex", alignItems:"center", gap:12, padding:"16px 18px" }}>
@@ -298,7 +298,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                         </div>
                         <div style={{ flex:1, minWidth:0 }}>
                           <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:2, flexWrap:"wrap" }}>
-                            <span style={{ color:"#F5F0E8", fontSize:14, fontWeight:700 }}>{rec.domain}</span>
+                            <span style={{ color:"var(--ink)", fontSize:14, fontWeight:700 }}>{rec.domain}</span>
                             <span style={{ display:"flex", alignItems:"center", gap:4, background:`${statusCfg.color}15`, border:`1px solid ${statusCfg.color}30`, borderRadius:6, padding:"2px 8px", fontSize:10, color:statusCfg.color, fontWeight:600 }}>
                               {statusCfg.icon}{statusCfg.label}
                             </span>
@@ -350,7 +350,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                       )}
                       {!rec.verified ? (
                             <div>
-                              <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:600, margin:"0 0 14px" }}>
+                              <p style={{ color:"var(--ink)", fontSize:13, fontWeight:600, margin:"0 0 14px" }}>
                                 📋 Instructions de configuration DNS
                               </p>
 
@@ -359,7 +359,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                                 <p style={{ color:MUTED, fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:1, margin:"0 0 8px" }}>
                                   Étape 1 — Vérification : Enregistrement TXT
                                 </p>
-                                <div style={{ background:"#080808", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"12px 14px" }}>
+                                <div style={{ background:"var(--bg)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"12px 14px" }}>
                                   <div style={{ display:"grid", gridTemplateColumns:"60px 1fr 80px 1fr", gap:8, marginBottom:8 }}>
                                     {["Type","Nom","TTL","Valeur"].map((h,i) => (
                                       <span key={i} style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase" }}>{h}</span>
@@ -367,8 +367,8 @@ export default function DomainsPage({ pages, plan }: Props) {
                                   </div>
                                   <div style={{ display:"grid", gridTemplateColumns:"60px 1fr 80px 1fr", gap:8, alignItems:"center" }}>
                                     <span style={{ color:G, fontSize:12, fontWeight:700 }}>TXT</span>
-                                    <span style={{ color:"#F5F0E8", fontSize:12 }}>@</span>
-                                    <span style={{ color:"#F5F0E8", fontSize:12 }}>3600</span>
+                                    <span style={{ color:"var(--ink)", fontSize:12 }}>@</span>
+                                    <span style={{ color:"var(--ink)", fontSize:12 }}>3600</span>
                                     <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                                       <code style={{ color:"var(--success)", fontSize:11, background:"rgba(57,255,143,0.08)", padding:"3px 7px", borderRadius:5, wordBreak:"break-all" }}>
                                         qrowg-verify={rec.txt_record}
@@ -387,7 +387,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                                 <p style={{ color:MUTED, fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:1, margin:"0 0 8px" }}>
                                   Étape 2 — Pointage : Enregistrement CNAME
                                 </p>
-                                <div style={{ background:"#080808", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"12px 14px" }}>
+                                <div style={{ background:"var(--bg)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"12px 14px" }}>
                                   <div style={{ display:"grid", gridTemplateColumns:"60px 1fr 80px 1fr", gap:8, marginBottom:8 }}>
                                     {["Type","Nom","TTL","Valeur"].map((h,i) => (
                                       <span key={i} style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase" }}>{h}</span>
@@ -395,8 +395,8 @@ export default function DomainsPage({ pages, plan }: Props) {
                                   </div>
                                   <div style={{ display:"grid", gridTemplateColumns:"60px 1fr 80px 1fr", gap:8, alignItems:"center" }}>
                                     <span style={{ color:G, fontSize:12, fontWeight:700 }}>CNAME</span>
-                                    <span style={{ color:"#F5F0E8", fontSize:12 }}>www</span>
-                                    <span style={{ color:"#F5F0E8", fontSize:12 }}>3600</span>
+                                    <span style={{ color:"var(--ink)", fontSize:12 }}>www</span>
+                                    <span style={{ color:"var(--ink)", fontSize:12 }}>3600</span>
                                     <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                                       <code style={{ color:G, fontSize:11, background:"color-mix(in srgb, var(--accent) 8%, transparent)", padding:"3px 7px", borderRadius:5 }}>
                                         cname.vercel-dns.com
@@ -409,7 +409,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                                   </div>
                                 </div>
                                 <p style={{ color:MUTED, fontSize:11, margin:"6px 0 0" }}>
-                                  Pour un domaine racine (sans www), utilisez un enregistrement A pointant vers <strong style={{ color:"#F5F0E8" }}>76.76.21.21</strong>
+                                  Pour un domaine racine (sans www), utilisez un enregistrement A pointant vers <strong style={{ color:"var(--ink)" }}>76.76.21.21</strong>
                                 </p>
                               </div>
 
@@ -453,8 +453,8 @@ export default function DomainsPage({ pages, plan }: Props) {
             )}
 
             {/* Guide rapide */}
-            <div style={{ marginTop:24, background:"#0F0E0B", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"16px 18px" }}>
-              <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:700, margin:"0 0 10px" }}>📖 Comment ça fonctionne ?</p>
+            <div style={{ marginTop:24, background:"var(--surface)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"16px 18px" }}>
+              <p style={{ color:"var(--ink)", fontSize:12, fontWeight:700, margin:"0 0 10px" }}>📖 Comment ça fonctionne ?</p>
               <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
                 {[
                   ["1", "Ajoutez votre domaine et sélectionnez la page à associer"],

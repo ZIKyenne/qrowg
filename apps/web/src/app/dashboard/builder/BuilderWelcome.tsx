@@ -149,7 +149,7 @@ export default function BuilderWelcome({ mobile = false }: { mobile?: boolean })
               </button>
             )}
             <button onClick={() => (last ? finish() : setI(i + 1))}
-              style={{ background: `linear-gradient(90deg,${G},#b8953f)`, color: "#0a0a0a", border: "none", borderRadius: 10, minHeight: 44, padding: "0 22px", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 6px 20px rgba(201,168,76,0.3)" }}>
+              style={{ background: `linear-gradient(90deg,${G},#b8953f)`, color: "var(--ink-on-accent)", border: "none", borderRadius: 10, minHeight: 44, padding: "0 22px", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 6px 20px rgba(201,168,76,0.3)" }}>
               {last ? "C'est parti !" : "Suivant"}
             </button>
           </div>
@@ -171,7 +171,7 @@ function MiniMap({ zone }: { zone: Zone }) {
   const barCol = (active: boolean) => (active ? `${G}66` : "rgba(255,255,255,0.09)")
   const dot = (active: boolean): CSSProperties => ({ width: 5, height: 5, borderRadius: "50%", background: active ? G : "rgba(255,255,255,0.22)" })
   return (
-    <div aria-hidden style={{ borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", background: "#0A0A0A" }}>
+    <div aria-hidden style={{ borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", background: "var(--field)" }}>
       {/* Barre du haut : nom + annuler/refaire + Apercu (gauche) · Publier (droite) */}
       <div style={{ height: 30, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 8px", borderBottom: "1px solid rgba(255,255,255,0.06)", background: "#0D0D0D" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 5 }}>

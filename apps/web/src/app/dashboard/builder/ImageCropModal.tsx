@@ -108,9 +108,9 @@ export default function ImageCropModal({ file, onCancel, onConfirm, initialAspec
 
   return (
     <div onClick={onCancel} style={{ position: "fixed", inset: 0, zIndex: 500, background: "rgba(0,0,0,0.72)", backdropFilter: "blur(5px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: largeurModale(ecran.l), background: "#141210", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 18, padding: 16, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }}>
+      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: largeurModale(ecran.l), background: "var(--surface)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 18, padding: 16, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-          <p style={{ flex: 1, color: "#F5F0E8", fontSize: 14.5, fontWeight: 700, margin: 0 }}>Recadrer l'image</p>
+          <p style={{ flex: 1, color: "var(--ink)", fontSize: 14.5, fontWeight: 700, margin: 0 }}>Recadrer l'image</p>
           <button onClick={onCancel} aria-label="Annuler" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", width: 44, height: 44, display: "grid", placeItems: "center", flexShrink: 0 }}><X size={16} /></button>
         </div>
 
@@ -118,7 +118,7 @@ export default function ImageCropModal({ file, onCancel, onConfirm, initialAspec
         <div style={{ display: "flex", justifyContent: "center" }}>
           <div data-testid="crop-frame"
             onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}
-            style={{ position: "relative", width: frame.w, height: frame.h, borderRadius: 10, overflow: "hidden", background: "#0A0A0A", cursor: "grab", touchAction: "none", boxShadow: "0 0 0 1px rgba(255,255,255,0.12) inset" }}>
+            style={{ position: "relative", width: frame.w, height: frame.h, borderRadius: 10, overflow: "hidden", background: "var(--field)", cursor: "grab", touchAction: "none", boxShadow: "0 0 0 1px rgba(255,255,255,0.12) inset" }}>
             {url && <img src={url} alt="" draggable={false}
               style={{ position: "absolute", left: clamped.x, top: clamped.y, width: disp.w, height: disp.h, maxWidth: "none", userSelect: "none", display: "block" }} />}
             {/* Grille des tiers */}

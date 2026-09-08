@@ -88,13 +88,13 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
   }
 
   return (
-    <div style={{ background: "#0F0E0B", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 20 }}>
         <Mail size={16} color={G} style={{ marginTop: 2, flexShrink: 0 }} />
         <div>
-          <h3 style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: "0 0 3px" }}>
+          <h3 style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: "0 0 3px" }}>
             Rapports automatiques
           </h3>
           <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>
@@ -106,8 +106,8 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
       {!isPaid ? (
         /* Paywall */
         <div style={{ textAlign: "center", padding: "32px 20px", background: "rgba(255,255,255,0.02)", borderRadius: 12, border: "1px dashed rgba(255,255,255,0.1)" }}>
-          <div style={{ marginBottom: 12, color: "#5c554b" }}><Mail size={30} /></div>
-          <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 600, margin: "0 0 6px" }}>
+          <div style={{ marginBottom: 12, color: "var(--faint)" }}><Mail size={30} /></div>
+          <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 600, margin: "0 0 6px" }}>
             Rapports disponibles en Pro et Business
           </p>
           <p style={{ color: MUTED, fontSize: 12, margin: "0 0 20px", lineHeight: 1.6 }}>
@@ -126,7 +126,7 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
               </div>
               {/* L'adresse est celle du compte : le serveur n'en accepte aucune
                   autre (un rapport signé QRowg ne part qu'au titulaire). */}
-              <span style={{ color: "#F5F0E8", fontSize: 12, overflowWrap: "anywhere" }}>{email}</span>
+              <span style={{ color: "var(--ink)", fontSize: 12, overflowWrap: "anywhere" }}>{email}</span>
             </div>
           </div>
 
@@ -154,7 +154,7 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
                         </div>
                         <div style={{ flex: 1 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
-                            <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 700, margin: 0 }}>{cfg.label}</p>
+                            <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 700, margin: 0 }}>{cfg.label}</p>
                             {on && (
                               <span style={{ background: `${cfg.color}20`, border: `1px solid ${cfg.color}40`, borderRadius: 5, padding: "1px 6px", fontSize: 9, color: cfg.color, fontWeight: 700 }}>
                                 ACTIF

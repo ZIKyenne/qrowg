@@ -16,7 +16,7 @@ export default async function SubdomainServerPage() {
     .single()
 
   return (
-    <div style={{ minHeight:"100vh", background:"#080808", padding:"40px 24px 80px", fontFamily:"DM Sans, sans-serif" }}>
+    <div style={{ minHeight:"100vh", background:"var(--bg)", padding:"40px 24px 80px", fontFamily:"DM Sans, sans-serif" }}>
       <div style={{ maxWidth:560, margin:"0 auto" }}>
         <SubdomainPanel currentUsername={profile?.username ?? null} />
       </div>

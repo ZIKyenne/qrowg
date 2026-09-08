@@ -39,8 +39,8 @@ export function MobileBuilderHeader(p: MobileBuilderHeaderProps) {
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 1 }}>
         {p.onRename
           ? <input value={p.pageName} onChange={e => p.onRename!(e.target.value)} aria-label="Nom de la page"
-              style={{ fontSize: 13, fontWeight: 700, color: "var(--ink, #F5F0E8)", background: "transparent", border: "none", outline: "none", padding: 0, width: "100%", minWidth: 0, minHeight: 22, textOverflow: "ellipsis", fontFamily: "inherit" }} />
-          : <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink, #F5F0E8)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.pageName || "Ma page"}</span>}
+              style={{ fontSize: 13, fontWeight: 700, color: "var(--ink, var(--ink))", background: "transparent", border: "none", outline: "none", padding: 0, width: "100%", minWidth: 0, minHeight: 22, textOverflow: "ellipsis", fontFamily: "inherit" }} />
+          : <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink, var(--ink))", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.pageName || "Ma page"}</span>}
         <BuilderStatus mobile saving={p.saving} saved={p.saved} saveError={p.saveError} saveErrorMsg={p.saveErrorMsg} hasUnsaved={p.hasUnsaved} onSave={p.onSave} onRetry={p.onRetry} />
       </div>
       <button type="button" onClick={p.onUndo} disabled={!p.canUndo} aria-label="Annuler" title="Annuler" style={iconBtn(!p.canUndo)}>↶</button>

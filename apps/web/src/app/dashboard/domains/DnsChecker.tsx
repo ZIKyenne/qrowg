@@ -128,7 +128,7 @@ export default function DnsChecker({ domain, onVerified }: Props) {
                 : <Clock size={18} color="#F97316"/>
               }
               <div>
-                <p style={{ color:"#F5F0E8", fontSize:13, fontWeight:700, margin:"0 0 2px" }}>
+                <p style={{ color:"var(--ink)", fontSize:13, fontWeight:700, margin:"0 0 2px" }}>
                   {result.allOk ? "Configuration DNS complète ✓" : `${okCount}/${total} vérifications réussies`}
                 </p>
                 <p style={{ color:MUTED, fontSize:11, margin:0 }}>
@@ -167,7 +167,7 @@ export default function DnsChecker({ domain, onVerified }: Props) {
 
                     {/* Label + message */}
                     <div style={{ flex:1, minWidth:0 }}>
-                      <p style={{ color:"#F5F0E8", fontSize:12, fontWeight:700, margin:"0 0 2px" }}>{check.label}</p>
+                      <p style={{ color:"var(--ink)", fontSize:12, fontWeight:700, margin:"0 0 2px" }}>{check.label}</p>
                       <p style={{ color: cfg.color, fontSize:11, margin:0 }}>{check.message}</p>
                     </div>
 
@@ -228,7 +228,7 @@ export default function DnsChecker({ domain, onVerified }: Props) {
           {/* Guide fournisseurs */}
           {!result.allOk && (
             <div style={{ marginTop:14, padding:"12px 14px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:10 }}>
-              <p style={{ color:"#F5F0E8", fontSize:11, fontWeight:700, margin:"0 0 8px" }}>🔧 Où modifier vos DNS ?</p>
+              <p style={{ color:"var(--ink)", fontSize:11, fontWeight:700, margin:"0 0 8px" }}>🔧 Où modifier vos DNS ?</p>
               <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
                 {[
                   { name:"OVH",       url:"https://www.ovh.com/manager/web" },
@@ -244,7 +244,7 @@ export default function DnsChecker({ domain, onVerified }: Props) {
                 ))}
               </div>
               <p style={{ color:MUTED, fontSize:11, margin:"10px 0 0", lineHeight:1.5 }}>
-                ⏱ La propagation DNS peut prendre <strong style={{ color:"#F5F0E8" }}>quelques minutes à 48h</strong> selon votre fournisseur. Relancez la vérification régulièrement.
+                ⏱ La propagation DNS peut prendre <strong style={{ color:"var(--ink)" }}>quelques minutes à 48h</strong> selon votre fournisseur. Relancez la vérification régulièrement.
               </p>
             </div>
           )}

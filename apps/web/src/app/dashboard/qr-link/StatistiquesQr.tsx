@@ -56,7 +56,7 @@ export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null;
       { icon: Activity, label: "Statut", value: st.phrase, color: st.couleur },
     ]
     const panel: React.CSSProperties = {
-      background: "#141210", border: "1px solid rgba(201,168,76,0.25)", boxShadow: "0 20px 60px rgba(0,0,0,0.7)",
+      background: "var(--surface)", border: "1px solid rgba(201,168,76,0.25)", boxShadow: "0 20px 60px rgba(0,0,0,0.7)",
       zIndex: 401, overflowY: "auto", position: "fixed",
       ...(isMobile
         ? { left: 0, right: 0, bottom: 0, width: "100%", maxHeight: "85dvh", borderRadius: "22px 22px 0 0", padding: 20, paddingBottom: "calc(20px + env(safe-area-inset-bottom))", animation: "mo-slide-up .22s ease" }
@@ -69,7 +69,7 @@ export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null;
           <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 16 }}>
             <BarChart3 size={18} color={G} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 800, margin: 0 }}>Statistiques</p>
+              <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 800, margin: 0 }}>Statistiques</p>
               <p style={{ color: MUTED, fontSize: 11.5, margin: "1px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{stats.label || stats.dest_url || "Lien dynamique"}</p>
             </div>
             <button onClick={onFermer} aria-label="Fermer les statistiques" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", width: 30, height: 30, flexShrink: 0 }}><X size={15} /></button>
@@ -163,13 +163,13 @@ export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null;
           {details && details.detailed === false && (
             <a href="/upgrade" style={{ display: "block", marginTop: 16, padding: "13px 14px", borderRadius: 12, background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.28)", textDecoration: "none" }}>
               <p style={{ color: G, fontSize: 12.5, fontWeight: 700, margin: "0 0 3px", display: "flex", alignItems: "center", gap: 6 }}><BarChart3 size={14} /> Statistiques détaillées</p>
-              <p style={{ color: MUTED, fontSize: 11.5, margin: 0, lineHeight: 1.5 }}>Scans par jour, appareil et pays à partir du plan <strong style={{ color: "#F5F0E8" }}>Pro</strong>. Toucher pour découvrir →</p>
+              <p style={{ color: MUTED, fontSize: 11.5, margin: 0, lineHeight: 1.5 }}>Scans par jour, appareil et pays à partir du plan <strong style={{ color: "var(--ink)" }}>Pro</strong>. Toucher pour découvrir →</p>
             </a>
           )}
 
           <div style={{ marginTop: 16, padding: "11px 13px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
             <p style={{ color: "#6E685E", fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 3px" }}>Lien suivi</p>
-            <p style={{ color: "#F5F0E8", fontSize: 12, margin: 0, wordBreak: "break-all", fontFamily: "monospace" }}>{stats.payload}</p>
+            <p style={{ color: "var(--ink)", fontSize: 12, margin: 0, wordBreak: "break-all", fontFamily: "monospace" }}>{stats.payload}</p>
           </div>
           <p style={{ color: "#6E685E", fontSize: 10.5, margin: "10px 2px 0", lineHeight: 1.5, textAlign: "center" }}>Mis à jour à chaque scan.</p>
         </div>

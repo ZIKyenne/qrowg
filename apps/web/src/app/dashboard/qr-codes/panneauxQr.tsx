@@ -12,35 +12,35 @@ const G = "#C9A84C"
 const MUTED = "rgba(245,240,232,0.55)"
 
 export const GLYPH_COULEURS = (
-  <span style={{ width:16, height:16, borderRadius:"50%", border:"1.5px solid #e8c877", background:"linear-gradient(135deg, #e8c877 0 50%, transparent 50% 100%)" }} />
+  <span style={{ width:16, height:16, borderRadius:"50%", border:"1.5px solid var(--gold-light)", background:"linear-gradient(135deg, var(--gold-light) 0 50%, transparent 50% 100%)" }} />
 )
 export const GLYPH_MODULES = (
   <span style={{ display:"grid", gridTemplateColumns:"repeat(3, 4px)", gridTemplateRows:"repeat(3, 4px)", gap:2 }}>
-    <span style={{ background:"#e8c877", borderRadius:"50%" }}/><span style={{ background:"#e8c877", borderRadius:"50%" }}/><span style={{ background:"rgba(232,200,119,.3)", borderRadius:"50%" }}/>
-    <span style={{ background:"#e8c877", borderRadius:1 }}/><span style={{ background:"rgba(232,200,119,.3)", borderRadius:1 }}/><span style={{ background:"#e8c877", borderRadius:1 }}/>
-    <span style={{ background:"rgba(232,200,119,.3)", borderRadius:"50%" }}/><span style={{ background:"#e8c877", borderRadius:"50%" }}/><span style={{ background:"#e8c877", borderRadius:"50%" }}/>
+    <span style={{ background:"var(--gold-light)", borderRadius:"50%" }}/><span style={{ background:"var(--gold-light)", borderRadius:"50%" }}/><span style={{ background:"rgba(232,200,119,.3)", borderRadius:"50%" }}/>
+    <span style={{ background:"var(--gold-light)", borderRadius:1 }}/><span style={{ background:"rgba(232,200,119,.3)", borderRadius:1 }}/><span style={{ background:"var(--gold-light)", borderRadius:1 }}/>
+    <span style={{ background:"rgba(232,200,119,.3)", borderRadius:"50%" }}/><span style={{ background:"var(--gold-light)", borderRadius:"50%" }}/><span style={{ background:"var(--gold-light)", borderRadius:"50%" }}/>
   </span>
 )
 export const GLYPH_COINS = (<>
-  <span style={{ position:"absolute", left:4, top:4, width:13, height:13, border:"2px solid #e8c877", borderRadius:3 }}/>
-  <span style={{ position:"absolute", left:8, top:8, width:5, height:5, background:"#e8c877", borderRadius:1 }}/>
+  <span style={{ position:"absolute", left:4, top:4, width:13, height:13, border:"2px solid var(--gold-light)", borderRadius:3 }}/>
+  <span style={{ position:"absolute", left:8, top:8, width:5, height:5, background:"var(--gold-light)", borderRadius:1 }}/>
   <span style={{ position:"absolute", right:4, bottom:4, width:6, height:6, borderRight:"2px solid rgba(232,200,119,.5)", borderBottom:"2px solid rgba(232,200,119,.5)", borderBottomRightRadius:3 }}/>
 </>)
 export const GLYPH_AVANCES = (<>
   <span style={{ position:"absolute", left:5, top:10, width:16, height:1.5, background:"rgba(232,200,119,.55)" }}/>
-  <span style={{ position:"absolute", left:9, top:7.5, width:6, height:6, borderRadius:"50%", background:"#e8c877" }}/>
+  <span style={{ position:"absolute", left:9, top:7.5, width:6, height:6, borderRadius:"50%", background:"var(--gold-light)" }}/>
   <span style={{ position:"absolute", left:5, top:18, width:16, height:1.5, background:"rgba(232,200,119,.55)" }}/>
-  <span style={{ position:"absolute", left:15, top:15.5, width:6, height:6, borderRadius:"50%", background:"#e8c877" }}/>
+  <span style={{ position:"absolute", left:15, top:15.5, width:6, height:6, borderRadius:"50%", background:"var(--gold-light)" }}/>
 </>)
 export const GLYPH_LOGO = (
-  <span style={{ position:"relative", width:17, height:14, border:"1.5px solid #e8c877", borderRadius:3, overflow:"hidden" }}>
-    <span style={{ position:"absolute", left:2, top:2, width:3.5, height:3.5, borderRadius:"50%", background:"#e8c877" }}/>
-    <span style={{ position:"absolute", left:2, bottom:0, width:0, height:0, borderLeft:"5px solid transparent", borderRight:"5px solid transparent", borderBottom:"7px solid #e8c877" }}/>
+  <span style={{ position:"relative", width:17, height:14, border:"1.5px solid var(--gold-light)", borderRadius:3, overflow:"hidden" }}>
+    <span style={{ position:"absolute", left:2, top:2, width:3.5, height:3.5, borderRadius:"50%", background:"var(--gold-light)" }}/>
+    <span style={{ position:"absolute", left:2, bottom:0, width:0, height:0, borderLeft:"5px solid transparent", borderRight:"5px solid transparent", borderBottom:"7px solid var(--gold-light)" }}/>
   </span>
 )
 export const GLYPH_MARGE = (<>
   <span style={{ position:"absolute", left:6, top:6, width:16, height:16, border:"1.5px dashed rgba(232,200,119,.6)", borderRadius:3 }}/>
-  <span style={{ position:"absolute", left:10.5, top:10.5, width:7, height:7, background:"#e8c877", borderRadius:1 }}/>
+  <span style={{ position:"absolute", left:10.5, top:10.5, width:7, height:7, background:"var(--gold-light)", borderRadius:1 }}/>
 </>)
 
 export function AccSection({ id, title, icon, glyph, subtitle, openId, setOpenId, children }: {
@@ -59,8 +59,8 @@ export function AccSection({ id, title, icon, glyph, subtitle, openId, setOpenId
             <span aria-hidden="true" style={{ position:"relative", display:"inline-flex", alignItems:"center", justifyContent:"center", width:28, height:28, flexShrink:0, borderRadius:8, background:"linear-gradient(135deg, rgba(232,200,119,.16), rgba(201,162,77,.05))", border:"1px solid rgba(232,200,119,.22)" }}>{glyph}</span>
           ) : icon ? (<span style={{ fontSize:14 }}>{icon}</span>) : null}
           <span style={{ display:"flex", flexDirection:"column", gap:2, minWidth:0, textAlign:"left" as const }}>
-            <span style={{ fontSize:13.5, fontWeight:600, color:"#e8e3da", letterSpacing:"-.01em", whiteSpace:"nowrap" as const }}>{title}</span>
-            {subtitle && <span style={{ fontSize:11, color:"#8a8177", whiteSpace:"nowrap" as const, overflow:"hidden", textOverflow:"ellipsis" }}>{subtitle}</span>}
+            <span style={{ fontSize:13.5, fontWeight:600, color:"var(--ink)", letterSpacing:"-.01em", whiteSpace:"nowrap" as const }}>{title}</span>
+            {subtitle && <span style={{ fontSize:11, color:"var(--muted)", whiteSpace:"nowrap" as const, overflow:"hidden", textOverflow:"ellipsis" }}>{subtitle}</span>}
           </span>
         </span>
         <ChevronRight size={15} color={open ? "#e8c877" : "#7d766c"} style={{ flexShrink:0, transform: open ? "rotate(90deg)" : "rotate(0deg)", transition:"transform 0.2s" }}/>
@@ -132,16 +132,16 @@ export function ColorField({ label, value, onChange, onClear }: {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
       <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-        <label style={{ color:"#A8A190", fontSize:11, flex:1 }}>{label}</label>
+        <label style={{ color:"var(--muted)", fontSize:11, flex:1 }}>{label}</label>
         <button type="button" onClick={() => setOpen(o => !o)}
           style={{ width:28, height:28, borderRadius:6, border:`1px solid ${open?"#C9A84C":"rgba(255,255,255,0.15)"}`, background: valid ? safe : "transparent", cursor:"pointer", flexShrink:0, position:"relative", overflow:"hidden", padding:0 }}>
           {!valid && <span style={{ position:"absolute", inset:0, background:"repeating-linear-gradient(45deg,#222,#222 3px,#444 3px,#444 6px)" }}/>}
         </button>
         <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder="#----"
-          style={{ width:72, background:"#111009", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"5px 7px", color:valid?"#F5F0E8":"#A8A190", fontSize:10, fontFamily:"monospace", outline:"none" }}/>
+          style={{ width:72, background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"5px 7px", color:valid?"#F5F0E8":"#A8A190", fontSize:10, fontFamily:"monospace", outline:"none" }}/>
         {onClear && (
           <button type="button" onClick={onClear} title="Effacer"
-            style={{ width:24, height:24, borderRadius:6, border:"1px solid rgba(255,255,255,0.08)", background:"rgba(255,255,255,0.03)", color:"#A8A190", cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, padding:0 }}>×</button>
+            style={{ width:24, height:24, borderRadius:6, border:"1px solid rgba(255,255,255,0.08)", background:"rgba(255,255,255,0.03)", color:"var(--muted)", cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, padding:0 }}>×</button>
         )}
       </div>
 

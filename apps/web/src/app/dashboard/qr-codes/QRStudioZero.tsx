@@ -331,7 +331,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
             <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, color: MUTED, padding: 24, textAlign: "center" }}>
               <QrCode size={40} color={FAINT} />
               <p style={{ margin: 0, fontSize: 14 }}>{qrCodes.length ? "Choisissez un QR à gauche." : "Créez votre première page pour obtenir un QR."}</p>
-              {!qrCodes.length && <Link href="/dashboard/templates" style={{ padding: "9px 16px", borderRadius: 10, background: G, color: "#080808", fontWeight: 700, fontSize: 13, textDecoration: "none" }}>Nouvelle page + QR</Link>}
+              {!qrCodes.length && <Link href="/dashboard/templates" style={{ padding: "9px 16px", borderRadius: 10, background: G, color: "var(--ink-on-accent)", fontWeight: 700, fontSize: 13, textDecoration: "none" }}>Nouvelle page + QR</Link>}
             </div>
           )}
         </section>

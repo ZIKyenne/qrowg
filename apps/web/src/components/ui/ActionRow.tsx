@@ -48,7 +48,7 @@ export function ActionRow({ icon, title, subtitle, tone = "neutral", right, onCl
       )}
       <span style={{ flex: 1, minWidth: 0 }}>
         <span style={{ display: "block", color: t.title, fontSize: 13, fontWeight: 600 }}>{title}</span>
-        {subtitle && <span style={{ display: "block", color: "#A8A190", fontSize: 11, marginTop: 1 }}>{subtitle}</span>}
+        {subtitle && <span style={{ display: "block", color: "var(--muted)", fontSize: 11, marginTop: 1 }}>{subtitle}</span>}
       </span>
       {right}
     </>

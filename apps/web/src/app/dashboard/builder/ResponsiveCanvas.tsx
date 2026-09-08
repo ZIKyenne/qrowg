@@ -103,7 +103,7 @@ export function ResponsiveCanvas({ children, mobile, initialDevice = "fluid", se
           <span style={{ fontSize: 11, color: MUTED }}>{DEVICE_LABEL[device]}</span>
           <div style={{ flex: 1 }} />
           <button type="button" data-testid="exit-preview" onClick={() => setModeAndNotify("edit")}
-            style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", color: "var(--ink, #F5F0E8)", fontSize: 12, cursor: "pointer" }}>Éditer</button>
+            style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", color: "var(--ink, var(--ink))", fontSize: 12, cursor: "pointer" }}>Éditer</button>
         </div>
       )}
 
@@ -143,7 +143,7 @@ export function ResponsiveCanvas({ children, mobile, initialDevice = "fluid", se
         <div style={{ flex: 1 }} />
         <button type="button" data-testid="back-to-top" onClick={() => scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Revenir en haut" title="Revenir en haut"
-          style={{ fontSize: 10.5, color: "var(--ink, #F5F0E8)", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "3px 9px", cursor: "pointer" }}>↑ Haut</button>
+          style={{ fontSize: 10.5, color: "var(--ink, var(--ink))", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "3px 9px", cursor: "pointer" }}>↑ Haut</button>
       </div>
     </div>
   )

@@ -40,11 +40,11 @@ const CFG: Record<string, { label: string; icon: ReactNode; color: string; inter
   instagram_feed: { label: "Instagram",     icon: <Camera size={13} />, color: "#E1306C", interactive: true  },
   gallery:        { label: "Galerie",       icon: <Images size={13} />, color: "#A78BFA", interactive: true  },
   profile:        { label: "Profil",        icon: <User size={13} />, color: "var(--accent)", interactive: false },
-  bio:            { label: "Bio",           icon: <FileText size={13} />, color: "#A8A190", interactive: false },
+  bio:            { label: "Bio",           icon: <FileText size={13} />, color: "var(--muted)", interactive: false },
   testimonials:   { label: "Avis",          icon: <Star size={13} />, color: "#FFD700", interactive: false },
   visit_counter:  { label: "Compteur",      icon: <BarChart2 size={13} />, color: "#67E8F9", interactive: false },
-  heading:        { label: "Titre",         icon: <Type size={13} />, color: "#A8A190", interactive: false },
-  rich_text:      { label: "Texte",         icon: <AlignLeft size={13} />, color: "#A8A190", interactive: false },
+  heading:        { label: "Titre",         icon: <Type size={13} />, color: "var(--muted)", interactive: false },
+  rich_text:      { label: "Texte",         icon: <AlignLeft size={13} />, color: "var(--muted)", interactive: false },
   spacer:         { label: "Espaceur",      icon: <MoveVertical size={13} />, color: "#333",    interactive: false },
   divider:        { label: "Séparateur",    icon: <Minus size={13} />,  color: "#444",    interactive: false },
 }
@@ -62,7 +62,7 @@ function Tip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   const cfg = getCfg(label)
   return (
-    <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "10px 14px" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "10px 14px" }}>
       <p style={{ color: cfg.color, fontWeight: 700, fontSize: 12, margin: "0 0 6px" }}>
         {cfg.icon} {cfg.label}
       </p>
@@ -171,14 +171,14 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
     }))
 
   return (
-    <div style={{ background: "#0F0E0B", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
             <Layers size={16} color={G} />
-            <h3 style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0 }}>
+            <h3 style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>
               Performance des blocs
             </h3>
           </div>
@@ -192,7 +192,7 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
           {pages.length > 1 && page == null && (
             <select aria-label="Filtrer par page" value={pageId} onChange={e => setPageId(e.target.value)}
-              style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 9, color: "#F5F0E8", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
+              style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 9, color: "var(--ink)", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
               <option value="all">Toutes les pages</option>
               {pages.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
             </select>
@@ -241,7 +241,7 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
             {k.icon}
             <div>
               <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 2px" }}>{k.label}</p>
-              <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 800, margin: 0 }}>{k.value}</p>
+              <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 800, margin: 0 }}>{k.value}</p>
             </div>
           </div>
         ))}
@@ -249,7 +249,7 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
 
       {sorted.length === 0 ? (
         <div style={{ textAlign: "center", padding: "48px 20px", color: MUTED }}>
-          <div style={{ marginBottom: 10, color: "#5c554b" }}><Layers size={34} /></div>
+          <div style={{ marginBottom: 10, color: "var(--faint)" }}><Layers size={34} /></div>
           <p style={{ margin: "0 0 6px", fontSize: 14 }}>Aucune interaction enregistrée</p>
           <p style={{ margin: 0, fontSize: 12 }}>Les données apparaissent après les premiers clics</p>
         </div>
@@ -265,7 +265,7 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
                 <XAxis type="number" tick={{ fill: MUTED, fontSize: 10 }} axisLine={false} tickLine={false} />
                 <YAxis type="category" dataKey="name" width={80}
                   tickFormatter={n => getCfg(n).label}
-                  tick={{ fill: "#F5F0E8", fontSize: 11 }} axisLine={false} tickLine={false} />
+                  tick={{ fill: "var(--ink)", fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip content={<Tip />} cursor={{ fill: "color-mix(in srgb, var(--accent) 5%, transparent)" }} />
                 <Bar dataKey="Clics" radius={[0, 6, 6, 0]}>
                   {sorted.slice(0, 8).map((s, i) => (
@@ -290,10 +290,10 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
                 </span>
                 <div style={{ display: "flex", alignItems: "center", gap: 7, overflow: "hidden" }}>
                   <span style={{ flexShrink: 0, display: "inline-flex", color: row.cfg.color }}>{row.cfg.icon}</span>
-                  <span style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.cfg.label}</span>
+                  <span style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.cfg.label}</span>
                 </div>
                 <span style={{ color: MUTED, fontSize: 11 }}>{row.count}x</span>
-                <span style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 700 }}>{row.clics}</span>
+                <span style={{ color: "var(--ink)", fontSize: 13, fontWeight: 700 }}>{row.clics}</span>
                 <span title={row.ctrIsReal ? "CTR réel : clics ÷ impressions (bloc réellement vu)" : "Estimation : clics ÷ vues de page (pas encore d'impressions mesurées)"}
                   style={{ color: (row.effCtr ?? 0) >= 10 ? "var(--success)" : (row.effCtr ?? 0) >= 5 ? G : MUTED, fontSize: 12, fontWeight: 600 }}>
                   {row.effCtr == null ? "—" : `${row.ctrIsReal ? "" : "~"}${row.effCtr}%`}

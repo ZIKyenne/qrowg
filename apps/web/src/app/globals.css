@@ -139,6 +139,7 @@
   --gold-border: rgba(212, 175, 69, 0.25);
   --neon: #39FF8F;
   --ink: #F4F1E8;
+  --ink-on-accent: #15150F;    /* encre sombre posée sur --accent (boutons primaires, pastilles) */
   --muted: #A7A69F;
   --faint: #80847D;            /* libellés discrets — AA (≥ 4,5:1) sur --bg, --surface et --surface-2 */
 
@@ -950,8 +951,15 @@ img, video, canvas { max-width: 100%; }
    peut arriver après la première peinture. Voir DashboardShell.tsx. */
 @media (max-width: 859px) {
   .qf-sidebar { display: none !important; }
+  .qf-topbar { display: none !important; }
   .qf-main-nav { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
 }
+/* Rail et colonne (8 septembre) : survol et clavier, sans JavaScript. */
+.qf-tile:hover, .qf-row:hover { background: var(--surface) !important; color: var(--ink) !important; }
+.qf-tile[aria-current="page"]:hover { background: var(--surface-2) !important; color: var(--accent) !important; }
+.qf-row[aria-current="page"]:hover { background: var(--surface-2) !important; }
+.qf-chip:hover { border-color: color-mix(in srgb, var(--accent) 50%, transparent) !important; }
+.qf-tile:focus-visible, .qf-row:focus-visible, .qf-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (min-width: 860px) {
   .qf-mobile-nav { display: none; }
 }
@@ -1016,7 +1024,7 @@ a:focus-visible,
    Plus de dégradé, plus d'ombre interne « bouton de jeu », plus de saut. */
 .da-btn-primary, .qb-gold, .dam-primary, .ui-btn--primary, .da-btn-primary--sm {
   background: var(--accent) !important;
-  color: #15150F !important;
+  color: var(--ink-on-accent) !important;
   box-shadow: none !important;
   border-radius: 9px !important;
 }

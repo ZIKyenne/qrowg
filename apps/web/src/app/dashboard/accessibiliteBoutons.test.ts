@@ -45,8 +45,15 @@ describe("la barre latérale repliée garde ses noms", () => {
     expect(shell).toContain('aria-label={collapsed ? "Déployer le menu" : "Replier le menu"}')
     expect(shell).not.toMatch(/setCollapsed\(p => !p\)\}[^\n]*\n\s*style=\{\{ width: 26/)
   })
-  it("chaque lien de la barre réduite porte un aria-label", () => {
-    expect(shell).toContain('aria-label={collapsed ? label : undefined}')
-    for (const l of ['"Créer mon compte"', '"Voir les offres"', '"Mon profil"']) expect(shell).toContain(`aria-label={collapsed ? ${l} : undefined}`)
+  it("le rail écrit toujours le nom du module sous l'icône (plus de barre muette à nommer)", () => {
+    // Depuis les modules (8 septembre), le rail n'a plus d'état « icônes seules » :
+    // chaque tuile porte son libellé visible, et le survol liste les écrans.
+    expect(shell).toContain("<NavGlyph name={g.glyph} />")
+    expect(shell).toMatch(/whiteSpace: "nowrap" \}\}>\{g\.label\}<\/span>/)
+    expect(shell).not.toContain("aria-label={collapsed ? label : undefined}")
+  })
+  it("les liens sans texte de la barre du haut sont nommés", () => {
+    for (const l of ['"Voir les offres"', '"Mon profil"', '"QROWG — tableau de bord"']) expect(shell).toContain(`aria-label=${l}`)
+    expect(shell).toContain("Créer mon compte")
   })
 })

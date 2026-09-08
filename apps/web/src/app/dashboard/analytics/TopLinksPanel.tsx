@@ -95,8 +95,8 @@ function CustomTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null
   const d = payload[0].payload
   return (
-    <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "10px 14px", maxWidth: 220 }}>
-      <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 700, margin: "0 0 4px", wordBreak: "break-all" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "10px 14px", maxWidth: 220 }}>
+      <p style={{ color: "var(--ink)", fontSize: 12, fontWeight: 700, margin: "0 0 4px", wordBreak: "break-all" }}>
         {d.label}
       </p>
       <p style={{ color: G, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{d.clicks} clics</p>
@@ -173,14 +173,14 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
   const totalClicks = filteredClicks.length
 
   return (
-    <div style={{ background: "#0F0E0B", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20, gap: 12, flexWrap: "wrap" }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
             <MousePointerClick size={16} color={G} />
-            <h3 style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0 }}>Top 10 liens</h3>
+            <h3 style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>Top 10 liens</h3>
           </div>
           <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>
             {totalClicks} clics · CTR global {totalViews > 0 ? `${((totalClicks / totalViews) * 100).toFixed(1)}%` : "— (aucune vue pistée)"}
@@ -191,7 +191,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
           {/* Filtre page (masqué si piloté par la barre du haut) */}
           {pages.length > 1 && page == null && (
             <select aria-label="Filtrer par page" value={pageFilter} onChange={e => setPageFilter(e.target.value)}
-              style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 9, color: "#F5F0E8", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
+              style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 9, color: "var(--ink)", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
               <option value="all">Toutes les pages</option>
               {pages.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
             </select>
@@ -248,7 +248,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
             {stat.icon}
             <div>
               <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 2px" }}>{stat.label}</p>
-              <p style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 800, margin: 0 }}>{stat.value}</p>
+              <p style={{ color: "var(--ink)", fontSize: 16, fontWeight: 800, margin: 0 }}>{stat.value}</p>
             </div>
           </div>
         ))}
@@ -256,7 +256,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
 
       {linkData.length === 0 ? (
         <div style={{ textAlign: "center", padding: "48px 20px", color: MUTED }}>
-          <div style={{ marginBottom: 10, color: "#5c554b" }}><MousePointerClick size={34} /></div>
+          <div style={{ marginBottom: 10, color: "var(--faint)" }}><MousePointerClick size={34} /></div>
           <p style={{ margin: "0 0 6px", fontSize: 14 }}>Aucun clic sur cette période</p>
           <p style={{ margin: 0, fontSize: 12 }}>Les clics apparaissent en temps réel</p>
         </div>
@@ -305,7 +305,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
               <div style={{ overflow: "hidden" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
                   <a href={row.target.startsWith("http") ? row.target : "#"} target="_blank" rel="noopener noreferrer"
-                    style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, textDecoration: "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600, textDecoration: "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {row.label}
                   </a>
                   {row.target.startsWith("http") && <ExternalLink size={10} color={MUTED} style={{ flexShrink: 0 }} />}
@@ -314,12 +314,12 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
 
               {/* Type bloc */}
               <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <span style={{ display: "inline-flex", color: "#8a8177", flexShrink: 0 }}>{row.icon}</span>
+                <span style={{ display: "inline-flex", color: "var(--muted)", flexShrink: 0 }}>{row.icon}</span>
                 <span style={{ color: MUTED, fontSize: 10, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.typeLabel}</span>
               </div>
 
               {/* Clics */}
-              <span style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 700 }}>{row.clicks.toLocaleString()}</span>
+              <span style={{ color: "var(--ink)", fontSize: 13, fontWeight: 700 }}>{row.clicks.toLocaleString()}</span>
 
               {/* CTR — « — » quand aucune vue pistée (jamais un pourcentage inventé) */}
               <span title={row.ctr == null ? "CTR non calculable : aucune vue de page pistée" : undefined} style={{ color: row.ctr == null ? MUTED : row.ctr >= 10 ? "var(--success)" : row.ctr >= 5 ? G : MUTED, fontSize: 12, fontWeight: 600 }}>

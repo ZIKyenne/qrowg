@@ -51,10 +51,10 @@ export default function HeatmapPanel({ grid, byBlock, total, blocks }: Props) {
   const topMax = top[0]?.[1] || 0
 
   return (
-    <div style={{ background: "#141210", border: "1px solid #221f1b", borderRadius: 16, padding: "20px 22px" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid var(--surface-2)", borderRadius: 16, padding: "20px 22px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
         <Flame size={16} color={GOLD} />
-        <h3 style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0 }}>Carte de chaleur des clics</h3>
+        <h3 style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>Carte de chaleur des clics</h3>
       </div>
       <p style={{ color: MUTED, fontSize: 12, margin: "0 0 16px" }}>Où vos visiteurs cliquent vraiment sur la page.</p>
 
@@ -83,7 +83,7 @@ export default function HeatmapPanel({ grid, byBlock, total, blocks }: Props) {
 
           {/* Classement des blocs les plus touchés */}
           <div style={{ flex: 1, minWidth: 190 }}>
-            <p style={{ color: "#F5F0E8", fontSize: 12.5, fontWeight: 700, margin: "0 0 10px" }}>Blocs les plus cliqués</p>
+            <p style={{ color: "var(--ink)", fontSize: 12.5, fontWeight: 700, margin: "0 0 10px" }}>Blocs les plus cliqués</p>
             {top.length === 0 ? (
               <p style={{ color: MUTED, fontSize: 11.5 }}>Les clics enregistrés ne sont pas rattachés à un bloc précis.</p>
             ) : (

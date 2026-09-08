@@ -53,7 +53,7 @@ export default function SupportPanel({ qrs, scans, views, clicks, leads }: {
     <div style={card}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 4 }}>
         <div>
-          <p style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 800, margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
+          <p style={{ color: "var(--ink)", fontSize: 16, fontWeight: 800, margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
             <Store size={17} color={GOLD} /> Performance par support
           </p>
           <p style={{ color: MUTED, fontSize: 12.5, margin: "4px 0 0", lineHeight: 1.5 }}>
@@ -97,11 +97,11 @@ export default function SupportPanel({ qrs, scans, views, clicks, leads }: {
                         onBlur={() => saveLabel(r)}
                         onKeyDown={e => { if (e.key === "Enter") saveLabel(r); if (e.key === "Escape") setEditing(null) }}
                         placeholder="Nom du support…"
-                        style={{ width: "100%", boxSizing: "border-box", background: "#0A0A0A", border: "1px solid color-mix(in srgb, var(--accent) 50%, transparent)", borderRadius: 8, color: "#F5F0E8", fontSize: 13, fontWeight: 700, padding: "6px 9px", outline: "none" }} />
+                        style={{ width: "100%", boxSizing: "border-box", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 50%, transparent)", borderRadius: 8, color: "var(--ink)", fontSize: 13, fontWeight: 700, padding: "6px 9px", outline: "none" }} />
                     ) : (
                       <button type="button" title="Renommer ce support"
                         onClick={() => { setEditing(r.id); setDraft(over[r.id] ?? (r.label.startsWith("QR ") ? "" : r.label)) }}
-                        style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", padding: 0, cursor: "pointer", color: "#F5F0E8", fontSize: 13.5, fontWeight: 700, maxWidth: "100%" }}>
+                        style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", padding: 0, cursor: "pointer", color: "var(--ink)", fontSize: 13.5, fontWeight: 700, maxWidth: "100%" }}>
                         <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{labelOf(r)}</span>
                         <Pencil size={11} color={DIM} style={{ flexShrink: 0 }} />
                       </button>

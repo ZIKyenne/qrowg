@@ -10,7 +10,7 @@ const TONES: Record<BadgeTone, CSSProperties> = {
   success: { background: "var(--success-bg)", color: "var(--success)", border: "1px solid var(--success-border)" },
   warning: { background: "var(--warning-bg)", color: "var(--warning)", border: "1px solid var(--warning-border)" },
   danger: { background: "var(--danger-bg)", color: "var(--danger)", border: "1px solid var(--danger-border)" },
-  neutral: { background: "rgba(255,255,255,0.05)", color: "#A8A190", border: "1px solid rgba(255,255,255,0.10)" },
+  neutral: { background: "rgba(255,255,255,0.05)", color: "var(--muted)", border: "1px solid rgba(255,255,255,0.10)" },
 }
 
 export function Badge({ tone = "neutral", children, style }: { tone?: BadgeTone; children: ReactNode; style?: CSSProperties }) {

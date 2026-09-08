@@ -101,7 +101,7 @@ export default function AssetsPage() {
       )}
       <div style={{ display: "flex", alignItems: "flex-start", gap: 14, flexWrap: "wrap", marginBottom: 20 }}>
         <div style={{ flex: 1, minWidth: 220 }}>
-          <h1 style={{ color: "#F5F0E8", fontSize: 24, fontWeight: 700, margin: "0 0 4px", display: "flex", alignItems: "center", gap: 10 }}>
+          <h1 style={{ color: "var(--ink)", fontSize: 24, fontWeight: 700, margin: "0 0 4px", display: "flex", alignItems: "center", gap: 10 }}>
             <Images size={22} color={G} /> Médias
           </h1>
           <p style={{ color: MUTED, fontSize: 13, margin: 0 }}>Toutes vos images et fichiers, réutilisables sur toutes vos pages. {total > 0 ? `${total} média${total > 1 ? "s" : ""}.` : ""}</p>
@@ -124,7 +124,7 @@ export default function AssetsPage() {
       {importErreurs.length > 0 && (
         <div role="alert" style={{ marginBottom: 16, padding: "10px 14px", borderRadius: 12, background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.28)", display: "flex", gap: 10, alignItems: "flex-start" }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ margin: 0, color: "#F5F0E8", fontSize: 13, fontWeight: 700 }}>{importErreurs.length > 1 ? `${importErreurs.length} fichiers n'ont pas été importés` : "Un fichier n'a pas été importé"}</p>
+            <p style={{ margin: 0, color: "var(--ink)", fontSize: 13, fontWeight: 700 }}>{importErreurs.length > 1 ? `${importErreurs.length} fichiers n'ont pas été importés` : "Un fichier n'a pas été importé"}</p>
             {importErreurs.map((m, i) => <p key={i} style={{ margin: "4px 0 0", color: "#E8B4B4", fontSize: 12.5, lineHeight: 1.45, overflowWrap: "anywhere" }}>{m}</p>)}
           </div>
           <button type="button" onClick={() => setImportErreurs([])} aria-label="Fermer" style={{ width: 40, height: 40, flexShrink: 0, background: "none", border: "none", color: MUTED, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", margin: "-8px -10px -8px 0" }}><X size={16} /></button>
@@ -142,7 +142,7 @@ export default function AssetsPage() {
           ))}
         </div>
         <label className="dam-search">
-          <Search size={14} style={{ color: "#8a8177", flex: "none" }} />
+          <Search size={14} style={{ color: "var(--muted)", flex: "none" }} />
           <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Rechercher un média…" />
           {query && <button className="dam-clear" aria-label="Effacer la recherche" onClick={() => setQuery("")}><X size={13} /></button>}
         </label>
@@ -153,14 +153,14 @@ export default function AssetsPage() {
       ) : assets.length === 0 ? (
         <div style={{ textAlign: "center", padding: "56px 0", border: "2px dashed rgba(201,168,76,0.15)", borderRadius: 16 }}>
           <p style={{ fontSize: 34, margin: "0 0 8px" }}>{q ? "🔍" : tab === "image" ? "🖼️" : "📄"}</p>
-          <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 600, margin: "0 0 4px" }}>{q ? "Aucun média ne correspond" : `Aucun ${tab === "image" ? "média image" : "fichier"} pour l'instant`}</p>
+          <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 600, margin: "0 0 4px" }}>{q ? "Aucun média ne correspond" : `Aucun ${tab === "image" ? "média image" : "fichier"} pour l'instant`}</p>
           <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{q ? `Aucun résultat pour « ${query.trim()} ».` : "Cliquez sur « Importer » ou glissez-déposez vos fichiers ici."}</p>
         </div>
       ) : tab === "image" ? (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12 }}>
           {assets.map(a => (
             <div key={a.url} className="dam-card" onClick={() => toggleSel(a)} title="Cliquez pour sélectionner"
-              style={{ position: "relative", borderRadius: 14, overflow: "hidden", border: isSel(a) ? "1px solid rgba(232,200,119,.55)" : undefined, background: "#0A0A0A", aspectRatio: "1", cursor: "pointer" }}>
+              style={{ position: "relative", borderRadius: 14, overflow: "hidden", border: isSel(a) ? "1px solid rgba(232,200,119,.55)" : undefined, background: "var(--field)", aspectRatio: "1", cursor: "pointer" }}>
               <img src={a.url} alt="" loading="lazy" onError={e => { e.currentTarget.style.opacity = "0" }} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
               <span aria-hidden style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,.5) 0%, rgba(0,0,0,0) 34%, rgba(0,0,0,0) 66%, rgba(0,0,0,.4) 100%)", pointerEvents: "none" }} />
               {/* Pastille de sélection (clic = sélectionner, n'ouvre pas le média) */}
@@ -179,11 +179,11 @@ export default function AssetsPage() {
           {assets.map(a => (
             <div key={a.url} onClick={() => toggleSel(a)} title="Cliquez pour sélectionner"
               style={{ display: "flex", alignItems: "center", gap: 11, background: isSel(a) ? "rgba(201,168,76,0.08)" : "rgba(255,255,255,0.02)", border: `1px solid ${isSel(a) ? G + "66" : "rgba(255,255,255,0.07)"}`, borderRadius: 11, padding: "11px 14px", cursor: "pointer" }}>
-              <div aria-hidden style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", background: isSel(a) ? G : "transparent", border: `1.5px solid ${isSel(a) ? G : "rgba(255,255,255,0.35)"}`, display: "flex", alignItems: "center", justifyContent: "center", color: "#080808" }}>
+              <div aria-hidden style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", background: isSel(a) ? G : "transparent", border: `1.5px solid ${isSel(a) ? G : "rgba(255,255,255,0.35)"}`, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--ink-on-accent)" }}>
                 {isSel(a) && <Check size={14} />}
               </div>
               <FileText size={17} color={G} style={{ flexShrink: 0 }} />
-              <span style={{ flex: 1, color: "#F5F0E8", fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pretty(a.name)}</span>
+              <span style={{ flex: 1, color: "var(--ink)", fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pretty(a.name)}</span>
               <button onClick={e => { e.stopPropagation(); setMenuAsset(a) }} aria-label="Actions du fichier" style={{ ...rowBtn, width: 38, height: 38 }}><MoreHorizontal size={16} /></button>
             </div>
           ))}
@@ -193,7 +193,7 @@ export default function AssetsPage() {
       {/* Barre de sélection (sticky bas) — actions groupées, DA dorée */}
       {selCount > 0 && (
         <div style={{ position: "sticky", bottom: 18, zIndex: 15, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap", padding: "13px 16px 13px 20px", borderRadius: 14, background: "rgba(20,18,16,.96)", border: "1px solid rgba(232,200,119,.28)", boxShadow: "0 18px 38px -20px rgba(0,0,0,.9)", backdropFilter: "blur(6px)" }}>
-          <span style={{ fontSize: 13.5, fontWeight: 600, color: "#e8c877" }}>{selCount} média{selCount > 1 ? "s" : ""} sélectionné{selCount > 1 ? "s" : ""}</span>
+          <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--gold-light)" }}>{selCount} média{selCount > 1 ? "s" : ""} sélectionné{selCount > 1 ? "s" : ""}</span>
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
             <button className="dam-selbar-sec" onClick={allSelected ? clearSel : selectAllVisible}>{allSelected ? "Tout désélectionner" : "Tout sélectionner"}</button>
             <button className="dam-selbar-del" aria-disabled={busy} onClick={() => { if (!busy) bulkDelete() }}>
@@ -206,9 +206,9 @@ export default function AssetsPage() {
       {/* Menu d'un média (bottom sheet) : cibles tactiles pleines, une seule action visible sur la vignette */}
       {menuAsset && (
         <div onClick={() => setMenuAsset(null)} style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(3px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "#141210", borderTopLeftRadius: 20, borderTopRightRadius: 20, border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", padding: "10px 12px calc(14px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "var(--surface)", borderTopLeftRadius: 20, borderTopRightRadius: 20, border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", padding: "10px 12px calc(14px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)" }}>
             <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 10px" }} />
-            <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: "0 6px 6px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pretty(menuAsset.name)}</p>
+            <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: "0 6px 6px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pretty(menuAsset.name)}</p>
             {([
               { icon: copied === menuAsset.url ? <Check size={17} color="var(--success)" /> : <Link2 size={17} />, label: copied === menuAsset.url ? "Lien copié !" : "Copier le lien", onClick: () => copy(menuAsset.url) },
               { icon: <ExternalLink size={17} />, label: "Ouvrir", onClick: () => { window.open(menuAsset.url, "_blank"); setMenuAsset(null) } },

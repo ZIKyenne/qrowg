@@ -22,12 +22,12 @@ type Profile = { id: string; email: string; full_name: string | null; plan: stri
 
 function Section({ title, subtitle, icon, children }: { title: string; subtitle?: string; icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, overflow: "hidden", marginBottom: 20 }}>
+    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, overflow: "hidden", marginBottom: 20 }}>
       <div style={{ padding: "18px 24px", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", alignItems: "center", gap: 12 }}>
         <div style={{ color: "var(--accent)", background: "color-mix(in srgb, var(--accent) 10%, transparent)", borderRadius: 8, padding: 8 }}>{icon}</div>
         <div>
-          <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0 }}>{title}</p>
-          {subtitle && <p style={{ color: "#A8A190", fontSize: 12, margin: 0 }}>{subtitle}</p>}
+          <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>{title}</p>
+          {subtitle && <p style={{ color: "var(--muted)", fontSize: 12, margin: 0 }}>{subtitle}</p>}
         </div>
       </div>
       <div style={{ padding: "20px 24px" }}>{children}</div>
@@ -39,8 +39,8 @@ function Toggle({ value, onChange, label, description }: { value: boolean; onCha
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
       <div>
-        <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 600, margin: 0 }}>{label}</p>
-        {description && <p style={{ color: "#A8A190", fontSize: 12.5, margin: "2px 0 0" }}>{description}</p>}
+        <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600, margin: 0 }}>{label}</p>
+        {description && <p style={{ color: "var(--muted)", fontSize: 12.5, margin: "2px 0 0" }}>{description}</p>}
       </div>
       <Switch checked={value} onChange={onChange} ariaLabel={label} />
     </div>
@@ -205,7 +205,7 @@ export default function SettingsPage() {
   const G = "var(--accent)"; const MUTED = "#A8A190"
   const inputStyle: React.CSSProperties = {
     width: "100%", background: "#0d0c09", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)",
-    borderRadius: 10, padding: "11px 14px", color: "#F5F0E8", fontSize: 14,
+    borderRadius: 10, padding: "11px 14px", color: "var(--ink)", fontSize: 14,
     outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif"
   }
 
@@ -220,14 +220,14 @@ export default function SettingsPage() {
   )
 
   return (
-    <div className="qf-reglages" style={{ minHeight: "100dvh", background: "#080808", padding: "32px 28px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
-      <style>{`.qf-reglages input:focus,.qf-reglages textarea:focus{border-color:color-mix(in srgb, var(--accent) 50%, transparent);background:#111009}`}</style>
+    <div className="qf-reglages" style={{ minHeight: "100dvh", background: "var(--bg)", padding: "32px 28px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
+      <style>{`.qf-reglages input:focus,.qf-reglages textarea:focus{border-color:color-mix(in srgb, var(--accent) 50%, transparent);background:var(--surface)}`}</style>
 
       {/* Particules dorées en fond (comble le vide, comme la landing) */}
 
       <div style={{ maxWidth: 680, margin: "0 auto", position: "relative", zIndex: 1 }}>
         <div style={{ marginBottom: 28 }}>
-          <h1 style={{ fontFamily: "Fraunces, serif", fontSize: 32, color: "#F5F0E8", fontWeight: 700, margin: 0 }}>Paramètres</h1>
+          <h1 style={{ fontFamily: "Fraunces, serif", fontSize: 32, color: "var(--ink)", fontWeight: 700, margin: 0 }}>Paramètres</h1>
           <p style={{ color: MUTED, fontSize: 14, margin: "4px 0 0" }}>Gérez votre compte et vos préférences</p>
         </div>
 
@@ -237,7 +237,7 @@ export default function SettingsPage() {
             <div>
               <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 5 }}>Email</label>
               <div style={{ ...inputStyle, opacity: 0.6, cursor: "not-allowed", display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ color: "#F5F0E8" }}>{profile?.email}</span>
+                <span style={{ color: "var(--ink)" }}>{profile?.email}</span>
                 <span style={{ marginLeft: "auto", color: "var(--success)", fontSize: 10, background: "rgba(57,255,143,0.1)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 6, padding: "2px 7px" }}>Vérifié</span>
               </div>
               <p style={{ color: MUTED, fontSize: 12, margin: "4px 0 0" }}>L'e-mail ne peut pas être modifié pour des raisons de sécurité.</p>
@@ -260,7 +260,7 @@ export default function SettingsPage() {
         <Section title="Facturation" subtitle="Abonnement, factures et paiements" icon={<CreditCard size={16} />}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
             <div>
-              <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: "0 0 2px", textTransform: "capitalize" as const }}>Plan {profile?.plan || "free"}</p>
+              <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: "0 0 2px", textTransform: "capitalize" as const }}>Plan {profile?.plan || "free"}</p>
               <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>Factures et reçus envoyés par e-mail à chaque paiement.</p>
             </div>
             <a href="/upgrade" className="da-btn-primary da-btn-primary--sm" style={{ flexShrink: 0 }}>
@@ -297,8 +297,8 @@ export default function SettingsPage() {
 
             {pwdError && (
               <div style={{ display: "flex", gap: 7, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "9px 12px" }}>
-                <AlertTriangle size={14} color="#EF4444" style={{ flexShrink: 0, marginTop: 1 }} />
-                <p style={{ color: "#EF4444", fontSize: 12, margin: 0 }}>{pwdError}</p>
+                <AlertTriangle size={14} color="var(--danger)" style={{ flexShrink: 0, marginTop: 1 }} />
+                <p style={{ color: "var(--danger)", fontSize: 12, margin: 0 }}>{pwdError}</p>
               </div>
             )}
 
@@ -337,10 +337,10 @@ export default function SettingsPage() {
                 ligne, un interrupteur allumé ne garantissait rien du tout. */}
             {passages && (
               <div style={{ marginTop: 18, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-                <p style={{ color: "#8A8478", fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>Envois automatiques</p>
+                <p style={{ color: "var(--muted)", fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>Envois automatiques</p>
                 {!journalOuvert ? (
                   <p style={{ color: "#6E685E", fontSize: 12, lineHeight: 1.55, margin: 0 }}>
-                    Le journal des envois n&apos;est pas encore activé sur cette base. Une fois la table <code style={{ color: "#8A8478" }}>cron_runs</code> créée, chaque envoi automatique laissera une trace ici.
+                    Le journal des envois n&apos;est pas encore activé sur cette base. Une fois la table <code style={{ color: "var(--muted)" }}>cron_runs</code> créée, chaque envoi automatique laissera une trace ici.
                   </p>
                 ) : (
                   <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
@@ -374,8 +374,8 @@ export default function SettingsPage() {
             </p>
             {exportError && (
               <div style={{ display: "flex", gap: 7, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "9px 12px" }}>
-                <AlertTriangle size={14} color="#EF4444" style={{ flexShrink: 0, marginTop: 1 }} />
-                <p style={{ color: "#EF4444", fontSize: 12, margin: 0 }}>{exportError}</p>
+                <AlertTriangle size={14} color="var(--danger)" style={{ flexShrink: 0, marginTop: 1 }} />
+                <p style={{ color: "var(--danger)", fontSize: 12, margin: 0 }}>{exportError}</p>
               </div>
             )}
             <Button variant="secondary" onClick={exportData} loading={exporting}
@@ -391,7 +391,7 @@ export default function SettingsPage() {
             <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, padding: "12px 14px", display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--success)", animation: "mo-pulse 2s infinite" }} />
               <div style={{ flex: 1 }}>
-                <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: 600, margin: 0 }}>Session active</p>
+                <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600, margin: 0 }}>Session active</p>
                 <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{profile?.email}</p>
               </div>
             </div>
@@ -407,10 +407,10 @@ export default function SettingsPage() {
             L ancre #danger est la cible du lien depuis Profil › Sécurité. */}
         <div id="danger" style={{ scrollMarginTop: 24, background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 16, overflow: "hidden", marginTop: 16 }}>
           <div style={{ padding: "18px 24px", borderBottom: "1px solid rgba(239,68,68,0.1)", display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ color: "#EF4444", background: "rgba(239,68,68,0.1)", borderRadius: 8, padding: 8 }}><AlertTriangle size={16} /></div>
+            <div style={{ color: "var(--danger)", background: "rgba(239,68,68,0.1)", borderRadius: 8, padding: 8 }}><AlertTriangle size={16} /></div>
             <div>
-              <p style={{ color: "#EF4444", fontSize: 15, fontWeight: 700, margin: 0 }}>Zone de danger</p>
-              <p style={{ color: "#A8A190", fontSize: 12, margin: 0 }}>Actions irréversibles</p>
+              <p style={{ color: "var(--danger)", fontSize: 15, fontWeight: 700, margin: 0 }}>Zone de danger</p>
+              <p style={{ color: "var(--muted)", fontSize: 12, margin: 0 }}>Actions irréversibles</p>
             </div>
           </div>
           <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
@@ -418,7 +418,7 @@ export default function SettingsPage() {
               La suppression de votre compte effacera définitivement toutes vos pages, QR codes et données analytics. Cette action est irréversible.
             </p>
             <div>
-              <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 5 }}>Confirmez en tapant votre e-mail : <span style={{ color: "#EF4444" }}>{profile?.email}</span></label>
+              <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 5 }}>Confirmez en tapant votre e-mail : <span style={{ color: "var(--danger)" }}>{profile?.email}</span></label>
               <input value={deleteConfirm} onChange={e => setDeleteConfirm(e.target.value)}
                 placeholder={profile?.email || "vous@email.com"}
                 style={{ ...inputStyle, borderColor: deleteConfirm === profile?.email ? "rgba(239,68,68,0.4)" : "rgba(239,68,68,0.15)", background: "rgba(239,68,68,0.04)" }}
@@ -427,8 +427,8 @@ export default function SettingsPage() {
             </div>
             {deleteError && (
               <div style={{ display: "flex", gap: 7, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "9px 12px" }}>
-                <AlertTriangle size={14} color="#EF4444" style={{ flexShrink: 0, marginTop: 1 }} />
-                <p style={{ color: "#EF4444", fontSize: 12, margin: 0 }}>{deleteError}</p>
+                <AlertTriangle size={14} color="var(--danger)" style={{ flexShrink: 0, marginTop: 1 }} />
+                <p style={{ color: "var(--danger)", fontSize: 12, margin: 0 }}>{deleteError}</p>
               </div>
             )}
             <Button variant="danger" onClick={deleteAccount} loading={deleting}

@@ -51,7 +51,7 @@ export default function RecentLeadsCard() {
         <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
           <span style={{ color: "var(--accent)", background: "color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 8, padding: 7, display: "flex" }}><Inbox size={16} /></span>
           <p style={{ color: "#F8F4EC", fontSize: 15.5, fontWeight: 700, margin: 0, letterSpacing: "-0.2px" }}>
-            Derniers messages{unread > 0 && <span style={{ marginLeft: 8, background: "#EF4444", color: "#fff", fontSize: 10, fontWeight: 700, borderRadius: 9, padding: "1px 7px", verticalAlign: "middle" }}>{unread} non lu{unread > 1 ? "s" : ""}</span>}
+            Derniers messages{unread > 0 && <span style={{ marginLeft: 8, background: "var(--danger)", color: "#fff", fontSize: 10, fontWeight: 700, borderRadius: 9, padding: "1px 7px", verticalAlign: "middle" }}>{unread} non lu{unread > 1 ? "s" : ""}</span>}
           </p>
         </div>
         <Link href="/dashboard/leads" style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "var(--accent)", fontSize: 12.5, fontWeight: 600, textDecoration: "none" }}>
@@ -66,7 +66,7 @@ export default function RecentLeadsCard() {
               {!l.is_read && <span style={{ width: 7, height: 7, borderRadius: "50%", background: tc, flexShrink: 0 }} />}
               <span style={{ background: `color-mix(in srgb, ${tc} 14%, transparent)`, border: `1px solid color-mix(in srgb, ${tc} 30%, transparent)`, borderRadius: 20, padding: "2px 9px", color: tc, fontSize: 10.5, fontWeight: 700, flexShrink: 0 }}>{TYPE_LABELS[l.type] || l.type}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ color: "#F5F0E8", fontSize: 13, fontWeight: l.is_read ? 500 : 700, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.name || l.message || "Nouveau message"}</p>
+                <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: l.is_read ? 500 : 700, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.name || l.message || "Nouveau message"}</p>
               </div>
               <span style={{ color: MUTED, fontSize: 11, flexShrink: 0 }}>{ago(l.created_at)}</span>
             </Link>

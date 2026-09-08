@@ -58,7 +58,7 @@ export default function FileUpload({ value, onChange, hint }: Props) {
       {value ? (
         <div style={{ display: "flex", alignItems: "center", gap: 9, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 9, padding: "9px 11px" }}>
           <FileText size={16} color={G} style={{ flexShrink: 0 }} />
-          <span style={{ flex: 1, color: "#F5F0E8", fontSize: 12, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nameFromUrl(value)}</span>
+          <span style={{ flex: 1, color: "var(--ink)", fontSize: 12, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nameFromUrl(value)}</span>
           <a href={value} target="_blank" rel="noopener noreferrer" title="Ouvrir" style={{ color: MUTED, display: "flex", flexShrink: 0 }}><ExternalLink size={13} /></a>
           <button onClick={() => onChange("")} title="Retirer" style={{ background: "none", border: "none", cursor: "pointer", color: "var(--danger)", flexShrink: 0, display: "flex" }}><X size={14} /></button>
         </div>
@@ -69,7 +69,7 @@ export default function FileUpload({ value, onChange, hint }: Props) {
             <Upload size={14} color={G} /> {uploading ? "Import en cours…" : "Importer un fichier (PDF…)"}
           </button>
           <input value="" onChange={e => onChange(e.target.value)} placeholder="…ou collez un lien https://"
-            style={{ width: "100%", boxSizing: "border-box", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "8px 11px", color: "#F5F0E8", fontSize: 12, outline: "none" }} />
+            style={{ width: "100%", boxSizing: "border-box", background: "var(--field)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "8px 11px", color: "var(--ink)", fontSize: 12, outline: "none" }} />
         </div>
       )}
 
@@ -90,7 +90,7 @@ export default function FileUpload({ value, onChange, hint }: Props) {
             style={{ width: "100%", maxWidth: 520, maxHeight: "80vh", background: "#141414", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column" }}>
             <div style={{ padding: "14px 18px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 9 }}>
               <FolderOpen size={16} color={G} />
-              <p style={{ margin: 0, color: "#F5F0E8", fontSize: 14, fontWeight: 700, flex: 1 }}>Mes fichiers{libAssets && libAssets.length > 0 ? <span style={{ color: MUTED, fontWeight: 400 }}> · {libAssets.length}</span> : ""}</p>
+              <p style={{ margin: 0, color: "var(--ink)", fontSize: 14, fontWeight: 700, flex: 1 }}>Mes fichiers{libAssets && libAssets.length > 0 ? <span style={{ color: MUTED, fontWeight: 400 }}> · {libAssets.length}</span> : ""}</p>
               {libBusy && <div style={{ width: 15, height: 15, border: "2px solid rgba(201,168,76,0.25)", borderTopColor: G, borderRadius: "50%", animation: "mo-spin 0.8s linear infinite" }} />}
               <button onClick={() => setLibOpen(false)} aria-label="Fermer" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", width: 28, height: 28 }}><X size={14} /></button>
             </div>
@@ -110,7 +110,7 @@ export default function FileUpload({ value, onChange, hint }: Props) {
                 : libAssets.map(a => (
                     <div key={a.url} style={{ display: "flex", alignItems: "center", gap: 9, background: value === a.url ? "rgba(201,168,76,0.08)" : "rgba(255,255,255,0.02)", border: `1px solid ${value === a.url ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.07)"}`, borderRadius: 9, padding: "8px 11px" }}>
                       <FileText size={15} color={G} style={{ flexShrink: 0 }} />
-                      <button onClick={() => { onChange(a.url); setLibOpen(false) }} style={{ flex: 1, textAlign: "left", background: "none", border: "none", color: "#F5F0E8", fontSize: 12, cursor: "pointer", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{prettyName(a.name)}</button>
+                      <button onClick={() => { onChange(a.url); setLibOpen(false) }} style={{ flex: 1, textAlign: "left", background: "none", border: "none", color: "var(--ink)", fontSize: 12, cursor: "pointer", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{prettyName(a.name)}</button>
                       <button onClick={() => removeAsset(a)} aria-label="Supprimer" style={{ background: "none", border: "none", cursor: "pointer", color: "var(--danger)", flexShrink: 0, display: "flex" }}><Trash2 size={13} /></button>
                     </div>
                   ))}

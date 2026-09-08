@@ -419,8 +419,8 @@ function QuestionCard({ step, value, answers, placeholder, onChange, onSubmit, i
 const STATE_META: Record<string, { label: string; color: string }> = {
   filled:     { label: "Rempli", color: "#39FF8F" },
   example:    { label: "Contenu d'exemple", color: "#F59E0B" },
-  decorative: { label: "Décoratif", color: "#8A8478" },
-  empty:      { label: "Vide", color: "#EF4444" },
+  decorative: { label: "Décoratif", color: "var(--muted)" },
+  empty:      { label: "Vide", color: "var(--danger)" },
 }
 
 function ReviewList({ review, decisions, onChange }: {
@@ -520,7 +520,7 @@ function NamingCard({ name, slug, error, onName, onSlug, counts }: {
           <input value={slug} onChange={e => onSlug(e.target.value)} style={{ ...common, fontSize: 15 }} />
         </div>
       </label>
-      {error && <p style={{ color: "#EF4444", fontSize: 12.5, margin: "14px 0 0" }}>{error}</p>}
+      {error && <p style={{ color: "var(--danger)", fontSize: 12.5, margin: "14px 0 0" }}>{error}</p>}
     </div>
   )
 }
