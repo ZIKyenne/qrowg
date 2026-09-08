@@ -3,7 +3,6 @@
 import { useState, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Inbox, Mail, Phone, Trash2, Check, Search } from "lucide-react"
-import Particles from "@/components/Particles"
 import { useConfirm } from "@/components/ui/Confirm"
 import { useToast } from "@/components/Toast"
 import { erreurLisible } from "@/lib/erreurLisible"
@@ -107,7 +106,6 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
   return (
     <div style={{ minHeight: "100dvh", position: "relative", fontFamily: "DM Sans, sans-serif" }}>
       {/* Particules dorées en fond (comme les autres pages du dashboard) */}
-      <Particles />
       <div className="rpad" style={{ padding: "28px 24px 60px", maxWidth: 900, margin: "0 auto", position: "relative", zIndex: 1 }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 6, flexWrap: "wrap" }}>

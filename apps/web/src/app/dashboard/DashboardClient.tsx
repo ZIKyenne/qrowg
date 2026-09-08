@@ -5,7 +5,6 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import { Plus, QrCode, BarChart2, Eye, Zap, ArrowRight, Globe, Trash2, ExternalLink, Edit3, AlertTriangle, Check, MoreHorizontal, Printer, Settings, FileText } from "lucide-react"
 import { getPlan, fmtPrice } from "@/lib/plans"
-import Particles from "@/components/Particles"
 import { useIsMobile } from "@/lib/useIsMobile"
 import NextStepCard from "@/components/NextStepCard"
 import { accessibleOwnerIds } from "@/lib/team"
@@ -207,7 +206,6 @@ export default function DashboardClient({
   return (
     <div style={{ minHeight: "100dvh", background: "radial-gradient(1200px 600px at 70% -10%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%), #080808", padding: isMobile ? "22px 16px 40px" : "30px 28px 48px", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
       <PostCheckoutBanner param="upgraded" message="Bienvenue ! Votre abonnement est actif. 🎉" />
-      <Particles />
       <style>{`
         .dz{animation:mo-fade-up .5s var(--mo-ease-standard) backwards}
         .dz-row{transition:background .15s, transform .15s}

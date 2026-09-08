@@ -119,17 +119,28 @@
 :root {
   /* Police de l'animation d'entrée des pages (composant PageIntro) : reprend Inter. */
   --pi-font-family: 'Inter', system-ui, sans-serif;
-  --bg: #080808;
-  --surface: #111009;
-  --gold: #C9A84C;
-  --accent: #C9A84C; /* couleur d'accent utilisateur (pilotee par le profil), defaut = or */
-  --gold-light: #E8C96A;
-  --gold-dim: rgba(201, 168, 76, 0.12);
-  --gold-border: rgba(201, 168, 76, 0.25);
+
+  /* ── Palette « Calme » (8 septembre) ───────────────────────────────────────
+     Inspirée de la maquette « nouvelle direction » : grands aplats noirs,
+     contours fins, or réservé à la sélection, la validation et l'action
+     primaire. Les valeurs remplacent l'ancien or #C9A84C et l'ivoire #F5F0E8 ;
+     l'accent utilisateur (--accent, piloté par le profil) est conservé et
+     prend l'or comme défaut. */
+  --bg: #080A08;
+  --surface: #101310;
+  --surface-2: #151814;        /* cartes posées sur une surface, champs au repos */
+  --field: #0A0C0A;            /* fond des champs de saisie */
+  --line: rgba(244, 241, 232, 0.09);
+  --line-strong: rgba(244, 241, 232, 0.16);
+  --gold: #D4AF45;
+  --accent: #D4AF45; /* couleur d'accent utilisateur (pilotee par le profil), defaut = or */
+  --gold-light: #E3C56B;
+  --gold-dim: rgba(212, 175, 69, 0.12);
+  --gold-border: rgba(212, 175, 69, 0.25);
   --neon: #39FF8F;
-  --ink: #F5F0E8;
-  --muted: #8A8478;
-  --faint: #4A4640;
+  --ink: #F4F1E8;
+  --muted: #A7A69F;
+  --faint: #80847D;            /* libellés discrets — AA (≥ 4,5:1) sur --bg, --surface et --surface-2 */
 
   /* ── Palette sémantique canonique (design system QRowg) ───────────────────
      Un rôle = une couleur, partout. Les valeurs reprennent l'existant (aucune
@@ -158,10 +169,10 @@ html {
 
 /* Fond sombre sur <html> : évite toute frame blanche du navigateur pendant la
    navigation / avant le 1er paint (la page publique le surcharge à sa couleur). */
-html { background: #080808; }
+html { background: var(--bg); }
 body {
-  background: #080808;
-  color: #F5F0E8;
+  background: var(--bg);
+  color: var(--ink);
   font-family: 'Inter', system-ui, sans-serif;
   min-height: 100vh;
   /* Inter est une variable font ; l'optical-sizing auto reste sans effet néfaste
@@ -172,35 +183,45 @@ body {
 /* ── Signature QRowg : socle + texture matrice QR (cellules carrées) ─────────
    Fond statique (visible derrière les particules sur les pages transparentes).
    Donne une identité « QR » immédiate et fiabilise les captures plein écran. */
+/* La lueur dorée et la trame QR qui couvraient TOUTES les pages sont retirées :
+   la trame ne sert plus que de structure fonctionnelle, sur une scène de travail
+   (classe .stage-grid ci-dessous), jamais derrière du texte. */
 body::before {
   content: "";
   position: fixed; inset: 0; z-index: -2; pointer-events: none;
-  background:
-    radial-gradient(130% 70% at 50% -8%, rgba(201,168,76,0.07), transparent 58%),
-    #070707;
-}
-body::after {
-  content: "";
-  position: fixed; inset: 0; z-index: -2; pointer-events: none; opacity: 0.6;
-  background-image:
-    linear-gradient(rgba(201,168,76,0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(201,168,76,0.028) 1px, transparent 1px);
-  background-size: 24px 24px;
-  -webkit-mask-image: radial-gradient(circle at 50% 22%, #000 0%, rgba(0,0,0,0.5) 45%, transparent 78%);
-  mask-image: radial-gradient(circle at 50% 22%, #000 0%, rgba(0,0,0,0.5) 45%, transparent 78%);
+  background: var(--bg);
 }
 
-.bg-canvas { background: #080808; }
+.bg-canvas { background: var(--bg); }
+
+/* Scène de travail (aperçu de page, QR, support d'impression) : trame 24 px et
+   halo d'accent DERRIÈRE l'objet — c'est le seul endroit où la trame subsiste. */
+.stage-grid {
+  position: relative;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.stage-grid::before {
+  content: "";
+  position: absolute; left: 50%; top: 50%; width: 480px; height: 480px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 4%, transparent);
+  filter: blur(70px);
+  pointer-events: none;
+}
 
 ::selection {
-  background: rgba(201, 168, 76, 0.2);
-  color: #E8C96A;
+  background: rgba(212, 175, 69, 0.2);
+  color: var(--gold-light);
 }
 
 ::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: #080808; }
-::-webkit-scrollbar-thumb { background: rgba(201, 168, 76, 0.2); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(201, 168, 76, 0.4); }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(244, 241, 232, 0.28); }
 
 a { transition: opacity 0.2s; }
 a:hover { opacity: 0.8; }
@@ -214,13 +235,13 @@ html {
 
 /* Selection */
 ::selection {
-  background: rgba(201,168,76,0.3);
-  color: #F5F0E8;
+  background: rgba(212,175,69,0.3);
+  color: var(--ink);
 }
 
 /* Focus visible cohérent */
 :focus-visible {
-  outline: 2px solid rgba(201,168,76,0.6);
+  outline: 2px solid color-mix(in srgb, var(--accent) 70%, transparent);
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -955,7 +976,76 @@ select:focus-visible,
 textarea:focus-visible,
 a:focus-visible,
 [role="button"]:focus-visible {
-  outline: 2px solid #C9A84C;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 4px;
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   COUCHE « CALME » — 8 septembre
+   L'interface s'était couverte de décors qui tournent en boucle : halos qui
+   respirent derrière chaque bouton primaire, reflets (« gloss », « sheen »)
+   sur les boutons, lignes de balayage et anneaux pulsés sur les compteurs,
+   étoiles qui scintillent, logo qui s'allume toutes les six secondes. Ajoutés
+   un par un, ils donnaient l'impression d'un produit généré, pas dessiné.
+
+   La maquette « nouvelle direction » n'en a aucun : des aplats, des contours
+   fins, un or qui ne sert qu'à la sélection et à l'action primaire, des
+   animations courtes (150–220 ms), utiles et réversibles.
+
+   Cette couche neutralise ces décors PAR-DESSUS les classes existantes, sans
+   toucher aux composants qui les posent : les vingt fichiers qui écrivent
+   className="qb-halo" restent valides. La retirer rend l'ancien aspect.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Halos et reflets : n'existent plus. */
+.qb-halo, .dam-halo, .qb-gloss, .dam-gloss, .qb-sheen, .dam-sheen,
+.da-halo-wrap::before, .da-btn-primary::before, .da-btn-primary::after { display: none !important; }
+
+/* Compteurs, étoiles, respirations : figés. Les éléments restent, immobiles. */
+.kpi-dotring, .kpi-dotcore, .kpi-barshine, .kpi-scanline, .kpi-scanring,
+.qb-star-a, .qb-star-b, .om-breath, .om-sweep, .om-halo, .om-blink { animation: none !important; }
+.kpi-dotring, .kpi-scanline, .kpi-scanring, .om-halo, .om-sweep, .qb-star-a, .qb-star-b { opacity: 0 !important; }
+
+/* Logo : une seule apparition à l'ouverture (pop + montée, moins de 0,6 s),
+   plus de scintillement, plus de balayage, plus d'or qui se déplace. */
+.qlogo-blink, .qlogo-glow { animation: none !important; opacity: 0 !important; }
+.qlogo-gold { animation: omGoldSettle 1.2s cubic-bezier(.3,.85,.2,1) both !important; animation-delay: .3s !important; }
+
+/* Boutons primaires : or plein, texte sombre, un seul état de survol.
+   Plus de dégradé, plus d'ombre interne « bouton de jeu », plus de saut. */
+.da-btn-primary, .qb-gold, .dam-primary, .ui-btn--primary, .da-btn-primary--sm {
+  background: var(--accent) !important;
+  color: #15150F !important;
+  box-shadow: none !important;
+  border-radius: 9px !important;
+}
+.da-btn-primary:hover, .qb-gold:hover:not(:disabled), .dam-primary:hover, .ui-btn--primary:hover:not(:disabled) {
+  transform: none !important;
+  filter: brightness(1.06);
+  box-shadow: none !important;
+}
+.da-btn-primary:active, .qb-gold:active:not(:disabled) { transform: scale(.985) !important; }
+
+/* Pilule et fantôme : contour fin, fond neutre, texte ivoire ; l'or n'arrive
+   qu'au survol, et sans dégradé. */
+.qb-pill { background: var(--surface-2) !important; border-color: var(--line-strong) !important; color: var(--ink) !important; }
+.qb-pill:hover:not(:disabled) { background: var(--accent) !important; border-color: var(--accent) !important; color: #15150F !important; transform: none !important; box-shadow: none !important; }
+.qb-ghost, .da-btn-ghost, .da-btn-neutral { background: var(--surface-2) !important; border-color: var(--line-strong) !important; color: var(--ink) !important; }
+.qb-ghost:hover:not(:disabled), .da-btn-ghost:hover, .da-btn-neutral:hover { border-color: color-mix(in srgb, var(--accent) 55%, transparent) !important; background: var(--surface-2) !important; color: var(--ink) !important; }
+
+/* Champs : fond de champ, contour fin, focus à l'accent. */
+.da-field, .da-select, .ui-input, .ui-textarea, .ui-select {
+  background: var(--field) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 8px !important;
+  color: var(--ink) !important;
+  caret-color: var(--accent) !important;
+}
+.da-field:focus, .da-select:focus { border-color: var(--accent) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent) !important; }
+
+/* Compteurs d'en-tête : aplat sur surface, contour fin. */
+.kpi-chip { background: var(--surface) !important; border: 1px solid var(--line) !important; }
+
+/* Lien : plus d'atténuation au survol (elle faisait vaciller le texte). */
+a:hover { opacity: 1; }

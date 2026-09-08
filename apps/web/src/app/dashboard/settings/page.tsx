@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Save, Check, AlertTriangle, Eye, EyeOff, Bell, Shield, Trash2, LogOut, Key, Globe, Palette, Moon, CreditCard, ArrowRight, Loader2, Download, DatabaseBackup } from "lucide-react"
-import Particles from "@/components/Particles"
 import { Button } from "@/components/ui/Button"
 import { Switch } from "@/components/ui/Switch"
 import { Input } from "@/components/ui/Input"
@@ -225,7 +224,6 @@ export default function SettingsPage() {
       <style>{`.qf-reglages input:focus,.qf-reglages textarea:focus{border-color:color-mix(in srgb, var(--accent) 50%, transparent);background:#111009}`}</style>
 
       {/* Particules dorées en fond (comble le vide, comme la landing) */}
-      <Particles />
 
       <div style={{ maxWidth: 680, margin: "0 auto", position: "relative", zIndex: 1 }}>
         <div style={{ marginBottom: 28 }}>

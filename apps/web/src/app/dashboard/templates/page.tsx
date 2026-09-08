@@ -9,7 +9,6 @@ import { Sparkles, ArrowRight, Check, X, Lock, Search, Heart, Eye, Clock, Layers
   UtensilsCrossed, Martini, Coffee, Laptop, Target, User, Building2, Megaphone, Music, Camera, Home, Brush, PartyPopper, Rocket, ShoppingBag, Zap, Flame, Link2 as LinkIcon } from "lucide-react"
 import TemplatePreviewModal from "./TemplatePreviewModal"
 import TemplateWizardModal from "./TemplateWizardModal"
-import Particles from "@/components/Particles"
 import { useIsMobile } from "@/lib/useIsMobile"
 import { PAGE_TEMPLATES } from "../builder/page-templates"
 import { TEMPLATE_LAYOUT_LIST, galleryStyleChoices, nativeGalleryStyleKey, galleryComposeBlocks } from "../builder/templateEngine"
@@ -372,7 +371,6 @@ export default function TemplatesPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "transparent", paddingBottom: 120, fontFamily: "DM Sans, sans-serif", position: "relative" }}>
-      <Particles behind />
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
       <div style={{ padding: "26px 24px 0", textAlign: "center", maxWidth: 960, margin: "0 auto" }}>

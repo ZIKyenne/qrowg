@@ -2,7 +2,6 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import type { Metadata } from "next"
 import QRStudioSwitch from "./QRStudioSwitch"
-import Particles from "@/components/Particles"
 import { accessibleOwnerIds } from "@/lib/team"
 import { pageLimit } from "@/lib/plans"
 import { Plus, Link2 } from "lucide-react"
@@ -42,7 +41,6 @@ export default async function QRCodesPage() {
 
   return (
     <div style={{ minHeight: "100dvh", background: "transparent", fontFamily: "DM Sans, sans-serif", position: "relative" }}>
-      <Particles behind mobileVivid />
 
       {/* ===== Header ===== */}
       <style>{`

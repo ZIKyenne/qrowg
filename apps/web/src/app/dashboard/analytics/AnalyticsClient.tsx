@@ -18,7 +18,6 @@ import ScrollDepthPanel from "./ScrollDepthPanel"
 import ConversionFunnelPanel from "./ConversionFunnelPanel"
 import HeatmapPanel from "./HeatmapPanel"
 import SupportPanel from "./SupportPanel"
-import Particles from "@/components/Particles"
 
 type Profile = { total_pages: number; total_scans: number; plan: string; email?: string; full_name?: string } | null
 type Page = { id: string; title: string; slug: string; total_views: number; unique_views: number; status: string }
@@ -181,7 +180,6 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
 
   return (
     <div className="analytics-root" style={{ minHeight: "100dvh", background: "radial-gradient(1100px 520px at 75% -8%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%)", padding: "22px 24px 44px", fontFamily: "DM Sans, sans-serif", position: "relative", overflowX: "clip", maxWidth: "100%", boxSizing: "border-box" as const }}>
-      <Particles />
       <style>{`
         @keyframes ring{0%{box-shadow:0 0 0 0 rgba(57,255,143,0.5)}70%{box-shadow:0 0 0 8px rgba(57,255,143,0)}100%{box-shadow:0 0 0 0 rgba(57,255,143,0)}}
         .az{animation:mo-fade-up .5s var(--mo-ease-standard) backwards}

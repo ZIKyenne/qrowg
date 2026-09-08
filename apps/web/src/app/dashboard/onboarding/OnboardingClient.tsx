@@ -7,7 +7,6 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Sparkles } from "lucide-react"
-import Particles from "@/components/Particles"
 import { OBJECTIVES, SECTORS, composeRecipe, type Objective, type Sector } from "./objectives"
 
 const G = "var(--accent)"
@@ -63,7 +62,6 @@ export default function OnboardingClient() {
 
   return (
     <div style={{ position: "relative", minHeight: "100dvh", padding: "0 22px 60px", overflowX: "hidden" }}>
-      <Particles behind />
 
       {busy && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(8,8,8,0.72)", backdropFilter: "blur(4px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>

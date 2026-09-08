@@ -4,7 +4,6 @@ import { useEffect, useState, useRef, useCallback } from "react"
 import { useConfirm } from "@/components/ui/Confirm"
 import { createClient } from "@/lib/supabase/client"
 import { PLAN_LIST, PLAN_ORDER, PLANS, fmtPrice } from "@/lib/plans"
-import Particles from "@/components/Particles"
 import { Button } from "@/components/ui/Button"
 import { ActionRow } from "@/components/ui/ActionRow"
 import {
@@ -773,7 +772,6 @@ export default function ProfilePage() {
   // -- RENDER -------------------------------------------------------------------
   return (
     <div className="qf-profil" style={{ minHeight: "100dvh", background: "transparent", fontFamily: "DM Sans, sans-serif", position: "relative", isolation: "isolate" }}>
-      <Particles behind />
       <style>{`
         @keyframes profileFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
         @keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}

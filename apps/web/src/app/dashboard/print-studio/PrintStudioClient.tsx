@@ -12,7 +12,6 @@ import { ArrowLeft, Lock, Unlock, Eye, EyeOff, ChevronUp, Check, X, Download, Sh
   Award, Sun, Moon, Leaf, Navigation, Home, Users, Type, LayoutGrid, Wand2, Move, Utensils, Wine, Beer, Pizza, ShoppingBag, ShoppingCart,
   CreditCard, Percent, MessageCircle, ThumbsUp, Share2, Send, AtSign, Link2, QrCode, Smartphone, Calendar, Bell, Info, Scissors, ArrowDown } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
-import Particles from "@/components/Particles"
 import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
 import QRCanvas from "../qr-codes/QRCanvas"
@@ -890,7 +889,6 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     )
     return (
       <div style={{ position: "relative", minHeight: "100dvh", color: "#e8e3da", fontFamily: "Inter, system-ui, sans-serif", padding: "0 16px 56px" }}>
-        <Particles behind />
         <style>{`.ps2-card{transition:border-color .26s ease, transform .26s cubic-bezier(.2,.85,.3,1)}.ps2-card:hover{border-color:rgba(232,200,119,.45);transform:translateY(-2px)}.ps2-card:hover .ps2-perso{color:#e8c877}.ps2-sel:hover{border-color:rgba(232,200,119,.4);color:#e8e3da}.ps2-chip{transition:border-color .24s ease,color .24s ease}.ps2-chip:hover{border-color:rgba(232,200,119,.34);color:#e8e3da}.ps2-menuitem:hover{background:rgba(232,200,119,.07)!important}.ps2-x{opacity:.7;transition:opacity .2s ease}.ps2-x:hover{opacity:1}.ps2-search::placeholder{color:#6b6258}.ps2-search:focus{outline:none}.ps2-editeur{transition:background .28s ease,color .28s ease}.ps2-editeur:hover{background:linear-gradient(135deg,#e8c877,#c9a24d)!important;color:#1a1408!important}.ps2-more:hover{color:#e8c877}`}</style>
         <div style={{ maxWidth: 1180, margin: "0 auto", display: "flex", flexDirection: "column", gap: 22 }}>
 
@@ -1079,7 +1077,6 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const layBtn: React.CSSProperties = { width: 28, height: 28, borderRadius: 7, border: "none", background: "transparent", color: C.fgMuted, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }
   return (
     <div className="ps-root" style={{ position: "relative", minHeight: "100dvh", color: C.fg, fontFamily: "Inter, system-ui, sans-serif" }}>
-      <Particles behind />
       <header ref={mesureEntete.ref as any} className="ps-hdr" style={{ maxWidth: 1320, margin: "0 auto", padding: paysage && sheetOpen ? `14px ${tiroirW + 16}px 14px 16px` : "14px 16px", transition: "padding var(--mo-sheet) var(--mo-ease-standard)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
         <button onClick={() => setPhase("library")} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: "none", color: C.fgMuted, cursor: "pointer", fontSize: 13, flexShrink: 0, minHeight: 44, padding: "0 6px 0 0", marginLeft: -2 }}><ArrowLeft size={16} /> Bibliothèque</button>
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", justifyContent: "flex-end" }}>

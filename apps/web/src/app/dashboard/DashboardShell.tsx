@@ -336,18 +336,16 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
   return (
     <div style={{
       display: "flex", height: "100dvh", fontFamily: "DM Sans, sans-serif", overflow: "hidden",
-      // Signature QRowg : socle doré + trame matrice QR (cellules carrées) partagée par toute l'app
-      background:
-        "radial-gradient(120% 80% at 50% -8%, rgba(201,168,76,0.05), transparent 55%)," +
-        "linear-gradient(rgba(201,168,76,0.022) 1px, transparent 1px) 0 0 / 24px 24px," +
-        "linear-gradient(90deg, rgba(201,168,76,0.022) 1px, transparent 1px) 0 0 / 24px 24px," +
-        "#070707",
+      // Aplat : la trame QR et la lueur qui couvraient toute l'application sont
+      // retirées (couche « Calme », 8 septembre) — la trame ne sert plus qu'aux
+      // scènes de travail.
+      background: "var(--bg)",
     }}>
       {/* SIDEBAR (masquée sur mobile : remplacée par la barre du bas). La classe
           porte la media query qui la cache dès le HTML serveur, avant tout JS. */}
       <div className="qf-sidebar" style={{
-        width: W, minWidth: W, background: "#0A0A0A",
-        borderRight: "1px solid rgba(201,168,76,0.1)",
+        width: W, minWidth: W, background: "var(--bg)",
+        borderRight: "1px solid var(--line)",
         display: isMobile ? "none" : "flex", flexDirection: "column",
         transition: "width 0.25s var(--mo-ease-emphasized), min-width 0.25s var(--mo-ease-emphasized)",
         overflow: "hidden", flexShrink: 0, position: "relative", zIndex: 30
