@@ -18,6 +18,11 @@ export function eventInfoViewModel(content: Record<string, any> | null | undefin
   return {
     visible: !!(nom || rows.length || (typeof c.cta_label === "string" && c.cta_label.trim())),
     name: nom, rows, ctaLabel: c.cta_label,
-    link: { href: extHref(url) || null, external: false, trackTarget: url || "event_info", visible: !!c.cta_label },
+    // Ce lien menait le visiteur AILLEURS sans ouvrir d'onglet : il quittait la
+    // page du commerçant et n'y revenait pas. Soixante autres blocs ouvrent déjà
+    // un onglet pour une adresse externe ; ces trois-là ne le faisaient pas, par
+    // fidélité au legacy. Un chemin interne ou une ancre, eux, restent sur place.
+    // (Vague 26.)
+    link: { href: extHref(url) || null, external: /^https?:/i.test(url), trackTarget: url || "event_info", visible: !!c.cta_label },
   }
 }

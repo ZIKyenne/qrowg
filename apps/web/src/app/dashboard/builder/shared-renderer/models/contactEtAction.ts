@@ -82,6 +82,11 @@ export function boutonAction(c: Record<string, any> | null | undefined): BoutonA
     style: txt(src.style),
     // « Pleine largeur » etait propose dans les reglages et n'avait aucun effet.
     pleineLargeur: txt(src.full_width) !== "no",
-    lien: { href: destinationUtile(url), external: false, trackTarget: url || "cta_button", visible: true },
+    // Ce lien menait le visiteur AILLEURS sans ouvrir d'onglet : il quittait la
+    // page du commerçant et n'y revenait pas. Soixante autres blocs ouvrent déjà
+    // un onglet pour une adresse externe ; ces trois-là ne le faisaient pas, par
+    // fidélité au legacy. Un chemin interne ou une ancre, eux, restent sur place.
+    // (Vague 26.)
+    lien: { href: destinationUtile(url), external: /^https?:/i.test(url), trackTarget: url || "cta_button", visible: true },
   }
 }

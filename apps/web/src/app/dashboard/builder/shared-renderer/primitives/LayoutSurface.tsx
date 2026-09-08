@@ -30,12 +30,17 @@ export function LayoutSurface({ content, u, children, defaultPad, defaultRadius,
   )
 }
 
-export function SmartCta({ u, href, label, style, external = true, trackTarget }: {
+export function SmartCta({ u, href, label, style, external = true, trackTarget, nomAccessible }: {
   u: UnifiedCtx
   href: string
   label: ReactNode
   style: CSSProperties
   external?: boolean
+  /** Ce qu'un lecteur d'écran annonce quand le bouton n'a qu'une icône.
+   *  Se pose sur le <a> — et NULLE PART ailleurs : `aria-label` sur un <span>
+   *  sans rôle est ignoré par les lecteurs d'écran, et c'est exactement ce que
+   *  faisaient `team` et `multi_contact` depuis leur migration. (Vague 26.) */
+  nomAccessible?: string
   /** Cle de suivi si elle differe de l'adresse (ex. « tickets » quand aucune URL
       n'est saisie) : on conserve les cles historiques pour ne pas casser les
       statistiques deja collectees. */
@@ -44,12 +49,13 @@ export function SmartCta({ u, href, label, style, external = true, trackTarget }
   // Cible tactile plancher (voir avecCibleTactile) : ces boutons sont ceux qui
   // font réserver, commander, acheter — et on n'y touche qu'au téléphone.
   const st = avecCibleTactile(style)
-  if (u.mode === "editor" || !href) return <div aria-disabled="true" style={st}>{label}</div>
+  if (u.mode === "editor" || !href) return <div aria-disabled="true" aria-label={nomAccessible} style={st}>{label}</div>
   return (
     <a
       href={href}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
+      aria-label={nomAccessible}
       onClick={() => { try { u.trackClick(trackTarget ?? href) } catch {} }}
       style={st}
     >{label}</a>

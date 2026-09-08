@@ -1470,8 +1470,12 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
           {c.username && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 10px", textAlign: "center" }}>{c.username}</p>}
           {vids.length > 0 && (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 6 }}>
+              {/* Trois tuiles identiques portant une note de musique : un lecteur
+                  d'écran annonçait « lien », trois fois, sans rien de plus. Le
+                  visiteur voyant, lui, ne distinguait pas non plus les vidéos —
+                  mais lui pouvait au moins cliquer pour voir. (Vague 26.) */}
               {[c.video1_url, c.video2_url, c.video3_url].map((url, i) => url ? (
-                <a key={i} href={extHref(String(url))} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ aspectRatio: "9/16", background: "linear-gradient(135deg,rgba(255,0,80,0.15),rgba(0,242,234,0.15))", border: "1px solid rgba(245,240,232,0.12)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, textDecoration: "none" }}>🎵</a>
+                <a key={i} href={extHref(String(url))} target="_blank" rel="noopener noreferrer" aria-label={`${c.username ? `${c.username} — ` : ""}TikTok ${i + 1} sur ${vids.length}`} onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ aspectRatio: "9/16", background: "linear-gradient(135deg,rgba(255,0,80,0.15),rgba(0,242,234,0.15))", border: "1px solid rgba(245,240,232,0.12)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, textDecoration: "none" }}><span aria-hidden>🎵</span></a>
               ) : <div key={i} style={{ aspectRatio: "9/16", background: "rgba(245,240,232,0.06)", borderRadius: 9 }} />)}
             </div>
           )}

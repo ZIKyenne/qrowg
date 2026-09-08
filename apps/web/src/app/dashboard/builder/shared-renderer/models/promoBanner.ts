@@ -14,6 +14,11 @@ export function promoBannerViewModel(content: Record<string, any> | null | undef
   return {
     visible: !!(dit(c.emoji) || dit(c.text) || dit(c.subtext) || dit(c.cta_label)),
     emoji: c.emoji, text: c.text, subtext: c.subtext, ctaLabel: c.cta_label,
-    link: { href: extHref(url) || null, external: false, trackTarget: url || "promo_banner", visible: !!c.cta_label },
+    // Ce lien menait le visiteur AILLEURS sans ouvrir d'onglet : il quittait la
+    // page du commerçant et n'y revenait pas. Soixante autres blocs ouvrent déjà
+    // un onglet pour une adresse externe ; ces trois-là ne le faisaient pas, par
+    // fidélité au legacy. Un chemin interne ou une ancre, eux, restent sur place.
+    // (Vague 26.)
+    link: { href: extHref(url) || null, external: /^https?:/i.test(url), trackTarget: url || "promo_banner", visible: !!c.cta_label },
   }
 }

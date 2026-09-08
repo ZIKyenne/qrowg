@@ -93,11 +93,17 @@ describe("wave5 — modèles commerce/événement", () => {
     expect(giftCardViewModel({ title: "T", cta_label: "X", cta_url: "javascript:alert(1)" }).link.href?.startsWith("javascript:")).toBe(false)
     expect(promoBannerViewModel({ cta_label: "X", cta_url: "javascript:alert(1)" }).link.href?.startsWith("https://")).toBe(true)
   })
-  it("external : http(s) → true (gift_card/ticketing), sinon false ; promo/event_info toujours false", () => {
+  it("external : http(s) → true, un chemin interne ou un mailto reste sur place", () => {
+    // Ce test figeait « promo/event_info TOUJOURS false » — fidélité au legacy.
+    // Concrètement : le visiteur cliquait sur l'offre, partait sur un autre site,
+    // et la page du commerçant disparaissait de son écran. Soixante autres blocs
+    // ouvraient déjà un onglet. La règle est la même pour tous. (Vague 26.)
     expect(giftCardViewModel({ title: "T", cta_label: "X", cta_url: "https://x.co" }).link.external).toBe(true)
     expect(giftCardViewModel({ title: "T", cta_label: "X", cta_url: "mailto:a@b.c" }).link.external).toBe(false)
-    expect(promoBannerViewModel({ cta_label: "X", cta_url: "https://x.co" }).link.external).toBe(false)
-    expect(eventInfoViewModel({ cta_label: "X", cta_url: "https://x.co" }).link.external).toBe(false)
+    expect(promoBannerViewModel({ cta_label: "X", cta_url: "https://x.co" }).link.external).toBe(true)
+    expect(eventInfoViewModel({ cta_label: "X", cta_url: "https://x.co" }).link.external).toBe(true)
+    expect(promoBannerViewModel({ cta_label: "X", cta_url: "/nos-offres" }).link.external, "un chemin interne").toBe(false)
+    expect(eventInfoViewModel({ cta_label: "X", cta_url: "mailto:a@b.c" }).link.external).toBe(false)
   })
   it("cibles de tracking fidèles au legacy", () => {
     expect(promoBannerViewModel({ cta_label: "X" }).link.trackTarget).toBe("promo_banner")
@@ -174,11 +180,19 @@ describe("wave5 — parité public (null / items / lien réel)", () => {
     expect(H(createElement(PublicEventInfo, { content: { name: "N", cta_label: "R", cta_url: "https://x.co" }, ctx: pCtx }))).toContain("<a ")
     expect(H(createElement(PublicEventTicketing, { content: { event_name: "E", label: "B", url: "https://x.co" }, ctx: pCtx }))).toContain("<a ")
   })
-  it("event_ticketing/gift_card https → target=_blank ; promo_banner/event_info → aucun target", () => {
-    expect(H(createElement(PublicEventTicketing, { content: { event_name: "E", url: "https://x.co" }, ctx: pCtx }))).toContain('target="_blank"')
-    expect(H(createElement(PublicGiftCard, { content: { title: "T", cta_label: "X", cta_url: "https://x.co" }, ctx: pCtx }))).toContain('target="_blank"')
-    expect(H(createElement(PublicPromoBanner, { content: { text: "T", cta_label: "X", cta_url: "https://x.co" }, ctx: pCtx }))).not.toContain('target="_blank"')
-    expect(H(createElement(PublicEventInfo, { content: { name: "N", cta_label: "X", cta_url: "https://x.co" }, ctx: pCtx }))).not.toContain('target="_blank"')
+  it("une adresse externe ouvre un onglet, sur les quatre blocs", () => {
+    for (const [nom, Vue, contenu] of [
+      ["event_ticketing", PublicEventTicketing, { event_name: "E", url: "https://x.co" }],
+      ["gift_card", PublicGiftCard, { title: "T", cta_label: "X", cta_url: "https://x.co" }],
+      ["promo_banner", PublicPromoBanner, { text: "T", cta_label: "X", cta_url: "https://x.co" }],
+      ["event_info", PublicEventInfo, { name: "N", cta_label: "X", cta_url: "https://x.co" }],
+    ] as [string, any, any][]) {
+      const html = H(createElement(Vue, { content: contenu, ctx: pCtx }))
+      expect(html, `${nom} : onglet`).toContain('target="_blank"')
+      expect(html, `${nom} : et le rel qui va avec`).toContain('rel="noopener noreferrer"')
+    }
+    // Un chemin interne, lui, ne doit PAS ouvrir d'onglet.
+    expect(H(createElement(PublicPromoBanner, { content: { text: "T", cta_label: "X", cta_url: "/nos-offres" }, ctx: pCtx }))).not.toContain('target="_blank"')
   })
   it("URL dangereuse : plus de schema executable, et plus de lien mort non plus", () => {
     // Ce test figeait la fidelite au legacy : « javascript:alert(1) » ressortait

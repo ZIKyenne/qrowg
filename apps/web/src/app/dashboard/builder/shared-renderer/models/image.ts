@@ -20,7 +20,11 @@ export function imageViewModel(content: Record<string, any> | null | undefined):
   const linkUrl = typeof c.link === "string" ? c.link : ""
   return {
     visible: src != null, hasMedia: src != null,
-    src, alt: c.alt || c.caption || "", caption: c.caption || undefined,
+    // Une image DÉCORATIVE reste muette (alt=""), c'est la doctrine du
+    // 4 septembre. Mais une image CLIQUABLE et muette devient un lien que rien
+    // n'annonce : le lecteur d'écran dit « lien », point. Faute de légende, on
+    // annonce au moins ce que le lien fait. (Vague 26.)
+    src, alt: c.alt || c.caption || (linkUrl ? "Voir plus" : ""), caption: c.caption || undefined,
     isCircle, rounded: c.rounded || "", aspectRatio,
     link: { href: extHref(linkUrl) || null, external: true, trackTarget: linkUrl, visible: !!linkUrl },
   }
