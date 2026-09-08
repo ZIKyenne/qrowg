@@ -1,12 +1,20 @@
 "use client"
 import { eventInfoViewModel } from "../../models/eventInfo"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { EditorCtaShell } from "../../primitives/BlockCtaLink"
 import type { EditorAdapterProps } from "../../renderTypes"
 
 // Legacy sans gate : carte toujours rendue. Dates = texte statique (aucune logique temporelle).
 export function EditorEventInfo({ content, ctx }: EditorAdapterProps) {
-  const { name, rows, ctaLabel } = eventInfoViewModel(content)
+  const { visible, name, rows, ctaLabel } = eventInfoViewModel(content)
   const { theme, text, muted, surfaceStyle } = ctx
+  // La page ne publie plus le décor d'un bloc vide ; l'aperçu le dit, plutôt que
+  // de laisser un cadre muet dans le canvas. (Vague 25.)
+  if (!visible) return (
+    <div style={{ padding: "10px 16px", ...surfaceStyle }}>
+      <BlockEmptyState icon="🎉" label="Ajoutez le nom, la date ou le lieu" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={muted} />
+    </div>
+  )
   return (
     <div style={{ padding: "10px 16px", ...surfaceStyle }}>
       <div style={{ background: "rgba(236,72,153,0.08)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 12, padding: "14px" }}>

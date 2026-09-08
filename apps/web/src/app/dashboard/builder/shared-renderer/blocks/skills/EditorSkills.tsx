@@ -1,10 +1,18 @@
 "use client"
 import { skillsViewModel } from "../../models/skills"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import type { EditorAdapterProps } from "../../renderTypes"
 
 export function EditorSkills({ content, ctx }: EditorAdapterProps) {
-  const { title, tags } = skillsViewModel(content)
+  const { visible, title, tags } = skillsViewModel(content)
   const { primary, muted, surfaceStyle } = ctx
+  // La page ne publie plus le décor d'un bloc vide ; l'aperçu le dit, plutôt que
+  // de laisser un cadre muet dans le canvas. (Vague 25.)
+  if (!visible) return (
+    <div style={{ padding: "10px 16px", ...surfaceStyle }}>
+      <BlockEmptyState icon="🏷️" label="Ajoutez vos compétences" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={muted} />
+    </div>
+  )
   return (
     <div style={{ padding: "12px 16px", ...surfaceStyle }}>
       {title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>{title}</p>}

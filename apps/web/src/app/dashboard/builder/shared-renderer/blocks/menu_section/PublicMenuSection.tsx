@@ -7,7 +7,9 @@ import type { PublicAdapterProps } from "../../renderTypes"
 // Liste simple (legacy) OU grande carte dépliable (menu_display) : en-tête cliquable qui replie/déplie
 // les plats — pratique pour les gros menus. 1 ou 2 colonnes internes. Conteneur toujours rendu en liste.
 export function PublicMenuSection({ content, ctx }: PublicAdapterProps) {
-  const { category, items, collapsible, columns } = menuSectionViewModel(content)
+  const { visible, category, items, collapsible, columns } = menuSectionViewModel(content)
+  // Rien à publier : pas de cadre non plus. (Vague 25.)
+  if (!visible) return null
   const { G, TEXT, MUTED, FONT_D, FONT_B } = ctx
   const [open, setOpen] = useState(true)
 

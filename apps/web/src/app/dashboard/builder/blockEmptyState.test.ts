@@ -70,6 +70,13 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
   calendly: v => ({ url: v }),
   free_gift: v => ({ url: v }),
   instagram_feed: v => ({ cta_url: v }),
+  // Vague 25 : six blocs qui publiaient leur décor sans rien dedans.
+  bio: v => ({ text: v }),
+  skills: v => ({ tags: v }),
+  event_info: v => ({ name: v }),
+  menu_section: v => ({ category: v }),
+  promo_banner: v => ({ text: v }),
+  order_online: v => ({ url: v }),
 }
 
 describe("hasPublishableContent — toutes les familles listées sont couvertes", () => {

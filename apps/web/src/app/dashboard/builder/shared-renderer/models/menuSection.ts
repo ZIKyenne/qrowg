@@ -1,5 +1,7 @@
 // Modèle pur `menu_section`. items filtrés sur `name` (item{i}), limite 50. Prix conservé
-// brut (aucun reformatage). Toujours visible : le public rend le conteneur même vide.
+// brut (aucun reformatage).
+// Vague 25 — « visible: true » sans condition : posé vide, ce bloc publiait son
+// décor et rien d'autre. Un cadre vide sur la page du client.
 import { extractIndexed } from "./repeaterExtract"
 
 export type MenuItem = { name: string; price?: string; desc?: string }
@@ -12,5 +14,6 @@ export function menuSectionViewModel(content: Record<string, any> | null | undef
   // les plats (idéal pour les gros menus). Sinon liste simple (historique).
   const collapsible = c.menu_display === "Grande carte dépliable"
   const columns = c.item_columns === "2 colonnes" ? 2 : 1 // 2 produits par ligne (listes courtes)
-  return { visible: true, category: typeof c.category === "string" && c.category ? c.category : undefined, items, collapsible, columns }
+  const categorie = typeof c.category === "string" && c.category ? c.category : undefined
+  return { visible: !!(categorie || items.length), category: categorie, items, collapsible, columns }
 }

@@ -1,11 +1,18 @@
 "use client"
 import { orderOnlineViewModel } from "../../models/orderOnline"
 import { EditorCtaShell } from "../../primitives/BlockCtaLink"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { IconLabelCta } from "../../views/IconLabelCta"
 import type { EditorAdapterProps } from "../../renderTypes"
 
 export function EditorOrderOnline({ content, ctx }: EditorAdapterProps) {
-  const { label, platform } = orderOnlineViewModel(content)
+  const { visible, label, platform } = orderOnlineViewModel(content)
+  // La page ne publie plus le cadre d'un bloc vide ; l'aperçu le dit. (Vague 25.)
+  if (!visible) return (
+    <div style={{ padding: "10px 16px", ...ctx.surfaceStyle }}>
+      <BlockEmptyState icon="🛒" label="Ajoutez le lien de commande" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={ctx.muted} />
+    </div>
+  )
   return (
     <div style={{ padding: "4px 16px 10px", ...ctx.surfaceStyle }}>
       <EditorCtaShell style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(249,115,22,0.1)", border: "1.5px solid rgba(249,115,22,0.25)", borderRadius: 12, padding: "13px 18px" }}>

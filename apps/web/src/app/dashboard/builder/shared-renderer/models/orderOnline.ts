@@ -4,7 +4,10 @@
 import { extHref } from "../../types"
 import type { CtaLink } from "./ctaLink"
 
-export type OrderOnlineViewModel = { label: string; platform: string; link: CtaLink }
+// Vague 25 — sans adresse, PublicCtaLink n'affiche plus rien : il ne restait que
+// le conteneur. Un bloc « Commander en ligne » qui ne commande rien ne se publie
+// pas du tout.
+export type OrderOnlineViewModel = { visible: boolean; label: string; platform: string; link: CtaLink }
 export function orderOnlineViewModel(content: Record<string, any> | null | undefined): OrderOnlineViewModel {
   const c = content || {}
   const url = typeof c.url === "string" ? c.url : ""
@@ -13,5 +16,5 @@ export function orderOnlineViewModel(content: Record<string, any> | null | undef
   // personne : le commercant la choisissait, rien ne changeait. Elle rassure le
   // visiteur sur l'endroit ou le lien l'emmene, comme sur le bloc « Boutique ».
   const platform = typeof c.platform === "string" ? c.platform.trim() : ""
-  return { label: c.label || "Commander maintenant", platform, link: { href, external: /^https?:/.test(url), trackTarget: url || "order", visible: true } }
+  return { visible: !!href, label: c.label || "Commander maintenant", platform, link: { href, external: /^https?:/.test(url), trackTarget: url || "order", visible: !!href } }
 }

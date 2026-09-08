@@ -545,7 +545,7 @@ import { actionClavier } from "./raccourcisClavier"
           const claimed = claimRef.current
           const res = await fetch("/api/pages/create", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: claimed?.pageName || pageName }) })
           const json = await res.json().catch(() => ({}))
-          if (!res.ok || !json?.pageId) { setBootstrapError(json?.message || json?.error || "Impossible de creer la page."); return }
+          if (!res.ok || !json?.pageId) { setBootstrapError(json?.message || json?.error || "Impossible de créer la page."); return }
           if (claimed) {
             setBlocksRaw(claimed.blocks.map(b => ({ id: IS_UUID(b.id) ? b.id : genId(), type: b.type, content: { ...b.content }, visible: b.visible !== false, draft: b.draft, locked: b.locked })))
             setPageName(claimed.pageName)
@@ -570,7 +570,7 @@ import { actionClavier } from "./raccourcisClavier"
           if (json.slug) setPageSlug(json.slug)
           try { window.history.replaceState(null, "", "/dashboard/builder/" + json.pageId) } catch {}
         } catch (e: any) {
-          setBootstrapError(e?.message || "Impossible de creer la page.")
+          setBootstrapError(e?.message || "Impossible de créer la page.")
         }
       })()
     }, [pageId, authState])
@@ -1710,7 +1710,7 @@ import { actionClavier } from "./raccourcisClavier"
               <div style={{ padding: "8px 10px 6px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(4, minmax(0, 1fr))" : "1fr 1fr", gap: isMobile ? 5 : 6 }}>
                   {/* Essentiels — vue par defaut (~20 blocs les plus utiles). QWG-0017b */}
-                  <button onClick={() => setActiveCategory("essentials")} title="Les blocs les plus utiles pour demarrer"
+                  <button onClick={() => setActiveCategory("essentials")} title="Les blocs les plus utiles pour démarrer"
                     style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 7, minWidth: 0, background: activeCategory==="essentials" ? "rgba(201,168,76,0.16)" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory==="essentials" ? "rgba(201,168,76,0.5)" : "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: isMobile ? "5px 3px" : "9px 11px", color: activeCategory==="essentials" ? "#C9A84C" : MUTED, fontSize: 12, fontWeight: activeCategory==="essentials" ? 700 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
                     <span style={{ fontSize: isMobile ? 16 : 15, flexShrink: 0 }}>✨</span>
                     <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: isMobile ? "normal" as const : "nowrap", fontSize: isMobile ? 9.5 : undefined, textAlign: isMobile ? "center" as const : undefined, lineHeight: isMobile ? 1.15 : undefined, width: isMobile ? "100%" : undefined }}>Essentiels</span>

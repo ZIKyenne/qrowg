@@ -45,8 +45,13 @@ describe("wave2 — modèles purs (contenu + lien sûr)", () => {
     const vm = downloadFileViewModel({ url: "ex.com/f.pdf", type_doc: "PDF", label: "Guide" })
     expect(vm.link.href).toBe("https://ex.com/f.pdf"); expect(vm.typeDoc).toBe("PDF"); expect(vm.link.external).toBe(true)
   })
-  it("order_online : TOUJOURS visible, external seulement si http(s)", () => {
-    expect(orderOnlineViewModel({}).link.visible).toBe(true)
+  it("order_online : visible SEULEMENT avec une adresse, external si http(s)", () => {
+    // Ce test figeait « TOUJOURS visible » — fidélité au legacy, qui repliait sur
+    // « # ». Depuis que le rendu public refuse un bouton sans destination, il ne
+    // restait qu'un cadre orange vide sur la page. (Vague 25.)
+    expect(orderOnlineViewModel({}).link.visible).toBe(false)
+    expect(orderOnlineViewModel({}).visible).toBe(false)
+    expect(orderOnlineViewModel({ url: "https://ubereats.com/x" }).visible).toBe(true)
     expect(orderOnlineViewModel({ url: "https://ex.com" }).link.external).toBe(true)
     expect(orderOnlineViewModel({ url: "/interne" }).link.external).toBe(false)
     expect(orderOnlineViewModel({}).link.trackTarget).toBe("order")

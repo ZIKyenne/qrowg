@@ -1,3 +1,111 @@
+> # 🛑 08/09/2026 — CE DIAGNOSTIC EST CADUC. IL N'Y A JAMAIS EU DE PROBLÈME DE DISTRIBUTION.
+>
+> L'export natif *Pinterest Analytics overview 2026-08-08 → 2026-09-07* dit l'inverse de
+> tout ce qui précède. **Les impressions ne sont pas nulles, elles triplent.**
+>
+> | Période | Jours | Impressions | Moyenne/jour |
+> |---|---|---|---|
+> | 08 → 30 août (avant la production quotidienne) | 23 | 562 | **24,4** |
+> | 31 août → 07 sept (production quotidienne) | 8 | 645 | **80,6** |
+>
+> **×3,3 en moyenne**, et la courbe monte toujours : 113 impressions le 06/09,
+> **129 le 07/09**, le meilleur jour des trente. Total 1 207 impressions sur la période.
+>
+> ### La cause réelle : l'instrument était cassé
+> Les « 0 impression » lus chaque jour depuis le 02/09 venaient tous de **Buffer**, qui
+> ne remonte pas les métriques par épingle de Pinterest. Ce zéro était un **défaut de
+> reporting**, jamais un fait. Six jours de notes (02 → 07/09) ont bâti des hypothèses —
+> tableaux, domaine, audience, shadowban — sur une mesure vide.
+> **Règle : les chiffres Pinterest se lisent dans l'analytique native de Pinterest.
+> Buffer sert à programmer, pas à mesurer Pinterest.**
+>
+> ### Le test de placement est lisible, et les tableaux thématiques gagnent
+> Impressions par tableau sur 30 jours :
+>
+> | Tableau | Impressions |
+> |---|---|
+> | QR code restaurant | **119** |
+> | Avis Google commerce | 94 |
+> | QR code food truck | 82 |
+> | QR code boutique commerce | 51 |
+> | QR code immobilier | 28 |
+> | QR code hôtel | 20 |
+> | Templates gratuits *(historique)* | 19 |
+> | QR code salon coiffure | 15 |
+> | Idées rangement *(historique)* | 5 |
+> | Productivité au travail *(historique)* | absent du classement |
+>
+> Les tableaux **« QR code X » écrasent les tableaux historiques** (119 contre 19, et
+> *Productivité au travail* ne marque même pas). La consigne conditionnelle « si les
+> tableaux historiques gagnent, basculer sur eux » est donc **caduque** : ils perdent.
+> On garde les tableaux thématiques par défaut. Le pont d'audience se fait par le
+> **sujet** des épingles (food, commerce de proximité), pas par le tableau.
+>
+> ### Le vrai problème, désormais : la conversion, pas la portée
+> Sur 1 207 impressions en 30 jours : **7 clics sur épingle, 2 clics sortants, 1
+> enregistrement.** Soit 0,6 % de clic sur épingle et **0,17 % de clic sortant**.
+> L'audience voit les épingles et ne les ouvre pas. C'est là qu'il faut travailler :
+> - le **titre** de l'épingle et la première ligne de description (ce qui décide du clic),
+> - la promesse : « idée d'organisation » attire le regard mais ne promet rien à ouvrir,
+> - l'appel à l'action explicite vers la page,
+> - et le fait que le visuel *donne déjà toute la réponse* — il ne reste aucune raison
+>   de cliquer. Garder une part de la réponse derrière le lien.
+>
+> ### Ce qui reste vrai du reste de ce fichier
+> Rien concernant les causes. Le contenu ci-dessous est conservé **à titre d'archive**,
+> pour mémoire de la méthode et de l'erreur.
+
+---
+
+> ## Note intermédiaire 08/09/2026 (écrite avant l'export natif — partiellement fausse)
+>
+> **Cause n°1 (tableaux neufs) : éliminée.** Le test du 03/09 est tranché avant sa date
+> de lecture. Les épingles placées sur les tableaux historiques (*Productivité au
+> travail*, *Templates gratuits*) sont à **0 impression**, exactement comme le témoin sur
+> un tableau neuf. Le placement n'y est pour rien.
+>
+> **Cause n°2 (domaine non revendiqué) : éliminée — l'hypothèse était fausse.**
+> Vérification faite dans *Paramètres → Lien vers Pinterest* le 08/09 : `qrowg.com`
+> figure bien dans « Sites Web » avec le bouton **« Ne plus revendiquer »**, ce qui
+> signifie que le domaine **est revendiqué**. Cette cause a été supposée le 03/09 sans
+> être vérifiée dans l'interface, puis répétée comme un fait dans les notes du 05, 06 et
+> 07/09. À ne plus écrire sans avoir regardé l'écran.
+>
+> **Cause n°3 (audience hors sujet) : insuffisante.** Un contenu hors sujet est montré à
+> quelques centaines de personnes avant d'être enterré. Zéro strict, sur 56 épingles et
+> plusieurs semaines, n'est pas un problème d'intérêt.
+>
+> ### Ce qui reste, et le signal nouveau
+> Le même jour, on découvre que **4 carrousels Instagram ont été refusés** avec
+> « flagged this post as potential spam ». Deux plateformes différentes, le même verdict,
+> sur le même flux : le problème n'est probablement ni le tableau, ni le domaine, ni le
+> sujet, mais le **motif de publication** — volume quotidien automatisé, visuels très
+> proches les uns des autres, lien sortant systématique vers le même domaine, sur des
+> comptes hérités reconvertis. C'est le profil que les deux plateformes classent en spam.
+>
+> ### Les deux vérifications à faire avant toute nouvelle hypothèse
+> 1. **Les zéros sont-ils réels ?** Les chiffres viennent tous de Buffer. Ouvrir
+>    l'analytique **de Pinterest** (Business Hub → Analytics → Vue d'ensemble, 30 jours)
+>    et comparer. Si Pinterest affiche des impressions que Buffer ne remonte pas, il n'y
+>    a jamais eu de problème de distribution, seulement un problème de reporting.
+> 2. **Y a-t-il une notification de non-conformité ?** Regarder la cloche et la boîte
+>    mail du compte : Pinterest prévient quand il restreint un compte ou un domaine.
+>
+> ### Le test qui sépare « domaine » de « compte »
+> Si les zéros sont confirmés : publier **deux épingles à la main depuis Pinterest**
+> (pas via Buffer, pas via l'API), le même jour, même soin —
+> l'une **sans aucun lien sortant**, l'autre avec le lien `qrowg.com` habituel.
+> - Les deux à zéro → le compte est restreint, pas le lien.
+> - Seule celle sans lien décolle → c'est le domaine ou le lien sortant qui est filtré.
+> - Les deux décollent → c'est la **publication via API/Buffer** qui est déclassée, et il
+>   faut repasser en publication manuelle ou espacer fortement le rythme.
+>
+> En attendant ces réponses, **augmenter le volume d'épingles n'a aucun sens** : le
+> plafond reste à 4 par jour, et l'effort se reporte sur TikTok, seul canal réellement
+> distribué.
+
+---
+
 # Pourquoi Pinterest ne distribue rien — 03/09/2026
 
 ## Le chiffre

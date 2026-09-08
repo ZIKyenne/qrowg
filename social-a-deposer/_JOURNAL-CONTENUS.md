@@ -3,6 +3,63 @@
 > **À lire AVANT toute création.** Aucun slug, angle ou accroche listé ici ne peut être
 > réutilisé. Après chaque run, ajouter la ligne du jour en bas.
 
+## ⚑ Source des chiffres (lire en premier)
+
+**Buffer ne mesure PAS Pinterest.** Ses `metrics` renvoient `Impressions: 0` sur toutes
+les épingles, ce qui est un **défaut de reporting**, pas un fait. Toutes les notes du
+02 au 07/09 parlant de « 0 impression » sont **fausses** et ont produit six jours
+d'hypothèses inutiles (tableaux, domaine revendiqué, shadowban).
+La vérité vient de l'**export natif Pinterest Analytics** : sur 08/08 → 07/09,
+**1 207 impressions**, moyenne passée de **24,4/j** (avant production quotidienne) à
+**80,6/j** (depuis le 31/08), pic à **129 le 07/09**. La distribution Pinterest
+**fonctionne et triple**. Détail dans `marketing-design\DIAGNOSTIC-PINTEREST.md`.
+
+Buffer reste fiable pour **TikTok et Instagram** (vues, temps de visionnage, statut
+`error`). Pour Pinterest : programmer avec Buffer, mesurer dans Pinterest.
+
+**Le vrai chantier Pinterest est la conversion**, pas la portée : 1 207 impressions →
+7 clics sur épingle → **2 clics sortants** en 30 jours. Travailler les titres, la
+promesse, et cesser de tout dire dans le visuel (il ne reste aucune raison de cliquer).
+
+**Placement tranché :** les tableaux « QR code X » écrasent les tableaux historiques
+(QR code restaurant 119 impressions contre Templates gratuits 19, Productivité au
+travail non classé). On garde les tableaux thématiques par défaut.
+
+## ⚑ Épingles écrites POUR LE CLIC (formule en vigueur depuis le 08/09)
+
+Constat : 1 207 impressions en 30 jours n'ont produit que **2 clics sortants**. Cause
+retenue — **l'épingle donnait toute la réponse**. Titre = le problème, sous-titre = le
+mécanisme complet, QR = la solution. On lisait, on comprenait, on passait. Il ne restait
+aucune raison d'ouvrir.
+
+**La formule à appliquer désormais :**
+
+1. **Le visuel retient la réponse.** Le titre garde l'accroche (le problème, en une
+   phrase qui arrête le défilement). Le sous-titre **n'explique plus le mécanisme** : il
+   annonce une méthode à récupérer et s'arrête, avec une flèche.
+   - ✗ « Un QR sur la table ouvre la carte des softs maison : les sirops, les jus… »
+   - ✓ « La marche à suivre : 4 étapes, 5 minutes, sans carte bancaire → »
+2. **Sous-titre court** — deux lignes maximum, sinon la flèche s'orpheline en bout de
+   ligne et le bloc devient un pavé.
+3. **Le titre Pinterest promet, il ne décrit pas.** Il contient un livrable, un chiffre
+   ou une durée.
+   - ✗ « Carte des softs : autre chose que du Coca »
+   - ✓ « Carte des softs : la monter en 5 minutes, sans réimprimer »
+4. **Première phrase de la description = la promesse + l'appel à cliquer.** Pinterest
+   tronque : le contexte vient après, jamais avant. Terminer par « Clique pour… ».
+5. **Ne promettre que ce que la page livre.** Vérifié le 08/09 sur `/qr-code/menu` et
+   `/qr-code/salon` : outil gratuit, **sans carte bancaire**, **prêt à imprimer en
+   5 minutes**, **4 étapes**, modifiable sans réimprimer. Ces quatre arguments sont
+   honnêtes sur toutes les pages `/qr-code/<usage>`. Ne pas promettre un modèle, un PDF
+   ou une checklist tant que la page n'en propose pas — un clic gagné par appât est un
+   visiteur perdu.
+6. **Marquer l'expérience** : `&utm_content=clic` en fin de lien, pour séparer cette
+   série de tout ce qui précède.
+
+**Indicateur à suivre : le clic sortant**, pas l'impression. Base de départ à battre :
+**2 clics sortants / 1 207 impressions sur 30 jours (0,17 %)**. Relire dans Pinterest
+Analytics (pas dans Buffer) le 15/09.
+
 ## ⚑ Règles de publication (obligatoires, à appliquer à CHAQUE mise en file)
 
 1. **Mention « contenu généré par IA » : TOUJOURS activée.** Demande explicite d'Emilien
@@ -333,8 +390,31 @@
 > **Apprentissage Buffer.** Pinterest : **0 impression sur toutes les épingles publiées
 > depuis le 02/09**, sans exception, tableaux historiques compris — le test de placement
 > du 03/09 est tranché avant sa date de lecture du 11/09 : **le placement n'est pas la
-> cause**, il ne reste que la cause n°2 du diagnostic (`qrowg.com` non revendiqué).
-> Volume Pinterest maintenu à 4 épingles, pas davantage, tant que ce point n'est pas réglé.
+> cause**.
+> **CORRECTION FINALE DU 08/09 — tout ce paragraphe est faux.** L'export natif Pinterest
+> Analytics (08/08 → 07/09) montre **1 207 impressions**, en hausse de 24,4/j à 80,6/j
+> depuis le début de la production quotidienne, **pic à 129 le 07/09**. Les « 0 impression »
+> ne venaient que du reporting défaillant de Buffer sur Pinterest. Le test de placement
+> est bien lisible et **les tableaux thématiques gagnent largement** (QR code restaurant
+> 119 contre Templates gratuits 19). Il n'y a jamais eu de problème de distribution :
+> le vrai point faible est la **conversion** (2 clics sortants en 30 jours).
+> Voir l'en-tête « Source des chiffres » et `DIAGNOSTIC-PINTEREST.md`.
+>
+> *Ci-dessous, l'état du raisonnement avant l'export, conservé pour mémoire :*
+> **Correction du soir : la cause n°2 était fausse.** Vérification faite dans
+> *Paramètres Pinterest → Lien vers Pinterest* : `qrowg.com` est **bien revendiqué**
+> (bouton « Ne plus revendiquer » affiché). L'hypothèse « domaine non revendiqué » avait
+> été supposée le 03/09 sans vérification d'écran, puis répétée comme un fait les 05, 06
+> et 07/09. **Les trois causes du diagnostic sont donc éliminées.**
+> Nouvelle piste, appuyée par la découverte Instagram du jour : deux plateformes classent
+> le même flux en spam le même jour. Ce n'est probablement ni le tableau, ni le domaine,
+> ni le sujet, mais le **motif de publication** — volume automatisé quotidien, visuels
+> très proches, lien sortant systématique vers le même domaine, comptes hérités.
+> Prochaines vérifications listées dans `DIAGNOSTIC-PINTEREST.md` (mise à jour 08/09) :
+> comparer l'analytique **native Pinterest** aux chiffres Buffer avant tout, chercher une
+> notification de non-conformité, puis lancer le test « deux épingles manuelles, avec et
+> sans lien sortant » qui sépare un domaine filtré d'un compte restreint.
+> Volume Pinterest maintenu à 4 épingles tant que ces réponses manquent.
 > TikTok reste le seul canal distribué, mais **le visionnage moyen se dégrade** :
 > 12,73 s le 04/09 (restaurant · liste d'attente du samedi soir), 9,23 s le 07/09
 > (restaurant · carte enfants), **5,29 s aujourd'hui** pour le carrousel food truck du

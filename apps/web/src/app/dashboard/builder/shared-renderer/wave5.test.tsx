@@ -29,7 +29,12 @@ const H = (el: any) => renderToStaticMarkup(el)
 
 describe("wave5 — modèles commerce/événement", () => {
   it("vide → visibilité fidèle au legacy", () => {
-    expect(menuSectionViewModel({}).visible).toBe(true)       // legacy : conteneur toujours rendu
+    // « Fidèle au legacy » : le legacy publiait le conteneur vide. Ce n'était pas
+    // une vertu à préserver — un cadre sans un mot dedans sur la page du client.
+    // (Vague 25.)
+    expect(menuSectionViewModel({}).visible).toBe(false)
+    expect(menuSectionViewModel({ item1_name: "Pizza" }).visible).toBe(true)
+    expect(menuSectionViewModel({ category: "Entrées" }).visible, "une catégorie seule est un titre de section").toBe(true)
     expect(menuSectionViewModel({}).items).toEqual([])
     expect(servicesListViewModel({}).visible).toBe(false)     // public null si vide
     expect(giftCardViewModel({}).visible).toBe(false)         // (title||amount1)
@@ -143,10 +148,12 @@ describe("wave5 — parité public (null / items / lien réel)", () => {
     expect(H(createElement(PublicGiftCard, { content: {}, ctx: pCtx }))).toBe("")
     expect(H(createElement(PublicEventTicketing, { content: {}, ctx: pCtx }))).toBe("")
   })
-  it("menu_section/promo_banner/event_info : conteneur rendu même vide (fidèle legacy)", () => {
-    expect(H(createElement(PublicMenuSection, { content: {}, ctx: pCtx }))).not.toBe("")
-    expect(H(createElement(PublicPromoBanner, { content: {}, ctx: pCtx }))).not.toBe("")
-    expect(H(createElement(PublicEventInfo, { content: {}, ctx: pCtx }))).not.toBe("")
+  it("menu_section/promo_banner/event_info : plus de conteneur vide", () => {
+    // Ces trois-là publiaient leur décor sans contenu : une carte rose bordée
+    // pour event_info, un dégradé orange pour promo_banner. (Vague 25.)
+    expect(H(createElement(PublicMenuSection, { content: {}, ctx: pCtx }))).toBe("")
+    expect(H(createElement(PublicPromoBanner, { content: {}, ctx: pCtx }))).toBe("")
+    expect(H(createElement(PublicEventInfo, { content: {}, ctx: pCtx }))).toBe("")
   })
   const filled: [string, any, any, string][] = [
     ["menu_section", PublicMenuSection, { item1_name: "Pizza", item1_price: "12€" }, "Pizza"],

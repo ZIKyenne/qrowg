@@ -96,6 +96,23 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   google_reviews_block:    c => anyIndexed(c, i => c[`r${i}_name`]) || hasMeaningfulText(c.avg_rating),
   event_access:            c => hasMeaningfulText(c.embed_url) || hasMeaningfulText(c.address)
                               || hasMeaningfulText(c.transport1_label) || hasMeaningfulText(c.transport2_label) || hasMeaningfulText(c.transport3_label),
+
+  // ── Ajoutés le 8 septembre (vague 25) ─────────────────────────────────────
+  // Quatre blocs déjà passés au renderer partagé, dont le modèle affirmait
+  // `visible: true` sans condition : posés vides, ils publiaient leur DÉCOR.
+  // `event_info` est le plus voyant — une carte rose bordée, 351 octets, et rien
+  // dedans. Le visiteur voit un rectangle et croit la page cassée.
+  bio:                     c => hasMeaningfulText(c.text),
+  // Un titre « Mes compétences » sans une seule étiquette ne montre rien :
+  // c'est la liste qui EST le bloc.
+  skills:                  c => hasMeaningfulText(c.tags),
+  event_info:              c => hasMeaningfulText(c.name) || hasMeaningfulText(c.date) || hasMeaningfulText(c.time)
+                              || hasMeaningfulText(c.location) || hasMeaningfulText(c.price) || hasMeaningfulText(c.cta_label),
+  menu_section:            c => hasMeaningfulText(c.category) || anyIndexed(c, i => c[`item${i}_name`]),
+  promo_banner:            c => ["emoji", "text", "subtext", "cta_label"].some(k => hasMeaningfulText(c[k])),
+  // Le bouton « Commander » n'est plus publié sans adresse : sans elle il ne
+  // restait qu'un cadre orange. C'est le lien qui fait le bloc.
+  order_online:            c => hasMeaningfulText(c.url),
 }
 
 // Vrai si le bloc contient au moins un élément réellement publiable. Pour un type non

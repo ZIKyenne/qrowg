@@ -1,0 +1,42 @@
+{
+  "pins": [
+    {
+      "slug": "qr-code-carte-softs-sans-alcool-restaurant-v2",
+      "sector": "restaurant",
+      "layout": 0,
+      "tag": "Restaurant · sans alcool",
+      "title": "« Vous avez quoi sans alcool ? » — « Du [[Coca]]. »",
+      "subtitle": "La marche à suivre : 4 étapes, 5 minutes, sans carte bancaire →",
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260908-restaurant&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-programme-dimanche-sport-bar-v2",
+      "sector": "bar",
+      "layout": 1,
+      "tag": "Bar · dimanche sport",
+      "title": "Le match est à 21 h. Personne ne le [[sait]].",
+      "subtitle": "Changé chaque semaine, jamais réimprimé. Les 4 étapes →",
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260908-restaurant&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-commande-gateau-anniversaire-boulangerie-v2",
+      "layout": 2,
+      "tag": "Boulangerie",
+      "title": "Le gâteau se commande. Pas au [[téléphone]] à 8 h.",
+      "subtitle": "Le formulaire à coller en vitrine. Gratuit, 5 minutes →",
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260908-restaurant&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-creneau-libere-derniere-minute-salon-v2",
+      "layout": 3,
+      "tag": "Salon · dernière minute",
+      "title": "Une annulation à 14 h. Un fauteuil [[vide]] à 15 h.",
+      "subtitle": "Tes créneaux libérés au miroir, changés dans la journée →",
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20260908-restaurant&utm_content=clic"
+    }
+  ]
+}

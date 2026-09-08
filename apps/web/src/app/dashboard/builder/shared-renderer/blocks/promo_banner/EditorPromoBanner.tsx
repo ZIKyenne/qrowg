@@ -1,11 +1,18 @@
 "use client"
 import { promoBannerViewModel } from "../../models/promoBanner"
 import { EditorCtaShell } from "../../primitives/BlockCtaLink"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import type { EditorAdapterProps } from "../../renderTypes"
 
 export function EditorPromoBanner({ content, ctx }: EditorAdapterProps) {
-  const { emoji, text, subtext, ctaLabel } = promoBannerViewModel(content)
+  const { visible, emoji, text, subtext, ctaLabel } = promoBannerViewModel(content)
   const { text: textColor, muted, surfaceStyle } = ctx
+  // La page ne publie plus le cadre d'un bloc vide ; l'aperçu le dit. (Vague 25.)
+  if (!visible) return (
+    <div style={{ padding: "10px 16px", ...surfaceStyle }}>
+      <BlockEmptyState icon="🔥" label="Ajoutez le texte de la promo" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={muted} />
+    </div>
+  )
   return (
     <div style={{ padding: "10px 16px", ...surfaceStyle }}>
       <div style={{ background: "linear-gradient(135deg,rgba(249,115,22,0.15),rgba(249,115,22,0.08))", border: "1px solid rgba(249,115,22,0.3)", borderRadius: 10, padding: "12px 14px", textAlign: "center" }}>

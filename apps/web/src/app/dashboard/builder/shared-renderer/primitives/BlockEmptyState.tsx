@@ -12,3 +12,10 @@ export function BlockEmptyState({ icon, label, sub, muted }: { icon: string; lab
     </div>
   )
 }
+
+// Mention discrète pour les blocs qui s'éditent DIRECTEMENT dans le canvas
+// (titre, bio) : leur remplacer le champ par un état vide leur retirerait la
+// saisie en place. On garde le champ, on ajoute la vérité sous lui.
+export function NoteInvisibleEnLigne({ muted }: { muted: string }) {
+  return <p role="note" style={{ margin: "6px 0 0", fontSize: 10, color: muted, opacity: 0.8 }}>{HIDDEN_WHEN_EMPTY_NOTE}</p>
+}

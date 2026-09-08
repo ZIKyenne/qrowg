@@ -5,7 +5,9 @@ import type { PublicAdapterProps } from "../../renderTypes"
 
 // Legacy : conteneur toujours rendu. CTA legacy sans target/rel (external=false).
 export function PublicPromoBanner({ content, ctx }: PublicAdapterProps) {
-  const { emoji, text, subtext, ctaLabel, link } = promoBannerViewModel(content)
+  const { visible, emoji, text, subtext, ctaLabel, link } = promoBannerViewModel(content)
+  // Rien à annoncer : pas de bannière. (Vague 25.)
+  if (!visible) return null
   const { TEXT, MUTED, FONT_D, FONT_B, trackClick } = ctx
   return (
     <div style={{ padding: "6px 24px 16px" }}>

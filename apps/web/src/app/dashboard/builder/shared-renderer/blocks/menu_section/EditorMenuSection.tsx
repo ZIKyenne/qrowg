@@ -1,12 +1,20 @@
 "use client"
 import { menuSectionViewModel } from "../../models/menuSection"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { MenuItemList } from "../../primitives/MenuItemList"
 import type { EditorAdapterProps } from "../../renderTypes"
 
 // Aperçu éditeur : liste (1 ou 2 colonnes) ou carte dépliable. Toujours rendu.
 export function EditorMenuSection({ content, ctx }: EditorAdapterProps) {
-  const { category, items, collapsible, columns } = menuSectionViewModel(content)
+  const { visible, category, items, collapsible, columns } = menuSectionViewModel(content)
   const { text, muted, primary, surfaceStyle } = ctx
+  // La page ne publie plus le décor d'un bloc vide ; l'aperçu le dit, plutôt que
+  // de laisser un cadre muet dans le canvas. (Vague 25.)
+  if (!visible) return (
+    <div style={{ padding: "10px 16px", ...surfaceStyle }}>
+      <BlockEmptyState icon="🍽️" label="Ajoutez une catégorie ou un plat" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={muted} />
+    </div>
+  )
   const rows = <MenuItemList items={items} columns={columns} rowPad={7} text={text} muted={muted} primary={primary} />
   if (collapsible) {
     // Aperçu éditeur : carte toujours dépliée (édition), avec l'en-tête « dépliable ».

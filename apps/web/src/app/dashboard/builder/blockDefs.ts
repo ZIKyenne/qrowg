@@ -41,12 +41,12 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   skills: {
-    label: "Compétences", description: "Tags de compétences ou interets",
+    label: "Compétences", description: "Tags de compétences ou intérêts",
     icon: "🏷️", color: "#C9A84C", category: "identity",
     defaultContent: { title: "", tags: "" },
     fields: [
       { key: "title", label: "Titre (optionnel)", type: "text", placeholder: "Mes compétences" },
-      { key: "tags", label: "Tags (separes par virgule)", type: "text", placeholder: "React, Design, Marketing", suggestions: ["React, Design, Marketing", "Photographie, Retouche, Studio", "Coaching, Nutrition, Bien-être", "SEO, Contenu, Réseaux sociaux"] },
+      { key: "tags", label: "Tags (séparés par virgule)", type: "text", placeholder: "React, Design, Marketing", suggestions: ["React, Design, Marketing", "Photographie, Retouche, Studio", "Coaching, Nutrition, Bien-être", "SEO, Contenu, Réseaux sociaux"] },
     ],
   },
   // ── Actions ───────────────────────────────────────────────────────────────
@@ -146,7 +146,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   promo_banner: {
-    label: "Banniere promo", description: "Offre spéciale ou réduction",
+    label: "Bannière promo", description: "Offre spéciale ou réduction",
     icon: "🎁", color: "#F97316", category: "commerce",
     defaultContent: { emoji: "🎉", cta_label: "Profiter" },
     fields: [
@@ -165,7 +165,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "category", label: "Catégorie", type: "text", placeholder: "Entrées, Plats, Desserts..." },
       { key: "item1_name", label: "Plat 1 — Nom", type: "text", placeholder: "Salade cesar" },
       { key: "item1_price", label: "Plat 1 — Prix", type: "text", placeholder: "12€" },
-      { key: "item1_desc", label: "Plat 1 — Description", type: "text", placeholder: "Laitue, parmesan, croutons" },
+      { key: "item1_desc", label: "Plat 1 — Description", type: "text", placeholder: "Laitue, parmesan, croûtons" },
       { key: "item2_name", label: "Plat 2 — Nom", type: "text", placeholder: "Soupe du jour" },
       { key: "item2_price", label: "Plat 2 — Prix", type: "text", placeholder: "8€" },
       { key: "item2_desc", label: "Plat 2 — Description", type: "text", placeholder: "Selon saison" },
@@ -189,7 +189,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   services_list: {
-    label: "Liste de services", description: "3 services avec icones",
+    label: "Liste de services", description: "3 services avec icônes",
     icon: "⚙️", color: "#7B61FF", category: "commerce",
     defaultContent: { title: "Mes services", s1_icon: "💻" },
     fields: [
@@ -202,7 +202,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "s2_desc", label: "Service 2 — Description", type: "text", placeholder: "UI/UX, branding" },
       { key: "s3_icon", label: "Service 3 — Emoji", type: "text", placeholder: "🚀" },
       { key: "s3_name", label: "Service 3 — Nom", type: "text", placeholder: "Conseil" },
-      { key: "s3_desc", label: "Service 3 — Description", type: "text", placeholder: "Strategie digitale" },
+      { key: "s3_desc", label: "Service 3 — Description", type: "text", placeholder: "Stratégie digitale" },
     ],
   },
   // ── Medias ────────────────────────────────────────────────────────────────
@@ -243,12 +243,12 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   video: {
-    label: "Video", description: "Video YouTube ou Vimeo",
+    label: "Vidéo", description: "Vidéo YouTube ou Vimeo",
     icon: "▶️", color: "#FF0000", category: "media",
     defaultContent: { url: "", title: "" },
     fields: [
       { key: "url", label: "Lien YouTube ou Vimeo", type: "url", placeholder: "https://youtube.com/watch?v=..." },
-      { key: "title", label: "Titre (optionnel)", type: "text", placeholder: "Titre de la video" },
+      { key: "title", label: "Titre (optionnel)", type: "text", placeholder: "Titre de la vidéo" },
     ],
   },
   // ── Infos ─────────────────────────────────────────────────────────────────
@@ -326,13 +326,13 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     fields: [
       { key: "name1", label: "Avis 1 — Nom", type: "text", placeholder: "Marie D." },
       { key: "text1", label: "Avis 1 — Texte", type: "textarea", placeholder: "Excellent travail, je recommande !" },
-      { key: "stars1", label: "Avis 1 — Etoiles", type: "select", options: ["5", "4", "3"] },
+      { key: "stars1", label: "Avis 1 — Étoiles", type: "select", options: ["5", "4", "3"] },
       { key: "name2", label: "Avis 2 — Nom", type: "text", placeholder: "Pierre M." },
       { key: "text2", label: "Avis 2 — Texte", type: "textarea", placeholder: "" },
-      { key: "stars2", label: "Avis 2 — Etoiles", type: "select", options: ["5", "4", "3"] },
+      { key: "stars2", label: "Avis 2 — Étoiles", type: "select", options: ["5", "4", "3"] },
       { key: "name3", label: "Avis 3 — Nom", type: "text", placeholder: "Sophie L." },
       { key: "text3", label: "Avis 3 — Texte", type: "textarea", placeholder: "" },
-      { key: "stars3", label: "Avis 3 — Etoiles", type: "select", options: ["5", "4", "3"] },
+      { key: "stars3", label: "Avis 3 — Étoiles", type: "select", options: ["5", "4", "3"] },
     ],
   },
   visit_counter: {
@@ -389,7 +389,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     fields: [
       { key: "label", label: "Nom du lieu", type: "text", placeholder: "Mon restaurant" },
       { key: "address", label: "Adresse", type: "text", placeholder: "12 rue de la Paix, 75001 Paris" },
-      { key: "transport", label: "Accès transport", type: "text", placeholder: "Metro Opera - Ligne 3" },
+      { key: "transport", label: "Accès transport", type: "text", placeholder: "Métro Opéra - Ligne 3" },
     ],
   },
   opening_hours: {
@@ -460,14 +460,14 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   },
   // ── Event ─────────────────────────────────────────────────────────────────
   countdown: {
-    label: "Compte a rebours", description: "Decompte live jusqu a une echeance (offre, lancement, événement)",
+    label: "Compte a rebours", description: "Décompte live jusqu'à une échéance (offre, lancement, événement)",
     icon: "⏳", color: "#EF4444", category: "event",
-    defaultContent: { title: "Offre limitee", subtitle: "Profitez-en avant la fin", target: "", expired_text: "C est termine", cta_label: "", cta_url: "", accent: "#EF4444" },
+    defaultContent: { title: "Offre limitée", subtitle: "Profitez-en avant la fin", target: "", expired_text: "C est termine", cta_label: "", cta_url: "", accent: "#EF4444" },
     fields: [
-      { key: "title", label: "Titre", type: "text", placeholder: "Offre limitee -30%" },
+      { key: "title", label: "Titre", type: "text", placeholder: "Offre limitée -30%" },
       { key: "subtitle", label: "Sous-titre", type: "text", placeholder: "Profitez-en avant la fin" },
       { key: "target", label: "Date et heure de fin", type: "datetime", hint: "Le décompte s'arrête à cette date (jour + heure)" },
-      { key: "expired_text", label: "Message une fois termine", type: "text", placeholder: "Offre terminee" },
+      { key: "expired_text", label: "Message une fois termine", type: "text", placeholder: "Offre terminée" },
       { key: "cta_label", label: "Bouton (optionnel)", type: "text", placeholder: "En profiter" },
       { key: "cta_url", label: "Lien du bouton", type: "url", placeholder: "https://" },
       { key: "accent", label: "Couleur d'accent", type: "color", placeholder: "#EF4444" },
@@ -478,18 +478,18 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     icon: "🎉", color: "#EC4899", category: "event",
     defaultContent: {},
     fields: [
-      { key: "name", label: "Nom", type: "text", placeholder: "Soiree de lancement" },
+      { key: "name", label: "Nom", type: "text", placeholder: "Soirée de lancement" },
       { key: "date", label: "Date", type: "text", placeholder: "Samedi 28 juin 2025" },
       { key: "time", label: "Heure", type: "text", placeholder: "19h00 - 23h00" },
       { key: "location", label: "Lieu", type: "text", placeholder: "Paris 11e" },
-      { key: "price", label: "Prix", type: "text", placeholder: "Entree libre" },
+      { key: "price", label: "Prix", type: "text", placeholder: "Entrée libre" },
       { key: "cta_label", label: "Bouton", type: "text", placeholder: "Je participe" },
       { key: "cta_url", label: "Lien", type: "url", placeholder: "https://" },
     ],
   },
   // ── Mise en page ──────────────────────────────────────────────────────────
   divider: {
-    label: "Separateur", description: "Ligne decorative de separation",
+    label: "Séparateur", description: "Ligne décorative de séparation",
     icon: "➖", color: "#A8A190", category: "layout",
     defaultContent: { style: "gold" },
     fields: [
@@ -2007,7 +2007,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     fields: [
       { key: "label", label: "Texte", type: "text", placeholder: "Donner un avis" },
       { key: "url", label: "Lien Google Review", type: "url", placeholder: "https://g.page/r/..." },
-      { key: "stars", label: "Etoiles affichees", type: "select", options: ["5","4","3"] },
+      { key: "stars", label: "Étoiles affichées", type: "select", options: ["5","4","3"] },
     ],
   },
   table_booking: {
@@ -2042,7 +2042,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   donation: {
-    label: "Faire un don", description: "Soutenir le createur",
+    label: "Faire un don", description: "Soutenir le créateur",
     icon: "☕", color: "#F59E0B", category: "actions",
     defaultContent: { label: "Soutenir mon travail", platform: "Ko-fi" },
     fields: [
@@ -2091,9 +2091,9 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   limited_offer: {
-    label: "Offre limitee", description: "Promotion temporaire urgente",
+    label: "Offre limitée", description: "Promotion temporaire urgente",
     icon: "⚡", color: "#EF4444", category: "actions",
-    defaultContent: { title: "Offre limitee", cta_label: "Profiter de l'offre" },
+    defaultContent: { title: "Offre limitée", cta_label: "Profiter de l'offre" },
     fields: [
       { key: "title", label: "Titre", type: "text", placeholder: "Offre spéciale -30%" },
       { key: "description", label: "Description", type: "text", placeholder: "Valable jusqu au 30 juin" },
@@ -2132,29 +2132,29 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     fields: [
       { key: "label", label: "Texte", type: "text", placeholder: "Demander un devis" },
       { key: "url", label: "Lien formulaire", type: "url", placeholder: "https://..." },
-      { key: "description", label: "Description", type: "text", placeholder: "Reponse sous 24 heures" },
+      { key: "description", label: "Description", type: "text", placeholder: "Réponse sous 24 heures" },
     ],
   },
 
   // ── Nouveaux blocs Identite ───────────────────────────────────────────────
   cover_banner: {
-    label: "Banniere / Cover", description: "Image de fond en haut de page",
+    label: "Bannière / Cover", description: "Image de fond en haut de page",
     icon: "🖼️", color: "#C9A84C", category: "identity",
     defaultContent: { banner_type: "image", height: "md", overlay_opacity: "0.2", overlay_gradient: "none", text_position: "bottom-left", grad_preset: "or_nuit" },
     fields: [
-      { key: "banner_type", label: "Type de banniere", type: "select", options: ["image", "gradient", "color"], hint: "Image, degrade ou couleur unie" },
-      { key: "src", label: "Image de banniere", type: "image", showIf: { key: "banner_type", equals: "image" } },
-      { key: "grad_preset", label: "Degrade", type: "select", options: ["or_nuit", "aurore", "ocean", "coucher", "violet", "menthe", "corail", "personnalise"], showIf: { key: "banner_type", equals: "gradient" } },
+      { key: "banner_type", label: "Type de bannière", type: "select", options: ["image", "gradient", "color"], hint: "Image, dégradé ou couleur unie" },
+      { key: "src", label: "Image de bannière", type: "image", showIf: { key: "banner_type", equals: "image" } },
+      { key: "grad_preset", label: "Dégradé", type: "select", options: ["or_nuit", "aurore", "ocean", "coucher", "violet", "menthe", "corail", "personnalise"], showIf: { key: "banner_type", equals: "gradient" } },
       { key: "grad_c1", label: "Couleur 1 (perso)", type: "color", showIf: { key: "grad_preset", equals: "personnalise" } },
       { key: "grad_c2", label: "Couleur 2 (perso)", type: "color", showIf: { key: "grad_preset", equals: "personnalise" } },
       { key: "bg_color", label: "Couleur de fond", type: "color", showIf: { key: "banner_type", equals: "color" } },
       { key: "height", label: "Hauteur", type: "select", options: ["sm", "md", "lg", "xl"] },
-      { key: "cover_title", label: "Titre sur la banniere", type: "text", placeholder: "Mon titre...", maxRecommended: 40 },
+      { key: "cover_title", label: "Titre sur la bannière", type: "text", placeholder: "Mon titre...", maxRecommended: 40 },
       { key: "cover_subtitle", label: "Sous-titre", type: "text", placeholder: "Une phrase d'accroche...", maxRecommended: 70 },
       { key: "text_position", label: "Position du texte", type: "select", options: ["bottom-left", "bottom-center", "center"] },
-      { key: "overlay_gradient", label: "Voile pour lisibilite", type: "select", options: ["none", "bottom", "full"], hint: "Assombrit pour que le texte reste lisible" },
+      { key: "overlay_gradient", label: "Voile pour lisibilité", type: "select", options: ["none", "bottom", "full"], hint: "Assombrit pour que le texte reste lisible" },
       { key: "overlay_color", label: "Couleur voile", type: "color" },
-      { key: "overlay_opacity", label: "Opacite voile (0 a 1)", type: "text", placeholder: "0.3" },
+      { key: "overlay_opacity", label: "Opacité du voile (0 à 1)", type: "text", placeholder: "0.3" },
     ],
   },
   about: {
@@ -2162,13 +2162,13 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     icon: "📖", color: "#C9A84C", category: "identity",
     defaultContent: { title: "Mon histoire", emoji: "📖", collapsible: "yes" },
     fields: [
-      { key: "emoji", label: "Emoji decoratif", type: "text", placeholder: "📖" },
+      { key: "emoji", label: "Emoji décoratif", type: "text", placeholder: "📖" },
       { key: "title", label: "Titre", type: "text", placeholder: "Mon histoire" },
       { key: "text", label: "Texte", type: "textarea", placeholder: "Racontez votre histoire..." },
     ],
   },
   availability: {
-    label: "Disponibilite", description: "Statut de disponibilite pour freelances",
+    label: "Disponibilité", description: "Statut de disponibilité pour freelances",
     icon: "🟢", color: "#39FF8F", category: "identity",
     defaultContent: { status: "available", cta_label: "Prendre contact" },
     fields: [
@@ -2186,9 +2186,9 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Mon parcours" },
       { key: "line_1", label: "Ligne 1", type: "text", placeholder: "🚀 5 ans d'expérience en SaaS" },
-      { key: "line_2", label: "Ligne 2", type: "text", placeholder: "💼 20+ projets realises" },
+      { key: "line_2", label: "Ligne 2", type: "text", placeholder: "💼 20+ projets réalisés" },
       { key: "line_3", label: "Ligne 3", type: "text", placeholder: "🌍 Clients dans 8 pays" },
-      { key: "line_4", label: "Ligne 4", type: "text", placeholder: "🎯 Specialiste Next.js" },
+      { key: "line_4", label: "Ligne 4", type: "text", placeholder: "🎯 Spécialiste Next.js" },
     ],
   },
   expertise: {
@@ -2197,19 +2197,19 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     defaultContent: { title: "Mes expertises" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Mes expertises" },
-      { key: "s1_icon", label: "Expertise 1 — Icone", type: "text", placeholder: "💻" },
+      { key: "s1_icon", label: "Expertise 1 — Icône", type: "text", placeholder: "💻" },
       { key: "s1_name", label: "Expertise 1 — Nom", type: "text", placeholder: "Développement web" },
       { key: "s1_level", label: "Expertise 1 — Niveau (1-5)", type: "select", options: ["1","2","3","4","5"] },
-      { key: "s2_icon", label: "Expertise 2 — Icone", type: "text", placeholder: "🎨" },
+      { key: "s2_icon", label: "Expertise 2 — Icône", type: "text", placeholder: "🎨" },
       { key: "s2_name", label: "Expertise 2 — Nom", type: "text", placeholder: "UI/UX Design" },
       { key: "s2_level", label: "Expertise 2 — Niveau (1-5)", type: "select", options: ["1","2","3","4","5"] },
-      { key: "s3_icon", label: "Expertise 3 — Icone", type: "text", placeholder: "☁️" },
+      { key: "s3_icon", label: "Expertise 3 — Icône", type: "text", placeholder: "☁️" },
       { key: "s3_name", label: "Expertise 3 — Nom", type: "text", placeholder: "Cloud & DevOps" },
       { key: "s3_level", label: "Expertise 3 — Niveau (1-5)", type: "select", options: ["1","2","3","4","5"] },
-      { key: "s4_icon", label: "Expertise 4 — Icone", type: "text", placeholder: "📱" },
+      { key: "s4_icon", label: "Expertise 4 — Icône", type: "text", placeholder: "📱" },
       { key: "s4_name", label: "Expertise 4 — Nom", type: "text", placeholder: "Mobile" },
       { key: "s4_level", label: "Expertise 4 — Niveau (1-5)", type: "select", options: ["1","2","3","4","5"] },
-      { key: "s5_icon", label: "Expertise 5 — Icone", type: "text", placeholder: "🚀" },
+      { key: "s5_icon", label: "Expertise 5 — Icône", type: "text", placeholder: "🚀" },
       { key: "s5_name", label: "Expertise 5 — Nom", type: "text", placeholder: "Product" },
       { key: "s5_level", label: "Expertise 5 — Niveau (1-5)", type: "select", options: ["1","2","3","4","5"] },
     ],
@@ -2221,7 +2221,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     fields: [
       { key: "title", label: "Titre", type: "text", placeholder: "Langues" },
       { key: "lang_1_flag", label: "Langue 1 — Drapeau emoji", type: "text", placeholder: "🇫🇷" },
-      { key: "lang_1_name", label: "Langue 1 — Nom", type: "text", placeholder: "Francais" },
+      { key: "lang_1_name", label: "Langue 1 — Nom", type: "text", placeholder: "Français" },
       { key: "lang_1_level", label: "Langue 1 — Niveau", type: "select", options: ["Natif","Courant","Avance","Intermediaire","Debutant"] },
       { key: "lang_2_flag", label: "Langue 2 — Drapeau emoji", type: "text", placeholder: "🇬🇧" },
       { key: "lang_2_name", label: "Langue 2 — Nom", type: "text", placeholder: "Anglais" },
@@ -2243,19 +2243,19 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "cert_1_icon", label: "Cert 1 — Emoji", type: "text", placeholder: "🏆" },
       { key: "cert_1_name", label: "Cert 1 — Nom", type: "text", placeholder: "AWS Certified" },
       { key: "cert_1_org", label: "Cert 1 — Organisme", type: "text", placeholder: "Amazon" },
-      { key: "cert_1_year", label: "Cert 1 — Annee", type: "text", placeholder: "2023" },
+      { key: "cert_1_year", label: "Cert 1 — Année", type: "text", placeholder: "2023" },
       { key: "cert_2_icon", label: "Cert 2 — Emoji", type: "text", placeholder: "✅" },
       { key: "cert_2_name", label: "Cert 2 — Nom", type: "text", placeholder: "PSM I" },
       { key: "cert_2_org", label: "Cert 2 — Organisme", type: "text", placeholder: "Scrum.org" },
-      { key: "cert_2_year", label: "Cert 2 — Annee", type: "text", placeholder: "2022" },
+      { key: "cert_2_year", label: "Cert 2 — Année", type: "text", placeholder: "2022" },
       { key: "cert_3_icon", label: "Cert 3 — Emoji", type: "text", placeholder: "🎓" },
       { key: "cert_3_name", label: "Cert 3 — Nom", type: "text", placeholder: "" },
       { key: "cert_3_org", label: "Cert 3 — Organisme", type: "text", placeholder: "" },
-      { key: "cert_3_year", label: "Cert 3 — Annee", type: "text", placeholder: "" },
+      { key: "cert_3_year", label: "Cert 3 — Année", type: "text", placeholder: "" },
       { key: "cert_4_icon", label: "Cert 4 — Emoji", type: "text", placeholder: "📜" },
       { key: "cert_4_name", label: "Cert 4 — Nom", type: "text", placeholder: "" },
       { key: "cert_4_org", label: "Cert 4 — Organisme", type: "text", placeholder: "" },
-      { key: "cert_4_year", label: "Cert 4 — Annee", type: "text", placeholder: "" },
+      { key: "cert_4_year", label: "Cert 4 — Année", type: "text", placeholder: "" },
     ],
   },
   company: {
@@ -2267,8 +2267,8 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "company_name", label: "Nom de l'entreprise", type: "text", placeholder: "Studio PIXEL" },
       { key: "sector", label: "Secteur / Type", type: "text", placeholder: "Agence digitale" },
       { key: "website", label: "Site web", type: "url", placeholder: "https://monentreprise.com" },
-      { key: "founded_year", label: "Annee de création", type: "text", placeholder: "2019" },
-      { key: "team_size", label: "Taille equipe", type: "text", placeholder: "5 personnes" },
+      { key: "founded_year", label: "Année de création", type: "text", placeholder: "2019" },
+      { key: "team_size", label: "Taille équipe", type: "text", placeholder: "5 personnes" },
     ],
   },
 

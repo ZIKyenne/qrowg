@@ -83,7 +83,7 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
         {!rawTarget
           ? <p style={{ color: muted, fontSize: 11, margin: "6px 0 0" }}>Choisissez une date de fin ⏳</p>
           : p.expired
-          ? <p style={{ color: accent, fontSize: 14, fontWeight: 800, margin: "6px 0 0" }}>{c.expired_text || "Offre terminee"}</p>
+          ? <p style={{ color: accent, fontSize: 14, fontWeight: 800, margin: "6px 0 0" }}>{c.expired_text || "Offre terminée"}</p>
           : <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
               {units.map(([lbl, val]) => (
                 <div key={lbl} style={{ minWidth: 52, background: "rgba(0,0,0,0.25)", border: `1px solid ${accent}33`, borderRadius: 9, padding: "8px 4px" }}>

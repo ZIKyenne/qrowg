@@ -59,8 +59,14 @@ function textesAffiches(source: string): string[] {
   return [...out]
 }
 
-// Mots que QRowg emploie et qui portent un accent en français. La liste ne
-// cherche pas l'exhaustivité : elle fige ce qui a été trouvé et ce qui reviendrait.
+// Mots que QRowg emploie et qui portent un accent en français.
+//
+// La première version de cette liste était écrite de mémoire, et elle laissait
+// passer « Reponse sous 24 heures » : une mutation a survécu, ce qui a montré
+// le trou. La liste ci-dessous vient d'un passage au DICTIONNAIRE français sur
+// tous les textes affichés — chaque mot inconnu du dictionnaire dont une
+// variante accentuée, elle, existe. Elle fige ce qui a été trouvé le 8 septembre
+// et ce qui reviendrait par la même porte.
 const SANS_ACCENT = new RegExp(
   "\\b(" + [
     "Epuise", "epuise", "rarete", "Rarete", "grise",
@@ -70,6 +76,13 @@ const SANS_ACCENT = new RegExp(
     "speciale", "Speciale", "reduction", "Reduction",
     "Details", "Securise", "securise", "Verifie", "Duree", "Modele",
     "Ferme(?!e)", "Prefere", "Etape", "Recu", "Envoye", "affiche(?= *\"| *$)",
+    // Relevé au dictionnaire, le 8 septembre.
+    "Annee", "Etoiles", "affichees", "Banniere", "banniere", "Decompte", "echeance",
+    "Degrade", "degrade", "Disponibilite", "disponibilite", "decoratif", "decorative",
+    "Entree", "Icone", "icones", "Francais", "croutons", "separation", "separes",
+    "limitee", "terminee", "Opacite", "Reponse", "Soiree", "createur", "Strategie",
+    "interets", "equipe", "video", "Video", "lisibilite", "Specialiste", "realises",
+    "creer", "demarrer", "Separateur", "Metro",
   ].join("|") + ")\\b",
 )
 
@@ -84,6 +97,10 @@ describe("QRowg ecrit un francais correct", () => {
     expect(SANS_ACCENT.test("Ecouter sur Spotify")).toBe(true)
     expect(SANS_ACCENT.test("Écouter sur Spotify")).toBe(false)
     expect(SANS_ACCENT.test("Affiche le nombre de visiteurs"), "« Affiche » est un verbe").toBe(false)
+    expect(SANS_ACCENT.test("Reponse sous 24 heures"), "la mutation qui avait survécu").toBe(true)
+    expect(SANS_ACCENT.test("Réponse sous 24 heures")).toBe(false)
+    expect(SANS_ACCENT.test("Titre de la video")).toBe(true)
+    expect(SANS_ACCENT.test("Titre de la vidéo")).toBe(false)
     expect(APOSTROPHE_AVALEE.test("plateformes d écoute")).toBe(true)
     expect(APOSTROPHE_AVALEE.test("plateformes d'écoute")).toBe(false)
     expect(APOSTROPHE_AVALEE.test("Nom / Organisation")).toBe(false)

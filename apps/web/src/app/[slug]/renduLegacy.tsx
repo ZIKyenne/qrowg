@@ -765,7 +765,12 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
       </div>
     ) : null
     case "multi_cta": {
-      const btns = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`btn${i}_icon`], (c as any)[`btn${i}_label`], (c as any)[`btn${i}_url`]] }).filter(([, l]) => l)
+      // Le filtre ne retenait que les boutons PORTANT UN TEXTE. Ceux sans adresse
+      // passaient donc le filtre, puis LienPublic les effaçait un par un : la
+      // grille restait, vide, sur la page du client. On filtre maintenant sur ce
+      // qui décide vraiment — la destination. (Vague 25.)
+      const btns = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`btn${i}_icon`], (c as any)[`btn${i}_label`], (c as any)[`btn${i}_url`]] })
+        .filter(([, l, url]) => l && destinationUtile(url as string))
       return btns.length > 0 ? (
         <div style={{ padding: "6px 24px 10px" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
@@ -1730,7 +1735,8 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         </div>
       </div>
     ) : null
-    case "quote_request": return (c.label || c.url) ? (
+    // Même cadre vide que external_shop, même cause. (Vague 25.)
+    case "quote_request": return destinationUtile(c.url) ? (
       <div style={{ padding: "6px 24px 12px" }}>
         <LienPublic href={extHref(c.url)} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "quote")} style={{ display: "flex", alignItems: "center", gap: 11, background: `${G}08`, border: `1.5px solid ${G}20`, borderRadius: 13, padding: "12px 15px", textDecoration: "none" }}>
           <div style={{ width: 40, height: 40, background: `${G}12`, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19, flexShrink: 0 }}>📋</div>
@@ -1952,7 +1958,10 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         </div>
       ) : null
     }
-    case "external_shop": return (c.label || c.url) ? (
+    // Sans destination, ce bloc n'avait plus rien à publier — mais la condition
+    // regardait le LIBELLÉ. Un commerçant qui posait « Voir la boutique » sans
+    // coller son adresse publiait un cadre vide de 41 octets. (Vague 25.)
+    case "external_shop": return destinationUtile(c.url) ? (
       <div style={{ padding: "6px 24px 14px" }}>
         {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 11px", textAlign: "center" }}>{c.description}</p>}
         <LienPublic href={extHref(c.url)} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "shop")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: `${G}10`, border: `1.5px solid ${G}30`, borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>

@@ -3,7 +3,9 @@ import { skillsViewModel } from "../../models/skills"
 import type { PublicAdapterProps } from "../../renderTypes"
 
 export function PublicSkills({ content, ctx }: PublicAdapterProps) {
-  const { title, tags } = skillsViewModel(content)
+  const { visible, title, tags } = skillsViewModel(content)
+  // Rien à publier : pas de cadre non plus. (Vague 25.)
+  if (!visible) return null
   const { G, MUTED, FONT_B } = ctx
   return (
     <div style={{ padding: "6px 24px 16px" }}>

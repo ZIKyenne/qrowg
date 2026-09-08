@@ -5,7 +5,9 @@ import type { PublicAdapterProps } from "../../renderTypes"
 
 // Legacy : conteneur toujours rendu. CTA legacy sans target/rel (external=false).
 export function PublicEventInfo({ content, ctx }: PublicAdapterProps) {
-  const { name, rows, ctaLabel, link } = eventInfoViewModel(content)
+  const { visible, name, rows, ctaLabel, link } = eventInfoViewModel(content)
+  // Rien à publier : pas de cadre non plus. (Vague 25.)
+  if (!visible) return null
   const { TEXT, MUTED, FONT_D, FONT_B, trackClick } = ctx
   return (
     <div style={{ padding: "6px 24px 16px" }}>
