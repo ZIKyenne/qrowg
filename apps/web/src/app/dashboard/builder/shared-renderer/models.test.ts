@@ -9,8 +9,13 @@ import { BLOCK_FIXTURES } from "../blockFixtures"
 // Parité des modèles PURS avec la logique legacy caractérisée + garanties de non-mutation.
 
 describe("headingViewModel", () => {
-  it("vide → visible, texte vide, défauts (center/medium/default)", () => {
-    expect(headingViewModel({})).toEqual({ visible: true, text: "", align: "center", size: "medium", color: "default", subtitle: undefined })
+  it("vide → invisible (la page ne publie plus « Titre »)", () => {
+    // Ce test figeait `visible: true` : un bloc titre neuf, posé et publié tel
+    // quel, écrivait « Titre » en gros caractères sur la page du client. C'est de
+    // la doctrine anti-invention, pas une option d'affichage. (Vague 24.)
+    expect(headingViewModel({})).toEqual({ visible: false, text: "", align: "center", size: "medium", color: "default", subtitle: undefined })
+    expect(headingViewModel({ text: "   " }).visible, "un titre d'espaces reste vide").toBe(false)
+    expect(headingViewModel({ subtitle: "Seul le sous-titre" }).visible, "un sous-titre suffit").toBe(true)
   })
   it("titre + sous-titre + options", () => {
     const vm = headingViewModel({ text: "Bonjour", subtitle: "Sous", align: "left", size: "xl", color: "primary" })

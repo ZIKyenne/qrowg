@@ -5,7 +5,7 @@ import { safeMediaSrc } from "./mediaUrl"
 
 export type PdfViewerViewModel = {
   visible: boolean; title: string; description?: string; cover: string | null
-  pages?: string; fileSize?: string; href: string | null; ctaLabel?: string; showDownload: boolean; trackTarget: string
+  pages?: string; fileSize?: string; href: string | null; ctaLabel: string; showDownload: boolean; trackTarget: string
 }
 
 export function pdfViewerViewModel(content: Record<string, any> | null | undefined): PdfViewerViewModel {
@@ -14,6 +14,11 @@ export function pdfViewerViewModel(content: Record<string, any> | null | undefin
   return {
     visible: !!(c.url || c.title), title: c.title || "Mon document PDF", description: c.description || undefined,
     cover: safeMediaSrc(c.cover), pages: c.pages || undefined, fileSize: c.file_size || undefined,
-    href: extHref(url) || null, ctaLabel: c.cta_label || undefined, showDownload: c.show_download !== "no", trackTarget: url,
+    href: extHref(url) || null,
+    // Le libellé du bouton vivait dans la seule page publiée : l'aperçu ne
+    // dessinait de bouton QUE si le commerçant en avait écrit un, alors que la
+    // page en publiait toujours un, « Consulter le PDF ». (Vague 24.)
+    ctaLabel: (typeof c.cta_label === "string" && c.cta_label.trim()) || "Consulter le PDF",
+    showDownload: c.show_download !== "no", trackTarget: url,
   }
 }

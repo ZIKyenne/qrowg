@@ -20,7 +20,7 @@ export function EditorPodcastLinks({ content, ctx }: EditorAdapterProps) {
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         {platforms.length === 0
-          ? <p style={{ color: muted, fontSize: 11, textAlign: "center", margin: 0 }}>Ajoutez vos plateformes d écoute</p>
+          ? <p style={{ color: muted, fontSize: 11, textAlign: "center", margin: 0 }}>Ajoutez vos plateformes d'écoute</p>
           : platforms.map((p, i) => (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, background: `${p.color}12`, border: `1px solid ${p.color}25`, borderRadius: 9, padding: "9px 12px" }}>
               <span style={{ fontSize: 16 }}>{p.icon}</span>

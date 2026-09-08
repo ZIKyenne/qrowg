@@ -31,8 +31,9 @@ describe("parité rendu — heading", () => {
     expect(out).toContain("line-height:1.2")
     expect(out).toContain("Bonjour")
   })
-  it("public : texte vide → fallback « Titre »", () => {
-    expect(html(createElement(PublicHeading, { content: {}, ctx: publicCtx }))).toContain("Titre")
+  it("public : texte vide → rien du tout, pas même « Titre »", () => {
+    expect(html(createElement(PublicHeading, { content: {}, ctx: publicCtx }))).toBe("")
+    expect(html(createElement(PublicHeading, { content: { subtitle: "Sous" }, ctx: publicCtx })), "un sous-titre seul se publie").toContain("Sous")
   })
   it("public : sous-titre rendu quand présent, absent sinon", () => {
     expect(html(createElement(PublicHeading, { content: { text: "T", subtitle: "Sub" }, ctx: publicCtx }))).toContain("Sub")

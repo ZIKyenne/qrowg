@@ -5,7 +5,7 @@ import SmartImage from "@/components/SmartImage"
 
 // Éditeur : carte représentative (barre de progression décorative), aucun lecteur réel — fidèle legacy.
 export function EditorAudioPlayer({ content, ctx }: EditorAdapterProps) {
-  const { cover, title, artist } = audioPlayerViewModel(content)
+  const { cover, title, artist, showDownload } = audioPlayerViewModel(content)
   const { text, muted, surfaceStyle } = ctx
   return (
     <div style={{ padding: "10px 16px", ...surfaceStyle }}>
@@ -21,6 +21,9 @@ export function EditorAudioPlayer({ content, ctx }: EditorAdapterProps) {
           </div>
           <span style={{ fontSize: 18 }}>▶️</span>
         </div>
+        {/* Le réglage « téléchargement » publiait un lien que l'aperçu ne montrait
+            jamais : le commerçant offrait son fichier audio sans le voir. (Vague 24.) */}
+        {showDownload && <p style={{ display: "inline-block", margin: "9px 0 0", color: muted, fontSize: 11, fontWeight: 600 }}>↓ Télécharger</p>}
       </div>
     </div>
   )

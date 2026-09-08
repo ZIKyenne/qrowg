@@ -2,6 +2,7 @@
 // Adapter ÉDITEUR de `heading`. Reproduit builderPreview case "heading" à l'identique
 // (échelle canvas réduite + édition inline). Consomme le modèle pur partagé.
 import { InlineEditable } from "../../../InlineEditable"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { headingViewModel } from "../../models/heading"
 import type { EditorAdapterProps } from "../../renderTypes"
 
@@ -11,6 +12,13 @@ export function EditorHeading({ content, ctx }: EditorAdapterProps) {
   const vm = headingViewModel(content)
   const { theme, text, primary, accent, muted, surfaceStyle, canEdit, edit } = ctx
   const hColors: Record<string, string> = { default: text, primary, accent, muted }
+  // La page ne publie plus « Titre » à la place du commerçant : elle ne publie
+  // rien. L'aperçu le dit, plutôt que de laisser un cadre muet. (Vague 24.)
+  if (!vm.visible) return (
+    <div style={{ padding: "14px 16px", ...surfaceStyle }}>
+      <BlockEmptyState icon="📝" label="Ajoutez un titre" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={muted} />
+    </div>
+  )
   return (
     <div style={{ padding: "14px 16px", textAlign: vm.align as any, ...surfaceStyle }}>
       <InlineEditable as="h2" editable={canEdit} value={vm.text} placeholder="Titre" onCommit={edit("text")} style={{ fontFamily: theme.fontDisplay, fontSize: SIZES[vm.size] ?? SIZES.medium, color: hColors[vm.color] ?? text, fontWeight: 700, margin: "0 0 3px" }} />

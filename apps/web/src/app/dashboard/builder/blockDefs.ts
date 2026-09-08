@@ -65,7 +65,9 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   calendly: {
     label: "Calendly", description: "Bouton de prise de RDV",
     icon: "📅", color: "#39FF8F", category: "actions",
-    defaultContent: { label: "Réserver un creneau", description: "" },
+    // Le bouton porte désormais son propre libellé fixe (« Réserver un créneau ») :
+    // pré-remplir le TITRE avec la même phrase le faisait écrire deux fois. (Vague 24.)
+    defaultContent: { description: "" },
     fields: [
       { key: "label", label: "Titre", type: "text", placeholder: "Réserver un appel" },
       { key: "url", label: "Lien Calendly", type: "url", placeholder: "https://calendly.com/monnom" },
@@ -116,7 +118,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "old_price", label: "Ancien prix (optionnel)", type: "text", placeholder: "59€" },
       { key: "description", label: "Description", type: "textarea", placeholder: "Description du produit..." },
       { key: "image", label: "Image", type: "image" },
-      { key: "stock", label: "Stock restant (optionnel)", type: "text", placeholder: "3", hint: "Affiche la rarete. 0 = Epuise (bouton grise). Vide = rien" },
+      { key: "stock", label: "Stock restant (optionnel)", type: "text", placeholder: "3", hint: "Affiche la rareté. 0 = Épuisé (bouton grisé). Vide = rien" },
       { key: "cta_label", label: "Texte bouton", type: "text", placeholder: "Commander" },
       { key: "cta_url", label: "Lien", type: "url", placeholder: "https://" },
     ],
@@ -144,14 +146,14 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   promo_banner: {
-    label: "Banniere promo", description: "Offre speciale ou reduction",
+    label: "Banniere promo", description: "Offre spéciale ou réduction",
     icon: "🎁", color: "#F97316", category: "commerce",
     defaultContent: { emoji: "🎉", cta_label: "Profiter" },
     fields: [
       { key: "emoji", label: "Emoji", type: "text", placeholder: "🎉" },
-      { key: "text", label: "Titre", type: "text", placeholder: "Offre speciale -50%" },
+      { key: "text", label: "Titre", type: "text", placeholder: "Offre spéciale -50%" },
       { key: "subtext", label: "Sous-titre", type: "text", placeholder: "Valable jusqu au 31" },
-      { key: "cta_label", label: "Bouton", type: "text", placeholder: "Profiter de l offre" },
+      { key: "cta_label", label: "Bouton", type: "text", placeholder: "Profiter de l'offre" },
       { key: "cta_url", label: "Lien", type: "url", placeholder: "https://" },
     ],
   },
@@ -420,7 +422,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     fields: [
       { key: "title", label: "Titre", type: "text", placeholder: "Contactez-moi" },
       { key: "button_label", label: "Texte bouton", type: "text", placeholder: "Envoyer" },
-      { key: "show_phone", label: "Champ telephone", type: "select", options: ["no", "yes"] },
+      { key: "show_phone", label: "Champ téléphone", type: "select", options: ["no", "yes"] },
     ],
   },
   reservation_form: {
@@ -437,7 +439,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   spotify_player: {
     label: "Spotify", description: "Lien vers Spotify",
     icon: "🎧", color: "#1DB954", category: "music",
-    defaultContent: { title: "Ecouter ma musique", url: "" },
+    defaultContent: { title: "Écouter ma musique", url: "" },
     fields: [
       { key: "title", label: "Titre", type: "text", placeholder: "Mon dernier album" },
       { key: "url", label: "Lien Spotify", type: "url", placeholder: "https://open.spotify.com/..." },
@@ -464,15 +466,15 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     fields: [
       { key: "title", label: "Titre", type: "text", placeholder: "Offre limitee -30%" },
       { key: "subtitle", label: "Sous-titre", type: "text", placeholder: "Profitez-en avant la fin" },
-      { key: "target", label: "Date et heure de fin", type: "datetime", hint: "Le decompte s arrete a cette date (jour + heure)" },
+      { key: "target", label: "Date et heure de fin", type: "datetime", hint: "Le décompte s'arrête à cette date (jour + heure)" },
       { key: "expired_text", label: "Message une fois termine", type: "text", placeholder: "Offre terminee" },
       { key: "cta_label", label: "Bouton (optionnel)", type: "text", placeholder: "En profiter" },
       { key: "cta_url", label: "Lien du bouton", type: "url", placeholder: "https://" },
-      { key: "accent", label: "Couleur d accent", type: "color", placeholder: "#EF4444" },
+      { key: "accent", label: "Couleur d'accent", type: "color", placeholder: "#EF4444" },
     ],
   },
   event_info: {
-    label: "Infos événement", description: "Details d'un événement",
+    label: "Infos événement", description: "Détails d'un événement",
     icon: "🎉", color: "#EC4899", category: "event",
     defaultContent: {},
     fields: [
@@ -540,7 +542,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "price", label: "Prix", type: "text", placeholder: "99€" },
       { key: "old_price", label: "Ancien prix", type: "text", placeholder: "149€" },
       { key: "description", label: "Description", type: "textarea", placeholder: "Ce produit change tout..." },
-      { key: "stock", label: "Stock restant (optionnel)", type: "text", placeholder: "3", hint: "Affiche la rarete. 0 = Epuise (bouton grise). Vide = rien" },
+      { key: "stock", label: "Stock restant (optionnel)", type: "text", placeholder: "3", hint: "Affiche la rareté. 0 = Épuisé (bouton grisé). Vide = rien" },
       { key: "cta_label", label: "Bouton", type: "text", placeholder: "Commander maintenant" },
       { key: "cta_url", label: "Lien", type: "url", placeholder: "https://..." },
     ],
@@ -630,7 +632,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Ce que disent nos clients" },
       { key: "avg_rating", label: "Note moyenne (ex: 4.9)", type: "text", placeholder: "4.9" },
-      { key: "total_reviews", label: "Nombre d avis", type: "text", placeholder: "127" },
+      { key: "total_reviews", label: "Nombre d'avis", type: "text", placeholder: "127" },
       { key: "r1_name", label: "Avis 1 — Auteur", type: "text", placeholder: "Marie D." },
       { key: "r1_stars", label: "Avis 1 — Note", type: "select", options: ["5","4","3","2","1"] },
       { key: "r1_text", label: "Avis 1 — Commentaire", type: "textarea", placeholder: "Excellent service !" },
@@ -770,7 +772,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   reassurance: {
-    label: "Garantie / Réassurance", description: "Rassurer avant l achat",
+    label: "Garantie / Réassurance", description: "Rassurer avant l'achat",
     icon: "🔒", color: "#39FF8F", category: "commerce",
     defaultContent: { g1_icon: "🔒", g2_icon: "↩️", g3_icon: "🚚", g4_icon: "⭐" },
     fields: [
@@ -844,7 +846,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   hero_banner: {
-    label: "Hero Banner", description: "Grande bannière d ouverture premium",
+    label: "Hero Banner", description: "Grande bannière d'ouverture premium",
     icon: "🚀", color: "#C9A84C", category: "layout",
     defaultContent: { title: "", subtitle: "", cta_label: "" },
     fields: [
@@ -937,11 +939,11 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     defaultContent: {},
     fields: [
       { key: "tab1_label", label: "Onglet 1 — Titre", type: "text", placeholder: "Présentation" },
-      { key: "tab1_content", label: "Onglet 1 — Contenu", type: "textarea", placeholder: "Contenu de l onglet 1..." },
+      { key: "tab1_content", label: "Onglet 1 — Contenu", type: "textarea", placeholder: "Contenu de l'onglet 1..." },
       { key: "tab2_label", label: "Onglet 2 — Titre", type: "text", placeholder: "Tarifs" },
-      { key: "tab2_content", label: "Onglet 2 — Contenu", type: "textarea", placeholder: "Contenu de l onglet 2..." },
+      { key: "tab2_content", label: "Onglet 2 — Contenu", type: "textarea", placeholder: "Contenu de l'onglet 2..." },
       { key: "tab3_label", label: "Onglet 3 — Titre", type: "text", placeholder: "FAQ" },
-      { key: "tab3_content", label: "Onglet 3 — Contenu", type: "textarea", placeholder: "Contenu de l onglet 3..." },
+      { key: "tab3_content", label: "Onglet 3 — Contenu", type: "textarea", placeholder: "Contenu de l'onglet 3..." },
     ],
   },
   accordion_block: {
@@ -974,7 +976,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
 
   // ── Nouveaux blocs Event ──────────────────────────────────────────────────
   event_program: {
-    label: "Programme", description: "Planning détaillé de l événement",
+    label: "Programme", description: "Planning détaillé de l'événement",
     icon: "📋", color: "#EC4899", category: "event",
     defaultContent: { title: "Programme" },
     fields: [
@@ -1002,7 +1004,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     defaultContent: { label: "Réserver ma place", platform: "Eventbrite" },
     fields: [
       { key: "label", label: "Texte bouton", type: "text", placeholder: "Réserver ma place" },
-      { key: "event_name", label: "Nom de l événement", type: "text", placeholder: "Soirée de lancement" },
+      { key: "event_name", label: "Nom de l'événement", type: "text", placeholder: "Soirée de lancement" },
       { key: "date", label: "Date", type: "text", placeholder: "15 juin 2025" },
       { key: "location", label: "Lieu", type: "text", placeholder: "Paris, France" },
       { key: "price", label: "Prix", type: "text", placeholder: "Gratuit / 25€" },
@@ -1058,7 +1060,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   event_access: {
-    label: "Plan d accès", description: "Carte et itinéraire vers l événement",
+    label: "Plan d'accès", description: "Carte et itinéraire vers l'événement",
     icon: "🗺️", color: "#EC4899", category: "event",
     defaultContent: { title: "Comment venir" },
     fields: [
@@ -1074,15 +1076,15 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   event_register: {
-    label: "Formulaire d inscription", description: "Inscription gratuite à l événement",
+    label: "Formulaire d'inscription", description: "Inscription gratuite à l'événement",
     icon: "📝", color: "#EC4899", category: "event",
-    defaultContent: { title: "S inscrire gratuitement", button_label: "Je m inscris" },
+    defaultContent: { title: "S inscrire gratuitement", button_label: "Je m'inscris" },
     fields: [
       { key: "title", label: "Titre", type: "text", placeholder: "S inscrire gratuitement" },
       { key: "description", label: "Description", type: "text", placeholder: "Places limitées" },
       { key: "show_phone", label: "Champ téléphone", type: "select", options: ["no", "yes"] },
       { key: "show_company", label: "Champ société", type: "select", options: ["no", "yes"] },
-      { key: "button_label", label: "Bouton", type: "text", placeholder: "Je m inscris" },
+      { key: "button_label", label: "Bouton", type: "text", placeholder: "Je m'inscris" },
     ],
   },
   rsvp: {
@@ -1098,11 +1100,11 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   add_to_calendar: {
-    label: "Ajouter au calendrier", description: "Sauvegarder l événement dans son agenda",
+    label: "Ajouter au calendrier", description: "Sauvegarder l'événement dans son agenda",
     icon: "📅", color: "#EC4899", category: "event",
     defaultContent: { cta_label: "Ajouter à mon agenda" },
     fields: [
-      { key: "event_name", label: "Nom de l événement", type: "text", placeholder: "Soirée de lancement" },
+      { key: "event_name", label: "Nom de l'événement", type: "text", placeholder: "Soirée de lancement" },
       { key: "start_date", label: "Date et heure de début", type: "datetime", hint: "Suffit à générer les liens Google Agenda + fichier .ics (Apple/Outlook)" },
       { key: "end_date", label: "Date et heure de fin (optionnel)", type: "datetime", hint: "Par défaut : +1h" },
       { key: "location", label: "Lieu", type: "text", placeholder: "Paris, France" },
@@ -1111,7 +1113,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   participants_count: {
-    label: "Nombre de participants", description: "Compteur d inscrits en temps réel",
+    label: "Nombre de participants", description: "Compteur d'inscrits en temps réel",
     icon: "👥", color: "#EC4899", category: "event",
     defaultContent: { label: "participants inscrits", emoji: "👥", show_progress: "yes" },
     fields: [
@@ -1123,13 +1125,13 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   tickets_left: {
-    label: "Places restantes", description: "Compteur d urgence de billets restants",
+    label: "Places restantes", description: "Compteur d'urgence de billets restants",
     icon: "🎟️", color: "#EF4444", category: "event",
     defaultContent: { label: "places restantes", urgency: "high", cta_label: "Réserver maintenant" },
     fields: [
       { key: "count", label: "Nombre de places restantes", type: "text", placeholder: "14" },
       { key: "label", label: "Label", type: "text", placeholder: "places restantes" },
-      { key: "urgency", label: "Niveau d urgence", type: "select", options: ["high", "medium", "low"] },
+      { key: "urgency", label: "Niveau d'urgence", type: "select", options: ["high", "medium", "low"] },
       { key: "cta_label", label: "Bouton", type: "text", placeholder: "Réserver maintenant" },
       { key: "cta_url", label: "Lien billetterie", type: "url", placeholder: "https://..." },
     ],
@@ -1187,10 +1189,10 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   album_block: {
     label: "Album", description: "Mise en avant d un album complet",
     icon: "🎵", color: "#1DB954", category: "music",
-    defaultContent: { cta_label: "Écouter l album" },
+    defaultContent: { cta_label: "Écouter l'album" },
     fields: [
       { key: "cover", label: "Pochette", type: "image" },
-      { key: "title", label: "Titre de l album", type: "text", placeholder: "Mon Album" },
+      { key: "title", label: "Titre de l'album", type: "text", placeholder: "Mon Album" },
       { key: "artist", label: "Artiste", type: "text", placeholder: "Mon Nom" },
       { key: "year", label: "Année", type: "text", placeholder: "2025" },
       { key: "description", label: "Description", type: "textarea", placeholder: "Mon premier album..." },
@@ -1198,7 +1200,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "spotify_url", label: "Lien Spotify", type: "url", placeholder: "https://open.spotify.com/album/..." },
       { key: "apple_url", label: "Lien Apple Music", type: "url", placeholder: "https://music.apple.com/..." },
       { key: "deezer_url", label: "Lien Deezer", type: "url", placeholder: "https://deezer.com/album/..." },
-      { key: "cta_label", label: "Bouton", type: "text", placeholder: "Écouter l album" },
+      { key: "cta_label", label: "Bouton", type: "text", placeholder: "Écouter l'album" },
     ],
   },
   playlist_block: {
@@ -1245,7 +1247,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     defaultContent: { label: "Acheter mes billets", platform: "Ticketmaster" },
     fields: [
       { key: "label", label: "Texte bouton", type: "text", placeholder: "Acheter mes billets" },
-      { key: "event_name", label: "Nom de l événement", type: "text", placeholder: "Concert de lancement" },
+      { key: "event_name", label: "Nom de l'événement", type: "text", placeholder: "Concert de lancement" },
       { key: "date", label: "Date", type: "text", placeholder: "15 juin 2025" },
       { key: "venue", label: "Salle / Lieu", type: "text", placeholder: "L Olympia, Paris" },
       { key: "price", label: "Prix", type: "text", placeholder: "À partir de 25€" },
@@ -1362,11 +1364,11 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   service_area: {
-    label: "Zone d intervention", description: "Zones géographiques couvertes",
+    label: "Zone d'intervention", description: "Zones géographiques couvertes",
     icon: "📍", color: "#4285F4", category: "business",
-    defaultContent: { title: "Zone d intervention", radius: "" },
+    defaultContent: { title: "Zone d'intervention", radius: "" },
     fields: [
-      { key: "title", label: "Titre", type: "text", placeholder: "Zone d intervention" },
+      { key: "title", label: "Titre", type: "text", placeholder: "Zone d'intervention" },
       { key: "area", label: "Zone principale", type: "text", placeholder: "France entière" },
       { key: "radius", label: "Rayon (km)", type: "text", placeholder: "50 km autour de Paris" },
       { key: "city1", label: "Ville 1", type: "text", placeholder: "Paris" },
@@ -1482,7 +1484,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "e1_icon", label: "Étape 1 — Emoji", type: "text", placeholder: "🚀" },
       { key: "e1_date", label: "Étape 1 — Date", type: "text", placeholder: "2020" },
       { key: "e1_title", label: "Étape 1 — Titre", type: "text", placeholder: "Création" },
-      { key: "e1_desc", label: "Étape 1 — Description", type: "text", placeholder: "Lancement de l activité" },
+      { key: "e1_desc", label: "Étape 1 — Description", type: "text", placeholder: "Lancement de l'activité" },
       { key: "e2_icon", label: "Étape 2 — Emoji", type: "text", placeholder: "📈" },
       { key: "e2_date", label: "Étape 2 — Date", type: "text", placeholder: "2022" },
       { key: "e2_title", label: "Étape 2 — Titre", type: "text", placeholder: "Croissance" },
@@ -1551,7 +1553,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "m1_photo", label: "Membre 1 — Photo", type: "image" },
       { key: "m1_name", label: "Membre 1 — Nom", type: "text", placeholder: "Marie Dupont" },
       { key: "m1_role", label: "Membre 1 — Poste", type: "text", placeholder: "Fondatrice & CEO" },
-      { key: "m1_bio", label: "Membre 1 — Bio courte", type: "text", placeholder: "10 ans d expérience" },
+      { key: "m1_bio", label: "Membre 1 — Bio courte", type: "text", placeholder: "10 ans d'expérience" },
       { key: "m1_phone", label: "Membre 1 — Téléphone", type: "text", placeholder: "+33 6 12 34 56 78" },
       { key: "m1_email", label: "Membre 1 — Email", type: "text", placeholder: "marie@exemple.com" },
       { key: "m1_linkedin", label: "Membre 1 — LinkedIn", type: "url", placeholder: "linkedin.com/in/marie" },
@@ -1613,7 +1615,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     icon: "💬", color: "#38BDF8", category: "info",
     defaultContent: { author: "", source: "" },
     fields: [
-      { key: "quote", label: "Citation", type: "textarea", placeholder: "La qualité n est jamais un accident." },
+      { key: "quote", label: "Citation", type: "textarea", placeholder: "La qualité n'est jamais un accident." },
       { key: "author", label: "Auteur", type: "text", placeholder: "Steve Jobs" },
       { key: "source", label: "Source / Contexte", type: "text", placeholder: "Apple, 2007" },
     ],
@@ -1637,7 +1639,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   info_table: {
-    label: "Tableau d infos", description: "Informations structurées en tableau",
+    label: "Tableau d'infos", description: "Informations structurées en tableau",
     icon: "📋", color: "#38BDF8", category: "info",
     defaultContent: { title: "Informations" },
     fields: [
@@ -1671,7 +1673,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
 
   // ── Nouveaux blocs Médias ─────────────────────────────────────────────────
   image_carousel: {
-    label: "Carrousel d images", description: "Défilement horizontal de photos",
+    label: "Carrousel d'images", description: "Défilement horizontal de photos",
     icon: "🎠", color: "#4ECDC4", category: "media",
     defaultContent: { title: "" },
     fields: [
@@ -1762,7 +1764,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     defaultContent: { title: "Mes TikToks" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Mes TikToks" },
-      { key: "username", label: "Nom d utilisateur", type: "text", placeholder: "@monpseudo" },
+      { key: "username", label: "Nom d'utilisateur", type: "text", placeholder: "@monpseudo" },
       { key: "video1_url", label: "TikTok 1 — URL embed", type: "url", placeholder: "https://www.tiktok.com/embed/..." },
       { key: "video2_url", label: "TikTok 2 — URL embed", type: "url", placeholder: "https://www.tiktok.com/embed/..." },
       { key: "video3_url", label: "TikTok 3 — URL embed", type: "url", placeholder: "https://www.tiktok.com/embed/..." },
@@ -1817,7 +1819,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     icon: "🎵", color: "#F5F0E8", category: "social",
     defaultContent: { cta_label: "Me suivre sur TikTok" },
     fields: [
-      { key: "username", label: "Nom d utilisateur", type: "text", placeholder: "@monpseudo" },
+      { key: "username", label: "Nom d'utilisateur", type: "text", placeholder: "@monpseudo" },
       { key: "cta_label", label: "Texte bouton", type: "text", placeholder: "Me suivre sur TikTok" },
       { key: "cta_url", label: "Lien profil", type: "url", placeholder: "https://tiktok.com/@..." },
     ],
@@ -1855,7 +1857,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "members", label: "Membres (affiché)", type: "text", placeholder: "250 membres" },
       { key: "description", label: "Description", type: "text", placeholder: "Rejoins notre communauté !" },
       { key: "cta_label", label: "Texte bouton", type: "text", placeholder: "Rejoindre le Discord" },
-      { key: "cta_url", label: "Lien d invitation", type: "url", placeholder: "https://discord.gg/..." },
+      { key: "cta_url", label: "Lien d'invitation", type: "url", placeholder: "https://discord.gg/..." },
     ],
   },
   telegram_channel: {
@@ -1871,7 +1873,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   podcast_links: {
-    label: "Podcast", description: "Liens d écoute multi-plateformes",
+    label: "Podcast", description: "Liens d'écoute multi-plateformes",
     icon: "🎙️", color: "#B150E2", category: "social",
     defaultContent: { description: "" },
     fields: [
@@ -1910,7 +1912,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
 
   // ── Nouveaux blocs Actions ────────────────────────────────────────────────
   call_button: {
-    label: "Appeler", description: "Bouton d appel telephonique direct",
+    label: "Appeler", description: "Bouton d'appel téléphonique direct",
     icon: "📞", color: "#39FF8F", category: "actions",
     defaultContent: { label: "Appeler maintenant", phone: "" },
     fields: [
@@ -1921,7 +1923,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   directions_button: {
-    label: "Itinéraire", description: "Ouvre l itineraire vers votre adresse",
+    label: "Itinéraire", description: "Ouvre l'itinéraire vers votre adresse",
     icon: "🧭", color: "#4285F4", category: "actions",
     defaultContent: { label: "Obtenir l'itinéraire", address: "", provider: "auto", show_copy: "yes" },
     fields: [
@@ -1990,7 +1992,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     fields: [
       { key: "label", label: "Texte bouton", type: "text", placeholder: "Ajouter a mes contacts" },
       { key: "name", label: "Nom complet", type: "text", placeholder: "Jean Dupont" },
-      { key: "phone", label: "Telephone", type: "text", placeholder: "+33 6 12 34 56 78" },
+      { key: "phone", label: "Téléphone", type: "text", placeholder: "+33 6 12 34 56 78" },
       { key: "email", label: "Email", type: "text", placeholder: "jean@email.com" },
       { key: "company", label: "Entreprise", type: "text", placeholder: "Studio PIXEL" },
       { key: "title", label: "Fonction (optionnel)", type: "text", placeholder: "Directeur artistique" },
@@ -2061,7 +2063,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "btn2_label", label: "Btn 2 — Texte", type: "text", placeholder: "WhatsApp" },
       { key: "btn2_url", label: "Btn 2 — Lien", type: "url", placeholder: "https://wa.me/..." },
       { key: "btn3_icon", label: "Btn 3 — Emoji", type: "text", placeholder: "📅" },
-      { key: "btn3_label", label: "Btn 3 — Texte", type: "text", placeholder: "Reserver" },
+      { key: "btn3_label", label: "Btn 3 — Texte", type: "text", placeholder: "Réserver" },
       { key: "btn3_url", label: "Btn 3 — Lien", type: "url", placeholder: "https://..." },
       { key: "btn4_icon", label: "Btn 4 — Emoji", type: "text", placeholder: "✉️" },
       { key: "btn4_label", label: "Btn 4 — Texte", type: "text", placeholder: "Email" },
@@ -2069,11 +2071,11 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   app_download: {
-    label: "Télécharger l application", description: "Liens App Store et Google Play",
+    label: "Télécharger l'application", description: "Liens App Store et Google Play",
     icon: "📲", color: "#818CF8", category: "actions",
-    defaultContent: { label: "Télécharger l application", ios_url: "", android_url: "" },
+    defaultContent: { label: "Télécharger l'application", ios_url: "", android_url: "" },
     fields: [
-      { key: "label", label: "Titre", type: "text", placeholder: "Télécharger l application" },
+      { key: "label", label: "Titre", type: "text", placeholder: "Télécharger l'application" },
       { key: "ios_url", label: "Lien App Store", type: "url", placeholder: "https://apps.apple.com/..." },
       { key: "android_url", label: "Lien Google Play", type: "url", placeholder: "https://play.google.com/..." },
     ],
@@ -2091,12 +2093,12 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   limited_offer: {
     label: "Offre limitee", description: "Promotion temporaire urgente",
     icon: "⚡", color: "#EF4444", category: "actions",
-    defaultContent: { title: "Offre limitee", cta_label: "Profiter de l offre" },
+    defaultContent: { title: "Offre limitee", cta_label: "Profiter de l'offre" },
     fields: [
-      { key: "title", label: "Titre", type: "text", placeholder: "Offre speciale -30%" },
+      { key: "title", label: "Titre", type: "text", placeholder: "Offre spéciale -30%" },
       { key: "description", label: "Description", type: "text", placeholder: "Valable jusqu au 30 juin" },
       { key: "expires", label: "Date limite", type: "text", placeholder: "30 juin 2025" },
-      { key: "cta_label", label: "Texte bouton", type: "text", placeholder: "Profiter de l offre" },
+      { key: "cta_label", label: "Texte bouton", type: "text", placeholder: "Profiter de l'offre" },
       { key: "cta_url", label: "Lien", type: "url", placeholder: "https://..." },
     ],
   },
@@ -2120,7 +2122,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "platform", label: "Plateforme", type: "select", options: ["Stripe","PayPal","Lydia","Revolut","SumUp"], hint: "PayPal / Revolut : indiquez juste votre pseudo, le lien se construit tout seul" },
       { key: "handle", label: "Votre pseudo", type: "text", placeholder: "votre-nom", hint: "Ex : paypal.me/votre-nom -> saisissez votre-nom", showIf: { key: "platform", in: ["PayPal","Revolut"] } },
       { key: "url", label: "Lien de paiement", type: "url", placeholder: "https://buy.stripe.com/...", showIf: { key: "platform", in: ["Stripe","Lydia","SumUp"] } },
-      { key: "amount", label: "Montant affiche", type: "text", placeholder: "29€" },
+      { key: "amount", label: "Montant affiché", type: "text", placeholder: "29€" },
     ],
   },
   quote_request: {
@@ -2148,7 +2150,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "bg_color", label: "Couleur de fond", type: "color", showIf: { key: "banner_type", equals: "color" } },
       { key: "height", label: "Hauteur", type: "select", options: ["sm", "md", "lg", "xl"] },
       { key: "cover_title", label: "Titre sur la banniere", type: "text", placeholder: "Mon titre...", maxRecommended: 40 },
-      { key: "cover_subtitle", label: "Sous-titre", type: "text", placeholder: "Une phrase d accroche...", maxRecommended: 70 },
+      { key: "cover_subtitle", label: "Sous-titre", type: "text", placeholder: "Une phrase d'accroche...", maxRecommended: 70 },
       { key: "text_position", label: "Position du texte", type: "select", options: ["bottom-left", "bottom-center", "center"] },
       { key: "overlay_gradient", label: "Voile pour lisibilite", type: "select", options: ["none", "bottom", "full"], hint: "Assombrit pour que le texte reste lisible" },
       { key: "overlay_color", label: "Couleur voile", type: "color" },
@@ -2183,7 +2185,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     defaultContent: { title: "Mon parcours" },
     fields: [
       { key: "title", label: "Titre section", type: "text", placeholder: "Mon parcours" },
-      { key: "line_1", label: "Ligne 1", type: "text", placeholder: "🚀 5 ans d expérience en SaaS" },
+      { key: "line_1", label: "Ligne 1", type: "text", placeholder: "🚀 5 ans d'expérience en SaaS" },
       { key: "line_2", label: "Ligne 2", type: "text", placeholder: "💼 20+ projets realises" },
       { key: "line_3", label: "Ligne 3", type: "text", placeholder: "🌍 Clients dans 8 pays" },
       { key: "line_4", label: "Ligne 4", type: "text", placeholder: "🎯 Specialiste Next.js" },
@@ -2257,12 +2259,12 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     ],
   },
   company: {
-    label: "Entreprise", description: "Logo, nom et infos de l entreprise",
+    label: "Entreprise", description: "Logo, nom et infos de l'entreprise",
     icon: "🏢", color: "#38BDF8", category: "identity",
     defaultContent: {},
     fields: [
       { key: "logo_url", label: "Logo", type: "image" },
-      { key: "company_name", label: "Nom de l entreprise", type: "text", placeholder: "Studio PIXEL" },
+      { key: "company_name", label: "Nom de l'entreprise", type: "text", placeholder: "Studio PIXEL" },
       { key: "sector", label: "Secteur / Type", type: "text", placeholder: "Agence digitale" },
       { key: "website", label: "Site web", type: "url", placeholder: "https://monentreprise.com" },
       { key: "founded_year", label: "Annee de création", type: "text", placeholder: "2019" },

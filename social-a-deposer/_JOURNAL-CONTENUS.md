@@ -3,6 +3,32 @@
 > **À lire AVANT toute création.** Aucun slug, angle ou accroche listé ici ne peut être
 > réutilisé. Après chaque run, ajouter la ligne du jour en bas.
 
+## ⚑ Règles de publication (obligatoires, à appliquer à CHAQUE mise en file)
+
+1. **Mention « contenu généré par IA » : TOUJOURS activée.** Demande explicite d'Emilien
+   (08/09). Dans `create_post` / `edit_post`, poser `isAiGenerated: true` :
+   - Instagram → `metadata.instagram.isAiGenerated: true` (fonctionne sur les carrousels)
+   - X / Twitter → `metadata.twitter.isAiGenerated: true` (tweets originaux uniquement)
+   - TikTok → `metadata.tiktok.isAiGenerated: true` **sur les vidéos seulement**.
+     Sur un **carrousel photo**, l'API refuse : *« TikTok photo posts do not support AI
+     content disclosure »*. Ne pas l'envoyer pour un carrousel photo, sinon la mise en
+     file échoue — la mention se coche alors à la main dans l'appli si besoin.
+   - Pinterest / LinkedIn → le champ n'existe pas dans l'API Buffer.
+2. **Instagram : jamais d'URL dans la légende.** Le lien tracké vit **dans la bio**
+   (`utm_medium=bio`), la légende dit « Le lien est dans la bio ». **5 hashtags maximum.**
+   Motif : 4 carrousels (05, 06 et 07/09) ont été rejetés par Instagram —
+   *« flagged this post as potential spam »* — avec URL + UTM et 8 à 10 hashtags.
+3. **Pinterest : 500 caractères maximum** pour la description, sinon `create_post` échoue.
+4. **Contrôler `list_posts` avec le statut `error`** à chaque run, pas seulement
+   `scheduled` : un post rejeté ne se voit nulle part ailleurs et fausse la lecture des
+   statistiques (on croit lire 0 vue alors que rien n'a été publié).
+5. **Récupérer un post en `error` :** on ne peut pas le ré-enregistrer tel quel, son
+   heure est passée et Buffer refuse une date antérieure. Il faut `edit_post` **avec
+   `mode: "addToQueue"`** (ou `customScheduled` + `dueAt` futur) : cela corrige le texte
+   ET le replace dans un créneau à venir en une seule opération. Le champ `error` reste
+   affiché tant que la nouvelle tentative n'a pas eu lieu — c'est cosmétique, le
+   `status` repasse bien à `scheduled`.
+
 ## Règles d'unicité (obligatoires)
 1. **Slug** : jamais réutiliser un slug déjà présent. Interdiction aussi des quasi-doublons
    (même secteur + même objet + même bénéfice), même avec des mots différents.
@@ -61,15 +87,21 @@
 | Marché / producteur | Calendrier des marchés du mois | 07/09 |
 | Food truck | Carte de la semaine par thème | 07/09 |
 | Hôtel / chambre d'hôtes | Arrivée tardive en autonomie (code, étage) | 07/09 |
+| Restaurant | Service du midi : commande passée à l'assise (carrousel) | 08/09 |
+| Restaurant | Carte des softs et sans-alcool | 08/09 |
+| Bar | Programme du dimanche sport / matchs diffusés | 08/09 |
+| Boulangerie | Commande de gâteau d'anniversaire | 08/09 |
+| Salon / coiffeur | Créneau libéré à la dernière minute | 08/09 |
 
 ## Angles NEUFS disponibles (piocher ici en priorité)
 - Restaurant : plat à emporter du soir · anniversaire / privatisation ·
-  fiche « d'où vient ce plat » (producteurs) · le service du midi en 20 minutes chrono ·
-  la carte des softs et sans-alcool · le menu de Noël réservé dès novembre.
+  fiche « d'où vient ce plat » (producteurs) · le menu de Noël réservé dès novembre ·
+  la table du soir dressée deux fois (double service) · le plat du jour épuisé signalé en direct.
 - Bar : carte des cocktails saisonnière · quiz / jeu de table ·
-  happy hour qui change selon l'heure · la carte des softs maison · le programme du dimanche sport.
+  happy hour qui change selon l'heure · la carte des bières de saison ·
+  la privatisation de l'arrière-salle.
 - Boulangerie : commande de galette / bûche selon la saison · liste d'allergènes ·
-  la commande de gâteau d'anniversaire · le pain sur commande pour la semaine.
+  le pain sur commande pour la semaine · la formule petit-déjeuner à emporter.
 - Food truck : la fiche « où se garer » pour les entreprises · les moyens de paiement acceptés ·
   le camion en tournée de festival (dates et scène).
 - Marché / producteur : la recette du produit de saison · la fiche conservation du produit ·
@@ -78,8 +110,8 @@
   le mode d'emploi de l'article en cabine · les horaires exceptionnels affichés en vitrine.
 - Hôtel / chambre d'hôtes : le plan des transports depuis la gare ·
   les bonnes adresses du quartier tenues à jour · le petit-déjeuner commandé la veille.
-- Salon / coiffeur : le créneau libéré à la dernière minute · la routine d'entretien
-  après un balayage · la carte cadeau du salon.
+- Salon / coiffeur : la routine d'entretien après un balayage · la carte cadeau du salon ·
+  la fiche « ce qu'on a fait sur tes cheveux » remise en fin de rendez-vous.
 - Transverse : « ton QR imprimé en 2024 marche encore » (QR dynamique) ·
   le plafond souple (la page ne se coupe pas) · QR statique vs dynamique en 20 s ·
   ce que ton support papier ne te dit pas (mesure) · un support, une page, un chiffre.
@@ -158,6 +190,11 @@
 - « Le pain sort à 16 h. Personne ne le sait. »
 - « Le calendrier du mois, sur ton étal. »
 - « Cette semaine, c'est mexicain. »
+- « 45 minutes de pause. 20 d'attente. »
+- « "Vous avez quoi sans alcool ?" — "Du Coca." »
+- « Le match est à 21 h. Personne ne le sait. »
+- « Le gâteau se commande. Pas au téléphone à 8 h. »
+- « Une annulation à 14 h. Un fauteuil vide à 15 h. »
 
 | 05/09 | commerce / boutique (100 % inédit) | qr-code-stock-disponible-magasin-boutique (carrousel IG + TikTok + reel 32,2 s), qr-code-retours-garantie-ticket-caisse-boutique, qr-code-carte-sandwichs-du-midi-boulangerie, qr-code-carte-bieres-pression-du-moment-bar | Pinterest, IG, TikTok, X |
 
@@ -249,3 +286,60 @@
 > (restaurant · liste d'attente du samedi soir), pas au format. D'où un angle de
 > **tension de service** aujourd'hui encore — la demande d'événement qui meurt en DM.
 > Instagram : toujours 0 vue, 0 reach sur les carrousels.
+
+| 08/09 | restaurant · service du midi (100 % inédit) | qr-code-commande-midi-vingt-minutes-restaurant (carrousel IG + TikTok), qr-code-carte-softs-sans-alcool-restaurant, qr-code-programme-dimanche-sport-bar, qr-code-commande-gateau-anniversaire-boulangerie, qr-code-creneau-libere-derniere-minute-salon | Pinterest, IG, TikTok, LinkedIn, X |
+
+> **Note 08/09 — file Buffer trouvée VIDE (0/10)**, les 6 posts du 07/09 sont partis.
+> Réserve `_STOCK` vide au démarrage (tout en `en-file`) : production 100 % neuve,
+> **zéro doublon** contrôlé contre le journal et contre les 60 derniers posts Buffer.
+> Secteur du jour : **restaurant · le service du midi en 20 minutes chrono**, angle
+> jamais traité. Rotation respectée (07/09 = food truck). Mardi = pas de vidéo.
+> 4 épingles, **4 angles distincts**, **4 gabarits distincts (layouts 0, 1, 2, 3)** et
+> **4 tableaux distincts** — QR code restaurant, Templates gratuits, QR code boutique
+> commerce, QR code salon coiffure. Pont d'audience tenu : une seule épingle hors-food
+> (salon · créneau libéré).
+> Contrôle qualité : **16 visuels, 0 alerte**, chaque QR décodé vers son lien tracké.
+> Un correctif de composition en cours de run : sur le gabarit 2, l'eyebrow
+> « Boulangerie · commande » passait sous le cadre du QR — tag raccourci à
+> « Boulangerie » et épingle re-rendue.
+> **Dépôt fait** (16 PNG via `QRowg-Depot.cmd`), puis **6 posts mis en file** :
+> épingle restaurant · QR code restaurant (13 h 28 UTC), épingle bar · Templates gratuits
+> (14 h 44), carrousel Instagram (15 h 04), épingle boulangerie · QR code boutique
+> commerce (18 h 18), épingle salon · QR code salon coiffure (19 h 34) et carrousel photo
+> TikTok (09/09, 04 h 05). **File à 6/10**, le stock repasse à vide (`en-file` partout).
+> La description de l'épingle boulangerie a été raccourcie à la mise en file (Pinterest
+> plafonne à 500 caractères).
+>
+> **⚠️ DÉCOUVERTE MAJEURE — Instagram ne publie pas.** Le contrôle de la file avec le
+> statut `error` fait apparaître **4 carrousels Instagram jamais partis** : 05/09 (stock
+> boutique), 06/09 (carte enfants) et 07/09 **deux fois** (camion privatisé, dont une
+> reprise), tous rejetés avec *« Instagram flagged this post as potential spam »*.
+> Les « 0 vue, 0 reach » notés chaque jour depuis le 02/09 ne mesuraient donc pas une
+> mauvaise portée : **le contenu n'a jamais été publié**. Point commun des légendes
+> rejetées : une **URL brute complète avec paramètres UTM** + **8 à 10 hashtags**.
+> Correctif appliqué immédiatement au carrousel du jour, réédité avant publication :
+> plus d'URL dans la légende (« Le lien est dans la bio »), **5 hashtags** au lieu de 10.
+> Règle provisoire pour les prochains runs Instagram : jamais d'URL trackée dans la
+> légende — elle vit dans la bio — et 5 hashtags maximum. À confirmer demain selon que
+> le post du 08/09 passe ou non.
+>
+> **Rattrapage des 4 posts rejetés, même jour.** Les 3 carrousels uniques ont été
+> corrigés (URL retirée, 5 hashtags, `isAiGenerated: true`) et **reprogrammés** via
+> `edit_post` + `mode: addToQueue` : stock boutique → 08/09 17 h 35, carte enfants →
+> 09/09 07 h 57, camion privatisé → 09/09 16 h 55. Le 4ᵉ était un **doublon** (version
+> courte du camion privatisé du 07/09) : laissé en `error`, à supprimer à la main dans
+> Buffer — le passer en brouillon par l'API a été refusé par le garde-fou d'écriture.
+> **Mention IA activée partout où l'API l'accepte**, à la demande d'Emilien (08/09).
+> **Apprentissage Buffer.** Pinterest : **0 impression sur toutes les épingles publiées
+> depuis le 02/09**, sans exception, tableaux historiques compris — le test de placement
+> du 03/09 est tranché avant sa date de lecture du 11/09 : **le placement n'est pas la
+> cause**, il ne reste que la cause n°2 du diagnostic (`qrowg.com` non revendiqué).
+> Volume Pinterest maintenu à 4 épingles, pas davantage, tant que ce point n'est pas réglé.
+> TikTok reste le seul canal distribué, mais **le visionnage moyen se dégrade** :
+> 12,73 s le 04/09 (restaurant · liste d'attente du samedi soir), 9,23 s le 07/09
+> (restaurant · carte enfants), **5,29 s aujourd'hui** pour le carrousel food truck du
+> 07/09 (98 vues à J+0, contre 272 la veille). Les deux meilleurs scores sont des sujets
+> de **restauration en tension de service** ; le food truck décroche. D'où le retour
+> franc à ce sujet aujourd'hui, avec un angle neuf (le service du midi).
+> Instagram : toujours 0 vue, 0 reach sur les carrousels.
+

@@ -671,7 +671,7 @@ export function stockStatus(raw?: string, lowThreshold = 5): { state: "out" | "l
   if (raw === undefined || raw === null || String(raw).trim() === "") return null
   const n = parseInt(String(raw).replace(/[^0-9-]/g, ""), 10)
   if (!isFinite(n)) return null
-  if (n <= 0) return { state: "out", label: "Epuise", color: "#A8A190", soldOut: true }
+  if (n <= 0) return { state: "out", label: "Épuisé", color: "#A8A190", soldOut: true }
   if (n <= lowThreshold) return { state: "low", label: `Plus que ${n} en stock`, color: "#F97316", soldOut: false }
   return { state: "in", label: "En stock", color: "#39FF8F", soldOut: false }
 }

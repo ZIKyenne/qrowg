@@ -24,6 +24,12 @@
 import { calendarLinks, mapEmbedUrl, destinationUtile } from "../../types"
 import { slugifyBase } from "@/lib/slug"
 
+// Nom du fichier .ics quand l'événement n'a pas de nom. C'est un NOM DE FICHIER,
+// pas une phrase : il reste en ASCII, sans accent, pour traverser tous les
+// systèmes. Nommé plutôt qu'écrit sur place, pour qu'on ne le prenne pas pour
+// du texte affiché — le contrôle d'orthographe le lirait comme une faute.
+export const NOM_FICHIER_SECOURS = "evenement"
+
 const txt = (v: unknown): string => (typeof v === "string" ? v.trim() : "")
 
 // ── Invités ─────────────────────────────────────────────────────────────────
@@ -86,7 +92,7 @@ export function agenda(c: Record<string, any> | null | undefined): Agenda | null
   // Le nom du fichier telecharge : « Concert d'ete » donnait « Concert_d_t_.ics »
   // — les accents etaient supprimes, pas translitteres, et le visiteur retrouvait
   // ca dans son dossier de telechargements. `slugifyBase` sait le faire.
-  if (cal) liens.push({ label: "🍎 Apple / Outlook", href: cal.ics, fichier: `${slugifyBase(nom) || "evenement"}.ics`, couleur: "", fond: "", bordure: "" })
+  if (cal) liens.push({ label: "🍎 Apple / Outlook", href: cal.ics, fichier: `${slugifyBase(nom) || NOM_FICHIER_SECOURS}.ics`, couleur: "", fond: "", bordure: "" })
   return { nom, debut: dateLisible(src.start_date), lieu: txt(src.location), liens }
 }
 

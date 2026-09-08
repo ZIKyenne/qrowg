@@ -23,7 +23,7 @@ export function EditorPdfViewer({ content, ctx }: EditorAdapterProps) {
         </div>
         {hasUrl && <div style={{ background: "rgba(0,0,0,0.3)", borderRadius: 8, overflow: "hidden", marginBottom: 10, height: 120, display: "flex", alignItems: "center", justifyContent: "center" }}><p style={{ color: muted, fontSize: 11, margin: 0 }}>Aperçu PDF</p></div>}
         <div style={{ display: "flex", gap: 7 }}>
-          {ctaLabel && <EditorCtaShell style={{ flex: 1, background: `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 8, padding: "9px", textAlign: "center", fontSize: 12, fontWeight: 700, color: "#080808" }}>{ctaLabel}</EditorCtaShell>}
+          {hasUrl && <EditorCtaShell style={{ flex: 1, background: `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 8, padding: "9px", textAlign: "center", fontSize: 12, fontWeight: 700, color: "#080808" }}>{ctaLabel}</EditorCtaShell>}
           {showDownload && <div style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "9px 14px", fontSize: 12, fontWeight: 600, color: muted }}>↓ PDF</div>}
         </div>
       </div>

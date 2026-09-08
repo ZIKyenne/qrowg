@@ -213,3 +213,67 @@ Résumé des titres et tableaux Pinterest :
 **Titre Pinterest** : Arrivée tardive : le check-in qui se fait sans toi
 **Tableau** : QR code hôtel — premier épinglage sur ce tableau
 `#hotel #chambredhotes #locationsaisonniere #organisation`
+
+---
+
+## 08/09 — production du jour · DÉPOSÉE ET EN FILE
+
+> **File Buffer trouvée VIDE (0/10)** : les 6 posts du 07/09 sont tous partis.
+> Réserve vide au démarrage (tout en `en-file`) : production 100 % neuve.
+> Secteur : **restaurant · le service du midi en 20 minutes chrono**, angle jamais traité.
+> Rotation respectée (07/09 = food truck). Mardi n'est pas un jour vidéo : pas de mp4.
+> Contrôle qualité : **16 visuels, 0 alerte**, chaque QR décodé vers son lien tracké.
+> 4 épingles, 4 angles distincts, **4 gabarits distincts (layouts 0, 1, 2, 3)** et
+> **4 tableaux distincts**. Une seule épingle hors-food (salon) : pont d'audience tenu.
+>
+> **Dépôt fait** (16 PNG via `QRowg-Depot.cmd`), puis **6 posts mis en file** :
+> épingle restaurant · softs (13 h 28 UTC), épingle bar · dimanche sport (14 h 44),
+> carrousel Instagram (15 h 04), épingle boulangerie · gâteau (18 h 18),
+> épingle salon · créneau libéré (19 h 34) et carrousel photo TikTok (09/09, 04 h 05).
+> **File à 6/10**, réserve vide. La description de l'épingle boulangerie a été raccourcie
+> à la mise en file : Pinterest plafonne à 500 caractères.
+>
+> ⚠️ **Découverte du run** : `list_posts` avec le statut `error` révèle **4 carrousels
+> Instagram jamais publiés** — 05/09, 06/09 et 07/09 (deux fois) — tous rejetés avec
+> « Instagram flagged this post as potential spam ». Les « 0 vue, 0 reach » d'Instagram
+> ne sont donc pas un problème de portée : **les posts ne sont jamais sortis**. Point
+> commun des légendes rejetées : URL brute complète avec UTM + 8 à 10 hashtags.
+> Correctif appliqué aujourd'hui : le carrousel Instagram du jour a été réédité sans
+> URL dans la légende (« Le lien est dans la bio ») et avec **5 hashtags** au lieu de 10.
+> À surveiller demain : si le post du 08/09 passe, la règle devient permanente.
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| en-file | qr-code-commande-midi-vingt-minutes-restaurant-01..06.png | Instagram (carrousel) | — | restaurant · service du midi · la commande part à l'assise, la table tourne deux fois | https://qrowg.com/qr-code/menu?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260908-restaurant | 2026-09-08 |
+| en-file | tiktok-qr-code-commande-midi-vingt-minutes-restaurant-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 | https://qrowg.com/qr-code/menu?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260908-restaurant | 2026-09-08 |
+| en-file | qr-code-carte-softs-sans-alcool-restaurant.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 0 | restaurant · carte des softs et sans-alcool · autre chose que « du Coca » | https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260908-restaurant | 2026-09-08 |
+| en-file | qr-code-programme-dimanche-sport-bar.png | Pinterest | Templates gratuits (726416683586787015) — gabarit 1 | bar · programme du dimanche sport · le match diffusé annoncé à l'heure juste | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260908-restaurant | 2026-09-08 |
+| en-file | qr-code-commande-gateau-anniversaire-boulangerie.png | Pinterest | QR code boutique commerce (726416683586817655) — gabarit 2 | boulangerie · commande de gâteau d'anniversaire · la demande arrive écrite | https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260908-restaurant | 2026-09-08 |
+| en-file | qr-code-creneau-libere-derniere-minute-salon.png | Pinterest | QR code salon coiffure (726416683586817657) — gabarit 3 | salon · créneau libéré à la dernière minute · le désistement se remplit tout seul | https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20260908-restaurant | 2026-09-08 |
+
+## Textes prêts — 08/09
+
+Légendes complètes (Instagram, TikTok, Pinterest ×4, LinkedIn, X) avec bouton Copier :
+`social-a-deposer\2026-09-08\textes-du-jour-2026-09-08.html`.
+Bios : `social-a-deposer\2026-09-08\bios-du-jour-2026-09-08.html`.
+Résumé des titres et tableaux Pinterest :
+
+### qr-code-carte-softs-sans-alcool-restaurant
+**Titre Pinterest** : Carte des softs : autre chose que « du Coca »
+**Tableau** : QR code restaurant
+`#restaurant #sansalcool #cartedesboissons #qrcode`
+
+### qr-code-programme-dimanche-sport-bar
+**Titre Pinterest** : Dimanche sport : le programme diffusé, à jour
+**Tableau** : Templates gratuits
+`#bar #pub #sport #qrcode`
+
+### qr-code-commande-gateau-anniversaire-boulangerie
+**Titre Pinterest** : Commande de gâteau : le formulaire plutôt que le téléphone
+**Tableau** : QR code boutique commerce
+`#boulangerie #patisserie #organisation #commercelocal`
+
+### qr-code-creneau-libere-derniere-minute-salon
+**Titre Pinterest** : Créneau libéré : le désistement qui se remplit tout seul
+**Tableau** : QR code salon coiffure — unique épingle hors-food du jour
+`#salondecoiffure #coiffure #organisation #qrcode`

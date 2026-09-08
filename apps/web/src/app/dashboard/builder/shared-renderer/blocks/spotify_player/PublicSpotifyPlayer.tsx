@@ -13,7 +13,7 @@ export function PublicSpotifyPlayer({ content, ctx }: PublicAdapterProps) {
         <div style={{ width: 48, height: 48, background: "#1DB954", borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>🎧</div>
         <div style={{ flex: 1 }}>
           <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{title}</p>
-          <p style={{ color: MUTED, fontSize: 12, margin: 0, fontFamily: FONT_B }}>Ecouter sur Spotify</p>
+          <p style={{ color: MUTED, fontSize: 12, margin: 0, fontFamily: FONT_B }}>Écouter sur Spotify</p>
         </div>
         {link.visible && <PublicCtaLink href={link.href} external={link.external} trackTarget={link.trackTarget} trackClick={trackClick} style={{ background: "#1DB954", color: "#000", padding: "8px 16px", borderRadius: 20, textDecoration: "none", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>▶ Play</PublicCtaLink>}
       </div>

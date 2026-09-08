@@ -1,0 +1,118 @@
+{
+  "total": 16,
+  "avec_alerte": 0,
+  "details": [
+    {
+      "fichier": "qr-code-carte-softs-sans-alcool-restaurant.png",
+      "fond_sombre_pct": 89.9,
+      "or_pct": 3.9,
+      "qr": "https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260908-restaurant",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commande-gateau-anniversaire-boulangerie.png",
+      "fond_sombre_pct": 88.6,
+      "or_pct": 4.7,
+      "qr": "https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260908-restaurant",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commande-midi-vingt-minutes-restaurant-01.png",
+      "fond_sombre_pct": 92.6,
+      "or_pct": 1.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commande-midi-vingt-minutes-restaurant-02.png",
+      "fond_sombre_pct": 93.6,
+      "or_pct": 1.6,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commande-midi-vingt-minutes-restaurant-03.png",
+      "fond_sombre_pct": 85.7,
+      "or_pct": 8.9,
+      "qr": "https://qrowg.com/qr-code/menu?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260908-restaurant",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commande-midi-vingt-minutes-restaurant-04.png",
+      "fond_sombre_pct": 93.2,
+      "or_pct": 0.6,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commande-midi-vingt-minutes-restaurant-05.png",
+      "fond_sombre_pct": 89.8,
+      "or_pct": 0.6,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commande-midi-vingt-minutes-restaurant-06.png",
+      "fond_sombre_pct": 83.9,
+      "or_pct": 6.7,
+      "qr": "https://qrowg.com/qr-code/menu?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260908-restaurant",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-creneau-libere-derniere-minute-salon.png",
+      "fond_sombre_pct": 89.6,
+      "or_pct": 4.3,
+      "qr": "https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20260908-restaurant",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-programme-dimanche-sport-bar.png",
+      "fond_sombre_pct": 88.6,
+      "or_pct": 4.6,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260908-restaurant",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-commande-midi-vingt-minutes-restaurant-01.png",
+      "fond_sombre_pct": 92.6,
+      "or_pct": 1.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-commande-midi-vingt-minutes-restaurant-02.png",
+      "fond_sombre_pct": 93.6,
+      "or_pct": 1.6,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-commande-midi-vingt-minutes-restaurant-03.png",
+      "fond_sombre_pct": 85.8,
+      "or_pct": 9.0,
+      "qr": "https://qrowg.com/qr-code/menu?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260908-restaurant",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-commande-midi-vingt-minutes-restaurant-04.png",
+      "fond_sombre_pct": 93.2,
+      "or_pct": 0.6,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-commande-midi-vingt-minutes-restaurant-05.png",
+      "fond_sombre_pct": 89.8,
+      "or_pct": 0.6,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-commande-midi-vingt-minutes-restaurant-06.png",
+      "fond_sombre_pct": 83.9,
+      "or_pct": 6.7,
+      "qr": "https://qrowg.com/qr-code/menu?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260908-restaurant",
+      "alertes": []
+    }
+  ]
+}

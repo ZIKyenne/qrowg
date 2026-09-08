@@ -1,0 +1,89 @@
+{
+  "carousels": [
+    {
+      "slug": "qr-code-commande-midi-vingt-minutes-restaurant",
+      "sector": "restaurant",
+      "url": "https://qrowg.com/qr-code/menu?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260908-restaurant",
+      "slides": [
+        {
+          "kind": "cover",
+          "tag": "Restaurant · service du midi",
+          "title": "45 minutes de pause. 20 d'[[attente]].",
+          "body": "Le service du midi se joue avant que le plat parte."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le problème",
+          "title": "Il repart avant d'avoir [[commandé]]",
+          "body": "Assis à 12h35, servi à 12h55. Il reprend à 13h15. Demain, il ira ailleurs."
+        },
+        {
+          "kind": "qr",
+          "kicker": "Sur la table",
+          "title": "Un QR. La commande part à [[l'assise]].",
+          "body": "Il choisit pendant que tu dresses. La cuisine a dix minutes d'avance."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le geste",
+          "title": "La formule du midi change. Le support, [[non]].",
+          "body": "Nouveau plat à 11h, page à jour à 11h02. Aucune réimpression, aucun autocollant à recoller."
+        },
+        {
+          "kind": "metric",
+          "kicker": "Preuve",
+          "number": "20 min",
+          "title": "entre l'assise et le [[café]]",
+          "body": "C'est ce que ta table du midi doit tenir pour tourner deux fois."
+        },
+        {
+          "kind": "cta",
+          "title": "Crée ta carte du midi en 2 [[minutes]]",
+          "body": "Prête à imprimer, à ta marque, modifiable chaque jour.",
+          "cta": "qrowg.com",
+          "qr": true
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "slug": "qr-code-carte-softs-sans-alcool-restaurant",
+      "sector": "restaurant",
+      "layout": 0,
+      "tag": "Restaurant · sans alcool",
+      "title": "« Vous avez quoi sans alcool ? » — « Du [[Coca]]. »",
+      "subtitle": "Un QR sur la table ouvre la carte des softs maison : les infusions, les jus pressés, les cocktails sans alcool. La carte s'étoffe, le support ne bouge pas.",
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260908-restaurant"
+    },
+    {
+      "slug": "qr-code-programme-dimanche-sport-bar",
+      "sector": "bar",
+      "layout": 1,
+      "tag": "Bar · dimanche sport",
+      "title": "Le match est à 21 h. Personne ne le [[sait]].",
+      "subtitle": "Un QR sur le comptoir ouvre le programme diffusé : quel match, quelle heure, quel écran. Le calendrier change chaque semaine, l'affiche jamais.",
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260908-restaurant"
+    },
+    {
+      "slug": "qr-code-commande-gateau-anniversaire-boulangerie",
+      "layout": 2,
+      "tag": "Boulangerie",
+      "title": "Le gâteau se commande. Pas au [[téléphone]] à 8 h.",
+      "subtitle": "Un QR en vitrine ouvre le formulaire de commande : la taille, le parfum, la date, le message à écrire dessus. La demande arrive écrite, pas criée par-dessus la file.",
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260908-restaurant"
+    },
+    {
+      "slug": "qr-code-creneau-libere-derniere-minute-salon",
+      "layout": 3,
+      "tag": "Salon · dernière minute",
+      "title": "Une annulation à 14 h. Un fauteuil [[vide]] à 15 h.",
+      "subtitle": "Un QR au miroir ouvre les créneaux libérés du jour. Le désistement se remplit tout seul, sans appeler dix clientes une par une.",
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20260908-restaurant"
+    }
+  ]
+}

@@ -34,6 +34,7 @@ import { queueEngagement, trackDwell, queueTap } from "@/lib/trackEngagement"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
 import { contactFormFields, reservationFormFields, quoteFormFields, bookingRequestFields, telephoneDirect } from "@/lib/leadForms"
+import { NOM_FICHIER_SECOURS } from "../dashboard/builder/shared-renderer/models/evenement"
 import { pricingCtaModel } from "../dashboard/builder/pricingCta"
 import { normalizePageTheme, destinationUtile } from "../dashboard/builder/types"
 import { albumBlockCtaModel } from "../dashboard/builder/shared-renderer/models/albumBlockCta"
@@ -435,7 +436,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
           <div style={{ width: 48, height: 48, background: "#1DB954", borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>🎧</div>
           <div style={{ flex: 1 }}>
             {c.title && <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{c.title}</p>}
-            <p style={{ color: MUTED, fontSize: 12, margin: 0, fontFamily: FONT_B }}>Ecouter sur Spotify</p>
+            <p style={{ color: MUTED, fontSize: 12, margin: 0, fontFamily: FONT_B }}>Écouter sur Spotify</p>
           </div>
           {c.url && <a href={extHref(c.url)} onClick={() => trackLinkClick(pageId, block.id, c.url||block.type)} target="_blank" rel="noopener noreferrer" style={{ background: "#1DB954", color: "#000", padding: "8px 16px", borderRadius: 20, textDecoration: "none", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>▶ Play</a>}
         </div>
@@ -498,11 +499,15 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
           <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
             <div style={{ width: 42, height: 42, background: `${G}12`, border: `1px solid ${G}25`, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>📅</div>
             <div>
-              <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.label || "Reserver"}</p>
+              {/* `c.label` servait à la fois de titre de la carte ET de texte du
+                  bouton, avec deux replis différents : une page en ligne affichait
+                  deux fois « Reserver un appel decouverte ». Le titre est celui du
+                  commerçant ; le bouton porte son propre libellé. (Vague 24.) */}
+              {c.label && <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.label}</p>}
               {c.description && <p style={{ color: MUTED, fontSize: 13.5, margin: 0, fontFamily: FONT_B }}>{c.description}</p>}
             </div>
           </div>
-          <LienPublic href={extHref(c.url)} onClick={() => trackLinkClick(pageId, block.id, c.url||"calendly")} target="_blank" rel="noopener noreferrer" style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, color: "#080808", textAlign: "center", padding: "13px", borderRadius: 9, textDecoration: "none", fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Réserver un creneau"}</LienPublic>
+          <LienPublic href={extHref(c.url)} onClick={() => trackLinkClick(pageId, block.id, c.url||"calendly")} target="_blank" rel="noopener noreferrer" style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, color: "#080808", textAlign: "center", padding: "13px", borderRadius: 9, textDecoration: "none", fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{"Réserver un créneau"}</LienPublic>
         </div>
       </div>
     )
@@ -909,7 +914,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         <div style={{ background: "rgba(236,72,153,0.08)", border: "1.5px solid rgba(236,72,153,0.25)", borderRadius: 13, padding: "16px", textAlign: "center" }}>
           <span style={{ fontSize: 32, display: "block", marginBottom: 8 }}>{c.emoji || "🎁"}</span>
           {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 11px", fontFamily: FONT_B }}>{c.description}</p>}
-          <LienPublic href={extHref(c.url)} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "gift")} style={{ display: "block", background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 10, padding: "12px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.label || "Recevoir mon cadeau"}</LienPublic>
+          <LienPublic href={extHref(c.url)} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "gift")} style={{ display: "block", background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 10, padding: "12px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.label || "Recevoir mon guide gratuit"}</LienPublic>
         </div>
       </div>
     )
@@ -1618,7 +1623,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {gUrl && <a href={gUrl} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, "calendar:google")} style={{ flex: 1, minWidth: 130, display: "flex", alignItems: "center", justifyContent: "center", gap: 7, background: "rgba(66,133,244,0.12)", border: "1px solid rgba(66,133,244,0.3)", borderRadius: 10, padding: "13px", fontSize: 12.5, fontWeight: 700, color: "#4285F4", textDecoration: "none", fontFamily: FONT_B }}>📅 Google Agenda</a>}
-            {cal && <a href={cal.ics} download={`${(c.event_name || "evenement").replace(/[^\w-]+/g, "_")}.ics`} onClick={() => trackLinkClick(pageId, block.id, "calendar:ics")} style={{ flex: 1, minWidth: 130, display: "flex", alignItems: "center", justifyContent: "center", gap: 7, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "13px", fontSize: 12.5, fontWeight: 700, color: TEXT, textDecoration: "none", fontFamily: FONT_B }}>🍎 Apple / Outlook</a>}
+            {cal && <a href={cal.ics} download={`${(c.event_name || NOM_FICHIER_SECOURS).replace(/[^\w-]+/g, "_")}.ics`} onClick={() => trackLinkClick(pageId, block.id, "calendar:ics")} style={{ flex: 1, minWidth: 130, display: "flex", alignItems: "center", justifyContent: "center", gap: 7, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "13px", fontSize: 12.5, fontWeight: 700, color: TEXT, textDecoration: "none", fontFamily: FONT_B }}>🍎 Apple / Outlook</a>}
           </div>
         </div>
       </div>

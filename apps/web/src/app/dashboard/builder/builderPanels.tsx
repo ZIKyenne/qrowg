@@ -1638,7 +1638,7 @@ Tiramisu;6,50€;Fait maison`
                         <input type="color" aria-label="Couleur du voile" value={(theme as any).overlay_color||"#000000"}
                           onChange={e => onThemeChange({...theme, overlay_color: e.target.value} as any)}
                           style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }} />
-                        <span style={{ color: MUTED, fontSize: 11 }}>Couleur de l overlay</span>
+                        <span style={{ color: MUTED, fontSize: 11 }}>Couleur de l'overlay</span>
                       </div>
                       <div>
                         <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Opacité: {(theme as any).overlay_opacity||30}%</label>

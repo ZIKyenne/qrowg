@@ -24,7 +24,7 @@ export function PublicPdfViewer({ content, ctx }: PublicAdapterProps) {
         </div>
         {href && (
           <div style={{ display: "flex", gap: 8 }}>
-            <PublicCtaLink href={href} external trackTarget={trackTarget} trackClick={trackClick} style={{ flex: 1, background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 9, padding: "11px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#080808", textDecoration: "none", fontFamily: FONT_B }}>{ctaLabel || "Consulter le PDF"}</PublicCtaLink>
+            <PublicCtaLink href={href} external trackTarget={trackTarget} trackClick={trackClick} style={{ flex: 1, background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 9, padding: "11px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#080808", textDecoration: "none", fontFamily: FONT_B }}>{ctaLabel}</PublicCtaLink>
             {showDownload && <a href={href} download onClick={() => { try { trackClick(trackTarget) } catch {} }} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, padding: "11px 16px", fontSize: 13, fontWeight: 600, color: MUTED, textDecoration: "none" }}>↓ PDF</a>}
           </div>
         )}

@@ -411,7 +411,7 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
                 {(() => { const d = priceDiscount(c.price, c.old_price); return d ? <span style={{ background: "#EF4444", color: "#fff", borderRadius: 5, padding: "1px 6px", fontSize: 10, fontWeight: 800 }}>{d.label}</span> : null })()}
               </div>
               {(() => { const st = stockStatus(c.stock); return st ? <p style={{ color: st.color, fontSize: 10, fontWeight: 700, margin: "0 0 6px" }}>{st.state === "in" ? "✓ " : st.state === "out" ? "⛔ " : "🔥 "}{st.label}</p> : null })()}
-              {c.cta_label && (() => { const out = stockStatus(c.stock)?.soldOut; return <div style={{ background: out ? "rgba(255,255,255,0.08)" : `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 7, padding: "8px", textAlign: "center", fontSize: 12, fontWeight: 700, color: out ? muted : "#080808" }}>{out ? "Epuise" : c.cta_label}</div> })()}
+              {c.cta_label && (() => { const out = stockStatus(c.stock)?.soldOut; return <div style={{ background: out ? "rgba(255,255,255,0.08)" : `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 7, padding: "8px", textAlign: "center", fontSize: 12, fontWeight: 700, color: out ? muted : "#080808" }}>{out ? "Épuisé" : c.cta_label}</div> })()}
             </div>
           </div>
         </div>
@@ -1067,7 +1067,7 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
                 {(() => { const d = priceDiscount(c.price||"99€", c.old_price); return c.old_price ? <span style={{ background: "#EF4444", color: "#fff", borderRadius: 6, padding: "2px 7px", fontSize: 10, fontWeight: 800 }}>{d ? d.label : "Promo"}</span> : null })()}
               </div>
               {(() => { const st = stockStatus(c.stock); return st ? <p style={{ color: st.color, fontSize: 11, fontWeight: 700, margin: "0 0 10px" }}>{st.state === "in" ? "✓ " : st.state === "out" ? "⛔ " : "🔥 "}{st.label}</p> : null })()}
-              {c.cta_label && (() => { const out = stockStatus(c.stock)?.soldOut; return <div style={{ background: out ? "rgba(255,255,255,0.08)" : `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: out ? muted : "#080808" }}>{out ? "Epuise" : c.cta_label}</div> })()}
+              {c.cta_label && (() => { const out = stockStatus(c.stock)?.soldOut; return <div style={{ background: out ? "rgba(255,255,255,0.08)" : `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: out ? muted : "#080808" }}>{out ? "Épuisé" : c.cta_label}</div> })()}
             </div>
           </div>
         </div>
@@ -2726,9 +2726,9 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
           <div style={{ background: `${primary}08`, border: `1px solid ${primary}20`, borderRadius: 12, padding: "12px 14px" }}>
             <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
               <div style={{ width: 36, height: 36, background: `${primary}14`, border: `1px solid ${primary}25`, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>📅</div>
-              <div><p style={{ color: text, fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label||"Reserver"}</p>{c.description && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{c.description}</p>}</div>
+              <div>{c.label && <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label}</p>}{c.description && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{c.description}</p>}</div>
             </div>
-            <div style={{ background: `linear-gradient(90deg,${primary},${primary}cc)`, color: "#080808", textAlign: "center", padding: "9px", borderRadius: 8, fontSize: 12, fontWeight: 700 }}>{c.label||"Reserver un creneau"}</div>
+            <div style={{ background: `linear-gradient(90deg,${primary},${primary}cc)`, color: "#080808", textAlign: "center", padding: "9px", borderRadius: 8, fontSize: 12, fontWeight: 700 }}>{"Réserver un créneau"}</div>
           </div>
         </div>
       )

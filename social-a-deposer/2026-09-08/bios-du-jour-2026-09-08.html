@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QRowg — Bios du jour · 08/09/2026</title>
+<style>
+  :root{--noir:#0b0c0b;--carte:#141613;--or:#d4af45;--txt:#eceae3;--gris:#9a978c;}
+  *{box-sizing:border-box}
+  body{margin:0;padding:32px 20px 80px;background:var(--noir);color:var(--txt);
+       font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:820px;margin:0 auto}
+  h1{font-size:30px;letter-spacing:-.02em;margin:0 0 6px}
+  .meta{color:var(--gris);font-size:14px;margin-bottom:28px}
+  h2{font-size:15px;text-transform:uppercase;letter-spacing:.16em;color:var(--or);
+     margin:34px 0 10px;border-top:1px solid #2a2c27;padding-top:22px}
+  .lim{color:var(--gris);font-size:13px;font-weight:400;text-transform:none;letter-spacing:0}
+  .bloc{background:var(--carte);border:1px solid #262822;border-radius:14px;padding:16px 18px 14px;margin-bottom:10px}
+  .zone{white-space:pre-wrap;outline:none;min-height:26px}
+  .zone:focus{box-shadow:inset 0 0 0 2px rgba(212,175,69,.35);border-radius:8px}
+  .n{color:var(--gris);font-size:12.5px;margin-top:8px}
+  button{margin-top:10px;background:var(--or);color:#141613;border:0;border-radius:9px;
+         padding:8px 16px;font-weight:700;font-size:13.5px;cursor:pointer}
+  button.ok{background:#5aa469;color:#fff}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Bios du jour — 8 septembre 2026</h1>
+<p class="meta">Deux variantes par réseau. Le compteur sous chaque bloc se met à jour quand tu modifies le texte.</p>
+
+<h2>Instagram <span class="lim">— 150 caractères max</span></h2>
+<div class="bloc"><div class="zone" contenteditable>Un support imprimé une fois. Une page qui change tous les jours. Menus, cartes, horaires — modifiés en 10 s, et chaque scan est mesuré.</div><div class="n"></div><button onclick="cp(this)">Copier</button></div>
+<div class="bloc"><div class="zone" contenteditable>Ta carte change. Ton QR, jamais. Restaurants, boulangeries, commerces : crée ton support, modifie la page, mesure les scans.</div><div class="n"></div><button onclick="cp(this)">Copier</button></div>
+
+<h2>TikTok <span class="lim">— 80 caractères max</span></h2>
+<div class="bloc"><div class="zone" contenteditable>Ta carte change. Ton QR ne bouge pas. Idées QR pour resto et commerce.</div><div class="n"></div><button onclick="cp(this)">Copier</button></div>
+<div class="bloc"><div class="zone" contenteditable>Un QR imprimé une fois, une page modifiable tous les jours. qrowg.com</div><div class="n"></div><button onclick="cp(this)">Copier</button></div>
+
+<h2>Pinterest <span class="lim">— 160 caractères max</span></h2>
+<div class="bloc"><div class="zone" contenteditable>Idées d'organisation pour restaurants, boulangeries et commerces : un QR sur la table ou en vitrine, une page à jour en 10 secondes, sans réimprimer.</div><div class="n"></div><button onclick="cp(this)">Copier</button></div>
+<div class="bloc"><div class="zone" contenteditable>Menus, horaires, commandes, avis : des supports imprimés une seule fois, des pages que tu modifies quand tu veux. Idées simples pour commerce local.</div><div class="n"></div><button onclick="cp(this)">Copier</button></div>
+
+<h2>LinkedIn <span class="lim">— 220 caractères max</span></h2>
+<div class="bloc"><div class="zone" contenteditable>QRowg transforme un support physique — table, vitrine, ticket, flyer — en page personnalisable et mesurable. Vous imprimez une fois, vous modifiez le contenu quand vous voulez, et vous voyez ce qui convertit.</div><div class="n"></div><button onclick="cp(this)">Copier</button></div>
+<div class="bloc"><div class="zone" contenteditable>Le support imprimé ne devrait pas périmer avant vous. QRowg relie chaque support physique à une page que vous mettez à jour en dix secondes, et mesure les scans support par support.</div><div class="n"></div><button onclick="cp(this)">Copier</button></div>
+
+<h2>X <span class="lim">— 160 caractères max</span></h2>
+<div class="bloc"><div class="zone" contenteditable>Un support imprimé une fois, une page modifiée tous les jours, des scans mesurés. Pour restos, boulangeries et commerces. qrowg.com</div><div class="n"></div><button onclick="cp(this)">Copier</button></div>
+<div class="bloc"><div class="zone" contenteditable>Ta carte change. Ton QR ne bouge pas. Crée, connecte, mesure — qrowg.com</div><div class="n"></div><button onclick="cp(this)">Copier</button></div>
+
+</div>
+<script>
+var LIM=[150,150,80,80,160,160,220,220,160,160];
+var zones=document.querySelectorAll('.zone');
+function maj(){
+  zones.forEach(function(z,i){
+    var n=z.innerText.trim().length, l=LIM[i];
+    var el=z.parentNode.querySelector('.n');
+    el.textContent=n+' / '+l+(n>l?'  — trop long':'');
+    el.style.color = n>l ? '#e0705f' : '#9a978c';
+  });
+}
+zones.forEach(function(z){z.addEventListener('input',maj);});
+maj();
+function cp(btn){
+  var z=btn.parentNode.querySelector('.zone');
+  navigator.clipboard.writeText(z.innerText).then(function(){
+    var t=btn.textContent; btn.textContent='Copié'; btn.className='ok';
+    setTimeout(function(){btn.textContent=t;btn.className='';},1400);
+  });
+}
+</script>
+</body>
+</html>

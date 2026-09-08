@@ -537,7 +537,7 @@ export function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail }: 
     // Repli mailto si l'enregistrement échoue
     if (ownerEmail) {
       const body = encodeURIComponent(Object.entries(data).map(([k, v]) => `${k}: ${v}`).join("\n"))
-      window.location.href = `mailto:${ownerEmail}?subject=${encodeURIComponent(`Inscription: ${c.title || "evenement"}`)}&body=${body}`
+      window.location.href = `mailto:${ownerEmail}?subject=${encodeURIComponent(`Inscription: ${c.title || "événement"}`)}&body=${body}`
       setStatus("done")
     } else setStatus("error")
   }
