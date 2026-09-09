@@ -27,6 +27,7 @@ import { BLOCK_DEFS, blocsProposables } from "./blockDefs"
   import { EditPanel, ThemePanel, Segmented, STYLE_COPY_KEYS, isAppearanceField } from "./builderPanels"
   import { InspecteurVide } from "./InspecteurVide"
   import { AlertesPublication } from "./AlertesPublication"
+  import QrowgLogo from "@/components/QrowgLogo"
 import { motifDeFond } from "./types"
 import { actionClavier } from "./raccourcisClavier"
   import { BuilderStatus } from "./BuilderStatus"
@@ -1388,10 +1389,9 @@ import { actionClavier } from "./raccourcisClavier"
 
         {/* TOPBAR (masquee en mode Apercu plein ecran sur mobile) */}
         <div style={{ height: isMobile ? 50 : 56, background: "var(--bg)", borderBottom: "1px solid var(--line)", display: (preview && isMobile) ? "none" : "flex", alignItems: "center", padding: isMobile ? "0 9px" : "0 16px", gap: isMobile ? 6 : 10, flexShrink: 0, zIndex: 20 }}>
-          {/* Même lockup que la barre du haut de la coquille : retour + QROWG. */}
           <a href={guest ? "/dashboard/templates" : "/dashboard"} aria-label={guest ? "Retour aux modèles" : "Retour au tableau de bord"}
             style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, flexShrink: 0, textDecoration: "none", color: "var(--muted)", fontSize: 13, whiteSpace: "nowrap", ...(isMobile ? { width: 44, height: 44, fontSize: 19 } : {}) }}>
-            <ArrowLeft size={16} aria-hidden="true" />{!isMobile && <span style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, letterSpacing: ".16em" }}>QROWG</span>}
+            <ArrowLeft size={16} aria-hidden="true" />{!isMobile && <QrowgLogo size={16} />}
           </a>
           {!isMobile && <div style={{ width: 1, height: 18, background: "var(--line-strong)" }} />}
           {!isMobile && <span style={{ color: "var(--muted)", fontSize: 13 }}>Page</span>}
@@ -1635,7 +1635,6 @@ import { actionClavier } from "./raccourcisClavier"
                       <button onClick={()=>setPublishError("")} style={{marginLeft:"auto",background:"none",border:"none",cursor:"pointer",color:"#F87171",fontSize:14,lineHeight:1}}>×</button>
                     </div>
                   )}
-                  {/* Ce qui ne partira pas en ligne, résumé ici (revue du 9 septembre) — chaque ligne ouvre le bloc. */}
                   <AlertesPublication blocks={blocks} onVoir={id => { setSelectedId(id); setRightTab("edit"); setShowPublishPopup(false); if (isMobile) setMobileTab("panel") }} />
                   {/* Voir la page */}
                   {pageSlug && pageStatus === "published" && (

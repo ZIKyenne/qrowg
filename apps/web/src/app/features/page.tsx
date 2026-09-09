@@ -2,6 +2,7 @@
 import Link from "next/link"
 import { useState } from "react"
 import { PLANS } from "@/lib/plans"
+import QrowgLogo from "@/components/QrowgLogo"
 
 // ── Design tokens ────────────────────────────────────────────────────────────
 import { creerUrl, creerUrlSecteur } from "../creer/entry"
@@ -14,16 +15,13 @@ const BOR = "rgba(201,168,76,0.18)"
 
 // ── Sous-composants ──────────────────────────────────────────────────────────
 
+// Surtitre de section (revue du 9 septembre) : du texte, pas une pastille à contour
+// qui ressemblait à un filtre cliquable.
 function Chip({ label }: { label: string }) {
   return (
-    <span style={{
-      display: "inline-flex", alignItems: "center",
-      background: "rgba(201,168,76,0.08)",
-      border: "1px solid rgba(201,168,76,0.22)",
-      borderRadius: 100, padding: "5px 14px",
-      color: G, fontSize: 11, fontWeight: 700, letterSpacing: 2.5,
-      textTransform: "uppercase",
-    }}>{label}</span>
+    <span style={{ display: "inline-block", color: G, fontSize: 11, fontWeight: 700, letterSpacing: 2.5, textTransform: "uppercase" }}>
+      {label}
+    </span>
   )
 }
 
@@ -262,7 +260,7 @@ export default function FeaturesPage() {
         .feat-2col { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; }
         .feat-2col.rev { }
         @media(max-width:900px){ .feat-2col{ grid-template-columns:1fr !important; gap:40px !important; } }
-        @media(max-width:640px){ .feat-sec{ padding:72px 24px !important; } .feat-hero{ padding:120px 24px 80px !important; } }
+        @media(max-width:640px){ .feat-sec{ padding:56px 24px !important; } .feat-hero{ padding:120px 24px 80px !important; } }
       `}</style>
 
       {/* NAV */}
@@ -273,8 +271,8 @@ export default function FeaturesPage() {
         display:"flex",alignItems:"center",justifyContent:"space-between",
         padding:"0 48px",
       }}>
-        <Link href="/" style={{textDecoration:"none"}}>
-          <span style={{fontFamily:"Fraunces,serif",fontSize:20,color:G,fontWeight:700}}>QRowg</span>
+        <Link href="/" aria-label="QRowg — accueil" style={{textDecoration:"none",display:"inline-flex"}}>
+          <QrowgLogo size={22} />
         </Link>
         <div className="qf-entete" style={{display:"flex",alignItems:"center",gap:24}}>
           <Link href="/#pricing" style={{color:MUT,textDecoration:"none",fontSize:13,transition:"color 0.2s"}}
@@ -343,7 +341,7 @@ export default function FeaturesPage() {
       </section>
 
       {/* ── 1. BUILDER ───────────────────────────────────────────────────────── */}
-      <section style={{padding:"100px 48px",position:"relative",zIndex:2}} className="feat-sec">
+      <section style={{padding:"72px 48px",position:"relative",zIndex:2}} className="feat-sec">
         <div style={{maxWidth:1100,margin:"0 auto"}}>
           <div className="feat-2col">
             <div>
@@ -367,7 +365,7 @@ export default function FeaturesPage() {
       </section>
 
       {/* ── 2. QR DYNAMIQUE ──────────────────────────────────────────────────── */}
-      <section style={{padding:"100px 48px",position:"relative",zIndex:2,background:"rgba(255,255,255,0.012)"}} className="feat-sec">
+      <section style={{padding:"72px 48px",position:"relative",zIndex:2,background:"rgba(255,255,255,0.012)"}} className="feat-sec">
         <div style={{maxWidth:1100,margin:"0 auto"}}>
           <div className="feat-2col" style={{direction:"rtl" as const}}>
             <div style={{direction:"ltr" as const}}>
@@ -393,7 +391,7 @@ export default function FeaturesPage() {
       </section>
 
       {/* ── 3. ANALYTICS ─────────────────────────────────────────────────────── */}
-      <section style={{padding:"100px 48px",position:"relative",zIndex:2}} className="feat-sec">
+      <section style={{padding:"72px 48px",position:"relative",zIndex:2}} className="feat-sec">
         <div style={{maxWidth:1100,margin:"0 auto"}}>
           <div className="feat-2col">
             <div>
@@ -417,10 +415,10 @@ export default function FeaturesPage() {
       </section>
 
       {/* ── 4. TEMPLATES ─────────────────────────────────────────────────────── */}
-      <section style={{padding:"100px 48px",position:"relative",zIndex:2,background:"rgba(255,255,255,0.012)"}} className="feat-sec">
+      <section style={{padding:"72px 48px",position:"relative",zIndex:2,background:"rgba(255,255,255,0.012)"}} className="feat-sec">
         <div style={{maxWidth:1100,margin:"0 auto"}}>
           <div style={{textAlign:"center",marginBottom:56}}>
-            <div style={{marginBottom:16}}><Chip label="Templates" /></div>
+            <div style={{marginBottom:16}}><Chip label="Modèles" /></div>
             <h2 style={{fontFamily:"Fraunces,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing:"-0.02em",margin:"0 auto 16px",maxWidth:560}}>
               Partez d'un modèle <span style={{color:G}}>fait pour votre métier.</span>
             </h2>
@@ -463,7 +461,7 @@ export default function FeaturesPage() {
       </section>
 
       {/* ── 5-6-7. AUTRES FEATURES ───────────────────────────────────────────── */}
-      <section style={{padding:"100px 48px",position:"relative",zIndex:2}} className="feat-sec">
+      <section style={{padding:"72px 48px",position:"relative",zIndex:2}} className="feat-sec">
         <div style={{maxWidth:1100,margin:"0 auto"}}>
           <div style={{textAlign:"center",marginBottom:56}}>
             <div style={{marginBottom:16}}><Chip label="Et aussi" /></div>
@@ -510,7 +508,7 @@ export default function FeaturesPage() {
       </section>
 
       {/* ── CTA FINAL ────────────────────────────────────────────────────────── */}
-      <section style={{padding:"100px 48px 120px",position:"relative",zIndex:2,textAlign:"center"}} className="feat-sec">
+      <section style={{padding:"72px 48px 88px",position:"relative",zIndex:2,textAlign:"center"}} className="feat-sec">
         <div style={{
           maxWidth:660,margin:"0 auto",
           background:"linear-gradient(145deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03))",

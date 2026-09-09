@@ -89,7 +89,7 @@ export function FeaturesSection() {
       id="features"
       ref={ref}
       aria-labelledby="features-title"
-      style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}
+      style={{ padding: "72px 48px", position: "relative", zIndex: 1 }}
     >
       {/* Header */}
       <div style={{
@@ -236,7 +236,7 @@ export function FeaturesSection() {
           .feat-grid > * { grid-column: auto !important; }
           .feat-big { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; padding: 26px 22px !important; }
         }
-        @media (max-width: 640px) { #features { padding: 72px 24px !important; } }
+        @media (max-width: 640px) { #features { padding:56px 24px!important; } }
       `}</style>
 
       {/* Fenetre explicative d'une fonctionnalite (Pb 6) */}
@@ -258,7 +258,7 @@ export function FeaturesSection() {
               </div>
             ))}
             <Link href="/creer" style={{ display: "block", textAlign: "center", marginTop: 20, padding: "12px", borderRadius: 11, background: `linear-gradient(90deg, ${fInfo.accent}, ${fInfo.accent}cc)`, color: "#080808", textDecoration: "none", fontSize: 13.5, fontWeight: 800 }}>
-              Essayer gratuitement
+              Composer ma page — sans compte
             </Link>
           </div>
         </div>

@@ -39,11 +39,11 @@ export function QRStudioLive() {
 
   return (
     <section id="qr-studio" ref={ref} aria-labelledby="qrlive-title"
-      style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
+      style={{ padding: "72px 48px", position: "relative", zIndex: 1 }}>
       <style>{`
         .qrl-grid { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; max-width:1000px; margin:0 auto; }
         @media(max-width:820px){ .qrl-grid { grid-template-columns:1fr !important; gap:36px !important; } }
-        @media(max-width:640px){ #qr-studio { padding:72px 24px !important; } }
+        @media(max-width:640px){ #qr-studio { padding:56px 24px!important; } }
         .qrl-sw { width:34px; height:34px; border-radius:9px; cursor:pointer; padding:0; transition:transform .18s ease, border-color .2s; }
         .qrl-sw:hover { transform:scale(1.1); }
         .qrl-sw:focus-visible { outline:2px solid rgba(201,168,76,0.6); outline-offset:2px; }
@@ -104,7 +104,7 @@ export function QRStudioLive() {
             fontWeight: 700, fontSize: 15, padding: "13px 24px", borderRadius: 12,
             textDecoration: "none", boxShadow: "0 8px 24px rgba(201,168,76,0.25)",
             fontFamily: "'DM Sans', system-ui, sans-serif",
-          }}>Créer mon QR code gratuit <span aria-hidden="true">→</span></a>
+          }}>Créer mon QR code <span aria-hidden="true">→</span></a>
         </div>
 
         {/* Aperçu live */}

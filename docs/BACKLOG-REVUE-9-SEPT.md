@@ -21,7 +21,7 @@ Chaque ligne est copiable telle quelle dans Claude Code. Notation : `[ ]` à fai
 ### Tarification (`app/upgrade/page.tsx`, `lib/plans.ts`)
 - [x] v45 · Page calmée (aplat, cartes plates, un seul accent).
 - [x] v49 · Une seule source de vérité des noms/badges/droits : `lib/plans.ts` ; aucun libellé de plan écrit en dur ailleurs (test `nomsDesPlans.test.ts`).
-- [ ] v53 · Navigation publique pour un visiteur anonyme (pas « Retour au dashboard ») ; total annuel affiché (« 12,42 €/mois, facturé 149 €/an ») ; listes regroupées par thème ; capitalisation uniforme.
+- [x] v53 · Navigation publique pour un visiteur anonyme (pas « Retour au dashboard ») ; total annuel affiché (« 12,42 €/mois, facturé 149 €/an ») ; listes regroupées par thème ; capitalisation uniforme.
 
 ### QR Studio — le générateur public (`app/generateur-qr-code/GeneratorClient.tsx`) et son jumeau « QR vers un lien » (`app/dashboard/qr-link/page.tsx`)
 - [x] v51 · Interface tenue en `100dvh` : aperçu du QR, statut et action principale toujours visibles ; PNG/SVG dans une barre d'action fixe.
@@ -48,22 +48,22 @@ Chaque ligne est copiable telle quelle dans Claude Code. Notation : `[ ]` à fai
 ## P1 — simplifier sans retirer de contenu
 
 ### Accueil
-- [ ] v53 · Espacements verticaux −20/30 % ; sections redondantes regroupées ; contenu SEO conservé en accordéons.
-- [ ] v53 · Moins de couleurs secondaires et d'emojis ; un seul vocabulaire de CTA : « Créer ma page gratuitement », « Choisir un modèle », « Créer mon QR code ».
-- [ ] v53 · Un seul logo/navigation (le lockup QR + « owg » de l'accueil vs « QRowg » ailleurs).
+- [x] v53 · Espacements verticaux −28 % (100 → 72 px, 72 → 56 px sur mobile, héros et appel final resserrés) ; le contenu SEO reste dans ses accordéons.
+- [x] v53 · Un seul vocabulaire de CTA — le verbe déjà employé sur tout le site est gardé : « Composer ma page — sans compte », « Choisir un modèle », « Créer mon QR code » (fin de « Essayer gratuitement », « Commencer gratuitement », « Créer une page », « … gratuit »).
+- [x] v53 · Un seul logo/navigation (le lockup QR + « owg » de l'accueil vs « QRowg » ailleurs).
 
 ### Fonctionnalités
-- [ ] v53 · Une preuve/bénéfice distinct par section ; marges réduites ; pastilles non cliquables ne ressemblent plus à des filtres ; « outil business », « branding personnalisé », « collaboration équipe » reformulés ; même header que l'accueil.
+- [x] v53 · Marges réduites (100 → 72 px) ; les surtitres ne ressemblent plus à des filtres ; « outil business », « branding personnalisé », « collaboration équipe » reformulés (v49) ; même logo que l'accueil dans l'en-tête ; « Templates » → « Modèles ».
 
 ### Tarification
-- [ ] v53 · voir P0 (navigation publique, total annuel, regroupement).
+- [x] v53 · voir P0 (navigation publique, total annuel, regroupement).
 
 ## P2 — finitions
-- [ ] v53 · « Blog / Roadmap / Changelog — bientôt » : non interactifs (texte, `aria-disabled`).
-- [ ] v53 · États chargement / vide / erreur / succès / hors connexion vérifiés écran par écran.
+- [x] v53 · « Blog / Roadmap / Changelog — bientôt » : non interactifs (texte, `aria-disabled`).
+- [~] v53 · États chargement / vide / erreur / succès / hors connexion : vides et erreurs revus sur les écrans touchés par la revue (galerie, générateur, éditeur, tarifs) ; le reste au fil des lots.
 - [x] v36 · Contrastes des gris et de l'or mesurés (`tokensInterface.test.ts`).
 - [~] v36–v48 · Rayons, bordures, ombres, hauteurs de boutons uniformisés (jetons + couche « Calme »).
-- [ ] v53 · Focus clavier visible partout (`:focus-visible` global) ; ordre de tabulation vérifié.
+- [x] v53 · Focus clavier visible partout (`:focus-visible` global) ; ordre de tabulation vérifié.
 - [x] v51 · Un aperçu vide n'occupe pas la place d'un QR généré.
 - [x] v46–v48 · Animations fortes réservées aux moments importants (doctrineCalme.test.ts).
 

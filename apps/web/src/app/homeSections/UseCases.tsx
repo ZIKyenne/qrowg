@@ -115,7 +115,7 @@ export function UseCasesSection() {
 
   return (
     <section id="examples" ref={ref} aria-labelledby="uc-title"
-      style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
+      style={{ padding: "72px 48px", position: "relative", zIndex: 1 }}>
       <style>{`
         .uc-tabs  { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
         .uc-tab   { display:flex; align-items:center; gap:7px; padding:9px 18px; border-radius:100px;
@@ -127,7 +127,7 @@ export function UseCasesSection() {
           .uc-blocks{ grid-template-columns:repeat(2,1fr)!important; }
           .uc-tabs { gap:6px!important; }
           .uc-tab  { padding:7px 12px!important; font-size:12px!important; }
-          #examples{ padding:72px 20px!important; }
+          #examples{ padding:56px 20px!important; }
         }
         @media(max-width:400px){
           .uc-blocks{ grid-template-columns:1fr!important; }

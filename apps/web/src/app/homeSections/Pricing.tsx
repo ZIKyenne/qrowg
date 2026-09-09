@@ -6,7 +6,7 @@ import { useInView, Eyebrow } from "../homeUi"
 import { PLAN_LIST, PLAN_COMPARISON, fmtPrice, PLANS as PLANS_DEF } from "@/lib/plans"
 
 const PLAN_LANDING_UI = {
-  free:     { cta: "Commencer gratuitement",     href: "/creer",                       badge: null,                note: "Sans compte pour composer · le compte n'est demandé qu'à la publication" },
+  free:     { cta: "Composer ma page — sans compte",     href: "/creer",                       badge: null,                note: "Sans compte pour composer · le compte n'est demandé qu'à la publication" },
 
   pro:      { cta: `Choisir ${PLANS_DEF.pro.label}`,                 href: "/auth/signup?plan=pro",      badge: "Le plus populaire",   note: "Sans engagement · Annulable en 1 clic" },
   business: { cta: `Choisir ${PLANS_DEF.business.label}`,            href: "/auth/signup?plan=business", badge: null,                note: "Sans engagement · Annulable en 1 clic" },
@@ -68,7 +68,7 @@ export function PricingSection() {
   return (
     <section id="pricing" ref={ref} aria-labelledby="pricing-title"
       style={{
-        padding: "100px 48px", position: "relative", zIndex: 1,
+        padding: "72px 48px", position: "relative", zIndex: 1,
         background: "linear-gradient(180deg, rgba(255,255,255,0.024), rgba(255,255,255,0.008)), radial-gradient(130% 60% at 50% 0%, rgba(201,168,76,0.06), transparent 60%)",
         borderTop: "1px solid rgba(201,168,76,0.13)",
         borderBottom: "1px solid rgba(201,168,76,0.13)",
@@ -81,7 +81,7 @@ export function PricingSection() {
         .plan-card.highlight { transform:scale(1.05); }
         .plan-card.highlight:hover { transform:scale(1.05) translateY(-6px); }
         @media(max-width:1024px){ .plans-grid{ grid-template-columns:repeat(2,1fr)!important; max-width:680px!important; margin:0 auto!important; } .plan-card.highlight{ transform:none!important; } .plan-card.highlight:hover{ transform:translateY(-4px)!important; } }
-        @media(max-width:560px){ .plans-grid{ grid-template-columns:1fr!important; max-width:420px!important; } #pricing{ padding:72px 20px!important; } }
+        @media(max-width:560px){ .plans-grid{ grid-template-columns:1fr!important; max-width:420px!important; } #pricing{ padding:56px 20px!important; } }
       `}</style>
 
       {/* Header */}

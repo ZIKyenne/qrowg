@@ -56,6 +56,10 @@ export type PlanCaps = {
   apiAppelsMois: number | null // appels API publics par mois calendaire (null = pas d'accès)
 }
 
+export type GroupePerk = "Pages" | "QR codes" | "Statistiques" | "Image de marque" | "Outils" | "Équipe & support"
+/** Ordre d'affichage des groupes sur la grille tarifaire. */
+export const GROUPES_PERKS: readonly GroupePerk[] = ["Pages", "QR codes", "Statistiques", "Image de marque", "Outils", "Équipe & support"]
+
 export interface Plan {
   id: PlanId
   label: string
@@ -67,7 +71,8 @@ export interface Plan {
   limits: PlanLimits
   caps: PlanCaps
   features: string[] // liste courte (carte plan du dashboard)
-  perks: { text: string; included: boolean; soon?: boolean }[] // liste détaillée (page /upgrade) ; soon = feature promise mais pas encore construite
+  /** Liste détaillée (page /upgrade) ; soon = feature promise mais pas encore construite ; groupe = thème d'affichage (revue du 9 septembre : listes regroupées). */
+  perks: { text: string; included: boolean; soon?: boolean; groupe: GroupePerk }[]
 }
 
 export const PLANS: Record<PlanId, Plan> = {
@@ -84,16 +89,16 @@ export const PLANS: Record<PlanId, Plan> = {
             dynStatsDetaillees: false, dynDomaineMarque: false, dynSecuriteLien: false, dynEnMasse: false, apiAppelsMois: null },
     features: ["1 page", "Vues illimitées", "3 QR autonomes, dont 1 modifiable", "Branding QRowg visible", "Statistiques de base"],
     perks: [
-      { text: "1 page publiée", included: true },
-      { text: "Vues illimitées — un QR imprimé ne s'arrête jamais", included: true },
-      { text: "3 QR autonomes", included: true },
-      { text: "1 QR modifiable après impression", included: true },
-      { text: "Hébergement inclus", included: true },
-      { text: "Statistiques de base", included: true },
-      { text: "Branding QRowg visible", included: true },
-      { text: "Atelier d'impression", included: false },
-      { text: "Domaine personnalisé", included: false },
-      { text: "Génération IA", included: false },
+      { text: "1 page publiée", included: true, groupe: "Pages" },
+      { text: "Vues illimitées — un QR imprimé ne s'arrête jamais", included: true, groupe: "Pages" },
+      { text: "3 QR autonomes", included: true, groupe: "QR codes" },
+      { text: "1 QR modifiable après impression", included: true, groupe: "QR codes" },
+      { text: "Hébergement inclus", included: true, groupe: "Pages" },
+      { text: "Statistiques de base", included: true, groupe: "Statistiques" },
+      { text: "Branding QRowg visible", included: true, groupe: "Image de marque" },
+      { text: "Atelier d'impression", included: false, groupe: "Outils" },
+      { text: "Domaine personnalisé", included: false, groupe: "Image de marque" },
+      { text: "Génération IA", included: false, groupe: "Outils" },
     ],
   },
   pro: {
@@ -107,23 +112,23 @@ export const PLANS: Record<PlanId, Plan> = {
     limits: { pages: 10, views: null, qr: 30, dyn: 20, team: null },
     caps: { printStudio: true, qrStudioAdvanced: true, ai: true, removeBranding: true, pageIntro: true, exportFormats: ["png", "jpg", "pdf", "svg"],
             dynStatsDetaillees: true, dynDomaineMarque: true, dynSecuriteLien: true, dynEnMasse: false, apiAppelsMois: 1000 },
-    features: ["10 pages", "Vues illimitées", "30 QR, dont 20 modifiables après impression", "Sans branding", "atelier d'impression complet", "Domaine personnalisé", "Statistiques détaillées"],
+    features: ["10 pages", "Vues illimitées", "30 QR, dont 20 modifiables après impression", "Sans branding", "Atelier d'impression complet", "Domaine personnalisé", "Statistiques détaillées"],
     perks: [
-      { text: "10 pages — de quoi couvrir un commerce entier", included: true },
-      { text: "Vues illimitées", included: true },
-      { text: "30 QR autonomes, dont 20 modifiables après impression", included: true },
-      { text: "Changer la destination sans réimprimer", included: true },
-      { text: "Statistiques détaillées : jour, appareil, pays", included: true },
-      { text: "Mot de passe et expiration sur un lien", included: true },
-      { text: "Branding QRowg retiré", included: true },
-      { text: "Domaine personnalisé", included: true },
-      { text: "QR Studio complet", included: true },
-      { text: "atelier d'impression complet", included: true },
-      { text: "Tous les modèles", included: true },
-      { text: "Génération IA + rapports", included: true },
-      { text: "Export PNG / JPG / PDF HD / SVG", included: true },
-      { text: "Accès API · 1 000 appels / mois", included: true }, // = caps.apiAppelsMois (testé)
-      { text: "Support prioritaire", included: true },
+      { text: "10 pages — de quoi couvrir un commerce entier", included: true, groupe: "Pages" },
+      { text: "Vues illimitées", included: true, groupe: "Pages" },
+      { text: "30 QR autonomes, dont 20 modifiables après impression", included: true, groupe: "QR codes" },
+      { text: "Changer la destination sans réimprimer", included: true, groupe: "QR codes" },
+      { text: "Statistiques détaillées : jour, appareil, pays", included: true, groupe: "Statistiques" },
+      { text: "Mot de passe et expiration sur un lien", included: true, groupe: "QR codes" },
+      { text: "Branding QRowg retiré", included: true, groupe: "Image de marque" },
+      { text: "Domaine personnalisé", included: true, groupe: "Image de marque" },
+      { text: "QR Studio complet", included: true, groupe: "Outils" },
+      { text: "Atelier d'impression complet", included: true, groupe: "Outils" },
+      { text: "Tous les modèles", included: true, groupe: "Pages" },
+      { text: "Génération IA + rapports", included: true, groupe: "Outils" },
+      { text: "Export PNG / JPG / PDF HD / SVG", included: true, groupe: "Outils" },
+      { text: "Accès API · 1 000 appels / mois", included: true, groupe: "Outils" }, // = caps.apiAppelsMois (testé)
+      { text: "Support prioritaire", included: true, groupe: "Équipe & support" },
     ],
   },
   business: {
@@ -139,17 +144,17 @@ export const PLANS: Record<PlanId, Plan> = {
             dynStatsDetaillees: true, dynDomaineMarque: true, dynSecuriteLien: true, dynEnMasse: true, apiAppelsMois: 10000 },
     features: ["Jusqu'à 5 établissements", "Pages et QR illimités", "Import CSV en masse", "Équipe · 5 membres", "Marque blanche", "API"],
     perks: [
-      { text: "Pages illimitées", included: true },
-      { text: "QR autonomes et modifiables illimités", included: true },
-      { text: "Création en masse par import CSV", included: true },
-      { text: "5 membres d'équipe", included: true },
-      { text: "Marque blanche", included: true },
-      { text: "Domaine personnalisé", included: true },
-      { text: "Statistiques détaillées + export", included: true },
-      { text: "QR Studio et atelier d'impression complets", included: true },
-      { text: "Génération IA illimitée + rapports", included: true },
-      { text: "Accès API · 10 000 appels / mois", included: true }, // = caps.apiAppelsMois (testé)
-      { text: "Support prioritaire", included: true },
+      { text: "Pages illimitées", included: true, groupe: "Pages" },
+      { text: "QR autonomes et modifiables illimités", included: true, groupe: "QR codes" },
+      { text: "Création en masse par import CSV", included: true, groupe: "QR codes" },
+      { text: "5 membres d'équipe", included: true, groupe: "Équipe & support" },
+      { text: "Marque blanche", included: true, groupe: "Image de marque" },
+      { text: "Domaine personnalisé", included: true, groupe: "Image de marque" },
+      { text: "Statistiques détaillées + export", included: true, groupe: "Statistiques" },
+      { text: "QR Studio et atelier d'impression complets", included: true, groupe: "Outils" },
+      { text: "Génération IA illimitée + rapports", included: true, groupe: "Outils" },
+      { text: "Accès API · 10 000 appels / mois", included: true, groupe: "Outils" }, // = caps.apiAppelsMois (testé)
+      { text: "Support prioritaire", included: true, groupe: "Équipe & support" },
     ],
   },
 }

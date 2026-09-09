@@ -215,11 +215,11 @@ export function AnalyticsSection() {
   const { ref, visible } = useInView(0.06)
   return (
     <section id="analytics" ref={ref} aria-labelledby="analytics-title"
-      style={{ padding: "100px 48px", position: "relative", zIndex: 1, overflow: "hidden" }}>
+      style={{ padding: "72px 48px", position: "relative", zIndex: 1, overflow: "hidden" }}>
       <style>{`
         .analytics-layout { display:grid; grid-template-columns:1fr 1.5fr; gap:72px; align-items:center; }
         @media(max-width:1024px){ .analytics-layout{ grid-template-columns:1fr!important; gap:48px!important; } }
-        @media(max-width:640px){ #analytics{ padding:72px 20px!important; } }
+        @media(max-width:640px){ #analytics{ padding:56px 20px!important; } }
       `}</style>
 
       {/* Ambiance bleutée (donnée / data) — variation de fond par section */}

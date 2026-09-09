@@ -4,7 +4,9 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Check, Zap, Crown, Star, ArrowLeft, Sparkles } from "lucide-react"
 import Link from "next/link"
-import { PLAN_LIST, PLAN_COMPARISON, PLANS as PLANS_DEF, fmtPrice } from "@/lib/plans"
+import { PLAN_LIST, PLAN_COMPARISON, PLANS as PLANS_DEF, fmtPrice, GROUPES_PERKS } from "@/lib/plans"
+import QrowgLogo from "@/components/QrowgLogo"
+import { creerUrl } from "../creer/entry"
 import { useAccent } from "@/lib/useAccent"
 import SubscribeButton from "@/components/SubscribeButton"
 import CheckoutErrorBanner from "@/components/CheckoutErrorBanner"
@@ -33,6 +35,8 @@ const COMPARISON = PLAN_COMPARISON
 
 export default function UpgradePage() {
   const [currentPlan, setCurrentPlan] = useState("free")
+  // null = pas encore su ; false = visiteur sans compte (navigation publique, pas de « retour au tableau de bord »)
+  const [signedIn, setSignedIn] = useState<boolean | null>(null)
   const [loading, setLoading] = useState<string | null>(null)
   const [annual, setAnnual] = useState(false)
   const [showComparison, setShowComparison] = useState(false)
@@ -41,6 +45,7 @@ export default function UpgradePage() {
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
+      setSignedIn(!!user)
       if (!user) return
       supabase.from("profiles").select("plan").eq("id", user.id).single().then(({ data }) => {
         if (data) setCurrentPlan(data.plan)
@@ -110,14 +115,26 @@ export default function UpgradePage() {
       <CheckoutErrorBanner error={payErr} onClose={() => setPayErr(null)} />
 
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        {/* Back */}
-        <div style={{ paddingTop: 32, marginBottom: 40 }}>
-          {/* 17 px de haut mesurés : le seul chemin de retour de la page, et il
-              fallait viser juste. Épaissi sans décaler la mise en page. */}
-          <Link href="/dashboard" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: MUTED, textDecoration: "none", fontSize: 14, minHeight: 44, padding: "0 6px", marginLeft: -6 }}>
-            <ArrowLeft size={16} /> Retour au dashboard
-          </Link>
-        </div>
+        {/* Revue du 9 septembre : un visiteur sans compte arrive ici depuis le site — il reçoit la
+            navigation publique, pas « Retour au tableau de bord ». Le connecté garde son retour. */}
+        {signedIn === false ? (
+          <header className="qf-entete" style={{ paddingTop: 18, marginBottom: 36, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+            <Link href="/" aria-label="QRowg — accueil" style={{ textDecoration: "none" }}><QrowgLogo size={22} /></Link>
+            <nav aria-label="Navigation" style={{ display: "flex", alignItems: "center", gap: "clamp(9px,2.6vw,14px)" }}>
+              <Link href="/features" style={{ color: MUTED, textDecoration: "none", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>Fonctionnalités</Link>
+              <Link href="/auth/login" style={{ color: MUTED, textDecoration: "none", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>Connexion</Link>
+              <Link href={creerUrl()} style={{ background: "var(--accent)", color: "var(--ink-on-accent)", textDecoration: "none", fontSize: 13, fontWeight: 700, padding: "9px 14px", borderRadius: 10, whiteSpace: "nowrap" }}>Composer ma page — sans compte</Link>
+            </nav>
+          </header>
+        ) : (
+          <div style={{ paddingTop: 32, marginBottom: 40 }}>
+            {/* 17 px de haut mesurés : le seul chemin de retour de la page, et il
+                fallait viser juste. Épaissi sans décaler la mise en page. */}
+            <Link href="/dashboard" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: MUTED, textDecoration: "none", fontSize: 14, minHeight: 44, padding: "0 6px", marginLeft: -6, visibility: signedIn === null ? "hidden" : undefined }}>
+              <ArrowLeft size={16} /> Retour au tableau de bord
+            </Link>
+          </div>
+        )}
 
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 44 }}>
@@ -159,7 +176,8 @@ export default function UpgradePage() {
         <div style={{ position: "relative", margin: "8px 0 40px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 16, alignItems: "start" }}>
           {PLANS.map(plan => {
-            const isCurrentPlan = currentPlan === plan.id
+            // « Actuel » n'a de sens que pour un compte : un visiteur n'a pas de plan.
+            const isCurrentPlan = signedIn === true && currentPlan === plan.id
             const price = annual ? plan.price.annual : plan.price.monthly
             const pc = plan.color
 
@@ -183,18 +201,27 @@ export default function UpgradePage() {
                 </div>
 
                 <div style={{ display: "flex", alignItems: "baseline", gap: 4, margin: "18px 0 20px" }}>
-                  <span style={{ color: "var(--ink)", fontSize: 36, fontWeight: 600, letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums" }}>{price === "0" ? "Gratuit" : price + "€"}</span>
+                  <span style={{ color: "var(--ink)", fontSize: 36, fontWeight: 600, letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums" }}>{price === "0" ? "Gratuit" : price + " €"}</span>
                   {price !== "0" && <span style={{ color: MUTED, fontSize: 13 }}>/mois</span>}
                 </div>
 
+                {/* Le total annuel est écrit tel qu'il sera facturé (revue du 9 septembre). */}
                 {annual && price !== "0" && (
-                  <p style={{ color: "var(--success)", fontSize: 12.5, margin: "-14px 0 16px", fontWeight: 600 }}>
-                    Soit {(plan.rawAnnual * 12).toLocaleString("fr-FR", { maximumFractionDigits: 0 })}€/an — économisez {((plan.rawMonthly - plan.rawAnnual) * 12).toLocaleString("fr-FR", { maximumFractionDigits: 0 })}€
+                  <p style={{ color: MUTED, fontSize: 12.5, margin: "-14px 0 16px", fontWeight: 500, lineHeight: 1.5 }}>
+                    <span style={{ color: "var(--ink)", fontWeight: 600 }}>{price} €/mois, facturé {(plan.rawAnnual * 12).toLocaleString("fr-FR", { maximumFractionDigits: 0 })} €/an</span>
+                    {" · "}<span style={{ color: "var(--success)", fontWeight: 600 }}>vous économisez {((plan.rawMonthly - plan.rawAnnual) * 12).toLocaleString("fr-FR", { maximumFractionDigits: 0 })} €</span>
                   </p>
                 )}
 
+                {/* Avantages regroupés par thème, dans un ordre fixe d'une carte à l'autre. */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
-                  {plan.perks.map((perk: { text: string; included: boolean; soon?: boolean }, i: number) => (
+                  {GROUPES_PERKS.map(groupe => {
+                    const perks = plan.perks.filter((p: { groupe: string }) => p.groupe === groupe)
+                    if (perks.length === 0) return null
+                    return (
+                      <div key={groupe} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        <p style={{ color: "var(--faint)", fontSize: 10, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", margin: "6px 0 0" }}>{groupe}</p>
+                        {perks.map((perk: { text: string; included: boolean; soon?: boolean }, i: number) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, opacity: perk.included ? 1 : 0.35 }}>
                       <div style={{ width: 16, height: 16, borderRadius: "50%", background: perk.included ? "color-mix(in srgb, var(--success) 14%, transparent)" : "var(--surface-2)", border: "1px solid " + (perk.included ? "color-mix(in srgb, var(--success) 35%, transparent)" : "rgba(255,255,255,0.08)"), display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         {perk.included ? <Check size={9} color={pc} /> : <span style={{ color: MUTED, fontSize: 8 }}>—</span>}
@@ -204,7 +231,10 @@ export default function UpgradePage() {
                         <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.4, textTransform: "uppercase", color: "var(--accent)", background: "var(--surface-2)", border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)", borderRadius: 6, padding: "1px 6px", whiteSpace: "nowrap" }}>Bientôt</span>
                       )}
                     </div>
-                  ))}
+                        ))}
+                      </div>
+                    )
+                  })}
                 </div>
 
                 {!isCurrentPlan && !plan.ctaDisabled ? (

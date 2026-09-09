@@ -269,7 +269,7 @@ export function TemplatesSection() {
   const { ref, visible } = useInView(0.06)
   return (
     <section id="templates" ref={ref} aria-labelledby="templates-title"
-      style={{ padding: "100px 48px", position: "relative", zIndex: 1 }}>
+      style={{ padding: "72px 48px", position: "relative", zIndex: 1 }}>
       <style>{`
         .tpl-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
         @media(max-width:900px){ .tpl-grid { grid-template-columns:repeat(2,1fr) !important; } }
@@ -282,7 +282,7 @@ export function TemplatesSection() {
         .tpl-grid::-webkit-scrollbar { height:4px; }
         .tpl-grid::-webkit-scrollbar-track { background:rgba(255,255,255,0.04); border-radius:2px; }
         .tpl-grid::-webkit-scrollbar-thumb { background:rgba(201,168,76,0.3); border-radius:2px; }
-        @media(max-width:640px){ #templates { padding:72px 24px !important; } }
+        @media(max-width:640px){ #templates { padding:56px 24px!important; } }
         .tpl-sweep { animation: tpl-sweep 0.9s ease forwards; }
         @keyframes tpl-sweep { to { left: 120%; } }
         @media(prefers-reduced-motion:reduce){ .tpl-sweep { animation: none !important; display:none !important; } }
@@ -346,7 +346,7 @@ export function TemplatesSection() {
             el.style.background = "transparent"
             el.style.borderColor = "rgba(201,168,76,0.25)"
           }}>
-          Voir tous les modèles
+          Choisir un modèle
           <span style={{ fontSize: 16 }}>→</span>
         </a>
       </div>

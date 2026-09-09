@@ -478,7 +478,7 @@ export default function HomeClient() {
       {/* HERO */}
       <section style={{
         minHeight: "100vh", display: "flex", alignItems: "center",
-        padding: "104px 48px 72px", position: "relative", zIndex: 1, overflow: "hidden"
+        padding: "88px 48px 56px", position: "relative", zIndex: 1, overflow: "hidden"
       }}>
         {/* Ambiance cinématographique — halo doré lumineux + profondeur + vignette */}
         <div aria-hidden="true" style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden" }}>
@@ -669,10 +669,10 @@ export default function HomeClient() {
       <FAQSection />
 
       {/* CTA FINAL */}
-      <section className="cta-final-section" style={{ padding:"110px 48px 90px", position:"relative", zIndex:1, overflow:"hidden" }}>
+      <section className="cta-final-section" style={{ padding:"80px 48px 64px", position:"relative", zIndex:1, overflow:"hidden" }}>
         <style>{`
           @keyframes ctaGlow{0%,100%{opacity:0.5}50%{opacity:1}}
-          @media(max-width:640px){ .cta-final-section{padding:80px 20px 70px!important;} }
+          @media(max-width:640px){ .cta-final-section{padding:64px 20px 56px!important;} }
         `}</style>
         {/* Halo cinématographique du CTA final */}
         <div style={{
@@ -822,7 +822,7 @@ export default function HomeClient() {
             {/* /dashboard/* est bloqué aux robots : un lien de pied de page vers
                 l'éditeur envoyait Google dans un cul-de-sac, et un visiteur sans
                 compte sur un écran de connexion. /creer est la même porte, ouverte. */}
-            <Link href="/creer"             className="fl">Créer une page</Link>
+            <Link href="/creer"             className="fl">Composer ma page</Link>
             <Link href="/#analytics"        className="fl">Statistiques</Link>
             <Link href="/#features"         className="fl">QR Codes</Link>
             <Link href="/#pricing"          className="fl">Tarifs</Link>

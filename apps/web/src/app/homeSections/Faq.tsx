@@ -9,7 +9,7 @@ export function FAQSection() {
   const [openIdx, setOpenIdx] = useState<number | null>(null)
   return (
     <section id="faq" ref={ref} aria-labelledby="faq-title"
-      style={{ padding:"100px 48px", position:"relative", zIndex:1 }}>
+      style={{ padding:"72px 48px", position:"relative", zIndex:1 }}>
       <style>{`
         .faq-item{ border-bottom:1px solid rgba(255,255,255,0.06); }
         .faq-item:first-child{ border-top:1px solid rgba(255,255,255,0.06); }
@@ -23,7 +23,7 @@ export function FAQSection() {
           justify-content:center; flex-shrink:0;
           transition:transform 0.3s ease, background 0.2s, border-color 0.2s; }
         .faq-ans{ overflow:hidden; transition:max-height 0.35s var(--mo-ease-emphasized), opacity 0.3s; }
-        @media(max-width:640px){ #faq{ padding:72px 20px !important; } }
+        @media(max-width:640px){ #faq{ padding:56px 20px!important; } }
         @media(prefers-reduced-motion:reduce){ .faq-ans,.faq-icon{ transition:none !important; } }
       `}</style>
       <div style={{ maxWidth:720, margin:"0 auto 56px", textAlign:"center",

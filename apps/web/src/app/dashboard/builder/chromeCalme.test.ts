@@ -25,9 +25,9 @@ describe("chrome de l'éditeur — barre du haut", () => {
     expect(barre).toContain("height: isMobile ? 50 : 56")
     expect(barre).not.toContain("#0D0D0D")
   })
-  it("porte le même lockup QROWG que la coquille, précédé d'une flèche de retour", () => {
+  it("porte le même logo QRowg que la coquille et la vitrine, précédé d'une flèche de retour", () => {
     expect(barre).toContain("<ArrowLeft size={16}")
-    expect(barre).toContain(">QROWG</span>")
+    expect(barre).toContain("<QrowgLogo size={16} />")
     expect(barre).not.toContain("← QRowg")
   })
   it("ses boutons sont plats : surface-2 + contour, l'or reste à Publier", () => {

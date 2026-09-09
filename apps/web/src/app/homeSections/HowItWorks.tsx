@@ -14,7 +14,7 @@ export function HowItWorks() {
   const {ref,visible}=useInView(0.08)
   return(
     <section id="how" ref={ref} aria-labelledby="how-title"
-      style={{padding:"100px 48px",position:"relative",zIndex:1}}>
+      style={{padding:"72px 48px",position:"relative",zIndex:1}}>
       <style>{`
         .hsteps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;position:relative;}
         .hstep{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;}
@@ -33,7 +33,7 @@ export function HowItWorks() {
             gap:20px!important;padding:24px 0!important;border-bottom:1px solid rgba(201,168,76,0.07)!important;
             position:relative!important;z-index:1!important;}
           .hstep:last-child{border-bottom:none!important;}}
-        @media(max-width:640px){#how{padding:72px 24px!important;}}
+        @media(max-width:640px){#how{padding:56px 24px!important;}}
       `}</style>
       <div style={{maxWidth:1140,margin:"0 auto 72px",textAlign:"center",
         opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(24px)",

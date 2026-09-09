@@ -11,6 +11,7 @@ import MobileNav from "@/components/MobileNav"
 import { SessionShellContext } from "./sessionShell"
 import { accessibleOwnerIds } from "@/lib/team"
 import { pageLimit, getPlan, PLANS } from "@/lib/plans"
+import QrowgLogo from "@/components/QrowgLogo"
 
 const DEFAULT_ACCENT = "#D4AF45"
 const MUTED = "var(--muted)"
@@ -376,17 +377,9 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
           CSS (.qf-topbar) et dans les studios immersifs qui ont la leur. */}
       {!immersif && (
         <header className="qf-topbar" style={{ height: 56, flexShrink: 0, display: "flex", alignItems: "center", gap: 18, padding: "0 18px 0 16px", borderBottom: "1px solid var(--line)" }}>
-          <Link href="/dashboard" aria-label="QROWG — tableau de bord" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-            <span style={{ display: "inline-flex", width: 28, height: 28, borderRadius: 8 }}>
-              <svg viewBox="0 0 32 32" width="28" height="28" style={{ flex: "none" }} aria-hidden="true">
-                <rect x=".9" y=".9" width="30.2" height="30.2" rx="9" fill="none" stroke="rgba(212,175,69,.35)" strokeWidth="1.4" />
-                <rect x="7" y="7" width="7" height="7" rx="2" fill="none" stroke="var(--gold)" strokeWidth="1.5" /><rect x="10" y="10" width="1.9" height="1.9" fill="var(--gold)" />
-                <rect x="18" y="7" width="7" height="7" rx="2" fill="none" stroke="rgba(244,241,232,.55)" strokeWidth="1.5" /><rect x="21" y="10" width="1.9" height="1.9" fill="rgba(244,241,232,.55)" />
-                <rect x="7" y="18" width="7" height="7" rx="2" fill="none" stroke="rgba(244,241,232,.55)" strokeWidth="1.5" /><rect x="10" y="21" width="1.9" height="1.9" fill="rgba(244,241,232,.55)" />
-                <rect x="19.5" y="19.5" width="2.6" height="2.6" fill="var(--gold)" /><rect x="23.4" y="23.4" width="2.6" height="2.6" fill="rgba(244,241,232,.3)" />
-              </svg>
-            </span>
-            <span style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 15, fontWeight: 700, letterSpacing: ".16em", color: "var(--ink)" }}>QROWG</span>
+          {/* Un seul logo, le même que la vitrine (revue du 9 septembre). */}
+          <Link href="/dashboard" aria-label="QRowg — tableau de bord" style={{ textDecoration: "none", display: "flex", alignItems: "center", flexShrink: 0 }}>
+            <QrowgLogo size={18} />
           </Link>
 
           {/* Fil : Module › Écran */}

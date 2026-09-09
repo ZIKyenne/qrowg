@@ -53,7 +53,7 @@ describe("la barre latérale repliée garde ses noms", () => {
     expect(shell).not.toContain("aria-label={collapsed ? label : undefined}")
   })
   it("les liens sans texte de la barre du haut sont nommés", () => {
-    for (const l of ['"Voir les offres"', '"Mon profil"', '"QROWG — tableau de bord"']) expect(shell).toContain(`aria-label=${l}`)
+    for (const l of ['"Voir les offres"', '"Mon profil"', '"QRowg — tableau de bord"']) expect(shell).toContain(`aria-label=${l}`)
     expect(shell).toContain("Créer mon compte")
   })
 })
