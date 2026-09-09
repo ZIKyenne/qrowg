@@ -23,13 +23,13 @@ Chaque ligne est copiable telle quelle dans Claude Code. Notation : `[ ]` à fai
 - [x] v49 · Une seule source de vérité des noms/badges/droits : `lib/plans.ts` ; aucun libellé de plan écrit en dur ailleurs (test `nomsDesPlans.test.ts`).
 - [ ] v53 · Navigation publique pour un visiteur anonyme (pas « Retour au dashboard ») ; total annuel affiché (« 12,42 €/mois, facturé 149 €/an ») ; listes regroupées par thème ; capitalisation uniforme.
 
-### QR Studio (`app/dashboard/qr-codes/QRStudio.tsx`)
-- [ ] v51 · Interface tenue en `100dvh` : aperçu du QR, statut et action principale toujours visibles ; PNG/SVG dans une barre d'action fixe.
-- [ ] v51 · Réglages en Style · Forme · Couleurs · Logo · Avancé (correction d'erreur dans Avancé) — mêmes réglages, mieux rangés.
-- [ ] v51 · Un seul diagnostic lisible (« Excellente lisibilité », « Contraste insuffisant »…).
-- [ ] v51 · Statique / Dynamique distingués dès le départ (téléchargement immédiat vs modifiable + scans).
-- [ ] v51 · SMS : proposé par le générateur public, absent de l'app → même liste de types partout (`lib/typesQr` unique).
-- [ ] Validation : aperçu + contrôles essentiels + téléchargement sans défilement à 1440×900, 1536×864, 1920×1080.
+### QR Studio — le générateur public (`app/generateur-qr-code/GeneratorClient.tsx`) et son jumeau « QR vers un lien » (`app/dashboard/qr-link/page.tsx`)
+- [x] v51 · Interface tenue en `100dvh` : aperçu du QR, statut et action principale toujours visibles ; PNG/SVG dans une barre d'action fixe.
+- [x] v51 · Réglages en Style · Couleurs · Logo · Avancé (correction d'erreur dans Avancé) — mêmes réglages, mieux rangés. « Forme » n'est pas une section à part : la forme des modules EST le réglage « Style », et aucun réglage n'est ajouté.
+- [x] v51 · Un seul diagnostic lisible (« Excellente lisibilité », « Contraste insuffisant »…).
+- [x] v51 · Statique / Dynamique distingués dès le départ (téléchargement immédiat vs modifiable + scans).
+- [x] v51 · SMS : proposé par le générateur public, absent de l'app → même liste de types partout (`lib/typesQr` unique).
+- [x] Validation : aperçu + contrôles essentiels + téléchargement sans défilement à 1440×900, 1536×864, 1920×1080 (mesuré : barre PNG/SVG à 616 px du haut ; 1280×800 aussi).
 
 ### Fonctionnalités (`app/features/page.tsx`)
 - [x] v50 · Visuel « QR dynamique » : rendu de secours fiable (SVG statique) si le QR généré côté client ne se charge pas ; tout visuel QR du site dispose d'un secours.
@@ -64,7 +64,7 @@ Chaque ligne est copiable telle quelle dans Claude Code. Notation : `[ ]` à fai
 - [x] v36 · Contrastes des gris et de l'or mesurés (`tokensInterface.test.ts`).
 - [~] v36–v48 · Rayons, bordures, ombres, hauteurs de boutons uniformisés (jetons + couche « Calme »).
 - [ ] v53 · Focus clavier visible partout (`:focus-visible` global) ; ordre de tabulation vérifié.
-- [ ] v51 · Un aperçu vide n'occupe pas la place d'un QR généré.
+- [x] v51 · Un aperçu vide n'occupe pas la place d'un QR généré.
 - [x] v46–v48 · Animations fortes réservées aux moments importants (doctrineCalme.test.ts).
 
 ## Critères de fin de chantier

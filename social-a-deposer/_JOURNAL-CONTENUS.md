@@ -613,3 +613,26 @@ listés dans le tableau plus haut sont à supprimer à la main dans l'appli.
 d'approbation. Plus aucun post rouge ne peut être requeué par erreur.
 La règle bloquante « INSTAGRAM — NE JAMAIS PUBLIER DEUX FOIS » s'applique à partir
 de maintenant, à chaque run, avant toute mise en file.
+
+### Doublon Instagram intercepté — 09/09, 14 h 42
+
+Un post Instagram a été créé dans Buffer le 09/09 à 14 h 42 (`via: buffer`, auteur
+qrowg.com), programmé le **10/09 à 08 h 19**. Il ne vient pas du run marketing du matin.
+
+Contenu : les images du **08/09** (`social/2026-09-08/qr-code-commande-midi-vingt-minutes-*`)
+et l'angle « 45 minutes de pause, 20 d'attente » — c'est-à-dire une **republication du
+carrousel déjà en ligne** sous `/p/DdB95BkloaZ/`. **Supprimé** sur accord d'Emilien.
+
+**Ce que ça confirme :** le doublon ne vient pas seulement d'un run automatique. Il peut
+naître d'une reprise manuelle ou d'un rattrapage lancé après coup, sur des images d'un
+jour précédent. D'où l'ajout au contrôle obligatoire :
+
+6. **Vérifier le chemin des images de tout post Instagram programmé.** Si le `source` de
+   l'asset pointe vers `social/<date>/` avec une **date antérieure au jour du run**, c'est
+   une republication : chercher le `sent` correspondant avant de laisser partir le post.
+7. **Contrôler la file au-delà du jour courant.** Un doublon peut être programmé pour
+   demain et passer inaperçu si on ne regarde que les créneaux du jour.
+
+Le second dépôt du 09/09 (relancé par Emilien) était **identique au premier** : même
+dossier, mêmes fichiers, `x-upsert` écrase en place, mêmes URLs. **Aucune remise en file
+n'a été faite** — c'était le bon réflexe, rejouer `create_post` aurait créé six doublons.

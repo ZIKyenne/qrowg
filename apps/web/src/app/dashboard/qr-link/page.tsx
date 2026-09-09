@@ -1,6 +1,6 @@
 "use client"
 
-// « Créer un QR » — Lien / Wifi / Texte / Contact / Appel / Email.
+// « Créer un QR » — Lien / Wi-Fi / Texte / Contact / Appel / Email / SMS (mêmes types que le générateur public).
 // Rendu 100% local (qr-code-styling via qrRender), sans API. Deux sorties :
 //  · TÉLÉCHARGEMENT PNG/SVG : fichier, contenu encodé directement, rien à gérer.
 //  · COMPTE : QR MODIFIABLE après impression (lien/texte/appel/email → redirigé
@@ -14,7 +14,7 @@
 import { PageHeader } from "@/components/ui/PageHeader"
 import { useCallback, useMemo, useRef, useState, useEffect } from "react"
 import Link from "next/link"
-import { ArrowLeft, Download, Check, QrCode as QrIcon, ShieldCheck, AlertTriangle, Upload, X, Link2, Wifi, Type, Contact, Phone, Mail, Save, Trash2, ChevronDown, Zap, BarChart3, Clock, Calendar, TrendingUp, Activity, Pencil, Lock, Pause, Play } from "lucide-react"
+import { ArrowLeft, Download, Check, QrCode as QrIcon, ShieldCheck, AlertTriangle, Upload, X, Link2, Wifi, Type, Contact, Phone, Mail, Save, Trash2, ChevronDown, Zap, BarChart3, Clock, Calendar, TrendingUp, Activity, Pencil, Lock, Pause, Play, MessageSquare } from "lucide-react"
 import { countryFlag, DEVICE_LABEL } from "@/lib/scanStats"
 import { canDynSecurite, canDynMasse } from "@/lib/plans"
 import { etatQuota } from "./quotaQr"
@@ -22,7 +22,7 @@ import { parseBulkCsv } from "@/lib/bulkCsv"
 import QRCanvas from "../qr-codes/QRCanvas"
 import QrWatermark from "@/components/QrWatermark"
 import { getQRBlob, type QROptions, type QRStyleConfig } from "../qr-codes/qrRender"
-import { normalizeUrl, buildWifi, buildVCard, buildTel, buildEmail, type VCardFields } from "./qrLinkUtils"
+import { normalizeUrl, buildWifi, buildVCard, buildTel, buildEmail, buildSms, type VCardFields } from "./qrLinkUtils"
 import { rapportContraste, estInverse, CONTRASTE_INSUFFISANT } from "@/lib/contrasteQr"
 import { STYLES_QR, formeQr, ENCRES_QR, FONDS_QR, NIVEAUX_ECC, typesQr, presetQr, nommerCouleur, estTypeDynamique, libelleTypeQr, STYLE_QR_DEFAUT, ENCRE_QR_DEFAUT, FOND_QR_DEFAUT, ECC_DEFAUT, type TypeQr, type NiveauEcc } from "@/lib/stylesQr"
 import PostCheckoutBanner from "@/components/PostCheckoutBanner"
@@ -41,11 +41,13 @@ const MUTED = "var(--muted)"
 // @/lib/stylesQr : cet écran et le générateur public fabriquent le même objet et
 // ne doivent plus pouvoir en donner deux descriptions différentes. Ne restent ici
 // que l'icône et l'ordre des types offerts SUR CET ÉCRAN.
-const ICONES: Partial<Record<TypeQr, any>> = { link: Link2, wifi: Wifi, text: Type, contact: Contact, phone: Phone, email: Mail }
-const TYPES = typesQr(["link", "wifi", "text", "contact", "phone", "email"])
+// Revue du 9 septembre : mêmes types que le générateur public — le SMS manquait ici.
+const ICONES: Partial<Record<TypeQr, any>> = { link: Link2, wifi: Wifi, text: Type, contact: Contact, phone: Phone, email: Mail, sms: MessageSquare }
+const TYPES = typesQr(["link", "wifi", "text", "contact", "phone", "email", "sms"])
 
 type WifiEnc = "WPA" | "WEP" | "nopass"
 type EmailFields = { to?: string; subject?: string; body?: string }
+type SmsFields = { to?: string; body?: string }
 
 const EMPTY_VC: VCardFields = { firstName: "", lastName: "", phone: "", email: "", org: "", title: "", url: "" }
 const EMPTY_EM: EmailFields = { to: "", subject: "", body: "" }
@@ -67,7 +69,7 @@ type Demande =
 // Champs qui determinent la charge utile du QR (partages entre l'etat live et l'historique).
 type QrSource = {
   type: TypeQr; url: string; ssid: string; wifiPass: string; wifiEnc: WifiEnc; text: string
-  vc: VCardFields; phone: string; em: EmailFields
+  vc: VCardFields; phone: string; em: EmailFields; sms?: SmsFields
 }
 type QrHistEntry = QrSource & {
   fg: string; bg: string; ecc: NiveauEcc; styleKey: string
@@ -80,6 +82,7 @@ function payload(s: QrSource): string {
   if (s.type === "contact") return buildVCard(s.vc)
   if (s.type === "phone") return buildTel(s.phone)
   if (s.type === "email") return buildEmail(s.em.to ?? "", s.em.subject, s.em.body)
+  if (s.type === "sms") return buildSms(s.sms?.to ?? "", s.sms?.body)
   return normalizeUrl(s.url)
 }
 
@@ -93,6 +96,7 @@ export default function QrLinkPage() {
   const [vc, setVc] = useState<VCardFields>(EMPTY_VC)
   const [phone, setPhone] = useState("")
   const [em, setEm] = useState<EmailFields>(EMPTY_EM)
+  const [sms, setSms] = useState<SmsFields>({ to: "", body: "" })
   const [fg, setFg] = useState<string>(ENCRE_QR_DEFAUT)
   const [bg, setBg] = useState<string>(FOND_QR_DEFAUT)
   const [ecc, setEcc] = useState<NiveauEcc>(ECC_DEFAUT)
@@ -140,7 +144,7 @@ export default function QrLinkPage() {
   }
   useEffect(() => () => { if (minuteurMsg.current) clearTimeout(minuteurMsg.current) }, [])
 
-  const data = useMemo(() => payload({ type: qrType, url, ssid, wifiPass, wifiEnc, text, vc, phone, em }), [qrType, url, ssid, wifiPass, wifiEnc, text, vc, phone, em])
+  const data = useMemo(() => payload({ type: qrType, url, ssid, wifiPass, wifiEnc, text, vc, phone, em, sms }), [qrType, url, ssid, wifiPass, wifiEnc, text, vc, phone, em, sms])
   const ready = data.length > 0
   const ratio = rapportContraste(fg, bg) ?? 0
   const inverted = estInverse(fg, bg)
@@ -180,14 +184,14 @@ export default function QrLinkPage() {
     // Le mot de passe Wifi était écrit en clair dans localStorage à chaque
     // téléchargement — alors que le même fichier refuse explicitement de l'envoyer
     // au serveur. Le brouillon garde tout sauf lui ; on le retape, c'est tout.
-    const entry: QrHistEntry = { type: qrType, url: url.trim(), ssid, wifiPass: "", wifiEnc, text: text.trim(), vc, phone, em, fg, bg, ecc, styleKey }
+    const entry: QrHistEntry = { type: qrType, url: url.trim(), ssid, wifiPass: "", wifiEnc, text: text.trim(), vc, phone, em, sms, fg, bg, ecc, styleKey }
     const next = [entry, ...prev.filter(e => payload(e) !== data)].slice(0, 8)
     try { localStorage.setItem("qrfolio_qr_history", JSON.stringify(next)) } catch {}
     return next
   })
   const loadEntry = (h: QrHistEntry) => {
     setQrType(h.type); setUrl(h.url); setSsid(h.ssid); setWifiPass(h.wifiPass); setWifiEnc(h.wifiEnc); setText(h.text)
-    setVc({ ...EMPTY_VC, ...(h.vc || {}) }); setPhone(h.phone || ""); setEm({ ...EMPTY_EM, ...(h.em || {}) })
+    setVc({ ...EMPTY_VC, ...(h.vc || {}) }); setPhone(h.phone || ""); setEm({ ...EMPTY_EM, ...(h.em || {}) }); setSms({ to: "", body: "", ...(h.sms || {}) })
     setFg(h.fg); setBg(h.bg); setEcc(h.ecc); setStyleKey(h.styleKey); setLogo(null)
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" })
   }
@@ -198,6 +202,7 @@ export default function QrLinkPage() {
     : h.type === "contact" ? `👤 ${vcName(h.vc || {})}`
     : h.type === "phone" ? `📞 ${h.phone}`
     : h.type === "email" ? `✉️ ${h.em?.to || ""}`
+    : h.type === "sms" ? `💬 ${h.sms?.to || ""}`
     : normalizeUrl(h.url).replace(/^https?:\/\//, "")
 
   const preset = presetQr(styleKey)
@@ -225,7 +230,7 @@ export default function QrLinkPage() {
       // le MÊME design (PNG puis SVG) ne reconsomme rien (mémo dlSig).
       const sig = `${qrType}|${data}`
       if (dlSig !== sig) {
-        const inputs = { type: qrType, url, ssid, wifiEnc, text, vc, phone, em }
+        const inputs = { type: qrType, url, ssid, wifiEnc, text, vc, phone, em, sms }
         const res = await fetch("/api/qr-instant", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ kind: qrType, label: previewLabel || null, payload: data, inputs, style: { fg, bg, ecc: effectiveEcc, styleKey } }),
@@ -257,7 +262,7 @@ export default function QrLinkPage() {
     try {
       // On ne stocke pas le mot de passe Wifi en clair dans `inputs` (il figure de
       // toute façon dans `payload`, inhérent au QR Wifi, protégé par la RLS proprio).
-      const inputs = { type: qrType, url, ssid, wifiEnc, text, vc, phone, em }
+      const inputs = { type: qrType, url, ssid, wifiEnc, text, vc, phone, em, sms }
       const res = await fetch("/api/qr-instant", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ kind: qrType, label: previewLabel || null, payload: data, inputs, style: { fg, bg, ecc: effectiveEcc, styleKey } }),
@@ -281,7 +286,7 @@ export default function QrLinkPage() {
     if (dynBlocked) { annoncer(quota.raisonModifiable ?? "Limite atteinte sur votre plan.", false, 4500); return }
     setSaveBusy(true); setSaveMsg(null)
     try {
-      const inputs = { type: qrType, url, ssid, wifiEnc, text, vc, phone, em }
+      const inputs = { type: qrType, url, ssid, wifiEnc, text, vc, phone, em, sms }
       const res = await fetch("/api/qr-instant", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ kind: qrType, dynamic: true, payload: data, dest: qrType === "link" ? url : data, label: previewLabel || null, inputs, style: { fg, bg, ecc: effectiveEcc, styleKey } }),
@@ -396,6 +401,7 @@ export default function QrLinkPage() {
     : qrType === "contact" ? (vcName(vc) ? `👤 ${vcName(vc)}` : "")
     : qrType === "phone" ? (phone.trim() ? `📞 ${phone.trim()}` : "")
     : qrType === "email" ? (em.to?.trim() ? `✉️ ${em.to.trim()}` : "")
+    : qrType === "sms" ? (sms.to?.trim() ? `💬 ${sms.to.trim()}` : "")
     : normalizeUrl(url).replace(/^https?:\/\//, "")
 
   // Boutons de téléchargement PNG/SVG (fichier statique). `primary` = mis en avant.
@@ -433,7 +439,7 @@ export default function QrLinkPage() {
         <div className="qrdyn-main">
 
       {/* 1 · Type de QR */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(96px, 1fr))", gap: 8, marginBottom: 14 }}>
         {TYPES.map(t => {
           const on = qrType === t.k
           const Icon = ICONES[t.k]
@@ -507,6 +513,15 @@ export default function QrLinkPage() {
           <textarea value={em.body} onChange={e => setEm(v => ({ ...v, body: e.target.value }))} rows={2} placeholder="Message pré-rempli (optionnel)"
             style={{ width: "100%", boxSizing: "border-box", resize: "vertical", minHeight: 60, background: "var(--field)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "var(--ink)", fontSize: 15, padding: "12px 14px", lineHeight: 1.45, fontFamily: "inherit", outline: "none" }} />
           <p style={{ color: MUTED, fontSize: 11, margin: "9px 2px 0", lineHeight: 1.45 }}>Scanné, ce QR ouvre un brouillon d&apos;email pré-rempli vers cette adresse.</p>
+        </>)}
+
+        {qrType === "sms" && (<>
+          <p style={secTitle}>{accentBar} SMS à envoyer</p>
+          <input value={sms.to} onChange={e => setSms(v => ({ ...v, to: e.target.value }))} inputMode="tel" autoComplete="tel" type="tel" aria-label="Numéro du destinataire SMS"
+            placeholder="ex : +33 6 12 34 56 78" style={{ ...field, marginBottom: 10, borderColor: (sms.to ?? "").trim() ? G + "80" : "rgba(255,255,255,0.14)" }} />
+          <textarea value={sms.body} onChange={e => setSms(v => ({ ...v, body: e.target.value }))} rows={2} placeholder="Message pré-rempli (optionnel)" aria-label="Message du SMS"
+            style={{ width: "100%", boxSizing: "border-box", resize: "vertical", minHeight: 60, background: "var(--field)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "var(--ink)", fontSize: 15, padding: "12px 14px", lineHeight: 1.45, fontFamily: "inherit", outline: "none" }} />
+          <p style={{ color: MUTED, fontSize: 11, margin: "9px 2px 0", lineHeight: 1.45 }}>Scanné, ce QR ouvre un SMS pré-rempli vers ce numéro. Fonctionne hors ligne.</p>
         </>)}
       </div>
 
@@ -597,7 +612,7 @@ export default function QrLinkPage() {
                 pouvait l'imprimer en croyant que c'était le sien. */}
             {ready
               ? <QRCanvas value={previewBlocked ? "https://qrowg.com" : data} size={210} fg={fg} bg={bg} style={qrStyle} ecc={effectiveEcc} />
-              : <div aria-hidden style={{ width: 210, height: 210, borderRadius: 8, background: "rgba(127,127,127,0.09)", border: "1px dashed rgba(127,127,127,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}><QrIcon size={40} color="rgba(127,127,127,0.45)" /></div>}
+              : <div aria-hidden style={{ width: 140, height: 140, borderRadius: 12, background: "rgba(127,127,127,0.09)", border: "1px dashed rgba(127,127,127,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}><QrIcon size={36} color="rgba(127,127,127,0.45)" /></div>}
             {ready && (previewBlocked
               ? <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, background: "rgba(8,8,8,0.82)", backdropFilter: "blur(3px)", WebkitBackdropFilter: "blur(3px)", color: "var(--ink)", textAlign: "center", padding: 10 }}><Lock size={22} color={G} /><span style={{ fontSize: 11.5, fontWeight: 700, lineHeight: 1.3 }}>Limite atteinte</span></div>
               : <QrWatermark />)}
@@ -608,11 +623,11 @@ export default function QrLinkPage() {
         </div>
 
         {!ready
-          ? <p style={{ color: MUTED, fontSize: 12.5, margin: 0, textAlign: "center" }}>{qrType === "wifi" ? "Entrez le nom du réseau pour générer le QR." : qrType === "contact" ? "Entrez au moins un nom pour générer la carte." : qrType === "phone" ? "Entrez un numéro pour générer le QR." : qrType === "email" ? "Entrez une adresse email pour générer le QR." : "Renseignez le contenu ci-dessus pour générer votre QR code."}</p>
+          ? <p style={{ color: MUTED, fontSize: 12.5, margin: 0, textAlign: "center" }}>{qrType === "wifi" ? "Entrez le nom du réseau pour générer le QR." : qrType === "contact" ? "Entrez au moins un nom pour générer la carte." : qrType === "phone" ? "Entrez un numéro pour générer le QR." : qrType === "email" ? "Entrez une adresse email pour générer le QR." : qrType === "sms" ? "Entrez un numéro pour générer le QR." : "Renseignez le contenu ci-dessus pour générer votre QR code."}</p>
           : ratio < 3
             ? <button onClick={() => { setFg("#080808"); setBg("#FFFFFF") }} title="Rétablir noir sur blanc"
                 style={{ display: "flex", alignItems: "center", gap: 7, color: "var(--danger)", fontSize: 12, fontWeight: 600, background: "rgba(255,107,107,0.1)", border: "1px solid rgba(255,107,107,0.3)", borderRadius: 999, padding: "6px 14px", cursor: "pointer" }}>
-                <AlertTriangle size={14} /> Risque de non-scan — <span style={{ textDecoration: "underline" }}>corriger</span>
+                <AlertTriangle size={14} /> Contraste insuffisant — <span style={{ textDecoration: "underline" }}>corriger</span>
               </button>
             : inverted
               ? <button onClick={() => { const f = fg; setFg(bg); setBg(f) }} title="Inverser les couleurs (modules sombres sur fond clair)"
@@ -624,7 +639,7 @@ export default function QrLinkPage() {
                   <AlertTriangle size={14} /> Contraste limite — testez avant d&apos;imprimer
                 </div>
               : <div style={{ display: "flex", alignItems: "center", gap: 7, color: "var(--success)", fontSize: 12, fontWeight: 600, background: "rgba(57,255,143,0.09)", border: "1px solid rgba(57,255,143,0.28)", borderRadius: 999, padding: "6px 14px" }}>
-                  <ShieldCheck size={14} /> Scannable
+                  <ShieldCheck size={14} /> Excellente lisibilité
                 </div>}
       </div>
 
@@ -665,7 +680,7 @@ export default function QrLinkPage() {
             {saveBusy ? spin() : <Save size={16} />}<span>Enregistrer ce QR</span>
           </button>
           <p style={{ color: "#6E685E", fontSize: 11, margin: "8px 2px 0", lineHeight: 1.45 }}>
-            QR statique — fonctionne hors ligne, sans expiration ({qrType === "wifi" ? "auto-connexion Wi-Fi" : "ajout du contact"} au scan).
+            QR statique — fonctionne hors ligne, sans expiration ({qrType === "wifi" ? "auto-connexion Wi-Fi" : qrType === "sms" ? "SMS pré-rempli" : "ajout du contact"} au scan).
           </p>
         </>)}
         {saveMsg && <p style={{ color: saveMsg.ok ? "var(--success)" : "#FBBF24", fontSize: 12.5, textAlign: "center", margin: "11px 0 0" }}>{saveMsg.text}</p>}
