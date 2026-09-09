@@ -538,14 +538,14 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
 
       {/* Sheet "Créer" (bouton central de la barre mobile) */}
       {isMobile && !hideMobileNav && createOpen && (
-        <div onClick={() => setCreateOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(3px)", display: "flex", alignItems: "flex-end" }}>
-          <div role="dialog" aria-modal="true" aria-label="Créer" onClick={e => e.stopPropagation()} style={{ width: "100%", background: "var(--surface)", borderTopLeftRadius: 22, borderTopRightRadius: 22, border: `1px solid color-mix(in srgb, ${G} 16%, transparent)`, borderBottom: "none", padding: "10px 14px calc(16px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)", animation: "sheetUp .24s var(--mo-ease-standard)" }}>
-            <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 12px" }} />
-            <p style={{ margin: "0 4px 10px", color: "var(--ink)", fontSize: 15, fontWeight: 800 }}>Créer</p>
+        <div onClick={() => setCreateOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "flex-end" }}>
+          <div role="dialog" aria-modal="true" aria-label="Créer" onClick={e => e.stopPropagation()} style={{ width: "100%", background: "var(--surface)", borderTopLeftRadius: 18, borderTopRightRadius: 18, border: "1px solid var(--line-strong)", borderBottom: "none", padding: "10px 14px calc(16px + env(safe-area-inset-bottom))", animation: "sheetUp .2s var(--mo-ease-standard)" }}>
+            <div style={{ width: 40, height: 4, borderRadius: 4, background: "var(--line-strong)", margin: "0 auto 12px" }} />
+            <p style={{ margin: "0 4px 10px", color: "var(--ink)", fontSize: 15, fontWeight: 600 }}>Créer</p>
             {(guest ? GUEST_CREATE_ACTIONS : CREATE_ACTIONS).map(({ href, icon: Icon, label, sub }, i) => (
               <Link key={i} href={href} onClick={() => setCreateOpen(false)}
-                style={{ display: "flex", alignItems: "center", gap: 14, padding: "13px 10px", textDecoration: "none", borderTop: i ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-                <span style={{ width: 42, height: 42, flexShrink: 0, borderRadius: 12, background: `color-mix(in srgb, ${G} 14%, transparent)`, border: `1px solid color-mix(in srgb, ${G} 28%, transparent)`, display: "flex", alignItems: "center", justifyContent: "center", color: G }}><Icon size={20} /></span>
+                style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 10px", textDecoration: "none", borderTop: i ? "1px solid var(--line)" : "none" }}>
+                <span style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 10, background: "var(--surface-2)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", color: G }}><Icon size={19} /></span>
                 {/* `minWidth: 0` : sans lui, un libellé long pousse le chevron
                     hors de l'écran au lieu de se replier. */}
                 <span style={{ display: "flex", flexDirection: "column", gap: 2, flex: 1, minWidth: 0 }}>
