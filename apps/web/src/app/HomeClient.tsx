@@ -7,165 +7,13 @@ import dynamic from "next/dynamic"
 import { PLAN_LIST, PLAN_COMPARISON, PLANS as PLANS_DEF, fmtPrice } from "@/lib/plans"
 import { useIsMobile } from "@/lib/useIsMobile"
 import QrowgLogo from "@/components/QrowgLogo"
-import IntroOverlay from "@/components/IntroOverlay"
 import { serializeJsonLd } from "@/lib/jsonLd"
 import { landingJsonLd } from "@/lib/landingJsonLd"
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-// ── Particle background ───────────────────────────────────────────────────────
-function Particles() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
-    const canvas = canvasRef.current!
-    if (!canvas) return
-    const ctx = canvas.getContext("2d", { alpha: true })!
-
-    // ── Zones de contenu (colonnes centrales) ───────────────────────────────
-    // Le contenu est centré dans max-width:1140px avec padding:0 48px
-    // On recalcule dynamiquement les zones où les particules doivent s'atténuer
-    let W = canvas.width  = window.innerWidth
-    let H = canvas.height = window.innerHeight
-
-    const getContentZone = () => {
-      const contentW = Math.min(1140, W - 96)
-      const cx = W / 2
-      return {
-        x1: cx - contentW / 2,
-        x2: cx + contentW / 2,
-      }
-    }
-
-    const isMobile = W < 768
-    const COUNT    = isMobile ? 22 : 38
-
-    // ── 3 couches de profondeur ───────────────────────────────────────────────
-    // Layer = 0 (lointain), 1 (intermédiaire), 2 (proche)
-    const pts = Array.from({ length: COUNT }, (_, idx) => {
-      const layer = idx < COUNT * 0.4 ? 0 : idx < COUNT * 0.75 ? 1 : 2
-      return {
-        x:     Math.random() * W,
-        y:     Math.random() * H,
-        layer,
-        // Rayon selon profondeur : lointain petit, proche plus grand
-        r:     layer === 0 ? Math.random() * 0.8 + 0.3
-             : layer === 1 ? Math.random() * 1.2 + 0.6
-             :                Math.random() * 1.6 + 0.9,
-        // Vitesse selon profondeur (parallaxe)
-        dx:    (Math.random() - 0.5) * (layer === 0 ? 0.12 : layer === 1 ? 0.22 : 0.32),
-        dy:    (Math.random() - 0.5) * (layer === 0 ? 0.12 : layer === 1 ? 0.22 : 0.32),
-        // Opacité max selon profondeur : lointain très discret
-        oMax:  layer === 0 ? 0.20 : layer === 1 ? 0.38 : 0.55,
-        phase: Math.random() * Math.PI * 2,
-        speed: Math.random() * 0.012 + 0.005,
-        // Rayon glow selon profondeur
-        glowR: layer === 0 ? Math.random() * 6 + 3
-             : layer === 1 ? Math.random() * 10 + 5
-             :                Math.random() * 14 + 7,
-      }
-    })
-
-    let raf = 0
-    let paused = false
-    let t = 0
-
-    const onVisibility = () => { paused = document.hidden }
-    document.addEventListener("visibilitychange", onVisibility)
-
-    function draw() {
-      t += 0.016
-      if (paused) { raf = requestAnimationFrame(draw); return }
-
-      ctx.clearRect(0, 0, W, H)
-      const zone = getContentZone()
-
-      // Dessiner les couches de l'arrière vers l'avant
-      for (let layer = 0; layer <= 2; layer++) {
-        for (const p of pts) {
-          if (p.layer !== layer) continue
-
-          const pulse      = (Math.sin(t * p.speed * 60 + p.phase) + 1) / 2 // 0..1
-          const glowRadius = p.glowR * (0.45 + pulse * 0.55)
-          let   alpha      = p.oMax * (0.5 + pulse * 0.5)
-
-          // ── Protection de lisibilité : atténuer dans la zone contenu ──────
-          // La zone contenu est entre zone.x1 et zone.x2
-          // Plus la particule est proche du centre, plus elle s'atténue
-          const inContentH = p.x > zone.x1 && p.x < zone.x2
-          if (inContentH) {
-            // Atténuation progressive : pleine au bord, max -80% au centre
-            const relX   = (p.x - zone.x1) / (zone.x2 - zone.x1) // 0..1
-            const dist   = Math.abs(relX - 0.5) * 2               // 0..1 (0=centre, 1=bord)
-            const fade   = 0.12 + dist * 0.28                     // 0.12 bord centre, 0.40 bords
-            alpha        = alpha * fade
-          }
-
-          if (alpha < 0.005) {
-            p.x += p.dx; p.y += p.dy
-            if (p.x < -glowRadius)    p.x = W + glowRadius
-            if (p.x > W + glowRadius) p.x = -glowRadius
-            if (p.y < -glowRadius)    p.y = H + glowRadius
-            if (p.y > H + glowRadius) p.y = -glowRadius
-            continue
-          }
-
-          // ── Halo diffus (très subtil dans la zone contenu) ─────────────────
-          const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowRadius)
-          grad.addColorStop(0,    `rgba(201,168,76,${(alpha * 0.6).toFixed(3)})`)
-          grad.addColorStop(0.4,  `rgba(201,168,76,${(alpha * 0.18).toFixed(3)})`)
-          grad.addColorStop(0.75, `rgba(201,168,76,${(alpha * 0.04).toFixed(3)})`)
-          grad.addColorStop(1,    "rgba(201,168,76,0)")
-          ctx.beginPath()
-          ctx.arc(p.x, p.y, glowRadius, 0, Math.PI * 2)
-          ctx.fillStyle = grad
-          ctx.fill()
-
-          // ── Point central ──────────────────────────────────────────────────
-          const coreR = p.r * (0.75 + pulse * 0.25)
-          ctx.beginPath()
-          ctx.arc(p.x, p.y, coreR, 0, Math.PI * 2)
-          ctx.fillStyle = `rgba(245,210,110,${(alpha * 0.9).toFixed(3)})`
-          ctx.fill()
-
-          // Mouvement
-          p.x += p.dx; p.y += p.dy
-          if (p.x < -glowRadius)    p.x = W + glowRadius
-          if (p.x > W + glowRadius) p.x = -glowRadius
-          if (p.y < -glowRadius)    p.y = H + glowRadius
-          if (p.y > H + glowRadius) p.y = -glowRadius
-        }
-      }
-      raf = requestAnimationFrame(draw)
-    }
-    draw()
-
-    let resizeTimer = 0
-    const onResize = () => {
-      clearTimeout(resizeTimer)
-      resizeTimer = window.setTimeout(() => {
-        W = canvas.width  = window.innerWidth
-        H = canvas.height = window.innerHeight
-      }, 200) as unknown as number
-    }
-    window.addEventListener("resize", onResize, { passive: true })
-
-    return () => {
-      cancelAnimationFrame(raf)
-      clearTimeout(resizeTimer)
-      window.removeEventListener("resize", onResize)
-      document.removeEventListener("visibilitychange", onVisibility)
-    }
-  }, [])
-
-  return <canvas ref={canvasRef} style={{
-    position: "fixed", inset: 0, pointerEvents: "none",
-    zIndex: 0, opacity: 1,
-    transform: "translateZ(0)",
-    willChange: "transform",
-  }} />
-}
+// ── Fond ─────────────────────────────────────────────────────────────────────
+// 9 septembre : plus de particules — le fond est un aplat --bg (voir globals.css).
 
 // ── Animated QR mockup ────────────────────────────────────────────────────────
 function QRMockup() {
@@ -206,7 +54,7 @@ function QRMockup() {
           transform: `rotate(${c.rot}deg)`, filter: "blur(0.4px)",
           animation: inView ? "revealUp 0.8s ease 0.4s both" : "none",
         }}>
-          <div style={{ animation: `floatCard ${c.dur}s ease-in-out ${c.delay}s infinite`, willChange: "transform" }}>
+          <div style={{  }}>
             <div style={{
               display: "flex", alignItems: "center", gap: 9,
               padding: "10px 14px", borderRadius: 14,
@@ -272,7 +120,7 @@ function QRMockup() {
         <div style={{
           position: "absolute", inset: 0,
           background: "linear-gradient(135deg, transparent 30%, rgba(201,168,76,0.04) 50%, transparent 70%)",
-          animation: "heroShimmer 3s infinite"
+          
         }} />
         {/* Corner accent top-left */}
         <div style={{
@@ -301,7 +149,7 @@ function QRMockup() {
           <div style={{
             position: "absolute", top: 0, bottom: 0, width: "45%",
             background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.32), transparent)",
-            animation: "sweepLight 5.2s ease-in-out 1.6s infinite", willChange: "transform, opacity",
+            
           }} />
         </div>
         {/* QR grid (échelle relative -> grandit avec la carte). Construction progressive
@@ -589,7 +437,6 @@ export default function HomeClient() {
 
   return (
     <div style={{ background: "transparent", minHeight: "100vh", fontFamily: "DM Sans, sans-serif" }}>
-      <IntroOverlay />
       {/* Données structurées (SEO) — Organization/WebSite/SoftwareApplication+offres/
           HowTo/FAQPage/BreadcrumbList, construites depuis le vrai contenu. */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(landingJsonLd(FAQ_ITEMS)) }} />
@@ -625,8 +472,6 @@ export default function HomeClient() {
         * { box-sizing: border-box; }
       `}</style>
 
-      <Particles />
-
       {/* NAV */}
       <Navbar />
 
@@ -637,12 +482,6 @@ export default function HomeClient() {
       }}>
         {/* Ambiance cinématographique — halo doré lumineux + profondeur + vignette */}
         <div aria-hidden="true" style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden" }}>
-          <div style={{
-            position: "absolute", top: "-16%", left: "50%", transform: "translateX(-50%)",
-            width: "min(920px, 132vw)", height: "min(680px, 88vh)",
-            background: "radial-gradient(ellipse at center, rgba(201,168,76,0.17), rgba(201,168,76,0.05) 38%, transparent 68%)",
-            filter: "blur(16px)", animation: "heroAura 15s ease-in-out infinite", willChange: "transform, opacity",
-          }} />
           <div style={{
             position: "absolute", bottom: "-12%", right: "-10%",
             width: "min(540px, 82vw)", height: 520, borderRadius: "50%",
@@ -669,7 +508,7 @@ export default function HomeClient() {
               textTransform: "uppercase", fontWeight: 700,
               animation: "mo-fade-up 0.6s ease 0.1s both"
             }}>
-              <span aria-hidden="true" style={{ width: 7, height: 7, borderRadius: 2, background: "#C9A84C", animation: "glowPulse 2s ease-in-out infinite", willChange: "opacity" }} />
+              <span aria-hidden="true" style={{ width: 7, height: 7, borderRadius: 2, background: "#C9A84C",  }} />
               Reliez le monde physique au digital
             </div>
 
@@ -710,9 +549,8 @@ export default function HomeClient() {
               animation: "mo-fade-up 0.7s ease 0.75s both"
             }}>
               <Link href="/creer" style={{
-                background: "linear-gradient(90deg, #C9A84C, #d4a843, #b8953f)",
-                backgroundSize: "200% 200%", animation: "gradientShift 3s ease infinite",
-                color: "#080808", textDecoration: "none", fontSize: 15, fontWeight: 700,
+                background: "var(--accent)",
+                color: "var(--ink-on-accent)", textDecoration: "none", fontSize: 15, fontWeight: 700,
                 padding: "15px 32px", borderRadius: 12, display: "inline-block",
                 boxShadow: "0 4px 28px rgba(201,168,76,0.45), 0 0 0 0 rgba(201,168,76,0)",
                 transition: "transform 0.25s var(--mo-ease-spring), box-shadow 0.25s ease",
@@ -781,7 +619,7 @@ export default function HomeClient() {
 
           {/* Right: QR */}
           <div className="hero-qr" style={{
-            animation: "float 5s ease-in-out infinite", willChange: "transform",
+            
             zIndex: 1, display: "flex", justifyContent: "center"
           }}>
             <QRMockup />
@@ -843,12 +681,6 @@ export default function HomeClient() {
           @media(max-width:640px){ .cta-final-section{padding:80px 20px 70px!important;} }
         `}</style>
         {/* Halo cinématographique du CTA final */}
-        <div aria-hidden="true" style={{
-          position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)",
-          width:"min(900px,120vw)", height:560,
-          background:"radial-gradient(ellipse at center, rgba(201,168,76,0.14), transparent 66%)",
-          animation:"ctaGlow 5s ease-in-out infinite", pointerEvents:"none", zIndex:0,
-        }}/>
         <div style={{
           maxWidth:720, margin:"0 auto", textAlign:"center",
           position:"relative", zIndex:1,
@@ -888,7 +720,7 @@ export default function HomeClient() {
                 border:"1px solid rgba(201,168,76,0.42)",
                 display:"flex", alignItems:"center", justifyContent:"center",
                 boxShadow:"0 16px 44px rgba(0,0,0,0.55), 0 0 54px rgba(201,168,76,0.2)",
-                animation:"float 5s ease-in-out infinite",
+                
               }}>
                 <QRMiniSvg fg="#F5F0E8" bg="transparent" accent="#C9A84C" size={58} />
               </div>

@@ -6,9 +6,12 @@
 // propres fichiers sans se recopier.
 import { useEffect, useRef, useState } from "react"
 
+// 9 septembre : les sections sont visibles AU REPOS. Le hook ne sert plus qu'à savoir
+// si la section est passée à l'écran (compteurs, mises en avant) — plus aucun contenu
+// ne reste à opacité 0 en attendant le défilement.
 export function useInView(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(true)
   useEffect(() => {
     const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true) }, { threshold })
     if (ref.current) obs.observe(ref.current)
