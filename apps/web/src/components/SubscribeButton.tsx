@@ -107,7 +107,7 @@ export default function SubscribeButton({
   onSubscribe,
   successLabel = "Redirection vers le paiement",
   minScanMs = 1800,
-  accent = "#e8c766",
+  accent = "#D4AF45",
   success = "#22c55e",
   width = "100%",
   height = 58,
@@ -183,18 +183,20 @@ export default function SubscribeButton({
     position: "relative",
     overflow: "hidden",
     height,
-    borderRadius: 15,
+    borderRadius: 11,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     boxSizing: "border-box",
-    background: `linear-gradient(180deg, ${lighten(accent)}, ${darken(accent)})`,
-    color: "#1a1405",
-    fontSize: 16,
-    fontWeight: 800,
+    // Face au repos à plat (9 septembre) : la séquence de scan garde ses animations,
+    // le bouton lui-même est un aplat d'accent sans halo ni relief.
+    background: accent,
+    color: "#15150F",
+    fontSize: 15,
+    fontWeight: 600,
     letterSpacing: "-.01em",
     whiteSpace: "nowrap",
-    boxShadow: `0 12px 30px ${rgba(accent, 0.3)}, inset 0 1px 0 rgba(255,255,255,.55)`,
+    boxShadow: "none",
   };
 
   return (
@@ -218,12 +220,11 @@ export default function SubscribeButton({
           }}
           onMouseEnter={(e) => {
             if (disabled) return;
-            e.currentTarget.style.transform = "translateY(-2px)";
-            e.currentTarget.style.boxShadow = `0 20px 42px ${rgba(accent, 0.42)}, inset 0 1px 0 rgba(255,255,255,.7)`;
+            e.currentTarget.style.filter = "brightness(1.06)";
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = "";
-            e.currentTarget.style.boxShadow = goldFace.boxShadow as string;
+            e.currentTarget.style.filter = "";
           }}
           onMouseDown={(e) => {
             e.currentTarget.style.transform = "translateY(1px) scale(.985)";

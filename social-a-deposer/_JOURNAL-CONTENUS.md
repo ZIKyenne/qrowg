@@ -85,6 +85,46 @@ d'image (les fichiers sont accessibles et valides, 2160×2700).
 **réels**. Les posts sortent et ne touchent personne. Le problème Instagram est un
 problème d'audience et de portée, pas de publication.
 
+## ⚑ INSTAGRAM — NE JAMAIS PUBLIER DEUX FOIS (règle bloquante, 09/09)
+
+Demande explicite d'Emilien le 09/09 : le compte Instagram a accumulé des carrousels
+publiés en double. **Audit fait le 09/09 sur les 25 posts Instagram envoyés.** Les
+doublons réels, à supprimer côté Instagram :
+
+| Doublon | Publications | Cause |
+|---|---|---|
+| Food truck · privatisation | 07/09 16 h 49 `/p/Dc_lDInIHjY/` **et** 07/09 18 h 51 `/p/Dc_zAPNmK-z/` | **le même carrousel republié après un statut `error` qui était faux** |
+| Restaurant · carte enfants | 06/09 `/p/Dc9QC01iWLP/` (carrousel) et 07/09 `/reel/Dc_ugk2MB6R/` (reel) | même accroche à 23 h d'écart, formats différents |
+| Restaurant · plat du jour / carton de table | 24/08 16 h 49 `/p/Dcbh6zsFNKq/` et 24/08 22 h 44 `/p/DccKhwsFujt/` | deux posts du même angle le même jour |
+| Restaurant · carte de rentrée | 28/08 `/p/DcmGYaYiWRm/`, 01/09 `/p/DcwNiyfibhM/`, 02/09 `/p/DcxwMlOFnNl/`, 02/09 `/reel/DcyX5R_sgS1/` | **quatre fois le même angle en six jours** |
+
+**Les deux causes, et les deux parades :**
+
+1. **Republication d'un post `error` qui était en réalité en ligne.** Buffer affiche
+   `error: « Instagram flagged this post as potential spam »` sur des posts qu'Instagram
+   a bel et bien publiés, puis récupère la vraie publication dans un **second
+   enregistrement `via: "network"`**. Requeuer le premier publie une deuxième fois.
+   → **Parade : ne JAMAIS toucher à un post Instagram en `error` sans avoir d'abord
+   interrogé les posts `sent` du canal avec `externalLink`.** Si un `sent` existe le même
+   jour, **le post est en ligne : le passer en brouillon, ne pas le rejouer.**
+   Vérifié le 09/09 : 05/09 `/p/Dc616I8mTiZ/` · 06/09 `/p/Dc9QC01iWLP/` ·
+   07/09 `/p/Dc_zAPNmK-z/` · 08/09 `/p/DdB95BkloaZ/` — tous en ligne, tous marqués `error`.
+
+2. **Un seul carrousel Instagram par jour, un angle par 21 jours.** Deux posts Instagram
+   dans la même journée, ou le même angle deux fois dans la semaine, se lisent comme un
+   doublon dans le fil même si les textes diffèrent.
+
+### Contrôle obligatoire AVANT toute mise en file Instagram
+À faire à chaque run, dans cet ordre, sans exception :
+1. `list_posts` statut `["error"]` → **ne rien requeuer**, seulement constater.
+2. `execute_query` sur les posts `sent` du canal Instagram avec `sentAt` + `externalLink`
+   + `text` sur les **14 derniers jours**.
+3. Comparer la **première phrase** du post du jour à celles-là. Une accroche déjà vue,
+   même reformulée = **on ne publie pas**, on change d'angle.
+4. Vérifier qu'aucun autre post Instagram n'est déjà programmé pour la même journée.
+5. Un seul post Instagram par jour. Le reel ne compte pas comme un deuxième post à
+   condition qu'il porte **un angle différent** du carrousel du jour.
+
 ## ⚑ Règles de publication (obligatoires, à appliquer à CHAQUE mise en file)
 
 1. **Mention « contenu généré par IA » : TOUJOURS activée.** Demande explicite d'Emilien
@@ -559,3 +599,17 @@ Résumé des titres et tableaux Pinterest :
   Ne rien conclure d'ici. La lecture se fait dans Pinterest Analytics, prochaine échéance
   **le 15/09** pour l'indicateur qui compte, le **clic sortant** (base à battre :
   2 clics / 1 207 impressions sur 30 jours).
+
+### Nettoyage Instagram — 09/09
+
+Sur demande d'Emilien, les **3 enregistrements Buffer bloqués en `error`** ont été
+**supprimés** après vérification que leurs publications Instagram existaient bien :
+05/09 `/p/Dc616I8mTiZ/`, 06/09 `/p/Dc9QC01iWLP/`, 08/09 `/p/DdB95BkloaZ/`.
+(Le 06/09 avait déjà disparu de lui-même : « Document not found ».)
+Les publications Instagram elles-mêmes ne sont pas touchées — seuls les doublons
+listés dans le tableau plus haut sont à supprimer à la main dans l'appli.
+
+**Buffer est désormais propre** : 0 post en `error`, 0 brouillon, 0 en attente
+d'approbation. Plus aucun post rouge ne peut être requeué par erreur.
+La règle bloquante « INSTAGRAM — NE JAMAIS PUBLIER DEUX FOIS » s'applique à partir
+de maintenant, à chaque run, avant toute mise en file.
