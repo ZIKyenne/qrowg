@@ -108,7 +108,7 @@ export default function ImageCropModal({ file, onCancel, onConfirm, initialAspec
 
   return (
     <div onClick={onCancel} style={{ position: "fixed", inset: 0, zIndex: 500, background: "rgba(0,0,0,0.72)", backdropFilter: "blur(5px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: largeurModale(ecran.l), background: "var(--surface)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 18, padding: 16, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }}>
+      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: largeurModale(ecran.l), background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 18, padding: 16, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
           <p style={{ flex: 1, color: "var(--ink)", fontSize: 14.5, fontWeight: 700, margin: 0 }}>Recadrer l'image</p>
           <button onClick={onCancel} aria-label="Annuler" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", width: 44, height: 44, display: "grid", placeItems: "center", flexShrink: 0 }}><X size={16} /></button>
@@ -141,7 +141,7 @@ export default function ImageCropModal({ file, onCancel, onConfirm, initialAspec
               <button key={a.key} type="button" data-testid={"aspect-" + a.key} onClick={() => setAspectKey(a.key)}
                 // 24 px de haut : on choisit ici le cadrage d'une photo qui
                 // s'affichera en grand sur la page publiée. Ça se vise au doigt.
-                style={{ padding: "0 12px", minHeight: 40, display: "inline-flex", alignItems: "center", borderRadius: 8, border: active ? `1px solid ${G}` : "1px solid rgba(255,255,255,0.12)", background: active ? "rgba(201,168,76,0.14)" : "rgba(255,255,255,0.03)", color: active ? "#F5F0E8" : MUTED, fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>
+                style={{ padding: "0 12px", minHeight: 40, display: "inline-flex", alignItems: "center", borderRadius: 8, border: active ? `1px solid ${G}` : "1px solid rgba(255,255,255,0.12)", background: active ? "color-mix(in srgb, var(--accent) 14%, transparent)" : "rgba(255,255,255,0.03)", color: active ? "#F5F0E8" : MUTED, fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>
                 {a.label}
               </button>
             )

@@ -172,7 +172,7 @@ export default function TemplateWizardModal({
       style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(4,4,4,0.88)", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", justifyContent: "center", padding: isMobile ? 0 : 20 }}>
       <div style={{
         width: "100%", maxWidth: 1080, height: isMobile ? "100%" : "min(92vh, 860px)",
-        background: "#0B0B0A", border: "1px solid rgba(201,168,76,0.22)", borderRadius: isMobile ? 0 : 20,
+        background: "#0B0B0A", border: "1px solid color-mix(in srgb, var(--accent) 22%, transparent)", borderRadius: isMobile ? 0 : 20,
         display: "flex", flexDirection: "column", overflow: "hidden",
       }}>
         {/* En-tête + progression */}

@@ -25,7 +25,7 @@ export default function AcceptInvitePage() {
   }, [])
 
   const wrap: React.CSSProperties = { minHeight: "70vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "DM Sans, sans-serif" }
-  const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid rgba(201,168,76,0.16)", borderRadius: 18, padding: "36px 32px", maxWidth: 420, width: "100%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }
+  const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 16%, transparent)", borderRadius: 18, padding: "36px 32px", maxWidth: 420, width: "100%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }
   const btn: React.CSSProperties = { display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 24, padding: "12px 24px", borderRadius: 11, background: "linear-gradient(135deg,#EBCE72,#C9A84C)", color: "var(--ink-on-accent)", fontWeight: 700, fontSize: 14, textDecoration: "none" }
 
   return (
@@ -48,7 +48,7 @@ export default function AcceptInvitePage() {
         )}
         {status === "auth" && (
           <>
-            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(201,168,76,0.14)", border: "1px solid rgba(201,168,76,0.4)", display: "inline-flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}><Users size={24} color={GOLD} /></div>
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "color-mix(in srgb, var(--accent) 14%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 40%, transparent)", display: "inline-flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}><Users size={24} color={GOLD} /></div>
             <h1 style={{ fontFamily: "Fraunces, serif", fontSize: 22, color: "var(--ink)", margin: "18px 0 8px" }}>Connectez-vous d'abord</h1>
             <p style={{ color: "var(--muted)", fontSize: 14, margin: 0 }}>Connectez-vous (ou créez un compte avec l'adresse invitée), puis rouvrez ce lien.</p>
             <Link href={`/auth/login?redirect=${encodeURIComponent(typeof window !== "undefined" ? window.location.pathname + window.location.search : "/dashboard/team")}`} style={btn}>Se connecter</Link>

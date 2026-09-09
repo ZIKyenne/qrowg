@@ -53,19 +53,19 @@ export default function OnboardingClient() {
 
   const tile: React.CSSProperties = {
     position: "relative", textAlign: "left", background: "rgba(255,255,255,0.025)",
-    border: "1px solid rgba(201,168,76,0.16)", borderRadius: 18, padding: "20px 20px 18px",
+    border: "1px solid color-mix(in srgb, var(--accent) 16%, transparent)", borderRadius: 18, padding: "20px 20px 18px",
     cursor: "pointer", transition: "transform .15s var(--mo-ease-spring), border-color .15s, background .15s",
     display: "flex", flexDirection: "column", gap: 8,
   }
-  const hoverIn = (e: React.MouseEvent) => { if (busy) return; const el = e.currentTarget as HTMLElement; el.style.transform = "translateY(-3px)"; el.style.borderColor = "color-mix(in srgb, var(--accent) 45%, transparent)"; el.style.background = "rgba(201,168,76,0.06)" }
-  const hoverOut = (e: React.MouseEvent) => { const el = e.currentTarget as HTMLElement; el.style.transform = "none"; el.style.borderColor = "rgba(201,168,76,0.16)"; el.style.background = "rgba(255,255,255,0.025)" }
+  const hoverIn = (e: React.MouseEvent) => { if (busy) return; const el = e.currentTarget as HTMLElement; el.style.transform = "translateY(-3px)"; el.style.borderColor = "color-mix(in srgb, var(--accent) 45%, transparent)"; el.style.background = "color-mix(in srgb, var(--accent) 6%, transparent)" }
+  const hoverOut = (e: React.MouseEvent) => { const el = e.currentTarget as HTMLElement; el.style.transform = "none"; el.style.borderColor = "color-mix(in srgb, var(--accent) 16%, transparent)"; el.style.background = "rgba(255,255,255,0.025)" }
 
   return (
     <div style={{ position: "relative", minHeight: "100dvh", padding: "0 22px 60px", overflowX: "hidden" }}>
 
       {busy && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(8,8,8,0.72)", backdropFilter: "blur(4px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
-          <div style={{ width: 30, height: 30, border: "3px solid rgba(201,168,76,0.25)", borderTopColor: "var(--accent)", borderRadius: "50%", animation: "mo-spin 0.8s linear infinite" }} />
+          <div style={{ width: 30, height: 30, border: "3px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderTopColor: "var(--accent)", borderRadius: "50%", animation: "mo-spin 0.8s linear infinite" }} />
           <p style={{ color: INK, fontSize: 15, fontWeight: 700, margin: 0 }}>Création de votre page…</p>
           <p style={{ color: MUT, fontSize: 12.5, margin: 0 }}>Page + blocs + QR + objectif</p>
         </div>

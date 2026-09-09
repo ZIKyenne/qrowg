@@ -201,7 +201,7 @@ export default function UpgradePage() {
                       </div>
                       <span style={{ color: perk.included ? "var(--ink)" : MUTED, fontSize: 13 }}>{perk.text}</span>
                       {perk.soon && (
-                        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.4, textTransform: "uppercase", color: "var(--accent)", background: "var(--surface-2)", border: "1px solid rgba(201,168,76,0.28)", borderRadius: 6, padding: "1px 6px", whiteSpace: "nowrap" }}>Bientôt</span>
+                        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.4, textTransform: "uppercase", color: "var(--accent)", background: "var(--surface-2)", border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)", borderRadius: 6, padding: "1px 6px", whiteSpace: "nowrap" }}>Bientôt</span>
                       )}
                     </div>
                   ))}

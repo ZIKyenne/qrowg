@@ -1321,13 +1321,13 @@ export default function ProfilePage() {
                   { emoji:"🎁", step:"3", label:"Recompense",   desc:"+1 mois Pro offert"            },
                 ] as const).map((s, i) => (
                   <div key={i} style={{ display:"flex", alignItems:"center", flex:1 }}>
-                    <div style={{ flex:1, background:"rgba(201,162,77,0.06)", border:"1px solid rgba(201,162,77,0.14)", borderRadius:9, padding:"10px 8px", textAlign:"center" as const, position:"relative" as const }}>
-                      <div style={{ position:"absolute" as const, top:-8, left:"50%", transform:"translateX(-50%)", background:"rgba(201,162,77,0.15)", border:"1px solid rgba(201,162,77,0.3)", borderRadius:20, padding:"1px 7px", fontSize:8, color:"var(--accent)", fontWeight:800 }}>{s.step}</div>
+                    <div style={{ flex:1, background:"color-mix(in srgb, var(--accent) 6%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 14%, transparent)", borderRadius:9, padding:"10px 8px", textAlign:"center" as const, position:"relative" as const }}>
+                      <div style={{ position:"absolute" as const, top:-8, left:"50%", transform:"translateX(-50%)", background:"color-mix(in srgb, var(--accent) 15%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:20, padding:"1px 7px", fontSize:8, color:"var(--accent)", fontWeight:800 }}>{s.step}</div>
                       <span style={{ fontSize:20, display:"block", margin:"4px 0 5px" }}>{s.emoji}</span>
                       <p style={{ color:"var(--ink)", fontSize:10, fontWeight:700, margin:"0 0 2px" }}>{s.label}</p>
                       <p style={{ color:MUTED, fontSize:9, margin:0, lineHeight:1.4 }}>{s.desc}</p>
                     </div>
-                    {i < 2 && <div style={{ width:16, height:1, background:"rgba(201,162,77,0.25)", flexShrink:0 }}/>}
+                    {i < 2 && <div style={{ width:16, height:1, background:"color-mix(in srgb, var(--accent) 25%, transparent)", flexShrink:0 }}/>}
                   </div>
                 ))}
               </div>
@@ -1412,7 +1412,7 @@ export default function ProfilePage() {
                       { id:"expired",   label:"Expires",    count:expiredRefs      },
                     ] as const).filter(f => f.id === "all" || f.count > 0).map(f => (
                       <button key={f.id} type="button" onClick={() => setRefFilter(f.id)}
-                        style={{ display:"inline-flex", alignItems:"center", gap:4, padding:"3px 10px", background:refFilter===f.id?"rgba(201,162,77,0.12)":"rgba(255,255,255,0.04)", border:`1px solid ${refFilter===f.id?"rgba(201,162,77,0.35)":"rgba(255,255,255,0.07)"}`, borderRadius:20, color:refFilter===f.id?"var(--accent)":MUTED, fontSize:10, fontWeight:refFilter===f.id?700:400, cursor:"pointer" }}>
+                        style={{ display:"inline-flex", alignItems:"center", gap:4, padding:"3px 10px", background:refFilter===f.id?"color-mix(in srgb, var(--accent) 12%, transparent)":"rgba(255,255,255,0.04)", border:`1px solid ${refFilter===f.id?"color-mix(in srgb, var(--accent) 35%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:20, color:refFilter===f.id?"var(--accent)":MUTED, fontSize:10, fontWeight:refFilter===f.id?700:400, cursor:"pointer" }}>
                         {f.label}
                         <span style={{ background:"rgba(255,255,255,0.07)", borderRadius:10, padding:"0 5px", fontSize:9 }}>{f.count}</span>
                       </button>
@@ -1559,7 +1559,7 @@ export default function ProfilePage() {
                       </a>
                     )}
                     {topQR && topQR.total_scans > 0 && (
-                      <div style={{ display:"flex", alignItems:"center", gap:9, padding:"9px 11px", background:"rgba(201,162,77,0.05)", border:"1px solid rgba(201,162,77,0.12)", borderRadius:9 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:9, padding:"9px 11px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid var(--line-strong)", borderRadius:9 }}>
                         <div style={{ width:28, height:28, borderRadius:7, background:"color-mix(in srgb, var(--accent) 10%, transparent)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                           <QrCode size={13} color="var(--accent)"/>
                         </div>
@@ -1607,15 +1607,15 @@ export default function ProfilePage() {
 
                 {/* Alerte email non verifie */}
                 {!emailVerified && (
-                  <div style={{ display:"flex", alignItems:"flex-start", gap:10, padding:"12px 14px", background:"rgba(201,162,77,0.08)", border:"1px solid rgba(201,162,77,0.25)", borderRadius:10 }}>
+                  <div style={{ display:"flex", alignItems:"flex-start", gap:10, padding:"12px 14px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius:10 }}>
                     <AlertTriangle size={15} color="var(--accent)" style={{ flexShrink:0, marginTop:1 }}/>
                     <div style={{ flex:1 }}>
                       <p style={{ color:"var(--accent)", fontSize:12, fontWeight:700, margin:"0 0 3px" }}>E-mail non vérifié</p>
-                      <p style={{ color:"rgba(201,162,77,0.8)", fontSize:11, margin:"0 0 8px" }}>
+                      <p style={{ color:"color-mix(in srgb, var(--accent) 80%, transparent)", fontSize:11, margin:"0 0 8px" }}>
                         Verifiez votre email pour securiser votre compte et recevoir les notifications.
                       </p>
                       <button onClick={sendVerificationEmail} disabled={sendingVerif || verifSent}
-                        style={{ display:"flex", alignItems:"center", gap:6, padding:"6px 13px", background:"rgba(201,162,77,0.15)", border:"1px solid rgba(201,162,77,0.3)", borderRadius:7, color:"var(--accent)", fontSize:11, fontWeight:700, cursor:sendingVerif||verifSent?"default":"pointer" }}>
+                        style={{ display:"flex", alignItems:"center", gap:6, padding:"6px 13px", background:"color-mix(in srgb, var(--accent) 15%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:7, color:"var(--accent)", fontSize:11, fontWeight:700, cursor:sendingVerif||verifSent?"default":"pointer" }}>
                         {verifSent ? <><Check size={11}/> Email envoye !</>
                           : sendingVerif ? "Envoi..."
                           : <><Mail size={11}/> Renvoyer l'email de vérification</>}
@@ -1760,7 +1760,7 @@ export default function ProfilePage() {
 
                 {/* Badges securite */}
                 <div style={{ display:"flex", gap:7, flexWrap:"wrap" as const }}>
-                  <span style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"4px 10px", background:emailVerified?"rgba(57,255,143,0.08)":"rgba(201,162,77,0.08)", border:`1px solid ${emailVerified?"rgba(57,255,143,0.2)":"rgba(201,162,77,0.2)"}`, borderRadius:20, fontSize:10, color:emailVerified?"var(--success)":"var(--accent)" }}>
+                  <span style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"4px 10px", background:emailVerified?"rgba(57,255,143,0.08)":"color-mix(in srgb, var(--accent) 8%, transparent)", border:`1px solid ${emailVerified?"rgba(57,255,143,0.2)":"color-mix(in srgb, var(--accent) 20%, transparent)"}`, borderRadius:20, fontSize:10, color:emailVerified?"var(--success)":"var(--accent)" }}>
                     {emailVerified ? <ShieldCheck size={11}/> : <ShieldOff size={11}/>}
                     Email {emailVerified?"verifie":"non vérifié"}
                   </span>
@@ -1787,14 +1787,14 @@ export default function ProfilePage() {
             <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
               {/* Badge RGPD */}
-              <div style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px", background:"rgba(201,162,77,0.05)", border:"1px solid rgba(201,162,77,0.15)", borderRadius:10 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid var(--line-strong)", borderRadius:10 }}>
                 <div style={{ width:36, height:36, borderRadius:10, background:"color-mix(in srgb, var(--accent) 10%, transparent)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                   <Shield size={16} color="var(--accent)"/>
                 </div>
                 <div>
                   <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:2 }}>
                     <p style={{ color:"var(--ink)", fontSize:12, fontWeight:700, margin:0 }}>Vos droits RGPD</p>
-                    <span style={{ background:"rgba(201,162,77,0.12)", border:"1px solid rgba(201,162,77,0.25)", borderRadius:4, padding:"1px 7px", fontSize:8, color:"var(--accent)", fontWeight:800 }}>
+                    <span style={{ background:"color-mix(in srgb, var(--accent) 12%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius:4, padding:"1px 7px", fontSize:8, color:"var(--accent)", fontWeight:800 }}>
                       RGPD
                     </span>
                   </div>
@@ -1821,7 +1821,7 @@ export default function ProfilePage() {
                   const fmt = fmtMap[job.id] ?? "JSON"
                   return (
                     <div key={job.id} style={{ display:"flex", alignItems:"center", gap:10, padding:"11px 13px", background:SURF2, border:`1px solid ${job.status==="done"?"rgba(57,255,143,0.15)":job.status==="error"?"rgba(255,107,107,0.15)":"rgba(255,255,255,0.06)"}`, borderRadius:9 }}>
-                      <div style={{ width:32, height:32, borderRadius:8, background:"rgba(201,162,77,0.08)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, color:"var(--accent)" }}>
+                      <div style={{ width:32, height:32, borderRadius:8, background:"color-mix(in srgb, var(--accent) 8%, transparent)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, color:"var(--accent)" }}>
                         {iconMap[job.id]}
                       </div>
                       <div style={{ flex:1, minWidth:0 }}>
@@ -1847,9 +1847,9 @@ export default function ProfilePage() {
                       <button type="button"
                         onClick={() => { if (job.status !== "running") runExport(job.id) }}
                         disabled={job.status === "running"}
-                        style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 13px", background:job.status==="done"?"rgba(57,255,143,0.08)":job.status==="error"?"rgba(255,107,107,0.08)":"rgba(201,162,77,0.08)", border:`1px solid ${job.status==="done"?"rgba(57,255,143,0.2)":job.status==="error"?"rgba(255,107,107,0.2)":"rgba(201,162,77,0.2)"}`, borderRadius:7, color:job.status==="done"?"var(--success)":job.status==="error"?"var(--danger)":"var(--accent)", fontSize:11, fontWeight:600, cursor:job.status==="running"?"wait":"pointer", flexShrink:0 }}>
+                        style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 13px", background:job.status==="done"?"rgba(57,255,143,0.08)":job.status==="error"?"rgba(255,107,107,0.08)":"color-mix(in srgb, var(--accent) 8%, transparent)", border:`1px solid ${job.status==="done"?"rgba(57,255,143,0.2)":job.status==="error"?"rgba(255,107,107,0.2)":"color-mix(in srgb, var(--accent) 20%, transparent)"}`, borderRadius:7, color:job.status==="done"?"var(--success)":job.status==="error"?"var(--danger)":"var(--accent)", fontSize:11, fontWeight:600, cursor:job.status==="running"?"wait":"pointer", flexShrink:0 }}>
                         {job.status==="running"
-                          ? <><div style={{ width:11, height:11, border:"1.5px solid rgba(201,162,77,0.3)", borderTopColor:"var(--accent)", borderRadius:"50%", animation:"mo-spin 0.7s linear infinite" }}/> Export...</>
+                          ? <><div style={{ width:11, height:11, border:"1.5px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderTopColor:"var(--accent)", borderRadius:"50%", animation:"mo-spin 0.7s linear infinite" }}/> Export...</>
                           : job.status==="done"
                           ? <><Check size={12}/> OK</>
                           : job.status==="error"
@@ -1948,7 +1948,7 @@ export default function ProfilePage() {
                           Plan {planCfg.label}
                         </p>
                         {planCfg.badge && (
-                          <span style={{ background:"rgba(201,162,77,0.15)", border:"1px solid rgba(201,162,77,0.3)", borderRadius:5, padding:"1px 7px", fontSize:9, color:"var(--accent)", fontWeight:800 }}>
+                          <span style={{ background:"color-mix(in srgb, var(--accent) 15%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:5, padding:"1px 7px", fontSize:9, color:"var(--accent)", fontWeight:800 }}>
                             {planCfg.badge}
                           </span>
                         )}
@@ -2105,7 +2105,7 @@ export default function ProfilePage() {
                         <div style={{ display:"flex", alignItems:"center", gap:7 }}>
                           <Eye size={12} color="var(--accent)"/>
                           <span style={{ color:"var(--ink)", fontSize:12, fontWeight:600 }}>Pages</span>
-                          {isNear && !isAt && <span style={{ color:"var(--accent)", fontSize:9, fontWeight:700, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid rgba(201,162,77,0.2)", borderRadius:4, padding:"1px 5px" }}>Bientot plein</span>}
+                          {isNear && !isAt && <span style={{ color:"var(--accent)", fontSize:9, fontWeight:700, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid var(--line-strong)", borderRadius:4, padding:"1px 5px" }}>Bientot plein</span>}
                           {isAt && <span style={{ color:"var(--danger)", fontSize:9, fontWeight:700, background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:4, padding:"1px 5px" }}>Limite atteinte</span>}
                         </div>
                         <span style={{ color:isAt?"var(--danger)":isNear?"var(--accent)":MUTED, fontSize:11, fontWeight:600 }}>
@@ -2137,7 +2137,7 @@ export default function ProfilePage() {
                         <div style={{ display:"flex", alignItems:"center", gap:7 }}>
                           <TrendingUp size={12} color={G}/>
                           <span style={{ color:"var(--ink)", fontSize:12, fontWeight:600 }}>Vues ce mois</span>
-                          {isNear && !isAt && <span style={{ color:"var(--accent)", fontSize:9, fontWeight:700, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid rgba(201,162,77,0.2)", borderRadius:4, padding:"1px 5px" }}>Bientot plein</span>}
+                          {isNear && !isAt && <span style={{ color:"var(--accent)", fontSize:9, fontWeight:700, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid var(--line-strong)", borderRadius:4, padding:"1px 5px" }}>Bientot plein</span>}
                           {isAt && <span style={{ color:"var(--danger)", fontSize:9, fontWeight:700, background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:4, padding:"1px 5px" }}>Limite atteinte</span>}
                         </div>
                         <span style={{ color:isAt?"var(--danger)":isNear?"var(--accent)":MUTED, fontSize:11, fontWeight:600 }}>
@@ -2334,7 +2334,7 @@ export default function ProfilePage() {
 
                   {/* Stats parrainage conservees */}
                   {(totalMonths > 0 || validatedRefs > 0) && (
-                    <div style={{ padding:"12px 14px", background:"rgba(201,162,77,0.05)", border:"1px solid rgba(201,162,77,0.12)", borderRadius:10 }}>
+                    <div style={{ padding:"12px 14px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid var(--line-strong)", borderRadius:10 }}>
                       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, textAlign:"center" as const }}>
                         <div>
                           <p style={{ color:"var(--accent)", fontSize:20, fontWeight:800, margin:0, fontFamily:"Fraunces, serif" }}>{totalMonths}</p>
@@ -2367,7 +2367,7 @@ export default function ProfilePage() {
             {currentPlan === "free" || currentPlan === "starter" ? (
               /* Plans insuffisants */
               <div style={{ textAlign:"center" as const, padding:"20px 0" }}>
-                <div style={{ width:48, height:48, borderRadius:14, background:"rgba(201,162,77,0.08)", border:"1px solid rgba(201,162,77,0.15)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 12px" }}>
+                <div style={{ width:48, height:48, borderRadius:14, background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 12px" }}>
                   <Lock size={20} color="var(--accent)"/>
                 </div>
                 <p style={{ color:"var(--ink)", fontSize:13, fontWeight:600, margin:"0 0 5px" }}>Accès API</p>
@@ -2387,7 +2387,7 @@ export default function ProfilePage() {
                     "Clés révocables à tout moment",
                   ].map((f,i) => (
                     <div key={i} style={{ display:"flex", alignItems:"center", gap:6 }}>
-                      <CheckCircle size={11} color="rgba(201,162,77,0.5)"/>
+                      <CheckCircle size={11} color="color-mix(in srgb, var(--accent) 50%, transparent)"/>
                       <span style={{ color:MUTED, fontSize:10 }}>{f}</span>
                     </div>
                   ))}
@@ -2466,11 +2466,11 @@ export default function ProfilePage() {
                   const pct   = limit > 0 ? Math.min((used/limit)*100, 100) : 0
                   const isNear= limit > 0 && used >= Math.floor(limit * 0.8)
                   return (
-                    <div style={{ padding:"12px 14px", background:`${isNear?"rgba(201,162,77,0.06)":"rgba(201,162,77,0.06)"}`, border:`1px solid ${isNear?"rgba(201,162,77,0.2)":"rgba(201,162,77,0.15)"}`, borderRadius:10 }}>
+                    <div style={{ padding:"12px 14px", background:`${isNear?"color-mix(in srgb, var(--accent) 6%, transparent)":"color-mix(in srgb, var(--accent) 6%, transparent)"}`, border:`1px solid ${isNear?"color-mix(in srgb, var(--accent) 20%, transparent)":"color-mix(in srgb, var(--accent) 15%, transparent)"}`, borderRadius:10 }}>
                       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:7 }}>
                         <div style={{ display:"flex", alignItems:"center", gap:7 }}>
                           <span style={{ color:"var(--accent)", fontSize:11, fontWeight:700 }}>Appels API ce mois</span>
-                          {isNear && <span style={{ color:"var(--accent)", fontSize:9, fontWeight:700, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid rgba(201,162,77,0.2)", borderRadius:4, padding:"1px 5px" }}>Limite proche</span>}
+                          {isNear && <span style={{ color:"var(--accent)", fontSize:9, fontWeight:700, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid var(--line-strong)", borderRadius:4, padding:"1px 5px" }}>Limite proche</span>}
                         </div>
                         <span style={{ color:isNear?"var(--accent)":"var(--accent)", fontSize:12, fontWeight:700 }}>
                           {used.toLocaleString("fr-FR")} / {limit > 0 ? limit.toLocaleString("fr-FR") : "illimite"}
@@ -2492,7 +2492,7 @@ export default function ProfilePage() {
                       Cles API ({apiKeys.filter(k=>k.is_active).length} active{apiKeys.filter(k=>k.is_active).length>1?"s":""})
                     </p>
                     {apiKeys.map(key => (
-                      <div key={key.id} style={{ background:SURF2, border:`1px solid ${key.is_active?"rgba(201,162,77,0.15)":"rgba(255,255,255,0.05)"}`, borderRadius:10, overflow:"hidden", opacity:key.is_active?1:0.6 }}>
+                      <div key={key.id} style={{ background:SURF2, border:`1px solid ${key.is_active?"color-mix(in srgb, var(--accent) 15%, transparent)":"rgba(255,255,255,0.05)"}`, borderRadius:10, overflow:"hidden", opacity:key.is_active?1:0.6 }}>
                         {/* Header cle */}
                         <div style={{ display:"flex", alignItems:"center", gap:10, padding:"11px 13px" }}>
                           <div style={{ width:8, height:8, borderRadius:"50%", background:key.is_active?"var(--success)":MUTED, flexShrink:0 }}/>
@@ -2603,7 +2603,7 @@ export default function ProfilePage() {
                   ] as const).map((e, i) => (
                     <div key={i} style={{ marginBottom:11 }}>
                       <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:5, flexWrap:"wrap" }}>
-                        <span style={{ fontSize:9, fontWeight:800, color:e.m==="GET"?"var(--success)":"var(--accent)", background:e.m==="GET"?"rgba(57,255,143,0.1)":"color-mix(in srgb, var(--accent) 10%, transparent)", border:`1px solid ${e.m==="GET"?"rgba(57,255,143,0.25)":"rgba(201,162,77,0.25)"}`, borderRadius:4, padding:"1px 6px" }}>{e.m}</span>
+                        <span style={{ fontSize:9, fontWeight:800, color:e.m==="GET"?"var(--success)":"var(--accent)", background:e.m==="GET"?"rgba(57,255,143,0.1)":"color-mix(in srgb, var(--accent) 10%, transparent)", border:`1px solid ${e.m==="GET"?"rgba(57,255,143,0.25)":"color-mix(in srgb, var(--accent) 25%, transparent)"}`, borderRadius:4, padding:"1px 6px" }}>{e.m}</span>
                         <code style={{ color:"var(--ink)", fontSize:11 }}>{e.p}</code>
                         <span style={{ color:MUTED, fontSize:10 }}>· {e.d}</span>
                       </div>
@@ -2655,7 +2655,7 @@ export default function ProfilePage() {
                   Utilisez votre propre domaine pour<br/>toutes vos pages QRowg.
                 </p>
                 <a href="/dashboard/domains"
-                  style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"9px 18px", background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid rgba(201,162,77,0.25)", borderRadius:9, color:"var(--accent)", textDecoration:"none", fontSize:12, fontWeight:700 }}>
+                  style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"9px 18px", background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius:9, color:"var(--accent)", textDecoration:"none", fontSize:12, fontWeight:700 }}>
                   <Plus size={13}/> Ajouter un domaine
                 </a>
               </div>
@@ -2729,7 +2729,7 @@ export default function ProfilePage() {
                           <a href="/dashboard/domains"
                             title="Configurer DNS"
                             aria-label={`Configurer le DNS de ${dm.domain}`}
-                            style={{ width:40, height:40, background:"rgba(201,162,77,0.06)", border:"1px solid rgba(201,162,77,0.15)", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", color:"var(--accent)", textDecoration:"none" }}>
+                            style={{ width:40, height:40, background:"color-mix(in srgb, var(--accent) 6%, transparent)", border:"1px solid var(--line-strong)", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", color:"var(--accent)", textDecoration:"none" }}>
                             <Settings size={11}/>
                           </a>
                           <button type="button"
@@ -2774,7 +2774,7 @@ export default function ProfilePage() {
 
                 {/* CTA ajouter */}
                 <a href="/dashboard/domains"
-                  style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"10px", background:"rgba(201,162,77,0.06)", border:"1px solid rgba(201,162,77,0.15)", borderRadius:9, color:"var(--accent)", textDecoration:"none", fontSize:12, fontWeight:600 }}>
+                  style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"10px", background:"color-mix(in srgb, var(--accent) 6%, transparent)", border:"1px solid var(--line-strong)", borderRadius:9, color:"var(--accent)", textDecoration:"none", fontSize:12, fontWeight:600 }}>
                   <Plus size={13}/> Ajouter un domaine
                 </a>
               </div>
@@ -2789,7 +2789,7 @@ export default function ProfilePage() {
             action={
               <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                 {prefsSaving && (
-                  <div style={{ width:12, height:12, border:"1.5px solid rgba(201,162,77,0.3)", borderTopColor:"var(--accent)", borderRadius:"50%", animation:"mo-spin 0.7s linear infinite" }}/>
+                  <div style={{ width:12, height:12, border:"1.5px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderTopColor:"var(--accent)", borderRadius:"50%", animation:"mo-spin 0.7s linear infinite" }}/>
                 )}
                 {prefsSaved && !prefsSaving && (
                   <span style={{ color:"var(--success)", fontSize:10, display:"flex", alignItems:"center", gap:4 }}>
@@ -2877,7 +2877,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Preview format */}
-                <div style={{ marginTop:8, padding:"7px 11px", background:"rgba(201,162,77,0.05)", border:"1px solid rgba(201,162,77,0.12)", borderRadius:8, display:"flex", alignItems:"center", gap:8 }}>
+                <div style={{ marginTop:8, padding:"7px 11px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid var(--line-strong)", borderRadius:8, display:"flex", alignItems:"center", gap:8 }}>
                   <Clock size={11} color="var(--accent)"/>
                   <span style={{ color:MUTED, fontSize:10 }}>
                     Apercu : {(() => {
@@ -2959,8 +2959,10 @@ export default function ProfilePage() {
                 <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                   <div style={{ display:"flex", gap:7, flexWrap:"wrap" as const }}>
                     {[
-                      "#C9A84C","var(--success)","var(--accent)","var(--accent)",
-                      "var(--accent)","var(--accent)","var(--danger)","#F5F0E8",
+                      // Huit accents distincts, en hex (l'accent est concaténé avec une alpha ailleurs :
+                      // une var() ici rendait --accent circulaire et cassait la couleur).
+                      "#D4AF45","#39FF8F","#38BDF8","#EC4899",
+                      "#F97316","#A78BFA","#FF6B6B","#F4F1E8",
                     ].map(color => (
                       <button key={color} type="button" onClick={() => setPrefField("accent_color", color)}
                         style={{ width:28, height:28, borderRadius:8, background:color, border:prefs.accent_color===color?`2px solid #F5F0E8`:"2px solid transparent", cursor:"pointer", transition:"border 0.15s", boxShadow:prefs.accent_color===color?`0 0 10px ${color}60`:"none" }}/>

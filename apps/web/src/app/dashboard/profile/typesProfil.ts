@@ -75,7 +75,7 @@ export const DEFAULT_PREFS: UserPreferences = {
   time_format: "24 heures", currency: "EUR",
   notif_email: true, notif_scan: true, notif_security: true,
   report_weekly: false, report_monthly: false,
-  accent_color: "#C9A84C",
+  accent_color: "#D4AF45",
 }
 
 export type DomainRecord = {

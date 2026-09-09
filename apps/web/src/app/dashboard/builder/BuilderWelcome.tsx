@@ -95,7 +95,7 @@ export default function BuilderWelcome({ mobile = false }: { mobile?: boolean })
       <div style={{
         width: "min(560px, 100%)", maxHeight: "92dvh", overflowY: "auto",
         background: "linear-gradient(180deg,#151109,#0E0C08)", border: `1px solid ${G}44`, borderRadius: 22,
-        padding: "clamp(20px,4vw,30px)", boxShadow: "0 30px 90px rgba(0,0,0,.7), 0 0 0 1px rgba(201,168,76,.08)",
+        padding: "clamp(20px,4vw,30px)", boxShadow: "0 30px 90px rgba(0,0,0,.7), 0 0 0 1px color-mix(in srgb, var(--accent) 8%, transparent)",
         animation: "bwPop .3s cubic-bezier(.22,1,.36,1)",
       }}>
         {/* Header */}
@@ -149,7 +149,7 @@ export default function BuilderWelcome({ mobile = false }: { mobile?: boolean })
               </button>
             )}
             <button onClick={() => (last ? finish() : setI(i + 1))}
-              style={{ background: `linear-gradient(90deg,${G},#b8953f)`, color: "var(--ink-on-accent)", border: "none", borderRadius: 10, minHeight: 44, padding: "0 22px", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 6px 20px rgba(201,168,76,0.3)" }}>
+              style={{ background: `linear-gradient(90deg,${G},#b8953f)`, color: "var(--ink-on-accent)", border: "none", borderRadius: 10, minHeight: 44, padding: "0 22px", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 6px 20px color-mix(in srgb, var(--accent) 30%, transparent)" }}>
               {last ? "C'est parti !" : "Suivant"}
             </button>
           </div>

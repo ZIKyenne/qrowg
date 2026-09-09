@@ -16,20 +16,20 @@ export const GLYPH_COULEURS = (
 )
 export const GLYPH_MODULES = (
   <span style={{ display:"grid", gridTemplateColumns:"repeat(3, 4px)", gridTemplateRows:"repeat(3, 4px)", gap:2 }}>
-    <span style={{ background:"var(--gold-light)", borderRadius:"50%" }}/><span style={{ background:"var(--gold-light)", borderRadius:"50%" }}/><span style={{ background:"rgba(232,200,119,.3)", borderRadius:"50%" }}/>
-    <span style={{ background:"var(--gold-light)", borderRadius:1 }}/><span style={{ background:"rgba(232,200,119,.3)", borderRadius:1 }}/><span style={{ background:"var(--gold-light)", borderRadius:1 }}/>
-    <span style={{ background:"rgba(232,200,119,.3)", borderRadius:"50%" }}/><span style={{ background:"var(--gold-light)", borderRadius:"50%" }}/><span style={{ background:"var(--gold-light)", borderRadius:"50%" }}/>
+    <span style={{ background:"var(--gold-light)", borderRadius:"50%" }}/><span style={{ background:"var(--gold-light)", borderRadius:"50%" }}/><span style={{ background:"color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:"50%" }}/>
+    <span style={{ background:"var(--gold-light)", borderRadius:1 }}/><span style={{ background:"color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:1 }}/><span style={{ background:"var(--gold-light)", borderRadius:1 }}/>
+    <span style={{ background:"color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:"50%" }}/><span style={{ background:"var(--gold-light)", borderRadius:"50%" }}/><span style={{ background:"var(--gold-light)", borderRadius:"50%" }}/>
   </span>
 )
 export const GLYPH_COINS = (<>
   <span style={{ position:"absolute", left:4, top:4, width:13, height:13, border:"2px solid var(--gold-light)", borderRadius:3 }}/>
   <span style={{ position:"absolute", left:8, top:8, width:5, height:5, background:"var(--gold-light)", borderRadius:1 }}/>
-  <span style={{ position:"absolute", right:4, bottom:4, width:6, height:6, borderRight:"2px solid rgba(232,200,119,.5)", borderBottom:"2px solid rgba(232,200,119,.5)", borderBottomRightRadius:3 }}/>
+  <span style={{ position:"absolute", right:4, bottom:4, width:6, height:6, borderRight:"2px solid color-mix(in srgb, var(--accent) 50%, transparent)", borderBottom:"2px solid color-mix(in srgb, var(--accent) 50%, transparent)", borderBottomRightRadius:3 }}/>
 </>)
 export const GLYPH_AVANCES = (<>
-  <span style={{ position:"absolute", left:5, top:10, width:16, height:1.5, background:"rgba(232,200,119,.55)" }}/>
+  <span style={{ position:"absolute", left:5, top:10, width:16, height:1.5, background:"color-mix(in srgb, var(--accent) 55%, transparent)" }}/>
   <span style={{ position:"absolute", left:9, top:7.5, width:6, height:6, borderRadius:"50%", background:"var(--gold-light)" }}/>
-  <span style={{ position:"absolute", left:5, top:18, width:16, height:1.5, background:"rgba(232,200,119,.55)" }}/>
+  <span style={{ position:"absolute", left:5, top:18, width:16, height:1.5, background:"color-mix(in srgb, var(--accent) 55%, transparent)" }}/>
   <span style={{ position:"absolute", left:15, top:15.5, width:6, height:6, borderRadius:"50%", background:"var(--gold-light)" }}/>
 </>)
 export const GLYPH_LOGO = (
@@ -39,7 +39,7 @@ export const GLYPH_LOGO = (
   </span>
 )
 export const GLYPH_MARGE = (<>
-  <span style={{ position:"absolute", left:6, top:6, width:16, height:16, border:"1.5px dashed rgba(232,200,119,.6)", borderRadius:3 }}/>
+  <span style={{ position:"absolute", left:6, top:6, width:16, height:16, border:"1.5px dashed color-mix(in srgb, var(--accent) 60%, transparent)", borderRadius:3 }}/>
   <span style={{ position:"absolute", left:10.5, top:10.5, width:7, height:7, background:"var(--gold-light)", borderRadius:1 }}/>
 </>)
 
@@ -49,14 +49,14 @@ export function AccSection({ id, title, icon, glyph, subtitle, openId, setOpenId
 }) {
   const open = openId === id
   return (
-    <div style={{ border:`1px solid ${open?"rgba(232,200,119,.42)":"#26211a"}`, borderRadius:11, overflow:"hidden", background:"rgba(255,255,255,0.025)", transition:"border-color 0.24s ease" }}>
+    <div style={{ border:`1px solid ${open?"color-mix(in srgb, var(--accent) 42%, transparent)":"#26211a"}`, borderRadius:11, overflow:"hidden", background:"rgba(255,255,255,0.025)", transition:"border-color 0.24s ease" }}>
       <button type="button" onClick={() => setOpenId(open ? "" : id)}
-        onMouseEnter={e => { if (!open) e.currentTarget.style.background = "rgba(232,200,119,.07)" }}
+        onMouseEnter={e => { if (!open) e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 7%, transparent)" }}
         onMouseLeave={e => { if (!open) e.currentTarget.style.background = "transparent" }}
-        style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, padding:"12px 14px", background: open ? "rgba(232,200,119,.07)" : "transparent", border:"none", cursor:"pointer", transition:"background 0.24s ease" }}>
+        style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, padding:"12px 14px", background: open ? "color-mix(in srgb, var(--accent) 7%, transparent)" : "transparent", border:"none", cursor:"pointer", transition:"background 0.24s ease" }}>
         <span style={{ display:"flex", alignItems:"center", gap:11, minWidth:0 }}>
           {glyph ? (
-            <span aria-hidden="true" style={{ position:"relative", display:"inline-flex", alignItems:"center", justifyContent:"center", width:28, height:28, flexShrink:0, borderRadius:8, background:"linear-gradient(135deg, rgba(232,200,119,.16), rgba(201,162,77,.05))", border:"1px solid rgba(232,200,119,.22)" }}>{glyph}</span>
+            <span aria-hidden="true" style={{ position:"relative", display:"inline-flex", alignItems:"center", justifyContent:"center", width:28, height:28, flexShrink:0, borderRadius:8, background:"linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, transparent), color-mix(in srgb, var(--accent) 5%, transparent))", border:"1px solid color-mix(in srgb, var(--accent) 22%, transparent)" }}>{glyph}</span>
           ) : icon ? (<span style={{ fontSize:14 }}>{icon}</span>) : null}
           <span style={{ display:"flex", flexDirection:"column", gap:2, minWidth:0, textAlign:"left" as const }}>
             <span style={{ fontSize:13.5, fontWeight:600, color:"var(--ink)", letterSpacing:"-.01em", whiteSpace:"nowrap" as const }}>{title}</span>

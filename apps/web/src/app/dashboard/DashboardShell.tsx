@@ -12,7 +12,7 @@ import { SessionShellContext } from "./sessionShell"
 import { accessibleOwnerIds } from "@/lib/team"
 import { pageLimit } from "@/lib/plans"
 
-const DEFAULT_ACCENT = "#C9A84C"
+const DEFAULT_ACCENT = "#D4AF45"
 const MUTED = "var(--muted)"
 
 // Jeu de glyphes filaires de la nav (DA §10) : 16×16, traits 1.4px, dessinés en `currentColor` → ils s'éclairent

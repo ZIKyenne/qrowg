@@ -43,14 +43,14 @@ Tiramisu;6,50€;Fait maison`
     return (
       <>
         <button type="button" onClick={() => setHelpOpen(true)}
-          style={{ display: "inline-flex", alignItems: "center", gap: 6, alignSelf: "flex-start", padding: "6px 10px", borderRadius: 8, border: "1px solid rgba(201,168,76,0.3)", background: "rgba(201,168,76,0.08)", color: G, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>
+          style={{ display: "inline-flex", alignItems: "center", gap: 6, alignSelf: "flex-start", padding: "6px 10px", borderRadius: 8, border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", background: "color-mix(in srgb, var(--accent) 8%, transparent)", color: G, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>
           <Sparkles size={13} /> Pas de tableur ? Photographiez votre carte (IA)
         </button>
         {helpOpen && (
           <div onClick={() => setHelpOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 520, background: "rgba(0,0,0,0.72)", backdropFilter: "blur(5px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-            <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, maxHeight: "88vh", overflowY: "auto", background: "var(--surface)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 18, padding: 18, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }}>
+            <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, maxHeight: "88vh", overflowY: "auto", background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 18, padding: 18, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                <span style={{ width: 30, height: 30, borderRadius: 9, background: "rgba(201,168,76,0.14)", border: "1px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", color: G }}><Sparkles size={16} /></span>
+                <span style={{ width: 30, height: 30, borderRadius: 9, background: "color-mix(in srgb, var(--accent) 14%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", display: "flex", alignItems: "center", justifyContent: "center", color: G }}><Sparkles size={16} /></span>
                 <p style={{ flex: 1, color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>Remplir le menu avec une photo (IA)</p>
                 <button onClick={() => setHelpOpen(false)} aria-label="Fermer" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", width: 28, height: 28 }}><X size={14} /></button>
               </div>
@@ -111,9 +111,9 @@ Tiramisu;6,50€;Fait maison`
       setMsg(`${items.length} plat${items.length > 1 ? "s" : ""} importé${items.length > 1 ? "s" : ""} ✓`)
       setText("")
     }
-    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: "var(--ink)", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
+    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "9px 11px", color: "var(--ink)", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
     return (
-      <div style={{ border: "1px solid rgba(201,168,76,0.25)", borderRadius: 12, background: "rgba(201,168,76,0.04)", overflow: "hidden" }}>
+      <div style={{ border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 12, background: "color-mix(in srgb, var(--accent) 4%, transparent)", overflow: "hidden" }}>
         <button type="button" onClick={() => setOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "11px 12px", background: "transparent", border: "none", color: G, fontSize: 12.5, fontWeight: 700, cursor: "pointer", textAlign: "left" }}>
           <span style={{ fontSize: 15 }}>📋</span> Importer depuis un tableur
           <ChevronDown size={16} style={{ marginLeft: "auto", transform: open ? "rotate(180deg)" : "none", transition: "transform .2s" }} />
@@ -150,7 +150,7 @@ Tiramisu;6,50€;Fait maison`
     const move = (i: number, d: number) => { const j = i + d; if (j < 0 || j >= imgs.length) return; const a = [...imgs];[a[i], a[j]] = [a[j], a[i]]; write(a) }
     const replaceAt = (i: number, url: string) => { if (!url) { write(imgs.filter((_, j) => j !== i)); return } const a = [...imgs]; a[i] = url; write(a) }
     const add = (url: string) => { if (url && imgs.length < MAX) write([...imgs, url]) }
-    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
+    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
     const Seg = ({ opts, val, k }: { opts: { k: string; l: string }[]; val: string; k: string }) => (
       <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
         {opts.map(o => <button key={o.k} type="button" onClick={() => onChange(k, o.k)} style={{ flex: 1, padding: "7px 4px", borderRadius: 7, background: val === o.k ? GG : "transparent", border: "none", color: val === o.k ? "#080808" : M, fontSize: 11, fontWeight: val === o.k ? 700 : 500, cursor: "pointer" }}>{o.l}</button>)}
@@ -206,7 +206,7 @@ Tiramisu;6,50€;Fait maison`
       { label: "Resto / Bar", tags: ["Cuisine", "Cocktails", "Fait maison"] },
       { label: "Business", tags: ["Conseil", "Stratégie", "Gestion"] },
     ]
-    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
+    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
         <div>
@@ -238,7 +238,7 @@ Tiramisu;6,50€;Fait maison`
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
             {PRESETS.map(p => (
               <button key={p.label} type="button" onClick={() => commit([...tags, ...p.tags.filter(t => !tags.some(x => x.toLowerCase() === t.toLowerCase()))])}
-                style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 20, padding: "5px 11px", color: GG, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>+ {p.label}</button>
+                style={{ background: "color-mix(in srgb, var(--accent) 6%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 20, padding: "5px 11px", color: GG, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>+ {p.label}</button>
             ))}
           </div>
         </div>
@@ -250,7 +250,7 @@ Tiramisu;6,50€;Fait maison`
     const M = "#A8A190", TXT = "#F5F0E8", GG = "var(--accent, #C9A84C)"
     const cur = content.status || "available"
     const sc = availabilityStatus(cur, content.dot_color)
-    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
+    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
     const msgSuggestions = ["Ouvert aux nouvelles missions", "Disponible cette semaine", "Complet ce mois-ci", "Réponse en moins de 24 heures", "Sur réservation uniquement"]
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
@@ -282,7 +282,7 @@ Tiramisu;6,50€;Fait maison`
           <label style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>Message</label>
           <input value={content.message || ""} placeholder="Ouvert aux nouvelles missions" onChange={e => onChange("message", e.target.value)} style={inputStyle} />
           <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 6 }}>
-            {msgSuggestions.map(m => <button key={m} type="button" onClick={() => onChange("message", m)} style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 20, padding: "4px 9px", color: GG, fontSize: 10, cursor: "pointer" }}>{m}</button>)}
+            {msgSuggestions.map(m => <button key={m} type="button" onClick={() => onChange("message", m)} style={{ background: "color-mix(in srgb, var(--accent) 6%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 18%, transparent)", borderRadius: 20, padding: "4px 9px", color: GG, fontSize: 10, cursor: "pointer" }}>{m}</button>)}
           </div>
         </div>
         <div>
@@ -344,8 +344,8 @@ Tiramisu;6,50€;Fait maison`
     for (let i = 1; i <= MAX; i++) { if (fields.some(f => c[key(i, f.suffix)])) derived = i }
     const [rows, setRows] = useState(() => Math.max(1, derived))
     const count = Math.max(rows, derived)
-    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: "var(--ink)", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
-    const foc = (on: boolean) => (e: React.FocusEvent<HTMLInputElement>) => { e.target.style.borderColor = on ? "rgba(201,168,76,0.5)" : "rgba(201,168,76,0.2)" }
+    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "9px 11px", color: "var(--ink)", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
+    const foc = (on: boolean) => (e: React.FocusEvent<HTMLInputElement>) => { e.target.style.borderColor = on ? "color-mix(in srgb, var(--accent) 50%, transparent)" : "color-mix(in srgb, var(--accent) 20%, transparent)" }
     const iconBtn = (disabled: boolean): React.CSSProperties => ({ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", color: disabled ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: disabled ? "default" : "pointer", flexShrink: 0 })
     const lbl: React.CSSProperties = { color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }
     const deleteItem = (idx: number) => {
@@ -392,7 +392,7 @@ Tiramisu;6,50€;Fait maison`
         </div>
         {count < MAX
           ? <button type="button" onClick={() => setRows(Math.min(MAX, count + 1))}
-              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, minHeight: 46, border: "2px dashed rgba(201,168,76,0.3)", borderRadius: 11, background: "rgba(201,168,76,0.04)", color: G, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, minHeight: 46, border: "2px dashed color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 11, background: "color-mix(in srgb, var(--accent) 4%, transparent)", color: G, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
               <Plus size={16} /> {addLabel}
             </button>
           : <p style={{ textAlign: "center", color: MUTED, fontSize: 11.5, margin: 0, padding: "11px", border: "1px dashed rgba(255,255,255,0.12)", borderRadius: 11 }}>Maximum de {MAX} éléments atteint.</p>}
@@ -410,7 +410,7 @@ Tiramisu;6,50€;Fait maison`
     if (!def) return null
     // Les éditeurs personnalisés ne s'affichent que côté Contenu (leur mise en page passe par les réglages universels).
     if (only === "layout" && CUSTOM_EDITOR_TYPES.has(block.type)) return null
-    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: "var(--ink)", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
+    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "9px 11px", color: "var(--ink)", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
 
     if (block.type === "cover_banner") {
       return <BannerStudio content={block.content} onChange={onChange} />
@@ -442,7 +442,7 @@ Tiramisu;6,50€;Fait maison`
     if (block.type === "menu_tabs") {
       return (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div style={{ border: "1px solid rgba(201,168,76,0.25)", borderRadius: 12, background: "rgba(201,168,76,0.04)", padding: 12, display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 12, background: "color-mix(in srgb, var(--accent) 4%, transparent)", padding: 12, display: "flex", flexDirection: "column", gap: 8 }}>
             <p style={{ color: MUTED, fontSize: 11, margin: 0, lineHeight: 1.5 }}>
               Une <b>section = un onglet</b>. Collez les produits d'une section (depuis un tableur ou ChatGPT),
               un par ligne : <b>Nom;Prix;Description</b>. Idéal pour les gros menus (150+ produits).
@@ -710,9 +710,9 @@ Tiramisu;6,50€;Fait maison`
                 </label>
                 <input type="url" value={block.content[n.key]||""} onChange={e => onChange(n.key, e.target.value)}
                   placeholder={`https://${n.key}.com/...`}
-                  style={{ ...inputStyle, borderColor: block.content[n.key] ? n.color+"50" : "rgba(201,168,76,0.2)" }}
+                  style={{ ...inputStyle, borderColor: block.content[n.key] ? n.color+"50" : "color-mix(in srgb, var(--accent) 20%, transparent)" }}
                   onFocus={e => e.target.style.borderColor = n.color+"80"}
-                  onBlur={e => e.target.style.borderColor = block.content[n.key] ? n.color+"50" : "rgba(201,168,76,0.2)"} />
+                  onBlur={e => e.target.style.borderColor = block.content[n.key] ? n.color+"50" : "color-mix(in srgb, var(--accent) 20%, transparent)"} />
                 {block.content[n.key] && (
                   <div style={{ display: "flex", gap: 6, marginTop: 5 }}>
                     <input value={block.content[n.key+"__label"]||""} onChange={e => onChange(n.key+"__label", e.target.value)} placeholder={`Libellé (${n.label})`} style={{ ...inputStyle, flex: 1, fontSize: 11, padding: "7px 9px" }} />
@@ -739,7 +739,7 @@ Tiramisu;6,50€;Fait maison`
                     return (
                       <div key={g}>
                         <button type="button" onClick={() => setOpenNetGroup(open ? null : g)}
-                          style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, minHeight: 46, padding: "10px 12px", borderRadius: 10, border: `1px solid ${open ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.08)"}`, background: open ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.02)", color: "var(--ink)", cursor: "pointer", textAlign: "left" }}>
+                          style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, minHeight: 46, padding: "10px 12px", borderRadius: 10, border: `1px solid ${open ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "rgba(255,255,255,0.08)"}`, background: open ? "color-mix(in srgb, var(--accent) 6%, transparent)" : "rgba(255,255,255,0.02)", color: "var(--ink)", cursor: "pointer", textAlign: "left" }}>
                           <span style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>{GROUP_LABELS[g] || g}</span>
                           <span style={{ fontSize: 11, color: MUTED }}>{nets.length}</span>
                           <ChevronDown size={16} color={MUTED} style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform .2s", flexShrink: 0 }} />
@@ -793,8 +793,8 @@ Tiramisu;6,50€;Fait maison`
               ? <textarea value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)}
                   placeholder={field.placeholder} rows={3}
                   style={{ ...inputStyle, resize: "vertical" }}
-                  onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"}
-                  onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />
+                  onFocus={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)"}
+                  onBlur={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 20%, transparent)"} />
               : field.type === "select"
               ? (field.options && field.options.length <= 5
                   ? <Segmented value={block.content[field.key] || field.options[0]} options={field.options} onChange={v => onChange(field.key, v)} />
@@ -804,19 +804,19 @@ Tiramisu;6,50€;Fait maison`
               : field.type === "color"
               ? <div style={{ display: "flex", gap: 7 }}>
                   <input type="color" aria-label={field.label} value={block.content[field.key]||"#C9A84C"} onChange={e => onChange(field.key, e.target.value)} style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }} />
-                  <input type="text" value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)} placeholder={field.placeholder} style={{ ...inputStyle, flex: 1 }} onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"} onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />
+                  <input type="text" value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)} placeholder={field.placeholder} style={{ ...inputStyle, flex: 1 }} onFocus={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)"} onBlur={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 20%, transparent)"} />
                 </div>
               : field.type === "image"
               ? <ImageUpload value={block.content[field.key]||""} onChange={url => onChange(field.key, url)} hint={field.hint} cropAspect={(field as any).cropAspect} />
               : field.type === "file"
               ? <FileUpload value={block.content[field.key]||""} onChange={url => onChange(field.key, url)} hint={field.hint} />
               : field.type === "datetime"
-              ? <input type="datetime-local" value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)} style={inputStyle} onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"} onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />
+              ? <input type="datetime-local" value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)} style={inputStyle} onFocus={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)"} onBlur={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 20%, transparent)"} />
               : <input type={field.type==="url" ? "url" : "text"} value={block.content[field.key]||""}
                   onChange={e => onChange(field.key, e.target.value)}
                   placeholder={field.placeholder} style={inputStyle}
-                  onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.5)"}
-                  onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"} />}
+                  onFocus={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)"}
+                  onBlur={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 20%, transparent)"} />}
             {field.hint && <p style={{ color: MUTED, fontSize: 11, margin: "3px 0 0", lineHeight: 1.4 }}>{field.hint}</p>}
             {/* Validation guidée : URL / email / téléphone (affichage seul) */}
             {(() => {
@@ -882,7 +882,7 @@ Tiramisu;6,50€;Fait maison`
                         if (active) onChange(field.key, parts.filter((p: string) => p !== sug).join(", "))
                         else if (parts.length < 5) onChange(field.key, [...parts, sug].join(", "))
                       }}
-                      style={{ padding: "4px 9px", borderRadius: 999, background: active ? G : "rgba(201,168,76,0.1)", border: `1px solid ${active ? G : "rgba(201,168,76,0.25)"}`, color: active ? "#080808" : G, fontSize: 10, fontWeight: active ? 800 : 600, cursor: "pointer", whiteSpace: "nowrap" as const, maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      style={{ padding: "4px 9px", borderRadius: 999, background: active ? G : "color-mix(in srgb, var(--accent) 10%, transparent)", border: `1px solid ${active ? G : "color-mix(in srgb, var(--accent) 25%, transparent)"}`, color: active ? "#080808" : G, fontSize: 10, fontWeight: active ? 800 : 600, cursor: "pointer", whiteSpace: "nowrap" as const, maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis" }}>
                       {active ? "✓ " : ""}{sug}
                     </button>
                   )
@@ -901,7 +901,7 @@ Tiramisu;6,50€;Fait maison`
           return (
             <div key={g}>
               <button type="button" onClick={() => setOpenCards(prev => { const n = new Set(prev); if (n.has(g)) n.delete(g); else n.add(g); return n })}
-                style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, minHeight: 46, padding: "10px 12px", borderRadius: 10, border: `1px solid ${open ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.08)"}`, background: open ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.02)", color: "var(--ink)", cursor: "pointer", textAlign: "left" }}>
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, minHeight: 46, padding: "10px 12px", borderRadius: 10, border: `1px solid ${open ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "rgba(255,255,255,0.08)"}`, background: open ? "color-mix(in srgb, var(--accent) 6%, transparent)" : "rgba(255,255,255,0.02)", color: "var(--ink)", cursor: "pointer", textAlign: "left" }}>
                 <span style={{ width: 7, height: 7, borderRadius: "50%", background: filled ? "var(--success)" : "rgba(255,255,255,0.18)", flexShrink: 0 }} />
                 <span style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>{g}</span>
                 <span style={{ fontSize: 10.5, color: MUTED }}>{filled ? `${filled}/${fields.length}` : "vide"}</span>
@@ -972,7 +972,7 @@ Tiramisu;6,50€;Fait maison`
     const MUTED = "#A8A190"
 
     const inputStyle: React.CSSProperties = {
-      width: "100%", background: "var(--field)", border: "1px solid rgba(201,168,76,0.2)",
+      width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)",
       borderRadius: 8, padding: "8px 10px", color: "var(--ink)", fontSize: 12,
       outline: "none", boxSizing: "border-box" as const, fontFamily: "monospace"
     }
@@ -1498,7 +1498,7 @@ Tiramisu;6,50€;Fait maison`
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     <label style={{ color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Image de fond</label>
                     {/* Upload fichier */}
-                    <label style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, height: 48, background: "rgba(201,168,76,0.08)", border: "1.5px dashed rgba(201,168,76,0.3)", borderRadius: 10, cursor: "pointer", color: G, fontSize: 12, fontWeight: 600 }}>
+                    <label style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, height: 48, background: "color-mix(in srgb, var(--accent) 8%, transparent)", border: "1.5px dashed color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 10, cursor: "pointer", color: G, fontSize: 12, fontWeight: 600 }}>
                       <span>📁</span> Choisir une image
                       <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => {
                         const file = e.target.files?.[0]
@@ -1772,7 +1772,7 @@ Tiramisu;6,50€;Fait maison`
                   const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" })
                   const url = URL.createObjectURL(blob)
                   const a = document.createElement("a"); a.href = url; a.download = "qrfolio-style.json"; a.click()
-                }} style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 9, padding: "10px", color: G, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
+                }} style={{ background: "color-mix(in srgb, var(--accent) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 9, padding: "10px", color: G, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
                   📤 Exporter le style complet
                 </button>
                 {/* Aperçu fond actuel */}
@@ -1847,7 +1847,7 @@ Tiramisu;6,50€;Fait maison`
           const setIntro = (patch: Partial<PageTheme>) => onThemeChange({ ...theme, ...patch })
           const STYLES_L: [string, string][] = [["reveal","Révélation"],["fade","Fondu"],["curtain","Rideau"],["pulse","Pulse"],["ring","Anneau"],["stack","Pile"],["zoom","Zoom"],["flip","Flip"],["slide","Glissé"],["corners","Coins QR"]]
           if (!canIntro) return (
-            <div style={{ padding: "22px 16px", textAlign: "center", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 12, background: "rgba(201,168,76,0.05)" }}>
+            <div style={{ padding: "22px 16px", textAlign: "center", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 12, background: "color-mix(in srgb, var(--accent) 5%, transparent)" }}>
               <div style={{ fontSize: 26, marginBottom: 8 }}>✨</div>
               <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 700, margin: "0 0 5px" }}>Animation d&apos;entrée</p>
               <p style={{ color: MUTED, fontSize: 11.5, margin: "0 0 14px", lineHeight: 1.5 }}>Une courte animation aux couleurs de votre page accueille vos visiteurs. Réservé au plan <b style={{ color: G }}>Pro</b> et plus.</p>

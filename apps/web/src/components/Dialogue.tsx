@@ -93,7 +93,7 @@ export default function Dialogue({
         aria-describedby={description ? idDescription : undefined}
         tabIndex={-1}
         onClick={e => e.stopPropagation()}
-        style={{ width: "100%", maxWidth: 420, background: "#111010", border: "1px solid rgba(201,168,76,0.24)", borderRadius: 18, padding: "22px 20px 18px", boxSizing: "border-box", boxShadow: "0 24px 70px rgba(0,0,0,0.6)", outline: "none" }}
+        style={{ width: "100%", maxWidth: 420, background: "#111010", border: "1px solid color-mix(in srgb, var(--accent) 24%, transparent)", borderRadius: 18, padding: "22px 20px 18px", boxSizing: "border-box", boxShadow: "0 24px 70px rgba(0,0,0,0.6)", outline: "none" }}
       >
         <h2 id={idTitre} style={{ color: "var(--ink)", fontSize: 16.5, fontWeight: 800, margin: 0, letterSpacing: -0.2 }}>{titre}</h2>
         {description && (

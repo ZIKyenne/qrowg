@@ -152,7 +152,7 @@ export default function AssetsPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12 }}>
           {assets.map(a => (
             <div key={a.url} className="dam-card" onClick={() => toggleSel(a)} title="Cliquez pour sélectionner"
-              style={{ position: "relative", borderRadius: 14, overflow: "hidden", border: isSel(a) ? "1px solid rgba(232,200,119,.55)" : undefined, background: "var(--field)", aspectRatio: "1", cursor: "pointer" }}>
+              style={{ position: "relative", borderRadius: 14, overflow: "hidden", border: isSel(a) ? "1px solid color-mix(in srgb, var(--accent) 55%, transparent)" : undefined, background: "var(--field)", aspectRatio: "1", cursor: "pointer" }}>
               <img src={a.url} alt="" loading="lazy" onError={e => { e.currentTarget.style.opacity = "0" }} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
               <span aria-hidden style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,.5) 0%, rgba(0,0,0,0) 34%, rgba(0,0,0,0) 66%, rgba(0,0,0,.4) 100%)", pointerEvents: "none" }} />
               {/* Pastille de sélection (clic = sélectionner, n'ouvre pas le média) */}
@@ -184,7 +184,7 @@ export default function AssetsPage() {
 
       {/* Barre de sélection (sticky bas) — actions groupées, DA dorée */}
       {selCount > 0 && (
-        <div style={{ position: "sticky", bottom: 18, zIndex: 15, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap", padding: "13px 16px 13px 20px", borderRadius: 14, background: "rgba(20,18,16,.96)", border: "1px solid rgba(232,200,119,.28)", boxShadow: "0 18px 38px -20px rgba(0,0,0,.9)", backdropFilter: "blur(6px)" }}>
+        <div style={{ position: "sticky", bottom: 18, zIndex: 15, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap", padding: "13px 16px 13px 20px", borderRadius: 14, background: "rgba(20,18,16,.96)", border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)", boxShadow: "0 18px 38px -20px rgba(0,0,0,.9)", backdropFilter: "blur(6px)" }}>
           <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--gold-light)" }}>{selCount} média{selCount > 1 ? "s" : ""} sélectionné{selCount > 1 ? "s" : ""}</span>
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
             <button className="dam-selbar-sec" onClick={allSelected ? clearSel : selectAllVisible}>{allSelected ? "Tout désélectionner" : "Tout sélectionner"}</button>

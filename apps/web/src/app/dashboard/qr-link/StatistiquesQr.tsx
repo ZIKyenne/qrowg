@@ -56,7 +56,7 @@ export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null;
       { icon: Activity, label: "Statut", value: st.phrase, color: st.couleur },
     ]
     const panel: React.CSSProperties = {
-      background: "var(--surface)", border: "1px solid rgba(201,168,76,0.25)", boxShadow: "0 20px 60px rgba(0,0,0,0.7)",
+      background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", boxShadow: "0 20px 60px rgba(0,0,0,0.7)",
       zIndex: 401, overflowY: "auto", position: "fixed",
       ...(isMobile
         ? { left: 0, right: 0, bottom: 0, width: "100%", maxHeight: "85dvh", borderRadius: "22px 22px 0 0", padding: 20, paddingBottom: "calc(20px + env(safe-area-inset-bottom))", animation: "mo-slide-up .22s ease" }
@@ -76,7 +76,7 @@ export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null;
           </div>
 
           {/* Total (chiffre héro) */}
-          <div style={{ textAlign: "center", padding: "18px 12px", borderRadius: 16, background: "radial-gradient(120% 100% at 50% 0%, rgba(201,168,76,0.14), transparent 65%), rgba(255,255,255,0.02)", border: "1px solid rgba(201,168,76,0.16)", marginBottom: 14 }}>
+          <div style={{ textAlign: "center", padding: "18px 12px", borderRadius: 16, background: "radial-gradient(120% 100% at 50% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 65%), rgba(255,255,255,0.02)", border: "1px solid color-mix(in srgb, var(--accent) 16%, transparent)", marginBottom: 14 }}>
             <p style={{ color: G, fontSize: 44, fontWeight: 800, margin: 0, lineHeight: 1, letterSpacing: -1 }}>{total.toLocaleString("fr-FR")}</p>
             <p style={{ color: MUTED, fontSize: 12, fontWeight: 600, margin: "7px 0 0", textTransform: "uppercase", letterSpacing: 1.2 }}>scan{total > 1 ? "s" : ""} au total</p>
           </div>
@@ -161,7 +161,7 @@ export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null;
 
           {/* Upsell : stats détaillées réservées au Pro */}
           {details && details.detailed === false && (
-            <a href="/upgrade" style={{ display: "block", marginTop: 16, padding: "13px 14px", borderRadius: 12, background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.28)", textDecoration: "none" }}>
+            <a href="/upgrade" style={{ display: "block", marginTop: 16, padding: "13px 14px", borderRadius: 12, background: "color-mix(in srgb, var(--accent) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)", textDecoration: "none" }}>
               <p style={{ color: G, fontSize: 12.5, fontWeight: 700, margin: "0 0 3px", display: "flex", alignItems: "center", gap: 6 }}><BarChart3 size={14} /> Statistiques détaillées</p>
               <p style={{ color: MUTED, fontSize: 11.5, margin: 0, lineHeight: 1.5 }}>Scans par jour, appareil et pays à partir du plan <strong style={{ color: "var(--ink)" }}>Pro</strong>. Toucher pour découvrir →</p>
             </a>

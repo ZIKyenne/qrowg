@@ -6,7 +6,7 @@
 // =============================================================================
 
 const APP = "https://qrowg.com"
-const GOLD = "#C9A84C"
+const GOLD = "#D4AF45"
 
 // En-tete : logo capsule "QR"+"owg" par defaut, ou un nom de marque (deja echappe)
 // en serif dore (utilise par l'email de confirmation, envoye "de la part" du pro).

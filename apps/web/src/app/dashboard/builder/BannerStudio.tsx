@@ -16,9 +16,9 @@ const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 function Section({ title, icon, open, onToggle, children, hero }: { title: string; icon: React.ReactNode; open: boolean; onToggle: () => void; children: React.ReactNode; hero?: boolean }) {
   return (
     <div style={{
-      border: `1px solid ${open ? "rgba(201,168,76,0.35)" : hero ? "rgba(201,168,76,0.2)" : "rgba(255,255,255,0.07)"}`,
+      border: `1px solid ${open ? "color-mix(in srgb, var(--accent) 35%, transparent)" : hero ? "color-mix(in srgb, var(--accent) 20%, transparent)" : "rgba(255,255,255,0.07)"}`,
       borderRadius: 12, overflow: "hidden",
-      background: open ? "rgba(201,168,76,0.06)" : hero ? "rgba(201,168,76,0.03)" : "transparent",
+      background: open ? "color-mix(in srgb, var(--accent) 6%, transparent)" : hero ? "color-mix(in srgb, var(--accent) 3%, transparent)" : "transparent",
       transition: "border-color .2s, background .2s",
       boxShadow: open ? "0 4px 18px rgba(0,0,0,0.25)" : "none",
     }}>
@@ -109,7 +109,7 @@ function ColorStudio({ label, value, fallback, onChange }: { label: string; valu
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
         <label style={{ color: MUTED, fontSize: 11, fontWeight: 500 }}>{label}</label>
         <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-          <input value={value || ""} placeholder={fallback} onChange={e => onChange(e.target.value)} onBlur={e => e.target.value && commit(e.target.value)} style={{ width: 82, background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 7, padding: "6px 8px", color: TEXT, fontSize: 11, outline: "none", fontFamily: "monospace" }} />
+          <input value={value || ""} placeholder={fallback} onChange={e => onChange(e.target.value)} onBlur={e => e.target.value && commit(e.target.value)} style={{ width: 82, background: "#0A0A0A", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 7, padding: "6px 8px", color: TEXT, fontSize: 11, outline: "none", fontFamily: "monospace" }} />
           <label style={{ width: 26, height: 26, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: value || fallback, cursor: "pointer", flexShrink: 0, position: "relative", overflow: "hidden" }} title="Pipette / roue chromatique">
             <input type="color" value={value || fallback} onChange={e => commit(e.target.value)} style={{ position: "absolute", inset: -4, width: 40, height: 40, border: "none", padding: 0, cursor: "pointer", opacity: 0 }} />
           </label>
@@ -168,7 +168,7 @@ function CropEditor({ content, set, onClose }: { content: Record<string, any>; s
 
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#111009", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 16, padding: 18, width: 340, maxWidth: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#111009", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 16, padding: 18, width: 340, maxWidth: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
           <Crop size={16} color={G} />
           <span style={{ color: G, fontSize: 13, fontWeight: 800, letterSpacing: 0.5, textTransform: "uppercase", flex: 1 }}>Recadrage</span>
@@ -264,7 +264,7 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
       {crop && <CropEditor content={c} set={set} onClose={() => setCrop(false)} />}
 
       {/* EN-TÊTE STUDIO */}
-      <div style={{ background: "linear-gradient(135deg,rgba(201,168,76,0.14),rgba(201,168,76,0.03))", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 13, padding: "12px 14px" }}>
+      <div style={{ background: "linear-gradient(135deg,color-mix(in srgb, var(--accent) 14%, transparent),color-mix(in srgb, var(--accent) 3%, transparent))", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 13, padding: "12px 14px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 10 }}>
           <span style={{ display: "flex", color: G, animation: "qfbFloat 4s ease-in-out infinite" }}><Wand2 size={16} /></span>
           <div style={{ flex: 1 }}>
@@ -304,8 +304,8 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
           <>
             <ImageUpload value={c.src || ""} onChange={url => set("src", url)} cropAspect="wide" hint="Glissez-déposez, collez ou importez une URL" />
             {c.src && (
-              <button onClick={() => setCrop(true)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 9, padding: "10px", color: G, fontSize: 12, fontWeight: 700, cursor: "pointer", transition: "background .15s" }}
-                onMouseEnter={e => e.currentTarget.style.background = "rgba(201,168,76,0.18)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(201,168,76,0.1)"}>
+              <button onClick={() => setCrop(true)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 9, padding: "10px", color: G, fontSize: 12, fontWeight: 700, cursor: "pointer", transition: "background .15s" }}
+                onMouseEnter={e => e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 18%, transparent)"} onMouseLeave={e => e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 10%, transparent)"}>
                 <Crop size={14} /> Recadrer &amp; Zoomer{(parseFloat(c.img_zoom) > 1 || (c.img_pos_x && c.img_pos_x !== "50")) ? " ✓" : ""}
               </button>
             )}
@@ -399,7 +399,7 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
             {[{ key: "auto", label: "Auto", ff: "inherit" }, { key: "serif", label: "Serif", ff: BANNER_FONTS.serif }, { key: "sans", label: "Sans", ff: BANNER_FONTS.sans }, { key: "display", label: "Display", ff: BANNER_FONTS.display }, { key: "mono", label: "Mono", ff: BANNER_FONTS.mono }].map(o => {
               const on = (c.title_font || "auto") === o.key
               return (
-                <button key={o.key} onClick={() => set("title_font", o.key)} style={{ borderRadius: 9, border: `1.5px solid ${on ? G : "rgba(255,255,255,0.1)"}`, background: on ? "rgba(201,168,76,0.1)" : "rgba(255,255,255,0.03)", cursor: "pointer", padding: "8px 4px" }}>
+                <button key={o.key} onClick={() => set("title_font", o.key)} style={{ borderRadius: 9, border: `1.5px solid ${on ? G : "rgba(255,255,255,0.1)"}`, background: on ? "color-mix(in srgb, var(--accent) 10%, transparent)" : "rgba(255,255,255,0.03)", cursor: "pointer", padding: "8px 4px" }}>
                   <div style={{ fontFamily: o.ff, color: on ? G : TEXT, fontSize: 18, fontWeight: 700, lineHeight: 1 }}>Ag</div>
                   <div style={{ fontSize: 9, color: on ? G : MUTED, marginTop: 3 }}>{o.label}</div>
                 </button>
@@ -424,7 +424,7 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
               const cur = c.title_effect || "shadow"
               const on = cur === o.key
               return (
-                <button key={o.key} onClick={() => set("title_effect", o.key)} style={{ borderRadius: 9, border: `1.5px solid ${on ? G : "rgba(255,255,255,0.1)"}`, background: on ? "rgba(201,168,76,0.1)" : "rgba(255,255,255,0.03)", cursor: "pointer", padding: "9px 2px" }}>
+                <button key={o.key} onClick={() => set("title_effect", o.key)} style={{ borderRadius: 9, border: `1.5px solid ${on ? G : "rgba(255,255,255,0.1)"}`, background: on ? "color-mix(in srgb, var(--accent) 10%, transparent)" : "rgba(255,255,255,0.03)", cursor: "pointer", padding: "9px 2px" }}>
                   <div style={{ color: "#fff", fontSize: 15, fontWeight: 800, lineHeight: 1, textShadow: (o as any).sh || "none", WebkitTextStroke: (o as any).stroke ? "0.8px rgba(0,0,0,0.7)" : undefined }}>Ag</div>
                   <div style={{ fontSize: 8.5, color: on ? G : MUTED, marginTop: 4 }}>{o.label}</div>
                 </button>
@@ -460,7 +460,7 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
         {(parseFloat(c.overlay_opacity || "0") > 0) && (
           <div>
             <label style={{ color: MUTED, fontSize: 11, fontWeight: 500, display: "block", marginBottom: 6 }}>Mode de fusion de la teinte</label>
-            <select aria-label="Mode de fusion" value={c.blend_mode || "normal"} onChange={e => set("blend_mode", e.target.value)} style={{ width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "8px 10px", color: TEXT, fontSize: 12, outline: "none" }}>
+            <select aria-label="Mode de fusion" value={c.blend_mode || "normal"} onChange={e => set("blend_mode", e.target.value)} style={{ width: "100%", background: "#0A0A0A", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "8px 10px", color: TEXT, fontSize: 12, outline: "none" }}>
               {["normal", "multiply", "screen", "overlay", "soft-light", "color-burn", "darken", "lighten"].map(m => <option key={m} value={m}>{m}</option>)}
             </select>
           </div>
@@ -494,7 +494,7 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
           {ANIM_OPTS.map(o => {
             const on = anim === o.key
             return (
-              <button key={o.key} onClick={() => set("animation", o.key)} style={{ borderRadius: 10, overflow: "hidden", border: `1.5px solid ${on ? "rgba(201,168,76,0.5)" : "rgba(255,255,255,0.09)"}`, background: on ? "rgba(201,168,76,0.08)" : "rgba(255,255,255,0.03)", cursor: "pointer", padding: 0 }}>
+              <button key={o.key} onClick={() => set("animation", o.key)} style={{ borderRadius: 10, overflow: "hidden", border: `1.5px solid ${on ? "color-mix(in srgb, var(--accent) 50%, transparent)" : "rgba(255,255,255,0.09)"}`, background: on ? "color-mix(in srgb, var(--accent) 8%, transparent)" : "rgba(255,255,255,0.03)", cursor: "pointer", padding: 0 }}>
                 <div className={o.key !== "none" ? `qfb qfb-${o.key}` : undefined} style={{ height: 38, position: "relative", overflow: "hidden" }}>
                   <div className="qfb-media" style={{ position: "absolute", inset: 0, background: `linear-gradient(135deg,${G},#1a1206)` }} />
                   {o.key === "shimmer" && <div className="qfb-shine" />}
@@ -518,7 +518,7 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
             const anim2 = p.content.animation && p.content.animation !== "none" ? p.content.animation : null
             return (
               <button key={p.key} onClick={() => applyPreset(p.content)} style={{ borderRadius: 11, overflow: "hidden", border: "1px solid rgba(255,255,255,0.09)", background: "rgba(255,255,255,0.03)", cursor: "pointer", padding: 0, transition: "border-color .15s, transform .15s" }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(201,168,76,0.45)"; e.currentTarget.style.transform = "translateY(-2px)" }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 45%, transparent)"; e.currentTarget.style.transform = "translateY(-2px)" }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.09)"; e.currentTarget.style.transform = "none" }}>
                 <div className={anim2 ? `qfb qfb-${anim2}` : undefined} style={{ height: 46, position: "relative", overflow: "hidden" }}>
                   <div className="qfb-media" style={{ position: "absolute", inset: 0, ...bgPreview(p.content) }} />
@@ -544,8 +544,8 @@ function Field({ label, value, placeholder, max, onChange }: { label: string; va
         <label style={{ color: MUTED, fontSize: 11, fontWeight: 500 }}>{label}</label>
         {max && <span style={{ color: len > max ? "#EF4444" : MUTED, fontSize: 10, fontVariantNumeric: "tabular-nums" }}>{len}/{max}</span>}
       </div>
-      <input value={value || ""} placeholder={placeholder} onChange={e => onChange(e.target.value)} style={{ width: "100%", background: "#0A0A0A", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, padding: "9px 11px", color: TEXT, fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif", transition: "border-color .15s" }}
-        onFocus={e => e.currentTarget.style.borderColor = "rgba(201,168,76,0.5)"} onBlur={e => e.currentTarget.style.borderColor = "rgba(201,168,76,0.2)"} />
+      <input value={value || ""} placeholder={placeholder} onChange={e => onChange(e.target.value)} style={{ width: "100%", background: "#0A0A0A", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "9px 11px", color: TEXT, fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif", transition: "border-color .15s" }}
+        onFocus={e => e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)"} onBlur={e => e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 20%, transparent)"} />
     </div>
   )
 }

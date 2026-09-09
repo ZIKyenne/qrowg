@@ -534,7 +534,7 @@ export default function QrLinkPage() {
                 const on = styleKey === p.k
                 return (
                   <button key={p.k} onClick={() => setStyleKey(p.k)} aria-pressed={on}
-                    style={{ flex: "1 1 0", minWidth: 0, minHeight: 42, borderRadius: 10, cursor: "pointer", background: on ? "rgba(201,168,76,0.14)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? G + "66" : "rgba(255,255,255,0.1)"}`, color: on ? G : MUTED, fontSize: 11.5, fontWeight: on ? 800 : 600, transition: "all .15s" }}>{p.label}</button>
+                    style={{ flex: "1 1 0", minWidth: 0, minHeight: 42, borderRadius: 10, cursor: "pointer", background: on ? "color-mix(in srgb, var(--accent) 14%, transparent)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? G + "66" : "rgba(255,255,255,0.1)"}`, color: on ? G : MUTED, fontSize: 11.5, fontWeight: on ? 800 : 600, transition: "all .15s" }}>{p.label}</button>
                 )
               })}
             </div>
@@ -588,7 +588,7 @@ export default function QrLinkPage() {
         <div className="qrdyn-aside">
 
       {/* 3 · Aperçu — poster QR */}
-      <div style={{ position: "relative", borderRadius: 20, padding: "26px 18px", marginBottom: 14, overflow: "hidden", background: "radial-gradient(120% 90% at 50% 0%, rgba(201,168,76,0.12), transparent 60%), rgba(255,255,255,0.02)", border: "1px solid rgba(201,168,76,0.16)", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+      <div style={{ position: "relative", borderRadius: 20, padding: "26px 18px", marginBottom: 14, overflow: "hidden", background: "radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%), rgba(255,255,255,0.02)", border: "1px solid color-mix(in srgb, var(--accent) 16%, transparent)", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
         <div style={{ background: bg, borderRadius: 20, padding: 20, boxShadow: "0 14px 40px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(0,0,0,0.06)", display: "flex", flexDirection: "column", alignItems: "center", gap: 12, transition: "background .2s", maxWidth: "100%" }}>
           <div style={{ position: "relative", lineHeight: 0, borderRadius: 8, overflow: "hidden" }}>
             {/* Tant qu'il n'y a rien à encoder, on n'affiche PAS de QR. La page en
@@ -677,7 +677,7 @@ export default function QrLinkPage() {
       {/* Génération en masse (Business) : créer plusieurs liens dynamiques depuis un CSV. */}
       {canDynMasse(plan) && (
         <button onClick={() => setBulkOpen(true)}
-          style={{ marginTop: 22, width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, minHeight: 46, borderRadius: 12, border: "1.5px dashed rgba(201,168,76,0.35)", background: "rgba(201,168,76,0.05)", color: G, fontSize: 13.5, fontWeight: 700, cursor: "pointer" }}>
+          style={{ marginTop: 22, width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, minHeight: 46, borderRadius: 12, border: "1.5px dashed color-mix(in srgb, var(--accent) 35%, transparent)", background: "color-mix(in srgb, var(--accent) 5%, transparent)", color: G, fontSize: 13.5, fontWeight: 700, cursor: "pointer" }}>
           <Upload size={16} /> Importer des liens en masse (CSV)
         </button>
       )}
@@ -755,7 +755,7 @@ export default function QrLinkPage() {
       {/* Aperçu détaillé d'un QR enregistré (clic) : grand QR + infos + décompte d'expiration */}
       {detail && (() => { const ex = etatLien(detail); return (
         <div onClick={fermerDetail} style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 400, maxHeight: "90vh", overflowY: "auto", background: "var(--surface)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 20, padding: 20, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 400, maxHeight: "90vh", overflowY: "auto", background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 20, padding: 20, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
               <p style={{ flex: 1, color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{detail.label || (detail.dynamic ? "Lien dynamique" : libelleTypeQr(detail.kind))}</p>
               <button onClick={fermerDetail} aria-label="Fermer la fiche" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", width: 30, height: 30 }}><X size={15} /></button>
@@ -789,7 +789,7 @@ export default function QrLinkPage() {
                   <button onClick={() => demanderDestination(detail)} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, color: "var(--ink)", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: "8px 12px" }}>Modifier la destination</button>
                 </div>
                 <button onClick={() => setStats(detail)}
-                  style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, alignSelf: "flex-start", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 10, color: G, fontSize: 12.5, fontWeight: 700, cursor: "pointer", padding: "9px 14px" }}>
+                  style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, alignSelf: "flex-start", background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 10, color: G, fontSize: 12.5, fontWeight: 700, cursor: "pointer", padding: "9px 14px" }}>
                   <BarChart3 size={15} /> Statistiques
                 </button>
 

@@ -1168,7 +1168,7 @@ import { actionClavier } from "./raccourcisClavier"
       const lo = text.toLowerCase()
       const idx = lo.indexOf(query.toLowerCase())
       if (idx === -1) return text
-      return <>{text.slice(0, idx)}<mark style={{ background: "rgba(201,168,76,0.25)", color: "var(--ink)", borderRadius: 2, padding: "0 1px" }}>{text.slice(idx, idx + query.length)}</mark>{text.slice(idx + query.length)}</>
+      return <>{text.slice(0, idx)}<mark style={{ background: "color-mix(in srgb, var(--accent) 25%, transparent)", color: "var(--ink)", borderRadius: 2, padding: "0 1px" }}>{text.slice(idx, idx + query.length)}</mark>{text.slice(idx + query.length)}</>
     }
 
     // selectedBlock recalculé depuis blocks à chaque render — garantit fraîcheur
@@ -1228,7 +1228,7 @@ import { actionClavier } from "./raccourcisClavier"
         : { icon: "⚠️", title: "Impossible de charger la page", sub: "Vérifiez votre connexion puis réessayez." }
       return (
         <div style={{ height: "100dvh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "DM Sans, sans-serif", color: "var(--ink)", padding: 24 }}>
-          <div role="alert" style={{ maxWidth: 380, textAlign: "center", background: "var(--surface)", border: "1px solid rgba(201,168,76,0.16)", borderRadius: 16, padding: "32px 28px" }}>
+          <div role="alert" style={{ maxWidth: 380, textAlign: "center", background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 16%, transparent)", borderRadius: 16, padding: "32px 28px" }}>
             <div style={{ fontSize: 40, marginBottom: 12 }} aria-hidden>{info.icon}</div>
             <h1 style={{ fontSize: 18, fontWeight: 700, margin: "0 0 8px", fontFamily: "Fraunces, serif" }}>{info.title}</h1>
             <p style={{ fontSize: 13, color: "var(--muted)", margin: "0 0 22px", lineHeight: 1.6 }}>{info.sub}</p>
@@ -1256,7 +1256,7 @@ import { actionClavier } from "./raccourcisClavier"
         {draftFound && (
           <div role="dialog" aria-modal="true" aria-label="Reprendre votre page"
             style={{ position: "fixed", inset: 0, zIndex: 400, background: "rgba(0,0,0,0.72)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-            <div style={{ maxWidth: 380, width: "100%", background: "var(--surface)", border: "1px solid rgba(201,168,76,0.22)", borderRadius: 18, padding: "26px 24px", textAlign: "center" }}>
+            <div style={{ maxWidth: 380, width: "100%", background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 22%, transparent)", borderRadius: 18, padding: "26px 24px", textAlign: "center" }}>
               <div style={{ fontSize: 32, marginBottom: 10 }} aria-hidden>📝</div>
               <h2 style={{ fontSize: 17, fontWeight: 700, margin: "0 0 6px", fontFamily: "Fraunces, serif", color: "var(--ink)" }}>Vous aviez commencé une page</h2>
               <p style={{ fontSize: 13, color: MUTED, margin: "0 0 20px", lineHeight: 1.55 }}>
@@ -1326,7 +1326,7 @@ import { actionClavier } from "./raccourcisClavier"
             )}
             renderTemplates={() => (
               <button type="button" onClick={() => setShowTemplates(true)}
-                style={{ width: "100%", minHeight: 44, borderRadius: 10, border: "1px solid rgba(201,168,76,0.25)", background: "rgba(201,168,76,0.1)", color: G, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                style={{ width: "100%", minHeight: 44, borderRadius: 10, border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", background: "color-mix(in srgb, var(--accent) 10%, transparent)", color: G, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
                 Voir les modèles de page
               </button>
             )}
@@ -1337,7 +1337,7 @@ import { actionClavier } from "./raccourcisClavier"
                   <div style={{ background: "#FFFFFF", borderRadius: 10, padding: 8, marginBottom: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <QRCanvas value={qrTarget} size={132} />
                   </div>
-                  <button type="button" onClick={downloadQrPng} style={{ width: "100%", minHeight: 44, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 10, color: G, cursor: "pointer", fontSize: 13, fontWeight: 700 }}>↓ Télécharger le QR (PNG)</button>
+                  <button type="button" onClick={downloadQrPng} style={{ width: "100%", minHeight: 44, background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 10, color: G, cursor: "pointer", fontSize: 13, fontWeight: 700 }}>↓ Télécharger le QR (PNG)</button>
                 </div>
               ) : (
                 <p style={{ margin: 0, fontSize: 12, color: MUTED, textAlign: "center" }}>Le QR est généré dès que la page est en ligne.</p>
@@ -1477,7 +1477,7 @@ import { actionClavier } from "./raccourcisClavier"
               de droite (Aperçu / Éditer / Thème) et « Voir en direct ». */}
           {qrTarget && !isMobile && (
             <div style={{ position: "relative" }}>
-              <button onClick={() => setShowQrPanel(p => !p)} style={{ display: "flex", alignItems: "center", gap: 5, background: showQrPanel ? "rgba(201,168,76,0.12)" : "rgba(201,168,76,0.06)", border: `1px solid ${showQrPanel ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.2)"}`, borderRadius: 8, padding: "5px 11px", color: G, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
+              <button onClick={() => setShowQrPanel(p => !p)} style={{ display: "flex", alignItems: "center", gap: 5, background: showQrPanel ? "color-mix(in srgb, var(--accent) 12%, transparent)" : "color-mix(in srgb, var(--accent) 6%, transparent)", border: `1px solid ${showQrPanel ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "color-mix(in srgb, var(--accent) 20%, transparent)"}`, borderRadius: 8, padding: "5px 11px", color: G, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
                 <QrCode size={11} /> QR Code
               </button>
               {showQrPanel && (
@@ -1489,12 +1489,12 @@ import { actionClavier } from "./raccourcisClavier"
                     <div style={{ background: "#FFFFFF", borderRadius: 10, padding: 8, marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <QRCanvas value={qrTarget} size={120} />
                     </div>
-                    <div style={{ background: "var(--field)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 7, padding: "6px 9px", marginBottom: 8 }}>
+                    <div style={{ background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius: 7, padding: "6px 9px", marginBottom: 8 }}>
                       <p style={{ color: MUTED, fontSize: 8, margin: "0 0 1px", textTransform: "uppercase", letterSpacing: 1 }}>URL de scan</p>
                       <p style={{ color: G, fontSize: 10, margin: 0, fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>/q/{qrShortCode}</p>
                     </div>
                     <div style={{ display: "flex", gap: 5 }}>
-                      <button onClick={downloadQrPng} style={{ flex: 1, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "7px", color: G, cursor: "pointer", fontSize: 10, fontWeight: 600, textAlign: "center" }}>↓ PNG</button>
+                      <button onClick={downloadQrPng} style={{ flex: 1, background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 7, padding: "7px", color: G, cursor: "pointer", fontSize: 10, fontWeight: 600, textAlign: "center" }}>↓ PNG</button>
                       <a href="/dashboard/qr-codes" style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px", color: MUTED, textDecoration: "none", fontSize: 10, textAlign: "center" }}>Perso →</a>
                     </div>
                   </div>
@@ -1506,7 +1506,7 @@ import { actionClavier } from "./raccourcisClavier"
 
 
           {pageId && pageSlug && pageStatus === "published" && !isMobile && (
-            <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "5px 11px", color: G, textDecoration: "none", fontSize: 11, fontWeight: 600 }}>
+            <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 5, background: "color-mix(in srgb, var(--accent) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 7, padding: "5px 11px", color: G, textDecoration: "none", fontSize: 11, fontWeight: 600 }}>
               <ExternalLink size={11} /> Voir en direct
             </a>
           )}
@@ -1527,7 +1527,7 @@ import { actionClavier } from "./raccourcisClavier"
                 <div>
                   {/* Header */}
                   <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-                    <div style={{ width: 42, height: 42, borderRadius: 12, background: pageStatus==="published" ? "rgba(57,255,143,0.12)" : "rgba(201,168,76,0.12)", border: `1px solid ${pageStatus==="published" ? "rgba(57,255,143,0.3)" : "rgba(201,168,76,0.3)"}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: 42, height: 42, borderRadius: 12, background: pageStatus==="published" ? "rgba(57,255,143,0.12)" : "color-mix(in srgb, var(--accent) 12%, transparent)", border: `1px solid ${pageStatus==="published" ? "rgba(57,255,143,0.3)" : "color-mix(in srgb, var(--accent) 30%, transparent)"}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                       {pageStatus==="published" ? <Globe size={20} color="var(--success)" /> : <Send size={20} color={G} />}
                     </div>
                     <div>
@@ -1547,12 +1547,12 @@ import { actionClavier } from "./raccourcisClavier"
                   {pageSlug && !guest && (
                     <div style={{ marginBottom: 16 }}>
                       <p style={{ color: MUTED, fontSize: 10, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1.5 }}>URL de la page</p>
-                      <div style={{ background: "var(--field)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 10, padding: "10px 12px", display: "flex", alignItems: "center", gap: 8 }}>
+                      <div style={{ background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 10, padding: "10px 12px", display: "flex", alignItems: "center", gap: 8 }}>
                         <p style={{ color: G, fontSize: 12, margin: 0, fontFamily: "JetBrains Mono, monospace", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {typeof window !== "undefined" ? window.location.origin : ""}/{pageSlug}
                         </p>
                         <button onClick={() => { navigator.clipboard.writeText((typeof window !== "undefined" ? window.location.origin : "")+"/"+pageSlug) }}
-                          style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 6, padding: "4px 8px", color: G, cursor: "pointer", fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
+                          style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 6, padding: "4px 8px", color: G, cursor: "pointer", fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
                           Copier
                         </button>
                       </div>
@@ -1561,7 +1561,7 @@ import { actionClavier } from "./raccourcisClavier"
 
                   {/* Stats rapides */}
                   <div style={{ display: guest ? "none" : "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
-                    <div style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 10, padding: "10px", textAlign: "center" }}>
+                    <div style={{ background: "color-mix(in srgb, var(--accent) 6%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius: 10, padding: "10px", textAlign: "center" }}>
                       <p style={{ color: G, fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif" }}>{pageStats.views}</p>
                       <p style={{ color: MUTED, fontSize: 9, margin: 0 }}>👁 Vues</p>
                     </div>
@@ -1637,7 +1637,7 @@ import { actionClavier } from "./raccourcisClavier"
                       <div style={{ background: "#FFFFFF", borderRadius: 10, padding: 8, marginBottom: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
                         <QRCanvas value={qrTarget} size={132} />
                       </div>
-                      <button onClick={downloadQrPng} style={{ width: "100%", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 10, padding: "11px", color: G, cursor: "pointer", fontSize: 13, fontWeight: 700 }}>↓ Télécharger le QR (PNG)</button>
+                      <button onClick={downloadQrPng} style={{ width: "100%", background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 10, padding: "11px", color: G, cursor: "pointer", fontSize: 13, fontWeight: 700 }}>↓ Télécharger le QR (PNG)</button>
 
                       {/* Un QR en PNG ne sert à rien tant qu'il n'est pas posé quelque part.
                           On propose donc les 3 supports les plus évidents pour ce métier, avec
@@ -1651,7 +1651,7 @@ import { actionClavier } from "./raccourcisClavier"
                           {handoff.suggested.map(sg => (
                             <a key={sg.id} href={printStudioUrl(qrShortCode, handoff, sg.id)}
                               style={{ display: "flex", alignItems: "center", gap: 9, background: "rgba(255,255,255,0.035)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "9px 10px", textDecoration: "none" }}>
-                              <span aria-hidden style={{ flexShrink: 0, width: 26, height: 26, borderRadius: 7, background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.22)", display: "flex", alignItems: "center", justifyContent: "center", color: G, fontSize: 12 }}>🖨</span>
+                              <span aria-hidden style={{ flexShrink: 0, width: 26, height: 26, borderRadius: 7, background: "color-mix(in srgb, var(--accent) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 22%, transparent)", display: "flex", alignItems: "center", justifyContent: "center", color: G, fontSize: 12 }}>🖨</span>
                               <span style={{ minWidth: 0 }}>
                                 <span style={{ display: "block", color: "var(--ink)", fontSize: 12, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{sg.label}</span>
                                 <span style={{ display: "block", color: MUTED, fontSize: 10, lineHeight: 1.3 }}>{sg.why}</span>
@@ -1793,7 +1793,7 @@ import { actionClavier } from "./raccourcisClavier"
                       <p style={{ fontSize: 22, margin: "0 0 8px" }}>🔍</p>
                       <p style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600, margin: "0 0 3px" }}>Aucun bloc trouvé</p>
                       <p style={{ color: MUTED, fontSize: 10, margin: "0 0 12px" }}>"{search}"</p>
-                      <button onClick={() => setSearch("")} style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 7, padding: "5px 12px", color: G, fontSize: 10, fontWeight: 600, cursor: "pointer" }}>Effacer</button>
+                      <button onClick={() => setSearch("")} style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 7, padding: "5px 12px", color: G, fontSize: 10, fontWeight: 600, cursor: "pointer" }}>Effacer</button>
                     </div>
                   )
                   : (<>
@@ -1909,7 +1909,7 @@ import { actionClavier } from "./raccourcisClavier"
                               <div style={{ flex: 1, minWidth: 0 }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
                                   <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: "inherit", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.label}</p>
-                                  {RECO.has(type) && <span style={{ flexShrink: 0, background: "rgba(201,168,76,0.16)", border: "1px solid rgba(201,168,76,0.35)", color: G, fontSize: 8, fontWeight: 800, letterSpacing: 0.3, borderRadius: 6, padding: "1px 5px", textTransform: "uppercase" as const }}>★ Reco</span>}
+                                  {RECO.has(type) && <span style={{ flexShrink: 0, background: "color-mix(in srgb, var(--accent) 16%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 35%, transparent)", color: G, fontSize: 8, fontWeight: 800, letterSpacing: 0.3, borderRadius: 6, padding: "1px 5px", textTransform: "uppercase" as const }}>★ Reco</span>}
                                 </div>
                                 <p style={{ margin: 0, fontSize: 10.5, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1.3 }}>{def.description}</p>
                               </div>
@@ -1939,13 +1939,13 @@ import { actionClavier } from "./raccourcisClavier"
                                     return (<>
                                       {/* Modèles par métier : 1 clic crée une identité adaptée */}
                                       <div style={{ margin: "0 0 10px" }}>
-                                        <button type="button" onClick={() => setMetierOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, width: "100%", background: metierOpen ? "rgba(201,168,76,0.05)" : "rgba(201,168,76,0.09)", border: `1px solid ${metierOpen ? "rgba(201,168,76,0.18)" : "rgba(201,168,76,0.3)"}`, borderRadius: 9, cursor: "pointer", padding: "9px 12px", margin: "8px 0" }}><span style={{ display: "flex", alignItems: "center", gap: 7, color: "var(--ink)", fontSize: 12.5, fontWeight: 700 }}><Sparkles size={13} /> Modèles par métier</span><ChevronDown size={15} color={G} style={{ transform: metierOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }} /></button>
+                                        <button type="button" onClick={() => setMetierOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, width: "100%", background: metierOpen ? "color-mix(in srgb, var(--accent) 5%, transparent)" : "color-mix(in srgb, var(--accent) 9%, transparent)", border: `1px solid ${metierOpen ? "color-mix(in srgb, var(--accent) 18%, transparent)" : "color-mix(in srgb, var(--accent) 30%, transparent)"}`, borderRadius: 9, cursor: "pointer", padding: "9px 12px", margin: "8px 0" }}><span style={{ display: "flex", alignItems: "center", gap: 7, color: "var(--ink)", fontSize: 12.5, fontWeight: 700 }}><Sparkles size={13} /> Modèles par métier</span><ChevronDown size={15} color={G} style={{ transform: metierOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }} /></button>
                                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                                           {metierOpen && IDENTITY_PRESETS.map(p => (
                                             <button key={p.key} type="button" onClick={() => generateIdentityPreset(p)} title={`Crée : ${p.blocks.map(b => (BLOCK_DEFS as any)[b.type]?.label || b.type).join(", ")}`}
-                                              style={{ display: "flex", alignItems: "center", gap: 7, minHeight: isMobile ? 46 : undefined, padding: isMobile ? "11px 11px" : "9px 10px", borderRadius: 10, border: "1px solid rgba(201,168,76,0.18)", cursor: "pointer", background: "rgba(201,168,76,0.05)", color: "var(--ink)", fontSize: isMobile ? 12 : 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
-                                              onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.12)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)" }}
-                                              onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,168,76,0.05)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.18)" }}>
+                                              style={{ display: "flex", alignItems: "center", gap: 7, minHeight: isMobile ? 46 : undefined, padding: isMobile ? "11px 11px" : "9px 10px", borderRadius: 10, border: "1px solid color-mix(in srgb, var(--accent) 18%, transparent)", cursor: "pointer", background: "color-mix(in srgb, var(--accent) 5%, transparent)", color: "var(--ink)", fontSize: isMobile ? 12 : 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
+                                              onMouseEnter={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 12%, transparent)"; e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 40%, transparent)" }}
+                                              onMouseLeave={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 5%, transparent)"; e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 18%, transparent)" }}>
                                               <span style={{ fontSize: 16 }}>{p.emoji}</span>
                                               <span style={{ flex: 1, lineHeight: 1.2 }}>{p.label}</span>
                                             </button>
@@ -1968,13 +1968,13 @@ import { actionClavier } from "./raccourcisClavier"
                                 : activeCategory === "actions"
                                 ? (<>
                                     <div style={{ margin: "2px 0 10px" }}>
-                                      <button type="button" onClick={() => setMetierOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, width: "100%", background: metierOpen ? "rgba(201,168,76,0.05)" : "rgba(201,168,76,0.09)", border: `1px solid ${metierOpen ? "rgba(201,168,76,0.18)" : "rgba(201,168,76,0.3)"}`, borderRadius: 9, cursor: "pointer", padding: "9px 12px", margin: "8px 0" }}><span style={{ display: "flex", alignItems: "center", gap: 7, color: "var(--ink)", fontSize: 12.5, fontWeight: 700 }}><Sparkles size={13} /> Modèles par métier</span><ChevronDown size={15} color={G} style={{ transform: metierOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }} /></button>
+                                      <button type="button" onClick={() => setMetierOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, width: "100%", background: metierOpen ? "color-mix(in srgb, var(--accent) 5%, transparent)" : "color-mix(in srgb, var(--accent) 9%, transparent)", border: `1px solid ${metierOpen ? "color-mix(in srgb, var(--accent) 18%, transparent)" : "color-mix(in srgb, var(--accent) 30%, transparent)"}`, borderRadius: 9, cursor: "pointer", padding: "9px 12px", margin: "8px 0" }}><span style={{ display: "flex", alignItems: "center", gap: 7, color: "var(--ink)", fontSize: 12.5, fontWeight: 700 }}><Sparkles size={13} /> Modèles par métier</span><ChevronDown size={15} color={G} style={{ transform: metierOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }} /></button>
                                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                                         {metierOpen && ACTION_PRESETS.map(p => (
                                           <button key={p.key} type="button" onClick={() => generateActionPreset(p)} title={`Crée : ${p.blocks.map(b => (BLOCK_DEFS as any)[b.type]?.label || b.type).join(", ")}`}
-                                            style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 10px", borderRadius: 9, border: "1px solid rgba(201,168,76,0.18)", cursor: "pointer", background: "rgba(201,168,76,0.05)", color: "var(--ink)", fontSize: 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
-                                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.12)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)" }}
-                                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,168,76,0.05)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.18)" }}>
+                                            style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 10px", borderRadius: 9, border: "1px solid color-mix(in srgb, var(--accent) 18%, transparent)", cursor: "pointer", background: "color-mix(in srgb, var(--accent) 5%, transparent)", color: "var(--ink)", fontSize: 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
+                                            onMouseEnter={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 12%, transparent)"; e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 40%, transparent)" }}
+                                            onMouseLeave={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 5%, transparent)"; e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 18%, transparent)" }}>
                                             <span style={{ fontSize: 16 }}>{p.emoji}</span>
                                             <span style={{ flex: 1, lineHeight: 1.2 }}>{p.label}</span>
                                           </button>
@@ -1987,13 +1987,13 @@ import { actionClavier } from "./raccourcisClavier"
                                 : activeCategory === "media"
                                 ? (<>
                                     <div style={{ margin: "2px 0 10px" }}>
-                                      <button type="button" onClick={() => setMetierOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, width: "100%", background: metierOpen ? "rgba(201,168,76,0.05)" : "rgba(201,168,76,0.09)", border: `1px solid ${metierOpen ? "rgba(201,168,76,0.18)" : "rgba(201,168,76,0.3)"}`, borderRadius: 9, cursor: "pointer", padding: "9px 12px", margin: "8px 0" }}><span style={{ display: "flex", alignItems: "center", gap: 7, color: "var(--ink)", fontSize: 12.5, fontWeight: 700 }}><Sparkles size={13} /> Modèles par métier</span><ChevronDown size={15} color={G} style={{ transform: metierOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }} /></button>
+                                      <button type="button" onClick={() => setMetierOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, width: "100%", background: metierOpen ? "color-mix(in srgb, var(--accent) 5%, transparent)" : "color-mix(in srgb, var(--accent) 9%, transparent)", border: `1px solid ${metierOpen ? "color-mix(in srgb, var(--accent) 18%, transparent)" : "color-mix(in srgb, var(--accent) 30%, transparent)"}`, borderRadius: 9, cursor: "pointer", padding: "9px 12px", margin: "8px 0" }}><span style={{ display: "flex", alignItems: "center", gap: 7, color: "var(--ink)", fontSize: 12.5, fontWeight: 700 }}><Sparkles size={13} /> Modèles par métier</span><ChevronDown size={15} color={G} style={{ transform: metierOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }} /></button>
                                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                                         {metierOpen && MEDIA_PRESETS.map(p => (
                                           <button key={p.key} type="button" onClick={() => generateMediaPreset(p)} title={`Crée : ${p.blocks.map(b => (BLOCK_DEFS as any)[b.type]?.label || b.type).join(", ")}`}
-                                            style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 10px", borderRadius: 9, border: "1px solid rgba(201,168,76,0.18)", cursor: "pointer", background: "rgba(201,168,76,0.05)", color: "var(--ink)", fontSize: 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
-                                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.12)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)" }}
-                                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,168,76,0.05)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.18)" }}>
+                                            style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 10px", borderRadius: 9, border: "1px solid color-mix(in srgb, var(--accent) 18%, transparent)", cursor: "pointer", background: "color-mix(in srgb, var(--accent) 5%, transparent)", color: "var(--ink)", fontSize: 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
+                                            onMouseEnter={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 12%, transparent)"; e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 40%, transparent)" }}
+                                            onMouseLeave={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 5%, transparent)"; e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 18%, transparent)" }}>
                                             <span style={{ fontSize: 16 }}>{p.emoji}</span>
                                             <span style={{ flex: 1, lineHeight: 1.2 }}>{p.label}</span>
                                           </button>
@@ -2006,13 +2006,13 @@ import { actionClavier } from "./raccourcisClavier"
                                 : activeCategory === "commerce"
                                 ? (<>
                                     <div style={{ margin: "2px 0 10px" }}>
-                                      <button type="button" onClick={() => setMetierOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, width: "100%", background: metierOpen ? "rgba(201,168,76,0.05)" : "rgba(201,168,76,0.09)", border: `1px solid ${metierOpen ? "rgba(201,168,76,0.18)" : "rgba(201,168,76,0.3)"}`, borderRadius: 9, cursor: "pointer", padding: "9px 12px", margin: "8px 0" }}><span style={{ display: "flex", alignItems: "center", gap: 7, color: "var(--ink)", fontSize: 12.5, fontWeight: 700 }}><Sparkles size={13} /> Modèles par métier</span><ChevronDown size={15} color={G} style={{ transform: metierOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }} /></button>
+                                      <button type="button" onClick={() => setMetierOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, width: "100%", background: metierOpen ? "color-mix(in srgb, var(--accent) 5%, transparent)" : "color-mix(in srgb, var(--accent) 9%, transparent)", border: `1px solid ${metierOpen ? "color-mix(in srgb, var(--accent) 18%, transparent)" : "color-mix(in srgb, var(--accent) 30%, transparent)"}`, borderRadius: 9, cursor: "pointer", padding: "9px 12px", margin: "8px 0" }}><span style={{ display: "flex", alignItems: "center", gap: 7, color: "var(--ink)", fontSize: 12.5, fontWeight: 700 }}><Sparkles size={13} /> Modèles par métier</span><ChevronDown size={15} color={G} style={{ transform: metierOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }} /></button>
                                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                                         {metierOpen && COMMERCE_PRESETS.map(p => (
                                           <button key={p.key} type="button" onClick={() => generateCommercePreset(p)} title={`Crée : ${p.blocks.map(b => (BLOCK_DEFS as any)[b.type]?.label || b.type).join(", ")}`}
-                                            style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 10px", borderRadius: 9, border: "1px solid rgba(201,168,76,0.18)", cursor: "pointer", background: "rgba(201,168,76,0.05)", color: "var(--ink)", fontSize: 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
-                                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.12)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)" }}
-                                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,168,76,0.05)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.18)" }}>
+                                            style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 10px", borderRadius: 9, border: "1px solid color-mix(in srgb, var(--accent) 18%, transparent)", cursor: "pointer", background: "color-mix(in srgb, var(--accent) 5%, transparent)", color: "var(--ink)", fontSize: 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
+                                            onMouseEnter={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 12%, transparent)"; e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 40%, transparent)" }}
+                                            onMouseLeave={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 5%, transparent)"; e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 18%, transparent)" }}>
                                             <span style={{ fontSize: 16 }}>{p.emoji}</span>
                                             <span style={{ flex: 1, lineHeight: 1.2 }}>{p.label}</span>
                                           </button>
@@ -2025,13 +2025,13 @@ import { actionClavier } from "./raccourcisClavier"
                                 : activeCategory === "social"
                                 ? (<>
                                     <div style={{ margin: "2px 0 10px" }}>
-                                      <button type="button" onClick={() => setMetierOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, width: "100%", background: metierOpen ? "rgba(201,168,76,0.05)" : "rgba(201,168,76,0.09)", border: `1px solid ${metierOpen ? "rgba(201,168,76,0.18)" : "rgba(201,168,76,0.3)"}`, borderRadius: 9, cursor: "pointer", padding: "9px 12px", margin: "8px 0" }}><span style={{ display: "flex", alignItems: "center", gap: 7, color: "var(--ink)", fontSize: 12.5, fontWeight: 700 }}><Sparkles size={13} /> Modèles par métier</span><ChevronDown size={15} color={G} style={{ transform: metierOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }} /></button>
+                                      <button type="button" onClick={() => setMetierOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, width: "100%", background: metierOpen ? "color-mix(in srgb, var(--accent) 5%, transparent)" : "color-mix(in srgb, var(--accent) 9%, transparent)", border: `1px solid ${metierOpen ? "color-mix(in srgb, var(--accent) 18%, transparent)" : "color-mix(in srgb, var(--accent) 30%, transparent)"}`, borderRadius: 9, cursor: "pointer", padding: "9px 12px", margin: "8px 0" }}><span style={{ display: "flex", alignItems: "center", gap: 7, color: "var(--ink)", fontSize: 12.5, fontWeight: 700 }}><Sparkles size={13} /> Modèles par métier</span><ChevronDown size={15} color={G} style={{ transform: metierOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }} /></button>
                                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                                         {metierOpen && SOCIAL_PRESETS.map(p => (
                                           <button key={p.key} type="button" onClick={() => generateSocialPreset(p)} title={`Crée un bloc Liens sociaux : ${p.networks.join(", ")}`}
-                                            style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 10px", borderRadius: 9, border: "1px solid rgba(201,168,76,0.18)", cursor: "pointer", background: "rgba(201,168,76,0.05)", color: "var(--ink)", fontSize: 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
-                                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.12)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)" }}
-                                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,168,76,0.05)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.18)" }}>
+                                            style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 10px", borderRadius: 9, border: "1px solid color-mix(in srgb, var(--accent) 18%, transparent)", cursor: "pointer", background: "color-mix(in srgb, var(--accent) 5%, transparent)", color: "var(--ink)", fontSize: 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
+                                            onMouseEnter={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 12%, transparent)"; e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 40%, transparent)" }}
+                                            onMouseLeave={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 5%, transparent)"; e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 18%, transparent)" }}>
                                             <span style={{ fontSize: 16 }}>{p.emoji}</span>
                                             <span style={{ flex: 1, lineHeight: 1.2 }}>{p.label}</span>
                                           </button>
@@ -2062,13 +2062,13 @@ import { actionClavier } from "./raccourcisClavier"
                                     return (<>
                                       {/* Modèles par métier : 1 clic crée une section informative complète */}
                                       <div style={{ margin: "2px 0 10px" }}>
-                                        <button type="button" onClick={() => setMetierOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, width: "100%", background: metierOpen ? "rgba(201,168,76,0.05)" : "rgba(201,168,76,0.09)", border: `1px solid ${metierOpen ? "rgba(201,168,76,0.18)" : "rgba(201,168,76,0.3)"}`, borderRadius: 9, cursor: "pointer", padding: "9px 12px", margin: "8px 0" }}><span style={{ display: "flex", alignItems: "center", gap: 7, color: "var(--ink)", fontSize: 12.5, fontWeight: 700 }}><Sparkles size={13} /> Modèles par métier</span><ChevronDown size={15} color={G} style={{ transform: metierOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }} /></button>
+                                        <button type="button" onClick={() => setMetierOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, width: "100%", background: metierOpen ? "color-mix(in srgb, var(--accent) 5%, transparent)" : "color-mix(in srgb, var(--accent) 9%, transparent)", border: `1px solid ${metierOpen ? "color-mix(in srgb, var(--accent) 18%, transparent)" : "color-mix(in srgb, var(--accent) 30%, transparent)"}`, borderRadius: 9, cursor: "pointer", padding: "9px 12px", margin: "8px 0" }}><span style={{ display: "flex", alignItems: "center", gap: 7, color: "var(--ink)", fontSize: 12.5, fontWeight: 700 }}><Sparkles size={13} /> Modèles par métier</span><ChevronDown size={15} color={G} style={{ transform: metierOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }} /></button>
                                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                                           {metierOpen && INFO_PRESETS.map(p => (
                                             <button key={p.key} type="button" onClick={() => generateInfoPreset(p)} title={`Crée : ${p.blocks.map(b => (BLOCK_DEFS as any)[b.type]?.label || b.type).join(", ")}`}
-                                              style={{ display: "flex", alignItems: "center", gap: 7, minHeight: isMobile ? 46 : undefined, padding: isMobile ? "11px 11px" : "9px 10px", borderRadius: 10, border: "1px solid rgba(201,168,76,0.18)", cursor: "pointer", background: "rgba(201,168,76,0.05)", color: "var(--ink)", fontSize: isMobile ? 12 : 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
-                                              onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.12)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)" }}
-                                              onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,168,76,0.05)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.18)" }}>
+                                              style={{ display: "flex", alignItems: "center", gap: 7, minHeight: isMobile ? 46 : undefined, padding: isMobile ? "11px 11px" : "9px 10px", borderRadius: 10, border: "1px solid color-mix(in srgb, var(--accent) 18%, transparent)", cursor: "pointer", background: "color-mix(in srgb, var(--accent) 5%, transparent)", color: "var(--ink)", fontSize: isMobile ? 12 : 11, fontWeight: 600, textAlign: "left" as const, transition: "all .15s" }}
+                                              onMouseEnter={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 12%, transparent)"; e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 40%, transparent)" }}
+                                              onMouseLeave={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 5%, transparent)"; e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 18%, transparent)" }}>
                                               <span style={{ fontSize: 16 }}>{p.emoji}</span>
                                               <span style={{ flex: 1, lineHeight: 1.2 }}>{p.label}</span>
                                             </button>
@@ -2105,24 +2105,24 @@ import { actionClavier } from "./raccourcisClavier"
             <div
               onMouseDown={blocksResize.onMouseDown}
               style={{
-                width: 4, flexShrink: 0, background: "rgba(201,168,76,0.1)",
-                borderRight: "1px solid rgba(201,168,76,0.1)",
+                width: 4, flexShrink: 0, background: "color-mix(in srgb, var(--accent) 10%, transparent)",
+                borderRight: "1px solid color-mix(in srgb, var(--accent) 10%, transparent)",
                 cursor: "col-resize", position: "relative", zIndex: 10,
                 transition: "background 0.15s"
               }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(201,168,76,0.4)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(201,168,76,0.1)"}
+              onMouseEnter={e => e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 40%, transparent)"}
+              onMouseLeave={e => e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 10%, transparent)"}
             >
               {/* Indicateur visuel */}
               <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", display: "flex", flexDirection: "column", gap: 3 }}>
-                {[0,1,2].map(i => <div key={i} style={{ width: 2, height: 2, borderRadius: "50%", background: "rgba(201,168,76,0.6)" }} />)}
+                {[0,1,2].map(i => <div key={i} style={{ width: 2, height: 2, borderRadius: "50%", background: "color-mix(in srgb, var(--accent) 60%, transparent)" }} />)}
               </div>
             </div>
           )}
 
           {/* DRAWER FLOTTANT — mode réduit blocs */}
           {blocksCollapsed && drawerCategory && (
-            <div ref={drawerRef} style={{ position: "absolute", left: 64, top: 0, width: 240, height: "100%", background: "#0D0D0D", borderRight: "1px solid rgba(201,168,76,0.15)", zIndex: 50, display: "flex", flexDirection: "column", boxShadow: "4px 0 24px rgba(0,0,0,0.5)" }}>
+            <div ref={drawerRef} style={{ position: "absolute", left: 64, top: 0, width: 240, height: "100%", background: "#0D0D0D", borderRight: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", zIndex: 50, display: "flex", flexDirection: "column", boxShadow: "4px 0 24px rgba(0,0,0,0.5)" }}>
               <div style={{ padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
                   <span style={{ fontSize: 14 }}>{drawerCategory==="recents" ? "🕐" : drawerCategory==="favorites" ? "⭐" : BLOCK_CATEGORIES.find(c => c.id===drawerCategory)?.icon}</span>
@@ -2244,9 +2244,9 @@ import { actionClavier } from "./raccourcisClavier"
                           setBlocks(p => p.map(b => ids.includes(b.id) ? {...b, locked: !allLocked} : b))
                         }}
                         title={allLocked ? "Déverrouiller" : `Verrouiller${lockedCount>0?` (${lockedCount} déjà verrouillé${lockedCount>1?"s":""})`:""}`}
-                        style={{ display: "flex", alignItems: "center", gap: 5, background: allLocked ? "rgba(201,168,76,0.12)" : "rgba(255,255,255,0.05)", border: `1px solid ${allLocked ? "rgba(201,168,76,0.3)" : "rgba(255,255,255,0.1)"}`, borderRadius: 8, padding: "6px 11px", color: allLocked ? G : MUTED, fontSize: 11, cursor: "pointer", transition: "all 0.15s" }}
-                        onMouseEnter={e => { e.currentTarget.style.background="rgba(201,168,76,0.15)"; e.currentTarget.style.color=G }}
-                        onMouseLeave={e => { e.currentTarget.style.background=allLocked?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.05)"; e.currentTarget.style.color=allLocked?G:MUTED }}>
+                        style={{ display: "flex", alignItems: "center", gap: 5, background: allLocked ? "color-mix(in srgb, var(--accent) 12%, transparent)" : "rgba(255,255,255,0.05)", border: `1px solid ${allLocked ? "color-mix(in srgb, var(--accent) 30%, transparent)" : "rgba(255,255,255,0.1)"}`, borderRadius: 8, padding: "6px 11px", color: allLocked ? G : MUTED, fontSize: 11, cursor: "pointer", transition: "all 0.15s" }}
+                        onMouseEnter={e => { e.currentTarget.style.background="color-mix(in srgb, var(--accent) 15%, transparent)"; e.currentTarget.style.color=G }}
+                        onMouseLeave={e => { e.currentTarget.style.background=allLocked?"color-mix(in srgb, var(--accent) 12%, transparent)":"rgba(255,255,255,0.05)"; e.currentTarget.style.color=allLocked?G:MUTED }}>
                         {allLocked ? <Unlock size={11} /> : <Lock size={11} />}
                         <span>{allLocked ? "Déverrouiller" : "Verrouiller"}</span>
                       </button>
@@ -2325,9 +2325,9 @@ import { actionClavier } from "./raccourcisClavier"
                     onClick={(e) => handleBlockClick(e, block.id, idx)}
                     onDragOver={dragIdx === null ? undefined : (e) => { e.preventDefault(); const r = e.currentTarget.getBoundingClientRect(); const nb = (e.clientY - r.top) < r.height / 2 ? idx : idx + 1; setDropBefore(p => p === nb ? p : nb) }}
                     onDrop={dragIdx === null ? undefined : (e) => { e.preventDefault(); if (dragIdx === null) return; const ib = dropBefore ?? idx; const from = dragIdx; setBlocks(prev => reorderArray(prev, from, ib)); setDragIdx(null); setDropBefore(null) }}
-                    style={{ fontFamily: theme.fontBody || "DM Sans, sans-serif", position: "relative", marginBottom: 0, border: "none", borderRadius: isSelected ? 10 : 0, overflow: "visible", cursor: block.locked ? "default" : "pointer", transition: "box-shadow 0.15s, background 0.1s", opacity: idx === dragIdx ? 0.4 : (block.visible ? (block.draft ? 0.6 : 1) : 0.35), background: isSelected ? "rgba(201,168,76,0.05)" : isMultiSelected ? "rgba(201,168,76,0.06)" : block.draft ? "rgba(251,191,36,0.03)" : "transparent", boxShadow: isSelected ? `inset 0 0 0 2px ${G}, 0 0 0 4px ${G}1f` : isMultiSelected ? `inset 3px 0 0 ${G}80` : block.draft ? "inset 3px 0 0 rgba(251,191,36,0.5)" : block.locked ? "inset 3px 0 0 rgba(168,161,144,0.55)" : "none" }}
+                    style={{ fontFamily: theme.fontBody || "DM Sans, sans-serif", position: "relative", marginBottom: 0, border: "none", borderRadius: isSelected ? 10 : 0, overflow: "visible", cursor: block.locked ? "default" : "pointer", transition: "box-shadow 0.15s, background 0.1s", opacity: idx === dragIdx ? 0.4 : (block.visible ? (block.draft ? 0.6 : 1) : 0.35), background: isSelected ? "color-mix(in srgb, var(--accent) 5%, transparent)" : isMultiSelected ? "color-mix(in srgb, var(--accent) 6%, transparent)" : block.draft ? "rgba(251,191,36,0.03)" : "transparent", boxShadow: isSelected ? `inset 0 0 0 2px ${G}, 0 0 0 4px ${G}1f` : isMultiSelected ? `inset 3px 0 0 ${G}80` : block.draft ? "inset 3px 0 0 rgba(251,191,36,0.5)" : block.locked ? "inset 3px 0 0 rgba(168,161,144,0.55)" : "none" }}
                     onMouseEnter={e => {
-                      if (!isSelected) e.currentTarget.style.boxShadow = `inset 3px 0 0 rgba(201,168,76,0.3)`
+                      if (!isSelected) e.currentTarget.style.boxShadow = `inset 3px 0 0 color-mix(in srgb, var(--accent) 30%, transparent)`
                       const overlay = e.currentTarget.querySelector(".block-overlay") as HTMLElement
                       const handle = e.currentTarget.querySelector(".block-handle") as HTMLElement
                       if (overlay) overlay.style.opacity = "1"
@@ -2361,7 +2361,7 @@ import { actionClavier } from "./raccourcisClavier"
                       onDragEnd={() => { setDragIdx(null); setDropBefore(null) }}
                       style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 18, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0, transition: "opacity 0.15s", cursor: block.locked ? "not-allowed" : "grab", zIndex: 10 }}>
                       <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                        {[0,1,2,3,4,5].map(i => <div key={i} style={{ width: 3, height: 3, borderRadius: "50%", background: "rgba(201,168,76,0.5)" }} />)}
+                        {[0,1,2,3,4,5].map(i => <div key={i} style={{ width: 3, height: 3, borderRadius: "50%", background: "color-mix(in srgb, var(--accent) 50%, transparent)" }} />)}
                       </div>
                     </div>}
 
@@ -2414,10 +2414,10 @@ import { actionClavier } from "./raccourcisClavier"
               )}
 
               {!preview && <button onClick={() => { setActiveCategory("identity"); setSearch("") }}
-                style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: "rgba(201,168,76,0.04)", border: "2px dashed rgba(201,168,76,0.2)", borderRadius: 14, padding: "18px", color: MUTED, fontSize: 14, fontWeight: 600, cursor: "pointer", marginTop: 8, transition: "all 0.2s" }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(201,168,76,0.5)"; e.currentTarget.style.color=G; e.currentTarget.style.background="rgba(201,168,76,0.08)"; e.currentTarget.style.transform="translateY(-1px)" }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor="rgba(201,168,76,0.2)"; e.currentTarget.style.color=MUTED; e.currentTarget.style.background="rgba(201,168,76,0.04)"; e.currentTarget.style.transform="translateY(0)" }}>
-                <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}><Plus size={14} color={G} /></div>
+                style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: "color-mix(in srgb, var(--accent) 4%, transparent)", border: "2px dashed color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 14, padding: "18px", color: MUTED, fontSize: 14, fontWeight: 600, cursor: "pointer", marginTop: 8, transition: "all 0.2s" }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor="color-mix(in srgb, var(--accent) 50%, transparent)"; e.currentTarget.style.color=G; e.currentTarget.style.background="color-mix(in srgb, var(--accent) 8%, transparent)"; e.currentTarget.style.transform="translateY(-1px)" }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor="color-mix(in srgb, var(--accent) 20%, transparent)"; e.currentTarget.style.color=MUTED; e.currentTarget.style.background="color-mix(in srgb, var(--accent) 4%, transparent)"; e.currentTarget.style.transform="translateY(0)" }}>
+                <div style={{ width: 28, height: 28, borderRadius: "50%", background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", display: "flex", alignItems: "center", justifyContent: "center" }}><Plus size={14} color={G} /></div>
                 Ajouter un nouveau bloc
               </button>}
               {!preview && <button onClick={() => setShowTemplates(true)}
@@ -2435,16 +2435,16 @@ import { actionClavier } from "./raccourcisClavier"
             <div
               onMouseDown={rightResize.onMouseDown}
               style={{
-                width: 4, flexShrink: 0, background: "rgba(201,168,76,0.1)",
-                borderLeft: "1px solid rgba(201,168,76,0.1)",
+                width: 4, flexShrink: 0, background: "color-mix(in srgb, var(--accent) 10%, transparent)",
+                borderLeft: "1px solid color-mix(in srgb, var(--accent) 10%, transparent)",
                 cursor: "col-resize", position: "relative", zIndex: 10,
                 transition: "background 0.15s"
               }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(201,168,76,0.4)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(201,168,76,0.1)"}
+              onMouseEnter={e => e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 40%, transparent)"}
+              onMouseLeave={e => e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 10%, transparent)"}
             >
               <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", display: "flex", flexDirection: "column", gap: 3 }}>
-                {[0,1,2].map(i => <div key={i} style={{ width: 2, height: 2, borderRadius: "50%", background: "rgba(201,168,76,0.6)" }} />)}
+                {[0,1,2].map(i => <div key={i} style={{ width: 2, height: 2, borderRadius: "50%", background: "color-mix(in srgb, var(--accent) 60%, transparent)" }} />)}
               </div>
             </div>
           )}
@@ -2529,7 +2529,7 @@ import { actionClavier } from "./raccourcisClavier"
                       {(() => {
                         const bc = selectedBlock.content as any
                         const set = (k: string, v: string) => updateBlock(selectedBlock.id, k, v)
-                        const selStyle: React.CSSProperties = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 8, color: "var(--ink)", fontSize: 12, padding: "7px 9px", cursor: "pointer" }
+                        const selStyle: React.CSSProperties = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, color: "var(--ink)", fontSize: 12, padding: "7px 9px", cursor: "pointer" }
                         const labelStyle: React.CSSProperties = { color: MUTED, fontSize: 11, display: "block", marginBottom: 4, fontWeight: 500 }
                         const secTitle: React.CSSProperties = { color: MUTED, fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 9px" }
                         // Helpers appelés en ligne (sel/toggle) au lieu de composants JSX — évite un remontage à chaque rendu.
@@ -2748,7 +2748,7 @@ import { actionClavier } from "./raccourcisClavier"
         {/* BARRE D'ONGLETS MOBILE — un panneau à la fois (palette | page | réglages) */}
         {/* Barre flottante en mode Apercu : sortir + voir en direct (#02) */}
         {isMobile && preview && (
-          <div style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 60, display: "flex", gap: 10, padding: "10px 14px calc(10px + env(safe-area-inset-bottom))", background: "rgba(12,11,9,0.9)", backdropFilter: "blur(14px)", borderTop: "1px solid rgba(201,168,76,0.2)" }}>
+          <div style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 60, display: "flex", gap: 10, padding: "10px 14px calc(10px + env(safe-area-inset-bottom))", background: "rgba(12,11,9,0.9)", backdropFilter: "blur(14px)", borderTop: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)" }}>
             <button onClick={() => setPreview(false)} className="da-btn-primary da-btn-primary--sm" style={{ flex: 1, minHeight: 48, justifyContent: "center" }}>
               <ChevronDown size={16} style={{ transform: "rotate(90deg)" }} /> <span>Modifier</span>
             </button>
@@ -2872,7 +2872,7 @@ import { actionClavier } from "./raccourcisClavier"
           <div onClick={() => setShowTemplates(false)}
             style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
             <div onClick={e => e.stopPropagation()}
-              style={{ width: "100%", maxWidth: 860, maxHeight: "88vh", background: "#111", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 16, overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 24px 80px rgba(0,0,0,0.6)" }}>
+              style={{ width: "100%", maxWidth: 860, maxHeight: "88vh", background: "#111", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 16, overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 24px 80px rgba(0,0,0,0.6)" }}>
               {/* En-tête */}
               <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 10 }}>
                 <Sparkles size={20} color={G} />
@@ -2885,7 +2885,7 @@ import { actionClavier } from "./raccourcisClavier"
               {/* Génération par IA — décris ton activité, l'IA construit la page.
                   Absent tant que la clé serveur n'existe pas : on ne fait pas rédiger
                   quelqu'un pour lui répondre « bientôt ». */}
-              {GENERATION_IA_ACTIVE && <div style={{ padding: "12px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)", background: "linear-gradient(120deg,rgba(201,168,76,0.09),rgba(57,255,143,0.05))" }}>
+              {GENERATION_IA_ACTIVE && <div style={{ padding: "12px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)", background: "linear-gradient(120deg,color-mix(in srgb, var(--accent) 9%, transparent),rgba(57,255,143,0.05))" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
                   <span style={{ fontSize: 17 }}>🪄</span>
                   <p style={{ margin: 0, color: "var(--ink)", fontSize: 13.5, fontWeight: 800 }}>Générer ma page avec l&apos;IA</p>
@@ -2908,7 +2908,7 @@ import { actionClavier } from "./raccourcisClavier"
                   </button>
                 </div>
                 {aiGenError && (aiGenSoon || aiGenUpgrade
-                  ? <div style={{ margin: "9px 0 0", padding: "9px 11px", borderRadius: 9, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.28)", color: "#E8D9A8", fontSize: 11.5, lineHeight: 1.45, display: "flex", gap: 7 }}><span style={{ flexShrink: 0 }}>{aiGenUpgrade ? "✨" : "⏳"}</span><span>{aiGenError}</span></div>
+                  ? <div style={{ margin: "9px 0 0", padding: "9px 11px", borderRadius: 9, background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)", color: "#E8D9A8", fontSize: 11.5, lineHeight: 1.45, display: "flex", gap: 7 }}><span style={{ flexShrink: 0 }}>{aiGenUpgrade ? "✨" : "⏳"}</span><span>{aiGenError}</span></div>
                   : <p style={{ margin: "7px 0 0", color: "#F87171", fontSize: 10.5 }}>{aiGenError}</p>)}
                 {aiGenError && aiGenUpgrade && (
                   <a href="/upgrade?reason=ia" className="da-btn-primary da-btn-primary--sm" style={{ marginTop: 8, display: "inline-flex" }}>Voir les offres</a>
@@ -2923,7 +2923,7 @@ import { actionClavier } from "./raccourcisClavier"
                     const emoji = PAGE_TEMPLATES.find(t => t.group === grp)?.emoji || "📄"
                     return (
                       <button key={grp} onClick={() => setTemplateGroup(grp)}
-                        style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "9px 10px", marginBottom: 3, borderRadius: 9, border: "none", cursor: "pointer", background: on ? "rgba(201,168,76,0.12)" : "transparent", color: on ? G : "#C8C2B6", fontSize: 12, fontWeight: on ? 700 : 500, textAlign: "left" as const }}>
+                        style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "9px 10px", marginBottom: 3, borderRadius: 9, border: "none", cursor: "pointer", background: on ? "color-mix(in srgb, var(--accent) 12%, transparent)" : "transparent", color: on ? G : "#C8C2B6", fontSize: 12, fontWeight: on ? 700 : 500, textAlign: "left" as const }}>
                         <span style={{ fontSize: 15 }}>{emoji}</span>{grp}
                       </button>
                     )

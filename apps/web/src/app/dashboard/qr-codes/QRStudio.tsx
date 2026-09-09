@@ -410,8 +410,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const pts   = data.map((v, i) => [i * step, H - 4 - (v / max) * (H - 10)] as [number,number])
     // Zone de remplissage
     const grad  = ctx.createLinearGradient(0, 0, 0, H)
-    grad.addColorStop(0, "rgba(201,168,76,0.3)")
-    grad.addColorStop(1, "rgba(201,168,76,0)")
+    grad.addColorStop(0, "color-mix(in srgb, var(--accent) 30%, transparent)")
+    grad.addColorStop(1, "color-mix(in srgb, var(--accent) 1%, transparent)")
     ctx.beginPath()
     ctx.moveTo(pts[0][0], H)
     pts.forEach(([x,y]) => ctx.lineTo(x, y))
@@ -1393,7 +1393,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     {/* Pastille d'état (DA §02) : actif = point doré + halo qui respire ; brouillon = anneau creux bronze ; aucun vert. */}
                     {qs === "active" ? (
                       <span title={sCfg.label} style={{ position:"absolute", bottom:-3, right:-3, width:9, height:9, borderRadius:"50%", background:"var(--gold-light)", border:"1.5px solid var(--surface)" }}>
-                        <span aria-hidden="true" className="om-breath" style={{ position:"absolute", inset:-1.5, borderRadius:"50%", background:"rgba(232,200,119,.5)" }}/>
+                        <span aria-hidden="true" className="om-breath" style={{ position:"absolute", inset:-1.5, borderRadius:"50%", background:"color-mix(in srgb, var(--accent) 50%, transparent)" }}/>
                       </span>
                     ) : qs === "draft" ? (
                       <span title={sCfg.label} style={{ position:"absolute", bottom:-3, right:-3, width:9, height:9, borderRadius:"50%", background:"var(--surface)", border:"1.5px solid var(--accent)" }}/>
@@ -1692,7 +1692,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         <span aria-hidden="true" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 2, overflow: "hidden" }}>
                           <span className="om-bar" style={{ position: "absolute", left: 0, right: 0, height: "40%", background: "rgba(255,255,255,.75)" }} />
                         </span>
-                        <span aria-hidden="true" style={{ width: 7, height: 7, flexShrink: 0, borderRadius: "50%", background: "var(--gold-light)", boxShadow: "0 0 0 4px rgba(232,200,119,.12)" }} />
+                        <span aria-hidden="true" style={{ width: 7, height: 7, flexShrink: 0, borderRadius: "50%", background: "var(--gold-light)", boxShadow: "0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent)" }} />
                         <p style={{ flex: 1, minWidth: 0, margin: 0, color: "var(--muted)", fontSize: 12.5, lineHeight: 1.45 }}>{text}</p>
                         {cta}
                       </div>
@@ -2087,12 +2087,12 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   const on = ti === i
                   return (
                     <button key={id} role="tab" aria-selected={on} type="button" onClick={() => setActiveTab(id as any)} className="qv-tab"
-                      style={{ position: "relative", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, minHeight: isMobile ? 48 : undefined, padding: isMobile ? "14px 8px" : "13px 10px", background: on ? "linear-gradient(180deg, rgba(232,200,119,.09), rgba(232,200,119,.02))" : "transparent", color: on ? "#e8c877" : "#8a8177", fontSize: 14, fontWeight: on ? 600 : 500, transition: "color .2s ease, background .24s ease, font-weight .18s ease", whiteSpace: "nowrap" }}>
+                      style={{ position: "relative", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, minHeight: isMobile ? 48 : undefined, padding: isMobile ? "14px 8px" : "13px 10px", background: on ? "linear-gradient(180deg, color-mix(in srgb, var(--accent) 9%, transparent), color-mix(in srgb, var(--accent) 2%, transparent))" : "transparent", color: on ? "#e8c877" : "#8a8177", fontSize: 14, fontWeight: on ? 600 : 500, transition: "color .2s ease, background .24s ease, font-weight .18s ease", whiteSpace: "nowrap" }}>
                       <span style={{ display: "inline-flex", transition: "transform .26s cubic-bezier(.2,.8,.2,1)", transform: on ? "scale(1.06)" : "none" }}>{icon}</span> {label}
                     </button>
                   )
                 })}
-                <div aria-hidden="true" className="qv-ind" style={{ position: "absolute", left: 0, bottom: -1, height: 2, width: "calc(100% / 3)", transform: `translateX(calc(${ti} * 100%))`, transition: "transform .38s cubic-bezier(.2,.85,.2,1)", background: "linear-gradient(90deg, rgba(201,162,77,.35), var(--gold-light), rgba(201,162,77,.35))", borderRadius: 2, boxShadow: "0 0 12px rgba(232,200,119,.4)" }} />
+                <div aria-hidden="true" className="qv-ind" style={{ position: "absolute", left: 0, bottom: -1, height: 2, width: "calc(100% / 3)", transform: `translateX(calc(${ti} * 100%))`, transition: "transform .38s cubic-bezier(.2,.85,.2,1)", background: "linear-gradient(90deg, color-mix(in srgb, var(--accent) 35%, transparent), var(--gold-light), color-mix(in srgb, var(--accent) 35%, transparent))", borderRadius: 2, boxShadow: "0 0 12px color-mix(in srgb, var(--accent) 40%, transparent)" }} />
               </div>
               {/* Légende d'onglet : desktop uniquement (mobile désencombré — la légende du mode suffit). */}
               {!isMobile && hints[ti] && <div style={{ padding: "10px 14px 0", fontSize: 12.5, lineHeight: 1.5, color: "var(--muted)" }}>{hints[ti]}</div>}
@@ -2130,7 +2130,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </div>
                     {/* Légende du mode — occurrence unique, précédée d'un filet doré (DA §06). */}
                     <div style={{ display:"flex", gap:9, alignItems:"flex-start", margin:"0 0 4px" }}>
-                      <span aria-hidden="true" style={{ width:2, alignSelf:"stretch", borderRadius:2, background:"rgba(232,200,119,.35)", flexShrink:0 }} />
+                      <span aria-hidden="true" style={{ width:2, alignSelf:"stretch", borderRadius:2, background:"color-mix(in srgb, var(--accent) 35%, transparent)", flexShrink:0 }} />
                       <p style={{ color:"var(--muted)", fontSize:11.5, lineHeight:1.55, margin:0 }}>
                         {level==="simple" ? "L'essentiel : choisir un style et les couleurs. Idéal pour aller vite." : level==="inter" ? "+ formes des modules et des coins." : "Tous les réglages : logo, dégradés, marge, correction d'erreur…"}
                       </p>
@@ -2621,9 +2621,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             {/* CTA « Ouvrir l"atelier d'impression » — carte bronze à tuile dorée (DA §09) : plus d"aplat plein
                 (le seul bouton plein doré de la zone reste « Télécharger »). */}
             <button type="button" onClick={openEditor} className="da-suppcta">
-              <span aria-hidden="true" style={{ position:"absolute", left:0, top:0, right:0, height:1, background:"linear-gradient(90deg, transparent, rgba(232,200,119,.5), transparent)" }} />
+              <span aria-hidden="true" style={{ position:"absolute", left:0, top:0, right:0, height:1, background:"linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 50%, transparent), transparent)" }} />
               {/* Tuile dorée pleine + glyphe imprimante (dit « Atelier d'impression », là où une flèche ne représentait rien) */}
-              <span aria-hidden="true" style={{ position:"relative", display:"inline-flex", alignItems:"center", justifyContent:"center", width:34, height:34, flexShrink:0, borderRadius:10, background:"linear-gradient(135deg, var(--gold-light), var(--accent))", boxShadow:"0 8px 18px -10px rgba(201,162,77,.9)" }}>
+              <span aria-hidden="true" style={{ position:"relative", display:"inline-flex", alignItems:"center", justifyContent:"center", width:34, height:34, flexShrink:0, borderRadius:10, background:"linear-gradient(135deg, var(--gold-light), var(--accent))", boxShadow:"0 8px 18px -10px color-mix(in srgb, var(--accent) 90%, transparent)" }}>
                 <span style={{ position:"relative", display:"inline-block", width:18, height:18 }}>
                   <span style={{ position:"absolute", left:4, top:0, width:10, height:4.5, border:"1.6px solid #1a1408", borderBottom:"none", borderRadius:"1px 1px 0 0" }}/>
                   <span style={{ position:"absolute", left:0, top:4.5, width:18, height:7.5, borderRadius:2, background:"#1a1408" }}/>
@@ -2646,9 +2646,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 { key:"carte",   label:"Carte",   glyph:<span style={{ width:19, height:12, border:"1.5px solid var(--gold-light)", borderRadius:2 }}/> },
                 { key:"sticker", label:"Sticker", glyph:<span style={{ width:16, height:16, border:"1.5px dashed var(--gold-light)", borderRadius:"50%" }}/> },
                 { key:"menu",    label:"Menu",    glyph:(<span style={{ position:"relative", width:12, height:18, border:"1.5px solid var(--gold-light)", borderRadius:2 }}>
-                  <span style={{ position:"absolute", left:2, top:3, right:2, height:1.5, background:"rgba(232,200,119,.75)" }}/>
-                  <span style={{ position:"absolute", left:2, top:7, right:4, height:1.5, background:"rgba(232,200,119,.5)" }}/>
-                  <span style={{ position:"absolute", left:2, top:11, right:3, height:1.5, background:"rgba(232,200,119,.5)" }}/>
+                  <span style={{ position:"absolute", left:2, top:3, right:2, height:1.5, background:"color-mix(in srgb, var(--accent) 75%, transparent)" }}/>
+                  <span style={{ position:"absolute", left:2, top:7, right:4, height:1.5, background:"color-mix(in srgb, var(--accent) 50%, transparent)" }}/>
+                  <span style={{ position:"absolute", left:2, top:11, right:3, height:1.5, background:"color-mix(in srgb, var(--accent) 50%, transparent)" }}/>
                 </span>) },
                 { key:"avis",    label:"Avis",    glyph:(<span style={{ position:"relative", display:"inline-flex", width:18, height:18 }}>
                   <span style={{ position:"absolute", top:2, left:0, right:0, height:12, border:"1.5px solid var(--gold-light)", borderRadius:3 }}/>

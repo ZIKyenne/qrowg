@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 
 // Couleur d'accent par défaut (or signature QRowg)
-export const DEFAULT_ACCENT = "#C9A84C"
+export const DEFAULT_ACCENT = "#D4AF45"
 
 /**
  * Renvoie la couleur d'accent choisie par l'utilisateur (profil → couleur d'accent).

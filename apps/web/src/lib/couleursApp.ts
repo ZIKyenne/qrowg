@@ -3,6 +3,6 @@
 // (manifest.ts) doivent être identiques : sinon la barre de statut change de
 // couleur entre le site ouvert dans le navigateur et l'icône installée sur
 // l'écran d'accueil. C'est le fond de l'application qui fait foi.
-export const FOND_APP = "#080808"
+export const FOND_APP = "#080A08"
 /** Or QRowg — accent de marque, jamais utilisé comme couleur de barre système. */
-export const OR_QROWG = "#C9A84C"
+export const OR_QROWG = "#D4AF45"

@@ -100,14 +100,14 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
       {label && <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 6, fontWeight: 500 }}>{label}</label>}
 
       {value ? (
-        <div style={{ position: "relative", borderRadius: 10, overflow: "hidden", border: "1px solid rgba(201,168,76,0.3)" }}>
+        <div style={{ position: "relative", borderRadius: 10, overflow: "hidden", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)" }}>
           <img src={value} alt="" style={{ width: "100%", maxHeight: 160, objectFit: "cover", display: "block" }} />
           <button onClick={() => onChange("")}
             style={{ position: "absolute", top: 8, right: 8, background: "rgba(8,8,8,0.8)", border: "none", borderRadius: "50%", width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--danger)" }}>
             <X size={14} />
           </button>
           <button onClick={() => setPickerOpen(true)}
-            style={{ position: "absolute", bottom: 8, right: 8, background: "rgba(201,168,76,0.9)", border: "none", borderRadius: 6, padding: "5px 10px", cursor: "pointer", color: "var(--ink-on-accent)", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
+            style={{ position: "absolute", bottom: 8, right: 8, background: "color-mix(in srgb, var(--accent) 90%, transparent)", border: "none", borderRadius: 6, padding: "5px 10px", cursor: "pointer", color: "var(--ink-on-accent)", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
             <Upload size={11} /> Changer
           </button>
         </div>
@@ -117,15 +117,15 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
           onDragOver={e => { e.preventDefault(); setDragOver(true) }}
           onDragLeave={() => setDragOver(false)}
           onDrop={onDrop}
-          style={{ border: `2px dashed ${dragOver ? G : "rgba(201,168,76,0.2)"}`, borderRadius: 10, padding: "24px 16px", textAlign: "center", cursor: "pointer", background: dragOver ? "rgba(201,168,76,0.05)" : "transparent", transition: "all 0.2s" }}>
+          style={{ border: `2px dashed ${dragOver ? G : "color-mix(in srgb, var(--accent) 20%, transparent)"}`, borderRadius: 10, padding: "24px 16px", textAlign: "center", cursor: "pointer", background: dragOver ? "color-mix(in srgb, var(--accent) 5%, transparent)" : "transparent", transition: "all 0.2s" }}>
           {uploading ? (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-              <div style={{ width: 24, height: 24, border: "2px solid rgba(201,168,76,0.2)", borderTopColor: G, borderRadius: "50%", animation: "mo-spin 0.8s linear infinite" }} />
+              <div style={{ width: 24, height: 24, border: "2px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderTopColor: G, borderRadius: "50%", animation: "mo-spin 0.8s linear infinite" }} />
               <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>Upload en cours...</p>
             </div>
           ) : (
             <>
-              <div style={{ width: 40, height: 40, background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 10px" }}>
+              <div style={{ width: 40, height: 40, background: "color-mix(in srgb, var(--accent) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 10px" }}>
                 <ImageIcon size={18} color={G} />
               </div>
               <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600, margin: "0 0 4px" }}>Cliquez ou déposez une image</p>
@@ -149,7 +149,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
             <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: "0 6px 6px" }}>Ajouter une image</p>
             <button type="button" onClick={() => { setPickerOpen(false); inputRef.current?.click() }}
               style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "14px 12px", background: "none", border: "none", color: "var(--ink)", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
-              <span style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 11, background: "rgba(201,168,76,0.14)", border: "1px solid rgba(201,168,76,0.28)", display: "flex", alignItems: "center", justifyContent: "center", color: G }}><Upload size={19} /></span>
+              <span style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 11, background: "color-mix(in srgb, var(--accent) 14%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)", display: "flex", alignItems: "center", justifyContent: "center", color: G }}><Upload size={19} /></span>
               <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <span>Depuis mon téléphone</span>
                 <span style={{ color: MUTED, fontSize: 12 }}>Photo, photothèque ou fichier</span>
@@ -157,7 +157,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
             </button>
             <button type="button" onClick={() => { setPickerOpen(false); openLibrary() }}
               style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "14px 12px", background: "none", border: "none", borderTop: "1px solid rgba(255,255,255,0.05)", color: "var(--ink)", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
-              <span style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 11, background: "rgba(201,168,76,0.14)", border: "1px solid rgba(201,168,76,0.28)", display: "flex", alignItems: "center", justifyContent: "center", color: G }}><FolderOpen size={19} /></span>
+              <span style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 11, background: "color-mix(in srgb, var(--accent) 14%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)", display: "flex", alignItems: "center", justifyContent: "center", color: G }}><FolderOpen size={19} /></span>
               <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <span>Ma bibliothèque QRowg</span>
                 <span style={{ color: MUTED, fontSize: 12 }}>Images déjà importées</span>
@@ -176,11 +176,11 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
         <div onClick={() => setLibOpen(false)}
           style={{ position: "fixed", inset: 0, zIndex: 400, background: "rgba(0,0,0,0.65)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div onClick={e => e.stopPropagation()}
-            style={{ width: "100%", maxWidth: 620, maxHeight: "80vh", background: "#141414", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+            style={{ width: "100%", maxWidth: 620, maxHeight: "80vh", background: "#141414", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column" }}>
             <div style={{ padding: "14px 18px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 9 }}>
               <FolderOpen size={16} color={G} />
               <p style={{ margin: 0, color: "var(--ink)", fontSize: 14, fontWeight: 700, flex: 1 }}>Ma bibliothèque{libAssets && libAssets.length > 0 ? <span style={{ color: MUTED, fontWeight: 400 }}> · {libAssets.length}</span> : ""}</p>
-              {libBusy && <div style={{ width: 15, height: 15, border: "2px solid rgba(201,168,76,0.25)", borderTopColor: G, borderRadius: "50%", animation: "mo-spin 0.8s linear infinite" }} />}
+              {libBusy && <div style={{ width: 15, height: 15, border: "2px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderTopColor: G, borderRadius: "50%", animation: "mo-spin 0.8s linear infinite" }} />}
               <button onClick={() => setLibOpen(false)} aria-label="Fermer" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", width: 28, height: 28 }}><X size={14} /></button>
             </div>
             {/* Recherche (#07) — visible des qu'il y a des images */}
@@ -202,7 +202,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
                 : <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(96px, 1fr))", gap: 8 }}>
                     {/* Tuile d'ajout : upload direct dans la bibliothèque */}
                     {!libQuery && <button onClick={() => libInputRef.current?.click()} title="Ajouter une image"
-                      style={{ aspectRatio: "1", border: "2px dashed rgba(201,168,76,0.3)", borderRadius: 9, background: "rgba(201,168,76,0.04)", color: G, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, fontSize: 10, fontWeight: 600 }}>
+                      style={{ aspectRatio: "1", border: "2px dashed color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 9, background: "color-mix(in srgb, var(--accent) 4%, transparent)", color: G, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, fontSize: 10, fontWeight: 600 }}>
                       <Plus size={18} /> Ajouter
                     </button>}
                     {libAssets.filter(a => !libQuery || a.name.toLowerCase().includes(libQuery.toLowerCase()))

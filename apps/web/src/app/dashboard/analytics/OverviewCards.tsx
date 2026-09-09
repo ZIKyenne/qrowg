@@ -134,8 +134,8 @@ export function OverviewChart({ daily, rangeLabel = "30 derniers jours" }: { dai
 
           {/* Pic de la periode */}
           {showPeak && <>
-            <div style={{ position: "absolute", left: `${(g.peakI / (g.n - 1)) * 100}%`, top: `${(g.py(peakVal) / g.H) * 100}%`, width: 7, height: 7, margin: "-4px 0 0 -4px", borderRadius: "50%", background: GOLD, boxShadow: "0 0 0 3px rgba(232,200,119,.18)", pointerEvents: "none" }} />
-            <div style={{ position: "absolute", left: `${(g.peakI / (g.n - 1)) * 100}%`, top: `${(g.py(peakVal) / g.H) * 100}%`, transform: "translate(-50%,-30px)", display: "flex", alignItems: "center", gap: 6, padding: "4px 9px", borderRadius: 999, background: "rgba(232,200,119,.12)", border: "1px solid rgba(232,200,119,.26)", color: GOLD, fontSize: 10.5, fontWeight: 700, whiteSpace: "nowrap", pointerEvents: "none" }}>
+            <div style={{ position: "absolute", left: `${(g.peakI / (g.n - 1)) * 100}%`, top: `${(g.py(peakVal) / g.H) * 100}%`, width: 7, height: 7, margin: "-4px 0 0 -4px", borderRadius: "50%", background: GOLD, boxShadow: "0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent)", pointerEvents: "none" }} />
+            <div style={{ position: "absolute", left: `${(g.peakI / (g.n - 1)) * 100}%`, top: `${(g.py(peakVal) / g.H) * 100}%`, transform: "translate(-50%,-30px)", display: "flex", alignItems: "center", gap: 6, padding: "4px 9px", borderRadius: 999, background: "color-mix(in srgb, var(--accent) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 26%, transparent)", color: GOLD, fontSize: 10.5, fontWeight: 700, whiteSpace: "nowrap", pointerEvents: "none" }}>
               <span aria-hidden style={{ width: 7, height: 7, background: "currentColor", clipPath: "path('M4 0 L8 4 L5 4 L5 8 L3 8 L3 4 L0 4 Z')" }} />
               pic · {peakVal} scans le {g.dates[g.peakI]}
             </div>
@@ -143,9 +143,9 @@ export function OverviewChart({ daily, rangeLabel = "30 derniers jours" }: { dai
 
           {/* Point survole */}
           {hover !== null && <>
-            <div style={{ position: "absolute", top: 0, bottom: 0, left: hvX, width: 1, background: "rgba(232,200,119,.45)", pointerEvents: "none" }} />
-            <div style={{ position: "absolute", left: hvX, top: hvY, width: 9, height: 9, margin: "-5px 0 0 -5px", borderRadius: "50%", background: GOLD, boxShadow: "0 0 0 3px rgba(232,200,119,.22)", pointerEvents: "none" }} />
-            <div style={{ position: "absolute", left: hvX, top: 8, transform: `translateX(${hvShift})`, padding: "10px 13px", borderRadius: 11, background: "rgba(15,13,11,.97)", border: "1px solid rgba(232,200,119,.3)", boxShadow: "0 14px 30px -18px rgba(0,0,0,.95)", pointerEvents: "none", whiteSpace: "nowrap" }}>
+            <div style={{ position: "absolute", top: 0, bottom: 0, left: hvX, width: 1, background: "color-mix(in srgb, var(--accent) 45%, transparent)", pointerEvents: "none" }} />
+            <div style={{ position: "absolute", left: hvX, top: hvY, width: 9, height: 9, margin: "-5px 0 0 -5px", borderRadius: "50%", background: GOLD, boxShadow: "0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent)", pointerEvents: "none" }} />
+            <div style={{ position: "absolute", left: hvX, top: 8, transform: `translateX(${hvShift})`, padding: "10px 13px", borderRadius: 11, background: "rgba(15,13,11,.97)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", boxShadow: "0 14px 30px -18px rgba(0,0,0,.95)", pointerEvents: "none", whiteSpace: "nowrap" }}>
               <span style={{ display: "block", fontSize: 11, color: T3, marginBottom: 5 }}>{g.dates[hover]}</span>
               <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, fontWeight: 700, color: T1 }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: GOLD }} />{g.scans[hover]} scans</span>
               <span style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 3, fontSize: 12.5, fontWeight: 700, color: T1 }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: GREEN }} />{g.views[hover]} vues</span>
@@ -199,12 +199,12 @@ export function TopPagesCard({ pages }: { pages: PageRow[] }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {top.map((p, i) => {
             const v = p.total_views || 0
-            const rankBg = i === 0 ? "rgba(232,200,119,.14)" : "transparent"
+            const rankBg = i === 0 ? "color-mix(in srgb, var(--accent) 14%, transparent)" : "transparent"
             const rankCol = i === 0 ? GOLD : i < 3 ? GOLD_DEEP : T3
             const w = v ? `${Math.max(3, (v / pMax) * 100)}%` : "0%"
             return (
               <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 13, padding: 10, borderRadius: 10, margin: "0 -10px", cursor: "default", transition: "background .2s ease" }}
-                onMouseEnter={e => { e.currentTarget.style.background = "rgba(232,200,119,.05)" }}
+                onMouseEnter={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 5%, transparent)" }}
                 onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}>
                 <span style={{ flex: "none", display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, borderRadius: 7, background: rankBg, fontSize: 11.5, fontWeight: 700, color: rankCol, fontVariantNumeric: "tabular-nums" }}>{i + 1}</span>
                 <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 8 }}>

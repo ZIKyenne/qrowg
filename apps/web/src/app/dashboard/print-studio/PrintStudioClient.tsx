@@ -875,7 +875,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     const card = (it: Item, top?: string) => (
       <button key={it.id} className="ps2-card" onClick={() => openItem(it.id)} style={{ position: "relative", textAlign: "left", display: "flex", flexDirection: "column", background: "var(--surface)", border: "1px solid var(--surface-2)", borderRadius: 14, overflow: "hidden", cursor: "pointer", color: "var(--ink)" }}>
         <div style={{ position: "relative", aspectRatio: "4 / 3", display: "flex", alignItems: "center", justifyContent: "center", background: "radial-gradient(120% 100% at 50% 0%, #191512, #100e0c 72%)", borderBottom: "1px solid #1c1917" }}>
-          <span style={{ position: "absolute", top: 11, right: 11, padding: "3px 9px", borderRadius: 999, background: "rgba(232,200,119,.1)", border: "1px solid rgba(232,200,119,.3)", color: "var(--accent)", fontSize: 9.5, letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 700, whiteSpace: "nowrap" }}>{it.size}</span>
+          <span style={{ position: "absolute", top: 11, right: 11, padding: "3px 9px", borderRadius: 999, background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", color: "var(--accent)", fontSize: 9.5, letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 700, whiteSpace: "nowrap" }}>{it.size}</span>
           {top && <span style={{ position: "absolute", top: 11, left: 11, padding: "3px 9px", borderRadius: 999, background: "linear-gradient(135deg,var(--gold-light),var(--accent))", color: "#1a1408", fontSize: 9.5, letterSpacing: ".08em", textTransform: "uppercase", fontWeight: 700, whiteSpace: "nowrap" }}>{top}</span>}
           <MiniSupport item={it} style={STYLE_BY_ID[it.pal]} />
         </div>
@@ -889,7 +889,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     )
     return (
       <div style={{ position: "relative", minHeight: "100dvh", color: "var(--ink)", fontFamily: "Inter, system-ui, sans-serif", padding: "0 16px 56px" }}>
-        <style>{`.ps2-card{transition:border-color .26s ease, transform .26s cubic-bezier(.2,.85,.3,1)}.ps2-card:hover{border-color:rgba(232,200,119,.45);transform:translateY(-2px)}.ps2-card:hover .ps2-perso{color:var(--gold-light)}.ps2-sel:hover{border-color:rgba(232,200,119,.4);color:var(--ink)}.ps2-chip{transition:border-color .24s ease,color .24s ease}.ps2-chip:hover{border-color:rgba(232,200,119,.34);color:var(--ink)}.ps2-menuitem:hover{background:rgba(232,200,119,.07)!important}.ps2-x{opacity:.7;transition:opacity .2s ease}.ps2-x:hover{opacity:1}.ps2-search::placeholder{color:#6b6258}.ps2-search:focus{outline:none}.ps2-editeur{transition:background .28s ease,color .28s ease}.ps2-editeur:hover{background:linear-gradient(135deg,var(--gold-light),var(--accent))!important;color:#1a1408!important}.ps2-more:hover{color:var(--gold-light)}`}</style>
+        <style>{`.ps2-card{transition:border-color .26s ease, transform .26s cubic-bezier(.2,.85,.3,1)}.ps2-card:hover{border-color:color-mix(in srgb, var(--accent) 45%, transparent);transform:translateY(-2px)}.ps2-card:hover .ps2-perso{color:var(--gold-light)}.ps2-sel:hover{border-color:color-mix(in srgb, var(--accent) 40%, transparent);color:var(--ink)}.ps2-chip{transition:border-color .24s ease,color .24s ease}.ps2-chip:hover{border-color:color-mix(in srgb, var(--accent) 34%, transparent);color:var(--ink)}.ps2-menuitem:hover{background:color-mix(in srgb, var(--accent) 7%, transparent)!important}.ps2-x{opacity:.7;transition:opacity .2s ease}.ps2-x:hover{opacity:1}.ps2-search::placeholder{color:#6b6258}.ps2-search:focus{outline:none}.ps2-editeur{transition:background .28s ease,color .28s ease}.ps2-editeur:hover{background:linear-gradient(135deg,var(--gold-light),var(--accent))!important;color:#1a1408!important}.ps2-more:hover{color:var(--gold-light)}`}</style>
         <div style={{ maxWidth: 1180, margin: "0 auto", display: "flex", flexDirection: "column", gap: 22 }}>
 
           {/* En-tête : fil d'Ariane + eyebrow */}
@@ -938,10 +938,10 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                 const on = metier === m
                 return (
                   <button key={m} type="button" className={on ? undefined : "ps2-chip"} onClick={() => setMetier(on ? "Tout" : m)}
-                    style={{ padding: "6px 13px", borderRadius: 999, cursor: "pointer", fontSize: 12, fontWeight: on ? 600 : 500, background: on ? "rgba(232,200,119,.1)" : "transparent", border: `1px solid ${on ? "rgba(232,200,119,.4)" : "#26211a"}`, color: on ? "#e8c877" : "#8a8177" }}>{m}</button>
+                    style={{ padding: "6px 13px", borderRadius: 999, cursor: "pointer", fontSize: 12, fontWeight: on ? 600 : 500, background: on ? "color-mix(in srgb, var(--accent) 10%, transparent)" : "transparent", border: `1px solid ${on ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "#26211a"}`, color: on ? "#e8c877" : "#8a8177" }}>{m}</button>
                 )
               })}
-              <button type="button" className="ps2-more" onClick={() => setAllMetiers(a => !a)} style={{ padding: "6px 4px", background: "none", border: "none", color: "var(--muted)", fontSize: 12, fontWeight: 600, cursor: "pointer", textDecoration: "underline", textDecorationColor: "rgba(232,200,119,.3)", textUnderlineOffset: 3, transition: "color .24s ease" }}>{allMetiers ? "− Réduire" : `+ ${METIERS.length - 1 - 6} métiers`}</button>
+              <button type="button" className="ps2-more" onClick={() => setAllMetiers(a => !a)} style={{ padding: "6px 4px", background: "none", border: "none", color: "var(--muted)", fontSize: 12, fontWeight: 600, cursor: "pointer", textDecoration: "underline", textDecorationColor: "color-mix(in srgb, var(--accent) 30%, transparent)", textUnderlineOffset: 3, transition: "color .24s ease" }}>{allMetiers ? "− Réduire" : `+ ${METIERS.length - 1 - 6} métiers`}</button>
             </div>
 
             {hasFilter && (
@@ -996,7 +996,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               <span style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)" }}>Vous ne trouvez pas votre support ?</span>
               <span style={{ fontSize: 11.5, color: "var(--muted)" }}>L'éditeur libre part d'un format A4 : vous posez le QR où vous voulez.</span>
             </div>
-            <button type="button" className="ps2-editeur" onClick={() => { setMode("studio"); try { localStorage.setItem("qrowg-print-mode", "studio") } catch {}; openItem("i11") }} style={{ marginLeft: "auto", padding: "9px 18px", borderRadius: 999, border: "1px solid rgba(232,200,119,.35)", background: "linear-gradient(135deg, rgba(232,200,119,.16), rgba(201,162,77,.1))", color: "var(--gold-light)", fontSize: 12.5, fontWeight: 700, whiteSpace: "nowrap", cursor: "pointer" }}>Éditeur libre</button>
+            <button type="button" className="ps2-editeur" onClick={() => { setMode("studio"); try { localStorage.setItem("qrowg-print-mode", "studio") } catch {}; openItem("i11") }} style={{ marginLeft: "auto", padding: "9px 18px", borderRadius: 999, border: "1px solid color-mix(in srgb, var(--accent) 35%, transparent)", background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, transparent), color-mix(in srgb, var(--accent) 10%, transparent))", color: "var(--gold-light)", fontSize: 12.5, fontWeight: 700, whiteSpace: "nowrap", cursor: "pointer" }}>Éditeur libre</button>
           </div>
         </div>
       </div>
@@ -1851,7 +1851,7 @@ function FilterSelect({ label, value, options, onPick }: { label: string; value:
               const on = o === value
               return (
                 <button key={o} type="button" className="ps2-menuitem" onClick={() => { onPick(o); setOpen(false) }}
-                  style={{ display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "8px 10px", borderRadius: 8, background: on ? "rgba(232,200,119,.08)" : "transparent", border: "none", color: on ? "#e8c877" : "#b8b1a6", fontSize: 12.5, fontWeight: on ? 600 : 500, cursor: "pointer", textAlign: "left" }}>
+                  style={{ display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "8px 10px", borderRadius: 8, background: on ? "color-mix(in srgb, var(--accent) 8%, transparent)" : "transparent", border: "none", color: on ? "#e8c877" : "#b8b1a6", fontSize: 12.5, fontWeight: on ? 600 : 500, cursor: "pointer", textAlign: "left" }}>
                   {o}{on && <span aria-hidden style={{ width: 6, height: 6, borderRight: "1.5px solid var(--gold-light)", borderBottom: "1.5px solid var(--gold-light)", transform: "rotate(45deg)" }} />}
                 </button>
               )
@@ -1866,9 +1866,9 @@ function FilterSelect({ label, value, options, onPick }: { label: string; value:
 // Pastille de filtre actif (dorée) avec croix de retrait.
 function ActiveChip({ label, onClear }: { label: string; onClear: () => void }) {
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 8px 5px 11px", borderRadius: 999, background: "rgba(232,200,119,.07)", border: "1px solid rgba(232,200,119,.28)", color: "var(--gold-light)", fontSize: 11.5, fontWeight: 600 }}>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 8px 5px 11px", borderRadius: 999, background: "color-mix(in srgb, var(--accent) 7%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)", color: "var(--gold-light)", fontSize: 11.5, fontWeight: 600 }}>
       {label}
-      <button type="button" aria-label={`Retirer ${label}`} onClick={onClear} className="ps2-x" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 14, height: 14, borderRadius: "50%", background: "rgba(232,200,119,.15)", border: "none", cursor: "pointer", padding: 0 }}>
+      <button type="button" aria-label={`Retirer ${label}`} onClick={onClear} className="ps2-x" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 14, height: 14, borderRadius: "50%", background: "color-mix(in srgb, var(--accent) 15%, transparent)", border: "none", cursor: "pointer", padding: 0 }}>
         <span style={{ position: "relative", width: 7, height: 7 }}>
           <span style={{ position: "absolute", top: 2.8, left: 0, width: 7, height: 1.4, background: "var(--gold-light)", transform: "rotate(45deg)" }} />
           <span style={{ position: "absolute", top: 2.8, left: 0, width: 7, height: 1.4, background: "var(--gold-light)", transform: "rotate(-45deg)" }} />
