@@ -11,5 +11,10 @@ export const dynamic = "force-dynamic"
 export default async function E2ERedirectionsPage() {
   if (!harnessAutorise()) notFound()
 
-  return <ToastProvider><ConfirmProvider><RedirectsPanel userDomains={["demo.exemple.fr"]} /></ConfirmProvider></ToastProvider>
+  const il_y_a = (j: number) => new Date(Date.now() - j * 864e5).toISOString()
+  const redirects = [
+    { id: "demo-r1", from_domain: "ancien-bistrot.fr", from_path: "/", to_url: "https://carte.bistrot-horizon.fr", redirect_type: 301 as const, label: "Ancien site", enabled: true, hit_count: 342, last_hit_at: il_y_a(0), created_at: il_y_a(60) },
+    { id: "demo-r2", from_domain: "carte.bistrot-horizon.fr", from_path: "/menu-ete", to_url: "https://carte.bistrot-horizon.fr/menu", redirect_type: 302 as const, label: "Menu d'été (fini)", enabled: false, hit_count: 18, last_hit_at: il_y_a(30), created_at: il_y_a(90) },
+  ]
+  return <ToastProvider><ConfirmProvider><RedirectsPanel userDomains={["carte.bistrot-horizon.fr", "avis.bistrot-horizon.fr"]} initialRedirects={redirects} /></ConfirmProvider></ToastProvider>
 }

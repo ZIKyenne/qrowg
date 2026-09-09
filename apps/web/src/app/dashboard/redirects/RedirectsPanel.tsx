@@ -26,6 +26,8 @@ type Redirect = {
 
 interface Props {
   userDomains: string[]
+  /** Amorçage (bancs d'essai, tests) : la liste est fournie, aucun appel réseau au montage. */
+  initialRedirects?: Redirect[]
 }
 
 const G     = "var(--accent)"
@@ -37,9 +39,9 @@ const TYPE_CFG = {
   302: { color: "#C8BFB2", bg: "rgba(255,255,255,0.04)",  border: "rgba(255,255,255,0.12)",  label: "302 Temporaire", desc: "Le SEO reste sur la source" },
 }
 
-export default function RedirectsPanel({ userDomains }: Props) {
-  const [redirects, setRedirects] = useState<Redirect[]>([])
-  const [loading,   setLoading]   = useState(true)
+export default function RedirectsPanel({ userDomains, initialRedirects }: Props) {
+  const [redirects, setRedirects] = useState<Redirect[]>(initialRedirects ?? [])
+  const [loading,   setLoading]   = useState(!initialRedirects)
   const [showForm,  setShowForm]  = useState(false)
   const [editId,    setEditId]    = useState<string | null>(null)
   const [saving,    setSaving]    = useState(false)
@@ -64,7 +66,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
       .then(d => { setRedirects(d.redirects ?? []); setLoading(false) })
       .catch(e => { setErreurChargement(e instanceof Error ? e.message : "Erreur réseau"); setLoading(false) })
   }
-  useEffect(() => { charger() }, [])
+  useEffect(() => { if (!initialRedirects) charger() }, [])
 
   function openEdit(r: Redirect) {
     setEditId(r.id)

@@ -21,6 +21,10 @@ type DomainRecord = {
 }
 
 interface Props {
+  /** Vue compacte (v56) : entête (plan, compteur, ajout) et rappel du domaine principal,
+      SANS cartes — la liste détaillée de l'écran parent les affiche déjà, avec le
+      marqueur « Principal » et « Définir principal ». Fini le même domaine deux fois. */
+  vueCompacte?: boolean
   domains:    DomainRecord[]
   pages:      { id: string; title: string; slug: string }[]
   plan:       string
@@ -55,6 +59,11 @@ function StatusBadge({ status, verified }: { status: string; verified: boolean }
       <AlertCircle size={10}/> Erreur
     </span>
   )
+  if (status === "verified") return (
+    <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:"rgba(57,255,143,0.1)", border:"1px solid rgba(57,255,143,0.25)", borderRadius:6, padding:"2px 8px", fontSize:10, color:"var(--success)" }}>
+      <CheckCircle size={10}/> Vérifié
+    </span>
+  )
   return (
     <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:6, padding:"2px 8px", fontSize:10, color:MUTED, fontWeight:600 }}>
       <Clock size={10}/> {status}
@@ -62,7 +71,7 @@ function StatusBadge({ status, verified }: { status: string; verified: boolean }
   )
 }
 
-export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrimary, onDelete, onAddClick }: Props) {
+export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrimary, onDelete, onAddClick, vueCompacte = false }: Props) {
   const [settingPrimary, setSettingPrimary] = useState<string | null>(null)
   const [deleting,       setDeleting]       = useState<string | null>(null)
 
@@ -202,7 +211,9 @@ export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrim
             Domaine principal
           </p>
           {primary ? (
-            <DomainCard rec={primary} isPrimary={true} hasPrimary={true}/>
+            vueCompacte
+              ? <p style={{ color:"var(--ink)", fontSize:13, margin:0, display:"flex", alignItems:"center", gap:7 }}><Star size={13} color={G}/> {primary.domain}{isBusiness && secondary.length > 0 && <span style={{ color:MUTED, fontSize:12 }}>· {secondary.length} secondaire{secondary.length > 1 ? "s" : ""} redirigé{secondary.length > 1 ? "s" : ""} (301)</span>}</p>
+              : <DomainCard rec={primary} isPrimary={true} hasPrimary={true}/>
           ) : (
             <div style={{ padding:"12px 14px", background:"rgba(255,255,255,0.02)", border:"1px dashed rgba(255,255,255,0.08)", borderRadius:10 }}>
               <p style={{ color:MUTED, fontSize:12, margin:0 }}>
@@ -217,7 +228,7 @@ export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrim
       )}
 
       {/* Domaines secondaires (Business) */}
-      {isBusiness && secondary.length > 0 && (
+      {!vueCompacte && isBusiness && secondary.length > 0 && (
         <div style={{ marginBottom:16 }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
             <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>
@@ -236,7 +247,7 @@ export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrim
       )}
 
       {/* Domaines (plan Pro: liste simple) */}
-      {!isBusiness && domains.length > 0 && !primary && (
+      {!vueCompacte && !isBusiness && domains.length > 0 && !primary && (
         <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
           {domains.map(rec => (
             <DomainCard key={rec.id} rec={rec} isPrimary={false} hasPrimary={!!primary}/>

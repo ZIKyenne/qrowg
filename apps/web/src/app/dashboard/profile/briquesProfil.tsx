@@ -29,7 +29,7 @@ export function StatPill({ icon: Icon, label, value, color }: { icon: any; label
       </div>
       <div>
         <p style={{ color: "var(--ink)", fontSize: 20, fontWeight: 600, margin: 0, lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{value}</p>
-        <p style={{ color: MUTED, fontSize: 10, margin: "2px 0 0", textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</p>
+        <p style={{ color: MUTED, fontSize:11.5, margin: "2px 0 0", textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</p>
       </div>
     </div>
   )

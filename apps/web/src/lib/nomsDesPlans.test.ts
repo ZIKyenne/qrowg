@@ -30,6 +30,8 @@ const ECRANS = [
   "dashboard/DashboardClient.tsx",
   "dashboard/profile/page.tsx",
   "dashboard/qr-codes/QRStudio.tsx",
+  "dashboard/settings/page.tsx",
+  "dashboard/domains/MultiBrandDomainsPanel.tsx",
 ]
 const EN_DUR = [
   /["'`]Starter["'`]/,
@@ -41,6 +43,8 @@ const EN_DUR = [
   /Passer à Starter/,
   /Passez à Starter/,
   /\?\s*"Business"\s*:\s*[^?]*\?\s*"Pro"/,
+  /\{profile\?\.plan \|\| "free"\}/,
+  /plan\?\.toUpperCase\(\)\} —/,
 ]
 
 describe("les écrans lisent les noms dans lib/plans.ts", () => {

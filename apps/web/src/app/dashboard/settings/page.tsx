@@ -1,5 +1,6 @@
 "use client"
 
+import { getPlan } from "@/lib/plans"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { SettingsSection, champStyle } from "@/components/ui/SettingsSection"
 import { useEffect, useState } from "react"
@@ -223,15 +224,15 @@ export default function SettingsPage() {
               <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 5 }}>Email</label>
               <div style={{ ...inputStyle, opacity: 0.6, cursor: "not-allowed", display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ color: "var(--ink)" }}>{profile?.email}</span>
-                <span style={{ marginLeft: "auto", color: "var(--success)", fontSize: 10, background: "rgba(57,255,143,0.1)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 6, padding: "2px 7px" }}>Vérifié</span>
+                <span style={{ marginLeft: "auto", color: "var(--success)", fontSize:11.5, background: "rgba(57,255,143,0.1)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 6, padding: "2px 7px" }}>Vérifié</span>
               </div>
               <p style={{ color: MUTED, fontSize: 12, margin: "4px 0 0" }}>L'e-mail ne peut pas être modifié pour des raisons de sécurité.</p>
             </div>
             <div>
               <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 5 }}>Plan actuel</label>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ background: "color-mix(in srgb, var(--accent) 7%, transparent)", border:"1px solid var(--line-strong)", borderRadius: 8, padding: "6px 14px", color: G, fontSize: 13, fontWeight: 700, textTransform: "capitalize" }}>
-                  {profile?.plan || "free"}
+                <span style={{ background: "color-mix(in srgb, var(--accent) 7%, transparent)", border:"1px solid var(--line-strong)", borderRadius: 8, padding: "6px 14px", color: G, fontSize: 13, fontWeight: 700 }}>
+                  {getPlan(profile?.plan).label}
                 </span>
                 {profile?.plan !== "business" && (
                   <a href="/upgrade" style={{ color: G, fontSize: 12, textDecoration: "none", opacity: 0.8 }}>Changer de plan →</a>
@@ -245,7 +246,7 @@ export default function SettingsPage() {
         <Section title="Facturation" subtitle="Abonnement, factures et paiements" icon={<CreditCard size={16} />}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
             <div>
-              <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: "0 0 2px", textTransform: "capitalize" as const }}>Plan {profile?.plan || "free"}</p>
+              <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>Plan {getPlan(profile?.plan).label}</p>
               <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>Factures et reçus envoyés par e-mail à chaque paiement.</p>
             </div>
             <a href="/upgrade" className="da-btn-primary da-btn-primary--sm" style={{ flexShrink: 0 }}>
@@ -322,7 +323,7 @@ export default function SettingsPage() {
                 ligne, un interrupteur allumé ne garantissait rien du tout. */}
             {passages && (
               <div style={{ marginTop: 18, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-                <p style={{ color: "var(--muted)", fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>Envois automatiques</p>
+                <p style={{ color: "var(--muted)", fontSize:12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>Envois automatiques</p>
                 {!journalOuvert ? (
                   <p style={{ color: "#6E685E", fontSize: 12, lineHeight: 1.55, margin: 0 }}>
                     Le journal des envois n&apos;est pas encore activé sur cette base. Une fois la table <code style={{ color: "var(--muted)" }}>cron_runs</code> créée, chaque envoi automatique laissera une trace ici.

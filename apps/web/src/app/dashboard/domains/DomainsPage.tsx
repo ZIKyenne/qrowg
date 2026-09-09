@@ -10,8 +10,7 @@ import { Button } from "@/components/ui/Button"
 import { useToast } from "@/components/Toast"
 import {
   Globe, Plus, Trash2, CheckCircle, Clock, AlertCircle,
-  Copy, ExternalLink, Loader, ChevronDown, ChevronUp, X, RefreshCw
-} from "lucide-react"
+  Copy, ExternalLink, Loader, ChevronDown, ChevronUp, X, RefreshCw, Star } from "lucide-react"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type DomainRecord = {
@@ -31,6 +30,8 @@ type DomainRecord = {
 interface Props {
   pages: { id: string; title: string; slug: string; status: string }[]
   plan:  string
+  /** Amorçage (bancs d'essai, tests) : la liste est fournie, aucun appel réseau au montage. */
+  initialDomains?: DomainRecord[]
 }
 
 // ── Config ────────────────────────────────────────────────────────────────────
@@ -39,17 +40,18 @@ const PAID_PLANS = ["pro", "business"]
 const STATUS_CFG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   pending: { label: "En attente",   color: "#F97316", icon: <Clock size={13}/> },
   active:  { label: "Actif",        color: "var(--success)", icon: <CheckCircle size={13}/> },
+  verified:{ label: "Vérifié",      color: "var(--success)", icon: <CheckCircle size={13}/> },
   error:   { label: "Erreur",       color: "var(--danger)", icon: <AlertCircle size={13}/> },
 }
 
 const G     = "var(--accent)"
 const MUTED = "var(--muted)"
 
-export default function DomainsPage({ pages, plan }: Props) {
+export default function DomainsPage({ pages, plan, initialDomains }: Props) {
   const toast = useToast()
   const confirm = useConfirm()
-  const [domains,    setDomains]    = useState<DomainRecord[]>([])
-  const [loading,    setLoading]    = useState(true)
+  const [domains,    setDomains]    = useState<DomainRecord[]>(initialDomains ?? [])
+  const [loading,    setLoading]    = useState(!initialDomains)
   const [showForm,   setShowForm]   = useState(false)
   const [expanded,   setExpanded]   = useState<string | null>(null)
   const [copied,     setCopied]     = useState<string | null>(null)
@@ -73,7 +75,7 @@ export default function DomainsPage({ pages, plan }: Props) {
       .then(d => { setDomains(d.domains ?? []); setLoading(false) })
       .catch(e => { setErreurChargement(e instanceof Error ? e.message : "Erreur réseau"); setLoading(false) })
   }
-  useEffect(() => { charger() }, [])
+  useEffect(() => { if (!initialDomains) charger() }, [])
 
   async function addDomain() {
     if (!fDomain || !fPageId) return
@@ -194,6 +196,7 @@ export default function DomainsPage({ pages, plan }: Props) {
             {/* ── Vue multi-brand ──────────────────────────────────────────── */}
             <div style={{ marginBottom: 20 }}>
               <MultiBrandDomainsPanel
+                vueCompacte
                 domains={domains}
                 pages={pages}
                 plan={plan}
@@ -283,7 +286,8 @@ export default function DomainsPage({ pages, plan }: Props) {
             ) : (
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                 {domains.map(rec => {
-                  const statusCfg = STATUS_CFG[rec.vercel_status] ?? STATUS_CFG.pending
+                  // Un domaine vérifié se dit « Vérifié », quel que soit le mot brut de l'hébergeur.
+                  const statusCfg = rec.verified ? STATUS_CFG.verified : (STATUS_CFG[rec.vercel_status] ?? STATUS_CFG.pending)
                   const isOpen    = expanded === rec.id
                   const isBusy    = verifying === rec.id || deleting === rec.id
 
@@ -301,6 +305,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                             <span style={{ display:"flex", alignItems:"center", gap:4, background:`${statusCfg.color}15`, border:`1px solid ${statusCfg.color}30`, borderRadius:6, padding:"2px 8px", fontSize:10, color:statusCfg.color, fontWeight:600 }}>
                               {statusCfg.icon}{statusCfg.label}
                             </span>
+                            {rec.is_primary && <span style={{ display:"flex", alignItems:"center", gap:4, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid var(--line-strong)", borderRadius:6, padding:"2px 8px", fontSize:10, color:G, fontWeight:700 }}><Star size={10}/> Principal</span>}
                           </div>
                           <p style={{ color:MUTED, fontSize:11, margin:0 }}>
                             → {rec.pages?.title ?? pages.find(p => p.id === rec.page_id)?.title ?? "Page non liée"} · Ajouté le {formatDate(rec.created_at)}
@@ -312,6 +317,9 @@ export default function DomainsPage({ pages, plan }: Props) {
                               style={{ width:28, height:28, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:MUTED, textDecoration:"none" }}>
                               <ExternalLink size={13}/>
                             </a>
+                          )}
+                          {plan?.toLowerCase() === "business" && rec.verified && !rec.is_primary && (
+                            <button type="button" onClick={() => setPrimaryDomain(rec.domain)} className="da-btn-neutral da-btn-neutral--sm" style={{ fontSize:12 }}><Star size={12}/> <span>Définir principal</span></button>
                           )}
                           {!rec.verified && (
                             <button type="button" onClick={() => { const ouvre = showChecker !== rec.id; setShowChecker(ouvre ? rec.id : null); if (ouvre) setExpanded(rec.id) }}

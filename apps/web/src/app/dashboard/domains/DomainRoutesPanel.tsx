@@ -130,7 +130,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
       <div style={{ background:"var(--surface)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:14, padding:24, fontFamily:"DM Sans, sans-serif" }}>
         <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
           <Layers size={16} color={MUTED}/>
-          <h3 style={{ color:"var(--ink)", fontSize:14, fontWeight:700, margin:0 }}>Routing multi-pages</h3>
+          <h3 style={{ color:"var(--ink)", fontSize:14, fontWeight:700, margin:0 }}>Une page par sous-domaine</h3>
         </div>
         <div style={{ textAlign:"center", padding:"24px 0", color:MUTED }}>
           <Globe size={28} color={MUTED} style={{ marginBottom:10 }}/>
@@ -149,10 +149,10 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
         <div>
           <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
             <Layers size={16} color={G}/>
-            <h3 style={{ color:"var(--ink)", fontSize:14, fontWeight:700, margin:0 }}>Routing multi-pages</h3>
+            <h3 style={{ color:"var(--ink)", fontSize:14, fontWeight:700, margin:0 }}>Une page par sous-domaine</h3>
           </div>
           <p style={{ color:MUTED, fontSize:12, margin:0 }}>
-            Associez chaque sous-domaine à une page différente
+            Chaque sous-domaine mène à la page de votre choix
           </p>
         </div>
         <button type="button" onClick={() => setShowForm(true)} className="da-btn-primary da-btn-primary--sm">
@@ -178,7 +178,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
               <ArrowRight size={11} color={MUTED}/>
               <span style={{ color:"var(--ink)", fontSize:11 }}>{ex.page}</span>
               {ex.special === "wildcard" && (
-                <span style={{ background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid var(--line-strong)", borderRadius:5, padding:"1px 6px", fontSize:9, color:G }}>wildcard</span>
+                <span style={{ background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid var(--line-strong)", borderRadius:5, padding:"1px 6px", fontSize:11, color:G }}>joker</span>
               )}
             </div>
           ))}

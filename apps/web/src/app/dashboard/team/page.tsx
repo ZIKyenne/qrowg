@@ -12,7 +12,7 @@ import { erreurLisible, MessageUtilisateur } from "@/lib/erreurLisible"
 type Role = "owner" | "admin" | "editor" | "viewer"
 type Member = { id: string; user_id: string; role: Role; joined_at: string; profiles?: { email?: string; full_name?: string } }
 type Invitation = { id: string; email: string; role: Role; created_at: string }
-type TeamData = {
+export type TeamData = {
   team: { id: string; name: string; ownerId: string }
   owner: { id: string; email?: string; name?: string }
   members: Member[]
@@ -25,7 +25,7 @@ type TeamData = {
 }
 
 const GOLD = "var(--accent)"
-const ROLE_LABEL: Record<Role, string> = { owner: "Propriétaire", admin: "Admin", editor: "Éditeur", viewer: "Lecture" }
+const ROLE_LABEL: Record<Role, string> = { owner: "Propriétaire", admin: "Administrateur", editor: "Éditeur", viewer: "Lecture" }
 
 function RoleBadge({ role }: { role: Role }) {
   const c = role === "owner" ? GOLD : role === "admin" ? "#A78BFA" : "var(--success)"
@@ -38,11 +38,11 @@ function RoleBadge({ role }: { role: Role }) {
   )
 }
 
-export default function TeamPage() {
+export default function TeamPage({ initialData }: { initialData?: TeamData } = {}) {
   const toast = useToast()
   const confirm = useConfirm()
-  const [data, setData] = useState<TeamData | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState<TeamData | null>(initialData ?? null)
+  const [loading, setLoading] = useState(!initialData)
   const [email, setEmail] = useState("")
   const [role, setRole] = useState<"editor" | "admin">("editor")
   const [inviting, setInviting] = useState(false)
@@ -60,7 +60,7 @@ export default function TeamPage() {
     }
   }, [toast])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { if (!initialData) load() }, [load, initialData])
 
   const canManage = data?.myRole === "owner" || data?.myRole === "admin"
 
@@ -126,7 +126,7 @@ export default function TeamPage() {
   return (
     <div style={{ maxWidth: 760, margin: "0 auto", padding: "clamp(20px,4vw,40px) clamp(16px,4vw,28px)", fontFamily: "DM Sans, sans-serif" }}>
       <PageHeader kicker="Espace" title="Équipe" gap={28}
-        sub={<>Invitez des collaborateurs à gérer vos pages et QR codes. <strong style={{ color: "var(--ink)" }}>Éditeur</strong> : modifie ; <strong style={{ color: "var(--ink)" }}>Admin</strong> : gère aussi les membres.</>} />
+        sub={<>Invitez des collaborateurs à gérer vos pages et QR codes. <strong style={{ color: "var(--ink)" }}>Éditeur</strong> : modifie ; <strong style={{ color: "var(--ink)" }}>Administrateur</strong> : gère aussi les membres.</>} />
 
       {loading ? (
         <div style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--muted)", padding: 40, justifyContent: "center" }}>
@@ -164,7 +164,7 @@ export default function TeamPage() {
                 <select aria-label="Rôle de la personne invitée" value={role} onChange={e => setRole(e.target.value as "editor" | "admin")}
                   style={{ padding: "11px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.12)", background: "#0A0908", color: "var(--ink)", fontSize: 14, cursor: "pointer" }}>
                   <option value="editor">Éditeur</option>
-                  <option value="admin">Admin</option>
+                  <option value="admin">Administrateur</option>
                 </select>
                 <Button type="submit" variant="primary" loading={inviting}>Inviter</Button>
               </div>
@@ -202,7 +202,7 @@ export default function TeamPage() {
                     <select aria-label={`Rôle de ${m.profiles?.full_name || m.profiles?.email || "ce membre"}`} value={m.role} onChange={e => changeRole(m.id, e.target.value as "editor" | "admin")}
                       style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.14)", background: "#0A0908", color: "var(--ink)", fontSize: 12.5, cursor: "pointer" }}>
                       <option value="editor">Éditeur</option>
-                      <option value="admin">Admin</option>
+                      <option value="admin">Administrateur</option>
                     </select>
                   ) : <RoleBadge role={m.role} />}
                   {canManage && (

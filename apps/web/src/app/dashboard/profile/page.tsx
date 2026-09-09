@@ -830,7 +830,7 @@ export default function ProfilePage() {
                 </h1>
                 <span style={{ position: "relative", overflow: "hidden", display: "inline-flex", alignItems: "center", gap: 5, background: "var(--surface-2)", border: `1px solid ${pc}55`, borderRadius: 999, padding: "3px 10px" }}>
                   <PlanIcon size={11} color={pc}/>
-                  <span style={{ color: pc, fontSize: 10.5, fontWeight: 600 }}>{planCfg.label}</span>
+                  <span style={{ color: pc, fontSize:12, fontWeight: 600 }}>{planCfg.label}</span>
                   
                 </span>
               </div>
@@ -883,7 +883,7 @@ export default function ProfilePage() {
                 <div key={i} className="hero-in hero-tile" style={{ animationDelay: `${120 + i * 80}ms`, background: "rgba(255,255,255,0.04)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "9px 7px", textAlign: "center" as const }}>
                   <span style={{ display: "inline-flex", width: 24, height: 24, borderRadius: 7, background: s.color + "1c", alignItems: "center", justifyContent: "center", marginBottom: 5 }}><s.icon size={12} color={s.color}/></span>
                   <p style={{ color: "var(--ink)", fontSize: 20, fontWeight: 600, margin: 0, lineHeight: 1, fontVariantNumeric: "tabular-nums" }}><CountUp value={s.value}/></p>
-                  <p style={{ color: MUTED, fontSize: 10.5, margin: "2px 0 0" }}>{s.label}</p>
+                  <p style={{ color: MUTED, fontSize:12, margin: "2px 0 0" }}>{s.label}</p>
                 </div>
               ))}
             </div>
@@ -898,20 +898,23 @@ export default function ProfilePage() {
                   </a>
                 )}
               </div>
+              {/* Une limite absente n'est pas « ∞ » avec une jauge remplie à 12 % : on l'écrit, sans jauge (v56). */}
               {([
-                { label: "QR actifs", used: activeQR, limit: planLimits.pages, pct: pagesUsagePct, near: isAtLimitPages },
+                { label: "Pages publiées", used: activeQR, limit: planLimits.pages, pct: pagesUsagePct, near: isAtLimitPages },
                 { label: "Vues ce mois", used: totalViews, limit: planLimits.views, pct: viewsUsagePct, near: isAtLimitViews },
               ] as const).map((g, i) => (
                 <div key={i} style={{ marginBottom: i === 0 ? 11 : 0 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 5 }}>
-                    <span style={{ color: "var(--muted)", fontSize: 11, fontWeight: 500 }}>{g.label}</span>
-                    <span style={{ color: g.near ? "var(--danger)" : "var(--ink)", fontSize: 11, fontWeight: 700 }}>
-                      {(g.used || 0).toLocaleString("fr-FR")}<span style={{ color: MUTED, fontWeight: 400 }}> / {g.limit == null ? "∞" : g.limit.toLocaleString("fr-FR")}</span>
+                    <span style={{ color: "var(--muted)", fontSize: 12, fontWeight: 500 }}>{g.label}</span>
+                    <span style={{ color: g.near ? "var(--danger)" : "var(--ink)", fontSize: 12, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
+                      {(g.used || 0).toLocaleString("fr-FR")}<span style={{ color: MUTED, fontWeight: 400 }}>{g.limit == null ? " · illimitées" : ` / ${g.limit.toLocaleString("fr-FR")}`}</span>
                     </span>
                   </div>
-                  <div style={{ height: 7, borderRadius: 4, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: g.limit == null ? "12%" : `${Math.max(3, g.pct)}%`, borderRadius: 4, background: g.near ? "linear-gradient(90deg,var(--danger),var(--accent))" : `linear-gradient(90deg,${pc},color-mix(in srgb, var(--accent) 70%, #000))`, transition: "width .8s var(--mo-ease-standard)" }}/>
-                  </div>
+                  {g.limit != null && (
+                    <div style={{ height: 6, borderRadius: 4, background: "var(--surface-2)", overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: `${Math.max(3, g.pct)}%`, borderRadius: 4, background: g.near ? "var(--danger)" : "var(--accent)" }} />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -966,15 +969,15 @@ export default function ProfilePage() {
 
           {/* 1. IDENTITE */}
           {ptab === "identite" && (
-          <SectionCard title="Identite" icon={Settings} color={G}
+          <SectionCard title="Identité" icon={Settings} color={G}
             action={
               <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                 {profile?.plan === "free" && memberMonths <= 6 && (
-                  <span style={{ background:"rgba(57,255,143,0.1)", border:"1px solid rgba(57,255,143,0.2)", borderRadius:20, padding:"2px 8px", fontSize:9, color:"var(--success)", fontWeight:700 }}>
+                  <span style={{ background:"rgba(57,255,143,0.1)", border:"1px solid rgba(57,255,143,0.2)", borderRadius:20, padding:"2px 8px", fontSize:11, color:"var(--success)", fontWeight:700 }}>
                     Early User
                   </span>
                 )}
-                <span style={{ background:pc+"15", border:`1px solid ${pc}30`, borderRadius:20, padding:"2px 9px", fontSize:9, color:pc, fontWeight:700 }}>
+                <span style={{ background:pc+"15", border:`1px solid ${pc}30`, borderRadius:20, padding:"2px 9px", fontSize:11, color:pc, fontWeight:700 }}>
                   {planCfg.label}
                 </span>
               </div>
@@ -1025,7 +1028,7 @@ export default function ProfilePage() {
                       </button>
                     )}
                   </div>
-                  <p style={{ color:"var(--muted)", fontSize:9, margin:"6px 0 0" }}>PNG, JPG, WEBP -- max 5 Mo -- recadrage automatique 400x400</p>
+                  <p style={{ color:"var(--muted)", fontSize:11, margin:"6px 0 0" }}>PNG, JPG, WEBP · 5 Mo maximum · recadrage automatique 400 × 400</p>
                 </div>
               </div>
 
@@ -1040,7 +1043,7 @@ export default function ProfilePage() {
                       <img src={cropSrc} alt="preview" style={{ width:120, height:120, objectFit:"cover", borderRadius:"50%", border:"2px solid color-mix(in srgb, var(--accent) 30%, transparent)" }}/>
                       <div>
                         <p style={{ color:"var(--muted)", fontSize:11, margin:"0 0 6px" }}>L'image sera recadree<br/>en carre 400x400 px.</p>
-                        <p style={{ color:"var(--muted)", fontSize:10, margin:0 }}>Format: JPEG 92%</p>
+                        <p style={{ color:"var(--muted)", fontSize:11.5, margin:0 }}>Format: JPEG 92%</p>
                       </div>
                     </div>
                     <div style={{ display:"flex", gap:8 }}>
@@ -1083,11 +1086,11 @@ export default function ProfilePage() {
                 </div>
                 {/* Message validation */}
                 {usernameMsg && (
-                  <p style={{ color:usernameStatus==="ok"?"var(--success)":usernameStatus==="checking"?"var(--muted)":"var(--danger)", fontSize:10, margin:"4px 0 0", display:"flex", alignItems:"center", gap:4 }}>
+                  <p style={{ color:usernameStatus==="ok"?"var(--success)":usernameStatus==="checking"?"var(--muted)":"var(--danger)", fontSize:11.5, margin:"4px 0 0", display:"flex", alignItems:"center", gap:4 }}>
                     {usernameMsg}
                   </p>
                 )}
-                <p style={{ color:"var(--muted)", fontSize:10, margin:"3px 0 0" }}>3-30 caracteres -- lettres, chiffres, _ et -</p>
+                <p style={{ color:"var(--muted)", fontSize:11.5, margin:"3px 0 0" }}>3-30 caracteres -- lettres, chiffres, _ et -</p>
               </div>
 
               {/* URL publique */}
@@ -1114,7 +1117,7 @@ export default function ProfilePage() {
                 <textarea value={form.bio} onChange={e => setForm(f => ({ ...f, bio: e.target.value }))}
                   placeholder="Décrivez-vous en quelques mots…" rows={2}
                   style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 13px", color:"var(--ink)", fontSize:13, outline:"none", boxSizing:"border-box" as const, resize:"vertical" as const, lineHeight:1.6 }}/>
-                <p style={{ color:"var(--muted)", fontSize:10, margin:"3px 0 0" }}>{form.bio.length}/160</p>
+                <p style={{ color:"var(--muted)", fontSize:11.5, margin:"3px 0 0" }}>{form.bio.length}/160</p>
               </div>
 
               {/* Site web */}
@@ -1180,9 +1183,9 @@ export default function ProfilePage() {
                   <div style={{ display:"flex", gap:5, overflowX:"auto" }}>
                     {ACTIVITY_FILTER_OPTS.map(f => (
                       <button key={f.id} type="button" onClick={() => { setActivityFilter(f.id); setActivityPage(0) }}
-                        style={{ display:"inline-flex", alignItems:"center", gap:4, padding:"4px 10px", background:activityFilter===f.id?"color-mix(in srgb, var(--accent) 12%, transparent)":"rgba(255,255,255,0.04)", border:`1px solid ${activityFilter===f.id?"color-mix(in srgb, var(--accent) 35%, transparent)":"rgba(255,255,255,0.08)"}`, borderRadius:20, color:activityFilter===f.id?G:MUTED, fontSize:10, fontWeight:activityFilter===f.id?700:400, cursor:"pointer", whiteSpace:"nowrap" as const, flexShrink:0 }}>
+                        style={{ display:"inline-flex", alignItems:"center", gap:4, padding:"4px 10px", background:activityFilter===f.id?"color-mix(in srgb, var(--accent) 12%, transparent)":"rgba(255,255,255,0.04)", border:`1px solid ${activityFilter===f.id?"color-mix(in srgb, var(--accent) 35%, transparent)":"rgba(255,255,255,0.08)"}`, borderRadius:20, color:activityFilter===f.id?G:MUTED, fontSize:11.5, fontWeight:activityFilter===f.id?700:400, cursor:"pointer", whiteSpace:"nowrap" as const, flexShrink:0 }}>
                         {f.label}
-                        <span style={{ background:activityFilter===f.id?"color-mix(in srgb, var(--accent) 20%, transparent)":"rgba(255,255,255,0.06)", borderRadius:10, padding:"0px 5px", fontSize:9 }}>
+                        <span style={{ background:activityFilter===f.id?"color-mix(in srgb, var(--accent) 20%, transparent)":"rgba(255,255,255,0.06)", borderRadius:10, padding:"0px 5px", fontSize:11 }}>
                           {f.id==="all" ? rawEvts.length
                             : f.id==="pages" ? rawEvts.filter(e=>["page_created","page_published","page_updated"].includes(e.event_type)).length
                             : f.id==="qr"    ? rawEvts.filter(e=>["qr_created","qr_customized","qr_scanned","qr_downloaded"].includes(e.event_type)).length
@@ -1224,7 +1227,7 @@ export default function ProfilePage() {
                         <div key={groupName}>
                           {/* Label de groupe */}
                           <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
-                            <span style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase" as const, letterSpacing:1.2, whiteSpace:"nowrap" as const }}>
+                            <span style={{ color:MUTED, fontSize:11, fontWeight:700, textTransform:"uppercase" as const, letterSpacing:1.2, whiteSpace:"nowrap" as const }}>
                               {groupName}
                             </span>
                             <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.05)" }}/>
@@ -1258,7 +1261,7 @@ export default function ProfilePage() {
                                         <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:"0 0 2px", display:"flex", alignItems:"center", gap:6 }}>
                                           {evt.title}
                                           {evt.entity_label && (
-                                            <span style={{ color:cfg.color, fontSize:10, fontWeight:400, background:cfg.bg, padding:"1px 6px", borderRadius:4, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, maxWidth:120 }}>
+                                            <span style={{ color:cfg.color, fontSize:11.5, fontWeight:400, background:cfg.bg, padding:"1px 6px", borderRadius:4, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, maxWidth:120 }}>
                                               {evt.entity_label}
                                             </span>
                                           )}
@@ -1268,7 +1271,7 @@ export default function ProfilePage() {
                                         )}
                                       </div>
                                       <div style={{ display:"flex", alignItems:"center", gap:6, flexShrink:0 }}>
-                                        <span style={{ color:MUTED, fontSize:9, whiteSpace:"nowrap" as const }}>{timeAgo(evt.created_at)}</span>
+                                        <span style={{ color:MUTED, fontSize:11, whiteSpace:"nowrap" as const }}>{timeAgo(evt.created_at)}</span>
                                         {href && (
                                           <a href={href} style={{ color:MUTED, display:"flex", alignItems:"center" }}>
                                             <ExternalLink size={10}/>
@@ -1316,8 +1319,8 @@ export default function ProfilePage() {
                     <div style={{ flex:1, background:"color-mix(in srgb, var(--accent) 6%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 14%, transparent)", borderRadius:9, padding:"10px 8px", textAlign:"center" as const, position:"relative" as const }}>
                       <div style={{ position:"absolute" as const, top:-8, left:"50%", transform:"translateX(-50%)", background:"color-mix(in srgb, var(--accent) 15%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:20, padding:"1px 7px", fontSize:8, color:"var(--accent)", fontWeight:600 }}>{s.step}</div>
                       <span style={{ fontSize:20, display:"block", margin:"4px 0 5px" }}>{s.emoji}</span>
-                      <p style={{ color:"var(--ink)", fontSize:10, fontWeight:700, margin:"0 0 2px" }}>{s.label}</p>
-                      <p style={{ color:MUTED, fontSize:9, margin:0, lineHeight:1.4 }}>{s.desc}</p>
+                      <p style={{ color:"var(--ink)", fontSize:11.5, fontWeight:700, margin:"0 0 2px" }}>{s.label}</p>
+                      <p style={{ color:MUTED, fontSize:11, margin:0, lineHeight:1.4 }}>{s.desc}</p>
                     </div>
                     {i < 2 && <div style={{ width:16, height:1, background:"color-mix(in srgb, var(--accent) 25%, transparent)", flexShrink:0 }}/>}
                   </div>
@@ -1334,7 +1337,7 @@ export default function ProfilePage() {
                 ] as const).map((k, i) => (
                   <div key={i} style={{ background:SURF2, border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 8px", textAlign:"center" as const }}>
                     <p style={{ color:k.color, fontSize:20, fontWeight:600, margin:0, lineHeight:1 }}>{k.value}</p>
-                    <p style={{ color:MUTED, fontSize:9, margin:"3px 0 0", lineHeight:1.3 }}>{k.label}</p>
+                    <p style={{ color:MUTED, fontSize:11, margin:"3px 0 0", lineHeight:1.3 }}>{k.label}</p>
                   </div>
                 ))}
               </div>
@@ -1344,14 +1347,14 @@ export default function ProfilePage() {
                 <p style={{ color:G, fontSize:11, fontWeight:700, margin:"0 0 3px", display:"flex", alignItems:"center", gap:6 }}>
                   Comment gagner un mois Pro ?
                 </p>
-                <p style={{ color:MUTED, fontSize:10, margin:0, lineHeight:1.6 }}>
+                <p style={{ color:MUTED, fontSize:11.5, margin:0, lineHeight:1.6 }}>
                   Votre filleul doit s'inscrire via votre lien et <strong style={{ color:"var(--ink)" }}>souscrire a un plan payant</strong> dans les 30 jours. La recompense est creditee automatiquement.
                 </p>
               </div>
 
               {/* Lien + actions partage */}
               <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
-                <label style={{ color:MUTED, fontSize:10, fontWeight:500 }}>Votre lien de parrainage</label>
+                <label style={{ color:MUTED, fontSize:11.5, fontWeight:500 }}>Votre lien de parrainage</label>
                 <div style={{ display:"flex", gap:7 }}>
                   <div style={{ flex:1, background:SURF2, border:"1px solid var(--line-strong)", borderRadius:9, padding:"9px 12px", color:G, fontSize:11, fontFamily:"monospace", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, display:"flex", alignItems:"center" }}>
                     {referralLink}
@@ -1404,9 +1407,9 @@ export default function ProfilePage() {
                       { id:"expired",   label:"Expires",    count:expiredRefs      },
                     ] as const).filter(f => f.id === "all" || f.count > 0).map(f => (
                       <button key={f.id} type="button" onClick={() => setRefFilter(f.id)}
-                        style={{ display:"inline-flex", alignItems:"center", gap:4, padding:"3px 10px", background:refFilter===f.id?"color-mix(in srgb, var(--accent) 12%, transparent)":"rgba(255,255,255,0.04)", border:`1px solid ${refFilter===f.id?"color-mix(in srgb, var(--accent) 35%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:20, color:refFilter===f.id?"var(--accent)":MUTED, fontSize:10, fontWeight:refFilter===f.id?700:400, cursor:"pointer" }}>
+                        style={{ display:"inline-flex", alignItems:"center", gap:4, padding:"3px 10px", background:refFilter===f.id?"color-mix(in srgb, var(--accent) 12%, transparent)":"rgba(255,255,255,0.04)", border:`1px solid ${refFilter===f.id?"color-mix(in srgb, var(--accent) 35%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:20, color:refFilter===f.id?"var(--accent)":MUTED, fontSize:11.5, fontWeight:refFilter===f.id?700:400, cursor:"pointer" }}>
                         {f.label}
-                        <span style={{ background:"rgba(255,255,255,0.07)", borderRadius:10, padding:"0 5px", fontSize:9 }}>{f.count}</span>
+                        <span style={{ background:"rgba(255,255,255,0.07)", borderRadius:10, padding:"0 5px", fontSize:11 }}>{f.count}</span>
                       </button>
                     ))}
                   </div>
@@ -1430,9 +1433,9 @@ export default function ProfilePage() {
                           </div>
                           <div style={{ flex:1, minWidth:0 }}>
                             <p style={{ color:"var(--ink)", fontSize:11, fontWeight:600, margin:"0 0 1px" }}>Filleul #{i+1}</p>
-                            <p style={{ color:MUTED, fontSize:9, margin:0 }}>{formatDate(r.created_at)}{r.reward_months ? ` . +${r.reward_months} mois Pro` : ""}</p>
+                            <p style={{ color:MUTED, fontSize:11, margin:0 }}>{formatDate(r.created_at)}{r.reward_months ? ` . +${r.reward_months} mois Pro` : ""}</p>
                           </div>
-                          <span style={{ background:scfg.bg, border:`1px solid ${scfg.color}30`, borderRadius:5, padding:"2px 8px", fontSize:9, color:scfg.color, fontWeight:700, flexShrink:0 }}>
+                          <span style={{ background:scfg.bg, border:`1px solid ${scfg.color}30`, borderRadius:5, padding:"2px 8px", fontSize:11, color:scfg.color, fontWeight:700, flexShrink:0 }}>
                             {scfg.label}
                           </span>
                         </div>
@@ -1500,7 +1503,7 @@ export default function ProfilePage() {
                         <div style={{ width:22, height:22, borderRadius:6, background:s.color+"15", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                           <s.icon size={11} color={s.color}/>
                         </div>
-                        <span style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:0.8, lineHeight:1.2 }}>{s.label}</span>
+                        <span style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:0.8, lineHeight:1.2 }}>{s.label}</span>
                       </div>
                       <p style={{ color:"var(--ink)", fontSize:18, fontWeight:600, margin:0, lineHeight:1 }}>
                         {s.value}
@@ -1512,12 +1515,12 @@ export default function ProfilePage() {
                 {/* Ligne de conversion */}
                 <div className="rcols-2" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
                   <div style={{ background:"var(--surface)", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 12px" }}>
-                    <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:0.8, margin:"0 0 5px" }}>Taux conversion</p>
+                    <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:0.8, margin:"0 0 5px" }}>Taux conversion</p>
                     <div style={{ display:"flex", alignItems:"flex-end", gap:6 }}>
                       <p style={{ color:convRate > 10 ? "var(--success)" : convRate > 5 ? G : MUTED, fontSize:22, fontWeight:600, margin:0, lineHeight:1 }}>
                         {convRate}%
                       </p>
-                      <span style={{ color:MUTED, fontSize:9, paddingBottom:2 }}>scans / vues</span>
+                      <span style={{ color:MUTED, fontSize:11, paddingBottom:2 }}>scans / vues</span>
                     </div>
                     {/* Barre */}
                     <div style={{ height:3, background:"rgba(255,255,255,0.05)", borderRadius:2, marginTop:6, overflow:"hidden" }}>
@@ -1525,7 +1528,7 @@ export default function ProfilePage() {
                     </div>
                   </div>
                   <div style={{ background:"var(--surface)", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 12px" }}>
-                    <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:0.8, margin:"0 0 5px" }}>Vues / page moy.</p>
+                    <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:0.8, margin:"0 0 5px" }}>Vues / page moy.</p>
                     <p style={{ color:"var(--ink)", fontSize:22, fontWeight:600, margin:0, lineHeight:1 }}>
                       {avgViews.toLocaleString("fr-FR")}
                     </p>
@@ -1535,7 +1538,7 @@ export default function ProfilePage() {
                 {/* Top page / Top QR -- Pro+ */}
                 {(profile?.plan === "pro" || profile?.plan === "business") && (topPage || topQR) && (
                   <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
-                    <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1, margin:0 }}>Top performers</p>
+                    <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1, margin:0 }}>Top performers</p>
                     {topPage && (
                       <a href={`/dashboard/builder/${topPage.id}`} style={{ display:"flex", alignItems:"center", gap:9, padding:"9px 11px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid var(--line-strong)", borderRadius:9, textDecoration:"none" }}>
                         <div style={{ width:28, height:28, borderRadius:7, background:"color-mix(in srgb, var(--accent) 10%, transparent)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
@@ -1545,9 +1548,9 @@ export default function ProfilePage() {
                           <p style={{ color:"var(--ink)", fontSize:11, fontWeight:600, margin:"0 0 1px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
                             {topPage.title}
                           </p>
-                          <p style={{ color:MUTED, fontSize:10, margin:0 }}>{topPage.total_views.toLocaleString("fr-FR")} vues</p>
+                          <p style={{ color:MUTED, fontSize:11.5, margin:0 }}>{topPage.total_views.toLocaleString("fr-FR")} vues</p>
                         </div>
-                        <span style={{ color:G, fontSize:9, fontWeight:700, background:"color-mix(in srgb, var(--accent) 10%, transparent)", borderRadius:5, padding:"2px 7px", flexShrink:0 }}>Top page</span>
+                        <span style={{ color:G, fontSize:11, fontWeight:700, background:"color-mix(in srgb, var(--accent) 10%, transparent)", borderRadius:5, padding:"2px 7px", flexShrink:0 }}>Top page</span>
                       </a>
                     )}
                     {topQR && topQR.total_scans > 0 && (
@@ -1559,9 +1562,9 @@ export default function ProfilePage() {
                           <p style={{ color:"var(--ink)", fontSize:11, fontWeight:600, margin:"0 0 1px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
                             {(topQR.pages as any)?.title || topQR.short_code}
                           </p>
-                          <p style={{ color:MUTED, fontSize:10, margin:0 }}>/{topQR.short_code} . {topQR.total_scans.toLocaleString("fr-FR")} scans</p>
+                          <p style={{ color:MUTED, fontSize:11.5, margin:0 }}>/{topQR.short_code} . {topQR.total_scans.toLocaleString("fr-FR")} scans</p>
                         </div>
-                        <span style={{ color:"var(--accent)", fontSize:9, fontWeight:700, background:"color-mix(in srgb, var(--accent) 10%, transparent)", borderRadius:5, padding:"2px 7px", flexShrink:0 }}>Top QR</span>
+                        <span style={{ color:"var(--accent)", fontSize:11, fontWeight:700, background:"color-mix(in srgb, var(--accent) 10%, transparent)", borderRadius:5, padding:"2px 7px", flexShrink:0 }}>Top QR</span>
                       </div>
                     )}
                   </div>
@@ -1572,7 +1575,7 @@ export default function ProfilePage() {
                   <div style={{ padding:"10px 12px", background:"color-mix(in srgb, var(--accent) 4%, transparent)", border:"1px dashed color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"space-between", gap:10 }}>
                     <div>
                       <p style={{ color:"var(--ink)", fontSize:11, fontWeight:600, margin:"0 0 2px" }}>Top page & Top QR</p>
-                      <p style={{ color:MUTED, fontSize:10, margin:0 }}>Disponible en plan Pro</p>
+                      <p style={{ color:MUTED, fontSize:11.5, margin:0 }}>Disponible en plan Pro</p>
                     </div>
                     <a href="/upgrade" className="da-btn-primary da-btn-primary--sm" style={{ flexShrink:0 }}>
                       <span>Upgrade</span>
@@ -1630,7 +1633,7 @@ export default function ProfilePage() {
                       </p>
                       <div style={{ display:"flex", alignItems:"center", gap:5 }}>
                         <div style={{ width:5, height:5, borderRadius:"50%", background:emailVerified?"var(--success)":"var(--accent)" }}/>
-                        <span style={{ color:emailVerified?"var(--success)":"var(--accent)", fontSize:10 }}>
+                        <span style={{ color:emailVerified?"var(--success)":"var(--accent)", fontSize:11.5 }}>
                           {emailVerified ? "Email vérifié" : "Email non vérifié"}
                         </span>
                       </div>
@@ -1638,8 +1641,8 @@ export default function ProfilePage() {
                   </div>
                   {lastSignIn && (
                     <div style={{ textAlign:"right" as const }}>
-                      <p style={{ color:MUTED, fontSize:9, margin:0 }}>Dernière connexion</p>
-                      <p style={{ color:"var(--ink)", fontSize:10, fontWeight:600, margin:0 }}>
+                      <p style={{ color:MUTED, fontSize:11, margin:0 }}>Dernière connexion</p>
+                      <p style={{ color:"var(--ink)", fontSize:11.5, fontWeight:600, margin:0 }}>
                         {new Date(lastSignIn).toLocaleDateString("fr-FR", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" })}
                       </p>
                     </div>
@@ -1655,7 +1658,7 @@ export default function ProfilePage() {
                     </div>
                     <div style={{ flex:1 }}>
                       <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>Mot de passe</p>
-                      <p style={{ color:MUTED, fontSize:10, margin:0 }}>Modifier ou reinitialiser votre mot de passe</p>
+                      <p style={{ color:MUTED, fontSize:11.5, margin:0 }}>Modifier ou reinitialiser votre mot de passe</p>
                     </div>
                     <ChevronRight size={14} color={MUTED} style={{ transform:showPwdChange?"rotate(90deg)":"none", transition:"transform 0.2s" }}/>
                   </button>
@@ -1669,7 +1672,7 @@ export default function ProfilePage() {
                       </div>
                       <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                         <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.06)" }}/>
-                        <span style={{ color:MUTED, fontSize:9 }}>ou changer directement</span>
+                        <span style={{ color:MUTED, fontSize:11 }}>ou changer directement</span>
                         <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.06)" }}/>
                       </div>
                       <div>
@@ -1682,7 +1685,7 @@ export default function ProfilePage() {
                             <div style={{ height:4, background:"rgba(255,255,255,0.06)", borderRadius:2, overflow:"hidden", marginBottom:3 }}>
                               <div style={{ height:"100%", width:`${pwdStrength}%`, background:pwdStrength<40?"var(--danger)":pwdStrength<70?"var(--accent)":"var(--success)", borderRadius:2, transition:"width 0.3s, background 0.3s" }}/>
                             </div>
-                            <p style={{ color:pwdStrength<40?"var(--danger)":pwdStrength<70?"var(--accent)":"var(--success)", fontSize:9, margin:0 }}>
+                            <p style={{ color:pwdStrength<40?"var(--danger)":pwdStrength<70?"var(--accent)":"var(--success)", fontSize:11, margin:0 }}>
                               {pwdStrength<40?"Mot de passe faible":pwdStrength<70?"Correct -- ajoutez des chiffres et symboles":"Mot de passe fort"}
                             </p>
                           </div>
@@ -1693,7 +1696,7 @@ export default function ProfilePage() {
                         placeholder="Confirmer le mot de passe"
                         style={{ width:"100%", background:"var(--surface)", border:`1px solid ${newPwdConfirm && newPwd !== newPwdConfirm?"rgba(255,107,107,0.4)":"rgba(255,255,255,0.08)"}`, borderRadius:8, padding:"9px 12px", color:"var(--ink)", fontSize:12, outline:"none", boxSizing:"border-box" as const }}/>
                       {newPwdConfirm && newPwd !== newPwdConfirm && (
-                        <p style={{ color:"var(--danger)", fontSize:10, margin:"0" }}>Les mots de passe ne correspondent pas</p>
+                        <p style={{ color:"var(--danger)", fontSize:11.5, margin:"0" }}>Les mots de passe ne correspondent pas</p>
                       )}
                       <Button variant="danger" fullWidth onClick={changePasswordDirect} loading={pwdLoading}
                         disabled={newPwd.length < 8 || newPwd !== newPwdConfirm} leftIcon={<Lock size={12}/>}>
@@ -1705,7 +1708,7 @@ export default function ProfilePage() {
 
                 {/* Cet appareil (Supabase ne donne pas les autres sessions au client) */}
                 <div>
-                  <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 8px" }}>Cet appareil</p>
+                  <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 8px" }}>Cet appareil</p>
                   <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
                     {sessions.map((sess, i) => {
                       const DevIcon = sess.device === "mobile" ? Smartphone : sess.device === "tablet" ? Tablet : Monitor
@@ -1727,7 +1730,7 @@ export default function ProfilePage() {
                           </div>
                           {!sess.current && (
                             <button type="button" onClick={() => signOutAllDevices()}
-                              style={{ padding:"4px 10px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.15)", borderRadius:6, color:"var(--danger)", fontSize:10, cursor:"pointer" }}>
+                              style={{ padding:"4px 10px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.15)", borderRadius:6, color:"var(--danger)", fontSize:11.5, cursor:"pointer" }}>
                               Revoquer
                             </button>
                           )}
@@ -1752,16 +1755,16 @@ export default function ProfilePage() {
 
                 {/* Badges securite */}
                 <div style={{ display:"flex", gap:7, flexWrap:"wrap" as const }}>
-                  <span style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"4px 10px", background:emailVerified?"rgba(57,255,143,0.08)":"color-mix(in srgb, var(--accent) 8%, transparent)", border:`1px solid ${emailVerified?"rgba(57,255,143,0.2)":"color-mix(in srgb, var(--accent) 20%, transparent)"}`, borderRadius:20, fontSize:10, color:emailVerified?"var(--success)":"var(--accent)" }}>
+                  <span style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"4px 10px", background:emailVerified?"rgba(57,255,143,0.08)":"color-mix(in srgb, var(--accent) 8%, transparent)", border:`1px solid ${emailVerified?"rgba(57,255,143,0.2)":"color-mix(in srgb, var(--accent) 20%, transparent)"}`, borderRadius:20, fontSize:11.5, color:emailVerified?"var(--success)":"var(--accent)" }}>
                     {emailVerified ? <ShieldCheck size={11}/> : <ShieldOff size={11}/>}
                     Email {emailVerified?"verifie":"non vérifié"}
                   </span>
-                  <span style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"4px 10px", background:"rgba(57,255,143,0.08)", border:"1px solid rgba(57,255,143,0.2)", borderRadius:20, fontSize:10, color:"var(--success)" }}>
+                  <span style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"4px 10px", background:"rgba(57,255,143,0.08)", border:"1px solid rgba(57,255,143,0.2)", borderRadius:20, fontSize:11.5, color:"var(--success)" }}>
                     <Shield size={11}/>
                     Compte actif
                   </span>
                   {profile?.plan !== "free" && (
-                    <span style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"4px 10px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:20, fontSize:10, color:G }}>
+                    <span style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"4px 10px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:20, fontSize:11.5, color:G }}>
                       <Key size={11}/>
                       Plan payant
                     </span>
@@ -1790,7 +1793,7 @@ export default function ProfilePage() {
                       RGPD
                     </span>
                   </div>
-                  <p style={{ color:MUTED, fontSize:10, margin:0, lineHeight:1.5 }}>
+                  <p style={{ color:MUTED, fontSize:11.5, margin:0, lineHeight:1.5 }}>
                     Conformement au RGPD, vous pouvez exporter, corriger ou supprimer vos donnees a tout moment. Seules vos donnees sont incluses.
                   </p>
                 </div>
@@ -1798,7 +1801,7 @@ export default function ProfilePage() {
 
               {/* Exports granulaires */}
               <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
-                <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:0 }}>Télécharger mes données</p>
+                <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1.2, margin:0 }}>Télécharger mes données</p>
                 {exportJobs.map(job => {
                   const fmtMap: Record<string,string> = {
                     full:"JSON", pages:"CSV", qrcodes:"CSV", analytics:"CSV", activity:"JSON"
@@ -1823,7 +1826,7 @@ export default function ProfilePage() {
                             {fmt}
                           </span>
                         </div>
-                        <p style={{ color:MUTED, fontSize:10, margin:0 }}>
+                        <p style={{ color:MUTED, fontSize:11.5, margin:0 }}>
                           {job.status==="done" && job.filename
                             ? <span style={{ color:"var(--success)" }}>{job.filename}</span>
                             : job.status==="error"
@@ -1856,16 +1859,16 @@ export default function ProfilePage() {
               {/* Historique exports */}
               {exportHistory.length > 0 && (
                 <div>
-                  <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 8px" }}>
+                  <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 8px" }}>
                     Historique de cette session ({exportHistory.length})
                   </p>
                   <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
                     {exportHistory.slice(0,5).map((h,i) => (
                       <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"7px 11px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.04)", borderRadius:8 }}>
                         <Check size={11} color="var(--success)"/>
-                        <span style={{ flex:1, color:MUTED, fontSize:10 }}>{h.label}</span>
+                        <span style={{ flex:1, color:MUTED, fontSize:11.5 }}>{h.label}</span>
                         <span style={{ background:"rgba(255,255,255,0.05)", borderRadius:4, padding:"1px 6px", fontSize:8, color:MUTED, fontFamily:"monospace" }}>{h.format}</span>
-                        <span style={{ color:MUTED, fontSize:9 }}>
+                        <span style={{ color:MUTED, fontSize:11 }}>
                           {new Date(h.date).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}
                         </span>
                       </div>
@@ -1884,7 +1887,7 @@ export default function ProfilePage() {
                   ] as const).map((note, i) => (
                     <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:7 }}>
                       <Shield size={10} color={MUTED} style={{ flexShrink:0, marginTop:1 }}/>
-                      <span style={{ color:MUTED, fontSize:10, lineHeight:1.5 }}>{note}</span>
+                      <span style={{ color:MUTED, fontSize:11.5, lineHeight:1.5 }}>{note}</span>
                     </div>
                   ))}
                 </div>
@@ -1940,13 +1943,13 @@ export default function ProfilePage() {
                           Plan {planCfg.label}
                         </p>
                         {planCfg.badge && (
-                          <span style={{ background:"color-mix(in srgb, var(--accent) 15%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:5, padding:"1px 7px", fontSize:9, color:"var(--accent)", fontWeight:600 }}>
+                          <span style={{ background:"color-mix(in srgb, var(--accent) 15%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:5, padding:"1px 7px", fontSize:11, color:"var(--accent)", fontWeight:600 }}>
                             {planCfg.badge}
                           </span>
                         )}
                         <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:subStatus==="active"?"rgba(57,255,143,0.1)":subStatus==="trialing"?"color-mix(in srgb, var(--accent) 10%, transparent)":subStatus==="free"?"rgba(138,132,120,0.1)":"rgba(255,107,107,0.1)", border:`1px solid ${subStatus==="active"?"rgba(57,255,143,0.25)":subStatus==="trialing"?"color-mix(in srgb, var(--accent) 25%, transparent)":subStatus==="free"?"rgba(138,132,120,0.2)":"rgba(255,107,107,0.25)"}`, borderRadius:20, padding:"2px 9px" }}>
                           <div style={{ width:5, height:5, borderRadius:"50%", background:subStatus==="active"?"var(--success)":subStatus==="trialing"?"var(--accent)":subStatus==="free"?"var(--muted)":"var(--danger)" }}/>
-                          <span style={{ color:subStatus==="active"?"var(--success)":subStatus==="trialing"?"var(--accent)":subStatus==="free"?"var(--muted)":"var(--danger)", fontSize:10, fontWeight:600 }}>
+                          <span style={{ color:subStatus==="active"?"var(--success)":subStatus==="trialing"?"var(--accent)":subStatus==="free"?"var(--muted)":"var(--danger)", fontSize:11.5, fontWeight:600 }}>
                             {subStatus==="active"?"Actif":subStatus==="trialing"?"Essai gratuit":subStatus==="free"?"Plan gratuit":subStatus==="past_due"?"Paiement en attente":"Annule"}
                           </span>
                         </span>
@@ -1962,7 +1965,7 @@ export default function ProfilePage() {
                           <p style={{ color:"var(--ink)", fontSize:18, fontWeight:600, margin:0, lineHeight:1 }}>
                             {cycleDe(abonnement)==="annual" ? planCfg.price_annual : planCfg.price_monthly}.
                           </p>
-                          <p style={{ color:MUTED, fontSize:9, margin:"2px 0 0" }}>/ mois</p>
+                          <p style={{ color:MUTED, fontSize:11, margin:"2px 0 0" }}>/ mois</p>
                         </>
                       )}
                     </div>
@@ -1988,7 +1991,7 @@ export default function ProfilePage() {
 
                 {/* Features incluses */}
                 <div>
-                  <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 8px" }}>Inclus dans votre plan</p>
+                  <p style={{ color:MUTED, fontSize:11, fontWeight:700, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 8px" }}>Inclus dans votre plan</p>
                   <div className="rcols-2" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
                     {planCfg.features.map((f, i) => (
                       <div key={i} style={{ display:"flex", alignItems:"center", gap:7 }}>
@@ -2005,7 +2008,7 @@ export default function ProfilePage() {
                   if (!locked.length) return null
                   return (
                     <div style={{ background:`${nextPlan.color}0d`, border:`1px solid ${nextPlan.color}26`, borderRadius:12, padding:"13px 15px" }}>
-                      <p style={{ color:MUTED, fontSize:9, fontWeight:700, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 8px" }}>
+                      <p style={{ color:MUTED, fontSize:11, fontWeight:700, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 8px" }}>
                         Débloqué avec <span style={{ color:nextPlan.color }}>{nextPlan.label}</span>
                       </p>
                       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
@@ -2097,8 +2100,8 @@ export default function ProfilePage() {
                         <div style={{ display:"flex", alignItems:"center", gap:7 }}>
                           <Eye size={12} color="var(--accent)"/>
                           <span style={{ color:"var(--ink)", fontSize:12, fontWeight:600 }}>Pages</span>
-                          {isNear && !isAt && <span style={{ color:"var(--accent)", fontSize:9, fontWeight:700, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid var(--line-strong)", borderRadius:4, padding:"1px 5px" }}>Bientot plein</span>}
-                          {isAt && <span style={{ color:"var(--danger)", fontSize:9, fontWeight:700, background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:4, padding:"1px 5px" }}>Limite atteinte</span>}
+                          {isNear && !isAt && <span style={{ color:"var(--accent)", fontSize:11, fontWeight:700, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid var(--line-strong)", borderRadius:4, padding:"1px 5px" }}>Bientot plein</span>}
+                          {isAt && <span style={{ color:"var(--danger)", fontSize:11, fontWeight:700, background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:4, padding:"1px 5px" }}>Limite atteinte</span>}
                         </div>
                         <span style={{ color:isAt?"var(--danger)":isNear?"var(--accent)":MUTED, fontSize:11, fontWeight:600 }}>
                           {used} {limit ? `/ ${limit}` : "/ illimite"}
@@ -2129,8 +2132,8 @@ export default function ProfilePage() {
                         <div style={{ display:"flex", alignItems:"center", gap:7 }}>
                           <TrendingUp size={12} color={G}/>
                           <span style={{ color:"var(--ink)", fontSize:12, fontWeight:600 }}>Vues ce mois</span>
-                          {isNear && !isAt && <span style={{ color:"var(--accent)", fontSize:9, fontWeight:700, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid var(--line-strong)", borderRadius:4, padding:"1px 5px" }}>Bientot plein</span>}
-                          {isAt && <span style={{ color:"var(--danger)", fontSize:9, fontWeight:700, background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:4, padding:"1px 5px" }}>Limite atteinte</span>}
+                          {isNear && !isAt && <span style={{ color:"var(--accent)", fontSize:11, fontWeight:700, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid var(--line-strong)", borderRadius:4, padding:"1px 5px" }}>Bientot plein</span>}
+                          {isAt && <span style={{ color:"var(--danger)", fontSize:11, fontWeight:700, background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:4, padding:"1px 5px" }}>Limite atteinte</span>}
                         </div>
                         <span style={{ color:isAt?"var(--danger)":isNear?"var(--accent)":MUTED, fontSize:11, fontWeight:600 }}>
                           {used.toLocaleString("fr-FR")} {limit ? `/ ${limit.toLocaleString("fr-FR")}` : "/ illimite"}
@@ -2236,7 +2239,7 @@ export default function ProfilePage() {
                         <div style={{ display:"flex", alignItems:"baseline", gap:8, marginBottom:2 }}>
                           <p style={{ color:"var(--ink)", fontSize:15, fontWeight:600, margin:0 }}>{lvl.current.label}</p>
                           {lvl.nextLvl && (
-                            <span style={{ color:MUTED, fontSize:10 }}>{"-> "}{lvl.nextLvl.label}</span>
+                            <span style={{ color:MUTED, fontSize:11.5 }}>{"-> "}{lvl.nextLvl.label}</span>
                           )}
                         </div>
                         <p style={{ color:MUTED, fontSize:11, margin:0 }}>Score QRowg : <span style={{ color:lvl.current.color, fontWeight:700 }}>{lvl.score}/100</span></p>
@@ -2261,13 +2264,13 @@ export default function ProfilePage() {
                     {lvl.nextLvl && (
                       <div>
                         <div style={{ display:"flex", justifyContent:"space-between", marginBottom:5 }}>
-                          <span style={{ color:MUTED, fontSize:9 }}>Progression vers {lvl.nextLvl.label}</span>
-                          <span style={{ color:lvl.current.color, fontSize:9, fontWeight:700 }}>{lvl.progressPct}%</span>
+                          <span style={{ color:MUTED, fontSize:11 }}>Progression vers {lvl.nextLvl.label}</span>
+                          <span style={{ color:lvl.current.color, fontSize:11, fontWeight:700 }}>{lvl.progressPct}%</span>
                         </div>
                         <div style={{ height:5, background:"rgba(255,255,255,0.06)", borderRadius:3, overflow:"hidden" }}>
                           <div style={{ height:"100%", width:`${lvl.progressPct}%`, background:`linear-gradient(90deg,${lvl.current.color},${lvl.nextLvl.color})`, borderRadius:3, transition:"width 0.8s ease" }}/>
                         </div>
-                        <p style={{ color:MUTED, fontSize:9, margin:"4px 0 0" }}>
+                        <p style={{ color:MUTED, fontSize:11, margin:"4px 0 0" }}>
                           Gagnez des points en publiant des pages, obtenant des scans et parrainant des amis
                         </p>
                       </div>
@@ -2281,7 +2284,7 @@ export default function ProfilePage() {
 
                   {/* Compteur badges */}
                   <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-                    <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:0 }}>
+                    <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1.2, margin:0 }}>
                       Badges debloques
                     </p>
                     <span style={{ color:"var(--ink)", fontSize:11, fontWeight:700 }}>
@@ -2295,9 +2298,9 @@ export default function ProfilePage() {
                     if (catBadges.length === 0) return null
                     return (
                       <div key={cat}>
-                        <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1, margin:"0 0 8px", display:"flex", alignItems:"center", gap:6 }}>
+                        <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1, margin:"0 0 8px", display:"flex", alignItems:"center", gap:6 }}>
                           {catLabels[cat]}
-                          <span style={{ color:"rgba(138,132,120,0.5)", fontSize:9 }}>
+                          <span style={{ color:"rgba(138,132,120,0.5)", fontSize:11 }}>
                             {catBadges.filter(b=>b.unlocked).length}/{catBadges.length}
                           </span>
                         </p>
@@ -2309,7 +2312,7 @@ export default function ProfilePage() {
                               <span style={{ fontSize:22, lineHeight:1, filter:badge.unlocked?"none":"brightness(0.3)" }}>
                                 {badge.emoji}
                               </span>
-                              <p style={{ color:badge.unlocked?badge.color:MUTED, fontSize:9, fontWeight:badge.unlocked?700:400, margin:0, lineHeight:1.3 }}>
+                              <p style={{ color:badge.unlocked?badge.color:MUTED, fontSize:11, fontWeight:badge.unlocked?700:400, margin:0, lineHeight:1.3 }}>
                                 {badge.label}
                               </p>
                               {badge.unlocked && (
@@ -2330,11 +2333,11 @@ export default function ProfilePage() {
                       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, textAlign:"center" as const }}>
                         <div>
                           <p style={{ color:"var(--accent)", fontSize:20, fontWeight:600, margin:0 }}>{totalMonths}</p>
-                          <p style={{ color:MUTED, fontSize:10, margin:0 }}>Mois Pro gagnes</p>
+                          <p style={{ color:MUTED, fontSize:11.5, margin:0 }}>Mois Pro gagnes</p>
                         </div>
                         <div>
                           <p style={{ color:"var(--accent)", fontSize:20, fontWeight:600, margin:0 }}>{validatedRefs}</p>
-                          <p style={{ color:MUTED, fontSize:10, margin:0 }}>Parrainages valides</p>
+                          <p style={{ color:MUTED, fontSize:11.5, margin:0 }}>Parrainages valides</p>
                         </div>
                       </div>
                     </div>
@@ -2380,7 +2383,7 @@ export default function ProfilePage() {
                   ].map((f,i) => (
                     <div key={i} style={{ display:"flex", alignItems:"center", gap:6 }}>
                       <CheckCircle size={11} color="color-mix(in srgb, var(--accent) 50%, transparent)"/>
-                      <span style={{ color:MUTED, fontSize:10 }}>{f}</span>
+                      <span style={{ color:MUTED, fontSize:11.5 }}>{f}</span>
                     </div>
                   ))}
                 </div>
@@ -2436,7 +2439,7 @@ export default function ProfilePage() {
                       </p>
                     </div>
                     <div style={{ display:"flex", alignItems:"center", gap:8, background:SURF2, borderRadius:8, padding:"8px 11px", marginBottom:8 }}>
-                      <code style={{ flex:1, color:"var(--ink)", fontSize:10, wordBreak:"break-all" as const, fontFamily:"monospace" }}>
+                      <code style={{ flex:1, color:"var(--ink)", fontSize:11.5, wordBreak:"break-all" as const, fontFamily:"monospace" }}>
                         {newKeyCreated}
                       </code>
                     </div>
@@ -2445,7 +2448,7 @@ export default function ProfilePage() {
                       style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 14px", background:copiedKey==="new"?"rgba(57,255,143,0.12)":"rgba(255,255,255,0.06)", border:`1px solid ${copiedKey==="new"?"rgba(57,255,143,0.3)":"rgba(255,255,255,0.1)"}`, borderRadius:8, color:copiedKey==="new"?"var(--success)":"var(--ink)", fontSize:11, fontWeight:600, cursor:"pointer" }}>
                       {copiedKey==="new" ? <><Check size={12}/> Copiee !</> : <><Copy size={12}/> Copier la clé</>}
                     </button>
-                    <p style={{ color:"rgba(57,255,143,0.5)", fontSize:9, margin:"8px 0 0" }}>
+                    <p style={{ color:"rgba(57,255,143,0.5)", fontSize:11, margin:"8px 0 0" }}>
                       Cette cle complete ne sera plus visible apres fermeture. Stockez-la dans votre gestionnaire de secrets.
                     </p>
                   </div>
@@ -2462,7 +2465,7 @@ export default function ProfilePage() {
                       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:7 }}>
                         <div style={{ display:"flex", alignItems:"center", gap:7 }}>
                           <span style={{ color:"var(--accent)", fontSize:11, fontWeight:700 }}>Appels API ce mois</span>
-                          {isNear && <span style={{ color:"var(--accent)", fontSize:9, fontWeight:700, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid var(--line-strong)", borderRadius:4, padding:"1px 5px" }}>Limite proche</span>}
+                          {isNear && <span style={{ color:"var(--accent)", fontSize:11, fontWeight:700, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid var(--line-strong)", borderRadius:4, padding:"1px 5px" }}>Limite proche</span>}
                         </div>
                         <span style={{ color:isNear?"var(--accent)":"var(--accent)", fontSize:12, fontWeight:700 }}>
                           {used.toLocaleString("fr-FR")} / {limit > 0 ? limit.toLocaleString("fr-FR") : "illimite"}
@@ -2480,7 +2483,7 @@ export default function ProfilePage() {
                 {/* Liste des cles */}
                 {apiKeys.length > 0 && (
                   <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                    <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:0 }}>
+                    <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1.2, margin:0 }}>
                       Cles API ({apiKeys.filter(k=>k.is_active).length} active{apiKeys.filter(k=>k.is_active).length>1?"s":""})
                     </p>
                     {apiKeys.map(key => (
@@ -2497,7 +2500,7 @@ export default function ProfilePage() {
                                 </span>
                               )}
                             </div>
-                            <code style={{ color:MUTED, fontSize:10 }}>{key.key_preview}</code>
+                            <code style={{ color:MUTED, fontSize:11.5 }}>{key.key_preview}</code>
                           </div>
                           {/* Actions */}
                           {key.is_active && (
@@ -2525,18 +2528,18 @@ export default function ProfilePage() {
                         </div>
                         {/* Meta cle */}
                         <div style={{ display:"flex", gap:12, padding:"7px 13px", background:"rgba(0,0,0,0.15)", borderTop:"1px solid rgba(255,255,255,0.04)" }}>
-                          <span style={{ color:MUTED, fontSize:9 }}>
+                          <span style={{ color:MUTED, fontSize:11 }}>
                             Cree le {new Date(key.created_at).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})}
                           </span>
                           {key.last_used_at ? (
-                            <span style={{ color:MUTED, fontSize:9 }}>
+                            <span style={{ color:MUTED, fontSize:11 }}>
                               {" . "}Dernière util. {new Date(key.last_used_at).toLocaleDateString("fr-FR",{day:"numeric",month:"short"})}
                             </span>
                           ) : (
-                            <span style={{ color:MUTED, fontSize:9 }}>{" . "}Jamais utilisee</span>
+                            <span style={{ color:MUTED, fontSize:11 }}>{" . "}Jamais utilisee</span>
                           )}
                           {key.expires_at && (
-                            <span style={{ color:new Date(key.expires_at)<new Date()?"var(--danger)":"var(--accent)", fontSize:9 }}>
+                            <span style={{ color:new Date(key.expires_at)<new Date()?"var(--danger)":"var(--accent)", fontSize:11 }}>
                               {" . "}Expire le {new Date(key.expires_at).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})}
                             </span>
                           )}
@@ -2576,7 +2579,7 @@ export default function ProfilePage() {
                     ] as const).map((info, i) => (
                       <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:8 }}>
                         <info.icon size={11} color={MUTED} style={{ flexShrink:0, marginTop:1 }}/>
-                        <span style={{ color:MUTED, fontSize:10, lineHeight:1.5 }}>{info.text}</span>
+                        <span style={{ color:MUTED, fontSize:11.5, lineHeight:1.5 }}>{info.text}</span>
                       </div>
                     ))}
                   </div>
@@ -2585,7 +2588,7 @@ export default function ProfilePage() {
                 {/* Documentation API — exemples pour développeurs */}
                 <div style={{ padding:"14px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:9 }}>
                   <p style={{ color:"var(--ink)", fontSize:12, fontWeight:700, margin:"0 0 4px" }}>Documentation API</p>
-                  <p style={{ color:MUTED, fontSize:10.5, margin:"0 0 12px", lineHeight:1.6 }}>
+                  <p style={{ color:MUTED, fontSize:12, margin:"0 0 12px", lineHeight:1.6 }}>
                     Base <code style={{ color:"var(--muted)" }}>https://qrowg.com/api/v1</code> · en-tête <code style={{ color:"var(--muted)" }}>Authorization: Bearer &lt;clé&gt;</code> · 120 req/min par clé.
                   </p>
                   {([
@@ -2595,11 +2598,11 @@ export default function ProfilePage() {
                   ] as const).map((e, i) => (
                     <div key={i} style={{ marginBottom:11 }}>
                       <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:5, flexWrap:"wrap" }}>
-                        <span style={{ fontSize:9, fontWeight:600, color:e.m==="GET"?"var(--success)":"var(--accent)", background:e.m==="GET"?"rgba(57,255,143,0.1)":"color-mix(in srgb, var(--accent) 10%, transparent)", border:`1px solid ${e.m==="GET"?"rgba(57,255,143,0.25)":"color-mix(in srgb, var(--accent) 25%, transparent)"}`, borderRadius:4, padding:"1px 6px" }}>{e.m}</span>
+                        <span style={{ fontSize:11, fontWeight:600, color:e.m==="GET"?"var(--success)":"var(--accent)", background:e.m==="GET"?"rgba(57,255,143,0.1)":"color-mix(in srgb, var(--accent) 10%, transparent)", border:`1px solid ${e.m==="GET"?"rgba(57,255,143,0.25)":"color-mix(in srgb, var(--accent) 25%, transparent)"}`, borderRadius:4, padding:"1px 6px" }}>{e.m}</span>
                         <code style={{ color:"var(--ink)", fontSize:11 }}>{e.p}</code>
-                        <span style={{ color:MUTED, fontSize:10 }}>· {e.d}</span>
+                        <span style={{ color:MUTED, fontSize:11.5 }}>· {e.d}</span>
                       </div>
-                      <pre style={{ margin:0, padding:"8px 10px", background:"#0A0908", border:"1px solid rgba(255,255,255,0.06)", borderRadius:7, color:"#B8B2A4", fontSize:9.5, lineHeight:1.6, overflowX:"auto", whiteSpace:"pre" }}>{e.cmd}</pre>
+                      <pre style={{ margin:0, padding:"8px 10px", background:"#0A0908", border:"1px solid rgba(255,255,255,0.06)", borderRadius:7, color:"#B8B2A4", fontSize:11, lineHeight:1.6, overflowX:"auto", whiteSpace:"pre" }}>{e.cmd}</pre>
                     </div>
                   ))}
                 </div>
@@ -2664,7 +2667,7 @@ export default function ProfilePage() {
                   ] as const).map((k,i) => (
                     <div key={i} style={{ background:SURF2, border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"9px 10px", textAlign:"center" as const }}>
                       <p style={{ color:k.color, fontSize:18, fontWeight:600, margin:0, lineHeight:1 }}>{k.value}</p>
-                      <p style={{ color:MUTED, fontSize:9, margin:"3px 0 0" }}>{k.label}</p>
+                      <p style={{ color:MUTED, fontSize:11, margin:"3px 0 0" }}>{k.label}</p>
                     </div>
                   ))}
                 </div>
@@ -2696,9 +2699,9 @@ export default function ProfilePage() {
                             )}
                           </div>
                           <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:2 }}>
-                            <span style={{ color:st.color, fontSize:9, fontWeight:600 }}>{st.label}</span>
+                            <span style={{ color:st.color, fontSize:11, fontWeight:600 }}>{st.label}</span>
                             {dm.pages && (
-                              <span style={{ color:MUTED, fontSize:9 }}>
+                              <span style={{ color:MUTED, fontSize:11 }}>
                                 {" . "}{dm.pages.title}
                               </span>
                             )}
@@ -2740,7 +2743,7 @@ export default function ProfilePage() {
                       {/* Alerte erreur DNS */}
                       {dm.vercel_status === "error" && dm.vercel_error && (
                         <div style={{ padding:"8px 13px", background:"rgba(255,107,107,0.06)", borderTop:"1px solid rgba(255,107,107,0.12)" }}>
-                          <p style={{ color:"rgba(255,107,107,0.8)", fontSize:10, margin:0 }}>{dm.vercel_error}</p>
+                          <p style={{ color:"rgba(255,107,107,0.8)", fontSize:11.5, margin:0 }}>{dm.vercel_error}</p>
                         </div>
                       )}
 
@@ -2748,7 +2751,7 @@ export default function ProfilePage() {
                       {dm.vercel_status === "active" && (
                         <div style={{ display:"flex", alignItems:"center", gap:6, padding:"6px 13px", background:"rgba(57,255,143,0.03)", borderTop:"1px solid rgba(57,255,143,0.08)" }}>
                           <Shield size={10} color="var(--success)"/>
-                          <span style={{ color:"rgba(57,255,143,0.7)", fontSize:9 }}>
+                          <span style={{ color:"rgba(57,255,143,0.7)", fontSize:11 }}>
                             SSL actif {dm.verified_at ? `depuis le ${new Date(dm.verified_at).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})}` : ""}
                           </span>
                         </div>
@@ -2784,7 +2787,7 @@ export default function ProfilePage() {
                   <div style={{ width:12, height:12, border:"1.5px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderTopColor:"var(--accent)", borderRadius:"50%", animation:"mo-spin 0.7s linear infinite" }}/>
                 )}
                 {prefsSaved && !prefsSaving && (
-                  <span style={{ color:"var(--success)", fontSize:10, display:"flex", alignItems:"center", gap:4 }}>
+                  <span style={{ color:"var(--success)", fontSize:11.5, display:"flex", alignItems:"center", gap:4 }}>
                     <Check size={10}/> Sauvegarde
                   </span>
                 )}
@@ -2794,12 +2797,12 @@ export default function ProfilePage() {
 
               {/* -- Localisation ---------------------------------------- */}
               <div>
-                <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 10px" }}>Localisation</p>
+                <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 10px" }}>Localisation</p>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
 
                   {/* Langue */}
                   <div>
-                    <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:5, fontWeight:500 }}>Langue</label>
+                    <label style={{ color:MUTED, fontSize:11.5, display:"block", marginBottom:5, fontWeight:500 }}>Langue</label>
                     <select aria-label="Langue" value={prefs.locale} onChange={e => setPrefField("locale", e.target.value)}
                       style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"var(--ink)", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                       <option value="fr">Francais</option>
@@ -2812,7 +2815,7 @@ export default function ProfilePage() {
 
                   {/* Devise */}
                   <div>
-                    <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:5, fontWeight:500 }}>Devise</label>
+                    <label style={{ color:MUTED, fontSize:11.5, display:"block", marginBottom:5, fontWeight:500 }}>Devise</label>
                     <select aria-label="Devise" value={prefs.currency} onChange={e => setPrefField("currency", e.target.value)}
                       style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"var(--ink)", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                       <option value="EUR">EUR (Euro)</option>
@@ -2826,10 +2829,10 @@ export default function ProfilePage() {
                   {/* Fuseau horaire */}
                   <div style={{ gridColumn:"1 / -1" }}>
                     <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:5 }}>
-                      <label style={{ color:MUTED, fontSize:10, fontWeight:500 }}>Fuseau horaire</label>
+                      <label style={{ color:MUTED, fontSize:11.5, fontWeight:500 }}>Fuseau horaire</label>
                       <button type="button"
                         onClick={() => setPrefField("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone)}
-                        style={{ color:G, fontSize:9, background:"none", border:"none", cursor:"pointer", padding:0, display:"flex", alignItems:"center", gap:3 }}>
+                        style={{ color:G, fontSize:11, background:"none", border:"none", cursor:"pointer", padding:0, display:"flex", alignItems:"center", gap:3 }}>
                         <RotateCcw size={9}/> Auto-detecter
                       </button>
                     </div>
@@ -2847,7 +2850,7 @@ export default function ProfilePage() {
 
                   {/* Format date */}
                   <div>
-                    <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:5, fontWeight:500 }}>Format date</label>
+                    <label style={{ color:MUTED, fontSize:11.5, display:"block", marginBottom:5, fontWeight:500 }}>Format date</label>
                     <select aria-label="Format de date" value={prefs.date_format} onChange={e => setPrefField("date_format", e.target.value)}
                       style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"var(--ink)", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                       <option value="DD/MM/YYYY">DD/MM/YYYY</option>
@@ -2859,7 +2862,7 @@ export default function ProfilePage() {
 
                   {/* Format heure */}
                   <div>
-                    <label style={{ color:MUTED, fontSize:10, display:"block", marginBottom:5, fontWeight:500 }}>Format heure</label>
+                    <label style={{ color:MUTED, fontSize:11.5, display:"block", marginBottom:5, fontWeight:500 }}>Format heure</label>
                     <select aria-label="Format d'heure" value={prefs.time_format} onChange={e => setPrefField("time_format", e.target.value)}
                       style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"var(--ink)", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                       <option value="24 heures">24h (14:30)</option>
@@ -2871,7 +2874,7 @@ export default function ProfilePage() {
                 {/* Preview format */}
                 <div style={{ marginTop:8, padding:"7px 11px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid var(--line-strong)", borderRadius:8, display:"flex", alignItems:"center", gap:8 }}>
                   <Clock size={11} color="var(--accent)"/>
-                  <span style={{ color:MUTED, fontSize:10 }}>
+                  <span style={{ color:MUTED, fontSize:11.5 }}>
                     Apercu : {(() => {
                       const now = new Date()
                       const d   = now.getDate().toString().padStart(2,"0")
@@ -2894,7 +2897,7 @@ export default function ProfilePage() {
 
               {/* -- Notifications --------------------------------------- */}
               <div>
-                <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 10px" }}>Notifications</p>
+                <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 10px" }}>Notifications</p>
                 <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
                   {([
                     { key:"notif_email"    as const, label:"Notifications par email",   desc:"Alertes scans, vues, QR codes"         },
@@ -2904,7 +2907,7 @@ export default function ProfilePage() {
                     <div key={item.key} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 12px", background:SURF2, border:"1px solid rgba(255,255,255,0.05)", borderRadius:9 }}>
                       <div>
                         <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{item.label}</p>
-                        <p style={{ color:MUTED, fontSize:10, margin:"2px 0 0" }}>{item.desc}</p>
+                        <p style={{ color:MUTED, fontSize:11.5, margin:"2px 0 0" }}>{item.desc}</p>
                       </div>
                       <button type="button" onClick={() => togglePref(item.key, !prefs[item.key])}
                         style={{ width:38, height:21, borderRadius:11, background:prefs[item.key]?`linear-gradient(90deg,${G},color-mix(in srgb, var(--accent) 75%, #000))`:"rgba(255,255,255,0.08)", border:"none", cursor:"pointer", position:"relative" as const, transition:"background 0.2s", flexShrink:0 }}>
@@ -2917,7 +2920,7 @@ export default function ProfilePage() {
 
               {/* -- Rapports ------------------------------------------- */}
               <div>
-                <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 10px" }}>Rapports automatiques</p>
+                <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 10px" }}>Rapports automatiques</p>
                 <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
                   {([
                     { key:"report_weekly"  as const, label:"Résumé hebdomadaire", desc:"Stats de la semaine chaque lundi matin",   plan:"free" },
@@ -2931,7 +2934,7 @@ export default function ProfilePage() {
                             <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{item.label}</p>
                             {locked && <span style={{ background:`color-mix(in srgb, var(--accent) 7%, transparent)`, border:"1px solid var(--line-strong)", borderRadius:4, padding:"1px 6px", fontSize:8, color:G, fontWeight:700 }}>Pro</span>}
                           </div>
-                          <p style={{ color:MUTED, fontSize:10, margin:"2px 0 0" }}>{item.desc}</p>
+                          <p style={{ color:MUTED, fontSize:11.5, margin:"2px 0 0" }}>{item.desc}</p>
                         </div>
                         <button type="button"
                           disabled={locked}
@@ -2947,7 +2950,7 @@ export default function ProfilePage() {
 
               {/* -- Couleur d'accent ------------------------------------ */}
               <div>
-                <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 10px" }}>Couleur d'accent</p>
+                <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 10px" }}>Couleur d'accent</p>
                 <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                   <div style={{ display:"flex", gap:7, flexWrap:"wrap" as const }}>
                     {[
@@ -2968,9 +2971,9 @@ export default function ProfilePage() {
                     </label>
                   </div>
                   <div style={{ flex:1, height:6, borderRadius:3, background:`linear-gradient(90deg,${prefs.accent_color},${prefs.accent_color}40)`, transition:"background 0.3s" }}/>
-                  <code style={{ color:prefs.accent_color, fontSize:10, fontFamily:"monospace", flexShrink:0 }}>{prefs.accent_color}</code>
+                  <code style={{ color:prefs.accent_color, fontSize:11.5, fontFamily:"monospace", flexShrink:0 }}>{prefs.accent_color}</code>
                 </div>
-                <p style={{ color:MUTED, fontSize:9, margin:"6px 0 0" }}>
+                <p style={{ color:MUTED, fontSize:11, margin:"6px 0 0" }}>
                   S'applique immediatement au tableau de bord (menu lateral, logo, elements actifs).
                 </p>
               </div>
