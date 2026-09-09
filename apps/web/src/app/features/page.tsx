@@ -198,37 +198,48 @@ function AnalyticsMockupSvg() {
   )
 }
 
+// Visuel « QR dynamique » (revue du 9 septembre, P0) : un VRAI <svg> statique,
+// dessiné côté serveur — il s'affiche même si JavaScript n'a pas tourné ou si
+// le rendu client échoue. Le sélecteur de style ne fait que changer trois
+// couleurs ; le dessin lui-même ne dépend d'aucun état.
+const QR_CELLS = [1,1,1,1,1,1,1,0,1,0,0,1,0,1,1,1,1,1,1,1,1,
+                  1,0,0,0,0,0,1,0,0,1,1,0,0,0,1,0,0,0,0,0,1,
+                  1,0,1,1,1,0,1,0,1,0,1,0,0,0,1,0,1,1,1,0,1,
+                  1,0,1,1,1,0,1,0,0,1,0,1,1,0,1,0,1,1,1,0,1,
+                  1,0,1,1,1,0,1,0,1,0,0,0,1,0,1,0,1,1,1,0,1,
+                  1,0,0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0,0,0,1,
+                  1,1,1,1,1,1,1,0,1,0,1,0,1,0,1,1,1,1,1,1,1]
+const QR_GOLD = new Set([10,11,24,25,31,32])
+const QR_STYLES = [
+  { fg:"#1a1a1a", bg:"#ffffff", acc:"#C9A84C", name:"Classique" },
+  { fg:"#C9A84C", bg:"#111009", acc:"#F5F0E8", name:"Or" },
+  { fg:"#39FF8F", bg:"#050505", acc:"#A78BFA", name:"Néon" },
+]
+
+export function QRMockupStatique({ style: s = QR_STYLES[0] }: { style?: typeof QR_STYLES[number] }) {
+  const N = 21, C = 8, PAD = 12, W = N * C + PAD * 2
+  return (
+    <svg role="img" aria-label="Exemple de QR code QRowg, illustration" viewBox={`0 0 ${W} ${W + 22}`} width={200} height={222}
+      style={{ display:"block", borderRadius:18, border:"2px solid rgba(201,168,76,0.35)", background:s.bg, transition:"background 0.4s ease" }}>
+      {QR_CELLS.map((c, i) => c === 0 ? null : (
+        <rect key={i} x={PAD + (i % N) * C + 0.75} y={PAD + Math.floor(i / N) * C + 0.75} width={C - 1.5} height={C - 1.5} rx={1.5}
+          fill={QR_GOLD.has(Math.floor(i / N) * 7 + (i % 7)) ? s.acc : s.fg} style={{ transition:"fill 0.4s" }} />
+      ))}
+      <text x={W / 2} y={W + 12} textAnchor="middle" fontSize={8} fontWeight={700} letterSpacing={2.5} fill={s.acc} fontFamily="inherit">QROWG.COM</text>
+    </svg>
+  )
+}
+
 function QRMockupSvg() {
-  const STYLES = [
-    { fg:"#1a1a1a", bg:"#ffffff", acc:"#C9A84C", name:"Classic" },
-    { fg:"#C9A84C", bg:"#111009", acc:"#F5F0E8", name:"Gold" },
-    { fg:"var(--success)", bg:"#050505", acc:"#A78BFA", name:"Neon" },
-  ]
   const [active, setActive] = useState(0)
-  const s = STYLES[active]
-  const cells = [1,1,1,1,1,1,1,0,1,0,0,1,0,1,1,1,1,1,1,1,1,
-                 1,0,0,0,0,0,1,0,0,1,1,0,0,0,1,0,0,0,0,0,1,
-                 1,0,1,1,1,0,1,0,1,0,1,0,0,0,1,0,1,1,1,0,1,
-                 1,0,1,1,1,0,1,0,0,1,0,1,1,0,1,0,1,1,1,0,1,
-                 1,0,1,1,1,0,1,0,1,0,0,0,1,0,1,0,1,1,1,0,1,
-                 1,0,0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0,0,0,1,
-                 1,1,1,1,1,1,1,0,1,0,1,0,1,0,1,1,1,1,1,1,1]
-  const goldIdx = new Set([10,11,24,25,31,32])
+  const s = QR_STYLES[active]
   return (
     <div style={{ display:"flex",flexDirection:"column",gap:20,alignItems:"center" }}>
-      {/* QR card */}
-      <div style={{ width:200,height:200,background:s.bg,border:"2px solid rgba(201,168,76,0.35)",borderRadius:18,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:10,boxShadow:"0 0 60px rgba(201,168,76,0.15)",transition:"all 0.4s ease" }}>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(21,1fr)",gap:1.5,padding:6}}>
-          {cells.map((c,i) => c === 0 ? <div key={i}/> : (
-            <div key={i} style={{ aspectRatio:"1",borderRadius:1.5,background:goldIdx.has(Math.floor(i/21)*7+(i%7)) ? s.acc : s.fg,transition:"background 0.4s" }}/>
-          ))}
-        </div>
-        <p style={{color:s.acc,fontSize:8,letterSpacing:2.5,fontWeight:700}}>QROWG.COM</p>
-      </div>
+      <QRMockupStatique style={s} />
       {/* Sélecteur de style */}
-      <div style={{display:"flex",gap:8}}>
-        {STYLES.map((st,i) => (
-          <button key={st.name} onClick={()=>setActive(i)} style={{
+      <div style={{display:"flex",gap:8}} role="group" aria-label="Style du QR d'exemple">
+        {QR_STYLES.map((st,i) => (
+          <button key={st.name} type="button" aria-pressed={active===i} onClick={()=>setActive(i)} style={{
             display:"inline-flex",alignItems:"center",minHeight:44,padding:"0 16px",borderRadius:22,border:"1px solid",cursor:"pointer",fontSize:11,fontWeight:600,fontFamily:"inherit",
             background:active===i?"rgba(201,168,76,0.1)":"transparent",
             borderColor:active===i?"rgba(201,168,76,0.5)":"rgba(255,255,255,0.12)",
@@ -252,10 +263,6 @@ export default function FeaturesPage() {
         .feat-2col.rev { }
         @media(max-width:900px){ .feat-2col{ grid-template-columns:1fr !important; gap:40px !important; } }
         @media(max-width:640px){ .feat-sec{ padding:72px 24px !important; } .feat-hero{ padding:120px 24px 80px !important; } }
-        .au1{animation:mo-fade-up 0.6s ease 0.1s both}
-        .au2{animation:mo-fade-up 0.6s ease 0.25s both}
-        .au3{animation:mo-fade-up 0.6s ease 0.4s both}
-        .au4{animation:mo-fade-up 0.6s ease 0.55s both}
       `}</style>
 
       {/* NAV */}
@@ -291,20 +298,20 @@ export default function FeaturesPage() {
       {/* HERO */}
       <section style={{ padding:"140px 48px 100px",textAlign:"center",position:"relative",zIndex:1 }} className="feat-hero">
         <div style={{maxWidth:780,margin:"0 auto"}}>
-          <div style={{marginBottom:20}} className="au1"><Chip label="Fonctionnalités" /></div>
+          <div style={{marginBottom:20}}><Chip label="Fonctionnalités" /></div>
           <h1 style={{
             fontFamily:"Fraunces, serif",
             fontSize:"clamp(32px,4.5vw,64px)",
             color:INK,fontWeight:700,lineHeight:1.08,
             letterSpacing:"-0.02em",margin:"0 0 24px",
-          }} className="au2">
+          }}>
             Tout ce qu'il vous faut pour transformer<br/>
             un QR code en <span style={{color:G}}>outil de travail.</span>
           </h1>
-          <p style={{color:MUT,fontSize:18,lineHeight:1.7,maxWidth:560,margin:"0 auto 44px"}} className="au3">
+          <p style={{color:MUT,fontSize:18,lineHeight:1.7,maxWidth:560,margin:"0 auto 44px"}}>
             Créez une page mobile, générez un QR dynamique et mesurez chaque interaction.
           </p>
-          <div style={{display:"flex",justifyContent:"center",gap:14,flexWrap:"wrap"}} className="au4">
+          <div style={{display:"flex",justifyContent:"center",gap:14,flexWrap:"wrap"}}>
             <CtaInline label="Créer gratuitement" />
             <Link href="/#pricing" style={{
               display:"inline-flex",alignItems:"center",gap:8,

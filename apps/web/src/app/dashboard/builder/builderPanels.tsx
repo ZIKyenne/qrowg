@@ -301,6 +301,19 @@ Tiramisu;6,50€;Fait maison`
   // Clés de champs considérées comme « mise en page » (onglet dédié), le reste = « contenu ».
   const LAYOUT_FIELD_KEYS = new Set(["align", "layout", "width", "height", "columns", "cols", "disposition", "orientation", "size"])
   const isLayoutField = (key: string) => LAYOUT_FIELD_KEYS.has(key) || key.endsWith("_align")
+  // Revue du 9 septembre (P0) : AUCUN réglage visuel dans Contenu. Un champ d'apparence
+  // (forme, contour, fond, ombre, couleur, style, coins, cadre, voile…) vit dans Style.
+  // Décidé par la clé ET le type : « Rayon (km) » de la carte (texte, key radius) reste du contenu.
+  const APPARENCE_RE = /(^|_)(shape|style|radius|border|shadow|bg|overlay|frame|glow|ring|font|variant|opacity|gradient|effect)(_|$)|color/
+  type ChampDef = { key: string; type?: string }
+  export const isAppearanceField = (f: ChampDef) => {
+    if (isLayoutField(f.key)) return false
+    if (f.type === "color") return true
+    if (f.key.startsWith("overlay")) return true
+    if (f.type === "text" || f.type === "textarea" || f.type === "url" || f.type === "image") return false
+    return APPARENCE_RE.test(f.key)
+  }
+  export const champDe = (f: ChampDef): "content" | "layout" | "apparence" => isLayoutField(f.key) ? "layout" : isAppearanceField(f) ? "apparence" : "content"
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
   const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages", "expertise", "trust_badge", "on_site_services", "advantages", "logo_wall", "multi_cta", "business_stats"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
@@ -401,7 +414,7 @@ Tiramisu;6,50€;Fait maison`
     )
   }
 
-  export function EditPanel({ block, onChange, only }: { block: Block; onChange: (key: string, val: string) => void; only?: "content" | "layout" }) {
+  export function EditPanel({ block, onChange, only }: { block: Block; onChange: (key: string, val: string) => void; only?: "content" | "layout" | "apparence" }) {
     // Accordeon de l'editeur social_links : un groupe de reseaux ouvert a la fois (evite 78 champs empiles).
     const [openNetGroup, setOpenNetGroup] = useState<string | null>(null)
     // Cartes repliables pour les champs numerotes ("Plat 1 — Nom" -> carte "Plat 1"). Presentation seule.
@@ -409,7 +422,7 @@ Tiramisu;6,50€;Fait maison`
     const def = BLOCK_DEFS[block.type]
     if (!def) return null
     // Les éditeurs personnalisés ne s'affichent que côté Contenu (leur mise en page passe par les réglages universels).
-    if (only === "layout" && CUSTOM_EDITOR_TYPES.has(block.type)) return null
+    if ((only === "layout" || only === "apparence") && CUSTOM_EDITOR_TYPES.has(block.type)) return null
     const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "9px 11px", color: "var(--ink)", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
 
     if (block.type === "cover_banner") {
@@ -760,8 +773,8 @@ Tiramisu;6,50€;Fait maison`
       )
     }
 
-    const scoped = def.fields.filter(f => only === "layout" ? isLayoutField(f.key) : only === "content" ? !isLayoutField(f.key) : true)
-    if (only === "layout" && scoped.length === 0) return null
+    const scoped = def.fields.filter(f => only ? champDe(f as ChampDef) === only : true)
+    if ((only === "layout" || only === "apparence") && scoped.length === 0) return null
     const visibleFields = scoped.filter(field => {
       const si = (field as any).showIf
       if (!si) return true

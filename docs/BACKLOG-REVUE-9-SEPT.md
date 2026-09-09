@@ -32,13 +32,13 @@ Chaque ligne est copiable telle quelle dans Claude Code. Notation : `[ ]` à fai
 - [ ] Validation : aperçu + contrôles essentiels + téléchargement sans défilement à 1440×900, 1536×864, 1920×1080.
 
 ### Fonctionnalités (`app/features/page.tsx`)
-- [ ] v50 · Visuel « QR dynamique » : rendu de secours fiable (SVG statique) si le QR généré côté client ne se charge pas ; tout visuel QR du site dispose d'un secours.
+- [x] v50 · Visuel « QR dynamique » : rendu de secours fiable (SVG statique) si le QR généré côté client ne se charge pas ; tout visuel QR du site dispose d'un secours.
 
 ### Éditeur (`app/dashboard/builder/BuilderV4.tsx`)
 - [x] v44 · Inspecteur en Contenu · Style · Effets + « Réglages avancés » replié.
-- [ ] v50 · Premier bloc sélectionné automatiquement à l'ouverture (ou aide dans l'inspecteur vide indiquant l'action attendue).
-- [ ] v50 · Canevas ≥ 55 % de la largeur utile ; bibliothèque et inspecteur repliables en un clic (déjà présents : rendre le repli évident).
-- [ ] v50 · Aucun réglage visuel dans Contenu : forme/contour/fond/ombre d'avatar et équivalents passent dans Style (`blockDefs` : champ → onglet).
+- [x] v50 · Premier bloc sélectionné automatiquement à l'ouverture (ou aide dans l'inspecteur vide indiquant l'action attendue).
+- [x] v50 · Canevas ≥ 55 % de la largeur utile (mesuré : 55 % à 1440, 65 % à 1280 où la bibliothèque s'ouvre repliée) ; bibliothèque et inspecteur repliables en un clic.
+- [x] v50 · Aucun réglage visuel dans Contenu : forme/contour/fond/ombre d'avatar et équivalents passent dans Style (`blockDefs` : champ → onglet).
 - [ ] v52 · Doublon « Brouillon gardé ici » / « Brouillon gardé » → un seul ; « Excellent — 43/80 » → compteur + alertes utiles seulement ; Page / Ma page / Votre page → un seul mot.
 - [ ] v52 · Texte d'interface ≥ 14 px dans les panneaux, cibles ≥ 44 px ; Récents et Favoris d'abord, les 12 catégories ensuite ; erreurs de publication résumées près de « Publier ».
 

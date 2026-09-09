@@ -18,10 +18,13 @@ describe("taper un bloc sur téléphone", () => {
   })
 
   it("l'état vide propose de revenir à la page au lieu de parler d'un canvas invisible", () => {
+    // L'état vide vit désormais dans InspecteurVide.tsx (revue du 9 septembre) ; BuilderV4 lui passe « Voir la page ».
+    const iv = readFileSync(join(__dirname, "InspecteurVide.tsx"), "utf8")
     expect(src).not.toContain("Clique sur un bloc dans le canvas")
-    expect(src).toContain("Touchez un bloc de la page pour le modifier")
-    const i = src.indexOf("Touchez un bloc de la page")
-    expect(src.slice(i, i + 400)).toContain('onClick={() => setMobileTab("canvas")}')
-    expect(src.slice(i, i + 400)).toContain("Voir la page")
+    expect(iv).toContain("Touchez un bloc de la page pour le modifier")
+    const i = iv.indexOf("Touchez un bloc de la page")
+    expect(iv.slice(i, i + 400)).toContain("onClick={onVoirPage}")
+    expect(iv.slice(i, i + 400)).toContain("Voir la page")
+    expect(src).toContain('onVoirPage={() => setMobileTab("canvas")}')
   })
 })

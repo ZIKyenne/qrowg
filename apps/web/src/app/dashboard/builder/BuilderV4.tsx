@@ -24,7 +24,8 @@ import { BLOCK_DEFS, blocsProposables } from "./blockDefs"
   // via .map préserve les autres) -> les blocs inchangés ne re-rendent plus.
   // Props stables (block/theme/dayMode, aucun callback) -> aucun risque de rendu périmé.
   const MemoBlockPreview = memo(BlockPreview)
-  import { EditPanel, ThemePanel, Segmented, STYLE_COPY_KEYS } from "./builderPanels"
+  import { EditPanel, ThemePanel, Segmented, STYLE_COPY_KEYS, isAppearanceField } from "./builderPanels"
+  import { InspecteurVide } from "./InspecteurVide"
 import { motifDeFond } from "./types"
 import { actionClavier } from "./raccourcisClavier"
   import { BuilderStatus } from "./BuilderStatus"
@@ -116,6 +117,8 @@ import { actionClavier } from "./raccourcisClavier"
     // handler clavier global (deps []), sans re-souscrire l'écouteur à chaque frappe.
     const blocksKbRef = useRef(blocks)
     const selectedIdKbRef = useRef(selectedId)
+    // Sélection d'ouverture (premier bloc) déjà faite pour cette page ? (revue du 9 septembre)
+    const premierBlocChoisiRef = useRef<string | undefined>(undefined)
     useEffect(() => { blocksKbRef.current = blocks }, [blocks])
     useEffect(() => { selectedIdKbRef.current = selectedId }, [selectedId])
     // multiSelection était lu depuis le state figé au montage dans le handler
@@ -309,6 +312,14 @@ import { actionClavier } from "./raccourcisClavier"
       if (typeof window !== "undefined") localStorage.setItem("qrfolio_sidebar_collapsed", String(sidebarCollapsed))
     }, [sidebarCollapsed])
 
+    // Écran étroit (1024–1365 px) sans préférence enregistrée : la bibliothèque s'ouvre repliée,
+    // le canevas d'abord (revue du 9 septembre). Décidé au montage — pas dans l'initialiseur, qui
+    // ferait diverger le rendu serveur du rendu client. Déclaré AVANT l'effet qui mémorise le choix.
+    useEffect(() => {
+      if (localStorage.getItem("qrfolio_blocks_collapsed") !== null) return
+      if (window.innerWidth >= 1024 && window.innerWidth < 1366) setBlocksCollapsed(true)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
     useEffect(() => {
       if (typeof window !== "undefined") localStorage.setItem("qrfolio_blocks_collapsed", String(blocksCollapsed))
     }, [blocksCollapsed])
@@ -391,8 +402,11 @@ import { actionClavier } from "./raccourcisClavier"
     function toggleRight() { setRightCollapsed(p => !p); setFocusMode(false) }
 
     // ── Resize panneaux ────────────────────────────────────────────────────
-    const blocksResize = useResize("blocks", 300, 240, 520)
-    const rightResize = useResize("right", 340, 280, 520)
+    // Largeurs par défaut (revue du 9 septembre) : rail 76 + bibliothèque 260 + inspecteur 300 = 636 px,
+    // le canevas garde ≥ 55 % de la largeur dès 1440 px (53 % à 1366) ; en dessous, la bibliothèque
+    // s'ouvre repliée (icônes) la première fois — un clic la déploie, rien n'est retiré.
+    const blocksResize = useResize("blocks", 260, 240, 520)
+    const rightResize = useResize("right", 300, 280, 520)
     // Responsive : sous 1024px, les 3 colonnes (palette | page | réglages) ne tiennent plus côte à côte.
     // On bascule en mode « un panneau à la fois » piloté par une barre d'onglets en bas.
     const isMobile = useIsMobile(1024)
@@ -667,6 +681,8 @@ import { actionClavier } from "./raccourcisClavier"
       // Page déjà remplie : le guide « on a posé 3 blocs pour toi » n'a plus de sens.
       if (d.templateKey || d.blocks.length > 3) setFromTemplate(true)
       setBlocksRaw(d.blocks.map(b => ({ id: b.id, type: b.type, content: { ...b.content }, visible: b.visible !== false, draft: b.draft, locked: b.locked })))
+      // Les identifiants changent : on laisse la sélection d'ouverture se refaire sur le brouillon.
+      setSelectedId(null); premierBlocChoisiRef.current = undefined
       setPageName(d.pageName)
       if (d.theme) setTheme(normalizePageTheme(d.theme))
       setDraftFound(null)
@@ -1176,6 +1192,20 @@ import { actionClavier } from "./raccourcisClavier"
     // Revenir à l'onglet Contenu à chaque changement de bloc sélectionné.
     useEffect(() => { setEditTab("contenu") }, [selectedId])
 
+    // Revue du 9 septembre (P0) : à l'ouverture, l'inspecteur ne doit jamais rester
+    // vide sans consigne. Sur grand écran, le premier bloc de la page est sélectionné
+    // d'office une fois la page chargée — l'utilisateur voit tout de suite « où » on
+    // édite. Une seule fois par page, et jamais par-dessus un choix déjà fait.
+    // Page en base : après le chargement ; page neuve ou invité : dès que la session est connue
+    // (le brouillon restauré remet le compteur à zéro, voir applyDraft).
+    const pagePrete = IS_UUID(liveId) ? loadState === "loaded" : authState !== "unknown"
+    useEffect(() => {
+      if (isMobile || !pagePrete || selectedId || blocks.length === 0) return
+      if (premierBlocChoisiRef.current === (liveId ?? pageId)) return
+      premierBlocChoisiRef.current = liveId ?? pageId
+      setSelectedId(blocks[0].id); setRightTab("edit")
+    }, [isMobile, pagePrete, selectedId, blocks, liveId, pageId])
+
     // Fond du thème appliqué partout
     function bgStyle(): React.CSSProperties {
       if (dayMode) return { background: "#FAFAFA" }
@@ -1351,7 +1381,7 @@ import { actionClavier } from "./raccourcisClavier"
               </div>
             ))}
             renderLegacyContent={(b) => <EditPanel key={b.id + "-mc"} block={b} onChange={(k, v) => updateBlock(b.id, k, v)} only="content" />}
-            renderLegacyDesign={(b) => <EditPanel key={b.id + "-ml"} block={b} onChange={(k, v) => updateBlock(b.id, k, v)} only="layout" />}
+            renderLegacyDesign={(b) => <><EditPanel key={b.id + "-ma"} block={b} onChange={(k, v) => updateBlock(b.id, k, v)} only="apparence" /><EditPanel key={b.id + "-ml"} block={b} onChange={(k, v) => updateBlock(b.id, k, v)} only="layout" /></>}
           />
         )}
 
@@ -1732,7 +1762,7 @@ import { actionClavier } from "./raccourcisClavier"
                   {/* Catégorie Favoris — visible seulement si au moins 1 favori */}
                   {favorites.length > 0 && (
                     <button onClick={() => setActiveCategory("favorites")} title="Vos blocs favoris"
-                      style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 7, minWidth: 0, background: activeCategory==="favorites" ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory==="favorites" ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "5px 3px" : "8px 10px", color: activeCategory==="favorites" ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory==="favorites" ? 600 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
+                      style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 5, minWidth: 0, background: activeCategory==="favorites" ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory==="favorites" ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "5px 3px" : "8px 8px", color: activeCategory==="favorites" ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory==="favorites" ? 600 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
                       <span style={{ fontSize: isMobile ? 16 : 15, flexShrink: 0 }}>⭐</span>
                       <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: isMobile ? "normal" as const : "nowrap", fontSize: isMobile ? 9.5 : undefined, textAlign: isMobile ? "center" as const : undefined, lineHeight: isMobile ? 1.15 : undefined, width: isMobile ? "100%" : undefined }}>Favoris</span>
                       <span style={{ display: isMobile ? "none" : undefined, marginLeft: "auto", flexShrink: 0, background: "rgba(255,215,0,0.15)", borderRadius: 10, padding: "0px 6px", fontSize: 9.5, fontWeight: 700 }}>{favorites.length}</span>
@@ -1741,7 +1771,7 @@ import { actionClavier } from "./raccourcisClavier"
                   {BLOCK_CATEGORIES.map(cat => (
                     <button key={cat.id} onClick={() => setActiveCategory(cat.id)} title={cat.desc}
                       className={activeCategory===cat.id ? "da-cat on" : "da-cat"}
-                      style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 7, minWidth: 0, background: activeCategory===cat.id ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory===cat.id ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "5px 3px" : "8px 10px", color: activeCategory===cat.id ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory===cat.id ? 600 : 500, cursor: "pointer", transition: "background .18s ease, border-color .18s ease, color .18s ease", textAlign: "left" as const }}>
+                      style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 5, minWidth: 0, background: activeCategory===cat.id ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory===cat.id ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "5px 3px" : "8px 8px", color: activeCategory===cat.id ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory===cat.id ? 600 : 500, cursor: "pointer", transition: "background .18s ease, border-color .18s ease, color .18s ease", textAlign: "left" as const }}>
                       <span style={{ fontSize: isMobile ? 16 : 15, flexShrink: 0 }}>{cat.icon}</span>
                       <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: isMobile ? "normal" as const : "nowrap", fontSize: isMobile ? 9.5 : undefined, textAlign: isMobile ? "center" as const : undefined, lineHeight: isMobile ? 1.15 : undefined, width: isMobile ? "100%" : undefined }}>{cat.label}</span>
                       {search && searchCounts ? (
@@ -2500,20 +2530,15 @@ import { actionClavier } from "./raccourcisClavier"
                       onOpenOutline={() => setOutlineOpen(true)}
                       confirm={(m) => confirm({ title: "Confirmer", message: m, confirmLabel: "Confirmer" })}
                       renderLegacyContent={(b) => <EditPanel key={b.id+"-c"} block={b} onChange={(k, v) => updateBlock(b.id, k, v)} only="content" />}
-                      renderLegacyDesign={(b) => <EditPanel key={b.id+"-l"} block={b} onChange={(k, v) => updateBlock(b.id, k, v)} only="layout" />}
+                      renderLegacyDesign={(b) => <><EditPanel key={b.id+"-a"} block={b} onChange={(k, v) => updateBlock(b.id, k, v)} only="apparence" /><EditPanel key={b.id+"-l"} block={b} onChange={(k, v) => updateBlock(b.id, k, v)} only="layout" /></>}
                     />
                   </div>
                 )}
                 {!selectedBlock
-                  ? <div style={{ textAlign: "center", padding: "50px 14px" }}>
-                      <Settings size={28} color={MUTED} style={{ margin: "0 auto 8px", opacity: 0.2, display: "block" }} />
-                      <p style={{ color: MUTED, fontSize: 12, margin: 0, lineHeight: 1.7 }}>{isMobile ? "Touchez un bloc de la page pour le modifier" : "Cliquez sur un bloc de la page pour le modifier"}</p>
-                      {isMobile && (
-                        <button type="button" onClick={() => setMobileTab("canvas")} className="da-btn-neutral da-btn-neutral--sm" style={{ marginTop: 14 }}>
-                          Voir la page
-                        </button>
-                      )}
-                    </div>
+                  ? <InspecteurVide vide={blocks.length === 0} isMobile={isMobile}
+                      onChoisirBloc={() => { if (isMobile) setMobileTab("blocks"); else { setBlocksCollapsed(false); setFocusMode(false) } }}
+                      onVoirPage={() => setMobileTab("canvas")}
+                      onPremierBloc={() => { setSelectedId(blocks[0].id); setRightTab("edit") }} />
                   : <>
                       <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 16, paddingBottom: 12, borderBottom: "1px solid var(--line)" }}>
                         <div style={{ minWidth: 0 }}>
@@ -2641,6 +2666,14 @@ import { actionClavier } from "./raccourcisClavier"
                               </div>
                             )}
 
+                            {/* APPARENCE DU BLOC — les réglages visuels propres au bloc (forme, contour,
+                                fond, ombre, couleurs, style…) : dans Style, jamais dans Contenu (revue du 9 septembre). */}
+                            {editTab === "style" && (BLOCK_DEFS[selectedBlock.type]?.fields ?? []).some(f => isAppearanceField(f as any)) && (
+                              <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 18, paddingTop: 16, borderTop: "1px solid var(--line)" }}>
+                                <p style={secTitle}>Apparence du bloc</p>
+                                <EditPanel key={selectedBlock.id+"-a"} block={selectedBlock} onChange={set} only="apparence" />
+                              </div>
+                            )}
                             {/* MISE EN PAGE — vit dans l'onglet Style, après l'apparence */}
                             {editTab === "style" && (
                               <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 18, paddingTop: 16, borderTop: "1px solid var(--line)" }}>

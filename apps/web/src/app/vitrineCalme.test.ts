@@ -47,6 +47,22 @@ describe("accueil", () => {
   })
 })
 
+describe("fonctionnalités", () => {
+  const f = lire("features/page.tsx")
+  it("le visuel « QR dynamique » est un <svg> statique rendu côté serveur (secours garanti sans JavaScript)", () => {
+    expect(f).toContain('<svg role="img" aria-label="Exemple de QR code QRowg, illustration"')
+    expect(f).toContain("export function QRMockupStatique(")
+    expect(f).toContain("<QRMockupStatique style={s} />")
+    // Le dessin ne dépend d'aucun état : cellules et coins sont des constantes de module.
+    expect(f).toContain("const QR_CELLS = [")
+    expect(f).not.toContain('gridTemplateColumns:"repeat(21,1fr)"')
+  })
+  it("le héros est rendu au repos : plus de classes d'entrée « both »", () => {
+    expect(f).not.toMatch(/\.au[1-4]\{animation/)
+    expect(f).not.toContain('className="au')
+  })
+})
+
 describe("pages publiques (générateurs, guides, outils, sécurité)", () => {
   for (const f of ["generateur-qr-code-wifi/page.tsx", "generateur-qr-code/page.tsx", "guides/[slug]/page.tsx", "guides/page.tsx", "outils/page.tsx", "outils/taille-qr-code/page.tsx", "outils/testeur-qr-code/page.tsx", "qr-code/[usage]/page.tsx", "qr-code/page.tsx", "security/page.tsx"]) {
     it(`${f} : sans particules`, () => { expect(lire(f)).not.toContain("Particles") })
