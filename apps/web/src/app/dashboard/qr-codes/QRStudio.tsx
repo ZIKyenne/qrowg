@@ -1307,9 +1307,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         <div style={{ padding:"12px 12px 10px", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", gap:8 }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <div>
-              <p style={{ color:"var(--ink)", fontSize:11, fontWeight:700, margin:"0 0 1px" }}>QR Codes</p>
-              <p style={{ color:MUTED, fontSize:9, margin:0 }}>
-                {qrCodes.length} total
+              <p style={{ color:"var(--ink)", fontSize:12, fontWeight:700, margin:"0 0 1px" }}>QR de pages</p>
+              <p style={{ color:MUTED, fontSize:11, margin:0 }}>
+                {qrCodes.length} au total
               </p>
             </div>
             <div style={{ display:"flex", gap:6, alignItems:"center" }}>
@@ -1344,7 +1344,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             </select>
             <select aria-label="Trier les QR" value={sortKey} onChange={e => setSortKey(e.target.value)} className="da-select"
               style={{ flex:1, padding:"6px 8px", fontSize:10 }}>
-              <option value="date-desc">Date rec.</option>
+              <option value="date-desc">Plus récents</option>
               <option value="date-asc">Date anc.</option>
               <option value="scans-desc">+ scans</option>
               <option value="scans-asc">- scans</option>
@@ -1612,7 +1612,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           <span style={{ position:"relative", fontSize:12, fontWeight:700, color:"var(--gold-light)", letterSpacing:"-.02em" }}>{scanScore.score}</span>
                         </span>
                         <div style={{ flex:1, minWidth:0 }}>
-                          <p style={{ color:"var(--gold-light)", fontSize:12.5, fontWeight: 700, margin:0 }}>{scanScore.grade} · scannabilité</p>
+                          <p style={{ color:"var(--gold-light)", fontSize:12.5, fontWeight: 700, margin:0 }}>{scanScore.grade} · lisibilité</p>
                           <p style={{ color:MUTED, fontSize:10.5, margin:"1px 0 0", lineHeight:1.4, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
                             {scanScore.grade === "Excellent"
                               ? "Contraste élevé et marge suffisante : il se scanne sans souci."
@@ -1943,7 +1943,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     style={{ width:"100%", display:"flex", alignItems:"center", gap:10, padding:"9px 11px", background:`${scanScore.gradeColor}0e`, border:`1px solid ${scanScore.gradeColor}33`, borderRadius:12, cursor: scanScore.issues.length ? "default" : "pointer", textAlign:"left" as const }}>
                     <span style={{ width:30, height:30, borderRadius:"50%", background:scanScore.gradeColor, color:"var(--ink-on-accent)", fontSize:12, fontWeight: 700, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{scanScore.score}</span>
                     <div style={{ flex:1, minWidth:0 }}>
-                      <p style={{ color:scanScore.gradeColor, fontSize:12.5, fontWeight: 700, margin:0 }}>{scanScore.grade} · scannabilité</p>
+                      <p style={{ color:scanScore.gradeColor, fontSize:12.5, fontWeight: 700, margin:0 }}>{scanScore.grade} · lisibilité</p>
                       <p style={{ color:"var(--muted)", fontSize:10, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>Contraste {scanScore.ratio}:1 · ECC {ecLevel}</p>
                     </div>
                     {scanScore.issues.length === 0 && <ChevronDown size={16} color="var(--muted)" style={{ transform: scanOpen ? "rotate(180deg)" : "none", transition:"transform .2s", flexShrink:0 }}/>}
@@ -2552,7 +2552,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
               {/* -- MARGE & SCANNABILITÉ (accordéon) ------------------------- */}
               {(
-                <AccSection id="qualite" title="Marge & scannabilité" glyph={GLYPH_MARGE} subtitle="Zone de silence, contraste" openId={openAcc} setOpenId={setOpenAcc}>
+                <AccSection id="qualite" title="Marge et lisibilité" glyph={GLYPH_MARGE} subtitle="Marge blanche, contraste" openId={openAcc} setOpenId={setOpenAcc}>
                 <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
                   {/* Marge : 2 choix simples (Petit / Grand) — plus de curseur. */}

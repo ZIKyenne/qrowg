@@ -67,7 +67,7 @@ describe("buildSourceData", () => {
   })
   it("un scan de QR code est nommé en toutes lettres", () => {
     const r = buildSourceData([{ viewed_at: "x", source: "qr_scan" }])
-    expect(r).toContainEqual({ name: "QR Scan", value: 1 })
+    expect(r).toContainEqual({ name: "QR code", value: 1 })
   })
   it("le trafic venu du site lui-même est nommé pour le client, pas pour nous", () => {
     const r = buildSourceData([{ viewed_at: "x", source: "interne" }])
@@ -78,7 +78,7 @@ describe("buildSourceData", () => {
       { viewed_at: "x", source: "google" },
       { viewed_at: "x", source: "qr_scan" }, { viewed_at: "x", source: "qr_scan" },
     ])
-    expect(r[0]).toEqual({ name: "QR Scan", value: 2 })
+    expect(r[0]).toEqual({ name: "QR code", value: 2 })
   })
   it("source absente/vide -> 'direct'", () => {
     const r = buildSourceData([{ viewed_at: "x" }, { viewed_at: "x", source: "" }, { viewed_at: "x", source: null }])

@@ -304,7 +304,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
                 {(() => {
                   const advice =
                     totalScans30 < 10 ? "Partagez votre QR sur vos réseaux et imprimez-le pour décoller."
-                    : story.peakHour != null ? `Publiez vos posts autour de ${story.peakHour}h, votre heure de pic.`
+                    : story.peakHour != null ? `Publiez vos contenus autour de ${story.peakHour} h, votre heure de pic.`
                     : story.topSource ? `L’essentiel vient de ${story.topSource} — testez un autre canal pour diversifier.`
                     : null
                   return advice ? (
@@ -339,7 +339,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
                 <TrendingUp size={13} style={{ transform: live.evo >= 0 ? "none" : "scaleY(-1)" }} /> {live.evo >= 0 ? "+" : ""}{live.evo}%
               </span>
             </div>
-            <p style={{ color: MUTED, fontSize: 10.5, margin: "2px 0 0" }}>vs hier ({live.ydayN}) · scans + vues</p>
+            <p style={{ color: MUTED, fontSize: 11.5, margin: "2px 0 0" }}>contre hier ({live.ydayN}) · scans + vues</p>
           </div>
           {/* Dernier événement */}
           <div className="az-card" style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 14, padding: "16px 18px" }}>

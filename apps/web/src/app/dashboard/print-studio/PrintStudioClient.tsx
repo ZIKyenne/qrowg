@@ -1271,14 +1271,14 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               const actif = ongletEffectif === (o.id as OngletDroite)
               return (
                 <button key={o.id} role="tab" aria-selected={actif} onClick={() => { setOngletDroite(o.id); setSelEl(null) }}
-                  style={{ flex: 1, minHeight: 38, borderRadius: 9, border: "none", cursor: "pointer", fontSize: 12, fontWeight: actif ? 800 : 600,
-                    background: actif ? C.gold : "transparent", color: actif ? "#080808" : C.fgMuted }}>{o.label}</button>
+                  style={{ flex: 1, minHeight: 38, borderRadius: 9, border: "none", cursor: "pointer", fontSize: 12.5, fontWeight: actif ? 700 : 500,
+                    background: actif ? "var(--surface-2)" : "transparent", color: actif ? "var(--ink)" : C.fgMuted, boxShadow: actif ? "inset 0 -2px 0 var(--accent)" : "none" }}>{o.label}</button>
               )
             })}
             {sel && (
               <button role="tab" aria-selected={ongletEffectif === "selection"} onClick={() => setOngletDroite("selection")}
                 style={{ flex: 1, minHeight: 38, borderRadius: 9, border: "none", cursor: "pointer", fontSize: 12, fontWeight: ongletEffectif === "selection" ? 800 : 600,
-                  background: ongletEffectif === "selection" ? C.gold : "transparent", color: ongletEffectif === "selection" ? "#080808" : C.gold }}>Sélection</button>
+                  background: ongletEffectif === "selection" ? "var(--surface-2)" : "transparent", color: ongletEffectif === "selection" ? "var(--ink)" : C.gold, boxShadow: ongletEffectif === "selection" ? "inset 0 -2px 0 var(--accent)" : "none" }}>Sélection</button>
             )}
           </div>
 
@@ -1367,7 +1367,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               return <Field label="Taille du QR">
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: 4 }}>{chips.map(([cid, lab, val]) => (
-                    <button key={cid} onClick={() => setQrScale(val)} style={{ flex: 1, minHeight: 40, borderRadius: 9, border: "none", cursor: "pointer", background: sem === cid ? C.gold : "transparent", color: sem === cid ? "var(--ink-on-accent)" : C.fgMuted, fontSize: 12.5, fontWeight: sem === cid ? 800 : 600 }}>{lab}</button>
+                    <button key={cid} onClick={() => setQrScale(val)} style={{ flex: 1, minHeight: 40, borderRadius: 9, border: "none", cursor: "pointer", background: sem === cid ? "var(--surface-2)" : "transparent", color: sem === cid ? "var(--ink)" : C.fgMuted, boxShadow: sem === cid ? "inset 0 -2px 0 var(--accent)" : "none", fontSize: 12.5, fontWeight: sem === cid ? 700 : 500 }}>{lab}</button>
                   ))}</div>
                   <Range value={clampS(qrScale)} min={qMin} max={qMax} step={0.02} onChange={v => setQrScale(clampS(v))} hint={`${Math.round(item.qrMm * size.factor * qrScale)} mm${preflight.scanDistanceM ? ` · lisible ~${preflight.scanDistanceM} m` : ""}`} />
                 </div>
@@ -1589,7 +1589,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                 return <Field label="Taille du QR">
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: 4 }}>{chips.map(([cid, lab, val]) => (
-                      <button key={cid} onClick={() => setQrScale(val)} style={{ flex: 1, minHeight: 40, borderRadius: 9, border: "none", cursor: "pointer", background: sem === cid ? C.gold : "transparent", color: sem === cid ? "var(--ink-on-accent)" : C.fgMuted, fontSize: 12.5, fontWeight: sem === cid ? 800 : 600 }}>{lab}</button>
+                      <button key={cid} onClick={() => setQrScale(val)} style={{ flex: 1, minHeight: 40, borderRadius: 9, border: "none", cursor: "pointer", background: sem === cid ? "var(--surface-2)" : "transparent", color: sem === cid ? "var(--ink)" : C.fgMuted, boxShadow: sem === cid ? "inset 0 -2px 0 var(--accent)" : "none", fontSize: 12.5, fontWeight: sem === cid ? 700 : 500 }}>{lab}</button>
                     ))}</div>
                     <Range value={clampS(qrScale)} min={qMin} max={qMax} step={0.02} onChange={v => setQrScale(clampS(v))} hint={`${Math.round(item.qrMm * size.factor * qrScale)} mm${preflight.scanDistanceM ? ` · ~${preflight.scanDistanceM} m` : ""}`} />
                   </div>
@@ -1913,12 +1913,11 @@ function SuggRow({ items, active, onPick }: { items: string[]; active: string; o
 }
 function Seg({ value, options, onPick, labels }: { value: string; options: string[]; onPick: (v: string) => void; labels?: string[] }) {
   return (
-    // MÊME dessin que les onglets de réglages : une piste, une pastille dorée
-    // pleine sur le choix retenu. Les deux commandes disaient la même chose —
-    // « c'est celui-ci » — avec deux vocabulaires différents (bord + or faible
-    // ici, pastille pleine là), dans la même colonne, à trois centimètres d'écart.
-    <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: 4 }}>
-      {options.map((o, i) => <button key={o} onClick={() => onPick(o)} style={{ flex: 1, minHeight: 40, borderRadius: 9, border: "none", cursor: "pointer", background: value === o ? C.gold : "transparent", color: value === o ? "var(--ink-on-accent)" : C.fgMuted, fontSize: 12.5, fontWeight: value === o ? 800 : 600, transition: "background var(--mo-fast) var(--mo-ease-standard)" }}>{labels ? labels[i] : o}</button>)}
+    // MÊME dessin que tous les segmenteurs de l'application (couche « Calme », v57) :
+    // piste = champ + filet, segment retenu = surface-2 + encre + filet d'accent en
+    // bas. L'or plein reste réservé à l'action primaire « Vérifier & exporter ».
+    <div style={{ display: "flex", gap: 4, background: "var(--field)", border: "1px solid var(--line-strong)", borderRadius: 12, padding: 4 }}>
+      {options.map((o, i) => <button key={o} onClick={() => onPick(o)} aria-pressed={value === o} style={{ flex: 1, minHeight: 40, borderRadius: 9, border: "none", cursor: "pointer", background: value === o ? "var(--surface-2)" : "transparent", color: value === o ? "var(--ink)" : C.fgMuted, boxShadow: value === o ? "inset 0 -2px 0 var(--accent)" : "none", fontSize: 12.5, fontWeight: value === o ? 700 : 500, fontFamily: "inherit" }}>{labels?.[i] ?? o}</button>)}
     </div>
   )
 }

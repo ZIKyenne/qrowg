@@ -8,7 +8,8 @@
 // Une seule source pour ces noms, partagée par tout ce qui affiche du trafic.
 
 export const SOURCE_LABELS: Record<string, string> = {
-  qr_scan:   "QR Scan",
+  qr_scan:   "QR code",
+  qr:        "QR code",   // même chose, clé courte relevée en base
   direct:    "Direct",
   interne:   "Votre site",
   instagram: "Instagram",
