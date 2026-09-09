@@ -281,3 +281,57 @@ Résumé des titres et tableaux Pinterest :
 **Titre Pinterest** : Créneau libéré : le désistement qui se remplit tout seul
 **Tableau** : QR code salon coiffure — unique épingle hors-food du jour
 `#salondecoiffure #coiffure #organisation #qrcode`
+
+---
+
+## 09/09 — production du jour · DÉPOSÉE ET MISE EN FILE (réserve vide)
+
+> **Tout est parti en file.** Dépôt effectué en cours de session, puis 6 posts programmés :
+> carrousel Instagram, carrousel photo TikTok et les 4 épingles sur 4 tableaux distincts
+> (QR code restaurant, QR code boutique commerce, QR code food truck, QR code hôtel).
+> **File à 6/10, réserve vide.** Contrôle qualité : 16 visuels, 0 alerte, chaque QR décodé
+> vers son lien tracké. Textes conservés ci-dessous.
+> La vidéo `qr-code-carte-cocktails-de-saison-bar-reel.mp4` (32,2 s) reste **manuelle**.
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| en-file | qr-code-carte-cocktails-de-saison-bar-01..06.png | Instagram (carrousel) | — | bar · carte des cocktails de saison · la carte suit la saison, le support ne bouge plus | https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260909-bar | 2026-09-09 |
+| en-file | tiktok-qr-code-carte-cocktails-de-saison-bar-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 | https://qrowg.com/qr-code/restaurant?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260909-bar | 2026-09-09 |
+| en-file | qr-code-plat-du-jour-epuise-signale-restaurant.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 0 | restaurant · plat du jour épuisé · le barrer en 10 secondes | https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260909-bar&utm_content=clic | 2026-09-09 |
+| en-file | qr-code-formule-petit-dejeuner-a-emporter-boulangerie.png | Pinterest | QR code boutique commerce (726416683586817655) — gabarit 1 | boulangerie · formule petit-déjeuner à emporter · le prix lisible en trois minutes | https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260909-bar&utm_content=clic | 2026-09-09 |
+| en-file | qr-code-fiche-conservation-produit-de-saison-producteur.png | Pinterest | QR code food truck (726416683586817654) — gabarit 2 | marché/producteur · fiche conservation du produit · le produit ne finit plus à la poubelle | https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260909-bar&utm_content=clic&utm_term=producteur | 2026-09-09 |
+| en-file | qr-code-plan-des-transports-depuis-la-gare-hotel.png | Pinterest | QR code hôtel (726416683586817656) — gabarit 3 | hôtel · plan des transports depuis la gare · le même message n'est plus réécrit | https://qrowg.com/qr-code/hotel?utm_source=pinterest&utm_medium=pin&utm_campaign=20260909-bar&utm_content=clic | 2026-09-09 |
+
+## Textes prêts — 09/09
+
+### Instagram (carrousel) — aucune URL dans la légende, 5 hashtags, `isAiGenerated: true`
+L'été est fini. Ta carte, elle, ne le sait pas encore.
+
+Le mojito est toujours en deuxième ligne, la menthe n'est plus la même et les fruits rouges ont disparu. Le client commande, le serveur s'excuse. Trois fois par service.
+
+Un QR posé sur la table ouvre la carte du moment : ce qui est faisable ce soir, avec ce qu'il y a vraiment derrière le bar. Nouveau cocktail à 17 h, en ligne à 17 h 02, depuis ton téléphone.
+
+Quatre saisons dans l'année. Quatre passages chez l'imprimeur — ou zéro.
+
+Le lien est dans la bio.
+
+`#bar #cocktails #cartedujour #commercelocal #qrcode`
+
+### TikTok (carrousel photo) — copies `tiktok-`, PAS de `isAiGenerated`
+Ta carte des cocktails date de juillet. On est en septembre.
+
+Plus de fruits rouges, plus de menthe correcte — mais la carte les propose encore. Le client commande, tu t'excuses.
+
+Un QR sur la table, la carte du soir change en dix secondes. Le carton imprimé, lui, ne bouge plus jamais.
+
+https://qrowg.com/qr-code/restaurant?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260909-bar
+
+`#bar #cocktails #barman #restauration #commercelocal`
+
+### Pinterest ×4
+Les quatre titres, descriptions (toutes ≤ 500 caractères) et tableaux sont dans
+`2026-09-09\textes-du-jour-2026-09-09.html`. Résumé :
+- **QR code restaurant** — « Plat épuisé : le barrer en 10 secondes, sans réimprimer »
+- **QR code boutique commerce** — « Formule petit-déj : la monter en 5 minutes, gratuitement »
+- **QR code food truck** — « Fiche conservation : la créer en 5 minutes, sans carte bancaire »
+- **QR code hôtel** — « Plan depuis la gare : la page à faire en 4 étapes »

@@ -470,3 +470,92 @@ problème d'audience et de portée, pas de publication.
 > franc à ce sujet aujourd'hui, avec un angle neuf (le service du midi).
 > Instagram : toujours 0 vue, 0 reach sur les carrousels.
 
+
+---
+
+## 09/09 — production du jour · DÉPOSÉE ET EN FILE
+
+> **File Buffer trouvée VIDE (0/10)** : les 6 posts du 08/09 sont tous partis.
+> **Réserve `_STOCK` vide au démarrage** (tout en `en-file` ou `retiré`) : production 100 % neuve.
+> Secteur principal : **bar · la carte des cocktails de saison**, angle jamais traité.
+> Rotation respectée (08/09 = restaurant, 07/09 = food truck). Angle saisonnier tissé
+> (fin d'été → carte d'automne), conformément à `calendrier-marketing.md`.
+> Mercredi = **jour vidéo** : reel de 32,2 s produit, 7 scènes, 7 moteurs distincts,
+> palette `or` stable, `scrim` 0,72, validateur « rien à signaler ».
+>
+> Contrôle qualité : **16 visuels, 0 alerte**, chaque QR décodé vers son lien tracké.
+> 4 épingles, 4 angles distincts, **4 gabarits distincts (layouts 0, 1, 2, 3)** et
+> **4 tableaux distincts**. Une seule épingle hors-food (hôtel) : pont d'audience tenu.
+> Deux re-rendus ont été nécessaires : les sous-titres des gabarits 0 et 2 orphelinaient
+> la flèche en bout de ligne (défaut listé dans `AUDIT-DESIGN-2026-09-03.md`), et le titre
+> de l'épingle hôtel rejetait « ? » » seul sur la dernière ligne. Corrigés, revérifiés à l'œil.
+>
+> **Dépôt fait** (17 PNG via `QRowg-Depot.cmd`), puis **6 posts mis en file**, aucun en erreur :
+> épingle restaurant · plat épuisé (12 h 48 UTC), épingle boulangerie · petit-déj (13 h 03),
+> épingle producteur · fiche conservation (14 h 19), carrousel Instagram (16 h 55),
+> épingle hôtel · plan depuis la gare (17 h 06) et carrousel photo TikTok (20 h 08).
+> **File à 6/10**, réserve vide. Mention « contenu généré par IA » posée sur Instagram ;
+> non envoyée sur le carrousel photo TikTok (l'API la refuse pour ce format).
+> La planche-contact du reel a été déposée avec les visuels (17 PNG au lieu de 16) : elle
+> n'est pas publiée, c'est un fichier de contrôle. À exclure du dossier outputs au prochain run.
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| en-file | qr-code-carte-cocktails-de-saison-bar-01..06.png | Instagram (carrousel) | — | bar · carte des cocktails de saison · la carte suit la saison, le support ne bouge plus | https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260909-bar | 2026-09-09 |
+| en-file | tiktok-qr-code-carte-cocktails-de-saison-bar-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 | https://qrowg.com/qr-code/restaurant?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260909-bar | 2026-09-09 |
+| en-file | qr-code-plat-du-jour-epuise-signale-restaurant.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 0 | restaurant · plat du jour épuisé · le barrer en 10 secondes | https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260909-bar&utm_content=clic | 2026-09-09 |
+| en-file | qr-code-formule-petit-dejeuner-a-emporter-boulangerie.png | Pinterest | QR code boutique commerce (726416683586817655) — gabarit 1 | boulangerie · formule petit-déjeuner à emporter · le prix lisible en trois minutes | https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260909-bar&utm_content=clic | 2026-09-09 |
+| en-file | qr-code-fiche-conservation-produit-de-saison-producteur.png | Pinterest | QR code food truck (726416683586817654) — gabarit 2 | marché/producteur · fiche conservation du produit · le produit ne finit plus à la poubelle | https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260909-bar&utm_content=clic&utm_term=producteur | 2026-09-09 |
+| en-file | qr-code-plan-des-transports-depuis-la-gare-hotel.png | Pinterest | QR code hôtel (726416683586817656) — gabarit 3 | hôtel · plan des transports depuis la gare · le même message n'est plus réécrit à chaque réservation | https://qrowg.com/qr-code/hotel?utm_source=pinterest&utm_medium=pin&utm_campaign=20260909-bar&utm_content=clic | 2026-09-09 |
+
+> La vidéo `qr-code-carte-cocktails-de-saison-bar-reel.mp4` (32,2 s, 1080×1920) reste
+> **manuelle** et n'entre jamais dans ce circuit.
+
+## Textes prêts — 09/09
+
+Légendes complètes (Instagram, TikTok, Pinterest ×4, LinkedIn, reel) avec bouton Copier :
+`social-a-deposer\2026-09-09\textes-du-jour-2026-09-09.html`.
+Bios : `social-a-deposer\2026-09-09\bios-du-jour-2026-09-09.html`.
+Pas de post X aujourd'hui (X = mardi, jeudi, samedi).
+Résumé des titres et tableaux Pinterest :
+
+### qr-code-plat-du-jour-epuise-signale-restaurant
+**Titre Pinterest** : Plat épuisé : le barrer en 10 secondes, sans réimprimer
+**Tableau** : QR code restaurant
+`#restaurant #platdujour #organisation #qrcode`
+
+### qr-code-formule-petit-dejeuner-a-emporter-boulangerie
+**Titre Pinterest** : Formule petit-déj : la monter en 5 minutes, gratuitement
+**Tableau** : QR code boutique commerce
+`#boulangerie #petitdejeuner #organisation #commercelocal`
+
+### qr-code-fiche-conservation-produit-de-saison-producteur
+**Titre Pinterest** : Fiche conservation : la créer en 5 minutes, sans carte bancaire
+**Tableau** : QR code food truck
+`#marche #producteurlocal #circuitcourt #antigaspi`
+
+### qr-code-plan-des-transports-depuis-la-gare-hotel
+**Titre Pinterest** : Plan depuis la gare : la page à faire en 4 étapes
+**Tableau** : QR code hôtel — unique épingle hors-food du jour
+`#chambredhotes #locationsaisonniere #hotel #organisation`
+
+### Lecture des chiffres — 09/09
+
+- **Le carrousel Instagram du 08/09 est EN LIGNE** malgré son statut `error`
+  (« flagged as potential spam ») : un second enregistrement `via: "network"` porte
+  `https://www.instagram.com/p/DdB95BkloaZ/`, publié à 15 h 05. **Ne pas le rejouer.**
+  Conséquence : le correctif d'hier (pas d'URL en légende, 5 hashtags) **n'a pas empêché
+  le flag** — mais le flag n'a jamais empêché la publication non plus. La règle « pas
+  d'URL, 5 hashtags » reste bonne en soi, elle ne doit simplement plus servir de
+  diagnostic. Le vrai problème Instagram est la portée, pas la publication.
+- **Instagram : 0 vue, 0 reach** sur tous les carrousels du 05 au 08/09. Un seul point
+  positif : le reel du 07/09 (`/reel/Dc_ugk2MB6R/`) a fait **1 vue, 5,87 s de visionnage**
+  — c'est-à-dire le seul format qui sort, même marginalement. Le compte n'a pas d'audience.
+- **TikTok reste le seul canal réellement distribué**, mais il redescend :
+  255 vues le 07/09 (2,76 s), **267 le 08/09 (4,26 s)**, **81 aujourd'hui à J+0 (4,92 s)**.
+  Le temps de visionnage moyen remonte pendant que le volume baisse : le contenu tient
+  mieux, il est simplement moins poussé. À relire demain, 81 vues à J+0 n'est pas final.
+- **Pinterest : Buffer affiche 0 impression partout — c'est le défaut de reporting connu.**
+  Ne rien conclure d'ici. La lecture se fait dans Pinterest Analytics, prochaine échéance
+  **le 15/09** pour l'indicateur qui compte, le **clic sortant** (base à battre :
+  2 clics / 1 207 impressions sur 30 jours).

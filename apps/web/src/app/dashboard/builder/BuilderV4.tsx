@@ -169,12 +169,16 @@ import { actionClavier } from "./raccourcisClavier"
       }).catch(() => setAuthState("guest"))
     }, [])
     const [rightTab, setRightTab] = useState<"preview"|"edit"|"theme">("edit")
-    const [editTab, setEditTab] = useState<"contenu"|"style"|"layout"|"avance">("contenu")
+    // Inspecteur (9 septembre, maquette) : trois onglets toujours visibles — Contenu · Style ·
+    // Effets — et « Réglages avancés » replié en bas. Les anciens onglets « Mise en page » et
+    // « Avancé » vivent respectivement dans Style et dans le repli : aucun réglage n'a disparu.
+    const [editTab, setEditTab] = useState<"contenu"|"style"|"effets">("contenu")
+    const [avanceOuvert, setAvanceOuvert] = useState(false)
     // Mode Simple (defaut) = un seul contexte "Contenu" (audit #10/#14 "montrer moins"). Expert = 4 onglets.
     // Defaut false = ce que rend le SSR ; on lit localStorage APRES montage (pas de mismatch d'hydratation),
     // et on persiste DANS le setter (pas dans un effet -> pas d'ecrasement au montage). Cf review #2.
     const [expertMode, setExpertModeRaw] = useState(false)
-    useEffect(() => { try { if (localStorage.getItem("qrfolio_expert_mode") === "1") setExpertModeRaw(true) } catch {} }, [])
+    useEffect(() => { try { if (localStorage.getItem("qrfolio_expert_mode") === "1") { setExpertModeRaw(true); setAvanceOuvert(true) } } catch {} }, [])
     const setExpertMode = (v: boolean | ((p: boolean) => boolean)) => setExpertModeRaw(prev => {
       const next = typeof v === "function" ? v(prev) : v
       try { localStorage.setItem("qrfolio_expert_mode", next ? "1" : "0") } catch {}
@@ -2552,49 +2556,23 @@ import { actionClavier } from "./raccourcisClavier"
                         const TABS = [
                           { k: "contenu", label: "Contenu" },
                           { k: "style", label: "Style" },
-                          { k: "layout", label: "Mise en page" },
-                          { k: "avance", label: "Avancé" },
+                          { k: "effets", label: "Effets" },
                         ] as const
                         return (
                           <>
-                            {/* Onglets d'édition du bloc — visibles seulement en mode Expert (audit #10 : un seul contexte) */}
-                            {expertMode && (
+                            {/* Onglets d'édition du bloc — toujours visibles (maquette : Contenu · Style · Effets) */}
                             <div role="tablist" style={{ display: "flex", gap: 2, borderBottom: "1px solid var(--line)", margin: "0 0 14px" }}>
                               {TABS.map(t => (
                                 <button key={t.k} role="tab" aria-selected={editTab===t.k} onClick={() => setEditTab(t.k)}
                                   style={{ flex: 1, minHeight: isMobile ? 42 : 36, padding: isMobile ? "10px 3px" : "8px 3px", border: "none", borderBottom: `2px solid ${editTab===t.k ? "var(--accent)" : "transparent"}`, marginBottom: -1, cursor: "pointer", background: "transparent", color: editTab===t.k ? "var(--ink)" : MUTED, fontSize: isMobile ? 11.5 : 11, fontWeight: editTab===t.k ? 600 : 500, transition: "color .18s ease, border-color .18s ease", whiteSpace: "nowrap" as const }}>{t.label}</button>
                               ))}
                             </div>
-                            )}
 
                             {/* CONTENU — toujours affiché en mode Simple, ou sous l'onglet Contenu en Expert */}
-                            {(!expertMode || editTab === "contenu") && <EditPanel key={selectedBlock.id+"-c"} block={selectedBlock} onChange={set} only="content" />}
-
-                            {/* MISE EN PAGE */}
-                            {expertMode && editTab === "layout" && (
-                              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                                <EditPanel key={selectedBlock.id+"-l"} block={selectedBlock} onChange={set} only="layout" />
-                                {sel("__width", "Largeur du bloc", BLOCK_WIDTH_OPTIONS, "Normale")}
-                                {sel("__space", "Espacement vertical", BLOCK_SPACE_OPTIONS, "Défaut")}
-                                {/* Taille du texte — curseur (met à l'échelle le contenu du bloc). 100 % = normal. */}
-                                <div>
-                                  <label style={labelStyle}>Taille du texte</label>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                                    <input type="range" min={80} max={140} step={5}
-                                      value={Number(bc.__text_scale) || 100}
-                                      onChange={e => set("__text_scale", e.target.value === "100" ? "" : e.target.value)}
-                                      aria-label="Taille du texte" style={{ flex: 1, accentColor: G }} />
-                                    <span style={{ minWidth: 42, textAlign: "right", color: "var(--ink)", fontSize: 12, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{Number(bc.__text_scale) || 100}%</span>
-                                  </div>
-                                  {(Number(bc.__text_scale) || 100) !== 100 && (
-                                    <button onClick={() => set("__text_scale", "")} style={{ marginTop: 5, background: "none", border: "none", color: MUTED, fontSize: 10, cursor: "pointer", textDecoration: "underline", padding: 0 }}>Réinitialiser</button>
-                                  )}
-                                </div>
-                              </div>
-                            )}
+                            {editTab === "contenu" && <EditPanel key={selectedBlock.id+"-c"} block={selectedBlock} onChange={set} only="content" />}
 
                             {/* STYLE */}
-                            {expertMode && editTab === "style" && (
+                            {editTab === "style" && (
                               <div>
                                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 0 10px" }}>
                                   <p style={secTitle}>Modèles d&apos;apparence</p>
@@ -2604,20 +2582,19 @@ import { actionClavier } from "./raccourcisClavier"
                                 {/* Copier / coller le style entre blocs */}
                                 <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
                                   <button onClick={() => setStyleClipboard(Object.fromEntries(STYLE_COPY_KEYS.map(k => [k, bc[k] || ""])))} title="Copier l'apparence de ce bloc"
-                                    style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "8px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "var(--ink)", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
+                                    className="da-btn-neutral da-btn-neutral--sm" style={{ flex: 1, padding: "8px", fontSize: 11 }}>
                                     <Copy size={11} /> Copier le style
                                   </button>
                                   <button onClick={() => { if (styleClipboard) applyPreset(styleClipboard) }} disabled={!styleClipboard} title={styleClipboard ? "Appliquer l'apparence copiée" : "Copiez d'abord le style d'un bloc"}
-                                    style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "8px", borderRadius: 8, border: `1px solid ${styleClipboard ? "rgba(201,168,76,0.3)" : "rgba(255,255,255,0.07)"}`, background: styleClipboard ? "rgba(201,168,76,0.08)" : "rgba(255,255,255,0.02)", color: styleClipboard ? G : "rgba(255,255,255,0.25)", fontSize: 11, fontWeight: 600, cursor: styleClipboard ? "pointer" : "not-allowed" }}>
-                                    📋 Coller le style
+                                    className="da-btn-neutral da-btn-neutral--sm" style={{ flex: 1, padding: "8px", fontSize: 11, borderColor: styleClipboard ? "color-mix(in srgb, var(--accent) 45%, transparent)" : undefined, color: styleClipboard ? G : "var(--faint)", cursor: styleClipboard ? "pointer" : "not-allowed" }}>
+                                    Coller le style
                                   </button>
                                 </div>
                                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
                                   {BLOCK_STYLE_PRESETS.map(p => (
                                     <button key={p.key} onClick={() => applyPreset(p.apply)} title={`Appliquer le style ${p.label}`}
-                                      style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 10px", borderRadius: 8, border: "1px solid rgba(201,168,76,0.2)", background: "rgba(201,168,76,0.05)", color: "var(--ink)", fontSize: 11, fontWeight: 600, cursor: "pointer" }}
-                                      onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,0.12)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)" }}
-                                      onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,168,76,0.05)"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.2)" }}>
+                                      className="qf-row"
+                                      style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 10px", borderRadius: 8, border: "1px solid var(--line-strong)", background: "var(--surface-2)", color: "var(--ink)", fontSize: 11, fontWeight: 500, cursor: "pointer" }}>
                                       <span style={{ fontSize: 13 }}>{p.emoji}</span>{p.label}
                                     </button>
                                   ))}
@@ -2660,71 +2637,94 @@ import { actionClavier } from "./raccourcisClavier"
                                   {toggle("__border", "Bordure", <Square size={12} />)}
                                   {sel("__radius", "Coins arrondis", BLOCK_RADIUS_OPTIONS, "Défaut")}
                                   {sel("__shadow", "Ombre", BLOCK_SHADOW_OPTIONS, "Non")}
-                                  {toggle("__glow", "Halo lumineux (glow)", <Sparkles size={12} />)}
-                                  {toggle("__glass", "Effet verre (flou)", <Layers size={12} />)}
                                 </div>
                               </div>
                             )}
 
-                            {/* AVANCÉ */}
-                            {expertMode && editTab === "avance" && (
-                              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                            {/* MISE EN PAGE — vit dans l'onglet Style, après l'apparence */}
+                            {editTab === "style" && (
+                              <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 18, paddingTop: 16, borderTop: "1px solid var(--line)" }}>
+                                <p style={secTitle}>Mise en page</p>
+                                <EditPanel key={selectedBlock.id+"-l"} block={selectedBlock} onChange={set} only="layout" />
+                                {sel("__width", "Largeur du bloc", BLOCK_WIDTH_OPTIONS, "Normale")}
+                                {sel("__space", "Espacement vertical", BLOCK_SPACE_OPTIONS, "Défaut")}
+                                {/* Taille du texte — curseur (met à l'échelle le contenu du bloc). 100 % = normal. */}
+                                <div>
+                                  <label style={labelStyle}>Taille du texte</label>
+                                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                    <input type="range" min={80} max={140} step={5}
+                                      value={Number(bc.__text_scale) || 100}
+                                      onChange={e => set("__text_scale", e.target.value === "100" ? "" : e.target.value)}
+                                      aria-label="Taille du texte" style={{ flex: 1, accentColor: G }} />
+                                    <span style={{ minWidth: 42, textAlign: "right", color: "var(--ink)", fontSize: 12, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{Number(bc.__text_scale) || 100}%</span>
+                                  </div>
+                                  {(Number(bc.__text_scale) || 100) !== 100 && (
+                                    <button onClick={() => set("__text_scale", "")} style={{ marginTop: 5, background: "none", border: "none", color: MUTED, fontSize: 10, cursor: "pointer", textDecoration: "underline", padding: 0 }}>Réinitialiser</button>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* EFFETS */}
+                            {editTab === "effets" && (
+                              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                <p style={secTitle}>Animations</p>
+                                {sel("__anim", "À l'apparition (au scroll)", BLOCK_ANIM_OPTIONS, "Aucune")}
+                                {bc.__anim && bc.__anim !== "Aucune" && sel("__anim_speed", "Vitesse d'apparition", BLOCK_ANIM_SPEED_OPTIONS, "Normal")}
+                                {sel("__hover", "Au survol", BLOCK_HOVER_OPTIONS, "Aucun")}
+                                {sel("__loop", "En boucle (emphase)", BLOCK_LOOP_OPTIONS, "Aucune")}
+                                <p style={{ color: MUTED, fontSize: 11, margin: "-2px 0 0" }}>L&apos;apparition se déclenche quand le bloc entre à l&apos;écran (visible sur la page publiée).</p>
+                                <p style={{ ...secTitle, marginTop: 8 }}>Lumière et matière</p>
+                                {toggle("__glow", "Halo lumineux (glow)", <Sparkles size={12} />)}
+                                {toggle("__glass", "Effet verre (flou)", <Layers size={12} />)}
+                              </div>
+                            )}
+
+                            {/* RÉGLAGES AVANCÉS — repliés par défaut (maquette), sous chaque onglet : visibilité, nom interne, actions */}
+                            <div style={{ marginTop: 18, borderTop: "1px solid var(--line)", paddingTop: 10 }}>
+                              <button type="button" onClick={() => setAvanceOuvert(v => !v)} aria-expanded={avanceOuvert} aria-controls="reglages-avances-bloc"
+                                style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, minHeight: 44, padding: "0 12px", border: "1px solid var(--line-strong)", borderRadius: 9, background: "var(--surface-2)", color: "var(--ink)", fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><Settings size={14} aria-hidden="true" /> Réglages avancés</span>
+                                <ChevronDown size={14} aria-hidden="true" style={{ transform: avanceOuvert ? "rotate(180deg)" : "none", transition: "transform .18s" }} />
+                              </button>
+                              {avanceOuvert && (
+                              <div id="reglages-avances-bloc" style={{ display: "flex", flexDirection: "column", gap: 16, marginTop: 14 }}>
                                 <div>
                                   <p style={secTitle}>Visibilité</p>
                                   {[
-                                    { key: "hide_mobile", label: "Afficher sur mobile", icon: "📱" },
-                                    { key: "hide_desktop", label: "Afficher sur ordinateur", icon: "🖥️" },
+                                    { key: "hide_mobile", label: "Afficher sur mobile", icon: <Smartphone size={12} aria-hidden="true" /> },
+                                    { key: "hide_desktop", label: "Afficher sur ordinateur", icon: <Square size={12} aria-hidden="true" /> },
                                   ].map(o => {
                                     const shown = bc[o.key] !== "yes" // "yes" = masqué
                                     return (
                                       <div key={o.key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "7px 0" }}>
-                                        <span style={{ color: "var(--ink)", fontSize: 12, display: "flex", alignItems: "center", gap: 7 }}><span>{o.icon}</span>{o.label}</span>
-                                        <button onClick={() => set(o.key, shown ? "yes" : "")} title={shown ? "Cliquer pour masquer" : "Cliquer pour afficher"}
-                                          style={{ width: 42, height: 24, borderRadius: 12, background: shown ? G : "rgba(255,255,255,0.12)", border: "none", cursor: "pointer", position: "relative", transition: "background .2s", flexShrink: 0 }}>
-                                          <span style={{ position: "absolute", top: 3, left: shown ? 21 : 3, width: 18, height: 18, borderRadius: "50%", background: "#fff", transition: "left .2s", boxShadow: "0 1px 4px rgba(0,0,0,0.3)" }} />
+                                        <span style={{ color: "var(--ink)", fontSize: 12, display: "flex", alignItems: "center", gap: 7 }}><span style={{ display: "inline-flex" }}>{o.icon}</span>{o.label}</span>
+                                        <button onClick={() => set(o.key, shown ? "yes" : "")} title={shown ? "Cliquer pour masquer" : "Cliquer pour afficher"} aria-pressed={shown} aria-label={o.label}
+                                          style={{ width: 42, height: 24, borderRadius: 12, background: shown ? G : "var(--surface-2)", border: "1px solid var(--line-strong)", cursor: "pointer", position: "relative", transition: "background .2s", flexShrink: 0 }}>
+                                          <span style={{ position: "absolute", top: 2, left: shown ? 20 : 2, width: 18, height: 18, borderRadius: "50%", background: "#fff", transition: "left .2s" }} />
                                         </button>
                                       </div>
                                     )
                                   })}
                                   {(bc.hide_mobile === "yes" || bc.hide_desktop === "yes") && (
-                                    <p style={{ color: "#F59E0B", fontSize: 9.5, margin: "4px 0 0" }}>⚠ Ce bloc est masqué sur {bc.hide_mobile === "yes" ? "mobile" : ""}{bc.hide_mobile === "yes" && bc.hide_desktop === "yes" ? " et " : ""}{bc.hide_desktop === "yes" ? "ordinateur" : ""} (page publiée).</p>
+                                    <p style={{ color: "var(--warning)", fontSize: 11, margin: "4px 0 0" }}>⚠ Ce bloc est masqué sur {bc.hide_mobile === "yes" ? "mobile" : ""}{bc.hide_mobile === "yes" && bc.hide_desktop === "yes" ? " et " : ""}{bc.hide_desktop === "yes" ? "ordinateur" : ""} (page publiée).</p>
                                   )}
-                                </div>
-                                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                                  <p style={secTitle}>Animations</p>
-                                  {sel("__anim", "À l'apparition (au scroll)", BLOCK_ANIM_OPTIONS, "Aucune")}
-                                  {bc.__anim && bc.__anim !== "Aucune" && sel("__anim_speed", "Vitesse d'apparition", BLOCK_ANIM_SPEED_OPTIONS, "Normal")}
-                                  {sel("__hover", "Au survol", BLOCK_HOVER_OPTIONS, "Aucun")}
-                                  {sel("__loop", "En boucle (emphase)", BLOCK_LOOP_OPTIONS, "Aucune")}
-                                  <p style={{ color: MUTED, fontSize: 9.5, margin: "-2px 0 0" }}>L&apos;apparition se déclenche quand le bloc entre à l&apos;écran (visible sur la page publiée).</p>
                                 </div>
                                 <div>
                                   <p style={secTitle}>Nom interne</p>
-                                  <input type="text" value={bc.__name || ""} onChange={e => set("__name", e.target.value)} placeholder="Ex : Section horaires (privé)" style={{ ...selStyle, cursor: "text" }} />
-                                  <p style={{ color: MUTED, fontSize: 9.5, margin: "4px 0 0" }}>Aide-mémoire visible uniquement par vous.</p>
+                                  <input type="text" value={bc.__name || ""} onChange={e => set("__name", e.target.value)} placeholder="Ex : Section horaires (privé)" aria-label="Nom interne du bloc" style={{ ...selStyle, cursor: "text" }} />
+                                  <p style={{ color: MUTED, fontSize: 11, margin: "4px 0 0" }}>Aide-mémoire visible uniquement par vous.</p>
                                 </div>
                                 <div>
                                   <p style={secTitle}>Actions</p>
                                   <div style={{ display: "flex", gap: 6 }}>
-                                    <button onClick={() => duplicateBlock(selectedBlock.id)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "var(--ink)", fontSize: 12, cursor: "pointer" }}><Copy size={11} /> Dupliquer</button>
-                                    {!selectedBlock.locked && <button onClick={() => deleteBlock(selectedBlock.id)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", borderRadius: 8, border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.07)", color: "var(--danger)", fontSize: 12, cursor: "pointer" }}><Trash2 size={11} /> Supprimer</button>}
+                                    <button onClick={() => duplicateBlock(selectedBlock.id)} className="da-btn-neutral da-btn-neutral--sm" style={{ flex: 1 }}><Copy size={11} /> Dupliquer</button>
+                                    {!selectedBlock.locked && <button onClick={() => deleteBlock(selectedBlock.id)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", borderRadius: 10, border: "1px solid var(--danger-border)", background: "var(--danger-bg)", color: "var(--danger)", fontSize: 12, cursor: "pointer" }}><Trash2 size={11} /> Supprimer</button>}
                                   </div>
                                 </div>
                               </div>
-                            )}
-
-                            {/* Bascule Simple <-> Expert (audit #10/#14 : options avancees masquees par defaut) */}
-                            {!expertMode ? (
-                              <button type="button" onClick={() => { setExpertMode(true); setEditTab("style") }}
-                                style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, minHeight: 46, marginTop: 16, border: "1px dashed rgba(255,255,255,0.14)", borderRadius: 11, background: "rgba(255,255,255,0.02)", color: MUTED, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>
-                                <Settings size={15} /> Style &amp; options avancées
-                              </button>
-                            ) : (
-                              <button type="button" onClick={() => { setExpertMode(false); setEditTab("contenu") }}
-                                style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, minHeight: 42, marginTop: 16, border: "none", background: "none", color: MUTED, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
-                                ← Revenir au mode simple
-                              </button>
-                            )}
+                              )}
+                            </div>
                           </>
                         )
                       })()}
@@ -2980,7 +2980,7 @@ import { actionClavier } from "./raccourcisClavier"
             { id: "outline", label: "Plan de la page", keywords: "plan structure calques navigation sommaire", icon: "☰", run: () => setOutlineOpen(true) },
             { id: "theme", label: "Ouvrir le thème", keywords: "thème couleur police design", icon: "🎨", run: () => setRightTab("theme") },
             { id: "focus", label: "Mode Focus", hint: "Ctrl+F", keywords: "focus concentration", icon: "◱", run: toggleFocus },
-            { id: "expert", label: expertMode ? "Passer en mode Simple" : "Passer en mode Expert", keywords: "simple expert avancé", icon: "⚙", run: () => setExpertMode(v => !v) },
+            { id: "expert", label: expertMode ? "Replier les réglages avancés" : "Déplier les réglages avancés", keywords: "simple expert avancé réglages", icon: "⚙", run: () => { setExpertMode(v => !v); setAvanceOuvert(v => !v) } },
           ] as PaletteCommand[]}
         />
 
