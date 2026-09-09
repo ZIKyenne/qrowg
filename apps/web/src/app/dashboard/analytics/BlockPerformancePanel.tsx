@@ -62,7 +62,7 @@ function Tip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   const cfg = getCfg(label)
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "10px 14px" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 8, padding: "10px 14px" }}>
       <p style={{ color: cfg.color, fontWeight: 700, fontSize: 12, margin: "0 0 6px" }}>
         {cfg.icon} {cfg.label}
       </p>
@@ -171,7 +171,7 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
     }))
 
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
@@ -192,7 +192,7 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
           {pages.length > 1 && page == null && (
             <select aria-label="Filtrer par page" value={pageId} onChange={e => setPageId(e.target.value)}
-              style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 9, color: "var(--ink)", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
+              style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 9, color: "var(--ink)", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
               <option value="all">Toutes les pages</option>
               {pages.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
             </select>

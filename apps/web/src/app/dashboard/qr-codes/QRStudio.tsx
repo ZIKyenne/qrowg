@@ -1079,7 +1079,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         <div onClick={() => setModeSheet(false)} style={{ position:"fixed", inset:0, zIndex:2050, background:"rgba(0,0,0,0.55)", backdropFilter:"blur(3px)", display:"flex", alignItems:"flex-end" }}>
           <div onClick={e => e.stopPropagation()} style={{ width:"100%", background:"#141109", borderTop:"1px solid color-mix(in srgb, var(--accent) 22%, transparent)", borderTopLeftRadius:22, borderTopRightRadius:22, padding:"10px 16px calc(18px + env(safe-area-inset-bottom))" }}>
             <div style={{ width:40, height:4, borderRadius:4, background:"rgba(255,255,255,0.18)", margin:"0 auto 14px" }} />
-            <p style={{ color:"var(--ink)", fontSize:16, fontWeight:700, margin:"0 0 12px", fontFamily:"Fraunces, serif" }}>Niveau de réglages</p>
+            <p style={{ color:"var(--ink)", fontSize:16, fontWeight:600, margin:"0 0 12px" }}>Niveau de réglages</p>
             {([["simple","Simple","L'essentiel : un style et les couleurs. Pour aller vite."],["inter","Intermédiaire","+ formes des modules et des coins."],["expert","Expert","Tous les réglages : logo, dégradés, marge, correction d'erreur…"]] as const).map(([k,l,d]) => (
               <button key={k} type="button" onClick={() => { setLevel(k); setModeSheet(false) }}
                 style={{ display:"flex", alignItems:"flex-start", gap:11, width:"100%", textAlign:"left" as const, padding:"13px 12px", marginBottom:6, borderRadius:12, cursor:"pointer",
@@ -1726,15 +1726,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   </div>
                   {/* Enregistrer le style (or) + Appliquer à tous (fantôme) — sous l'aperçu, gauche/droite */}
                   <div style={{ display:"flex", gap:8, width:"100%", alignItems:"stretch" }}>
-                    <div style={{ position:"relative", flex:1, display:"flex" }}>
-                      <div aria-hidden="true" className="qb-halo" />
-                      <button type="button" onClick={saveCustomization} disabled={saving} className="qb-gold qb-save" style={{ padding:"12px 16px", fontSize:13.5 }}>
-                        <span aria-hidden="true" className="qb-gloss" />
-                        <span aria-hidden="true" className="qb-sheen" />
-                        <span className="qb-ico">{saving ? <Loader2 size={14} style={{ animation:"mo-spin 0.8s linear infinite" }}/> : saved ? <Check size={14}/> : <Palette size={14}/>}</span>
-                        <span style={{ position:"relative", zIndex:1 }}>{saving ? "Enregistrement…" : saved ? "Enregistré" : "Enregistrer le style"}</span>
-                      </button>
-                    </div>
+                    {/* Un seul bouton or par colonne : Télécharger. Enregistrer le style passe en contour. */}
+                    <button type="button" onClick={saveCustomization} disabled={saving} className="qb-ghost qb-save" style={{ flex:1, padding:"12px 16px", fontSize:13.5 }}>
+                      <span className="qb-ico">{saving ? <Loader2 size={14} style={{ animation:"mo-spin 0.8s linear infinite" }}/> : saved ? <Check size={14}/> : <Palette size={14}/>}</span>
+                      <span>{saving ? "Enregistrement…" : saved ? "Enregistré" : "Enregistrer le style"}</span>
+                    </button>
                     <button type="button" onClick={() => setApplyAllModal(true)} className="qb-phantom" style={{ flex:1, padding:"12px 16px", fontSize:13, ...(applyAllOk ? { color:"var(--success)" } : {}) }}>
                       {applyAllOk ? <Check size={13}/> : <Settings size={13}/>}
                       {applyAllOk ? "Appliqué à tous" : "Appliquer à tous"}

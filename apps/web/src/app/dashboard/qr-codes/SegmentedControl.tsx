@@ -1,8 +1,8 @@
 "use client"
 
-// Sélecteur segmenté doré (handoff « Segmented Control ») : indicateur qui glisse sous l'option active,
-// reflet balayant rejoué à chaque changement (via key={moves}), halo doré qui respire en boucle.
-// Fidèle au spec (couleurs/durées/courbes) ; N options ; a11y (tablist/tab + flèches + focus) ; reduced-motion.
+// Sélecteur segmenté (8 septembre, maquette) : indicateur qui glisse sous l'option active,
+// surface claire + encre + filet d'accent — plus de halo qui respire ni de reflet doré.
+// N options ; a11y (tablist/tab + flèches + focus) ; reduced-motion.
 import { useRef, useState } from "react"
 
 export function SegmentedControl({
@@ -33,31 +33,22 @@ export function SegmentedControl({
   return (
     <div style={{ position: "relative", display: "inline-flex", width: "100%", maxWidth: 440 }}>
       <style>{`
-        @keyframes scGlow { 0%{opacity:.45;transform:scale(.95)} 50%{opacity:.9;transform:scale(1.05)} 100%{opacity:.45;transform:scale(.95)} }
-        @keyframes scSheen { 0%{transform:translateX(-140%) skewX(-18deg);opacity:0} 14%{opacity:.8} 100%{transform:translateX(260%) skewX(-18deg);opacity:0} }
-        .sc-halo{animation:scGlow 6s ease-in-out infinite}
-        .sc-sheen{animation:scSheen .8s cubic-bezier(.3,.7,.3,1) 40ms both}
-        .sc-tab:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(201,162,77,.35)}
-        @media (prefers-reduced-motion: reduce){ .sc-halo,.sc-sheen{animation:none!important} .sc-thumb{transition-duration:.01ms!important} }
+        .sc-tab:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent)}
+        @media (prefers-reduced-motion: reduce){ .sc-thumb{transition-duration:.01ms!important} }
       `}</style>
 
-      {/* Halo qui respire (décoratif) */}
-      <div aria-hidden="true" className="sc-halo" style={{ position: "absolute", inset: -10, borderRadius: 999, background: "radial-gradient(58% 118% at 50% 50%, rgba(201,162,77,.20), rgba(201,162,77,0) 70%)", filter: "blur(16px)", pointerEvents: "none", willChange: "transform, opacity" }} />
-
       {/* Rail */}
-      <div role="tablist" aria-label={ariaLabel} onKeyDown={onKey} style={{ position: "relative", display: "grid", gridAutoFlow: "column", gridAutoColumns: "1fr", width: "100%", padding: 5, borderRadius: 999, background: "#100e0c", border: "1px solid var(--surface-2)", boxShadow: "0 1px 0 rgba(255,255,255,.04) inset, 0 -1px 0 rgba(0,0,0,.6) inset", isolation: "isolate" }}>
+      <div role="tablist" aria-label={ariaLabel} onKeyDown={onKey} style={{ position: "relative", display: "grid", gridAutoFlow: "column", gridAutoColumns: "1fr", width: "100%", padding: 3, borderRadius: 9, background: "var(--field)", border: "1px solid var(--line)", isolation: "isolate" }}>
 
-        {/* Indicateur glissant + reflet */}
-        <div aria-hidden="true" className="sc-thumb" style={{ position: "absolute", top: 5, bottom: 5, left: 5, width: `calc((100% - 10px) / ${n})`, transform: `translateX(calc(${value} * 100%))`, transition: "transform .42s cubic-bezier(.2,.85,.2,1)", borderRadius: 999, overflow: "hidden", background: "linear-gradient(135deg, var(--gold-light), var(--accent))", boxShadow: "0 1px 0 rgba(255,255,255,.45) inset, 0 -2px 6px rgba(90,62,20,.4) inset, 0 6px 18px -8px rgba(201,162,77,.5)", pointerEvents: "none" }}>
-          <div key={moves} className="sc-sheen" style={{ position: "absolute", top: "-20%", bottom: "-20%", left: 0, width: "34%", background: "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.7) 50%, rgba(255,255,255,0) 100%)" }} />
-        </div>
+        {/* Indicateur glissant */}
+        <div aria-hidden="true" className="sc-thumb" data-moves={moves} style={{ position: "absolute", top: 3, bottom: 3, left: 3, width: `calc((100% - 6px) / ${n})`, transform: `translateX(calc(${value} * 100%))`, transition: "transform .2s cubic-bezier(.2,.85,.2,1)", borderRadius: 7, background: "var(--surface-2)", border: "1px solid var(--line-strong)", boxShadow: "inset 0 -2px 0 var(--accent)", boxSizing: "border-box", pointerEvents: "none" }} />
 
         {/* Options */}
         {labels.map((l, i) => {
           const on = i === value
           return (
             <button key={l} ref={el => { refs.current[i] = el }} role="tab" aria-selected={on} tabIndex={on ? 0 : -1} type="button" onClick={() => select(i)} className="sc-tab"
-              style={{ position: "relative", zIndex: 1, appearance: "none", border: "none", background: "transparent", cursor: "pointer", padding: dense ? "9px 6px" : "12px 18px", borderRadius: 999, fontFamily: "inherit", fontSize: dense ? 12 : 15, fontWeight: on ? 600 : 500, color: on ? "#1a1408" : "#8a8177", transition: "color .2s ease, font-weight .18s ease", whiteSpace: "nowrap" }}>
+              style={{ position: "relative", zIndex: 1, appearance: "none", border: "none", background: "transparent", cursor: "pointer", padding: dense ? "8px 6px" : "11px 18px", borderRadius: 7, fontFamily: "inherit", fontSize: dense ? 12 : 14, fontWeight: on ? 600 : 500, color: on ? "var(--ink)" : "var(--muted)", transition: "color .2s ease, font-weight .18s ease", whiteSpace: "nowrap" }}>
               {l}
             </button>
           )

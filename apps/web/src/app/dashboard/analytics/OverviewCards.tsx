@@ -8,10 +8,10 @@
 import { useMemo, useState, type CSSProperties } from "react"
 
 // ── Palette du design (tokens du handoff) ───────────────────────────────────
-const CARD_BG = "#141210", CARD_BC = "#221f1b"
-const GOLD = "#e8c877", GOLD_DEEP = "#c9a24d"
-const GREEN = "#3ee08a"
-const T1 = "#e8e3da", T2 = "#c8bfb2", T3 = "#8a8177", T4 = "#6b6258"
+const CARD_BG = "var(--surface)", CARD_BC = "var(--line-strong)"
+const GOLD = "#E3C56B", GOLD_DEEP = "#D4AF45"
+const GREEN = "#A7A69F" // seconde série en gris (maquette) : l'or reste aux scans
+const T1 = "var(--ink)", T2 = "#C9C3B6", T3 = "var(--muted)", T4 = "var(--faint)"
 
 type DailyPoint = { date: string; scans: number; views: number }
 type PageRow = { id: string; title: string; total_views: number }
@@ -74,8 +74,8 @@ export function OverviewChart({ daily, rangeLabel = "30 derniers jours" }: { dai
   const noViews = showViews && !g.anyViews
 
   const chip = (active: boolean): CSSProperties => active
-    ? { background: "rgba(232,200,119,.10)", border: "1px solid rgba(232,200,119,.45)", color: GOLD, fontWeight: 700 }
-    : { background: "transparent", border: `1px solid #26211a`, color: T3, fontWeight: 500 }
+    ? { background: "var(--surface-2)", border: "1px solid var(--line-strong)", color: "var(--ink)", fontWeight: 600 }
+    : { background: "transparent", border: `1px solid var(--line-strong)`, color: T3, fontWeight: 500 }
 
   const hvX = hover === null ? "0%" : `${(hover / (g.n - 1)) * 100}%`
   const hvY = hover === null ? "0%" : `${(g.py(g.scans[hover]) / g.H) * 100}%`

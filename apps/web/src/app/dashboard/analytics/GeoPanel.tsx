@@ -130,7 +130,7 @@ export default function GeoPanel({ scans, pageViews, pages, page, periodDays }: 
   byCountry.forEach(c => { countryMap[c.code] = c.total })
 
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
@@ -150,7 +150,7 @@ export default function GeoPanel({ scans, pageViews, pages, page, periodDays }: 
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
           {pages.length > 1 && page == null && (
             <select aria-label="Filtrer par page" value={pageId} onChange={e => setPageId(e.target.value)}
-              style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 9, color: "var(--ink)", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
+              style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 9, color: "var(--ink)", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
               <option value="all">Toutes les pages</option>
               {pages.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
             </select>
@@ -277,7 +277,7 @@ export default function GeoPanel({ scans, pageViews, pages, page, periodDays }: 
                 { icon: <ZoomOut size={14} />, action: () => setZoom(z => Math.max(z - 0.5, 1)) },
               ].map((btn, i) => (
                 <button key={i} type="button" onClick={btn.action}
-                  style={{ width: 28, height: 28, background: "color-mix(in srgb, var(--accent) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 7, color: G, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  style={{ width: 28, height: 28, background: "color-mix(in srgb, var(--accent) 12%, transparent)", border: "1px solid var(--line-strong)", borderRadius: 7, color: G, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   {btn.icon}
                 </button>
               ))}
@@ -285,7 +285,7 @@ export default function GeoPanel({ scans, pageViews, pages, page, periodDays }: 
 
             {/* Tooltip hover */}
             {hover && countryMap[hover] !== undefined && (
-              <div style={{ position: "absolute", top: 10, left: 10, zIndex: 10, background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "8px 12px", pointerEvents: "none" }}>
+              <div style={{ position: "absolute", top: 10, left: 10, zIndex: 10, background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 8, padding: "8px 12px", pointerEvents: "none" }}>
                 <p style={{ color: "var(--ink)", fontSize: 12, fontWeight: 700, margin: "0 0 3px" }}>{getName(hover)}</p>
                 <p style={{ color: G, fontSize: 11, margin: 0 }}>{countryMap[hover].toLocaleString()} visites</p>
               </div>

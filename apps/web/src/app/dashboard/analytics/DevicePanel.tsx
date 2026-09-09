@@ -92,7 +92,7 @@ function PieTip({ active, payload }: any) {
   if (!active || !payload?.length) return null
   const d = payload[0]
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "8px 12px" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 8, padding: "8px 12px" }}>
       <p style={{ color: d.payload.color || G, fontSize: 12, fontWeight: 700, margin: "0 0 3px" }}>{d.name}</p>
       <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 700, margin: 0 }}>{d.value} · {d.payload.pct}%</p>
     </div>
@@ -102,7 +102,7 @@ function PieTip({ active, payload }: any) {
 function BarTip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "8px 12px" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 8, padding: "8px 12px" }}>
       <p style={{ color: G, fontSize: 12, fontWeight: 700, margin: "0 0 3px" }}>{label}</p>
       {payload.map((p: any, i: number) => (
         <p key={i} style={{ color: p.color, fontSize: 12, fontWeight: 600, margin: "2px 0" }}>
@@ -194,7 +194,7 @@ export default function DevicePanel({ scans, pageViews, pages, page, periodDays 
   const topDevice = deviceData[0]
 
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
@@ -214,7 +214,7 @@ export default function DevicePanel({ scans, pageViews, pages, page, periodDays 
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
           {pages.length > 1 && page == null && (
             <select aria-label="Filtrer par page" value={pageId} onChange={e => setPageId(e.target.value)}
-              style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 9, color: "var(--ink)", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
+              style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 9, color: "var(--ink)", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
               <option value="all">Toutes les pages</option>
               {pages.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
             </select>

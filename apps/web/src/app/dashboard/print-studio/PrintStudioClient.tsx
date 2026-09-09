@@ -897,23 +897,23 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
             <Link href="/dashboard/qr-codes" className="ps2-chip" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 13px 6px 10px", borderRadius: 999, border: "1px solid #26211a", color: "var(--muted)", fontSize: 12, fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap" }}>
               <span aria-hidden style={{ width: 6, height: 6, borderLeft: "1.5px solid currentColor", borderBottom: "1.5px solid currentColor", transform: "rotate(45deg)" }} /> QR codes
             </Link>
-            <span style={{ fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 700 }}>Atelier d'impression</span>
           </header>
 
-          {/* Titre + compteurs réels */}
+          {/* Titre + compteurs réels — même en-tête que les autres écrans (kicker · titre 22 px · sous-titre) */}
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24, flexWrap: "wrap" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 620 }}>
-              <h1 style={{ fontFamily: "Fraunces, Georgia, serif", fontSize: "clamp(26px,4vw,34px)", fontWeight: 700, letterSpacing: "-.025em", lineHeight: 1.05, margin: 0 }}>Choisissez un support</h1>
-              <p style={{ fontSize: 14.5, lineHeight: 1.5, color: "var(--muted)", margin: 0, textWrap: "pretty" as any }}>Un objet réel, déjà réussi. Trois suffisent : à table, en vitrine, dans la main.</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 620 }}>
+              <span style={{ fontSize: 10.5, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700 }}>Imprimer · Atelier d'impression</span>
+              <h1 style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-.01em", lineHeight: 1.2, margin: 0 }}>Choisissez un support</h1>
+              <p style={{ fontSize: 13.5, lineHeight: 1.5, color: "var(--muted)", margin: 0, textWrap: "pretty" as any }}>Un objet réel, déjà réussi. Trois suffisent : à table, en vitrine, dans la main.</p>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 22, padding: "14px 20px", borderRadius: 12, background: "var(--surface)", border: "1px solid var(--surface-2)" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                <div style={{ fontSize: 17, fontWeight: 700, color: "var(--gold-light)", letterSpacing: "-.01em" }}>{allItems.length}</div>
+                <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)", letterSpacing: "-.01em", fontVariantNumeric: "tabular-nums" }}>{allItems.length}</div>
                 <div style={{ fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 600 }}>Supports</div>
               </div>
               <span style={{ width: 1, height: 26, background: "var(--surface-2)" }} />
               <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                <div style={{ fontSize: 17, fontWeight: 700, color: "var(--gold-light)", letterSpacing: "-.01em" }}>{totalFormats}</div>
+                <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)", letterSpacing: "-.01em", fontVariantNumeric: "tabular-nums" }}>{totalFormats}</div>
                 <div style={{ fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 600 }}>Formats</div>
               </div>
             </div>

@@ -52,7 +52,8 @@ interface Props {
 const GOLD = "var(--accent)"
 const NEON = "var(--success)"
 const MUTED = "var(--muted)"
-const COLORS = [GOLD, NEON, "#7B61FF", "var(--danger)", "#4ECDC4", "#FFE66D"]
+// Palette catégorielle calme : l'or d'abord, puis des teintes désaturées qui restent distinguables.
+const COLORS = [GOLD, "#A7A69F", "#6FA8A0", "#8C7BC8", "#C08457", "#5E6A8C"]
 
 function formatAgo(iso: string) {
   const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
@@ -66,7 +67,7 @@ function formatAgo(iso: string) {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "10px 14px" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 8, padding: "10px 14px" }}>
       <p style={{ color: "var(--muted)", fontSize: 12, marginBottom: 4 }}>{label}</p>
       {payload.map((p: any, i: number) => (
         <p key={i} style={{ color: p.color, fontSize: 13, fontWeight: 600 }}>
@@ -180,7 +181,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
   }, [noData, sourceData, deviceData, filteredScans, filteredViews])
 
   return (
-    <div className="analytics-root" style={{ minHeight: "100dvh", background: "radial-gradient(1100px 520px at 75% -8%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%)", padding: "22px 24px 44px", fontFamily: "DM Sans, sans-serif", position: "relative", overflowX: "clip", maxWidth: "100%", boxSizing: "border-box" as const }}>
+    <div className="analytics-root" style={{ minHeight: "100dvh", background: "var(--bg)", padding: "22px 24px 44px", fontFamily: "DM Sans, sans-serif", position: "relative", overflowX: "clip", maxWidth: "100%", boxSizing: "border-box" as const }}>
       <style>{`
         @keyframes ring{0%{box-shadow:0 0 0 0 rgba(57,255,143,0.5)}70%{box-shadow:0 0 0 8px rgba(57,255,143,0)}100%{box-shadow:0 0 0 0 rgba(57,255,143,0)}}
         .az{animation:mo-fade-up .5s var(--mo-ease-standard) backwards}
@@ -217,7 +218,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             aria-label="Filtrer par page" value={selectedPage}
             onChange={e => setSelectedPage(e.target.value)}
             style={{
-              background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)",
+              background: "var(--field)", border: "1px solid var(--line-strong)",
               borderRadius: 10, color: "var(--ink)", padding: "9px 14px", fontSize: 13.5, cursor: "pointer"
             }}
           >
@@ -225,10 +226,10 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             {pages.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
           </select>
           {/* Période unique : pilote tous les panneaux (dedup #2) */}
-          <div role="group" aria-label="Période" style={{ display: "flex", gap: 3, background: "var(--surface)", border: "1px solid var(--surface-2)", borderRadius: 10, padding: 3 }}>
+          <div role="group" aria-label="Période" style={{ display: "flex", gap: 3, background: "var(--field)", border: "1px solid var(--line)", borderRadius: 10, padding: 3 }}>
             {[7, 30, 90].map(d => (
               <button key={d} type="button" aria-pressed={period === d} onClick={() => setPeriod(d)}
-                style={{ padding: "7px 13px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 12.5, fontWeight: period === d ? 700 : 500, background: period === d ? "var(--accent)" : "transparent", color: period === d ? "#1a1408" : MUTED }}>{d}j</button>
+                style={{ padding: "7px 13px", borderRadius: 7, border: `1px solid ${period === d ? "var(--line-strong)" : "transparent"}`, cursor: "pointer", fontSize: 12.5, fontWeight: period === d ? 600 : 500, background: period === d ? "var(--surface-2)" : "transparent", color: period === d ? "var(--ink)" : MUTED, boxShadow: period === d ? "inset 0 -2px 0 var(--accent)" : "none" }}>{d}j</button>
             ))}
           </div>
           </>} />
@@ -247,7 +248,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
               return (
                 <button key={t.id} role="tab" aria-selected={on} onClick={() => setTab(t.id)} style={{ position: "relative", display: "flex", alignItems: "center", gap: 9, padding: "11px 16px 13px", cursor: "pointer", fontSize: 13.5, fontWeight: on ? 700 : 500, color: on ? "#e8c877" : "#8a8177", background: "none", border: "none", fontFamily: "inherit", transition: "color .2s ease", whiteSpace: "nowrap" }}>
                   {t.icon} {t.label}
-                  {on && <span aria-hidden style={{ position: "absolute", left: 10, right: 10, bottom: -1, height: 2, borderRadius: 2, background: "linear-gradient(90deg,var(--gold-light),var(--accent))" }} />}
+                  {on && <span aria-hidden style={{ position: "absolute", left: 10, right: 10, bottom: -1, height: 2, borderRadius: 2, background: "var(--accent)" }} />}
                 </button>
               )
             })}
@@ -257,17 +258,15 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
         {/* État vide pédagogique : aucune donnée encore */}
         {noData && (
           <div className="az" style={{ marginBottom: 14, padding: "22px 24px", borderRadius: 16, position: "relative", overflow: "hidden",
-            background: "linear-gradient(135deg, color-mix(in srgb,#7B61FF 12%,#100F0A), #100F0A)",
-            border: "1px solid rgba(123,97,255,0.3)", boxShadow: "0 10px 34px rgba(0,0,0,0.3)" }}>
-            <div style={{ position: "absolute", top: -30, right: -20, width: 150, height: 150, borderRadius: "50%", background: "radial-gradient(circle, rgba(123,97,255,0.16), transparent 70%)" }} />
+            background: "var(--surface)", border: "1px solid var(--line-strong)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 6 }}>
-              <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, background: "rgba(123,97,255,0.18)", color: "#A78BFA" }}><BarChart2 size={15} /></span>
-              <span style={{ color: "#A78BFA", fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase" as const }}>Bientôt vos données</span>
+              <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, background: "var(--surface-2)", color: "var(--accent)" }}><BarChart2 size={15} /></span>
+              <span style={{ color: "var(--faint)", fontSize: 10.5, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase" as const }}>Bientôt vos données</span>
             </div>
-            <h2 style={{ color: "#F8F4EC", fontSize: 21, fontWeight: 700, margin: "0 0 4px", fontFamily: "Fraunces, serif", letterSpacing: "-0.3px" }}>
+            <h2 style={{ color: "var(--ink)", fontSize: 18, fontWeight: 600, margin: "0 0 4px", letterSpacing: "-.01em" }}>
               Vos statistiques apparaîtront ici dès le premier scan
             </h2>
-            <p style={{ color: "#C9C3B6", fontSize: 13, margin: "0 0 14px", lineHeight: 1.55, maxWidth: 620 }}>
+            <p style={{ color: "var(--muted)", fontSize: 13, margin: "0 0 14px", lineHeight: 1.55, maxWidth: 620 }}>
               Vous verrez en temps réel : <strong style={{ color: "var(--ink)" }}>scans &amp; vues</strong>, <strong style={{ color: "var(--ink)" }}>pays &amp; villes</strong>, <strong style={{ color: "var(--ink)" }}>appareils</strong>, <strong style={{ color: "var(--ink)" }}>sources de trafic</strong> et vos <strong style={{ color: "var(--ink)" }}>pages les plus performantes</strong>. Lancez-vous pour activer le suivi.
             </p>
             <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
@@ -289,16 +288,14 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
         {/* ── Synthèse narrative (storytelling) ──────────────────────────── */}
         {!noData && tab === "overview" && story && (
           <div className="az" style={{ marginBottom: 14, padding: "18px 20px", borderRadius: 16, position: "relative", overflow: "hidden",
-            background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 11%, #100F0A), #100F0A)",
-            border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)" }}>
-            <div style={{ position: "absolute", top: -30, right: -20, width: 150, height: 150, borderRadius: "50%", background: "radial-gradient(circle, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%)" }} />
+            background: "var(--surface)", border: "1px solid var(--line-strong)", borderLeft: "3px solid var(--accent)" }}>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 12, position: "relative" }}>
               <span style={{ flexShrink: 0, lineHeight: 1.1, color: "var(--accent)" }}>{live.evo < -5 ? <TrendingUp size={19} style={{ transform: "scaleY(-1)" }} /> : <TrendingUp size={19} />}</span>
               <div style={{ minWidth: 0 }}>
-                <p style={{ color: "#F8F4EC", fontSize: 16, fontWeight: 700, margin: "0 0 3px", fontFamily: "Fraunces, serif", letterSpacing: "-0.2px" }}>
+                <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 600, margin: "0 0 3px", letterSpacing: "-.01em" }}>
                   {live.evo > 5 ? "Votre trafic augmente." : live.evo < -5 ? "Votre trafic ralentit un peu." : "Votre QR est suivi en temps réel."}
                 </p>
-                <p style={{ color: "#C9C3B6", fontSize: 13.5, margin: 0, lineHeight: 1.55 }}>
+                <p style={{ color: "var(--muted)", fontSize: 13.5, margin: 0, lineHeight: 1.55 }}>
                   {totalScans30} scan{totalScans30 > 1 ? "s" : ""} sur 30 jours
                   {story.topSource ? <>, surtout via <strong style={{ color: "var(--ink)" }}>{story.topSource}</strong></> : null}
                   {story.topDevice ? <> sur <strong style={{ color: "var(--ink)" }}>{story.topDevice}</strong></> : null}
@@ -325,20 +322,19 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
         {!noData && tab === "overview" && (
         <div className="az" style={{ animationDelay: "60ms", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 13, marginBottom: 13 }}>
           {/* Visiteurs actifs (hero live) */}
-          <div className="az-card" style={{ background: "linear-gradient(135deg, color-mix(in srgb,var(--success) 11%,#0E0D09), #0E0D09)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 14, padding: "16px 18px", position: "relative", overflow: "hidden" }}>
-            <div style={{ position: "absolute", top: -16, right: -16, width: 80, height: 80, borderRadius: "50%", background: "radial-gradient(circle,rgba(57,255,143,0.16),transparent 70%)" }} />
+          <div className="az-card" style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 14, padding: "16px 18px", position: "relative", overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
               <span style={{ width: 9, height: 9, borderRadius: "50%", background: "var(--success)", animation: live.active ? "ring 1.6s infinite" : "mo-pulse 2s infinite" }} />
-              <span style={{ color: "var(--success)", fontSize: 11.5, fontWeight: 700 }}>Visiteurs actifs</span>
+              <span style={{ color: "var(--muted)", fontSize: 11.5, fontWeight: 600 }}>Visiteurs actifs</span>
             </div>
-            <p style={{ color: "#F8F4EC", fontSize: 38, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif", lineHeight: 1 }}>{live.active}</p>
-            <p style={{ color: "rgba(57,255,143,0.7)", fontSize: 10.5, margin: "2px 0 0" }}>sur les 10 dernières minutes</p>
+            <p style={{ color: "var(--ink)", fontSize: 36, fontWeight: 600, margin: 0, lineHeight: 1, letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums" }}>{live.active}</p>
+            <p style={{ color: "var(--muted)", fontSize: 10.5, margin: "2px 0 0" }}>sur les 10 dernières minutes</p>
           </div>
           {/* Aujourd'hui + évolution */}
-          <div className="az-card" style={{ background: "#100F0A", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius: 14, padding: "16px 18px", position: "relative", overflow: "hidden" }}>
+          <div className="az-card" style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 14, padding: "16px 18px", position: "relative", overflow: "hidden" }}>
             <p style={{ color: "var(--muted)", fontSize: 11.5, fontWeight: 600, margin: "0 0 8px" }}>Activité aujourd'hui</p>
             <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-              <p style={{ color: "#F8F4EC", fontSize: 38, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif", lineHeight: 1 }}>{live.todayN}</p>
+              <p style={{ color: "var(--ink)", fontSize: 36, fontWeight: 600, margin: 0, lineHeight: 1, letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums" }}>{live.todayN}</p>
               <span style={{ display: "inline-flex", alignItems: "center", gap: 3, color: live.evo >= 0 ? "var(--success)" : "var(--danger)", fontSize: 12.5, fontWeight: 700 }}>
                 <TrendingUp size={13} style={{ transform: live.evo >= 0 ? "none" : "scaleY(-1)" }} /> {live.evo >= 0 ? "+" : ""}{live.evo}%
               </span>
@@ -346,11 +342,11 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             <p style={{ color: MUTED, fontSize: 10.5, margin: "2px 0 0" }}>vs hier ({live.ydayN}) · scans + vues</p>
           </div>
           {/* Dernier événement */}
-          <div className="az-card" style={{ background: "#100F0A", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius: 14, padding: "16px 18px" }}>
+          <div className="az-card" style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 14, padding: "16px 18px" }}>
             <p style={{ color: "var(--muted)", fontSize: 11.5, fontWeight: 600, margin: "0 0 8px" }}>Dernier événement</p>
             {live.last ? (
               <>
-                <p style={{ color: "#F8F4EC", fontSize: 19, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif" }}>{live.last.kind}</p>
+                <p style={{ color: "var(--ink)", fontSize: 18, fontWeight: 600, margin: 0 }}>{live.last.kind}</p>
                 <p style={{ color: GOLD, fontSize: 11.5, margin: "3px 0 0", fontWeight: 600 }}>{formatAgo(live.last.t)}</p>
               </>
             ) : (
@@ -367,29 +363,28 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             // Sparkline = série PROPRE à la métrique (README #5). Pages actives / Total scans n'ont pas de
             // série journalière -> pas de sparkline (elles n'empruntent pas la courbe des scans).
             { icon: <QrCode size={18} />, label: `Scans (${period}j)`, value: filteredScans.filter(s => Date.now() - new Date(s.scanned_at).getTime() <= period * 864e5).length, color: GOLD, spark: dailyData.map((d: any) => d.scans as number) },
-            { icon: <Eye size={18} />, label: `Vues (${period}j)`, value: filteredViews.filter(v => Date.now() - new Date(v.viewed_at).getTime() <= period * 864e5).length, color: NEON, spark: dailyData.map((d: any) => d.views as number) },
-            { icon: <BarChart2 size={18} />, label: "Pages actives", value: pages.filter(p => p.status === "published").length, color: "#7B61FF", spark: undefined as number[] | undefined },
-            { icon: <TrendingUp size={18} />, label: "Total scans", value: profile?.total_scans || 0, color: "var(--danger)", spark: undefined as number[] | undefined },
+            { icon: <Eye size={18} />, label: `Vues (${period}j)`, value: filteredViews.filter(v => Date.now() - new Date(v.viewed_at).getTime() <= period * 864e5).length, color: "#A7A69F", spark: dailyData.map((d: any) => d.views as number) },
+            { icon: <BarChart2 size={18} />, label: "Pages actives", value: pages.filter(p => p.status === "published").length, color: GOLD, spark: undefined as number[] | undefined },
+            { icon: <TrendingUp size={18} />, label: "Total scans", value: profile?.total_scans || 0, color: GOLD, spark: undefined as number[] | undefined },
           ].map((kpi, i) => (
             <div key={i} className="az az-card" style={{
               animationDelay: `${120 + i * 60}ms`,
-              background: "#100F0A", border: "1px solid color-mix(in srgb, var(--accent) 13%, transparent)",
+              background: "var(--surface)", border: "1px solid var(--line-strong)",
               borderRadius: 13, padding: "16px 18px",
               display: "flex", alignItems: "center", gap: 14, position: "relative", overflow: "hidden"
             }}>
-              <div style={{ position: "absolute", top: -12, right: -12, width: 60, height: 60, borderRadius: "50%", background: `radial-gradient(circle,${kpi.color}1c,transparent 70%)` }} />
-              <div style={{ color: kpi.color, background: `${kpi.color}1a`, borderRadius: 9, padding: 10, display: "flex" }}>
+              <div style={{ color: kpi.color, background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 9, padding: 10, display: "flex" }}>
                 {kpi.icon}
               </div>
               <div>
-                <p style={{ color: "#C9C3B6", fontSize: 11.5, margin: 0, fontWeight: 500 }}>{kpi.label}</p>
-                <p style={{ color: "#F8F4EC", fontSize: 28, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif", lineHeight: 1.1 }}>{(kpi.value as number).toLocaleString("fr-FR")}</p>
+                <p style={{ color: "var(--muted)", fontSize: 11.5, margin: 0, fontWeight: 500 }}>{kpi.label}</p>
+                <p style={{ color: "var(--ink)", fontSize: 26, fontWeight: 600, margin: 0, lineHeight: 1.1, letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums" }}>{(kpi.value as number).toLocaleString("fr-FR")}</p>
               </div>
               {kpi.spark && (() => {
                 const arr = kpi.spark.slice(-14); const m = Math.max(...arr, 1)
                 return (
                   <div aria-hidden style={{ marginLeft: "auto", display: "flex", alignItems: "flex-end", gap: 2, height: 30 }}>
-                    {arr.map((v, j) => <span key={j} style={{ width: 4, height: Math.max(2, (v / m) * 30), borderRadius: 1.5, background: v ? kpi.color : "#26211a" }} />)}
+                    {arr.map((v, j) => <span key={j} style={{ width: 4, height: Math.max(2, (v / m) * 30), borderRadius: 1.5, background: v ? kpi.color : "var(--surface-2)" }} />)}
                   </div>
                 )
               })()}
@@ -412,7 +407,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
         <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
           {/* Device */}
           <div style={{
-            background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)",
+            background: "var(--surface)", border: "1px solid var(--line-strong)",
             borderRadius: 12, padding: "24px"
           }}>
             <h2 style={{ color: "var(--ink)", fontSize: 16, fontWeight: 600, marginBottom: 20, marginTop: 0, display: "flex", alignItems: "center", gap: 8 }}>
@@ -451,7 +446,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
 
           {/* Source */}
           <div style={{
-            background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)",
+            background: "var(--surface)", border: "1px solid var(--line-strong)",
             borderRadius: 12, padding: "24px"
           }}>
             <h2 style={{ color: "var(--ink)", fontSize: 16, fontWeight: 600, marginBottom: 20, marginTop: 0, display: "flex", alignItems: "center", gap: 8 }}>

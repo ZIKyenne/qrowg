@@ -136,7 +136,7 @@ function calcConversions(goal: Goal, clicks: ClickRow[], views: ViewRow[]) {
 function MiniTip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 7, padding: "6px 10px" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 7, padding: "6px 10px" }}>
       <p style={{ color: MUTED, fontSize: 10, margin: "0 0 2px" }}>{label}</p>
       <p style={{ color: G, fontSize: 13, fontWeight: 700, margin: 0 }}>{payload[0].value} conv.</p>
     </div>

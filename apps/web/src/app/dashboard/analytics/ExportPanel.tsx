@@ -222,7 +222,7 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
   }, [isPaid, selected, period, customFrom, customTo, views, scans, clicks, blocks, geoScans, pageMap])
 
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
@@ -313,19 +313,19 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   <label style={{ color: MUTED, fontSize: 10, fontWeight: 600 }}>Du</label>
                   <input type="date" aria-label="Date de début" value={customFrom} onChange={e => setCustomFrom(e.target.value)}
-                    style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, color: "var(--ink)", padding: "7px 10px", fontSize: 12, outline: "none", cursor: "pointer" }} />
+                    style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 8, color: "var(--ink)", padding: "7px 10px", fontSize: 12, outline: "none", cursor: "pointer" }} />
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   <label style={{ color: MUTED, fontSize: 10, fontWeight: 600 }}>Au</label>
                   <input type="date" aria-label="Date de fin" value={customTo} onChange={e => setCustomTo(e.target.value)}
-                    style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, color: "var(--ink)", padding: "7px 10px", fontSize: 12, outline: "none", cursor: "pointer" }} />
+                    style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 8, color: "var(--ink)", padding: "7px 10px", fontSize: 12, outline: "none", cursor: "pointer" }} />
                 </div>
               </div>
             )}
           </div>
 
           {/* Résumé + bouton */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "16px 20px", background: "color-mix(in srgb, var(--accent) 5%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius: 12, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "16px 20px", background: "color-mix(in srgb, var(--accent) 5%, transparent)", border: "1px solid var(--line-strong)", borderRadius: 12, flexWrap: "wrap" }}>
             <div>
               <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600, margin: "0 0 3px" }}>
                 {selected.size} fichier{selected.size > 1 ? "s" : ""} · {PERIODS.find(p => p.id === period)?.label}

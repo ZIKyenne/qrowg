@@ -95,7 +95,7 @@ function CustomTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null
   const d = payload[0].payload
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 8, padding: "10px 14px", maxWidth: 220 }}>
+    <div style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 8, padding: "10px 14px", maxWidth: 220 }}>
       <p style={{ color: "var(--ink)", fontSize: 12, fontWeight: 700, margin: "0 0 4px", wordBreak: "break-all" }}>
         {d.label}
       </p>
@@ -173,7 +173,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
   const totalClicks = filteredClicks.length
 
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 16, padding: 24, fontFamily: "DM Sans, sans-serif" }}>
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20, gap: 12, flexWrap: "wrap" }}>
@@ -191,7 +191,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
           {/* Filtre page (masqué si piloté par la barre du haut) */}
           {pages.length > 1 && page == null && (
             <select aria-label="Filtrer par page" value={pageFilter} onChange={e => setPageFilter(e.target.value)}
-              style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 9, color: "var(--ink)", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
+              style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 9, color: "var(--ink)", padding: "5px 10px", fontSize: 11, cursor: "pointer", outline: "none" }}>
               <option value="all">Toutes les pages</option>
               {pages.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
             </select>
