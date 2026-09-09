@@ -38,9 +38,9 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
 
   async function openLibrary() {
     setLibOpen(true)
-    if (libAssets === null) setLibAssets(await listAssets())
+    if (libAssets === null) setLibAssets(await listAssets().catch(() => []))
   }
-  async function refreshLibrary() { setLibAssets(await listAssets()) }
+  async function refreshLibrary() { setLibAssets(await listAssets().catch(() => [])) }
 
   // Upload depuis la modale : ajoute à la bibliothèque puis rafraîchit (l'utilisateur clique pour choisir).
   function handleLibFile(file: File) {

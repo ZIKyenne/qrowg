@@ -34,9 +34,17 @@ export default function AssetsPage() {
 
   // Fonction simple (pas de useCallback) : listAssets a une identité instable, la mémoïser
   // ferait boucler l'effet. On charge au montage + après chaque upload/suppression.
+  const [erreurChargement, setErreurChargement] = useState<string | null>(null)
   async function load() {
-    const [imgs, fls] = await Promise.all([listAssets("image"), listAssets("file")])
-    setImages(imgs); setFiles(fls)
+    setErreurChargement(null)
+    try {
+      const [imgs, fls] = await Promise.all([listAssets("image"), listAssets("file")])
+      setImages(imgs); setFiles(fls)
+    } catch (e) {
+      // Un stockage injoignable n'est pas « aucun média » (v55) : l'écran le dit et propose de réessayer.
+      setErreurChargement(e instanceof Error && e.message ? e.message : "Lecture des médias impossible")
+      setImages([]); setFiles([])
+    }
   }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load() }, [])
@@ -142,6 +150,11 @@ export default function AssetsPage() {
 
       {assets === null ? (
         <p style={{ color: MUTED, fontSize: 13, textAlign: "center", padding: "50px 0" }}>Chargement…</p>
+      ) : erreurChargement ? (
+        <div role="alert" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", padding: "18px 20px", border: "1px solid var(--line-strong)", borderRadius: 14, background: "var(--surface)", color: "var(--muted)", fontSize: 13.5 }}>
+          <span>Impossible de charger vos médias ({erreurChargement}). Vérifiez votre connexion, puis réessayez.</span>
+          <button type="button" onClick={() => { setImages(null); setFiles(null); void load() }} className="da-btn-neutral da-btn-neutral--sm">Réessayer</button>
+        </div>
       ) : assets.length === 0 ? (
         <div style={{ textAlign: "center", padding: "56px 0", border: "1px dashed var(--line-strong)", borderRadius: 14 }}>
           <p style={{ fontSize: 34, margin: "0 0 8px" }}>{q ? "🔍" : tab === "image" ? "🖼️" : "📄"}</p>

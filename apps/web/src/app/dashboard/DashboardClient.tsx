@@ -290,7 +290,7 @@ export default function DashboardClient({
           const onePage = pages.length === 1
           const tip = onePage
             ? { icon: <Plus size={17} />, text: <>Créez une 2ᵉ page pour un autre usage (menu, événement, promo).</>, label: "Nouvelle page", href: "/dashboard/templates" }
-            : { icon: <Printer size={17} />, text: <><strong style={{ color: "var(--ink)" }}>{totalScans.toLocaleString("fr-FR")}</strong> scan{totalScans > 1 ? "s" : ""} — créez un support imprimable pour booster vos scans.</>, label: "Créer un support", href: "/dashboard/qr-codes" }
+            : { icon: <Printer size={17} />, text: <><strong style={{ color: "var(--ink)" }}>{totalScans.toLocaleString("fr-FR")}</strong> scan{totalScans > 1 ? "s" : ""} — créez un support imprimable pour multiplier vos scans.</>, label: "Créer un support", href: "/dashboard/qr-codes" }
           return (
             <div className="dz" style={{ marginBottom: 20 }}>
               <NextStepCard icon={tip.icon} ctaLabel={tip.label} href={tip.href} animationDelay="40ms">{tip.text}</NextStepCard>
@@ -357,48 +357,39 @@ export default function DashboardClient({
           )
         })()}
 
-        {/* Cockpit : 1 métrique héro + stats secondaires (au lieu de 4 cartes concurrentes) */}
-        <div className="dz dz-card" style={{ animationDelay: "120ms", marginBottom: 20, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "18px 22px", position: "relative", overflow: "hidden" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap", position: "relative" }}>
-
-            {/* HÉRO : scans totaux */}
-            <div style={{ flex: "1 1 190px", minWidth: 150 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ color: "var(--accent)", background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 9, padding: 8, display: "flex" }}><QrCode size={18} /></span>
-                <span style={{ color: MUTED, fontSize: 12.5, fontWeight: 600 }}>Scans totaux</span>
-              </div>
-              <p style={{ color: "var(--ink)", fontSize: 40, fontWeight: 600, margin: "8px 0 0", lineHeight: 1, letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums" }}>{(profile?.total_scans || 0).toLocaleString("fr-FR")}</p>
-              <p style={{ color: MUTED, fontSize: 11, margin: "2px 0 0" }}>tous temps</p>
-            </div>
-
-            {!isMobile && <div aria-hidden style={{ width: 1, alignSelf: "stretch", minHeight: 64, background: HAIR }} />}
-
-            {/* SECONDAIRES : vues / pages / publiées */}
-            <div style={{ display: "flex", gap: 24, flexWrap: "wrap", flex: "2 1 300px" }}>
-              {[
-                { icon: <BarChart2 size={15} />, label: "Vues ce mois", value: monthViews.toLocaleString("fr-FR"), sub: viewsLimit ? `/ ${viewsLimit.toLocaleString("fr-FR")}` : "illimitées", color: overViews ? "var(--danger)" : "var(--accent)", spark: true },
-                { icon: <Eye size={15} />, label: "Pages créées", value: pages.length, sub: publishedCount + " publiée" + (publishedCount > 1 ? "s" : ""), color: G, spark: false },
-                { icon: <Globe size={15} />, label: "Publiées", value: publishedCount, sub: "sur " + pages.length, color: "var(--success)", spark: false, hideMobile: true },
-              ].map((s, i) => (
-                <div key={i} className={(s as any).hideMobile ? "dash-stat-hide-mobile" : undefined} style={{ minWidth: 92 }}>
+        {/* Cockpit : quatre chiffres alignés sur une même grille (v55). Scans totaux reste le
+            plus grand ; les autres partagent une taille, un sous-titre et une seule couleur
+            (l'accent), l'état d'alerte étant la seule exception. */}
+        <div className="dz dz-card" style={{ animationDelay: "120ms", marginBottom: 20, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "6px 22px", position: "relative", overflow: "hidden" }}>
+          <div className="dash-kpis" style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1.4fr 1fr 1fr 1fr", alignItems: "stretch" }}>
+            {[
+              { icon: <QrCode size={15} />, label: "Scans totaux", value: (profile?.total_scans || 0).toLocaleString("fr-FR"), sub: "depuis le début", hero: true },
+              { icon: <BarChart2 size={15} />, label: "Vues ce mois", value: monthViews.toLocaleString("fr-FR"), sub: viewsLimit ? `sur ${viewsLimit.toLocaleString("fr-FR")}` : "illimitées", alerte: overViews, spark: true },
+              { icon: <Eye size={15} />, label: "Pages créées", value: String(pages.length), sub: publishedCount + " publiée" + (publishedCount > 1 ? "s" : "") },
+              { icon: <Globe size={15} />, label: "Publiées", value: String(publishedCount), sub: "sur " + pages.length, hideMobile: true },
+            ].map((s, i) => {
+              const couleur = s.alerte ? "var(--danger)" : "var(--accent)"
+              return (
+                <div key={i} className={s.hideMobile ? "dash-stat-hide-mobile" : undefined}
+                  style={{ padding: "14px 18px 14px 0", marginRight: 18, borderRight: !isMobile && i < 3 ? `1px solid ${HAIR}` : "none", minWidth: 0, gridColumn: isMobile && i === 2 ? "1 / -1" : undefined }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ color: s.color, display: "flex" }}>{s.icon}</span>
-                      <span style={{ color: MUTED, fontSize: 11.5, fontWeight: 500 }}>{s.label}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
+                      <span style={{ color: couleur, display: "flex", flexShrink: 0 }}>{s.icon}</span>
+                      <span style={{ color: MUTED, fontSize: 12.5, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.label}</span>
                     </div>
-                    {s.spark && weekViews.length === 7 && (
-                      <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 18 }}>
+                    {s.spark && !isMobile && weekViews.length === 7 && (
+                      <div aria-hidden="true" title="7 derniers jours" style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 18, flexShrink: 0 }}>
                         {weekViews.map((v, j) => (
-                          <div key={j} style={{ width: 3, height: Math.max(2, Math.round((v / maxToday) * 18)), borderRadius: 2, background: j === 6 ? s.color : s.color + "55" }} />
+                          <div key={j} style={{ width: 3, height: Math.max(2, Math.round((v / maxToday) * 18)), borderRadius: 2, background: j === 6 ? couleur : `color-mix(in srgb, ${couleur} 35%, transparent)` }} />
                         ))}
                       </div>
                     )}
                   </div>
-                  <p style={{ color: "var(--ink)", fontSize: 24, fontWeight: 600, margin: "6px 0 0", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{s.value}</p>
-                  <p style={{ color: MUTED, fontSize: 10, margin: "2px 0 0", whiteSpace: "nowrap" }}>{s.sub}</p>
+                  <p style={{ color: s.alerte ? "var(--danger)" : "var(--ink)", fontSize: s.hero ? 34 : 24, fontWeight: 600, margin: "8px 0 0", lineHeight: 1, letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums" }}>{s.value}</p>
+                  <p style={{ color: MUTED, fontSize: 11.5, margin: "4px 0 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.sub}</p>
                 </div>
-              ))}
-            </div>
+              )
+            })}
           </div>
         </div>
 
@@ -443,11 +434,11 @@ export default function DashboardClient({
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ color: "var(--ink)", fontSize: 13.5, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{page.title}</p>
                       <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2, overflow: "hidden", whiteSpace: "nowrap" }}>
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 10.5, fontWeight: 700, color: pub ? "var(--success)" : MUTED, flexShrink: 0 }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11.5, fontWeight: 700, color: pub ? "var(--success)" : MUTED, flexShrink: 0 }}>
                           <span style={{ width: 5, height: 5, borderRadius: "50%", background: pub ? "var(--success)" : MUTED }} />{pub ? "En ligne" : "Brouillon"}
                         </span>
-                        <span style={{ color: MUTED, fontSize: 10.5, flexShrink: 0 }}>· {page.total_views} vues</span>
-                        {relTime(page.created_at) && <span style={{ color: MUTED, fontSize: 10.5, overflow: "hidden", textOverflow: "ellipsis" }}>· {relTime(page.created_at)}</span>}
+                        <span style={{ color: MUTED, fontSize: 11.5, flexShrink: 0 }}>· {page.total_views} vues</span>
+                        {relTime(page.created_at) && <span style={{ color: MUTED, fontSize: 11.5, overflow: "hidden", textOverflow: "ellipsis" }}>· {relTime(page.created_at)}</span>}
                       </div>
                     </div>
 
@@ -495,7 +486,7 @@ export default function DashboardClient({
                 <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: 0 }}>Raccourcis</p>
               </div>
               {[
-                { icon: <Globe size={16} />, label: "Domaines perso", href: "/dashboard/domains", color: "var(--success)" },
+                { icon: <Globe size={16} />, label: "Domaines personnalisés", href: "/dashboard/domains", color: MUTED },
                 { icon: <Settings size={16} />, label: "Paramètres", href: "/dashboard/settings", color: MUTED },
               ].map((action, i, arr) => (
                 <Link key={i} href={action.href} className="dz-row dz-act"

@@ -77,4 +77,4 @@ Chaque ligne est copiable telle quelle dans Claude Code. Notation : `[ ]` à fai
 7. Tous les visuels QR ont un rendu de secours.
 8. Parcours mobiles à 375, 390 et 430 px : aucun défilement horizontal, action principale à portée de pouce. — v54 : balayage de 32 écrans × 3 largeurs sans débordement ; sur téléphone le générateur passe en contenu → aperçu + PNG/SVG → réglages.
 
-Non vérifié par la revue (données réelles nécessaires) : statistiques, paiement, équipe, domaines, API, atelier d'impression complet.
+Non vérifié par la revue (données réelles nécessaires) : statistiques, paiement, équipe, domaines, API, atelier d'impression complet. — v55 : bancs d'essai `e2e-harness/{accueil,messages,medias,equipe,domaines,redirections}` ajoutés ; ce qu'on y a vu est corrigé (erreurs de chargement déguisées en état vide, couleurs secondaires de Messages, cockpit de l'accueil, nom du plan et doublon d'état vide sur Domaines).

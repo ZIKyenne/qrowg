@@ -54,12 +54,17 @@ export default function RedirectsPanel({ userDomains }: Props) {
   const [fType,     setFType]     = useState<301|302>(301)
   const [fLabel,    setFLabel]    = useState("")
 
-  useEffect(() => {
+  // Une réponse en erreur (401, 500, réseau) n'est pas « aucune redirection » (v55) :
+  // l'écran le dit et propose de réessayer.
+  const [erreurChargement, setErreurChargement] = useState<string | null>(null)
+  const charger = () => {
+    setLoading(true); setErreurChargement(null)
     fetch("/api/redirects")
-      .then(r => r.json())
+      .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || `Réponse ${r.status}`); return d })
       .then(d => { setRedirects(d.redirects ?? []); setLoading(false) })
-      .catch(() => setLoading(false))
-  }, [])
+      .catch(e => { setErreurChargement(e instanceof Error ? e.message : "Erreur réseau"); setLoading(false) })
+  }
+  useEffect(() => { charger() }, [])
 
   function openEdit(r: Redirect) {
     setEditId(r.id)
@@ -281,6 +286,11 @@ export default function RedirectsPanel({ userDomains }: Props) {
         {loading ? (
           <div style={{ textAlign:"center", padding:"60px", color:MUTED }}>
             <Loader size={22} color={MUTED} style={{ animation:"mo-spin 0.8s linear infinite" }}/>
+          </div>
+        ) : erreurChargement ? (
+          <div role="alert" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap", padding:"18px 20px", border:"1px solid var(--line-strong)", borderRadius:14, background:"var(--surface)", color:MUTED, fontSize:13.5 }}>
+            <span>Impossible de charger vos redirections ({erreurChargement}). Vérifiez votre connexion, puis réessayez.</span>
+            <button type="button" onClick={charger} className="da-btn-neutral da-btn-neutral--sm">Réessayer</button>
           </div>
         ) : redirects.length === 0 ? (
           <div style={{ textAlign:"center", padding:"56px 20px", background:"var(--surface)", border:"1px dashed rgba(255,255,255,0.1)", borderRadius:14 }}>

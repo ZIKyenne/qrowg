@@ -134,7 +134,10 @@ export default function TeamPage() {
           <style>{`.qf-spin{animation:qfspin 1s linear infinite}@keyframes qfspin{to{transform:rotate(360deg)}}`}</style>
         </div>
       ) : !data ? (
-        <div style={{ ...card, color: "var(--muted)" }}>Impossible de charger l'équipe.</div>
+        <div role="alert" style={{ ...card, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", color: "var(--muted)" }}>
+          <span>Impossible de charger l&apos;équipe. Vérifiez votre connexion, puis réessayez.</span>
+          <button type="button" onClick={() => { setLoading(true); void load() }} className="da-btn-neutral da-btn-neutral--sm">Réessayer</button>
+        </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 

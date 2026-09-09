@@ -97,7 +97,9 @@ export function useImageUpload() {
     const { data, error } = await supabase.storage
       .from("page-assets")
       .list(user.id, { limit: 200, sortBy: { column: "created_at", order: "desc" } })
-    if (error || !data) return []
+    // Une erreur de stockage n'est pas « aucun média » : on la remonte, l'écran la dit et propose de réessayer.
+    if (error) throw new Error(error.message || "Lecture des médias impossible")
+    if (!data) return []
     return data
       .filter(f => f.name && (kind === "image" ? IMAGE_RE.test(f.name) : !IMAGE_RE.test(f.name)))
       .map(f => {

@@ -64,12 +64,16 @@ export default function DomainsPage({ pages, plan }: Props) {
 
   const isPaid = PAID_PLANS.includes(plan?.toLowerCase() ?? "")
 
-  useEffect(() => {
+  // Une réponse en erreur n'est pas « aucun domaine » (v55) : l'écran le dit et propose de réessayer.
+  const [erreurChargement, setErreurChargement] = useState<string | null>(null)
+  const charger = () => {
+    setLoading(true); setErreurChargement(null)
     fetch("/api/domains")
-      .then(r => r.json())
+      .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || `Réponse ${r.status}`); return d })
       .then(d => { setDomains(d.domains ?? []); setLoading(false) })
-      .catch(() => setLoading(false))
-  }, [])
+      .catch(e => { setErreurChargement(e instanceof Error ? e.message : "Erreur réseau"); setLoading(false) })
+  }
+  useEffect(() => { charger() }, [])
 
   async function addDomain() {
     if (!fDomain || !fPageId) return
@@ -254,6 +258,11 @@ export default function DomainsPage({ pages, plan }: Props) {
             {loading ? (
               <div style={{ textAlign:"center", padding:"48px", color:MUTED }}>
                 <Loader size={22} color={MUTED} style={{ animation:"mo-spin 0.8s linear infinite" }}/>
+              </div>
+            ) : erreurChargement ? (
+              <div role="alert" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap", padding:"18px 20px", border:"1px solid var(--line-strong)", borderRadius:14, background:"var(--surface)", color:MUTED, fontSize:13.5 }}>
+                <span>Impossible de charger vos domaines ({erreurChargement}). Vérifiez votre connexion, puis réessayez.</span>
+                <button type="button" onClick={charger} className="da-btn-neutral da-btn-neutral--sm">Réessayer</button>
               </div>
             ) : domains.length === 0 ? (
               <div style={{ textAlign:"center", padding:"30px 20px", background:"var(--surface)", border:"1px dashed rgba(255,255,255,0.1)", borderRadius:14 }}>
@@ -448,7 +457,7 @@ export default function DomainsPage({ pages, plan }: Props) {
               <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
                 {[
                   ["1", "Ajoutez votre domaine et sélectionnez la page à associer"],
-                  ["2", "Copiez les enregistrements DNS dans votre registrar (OVH, Gandi, Namecheap…)"],
+                  ["2", "Copiez les enregistrements DNS chez votre hébergeur de domaine (OVH, Gandi, Namecheap…)"],
                   ["3", "Cliquez Vérifier — la validation est automatique"],
                   ["4", "Votre domaine redirige vers votre page QRowg"],
                 ].map(([step, text]) => (

@@ -30,10 +30,6 @@ const TYPE_LABELS: Record<string, string> = {
   quote: "Devis", reservation: "Réservation", booking: "Réservation événement",
   register: "Inscription", rsvp: "RSVP", form: "Message",
 }
-const TYPE_COLORS: Record<string, string> = {
-  quote: "#C9A84C", reservation: "#EF4444", booking: "#9146FF",
-  register: "#EC4899", rsvp: "var(--success)", form: "var(--action)",
-}
 
 function fmtDate(iso: string) {
   const d = new Date(iso)
@@ -160,9 +156,9 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
               return (
                 <button key={s.key} onClick={() => setStatusFilter(s.key)} style={{
                   display: "inline-flex", alignItems: "center", gap: 6,
-                  background: statusFilter === s.key ? `color-mix(in srgb, ${s.color} 16%, transparent)` : "rgba(255,255,255,0.03)",
-                  border: `1px solid ${statusFilter === s.key ? `color-mix(in srgb, ${s.color} 40%, transparent)` : "rgba(255,255,255,0.07)"}`,
-                  borderRadius: 9, padding: "6px 12px", color: statusFilter === s.key ? s.color : MUTED, fontSize: 12, fontWeight: 600, cursor: "pointer",
+                  background: statusFilter === s.key ? "var(--surface-2)" : "transparent",
+                  border: `1px solid ${statusFilter === s.key ? "var(--line-strong)" : "var(--line)"}`,
+                  borderRadius: 9, padding: "6px 12px", color: statusFilter === s.key ? "var(--ink)" : MUTED, fontSize: 12.5, fontWeight: 600, cursor: "pointer",
                 }}>
                   {s.key !== "all" && <span style={{ width: 7, height: 7, borderRadius: "50%", background: s.color }} />}
                   {s.label} <span style={{ opacity: 0.7 }}>· {n}</span>
@@ -174,18 +170,19 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
           {/* Liste */}
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {filtered.map(l => {
-              const tc = TYPE_COLORS[l.type] || G as string
+              // Couche « Calme » (v55) : le type n'a plus sa couleur — une carte lisible, un seul accent.
+              const tc = "var(--accent)"
               const extra = Object.entries(l.data || {}).filter(([k]) => !["nom", "email", "telephone"].includes(k.toLowerCase()))
               return (
                 <div key={l.id} style={{
-                  background: l.is_read ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.04)",
-                  border: `1px solid ${l.is_read ? "rgba(255,255,255,0.07)" : `color-mix(in srgb, ${tc} 30%, transparent)`}`,
+                  background: "var(--surface)",
+                  border: `1px solid ${l.is_read ? "var(--line)" : "var(--line-strong)"}`,
                   borderRadius: 14, padding: "15px 16px",
                 }}>
                   <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 8 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 9, flexWrap: "wrap" }}>
                       {!l.is_read && <span style={{ width: 8, height: 8, borderRadius: "50%", background: tc, flexShrink: 0 }} />}
-                      <span style={{ background: `color-mix(in srgb, ${tc} 14%, transparent)`, border: `1px solid color-mix(in srgb, ${tc} 30%, transparent)`, borderRadius: 20, padding: "3px 10px", color: tc, fontSize: 11, fontWeight: 700 }}>{TYPE_LABELS[l.type] || l.type}</span>
+                      <span style={{ background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 20, padding: "3px 10px", color: "var(--ink)", fontSize: 11.5, fontWeight: 600 }}>{TYPE_LABELS[l.type] || l.type}</span>
                       <span style={{ color: MUTED, fontSize: 12 }}>{pageTitle(l.page_id)}</span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
@@ -201,9 +198,9 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
                       return (
                         <button key={s.key} onClick={() => setStatus(l.id, s.key)} style={{
                           display: "inline-flex", alignItems: "center", gap: 5,
-                          background: on ? `color-mix(in srgb, ${s.color} 18%, transparent)` : "rgba(255,255,255,0.03)",
-                          border: `1px solid ${on ? `color-mix(in srgb, ${s.color} 45%, transparent)` : "rgba(255,255,255,0.07)"}`,
-                          borderRadius: 8, padding: "5px 10px", color: on ? s.color : MUTED, fontSize: 11, fontWeight: on ? 700 : 500, cursor: "pointer",
+                          background: on ? "var(--surface-2)" : "transparent",
+                          border: `1px solid ${on ? "var(--line-strong)" : "var(--line)"}`,
+                          borderRadius: 8, padding: "5px 10px", color: on ? "var(--ink)" : MUTED, fontSize: 12, fontWeight: on ? 700 : 500, cursor: "pointer",
                         }}>
                           {on && <Check size={11} />}{s.label}
                         </button>
@@ -215,8 +212,8 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
                   {l.message && <p style={{ color: TEXT, fontSize: 13, margin: "0 0 8px", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{l.message}</p>}
 
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: extra.length ? 8 : 0 }}>
-                    {l.email && <a href={`mailto:${l.email}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--action-bg)", border: "1px solid var(--action-border)", borderRadius: 8, padding: "6px 11px", color: "var(--action)", textDecoration: "none", fontSize: 12, fontWeight: 600 }}><Mail size={12} /> {l.email}</a>}
-                    {l.phone && <a href={`tel:${l.phone}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--success-bg)", border: "1px solid var(--success-border)", borderRadius: 8, padding: "6px 11px", color: "var(--success)", textDecoration: "none", fontSize: 12, fontWeight: 600 }}><Phone size={12} /> {l.phone}</a>}
+                    {l.email && <a href={`mailto:${l.email}`} className="da-btn-neutral da-btn-neutral--sm" style={{ fontSize: 12.5 }}><Mail size={13} /> <span>{l.email}</span></a>}
+                    {l.phone && <a href={`tel:${l.phone}`} className="da-btn-neutral da-btn-neutral--sm" style={{ fontSize: 12.5 }}><Phone size={13} /> <span>{l.phone}</span></a>}
                   </div>
 
                   {extra.length > 0 && (

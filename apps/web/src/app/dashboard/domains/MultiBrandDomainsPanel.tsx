@@ -1,5 +1,6 @@
 "use client"
 
+import { getPlan } from "@/lib/plans"
 import { useState, useEffect } from "react"
 import {
   Globe, Star, StarOff, Crown, Plus, Trash2,
@@ -153,7 +154,7 @@ export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrim
           <div style={{ display:"flex", alignItems:"center", gap:6, padding:"5px 12px", background: isBusiness ? "color-mix(in srgb, var(--accent) 10%, transparent)" : "rgba(255,255,255,0.04)", border: isBusiness ? "1px solid color-mix(in srgb, var(--accent) 25%, transparent)" : "1px solid rgba(255,255,255,0.08)", borderRadius:8 }}>
             {isBusiness && <Crown size={12} color={G}/>}
             <span style={{ color: isBusiness ? G : MUTED, fontSize:11, fontWeight:700 }}>
-              {plan?.toUpperCase()} — {planInfo.label}
+              {getPlan(plan).label} — {planInfo.label}
             </span>
           </div>
           <span style={{ color:MUTED, fontSize:12 }}>
@@ -243,19 +244,7 @@ export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrim
         </div>
       )}
 
-      {/* Empty state */}
-      {domains.length === 0 && (
-        <div style={{ textAlign:"center", padding:"32px 20px", background:"rgba(255,255,255,0.01)", border:"1px dashed rgba(255,255,255,0.08)", borderRadius:12 }}>
-          <Globe size={32} color={MUTED} style={{ marginBottom:12 }}/>
-          <p style={{ color:"var(--ink)", fontSize:13, fontWeight:600, margin:"0 0 5px" }}>Aucun domaine</p>
-          <p style={{ color:MUTED, fontSize:12, margin:"0 0 16px" }}>Ajoutez votre premier domaine personnalisé</p>
-          {canAdd && (
-            <span className="da-halo-wrap">
-              <button type="button" onClick={onAddClick} className="da-btn-primary da-btn-primary--sm"><Plus className="da-ic da-ic-plus" size={13}/> <span>Ajouter un domaine</span></button>
-            </span>
-          )}
-        </div>
-      )}
+      {/* État vide : porté par l'écran parent (un seul, avec l'exemple et le bouton) — plus de doublon ici. */}
 
       {/* CTA upgrade pour Business si plan Pro limité */}
       {!isBusiness && plan?.toLowerCase() === "pro" && domains.length > 0 && (
