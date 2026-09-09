@@ -95,7 +95,7 @@ export default function UpgradePage() {
   }
 
 
-  const G = useAccent(); const MUTED = "#8A8478"
+  const G = useAccent(); const MUTED = "var(--muted)"
 
   // Cette page est hors du layout dashboard : on applique l'accent au document
   // (et on prévient les particules) pour qu'elles prennent la couleur de l'utilisateur.
@@ -248,7 +248,7 @@ export default function UpgradePage() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 12, maxWidth: 560, margin: "0 auto" }}>
               {PLAN_LIST.map(pl => (
                 <div key={pl.id} style={{ background: "rgba(255,255,255,0.025)", border: `1px solid ${pl.id === "pro" ? pl.color + "66" : "rgba(255,255,255,0.09)"}`, borderRadius: 14, padding: "14px 10px" }}>
-                  <div style={{ color: pl.color, fontSize: 11.5, fontWeight: 800, letterSpacing: 0.4, textTransform: "uppercase", marginBottom: 7 }}>{pl.label}</div>
+                  <div style={{ color: pl.color, fontSize: 11.5, fontWeight: 700, letterSpacing: 0.4, textTransform: "uppercase", marginBottom: 7 }}>{pl.label}</div>
                   <div style={{ color: "var(--ink)", fontSize: 24, fontWeight: 600, letterSpacing: "-.02em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{pl.limits.dyn === null ? "∞" : pl.limits.dyn}</div>
                   <div style={{ color: "#6E685E", fontSize: 10.5, marginTop: 5 }}>QR modifiables</div>
                 </div>
@@ -274,7 +274,7 @@ export default function UpgradePage() {
               <div style={{ padding: "14px 20px" }}><span style={{ color: MUTED, fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Fonctionnalite</span></div>
               {["Gratuit", "Établissement", "Multi-sites"].map((h, i) => (
                 <div key={i} style={{ padding: "14px 12px", textAlign: "center" }}>
-                  <span style={{ color: ["#8A8478","#C9A84C","var(--success)"][i], fontSize: 12, fontWeight: 700 }}>{h}</span>
+                  <span style={{ color: ["var(--muted)","#C9A84C","var(--success)"][i], fontSize: 12, fontWeight: 700 }}>{h}</span>
                 </div>
               ))}
             </div>
@@ -302,7 +302,7 @@ export default function UpgradePage() {
               l'obtenir. Les trois arguments restants sont, eux, tenus par le code :
               Stripe encaisse, la résiliation est en un clic dans Paramètres, et
               l'abonnement n'a pas de durée minimale. */}
-          <p style={{ color: "#8A8478", fontSize: 12, margin: 0 }}>
+          <p style={{ color: "var(--muted)", fontSize: 12, margin: 0 }}>
             Paiement sécurisé par Stripe · Annulation à tout moment · Sans engagement
           </p>
         </div>

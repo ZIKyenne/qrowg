@@ -124,7 +124,7 @@ export function BlockLibrary(props: BlockLibraryProps) {
       {/* HEADER — masqué quand le conteneur en fournit déjà un (bottom sheet mobile). */}
       {!props.hideHeader && (
       <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 8, padding: mobile ? "calc(env(safe-area-inset-top) + 10px) 12px 10px" : "12px 12px 8px" }}>
-        <h2 style={{ margin: 0, fontSize: mobile ? 16 : 13, fontWeight: 800, color: "var(--ink, var(--ink))", flex: 1 }}>{props.title ?? "Ajouter un bloc"}</h2>
+        <h2 style={{ margin: 0, fontSize: mobile ? 16 : 13, fontWeight: 700, color: "var(--ink, var(--ink))", flex: 1 }}>{props.title ?? "Ajouter un bloc"}</h2>
         {onRequestClose && (
           <button type="button" onClick={onRequestClose} aria-label="Fermer la bibliothèque"
             style={{ width: mobile ? 40 : 30, height: mobile ? 40 : 30, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, cursor: "pointer", color: MUTED, fontSize: 15 }}>✕</button>
@@ -197,7 +197,7 @@ export function BlockLibrary(props: BlockLibraryProps) {
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
             <span aria-hidden="true" style={{ width: 44, height: 44, borderRadius: 11, background: detailItem.color + "1c", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{detailItem.icon}</span>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--ink, var(--ink))" }}>{detailItem.title}</p>
+              <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "var(--ink, var(--ink))" }}>{detailItem.title}</p>
               <p style={{ margin: 0, fontSize: 12, color: MUTED }}>{detailItem.categoryLabel}{detailItem.isPremium ? " · 👑 Premium" : ""}</p>
             </div>
             <button type="button" onClick={() => setDetail(null)} aria-label="Fermer les détails"
@@ -214,7 +214,7 @@ export function BlockLibrary(props: BlockLibraryProps) {
           )}
           <div style={{ flex: 1 }} />
           <button type="button" data-detail-add={detailItem.type} onClick={() => { onAdd(detailItem.type); setDetail(null) }}
-            style={{ minHeight: 48, borderRadius: 12, background: "var(--accent)", border: "none", color: "var(--ink-on-accent)", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>
+            style={{ minHeight: 48, borderRadius: 12, background: "var(--accent)", border: "none", color: "var(--ink-on-accent)", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
             Ajouter ce bloc
           </button>
         </div>

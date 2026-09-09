@@ -37,10 +37,10 @@ export function Modal({ open, onClose, title, children, footer, maxWidth = 460 }
       >
         {title && (
           <div style={{ padding: "18px 22px 0" }}>
-            <h2 id={titleId} style={{ fontFamily: "Fraunces, serif", color: "var(--ink)", fontSize: 19, fontWeight: 700, margin: 0 }}>{title}</h2>
+            <h2 id={titleId} style={{ color: "var(--ink)", fontSize: 19, fontWeight: 700, margin: 0 }}>{title}</h2>
           </div>
         )}
-        <div style={{ padding: "16px 22px 20px", color: "#C9C3B6", fontSize: 14, lineHeight: 1.6 }}>{children}</div>
+        <div style={{ padding: "16px 22px 20px", color: "var(--muted)", fontSize: 14, lineHeight: 1.6 }}>{children}</div>
         {footer && <div style={{ padding: "0 22px 20px", display: "flex", gap: 10, justifyContent: "flex-end", flexWrap: "wrap" }}>{footer}</div>}
       </div>
     </div>

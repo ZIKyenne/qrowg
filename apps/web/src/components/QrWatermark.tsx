@@ -34,7 +34,7 @@ export default function QrWatermark({ text = "QROWG", size = 210 }: { text?: str
   }
 
   const label: CSSProperties = {
-    color: gold, fontSize: g.fontSize, fontWeight: 800,
+    color: gold, fontSize: g.fontSize, fontWeight: 700,
     letterSpacing: g.letterSpacing, whiteSpace: "nowrap", userSelect: "none",
     fontFamily: "DM Sans, sans-serif", textTransform: "uppercase",
   }

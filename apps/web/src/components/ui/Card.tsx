@@ -33,7 +33,7 @@ export function Card({ children, title, icon, action, elevated = false, padding 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: `${padding}px ${padding}px 0` }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
             {icon && <span style={{ color: "var(--accent)", display: "flex", flexShrink: 0 }}>{icon}</span>}
-            {title && <h3 style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif" }}>{title}</h3>}
+            {title && <h3 style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>{title}</h3>}
           </div>
           {action}
         </div>

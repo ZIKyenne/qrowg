@@ -37,15 +37,15 @@ export default function DashboardError({ error, reset }: { error: Error & { dige
         <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(255,107,107,0.12)", border: "1px solid rgba(255,107,107,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
           <AlertTriangle size={24} color="var(--danger)" />
         </div>
-        <h1 style={{ color: "#F8F4EC", fontSize: 22, fontWeight: 700, margin: "0 0 8px", fontFamily: "Fraunces, serif" }}>{chunk ? "Mise à jour de l'application" : "Oups, un souci est survenu"}</h1>
-        <p style={{ color: "#C9C3B6", fontSize: 13.5, margin: "0 0 20px", lineHeight: 1.6 }}>
+        <h1 style={{ color: "var(--ink)", fontSize: 22, fontWeight: 700, margin: "0 0 8px" }}>{chunk ? "Mise à jour de l'application" : "Oups, un souci est survenu"}</h1>
+        <p style={{ color: "var(--muted)", fontSize: 13.5, margin: "0 0 20px", lineHeight: 1.6 }}>
           {chunk
             ? "Une nouvelle version vient d'être publiée. Rechargement en cours… Si rien ne se passe, touchez Recharger."
             : "Cette page n'a pas pu s'afficher. Réessayez — si le problème persiste, rechargez complètement ou contactez le support."}
         </p>
         <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
           <button type="button" onClick={retry}
-            style={{ display: "flex", alignItems: "center", gap: 7, padding: "11px 20px", borderRadius: 11, background: "linear-gradient(90deg,var(--accent,var(--accent)),#b8953f)", color: "var(--ink-on-accent)", border: "none", fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}>
+            style={{ display: "flex", alignItems: "center", gap: 7, padding: "11px 20px", borderRadius: 11, background: "linear-gradient(90deg,var(--accent,var(--accent)),#b8953f)", color: "var(--ink-on-accent)", border: "none", fontSize: 13.5, fontWeight: 700, cursor: "pointer" }}>
             <RotateCw size={15} /> {chunk ? "Recharger" : "Réessayer"}
           </button>
           <a href="/dashboard"

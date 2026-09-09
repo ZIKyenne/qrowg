@@ -248,7 +248,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
             {stat.icon}
             <div>
               <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 2px" }}>{stat.label}</p>
-              <p style={{ color: "var(--ink)", fontSize: 16, fontWeight: 800, margin: 0 }}>{stat.value}</p>
+              <p style={{ color: "var(--ink)", fontSize: 16, fontWeight: 700, margin: 0 }}>{stat.value}</p>
             </div>
           </div>
         ))}

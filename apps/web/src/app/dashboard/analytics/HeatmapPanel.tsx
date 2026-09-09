@@ -95,7 +95,7 @@ export default function HeatmapPanel({ grid, byBlock, total, blocks }: Props) {
                   return (
                     <div key={id}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 3 }}>
-                        <span style={{ color: type ? "#F5F0E8" : MUTED, fontSize: 12, fontWeight: 600 }}>
+                        <span style={{ color: type ? "var(--ink)" : MUTED, fontSize: 12, fontWeight: 600 }}>
                           {name}
                         </span>
                         <span style={{ color: GOLD, fontSize: 12, fontWeight: 700 }}>{n}</span>

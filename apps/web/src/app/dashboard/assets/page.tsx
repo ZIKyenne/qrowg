@@ -207,7 +207,7 @@ export default function AssetsPage() {
               { icon: <Trash2 size={17} color="var(--danger)" />, label: "Supprimer", danger: true, onClick: () => { const x = menuAsset; setMenuAsset(null); onDelete(x) } },
             ] as { icon: React.ReactNode; label: string; onClick: () => void; danger?: boolean }[]).map((it, i) => (
               <button key={i} onClick={it.onClick}
-                style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "13px 12px", background: "none", border: "none", borderTop: i ? "1px solid rgba(255,255,255,0.05)" : "none", color: it.danger ? "var(--danger)" : "#F5F0E8", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
+                style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "13px 12px", background: "none", border: "none", borderTop: i ? "1px solid rgba(255,255,255,0.05)" : "none", color: it.danger ? "var(--danger)" : "var(--ink)", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
                 <span style={{ width: 24, display: "flex", justifyContent: "center", flexShrink: 0 }}>{it.icon}</span> {it.label}
               </button>
             ))}

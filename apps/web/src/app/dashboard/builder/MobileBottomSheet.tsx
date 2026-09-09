@@ -64,13 +64,13 @@ export function MobileBottomSheet({ open, title, snap, onSnap, onClose, safeArea
 
         {/* Header : titre + snaps + fermer */}
         <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 8, padding: "6px 12px 10px" }}>
-          <h2 style={{ flex: 1, margin: 0, fontSize: 15, fontWeight: 800, color: "var(--ink, var(--ink))", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title}</h2>
+          <h2 style={{ flex: 1, margin: 0, fontSize: 15, fontWeight: 700, color: "var(--ink, var(--ink))", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title}</h2>
           {!side && (
             <div role="group" aria-label="Taille du panneau" style={{ display: "flex", gap: 2, background: "rgba(255,255,255,0.05)", borderRadius: 8, padding: 2 }}>
               {SNAPS.map(s => (
                 <button key={s.id} type="button" data-snap-btn={s.id} aria-pressed={snap === s.id} aria-label={`Taille : ${s.label}`}
                   onClick={() => onSnap(s.id)}
-                  style={{ minHeight: 32, padding: "0 9px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 11, fontWeight: snap === s.id ? 800 : 600, background: snap === s.id ? "var(--accent)" : "transparent", color: snap === s.id ? "#080808" : MUTED }}>
+                  style={{ minHeight: 32, padding: "0 9px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 11, fontWeight: snap === s.id ? 800 : 600, background: snap === s.id ? "var(--accent)" : "transparent", color: snap === s.id ? "var(--ink-on-accent)" : MUTED }}>
                   {s.label}
                 </button>
               ))}

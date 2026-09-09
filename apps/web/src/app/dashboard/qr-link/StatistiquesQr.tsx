@@ -69,7 +69,7 @@ export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null;
           <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 16 }}>
             <BarChart3 size={18} color={G} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 800, margin: 0 }}>Statistiques</p>
+              <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>Statistiques</p>
               <p style={{ color: MUTED, fontSize: 11.5, margin: "1px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{stats.label || stats.dest_url || "Lien dynamique"}</p>
             </div>
             <button onClick={onFermer} aria-label="Fermer les statistiques" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", width: 30, height: 30, flexShrink: 0 }}><X size={15} /></button>
@@ -77,7 +77,7 @@ export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null;
 
           {/* Total (chiffre héro) */}
           <div style={{ textAlign: "center", padding: "18px 12px", borderRadius: 16, background: "radial-gradient(120% 100% at 50% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 65%), rgba(255,255,255,0.02)", border: "1px solid color-mix(in srgb, var(--accent) 16%, transparent)", marginBottom: 14 }}>
-            <p style={{ color: G, fontSize: 44, fontWeight: 800, margin: 0, lineHeight: 1, letterSpacing: -1 }}>{total.toLocaleString("fr-FR")}</p>
+            <p style={{ color: G, fontSize: 44, fontWeight: 700, margin: 0, lineHeight: 1, letterSpacing: -1 }}>{total.toLocaleString("fr-FR")}</p>
             <p style={{ color: MUTED, fontSize: 12, fontWeight: 600, margin: "7px 0 0", textTransform: "uppercase", letterSpacing: 1.2 }}>scan{total > 1 ? "s" : ""} au total</p>
           </div>
 
@@ -91,7 +91,7 @@ export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null;
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, padding: "11px 2px", borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,0.06)" }}>
                 <Icon size={16} color={MUTED} style={{ flexShrink: 0 }} />
                 <span style={{ flex: 1, color: MUTED, fontSize: 12.5 }}>{r.label}</span>
-                <span style={{ color: r.color || "#F5F0E8", fontSize: 12.5, fontWeight: 700, textAlign: "right" }}>{r.value}</span>
+                <span style={{ color: r.color || "var(--ink)", fontSize: 12.5, fontWeight: 700, textAlign: "right" }}>{r.value}</span>
               </div>
             ) })}
           </div>

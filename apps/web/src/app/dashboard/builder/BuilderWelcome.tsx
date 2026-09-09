@@ -9,7 +9,7 @@ import { useEffect, useState, type CSSProperties } from "react"
 
 const KEY = "qrfolio_builder_coach_done"
 const G = "#C9A84C"
-const INK = "#F5F0E8"
+const INK = "var(--ink)"
 const MUT = "rgba(168,161,144,0.94)"
 
 type Zone = "canvas" | "library" | "panel" | "topbar" | "theme" | "publish"
@@ -100,7 +100,7 @@ export default function BuilderWelcome({ mobile = false }: { mobile?: boolean })
       }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-          <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", color: G }}>Bienvenue dans votre éditeur</span>
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: G }}>Bienvenue dans votre éditeur</span>
           <button onClick={finish} aria-label="Passer le guide"
             style={{ background: "transparent", border: "none", color: MUT, fontSize: 13, cursor: "pointer", minHeight: 44, padding: "0 8px", margin: "-10px -8px -10px 0", display: "inline-flex", alignItems: "center" }}>
             Passer
@@ -115,7 +115,7 @@ export default function BuilderWelcome({ mobile = false }: { mobile?: boolean })
           <div aria-hidden style={{ fontSize: 30, lineHeight: 1, flexShrink: 0 }}>{step.icon}</div>
           <div style={{ minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              <h2 style={{ fontFamily: "Fraunces, serif", fontSize: 20, fontWeight: 800, color: INK, margin: 0, letterSpacing: "-0.01em" }}>{step.title}</h2>
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: INK, margin: 0, letterSpacing: "-0.01em" }}>{step.title}</h2>
               <span style={{ fontSize: 10.5, fontWeight: 700, color: G, background: `${G}18`, border: `1px solid ${G}33`, borderRadius: 999, padding: "2px 9px", whiteSpace: "nowrap" }}>
                 {mobile ? step.hintM : step.hintD}
               </span>
@@ -149,7 +149,7 @@ export default function BuilderWelcome({ mobile = false }: { mobile?: boolean })
               </button>
             )}
             <button onClick={() => (last ? finish() : setI(i + 1))}
-              style={{ background: `linear-gradient(90deg,${G},#b8953f)`, color: "var(--ink-on-accent)", border: "none", borderRadius: 10, minHeight: 44, padding: "0 22px", fontSize: 13.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 6px 20px color-mix(in srgb, var(--accent) 30%, transparent)" }}>
+              style={{ background: `linear-gradient(90deg,${G},#b8953f)`, color: "var(--ink-on-accent)", border: "none", borderRadius: 10, minHeight: 44, padding: "0 22px", fontSize: 13.5, fontWeight: 700, cursor: "pointer", boxShadow: "0 6px 20px color-mix(in srgb, var(--accent) 30%, transparent)" }}>
               {last ? "C'est parti !" : "Suivant"}
             </button>
           </div>
@@ -178,9 +178,9 @@ function MiniMap({ zone }: { zone: Zone }) {
           <div style={{ ...cell(on("topbar")), width: 30, height: 13, borderRadius: 4, boxShadow: on("topbar") ? `0 0 0 3px ${G}22` : "none" }} />
           <span style={dot(on("topbar"))} />
           <span style={dot(on("topbar"))} />
-          <div style={{ ...cell(on("topbar")), width: 34, height: 14, borderRadius: 5, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 6.5, fontWeight: 800, color: on("topbar") ? G : "rgba(255,255,255,0.4)" }}>Aperçu</div>
+          <div style={{ ...cell(on("topbar")), width: 34, height: 14, borderRadius: 5, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 6.5, fontWeight: 700, color: on("topbar") ? G : "rgba(255,255,255,0.4)" }}>Aperçu</div>
         </div>
-        <div style={{ ...cell(on("publish")), height: 15, width: 52, borderRadius: 5, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7.5, fontWeight: 800, letterSpacing: 0.3, color: on("publish") ? G : "rgba(255,255,255,0.4)" }}>Publier</div>
+        <div style={{ ...cell(on("publish")), height: 15, width: 52, borderRadius: 5, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7.5, fontWeight: 700, letterSpacing: 0.3, color: on("publish") ? G : "rgba(255,255,255,0.4)" }}>Publier</div>
       </div>
       {/* 3 colonnes : bibliotheque | page | reglages(+theme) */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1.3fr 1fr", gap: 6, padding: 8, height: 120 }}>

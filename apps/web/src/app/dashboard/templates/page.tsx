@@ -340,7 +340,7 @@ export default function TemplatesPage() {
   // (createFromTemplate retiree avec la carte "Recommande" : la creation passe par
   //  le modal de nommage -> /api/templates/use.)
   const G = "var(--accent)"
-  const MUTED = "#A8A190"
+  const MUTED = "var(--muted)"
   const previewTemplate  = TEMPLATES.find((t: any) => t.id === preview)
   const selectedTemplate = TEMPLATES.find((t: any) => t.id === selected)
   const activeCat = BUSINESS_CATEGORIES.find(c => c.id === activeMetier)
@@ -440,7 +440,7 @@ export default function TemplatesPage() {
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxHeight: "82vh", overflowY: "auto", background: "#0E0D0A", borderTopLeftRadius: 22, borderTopRightRadius: 22, borderTop: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", padding: "10px 18px calc(20px + env(safe-area-inset-bottom))", animation: "tplUp .28s var(--mo-ease-standard)" }}>
             <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 16px" }} />
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-              <h2 style={{ fontFamily: "Fraunces, serif", fontSize: 21, color: "var(--ink)", fontWeight: 700, margin: 0 }}>Filtrer</h2>
+              <h2 style={{ fontSize: 21, color: "var(--ink)", fontWeight: 700, margin: 0 }}>Filtrer</h2>
               {hasFilters && <button type="button" onClick={() => { setActiveMetier("Tous"); setActivePlan("all") }} style={{ background: "none", border: "none", color: "var(--accent)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Réinitialiser</button>}
             </div>
 
@@ -815,7 +815,7 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
 }) {
   const { ref: dlg, props: dlgProps } = useDialogue(true, onClose, { label: "Créer une page depuis ce modèle" })
   const G = "var(--accent)"
-  const MUTED = "#A8A190"
+  const MUTED = "var(--muted)"
   const [name, setName] = useState(template.name || "")
   const [slug, setSlug] = useState("")
   const [slugTouched, setSlugTouched] = useState(false)
@@ -919,7 +919,7 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
                 return (
                   <button key={s.key} data-testid={"style-" + s.key} data-active={active ? "1" : "0"} type="button"
                     onClick={() => onStyleChange?.(s.key)}
-                    style={{ display: "flex", alignItems: "center", gap: 6, background: active ? "color-mix(in srgb, var(--accent) 14%, transparent)" : "rgba(255,255,255,0.03)", border: active ? "1px solid var(--accent)" : "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "5px 9px", color: active ? "#F5F0E8" : MUTED, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
+                    style={{ display: "flex", alignItems: "center", gap: 6, background: active ? "color-mix(in srgb, var(--accent) 14%, transparent)" : "rgba(255,255,255,0.03)", border: active ? "1px solid var(--accent)" : "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "5px 9px", color: active ? "var(--ink)" : MUTED, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
                     <span style={{ width: 12, height: 12, borderRadius: "50%", background: s.color, border: "1px solid rgba(255,255,255,0.2)", flexShrink: 0 }} />
                     {s.label}
                   </button>
@@ -939,7 +939,7 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
                 return (
                   <button key={l.key} data-testid={"layout-" + l.key} data-active={active ? "1" : "0"} type="button"
                     onClick={() => onLayoutChange?.(l.key)}
-                    style={{ flex: 1, background: active ? "color-mix(in srgb, var(--accent) 14%, transparent)" : "rgba(255,255,255,0.03)", border: active ? "1px solid var(--accent)" : "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "7px", color: active ? "#F5F0E8" : MUTED, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
+                    style={{ flex: 1, background: active ? "color-mix(in srgb, var(--accent) 14%, transparent)" : "rgba(255,255,255,0.03)", border: active ? "1px solid var(--accent)" : "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "7px", color: active ? "var(--ink)" : MUTED, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
                     {l.label}
                   </button>
                 )

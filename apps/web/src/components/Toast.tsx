@@ -86,7 +86,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             >
               <span aria-hidden="true" style={{
                 flexShrink: 0, width: 22, height: 22, borderRadius: 7, background: s.icon,
-                color: s.bar, fontWeight: 800, fontSize: 13, display: "flex",
+                color: s.bar, fontWeight: 700, fontSize: 13, display: "flex",
                 alignItems: "center", justifyContent: "center", marginTop: 1,
               }}>{s.ico}</span>
               <span style={{ flex: 1, color: "var(--ink)", fontSize: 14, lineHeight: 1.45 }}>{t.msg}</span>

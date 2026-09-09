@@ -37,7 +37,7 @@ type Item =
   | { kind: "block"; key: string; label: string; hint?: string; icon?: ReactNode; run: () => void }
 
 const G = "var(--accent)"
-const MUTED = "#8A8478"
+const MUTED = "var(--muted)"
 
 export function CommandPalette({ open, onClose, commands, blockDefs, onInsertBlock, recentBlockTypes, maxBlocks = 8 }: Props) {
   const [q, setQ] = useState("")

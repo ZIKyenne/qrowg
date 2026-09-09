@@ -61,7 +61,7 @@ export default function ImportEnMasse({ ouvert, onFermer, onCrees }: {
     <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, maxHeight: "90vh", overflowY: "auto", background: "var(--surface)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 20, padding: 20, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 6 }}>
         <Upload size={17} color={G} />
-        <p style={{ flex: 1, color: "var(--ink)", fontSize: 16, fontWeight: 800, margin: 0 }}>Importer en masse</p>
+        <p style={{ flex: 1, color: "var(--ink)", fontSize: 16, fontWeight: 700, margin: 0 }}>Importer en masse</p>
         <button onClick={onFermer} aria-label="Fermer l'import" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", width: 30, height: 30 }}><X size={15} /></button>
       </div>
       <p style={{ color: MUTED, fontSize: 12, margin: "0 0 14px", lineHeight: 1.55 }}>

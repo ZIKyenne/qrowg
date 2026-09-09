@@ -26,7 +26,7 @@ export function LegalLayout({ children, title, updated }: {
       `}</style>
       <header style={{ position:"fixed",top:0,left:0,right:0,zIndex:100,background:"rgba(8,8,8,0.93)",backdropFilter:"blur(24px)",borderBottom:"1px solid color-mix(in srgb, var(--accent) 12%, transparent)",padding:"0 48px",height:64,display:"flex",alignItems:"center",justifyContent:"space-between" }} className="lheader">
         <Link href="/" style={{ textDecoration:"none" }}>
-          <span style={{ fontFamily:"Fraunces,serif",fontSize:20,color:"var(--accent)",fontWeight:700 }}>QRowg</span>
+          <span style={{ fontSize:20,color:"var(--accent)",fontWeight:700 }}>QRowg</span>
         </Link>
         <Link href="/" style={{ display:"flex",alignItems:"center",gap:6,color:"rgba(138,132,120,0.65)",textDecoration:"none",fontSize:13,transition:"color 0.2s" }}
           onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color="var(--ink)"}}
@@ -37,7 +37,7 @@ export function LegalLayout({ children, title, updated }: {
       <main style={{ maxWidth:740,margin:"0 auto",padding:"100px 48px 80px" }} className="lcontent">
         <div style={{ marginBottom:44,paddingBottom:32,borderBottom:"1px solid color-mix(in srgb, var(--accent) 12%, transparent)" }}>
           <p style={{ color:"var(--accent)",fontSize:10,letterSpacing:3,textTransform:"uppercase",fontWeight:600,marginBottom:12 }}>QRowg — Legal</p>
-          <h1 style={{ fontFamily:"Fraunces,serif",fontSize:"clamp(28px,4vw,44px)",fontWeight:700,color:"var(--ink)",lineHeight:1.1,marginBottom:10 }}>{title}</h1>
+          <h1 style={{ fontSize:"clamp(28px,4vw,44px)",fontWeight:700,color:"var(--ink)",lineHeight:1.1,marginBottom:10 }}>{title}</h1>
           <p style={{ color:"rgba(138,132,120,0.5)",fontSize:12.5 }}>Dernière mise à jour : {updated}</p>
         </div>
         {children}

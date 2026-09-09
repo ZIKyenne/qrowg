@@ -214,7 +214,7 @@ export default function SubscribeButton({
             opacity: disabled ? 0.55 : 1,
             font: "inherit",
             fontSize: 16,
-            fontWeight: 800,
+            fontWeight: 700,
             transition: "transform .18s cubic-bezier(.2,.8,.3,1), box-shadow .18s",
             animation: "sb-pop .32s cubic-bezier(.2,.8,.3,1)",
           }}

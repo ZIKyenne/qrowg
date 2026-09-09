@@ -259,7 +259,7 @@ export function MobileBuilderShell(p: MobileBuilderShellProps) {
               {p.saveError && <li data-testid="publish-save-error" style={{ fontSize: 12.5, color: "var(--danger)" }}>⚠ Sauvegarde en erreur — réessayez avant de publier.</li>}
             </ul>
             <button type="button" data-testid="mobile-publish" disabled={!p.onPublish || p.publishing || p.saveError} onClick={() => p.onPublish?.()}
-              style={{ minHeight: 48, borderRadius: 12, border: "none", background: "var(--accent)", color: "var(--ink-on-accent)", fontSize: 14, fontWeight: 800, cursor: p.onPublish && !p.publishing && !p.saveError ? "pointer" : "not-allowed", opacity: p.onPublish && !p.saveError ? 1 : 0.5 }}>
+              style={{ minHeight: 48, borderRadius: 12, border: "none", background: "var(--accent)", color: "var(--ink-on-accent)", fontSize: 14, fontWeight: 700, cursor: p.onPublish && !p.publishing && !p.saveError ? "pointer" : "not-allowed", opacity: p.onPublish && !p.saveError ? 1 : 0.5 }}>
               {p.publishing ? "Publication…" : p.pageStatus === "published" ? "Mettre à jour la page" : "Publier maintenant"}
             </button>
             {p.publishError && <p data-testid="publish-error" style={{ margin: 0, fontSize: 12, color: "var(--danger)" }}>{p.publishError}</p>}

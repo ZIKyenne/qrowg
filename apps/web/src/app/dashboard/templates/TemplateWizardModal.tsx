@@ -21,7 +21,7 @@ import { slugifyBase } from "@/lib/slug"
 import { useIsMobile } from "@/lib/useIsMobile"
 
 const MUTED = "var(--muted)"
-const INK = "#F5F0E8"
+const INK = "var(--ink)"
 
 // Les informations PERSONNELLES arrivent vides, avec l'exemple du modèle en gris :
 // personne ne doit publier « 12 rue de la Paix » sans s'en rendre compte. Le contenu

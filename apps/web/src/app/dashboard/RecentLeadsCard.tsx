@@ -50,7 +50,7 @@ export default function RecentLeadsCard() {
       <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
           <span style={{ color: "var(--accent)", background: "color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 8, padding: 7, display: "flex" }}><Inbox size={16} /></span>
-          <p style={{ color: "#F8F4EC", fontSize: 15.5, fontWeight: 700, margin: 0, letterSpacing: "-0.2px" }}>
+          <p style={{ color: "var(--ink)", fontSize: 15.5, fontWeight: 700, margin: 0, letterSpacing: "-0.2px" }}>
             Derniers messages{unread > 0 && <span style={{ marginLeft: 8, background: "var(--danger)", color: "#fff", fontSize: 10, fontWeight: 700, borderRadius: 9, padding: "1px 7px", verticalAlign: "middle" }}>{unread} non lu{unread > 1 ? "s" : ""}</span>}
           </p>
         </div>

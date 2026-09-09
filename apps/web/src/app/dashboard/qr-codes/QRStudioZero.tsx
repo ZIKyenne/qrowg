@@ -20,7 +20,7 @@ import { PRESETS, PRESET_CATS, canUsePreset, type Preset } from "./presetsQr"
 import { PLAN_RANK } from "@/lib/plans"
 
 const G = "var(--accent)"
-const INK = "#F5F0E8"
+const INK = "var(--ink)"
 const MUTED = "var(--muted)"
 const FAINT = "rgba(245,240,232,0.42)"
 const SHELL_BG = "#0B0A08"
@@ -257,7 +257,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
         <aside className="qz-col qz-aside" style={{ borderRight: `1px solid ${LINE}`, display: collapsed ? "none" : "flex", flexDirection: "column", minHeight: 0, background: "rgba(0,0,0,0.18)" }}>
           <div style={{ padding: "12px 12px 8px", flexShrink: 0 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-              <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: 1, color: MUTED, textTransform: "uppercase" }}>Mes QR</span>
+              <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: 1, color: MUTED, textTransform: "uppercase" }}>Mes QR</span>
               <Link href="/dashboard/templates" title="Nouveau QR" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, background: "color-mix(in srgb, var(--accent) 14%, transparent)", border: `1px solid color-mix(in srgb, var(--accent) 30%, transparent)`, color: G }}><Plus size={15} /></Link>
             </div>
             <div style={{ position: "relative" }}>
@@ -271,7 +271,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
               return (
                 <button key={q.id} type="button" onClick={() => setActiveId(q.id)} className="qz-row" style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", marginBottom: 3, borderRadius: 10, cursor: "pointer", textAlign: "left", background: on ? "color-mix(in srgb, var(--accent) 12%, transparent)" : "transparent", border: `1px solid ${on ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "transparent"}` }}>
                   {/* Pastille légère (PAS de moteur QR par ligne — cf. perfs mobile). */}
-                  <span style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, background: q.background_color || "#fff", border: `1px solid ${LINE}`, display: "flex", alignItems: "center", justifyContent: "center" }}><QrCode size={16} color={q.foreground_color || "#0A0A0A"} /></span>
+                  <span style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, background: q.background_color || "#fff", border: `1px solid ${LINE}`, display: "flex", alignItems: "center", justifyContent: "center" }}><QrCode size={16} color={q.foreground_color || "var(--field)"} /></span>
                   <span style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: on ? INK : "#D9D3C7", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{q.pages?.title || q.short_code}</span>
                     <span style={{ display: "block", fontSize: 10, color: FAINT, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{q.pages ? "Page" : "Lien"} · {q.short_code}</span>
@@ -308,7 +308,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                 </div>
               </div>
               <div style={{ textAlign: "center", flexShrink: 0 }}>
-                <p style={{ fontFamily: "Fraunces, serif", fontSize: 18, fontWeight: 700, color: INK, margin: "0 0 2px" }}>{active.pages?.title || active.short_code}</p>
+                <p style={{ fontSize: 18, fontWeight: 700, color: INK, margin: "0 0 2px" }}>{active.pages?.title || active.short_code}</p>
                 <button type="button" onClick={copyUrl} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: "none", color: MUTED, fontSize: 12, cursor: "pointer", fontFamily: "ui-monospace, monospace" }}>{qrUrl.replace(/^https?:\/\//, "")} {copied ? <Check size={12} color="var(--success)" /> : <Copy size={12} />}</button>
               </div>
               {/* Indicateur UNIQUE de lisibilité (§16) — détails au clic. */}
@@ -316,7 +316,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                 <button type="button" onClick={() => setScanOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "9px 13px", borderRadius: 11, background: `color-mix(in srgb, ${scanColor} 8%, transparent)`, border: `1px solid color-mix(in srgb, ${scanColor} 30%, transparent)`, color: INK, cursor: "pointer", textAlign: "left" }}>
                   <span style={{ width: 9, height: 9, borderRadius: "50%", background: scanColor, flexShrink: 0, boxShadow: `0 0 8px ${scanColor}` }} />
                   <span style={{ flex: 1, fontSize: 12.5, fontWeight: 700, color: scanColor }}>{scan.label}</span>
-                  {risky && <span onClick={e => { e.stopPropagation(); fixContrast() }} style={{ fontSize: 11, fontWeight: 700, color: "#080808", background: scanColor, borderRadius: 7, padding: "4px 9px" }}>Corriger</span>}
+                  {risky && <span onClick={e => { e.stopPropagation(); fixContrast() }} style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-on-accent)", background: scanColor, borderRadius: 7, padding: "4px 9px" }}>Corriger</span>}
                   <ChevronDown size={15} color={MUTED} style={{ transform: scanOpen ? "rotate(180deg)" : "none", transition: "transform .2s", flexShrink: 0 }} />
                 </button>
                 {scanOpen && (
@@ -357,7 +357,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                         {Array.from({ length: 9 }).map((_, i) => <span key={i} style={{ background: [0, 2, 4, 6, 8, 3, 5].includes(i) ? p.fg : "transparent", borderRadius: dotR }} />)}
                       </div>
                       <span style={{ display: "block", marginTop: 6, fontSize: 8.5, fontWeight: 700, color: MUTED, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", textAlign: "center" }}>{p.label}</span>
-                      {locked && <span style={{ position: "absolute", top: 4, right: 4, fontSize: 8, fontWeight: 800, color: G, background: "rgba(0,0,0,0.6)", borderRadius: 5, padding: "1px 4px" }}>PRO</span>}
+                      {locked && <span style={{ position: "absolute", top: 4, right: 4, fontSize: 8, fontWeight: 700, color: G, background: "rgba(0,0,0,0.6)", borderRadius: 5, padding: "1px 4px" }}>PRO</span>}
                     </button>
                   )
                 })}
@@ -404,7 +404,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                 <div className="mo-fade-up" style={{ marginTop: 12, padding: 10, background: SURF, border: `1px solid ${LINE}`, borderRadius: 10 }}>
                   <p style={miniLabel}>Type de dégradé</p>
                   <div style={{ display: "flex", gap: 4, background: "rgba(0,0,0,0.2)", borderRadius: 8, padding: 3, marginBottom: 8 }}>
-                    {(["none", "linear", "radial", "diagonal"] as const).map(gt => <button key={gt} type="button" onClick={() => setStyleConf(s => ({ ...s, gradient: gt }))} style={{ flex: 1, padding: "6px 0", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 10.5, fontWeight: (styleConf.gradient ?? "none") === gt ? 800 : 600, background: (styleConf.gradient ?? "none") === gt ? G : "transparent", color: (styleConf.gradient ?? "none") === gt ? "#080808" : MUTED }}>{gt === "none" ? "Aucun" : gt === "linear" ? "Linéaire" : gt === "radial" ? "Radial" : "Diagonal"}</button>)}
+                    {(["none", "linear", "radial", "diagonal"] as const).map(gt => <button key={gt} type="button" onClick={() => setStyleConf(s => ({ ...s, gradient: gt }))} style={{ flex: 1, padding: "6px 0", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 10.5, fontWeight: (styleConf.gradient ?? "none") === gt ? 800 : 600, background: (styleConf.gradient ?? "none") === gt ? G : "transparent", color: (styleConf.gradient ?? "none") === gt ? "var(--ink-on-accent)" : MUTED }}>{gt === "none" ? "Aucun" : gt === "linear" ? "Linéaire" : gt === "radial" ? "Radial" : "Diagonal"}</button>)}
                   </div>
                   {styleConf.gradient && styleConf.gradient !== "none" && <ColorRow label="2ᵉ ton" value={styleConf.fg2 || fg || "#0A0A0A"} onChange={v => setStyleConf(s => ({ ...s, fg2: v }))} />}
                 </div>
@@ -445,7 +445,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                   <div>
                     <p style={miniLabel}>Correction d'erreur</p>
                     <div style={{ display: "flex", gap: 4, background: SURF, borderRadius: 9, padding: 3 }}>
-                      {(["L", "M", "Q", "H"] as const).map(l => <button key={l} type="button" onClick={() => setEcc(l)} style={{ flex: 1, padding: "7px 0", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 11.5, fontWeight: ecc === l ? 800 : 600, background: ecc === l ? G : "transparent", color: ecc === l ? "#080808" : MUTED }}>{l}</button>)}
+                      {(["L", "M", "Q", "H"] as const).map(l => <button key={l} type="button" onClick={() => setEcc(l)} style={{ flex: 1, padding: "7px 0", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 11.5, fontWeight: ecc === l ? 800 : 600, background: ecc === l ? G : "transparent", color: ecc === l ? "var(--ink-on-accent)" : MUTED }}>{l}</button>)}
                     </div>
                   </div>
                   <div>
@@ -467,7 +467,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
         <div onClick={() => setDlOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 90, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div onClick={e => e.stopPropagation()} className="mo-pop-in" style={{ width: "100%", maxWidth: 380, background: SHELL_BG, border: `1px solid ${LINE}`, borderRadius: 18, padding: 20, boxShadow: "0 24px 60px rgba(0,0,0,0.6)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-              <h3 style={{ fontFamily: "Fraunces, serif", fontSize: 18, fontWeight: 700, margin: 0 }}>Télécharger votre QR</h3>
+              <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Télécharger votre QR</h3>
               <button type="button" onClick={() => setDlOpen(false)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer" }}><X size={18} /></button>
             </div>
             {risky ? (
@@ -496,7 +496,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
         <div onClick={() => setAllPresets(false)} style={{ position: "fixed", inset: 0, zIndex: 90, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div onClick={e => e.stopPropagation()} className="mo-pop-in qz-col" style={{ width: "100%", maxWidth: 560, maxHeight: "80vh", overflowY: "auto", background: SHELL_BG, border: `1px solid ${LINE}`, borderRadius: 18, padding: 20, boxShadow: "0 24px 60px rgba(0,0,0,0.6)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, position: "sticky", top: 0, background: SHELL_BG }}>
-              <h3 style={{ fontFamily: "Fraunces, serif", fontSize: 18, fontWeight: 700, margin: 0 }}>Tous les styles</h3>
+              <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Tous les styles</h3>
               <button type="button" onClick={() => setAllPresets(false)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer" }}><X size={18} /></button>
             </div>
             {PRESET_CATS.map(cat => {
@@ -516,7 +516,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                             {Array.from({ length: 9 }).map((_, i) => <span key={i} style={{ background: [0, 2, 4, 6, 8, 3, 5].includes(i) ? p.fg : "transparent", borderRadius: dotR }} />)}
                           </div>
                           <span style={{ display: "block", marginTop: 5, fontSize: 8, fontWeight: 700, color: MUTED, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", textAlign: "center" }}>{p.label}</span>
-                          {locked && <span style={{ position: "absolute", top: 3, right: 3, fontSize: 7.5, fontWeight: 800, color: G, background: "rgba(0,0,0,0.6)", borderRadius: 4, padding: "1px 3px" }}>PRO</span>}
+                          {locked && <span style={{ position: "absolute", top: 3, right: 3, fontSize: 7.5, fontWeight: 700, color: G, background: "rgba(0,0,0,0.6)", borderRadius: 4, padding: "1px 3px" }}>PRO</span>}
                         </button>
                       )
                     })}
@@ -547,7 +547,7 @@ const PALETTES: [string, string][] = [
   ["#0A0A0A", "#FFFFFF"], ["#1E3A5F", "#FFFFFF"], ["#B91C1C", "#FFF7ED"],
   ["#047857", "#ECFDF5"], ["#4F46E5", "#FFFFFF"], ["#C9A84C", "#0A0A0A"], ["#2D2D2D", "#F5F0E8"],
 ]
-const secH: React.CSSProperties = { fontFamily: "Fraunces, serif", fontSize: 15, fontWeight: 700, color: INK, margin: "0 0 10px" }
+const secH: React.CSSProperties = { fontSize: 15, fontWeight: 700, color: INK, margin: "0 0 10px" }
 const miniLabel: React.CSSProperties = { margin: "0 0 6px", fontSize: 10.5, fontWeight: 600, color: MUTED }
 const smallBtn: React.CSSProperties = { minHeight: 34, padding: "0 12px", borderRadius: 9, background: SURF, border: `1px solid ${LINE}`, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center" }
 function shapeBtn(on: boolean): React.CSSProperties {

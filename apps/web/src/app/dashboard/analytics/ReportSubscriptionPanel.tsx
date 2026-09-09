@@ -175,11 +175,11 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
                       <button type="button" onClick={() => toggle(freq)} disabled={busy}
                         style={{ width: 44, height: 24, borderRadius: 12, border: "none", background: on ? cfg.color : "rgba(255,255,255,0.1)", cursor: busy ? "wait" : "pointer", position: "relative", transition: "all 0.2s", flexShrink: 0, opacity: busy ? 0.7 : 1 }}>
                         {busy ? (
-                          <Loader size={12} color={on ? "#080808" : MUTED} style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", animation: "mo-spin 0.8s linear infinite" }} />
+                          <Loader size={12} color={on ? "var(--bg)" : MUTED} style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", animation: "mo-spin 0.8s linear infinite" }} />
                         ) : ok ? (
-                          <CheckCircle size={14} color={on ? "#080808" : "var(--success)"} style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)" }} />
+                          <CheckCircle size={14} color={on ? "var(--bg)" : "var(--success)"} style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)" }} />
                         ) : (
-                          <div style={{ width: 16, height: 16, borderRadius: "50%", background: on ? "#080808" : "rgba(255,255,255,0.3)", position: "absolute", top: "50%", transform: "translateY(-50%)", transition: "left 0.2s", left: on ? "calc(100% - 20px)" : 4 }} />
+                          <div style={{ width: 16, height: 16, borderRadius: "50%", background: on ? "var(--bg)" : "rgba(255,255,255,0.3)", position: "absolute", top: "50%", transform: "translateY(-50%)", transition: "left 0.2s", left: on ? "calc(100% - 20px)" : 4 }} />
                         )}
                       </button>
                     </div>

@@ -25,13 +25,13 @@ export default function UiDemoPage() {
   const [sw2, setSw2] = useState(false)
 
   const section: React.CSSProperties = { marginBottom: 40 }
-  const h2: React.CSSProperties = { fontFamily: "Fraunces, serif", color: "var(--ink)", fontSize: 20, fontWeight: 700, margin: "0 0 14px" }
+  const h2: React.CSSProperties = { color: "var(--ink)", fontSize: 20, fontWeight: 700, margin: "0 0 14px" }
   const lbl: React.CSSProperties = { color: "var(--muted)", fontSize: 11, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px", fontWeight: 700 }
   const row: React.CSSProperties = { display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12, marginBottom: 18 }
 
   return (
     <div style={{ minHeight: "100dvh", padding: "28px 24px 80px", maxWidth: 900, margin: "0 auto", fontFamily: "Inter, system-ui, sans-serif" }}>
-      <h1 style={{ fontFamily: "Fraunces, serif", color: "var(--ink)", fontSize: 30, fontWeight: 800, margin: "0 0 6px" }}>Design System — Primitives</h1>
+      <h1 style={{ color: "var(--ink)", fontSize: 30, fontWeight: 700, margin: "0 0 6px" }}>Design System — Primitives</h1>
       <p style={{ color: "var(--muted)", fontSize: 14, margin: "0 0 32px" }}>Revue visuelle des composants réutilisables. Astuce : changez la couleur d'accent dans Profil — les éléments « accent/primary » la suivent.</p>
 
       {/* BUTTON */}
@@ -75,10 +75,10 @@ export default function UiDemoPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(260px,100%),1fr))", gap: 16 }}>
           <Card>Carte simple (sans en-tête). Contenu libre.</Card>
           <Card title="QR actifs" icon={<QrCode size={16} />} action={<Badge tone="success">5 / 25</Badge>}>
-            <p style={{ margin: 0, color: "#C9C3B6", fontSize: 14 }}>Carte avec en-tête, icône et action à droite.</p>
+            <p style={{ margin: 0, color: "var(--muted)", fontSize: 14 }}>Carte avec en-tête, icône et action à droite.</p>
           </Card>
           <Card elevated title="Statistiques" icon={<BarChart size={16} />}>
-            <p style={{ margin: 0, color: "#C9C3B6", fontSize: 14 }}>Variante <strong>elevated</strong> (ombre plus marquée).</p>
+            <p style={{ margin: 0, color: "var(--muted)", fontSize: 14 }}>Variante <strong>elevated</strong> (ombre plus marquée).</p>
           </Card>
         </div>
       </div>
@@ -96,7 +96,7 @@ export default function UiDemoPage() {
               { id: "style", label: "Style", icon: <Palette size={14} /> },
             ]}
           />
-          <div style={{ padding: 18, color: "#C9C3B6", fontSize: 14 }}>Onglet actif : <strong style={{ color: "var(--accent)" }}>{tab}</strong></div>
+          <div style={{ padding: 18, color: "var(--muted)", fontSize: 14 }}>Onglet actif : <strong style={{ color: "var(--accent)" }}>{tab}</strong></div>
         </Card>
       </div>
 

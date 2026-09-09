@@ -213,7 +213,7 @@ export default function DnsChecker({ domain, onVerified }: Props) {
                           <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1, margin:"0 0 5px" }}>
                             {check.status === "error" ? "Valeur actuelle (incorrecte)" : "Valeur trouvée"}
                           </p>
-                          <code style={{ color: check.status === "error" ? "var(--danger)" : "#F5F0E8", fontSize:11, background:"rgba(255,255,255,0.04)", padding:"5px 10px", borderRadius:7, display:"block", wordBreak:"break-all" }}>
+                          <code style={{ color: check.status === "error" ? "var(--danger)" : "var(--ink)", fontSize:11, background:"rgba(255,255,255,0.04)", padding:"5px 10px", borderRadius:7, display:"block", wordBreak:"break-all" }}>
                             {check.found}
                           </code>
                         </div>

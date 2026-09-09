@@ -24,7 +24,7 @@ export default function ConversionFunnelPanel({ steps, conversionRate, hasEngage
         </div>
         {views > 0 && (
           <div style={{ textAlign: "right" }}>
-            <span style={{ color: NEON, fontSize: 20, fontWeight: 800 }}>{conversionRate}%</span>
+            <span style={{ color: NEON, fontSize: 20, fontWeight: 700 }}>{conversionRate}%</span>
             <span style={{ color: MUTED, fontSize: 11, marginLeft: 6 }}>taux de conversion</span>
           </div>
         )}

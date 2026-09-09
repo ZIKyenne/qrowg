@@ -224,7 +224,7 @@ export default function DevicePanel({ scans, pageViews, pages, page, periodDays 
           <div style={{ display: "flex", background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 3, gap: 3 }}>
             {PERIODS.map(o => (
               <button key={o.v} type="button" onClick={() => setPeriod(o.v)}
-                style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", background: period === o.v ? G : "transparent", color: period === o.v ? "#080808" : MUTED }}>
+                style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", background: period === o.v ? G : "transparent", color: period === o.v ? "var(--ink-on-accent)" : MUTED }}>
                 {o.l}
               </button>
             ))}

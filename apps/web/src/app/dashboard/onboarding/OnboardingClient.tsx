@@ -10,7 +10,7 @@ import { ArrowLeft, Sparkles } from "lucide-react"
 import { OBJECTIVES, SECTORS, composeRecipe, type Objective, type Sector } from "./objectives"
 
 const G = "var(--accent)"
-const INK = "#F5F0E8"
+const INK = "var(--ink)"
 const MUT = "#A8A190"
 
 export default function OnboardingClient() {
@@ -86,10 +86,10 @@ export default function OnboardingClient() {
 
         {/* En-tête */}
         <div style={{ textAlign: "center", maxWidth: 660, margin: "8px auto 30px" }}>
-          <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", display: "inline-flex", alignItems: "center", gap: 7 }}>
+          <p style={{ color: G, fontSize: 12, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", display: "inline-flex", alignItems: "center", gap: 7 }}>
             <Sparkles size={14} /> Création guidée{chosen ? " · étape 2/2" : ""}
           </p>
-          <h1 style={{ color: INK, fontSize: "clamp(24px,4.6vw,38px)", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.12, margin: "12px 0 12px", textWrap: "balance" }}>
+          <h1 style={{ color: INK, fontSize: "clamp(24px,4.6vw,38px)", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.12, margin: "12px 0 12px", textWrap: "balance" }}>
             {chosen ? <>Vous êtes plutôt… <span style={{ color: G }}>{chosen.emoji} {chosen.label.toLowerCase()}</span></> : "Que voulez-vous accomplir ?"}
           </h1>
           <p style={{ color: MUT, fontSize: "clamp(14px,2.2vw,16px)", lineHeight: 1.6, margin: 0 }}>
@@ -107,7 +107,7 @@ export default function OnboardingClient() {
             {OBJECTIVES.map(o => (
               <button key={o.key} type="button" onClick={() => setChosen(o)} style={{ ...tile, minHeight: 150 }} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
                 <span style={{ fontSize: 30, lineHeight: 1 }}>{o.emoji}</span>
-                <span style={{ color: INK, fontSize: 16.5, fontWeight: 800 }}>{o.label}</span>
+                <span style={{ color: INK, fontSize: 16.5, fontWeight: 700 }}>{o.label}</span>
                 <span style={{ color: MUT, fontSize: 13, lineHeight: 1.5, flex: 1 }}>{o.desc}</span>
                 <span style={{ color: G, fontSize: 12.5, fontWeight: 700, marginTop: 2 }}>{o.cta} →</span>
               </button>
@@ -123,7 +123,7 @@ export default function OnboardingClient() {
                 <button key={s.key} type="button" disabled={busy} onClick={() => generate(chosen, s)} style={{ ...tile, minHeight: 96, flexDirection: "row", alignItems: "center", gap: 13 }} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
                   <span style={{ fontSize: 26, lineHeight: 1, flexShrink: 0 }}>{s.emoji}</span>
                   <span style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0 }}>
-                    <span style={{ color: INK, fontSize: 15, fontWeight: 800, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.label}</span>
+                    <span style={{ color: INK, fontSize: 15, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.label}</span>
                     <span style={{ color: MUT, fontSize: 12 }}>{s.tagline}</span>
                   </span>
                 </button>

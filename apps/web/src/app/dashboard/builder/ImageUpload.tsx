@@ -93,7 +93,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
   }
 
   const G = "#C9A84C"
-  const MUTED = "#A8A190"
+  const MUTED = "var(--muted)"
 
   return (
     <div>

@@ -266,7 +266,7 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
       {/* EN-TÊTE STUDIO */}
       <div style={{ background: "linear-gradient(135deg,color-mix(in srgb, var(--accent) 14%, transparent),color-mix(in srgb, var(--accent) 3%, transparent))", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 13, padding: "12px 14px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 10 }}>
-          <span style={{ display: "flex", color: G, animation: "qfbFloat 4s ease-in-out infinite" }}><Wand2 size={16} /></span>
+          <span style={{ display: "flex", color: G }}><Wand2 size={16} /></span>
           <div style={{ flex: 1 }}>
             <p style={{ color: G, fontSize: 12.5, fontWeight: 800, letterSpacing: 0.5, margin: 0, textTransform: "uppercase" }}>Banner Studio</p>
             <p style={{ color: MUTED, fontSize: 10, margin: "1px 0 0" }}>{typeLabel} · {heightPx}px · {animLabel}</p>

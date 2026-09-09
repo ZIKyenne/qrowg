@@ -141,7 +141,7 @@ Tiramisu;6,50€;Fait maison`
   }
 
   function GalleryImagesEditor({ block, onChange }: { block: Block; onChange: (key: string, val: string) => void }) {
-    const M = "#A8A190", TXT = "#F5F0E8", GG = "var(--accent, #C9A84C)"
+    const M = "var(--muted)", TXT = "var(--ink)", GG = "var(--accent, #C9A84C)"
     const isCarousel = block.type === "image_carousel"
     const KEYS = ["img1", "img2", "img3", "img4", "img5", "img6", "img7", "img8", "img9", "img10", "img11", "img12"]
     const MAX = KEYS.length
@@ -153,7 +153,7 @@ Tiramisu;6,50€;Fait maison`
     const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
     const Seg = ({ opts, val, k }: { opts: { k: string; l: string }[]; val: string; k: string }) => (
       <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
-        {opts.map(o => <button key={o.k} type="button" onClick={() => onChange(k, o.k)} style={{ flex: 1, padding: "7px 4px", borderRadius: 7, background: val === o.k ? GG : "transparent", border: "none", color: val === o.k ? "#080808" : M, fontSize: 11, fontWeight: val === o.k ? 700 : 500, cursor: "pointer" }}>{o.l}</button>)}
+        {opts.map(o => <button key={o.k} type="button" onClick={() => onChange(k, o.k)} style={{ flex: 1, padding: "7px 4px", borderRadius: 7, background: val === o.k ? GG : "transparent", border: "none", color: val === o.k ? "var(--ink-on-accent)" : M, fontSize: 11, fontWeight: val === o.k ? 700 : 500, cursor: "pointer" }}>{o.l}</button>)}
       </div>
     )
     return (
@@ -191,7 +191,7 @@ Tiramisu;6,50€;Fait maison`
   }
 
   function SkillsEditor({ content, onChange }: { content: BlockContent; onChange: (key: string, val: string) => void }) {
-    const M = "#A8A190", TXT = "#F5F0E8", GG = "var(--accent, #C9A84C)"
+    const M = "var(--muted)", TXT = "var(--ink)", GG = "var(--accent, #C9A84C)"
     const tags: string[] = String(content.tags || "").split(",").map(t => t.trim()).filter(Boolean)
     const [input, setInput] = useState("")
     const commit = (arr: string[]) => onChange("tags", arr.join(", "))
@@ -247,7 +247,7 @@ Tiramisu;6,50€;Fait maison`
   }
 
   function AvailabilityEditor({ content, onChange }: { content: BlockContent; onChange: (key: string, val: string) => void }) {
-    const M = "#A8A190", TXT = "#F5F0E8", GG = "var(--accent, #C9A84C)"
+    const M = "var(--muted)", TXT = "var(--ink)", GG = "var(--accent, #C9A84C)"
     const cur = content.status || "available"
     const sc = availabilityStatus(cur, content.dot_color)
     const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
@@ -346,7 +346,7 @@ Tiramisu;6,50€;Fait maison`
     const count = Math.max(rows, derived)
     const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "9px 11px", color: "var(--ink)", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
     const foc = (on: boolean) => (e: React.FocusEvent<HTMLInputElement>) => { e.target.style.borderColor = on ? "color-mix(in srgb, var(--accent) 50%, transparent)" : "color-mix(in srgb, var(--accent) 20%, transparent)" }
-    const iconBtn = (disabled: boolean): React.CSSProperties => ({ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", color: disabled ? "rgba(255,255,255,0.2)" : "#F5F0E8", cursor: disabled ? "default" : "pointer", flexShrink: 0 })
+    const iconBtn = (disabled: boolean): React.CSSProperties => ({ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", color: disabled ? "rgba(255,255,255,0.2)" : "var(--ink)", cursor: disabled ? "default" : "pointer", flexShrink: 0 })
     const lbl: React.CSSProperties = { color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }
     const deleteItem = (idx: number) => {
       for (let j = idx; j < count; j++) writeItem(j, item(j + 1))
@@ -694,7 +694,7 @@ Tiramisu;6,50€;Fait maison`
             <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
               {[{ k: "list", l: "Liste" }, { k: "grid", l: "Grille" }, { k: "icons", l: "Icônes" }].map(o => {
                 const on = disp === o.k
-                return <button key={o.k} type="button" onClick={() => onChange("display", o.k)} style={{ flex: 1, padding: "7px 4px", borderRadius: 7, background: on ? G : "transparent", border: "none", color: on ? "#080808" : MUTED, fontSize: 11, fontWeight: on ? 700 : 500, cursor: "pointer" }}>{o.l}</button>
+                return <button key={o.k} type="button" onClick={() => onChange("display", o.k)} style={{ flex: 1, padding: "7px 4px", borderRadius: 7, background: on ? G : "transparent", border: "none", color: on ? "var(--ink-on-accent)" : MUTED, fontSize: 11, fontWeight: on ? 700 : 500, cursor: "pointer" }}>{o.l}</button>
               })}
             </div>
           </div>
@@ -882,7 +882,7 @@ Tiramisu;6,50€;Fait maison`
                         if (active) onChange(field.key, parts.filter((p: string) => p !== sug).join(", "))
                         else if (parts.length < 5) onChange(field.key, [...parts, sug].join(", "))
                       }}
-                      style={{ padding: "4px 9px", borderRadius: 999, background: active ? G : "color-mix(in srgb, var(--accent) 10%, transparent)", border: `1px solid ${active ? G : "color-mix(in srgb, var(--accent) 25%, transparent)"}`, color: active ? "#080808" : G, fontSize: 10, fontWeight: active ? 800 : 600, cursor: "pointer", whiteSpace: "nowrap" as const, maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      style={{ padding: "4px 9px", borderRadius: 999, background: active ? G : "color-mix(in srgb, var(--accent) 10%, transparent)", border: `1px solid ${active ? G : "color-mix(in srgb, var(--accent) 25%, transparent)"}`, color: active ? "var(--ink-on-accent)" : G, fontSize: 10, fontWeight: active ? 800 : 600, cursor: "pointer", whiteSpace: "nowrap" as const, maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis" }}>
                       {active ? "✓ " : ""}{sug}
                     </button>
                   )
@@ -969,7 +969,7 @@ Tiramisu;6,50€;Fait maison`
     const introPreviewRef = useRef<HTMLDivElement>(null)
 
     const G = "#C9A84C"
-    const MUTED = "#A8A190"
+    const MUTED = "var(--muted)"
 
     const inputStyle: React.CSSProperties = {
       width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)",
@@ -981,9 +981,9 @@ Tiramisu;6,50€;Fait maison`
     const PRESETS = [
       // Business
       { name: "Executive Blue", group: "Business", bg: "#0A1628", primary: "#1E88E5", accent: "#42A5F5", text: "#F5F0E8", muted: "#8A9BA8", gradient: "linear-gradient(135deg,#0A1628 0%,#1A2A4A 100%)" },
-      { name: "Corporate Black", group: "Business", bg: "#080808", primary: "#C9A84C", accent: "var(--success)", text: "#F5F0E8", muted: "#A8A190", gradient: "linear-gradient(135deg,#080808 0%,#111111 100%)" },
+      { name: "Corporate Black", group: "Business", bg: "#080808", primary: "#C9A84C", accent: "#39FF8F", text: "#F5F0E8", muted: "#A8A190", gradient: "linear-gradient(135deg,#080808 0%,#111111 100%)" },
       { name: "Premium Navy", group: "Business", bg: "#0D1B2A", primary: "#C9A84C", accent: "#E8C96A", text: "#F5F0E8", muted: "#7A8B9A", gradient: "linear-gradient(135deg,#0D1B2A 0%,#1A3050 100%)" },
-      { name: "Midnight Gold", group: "Business", bg: "#080808", primary: "#C9A84C", accent: "var(--success)", text: "#F5F0E8", muted: "#A8A190", gradient: "linear-gradient(135deg,#080808,#1a1a08)" },
+      { name: "Midnight Gold", group: "Business", bg: "#080808", primary: "#C9A84C", accent: "#39FF8F", text: "#F5F0E8", muted: "#A8A190", gradient: "linear-gradient(135deg,#080808,#1a1a08)" },
       { name: "Boardroom", group: "Business", bg: "#1A1A1A", primary: "#E0E0E0", accent: "#C9A84C", text: "#F5F0E8", muted: "#888888", gradient: "linear-gradient(160deg,#1A1A1A,#2D2D2D)" },
       // Luxury
       { name: "Velvet Noir", group: "Luxury", bg: "#0D0A1A", primary: "#9B59B6", accent: "#E056FD", text: "#F5F0E8", muted: "#8A7A9A", gradient: "linear-gradient(135deg,#0D0A1A 0%,#1A0D2E 100%)" },
@@ -993,7 +993,7 @@ Tiramisu;6,50€;Fait maison`
       { name: "Prestige", group: "Luxury", bg: "#0C0C0C", primary: "#C9A84C", accent: "#FFD700", text: "#F5EDD0", muted: "#A8A190", gradient: "linear-gradient(160deg,#0C0C0C,#1A1500)" },
       // SaaS
       { name: "Deep Space", group: "SaaS", bg: "#020B18", primary: "#00D4FF", accent: "#7B2FBE", text: "#F5F0E8", muted: "#8A9BA8", gradient: "linear-gradient(135deg,#020B18,#0A1628)" },
-      { name: "Aurora", group: "SaaS", bg: "#0A0F1E", primary: "#00FF9D", accent: "var(--danger)", text: "#F5F0E8", muted: "#8A8FA0", gradient: "linear-gradient(135deg,#0A0F1E,#0D1628)" },
+      { name: "Aurora", group: "SaaS", bg: "#0A0F1E", primary: "#00FF9D", accent: "#00CFFF", text: "#F5F0E8", muted: "#8A8FA0", gradient: "linear-gradient(135deg,#0A0F1E,#0D1628)" },
       { name: "Ocean Tech", group: "SaaS", bg: "#050F1A", primary: "#00B4D8", accent: "#0096C7", text: "#F5F0E8", muted: "#6A8A9A", gradient: "linear-gradient(160deg,#050F1A,#0A1E2A)" },
       { name: "Matrix Code", group: "SaaS", bg: "#000D00", primary: "#00FF41", accent: "#00CC33", text: "#00FF41", muted: "#006B1A", gradient: "linear-gradient(180deg,#000D00,#001500)" },
       { name: "Future Grid", group: "SaaS", bg: "#08001A", primary: "#7B2FBE", accent: "#9B59B6", text: "#F5F0E8", muted: "#7A6A8A", gradient: "linear-gradient(135deg,#08001A,#100028)" },
@@ -1008,7 +1008,7 @@ Tiramisu;6,50€;Fait maison`
       { name: "TikTok Vibes", group: "Creator", bg: "#010101", primary: "#FF0050", accent: "#00F2EA", text: "#F5F0E8", muted: "#888888", gradient: "linear-gradient(135deg,#010101,#0A000A)" },
       { name: "Cyber Purple", group: "Creator", bg: "#0A0015", primary: "#BF00FF", accent: "#7B2FBE", text: "#F5F0E8", muted: "#7A6A8A", gradient: "linear-gradient(135deg,#0A0015,#150020)" },
       { name: "Creator Blue", group: "Creator", bg: "#000A20", primary: "#0066FF", accent: "#4A90FF", text: "#F5F0E8", muted: "#6A7A9A", gradient: "linear-gradient(135deg,#000A20,#000F30)" },
-      { name: "Electric Neon", group: "Creator", bg: "#050505", primary: "var(--success)", accent: "#00FFFF", text: "#F5F0E8", muted: "#5A8A7A", gradient: "linear-gradient(135deg,#050505,#050F0A)" },
+      { name: "Electric Neon", group: "Creator", bg: "#050505", primary: "#39FF8F", accent: "#00FFFF", text: "#F5F0E8", muted: "#5A8A7A", gradient: "linear-gradient(135deg,#050505,#050F0A)" },
       // Minimal
       { name: "Pure White", group: "Minimal", bg: "#FFFFFF", primary: "#1A1A1A", accent: "#C9A84C", text: "#1A1A1A", muted: "#6B7280", gradient: "linear-gradient(135deg,#FFFFFF,#F8F8F8)" },
       { name: "Minimal Cream", group: "Minimal", bg: "#FAF7F2", primary: "#1A1A1A", accent: "#C9A84C", text: "#2D2D2D", muted: "#7A7060", gradient: "linear-gradient(135deg,#FAF7F2,#F0EDE8)" },
@@ -1212,7 +1212,7 @@ Tiramisu;6,50€;Fait maison`
                 <div style={{ display: "flex", flexDirection: "column", gap: 4, maxHeight: 200, overflowY: "auto" }} className="iphone-scroll">
                   {GOOGLE_FONTS.map(f => (
                     <button key={f} onClick={() => onThemeChange({...theme, [key]: f})}
-                      style={{ padding: "9px 12px", background: (theme as any)[key]===f ? G+"12" : "rgba(255,255,255,0.03)", border: `1px solid ${(theme as any)[key]===f ? G+"30" : "rgba(255,255,255,0.06)"}`, borderRadius: 8, color: (theme as any)[key]===f ? G : "#F5F0E8", fontSize: 14, cursor: "pointer", textAlign: "left", fontFamily: f, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      style={{ padding: "9px 12px", background: (theme as any)[key]===f ? G+"12" : "rgba(255,255,255,0.03)", border: `1px solid ${(theme as any)[key]===f ? G+"30" : "rgba(255,255,255,0.06)"}`, borderRadius: 8, color: (theme as any)[key]===f ? G : "var(--ink)", fontSize: 14, cursor: "pointer", textAlign: "left", fontFamily: f, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                       {f}
                       {(theme as any)[key]===f && <Check size={11} color={G} />}
                     </button>
@@ -1705,7 +1705,7 @@ Tiramisu;6,50€;Fait maison`
                     style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: animation===id ? G+"10" : "rgba(255,255,255,0.03)", border: `1.5px solid ${animation===id ? G+"40" : "rgba(255,255,255,0.07)"}`, borderRadius: 11, cursor: soon ? "not-allowed" : "pointer", opacity: soon ? 0.5 : 1 }}>
                     <span style={{ fontSize: 22, flexShrink: 0 }}>{icon}</span>
                     <div style={{ flex: 1, textAlign: "left" }}>
-                      <p style={{ color: animation===id ? G : "#F5F0E8", fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>{label} {soon && <span style={{ color: MUTED, fontSize: 9, fontWeight: 400 }}>— Bientôt</span>}</p>
+                      <p style={{ color: animation===id ? G : "var(--ink)", fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>{label} {soon && <span style={{ color: MUTED, fontSize: 9, fontWeight: 400 }}>— Bientôt</span>}</p>
                       <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{desc}</p>
                     </div>
                     {animation===id && <Check size={13} color={G} style={{ flexShrink: 0 }} />}

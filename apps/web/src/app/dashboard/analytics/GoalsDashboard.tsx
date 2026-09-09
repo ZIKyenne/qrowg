@@ -59,10 +59,10 @@ const SWATCHES  = ["var(--accent)", "var(--success)", "#818CF8", "var(--danger)"
 const G       = "var(--accent)"
 const TEXT = "var(--ink)"
 const MUTED = "var(--muted)"
-const CARD    = "#141210"
+const CARD    = "var(--surface)"
 const PANEL   = "#100e0c"
 const FIELD   = "#1a1712"
-const BORDER  = "#221f1b"
+const BORDER  = "var(--surface-2)"
 const HAIR    = "rgba(255,255,255,0.07)"
 
 const isTypeLabel = (s: string) => Object.values(GOAL_TYPES).some(c => c.label === s)
@@ -322,7 +322,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
               {k.icon}
               <div style={{ minWidth: 0 }}>
                 <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 3px" }}>{k.label}</p>
-                <p style={{ color: TEXT, fontSize: 15, fontWeight: 800, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{k.value}</p>
+                <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{k.value}</p>
               </div>
             </div>
           ))}
@@ -573,7 +573,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
                   ].map((m, i) => (
                     <div key={i} style={{ background: PANEL, border: `1px solid ${HAIR}`, borderRadius: 10, padding: "10px 12px" }}>
                       <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 4px" }}>{m.label}</p>
-                      <p style={{ color: m.color, fontSize: 18, fontWeight: 800, margin: 0 }}>{m.value}</p>
+                      <p style={{ color: m.color, fontSize: 18, fontWeight: 700, margin: 0 }}>{m.value}</p>
                     </div>
                   ))}
                 </div>

@@ -22,7 +22,7 @@ function nameFromUrl(url: string): string {
 }
 
 const G = "#C9A84C"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 
 export default function FileUpload({ value, onChange, hint }: Props) {
   const { envoyerFichier, uploading, listAssets, deleteAsset } = useImageUpload()
@@ -65,7 +65,7 @@ export default function FileUpload({ value, onChange, hint }: Props) {
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <button type="button" onClick={() => inputRef.current?.click()} disabled={uploading}
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, border: "2px dashed color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 9, padding: "12px", background: "transparent", color: uploading ? MUTED : "#F5F0E8", fontSize: 12, fontWeight: 600, cursor: uploading ? "default" : "pointer" }}>
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, border: "2px dashed color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 9, padding: "12px", background: "transparent", color: uploading ? MUTED : "var(--ink)", fontSize: 12, fontWeight: 600, cursor: uploading ? "default" : "pointer" }}>
             <Upload size={14} color={G} /> {uploading ? "Import en cours…" : "Importer un fichier (PDF…)"}
           </button>
           <input value="" onChange={e => onChange(e.target.value)} placeholder="…ou collez un lien https://"

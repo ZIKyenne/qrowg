@@ -158,7 +158,7 @@ export default function DashboardClient({
   }
 
   const planCfg = PLAN_CONFIG[profile?.plan || "free"]
-  const G = "var(--accent)"; const MUTED = "#A8A190"
+  const G = "var(--accent)"; const MUTED = "var(--muted)"
   // Tokens DA doré (identiques à la section Objectifs / Analytics) : surfaces plates,
   // plus de dégradés verts ni de barres de gradient.
   const CARD = "var(--surface)"; const PANEL = "var(--surface)"; const BORDER = "var(--line)"; const HAIR = "var(--line)"
@@ -283,7 +283,7 @@ export default function DashboardClient({
                 <div style={{ height: "100%", width: Math.min(viewsPct, 100) + "%", background: overViews ? "linear-gradient(90deg,var(--danger),#F97316)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 3 }} />
               </div>
             </div>
-            <Link href="/upgrade" style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, background: overViews ? "linear-gradient(90deg,var(--danger),#F97316)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 10, padding: "9px 16px", color: "var(--ink-on-accent)", textDecoration: "none", fontSize: 12.5, fontWeight: 800 }}>
+            <Link href="/upgrade" style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, background: overViews ? "linear-gradient(90deg,var(--danger),#F97316)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 10, padding: "9px 16px", color: "var(--ink-on-accent)", textDecoration: "none", fontSize: 12.5, fontWeight: 700 }}>
               <Zap size={13} /> Augmenter mon quota
             </Link>
           </div>
@@ -319,7 +319,7 @@ export default function DashboardClient({
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
                     <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, background: "color-mix(in srgb, var(--accent) 18%, transparent)", color: G }}><Zap size={15} /></span>
-                    <span style={{ color: G, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase" as const }}>Premiers pas</span>
+                    <span style={{ color: G, fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" as const }}>Premiers pas</span>
                   </div>
                   <h2 style={{ color: "var(--ink)", fontSize: 18, fontWeight: 600, margin: 0, letterSpacing: "-.01em" }}>Lancez votre QRowg en 3 étapes</h2>
                 </div>

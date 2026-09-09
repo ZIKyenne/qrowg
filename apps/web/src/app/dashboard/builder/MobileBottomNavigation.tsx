@@ -29,7 +29,7 @@ export function MobileBottomNavigation({ active, onSelect, compact, badges }: Mo
             <span aria-hidden="true" style={{ fontSize: compact ? 15 : 17 }}>{item.icon}</span>
             <span>{item.label}</span>
             {badge === "error" && <span aria-label="erreur" style={{ position: "absolute", top: 6, right: "50%", marginRight: -22, width: 8, height: 8, borderRadius: "50%", background: "var(--danger)" }} />}
-            {typeof badge === "number" && badge > 0 && <span style={{ position: "absolute", top: 4, right: "50%", marginRight: -24, background: "var(--accent)", color: "var(--ink-on-accent)", borderRadius: 8, minWidth: 15, height: 15, padding: "0 4px", fontSize: 9, fontWeight: 800, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{badge}</span>}
+            {typeof badge === "number" && badge > 0 && <span style={{ position: "absolute", top: 4, right: "50%", marginRight: -24, background: "var(--accent)", color: "var(--ink-on-accent)", borderRadius: 8, minWidth: 15, height: 15, padding: "0 4px", fontSize: 9, fontWeight: 700, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{badge}</span>}
           </button>
         )
       })}

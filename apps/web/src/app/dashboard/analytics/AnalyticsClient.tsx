@@ -246,7 +246,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             ].map(t => {
               const on = tab === t.id
               return (
-                <button key={t.id} role="tab" aria-selected={on} onClick={() => setTab(t.id)} style={{ position: "relative", display: "flex", alignItems: "center", gap: 9, padding: "11px 16px 13px", cursor: "pointer", fontSize: 13.5, fontWeight: on ? 700 : 500, color: on ? "#e8c877" : "#8a8177", background: "none", border: "none", fontFamily: "inherit", transition: "color .2s ease", whiteSpace: "nowrap" }}>
+                <button key={t.id} role="tab" aria-selected={on} onClick={() => setTab(t.id)} style={{ position: "relative", display: "flex", alignItems: "center", gap: 9, padding: "11px 16px 13px", cursor: "pointer", fontSize: 13.5, fontWeight: on ? 700 : 500, color: on ? "#e8c877" : "var(--muted)", background: "none", border: "none", fontFamily: "inherit", transition: "color .2s ease", whiteSpace: "nowrap" }}>
                   {t.icon} {t.label}
                   {on && <span aria-hidden style={{ position: "absolute", left: 10, right: 10, bottom: -1, height: 2, borderRadius: 2, background: "var(--accent)" }} />}
                 </button>

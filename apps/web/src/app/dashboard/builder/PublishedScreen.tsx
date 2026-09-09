@@ -50,7 +50,7 @@ export default function PublishedScreen({
           <div style={{ width: 46, height: 46, borderRadius: 14, margin: "0 auto 12px", background: "rgba(57,255,143,0.12)", border: "1px solid rgba(57,255,143,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Check size={22} color="var(--success,#39FF8F)" />
           </div>
-          <h2 style={{ fontFamily: "Fraunces, serif", fontSize: mobile ? 20 : 23, fontWeight: 700, color: INK, margin: "0 0 6px" }}>Votre page est en ligne</h2>
+          <h2 style={{ fontSize: mobile ? 20 : 23, fontWeight: 700, color: INK, margin: "0 0 6px" }}>Votre page est en ligne</h2>
           <p style={{ color: MUT, fontSize: 13, margin: 0, lineHeight: 1.5 }}>Il reste trois gestes pour qu'un client puisse la scanner.</p>
         </div>
 
@@ -112,7 +112,7 @@ export default function PublishedScreen({
 const boutonPrincipal: React.CSSProperties = {
   display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%",
   minHeight: 46, borderRadius: 11, background: G, color: "var(--ink-on-accent)",
-  fontSize: 14, fontWeight: 800, textDecoration: "none", boxSizing: "border-box",
+  fontSize: 14, fontWeight: 700, textDecoration: "none", boxSizing: "border-box",
 }
 const boutonSecondaire: React.CSSProperties = {
   display: "flex", alignItems: "center", justifyContent: "center", gap: 7, width: "100%",
@@ -124,7 +124,7 @@ function Etape({ e, dernier = false, children }: { e: { n: number; titre: string
   return (
     <div style={{ marginBottom: dernier ? 0 : 18 }}>
       <div style={{ display: "flex", alignItems: "baseline", gap: 9, marginBottom: 4 }}>
-        <span aria-hidden style={{ flexShrink: 0, width: 20, height: 20, borderRadius: "50%", background: `${G}1F`, border: `1px solid ${G}45`, color: G, fontSize: 11, fontWeight: 800, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{e.n}</span>
+        <span aria-hidden style={{ flexShrink: 0, width: 20, height: 20, borderRadius: "50%", background: `${G}1F`, border: `1px solid ${G}45`, color: G, fontSize: 11, fontWeight: 700, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{e.n}</span>
         <h3 style={{ color: INK, fontSize: 14, fontWeight: 700, margin: 0 }}>{e.titre}</h3>
       </div>
       <p style={{ color: MUT, fontSize: 12, lineHeight: 1.5, margin: "0 0 10px", paddingLeft: 29 }}>{e.pourquoi}</p>

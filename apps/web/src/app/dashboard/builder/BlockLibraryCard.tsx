@@ -47,7 +47,7 @@ export function BlockLibraryCard({ item, mobile, onAdd, onToggleFavorite, onOpen
           <span style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
             <span style={{ fontSize: mobile ? 14 : 12.5, fontWeight: 700, lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.title}</span>
             {item.isPremium && (
-              <span data-badge="premium" style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 3, background: "color-mix(in srgb, var(--accent) 16%, transparent)", color: "var(--accent)", borderRadius: 6, padding: "1px 6px", fontSize: 9, fontWeight: 800, letterSpacing: 0.3 }}>👑 Premium</span>
+              <span data-badge="premium" style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 3, background: "color-mix(in srgb, var(--accent) 16%, transparent)", color: "var(--accent)", borderRadius: 6, padding: "1px 6px", fontSize: 9, fontWeight: 700, letterSpacing: 0.3 }}>👑 Premium</span>
             )}
           </span>
           <span style={{ fontSize: mobile ? 12 : 10.5, color: MUTED, lineHeight: 1.35, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const }}>{item.description}</span>

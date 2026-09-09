@@ -182,7 +182,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
                 {k.icon}
                 <div>
                   <p style={{ color:MUTED, fontSize:10, textTransform:"uppercase", letterSpacing:1, margin:"0 0 2px" }}>{k.label}</p>
-                  <p style={{ color:"var(--ink)", fontSize:16, fontWeight:800, margin:0 }}>{k.value}</p>
+                  <p style={{ color:"var(--ink)", fontSize:16, fontWeight: 700, margin:0 }}>{k.value}</p>
                 </div>
               </div>
             ))}
@@ -212,7 +212,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
                   return (
                     <button key={t} type="button" onClick={() => setFType(t)}
                       style={{ flex:1, padding:"12px 14px", background: sel ? "color-mix(in srgb, var(--accent) 13%, transparent)" : "rgba(255,255,255,0.02)", border: sel ? "1px solid color-mix(in srgb, var(--accent) 55%, transparent)" : "1px solid rgba(255,255,255,0.07)", borderRadius:10, cursor:"pointer", textAlign:"left" as const, boxShadow: sel ? "0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent)" : "none", transition:"all 0.15s" }}>
-                      <p style={{ color: sel ? "#f0d590" : "#F5F0E8", fontSize:13, fontWeight:700, margin:"0 0 3px" }}>{cfg.label}</p>
+                      <p style={{ color: sel ? "#f0d590" : "var(--ink)", fontSize:13, fontWeight:700, margin:"0 0 3px" }}>{cfg.label}</p>
                       <p style={{ color:MUTED, fontSize:11, margin:0 }}>{cfg.desc}</p>
                     </button>
                   )

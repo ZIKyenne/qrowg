@@ -309,7 +309,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
                           <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                             {route.subdomain === null && <Star size={11} color={G}/>}
                             {route.subdomain === "*" && <span style={{ color:MUTED, fontSize:10 }}>*</span>}
-                            <code style={{ color: route.subdomain === null ? G : "#F5F0E8", fontSize:12, fontWeight: route.subdomain === null ? 700 : 500, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+                            <code style={{ color: route.subdomain === null ? G : "var(--ink)", fontSize:12, fontWeight: route.subdomain === null ? 700 : 500, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
                               {fullUrl(rootDomain, route.subdomain)}
                             </code>
                           </div>

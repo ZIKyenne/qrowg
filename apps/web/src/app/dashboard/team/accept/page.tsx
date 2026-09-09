@@ -41,7 +41,7 @@ export default function AcceptInvitePage() {
         {status === "ok" && (
           <>
             <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(57,255,143,0.14)", border: "1px solid rgba(57,255,143,0.4)", display: "inline-flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}><Check size={26} color="var(--success)" /></div>
-            <h1 style={{ fontFamily: "Fraunces, serif", fontSize: 23, color: "var(--ink)", margin: "18px 0 8px" }}>Bienvenue dans l'équipe !</h1>
+            <h1 style={{ fontSize: 23, color: "var(--ink)", margin: "18px 0 8px" }}>Bienvenue dans l'équipe !</h1>
             <p style={{ color: "var(--muted)", fontSize: 14, margin: 0 }}>Vous avez désormais accès aux pages et QR codes partagés.</p>
             <Link href="/dashboard" style={btn}><Users size={16} /> Aller au tableau de bord</Link>
           </>
@@ -49,7 +49,7 @@ export default function AcceptInvitePage() {
         {status === "auth" && (
           <>
             <div style={{ width: 52, height: 52, borderRadius: "50%", background: "color-mix(in srgb, var(--accent) 14%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 40%, transparent)", display: "inline-flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}><Users size={24} color={GOLD} /></div>
-            <h1 style={{ fontFamily: "Fraunces, serif", fontSize: 22, color: "var(--ink)", margin: "18px 0 8px" }}>Connectez-vous d'abord</h1>
+            <h1 style={{ fontSize: 22, color: "var(--ink)", margin: "18px 0 8px" }}>Connectez-vous d'abord</h1>
             <p style={{ color: "var(--muted)", fontSize: 14, margin: 0 }}>Connectez-vous (ou créez un compte avec l'adresse invitée), puis rouvrez ce lien.</p>
             <Link href={`/auth/login?redirect=${encodeURIComponent(typeof window !== "undefined" ? window.location.pathname + window.location.search : "/dashboard/team")}`} style={btn}>Se connecter</Link>
           </>
@@ -57,7 +57,7 @@ export default function AcceptInvitePage() {
         {status === "error" && (
           <>
             <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(255,107,107,0.12)", border: "1px solid rgba(255,107,107,0.35)", display: "inline-flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}><AlertTriangle size={24} color="var(--danger)" /></div>
-            <h1 style={{ fontFamily: "Fraunces, serif", fontSize: 22, color: "var(--ink)", margin: "18px 0 8px" }}>Invitation indisponible</h1>
+            <h1 style={{ fontSize: 22, color: "var(--ink)", margin: "18px 0 8px" }}>Invitation indisponible</h1>
             <p style={{ color: "var(--muted)", fontSize: 14, margin: 0 }}>{msg}</p>
             <Link href="/dashboard" style={btn}>Retour au tableau de bord</Link>
           </>

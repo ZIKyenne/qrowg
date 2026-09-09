@@ -25,7 +25,7 @@ interface Props {
 }
 
 const G = "var(--accent)"
-const MUTED = "#8A8478"
+const MUTED = "var(--muted)"
 
 export function OutlinePanel({ open, onClose, blocks, blockDefs, onSelect, onMove }: Props) {
   if (!open) return null

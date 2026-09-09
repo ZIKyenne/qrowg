@@ -15,7 +15,7 @@
 import { useEffect, useId, useRef } from "react"
 
 const G = "#C9A84C"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 
 const SELECTEURS_FOCUSABLES =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
@@ -95,7 +95,7 @@ export default function Dialogue({
         onClick={e => e.stopPropagation()}
         style={{ width: "100%", maxWidth: 420, background: "#111010", border: "1px solid color-mix(in srgb, var(--accent) 24%, transparent)", borderRadius: 18, padding: "22px 20px 18px", boxSizing: "border-box", boxShadow: "0 24px 70px rgba(0,0,0,0.6)", outline: "none" }}
       >
-        <h2 id={idTitre} style={{ color: "var(--ink)", fontSize: 16.5, fontWeight: 800, margin: 0, letterSpacing: -0.2 }}>{titre}</h2>
+        <h2 id={idTitre} style={{ color: "var(--ink)", fontSize: 16.5, fontWeight: 700, margin: 0, letterSpacing: -0.2 }}>{titre}</h2>
         {description && (
           <p id={idDescription} style={{ color: MUTED, fontSize: 12.5, lineHeight: 1.5, margin: "8px 0 0" }}>{description}</p>
         )}
@@ -120,7 +120,7 @@ export default function Dialogue({
                 background: destructif ? "rgba(255,107,107,0.14)" : G,
                 border: destructif ? "1px solid rgba(255,107,107,0.45)" : `1px solid ${G}`,
                 color: destructif ? "#FF8F8F" : "#100E09",
-                fontSize: 13.5, fontWeight: 800,
+                fontSize: 13.5, fontWeight: 700,
               }}
             >
               {libelleConfirmer}

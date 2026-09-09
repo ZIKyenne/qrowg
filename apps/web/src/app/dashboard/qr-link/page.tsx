@@ -465,7 +465,7 @@ export default function QrLinkPage() {
           <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 11, padding: 3 }}>
             {([["WPA", "WPA/WPA2"], ["WEP", "WEP"], ["nopass", "Ouvert"]] as [WifiEnc, string][]).map(([k, l]) => (
               <button key={k} onClick={() => setWifiEnc(k)} aria-pressed={wifiEnc === k}
-                style={{ flex: 1, minHeight: 42, borderRadius: 8, border: "none", cursor: "pointer", background: wifiEnc === k ? G : "transparent", color: wifiEnc === k ? "#080808" : MUTED, fontSize: 12, fontWeight: wifiEnc === k ? 800 : 600 }}>{l}</button>
+                style={{ flex: 1, minHeight: 42, borderRadius: 8, border: "none", cursor: "pointer", background: wifiEnc === k ? G : "transparent", color: wifiEnc === k ? "var(--ink-on-accent)" : MUTED, fontSize: 12, fontWeight: wifiEnc === k ? 800 : 600 }}>{l}</button>
             ))}
           </div>
           <p style={{ color: MUTED, fontSize: 11, margin: "9px 2px 0", lineHeight: 1.45 }}>Scanné, ce QR propose de rejoindre le réseau — idéal sur une table ou une affiche.</p>
@@ -559,7 +559,7 @@ export default function QrLinkPage() {
             <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 11, padding: 3 }}>
               {NIVEAUX_ECC.map(o => (
                 <button key={o.k} onClick={() => setEcc(o.k)} aria-pressed={ecc === o.k}
-                  style={{ flex: 1, minHeight: 42, borderRadius: 8, border: "none", cursor: "pointer", background: ecc === o.k ? G : "transparent", color: ecc === o.k ? "#080808" : MUTED, fontSize: 12.5, fontWeight: ecc === o.k ? 800 : 600, transition: "all .15s" }}>{o.label}</button>
+                  style={{ flex: 1, minHeight: 42, borderRadius: 8, border: "none", cursor: "pointer", background: ecc === o.k ? G : "transparent", color: ecc === o.k ? "var(--ink-on-accent)" : MUTED, fontSize: 12.5, fontWeight: ecc === o.k ? 800 : 600, transition: "all .15s" }}>{o.label}</button>
               ))}
             </div>
             <p style={{ color: MUTED, fontSize: 11, margin: "9px 2px 0", lineHeight: 1.45 }}>Plus la correction est élevée, plus le QR reste lisible s&apos;il est abîmé (utile pour l&apos;impression).</p>
@@ -828,7 +828,7 @@ export default function QrLinkPage() {
             )}
 
             <div style={{ display: "flex", gap: 9, marginTop: 16 }}>
-              <button onClick={copyDetail} style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", color: detailCopied ? "var(--success)" : "#F5F0E8", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+              <button onClick={copyDetail} style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", color: detailCopied ? "var(--success)" : "var(--ink)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
                 {detailCopied ? <><Check size={15} /> Copié !</> : <><Link2 size={15} /> Copier</>}
               </button>
               <button onClick={downloadDetail} style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 10, border: "none", background: G, color: "var(--ink-on-accent)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>

@@ -194,7 +194,7 @@ export default function SettingsPage() {
     setDeleting(false)
   }
 
-  const G = "var(--accent)"; const MUTED = "#A8A190"
+  const G = "var(--accent)"; const MUTED = "var(--muted)"
   const inputStyle: React.CSSProperties = champStyle
 
   if (loading) return (

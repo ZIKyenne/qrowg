@@ -53,7 +53,7 @@ export default function SupportPanel({ qrs, scans, views, clicks, leads }: {
     <div style={card}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 4 }}>
         <div>
-          <p style={{ color: "var(--ink)", fontSize: 16, fontWeight: 800, margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
+          <p style={{ color: "var(--ink)", fontSize: 16, fontWeight: 700, margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
             <Store size={17} color={GOLD} /> Performance par support
           </p>
           <p style={{ color: MUTED, fontSize: 12.5, margin: "4px 0 0", lineHeight: 1.5 }}>
@@ -64,7 +64,7 @@ export default function SupportPanel({ qrs, scans, views, clicks, leads }: {
           <div style={{ display: "flex", gap: 14, flexShrink: 0 }}>
             {STAGES.map(s => (
               <div key={s.key} style={{ textAlign: "right" }}>
-                <p style={{ color: s.color, fontSize: 18, fontWeight: 800, margin: 0, fontVariantNumeric: "tabular-nums" }}>{(totals as any)[s.key].toLocaleString("fr-FR")}</p>
+                <p style={{ color: s.color, fontSize: 18, fontWeight: 700, margin: 0, fontVariantNumeric: "tabular-nums" }}>{(totals as any)[s.key].toLocaleString("fr-FR")}</p>
                 <p style={{ color: DIM, fontSize: 9.5, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase", margin: 0 }}>{s.label}</p>
               </div>
             ))}
@@ -81,9 +81,9 @@ export default function SupportPanel({ qrs, scans, views, clicks, leads }: {
           <table style={{ width: "100%", minWidth: 560, borderCollapse: "collapse", fontVariantNumeric: "tabular-nums" }}>
             <thead>
               <tr>
-                <th style={{ textAlign: "left", padding: "8px 10px", fontSize: 10.5, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: MUTED, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Support</th>
+                <th style={{ textAlign: "left", padding: "8px 10px", fontSize: 10.5, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase", color: MUTED, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Support</th>
                 {STAGES.map(s => (
-                  <th key={s.key} style={{ textAlign: "right", padding: "8px 10px", fontSize: 10.5, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: MUTED, borderBottom: "1px solid rgba(255,255,255,0.07)", whiteSpace: "nowrap" }}>{s.label}</th>
+                  <th key={s.key} style={{ textAlign: "right", padding: "8px 10px", fontSize: 10.5, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase", color: MUTED, borderBottom: "1px solid rgba(255,255,255,0.07)", whiteSpace: "nowrap" }}>{s.label}</th>
                 ))}
               </tr>
             </thead>
@@ -116,7 +116,7 @@ export default function SupportPanel({ qrs, scans, views, clicks, leads }: {
                     const rate = i === 1 ? r.viewRate : i === 2 ? r.clickRate : i === 3 ? r.convRate : null
                     return (
                       <td key={s.key} style={{ padding: "11px 10px", borderBottom: "1px solid rgba(255,255,255,0.05)", textAlign: "right", whiteSpace: "nowrap" }}>
-                        <span style={{ color: val > 0 ? "#F5F0E8" : DIM, fontSize: 14, fontWeight: 700 }}>{val.toLocaleString("fr-FR")}</span>
+                        <span style={{ color: val > 0 ? "var(--ink)" : DIM, fontSize: 14, fontWeight: 700 }}>{val.toLocaleString("fr-FR")}</span>
                         {i > 0 && <span style={{ color: DIM, fontSize: 10.5, marginLeft: 6 }}>{pct(rate)}</span>}
                       </td>
                     )
