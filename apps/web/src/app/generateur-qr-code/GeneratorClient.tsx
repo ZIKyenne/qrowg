@@ -203,13 +203,21 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
         @media(min-width:900px){
           .gen-grid{grid-template-columns:1fr 380px !important;align-items:start}
           .gen-aside{position:sticky;top:16px}
-          .gen-main{max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding-right:4px}
+          .gen-main{display:flex;flex-direction:column;gap:14px;max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding-right:4px}
+        }
+        /* Téléphone (revue du 9 septembre, parcours mobile) : contenu → aperçu + PNG/SVG → réglages.
+           L'action principale arrive juste après la saisie, pas après trois écrans de réglages. */
+        @media(max-width:899px){
+          .gen-main{display:contents}
+          .gen-haut{order:0} .gen-aside{order:1} .gen-reglages{order:2}
+          .gen-haut,.gen-reglages{display:flex;flex-direction:column;gap:14px;min-width:0}
         }
         .gen-sec + .gen-sec{border-top:1px solid ${BOR}}
       `}</style>
 
       {/* Colonne gauche : statique / dynamique, contenu, réglages */}
-      <div className="gen-main" style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+      <div className="gen-main">
+        <div className="gen-haut" style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
         {/* 1 · Statique ou dynamique — décidé d'abord, parce que tout le reste en dépend. */}
         <div role="radiogroup" aria-label="Statique ou dynamique" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
           {([
@@ -283,8 +291,9 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
           </>)}
         </div>
 
+        </div>
         {/* 3 · Réglages — Style · Couleurs · Logo · Avancé (mêmes réglages qu'avant, rangés) */}
-        <div style={{ ...card, padding: 0, overflow: "hidden" }}>
+        <div className="gen-reglages" style={{ ...card, padding: 0, overflow: "hidden" }}>
           {section("Style", "La forme des modules.", (
             <div style={{ display: "flex", gap: 7 }}>
               {STYLES_QR.map(p => { const on = styleKey === p.k; return (

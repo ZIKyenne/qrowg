@@ -12,6 +12,7 @@ import { SessionShellContext } from "./sessionShell"
 import { accessibleOwnerIds } from "@/lib/team"
 import { pageLimit, getPlan, PLANS } from "@/lib/plans"
 import QrowgLogo from "@/components/QrowgLogo"
+import { BandeauHorsConnexion } from "@/components/BandeauHorsConnexion"
 
 const DEFAULT_ACCENT = "#D4AF45"
 const MUTED = "var(--muted)"
@@ -373,6 +374,8 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
       // scènes de travail.
       background: "var(--bg)",
     }}>
+      {/* Hors connexion : dit une fois, ici, pour tous les écrans (studios immersifs compris). */}
+      <BandeauHorsConnexion />
       {/* BARRE DU HAUT (PC) : logo · Module › Écran · compte. Cachée sur téléphone par le
           CSS (.qf-topbar) et dans les studios immersifs qui ont la leur. */}
       {!immersif && (

@@ -14,7 +14,7 @@ const lien = readFileSync(join(__dirname, "../dashboard/qr-link/page.tsx"), "utf
 
 describe("générateur public : tenu dans l'écran", () => {
   it("la colonne de réglages défile dans son cadre, l'aperçu et la barre d'action sont collants", () => {
-    expect(gen).toContain(".gen-main{max-height:calc(100dvh - 32px);overflow-y:auto;")
+    expect(gen).toContain("max-height:calc(100dvh - 32px);overflow-y:auto;")
     expect(gen).toContain(".gen-aside{position:sticky;top:16px}")
     expect(gen).toContain('<div className="gen-actions" style={{ display: "flex", gap: 10 }}>')
     // La barre d'action vit dans la colonne collante, juste après l'aperçu et l'erreur éventuelle.

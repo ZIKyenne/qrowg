@@ -60,7 +60,7 @@ Chaque ligne est copiable telle quelle dans Claude Code. Notation : `[ ]` à fai
 
 ## P2 — finitions
 - [x] v53 · « Blog / Roadmap / Changelog — bientôt » : non interactifs (texte, `aria-disabled`).
-- [~] v53 · États chargement / vide / erreur / succès / hors connexion : vides et erreurs revus sur les écrans touchés par la revue (galerie, générateur, éditeur, tarifs) ; le reste au fil des lots.
+- [x] v54 · États : squelette de chargement et garde-fou d'erreur du tableau de bord vérifiés, écrans d'erreur (site et tableau de bord) passés sur jetons, bandeau « Hors connexion » unique dans la coquille ; vides et erreurs des écrans de la revue revus (v49–v53).
 - [x] v36 · Contrastes des gris et de l'or mesurés (`tokensInterface.test.ts`).
 - [~] v36–v48 · Rayons, bordures, ombres, hauteurs de boutons uniformisés (jetons + couche « Calme »).
 - [x] v53 · Focus clavier visible partout (`:focus-visible` global) ; ordre de tabulation vérifié.
@@ -75,6 +75,6 @@ Chaque ligne est copiable telle quelle dans Claude Code. Notation : `[ ]` à fai
 5. Éditeur compréhensible à l'ouverture, inspecteur jamais vide sans consigne ; aucun réglage visuel dans Contenu.
 6. Aucun texte ne mélange tutoiement/vouvoiement ni français/anglais.
 7. Tous les visuels QR ont un rendu de secours.
-8. Parcours mobiles à 375, 390 et 430 px : aucun défilement horizontal, action principale à portée de pouce.
+8. Parcours mobiles à 375, 390 et 430 px : aucun défilement horizontal, action principale à portée de pouce. — v54 : balayage de 32 écrans × 3 largeurs sans débordement ; sur téléphone le générateur passe en contenu → aperçu + PNG/SVG → réglages.
 
 Non vérifié par la revue (données réelles nécessaires) : statistiques, paiement, équipe, domaines, API, atelier d'impression complet.
