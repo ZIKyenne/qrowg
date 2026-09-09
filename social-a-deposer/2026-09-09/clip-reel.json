@@ -1,0 +1,32 @@
+{
+  "format": "reel",
+  "fps": 30,
+  "scrim": 0.72,
+  "progress": true,
+  "maxDuration": 36,
+  "brand": { "handle": "@qrowg", "logo": true },
+  "motion": { "effect": "tunnel", "palette": "or", "density": 1500, "speed": 1.05, "seed": 9 },
+  "scenes": [
+    { "dur": 4.6, "kicker": "QROWG", "align": "center", "titleSize": 110,
+      "title": "L'été est fini.\nPas ta carte.",
+      "motion": { "effect": "tunnel" } },
+    { "dur": 4.6, "title": "Le mojito en septembre.",
+      "sub": "Plus de menthe correcte. Plus de fruits rouges.",
+      "motion": { "effect": "glitch", "speed": 1.2 } },
+    { "dur": 4.6, "title": "Le client commande.\nTu t'excuses.",
+      "sub": "Trois fois par service.",
+      "motion": { "effect": "shatter" } },
+    { "dur": 4.6, "title": "Un QR sur la table.",
+      "sub": "La carte du moment, celle de ce soir.",
+      "motion": { "effect": "scan", "speed": 1.3 } },
+    { "dur": 4.6, "title": "Nouveau cocktail à 17 h.",
+      "sub": "En ligne à 17 h 02, depuis ton téléphone.",
+      "motion": { "effect": "gen" } },
+    { "dur": 4.6, "title": "Quatre saisons.\nZéro réimpression.",
+      "sub": "Le support ne bouge plus. La page, si.",
+      "motion": { "effect": "stats" } },
+    { "dur": 4.6, "align": "center", "title": "Crée ta carte de saison",
+      "cta": "qrowg.com",
+      "motion": { "effect": "publish" } }
+  ]
+}

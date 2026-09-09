@@ -1,0 +1,118 @@
+{
+  "total": 16,
+  "avec_alerte": 0,
+  "details": [
+    {
+      "fichier": "qr-code-carte-cocktails-de-saison-bar-01.png",
+      "fond_sombre_pct": 93.6,
+      "or_pct": 1.0,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-carte-cocktails-de-saison-bar-02.png",
+      "fond_sombre_pct": 94.3,
+      "or_pct": 1.7,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-carte-cocktails-de-saison-bar-03.png",
+      "fond_sombre_pct": 86.7,
+      "or_pct": 9.0,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260909-bar",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-carte-cocktails-de-saison-bar-04.png",
+      "fond_sombre_pct": 93.8,
+      "or_pct": 0.6,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-carte-cocktails-de-saison-bar-05.png",
+      "fond_sombre_pct": 94.3,
+      "or_pct": 0.4,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-carte-cocktails-de-saison-bar-06.png",
+      "fond_sombre_pct": 83.9,
+      "or_pct": 6.5,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260909-bar",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-fiche-conservation-produit-de-saison-producteur.png",
+      "fond_sombre_pct": 90.3,
+      "or_pct": 4.3,
+      "qr": "https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260909-bar&utm_content=clic&utm_term=producteur",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-formule-petit-dejeuner-a-emporter-boulangerie.png",
+      "fond_sombre_pct": 89.8,
+      "or_pct": 5.0,
+      "qr": "https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260909-bar&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-plan-des-transports-depuis-la-gare-hotel.png",
+      "fond_sombre_pct": 89.6,
+      "or_pct": 4.6,
+      "qr": "https://qrowg.com/qr-code/hotel?utm_source=pinterest&utm_medium=pin&utm_campaign=20260909-bar&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-plat-du-jour-epuise-signale-restaurant.png",
+      "fond_sombre_pct": 91.2,
+      "or_pct": 4.5,
+      "qr": "https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260909-bar&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-carte-cocktails-de-saison-bar-01.png",
+      "fond_sombre_pct": 93.6,
+      "or_pct": 1.0,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-carte-cocktails-de-saison-bar-02.png",
+      "fond_sombre_pct": 94.3,
+      "or_pct": 1.7,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-carte-cocktails-de-saison-bar-03.png",
+      "fond_sombre_pct": 86.7,
+      "or_pct": 9.0,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260909-bar",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-carte-cocktails-de-saison-bar-04.png",
+      "fond_sombre_pct": 93.8,
+      "or_pct": 0.6,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-carte-cocktails-de-saison-bar-05.png",
+      "fond_sombre_pct": 94.3,
+      "or_pct": 0.4,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-carte-cocktails-de-saison-bar-06.png",
+      "fond_sombre_pct": 83.9,
+      "or_pct": 6.5,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260909-bar",
+      "alertes": []
+    }
+  ]
+}

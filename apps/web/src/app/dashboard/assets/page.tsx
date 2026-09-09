@@ -95,7 +95,7 @@ export default function AssetsPage() {
       onDrop={e => { e.preventDefault(); setDragOver(false); onUploadFiles(Array.from(e.dataTransfer.files || [])) }}
       style={{ padding: "clamp(16px, 4vw, 34px)", maxWidth: 1100, margin: "0 auto", position: "relative" }}>
       {dragOver && (
-        <div style={{ position: "absolute", inset: 12, zIndex: 20, background: "rgba(201,168,76,0.08)", border: `2px dashed ${G}`, borderRadius: 18, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, pointerEvents: "none" }}>
+        <div style={{ position: "absolute", inset: 12, zIndex: 20, background: "color-mix(in srgb, var(--accent) 8%, transparent)", border: `2px dashed ${G}`, borderRadius: 14, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, pointerEvents: "none" }}>
           <Upload size={28} color={G} />
           <p style={{ color: G, fontSize: 15, fontWeight: 700, margin: 0 }}>Déposez vos fichiers pour les importer</p>
         </div>
@@ -103,11 +103,8 @@ export default function AssetsPage() {
       <PageHeader kicker="Construire" title="Médias" gap={20}
         sub={<>Toutes vos images et fichiers, réutilisables sur toutes vos pages. {total > 0 ? `${total} média${total > 1 ? "s" : ""}.` : ""}</>}
         actions={<div style={{ position: "relative" }}>
-          <div className="dam-halo" aria-hidden />
-          <label className="dam-primary" aria-disabled={uploading || busy} style={{ pointerEvents: uploading || busy ? "none" : "auto" }}>
-            <span className="dam-gloss" aria-hidden />
-            <span className="dam-sheen" aria-hidden />
-            <span style={{ position: "relative", display: "inline-flex", alignItems: "center", gap: 10 }}>
+          <label className="da-btn-primary da-btn-primary--sm" aria-disabled={uploading || busy} style={{ pointerEvents: uploading || busy ? "none" : "auto", cursor: "pointer" }}>
+            <span style={{ position: "relative", display: "inline-flex", alignItems: "center", gap: 8 }}>
               <Upload size={15} /> {uploading || busy ? "En cours…" : "Importer"}
             </span>
             <input type="file" multiple accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv" style={{ display: "none" }}
@@ -146,7 +143,7 @@ export default function AssetsPage() {
       {assets === null ? (
         <p style={{ color: MUTED, fontSize: 13, textAlign: "center", padding: "50px 0" }}>Chargement…</p>
       ) : assets.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "56px 0", border: "2px dashed rgba(201,168,76,0.15)", borderRadius: 16 }}>
+        <div style={{ textAlign: "center", padding: "56px 0", border: "1px dashed var(--line-strong)", borderRadius: 14 }}>
           <p style={{ fontSize: 34, margin: "0 0 8px" }}>{q ? "🔍" : tab === "image" ? "🖼️" : "📄"}</p>
           <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 600, margin: "0 0 4px" }}>{q ? "Aucun média ne correspond" : `Aucun ${tab === "image" ? "média image" : "fichier"} pour l'instant`}</p>
           <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{q ? `Aucun résultat pour « ${query.trim()} ».` : "Cliquez sur « Importer » ou glissez-déposez vos fichiers ici."}</p>
@@ -173,7 +170,7 @@ export default function AssetsPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {assets.map(a => (
             <div key={a.url} onClick={() => toggleSel(a)} title="Cliquez pour sélectionner"
-              style={{ display: "flex", alignItems: "center", gap: 11, background: isSel(a) ? "rgba(201,168,76,0.08)" : "rgba(255,255,255,0.02)", border: `1px solid ${isSel(a) ? G + "66" : "rgba(255,255,255,0.07)"}`, borderRadius: 11, padding: "11px 14px", cursor: "pointer" }}>
+              style={{ display: "flex", alignItems: "center", gap: 11, background: isSel(a) ? "var(--surface-2)" : "var(--surface)", border: `1px solid ${isSel(a) ? G + "66" : "rgba(255,255,255,0.07)"}`, borderRadius: 11, padding: "11px 14px", cursor: "pointer" }}>
               <div aria-hidden style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", background: isSel(a) ? G : "transparent", border: `1.5px solid ${isSel(a) ? G : "rgba(255,255,255,0.35)"}`, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--ink-on-accent)" }}>
                 {isSel(a) && <Check size={14} />}
               </div>
@@ -200,9 +197,9 @@ export default function AssetsPage() {
 
       {/* Menu d'un média (bottom sheet) : cibles tactiles pleines, une seule action visible sur la vignette */}
       {menuAsset && (
-        <div onClick={() => setMenuAsset(null)} style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(3px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+        <div onClick={() => setMenuAsset(null)} style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "var(--surface)", borderTopLeftRadius: 20, borderTopRightRadius: 20, border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", padding: "10px 12px calc(14px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)" }}>
-            <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 10px" }} />
+            <div style={{ width: 40, height: 4, borderRadius: 4, background: "var(--line-strong)", margin: "0 auto 10px" }} />
             <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: "0 6px 6px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pretty(menuAsset.name)}</p>
             {([
               { icon: copied === menuAsset.url ? <Check size={17} color="var(--success)" /> : <Link2 size={17} />, label: copied === menuAsset.url ? "Lien copié !" : "Copier le lien", onClick: () => copy(menuAsset.url) },
@@ -221,4 +218,4 @@ export default function AssetsPage() {
   )
 }
 
-const rowBtn: any = { width: 30, height: 30, borderRadius: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: MUTED, flexShrink: 0, textDecoration: "none" }
+const rowBtn: any = { width: 30, height: 30, borderRadius: 8, background: "var(--surface-2)", border: "1px solid var(--line-strong)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: MUTED, flexShrink: 0, textDecoration: "none" }

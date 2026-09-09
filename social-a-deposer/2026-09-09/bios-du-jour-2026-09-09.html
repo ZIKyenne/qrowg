@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>QRowg — Bios du jour · 9 septembre 2026</title>
+<style>
+  :root{--gold:#D4AF45;--bg:#0B0B0C;--panel:#141416;--hair:#26262a;--txt:#EDEAE3;--mut:#9a978f}
+  *{box-sizing:border-box}
+  body{margin:0;padding:40px 24px 80px;background:var(--bg);color:var(--txt);
+       font:16px/1.6 -apple-system,Segoe UI,Roboto,sans-serif}
+  .wrap{max-width:860px;margin:0 auto}
+  h1{font-size:30px;margin:0 0 4px;letter-spacing:-.5px}
+  .sub{color:var(--mut);margin:0 0 34px}
+  h2{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);
+     margin:44px 0 14px;border-bottom:1px solid var(--hair);padding-bottom:10px}
+  .card{background:var(--panel);border:1px solid var(--hair);border-radius:14px;padding:18px;margin:0 0 16px}
+  .lbl{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--mut);margin-bottom:10px}
+  .ed{white-space:pre-wrap;outline:none;border:1px dashed transparent;border-radius:8px;padding:8px}
+  .ed:focus{border-color:var(--gold);background:#1b1b1e}
+  button{margin-top:12px;background:var(--gold);color:#111;border:0;border-radius:999px;
+         padding:9px 20px;font-weight:700;cursor:pointer;font-size:14px}
+  .ok{color:var(--gold);font-size:13px;margin-left:10px}
+  .cnt{float:right;font-size:12px;color:var(--mut)}
+  code{background:#000;border:1px solid var(--hair);border-radius:6px;padding:2px 7px;
+       font-size:13px;color:var(--gold);word-break:break-all}
+</style>
+<div class="wrap">
+<h1>Bios du jour — mercredi 9 septembre 2026</h1>
+<p class="sub">Deux variantes par réseau. Le lien de bio Instagram porte <code>utm_medium=bio</code>.</p>
+
+<h2>Instagram — 150 caractères max</h2>
+<div class="card"><div class="lbl">Variante A <span class="cnt">137</span></div>
+<div class="ed" contenteditable>Ton support imprimé une fois. La page qu'il ouvre, modifiée en dix secondes.
+Menus, tarifs, horaires — sans jamais réimprimer.
+Lien ↓</div>
+<button onclick="cp(this)">Copier</button></div>
+
+<div class="card"><div class="lbl">Variante B <span class="cnt">142</span></div>
+<div class="ed" contenteditable>Le QR de ton resto, ton bar, ta boutique.
+Tu changes la page, pas l'autocollant.
+Gratuit, prêt à imprimer en 5 minutes. Lien ↓</div>
+<button onclick="cp(this)">Copier</button></div>
+
+<div class="card"><div class="lbl">Lien de bio</div>
+<div class="ed" contenteditable>https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=bio&utm_campaign=20260909-bar</div>
+<button onclick="cp(this)">Copier</button></div>
+
+<h2>TikTok — 80 caractères max</h2>
+<div class="card"><div class="lbl">Variante A <span class="cnt">76</span></div>
+<div class="ed" contenteditable>Un QR, une page qui change. Menus, tarifs, horaires — sans réimprimer.</div>
+<button onclick="cp(this)">Copier</button></div>
+
+<div class="card"><div class="lbl">Variante B <span class="cnt">73</span></div>
+<div class="ed" contenteditable>Tu imprimes une fois. Tu modifies quand tu veux. Gratuit, en 5 minutes.</div>
+<button onclick="cp(this)">Copier</button></div>
+
+<h2>Pinterest — 160 caractères max</h2>
+<div class="card"><div class="lbl">Variante A <span class="cnt">151</span></div>
+<div class="ed" contenteditable>Idées d'organisation pour restaurants, bars, boulangeries et commerces : menus, tarifs et horaires derrière un QR, modifiables sans jamais réimprimer.</div>
+<button onclick="cp(this)">Copier</button></div>
+
+<div class="card"><div class="lbl">Variante B <span class="cnt">156</span></div>
+<div class="ed" contenteditable>Supports à imprimer pour commerce local : chevalets, ardoises, vitrines. Un QR, une page qui se met à jour en dix secondes. Gratuit, prêt en 5 minutes.</div>
+<button onclick="cp(this)">Copier</button></div>
+
+<h2>LinkedIn — 220 caractères max</h2>
+<div class="card"><div class="lbl">Variante A <span class="cnt">203</span></div>
+<div class="ed" contenteditable>QRowg — la plateforme phygitale qui relie un support physique à une page qu'on peut modifier. Restaurants, commerces, artisans : imprimez une fois, mettez à jour quand vous voulez, mesurez les scans.</div>
+<button onclick="cp(this)">Copier</button></div>
+
+<div class="card"><div class="lbl">Variante B <span class="cnt">211</span></div>
+<div class="ed" contenteditable>On aide les commerces à arrêter de réimprimer. Un QR dynamique, une page à jour en dix secondes, des scans mesurés. Menus, tarifs, horaires, formulaires — sans repasser par l'imprimeur. Essai gratuit.</div>
+<button onclick="cp(this)">Copier</button></div>
+
+<h2>X — 160 caractères max</h2>
+<div class="card"><div class="lbl">Variante A <span class="cnt">139</span></div>
+<div class="ed" contenteditable>Le support s'imprime une fois. La page se modifie en dix secondes. QR dynamiques pour restaurants, bars et commerces. qrowg.com</div>
+<button onclick="cp(this)">Copier</button></div>
+
+<div class="card"><div class="lbl">Variante B <span class="cnt">147</span></div>
+<div class="ed" contenteditable>Menus, tarifs, horaires : derrière un QR, à jour en dix secondes, jamais réimprimés. Gratuit, prêt à imprimer en 5 minutes. qrowg.com</div>
+<button onclick="cp(this)">Copier</button></div>
+</div>
+<script>
+document.querySelectorAll('.card').forEach(c=>{
+  const ed=c.querySelector('.ed'), cnt=c.querySelector('.cnt');
+  if(!ed||!cnt) return;
+  const up=()=>cnt.textContent=ed.innerText.trim().length;
+  up(); ed.addEventListener('input',up);
+});
+function cp(btn){
+  const t = btn.parentElement.querySelector('.ed').innerText;
+  navigator.clipboard.writeText(t).then(()=>{
+    let s = btn.parentElement.querySelector('.ok');
+    if(!s){ s=document.createElement('span'); s.className='ok'; btn.after(s); }
+    s.textContent='copié'; setTimeout(()=>s.textContent='',1600);
+  });
+}
+</script>

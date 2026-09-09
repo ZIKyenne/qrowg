@@ -1,0 +1,88 @@
+{
+  "carousels": [
+    {
+      "slug": "qr-code-carte-cocktails-de-saison-bar",
+      "sector": "bar",
+      "url": "https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260909-bar",
+      "slides": [
+        {
+          "kind": "cover",
+          "tag": "Bar · carte de saison",
+          "title": "L'été est fini. Ta carte ne le [[sait]] pas.",
+          "body": "La saison change tous les trois mois. Le support, jamais."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le problème",
+          "title": "Le mojito en [[septembre]]",
+          "body": "Plus de menthe correcte, plus de fruits rouges. La carte les propose encore. Le client commande, le serveur s'excuse."
+        },
+        {
+          "kind": "qr",
+          "kicker": "Sur la table",
+          "title": "Un QR. La carte du [[moment]].",
+          "body": "Ce qui est faisable ce soir, avec ce qu'il y a derrière le bar."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le geste",
+          "title": "Nouveau cocktail à 17 h. En ligne à [[17 h 02]].",
+          "body": "Tu modifies la page depuis ton téléphone. Les cartes posées sur les tables ne bougent pas."
+        },
+        {
+          "kind": "metric",
+          "kicker": "Preuve",
+          "number": "4×",
+          "title": "de réimpressions par [[an]]",
+          "body": "Quatre saisons, quatre passages chez l'imprimeur — ou zéro."
+        },
+        {
+          "kind": "cta",
+          "title": "Crée ta carte de saison en 2 [[minutes]]",
+          "body": "Prête à imprimer, à ta marque, modifiable à chaque saison.",
+          "cta": "qrowg.com",
+          "qr": true
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "slug": "qr-code-plat-du-jour-epuise-signale-restaurant",
+      "sector": "restaurant",
+      "layout": 0,
+      "tag": "Restaurant · plat du jour",
+      "title": "« Il n'y en a plus. » À la [[troisième]] table.",
+      "subtitle": "Barrer un plat en 10 secondes →",
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260909-bar&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-formule-petit-dejeuner-a-emporter-boulangerie",
+      "layout": 1,
+      "tag": "Boulangerie · petit-déj",
+      "title": "7 h 10. Il a trois minutes avant son [[train]].",
+      "subtitle": "Ta formule du matin en 5 minutes, gratuit →",
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260909-bar&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-fiche-conservation-produit-de-saison-producteur",
+      "layout": 2,
+      "tag": "Producteur · conservation",
+      "title": "Ta courge finit au [[frigo]]. Puis à la poubelle.",
+      "subtitle": "Ta fiche conservation, gratuite →",
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260909-bar&utm_content=clic&utm_term=producteur"
+    },
+    {
+      "slug": "qr-code-plan-des-transports-depuis-la-gare-hotel",
+      "layout": 3,
+      "tag": "Hôtel · arrivée",
+      "title": "Depuis la [[gare]], on vient comment ?",
+      "subtitle": "Ta page d'arrivée en 4 étapes, gratuit →",
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/hotel?utm_source=pinterest&utm_medium=pin&utm_campaign=20260909-bar&utm_content=clic"
+    }
+  ]
+}

@@ -60,6 +60,31 @@ aucune raison d'ouvrir.
 **2 clics sortants / 1 207 impressions sur 30 jours (0,17 %)**. Relire dans Pinterest
 Analytics (pas dans Buffer) le 15/09.
 
+## ⚑ Instagram : un post en `error` peut être EN LIGNE (vérifié le 09/09)
+
+**Ne jamais republier un post Instagram en `error` sans avoir vérifié `externalLink`.**
+
+Buffer affiche `error: « Instagram flagged this post as potential spam »` sur des posts
+qui **ont pourtant été publiés**. Instagram renvoie l'erreur, Buffer la garde, mais le
+post passe quand même — Buffer le récupère alors dans un **second enregistrement**
+`via: "network"` portant le vrai `externalLink` Instagram. On se retrouve avec deux
+lignes pour un seul post : une rouge et fausse, une verte et réelle.
+
+Vérifié le 09/09 : les 4 carrousels crus « jamais publiés » sont tous en ligne —
+05/09 `/p/Dc616I8mTiZ/` · 06/09 `/p/Dc9QC01iWLP/` · 07/09 `/p/Dc_zAPNmK-z/` ·
+08/09 `/p/DdB95BkloaZ/`.
+
+**Le contrôle à faire :** avant de reprogrammer un post en `error`, interroger les posts
+`sent` du même canal avec le champ `externalLink`. Si un `sent` existe au même horaire
+ou avec le même contenu, **le post est en ligne : ne pas le rejouer**, le passer en
+brouillon. Les reprogrammations du 08/09 ont d'ailleurs échoué d'elles-mêmes avec
+« issue with the media » — c'est Instagram qui refusait un doublon, pas un problème
+d'image (les fichiers sont accessibles et valides, 2160×2700).
+
+**Conséquence sur la lecture des chiffres :** les « 0 vue, 0 reach » d'Instagram sont
+**réels**. Les posts sortent et ne touchent personne. Le problème Instagram est un
+problème d'audience et de portée, pas de publication.
+
 ## ⚑ Règles de publication (obligatoires, à appliquer à CHAQUE mise en file)
 
 1. **Mention « contenu généré par IA » : TOUJOURS activée.** Demande explicite d'Emilien
@@ -149,24 +174,29 @@ Analytics (pas dans Buffer) le 15/09.
 | Bar | Programme du dimanche sport / matchs diffusés | 08/09 |
 | Boulangerie | Commande de gâteau d'anniversaire | 08/09 |
 | Salon / coiffeur | Créneau libéré à la dernière minute | 08/09 |
+| Bar | Carte des cocktails de saison (carrousel + reel) | 09/09 |
+| Restaurant | Plat du jour épuisé signalé en direct | 09/09 |
+| Boulangerie | Formule petit-déjeuner à emporter | 09/09 |
+| Marché / producteur | Fiche conservation du produit de saison | 09/09 |
+| Hôtel / chambre d'hôtes | Plan des transports depuis la gare | 09/09 |
 
 ## Angles NEUFS disponibles (piocher ici en priorité)
 - Restaurant : plat à emporter du soir · anniversaire / privatisation ·
   fiche « d'où vient ce plat » (producteurs) · le menu de Noël réservé dès novembre ·
-  la table du soir dressée deux fois (double service) · le plat du jour épuisé signalé en direct.
-- Bar : carte des cocktails saisonnière · quiz / jeu de table ·
+  la table du soir dressée deux fois (double service) · le plateau de fromages du moment · la carte du soir écourtée en fin de service.
+- Bar : quiz / jeu de table ·
   happy hour qui change selon l'heure · la carte des bières de saison ·
-  la privatisation de l'arrière-salle.
+  la privatisation de l'arrière-salle · la carte des softs travaillés pour le conducteur.
 - Boulangerie : commande de galette / bûche selon la saison · liste d'allergènes ·
-  le pain sur commande pour la semaine · la formule petit-déjeuner à emporter.
+  le pain sur commande pour la semaine · les farines et provenances affichées.
 - Food truck : la fiche « où se garer » pour les entreprises · les moyens de paiement acceptés ·
   le camion en tournée de festival (dates et scène).
-- Marché / producteur : la recette du produit de saison · la fiche conservation du produit ·
-  la vente à la ferme hors marché.
+- Marché / producteur : la recette du produit de saison · la vente à la ferme hors marché ·
+  la commande groupée entre voisins.
 - Commerce : inscription newsletter en caisse · parrainage · la notice du produit sans papier ·
   le mode d'emploi de l'article en cabine · les horaires exceptionnels affichés en vitrine.
-- Hôtel / chambre d'hôtes : le plan des transports depuis la gare ·
-  les bonnes adresses du quartier tenues à jour · le petit-déjeuner commandé la veille.
+- Hôtel / chambre d'hôtes : les bonnes adresses du quartier tenues à jour ·
+  le petit-déjeuner commandé la veille · le règlement intérieur et les horaires affichés.
 - Salon / coiffeur : la routine d'entretien après un balayage · la carte cadeau du salon ·
   la fiche « ce qu'on a fait sur tes cheveux » remise en fin de rendez-vous.
 - Transverse : « ton QR imprimé en 2024 marche encore » (QR dynamique) ·
@@ -233,6 +263,12 @@ Analytics (pas dans Buffer) le 15/09.
 - « Ta carte en 4 langues. Sans réimprimer. »
 - « Les vins au verre tournent. Le support, non. »
 - « Les invendus du soir, annoncés à 18 h. »
+- « L'été est fini. Ta carte ne le sait pas. »
+- « Le mojito en septembre. »
+- « Il n'y en a plus. À la troisième table. »
+- « 7 h 10. Il a trois minutes avant son train. »
+- « Ta courge finit au frigo. Puis à la poubelle. »
+- « Depuis la gare, on vient comment ? »
 - « Le panier de la semaine, réservé avant l'étal. »
 - « "Vous l'avez en 40 ?" Personne ne sait. »
 - « Le ticket qui explique le retour. »
@@ -367,6 +403,17 @@ Analytics (pas dans Buffer) le 15/09.
 > La description de l'épingle boulangerie a été raccourcie à la mise en file (Pinterest
 > plafonne à 500 caractères).
 >
+> **⚠️ CORRIGÉ LE 09/09 — le paragraphe ci-dessous est FAUX.** Les 4 carrousels étaient
+> **bien publiés** : `externalLink` le prouve (05/09 `/p/Dc616I8mTiZ/`, 06/09
+> `/p/Dc9QC01iWLP/`, 07/09 `/p/Dc_zAPNmK-z/`, 08/09 `/p/DdB95BkloaZ/`). Buffer produit
+> une ligne `error` **et** une ligne `sent via network` pour un même post. Les trois
+> reprogrammations du 08/09 étaient donc des doublons : deux ont échoué d'elles-mêmes,
+> la troisième a été passée en brouillon le 09/09 avant publication. Voir l'en-tête
+> « Instagram : un post en `error` peut être EN LIGNE ».
+> Le correctif de légende (pas d'URL, 5 hashtags) **reste bon à garder** — mais il n'a
+> rien débloqué, puisqu'il n'y avait rien de bloqué.
+>
+> *Ci-dessous, le raisonnement erroné du 08/09, conservé pour mémoire :*
 > **⚠️ DÉCOUVERTE MAJEURE — Instagram ne publie pas.** Le contrôle de la file avec le
 > statut `error` fait apparaître **4 carrousels Instagram jamais partis** : 05/09 (stock
 > boutique), 06/09 (carte enfants) et 07/09 **deux fois** (camion privatisé, dont une

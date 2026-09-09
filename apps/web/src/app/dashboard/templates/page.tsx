@@ -515,22 +515,19 @@ export default function TemplatesPage() {
                   onClick={() => { if (isMobile) { setPreview(template.id); return } if (!locked) setSelected(isSelected ? null : template.id) }}
                   onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (isMobile) { setPreview(template.id); return } if (!locked) setSelected(isSelected ? null : template.id) } }}
                   style={{
-                    background: isSelected ? "color-mix(in srgb, var(--accent) 5%, transparent)" : "#0F0E0B",
-                    border: "1.5px solid " + (isSelected ? "color-mix(in srgb, var(--accent) 50%, transparent)" : isHovered ? "color-mix(in srgb, var(--accent) 20%, transparent)" : "rgba(255,255,255,0.06)"),
-                    borderRadius: 18, overflow: "hidden", cursor: locked ? "not-allowed" : "pointer",
-                    transition: "transform .22s var(--mo-ease-standard), box-shadow .22s, border-color .2s", transform: isSelected ? "translateY(-4px)" : isHovered ? "translateY(-4px)" : "none",
+                    background: "var(--surface)",
+                    border: "1px solid " + (isSelected ? "color-mix(in srgb, var(--accent) 55%, transparent)" : isHovered ? "var(--line-strong)" : "var(--line)"),
+                    borderRadius: 14, overflow: "hidden", cursor: locked ? "not-allowed" : "pointer",
+                    transition: "border-color .15s",
                     opacity: locked ? 0.6 : 1, position: "relative",
-                    animation: "tplUp .45s var(--mo-ease-standard) backwards", animationDelay: `${(idx % 12) * 45}ms`,
-                    boxShadow: isSelected ? "0 14px 38px color-mix(in srgb, var(--accent) 16%, transparent)" : isHovered ? "0 16px 40px rgba(0,0,0,0.5)" : "0 2px 8px rgba(0,0,0,0.2)"
+                    animation: "tplUp .3s var(--mo-ease-standard) backwards", animationDelay: `${Math.min(idx, 11) * 30}ms`,
                   }}>
 
                   {/* ── Aperçu visuel ──────────────────────────────────────── */}
-                  <div style={{ height: isMobile ? 128 : 190, background: "linear-gradient(145deg, " + template.bg + " 0%, " + template.surface + " 100%)", position: "relative", overflow: "hidden" }}>
-                    {/* Ambient glow */}
-                    <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 0%, " + template.color + "25, transparent 65%)" }} />
-
+                  {/* La vignette garde les couleurs DU MODÈLE (c'est ce qu'on choisit), posées à plat sur sa surface. */}
+                  <div style={{ height: isMobile ? 128 : 190, background: template.surface, borderBottom: "1px solid var(--line)", position: "relative", overflow: "hidden" }}>
                     {/* Mini page mockup */}
-                    <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%) scale(" + (isHovered ? 1.06 : 1) + ")", transition: "transform .3s var(--mo-ease-standard)", width: "90%", maxWidth: 138, background: template.bg, border: "1px solid " + template.color + "20", borderRadius: 10, overflow: "hidden", zIndex: 1, boxShadow: isHovered ? "0 10px 30px rgba(0,0,0,0.45)" : "0 4px 14px rgba(0,0,0,0.3)" }}>
+                    <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: "90%", maxWidth: 138, background: template.bg, border: "1px solid " + template.color + "20", borderRadius: 10, overflow: "hidden", zIndex: 1, boxShadow: "0 4px 14px rgba(0,0,0,0.3)" }}>
                       {/* Barre de couleur */}
                       <div style={{ height: 4, background: "linear-gradient(90deg," + template.color + "," + template.accent + ")" }} />
                       {/* Contenu simulé */}
@@ -547,9 +544,8 @@ export default function TemplatesPage() {
                     </div>
 
                     {/* Badge plan (haut gauche) */}
-                    <div style={{ position: "absolute", top: 10, left: 10, display: "flex", alignItems: "center", gap: 4, background: planCfg.color + "18", border: "1px solid " + planCfg.color + "35", borderRadius: 12, padding: "3px 8px" }}>
-                      <span style={{ fontSize: 8 }}>{planCfg.icon}</span>
-                      <span style={{ color: planCfg.color, fontSize: 9, fontWeight: 700 }}>{planCfg.label}</span>
+                    <div style={{ position: "absolute", top: 10, left: 10, display: "flex", alignItems: "center", gap: 4, background: "color-mix(in srgb, var(--bg) 75%, transparent)", border: "1px solid var(--line-strong)", borderRadius: 999, padding: "3px 9px" }}>
+                      <span style={{ color: "var(--ink)", fontSize: 9.5, fontWeight: 600, letterSpacing: ".04em" }}>{planCfg.label}</span>
                     </div>
 
                     {/* Favori (haut droit) */}
@@ -574,8 +570,6 @@ export default function TemplatesPage() {
                       </div>
                     )}
 
-                    {/* Barre de couleur bas */}
-                    <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg," + template.color + "," + template.accent + ")", opacity: isSelected || isHovered ? 1 : 0.4, transition: "opacity 0.2s" }} />
                   </div>
 
                   {/* ── Infos ─────────────────────────────────────────────── */}
@@ -585,10 +579,10 @@ export default function TemplatesPage() {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <h2 style={{ color: "var(--ink)", fontSize: isMobile ? 12.5 : 15, fontWeight: 700, margin: isMobile ? 0 : "0 0 5px", letterSpacing: "-0.2px", whiteSpace: isMobile ? "nowrap" as const : "normal", overflow: "hidden", textOverflow: "ellipsis" }}>{template.name}</h2>
                         {!isMobile && <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
-                          <span style={{ background: template.color + "12", border: "1px solid " + template.color + "22", borderRadius: 6, padding: "1px 7px", fontSize: 9, color: template.color, fontWeight: 600 }}>{template.category}</span>
+                          <span style={{ background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 6, padding: "1px 7px", fontSize: 10, color: "var(--muted)", fontWeight: 500 }}>{template.category}</span>
                           {tier && (
-                            <span style={{ display: "inline-flex", alignItems: "center", gap: 3, background: tier.color + "16", border: "1px solid " + tier.color + "33", borderRadius: 6, padding: "1px 7px", fontSize: 9, color: tier.color, fontWeight: 700 }}>
-                              {tier.emoji} {tier.label}
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 3, background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 6, padding: "1px 7px", fontSize: 10, color: "var(--accent)", fontWeight: 600 }}>
+                              {tier.label}
                             </span>
                           )}
                         </div>}
@@ -601,9 +595,7 @@ export default function TemplatesPage() {
 
                       {/* Highlight */}
                       {template.highlight && (
-                        <div style={{ background: template.color + "08", border: "1px solid " + template.color + "15", borderRadius: 6, padding: "4px 8px", marginBottom: 10 }}>
-                          <span style={{ color: template.color, fontSize: 12, fontWeight: 600 }}>✦ {template.highlight}</span>
-                        </div>
+                        <p style={{ margin: "0 0 10px", color: "var(--ink)", fontSize: 12, fontWeight: 500 }}>{template.highlight}</p>
                       )}
 
                       {/* Métadonnées : blocs + temps */}
@@ -621,7 +613,7 @@ export default function TemplatesPage() {
                       {/* Tags */}
                       <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 14 }}>
                         {template.tags.slice(0, 4).map((tag: string, i: number) => (
-                          <span key={i} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 4, padding: "2px 6px", fontSize: 9, color: MUTED }}>{tag}</span>
+                          <span key={i} style={{ background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 4, padding: "2px 6px", fontSize: 10, color: MUTED }}>{tag}</span>
                         ))}
                       </div>
                     </>}
@@ -633,7 +625,7 @@ export default function TemplatesPage() {
                           on passait à côté de l'aperçu ET de l'assistant qui vit dedans.
                           D'où ce bouton compact, réduit à l'icône faute de place. */}
                       <button type="button" onClick={(e) => { e.stopPropagation(); setPreview(template.id) }}
-                        className="dam-selbar-sec" aria-label={`Aperçu de ${template.name}`}
+                        className="da-btn-neutral da-btn-neutral--sm" aria-label={`Aperçu de ${template.name}`}
                         title={isMobile ? "Aperçu" : undefined}
                         style={isMobile
                           ? { flex: "none", width: 44, minHeight: 44, padding: "0", justifyContent: "center", fontSize: 13.5 }
@@ -644,12 +636,10 @@ export default function TemplatesPage() {
                       {/* Utiliser — primaire or (halo/reflet) hors état verrouillé */}
                       <button type="button" onClick={(e) => { e.stopPropagation(); if (locked) { router.push("/upgrade?reason=template"); return } setNamingFor(template.id) }}
                         disabled={!!creating}
-                        className={locked ? undefined : "dam-primary"}
+                        className={locked ? undefined : "da-btn-primary da-btn-primary--sm"}
                         style={locked
                           ? { flex: isMobile ? 1 : 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: isMobile ? "11px 10px" : "11px 16px", minHeight: isMobile ? 44 : undefined, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 11, color: MUTED, fontSize: 13.5, fontWeight: 700, cursor: "pointer", transition: "all 0.15s" }
                           : { flex: isMobile ? 1 : 2, padding: isMobile ? "11px 10px" : "11px 16px", minHeight: isMobile ? 44 : undefined, justifyContent: "center", fontSize: 13.5, fontWeight: 700, opacity: creating && !isCreating ? 0.5 : 1, cursor: creating ? "not-allowed" : "pointer" }}>
-                        {!locked && <span className="dam-gloss" aria-hidden />}
-                        {!locked && <span className="dam-sheen" aria-hidden />}
                         <span style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7 }}>
                           {isCreating ? <><span style={{ width: 12, height: 12, border: "1.5px solid currentColor", borderTopColor: "transparent", borderRadius: "50%", animation: "mo-spin 0.8s linear infinite" }} /> Création…</> : locked ? <><Lock size={13} /> Débloquer</> : <>Utiliser <ArrowRight size={14} /></>}
                         </span>
@@ -665,7 +655,7 @@ export default function TemplatesPage() {
         {/* Lien page vide */}
         <div style={{ textAlign: "center", marginTop: 48 }}>
           <button type="button" onClick={() => router.push("/dashboard/builder/new")}
-            style={{ background: "transparent", border: "1px dashed rgba(255,255,255,0.12)", borderRadius: 14, padding: "20px 32px", color: MUTED, fontSize: 13, cursor: "pointer" }}>
+            style={{ background: "transparent", border: "1px dashed var(--line-strong)", borderRadius: 12, padding: "18px 28px", color: MUTED, fontSize: 13, cursor: "pointer" }}>
             <div style={{ fontSize: 24, marginBottom: 6 }}>+</div>
             Partir d'une page vide
           </button>
