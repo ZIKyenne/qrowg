@@ -31,9 +31,9 @@ import { ACTIVITY_CFG, ACTIVITY_FILTER_OPTS, DEFAULT_PREFS, PLAN_CFG, type PlanL
 // -- Constantes ---------------------------------------------------------------
 const G = "var(--accent)"
 const MUTED = "var(--muted)"
-const BG = "#080808"
-const SURF = "#111009"
-const SURF2 = "#0F0E0B"
+const BG = "var(--bg)"
+const SURF = "var(--surface)"
+const SURF2 = "var(--surface-2)"
 
 // Les plans, leurs limites et leurs icônes : typesProfil.ts.
 
@@ -793,7 +793,7 @@ export default function ProfilePage() {
 
       {/* Tooltip stats */}
       {statsTooltip && (
-        <div style={{ position:"fixed", bottom:70, left:"50%", transform:"translateX(-50%)", zIndex:9998, padding:"7px 14px", background:"rgba(20,18,12,0.95)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:8, color:"var(--muted)", fontSize:11, whiteSpace:"nowrap" as const, backdropFilter:"blur(8px)", pointerEvents:"none" }}>
+        <div style={{ position:"fixed", bottom:70, left:"50%", transform:"translateX(-50%)", zIndex:9998, padding:"7px 14px", background:"rgba(20,18,12,0.95)", border:"1px solid var(--line-strong)", borderRadius:8, color:"var(--muted)", fontSize:11, whiteSpace:"nowrap" as const, backdropFilter:"blur(8px)", pointerEvents:"none" }}>
           {statsTooltip}
         </div>
       )}
@@ -897,7 +897,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Jauges utilisation (verre) */}
-            <div className="hero-in" style={{ animationDelay: "200ms", background: "rgba(255,255,255,0.04)", backdropFilter: "blur(10px)", border: `1px solid ${pc}2e`, borderRadius: 16, padding: "13px 16px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+            <div className="hero-in" style={{ animationDelay: "200ms", background: "rgba(255,255,255,0.04)", backdropFilter: "blur(10px)", border: `1px solid ${pc}2e`, borderRadius: 14, padding: "13px 16px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                 <span style={{ color: "#F8F4EC", fontSize: 12.5, fontWeight: 700 }}>Mon utilisation</span>
                 {profile?.plan !== "business" && (
@@ -1022,7 +1022,7 @@ export default function ProfilePage() {
                   )}
                   <div style={{ display:"flex", gap:6 }}>
                     <button onClick={() => fileRef.current?.click()}
-                      style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 10px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:7, color:G, fontSize:11, cursor:"pointer" }}>
+                      style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 10px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:7, color:G, fontSize:11, cursor:"pointer" }}>
                       <Camera size={11}/> Changer
                     </button>
                     {/* Action secondaire discrete (#11) : pas de rouge (reversible), moins prioritaire que "Changer" */}
@@ -1041,7 +1041,7 @@ export default function ProfilePage() {
               {cropMode && cropSrc && (
                 <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.85)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:2000, padding:24 }}
                   onClick={() => { setCropMode(false); setCropSrc(null) }}>
-                  <div style={{ background:"var(--surface)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:16, padding:24, maxWidth:440, width:"100%" }}
+                  <div style={{ background:"var(--surface)", border:"1px solid var(--line-strong)", borderRadius:14, padding:24, maxWidth:440, width:"100%" }}
                     onClick={e => e.stopPropagation()}>
                     <p style={{ color:"var(--ink)", fontSize:15, fontWeight:700, margin:"0 0 14px" }}>Aperçu de l'avatar</p>
                     <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:16, marginBottom:18 }}>
@@ -1100,7 +1100,7 @@ export default function ProfilePage() {
 
               {/* URL publique */}
               {publicUrl && (
-                <div style={{ gridColumn:"1 / -1", display:"flex", alignItems:"center", gap:7, padding:"9px 12px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius:9 }}>
+                <div style={{ gridColumn:"1 / -1", display:"flex", alignItems:"center", gap:7, padding:"9px 12px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid var(--line-strong)", borderRadius:9 }}>
                   <Link size={12} color={G} style={{ flexShrink:0 }}/>
                   <span style={{ flex:1, color:G, fontSize:11, fontFamily:"monospace", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
                     {publicUrl}
@@ -1348,7 +1348,7 @@ export default function ProfilePage() {
               </div>
 
               {/* Condition de validation */}
-              <div style={{ padding:"10px 13px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius:9 }}>
+              <div style={{ padding:"10px 13px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid var(--line-strong)", borderRadius:9 }}>
                 <p style={{ color:G, fontSize:11, fontWeight:700, margin:"0 0 3px", display:"flex", alignItems:"center", gap:6 }}>
                   Comment gagner un mois Pro ?
                 </p>
@@ -1361,7 +1361,7 @@ export default function ProfilePage() {
               <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
                 <label style={{ color:MUTED, fontSize:10, fontWeight:500 }}>Votre lien de parrainage</label>
                 <div style={{ display:"flex", gap:7 }}>
-                  <div style={{ flex:1, background:SURF2, border:`1px solid color-mix(in srgb, var(--accent) 13%, transparent)`, borderRadius:9, padding:"9px 12px", color:G, fontSize:11, fontFamily:"monospace", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, display:"flex", alignItems:"center" }}>
+                  <div style={{ flex:1, background:SURF2, border:"1px solid var(--line-strong)", borderRadius:9, padding:"9px 12px", color:G, fontSize:11, fontFamily:"monospace", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const, display:"flex", alignItems:"center" }}>
                     {referralLink}
                   </div>
                   <button onClick={copyReferral}
@@ -1545,7 +1545,7 @@ export default function ProfilePage() {
                   <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
                     <p style={{ color:MUTED, fontSize:9, textTransform:"uppercase" as const, letterSpacing:1, margin:0 }}>Top performers</p>
                     {topPage && (
-                      <a href={`/dashboard/builder/${topPage.id}`} style={{ display:"flex", alignItems:"center", gap:9, padding:"9px 11px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius:9, textDecoration:"none" }}>
+                      <a href={`/dashboard/builder/${topPage.id}`} style={{ display:"flex", alignItems:"center", gap:9, padding:"9px 11px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid var(--line-strong)", borderRadius:9, textDecoration:"none" }}>
                         <div style={{ width:28, height:28, borderRadius:7, background:"color-mix(in srgb, var(--accent) 10%, transparent)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                           <Eye size={13} color={G}/>
                         </div>
@@ -1769,7 +1769,7 @@ export default function ProfilePage() {
                     Compte actif
                   </span>
                   {profile?.plan !== "free" && (
-                    <span style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"4px 10px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:20, fontSize:10, color:G }}>
+                    <span style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"4px 10px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:20, fontSize:10, color:G }}>
                       <Key size={11}/>
                       Plan payant
                     </span>
@@ -2403,7 +2403,7 @@ export default function ProfilePage() {
                 {(confirmRegen || confirmRevoke) && (
                   <div style={{ position:"fixed" as const, inset:0, background:"rgba(0,0,0,0.75)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:2000, padding:20 }}
                     onClick={() => { setConfirmRegen(null); setConfirmRevoke(null) }}>
-                    <div style={{ background:"var(--surface)", border:`1px solid ${confirmRevoke?"rgba(255,107,107,0.3)":"color-mix(in srgb, var(--accent) 25%, transparent)"}`, borderRadius:16, padding:28, maxWidth:360, width:"100%" }}
+                    <div style={{ background:"var(--surface)", border:`1px solid ${confirmRevoke?"rgba(255,107,107,0.3)":"color-mix(in srgb, var(--accent) 25%, transparent)"}`, borderRadius:14, padding:28, maxWidth:360, width:"100%" }}
                       onClick={e => e.stopPropagation()}>
                       <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
                         <AlertTriangle size={18} color={confirmRevoke?"var(--danger)":"var(--accent)"}/>
@@ -2519,7 +2519,7 @@ export default function ProfilePage() {
                               <button type="button"
                                 onClick={() => setConfirmRegen(key.id)}
                                 title="Regenerer"
-                                style={{ width:28, height:28, background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:G }}>
+                                style={{ width:28, height:28, background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:G }}>
                                 <RotateCcw size={12}/>
                               </button>
                               <button type="button"
@@ -2720,7 +2720,7 @@ export default function ProfilePage() {
                               disabled={settingPrimary === dm.id}
                               title="Définir comme principal"
                               aria-label={`Définir ${dm.domain} comme domaine principal`}
-                              style={{ width:40, height:40, background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:G }}>
+                              style={{ width:40, height:40, background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:G }}>
                               {settingPrimary===dm.id
                                 ? <div style={{ width:11, height:11, border:`1.5px solid color-mix(in srgb, var(--accent) 19%, transparent)`, borderTopColor:G, borderRadius:"50%", animation:"mo-spin 0.7s linear infinite" }}/>
                                 : <CheckCircle size={12}/>}
@@ -2937,7 +2937,7 @@ export default function ProfilePage() {
                         <div>
                           <div style={{ display:"flex", alignItems:"center", gap:7 }}>
                             <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{item.label}</p>
-                            {locked && <span style={{ background:`color-mix(in srgb, var(--accent) 7%, transparent)`, border:`1px solid color-mix(in srgb, var(--accent) 15%, transparent)`, borderRadius:4, padding:"1px 6px", fontSize:8, color:G, fontWeight:700 }}>Pro</span>}
+                            {locked && <span style={{ background:`color-mix(in srgb, var(--accent) 7%, transparent)`, border:"1px solid var(--line-strong)", borderRadius:4, padding:"1px 6px", fontSize:8, color:G, fontWeight:700 }}>Pro</span>}
                           </div>
                           <p style={{ color:MUTED, fontSize:10, margin:"2px 0 0" }}>{item.desc}</p>
                         </div>

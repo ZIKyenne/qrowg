@@ -178,7 +178,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
               { icon:<ToggleLeft size={14} color={MUTED}/>,        label:"Inactives",value:inactive },
               { icon:<MousePointerClick size={14} color={G}/>,label:"Clics total",value:redirects.reduce((a,r)=>a+r.hit_count,0).toLocaleString() },
             ].map((k,i) => (
-              <div key={i} style={{ background:"var(--surface)", border:"1px solid color-mix(in srgb, var(--accent) 10%, transparent)", borderRadius:11, padding:"12px 14px", display:"flex", alignItems:"center", gap:9 }}>
+              <div key={i} style={{ background:"var(--surface)", border:"1px solid var(--line-strong)", borderRadius:11, padding:"12px 14px", display:"flex", alignItems:"center", gap:9 }}>
                 {k.icon}
                 <div>
                   <p style={{ color:MUTED, fontSize:10, textTransform:"uppercase", letterSpacing:1, margin:"0 0 2px" }}>{k.label}</p>
@@ -191,7 +191,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
 
         {/* Formulaire */}
         {showForm && (
-          <div style={{ background:"var(--surface)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:14, padding:22, marginBottom:24 }}>
+          <div style={{ background:"var(--surface)", border:"1px solid var(--line-strong)", borderRadius:14, padding:22, marginBottom:24 }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:18 }}>
               <p style={{ color:"var(--ink)", fontSize:14, fontWeight:700, margin:0, display:"flex", alignItems:"center", gap:8 }}>
                 {editId ? <Pencil size={15} color={G}/> : <Plus size={15} color={G}/>}
@@ -226,13 +226,13 @@ export default function RedirectsPanel({ userDomains }: Props) {
                 <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:7 }}>Source</label>
                 <div style={{ display:"flex", gap:8, alignItems:"center" }}>
                   <select aria-label="Domaine de départ" value={fDomain} onChange={e => setFDomain(e.target.value)}
-                    style={{ flex:2, background:"var(--surface)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none", cursor:"pointer" }}>
+                    style={{ flex:2, background:"var(--field)", border:"1px solid var(--line-strong)", borderRadius:9, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none", cursor:"pointer" }}>
                     {userDomains.map(d => <option key={d} value={d}>{d}</option>)}
                     <option value="qrowg.com">qrowg.com (sous-domaine)</option>
                   </select>
                   <input value={fPath} onChange={e => setFPath(e.target.value.startsWith("/") ? e.target.value : "/" + e.target.value)}
                     placeholder="/chemin"
-                    style={{ flex:1, background:"var(--surface)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none" }}/>
+                    style={{ flex:1, background:"var(--field)", border:"1px solid var(--line-strong)", borderRadius:9, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none" }}/>
                 </div>
                 <p style={{ color:MUTED, fontSize:10, margin:"5px 0 0" }}>
                   → URL source : <code style={{ color:G }}>{fDomain}{fPath}</code>
@@ -330,7 +330,7 @@ export default function RedirectsPanel({ userDomains }: Props) {
                         {toggling === r.id ? <Loader size={12} style={{ animation:"mo-spin 0.8s linear infinite" }}/> : r.enabled ? <ToggleRight size={13}/> : <ToggleLeft size={13}/>}
                       </button>
                       <button type="button" onClick={() => openEdit(r)}
-                        style={{ width:28, height:28, background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:G }}>
+                        style={{ width:28, height:28, background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:G }}>
                         <Pencil size={12}/>
                       </button>
                       <a href={`https://${r.from_domain}${r.from_path}`} target="_blank" rel="noopener noreferrer"

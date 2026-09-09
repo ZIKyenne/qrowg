@@ -175,7 +175,7 @@ export default function DomainsPage({ pages, plan }: Props) {
 
         {!isPaid ? (
           /* Paywall */
-          <div style={{ textAlign:"center", padding:"48px 20px", background:"var(--surface)", border:"1px dashed rgba(255,255,255,0.1)", borderRadius:16 }}>
+          <div style={{ textAlign:"center", padding:"48px 20px", background:"var(--surface)", border:"1px dashed rgba(255,255,255,0.1)", borderRadius:14 }}>
             <Globe size={40} color={MUTED} style={{ marginBottom:14 }}/>
             <p style={{ color:"var(--ink)", fontSize:15, fontWeight:600, margin:"0 0 6px" }}>Domaines personnalisés — Pro & Business</p>
             <p style={{ color:MUTED, fontSize:13, margin:"0 0 24px", lineHeight:1.6 }}>
@@ -201,7 +201,7 @@ export default function DomainsPage({ pages, plan }: Props) {
 
             {/* Formulaire ajout */}
             {showForm && (
-              <div style={{ background:"var(--surface)", border:`1px solid color-mix(in srgb, var(--accent) 20%, transparent)`, borderRadius:14, padding:22, marginBottom:20 }}>
+              <div style={{ background:"var(--surface)", border:"1px solid var(--line-strong)", borderRadius:14, padding:22, marginBottom:20 }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:18 }}>
                   <p style={{ color:"var(--ink)", fontSize:14, fontWeight:700, margin:0, display:"flex", alignItems:"center", gap:8 }}>
                     <Plus size={14} color={G}/> Nouveau domaine
@@ -219,7 +219,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                       value={fDomain}
                       onChange={e => setFDomain(e.target.value)}
                       placeholder="mondomaine.fr"
-                      style={{ width:"100%", background:"var(--surface)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:9, color:"var(--ink)", padding:"10px 14px", fontSize:13, outline:"none", boxSizing:"border-box" }}
+                      style={{ width:"100%", background:"var(--surface)", border:"1px solid var(--line-strong)", borderRadius:9, color:"var(--ink)", padding:"10px 14px", fontSize:13, outline:"none", boxSizing:"border-box" }}
                     />
                     <p style={{ color:MUTED, fontSize:11, margin:"5px 0 0" }}>
                       Sans www. ni https:// — ex: mondomaine.fr
@@ -229,7 +229,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                   <div>
                     <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:6 }}>Page associée</label>
                     <select aria-label="Page à rattacher au domaine" value={fPageId} onChange={e => setFPageId(e.target.value)}
-                      style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, color:"var(--ink)", padding:"10px 14px", fontSize:13, outline:"none", cursor:"pointer" }}>
+                      style={{ width:"100%", background:"var(--field)", border:"1px solid var(--line-strong)", borderRadius:9, color:"var(--ink)", padding:"10px 14px", fontSize:13, outline:"none", cursor:"pointer" }}>
                       {pages.map(p => <option key={p.id} value={p.id}>{p.title} (/{p.slug})</option>)}
                     </select>
                   </div>
@@ -263,7 +263,7 @@ export default function DomainsPage({ pages, plan }: Props) {
                   Remplacez l'adresse <span style={{ color:"#C9C3B6", fontFamily:"monospace" }}>qrowg.com</span> par la vôtre — vos clients ne voient que votre marque.
                 </p>
                 {/* Exemple concret */}
-                <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"7px 14px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:9, marginBottom:18 }}>
+                <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"7px 14px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:9, marginBottom:18 }}>
                   <span style={{ width:6, height:6, borderRadius:"50%", background:"var(--success)", flexShrink:0 }}/>
                   <span style={{ color:"var(--ink)", fontSize:13, fontWeight:600, fontFamily:"monospace" }}>votreentreprise.fr</span>
                 </div>

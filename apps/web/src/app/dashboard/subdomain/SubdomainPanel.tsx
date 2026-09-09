@@ -144,7 +144,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
   }
 
   return (
-    <div style={{ background:"var(--surface)", border:"1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius:16, padding:24, fontFamily:"DM Sans, sans-serif" }}>
+    <div style={{ background:"var(--surface)", border:"1px solid var(--line-strong)", borderRadius:14, padding:24, fontFamily:"DM Sans, sans-serif" }}>
 
       {/* Header */}
       <div style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:20 }}>
@@ -186,7 +186,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
                   {copied ? <Check size={13}/> : <Copy size={13}/>}
                 </button>
                 <button type="button" onClick={() => { setInput(currentUsername); setEditing(true) }}
-                  style={{ width:30, height:30, background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:G, cursor:"pointer" }}>
+                  style={{ width:30, height:30, background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:G, cursor:"pointer" }}>
                   <Pencil size={13}/>
                 </button>
                 <button type="button" onClick={release} disabled={deleting}
@@ -257,7 +257,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
               <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                 {suggestions.map(s => (
                   <button key={s} type="button" onClick={() => setInput(s)}
-                    style={{ padding:"5px 12px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:8, color:G, fontSize:11, fontWeight:600, cursor:"pointer" }}>
+                    style={{ padding:"5px 12px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:8, color:G, fontSize:11, fontWeight:600, cursor:"pointer" }}>
                     {s}.{APP}
                   </button>
                 ))}

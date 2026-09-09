@@ -120,8 +120,8 @@ export default function TeamPage() {
     } catch (e) { toast.error(erreurLisible(e, "Impossible de quitter l'équipe pour le moment.")) }
   }
 
-  const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid rgba(201,168,76,0.14)", borderRadius: 16, padding: 22 }
-  const rowStyle: React.CSSProperties = { display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,0.06)" }
+  const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 14, padding: 18 }
+  const rowStyle: React.CSSProperties = { display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: "1px solid var(--line)" }
 
   return (
     <div style={{ maxWidth: 760, margin: "0 auto", padding: "clamp(20px,4vw,40px) clamp(16px,4vw,28px)", fontFamily: "DM Sans, sans-serif" }}>
@@ -140,9 +140,9 @@ export default function TeamPage() {
 
           {/* Upsell si le plan du propriétaire n'inclut pas l'Équipe */}
           {data.myRole === "owner" && !data.teamEnabled && (
-            <div style={{ ...card, borderColor: "rgba(201,168,76,0.35)", background: "linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.02))" }}>
+            <div style={{ ...card, borderColor: "color-mix(in srgb, var(--accent) 35%, transparent)" }}>
               <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: "0 0 8px", display: "flex", alignItems: "center", gap: 8 }}><Sparkles size={16} color={GOLD} /> Invitez votre équipe</p>
-              <p style={{ color: "#B8B2A4", fontSize: 14, margin: "0 0 16px", lineHeight: 1.6 }}>La collaboration en équipe est incluse dans le plan <strong style={{ color: GOLD }}>Business</strong> (jusqu'à 5 membres). Passez à Business pour inviter des éditeurs et admins.</p>
+              <p style={{ color: "var(--muted)", fontSize: 14, margin: "0 0 16px", lineHeight: 1.6 }}>La collaboration en équipe est incluse dans le plan <strong style={{ color: GOLD }}>Business</strong> (jusqu'à 5 membres). Passez à Business pour inviter des éditeurs et admins.</p>
               <span className="da-halo-wrap">
                 <Link href="/upgrade?reason=team" className="da-btn-primary da-btn-primary--sm">
                   <span>Passer à Business</span> <ArrowRight className="da-ic da-ic-arrow" size={15} />

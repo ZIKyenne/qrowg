@@ -127,7 +127,7 @@ export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrim
             {/* Définir comme principal (Business uniquement, si pas déjà principal) */}
             {isBusiness && !isPrimary && rec.verified && (
               <button type="button" onClick={() => handleSetPrimary(rec.domain)} disabled={settingPrimary === rec.domain}
-                style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 10px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:8, color:G, fontSize:11, fontWeight:600, cursor:settingPrimary===rec.domain?"wait":"pointer", opacity:settingPrimary===rec.domain?0.6:1 }}>
+                style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 10px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:8, color:G, fontSize:11, fontWeight:600, cursor:settingPrimary===rec.domain?"wait":"pointer", opacity:settingPrimary===rec.domain?0.6:1 }}>
                 {settingPrimary === rec.domain ? <Loader size={11} style={{ animation:"mo-spin 0.8s linear infinite" }}/> : <Star size={11}/>}
                 Définir principal
               </button>
@@ -184,7 +184,7 @@ export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrim
             <div style={{ height:"100%", width:`${Math.min((domains.length/planInfo.max)*100, 100)}%`, background: atLimit ? "var(--danger)" : "linear-gradient(90deg,#c9a24d,#e8c877)", borderRadius:3, transition:"width 0.5s" }}/>
           </div>
           {atLimit && (
-            <div style={{ marginTop:8, display:"flex", alignItems:"center", gap:7, padding:"8px 12px", background:"color-mix(in srgb, var(--accent) 6%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius:8 }}>
+            <div style={{ marginTop:8, display:"flex", alignItems:"center", gap:7, padding:"8px 12px", background:"color-mix(in srgb, var(--accent) 6%, transparent)", border:"1px solid var(--line-strong)", borderRadius:8 }}>
               <Crown size={13} color={G}/>
               <span style={{ color:MUTED, fontSize:11 }}>
                 Limite atteinte · <a href="/upgrade" style={{ color:G, textDecoration:"none", fontWeight:600 }}>Passer au Business pour des domaines illimités →</a>
@@ -259,7 +259,7 @@ export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrim
 
       {/* CTA upgrade pour Business si plan Pro limité */}
       {!isBusiness && plan?.toLowerCase() === "pro" && domains.length > 0 && (
-        <div style={{ marginTop:14, padding:"12px 14px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, flexWrap:"wrap" }}>
+        <div style={{ marginTop:14, padding:"12px 14px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid var(--line-strong)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, flexWrap:"wrap" }}>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <Crown size={14} color={G}/>
             <span style={{ color:MUTED, fontSize:12 }}>

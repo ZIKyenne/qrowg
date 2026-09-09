@@ -142,7 +142,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
   }
 
   return (
-    <div style={{ background:"var(--surface)", border:"1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius:14, padding:24, fontFamily:"DM Sans, sans-serif" }}>
+    <div style={{ background:"var(--surface)", border:"1px solid var(--line-strong)", borderRadius:14, padding:24, fontFamily:"DM Sans, sans-serif" }}>
 
       {/* Header */}
       <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:20, gap:12, flexWrap:"wrap" }}>
@@ -178,7 +178,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
               <ArrowRight size={11} color={MUTED}/>
               <span style={{ color:"var(--ink)", fontSize:11 }}>{ex.page}</span>
               {ex.special === "wildcard" && (
-                <span style={{ background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:5, padding:"1px 6px", fontSize:9, color:G }}>wildcard</span>
+                <span style={{ background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid var(--line-strong)", borderRadius:5, padding:"1px 6px", fontSize:9, color:G }}>wildcard</span>
               )}
             </div>
           ))}
@@ -187,7 +187,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
 
       {/* Formulaire */}
       {showForm && (
-        <div style={{ background:"rgba(255,255,255,0.02)", border:"1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius:11, padding:18, marginBottom:18 }}>
+        <div style={{ background:"rgba(255,255,255,0.02)", border:"1px solid var(--line-strong)", borderRadius:11, padding:18, marginBottom:18 }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
             <p style={{ color:"var(--ink)", fontSize:13, fontWeight:700, margin:0 }}>Nouvelle route</p>
             <button type="button" onClick={() => { setShowForm(false); setError("") }}
@@ -225,7 +225,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
                 <option value="__custom__">Autre (saisie libre)</option>
               </select>
               {fSub === "__custom__" && (
-                <div style={{ display:"flex", alignItems:"center", gap:0, background:"var(--surface)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:8, overflow:"hidden" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:0, background:"var(--surface)", border:"1px solid var(--line-strong)", borderRadius:8, overflow:"hidden" }}>
                   <input value={fCustomSub} onChange={e => setFCustomSub(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g,""))}
                     placeholder="mon-sous-domaine"
                     style={{ flex:1, background:"transparent", border:"none", color:"var(--ink)", padding:"9px 10px", fontSize:12, outline:"none" }}/>

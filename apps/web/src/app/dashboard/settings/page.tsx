@@ -1,6 +1,7 @@
 "use client"
 
 import { PageHeader } from "@/components/ui/PageHeader"
+import { SettingsSection, champStyle } from "@/components/ui/SettingsSection"
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Save, Check, AlertTriangle, Eye, EyeOff, Bell, Shield, Trash2, LogOut, Key, Globe, Palette, Moon, CreditCard, ArrowRight, Loader2, Download, DatabaseBackup } from "lucide-react"
@@ -21,26 +22,16 @@ const ENVOIS: { cle: string; nom: string }[] = [
 
 type Profile = { id: string; email: string; full_name: string | null; plan: string }
 
+// Section = primitive partagée (components/ui/SettingsSection) — même forme que Profil, Équipe, Domaines.
 function Section({ title, subtitle, icon, children }: { title: string; subtitle?: string; icon: React.ReactNode; children: React.ReactNode }) {
-  return (
-    <div style={{ background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 16, overflow: "hidden", marginBottom: 20 }}>
-      <div style={{ padding: "18px 24px", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", alignItems: "center", gap: 12 }}>
-        <div style={{ color: "var(--accent)", background: "color-mix(in srgb, var(--accent) 10%, transparent)", borderRadius: 8, padding: 8 }}>{icon}</div>
-        <div>
-          <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>{title}</p>
-          {subtitle && <p style={{ color: "var(--muted)", fontSize: 12, margin: 0 }}>{subtitle}</p>}
-        </div>
-      </div>
-      <div style={{ padding: "20px 24px" }}>{children}</div>
-    </div>
-  )
+  return <SettingsSection title={title} sub={subtitle} icon={icon} gap={20}>{children}</SettingsSection>
 }
 
 function Toggle({ value, onChange, label, description }: { value: boolean; onChange: (v: boolean) => void; label: string; description?: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, padding: "12px 0", borderBottom: "1px solid var(--line)" }}>
       <div>
-        <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600, margin: 0 }}>{label}</p>
+        <p style={{ color: "var(--ink)", fontSize: 13.5, fontWeight: 500, margin: 0 }}>{label}</p>
         {description && <p style={{ color: "var(--muted)", fontSize: 12.5, margin: "2px 0 0" }}>{description}</p>}
       </div>
       <Switch checked={value} onChange={onChange} ariaLabel={label} />
@@ -204,18 +195,14 @@ export default function SettingsPage() {
   }
 
   const G = "var(--accent)"; const MUTED = "#A8A190"
-  const inputStyle: React.CSSProperties = {
-    width: "100%", background: "#0d0c09", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)",
-    borderRadius: 10, padding: "11px 14px", color: "var(--ink)", fontSize: 14,
-    outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif"
-  }
+  const inputStyle: React.CSSProperties = champStyle
 
   if (loading) return (
     <div style={{ minHeight: "100dvh", background: "transparent", padding: "32px 28px", fontFamily: "DM Sans, sans-serif" }}>
       <div style={{ maxWidth: 680, margin: "0 auto" }}>
         <div className="skeleton" style={{ width: 220, height: 34, marginBottom: 8 }} />
         <div className="skeleton" style={{ width: 280, height: 16, marginBottom: 28 }} />
-        {[150, 220, 190, 130].map((h, i) => <div key={i} className="skeleton" style={{ height: h, borderRadius: 16, marginBottom: 20 }} />)}
+        {[150, 220, 190, 130].map((h, i) => <div key={i} className="skeleton" style={{ height: h, borderRadius: 14, marginBottom: 20 }} />)}
       </div>
     </div>
   )
@@ -243,7 +230,7 @@ export default function SettingsPage() {
             <div>
               <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 5 }}>Plan actuel</label>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ background: "color-mix(in srgb, var(--accent) 7%, transparent)", border: `1px solid color-mix(in srgb, var(--accent) 15%, transparent)`, borderRadius: 8, padding: "6px 14px", color: G, fontSize: 13, fontWeight: 700, textTransform: "capitalize" }}>
+                <span style={{ background: "color-mix(in srgb, var(--accent) 7%, transparent)", border:"1px solid var(--line-strong)", borderRadius: 8, padding: "6px 14px", color: G, fontSize: 13, fontWeight: 700, textTransform: "capitalize" }}>
                   {profile?.plan || "free"}
                 </span>
                 {profile?.plan !== "business" && (
@@ -403,7 +390,7 @@ export default function SettingsPage() {
 
         {/* Danger zone — isolee en fin de page, davantage d'espace (#05).
             L ancre #danger est la cible du lien depuis Profil › Sécurité. */}
-        <div id="danger" style={{ scrollMarginTop: 24, background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 16, overflow: "hidden", marginTop: 16 }}>
+        <div id="danger" style={{ scrollMarginTop: 24, background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 14, overflow: "hidden", marginTop: 16 }}>
           <div style={{ padding: "18px 24px", borderBottom: "1px solid rgba(239,68,68,0.1)", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ color: "var(--danger)", background: "rgba(239,68,68,0.1)", borderRadius: 8, padding: 8 }}><AlertTriangle size={16} /></div>
             <div>
