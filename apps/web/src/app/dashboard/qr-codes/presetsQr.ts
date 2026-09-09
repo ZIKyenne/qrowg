@@ -28,13 +28,13 @@ export type Preset = {
 
 export const PRESET_CATS = [
   { id:"classic",    label:"Classique",  emoji:"⚫" },
-  { id:"business",   label:"Business",   emoji:"💼" },
+  { id:"business",   label:"Entreprise", emoji:"💼" },
   { id:"restaurant", label:"Restaurant", emoji:"🍽️" },
   { id:"luxury",     label:"Luxe",       emoji:"💎" },
-  { id:"creator",    label:"Createur",   emoji:"🎬" },
+  { id:"creator",    label:"Créateur",   emoji:"🎬" },
   { id:"tech",       label:"Tech",       emoji:"⚡" },
-  { id:"event",      label:"Event",      emoji:"🎉" },
-  { id:"retail",     label:"Retail",     emoji:"🛍️" },
+  { id:"event",      label:"Événement",  emoji:"🎉" },
+  { id:"retail",     label:"Commerce",   emoji:"🛍️" },
 ]
 
 export const PRESETS: Preset[] = [

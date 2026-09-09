@@ -12,12 +12,12 @@ const css = readFileSync(join(__dirname, "../globals.css"), "utf8")
 describe("cartes de modèles", () => {
   const src = lire("templates/page.tsx")
   it("sont plates : --surface, filet, sans levée ni grande ombre", () => {
-    expect(src).toContain('background: "var(--surface)",\n                    border: "1px solid " + (isSelected ? "color-mix(in srgb, var(--accent) 55%, transparent)" : isHovered ? "var(--line-strong)" : "var(--line)")')
+    expect(src).toContain('background: "var(--surface)",\n                    border: "1px solid " + (isHovered ? "var(--line-strong)" : "var(--line)")')
     expect(src).not.toContain('transform: isSelected ? "translateY(-4px)"')
     expect(src).not.toContain("0 16px 40px rgba(0,0,0,0.5)")
   })
   it("la vignette garde les couleurs du modèle, à plat, sans halo ni zoom au survol", () => {
-    expect(src).toContain('background: template.surface, borderBottom: "1px solid var(--line)"')
+    expect(src).toContain('background: template.surface, border: 0, borderBottom: "1px solid var(--line)"')
     expect(src).not.toContain("radial-gradient(ellipse at 50% 0%")
     expect(src).not.toContain("scale(\" + (isHovered ? 1.06 : 1)")
     expect(src).not.toContain("{/* Barre de couleur bas */}")

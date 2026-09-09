@@ -28,6 +28,19 @@ describe("accueil", () => {
     }
     expect(home).toContain("scanLine 3.4s")
   })
+  it("le héros (badge, H1, description, CTA, réassurance) est rendu sans animation d'entrée", () => {
+    // Revue du 9 septembre, P0 : le contenu essentiel ne dépend d'aucune
+    // animation `both`/`backwards` (invisible tant que JavaScript n'a pas tourné,
+    // et ignorée par prefers-reduced-motion quand elle est en ligne).
+    const debut = home.indexOf('className="hero-badge"')
+    const fin = home.indexOf('className="hero-reassurance"')
+    expect(debut).toBeGreaterThan(0)
+    expect(fin).toBeGreaterThan(debut)
+    const heros = home.slice(debut, home.indexOf("</div>", fin))
+    expect(heros).not.toContain("mo-fade-up")
+    expect(heros).not.toMatch(/animation:\s*["'`]/)
+    expect(heros).toContain("Votre page pro et son")
+  })
   it("le bouton principal est un aplat d'accent", () => {
     expect(home).toContain('background: "var(--accent)",\n                color: "var(--ink-on-accent)",')
     expect(home).not.toContain("linear-gradient(90deg, #C9A84C, #d4a843, #b8953f)")

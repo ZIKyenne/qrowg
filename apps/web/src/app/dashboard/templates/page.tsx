@@ -3,13 +3,14 @@
 import { useState, useEffect, useRef, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { PLAN_RANK, getPlan } from "@/lib/plans"
+import { PLAN_RANK, getPlan, PLANS } from "@/lib/plans"
 import { slugifyBase } from "@/lib/slug"
 import { PageHeader } from "@/components/ui/PageHeader"
-import { Sparkles, ArrowRight, Check, X, Lock, Search, Heart, Eye, Clock, Layers, SlidersHorizontal,
-  UtensilsCrossed, Martini, Coffee, Laptop, Target, User, Building2, Megaphone, Music, Camera, Home, Brush, PartyPopper, Rocket, ShoppingBag, Zap, Flame, Link2 as LinkIcon } from "lucide-react"
+import { Sparkles, ArrowRight, X, Lock, Search, Heart, Eye, Clock, Layers, SlidersHorizontal,
+  UtensilsCrossed, Martini, Coffee, Laptop, Target, User, Building2, Megaphone, Music, Camera, Home, Brush, PartyPopper, Rocket, ShoppingBag, Flame, Link2 as LinkIcon } from "lucide-react"
 import TemplatePreviewModal from "./TemplatePreviewModal"
 import TemplateWizardModal from "./TemplateWizardModal"
+import { categorieLue } from "./categorieLue"
 import { useIsMobile } from "@/lib/useIsMobile"
 import { PAGE_TEMPLATES } from "../builder/page-templates"
 import { TEMPLATE_LAYOUT_LIST, galleryStyleChoices, nativeGalleryStyleKey, galleryComposeBlocks } from "../builder/templateEngine"
@@ -79,8 +80,11 @@ const CATEGORY_ICON: Record<string, any> = {
   Influenceur: Megaphone, Musicien: Music, Photographe: Camera, Immobilier: Home,
   Beaute: Brush, Sante: Heart, Evenement: PartyPopper, SaaS: Rocket, Ecommerce: ShoppingBag,
 }
-const PLAN_MARK: Record<string, any> = { free: Sparkles, starter: Zap, pro: Flame }
-const PLAN_CLEAN_LABEL: Record<string, string> = { all: "Tous les plans", free: "Gratuit", starter: "Starter", pro: "Pro" }
+// Noms de plans : UNE source (lib/plans.ts). « Starter » n'existe plus dans la
+// grille ; un modèle marqué `starter` dans les données est un modèle du plan
+// Établissement (getPlan le replie), et se filtre comme tel.
+const PLAN_MARK: Record<string, any> = { free: Sparkles, pro: Flame }
+const PLAN_CLEAN_LABEL: Record<string, string> = { all: "Tous les plans", free: PLANS.free.label, pro: PLANS.pro.label }
 
 // Mapping catégorie → ids templates (extensible)
 // Un secteur → les modèles qui lui correspondent, par identifiant OU par groupe.
@@ -116,32 +120,28 @@ const TEMPLATES: any[] = [
   { id: "freelance", name: "Freelance Pro", category: "Business", plan: "free", description: "Portfolio, services, tarifs, prise de contact", emoji: "💼", color: "var(--accent)", accent: "var(--success)", bg: "#080808", surface: "#111009", tags: ["Services", "Tarifs", "Contact", "Calendly"] },
   { id: "restaurant", name: "Restaurant & Bar", category: "Food", plan: "free", description: "Menu, horaires, réservation, réseaux", emoji: "🍽️", color: "var(--danger)", accent: "#F97316", bg: "#0D0505", surface: "#1A0A0A", tags: ["Menu", "Horaires", "Carte", "Réservation"] },
   { id: "artiste", name: "Artiste & Musicien", category: "Creatif", plan: "free", description: "Bio, musique, concerts, réseaux sociaux", emoji: "🎵", color: "#A78BFA", accent: "#F472B6", bg: "#0A0510", surface: "#130A20", tags: ["Spotify", "Concerts", "Réseaux", "Bio"] },
-  { id: "coach", name: "Coach & Thérapeute", category: "Bien-etre", plan: "free", description: "Présentation, methode, témoignages, RDV", emoji: "🧘", color: "#4ADE80", accent: "#86EFAC", bg: "#040D06", surface: "#081A0C", tags: ["Services", "Témoignages", "Tarifs", "RDV"] },
+  { id: "coach", name: "Coach & Thérapeute", category: "Bien-etre", plan: "free", description: "Présentation, méthode, témoignages, RDV", emoji: "🧘", color: "#4ADE80", accent: "#86EFAC", bg: "#040D06", surface: "#081A0C", tags: ["Services", "Témoignages", "Tarifs", "RDV"] },
   { id: "createur", name: "Créateur de contenu", category: "Creatif", plan: "free", description: "Liens réseaux, partenariats, stats", emoji: "📱", color: "var(--danger)", accent: "#FFD93D", bg: "#080810", surface: "#10101E", tags: ["Réseaux", "Stats", "Partenariats", "Feed"] },
-  { id: "event", name: "Événement & Soirée", category: "Event", plan: "free", description: "Countdown, programme, billetterie", emoji: "🎉", color: "#EC4899", accent: "#A855F7", bg: "#05020D", surface: "#0D0620", tags: ["Countdown", "Programme", "Billets", "Lieu"] },
+  { id: "event", name: "Événement & Soirée", category: "Event", plan: "free", description: "Compte à rebours, programme, billetterie", emoji: "🎉", color: "#EC4899", accent: "#A855F7", bg: "#05020D", surface: "#0D0620", tags: ["Compte à rebours", "Programme", "Billets", "Lieu"] },
   { id: "ecommerce", name: "Boutique E-commerce", category: "Commerce", plan: "starter", description: "Produits phares, promos, avis, boutique", emoji: "🛍️", color: "#F97316", accent: "#FCD34D", bg: "#0D0700", surface: "#1A1000", tags: ["Produits", "Promo", "Avis", "Boutique"], highlight: "Catalogue produits + promo" },
   { id: "coiffeur", name: "Salon Beauté", category: "Beaute", plan: "starter", description: "Services, galerie, avis, prise de RDV", emoji: "✂️", color: "#F472B6", accent: "#FB7185", bg: "#0D0508", surface: "#1A0812", tags: ["Services", "Galerie", "Avis", "RDV"], highlight: "Galerie + réservations en ligne" },
   { id: "agence", name: "Agence & Studio", category: "Business", plan: "starter", description: "Portfolio, services, tarifs, contact pro", emoji: "🏢", color: "var(--action)", accent: "#818CF8", bg: "#020C18", surface: "#041828", tags: ["Portfolio", "Services", "Tarifs", "Contact"], highlight: "Portfolio + tunnel de conversion" },
-  { id: "medecin", name: "Médecin & Praticien", category: "Sante", plan: "starter", description: "Cabinet, specialites, horaires, RDV", emoji: "🏥", color: "#34D399", accent: "#6EE7B7", bg: "#020D08", surface: "#041A10", tags: ["Cabinet", "Spécialités", "Horaires", "RDV"], highlight: "Integration Doctolib + infos cabinet" },
-  { id: "vente_produits", name: "Vente Produits Digitaux", category: "Commerce", plan: "pro", description: "Formations, ebooks, templates, accès membres", emoji: "📦", color: "#A78BFA", accent: "#F472B6", bg: "#060410", surface: "#0E0820", tags: ["Formations", "Produits", "Témoignages", "Accès"], highlight: "Tunnel de vente complet" },
+  { id: "medecin", name: "Médecin & Praticien", category: "Sante", plan: "starter", description: "Cabinet, spécialités, horaires, RDV", emoji: "🏥", color: "#34D399", accent: "#6EE7B7", bg: "#020D08", surface: "#041A10", tags: ["Cabinet", "Spécialités", "Horaires", "RDV"], highlight: "Intégration Doctolib + infos cabinet" },
+  { id: "vente_produits", name: "Vente de produits numériques", category: "Commerce", plan: "pro", description: "Formations, livres numériques, modèles, accès membres", emoji: "📦", color: "#A78BFA", accent: "#F472B6", bg: "#060410", surface: "#0E0820", tags: ["Formations", "Produits", "Témoignages", "Accès"], highlight: "Tunnel de vente complet" },
   { id: "immobilier", name: "Agent Immobilier", category: "Immobilier", plan: "pro", description: "Biens, expertises, contact, avis clients", emoji: "🏠", color: "var(--warning)", accent: "#F59E0B", bg: "#0A0800", surface: "#171200", tags: ["Biens", "Expertise", "Avis", "Contact"], highlight: "Vitrine biens + avis Google" },
-  { id: "startup", name: "Startup & SaaS", category: "Tech", plan: "pro", description: "Pitch, features, pricing, waitlist", emoji: "🚀", color: "#22D3EE", accent: "#818CF8", bg: "#030A14", surface: "#06152A", tags: ["Features", "Pricing", "Waitlist", "Stats"], highlight: "Landing page SaaS avec waitlist" },
-  { id: "influenceur", name: "Influenceur & Personal Brand", category: "Creatif", plan: "pro", description: "Media kit, statistiques, partenariats premium", emoji: "⭐", color: "#F59E0B", accent: "#EF4444", bg: "#0A0500", surface: "#150B00", tags: ["Media Kit", "Stats", "Partenariats", "Feed"], highlight: "Media kit professionnel" },
+  { id: "startup", name: "Startup & SaaS", category: "Tech", plan: "pro", description: "Présentation, fonctionnalités, tarifs, liste d'attente", emoji: "🚀", color: "#22D3EE", accent: "#818CF8", bg: "#030A14", surface: "#06152A", tags: ["Fonctionnalités", "Tarifs", "Liste d'attente", "Stats"], highlight: "Page SaaS avec liste d'attente" },
+  { id: "influenceur", name: "Influenceur & Personal Brand", category: "Creatif", plan: "pro", description: "Kit média, statistiques, partenariats", emoji: "⭐", color: "#F59E0B", accent: "#EF4444", bg: "#0A0500", surface: "#150B00", tags: ["Kit média", "Stats", "Partenariats", "Fil"], highlight: "Kit média professionnel" },
   ...SHARED_META,
 ]
 
-const PLAN_CONFIG: Record<string, { label: string; color: string; icon: string }> = {
-  free:     { label: "Gratuit",  color: "var(--muted)", icon: "✦"  },
-  starter:  { label: "Starter",  color: "var(--action)", icon: "⚡" },
-  pro:      { label: "Pro",      color: "var(--accent)", icon: "🔥" },
-  business: { label: "Business", color: "var(--success)", icon: "👑" },
-}
+const PLAN_COULEUR: Record<string, string> = { free: "var(--muted)", pro: "var(--accent)", business: "var(--success)" }
+/** Étiquette et couleur d'un plan, quel que soit l'identifiant écrit dans les données (`starter` → Établissement). */
+const planConfig = (plan: string) => { const p = getPlan(plan); return { label: p.label, color: PLAN_COULEUR[p.id] } }
 const FAV_KEY = "qrfolio_fav_templates"
-const PLAN_FILTERS: [string, string, string][] = [["all", "Tous les plans", "#A8A190"], ["free", "Gratuit ✦", "#A8A190"], ["starter", "Starter ⚡", "var(--action)"], ["pro", "Pro 🔥", "var(--accent)"]]
+const PLAN_FILTERS: [string, string][] = [["all", "Tous les plans"], ["free", PLANS.free.label], ["pro", PLANS.pro.label]]
 const STARTER_TEMPLATE_ID = "freelance" // modèle recommandé par défaut (nouvel utilisateur sans page)
 
 export default function TemplatesPage() {
-  const [selected,     setSelected]     = useState<string | null>(null)
   // ?metier=… : quelqu'un venu de « QR code restaurant » doit voir des restaurants,
   // pas 48 modèles tous secteurs confondus. Lu une seule fois, au montage.
   const [activeMetier, setActiveMetier] = useState("Tous")
@@ -254,7 +254,7 @@ export default function TemplatesPage() {
       const ids = CATEGORY_MAP[activeMetier] || []
       matchMetier = ids.includes(t.id) || t.category === activeMetier
     }
-    const matchPlan = activePlan === "all" || t.plan === activePlan
+    const matchPlan = activePlan === "all" || getPlan(t.plan).id === activePlan
     const q = search.toLowerCase()
     const matchSearch = !q
       || t.name.toLowerCase().includes(q)
@@ -342,7 +342,6 @@ export default function TemplatesPage() {
   const G = "var(--accent)"
   const MUTED = "var(--muted)"
   const previewTemplate  = TEMPLATES.find((t: any) => t.id === preview)
-  const selectedTemplate = TEMPLATES.find((t: any) => t.id === selected)
   const activeCat = BUSINESS_CATEGORIES.find(c => c.id === activeMetier)
   const hasFilters = activeMetier !== "Tous" || activePlan !== "all"
 
@@ -425,7 +424,7 @@ export default function TemplatesPage() {
                 color: hasFilters ? "var(--accent)" : "#F5F0E8" }}>
               <SlidersHorizontal size={15} />
               {hasFilters
-                ? <>{[activeCat && activeCat.id !== "Tous" ? `${activeCat.emoji} ${activeCat.label}` : null, activePlan !== "all" ? PLAN_CONFIG[activePlan]?.label : null].filter(Boolean).join(" · ")}</>
+                ? <>{[activeCat && activeCat.id !== "Tous" ? `${activeCat.emoji} ${activeCat.label}` : null, activePlan !== "all" ? planConfig(activePlan).label : null].filter(Boolean).join(" · ")}</>
                 : "Filtrer"}
               {hasFilters && <span onClick={(e) => { e.stopPropagation(); setActiveMetier("Tous"); setActivePlan("all") }} style={{ display: "inline-flex", marginLeft: 2 }}><X size={14} /></span>}
             </button>
@@ -488,15 +487,14 @@ export default function TemplatesPage() {
             <p style={{ fontSize: 12, marginBottom: 20 }}>Essayez un autre secteur ou modifiez votre recherche</p>
             <button type="button" onClick={() => { setSearch(""); setActiveMetier("Tous"); setActivePlan("all") }}
               style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 10, padding: "9px 18px", color: G, fontSize: 12, cursor: "pointer" }}>
-              Voir tous les templates
+              Voir tous les modèles
             </button>
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(min(290px,100%), 1fr))", gap: isMobile ? 11 : 18 }}>
             <style>{`@keyframes tplUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}`}</style>
             {ordonnes.map((template: any, idx: number) => {
-              const isSelected = selected === template.id
-              const planCfg = PLAN_CONFIG[template.plan]
+              const planCfg = planConfig(template.plan)
               const locked = !canUse(template.plan)
               const blockCount = (TEMPLATE_BLOCKS[template.id] || []).length
               const isFav = favs.includes(template.id)
@@ -505,71 +503,68 @@ export default function TemplatesPage() {
               const tier = popTier(template.id)
 
               return (
-                <div key={template.id}
+                // Revue du 9 septembre (P0) : la carte n'est plus un `role="button"`
+                // qui contenait des boutons (imbrication interdite, clics qui se
+                // marchaient dessus, aperçu qui ne s'ouvrait pas). C'est un <article>
+                // avec trois vrais contrôles : Favori, Aperçu (la vignette ET le bouton
+                // du bas), Utiliser. Souris, clavier et tactile passent par les mêmes.
+                <article key={template.id}
                   className="tpl-card"
-                  role="button"
-                  tabIndex={locked ? -1 : 0}
-                  aria-label="Ouvrir le modèle"
+                  aria-labelledby={`tpl-nom-${template.id}`}
                   onMouseEnter={() => setHoveredCard(template.id)}
                   onMouseLeave={() => setHoveredCard(null)}
-                  onClick={() => { if (isMobile) { setPreview(template.id); return } if (!locked) setSelected(isSelected ? null : template.id) }}
-                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (isMobile) { setPreview(template.id); return } if (!locked) setSelected(isSelected ? null : template.id) } }}
                   style={{
                     background: "var(--surface)",
-                    border: "1px solid " + (isSelected ? "color-mix(in srgb, var(--accent) 55%, transparent)" : isHovered ? "var(--line-strong)" : "var(--line)"),
-                    borderRadius: 14, overflow: "hidden", cursor: locked ? "not-allowed" : "pointer",
+                    border: "1px solid " + (isHovered ? "var(--line-strong)" : "var(--line)"),
+                    borderRadius: 14, overflow: "hidden",
                     transition: "border-color .15s",
-                    opacity: locked ? 0.6 : 1, position: "relative",
+                    opacity: locked ? 0.75 : 1, position: "relative",
                     animation: "tplUp .3s var(--mo-ease-standard) backwards", animationDelay: `${Math.min(idx, 11) * 30}ms`,
                   }}>
 
-                  {/* ── Aperçu visuel ──────────────────────────────────────── */}
+                  {/* ── Vignette = bouton « Aperçu » ─────────────────────── */}
                   {/* La vignette garde les couleurs DU MODÈLE (c'est ce qu'on choisit), posées à plat sur sa surface. */}
-                  <div style={{ height: isMobile ? 128 : 190, background: template.surface, borderBottom: "1px solid var(--line)", position: "relative", overflow: "hidden" }}>
-                    {/* Mini page mockup */}
-                    <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: "90%", maxWidth: 138, background: template.bg, border: "1px solid " + template.color + "20", borderRadius: 10, overflow: "hidden", zIndex: 1, boxShadow: "0 4px 14px rgba(0,0,0,0.3)" }}>
-                      {/* Barre de couleur */}
-                      <div style={{ height: 4, background: "linear-gradient(90deg," + template.color + "," + template.accent + ")" }} />
-                      {/* Contenu simulé */}
-                      <div style={{ padding: "10px 10px 8px", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                        {/* Avatar */}
-                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg," + template.color + "60," + template.accent + "40)", border: "1.5px solid " + template.color + "50", marginBottom: 2, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>{template.emoji}</div>
-                        <div style={{ width: "70%", height: 3, background: template.color + "80", borderRadius: 2 }} />
-                        <div style={{ width: "50%", height: 2, background: MUTED + "40", borderRadius: 2 }} />
-                        <div style={{ width: "80%", height: 8, background: template.color + "30", borderRadius: 4, marginTop: 3, border: "1px solid " + template.color + "40" }} />
-                        <div style={{ width: "80%", height: 8, background: template.surface, borderRadius: 4, border: "1px solid rgba(255,255,255,0.06)" }} />
-                        {[72, 58, 65].map((w, i) => <div key={i} style={{ width: w + "%", height: 2, background: template.color + "20", borderRadius: 2 }} />)}
-                        <div style={{ width: "80%", height: 7, background: template.color + "25", borderRadius: 3, marginTop: 1 }} />
-                      </div>
-                    </div>
+                  <div style={{ position: "relative" }}>
+                    <button type="button" className="tpl-vignette" aria-label={`Aperçu de ${template.name}`}
+                      onClick={() => setPreview(template.id)}
+                      style={{ display: "block", width: "100%", height: isMobile ? 128 : 190, background: template.surface, border: 0, borderBottom: "1px solid var(--line)", borderRadius: 0, padding: 0, margin: 0, position: "relative", overflow: "hidden", cursor: "pointer", font: "inherit" }}>
+                      {/* Mini page mockup */}
+                      <span aria-hidden="true" style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: "90%", maxWidth: 138, background: template.bg, border: "1px solid " + template.color + "20", borderRadius: 10, overflow: "hidden", zIndex: 1, boxShadow: "0 4px 14px rgba(0,0,0,0.3)", display: "block" }}>
+                        {/* Barre de couleur */}
+                        <span style={{ display: "block", height: 4, background: "linear-gradient(90deg," + template.color + "," + template.accent + ")" }} />
+                        {/* Contenu simulé */}
+                        <span style={{ padding: "10px 10px 8px", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                          {/* Avatar */}
+                          <span style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg," + template.color + "60," + template.accent + "40)", border: "1.5px solid " + template.color + "50", marginBottom: 2, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>{template.emoji}</span>
+                          <span style={{ display: "block", width: "70%", height: 3, background: template.color + "80", borderRadius: 2 }} />
+                          <span style={{ display: "block", width: "50%", height: 2, background: MUTED + "40", borderRadius: 2 }} />
+                          <span style={{ display: "block", width: "80%", height: 8, background: template.color + "30", borderRadius: 4, marginTop: 3, border: "1px solid " + template.color + "40" }} />
+                          <span style={{ display: "block", width: "80%", height: 8, background: template.surface, borderRadius: 4, border: "1px solid rgba(255,255,255,0.06)" }} />
+                          {[72, 58, 65].map((w, i) => <span key={i} style={{ display: "block", width: w + "%", height: 2, background: template.color + "20", borderRadius: 2 }} />)}
+                          <span style={{ display: "block", width: "80%", height: 7, background: template.color + "25", borderRadius: 3, marginTop: 1 }} />
+                        </span>
+                      </span>
 
-                    {/* Badge plan (haut gauche) */}
-                    <div style={{ position: "absolute", top: 10, left: 10, display: "flex", alignItems: "center", gap: 4, background: "color-mix(in srgb, var(--bg) 75%, transparent)", border: "1px solid var(--line-strong)", borderRadius: 999, padding: "3px 9px" }}>
+                      {/* Voile si verrouillé (l'aperçu reste ouvrable : c'est « Utiliser » qui mène à l'offre) */}
+                      {locked && (
+                        <span aria-hidden="true" style={{ position: "absolute", inset: 0, background: "rgba(8,8,8,0.65)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, zIndex: 3 }}>
+                          <Lock size={20} color={planCfg.color} />
+                          <span style={{ color: planCfg.color, fontSize: 10, fontWeight: 700 }}>Plan {planCfg.label}</span>
+                        </span>
+                      )}
+                    </button>
+
+                    {/* Badge plan (haut gauche) — hors du bouton, purement informatif */}
+                    <div style={{ position: "absolute", top: 10, left: 10, zIndex: 4, pointerEvents: "none", display: "flex", alignItems: "center", gap: 4, background: "color-mix(in srgb, var(--bg) 75%, transparent)", border: "1px solid var(--line-strong)", borderRadius: 999, padding: "3px 9px" }}>
                       <span style={{ color: "var(--ink)", fontSize: 9.5, fontWeight: 600, letterSpacing: ".04em" }}>{planCfg.label}</span>
                     </div>
 
-                    {/* Favori (haut droit) */}
+                    {/* Favori (haut droit) — frère du bouton Aperçu, jamais dedans */}
                     <button type="button" aria-pressed={isFav} aria-label={isFav ? "Retirer des favoris" : "Ajouter aux favoris"} onClick={(e) => toggleFav(template.id, e)}
                       className={`dat-fav${isFav ? " on" : ""}`}
-                      style={{ position: "absolute", top: 8, right: 8, width: isMobile ? 44 : 30, height: isMobile ? 44 : 30, zIndex: 2 }}>
+                      style={{ position: "absolute", top: 8, right: 8, width: isMobile ? 44 : 30, height: isMobile ? 44 : 30, zIndex: 4 }}>
                       <Heart size={14} fill={isFav ? "currentColor" : "none"} />
                     </button>
-
-                    {/* Check si sélectionné */}
-                    {isSelected && (
-                      <div style={{ position: "absolute", bottom: 10, right: 10, background: G, borderRadius: "50%", width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2 }}>
-                        <Check size={12} color="var(--ink-on-accent)" />
-                      </div>
-                    )}
-
-                    {/* Overlay si locked */}
-                    {locked && (
-                      <div style={{ position: "absolute", inset: 0, background: "rgba(8,8,8,0.65)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, zIndex: 3 }}>
-                        <Lock size={20} color={planCfg.color} />
-                        <span style={{ color: planCfg.color, fontSize: 10, fontWeight: 700 }}>Plan {planCfg.label}</span>
-                      </div>
-                    )}
-
                   </div>
 
                   {/* ── Infos ─────────────────────────────────────────────── */}
@@ -577,9 +572,9 @@ export default function TemplatesPage() {
                     {/* Nom + catégorie */}
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: isMobile ? 8 : 6 }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <h2 style={{ color: "var(--ink)", fontSize: isMobile ? 12.5 : 15, fontWeight: 700, margin: isMobile ? 0 : "0 0 5px", letterSpacing: "-0.2px", whiteSpace: isMobile ? "nowrap" as const : "normal", overflow: "hidden", textOverflow: "ellipsis" }}>{template.name}</h2>
+                        <h2 id={`tpl-nom-${template.id}`} style={{ color: "var(--ink)", fontSize: isMobile ? 12.5 : 15, fontWeight: 700, margin: isMobile ? 0 : "0 0 5px", letterSpacing: "-0.2px", whiteSpace: isMobile ? "nowrap" as const : "normal", overflow: "hidden", textOverflow: "ellipsis" }}>{template.name}</h2>
                         {!isMobile && <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
-                          <span style={{ background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 6, padding: "1px 7px", fontSize: 10, color: "var(--muted)", fontWeight: 500 }}>{template.category}</span>
+                          <span style={{ background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 6, padding: "1px 7px", fontSize: 10, color: "var(--muted)", fontWeight: 500 }}>{categorieLue(template.category)}</span>
                           {tier && (
                             <span style={{ display: "inline-flex", alignItems: "center", gap: 3, background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 6, padding: "1px 7px", fontSize: 10, color: "var(--accent)", fontWeight: 600 }}>
                               {tier.label}
@@ -620,11 +615,8 @@ export default function TemplatesPage() {
 
                     {/* Actions */}
                     <div style={{ display: "flex", gap: 7 }}>
-                      {/* Aperçu. Sur mobile, taper la carte l'ouvre aussi — mais rien ne
-                          le laissait deviner, et « Utiliser » attirait tous les appuis :
-                          on passait à côté de l'aperçu ET de l'assistant qui vit dedans.
-                          D'où ce bouton compact, réduit à l'icône faute de place. */}
-                      <button type="button" onClick={(e) => { e.stopPropagation(); setPreview(template.id) }}
+                      {/* Aperçu — même action que la vignette ; compact sur mobile faute de place. */}
+                      <button type="button" onClick={() => setPreview(template.id)}
                         className="da-btn-neutral da-btn-neutral--sm" aria-label={`Aperçu de ${template.name}`}
                         title={isMobile ? "Aperçu" : undefined}
                         style={isMobile
@@ -634,7 +626,7 @@ export default function TemplatesPage() {
                       </button>
 
                       {/* Utiliser — primaire or (halo/reflet) hors état verrouillé */}
-                      <button type="button" onClick={(e) => { e.stopPropagation(); if (locked) { router.push("/upgrade?reason=template"); return } setNamingFor(template.id) }}
+                      <button type="button" onClick={() => { if (locked) { router.push("/upgrade?reason=template"); return } setNamingFor(template.id) }}
                         disabled={!!creating}
                         className={locked ? undefined : "da-btn-primary da-btn-primary--sm"}
                         style={locked
@@ -646,7 +638,7 @@ export default function TemplatesPage() {
                       </button>
                     </div>
                   </div>
-                </div>
+                </article>
               )
             })}
           </div>
@@ -717,23 +709,6 @@ export default function TemplatesPage() {
           canUse={canUse(previewTemplate.plan)}
           isCreating={isCreating}
         />
-      )}
-
-      {/* ── Barre de sélection fixe ───────────────────────────────────────── */}
-      {selected && selectedTemplate && (
-        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 100, padding: "12px 20px", background: "rgba(8,8,8,0.95)", borderTop: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
-          <span style={{ fontSize: 20 }}>{selectedTemplate.emoji}</span>
-          <div style={{ flex: 1, maxWidth: 400 }}>
-            <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600, margin: 0 }}>{selectedTemplate.name}</p>
-            <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{(TEMPLATE_BLOCKS[selected] || []).length} blocs · {SETUP_TIME[selected] || "5 min"}</p>
-          </div>
-          <button type="button" onClick={() => setSelected(null)} className="da-btn-neutral da-btn-neutral--sm">
-            <X className="da-ic da-ic-x" size={13} /> Annuler
-          </button>
-          <button type="button" onClick={() => setNamingFor(selected!)} disabled={!!creating} className="da-btn-primary da-btn-primary--sm">
-            {creating === selected ? <span>Création en cours...</span> : <><span>Utiliser ce modèle</span> <ArrowRight className="da-ic da-ic-arrow" size={14} /></>}
-          </button>
-        </div>
       )}
 
       <style>{``}</style>
@@ -886,7 +861,7 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
           <div style={{ width: 44, height: 44, borderRadius: 12, background: template.color + "18", border: "1px solid " + template.color + "35", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{template.emoji}</div>
           <div style={{ flex: 1 }}>
             <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>Créer une page depuis ce modèle</p>
-            <p style={{ color: MUTED, fontSize: 12.5, margin: 0 }}>{template.name} · {template.category} · {blockCount} blocs</p>
+            <p style={{ color: MUTED, fontSize: 12.5, margin: 0 }}>{template.name} · {categorieLue(template.category)} · {blockCount} blocs</p>
           </div>
           <button onClick={onClose} aria-label="Fermer" style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 4 }}><X size={18} /></button>
         </div>

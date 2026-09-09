@@ -299,10 +299,10 @@ export default function FeaturesPage() {
             letterSpacing:"-0.02em",margin:"0 0 24px",
           }} className="au2">
             Tout ce qu'il vous faut pour transformer<br/>
-            un QR code en <span style={{color:G}}>outil business.</span>
+            un QR code en <span style={{color:G}}>outil de travail.</span>
           </h1>
           <p style={{color:MUT,fontSize:18,lineHeight:1.7,maxWidth:560,margin:"0 auto 44px"}} className="au3">
-            Crée une page mobile, génère un QR dynamique et mesure chaque interaction.
+            Créez une page mobile, générez un QR dynamique et mesurez chaque interaction.
           </p>
           <div style={{display:"flex",justifyContent:"center",gap:14,flexWrap:"wrap"}} className="au4">
             <CtaInline label="Créer gratuitement" />
@@ -392,7 +392,7 @@ export default function FeaturesPage() {
             <div>
               <SectionHeader
                 chip="Analytics"
-                title={<>Comprends ce qui se passe <span style={{color:G}}>après chaque scan.</span></>}
+                title={<>Comprenez ce qui se passe <span style={{color:G}}>après chaque scan.</span></>}
                 sub={`Vues, scans, sources et pages les plus performantes — en temps réel. Statistiques de base incluses, détail par appareil dès ${PLANS.pro.label}.`}
               />
               <div style={{display:"flex",flexDirection:"column",gap:12}}>
@@ -468,8 +468,8 @@ export default function FeaturesPage() {
             <style>{`@media(max-width:700px){.other-grid{grid-template-columns:1fr !important;}}`}</style>
             {[
               { icon:"🌐", color:"var(--action)", title:"Domaine personnalisé",   desc:"Connectez votre sous-domaine (carte.votresite.fr). Votre image, pas la nôtre.", tag:PLANS.pro.label },
-              { icon:"✨", color:"#A78BFA", title:"Branding personnalisé",   desc:"Retirez la mention QRowg. Votre page, vos couleurs, votre identité.", tag:PLANS.pro.label },
-              { icon:"👥", color:"var(--success)", title:"Collaboration équipe",     desc:"Gérez vos pages à plusieurs avec des rôles et permissions.", tag:PLANS.business.label },
+              { icon:"✨", color:"#A78BFA", title:"À votre image",   desc:"Retirez la mention QRowg. Votre page, vos couleurs, votre identité.", tag:PLANS.pro.label },
+              { icon:"👥", color:"var(--success)", title:"Travail en équipe",     desc:"Gérez vos pages à plusieurs, avec des rôles et des permissions.", tag:PLANS.business.label },
             ].map(f => (
               <div key={f.title} style={{
                 background:"rgba(255,255,255,0.02)",

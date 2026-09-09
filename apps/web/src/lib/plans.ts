@@ -75,7 +75,7 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "free",
     label: "Gratuit",
     color: "#8A8478",
-    description: "Un support, pour de vrai",
+    description: "Une page et son QR, pour commencer",
     priceMonthly: 0,
     priceAnnual: 0,
     badge: null,

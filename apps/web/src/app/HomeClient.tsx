@@ -506,30 +506,27 @@ export default function HomeClient() {
               borderRadius: 11, padding: "8px 15px", marginBottom: 20,
               fontSize: 11, color: "#D8BE72", letterSpacing: 2,
               textTransform: "uppercase", fontWeight: 700,
-              animation: "mo-fade-up 0.6s ease 0.1s both"
             }}>
               <span aria-hidden="true" style={{ width: 7, height: 7, borderRadius: 2, background: "#C9A84C",  }} />
               Reliez le monde physique au digital
             </div>
 
-            {/* Titre — hierarchie forte, reveal ligne par ligne (aucun effet flashy).
-                Les 2 premieres lignes posent le produit, la 3e (or) porte le differenciateur. */}
+            {/* Titre — hiérarchie forte, rendu immédiatement (revue du 9 septembre :
+                le contenu essentiel n'attend aucune animation d'entrée, JavaScript ou non).
+                Les 2 premières lignes posent le produit, la 3e (or) porte le différenciateur. */}
             <h1 style={{
               fontFamily: "Fraunces, serif",
               fontSize: "clamp(30px, 3.4vw, 52px)",
               color: "#F5F0E8", fontWeight: 800, lineHeight: 1.06,
               margin: "0 0 18px", letterSpacing: "-0.02em",
             }}>
-              <span style={{ display: "block", animation: "mo-fade-up 0.7s cubic-bezier(0.22,1,0.36,1) 0.15s both" }}>
+              <span style={{ display: "block" }}>
                 Votre page pro et son
               </span>
-              <span style={{
-                display: "block", animation: "mo-fade-up 0.7s cubic-bezier(0.22,1,0.36,1) 0.30s both",
-                color: "#C9A84C",
-              }}>
+              <span style={{ display: "block", color: "var(--accent)" }}>
                 QR code dynamique,
               </span>
-              <span style={{ display: "block", animation: "mo-fade-up 0.7s cubic-bezier(0.22,1,0.36,1) 0.45s both" }}>
+              <span style={{ display: "block" }}>
                 prêts en 5 minutes.
               </span>
             </h1>
@@ -538,7 +535,6 @@ export default function HomeClient() {
             <p style={{
               color: "rgba(226,220,206,0.92)", fontSize: 16.5, lineHeight: 1.58,
               margin: "0 0 26px", maxWidth: 452, fontWeight: 400,
-              animation: "mo-fade-up 0.7s ease 0.6s both"
             }}>
               Pour les <strong style={{ color: "#F5F0E8", fontWeight: 600 }}>commerçants, indépendants et créateurs</strong> : créez votre page (menu, portfolio, liens…), générez son <strong style={{ color: "#F5F0E8", fontWeight: 600 }}>QR&nbsp;code dynamique</strong>, imprimez-le — puis <strong style={{ color: "#F5F0E8", fontWeight: 600 }}>suivez chaque scan</strong>. Modifiable à tout moment, sans jamais réimprimer.
             </p>
@@ -546,7 +542,6 @@ export default function HomeClient() {
             {/* CTAs */}
             <div className="hero-ctas" style={{
               display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center",
-              animation: "mo-fade-up 0.7s ease 0.75s both"
             }}>
               <Link href="/creer" style={{
                 background: "var(--accent)",
@@ -595,7 +590,6 @@ export default function HomeClient() {
             {/* Micro-réassurance */}
             <div className="hero-reassurance" style={{
               display: "flex", gap: 20, marginTop: 26, flexWrap: "wrap",
-              animation: "mo-fade-up 0.7s ease 0.9s both"
             }}>
               {[
                 { t: "Chiffré", href: "/security" },

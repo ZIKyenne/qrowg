@@ -204,7 +204,7 @@ Tiramisu;6,50€;Fait maison`
       { label: "Coach", tags: ["Coaching", "Nutrition", "Motivation"] },
       { label: "Marketing", tags: ["SEO", "Contenu", "Réseaux sociaux"] },
       { label: "Resto / Bar", tags: ["Cuisine", "Cocktails", "Fait maison"] },
-      { label: "Business", tags: ["Conseil", "Stratégie", "Gestion"] },
+      { label: "Entreprise", tags: ["Conseil", "Stratégie", "Gestion"] },
     ]
     const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
     return (
@@ -980,17 +980,17 @@ Tiramisu;6,50€;Fait maison`
     // 40+ presets
     const PRESETS = [
       // Business
-      { name: "Executive Blue", group: "Business", bg: "#0A1628", primary: "#1E88E5", accent: "#42A5F5", text: "#F5F0E8", muted: "#8A9BA8", gradient: "linear-gradient(135deg,#0A1628 0%,#1A2A4A 100%)" },
-      { name: "Corporate Black", group: "Business", bg: "#080808", primary: "#C9A84C", accent: "#39FF8F", text: "#F5F0E8", muted: "#A8A190", gradient: "linear-gradient(135deg,#080808 0%,#111111 100%)" },
-      { name: "Premium Navy", group: "Business", bg: "#0D1B2A", primary: "#C9A84C", accent: "#E8C96A", text: "#F5F0E8", muted: "#7A8B9A", gradient: "linear-gradient(135deg,#0D1B2A 0%,#1A3050 100%)" },
-      { name: "Midnight Gold", group: "Business", bg: "#080808", primary: "#C9A84C", accent: "#39FF8F", text: "#F5F0E8", muted: "#A8A190", gradient: "linear-gradient(135deg,#080808,#1a1a08)" },
-      { name: "Boardroom", group: "Business", bg: "#1A1A1A", primary: "#E0E0E0", accent: "#C9A84C", text: "#F5F0E8", muted: "#888888", gradient: "linear-gradient(160deg,#1A1A1A,#2D2D2D)" },
+      { name: "Executive Blue", group: "Entreprise", bg: "#0A1628", primary: "#1E88E5", accent: "#42A5F5", text: "#F5F0E8", muted: "#8A9BA8", gradient: "linear-gradient(135deg,#0A1628 0%,#1A2A4A 100%)" },
+      { name: "Corporate Black", group: "Entreprise", bg: "#080808", primary: "#C9A84C", accent: "#39FF8F", text: "#F5F0E8", muted: "#A8A190", gradient: "linear-gradient(135deg,#080808 0%,#111111 100%)" },
+      { name: "Premium Navy", group: "Entreprise", bg: "#0D1B2A", primary: "#C9A84C", accent: "#E8C96A", text: "#F5F0E8", muted: "#7A8B9A", gradient: "linear-gradient(135deg,#0D1B2A 0%,#1A3050 100%)" },
+      { name: "Midnight Gold", group: "Entreprise", bg: "#080808", primary: "#C9A84C", accent: "#39FF8F", text: "#F5F0E8", muted: "#A8A190", gradient: "linear-gradient(135deg,#080808,#1a1a08)" },
+      { name: "Boardroom", group: "Entreprise", bg: "#1A1A1A", primary: "#E0E0E0", accent: "#C9A84C", text: "#F5F0E8", muted: "#888888", gradient: "linear-gradient(160deg,#1A1A1A,#2D2D2D)" },
       // Luxury
-      { name: "Velvet Noir", group: "Luxury", bg: "#0D0A1A", primary: "#9B59B6", accent: "#E056FD", text: "#F5F0E8", muted: "#8A7A9A", gradient: "linear-gradient(135deg,#0D0A1A 0%,#1A0D2E 100%)" },
-      { name: "Golden Luxury", group: "Luxury", bg: "#0A0800", primary: "#FFD700", accent: "#FFA500", text: "#F5EDD0", muted: "#9A8A70", gradient: "linear-gradient(135deg,#0A0800,#1A1200)" },
-      { name: "Royal Purple", group: "Luxury", bg: "#0A0015", primary: "#8B00FF", accent: "#DA70D6", text: "#F5F0E8", muted: "#8A7A9A", gradient: "linear-gradient(135deg,#0A0015,#150020)" },
-      { name: "Diamond White", group: "Luxury", bg: "#FAFAFA", primary: "#1A1A1A", accent: "#C9A84C", text: "#1A1A1A", muted: "#6B7280", gradient: "linear-gradient(135deg,#FAFAFA,#F0F0F5)" },
-      { name: "Prestige", group: "Luxury", bg: "#0C0C0C", primary: "#C9A84C", accent: "#FFD700", text: "#F5EDD0", muted: "#A8A190", gradient: "linear-gradient(160deg,#0C0C0C,#1A1500)" },
+      { name: "Velvet Noir", group: "Luxe", bg: "#0D0A1A", primary: "#9B59B6", accent: "#E056FD", text: "#F5F0E8", muted: "#8A7A9A", gradient: "linear-gradient(135deg,#0D0A1A 0%,#1A0D2E 100%)" },
+      { name: "Golden Luxury", group: "Luxe", bg: "#0A0800", primary: "#FFD700", accent: "#FFA500", text: "#F5EDD0", muted: "#9A8A70", gradient: "linear-gradient(135deg,#0A0800,#1A1200)" },
+      { name: "Royal Purple", group: "Luxe", bg: "#0A0015", primary: "#8B00FF", accent: "#DA70D6", text: "#F5F0E8", muted: "#8A7A9A", gradient: "linear-gradient(135deg,#0A0015,#150020)" },
+      { name: "Diamond White", group: "Luxe", bg: "#FAFAFA", primary: "#1A1A1A", accent: "#C9A84C", text: "#1A1A1A", muted: "#6B7280", gradient: "linear-gradient(135deg,#FAFAFA,#F0F0F5)" },
+      { name: "Prestige", group: "Luxe", bg: "#0C0C0C", primary: "#C9A84C", accent: "#FFD700", text: "#F5EDD0", muted: "#A8A190", gradient: "linear-gradient(160deg,#0C0C0C,#1A1500)" },
       // SaaS
       { name: "Deep Space", group: "SaaS", bg: "#020B18", primary: "#00D4FF", accent: "#7B2FBE", text: "#F5F0E8", muted: "#8A9BA8", gradient: "linear-gradient(135deg,#020B18,#0A1628)" },
       { name: "Aurora", group: "SaaS", bg: "#0A0F1E", primary: "#00FF9D", accent: "#00CFFF", text: "#F5F0E8", muted: "#8A8FA0", gradient: "linear-gradient(135deg,#0A0F1E,#0D1628)" },
@@ -1004,11 +1004,11 @@ Tiramisu;6,50€;Fait maison`
       { name: "Olive Garden", group: "Restaurant", bg: "#0A0F05", primary: "#556B2F", accent: "#6B8E23", text: "#F5F0E8", muted: "#7A8A6A", gradient: "linear-gradient(135deg,#0A0F05,#141A08)" },
       { name: "Italian Night", group: "Restaurant", bg: "#0D0808", primary: "#8B0000", accent: "#C9A84C", text: "#F5E8D0", muted: "#9A8070", gradient: "linear-gradient(160deg,#0D0808,#1A0D0D)" },
       // Creator
-      { name: "Neon Pink", group: "Creator", bg: "#0D0010", primary: "#FF0080", accent: "#FF69B4", text: "#F5F0E8", muted: "#8A7A8A", gradient: "linear-gradient(135deg,#0D0010,#180015)" },
-      { name: "TikTok Vibes", group: "Creator", bg: "#010101", primary: "#FF0050", accent: "#00F2EA", text: "#F5F0E8", muted: "#888888", gradient: "linear-gradient(135deg,#010101,#0A000A)" },
-      { name: "Cyber Purple", group: "Creator", bg: "#0A0015", primary: "#BF00FF", accent: "#7B2FBE", text: "#F5F0E8", muted: "#7A6A8A", gradient: "linear-gradient(135deg,#0A0015,#150020)" },
-      { name: "Creator Blue", group: "Creator", bg: "#000A20", primary: "#0066FF", accent: "#4A90FF", text: "#F5F0E8", muted: "#6A7A9A", gradient: "linear-gradient(135deg,#000A20,#000F30)" },
-      { name: "Electric Neon", group: "Creator", bg: "#050505", primary: "#39FF8F", accent: "#00FFFF", text: "#F5F0E8", muted: "#5A8A7A", gradient: "linear-gradient(135deg,#050505,#050F0A)" },
+      { name: "Neon Pink", group: "Créateur", bg: "#0D0010", primary: "#FF0080", accent: "#FF69B4", text: "#F5F0E8", muted: "#8A7A8A", gradient: "linear-gradient(135deg,#0D0010,#180015)" },
+      { name: "TikTok Vibes", group: "Créateur", bg: "#010101", primary: "#FF0050", accent: "#00F2EA", text: "#F5F0E8", muted: "#888888", gradient: "linear-gradient(135deg,#010101,#0A000A)" },
+      { name: "Cyber Purple", group: "Créateur", bg: "#0A0015", primary: "#BF00FF", accent: "#7B2FBE", text: "#F5F0E8", muted: "#7A6A8A", gradient: "linear-gradient(135deg,#0A0015,#150020)" },
+      { name: "Creator Blue", group: "Créateur", bg: "#000A20", primary: "#0066FF", accent: "#4A90FF", text: "#F5F0E8", muted: "#6A7A9A", gradient: "linear-gradient(135deg,#000A20,#000F30)" },
+      { name: "Electric Neon", group: "Créateur", bg: "#050505", primary: "#39FF8F", accent: "#00FFFF", text: "#F5F0E8", muted: "#5A8A7A", gradient: "linear-gradient(135deg,#050505,#050F0A)" },
       // Minimal
       { name: "Pure White", group: "Minimal", bg: "#FFFFFF", primary: "#1A1A1A", accent: "#C9A84C", text: "#1A1A1A", muted: "#6B7280", gradient: "linear-gradient(135deg,#FFFFFF,#F8F8F8)" },
       { name: "Minimal Cream", group: "Minimal", bg: "#FAF7F2", primary: "#1A1A1A", accent: "#C9A84C", text: "#2D2D2D", muted: "#7A7060", gradient: "linear-gradient(135deg,#FAF7F2,#F0EDE8)" },
@@ -1046,7 +1046,7 @@ Tiramisu;6,50€;Fait maison`
     const getPatternCSS = motifDeFond
 
     const presetGroups = Array.from(new Set(PRESETS.map(p => p.group)))
-    const [activePresetGroup, setActivePresetGroup] = useState("Business")
+    const [activePresetGroup, setActivePresetGroup] = useState("Entreprise")
 
     // Appliquer un preset complet
     const applyPreset = (preset: typeof PRESETS[0]) => {
@@ -1914,7 +1914,7 @@ Tiramisu;6,50€;Fait maison`
                   </div>
                 </div>
                 <p style={{ color: "#6E685E", fontSize: 9.5, margin: 0, lineHeight: 1.5 }}>
-                  L&apos;animation reprend l&apos;accent, le fond et le nom de ta page. Elle ne joue qu&apos;une fois par session visiteur et se passe au toucher.
+                  L&apos;animation reprend l&apos;accent, le fond et le nom de votre page. Elle ne joue qu&apos;une fois par session visiteur et se passe au toucher.
                 </p>
               </>)}
             </div>

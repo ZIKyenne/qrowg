@@ -632,6 +632,9 @@ button.da-pill:hover { border-color:rgba(232,200,119,.34); color:var(--accent); 
 .dat-fav:active { transform:scale(.9); }
 .dat-fav.on { background:rgba(232,200,119,.18); border-color:var(--gold-light); color:var(--gold-light); }
 @media (prefers-reduced-motion: reduce) { .dat-chip:hover, .dat-chip:active, .dat-fav:active { transform:none; } }
+/* Vignette de modèle = bouton « Aperçu » (revue du 9 septembre) : focus dessiné à l'intérieur, la carte coupe ce qui dépasse. */
+.tpl-vignette:focus-visible { outline:none; box-shadow:inset 0 0 0 3px color-mix(in srgb, var(--accent) 70%, transparent); }
+.tpl-vignette:hover { filter:brightness(1.06); }
 
 /* Corrections DA §09 — onglet Supports : CTA Print Studio en carte bronze (plus d'aplat plein) + vignettes de format */
 .da-suppcta { position:relative; overflow:hidden; cursor:pointer; width:100%; display:flex; align-items:center; gap:13px; padding:15px 17px; border-radius:12px; background:linear-gradient(135deg, rgba(232,200,119,.07), rgba(201,162,77,.02)); border:1px solid rgba(232,200,119,.3); transition:background .3s ease, border-color .3s ease; text-align:left; }

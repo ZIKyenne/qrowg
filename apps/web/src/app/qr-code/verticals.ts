@@ -134,7 +134,7 @@ export const VERTICALS: Record<string, Vertical> = {
     outilHref: "/generateur-qr-code-wifi",
     outilLabel: "Créer mon QR code Wi-Fi",
     emoji: "📶",
-    eyebrow: "wifi",
+    eyebrow: "Wi-Fi",
     metaTitle: "QR code Wi-Fi : connexion en un scan (gratuit)",
     metaDescription: "Créez un QR code Wi-Fi : vos visiteurs se connectent en un scan, sans taper le mot de passe. Fonctionne hors ligne, prêt à imprimer sur une affiche.",
     h1: "Vos invités se connectent au Wi-Fi en un scan",

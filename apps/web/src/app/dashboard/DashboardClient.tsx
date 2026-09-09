@@ -19,12 +19,8 @@ import { erreurLisible } from "@/lib/erreurLisible"
 type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string }
 type Profile = { full_name: string | null; plan: string; total_scans: number; total_pages: number; avatar_url: string | null }
 
-const PLAN_CONFIG: Record<string, { color: string; label: string }> = {
-  free: { color: "var(--muted)", label: "Free" },
-  starter: { color: "var(--action)", label: "Starter" },
-  pro: { color: "var(--accent)", label: "Pro" },
-  business: { color: "var(--success)", label: "Business" },
-}
+// Couleur par plan ; le NOM vient de lib/plans.ts (une seule source, cf. revue du 9 septembre).
+const PLAN_COULEUR: Record<string, string> = { free: "var(--muted)", pro: "var(--accent)", business: "var(--success)" }
 
 function DeleteModal({ page, onConfirm, onCancel, deleting }: { page: Page; onConfirm: () => void; onCancel: () => void; deleting: boolean }) {
   return (
@@ -157,7 +153,7 @@ export default function DashboardClient({
     setCopiedId(page.id); setTimeout(() => setCopiedId(null), 1600)
   }
 
-  const planCfg = PLAN_CONFIG[profile?.plan || "free"]
+  const planCfg = { label: getPlan(profile?.plan).label, color: PLAN_COULEUR[getPlan(profile?.plan).id] }
   const G = "var(--accent)"; const MUTED = "var(--muted)"
   // Tokens DA doré (identiques à la section Objectifs / Analytics) : surfaces plates,
   // plus de dégradés verts ni de barres de gradient.
@@ -483,9 +479,9 @@ export default function DashboardClient({
               <div style={{ background: CARD, border: "1px solid color-mix(in srgb, var(--accent) 22%, var(--surface-2))", borderRadius: 14, padding: "16px 18px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                   <Zap size={16} color={G} />
-                  <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 700, margin: 0 }}>Passez à Starter — {fmtPrice(getPlan("starter").priceMonthly)}€/mois</p>
+                  <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 700, margin: 0 }}>Passez à {getPlan("pro").label} — {fmtPrice(getPlan("pro").priceMonthly)}€/mois</p>
                 </div>
-                <p style={{ color: MUTED, fontSize: 12, margin: "0 0 12px", lineHeight: 1.5 }}>{getPlan("starter").limits.pages} pages, {getPlan("starter").limits.views!.toLocaleString("fr-FR")} vues/mois, QR personnalisés, sans branding</p>
+                <p style={{ color: MUTED, fontSize: 12, margin: "0 0 12px", lineHeight: 1.5 }}>{getPlan("pro").limits.pages} pages, vues illimitées, QR personnalisés, sans branding</p>
                 <Link href="/upgrade" className="da-btn-primary da-btn-primary--sm" style={{ width: "100%", justifyContent: "center" }}>
                   <span>Voir les offres</span> <ArrowRight className="da-ic da-ic-arrow" size={13} />
                 </Link>

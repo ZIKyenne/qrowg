@@ -2349,7 +2349,7 @@ export default function ProfilePage() {
           {/* 8. API BUSINESS */}
           {ptab === "abonnement" && (
           <SectionCard title="API Business" icon={Code} color="var(--accent)"
-            tag={currentPlan==="business"?"Business":currentPlan==="pro"?"Pro":"Verrouille"}
+            tag={currentPlan==="business"||currentPlan==="pro"||currentPlan==="starter"?PLANS[currentPlan==="business"?"business":"pro"].label:"Verrouillé"}
             action={
               <a href="https://docs.qrowg.com" target="_blank" rel="noopener noreferrer"
                 style={{ display:"flex", alignItems:"center", gap:4, color:MUTED, fontSize:11, textDecoration:"none" }}>
@@ -2628,7 +2628,7 @@ export default function ProfilePage() {
                   Connectez votre propre domaine<br/>a vos pages QRowg.
                 </p>
                 <a href="/upgrade" className="da-btn-primary da-btn-primary--sm">
-                  <Activity size={13}/> <span>Passer à Starter ou Pro</span>
+                  <Activity size={13}/> <span>Passer à {PLANS.pro.label}</span>
                 </a>
               </div>
             ) : domainsLoading ? (

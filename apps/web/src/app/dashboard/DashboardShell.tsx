@@ -10,7 +10,7 @@ import { ConfirmProvider } from "@/components/ui/Confirm"
 import MobileNav from "@/components/MobileNav"
 import { SessionShellContext } from "./sessionShell"
 import { accessibleOwnerIds } from "@/lib/team"
-import { pageLimit } from "@/lib/plans"
+import { pageLimit, getPlan, PLANS } from "@/lib/plans"
 
 const DEFAULT_ACCENT = "#D4AF45"
 const MUTED = "var(--muted)"
@@ -414,7 +414,8 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
             {!guest && (() => {
               const plan = profile?.plan || "free"
               const isPaid = plan === "pro" || plan === "business" || plan === "starter"
-              const planLabel = plan === "business" ? "Business" : plan === "pro" ? "Plan Pro" : plan === "starter" ? "Starter" : "Passer au Pro"
+              // Le nom vient de lib/plans.ts (Gratuit · Établissement · Multi-sites) ; un compte gratuit lit l'invitation.
+              const planLabel = isPaid ? `Plan ${getPlan(plan).label}` : `Passer à ${PLANS.pro.label}`
               // Une page = un QR de page : la jauge parle donc de pages, et le dit.
               const planLimit = pageLimit(plan)
               const pct = planLimit && qrActive != null ? Math.min(100, Math.round((qrActive / planLimit) * 100)) : 0

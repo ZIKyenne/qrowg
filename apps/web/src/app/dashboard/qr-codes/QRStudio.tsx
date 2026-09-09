@@ -18,7 +18,7 @@ import { useToast } from "@/components/Toast"
 import { erreurLisible } from "@/lib/erreurLisible"
 import { Button } from "@/components/ui/Button"
 import { Modal } from "@/components/ui/Modal"
-import { PLAN_RANK, canPrintStudio, minPlanFor } from "@/lib/plans"
+import { PLAN_RANK, canPrintStudio, minPlanFor, getPlan } from "@/lib/plans"
 import { createQR, updateQR, getQRBlob, downloadBlob, blobToDataUrl, buildAndDownloadPdf, type QROptions } from "./qrRender"
 import { composeLogo } from "./logoCompose"
 import { BatchQrModal } from "./BatchQrModal"
@@ -1167,15 +1167,14 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           redirige vers l'atelier d'impression guidé /dashboard/print-studio (cf. docs/PRINT-STUDIO-CONVERGENCE.md). */}
 
       {upsell && (() => {
-        const isBiz = upsell.plan === "business"
-        const isStarter = upsell.plan === "starter"
-        const planName = isBiz ? "Business" : isStarter ? "Starter" : "Pro"
-        const accent = isBiz ? "var(--success)" : isStarter ? "var(--action)" : "#C9A84C"
+        // Le nom du plan vient de lib/plans.ts ; « starter » (ancienne grille) est replié sur Établissement.
+        const cible = getPlan(upsell.plan)
+        const isBiz = cible.id === "business"
+        const planName = cible.label
+        const accent = isBiz ? "var(--success)" : "var(--accent)"
         const benefits = isBiz
-          ? ["Tous les presets premium ET luxe", "Modules & coins luxe", "Export PDF, SVG et WEBP", "Correction d'erreur maximale", "Logo central + branding complet"]
-          : isStarter
-          ? ["atelier d'impression", "QR Studio (personnalisation)", "5 pages · 850 vues/mois", "Sans branding QRowg", "Domaine personnalisé"]
-          : ["Tous les presets premium", "Modules avances (pixel, neon...)", "Coins avances (diamond...)", "Export SVG et WEBP", "Correction d'erreur elevee (H)"]
+          ? ["Tous les styles premium et luxe", "Modules et coins luxe", "Export PDF, SVG et WEBP", "Correction d'erreur maximale", "Logo central et image de marque complète"]
+          : ["Tous les styles premium", "Modules avancés (pixel, néon…)", "Coins avancés (diamant…)", "Export SVG et WEBP", "Correction d'erreur élevée (H)"]
         return (
           <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.85)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:4300, padding:24 }}
             onClick={() => setUpsell(null)}>
