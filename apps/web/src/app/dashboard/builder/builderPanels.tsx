@@ -331,7 +331,7 @@ Tiramisu;6,50€;Fait maison`
         {options.map(o => {
           const on = value === o || optionLabel(value) === o
           return <button key={o} type="button" aria-pressed={on} onClick={() => onChange(o)} className={on ? undefined : "da-seg-btn"}
-            style={{ flex: "1 1 auto", minWidth: 0, padding: "7px 9px", borderRadius: 7, border: `1px solid ${on ? "var(--line-strong)" : "transparent"}`, cursor: "pointer", background: on ? "var(--surface-2)" : "transparent", color: on ? "var(--ink)" : muted, fontSize: 11, fontWeight: on ? 600 : 500, whiteSpace: "nowrap", boxShadow: on ? "inset 0 -2px 0 var(--accent)" : "none", transition: "background .18s ease, color .18s ease" }}>{optionLabel(o)}</button>
+            style={{ flex: "1 1 auto", minWidth: 0, minHeight: 32, padding: "6px 9px", borderRadius: 7, border: `1px solid ${on ? "var(--line-strong)" : "transparent"}`, cursor: "pointer", background: on ? "var(--surface-2)" : "transparent", color: on ? "var(--ink)" : muted, fontSize: 11.5, fontWeight: on ? 600 : 500, whiteSpace: "nowrap", boxShadow: on ? "inset 0 -2px 0 var(--accent)" : "none", transition: "background .18s ease, color .18s ease" }}>{optionLabel(o)}</button>
         })}
       </div>
     )
@@ -896,7 +896,7 @@ Tiramisu;6,50€;Fait maison`
                         if (active) onChange(field.key, parts.filter((p: string) => p !== sug).join(", "))
                         else if (parts.length < 5) onChange(field.key, [...parts, sug].join(", "))
                       }}
-                      style={{ padding: "4px 9px", borderRadius: 999, background: active ? G : "color-mix(in srgb, var(--accent) 10%, transparent)", border: `1px solid ${active ? G : "color-mix(in srgb, var(--accent) 25%, transparent)"}`, color: active ? "var(--ink-on-accent)" : G, fontSize: 10, fontWeight: active ? 800 : 600, cursor: "pointer", whiteSpace: "nowrap" as const, maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      style={{ minHeight: 32, padding: "4px 10px", borderRadius: 999, background: active ? G : "color-mix(in srgb, var(--accent) 10%, transparent)", border: `1px solid ${active ? G : "color-mix(in srgb, var(--accent) 25%, transparent)"}`, color: active ? "var(--ink-on-accent)" : G, fontSize: 11, fontWeight: active ? 800 : 600, cursor: "pointer", whiteSpace: "nowrap" as const, maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis" }}>
                       {active ? "✓ " : ""}{sug}
                     </button>
                   )
@@ -1096,8 +1096,8 @@ Tiramisu;6,50€;Fait maison`
             <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 12 }}>
               {PRESET_CATEGORIES.map(cat => (
                 <button key={cat.id} onClick={() => setActiveCat(cat.id)}
-                  style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", background: activeCat===cat.id ? cat.color+"20" : "rgba(255,255,255,0.04)", border: `1px solid ${activeCat===cat.id ? cat.color+"50" : "rgba(255,255,255,0.08)"}`, borderRadius: 20, color: activeCat===cat.id ? cat.color : MUTED, fontSize: 10, fontWeight: activeCat===cat.id ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
-                  <span>{cat.icon}</span><span style={{ marginLeft: 3 }}>{cat.id}</span>
+                  style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", background: activeCat===cat.id ? cat.color+"20" : "rgba(255,255,255,0.04)", border: `1px solid ${activeCat===cat.id ? cat.color+"50" : "rgba(255,255,255,0.08)"}`, borderRadius: 20, minHeight: 32, color: activeCat===cat.id ? cat.color : MUTED, fontSize: 11.5, fontWeight: activeCat===cat.id ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                  <span>{cat.icon}</span><span style={{ marginLeft: 3 }}>{cat.label}</span>
                 </button>
               ))}
             </div>

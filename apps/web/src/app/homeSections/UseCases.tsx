@@ -19,7 +19,7 @@ const USE_CASES = [
       { icon:"📍", label:"Itinéraire",         note:"Google Maps intégré" },
       { icon:"🎉", label:"Événements spéciaux",note:"Soirées, menus du jour" },
     ],
-    cta: "Créer ma page restaurant",
+    cta: "Composer ma page restaurant",
   },
   {
     id: "freelance",
@@ -36,7 +36,7 @@ const USE_CASES = [
       { icon:"🔗", label:"Liens sociaux",     note:"LinkedIn, Behance…" },
       { icon:"📅", label:"Calendly",          note:"Prise de RDV intégrée" },
     ],
-    cta: "Créer ma page indépendant",
+    cta: "Composer ma page indépendant",
   },
   {
     id: "creator",
@@ -53,7 +53,7 @@ const USE_CASES = [
       { icon:"💌", label:"Newsletter",         note:"Formulaire d'inscription" },
       { icon:"🛍️",  label:"Boutique",          note:"Vos produits / merch" },
     ],
-    cta: "Créer ma page créateur",
+    cta: "Composer ma page créateur",
   },
   {
     id: "immo",
@@ -70,7 +70,7 @@ const USE_CASES = [
       { icon:"🗺️",  label:"Localisation",      note:"Plan interactif" },
       { icon:"💶", label:"Financement",        note:"Simulateur de crédit" },
     ],
-    cta: "Créer ma page immobilier",
+    cta: "Composer ma page immobilier",
   },
   {
     id: "event",
@@ -87,7 +87,7 @@ const USE_CASES = [
       { icon:"📸", label:"Galerie",            note:"Photos de l'édition passée" },
       { icon:"📣", label:"Intervenants",       note:"Biographies et horaires" },
     ],
-    cta: "Créer ma page événement",
+    cta: "Composer ma page événement",
   },
   {
     id: "commerce",
@@ -104,7 +104,7 @@ const USE_CASES = [
       { icon:"📍", label:"Itinéraire",          note:"Depuis n'importe où" },
       { icon:"💬", label:"Contact rapide",      note:"WhatsApp ou appel" },
     ],
-    cta: "Créer ma page commerce",
+    cta: "Composer ma page commerce",
   },
 ] as const
 
@@ -115,7 +115,7 @@ export function UseCasesSection() {
 
   return (
     <section id="examples" ref={ref} aria-labelledby="uc-title"
-      style={{ padding: "72px 48px", position: "relative", zIndex: 1 }}>
+      style={{ padding: "64px 48px", position: "relative", zIndex: 1 }}>
       <style>{`
         .uc-tabs  { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
         .uc-tab   { display:flex; align-items:center; gap:7px; padding:9px 18px; border-radius:100px;
@@ -137,7 +137,7 @@ export function UseCasesSection() {
 
       {/* Header */}
       <div style={{
-        maxWidth: 1140, margin: "0 auto 56px", textAlign: "center",
+        maxWidth: 1140, margin: "0 auto 36px", textAlign: "center",
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(24px)",
         transition: "opacity 0.6s ease, transform 0.6s ease",
@@ -146,10 +146,10 @@ export function UseCasesSection() {
           textTransform: "uppercase", fontWeight: 600, marginBottom: 16 }}>Cas d'usage</p>
         <h2 id="uc-title" style={{
           fontFamily: "Fraunces, serif",
-          fontSize: "clamp(28px, 4vw, 52px)",
+          fontSize: "clamp(28px, 3.4vw, 44px)",
           color: "#F5F0E8", fontWeight: 700,
           margin: "0 auto 16px", lineHeight: 1.1,
-          maxWidth: 600, letterSpacing: "-0.02em",
+          maxWidth: 800, letterSpacing: "-0.02em",
         }}>
           Fait pour <span style={{ color: "#C9A84C" }}>votre métier.</span>
         </h2>
@@ -163,7 +163,7 @@ export function UseCasesSection() {
 
         {/* Tabs */}
         <div className="uc-tabs" style={{
-          marginBottom: 40,
+          marginBottom: 28,
           opacity: visible ? 1 : 0,
           transition: "opacity 0.6s ease 0.15s",
         }}>
@@ -201,11 +201,11 @@ export function UseCasesSection() {
           <div style={{
             background: "rgba(255,255,255,0.018)",
             border: "1px solid " + uc.color + "25",
-            borderRadius: 18, padding: "28px 24px",
+            borderRadius: 16, padding: "22px 22px",
             position: "sticky", top: 88,
           }}>
             {/* Header card */}
-            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
               <div style={{
                 width: 52, height: 52, borderRadius: 14,
                 background: uc.color + "14",
@@ -222,14 +222,14 @@ export function UseCasesSection() {
             </div>
 
             <p style={{ color: "rgba(188,182,166,0.85)", fontSize: 13.5,
-              lineHeight: 1.65, marginBottom: 22 }}>{uc.desc}</p>
+              lineHeight: 1.65, marginBottom: 16 }}>{uc.desc}</p>
 
             {/* Aperçu du rendu : mini-téléphone (Pb 9) */}
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: 22 }}>
-              <div style={{ width: 168, borderRadius: 22, padding: 7, background: "#080705", border: "1px solid rgba(255,255,255,0.12)", boxShadow: `0 18px 50px rgba(0,0,0,0.5), 0 0 0 1px ${uc.color}14` }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
+              <div style={{ width: 148, borderRadius: 20, padding: 6, background: "#080705", border: "1px solid rgba(255,255,255,0.12)", boxShadow: `0 18px 50px rgba(0,0,0,0.5), 0 0 0 1px ${uc.color}14` }}>
                 <div style={{ borderRadius: 16, overflow: "hidden", background: "#0E0D0B" }}>
                   {/* en-tête coloré + encoche */}
-                  <div style={{ position: "relative", height: 58, background: `linear-gradient(135deg, ${uc.color}, ${uc.color}99)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div style={{ position: "relative", height: 58, background: uc.color, display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <div style={{ position: "absolute", top: 6, left: "50%", transform: "translateX(-50%)", width: 36, height: 4, borderRadius: 3, background: "rgba(0,0,0,0.35)" }} />
                     <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(255,255,255,0.92)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginTop: 6 }}>{uc.icon}</div>
                   </div>
@@ -242,7 +242,7 @@ export function UseCasesSection() {
                       {Array.from({ length: 25 }).map((_, k) => <div key={k} style={{ background: (k * 7 + 3) % 3 === 0 ? "#0E0D0B" : "transparent", borderRadius: 1 }} />)}
                     </div>
                     {/* CTA */}
-                    <div style={{ marginTop: 6, height: 22, width: "82%", borderRadius: 7, background: uc.color, display: "flex", alignItems: "center", justifyContent: "center", color: "#080808", fontSize: 8.5, fontWeight: 800, padding: "0 4px", textAlign: "center", lineHeight: 1 }}>{uc.cta.replace(/^Créer ma page /i, "").replace(/^./, c => c.toUpperCase())}</div>
+                    <div style={{ marginTop: 6, height: 22, width: "82%", borderRadius: 7, background: uc.color, display: "flex", alignItems: "center", justifyContent: "center", color: "#080808", fontSize: 8.5, fontWeight: 800, padding: "0 4px", textAlign: "center", lineHeight: 1 }}>{uc.cta.replace(/^Composer ma page /i, "").replace(/^./, c => c.toUpperCase())}</div>
                   </div>
                 </div>
               </div>
@@ -250,8 +250,8 @@ export function UseCasesSection() {
 
             {/* Ligne d'accent */}
             <div style={{
-              height: 1, marginBottom: 24,
-              background: "linear-gradient(90deg, " + uc.color + "40, transparent)",
+              height: 1, marginBottom: 16,
+              background: uc.color + "40",
             }} />
 
             <a href="/creer" style={{
@@ -280,7 +280,7 @@ export function UseCasesSection() {
           <div>
             <p style={{ color: "rgba(188,182,166,0.55)", fontSize: 10,
               letterSpacing: 2, textTransform: "uppercase", marginBottom: 16 }}>
-              Blocs inclus dans ce template
+              Blocs inclus dans ce modèle
             </p>
             <div className="uc-blocks">
               {uc.blocks.map((block, i) => (

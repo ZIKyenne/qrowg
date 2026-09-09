@@ -68,14 +68,14 @@ export function PricingSection() {
   return (
     <section id="pricing" ref={ref} aria-labelledby="pricing-title"
       style={{
-        padding: "72px 48px", position: "relative", zIndex: 1,
-        background: "linear-gradient(180deg, rgba(255,255,255,0.024), rgba(255,255,255,0.008)), radial-gradient(130% 60% at 50% 0%, rgba(201,168,76,0.06), transparent 60%)",
+        padding: "64px 48px", position: "relative", zIndex: 1,
+        background: "rgba(255,255,255,0.015)",
         borderTop: "1px solid rgba(201,168,76,0.13)",
         borderBottom: "1px solid rgba(201,168,76,0.13)",
       }}>
       <style>{`
         .plans-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; align-items:stretch; }
-        .plan-card  { border-radius:20px; padding:28px 22px; position:relative; overflow:hidden;
+        .plan-card  { border-radius:18px; padding:24px 20px; position:relative; overflow:hidden;
                       transition:transform 0.3s var(--mo-ease-spring), box-shadow 0.3s, border-color 0.25s; }
         .plan-card:hover { transform:translateY(-6px); }
         .plan-card.highlight { transform:scale(1.05); }
@@ -86,7 +86,7 @@ export function PricingSection() {
 
       {/* Header */}
       <div style={{
-        maxWidth: 1000, margin: "0 auto 64px", textAlign: "center",
+        maxWidth: 1000, margin: "0 auto 40px", textAlign: "center",
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(24px)",
         transition: "opacity 0.6s ease, transform 0.6s ease",
@@ -94,10 +94,10 @@ export function PricingSection() {
         <Eyebrow>Tarifs</Eyebrow>
         <h2 id="pricing-title" style={{
           fontFamily:"Fraunces, serif",
-          fontSize:"clamp(28px,4vw,52px)",
+          fontSize:"clamp(28px,3.4vw,44px)",
           color:"#F5F0E8", fontWeight:700,
           margin:"0 auto 16px", lineHeight:1.1,
-          maxWidth:520, letterSpacing:"-0.02em",
+          maxWidth:800, letterSpacing:"-0.02em",
         }}>
           Simple, transparent,{" "}
           <span style={{ color:"#C9A84C" }}>sans surprise.</span>
@@ -112,7 +112,7 @@ export function PricingSection() {
           <span style={{ color: !annual ? "#F5F0E8" : "rgba(188,182,166,0.6)", fontSize:14, fontWeight: !annual ? 600 : 400, transition:"color 0.2s" }}>Mensuel</span>
           <button type="button" onClick={() => setAnnual(a => !a)} role="switch" aria-checked={annual}
             aria-label="Basculer facturation annuelle"
-            style={{ width:48, height:26, borderRadius:13, background: annual ? "linear-gradient(90deg,#C9A84C,#b8953f)" : "rgba(255,255,255,0.12)",
+            style={{ width:48, height:26, borderRadius:13, background: annual ? "var(--accent)" : "rgba(255,255,255,0.12)",
               border:"none", cursor:"pointer", position:"relative", transition:"background 0.25s", flexShrink:0 }}>
             <span style={{ position:"absolute", top:3, left: annual ? 25 : 3, width:20, height:20, borderRadius:"50%",
               background:"#fff", transition:"left 0.25s var(--mo-ease-spring)", boxShadow:"0 1px 4px rgba(0,0,0,0.3)" }}/>
@@ -135,14 +135,12 @@ export function PricingSection() {
               className={"plan-card" + (plan.highlight ? " highlight" : "")}
               style={{
                 background: plan.highlight
-                  ? "linear-gradient(145deg, rgba(201,168,76,0.12), rgba(201,168,76,0.04))"
+                  ? "rgba(201,168,76,0.07)"
                   : "rgba(255,255,255,0.02)",
                 border: "1px solid " + (plan.highlight
                   ? "rgba(201,168,76,0.55)"
                   : "rgba(255,255,255,0.08)"),
-                boxShadow: plan.highlight
-                  ? "0 0 80px rgba(201,168,76,0.18), 0 0 0 1px rgba(201,168,76,0.12)"
-                  : "none",
+                boxShadow: "none",
                 opacity: visible ? 1 : 0,
                 paddingTop: plan.badge ? 50 : undefined,
                 transform: visible
@@ -155,7 +153,7 @@ export function PricingSection() {
               <div style={{
                 position:"absolute", top:0, left:0, right:0, height:2,
                 background: plan.highlight
-                  ? "linear-gradient(90deg,#C9A84C,#d4a843,#C9A84C)"
+                  ? "var(--accent)"
                   : "transparent",
                 borderRadius:"22px 22px 0 0",
               }}/>
@@ -164,11 +162,10 @@ export function PricingSection() {
               {plan.badge && (
                 <div style={{
                   position:"absolute", top:14, left:"50%", transform:"translateX(-50%)",
-                  background:"linear-gradient(90deg,#C9A84C,#b8953f)",
+                  background:"var(--accent)",
                   borderRadius:20, padding:"4px 14px",
-                  fontSize:10, fontWeight:800, color:"#080808",
+                  fontSize:11, fontWeight:800, color:"var(--ink-on-accent)",
                   letterSpacing:0.5, whiteSpace:"nowrap", zIndex:3,
-                  boxShadow:"0 4px 14px rgba(201,168,76,0.45)",
                 }}>{plan.badge}</div>
               )}
 
@@ -210,12 +207,12 @@ export function PricingSection() {
               <div style={{
                 height:1, marginBottom:24,
                 background: plan.highlight
-                  ? "linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent)"
+                  ? "rgba(201,168,76,0.3)"
                   : "rgba(255,255,255,0.06)",
               }}/>
 
               {/* Features */}
-              <div style={{ display:"flex", flexDirection:"column", gap:11, marginBottom:28 }}>
+              <div style={{ display:"flex", flexDirection:"column", gap:9, marginBottom:22 }}>
                 {plan.features.map((f, j) => (
                   <div key={j} style={{ display:"flex", alignItems:"center", gap:10 }}>
                     <span style={{
@@ -242,17 +239,17 @@ export function PricingSection() {
                 padding:"13px 24px", borderRadius:11,
                 fontWeight:700, fontSize:14, letterSpacing:0.1,
                 background: plan.highlight
-                  ? "linear-gradient(90deg,#C9A84C,#b8953f)"
+                  ? "var(--accent)"
                   : "transparent",
-                color: plan.highlight ? "#080808" : plan.color,
+                color: plan.highlight ? "var(--ink-on-accent)" : plan.color,
                 border: plan.highlight ? "none" : "1px solid " + plan.color + "40",
                 transition:"all 0.2s ease",
-                boxShadow: plan.highlight ? "0 4px 20px rgba(201,168,76,0.35)" : "none",
+                boxShadow: "none",
               }}
                 onMouseEnter={e => {
                   const el = e.currentTarget as HTMLElement
                   if (plan.highlight) {
-                    el.style.boxShadow = "0 6px 28px rgba(201,168,76,0.5)"
+                    el.style.opacity = "0.92"
                     el.style.transform = "translateY(-1px)"
                   } else {
                     el.style.background = plan.color + "12"

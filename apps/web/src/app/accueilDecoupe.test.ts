@@ -12,7 +12,8 @@ const APP = __dirname
 const lire = (p: string) => readFileSync(join(APP, p), "utf8")
 const accueil = lire("HomeClient.tsx")
 
-const SECTIONS = ["HowItWorks", "Features", "Templates", "Analytics", "UseCases", "Pricing", "Faq", "QRStudioLive"]
+// « HowItWorks » a fusionné dans Features (revue interne du 9 septembre).
+const SECTIONS = ["Features", "Templates", "Analytics", "UseCases", "Pricing", "Faq", "QRStudioLive"]
 
 describe("les sections vivent dans leurs propres fichiers", () => {
   it("chacune existe et exporte son composant", () => {
@@ -39,7 +40,7 @@ describe("les sections vivent dans leurs propres fichiers", () => {
 describe("le texte reste dans le HTML : rien de ce que lit Google ne part au client seul", () => {
   // `dynamic()` sans option rend quand même côté serveur ; `ssr: false` non. Une
   // section de contenu passée en ssr:false disparaîtrait des résultats de recherche.
-  const CONTENU = ["HowItWorks", "Features", "Templates", "Analytics", "UseCases", "Pricing", "Faq"]
+  const CONTENU = ["Features", "Templates", "Analytics", "UseCases", "Pricing", "Faq"]
 
   for (const s of CONTENU) {
     it(`${s} est rendue côté serveur`, () => {

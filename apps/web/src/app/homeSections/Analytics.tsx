@@ -51,7 +51,7 @@ function AnalyticsMockup() {
 
   return (
     <div style={{
-      background: "linear-gradient(145deg, #0e0c08, #111009)",
+      background: "var(--surface)",
       border: "1px solid rgba(201,168,76,0.18)",
       borderRadius: 20, overflow: "hidden",
       boxShadow: "0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.08)",
@@ -129,7 +129,7 @@ function AnalyticsMockup() {
                   }}/>
                   <div title={d.scans + " scans"} style={{
                     width: "40%", maxWidth: 14, borderRadius: "3px 3px 0 0",
-                    background: "linear-gradient(to top, #C9A84C, #d4a843)",
+                    background: "var(--accent)",
                     height: Math.max(3, Math.round((d.scans / maxScans) * chartH)) + "px",
                     transition: "height 0.4s ease",
                   }}/>
@@ -215,17 +215,12 @@ export function AnalyticsSection() {
   const { ref, visible } = useInView(0.06)
   return (
     <section id="analytics" ref={ref} aria-labelledby="analytics-title"
-      style={{ padding: "72px 48px", position: "relative", zIndex: 1, overflow: "hidden" }}>
+      style={{ padding: "64px 48px", position: "relative", zIndex: 1, overflow: "hidden" }}>
       <style>{`
         .analytics-layout { display:grid; grid-template-columns:1fr 1.5fr; gap:72px; align-items:center; }
         @media(max-width:1024px){ .analytics-layout{ grid-template-columns:1fr!important; gap:48px!important; } }
         @media(max-width:640px){ #analytics{ padding:56px 20px!important; } }
       `}</style>
-
-      {/* Ambiance bleutée (donnée / data) — variation de fond par section */}
-      <div aria-hidden="true" style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none" }}>
-        <div style={{ position: "absolute", top: "10%", left: "-6%", width: "min(620px,70vw)", height: 520, borderRadius: "50%", background: "radial-gradient(circle, rgba(56,189,248,0.08), transparent 64%)", filter: "blur(50px)" }} />
-      </div>
 
       <div style={{ maxWidth: 1140, margin: "0 auto", position: "relative", zIndex: 1 }}>
         <div className="analytics-layout">
@@ -240,7 +235,7 @@ export function AnalyticsSection() {
               textTransform: "uppercase", fontWeight: 600, marginBottom: 16 }}>Statistiques</p>
             <h2 id="analytics-title" style={{
               fontFamily: "Fraunces, serif",
-              fontSize: "clamp(26px, 3.5vw, 46px)",
+              fontSize: "clamp(26px, 3.4vw, 44px)",
               color: "#F5F0E8", fontWeight: 700,
               margin: "0 0 20px", lineHeight: 1.12,
               letterSpacing: "-0.02em",
@@ -277,14 +272,14 @@ export function AnalyticsSection() {
             <div style={{
               display: "flex", gap: 12, alignItems: "flex-start",
               padding: "14px 16px", borderRadius: 14, marginBottom: 32,
-              background: "linear-gradient(135deg, rgba(201,168,76,0.1), rgba(255,255,255,0.02))",
-              border: "1px solid rgba(201,168,76,0.28)",
+              background: "rgba(201,168,76,0.06)",
+              border: "1px solid var(--line-strong)",
               opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(16px)",
               transition: "opacity 0.55s ease 0.5s, transform 0.55s ease 0.5s",
             }}>
               <span style={{ fontSize: 18, flexShrink: 0, lineHeight: 1.2 }}>💡</span>
               <div>
-                <p style={{ color: "#C9A84C", fontSize: 9.5, fontWeight: 800, letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 4px" }}>Recommandation</p>
+                <p style={{ color: "#C9A84C", fontSize: 11, fontWeight: 800, letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 4px" }}>Recommandation</p>
                 <p style={{ color: "#E8E6E0", fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>
                   Votre QR <strong style={{ color: "#F5F0E8" }}>Restaurant</strong> performe mieux entre <strong style={{ color: "#F5F0E8" }}>18h et 21h</strong>. Partagez-le juste avant le service.
                 </p>
@@ -310,7 +305,7 @@ export function AnalyticsSection() {
                 el.style.background = "transparent"
                 el.style.borderColor = "rgba(201,168,76,0.3)"
               }}>
-              Voir mes analytics <span style={{ fontSize: 16 }}>→</span>
+              Composer ma page — sans compte <span style={{ fontSize: 16 }}>→</span>
             </a>
           </div>
 

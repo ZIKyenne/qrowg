@@ -2,7 +2,7 @@
 import Link from "next/link"
 import { useState } from "react"
 import { PLANS } from "@/lib/plans"
-import QrowgLogo from "@/components/QrowgLogo"
+import EnTeteSite from "@/components/EnTeteSite"
 
 // ── Design tokens ────────────────────────────────────────────────────────────
 import { creerUrl, creerUrlSecteur } from "../creer/entry"
@@ -55,28 +55,27 @@ function SectionHeader({ chip, title, sub }: { chip: string; title: React.ReactN
   )
 }
 
-function CtaInline({ label = "Essayer gratuitement" }: { label?: string }) {
+// Un seul vocabulaire d'appel à l'action, le même que l'accueil (revue interne
+// du 9 septembre : six libellés différents sur cette page). Bouton à plat.
+const CTA = {
+  page:    { label: "Composer ma page — sans compte", href: () => creerUrl() },
+  qr:      { label: "Créer mon QR code",              href: () => "/generateur-qr-code" },
+  modele:  { label: "Choisir un modèle",              href: () => creerUrl() },
+} as const
+function CtaInline({ action = "page" }: { action?: keyof typeof CTA }) {
+  const c = CTA[action]
   return (
-    <Link href={creerUrl()} style={{
+    <Link href={c.href()} style={{
       display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
-      background: "linear-gradient(90deg, #C9A84C, #b8953f)",
-      color: BG, textDecoration: "none",
+      background: "var(--accent)",
+      color: "var(--ink-on-accent)", textDecoration: "none",
       fontSize: 14, fontWeight: 700,
       minHeight: 44, padding: "0 26px", borderRadius: 11,
-      boxShadow: "0 4px 20px rgba(201,168,76,0.3)",
-      transition: "transform 0.2s var(--mo-ease-spring), box-shadow 0.2s",
+      transition: "opacity 0.2s",
     }}
-      onMouseEnter={e => {
-        const el = e.currentTarget as HTMLElement
-        el.style.transform = "translateY(-2px) scale(1.03)"
-        el.style.boxShadow = "0 6px 28px rgba(201,168,76,0.45)"
-      }}
-      onMouseLeave={e => {
-        const el = e.currentTarget as HTMLElement
-        el.style.transform = "none"
-        el.style.boxShadow = "0 4px 20px rgba(201,168,76,0.3)"
-      }}>
-      {label} →
+      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = "0.92" }}
+      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = "1" }}>
+      {c.label} →
     </Link>
   )
 }
@@ -92,7 +91,7 @@ function BuilderMockupSvg() {
   ]
   return (
     <div style={{
-      background: "linear-gradient(145deg, #0e0c08, #111009)",
+      background: "var(--surface)",
       border: "1px solid " + BOR,
       borderRadius: 20, padding: 20, overflow: "hidden",
       boxShadow: "0 24px 80px rgba(0,0,0,0.5)",
@@ -124,7 +123,7 @@ function BuilderMockupSvg() {
         {/* Canvas */}
         <div style={{ background: "rgba(255,255,255,0.018)", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 12, padding: 12, display: "flex", flexDirection: "column", gap: 8 }}>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "12px 10px", background: "rgba(201,168,76,0.04)", border: "1px dashed rgba(201,168,76,0.18)", borderRadius: 8 }}>
-            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#C9A84C,#b8953f)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>👤</div>
+            <div style={{ width: 36, height: 36, borderRadius: "50%", background: G, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>👤</div>
             <div style={{ height: 6, width: "65%", borderRadius: 3, background: "rgba(245,240,232,0.2)" }} />
             <div style={{ height: 4, width: "45%", borderRadius: 3, background: "rgba(245,240,232,0.1)" }} />
           </div>
@@ -142,7 +141,7 @@ function BuilderMockupSvg() {
           <div style={{ width: 60, border: "2px solid rgba(201,168,76,0.25)", borderRadius: 14, padding: "8px 5px", background: "rgba(8,8,8,0.8)" }}>
             <div style={{ width: 18, height: 3, borderRadius: 2, background: "rgba(255,255,255,0.1)", margin: "0 auto 6px" }} />
             <div style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "center" }}>
-              <div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,#C9A84C,#b8953f)" }} />
+              <div style={{ width: 22, height: 22, borderRadius: "50%", background: G }} />
               {[[80, "#C9A84C", 0.4], [60, "#fff", 0.1], [90, "var(--action)", 0.2], [70, "#fff", 0.08]].map(([w, c, o], i) => (
                 <div key={i} style={{ height: i === 2 ? 18 : 5, width: w + "%", borderRadius: 4, background: c as string, opacity: o as number }} />
               ))}
@@ -163,7 +162,7 @@ function AnalyticsMockupSvg() {
   const maxV = 121
   const days = ["L","M","M","J","V","S","D"]
   return (
-    <div style={{ background: "linear-gradient(145deg, #0e0c08, #111009)", border: "1px solid " + BOR, borderRadius: 20, padding: 20, boxShadow: "0 24px 80px rgba(0,0,0,0.5)" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid " + BOR, borderRadius: 20, padding: 20, boxShadow: "0 24px 80px rgba(0,0,0,0.5)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
         {["var(--danger)","#F97316","var(--success)"].map((c,i) => <div key={i} style={{ width:8,height:8,borderRadius:"50%",background:c,opacity:0.65 }}/>)}
         <span style={{ color:"rgba(201,168,76,0.4)",fontSize:9,letterSpacing:1.5,marginLeft:8 }}>STATISTIQUES — QRowg</span>
@@ -185,7 +184,7 @@ function AnalyticsMockupSvg() {
           {bars.map((v,i) => (
             <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3,height:"100%"}}>
               <div style={{flex:1,width:"100%",display:"flex",alignItems:"flex-end"}}>
-                <div style={{width:"100%",height:Math.round((v/maxV)*52)+"px",borderRadius:"3px 3px 0 0",background:"linear-gradient(to top,#C9A84C,#d4a843)"}}/>
+                <div style={{width:"100%",height:Math.round((v/maxV)*52)+"px",borderRadius:"3px 3px 0 0",background:G}}/>
               </div>
               <span style={{color:"rgba(138,132,120,0.5)",fontSize:8}}>{days[i]}</span>
             </div>
@@ -263,35 +262,8 @@ export default function FeaturesPage() {
         @media(max-width:640px){ .feat-sec{ padding:56px 24px !important; } .feat-hero{ padding:120px 24px 80px !important; } }
       `}</style>
 
-      {/* NAV */}
-      <nav className="nav-page qf-entete" style={{
-        position:"fixed",top:0,left:0,right:0,zIndex:100,height:64,
-        background:"rgba(8,8,8,0.92)",backdropFilter:"blur(24px)",
-        borderBottom:"1px solid rgba(201,168,76,0.12)",
-        display:"flex",alignItems:"center",justifyContent:"space-between",
-        padding:"0 48px",
-      }}>
-        <Link href="/" aria-label="QRowg — accueil" style={{textDecoration:"none",display:"inline-flex"}}>
-          <QrowgLogo size={22} />
-        </Link>
-        <div className="qf-entete" style={{display:"flex",alignItems:"center",gap:24}}>
-          <Link href="/#pricing" style={{color:MUT,textDecoration:"none",fontSize:13,transition:"color 0.2s"}}
-            onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color=INK}}
-            onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color=MUT}}>Tarifs</Link>
-          <Link href="/auth/login" style={{color:MUT,textDecoration:"none",fontSize:13,transition:"color 0.2s"}}
-            onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color=INK}}
-            onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color=MUT}}>Connexion</Link>
-          <Link href={creerUrl()} style={{
-            background:"linear-gradient(90deg,#C9A84C,#b8953f)",color:BG,
-            textDecoration:"none",fontSize:13,fontWeight:700,padding:"8px 20px",borderRadius:9,
-            boxShadow:"0 2px 14px rgba(201,168,76,0.3)",transition:"transform 0.2s,box-shadow 0.2s",
-          }}
-            onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="translateY(-1px) scale(1.02)";el.style.boxShadow="0 4px 20px rgba(201,168,76,0.45)"}}
-            onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="none";el.style.boxShadow="0 2px 14px rgba(201,168,76,0.3)"}}>
-            Composer ma page
-          </Link>
-        </div>
-      </nav>
+      {/* En-tête : le même que l'accueil (5 entrées, Connexion, Composer ma page) */}
+      <EnTeteSite page="features" />
 
       {/* HERO */}
       <section style={{ padding:"140px 48px 100px",textAlign:"center",position:"relative",zIndex:1 }} className="feat-hero">
@@ -299,7 +271,7 @@ export default function FeaturesPage() {
           <div style={{marginBottom:20}}><Chip label="Fonctionnalités" /></div>
           <h1 style={{
             fontFamily:"Fraunces, serif",
-            fontSize:"clamp(32px,4.5vw,64px)",
+            fontSize:"clamp(32px,3.8vw,52px)",
             color:INK,fontWeight:700,lineHeight:1.08,
             letterSpacing:"-0.02em",margin:"0 0 24px",
           }}>
@@ -310,7 +282,7 @@ export default function FeaturesPage() {
             Créez une page mobile, générez un QR dynamique et mesurez chaque interaction.
           </p>
           <div style={{display:"flex",justifyContent:"center",gap:14,flexWrap:"wrap"}}>
-            <CtaInline label="Créer gratuitement" />
+            <CtaInline />
             <Link href="/#pricing" style={{
               display:"inline-flex",alignItems:"center",gap:8,
               color:MUT,textDecoration:"none",fontSize:14,fontWeight:500,
@@ -357,7 +329,7 @@ export default function FeaturesPage() {
                 <Check text="Personnalisation couleurs, polices et styles en un clic" />
                 <Check text="Publication en un clic — votre page est en ligne aussitôt" />
               </div>
-              <div style={{marginTop:32}}><CtaInline label="Ouvrir l'éditeur" /></div>
+              <div style={{marginTop:32}}><CtaInline /></div>
             </div>
             <BuilderMockupSvg />
           </div>
@@ -381,7 +353,7 @@ export default function FeaturesPage() {
                 <Check text={`Export PNG HD ; SVG et PDF pour l'impression dès ${PLANS.pro.label}`} />
                 <Check text="Votre logo intégré au centre du QR code" />
               </div>
-              <div style={{marginTop:32}}><CtaInline label="Créer mon QR code" /></div>
+              <div style={{marginTop:32}}><CtaInline action="qr" /></div>
             </div>
             <div style={{direction:"ltr" as const}}>
               <QRMockupSvg />
@@ -407,7 +379,7 @@ export default function FeaturesPage() {
                 <Check text="Top pages les plus visitées" />
                 <Check text="Inclus nativement — sans plugin, sans configuration" />
               </div>
-              <div style={{marginTop:32}}><CtaInline label="Voir mes statistiques" /></div>
+              <div style={{marginTop:32}}><CtaInline /></div>
             </div>
             <AnalyticsMockupSvg />
           </div>
@@ -430,7 +402,7 @@ export default function FeaturesPage() {
             <style>{`@media(max-width:700px){.tpl-grid{grid-template-columns:1fr !important;}}`}</style>
             {[
               { icon:"🍽️", name:"Restaurant & Bar",    color:"#F97316", blocks:7, secteur:"Restaurant" },
-              { icon:"💼", name:"Freelance Pro",         color:"var(--action)", blocks:6, secteur:"Freelance" },
+              { icon:"💼", name:"Freelance",             color:"var(--action)", blocks:6, secteur:"Freelance" },
               { icon:"🎵", name:"Artiste & Musicien",    color:"#A78BFA", blocks:7, secteur:"Musicien" },
               { icon:"🏠", name:"Agent Immobilier",      color:"#C9A84C", blocks:6, secteur:"Immobilier" },
               { icon:"🎪", name:"Événement",             color:"var(--success)", blocks:6, secteur:"Evenement" },
@@ -455,7 +427,7 @@ export default function FeaturesPage() {
             ))}
           </div>
           <div style={{textAlign:"center",marginTop:40}}>
-            <CtaInline label="Choisir un modèle" />
+            <CtaInline action="modele" />
           </div>
         </div>
       </section>
@@ -483,7 +455,6 @@ export default function FeaturesPage() {
                 display:"flex",flexDirection:"column",gap:14,
                 position:"relative",overflow:"hidden",
               }}>
-                <div style={{position:"absolute",top:0,left:0,right:0,height:1,background:`linear-gradient(90deg,transparent,${f.color}40,transparent)`}}/>
                 <div style={{
                   width:44,height:44,borderRadius:12,
                   background:f.color+"12",border:"1px solid "+f.color+"28",
@@ -493,7 +464,7 @@ export default function FeaturesPage() {
                   <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
                     <h3 style={{color:INK,fontSize:16,fontWeight:700,margin:0}}>{f.title}</h3>
                     <span style={{
-                      fontSize:9,fontWeight:800,padding:"2px 7px",borderRadius:4,
+                      fontSize:11,fontWeight:800,padding:"2px 7px",borderRadius:4,
                       background:f.tag===PLANS.pro.label?"rgba(201,168,76,0.12)":"rgba(167,139,250,0.12)",
                       color:f.tag===PLANS.pro.label?G:"#A78BFA",border:"1px solid",
                       borderColor:f.tag===PLANS.pro.label?"rgba(201,168,76,0.3)":"rgba(167,139,250,0.3)",
@@ -511,18 +482,17 @@ export default function FeaturesPage() {
       <section style={{padding:"72px 48px 88px",position:"relative",zIndex:2,textAlign:"center"}} className="feat-sec">
         <div style={{
           maxWidth:660,margin:"0 auto",
-          background:"linear-gradient(145deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03))",
-          border:"1px solid rgba(201,168,76,0.28)",
-          borderRadius:24,padding:"56px 48px",position:"relative",overflow:"hidden",
+          background:"var(--surface)",
+          border:"1px solid var(--line-strong)",
+          borderRadius:20,padding:"44px 40px",position:"relative",overflow:"hidden",
         }}>
-          <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(90deg,transparent,#C9A84C,transparent)"}}/>
           <h2 style={{fontFamily:"Fraunces,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.12,margin:"0 0 18px",letterSpacing:"-0.02em"}}>
             Prêt à créer votre page <span style={{color:G}}>professionnelle ?</span>
           </h2>
           <p style={{color:MUT,fontSize:16,lineHeight:1.7,margin:"0 0 36px",maxWidth:420,marginLeft:"auto",marginRight:"auto"}}>
-            Commence gratuitement. Pas de carte bancaire. Prêt en 5 minutes.
+            Commencez gratuitement. Pas de carte bancaire. Prêt en 5 minutes.
           </p>
-          <CtaInline label="Créer mon QRowg gratuit" />
+          <CtaInline />
           <p style={{color:"rgba(138,132,120,0.45)",fontSize:11.5,margin:"18px 0 0"}}>Gratuit · Sans carte bancaire · Annulation à tout moment</p>
         </div>
       </section>

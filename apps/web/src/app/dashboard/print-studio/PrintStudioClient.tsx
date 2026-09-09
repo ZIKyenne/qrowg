@@ -260,6 +260,15 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const [sheetPos, setSheetPos] = useState<SheetPos>("half")   // #17 : position ancrée de la sheet (peek/half/full)
   const [sheetDragging, setSheetDragging] = useState(false)    // drag du handle en cours (désactive la transition)
   const [sheetDragPx, setSheetDragPx] = useState(0)            // décalage vertical live pendant le drag
+  // La feuille fermée n'est plus rendue (revue interne du 9 septembre : 217 cibles et
+  // 152 textes hors écran, du poids pour rien). Elle reste montée le temps de glisser
+  // vers le bas, puis disparaît ; à l'ouverture, une animation d'entrée fait le reste.
+  const [sheetMontee, setSheetMontee] = useState(false)
+  useEffect(() => {
+    if (sheetOpen) { setSheetMontee(true); return }
+    const t = setTimeout(() => setSheetMontee(false), 360)
+    return () => clearTimeout(t)
+  }, [sheetOpen])
   const sheetDrag = useRef<{ y0: number; moved: number } | null>(null)
   const [mobileTab, setMobileTab] = useState<"theme" | "couleurs" | "texte" | "qr">("theme")   // onglet simple mobile
   const [phase, setPhase] = useState<"library" | "studio">("library")
@@ -1118,7 +1127,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
         {/* Canvas héros (#2) + shell ZÉRO-SCROLL (§11) : sur desktop le root est une colonne 100dvh (header figé,
             grille flex:1 à overflow interne, barre d'action en pied statique) → aucun scroll de page, seuls les
             panneaux/canvas scrollent en interne. Mobile inchangé (scroll doux + sheet). */}
-        <style>{`@media(min-width:1025px){.ps-grid{grid-template-columns:92px minmax(0,1fr) 356px!important;align-items:start;position:relative}.ps-aside{position:sticky;top:14px;align-self:start}.ps-rail{position:sticky;top:14px;align-self:start}.ps-panels{position:sticky;top:14px;align-self:start;max-height:calc(100dvh - 190px)}}.ps-chip{transition:border-color var(--mo-fast) var(--mo-ease-standard),background var(--mo-fast) var(--mo-ease-standard),color var(--mo-fast) var(--mo-ease-standard)}.ps-chip:hover{border-color:color-mix(in srgb,var(--accent) 50%,transparent)}.ps-foc{outline:2px solid transparent;outline-offset:3px;border-radius:4px;transition:outline-color var(--mo-fast) var(--mo-ease-standard)}.ps-foc:hover{outline-color:color-mix(in srgb,var(--accent) 60%,transparent)}.ps-flash{animation:psflash var(--mo-slow) var(--mo-ease-emphasized)}@keyframes psflash{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 60%,transparent)}30%{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 45%,transparent)}100%{box-shadow:0 0 0 0 transparent}}@media(prefers-reduced-motion:reduce){.ps-flash{animation:none}.ps-foc{transition:none}}`}</style>
+        <style>{`@media(min-width:1025px){.ps-grid{grid-template-columns:92px minmax(0,1fr) 356px!important;align-items:start;position:relative}.ps-aside{position:sticky;top:14px;align-self:start}.ps-rail{position:sticky;top:14px;align-self:start}.ps-panels{position:sticky;top:14px;align-self:start;max-height:calc(100dvh - 190px)}}.ps-chip{transition:border-color var(--mo-fast) var(--mo-ease-standard),background var(--mo-fast) var(--mo-ease-standard),color var(--mo-fast) var(--mo-ease-standard)}.ps-chip:hover{border-color:color-mix(in srgb,var(--accent) 50%,transparent)}.ps-foc{outline:2px solid transparent;outline-offset:3px;border-radius:4px;transition:outline-color var(--mo-fast) var(--mo-ease-standard)}.ps-foc:hover{outline-color:color-mix(in srgb,var(--accent) 60%,transparent)}.ps-flash{animation:psflash var(--mo-slow) var(--mo-ease-emphasized)}@keyframes psflash{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 60%,transparent)}30%{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 45%,transparent)}100%{box-shadow:0 0 0 0 transparent}}@keyframes ps-sheet-in-y{from{transform:translateY(112%)}}@keyframes ps-sheet-in-x{from{transform:translateX(112%)}}@media(prefers-reduced-motion:reduce){.ps-flash{animation:none}.ps-foc{transition:none}}`}</style>
 
         {/* ── RAIL D'OUTILS (gauche) ────────────────────────────────────────
             Les modèles et les calques ne sont plus des accordéons empilés dans la
@@ -1509,14 +1518,14 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       </div>
 
       {/* ── MOBILE : version SIMPLIFIÉE — Thème · Couleurs · Texte · QR uniquement (sheet courte, canvas visible). ── */}
-      {isMobile && (
+      {isMobile && sheetMontee && (
         <>
           {/* Backdrop seulement en « full » (tap = revenir à half) ; en peek/half le canvas reste VISIBLE et interactif. */}
           {!paysage && sheetOpen && sheetPos === "full" && <div onClick={() => setSheetPos("half")} aria-hidden style={{ position: "fixed", inset: 0, zIndex: 69, background: "rgba(0,0,0,0.35)" }} />}
           {/* Padding bas généreux : la barre d'onglets (zIndex 71) reste AU-DESSUS de la sheet → onglets toujours cliquables. */}
           <div style={paysage
-            ? { position: "fixed", top: 0, right: 0, bottom: 0, zIndex: 70, width: tiroirW, maxWidth: "58vw", overflowY: "auto", WebkitOverflowScrolling: "touch", background: C.bg, borderTopLeftRadius: 20, borderBottomLeftRadius: 20, borderLeft: `1px solid ${C.hairline}`, boxShadow: "-16px 0 44px rgba(0,0,0,0.5)", padding: `0 16px calc(${HAUT_BARRE_PAYSAGE + 12}px + env(safe-area-inset-bottom))`, transform: sheetOpen ? "translateX(0)" : "translateX(112%)", transition: "transform var(--mo-sheet) var(--mo-ease-standard)", display: "flex", flexDirection: "column", gap: 12 }
-            : { position: "fixed", left: 0, right: 0, bottom: kb, zIndex: 70, height: kb ? `calc(74vh - ${kb}px)` : `${vhFeuille}vh`, maxHeight: "92vh", overflowY: "auto", WebkitOverflowScrolling: "touch", background: C.bg, borderTopLeftRadius: 20, borderTopRightRadius: 20, borderTop: `1px solid ${C.hairline}`, boxShadow: "0 -16px 44px rgba(0,0,0,0.5)", padding: `0 16px ${kb ? "66px" : "calc(128px + env(safe-area-inset-bottom))"}`, transform: sheetOpen ? `translateY(${sheetDragPx}px)` : "translateY(112%)", transition: sheetDragging ? "none" : "transform var(--mo-sheet) var(--mo-ease-standard), height var(--mo-sheet) var(--mo-ease-standard)", display: "flex", flexDirection: "column", gap: 12 }}>
+            ? { position: "fixed", top: 0, right: 0, bottom: 0, zIndex: 70, width: tiroirW, maxWidth: "58vw", overflowY: "auto", WebkitOverflowScrolling: "touch", background: C.bg, borderTopLeftRadius: 20, borderBottomLeftRadius: 20, borderLeft: `1px solid ${C.hairline}`, boxShadow: "-16px 0 44px rgba(0,0,0,0.5)", padding: `0 16px calc(${HAUT_BARRE_PAYSAGE + 12}px + env(safe-area-inset-bottom))`, transform: sheetOpen ? "translateX(0)" : "translateX(112%)", transition: "transform var(--mo-sheet) var(--mo-ease-standard)", animation: "ps-sheet-in-x var(--mo-sheet) var(--mo-ease-standard)", display: "flex", flexDirection: "column", gap: 12 }
+            : { position: "fixed", left: 0, right: 0, bottom: kb, zIndex: 70, height: kb ? `calc(74vh - ${kb}px)` : `${vhFeuille}vh`, maxHeight: "92vh", overflowY: "auto", WebkitOverflowScrolling: "touch", background: C.bg, borderTopLeftRadius: 20, borderTopRightRadius: 20, borderTop: `1px solid ${C.hairline}`, boxShadow: "0 -16px 44px rgba(0,0,0,0.5)", padding: `0 16px ${kb ? "66px" : "calc(128px + env(safe-area-inset-bottom))"}`, transform: sheetOpen ? `translateY(${sheetDragPx}px)` : "translateY(112%)", animation: "ps-sheet-in-y var(--mo-sheet) var(--mo-ease-standard)", transition: sheetDragging ? "none" : "transform var(--mo-sheet) var(--mo-ease-standard), height var(--mo-sheet) var(--mo-ease-standard)", display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={{ position: "sticky", top: 0, zIndex: 3, background: C.bg, paddingTop: 8 }}>
               {/* Handle : glisser pour changer de hauteur (snap au cran voisin) · tap pour passer au cran suivant. */}
               {!paysage && <div onPointerDown={onSheetDown} onPointerMove={onSheetMove} onPointerUp={onSheetUp} onPointerCancel={onSheetUp} role="slider" aria-label="Hauteur du panneau" aria-valuetext={sheetPos} tabIndex={0} style={{ touchAction: "none", cursor: "grab", padding: "2px 0 6px" }}>

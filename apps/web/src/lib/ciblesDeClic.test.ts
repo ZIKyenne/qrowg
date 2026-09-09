@@ -63,7 +63,9 @@ describe("barres d'en-tête du site public", () => {
       "app/guides/page.tsx", "app/qr-code/page.tsx", "app/outils/page.tsx",
       "app/generateur-qr-code/page.tsx", "app/security/page.tsx", "app/creer/layout.tsx",
     ]
-    const sans = attendus.filter(f => !lire(f).includes("qf-entete"))
+    // Fonctionnalités monte l'en-tête partagé (components/EnTeteSite.tsx), qui la porte.
+    expect(lire("components/EnTeteSite.tsx")).toContain("qf-entete")
+    const sans = attendus.filter(f => !lire(f).includes("qf-entete") && !lire(f).includes("<EnTeteSite"))
     expect(sans).toEqual([])
   })
 

@@ -8,7 +8,7 @@ const TEMPLATE_DATA = [
   {
     id: "restaurant",
     name: "Restaurant & Bar",
-    category: "Food & Beverage",
+    category: "Restauration",
     includes: ["Menu", "Réservation", "Avis Google"],
     blocks: 7,
     isPro: false,
@@ -24,7 +24,7 @@ const TEMPLATE_DATA = [
   },
   {
     id: "freelance",
-    name: "Freelance Pro",
+    name: "Freelance",
     category: "Services",
     includes: ["Portfolio", "Contact", "Réseaux"],
     blocks: 6,
@@ -134,7 +134,7 @@ function TemplateMiniPreview({ preview, accent, hovered = false }: { preview: re
         if (p.type === "avatar") return (
           <div key={i} style={{ display: "flex", alignItems: "center", gap: 7 }}>
             <div style={{ width: 24, height: 24, borderRadius: "50%",
-              background: `linear-gradient(135deg, ${accent}, ${accent}80)`, flexShrink: 0 }} />
+              background: accent, flexShrink: 0 }} />
             <div style={{ height: 5, width: "50%", borderRadius: 3,
               background: "rgba(245,240,232,0.18)" }} />
           </div>
@@ -198,15 +198,6 @@ function TemplateCard({ tpl, i, visible }: { tpl: typeof TEMPLATE_DATA[number]; 
         cursor: "default",
       }}
     >
-      {/* Top accent line */}
-      <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, height: 1,
-        background: hovered
-          ? `linear-gradient(90deg, transparent, ${tpl.accent}60, transparent)`
-          : "linear-gradient(90deg, transparent, rgba(201,168,76,0.12), transparent)",
-        transition: "background 0.3s",
-      }} />
-
       {/* Badge Pro/Free */}
       <div style={{ position: "absolute", top: 14, right: 14 }}>
         <span style={{
@@ -269,7 +260,7 @@ export function TemplatesSection() {
   const { ref, visible } = useInView(0.06)
   return (
     <section id="templates" ref={ref} aria-labelledby="templates-title"
-      style={{ padding: "72px 48px", position: "relative", zIndex: 1 }}>
+      style={{ padding: "64px 48px", position: "relative", zIndex: 1 }}>
       <style>{`
         .tpl-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
         @media(max-width:900px){ .tpl-grid { grid-template-columns:repeat(2,1fr) !important; } }
@@ -290,16 +281,16 @@ export function TemplatesSection() {
 
       {/* Header */}
       <div style={{
-        maxWidth: 1140, margin: "0 auto 64px", textAlign: "center",
+        maxWidth: 1140, margin: "0 auto 36px", textAlign: "center",
         opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(24px)",
         transition: "opacity 0.6s ease, transform 0.6s ease",
       }}>
         <Eyebrow>Modèles</Eyebrow>
         <h2 id="templates-title" style={{
           fontFamily: "Fraunces, serif",
-          fontSize: "clamp(28px, 4vw, 52px)",
+          fontSize: "clamp(28px, 3.4vw, 44px)",
           color: "#F5F0E8", fontWeight: 700, margin: "0 auto 20px",
-          lineHeight: 1.1, maxWidth: 620, letterSpacing: "-0.02em",
+          lineHeight: 1.1, maxWidth: 800, letterSpacing: "-0.02em",
         }}>
           Des modèles prêts{" "}
           <span style={{ color: "#C9A84C" }}>pour votre métier.</span>
@@ -324,7 +315,7 @@ export function TemplatesSection() {
 
       {/* CTA */}
       <div style={{
-        textAlign: "center", marginTop: 52,
+        textAlign: "center", marginTop: 40,
         opacity: visible ? 1 : 0, transition: "opacity 0.6s ease 0.65s",
       }}>
         <a href="/creer" style={{

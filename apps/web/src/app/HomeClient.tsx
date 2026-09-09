@@ -1,12 +1,12 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import dynamic from "next/dynamic"
 import { PLAN_LIST, PLAN_COMPARISON, PLANS as PLANS_DEF, fmtPrice } from "@/lib/plans"
 import { useIsMobile } from "@/lib/useIsMobile"
 import QrowgLogo from "@/components/QrowgLogo"
+import EnTeteSite from "@/components/EnTeteSite"
 import { serializeJsonLd } from "@/lib/jsonLd"
 import { landingJsonLd } from "@/lib/landingJsonLd"
 
@@ -58,9 +58,9 @@ function QRMockup() {
             <div style={{
               display: "flex", alignItems: "center", gap: 9,
               padding: "10px 14px", borderRadius: 14,
-              background: "linear-gradient(145deg, rgba(28,25,19,0.92), rgba(16,15,11,0.92))",
-              border: "1px solid rgba(201,168,76,0.22)",
-              boxShadow: "0 18px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(201,168,76,0.1)",
+              background: "rgba(20,18,13,0.94)",
+              border: "1px solid var(--line-strong)",
+              boxShadow: "0 18px 40px rgba(0,0,0,0.45)",
               backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)",
             }}>
               <span style={{
@@ -79,22 +79,6 @@ function QRMockup() {
         background: "radial-gradient(circle, rgba(201,168,76,0.18) 0%, transparent 65%)",
         transform: pulse ? "scale(1.15)" : "scale(1)",
         transition: "transform 2.4s ease-in-out",
-        pointerEvents: "none"
-      }} />
-      {/* Reflet / halo au sol — ancre l'objet exposé */}
-      <div aria-hidden="true" style={{
-        position: "absolute", left: "50%", bottom: "-13%", transform: "translateX(-50%)",
-        width: "74%", height: "14%", borderRadius: "50%",
-        background: "radial-gradient(ellipse, rgba(201,168,76,0.22), transparent 70%)",
-        filter: "blur(13px)", pointerEvents: "none"
-      }} />
-      {/* Glow ring inner */}
-      <div style={{
-        position: "absolute", inset: -12, borderRadius: 28,
-        background: hovered
-          ? "radial-gradient(circle at 50% 50%, rgba(201,168,76,0.18) 0%, transparent 70%)"
-          : "radial-gradient(circle at 50% 50%, rgba(201,168,76,0.08) 0%, transparent 70%)",
-        transition: "background 0.4s ease",
         pointerEvents: "none"
       }} />
       {/* Card */}
@@ -116,12 +100,6 @@ function QRMockup() {
           : "perspective(1300px) rotateX(4deg) rotateY(-7deg) scale(1)",
         transition: "all 0.5s var(--mo-ease-spring)"
       }}>
-        {/* Shimmer */}
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "linear-gradient(135deg, transparent 30%, rgba(201,168,76,0.04) 50%, transparent 70%)",
-          
-        }} />
         {/* Corner accent top-left */}
         <div style={{
           position: "absolute", top: 0, left: 0, width: 40, height: 40,
@@ -141,17 +119,6 @@ function QRMockup() {
           boxShadow: "0 0 18px 3px rgba(201,168,76,0.55)",
           animation: "scanLine 3.4s ease-in-out infinite", pointerEvents: "none", zIndex: 3,
         }} />
-        {/* Balayage lumineux — une lumiere traverse doucement le QR (boucle infinie discrete) */}
-        <div aria-hidden="true" style={{
-          position: "absolute", top: "18%", bottom: "18%", left: "18%", right: "18%",
-          overflow: "hidden", borderRadius: 8, zIndex: 2, pointerEvents: "none",
-        }}>
-          <div style={{
-            position: "absolute", top: 0, bottom: 0, width: "45%",
-            background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.32), transparent)",
-            
-          }} />
-        </div>
         {/* QR grid (échelle relative -> grandit avec la carte). Construction progressive
             module par module a l'apparition (stagger sequentiel = effet "assemblage"). */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: "4.5%", width: "60%", aspectRatio: "1 / 1", position: "relative", zIndex: 1 }}>
@@ -191,7 +158,6 @@ import { useInView, QRFinder, Eyebrow, QRMiniSvg } from "./homeUi"
 // héros ne s'anime. Chacune reste rendue côté serveur : le texte est dans le HTML,
 // donc lisible par les moteurs de recherche, seul son JavaScript arrive plus tard.
 import { FAQ_ITEMS } from "./homeSections/faqData"
-const HowItWorks = dynamic(() => import("./homeSections/HowItWorks").then(m => m.HowItWorks))
 const FeaturesSection = dynamic(() => import("./homeSections/Features").then(m => m.FeaturesSection))
 const TemplatesSection = dynamic(() => import("./homeSections/Templates").then(m => m.TemplatesSection))
 const AnalyticsSection = dynamic(() => import("./homeSections/Analytics").then(m => m.AnalyticsSection))
@@ -205,182 +171,17 @@ const QRStudioLive = dynamic(() => import("./homeSections/QRStudioLive").then(m 
   loading: () => <div style={{ minHeight: 520 }} aria-hidden="true" />,
 })
 
-const NAV_LINKS = [
-  { label: "Fonctionnalités", href: "#features"  },
-  { label: "Modèles",         href: "#templates" },
-  { label: "Exemples",        href: "#examples"  },
-  { label: "Tarifs",          href: "#pricing"   },
-  { label: "FAQ",             href: "#faq"       },
-]
-function Navbar() {
-  const [scrolled, setScrolled] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [active,   setActive]   = useState("")
-  const [authed,   setAuthed]   = useState(false)
-  useEffect(() => {
-    // Header conscient de la connexion : un utilisateur connecté voit « Mon espace »
-    // au lieu de « Connexion / Commencer » (sinon il croit être anonyme).
-    createClient().auth.getUser().then(({ data }) => setAuthed(!!data.user)).catch(() => {})
-  }, [])
-  useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 20)
-    window.addEventListener("scroll", fn, { passive: true })
-    return () => window.removeEventListener("scroll", fn)
-  }, [])
-  useEffect(() => {
-    const ids = NAV_LINKS.map(l => l.href.replace("#",""))
-    const obs = new IntersectionObserver(
-      entries => entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id) }),
-      { rootMargin: "-40% 0px -55% 0px" }
-    )
-    ids.forEach(id => { const el = document.getElementById(id); if (el) obs.observe(el) })
-    return () => obs.disconnect()
-  }, [])
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : ""
-    return () => { document.body.style.overflow = "" }
-  }, [menuOpen])
-  return (
-    <>
-      <style>{`
-        .nl::after{content:"";position:absolute;bottom:-2px;left:0;right:0;height:1.5px;
-          background:linear-gradient(90deg,#C9A84C,#d4a843);transform:scaleX(0);
-          transform-origin:left;transition:transform 0.25s ease;border-radius:2px;}
-        .nl:hover::after,.nl.act::after{transform:scaleX(1);}
-        .nl:hover{color:#F5F0E8 !important;}
-        .nl:focus-visible,.nct:focus-visible{outline:2px solid rgba(201,168,76,0.6);outline-offset:4px;border-radius:4px;}
-        .ml{display:block;color:#BCB6A6;text-decoration:none;font-size:18px;padding:16px 0;
-          border-bottom:1px solid rgba(201,168,76,0.08);transition:color 0.2s;}
-        .ml:hover,.ml.act{color:#F5F0E8;}
-        @keyframes slideMenu{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-        @media(max-width:900px){.dNav{display:none !important;}.brg{display:flex !important;}}
-        @media(min-width:901px){.brg{display:none !important;}#mobileMenu{display:none !important;}}
-        @media(max-width:640px){.navWrap{padding:env(safe-area-inset-top) 20px 0 !important;}}
-        @media(prefers-reduced-motion:reduce){.nl::after{transition:none;}}
-      `}</style>
-      <nav aria-label="Navigation principale" className="navWrap" style={{
-        position:"fixed",top:0,left:0,right:0,zIndex:200,
-        display:"flex",alignItems:"center",justifyContent:"space-between",
-        padding:"env(safe-area-inset-top) 48px 0",height:"calc(68px + env(safe-area-inset-top))",
-        background:scrolled?"rgba(8,8,8,0.97)":"rgba(8,8,8,0.9)",
-        backdropFilter:"blur(28px)",WebkitBackdropFilter:"blur(28px)",
-        borderBottom:scrolled?"1px solid rgba(201,168,76,0.2)":"1px solid rgba(201,168,76,0.07)",
-        boxShadow:scrolled?"0 4px 32px rgba(0,0,0,0.5)":"none",
-        transition:"background 0.3s,border-color 0.3s,box-shadow 0.3s",
-      }}>
-        <Link href="/" aria-label="QRowg — accueil" style={{textDecoration:"none",display:"inline-flex",transition:"transform 0.2s var(--mo-ease-spring)"}}
-          onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.transform="scale(1.04)"}}
-          onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.transform="none"}}>
-          <QrowgLogo size={22} />
-        </Link>
-        <div className="dNav" role="menubar" style={{display:"flex",alignItems:"center",gap:32}}>
-          {NAV_LINKS.map(({label,href})=>{
-            const id=href.replace("#",""); const isAct=active===id
-            return(<Link key={href} href={href} role="menuitem" aria-current={isAct?"page":undefined}
-              className={"nl"+(isAct?" act":"")}
-              style={{color:isAct?"#F5F0E8":"#BCB6A6",textDecoration:"none",fontSize:14,
-                fontWeight:isAct?600:400,position:"relative",paddingBottom:2,transition:"color 0.2s"}}>{label}</Link>)
-          })}
-        </div>
-        <div className="dNav" style={{display:"flex",alignItems:"center",gap:16}}>
-          {authed ? (
-            <Link href="/dashboard" className="nct" style={{
-              background:"linear-gradient(90deg,#C9A84C,#b8953f)",color:"#080808",
-              textDecoration:"none",fontSize:14,fontWeight:700,padding:"9px 22px",borderRadius:10,
-              display:"inline-block",boxShadow:"0 2px 16px rgba(201,168,76,0.3)",
-              transition:"transform 0.2s var(--mo-ease-spring),box-shadow 0.2s",
-            }}
-              onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="translateY(-2px) scale(1.03)";el.style.boxShadow="0 6px 24px rgba(201,168,76,0.5)"}}
-              onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="none";el.style.boxShadow="0 2px 16px rgba(201,168,76,0.3)"}}>
-              Mon espace →
-            </Link>
-          ) : (<>
-            <Link href="/auth/login" className="nl"
-              style={{color:"#BCB6A6",textDecoration:"none",fontSize:14,position:"relative",paddingBottom:2,transition:"color 0.2s"}}>Connexion</Link>
-            <Link href="/creer" className="nct" style={{
-              background:"linear-gradient(90deg,#C9A84C,#b8953f)",color:"#080808",
-              textDecoration:"none",fontSize:14,fontWeight:700,padding:"9px 22px",borderRadius:10,
-              display:"inline-block",boxShadow:"0 2px 16px rgba(201,168,76,0.3)",
-              transition:"transform 0.2s var(--mo-ease-spring),box-shadow 0.2s",
-            }}
-              onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="translateY(-2px) scale(1.03)";el.style.boxShadow="0 6px 24px rgba(201,168,76,0.5)"}}
-              onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="none";el.style.boxShadow="0 2px 16px rgba(201,168,76,0.3)"}}>
-              Composer ma page
-            </Link>
-          </>)}
-        </div>
-        {/* Burger — sibling direct de <nav> (hors .dNav, sinon masqué par display:none parent en mobile) */}
-        <button onClick={()=>setMenuOpen(o=>!o)} aria-label={menuOpen?"Fermer le menu":"Ouvrir le menu"}
-          aria-expanded={menuOpen} aria-controls="mobileMenu" className="brg"
-          style={{display:"none",background:menuOpen?"rgba(201,168,76,0.14)":"rgba(255,255,255,0.05)",
-            border:"1px solid rgba(201,168,76,0.28)",borderRadius:11,cursor:"pointer",
-            width:44,height:44,flexDirection:"column",gap:5,alignItems:"center",justifyContent:"center",
-            transition:"background 0.2s,border-color 0.2s"}}>
-          {[
-            {tf:menuOpen?"rotate(45deg) translate(5px,5px)":"none",op:1},
-            {tf:"none",op:menuOpen?0:1},
-            {tf:menuOpen?"rotate(-45deg) translate(5px,-5px)":"none",op:1},
-          ].map((s,i)=>(
-            <span key={i} style={{display:"block",width:22,height:2,background:"#C9A84C",
-              borderRadius:2,transform:s.tf,opacity:s.op,transition:"transform 0.25s,opacity 0.2s"}}/>
-          ))}
-        </button>
-      </nav>
-      {menuOpen&&(
-        <div id="mobileMenu" role="dialog" aria-label="Menu mobile" style={{
-          position:"fixed",top:"calc(68px + env(safe-area-inset-top))",left:0,right:0,bottom:0,zIndex:199,
-          background:"rgba(8,8,8,0.97)",backdropFilter:"blur(20px)",
-          padding:"32px",display:"flex",flexDirection:"column",
-          animation:"slideMenu 0.25s ease",overflowY:"auto",
-        }}>
-          {NAV_LINKS.map(({label,href})=>(
-            <Link key={href} href={href}
-              className={"ml"+(active===href.replace("#","")?" act":"")}
-              onClick={()=>setMenuOpen(false)}>{label}</Link>
-          ))}
-          <div style={{marginTop:32,display:"flex",flexDirection:"column",gap:12}}>
-            {authed ? (
-              <Link href="/dashboard" onClick={()=>setMenuOpen(false)} style={{
-                display:"block",textAlign:"center",
-                background:"linear-gradient(90deg,#C9A84C,#b8953f)",
-                color:"#080808",textDecoration:"none",fontSize:16,fontWeight:700,
-                padding:"16px",borderRadius:12,boxShadow:"0 4px 24px rgba(201,168,76,0.4)"}}>
-                Mon espace →</Link>
-            ) : (<>
-              <Link href="/auth/login" onClick={()=>setMenuOpen(false)} style={{
-                display:"block",textAlign:"center",color:"#BCB6A6",textDecoration:"none",
-                fontSize:16,padding:"14px",border:"1px solid rgba(201,168,76,0.15)",borderRadius:12}}>Connexion</Link>
-              <Link href="/creer" onClick={()=>setMenuOpen(false)} style={{
-                display:"block",textAlign:"center",
-                background:"linear-gradient(90deg,#C9A84C,#b8953f)",
-                color:"#080808",textDecoration:"none",fontSize:16,fontWeight:700,
-                padding:"16px",borderRadius:12,boxShadow:"0 4px 24px rgba(201,168,76,0.4)"}}>
-                Composer ma page →</Link>
-            </>)}
-          </div>
-        </div>
-      )}
-    </>
-  )
-}
-
-// ── How it works ──────────────────────────────────────────────────────────────
-// La boucle QRowg : le système, du support physique à la mesure, en 6 temps.
-function SectionSeam({ delay = 0 }: { delay?: number }) {
-  // Séparateur signature : le « finder pattern » d'un QR au centre, balayé par un
-  // faisceau de scan (la transition signature de QRowg).
+// ── Couture entre sections ────────────────────────────────────────────────────
+function SectionSeam() {
+  // Séparateur signature : un trait et le « finder pattern » d'un QR au centre.
   return (
     <div aria-hidden="true" style={{
       position: "relative", overflow: "hidden", maxWidth: 1140, margin: "0 auto", zIndex: 1,
-      display: "flex", alignItems: "center", justifyContent: "center", gap: 16, padding: "2px 24px",
+      display: "flex", alignItems: "center", justifyContent: "center", gap: 16, padding: "0 24px",
     }}>
-      <span className="seam-beam" style={{ animationDelay: `${delay}s` }} />
-      <div style={{ flex: 1, maxWidth: 360, height: 1, background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.22))" }} />
-      <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ position: "absolute", inset: -12, background: "radial-gradient(circle, rgba(201,168,76,0.14), transparent 70%)", pointerEvents: "none" }} />
-        <QRFinder size={16} color="rgba(201,168,76,0.6)" style={{ position: "relative" }} />
-      </div>
-      <div style={{ flex: 1, maxWidth: 360, height: 1, background: "linear-gradient(90deg, rgba(201,168,76,0.22), transparent)" }} />
+      <div style={{ flex: 1, maxWidth: 360, height: 1, background: "var(--line)" }} />
+      <QRFinder size={14} color="rgba(201,168,76,0.5)" style={{ position: "relative" }} />
+      <div style={{ flex: 1, maxWidth: 360, height: 1, background: "var(--line)" }} />
     </div>
   )
 }
@@ -473,20 +274,15 @@ export default function HomeClient() {
       `}</style>
 
       {/* NAV */}
-      <Navbar />
+      <EnTeteSite />
 
       {/* HERO */}
       <section style={{
-        minHeight: "100vh", display: "flex", alignItems: "center",
+        minHeight: "min(100vh, 740px)", display: "flex", alignItems: "center",
         padding: "88px 48px 56px", position: "relative", zIndex: 1, overflow: "hidden"
       }}>
         {/* Ambiance cinématographique — halo doré lumineux + profondeur + vignette */}
         <div aria-hidden="true" style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden" }}>
-          <div style={{
-            position: "absolute", bottom: "-12%", right: "-10%",
-            width: "min(540px, 82vw)", height: 520, borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(120,150,255,0.06), transparent 62%)", filter: "blur(48px)",
-          }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(125% 80% at 50% 2%, transparent 52%, rgba(0,0,0,0.55) 100%)" }} />
           {/* Halo carré (signature : finder pattern QR, pas un cercle) */}
           <div className="hero-finder" style={{ position: "absolute", top: "14%", right: "8%", width: 180, height: 180, borderRadius: 36, background: "radial-gradient(rgba(201,168,76,0.10), transparent 70%)", filter: "blur(26px)" }} />
@@ -583,7 +379,7 @@ export default function HomeClient() {
                   el.style.color = "rgba(245,240,232,0.7)"
                   el.style.background = "transparent"
                 }}>
-                Voir la démo
+                Tester le générateur de QR
               </Link>
             </div>
 
@@ -623,17 +419,14 @@ export default function HomeClient() {
 
       {/* (Bande de réassurance retirée : redondante avec les puces du hero.) */}
 
-      {/* HOW IT WORKS */}
-      <HowItWorks />
-      <SectionSeam delay={0} />
-
-      {/* FEATURES */}
+      {/* LE SYSTÈME QROWG — les 6 étapes en sommaire, puis les 6 fonctionnalités
+          (une seule section depuis la revue interne du 9 septembre). */}
       <FeaturesSection />
-      <SectionSeam delay={0.7} />
+      <SectionSeam />
 
       {/* TEMPLATES — les RÉSULTATS montrés AVANT le builder (« voici ce que vous pouvez créer »). */}
       <TemplatesSection />
-      <SectionSeam delay={1.05} />
+      <SectionSeam />
 
       {/* BuilderSection retiree (declutter accueil) — composant conserve, non rendu. */}
 
@@ -641,7 +434,7 @@ export default function HomeClient() {
 
       {/* QR STUDIO LIVE — démo interactive (vrai QR généré en local, aperçu en direct) */}
       <QRStudioLive />
-      <SectionSeam delay={3} />
+      <SectionSeam />
 
       {/* QR DYNAMIQUE — fusionné : concept déjà couvert (hero, key-points, fonctionnalités, FAQ).
           Section retirée pour réduire la redondance (Pb 10). Le composant est conservé
@@ -649,13 +442,13 @@ export default function HomeClient() {
 
       {/* ANALYTICS */}
       <AnalyticsSection />
-      <SectionSeam delay={3.5} />
+      <SectionSeam />
 
       {/* PrintStudioSection retiree (declutter accueil) — composant conserve, non rendu. */}
 
       {/* USE CASES */}
       <UseCasesSection />
-      <SectionSeam delay={1.0} />
+      <SectionSeam />
 
       {/* BrandProSection retiree (declutter accueil) — le "Sans branding" reste dans les tarifs. */}
 
@@ -663,28 +456,28 @@ export default function HomeClient() {
 
       {/* PRICING */}
       <PricingSection />
-      <SectionSeam delay={2.5} />
+      <SectionSeam />
 
       {/* FAQ */}
       <FAQSection />
 
       {/* CTA FINAL */}
-      <section className="cta-final-section" style={{ padding:"80px 48px 64px", position:"relative", zIndex:1, overflow:"hidden" }}>
+      <section className="cta-final-section" style={{ padding:"56px 48px 48px", position:"relative", zIndex:1, overflow:"hidden" }}>
         <style>{`
           @keyframes ctaGlow{0%,100%{opacity:0.5}50%{opacity:1}}
           @media(max-width:640px){ .cta-final-section{padding:64px 20px 56px!important;} }
         `}</style>
         {/* Halo cinématographique du CTA final */}
         <div style={{
-          maxWidth:720, margin:"0 auto", textAlign:"center",
+          maxWidth:820, margin:"0 auto", textAlign:"center",
           position:"relative", zIndex:1,
         }}>
 
           {/* Card */}
           <div style={{
-            background:"linear-gradient(145deg, rgba(201,168,76,0.08), rgba(201,168,76,0.03))",
-            border:"1px solid rgba(201,168,76,0.28)",
-            borderRadius:24, padding:"60px 48px",
+            background:"var(--surface)",
+            border:"1px solid var(--line-strong)",
+            borderRadius:20, padding:"36px 36px",
             position:"relative", overflow:"hidden",
           }}>
             {/* Corner accents */}
@@ -707,24 +500,24 @@ export default function HomeClient() {
             ))}
 
             {/* QR flottant — l'objet de désir, en tête du CTA */}
-            <div style={{ display:"flex", justifyContent:"center", marginBottom:26 }}>
+            <div style={{ display:"flex", justifyContent:"center", marginBottom:20 }}>
               <div style={{
-                width:90, height:90, borderRadius:22,
+                width:72, height:72, borderRadius:18,
                 background:"linear-gradient(145deg,#151210,#0d0c09)",
                 border:"1px solid rgba(201,168,76,0.42)",
                 display:"flex", alignItems:"center", justifyContent:"center",
                 boxShadow:"0 16px 44px rgba(0,0,0,0.55), 0 0 54px rgba(201,168,76,0.2)",
                 
               }}>
-                <QRMiniSvg fg="#F5F0E8" bg="transparent" accent="#C9A84C" size={58} />
+                <QRMiniSvg fg="#F5F0E8" bg="transparent" accent="#C9A84C" size={46} />
               </div>
             </div>
 
             <h2 style={{
               fontFamily:"Fraunces, serif",
-              fontSize:"clamp(28px,4vw,48px)",
+              fontSize:"clamp(28px,3.4vw,44px)",
               color:"#F5F0E8", fontWeight:700,
-              margin:"0 0 20px", lineHeight:1.12,
+              margin:"0 0 16px", lineHeight:1.12,
               letterSpacing:"-0.02em",
             }}>
               Prêt à transformer votre QR code en{" "}
@@ -733,7 +526,7 @@ export default function HomeClient() {
 
             <p style={{
               color:"rgba(188,182,166,0.85)", fontSize:17,
-              lineHeight:1.7, margin:"0 0 44px", maxWidth:520,
+              lineHeight:1.7, margin:"0 0 32px", maxWidth:520,
               marginLeft:"auto", marginRight:"auto",
             }}>
               Créez votre QRowg gratuitement, personnalisez votre page et commencez à suivre vos scans en quelques minutes.
@@ -741,8 +534,8 @@ export default function HomeClient() {
 
             <Link href="/creer" style={{
               display:"inline-flex", alignItems:"center", gap:10,
-              background:"linear-gradient(90deg,#C9A84C,#b8953f)",
-              color:"#080808", textDecoration:"none",
+              background:"var(--accent)",
+              color:"var(--ink-on-accent)", textDecoration:"none",
               fontSize:16, fontWeight:800,
               padding:"16px 40px", borderRadius:13,
               letterSpacing:0.2,
@@ -767,7 +560,7 @@ export default function HomeClient() {
       {/* FOOTER */}
       <footer style={{ borderTop:"1px solid rgba(201,168,76,0.1)", position:"relative", zIndex:2 }} aria-label="Pied de page">
         <style>{`
-          .fg { display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr 1fr 1fr; gap:36px; padding:56px 48px 48px; }
+          .fg { display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr 1fr 1fr; gap:36px; padding:44px 48px 40px; }
           .fc-title { color:#C9A84C; font-size:10px; letter-spacing:2.5px; text-transform:uppercase; font-weight:700; margin-bottom:18px; }
           .fl { display:block; color:rgba(188,182,166,0.72); text-decoration:none; font-size:13.5px; margin-bottom:11px; line-height:1.4; transition:color 0.2s; }
           .fl:hover { color:#F5F0E8; }
@@ -900,10 +693,9 @@ export default function HomeClient() {
         <Link href="/creer" style={{
           display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
           width: "100%", padding: "14px", borderRadius: 12,
-          background: "linear-gradient(90deg, #C9A84C, #b8953f)",
-          color: "#080808", fontWeight: 800, fontSize: 15, textDecoration: "none",
-          boxShadow: "0 6px 22px rgba(201,168,76,0.4)",
-        }}>
+          background: "var(--accent)",
+          color: "var(--ink-on-accent)", fontWeight: 800, fontSize: 15, textDecoration: "none",
+          }}>
           Composer ma page — sans compte <span style={{ fontSize: 16 }}>→</span>
         </Link>
       </div>

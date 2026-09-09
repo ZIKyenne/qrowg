@@ -136,7 +136,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
       )}
 
       <button type="button" onClick={() => setPickerOpen(true)}
-        style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 7, background: "none", border: "none", color: MUTED, fontSize: 11, cursor: "pointer", padding: 0 }}
+        style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 2, minHeight: 32, background: "none", border: "none", color: MUTED, fontSize: 12, cursor: "pointer", padding: 0 }}
         onMouseEnter={e => e.currentTarget.style.color = G} onMouseLeave={e => e.currentTarget.style.color = MUTED}>
         <FolderOpen size={12} /> Changer d'image…
       </button>

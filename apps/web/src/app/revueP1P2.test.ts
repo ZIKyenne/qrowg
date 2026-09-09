@@ -36,7 +36,7 @@ describe("tarification", () => {
 describe("accueil", () => {
   const home = lire("HomeClient.tsx")
   it("sections resserrées : 72 px de haut au lieu de 100 (56 au lieu de 72 sur mobile)", () => {
-    for (const f of ["Analytics", "Faq", "HowItWorks", "Pricing", "QRStudioLive", "Templates", "UseCases", "Features"]) {
+    for (const f of ["Analytics", "Faq", "Pricing", "QRStudioLive", "Templates", "UseCases", "Features"]) {
       const s = lire(`homeSections/${f}.tsx`)
       expect(s, f).not.toMatch(/padding: ?"100px 48px"/)
       expect(s, f).not.toMatch(/padding: ?72px 2[04]px ?!important/)
@@ -51,10 +51,13 @@ describe("accueil", () => {
     expect(home).not.toContain('className="fl">Créer une page</Link>')
   })
   it("un seul logo : QrowgLogo sur l'accueil, dans la coquille, l'éditeur et la page Fonctionnalités", () => {
-    expect(home).toContain("<QrowgLogo size={22} />")
+    // L'en-tête public est partagé (components/EnTeteSite.tsx) : l'accueil et
+    // Fonctionnalités le montent, il porte le logo.
+    expect(lire("../components/EnTeteSite.tsx")).toContain("<QrowgLogo size={22} />")
+    expect(home).toContain("<EnTeteSite />")
+    expect(lire("features/page.tsx")).toContain('<EnTeteSite page="features" />')
     expect(lire("dashboard/DashboardShell.tsx")).toContain("<QrowgLogo size={18} />")
     expect(lire("dashboard/builder/BuilderV4.tsx")).toContain("<QrowgLogo size={16} />")
-    expect(lire("features/page.tsx")).toContain("<QrowgLogo size={22} />")
     expect(lire("features/page.tsx")).not.toContain('fontFamily:"Fraunces,serif",fontSize:20,color:G,fontWeight:700}}>QRowg')
     const logo = lire("../components/QrowgLogo.tsx")
     expect(logo).not.toContain("linear-gradient")

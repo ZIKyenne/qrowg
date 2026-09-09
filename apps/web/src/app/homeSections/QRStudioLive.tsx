@@ -39,7 +39,7 @@ export function QRStudioLive() {
 
   return (
     <section id="qr-studio" ref={ref} aria-labelledby="qrlive-title"
-      style={{ padding: "72px 48px", position: "relative", zIndex: 1 }}>
+      style={{ padding: "56px 48px", position: "relative", zIndex: 1 }}>
       <style>{`
         .qrl-grid { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; max-width:1000px; margin:0 auto; }
         @media(max-width:820px){ .qrl-grid { grid-template-columns:1fr !important; gap:36px !important; } }
@@ -55,15 +55,15 @@ export function QRStudioLive() {
 
       {/* Header */}
       <div style={{
-        maxWidth: 1000, margin: "0 auto 56px", textAlign: "center",
+        maxWidth: 1000, margin: "0 auto 36px", textAlign: "center",
         opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(24px)",
         transition: "opacity 0.6s ease, transform 0.6s ease",
       }}>
         <Eyebrow>QR Studio</Eyebrow>
         <h2 id="qrlive-title" style={{
-          fontFamily: "Fraunces, serif", fontSize: "clamp(28px, 4vw, 52px)",
+          fontFamily: "Fraunces, serif", fontSize: "clamp(28px, 3.4vw, 44px)",
           color: "#F5F0E8", fontWeight: 700, margin: "0 auto 20px",
-          lineHeight: 1.1, maxWidth: 620, letterSpacing: "-0.02em",
+          lineHeight: 1.1, maxWidth: 800, letterSpacing: "-0.02em",
         }}>
           Un QR code{" "}<span style={{ color: "#C9A84C" }}>à votre image.</span>
         </h2>
@@ -100,9 +100,9 @@ export function QRStudioLive() {
           </div>
           <a href="/generateur-qr-code" style={{
             display: "inline-flex", alignItems: "center", gap: 8, alignSelf: "flex-start", marginTop: 4,
-            background: "linear-gradient(135deg, #EBCE72, #C9A84C)", color: "#0A0A0A",
+            background: "var(--accent)", color: "var(--ink-on-accent)",
             fontWeight: 700, fontSize: 15, padding: "13px 24px", borderRadius: 12,
-            textDecoration: "none", boxShadow: "0 8px 24px rgba(201,168,76,0.25)",
+            textDecoration: "none",
             fontFamily: "'DM Sans', system-ui, sans-serif",
           }}>Créer mon QR code <span aria-hidden="true">→</span></a>
         </div>

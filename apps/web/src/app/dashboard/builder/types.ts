@@ -1117,19 +1117,20 @@ export function themeBackgroundStyle(theme: PageTheme): Record<string, string | 
 }
 
 // ── Catégories de presets ─────────────────────────────────────────────────────
+// `id` reste la clé technique des presets (editorPresets.ts) ; `label` est ce qu'on lit.
 export const PRESET_CATEGORIES = [
-  { id: "Minimal",      icon: "◻️", color: "#A8A190" },
-  { id: "Business",     icon: "💼", color: "#3B82F6" },
-  { id: "Luxury",       icon: "💎", color: "#C9A84C" },
-  { id: "Creator",      icon: "🎨", color: "#EC4899" },
-  { id: "Startup",      icon: "🚀", color: "#8B5CF6" },
-  { id: "Restaurant",   icon: "🍽️", color: "#F97316" },
-  { id: "Immobilier",   icon: "🏠", color: "#10B981" },
-  { id: "Fitness",      icon: "💪", color: "#EF4444" },
-  { id: "Event",        icon: "🎉", color: "#F59E0B" },
-  { id: "Music",        icon: "🎵", color: "#1DB954" },
-  { id: "Portfolio",        icon: "📐", color: "#6366F1" },
-  { id: "QRowg Signature", icon: "✦",  color: "#C9A84C" },
+  { id: "Minimal", label: "Minimal", icon: "◻️", color: "#A8A190" },
+  { id: "Business", label: "Entreprise", icon: "💼", color: "#3B82F6" },
+  { id: "Luxury", label: "Luxe", icon: "💎", color: "#C9A84C" },
+  { id: "Creator", label: "Créateur", icon: "🎨", color: "#EC4899" },
+  { id: "Startup", label: "Startup", icon: "🚀", color: "#8B5CF6" },
+  { id: "Restaurant", label: "Restaurant", icon: "🍽️", color: "#F97316" },
+  { id: "Immobilier", label: "Immobilier", icon: "🏠", color: "#10B981" },
+  { id: "Fitness", label: "Sport", icon: "💪", color: "#EF4444" },
+  { id: "Event", label: "Événement", icon: "🎉", color: "#F59E0B" },
+  { id: "Music", label: "Musique", icon: "🎵", color: "#1DB954" },
+  { id: "Portfolio", label: "Portfolio", icon: "📐", color: "#6366F1" },
+  { id: "QRowg Signature", label: "Signature QRowg", icon: "✦", color: "#C9A84C" },
 ] as const
 
 // ── 50+ Google Fonts ──────────────────────────────────────────────────────────
@@ -1455,9 +1456,9 @@ export const BLOCK_CATEGORIES = [
   { id: "commerce", label: "Commerce", icon: "🛍️", color: "#F97316", desc: "Vendre mes produits et services" },
   { id: "media", label: "Médias", icon: "🎬", color: "#A78BFA", desc: "Montrer mon travail" },
   { id: "info", label: "Infos", icon: "📋", color: "#38BDF8", desc: "Informer et rassurer" },
-  { id: "business", label: "Business", icon: "🏢", color: "#EC4899", desc: "Infos pratiques : adresse, horaires" },
+  { id: "business", label: "Entreprise", icon: "🏢", color: "#EC4899", desc: "Infos pratiques : adresse, horaires" },
   { id: "music", label: "Musique", icon: "🎵", color: "#1DB954", desc: "Partager ma musique" },
-  { id: "event", label: "Event", icon: "🎉", color: "#F472B6", desc: "Annoncer un événement" },
+  { id: "event", label: "Événement", icon: "🎉", color: "#F472B6", desc: "Annoncer un événement" },
   { id: "freeform", label: "Création libre", icon: "🎨", color: "#C9A84C", desc: "Composer ma page comme je veux" },
   { id: "layout", label: "Mise en page", icon: "📐", color: "#A8A190", desc: "Structurer ma page" },
 ]

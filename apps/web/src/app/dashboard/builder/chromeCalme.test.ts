@@ -71,7 +71,7 @@ describe("chrome de l'éditeur — scène et inspecteur", () => {
   it("l'inspecteur est sur --bg avec un filet, ses onglets soulignés et non des boutons or", () => {
     expect(v4).toContain('background: "var(--bg)", borderLeft: "1px solid var(--line)"')
     expect(v4).not.toContain('background: "#161616"')
-    const onglets = entre(v4, "{/* Onglets d'édition du bloc", "{/* CONTENU —")
+    const onglets = entre(v4, "{/* Onglets internes", "{/* CONTENU —")
     expect(onglets).toContain('role="tablist"')
     expect(onglets).not.toContain("linear-gradient")
   })

@@ -60,8 +60,9 @@ describe("aucune page publique ne pousse vers le formulaire d'inscription", () =
 })
 
 describe("les portes d'entrée mènent à l'essai", () => {
-  it("la barre du haut de l'accueil, et son menu mobile", () => {
-    const h = read("app/HomeClient.tsx")
+  it("la barre du haut de l'accueil (partagée avec Fonctionnalités), et son menu mobile", () => {
+    const h = read("components/EnTeteSite.tsx")
+    expect(read("app/HomeClient.tsx")).toContain("<EnTeteSite />")
     expect(h).toContain('<Link href="/creer" className="nct"')
     expect(h).toContain("Composer ma page\n            </Link>")
     expect(h).toContain('<Link href="/creer" onClick={()=>setMenuOpen(false)}')
