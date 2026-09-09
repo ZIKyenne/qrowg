@@ -30,7 +30,7 @@ import { ACTIVITY_CFG, ACTIVITY_FILTER_OPTS, DEFAULT_PREFS, PLAN_CFG, type PlanL
 
 // -- Constantes ---------------------------------------------------------------
 const G = "var(--accent)"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 const BG = "#080808"
 const SURF = "#111009"
 const SURF2 = "#0F0E0B"
@@ -833,7 +833,7 @@ export default function ProfilePage() {
 
             <div style={{ minWidth: 0, flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
-                <h1 style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(21px,3vw,30px)", color: "#F8F4EC", fontWeight: 700, margin: 0, lineHeight: 1.05, letterSpacing: "-0.3px" }}>
+                <h1 style={{ fontSize: 22, color: "var(--ink)", fontWeight: 600, margin: 0, lineHeight: 1.2, letterSpacing: "-.01em" }}>
                   Bonjour, {(form.full_name || "").trim().split(" ")[0] || profile?.email?.split("@")[0] || "vous"}
                 </h1>
                 <span style={{ position: "relative", overflow: "hidden", display: "inline-flex", alignItems: "center", gap: 5, background: currentPlan === "free" ? "rgba(255,255,255,0.06)" : `linear-gradient(135deg, ${pc}33, ${pc}1a)`, border: `1px solid ${pc}55`, borderRadius: 999, padding: "3px 10px" }}>

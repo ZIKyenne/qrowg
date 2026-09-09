@@ -20,7 +20,7 @@ import { BlockPreview, computeBgStyle } from "./TemplatePreviewModal"
 import { slugifyBase } from "@/lib/slug"
 import { useIsMobile } from "@/lib/useIsMobile"
 
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 const INK = "#F5F0E8"
 
 // Les informations PERSONNELLES arrivent vides, avec l'exemple du modèle en gris :

@@ -44,7 +44,7 @@ const PERIODS = [{ v: 7, l: "7j" }, { v: 30, l: "30j" }, { v: 90, l: "90j" }]
 const MODES   = [{ v: "table", l: "Tableau" }, { v: "map", l: "Carte" }]
 
 const G     = "var(--accent)"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 
 // ── Gradient de chaleur ───────────────────────────────────────────────────────
 function heatColor(ratio: number): string {

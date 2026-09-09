@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react"
 
 const G     = "var(--accent)"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 const SURF  = "#111009"
 const SURF2 = "#0F0E0B"
 

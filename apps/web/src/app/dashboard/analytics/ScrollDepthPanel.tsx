@@ -4,7 +4,7 @@ import { AlignLeft } from "lucide-react"
 import type { ScrollStep } from "./analyticsAgg"
 
 const GOLD = "var(--accent)"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 
 type Props = { funnel: ScrollStep[] }
 

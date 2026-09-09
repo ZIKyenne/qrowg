@@ -7,7 +7,7 @@ import { Flame } from "lucide-react"
 // Le rendu de la vraie page n'est pas reproduit ici : on montre l'intensité par zone (haut/milieu/bas × gauche/droite).
 
 const GOLD = "var(--accent)"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 
 type BRow = { id: string; type: string }
 type Props = {

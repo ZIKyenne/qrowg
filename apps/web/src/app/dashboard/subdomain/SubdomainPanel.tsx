@@ -15,7 +15,7 @@ interface Props {
 type AvailStatus = "idle" | "checking" | "available" | "taken" | "invalid" | "own"
 
 const G     = "var(--accent)"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 const APP   = "qrowg.com"
 
 // Suggestions basées sur le nom saisi

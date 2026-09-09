@@ -21,7 +21,7 @@ import { PLAN_RANK } from "@/lib/plans"
 
 const G = "var(--accent)"
 const INK = "#F5F0E8"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 const FAINT = "rgba(245,240,232,0.42)"
 const SHELL_BG = "#0B0A08"
 const SURF = "rgba(255,255,255,0.035)"

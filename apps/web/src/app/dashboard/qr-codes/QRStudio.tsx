@@ -32,7 +32,7 @@ import { diagnostiquer, lireContraste, correctionsAuto, contrasteWcag, type Scan
 import type QRCodeStyling from "qr-code-styling"
 
 const G     = "var(--accent)"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 const SURF  = "#0F0E0B"
 const BG    = "#080808"
 

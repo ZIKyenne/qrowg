@@ -5,7 +5,7 @@ import type { FunnelStep } from "./analyticsAgg"
 
 const GOLD = "var(--accent)"
 const NEON = "var(--success)"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 
 type Props = { steps: FunnelStep[]; conversionRate: number; hasEngagementData: boolean }
 

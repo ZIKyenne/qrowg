@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { PLAN_RANK, getPlan } from "@/lib/plans"
 import { slugifyBase } from "@/lib/slug"
+import { PageHeader } from "@/components/ui/PageHeader"
 import { Sparkles, ArrowRight, Check, X, Lock, Search, Heart, Eye, Clock, Layers, SlidersHorizontal,
   UtensilsCrossed, Martini, Coffee, Laptop, Target, User, Building2, Megaphone, Music, Camera, Home, Brush, PartyPopper, Rocket, ShoppingBag, Zap, Flame, Link2 as LinkIcon } from "lucide-react"
 import TemplatePreviewModal from "./TemplatePreviewModal"
@@ -373,29 +374,21 @@ export default function TemplatesPage() {
     <div style={{ minHeight: "100vh", background: "transparent", paddingBottom: 120, fontFamily: "DM Sans, sans-serif", position: "relative" }}>
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
-      <div style={{ padding: "26px 24px 0", textAlign: "center", maxWidth: 960, margin: "0 auto" }}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 20, padding: "5px 14px", marginBottom: 12 }}>
-          <Sparkles size={13} color={G} />
-          <span style={{ color: G, fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase" }}>Modèles</span>
-        </div>
-        <h1 style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(26px,3.4vw,36px)", color: "var(--ink)", margin: "0 0 8px", fontWeight: 700 }}>
-          {fromEntry ? "Vos modèles sont prêts" : "Choisissez votre secteur"}
-        </h1>
-        {/* On dit d'où l'on vient et pourquoi la liste est déjà réduite — sinon le
-            filtre appliqué d'office passerait pour un catalogue famélique. */}
-        {fromEntry ? (
-          <p style={{ color: MUTED, fontSize: 14.5, margin: "0 0 22px" }}>
-            Ceux de la {SECTEUR_LABEL[fromEntry] || "votre activité"} d'abord, puis les {TEMPLATES.length - 1} autres.{" "}
-            <button type="button" onClick={() => setFromEntry("")}
-              style={{ background: "none", border: "none", padding: 0, color: G, fontSize: 14.5, fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>
-              Ordre habituel
-            </button>
-          </p>
-        ) : (
-          <p style={{ color: MUTED, fontSize: 14.5, margin: "0 0 22px" }}>
-            {TEMPLATES.length} templates pré-configurés pour votre métier
-          </p>
-        )}
+      <div style={{ padding: "26px 24px 0", maxWidth: 1080, margin: "0 auto" }}>
+        <PageHeader
+          kicker="Construire"
+          title={fromEntry ? "Vos modèles sont prêts" : "Choisissez votre secteur"}
+          gap={18}
+          sub={fromEntry ? (
+            // On dit d'où l'on vient et pourquoi la liste est déjà réduite — sinon le
+            // filtre appliqué d'office passerait pour un catalogue famélique.
+            <>Ceux de la {SECTEUR_LABEL[fromEntry] || "votre activité"} d'abord, puis les {TEMPLATES.length - 1} autres.{" "}
+              <button type="button" onClick={() => setFromEntry("")}
+                style={{ background: "none", border: "none", padding: 0, color: G, fontSize: 13.5, fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>
+                Ordre habituel
+              </button></>
+          ) : <>{TEMPLATES.length} modèles pré-configurés pour votre métier</>}
+        />
 
         {/* Le lien apporté du générateur : annoncé, jamais glissé en douce. */}
         {entryLink && (
@@ -414,7 +407,7 @@ export default function TemplatesPage() {
         {!isMobile ? (
           <>
             {/* ── Navigation métier (desktop) ─────────────────────────────── */}
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", marginBottom: 20, scrollbarWidth: "none" as const }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20, scrollbarWidth: "none" as const }}>
               {secteurChipEls}
             </div>
             {/* ── Filtres Plan (desktop) ──────────────────────────────────── */}

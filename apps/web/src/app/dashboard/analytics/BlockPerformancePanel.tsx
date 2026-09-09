@@ -55,7 +55,7 @@ const PERIODS = [{ v: 7, l: "7j" }, { v: 30, l: "30j" }, { v: 90, l: "90j" }]
 const SORTS   = [{ v: "clicks", l: "Clics" }, { v: "ctr", l: "CTR" }, { v: "count", l: "Blocs" }]
 
 const G     = "var(--accent)"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 
 // ── Tooltip ───────────────────────────────────────────────────────────────────
 function Tip({ active, payload, label }: any) {

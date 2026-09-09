@@ -14,8 +14,8 @@ import { useFermetureModale } from "@/lib/useFermetureModale"
 import { Button } from "@/components/ui/Button"
 import type { InstantQr } from "./instantQr"
 
-const G = "#C9A84C"
-const MUTED = "#A8A190"
+const G = "var(--accent)"
+const MUTED = "var(--muted)"
 
 export default function ImportEnMasse({ ouvert, onFermer, onCrees }: {
   ouvert: boolean

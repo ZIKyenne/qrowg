@@ -1,5 +1,6 @@
 "use client"
 
+import { PageHeader } from "@/components/ui/PageHeader"
 import { useMemo, useState, useEffect } from "react"
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
@@ -50,7 +51,7 @@ interface Props {
 
 const GOLD = "var(--accent)"
 const NEON = "var(--success)"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 const COLORS = [GOLD, NEON, "#7B61FF", "var(--danger)", "#4ECDC4", "#FFE66D"]
 
 function formatAgo(iso: string) {
@@ -199,22 +200,18 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
       `}</style>
       {/* Header */}
       <div style={{ maxWidth: 1100, margin: "0 auto", position: "relative", zIndex: 1 }}>
-        <div className="az" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 16 }}>
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 5 }}>
-              <h1 style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(26px,3.6vw,36px)", lineHeight: 1, color: "var(--ink)", fontWeight: 700, margin: 0, letterSpacing: "-0.4px" }}>
-                Analytics
-              </h1>
-              {/* Badge EN DIRECT masque tant qu'aucune donnee (audit #04 : pas de "live" trompeur) */}
-              {!noData && (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(57,255,143,0.1)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 999, padding: "3px 10px" }}>
-                  <span style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--success)", animation: "mo-pulse 1.8s ease-in-out infinite" }} />
-                  <span style={{ color: "var(--success)", fontSize: 11, fontWeight: 800, letterSpacing: 0.5 }}>EN DIRECT</span>
-                </span>
-              )}
-            </div>
-            <p style={{ color: "var(--muted)", margin: 0, fontSize: 13.5 }}>30 derniers jours · {live.last ? `dernier événement ${formatAgo(live.last.t)}` : "en attente de données"}</p>
-          </div>
+        <PageHeader kicker="Mesurer" gap={14}
+          title={<span style={{ display: "inline-flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>Statistiques
+            {/* Badge EN DIRECT masqué tant qu'aucune donnée (audit #04 : pas de « live » trompeur) */}
+            {!noData && (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "color-mix(in srgb, var(--success) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--success) 30%, transparent)", borderRadius: 999, padding: "2px 9px", verticalAlign: "middle" }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--success)" }} />
+                <span style={{ color: "var(--success)", fontSize: 10.5, fontWeight: 700, letterSpacing: ".06em" }}>EN DIRECT</span>
+              </span>
+            )}
+          </span>}
+          sub={<>30 derniers jours · {live.last ? `dernier événement ${formatAgo(live.last.t)}` : "en attente de données"}</>}
+          actions={<>
           {/* Filtre page */}
           <select
             aria-label="Filtrer par page" value={selectedPage}
@@ -234,7 +231,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
                 style={{ padding: "7px 13px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 12.5, fontWeight: period === d ? 700 : 500, background: period === d ? "var(--accent)" : "transparent", color: period === d ? "#1a1408" : MUTED }}>{d}j</button>
             ))}
           </div>
-        </div>
+          </>} />
 
         {/* ── Onglets (handoff #1) : Vue d'ensemble · Contenu · Audience · Supports · Rapports ── */}
         {!noData && (

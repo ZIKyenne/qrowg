@@ -15,8 +15,8 @@ import { useFermetureModale } from "@/lib/useFermetureModale"
 import { useIsMobile } from "@/lib/useIsMobile"
 import { etatLien, dateLisible, type InstantQr, type StatsLien } from "./instantQr"
 
-const G = "#C9A84C"
-const MUTED = "#A8A190"
+const G = "var(--accent)"
+const MUTED = "var(--muted)"
 
 export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null; onFermer: () => void }) {
   const [details, setDetails] = useState<StatsLien | null>(null)

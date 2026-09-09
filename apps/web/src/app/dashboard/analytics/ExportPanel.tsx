@@ -44,7 +44,7 @@ type PeriodId = typeof PERIODS[number]["id"]
 const PAID_PLANS = ["pro", "business"]
 
 const G     = "var(--accent)"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 
 // ── CSV helpers ───────────────────────────────────────────────────────────────
 function escapeCell(v: unknown): string {

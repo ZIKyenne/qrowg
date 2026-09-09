@@ -1,5 +1,6 @@
 "use client"
 
+import { PageHeader } from "@/components/ui/PageHeader"
 import { useState, useEffect } from "react"
 import { useConfirm } from "@/components/ui/Confirm"
 import DnsChecker from "./DnsChecker"
@@ -42,7 +43,7 @@ const STATUS_CFG: Record<string, { label: string; color: string; icon: React.Rea
 }
 
 const G     = "var(--accent)"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 
 export default function DomainsPage({ pages, plan }: Props) {
   const toast = useToast()
@@ -170,18 +171,7 @@ export default function DomainsPage({ pages, plan }: Props) {
       <div style={{ maxWidth:800, margin:"0 auto" }}>
 
         {/* Header */}
-        <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:28, gap:16, flexWrap:"wrap" }}>
-          <div>
-            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:6 }}>
-              <Globe size={22} color={G}/>
-              <h1 style={{ fontSize:22, fontWeight:700, color:"var(--ink)", margin:0 }}>Domaines personnalisés</h1>
-            </div>
-            <p style={{ color:MUTED, fontSize:13, margin:0 }}>
-              Connectez votre propre domaine à vos pages QRowg
-            </p>
-          </div>
-
-        </div>
+        <PageHeader kicker="Espace" title="Domaines personnalisés" gap={28} sub="Connectez votre propre domaine à vos pages QRowg" />
 
         {!isPaid ? (
           /* Paywall */

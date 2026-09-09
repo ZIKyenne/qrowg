@@ -2579,7 +2579,7 @@ interface TemplatePreviewModalProps {
 }
 
 const PLAN_LABELS: Record<string, string> = { free: "Gratuit", starter: "Starter", pro: "Pro", business: "Business" }
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 const G = "var(--accent)"
 
 export default function TemplatePreviewModal({

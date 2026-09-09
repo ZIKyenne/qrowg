@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Users, Check, AlertTriangle, Loader2 } from "lucide-react"
 import { erreurLisible, MessageUtilisateur } from "@/lib/erreurLisible"
 
-const GOLD = "#C9A84C"
+const GOLD = "var(--accent)"
 
 export default function AcceptInvitePage() {
   const [status, setStatus] = useState<"loading" | "ok" | "error" | "auth">("loading")

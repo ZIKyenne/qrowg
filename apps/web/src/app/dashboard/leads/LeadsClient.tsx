@@ -1,5 +1,6 @@
 "use client"
 
+import { PageHeader } from "@/components/ui/PageHeader"
 import { useState, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Inbox, Mail, Phone, Trash2, Check, Search } from "lucide-react"
@@ -8,8 +9,8 @@ import { useToast } from "@/components/Toast"
 import { erreurLisible } from "@/lib/erreurLisible"
 
 const G = "var(--accent, #C9A84C)"
-const MUTED = "#A8A190"
-const TEXT = "#F5F0E8"
+const MUTED = "var(--muted)"
+const TEXT = "var(--ink)"
 
 type Lead = {
   id: string; page_id: string; block_id: string | null; type: string
@@ -108,20 +109,11 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
       {/* Particules dorées en fond (comme les autres pages du dashboard) */}
       <div className="rpad" style={{ padding: "28px 24px 60px", maxWidth: 900, margin: "0 auto", position: "relative", zIndex: 1 }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 6, flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 11, background: `color-mix(in srgb, ${G} 14%, transparent)`, border: `1px solid color-mix(in srgb, ${G} 30%, transparent)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Inbox size={20} color={G as string} />
-          </div>
-          <div>
-            <h1 style={{ color: TEXT, fontSize: 24, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif" }}>Messages</h1>
-            <p style={{ color: MUTED, fontSize: 13, margin: 0 }}>{leads.length} reçu{leads.length > 1 ? "s" : ""}{unreadCount > 0 ? ` · ${unreadCount} non lu${unreadCount > 1 ? "s" : ""}` : ""}</p>
-          </div>
-        </div>
-        {leads.length > 0 && (
-          <button onClick={exportCsv} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, padding: "9px 14px", color: TEXT, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>↓ Exporter CSV</button>
-        )}
-      </div>
+      <PageHeader kicker="Mesurer" title="Messages" gap={14}
+        sub={`${leads.length} reçu${leads.length > 1 ? "s" : ""}${unreadCount > 0 ? ` · ${unreadCount} non lu${unreadCount > 1 ? "s" : ""}` : ""}`}
+        actions={leads.length > 0 && (
+          <button onClick={exportCsv} className="da-btn-ghost da-btn-ghost--sm">↓ Exporter CSV</button>
+        )} />
 
       {setupNeeded && (
         <div style={{ marginTop: 20, padding: "18px 20px", background: "var(--warning-bg)", border: "1px solid var(--warning-border)", borderRadius: 14 }}>

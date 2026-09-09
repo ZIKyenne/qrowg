@@ -47,7 +47,7 @@ const BROWSER_COLORS: Record<string, string> = {
 const PERIODS = [{ v: 7, l: "7j" }, { v: 30, l: "30j" }, { v: 90, l: "90j" }]
 
 const G     = "var(--accent)"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 
 // Normalise OS/browser vers une clé propre
 function normalizeOs(raw: string | null): string {

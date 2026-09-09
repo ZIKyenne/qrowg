@@ -57,8 +57,8 @@ const SWATCHES  = ["var(--accent)", "var(--success)", "#818CF8", "var(--danger)"
 
 // ── Tokens gold DA ──────────────────────────────────────────────────────────
 const G       = "var(--accent)"
-const TEXT    = "#F5F0E8"
-const MUTED   = "#A8A190"
+const TEXT = "var(--ink)"
+const MUTED = "var(--muted)"
 const CARD    = "#141210"
 const PANEL   = "#100e0c"
 const FIELD   = "#1a1712"

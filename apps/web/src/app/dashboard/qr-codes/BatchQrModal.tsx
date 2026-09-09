@@ -27,7 +27,7 @@ interface Props {
   max?: number
 }
 
-const MUTED = "#8A8478"
+const MUTED = "var(--muted)"
 
 export function BatchQrModal({ open, onClose, genBlob, isPro, onUpsell, max = 500 }: Props) {
   const [text, setText] = useState("")

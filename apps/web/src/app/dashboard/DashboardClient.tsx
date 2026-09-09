@@ -1,5 +1,6 @@
 "use client"
 
+import { PageHeader } from "@/components/ui/PageHeader"
 import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
@@ -160,7 +161,7 @@ export default function DashboardClient({
   const G = "var(--accent)"; const MUTED = "#A8A190"
   // Tokens DA doré (identiques à la section Objectifs / Analytics) : surfaces plates,
   // plus de dégradés verts ni de barres de gradient.
-  const CARD = "#141210"; const PANEL = "#100e0c"; const BORDER = "#221f1b"; const HAIR = "rgba(255,255,255,0.06)"
+  const CARD = "var(--surface)"; const PANEL = "var(--surface)"; const BORDER = "var(--line)"; const HAIR = "var(--line)"
   const publishedCount = pages.filter(p => p.status === "published").length
   // Parcours guidé : tant qu'aucun scan, on montre la prochaine meilleure action
   const totalScans = profile?.total_scans || 0
@@ -244,7 +245,7 @@ export default function DashboardClient({
               { icon: <Trash2 size={17} color="var(--danger)" />, label: "Supprimer", danger: true, onClick: () => { setPageToDelete(menuPage); setMenuPage(null) } },
             ] as { icon: React.ReactNode; label: string; onClick: () => void; danger?: boolean }[]).map((a, i) => (
               <button key={i} onClick={a.onClick}
-                style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "13px 12px", background: "none", border: "none", borderTop: i ? "1px solid rgba(255,255,255,0.05)" : "none", color: a.danger ? "#EF4444" : "#F5F0E8", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
+                style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "13px 12px", background: "none", border: "none", borderTop: i ? "1px solid rgba(255,255,255,0.05)" : "none", color: a.danger ? "var(--danger)" : "var(--ink)", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
                 <span style={{ width: 24, display: "flex", justifyContent: "center", flexShrink: 0 }}>{a.icon}</span> {a.label}
               </button>
             ))}
@@ -254,27 +255,14 @@ export default function DashboardClient({
 
       <div style={{ maxWidth: 1080, margin: "0 auto", position: "relative", zIndex: 1 }}>
         {/* Header */}
-        <div className="dz" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 22, flexWrap: "wrap", gap: 14 }}>
-          <div>
-            <h1 style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(30px,4.5vw,44px)", lineHeight: 1.05, color: "var(--ink)", fontWeight: 700, margin: "0 0 8px", letterSpacing: "-0.5px" }}>
-              {greeting}{profile?.full_name ? ", " + profile.full_name.split(" ")[0] : ""} !
-            </h1>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: planCfg.color + "14", border: "1px solid " + planCfg.color + "33", borderRadius: 999, padding: "3px 11px" }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: planCfg.color, boxShadow: "0 0 7px " + planCfg.color, animation: "mo-pulse 2.4s ease-in-out infinite" }} />
-                <span style={{ color: planCfg.color, fontSize: 12, fontWeight: 700 }}>Plan {planCfg.label}</span>
-              </span>
-              <span style={{ color: MUTED, fontSize: 12.5 }}>
-                <span style={{ color: "var(--success)", fontWeight: 700 }}>{todayViews}</span> vue{todayViews > 1 ? "s" : ""} aujourd'hui
-              </span>
-            </div>
-          </div>
-          <span className="da-halo-wrap" style={{ flexShrink: 0 }}>
-            <Link href="/dashboard/onboarding" className="da-btn-primary">
-              <Plus className="da-ic da-ic-plus" size={17} strokeWidth={2.4} /> <span>Nouvelle page</span>
+        <PageHeader kicker="Votre espace"
+          title={<>{greeting}{profile?.full_name ? ", " + profile.full_name.split(" ")[0] : ""}</>}
+          sub={<><span style={{ color: planCfg.color, fontWeight: 600 }}>Plan {planCfg.label}</span> · <span style={{ color: "var(--ink)", fontWeight: 600 }}>{todayViews}</span> vue{todayViews > 1 ? "s" : ""} aujourd'hui</>}
+          actions={
+            <Link href="/dashboard/onboarding" className="da-btn-primary da-btn-primary--sm">
+              <Plus className="da-ic da-ic-plus" size={16} strokeWidth={2.4} /> <span>Nouvelle page</span>
             </Link>
-          </span>
-        </div>
+          } />
 
         {/* Soft-cap quota de vues : alerte (jamais de blocage des pages publiques) */}
         {(nearViews || overViews) && (
@@ -325,22 +313,20 @@ export default function DashboardClient({
           const doneN = steps.filter(s => s.done).length
           const current = steps.find(s => !s.done)
           return (
-            <div className="dz" style={{ animationDelay: "40ms", marginBottom: 20, padding: "20px 22px", borderRadius: 16, position: "relative", overflow: "hidden",
-              background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, #100F0A), #100F0A)",
-              border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", boxShadow: "0 10px 34px rgba(0,0,0,0.3)" }}>
-              <div style={{ position: "absolute", top: -30, right: -20, width: 150, height: 150, borderRadius: "50%", background: "radial-gradient(circle, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%)" }} />
+            <div className="dz" style={{ animationDelay: "40ms", marginBottom: 20, padding: "20px 22px", borderRadius: 14, position: "relative", overflow: "hidden",
+              background: CARD, border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 12 }}>
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
                     <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, background: "color-mix(in srgb, var(--accent) 18%, transparent)", color: G }}><Zap size={15} /></span>
                     <span style={{ color: G, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase" as const }}>Premiers pas</span>
                   </div>
-                  <h2 style={{ color: "#F8F4EC", fontSize: 21, fontWeight: 700, margin: 0, fontFamily: "Fraunces, serif", letterSpacing: "-0.3px" }}>Lancez votre QRowg en 3 étapes</h2>
+                  <h2 style={{ color: "var(--ink)", fontSize: 18, fontWeight: 600, margin: 0, letterSpacing: "-.01em" }}>Lancez votre QRowg en 3 étapes</h2>
                 </div>
                 <div style={{ textAlign: "right" as const, minWidth: 120 }}>
-                  <span style={{ color: "#F8F4EC", fontSize: 22, fontWeight: 700, fontFamily: "Fraunces, serif" }}>{doneN}<span style={{ color: MUTED, fontSize: 15 }}> / {steps.length}</span></span>
-                  <div style={{ height: 6, width: 120, borderRadius: 3, background: "rgba(255,255,255,0.08)", marginTop: 5, overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: `${(doneN / steps.length) * 100}%`, background: "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 3, transition: "width .5s ease" }} />
+                  <span style={{ color: "var(--ink)", fontSize: 20, fontWeight: 600 }}>{doneN}<span style={{ color: MUTED, fontSize: 14 }}> / {steps.length}</span></span>
+                  <div style={{ height: 4, width: 120, borderRadius: 3, background: "var(--surface-2)", marginTop: 5, overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${(doneN / steps.length) * 100}%`, background: "var(--accent)", borderRadius: 3, transition: "width .5s ease" }} />
                   </div>
                 </div>
               </div>
@@ -359,7 +345,7 @@ export default function DashboardClient({
                         {s.done ? <Check size={13} color="var(--success)" /> : <span style={{ color: isCurrent ? G : MUTED, fontSize: 11, fontWeight: 700 }}>{i + 1}</span>}
                       </span>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ color: s.done ? MUTED : "#F5F0E8", fontSize: 13.5, fontWeight: 600, margin: 0, textDecoration: s.done ? "line-through" : "none" }}>{s.label}</p>
+                        <p style={{ color: s.done ? MUTED : "var(--ink)", fontSize: 13.5, fontWeight: 600, margin: 0, textDecoration: s.done ? "line-through" : "none" }}>{s.label}</p>
                         {!s.done && <p style={{ color: MUTED, fontSize: 11.5, margin: "1px 0 0" }}>{s.desc}</p>}
                       </div>
                       {isCurrent && (
@@ -376,16 +362,16 @@ export default function DashboardClient({
         })()}
 
         {/* Cockpit : 1 métrique héro + stats secondaires (au lieu de 4 cartes concurrentes) */}
-        <div className="dz dz-card" style={{ animationDelay: "120ms", marginBottom: 20, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, padding: "18px 22px", position: "relative", overflow: "hidden" }}>
+        <div className="dz dz-card" style={{ animationDelay: "120ms", marginBottom: 20, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "18px 22px", position: "relative", overflow: "hidden" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap", position: "relative" }}>
 
             {/* HÉRO : scans totaux */}
             <div style={{ flex: "1 1 190px", minWidth: 150 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ color: "var(--success)", background: "color-mix(in srgb, var(--success) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--success) 26%, transparent)", borderRadius: 9, padding: 8, display: "flex" }}><QrCode size={18} /></span>
-                <span style={{ color: "#C9C3B6", fontSize: 12.5, fontWeight: 600 }}>Scans totaux</span>
+                <span style={{ color: "var(--accent)", background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 9, padding: 8, display: "flex" }}><QrCode size={18} /></span>
+                <span style={{ color: MUTED, fontSize: 12.5, fontWeight: 600 }}>Scans totaux</span>
               </div>
-              <p style={{ color: "#F8F4EC", fontSize: 44, fontWeight: 700, margin: "8px 0 0", fontFamily: "Fraunces, serif", lineHeight: 1 }}>{(profile?.total_scans || 0).toLocaleString("fr-FR")}</p>
+              <p style={{ color: "var(--ink)", fontSize: 40, fontWeight: 600, margin: "8px 0 0", lineHeight: 1, letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums" }}>{(profile?.total_scans || 0).toLocaleString("fr-FR")}</p>
               <p style={{ color: MUTED, fontSize: 11, margin: "2px 0 0" }}>tous temps</p>
             </div>
 
@@ -394,15 +380,15 @@ export default function DashboardClient({
             {/* SECONDAIRES : vues / pages / publiées */}
             <div style={{ display: "flex", gap: 24, flexWrap: "wrap", flex: "2 1 300px" }}>
               {[
-                { icon: <BarChart2 size={15} />, label: "Vues ce mois", value: monthViews.toLocaleString("fr-FR"), sub: viewsLimit ? `/ ${viewsLimit.toLocaleString("fr-FR")}` : "illimitées", color: overViews ? "var(--danger)" : "#7B61FF", spark: true },
+                { icon: <BarChart2 size={15} />, label: "Vues ce mois", value: monthViews.toLocaleString("fr-FR"), sub: viewsLimit ? `/ ${viewsLimit.toLocaleString("fr-FR")}` : "illimitées", color: overViews ? "var(--danger)" : "var(--accent)", spark: true },
                 { icon: <Eye size={15} />, label: "Pages créées", value: pages.length, sub: publishedCount + " publiée" + (publishedCount > 1 ? "s" : ""), color: G, spark: false },
-                { icon: <Globe size={15} />, label: "Publiées", value: publishedCount, sub: "sur " + pages.length, color: "var(--action)", spark: false, hideMobile: true },
+                { icon: <Globe size={15} />, label: "Publiées", value: publishedCount, sub: "sur " + pages.length, color: "var(--success)", spark: false, hideMobile: true },
               ].map((s, i) => (
                 <div key={i} className={(s as any).hideMobile ? "dash-stat-hide-mobile" : undefined} style={{ minWidth: 92 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <span style={{ color: s.color, display: "flex" }}>{s.icon}</span>
-                      <span style={{ color: "#C9C3B6", fontSize: 11.5, fontWeight: 500 }}>{s.label}</span>
+                      <span style={{ color: MUTED, fontSize: 11.5, fontWeight: 500 }}>{s.label}</span>
                     </div>
                     {s.spark && weekViews.length === 7 && (
                       <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 18 }}>
@@ -412,7 +398,7 @@ export default function DashboardClient({
                       </div>
                     )}
                   </div>
-                  <p style={{ color: "#F8F4EC", fontSize: 26, fontWeight: 700, margin: "6px 0 0", fontFamily: "Fraunces, serif", lineHeight: 1 }}>{s.value}</p>
+                  <p style={{ color: "var(--ink)", fontSize: 24, fontWeight: 600, margin: "6px 0 0", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{s.value}</p>
                   <p style={{ color: MUTED, fontSize: 10, margin: "2px 0 0", whiteSpace: "nowrap" }}>{s.sub}</p>
                 </div>
               ))}
@@ -427,9 +413,9 @@ export default function DashboardClient({
         <div className="dz dash-2col" style={{ animationDelay: "180ms", display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 14 }}>
 
           {/* Pages (PRINCIPAL) */}
-          <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, overflow: "hidden", position: "relative" }}>
-            <div style={{ padding: "16px 20px", borderBottom: `1px solid ${HAIR}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <p style={{ color: "#F8F4EC", fontSize: 15.5, fontWeight: 700, margin: 0, letterSpacing: "-0.2px" }}>Mes pages <span style={{ color: MUTED, fontWeight: 500 }}>({pages.length})</span></p>
+          <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, overflow: "hidden", position: "relative" }}>
+            <div style={{ padding: "14px 18px", borderBottom: `1px solid ${HAIR}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 600, margin: 0, letterSpacing: "-.01em" }}>Mes pages <span style={{ color: MUTED, fontWeight: 500 }}>({pages.length})</span></p>
               <Link href="/dashboard/templates" className="da-btn-ghost">
                 <Plus className="da-ic da-ic-plus" size={15} strokeWidth={2.4} /> Nouvelle
               </Link>
@@ -453,7 +439,7 @@ export default function DashboardClient({
                   <div key={page.id} className="dz-row" style={{ display: "flex", alignItems: "center", gap: 11, padding: "10px 14px", borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none" }}>
 
                     {/* Miniature (degrade + initiale ; anneau vert = en ligne) */}
-                    <div style={{ width: isMobile ? 42 : 38, height: isMobile ? 42 : 38, flexShrink: 0, borderRadius: 10, background: `linear-gradient(135deg, hsl(${hue} 52% 44%), hsl(${(hue + 42) % 360} 52% 26%))`, border: `1.5px solid ${pub ? "var(--success)" : "rgba(255,255,255,0.14)"}`, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 17, fontFamily: "Fraunces, serif" }}>
+                    <div style={{ width: isMobile ? 42 : 38, height: isMobile ? 42 : 38, flexShrink: 0, borderRadius: 10, background: `hsl(${hue} 30% 22%)`, border: `1.5px solid ${pub ? "var(--success)" : "var(--line-strong)"}`, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--ink)", fontWeight: 700, fontSize: 16 }}>
                       {(page.title || page.slug || "?").trim()[0]?.toUpperCase() || "?"}
                     </div>
 

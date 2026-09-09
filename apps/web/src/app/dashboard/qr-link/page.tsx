@@ -11,6 +11,7 @@
 // alors qu'elle fabrique surtout des QR ordinaires, et que la page voisine
 // s'annonçait aussi comme celle qui « crée des QR codes ». Elle porte maintenant
 // le nom de ce qu'elle fait.
+import { PageHeader } from "@/components/ui/PageHeader"
 import { useCallback, useMemo, useRef, useState, useEffect } from "react"
 import Link from "next/link"
 import { ArrowLeft, Download, Check, QrCode as QrIcon, ShieldCheck, AlertTriangle, Upload, X, Link2, Wifi, Type, Contact, Phone, Mail, Save, Trash2, ChevronDown, Zap, BarChart3, Clock, Calendar, TrendingUp, Activity, Pencil, Lock, Pause, Play } from "lucide-react"
@@ -33,8 +34,8 @@ import { etatLien, styleSur, type InstantQr, type StatsLien } from "./instantQr"
 import { Button } from "@/components/ui/Button"
 import { useSessionShell } from "../sessionShell"
 
-const G = "#C9A84C"
-const MUTED = "#A8A190"
+const G = "var(--accent)"
+const MUTED = "var(--muted)"
 
 // Styles, pastilles, noms de couleurs et niveaux de correction viennent tous de
 // @/lib/stylesQr : cet écran et le générateur public fabriquent le même objet et
@@ -423,20 +424,8 @@ export default function QrLinkPage() {
   return (
     <div className="rpad" style={{ position: "relative", minHeight: "100dvh", maxWidth: 1000, margin: "0 auto", padding: "18px 18px calc(40px + env(safe-area-inset-bottom))" }}>
       <PostCheckoutBanner param="upgraded" message="Paiement confirmé — votre nouveau plan est actif. 🎉" />
-      {/* 16 px de haut mesurés : c'est le chemin de retour de la page. */}
-      <Link href="/dashboard" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: MUTED, textDecoration: "none", fontSize: 13, marginBottom: 16, minHeight: 44, padding: "0 6px", marginLeft: -6 }}>
-        <ArrowLeft size={16} /> Retour
-      </Link>
-
-      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
-        <div style={{ width: 50, height: 50, borderRadius: 14, flexShrink: 0, background: "linear-gradient(145deg,rgba(201,168,76,0.24),rgba(201,168,76,0.06))", border: "1px solid rgba(201,168,76,0.32)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <QrIcon size={24} color={G} />
-        </div>
-        <div>
-          <h1 style={{ color: "var(--ink)", fontSize: 24, fontWeight: 800, margin: 0, letterSpacing: -0.4 }}>Créer un QR code</h1>
-          <p style={{ color: MUTED, fontSize: 13, margin: "2px 0 0", lineHeight: 1.4 }}>Vers un lien, votre Wi-Fi, un contact, un numéro. Modifiable après impression si vous voulez.</p>
-        </div>
-      </div>
+      <PageHeader back={{ href: "/dashboard" }} kicker="Mes QR codes" title="Créer un QR code" gap={18}
+        sub="Vers un lien, votre Wi-Fi, un contact, un numéro. Modifiable après impression si vous voulez." />
 
 
       {/* Mise en page : saisie (gauche) · panneau résultat collant (droite) sur desktop. */}

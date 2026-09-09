@@ -36,7 +36,7 @@ const PLAN_LIMITS: Record<string, { max: number; label: string }> = {
 }
 
 const G     = "var(--accent)"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 
 function StatusBadge({ status, verified }: { status: string; verified: boolean }) {
   if (!verified) return (

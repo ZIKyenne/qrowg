@@ -15,11 +15,18 @@ function niveaux(src: string): number[] {
 const PAGES = ["examples/page.tsx", "dashboard/templates/page.tsx", "HomeClient.tsx", "features/page.tsx", "contact/page.tsx", "upgrade/page.tsx", "privacy/page.tsx", "terms/page.tsx", "security/page.tsx"]
 
 describe("hiérarchie des titres", () => {
+  it("PageHeader porte exactement un h1", () => {
+    // le commentaire d'en-tête dessine aussi un <h1> : on ne lit que le JSX
+    const src = readFileSync(join(__dirname, "../components/ui/PageHeader.tsx"), "utf8")
+    expect(niveaux(src.slice(src.indexOf("export function PageHeader")))).toEqual([1])
+  })
+
   for (const p of PAGES) {
     it(`${p} : un seul h1, jamais de niveau sauté`, () => {
       const src = lire(p)
-      // Les pages légales reçoivent leur h1 de LegalLayout.
-      const n = src.includes("<LegalLayout") ? [1, ...niveaux(src)] : niveaux(src)
+      // Les pages légales reçoivent leur h1 de LegalLayout ; les écrans du
+      // tableau de bord, de PageHeader (un seul h1 dedans, cf. components/ui).
+      const n = src.includes("<LegalLayout") || src.includes("<PageHeader") ? [1, ...niveaux(src)] : niveaux(src)
       expect(n.filter(x => x === 1).length, "h1").toBe(1)
       let max = 1
       for (const x of n) {

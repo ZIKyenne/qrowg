@@ -5,6 +5,7 @@ import QRStudioSwitch from "./QRStudioSwitch"
 import { accessibleOwnerIds } from "@/lib/team"
 import { pageLimit } from "@/lib/plans"
 import { Plus, Link2 } from "lucide-react"
+import { PageHeader } from "@/components/ui/PageHeader"
 
 export const metadata: Metadata = { title: "QR de mes pages - QRowg" }
 
@@ -44,121 +45,55 @@ export default async function QRCodesPage() {
 
       {/* ===== Header ===== */}
       <style>{`
-        .qrh-inner { max-width:1320px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:66px; }
-        .qrh-actions { display:flex; align-items:center; gap:14px; }
-        .qrh-cta-group { display:flex; align-items:center; gap:14px; }
+        .qrh-content { max-width:1320px; margin:0 auto; padding:20px 24px 40px; }
+        .qrh-kpis { display:flex; align-items:center; gap:10px; }
+        .qrh-cta-group { display:flex; align-items:center; gap:10px; }
         @media (max-width:860px) {
-          /* En-tete NON sticky sur mobile : il defile au lieu d'occuper l'ecran en
-             permanence -> la personnalisation commence plus haut et le bas des
-             reglages devient atteignable au scroll (fix scroll bloque). */
-          .qrh-bar { padding:12px 16px !important; position: static !important; }
-          .qrh-inner { flex-direction:column; align-items:stretch; height:auto; gap:12px; }
-          .qrh-actions { flex-direction:column; align-items:stretch; gap:10px; width:100%; }
-          /* KPIs (QR actifs / scans total) masques sur mobile : peu d'info pour la
+          .qrh-content { padding:16px 16px 130px !important; }
+          /* KPIs (QR actifs / scans total) masqués sur mobile : peu d'info pour la
              place prise ; les scans restent consultables dans l'onglet Stats. */
           .qrh-kpis { display:none !important; }
           /* « Créer un QR » + Nouvelle page + QR masqués sur mobile : déjà accessibles via le « + » de la barre du bas. */
           .qrh-cta-group { display:none !important; }
-          .qrh-content { padding:16px 16px 130px !important; }
         }
       `}</style>
-      <div className="qrh-bar" style={{ borderBottom: "1px solid rgba(201,168,76,0.1)", background: "rgba(15,14,11,0.85)", backdropFilter: "blur(14px)", position: "sticky", top: 0, zIndex: 50, padding: "0 24px" }}>
-        <div className="qrh-inner">
 
-          {/* Identite */}
-          <div style={{ display: "flex", alignItems: "center", gap: 13 }}>
-            {/* Marque QR (DA §10) : glyphe unique (3 repères + matrice de données), tuile dorée animée
-                (halo qui respire + voile lumineux toutes les 5 s + un module qui s'allume). */}
-            <span style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center", width: 44, height: 44, flex: "none" }}>
-              <span aria-hidden="true" className="om-halo" style={{ position: "absolute", inset: -5, borderRadius: 16, background: "radial-gradient(60% 60% at 50% 50%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 70%)", filter: "blur(5px)" }} />
-              <span style={{ position: "relative", display: "inline-block", overflow: "hidden", width: 44, height: 44, borderRadius: 12, background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 18%, transparent), color-mix(in srgb, var(--accent) 5%, transparent))", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)" }}>
-                <span aria-hidden="true" className="om-sweep" style={{ position: "absolute", top: "-20%", bottom: "-20%", left: 0, width: "26%", background: "linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.5), rgba(255,255,255,0))" }} />
-                {/* 3 repères (anneau + module plein centré) */}
-                <span style={{ position: "absolute", left: 11, top: 11, display: "inline-flex", alignItems: "center", justifyContent: "center", width: 8, height: 8, border: "1.5px solid var(--accent)", borderRadius: 2 }}><span style={{ width: 3, height: 3, background: "var(--accent)", borderRadius: 0.5 }} /></span>
-                <span style={{ position: "absolute", right: 11, top: 11, display: "inline-flex", alignItems: "center", justifyContent: "center", width: 8, height: 8, border: "1.5px solid var(--accent)", borderRadius: 2 }}><span style={{ width: 3, height: 3, background: "var(--accent)", borderRadius: 0.5 }} /></span>
-                <span style={{ position: "absolute", left: 11, bottom: 11, display: "inline-flex", alignItems: "center", justifyContent: "center", width: 8, height: 8, border: "1.5px solid var(--accent)", borderRadius: 2 }}><span style={{ width: 3, height: 3, background: "var(--accent)", borderRadius: 0.5 }} /></span>
-                {/* Matrice de données 2×2 (bas-droite) — un module à .55, un qui clignote */}
-                <span style={{ position: "absolute", right: 16, bottom: 16, width: 3.5, height: 3.5, background: "color-mix(in srgb, var(--accent) 55%, transparent)", borderRadius: 0.5 }} />
-                <span style={{ position: "absolute", right: 11, bottom: 16, width: 3.5, height: 3.5, background: "var(--accent)", borderRadius: 0.5 }} />
-                <span style={{ position: "absolute", right: 16, bottom: 11, width: 3.5, height: 3.5, background: "var(--accent)", borderRadius: 0.5 }} />
-                <span aria-hidden="true" className="om-blink" style={{ position: "absolute", right: 11, bottom: 11, width: 3.5, height: 3.5, background: "var(--accent)", borderRadius: 0.5 }} />
-              </span>
-            </span>
-            <div>
-              <h1 style={{ fontFamily: "Fraunces, serif", fontSize: 22, color: "var(--ink)", fontWeight: 700, margin: 0, lineHeight: 1.15 }}>
-                QR de mes pages
-              </h1>
-              <p style={{ color: "var(--muted)", fontSize: 11, margin: 0 }}>
-                Le QR code de chacune de vos pages QRowg — personnalisez-le et exportez-le
-              </p>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="qrh-actions">
-            {/* Compteurs d'en-tête — indicateurs animés dorés (handoff « Compteurs d'en-tête »). */}
-            <div className="qrh-kpis" style={{ display: "flex", alignItems: "center", gap: 12 }}>
-
-              {/* QR ACTIFS — pastille d'état vivante + barre de quota (valeur réelle) */}
+      {/* ===== Studio ===== */}
+      <div className="qrh-content">
+        <PageHeader kicker="Mes QR codes" title="QR de mes pages" gap={18}
+          sub="Le QR code de chacune de vos pages QRowg — personnalisez-le et exportez-le"
+          actions={<>
+            {/* Compteurs d'en-tête : valeurs réelles, sans animation. */}
+            <div className="qrh-kpis">
               <div className="kpi-chip" aria-label={activeLimit != null ? `${activeQR} QR actifs sur ${activeLimit}` : `${activeQR} QR actifs`}>
-                <span aria-hidden="true" style={{ position: "relative", display: "inline-flex", width: 11, height: 11, flex: "none" }}>
-                  <span className="kpi-dotring" style={{ position: "absolute", inset: 0, borderRadius: "50%", border: `1.5px solid ${dotColor}` }} />
-                  <span className="kpi-dotcore" style={{ position: "absolute", inset: 1, borderRadius: "50%", background: dotColor, boxShadow: `0 0 12px ${dotColor}b3` }} />
-                </span>
+                <span aria-hidden="true" style={{ width: 8, height: 8, borderRadius: "50%", background: dotColor, flex: "none" }} />
                 <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                  <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-.01em", color: "var(--gold-light)", lineHeight: 1 }}>{activeQR}{activeLimit != null && <span style={{ color: "#6b6258", fontWeight: 500 }}> / {activeLimit}</span>}</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-.01em", color: "var(--ink)", lineHeight: 1 }}>{activeQR}{activeLimit != null && <span style={{ color: "var(--faint)", fontWeight: 500 }}> / {activeLimit}</span>}</div>
                   <div style={{ fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 600 }}>QR actifs</div>
                 </div>
                 {activeLimit != null && (
                   <div aria-hidden="true" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 2, background: "var(--surface-2)" }}>
-                    <div style={{ position: "relative", overflow: "hidden", height: "100%", width: `${quotaPct}%`, background: "linear-gradient(90deg,var(--accent),var(--gold-light))", transition: "width .6s cubic-bezier(.2,.8,.2,1)" }}>
-                      <div className="kpi-barshine" style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: "40%", background: "linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.85), rgba(255,255,255,0))" }} />
-                    </div>
+                    <div style={{ height: "100%", width: `${quotaPct}%`, background: "var(--accent)", transition: "width .6s cubic-bezier(.2,.8,.2,1)" }} />
                   </div>
                 )}
               </div>
-
-              {/* SCANS TOTAL — icône mini-QR scanné (faisceau + onde) */}
               <div className="kpi-chip" aria-label={`${totalScans} scans au total`}>
-                <span aria-hidden="true" style={{ position: "relative", display: "inline-flex", width: 20, height: 20, flex: "none" }}>
-                  <span style={{ position: "absolute", inset: 0, borderRadius: 6, border: "1.5px solid rgba(232,200,119,.55)" }} />
-                  <span className="kpi-scanring" style={{ position: "absolute", inset: 0, borderRadius: 6, border: "1.5px solid rgba(232,200,119,.5)" }} />
-                  <span style={{ position: "absolute", left: 4, top: 4, width: 4, height: 4, borderRadius: 1, background: "rgba(232,200,119,.75)" }} />
-                  <span style={{ position: "absolute", right: 4, top: 4, width: 4, height: 4, borderRadius: 1, background: "rgba(232,200,119,.75)" }} />
-                  <span style={{ position: "absolute", left: 4, bottom: 4, width: 4, height: 4, borderRadius: 1, background: "rgba(232,200,119,.75)" }} />
-                  <span className="kpi-scanline" style={{ position: "absolute", left: 2, right: 2, top: 3, height: 1.5, borderRadius: 2, background: "linear-gradient(90deg, rgba(232,200,119,0), #f0d590, rgba(232,200,119,0))", boxShadow: "0 0 8px rgba(232,200,119,.8)" }} />
-                </span>
                 <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                  <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-.01em", color: "var(--gold-light)", lineHeight: 1 }}>{totalScans.toLocaleString("fr-FR")}</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-.01em", color: "var(--ink)", lineHeight: 1 }}>{totalScans.toLocaleString("fr-FR")}</div>
                   <div style={{ fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 600 }}>Scans total</div>
                 </div>
               </div>
             </div>
-
             {/* « Créer un QR » + Nouvelle page + QR — masqués sur mobile (redondants avec le « + » de la barre du bas). */}
             <div className="qrh-cta-group">
-              {/* « Créer un QR » — secondaire or contour (handoff « Boutons d'en-tête »). */}
-              <a href="/dashboard/qr-link" className="qb-hsec">
-                <span className="qb-ico" aria-hidden="true" style={{ display: "inline-flex" }}><Link2 size={15}/></span> Créer un QR
+              <a href="/dashboard/qr-link" className="da-btn-ghost da-btn-ghost--sm">
+                <Link2 size={15} aria-hidden="true" /> Créer un QR
               </a>
-
-              {/* Nouvelle page + QR — primaire or (halo respirant + reflet au survol). */}
-              <span style={{ position: "relative", display: "inline-flex" }}>
-                <span aria-hidden="true" className="qb-halo" />
-                <a href="/dashboard/templates" className="qb-hpri">
-                  <span aria-hidden="true" className="qb-gloss" />
-                  <span aria-hidden="true" className="qb-sheen" />
-                  <span className="qb-ico" aria-hidden="true" style={{ display: "inline-flex" }}><Plus size={16}/></span>
-                  <span style={{ position: "relative", zIndex: 1 }}>Nouvelle page + QR</span>
-                </a>
-              </span>
+              <a href="/dashboard/templates" className="da-btn-primary da-btn-primary--sm">
+                <Plus size={16} aria-hidden="true" /> <span>Nouvelle page + QR</span>
+              </a>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ===== Studio ===== */}
-      <div className="qrh-content" style={{ maxWidth: 1320, margin: "0 auto", padding: "20px 24px 40px" }}>
+          </>} />
         <QRStudioSwitch
           qrCodes={(qrCodes ?? []) as any}
           userPlan={userPlan}

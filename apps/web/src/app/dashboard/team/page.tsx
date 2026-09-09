@@ -1,5 +1,6 @@
 "use client"
 
+import { PageHeader } from "@/components/ui/PageHeader"
 import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import { Users, Mail, Trash2, ShieldCheck, Pencil, Crown, Loader2, LogOut, Sparkles, ArrowRight } from "lucide-react"
@@ -23,7 +24,7 @@ type TeamData = {
   seatsUsed: number
 }
 
-const GOLD = "#C9A84C"
+const GOLD = "var(--accent)"
 const ROLE_LABEL: Record<Role, string> = { owner: "Propriétaire", admin: "Admin", editor: "Éditeur", viewer: "Lecture" }
 
 function RoleBadge({ role }: { role: Role }) {
@@ -124,13 +125,8 @@ export default function TeamPage() {
 
   return (
     <div style={{ maxWidth: 760, margin: "0 auto", padding: "clamp(20px,4vw,40px) clamp(16px,4vw,28px)", fontFamily: "DM Sans, sans-serif" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
-        <Users size={22} color={GOLD} />
-        <h1 style={{ fontFamily: "Fraunces, serif", fontSize: 28, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Équipe</h1>
-      </div>
-      <p style={{ color: "var(--muted)", fontSize: 14.5, margin: "0 0 28px" }}>
-        Invitez des collaborateurs à gérer vos pages et QR codes. <strong style={{ color: "#B8B2A4" }}>Éditeur</strong> : modifie ; <strong style={{ color: "#B8B2A4" }}>Admin</strong> : gère aussi les membres.
-      </p>
+      <PageHeader kicker="Espace" title="Équipe" gap={28}
+        sub={<>Invitez des collaborateurs à gérer vos pages et QR codes. <strong style={{ color: "var(--ink)" }}>Éditeur</strong> : modifie ; <strong style={{ color: "var(--ink)" }}>Admin</strong> : gère aussi les membres.</>} />
 
       {loading ? (
         <div style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--muted)", padding: 40, justifyContent: "center" }}>

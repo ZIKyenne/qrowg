@@ -8,7 +8,7 @@
 import { useState, useRef, type ReactNode } from "react"
 import { ChevronRight } from "lucide-react"
 
-const G = "#C9A84C"
+const G = "var(--accent)"
 const MUTED = "rgba(245,240,232,0.55)"
 
 export const GLYPH_COULEURS = (

@@ -14,7 +14,7 @@ type ScanRow = { qr_code_id?: string | null }
 type SrcRow = { qr_source?: string | null }
 
 const GOLD = "var(--accent)"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 const DIM = "#6E685E"
 const pct = (r: number | null) => (r === null ? "—" : `${Math.round(r * 100)}%`)
 

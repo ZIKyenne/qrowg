@@ -1,13 +1,14 @@
 "use client"
 
+import { PageHeader } from "@/components/ui/PageHeader"
 import { useEffect, useState } from "react"
 import { Images, FileText, Upload, Trash2, Link2, Check, ExternalLink, MoreHorizontal, Search, X } from "lucide-react"
 import { useImageUpload } from "../builder/useImageUpload"
 import { messageEnvoi } from "../builder/validationEnvoi"
 import { useConfirm } from "@/components/ui/Confirm"
 
-const G = "#C9A84C"
-const MUTED = "#A8A190"
+const G = "var(--accent)"
+const MUTED = "var(--muted)"
 
 type Asset = { name: string; url: string }
 
@@ -99,14 +100,9 @@ export default function AssetsPage() {
           <p style={{ color: G, fontSize: 15, fontWeight: 700, margin: 0 }}>Déposez vos fichiers pour les importer</p>
         </div>
       )}
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 14, flexWrap: "wrap", marginBottom: 20 }}>
-        <div style={{ flex: 1, minWidth: 220 }}>
-          <h1 style={{ color: "var(--ink)", fontSize: 24, fontWeight: 700, margin: "0 0 4px", display: "flex", alignItems: "center", gap: 10 }}>
-            <Images size={22} color={G} /> Médias
-          </h1>
-          <p style={{ color: MUTED, fontSize: 13, margin: 0 }}>Toutes vos images et fichiers, réutilisables sur toutes vos pages. {total > 0 ? `${total} média${total > 1 ? "s" : ""}.` : ""}</p>
-        </div>
-        <div style={{ position: "relative" }}>
+      <PageHeader kicker="Construire" title="Médias" gap={20}
+        sub={<>Toutes vos images et fichiers, réutilisables sur toutes vos pages. {total > 0 ? `${total} média${total > 1 ? "s" : ""}.` : ""}</>}
+        actions={<div style={{ position: "relative" }}>
           <div className="dam-halo" aria-hidden />
           <label className="dam-primary" aria-disabled={uploading || busy} style={{ pointerEvents: uploading || busy ? "none" : "auto" }}>
             <span className="dam-gloss" aria-hidden />
@@ -118,8 +114,7 @@ export default function AssetsPage() {
               disabled={uploading || busy}
               onChange={e => { onUploadFiles(Array.from(e.target.files || [])); e.target.value = "" }} />
           </label>
-        </div>
-      </div>
+        </div>} />
 
       {importErreurs.length > 0 && (
         <div role="alert" style={{ marginBottom: 16, padding: "10px 14px", borderRadius: 12, background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.28)", display: "flex", gap: 10, alignItems: "flex-start" }}>

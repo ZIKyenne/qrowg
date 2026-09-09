@@ -1,5 +1,6 @@
 "use client"
 
+import { PageHeader } from "@/components/ui/PageHeader"
 import { useState, useEffect } from "react"
 import { useConfirm } from "@/components/ui/Confirm"
 import { Button } from "@/components/ui/Button"
@@ -28,7 +29,7 @@ interface Props {
 }
 
 const G     = "var(--accent)"
-const MUTED = "#A8A190"
+const MUTED = "var(--muted)"
 
 // 301/302 ne se distinguent plus par du vert/bleu mais par l'OR de sélection (301) vs neutre (302).
 const TYPE_CFG = {
@@ -160,21 +161,13 @@ export default function RedirectsPanel({ userDomains }: Props) {
       <div style={{ maxWidth:860, margin:"0 auto" }}>
 
         {/* Header */}
-        <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:28, gap:16, flexWrap:"wrap" }}>
-          <div>
-            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:6 }}>
-              <ArrowRight size={22} color={G}/>
-              <h1 style={{ fontSize:22, fontWeight:700, color:"var(--ink)", margin:0 }}>Redirections</h1>
-            </div>
-            <p style={{ color:MUTED, fontSize:13, margin:0 }}>
-              Redirigez des domaines ou chemins vers de nouvelles destinations
-            </p>
-          </div>
-          {/* Add dupliqué : secondaire tant que l'état vide (avec son primaire) est affiché. */}
-          <button type="button" onClick={() => setShowForm(true)} className={redirects.length === 0 ? "da-btn-ghost da-btn-ghost--sm" : "da-btn-primary da-btn-primary--sm"}>
-            <Plus className="da-ic da-ic-plus" size={15}/> Ajouter une redirection
-          </button>
-        </div>
+        <PageHeader kicker="Espace" title="Redirections" gap={28} sub="Redirigez des domaines ou chemins vers de nouvelles destinations"
+          actions={
+            /* Add dupliqué : secondaire tant que l'état vide (avec son primaire) est affiché. */
+            <button type="button" onClick={() => setShowForm(true)} className={redirects.length === 0 ? "da-btn-ghost da-btn-ghost--sm" : "da-btn-primary da-btn-primary--sm"}>
+              <Plus className="da-ic da-ic-plus" size={15}/> Ajouter une redirection
+            </button>
+          } />
 
         {/* KPIs */}
         {redirects.length > 0 && (

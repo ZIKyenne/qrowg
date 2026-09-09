@@ -1,5 +1,6 @@
 "use client"
 
+import { PageHeader } from "@/components/ui/PageHeader"
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Save, Check, AlertTriangle, Eye, EyeOff, Bell, Shield, Trash2, LogOut, Key, Globe, Palette, Moon, CreditCard, ArrowRight, Loader2, Download, DatabaseBackup } from "lucide-react"
@@ -226,10 +227,7 @@ export default function SettingsPage() {
       {/* Particules dorées en fond (comble le vide, comme la landing) */}
 
       <div style={{ maxWidth: 680, margin: "0 auto", position: "relative", zIndex: 1 }}>
-        <div style={{ marginBottom: 28 }}>
-          <h1 style={{ fontFamily: "Fraunces, serif", fontSize: 32, color: "var(--ink)", fontWeight: 700, margin: 0 }}>Paramètres</h1>
-          <p style={{ color: MUTED, fontSize: 14, margin: "4px 0 0" }}>Gérez votre compte et vos préférences</p>
-        </div>
+        <PageHeader kicker="Espace" title="Paramètres" gap={28} sub="Gérez votre compte et vos préférences" />
 
         {/* Compte */}
         <Section title="Informations du compte" subtitle="Email et identifiant" icon={<Shield size={16} />}>

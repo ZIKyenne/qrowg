@@ -139,8 +139,8 @@ describe("chaque page a un nom, et un seul", () => {
 
   it("la page ne se présente plus sous le nom de l'abonnement qu'elle vendait", () => {
     const page = lire("./qr-link/page.tsx")
-    expect(page).toContain(">Créer un QR code</h1>")
-    expect(page).not.toMatch(/>QR Dynamique<\/h1>/)
+    expect(page).toContain('title="Créer un QR code"')
+    expect(page).not.toMatch(/title="QR Dynamique"/)
   })
 
   it("la nav mobile emploie les mêmes mots que la barre latérale", () => {
