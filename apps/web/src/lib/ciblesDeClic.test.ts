@@ -42,7 +42,7 @@ describe("barre du haut de l'éditeur", () => {
   })
 
   it("le nom de la page se vise, et « Modèles » et « Focus » aussi", () => {
-    expect(src).toContain('{ width: 180, minHeight: 32, padding: "0 6px", borderRadius: 6 }')
+    expect(src).toContain('{ width: 200, minHeight: 32, padding: "0 6px", borderRadius: 6 }')
     expect(src).toContain('minHeight: isMobile ? 40 : 32')   // Modèles
     expect(src).toContain('padding: "0 12px", minHeight: 32')  // Focus
   })

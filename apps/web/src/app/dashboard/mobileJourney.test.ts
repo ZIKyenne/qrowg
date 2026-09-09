@@ -47,8 +47,9 @@ describe("modale de création sur téléphone", () => {
 
 describe("barre du haut de l'éditeur sur téléphone", () => {
   it("le logo cède la place à une simple flèche", () => {
-    // « ← QRowg » passait à la ligne et recouvrait la flèche de retour.
-    expect(BUILDER).toContain('{isMobile ? "←" : "← QRowg"}')
+    // « ← QRowg » passait à la ligne et recouvrait la flèche de retour : sur
+    // téléphone il ne reste que la flèche, le mot QROWG n'apparaît que sur PC.
+    expect(BUILDER).toContain('<ArrowLeft size={16} aria-hidden="true" />{!isMobile && <span')
     // Le libellé dépend de la destination : un invité retourne aux modèles (P1-2).
     expect(BUILDER).toContain('aria-label={guest ? "Retour aux modèles" : "Retour au tableau de bord"}')
   })

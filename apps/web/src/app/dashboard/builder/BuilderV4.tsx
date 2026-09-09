@@ -7,7 +7,7 @@
     X, ChevronUp, ChevronDown, Trash2,
     Eye, Plus, Settings, Check, Search, Copy, EyeOff,
     ExternalLink, GripVertical, QrCode, MoreHorizontal, Undo2, Redo2, Sparkles,
-    Pencil, Palette, Lightbulb, Globe, Send, Smartphone, RefreshCw, Lock, Unlock, Square, Layers
+    Pencil, Palette, Lightbulb, Globe, Send, Smartphone, RefreshCw, Lock, Unlock, Square, Layers, ArrowLeft, LayoutTemplate, Maximize2
   } from "lucide-react"
   import { BLOCK_CATEGORIES, PRESET_CATEGORIES, SOCIAL_NETWORKS, SOCIAL_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, announcementMeta, optionLabel, blockDecoration, BLOCK_GRADIENTS, BLOCK_RADIUS_OPTIONS, BLOCK_SHADOW_OPTIONS, BLOCK_SPACE_OPTIONS, BLOCK_WIDTH_OPTIONS, BLOCK_ANIM_OPTIONS, BLOCK_ANIM_SPEED_OPTIONS, BLOCK_HOVER_OPTIONS, BLOCK_LOOP_OPTIONS, BLOCK_INTENSITY_OPTIONS, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, normalizePageTheme, type Block, type BlockContent, type PageTheme } from "./types"
 import { BLOCK_HINTS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, INFO_PRESETS, BLOCK_STYLE_PRESETS } from "./editorPresets"
@@ -1352,12 +1352,14 @@ import { actionClavier } from "./raccourcisClavier"
         )}
 
         {/* TOPBAR (masquee en mode Apercu plein ecran sur mobile) */}
-        <div style={{ height: 50, background: "#0D0D0D", borderBottom: "1px solid rgba(201,168,76,0.12)", display: (preview && isMobile) ? "none" : "flex", alignItems: "center", padding: isMobile ? "0 9px" : "0 14px", gap: isMobile ? 6 : 10, flexShrink: 0, zIndex: 20 }}>
+        <div style={{ height: isMobile ? 50 : 56, background: "var(--bg)", borderBottom: "1px solid var(--line)", display: (preview && isMobile) ? "none" : "flex", alignItems: "center", padding: isMobile ? "0 9px" : "0 16px", gap: isMobile ? 6 : 10, flexShrink: 0, zIndex: 20 }}>
+          {/* Même lockup que la barre du haut de la coquille : retour + QROWG. */}
           <a href={guest ? "/dashboard/templates" : "/dashboard"} aria-label={guest ? "Retour aux modèles" : "Retour au tableau de bord"}
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, flexShrink: 0, textDecoration: "none", color: G, fontFamily: "Fraunces, serif", fontSize: 16, fontWeight: 700, textTransform: "lowercase", whiteSpace: "nowrap", ...(isMobile ? { width: 44, height: 44, fontSize: 19 } : {}) }}>
-            {isMobile ? "←" : "← QRowg"}
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, flexShrink: 0, textDecoration: "none", color: "var(--muted)", fontSize: 13, whiteSpace: "nowrap", ...(isMobile ? { width: 44, height: 44, fontSize: 19 } : {}) }}>
+            <ArrowLeft size={16} aria-hidden="true" />{!isMobile && <span style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, letterSpacing: ".16em" }}>QROWG</span>}
           </a>
-          {!isMobile && <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.08)" }} />}
+          {!isMobile && <div style={{ width: 1, height: 18, background: "var(--line-strong)" }} />}
+          {!isMobile && <span style={{ color: "var(--muted)", fontSize: 13 }}>Page</span>}
           {/* Le nom se coupait au milieu d'un mot, sans point de suspension : on lui
               laisse la place restante et on l'ellipse proprement. */}
           {/* L'éditeur n'avait aucun h1 : le nom de la page en est un, visuellement
@@ -1366,7 +1368,7 @@ import { actionClavier } from "./raccourcisClavier"
           <input value={pageName} onChange={e => { const v = e.target.value; setPageName(v); undoRedo.push({ blocks: blocksKbRef.current, theme: themeRef.current, name: v }, "pagename") }}
             aria-label="Nom de la page"
             // 18 px de haut sur téléphone : on tape à côté et on ouvre autre chose.
-            style={{ background: "transparent", border: "none", color: "var(--ink)", fontSize: 13, fontWeight: 600, outline: "none", minWidth: 0, textOverflow: "ellipsis", ...(isMobile ? { flex: "1 1 0", minHeight: 40 } : { width: 180, minHeight: 32, padding: "0 6px", borderRadius: 6 }) }} />
+            style={{ background: "transparent", border: "none", color: "var(--ink)", fontSize: 14, fontWeight: 600, outline: "none", minWidth: 0, textOverflow: "ellipsis", ...(isMobile ? { flex: "1 1 0", minHeight: 40 } : { width: 200, minHeight: 32, padding: "0 6px", borderRadius: 6 }) }} />
           {/* Statut de sauvegarde. Flag ON (C01) : indicateur unifié tokenisé + a11y (role=status/aria-live).
               Flag OFF : coquille historique inchangée (zéro régression). */}
           {BUILDER_REDESIGN ? (
@@ -1403,43 +1405,43 @@ import { actionClavier } from "./raccourcisClavier"
             <button onClick={() => { const p = undoRedo.undo(); if(p) applySnapshot(p) }}
               disabled={!undoRedo.canUndo()}
               title="Annuler — Ctrl+Z"
-              style={{ width: isMobile ? 40 : 32, height: isMobile ? 40 : 32, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, cursor: undoRedo.canUndo() ? "pointer" : "default", color: undoRedo.canUndo() ? "#F5F0E8" : "rgba(255,255,255,0.2)", fontSize: 13, transition: "all 0.15s" }}
-              onMouseEnter={e => { if(undoRedo.canUndo()) { e.currentTarget.style.background="rgba(201,168,76,0.1)"; e.currentTarget.style.borderColor="rgba(201,168,76,0.3)" }}}
-              onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor="rgba(255,255,255,0.08)" }}>
+              style={{ width: isMobile ? 40 : 32, height: isMobile ? 40 : 32, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 8, cursor: undoRedo.canUndo() ? "pointer" : "default", color: undoRedo.canUndo() ? "var(--ink)" : "var(--faint)", fontSize: 13, transition: "all 0.15s" }}
+              onMouseEnter={e => { if(undoRedo.canUndo()) { e.currentTarget.style.background="var(--surface)"; e.currentTarget.style.borderColor="color-mix(in srgb, var(--accent) 40%, transparent)" }}}
+              onMouseLeave={e => { e.currentTarget.style.background="var(--surface-2)"; e.currentTarget.style.borderColor="var(--line-strong)" }}>
               <Undo2 size={15} />
             </button>
             <button onClick={() => { const n = undoRedo.redo(); if(n) applySnapshot(n) }}
               disabled={!undoRedo.canRedo()}
               title="Rétablir — Ctrl+Shift+Z"
-              style={{ width: isMobile ? 40 : 32, height: isMobile ? 40 : 32, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, cursor: undoRedo.canRedo() ? "pointer" : "default", color: undoRedo.canRedo() ? "#F5F0E8" : "rgba(255,255,255,0.2)", fontSize: 13, transition: "all 0.15s" }}
-              onMouseEnter={e => { if(undoRedo.canRedo()) { e.currentTarget.style.background="rgba(201,168,76,0.1)"; e.currentTarget.style.borderColor="rgba(201,168,76,0.3)" }}}
-              onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor="rgba(255,255,255,0.08)" }}>
+              style={{ width: isMobile ? 40 : 32, height: isMobile ? 40 : 32, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 8, cursor: undoRedo.canRedo() ? "pointer" : "default", color: undoRedo.canRedo() ? "var(--ink)" : "var(--faint)", fontSize: 13, transition: "all 0.15s" }}
+              onMouseEnter={e => { if(undoRedo.canRedo()) { e.currentTarget.style.background="var(--surface)"; e.currentTarget.style.borderColor="color-mix(in srgb, var(--accent) 40%, transparent)" }}}
+              onMouseLeave={e => { e.currentTarget.style.background="var(--surface-2)"; e.currentTarget.style.borderColor="var(--line-strong)" }}>
               <Redo2 size={15} />
             </button>
           </div>
 
           {/* Modèles de page complets (icone seule sur mobile pour degager la barre) */}
           <button onClick={() => setShowTemplates(true)} title="Partir d'un modèle de page complet"
-            style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 7, padding: isMobile ? "0 12px" : "0 12px", minHeight: isMobile ? 40 : 32, ...(isMobile ? { minHeight: 40, justifyContent: "center" } : {}), color: G, fontSize: 10, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}>
-            <Sparkles size={12} />{!isMobile && " Modèles"}
+            style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 8, padding: isMobile ? "0 12px" : "0 12px", minHeight: isMobile ? 40 : 32, ...(isMobile ? { minHeight: 40, justifyContent: "center" } : {}), color: "var(--ink)", fontSize: 12, fontWeight: 600, cursor: "pointer", flexShrink: 0 }}>
+            <LayoutTemplate size={13} aria-hidden="true" />{!isMobile && " Modèles"}
           </button>
 
           {/* Bouton Focus Mode (desktop uniquement — panneaux redimensionnables) */}
           {!isMobile && <button onClick={toggleFocus} title="Mode Focus — Ctrl+F"
-            style={{ display: "flex", alignItems: "center", gap: 5, background: focusMode ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.04)", border: `1px solid ${focusMode ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.08)"}`, borderRadius: 7, padding: "0 12px", minHeight: 32, color: focusMode ? G : MUTED, fontSize: 10, fontWeight: focusMode ? 700 : 400, cursor: "pointer" }}>
-            {focusMode ? "⊞" : "⊡"} Focus
+            style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--surface-2)", border: `1px solid ${focusMode ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line-strong)"}`, borderRadius: 8, padding: "0 12px", minHeight: 32, color: focusMode ? G : "var(--ink)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+            <Maximize2 size={13} aria-hidden="true" /> Focus
           </button>}
 
           {/* Raccourcis clavier — tooltip (survol : desktop uniquement) */}
           <div style={{ position: "relative", display: isMobile ? "none" : "block" }}>
             <button
-              style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, cursor: "pointer", color: MUTED, fontSize: 11, fontWeight: 700 }}
+              style={{ width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 8, cursor: "pointer", color: MUTED, fontSize: 12, fontWeight: 700 }}
               title="Raccourcis clavier"
               onMouseEnter={e => { const t = e.currentTarget.nextElementSibling as HTMLElement; if(t) t.style.opacity = "1"; if(t) t.style.pointerEvents = "none" }}
               onMouseLeave={e => { const t = e.currentTarget.nextElementSibling as HTMLElement; if(t) t.style.opacity = "0" }}>
               ?
             </button>
-            <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, background: "#161616", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 12, padding: "12px 14px", zIndex: 200, opacity: 0, transition: "opacity 0.15s", pointerEvents: "none", minWidth: 200, boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}>
+            <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 12, padding: "12px 14px", zIndex: 200, opacity: 0, transition: "opacity 0.15s", pointerEvents: "none", minWidth: 200, boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}>
               <p style={{ color: MUTED, fontSize: 9, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>Raccourcis</p>
               {[
                 ["Ctrl+K", "Palette de commandes"],
@@ -1477,7 +1479,7 @@ import { actionClavier } from "./raccourcisClavier"
               {showQrPanel && (
                 <>
                   <div onClick={() => setShowQrPanel(false)} style={{ position: "fixed", inset: 0, zIndex: 199 }} />
-                  <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, background: "#161616", border: "1px solid rgba(201,168,76,0.25)", borderRadius: 16, padding: "18px", zIndex: 200, boxShadow: "0 8px 40px rgba(0,0,0,0.6)", width: 200 }}>
+                  <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 16, padding: "18px", zIndex: 200, boxShadow: "0 8px 40px rgba(0,0,0,0.6)", width: 200 }}>
                     <p style={{ color: "var(--ink)", fontSize: 12, fontWeight: 700, margin: "0 0 10px", textAlign: "center" }}>Mon QR Code</p>
                     {pageStatus !== "published" && <p style={{ color: "var(--warning)", fontSize: 10, fontWeight: 700, textAlign: "center", margin: "0 0 8px", lineHeight: 1.35 }}>Publiez votre page pour activer ce QR (sinon il mène à une page vide).</p>}
                     <div style={{ background: "#FFFFFF", borderRadius: 10, padding: 8, marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -1671,7 +1673,7 @@ import { actionClavier } from "./raccourcisClavier"
         <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
 
           {/* SIDEBAR BLOCS — masquée en mode Focus (concentration canvas + éditeur) */}
-          <div style={{ width: isMobile ? "100%" : (blocksCollapsed ? 64 : blocksResize.width), background: "var(--field)", borderRight: "none", display: (focusMode && !isMobile) ? "none" : (isMobile && mobileTab !== "blocks" ? "none" : "flex"), flexDirection: "column", flexShrink: isMobile ? 1 : 0, overflow: "hidden", transition: blocksCollapsed ? "width 0.25s ease" : "none", position: "relative" }}>
+          <div style={{ width: isMobile ? "100%" : (blocksCollapsed ? 64 : blocksResize.width), background: "var(--bg)", borderRight: "1px solid var(--line)", display: (focusMode && !isMobile) ? "none" : (isMobile && mobileTab !== "blocks" ? "none" : "flex"), flexDirection: "column", flexShrink: isMobile ? 1 : 0, overflow: "hidden", transition: blocksCollapsed ? "width 0.25s ease" : "none", position: "relative" }}>
             {/* C02 — Bibliothèque refondue en overlay (flag ON, panneau déplié). Flag OFF ou rail replié :
                 la bibliothèque legacy ci-dessous reste strictement inchangée (zéro régression). */}
             {BUILDER_REDESIGN && !blocksCollapsed && (
@@ -1681,18 +1683,18 @@ import { actionClavier } from "./raccourcisClavier"
             )}
             {/* Bouton collapse/expand */}
             <button onClick={toggleBlocks} aria-label={blocksCollapsed ? "Déployer la bibliothèque de blocs" : "Replier la bibliothèque de blocs"} title={blocksCollapsed ? "Ouvrir" : "Réduire"}
-              style={{ position: "absolute", top: 8, right: 8, zIndex: 20, width: 22, height: 22, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10 }}>
+              style={{ position: "absolute", top: 12, right: 8, zIndex: 20, width: 24, height: 24, background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 6, color: MUTED, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10 }}>
               {blocksCollapsed ? "›" : "‹"}
             </button>
             {/* Mode étendu: recherche normale */}
             {!blocksCollapsed && (
               <div style={{ padding: "10px 8px 10px 10px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
                 <div style={{ position: "relative" }}>
-                  <Search size={isMobile ? 15 : 11} style={{ position: "absolute", left: isMobile ? 12 : 8, top: "50%", transform: "translateY(-50%)", color: MUTED }} />
+                  <Search size={isMobile ? 15 : 13} style={{ position: "absolute", left: isMobile ? 12 : 10, top: "50%", transform: "translateY(-50%)", color: MUTED }} />
                   <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher un bloc..."
-                    style={{ width: "100%", height: isMobile ? 46 : undefined, background: "#111", border: "1px solid rgba(201,168,76,0.15)", borderRadius: isMobile ? 11 : 7, padding: isMobile ? "0 34px 0 36px" : "7px 7px 7px 24px", color: "var(--ink)", fontSize: isMobile ? 15 : 11, outline: "none", boxSizing: "border-box" }}
-                    onFocus={e => { e.target.style.borderColor = "rgba(201,168,76,0.4)"; setBlockSearchFocus(true) }}
-                    onBlur={e => { e.target.style.borderColor = "rgba(201,168,76,0.15)"; setBlockSearchFocus(false) }} />
+                    style={{ width: "100%", height: isMobile ? 46 : 36, background: "var(--field)", border: "1px solid var(--line)", borderRadius: isMobile ? 11 : 9, padding: isMobile ? "0 34px 0 36px" : "0 28px 0 28px", color: "var(--ink)", fontSize: isMobile ? 15 : 12.5, outline: "none", boxSizing: "border-box" }}
+                    onFocus={e => { e.target.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)"; setBlockSearchFocus(true) }}
+                    onBlur={e => { e.target.style.borderColor = "var(--line)"; setBlockSearchFocus(false) }} />
                   {search && <button onClick={() => setSearch("")} aria-label="Effacer" style={{ position: "absolute", right: isMobile ? 8 : 7, top: "50%", transform: "translateY(-50%)", width: isMobile ? 30 : undefined, height: isMobile ? 30 : undefined, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 0 }}><X size={isMobile ? 15 : 10} /></button>}
                 </div>
               </div>
@@ -1711,14 +1713,14 @@ import { actionClavier } from "./raccourcisClavier"
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(4, minmax(0, 1fr))" : "1fr 1fr", gap: isMobile ? 5 : 6 }}>
                   {/* Essentiels — vue par defaut (~20 blocs les plus utiles). QWG-0017b */}
                   <button onClick={() => setActiveCategory("essentials")} title="Les blocs les plus utiles pour démarrer"
-                    style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 7, minWidth: 0, background: activeCategory==="essentials" ? "rgba(201,168,76,0.16)" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory==="essentials" ? "rgba(201,168,76,0.5)" : "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: isMobile ? "5px 3px" : "9px 11px", color: activeCategory==="essentials" ? "#C9A84C" : MUTED, fontSize: 12, fontWeight: activeCategory==="essentials" ? 700 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
+                    style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 7, minWidth: 0, background: activeCategory==="essentials" ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory==="essentials" ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "5px 3px" : "8px 10px", color: activeCategory==="essentials" ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory==="essentials" ? 600 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
                     <span style={{ fontSize: isMobile ? 16 : 15, flexShrink: 0 }}>✨</span>
                     <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: isMobile ? "normal" as const : "nowrap", fontSize: isMobile ? 9.5 : undefined, textAlign: isMobile ? "center" as const : undefined, lineHeight: isMobile ? 1.15 : undefined, width: isMobile ? "100%" : undefined }}>Essentiels</span>
                   </button>
                   {/* Catégorie Récents — visible seulement si au moins 1 récent */}
                   {recentBlocks.length > 0 && (
                     <button onClick={() => setActiveCategory("recents")} title="Blocs récemment utilisés"
-                      style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 7, minWidth: 0, background: activeCategory==="recents" ? "var(--action)18" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory==="recents" ? "var(--action)50" : "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: isMobile ? "5px 3px" : "9px 11px", color: activeCategory==="recents" ? "var(--action)" : MUTED, fontSize: 12, fontWeight: activeCategory==="recents" ? 700 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
+                      style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 7, minWidth: 0, background: activeCategory==="recents" ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory==="recents" ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "5px 3px" : "8px 10px", color: activeCategory==="recents" ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory==="recents" ? 600 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
                       <span style={{ fontSize: isMobile ? 16 : 15, flexShrink: 0 }}>🕐</span>
                       <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: isMobile ? "normal" as const : "nowrap", fontSize: isMobile ? 9.5 : undefined, textAlign: isMobile ? "center" as const : undefined, lineHeight: isMobile ? 1.15 : undefined, width: isMobile ? "100%" : undefined }}>Récents</span>
                     </button>
@@ -1726,7 +1728,7 @@ import { actionClavier } from "./raccourcisClavier"
                   {/* Catégorie Favoris — visible seulement si au moins 1 favori */}
                   {favorites.length > 0 && (
                     <button onClick={() => setActiveCategory("favorites")} title="Vos blocs favoris"
-                      style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 7, minWidth: 0, background: activeCategory==="favorites" ? "#FFD70018" : "rgba(255,255,255,0.03)", border: `1px solid ${activeCategory==="favorites" ? "#FFD70050" : "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: isMobile ? "5px 3px" : "9px 11px", color: activeCategory==="favorites" ? "#FFD700" : MUTED, fontSize: 12, fontWeight: activeCategory==="favorites" ? 700 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
+                      style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 7, minWidth: 0, background: activeCategory==="favorites" ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory==="favorites" ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "5px 3px" : "8px 10px", color: activeCategory==="favorites" ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory==="favorites" ? 600 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
                       <span style={{ fontSize: isMobile ? 16 : 15, flexShrink: 0 }}>⭐</span>
                       <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: isMobile ? "normal" as const : "nowrap", fontSize: isMobile ? 9.5 : undefined, textAlign: isMobile ? "center" as const : undefined, lineHeight: isMobile ? 1.15 : undefined, width: isMobile ? "100%" : undefined }}>Favoris</span>
                       <span style={{ display: isMobile ? "none" : undefined, marginLeft: "auto", flexShrink: 0, background: "rgba(255,215,0,0.15)", borderRadius: 10, padding: "0px 6px", fontSize: 9.5, fontWeight: 700 }}>{favorites.length}</span>
@@ -1735,11 +1737,11 @@ import { actionClavier } from "./raccourcisClavier"
                   {BLOCK_CATEGORIES.map(cat => (
                     <button key={cat.id} onClick={() => setActiveCategory(cat.id)} title={cat.desc}
                       className={activeCategory===cat.id ? "da-cat on" : "da-cat"}
-                      style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 7, minWidth: 0, background: activeCategory===cat.id ? `color-mix(in srgb, ${cat.color} 15%, transparent)` : "#14110d", border: `1px solid ${activeCategory===cat.id ? `color-mix(in srgb, ${cat.color} 46%, transparent)` : "rgba(255,255,255,0.08)"}`, borderRadius: 10, padding: isMobile ? "5px 3px" : "9px 11px", color: activeCategory===cat.id ? cat.color : MUTED, fontSize: 12, fontWeight: activeCategory===cat.id ? 700 : 500, cursor: "pointer", transition: "background .18s ease, border-color .18s ease, color .18s ease", textAlign: "left" as const }}>
+                      style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 7, minWidth: 0, background: activeCategory===cat.id ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory===cat.id ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "5px 3px" : "8px 10px", color: activeCategory===cat.id ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory===cat.id ? 600 : 500, cursor: "pointer", transition: "background .18s ease, border-color .18s ease, color .18s ease", textAlign: "left" as const }}>
                       <span style={{ fontSize: isMobile ? 16 : 15, flexShrink: 0 }}>{cat.icon}</span>
                       <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: isMobile ? "normal" as const : "nowrap", fontSize: isMobile ? 9.5 : undefined, textAlign: isMobile ? "center" as const : undefined, lineHeight: isMobile ? 1.15 : undefined, width: isMobile ? "100%" : undefined }}>{cat.label}</span>
                       {search && searchCounts ? (
-                      <span style={{ display: isMobile ? "none" : undefined, marginLeft: "auto", flexShrink: 0, background: activeCategory===cat.id ? `color-mix(in srgb, ${cat.color} 22%, transparent)` : "rgba(255,255,255,0.06)", color: activeCategory===cat.id ? cat.color : MUTED, borderRadius: 999, padding: "0px 7px", fontSize: 9.5, fontWeight: 700, lineHeight: "17px" }}>
+                      <span style={{ display: isMobile ? "none" : undefined, marginLeft: "auto", flexShrink: 0, background: "var(--surface)", color: activeCategory===cat.id ? "var(--accent)" : MUTED, borderRadius: 999, padding: "0px 7px", fontSize: 9.5, fontWeight: 700, lineHeight: "17px" }}>
                         {searchCounts[cat.id] || 0}
                       </span>
                       ) : null}
@@ -1801,9 +1803,9 @@ import { actionClavier } from "./raccourcisClavier"
                         {catBlocks.map(([type, def]) => (
                           <button key={type} onClick={() => addBlock(type)}
                             style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "7px 8px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 1 }}
-                            onMouseEnter={e => { e.currentTarget.style.background = def.color+"10"; e.currentTarget.style.color = "var(--ink)"; showPopover(type, e) }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "var(--surface)"; e.currentTarget.style.color = "var(--ink)"; showPopover(type, e) }}
                             onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MUTED; hidePopover() }}>
-                            <div style={{ width: 26, height: 26, borderRadius: 6, background: def.color+"12", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>{def.icon}</div>
+                            <div style={{ width: 26, height: 26, borderRadius: 6, background: "var(--surface-2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>{def.icon}</div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: "inherit", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{hlText(def.label, search)}</p>
                               <p style={{ margin: 0, fontSize: 12, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{hlText(def.description, search)}</p>
@@ -1821,9 +1823,9 @@ import { actionClavier } from "./raccourcisClavier"
                     {activeCategory==="essentials" && filteredBlocks.map(([type, def]) => (
                       <button key={type} onClick={() => addBlock(type)}
                         style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 2 }}
-                        onMouseEnter={e => { const el = e.currentTarget; el.style.background = def.color+"10"; el.style.color = "var(--ink)" }}
+                        onMouseEnter={e => { const el = e.currentTarget; el.style.background = "var(--surface)"; el.style.color = "var(--ink)" }}
                         onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = MUTED }}>
-                        <div style={{ width: 30, height: 30, borderRadius: 8, background: def.color+"12", border: `1px solid ${def.color}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
+                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--surface-2)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
                           <p style={{ margin: 0, fontSize: 10.5, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.description}</p>
@@ -1843,7 +1845,7 @@ import { actionClavier } from "./raccourcisClavier"
                         style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 2 }}
                         onMouseEnter={e => { const el = e.currentTarget; el.style.background = "var(--action)10"; el.style.color = "var(--ink)" }}
                         onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = MUTED }}>
-                        <div style={{ width: 30, height: 30, borderRadius: 8, background: def.color+"12", border: `1px solid ${def.color}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
+                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--surface-2)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
                           <p style={{ margin: 0, fontSize: 10.5, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.description}</p>
@@ -1863,7 +1865,7 @@ import { actionClavier } from "./raccourcisClavier"
                         style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 2 }}
                         onMouseEnter={e => { const el = e.currentTarget; el.style.background = "#FFD70010"; el.style.color = "var(--ink)" }}
                         onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = MUTED }}>
-                        <div style={{ width: 30, height: 30, borderRadius: 8, background: def.color+"12", border: `1px solid ${def.color}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
+                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--surface-2)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
                           <p style={{ margin: 0, fontSize: 10.5, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.description}</p>
@@ -1897,9 +1899,9 @@ import { actionClavier } from "./raccourcisClavier"
                           const blockBtn = (type: string, def: any) => (
                             <button key={type} onClick={() => addBlock(type)}
                               style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 2, transition: "all 0.15s" }}
-                              onMouseEnter={e => { const el = e.currentTarget; el.style.background = def.color+"10"; el.style.color = "var(--ink)"; el.style.borderColor = def.color+"20"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0.5"; showPopover(type, e) }}
+                              onMouseEnter={e => { const el = e.currentTarget; el.style.background = "var(--surface)"; el.style.color = "var(--ink)"; el.style.borderColor = "var(--line-strong)"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0.5"; showPopover(type, e) }}
                               onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = MUTED; el.style.borderColor = "transparent"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0"; hidePopover() }}>
-                              <div style={{ width: 30, height: 30, borderRadius: 8, background: def.color+"12", border: `1px solid ${def.color}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
+                              <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--surface-2)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
                               <div style={{ flex: 1, minWidth: 0 }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
                                   <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: "inherit", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.label}</p>
@@ -2140,7 +2142,7 @@ import { actionClavier } from "./raccourcisClavier"
                     style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 2 }}
                     onMouseEnter={e => { const el = e.currentTarget; el.style.background = BLOCK_DEFS[type]?.color+"10"; el.style.color = "var(--ink)" }}
                     onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = MUTED }}>
-                    <div style={{ width: 28, height: 28, borderRadius: 7, background: def.color+"12", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
+                    <div style={{ width: 28, height: 28, borderRadius: 7, background: "var(--surface-2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
                       <p style={{ margin: 0, fontSize: 10.5, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.description}</p>
@@ -2158,7 +2160,7 @@ import { actionClavier } from "./raccourcisClavier"
           )}
 
           {/* CANVAS */}
-          <div style={{ flex: 1, overflowY: "auto", padding: preview && isMobile ? "0 0 96px" : isMobile ? "12px" : "20px", background: BUILDER_REDESIGN ? "#070707" : "#0A0A0A", display: isMobile && mobileTab !== "canvas" ? "none" : undefined }}
+          <div className={isMobile ? undefined : "stage-grid"} style={{ flex: 1, overflowY: "auto", padding: preview && isMobile ? "0 0 96px" : isMobile ? "12px" : "24px", background: "var(--bg)", display: isMobile && mobileTab !== "canvas" ? "none" : undefined }}
             onClick={e => { if (e.target === e.currentTarget) { setSelectedId(null); setMultiSelection([]) } }}>
             {/* C04 — Toolbar canvas responsive (flag ON, desktop). Flag OFF = rien (canvas inchangé). */}
             {BUILDER_REDESIGN && !isMobile && !preview && canvasMode === "edit" && (() => {
@@ -2277,9 +2279,9 @@ import { actionClavier } from "./raccourcisClavier"
                   </button>
                 </div>
               )}
-              {!preview && <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, padding: "6px 12px", background: "rgba(10,10,10,0.8)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 9, backdropFilter: "blur(10px)", position: "sticky", top: 0, zIndex: 10 }}>
-                <span style={{ fontSize: 9, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)" }}>CANVAS</span>
-                <span style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 6, padding: "1px 6px", fontSize: 10, color: G }}>{blocks.length} bloc{blocks.length!==1?"s":""}</span>
+              {!preview && <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, padding: "6px 12px", background: "color-mix(in srgb, var(--bg) 88%, transparent)", border: "1px solid var(--line)", borderRadius: 9, backdropFilter: "blur(10px)", position: "sticky", top: 0, zIndex: 10 }}>
+                <span style={{ fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700 }}>Votre page</span>
+                <span style={{ background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 6, padding: "1px 7px", fontSize: 10.5, color: "var(--ink)" }}>{blocks.length} bloc{blocks.length!==1?"s":""}</span>
                 {blocks.filter(b => b.draft).length > 0 && (
                   <span style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", borderRadius: 6, padding: "1px 6px", fontSize: 10, color: "var(--warning)", display: "inline-flex", alignItems: "center", gap: 3 }}>
                     <Pencil size={9} /> {blocks.filter(b => b.draft).length} brouillon{blocks.filter(b => b.draft).length > 1 ? "s" : ""}
@@ -2289,7 +2291,7 @@ import { actionClavier } from "./raccourcisClavier"
                 {!guest && !pageId && <span style={{ color: "var(--muted)", fontSize: 9, marginLeft: "auto" }}>Mode démo</span>}
               </div>}
 
-              <div style={{ ...bgStyle(), borderRadius: 20, overflow: "hidden", minHeight: 200, position: "relative", boxShadow: "0 8px 60px rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.05)" }}>
+              <div style={{ ...bgStyle(), borderRadius: 20, overflow: "hidden", minHeight: 200, position: "relative", boxShadow: "0 24px 60px -30px rgba(0,0,0,0.8)", border: "1px solid var(--line-strong)" }}>
               {/* Effets overlay */}
               {(theme as any).effect_noise && (
                 <div style={{ position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none", opacity: (theme as any).noise_opacity ? (theme as any).noise_opacity/100 : 0.06, mixBlendMode: "overlay" as const, backgroundImage: NOISE_SVG_URL, backgroundRepeat: "repeat", backgroundSize: "128px 128px" }} />
@@ -2442,8 +2444,8 @@ import { actionClavier } from "./raccourcisClavier"
               </div>
             </div>
           )}
-          <div style={{ width: isMobile ? "100%" : (rightCollapsed ? 48 : (focusMode ? (focusNarrow ? 620 : 740) : rightResize.width)), background: "#161616", borderLeft: "none", display: isMobile && mobileTab !== "panel" ? "none" : "flex", flexDirection: (focusMode && !isMobile) ? "row" : "column", flexShrink: isMobile ? 1 : 0, overflow: "hidden", transition: rightCollapsed ? "width 0.25s ease" : "none", position: "relative" }}>
-            <div style={{ display: focusMode ? "none" : "flex", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+          <div style={{ width: isMobile ? "100%" : (rightCollapsed ? 48 : (focusMode ? (focusNarrow ? 620 : 740) : rightResize.width)), background: "var(--bg)", borderLeft: "1px solid var(--line)", display: isMobile && mobileTab !== "panel" ? "none" : "flex", flexDirection: (focusMode && !isMobile) ? "row" : "column", flexShrink: isMobile ? 1 : 0, overflow: "hidden", transition: rightCollapsed ? "width 0.25s ease" : "none", position: "relative" }}>
+            <div style={{ display: focusMode ? "none" : "flex", borderBottom: "1px solid var(--line)", flexShrink: 0 }}>
               {rightCollapsed
                 ? /* Mode réduit: onglets verticaux */
                   <div style={{ display: "flex", flexDirection: "column", width: "100%", gap: 0 }}>
@@ -2459,7 +2461,7 @@ import { actionClavier } from "./raccourcisClavier"
                   <>
                     {(["edit","theme"] as const).map(tab => (
                       <button key={tab} onClick={() => setRightTab(tab)}
-                        style={{ flex: 1, padding: "11px 4px", background: "transparent", border: "none", borderBottom: `2px solid ${rightTab===tab ? G : "transparent"}`, color: rightTab===tab ? G : MUTED, fontSize: 12, fontWeight: rightTab===tab ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                        style={{ flex: 1, padding: "13px 4px", background: "transparent", border: "none", borderBottom: `2px solid ${rightTab===tab ? G : "transparent"}`, color: rightTab===tab ? "var(--ink)" : MUTED, fontSize: 12.5, fontWeight: rightTab===tab ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>
                         {tab==="edit" ? "Éditer" : "Thème"}
                       </button>
                     ))}
@@ -2476,7 +2478,7 @@ import { actionClavier } from "./raccourcisClavier"
                     legacy (EditPanel) pour le design/disposition et les blocs non pilotes. Flag OFF =
                     éditeur historique ci-dessous strictement inchangé (zéro régression). */}
                 {BUILDER_REDESIGN && (
-                  <div style={{ position: "absolute", inset: 0, zIndex: 6, background: "#161616" }}>
+                  <div style={{ position: "absolute", inset: 0, zIndex: 6, background: "var(--bg)" }}>
                     <BlockSettingsPanel
                       block={selectedBlock ?? null}
                       mobile={isMobile}
@@ -2509,17 +2511,15 @@ import { actionClavier } from "./raccourcisClavier"
                       )}
                     </div>
                   : <>
-                      <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 16, paddingBottom: 12, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                        <div style={{ background: `${BLOCK_DEFS[selectedBlock.type]?.color||G}12`, border: `1px solid ${BLOCK_DEFS[selectedBlock.type]?.color||G}25`, borderRadius: 8, width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>
-                          {BLOCK_DEFS[selectedBlock.type]?.icon}
-                        </div>
-                        <div>
-                          <p style={{ color: "var(--ink)", fontSize: 12, fontWeight: 700, margin: 0 }}>{BLOCK_DEFS[selectedBlock.type]?.label}</p>
-                          <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{BLOCK_DEFS[selectedBlock.type]?.description}</p>
+                      <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 16, paddingBottom: 12, borderBottom: "1px solid var(--line)" }}>
+                        <div style={{ minWidth: 0 }}>
+                          <p style={{ color: "var(--faint)", fontSize: 10, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", margin: "0 0 3px" }}>Propriétés</p>
+                          <p style={{ color: "var(--ink)", fontSize: 16, fontWeight: 600, margin: 0, letterSpacing: "-.01em" }}><span aria-hidden="true" style={{ marginRight: 7 }}>{BLOCK_DEFS[selectedBlock.type]?.icon}</span>{BLOCK_DEFS[selectedBlock.type]?.label}</p>
+                          <p style={{ color: MUTED, fontSize: 11, margin: "2px 0 0" }}>{BLOCK_DEFS[selectedBlock.type]?.description}</p>
                         </div>
                         <div style={{ marginLeft: "auto", display: "flex", gap: 4 }}>
                           {/* #11 : une seule action "..." -> meme bottom sheet que l'overlay (dup/masquer/verrouiller/brouillon/supprimer) */}
-                          <button onClick={() => setBlockMenu(selectedBlock.id)} title="Plus d'actions" aria-label="Plus d'actions" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, width: isMobile ? 34 : 26, height: isMobile ? 34 : 26, cursor: "pointer", color: "var(--ink)", display: "flex", alignItems: "center", justifyContent: "center" }}><MoreHorizontal size={isMobile ? 17 : 13} /></button>
+                          <button onClick={() => setBlockMenu(selectedBlock.id)} title="Plus d'actions" aria-label="Plus d'actions" style={{ background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 8, width: isMobile ? 34 : 30, height: isMobile ? 34 : 30, cursor: "pointer", color: "var(--ink)", display: "flex", alignItems: "center", justifyContent: "center" }}><MoreHorizontal size={isMobile ? 17 : 13} /></button>
                         </div>
                       </div>
                       {(() => {
@@ -2559,10 +2559,10 @@ import { actionClavier } from "./raccourcisClavier"
                           <>
                             {/* Onglets d'édition du bloc — visibles seulement en mode Expert (audit #10 : un seul contexte) */}
                             {expertMode && (
-                            <div style={{ display: "flex", gap: 4, background: "#100e0c", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 11, padding: 4, margin: "0 0 14px" }}>
+                            <div role="tablist" style={{ display: "flex", gap: 2, borderBottom: "1px solid var(--line)", margin: "0 0 14px" }}>
                               {TABS.map(t => (
-                                <button key={t.k} onClick={() => setEditTab(t.k)} className={editTab===t.k ? undefined : "da-seg-btn"}
-                                  style={{ flex: 1, minHeight: isMobile ? 42 : undefined, padding: isMobile ? "10px 3px" : "8px 3px", borderRadius: 8, border: "none", cursor: "pointer", background: editTab===t.k ? "linear-gradient(135deg, color-mix(in srgb, var(--accent) 88%, #fff), var(--accent))" : "transparent", color: editTab===t.k ? "#1a1408" : MUTED, fontSize: isMobile ? 11.5 : 10, fontWeight: editTab===t.k ? 800 : 600, boxShadow: editTab===t.k ? "0 1px 0 rgba(255,255,255,.4) inset, 0 6px 16px -10px rgba(201,162,77,.7)" : "none", transition: "background .18s ease, color .18s ease", whiteSpace: "nowrap" as const }}>{t.label}</button>
+                                <button key={t.k} role="tab" aria-selected={editTab===t.k} onClick={() => setEditTab(t.k)}
+                                  style={{ flex: 1, minHeight: isMobile ? 42 : 36, padding: isMobile ? "10px 3px" : "8px 3px", border: "none", borderBottom: `2px solid ${editTab===t.k ? "var(--accent)" : "transparent"}`, marginBottom: -1, cursor: "pointer", background: "transparent", color: editTab===t.k ? "var(--ink)" : MUTED, fontSize: isMobile ? 11.5 : 11, fontWeight: editTab===t.k ? 600 : 500, transition: "color .18s ease, border-color .18s ease", whiteSpace: "nowrap" as const }}>{t.label}</button>
                               ))}
                             </div>
                             )}
@@ -2760,17 +2760,17 @@ import { actionClavier } from "./raccourcisClavier"
         {/* C06 — le shell mobile (flag ON) remplace la barre historique : on l'évite pour ne pas
             créer deux navigations simultanées (§4). */}
         {isMobile && !BUILDER_REDESIGN && !preview && !(blockSearchFocus && mobileTab === "blocks") && (
-          <div style={{ flexShrink: 0, display: "flex", background: "#0C0C0C", borderTop: "1px solid rgba(255,255,255,0.08)", paddingBottom: "env(safe-area-inset-bottom)" }}>
+          <div style={{ flexShrink: 0, display: "flex", background: "var(--bg)", borderTop: "1px solid var(--line)", paddingBottom: "env(safe-area-inset-bottom)" }}>
             {([
-              { id: "blocks", label: "Blocs", icon: "🧱" },
-              { id: "canvas", label: "Page", icon: "📄" },
-              { id: "panel", label: "Réglages", icon: "⚙️" },
+              { id: "blocks", label: "Blocs", icon: <Layers size={18} aria-hidden="true" /> },
+              { id: "canvas", label: "Page", icon: <Smartphone size={18} aria-hidden="true" /> },
+              { id: "panel", label: "Réglages", icon: <Settings size={18} aria-hidden="true" /> },
             ] as const).map(t => {
               const on = mobileTab === t.id
               return (
                 <button key={t.id} onClick={() => setMobileTab(t.id)}
-                  style={{ flex: 1, minHeight: 52, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, padding: "8px 4px", background: on ? "rgba(201,168,76,0.12)" : "transparent", border: "none", borderTop: `3px solid ${on ? G : "transparent"}`, color: on ? G : MUTED, fontSize: 11, fontWeight: on ? 800 : 500, cursor: "pointer" }}>
-                  <span style={{ fontSize: 17 }}>{t.icon}</span>{t.label}
+                  style={{ flex: 1, minHeight: 52, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, padding: "8px 4px", background: "transparent", border: "none", borderTop: `2px solid ${on ? G : "transparent"}`, color: on ? G : MUTED, fontSize: 11, fontWeight: on ? 600 : 500, cursor: "pointer" }}>
+                  <span style={{ display: "flex" }}>{t.icon}</span>{t.label}
                 </button>
               )
             })}
@@ -2817,7 +2817,7 @@ import { actionClavier } from "./raccourcisClavier"
           return (
             <div style={{
               position: "fixed", left: popover.x, top: adjustedY, zIndex: 9999,
-              width: 220, background: "#161616",
+              width: 220, background: "var(--surface)",
               border: `1px solid ${def.color}30`,
               borderRadius: 14, overflow: "hidden",
               boxShadow: `0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)`,

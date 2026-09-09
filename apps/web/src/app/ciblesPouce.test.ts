@@ -70,8 +70,8 @@ describe("tout ce qui se tape au pouce fait au moins 44 px", () => {
     // 40 px au pouce ; 32 px à la souris depuis P2-14 (elles faisaient 28 px).
     expect(src.match(/width: isMobile \? 40 : 32, height: isMobile \? 40 : 32/g)?.length ?? 0).toBe(2)
     expect(src).toContain("{ minHeight: 40, justifyContent: \"center\" }")             // Modèles
-    // La barre mesure 50 px : elle doit rester assez haute pour ces cibles.
-    expect(src).toContain("style={{ height: 50, background: \"#0D0D0D\"")
+    // La barre mesure 50 px sur téléphone (56 sur PC, comme la coquille) : assez haute pour ces cibles.
+    expect(src).toContain("style={{ height: isMobile ? 50 : 56, background: \"var(--bg)\"")
   })
 
   it("« Publier » ne descend pas sous 44 px sur téléphone", () => {
