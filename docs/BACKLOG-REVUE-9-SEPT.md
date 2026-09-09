@@ -14,9 +14,9 @@ Chaque ligne est copiable telle quelle dans Claude Code. Notation : `[ ]` à fai
 ### Choix d'un modèle (`app/dashboard/templates/page.tsx`)
 - [x] v49 · La carte n'est plus un `role="button"` qui contient des boutons : conteneur `<article>`, trois vrais contrôles (Favori, Aperçu, Utiliser), vignette = bouton « Aperçu » distinct ; test clavier/souris/tactile de l'aperçu. La barre de sélection fixe (doublon de « Utiliser », alimentée par le clic sur la carte entière) disparaît avec lui.
 - [x] v49 · Noms de plans depuis `lib/plans.ts` (`getPlan(id).label`) : Gratuit · Établissement · Multi-sites — plus de « Starter/Pro » ici, dans l'aperçu de modèle, la puce de la coquille, l'Accueil connecté et le Profil.
-- [ ] v52 · Métadonnées par défaut réduites (plan, nom, phrase, action) ; le reste (blocs, durée, tags, bénéfice) au survol ou dans l'aperçu ; 6–8 modèles recommandés d'abord, tous les autres via recherche/filtres existants.
-- [ ] v52 · Quasi-doublons clarifiés (« Freelance Pro » / « Freelance / Consultant »), catégories et compteurs harmonisés.
-- [ ] v52 · Fenêtre de création : nom du projet d'abord, apparence ensuite.
+- [x] v52 · Métadonnées par défaut réduites (plan, nom, phrase, action) ; le reste (blocs, durée, tags, bénéfice) au survol ou dans l'aperçu ; 6–8 modèles recommandés d'abord, tous les autres via recherche/filtres existants.
+- [x] v52 · Quasi-doublons clarifiés (« Freelance Pro » / « Freelance / Consultant »), catégories et compteurs harmonisés.
+- [x] v52 · Fenêtre de création : nom du projet d'abord, apparence ensuite.
 
 ### Tarification (`app/upgrade/page.tsx`, `lib/plans.ts`)
 - [x] v45 · Page calmée (aplat, cartes plates, un seul accent).
@@ -39,8 +39,8 @@ Chaque ligne est copiable telle quelle dans Claude Code. Notation : `[ ]` à fai
 - [x] v50 · Premier bloc sélectionné automatiquement à l'ouverture (ou aide dans l'inspecteur vide indiquant l'action attendue).
 - [x] v50 · Canevas ≥ 55 % de la largeur utile (mesuré : 55 % à 1440, 65 % à 1280 où la bibliothèque s'ouvre repliée) ; bibliothèque et inspecteur repliables en un clic.
 - [x] v50 · Aucun réglage visuel dans Contenu : forme/contour/fond/ombre d'avatar et équivalents passent dans Style (`blockDefs` : champ → onglet).
-- [ ] v52 · Doublon « Brouillon gardé ici » / « Brouillon gardé » → un seul ; « Excellent — 43/80 » → compteur + alertes utiles seulement ; Page / Ma page / Votre page → un seul mot.
-- [ ] v52 · Texte d'interface ≥ 14 px dans les panneaux, cibles ≥ 44 px ; Récents et Favoris d'abord, les 12 catégories ensuite ; erreurs de publication résumées près de « Publier ».
+- [x] v52 · Doublon « Brouillon gardé ici » / « Brouillon gardé » → un seul ; « Excellent — 43/80 » → compteur + alertes utiles seulement ; Page / Ma page / Votre page → un seul mot.
+- [x] v52 · Champs de l'inspecteur 14 px, étiquettes et aides ≥ 12 px, onglets 40/44 px ; Récents et Favoris précédaient déjà les 12 catégories (après « Essentiels ») ; ce qui ne sera pas publié est résumé dans la fenêtre Publier, chaque ligne ouvre le bloc.
 
 ### Passe éditoriale (`lib/motsDuProduit`, `blockDefs`, modèles, pages publiques)
 - [x] v49 · Vouvoiement partout (« Créez », « Comprenez ») ; « Un support, pour de vrai » reformulé ; « wifi » → « Wi‑Fi » ; accents dans les modèles ; anglicismes (Business, Creator, Luxury, Event, Branding, Media Kit, Countdown…) traduits dans l'interface (les identifiants techniques restent).

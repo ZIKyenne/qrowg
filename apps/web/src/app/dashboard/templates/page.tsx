@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { PLAN_RANK, getPlan, PLANS } from "@/lib/plans"
 import { slugifyBase } from "@/lib/slug"
 import { PageHeader } from "@/components/ui/PageHeader"
-import { Sparkles, ArrowRight, X, Lock, Search, Heart, Eye, Clock, Layers, SlidersHorizontal,
+import { Sparkles, ArrowRight, X, Lock, Search, Heart, Eye, SlidersHorizontal,
   UtensilsCrossed, Martini, Coffee, Laptop, Target, User, Building2, Megaphone, Music, Camera, Home, Brush, PartyPopper, Rocket, ShoppingBag, Flame, Link2 as LinkIcon } from "lucide-react"
 import TemplatePreviewModal from "./TemplatePreviewModal"
 import TemplateWizardModal from "./TemplateWizardModal"
@@ -22,30 +22,16 @@ import { useDialogue } from "@/components/ui/useDialogue"
 
 // Source unique partagée avec le builder : les modèles de page complets (métier + sous-variantes)
 // alimentent AUSSI la galerie d'onboarding (en plus des 14 modèles curés historiques).
+// Les modèles « studio » signent leur ambiance à la fin de la description (« … — rose nuit ») :
+// elle devient la variante, ce qui distingue deux « Salon de coiffure » sans toucher aux noms.
 const SHARED_META = PAGE_TEMPLATES.map(t => ({
   id: t.key, name: t.label, category: t.group, plan: "free",
-  description: t.desc, emoji: t.emoji,
+  description: t.desc.split(" — ")[0], variante: t.desc.includes(" — ") ? t.desc.split(" — ").slice(1).join(" — ") : undefined, emoji: t.emoji,
   color: t.theme.primary, accent: t.theme.accent, bg: t.theme.bg, surface: t.theme.surface,
   tags: [] as string[],
 }))
 const SHARED_BLOCKS = Object.fromEntries(PAGE_TEMPLATES.map(t => [t.key, t.blocks]))
 const SHARED_THEMES = Object.fromEntries(PAGE_TEMPLATES.map(t => [t.key, t.theme]))
-
-// ── Temps estimé ─────────────────────────────────────────────────────────────
-const SETUP_TIME: Record<string, string> = {
-  freelance: "5 min", restaurant: "7 min", artiste: "5 min", coach: "6 min",
-  createur: "4 min", event: "6 min", ecommerce: "8 min", coiffeur: "6 min",
-  agence: "7 min", medecin: "6 min", vente_produits: "8 min",
-  immobilier: "7 min", startup: "7 min", influenceur: "5 min",
-}
-
-// ── Popularité éditoriale (déterministe par id : stable, ~1/3 "populaire", ~1/4 "tendance") ──
-function popTier(id: string): { label: string; emoji: string; color: string } | null {
-  let h = 0; for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0
-  if (h % 3 === 0) return { label: "Populaire", emoji: "🔥", color: "var(--danger)" }
-  if (h % 4 === 0) return { label: "Tendance", emoji: "✦", color: "#7B61FF" }
-  return null
-}
 
 // ── Blocs pré-configurés ─────────────────────────────────────────────────────
 const TEMPLATE_BLOCKS: Record<string, any[]> = { ...SHARED_BLOCKS, "createur":[{"type":"profile","content":{"name":"Alex Crea","tagline":"Createur de contenu - Lifestyle & Tech","badge":"500K abonnés"}},{"type":"bio","content":{"text":"Je crée du contenu autour du lifestyle, de la tech et de la productivité. Rejoins ma communaute sur tous mes réseaux !","align":"center"}},{"type":"social_links","content":{"instagram":"https://instagram.com","tiktok":"https://tiktok.com","youtube":"https://youtube.com","twitter":"https://twitter.com"}},{"type":"visit_counter","content":{"label":"vues ce mois"}},{"type":"promo_banner","content":{"emoji":"🎁","text":"Mon code promo -15%","subtext":"Code ALEX15 chez mes partenaires","cta_label":"En profiter","cta_url":"#"}},{"type":"cta_button","content":{"label":"Télécharger mon media kit","url":"#","style":"neon","icon":"📋","full_width":"yes"}},{"type":"cta_button","content":{"label":"Proposer une collaboration","url":"mailto:contact@alex.com","style":"gold","icon":"💌","full_width":"yes"}}],"freelance":[{"type":"profile","content":{"name":"Jean Dupont","tagline":"Développeur Full-Stack & Consultant Digital","badge":"Disponible pour missions"}},{"type":"bio","content":{"text":"10 ans d expérience en développement web. Je transforme vos idees en produits digitaux performants. Specialise React, Node.js et architecture cloud.","align":"left"}},{"type":"skills","content":{"title":"Mes expertises","tags":"React, Next.js, Node.js, TypeScript, AWS, Docker, UX Design"}},{"type":"services_list","content":{"title":"Mes services","s1_icon":"💻","s1_name":"Développement sur mesure","s1_desc":"Applications web et mobiles performantes","s2_icon":"🎨","s2_name":"Design & Prototypage","s2_desc":"Figma, design system, UI/UX","s3_icon":"🚀","s3_name":"Conseil & Architecture","s3_desc":"Audit technique, roadmap, choix stack"}},{"type":"pricing","content":{"title":"Mes tarifs","title1":"Journee","price1":"650 EUR","desc1":"TJM standard","title2":"Forfait web","price2":"3500 EUR","desc2":"Site vitrine complet","title3":"Retainer","price3":"2000 EUR","desc3":"20h/mois","cta_label":"Demander un devis","cta_url":"#"}},{"type":"testimonials","content":{"name1":"Sarah M.","text1":"Jean a livre notre MVP en 6 semaines. Code propre, communication parfaite.","stars1":"5","name2":"Thomas R.","text2":"Excellent consultant, vision claire et pragmatique.","stars2":"5"}},{"type":"calendly","content":{"label":"Réserver un appel decouverte","url":"https://calendly.com","description":"30 min - Gratuit - Visio ou telephone"}},{"type":"social_links","content":{"linkedin":"https://linkedin.com","github":"https://github.com","website":"https://monsite.com"}}],"restaurant":[{"type":"profile","content":{"name":"Le Bistrot Parisien","tagline":"Cuisine française depuis 1985","badge":"Ouvert aujourd hui"}},{"type":"cta_button","content":{"label":"Réserver une table","url":"#","style":"gold","icon":"🍷","full_width":"yes"}},{"type":"menu_section","content":{"category":"Entrees","item1_name":"Foie gras poele","item1_price":"18 EUR","item1_desc":"Chutney de figues","item2_name":"Soupe à l'oignon","item2_price":"12 EUR","item2_desc":"Gratinée au comte","item3_name":"Tartare de saumon","item3_price":"16 EUR","item3_desc":"Avocat, citron vert"}},{"type":"menu_section","content":{"category":"Plats","item1_name":"Entrecôte 300g","item1_price":"32 EUR","item1_desc":"Sauce béarnaise, frites maison","item2_name":"Filet de sole","item2_price":"28 EUR","item2_desc":"Beurre blanc, légumes","item3_name":"Risotto aux truffes","item3_price":"24 EUR","item3_desc":"Parmesan, truffe noire"}},{"type":"opening_hours","content":{"title":"Nos horaires","mon_fri":"12h-14h30 / 19h-23h","saturday":"19h-23h30","sunday":"12h-15h","note":"Réservation recommandee"}},{"type":"google_maps","content":{"label":"Le Bistrot Parisien","address":"12 rue de la Paix, 75001 Paris","transport":"Metro Opera - Ligne 3, 7, 8"}},{"type":"testimonials","content":{"name1":"Marie L.","text1":"Cuisine excellente, service impeccable. La meilleure entrecote de Paris !","stars1":"5","name2":"Pierre M.","text2":"Cadre magnifique, plats savoureux.","stars2":"5"}},{"type":"social_links","content":{"instagram":"https://instagram.com","facebook":"https://facebook.com"}}],"artiste":[{"type":"profile","content":{"name":"NOVA","tagline":"Artiste electro-pop - Paris","badge":"Nouvel EP disponible"}},{"type":"bio","content":{"text":"Productrice et chanteuse, NOVA mêle électronique et pop émotionnelle pour créer un univers sonore unique. Plus de 2M de streams.","align":"center"}},{"type":"spotify_player","content":{"title":"Ecouter mon dernier EP","url":"https://open.spotify.com"}},{"type":"music_links","content":{"artist_name":"NOVA","spotify":"https://open.spotify.com","apple_music":"https://music.apple.com","deezer":"https://deezer.com","youtube_music":"https://music.youtube.com"}},{"type":"event_info","content":{"name":"Concert Release Party","date":"Samedi 28 juin 2025","time":"21h00","location":"La Cigale, Paris 18e","price":"25 EUR - Places limitees","cta_label":"Réserver ma place","cta_url":"#"}},{"type":"cta_button","content":{"label":"Me suivre sur Instagram","url":"https://instagram.com","style":"neon","icon":"📸","full_width":"yes"}},{"type":"social_links","content":{"instagram":"https://instagram.com","tiktok":"https://tiktok.com","youtube":"https://youtube.com","spotify":"https://open.spotify.com"}}],"coach":[{"type":"profile","content":{"name":"Marie Laurent","tagline":"Coach de vie certifiee - PNL et Mindfulness","badge":"+200 clients accompagnes"}},{"type":"bio","content":{"text":"Je vous accompagne vers une vie plus alignee avec vos valeurs. Ma methode combine la PNL, la pleine conscience et le coaching systemique.","align":"center"}},{"type":"services_list","content":{"title":"Mon accompagnement","s1_icon":"🎯","s1_name":"Coaching individuel","s1_desc":"Seances 1h, en visio ou presentiel","s2_icon":"👥","s2_name":"Ateliers de groupe","s2_desc":"Petits groupes de 6 personnes max","s3_icon":"📚","s3_name":"Programme 3 mois","s3_desc":"Transformation en profondeur"}},{"type":"pricing","content":{"title":"Tarifs","title1":"Seance unique","price1":"90 EUR","desc1":"1h en visio","title2":"Pack 5 seances","price2":"380 EUR","desc2":"Economisez 70 EUR","title3":"Programme 3 mois","price3":"850 EUR","desc3":"12 seances + suivi"}},{"type":"testimonials","content":{"name1":"Lucie D.","text1":"Marie m a aide a reprendre confiance en moi. Sa bienveillance est remarquable.","stars1":"5","name2":"Pierre M.","text2":"Un accompagnement qui m a permis de changer de cap professionnel.","stars2":"5"}},{"type":"calendly","content":{"label":"Seance decouverte offerte","url":"https://calendly.com","description":"45 min - Gratuit - Sans engagement"}},{"type":"social_links","content":{"instagram":"https://instagram.com","linkedin":"https://linkedin.com"}}],"ecommerce":[{"type":"profile","content":{"name":"Maison Lumiere","tagline":"Décoration artisanale et objets de createurs","badge":"Livraison gratuite des 60 EUR"}},{"type":"promo_banner","content":{"emoji":"🎉","text":"Soldes d'été jusqu'à −40 %","subtext":"Offre valable jusqu au 31 juillet","cta_label":"Voir les offres","cta_url":"#"}},{"type":"product","content":{"name":"Vase céramique artisanal","price":"45 EUR","old_price":"75 EUR","description":"Fait main en France, collection printemps. Livre avec certificat d authenticite.","cta_label":"Commander","cta_url":"#"}},{"type":"product","content":{"name":"Bougie parfumée 200g","price":"28 EUR","description":"Cire végétale, parfum vanille et santal. Durée de combustion 45h.","cta_label":"Commander","cta_url":"#"}},{"type":"cta_button","content":{"label":"Voir toute la boutique","url":"#","style":"gold","icon":"🛍️","full_width":"yes"}},{"type":"testimonials","content":{"name1":"Claire B.","text1":"Des produits magnifiques, emballage soigne. Je recommande a 100% !","stars1":"5","name2":"Antoine L.","text2":"Livraison rapide, qualite au rendez-vous.","stars2":"5"}},{"type":"social_links","content":{"instagram":"https://instagram.com","pinterest":"https://pinterest.com","website":"https://monsite.com"}}],"event":[{"type":"profile","content":{"name":"GALA NIGHT 2025","tagline":"La soiree de l annee - 500 invites","badge":"Dernieres places disponibles"}},{"type":"countdown","content":{"title":"La soiree commence dans","target":"2026-12-31T21:00","subtitle":"Soyez prets pour une nuit inoubliable !"}},{"type":"event_info","content":{"name":"GALA NIGHT 2025","date":"Mercredi 31 decembre 2025","time":"21h00 - 6h00","location":"Palais Brongniart, Paris 2e","price":"A partir de 80 EUR","cta_label":"Réserver mes billets","cta_url":"#"}},{"type":"promo_banner","content":{"emoji":"🥂","text":"Early Bird - 20% de reduction","subtext":"Offre valable jusqu au 30 novembre","cta_label":"Profiter de l offre","cta_url":"#"}},{"type":"social_links","content":{"instagram":"https://instagram.com","facebook":"https://facebook.com"}}],"coiffeur":[{"type":"profile","content":{"name":"Salon Eclat","tagline":"Coiffure et Beaute - Paris 11e","badge":"4.9/5 - 300 avis"}},{"type":"bio","content":{"text":"Votre salon de coiffure et beaute a Paris. Specialises en colorations naturelles, soins keratine et balayage californien.","align":"center"}},{"type":"services_list","content":{"title":"Nos prestations","s1_icon":"✂️","s1_name":"Coupe et Brushing","s1_desc":"Femme 55 EUR - Homme 35 EUR","s2_icon":"🎨","s2_name":"Coloration et Balayage","s2_desc":"A partir de 80 EUR","s3_icon":"💆","s3_name":"Soins et Traitements","s3_desc":"Keratine, lissage, soin profond"}},{"type":"calendly","content":{"label":"Prendre rendez-vous","url":"https://calendly.com","description":"Réservation en ligne 24 h/24"}},{"type":"testimonials","content":{"name1":"Emma R.","text1":"Super salon ! Le balayage est parfait, l equipe est adorable.","stars1":"5","name2":"Julie M.","text2":"Meilleure coloration de ma vie. Merci Sophie !","stars2":"5"}},{"type":"opening_hours","content":{"title":"Horaires","mon_fri":"9h - 19h","saturday":"9h - 18h","sunday":"Ferme"}},{"type":"social_links","content":{"instagram":"https://instagram.com"}}],"agence":[{"type":"profile","content":{"name":"Studio PIXEL","tagline":"Agence creative - Web - Brand - Motion","badge":"50+ projets livres"}},{"type":"bio","content":{"text":"Nous creons des expériences digitales memorables. De la strategie de marque au développement web, nous accompagnons startups et entreprises.","align":"left"}},{"type":"services_list","content":{"title":"Nos expertises","s1_icon":"🎨","s1_name":"Branding et Identite","s1_desc":"Logo, charte graphique, guidelines","s2_icon":"💻","s2_name":"Développement web","s2_desc":"Sites, apps, e-commerce","s3_icon":"📱","s3_name":"Social Media et Contenu","s3_desc":"Strategie, création, gestion"}},{"type":"pricing","content":{"title":"Nos offres","title1":"Starter","price1":"2500 EUR","desc1":"Site vitrine 5 pages","title2":"Business","price2":"6500 EUR","desc2":"Site + branding complet","title3":"Premium","price3":"Sur devis","desc3":"Solution sur mesure"}},{"type":"contact_form","content":{"title":"Parlons de votre projet","button_label":"Envoyer"}},{"type":"social_links","content":{"linkedin":"https://linkedin.com","instagram":"https://instagram.com","website":"https://monsite.com"}}],"medecin":[{"type":"profile","content":{"name":"Dr. Sophie Martin","tagline":"Medecin generaliste - Paris 15e","badge":"Nouveaux patients acceptes"}},{"type":"bio","content":{"text":"Medecin generaliste avec 15 ans d expérience. Consultations en cabinet ou en teleconsultation. Specialisee en medecine preventive.","align":"left"}},{"type":"services_list","content":{"title":"Consultations","s1_icon":"🏥","s1_name":"Consultation generale","s1_desc":"En cabinet ou teleconsultation","s2_icon":"💊","s2_name":"Suivi maladies chroniques","s2_desc":"Diabete, hypertension, asthme","s3_icon":"🔬","s3_name":"Bilan de sante","s3_desc":"Bilan complet annuel"}},{"type":"opening_hours","content":{"title":"Horaires de consultation","mon_fri":"8h30-12h30 / 14h-18h","saturday":"8h30-12h30","sunday":"Urgences uniquement"}},{"type":"calendly","content":{"label":"Prendre rendez-vous","url":"https://doctolib.fr","description":"Consultation en cabinet ou teleconsultation"}},{"type":"google_maps","content":{"label":"Cabinet medical","address":"45 rue de la Convention, 75015 Paris","transport":"Metro Convention - Ligne 12"}},{"type":"social_links","content":{"website":"https://doctolib.fr","phone":"tel:+33123456789"}}],"vente_produits":[{"type":"profile","content":{"name":"Digital Studio","tagline":"Formations et Ressources pour entrepreneurs","badge":"+1200 eleves formes"}},{"type":"bio","content":{"text":"Je crée des formations et des ressources pratiques pour aider les entrepreneurs a developper leur business en ligne. Accès immediat après paiement.","align":"center"}},{"type":"promo_banner","content":{"emoji":"⚡","text":"Formation bestseller a -50%","subtext":"Offre limitee - 47 EUR au lieu de 97 EUR","cta_label":"Profiter de l offre","cta_url":"#"}},{"type":"product","content":{"name":"Formation Marketing Digital 2025","price":"47 EUR","old_price":"97 EUR","description":"8h de contenu video, 50 ressources, accès a vie.","cta_label":"Acceder a la formation","cta_url":"#"}},{"type":"product","content":{"name":"Pack Templates Canva Pro","price":"27 EUR","description":"200+ templates premium pour vos réseaux sociaux.","cta_label":"Télécharger le pack","cta_url":"#"}},{"type":"testimonials","content":{"name1":"Marine C.","text1":"Formation ultra complete et actionnable. J ai triple mon CA en 3 mois !","stars1":"5","name2":"Romain D.","text2":"Les templates sont incroyables.","stars2":"5"}},{"type":"social_links","content":{"instagram":"https://instagram.com","youtube":"https://youtube.com"}}],"immobilier":[{"type":"profile","content":{"name":"Marc Dubois Immobilier","tagline":"Agent immobilier - Paris et IDF","badge":"+150 biens vendus"}},{"type":"bio","content":{"text":"Specialiste de l immobilier parisien depuis 12 ans. J accompagne acheteurs et vendeurs dans tous leurs projets immobiliers avec expertise et transparence.","align":"left"}},{"type":"services_list","content":{"title":"Mes services","s1_icon":"🏠","s1_name":"Vente et Achat","s1_desc":"Estimation, negociation, closing","s2_icon":"🔑","s2_name":"Location et Gestion","s2_desc":"Mise en location, suivi locataires","s3_icon":"📊","s3_name":"Estimation gratuite","s3_desc":"Valorisation de votre bien"}},{"type":"testimonials","content":{"name1":"Famille Moreau","text1":"Marc a trouve notre appartement ideal en 3 semaines. Professionnel et efficace.","stars1":"5","name2":"Sophie L.","text2":"Vente rapide au meilleur prix. Je recommande vivement !","stars2":"5"}},{"type":"cta_button","content":{"label":"Estimation gratuite de mon bien","url":"#","style":"gold","icon":"🏡","full_width":"yes"}},{"type":"contact_form","content":{"title":"Contactez-moi","button_label":"Envoyer ma demande"}},{"type":"social_links","content":{"linkedin":"https://linkedin.com","website":"https://monsite.com","phone":"tel:+33123456789"}}],"startup":[{"type":"profile","content":{"name":"TechVision AI","tagline":"La plateforme IA qui transforme vos données en decisions","badge":"Beta - Accès gratuit"}},{"type":"bio","content":{"text":"TechVision AI utilise le machine learning pour analyser vos données metier et générer des insights actionnables en temps réel. Plus de 500 entreprises nous font confiance.","align":"center"}},{"type":"services_list","content":{"title":"Fonctionnalites clés","s1_icon":"🤖","s1_name":"Analyse predictive","s1_desc":"Anticipez les tendances de votre marche","s2_icon":"📊","s2_name":"Tableaux de bord IA","s2_desc":"Visualisations intelligentes en temps réel","s3_icon":"🔗","s3_name":"Integrations natives","s3_desc":"Salesforce, HubSpot, Notion et +50 outils"}},{"type":"pricing","content":{"title":"Tarifs simples","title1":"Starter","price1":"0 EUR","desc1":"Pour tester","title2":"Growth","price2":"49 EUR/mois","desc2":"Pour les equipes","title3":"Enterprise","price3":"Sur devis","desc3":"Pour les grands comptes","cta_label":"Commencer gratuitement","cta_url":"#"}},{"type":"cta_button","content":{"label":"Rejoindre la beta gratuite","url":"#","style":"gold","icon":"🚀","full_width":"yes"}},{"type":"social_links","content":{"linkedin":"https://linkedin.com","twitter":"https://twitter.com","website":"https://monsite.com"}}],"influenceur":[{"type":"profile","content":{"name":"Sarah Style","tagline":"Influenceuse Mode et Lifestyle - 1.2M followers","badge":"Collaborations ouvertes"}},{"type":"bio","content":{"text":"Passionnée de mode, de beauté et d'art de vivre. Je partage mon quotidien avec authenticite et cree du contenu inspire pour une communaute engagee et bienveillante.","align":"center"}},{"type":"social_links","content":{"instagram":"https://instagram.com","tiktok":"https://tiktok.com","youtube":"https://youtube.com","pinterest":"https://pinterest.com"}},{"type":"promo_banner","content":{"emoji":"✨","text":"Mon code promo -20%","subtext":"Code SARAH20 sur toute la boutique partenaire","cta_label":"Profiter du code","cta_url":"#"}},{"type":"cta_button","content":{"label":"Télécharger mon media kit","url":"#","style":"outline","icon":"📋","full_width":"yes"}},{"type":"cta_button","content":{"label":"Proposer une collaboration","url":"mailto:contact@sarah.com","style":"gold","icon":"💌","full_width":"yes"}},{"type":"visit_counter","content":{"label":"visiteurs ce mois"}}]}
@@ -117,20 +103,20 @@ const CATEGORY_MAP: Record<string, string[]> = {
 }
 
 const TEMPLATES: any[] = [
-  { id: "freelance", name: "Freelance Pro", category: "Business", plan: "free", description: "Portfolio, services, tarifs, prise de contact", emoji: "💼", color: "var(--accent)", accent: "var(--success)", bg: "#080808", surface: "#111009", tags: ["Services", "Tarifs", "Contact", "Calendly"] },
-  { id: "restaurant", name: "Restaurant & Bar", category: "Food", plan: "free", description: "Menu, horaires, réservation, réseaux", emoji: "🍽️", color: "var(--danger)", accent: "#F97316", bg: "#0D0505", surface: "#1A0A0A", tags: ["Menu", "Horaires", "Carte", "Réservation"] },
-  { id: "artiste", name: "Artiste & Musicien", category: "Creatif", plan: "free", description: "Bio, musique, concerts, réseaux sociaux", emoji: "🎵", color: "#A78BFA", accent: "#F472B6", bg: "#0A0510", surface: "#130A20", tags: ["Spotify", "Concerts", "Réseaux", "Bio"] },
-  { id: "coach", name: "Coach & Thérapeute", category: "Bien-etre", plan: "free", description: "Présentation, méthode, témoignages, RDV", emoji: "🧘", color: "#4ADE80", accent: "#86EFAC", bg: "#040D06", surface: "#081A0C", tags: ["Services", "Témoignages", "Tarifs", "RDV"] },
-  { id: "createur", name: "Créateur de contenu", category: "Creatif", plan: "free", description: "Liens réseaux, partenariats, stats", emoji: "📱", color: "var(--danger)", accent: "#FFD93D", bg: "#080810", surface: "#10101E", tags: ["Réseaux", "Stats", "Partenariats", "Feed"] },
-  { id: "event", name: "Événement & Soirée", category: "Event", plan: "free", description: "Compte à rebours, programme, billetterie", emoji: "🎉", color: "#EC4899", accent: "#A855F7", bg: "#05020D", surface: "#0D0620", tags: ["Compte à rebours", "Programme", "Billets", "Lieu"] },
-  { id: "ecommerce", name: "Boutique E-commerce", category: "Commerce", plan: "starter", description: "Produits phares, promos, avis, boutique", emoji: "🛍️", color: "#F97316", accent: "#FCD34D", bg: "#0D0700", surface: "#1A1000", tags: ["Produits", "Promo", "Avis", "Boutique"], highlight: "Catalogue produits + promo" },
-  { id: "coiffeur", name: "Salon Beauté", category: "Beaute", plan: "starter", description: "Services, galerie, avis, prise de RDV", emoji: "✂️", color: "#F472B6", accent: "#FB7185", bg: "#0D0508", surface: "#1A0812", tags: ["Services", "Galerie", "Avis", "RDV"], highlight: "Galerie + réservations en ligne" },
-  { id: "agence", name: "Agence & Studio", category: "Business", plan: "starter", description: "Portfolio, services, tarifs, contact pro", emoji: "🏢", color: "var(--action)", accent: "#818CF8", bg: "#020C18", surface: "#041828", tags: ["Portfolio", "Services", "Tarifs", "Contact"], highlight: "Portfolio + tunnel de conversion" },
-  { id: "medecin", name: "Médecin & Praticien", category: "Sante", plan: "starter", description: "Cabinet, spécialités, horaires, RDV", emoji: "🏥", color: "#34D399", accent: "#6EE7B7", bg: "#020D08", surface: "#041A10", tags: ["Cabinet", "Spécialités", "Horaires", "RDV"], highlight: "Intégration Doctolib + infos cabinet" },
-  { id: "vente_produits", name: "Vente de produits numériques", category: "Commerce", plan: "pro", description: "Formations, livres numériques, modèles, accès membres", emoji: "📦", color: "#A78BFA", accent: "#F472B6", bg: "#060410", surface: "#0E0820", tags: ["Formations", "Produits", "Témoignages", "Accès"], highlight: "Tunnel de vente complet" },
-  { id: "immobilier", name: "Agent Immobilier", category: "Immobilier", plan: "pro", description: "Biens, expertises, contact, avis clients", emoji: "🏠", color: "var(--warning)", accent: "#F59E0B", bg: "#0A0800", surface: "#171200", tags: ["Biens", "Expertise", "Avis", "Contact"], highlight: "Vitrine biens + avis Google" },
-  { id: "startup", name: "Startup & SaaS", category: "Tech", plan: "pro", description: "Présentation, fonctionnalités, tarifs, liste d'attente", emoji: "🚀", color: "#22D3EE", accent: "#818CF8", bg: "#030A14", surface: "#06152A", tags: ["Fonctionnalités", "Tarifs", "Liste d'attente", "Stats"], highlight: "Page SaaS avec liste d'attente" },
-  { id: "influenceur", name: "Influenceur & Personal Brand", category: "Creatif", plan: "pro", description: "Kit média, statistiques, partenariats", emoji: "⭐", color: "#F59E0B", accent: "#EF4444", bg: "#0A0500", surface: "#150B00", tags: ["Kit média", "Stats", "Partenariats", "Fil"], highlight: "Kit média professionnel" },
+  { id: "freelance", name: "Freelance", variante: "noir & or", category: "Business", plan: "free", description: "Portfolio, services, tarifs, prise de contact", emoji: "💼", color: "var(--accent)", accent: "var(--success)", bg: "#080808", surface: "#111009", tags: ["Services", "Tarifs", "Contact", "Calendly"] },
+  { id: "restaurant", name: "Restaurant & Bar", variante: "braise", category: "Food", plan: "free", description: "Menu, horaires, réservation, réseaux", emoji: "🍽️", color: "var(--danger)", accent: "#F97316", bg: "#0D0505", surface: "#1A0A0A", tags: ["Menu", "Horaires", "Carte", "Réservation"] },
+  { id: "artiste", name: "Artiste & Musicien", variante: "velours", category: "Creatif", plan: "free", description: "Bio, musique, concerts, réseaux sociaux", emoji: "🎵", color: "#A78BFA", accent: "#F472B6", bg: "#0A0510", surface: "#130A20", tags: ["Spotify", "Concerts", "Réseaux", "Bio"] },
+  { id: "coach", name: "Coach & Thérapeute", variante: "vert clair", category: "Bien-etre", plan: "free", description: "Présentation, méthode, témoignages, RDV", emoji: "🧘", color: "#4ADE80", accent: "#86EFAC", bg: "#040D06", surface: "#081A0C", tags: ["Services", "Témoignages", "Tarifs", "RDV"] },
+  { id: "createur", name: "Créateur de contenu", variante: "néon", category: "Creatif", plan: "free", description: "Liens réseaux, partenariats, stats", emoji: "📱", color: "var(--danger)", accent: "#FFD93D", bg: "#080810", surface: "#10101E", tags: ["Réseaux", "Stats", "Partenariats", "Feed"] },
+  { id: "event", name: "Événement & Soirée", variante: "festival", category: "Event", plan: "free", description: "Compte à rebours, programme, billetterie", emoji: "🎉", color: "#EC4899", accent: "#A855F7", bg: "#05020D", surface: "#0D0620", tags: ["Compte à rebours", "Programme", "Billets", "Lieu"] },
+  { id: "ecommerce", name: "Boutique E-commerce", variante: "orange vif", category: "Commerce", plan: "starter", description: "Produits phares, promos, avis, boutique", emoji: "🛍️", color: "#F97316", accent: "#FCD34D", bg: "#0D0700", surface: "#1A1000", tags: ["Produits", "Promo", "Avis", "Boutique"], highlight: "Catalogue produits + promo" },
+  { id: "coiffeur", name: "Salon Beauté", variante: "rose nuit", category: "Beaute", plan: "starter", description: "Services, galerie, avis, prise de RDV", emoji: "✂️", color: "#F472B6", accent: "#FB7185", bg: "#0D0508", surface: "#1A0812", tags: ["Services", "Galerie", "Avis", "RDV"], highlight: "Galerie + réservations en ligne" },
+  { id: "agence", name: "Agence & Studio", variante: "bleu profond", category: "Business", plan: "starter", description: "Portfolio, services, tarifs, contact pro", emoji: "🏢", color: "var(--action)", accent: "#818CF8", bg: "#020C18", surface: "#041828", tags: ["Portfolio", "Services", "Tarifs", "Contact"], highlight: "Portfolio + tunnel de conversion" },
+  { id: "medecin", name: "Médecin & Praticien", variante: "vert clair", category: "Sante", plan: "starter", description: "Cabinet, spécialités, horaires, RDV", emoji: "🏥", color: "#34D399", accent: "#6EE7B7", bg: "#020D08", surface: "#041A10", tags: ["Cabinet", "Spécialités", "Horaires", "RDV"], highlight: "Intégration Doctolib + infos cabinet" },
+  { id: "vente_produits", name: "Vente de produits numériques", variante: "velours", category: "Commerce", plan: "pro", description: "Formations, livres numériques, modèles, accès membres", emoji: "📦", color: "#A78BFA", accent: "#F472B6", bg: "#060410", surface: "#0E0820", tags: ["Formations", "Produits", "Témoignages", "Accès"], highlight: "Tunnel de vente complet" },
+  { id: "immobilier", name: "Agent immobilier", variante: "prestige or", category: "Immobilier", plan: "pro", description: "Biens, expertises, contact, avis clients", emoji: "🏠", color: "var(--warning)", accent: "#F59E0B", bg: "#0A0800", surface: "#171200", tags: ["Biens", "Expertise", "Avis", "Contact"], highlight: "Vitrine biens + avis Google" },
+  { id: "startup", name: "Startup & SaaS", variante: "aurore", category: "Tech", plan: "pro", description: "Présentation, fonctionnalités, tarifs, liste d'attente", emoji: "🚀", color: "#22D3EE", accent: "#818CF8", bg: "#030A14", surface: "#06152A", tags: ["Fonctionnalités", "Tarifs", "Liste d'attente", "Stats"], highlight: "Page SaaS avec liste d'attente" },
+  { id: "influenceur", name: "Influenceur & Marque personnelle", variante: "or luxe", category: "Creatif", plan: "pro", description: "Kit média, statistiques, partenariats", emoji: "⭐", color: "#F59E0B", accent: "#EF4444", bg: "#0A0500", surface: "#150B00", tags: ["Kit média", "Stats", "Partenariats", "Fil"], highlight: "Kit média professionnel" },
   ...SHARED_META,
 ]
 
@@ -139,7 +125,9 @@ const PLAN_COULEUR: Record<string, string> = { free: "var(--muted)", pro: "var(-
 const planConfig = (plan: string) => { const p = getPlan(plan); return { label: p.label, color: PLAN_COULEUR[p.id] } }
 const FAV_KEY = "qrfolio_fav_templates"
 const PLAN_FILTERS: [string, string][] = [["all", "Tous les plans"], ["free", PLANS.free.label], ["pro", PLANS.pro.label]]
-const STARTER_TEMPLATE_ID = "freelance" // modèle recommandé par défaut (nouvel utilisateur sans page)
+// Revue du 9 septembre : 8 modèles recommandés d'abord (tous gratuits, un par grand
+// métier), les 40 autres en un clic ou par la recherche et les filtres existants.
+const RECOMMANDES = ["biz_freelance", "resto_bistrot", "beaute_coiffure", "coach_vie", "creatif_artiste", "immo_agence", "shop_boutique", "event_soiree"]
 
 export default function TemplatesPage() {
   // ?metier=… : quelqu'un venu de « QR code restaurant » doit voir des restaurants,
@@ -275,15 +263,23 @@ export default function TemplatesPage() {
   // avec un cadenas et « Débloquer » — un mur payant à l'entrée d'un produit
   // que personne ne connaît encore. Les modèles payants restent visibles,
   // simplement plus bas.
+  const accueil = !fromEntry && activeMetier === "Tous" && activePlan === "all" && !search.trim()
+  const [voirTout, setVoirTout] = useState(false)
   const ordonnes = useMemo(() => {
-    if (!fromEntry) return filtered
+    if (!fromEntry) {
+      if (!accueil) return filtered
+      const reco = RECOMMANDES.map(id => filtered.find((t: any) => t.id === id)).filter(Boolean)
+      return [...reco, ...filtered.filter((t: any) => !RECOMMANDES.includes(t.id))]
+    }
     const dedans = filtered.filter((t: any) => dansSecteur(t, fromEntry))
     const dehors = filtered.filter((t: any) => !dansSecteur(t, fromEntry))
     const ouverts = dedans.filter((t: any) => canUse(t.plan))
     const fermes = dedans.filter((t: any) => !canUse(t.plan))
     return [...ouverts, ...fermes, ...dehors]
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filtered, fromEntry, userPlan])
+  }, [filtered, fromEntry, userPlan, accueil])
+  const affiches = accueil && !voirTout ? ordonnes.slice(0, RECOMMANDES.length) : ordonnes
+  const autres = ordonnes.length - affiches.length
 
   // Compteur par catégorie
   const countByMetier = useMemo(() => {
@@ -301,22 +297,6 @@ export default function TemplatesPage() {
   function planRequis(plan: string) {
     toast.info(`Ce modèle fait partie du plan ${getPlan(plan).label}.`, { action: { label: "Voir les offres", onClick: () => router.push("/upgrade?reason=template") } })
   }
-
-  // ── Recommandation (basée sur les pages existantes) ─────────────────────────
-  const reco = useMemo(() => {
-    const used = new Set(usedTemplateIds)
-    const notUsed = TEMPLATES.filter((t: any) => !used.has(t.id))
-    // priorité : un modèle populaire pas encore utilisé, sinon le 1er non utilisé
-    const popular = notUsed.find((t: any) => popTier(t.id)?.label === "Populaire")
-    if (used.size === 0) {
-      // Aucun page encore : on guide vers un démarrage simple (modèle gratuit)
-      const starter = TEMPLATES.find((t: any) => t.id === STARTER_TEMPLATE_ID) || TEMPLATES[0]
-      return { t: starter, reason: "Le plus choisi pour bien démarrer", isStart: true }
-    }
-    const pick = popular || notUsed[0]
-    if (!pick) return null
-    return { t: pick, reason: `Vous avez déjà ${used.size} page${used.size > 1 ? "s" : ""} — variez les usages avec ce modèle`, isStart: false }
-  }, [usedTemplateIds])
 
   // Thèmes complets par template (utilise les PRESET_THEMES officiels)
   const TEMPLATE_THEMES: Record<string, any> = {
@@ -466,10 +446,10 @@ export default function TemplatesPage() {
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             {activeCat && activeCat.id !== "Tous" && <span style={{ fontSize: 18 }}>{activeCat.emoji}</span>}
             <span style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600 }}>
-              {activeMetier === "Tous" ? "Tous les modèles" : activeCat?.label}
+              {accueil && !voirTout ? "Pour bien démarrer" : activeMetier === "Tous" ? "Tous les modèles" : activeCat?.label}
             </span>
             <span style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 10, padding: "2px 9px", color: G, fontSize: 11, fontWeight: 700 }}>
-              {filtered.length} résultat{filtered.length > 1 ? "s" : ""}
+              {accueil && !voirTout ? `${affiches.length} recommandés` : `${filtered.length} résultat${filtered.length > 1 ? "s" : ""}`}
             </span>
           </div>
           {(activeMetier !== "Tous" || activePlan !== "all" || search) && (
@@ -493,14 +473,12 @@ export default function TemplatesPage() {
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(min(290px,100%), 1fr))", gap: isMobile ? 11 : 18 }}>
             <style>{`@keyframes tplUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}`}</style>
-            {ordonnes.map((template: any, idx: number) => {
+            {affiches.map((template: any, idx: number) => {
               const planCfg = planConfig(template.plan)
               const locked = !canUse(template.plan)
-              const blockCount = (TEMPLATE_BLOCKS[template.id] || []).length
               const isFav = favs.includes(template.id)
               const isHovered = hoveredCard === template.id
               const isCreating = creating === template.id
-              const tier = popTier(template.id)
 
               return (
                 // Revue du 9 septembre (P0) : la carte n'est plus un `role="button"`
@@ -569,49 +547,14 @@ export default function TemplatesPage() {
 
                   {/* ── Infos ─────────────────────────────────────────────── */}
                   <div style={{ padding: isMobile ? "9px 10px 11px" : "14px 16px" }}>
-                    {/* Nom + catégorie */}
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: isMobile ? 8 : 6 }}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <h2 id={`tpl-nom-${template.id}`} style={{ color: "var(--ink)", fontSize: isMobile ? 12.5 : 15, fontWeight: 700, margin: isMobile ? 0 : "0 0 5px", letterSpacing: "-0.2px", whiteSpace: isMobile ? "nowrap" as const : "normal", overflow: "hidden", textOverflow: "ellipsis" }}>{template.name}</h2>
-                        {!isMobile && <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
-                          <span style={{ background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 6, padding: "1px 7px", fontSize: 10, color: "var(--muted)", fontWeight: 500 }}>{categorieLue(template.category)}</span>
-                          {tier && (
-                            <span style={{ display: "inline-flex", alignItems: "center", gap: 3, background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 6, padding: "1px 7px", fontSize: 10, color: "var(--accent)", fontWeight: 600 }}>
-                              {tier.label}
-                            </span>
-                          )}
-                        </div>}
-                      </div>
+                    {/* Revue du 9 septembre : la carte ne porte que l'essentiel — plan (sur la
+                        vignette), nom, une phrase, actions. Blocs, durée, étiquettes et accroche
+                        vivent dans l'aperçu. La « variante » distingue deux modèles homonymes. */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: isMobile ? 8 : 4, minWidth: 0 }}>
+                      <h2 id={`tpl-nom-${template.id}`} style={{ color: "var(--ink)", fontSize: isMobile ? 12.5 : 15, fontWeight: 700, margin: 0, letterSpacing: "-0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}>{template.name}</h2>
+                      {template.variante && !isMobile && <span style={{ flexShrink: 0, background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 6, padding: "1px 7px", fontSize: 10, color: "var(--muted)", fontWeight: 500 }}>{template.variante}</span>}
                     </div>
-
-                    {!isMobile && <>
-                      {/* Description */}
-                      <p style={{ color: MUTED, fontSize: 12.5, margin: "0 0 8px", lineHeight: 1.5 }}>{template.description}</p>
-
-                      {/* Highlight */}
-                      {template.highlight && (
-                        <p style={{ margin: "0 0 10px", color: "var(--ink)", fontSize: 12, fontWeight: 500 }}>{template.highlight}</p>
-                      )}
-
-                      {/* Métadonnées : blocs + temps */}
-                      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                          <Layers size={11} color={MUTED} />
-                          <span style={{ color: MUTED, fontSize: 12 }}>{blockCount} blocs</span>
-                        </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                          <Clock size={11} color={MUTED} />
-                          <span style={{ color: MUTED, fontSize: 12 }}>≈ {SETUP_TIME[template.id] || "5 min"}</span>
-                        </div>
-                      </div>
-
-                      {/* Tags */}
-                      <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 14 }}>
-                        {template.tags.slice(0, 4).map((tag: string, i: number) => (
-                          <span key={i} style={{ background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 4, padding: "2px 6px", fontSize: 10, color: MUTED }}>{tag}</span>
-                        ))}
-                      </div>
-                    </>}
+                    {!isMobile && <p style={{ color: MUTED, fontSize: 12.5, margin: "0 0 12px", lineHeight: 1.5 }}>{template.description}</p>}
 
                     {/* Actions */}
                     <div style={{ display: "flex", gap: 7 }}>
@@ -641,6 +584,15 @@ export default function TemplatesPage() {
                 </article>
               )
             })}
+          </div>
+        )}
+
+        {/* Les autres modèles : un clic, ou la recherche et les filtres. */}
+        {accueil && !voirTout && autres > 0 && (
+          <div style={{ textAlign: "center", marginTop: 24 }}>
+            <button type="button" onClick={() => setVoirTout(true)} className="da-btn-neutral" style={{ padding: "12px 22px" }}>
+              Voir les {autres} autres modèles
+            </button>
           </div>
         )}
 
@@ -866,9 +818,46 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
           <button onClick={onClose} aria-label="Fermer" style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 4 }}><X size={18} /></button>
         </div>
 
-        {/* Apparence repliable. Sur mobile, ces deux réglages occupaient tout l'écran
-            et enterraient le champ « nom » et le bouton : un visiteur devait faire
-            défiler une page entière de pastilles avant de pouvoir avancer. */}
+        {/* Nom */}
+        <div style={{ marginBottom: 14 }}>
+          <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>Nom du projet</label>
+          <input value={name} onChange={e => setName(e.target.value)} placeholder="Ex : Le Bistrot Parisien" style={inputStyle} autoFocus />
+          {!nameValid && name.length > 0 && <p style={{ color: "#F87171", fontSize: 10, margin: "4px 0 0" }}>Le nom doit faire 2 a 80 caracteres.</p>}
+        </div>
+
+        {/* Adresse de la page (« slug ») — masquée sans compte : elle se choisit au moment de publier. */}
+        <div style={{ marginBottom: 14, display: guest ? "none" : undefined }}>
+          <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>Adresse de la page</label>
+          <input value={slug} onChange={e => { setSlugTouched(true); setSlug(slugify(e.target.value)) }} placeholder="le-bistrot-parisien" style={{ ...inputStyle, fontFamily: "monospace" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "5px 0 0", minHeight: 16 }}>
+            {slugStatus === "checking" && <span style={{ color: MUTED, fontSize: 10 }}>Vérification…</span>}
+            {slugStatus === "available" && <span style={{ color: "var(--success)", fontSize: 10, fontWeight: 600 }}>✓ Disponible</span>}
+            {slugStatus === "taken" && <span style={{ color: "#F87171", fontSize: 10, fontWeight: 600 }}>✗ Déjà pris</span>}
+            {slugStatus === "reserved" && <span style={{ color: "#F87171", fontSize: 10, fontWeight: 600 }}>✗ Adresse réservée</span>}
+            {slugStatus === "invalid" && <span style={{ color: "var(--warning)", fontSize: 10, fontWeight: 600 }}>2 à 60 caractères : minuscules, chiffres et tirets</span>}
+          </div>
+          <p style={{ color: MUTED, fontSize: 10, margin: "4px 0 0", fontFamily: "monospace" }}>qrowg.com/{slug || "..."}</p>
+          {(slugStatus === "taken") && suggestions.length > 0 && (
+            <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 7 }}>
+              {suggestions.map(s => (
+                <button key={s} onClick={() => { setSlugTouched(true); setSlug(s) }} style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 6, padding: "3px 8px", color: G, fontSize: 10, cursor: "pointer", fontFamily: "monospace" }}>{s}</button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Description */}
+        <div style={{ marginBottom: 18 }}>
+          <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>Description (optionnel)</label>
+          <input value={description} onChange={e => setDescription(e.target.value)} placeholder="Courte description de la page" style={inputStyle} />
+        </div>
+
+        {/* Erreur */}
+        {error && <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 9, padding: "9px 12px", color: "#F87171", fontSize: 12, marginBottom: 14 }}>⚠ {error}</div>}
+
+        {/* Apparence, APRÈS le nom (revue du 9 septembre : on nomme le projet, puis on
+            choisit l'ambiance). Repliable : sur mobile, ces deux réglages enterraient le
+            champ « nom » et le bouton. */}
         {(styleOptions?.length || layoutOptions?.length) ? (
           <button type="button" onClick={() => setLookOpen(v => !v)} aria-expanded={lookOpen}
             style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, marginBottom: lookOpen ? 12 : 16,
@@ -922,43 +911,6 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
             </div>
           </div>
         )}
-
-        {/* Nom */}
-        <div style={{ marginBottom: 14 }}>
-          <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>Nom du projet</label>
-          <input value={name} onChange={e => setName(e.target.value)} placeholder="Ex : Le Bistrot Parisien" style={inputStyle} autoFocus />
-          {!nameValid && name.length > 0 && <p style={{ color: "#F87171", fontSize: 10, margin: "4px 0 0" }}>Le nom doit faire 2 a 80 caracteres.</p>}
-        </div>
-
-        {/* Adresse de la page (« slug ») — masquée sans compte : elle se choisit au moment de publier. */}
-        <div style={{ marginBottom: 14, display: guest ? "none" : undefined }}>
-          <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>Adresse de la page</label>
-          <input value={slug} onChange={e => { setSlugTouched(true); setSlug(slugify(e.target.value)) }} placeholder="le-bistrot-parisien" style={{ ...inputStyle, fontFamily: "monospace" }} />
-          <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "5px 0 0", minHeight: 16 }}>
-            {slugStatus === "checking" && <span style={{ color: MUTED, fontSize: 10 }}>Vérification…</span>}
-            {slugStatus === "available" && <span style={{ color: "var(--success)", fontSize: 10, fontWeight: 600 }}>✓ Disponible</span>}
-            {slugStatus === "taken" && <span style={{ color: "#F87171", fontSize: 10, fontWeight: 600 }}>✗ Déjà pris</span>}
-            {slugStatus === "reserved" && <span style={{ color: "#F87171", fontSize: 10, fontWeight: 600 }}>✗ Adresse réservée</span>}
-            {slugStatus === "invalid" && <span style={{ color: "var(--warning)", fontSize: 10, fontWeight: 600 }}>2 à 60 caractères : minuscules, chiffres et tirets</span>}
-          </div>
-          <p style={{ color: MUTED, fontSize: 10, margin: "4px 0 0", fontFamily: "monospace" }}>qrowg.com/{slug || "..."}</p>
-          {(slugStatus === "taken") && suggestions.length > 0 && (
-            <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 7 }}>
-              {suggestions.map(s => (
-                <button key={s} onClick={() => { setSlugTouched(true); setSlug(s) }} style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 6, padding: "3px 8px", color: G, fontSize: 10, cursor: "pointer", fontFamily: "monospace" }}>{s}</button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Description */}
-        <div style={{ marginBottom: 18 }}>
-          <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>Description (optionnel)</label>
-          <input value={description} onChange={e => setDescription(e.target.value)} placeholder="Courte description de la page" style={inputStyle} />
-        </div>
-
-        {/* Erreur */}
-        {error && <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 9, padding: "9px 12px", color: "#F87171", fontSize: 12, marginBottom: 14 }}>⚠ {error}</div>}
 
         {/* Boutons */}
         <div style={{ display: "flex", gap: 9 }}>

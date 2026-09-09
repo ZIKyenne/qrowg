@@ -74,7 +74,7 @@ Tiramisu;6,50€;Fait maison`
                   Ouvrir ChatGPT ↗
                 </a>
               </div>
-              <p style={{ color: MUTED, fontSize: 10.5, margin: "11px 0 0", lineHeight: 1.5 }}>
+              <p style={{ color: MUTED, fontSize: 12, margin: "11px 0 0", lineHeight: 1.5 }}>
                 Astuce : pour un menu à plusieurs catégories, demandez une liste par catégorie et collez chacune dans sa section.
               </p>
             </div>
@@ -111,7 +111,7 @@ Tiramisu;6,50€;Fait maison`
       setMsg(`${items.length} plat${items.length > 1 ? "s" : ""} importé${items.length > 1 ? "s" : ""} ✓`)
       setText("")
     }
-    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "9px 11px", color: "var(--ink)", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
+    const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "10px 11px", color: "var(--ink)", fontSize: 14, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
     return (
       <div style={{ border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 12, background: "color-mix(in srgb, var(--accent) 4%, transparent)", overflow: "hidden" }}>
         <button type="button" onClick={() => setOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "11px 12px", background: "transparent", border: "none", color: G, fontSize: 12.5, fontWeight: 700, cursor: "pointer", textAlign: "left" }}>
@@ -384,7 +384,7 @@ Tiramisu;6,50€;Fait maison`
             return (
               <div key={i} style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: 11, background: "rgba(255,255,255,0.02)", display: "flex", flexDirection: "column", gap: 8 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ flex: 1, color: MUTED, fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>{noun} {i}</span>
+                  <span style={{ flex: 1, color: MUTED, fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>{noun} {i}</span>
                   <button type="button" onClick={() => moveItem(i, -1)} disabled={i === 1} aria-label="Monter" style={iconBtn(i === 1)}><ChevronUp size={16} /></button>
                   <button type="button" onClick={() => moveItem(i, 1)} disabled={i === count} aria-label="Descendre" style={iconBtn(i === count)}><ChevronDown size={16} /></button>
                   <button type="button" onClick={() => deleteItem(i)} aria-label="Supprimer" style={{ ...iconBtn(false), color: "var(--danger)" }}><Trash2 size={15} /></button>
@@ -396,7 +396,7 @@ Tiramisu;6,50€;Fait maison`
                   : f.kind === "textarea"
                   ? <textarea key={f.suffix} value={it[f.suffix]} onChange={e => onChange(key(i, f.suffix), e.target.value)} placeholder={f.placeholder} rows={5} style={{ ...inputStyle, fontFamily: "monospace", whiteSpace: "pre", resize: "vertical" }} />
                   : f.options
-                  ? <div key={f.suffix}>{f.placeholder && <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4, fontWeight: 500 }}>{f.placeholder}</label>}<Segmented value={it[f.suffix]} options={f.options} onChange={v => onChange(key(i, f.suffix), v)} /></div>
+                  ? <div key={f.suffix}>{f.placeholder && <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4, fontWeight: 500 }}>{f.placeholder}</label>}<Segmented value={it[f.suffix]} options={f.options} onChange={v => onChange(key(i, f.suffix), v)} /></div>
                   : <input key={f.suffix} type={f.kind === "url" ? "url" : "text"} value={it[f.suffix]} onChange={e => onChange(key(i, f.suffix), e.target.value)} placeholder={f.placeholder} style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />
                 )}
               </div>
@@ -703,7 +703,7 @@ Tiramisu;6,50€;Fait maison`
       return (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <div>
-            <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 6, fontWeight: 500 }}>Affichage</label>
+            <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 6, fontWeight: 500 }}>Affichage</label>
             <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
               {[{ k: "list", l: "Liste" }, { k: "grid", l: "Grille" }, { k: "icons", l: "Icônes" }].map(o => {
                 const on = disp === o.k
@@ -717,7 +717,7 @@ Tiramisu;6,50€;Fait maison`
             const filled = SOCIAL_NETWORKS.filter(n => block.content[n.key])
             const renderNet = (n: typeof SOCIAL_NETWORKS[number]) => (
               <div key={n.key}>
-                <label style={{ color: MUTED, fontSize: 11, display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
+                <label style={{ color: MUTED, fontSize: 12, display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
                   <span style={{ fontSize: 14 }}>{n.icon}</span>
                   <span style={{ color: n.color, fontWeight: 600 }}>{n.label}</span>
                 </label>
@@ -801,7 +801,7 @@ Tiramisu;6,50€;Fait maison`
     const useCards = cardOrder.length >= 2
     const renderField = (field: typeof scoped[number], labelOverride?: string) => (
           <div key={field.key}>
-            <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>{labelOverride ?? field.label}</label>
+            <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 5, fontWeight: 500 }}>{labelOverride ?? field.label}</label>
             {field.type === "textarea"
               ? <textarea value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)}
                   placeholder={field.placeholder} rows={3}
@@ -849,7 +849,7 @@ Tiramisu;6,50€;Fait maison`
               const isTestable = field.type === "url" && valid && /^https?:\/\//i.test(val)
               return (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: 4 }}>
-                  <span style={{ color: valid ? "var(--success)" : "#F59E0B", fontSize: 10.5, fontWeight: 600 }}>{valid ? "✓ Format valide" : `⚠ ${msg}`}</span>
+                  <span style={{ color: valid ? "var(--success)" : "#F59E0B", fontSize: 12, fontWeight: 600 }}>{valid ? "✓ Format valide" : `⚠ ${msg}`}</span>
                   {isTestable && <a href={val} target="_blank" rel="noopener noreferrer" style={{ color: G, fontSize: 9, fontWeight: 700, textDecoration: "none" }}>Tester ↗</a>}
                 </div>
               )
@@ -858,11 +858,12 @@ Tiramisu;6,50€;Fait maison`
             {field.type === "textarea" && !(field as any).maxRecommended && (() => {
               const len = (block.content[field.key] || "").length
               if (!len) return null
-              const [txt, col] = len < 40 ? ["Un peu court", "#F59E0B"] : len <= 200 ? ["Bonne longueur ✓", "var(--success)"] : ["Un peu long pour mobile", "#F59E0B"]
+              // Revue du 9 septembre : un compteur, et une alerte seulement quand elle sert (plus de mention positive).
+              const alerte = len < 40 ? "Un peu court" : len > 200 ? "Un peu long pour mobile" : null
               return (
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
-                  <span style={{ color: col, fontSize: 10.5, fontWeight: 600 }}>{txt}</span>
-                  <span style={{ color: MUTED, fontSize: 10.5 }}>{len} car.</span>
+                  <span style={{ color: "#F59E0B", fontSize: 12, fontWeight: 600 }}>{alerte}</span>
+                  <span style={{ color: MUTED, fontSize: 12 }}>{len} car.</span>
                 </div>
               )
             })()}
@@ -872,18 +873,18 @@ Tiramisu;6,50€;Fait maison`
               if (!len) return null
               const max = (field as any).maxRecommended as number
               const short = Math.max(12, Math.round(max * 0.15))
-              const [txt, col] = len < short ? ["Un peu court", "#F59E0B"] : len <= max * 0.9 ? ["Excellent ✓", "var(--success)"] : len <= max ? ["Bonne longueur ✓", "var(--success)"] : ["Trop long", "var(--danger)"]
+              const alerte = len < short ? ["Un peu court", "#F59E0B"] : len > max ? ["Trop long", "var(--danger)"] : null
               return (
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
-                  <span style={{ color: col, fontSize: 10.5, fontWeight: 600 }}>{txt}</span>
-                  <span style={{ color: len > max ? "var(--danger)" : MUTED, fontSize: 10.5 }}>{len}/{max}</span>
+                  <span style={{ color: alerte?.[1], fontSize: 12, fontWeight: 600 }}>{alerte?.[0]}</span>
+                  <span style={{ color: len > max ? "var(--danger)" : MUTED, fontSize: 12 }}>{len}/{max}</span>
                 </div>
               )
             })()}
             {/* Suggestions curées — pour ne jamais partir d'un champ vide */}
             {(field as any).suggestions && ((field as any).suggestionsMode === "append" || (block.content[field.key] || "").trim() === "") && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 6 }}>
-                <span style={{ color: MUTED, fontSize: 9, alignSelf: "center", marginRight: 1 }}>Exemples&nbsp;:</span>
+                <span style={{ color: MUTED, fontSize: 11, alignSelf: "center", marginRight: 1 }}>Exemples&nbsp;:</span>
                 {((field as any).suggestions as string[]).map(sug => {
                   const append = (field as any).suggestionsMode === "append"
                   const parts = (block.content[field.key] || "").split(/[,\n]/).map((s: string) => s.trim()).filter(Boolean)
@@ -917,7 +918,7 @@ Tiramisu;6,50€;Fait maison`
                 style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, minHeight: 46, padding: "10px 12px", borderRadius: 10, border: `1px solid ${open ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "rgba(255,255,255,0.08)"}`, background: open ? "color-mix(in srgb, var(--accent) 6%, transparent)" : "rgba(255,255,255,0.02)", color: "var(--ink)", cursor: "pointer", textAlign: "left" }}>
                 <span style={{ width: 7, height: 7, borderRadius: "50%", background: filled ? "var(--success)" : "rgba(255,255,255,0.18)", flexShrink: 0 }} />
                 <span style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>{g}</span>
-                <span style={{ fontSize: 10.5, color: MUTED }}>{filled ? `${filled}/${fields.length}` : "vide"}</span>
+                <span style={{ fontSize: 12, color: MUTED }}>{filled ? `${filled}/${fields.length}` : "vide"}</span>
                 <ChevronDown size={16} color={MUTED} style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform .2s", flexShrink: 0 }} />
               </button>
               {open && (
@@ -1082,7 +1083,7 @@ Tiramisu;6,50€;Fait maison`
         <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,0.06)", marginBottom: 14, flexShrink: 0 }}>
           {(["themes","colors","fonts","bg","blocks","intro"] as const).map(tab => (
             <button key={tab} onClick={() => setThemeTab(tab)}
-              style={{ flex: 1, padding: "10px 2px", background: "transparent", border: "none", borderBottom: `2px solid ${themeTab===tab ? G : "transparent"}`, color: themeTab===tab ? G : MUTED, fontSize: 10.5, fontWeight: themeTab===tab ? 700 : 400, cursor: "pointer" }}>
+              style={{ flex: 1, padding: "10px 2px", background: "transparent", border: "none", borderBottom: `2px solid ${themeTab===tab ? G : "transparent"}`, color: themeTab===tab ? G : MUTED, fontSize: 12, fontWeight: themeTab===tab ? 700 : 400, cursor: "pointer" }}>
               {tab==="themes" ? "Thèmes" : tab==="colors" ? "Couleurs" : tab==="fonts" ? "Polices" : tab==="bg" ? "Fond" : tab==="blocks" ? "Blocs" : "Intro"}
             </button>
           ))}
@@ -1221,7 +1222,7 @@ Tiramisu;6,50€;Fait maison`
               { key: "fontBody", label: "Police corps" },
             ].map(({ key, label }) => (
               <div key={key}>
-                <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 8, fontWeight: 500, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>{label}</label>
+                <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 8, fontWeight: 500, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>{label}</label>
                 <div style={{ display: "flex", flexDirection: "column", gap: 4, maxHeight: 200, overflowY: "auto" }} className="iphone-scroll">
                   {GOOGLE_FONTS.map(f => (
                     <button key={f} onClick={() => onThemeChange({...theme, [key]: f})}
@@ -1282,7 +1283,7 @@ Tiramisu;6,50€;Fait maison`
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {/* Type selector */}
                 <div>
-                  <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 8, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Type de fond</label>
+                  <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 8, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Type de fond</label>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 5 }}>
                     {[
                       { id: "solid", label: "Uni", icon: "🎨" },
@@ -1304,7 +1305,7 @@ Tiramisu;6,50€;Fait maison`
                 {/* UNI */}
                 {bgMode==="solid" && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    <label style={{ color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Couleur de fond</label>
+                    <label style={{ color: MUTED, fontSize: 12, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Couleur de fond</label>
                     <div style={{ display: "flex", gap: 8 }}>
                       <input type="color" aria-label="Couleur de fond" value={theme.bg} onChange={e => onThemeChange({...theme, bg: e.target.value})}
                         style={{ width: 44, height: 40, border: "none", borderRadius: 8, cursor: "pointer", padding: 0 }} />
@@ -1316,7 +1317,7 @@ Tiramisu;6,50€;Fait maison`
                 {/* DÉGRADÉ */}
                 {bgMode==="gradient" && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    <label style={{ color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Dégradé linéaire</label>
+                    <label style={{ color: MUTED, fontSize: 12, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Dégradé linéaire</label>
                     <div style={{ height: 50, borderRadius: 10, background: theme.bgGradient||"linear-gradient(135deg,#080808,#1a1a08)", border: "1px solid rgba(255,255,255,0.1)" }} />
                     {[
                       { label: "Couleur 1", key: "grad_c1", default: "#080808" },
@@ -1324,7 +1325,7 @@ Tiramisu;6,50€;Fait maison`
                       { label: "Couleur 3 (optionnel)", key: "grad_c3", default: "" },
                     ].map(({ label, key, default: def }) => (
                       <div key={key}>
-                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>{label}</label>
+                        <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{label}</label>
                         <div style={{ display: "flex", gap: 7 }}>
                           <input type="color" aria-label="label" value={(theme as any)[key]||def||"#080808"} onChange={e => {
                             const t2 = {...theme, [key]: e.target.value}
@@ -1340,7 +1341,7 @@ Tiramisu;6,50€;Fait maison`
                       </div>
                     ))}
                     <div>
-                      <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Angle: {(theme as any).grad_angle||135}°</label>
+                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Angle: {(theme as any).grad_angle||135}°</label>
                       <input type="range" aria-label="Angle" min="0" max="360" value={(theme as any).grad_angle||135}
                         onChange={e => {
                           const angle = parseInt(e.target.value)
@@ -1351,7 +1352,7 @@ Tiramisu;6,50€;Fait maison`
                         }}
                         style={{ width: "100%", accentColor: G }} />
                     </div>
-                    <label style={{ color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5, marginTop: 4 }}>Presets rapides</label>
+                    <label style={{ color: MUTED, fontSize: 12, textTransform: "uppercase" as const, letterSpacing: 1.5, marginTop: 4 }}>Presets rapides</label>
                     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                       {[
                         "linear-gradient(135deg,#080808,#1a1a08)",
@@ -1375,7 +1376,7 @@ Tiramisu;6,50€;Fait maison`
                 {/* DÉGRADÉ RADIAL */}
                 {bgMode==="radial" && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    <label style={{ color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Dégradé radial</label>
+                    <label style={{ color: MUTED, fontSize: 12, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Dégradé radial</label>
                     {/* Preview */}
                     <div style={{ height: 80, borderRadius: 10, background: `radial-gradient(circle at ${(theme as any).radial_x||50}% ${(theme as any).radial_y||50}%, ${(theme as any).radial_c1||"#C9A84C"}, ${(theme as any).radial_c2||"#080808"}${(theme as any).radial_c3 ? `, ${(theme as any).radial_c3}` : ""})`, border: "1px solid rgba(255,255,255,0.1)" }} />
                     {/* Couleurs */}
@@ -1385,7 +1386,7 @@ Tiramisu;6,50€;Fait maison`
                       { label: "Couleur bord (opt.)", key: "radial_c3", default: "" },
                     ].map(({ label, key, default: def }) => (
                       <div key={key}>
-                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>{label}</label>
+                        <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{label}</label>
                         <div style={{ display: "flex", gap: 7 }}>
                           <input type="color" aria-label="label" value={(theme as any)[key]||def||"#080808"}
                             onChange={e => {
@@ -1407,7 +1408,7 @@ Tiramisu;6,50€;Fait maison`
                     {/* Position du centre */}
                     <div style={{ display: "flex", gap: 10 }}>
                       <div style={{ flex: 1 }}>
-                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Centre X: {(theme as any).radial_x||50}%</label>
+                        <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Centre X: {(theme as any).radial_x||50}%</label>
                         <input type="range" aria-label="Centre X" min="0" max="100" value={(theme as any).radial_x||50}
                           onChange={e => {
                             const x = parseInt(e.target.value)
@@ -1420,7 +1421,7 @@ Tiramisu;6,50€;Fait maison`
                           style={{ width: "100%", accentColor: G }} />
                       </div>
                       <div style={{ flex: 1 }}>
-                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Centre Y: {(theme as any).radial_y||50}%</label>
+                        <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Centre Y: {(theme as any).radial_y||50}%</label>
                         <input type="range" aria-label="Centre Y" min="0" max="100" value={(theme as any).radial_y||50}
                           onChange={e => {
                             const y = parseInt(e.target.value)
@@ -1455,7 +1456,7 @@ Tiramisu;6,50€;Fait maison`
                 {/* MESH */}
                 {bgMode==="mesh" && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    <label style={{ color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Dégradé Mesh</label>
+                    <label style={{ color: MUTED, fontSize: 12, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Dégradé Mesh</label>
                     <div style={{ height: 60, borderRadius: 10, background: `radial-gradient(ellipse at 0% 0%, ${(theme as any).mesh_c1||"#C9A84C"}80, transparent 50%), radial-gradient(ellipse at 100% 100%, ${(theme as any).mesh_c2||"var(--success)"}80, transparent 50%), radial-gradient(ellipse at 100% 0%, ${(theme as any).mesh_c3||"#7B2FBE"}60, transparent 50%), ${theme.bg}`, border: "1px solid rgba(255,255,255,0.1)", filter: `blur(${Math.round(((theme as any).mesh_blur||40)/5)}px)`, overflow: "hidden" }} />
                     {[
                       { label: "Couleur 1", key: "mesh_c1", default: "#C9A84C" },
@@ -1469,7 +1470,7 @@ Tiramisu;6,50€;Fait maison`
                       </div>
                     ))}
                     <div>
-                      <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Flou: {(theme as any).mesh_blur||40}px</label>
+                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Flou: {(theme as any).mesh_blur||40}px</label>
                       <input type="range" aria-label="Flou" min="0" max="100" value={(theme as any).mesh_blur||40}
                         onChange={e => onThemeChange({...theme, mesh_blur: parseInt(e.target.value)} as any)}
                         style={{ width: "100%", accentColor: G }} />
@@ -1480,7 +1481,7 @@ Tiramisu;6,50€;Fait maison`
                 {/* MOTIF */}
                 {bgMode==="pattern" && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    <label style={{ color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Motif</label>
+                    <label style={{ color: MUTED, fontSize: 12, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Motif</label>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 5 }}>
                       {PATTERNS_LIST.map(p => (
                         <button key={p.id} onClick={() => { setPatternType(p.id); onThemeChange({...theme, bgPattern: p.id} as any) }}
@@ -1491,11 +1492,11 @@ Tiramisu;6,50€;Fait maison`
                       ))}
                     </div>
                     <div>
-                      <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Taille: {(theme as any).pattern_size||20}px</label>
+                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Taille: {(theme as any).pattern_size||20}px</label>
                       <input type="range" aria-label="Taille" min="5" max="80" value={(theme as any).pattern_size||20} onChange={e => onThemeChange({...theme, pattern_size: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
                     </div>
                     <div>
-                      <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Opacité: {Math.round((((theme as any).pattern_opacity ?? 0.15))*100)}%</label>
+                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Opacité: {Math.round((((theme as any).pattern_opacity ?? 0.15))*100)}%</label>
                       <input type="range" aria-label="Opacité" min="1" max="100" value={Math.round((((theme as any).pattern_opacity ?? 0.15))*100)} onChange={e => onThemeChange({...theme, pattern_opacity: parseInt(e.target.value)/100} as any)} style={{ width: "100%", accentColor: G }} />
                     </div>
                     <div style={{ display: "flex", gap: 7, alignItems: "center" }}>
@@ -1509,7 +1510,7 @@ Tiramisu;6,50€;Fait maison`
                 {/* IMAGE */}
                 {bgMode==="image" && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    <label style={{ color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Image de fond</label>
+                    <label style={{ color: MUTED, fontSize: 12, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Image de fond</label>
                     {/* Upload fichier */}
                     <label style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, height: 48, background: "color-mix(in srgb, var(--accent) 8%, transparent)", border: "1.5px dashed color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 10, cursor: "pointer", color: G, fontSize: 12, fontWeight: 600 }}>
                       <span>📁</span> Choisir une image
@@ -1537,7 +1538,7 @@ Tiramisu;6,50€;Fait maison`
                       </div>
                     )}
                     <div>
-                      <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 6 }}>Taille & position</label>
+                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 6 }}>Taille & position</label>
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                         {[
                           { val: "cover", label: "Cover", icon: "⬛", desc: "Remplit tout" },
@@ -1555,11 +1556,11 @@ Tiramisu;6,50€;Fait maison`
                       </div>
                     </div>
                     <div>
-                      <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Overlay: {Math.round(((theme as any).bgOverlayOpacity||0.5)*100)}%</label>
+                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Overlay: {Math.round(((theme as any).bgOverlayOpacity||0.5)*100)}%</label>
                       <input type="range" aria-label="Overlay" min="0" max="100" value={Math.round(((theme as any).bgOverlayOpacity||0.5)*100)} onChange={e => onThemeChange({...theme, bgOverlayOpacity: parseInt(e.target.value)/100} as any)} style={{ width: "100%", accentColor: G }} />
                     </div>
                     <div>
-                      <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Flou: {(theme as any).bgBlur||0}px</label>
+                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Flou: {(theme as any).bgBlur||0}px</label>
                       <input type="range" aria-label="Flou" min="0" max="20" value={(theme as any).bgBlur||0} onChange={e => onThemeChange({...theme, bgBlur: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
                     </div>
                   </div>
@@ -1590,7 +1591,7 @@ Tiramisu;6,50€;Fait maison`
                   </div>
                   {(theme as any).effect_noise && (
                     <div>
-                      <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Opacité: {(theme as any).noise_opacity||20}%</label>
+                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Opacité: {(theme as any).noise_opacity||20}%</label>
                       <input type="range" aria-label="Opacité" min="1" max="80" value={(theme as any).noise_opacity||20} onChange={e => onThemeChange({...theme, noise_opacity: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
                     </div>
                   )}
@@ -1611,11 +1612,11 @@ Tiramisu;6,50€;Fait maison`
                         <span style={{ color: MUTED, fontSize: 11 }}>Couleur</span>
                       </div>
                       <div>
-                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Intensité: {(theme as any).glow_intensity||30}%</label>
+                        <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Intensité: {(theme as any).glow_intensity||30}%</label>
                         <input type="range" aria-label="Intensité" min="5" max="100" value={(theme as any).glow_intensity||30} onChange={e => onThemeChange({...theme, glow_intensity: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
                       </div>
                       <div>
-                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Taille: {(theme as any).glow_size||200}px</label>
+                        <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Taille: {(theme as any).glow_size||200}px</label>
                         <input type="range" aria-label="Taille" min="50" max="600" value={(theme as any).glow_size||200} onChange={e => onThemeChange({...theme, glow_size: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
                       </div>
                     </div>
@@ -1632,7 +1633,7 @@ Tiramisu;6,50€;Fait maison`
                   </div>
                   {(theme as any).effect_vignette && (
                     <div>
-                      <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Intensité: {(theme as any).vignette_intensity||40}%</label>
+                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Intensité: {(theme as any).vignette_intensity||40}%</label>
                       <input type="range" aria-label="Intensité" min="5" max="100" value={(theme as any).vignette_intensity||40} onChange={e => onThemeChange({...theme, vignette_intensity: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
                     </div>
                   )}
@@ -1656,7 +1657,7 @@ Tiramisu;6,50€;Fait maison`
                         <span style={{ color: MUTED, fontSize: 11 }}>Couleur de l'overlay</span>
                       </div>
                       <div>
-                        <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Opacité: {(theme as any).overlay_opacity||30}%</label>
+                        <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Opacité: {(theme as any).overlay_opacity||30}%</label>
                         <input type="range" aria-label="Opacité" min="1" max="90" value={(theme as any).overlay_opacity||30}
                           onChange={e => onThemeChange({...theme, overlay_opacity: parseInt(e.target.value)} as any)}
                           style={{ width: "100%", accentColor: G }} />
@@ -1676,7 +1677,7 @@ Tiramisu;6,50€;Fait maison`
                   </div>
                   {(theme as any).effect_blur && (
                     <div>
-                      <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Intensité: {(theme as any).blur_amount||4}px</label>
+                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Intensité: {(theme as any).blur_amount||4}px</label>
                       <input type="range" aria-label="Intensité" min="1" max="20" value={(theme as any).blur_amount||4}
                         onChange={e => onThemeChange({...theme, blur_amount: parseInt(e.target.value)} as any)}
                         style={{ width: "100%", accentColor: G }} />
@@ -1706,7 +1707,7 @@ Tiramisu;6,50€;Fait maison`
                     </p>
                   </div>
                 </div>
-                <label style={{ color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Animation de fond</label>
+                <label style={{ color: MUTED, fontSize: 12, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Animation de fond</label>
                 {[
                   { id: "none", label: "Statique", desc: "Aucune animation", icon: "⏸" },
                   { id: "gradient-flow", label: "Gradient Flow", desc: "Dégradé animé lent", icon: "🌊" },
@@ -1726,18 +1727,18 @@ Tiramisu;6,50€;Fait maison`
                 ))}
                 {animation==="gradient-flow" && (
                   <div style={{ marginTop: 6 }}>
-                    <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Vitesse: {(theme as any).anim_speed||8}s</label>
+                    <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Vitesse: {(theme as any).anim_speed||8}s</label>
                     <input type="range" aria-label="Vitesse" min="2" max="30" value={(theme as any).anim_speed||8} onChange={e => onThemeChange({...theme, anim_speed: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
                   </div>
                 )}
                 {animation==="aurora" && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 6 }}>
                     <div>
-                      <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Vitesse: {(theme as any).anim_speed||12}s</label>
+                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Vitesse: {(theme as any).anim_speed||12}s</label>
                       <input type="range" aria-label="Vitesse" min="4" max="40" value={(theme as any).anim_speed||12} onChange={e => onThemeChange({...theme, anim_speed: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
                     </div>
                     <div>
-                      <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 4 }}>Intensité: {(theme as any).anim_intensity||60}%</label>
+                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Intensité: {(theme as any).anim_intensity||60}%</label>
                       <input type="range" aria-label="Intensité" min="10" max="100" value={(theme as any).anim_intensity||60} onChange={e => onThemeChange({...theme, anim_intensity: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
                     </div>
                   </div>
@@ -1749,7 +1750,7 @@ Tiramisu;6,50€;Fait maison`
             {bgSubTab==="advanced" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 <div>
-                  <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 6, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>CSS personnalisé</label>
+                  <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 6, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>CSS personnalisé</label>
                   <textarea value={(theme as any).customCSS||""} onChange={e => onThemeChange({...theme, bgGradient: e.target.value, customCSS: e.target.value} as any)}
                     placeholder={"linear-gradient(135deg, #080808, #1a1a08)\n\n/* Ou tout CSS valide pour 'background' */"}
                     rows={5}
@@ -1790,7 +1791,7 @@ Tiramisu;6,50€;Fait maison`
                 </button>
                 {/* Aperçu fond actuel */}
                 <div>
-                  <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 6 }}>Aperçu fond actuel</label>
+                  <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 6 }}>Aperçu fond actuel</label>
                   <div style={{ height: 60, borderRadius: 10, background: theme.bgGradient || theme.bg, backgroundImage: (theme as any).bgMode==="pattern" ? getPatternCSS(patternType, (theme as any).pattern_color||G, (theme as any).pattern_size||20, ((theme as any).pattern_opacity ?? 0.15)) : undefined, backgroundSize: (theme as any).bgMode==="pattern" ? `${(theme as any).pattern_size||20}px ${(theme as any).pattern_size||20}px` : undefined, border: "1px solid rgba(255,255,255,0.1)" }} />
                 </div>
               </div>
@@ -1816,7 +1817,7 @@ Tiramisu;6,50€;Fait maison`
               </p>
               {rows.map(r => (
                 <div key={r.key}>
-                  <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 6, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>{r.label}</label>
+                  <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 6, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>{r.label}</label>
                   <Segmented value={String(bs[r.key] ?? r.def)} options={r.opts} onChange={v => setBS(r.key, v)} />
                 </div>
               ))}
@@ -1828,11 +1829,11 @@ Tiramisu;6,50€;Fait maison`
               </button>
               {themeBlocksAdv && (<>
                 <div>
-                  <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 6, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Animation à l&apos;apparition</label>
+                  <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 6, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Animation à l&apos;apparition</label>
                   <Segmented value={String(bs.__anim ?? "Aucune")} options={BLOCK_ANIM_OPTIONS} onChange={v => setBS("__anim", v)} />
                 </div>
                 <div>
-                  <label style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 6, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Effet verre (flou)</label>
+                  <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 6, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>Effet verre (flou)</label>
                   <Segmented value={bs.__glass ? "Oui" : "Non"} options={["Non", "Oui"]} onChange={v => setBS("__glass", v === "Oui")} />
                 </div>
               </>)}
@@ -1878,7 +1879,7 @@ Tiramisu;6,50€;Fait maison`
               </label>
               {enabled && (<>
                 <div>
-                  <p style={{ color: MUTED, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 7px" }}>Style</p>
+                  <p style={{ color: MUTED, fontSize: 12, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 7px" }}>Style</p>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
                     {STYLES_L.map(([id, label]) => (
                       <button key={id} onClick={() => setIntro({ intro_style: id })}
@@ -1889,14 +1890,14 @@ Tiramisu;6,50€;Fait maison`
                   </div>
                 </div>
                 <div>
-                  <div style={{ display: "flex", justifyContent: "space-between", color: MUTED, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", color: MUTED, fontSize: 12, textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>
                     <span>Durée</span><span style={{ color: G }}>{(curDur / 1000).toFixed(1)} s</span>
                   </div>
                   <input type="range" aria-label="Durée de l'animation" min={800} max={3000} step={100} value={curDur} onChange={e => setIntro({ intro_duration: parseInt(e.target.value, 10) })} style={{ width: "100%", accentColor: G }} />
                 </div>
                 <div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                    <span style={{ color: MUTED, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1 }}>Aperçu</span>
+                    <span style={{ color: MUTED, fontSize: 12, textTransform: "uppercase", letterSpacing: 1 }}>Aperçu</span>
                     <button onClick={() => setIntroReplay(r => r + 1)}
                       style={{ background: "rgba(255,255,255,0.05)", border: `1px solid ${G}55`, borderRadius: 8, color: G, fontSize: 11, fontWeight: 600, padding: "5px 11px", cursor: "pointer" }}>
                       ▶ Rejouer

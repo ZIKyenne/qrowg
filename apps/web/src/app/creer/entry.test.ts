@@ -119,7 +119,10 @@ describe("les pages d'entrée mènent bien à l'essai", () => {
   })
 
   it("la grille affiche la liste ordonnée, pas la liste brute", () => {
-    expect(read("../dashboard/templates/page.tsx")).toContain("{ordonnes.map((template: any, idx: number) => {")
+    // `affiches` = la liste ordonnée, éventuellement tronquée aux recommandés sur la vue d'accueil (revue du 9 septembre).
+    const g = read("../dashboard/templates/page.tsx")
+    expect(g).toContain("{affiches.map((template: any, idx: number) => {")
+    expect(g).toContain("const affiches = accueil && !voirTout ? ordonnes.slice(0, RECOMMANDES.length) : ordonnes")
   })
 
   it("et laisse revenir à l'ordre habituel", () => {

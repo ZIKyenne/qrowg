@@ -26,6 +26,7 @@ import { BLOCK_DEFS, blocsProposables } from "./blockDefs"
   const MemoBlockPreview = memo(BlockPreview)
   import { EditPanel, ThemePanel, Segmented, STYLE_COPY_KEYS, isAppearanceField } from "./builderPanels"
   import { InspecteurVide } from "./InspecteurVide"
+  import { AlertesPublication } from "./AlertesPublication"
 import { motifDeFond } from "./types"
 import { actionClavier } from "./raccourcisClavier"
   import { BuilderStatus } from "./BuilderStatus"
@@ -1425,7 +1426,7 @@ import { actionClavier } from "./raccourcisClavier"
           {/* Sur mobile, la barre du haut n'a pas la place : le logo passait à la ligne
               et le nom de la page se coupait au milieu d'un mot. Le bandeau du canvas,
               juste en dessous, porte déjà la même information — celle-ci est en trop. */}
-          {guest && !isMobile && draftState === "saved" && <span style={{ color: "var(--success)", fontSize: 10, display: "flex", alignItems: "center", gap: 3, whiteSpace: "nowrap" }}><Check size={10} /> Brouillon gardé ici</span>}
+          {guest && !isMobile && draftState === "saved" && <span style={{ color: "var(--success)", fontSize: 10, display: "flex", alignItems: "center", gap: 3, whiteSpace: "nowrap" }}><Check size={10} /> Brouillon gardé</span>}
           {guest && draftState === "too_big" && <span style={{ color: "var(--warning)", fontSize: 10, whiteSpace: "nowrap" }} title="Le brouillon dépasse ce que le navigateur peut garder — créez un compte pour ne rien perdre.">⚠ {isMobile ? "Trop lourd" : "Brouillon trop lourd"}</span>}
           {guest && draftState === "unavailable" && <span style={{ color: "var(--warning)", fontSize: 10, whiteSpace: "nowrap" }} title="Ce navigateur refuse d'enregistrer (navigation privée ?) — créez un compte pour garder votre page.">⚠ {isMobile ? "Non gardé" : "Rien ne peut être gardé ici"}</span>}
           {!guest && !pageId && !isMobile && <span style={{ color: "var(--muted)", fontSize: 9 }}>Mode démo</span>}
@@ -1634,6 +1635,8 @@ import { actionClavier } from "./raccourcisClavier"
                       <button onClick={()=>setPublishError("")} style={{marginLeft:"auto",background:"none",border:"none",cursor:"pointer",color:"#F87171",fontSize:14,lineHeight:1}}>×</button>
                     </div>
                   )}
+                  {/* Ce qui ne partira pas en ligne, résumé ici (revue du 9 septembre) — chaque ligne ouvre le bloc. */}
+                  <AlertesPublication blocks={blocks} onVoir={id => { setSelectedId(id); setRightTab("edit"); setShowPublishPopup(false); if (isMobile) setMobileTab("panel") }} />
                   {/* Voir la page */}
                   {pageSlug && pageStatus === "published" && (
                     <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer"
@@ -2314,14 +2317,14 @@ import { actionClavier } from "./raccourcisClavier"
                 </div>
               )}
               {!preview && <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, padding: "6px 12px", background: "color-mix(in srgb, var(--bg) 88%, transparent)", border: "1px solid var(--line)", borderRadius: 9, backdropFilter: "blur(10px)", position: "sticky", top: 0, zIndex: 10 }}>
-                <span style={{ fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700 }}>Votre page</span>
+                <span style={{ fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700 }}>Page</span>
                 <span style={{ background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 6, padding: "1px 7px", fontSize: 10.5, color: "var(--ink)" }}>{blocks.length} bloc{blocks.length!==1?"s":""}</span>
                 {blocks.filter(b => b.draft).length > 0 && (
                   <span style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", borderRadius: 6, padding: "1px 6px", fontSize: 10, color: "var(--warning)", display: "inline-flex", alignItems: "center", gap: 3 }}>
                     <Pencil size={9} /> {blocks.filter(b => b.draft).length} brouillon{blocks.filter(b => b.draft).length > 1 ? "s" : ""}
                   </span>
                 )}
-                {guest && draftState === "saved" && <span style={{ color: "var(--success)", fontSize: 9, marginLeft: "auto" }}>Brouillon gardé</span>}
+                {guest && isMobile && draftState === "saved" && <span style={{ color: "var(--success)", fontSize: 11, marginLeft: "auto" }}>Brouillon gardé</span>}
                 {!guest && !pageId && <span style={{ color: "var(--muted)", fontSize: 9, marginLeft: "auto" }}>Mode démo</span>}
               </div>}
 
@@ -2554,9 +2557,9 @@ import { actionClavier } from "./raccourcisClavier"
                       {(() => {
                         const bc = selectedBlock.content as any
                         const set = (k: string, v: string) => updateBlock(selectedBlock.id, k, v)
-                        const selStyle: React.CSSProperties = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, color: "var(--ink)", fontSize: 12, padding: "7px 9px", cursor: "pointer" }
-                        const labelStyle: React.CSSProperties = { color: MUTED, fontSize: 11, display: "block", marginBottom: 4, fontWeight: 500 }
-                        const secTitle: React.CSSProperties = { color: MUTED, fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 9px" }
+                        const selStyle: React.CSSProperties = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, color: "var(--ink)", fontSize: 13, padding: "8px 9px", cursor: "pointer" }
+                        const labelStyle: React.CSSProperties = { color: MUTED, fontSize: 12, display: "block", marginBottom: 4, fontWeight: 500 }
+                        const secTitle: React.CSSProperties = { color: MUTED, fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 9px" }
                         // Helpers appelés en ligne (sel/toggle) au lieu de composants JSX — évite un remontage à chaque rendu.
                         const sel = (k: string, label: string, options: string[], def: string) => (
                           <div>
@@ -2589,7 +2592,7 @@ import { actionClavier } from "./raccourcisClavier"
                             <div role="tablist" style={{ display: "flex", gap: 2, borderBottom: "1px solid var(--line)", margin: "0 0 14px" }}>
                               {TABS.map(t => (
                                 <button key={t.k} role="tab" aria-selected={editTab===t.k} onClick={() => setEditTab(t.k)}
-                                  style={{ flex: 1, minHeight: isMobile ? 42 : 36, padding: isMobile ? "10px 3px" : "8px 3px", border: "none", borderBottom: `2px solid ${editTab===t.k ? "var(--accent)" : "transparent"}`, marginBottom: -1, cursor: "pointer", background: "transparent", color: editTab===t.k ? "var(--ink)" : MUTED, fontSize: isMobile ? 11.5 : 11, fontWeight: editTab===t.k ? 600 : 500, transition: "color .18s ease, border-color .18s ease", whiteSpace: "nowrap" as const }}>{t.label}</button>
+                                  style={{ flex: 1, minHeight: isMobile ? 44 : 40, padding: isMobile ? "10px 3px" : "8px 3px", border: "none", borderBottom: `2px solid ${editTab===t.k ? "var(--accent)" : "transparent"}`, marginBottom: -1, cursor: "pointer", background: "transparent", color: editTab===t.k ? "var(--ink)" : MUTED, fontSize: isMobile ? 12.5 : 12.5, fontWeight: editTab===t.k ? 600 : 500, transition: "color .18s ease, border-color .18s ease", whiteSpace: "nowrap" as const }}>{t.label}</button>
                               ))}
                             </div>
 

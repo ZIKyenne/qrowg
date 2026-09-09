@@ -66,7 +66,7 @@ describe("chrome de l'éditeur — scène et inspecteur", () => {
   })
   it("le bandeau au-dessus de la page ne crie plus CANVAS", () => {
     expect(v4).not.toContain(">CANVAS</span>")
-    expect(v4).toContain(">Votre page</span>")
+    expect(v4).toContain(">Page</span>")
   })
   it("l'inspecteur est sur --bg avec un filet, ses onglets soulignés et non des boutons or", () => {
     expect(v4).toContain('background: "var(--bg)", borderLeft: "1px solid var(--line)"')

@@ -2570,6 +2570,8 @@ interface TemplatePreviewModalProps {
     id: string; name: string; category: string; plan: string
     emoji: string; color: string; accent: string; bg: string; surface: string
     description: string; tags: string[]
+    /** Accroche courte (galerie → aperçu) et variante d'ambiance quand deux modèles portent le même nom. */
+    highlight?: string; variante?: string
   }
   blocks: { type: string; content: Record<string, string> }[]
   onClose: () => void
@@ -2759,14 +2761,16 @@ export default function TemplatePreviewModal({
             <div style={{ flex: 1 }}>
               <h2 style={{ color: "#F5F0E8", fontSize: 18, fontWeight: 700, margin: "0 0 4px" }}>{template.name}</h2>
               <span style={{ background: template.color + "15", border: "1px solid " + template.color + "25", borderRadius: 8, padding: "2px 8px", fontSize: 10, color: template.color, fontWeight: 600 }}>{categorieLue(template.category)}</span>
+              {template.variante && <span style={{ marginLeft: 6, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "2px 8px", fontSize: 10, color: MUTED, fontWeight: 500 }}>{template.variante}</span>}
             </div>
             <button type="button" onClick={onClose} aria-label="Fermer l'aperçu" style={{ width: 40, height: 40, borderRadius: 9, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
               <X size={14} color={MUTED} />
             </button>
           </div>
 
-          {/* Description */}
+          {/* Description + accroche (l'accroche a quitté la carte de la galerie : elle vit ici) */}
           <p style={{ color: MUTED, fontSize: 13, margin: 0, lineHeight: 1.7 }}>{template.description}</p>
+          {template.highlight && <p style={{ color: "#F5F0E8", fontSize: 12.5, margin: "-6px 0 0", fontWeight: 500 }}>{template.highlight}</p>}
 
           {/* Stats */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>

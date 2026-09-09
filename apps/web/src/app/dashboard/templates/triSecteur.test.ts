@@ -63,7 +63,7 @@ describe("les modèles utilisables passent devant les modèles verrouillés", ()
 
   it("le tri se recalcule quand le plan change", () => {
     const bloc = src.slice(src.indexOf("const ordonnes"), src.indexOf("const ordonnes") + 1000)
-    expect(bloc, "userPlan absent des dépendances : un changement de plan ne réordonnerait rien").toMatch(/\[filtered, fromEntry, userPlan\]/)
+    expect(bloc, "userPlan absent des dépendances : un changement de plan ne réordonnerait rien").toMatch(/\[filtered, fromEntry, userPlan, accueil\]/)
   })
 
   it("les modèles payants restent visibles, seulement plus bas", () => {

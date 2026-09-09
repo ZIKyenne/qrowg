@@ -78,7 +78,7 @@ describe("le texte de lecture du site et de l'éditeur ne descend plus sous 12 p
   const cas: [string, string][] = [
     ["homeSections/Templates.tsx", "{tpl.includes.join(\" · \")}"],
     ["dashboard/templates/page.tsx", "{template.description}</p>"],
-    ["dashboard/templates/page.tsx", "{template.highlight}</p>"],
+    ["dashboard/templates/TemplatePreviewModal.tsx", "{template.highlight}</p>"],
     ["dashboard/templates/page.tsx", "{template.name} · {categorieLue(template.category)} · {blockCount} blocs"],
     ["upgrade/page.tsx", "{plan.description}</p>"],
     ["generateur-qr-code/GeneratorClient.tsx", "Logo ajouté — correction portée au maximum."],
