@@ -18,8 +18,8 @@ export function PublicPricing({ content, ctx }: PublicAdapterProps) {
           <div key={i} style={{ flex: 1, minWidth: 90, position: "relative", background: i === 1 ? `${G}10` : "rgba(255,255,255,0.03)", border: `1px solid ${i === 1 ? G + "40" : "rgba(255,255,255,0.06)"}`, borderRadius: 13, padding: "16px 12px", textAlign: "center", transition: "transform 0.15s" }}
             onMouseEnter={e => (e.currentTarget.style.transform = "translateY(-3px)")}
             onMouseLeave={e => (e.currentTarget.style.transform = "translateY(0)")}>
-            {pl.disc && <span style={{ position: "absolute", top: -9, right: 8, background: "#EF4444", color: "#fff", borderRadius: 6, padding: "2px 7px", fontSize: 10, fontWeight: 800, fontFamily: FONT_B }}>{pl.disc.label}</span>}
-            <p style={{ color: MUTED, fontSize: 10, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: 1, fontFamily: FONT_B }}>{pl.title}</p>
+            {pl.disc && <span style={{ position: "absolute", top: -9, right: 8, background: "#EF4444", color: "#fff", borderRadius: 6, padding: "2px 7px", fontSize: 11, fontWeight: 800, fontFamily: FONT_B }}>{pl.disc.label}</span>}
+            <p style={{ color: MUTED, fontSize: 11, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: 1, fontFamily: FONT_B }}>{pl.title}</p>
             <p style={{ color: G, fontSize: 26, fontWeight: 700, margin: "0 0 4px", fontFamily: FONT_D }}>{pl.price}</p>
             {pl.oldPrice && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 4px", textDecoration: "line-through", fontFamily: FONT_B }}>{pl.oldPrice}</p>}
             <p style={{ color: MUTED, fontSize: 13.5, margin: 0, fontFamily: FONT_B }}>{pl.desc}</p>

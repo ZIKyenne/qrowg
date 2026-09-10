@@ -17,7 +17,7 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   return (
     <LayoutSurface content={c} u={u}>
       <div style={{ textAlign: align }}>
-        {c.eyebrow && <p style={{ color: u.MUTED, fontSize: Math.round(10.5 * u.scale), textTransform: "uppercase", letterSpacing: 2, margin: `0 0 ${Math.round(6 * u.scale)}px`, fontFamily: u.FONT_B }}>{c.eyebrow}</p>}
+        {c.eyebrow && <p style={{ color: u.MUTED, fontSize: Math.round(11 * u.scale), textTransform: "uppercase", letterSpacing: 2, margin: `0 0 ${Math.round(6 * u.scale)}px`, fontFamily: u.FONT_B }}>{c.eyebrow}</p>}
         <p style={{ margin: 0, fontSize: Math.round(size * u.scale), fontWeight: 800, lineHeight: 1, fontFamily: u.FONT_D, letterSpacing: -1.5, ...grad }}>
           {c.value}{c.unit && <span style={{ fontSize: Math.round(size * 0.45 * u.scale), marginLeft: Math.round(3 * u.scale) }}>{c.unit}</span>}
         </p>

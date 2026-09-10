@@ -336,7 +336,7 @@ export default function PublicPageClient({ page, blocks, showBranding = true, in
               style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 15px", borderRadius: 999, background: `${theme.primary}14`, border: `1px solid ${theme.primary}33`, color: theme.primary, fontSize: 12.5, fontWeight: 800, textDecoration: "none", fontFamily: theme.fontBody }}>
               <span aria-hidden style={{ fontSize: 13 }}>⚡</span> Créez votre page + QR code gratuitement
             </a>
-            <div style={{ marginTop: 8, fontSize: 10.5, letterSpacing: 0.8, color: theme.muted, opacity: 0.75, fontFamily: theme.fontBody }}>Créé avec QRowg</div>
+            <div style={{ marginTop: 8, fontSize: 11.5, letterSpacing: 0.8, color: theme.muted, opacity: 0.85, fontFamily: theme.fontBody }}>Créé avec QRowg</div>
           </div>
         )}
       </div>

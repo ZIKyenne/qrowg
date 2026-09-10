@@ -64,7 +64,7 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
             const ferme = estFerme(l.heures)
             return (
               <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: `${sz(u, 11)}px ${sz(u, 16)}px`, background: aujourdhui ? `${u.G}0c` : "transparent", borderBottom: i < h.lignes.length - 1 ? `1px solid ${u.LINE}` : "none" }}>
-                <span style={{ color: aujourdhui ? u.TEXT : u.MUTED, fontSize: sz(u, 13), fontWeight: aujourdhui ? 700 : 400, fontFamily: u.FONT_B }}>{l.label}{aujourdhui && <span style={{ color: u.G, fontSize: sz(u, 10), fontWeight: 700, marginLeft: sz(u, 7), textTransform: "uppercase", letterSpacing: 0.5 }}>Aujourd&apos;hui</span>}</span>
+                <span style={{ color: aujourdhui ? u.TEXT : u.MUTED, fontSize: sz(u, 13), fontWeight: aujourdhui ? 700 : 400, fontFamily: u.FONT_B }}>{l.label}{aujourdhui && <span style={{ color: u.G, fontSize: sz(u, 11), fontWeight: 700, marginLeft: sz(u, 7), textTransform: "uppercase", letterSpacing: 0.5 }}>Aujourd&apos;hui</span>}</span>
                 <span style={{ color: ferme ? u.MUTED : u.TEXT, fontSize: sz(u, 13), fontWeight: 600, fontFamily: u.FONT_B, opacity: ferme ? 0.65 : 1 }}>{l.heures}</span>
               </div>
             )

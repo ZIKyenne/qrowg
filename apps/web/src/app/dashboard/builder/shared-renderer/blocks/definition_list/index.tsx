@@ -30,7 +30,7 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
       <dl style={{ margin: `${c.title ? Math.round(12 * u.scale) : 0}px 0 0`, display: "flex", flexDirection: "column", gap: Math.round(stacked ? 11 : 8) }}>
         {rows.map((r, i) => stacked ? (
           <div key={i}>
-            <dt style={{ color: u.MUTED, fontSize: Math.round(10.5 * u.scale), textTransform: "uppercase", letterSpacing: 1.5, fontFamily: u.FONT_B, margin: 0 }}>{r.label}</dt>
+            <dt style={{ color: u.MUTED, fontSize: Math.round(11 * u.scale), textTransform: "uppercase", letterSpacing: 1.5, fontFamily: u.FONT_B, margin: 0 }}>{r.label}</dt>
             <dd style={{ color: r.strong ? accent : u.TEXT, fontSize: Math.round(14 * u.scale), fontWeight: r.strong ? 700 : 600, margin: `${Math.round(2 * u.scale)}px 0 0`, fontFamily: u.FONT_B }}>{r.value}</dd>
           </div>
         ) : (

@@ -17,7 +17,7 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
           <div key={i} style={{ background: u.FILL, border: `1px solid ${u.LINE}`, borderRadius: 11, padding: `${sz(u, 13)}px ${sz(u, 10)}px`, textAlign: "center" }}>
             {k.icone && <span aria-hidden style={{ fontSize: sz(u, 24), display: "block", marginBottom: sz(u, 7) }}>{k.icone}</span>}
             <p style={{ color: u.TEXT, fontSize: sz(u, 12), fontWeight: 700, margin: `0 0 ${sz(u, 3)}px`, fontFamily: u.FONT_B }}>{k.titre}</p>
-            {k.texte && <p style={{ color: u.MUTED, fontSize: sz(u, 10), margin: 0, fontFamily: u.FONT_B }}>{k.texte}</p>}
+            {k.texte && <p style={{ color: u.MUTED, fontSize: sz(u, 11), margin: 0, fontFamily: u.FONT_B }}>{k.texte}</p>}
           </div>
         ))}
       </div>

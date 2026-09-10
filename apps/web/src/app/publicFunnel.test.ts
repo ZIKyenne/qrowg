@@ -95,7 +95,7 @@ describe("les portes d'entrée mènent à l'essai", () => {
   })
 
   it("les pages de contenu, chacune vers les modèles de son secteur", () => {
-    expect(read("app/examples/page.tsx")).toContain("creerUrlSecteur(example.category)")
+    expect(read("app/examples/page.tsx")).toContain("creerUrlSecteur(SECTEUR_PAR_MODELE[t.key])")
     expect(read("app/features/page.tsx")).toContain("creerUrlSecteur(t.secteur)")
     expect(read("app/not-found.tsx")).toContain("Composer ma page — sans compte")
     expect(read("app/contact/page.tsx")).toContain("creerUrl()")
@@ -140,11 +140,11 @@ describe("l'adresse de l'essai depuis un secteur déjà connu", () => {
     expect(creerUrl()).toBe("/creer")
   })
 
-  it("les six exemples publiés mènent tous quelque part de sensé", () => {
+  it("les exemples publiés mènent tous quelque part de sensé", () => {
+    // Les exemples ne sont plus six fiches inventées mais le catalogue de modèles :
+    // le détail est vérifié dans app/exemplesReels.test.ts. Ici on garde la règle.
     const s = read("app/examples/page.tsx")
-    const cats = [...s.matchAll(/category: "([^"]+)"/g)].map(m => m[1])
-    expect(cats.length).toBe(6)
-    const sans = cats.filter(c => creerUrlSecteur(c) === "/creer")
-    expect(sans, "catégories qui ne trouvent aucun secteur").toEqual([])
+    expect(s).toContain("PAGE_TEMPLATES")
+    expect(s).toContain("SECTEUR_PAR_MODELE")
   })
 })

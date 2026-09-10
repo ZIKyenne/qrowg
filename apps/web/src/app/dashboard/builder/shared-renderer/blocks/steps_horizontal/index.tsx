@@ -41,7 +41,7 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
                 : <span style={{ fontSize: Math.round(16 * u.scale) }}>{s.emoji || "•"}</span>}
             </div>
             {s.title && <p style={{ color: u.TEXT, fontSize: Math.round(12 * u.scale), fontWeight: 700, margin: `${Math.round(7 * u.scale)}px ${Math.round(3 * u.scale)}px 0`, fontFamily: u.FONT_D, lineHeight: 1.3 }}>{s.title}</p>}
-            {s.text && <p style={{ color: u.MUTED, fontSize: Math.round(10.5 * u.scale), margin: `${Math.round(3 * u.scale)}px ${Math.round(3 * u.scale)}px 0`, lineHeight: 1.4, fontFamily: u.FONT_B }}>{s.text}</p>}
+            {s.text && <p style={{ color: u.MUTED, fontSize: Math.round(11 * u.scale), margin: `${Math.round(3 * u.scale)}px ${Math.round(3 * u.scale)}px 0`, lineHeight: 1.4, fontFamily: u.FONT_B }}>{s.text}</p>}
           </div>
         ))}
       </div>

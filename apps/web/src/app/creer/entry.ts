@@ -46,6 +46,35 @@ export const SECTEURS = [
   "Evenement", "SaaS", "Ecommerce",
 ] as const
 
+/**
+ * Modèle de page (page-templates.ts) → secteur de la galerie.
+ *
+ * Sert aux exemples publics : « Utiliser » depuis un modèle ouvre la galerie déjà
+ * filtrée sur le bon métier. Une association n'a pas de secteur dédié : elle ouvre
+ * la galerie entière plutôt qu'un filtre qui ne lui ressemblerait pas.
+ */
+export const SECTEUR_PAR_MODELE: Record<string, string> = {
+  resto_bistrot: "Restaurant", resto_fastfood: "Restaurant", resto_bar: "Bar",
+  beaute_coiffure: "Beaute", beaute_spa: "Beaute",
+  coach_vie: "Coach", coach_formateur: "Coach",
+  immo_agence: "Immobilier", immo_location: "Immobilier",
+  artisan_batiment: "Consultant",
+  biz_freelance: "Freelance", biz_agence: "Agence", biz_startup: "SaaS",
+  creatif_photo: "Photographe", creatif_artiste: "Musicien", creatif_createur: "Influenceur",
+  event_soiree: "Evenement", event_mariage: "Evenement",
+  shop_boutique: "Ecommerce",
+  asso_ong: "",
+  // Modèles « studio » (templatesStudio.ts), même catalogue.
+  studio_gastro: "Restaurant", studio_pizzeria: "Restaurant", studio_bar_nuit: "Bar",
+  studio_boulangerie: "Restaurant", studio_coffee: "Cafe",
+  studio_coiffure: "Beaute", studio_barbier: "Beaute", studio_institut: "Beaute",
+  studio_salle_sport: "Coach",
+  studio_artisan: "Consultant",
+  studio_gite: "Immobilier",
+  studio_boutique: "Ecommerce", studio_fleuriste: "Ecommerce",
+  studio_sante: "Sante",
+}
+
 /** Secteur recevable, ou "" — jamais une valeur qui viderait la galerie. */
 export function safeMetier(v: string | null | undefined): string {
   const s = (v || "").trim()

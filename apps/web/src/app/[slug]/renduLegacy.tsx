@@ -191,7 +191,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                 <span style={{ fontSize: 28 }}>{n.icon}</span>
                 <span style={{ color: col, fontSize: 12, fontWeight: 700, fontFamily: FONT_B }}>{n.label}</span>
-                <span style={{ marginLeft: "auto", background: col, color: "#080808", borderRadius: 20, padding: "2px 10px", fontSize: 9, fontWeight: 700 }}>PRINCIPAL</span>
+                <span style={{ marginLeft: "auto", background: col, color: "#080808", borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700 }}>PRINCIPAL</span>
               </div>
               <p style={{ color: TEXT, fontSize: 18, fontWeight: 700, margin: "0 0 4px", fontFamily: FONT_D }}>{c.title || "Suivez-moi"}</p>
               {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 6px", lineHeight: 1.5, fontFamily: FONT_B }}>{c.description}</p>}
@@ -329,8 +329,8 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               <div key={i} style={{ flex: 1, minWidth: 90, position: "relative", background: i===1 ? `${G}10` : "rgba(255,255,255,0.03)", border: `1px solid ${i===1 ? G+"40" : "rgba(255,255,255,0.06)"}`, borderRadius: 13, padding: "16px 12px", textAlign: "center", transition: "transform 0.15s" }}
                 onMouseEnter={e => (e.currentTarget.style.transform = "translateY(-3px)")}
                 onMouseLeave={e => (e.currentTarget.style.transform = "translateY(0)")}>
-                {disc && <span style={{ position: "absolute", top: -9, right: 8, background: "#EF4444", color: "#fff", borderRadius: 6, padding: "2px 7px", fontSize: 10, fontWeight: 800, fontFamily: FONT_B }}>{disc.label}</span>}
-                <p style={{ color: MUTED, fontSize: 10, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: 1, fontFamily: FONT_B }}>{t}</p>
+                {disc && <span style={{ position: "absolute", top: -9, right: 8, background: "#EF4444", color: "#fff", borderRadius: 6, padding: "2px 7px", fontSize: 11, fontWeight: 800, fontFamily: FONT_B }}>{disc.label}</span>}
+                <p style={{ color: MUTED, fontSize: 11, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: 1, fontFamily: FONT_B }}>{t}</p>
                 <p style={{ color: G, fontSize: 26, fontWeight: 700, margin: "0 0 4px", fontFamily: FONT_D }}>{p}</p>
                 {op && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 4px", textDecoration: "line-through", fontFamily: FONT_B }}>{op}</p>}
                 <p style={{ color: MUTED, fontSize: 13.5, margin: 0, fontFamily: FONT_B }}>{d}</p>
@@ -701,7 +701,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
           <div style={{ position: "fixed", ...pos, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, zIndex: 60, background: barBg, backdropFilter: c.bar_style === "blur" ? "blur(14px)" : undefined, WebkitBackdropFilter: c.bar_style === "blur" ? "blur(14px)" : undefined, borderTop: c.position === "top" ? "none" : "1px solid rgba(255,255,255,0.1)", borderBottom: c.position === "top" ? "1px solid rgba(255,255,255,0.1)" : "none", boxShadow: c.position === "top" ? "0 8px 24px rgba(0,0,0,0.4)" : "0 -8px 24px rgba(0,0,0,0.4)", display: "flex", justifyContent: "space-around", alignItems: "stretch", padding: `8px 6px calc(8px + env(safe-area-inset-bottom))` }}>
             {acts.slice(0, 5).map((a, i) => {
               const col = goldStyle ? "#080808" : a.color
-              const inner = <span style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}><span style={{ fontSize: 20 }}>{a.icon}</span>{showL && <span style={{ color: col, fontSize: 10, fontWeight: 700 }}>{a.label}</span>}</span>
+              const inner = <span style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}><span style={{ fontSize: 20 }}>{a.icon}</span>{showL && <span style={{ color: col, fontSize: 11, fontWeight: 700 }}>{a.label}</span>}</span>
               const st: any = { flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "6px 4px", textDecoration: "none", background: "transparent", border: "none", cursor: "pointer" }
               return a.share
                 ? <ShareButton key={i} pageId={pageId} blockId={block.id} style={st} inner={inner} />
@@ -839,14 +839,14 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
           <div style={{ display: "flex", gap: 8 }}>
             {plans.map((p, i) => (
               <div key={i} style={{ flex: 1, minWidth: 0, background: p.hl ? `${G}12` : "rgba(255,255,255,0.03)", border: `1.5px solid ${p.hl ? `${G}50` : "rgba(255,255,255,0.08)"}`, borderRadius: 13, padding: "14px 10px", position: "relative" }}>
-                {p.hl && <div style={{ position: "absolute", top: -9, left: "50%", transform: "translateX(-50%)", background: G, color: "#080808", borderRadius: 20, padding: "2px 10px", fontSize: 9, fontWeight: 700, whiteSpace: "nowrap" }}>⭐ Populaire</div>}
+                {p.hl && <div style={{ position: "absolute", top: -9, left: "50%", transform: "translateX(-50%)", background: G, color: "#080808", borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>⭐ Populaire</div>}
                 <p style={{ color: p.hl ? G : TEXT, fontSize: 12, fontWeight: 700, margin: "0 0 5px", textAlign: "center", fontFamily: FONT_B }}>{p.name}</p>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", margin: "0 0 9px" }}>
                   <p style={{ color: G, fontSize: 19, fontWeight: 700, margin: 0, textAlign: "center", fontFamily: FONT_D }}>{p.price}</p>
                   {p.old_price && (() => { const disc = priceDiscount(p.price, p.old_price); return <p style={{ margin: "2px 0 0", fontSize: 11, fontFamily: FONT_B }}><span style={{ color: MUTED, textDecoration: "line-through" }}>{p.old_price}</span>{disc && <span style={{ color: "#EF4444", fontWeight: 800, marginLeft: 4 }}>{disc.label}</span>}</p> })()}
                 </div>
                 {(p.features || "").split("\n").filter(Boolean).map((f: string, j: number) => (
-                  <p key={j} style={{ color: MUTED, fontSize: 10.5, margin: "0 0 4px", display: "flex", gap: 5 }}><span style={{ color: "var(--success)" }}>✓</span> {f}</p>
+                  <p key={j} style={{ color: MUTED, fontSize: 11, margin: "0 0 4px", display: "flex", gap: 5 }}><span style={{ color: "var(--success)" }}>✓</span> {f}</p>
                 ))}
               </div>
             ))}
@@ -1070,7 +1070,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 9 }}>
             {logos.map(([img, name]: any[], i: number) => (
               <div key={i} style={{ height: 40, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-                {img ? <SmartImage width={800} height={800} sizes={SIZES_DEMI} onError={e => { e.currentTarget.style.display = 'none' }} src={String(img)} alt={String(name)} style={{ maxWidth: "90%", maxHeight: "90%", objectFit: "contain" }} /> : <p style={{ color: MUTED, fontSize: 9, margin: 0, textAlign: "center", padding: "0 4px", lineHeight: 1.2 }}>{name}</p>}
+                {img ? <SmartImage width={800} height={800} sizes={SIZES_DEMI} onError={e => { e.currentTarget.style.display = 'none' }} src={String(img)} alt={String(name)} style={{ maxWidth: "90%", maxHeight: "90%", objectFit: "contain" }} /> : <p style={{ color: MUTED, fontSize: 11, margin: 0, textAlign: "center", padding: "0 4px", lineHeight: 1.2 }}>{name}</p>}
               </div>
             ))}
           </div>
@@ -1299,7 +1299,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               <div style={{ flex: 1 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
                   {c.username && <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.username}</p>}
-                  {isLive && <span style={{ background: "#EF4444", color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 9, fontWeight: 700 }}>● LIVE</span>}
+                  {isLive && <span style={{ background: "#EF4444", color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, fontWeight: 700 }}>● LIVE</span>}
                 </div>
                 {c.game && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>🎯 {c.game}</p>}
                 {c.viewers && isLive && <p style={{ color: "#9146FF", fontSize: 11, margin: 0 }}>👁 {c.viewers}</p>}
@@ -1525,7 +1525,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
             {steps.map(([time, title, desc]: any[], i: number, arr: any[]) => (
               <div key={i} style={{ display: "flex", gap: 15, paddingBottom: i < arr.length - 1 ? 15 : 0 }}>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
-                  <div style={{ width: 40, height: 40, borderRadius: "50%", background: "linear-gradient(135deg,#EC4899,#F472B6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{time}</div>
+                  <div style={{ width: 40, height: 40, borderRadius: "50%", background: "linear-gradient(135deg,#EC4899,#F472B6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{time}</div>
                   {i < arr.length - 1 && <div style={{ width: 2, flex: 1, background: "rgba(236,72,153,0.2)", marginTop: 4 }} />}
                 </div>
                 <div style={{ flex: 1, paddingTop: 7 }}>
@@ -1585,7 +1585,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <p style={{ color: headliner === "yes" ? "#EC4899" : TEXT, fontSize: headliner === "yes" ? 16 : 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{name}</p>
-                    {headliner === "yes" && <span style={{ background: "#EC4899", color: "#fff", borderRadius: 10, padding: "1px 8px", fontSize: 9, fontWeight: 700 }}>HEADLINER</span>}
+                    {headliner === "yes" && <span style={{ background: "#EC4899", color: "#fff", borderRadius: 10, padding: "1px 8px", fontSize: 11, fontWeight: 700 }}>HEADLINER</span>}
                   </div>
                   {stage && <p style={{ color: MUTED, fontSize: 11, margin: "2px 0 0" }}>🎭 {stage}</p>}
                 </div>
@@ -1706,7 +1706,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
       <div style={{ padding: "6px 24px 12px" }}>
         <a href={extHref(c.url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url)} style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(251,191,36,0.08)", border: "1.5px solid rgba(251,191,36,0.25)", borderRadius: 13, padding: "13px 15px", textDecoration: "none" }}>
           <div style={{ display: "flex", gap: 1 }}>{Array.from({ length: parseInt(c.stars || "5") }).map((_, i) => <span key={i} style={{ color: "#FBBF24", fontSize: 13 }}>★</span>)}</div>
-          <div style={{ flex: 1 }}><p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.label || "Donner un avis"}</p><p style={{ color: MUTED, fontSize: 10, margin: 0 }}>Google Reviews</p></div>
+          <div style={{ flex: 1 }}><p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.label || "Donner un avis"}</p><p style={{ color: MUTED, fontSize: 11, margin: 0 }}>Google Reviews</p></div>
           <span style={{ fontSize: 19 }}>⭐</span>
         </a>
       </div>
@@ -1734,8 +1734,8 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
     case "app_download": return (c.ios_url || c.android_url) ? (
       <div style={{ padding: "6px 24px 12px" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {c.ios_url && <a href={extHref(c.ios_url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.ios_url)} style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(0,0,0,0.25)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: "11px 15px", textDecoration: "none" }}><span style={{ fontSize: 24 }}>🍎</span><div><p style={{ color: MUTED, fontSize: 9, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>Disponible sur</p><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>App Store</p></div></a>}
-          {c.android_url && <a href={extHref(c.android_url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.android_url)} style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(0,0,0,0.25)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: "11px 15px", textDecoration: "none" }}><span style={{ fontSize: 24 }}>🤖</span><div><p style={{ color: MUTED, fontSize: 9, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>Disponible sur</p><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>Google Play</p></div></a>}
+          {c.ios_url && <a href={extHref(c.ios_url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.ios_url)} style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(0,0,0,0.25)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: "11px 15px", textDecoration: "none" }}><span style={{ fontSize: 24 }}>🍎</span><div><p style={{ color: MUTED, fontSize: 11, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>Disponible sur</p><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>App Store</p></div></a>}
+          {c.android_url && <a href={extHref(c.android_url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.android_url)} style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(0,0,0,0.25)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: "11px 15px", textDecoration: "none" }}><span style={{ fontSize: 24 }}>🤖</span><div><p style={{ color: MUTED, fontSize: 11, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>Disponible sur</p><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>Google Play</p></div></a>}
         </div>
       </div>
     ) : null
@@ -1744,7 +1744,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
       <div style={{ padding: "6px 24px 12px" }}>
         <LienPublic href={extHref(c.url)} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "quote")} style={{ display: "flex", alignItems: "center", gap: 11, background: `${G}08`, border: `1.5px solid ${G}20`, borderRadius: 13, padding: "12px 15px", textDecoration: "none" }}>
           <div style={{ width: 40, height: 40, background: `${G}12`, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19, flexShrink: 0 }}>📋</div>
-          <div style={{ flex: 1 }}><p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.label || "Demander un devis"}</p>{c.description && <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{c.description}</p>}</div>
+          <div style={{ flex: 1 }}><p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.label || "Demander un devis"}</p>{c.description && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.description}</p>}</div>
           <span style={{ color: G, fontSize: 15 }}>→</span>
         </LienPublic>
       </div>
@@ -1970,7 +1970,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 11px", textAlign: "center" }}>{c.description}</p>}
         <LienPublic href={extHref(c.url)} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "shop")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: `${G}10`, border: `1.5px solid ${G}30`, borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
           <span style={{ fontSize: 21 }}>🛒</span>
-          <div><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.label || "Voir la boutique"}</p>{c.platform && <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>via {c.platform}</p>}</div>
+          <div><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.label || "Voir la boutique"}</p>{c.platform && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>via {c.platform}</p>}</div>
           <ExternalLink size={14} color={G} style={{ marginLeft: "auto" }} />
         </LienPublic>
       </div>
@@ -2159,7 +2159,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
             {albums.map(([cover, title, year, type, url]: any[], i: number) => {
               const inner = <>
                 {cover ? <SmartImage onError={e => { e.currentTarget.style.display = 'none' }} src={String(cover)} alt="" width={54} height={54} style={{ width: 54, height: 54, borderRadius: 9, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 54, height: 54, borderRadius: 9, background: "rgba(29,185,84,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 25, flexShrink: 0 }}>💿</div>}
-                <div style={{ flex: 1 }}><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_B }}>{title}</p><div style={{ display: "flex", alignItems: "center", gap: 7 }}>{type && <span style={{ background: "rgba(29,185,84,0.12)", border: "1px solid rgba(29,185,84,0.2)", borderRadius: 10, padding: "1px 8px", color: "#1DB954", fontSize: 10, fontWeight: 700 }}>{type}</span>}{year && <span style={{ color: MUTED, fontSize: 12 }}>{year}</span>}</div></div>
+                <div style={{ flex: 1 }}><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_B }}>{title}</p><div style={{ display: "flex", alignItems: "center", gap: 7 }}>{type && <span style={{ background: "rgba(29,185,84,0.12)", border: "1px solid rgba(29,185,84,0.2)", borderRadius: 10, padding: "1px 8px", color: "#1DB954", fontSize: 11, fontWeight: 700 }}>{type}</span>}{year && <span style={{ color: MUTED, fontSize: 12 }}>{year}</span>}</div></div>
                 <span style={{ color: "#1DB954", fontSize: 19 }}>▶</span>
               </>
               const st: any = { display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }
@@ -2312,7 +2312,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 11, padding: "13px 10px", textAlign: "center" }}>
                 {icon && <span style={{ fontSize: 24, display: "block", marginBottom: 7 }}>{icon}</span>}
                 <p style={{ color: TEXT, fontSize: 12, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_B }}>{title}</p>
-                {txt && <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{txt}</p>}
+                {txt && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{txt}</p>}
               </div>
             ))}
           </div>

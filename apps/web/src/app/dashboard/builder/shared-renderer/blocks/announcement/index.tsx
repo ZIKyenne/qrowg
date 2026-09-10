@@ -55,7 +55,7 @@ function Vue({ u, c, Texte, blockId }: { u: UnifiedCtx; c: Record<string, any>; 
             : <span aria-hidden style={{ position: "absolute", top: sz(u, 8), right: sz(u, 10), color: a.couleur, opacity: 0.6, fontSize: sz(u, 18), lineHeight: 1 }}>×</span>)}
         </div>
       </div>
-      {mention && <p role="note" style={{ margin: `${sz(u, 6)}px 0 0`, color: u.MUTED, fontSize: sz(u, 10), textAlign: "center", fontFamily: u.FONT_B }}>⚠︎ {mention}</p>}
+      {mention && <p role="note" style={{ margin: `${sz(u, 6)}px 0 0`, color: u.MUTED, fontSize: sz(u, 11), textAlign: "center", fontFamily: u.FONT_B }}>⚠︎ {mention}</p>}
     </div>
   )
 }

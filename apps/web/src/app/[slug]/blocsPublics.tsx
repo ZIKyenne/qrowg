@@ -190,7 +190,7 @@ export function ShareButton({ pageId, blockId, style, inner }: { pageId: string;
               <a key={tgt.key} href={tgt.href} target="_blank" rel="noopener noreferrer" onClick={() => { setOpen(false); trackLinkClick(pageId, blockId, `share:${tgt.key}`) }}
                 style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "8px 4px", borderRadius: 9, textDecoration: "none", background: "rgba(255,255,255,0.04)" }}>
                 <span style={{ fontSize: 18 }}>{tgt.icon}</span>
-                <span style={{ color: "#F5F0E8", fontSize: 9, fontWeight: 600 }}>{tgt.label}</span>
+                <span style={{ color: "#F5F0E8", fontSize: 11, fontWeight: 600 }}>{tgt.label}</span>
               </a>
             ))}
             <button onClick={copy} style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", borderRadius: 9, border: "none", cursor: "pointer", background: copied ? "rgba(57,255,143,0.14)" : "rgba(201,168,76,0.12)", color: copied ? "var(--success)" : "#C9A84C", fontSize: 11, fontWeight: 700 }}>
@@ -262,7 +262,7 @@ export function HoursPublic({ c, theme }: { c: any; theme: any }) {
             const closed = /^(fermé|ferme|closed|repos)/i.test(r.hours.trim())
             return (
               <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 16px", background: highlight ? `${G}0c` : "transparent", borderBottom: i < rows.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
-                <span style={{ color: highlight ? TEXT : MUTED, fontSize: 13, fontWeight: highlight ? 700 : 400, fontFamily: FONT_B }}>{r.label}{highlight && <span style={{ color: G, fontSize: 10, fontWeight: 700, marginLeft: 7, textTransform: "uppercase", letterSpacing: 0.5 }}>Aujourd&apos;hui</span>}</span>
+                <span style={{ color: highlight ? TEXT : MUTED, fontSize: 13, fontWeight: highlight ? 700 : 400, fontFamily: FONT_B }}>{r.label}{highlight && <span style={{ color: G, fontSize: 11, fontWeight: 700, marginLeft: 7, textTransform: "uppercase", letterSpacing: 0.5 }}>Aujourd&apos;hui</span>}</span>
                 <span style={{ color: closed ? MUTED : TEXT, fontSize: 13, fontWeight: 600, fontFamily: FONT_B, opacity: closed ? 0.65 : 1 }}>{r.hours}</span>
               </div>
             )
@@ -323,7 +323,7 @@ export function CountdownPublic({ c, TEXT, MUTED, FONT_D, FONT_B, pageId, blockI
               {units.map(([lbl, val]) => (
                 <div key={lbl} style={{ minWidth: 62, background: "rgba(0,0,0,0.28)", border: `1px solid ${accent}33`, borderRadius: 11, padding: "10px 6px" }}>
                   <div style={{ color: accent, fontSize: 26, fontWeight: 800, fontVariantNumeric: "tabular-nums", lineHeight: 1, fontFamily: FONT_D }}>{val === null ? "––" : String(val).padStart(2, "0")}</div>
-                  <div style={{ color: MUTED, fontSize: 10, marginTop: 4, textTransform: "uppercase", letterSpacing: 0.6, fontFamily: FONT_B }}>{lbl}</div>
+                  <div style={{ color: MUTED, fontSize: 11, marginTop: 4, textTransform: "uppercase", letterSpacing: 0.6, fontFamily: FONT_B }}>{lbl}</div>
                 </div>
               ))}
             </div>}

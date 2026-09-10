@@ -38,7 +38,7 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
               <div style={{ display: "flex", gap: Math.round(11 * u.scale), alignItems: "center", padding: `${Math.round(12 * u.scale)}px ${Math.round(13 * u.scale)}px` }}>
                 {!banner && it.image && <SmartImage src={it.image} alt="" width={54} height={54} sizes="54px" onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none" }} style={{ width: Math.round(54 * u.scale), height: Math.round(54 * u.scale), borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  {it.badge && <span style={{ display: "inline-block", background: `${u.G}22`, color: u.G, border: `1px solid ${u.G}44`, borderRadius: 20, padding: `${Math.round(2 * u.scale)}px ${Math.round(9 * u.scale)}px`, fontSize: Math.round(10 * u.scale), fontWeight: 700, marginBottom: Math.round(5 * u.scale), fontFamily: u.FONT_B }}>{it.badge}</span>}
+                  {it.badge && <span style={{ display: "inline-block", background: `${u.G}22`, color: u.G, border: `1px solid ${u.G}44`, borderRadius: 20, padding: `${Math.round(2 * u.scale)}px ${Math.round(9 * u.scale)}px`, fontSize: Math.round(11 * u.scale), fontWeight: 700, marginBottom: Math.round(5 * u.scale), fontFamily: u.FONT_B }}>{it.badge}</span>}
                   {it.title && <p style={{ color: u.TEXT, fontSize: Math.round(14 * u.scale), fontWeight: 700, margin: 0, fontFamily: u.FONT_D }}>{it.title}</p>}
                   {it.text && <p style={{ color: u.MUTED, fontSize: Math.round(12.5 * u.scale), margin: `${Math.round(3 * u.scale)}px 0 0`, lineHeight: 1.5, fontFamily: u.FONT_B }}>{it.text}</p>}
                 </div>

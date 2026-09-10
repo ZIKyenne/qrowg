@@ -21,7 +21,7 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
         {!cover && img && <SmartImage src={img} alt="" width={56} height={56} sizes="56px" onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none" }} style={{ width: Math.round(56 * u.scale), height: Math.round(56 * u.scale), borderRadius: 11, objectFit: "cover", flexShrink: 0 }} />}
         {!cover && !img && c.emoji && <span style={{ fontSize: Math.round(28 * u.scale), flexShrink: 0 }}>{c.emoji}</span>}
         <div style={{ flex: 1, minWidth: 0 }}>
-          {c.eyebrow && <p style={{ color: accent, fontSize: Math.round(10 * u.scale), fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", margin: `0 0 ${Math.round(3 * u.scale)}px`, fontFamily: u.FONT_B }}>{c.eyebrow}</p>}
+          {c.eyebrow && <p style={{ color: accent, fontSize: Math.round(11 * u.scale), fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", margin: `0 0 ${Math.round(3 * u.scale)}px`, fontFamily: u.FONT_B }}>{c.eyebrow}</p>}
           {c.title && <p style={{ color: u.TEXT, fontSize: Math.round(15 * u.scale), fontWeight: 700, margin: 0, fontFamily: u.FONT_D }}>{c.title}</p>}
           {c.text && <p style={{ color: u.MUTED, fontSize: Math.round(12.5 * u.scale), margin: `${Math.round(3 * u.scale)}px 0 0`, lineHeight: 1.5, fontFamily: u.FONT_B }}>{c.text}</p>}
         </div>

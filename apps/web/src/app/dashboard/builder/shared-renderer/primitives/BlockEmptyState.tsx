@@ -8,7 +8,7 @@ export function BlockEmptyState({ icon, label, sub, muted }: { icon: string; lab
     <div role="note" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "18px 12px", border: `1.5px dashed ${muted}40`, borderRadius: 12, color: muted, textAlign: "center" }}>
       <span style={{ fontSize: 22, opacity: 0.7 }} aria-hidden>{icon}</span>
       <span style={{ fontSize: 12, fontWeight: 600 }}>{label}</span>
-      {sub && <span style={{ fontSize: 10, fontWeight: 400, opacity: 0.75 }}>{sub}</span>}
+      {sub && <span style={{ fontSize: 11, fontWeight: 400, opacity: 0.75 }}>{sub}</span>}
     </div>
   )
 }
@@ -17,5 +17,5 @@ export function BlockEmptyState({ icon, label, sub, muted }: { icon: string; lab
 // (titre, bio) : leur remplacer le champ par un état vide leur retirerait la
 // saisie en place. On garde le champ, on ajoute la vérité sous lui.
 export function NoteInvisibleEnLigne({ muted }: { muted: string }) {
-  return <p role="note" style={{ margin: "6px 0 0", fontSize: 10, color: muted, opacity: 0.8 }}>{HIDDEN_WHEN_EMPTY_NOTE}</p>
+  return <p role="note" style={{ margin: "6px 0 0", fontSize: 11, color: muted, opacity: 0.8 }}>{HIDDEN_WHEN_EMPTY_NOTE}</p>
 }

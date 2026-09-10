@@ -40,7 +40,7 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
                 ? <SmartImage src={it.image} alt="" width={96} height={96} sizes="96px" onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none" }} style={{ width: "72%", height: "72%", objectFit: "contain" }} />
                 : <span style={{ fontSize: Math.round(box * 0.5) }}>{it.emoji || "•"}</span>}
             </div>
-            {it.label && <p style={{ color: u.MUTED, fontSize: Math.round(10.5 * u.scale), margin: `${Math.round(6 * u.scale)}px 0 0`, lineHeight: 1.3, fontFamily: u.FONT_B }}>{it.label}</p>}
+            {it.label && <p style={{ color: u.MUTED, fontSize: Math.round(11 * u.scale), margin: `${Math.round(6 * u.scale)}px 0 0`, lineHeight: 1.3, fontFamily: u.FONT_B }}>{it.label}</p>}
           </div>
         ))}
       </div>

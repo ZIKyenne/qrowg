@@ -205,9 +205,12 @@ describe("ce que Fonctionnalités et Exemples promettent existe", () => {
     expect(fonctionnalites).toContain("SVG et PDF pour l'impression dès ${PLANS.pro.label}")
   })
 
-  it("Exemples ne promet plus « tous les templates inclus »", () => {
+  it("Exemples ne promet aucun plan : elle montre les modèles, pas une offre", () => {
     expect(exemples).not.toContain("Tous les templates inclus")
-    expect(exemples).toContain('e.plan === "free"')
+    // Depuis la refonte du 10 septembre, la page liste les modèles réels et
+    // n'affiche plus de pastille de plan — donc rien à sur-promettre.
+    expect(exemples).not.toMatch(/plan\s*[:=]/)
+    expect(exemples).toContain("PAGE_TEMPLATES")
   })
 
   it("le guide ne dit plus que le QR dynamique nécessite un abonnement", () => {

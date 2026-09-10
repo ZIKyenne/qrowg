@@ -15,7 +15,7 @@ export function PublicLineup({ content, ctx }: PublicAdapterProps) {
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <p style={{ color: a.headliner === "yes" ? "#EC4899" : TEXT, fontSize: a.headliner === "yes" ? 16 : 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{a.name}</p>
-                {a.headliner === "yes" && <span style={{ background: "#EC4899", color: "#fff", borderRadius: 10, padding: "1px 8px", fontSize: 9, fontWeight: 700 }}>HEADLINER</span>}
+                {a.headliner === "yes" && <span style={{ background: "#EC4899", color: "#fff", borderRadius: 10, padding: "1px 8px", fontSize: 11, fontWeight: 700 }}>HEADLINER</span>}
               </div>
               {a.stage && <p style={{ color: MUTED, fontSize: 11, margin: "2px 0 0" }}>🎭 {a.stage}</p>}
             </div>

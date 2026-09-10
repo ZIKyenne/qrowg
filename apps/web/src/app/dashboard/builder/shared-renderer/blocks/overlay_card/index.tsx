@@ -25,7 +25,7 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
       }}>
         <div aria-hidden style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, rgba(0,0,0,${pct01(c.overlay, 0.62)}), rgba(0,0,0,${pct01(c.overlay, 0.62) * 0.25}))`, pointerEvents: "none" }} />
         <div style={{ position: "relative", padding: `${Math.round(20 * u.scale)}px ${Math.round(18 * u.scale)}px`, textAlign: align }}>
-          {c.eyebrow && <p style={{ color: u.G, fontSize: Math.round(10.5 * u.scale), fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", margin: `0 0 ${Math.round(6 * u.scale)}px`, fontFamily: u.FONT_B }}>{c.eyebrow}</p>}
+          {c.eyebrow && <p style={{ color: u.G, fontSize: Math.round(11 * u.scale), fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", margin: `0 0 ${Math.round(6 * u.scale)}px`, fontFamily: u.FONT_B }}>{c.eyebrow}</p>}
           {c.title && <p style={{ color: "#FFFFFF", fontSize: Math.round(23 * u.scale), fontWeight: 800, margin: 0, lineHeight: 1.2, fontFamily: u.FONT_D, textShadow: "0 2px 12px rgba(0,0,0,0.5)" }}>{c.title}</p>}
           {c.subtitle && <p style={{ color: "rgba(255,255,255,0.85)", fontSize: Math.round(13.5 * u.scale), margin: `${Math.round(7 * u.scale)}px 0 0`, lineHeight: 1.55, fontFamily: u.FONT_B }}>{c.subtitle}</p>}
           {c.cta_label && (
