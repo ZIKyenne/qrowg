@@ -242,7 +242,7 @@ export function UseCasesSection() {
                       {Array.from({ length: 25 }).map((_, k) => <div key={k} style={{ background: (k * 7 + 3) % 3 === 0 ? "#0E0D0B" : "transparent", borderRadius: 1 }} />)}
                     </div>
                     {/* CTA */}
-                    <div style={{ marginTop: 6, height: 22, width: "82%", borderRadius: 7, background: uc.color, display: "flex", alignItems: "center", justifyContent: "center", color: "#080808", fontSize: 8.5, fontWeight: 800, padding: "0 4px", textAlign: "center", lineHeight: 1 }}>{uc.cta.replace(/^Composer ma page /i, "").replace(/^./, c => c.toUpperCase())}</div>
+                    <div style={{ marginTop: 6, minHeight: 26, width: "86%", borderRadius: 7, background: uc.color, display: "flex", alignItems: "center", justifyContent: "center", color: "#080808", fontSize: 11, fontWeight: 800, padding: "3px 5px", textAlign: "center", lineHeight: 1.15 }}>{uc.cta.replace(/^Composer ma page /i, "").replace(/^./, c => c.toUpperCase())}</div>
                   </div>
                 </div>
               </div>

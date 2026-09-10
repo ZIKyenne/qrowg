@@ -58,6 +58,46 @@ Aucun tutoiement détecté. Aucune erreur de script sur les 30 captures.
 
 Balayage après ce lot (1440×900 et 390×844, 14 écrans du produit) : 0 texte < 11 px et 0 cible < 32 px partout, sauf les 44 textes des maquettes de l'accueil et de Fonctionnalités, qui sont des dessins.
 
+## Lot v61 — les maquettes rejoignent la règle
+
+Les 44 textes restants étaient dans des **maquettes d'illustration** : la vignette « ANALYTICS · EXEMPLE » de l'accueil, les maquettes d'éditeur et de statistiques de la page Fonctionnalités, le mini-téléphone des cas d'usage. Elles ont été redessinées plutôt que dispensées :
+
+- Vignette de statistiques de l'accueil : quatre panneaux de quatre lignes → trois panneaux de trois lignes, tout à 11 px, et sur téléphone les indicateurs passent en 2×2 et les panneaux s'empilent au lieu de rapetisser. « Réseaux soc. » redevient « Réseaux ».
+- Fonctionnalités : maquettes d'éditeur et de statistiques à 11 px, la pastille « LIVE » de 7 px devient un état lisible, la légende du QR dessiné passe de 8 à 11 px.
+- Cas d'usage : le bouton du mini-téléphone passe de 8,5 à 11 px.
+- Éditeur : barre du haut, bandeau du canvas, étiquette de bloc, « Propriétés », mention « bouton sans lien », panneaux de style — tout à 11 px ; interrupteurs et rangées de styles à 32 px ; le compteur de 7 px sur les icônes de catégories est retiré (l'infobulle le porte déjà).
+- Aperçu de modèle : l'interface de la modale passe à 11 px, et « Temps de setup » devient « Prêt en ».
+- Barre du bas sur téléphone : libellés à 11,5 px.
+
+Il ne reste dispensés que les **rendus à l'échelle** — la page du client telle qu'elle sera publiée (canvas de l'éditeur, téléphone de l'aperçu de modèle) et le support imprimé tel qu'il sortira (scène de QR de pages, vignettes de l'atelier). Les agrandir mentirait sur le rendu. Le test les nomme un par un, avec la frontière exacte dans le fichier, et vérifie que cette frontière existe encore.
+
+### Balayage à froid après v61 (1440×900 et 390×844)
+
+| Écran | Textes < 11 px | Cibles < 32 px | Dégradés | Débordement | Hauteur PC |
+|---|---|---|---|---|---|
+| Accueil | 0 / 0 | 0 / 0 | 6 | non | 7 503 px |
+| Fonctionnalités | 0 / 0 | 0 / 0 | 0 | non | 4 416 px |
+| Tarifs | 0 / 0 | 0 / 0 | 2 | non | 1 760 px |
+| Connexion | 0 / 0 | 0 / 0 | 0 | non | 900 px |
+| Modèles (/creer) | 0 / 0 | 0 / 0 | 16 | non | 1 521 px |
+| Générateur | 0 / 0 | 0 / 0 | 3 | non | 2 759 px |
+| QR vers un lien | 0 / 0 | 0 / 0 | 3 | non | — |
+| Éditeur (4 onglets) | 0 | 0 | — | non | — |
+| Aperçu de modèle | 0 (hors rendu) | 0 | — | non | — |
+| Accueil connecté | 0 / 0 | 0 / 0 | 1 | non | — |
+| QR de pages | 0 / 0 | 0 / 0 | 12 | non | — |
+| Statistiques | 0 / 0 | 0 / 0 | 2 | non | 1 126 px |
+| Messages | 0 / 0 | 0 / 0 | 0 | non | 936 px |
+| Médias | 0 / 0 | 0 / 0 | 0 | non | 900 px |
+| Paramètres | 0 / 0 | 0 / 0 | 0 | non | 916 px |
+| Atelier d'impression | 0 / 0 | 0 / 0 | 1 | non | 900 px |
+
+Aucune erreur de script sur les 32 captures. Les 16 dégradés de la galerie de modèles sont les mini-aperçus colorés des modèles (le dessin du modèle lui-même), les 12 de « QR de pages » ses vignettes de supports.
+
+## Ce qui reste
+
+Les deux backlogs P1 et P2 de la revue interne sont vidés. Les prochains chantiers ne sont plus des corrections mais des choix : contenu (la page Exemples, les guides), conversion (ce que dit le héros, l'ordre des sections), et le fond de l'offre.
+
 ## Critères de fin, état
 
 1. Héros visible immédiatement : **oui** (v49, v50).

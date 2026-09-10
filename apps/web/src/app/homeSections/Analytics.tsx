@@ -19,10 +19,9 @@ const ANALYTICS_DEMO = {
     { day: "D",  scans: 93,  views: 248 },
   ],
   pages: [
-    { name: "Ma carte pro",   scans: 312, bar: 100, color: "#C9A84C"  },
-    { name: "Menu restaurant",scans: 198, bar: 63,  color: "var(--action)"  },
-    { name: "Portfolio",      scans: 142, bar: 45,  color: "#A78BFA"  },
-    { name: "Promo flash",    scans: 89,  bar: 28,  color: "var(--success)"  },
+    { name: "Ma carte pro",    scans: 312, bar: 100, color: "#C9A84C" },
+    { name: "Menu restaurant", scans: 198, bar: 63,  color: "var(--action)" },
+    { name: "Portfolio",       scans: 142, bar: 45,  color: "#A78BFA" },
   ],
   devices: [
     { label: "Mobile", pct: 72, color: "#C9A84C"  },
@@ -30,10 +29,9 @@ const ANALYTICS_DEMO = {
     { label: "Desktop", pct: 10, color: "#A78BFA" },
   ],
   sources: [
-    { label: "Direct QR",    pct: 58, color: "#C9A84C" },
-    { label: "Réseaux soc.", pct: 24, color: "#F97316" },
-    { label: "Email",        pct: 11, color: "var(--action)" },
-    { label: "Autre",        pct: 7,  color: "#BCB6A6" },
+    { label: "Direct QR", pct: 58, color: "#C9A84C" },
+    { label: "Réseaux",   pct: 24, color: "#F97316" },
+    { label: "Email",     pct: 18, color: "var(--action)" },
   ],
 }
 
@@ -67,21 +65,21 @@ function AnalyticsMockup() {
           {["var(--danger)","#F97316","var(--success)"].map((c,i) => (
             <div key={i} style={{ width:8, height:8, borderRadius:"50%", background:c, opacity:0.6 }}/>
           ))}
-          <span style={{ color:"rgba(201,168,76,0.5)", fontSize:10, letterSpacing:1.5, marginLeft:4 }}>ANALYTICS</span>
+          <span style={{ color:"rgba(201,168,76,0.6)", fontSize:11, letterSpacing:1.5, marginLeft:4 }}>ANALYTICS</span>
         </div>
         <div style={{
           background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.28)",
           borderRadius: 6, padding: "3px 10px",
           display: "flex", alignItems: "center", gap: 5,
         }} title="Données de démonstration — pas vos chiffres réels">
-          <span style={{ color:"#C9A84C", fontSize:9, fontWeight:700, letterSpacing:1 }}>EXEMPLE</span>
+          <span style={{ color:"#C9A84C", fontSize:11, fontWeight:700, letterSpacing:1 }}>EXEMPLE</span>
         </div>
       </div>
 
       <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 16 }}>
 
         {/* 4 KPI */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 }}>
+        <div className="an-kpis" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 }}>
           {ANALYTICS_DEMO.stats.map((s) => (
             <div key={s.label} style={{
               background: "rgba(255,255,255,0.025)",
@@ -91,9 +89,9 @@ function AnalyticsMockup() {
             }}>
               <span style={{ fontSize: 14 }}>{s.icon}</span>
               <p style={{ color: s.color, fontSize: 16, fontWeight: 800, margin: 0, lineHeight: 1 }}>{s.value}</p>
-              <p style={{ color: "rgba(188,182,166,0.7)", fontSize: 9, margin: 0, lineHeight: 1.3 }}>{s.label}</p>
+              <p style={{ color: "var(--muted)", fontSize: 11, margin: 0, lineHeight: 1.3 }}>{s.label}</p>
               {s.delta && (
-                <span style={{ color: "var(--success)", fontSize: 8, fontWeight: 700 }}>{s.delta}</span>
+                <span style={{ color: "var(--success)", fontSize: 11, fontWeight: 700 }}>{s.delta}</span>
               )}
             </div>
           ))}
@@ -106,12 +104,12 @@ function AnalyticsMockup() {
           borderRadius: 12, padding: "12px 14px",
         }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-            <p style={{ color: "#F5F0E8", fontSize: 11, fontWeight: 600, margin: 0 }}>Scans · 7 jours</p>
+            <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: 0 }}>Scans · 7 jours</p>
             <div style={{ display: "flex", gap: 10 }}>
               {[["#C9A84C","Scans"],["var(--action)","Vues"]].map(([c,l]) => (
                 <div key={l as string} style={{ display:"flex", alignItems:"center", gap:4 }}>
                   <div style={{ width:6, height:6, borderRadius:2, background:c as string }}/>
-                  <span style={{ color:"rgba(188,182,166,0.7)", fontSize:9 }}>{l}</span>
+                  <span style={{ color:"var(--muted)", fontSize:11 }}>{l}</span>
                 </div>
               ))}
             </div>
@@ -134,14 +132,14 @@ function AnalyticsMockup() {
                     transition: "height 0.4s ease",
                   }}/>
                 </div>
-                <span style={{ color: "rgba(188,182,166,0.5)", fontSize: 8 }}>{d.day}</span>
+                <span style={{ color: "var(--muted)", fontSize: 11 }}>{d.day}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Ligne du bas: top pages + appareils + sources */}
-        <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr", gap: 10 }}>
+        <div className="an-bas" style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr", gap: 10 }}>
 
           {/* Top pages */}
           <div style={{
@@ -149,13 +147,13 @@ function AnalyticsMockup() {
             border: "1px solid rgba(255,255,255,0.05)",
             borderRadius: 12, padding: "12px",
           }}>
-            <p style={{ color: "#F5F0E8", fontSize: 10, fontWeight: 600, margin: "0 0 10px" }}>Top pages</p>
+            <p style={{ color: "#F5F0E8", fontSize: 11.5, fontWeight: 600, margin: "0 0 10px" }}>Top pages</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
               {ANALYTICS_DEMO.pages.map((p) => (
                 <div key={p.name}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
-                    <span style={{ color: "rgba(245,240,232,0.7)", fontSize: 9, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "70%" }}>{p.name}</span>
-                    <span style={{ color: p.color, fontSize: 9, fontWeight: 700, flexShrink: 0 }}>{p.scans}</span>
+                    <span style={{ color: "rgba(245,240,232,0.75)", fontSize: 11, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "68%" }}>{p.name}</span>
+                    <span style={{ color: p.color, fontSize: 11, fontWeight: 700, flexShrink: 0, fontVariantNumeric: "tabular-nums" }}>{p.scans}</span>
                   </div>
                   <div style={{ height: 3, background: "rgba(255,255,255,0.06)", borderRadius: 2 }}>
                     <div style={{ height: "100%", width: p.bar + "%", background: p.color, borderRadius: 2, opacity: 0.7 }}/>
@@ -171,13 +169,13 @@ function AnalyticsMockup() {
             border: "1px solid rgba(255,255,255,0.05)",
             borderRadius: 12, padding: "12px",
           }}>
-            <p style={{ color: "#F5F0E8", fontSize: 10, fontWeight: 600, margin: "0 0 10px" }}>Appareils</p>
+            <p style={{ color: "#F5F0E8", fontSize: 11.5, fontWeight: 600, margin: "0 0 10px" }}>Appareils</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {ANALYTICS_DEMO.devices.map((d) => (
                 <div key={d.label}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
-                    <span style={{ color: "rgba(245,240,232,0.7)", fontSize: 9 }}>{d.label}</span>
-                    <span style={{ color: d.color, fontSize: 9, fontWeight: 700 }}>{d.pct}%</span>
+                    <span style={{ color: "rgba(245,240,232,0.75)", fontSize: 11 }}>{d.label}</span>
+                    <span style={{ color: d.color, fontSize: 11, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{d.pct}%</span>
                   </div>
                   <div style={{ height: 4, background: "rgba(255,255,255,0.06)", borderRadius: 2 }}>
                     <div style={{ height: "100%", width: d.pct + "%", background: d.color, borderRadius: 2, opacity: 0.8 }}/>
@@ -193,13 +191,13 @@ function AnalyticsMockup() {
             border: "1px solid rgba(255,255,255,0.05)",
             borderRadius: 12, padding: "12px",
           }}>
-            <p style={{ color: "#F5F0E8", fontSize: 10, fontWeight: 600, margin: "0 0 10px" }}>Sources</p>
+            <p style={{ color: "#F5F0E8", fontSize: 11.5, fontWeight: 600, margin: "0 0 10px" }}>Sources</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {ANALYTICS_DEMO.sources.map((s) => (
                 <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <div style={{ width: 6, height: 6, borderRadius: "50%", background: s.color, flexShrink: 0 }}/>
-                  <span style={{ color: "rgba(245,240,232,0.65)", fontSize: 9, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.label}</span>
-                  <span style={{ color: s.color, fontSize: 9, fontWeight: 700 }}>{s.pct}%</span>
+                  <span style={{ color: "rgba(245,240,232,0.75)", fontSize: 11, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.label}</span>
+                  <span style={{ color: s.color, fontSize: 11, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{s.pct}%</span>
                 </div>
               ))}
             </div>
@@ -218,6 +216,8 @@ export function AnalyticsSection() {
       style={{ padding: "64px 48px", position: "relative", zIndex: 1, overflow: "hidden" }}>
       <style>{`
         .analytics-layout { display:grid; grid-template-columns:1fr 1.5fr; gap:72px; align-items:center; }
+        /* La maquette se réorganise au lieu de rapetisser : rien n'y descend sous 11 px. */
+        @media(max-width:720px){ .an-kpis{ grid-template-columns:repeat(2,1fr)!important; } .an-bas{ grid-template-columns:1fr!important; } }
         @media(max-width:1024px){ .analytics-layout{ grid-template-columns:1fr!important; gap:48px!important; } }
         @media(max-width:640px){ #analytics{ padding:56px 20px!important; } }
       `}</style>

@@ -12,21 +12,36 @@ const APP = __dirname
 const SRC = join(__dirname, "..")
 const lire = (p: string) => readFileSync(join(APP, p), "utf8")
 
-// Les maquettes dessinent un rendu à l'échelle (un tableau de bord en vignette, un
-// support imprimé, un téléphone miniature) : leurs tailles sont proportionnelles au
-// dessin, pas au texte que l'on lit. Elles sont nommées ici, une par une.
-const MAQUETTES = [
-  "app/homeSections/Analytics.tsx",       // vignette « ANALYTICS · EXEMPLE »
-  "app/homeSections/UseCases.tsx",        // mini-téléphone d'aperçu
-  "app/homeSections/Templates.tsx",       // mini-aperçus de modèles
-  "app/features/page.tsx",                // maquettes d'éditeur et de statistiques
-  "app/homeSectionsRetirees.tsx",         // sections conservées hors page
-  "app/dashboard/builder/builderPreview.tsx",
-  "app/dashboard/print-studio/PrintStudioClient.tsx", // vignettes de supports (> ligne 2200)
+// Deux sortes de dessins existaient. Les MAQUETTES D'ILLUSTRATION — la vignette
+// « ANALYTICS · EXEMPLE » de l'accueil, les maquettes d'éditeur et de statistiques
+// de Fonctionnalités, le mini-téléphone des cas d'usage — étaient dispensées de la
+// règle : elles ne le sont plus (lot v61). Elles ont été redessinées : moins
+// d'éléments, rien sous 11 px.
+//
+// Restent les RENDUS À L'ÉCHELLE : la page du client telle qu'elle sera publiée
+// (canvas de l'éditeur, téléphone de l'aperçu de modèle) et le support imprimé tel
+// qu'il sortira (scène de QR de pages, vignettes de l'atelier). Les agrandir
+// mentirait sur le rendu. Ils sont nommés ici, un par un, avec leur frontière.
+const RENDUS_A_ECHELLE: { fichier: string; avant?: number; borne?: [string, string]; pourquoi: string }[] = [
+  { fichier: "dashboard/templates/TemplatePreviewModal.tsx", avant: 2588,
+    pourquoi: "le téléphone d'aperçu rend la page du modèle à l'échelle ; l'interface de la modale commence après" },
+  { fichier: "dashboard/builder/builderPreview.tsx",
+    pourquoi: "le canvas de l'éditeur rend la page publiée à l'échelle" },
+  { fichier: "dashboard/qr-codes/QRStudio.tsx", borne: ['{previewScene !== "none" && (', '<div style={{ display: previewScene==="none"'],
+    pourquoi: "la scène d'aperçu montre carte, affiche et téléphone au format réel" },
+  { fichier: "dashboard/print-studio/PrintStudioClient.tsx", pourquoi: "les vignettes de supports (au-delà de la ligne 2200) reproduisent le support imprimé" },
 ]
 
 describe("aucun texte lu sous 11 px", () => {
   const ECRANS = [
+    "HomeClient.tsx",
+    "homeSections/Analytics.tsx",
+    "homeSections/UseCases.tsx",
+    "homeSections/Templates.tsx",
+    "homeSections/Features.tsx",
+    "features/page.tsx",
+    "dashboard/builder/BuilderV4.tsx",
+    "dashboard/builder/builderPanels.tsx",
     "upgrade/page.tsx",
     "dashboard/qr-codes/QRStudio.tsx",
     "dashboard/qr-codes/panneauxQr.tsx",
@@ -127,18 +142,36 @@ describe("Messages : le statut est un choix, pas trois boutons", () => {
   })
 })
 
-describe("les maquettes sont nommées, pas oubliées", () => {
-  it("chacune existe encore : le jour où l'une disparaît, sa dispense saute avec elle", () => {
-    for (const f of MAQUETTES) {
-      expect(statSync(join(SRC, f)).isFile(), f).toBe(true)
+describe("les rendus à l'échelle sont nommés, pas oubliés", () => {
+  it("chacun existe encore, et dit pourquoi il échappe à la règle", () => {
+    for (const r of RENDUS_A_ECHELLE) {
+      expect(statSync(join(APP, r.fichier)).isFile(), r.fichier).toBe(true)
+      expect(r.pourquoi.length, r.fichier).toBeGreaterThan(30)
     }
   })
-  it("aucun écran de la liste n'est aussi déclaré maquette", () => {
-    const dbl = MAQUETTES.filter(m => m.endsWith("upgrade/page.tsx") || m.endsWith("LeadsClient.tsx"))
-    expect(dbl).toEqual([])
+  it("les frontières citées existent dans le code : une dispense ne flotte pas", () => {
+    for (const r of RENDUS_A_ECHELLE) {
+      if (!r.borne) continue
+      const src = lire(r.fichier)
+      const [debut, fin] = r.borne
+      expect(src.indexOf(debut), `${r.fichier} : début`).toBeGreaterThan(-1)
+      expect(src.indexOf(fin), `${r.fichier} : fin`).toBeGreaterThan(src.indexOf(debut))
+    }
   })
-  it("l'inventaire reste à jour : autant de fichiers d'écran que de dossiers de sections", () => {
-    const sections = readdirSync(join(APP, "homeSections")).filter(f => f.endsWith(".tsx")).sort()
-    expect(sections.length).toBeGreaterThan(5)
+  it("la vitrine n'en fait plus partie : ses maquettes ont été redessinées", () => {
+    const fichiers = RENDUS_A_ECHELLE.map(r => r.fichier)
+    for (const f of ["homeSections/Analytics.tsx", "features/page.tsx", "homeSections/UseCases.tsx", "HomeClient.tsx"]) {
+      expect(fichiers, f).not.toContain(f)
+    }
+    // La vignette de statistiques de l'accueil : trois panneaux de trois lignes, pas quatre de quatre.
+    const a = lire("homeSections/Analytics.tsx")
+    expect((a.match(/\{ name: "/g) ?? []).length).toBe(3)
+    expect((a.match(/\{ label: "(Direct QR|Réseaux|Email)"/g) ?? []).length).toBe(3)
+    expect(a).not.toContain("Réseaux soc.")
+    expect(a).toContain('@media(max-width:720px){ .an-kpis{ grid-template-columns:repeat(2,1fr)!important; } .an-bas{ grid-template-columns:1fr!important; } }')
+  })
+  it("plus d'anglicisme dans l'aperçu de modèle", () => {
+    expect(lire("dashboard/templates/TemplatePreviewModal.tsx")).not.toContain("Temps de setup")
+    expect(lire("dashboard/templates/TemplatePreviewModal.tsx")).toContain('label: "Prêt en"')
   })
 })

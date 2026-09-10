@@ -2680,7 +2680,7 @@ export default function TemplatePreviewModal({
                 padding: "0 16px", flexShrink: 0,
                 borderBottom: "1px solid rgba(255,255,255,0.04)",
               }}>
-                <span style={{ color: theme.text, fontSize: 10, fontWeight: 700, opacity: 0.8 }}>9:41</span>
+                <span style={{ color: theme.text, fontSize: 11, fontWeight: 700, opacity: 0.8 }}>9:41</span>
                 <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
                   <div style={{ display: "flex", gap: 1, alignItems: "flex-end" }}>
                     {[3,4,5,6].map((h,i) => <div key={i} style={{ width: 2, height: h, background: theme.text, opacity: 0.7, borderRadius: 1 }} />)}
@@ -2760,8 +2760,8 @@ export default function TemplatePreviewModal({
             </div>
             <div style={{ flex: 1 }}>
               <h2 style={{ color: "#F5F0E8", fontSize: 18, fontWeight: 700, margin: "0 0 4px" }}>{template.name}</h2>
-              <span style={{ background: template.color + "15", border: "1px solid " + template.color + "25", borderRadius: 8, padding: "2px 8px", fontSize: 10, color: template.color, fontWeight: 600 }}>{categorieLue(template.category)}</span>
-              {template.variante && <span style={{ marginLeft: 6, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "2px 8px", fontSize: 10, color: MUTED, fontWeight: 500 }}>{template.variante}</span>}
+              <span style={{ background: template.color + "15", border: "1px solid " + template.color + "25", borderRadius: 8, padding: "2px 8px", fontSize: 11, color: template.color, fontWeight: 600 }}>{categorieLue(template.category)}</span>
+              {template.variante && <span style={{ marginLeft: 6, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "2px 8px", fontSize: 11, color: MUTED, fontWeight: 500 }}>{template.variante}</span>}
             </div>
             <button type="button" onClick={onClose} aria-label="Fermer l'aperçu" style={{ width: 40, height: 40, borderRadius: 9, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
               <X size={14} color={MUTED} />
@@ -2776,12 +2776,12 @@ export default function TemplatePreviewModal({
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
             {[
               { icon: <Layers size={14} color={template.color} />, label: "Blocs inclus", value: blockCount + " blocs" },
-              { icon: <Clock size={14} color={template.color} />, label: "Temps de setup", value: "≈ " + setupTime },
+              { icon: <Clock size={14} color={template.color} />, label: "Prêt en", value: "≈ " + setupTime },
             ].map((stat, i) => (
               <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, padding: "12px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
                   {stat.icon}
-                  <span style={{ color: MUTED, fontSize: 10 }}>{stat.label}</span>
+                  <span style={{ color: MUTED, fontSize: 11 }}>{stat.label}</span>
                 </div>
                 <span style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700 }}>{stat.value}</span>
               </div>
@@ -2790,7 +2790,7 @@ export default function TemplatePreviewModal({
 
           {/* Liste des blocs */}
           <div>
-            <p style={{ color: MUTED, fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 10px" }}>Blocs du modèle</p>
+            <p style={{ color: MUTED, fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 10px" }}>Blocs du modèle</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 5, maxHeight: 220, overflowY: "auto", scrollbarWidth: "none" }}>
             {(canUse ? blocks : blocks.slice(0, 3)).map((block, i) => {
                 const def = BLOCK_DEFS[block.type]
@@ -2799,7 +2799,7 @@ export default function TemplatePreviewModal({
                     <Check size={10} color={template.color} />
                     <span style={{ fontSize: 14 }}>{def?.icon || "📦"}</span>
                     <span style={{ color: "#F5F0E8", fontSize: 11, fontWeight: 500, flex: 1 }}>{def?.label || block.type}</span>
-                    <span style={{ color: MUTED, fontSize: 9, opacity: 0.6 }}>{i + 1}</span>
+                    <span style={{ color: MUTED, fontSize: 11, opacity: 0.6 }}>{i + 1}</span>
                   </div>
                 )
               })}
@@ -2815,13 +2815,13 @@ export default function TemplatePreviewModal({
           {/* Tags */}
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             {template.tags.map((tag, i) => (
-              <span key={i} style={{ background: template.color + "10", border: "1px solid " + template.color + "20", borderRadius: 6, padding: "3px 9px", fontSize: 10, color: template.color, fontWeight: 500 }}>{tag}</span>
+              <span key={i} style={{ background: template.color + "10", border: "1px solid " + template.color + "20", borderRadius: 6, padding: "3px 9px", fontSize: 11, color: template.color, fontWeight: 500 }}>{tag}</span>
             ))}
           </div>
 
           {/* Aperçu couleurs thème */}
           <div>
-            <p style={{ color: MUTED, fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 8px" }}>Palette de couleurs</p>
+            <p style={{ color: MUTED, fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 8px" }}>Palette de couleurs</p>
             <div style={{ display: "flex", gap: 6 }}>
               {[
                 { c: template.bg, label: "Fond" },
@@ -2832,7 +2832,7 @@ export default function TemplatePreviewModal({
               ].map((col, i) => (
                 <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
                   <div style={{ width: 32, height: 32, borderRadius: 8, background: col.c, border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 2px 8px rgba(0,0,0,0.4)" }} />
-                  <span style={{ color: MUTED, fontSize: 8, textAlign: "center" }}>{col.label}</span>
+                  <span style={{ color: MUTED, fontSize: 11, textAlign: "center" }}>{col.label}</span>
                 </div>
               ))}
             </div>

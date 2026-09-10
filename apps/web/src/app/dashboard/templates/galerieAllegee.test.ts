@@ -22,7 +22,8 @@ describe("carte allégée", () => {
   it("l'accroche, les blocs, la durée et les étiquettes vivent dans l'aperçu", () => {
     expect(modal).toContain("{template.highlight}</p>")
     expect(modal).toContain('label: "Blocs inclus"')
-    expect(modal).toContain('label: "Temps de setup"')
+    // « setup » a quitté l'interface avec le lot v61 : on lit « Prêt en ».
+    expect(modal).toContain('label: "Prêt en"')
     expect(modal).toContain("{template.tags.map(")
   })
   it("plus de popularité inventée (hachage de l'identifiant) nulle part", () => {

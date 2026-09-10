@@ -219,26 +219,33 @@ doublons réels, à supprimer côté Instagram :
 | Boulangerie | Formule petit-déjeuner à emporter | 09/09 |
 | Marché / producteur | Fiche conservation du produit de saison | 09/09 |
 | Hôtel / chambre d'hôtes | Plan des transports depuis la gare | 09/09 |
+| Restaurant | Second service du soir : la table à rendre à 21 h 15 (carrousel) | 10/09 |
+| Restaurant | Plateau de fromages du moment | 10/09 |
+| Boulangerie | Pain sur commande pour la semaine | 10/09 |
+| Food truck | Moyens de paiement acceptés | 10/09 |
+| Salon / coiffeur | Routine d'entretien après un balayage | 10/09 |
 
 ## Angles NEUFS disponibles (piocher ici en priorité)
 - Restaurant : plat à emporter du soir · anniversaire / privatisation ·
   fiche « d'où vient ce plat » (producteurs) · le menu de Noël réservé dès novembre ·
-  la table du soir dressée deux fois (double service) · le plateau de fromages du moment · la carte du soir écourtée en fin de service.
+  la carte du soir écourtée en fin de service · le vestiaire et les objets oubliés ·
+  la table dressée pour un anniversaire (bougie, message, playlist).
 - Bar : quiz / jeu de table ·
   happy hour qui change selon l'heure · la carte des bières de saison ·
   la privatisation de l'arrière-salle · la carte des softs travaillés pour le conducteur.
 - Boulangerie : commande de galette / bûche selon la saison · liste d'allergènes ·
-  le pain sur commande pour la semaine · les farines et provenances affichées.
-- Food truck : la fiche « où se garer » pour les entreprises · les moyens de paiement acceptés ·
-  le camion en tournée de festival (dates et scène).
+  les farines et provenances affichées · la tournée de livraison aux entreprises.
+- Food truck : la fiche « où se garer » pour les entreprises ·
+  le camion en tournée de festival (dates et scène) · la carte allergènes du camion.
 - Marché / producteur : la recette du produit de saison · la vente à la ferme hors marché ·
   la commande groupée entre voisins.
 - Commerce : inscription newsletter en caisse · parrainage · la notice du produit sans papier ·
   le mode d'emploi de l'article en cabine · les horaires exceptionnels affichés en vitrine.
 - Hôtel / chambre d'hôtes : les bonnes adresses du quartier tenues à jour ·
   le petit-déjeuner commandé la veille · le règlement intérieur et les horaires affichés.
-- Salon / coiffeur : la routine d'entretien après un balayage · la carte cadeau du salon ·
-  la fiche « ce qu'on a fait sur tes cheveux » remise en fin de rendez-vous.
+- Salon / coiffeur : la carte cadeau du salon ·
+  la fiche « ce qu'on a fait sur tes cheveux » remise en fin de rendez-vous ·
+  les produits utilisés, référencés et rachetables.
 - Transverse : « ton QR imprimé en 2024 marche encore » (QR dynamique) ·
   le plafond souple (la page ne se coupe pas) · QR statique vs dynamique en 20 s ·
   ce que ton support papier ne te dit pas (mesure) · un support, une page, un chiffre.
@@ -298,6 +305,11 @@ doublons réels, à supprimer côté Instagram :
 - « Le pain d'aujourd'hui, affiché ce matin. »
 - « Ce que coûte vraiment une réimpression. »
 - « L'étiquette qui raconte le produit. »
+- « Le second service saute pour vingt minutes. »
+- « Le plateau change chaque semaine. La carte, jamais. »
+- « Le pain de la semaine, commandé dimanche. »
+- « Vous prenez la carte ? Vingt fois par service. »
+- « Le balayage tient trois mois. Les conseils, 10 min. »
 - « Complet à 20 h. Vingt couverts perdus. »
 - « Un prénom sur un carnet, et personne ne rappelle. »
 - « Ta carte en 4 langues. Sans réimprimer. »
@@ -636,3 +648,92 @@ jour précédent. D'où l'ajout au contrôle obligatoire :
 Le second dépôt du 09/09 (relancé par Emilien) était **identique au premier** : même
 dossier, mêmes fichiers, `x-upsert` écrase en place, mêmes URLs. **Aucune remise en file
 n'a été faite** — c'était le bon réflexe, rejouer `create_post` aurait créé six doublons.
+
+---
+
+## 10/09 — production du jour · DÉPOSÉE ET EN FILE
+
+> **Deux doublons interceptés au démarrage.** La file contenait deux posts créés le
+> 10/09 à 08 h 05, hors run marketing, tous deux bâtis sur les images du **09/09**
+> (`social/2026-09-09/qr-code-carte-cocktails-de-saison-bar-*`) :
+> - **Instagram, programmé 10/09 08 h 19** — republication stricte du carrousel cocktails
+>   déjà en ligne sous `/p/DdEvUTzFXK6/` (publié le 09/09 à 16 h 55). Intercepté **11
+>   minutes** avant sa publication et **passé en brouillon** (`6aa264da284ead110948cf20`).
+> - **Pinterest, programmé 10/09 12 h 21** — épingle neuve mais sur l'angle *bar · carte
+>   des cocktails de saison* publié la veille, campagne `20260909-bar`, image = couverture
+>   du carrousel : violation de la règle des 21 jours et de la rotation des secteurs.
+>   **Passée en brouillon** (`6aa264d194192583998c5bf1`).
+>
+> Rien n'a été supprimé : les deux sont récupérables dans Buffer. Le contrôle n° 6 du
+> journal (« vérifier le chemin des images de tout post programmé ») a fonctionné —
+> c'est la deuxième fois en deux jours qu'un doublon naît **hors du run quotidien**.
+> À surveiller : quelque chose crée des posts vers 08 h 05 sur du contenu de la veille.
+>
+> **File Buffer réellement disponible : 10/10** après ces deux mises en brouillon.
+> **Réserve `_STOCK` vide au démarrage** (`dispo` = 0) : production 100 % neuve.
+> Secteur du jour : **restaurant · le second service du soir**, angle jamais traité,
+> rotation respectée (09/09 = bar). Jeudi : **pas de vidéo**, mais **post X** au programme.
+>
+> **Apprentissage Buffer.** TikTok reste le seul canal distribué et il est stable :
+> 253 vues le 09/09 (4,48 s) contre 268 le 08/09 (4,25 s) et 272 le 07/09 (9,23 s).
+> Les trois meilleurs temps de visionnage du mois sont tous des sujets de **restauration
+> en tension de service** — 12,73 s (liste d'attente du samedi), 9,71 s (commande du midi),
+> 9,23 s (carte enfants) — pendant que le bar cocktails retombe à 4,48 s. D'où le retour
+> assumé au restaurant aujourd'hui, sur le sujet le plus tendu qui reste : le second service.
+> Instagram : **0 vue, 0 reach** sur tous les carrousels, sans exception, y compris celui
+> du 09/09. Pinterest : Buffer affiche toujours 0 impression — défaut de reporting connu,
+> ne rien en conclure, lecture dans Pinterest Analytics le **15/09** (clic sortant).
+>
+> Contrôle qualité : **16 visuels, 0 alerte**, chaque QR décodé vers son lien tracké.
+> 4 épingles, 4 angles distincts, **4 gabarits distincts (layouts 0, 1, 2, 3)** et
+> **4 tableaux distincts**. Une seule épingle hors-food (salon) : pont d'audience tenu.
+> Deux re-rendus : le sous-titre de l'épingle boulangerie orphelinait sa flèche (gabarit 1),
+> et « dix minutes » cassait la dernière ligne du titre salon — corrigés, revérifiés à l'œil.
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| en-file | qr-code-second-service-du-soir-restaurant-01..06.png | Instagram (carrousel) | — | restaurant · second service du soir · la table rendue à temps sans vexer personne | https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260910-restaurant | 2026-09-10 |
+| en-file | tiktok-qr-code-second-service-du-soir-restaurant-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 | https://qrowg.com/qr-code/restaurant?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260910-restaurant | 2026-09-10 |
+| en-file | qr-code-plateau-de-fromages-du-moment-restaurant.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 0 | restaurant · plateau de fromages du moment · la carte suit l'affinage | https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260910-restaurant&utm_content=clic | 2026-09-10 |
+| en-file | qr-code-pain-sur-commande-de-la-semaine-boulangerie.png | Pinterest | QR code boutique commerce (726416683586817655) — gabarit 1 | boulangerie · pain sur commande de la semaine · on ne cuit plus à l'aveugle | https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260910-restaurant&utm_content=clic | 2026-09-10 |
+| en-file | qr-code-moyens-de-paiement-acceptes-food-truck.png | Pinterest | QR code food truck (726416683586817654) — gabarit 2 | food truck · moyens de paiement acceptés · la question qui revient vingt fois | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260910-restaurant&utm_content=clic | 2026-09-10 |
+| en-file | qr-code-routine-entretien-apres-balayage-salon.png | Pinterest | QR code salon coiffure (726416683586817657) — gabarit 3 | salon · routine d'entretien après balayage · les conseils ne s'oublient plus à la voiture | https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20260910-restaurant&utm_content=clic&utm_term=salon | 2026-09-10 |
+
+> **Pas de vidéo aujourd'hui** (jeudi n'est pas un jour vidéo). Jour X : le post est dans
+> le HTML des textes, publication manuelle.
+>
+> **Dépôt fait** (16 PNG via `QRowg-Depot.cmd`, aucune planche-contact parasite cette fois),
+> puis **6 posts mis en file**, aucun en erreur :
+> carrousel Instagram (09 h 04 UTC), épingle restaurant · plateau de fromages (12 h 21),
+> épingle boulangerie · pain sur commande (14 h 49), épingle food truck · moyens de
+> paiement (16 h 18), épingle salon · routine balayage (18 h 15) et carrousel photo
+> TikTok (19 h 16). **File à 6/10**, réserve vide.
+> Mention « contenu généré par IA » posée sur Instagram ; non envoyée sur le carrousel
+> photo TikTok (l'API la refuse pour ce format).
+
+## Textes prêts — 10/09
+
+Légendes complètes (Instagram, TikTok, Pinterest ×4, LinkedIn, X) avec bouton Copier :
+`social-a-deposer\2026-09-10\textes-du-jour-2026-09-10.html`.
+Bios : `social-a-deposer\2026-09-10\bios-du-jour-2026-09-10.html`.
+Résumé des titres et tableaux Pinterest :
+
+### qr-code-plateau-de-fromages-du-moment-restaurant
+**Titre Pinterest** : Plateau de fromages : la carte à mettre à jour en 5 minutes
+**Tableau** : QR code restaurant
+`#restaurant #fromage #cartedesfromages #commercelocal`
+
+### qr-code-pain-sur-commande-de-la-semaine-boulangerie
+**Titre Pinterest** : Pain sur commande : la page à monter en 5 minutes, gratuitement
+**Tableau** : QR code boutique commerce
+`#boulangerie #painmaison #organisation #commercelocal`
+
+### qr-code-moyens-de-paiement-acceptes-food-truck
+**Titre Pinterest** : Moyens de paiement : la fiche à faire en 4 étapes
+**Tableau** : QR code food truck
+`#foodtruck #streetfood #paiement #commercelocal`
+
+### qr-code-routine-entretien-apres-balayage-salon
+**Titre Pinterest** : Routine après balayage : la fiche à créer en 4 étapes
+**Tableau** : QR code salon coiffure — unique épingle hors-food du jour
+`#salondecoiffure #balayage #routinecheveux #coiffure`

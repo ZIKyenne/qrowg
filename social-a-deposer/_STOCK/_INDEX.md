@@ -335,3 +335,20 @@ Les quatre titres, descriptions (toutes ≤ 500 caractères) et tableaux sont da
 - **QR code boutique commerce** — « Formule petit-déj : la monter en 5 minutes, gratuitement »
 - **QR code food truck** — « Fiche conservation : la créer en 5 minutes, sans carte bancaire »
 - **QR code hôtel** — « Plan depuis la gare : la page à faire en 4 étapes »
+
+---
+
+## 10/09 — production du jour · réserve VIDE au démarrage et à l'arrivée
+
+> Aucun contenu en statut `dispo` au démarrage du run : rien à réinjecter, production
+> 100 % neuve. Les 16 visuels du jour (6 slides + 6 copies TikTok + 4 épingles) tiennent
+> tous dans la file (10 places libres après mise en brouillon des deux doublons) :
+> **rien ne part au stock aujourd'hui**. Confirmé après coup : les 6 posts sont en file
+> (1 Instagram, 1 TikTok, 4 Pinterest), file à 6/10, **réserve toujours vide**.
+>
+> Deux posts ont en revanche été **mis en brouillon dans Buffer** (pas supprimés, pas
+> archivés ici) parce qu'ils rejouaient le contenu du 09/09 :
+> `6aa264da284ead110948cf20` (Instagram, carrousel cocktails déjà en ligne) et
+> `6aa264d194192583998c5bf1` (Pinterest, angle bar cocktails de la veille).
+> Ils restent récupérables dans Buffer et n'ont pas leur place en réserve : ce sont des
+> doublons, pas du contenu en attente.

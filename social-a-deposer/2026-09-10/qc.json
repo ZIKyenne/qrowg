@@ -1,0 +1,118 @@
+{
+  "total": 16,
+  "avec_alerte": 0,
+  "details": [
+    {
+      "fichier": "qr-code-moyens-de-paiement-acceptes-food-truck.png",
+      "fond_sombre_pct": 90.7,
+      "or_pct": 4.3,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260910-restaurant&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-pain-sur-commande-de-la-semaine-boulangerie.png",
+      "fond_sombre_pct": 89.3,
+      "or_pct": 5.4,
+      "qr": "https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260910-restaurant&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-plateau-de-fromages-du-moment-restaurant.png",
+      "fond_sombre_pct": 90.7,
+      "or_pct": 4.1,
+      "qr": "https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260910-restaurant&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-routine-entretien-apres-balayage-salon.png",
+      "fond_sombre_pct": 90.9,
+      "or_pct": 4.0,
+      "qr": "https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20260910-restaurant&utm_content=clic&utm_term=salon",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-second-service-du-soir-restaurant-01.png",
+      "fond_sombre_pct": 93.0,
+      "or_pct": 1.4,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-second-service-du-soir-restaurant-02.png",
+      "fond_sombre_pct": 92.5,
+      "or_pct": 0.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-second-service-du-soir-restaurant-03.png",
+      "fond_sombre_pct": 86.0,
+      "or_pct": 8.9,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260910-restaurant",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-second-service-du-soir-restaurant-04.png",
+      "fond_sombre_pct": 93.5,
+      "or_pct": 1.1,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-second-service-du-soir-restaurant-05.png",
+      "fond_sombre_pct": 88.2,
+      "or_pct": 0.7,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-second-service-du-soir-restaurant-06.png",
+      "fond_sombre_pct": 83.9,
+      "or_pct": 6.5,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260910-restaurant",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-second-service-du-soir-restaurant-01.png",
+      "fond_sombre_pct": 93.1,
+      "or_pct": 1.4,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-second-service-du-soir-restaurant-02.png",
+      "fond_sombre_pct": 92.5,
+      "or_pct": 0.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-second-service-du-soir-restaurant-03.png",
+      "fond_sombre_pct": 86.1,
+      "or_pct": 8.9,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260910-restaurant",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-second-service-du-soir-restaurant-04.png",
+      "fond_sombre_pct": 93.5,
+      "or_pct": 1.1,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-second-service-du-soir-restaurant-05.png",
+      "fond_sombre_pct": 88.2,
+      "or_pct": 0.7,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-second-service-du-soir-restaurant-06.png",
+      "fond_sombre_pct": 83.9,
+      "or_pct": 6.5,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260910-restaurant",
+      "alertes": []
+    }
+  ]
+}

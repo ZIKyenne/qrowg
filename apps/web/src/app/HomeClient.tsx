@@ -583,7 +583,7 @@ export default function HomeClient() {
             .f-brand-desc{ display:none!important; }
             .f-brand-link{ margin-bottom:6px!important; }
             .f-brand-link span{ font-size:19px!important; }
-            .fl{ min-height:30px!important; font-size:13px!important; }
+            .fl{ min-height:32px!important; font-size:13px!important; }
             .fsoc{ margin-top:8px!important; margin-bottom:4px!important; gap:6px!important; }
             .fsoc a{ width:26px!important; height:26px!important; }
             .fb{ padding:10px 22px 14px!important; flex-direction:column!important; align-items:flex-start!important; gap:6px!important; }

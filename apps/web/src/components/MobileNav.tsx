@@ -168,10 +168,10 @@ export default function MobileNav({ onCreate, unread = 0, guest = false }: { onC
                 <span style={{ position: 'relative', display: 'block', height: 20, width: 20 }}>
                   <TabIcon />
                   {(tab.href === '/dashboard' || tab.more) && unread > 0 && (
-                    <span style={{ position: 'absolute', top: -5, right: -7, minWidth: 14, height: 14, padding: '0 3px', borderRadius: 7, background: 'var(--danger)', color: '#fff', fontSize: 9, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1, boxShadow: '0 0 0 2px var(--bg)' }}>{unread > 99 ? '99+' : unread}</span>
+                    <span style={{ position: 'absolute', top: -5, right: -7, minWidth: 14, height: 14, padding: '0 3px', borderRadius: 7, background: 'var(--danger)', color: '#fff', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1, boxShadow: '0 0 0 2px var(--bg)' }}>{unread > 99 ? '99+' : unread}</span>
                   )}
                 </span>
-                <span style={{ fontSize: 10.5, fontWeight: isActive ? 600 : 500, whiteSpace: 'nowrap' }}>{tab.label}</span>
+                <span style={{ fontSize: 11.5, fontWeight: isActive ? 600 : 500, whiteSpace: 'nowrap' }}>{tab.label}</span>
               </>
             )
 
@@ -209,7 +209,7 @@ export default function MobileNav({ onCreate, unread = 0, guest = false }: { onC
             <p style={{ margin: '0 4px 8px', color: 'var(--ink)', fontSize: 15, fontWeight: 600 }}>Toutes les sections</p>
             {MORE_GROUPS.map(g => (
               <div key={g.label} style={{ marginBottom: 10 }}>
-                <p style={{ margin: '8px 4px 2px', color: 'var(--faint)', fontSize: 10, letterSpacing: '.16em', textTransform: 'uppercase', fontWeight: 700 }}>{g.label}</p>
+                <p style={{ margin: '8px 4px 2px', color: 'var(--faint)', fontSize: 11, letterSpacing: '.16em', textTransform: 'uppercase', fontWeight: 700 }}>{g.label}</p>
                 {g.items.map(it => {
                   const courant = pathname === it.href || pathname.startsWith(it.href + '/')
                   const badge = it.href === '/dashboard/leads' && unread > 0

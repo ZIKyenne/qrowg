@@ -130,7 +130,7 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
     // n'existait pas. (Vague 27.)
     const mention = mentionBoutonSansLien(boutonsSansLien(block.type, c))
     const avecMention = (contenu: any) => mention
-      ? <>{contenu}<p role="note" style={{ margin: "0 16px 8px", padding: "6px 9px", borderRadius: 8, border: `1px dashed ${muted}40`, color: muted, fontSize: 10, textAlign: "center" }}>⚠︎ {mention}</p></>
+      ? <>{contenu}<p role="note" style={{ margin: "0 16px 8px", padding: "6px 9px", borderRadius: 8, border: `1px dashed ${muted}40`, color: muted, fontSize: 11.5, textAlign: "center" }}>⚠︎ {mention}</p></>
       : contenu
 
     // Renderer PARTAGÉ (pilotes derrière flag). Flag vide en prod → null → `case` legacy.

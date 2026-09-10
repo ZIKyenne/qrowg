@@ -1,0 +1,88 @@
+{
+  "carousels": [
+    {
+      "slug": "qr-code-second-service-du-soir-restaurant",
+      "sector": "restaurant",
+      "url": "https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260910-restaurant",
+      "slides": [
+        {
+          "kind": "cover",
+          "tag": "Restaurant",
+          "title": "Le second service saute pour vingt [[minutes]].",
+          "body": "La table de 19 h 30 se lève à 21 h 40."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le problème",
+          "title": "Personne n'ose annoncer l'heure de [[fin]].",
+          "body": "Ni au téléphone, ni à l'assise. Alors on laisse filer — et les quatre couverts de 21 h 15 vont ailleurs."
+        },
+        {
+          "kind": "qr",
+          "kicker": "Sur la table",
+          "title": "Un QR, et la soirée est [[écrite]].",
+          "body": "Horaire de la table, carte, desserts : tout est dit sans que personne ait à le dire."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le geste",
+          "title": "Tu changes la page, pas le [[carton]].",
+          "body": "Service allongé ce soir ? Deux lignes modifiées depuis le téléphone, entre deux plats."
+        },
+        {
+          "kind": "metric",
+          "kicker": "Preuve",
+          "number": "20 min",
+          "title": "c'est tout ce qui sépare un service d'un [[second]]",
+          "body": "Et chaque scan te dit enfin combien de tables ont lu le message."
+        },
+        {
+          "kind": "cta",
+          "title": "Crée ta page restaurant en 2 [[minutes]]",
+          "body": "Gratuit, sans carte bancaire, prêt à imprimer.",
+          "cta": "qrowg.com",
+          "qr": true
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "slug": "qr-code-plateau-de-fromages-du-moment-restaurant",
+      "tag": "Restaurant",
+      "sector": "restaurant",
+      "layout": 0,
+      "qr": true,
+      "title": "Le plateau change chaque semaine. La carte, [[jamais]].",
+      "subtitle": "La marche à suivre : 4 étapes, 5 minutes →",
+      "url": "https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260910-restaurant&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-pain-sur-commande-de-la-semaine-boulangerie",
+      "tag": "Boulangerie",
+      "layout": 1,
+      "qr": true,
+      "title": "Le pain de la semaine, commandé [[dimanche]].",
+      "subtitle": "Gratuit, sans carte bancaire →",
+      "url": "https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260910-restaurant&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-moyens-de-paiement-acceptes-food-truck",
+      "tag": "Food truck",
+      "layout": 2,
+      "qr": true,
+      "title": "« Vous prenez la carte ? » Vingt fois par [[service]].",
+      "subtitle": "La page à monter en 5 minutes →",
+      "url": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260910-restaurant&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-routine-entretien-apres-balayage-salon",
+      "tag": "Salon",
+      "layout": 3,
+      "qr": true,
+      "title": "Le balayage tient trois mois. Les conseils, [[10 min]].",
+      "subtitle": "Les 4 étapes pour créer la fiche →",
+      "url": "https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20260910-restaurant&utm_content=clic&utm_term=salon"
+    }
+  ]
+}

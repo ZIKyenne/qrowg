@@ -101,21 +101,21 @@ function BuilderMockupSvg() {
         {["var(--danger)", "#F97316", "var(--success)"].map((c, i) => (
           <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: c, opacity: 0.65 }} />
         ))}
-        <span style={{ color: "rgba(201,168,76,0.4)", fontSize: 9, letterSpacing: 1.5, marginLeft: 8 }}>ÉDITEUR — QRowg</span>
+        <span style={{ color: "rgba(201,168,76,0.55)", fontSize: 11, letterSpacing: 1.5, marginLeft: 8 }}>ÉDITEUR — QRowg</span>
         <div style={{
           marginLeft: "auto", padding: "3px 10px", borderRadius: 5,
           background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.25)",
-          fontSize: 9, color: G, fontWeight: 700,
+          fontSize: 11, color: G, fontWeight: 700,
         }}>PUBLIER</div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "100px 1fr 80px", gap: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "112px 1fr 92px", gap: 10 }}>
         {/* Blocs */}
         <div style={{ background: "rgba(255,255,255,0.025)", borderRadius: 12, padding: "10px 8px", display: "flex", flexDirection: "column", gap: 6 }}>
-          <p style={{ color: "rgba(201,168,76,0.5)", fontSize: 8, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 4 }}>Blocs</p>
+          <p style={{ color: "rgba(201,168,76,0.6)", fontSize: 11, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 4 }}>Blocs</p>
           {BLOCKS.map(b => (
             <div key={b.label} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
               <span style={{ fontSize: 12 }}>{b.icon}</span>
-              <span style={{ color: "rgba(245,240,232,0.65)", fontSize: 9 }}>{b.label}</span>
+              <span style={{ color: "rgba(245,240,232,0.75)", fontSize: 11 }}>{b.label}</span>
               <div style={{ marginLeft: "auto", width: 5, height: 5, borderRadius: "50%", background: b.c }} />
             </div>
           ))}
@@ -137,7 +137,7 @@ function BuilderMockupSvg() {
         </div>
         {/* Preview */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-          <p style={{ color: "rgba(201,168,76,0.45)", fontSize: 8, letterSpacing: 1.5, textTransform: "uppercase" }}>Aperçu</p>
+          <p style={{ color: "rgba(201,168,76,0.6)", fontSize: 11, letterSpacing: 1.2, textTransform: "uppercase" }}>Aperçu</p>
           <div style={{ width: 60, border: "2px solid rgba(201,168,76,0.25)", borderRadius: 14, padding: "8px 5px", background: "rgba(8,8,8,0.8)" }}>
             <div style={{ width: 18, height: 3, borderRadius: 2, background: "rgba(255,255,255,0.1)", margin: "0 auto 6px" }} />
             <div style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "center" }}>
@@ -147,9 +147,9 @@ function BuilderMockupSvg() {
               ))}
             </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 3, padding: "3px 7px", borderRadius: 12, background: "rgba(57,255,143,0.08)", border: "1px solid rgba(57,255,143,0.2)" }}>
-            <div style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--success)" }} />
-            <span style={{ color: "var(--success)", fontSize: 7, fontWeight: 700 }}>LIVE</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 9px", borderRadius: 12, background: "rgba(57,255,143,0.08)", border: "1px solid rgba(57,255,143,0.2)" }}>
+            <div style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--success)" }} />
+            <span style={{ color: "var(--success)", fontSize: 11, fontWeight: 700 }}>Live</span>
           </div>
         </div>
       </div>
@@ -165,7 +165,7 @@ function AnalyticsMockupSvg() {
     <div style={{ background: "var(--surface)", border: "1px solid " + BOR, borderRadius: 20, padding: 20, boxShadow: "0 24px 80px rgba(0,0,0,0.5)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
         {["var(--danger)","#F97316","var(--success)"].map((c,i) => <div key={i} style={{ width:8,height:8,borderRadius:"50%",background:c,opacity:0.65 }}/>)}
-        <span style={{ color:"rgba(201,168,76,0.4)",fontSize:9,letterSpacing:1.5,marginLeft:8 }}>STATISTIQUES — QRowg</span>
+        <span style={{ color:"rgba(201,168,76,0.55)",fontSize:11,letterSpacing:1.5,marginLeft:8 }}>STATISTIQUES — QRowg</span>
       </div>
       {/* KPI */}
       <div className="rcols-4" style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,marginBottom:14 }}>
@@ -173,20 +173,20 @@ function AnalyticsMockupSvg() {
           <div key={lbl as string} style={{ background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:9,padding:"8px 10px" }}>
             <span style={{fontSize:13}}>{icon}</span>
             <p style={{color:c as string,fontSize:15,fontWeight:800,margin:"3px 0 2px",lineHeight:1}}>{val}</p>
-            <p style={{color:"rgba(138,132,120,0.6)",fontSize:8,margin:0}}>{lbl}</p>
+            <p style={{color:"var(--muted)",fontSize:11,margin:0}}>{lbl}</p>
           </div>
         ))}
       </div>
       {/* Chart */}
       <div style={{ background:"rgba(255,255,255,0.018)",border:"1px solid rgba(255,255,255,0.05)",borderRadius:10,padding:"10px 12px" }}>
-        <p style={{color:INK,fontSize:10,fontWeight:600,margin:"0 0 10px"}}>Scans · 7 jours</p>
+        <p style={{color:INK,fontSize:12,fontWeight:600,margin:"0 0 10px"}}>Scans · 7 jours</p>
         <div style={{display:"flex",alignItems:"flex-end",gap:6,height:60}}>
           {bars.map((v,i) => (
             <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3,height:"100%"}}>
               <div style={{flex:1,width:"100%",display:"flex",alignItems:"flex-end"}}>
                 <div style={{width:"100%",height:Math.round((v/maxV)*52)+"px",borderRadius:"3px 3px 0 0",background:G}}/>
               </div>
-              <span style={{color:"rgba(138,132,120,0.5)",fontSize:8}}>{days[i]}</span>
+              <span style={{color:"var(--muted)",fontSize:11}}>{days[i]}</span>
             </div>
           ))}
         </div>
@@ -216,13 +216,13 @@ const QR_STYLES = [
 export function QRMockupStatique({ style: s = QR_STYLES[0] }: { style?: typeof QR_STYLES[number] }) {
   const N = 21, C = 8, PAD = 12, W = N * C + PAD * 2
   return (
-    <svg role="img" aria-label="Exemple de QR code QRowg, illustration" viewBox={`0 0 ${W} ${W + 22}`} width={200} height={222}
+    <svg role="img" aria-label="Exemple de QR code QRowg, illustration" viewBox={`0 0 ${W} ${W + 26}`} width={200} height={226}
       style={{ display:"block", borderRadius:18, border:"2px solid rgba(201,168,76,0.35)", background:s.bg, transition:"background 0.4s ease" }}>
       {QR_CELLS.map((c, i) => c === 0 ? null : (
         <rect key={i} x={PAD + (i % N) * C + 0.75} y={PAD + Math.floor(i / N) * C + 0.75} width={C - 1.5} height={C - 1.5} rx={1.5}
           fill={QR_GOLD.has(Math.floor(i / N) * 7 + (i % 7)) ? s.acc : s.fg} style={{ transition:"fill 0.4s" }} />
       ))}
-      <text x={W / 2} y={W + 12} textAnchor="middle" fontSize={8} fontWeight={700} letterSpacing={2.5} fill={s.acc} fontFamily="inherit">QROWG.COM</text>
+      <text x={W / 2} y={W + 14} textAnchor="middle" fontSize={11} fontWeight={700} letterSpacing={2} fill={s.acc} fontFamily="inherit">QROWG.COM</text>
     </svg>
   )
 }

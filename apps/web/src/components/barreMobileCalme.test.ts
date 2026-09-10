@@ -28,7 +28,7 @@ describe("la barre du bas", () => {
   })
   it("chaque tuile fait au moins 44 px et porte son nom", () => {
     expect(nav).toContain("minHeight: 52")
-    expect(nav).toContain("<span style={{ fontSize: 10.5, fontWeight: isActive ? 600 : 500, whiteSpace: 'nowrap' }}>{tab.label}</span>")
+    expect(nav).toContain("<span style={{ fontSize: 11.5, fontWeight: isActive ? 600 : 500, whiteSpace: 'nowrap' }}>{tab.label}</span>")
   })
 })
 

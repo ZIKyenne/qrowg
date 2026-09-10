@@ -214,14 +214,14 @@ Tiramisu;6,50€;Fait maison`
           <input value={content.title || ""} placeholder="Mes compétences" onChange={e => onChange("title", e.target.value)} style={inputStyle} />
         </div>
         <div>
-          <label style={{ color: M, fontSize: 11, display: "flex", justifyContent: "space-between", marginBottom: 6, fontWeight: 500 }}><span>Compétences</span><span style={{ color: M, fontSize: 10 }}>{tags.length}</span></label>
+          <label style={{ color: M, fontSize: 11, display: "flex", justifyContent: "space-between", marginBottom: 6, fontWeight: 500 }}><span>Compétences</span><span style={{ color: M, fontSize: 11 }}>{tags.length}</span></label>
           {tags.length === 0 && <p style={{ color: M, fontSize: 11, margin: "0 0 8px", fontStyle: "italic" }}>Aucune compétence. Ajoutez-en ci-dessous ou via un modèle.</p>}
           <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
             {tags.map((t, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 8px" }}>
                 <span style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                  <button type="button" onClick={() => move(i, -1)} disabled={i === 0} title="Monter" style={{ background: "none", border: "none", cursor: i === 0 ? "default" : "pointer", color: i === 0 ? "rgba(255,255,255,0.15)" : M, padding: 0, lineHeight: 0.7, fontSize: 10 }}>▲</button>
-                  <button type="button" onClick={() => move(i, 1)} disabled={i === tags.length - 1} title="Descendre" style={{ background: "none", border: "none", cursor: i === tags.length - 1 ? "default" : "pointer", color: i === tags.length - 1 ? "rgba(255,255,255,0.15)" : M, padding: 0, lineHeight: 0.7, fontSize: 10 }}>▼</button>
+                  <button type="button" onClick={() => move(i, -1)} disabled={i === 0} title="Monter" style={{ background: "none", border: "none", cursor: i === 0 ? "default" : "pointer", color: i === 0 ? "rgba(255,255,255,0.15)" : M, padding: 0, lineHeight: 0.7, fontSize: 11 }}>▲</button>
+                  <button type="button" onClick={() => move(i, 1)} disabled={i === tags.length - 1} title="Descendre" style={{ background: "none", border: "none", cursor: i === tags.length - 1 ? "default" : "pointer", color: i === tags.length - 1 ? "rgba(255,255,255,0.15)" : M, padding: 0, lineHeight: 0.7, fontSize: 11 }}>▼</button>
                 </span>
                 <span style={{ flex: 1, color: TXT, fontSize: 12.5, fontWeight: 600 }}>{t}</span>
                 <button type="button" onClick={() => remove(i)} title="Supprimer" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 6, width: 22, height: 22, cursor: "pointer", color: "var(--danger)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>×</button>
@@ -272,7 +272,7 @@ Tiramisu;6,50€;Fait maison`
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
           <label style={{ color: M, fontSize: 11, fontWeight: 500 }}>Couleur de la pastille</label>
           <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-            {content.dot_color && <button type="button" onClick={() => onChange("dot_color", "")} title="Couleur auto" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, padding: "4px 8px", color: M, fontSize: 10, cursor: "pointer" }}>Auto</button>}
+            {content.dot_color && <button type="button" onClick={() => onChange("dot_color", "")} title="Couleur auto" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, padding: "4px 8px", color: M, fontSize: 11, cursor: "pointer" }}>Auto</button>}
             <label style={{ width: 26, height: 26, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: sc.color, cursor: "pointer", position: "relative", overflow: "hidden", flexShrink: 0 }}>
               <input type="color" aria-label="Couleur de la pastille" value={sc.color} onChange={e => onChange("dot_color", e.target.value)} style={{ position: "absolute", inset: -4, width: 40, height: 40, border: "none", padding: 0, cursor: "pointer", opacity: 0 }} />
             </label>
@@ -282,7 +282,7 @@ Tiramisu;6,50€;Fait maison`
           <label style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>Message</label>
           <input value={content.message || ""} placeholder="Ouvert aux nouvelles missions" onChange={e => onChange("message", e.target.value)} style={inputStyle} />
           <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 6 }}>
-            {msgSuggestions.map(m => <button key={m} type="button" onClick={() => onChange("message", m)} style={{ background: "color-mix(in srgb, var(--accent) 6%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 18%, transparent)", borderRadius: 20, padding: "4px 9px", color: GG, fontSize: 10, cursor: "pointer" }}>{m}</button>)}
+            {msgSuggestions.map(m => <button key={m} type="button" onClick={() => onChange("message", m)} style={{ background: "color-mix(in srgb, var(--accent) 6%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 18%, transparent)", borderRadius: 20, padding: "4px 9px", color: GG, fontSize: 11, cursor: "pointer" }}>{m}</button>)}
           </div>
         </div>
         <div>
@@ -734,7 +734,7 @@ Tiramisu;6,50€;Fait maison`
                 )}
               </div>
             )
-            const grpHeader: React.CSSProperties = { color: MUTED, fontSize: 8.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "2px 2px 6px" }
+            const grpHeader: React.CSSProperties = { color: MUTED, fontSize: 11.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "2px 2px 6px" }
             return (
               <>
                 {filled.length > 0 && (
@@ -850,7 +850,7 @@ Tiramisu;6,50€;Fait maison`
               return (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: 4 }}>
                   <span style={{ color: valid ? "var(--success)" : "#F59E0B", fontSize: 12, fontWeight: 600 }}>{valid ? "✓ Format valide" : `⚠ ${msg}`}</span>
-                  {isTestable && <a href={val} target="_blank" rel="noopener noreferrer" style={{ color: G, fontSize: 9, fontWeight: 700, textDecoration: "none" }}>Tester ↗</a>}
+                  {isTestable && <a href={val} target="_blank" rel="noopener noreferrer" style={{ color: G, fontSize: 11, fontWeight: 700, textDecoration: "none" }}>Tester ↗</a>}
                 </div>
               )
             })()}
@@ -1131,7 +1131,7 @@ Tiramisu;6,50€;Fait maison`
             <div style={{ display: "flex", gap: 4, marginBottom: 14 }}>
               {(["hex","rgb","hsl"] as const).map(fmt => (
                 <button key={fmt} onClick={() => setColorFormat(fmt)}
-                  style={{ flex: 1, padding: "5px", background: colorFormat===fmt ? G+"15" : "rgba(255,255,255,0.04)", border: `1px solid ${colorFormat===fmt ? G+"40" : "rgba(255,255,255,0.07)"}`, borderRadius: 7, color: colorFormat===fmt ? G : MUTED, fontSize: 10, fontWeight: colorFormat===fmt ? 700 : 400, cursor: "pointer", textTransform: "uppercase" as const }}>
+                  style={{ flex: 1, padding: "5px", background: colorFormat===fmt ? G+"15" : "rgba(255,255,255,0.04)", border: `1px solid ${colorFormat===fmt ? G+"40" : "rgba(255,255,255,0.07)"}`, borderRadius: 7, color: colorFormat===fmt ? G : MUTED, fontSize: 11, fontWeight: colorFormat===fmt ? 700 : 400, cursor: "pointer", textTransform: "uppercase" as const }}>
                   {fmt}
                 </button>
               ))}
@@ -1155,10 +1155,10 @@ Tiramisu;6,50€;Fait maison`
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}>
                     <span style={{ fontSize: 12, width: 18, textAlign: "center" as const }}>{icon}</span>
                     <label style={{ color: "var(--ink)", fontSize: 11, fontWeight: 600, flex: 1 }}>{label}</label>
-                    <span style={{ fontSize: 9, color: MUTED }}>{hint}</span>
+                    <span style={{ fontSize: 11, color: MUTED }}>{hint}</span>
                     {/* Badge contraste */}
                     {(key === "text" || key === "muted") && (
-                      <span style={{ background: wcag==="AAA" ? "rgba(57,255,143,0.15)" : wcag==="AA" ? "rgba(251,191,36,0.15)" : "rgba(239,68,68,0.15)", border: `1px solid ${wcag==="AAA" ? "rgba(57,255,143,0.3)" : wcag==="AA" ? "rgba(251,191,36,0.3)" : "rgba(239,68,68,0.3)"}`, borderRadius: 6, padding: "1px 6px", fontSize: 9, fontWeight: 700, color: wcag==="AAA" ? "var(--success)" : wcag==="AA" ? "#FBBF24" : "#EF4444" }}>
+                      <span style={{ background: wcag==="AAA" ? "rgba(57,255,143,0.15)" : wcag==="AA" ? "rgba(251,191,36,0.15)" : "rgba(239,68,68,0.15)", border: `1px solid ${wcag==="AAA" ? "rgba(57,255,143,0.3)" : wcag==="AA" ? "rgba(251,191,36,0.3)" : "rgba(239,68,68,0.3)"}`, borderRadius: 6, padding: "1px 6px", fontSize: 11, fontWeight: 700, color: wcag==="AAA" ? "var(--success)" : wcag==="AA" ? "#FBBF24" : "#EF4444" }}>
                         {wcag} {ratio.toFixed(1)}:1
                       </span>
                     )}
@@ -1189,7 +1189,7 @@ Tiramisu;6,50€;Fait maison`
             {/* Couleurs récentes */}
             {recentColors.length > 0 && (
               <div style={{ marginTop: 8 }}>
-                <p style={{ color: MUTED, fontSize: 9, textTransform: "uppercase" as const, letterSpacing: 2, margin: "0 0 8px" }}>Récentes</p>
+                <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase" as const, letterSpacing: 2, margin: "0 0 8px" }}>Récentes</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                   {recentColors.map((col, i) => (
                     <button key={i} title={col}
@@ -1244,7 +1244,7 @@ Tiramisu;6,50€;Fait maison`
             <div style={{ display: "flex", gap: 4, marginBottom: 14, flexWrap: "wrap" }}>
               {(["presets","type","effects","animation","advanced"] as const).map(sub => (
                 <button key={sub} onClick={() => setBgSubTab(sub)}
-                  style={{ flex: 1, minWidth: 60, padding: "7px 4px", background: bgSubTab===sub ? G+"15" : "rgba(255,255,255,0.03)", border: `1px solid ${bgSubTab===sub ? G+"40" : "rgba(255,255,255,0.07)"}`, borderRadius: 8, color: bgSubTab===sub ? G : MUTED, fontSize: 10, fontWeight: bgSubTab===sub ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                  style={{ flex: 1, minWidth: 60, padding: "7px 4px", background: bgSubTab===sub ? G+"15" : "rgba(255,255,255,0.03)", border: `1px solid ${bgSubTab===sub ? G+"40" : "rgba(255,255,255,0.07)"}`, borderRadius: 8, color: bgSubTab===sub ? G : MUTED, fontSize: 11, fontWeight: bgSubTab===sub ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
                   {sub==="presets" ? "Presets" : sub==="type" ? "Type" : sub==="effects" ? "Effets" : sub==="animation" ? "Anim" : "Avancé"}
                 </button>
               ))}
@@ -1257,7 +1257,7 @@ Tiramisu;6,50€;Fait maison`
                 <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 12 }}>
                   {presetGroups.map(group => (
                     <button key={group} onClick={() => setActivePresetGroup(group)}
-                      style={{ padding: "4px 10px", background: activePresetGroup===group ? G+"15" : "rgba(255,255,255,0.04)", border: `1px solid ${activePresetGroup===group ? G+"40" : "rgba(255,255,255,0.08)"}`, borderRadius: 20, color: activePresetGroup===group ? G : MUTED, fontSize: 10, fontWeight: activePresetGroup===group ? 700 : 400, cursor: "pointer" }}>
+                      style={{ padding: "4px 10px", background: activePresetGroup===group ? G+"15" : "rgba(255,255,255,0.04)", border: `1px solid ${activePresetGroup===group ? G+"40" : "rgba(255,255,255,0.08)"}`, borderRadius: 20, color: activePresetGroup===group ? G : MUTED, fontSize: 11, fontWeight: activePresetGroup===group ? 700 : 400, cursor: "pointer" }}>
                       {group}
                     </button>
                   ))}
@@ -1270,7 +1270,7 @@ Tiramisu;6,50€;Fait maison`
                       <div style={{ display: "flex", gap: 4, marginBottom: 6 }}>
                         {[preset.primary, preset.accent, preset.text].map((col, i) => <div key={i} style={{ width: 10, height: 10, borderRadius: "50%", background: col, boxShadow: `0 0 4px ${col}80` }} />)}
                       </div>
-                      <p style={{ color: preset.text, fontSize: 10, fontWeight: 700, margin: 0, textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>{preset.name}</p>
+                      <p style={{ color: preset.text, fontSize: 11, fontWeight: 700, margin: 0, textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>{preset.name}</p>
                       {theme.name===preset.name && <div style={{ position: "absolute", top: 4, right: 4, width: 14, height: 14, background: G, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}><Check size={8} color="#000" /></div>}
                     </button>
                   ))}
@@ -1294,7 +1294,7 @@ Tiramisu;6,50€;Fait maison`
                       { id: "image", label: "Image", icon: "🖼️" },
                     ].map(({ id, label, icon }) => (
                       <button type="button" key={id} onClick={() => { setBgMode(id); onThemeChange({...theme, bgMode: id} as any) }}
-                        style={{ background: bgMode===id ? G+"15" : "rgba(255,255,255,0.03)", border: `1.5px solid ${bgMode===id ? G+"50" : "rgba(255,255,255,0.08)"}`, borderRadius: 9, padding: "9px 5px", cursor: "pointer", color: bgMode===id ? G : MUTED, fontSize: 10, fontWeight: bgMode===id ? 700 : 400, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                        style={{ background: bgMode===id ? G+"15" : "rgba(255,255,255,0.03)", border: `1.5px solid ${bgMode===id ? G+"50" : "rgba(255,255,255,0.08)"}`, borderRadius: 9, padding: "9px 5px", cursor: "pointer", color: bgMode===id ? G : MUTED, fontSize: 11, fontWeight: bgMode===id ? 700 : 400, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
                         <span style={{ fontSize: 16 }}>{icon}</span>
                         <span>{label}</span>
                       </button>
@@ -1445,7 +1445,7 @@ Tiramisu;6,50€;Fait maison`
                           const y = (theme as any).radial_y||50
                           onThemeChange({...theme, radial_shape: shape, bgGradient: `radial-gradient(${shape} at ${x}% ${y}%, ${c1}, ${c2}${c3?`, ${c3}`:""})`} as any)
                         }}
-                        style={{ flex: 1, padding: "6px", background: ((theme as any).radial_shape||"circle")===shape ? G+"15" : "rgba(255,255,255,0.04)", border: `1px solid ${((theme as any).radial_shape||"circle")===shape ? G+"40" : "rgba(255,255,255,0.08)"}`, borderRadius: 8, color: ((theme as any).radial_shape||"circle")===shape ? G : MUTED, fontSize: 10, cursor: "pointer" }}>
+                        style={{ flex: 1, padding: "6px", background: ((theme as any).radial_shape||"circle")===shape ? G+"15" : "rgba(255,255,255,0.04)", border: `1px solid ${((theme as any).radial_shape||"circle")===shape ? G+"40" : "rgba(255,255,255,0.08)"}`, borderRadius: 8, color: ((theme as any).radial_shape||"circle")===shape ? G : MUTED, fontSize: 11, cursor: "pointer" }}>
                           {shape === "circle" ? "⭕ Cercle" : "🔵 Ellipse"}
                         </button>
                       ))}
@@ -1485,7 +1485,7 @@ Tiramisu;6,50€;Fait maison`
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 5 }}>
                       {PATTERNS_LIST.map(p => (
                         <button key={p.id} onClick={() => { setPatternType(p.id); onThemeChange({...theme, bgPattern: p.id} as any) }}
-                          style={{ padding: "8px 4px", background: patternType===p.id ? G+"15" : "rgba(255,255,255,0.03)", border: `1.5px solid ${patternType===p.id ? G+"50" : "rgba(255,255,255,0.08)"}`, borderRadius: 8, cursor: "pointer", color: patternType===p.id ? G : MUTED, fontSize: 9, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+                          style={{ padding: "8px 4px", background: patternType===p.id ? G+"15" : "rgba(255,255,255,0.03)", border: `1.5px solid ${patternType===p.id ? G+"50" : "rgba(255,255,255,0.08)"}`, borderRadius: 8, cursor: "pointer", color: patternType===p.id ? G : MUTED, fontSize: 11, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
                           <span style={{ fontSize: 16 }}>{p.icon}</span>
                           <span>{p.label}</span>
                         </button>
@@ -1526,7 +1526,7 @@ Tiramisu;6,50€;Fait maison`
                     {/* OU lien URL */}
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
-                      <span style={{ color: MUTED, fontSize: 10 }}>ou URL</span>
+                      <span style={{ color: MUTED, fontSize: 11 }}>ou URL</span>
                       <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
                     </div>
                     <input type="url" value={(theme as any).bgImage?.startsWith("data:") ? "" : (theme as any).bgImage||""} onChange={e => onThemeChange({...theme, bgImage: e.target.value} as any)}
@@ -1547,10 +1547,10 @@ Tiramisu;6,50€;Fait maison`
                           { val: "auto", label: "Auto", icon: "⬜", desc: "Taille réelle" },
                         ].map(({ val, label, icon, desc }) => (
                           <button key={val} onClick={() => onThemeChange({...theme, bgImageSize: val} as any)}
-                            style={{ padding: "7px", background: ((theme as any).bgImageSize||"cover")===val ? G+"15" : "rgba(255,255,255,0.04)", border: `1px solid ${((theme as any).bgImageSize||"cover")===val ? G+"40" : "rgba(255,255,255,0.08)"}`, borderRadius: 8, cursor: "pointer", color: ((theme as any).bgImageSize||"cover")===val ? G : MUTED, fontSize: 10, textAlign: "left" as const }}>
+                            style={{ padding: "7px", background: ((theme as any).bgImageSize||"cover")===val ? G+"15" : "rgba(255,255,255,0.04)", border: `1px solid ${((theme as any).bgImageSize||"cover")===val ? G+"40" : "rgba(255,255,255,0.08)"}`, borderRadius: 8, cursor: "pointer", color: ((theme as any).bgImageSize||"cover")===val ? G : MUTED, fontSize: 11, textAlign: "left" as const }}>
                             <div style={{ fontSize: 14, marginBottom: 2 }}>{icon}</div>
                             <div style={{ fontWeight: 600 }}>{label}</div>
-                            <div style={{ fontSize: 8, opacity: 0.7 }}>{desc}</div>
+                            <div style={{ fontSize: 11, opacity: 0.7 }}>{desc}</div>
                           </button>
                         ))}
                       </div>
@@ -1578,7 +1578,7 @@ Tiramisu;6,50€;Fait maison`
                   {effectGlow && <div style={{ position: "absolute", inset: 0, background: `radial-gradient(circle at 50% 50%, ${(theme as any).glow_color||G}${Math.round(((theme as any).glow_intensity||30)/100*255).toString(16).padStart(2,"0")}, transparent ${(theme as any).glow_size||200}px)` }} />}
                   {effectVignette && <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at center, transparent ${100-(theme as any).vignette_intensity||60}%, rgba(0,0,0,0.8) 100%)` }} />}
                   <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, margin: 0, letterSpacing: 2, textTransform: "uppercase" as const }}>Aperçu des effets</p>
+                    <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, margin: 0, letterSpacing: 2, textTransform: "uppercase" as const }}>Aperçu des effets</p>
                   </div>
                 </div>
                 {/* Noise */}
@@ -1681,7 +1681,7 @@ Tiramisu;6,50€;Fait maison`
                       <input type="range" aria-label="Intensité" min="1" max="20" value={(theme as any).blur_amount||4}
                         onChange={e => onThemeChange({...theme, blur_amount: parseInt(e.target.value)} as any)}
                         style={{ width: "100%", accentColor: G }} />
-                      <p style={{ color: MUTED, fontSize: 9, margin: "5px 0 0" }}>⚠ S applique au fond — les blocs restent nets</p>
+                      <p style={{ color: MUTED, fontSize: 11, margin: "5px 0 0" }}>⚠ S applique au fond — les blocs restent nets</p>
                     </div>
                   )}
                 </div>
@@ -1702,7 +1702,7 @@ Tiramisu;6,50€;Fait maison`
                     backgroundSize: "200% 200%",
                   }} />
                   <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 10, margin: 0, letterSpacing: 2, textTransform: "uppercase" as const }}>
+                    <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, margin: 0, letterSpacing: 2, textTransform: "uppercase" as const }}>
                       {animation==="none" ? "Statique" : animation==="gradient-flow" ? "🌊 Gradient Flow" : animation==="aurora" ? "🌌 Aurora" : animation}
                     </p>
                   </div>
@@ -1719,8 +1719,8 @@ Tiramisu;6,50€;Fait maison`
                     style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: animation===id ? G+"10" : "rgba(255,255,255,0.03)", border: `1.5px solid ${animation===id ? G+"40" : "rgba(255,255,255,0.07)"}`, borderRadius: 11, cursor: soon ? "not-allowed" : "pointer", opacity: soon ? 0.5 : 1 }}>
                     <span style={{ fontSize: 22, flexShrink: 0 }}>{icon}</span>
                     <div style={{ flex: 1, textAlign: "left" }}>
-                      <p style={{ color: animation===id ? G : "var(--ink)", fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>{label} {soon && <span style={{ color: MUTED, fontSize: 9, fontWeight: 400 }}>— Bientôt</span>}</p>
-                      <p style={{ color: MUTED, fontSize: 10, margin: 0 }}>{desc}</p>
+                      <p style={{ color: animation===id ? G : "var(--ink)", fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>{label} {soon && <span style={{ color: MUTED, fontSize: 11, fontWeight: 400 }}>— Bientôt</span>}</p>
+                      <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{desc}</p>
                     </div>
                     {animation===id && <Check size={13} color={G} style={{ flexShrink: 0 }} />}
                   </button>
@@ -1823,7 +1823,7 @@ Tiramisu;6,50€;Fait maison`
               ))}
               {/* Avance masque par defaut : animation + effet verre (review #4 "options avancees trop tot") */}
               <button type="button" onClick={() => setThemeBlocksAdv(o => !o)}
-                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", cursor: "pointer", padding: "2px 0", color: MUTED, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 1.5, fontWeight: 700 }}>
+                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", cursor: "pointer", padding: "2px 0", color: MUTED, fontSize: 11, textTransform: "uppercase" as const, letterSpacing: 1.5, fontWeight: 700 }}>
                 Avancé
                 <ChevronDown size={14} style={{ transform: themeBlocksAdv ? "rotate(180deg)" : "none", transition: "transform .2s" }} />
               </button>
@@ -1843,7 +1843,7 @@ Tiramisu;6,50€;Fait maison`
                   ↺ Réinitialiser le style des blocs
                 </button>
               )}
-              <p style={{ color: "#6E685E", fontSize: 9.5, margin: 0, lineHeight: 1.5 }}>
+              <p style={{ color: "#6E685E", fontSize: 11.5, margin: 0, lineHeight: 1.5 }}>
                 Astuce : posez ici l&apos;ambiance générale (coins, ombre, animation), puis affinez au cas par cas dans chaque bloc.
               </p>
             </div>
@@ -1927,7 +1927,7 @@ Tiramisu;6,50€;Fait maison`
                     />
                   </div>
                 </div>
-                <p style={{ color: "#6E685E", fontSize: 9.5, margin: 0, lineHeight: 1.5 }}>
+                <p style={{ color: "#6E685E", fontSize: 11.5, margin: 0, lineHeight: 1.5 }}>
                   L&apos;animation reprend l&apos;accent, le fond et le nom de votre page. Elle ne joue qu&apos;une fois par session visiteur et se passe au toucher.
                 </p>
               </>)}
