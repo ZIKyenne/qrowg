@@ -527,20 +527,20 @@ export default function TemplatesPage() {
                       {locked && (
                         <span aria-hidden="true" style={{ position: "absolute", inset: 0, background: "rgba(8,8,8,0.65)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, zIndex: 3 }}>
                           <Lock size={20} color={planCfg.color} />
-                          <span style={{ color: planCfg.color, fontSize: 10, fontWeight: 700 }}>Plan {planCfg.label}</span>
+                          <span style={{ color: planCfg.color, fontSize: 11, fontWeight: 700 }}>Plan {planCfg.label}</span>
                         </span>
                       )}
                     </button>
 
                     {/* Badge plan (haut gauche) — hors du bouton, purement informatif */}
                     <div style={{ position: "absolute", top: 10, left: 10, zIndex: 4, pointerEvents: "none", display: "flex", alignItems: "center", gap: 4, background: "color-mix(in srgb, var(--bg) 75%, transparent)", border: "1px solid var(--line-strong)", borderRadius: 999, padding: "3px 9px" }}>
-                      <span style={{ color: "var(--ink)", fontSize: 9.5, fontWeight: 600, letterSpacing: ".04em" }}>{planCfg.label}</span>
+                      <span style={{ color: "var(--ink)", fontSize: 11, fontWeight: 600, letterSpacing: ".04em" }}>{planCfg.label}</span>
                     </div>
 
                     {/* Favori (haut droit) — frère du bouton Aperçu, jamais dedans */}
                     <button type="button" aria-pressed={isFav} aria-label={isFav ? "Retirer des favoris" : "Ajouter aux favoris"} onClick={(e) => toggleFav(template.id, e)}
                       className={`dat-fav${isFav ? " on" : ""}`}
-                      style={{ position: "absolute", top: 8, right: 8, width: isMobile ? 44 : 30, height: isMobile ? 44 : 30, zIndex: 4 }}>
+                      style={{ position: "absolute", top: 8, right: 8, width: isMobile ? 44 : 32, height: isMobile ? 44 : 32, zIndex: 4 }}>
                       <Heart size={14} fill={isFav ? "currentColor" : "none"} />
                     </button>
                   </div>
@@ -552,7 +552,7 @@ export default function TemplatesPage() {
                         vivent dans l'aperçu. La « variante » distingue deux modèles homonymes. */}
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: isMobile ? 8 : 4, minWidth: 0 }}>
                       <h2 id={`tpl-nom-${template.id}`} style={{ color: "var(--ink)", fontSize: isMobile ? 12.5 : 15, fontWeight: 700, margin: 0, letterSpacing: "-0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}>{template.name}</h2>
-                      {template.variante && !isMobile && <span style={{ flexShrink: 0, background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 6, padding: "1px 7px", fontSize: 10, color: "var(--muted)", fontWeight: 500 }}>{template.variante}</span>}
+                      {template.variante && !isMobile && <span style={{ flexShrink: 0, background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 6, padding: "1px 7px", fontSize: 11, color: "var(--muted)", fontWeight: 500 }}>{template.variante}</span>}
                     </div>
                     {!isMobile && <p style={{ color: MUTED, fontSize: 12.5, margin: "0 0 12px", lineHeight: 1.5 }}>{template.description}</p>}
 
@@ -822,7 +822,7 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
         <div style={{ marginBottom: 14 }}>
           <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>Nom du projet</label>
           <input value={name} onChange={e => setName(e.target.value)} placeholder="Ex : Le Bistrot Parisien" style={inputStyle} autoFocus />
-          {!nameValid && name.length > 0 && <p style={{ color: "#F87171", fontSize: 10, margin: "4px 0 0" }}>Le nom doit faire 2 a 80 caracteres.</p>}
+          {!nameValid && name.length > 0 && <p style={{ color: "#F87171", fontSize: 11, margin: "4px 0 0" }}>Le nom doit faire 2 a 80 caracteres.</p>}
         </div>
 
         {/* Adresse de la page (« slug ») — masquée sans compte : elle se choisit au moment de publier. */}
@@ -830,17 +830,17 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
           <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>Adresse de la page</label>
           <input value={slug} onChange={e => { setSlugTouched(true); setSlug(slugify(e.target.value)) }} placeholder="le-bistrot-parisien" style={{ ...inputStyle, fontFamily: "monospace" }} />
           <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "5px 0 0", minHeight: 16 }}>
-            {slugStatus === "checking" && <span style={{ color: MUTED, fontSize: 10 }}>Vérification…</span>}
-            {slugStatus === "available" && <span style={{ color: "var(--success)", fontSize: 10, fontWeight: 600 }}>✓ Disponible</span>}
-            {slugStatus === "taken" && <span style={{ color: "#F87171", fontSize: 10, fontWeight: 600 }}>✗ Déjà pris</span>}
-            {slugStatus === "reserved" && <span style={{ color: "#F87171", fontSize: 10, fontWeight: 600 }}>✗ Adresse réservée</span>}
-            {slugStatus === "invalid" && <span style={{ color: "var(--warning)", fontSize: 10, fontWeight: 600 }}>2 à 60 caractères : minuscules, chiffres et tirets</span>}
+            {slugStatus === "checking" && <span style={{ color: MUTED, fontSize: 11 }}>Vérification…</span>}
+            {slugStatus === "available" && <span style={{ color: "var(--success)", fontSize: 11, fontWeight: 600 }}>✓ Disponible</span>}
+            {slugStatus === "taken" && <span style={{ color: "#F87171", fontSize: 11, fontWeight: 600 }}>✗ Déjà pris</span>}
+            {slugStatus === "reserved" && <span style={{ color: "#F87171", fontSize: 11, fontWeight: 600 }}>✗ Adresse réservée</span>}
+            {slugStatus === "invalid" && <span style={{ color: "var(--warning)", fontSize: 11, fontWeight: 600 }}>2 à 60 caractères : minuscules, chiffres et tirets</span>}
           </div>
-          <p style={{ color: MUTED, fontSize: 10, margin: "4px 0 0", fontFamily: "monospace" }}>qrowg.com/{slug || "..."}</p>
+          <p style={{ color: MUTED, fontSize: 11, margin: "4px 0 0", fontFamily: "monospace" }}>qrowg.com/{slug || "..."}</p>
           {(slugStatus === "taken") && suggestions.length > 0 && (
             <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 7 }}>
               {suggestions.map(s => (
-                <button key={s} onClick={() => { setSlugTouched(true); setSlug(s) }} style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 6, padding: "3px 8px", color: G, fontSize: 10, cursor: "pointer", fontFamily: "monospace" }}>{s}</button>
+                <button key={s} onClick={() => { setSlugTouched(true); setSlug(s) }} style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 6, padding: "3px 8px", color: G, fontSize: 11, cursor: "pointer", fontFamily: "monospace" }}>{s}</button>
               ))}
             </div>
           )}
@@ -922,7 +922,7 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
             </button>
           </span>
         </div>
-        <p style={{ color: MUTED, fontSize: 10, margin: "12px 0 0", textAlign: "center" }}>
+        <p style={{ color: MUTED, fontSize: 11, margin: "12px 0 0", textAlign: "center" }}>
           {guest ? "Aucun compte n'est demandé : votre page sera gardée dans ce navigateur." : "Vous pourrez modifier ce nom plus tard."}
         </p>
       </div>

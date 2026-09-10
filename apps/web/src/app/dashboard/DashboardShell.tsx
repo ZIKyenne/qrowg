@@ -381,7 +381,7 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
       {!immersif && (
         <header className="qf-topbar" style={{ height: 56, flexShrink: 0, display: "flex", alignItems: "center", gap: 18, padding: "0 18px 0 16px", borderBottom: "1px solid var(--line)" }}>
           {/* Un seul logo, le même que la vitrine (revue du 9 septembre). */}
-          <Link href="/dashboard" aria-label="QRowg — tableau de bord" style={{ textDecoration: "none", display: "flex", alignItems: "center", flexShrink: 0 }}>
+          <Link href="/dashboard" aria-label="QRowg — tableau de bord" style={{ textDecoration: "none", display: "flex", alignItems: "center", minHeight: 32, flexShrink: 0 }}>
             <QrowgLogo size={18} />
           </Link>
 
@@ -469,9 +469,9 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
                     }}>
                     <span style={{ position: "relative", display: "flex" }}>
                       <NavGlyph name={g.glyph} />
-                      {badge && <span style={{ position: "absolute", top: -5, right: -7, minWidth: 15, height: 15, padding: "0 4px", borderRadius: 8, background: "var(--danger)", color: "#fff", fontSize: 9, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, boxShadow: "0 0 0 2px var(--bg)" }}>{unreadLeads > 99 ? "99+" : unreadLeads}</span>}
+                      {badge && <span style={{ position: "absolute", top: -5, right: -7, minWidth: 15, height: 15, padding: "0 4px", borderRadius: 8, background: "var(--danger)", color: "#fff", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, boxShadow: "0 0 0 2px var(--bg)" }}>{unreadLeads > 99 ? "99+" : unreadLeads}</span>}
                     </span>
-                    <span style={{ fontSize: 10.5, fontWeight: actif ? 600 : 500, letterSpacing: ".01em", whiteSpace: "nowrap" }}>{g.label}</span>
+                    <span style={{ fontSize: 11, fontWeight: actif ? 600 : 500, letterSpacing: ".01em", whiteSpace: "nowrap" }}>{g.label}</span>
                   </Link>
                   {/* Survol : les écrans du module, quand la colonne est repliée ou que le module n'est pas ouvert. */}
                   {g.items.length > 1 && (!colonne || !actif) && (
@@ -480,7 +480,7 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
                       background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 10,
                       padding: 6, zIndex: 100, opacity: 0, pointerEvents: "none", transition: "opacity .15s", boxShadow: "0 12px 32px rgba(0,0,0,.45)"
                     }}>
-                      <div style={{ padding: "6px 10px 4px", fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700 }}>{g.label}</div>
+                      <div style={{ padding: "6px 10px 4px", fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700 }}>{g.label}</div>
                       {g.items.map(it => (
                         <Link key={it.href} href={it.href} className="qf-row" aria-current={isActive(it.href, it.exact) ? "page" : undefined}
                           style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 7, fontSize: 12.5, color: isActive(it.href, it.exact) ? "var(--accent)" : "var(--ink)", whiteSpace: "nowrap" }}>
@@ -498,7 +498,7 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
           {colonne && moduleActif && (
             <nav aria-label={`Écrans — ${moduleActif.label}`} style={{ width: 232, display: "flex", flexDirection: "column", padding: "18px 12px 12px", borderRight: "1px solid var(--line)", overflowY: "auto" }}>
               <div style={{ padding: "0 8px 12px" }}>
-                <div style={{ fontSize: 10, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700 }}>{moduleActif.kicker}</div>
+                <div style={{ fontSize: 11, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700 }}>{moduleActif.kicker}</div>
                 <div style={{ fontSize: 18, fontWeight: 600, color: "var(--ink)", letterSpacing: "-.01em", marginTop: 4 }}>{moduleActif.label}</div>
               </div>
               {moduleActif.items.map(({ href, label, exact }) => {
@@ -516,7 +516,7 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
                     }}>
                     {active && <span aria-hidden="true" style={{ position: "absolute", left: -1, top: 10, bottom: 10, width: 2, borderRadius: 2, background: "var(--accent)" }} />}
                     <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
-                    {nonLus && <span style={{ marginLeft: "auto", background: "var(--danger)", color: "#fff", fontSize: 10, fontWeight: 700, borderRadius: 9, padding: "1px 7px", flexShrink: 0 }}>{unreadLeads > 99 ? "99+" : unreadLeads}</span>}
+                    {nonLus && <span style={{ marginLeft: "auto", background: "var(--danger)", color: "#fff", fontSize: 11, fontWeight: 700, borderRadius: 9, padding: "1px 7px", flexShrink: 0 }}>{unreadLeads > 99 ? "99+" : unreadLeads}</span>}
                     {!nonLus && <ChevronRight size={14} aria-hidden="true" style={{ marginLeft: "auto", flexShrink: 0, opacity: active ? .9 : .45 }} />}
                   </Link>
                 )

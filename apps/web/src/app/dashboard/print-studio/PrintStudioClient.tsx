@@ -911,7 +911,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
           {/* Titre + compteurs réels — même en-tête que les autres écrans (kicker · titre 22 px · sous-titre) */}
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24, flexWrap: "wrap" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 620 }}>
-              <span style={{ fontSize: 10.5, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700 }}>Imprimer · Atelier d'impression</span>
+              <span style={{ fontSize: 11.5, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700 }}>Imprimer · Atelier d'impression</span>
               <h1 style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-.01em", lineHeight: 1.2, margin: 0 }}>Choisissez un support</h1>
               <p style={{ fontSize: 13.5, lineHeight: 1.5, color: "var(--muted)", margin: 0, textWrap: "pretty" as any }}>Un objet réel, déjà réussi. Trois suffisent : à table, en vitrine, dans la main.</p>
             </div>
@@ -1146,7 +1146,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                   background: actif ? "color-mix(in srgb, var(--accent) 16%, transparent)" : "transparent",
                   border: `1px solid ${actif ? C.goldA55 : "transparent"}`, color: actif ? C.gold : C.fgMuted, transition: "background var(--mo-fast) var(--mo-ease-standard)" }}>
                 <Ico size={21} />
-                <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: ".01em" }}>{o.court}</span>
+                <span style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: ".01em" }}>{o.court}</span>
               </button>
             )
           })}
@@ -1330,7 +1330,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                 <div><p style={secLabel}>Opacité</p><Range value={sel.opacity ?? 1} min={0.1} max={1} step={0.05} onChange={v => updateEl(sel.id, { opacity: v })} hint={`${Math.round((sel.opacity ?? 1) * 100)} %`} /></div>
               </>}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                <span style={{ fontSize: 10.5, color: C.fgFaint }}>Flèches : déplacer · Suppr · Ctrl+D</span>
+                <span style={{ fontSize: 11.5, color: C.fgFaint }}>Flèches : déplacer · Suppr · Ctrl+D</span>
                 <button onClick={() => deleteEl(sel.id)} style={{ background: "none", border: "none", color: C.bad, cursor: "pointer", fontSize: 12, padding: 0, whiteSpace: "nowrap" }}>Supprimer</button>
               </div>
             </div>
@@ -1348,7 +1348,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                   <p style={{ margin: "8px 0 0", fontSize: 11, color: C.fgFaint, lineHeight: 1.45 }}>On met en scène ce QR existant — il reste pilotable depuis vos QR codes (destination modifiable) même après impression.</p>
                 </Field>
               ) : (
-                <p style={{ fontSize: 12.5, color: C.fgMuted, lineHeight: 1.5, margin: "10px 0 0" }}>Vous n'avez pas encore de QR. <Link href="/dashboard/qr-codes" style={{ color: C.gold }}>Créez-en un</Link>, ou importez un PNG ci-dessus.</p>
+                <p style={{ fontSize: 12.5, color: C.fgMuted, lineHeight: 1.5, margin: "10px 0 0" }}>Vous n'avez pas encore de QR. <Link href="/dashboard/qr-codes" style={{ color: C.gold, display: "inline-flex", alignItems: "center", minHeight: 40, margin: "-12px 0" }}>Créez-en un</Link>, ou importez un PNG ci-dessus.</p>
               )
             ) : (
               qrPng ? (
@@ -1392,7 +1392,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               const dist = preflight.scanDistanceM ? ` · lisible ~${preflight.scanDistanceM} m` : ""
               return <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600, color: col, background: C.surfaceUp, borderRadius: 999, padding: "6px 12px", alignSelf: "flex-start" }}>{worst === "ok" ? <Check size={13} /> : <AlertTriangle size={13} />} {label}{dist}</div>
             })()}
-            <button onClick={() => setAdvQr(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, padding: 0 }}>{advQr ? "Masquer les réglages avancés" : "Réglages avancés (taille précise · position) →"}</button>
+            <button onClick={() => setAdvQr(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, minHeight: 32, padding: 0, textAlign: "left" as const }}>{advQr ? "Masquer les réglages avancés" : "Réglages avancés (taille précise · position) →"}</button>
             {advQr && <>
               {layout.content === "stack" && !qrFree && <Field label="Position du QR"><Seg value={qrPos} options={["haut", "centre", "bas"]} onPick={setQrPos} labels={["Haut", "Centre", "Bas"]} /></Field>}
               <Field label="Position libre du QR"><Seg value={qrFree ? "libre" : "auto"} options={["auto", "libre"]} onPick={v => { setQrFree(v === "libre"); if (v === "libre") setLibre(true) }} labels={["Mise en page", "Libre (glisser)"]} /></Field>
@@ -1411,7 +1411,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
             </Field>
             <Field label="Sous-titre (optionnel)"><input {...textInputProps} value={subtitle} onChange={e => setSubtitle(e.target.value)} placeholder="Une ligne d'accroche…" style={inputStyle} /></Field>
             <Field label="Bouton"><input {...textInputProps} value={ctaText} onChange={e => setCtaText(e.target.value)} placeholder={item.cta} style={inputStyle} /></Field>
-            <button onClick={() => setAdvText(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, padding: 0 }}>{advText ? "Masquer la mise en forme" : "Casse · graisse · typo · alignement →"}</button>
+            <button onClick={() => setAdvText(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, minHeight: 32, padding: 0, textAlign: "left" as const }}>{advText ? "Masquer la mise en forme" : "Casse · graisse · typo · alignement →"}</button>
             {advText && <>
               <Field label="Casse du titre"><Seg value={titleCase} options={["normal", "upper"]} onPick={setTitleCase} labels={["Aa normal", "MAJUSCULES"]} /></Field>
               <Field label="Graisse du titre"><Seg value={titleWeight} options={["fin", "normal", "gras"]} onPick={setTitleWeight} labels={["Fin", "Normal", "Gras"]} /></Field>
@@ -1435,7 +1435,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                 {brandKit && <button onClick={applyBrandKit} style={chipStyle(false)}>Appliquer</button>}
                 <button onClick={saveBrandKit} style={{ ...chipStyle(false), whiteSpace: "nowrap" }}>{brandKit ? "Mettre à jour la charte" : "Enregistrer ma charte (logo · couleurs · police)"}</button>
               </div>
-              <p style={{ margin: "6px 0 0", fontSize: 10.5, color: C.fgFaint }}>Capture le look courant — logo, couleur principale (accent), secondaire (bouton), police.</p>
+              <p style={{ margin: "6px 0 0", fontSize: 11.5, color: C.fgFaint }}>Capture le look courant — logo, couleur principale (accent), secondaire (bouton), police.</p>
             </div>
             <div style={{ height: 1, background: C.hairline, margin: "8px 0 2px" }} />
             <p style={secLabel}>Ambiance &amp; accent</p>
@@ -1503,7 +1503,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               )}
               <input ref={logoInput} type="file" aria-label="Importer un logo" accept="image/*" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) { const r = new FileReader(); r.onload = () => setLogoUrl(String(r.result)); r.readAsDataURL(f) } if (e.target) e.target.value = "" }} />
             </Field>
-            <button onClick={() => setAdvColor(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, padding: 0 }}>{advColor ? "Masquer les couleurs par élément" : "Couleurs par élément (avancé) →"}</button>
+            <button onClick={() => setAdvColor(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, minHeight: 32, padding: 0, textAlign: "left" as const }}>{advColor ? "Masquer les couleurs par élément" : "Couleurs par élément (avancé) →"}</button>
             {advColor && <>
               <Field label="Couleur du titre"><ColorField value={titleColor} onChange={setTitleColor} /></Field>
               <Field label="Couleur du sous-titre"><ColorField value={subColor} onChange={setSubColor} /></Field>
@@ -1551,7 +1551,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 }}>
                 {(showAllColors ? STYLES : ambiances.map(a => STYLE_BY_ID[a.rep])).map(s => <Swatch key={s.id} s={s} on={styleId === s.id} label={showAllColors ? s.label : undefined} onClick={() => setStyleId(s.id)} />)}
               </div>
-              <button onClick={() => setShowAllColors(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, padding: 0 }}>{showAllColors ? "Voir les ambiances" : `Voir les ${STYLES.length} coloris`}</button>
+              <button onClick={() => setShowAllColors(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, minHeight: 32, padding: 0, textAlign: "left" as const }}>{showAllColors ? "Voir les ambiances" : `Voir les ${STYLES.length} coloris`}</button>
               <p style={secLabel}>Couleur d'accent</p>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {ACCENTS.map(a => (
@@ -1717,7 +1717,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                 </div>
                 <div>
                   <p style={{ margin: 0, fontSize: 12.5, fontWeight: 700, color: C.fg }}>{it.name}{it.id === item.id && <span style={{ color: C.gold }}> · actuel</span>}</p>
-                  <p style={{ margin: "2px 0 0", fontSize: 10.5, color: C.fgFaint, fontFamily: "ui-monospace, monospace" }}>{it.size}</p>
+                  <p style={{ margin: "2px 0 0", fontSize: 11.5, color: C.fgFaint, fontFamily: "ui-monospace, monospace" }}>{it.size}</p>
                 </div>
               </button>
             ))}
@@ -1741,7 +1741,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                   </div>
                   <div>
                     <p style={{ margin: 0, fontSize: 12.5, fontWeight: 700, color: C.fg }}>{it.name}</p>
-                    <p style={{ margin: "2px 0 0", fontSize: 10.5, color: C.fgFaint, fontFamily: "ui-monospace, monospace" }}>{it.size}</p>
+                    <p style={{ margin: "2px 0 0", fontSize: 11.5, color: C.fgFaint, fontFamily: "ui-monospace, monospace" }}>{it.size}</p>
                   </div>
                 </button>
               )
@@ -1946,7 +1946,7 @@ function Range({ value, min, max, step, onChange, hint, label }: { label?: strin
   return (
     <div>
       <input type="range" aria-label={label ?? hint ?? "Régler la valeur"} min={min} max={max} step={step} value={value} onChange={e => onChange(parseFloat(e.target.value))} style={{ width: "100%", accentColor: C.gold, height: 40, cursor: "pointer" }} />
-      {hint && <div style={{ fontSize: 10.5, color: C.fgFaint, marginTop: -2 }}>{hint}</div>}
+      {hint && <div style={{ fontSize: 11.5, color: C.fgFaint, marginTop: -2 }}>{hint}</div>}
     </div>
   )
 }

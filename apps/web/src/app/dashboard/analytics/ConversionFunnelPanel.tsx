@@ -38,7 +38,7 @@ export default function ConversionFunnelPanel({ steps, conversionRate, hasEngage
           {steps.map((s, i) => (
             <div key={s.label}>
               {i > 0 && s.dropFromPrev > 0 && (
-                <p style={{ color: "var(--warning)", fontSize: 10.5, margin: "0 0 4px", textAlign: "right", opacity: 0.9 }}>↓ −{s.dropFromPrev}% d&apos;abandon</p>
+                <p style={{ color: "var(--warning)", fontSize: 11, margin: "0 0 4px", textAlign: "right", opacity: 0.9 }}>↓ −{s.dropFromPrev}% d&apos;abandon</p>
               )}
               <div style={{ position: "relative", height: 42, background: "rgba(255,255,255,0.04)", borderRadius: 10, overflow: "hidden" }}>
                 <div style={{ position: "absolute", inset: 0, width: `${Math.max(s.pctOfTop, 6)}%`, background: `linear-gradient(90deg, ${COLORS[i] || GOLD}, color-mix(in srgb, ${COLORS[i] || GOLD} 55%, #000))`, borderRadius: 10, transition: "width .45s" }} />

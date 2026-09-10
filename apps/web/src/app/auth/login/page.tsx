@@ -30,7 +30,7 @@ export default async function LoginPage({
       <div style={{ width: '100%', maxWidth: 400, position: 'relative', zIndex: 1 }}>
         {/* Hiérarchie : logo -> titre -> sous-titre */}
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <a href="/" aria-label="QRowg — accueil" style={{ display: 'inline-flex', textDecoration: 'none' }}>
+          <a href="/" aria-label="QRowg — accueil" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 32, textDecoration: 'none' }}>
             <QrowgLogo size={26} />
           </a>
           <h1 style={{ color: '#F8F4EC', fontSize: 23, fontWeight: 700, margin: '18px 0 6px', fontFamily: 'Fraunces, serif' }}>Bon retour</h1>
@@ -57,7 +57,7 @@ export default async function LoginPage({
 
         <p style={{ textAlign: 'center', marginTop: 22, fontSize: 14.5, color: '#C9C3B6' }}>
           Pas encore de compte ?{' '}
-          <a href={signupHref} style={{ color: '#C9A84C', textDecoration: 'none', fontWeight: 700 }}>Créer un compte</a>
+          <a href={signupHref} style={{ color: '#C9A84C', textDecoration: 'none', fontWeight: 700, display: 'inline-flex', alignItems: 'center', minHeight: 32, margin: '-8px 0' }}>Créer un compte</a>
         </p>
       </div>
     </div>

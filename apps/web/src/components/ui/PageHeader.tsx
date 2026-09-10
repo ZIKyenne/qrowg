@@ -40,7 +40,7 @@ export function PageHeader({ kicker, title, sub, actions, back, children, gap = 
       )}
       <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
         <div style={{ minWidth: 0, flex: "1 1 280px" }}>
-          {kicker && <div style={{ fontSize: 10.5, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700, marginBottom: 6 }}>{kicker}</div>}
+          {kicker && <div style={{ fontSize: 11.5, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 700, marginBottom: 6 }}>{kicker}</div>}
           <h1 style={{ margin: 0, fontSize: 22, lineHeight: 1.2, fontWeight: 600, color: "var(--ink)", letterSpacing: "-.01em", textWrap: "balance" as any }}>{title}</h1>
           {sub && <p style={{ margin: "4px 0 0", fontSize: 13.5, lineHeight: 1.5, color: "var(--muted)", maxWidth: 640 }}>{sub}</p>}
         </div>

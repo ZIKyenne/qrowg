@@ -214,8 +214,8 @@ export function UseCasesSection() {
                 fontSize: 24,
               }}>{uc.icon}</div>
               <div>
-                <p style={{ color: uc.color, fontSize: 10, fontWeight: 700,
-                  letterSpacing: 2, textTransform: "uppercase", margin: "0 0 4px" }}>{uc.label}</p>
+                <p style={{ color: uc.color, fontSize: 11, fontWeight: 700,
+                  letterSpacing: 1.6, textTransform: "uppercase", margin: "0 0 4px" }}>{uc.label}</p>
                 <h3 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 700,
                   margin: 0, lineHeight: 1.3 }}>{uc.title}</h3>
               </div>
@@ -278,8 +278,8 @@ export function UseCasesSection() {
 
           {/* Grille de blocs droite */}
           <div>
-            <p style={{ color: "rgba(188,182,166,0.55)", fontSize: 10,
-              letterSpacing: 2, textTransform: "uppercase", marginBottom: 16 }}>
+            <p style={{ color: "var(--muted)", fontSize: 11,
+              letterSpacing: 1.6, textTransform: "uppercase", marginBottom: 16 }}>
               Blocs inclus dans ce modèle
             </p>
             <div className="uc-blocks">

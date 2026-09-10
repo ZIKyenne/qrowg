@@ -91,12 +91,12 @@ export function OverviewChart({ daily, rangeLabel = "30 derniers jours" }: { dai
         </span>
         <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
           <button type="button" onClick={() => setShowScans(v => !v)}
-            style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 12px", borderRadius: 999, cursor: "pointer", fontSize: 12, whiteSpace: "nowrap", transition: "background .2s ease, border-color .2s ease, color .2s ease", ...chip(showScans) }}>
+            style={{ display: "flex", alignItems: "center", gap: 8, minHeight: 32, padding: "0 12px", borderRadius: 999, cursor: "pointer", fontSize: 12, whiteSpace: "nowrap", transition: "background .2s ease, border-color .2s ease, color .2s ease", ...chip(showScans) }}>
             <span aria-hidden style={{ width: 9, height: 9, borderRadius: "50%", background: showScans ? GOLD : "#3a332a" }} />
             Scans QR <span style={{ color: T3 }}>{totalScans}</span>
           </button>
           <button type="button" onClick={() => setShowViews(v => !v)}
-            style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 12px", borderRadius: 999, cursor: "pointer", fontSize: 12, whiteSpace: "nowrap", transition: "background .2s ease, border-color .2s ease, color .2s ease", ...chip(showViews) }}>
+            style={{ display: "flex", alignItems: "center", gap: 8, minHeight: 32, padding: "0 12px", borderRadius: 999, cursor: "pointer", fontSize: 12, whiteSpace: "nowrap", transition: "background .2s ease, border-color .2s ease, color .2s ease", ...chip(showViews) }}>
             <span aria-hidden style={{ width: 9, height: 9, borderRadius: "50%", background: showViews ? GREEN : "#3a332a" }} />
             Vues <span style={{ color: T3 }}>{totalViews}</span>
           </button>
@@ -108,7 +108,7 @@ export function OverviewChart({ daily, rangeLabel = "30 derniers jours" }: { dai
         {/* Grille + axe Y */}
         {g.yTicks.map((y, i) => (
           <div key={i} style={{ position: "absolute", left: 0, right: 6, top: y.top, display: "flex", alignItems: "center", gap: 8, pointerEvents: "none" }}>
-            <span style={{ width: 24, textAlign: "right", fontSize: 10.5, lineHeight: 1, color: T4, fontVariantNumeric: "tabular-nums" }}>{y.label}</span>
+            <span style={{ width: 24, textAlign: "right", fontSize: 11, lineHeight: 1, color: T4, fontVariantNumeric: "tabular-nums" }}>{y.label}</span>
             <span style={{ flex: 1, height: 1, background: y.zero ? "#2a251d" : "rgba(42,37,29,.5)" }} />
           </div>
         ))}
@@ -135,7 +135,7 @@ export function OverviewChart({ daily, rangeLabel = "30 derniers jours" }: { dai
           {/* Pic de la periode */}
           {showPeak && <>
             <div style={{ position: "absolute", left: `${(g.peakI / (g.n - 1)) * 100}%`, top: `${(g.py(peakVal) / g.H) * 100}%`, width: 7, height: 7, margin: "-4px 0 0 -4px", borderRadius: "50%", background: GOLD, boxShadow: "0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent)", pointerEvents: "none" }} />
-            <div style={{ position: "absolute", left: `${(g.peakI / (g.n - 1)) * 100}%`, top: `${(g.py(peakVal) / g.H) * 100}%`, transform: "translate(-50%,-30px)", display: "flex", alignItems: "center", gap: 6, padding: "4px 9px", borderRadius: 999, background: "color-mix(in srgb, var(--accent) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 26%, transparent)", color: GOLD, fontSize: 10.5, fontWeight: 700, whiteSpace: "nowrap", pointerEvents: "none" }}>
+            <div style={{ position: "absolute", left: `${(g.peakI / (g.n - 1)) * 100}%`, top: `${(g.py(peakVal) / g.H) * 100}%`, transform: "translate(-50%,-30px)", display: "flex", alignItems: "center", gap: 6, padding: "4px 9px", borderRadius: 999, background: "color-mix(in srgb, var(--accent) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 26%, transparent)", color: GOLD, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap", pointerEvents: "none" }}>
               <span aria-hidden style={{ width: 7, height: 7, background: "currentColor", clipPath: "path('M4 0 L8 4 L5 4 L5 8 L3 8 L3 4 L0 4 Z')" }} />
               pic · {peakVal} scans le {g.dates[g.peakI]}
             </div>
@@ -163,7 +163,7 @@ export function OverviewChart({ daily, rangeLabel = "30 derniers jours" }: { dai
         {/* Axe X */}
         <div style={{ position: "absolute", left: 38, right: 6, bottom: 0, height: 20 }}>
           {g.xTicks.map((x, i) => (
-            <span key={i} style={{ position: "absolute", left: x.left, top: 0, transform: `translateX(${x.shift})`, fontSize: 10.5, color: T4, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{x.label}</span>
+            <span key={i} style={{ position: "absolute", left: x.left, top: 0, transform: `translateX(${x.shift})`, fontSize: 11, color: T4, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{x.label}</span>
           ))}
         </div>
       </div>

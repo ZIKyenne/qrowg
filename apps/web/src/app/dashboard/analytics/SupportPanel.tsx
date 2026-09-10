@@ -81,9 +81,9 @@ export default function SupportPanel({ qrs, scans, views, clicks, leads }: {
           <table style={{ width: "100%", minWidth: 560, borderCollapse: "collapse", fontVariantNumeric: "tabular-nums" }}>
             <thead>
               <tr>
-                <th style={{ textAlign: "left", padding: "8px 10px", fontSize: 10.5, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase", color: MUTED, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Support</th>
+                <th style={{ textAlign: "left", padding: "8px 10px", fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase", color: MUTED, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Support</th>
                 {STAGES.map(s => (
-                  <th key={s.key} style={{ textAlign: "right", padding: "8px 10px", fontSize: 10.5, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase", color: MUTED, borderBottom: "1px solid rgba(255,255,255,0.07)", whiteSpace: "nowrap" }}>{s.label}</th>
+                  <th key={s.key} style={{ textAlign: "right", padding: "8px 10px", fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase", color: MUTED, borderBottom: "1px solid rgba(255,255,255,0.07)", whiteSpace: "nowrap" }}>{s.label}</th>
                 ))}
               </tr>
             </thead>
@@ -117,7 +117,7 @@ export default function SupportPanel({ qrs, scans, views, clicks, leads }: {
                     return (
                       <td key={s.key} style={{ padding: "11px 10px", borderBottom: "1px solid rgba(255,255,255,0.05)", textAlign: "right", whiteSpace: "nowrap" }}>
                         <span style={{ color: val > 0 ? "var(--ink)" : DIM, fontSize: 14, fontWeight: 700 }}>{val.toLocaleString("fr-FR")}</span>
-                        {i > 0 && <span style={{ color: DIM, fontSize: 10.5, marginLeft: 6 }}>{pct(rate)}</span>}
+                        {i > 0 && <span style={{ color: DIM, fontSize: 11, marginLeft: 6 }}>{pct(rate)}</span>}
                       </td>
                     )
                   })}

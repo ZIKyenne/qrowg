@@ -58,7 +58,7 @@ describe("tout ce qui se tape au pouce fait au moins 44 px", () => {
 
   it("les commandes des cartes de modèles font 44 px sur téléphone", () => {
     const src = lire("dashboard", "templates", "page.tsx")
-    expect(src).toContain("width: isMobile ? 44 : 30, height: isMobile ? 44 : 30")   // favori
+    expect(src).toContain("width: isMobile ? 44 : 32, height: isMobile ? 44 : 32")   // favori (32 px sur PC depuis le lot P2)
     expect(src).toContain('{ flex: "none", width: 44, minHeight: 44')                // Aperçu
     expect(src.match(/minHeight: isMobile \? 44 : undefined/g)?.length ?? 0).toBe(2)  // Utiliser (libre + verrouillé)
     expect(src).toContain("gap: 9, minHeight: 44")                                    // Filtrer

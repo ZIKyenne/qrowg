@@ -76,7 +76,7 @@ export default async function GeneratorPage() {
 
       <main style={{ position: "relative", zIndex: 1, maxWidth: 980, margin: "0 auto", padding: "18px 22px 80px" }}>
         <nav aria-label="Fil d'Ariane" style={{ color: MUT, fontSize: 12.5, marginBottom: 18 }}>
-          <Link href="/" style={{ color: MUT, textDecoration: "none" }}>Accueil</Link>{" · "}<span style={{ color: INK }}>Générateur de QR code gratuit</span>
+          <Link href="/" style={{ color: MUT, textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: 32, margin: "-8px 0" }}>Accueil</Link>{" · "}<span style={{ color: INK }}>Générateur de QR code gratuit</span>
         </nav>
 
         {/* Hero */}
@@ -118,7 +118,7 @@ export default async function GeneratorPage() {
             </div>
           </div>
           <div style={{ textAlign: "center", marginTop: 22 }}>
-            <Link href={creerUrl()} style={{ display: "inline-flex", alignItems: "center", gap: 8, background: `linear-gradient(90deg,${G},#b8953f)`, color: "#080808", textDecoration: "none", fontSize: 15, fontWeight: 800, padding: "13px 28px", borderRadius: 12, boxShadow: "0 6px 26px rgba(201,168,76,0.3)" }}>Composer ma page — sans compte →</Link>
+            <Link href={creerUrl()} style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--accent)", color: "var(--ink-on-accent)", textDecoration: "none", fontSize: 15, fontWeight: 800, padding: "13px 28px", borderRadius: 12, boxShadow: "0 6px 26px rgba(201,168,76,0.3)" }}>Composer ma page — sans compte →</Link>
           </div>
         </section>
 
@@ -138,8 +138,8 @@ export default async function GeneratorPage() {
         {/* Maillage : usages */}
         <section>
           <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", textAlign: "center", marginBottom: 14 }}>QR codes par usage</p>
-          <p style={{ textAlign: "center", margin: "0 0 14px" }}><Link href="/generateur-qr-code-wifi" style={{ color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 600 }}>📶 Besoin d'un QR code Wi-Fi ? Utilisez le générateur Wi-Fi dédié →</Link></p>
-          <p style={{ textAlign: "center", margin: "0 0 14px" }}><Link href="/outils/testeur-qr-code" style={{ color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 600 }}>🔎 Avant d&apos;imprimer : testez votre QR code (contraste, marge, définition) →</Link></p>
+          <p style={{ textAlign: "center", margin: "0 0 14px" }}><Link href="/generateur-qr-code-wifi" style={{ color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 600, display: "inline-flex", alignItems: "center", minHeight: 40, padding: "0 12px", borderRadius: 10, border: `1px solid ${BOR}` }}>📶 Besoin d'un QR code Wi-Fi ? Utilisez le générateur Wi-Fi dédié →</Link></p>
+          <p style={{ textAlign: "center", margin: "0 0 14px" }}><Link href="/outils/testeur-qr-code" style={{ color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 600, display: "inline-flex", alignItems: "center", minHeight: 40, padding: "0 12px", borderRadius: 10, border: `1px solid ${BOR}` }}>🔎 Avant d&apos;imprimer : testez votre QR code (contraste, marge, définition) →</Link></p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
             {usages.map(v => (
               <Link key={v.slug} href={`/qr-code/${v.slug}`} style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.03)", border: `1px solid ${BOR}`, color: INK, textDecoration: "none", fontSize: 13.5, fontWeight: 600, padding: "10px 15px", borderRadius: 11 }}>
@@ -154,12 +154,12 @@ export default async function GeneratorPage() {
       <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 12.5 }}>
         <QrowgLogo size={16} />
         <p style={{ margin: "10px 0 0" }}>
-          <Link href="/" style={{ color: MUT, textDecoration: "none" }}>Accueil</Link>{" · "}
-          <Link href="/qr-code" style={{ color: MUT, textDecoration: "none" }}>QR codes par usage</Link>{" · "}
-          <Link href="/guides" style={{ color: MUT, textDecoration: "none" }}>Guides</Link>{" · "}
-          <Link href="/outils" style={{ color: MUT, textDecoration: "none" }}>Outils gratuits</Link>{" · "}
-          <Link href="/features" style={{ color: MUT, textDecoration: "none" }}>Fonctionnalités</Link>{" · "}
-          <Link href="/upgrade" style={{ color: MUT, textDecoration: "none" }}>Tarifs</Link>
+          <Link href="/" style={{ color: MUT, textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: 32, margin: "-8px 0" }}>Accueil</Link>{" · "}
+          <Link href="/qr-code" style={{ color: MUT, textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: 32, margin: "-8px 0" }}>QR codes par usage</Link>{" · "}
+          <Link href="/guides" style={{ color: MUT, textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: 32, margin: "-8px 0" }}>Guides</Link>{" · "}
+          <Link href="/outils" style={{ color: MUT, textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: 32, margin: "-8px 0" }}>Outils gratuits</Link>{" · "}
+          <Link href="/features" style={{ color: MUT, textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: 32, margin: "-8px 0" }}>Fonctionnalités</Link>{" · "}
+          <Link href="/upgrade" style={{ color: MUT, textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: 32, margin: "-8px 0" }}>Tarifs</Link>
         </p>
       </footer>
     </div>

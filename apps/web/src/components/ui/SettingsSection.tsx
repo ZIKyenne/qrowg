@@ -38,7 +38,7 @@ export function SettingsSection({ title, sub, icon, action, tag, children, id, g
           <div style={{ minWidth: 0 }}>
             <h2 style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--ink)", fontSize: 14, fontWeight: 600, margin: 0, letterSpacing: "-.01em" }}>
               <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title}</span>
-              {tag && <span style={{ flexShrink: 0, background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 999, padding: "1px 8px", fontSize: 10, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--accent)", fontWeight: 700 }}>{tag}</span>}
+              {tag && <span style={{ flexShrink: 0, background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 999, padding: "2px 9px", fontSize: 11, letterSpacing: ".06em", textTransform: "uppercase", color: "var(--accent)", fontWeight: 700 }}>{tag}</span>}
             </h2>
             {sub && <p style={{ color: "var(--muted)", fontSize: 12, margin: "2px 0 0", lineHeight: 1.45 }}>{sub}</p>}
           </div>

@@ -561,12 +561,12 @@ export default function HomeClient() {
       <footer style={{ borderTop:"1px solid rgba(201,168,76,0.1)", position:"relative", zIndex:2 }} aria-label="Pied de page">
         <style>{`
           .fg { display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr 1fr 1fr; gap:36px; padding:44px 48px 40px; }
-          .fc-title { color:#C9A84C; font-size:10px; letter-spacing:2.5px; text-transform:uppercase; font-weight:700; margin-bottom:18px; }
-          .fl { display:block; color:rgba(188,182,166,0.72); text-decoration:none; font-size:13.5px; margin-bottom:11px; line-height:1.4; transition:color 0.2s; }
+          .fc-title { color:#C9A84C; font-size:11px; letter-spacing:2px; text-transform:uppercase; font-weight:700; margin-bottom:18px; }
+          .fl { display:flex; align-items:center; min-height:32px; color:rgba(188,182,166,0.72); text-decoration:none; font-size:13.5px; line-height:1.4; transition:color 0.2s; }
           .fl:hover { color:#F5F0E8; }
           .fl:focus-visible { outline:2px solid rgba(201,168,76,0.5); outline-offset:3px; border-radius:3px; }
           .fl-soon { color:rgba(188,182,166,0.35) !important; cursor:default; pointer-events:none; }
-          .fl-soon::after { content:" (bientôt)"; font-size:10px; }
+          .fl-soon::after { content:" (bientôt)"; font-size:11px; }
           .fb { padding:16px 48px 24px; border-top:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
           .fsoc { display:flex; align-items:center; gap:8px; margin-top:20px; }
           .fsoc a { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); color:rgba(188,182,166,0.65); text-decoration:none; font-size:14px; transition:all 0.2s; }
@@ -583,7 +583,7 @@ export default function HomeClient() {
             .f-brand-desc{ display:none!important; }
             .f-brand-link{ margin-bottom:6px!important; }
             .f-brand-link span{ font-size:19px!important; }
-            .fl{ margin-bottom:6px!important; font-size:13px!important; }
+            .fl{ min-height:30px!important; font-size:13px!important; }
             .fsoc{ margin-top:8px!important; margin-bottom:4px!important; gap:6px!important; }
             .fsoc a{ width:26px!important; height:26px!important; }
             .fb{ padding:10px 22px 14px!important; flex-direction:column!important; align-items:flex-start!important; gap:6px!important; }
@@ -598,7 +598,7 @@ export default function HomeClient() {
 
           {/* Col 1: Brand */}
           <div>
-            <Link href="/" aria-label="QRowg — Accueil" className="f-brand-link" style={{ textDecoration:"none", display:"inline-block", marginBottom:12 }}>
+            <Link href="/" aria-label="QRowg — Accueil" className="f-brand-link" style={{ textDecoration:"none", display:"inline-flex", alignItems:"center", minHeight:32, marginBottom:12 }}>
               <QrowgLogo size={24} />
             </Link>
             <p className="f-brand-desc" style={{ color:"rgba(188,182,166,0.65)", fontSize:13, lineHeight:1.7, maxWidth:220, margin:0 }}>
@@ -675,7 +675,7 @@ export default function HomeClient() {
             </span>
             <div style={{ display:"flex",gap:14 }}>
               {([["Confidentialité","/privacy"],["Conditions","/terms"]] as const).map(([lbl,href])=>(
-                <Link key={href} href={href} style={{ color:"rgba(188,182,166,0.4)",fontSize:12,textDecoration:"none",transition:"color 0.2s" }}
+                <Link key={href} href={href} style={{ color:"rgba(188,182,166,0.4)",fontSize:12,textDecoration:"none",transition:"color 0.2s",display:"inline-flex",alignItems:"center",minHeight:32,margin:"-8px 0" }}
                   onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color="#C9A84C"}}
                   onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color="rgba(188,182,166,0.4)"}}>
                   {lbl}

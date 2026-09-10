@@ -26,7 +26,7 @@ describe("cartes de modèles", () => {
     expect(src).not.toContain("background: planCfg.color + \"18\"")
     expect(src).not.toContain('background: template.color + "12"')
     expect(src).not.toContain("tier.color")
-    expect(src).toContain('background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 6, padding: "1px 7px", fontSize: 10, color: "var(--muted)", fontWeight: 500 }}>{template.variante}</span>')
+    expect(src).toContain('background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 6, padding: "1px 7px", fontSize: 11, color: "var(--muted)", fontWeight: 500 }}>{template.variante}</span>')
   })
   it("un seul bouton or par carte : Utiliser ; Aperçu est neutre", () => {
     expect(src).toContain('className="da-btn-neutral da-btn-neutral--sm" aria-label={`Aperçu de ${template.name}`}')

@@ -452,7 +452,7 @@ button:not(:disabled):active { transform: scale(.97); }
 .da-select:focus { border-color:rgba(232,200,119,.42); box-shadow:0 0 0 3px rgba(232,200,119,.1); }
 
 /* Corrections DA §07 — famille de pills unique (compteur liste + bascule Archives) */
-.da-pill { display:inline-flex; align-items:center; gap:6px; border-radius:999px; padding:4px 11px; font-size:11px; font-weight:600; letter-spacing:.02em; border:1px solid var(--line-strong); background:transparent; color:var(--muted); cursor:pointer; transition:border-color .2s ease, color .2s ease, background .2s ease; white-space:nowrap; }
+.da-pill { display:inline-flex; align-items:center; gap:6px; border-radius:999px; min-height:32px; padding:4px 12px; font-size:11px; font-weight:600; letter-spacing:.02em; border:1px solid var(--line-strong); background:transparent; color:var(--muted); cursor:pointer; transition:border-color .2s ease, color .2s ease, background .2s ease; white-space:nowrap; }
 button.da-pill:hover { border-color:rgba(232,200,119,.34); color:var(--accent); }
 .da-pill.on { background:rgba(232,200,119,.1); border-color:rgba(232,200,119,.34); color:var(--gold-light); }
 .da-pill:focus-visible { outline:none; box-shadow:0 0 0 3px rgba(201,162,77,.3); }
@@ -945,7 +945,9 @@ img, video, canvas { max-width: 100%; }
 .qf-entete button {
   display: inline-flex;
   align-items: center;
-  min-height: 24px;
+  /* 24 px suffit à WCAG 2.5.8 ; 32 px est la règle interne, la même que celle du
+     tableau de bord et de l'éditeur (revue interne du 9 septembre). */
+  min-height: 32px;
 }
 
 /* === Contour de focus clavier ===

@@ -78,7 +78,7 @@ export default function HeatmapPanel({ grid, byBlock, total, blocks }: Props) {
               <span style={{ position: "absolute", top: 4, left: 6, fontSize: 8, color: "rgba(255,255,255,0.35)", pointerEvents: "none" }}>haut</span>
               <span style={{ position: "absolute", bottom: 4, left: 6, fontSize: 8, color: "rgba(255,255,255,0.35)", pointerEvents: "none" }}>bas</span>
             </div>
-            <p style={{ color: MUTED, fontSize: 10.5, textAlign: "center", margin: "8px 0 0" }}>{total} clic{total > 1 ? "s" : ""} · 30 j</p>
+            <p style={{ color: MUTED, fontSize: 11, textAlign: "center", margin: "8px 0 0" }}>{total} clic{total > 1 ? "s" : ""} · 30 j</p>
           </div>
 
           {/* Classement des blocs les plus touchés */}
@@ -108,7 +108,7 @@ export default function HeatmapPanel({ grid, byBlock, total, blocks }: Props) {
                 })}
               </div>
             )}
-            <p style={{ color: MUTED, fontSize: 10.5, margin: "12px 0 0", lineHeight: 1.5 }}>
+            <p style={{ color: MUTED, fontSize: 11, margin: "12px 0 0", lineHeight: 1.5 }}>
               Un bloc très cliqué mérite d&apos;être remonté ou mis en avant. Un bloc jamais cliqué peut être simplifié ou déplacé.
             </p>
           </div>

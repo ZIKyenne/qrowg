@@ -138,7 +138,7 @@ export default function UpgradePage() {
 
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 44 }}>
-          <div style={{ fontSize: 10.5, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700, marginBottom: 10 }}>
+          <div style={{ fontSize: 11.5, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 700, marginBottom: 10 }}>
             Votre abonnement
           </div>
           <h1 style={{ fontSize: "clamp(24px,3.2vw,32px)", color: "var(--ink)", fontWeight: 600, margin: "0 0 10px", lineHeight: 1.15, letterSpacing: "-.01em" }}>
@@ -186,10 +186,10 @@ export default function UpgradePage() {
                 style={{ background: "var(--surface)", border: "1px solid " + (plan.highlight ? "color-mix(in srgb, var(--accent) 60%, transparent)" : isCurrentPlan ? "color-mix(in srgb, var(--success) 40%, transparent)" : "var(--line-strong)"), borderRadius: 14, padding: plan.badge ? "46px 22px 26px" : "26px 22px", position: "relative", overflow: "hidden" }}>
 
                 {plan.badge && (
-                  <div style={{ position: "absolute", top: 14, left: "50%", transform: "translateX(-50%)", background: "var(--accent)", borderRadius: 999, padding: "4px 12px", fontSize: 10, fontWeight: 700, color: "var(--ink-on-accent)", letterSpacing: ".08em", whiteSpace: "nowrap", zIndex: 3 }}>{plan.badge}</div>
+                  <div style={{ position: "absolute", top: 14, left: "50%", transform: "translateX(-50%)", background: "var(--accent)", borderRadius: 999, padding: "4px 12px", fontSize: 11.5, fontWeight: 700, color: "var(--ink-on-accent)", letterSpacing: ".08em", whiteSpace: "nowrap", zIndex: 3 }}>{plan.badge}</div>
                 )}
                 {isCurrentPlan && (
-                  <div style={{ position: "absolute", top: 16, right: 16, background: "rgba(57,255,143,0.15)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 20, padding: "4px 12px", fontSize: 10, fontWeight: 700, color: "var(--success)" }}>ACTUEL</div>
+                  <div style={{ position: "absolute", top: 16, right: 16, background: "rgba(57,255,143,0.15)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 20, padding: "4px 12px", fontSize: 11.5, fontWeight: 700, color: "var(--success)" }}>ACTUEL</div>
                 )}
 
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
@@ -220,15 +220,15 @@ export default function UpgradePage() {
                     if (perks.length === 0) return null
                     return (
                       <div key={groupe} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                        <p style={{ color: "var(--faint)", fontSize: 10, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", margin: "6px 0 0" }}>{groupe}</p>
+                        <p style={{ color: "var(--muted)", fontSize: 11.5, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", margin: "8px 0 0" }}>{groupe}</p>
                         {perks.map((perk: { text: string; included: boolean; soon?: boolean }, i: number) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, opacity: perk.included ? 1 : 0.35 }}>
                       <div style={{ width: 16, height: 16, borderRadius: "50%", background: perk.included ? "color-mix(in srgb, var(--success) 14%, transparent)" : "var(--surface-2)", border: "1px solid " + (perk.included ? "color-mix(in srgb, var(--success) 35%, transparent)" : "rgba(255,255,255,0.08)"), display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        {perk.included ? <Check size={9} color={pc} /> : <span style={{ color: MUTED, fontSize: 8 }}>—</span>}
+                        {perk.included ? <Check size={11} color={pc} /> : <span aria-hidden="true" style={{ color: MUTED, fontSize: 11, lineHeight: 1 }}>—</span>}
                       </div>
                       <span style={{ color: perk.included ? "var(--ink)" : MUTED, fontSize: 13 }}>{perk.text}</span>
                       {perk.soon && (
-                        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.4, textTransform: "uppercase", color: "var(--accent)", background: "var(--surface-2)", border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)", borderRadius: 6, padding: "1px 6px", whiteSpace: "nowrap" }}>Bientôt</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.4, textTransform: "uppercase", color: "var(--accent)", background: "var(--surface-2)", border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)", borderRadius: 6, padding: "1px 6px", whiteSpace: "nowrap" }}>Bientôt</span>
                       )}
                     </div>
                         ))}
@@ -280,7 +280,7 @@ export default function UpgradePage() {
                 <div key={pl.id} style={{ background: "rgba(255,255,255,0.025)", border: `1px solid ${pl.id === "pro" ? pl.color + "66" : "rgba(255,255,255,0.09)"}`, borderRadius: 14, padding: "14px 10px" }}>
                   <div style={{ color: pl.color, fontSize: 11.5, fontWeight: 700, letterSpacing: 0.4, textTransform: "uppercase", marginBottom: 7 }}>{pl.label}</div>
                   <div style={{ color: "var(--ink)", fontSize: 24, fontWeight: 600, letterSpacing: "-.02em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{pl.limits.dyn === null ? "∞" : pl.limits.dyn}</div>
-                  <div style={{ color: "#6E685E", fontSize: 10.5, marginTop: 5 }}>QR modifiables</div>
+                  <div style={{ color: "var(--muted)", fontSize: 11.5, marginTop: 5 }}>QR modifiables</div>
                 </div>
               ))}
             </div>
@@ -324,7 +324,7 @@ export default function UpgradePage() {
         {/* Footer */}
         <div style={{ textAlign: "center" }}>
           <p style={{ color: MUTED, fontSize: 13, margin: "0 0 6px" }}>
-            Des questions ? <a href="mailto:hello@qrowg.com" style={{ color: G, textDecoration: "none" }}>Contactez-nous</a>
+            Des questions ? <a href="mailto:hello@qrowg.com" style={{ color: G, textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: 40, margin: "-12px 0" }}>Contactez-nous</a>
           </p>
           {/* « Remboursement 14 jours » a été retiré : les CGU disent l'inverse
               (« Aucun remboursement prorata ») et aucune logique de remboursement

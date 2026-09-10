@@ -112,9 +112,9 @@ export function PricingSection() {
           <span style={{ color: !annual ? "#F5F0E8" : "rgba(188,182,166,0.6)", fontSize:14, fontWeight: !annual ? 600 : 400, transition:"color 0.2s" }}>Mensuel</span>
           <button type="button" onClick={() => setAnnual(a => !a)} role="switch" aria-checked={annual}
             aria-label="Basculer facturation annuelle"
-            style={{ width:48, height:26, borderRadius:13, background: annual ? "var(--accent)" : "rgba(255,255,255,0.12)",
+            style={{ width:54, height:32, borderRadius:16, background: annual ? "var(--accent)" : "rgba(255,255,255,0.12)",
               border:"none", cursor:"pointer", position:"relative", transition:"background 0.25s", flexShrink:0 }}>
-            <span style={{ position:"absolute", top:3, left: annual ? 25 : 3, width:20, height:20, borderRadius:"50%",
+            <span style={{ position:"absolute", top:4, left: annual ? 30 : 4, width:24, height:24, borderRadius:"50%",
               background:"#fff", transition:"left 0.25s var(--mo-ease-spring)", boxShadow:"0 1px 4px rgba(0,0,0,0.3)" }}/>
           </button>
           <span style={{ color: annual ? "#F5F0E8" : "rgba(188,182,166,0.6)", fontSize:14, fontWeight: annual ? 600 : 400, transition:"color 0.2s" }}>Annuel</span>
@@ -171,7 +171,7 @@ export function PricingSection() {
 
               {/* Plan name */}
               <p style={{
-                color: plan.color, fontSize:10, fontWeight:700,
+                color: plan.color, fontSize:11, fontWeight:700,
                 letterSpacing:2.5, textTransform:"uppercase",
                 margin:"0 0 4px",
               }}>{plan.name}</p>
@@ -218,7 +218,7 @@ export function PricingSection() {
                     <span style={{
                       width:16, height:16, borderRadius:"50%", flexShrink:0,
                       display:"flex", alignItems:"center", justifyContent:"center",
-                      fontSize:9,
+                      fontSize:11,
                       background: f.ok
                         ? "rgba(57,255,143,0.15)"
                         : "rgba(188,182,166,0.08)",
@@ -328,7 +328,7 @@ export function PricingSection() {
                       <th style={{ padding: "16px 14px", textAlign: "left", fontSize: 11, color: "rgba(188,182,166,0.8)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>Fonctionnalité</th>
                       {PLAN_LIST.map(p => (
                         <th key={p.id} style={{ padding: "16px 14px", textAlign: "center", fontSize: 13, fontWeight: 800, color: p.id === "pro" ? "#C9A84C" : "#F5F0E8", background: p.id === "pro" ? "rgba(201,168,76,0.06)" : "transparent" }}>
-                          {p.label}{p.id === "pro" && <div style={{ fontSize: 8.5, color: "#C9A84C", fontWeight: 700, letterSpacing: 0.5 }}>POPULAIRE</div>}
+                          {p.label}{p.id === "pro" && <div style={{ fontSize: 11.5, color: "#C9A84C", fontWeight: 700, letterSpacing: 0.5 }}>POPULAIRE</div>}
                         </th>
                       ))}
                     </tr>
@@ -338,7 +338,7 @@ export function PricingSection() {
                       <tr key={row.feature}>
                         <td style={{ padding: "12px 14px", textAlign: "left", fontSize: 12.5, color: "#E8E6E0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                           {row.feature}
-                          {INFO[row.feature] && <span title={INFO[row.feature]} style={{ marginLeft: 6, display: "inline-flex", alignItems: "center", justifyContent: "center", width: 14, height: 14, borderRadius: "50%", background: "rgba(201,168,76,0.15)", color: "#C9A84C", fontSize: 9, fontWeight: 800, cursor: "help" }}>?</span>}
+                          {INFO[row.feature] && <span title={INFO[row.feature]} style={{ marginLeft: 6, display: "inline-flex", alignItems: "center", justifyContent: "center", width: 14, height: 14, borderRadius: "50%", background: "rgba(201,168,76,0.15)", color: "#C9A84C", fontSize: 11, fontWeight: 800, cursor: "help" }}>?</span>}
                         </td>
                         {cell(row.free, false)}
                         {cell(row.pro, true)}

@@ -134,11 +134,11 @@ export function ColorField({ label, value, onChange, onClear }: {
       <div style={{ display:"flex", alignItems:"center", gap:8 }}>
         <label style={{ color:"var(--muted)", fontSize:11, flex:1 }}>{label}</label>
         <button type="button" onClick={() => setOpen(o => !o)}
-          style={{ width:28, height:28, borderRadius:6, border:`1px solid ${open?"#C9A84C":"rgba(255,255,255,0.15)"}`, background: valid ? safe : "transparent", cursor:"pointer", flexShrink:0, position:"relative", overflow:"hidden", padding:0 }}>
+          style={{ width:32, height:32, borderRadius:7, border:`1px solid ${open?"#C9A84C":"rgba(255,255,255,0.15)"}`, background: valid ? safe : "transparent", cursor:"pointer", flexShrink:0, position:"relative", overflow:"hidden", padding:0 }}>
           {!valid && <span style={{ position:"absolute", inset:0, background:"repeating-linear-gradient(45deg,#222,#222 3px,#444 3px,#444 6px)" }}/>}
         </button>
         <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder="#----"
-          style={{ width:72, background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"5px 7px", color:valid?"var(--ink)":"var(--muted)", fontSize:10, fontFamily:"monospace", outline:"none" }}/>
+          style={{ width:72, background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"5px 7px", color:valid?"var(--ink)":"var(--muted)", fontSize:11, fontFamily:"monospace", outline:"none" }}/>
         {onClear && (
           <button type="button" onClick={onClear} title="Effacer"
             style={{ width:24, height:24, borderRadius:6, border:"1px solid rgba(255,255,255,0.08)", background:"rgba(255,255,255,0.03)", color:"var(--muted)", cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, padding:0 }}>×</button>

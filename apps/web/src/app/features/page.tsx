@@ -32,7 +32,7 @@ function Check({ text }: { text: string }) {
         width: 18, height: 18, borderRadius: "50%", flexShrink: 0, marginTop: 1,
         background: "rgba(57,255,143,0.12)", border: "1px solid rgba(57,255,143,0.3)",
         display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 9, color: "var(--success)", fontWeight: 800,
+        fontSize: 11, color: "var(--success)", fontWeight: 800,
       }}>✓</span>
       <span style={{ color: MUT, fontSize: 14, lineHeight: 1.55 }}>{text}</span>
     </div>
@@ -306,7 +306,7 @@ export default function FeaturesPage() {
               borderRadius:100,padding:"6px 14px",
               color:"rgba(245,240,232,0.6)",fontSize:12.5,
             }}>
-              <span style={{color:G,fontSize:10}}>✦</span>{f}
+              <span aria-hidden="true" style={{color:G,fontSize:11}}>✦</span>{f}
             </span>
           ))}
         </div>

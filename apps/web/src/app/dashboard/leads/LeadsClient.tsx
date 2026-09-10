@@ -137,7 +137,7 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
                 <button key={t} onClick={() => setFilter(t)} style={{
                   background: filter === t ? `color-mix(in srgb, ${G} 16%, transparent)` : "rgba(255,255,255,0.04)",
                   border: `1px solid ${filter === t ? `color-mix(in srgb, ${G} 35%, transparent)` : "rgba(255,255,255,0.08)"}`,
-                  borderRadius: 20, padding: "6px 13px", color: filter === t ? (G as string) : MUTED, fontSize: 12, fontWeight: 600, cursor: "pointer",
+                  borderRadius: 20, minHeight: 32, padding: "6px 14px", color: filter === t ? (G as string) : MUTED, fontSize: 12.5, fontWeight: 600, cursor: "pointer",
                 }}>
                   {t === "all" ? "Tous" : t === "unread" ? `Non lus${unreadCount ? ` (${unreadCount})` : ""}` : TYPE_LABELS[t] || t}
                 </button>
@@ -158,7 +158,7 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
                   display: "inline-flex", alignItems: "center", gap: 6,
                   background: statusFilter === s.key ? "var(--surface-2)" : "transparent",
                   border: `1px solid ${statusFilter === s.key ? "var(--line-strong)" : "var(--line)"}`,
-                  borderRadius: 9, padding: "6px 12px", color: statusFilter === s.key ? "var(--ink)" : MUTED, fontSize: 12.5, fontWeight: 600, cursor: "pointer",
+                  borderRadius: 9, minHeight: 32, padding: "6px 12px", color: statusFilter === s.key ? "var(--ink)" : MUTED, fontSize: 12.5, fontWeight: 600, cursor: "pointer",
                 }}>
                   {s.key !== "all" && <span style={{ width: 7, height: 7, borderRadius: "50%", background: s.color }} />}
                   {s.label} <span style={{ opacity: 0.7 }}>· {n}</span>
@@ -192,17 +192,19 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
                   </div>
 
                   {/* Pipeline : statut du lead */}
-                  <div style={{ display: "flex", gap: 4, marginBottom: (l.name || l.message) ? 10 : 0 }}>
+                  <div role="radiogroup" aria-label="Statut de ce message"
+                    style={{ display: "inline-flex", gap: 3, marginBottom: (l.name || l.message) ? 10 : 0, background: "var(--field)", border: "1px solid var(--line-strong)", borderRadius: 9, padding: 3 }}>
                     {STATUSES.map(s => {
                       const on = (l.status || "new") === s.key
                       return (
-                        <button key={s.key} onClick={() => setStatus(l.id, s.key)} style={{
-                          display: "inline-flex", alignItems: "center", gap: 5,
-                          background: on ? "var(--surface-2)" : "transparent",
-                          border: `1px solid ${on ? "var(--line-strong)" : "var(--line)"}`,
-                          borderRadius: 8, padding: "5px 10px", color: on ? "var(--ink)" : MUTED, fontSize: 12, fontWeight: on ? 700 : 500, cursor: "pointer",
+                        <button key={s.key} role="radio" aria-checked={on} onClick={() => setStatus(l.id, s.key)} style={{
+                          display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 5,
+                          minHeight: 32, background: on ? "var(--surface-2)" : "transparent",
+                          border: "1px solid " + (on ? "var(--line-strong)" : "transparent"),
+                          boxShadow: on ? "inset 0 -2px 0 var(--accent)" : "none",
+                          borderRadius: 7, padding: "0 11px", color: on ? "var(--ink)" : MUTED, fontSize: 12.5, fontWeight: on ? 600 : 500, cursor: "pointer",
                         }}>
-                          {on && <Check size={11} />}{s.label}
+                          {on && <Check size={12} />}{s.label}
                         </button>
                       )
                     })}

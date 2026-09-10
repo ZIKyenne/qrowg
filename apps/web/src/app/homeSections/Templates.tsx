@@ -201,8 +201,8 @@ function TemplateCard({ tpl, i, visible }: { tpl: typeof TEMPLATE_DATA[number]; 
       {/* Badge Pro/Free */}
       <div style={{ position: "absolute", top: 14, right: 14 }}>
         <span style={{
-          fontSize: 9, fontWeight: 800, letterSpacing: 1.5,
-          padding: "3px 8px", borderRadius: 20,
+          fontSize: 11, fontWeight: 800, letterSpacing: 1.2,
+          padding: "3px 9px", borderRadius: 20,
           background: tpl.isPro ? "rgba(167,139,250,0.15)" : "rgba(57,255,143,0.12)",
           border: `1px solid ${tpl.isPro ? "rgba(167,139,250,0.35)" : "rgba(57,255,143,0.3)"}`,
           color: tpl.isPro ? "#A78BFA" : "var(--success)",
@@ -223,8 +223,8 @@ function TemplateCard({ tpl, i, visible }: { tpl: typeof TEMPLATE_DATA[number]; 
           <h3 style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>
             {tpl.name}
           </h3>
-          <span style={{ color: tpl.accent, fontSize: 10, fontWeight: 600,
-            letterSpacing: 1.5, textTransform: "uppercase", opacity: 0.75 }}>
+          <span style={{ color: tpl.accent, fontSize: 11, fontWeight: 600,
+            letterSpacing: 1.2, textTransform: "uppercase", opacity: 0.85 }}>
             {tpl.category}
           </span>
         </div>

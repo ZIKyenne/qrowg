@@ -207,7 +207,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             {!noData && (
               <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "color-mix(in srgb, var(--success) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--success) 30%, transparent)", borderRadius: 999, padding: "2px 9px", verticalAlign: "middle" }}>
                 <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--success)" }} />
-                <span style={{ color: "var(--success)", fontSize: 10.5, fontWeight: 700, letterSpacing: ".06em" }}>EN DIRECT</span>
+                <span style={{ color: "var(--success)", fontSize: 11, fontWeight: 700, letterSpacing: ".06em" }}>EN DIRECT</span>
               </span>
             )}
           </span>}
@@ -229,7 +229,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
           <div role="group" aria-label="Période" style={{ display: "flex", gap: 3, background: "var(--field)", border: "1px solid var(--line)", borderRadius: 10, padding: 3 }}>
             {[7, 30, 90].map(d => (
               <button key={d} type="button" aria-pressed={period === d} onClick={() => setPeriod(d)}
-                style={{ padding: "7px 13px", borderRadius: 7, border: `1px solid ${period === d ? "var(--line-strong)" : "transparent"}`, cursor: "pointer", fontSize: 12.5, fontWeight: period === d ? 600 : 500, background: period === d ? "var(--surface-2)" : "transparent", color: period === d ? "var(--ink)" : MUTED, boxShadow: period === d ? "inset 0 -2px 0 var(--accent)" : "none" }}>{d}j</button>
+                style={{ minHeight: 32, padding: "0 13px", borderRadius: 7, border: `1px solid ${period === d ? "var(--line-strong)" : "transparent"}`, cursor: "pointer", fontSize: 12.5, fontWeight: period === d ? 600 : 500, background: period === d ? "var(--surface-2)" : "transparent", color: period === d ? "var(--ink)" : MUTED, boxShadow: period === d ? "inset 0 -2px 0 var(--accent)" : "none" }}>{d}j</button>
             ))}
           </div>
           </>} />
@@ -261,7 +261,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             background: "var(--surface)", border: "1px solid var(--line-strong)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 6 }}>
               <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, background: "var(--surface-2)", color: "var(--accent)" }}><BarChart2 size={15} /></span>
-              <span style={{ color: "var(--faint)", fontSize: 10.5, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase" as const }}>Bientôt vos données</span>
+              <span style={{ color: "var(--faint)", fontSize: 11, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase" as const }}>Bientôt vos données</span>
             </div>
             <h2 style={{ color: "var(--ink)", fontSize: 18, fontWeight: 600, margin: "0 0 4px", letterSpacing: "-.01em" }}>
               Vos statistiques apparaîtront ici dès le premier scan
@@ -328,7 +328,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
               <span style={{ color: "var(--muted)", fontSize: 11.5, fontWeight: 600 }}>Visiteurs actifs</span>
             </div>
             <p style={{ color: "var(--ink)", fontSize: 36, fontWeight: 600, margin: 0, lineHeight: 1, letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums" }}>{live.active}</p>
-            <p style={{ color: "var(--muted)", fontSize: 10.5, margin: "2px 0 0" }}>sur les 10 dernières minutes</p>
+            <p style={{ color: "var(--muted)", fontSize: 11, margin: "2px 0 0" }}>sur les 10 dernières minutes</p>
           </div>
           {/* Aujourd'hui + évolution */}
           <div className="az-card" style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 14, padding: "16px 18px", position: "relative", overflow: "hidden" }}>

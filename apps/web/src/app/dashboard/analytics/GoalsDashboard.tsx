@@ -402,7 +402,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
                     <input value={fMatch} onChange={e => setFMatch(e.target.value)}
                       placeholder={GOAL_TYPES[fType]?.matchHint ?? "mot-clé ou URL"}
                       style={{ ...inputStyle, fontSize: 12.5 }} />
-                    <p style={{ color: MUTED, fontSize: 10.5, margin: "6px 0 0" }}>Laissez vide pour compter tous les clics de ce type.</p>
+                    <p style={{ color: MUTED, fontSize: 11, margin: "6px 0 0" }}>Laissez vide pour compter tous les clics de ce type.</p>
                   </div>
                   <div>
                     <label style={fieldLabel}>Page suivie</label>
@@ -434,7 +434,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
                         })}
                       </div>
                     </div>
-                    <p style={{ color: MUTED, fontSize: 10.5, margin: "6px 0 0" }}>Sert à mesurer votre allure. Sans cible, pas de barre de progression.</p>
+                    <p style={{ color: MUTED, fontSize: 11, margin: "6px 0 0" }}>Sert à mesurer votre allure. Sans cible, pas de barre de progression.</p>
                   </div>
 
                   <div>

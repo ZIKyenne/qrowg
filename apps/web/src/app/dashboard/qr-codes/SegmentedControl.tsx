@@ -48,7 +48,7 @@ export function SegmentedControl({
           const on = i === value
           return (
             <button key={l} ref={el => { refs.current[i] = el }} role="tab" aria-selected={on} tabIndex={on ? 0 : -1} type="button" onClick={() => select(i)} className="sc-tab"
-              style={{ position: "relative", zIndex: 1, appearance: "none", border: "none", background: "transparent", cursor: "pointer", padding: dense ? "8px 6px" : "11px 18px", borderRadius: 7, fontFamily: "inherit", fontSize: dense ? 12 : 14, fontWeight: on ? 600 : 500, color: on ? "var(--ink)" : "var(--muted)", transition: "color .2s ease, font-weight .18s ease", whiteSpace: "nowrap" }}>
+              style={{ position: "relative", zIndex: 1, appearance: "none", border: "none", background: "transparent", cursor: "pointer", minHeight: 32, padding: dense ? "8px 6px" : "11px 18px", borderRadius: 7, fontFamily: "inherit", fontSize: dense ? 12 : 14, fontWeight: on ? 600 : 500, color: on ? "var(--ink)" : "var(--muted)", transition: "color .2s ease, font-weight .18s ease", whiteSpace: "nowrap" }}>
               {l}
             </button>
           )

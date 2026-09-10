@@ -51,10 +51,10 @@ describe("barre du haut de l'éditeur", () => {
 describe("barres d'en-tête du site public", () => {
   const css = lire("app/globals.css")
 
-  it("la règle existe et vise 24 px", () => {
+  it("la règle existe et vise 32 px (24 px suffit à WCAG, 32 est la règle interne)", () => {
     const i = css.indexOf(".qf-entete a,")
     expect(i).toBeGreaterThan(-1)
-    expect(css.slice(i, i + 220)).toContain("min-height: 24px")
+    expect(css.slice(i, i + 320)).toContain("min-height: 32px")
   })
 
   it("chaque barre publique la porte", () => {

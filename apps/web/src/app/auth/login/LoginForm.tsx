@@ -61,7 +61,7 @@ export default function LoginForm() {
           </button>
         </div>
         <div style={{ textAlign: "right", marginTop: 8 }}>
-          <a href="/auth/forgot-password" style={{ color: "#C9A84C", textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
+          <a href="/auth/forgot-password" style={{ color: "#C9A84C", textDecoration: "none", fontSize: 13, fontWeight: 600, display: "inline-flex", alignItems: "center", minHeight: 32 }}>
             Mot de passe oublié ?
           </a>
         </div>
