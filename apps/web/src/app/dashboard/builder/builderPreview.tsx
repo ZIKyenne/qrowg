@@ -1563,6 +1563,8 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
       )
 
       case "video_testimonials": {
+        // Livré vide : le produit ne met pas de témoignage dans la bouche d'un client.
+        if (!hasPublishableContent("video_testimonials", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🎥", "Ajoutez une vidéo de client", HIDDEN_WHEN_EMPTY_NOTE)}</div>
         const testi = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`t${i}_video_url`],c[`t${i}_name`],c[`t${i}_company`],c[`t${i}_quote`]]}).filter(([,n])=>n)
         return (
           <div style={{ padding: "10px 16px", ...s }}>

@@ -16,7 +16,7 @@ export function rowAvatars(c: Record<string, any>): { src: string; nom: string; 
   })
 }
 
-function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
+export function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const items = rowAvatars(c)
   const align = alignOf(c.align)
   const size = Math.round(38 * u.scale)
@@ -47,9 +47,8 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorAvatarRow({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
 export function PublicAvatarRow({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
-  if (rowAvatars(c).length === 0 && !c.label) return null
+  if (rowAvatars(c).length === 0 && !c.count && !c.label) return null
   return <View content={c} u={publicCtx(ctx)} />
 }

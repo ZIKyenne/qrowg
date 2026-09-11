@@ -6,7 +6,7 @@ import { alignOf, safeColor, clampInt } from "../../models/layoutStyle"
 import { LayoutSurface } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 
-function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
+export function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const align = alignOf(c.align)
   const accent = safeColor(c.color, u.G)
   const size = clampInt(c.size, 28, 96, 58)
@@ -28,7 +28,6 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorStatHero({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
 export function PublicStatHero({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
   if (!String(c.value || "").trim()) return null

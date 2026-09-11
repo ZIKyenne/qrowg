@@ -178,8 +178,8 @@ export const STUDIO_TEMPLATES: PageTemplate[] = [
         align: "Gauche", pad: "Compact", bg_type: "Carte", radius: "Arrondi",
       } },
       { type: "stat_hero", content: {
-        eyebrow: "DEPUIS 1972", value: "52", unit: "ans", label: "à la même adresse",
-        text: "Et la même recette de sauce au poivre.", size: "62", fill: "Dégradé", align: "Centre",
+        eyebrow: "DEPUIS 1972", value: "", unit: "", label: "",
+        text: "", size: "62", fill: "Dégradé", align: "Centre",
         pad: "Aéré", bg_type: "Carte", radius: "Arrondi",
       } },
       anchor("carte"),
@@ -467,8 +467,8 @@ export const STUDIO_TEMPLATES: PageTemplate[] = [
         m3_name: "Léa", m3_role: "Soins & coiffage",
       } },
       { type: "stat_hero", content: {
-        eyebrow: "AVIS GOOGLE", value: "4,9", unit: "/5", label: "sur 312 avis",
-        text: "Merci à vous.", size: "56", fill: "Dégradé", align: "Centre", pad: "Aéré", bg_type: "Carte", radius: "Arrondi",
+        eyebrow: "AVIS GOOGLE", value: "", unit: "", label: "",
+        text: "", size: "56", fill: "Dégradé", align: "Centre", pad: "Aéré", bg_type: "Carte", radius: "Arrondi",
       } },
       anchor("rdv"),
       { type: "free_section", content: {
@@ -510,7 +510,7 @@ export const STUDIO_TEMPLATES: PageTemplate[] = [
         marks: "Oui", pad: "Compact", bg_type: "Aucun",
       } },
       { type: "stat_hero", content: {
-        value: "39", unit: "€/mois", label: "l'abonnement deux coupes", text: "Sans engagement, résiliable en un clic.",
+        value: "", unit: "", label: "", text: "",
         size: "50", fill: "Uni", align: "Centre", pad: "Aéré", bg_type: "Dégradé", bg_color: "#C0844A", bg_color2: "#191D21", radius: "Arrondi",
       } },
       shape("#191D21", "Pente", "40"),
@@ -765,13 +765,13 @@ export const STUDIO_TEMPLATES: PageTemplate[] = [
       } },
       shape("#241220", "Arrondi", "40"),
       { type: "logo_marquee", content: {
-        title: "Les marques", name1: "Atelier Nord", name2: "Céramique 51", name3: "Maison Bleue",
-        name4: "Studio Craie", name5: "Les Verriers", style: "Nuances de gris", speed: "24", logo_height: "34",
+        title: "Les marques", name1: "", name2: "", name3: "",
+        name4: "", name5: "", style: "Nuances de gris", speed: "24", logo_height: "34",
         pad: "Compact", bg_type: "Aucun",
       } },
       { type: "avatar_row", content: {
-        count: "+1 200", label: "clientes et clients fidèles", sublabel: "Merci à vous",
-        name1: "A", name2: "M", name3: "L", align: "Centre", pad: "Compact", bg_type: "Carte", radius: "Arrondi",
+        count: "", label: "", sublabel: "",
+        name1: "", name2: "", name3: "", align: "Centre", pad: "Compact", bg_type: "Carte", radius: "Arrondi",
       } },
       { type: "toggle_content", content: {
         title: "Retours et échanges", text: "Les articles peuvent être échangés dans les 30 jours, avec le ticket de caisse et dans leur état d'origine.\n\nLes articles soldés sont échangeables mais non remboursables. Les bijoux et cosmétiques ne sont ni repris ni échangés, pour des raisons d'hygiène.",
@@ -810,8 +810,8 @@ export const STUDIO_TEMPLATES: PageTemplate[] = [
       } },
       shape("#FFFFFF", "Vague douce", "44"),
       { type: "stat_hero", content: {
-        eyebrow: "ABONNEMENT", value: "24", unit: "€/mois", label: "un bouquet toutes les deux semaines",
-        text: "Livré au bureau ou à la maison. Sans engagement.",
+        eyebrow: "ABONNEMENT", value: "", unit: "", label: "",
+        text: "",
         size: "52", fill: "Uni", align: "Centre", pad: "Aéré", bg_type: "Carte", radius: "Arrondi",
       } },
       { type: "steps_horizontal", content: {

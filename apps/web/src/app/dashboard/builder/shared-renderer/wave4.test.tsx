@@ -102,8 +102,18 @@ describe("wave4 — parité éditeur (état vide lineup/timeline ; contenu tous)
     expect(out).toContain("Ajoutez une étape")
     expect(out).not.toContain("Invisible en ligne tant qu")
   })
-  it("testimonials/business_stats/brands/reassurance : vide → conteneur sans état vide (legacy)", () => {
-    for (const Comp of [EditorTestimonials, EditorBusinessStats, EditorBrands, EditorReassurance]) {
+  // 10 septembre : `testimonials` a rejoint la doctrine de l'état vide. Les modèles ne
+  // pré-remplissent plus d'avis inventés ; le bloc arrive donc vide, et l'éditeur doit
+  // dire quoi y mettre au lieu de montrer un cadre muet. Les trois autres suivent
+  // encore le legacy — ils n'ont jamais porté de preuve fabriquée.
+  it("testimonials vide → état vide qui invite à coller un vrai avis", () => {
+    const out = H(createElement(EditorTestimonials, { content: {}, ctx: eCtx }))
+    expect(out).toContain('role="note"')
+    expect(out).toContain("Collez ici un avis reçu")
+    expect(out).toContain("Invisible en ligne tant qu")
+  })
+  it("business_stats/brands/reassurance : vide → conteneur sans état vide (legacy)", () => {
+    for (const Comp of [EditorBusinessStats, EditorBrands, EditorReassurance]) {
       expect(H(createElement(Comp, { content: {}, ctx: eCtx }))).not.toContain('role="note"')
     }
   })

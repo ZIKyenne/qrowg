@@ -2,10 +2,17 @@
 import { InlineEditable } from "../../../InlineEditable"
 import { testimonialsViewModel } from "../../models/testimonials"
 import type { EditorAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 
 export function EditorTestimonials({ content, ctx }: EditorAdapterProps) {
   const { items } = testimonialsViewModel(content)
   const { text, muted, primary, surfaceStyle, canEdit, edit } = ctx
+  // Les modèles écrivaient l'avis à la place du client (« Marie L. — La meilleure
+  // entrecôte de Paris »). Depuis le 10 septembre le bloc arrive vide : il attend
+  // de vrais retours, et ne publie rien tant qu'il n'en a pas.
+  if (items.length === 0) {
+    return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="💬" label="Collez ici un avis reçu" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={muted} /></div>
+  }
   return (
     <div style={{ padding: "10px 16px", display: "flex", flexDirection: "column", gap: 7, ...surfaceStyle }}>
       {items.map((r) => (

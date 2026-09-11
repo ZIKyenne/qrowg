@@ -38,6 +38,16 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   // « Logo » factices, ou affichait un cadre vide, pour un bloc qui ne publiait rien.
   logo_wall:               c => anyIndexed(c, i => c[`logo${i}_name`]),
   partners:                c => anyIndexed(c, i => c[`logo${i}_name`]),
+  // ── 10 septembre : les modèles écrivaient la preuve à la place de l'utilisateur
+  // (« Marie L. — La meilleure entrecôte de Paris », « 4,9/5 sur 312 avis »,
+  // « +1 200 clients »). Ces champs sont désormais livrés VIDES : le bloc ne publie
+  // rien tant que la personne n'a pas mis ses vrais avis, ses vrais chiffres. Sans
+  // détecteur, l'éditeur montrait un cadre vide sans dire quoi en faire.
+  testimonials:            c => anyIndexed(c, i => c[`name${i}`]),
+  video_testimonials:      c => anyIndexed(c, i => c[`t${i}_name`]),
+  logo_marquee:            c => anyIndexed(c, i => c[`name${i}`]),
+  avatar_row:              c => hasMeaningfulText(c.count) || anyIndexed(c, i => c[`name${i}`]),
+  stat_hero:               c => hasMeaningfulText(c.value),
   certifications:          c => anyIndexed(c, i => c[`cert_${i}_name`]),
   legal_info:              c => ["company_name", "siret", "tva", "address", "capital", "rcs", "email"].some(k => hasMeaningfulText(c[k])),
   engagements:            c => anyIndexed(c, i => c[`e${i}`]),

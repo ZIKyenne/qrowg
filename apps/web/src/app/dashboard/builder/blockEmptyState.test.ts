@@ -51,6 +51,12 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
   // que la doctrine ne le declare.
   logo_wall: v => ({ logo1_name: v }),
   partners: v => ({ logo1_name: v }),
+  // 10 septembre : la preuve sociale n'est plus pré-remplie par le produit.
+  testimonials: v => ({ name1: v }),
+  video_testimonials: v => ({ t1_name: v }),
+  logo_marquee: v => ({ name1: v }),
+  avatar_row: v => ({ count: v }),
+  stat_hero: v => ({ value: v }),
   certifications: v => ({ cert_1_name: v }),
   legal_info: v => ({ siret: v }),
   // Vague 10.

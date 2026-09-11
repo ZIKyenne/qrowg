@@ -123,3 +123,18 @@ Ouvrir la page publiée dans 34 variantes a montré ce qu'aucun écran d'adminis
 Le moteur partagé applique une échelle : dans le canvas de l'éditeur elle rapetisse le rendu, ce qui est légitime ; mais la taille de **référence** est celle du public. Elle est désormais à 11 px minimum dans les 4 blocs legacy et les 18 blocs partagés concernés, et le test vérifie les trois écritures possibles (`fontSize`, `sz(u, n)`, `Math.round(n * scale)`) sur l'ensemble du catalogue de blocs.
 
 Balayage : **34 pages de démonstration sur téléphone, 0 texte < 11 px, 0 cible < 32 px, aucun débordement, aucune erreur de script**, bandeau présent partout. Hub à 0 / 0 aux deux tailles.
+
+
+## Lot v63 — le produit n'écrit plus la preuve à la place de l'utilisateur
+
+En ouvrant les 34 pages de démonstration du lot précédent, on a lu ce que les modèles écrivaient pour le client : « Marie L. — La meilleure entrecôte de Paris », « Sarah M., CEO — MVP livré en 6 semaines », « 4,9/5 sur 312 avis », « +1 200 clientes et clients fidèles », « Assurance RC Pro », « Artisan certifié RGE ».
+
+Quelqu'un qui découvre QRowg prend un modèle, remplace le nom et l'adresse, publie — et diffuse des avis fabriqués signés de prénoms inventés, une note qu'il n'a pas reçue, une assurance qu'il n'a peut-être pas. Le produit lui faisait écrire un mensonge sans qu'il s'en rende compte, et l'exposait à ses propres clients.
+
+**La règle posée** : le pré-remplissage donne la *structure* et le *titre* — l'emplacement — jamais l'*affirmation*. Dans les 34 modèles et les 9 recettes de la création guidée, les champs de preuve arrivent vides : avis et notes (`testimonials`, `video_testimonials`, `google_review`), chiffres d'activité (`stats_block`, `stat_hero`, `avatar_row`), murs de marques (`logo_marquee`, `logo_wall`, `partners`), badges de conformité (`trust_badge`, `business_certifications`). Les titres restent : « Ils nous recommandent » invite à remplir, n'affirme rien.
+
+Le bloc vide ne publie rien (vérifié : aucun cadre fantôme sur les 34 démonstrations), et l'éditeur dit quoi y mettre — « Collez ici un avis reçu », « Votre chiffre qui compte », « Vos partenaires, vos marques », « Ajoutez une vidéo de client » — avec la mention « Invisible en ligne tant qu'il est vide ». Cinq types ont rejoint la doctrine de l'état vide ; pour trois d'entre eux l'adapter éditeur a été sorti dans son propre fichier, l'état vide étant du code d'édition qui n'a rien à faire dans le bundle de la page publiée.
+
+Garde `app/preuveNonInventee.test.ts` : elle lit modèles et recettes bloc par bloc, champ par champ, et refuse toute affirmation pré-remplie.
+
+Au passage : banc d'essai de la création guidée (`/e2e-harness/onboarding`), enfin mesurable — 0 texte < 11 px, 0 cible < 32 px aux deux tailles.

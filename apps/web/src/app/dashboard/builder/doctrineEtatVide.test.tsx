@@ -113,6 +113,8 @@ describe("dès qu'il y a du contenu, le bloc apparaît vraiment", () => {
     product: { name: "Le pain de campagne", price: "4,20 €" },
     availability: { status: "busy", message: "Complet jusqu'au 20" },
     section_banner: { title: "Nos services" },
+    // Depuis le 10 septembre, le témoignage vidéo arrive vide lui aussi.
+    video_testimonials: { t1_name: "Claire Martin", t1_quote: "Ils ont refait ma vitrine en deux jours." },
     calendly: { url: "https://calendly.com/atelier-nord" },
     free_gift: { url: "https://atelier-nord.fr/cadeau" },
     instagram_feed: { cta_url: "https://instagram.com/atelier.nord" },

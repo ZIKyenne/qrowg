@@ -17,7 +17,7 @@ export function marqueeLogos(c: Record<string, any>): { src: string; name: strin
   })
 }
 
-function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
+export function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const logos = marqueeLogos(c)
   const h = clampInt(c.logo_height, 22, 90, 40)
   const grey = String(c.style || "Nuances de gris") === "Nuances de gris"
@@ -39,7 +39,6 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorLogoMarquee({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
 export function PublicLogoMarquee({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
   if (marqueeLogos(c).length === 0) return null
