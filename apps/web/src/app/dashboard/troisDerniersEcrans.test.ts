@@ -26,8 +26,11 @@ describe("Statistiques", () => {
   })
   it("« Publiez vos contenus », « contre hier »", () => {
     const a = lire("analytics/AnalyticsClient.tsx")
-    expect(a).toContain("Publiez vos contenus autour de ${story.peakHour} h")
-    expect(a).toContain("contre hier ({live.ydayN})")
+    // Les deux phrases ont migré (lot v66) : le conseil vit dans lectureHonnete.ts,
+    // et « contre hier » ne s'affiche plus que lorsque la veille existe — sinon
+    // le pourcentage serait une division par zéro maquillée en « +100 % ».
+    expect(lire("analytics/lectureHonnete.ts")).toContain("Publiez vos contenus ${creneauHoraire(opts.heurePic)}, votre heure de pic.")
+    expect(a).toContain("contre hier (${live.ydayN})")
     expect(a).not.toContain("vos posts")
   })
 })

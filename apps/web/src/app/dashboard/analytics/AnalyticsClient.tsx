@@ -13,6 +13,7 @@ import GeoPanel from "./GeoPanel"
 import DevicePanel from "./DevicePanel"
 import ExportPanel from "./ExportPanel"
 import ReportSubscriptionPanel from "./ReportSubscriptionPanel"
+import { assezPourConclure, conseilLecture, creneauHoraire, evolutionJournaliere, pluriel, titreSynthese } from "./lectureHonnete"
 import { buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildFunnel, buildTapGrid, buildTapsByBlock, countTaps } from "./analyticsAgg"
 import { OverviewChart, TopPagesCard } from "./OverviewCards"
 import ScrollDepthPanel from "./ScrollDepthPanel"
@@ -164,20 +165,27 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
     const times = [...filteredScans.map(s => s.scanned_at), ...filteredViews.map(v => v.viewed_at)]
     const todayN = times.filter(t => ms(t) >= startToday.getTime()).length
     const ydayN = times.filter(t => ms(t) >= startY.getTime() && ms(t) < startToday.getTime()).length
-    const evo = ydayN ? Math.round(((todayN - ydayN) / ydayN) * 100) : (todayN > 0 ? 100 : 0)
+    // Partir de zéro n'est pas « +100 % » : evolutionJournaliere rend null, et
+    // la carte dit alors les deux nombres au lieu d'inventer un pourcentage.
+    const evo = evolutionJournaliere(todayN, ydayN)
     return { active, todayN, ydayN, evo, last: allT[0] as { t: string; kind: string } | undefined }
   }, [filteredScans, filteredViews])
 
   // ── Storytelling : une phrase de synthèse plutôt qu'un tableau de chiffres ──
   const story = useMemo(() => {
     if (noData) return null
+    const times = [...filteredScans.map(s => s.scanned_at), ...filteredViews.map(v => v.viewed_at)]
+    // Source dominante, appareil dominant, heure de pic : trois conclusions. Sous
+    // le seuil, l'échantillon ne les autorise pas — on les tait plutôt que de les
+    // énoncer avec l'aplomb d'une mesure.
+    const assez = assezPourConclure(times.length)
+    if (!assez) return { evenements: times.length, assez, topSource: null, topDevice: null, peakHour: null }
     const topSource = sourceData[0]?.name || null
     const topDevice = deviceData[0]?.name || null
-    const times = [...filteredScans.map(s => s.scanned_at), ...filteredViews.map(v => v.viewed_at)]
     const hourCount: Record<number, number> = {}
     times.forEach(t => { const h = new Date(t).getHours(); hourCount[h] = (hourCount[h] || 0) + 1 })
     const peakEntry = Object.entries(hourCount).sort((a, b) => b[1] - a[1])[0]
-    return { topSource, topDevice, peakHour: peakEntry ? Number(peakEntry[0]) : null }
+    return { evenements: times.length, assez, topSource, topDevice, peakHour: peakEntry ? Number(peakEntry[0]) : null }
   }, [noData, sourceData, deviceData, filteredScans, filteredViews])
 
   return (
@@ -290,23 +298,20 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
           <div className="az" style={{ marginBottom: 14, padding: "18px 20px", borderRadius: 16, position: "relative", overflow: "hidden",
             background: "var(--surface)", border: "1px solid var(--line-strong)", borderLeft: "3px solid var(--accent)" }}>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 12, position: "relative" }}>
-              <span style={{ flexShrink: 0, lineHeight: 1.1, color: "var(--accent)" }}>{live.evo < -5 ? <TrendingUp size={19} style={{ transform: "scaleY(-1)" }} /> : <TrendingUp size={19} />}</span>
+              <span style={{ flexShrink: 0, lineHeight: 1.1, color: "var(--accent)" }}>{story.assez && live.evo != null && live.evo < -5 ? <TrendingUp size={19} style={{ transform: "scaleY(-1)" }} /> : <TrendingUp size={19} />}</span>
               <div style={{ minWidth: 0 }}>
                 <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 600, margin: "0 0 3px", letterSpacing: "-.01em" }}>
-                  {live.evo > 5 ? "Votre trafic augmente." : live.evo < -5 ? "Votre trafic ralentit un peu." : "Votre QR est suivi en temps réel."}
+                  {titreSynthese(story.evenements, live.evo)}
                 </p>
                 <p style={{ color: "var(--muted)", fontSize: 13.5, margin: 0, lineHeight: 1.55 }}>
-                  {totalScans30} scan{totalScans30 > 1 ? "s" : ""} sur 30 jours
+                  {pluriel(totalScans30, "scan")} et {pluriel(totalViews30, "vue")} sur 30 jours
                   {story.topSource ? <>, surtout via <strong style={{ color: "var(--ink)" }}>{story.topSource}</strong></> : null}
                   {story.topDevice ? <> sur <strong style={{ color: "var(--ink)" }}>{story.topDevice}</strong></> : null}
-                  {story.peakHour != null ? <> · pic d&apos;activité vers <strong style={{ color: "var(--ink)" }}>{story.peakHour}h</strong></> : null}.
+                  {story.peakHour != null ? <> · pic d&apos;activité <strong style={{ color: "var(--ink)" }}>{creneauHoraire(story.peakHour)}</strong></> : null}.
+                  {!story.assez ? <> C&apos;est encore trop peu pour en tirer une tendance.</> : null}
                 </p>
                 {(() => {
-                  const advice =
-                    totalScans30 < 10 ? "Partagez votre QR sur vos réseaux et imprimez-le pour décoller."
-                    : story.peakHour != null ? `Publiez vos contenus autour de ${story.peakHour} h, votre heure de pic.`
-                    : story.topSource ? `L’essentiel vient de ${story.topSource} — testez un autre canal pour diversifier.`
-                    : null
+                  const advice = conseilLecture(story.evenements, { heurePic: story.peakHour, sourcePrincipale: story.topSource })
                   return advice ? (
                     <p style={{ display: "flex", alignItems: "baseline", gap: 7, color: "var(--accent)", fontSize: 12.5, fontWeight: 600, margin: "9px 0 0", lineHeight: 1.5 }}>
                       <Lightbulb size={13} style={{ flexShrink: 0 }} /> {advice}
@@ -335,11 +340,15 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             <p style={{ color: "var(--muted)", fontSize: 11.5, fontWeight: 600, margin: "0 0 8px" }}>Activité aujourd'hui</p>
             <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
               <p style={{ color: "var(--ink)", fontSize: 36, fontWeight: 600, margin: 0, lineHeight: 1, letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums" }}>{live.todayN}</p>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 3, color: live.evo >= 0 ? "var(--success)" : "var(--danger)", fontSize: 12.5, fontWeight: 700 }}>
-                <TrendingUp size={13} style={{ transform: live.evo >= 0 ? "none" : "scaleY(-1)" }} /> {live.evo >= 0 ? "+" : ""}{live.evo}%
-              </span>
+              {live.evo != null && (
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 3, color: live.evo >= 0 ? "var(--success)" : "var(--danger)", fontSize: 12.5, fontWeight: 700 }}>
+                  <TrendingUp size={13} style={{ transform: live.evo >= 0 ? "none" : "scaleY(-1)" }} /> {live.evo >= 0 ? "+" : ""}{live.evo}%
+                </span>
+              )}
             </div>
-            <p style={{ color: MUTED, fontSize: 11.5, margin: "2px 0 0" }}>contre hier ({live.ydayN}) · scans + vues</p>
+            <p style={{ color: MUTED, fontSize: 11.5, margin: "2px 0 0" }}>
+              {live.evo != null ? `contre hier (${live.ydayN}) · scans + vues` : "hier : rien · scans + vues"}
+            </p>
           </div>
           {/* Dernier événement */}
           <div className="az-card" style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 14, padding: "16px 18px" }}>

@@ -6,6 +6,7 @@
 // 2) TopPagesCard : classement des pages par vues cumulees (rang, part %, barre).
 // Autonome, aucune dependance graphique externe (pas de recharts) : SVG pur.
 import { useMemo, useState, type CSSProperties } from "react"
+import { pluriel, picLisible } from "./lectureHonnete"
 
 // ── Palette du design (tokens du handoff) ───────────────────────────────────
 const CARD_BG = "var(--surface)", CARD_BC = "var(--line-strong)"
@@ -70,7 +71,9 @@ export function OverviewChart({ daily, rangeLabel = "30 derniers jours" }: { dai
   const totalScans = g.scans.reduce((a, b) => a + b, 0)
   const totalViews = g.views.reduce((a, b) => a + b, 0)
   const peakVal = g.scans[g.peakI] || 0
-  const showPeak = showScans && hover === null && peakVal > 0
+  // Un « pic » sur une série de 1 scan par jour n'est pas un pic : c'est le
+  // premier index du tableau. picLisible exige un maximum unique et >= 2.
+  const showPeak = showScans && hover === null && picLisible(g.scans)
   const noViews = showViews && !g.anyViews
 
   const chip = (active: boolean): CSSProperties => active
@@ -137,7 +140,7 @@ export function OverviewChart({ daily, rangeLabel = "30 derniers jours" }: { dai
             <div style={{ position: "absolute", left: `${(g.peakI / (g.n - 1)) * 100}%`, top: `${(g.py(peakVal) / g.H) * 100}%`, width: 7, height: 7, margin: "-4px 0 0 -4px", borderRadius: "50%", background: GOLD, boxShadow: "0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent)", pointerEvents: "none" }} />
             <div style={{ position: "absolute", left: `${(g.peakI / (g.n - 1)) * 100}%`, top: `${(g.py(peakVal) / g.H) * 100}%`, transform: "translate(-50%,-30px)", display: "flex", alignItems: "center", gap: 6, padding: "4px 9px", borderRadius: 999, background: "color-mix(in srgb, var(--accent) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 26%, transparent)", color: GOLD, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap", pointerEvents: "none" }}>
               <span aria-hidden style={{ width: 7, height: 7, background: "currentColor", clipPath: "path('M4 0 L8 4 L5 4 L5 8 L3 8 L3 4 L0 4 Z')" }} />
-              pic · {peakVal} scans le {g.dates[g.peakI]}
+              pic · {pluriel(peakVal, "scan")} le {g.dates[g.peakI]}
             </div>
           </>}
 
@@ -147,8 +150,8 @@ export function OverviewChart({ daily, rangeLabel = "30 derniers jours" }: { dai
             <div style={{ position: "absolute", left: hvX, top: hvY, width: 9, height: 9, margin: "-5px 0 0 -5px", borderRadius: "50%", background: GOLD, boxShadow: "0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent)", pointerEvents: "none" }} />
             <div style={{ position: "absolute", left: hvX, top: 8, transform: `translateX(${hvShift})`, padding: "10px 13px", borderRadius: 11, background: "rgba(15,13,11,.97)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", boxShadow: "0 14px 30px -18px rgba(0,0,0,.95)", pointerEvents: "none", whiteSpace: "nowrap" }}>
               <span style={{ display: "block", fontSize: 11, color: T3, marginBottom: 5 }}>{g.dates[hover]}</span>
-              <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, fontWeight: 700, color: T1 }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: GOLD }} />{g.scans[hover]} scans</span>
-              <span style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 3, fontSize: 12.5, fontWeight: 700, color: T1 }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: GREEN }} />{g.views[hover]} vues</span>
+              <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, fontWeight: 700, color: T1 }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: GOLD }} />{pluriel(g.scans[hover], "scan")}</span>
+              <span style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 3, fontSize: 12.5, fontWeight: 700, color: T1 }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: GREEN }} />{pluriel(g.views[hover], "vue")}</span>
             </div>
           </>}
 

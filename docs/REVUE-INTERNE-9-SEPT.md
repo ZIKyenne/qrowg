@@ -158,3 +158,28 @@ Vérifié dans le navigateur sur le parcours complet, et sur les 34 pages de dé
 **Le héros.** Son second bouton menait au générateur de QR — un outil annexe, qui a sa propre section plus bas. Il mène maintenant à `/examples` : « Voir une page en vrai ». Depuis le lot v62, cette page ouvre 34 pages réelles rendues par le moteur public ; c'est la réponse à la question que pose le héros, et c'est ce qu'un visiteur veut voir avant de se lancer. La promesse et la preuve sont enfin reliées.
 
 Accueil re-mesuré après le changement : 0 texte < 11 px, 0 cible < 32 px, aux deux tailles.
+
+
+## Lot v66 — ce que l'écran affirme quand il ne sait rien
+
+Les lots précédents ont retiré du produit les affirmations que **l'utilisateur** aurait publiées sans le vouloir : faux avis, fausses notes, adresses qui ne sont pas les siennes. Restait celles que **le produit lui-même** lui adressait.
+
+**Les statistiques, vues par un compte qui vient de publier.** Le banc d'essai existait pour un compte mûr (169 scans) ; il monte maintenant aussi le compte du début — une page, trois scans, quatre vues (`/e2e-harness/statistiques?debut=1`). Ce que l'écran lui disait :
+
+> « Votre trafic augmente. » — « **+100 %** contre hier (0) » — « 3 scans sur 30 jours, surtout via **QR code** sur **mobile** · pic d'activité vers **0h** » — et le graphique titrait « pic · **1 scans** le 8/9 ».
+
+Aucune de ces quatre phrases n'était vraie. Passer de 0 à 2 n'est pas +100 % : c'est une division par zéro. Une source « dominante » et une « heure de pic » sur trois événements sont des conclusions tirées d'un échantillon qui n'en autorise aucune. Et « 1 scans » désignait le premier jour du tableau, faute de pic réel.
+
+La règle est posée dans un module pur, `analytics/lectureHonnete.ts`, testable seul : au-dessous de **vingt événements** sur la période, on donne les faits bruts et le geste utile ; au-dessus seulement, on interprète. `evolutionJournaliere` rend `null` quand la veille est à zéro — et la carte dit alors « hier : rien » au lieu d'afficher un pourcentage ; `picLisible` exige un maximum **unique et supérieur à 1** avant de désigner un jour de pic ; `creneauHoraire` écrit « entre 14 h et 15 h » plutôt que « 14h » ; `pluriel` fait l'accord aux quatre endroits où il était fait à la main. Le même écran affiche désormais :
+
+> « Vos premières mesures arrivent. » — « 3 scans et 4 vues sur 30 jours. C'est encore trop peu pour en tirer une tendance. » — « Partagez votre QR sur vos réseaux et imprimez-le : c'est ce qui fait venir les premiers scans. »
+
+Le compte mûr, lui, garde sa lecture complète : tendance, source, appareil, créneau de pic, conseil d'optimisation. Rien n'a été retiré — l'interprétation attend simplement d'avoir de quoi s'appuyer.
+
+**Le retour, trois jours plus tard.** Même exercice sur l'accueil connecté, qui n'avait de banc d'essai que pour trois pages et 507 vues (`?debut=1` le monte maintenant avec une page publiée il y a trois jours). Le conseil affiché était : « Créez une 2ᵉ page pour un autre usage (menu, événement, promo). » Il était piloté par `pages.length === 1` — un compte d'objets, pas une situation. Or sa première page ne tourne pas encore : lui en faire fabriquer une deuxième double le travail non rentabilisé et retarde le seul geste qui compte, sortir le QR du logiciel et le mettre devant des gens.
+
+`dashboard/prochaineEtape.ts` tranche sur la situation : page publiée et moins de dix scans → **diffuser** (« Votre page est en ligne : montrez son QR code à vos clients — vitrine, comptoir, réseaux. ») ; page qui tourne et seule → **élargir** (le conseil d'origine) ; plusieurs pages qui tournent → **imprimer** (le support, inchangé).
+
+Gardes : `analytics/lectureHonnete.test.ts` (14 cas sur le module pur), `analytics/statistiquesHonnetes.test.ts` (9 cas qui vérifient que l'interface s'y branche vraiment au lieu de refaire le calcul dans son coin), `dashboard/prochaineEtape.test.ts` et `dashboard/retourAccueil.test.ts`. Chacune vérifiée par injection du défaut d'origine.
+
+Les deux écrans re-mesurés aux deux tailles, dans les deux états : 0 texte < 11 px, 0 cible < 32 px, aucun `NaN`, aucun débordement.

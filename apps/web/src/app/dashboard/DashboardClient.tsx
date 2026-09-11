@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/Button"
 import { Modal } from "@/components/ui/Modal"
 import PostCheckoutBanner from "@/components/PostCheckoutBanner"
 import { erreurLisible } from "@/lib/erreurLisible"
+import { prochaineEtape } from "./prochaineEtape"
 
 type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string }
 type Profile = { full_name: string | null; plan: string; total_scans: number; total_pages: number; avatar_url: string | null }
@@ -287,8 +288,13 @@ export default function DashboardClient({
 
         {/* Assistant : conseil contextuel du parcours "normal" (onboarding fini, pas de quota) */}
         {!guide && !nearViews && !overViews && (() => {
-          const onePage = pages.length === 1
-          const tip = onePage
+          // Le conseil suit la situation du client, pas le nombre d'objets : tant que
+          // la première page publiée ne reçoit presque rien, en faire créer une
+          // deuxième double le travail sans rien lancer (voir prochaineEtape.ts).
+          const etape = prochaineEtape({ pagesPubliees: publishedCount, pages: pages.length, scans: totalScans })
+          const tip = etape === "diffuser"
+            ? { icon: <QrCode size={17} />, text: <>Votre page est en ligne : montrez son QR code à vos clients — vitrine, comptoir, réseaux.</>, label: "Voir mon QR code", href: "/dashboard/qr-codes" }
+            : etape === "elargir"
             ? { icon: <Plus size={17} />, text: <>Créez une 2ᵉ page pour un autre usage (menu, événement, promo).</>, label: "Nouvelle page", href: "/dashboard/templates" }
             : { icon: <Printer size={17} />, text: <><strong style={{ color: "var(--ink)" }}>{totalScans.toLocaleString("fr-FR")}</strong> scan{totalScans > 1 ? "s" : ""} — créez un support imprimable pour multiplier vos scans.</>, label: "Créer un support", href: "/dashboard/qr-codes" }
           return (
