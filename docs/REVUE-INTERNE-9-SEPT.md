@@ -252,3 +252,22 @@ L'accroche dit désormais pourquoi on en parle — « Votre QR tourne — voici 
 **Mesuré après.** À trois scans, l'encart n'est plus là : les deux éléments les plus forts de l'écran sont les deux gestes utiles. À soixante-quatre scans (nouvel état de banc d'essai, `?debut=2`), il revient — poids **0** : présent, lisible, et sous les gestes utiles. De 7 à 0.
 
 Gardes : `dashboard/offreUtile.test.ts` (11 cas sur les deux règles) et `dashboard/offreMesuree.test.ts` (8 cas sur le branchement et le relevé), vérifiées par injection — remettre `plan === "free"` comme seule condition, ou la liste écrite à la main, fait échouer la garde.
+
+
+## Lot v70 — ce que la grille tarifaire promet
+
+Le lot précédent a réparé la façon dont le produit demande de l'argent sur le tableau de bord. Restait la page où on le lui donne. Relevé du 11 septembre, en lisant la grille ligne à ligne contre le code.
+
+**« Génération IA + rapports », vendue pendant que l'éditeur la cache.** La fonction n'existe que si `ANTHROPIC_API_KEY` est définie au moment du build : `next.config.mjs` en dérive `NEXT_PUBLIC_GENERATION_IA`, et l'éditeur le respecte — sans clé, il ne montre pas le panneau. La grille tarifaire, elle, ne consultait jamais ce drapeau. Sans clé configurée, le produit **cachait dans l'éditeur ce qu'il vendait à 19 €/mois** sur la page d'à côté, et le mentionnait encore une troisième fois, barrée, dans la colonne gratuite — ce qui laissait croire qu'elle existait ailleurs.
+
+**« Support prioritaire », sur les deux plans payants.** Zéro occurrence ailleurs dans le dépôt. Rien, nulle part, ne distingue un ticket prioritaire d'un autre : ni file, ni étiquette, ni délai annoncé. Ligne retirée des deux plans.
+
+**Deux listes écrites à la main.** Les promesses vivaient dans `lib/plans.ts` (pour `/upgrade`) et dans `homeSections/Pricing.tsx` (pour l'accueil), sans lien entre elles — et elles avaient déjà divergé : l'accueil ne mentionnait pas la génération IA que `/upgrade` vendait. Deux sources de vérité sur ce qu'on vend, c'est une de trop.
+
+**La règle posée.** Toute promesse cochée porte une **preuve** : un champ de son propre plan (`limits.pages`, `caps.printStudio`…) ou un fichier du produit (`produit:app/[slug]/page.tsx`). `app/promessesTenues.ts` la résout — une capacité à `false` sur ce plan, une clé inventée, une limite à zéro ne prouvent rien — et la garde vérifie qu'aucune ligne n'en est dépourvue et qu'aucune preuve `produit:` ne pointe vers un fichier absent. La prose de l'accueil reste libre (il ne parle pas comme une fiche technique), mais chaque bénéfice qu'il affirme porte la même preuve et passe le même contrôle.
+
+La garde a d'ailleurs attrapé deux de mes propres approximations en la posant : « Branding QRowg visible » n'est pas adossé à une capacité mais à ce que la page publiée affiche, et les lignes *non* incluses devaient elles aussi porter leur identité pour être filtrées comme les autres.
+
+**Vérifié au navigateur, dans les deux sens.** Build sans `ANTHROPIC_API_KEY` : aucune occurrence de « Génération IA » sur `/upgrade`, et aucune de « Support prioritaire ». Build avec la clé : les trois lignes reviennent, à leur place. La grille se comporte enfin comme l'éditeur.
+
+Gardes : `app/promessesTenues.test.ts` (14 cas — une par plan sur les preuves, les fichiers cités, le filtrage de l'IA, le branchement réel de la page et la cohérence de l'accueil), vérifiée par injection : remettre une promesse sans preuve, ou retirer le drapeau du branchement, fait échouer la garde correspondante.

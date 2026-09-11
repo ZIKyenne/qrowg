@@ -13,32 +13,38 @@ const PLAN_LANDING_UI = {
 } as Record<string, { cta: string; href: string; badge: string | null; note: string | null }>
 
 // Bénéfices orientés résultat (Pb 12) — on vend ce que ça apporte, pas une liste de specs.
-// ⚠️ Les `ok` DOIVENT refléter lib/plans.ts (source de vérité) : retrait du branding et
-// domaine personnalisé dès le premier plan payant (PLANS.pro). Ne pas laisser diverger.
-const LANDING_BENEFITS: Record<string, { text: string; ok: boolean }[]> = {
+//
+// Cette liste est écrite à la main, en prose commerciale : c'est voulu, l'accueil
+// ne parle pas comme une fiche technique. Mais elle avait divergé de lib/plans.ts
+// sans que rien ne le signale (relevé du 11 septembre : /upgrade vendait la
+// génération IA, l'accueil n'en parlait pas). Chaque ligne porte donc désormais
+// la même PREUVE que la grille détaillée, et `app/promessesTenues.test.ts`
+// vérifie qu'elle se résout sur le plan concerné. La prose reste libre ; ce
+// qu'elle affirme, non.
+export const LANDING_BENEFITS: Record<string, { text: string; ok: boolean; preuve?: string }[]> = {
   free: [
-    { text: "Votre page en ligne en 5 minutes", ok: true },
-    { text: "3 QR codes, dont 1 modifiable après impression", ok: true },
-    { text: "Vues illimitées — votre QR ne s'arrête jamais", ok: true },
-    { text: "Suivez vos premières visites", ok: true },
+    { text: "Votre page en ligne en 5 minutes", ok: true, preuve: "limits.pages" },
+    { text: "3 QR codes, dont 1 modifiable après impression", ok: true, preuve: "limits.qr" },
+    { text: "Vues illimitées — votre QR ne s'arrête jamais", ok: true, preuve: "limits.views" },
+    { text: "Suivez vos premières visites", ok: true, preuve: "produit:app/dashboard/analytics/AnalyticsClient.tsx" },
     { text: "Sans la mention QRowg", ok: false },
     { text: "Votre nom de domaine", ok: false },
   ],
   pro: [
-    { text: "Changez la destination d'un QR déjà imprimé", ok: true },
-    { text: "Concevez vos supports : stickers, chevalets, affiches", ok: true },
-    { text: "Voyez qui scanne, quand et avec quoi", ok: true },
-    { text: "Votre marque, sans mention QRowg", ok: true },
-    { text: "Votre propre nom de domaine", ok: true },
-    { text: "10 pages · 30 QR dont 20 modifiables", ok: true },
+    { text: "Changez la destination d'un QR déjà imprimé", ok: true, preuve: "limits.dyn" },
+    { text: "Concevez vos supports : stickers, chevalets, affiches", ok: true, preuve: "caps.printStudio" },
+    { text: "Voyez qui scanne, quand et avec quoi", ok: true, preuve: "caps.dynStatsDetaillees" },
+    { text: "Votre marque, sans mention QRowg", ok: true, preuve: "caps.removeBranding" },
+    { text: "Votre propre nom de domaine", ok: true, preuve: "caps.dynDomaineMarque" },
+    { text: "10 pages · 30 QR dont 20 modifiables", ok: true, preuve: "limits.pages" },
   ],
   business: [
-    { text: "Plusieurs établissements, une seule facture", ok: true },
-    { text: "Tout le plan Établissement inclus", ok: true },
-    { text: "Création en masse par import CSV", ok: true },
-    { text: "Travaillez à plusieurs · 5 membres", ok: true },
-    { text: "Marque blanche", ok: true },
-    { text: "Accès API · 10 000 appels / mois", ok: true },
+    { text: "Plusieurs établissements, une seule facture", ok: true, preuve: "limits.pages" },
+    { text: "Tout le plan Établissement inclus", ok: true, preuve: "caps.printStudio" },
+    { text: "Création en masse par import CSV", ok: true, preuve: "caps.dynEnMasse" },
+    { text: "Travaillez à plusieurs · 5 membres", ok: true, preuve: "limits.team" },
+    { text: "Marque blanche", ok: true, preuve: "caps.removeBranding" },
+    { text: "Accès API · 10 000 appels / mois", ok: true, preuve: "caps.apiAppelsMois" },
   ],
 }
 

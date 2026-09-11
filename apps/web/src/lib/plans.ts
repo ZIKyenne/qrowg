@@ -60,6 +60,29 @@ export type GroupePerk = "Pages" | "QR codes" | "Statistiques" | "Image de marqu
 /** Ordre d'affichage des groupes sur la grille tarifaire. */
 export const GROUPES_PERKS: readonly GroupePerk[] = ["Pages", "QR codes", "Statistiques", "Image de marque", "Outils", "Équipe & support"]
 
+/**
+ * Ce qui ADOSSE une promesse tarifaire à quelque chose de réel :
+ *  • `limits.<clé>` / `caps.<clé>` : un champ de CE plan, vérifiable ici même ;
+ *  • `produit:<fichier>` : une surface du produit, vérifiée par la garde
+ *    `app/promessesTenues.test.ts` (le fichier doit exister).
+ *
+ * Une promesse `included: true` DOIT porter une preuve. Relevé du 11 septembre :
+ * « Support prioritaire » figurait sur les deux plans payants sans une seule
+ * occurrence ailleurs dans le produit, et « Génération IA » était vendue sans
+ * consulter le drapeau que l'éditeur, lui, respecte déjà.
+ */
+export type Preuve = `limits.${string}` | `caps.${string}` | `produit:${string}`
+
+export type Perk = {
+  text: string
+  included: boolean
+  /** Requise dès que `included` vaut true. */
+  preuve?: Preuve
+  /** Promise mais pas encore construite : affichée « bientôt », jamais comme acquise. */
+  soon?: boolean
+  groupe: GroupePerk
+}
+
 export interface Plan {
   id: PlanId
   label: string
@@ -72,7 +95,7 @@ export interface Plan {
   caps: PlanCaps
   features: string[] // liste courte (carte plan du dashboard)
   /** Liste détaillée (page /upgrade) ; soon = feature promise mais pas encore construite ; groupe = thème d'affichage (revue du 9 septembre : listes regroupées). */
-  perks: { text: string; included: boolean; soon?: boolean; groupe: GroupePerk }[]
+  perks: Perk[]
 }
 
 export const PLANS: Record<PlanId, Plan> = {
@@ -89,16 +112,16 @@ export const PLANS: Record<PlanId, Plan> = {
             dynStatsDetaillees: false, dynDomaineMarque: false, dynSecuriteLien: false, dynEnMasse: false, apiAppelsMois: null },
     features: ["1 page", "Vues illimitées", "3 QR autonomes, dont 1 modifiable", "Branding QRowg visible", "Statistiques de base"],
     perks: [
-      { text: "1 page publiée", included: true, groupe: "Pages" },
-      { text: "Vues illimitées — un QR imprimé ne s'arrête jamais", included: true, groupe: "Pages" },
-      { text: "3 QR autonomes", included: true, groupe: "QR codes" },
-      { text: "1 QR modifiable après impression", included: true, groupe: "QR codes" },
-      { text: "Hébergement inclus", included: true, groupe: "Pages" },
-      { text: "Statistiques de base", included: true, groupe: "Statistiques" },
-      { text: "Branding QRowg visible", included: true, groupe: "Image de marque" },
-      { text: "Atelier d'impression", included: false, groupe: "Outils" },
-      { text: "Domaine personnalisé", included: false, groupe: "Image de marque" },
-      { text: "Génération IA", included: false, groupe: "Outils" },
+      { text: "1 page publiée", included: true, preuve: "limits.pages", groupe: "Pages" },
+      { text: "Vues illimitées — un QR imprimé ne s'arrête jamais", included: true, preuve: "limits.views", groupe: "Pages" },
+      { text: "3 QR autonomes", included: true, preuve: "limits.qr", groupe: "QR codes" },
+      { text: "1 QR modifiable après impression", included: true, preuve: "limits.dyn", groupe: "QR codes" },
+      { text: "Hébergement inclus", included: true, preuve: "produit:app/[slug]/page.tsx", groupe: "Pages" },
+      { text: "Statistiques de base", included: true, preuve: "produit:app/dashboard/analytics/AnalyticsClient.tsx", groupe: "Statistiques" },
+      { text: "Branding QRowg visible", included: true, preuve: "produit:app/[slug]/PublicPageClient.tsx", groupe: "Image de marque" },
+      { text: "Atelier d'impression", included: false, preuve: "caps.printStudio", groupe: "Outils" },
+      { text: "Domaine personnalisé", included: false, preuve: "caps.dynDomaineMarque", groupe: "Image de marque" },
+      { text: "Génération IA", included: false, preuve: "caps.ai", groupe: "Outils" },
     ],
   },
   pro: {
@@ -114,22 +137,21 @@ export const PLANS: Record<PlanId, Plan> = {
             dynStatsDetaillees: true, dynDomaineMarque: true, dynSecuriteLien: true, dynEnMasse: false, apiAppelsMois: 1000 },
     features: ["10 pages", "Vues illimitées", "30 QR, dont 20 modifiables après impression", "Sans branding", "Atelier d'impression complet", "Domaine personnalisé", "Statistiques détaillées"],
     perks: [
-      { text: "10 pages — de quoi couvrir un commerce entier", included: true, groupe: "Pages" },
-      { text: "Vues illimitées", included: true, groupe: "Pages" },
-      { text: "30 QR autonomes, dont 20 modifiables après impression", included: true, groupe: "QR codes" },
-      { text: "Changer la destination sans réimprimer", included: true, groupe: "QR codes" },
-      { text: "Statistiques détaillées : jour, appareil, pays", included: true, groupe: "Statistiques" },
-      { text: "Mot de passe et expiration sur un lien", included: true, groupe: "QR codes" },
-      { text: "Branding QRowg retiré", included: true, groupe: "Image de marque" },
-      { text: "Domaine personnalisé", included: true, groupe: "Image de marque" },
-      { text: "QR Studio complet", included: true, groupe: "Outils" },
-      { text: "Atelier d'impression complet", included: true, groupe: "Outils" },
-      { text: "Tous les modèles", included: true, groupe: "Pages" },
-      { text: "Génération IA + rapports", included: true, groupe: "Outils" },
-      { text: "Export PNG / JPG / PDF HD / SVG", included: true, groupe: "Outils" },
-      { text: "Accès API · 1 000 appels / mois", included: true, groupe: "Outils" }, // = caps.apiAppelsMois (testé)
-      { text: "Support prioritaire", included: true, groupe: "Équipe & support" },
-    ],
+      { text: "10 pages — de quoi couvrir un commerce entier", included: true, preuve: "limits.pages", groupe: "Pages" },
+      { text: "Vues illimitées", included: true, preuve: "limits.views", groupe: "Pages" },
+      { text: "30 QR autonomes, dont 20 modifiables après impression", included: true, preuve: "limits.qr", groupe: "QR codes" },
+      { text: "Changer la destination sans réimprimer", included: true, preuve: "produit:app/dashboard/qr-link/page.tsx", groupe: "QR codes" },
+      { text: "Statistiques détaillées : jour, appareil, pays", included: true, preuve: "caps.dynStatsDetaillees", groupe: "Statistiques" },
+      { text: "Mot de passe et expiration sur un lien", included: true, preuve: "caps.dynSecuriteLien", groupe: "QR codes" },
+      { text: "Branding QRowg retiré", included: true, preuve: "caps.removeBranding", groupe: "Image de marque" },
+      { text: "Domaine personnalisé", included: true, preuve: "caps.dynDomaineMarque", groupe: "Image de marque" },
+      { text: "QR Studio complet", included: true, preuve: "caps.qrStudioAdvanced", groupe: "Outils" },
+      { text: "Atelier d'impression complet", included: true, preuve: "caps.printStudio", groupe: "Outils" },
+      { text: "Tous les modèles", included: true, preuve: "produit:app/dashboard/templates/page.tsx", groupe: "Pages" },
+      { text: "Génération IA + rapports", included: true, preuve: "caps.ai", groupe: "Outils" },
+      { text: "Export PNG / JPG / PDF HD / SVG", included: true, preuve: "caps.exportFormats", groupe: "Outils" },
+      { text: "Accès API · 1 000 appels / mois", included: true, preuve: "caps.apiAppelsMois", groupe: "Outils" }, // = caps.apiAppelsMois (testé)
+      ],
   },
   business: {
     id: "business",
@@ -144,18 +166,17 @@ export const PLANS: Record<PlanId, Plan> = {
             dynStatsDetaillees: true, dynDomaineMarque: true, dynSecuriteLien: true, dynEnMasse: true, apiAppelsMois: 10000 },
     features: ["Jusqu'à 5 établissements", "Pages et QR illimités", "Import CSV en masse", "Équipe · 5 membres", "Marque blanche", "API"],
     perks: [
-      { text: "Pages illimitées", included: true, groupe: "Pages" },
-      { text: "QR autonomes et modifiables illimités", included: true, groupe: "QR codes" },
-      { text: "Création en masse par import CSV", included: true, groupe: "QR codes" },
-      { text: "5 membres d'équipe", included: true, groupe: "Équipe & support" },
-      { text: "Marque blanche", included: true, groupe: "Image de marque" },
-      { text: "Domaine personnalisé", included: true, groupe: "Image de marque" },
-      { text: "Statistiques détaillées + export", included: true, groupe: "Statistiques" },
-      { text: "QR Studio et atelier d'impression complets", included: true, groupe: "Outils" },
-      { text: "Génération IA illimitée + rapports", included: true, groupe: "Outils" },
-      { text: "Accès API · 10 000 appels / mois", included: true, groupe: "Outils" }, // = caps.apiAppelsMois (testé)
-      { text: "Support prioritaire", included: true, groupe: "Équipe & support" },
-    ],
+      { text: "Pages illimitées", included: true, preuve: "limits.pages", groupe: "Pages" },
+      { text: "QR autonomes et modifiables illimités", included: true, preuve: "limits.qr", groupe: "QR codes" },
+      { text: "Création en masse par import CSV", included: true, preuve: "caps.dynEnMasse", groupe: "QR codes" },
+      { text: "5 membres d'équipe", included: true, preuve: "limits.team", groupe: "Équipe & support" },
+      { text: "Marque blanche", included: true, preuve: "caps.removeBranding", groupe: "Image de marque" },
+      { text: "Domaine personnalisé", included: true, preuve: "caps.dynDomaineMarque", groupe: "Image de marque" },
+      { text: "Statistiques détaillées + export", included: true, preuve: "caps.dynStatsDetaillees", groupe: "Statistiques" },
+      { text: "QR Studio et atelier d'impression complets", included: true, preuve: "caps.printStudio", groupe: "Outils" },
+      { text: "Génération IA illimitée + rapports", included: true, preuve: "caps.ai", groupe: "Outils" },
+      { text: "Accès API · 10 000 appels / mois", included: true, preuve: "caps.apiAppelsMois", groupe: "Outils" }, // = caps.apiAppelsMois (testé)
+      ],
   },
 }
 

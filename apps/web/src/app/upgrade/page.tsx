@@ -7,6 +7,8 @@ import Link from "next/link"
 import { PLAN_LIST, PLAN_COMPARISON, PLANS as PLANS_DEF, fmtPrice, GROUPES_PERKS } from "@/lib/plans"
 import QrowgLogo from "@/components/QrowgLogo"
 import { creerUrl } from "../creer/entry"
+import { perksAffichables } from "../promessesTenues"
+import { GENERATION_IA_ACTIVE } from "@/lib/generationIa"
 import { useAccent } from "@/lib/useAccent"
 import SubscribeButton from "@/components/SubscribeButton"
 import CheckoutErrorBanner from "@/components/CheckoutErrorBanner"
@@ -27,7 +29,10 @@ const PLANS = PLAN_LIST.map(p => ({
   color: p.color,
   description: p.description,
   badge: p.badge,
-  perks: p.perks,
+  // La génération IA n'existe que si la clé serveur est configurée : sans elle,
+  // l'éditeur masque la fonction. La grille ne la vend donc plus non plus
+  // (relevé du 11 septembre — voir app/promessesTenues.ts).
+  perks: perksAffichables(p.id, { iaActive: GENERATION_IA_ACTIVE }),
   ...PLAN_UI[p.id],
 }))
 
