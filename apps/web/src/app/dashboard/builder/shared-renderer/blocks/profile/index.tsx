@@ -42,7 +42,7 @@ function Vue({ u, c, accent, Texte }: { u: UnifiedCtx; c: Record<string, any>; a
         <div style={{ display: "flex", flexWrap: "wrap", gap: sz(u, 6), justifyContent: "center" }}>
           {p.badges.map((b, i) => {
             const bs = profileBadgeStyle(b, u.G)
-            return <span key={i} style={{ background: bs.bg, border: `1px solid ${bs.border}`, borderRadius: 20, padding: `${sz(u, 4)}px ${sz(u, 14)}px`, fontSize: sz(u, 12), color: bs.color, fontWeight: 600, fontFamily: u.FONT_B }}>{bs.icon ? bs.icon + " " : ""}{b}</span>
+            return <span key={i} style={{ background: bs.bg, border: `1px solid ${u.lisible(bs.border, 3)}`, borderRadius: 20, padding: `${sz(u, 4)}px ${sz(u, 14)}px`, fontSize: sz(u, 12), color: u.lisible(bs.color), fontWeight: 600, fontFamily: u.FONT_B }}>{bs.icon ? bs.icon + " " : ""}{b}</span>
           })}
         </div>
       )}

@@ -20,8 +20,10 @@ export function compareRows(c: Record<string, any>): Row[] {
 
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const rows = compareRows(c)
-  const good = safeColor(c.left_color, "#39FF8F")
-  const bad = safeColor(c.right_color, "#FF6B6B")
+  // Marqueurs ✓ / ✕ : des couleurs de SENS, écrites pour le fond noir du produit.
+  // Sur un thème clair elles tombaient à 1,1 : 1 (relevé du 11 septembre).
+  const good = u.lisible(safeColor(c.left_color, "#39FF8F"))
+  const bad = u.lisible(safeColor(c.right_color, "#FF6B6B"))
   const marks = String(c.marks || "Oui") === "Oui"
   const cell = (txt: string, color: string, mark: string) => (
     <div style={{ flex: 1, minWidth: 0, display: "flex", gap: Math.round(6 * u.scale), alignItems: "flex-start", padding: `${Math.round(9 * u.scale)}px ${Math.round(10 * u.scale)}px` }}>

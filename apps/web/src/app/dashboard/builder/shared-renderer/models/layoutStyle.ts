@@ -1,3 +1,4 @@
+import { encreSur, ENCRE_CLAIRE } from "../../couleurLisible"
 // layoutStyle.ts — Modèle PUR des réglages de mise en page partagés par les blocs « libres »
 // (vague Layout). Traduit des libellés utilisateur (français, tels qu'ils apparaissent dans
 // BLOCK_DEFS) en valeurs CSS sûres. Aucune dépendance React/Supabase : testable seul.
@@ -200,7 +201,13 @@ export function surfaceTokens(light: boolean): { FILL: string; LINE: string; LIN
 
 // Couleur de texte lisible SUR une couleur donnée (bouton, ruban, panneau).
 // Sans cela, un accent clair (jaune pâle, rose poudré) donne un bouton blanc sur blanc.
+//
+// Le seuil était une estimation : luminance > 0,45 → encre sombre, sinon blanc.
+// Il se trompait sur toute la bande intermédiaire. Relevé du 11 septembre sur la
+// terracotta du modèle Pizzeria (#E2603F, luminance 0,23) : l'estimation choisissait
+// le blanc, qui donne 3,5 : 1 — sous le seuil lisible — quand l'encre sombre donne
+// 6,0. Même chose sur « Réserver une table » (2,4) et « Séance d'essai » (3,7).
+// On ne devine plus : on calcule les deux rapports et on garde le meilleur.
 export function textOn(color: unknown): string {
-  const l = hexLuminance(color)
-  return l !== null && l > 0.45 ? "#0A0A0A" : "#FFFFFF"
+  return typeof color === "string" ? encreSur(color) : ENCRE_CLAIRE
 }

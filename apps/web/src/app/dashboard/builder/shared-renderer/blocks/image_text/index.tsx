@@ -16,7 +16,7 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   const w = WIDTHS[String(c.image_width || "Moyenne")] || "44%"
   const align = alignOf(c.align, "left")
   const color = textOnSurface(c, u.TEXT)
-  const muted = color === "#FFFFFF" ? "rgba(255,255,255,0.78)" : u.MUTED
+  const muted = color === "#FFFFFF" ? "rgba(255,255,255,0.9)" : u.MUTED
   const href = extHref(String(c.cta_url || ""))
 
   return (

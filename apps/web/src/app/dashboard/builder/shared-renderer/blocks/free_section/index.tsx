@@ -11,7 +11,7 @@ import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type Pu
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const align = alignOf(c.align)
   const color = textOnSurface(c, u.TEXT)
-  const muted = color === "#FFFFFF" ? "rgba(255,255,255,0.78)" : u.MUTED
+  const muted = color === "#FFFFFF" ? "rgba(255,255,255,0.9)" : u.MUTED
   const minH = clampInt(c.min_height, 0, 600, 0)
   const ctas: { label: string; href: string; primary: boolean }[] = []
   if (c.cta_label) ctas.push({ label: String(c.cta_label), href: extHref(String(c.cta_url || "")), primary: true })

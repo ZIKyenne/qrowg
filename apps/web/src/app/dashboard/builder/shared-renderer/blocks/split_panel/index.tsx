@@ -19,7 +19,7 @@ function panelOf(c: Record<string, any>, p: "l" | "r", fallback: string): Panel 
 
 function Side({ p, u }: { p: Panel; u: UnifiedCtx }) {
   const fg = textOn(p.bg)
-  const soft = fg === "#FFFFFF" ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.7)"
+  const soft = fg === "#FFFFFF" ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.85)"
   const chip = fg === "#FFFFFF" ? "rgba(255,255,255,0.16)" : "rgba(0,0,0,0.1)"
   const chipBorder = fg === "#FFFFFF" ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.18)"
   return (

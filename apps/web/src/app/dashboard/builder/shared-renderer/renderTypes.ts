@@ -3,6 +3,7 @@
 // dans le rendu public.
 
 import type { CSSProperties, ReactNode } from "react"
+import { surFond, CONTRASTE_MIN, MARGE_VOILE } from "../couleurLisible"
 import type { PageTheme } from "../types"
 import { isLightTheme, surfaceTokens } from "./models/layoutStyle"
 
@@ -66,6 +67,36 @@ export type UnifiedCtx = {
   LINE_STRONG: string // pointillés, séparateurs marqués
   /** Vrai seulement en public, sur le bloc qui porte le <h1> de la page. */
   titrePrincipal: boolean
+  /**
+   * Rend lisible une couleur de SENS sur le fond de la page du client.
+   *
+   * Les statuts (« Ouvert », « Fermé », « En stock ») et les pastilles de
+   * mots-clés (« bio », « certifié ») portent des couleurs écrites en dur dans
+   * le produit, choisies pour son fond noir. Sorties telles quelles sur un thème
+   * clair, elles descendaient à 1,1 : 1 — illisibles (relevé du 11 septembre).
+   * `lisible` conserve la teinte et déplace la clarté jusqu'au seuil demandé ;
+   * une couleur déjà lisible est rendue inchangée.
+   */
+  lisible: (couleur: string, min?: number) => string
+}
+
+/**
+ * Une couleur peut être posée sur le fond de la page OU sur une carte : les deux
+ * existent sur le même écran, et un badge tinté ajoute encore son propre voile.
+ * On exige donc le seuil sur les DEUX, en corrigeant d'abord sur l'un puis sur
+ * l'autre — sinon on obtient un badge lisible sur le fond et limite sur la carte,
+ * ce qu'on mesurait encore à 4,2 : 1 après un premier essai.
+ */
+function fabriqueLisible(theme: PageTheme | undefined) {
+  const bg = (theme as any)?.bg || "#080808"
+  const surface = (theme as any)?.surface || bg
+  // Marge : un badge pose souvent sa propre teinte (`${couleur}18`) entre le texte
+  // et la carte. Viser le seuil exact laissait la mesure réelle à 4,48 pour un
+  // minimum de 4,5. On vise donc un cran au-dessus, et le voile est absorbé.
+  return (couleur: string, min: number = CONTRASTE_MIN) => {
+    const vise = min + MARGE_VOILE
+    return surFond(surFond(couleur, bg, vise), surface, vise)
+  }
 }
 
 export function editorCtx(ctx: EditorRenderCtx): UnifiedCtx {
@@ -81,6 +112,7 @@ export function editorCtx(ctx: EditorRenderCtx): UnifiedCtx {
     scale: 0.86,
     trackClick: () => {},
     titrePrincipal: false,
+    lisible: fabriqueLisible(ctx.theme),
     ...themeSurfaces(ctx.theme),
   }
 }
@@ -104,6 +136,7 @@ export function publicCtx(ctx: PublicRenderCtx): UnifiedCtx {
     scale: 1,
     trackClick: ctx.trackClick,
     titrePrincipal: ctx.titrePrincipal === true,
+    lisible: fabriqueLisible(ctx.theme),
     ...themeSurfaces(ctx.theme),
   }
 }

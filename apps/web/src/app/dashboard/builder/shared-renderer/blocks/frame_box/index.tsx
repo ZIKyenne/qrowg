@@ -18,7 +18,7 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   const align = alignOf(c.align)
   const color = safeColor(c.frame_color, u.G)
   const text = textOnSurface(c, u.TEXT)
-  const muted = text === "#FFFFFF" ? "rgba(255,255,255,0.78)" : u.MUTED
+  const muted = text === "#FFFFFF" ? "rgba(255,255,255,0.9)" : u.MUTED
   return (
     <LayoutSurface content={c} u={u} defaultPad="none" defaultRadius={0}>
       <div style={{ ...frameStyle(String(c.frame_style || "Or"), color, u), borderRadius: Math.round(14 * u.scale), padding: `${Math.round(20 * u.scale)}px ${Math.round(18 * u.scale)}px`, textAlign: align }}>

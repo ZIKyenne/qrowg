@@ -28,8 +28,8 @@ function Badge({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   }, [c.mon_fri, c.saturday, c.sunday, c.mon, c.tue, c.wed, c.thu, c.fri, c.sat, c.sun, c.mode])
   if (!st) return null
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: sz(u, 6), background: `${st.color}18`, border: `1px solid ${st.color}55`, color: st.color, borderRadius: 20, padding: `${sz(u, 4)}px ${sz(u, 12)}px`, fontSize: sz(u, 12), fontWeight: 700, fontFamily: u.FONT_B }}>
-      <span style={{ width: sz(u, 7), height: sz(u, 7), borderRadius: "50%", background: st.color, boxShadow: `0 0 6px ${st.color}` }} />{st.label}
+    <span style={{ display: "inline-flex", alignItems: "center", gap: sz(u, 6), background: `${st.color}18`, border: `1px solid ${u.lisible(st.color, 3)}55`, color: u.lisible(st.color), borderRadius: 20, padding: `${sz(u, 4)}px ${sz(u, 12)}px`, fontSize: sz(u, 12), fontWeight: 700, fontFamily: u.FONT_B }}>
+      <span style={{ width: sz(u, 7), height: sz(u, 7), borderRadius: "50%", background: u.lisible(st.color, 3), boxShadow: `0 0 6px ${st.color}` }} />{st.label}
     </span>
   )
 }

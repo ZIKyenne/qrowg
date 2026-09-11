@@ -20,7 +20,8 @@ export function checklistLines(c: Record<string, any>): Line[] {
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const lines = checklistLines(c)
   const align = alignOf(c.align, "left")
-  const okColor = safeColor(c.check_color, "#39FF8F")
+  // Même règle que compare_two : la coche garde sa teinte et devient lisible.
+  const okColor = u.lisible(safeColor(c.check_color, "#39FF8F"))
   const boxed = String(c.line_style || "Simple") === "Encadré"
   return (
     <LayoutSurface content={c} u={u} defaultPad="compact">

@@ -237,6 +237,14 @@ export default function PublicPageClient({ page, blocks, showBranding = true, in
         @media (max-width: 640px) {
           .qf-public input, .qf-public textarea, .qf-public select { font-size: 16px !important; }
         }
+        /* Un lien dont personne n'a fixé la couleur prend celle du navigateur :
+           #0000EE, hérité de Mosaic. Sur un thème sombre, c'est 2:1 de contraste —
+           illisible — et sur tous les autres, c'est la seule couleur de la page que
+           le client n'a pas choisie. Le lien hérite donc de son parent par défaut ;
+           les blocs qui veulent une couleur la posent, et gagnent (spécificité).
+           Relevé du 11 septembre : liens de streaming, liens favoris et réseaux
+           sociaux sortaient en bleu de navigateur sur les 34 pages de démonstration. */
+        .qf-public a { color: inherit; }
         a:active { opacity: 0.75; }
         a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, [role="slider"]:focus-visible { outline: 2px solid ${theme.primary}; outline-offset: 2px; border-radius: 4px; }
         @media (max-width: 640px) {

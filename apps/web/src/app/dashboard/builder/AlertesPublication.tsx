@@ -6,8 +6,10 @@ import { AlertTriangle } from "lucide-react"
 import { BLOCK_DEFS } from "./blockDefs"
 import { boutonsSansLien } from "./boutonSansLien"
 import { hasPublishableContent, EMPTY_STATE_BLOCK_TYPES } from "./blockEmptyState"
+import { problemesDeTheme, phraseProbleme } from "./themeLisible"
 import type { Block } from "./types"
 
+/** `blocId` vide : l'alerte porte sur la PAGE (son thème), pas sur un bloc. */
 export type AlertePublication = { blocId: string; bloc: string; texte: string }
 
 /**
@@ -31,18 +33,34 @@ export function alertesPublication(blocks: Block[]): AlertePublication[] {
   return out
 }
 
-export function AlertesPublication({ blocks, onVoir }: { blocks: Block[]; onVoir: (blocId: string) => void }) {
-  const alertes = alertesPublication(blocks)
+/**
+ * Ce que le produit ne corrige pas à la place du client : les couleurs de SON
+ * thème qui ne se lisent pas. QRowg adapte désormais les couleurs qu'il impose
+ * (statuts, pastilles, encre des boutons — lot v68) ; celles que le client a
+ * choisies, il les signale. Relevé du 11 septembre : « 80 € » à 2,9 : 1 sur le
+ * modèle Institut, illisible dehors sur un téléphone.
+ */
+export function alertesTheme(theme: Record<string, any> | null | undefined): AlertePublication[] {
+  return problemesDeTheme(theme).map(p => ({ blocId: "", bloc: "Thème de la page", texte: phraseProbleme(p) }))
+}
+
+export function AlertesPublication({ blocks, theme, onVoir, onVoirTheme }: {
+  blocks: Block[]
+  theme?: Record<string, any> | null
+  onVoir: (blocId: string) => void
+  onVoirTheme?: () => void
+}) {
+  const alertes = [...alertesTheme(theme), ...alertesPublication(blocks)]
   if (alertes.length === 0) return null
   return (
     <div role="status" style={{ marginBottom: 10, padding: "9px 12px", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 9 }}>
       <p style={{ display: "flex", alignItems: "center", gap: 6, color: "#F59E0B", fontSize: 12, fontWeight: 700, margin: "0 0 6px" }}>
-        <AlertTriangle size={13} aria-hidden="true" /> {alertes.length === 1 ? "1 élément ne sera pas publié" : `${alertes.length} éléments ne seront pas publiés`}
+        <AlertTriangle size={13} aria-hidden="true" /> {alertes.length === 1 ? "1 point à vérifier avant de publier" : `${alertes.length} points à vérifier avant de publier`}
       </p>
       <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 4 }}>
         {alertes.map((a, i) => (
           <li key={a.blocId + i}>
-            <button type="button" onClick={() => onVoir(a.blocId)} title="Ouvrir ce bloc"
+            <button type="button" onClick={() => (a.blocId ? onVoir(a.blocId) : onVoirTheme?.())} title={a.blocId ? "Ouvrir ce bloc" : "Ouvrir le thème de la page"}
               style={{ width: "100%", textAlign: "left", background: "none", border: "none", padding: "2px 0", color: "var(--ink)", fontSize: 12, cursor: "pointer", fontFamily: "inherit", display: "flex", gap: 6 }}>
               <span style={{ color: "var(--muted)", flexShrink: 0 }}>{a.bloc} ·</span><span style={{ textDecoration: "underline", textUnderlineOffset: 2 }}>{a.texte}</span>
             </button>
