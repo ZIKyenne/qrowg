@@ -66,7 +66,10 @@ describe("un seul vocabulaire d'appel à l'action", () => {
   it("chaque section n'en porte qu'un, et il dit Composer ma page · Choisir un modèle · Créer mon QR code", () => {
     expect(tout).not.toContain("Voir mes analytics")
     expect(tout).not.toContain("Voir la démo")
-    expect(home).toContain("Tester le générateur de QR")
+    // Le second bouton du héros a cessé d'être un outil annexe : depuis que
+    // /examples ouvre 34 pages réelles, il mène à la preuve (lot v65).
+    expect(home).toContain("Voir une page en vrai")
+    expect(home).toContain('<Link href="/examples" style={{')
     const uc = lire("homeSections/UseCases.tsx")
     expect(uc.match(/cta: "[^"]+"/g)!.every(l => l.startsWith('cta: "Composer ma page '))).toBe(true)
     expect(uc).toContain('uc.cta.replace(/^Composer ma page /i, "")')

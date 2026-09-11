@@ -58,7 +58,7 @@ export default function PublishedScreen({
         <div style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--field)", border: `1px solid ${G}33`, borderRadius: 11, padding: "10px 12px", marginBottom: 20 }}>
           <span style={{ flex: 1, minWidth: 0, color: G, fontSize: 12.5, fontFamily: "JetBrains Mono, monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{adresseLisible(pageUrl)}</span>
           <button type="button" onClick={copier} aria-label="Copier l'adresse"
-            style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 5, background: `${G}1A`, border: `1px solid ${G}40`, borderRadius: 8, padding: "5px 9px", color: G, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+            style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 5, background: `${G}1A`, border: `1px solid ${G}40`, borderRadius: 8, minHeight: 32, padding: "0 10px", color: G, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>
             {copie ? <Check size={12} /> : <Copy size={12} />} {copie ? "Copié" : "Copier"}
           </button>
         </div>
@@ -89,7 +89,7 @@ export default function PublishedScreen({
                 style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.035)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 12px", textDecoration: "none" }}>
                 <span style={{ minWidth: 0, flex: 1 }}>
                   <span style={{ display: "block", color: INK, fontSize: 12.5, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.label}</span>
-                  <span style={{ display: "block", color: MUT, fontSize: 10.5, lineHeight: 1.35 }}>{s.why}</span>
+                  <span style={{ display: "block", color: MUT, fontSize: 11.5, lineHeight: 1.35 }}>{s.why}</span>
                 </span>
                 <span aria-hidden style={{ color: MUT, fontSize: 14 }}>›</span>
               </a>

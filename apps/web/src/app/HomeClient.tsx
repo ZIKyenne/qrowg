@@ -359,7 +359,12 @@ export default function HomeClient() {
                 }}>
                 Composer ma page — sans compte <span aria-hidden="true">→</span>
               </Link>
-              <Link href="#qr-studio" style={{
+              {/* Second bouton : la preuve, pas un outil annexe.
+                  Il menait au générateur de QR — qui a sa propre section plus bas.
+                  Depuis le 10 septembre, /examples ouvre 34 pages réelles rendues par
+                  le moteur public : c'est ce qu'un visiteur veut voir avant de se
+                  lancer, et ça répond à la question que le héros pose. */}
+              <Link href="/examples" style={{
                 background: "transparent",
                 border: "1px solid rgba(201,168,76,0.2)",
                 color: "rgba(245,240,232,0.7)", textDecoration: "none", fontSize: 15,
@@ -379,7 +384,7 @@ export default function HomeClient() {
                   el.style.color = "rgba(245,240,232,0.7)"
                   el.style.background = "transparent"
                 }}>
-                Tester le générateur de QR
+                Voir une page en vrai
               </Link>
             </div>
 

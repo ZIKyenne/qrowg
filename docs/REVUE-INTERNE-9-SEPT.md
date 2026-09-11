@@ -149,3 +149,12 @@ Même règle que pour les avis : les adresses arrivent vides, l'assistant de mod
 **Ce qui referme la boucle** : l'encadré près de « Publier » ne listait que les boutons sans lien. Il liste maintenant aussi les blocs encore vides. Sur le modèle Bistrot appliqué tel quel, il annonce « 3 éléments ne seront pas publiés » — le bouton de réservation sans lien, le bloc d'avis, la carte — chaque ligne cliquable menant au bloc concerné. L'utilisateur sait ce qui manque avant de publier, au lieu de le découvrir en ligne.
 
 Vérifié dans le navigateur sur le parcours complet, et sur les 34 pages de démonstration : aucune régression, aucun bloc fantôme.
+
+
+## Lot v65 — la fin du parcours, et la promesse du début
+
+**Après « Publier ».** L'écran de première mise en ligne n'avait jamais été regardé isolément, faute de pouvoir l'ouvrir sans compte ni page publiée. Il a désormais son banc d'essai (`/e2e-harness/publication`, avec `?metier=` et `?tel=1`), et il tient : il marque le moment, donne l'adresse copiable, puis dit d'abord de **tester le QR avec son téléphone** — avant de proposer d'imprimer quoi que ce soit —, ensuite propose les supports, enfin dit où poser, avec un conseil par métier (« sur les tables et à côté de la caisse »). L'ordre est le bon : imprimer deux cents flyers avec un QR jamais scanné est l'erreur qui coûte cher. Deux finitions seulement : les descriptions de supports passent de 10,5 à 11,5 px et le bouton « Copier » à 32 px.
+
+**Le héros.** Son second bouton menait au générateur de QR — un outil annexe, qui a sa propre section plus bas. Il mène maintenant à `/examples` : « Voir une page en vrai ». Depuis le lot v62, cette page ouvre 34 pages réelles rendues par le moteur public ; c'est la réponse à la question que pose le héros, et c'est ce qu'un visiteur veut voir avant de se lancer. La promesse et la preuve sont enfin reliées.
+
+Accueil re-mesuré après le changement : 0 texte < 11 px, 0 cible < 32 px, aux deux tailles.

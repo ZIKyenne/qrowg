@@ -159,3 +159,25 @@ describe("avant de publier, on sait ce qui manque", () => {
     expect(alertes.length).toBeGreaterThanOrEqual(3)
   })
 })
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 11 septembre, suite du parcours : ce que l'on voit juste après « Publier ».
+
+describe("l'écran de première mise en ligne", () => {
+  const p = lire("dashboard/builder/PublishedScreen.tsx")
+  it("dit d'abord de tester le QR, avant de proposer d'imprimer", () => {
+    const f = lire("dashboard/builder/firstPublish.ts")
+    expect(f).toContain("export function conseilPose")
+    expect(p.indexOf("1 · Tester")).toBeLessThan(p.indexOf("2 · Imprimer"))
+    expect(p.indexOf("2 · Imprimer")).toBeLessThan(p.indexOf("3 · Poser"))
+  })
+  it("respecte les deux règles de la maison", () => {
+    expect(p).not.toMatch(/fontSize: (7|8|9|10)(\.\d+)?\b/)
+    expect(p).toContain('borderRadius: 8, minHeight: 32, padding: "0 10px"')
+  })
+  it("a son banc d'essai, donc il se mesure", () => {
+    const h = lire("e2e-harness/publication/PublicationHarness.tsx")
+    expect(h).toContain("PublishedScreen")
+    expect(lire("e2e-harness/publication/page.tsx")).toContain("if (!harnessAutorise()) notFound()")
+  })
+})
