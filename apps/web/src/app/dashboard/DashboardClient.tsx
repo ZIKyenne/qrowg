@@ -16,6 +16,7 @@ import { Modal } from "@/components/ui/Modal"
 import PostCheckoutBanner from "@/components/PostCheckoutBanner"
 import { erreurLisible } from "@/lib/erreurLisible"
 import { prochaineEtape } from "./prochaineEtape"
+import { raisonDeProposer, accrocheOffre, avantagesEnPlus } from "./offreUtile"
 
 type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string }
 type Profile = { full_name: string | null; plan: string; total_scans: number; total_pages: number; avatar_url: string | null }
@@ -472,18 +473,30 @@ export default function DashboardClient({
 
           {/* Actions rapides */}
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {profile?.plan === "free" && (
-              <div style={{ background: CARD, border: "1px solid color-mix(in srgb, var(--accent) 22%, var(--surface-2))", borderRadius: 14, padding: "16px 18px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                  <Zap size={16} color={G} />
-                  <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 700, margin: 0 }}>Passez à {getPlan("pro").label} — {fmtPrice(getPlan("pro").priceMonthly)}€/mois</p>
+            {(() => {
+              // L'offre attend d'avoir une raison, et ne promet que les écarts
+              // réels entre les deux plans (voir offreUtile.ts). Mesuré le
+              // 11 septembre : sur un compte de trois scans, « Voir les offres »
+              // pesait plus que les deux gestes utiles réunis, et annonçait
+              // « vues illimitées » — que le plan gratuit a déjà.
+              const raison = raisonDeProposer({ plan: profile?.plan ?? "free", pages: pages.length, scans: totalScans })
+              if (!raison) return null
+              const plus = avantagesEnPlus("free", "pro").slice(0, 4)
+              return (
+                <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "16px 18px" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 8 }}>
+                    <Zap size={16} color={G} style={{ flexShrink: 0, marginTop: 1 }} />
+                    <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 700, margin: 0, lineHeight: 1.4 }}>{accrocheOffre(raison)}</p>
+                  </div>
+                  <p style={{ color: MUTED, fontSize: 12, margin: "0 0 12px", lineHeight: 1.5 }}>
+                    {getPlan("pro").label}, {fmtPrice(getPlan("pro").priceMonthly)}€/mois — {plus.join(", ")}
+                  </p>
+                  <Link href="/upgrade" className="da-btn-neutral da-btn-neutral--sm" style={{ width: "100%", justifyContent: "center" }}>
+                    <span>Voir les offres</span> <ArrowRight className="da-ic da-ic-arrow" size={13} />
+                  </Link>
                 </div>
-                <p style={{ color: MUTED, fontSize: 12, margin: "0 0 12px", lineHeight: 1.5 }}>{getPlan("pro").limits.pages} pages, vues illimitées, QR personnalisés, sans branding</p>
-                <Link href="/upgrade" className="da-btn-primary da-btn-primary--sm" style={{ width: "100%", justifyContent: "center" }}>
-                  <span>Voir les offres</span> <ArrowRight className="da-ic da-ic-arrow" size={13} />
-                </Link>
-              </div>
-            )}
+              )
+            })()}
 
             {/* Raccourcis : uniquement les destinations PAS deja dans la nav / le sheet Creer
                 (Templates, Analytics, QR y sont deja -> on ne les duplique plus ici). */}

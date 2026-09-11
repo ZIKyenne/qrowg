@@ -223,3 +223,32 @@ Deux règles de maison tenaient : la taille du texte et la taille des cibles. Il
 Gardes : `builder/couleurLisible.test.ts` (14 cas sur le calcul et la correction), `builder/themeLisible.test.ts` (5), `app/contrastePagePubliee.test.tsx` (12, dont deux qui rendent l'encadré et vérifient qu'il apparaît — et qu'il disparaît quand le thème tient).
 
 Reste mesuré, et assumé : quelques textes posés sur une photo de bandeau (le calcul ne voit pas l'image) et des titres en dégradé découpé (`-webkit-text-fill-color: transparent`), que la mesure ne sait pas lire ; et les couleurs de thème du client, désormais signalées plutôt que corrigées. Les deux règles précédentes n'ont pas bougé : 0 texte < 11 px, 0 cible < 32 px sur les bancs d'essai.
+
+
+## Lot v69 — quand le produit demande de l'argent
+
+Nouvelle mesure, celle du **poids visuel** : pour chaque bloc d'action d'un écran, sa surface multipliée par l'écart de clarté entre son fond et celui de la page. C'est une approximation de ce qui saute aux yeux en premier. Appliquée à l'accueil connecté d'un compte gratuit de trois scans — le banc d'essai du lot v66 :
+
+```
+poids 7   « Voir les offres »       ← l'encart payant
+poids 3   « Nouvelle page »
+poids 3   « Voir mon QR code »      ← l'étape utile du moment
+```
+
+L'élément le plus fort de l'écran, pour quelqu'un qui a publié sa première page il y a trois jours et reçu trois scans, était la demande d'argent. Elle valait plus que les deux gestes utiles réunis. Sa condition d'affichage tenait en un test : `profile?.plan === "free"`. Tous les jours, dès le premier, jusqu'au paiement.
+
+**Et elle ne disait pas la vérité.** L'encart annonçait « 10 pages, vues illimitées, QR personnalisés, sans branding ». Or `plans.ts` donne `views: null` aux **trois** plans : les vues sont illimitées partout, y compris en gratuit — et l'écran l'écrit lui-même deux cartes plus haut, « Vues ce mois · 4 · illimitées ». Le produit vendait comme un avantage quelque chose que l'utilisateur avait déjà, sur le même écran, à quinze centimètres.
+
+C'est la même faute que les avis inventés du lot v63, retournée : là, le produit faisait écrire un mensonge au client ; ici, il en écrivait un pour son propre compte.
+
+**Deux règles, dans `dashboard/offreUtile.ts` (module pur).**
+
+`raisonDeProposer` : l'offre attend d'avoir une raison. Un QR qui tourne (trente scans) en est une — « plus » veut alors dire quelque chose. Détenir plus de pages que son plan n'en garde en ligne en est une — le compte est vraiment bloqué. Occuper sa limite n'en est pas une : quelqu'un qui a la seule page à laquelle il a droit et n'a jamais demandé la deuxième n'est bloqué par rien ; le moment où il bute, c'est quand il clique « Nouvelle page », et c'est là que l'offre a sa place, pas sur son accueil tous les matins. Un compte payant n'est jamais relancé.
+
+`avantagesEnPlus` : ce que le plan cible apporte est **calculé sur `plans.ts`**, jamais écrit à la main. Une capacité que les deux plans possèdent n'apparaît pas — les vues illimitées ont disparu de la liste toutes seules. Au passage, le champ `team` cachait un piège : `null` n'y veut pas dire « illimité » comme pour les autres limites, mais « pas d'équipe du tout », et le traiter comme une limite faisait annoncer « places d'équipe en illimité » sur un plan qui n'a pas la fonction.
+
+L'accroche dit désormais pourquoi on en parle — « Votre QR tourne — voici ce que le plan supérieur ajoute » — au lieu de « Passez à Établissement », et le bouton passe de l'aplat d'or au bouton neutre.
+
+**Mesuré après.** À trois scans, l'encart n'est plus là : les deux éléments les plus forts de l'écran sont les deux gestes utiles. À soixante-quatre scans (nouvel état de banc d'essai, `?debut=2`), il revient — poids **0** : présent, lisible, et sous les gestes utiles. De 7 à 0.
+
+Gardes : `dashboard/offreUtile.test.ts` (11 cas sur les deux règles) et `dashboard/offreMesuree.test.ts` (8 cas sur le branchement et le relevé), vérifiées par injection — remettre `plan === "free"` comme seule condition, ou la liste écrite à la main, fait échouer la garde.

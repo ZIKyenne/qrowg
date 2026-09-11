@@ -71,8 +71,16 @@ describe("les écrans lisent les noms dans lib/plans.ts", () => {
   })
   it("accueil connecté : l'invitation cite le plan Établissement et ne promet plus un quota de vues (illimitées)", () => {
     const s = lire("dashboard/DashboardClient.tsx")
-    expect(s).toContain('Passez à {getPlan("pro").label} — {fmtPrice(getPlan("pro").priceMonthly)}€/mois')
+    // Depuis le lot v69, l'invitation ne commence plus par « Passez à … » : elle dit
+    // d'abord POURQUOI elle apparaît, et sa liste d'avantages est calculée sur
+    // plans.ts au lieu d'être écrite à la main (elle promettait « vues illimitées »,
+    // que le plan gratuit a déjà).
+    expect(s).toContain('{getPlan("pro").label}, {fmtPrice(getPlan("pro").priceMonthly)}€/mois')
+    expect(s).toContain('avantagesEnPlus("free", "pro")')
     expect(s).not.toContain('limits.views!.toLocaleString')
+    // hors commentaire : le code ne l'écrit plus nulle part
+    const code = s.split("\n").filter(l => !l.trim().startsWith("//")).join("\n")
+    expect(code).not.toContain("vues illimitées")
   })
   it("profil : « Passer à Établissement », pas « Starter ou Pro »", () => {
     expect(lire("dashboard/profile/page.tsx")).toContain("<span>Passer à {PLANS.pro.label}</span>")
