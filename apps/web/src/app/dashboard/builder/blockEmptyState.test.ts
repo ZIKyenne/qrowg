@@ -57,6 +57,7 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
   logo_marquee: v => ({ name1: v }),
   avatar_row: v => ({ count: v }),
   stat_hero: v => ({ value: v }),
+  google_maps_embed: v => ({ address: v }),
   certifications: v => ({ cert_1_name: v }),
   legal_info: v => ({ siret: v }),
   // Vague 10.

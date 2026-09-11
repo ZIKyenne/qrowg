@@ -138,3 +138,14 @@ Le bloc vide ne publie rien (vérifié : aucun cadre fantôme sur les 34 démons
 Garde `app/preuveNonInventee.test.ts` : elle lit modèles et recettes bloc par bloc, champ par champ, et refuse toute affirmation pré-remplie.
 
 Au passage : banc d'essai de la création guidée (`/e2e-harness/onboarding`), enfin mesurable — 0 texte < 11 px, 0 cible < 32 px aux deux tailles.
+
+
+## Lot v64 — le premier écran après « Utiliser ce modèle »
+
+Suite du précédent, en suivant cette fois le parcours réel dans l'éditeur : barre du haut → **Modèles** → *Bistrot français* → **Appliquer**. L'écran d'après affichait une **carte Google morte** — un grand cadre gris avec une icône d'image cassée. Le modèle plaçait l'établissement au « 12 rue de la Paix, 75001 Paris ». Une adresse réelle, qui appartient à quelqu'un d'autre. **Vingt-et-un modèles** en avaient une (Paris, Reims, Cannes, Versailles). Quelqu'un qui publie sans la changer envoie ses clients chez un inconnu, et fait apparaître son commerce à une adresse qui n'est pas la sienne.
+
+Même règle que pour les avis : les adresses arrivent vides, l'assistant de modèle les demande (il le faisait déjà), et le bloc carte affiche « Ajoutez une adresse » au lieu d'une carte morte — en éditeur comme dans le renderer partagé. Trois boutons pointaient aussi vers une page de service nue (`calendly.com`, `open.spotify.com`) : vidés, donc signalés comme boutons sans lien.
+
+**Ce qui referme la boucle** : l'encadré près de « Publier » ne listait que les boutons sans lien. Il liste maintenant aussi les blocs encore vides. Sur le modèle Bistrot appliqué tel quel, il annonce « 3 éléments ne seront pas publiés » — le bouton de réservation sans lien, le bloc d'avis, la carte — chaque ligne cliquable menant au bloc concerné. L'utilisateur sait ce qui manque avant de publier, au lieu de le découvrir en ligne.
+
+Vérifié dans le navigateur sur le parcours complet, et sur les 34 pages de démonstration : aucune régression, aucun bloc fantôme.

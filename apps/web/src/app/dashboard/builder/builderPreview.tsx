@@ -1922,7 +1922,9 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
         )
       }
 
-      case "google_maps_embed": { const mapSrc = mapEmbedUrl(c.address, c.embed_url, c.zoom); return (
+      case "google_maps_embed": {
+        if (!hasPublishableContent("google_maps_embed", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🗺️", "Ajoutez une adresse", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+        const mapSrc = mapEmbedUrl(c.address, c.embed_url, c.zoom); return (
         <div style={{ padding: "10px 16px", ...s }}>
           {c.label && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.label}</p>}
           {mapSrc

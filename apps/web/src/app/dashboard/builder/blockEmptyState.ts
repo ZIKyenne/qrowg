@@ -48,6 +48,7 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   logo_marquee:            c => anyIndexed(c, i => c[`name${i}`]),
   avatar_row:              c => hasMeaningfulText(c.count) || anyIndexed(c, i => c[`name${i}`]),
   stat_hero:               c => hasMeaningfulText(c.value),
+  google_maps_embed:       c => hasMeaningfulText(c.address) || hasMeaningfulText(c.embed_url),
   certifications:          c => anyIndexed(c, i => c[`cert_${i}_name`]),
   legal_info:              c => ["company_name", "siret", "tva", "address", "capital", "rcs", "email"].some(k => hasMeaningfulText(c[k])),
   engagements:            c => anyIndexed(c, i => c[`e${i}`]),

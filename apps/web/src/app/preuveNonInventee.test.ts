@@ -111,3 +111,51 @@ describe("un bloc de preuve vide se voit et se dit", () => {
     }
   })
 })
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Suite, 11 septembre. En suivant le parcours réel — « Modèles » → Bistrot
+// français → Appliquer — l'écran d'après montrait une carte Google morte : le
+// modèle plaçait l'établissement « 12 rue de la Paix, 75001 Paris ». Une adresse
+// réelle, qui appartient à quelqu'un d'autre. Vingt-et-un modèles en avaient une.
+// Quelqu'un qui publie sans la changer envoie ses clients chez un inconnu.
+
+describe("aucune coordonnée réelle inventée", () => {
+  it("les modèles n'installent l'établissement nulle part", () => {
+    const src = lire("dashboard/builder/page-templates.ts") + lire("dashboard/builder/templatesStudio.ts")
+    const adresses = [...src.matchAll(/address: "([^"]+)"/g)].map(m => m[1])
+    expect(adresses, adresses.slice(0, 5).join(" · ")).toEqual([])
+  })
+  it("et ne posent pas de bouton vers une page de service nue", () => {
+    const src = lire("dashboard/builder/page-templates.ts") + lire("dashboard/builder/templatesStudio.ts")
+    for (const nu of ['url: "https://calendly.com"', 'url: "https://open.spotify.com"']) {
+      expect(src, nu).not.toContain(nu)
+    }
+  })
+  it("la carte sans adresse ne publie rien et le dit dans l'éditeur", () => {
+    expect(lire("dashboard/builder/blockEmptyState.ts")).toContain("google_maps_embed:       c => hasMeaningfulText(c.address) || hasMeaningfulText(c.embed_url)")
+    expect(lire("dashboard/builder/shared-renderer/blocks/google_maps_embed/EditorGoogleMapsEmbed.tsx")).toContain('label="Ajoutez une adresse"')
+    expect(lire("dashboard/builder/builderPreview.tsx")).toContain('emptyHint("🗺️", "Ajoutez une adresse"')
+  })
+  it("l'assistant de modèle demande l'adresse au lieu de l'inventer", () => {
+    expect(lire("dashboard/builder/templateWizard.ts")).toContain('google_maps_embed:  { label: "businessName", address: "address" }')
+  })
+})
+
+describe("avant de publier, on sait ce qui manque", () => {
+  it("un bloc vide est annoncé au même endroit qu'un bouton sans lien", () => {
+    const a = lire("dashboard/builder/AlertesPublication.tsx")
+    expect(a).toContain('import { hasPublishableContent, EMPTY_STATE_BLOCK_TYPES } from "./blockEmptyState"')
+    expect(a).toContain('out.push({ blocId: b.id, bloc, texte: "Bloc vide — rien à publier pour l\'instant" })')
+    expect(a).toContain("if (b.visible === false) continue")
+  })
+  it("la liste se calcule sur un vrai modèle appliqué", async () => {
+    const { alertesPublication } = await import("./dashboard/builder/AlertesPublication")
+    const bistrot = PAGE_TEMPLATES.find(t => t.key === "resto_bistrot")!
+    const blocks = bistrot.blocks.map((b, i) => ({ id: `b${i}`, type: b.type, content: b.content, visible: true })) as any
+    const alertes = alertesPublication(blocks)
+    // Le bloc d'avis et la carte arrivent vides ; le bouton de réservation n'a pas de lien.
+    expect(alertes.some(a => a.texte.includes("Bloc vide"))).toBe(true)
+    expect(alertes.some(a => a.texte.includes("sans lien"))).toBe(true)
+    expect(alertes.length).toBeGreaterThanOrEqual(3)
+  })
+})

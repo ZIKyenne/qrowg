@@ -54,11 +54,13 @@ describe("questionnaire dérivé des blocs", () => {
     }
   })
 
-  it("les valeurs du modèle préremplissent les champs", () => {
+  it("les valeurs du modèle préremplissent les champs — sauf l'adresse, qui ne s'invente pas", () => {
     const resto = PAGE_TEMPLATES.find(t => t.key === "studio_gastro")!
     const { initial } = buildWizard(resto.blocks)
     expect(initial.businessName).toBe("La Table d'Auguste")
-    expect(initial.address).toContain("Reims")
+    // Depuis le 10 septembre, les modèles ne placent plus l'établissement à une adresse
+    // réelle qui appartient à quelqu'un d'autre : le champ arrive vide et se demande.
+    expect(initial.address ?? "").toBe("")
   })
 })
 

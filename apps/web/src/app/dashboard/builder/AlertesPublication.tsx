@@ -5,17 +5,28 @@
 import { AlertTriangle } from "lucide-react"
 import { BLOCK_DEFS } from "./blockDefs"
 import { boutonsSansLien } from "./boutonSansLien"
+import { hasPublishableContent, EMPTY_STATE_BLOCK_TYPES } from "./blockEmptyState"
 import type { Block } from "./types"
 
 export type AlertePublication = { blocId: string; bloc: string; texte: string }
 
-/** Les boutons sans lien des blocs VISIBLES (un bloc masqué ne publie rien de toute façon). */
+/**
+ * Ce qui ne partira pas en ligne, dans les blocs VISIBLES (un bloc masqué ne publie
+ * rien de toute façon) :
+ *  • un bouton dont le lien manque — il disparaîtrait sans prévenir ;
+ *  • un bloc encore vide — depuis le 10 septembre les modèles ne pré-remplissent plus
+ *    ni avis, ni chiffres, ni adresse, donc un modèle appliqué tel quel arrive avec
+ *    des emplacements à remplir. Ils sont annoncés ici plutôt que découverts en ligne.
+ */
 export function alertesPublication(blocks: Block[]): AlertePublication[] {
   const out: AlertePublication[] = []
   for (const b of blocks) {
     if (b.visible === false) continue
     const bloc = BLOCK_DEFS[b.type]?.label || b.type
     for (const o of boutonsSansLien(b.type, b.content as any)) out.push({ blocId: b.id, bloc, texte: `Bouton « ${o.libelle} » sans lien` })
+    if (EMPTY_STATE_BLOCK_TYPES.includes(b.type) && !hasPublishableContent(b.type, b.content as any)) {
+      out.push({ blocId: b.id, bloc, texte: "Bloc vide — rien à publier pour l'instant" })
+    }
   }
   return out
 }

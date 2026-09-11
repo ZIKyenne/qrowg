@@ -1,12 +1,18 @@
 "use client"
 import { googleMapsEmbedViewModel } from "../../models/googleMapsEmbed"
 import { EditorCtaShell } from "../../primitives/BlockCtaLink"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import type { EditorAdapterProps } from "../../renderTypes"
 
 // Éditeur : iframe Google Maps (URL déjà contrôlée) ; lien itinéraire NEUTRALISÉ (non navigable).
 export function EditorGoogleMapsEmbed({ content, ctx }: EditorAdapterProps) {
   const { embed, label, address, height, showDirections } = googleMapsEmbedViewModel(content)
   const { muted, surfaceStyle } = ctx
+  // Les modèles ne placent plus l'établissement à une adresse réelle inventée : sans
+  // adresse, le bloc ne publie rien et l'éditeur le dit au lieu de montrer une carte morte.
+  if (!embed.src && !address) {
+    return <div style={{ padding: "10px 16px", ...surfaceStyle }}><BlockEmptyState icon="🗺️" label="Ajoutez une adresse" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={muted} /></div>
+  }
   return (
     <div style={{ padding: "10px 16px", ...surfaceStyle }}>
       {label && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{label}</p>}
