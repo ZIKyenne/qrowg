@@ -257,7 +257,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
         <aside className="qz-col qz-aside" style={{ borderRight: `1px solid ${LINE}`, display: collapsed ? "none" : "flex", flexDirection: "column", minHeight: 0, background: "rgba(0,0,0,0.18)" }}>
           <div style={{ padding: "12px 12px 8px", flexShrink: 0 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-              <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: 1, color: MUTED, textTransform: "uppercase" }}>Mes QR</span>
+              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: MUTED, textTransform: "uppercase" }}>Mes QR</span>
               <Link href="/dashboard/templates" title="Nouveau QR" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, background: "color-mix(in srgb, var(--accent) 14%, transparent)", border: `1px solid color-mix(in srgb, var(--accent) 30%, transparent)`, color: G }}><Plus size={15} /></Link>
             </div>
             <div style={{ position: "relative" }}>
@@ -274,7 +274,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                   <span style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, background: q.background_color || "#fff", border: `1px solid ${LINE}`, display: "flex", alignItems: "center", justifyContent: "center" }}><QrCode size={16} color={q.foreground_color || "var(--field)"} /></span>
                   <span style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: on ? INK : "#D9D3C7", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{q.pages?.title || q.short_code}</span>
-                    <span style={{ display: "block", fontSize: 10, color: FAINT, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{q.pages ? "Page" : "Lien"} · {q.short_code}</span>
+                    <span style={{ display: "block", fontSize: 11.5, color: FAINT, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{q.pages ? "Page" : "Lien"} · {q.short_code}</span>
                   </span>
                   {(q.status ?? "active") === "active" && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--success)", flexShrink: 0 }} />}
                 </button>
@@ -356,8 +356,8 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 2, width: 30, height: 30, margin: "0 auto" }}>
                         {Array.from({ length: 9 }).map((_, i) => <span key={i} style={{ background: [0, 2, 4, 6, 8, 3, 5].includes(i) ? p.fg : "transparent", borderRadius: dotR }} />)}
                       </div>
-                      <span style={{ display: "block", marginTop: 6, fontSize: 8.5, fontWeight: 700, color: MUTED, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", textAlign: "center" }}>{p.label}</span>
-                      {locked && <span style={{ position: "absolute", top: 4, right: 4, fontSize: 8, fontWeight: 700, color: G, background: "rgba(0,0,0,0.6)", borderRadius: 5, padding: "1px 4px" }}>PRO</span>}
+                      <span style={{ display: "block", marginTop: 6, fontSize: 11.5, fontWeight: 700, color: MUTED, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", textAlign: "center" }}>{p.label}</span>
+                      {locked && <span style={{ position: "absolute", top: 4, right: 4, fontSize: 11.5, fontWeight: 700, color: G, background: "rgba(0,0,0,0.6)", borderRadius: 5, padding: "1px 4px" }}>PRO</span>}
                     </button>
                   )
                 })}
@@ -404,7 +404,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                 <div className="mo-fade-up" style={{ marginTop: 12, padding: 10, background: SURF, border: `1px solid ${LINE}`, borderRadius: 10 }}>
                   <p style={miniLabel}>Type de dégradé</p>
                   <div style={{ display: "flex", gap: 4, background: "rgba(0,0,0,0.2)", borderRadius: 8, padding: 3, marginBottom: 8 }}>
-                    {(["none", "linear", "radial", "diagonal"] as const).map(gt => <button key={gt} type="button" onClick={() => setStyleConf(s => ({ ...s, gradient: gt }))} style={{ flex: 1, padding: "6px 0", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 10.5, fontWeight: (styleConf.gradient ?? "none") === gt ? 800 : 600, background: (styleConf.gradient ?? "none") === gt ? G : "transparent", color: (styleConf.gradient ?? "none") === gt ? "var(--ink-on-accent)" : MUTED }}>{gt === "none" ? "Aucun" : gt === "linear" ? "Linéaire" : gt === "radial" ? "Radial" : "Diagonal"}</button>)}
+                    {(["none", "linear", "radial", "diagonal"] as const).map(gt => <button key={gt} type="button" onClick={() => setStyleConf(s => ({ ...s, gradient: gt }))} style={{ flex: 1, padding: "6px 0", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 11.5, fontWeight: (styleConf.gradient ?? "none") === gt ? 800 : 600, background: (styleConf.gradient ?? "none") === gt ? G : "transparent", color: (styleConf.gradient ?? "none") === gt ? "var(--ink-on-accent)" : MUTED }}>{gt === "none" ? "Aucun" : gt === "linear" ? "Linéaire" : gt === "radial" ? "Radial" : "Diagonal"}</button>)}
                   </div>
                   {styleConf.gradient && styleConf.gradient !== "none" && <ColorRow label="2ᵉ ton" value={styleConf.fg2 || fg || "#0A0A0A"} onChange={v => setStyleConf(s => ({ ...s, fg2: v }))} />}
                 </div>
@@ -480,7 +480,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                 {([["png", "PNG", "Web, documents, présentations"], ["png-t", "PNG fond transparent", "Superposition sur un visuel"], ["svg", "SVG", "Vectoriel, qualité illimitée"], ["pdf", "PDF", "Impression simple"]] as const).map(([fmt, label, sub]) => (
                   <button key={fmt} type="button" onClick={() => download(fmt)} disabled={!!dlBusy} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", borderRadius: 12, background: SURF, border: `1px solid ${LINE}`, color: INK, cursor: "pointer", textAlign: "left" }}>
                     <Download size={16} color={G} />
-                    <span style={{ flex: 1 }}><span style={{ display: "block", fontSize: 13, fontWeight: 700 }}>{label}</span><span style={{ display: "block", fontSize: 10.5, color: MUTED }}>{sub}</span></span>
+                    <span style={{ flex: 1 }}><span style={{ display: "block", fontSize: 13, fontWeight: 700 }}>{label}</span><span style={{ display: "block", fontSize: 11.5, color: MUTED }}>{sub}</span></span>
                     {dlBusy === fmt && <span className="mo-pulse" style={{ fontSize: 11, color: MUTED }}>…</span>}
                   </button>
                 ))}
@@ -515,8 +515,8 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                           <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 2, width: 28, height: 28, margin: "0 auto" }}>
                             {Array.from({ length: 9 }).map((_, i) => <span key={i} style={{ background: [0, 2, 4, 6, 8, 3, 5].includes(i) ? p.fg : "transparent", borderRadius: dotR }} />)}
                           </div>
-                          <span style={{ display: "block", marginTop: 5, fontSize: 8, fontWeight: 700, color: MUTED, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", textAlign: "center" }}>{p.label}</span>
-                          {locked && <span style={{ position: "absolute", top: 3, right: 3, fontSize: 7.5, fontWeight: 700, color: G, background: "rgba(0,0,0,0.6)", borderRadius: 4, padding: "1px 3px" }}>PRO</span>}
+                          <span style={{ display: "block", marginTop: 5, fontSize: 11.5, fontWeight: 700, color: MUTED, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", textAlign: "center" }}>{p.label}</span>
+                          {locked && <span style={{ position: "absolute", top: 4, right: 4, fontSize: 11.5, fontWeight: 700, color: G, background: "rgba(0,0,0,0.6)", borderRadius: 5, padding: "1px 4px" }}>PRO</span>}
                         </button>
                       )
                     })}
@@ -548,7 +548,7 @@ const PALETTES: [string, string][] = [
   ["#047857", "#ECFDF5"], ["#4F46E5", "#FFFFFF"], ["#C9A84C", "#0A0A0A"], ["#2D2D2D", "#F5F0E8"],
 ]
 const secH: React.CSSProperties = { fontSize: 15, fontWeight: 700, color: INK, margin: "0 0 10px" }
-const miniLabel: React.CSSProperties = { margin: "0 0 6px", fontSize: 10.5, fontWeight: 600, color: MUTED }
+const miniLabel: React.CSSProperties = { margin: "0 0 6px", fontSize: 11.5, fontWeight: 600, color: MUTED }
 const smallBtn: React.CSSProperties = { minHeight: 34, padding: "0 12px", borderRadius: 9, background: SURF, border: `1px solid ${LINE}`, color: INK, fontSize: 12, fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center" }
 function shapeBtn(on: boolean): React.CSSProperties {
   return { width: 38, height: 38, borderRadius: 9, cursor: "pointer", fontSize: 16, display: "inline-flex", alignItems: "center", justifyContent: "center", background: on ? "color-mix(in srgb, var(--accent) 16%, transparent)" : SURF, border: `1px solid ${on ? "color-mix(in srgb, var(--accent) 45%, transparent)" : LINE}`, color: INK }

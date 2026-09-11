@@ -51,7 +51,7 @@ export default function RecentLeadsCard() {
         <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
           <span style={{ color: "var(--accent)", background: "color-mix(in srgb, var(--accent) 12%, transparent)", borderRadius: 8, padding: 7, display: "flex" }}><Inbox size={16} /></span>
           <p style={{ color: "var(--ink)", fontSize: 15.5, fontWeight: 700, margin: 0, letterSpacing: "-0.2px" }}>
-            Derniers messages{unread > 0 && <span style={{ marginLeft: 8, background: "var(--danger)", color: "#fff", fontSize: 10, fontWeight: 700, borderRadius: 9, padding: "1px 7px", verticalAlign: "middle" }}>{unread} non lu{unread > 1 ? "s" : ""}</span>}
+            Derniers messages{unread > 0 && <span style={{ marginLeft: 8, background: "var(--danger)", color: "#fff", fontSize: 11.5, fontWeight: 700, borderRadius: 9, padding: "1px 7px", verticalAlign: "middle" }}>{unread} non lu{unread > 1 ? "s" : ""}</span>}
           </p>
         </div>
         <Link href="/dashboard/leads" style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "var(--accent)", fontSize: 12.5, fontWeight: 600, textDecoration: "none" }}>
@@ -64,7 +64,7 @@ export default function RecentLeadsCard() {
           return (
             <Link key={l.id} href="/dashboard/leads" style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 20px", borderBottom: i < leads.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none", textDecoration: "none" }}>
               {!l.is_read && <span style={{ width: 7, height: 7, borderRadius: "50%", background: tc, flexShrink: 0 }} />}
-              <span style={{ background: `color-mix(in srgb, ${tc} 14%, transparent)`, border: `1px solid color-mix(in srgb, ${tc} 30%, transparent)`, borderRadius: 20, padding: "2px 9px", color: tc, fontSize: 10.5, fontWeight: 700, flexShrink: 0 }}>{TYPE_LABELS[l.type] || l.type}</span>
+              <span style={{ background: `color-mix(in srgb, ${tc} 14%, transparent)`, border: `1px solid color-mix(in srgb, ${tc} 30%, transparent)`, borderRadius: 20, padding: "2px 9px", color: tc, fontSize: 11.5, fontWeight: 700, flexShrink: 0 }}>{TYPE_LABELS[l.type] || l.type}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: l.is_read ? 500 : 700, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.name || l.message || "Nouveau message"}</p>
               </div>

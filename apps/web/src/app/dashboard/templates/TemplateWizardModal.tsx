@@ -203,7 +203,7 @@ export default function TemplateWizardModal({
         <div style={{ flex: 1, display: "flex", flexDirection: isMobile ? "column" : "row", minHeight: 0 }}>
           {!isMobile && (
             <div style={{ width: 340, borderRight: "1px solid rgba(255,255,255,0.07)", background: "#070707", padding: 16, display: "flex", flexDirection: "column", minHeight: 0 }}>
-              <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 1.5, margin: "0 0 10px", textAlign: "center" }}>Aperçu en direct</p>
+              <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 1.5, margin: "0 0 10px", textAlign: "center" }}>Aperçu en direct</p>
               <div ref={previewRef} style={{ flex: 1, overflowY: "auto", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)", ...bg }}>
                 {previewBlocks.map(b => (
                   <div key={b.id} data-wz-block={b.srcIndex}
@@ -231,7 +231,7 @@ export default function TemplateWizardModal({
           {isMobile && phase === "questions" && (
             <div style={{ borderBottom: "1px solid rgba(255,255,255,0.07)", background: "#070707", padding: "10px 16px 12px", flexShrink: 0 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 8 }}>
-                <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 1.4, margin: 0 }}>
+                <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 1.4, margin: 0 }}>
                   {pageEntiere ? "Votre page" : blocsQuestion.length ? "Ce que cette question modifie" : "Votre page"}
                 </p>
                 <button type="button" onClick={() => setPageEntiere(v => !v)}
@@ -356,7 +356,7 @@ function QuestionCard({ step, value, answers, placeholder, onChange, onSubmit, i
 
   return (
     <div style={{ maxWidth: 560 }}>
-      <p style={{ color: "var(--accent)", fontSize: 10, textTransform: "uppercase", letterSpacing: 1.8, margin: "0 0 8px", fontWeight: 700 }}>
+      <p style={{ color: "var(--accent)", fontSize: 11, textTransform: "uppercase", letterSpacing: 1.8, margin: "0 0 8px", fontWeight: 700 }}>
         {GROUP_LABEL[step.group] || ""}
       </p>
       <h2 style={{ color: INK, fontSize: 22, fontWeight: 700, margin: "0 0 6px", lineHeight: 1.3 }}>{step.label}</h2>
@@ -461,7 +461,7 @@ function ReviewList({ review, decisions, onChange }: {
                 <p style={{ color: INK, fontSize: 13, fontWeight: 600, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", textDecoration: d === "remove" ? "line-through" : "none" }}>
                   {r.preview || BLOCK_DEFS[r.type]?.label || r.type}
                 </p>
-                <p style={{ color: MUTED, fontSize: 10.5, margin: "1px 0 0" }}>{BLOCK_DEFS[r.type]?.label || r.type} · {meta.label}</p>
+                <p style={{ color: MUTED, fontSize: 11.5, margin: "1px 0 0" }}>{BLOCK_DEFS[r.type]?.label || r.type} · {meta.label}</p>
               </div>
               <div style={{ display: "flex", gap: 3, flexShrink: 0 }}>
                 <DecisionButton active={d === "keep"} onClick={() => onChange(r.index, "keep")} title="Garder"><Eye size={13} /></DecisionButton>

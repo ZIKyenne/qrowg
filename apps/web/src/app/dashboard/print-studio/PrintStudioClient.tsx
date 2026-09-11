@@ -884,8 +884,8 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     const card = (it: Item, top?: string) => (
       <button key={it.id} className="ps2-card" onClick={() => openItem(it.id)} style={{ position: "relative", textAlign: "left", display: "flex", flexDirection: "column", background: "var(--surface)", border: "1px solid var(--surface-2)", borderRadius: 14, overflow: "hidden", cursor: "pointer", color: "var(--ink)" }}>
         <div style={{ position: "relative", aspectRatio: "4 / 3", display: "flex", alignItems: "center", justifyContent: "center", background: "radial-gradient(120% 100% at 50% 0%, #191512, var(--surface) 72%)", borderBottom: "1px solid #1c1917" }}>
-          <span style={{ position: "absolute", top: 11, right: 11, padding: "3px 9px", borderRadius: 999, background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", color: "var(--accent)", fontSize: 9.5, letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 700, whiteSpace: "nowrap" }}>{it.size}</span>
-          {top && <span style={{ position: "absolute", top: 11, left: 11, padding: "3px 9px", borderRadius: 999, background: "linear-gradient(135deg,var(--gold-light),var(--accent))", color: "#1a1408", fontSize: 9.5, letterSpacing: ".08em", textTransform: "uppercase", fontWeight: 700, whiteSpace: "nowrap" }}>{top}</span>}
+          <span style={{ position: "absolute", top: 11, right: 11, padding: "3px 9px", borderRadius: 999, background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", color: "var(--accent)", fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 700, whiteSpace: "nowrap" }}>{it.size}</span>
+          {top && <span style={{ position: "absolute", top: 11, left: 11, padding: "3px 9px", borderRadius: 999, background: "linear-gradient(135deg,var(--gold-light),var(--accent))", color: "#1a1408", fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", fontWeight: 700, whiteSpace: "nowrap" }}>{top}</span>}
           <MiniSupport item={it} style={STYLE_BY_ID[it.pal]} />
         </div>
         <div style={{ padding: "13px 15px 15px", display: "flex", flexDirection: "column", gap: 5 }}>
@@ -903,7 +903,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
 
           {/* En-tête : fil d'Ariane + eyebrow */}
           <header style={{ padding: "18px 0 0", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-            <Link href="/dashboard/qr-codes" className="ps2-chip" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 13px 6px 10px", borderRadius: 999, border: "1px solid #26211a", color: "var(--muted)", fontSize: 12, fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap" }}>
+            <Link href="/dashboard/qr-codes" className="ps2-chip" style={{ display: "inline-flex", alignItems: "center", gap: 8, minHeight: 32, padding: "0 13px 0 10px", borderRadius: 999, border: "1px solid #26211a", color: "var(--muted)", fontSize: 12, fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap" }}>
               <span aria-hidden style={{ width: 6, height: 6, borderLeft: "1.5px solid currentColor", borderBottom: "1.5px solid currentColor", transform: "rotate(45deg)" }} /> QR codes
             </Link>
           </header>
@@ -918,12 +918,12 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
             <div style={{ display: "flex", alignItems: "center", gap: 22, padding: "14px 20px", borderRadius: 12, background: "var(--surface)", border: "1px solid var(--surface-2)" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
                 <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)", letterSpacing: "-.01em", fontVariantNumeric: "tabular-nums" }}>{allItems.length}</div>
-                <div style={{ fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 600 }}>Supports</div>
+                <div style={{ fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 600 }}>Supports</div>
               </div>
               <span style={{ width: 1, height: 26, background: "var(--surface-2)" }} />
               <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
                 <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)", letterSpacing: "-.01em", fontVariantNumeric: "tabular-nums" }}>{totalFormats}</div>
-                <div style={{ fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 600 }}>Formats</div>
+                <div style={{ fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 600 }}>Formats</div>
               </div>
             </div>
           </div>
@@ -931,9 +931,9 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
           {/* Barre de filtres collante */}
           <div style={{ position: "sticky", top: 0, zIndex: 5, background: "rgba(20,18,16,.95)", backdropFilter: "blur(10px)", border: "1px solid var(--surface-2)", borderRadius: 14, padding: "16px 18px", display: "flex", flexDirection: "column", gap: 14 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-              <div style={{ flex: "1 1 220px", minWidth: 180, display: "flex", alignItems: "center", gap: 9, padding: "10px 13px", borderRadius: 11, background: "var(--surface)", border: "1px solid #26211a" }}>
+              <div style={{ flex: "1 1 220px", minWidth: 180, display: "flex", alignItems: "center", gap: 9, padding: "5px 13px", borderRadius: 11, background: "var(--surface)", border: "1px solid #26211a" }}>
                 <span aria-hidden style={{ position: "relative", width: 11, height: 11, flex: "none", border: "1.5px solid var(--accent)", borderRadius: "50%" }}><span style={{ position: "absolute", right: -4, bottom: -3, width: 5, height: 1.5, background: "var(--accent)", transform: "rotate(45deg)" }} /></span>
-                <input className="ps2-search" value={suppSearch} onChange={e => setSuppSearch(e.target.value)} placeholder="Sticker, chevalet, carte…" style={{ flex: 1, minWidth: 0, background: "transparent", border: "none", color: "var(--ink)", fontSize: 12.5, caretColor: "var(--gold-light)" }} />
+                <input className="ps2-search" value={suppSearch} onChange={e => setSuppSearch(e.target.value)} placeholder="Sticker, chevalet, carte…" style={{ flex: 1, minWidth: 0, minHeight: 34, background: "transparent", border: "none", color: "var(--ink)", fontSize: 12.5, caretColor: "var(--gold-light)" }} />
                 {suppSearch && <button type="button" aria-label="Effacer" onClick={() => setSuppSearch("")} style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: 15, lineHeight: 1, padding: 0 }}>×</button>}
               </div>
               <FilterSelect label="Métier" value={metier} options={METIERS} onPick={setMetier} />
@@ -942,15 +942,15 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
             </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              <span style={{ fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700, marginRight: 2 }}>Rapide</span>
+              <span style={{ fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700, marginRight: 2 }}>Rapide</span>
               {quick.map(m => {
                 const on = metier === m
                 return (
                   <button key={m} type="button" className={on ? undefined : "ps2-chip"} onClick={() => setMetier(on ? "Tout" : m)}
-                    style={{ padding: "6px 13px", borderRadius: 999, cursor: "pointer", fontSize: 12, fontWeight: on ? 600 : 500, background: on ? "color-mix(in srgb, var(--accent) 10%, transparent)" : "transparent", border: `1px solid ${on ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "#26211a"}`, color: on ? "#e8c877" : "var(--muted)" }}>{m}</button>
+                    style={{ minHeight: 32, padding: "0 13px", borderRadius: 999, cursor: "pointer", fontSize: 12, fontWeight: on ? 600 : 500, background: on ? "color-mix(in srgb, var(--accent) 10%, transparent)" : "transparent", border: `1px solid ${on ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "#26211a"}`, color: on ? "#e8c877" : "var(--muted)" }}>{m}</button>
                 )
               })}
-              <button type="button" className="ps2-more" onClick={() => setAllMetiers(a => !a)} style={{ padding: "6px 4px", background: "none", border: "none", color: "var(--muted)", fontSize: 12, fontWeight: 600, cursor: "pointer", textDecoration: "underline", textDecorationColor: "color-mix(in srgb, var(--accent) 30%, transparent)", textUnderlineOffset: 3, transition: "color .24s ease" }}>{allMetiers ? "− Réduire" : `+ ${METIERS.length - 1 - 6} métiers`}</button>
+              <button type="button" className="ps2-more" onClick={() => setAllMetiers(a => !a)} style={{ minHeight: 32, padding: "0 4px", background: "none", border: "none", color: "var(--muted)", fontSize: 12, fontWeight: 600, cursor: "pointer", textDecoration: "underline", textDecorationColor: "color-mix(in srgb, var(--accent) 30%, transparent)", textUnderlineOffset: 3, transition: "color .24s ease" }}>{allMetiers ? "− Réduire" : `+ ${METIERS.length - 1 - 6} métiers`}</button>
             </div>
 
             {hasFilter && (
@@ -1452,7 +1452,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {ACCENTS.map(a => (
                   <button key={a.id} onClick={() => setAccent(a.id)} title={a.label} style={{ width: 44, height: 44, borderRadius: 11, cursor: "pointer", border: `2px solid ${accent === a.id ? C.gold : "transparent"}`, boxShadow: accent === a.id ? `0 0 0 2px ${C.goldA33}` : "none", background: a.hex || "conic-gradient(from 210deg,#C9A84C,#D4483B,#3E9E6E,#3B6FD4,#7A5CD4,#C9A84C)", position: "relative" }}>
-                    {a.id === "auto" && <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8.5, fontWeight: 700, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,.6)" }}>AUTO</span>}
+                    {a.id === "auto" && <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11.5, fontWeight: 700, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,.6)" }}>AUTO</span>}
                   </button>
                 ))}
               </div>
@@ -1556,7 +1556,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {ACCENTS.map(a => (
                   <button key={a.id} onClick={() => setAccent(a.id)} title={a.label} style={{ width: 44, height: 44, borderRadius: 12, cursor: "pointer", border: `2px solid ${accent === a.id ? C.gold : "transparent"}`, boxShadow: accent === a.id ? `0 0 0 2px ${C.goldA33}` : "none", background: a.hex || "conic-gradient(from 210deg,#C9A84C,#D4483B,#3E9E6E,#3B6FD4,#7A5CD4,#C9A84C)", position: "relative" }}>
-                    {a.id === "auto" && <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8.5, fontWeight: 700, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,.6)" }}>AUTO</span>}
+                    {a.id === "auto" && <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11.5, fontWeight: 700, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,.6)" }}>AUTO</span>}
                   </button>
                 ))}
               </div>
@@ -1848,7 +1848,7 @@ function FilterSelect({ label, value, options, onPick }: { label: string; value:
     <div style={{ position: "relative" }}>
       <button type="button" className="ps2-sel" aria-expanded={open} onClick={() => setOpen(o => !o)}
         style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 11, background: "rgba(255,255,255,.025)", border: "1px solid #26211a", color: "var(--muted)", fontSize: 12.5, cursor: "pointer", whiteSpace: "nowrap" }}>
-        <span style={{ fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700 }}>{label}</span>
+        <span style={{ fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700 }}>{label}</span>
         <span style={{ color: "var(--gold-light)", fontWeight: 600 }}>{value}</span>
         <span aria-hidden style={{ width: 6, height: 6, borderRight: "1.5px solid var(--accent)", borderBottom: "1.5px solid var(--accent)", transform: open ? "rotate(-135deg) translate(-1px,-1px)" : "rotate(45deg) translateY(-2px)", transition: "transform .22s ease" }} />
       </button>
@@ -1892,7 +1892,7 @@ function RailInline({ value, options, onPick }: { value: string; options: { id: 
     <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
       {options.map(o => (
         <button key={o.id} className="ps-chip" onClick={() => onPick(o.id)} style={{ ...chipStyle(value === o.id), flexDirection: "column", alignItems: "flex-start", minWidth: o.note ? 108 : undefined }}>
-          <span>{o.label}</span>{o.note && <span style={{ fontSize: 9.5, color: value === o.id ? "var(--ink-on-accent)" : C.fgFaint }}>{o.note}</span>}
+          <span>{o.label}</span>{o.note && <span style={{ fontSize: 11.5, color: value === o.id ? "var(--ink-on-accent)" : C.fgFaint }}>{o.note}</span>}
         </button>
       ))}
     </div>
@@ -1957,7 +1957,7 @@ function Swatch({ s, on, label, onClick }: { s: Style; on: boolean; label?: stri
         <span style={{ width: 12, height: 12, borderRadius: "50%", background: s.accent }} />
         <span style={{ width: 12, height: 12, borderRadius: 3, background: s.ink }} />
       </div>
-      {label && <div style={{ fontSize: 9.5, color: C.fgMuted, padding: "3px 4px", background: C.surface, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{label}</div>}
+      {label && <div style={{ fontSize: 11.5, color: C.fgMuted, padding: "3px 4px", background: C.surface, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{label}</div>}
     </button>
   )
 }

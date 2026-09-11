@@ -8,8 +8,10 @@ import TeamPage, { type TeamData } from "@/app/dashboard/team/page"
 
 export const dynamic = "force-dynamic"
 
-export default async function E2EEquipePage() {
+// ?vide=1 : le compte solo — aucun coéquipier, aucune invitation.
+export default async function E2EEquipePage({ searchParams }: { searchParams?: Promise<{ vide?: string }> }) {
   if (!harnessAutorise()) notFound()
+  const vide = ((await searchParams) ?? {}).vide === "1"
   const il_y_a = (j: number) => new Date(Date.now() - j * 864e5).toISOString()
   const data: TeamData = {
     team: { id: "demo-team", name: "Studio Horizon (démo)", ownerId: "demo-owner" },
@@ -21,5 +23,5 @@ export default async function E2EEquipePage() {
     invitations: [{ id: "demo-i1", email: "nouvelle.recrue@exemple.fr", role: "editor", created_at: il_y_a(1) }],
     myRole: "owner", plan: "business", teamEnabled: true, teamLimit: 5, seatsUsed: 3,
   }
-  return <ToastProvider><ConfirmProvider><TeamPage initialData={data} /></ConfirmProvider></ToastProvider>
+  return <ToastProvider><ConfirmProvider><TeamPage initialData={vide ? { ...data, members: [], invitations: [], seatsUsed: 1 } : data} /></ConfirmProvider></ToastProvider>
 }

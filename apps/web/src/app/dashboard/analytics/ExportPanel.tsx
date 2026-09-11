@@ -231,11 +231,11 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
             <Download size={16} color={G} />
             <h3 style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>Export CSV</h3>
             {isPaid ? (
-              <span style={{ background: "color-mix(in srgb, var(--accent) 15%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 6, padding: "2px 8px", fontSize: 10, color: G, fontWeight: 700 }}>
+              <span style={{ background: "color-mix(in srgb, var(--accent) 15%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 6, padding: "2px 8px", fontSize: 11.5, color: G, fontWeight: 700 }}>
                 {plan?.toUpperCase()}
               </span>
             ) : (
-              <span style={{ background: "rgba(255,100,100,0.1)", border: "1px solid rgba(255,100,100,0.3)", borderRadius: 6, padding: "2px 8px", fontSize: 10, color: "var(--danger)", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ background: "rgba(255,100,100,0.1)", border: "1px solid rgba(255,100,100,0.3)", borderRadius: 6, padding: "2px 8px", fontSize: 11.5, color: "var(--danger)", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
                 <Lock size={9} /> PRO
               </span>
             )}
@@ -269,7 +269,7 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
 
           {/* Sélection datasets */}
           <div>
-            <p style={{ color: MUTED, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, margin: "0 0 10px" }}>
+            <p style={{ color: MUTED, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, margin: "0 0 10px" }}>
               Données à exporter
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 8 }}>
@@ -285,7 +285,7 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
                       <p style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600, margin: "0 0 2px" }}>
                         {ds.icon} {ds.label}
                       </p>
-                      <p style={{ color: MUTED, fontSize: 10, margin: 0, lineHeight: 1.4 }}>{ds.desc}</p>
+                      <p style={{ color: MUTED, fontSize: 11.5, margin: 0, lineHeight: 1.4 }}>{ds.desc}</p>
                     </div>
                   </button>
                 )
@@ -295,7 +295,7 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
 
           {/* Période */}
           <div>
-            <p style={{ color: MUTED, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, margin: "0 0 10px" }}>
+            <p style={{ color: MUTED, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, margin: "0 0 10px" }}>
               Période
             </p>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -311,12 +311,12 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
             {period === "custom" && (
               <div style={{ display: "flex", gap: 10, marginTop: 12, alignItems: "center", flexWrap: "wrap" }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <label style={{ color: MUTED, fontSize: 10, fontWeight: 600 }}>Du</label>
+                  <label style={{ color: MUTED, fontSize: 11.5, fontWeight: 600 }}>Du</label>
                   <input type="date" aria-label="Date de début" value={customFrom} onChange={e => setCustomFrom(e.target.value)}
                     style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 8, color: "var(--ink)", padding: "7px 10px", fontSize: 12, outline: "none", cursor: "pointer" }} />
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <label style={{ color: MUTED, fontSize: 10, fontWeight: 600 }}>Au</label>
+                  <label style={{ color: MUTED, fontSize: 11.5, fontWeight: 600 }}>Au</label>
                   <input type="date" aria-label="Date de fin" value={customTo} onChange={e => setCustomTo(e.target.value)}
                     style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 8, color: "var(--ink)", padding: "7px 10px", fontSize: 12, outline: "none", cursor: "pointer" }} />
                 </div>

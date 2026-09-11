@@ -53,7 +53,7 @@ export function OutlinePanel({ open, onClose, blocks, blockDefs, onSelect, onMov
             return (
               <div key={b.id}
                 style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.02)", opacity: b.visible ? 1 : 0.5 }}>
-                <span style={{ width: 20, textAlign: "center", flexShrink: 0, color: MUTED, fontSize: 10, fontWeight: 700 }}>{i + 1}</span>
+                <span style={{ width: 20, textAlign: "center", flexShrink: 0, color: MUTED, fontSize: 11.5, fontWeight: 700 }}>{i + 1}</span>
                 <button type="button" onClick={() => onSelect(b.id)} title="Aller à ce bloc"
                   style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", color: "var(--ink)", textAlign: "left", padding: 0 }}>
                   <span style={{ fontSize: 14, flexShrink: 0 }}>{def?.icon}</span>

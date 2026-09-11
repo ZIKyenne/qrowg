@@ -25,7 +25,7 @@ function Section({ title, icon, open, onToggle, children, hero }: { title: strin
       <button onClick={onToggle} style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "12px 13px", background: "transparent", border: "none", cursor: "pointer", color: open || hero ? G : TEXT, textAlign: "left" }}>
         <span style={{ display: "flex", color: open ? G : hero ? G : MUTED, transition: "color .2s" }}>{icon}</span>
         <span style={{ fontSize: 13, fontWeight: 700, flex: 1 }}>{title}</span>
-        {hero && !open && <span style={{ background: `${G}22`, color: G, fontSize: 8.5, fontWeight: 800, letterSpacing: 0.5, padding: "2px 7px", borderRadius: 20, textTransform: "uppercase" }}>Démarrer</span>}
+        {hero && !open && <span style={{ background: `${G}22`, color: G, fontSize: 11, fontWeight: 800, letterSpacing: 0.5, padding: "2px 7px", borderRadius: 20, textTransform: "uppercase" }}>Démarrer</span>}
         <ChevronDown size={15} style={{ color: MUTED, transform: open ? "rotate(180deg)" : "none", transition: "transform .22s" }} />
       </button>
       <div style={{ display: "grid", gridTemplateRows: open ? "1fr" : "0fr", transition: "grid-template-rows .24s ease" }}>
@@ -75,7 +75,7 @@ function PositionGrid({ value, onChange }: { value: string; onChange: (v: string
           )
         })}
       </div>
-      <p style={{ color: MUTED, fontSize: 9.5, margin: "6px 0 0" }}>Rendu optimisé : bas-gauche, bas-centre, centre.</p>
+      <p style={{ color: MUTED, fontSize: 11.5, margin: "6px 0 0" }}>Rendu optimisé : bas-gauche, bas-centre, centre.</p>
     </div>
   )
 }
@@ -119,14 +119,14 @@ function ColorStudio({ label, value, fallback, onChange }: { label: string; valu
       {open && (
         <div style={{ marginTop: 8, background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, padding: 10, display: "flex", flexDirection: "column", gap: 8 }}>
           <div>
-            <p style={{ color: MUTED, fontSize: 9.5, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: 1 }}>Palette</p>
+            <p style={{ color: MUTED, fontSize: 11, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: 1 }}>Palette</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
               {PALETTE.map(col => <button key={col} onClick={() => commit(col)} title={col} style={{ width: 22, height: 22, borderRadius: 6, background: col, border: (value || "").toLowerCase() === col.toLowerCase() ? `2px solid ${G}` : "1px solid rgba(255,255,255,0.12)", cursor: "pointer" }} />)}
             </div>
           </div>
           {recent.length > 0 && (
             <div>
-              <p style={{ color: MUTED, fontSize: 9.5, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: 1 }}>Récentes</p>
+              <p style={{ color: MUTED, fontSize: 11, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: 1 }}>Récentes</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {recent.map(col => <button key={col} onClick={() => commit(col)} title={col} style={{ width: 22, height: 22, borderRadius: 6, background: col, border: "1px solid rgba(255,255,255,0.12)", cursor: "pointer" }} />)}
               </div>
@@ -180,7 +180,7 @@ function CropEditor({ content, set, onClose }: { content: Record<string, any>; s
           {c.src ? <img src={c.src} alt="" draggable={false} style={{ width: "100%", height: "100%", pointerEvents: "none", ...bannerImageStyle(c) }} /> : <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", color: MUTED, fontSize: 12 }}>Aucune image</div>}
           {/* Repère grille (règle des tiers) */}
           <div style={{ position: "absolute", inset: 0, pointerEvents: "none", backgroundImage: "linear-gradient(rgba(255,255,255,0.18) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.18) 1px,transparent 1px)", backgroundSize: "33.33% 33.33%" }} />
-          <div style={{ position: "absolute", top: 8, left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center", gap: 5, background: "rgba(0,0,0,0.5)", borderRadius: 20, padding: "4px 10px", color: "#fff", fontSize: 10, fontWeight: 600, pointerEvents: "none" }}><Move size={11} /> Glissez pour cadrer</div>
+          <div style={{ position: "absolute", top: 8, left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center", gap: 5, background: "rgba(0,0,0,0.5)", borderRadius: 20, padding: "4px 10px", color: "#fff", fontSize: 11.5, fontWeight: 600, pointerEvents: "none" }}><Move size={11} /> Glissez pour cadrer</div>
         </div>
         {/* Zoom */}
         <div style={{ marginTop: 14 }}>
@@ -199,7 +199,7 @@ function CropEditor({ content, set, onClose }: { content: Record<string, any>; s
   )
 }
 const miniBtn: React.CSSProperties = { flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "8px 4px", color: TEXT, fontSize: 11, fontWeight: 600, cursor: "pointer" }
-const styleBtn: React.CSSProperties = { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 7, padding: "5px 10px", color: TEXT, fontSize: 10.5, fontWeight: 600, cursor: "pointer" }
+const styleBtn: React.CSSProperties = { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 7, padding: "5px 10px", color: TEXT, fontSize: 11.5, fontWeight: 600, cursor: "pointer" }
 
 // Clés de "style" de la bannière (tout sauf le contenu réel : titre/sous-titre/badge/image/lien)
 const BANNER_STYLE_KEYS = [
@@ -269,7 +269,7 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
           <span style={{ display: "flex", color: G }}><Wand2 size={16} /></span>
           <div style={{ flex: 1 }}>
             <p style={{ color: G, fontSize: 12.5, fontWeight: 800, letterSpacing: 0.5, margin: 0, textTransform: "uppercase" }}>Banner Studio</p>
-            <p style={{ color: MUTED, fontSize: 10, margin: "1px 0 0" }}>{typeLabel} · {heightPx}px · {animLabel}</p>
+            <p style={{ color: MUTED, fontSize: 11.5, margin: "1px 0 0" }}>{typeLabel} · {heightPx}px · {animLabel}</p>
           </div>
           {/* aperçu miniature live */}
           <div className={anim !== "none" ? `qfb qfb-${anim}` : undefined} style={{ width: 58, height: 34, borderRadius: 7, overflow: "hidden", position: "relative", border: "1px solid rgba(255,255,255,0.12)", flexShrink: 0 }}>
@@ -280,20 +280,20 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
         {/* Score qualité */}
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-            <span style={{ color: MUTED, fontSize: 10, fontWeight: 600 }}>Qualité visuelle</span>
+            <span style={{ color: MUTED, fontSize: 11.5, fontWeight: 600 }}>Qualité visuelle</span>
             <span style={{ color: score >= 80 ? "var(--success)" : score >= 55 ? G : "#FBBF24", fontSize: 11, fontWeight: 700 }}>{score}% · {"★".repeat(stars)}{"☆".repeat(5 - stars)}</span>
           </div>
           <div style={{ height: 5, background: "rgba(255,255,255,0.08)", borderRadius: 3, overflow: "hidden" }}>
             <div style={{ height: "100%", width: `${score}%`, background: `linear-gradient(90deg,${G},var(--success))`, borderRadius: 3, transition: "width .3s ease" }} />
           </div>
-          {tips[0] && <p style={{ color: MUTED, fontSize: 10, margin: "7px 0 0", display: "flex", gap: 5 }}><span style={{ color: G }}>💡</span>{tips[0]}</p>}
+          {tips[0] && <p style={{ color: MUTED, fontSize: 11.5, margin: "7px 0 0", display: "flex", gap: 5 }}><span style={{ color: G }}>💡</span>{tips[0]}</p>}
         </div>
         {/* Style : copier / coller / réinitialiser */}
         <div style={{ display: "flex", gap: 6, marginTop: 11, alignItems: "center" }}>
           <button onClick={copyStyle} title="Copier le style de cette bannière" style={styleBtn}>Copier</button>
           <button onClick={pasteStyle} disabled={!hasClip} title={hasClip ? "Appliquer le style copié" : "Copiez d'abord un style"} style={{ ...styleBtn, opacity: hasClip ? 1 : 0.4, cursor: hasClip ? "pointer" : "not-allowed" }}>Coller</button>
           <button onClick={resetStyle} title="Réinitialiser le style" style={{ ...styleBtn, color: MUTED }}>Réinitialiser</button>
-          {flash && <span style={{ marginLeft: "auto", color: "var(--success)", fontSize: 10, fontWeight: 700 }}>✓ {flash}</span>}
+          {flash && <span style={{ marginLeft: "auto", color: "var(--success)", fontSize: 11.5, fontWeight: 700 }}>✓ {flash}</span>}
         </div>
       </div>
 
@@ -319,7 +319,7 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
                       return (
                         <button key={fl.key} onClick={() => Object.entries(fl.v).forEach(([k, v]) => set(k, v))} style={{ borderRadius: 9, overflow: "hidden", border: `1.5px solid ${on ? G : "rgba(255,255,255,0.1)"}`, cursor: "pointer", background: "transparent", padding: 0 }}>
                           <div style={{ height: 28, backgroundImage: `url(${c.src})`, backgroundSize: "cover", backgroundPosition: "center", filter: [fl.v.img_grayscale && +fl.v.img_grayscale ? `grayscale(${fl.v.img_grayscale}%)` : "", fl.v.img_sepia && +fl.v.img_sepia ? `sepia(${fl.v.img_sepia}%)` : "", fl.v.img_saturate ? `saturate(${fl.v.img_saturate}%)` : "", fl.v.img_contrast ? `contrast(${fl.v.img_contrast}%)` : "", fl.v.img_brightness ? `brightness(${fl.v.img_brightness}%)` : ""].filter(Boolean).join(" ") }} />
-                          <div style={{ fontSize: 9.5, color: on ? G : MUTED, fontWeight: on ? 700 : 500, padding: "3px 2px", textAlign: "center" }}>{fl.label}</div>
+                          <div style={{ fontSize: 11.5, color: on ? G : MUTED, fontWeight: on ? 700 : 500, padding: "3px 2px", textAlign: "center" }}>{fl.label}</div>
                         </button>
                       )
                     })}
@@ -341,7 +341,7 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
                 return (
                   <button key={o.key} onClick={() => set("grad_preset", o.key)} style={{ borderRadius: 9, overflow: "hidden", border: `1.5px solid ${on ? G : "rgba(255,255,255,0.1)"}`, cursor: "pointer", background: "transparent", padding: 0 }}>
                     <div style={{ height: 30, ...prevStyle }} />
-                    <div style={{ fontSize: 9.5, color: on ? G : MUTED, fontWeight: on ? 700 : 500, padding: "3px 2px", textAlign: "center" }}>{o.label}</div>
+                    <div style={{ fontSize: 11.5, color: on ? G : MUTED, fontWeight: on ? 700 : 500, padding: "3px 2px", textAlign: "center" }}>{o.label}</div>
                   </button>
                 )
               })}
@@ -387,7 +387,7 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
               <span style={{ color: MUTED, fontSize: 11 }}>Ouvrir dans un nouvel onglet</span>
             </label>
           )}
-          {c.link_url && <p style={{ color: G, fontSize: 10, margin: "7px 0 0", display: "flex", gap: 5 }}><span>👆</span>Toute la bannière devient cliquable (clic tracké dans les stats).</p>}
+          {c.link_url && <p style={{ color: G, fontSize: 11.5, margin: "7px 0 0", display: "flex", gap: 5 }}><span>👆</span>Toute la bannière devient cliquable (clic tracké dans les stats).</p>}
         </div>
       </Section>
 
@@ -401,7 +401,7 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
               return (
                 <button key={o.key} onClick={() => set("title_font", o.key)} style={{ borderRadius: 9, border: `1.5px solid ${on ? G : "rgba(255,255,255,0.1)"}`, background: on ? "color-mix(in srgb, var(--accent) 10%, transparent)" : "rgba(255,255,255,0.03)", cursor: "pointer", padding: "8px 4px" }}>
                   <div style={{ fontFamily: o.ff, color: on ? G : TEXT, fontSize: 18, fontWeight: 700, lineHeight: 1 }}>Ag</div>
-                  <div style={{ fontSize: 9, color: on ? G : MUTED, marginTop: 3 }}>{o.label}</div>
+                  <div style={{ fontSize: 11.5, color: on ? G : MUTED, marginTop: 3 }}>{o.label}</div>
                 </button>
               )
             })}
@@ -426,7 +426,7 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
               return (
                 <button key={o.key} onClick={() => set("title_effect", o.key)} style={{ borderRadius: 9, border: `1.5px solid ${on ? G : "rgba(255,255,255,0.1)"}`, background: on ? "color-mix(in srgb, var(--accent) 10%, transparent)" : "rgba(255,255,255,0.03)", cursor: "pointer", padding: "9px 2px" }}>
                   <div style={{ color: "#fff", fontSize: 15, fontWeight: 800, lineHeight: 1, textShadow: (o as any).sh || "none", WebkitTextStroke: (o as any).stroke ? "0.8px rgba(0,0,0,0.7)" : undefined }}>Ag</div>
-                  <div style={{ fontSize: 8.5, color: on ? G : MUTED, marginTop: 4 }}>{o.label}</div>
+                  <div style={{ fontSize: 11.5, color: on ? G : MUTED, marginTop: 4 }}>{o.label}</div>
                 </button>
               )
             })}
@@ -448,8 +448,8 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
               const on = (c.overlay_gradient || "none") === o.key
               return (
                 <button key={o.key} onClick={() => set("overlay_gradient", o.key)} style={{ borderRadius: 9, overflow: "hidden", border: `1.5px solid ${on ? G : "rgba(255,255,255,0.1)"}`, cursor: "pointer", background: "transparent", padding: 0 }}>
-                  <div style={{ height: 34, background: o.grad, position: "relative" }}><span style={{ position: "absolute", bottom: 4, left: 5, color: "#fff", fontSize: 8, fontWeight: 700, textShadow: "0 1px 2px #000" }}>Texte</span></div>
-                  <div style={{ fontSize: 10, color: on ? G : MUTED, fontWeight: on ? 700 : 500, padding: "4px 2px", textAlign: "center" }}>{o.label}</div>
+                  <div style={{ height: 34, background: o.grad, position: "relative" }}><span style={{ position: "absolute", bottom: 4, left: 5, color: "#fff", fontSize: 11.5, fontWeight: 700, textShadow: "0 1px 2px #000" }}>Texte</span></div>
+                  <div style={{ fontSize: 11.5, color: on ? G : MUTED, fontWeight: on ? 700 : 500, padding: "4px 2px", textAlign: "center" }}>{o.label}</div>
                 </button>
               )
             })}
@@ -479,12 +479,12 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
               return (
                 <button key={o.key} onClick={() => set("fx_overlay", o.key)} style={{ borderRadius: 9, overflow: "hidden", border: `1.5px solid ${on ? G : "rgba(255,255,255,0.1)"}`, cursor: "pointer", background: "transparent", padding: 0 }}>
                   <div style={{ height: 32, position: "relative", background: "#1a1a1a" }}>{o.prev}</div>
-                  <div style={{ fontSize: 9.5, color: on ? G : MUTED, fontWeight: on ? 700 : 500, padding: "3px 2px", textAlign: "center" }}>{o.label}</div>
+                  <div style={{ fontSize: 11.5, color: on ? G : MUTED, fontWeight: on ? 700 : 500, padding: "3px 2px", textAlign: "center" }}>{o.label}</div>
                 </button>
               )
             })}
           </div>
-          <p style={{ color: MUTED, fontSize: 9.5, margin: "6px 0 0" }}>Verre = flou dépoli · Grain = texture ciné · Mesh = halos colorés · Aurora = lueur animée.</p>
+          <p style={{ color: MUTED, fontSize: 11.5, margin: "6px 0 0" }}>Verre = flou dépoli · Grain = texture ciné · Mesh = halos colorés · Aurora = lueur animée.</p>
         </div>
       </Section>
 
@@ -502,17 +502,17 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
                     <span style={{ width: 16, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.7)" }} />
                   </div>
                 </div>
-                <div style={{ fontSize: 10.5, color: on ? G : MUTED, fontWeight: on ? 700 : 500, padding: "5px 2px", textAlign: "center" }}>{o.label}</div>
+                <div style={{ fontSize: 11.5, color: on ? G : MUTED, fontWeight: on ? 700 : 500, padding: "5px 2px", textAlign: "center" }}>{o.label}</div>
               </button>
             )
           })}
         </div>
-        <p style={{ color: MUTED, fontSize: 10, margin: 0, lineHeight: 1.5 }}>Les animations s'affichent sur la page publiée (aperçu réel ci-dessus).</p>
+        <p style={{ color: MUTED, fontSize: 11.5, margin: 0, lineHeight: 1.5 }}>Les animations s'affichent sur la page publiée (aperçu réel ci-dessus).</p>
       </Section>
 
       {/* MODELES — galerie avec mini-aperçus */}
       <Section title="Modèles" icon={<Layers size={15} />} open={open === "presets"} onToggle={() => toggle("presets")}>
-        <p style={{ color: MUTED, fontSize: 10.5, margin: 0 }}>Un clic configure toute la bannière. Ajoutez ensuite votre image.</p>
+        <p style={{ color: MUTED, fontSize: 11.5, margin: 0 }}>Un clic configure toute la bannière. Ajoutez ensuite votre image.</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 8 }}>
           {BANNER_PRESETS.map(p => {
             const anim2 = p.content.animation && p.content.animation !== "none" ? p.content.animation : null
@@ -542,7 +542,7 @@ function Field({ label, value, placeholder, max, onChange }: { label: string; va
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
         <label style={{ color: MUTED, fontSize: 11, fontWeight: 500 }}>{label}</label>
-        {max && <span style={{ color: len > max ? "#EF4444" : MUTED, fontSize: 10, fontVariantNumeric: "tabular-nums" }}>{len}/{max}</span>}
+        {max && <span style={{ color: len > max ? "#EF4444" : MUTED, fontSize: 11.5, fontVariantNumeric: "tabular-nums" }}>{len}/{max}</span>}
       </div>
       <input value={value || ""} placeholder={placeholder} onChange={e => onChange(e.target.value)} style={{ width: "100%", background: "#0A0A0A", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "9px 11px", color: TEXT, fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif", transition: "border-color .15s" }}
         onFocus={e => e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)"} onBlur={e => e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 20%, transparent)"} />

@@ -53,7 +53,7 @@ export function BuilderStatus(props: BuilderStatusProps) {
   )
 
   const base: React.CSSProperties = {
-    display: "flex", alignItems: "center", gap: 5, fontSize: 10, fontWeight: 600,
+    display: "flex", alignItems: "center", gap: 5, fontSize: 11.5, fontWeight: 600,
     color, flexShrink: 0, whiteSpace: "nowrap", maxWidth: props.mobile ? 150 : 360,
     overflow: "hidden", textOverflow: "ellipsis",
   }

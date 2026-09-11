@@ -133,17 +133,17 @@ export function ResponsiveCanvas({ children, mobile, initialDevice = "fluid", se
 
         {/* Repère fin de page */}
         {total > 0 && (
-          <div data-testid="page-end" aria-hidden="true" style={{ textAlign: "center", color: MUTED, fontSize: 10, letterSpacing: 2, textTransform: "uppercase", padding: "16px 0 4px" }}>Fin de page</div>
+          <div data-testid="page-end" aria-hidden="true" style={{ textAlign: "center", color: MUTED, fontSize: 11, letterSpacing: 2, textTransform: "uppercase", padding: "16px 0 4px" }}>Fin de page</div>
         )}
       </div>
 
       {/* Statut : position + retour en haut (§18) */}
       <div data-testid="canvas-status" style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 10, padding: "5px 12px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(12,12,12,0.6)" }}>
-        <span style={{ fontSize: 10.5, color: MUTED }} data-testid="page-position">{positionLabel}</span>
+        <span style={{ fontSize: 11.5, color: MUTED }} data-testid="page-position">{positionLabel}</span>
         <div style={{ flex: 1 }} />
         <button type="button" data-testid="back-to-top" onClick={() => scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Revenir en haut" title="Revenir en haut"
-          style={{ fontSize: 10.5, color: "var(--ink, var(--ink))", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "3px 9px", cursor: "pointer" }}>↑ Haut</button>
+          style={{ fontSize: 11.5, color: "var(--ink, var(--ink))", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "3px 9px", cursor: "pointer" }}>↑ Haut</button>
       </div>
     </div>
   )

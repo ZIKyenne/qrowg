@@ -224,28 +224,35 @@ doublons réels, à supprimer côté Instagram :
 | Boulangerie | Pain sur commande pour la semaine | 10/09 |
 | Food truck | Moyens de paiement acceptés | 10/09 |
 | Salon / coiffeur | Routine d'entretien après un balayage | 10/09 |
+| Marché / producteur | Recette du produit de saison sur l'étal (carrousel + reel) | 11/09 |
+| Restaurant | Carte du soir écourtée en fin de service | 11/09 |
+| Commerce | Horaires exceptionnels affichés en vitrine | 11/09 |
+| Food truck | Fiche « où se garer » pour les entreprises | 11/09 |
+| Immobilier | Panneau « à vendre » qui montre l'intérieur | 11/09 |
 
 ## Angles NEUFS disponibles (piocher ici en priorité)
 - Restaurant : plat à emporter du soir · anniversaire / privatisation ·
   fiche « d'où vient ce plat » (producteurs) · le menu de Noël réservé dès novembre ·
-  la carte du soir écourtée en fin de service · le vestiaire et les objets oubliés ·
-  la table dressée pour un anniversaire (bougie, message, playlist).
+  le vestiaire et les objets oubliés · la table dressée pour un anniversaire ·
+  le brunch du dimanche sur réservation.
 - Bar : quiz / jeu de table ·
   happy hour qui change selon l'heure · la carte des bières de saison ·
   la privatisation de l'arrière-salle · la carte des softs travaillés pour le conducteur.
 - Boulangerie : commande de galette / bûche selon la saison · liste d'allergènes ·
   les farines et provenances affichées · la tournée de livraison aux entreprises.
-- Food truck : la fiche « où se garer » pour les entreprises ·
-  le camion en tournée de festival (dates et scène) · la carte allergènes du camion.
-- Marché / producteur : la recette du produit de saison · la vente à la ferme hors marché ·
-  la commande groupée entre voisins.
+- Food truck : le camion en tournée de festival (dates et scène) ·
+  la carte allergènes du camion · l'abonnement midi des habitués.
+- Marché / producteur : la vente à la ferme hors marché ·
+  la commande groupée entre voisins · le calendrier des semis et des récoltes.
 - Commerce : inscription newsletter en caisse · parrainage · la notice du produit sans papier ·
-  le mode d'emploi de l'article en cabine · les horaires exceptionnels affichés en vitrine.
+  le mode d'emploi de l'article en cabine · la liste d'attente sur un produit en rupture.
 - Hôtel / chambre d'hôtes : les bonnes adresses du quartier tenues à jour ·
   le petit-déjeuner commandé la veille · le règlement intérieur et les horaires affichés.
 - Salon / coiffeur : la carte cadeau du salon ·
   la fiche « ce qu'on a fait sur tes cheveux » remise en fin de rendez-vous ·
   les produits utilisés, référencés et rachetables.
+- Immobilier : les diagnostics et le plan sur le panneau · la visite virtuelle depuis la vitrine
+  de l'agence · le dossier de location prérempli.
 - Transverse : « ton QR imprimé en 2024 marche encore » (QR dynamique) ·
   le plafond souple (la page ne se coupe pas) · QR statique vs dynamique en 20 s ·
   ce que ton support papier ne te dit pas (mesure) · un support, une page, un chiffre.
@@ -310,6 +317,11 @@ doublons réels, à supprimer côté Instagram :
 - « Le pain de la semaine, commandé dimanche. »
 - « Vous prenez la carte ? Vingt fois par service. »
 - « Le balayage tient trois mois. Les conseils, 10 min. »
+- « Il regarde le potimarron. Il le repose. »
+- « 22 h 30 : la moitié de la carte n'existe plus. »
+- « Fermé lundi. Le papier scotché dit l'inverse. »
+- « Vous venez chez nous ? Et la fiche n'existe pas. »
+- « Il photographie le panneau. Il n'appelle jamais. »
 - « Complet à 20 h. Vingt couverts perdus. »
 - « Un prénom sur un carnet, et personne ne rappelle. »
 - « Ta carte en 4 langues. Sans réimprimer. »
@@ -737,3 +749,164 @@ Résumé des titres et tableaux Pinterest :
 **Titre Pinterest** : Routine après balayage : la fiche à créer en 4 étapes
 **Tableau** : QR code salon coiffure — unique épingle hors-food du jour
 `#salondecoiffure #balayage #routinecheveux #coiffure`
+
+---
+
+## 11/09 — production du jour · DÉPOSÉE ET EN FILE
+
+> **File Buffer trouvée VIDE (0/10)** : les 6 posts du 10/09 sont tous partis, aucun en
+> `error`, aucun brouillon parasite programmé. **Réserve `_STOCK` vide** (`dispo` = 0) :
+> production 100 % neuve. Aucun post créé hors run ce matin — le phénomène des deux
+> jours précédents (création vers 08 h 05 sur du contenu de la veille) **ne s'est pas
+> reproduit**. À continuer de surveiller.
+>
+> Secteur du jour : **marché / producteur · la recette du produit de saison**, angle
+> jamais traité et **premier carrousel jamais consacré à ce secteur**. Rotation
+> respectée (10/09 = restaurant, 09/09 = bar). C'est aussi le contenu le plus proche
+> de l'audience héritée décrite dans `audience-bridge.md` (« Best produce, tips and
+> tricks », ~9 400 abonnés food) : pont d'audience joué à fond, saison d'automne tissée.
+> Vendredi = **jour vidéo** : reel de **32,2 s**, 7 scènes, 7 moteurs distincts, palette
+> `or` stable, `scrim` 0,72, `maxDuration` 36, validateur « rien à signaler ».
+> Pas de post X (X = mardi, jeudi, samedi).
+>
+> **Apprentissage Buffer.** Le carrousel Instagram du 10/09 est bien en ligne
+> (`/p/DdGeP3plhkf/`) et fait **0 vue, 0 reach** — comme les six précédents, sans
+> exception. TikTok reste le seul canal distribué et **s'érode lentement** :
+> 272 vues / 9,23 s le 07/09 → 268 / 4,25 s le 08/09 → 260 / 4,42 s le 09/09 →
+> **265 / 3,84 s le 10/09**. Le volume est stable, le temps de visionnage baisse : les
+> trois meilleurs scores du mois restent des sujets de **restauration en tension de
+> service**. Le sujet du jour garde ce ressort (une vente perdue en direct sur l'étal)
+> tout en changeant de secteur. Pinterest : Buffer affiche toujours 0 impression —
+> défaut de reporting connu, **ne rien en conclure**. Lecture dans Pinterest Analytics
+> le **15/09**, sur le clic sortant (base à battre : 2 clics / 1 207 impressions).
+>
+> **Tableau neuf mis en test :** l'épingle immobilier part sur **QR code immobilier**,
+> tableau **jamais utilisé jusqu'ici**. À relire le 18/09 : un tableau « QR code X »
+> vierge démarre-t-il aussi bien que les tableaux thématiques déjà alimentés ?
+>
+> Contrôle qualité : **16 visuels, 0 alerte**, chaque QR décodé vers son lien tracké.
+> 4 épingles, 4 angles distincts, **4 gabarits distincts (layouts 0, 1, 2, 3)** et
+> **4 tableaux distincts**. Une seule épingle hors-food (immobilier) : pont tenu.
+
+### ⚠️ Correctif du jour : longueur d'URL et densité du QR (à retenir)
+
+La slide `qr` du carrousel est sortie **en alerte** : QR présent mais non décodable au
+contrôle. Diagnostic mené jusqu'au bout plutôt que contourné :
+
+- Ce n'était **pas** le gabarit ni le `border-radius` du QR héros (testé à 0 : même échec).
+- C'est la **longueur de l'URL encodée**. Mesuré sur la même slide, même rendu :
+  **104 caractères → décodage seulement à 2 échelles sur 5** ; **97 caractères → 5/5** ;
+  **83 caractères → 5/5**.
+- Les liens d'épingle passent malgré leur longueur parce que leur QR héros est dessiné
+  plus grand ; le QR du carrousel est plus petit, donc plus sensible à la densité.
+
+**Règle ajoutée :** l'URL encodée dans un QR de **carrousel** doit rester **sous
+~100 caractères**. Le carrousel du jour encode donc
+`?utm_medium=carrousel&utm_campaign=20260911-marche` (83 car., sans `utm_source`) —
+ce qui est de toute façon plus honnête : la **même image** part sur Instagram *et*
+TikTok, la source n'y a jamais été mesurable. Les liens complets, eux, restent dans
+les légendes, la bio et les épingles.
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| en-file | qr-code-recette-du-produit-de-saison-etal-marche-01..06.png | Instagram (carrousel) | — | marché/producteur · recette du produit de saison · le produit de saison ne se vend plus seul | https://qrowg.com/qr-code/artisan?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260911-marche | 2026-09-11 |
+| en-file | tiktok-qr-code-recette-du-produit-de-saison-etal-marche-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 | https://qrowg.com/qr-code/artisan?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260911-marche | 2026-09-11 |
+| en-file | qr-code-carte-du-soir-ecourtee-fin-de-service-restaurant.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 0 | restaurant · carte du soir écourtée · ce qui part encore à 22 h 30 | https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260911-marche&utm_content=clic | 2026-09-11 |
+| en-file | qr-code-horaires-exceptionnels-vitrine-commerce.png | Pinterest | QR code boutique commerce (726416683586817655) — gabarit 1 | commerce · horaires exceptionnels · le client ne vient plus pour rien | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260911-marche&utm_content=clic | 2026-09-11 |
+| en-file | qr-code-ou-se-garer-entreprises-food-truck.png | Pinterest | QR code food truck (726416683586817654) — gabarit 2 | food truck · fiche « on vient chez vous » · place, accès, électricité, minimum | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260911-marche&utm_content=clic | 2026-09-11 |
+| en-file | qr-code-panneau-a-vendre-visite-interieur-immobilier.png | Pinterest | **QR code immobilier (726416683586817652)** — gabarit 3 — *tableau jamais utilisé, test de placement* | immobilier · panneau à vendre · il photographie et n'appelle jamais | https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260911-marche&utm_content=clic&utm_term=immobilier | 2026-09-11 |
+
+> La vidéo `qr-code-recette-du-produit-de-saison-etal-marche-reel.mp4` (32,2 s, 1080×1920)
+> reste **manuelle** et n'entre jamais dans ce circuit. La planche-contact
+> `.sheet.png` est archivée ici mais **exclue du dossier de dépôt** (fichier de contrôle).
+
+## Textes prêts — 11/09
+
+Légendes complètes (Instagram, TikTok, Pinterest ×4, reel, LinkedIn) avec bouton Copier :
+`social-a-deposer\2026-09-11\textes-du-jour-2026-09-11.html`.
+Bios : `social-a-deposer\2026-09-11\bios-du-jour-2026-09-11.html`.
+Pas de post X aujourd'hui (X = mardi, jeudi, samedi).
+Résumé des titres et tableaux Pinterest :
+
+### qr-code-carte-du-soir-ecourtee-fin-de-service-restaurant
+**Titre Pinterest** : Carte du soir : la raccourcir en 10 secondes, sans réimprimer
+**Tableau** : QR code restaurant
+`#restaurant #servicedusoir #cartedujour #commercelocal`
+
+### qr-code-horaires-exceptionnels-vitrine-commerce
+**Titre Pinterest** : Horaires exceptionnels : la page à monter en 5 minutes
+**Tableau** : QR code boutique commerce
+`#commercelocal #boutique #horaires #organisation`
+
+### qr-code-ou-se-garer-entreprises-food-truck
+**Titre Pinterest** : Venir en entreprise : la fiche à faire en 4 étapes
+**Tableau** : QR code food truck
+`#foodtruck #streetfood #entreprise #commercelocal`
+
+### qr-code-panneau-a-vendre-visite-interieur-immobilier
+**Titre Pinterest** : Panneau à vendre : la page à créer en 4 étapes
+**Tableau** : QR code immobilier — unique épingle hors-food, **tableau neuf en test**
+`#immobilier #agentimmobilier #venteimmobiliere #qrcode`
+
+### ⚑ Second passage du 11/09 (run planifié rejoué) — RIEN PRODUIT DE NEUF, c'est volontaire
+
+La tâche planifiée s'est déclenchée une **deuxième fois le même jour**. Contrôle fait avant
+tout : la production du 11/09 existait déjà (rendue à 12 h 41), la réserve `_STOCK` est à
+**0 `dispo`**, et la file Buffer est **vide (0/10)**. Produire un second carrousel Instagram
+le même jour est interdit par la règle bloquante du 09/09. **Aucune production nouvelle**,
+donc — le run a servi à finir celui de 12 h 41, resté bloqué au dépôt.
+
+**⚠️ Ma conclusion sur le script de dépôt était FAUSSE — voici la bonne (à retenir).**
+J'avais lu `QRowg-Depot.ps1` dans `social-a-deposer\2026-09-11\` et conclu qu'il scannait son
+propre dossier. **C'est une copie périmée.** Le script réellement utilisé par Emilien est plus
+récent : il scanne bien le **dossier `outputs` de la session**, et en plus il **isole
+automatiquement les vidéos** vers `C:\Users\PC\Desktop\QRowg-Videos-a-publier\AAAA-MM-JJ\`
+au lieu de les déposer. **L'ÉTAPE 5 de la tâche planifiée est donc correcte telle qu'elle est
+écrite** : copier les visuels du jour dans `outputs`, c'est ce dossier qui compte.
+Leçon de méthode : ne pas déduire le comportement d'un outil d'une copie archivée à côté des
+livrables — les dossiers datés contiennent des copies figées du script au jour J.
+Le dossier `outputs` est par ailleurs **propre à chaque session** : il était vide au démarrage
+de ce run alors que la production de 12 h 41 existait bien. **C'est exactement ce qui a bloqué
+le dépôt ce matin** — le premier run avait copié dans son propre `outputs`, devenu inaccessible.
+
+**Actions de ce passage :**
+- Planche-contact `*.sheet.png` **sortie du dossier de dépôt** vers `2026-09-11\_controle\` :
+  c'est un fichier de contrôle, il avait été déposé par erreur le 09/09. Le dossier de dépôt
+  contient donc exactement les **16 PNG** publiables.
+- Copie de confort des 16 PNG + zip + HTML + mp4 dans le dossier `outputs` de la session, pour
+  que les fichiers soient présentés et ouvrables par Emilien.
+- **Contrôle QR refait indépendamment** (décodage OpenCV multi-échelle contre `attendus.json`,
+  sans repasser par le générateur) : **8 visuels porteurs de QR, 8 décodés vers l'URL attendue
+  exacte, 0 écart**. Les 8 slides sans QR (1, 2, 4, 5 du carrousel et leurs copies TikTok) sont
+  conformes : seules les slides 3 et 6 portent le QR. Revue à l'œil : couverture du carrousel et
+  épingle immobilier (gabarit 3) propres — modules sombres sur plaque or, flèche non orphelinée,
+  `qrowg.com` lisible.
+- Durée du reel confirmée par ffprobe : **32,2 s**.
+
+**Instagram — post en `error` constaté, NON rejoué** (règle du 09/09 appliquée) :
+`6aa2e48aeb97ca19e9d5d533`, carrousel « second service du soir » du 10/09, créé le 10/09 à
+17 h 10 pour le 11/09 05 h 27, rejeté « flagged this post as potential spam ». C'est un
+**doublon** du carrousel du 10/09 déjà en ligne (`/p/DdGeP3plhkf/`), issu du phénomène de
+re-création automatique hors run. **Laissé en `error`, à supprimer à la main dans Buffer.**
+Le phénomène s'est donc bien reproduit cette nuit, contrairement à ce qui était noté ce matin :
+à surveiller à chaque run.
+
+**DÉPÔT FAIT ET FILE REMPLIE — run clos.** Emilien a lancé `QRowg-Depot.cmd` : **16 images
+déposées**, vidéo isolée automatiquement vers `QRowg-Videos-a-publier\2026-09-11\`. Présence
+vérifiée en base (`storage.objects`, préfixe `social/2026-09-11/`) : **16 objets**.
+Puis **6 posts mis en file**, aucun en erreur, dans l'ordre prescrit :
+
+| heure UTC | canal | contenu | tableau |
+|---|---|---|---|
+| 12 h 46 | Pinterest | épingle restaurant · carte du soir écourtée | QR code restaurant |
+| 13 h 30 | Pinterest | épingle commerce · horaires exceptionnels | QR code boutique commerce |
+| 14 h 14 | Pinterest | épingle food truck · « on vient chez vous » | QR code food truck |
+| 15 h 58 | Pinterest | épingle immobilier · panneau à vendre | **QR code immobilier (tableau neuf)** |
+| 18 h 56 | TikTok | carrousel photo, copies `tiktok-` 1080×1350 | — |
+| 19 h 20 | Instagram | carrousel 6 slides 2160×2700 | — |
+
+**File à 6/10**, réserve `_STOCK` toujours vide (rien n'a eu à partir au stock : les 6 posts du
+jour sont tous entrés). Dimensions confirmées côté Buffer : TikTok en 1080×1350 (sous le
+plafond de 2 073 600 px), Instagram en 2160×2700, épingles en 2000×3000.
+Mention « contenu généré par IA » posée sur Instagram ; **non envoyée** sur le carrousel photo
+TikTok (l'API la refuse sur ce format).

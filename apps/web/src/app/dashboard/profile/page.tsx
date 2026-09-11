@@ -1317,7 +1317,7 @@ export default function ProfilePage() {
                 ] as const).map((s, i) => (
                   <div key={i} style={{ display:"flex", alignItems:"center", flex:1 }}>
                     <div style={{ flex:1, background:"color-mix(in srgb, var(--accent) 6%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 14%, transparent)", borderRadius:9, padding:"10px 8px", textAlign:"center" as const, position:"relative" as const }}>
-                      <div style={{ position:"absolute" as const, top:-8, left:"50%", transform:"translateX(-50%)", background:"color-mix(in srgb, var(--accent) 15%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:20, padding:"1px 7px", fontSize:8, color:"var(--accent)", fontWeight:600 }}>{s.step}</div>
+                      <div style={{ position:"absolute" as const, top:-8, left:"50%", transform:"translateX(-50%)", background:"color-mix(in srgb, var(--accent) 15%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:20, padding:"1px 7px", fontSize:11.5, color:"var(--accent)", fontWeight:600 }}>{s.step}</div>
                       <span style={{ fontSize:20, display:"block", margin:"4px 0 5px" }}>{s.emoji}</span>
                       <p style={{ color:"var(--ink)", fontSize:11.5, fontWeight:700, margin:"0 0 2px" }}>{s.label}</p>
                       <p style={{ color:MUTED, fontSize:11, margin:0, lineHeight:1.4 }}>{s.desc}</p>
@@ -1376,7 +1376,7 @@ export default function ProfilePage() {
                     <button key={btn.id} type="button" onClick={() => shareRef(btn.id)}
                       style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:4, padding:"8px 4px", background:`${btn.color}10`, border:`1px solid ${btn.color}25`, borderRadius:9, cursor:"pointer" }}>
                       <span style={{ fontSize:16 }}>{btn.emoji}</span>
-                      <span style={{ color:MUTED, fontSize:8, fontWeight:600 }}>{btn.label}</span>
+                      <span style={{ color:MUTED, fontSize:11.5, fontWeight:600 }}>{btn.label}</span>
                     </button>
                   ))}
                 </div>
@@ -1721,7 +1721,7 @@ export default function ProfilePage() {
                             <div style={{ display:"flex", alignItems:"center", gap:7 }}>
                               <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{sess.browser}</p>
                               {sess.current && (
-                                <span style={{ background:"rgba(57,255,143,0.1)", border:"1px solid rgba(57,255,143,0.2)", borderRadius:4, padding:"1px 6px", fontSize:8, color:"var(--success)", fontWeight:700 }}>
+                                <span style={{ background:"rgba(57,255,143,0.1)", border:"1px solid rgba(57,255,143,0.2)", borderRadius:4, padding:"1px 6px", fontSize:11.5, color:"var(--success)", fontWeight:700 }}>
                                   Session actuelle
                                 </span>
                               )}
@@ -1789,7 +1789,7 @@ export default function ProfilePage() {
                 <div>
                   <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:2 }}>
                     <p style={{ color:"var(--ink)", fontSize:12, fontWeight:700, margin:0 }}>Vos droits RGPD</p>
-                    <span style={{ background:"color-mix(in srgb, var(--accent) 12%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius:4, padding:"1px 7px", fontSize:8, color:"var(--accent)", fontWeight:600 }}>
+                    <span style={{ background:"color-mix(in srgb, var(--accent) 12%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius:4, padding:"1px 7px", fontSize:11.5, color:"var(--accent)", fontWeight:600 }}>
                       RGPD
                     </span>
                   </div>
@@ -1822,7 +1822,7 @@ export default function ProfilePage() {
                       <div style={{ flex:1, minWidth:0 }}>
                         <div style={{ display:"flex", alignItems:"center", gap:7 }}>
                           <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{job.label}</p>
-                          <span style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:4, padding:"1px 6px", fontSize:8, color:MUTED, fontFamily:"monospace" }}>
+                          <span style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:4, padding:"1px 6px", fontSize:11.5, color:MUTED, fontFamily:"monospace" }}>
                             {fmt}
                           </span>
                         </div>
@@ -1867,7 +1867,7 @@ export default function ProfilePage() {
                       <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"7px 11px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.04)", borderRadius:8 }}>
                         <Check size={11} color="var(--success)"/>
                         <span style={{ flex:1, color:MUTED, fontSize:11.5 }}>{h.label}</span>
-                        <span style={{ background:"rgba(255,255,255,0.05)", borderRadius:4, padding:"1px 6px", fontSize:8, color:MUTED, fontFamily:"monospace" }}>{h.format}</span>
+                        <span style={{ background:"rgba(255,255,255,0.05)", borderRadius:4, padding:"1px 6px", fontSize:11.5, color:MUTED, fontFamily:"monospace" }}>{h.format}</span>
                         <span style={{ color:MUTED, fontSize:11 }}>
                           {new Date(h.date).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}
                         </span>
@@ -2317,7 +2317,7 @@ export default function ProfilePage() {
                               </p>
                               {badge.unlocked && (
                                 <div style={{ position:"absolute" as const, top:-4, right:-4, width:14, height:14, borderRadius:"50%", background:"var(--success)", border:"2px solid var(--bg)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                                  <span style={{ fontSize:7, color:"var(--ink-on-accent)", fontWeight:900 }}>v</span>
+                                  <svg viewBox="0 0 10 10" width="8" height="8" aria-hidden style={{ display:"block" }}><path d="M1.5 5.2 L3.8 7.5 L8.5 2.6" fill="none" stroke="var(--ink-on-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                                 </div>
                               )}
                             </div>
@@ -2495,7 +2495,7 @@ export default function ProfilePage() {
                             <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:2 }}>
                               <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{key.name}</p>
                               {!key.is_active && (
-                                <span style={{ background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:4, padding:"1px 6px", fontSize:8, color:"var(--danger)", fontWeight:700 }}>
+                                <span style={{ background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:4, padding:"1px 6px", fontSize:11.5, color:"var(--danger)", fontWeight:700 }}>
                                   REVOQUEE
                                 </span>
                               )}
@@ -2693,7 +2693,7 @@ export default function ProfilePage() {
                               {dm.domain}
                             </a>
                             {dm.is_primary && (
-                              <span style={{ background:"color-mix(in srgb, var(--accent) 12%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius:4, padding:"1px 6px", fontSize:8, color:G, fontWeight:600, flexShrink:0 }}>
+                              <span style={{ background:"color-mix(in srgb, var(--accent) 12%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius:4, padding:"1px 6px", fontSize:11.5, color:G, fontWeight:600, flexShrink:0 }}>
                                 PRINCIPAL
                               </span>
                             )}
@@ -2932,7 +2932,7 @@ export default function ProfilePage() {
                         <div>
                           <div style={{ display:"flex", alignItems:"center", gap:7 }}>
                             <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{item.label}</p>
-                            {locked && <span style={{ background:`color-mix(in srgb, var(--accent) 7%, transparent)`, border:"1px solid var(--line-strong)", borderRadius:4, padding:"1px 6px", fontSize:8, color:G, fontWeight:700 }}>Pro</span>}
+                            {locked && <span style={{ background:`color-mix(in srgb, var(--accent) 7%, transparent)`, border:"1px solid var(--line-strong)", borderRadius:4, padding:"1px 6px", fontSize:11.5, color:G, fontWeight:700 }}>Pro</span>}
                           </div>
                           <p style={{ color:MUTED, fontSize:11.5, margin:"2px 0 0" }}>{item.desc}</p>
                         </div>

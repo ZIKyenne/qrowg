@@ -156,17 +156,17 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
                           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
                             <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 700, margin: 0 }}>{cfg.label}</p>
                             {on && (
-                              <span style={{ background: `${cfg.color}20`, border: `1px solid ${cfg.color}40`, borderRadius: 5, padding: "1px 6px", fontSize: 9, color: cfg.color, fontWeight: 700 }}>
+                              <span style={{ background: `${cfg.color}20`, border: `1px solid ${cfg.color}40`, borderRadius: 5, padding: "1px 6px", fontSize: 11.5, color: cfg.color, fontWeight: 700 }}>
                                 ACTIF
                               </span>
                             )}
                           </div>
                           <p style={{ color: MUTED, fontSize: 11, margin: "0 0 4px" }}>{cfg.desc}</p>
-                          <p style={{ color: MUTED, fontSize: 10, margin: 0, opacity: 0.7 }}>{cfg.detail}</p>
+                          <p style={{ color: MUTED, fontSize: 11.5, margin: 0, opacity: 0.7 }}>{cfg.detail}</p>
                           {sub?.last_sent_at && (
                             <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 6 }}>
                               <Clock size={10} color={MUTED} />
-                              <span style={{ color: MUTED, fontSize: 10 }}>{formatLastSent(sub.last_sent_at)}</span>
+                              <span style={{ color: MUTED, fontSize: 11.5 }}>{formatLastSent(sub.last_sent_at)}</span>
                             </div>
                           )}
                         </div>

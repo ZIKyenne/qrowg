@@ -54,7 +54,7 @@ export function SettingsFieldRenderer({ blockId, fields, content, onChange, mobi
                 inputMode={mobile ? "text" : undefined}
                 onChange={e => onChange(f.key, e.target.value)} style={{ ...inputStyle(mobile), minHeight: mobile ? 46 : undefined }} />
             )}
-            {f.hint && <p style={{ color: MUTED, fontSize: 10.5, margin: "4px 0 0", lineHeight: 1.4 }}>{f.hint}</p>}
+            {f.hint && <p style={{ color: MUTED, fontSize: 11.5, margin: "4px 0 0", lineHeight: 1.4 }}>{f.hint}</p>}
           </div>
         )
       })}

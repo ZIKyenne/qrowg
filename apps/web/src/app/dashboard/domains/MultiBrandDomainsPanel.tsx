@@ -45,27 +45,27 @@ const MUTED = "var(--muted)"
 
 function StatusBadge({ status, verified }: { status: string; verified: boolean }) {
   if (!verified) return (
-    <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:"rgba(249,115,22,0.1)", border:"1px solid rgba(249,115,22,0.25)", borderRadius:6, padding:"2px 8px", fontSize:10, color:"#F97316", fontWeight:600 }}>
+    <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:"rgba(249,115,22,0.1)", border:"1px solid rgba(249,115,22,0.25)", borderRadius:6, padding:"2px 8px", fontSize:11.5, color:"#F97316", fontWeight:600 }}>
       <Clock size={10}/> En attente
     </span>
   )
   if (status === "active") return (
-    <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:"rgba(57,255,143,0.1)", border:"1px solid rgba(57,255,143,0.25)", borderRadius:6, padding:"2px 8px", fontSize:10, color:"var(--success)", fontWeight:600 }}>
+    <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:"rgba(57,255,143,0.1)", border:"1px solid rgba(57,255,143,0.25)", borderRadius:6, padding:"2px 8px", fontSize:11.5, color:"var(--success)", fontWeight:600 }}>
       <CheckCircle size={10}/> Actif
     </span>
   )
   if (status === "error") return (
-    <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.25)", borderRadius:6, padding:"2px 8px", fontSize:10, color:"var(--danger)", fontWeight:600 }}>
+    <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:"rgba(255,107,107,0.1)", border:"1px solid rgba(255,107,107,0.25)", borderRadius:6, padding:"2px 8px", fontSize:11.5, color:"var(--danger)", fontWeight:600 }}>
       <AlertCircle size={10}/> Erreur
     </span>
   )
   if (status === "verified") return (
-    <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:"rgba(57,255,143,0.1)", border:"1px solid rgba(57,255,143,0.25)", borderRadius:6, padding:"2px 8px", fontSize:10, color:"var(--success)" }}>
+    <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:"rgba(57,255,143,0.1)", border:"1px solid rgba(57,255,143,0.25)", borderRadius:6, padding:"2px 8px", fontSize:11.5, color:"var(--success)" }}>
       <CheckCircle size={10}/> Vérifié
     </span>
   )
   return (
-    <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:6, padding:"2px 8px", fontSize:10, color:MUTED, fontWeight:600 }}>
+    <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:6, padding:"2px 8px", fontSize:11.5, color:MUTED, fontWeight:600 }}>
       <Clock size={10}/> {status}
     </span>
   )
@@ -109,12 +109,12 @@ export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrim
             <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:3, flexWrap:"wrap" }}>
               <span style={{ color:"var(--ink)", fontSize:13, fontWeight:700 }}>{rec.domain}</span>
               {isPrimary && (
-                <span style={{ background:"color-mix(in srgb, var(--accent) 15%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:6, padding:"2px 8px", fontSize:9, color:G, fontWeight:700, textTransform:"uppercase", letterSpacing:1 }}>
+                <span style={{ background:"color-mix(in srgb, var(--accent) 15%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:6, padding:"2px 8px", fontSize:11, color:G, fontWeight:700, textTransform:"uppercase", letterSpacing:1 }}>
                   ⭐ Principal
                 </span>
               )}
               {!isPrimary && rec.verified && hasPrimary && (
-                <span style={{ background:"rgba(56,189,248,0.1)", border:"1px solid rgba(56,189,248,0.2)", borderRadius:6, padding:"2px 8px", fontSize:9, color:"var(--action)", fontWeight:600 }}>
+                <span style={{ background:"rgba(56,189,248,0.1)", border:"1px solid rgba(56,189,248,0.2)", borderRadius:6, padding:"2px 8px", fontSize:11.5, color:"var(--action)", fontWeight:600 }}>
                   → 301 vers principal
                 </span>
               )}
@@ -207,7 +207,7 @@ export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrim
       {/* Domaine principal */}
       {domains.length > 0 && (
         <div style={{ marginBottom:16 }}>
-          <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>
+          <p style={{ color:MUTED, fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>
             Domaine principal
           </p>
           {primary ? (
@@ -231,11 +231,11 @@ export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrim
       {!vueCompacte && isBusiness && secondary.length > 0 && (
         <div style={{ marginBottom:16 }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
-            <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>
+            <p style={{ color:MUTED, fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:0 }}>
               Domaines secondaires ({secondary.length})
             </p>
             {primary && (
-              <span style={{ color:G, fontSize:10 }}>301 → {primary.domain}</span>
+              <span style={{ color:G, fontSize:11.5 }}>301 → {primary.domain}</span>
             )}
           </div>
           <div style={{ display:"flex", flexDirection:"column", gap:8 }}>

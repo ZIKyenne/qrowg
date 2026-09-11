@@ -105,7 +105,7 @@ export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null;
             const totalWindow = (details.byDevice || []).reduce((n: number, d: any) => n + d.count, 0)
             return (
               <div style={{ marginTop: 18 }}>
-                <p style={{ color: MUTED, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 9px", display: "flex", justifyContent: "space-between" }}>
+                <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 9px", display: "flex", justifyContent: "space-between" }}>
                   <span>Scans · 14 derniers jours</span>
                   {details.peakDay && <span style={{ color: "#6E685E", textTransform: "none", letterSpacing: 0 }}>pic : {details.peakDay.count}</span>}
                 </p>
@@ -122,7 +122,7 @@ export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null;
                 {/* Appareils */}
                 {(details.byDevice || []).length > 0 && (
                   <div style={{ marginTop: 16 }}>
-                    <p style={{ color: MUTED, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 8px" }}>Appareils</p>
+                    <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 8px" }}>Appareils</p>
                     <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                       {details.byDevice.map((d: any) => {
                         const pct = totalWindow ? Math.round((d.count / totalWindow) * 100) : 0
@@ -143,7 +143,7 @@ export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null;
                 {/* Pays */}
                 {(details.byCountry || []).length > 0 && (
                   <div style={{ marginTop: 16 }}>
-                    <p style={{ color: MUTED, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 8px" }}>Pays</p>
+                    <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 8px" }}>Pays</p>
                     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                       {details.byCountry.slice(0, 5).map((c: any) => (
                         <div key={c.country} style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 12.5 }}>
@@ -168,10 +168,10 @@ export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null;
           )}
 
           <div style={{ marginTop: 16, padding: "11px 13px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-            <p style={{ color: "#6E685E", fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 3px" }}>Lien suivi</p>
+            <p style={{ color: "#6E685E", fontSize: 11, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 3px" }}>Lien suivi</p>
             <p style={{ color: "var(--ink)", fontSize: 12, margin: 0, wordBreak: "break-all", fontFamily: "monospace" }}>{stats.payload}</p>
           </div>
-          <p style={{ color: "#6E685E", fontSize: 10.5, margin: "10px 2px 0", lineHeight: 1.5, textAlign: "center" }}>Mis à jour à chaque scan.</p>
+          <p style={{ color: "#6E685E", fontSize: 11.5, margin: "10px 2px 0", lineHeight: 1.5, textAlign: "center" }}>Mis à jour à chaque scan.</p>
         </div>
       </div>
     )

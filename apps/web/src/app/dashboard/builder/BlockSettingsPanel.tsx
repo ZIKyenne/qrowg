@@ -138,7 +138,7 @@ export function BlockSettingsPanel(props: BlockSettingsPanelProps) {
           <span aria-hidden="true" style={{ width: 34, height: 34, borderRadius: 8, background: (def?.color ?? "#C9A84C") + "18", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>{def?.icon}</span>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "var(--ink, var(--ink))", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{clearLabel(block.type)}</p>
-            <p style={{ margin: 0, fontSize: 10.5, color: MUTED }}>{mode === "advanced" ? `${def?.category} · ${block.type}` : def?.category}</p>
+            <p style={{ margin: 0, fontSize: 11.5, color: MUTED }}>{mode === "advanced" ? `${def?.category} · ${block.type}` : def?.category}</p>
           </div>
           {onRequestClose && (
             <button type="button" onClick={onRequestClose} aria-label="Fermer les réglages"
@@ -150,7 +150,7 @@ export function BlockSettingsPanel(props: BlockSettingsPanelProps) {
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
           <div style={{ display: "flex", gap: 5, flex: 1, minWidth: 0, flexWrap: "wrap" }}>
             {badges.map(b => (
-              <span key={b.id} style={{ fontSize: 9.5, fontWeight: 700, padding: "2px 7px", borderRadius: 6, color: TONE[b.tone], background: `color-mix(in srgb, ${TONE[b.tone]} 12%, transparent)` }}>{b.label}</span>
+              <span key={b.id} style={{ fontSize: 11.5, fontWeight: 700, padding: "2px 7px", borderRadius: 6, color: TONE[b.tone], background: `color-mix(in srgb, ${TONE[b.tone]} 12%, transparent)` }}>{b.label}</span>
             ))}
           </div>
           <div role="group" aria-label="Niveau de réglages" style={{ display: "flex", gap: 2, background: "rgba(255,255,255,0.04)", borderRadius: 8, padding: 2, flexShrink: 0 }}>
@@ -176,7 +176,7 @@ export function BlockSettingsPanel(props: BlockSettingsPanelProps) {
               onClick={() => setSection(s.id)}
               style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 5, minHeight: mobile ? 38 : 28, padding: mobile ? "0 13px" : "0 11px", borderRadius: 9, background: on ? "color-mix(in srgb, var(--accent) 16%, transparent)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "rgba(255,255,255,0.07)"}`, color: on ? "var(--accent)" : MUTED, fontSize: mobile ? 13 : 11.5, fontWeight: on ? 700 : 500, cursor: "pointer" }}>
               {s.label}
-              {s.changedCount > 0 && <span data-changed style={{ background: "var(--accent)", color: "var(--ink-on-accent)", borderRadius: 8, minWidth: 15, height: 15, padding: "0 4px", fontSize: 9, fontWeight: 700, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{s.changedCount}</span>}
+              {s.changedCount > 0 && <span data-changed style={{ background: "var(--accent)", color: "var(--ink-on-accent)", borderRadius: 8, minWidth: 15, height: 15, padding: "0 4px", fontSize: 11.5, fontWeight: 700, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{s.changedCount}</span>}
             </button>
           )
         })}
@@ -194,7 +194,7 @@ export function BlockSettingsPanel(props: BlockSettingsPanelProps) {
         {/* ZONE DANGEREUSE (§19) — mode avancé, section avancée ou toujours en bas */}
         {mode === "advanced" && (
           <div style={{ marginTop: 20, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-            <p style={{ margin: "0 0 10px", fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: MUTED }}>Actions du bloc</p>
+            <p style={{ margin: "0 0 10px", fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: MUTED }}>Actions du bloc</p>
             <BlockContextToolbar block={block} index={index} total={total} mobile={mobile} handlers={handlers}
               only={["duplicate", "toggleVisible", "toggleLock", "toggleDraft", "reset"]} />
             {props.onDelete && (

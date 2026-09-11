@@ -352,3 +352,12 @@ Les quatre titres, descriptions (toutes ≤ 500 caractères) et tableaux sont da
 > `6aa264d194192583998c5bf1` (Pinterest, angle bar cocktails de la veille).
 > Ils restent récupérables dans Buffer et n'ont pas leur place en réserve : ce sont des
 > doublons, pas du contenu en attente.
+
+---
+
+## 11/09 — production du jour · réserve VIDE au démarrage
+
+> Aucun contenu en statut `dispo` au démarrage : rien à réinjecter, production 100 % neuve.
+> Les 16 visuels du jour (6 slides + 6 copies TikTok + 4 épingles) tiennent dans la file
+> (10 places libres) : **rien ne part au stock aujourd'hui**.
+> Le reel de 32,2 s est **manuel** et n'entre jamais en réserve.

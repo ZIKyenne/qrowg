@@ -137,11 +137,11 @@ export function CommandPalette({ open, onClose, commands, blockDefs, onInsertBlo
             <p style={{ color: MUTED, fontSize: 13, textAlign: "center", padding: "20px 0", margin: 0 }}>Aucun résultat</p>
           )}
           {cmdCount > 0 && (
-            <p style={{ color: MUTED, fontSize: 9, textTransform: "uppercase", letterSpacing: 2, margin: "4px 4px 2px" }}>Commandes</p>
+            <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "4px 4px 2px" }}>Commandes</p>
           )}
           {items.slice(0, cmdCount).map((item, i) => rowLabel(item, i))}
           {filteredBlocks.length > 0 && (
-            <p style={{ color: MUTED, fontSize: 9, textTransform: "uppercase", letterSpacing: 2, margin: "8px 4px 2px" }}>{query ? "Ajouter un bloc" : "Blocs récents"}</p>
+            <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "8px 4px 2px" }}>{query ? "Ajouter un bloc" : "Blocs récents"}</p>
           )}
           {items.slice(cmdCount).map((item, i) => rowLabel(item, cmdCount + i))}
         </div>

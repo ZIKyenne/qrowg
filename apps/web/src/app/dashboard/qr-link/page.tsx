@@ -378,7 +378,7 @@ export default function QrLinkPage() {
   const hasSaved = dynamicLinks.length > 0 || staticQrs.length > 0
 
   const secTitle: React.CSSProperties = { color: MUTED, fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", gap: 7, marginBottom: 11, textTransform: "uppercase", letterSpacing: 1.4 }
-  const subLabel: React.CSSProperties = { color: "#6E685E", fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 9px 2px" }
+  const subLabel: React.CSSProperties = { color: "#6E685E", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 9px 2px" }
   const accentBar = <span style={{ width: 3, height: 13, borderRadius: 2, background: G, flexShrink: 0 }} />
   const card: React.CSSProperties = { background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 18, padding: 18 }
   const field: React.CSSProperties = { width: "100%", boxSizing: "border-box", height: 50, background: "var(--field)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "var(--ink)", fontSize: 16, padding: "0 15px", outline: "none" }
@@ -618,7 +618,7 @@ export default function QrLinkPage() {
               : <QrWatermark />)}
           </div>
           {ready && previewLabel && (
-            <p style={{ margin: 0, maxWidth: 210, color: fg, opacity: 0.85, fontSize: 10.5, fontWeight: 600, textAlign: "center", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", letterSpacing: 0.2 }}>{previewLabel}</p>
+            <p style={{ margin: 0, maxWidth: 210, color: fg, opacity: 0.85, fontSize: 11.5, fontWeight: 600, textAlign: "center", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", letterSpacing: 0.2 }}>{previewLabel}</p>
           )}
         </div>
 
@@ -714,8 +714,8 @@ export default function QrLinkPage() {
                     <p style={{ color: "var(--ink)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.label || (s.dest_url || "").replace(/^https?:\/\//, "")}</p>
                     <p style={{ color: MUTED, fontSize: 11, margin: "0 0 5px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>→ {s.dest_url}</p>
                     <div style={{ display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap" }}>
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: st.couleur, fontSize: 10.5, fontWeight: 700, background: `${st.couleur}18`, borderRadius: 999, padding: "3px 8px" }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: st.couleur }} />{st.badge}</span>
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#6E685E", fontSize: 10.5, fontWeight: 600 }}><BarChart3 size={11} />{s.total_scans ?? 0} scan{(s.total_scans ?? 0) > 1 ? "s" : ""}</span>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: st.couleur, fontSize: 11.5, fontWeight: 700, background: `${st.couleur}18`, borderRadius: 999, padding: "3px 8px" }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: st.couleur }} />{st.badge}</span>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#6E685E", fontSize: 11.5, fontWeight: 600 }}><BarChart3 size={11} />{s.total_scans ?? 0} scan{(s.total_scans ?? 0) > 1 ? "s" : ""}</span>
                     </div>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 6, flexShrink: 0 }}>
@@ -736,7 +736,7 @@ export default function QrLinkPage() {
                   <div style={{ background: "#fff", borderRadius: 10, padding: 7, lineHeight: 0, boxShadow: "0 2px 10px rgba(0,0,0,0.3)" }}>
                     <QRCanvas value={s.payload || "https://qrowg.com"} size={82} fg={safeFg(s.style?.fg)} bg="#FFFFFF" />
                   </div>
-                  <span style={{ color: MUTED, fontSize: 10, maxWidth: 108, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "center" }}>{s.label || libelleTypeQr(s.kind)}</span>
+                  <span style={{ color: MUTED, fontSize: 11.5, maxWidth: 108, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "center" }}>{s.label || libelleTypeQr(s.kind)}</span>
                   <button onClick={e => { e.stopPropagation(); demanderSuppression(s) }} aria-label="Supprimer ce QR" className="da-btn-icon da-btn-icon--danger"
                     style={{ position: "absolute", top: 5, right: 5, width: 26, height: 26, borderRadius: 8 }}><Trash2 className="da-ic da-ic-trash" size={13} /></button>
                 </div>
@@ -760,7 +760,7 @@ export default function QrLinkPage() {
                     <QrWatermark size={58} />
                   </div>
                 </div>
-                <span style={{ color: MUTED, fontSize: 9.5, maxWidth: 86, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{histLabel(h)}</span>
+                <span style={{ color: MUTED, fontSize: 11.5, maxWidth: 86, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{histLabel(h)}</span>
               </button>
             ))}
           </div>
@@ -795,11 +795,11 @@ export default function QrLinkPage() {
             {detail.dynamic ? (
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <div>
-                  <p style={{ color: MUTED, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 4px" }}>Lien court (le QR pointe ici)</p>
+                  <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 4px" }}>Lien court (le QR pointe ici)</p>
                   <p style={{ color: "var(--ink)", fontSize: 12.5, margin: 0, wordBreak: "break-all", fontFamily: "monospace" }}>{detail.payload}</p>
                 </div>
                 <div>
-                  <p style={{ color: MUTED, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 4px" }}>Destination (modifiable)</p>
+                  <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 4px" }}>Destination (modifiable)</p>
                   <p style={{ color: "var(--ink)", fontSize: 12.5, margin: "0 0 6px", wordBreak: "break-all" }}>{detail.dest_url}</p>
                   <button onClick={() => demanderDestination(detail)} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, color: "var(--ink)", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: "8px 12px" }}>Modifier la destination</button>
                 </div>
@@ -811,7 +811,7 @@ export default function QrLinkPage() {
                 {/* Sécurité du lien (Pro+) : mot de passe, expiration programmée, pause manuelle. */}
                 {canDynSecurite(plan) ? (
                   <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 13, display: "flex", flexDirection: "column", gap: 11 }}>
-                    <p style={{ color: MUTED, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, margin: 0, display: "flex", alignItems: "center", gap: 6 }}><ShieldCheck size={13} /> Sécurité</p>
+                    <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 1, margin: 0, display: "flex", alignItems: "center", gap: 6 }}><ShieldCheck size={13} /> Sécurité</p>
                     <div style={secRow}>
                       <span style={secRowLabel}><Lock size={14} /> Mot de passe</span>
                       <span style={{ flex: 1, fontSize: 12, color: detail.has_password ? "var(--success)" : MUTED }}>{detail.has_password ? "Activé" : "Aucun"}</span>
@@ -837,7 +837,7 @@ export default function QrLinkPage() {
               </div>
             ) : (
               <div>
-                <p style={{ color: MUTED, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 4px" }}>Contenu encodé</p>
+                <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 4px" }}>Contenu encodé</p>
                 <p style={{ color: "var(--ink)", fontSize: 12.5, margin: 0, wordBreak: "break-all", fontFamily: "monospace" }}>{detail.payload}</p>
               </div>
             )}

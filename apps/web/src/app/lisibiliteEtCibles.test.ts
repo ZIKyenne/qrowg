@@ -22,56 +22,85 @@ const lire = (p: string) => readFileSync(join(APP, p), "utf8")
 // (canvas de l'éditeur, téléphone de l'aperçu de modèle) et le support imprimé tel
 // qu'il sortira (scène de QR de pages, vignettes de l'atelier). Les agrandir
 // mentirait sur le rendu. Ils sont nommés ici, un par un, avec leur frontière.
-const RENDUS_A_ECHELLE: { fichier: string; avant?: number; borne?: [string, string]; pourquoi: string }[] = [
+const RENDUS_A_ECHELLE: { fichier: string; avant?: number; apres?: number; borne?: [string, string]; pourquoi: string }[] = [
   { fichier: "dashboard/templates/TemplatePreviewModal.tsx", avant: 2588,
     pourquoi: "le téléphone d'aperçu rend la page du modèle à l'échelle ; l'interface de la modale commence après" },
   { fichier: "dashboard/builder/builderPreview.tsx",
     pourquoi: "le canvas de l'éditeur rend la page publiée à l'échelle" },
+  { fichier: "dashboard/builder/shared-renderer/blocks/",
+    pourquoi: "les adaptateurs éditeur de blocs sont dessinés DANS ce canvas : même rendu, même échelle réduite" },
   { fichier: "dashboard/qr-codes/QRStudio.tsx", borne: ['{previewScene !== "none" && (', '<div style={{ display: previewScene==="none"'],
     pourquoi: "la scène d'aperçu montre carte, affiche et téléphone au format réel" },
-  { fichier: "dashboard/print-studio/PrintStudioClient.tsx", pourquoi: "les vignettes de supports (au-delà de la ligne 2200) reproduisent le support imprimé" },
+  { fichier: "dashboard/print-studio/PrintStudioClient.tsx", apres: 2200,
+    pourquoi: "les vignettes de supports reproduisent le support imprimé ; tout ce qui précède la ligne 2200 est l'interface de l'atelier, et reste soumis à la règle" },
 ]
 
+// Lot v67. La règle avait une LISTE de vingt écrans ; trois n'y avaient jamais
+// figuré — Domaines, Redirections, Équipe — et personne ne s'en était aperçu,
+// parce qu'une liste ne signale pas ce qui lui manque. Mesuré sur le banc
+// d'essai, Domaines affichait quatre numéros d'étape à 10 px et Redirections
+// six libellés de statistiques et d'aperçu d'URL au même format.
+//
+// Le périmètre n'est donc plus une liste mais un ARBRE : tout `dashboard/`, tout
+// `homeSections/`, plus les écrans publics nommés. On n'en sort que par une
+// dispense écrite ci-dessus, avec sa raison. Ajouter un écran ne demande plus
+// de penser à l'inscrire quelque part : il est couvert dès qu'il existe.
+const ARBRES = ["dashboard", "homeSections"]
+const FICHIERS_EN_PLUS = [
+  "HomeClient.tsx", "features/page.tsx", "upgrade/page.tsx", "generateur-qr-code/page.tsx",
+  "examples/page.tsx", "../components/ui/PageHeader.tsx", "../components/ui/SettingsSection.tsx",
+  "../components/MobileNav.tsx", "../components/EnTeteSite.tsx", "../components/NextStepCard.tsx",
+]
+
+function tousLesEcrans(): string[] {
+  const vus: string[] = []
+  const marche = (rel: string) => {
+    for (const e of readdirSync(join(APP, rel), { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      const r = `${rel}/${e.name}`
+      if (e.isDirectory()) { marche(r); continue }
+      if (!e.name.endsWith(".tsx") || e.name.includes(".test.")) continue
+      vus.push(r)
+    }
+  }
+  for (const a of ARBRES) marche(a)
+  return [...vus, ...FICHIERS_EN_PLUS].sort()
+}
+
+/** Un fichier est dispensé si une entrée de RENDUS_A_ECHELLE le nomme, ou nomme son dossier. */
+const dispense = (f: string) => RENDUS_A_ECHELLE.find(r => r.fichier.endsWith("/") ? f.startsWith(r.fichier) : f === r.fichier)
+
 describe("aucun texte lu sous 11 px", () => {
-  const ECRANS = [
-    "HomeClient.tsx",
-    "homeSections/Analytics.tsx",
-    "homeSections/UseCases.tsx",
-    "homeSections/Templates.tsx",
-    "homeSections/Features.tsx",
-    "features/page.tsx",
-    "dashboard/builder/BuilderV4.tsx",
-    "dashboard/builder/builderPanels.tsx",
-    "upgrade/page.tsx",
-    "dashboard/qr-codes/QRStudio.tsx",
-    "dashboard/qr-codes/panneauxQr.tsx",
-    "dashboard/leads/LeadsClient.tsx",
-    "dashboard/analytics/AnalyticsClient.tsx",
-    "dashboard/analytics/OverviewCards.tsx",
-    "dashboard/DashboardShell.tsx",
-    "dashboard/templates/page.tsx",
-    "generateur-qr-code/page.tsx",
-    "homeSections/Pricing.tsx",
-    "../components/ui/PageHeader.tsx",
-    "../components/ui/SettingsSection.tsx",
-  ]
+  const ECRANS = tousLesEcrans()
+
+  it("le périmètre est un arbre, pas une liste : il couvre tout le tableau de bord", () => {
+    // Les trois écrans oubliés jusqu'au lot v67 y sont, sans avoir été inscrits.
+    for (const f of ["dashboard/domains/DomainsPage.tsx", "dashboard/redirects/RedirectsPanel.tsx", "dashboard/team/page.tsx"])
+      expect(ECRANS, f).toContain(f)
+    expect(ECRANS.length).toBeGreaterThan(100)
+  })
+
   for (const f of ECRANS) {
+    const d = dispense(f)
+    if (d && !d.borne && d.avant === undefined && d.apres === undefined) continue
     it(`${f}`, () => {
       const src = lire(f)
       // La scène d'aperçu de QRStudio dessine un support imprimé : elle est exclue par nom.
-      const scene = src.indexOf('{previewScene !== "none" && (')
-      const finScene = scene > -1 ? src.indexOf('<div style={{ display: previewScene==="none"', scene) : -1
+      const scene = d?.borne ? src.indexOf(d.borne[0]) : -1
+      const finScene = scene > -1 ? src.indexOf(d!.borne![1], scene) : -1
       const fautes: string[] = []
+      let pos = 0
       src.split("\n").forEach((l, i) => {
-        const pos = src.split("\n").slice(0, i).join("\n").length
-        if (scene > -1 && pos > scene && pos < finScene) return
+        const debutLigne = pos; pos += l.length + 1
+        if (scene > -1 && debutLigne > scene && debutLigne < finScene) return
+        if (d?.avant !== undefined && i + 1 < d.avant) return
+        if (d?.apres !== undefined && i + 1 > d.apres) return
         const m = l.match(/fontSize:\s*(\d+(?:\.\d+)?)/g)
         for (const x of m ?? []) {
           const v = parseFloat(x.replace(/fontSize:\s*/, ""))
           if (v < 11) fautes.push(`${i + 1}: ${v} px`)
         }
       })
-      expect(fautes, fautes.join(" · ")).toEqual([])
+      expect(fautes, `${f} — ${fautes.join(" · ")}`).toEqual([])
     })
   }
 
@@ -145,7 +174,8 @@ describe("Messages : le statut est un choix, pas trois boutons", () => {
 describe("les rendus à l'échelle sont nommés, pas oubliés", () => {
   it("chacun existe encore, et dit pourquoi il échappe à la règle", () => {
     for (const r of RENDUS_A_ECHELLE) {
-      expect(statSync(join(APP, r.fichier)).isFile(), r.fichier).toBe(true)
+      const st = statSync(join(APP, r.fichier))
+      expect(r.fichier.endsWith("/") ? st.isDirectory() : st.isFile(), r.fichier).toBe(true)
       expect(r.pourquoi.length, r.fichier).toBeGreaterThan(30)
     }
   })

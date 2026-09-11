@@ -183,3 +183,24 @@ Le compte mûr, lui, garde sa lecture complète : tendance, source, appareil, cr
 Gardes : `analytics/lectureHonnete.test.ts` (14 cas sur le module pur), `analytics/statistiquesHonnetes.test.ts` (9 cas qui vérifient que l'interface s'y branche vraiment au lieu de refaire le calcul dans son coin), `dashboard/prochaineEtape.test.ts` et `dashboard/retourAccueil.test.ts`. Chacune vérifiée par injection du défaut d'origine.
 
 Les deux écrans re-mesurés aux deux tailles, dans les deux états : 0 texte < 11 px, 0 cible < 32 px, aucun `NaN`, aucun débordement.
+
+
+## Lot v67 — la règle avait une liste, pas un périmètre
+
+Depuis le lot v60, deux règles de maison tiennent : aucun texte lu sous 11 px, aucune cible sous 32 px. Elles étaient vérifiées « sur les écrans du produit ». Sauf que « les écrans du produit » était **une liste de vingt noms écrite à la main** — et une liste ne signale jamais ce qui lui manque.
+
+Trois écrans n'y avaient jamais figuré : **Domaines**, **Redirections**, **Équipe**. Et leur état vide — celui que traverse tout compte neuf — n'avait jamais pu être monté, faute de banc d'essai. Mesuré une fois le banc écrit (`?vide=1` sur Messages, Équipe, Domaines, Redirections) :
+
+- Domaines : les quatre numéros du guide « Comment ça fonctionne ? » à **10 px**, le lien d'ouverture du site et « Vérifier DNS » à **28 et 26 px**.
+- Redirections : « Total », « Actives », « Inactives », « Clics total » et l'aperçu d'URL à **10 px** ; les trois boutons d'action de chaque ligne à **28 px**, à côté d'un bouton Supprimer de 40.
+- Équipe : les deux menus de rôle à **30 px**.
+
+**Le correctif de fond** : le périmètre n'est plus une liste mais un **arbre**. La garde marche tout `dashboard/`, tout `homeSections/`, plus les écrans publics nommés — 150 fichiers au lieu de 20. On n'en sort que par une dispense écrite, avec sa raison, et le test vérifie que chaque dispense désigne un fichier ou un dossier qui existe. Ajouter un écran ne demande plus de penser à l'inscrire : il est couvert dès qu'il existe. 146 textes ont été relevés dans 34 fichiers.
+
+**Ce que l'arbre a trouvé en plus.** La dispense de l'atelier d'impression disait « au-delà de la ligne 2200 » — mais rien ne le vérifiait, et le fichier entier échappait donc à la règle. Bornée pour de vrai, elle a révélé la moitié haute de l'écran : champ de recherche des supports haut de **14 px**, six puces de métier à 28, « + 19 métiers » à 26, neuf libellés d'interface entre 8,5 et 10 px. Trois miniatures trichaient aussi avec du texte minuscule — la maquette d'éditeur de l'accueil du builder (« Aperçu » à 6,5 px, « Publier » à 7,5), la coche d'un badge de profil dessinée avec la lettre « v » à 7 px, la pastille « PRO » d'un motif verrouillé à 7,5 px : les deux premières sont devenues des formes et une icône, la troisième se lit.
+
+**Le bug trouvé en chemin.** Sur un compte sans domaine connecté, le formulaire de redirection initialisait sa source à `userDomains[0] ?? ""`. Le menu déroulant, lui, contient toujours l'option de repli « qrowg.com (sous-domaine) » — et un `<select>` dont la valeur ne correspond à aucune option affiche sa première. L'utilisateur lisait donc **« qrowg.com » dans le champ**, pendant que l'aperçu juste en dessous annonçait **« → URL source : /chemin »** et que l'enregistrement serait parti avec un domaine vide. `redirects/sourceParDefaut.ts` tranche : la valeur proposée existe toujours parmi les options. Ce que l'écran montre est ce qu'il retiendra.
+
+Gardes : `app/ecransOublies.test.ts` (12 cas) et la réécriture de `app/lisibiliteEtCibles.test.ts` autour de l'arbre (150 cas), plus `redirects/sourceParDefaut.test.ts`. Vérifiées par injection : remettre la liste à la place de l'arbre, les boutons à 28 px, ou `?? ""` dans le formulaire fait échouer la garde correspondante.
+
+Re-mesuré au navigateur sur les treize bancs d'essai, deux tailles, états plein et vide : **0 texte < 11 px, 0 cible < 32 px** — hors les vignettes de supports imprimés, qui restent dispensées et le disent.

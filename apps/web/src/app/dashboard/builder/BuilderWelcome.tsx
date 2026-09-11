@@ -116,7 +116,7 @@ export default function BuilderWelcome({ mobile = false }: { mobile?: boolean })
           <div style={{ minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <h2 style={{ fontSize: 20, fontWeight: 700, color: INK, margin: 0, letterSpacing: "-0.01em" }}>{step.title}</h2>
-              <span style={{ fontSize: 10.5, fontWeight: 700, color: G, background: `${G}18`, border: `1px solid ${G}33`, borderRadius: 999, padding: "2px 9px", whiteSpace: "nowrap" }}>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: G, background: `${G}18`, border: `1px solid ${G}33`, borderRadius: 999, padding: "2px 9px", whiteSpace: "nowrap" }}>
                 {mobile ? step.hintM : step.hintD}
               </span>
             </div>
@@ -178,9 +178,9 @@ function MiniMap({ zone }: { zone: Zone }) {
           <div style={{ ...cell(on("topbar")), width: 30, height: 13, borderRadius: 4, boxShadow: on("topbar") ? `0 0 0 3px ${G}22` : "none" }} />
           <span style={dot(on("topbar"))} />
           <span style={dot(on("topbar"))} />
-          <div style={{ ...cell(on("topbar")), width: 34, height: 14, borderRadius: 5, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 6.5, fontWeight: 700, color: on("topbar") ? G : "rgba(255,255,255,0.4)" }}>Aperçu</div>
+          <div aria-hidden style={{ ...cell(on("topbar")), width: 34, height: 14, borderRadius: 5 }} />
         </div>
-        <div style={{ ...cell(on("publish")), height: 15, width: 52, borderRadius: 5, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7.5, fontWeight: 700, letterSpacing: 0.3, color: on("publish") ? G : "rgba(255,255,255,0.4)" }}>Publier</div>
+        <div aria-hidden style={{ ...cell(on("publish")), height: 15, width: 52, borderRadius: 5, background: on("publish") ? G : undefined }} />
       </div>
       {/* 3 colonnes : bibliotheque | page | reglages(+theme) */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1.3fr 1fr", gap: 6, padding: 8, height: 120 }}>

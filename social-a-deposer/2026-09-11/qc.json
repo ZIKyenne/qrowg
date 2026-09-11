@@ -1,0 +1,118 @@
+{
+  "total": 16,
+  "avec_alerte": 0,
+  "details": [
+    {
+      "fichier": "qr-code-carte-du-soir-ecourtee-fin-de-service-restaurant.png",
+      "fond_sombre_pct": 91.1,
+      "or_pct": 3.9,
+      "qr": "https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260911-marche&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-horaires-exceptionnels-vitrine-commerce.png",
+      "fond_sombre_pct": 89.8,
+      "or_pct": 5.2,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260911-marche&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-ou-se-garer-entreprises-food-truck.png",
+      "fond_sombre_pct": 90.8,
+      "or_pct": 4.1,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260911-marche&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-panneau-a-vendre-visite-interieur-immobilier.png",
+      "fond_sombre_pct": 90.5,
+      "or_pct": 4.3,
+      "qr": "https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260911-marche&utm_content=clic&utm_term=immobilier",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-recette-du-produit-de-saison-etal-marche-01.png",
+      "fond_sombre_pct": 92.6,
+      "or_pct": 1.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-recette-du-produit-de-saison-etal-marche-02.png",
+      "fond_sombre_pct": 92.7,
+      "or_pct": 0.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-recette-du-produit-de-saison-etal-marche-03.png",
+      "fond_sombre_pct": 86.8,
+      "or_pct": 9.3,
+      "qr": "https://qrowg.com/qr-code/artisan?utm_medium=carrousel&utm_campaign=20260911-marche",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-recette-du-produit-de-saison-etal-marche-04.png",
+      "fond_sombre_pct": 93.2,
+      "or_pct": 0.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-recette-du-produit-de-saison-etal-marche-05.png",
+      "fond_sombre_pct": 89.5,
+      "or_pct": 6.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-recette-du-produit-de-saison-etal-marche-06.png",
+      "fond_sombre_pct": 83.8,
+      "or_pct": 9.8,
+      "qr": "https://qrowg.com/qr-code/artisan?utm_medium=carrousel&utm_campaign=20260911-marche",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-recette-du-produit-de-saison-etal-marche-01.png",
+      "fond_sombre_pct": 92.6,
+      "or_pct": 1.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-recette-du-produit-de-saison-etal-marche-02.png",
+      "fond_sombre_pct": 92.7,
+      "or_pct": 0.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-recette-du-produit-de-saison-etal-marche-03.png",
+      "fond_sombre_pct": 86.9,
+      "or_pct": 9.3,
+      "qr": "https://qrowg.com/qr-code/artisan?utm_medium=carrousel&utm_campaign=20260911-marche",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-recette-du-produit-de-saison-etal-marche-04.png",
+      "fond_sombre_pct": 93.2,
+      "or_pct": 0.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-recette-du-produit-de-saison-etal-marche-05.png",
+      "fond_sombre_pct": 89.5,
+      "or_pct": 6.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-recette-du-produit-de-saison-etal-marche-06.png",
+      "fond_sombre_pct": 83.8,
+      "or_pct": 9.8,
+      "qr": "https://qrowg.com/qr-code/artisan?utm_medium=carrousel&utm_campaign=20260911-marche",
+      "alertes": []
+    }
+  ]
+}

@@ -247,7 +247,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
           <div key={i} style={{ background: SURFACE, border: "1px solid " + BORDER, borderRadius: 10, padding: "10px 16px", display: "flex", alignItems: "center", gap: 8, flex: "1 1 120px" }}>
             {stat.icon}
             <div>
-              <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 2px" }}>{stat.label}</p>
+              <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 2px" }}>{stat.label}</p>
               <p style={{ color: "var(--ink)", fontSize: 16, fontWeight: 700, margin: 0 }}>{stat.value}</p>
             </div>
           </div>
@@ -267,10 +267,10 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={linkData} margin={{ top: 4, right: 4, bottom: 40, left: -20 }} barCategoryGap="25%">
               <XAxis dataKey="label"
-                tick={{ fill: MUTED, fontSize: 10 }}
+                tick={{ fill: MUTED, fontSize: 11.5 }}
                 angle={-30} textAnchor="end" interval={0}
                 axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: MUTED, fontSize: 10 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: MUTED, fontSize: 11.5 }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: "color-mix(in srgb, var(--accent) 5%, transparent)" }} />
               <Bar dataKey="clicks" radius={[6,6,0,0]}>
                 {linkData.map((_, i) => (
@@ -288,7 +288,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
           {/* En-têtes */}
           <div style={{ display: "grid", gridTemplateColumns: "28px 1fr 90px 80px 80px 120px", gap: 8, padding: "0 8px 8px", borderBottom: "1px solid " + BORDER }}>
             {["#", "Lien", "Type", "Clics", "CTR", ""].map((h, i) => (
-              <span key={i} style={{ color: MUTED, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>{h}</span>
+              <span key={i} style={{ color: MUTED, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>{h}</span>
             ))}
           </div>
 
@@ -315,7 +315,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
               {/* Type bloc */}
               <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                 <span style={{ display: "inline-flex", color: "var(--muted)", flexShrink: 0 }}>{row.icon}</span>
-                <span style={{ color: MUTED, fontSize: 10, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.typeLabel}</span>
+                <span style={{ color: MUTED, fontSize: 11.5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.typeLabel}</span>
               </div>
 
               {/* Clics */}

@@ -294,7 +294,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
                   <Globe size={13} color={G}/>
                   <span style={{ color:G, fontSize:12, fontWeight:700 }}>{rootDomain}</span>
                   {verif?.verified && <CheckCircle size={11} color="var(--success)"/>}
-                  <span style={{ color:MUTED, fontSize:10 }}>{domRoutes.length} route{domRoutes.length !== 1 ? "s" : ""}</span>
+                  <span style={{ color:MUTED, fontSize:11.5 }}>{domRoutes.length} route{domRoutes.length !== 1 ? "s" : ""}</span>
                 </div>
 
                 {/* Tableau routes */}
@@ -308,12 +308,12 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
                         <div style={{ flex:1, minWidth:0 }}>
                           <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                             {route.subdomain === null && <Star size={11} color={G}/>}
-                            {route.subdomain === "*" && <span style={{ color:MUTED, fontSize:10 }}>*</span>}
+                            {route.subdomain === "*" && <span style={{ color:MUTED, fontSize:11.5 }}>*</span>}
                             <code style={{ color: route.subdomain === null ? G : "var(--ink)", fontSize:12, fontWeight: route.subdomain === null ? 700 : 500, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
                               {fullUrl(rootDomain, route.subdomain)}
                             </code>
                           </div>
-                          <p style={{ color:MUTED, fontSize:10, margin:"2px 0 0" }}>
+                          <p style={{ color:MUTED, fontSize:11.5, margin:"2px 0 0" }}>
                             {subLabel(route.subdomain)}
                             {route.subdomain === null && " · priorité racine"}
                             {route.subdomain === "*" && " · fallback"}
@@ -328,7 +328,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
                           <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
                             {route.pages?.title ?? "Page inconnue"}
                           </p>
-                          <p style={{ color:MUTED, fontSize:10, margin:"2px 0 0" }}>/{route.pages?.slug}</p>
+                          <p style={{ color:MUTED, fontSize:11.5, margin:"2px 0 0" }}>/{route.pages?.slug}</p>
                         </div>
 
                         {/* Statut page */}

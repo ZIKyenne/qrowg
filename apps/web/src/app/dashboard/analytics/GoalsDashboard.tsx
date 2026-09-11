@@ -137,7 +137,7 @@ function MiniTip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   return (
     <div style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 7, padding: "6px 10px" }}>
-      <p style={{ color: MUTED, fontSize: 10, margin: "0 0 2px" }}>{label}</p>
+      <p style={{ color: MUTED, fontSize: 11.5, margin: "0 0 2px" }}>{label}</p>
       <p style={{ color: G, fontSize: 13, fontWeight: 700, margin: 0 }}>{payload[0].value} conv.</p>
     </div>
   )
@@ -321,7 +321,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
             <div key={i} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "14px 16px", display: "flex", alignItems: "center", gap: 11 }}>
               {k.icon}
               <div style={{ minWidth: 0 }}>
-                <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 3px" }}>{k.label}</p>
+                <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 3px" }}>{k.label}</p>
                 <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{k.value}</p>
               </div>
             </div>
@@ -533,12 +533,12 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3, flexWrap: "wrap" }}>
                         <h3 style={{ color: TEXT, fontSize: 14.5, fontWeight: 700, margin: 0 }}>{goal.name}</h3>
                         {stats.pace === "ahead" && (
-                          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "color-mix(in srgb, var(--success) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--success) 30%, transparent)", borderRadius: 6, padding: "2px 8px", fontSize: 10, color: "var(--success)", fontWeight: 700 }}>
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "color-mix(in srgb, var(--success) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--success) 30%, transparent)", borderRadius: 6, padding: "2px 8px", fontSize: 11.5, color: "var(--success)", fontWeight: 700 }}>
                             <TrendingUp size={11} /> En bonne voie
                           </span>
                         )}
                         {stats.pace === "behind" && (
-                          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "color-mix(in srgb, var(--warning) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--warning) 30%, transparent)", borderRadius: 6, padding: "2px 8px", fontSize: 10, color: "var(--warning)", fontWeight: 700 }}>
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "color-mix(in srgb, var(--warning) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--warning) 30%, transparent)", borderRadius: 6, padding: "2px 8px", fontSize: 11.5, color: "var(--warning)", fontWeight: 700 }}>
                             <TrendingDown size={11} /> En retard
                           </span>
                         )}
@@ -572,7 +572,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
                     ...(goal.target_count ? [{ label: "Objectif", value: goal.target_count.toLocaleString(), color: MUTED }] : []),
                   ].map((m, i) => (
                     <div key={i} style={{ background: PANEL, border: `1px solid ${HAIR}`, borderRadius: 10, padding: "10px 12px" }}>
-                      <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 4px" }}>{m.label}</p>
+                      <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 4px" }}>{m.label}</p>
                       <p style={{ color: m.color, fontSize: 18, fontWeight: 700, margin: 0 }}>{m.value}</p>
                     </div>
                   ))}
@@ -593,7 +593,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
                       )}
                     </div>
                     {stats.paceMarker !== null && stats.paceMarker > 0 && stats.paceMarker < 100 && (
-                      <p style={{ color: MUTED, fontSize: 10, margin: "5px 0 0" }}>Le repère clair indique le rythme attendu à ce stade de la période.</p>
+                      <p style={{ color: MUTED, fontSize: 11.5, margin: "5px 0 0" }}>Le repère clair indique le rythme attendu à ce stade de la période.</p>
                     )}
                   </div>
                 )}
@@ -610,8 +610,8 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                        <XAxis dataKey="date" tick={{ fill: MUTED, fontSize: 9 }} axisLine={false} tickLine={false} interval={Math.floor(stats.chartData.length / 4)} />
-                        <YAxis tick={{ fill: MUTED, fontSize: 9 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                        <XAxis dataKey="date" tick={{ fill: MUTED, fontSize: 11.5 }} axisLine={false} tickLine={false} interval={Math.floor(stats.chartData.length / 4)} />
+                        <YAxis tick={{ fill: MUTED, fontSize: 11.5 }} axisLine={false} tickLine={false} allowDecimals={false} />
                         <Tooltip content={<MiniTip />} />
                         <Area type="monotone" dataKey="count" stroke={goal.color} strokeWidth={2} fill={`url(#grad-${goal.id})`} />
                       </AreaChart>

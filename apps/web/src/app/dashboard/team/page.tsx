@@ -200,7 +200,7 @@ export default function TeamPage({ initialData }: { initialData?: TeamData } = {
                   </div>
                   {canManage && (m.role === "editor" || m.role === "admin") ? (
                     <select aria-label={`Rôle de ${m.profiles?.full_name || m.profiles?.email || "ce membre"}`} value={m.role} onChange={e => changeRole(m.id, e.target.value as "editor" | "admin")}
-                      style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.14)", background: "#0A0908", color: "var(--ink)", fontSize: 12.5, cursor: "pointer" }}>
+                      style={{ minHeight: 32, padding: "0 10px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.14)", background: "#0A0908", color: "var(--ink)", fontSize: 12.5, cursor: "pointer" }}>
                       <option value="editor">Éditeur</option>
                       <option value="admin">Administrateur</option>
                     </select>

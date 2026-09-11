@@ -216,7 +216,7 @@ export function MobileBuilderShell(p: MobileBuilderShellProps) {
                 return (
                   <div key={b.id} data-structure-row={b.id}
                     style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 10, border: `1px solid ${b.id === p.selectedId ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "rgba(255,255,255,0.07)"}`, background: b.id === p.selectedId ? "color-mix(in srgb, var(--accent) 10%, transparent)" : "rgba(255,255,255,0.02)", opacity: b.visible ? 1 : 0.5 }}>
-                    <span style={{ width: 22, textAlign: "center", color: MUTED, fontSize: 10, fontWeight: 700 }}>{idx + 1}</span>
+                    <span style={{ width: 22, textAlign: "center", color: MUTED, fontSize: 11.5, fontWeight: 700 }}>{idx + 1}</span>
                     <button type="button" data-structure-select={b.id} onClick={() => selectAndEdit(b.id)}
                       style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", color: "var(--ink, var(--ink))", textAlign: "left", padding: 0, minHeight: 40 }}>
                       <span aria-hidden="true" style={{ fontSize: 15 }}>{def?.icon}</span>

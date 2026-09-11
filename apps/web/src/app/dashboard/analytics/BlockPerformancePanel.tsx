@@ -240,7 +240,7 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
           <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "10px 14px", display: "flex", alignItems: "center", gap: 8 }}>
             {k.icon}
             <div>
-              <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 2px" }}>{k.label}</p>
+              <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 2px" }}>{k.label}</p>
               <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>{k.value}</p>
             </div>
           </div>
@@ -262,7 +262,7 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
                 data={sorted.slice(0, 8).map(s => ({ name: s.type, Clics: s.clics }))}
                 layout="vertical"
                 margin={{ top: 0, right: 32, bottom: 0, left: 82 }}>
-                <XAxis type="number" tick={{ fill: MUTED, fontSize: 10 }} axisLine={false} tickLine={false} />
+                <XAxis type="number" tick={{ fill: MUTED, fontSize: 11.5 }} axisLine={false} tickLine={false} />
                 <YAxis type="category" dataKey="name" width={80}
                   tickFormatter={n => getCfg(n).label}
                   tick={{ fill: "var(--ink)", fontSize: 11 }} axisLine={false} tickLine={false} />
@@ -280,7 +280,7 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 14 }}>
             <div style={{ display: "grid", gridTemplateColumns: "28px 1fr 60px 70px 70px 110px", gap: 8, padding: "0 8px 8px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
               {["#", "Bloc", "Nbr", "Clics", "CTR", ""].map((h, i) => (
-                <span key={i} style={{ color: MUTED, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>{h}</span>
+                <span key={i} style={{ color: MUTED, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>{h}</span>
               ))}
             </div>
             {sorted.slice(0, 8).map((row, i) => (
@@ -312,7 +312,7 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
               <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
                 <PolarGrid stroke="rgba(255,255,255,0.08)" />
                 <PolarAngleAxis dataKey="subject" tick={{ fill: MUTED, fontSize: 11 }} />
-                <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: MUTED, fontSize: 9 }} />
+                <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: MUTED, fontSize: 11.5 }} />
                 <Radar name="Clics" dataKey="Clics" stroke={G} fill={G} fillOpacity={0.25} strokeWidth={2} />
                 <Radar name="CTR"   dataKey="CTR"   stroke="var(--success)" fill="var(--success)" fillOpacity={0.15} strokeWidth={2} />
               </RadarChart>

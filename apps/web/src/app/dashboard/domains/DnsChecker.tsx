@@ -195,7 +195,7 @@ export default function DnsChecker({ domain, onVerified }: Props) {
 
                       {check.expected && (
                         <div style={{ marginBottom:8 }}>
-                          <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1, margin:"0 0 5px" }}>Valeur attendue</p>
+                          <p style={{ color:MUTED, fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:1, margin:"0 0 5px" }}>Valeur attendue</p>
                           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                             <code style={{ color:"var(--success)", fontSize:11, background:"rgba(57,255,143,0.08)", padding:"5px 10px", borderRadius:7, flex:1, wordBreak:"break-all" }}>
                               {check.expected}
@@ -210,7 +210,7 @@ export default function DnsChecker({ domain, onVerified }: Props) {
 
                       {check.found && (
                         <div>
-                          <p style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:1, margin:"0 0 5px" }}>
+                          <p style={{ color:MUTED, fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:1, margin:"0 0 5px" }}>
                             {check.status === "error" ? "Valeur actuelle (incorrecte)" : "Valeur trouvée"}
                           </p>
                           <code style={{ color: check.status === "error" ? "var(--danger)" : "var(--ink)", fontSize:11, background:"rgba(255,255,255,0.04)", padding:"5px 10px", borderRadius:7, display:"block", wordBreak:"break-all" }}>

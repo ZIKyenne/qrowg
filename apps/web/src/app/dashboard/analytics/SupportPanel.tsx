@@ -65,7 +65,7 @@ export default function SupportPanel({ qrs, scans, views, clicks, leads }: {
             {STAGES.map(s => (
               <div key={s.key} style={{ textAlign: "right" }}>
                 <p style={{ color: s.color, fontSize: 18, fontWeight: 700, margin: 0, fontVariantNumeric: "tabular-nums" }}>{(totals as any)[s.key].toLocaleString("fr-FR")}</p>
-                <p style={{ color: DIM, fontSize: 9.5, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase", margin: 0 }}>{s.label}</p>
+                <p style={{ color: DIM, fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase", margin: 0 }}>{s.label}</p>
               </div>
             ))}
           </div>

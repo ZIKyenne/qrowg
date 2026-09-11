@@ -202,7 +202,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
                 : <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(96px, 1fr))", gap: 8 }}>
                     {/* Tuile d'ajout : upload direct dans la bibliothèque */}
                     {!libQuery && <button onClick={() => libInputRef.current?.click()} title="Ajouter une image"
-                      style={{ aspectRatio: "1", border: "2px dashed color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 9, background: "color-mix(in srgb, var(--accent) 4%, transparent)", color: G, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, fontSize: 10, fontWeight: 600 }}>
+                      style={{ aspectRatio: "1", border: "2px dashed color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 9, background: "color-mix(in srgb, var(--accent) 4%, transparent)", color: G, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, fontSize: 11.5, fontWeight: 600 }}>
                       <Plus size={18} /> Ajouter
                     </button>}
                     {libAssets.filter(a => !libQuery || a.name.toLowerCase().includes(libQuery.toLowerCase()))

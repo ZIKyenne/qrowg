@@ -278,7 +278,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
                     ? <CheckCircle size={11} color="var(--success)"/>
                     : <div style={{ width:11, height:11, borderRadius:"50%", border:`1.5px solid ${MUTED}` }}/>
                   }
-                  <span style={{ color: rule.ok && input.length > 0 ? "var(--success)" : MUTED, fontSize:10 }}>{rule.label}</span>
+                  <span style={{ color: rule.ok && input.length > 0 ? "var(--success)" : MUTED, fontSize:11.5 }}>{rule.label}</span>
                 </div>
               ))}
             </div>

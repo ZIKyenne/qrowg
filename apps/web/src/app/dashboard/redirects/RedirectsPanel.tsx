@@ -1,6 +1,7 @@
 "use client"
 
 import { PageHeader } from "@/components/ui/PageHeader"
+import { sourceParDefaut, SOUS_DOMAINE_QROWG } from "./sourceParDefaut"
 import { useState, useEffect } from "react"
 import { useConfirm } from "@/components/ui/Confirm"
 import { Button } from "@/components/ui/Button"
@@ -50,7 +51,7 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
   const [toggling,  setToggling]  = useState<string | null>(null)
   const [error,     setError]     = useState("")
 
-  const [fDomain,   setFDomain]   = useState(userDomains[0] ?? "")
+  const [fDomain,   setFDomain]   = useState(sourceParDefaut(userDomains))
   const [fPath,     setFPath]     = useState("/")
   const [fTo,       setFTo]       = useState("")
   const [fType,     setFType]     = useState<301|302>(301)
@@ -80,7 +81,7 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
 
   function resetForm() {
     setEditId(null)
-    setFDomain(userDomains[0] ?? "")
+    setFDomain(sourceParDefaut(userDomains))
     setFPath("/")
     setFTo("")
     setFType(301)
@@ -188,7 +189,7 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
               <div key={i} style={{ background:"var(--surface)", border:"1px solid var(--line-strong)", borderRadius:11, padding:"12px 14px", display:"flex", alignItems:"center", gap:9 }}>
                 {k.icon}
                 <div>
-                  <p style={{ color:MUTED, fontSize:10, textTransform:"uppercase", letterSpacing:1, margin:"0 0 2px" }}>{k.label}</p>
+                  <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase", letterSpacing:1, margin:"0 0 2px" }}>{k.label}</p>
                   <p style={{ color:"var(--ink)", fontSize:16, fontWeight: 700, margin:0 }}>{k.value}</p>
                 </div>
               </div>
@@ -234,14 +235,14 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
                 <div style={{ display:"flex", gap:8, alignItems:"center" }}>
                   <select aria-label="Domaine de départ" value={fDomain} onChange={e => setFDomain(e.target.value)}
                     style={{ flex:2, background:"var(--field)", border:"1px solid var(--line-strong)", borderRadius:9, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none", cursor:"pointer" }}>
-                    {userDomains.map(d => <option key={d} value={d}>{d}</option>)}
-                    <option value="qrowg.com">qrowg.com (sous-domaine)</option>
+                    {userDomains.filter(d => d.trim()).map(d => <option key={d} value={d}>{d}</option>)}
+                    <option value={SOUS_DOMAINE_QROWG}>{SOUS_DOMAINE_QROWG} (sous-domaine)</option>
                   </select>
                   <input value={fPath} onChange={e => setFPath(e.target.value.startsWith("/") ? e.target.value : "/" + e.target.value)}
                     placeholder="/chemin"
                     style={{ flex:1, background:"var(--field)", border:"1px solid var(--line-strong)", borderRadius:9, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none" }}/>
                 </div>
-                <p style={{ color:MUTED, fontSize:10, margin:"5px 0 0" }}>
+                <p style={{ color:MUTED, fontSize:11.5, margin:"5px 0 0" }}>
                   → URL source : <code style={{ color:G }}>{fDomain}{fPath}</code>
                 </p>
               </div>
@@ -254,7 +255,7 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
                 placeholder="https://nouveau-site.fr ou /nouvelle-page"
                 style={{ width:"100%", background:"var(--surface)", border:`1px solid ${fTo ? "color-mix(in srgb, var(--accent) 30%, transparent)" : "rgba(255,255,255,0.1)"}`, borderRadius:9, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none", boxSizing:"border-box" as const, transition:"border-color 0.15s" }}/>
               {fTo && (
-                <p style={{ color:MUTED, fontSize:10, margin:"5px 0 0" }}>
+                <p style={{ color:MUTED, fontSize:11.5, margin:"5px 0 0" }}>
                   ↳ <code style={{ color:"var(--success)" }}>{fTo}</code>
                 </p>
               )}
@@ -338,16 +339,16 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
                     {/* Actions */}
                     <div style={{ display:"flex", gap:5, flexShrink:0 }}>
                       <button type="button" onClick={() => toggle(r)} disabled={toggling === r.id}
-                        style={{ width:28, height:28, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:toggling===r.id?"wait":"pointer", color:r.enabled?"var(--success)":MUTED }}>
+                        style={{ width:32, height:32, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:toggling===r.id?"wait":"pointer", color:r.enabled?"var(--success)":MUTED }}>
                         {toggling === r.id ? <Loader size={12} style={{ animation:"mo-spin 0.8s linear infinite" }}/> : r.enabled ? <ToggleRight size={13}/> : <ToggleLeft size={13}/>}
                       </button>
                       <button type="button" onClick={() => openEdit(r)}
-                        style={{ width:28, height:28, background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:G }}>
-                        <Pencil size={12}/>
+                        style={{ width:32, height:32, background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:G }}>
+                        <Pencil size={14}/>
                       </button>
                       <a href={`https://${r.from_domain}${r.from_path}`} target="_blank" rel="noopener noreferrer"
-                        style={{ width:28, height:28, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:MUTED, textDecoration:"none" }}>
-                        <ExternalLink size={12}/>
+                        style={{ width:32, height:32, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:MUTED, textDecoration:"none" }}>
+                        <ExternalLink size={14}/>
                       </a>
                       <button type="button" onClick={() => del(r.id)} disabled={deleting === r.id} aria-label="Supprimer cette redirection"
                         style={{ width:40, height:40, background:"rgba(255,100,100,0.08)", border:"1px solid rgba(255,100,100,0.15)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:deleting===r.id?"wait":"pointer", color:"var(--danger)", opacity:deleting===r.id?0.5:1 }}>

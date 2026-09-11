@@ -1,0 +1,87 @@
+{
+  "carousels": [
+    {
+      "slug": "qr-code-recette-du-produit-de-saison-etal-marche",
+      "url": "https://qrowg.com/qr-code/artisan?utm_medium=carrousel&utm_campaign=20260911-marche",
+      "slides": [
+        {
+          "kind": "cover",
+          "tag": "Marché · producteur",
+          "title": "Il regarde le potimarron. Il le [[repose]].",
+          "body": "Pas parce qu'il est cher. Parce qu'il ne sait pas quoi en faire."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le problème",
+          "title": "Le produit de saison ne se vend pas [[seul]].",
+          "body": "Courge, panais, blette, coing : trois clients sur quatre passent devant sans savoir par quel bout le prendre."
+        },
+        {
+          "kind": "qr",
+          "kicker": "Sur l'étal",
+          "title": "Un QR, deux [[recettes]].",
+          "body": "Celles du produit de la semaine. Lues sur le téléphone, debout devant la caisse."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le geste",
+          "title": "La semaine change, la page [[suit]].",
+          "body": "Le coing arrive, tu remplaces les recettes en deux minutes. L'ardoise, elle, reste la même toute la saison."
+        },
+        {
+          "kind": "metric",
+          "kicker": "Preuve",
+          "number": "2 min",
+          "title": "pour changer le produit de la [[semaine]]",
+          "body": "Et chaque scan te dit quel produit intrigue vraiment tes clients."
+        },
+        {
+          "kind": "cta",
+          "title": "Crée ta page producteur en 2 [[minutes]]",
+          "body": "Gratuit, sans carte bancaire, prêt à imprimer.",
+          "cta": "qrowg.com",
+          "qr": true
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "slug": "qr-code-carte-du-soir-ecourtee-fin-de-service-restaurant",
+      "tag": "Restaurant",
+      "sector": "restaurant",
+      "layout": 0,
+      "qr": true,
+      "title": "22 h 30 : la moitié de la carte n'existe [[plus]].",
+      "subtitle": "La marche à suivre : 4 étapes, 5 minutes →",
+      "url": "https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260911-marche&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-horaires-exceptionnels-vitrine-commerce",
+      "tag": "Commerce",
+      "layout": 1,
+      "qr": true,
+      "title": "Fermé lundi. Le papier scotché dit [[l'inverse]].",
+      "subtitle": "Gratuit, sans carte bancaire →",
+      "url": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260911-marche&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-ou-se-garer-entreprises-food-truck",
+      "tag": "Food truck",
+      "layout": 2,
+      "qr": true,
+      "title": "« Vous venez chez nous ? » Et la fiche n'existe [[pas]].",
+      "subtitle": "La page à monter en 5 minutes →",
+      "url": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260911-marche&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-panneau-a-vendre-visite-interieur-immobilier",
+      "tag": "Immobilier",
+      "layout": 3,
+      "qr": true,
+      "title": "Il photographie le panneau. Il n'appelle [[jamais]].",
+      "subtitle": "Les 4 étapes pour créer la page →",
+      "url": "https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260911-marche&utm_content=clic&utm_term=immobilier"
+    }
+  ]
+}

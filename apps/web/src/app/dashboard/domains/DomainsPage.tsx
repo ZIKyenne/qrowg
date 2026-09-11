@@ -302,10 +302,10 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
                         <div style={{ flex:1, minWidth:0 }}>
                           <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:2, flexWrap:"wrap" }}>
                             <span style={{ color:"var(--ink)", fontSize:14, fontWeight:700 }}>{rec.domain}</span>
-                            <span style={{ display:"flex", alignItems:"center", gap:4, background:`${statusCfg.color}15`, border:`1px solid ${statusCfg.color}30`, borderRadius:6, padding:"2px 8px", fontSize:10, color:statusCfg.color, fontWeight:600 }}>
+                            <span style={{ display:"flex", alignItems:"center", gap:4, background:`${statusCfg.color}15`, border:`1px solid ${statusCfg.color}30`, borderRadius:6, padding:"2px 8px", fontSize:11.5, color:statusCfg.color, fontWeight:600 }}>
                               {statusCfg.icon}{statusCfg.label}
                             </span>
-                            {rec.is_primary && <span style={{ display:"flex", alignItems:"center", gap:4, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid var(--line-strong)", borderRadius:6, padding:"2px 8px", fontSize:10, color:G, fontWeight:700 }}><Star size={10}/> Principal</span>}
+                            {rec.is_primary && <span style={{ display:"flex", alignItems:"center", gap:4, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid var(--line-strong)", borderRadius:6, padding:"2px 8px", fontSize:11.5, color:G, fontWeight:700 }}><Star size={10}/> Principal</span>}
                           </div>
                           <p style={{ color:MUTED, fontSize:11, margin:0 }}>
                             → {rec.pages?.title ?? pages.find(p => p.id === rec.page_id)?.title ?? "Page non liée"} · Ajouté le {formatDate(rec.created_at)}
@@ -314,7 +314,7 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
                         <div style={{ display:"flex", gap:6, alignItems:"center", flexShrink:0 }}>
                           {rec.verified && (
                             <a href={`https://${rec.domain}`} target="_blank" rel="noopener noreferrer"
-                              style={{ width:28, height:28, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:MUTED, textDecoration:"none" }}>
+                              style={{ width:32, height:32, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:MUTED, textDecoration:"none" }}>
                               <ExternalLink size={13}/>
                             </a>
                           )}
@@ -323,7 +323,7 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
                           )}
                           {!rec.verified && (
                             <button type="button" onClick={() => { const ouvre = showChecker !== rec.id; setShowChecker(ouvre ? rec.id : null); if (ouvre) setExpanded(rec.id) }}
-                              style={{ display:"flex", alignItems:"center", gap:5, padding:"6px 12px", background: showChecker===rec.id ? "color-mix(in srgb, var(--accent) 20%, transparent)" : "color-mix(in srgb, var(--accent) 10%, transparent)", border:`1px solid color-mix(in srgb, var(--accent) 25%, transparent)`, borderRadius:8, color:G, fontSize:11, fontWeight:700, cursor:"pointer" }}>
+                              style={{ display:"flex", alignItems:"center", gap:5, minHeight:32, padding:"0 12px", background: showChecker===rec.id ? "color-mix(in srgb, var(--accent) 20%, transparent)" : "color-mix(in srgb, var(--accent) 10%, transparent)", border:`1px solid color-mix(in srgb, var(--accent) 25%, transparent)`, borderRadius:8, color:G, fontSize:11, fontWeight:700, cursor:"pointer" }}>
                               <RefreshCw size={12}/>
                               {showChecker === rec.id ? "Fermer" : "Vérifier DNS"}
                             </button>
@@ -369,7 +369,7 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
                                 <div style={{ background:"var(--bg)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"12px 14px" }}>
                                   <div style={{ display:"grid", gridTemplateColumns:"60px 1fr 80px 1fr", gap:8, marginBottom:8 }}>
                                     {["Type","Nom","TTL","Valeur"].map((h,i) => (
-                                      <span key={i} style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase" }}>{h}</span>
+                                      <span key={i} style={{ color:MUTED, fontSize:11, fontWeight:700, textTransform:"uppercase" }}>{h}</span>
                                     ))}
                                   </div>
                                   <div style={{ display:"grid", gridTemplateColumns:"60px 1fr 80px 1fr", gap:8, alignItems:"center" }}>
@@ -397,7 +397,7 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
                                 <div style={{ background:"var(--bg)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"12px 14px" }}>
                                   <div style={{ display:"grid", gridTemplateColumns:"60px 1fr 80px 1fr", gap:8, marginBottom:8 }}>
                                     {["Type","Nom","TTL","Valeur"].map((h,i) => (
-                                      <span key={i} style={{ color:MUTED, fontSize:10, fontWeight:700, textTransform:"uppercase" }}>{h}</span>
+                                      <span key={i} style={{ color:MUTED, fontSize:11, fontWeight:700, textTransform:"uppercase" }}>{h}</span>
                                     ))}
                                   </div>
                                   <div style={{ display:"grid", gridTemplateColumns:"60px 1fr 80px 1fr", gap:8, alignItems:"center" }}>
@@ -470,7 +470,7 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
                   ["4", "Votre domaine redirige vers votre page QRowg"],
                 ].map(([step, text]) => (
                   <div key={step} style={{ display:"flex", gap:10, alignItems:"flex-start" }}>
-                    <span style={{ background:"color-mix(in srgb, var(--accent) 15%, transparent)", color:G, fontSize:10, fontWeight:700, width:18, height:18, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{step}</span>
+                    <span style={{ background:"color-mix(in srgb, var(--accent) 15%, transparent)", color:G, fontSize:11.5, fontWeight:700, width:20, height:20, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{step}</span>
                     <span style={{ color:MUTED, fontSize:12, lineHeight:1.5 }}>{text}</span>
                   </div>
                 ))}

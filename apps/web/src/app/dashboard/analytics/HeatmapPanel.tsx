@@ -75,8 +75,8 @@ export default function HeatmapPanel({ grid, byBlock, total, blocks }: Props) {
                 <div key={`${r}-${c}`} style={{ background: heatColor(v), aspectRatio: "1 / 1" }} />
               )))}
               {/* Repères haut/bas */}
-              <span style={{ position: "absolute", top: 4, left: 6, fontSize: 8, color: "rgba(255,255,255,0.35)", pointerEvents: "none" }}>haut</span>
-              <span style={{ position: "absolute", bottom: 4, left: 6, fontSize: 8, color: "rgba(255,255,255,0.35)", pointerEvents: "none" }}>bas</span>
+              <span style={{ position: "absolute", top: 4, left: 6, fontSize: 11.5, color: "rgba(255,255,255,0.35)", pointerEvents: "none" }}>haut</span>
+              <span style={{ position: "absolute", bottom: 4, left: 6, fontSize: 11.5, color: "rgba(255,255,255,0.35)", pointerEvents: "none" }}>bas</span>
             </div>
             <p style={{ color: MUTED, fontSize: 11, textAlign: "center", margin: "8px 0 0" }}>{total} clic{total > 1 ? "s" : ""} · 30 j</p>
           </div>

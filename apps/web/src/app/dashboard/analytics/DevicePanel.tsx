@@ -298,7 +298,7 @@ export default function DevicePanel({ scans, pageViews, pages, page, periodDays 
                   data={activeData.map(d => ({ name: d.name, Visites: d.count, color: d.color }))}
                   layout="vertical"
                   margin={{ top: 0, right: 20, bottom: 0, left: 60 }}>
-                  <XAxis type="number" tick={{ fill: MUTED, fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <XAxis type="number" tick={{ fill: MUTED, fontSize: 11.5 }} axisLine={false} tickLine={false} />
                   <YAxis type="category" dataKey="name" width={58} tick={{ fill: "var(--ink)", fontSize: 11 }} axisLine={false} tickLine={false} />
                   <Tooltip content={<BarTip />} cursor={{ fill: "color-mix(in srgb, var(--accent) 5%, transparent)" }} />
                   <Bar dataKey="Visites" radius={[0, 6, 6, 0]}>
@@ -312,7 +312,7 @@ export default function DevicePanel({ scans, pageViews, pages, page, periodDays 
 
             {/* Note OS/browser */}
             {tab !== "device" && (
-              <p style={{ color: MUTED, fontSize: 10, margin: "12px 0 0", textAlign: "center", fontStyle: "italic" }}>
+              <p style={{ color: MUTED, fontSize: 11.5, margin: "12px 0 0", textAlign: "center", fontStyle: "italic" }}>
                 Basé sur les scans QR · {fScans.length} événements
               </p>
             )}

@@ -8,8 +8,11 @@ import LeadsClient from "@/app/dashboard/leads/LeadsClient"
 
 export const dynamic = "force-dynamic"
 
-export default async function E2EMessagesPage() {
+// ?vide=1 : le compte qui n'a encore reçu aucun message — l'état que traverse
+// tout nouveau client, et que personne n'avait regardé.
+export default async function E2EMessagesPage({ searchParams }: { searchParams?: Promise<{ vide?: string }> }) {
   if (!harnessAutorise()) notFound()
+  const vide = ((await searchParams) ?? {}).vide === "1"
   const il_y_a = (h: number) => new Date(Date.now() - h * 36e5).toISOString()
   const pages = [{ id: "demo-page-1", title: "Carte restaurant (démo)", slug: "carte-restaurant-demo" }, { id: "demo-page-2", title: "Avis Google (démo)", slug: "avis-google-demo" }]
   const leads = [
@@ -17,5 +20,5 @@ export default async function E2EMessagesPage() {
     { id: "demo-l2", page_id: "demo-page-1", block_id: null, type: "quote", name: "Atelier Nord (démo)", email: "contact@exemple.fr", phone: null, message: "Devis pour une privatisation de 30 personnes.", data: {}, is_read: true, status: "in_progress", created_at: il_y_a(30) },
     { id: "demo-l3", page_id: "demo-page-2", block_id: null, type: "form", name: null, email: "anonyme@exemple.fr", phone: null, message: "Merci pour l'accueil !", data: {}, is_read: true, status: "done", created_at: il_y_a(80) },
   ]
-  return <ToastProvider><ConfirmProvider><LeadsClient leads={leads} pages={pages} /></ConfirmProvider></ToastProvider>
+  return <ToastProvider><ConfirmProvider><LeadsClient leads={vide ? [] : leads} pages={vide ? [pages[0]] : pages} /></ConfirmProvider></ToastProvider>
 }

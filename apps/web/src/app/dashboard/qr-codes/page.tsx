@@ -69,7 +69,7 @@ export default async function QRCodesPage() {
                 <span aria-hidden="true" style={{ width: 8, height: 8, borderRadius: "50%", background: dotColor, flex: "none" }} />
                 <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
                   <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-.01em", color: "var(--ink)", lineHeight: 1 }}>{activeQR}{activeLimit != null && <span style={{ color: "var(--faint)", fontWeight: 500 }}> / {activeLimit}</span>}</div>
-                  <div style={{ fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 600 }}>QR actifs</div>
+                  <div style={{ fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 600 }}>QR actifs</div>
                 </div>
                 {activeLimit != null && (
                   <div aria-hidden="true" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 2, background: "var(--surface-2)" }}>
@@ -80,7 +80,7 @@ export default async function QRCodesPage() {
               <div className="kpi-chip" aria-label={`${totalScans} scans au total`}>
                 <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
                   <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-.01em", color: "var(--ink)", lineHeight: 1 }}>{totalScans.toLocaleString("fr-FR")}</div>
-                  <div style={{ fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 600 }}>Scans total</div>
+                  <div style={{ fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 600 }}>Scans total</div>
                 </div>
               </div>
             </div>

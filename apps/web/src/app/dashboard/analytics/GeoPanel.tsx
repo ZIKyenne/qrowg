@@ -189,7 +189,7 @@ export default function GeoPanel({ scans, pageViews, pages, page, periodDays }: 
           <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "10px 14px", display: "flex", alignItems: "center", gap: 8 }}>
             {k.icon}
             <div>
-              <p style={{ color: MUTED, fontSize: 10, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 2px" }}>{k.label}</p>
+              <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 2px" }}>{k.label}</p>
               <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>{k.value}</p>
             </div>
           </div>
@@ -207,12 +207,12 @@ export default function GeoPanel({ scans, pageViews, pages, page, periodDays }: 
 
           {/* Tableau pays */}
           <div>
-            <p style={{ color: MUTED, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, margin: "0 0 10px" }}>
+            <p style={{ color: MUTED, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, margin: "0 0 10px" }}>
               Par pays
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 60px 60px 90px", gap: 6, padding: "0 6px 8px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
               {["Pays", "Vues", "Scans", ""].map((h, i) => (
-                <span key={i} style={{ color: MUTED, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>{h}</span>
+                <span key={i} style={{ color: MUTED, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>{h}</span>
               ))}
             </div>
             {byCountry.slice(0, 12).map((row, i) => (
@@ -220,7 +220,7 @@ export default function GeoPanel({ scans, pageViews, pages, page, periodDays }: 
                 <div>
                   <span style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600 }}>{row.name}</span>
                   {row.cities && (
-                    <p style={{ color: MUTED, fontSize: 10, margin: "1px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <p style={{ color: MUTED, fontSize: 11.5, margin: "1px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {row.cities}
                     </p>
                   )}
@@ -236,7 +236,7 @@ export default function GeoPanel({ scans, pageViews, pages, page, periodDays }: 
 
           {/* Top villes */}
           <div>
-            <p style={{ color: MUTED, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, margin: "0 0 10px" }}>
+            <p style={{ color: MUTED, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, margin: "0 0 10px" }}>
               Top villes (scans QR)
             </p>
             {byCity.length === 0 ? (
@@ -254,7 +254,7 @@ export default function GeoPanel({ scans, pageViews, pages, page, periodDays }: 
                     </span>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <span style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600 }}>{city.city}</span>
-                      <span style={{ color: MUTED, fontSize: 10, marginLeft: 6 }}>{city.country}</span>
+                      <span style={{ color: MUTED, fontSize: 11.5, marginLeft: 6 }}>{city.country}</span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                       <QrCode size={10} color="var(--accent)" />
@@ -335,13 +335,13 @@ export default function GeoPanel({ scans, pageViews, pages, page, periodDays }: 
 
           {/* Légende */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 12 }}>
-            <span style={{ color: MUTED, fontSize: 10 }}>Aucune visite</span>
+            <span style={{ color: MUTED, fontSize: 11.5 }}>Aucune visite</span>
             <div style={{ display: "flex", gap: 2 }}>
               {["#1a1a0e", "#2a2210", "#4a3a14", "#7a5c1a", "#b08228", "var(--accent)"].map((c, i) => (
                 <div key={i} style={{ width: 20, height: 10, background: c, borderRadius: 2 }} />
               ))}
             </div>
-            <span style={{ color: MUTED, fontSize: 10 }}>Maximum</span>
+            <span style={{ color: MUTED, fontSize: 11.5 }}>Maximum</span>
           </div>
 
           {/* Top 5 pays sous la carte */}
