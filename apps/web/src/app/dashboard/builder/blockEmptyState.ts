@@ -7,6 +7,8 @@
 // (PublicPageClient) → `hasPublishableContent === false` ⟺ le bloc rend `null` en ligne.
 // Testable sans React (voir blockEmptyState.test.ts).
 
+import { embedHref } from "./types"
+
 // Une valeur ne compte comme réelle que si c'est un texte non vide (espaces ignorés) :
 // une ligne blanche, un item « fantôme » (espaces seuls) ne sont PAS du contenu publiable.
 export function hasMeaningfulText(v: any): boolean {
@@ -49,6 +51,36 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   avatar_row:              c => hasMeaningfulText(c.count) || anyIndexed(c, i => c[`name${i}`]),
   stat_hero:               c => hasMeaningfulText(c.value),
   google_maps_embed:       c => hasMeaningfulText(c.address) || hasMeaningfulText(c.embed_url),
+
+  // ── Les blocs d'ACTION (lot v72) ───────────────────────────────────────────
+  // Relevé du 12 septembre : sur les 34 pages de démonstration, celui qui vient
+  // de scanner ne voit AUCUNE action sur son premier écran dans 19 cas. La cause
+  // n'est pas la mise en page : ce sont ces treize blocs, qui rendent `null` en
+  // public dès que leur champ manque (`case "call_button": return c.phone ? … :
+  // null`), pendant que l'éditeur, lui, les dessine complets.
+  //
+  // Le commerçant ajoute « Appeler » depuis la bibliothèque, voit le bouton vert
+  // dans son aperçu, publie — et la page n'a pas de bouton. L'alerte de
+  // pré-publication ne le rattrapait pas : `boutonsSansLien` exige un couple
+  // libellé/url DÉJÀ rempli, et quatre de ces blocs (appel, e-mail, itinéraire,
+  // WhatsApp) ne portent même pas d'url — leur destination est un téléphone,
+  // une adresse e-mail, une adresse postale.
+  call_button:             c => hasMeaningfulText(c.phone),
+  whatsapp_button:         c => hasMeaningfulText(c.phone),
+  email_button:            c => hasMeaningfulText(c.email),
+  directions_button:       c => hasMeaningfulText(c.address),
+  booking_button:          c => hasMeaningfulText(c.url),
+  table_booking:           c => hasMeaningfulText(c.url),
+  donation:                c => hasMeaningfulText(c.url),
+  download_file:           c => hasMeaningfulText(c.url),
+  google_review:           c => hasMeaningfulText(c.url),
+  video:                   c => hasMeaningfulText(c.url),
+  // L'intégration a une seconde condition : l'hôte doit être autorisé, sinon la
+  // page rend un cadre vide. Le détecteur doit être le miroir EXACT du filtre
+  // public — c'est le contrat de ce module — donc il pose la même question.
+  embed_block:             c => hasMeaningfulText(c.url) && embedHref(c.url).length > 0,
+  spotify_embed:           c => hasMeaningfulText(c.url),
+  audio_player:            c => hasMeaningfulText(c.src),
   certifications:          c => anyIndexed(c, i => c[`cert_${i}_name`]),
   legal_info:              c => ["company_name", "siret", "tva", "address", "capital", "rcs", "email"].some(k => hasMeaningfulText(c[k])),
   engagements:            c => anyIndexed(c, i => c[`e${i}`]),

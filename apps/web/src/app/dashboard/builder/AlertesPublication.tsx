@@ -25,10 +25,15 @@ export function alertesPublication(blocks: Block[]): AlertePublication[] {
   for (const b of blocks) {
     if (b.visible === false) continue
     const bloc = BLOCK_DEFS[b.type]?.label || b.type
-    for (const o of boutonsSansLien(b.type, b.content as any)) out.push({ blocId: b.id, bloc, texte: `Bouton « ${o.libelle} » sans lien` })
-    if (EMPTY_STATE_BLOCK_TYPES.includes(b.type) && !hasPublishableContent(b.type, b.content as any)) {
+    // Un bloc entièrement vide se signale UNE fois. Depuis que les blocs d'action
+    // sont entrés dans la doctrine (lot v72), le même bloc pouvait remonter deux
+    // lignes — « bouton sans lien » et « bloc vide » — pour une seule chose à faire.
+    const vide = EMPTY_STATE_BLOCK_TYPES.includes(b.type) && !hasPublishableContent(b.type, b.content as any)
+    if (vide) {
       out.push({ blocId: b.id, bloc, texte: "Bloc vide — rien à publier pour l'instant" })
+      continue
     }
+    for (const o of boutonsSansLien(b.type, b.content as any)) out.push({ blocId: b.id, bloc, texte: `Bouton « ${o.libelle} » sans lien` })
   }
   return out
 }

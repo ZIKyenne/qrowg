@@ -118,6 +118,20 @@ describe("dès qu'il y a du contenu, le bloc apparaît vraiment", () => {
     calendly: { url: "https://calendly.com/atelier-nord" },
     free_gift: { url: "https://atelier-nord.fr/cadeau" },
     instagram_feed: { cta_url: "https://instagram.com/atelier.nord" },
+    // Les blocs d'action, entrés dans la doctrine au lot v72.
+    call_button: { phone: "+33 3 26 00 00 00" },
+    whatsapp_button: { phone: "+33 6 00 00 00 00" },
+    email_button: { email: "contact@atelier-nord.fr" },
+    directions_button: { address: "2 rue des Capucins, Reims" },
+    booking_button: { url: "https://atelier-nord.fr/rdv" },
+    table_booking: { url: "https://thefork.fr/atelier-nord" },
+    donation: { url: "https://ko-fi.com/atelier-nord" },
+    download_file: { url: "https://atelier-nord.fr/carte.pdf" },
+    google_review: { url: "https://g.page/r/atelier-nord/review" },
+    video: { url: "https://youtube.com/watch?v=demo" },
+    embed_block: { url: "https://www.youtube.com/embed/demo" },
+    spotify_embed: { url: "https://open.spotify.com/album/demo" },
+    audio_player: { src: "https://atelier-nord.fr/extrait.mp3" },
   }
 
   it("chaque type déclaré a un exemple rempli — sinon la moitié du contrôle manque", () => {

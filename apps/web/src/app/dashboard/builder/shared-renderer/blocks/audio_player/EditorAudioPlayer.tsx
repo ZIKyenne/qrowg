@@ -1,10 +1,17 @@
 "use client"
 import { audioPlayerViewModel } from "../../models/audioPlayer"
+import { hasMeaningfulText } from "../../../blockEmptyState"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import type { EditorAdapterProps } from "../../renderTypes"
 import SmartImage from "@/components/SmartImage"
 
 // Éditeur : carte représentative (barre de progression décorative), aucun lecteur réel — fidèle legacy.
 export function EditorAudioPlayer({ content, ctx }: EditorAdapterProps) {
+  // Lot v72 : sans src, la page publiée ne rend RIEN. L'éditeur le dit
+  // au lieu de dessiner un bouton que le visiteur n'aura jamais.
+  if (!hasMeaningfulText((content as any)?.src)) {
+    return <div style={{ padding: "10px 16px", ...ctx.surfaceStyle }}><BlockEmptyState icon="🎧" label="Ajoutez le fichier audio" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={ctx.muted} /></div>
+  }
   const { cover, title, artist, showDownload } = audioPlayerViewModel(content)
   const { text, muted, surfaceStyle } = ctx
   return (

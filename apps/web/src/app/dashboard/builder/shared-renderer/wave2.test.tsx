@@ -98,9 +98,28 @@ describe("wave2 — parité de rendu ÉDITEUR (non navigable)", () => {
       expect(out).not.toContain("href=")
     })
   }
-  it("éditeur : CTA affiché MÊME sans donnée de lien (aperçu)", () => {
-    expect(H(createElement(EditorWhatsappButton, { content: {}, ctx: eCtx }))).toContain("Discuter sur WhatsApp")
-    expect(H(createElement(EditorDonation, { content: {}, ctx: eCtx }))).toContain("Soutenir mon travail")
+  // Doctrine révisée au lot v72. L'aperçu montrait le bouton même sans
+  // destination — la règle d'alors disait « le commerçant doit pouvoir le voir et
+  // le composer ». Sauf qu'en public ces blocs rendent `null` : il voyait un
+  // bouton que son client n'aurait jamais. Mesuré le 12 septembre sur les 34
+  // pages de démonstration : dans 19 cas, celui qui scanne n'a AUCUNE action sur
+  // son premier écran.
+  //
+  // La composition n'est pas perdue pour autant : le bloc reste dans la page,
+  // sélectionnable, avec son panneau de réglages — et l'aperçu dit maintenant
+  // quoi y mettre, plus la mention « invisible en ligne tant qu'il est vide ».
+  it("éditeur : un bloc SANS destination affiche l'invite, pas un bouton fantôme", () => {
+    const wa = H(createElement(EditorWhatsappButton, { content: {}, ctx: eCtx }))
+    expect(wa).not.toContain("Discuter sur WhatsApp")
+    expect(wa).toContain("Ajoutez le numéro WhatsApp")
+    expect(wa).toContain('role="note"')
+    const don = H(createElement(EditorDonation, { content: {}, ctx: eCtx }))
+    expect(don).not.toContain("Soutenir mon travail")
+    expect(don).toContain("Ajoutez le lien de votre cagnotte")
+  })
+  it("éditeur : dès que la destination est là, le bouton revient", () => {
+    expect(H(createElement(EditorWhatsappButton, { content: { phone: "+33612345678" }, ctx: eCtx }))).toContain("Discuter sur WhatsApp")
+    expect(H(createElement(EditorDonation, { content: { url: "https://ko-fi.com/demo" }, ctx: eCtx }))).toContain("Soutenir mon travail")
   })
 })
 

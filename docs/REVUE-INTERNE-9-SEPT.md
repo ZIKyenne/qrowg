@@ -292,3 +292,26 @@ Les vingt-trois points d'affichage y passent, plus **cinq autres que la garde a 
 **Mesuré après, au navigateur, sur le même parcours** : « Non authentifie » est devenu « Votre session a expiré. Reconnectez-vous puis réessayez. »
 
 Gardes : `lib/messageDeRoute.test.ts` (17 cas, dont un par code réellement renvoyé par l'API) et `app/messagesLisibles.test.ts` (16 cas, qui balaient tout l'arbre à la recherche d'un corps de réponse affiché tel quel). Vérifiées par injection : remettre `d.message || d.error` dans la création guidée fait échouer les deux.
+
+
+## Lot v72 — les blocs que l'éditeur montre et que la page ne publie pas
+
+Nouvelle mesure, celle du **premier écran** : ce que voit celui qui vient de scanner le QR, sur un téléphone, avant de faire le moindre geste. Appliquée aux 34 pages de démonstration rendues par le vrai moteur public :
+
+> **19 pages sur 34 n'offrent aucune action sur ce premier écran.** Quatorze n'en offrent aucune nulle part.
+
+`resto_bistrot` — un modèle de restaurant — n'avait, dans toute la page, aucun bouton : ni téléphone, ni réservation, ni carte. Seulement Instagram, Facebook et le pied de page QRowg.
+
+La cause n'est pas la mise en page. Ce sont **treize types de blocs** qui rendent `null` en public dès que leur destination manque — `case "call_button": return c.phone ? … : null` — pendant que l'éditeur, lui, les dessinait complets, bouton compris. Appel, WhatsApp, e-mail, itinéraire, réservation, table, don, téléchargement, avis Google, vidéo, intégration, Spotify, audio : **exactement les blocs d'action**, c'est-à-dire la raison d'être du QR.
+
+Le commerçant ajoutait « Appeler » depuis la bibliothèque, voyait le bouton vert dans son aperçu, publiait — et la page n'avait pas de bouton. L'alerte de pré-publication ne le rattrapait pas : `boutonsSansLien` exige un couple libellé/url **déjà rempli**, et quatre de ces blocs n'ont même pas d'url — leur destination est un numéro de téléphone, une adresse e-mail, une adresse postale.
+
+**Les treize sont entrés dans la doctrine de l'état vide** (posée aux lots v63 et v64), chacun jugé sur *sa* destination. L'aperçu affiche maintenant « Ajoutez le numéro à appeler », « Ajoutez le lien de réservation », avec la mention « invisible en ligne tant qu'il est vide », et la liste de pré-publication les reprend.
+
+**Une doctrine a dû être révisée pour cela.** La règle du 7 septembre disait : garder le bouton dans l'aperçu même sans destination, « le commerçant doit pouvoir le voir et le composer ». Elle se défendait — mais elle produisait exactement le mal mesuré ci-dessus. La composition n'est pas perdue : le bloc reste dans la page, sélectionnable, avec son panneau de réglages ; l'aperçu dit simplement quoi y mettre. Le test qui gardait l'ancienne règle a été réécrit, avec la raison.
+
+**Deux trouvailles en chemin.** L'intégration (`embed_block`) a une seconde condition — l'hôte doit être autorisé, sinon la page rend un cadre vide : le détecteur pose désormais la même question, puisque ce module a pour contrat d'être le miroir exact du filtre public. Et un bloc entièrement vide se signalait deux fois (« bouton sans lien » *et* « bloc vide ») pour une seule chose à faire : il ne se signale plus qu'une.
+
+**Ce que ce lot ne fait pas** : il n'ajoute aucune action aux pages de démonstration. Elles restent à 19 sur 34 sans action au premier écran, et c'est normal — leurs destinations sont vides depuis le lot v64, volontairement. Ce qui change, c'est que le commerçant l'apprend dans son éditeur, avant de publier, au lieu de le découvrir en ligne.
+
+Gardes : `app/actionsPubliees.test.ts` (6 cas, dont celui qui **ferme la classe** : tout bloc du rendu public pouvant ne rien rendre doit être déclaré dans la doctrine), plus les cas ajoutés aux gardes existantes de l'état vide. Vérifiées par injection : retirer un des treize, ou rendre le détecteur d'intégration aveugle à l'hôte, fait échouer la garde.

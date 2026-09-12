@@ -327,7 +327,9 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
           </div>
         )
       }
-      case "video": return (
+      case "video":
+        if (!hasPublishableContent("video", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🎬", "Ajoutez le lien de la vidéo", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+        return (
         <div style={{ padding: "10px 16px", ...s }}>
           <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "24px", textAlign: "center" }}>
             <span style={{ fontSize: 28 }}>▶️</span>
@@ -549,7 +551,9 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
         const sSizes: Record<string,number> = { xs: 6, sm: 12, md: 24, lg: 40, xl: 60 }
         return <div style={{ height: sSizes[c.size||"md"] }} />
       }
-      case "call_button": return (
+      case "call_button":
+        if (!hasPublishableContent("call_button", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("📞", "Ajoutez le numéro à appeler", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+        return (
         <div style={{ padding: "4px 16px 10px", ...s }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(57,255,143,0.1)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 12, padding: "13px 18px" }}>
             <span style={{ fontSize: 16 }}>{c.icon||"📞"}</span>
@@ -557,7 +561,9 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
           </div>
         </div>
       )
-      case "whatsapp_button": return (
+      case "whatsapp_button":
+        if (!hasPublishableContent("whatsapp_button", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("💬", "Ajoutez le numéro WhatsApp", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+        return (
         <div style={{ padding: "4px 16px 10px", ...s }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(37,211,102,0.1)", border: "1.5px solid rgba(37,211,102,0.3)", borderRadius: 12, padding: "13px 18px" }}>
             <span style={{ fontSize: 16 }}>💬</span>
@@ -565,7 +571,9 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
           </div>
         </div>
       )
-      case "email_button": return (
+      case "email_button":
+        if (!hasPublishableContent("email_button", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("✉️", "Ajoutez l'adresse e-mail", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+        return (
         <div style={{ padding: "4px 16px 10px", ...s }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(56,189,248,0.1)", border: "1.5px solid rgba(56,189,248,0.3)", borderRadius: 12, padding: "13px 18px" }}>
             <span style={{ fontSize: 16 }}>✉️</span>
@@ -573,7 +581,9 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
           </div>
         </div>
       )
-      case "download_file": return (
+      case "download_file":
+        if (!hasPublishableContent("download_file", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("📄", "Ajoutez le fichier à télécharger", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+        return (
         <div style={{ padding: "4px 16px 10px", ...s }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(167,139,250,0.08)", border: "1.5px solid rgba(167,139,250,0.25)", borderRadius: 12, padding: "11px 14px" }}>
             <div style={{ width: 36, height: 36, background: "rgba(167,139,250,0.15)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{c.icon||"📄"}</div>
@@ -598,7 +608,9 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
           </div>
         </div>
       )
-      case "google_review": return (
+      case "google_review":
+        if (!hasPublishableContent("google_review", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("⭐", "Ajoutez le lien de votre fiche Google", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+        return (
         <div style={{ padding: "4px 16px 10px", ...s }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(251,191,36,0.08)", border: "1.5px solid rgba(251,191,36,0.25)", borderRadius: 12, padding: "11px 14px" }}>
             <div style={{ display: "flex", gap: 1 }}>{Array.from({length: parseInt(c.stars||"5")}).map((_,i) => <span key={i} style={{ color: "#FBBF24", fontSize: 12 }}>★</span>)}</div>
@@ -628,7 +640,9 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
           </div>
         )
       }
-      case "directions_button": return (
+      case "directions_button":
+        if (!hasPublishableContent("directions_button", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🧭", "Ajoutez l'adresse de l'itinéraire", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+        return (
         <div style={{ padding: "4px 16px 10px", ...s }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(66,133,244,0.1)", border: "1.5px solid rgba(66,133,244,0.25)", borderRadius: 12, padding: "13px 18px" }}>
             <span style={{ fontSize: 16 }}>🧭</span>
@@ -637,7 +651,9 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
           {c.address && <p style={{ color: muted, fontSize: 10, margin: "6px 0 0", textAlign: "center" }}>📍 {c.address}</p>}
         </div>
       )
-      case "table_booking": return (
+      case "table_booking":
+        if (!hasPublishableContent("table_booking", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🍽️", "Ajoutez le lien de réservation", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+        return (
         <div style={{ padding: "4px 16px 10px", ...s }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(239,68,68,0.1)", border: "1.5px solid rgba(239,68,68,0.25)", borderRadius: 12, padding: "13px 18px" }}>
             <span style={{ fontSize: 16 }}>🍽️</span>
@@ -665,6 +681,7 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
         </div>
       )
       case "donation": {
+        if (!hasPublishableContent("donation", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("☕", "Ajoutez le lien de votre cagnotte", HIDDEN_WHEN_EMPTY_NOTE)}</div>
         const dc = ({"Ko-fi":"#FF5E5B","Buy Me A Coffee":"#FFDD00","Patreon":"#FF424D","PayPal":"#009CDE","Tipeee":"#E55100"} as any)[c.platform||"Ko-fi"]||"#F59E0B"
         return (
           <div style={{ padding: "4px 16px 10px", ...s }}>
@@ -720,7 +737,9 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
           </div>
         </div>
       )
-      case "booking_button": return (
+      case "booking_button":
+        if (!hasPublishableContent("booking_button", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("📅", "Ajoutez le lien de prise de rendez-vous", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+        return (
         <div style={{ padding: "4px 16px 10px", ...s }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(56,189,248,0.08)", border: "1.5px solid rgba(56,189,248,0.25)", borderRadius: 12, padding: "11px 14px" }}>
             <div style={{ width: 38, height: 38, background: "rgba(56,189,248,0.12)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>📅</div>
@@ -1475,7 +1494,9 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
         </div>
       )
 
-      case "audio_player": return (
+      case "audio_player":
+        if (!hasPublishableContent("audio_player", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🎧", "Ajoutez le fichier audio", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+        return (
         <div style={{ padding: "10px 16px", ...s }}>
           <div style={{ background: "rgba(167,139,250,0.06)", border: "1.5px solid rgba(167,139,250,0.22)", borderRadius: 14, padding: "13px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
@@ -2100,6 +2121,7 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
 
 
       case "spotify_embed": {
+        if (!hasPublishableContent("spotify_embed", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🎵", "Ajoutez le lien Spotify", HIDDEN_WHEN_EMPTY_NOTE)}</div>
         const spotifySrc = spotifyEmbedUrl(c.url)
         const height = c.size==="lg" ? 352 : c.size==="sm" ? 80 : 152
         return (
@@ -2645,7 +2667,9 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
         </div>
       )
 
-      case "embed_block": return (
+      case "embed_block":
+        if (!hasPublishableContent("embed_block", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🔗", "Ajoutez l'adresse à intégrer", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+        return (
         <div style={{ padding: "10px 16px", ...s }}>
           {c.url
             ? <div>

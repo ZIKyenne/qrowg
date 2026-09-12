@@ -58,6 +58,22 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
   avatar_row: v => ({ count: v }),
   stat_hero: v => ({ value: v }),
   google_maps_embed: v => ({ address: v }),
+  // Les blocs d'action (lot v72) : leur destination n'est pas toujours une url.
+  call_button:       v => ({ phone: v }),
+  whatsapp_button:   v => ({ phone: v }),
+  email_button:      v => ({ email: v }),
+  directions_button: v => ({ address: v }),
+  booking_button:    v => ({ url: v }),
+  table_booking:     v => ({ url: v }),
+  donation:          v => ({ url: v }),
+  download_file:     v => ({ url: v }),
+  google_review:     v => ({ url: v }),
+  video:             v => ({ url: v }),
+  // L'hôte doit être autorisé ET la valeur réelle : une chaîne blanche ne
+  // devient pas une adresse parce qu'on la colle derrière un domaine valide.
+  embed_block:       v => ({ url: v.trim() ? `https://www.youtube.com/embed/${v.trim()}` : v }),
+  spotify_embed:     v => ({ url: v }),
+  audio_player:      v => ({ src: v }),
   certifications: v => ({ cert_1_name: v }),
   legal_info: v => ({ siret: v }),
   // Vague 10.

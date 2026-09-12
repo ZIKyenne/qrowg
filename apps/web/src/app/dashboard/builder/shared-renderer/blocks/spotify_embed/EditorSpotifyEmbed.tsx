@@ -1,8 +1,15 @@
 "use client"
 import { spotifyEmbedViewModel } from "../../models/spotifyEmbed"
+import { hasMeaningfulText } from "../../../blockEmptyState"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import type { EditorAdapterProps } from "../../renderTypes"
 
 export function EditorSpotifyEmbed({ content, ctx }: EditorAdapterProps) {
+  // Lot v72 : sans url, la page publiée ne rend RIEN. L'éditeur le dit
+  // au lieu de dessiner un bouton que le visiteur n'aura jamais.
+  if (!hasMeaningfulText((content as any)?.url)) {
+    return <div style={{ padding: "10px 16px", ...ctx.surfaceStyle }}><BlockEmptyState icon="🎵" label="Ajoutez le lien Spotify" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={ctx.muted} /></div>
+  }
   const { src, height } = spotifyEmbedViewModel(content)
   const { muted, surfaceStyle } = ctx
   return (

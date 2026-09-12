@@ -2,6 +2,7 @@
 // call_button — Appeler d'un doigt. Le sous-titre (« 7j/7 de 9h a 19h ») etait
 // reglable et servi au visiteur, mais l'apercu de l'editeur ne le montrait pas.
 import { boutonAppel } from "../../models/contactEtAction"
+import { hasMeaningfulText } from "../../../blockEmptyState"
 import { pagePad } from "../../views/TitreSection"
 import { SmartCta } from "../../primitives/LayoutSurface"
 import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
@@ -27,6 +28,11 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
 }
 
 export function EditorCallButton({ content, ctx }: EditorAdapterProps) {
+  // Lot v72 : sans phone, la page publiée ne rend RIEN. L'éditeur le dit
+  // au lieu de dessiner un bouton que le visiteur n'aura jamais.
+  if (!hasMeaningfulText((content as any)?.phone)) {
+    return <div style={{ padding: "10px 16px", ...ctx.surfaceStyle }}><BlockEmptyState icon="📞" label="Ajoutez le numéro à appeler" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={ctx.muted} /></div>
+  }
   const u = editorCtx(ctx)
   if (!boutonAppel(content)) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="📞" label="Ajoutez un numéro de téléphone" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
   return <Vue u={u} c={content} />

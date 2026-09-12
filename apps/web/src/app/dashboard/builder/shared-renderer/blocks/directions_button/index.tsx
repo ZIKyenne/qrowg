@@ -4,6 +4,7 @@
 // Deux choses differentes au meme endroit. C'est le bouton de copie qui gagne :
 // c'est lui que le visiteur utilise, debout devant la vitrine.
 import { boutonItineraire } from "../../models/contactEtAction"
+import { hasMeaningfulText } from "../../../blockEmptyState"
 import { pagePad } from "../../views/TitreSection"
 import { SmartCta } from "../../primitives/LayoutSurface"
 import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
@@ -34,6 +35,11 @@ function styleCopie(u: UnifiedCtx) {
 }
 
 export function EditorDirectionsButton({ content, ctx }: EditorAdapterProps) {
+  // Lot v72 : sans address, la page publiée ne rend RIEN. L'éditeur le dit
+  // au lieu de dessiner un bouton que le visiteur n'aura jamais.
+  if (!hasMeaningfulText((content as any)?.address)) {
+    return <div style={{ padding: "10px 16px", ...ctx.surfaceStyle }}><BlockEmptyState icon="🧭" label="Ajoutez l'adresse de l'itinéraire" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={ctx.muted} /></div>
+  }
   const u = editorCtx(ctx)
   if (!boutonItineraire(content)) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="🧭" label="Ajoutez votre adresse" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
   return <Vue u={u} c={content} boutonCopie={() => <div aria-disabled="true" style={{ ...styleCopie(u), boxSizing: "border-box" }}>📋 Copier l&apos;adresse</div>} />

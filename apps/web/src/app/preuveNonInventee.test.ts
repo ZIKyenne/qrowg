@@ -153,10 +153,19 @@ describe("avant de publier, on sait ce qui manque", () => {
     const bistrot = PAGE_TEMPLATES.find(t => t.key === "resto_bistrot")!
     const blocks = bistrot.blocks.map((b, i) => ({ id: `b${i}`, type: b.type, content: b.content, visible: true })) as any
     const alertes = alertesPublication(blocks)
-    // Le bloc d'avis et la carte arrivent vides ; le bouton de réservation n'a pas de lien.
+    // Le bloc d'avis, la carte et la réservation arrivent vides.
     expect(alertes.some(a => a.texte.includes("Bloc vide"))).toBe(true)
-    expect(alertes.some(a => a.texte.includes("sans lien"))).toBe(true)
     expect(alertes.length).toBeGreaterThanOrEqual(3)
+    // Depuis le lot v72, la réservation est jugée sur SA destination : elle
+    // remonte comme bloc vide, une seule fois — avant, le même bloc donnait deux
+    // lignes (« bouton sans lien » et « bloc vide ») pour une seule chose à faire.
+    const reservation = alertes.filter(a => a.bloc.includes("Réserver"))
+    expect(reservation).toHaveLength(1)
+    expect(reservation[0].texte).toContain("Bloc vide")
+    // et la règle « bouton sans lien » sert toujours, sur un bloc partiellement rempli
+    const { alertesPublication: a2 } = await import("./dashboard/builder/AlertesPublication")
+    const partiel = a2([{ id: "x", type: "cta_button", content: { label: "Réserver", url: "" }, visible: true }] as any)
+    expect(partiel.some(a => a.texte.includes("sans lien"))).toBe(true)
   })
 })
 
