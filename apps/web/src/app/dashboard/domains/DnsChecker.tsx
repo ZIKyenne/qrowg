@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { messageDeRoute } from "@/lib/messageDeRoute"
 import {
   CheckCircle, Clock, AlertCircle, RefreshCw,
   Loader, ChevronDown, ChevronUp, Copy, Check
@@ -79,7 +80,7 @@ export default function DnsChecker({ domain, onVerified }: Props) {
     try {
       const res = await fetch(`/api/domains/check?domain=${encodeURIComponent(domain)}`)
       const d   = await res.json()
-      if (d.error) { setError(d.error); setLoading(false); return }
+      if (d.error) { setError(messageDeRoute(res.status, d, "La vérification DNS n'a pas abouti.")); setLoading(false); return }
       setResult(d)
       if (d.canVerify) onVerified()
     } catch {

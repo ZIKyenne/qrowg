@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useMemo } from "react"
+import { messageDeRoute } from "@/lib/messageDeRoute"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { PLAN_RANK, getPlan, PLANS } from "@/lib/plans"
@@ -633,7 +634,7 @@ export default function TemplatesPage() {
               // Course possible : la session n'était pas encore connue au moment du clic.
               if (res.status === 401) return applyTemplateAsGuest({ key: String(wizardFor), name, theme: composed.theme, blocks })
               const json = await res.json()
-              if (!res.ok || !json.pageId) return { error: json.error || "Erreur création page." }
+              if (!res.ok || !json.pageId) return { error: messageDeRoute(res.status, json, "Votre page n'a pas pu être créée.") }
               toast.success("Page créée — à vous de jouer")
               setTimeout(() => router.push("/dashboard/builder/" + json.pageId), 400)
               return { ok: true }
@@ -702,7 +703,7 @@ export default function TemplatesPage() {
               if (res.status === 401) return applyTemplateAsGuest({ key: String(namingFor), name, theme, blocks })
               const json = await res.json()
               if (!res.ok || !json.pageId) {
-                return { error: json.error || "Erreur création page." }
+                return { error: messageDeRoute(res.status, json, "Votre page n'a pas pu être créée.") }
               }
               if (json.atActiveLimit) {
                 toast.success("Page créée en brouillon : limite de QR actifs atteinte. Mettez un QR en pause puis activez celle-ci.")
@@ -789,8 +790,10 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
     // Si le réseau tombe, `onCreate` rejette : sans le finally, le bouton
     // restait « en cours » pour toujours.
     try {
-      const result = await onCreate(name.trim(), slug, description.trim())
-      if (result.error) setError(result.error)
+      // `onCreate` rend une phrase déjà lisible (elle passe par messageDeRoute) :
+      // le nom le dit, pour qu'on ne confonde pas avec le corps brut d'une réponse.
+      const phrase = await onCreate(name.trim(), slug, description.trim())
+      if (phrase.error) setError(phrase.error)
     } catch {
       setError("Connexion impossible. Vérifiez votre réseau et réessayez.")
     } finally {

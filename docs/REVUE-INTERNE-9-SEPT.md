@@ -271,3 +271,24 @@ La garde a d'ailleurs attrapé deux de mes propres approximations en la posant :
 **Vérifié au navigateur, dans les deux sens.** Build sans `ANTHROPIC_API_KEY` : aucune occurrence de « Génération IA » sur `/upgrade`, et aucune de « Support prioritaire ». Build avec la clé : les trois lignes reviennent, à leur place. La grille se comporte enfin comme l'éditeur.
 
 Gardes : `app/promessesTenues.test.ts` (14 cas — une par plan sur les preuves, les fichiers cités, le filtrage de l'IA, le branchement réel de la page et la cohérence de l'accueil), vérifiée par injection : remettre une promesse sans preuve, ou retirer le drapeau du branchement, fait échouer la garde correspondante.
+
+
+## Lot v71 — les phrases que le serveur envoie ne sont pas pour le commerçant
+
+En marchant la création guidée sur son banc d'essai, au moment où elle génère la page, l'écran a affiché ceci, en haut, seul :
+
+> Non authentifie
+
+Pas d'accent, pas de ponctuation, pas de geste à faire — et le même écran derrière, avec les mêmes boutons. C'est la chaîne que renvoie la route, montrée telle quelle par `setErr(d.message || d.error || …)`.
+
+Ce n'était pas un cas isolé. **Vingt-trois endroits dans douze fichiers** affichaient le champ `error` d'une réponse sans le traduire — alors que `lib/erreurLisible.ts` existe depuis le lot v55 pour exactement cela, avec pour règle « jamais de détail technique ». La traduction existait ; elle n'était simplement pas branchée sur ce chemin-là.
+
+Et ce que les routes mettent dans ce champ n'a jamais été écrit pour être lu. Compté sur l'ensemble de `app/api` : **« Non authentifié » 48 fois**, « id requis » 10, « QR introuvable » 10, « Erreur serveur » 6, « limit », « domain requis », « qr_id requis ». Ce sont des codes déguisés en français — utiles dans un journal, illisibles sur un écran.
+
+**La règle posée**, dans `lib/messageDeRoute.ts` (module pur) : une chaîne venue d'une route n'est montrée que si elle a été **écrite pour être lue** — une vraie phrase, avec un espace et une ponctuation finale. « Réservé au propriétaire / admin. » passe ; « Non authentifié », « id requis », « limit » ne passent pas. Sinon, on prend la phrase du produit qui correspond au code HTTP : 401 → « Votre session a expiré. Reconnectez-vous puis réessayez. », 403 → les droits, 404 → l'objet, 429 → la patience, 5xx → la panne, et le réseau muet a la sienne. Un écran qui a sa propre phrase (« La redirection n'a pas pu être enregistrée. ») la garde pour les causes banales, mais pas pour une session expirée ni une panne serveur : là, c'est la cause qui compte.
+
+Les vingt-trois points d'affichage y passent, plus **cinq autres que la garde a trouvés** en balayant tout l'arbre — dont la création depuis un modèle, qui renvoyait « Erreur création page. » Au passage, deux variables ont été renommées : ce qu'une de nos fonctions rend est une `phrase` déjà traduite, pas le corps brut d'une réponse, et le nom le dit maintenant.
+
+**Mesuré après, au navigateur, sur le même parcours** : « Non authentifie » est devenu « Votre session a expiré. Reconnectez-vous puis réessayez. »
+
+Gardes : `lib/messageDeRoute.test.ts` (17 cas, dont un par code réellement renvoyé par l'API) et `app/messagesLisibles.test.ts` (16 cas, qui balaient tout l'arbre à la recherche d'un corps de réponse affiché tel quel). Vérifiées par injection : remettre `d.message || d.error` dans la création guidée fait échouer les deux.

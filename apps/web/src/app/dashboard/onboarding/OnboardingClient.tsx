@@ -4,6 +4,7 @@
 // On génère une page pré-remplie (blocs + CTA) + un QR + un objectif de conversion, puis on
 // atterrit dans le builder. Réutilise POST /api/templates/use + POST /api/goals (aucune migration).
 import { useState, useEffect } from "react"
+import { messageDeRoute } from "@/lib/messageDeRoute"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Sparkles } from "lucide-react"
@@ -38,7 +39,7 @@ export default function OnboardingClient() {
         body: JSON.stringify({ templateId: `goal_${o.key}${s ? "_" + s.key : ""}`, templateName, theme, blocks }),
       })
       const d = await res.json().catch(() => ({} as any))
-      if (!res.ok || !d.pageId) { setErr(d.message || d.error || "Création impossible pour le moment."); setBusy(false); return }
+      if (!res.ok || !d.pageId) { setErr(messageDeRoute(res.status, d, "Création impossible pour le moment.")); setBusy(false); return }
       if (goal) {
         fetch("/api/goals", {
           method: "POST", headers: { "Content-Type": "application/json" },
@@ -47,7 +48,7 @@ export default function OnboardingClient() {
       }
       router.push(`/dashboard/builder/${d.pageId}`)
     } catch {
-      setErr("Erreur réseau. Réessayez."); setBusy(false)
+      setErr(messageDeRoute(0, null)); setBusy(false)
     }
   }
 

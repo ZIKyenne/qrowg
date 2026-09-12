@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
+import { messageDeRoute } from "@/lib/messageDeRoute"
 import { useToast } from "@/components/Toast"
 import { useConfirm } from "@/components/ui/Confirm"
 import { Button } from "@/components/ui/Button"
@@ -241,7 +242,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
       // La réponse n'était pas lue en cas d'échec : le formulaire restait ouvert,
       // sans un mot, et l'objectif n'existait nulle part.
       if (!res.ok || d.error || !d.goal) {
-        toast.error(d.error || "L'objectif n'a pas pu être enregistré.")
+        toast.error(messageDeRoute(res.status, d, "L'objectif n'a pas pu être enregistré."))
         return
       }
       setGoals(prev => editId ? prev.map(g => g.id === editId ? d.goal : g) : [d.goal, ...prev])
@@ -265,7 +266,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
         body: JSON.stringify({ id }),
       })
       const d = await res.json().catch(() => ({}))
-      if (!res.ok || d.error) { toast.error(d.error || "L'objectif n'a pas pu être supprimé."); return }
+      if (!res.ok || d.error) { toast.error(messageDeRoute(res.status, d, "L'objectif n'a pas pu être supprimé.")); return }
       setGoals(prev => prev.filter(g => g.id !== id))
     } catch {
       toast.error("Connexion impossible. Vérifiez votre réseau et réessayez.")

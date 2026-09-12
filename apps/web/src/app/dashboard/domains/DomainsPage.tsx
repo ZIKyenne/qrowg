@@ -1,6 +1,7 @@
 "use client"
 
 import { PageHeader } from "@/components/ui/PageHeader"
+import { messageDeRoute } from "@/lib/messageDeRoute"
 import { useState, useEffect } from "react"
 import { useConfirm } from "@/components/ui/Confirm"
 import DnsChecker from "./DnsChecker"
@@ -87,7 +88,7 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
         body:    JSON.stringify({ domain: fDomain, page_id: fPageId }),
       })
       const d = await res.json().catch(() => ({}))
-      if (!res.ok || d.error || !d.domain) { setError(d.error || "Le domaine n'a pas pu être ajouté."); return }
+      if (!res.ok || d.error || !d.domain) { setError(messageDeRoute(res.status, d, "Le domaine n'a pas pu être ajouté.")); return }
       setDomains(prev => [d.domain, ...prev])
       setExpanded(d.domain.id)
       setShowForm(false)
@@ -115,7 +116,7 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
         if (d.vercel_ok) toast.success(`${rec.domain} est actif.`)
         else toast.error(`DNS validé, mais le rattachement a échoué : ${d.vercel_error || "réessayez dans quelques minutes"}.`)
       } else {
-        toast.error(d.error || "Le DNS ne pointe pas encore vers QRowg. Réessayez dans quelques minutes.")
+        toast.error(messageDeRoute(res.status, d, "Le DNS ne pointe pas encore vers QRowg. Réessayez dans quelques minutes."))
       }
     } catch {
       toast.error("Connexion impossible. Réessayez.")
@@ -134,7 +135,7 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
         body:    JSON.stringify({ action: "set_primary", domain }),
       })
       const d = await res.json().catch(() => ({}))
-      if (!res.ok || d.error) { toast.error(d.error || "Le domaine principal n'a pas pu être changé."); return }
+      if (!res.ok || d.error) { toast.error(messageDeRoute(res.status, d, "Le domaine principal n'a pas pu être changé.")); return }
       setDomains(prev => prev.map(d => ({ ...d, is_primary: d.domain === domain })))
       toast.success(`${domain} est maintenant le domaine principal.`)
     } catch {
@@ -153,7 +154,7 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
         body:    JSON.stringify({ id }),
       })
       const d = await res.json().catch(() => ({}))
-      if (!res.ok || d.error) { toast.error(d.error || "Le domaine n'a pas pu être supprimé."); return }
+      if (!res.ok || d.error) { toast.error(messageDeRoute(res.status, d, "Le domaine n'a pas pu être supprimé.")); return }
       setDomains(prev => prev.filter(d => d.id !== id))
     } catch {
       toast.error("Connexion impossible. Vérifiez votre réseau et réessayez.")

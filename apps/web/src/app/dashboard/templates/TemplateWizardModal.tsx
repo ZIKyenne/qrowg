@@ -147,8 +147,10 @@ export default function TemplateWizardModal({
     setBusy(true)
     const finalBlocks = finalizeBlocks(applied, decisions)
     try {
-      const res = await onCreate({ name: pageName.trim(), slug: slug.trim() || slugifyBase(pageName), blocks: finalBlocks })
-      if (res?.error) setError(res.error)
+      // `onCreate` rend une phrase déjà lisible (elle passe par messageDeRoute) :
+      // le nom le dit, pour qu'on ne confonde pas avec le corps brut d'une réponse.
+      const phrase = await onCreate({ name: pageName.trim(), slug: slug.trim() || slugifyBase(pageName), blocks: finalBlocks })
+      if (phrase?.error) setError(phrase.error)
     } catch {
       setError("Connexion impossible. Vérifiez votre réseau et réessayez.")
     } finally {

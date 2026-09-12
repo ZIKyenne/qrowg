@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
+import { messageDeRoute, estUnePhrase } from "@/lib/messageDeRoute"
 import {
   Globe, Check, X, Loader, AlertCircle,
   CheckCircle, Copy, ExternalLink, Pencil, Trash2
@@ -69,7 +70,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
         setMessage("C'est votre sous-domaine actuel")
       } else {
         setStatus("taken")
-        setMessage(d.reason ?? d.error ?? "Non disponible")
+        setMessage(estUnePhrase(d.reason) ? String(d.reason) : "Cette adresse n'est pas disponible.")
       }
     } catch {
       setStatus("invalid")
@@ -95,7 +96,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
         body:    JSON.stringify({ username: input.toLowerCase().trim() }),
       })
       const d = await res.json()
-      if (d.error) { setError(d.error); setSaving(false); return }
+      if (d.error) { setError(messageDeRoute(res.status, d, "Ce sous-domaine n'a pas pu être enregistré.")); setSaving(false); return }
       setEditing(false)
       onUpdated?.(d.username)
     } catch {
@@ -110,7 +111,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
     try {
       const res = await fetch("/api/subdomain", { method: "DELETE" })
       const d = await res.json().catch(() => ({}))
-      if (!res.ok || d.error) { setStatus("invalid"); setMessage(d.error || "Le sous-domaine n'a pas pu être libéré."); return }
+      if (!res.ok || d.error) { setStatus("invalid"); setMessage(messageDeRoute(res.status, d, "Le sous-domaine n'a pas pu être libéré.")); return }
       setInput("")
       setStatus("idle")
       setEditing(true)

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState, useCallback, type ReactNode } from "react"
+import { messageDeRoute } from "@/lib/messageDeRoute"
 import {
   QrCode, Download, Link, Check, Lock, Pencil, Plus,
   Eye, EyeOff, ChevronRight, ScanLine, Clock,
@@ -552,7 +553,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       })
       const d = await res.json()
       if (!res.ok || d.error || !d.qr) {
-        toast.error("Duplication impossible : " + (d.message || d.error || "erreur inconnue"))
+        toast.error(messageDeRoute(res.status, d, "Ce QR code n'a pas pu être dupliqué."))
         return
       }
       setQRCodes(prev => [d.qr, ...prev])
@@ -584,7 +585,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           : q
         ))
       } else {
-        toast.error(d.error || "Action impossible")
+        toast.error(messageDeRoute(res.status, d, "Cette action n'a pas pu aboutir."))
       }
     } catch {
       toast.error("Erreur réseau")
@@ -606,7 +607,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       // quand le serveur avait refusé, et revenait au rechargement.
       const d = await res.json().catch(() => ({}))
       if (!res.ok || d?.ok === false) {
-        toast.error(d?.error || "Suppression impossible. Réessayez.")
+        toast.error(messageDeRoute(res.status, d, "Ce QR code n'a pas pu être supprimé."))
       } else {
         const rest = qrCodes.filter(q => q.id !== qrId)
         setQRCodes(rest)
@@ -1021,7 +1022,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         body: JSON.stringify({ all: true, ...payload }),
       })
       const d = await res.json()
-      if (!res.ok || d.error) { toast.error("Application impossible : " + (d.error || "echec")); return }
+      if (!res.ok || d.error) { toast.error(messageDeRoute(res.status, d, "Ce réglage n'a pas pu être appliqué.")); return }
       setQRCodes(prev => prev.map(q => ({ ...q, ...payload })))
       setApplyAllOk(true); setTimeout(()=>setApplyAllOk(false), 2500)
     } catch {

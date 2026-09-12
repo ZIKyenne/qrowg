@@ -1,5 +1,6 @@
 "use client"
 import Link from "next/link"
+import { messageDeRoute } from "@/lib/messageDeRoute"
 import { useState, FormEvent } from "react"
 
 import { creerUrl } from "../creer/entry"
@@ -117,7 +118,7 @@ export default function ContactPage() {
         body: JSON.stringify(form),
       })
       const data = await res.json()
-      if (!res.ok) { setErrMsg(data.error || "Erreur."); setStatus("error"); return }
+      if (!res.ok) { setErrMsg(messageDeRoute(res.status, data, "Votre message n'a pas pu être envoyé.")); setStatus("error"); return }
       setStatus("success")
       setForm({ name:"", email:"", subject:"", message:"", website:"" })
     } catch {

@@ -5,6 +5,7 @@
 // (qrRender / QRCanvas) et les helpers purs (qrLinkUtils). Sortie STATIQUE (PNG/SVG) ;
 // CTA vers l'inscription pour le QR dynamique.
 import { useEffect, useMemo, useRef, useState } from "react"
+import { messageDeRoute } from "@/lib/messageDeRoute"
 import Link from "next/link"
 import { Download, Check, Link2, Type, Wifi, Phone, Mail, MessageSquare, Contact, AlertTriangle, ShieldCheck, Zap, Upload, X, Lock, QrCode as QrIcon } from "lucide-react"
 import QRCanvas from "../dashboard/qr-codes/QRCanvas"
@@ -148,7 +149,7 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
           const res = await fetch("/api/qr-instant", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
           if (res.status === 401) { window.location.href = "/auth/login"; return }
           const d = await res.json().catch(() => ({} as any))
-          if (!res.ok) { setErr({ msg: d?.error || "Création impossible pour le moment.", upgrade: !!d?.upgrade, dyn: isDyn }); return }
+          if (!res.ok) { setErr({ msg: messageDeRoute(res.status, d, "Création impossible pour le moment."), upgrade: !!d?.upgrade, dyn: isDyn }); return }
           enc = isDyn ? (d?.item?.payload || data) : data
           setSaved({ sig, encoded: enc })
           // Le QR vient d'être créé : on incrémente le compteur local pour que la

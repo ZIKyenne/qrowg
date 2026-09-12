@@ -8,6 +8,7 @@
 // facile à sortir, et celui qui rendait le plus difficile de lire la page.
 
 import { useMemo, useRef, useState } from "react"
+import { messageDeRoute } from "@/lib/messageDeRoute"
 import { Upload, X, Check } from "lucide-react"
 import { parseBulkCsv } from "@/lib/bulkCsv"
 import { useFermetureModale } from "@/lib/useFermetureModale"
@@ -49,7 +50,7 @@ export default function ImportEnMasse({ ouvert, onFermer, onCrees }: {
         const extra = [d.skipped ? `${d.skipped} ignoré(s)` : "", d.truncated ? `${d.truncated} au-delà de la limite (100)` : ""].filter(Boolean).join(" · ")
         setMessage({ ok: true, text: `${d.created} QR créé(s)${extra ? " · " + extra : ""}` })
         setTexte("")
-      } else setMessage({ ok: false, text: d.error || "Import impossible" })
+      } else setMessage({ ok: false, text: messageDeRoute(res.status, d, "L'import n'a pas abouti.") })
     } catch { setMessage({ ok: false, text: "Erreur réseau" }) }
     finally { setOccupe(false) }
   }

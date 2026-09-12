@@ -1,6 +1,7 @@
 "use client"
 
 import { PageHeader } from "@/components/ui/PageHeader"
+import { messageDeRoute } from "@/lib/messageDeRoute"
 import { sourceParDefaut, SOUS_DOMAINE_QROWG } from "./sourceParDefaut"
 import { useState, useEffect } from "react"
 import { useConfirm } from "@/components/ui/Confirm"
@@ -104,7 +105,7 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
         method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
       })
       const d = await res.json().catch(() => ({}))
-      if (!res.ok || d.error || !d.redirect) { setError(d.error || "La redirection n'a pas pu être enregistrée."); return }
+      if (!res.ok || d.error || !d.redirect) { setError(messageDeRoute(res.status, d, "La redirection n'a pas pu être enregistrée.")); return }
       if (editId) {
         setRedirects(prev => prev.map(r => r.id === editId ? d.redirect : r))
       } else {
@@ -127,7 +128,7 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
         body: JSON.stringify({ id: r.id, enabled: !r.enabled }),
       })
       const d = await res.json().catch(() => ({}))
-      if (!res.ok || !d.redirect) { setError(d.error || "La redirection n'a pas pu être modifiée."); return }
+      if (!res.ok || !d.redirect) { setError(messageDeRoute(res.status, d, "La redirection n'a pas pu être modifiée.")); return }
       setRedirects(prev => prev.map(x => x.id === r.id ? d.redirect : x))
     } catch {
       setError("Connexion impossible. Vérifiez votre réseau et réessayez.")
@@ -148,7 +149,7 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
         body: JSON.stringify({ id }),
       })
       const d = await res.json().catch(() => ({}))
-      if (!res.ok || d.error) { setError(d.error || "La redirection n'a pas pu être supprimée."); return }
+      if (!res.ok || d.error) { setError(messageDeRoute(res.status, d, "La redirection n'a pas pu être supprimée.")); return }
       setRedirects(prev => prev.filter(r => r.id !== id))
     } catch {
       setError("Connexion impossible. Vérifiez votre réseau et réessayez.")
