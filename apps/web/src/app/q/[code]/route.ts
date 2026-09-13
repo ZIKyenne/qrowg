@@ -6,6 +6,8 @@ import { estUnRobot } from "@/lib/robots"
 import { NextRequest, NextResponse, after } from "next/server"
 import { createHash } from "node:crypto"
 import { resolveOverrideDest, detectDevice, escapeHtml, type OverrideDest } from "./qrResolve"
+import { moyensDeJoindre, phraseDuMur, titreDuMur, type MoyenDeJoindre, type RaisonDuMur } from "./joindreLeCommerce"
+import { harnessAutorise } from "@/app/e2e-harness/gate"
 import { rateLimit, ipOf } from "@/lib/rateLimit"
 import { parseDevice } from "@/lib/scanStats"
 import { verifyLinkPassword } from "@/lib/linkPassword"
@@ -40,93 +42,85 @@ function parseUserAgent(ua: string): { os: string | null; browser: string | null
   return { os, browser }
 }
 
-function pausedHtml(message: string, appUrl: string): string {
+// ── Le mur au bout du QR imprimé ───────────────────────────────────────────
+//
+// Quatre écrans d'échec (introuvable, expiré, en pause, pas encore publiée)
+// n'offraient au client qu'un seul lien : « Créer votre propre QR Code → » vers
+// qrowg.com. Une personne devant la vitrine, le flyer à la main, recevait une
+// publicité pour l'outil de son commerçant (relevé du 13 septembre, voir
+// ./joindreLeCommerce.ts). Le mur rend maintenant ce que le flyer promettait :
+// le nom du commerce, et un moyen de le joindre quand le produit en connaît un.
+// Le lien QRowg reste, en bas, en petit — il n'est plus la seule sortie.
+
+const TEINTE_DU_MUR: Record<RaisonDuMur, string> = {
+  introuvable: "201,168,76",
+  expire: "255,107,107",
+  en_pause: "249,115,22",
+  brouillon: "201,168,76",
+  erreur: "255,107,107",
+}
+const EMOJI_DU_MUR: Record<RaisonDuMur, string> = {
+  introuvable: "🔍", expire: "⌛", en_pause: "⏸", brouillon: "🚧", erreur: "⚠️",
+}
+const ETIQUETTE_DU_MUR: Record<RaisonDuMur, string> = {
+  introuvable: "Code inconnu", expire: "Expiré", en_pause: "En pause",
+  brouillon: "Bientôt en ligne", erreur: "Indisponible",
+}
+
+/**
+ * L'écran d'échec, en une seule fonction pour les quatre cas — avant, trois
+ * gabarits presque identiques divergeaient à chaque retouche.
+ *
+ * Tailles de texte ≥ 11 px et cibles ≥ 48 px de haut : les règles de la maison
+ * valent AUSSI pour l'écran que voit le client (garde ./murDuQr.test.ts).
+ */
+function murHtml(o: {
+  raison: RaisonDuMur
+  nom?: string | null
+  moyens?: MoyenDeJoindre[]
+  message?: string | null
+  appUrl: string
+}): string {
+  const teinte = TEINTE_DU_MUR[o.raison]
+  const titre = titreDuMur(o.raison, o.nom)
+  const moyens = o.moyens ?? []
+  const phrase = (o.message && o.message.trim()) ? o.message.trim() : phraseDuMur(o.raison, o.nom, moyens.length > 0)
+  const boutons = moyens.map(m => `  <a class="joindre" href="${escapeHtml(m.href)}">${m.emoji} ${escapeHtml(m.libelle)}</a>`).join("\n")
   return `<!DOCTYPE html>
 <html lang="fr"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>QR Code temporairement indisponible</title>
+<title>${escapeHtml(titre)}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{min-height:100vh;background:#080808;color:#F5F0E8;font-family:'DM Sans',Arial,sans-serif;display:flex;align-items:center;justify-content:center;padding:20px}
-.card{background:#0F0E0B;border:1px solid rgba(249,115,22,0.3);border-radius:20px;padding:40px 32px;max-width:400px;width:100%;text-align:center}
+.card{background:#0F0E0B;border:1px solid rgba(${teinte},0.3);border-radius:20px;padding:40px 32px;max-width:400px;width:100%;text-align:center}
 .icon{font-size:48px;margin-bottom:16px}
-.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.25);border-radius:20px;padding:4px 14px;font-size:12px;color:#F97316;font-weight:600;margin-bottom:20px}
-.dot{width:6px;height:6px;border-radius:50%;background:#F97316;animation:pulse 1.5s infinite}
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(${teinte},0.1);border:1px solid rgba(${teinte},0.25);border-radius:20px;padding:4px 14px;font-size:12px;color:rgb(${teinte});font-weight:600;margin-bottom:20px}
 h1{font-size:22px;font-weight:700;margin-bottom:10px;color:#F5F0E8}
-p{font-size:14px;line-height:1.7;color:#8A8478;margin-bottom:28px}
-.link{color:#C9A84C;text-decoration:none;font-size:13px}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+p{font-size:15px;line-height:1.7;color:#BDB6A8;margin-bottom:24px}
+.joindre{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;margin-bottom:10px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.35);border-radius:12px;color:#E6C766;text-decoration:none;font-size:16px;font-weight:700}
+.pied{margin-top:22px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)}
+.link{display:inline-flex;align-items:center;min-height:32px;color:#9A927F;text-decoration:none;font-size:12px}
 </style>
 </head>
 <body>
 <div class="card">
-  <div class="icon">⏸</div>
-  <div class="badge"><div class="dot"></div>En pause</div>
-  <h1>QR Code temporairement indisponible</h1>
-  <p>${message ? escapeHtml(message) : "Ce QR Code est temporairement désactivé. Réessayez plus tard."}</p>
-  <a class="link" href="${appUrl}">Créer votre propre QR Code →</a>
+  <div class="icon">${EMOJI_DU_MUR[o.raison]}</div>
+  <div class="badge">${ETIQUETTE_DU_MUR[o.raison]}</div>
+  <h1>${escapeHtml(titre)}</h1>
+  <p>${escapeHtml(phrase)}</p>
+${boutons}
+  <div class="pied"><a class="link" href="${o.appUrl}">QR Code créé avec QRowg</a></div>
 </div>
 </body></html>`
 }
 
-function expiredHtml(appUrl: string): string {
-  return `<!DOCTYPE html>
-<html lang="fr"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>QR Code expiré</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{min-height:100vh;background:#080808;color:#F5F0E8;font-family:'DM Sans',Arial,sans-serif;display:flex;align-items:center;justify-content:center;padding:20px}
-.card{background:#0F0E0B;border:1px solid rgba(255,107,107,0.3);border-radius:20px;padding:40px 32px;max-width:400px;width:100%;text-align:center}
-.icon{font-size:48px;margin-bottom:16px}
-.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.25);border-radius:20px;padding:4px 14px;font-size:12px;color:#FF6B6B;font-weight:600;margin-bottom:20px}
-h1{font-size:22px;font-weight:700;margin-bottom:10px;color:#F5F0E8}
-p{font-size:14px;line-height:1.7;color:#8A8478;margin-bottom:28px}
-.link{color:#C9A84C;text-decoration:none;font-size:13px}
-</style>
-</head>
-<body>
-<div class="card">
-  <div class="icon">⌛</div>
-  <div class="badge">Expiré</div>
-  <h1>Ce QR Code a expiré</h1>
-  <p>La durée de validité de ce QR Code est dépassée. Contactez l'émetteur pour en obtenir un nouveau.</p>
-  <a class="link" href="${appUrl}">Créer votre propre QR Code →</a>
-</div>
-</body></html>`
-}
-
-// Notice visiteur (introuvable / brouillon / erreur) : on informe au lieu de rediriger
-// silencieusement vers la page marketing (sinon le scan est perdu, aucun message).
-function noticeHtml(icon: string, title: string, message: string, appUrl: string): string {
-  return `<!DOCTYPE html>
-<html lang="fr"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${title}</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{min-height:100vh;background:#080808;color:#F5F0E8;font-family:'DM Sans',Arial,sans-serif;display:flex;align-items:center;justify-content:center;padding:20px}
-.card{background:#0F0E0B;border:1px solid rgba(201,168,76,0.3);border-radius:20px;padding:40px 32px;max-width:400px;width:100%;text-align:center}
-.icon{font-size:48px;margin-bottom:16px}
-h1{font-size:22px;font-weight:700;margin-bottom:10px;color:#F5F0E8}
-p{font-size:14px;line-height:1.7;color:#8A8478;margin-bottom:28px}
-.link{color:#C9A84C;text-decoration:none;font-size:13px}
-</style>
-</head>
-<body>
-<div class="card">
-  <div class="icon">${icon}</div>
-  <h1>${title}</h1>
-  <p>${message}</p>
-  <a class="link" href="${appUrl}">Créer votre propre QR Code →</a>
-</div>
-</body></html>`
-}
-function noticeResponse(icon: string, title: string, message: string, appUrl: string, status: number): NextResponse {
-  return new NextResponse(noticeHtml(icon, title, message, appUrl), {
+function murResponse(o: Parameters<typeof murHtml>[0], status: number): NextResponse {
+  return new NextResponse(murHtml(o), {
     status, headers: { "Content-Type": "text/html;charset=utf-8", "Cache-Control": "no-store, must-revalidate" },
   })
 }
+
 
 // Page de saisie du mot de passe (sécurité du lien, Pro+). Formulaire POST vers la
 // même URL : le mot de passe ne passe plus dans l'adresse (historique du
@@ -270,13 +264,33 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
   const appUrl   = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrowg.com"
 
   try {
+    // ── L'écran d'échec, regardable ───────────────────────────────────────
+    // Ce mur est le seul écran du produit qu'aucun écran d'administration ne
+    // montre : pour le voir, il faut casser un QR. `?mur=<raison>` le rend avec
+    // un commerce d'exemple, uniquement quand le harnais est autorisé (jamais en
+    // production) — un écran qu'on ne peut pas regarder est un écran qui dérive.
+    const murDemande = req.nextUrl.searchParams.get("mur")
+    if (murDemande && harnessAutorise()) {
+      return murResponse({
+        raison: (["introuvable", "expire", "en_pause", "brouillon", "erreur"] as RaisonDuMur[])
+          .includes(murDemande as RaisonDuMur) ? (murDemande as RaisonDuMur) : "introuvable",
+        nom: "Le Comptoir",
+        moyens: moyensDeJoindre([
+          { type: "call_button", content: { phone: "01 23 45 67 89" } },
+          { type: "whatsapp_button", content: { phone: "+33612345678" } },
+          { type: "directions_button", content: { address: "12 rue des Lilas, Paris" } },
+        ]),
+        appUrl,
+      }, 200)
+    }
+
     // select("*") volontaire : robuste si des colonnes optionnelles (status,
     // dest_override, pause_message, expires_at — migrations 012/013) ne sont pas
     // appliquées en prod. Un select explicite d'une colonne absente ferait échouer
     // la requête -> data null -> redirection à tort vers l'accueil pour TOUS les QR.
     const { data: qr, error: qrErr } = await supabase
       .from("qr_codes")
-      .select("*, pages(slug, status)")
+      .select("*, pages(slug, status, title)")
       .eq("short_code", code)
       .maybeSingle()
 
@@ -295,10 +309,10 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
         const st = inst.status ?? "active"
         if (inst.expires_at && new Date(inst.expires_at) < new Date() && st === "active") {
           supabase.from("instant_qrs").update({ status: "expired" }).eq("id", inst.id).then(() => {}, () => {})
-          return htmlNoStore(expiredHtml(appUrl), 410)
+          return htmlNoStore(murHtml({ raison: "expire", appUrl }), 410)
         }
-        if (st === "paused") return htmlNoStore(pausedHtml("", appUrl), 503)
-        if (st === "expired") return htmlNoStore(expiredHtml(appUrl), 410)
+        if (st === "paused") return htmlNoStore(murHtml({ raison: "en_pause", appUrl }), 503)
+        if (st === "expired") return htmlNoStore(murHtml({ raison: "expire", appUrl }), 410)
 
         // Mot de passe (sécurité du lien, Pro+) : exiger le bon pw avant de résoudre/compter le scan.
         // `viaFormulaire` retient qu'on arrive de l'envoi du formulaire : la réponse ne
@@ -350,38 +364,43 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
         if (kind === "text" || kind === "wifi" || kind === "contact") return htmlNoStore(instantContentHtml(kind, content, appUrl), 200)
         if (/^https?:\/\//i.test(content)) return sortir(content) // repli
       }
-      return noticeResponse("🔍", "QR Code introuvable", "Ce QR Code n'existe pas ou n'est plus actif.", appUrl, 404)
+      return murResponse({ raison: "introuvable", appUrl }, 404)
     }
 
     const qrStatus = qr.status ?? "active"
+
+    // Quand le scan va échouer, on sait à quel commerce ce code appartient : son
+    // titre, et les moyens de le joindre que sa page porte déjà. Lu uniquement
+    // sur les branches d'échec — un scan qui réussit ne paie pas cette requête.
+    const commerceDuQr = async (): Promise<{ nom: string | null; moyens: MoyenDeJoindre[] }> => {
+      const nom = ((qr as any).pages?.title as string | null) ?? null
+      if (!qr.page_id) return { nom, moyens: [] }
+      try {
+        const { data: blocs } = await supabase
+          .from("blocks").select("type, content")
+          .eq("page_id", qr.page_id).eq("is_visible", true).limit(60)
+        return { nom, moyens: moyensDeJoindre(blocs as any) }
+      } catch { return { nom, moyens: [] } }
+    }
 
     // ── Vérifier expiration automatique ───────────────────────────────────
     if (qr.expires_at && new Date(qr.expires_at) < new Date() && qrStatus === "active") {
       // Auto-expirer
       supabase.from("qr_codes").update({ status: "expired" }).eq("id", qr.id).then(() => {}, () => {})
-      return new NextResponse(expiredHtml(appUrl), {
-        status: 410, headers: { "Content-Type": "text/html;charset=utf-8", "Cache-Control": "no-store, must-revalidate" }
-      })
+      return murResponse({ raison: "expire", ...(await commerceDuQr()), appUrl }, 410)
     }
 
     // ── Bloquer selon statut ───────────────────────────────────────────────
     switch (qrStatus) {
       case "paused":
-        return new NextResponse(pausedHtml(qr.pause_message ?? "", appUrl), {
-          status: 503, headers: { "Content-Type": "text/html;charset=utf-8", "Cache-Control": "no-store, must-revalidate" }
-        })
+        return murResponse({ raison: "en_pause", message: qr.pause_message ?? null, ...(await commerceDuQr()), appUrl }, 503)
       case "archived":
-        return new NextResponse(expiredHtml(appUrl), {
-          status: 410, headers: { "Content-Type": "text/html;charset=utf-8", "Cache-Control": "no-store, must-revalidate" }
-        })
       case "expired":
-        return new NextResponse(expiredHtml(appUrl), {
-          status: 410, headers: { "Content-Type": "text/html;charset=utf-8", "Cache-Control": "no-store, must-revalidate" }
-        })
+        return murResponse({ raison: "expire", ...(await commerceDuQr()), appUrl }, 410)
       case "draft":
         // Draft accessible uniquement si paramètre preview (pour le dashboard)
         if (!req.nextUrl.searchParams.has("preview")) {
-          return noticeResponse("🚧", "Page en préparation", "Cette page n'est pas encore publiée. Revenez bientôt !", appUrl, 404)
+          return murResponse({ raison: "brouillon", ...(await commerceDuQr()), appUrl }, 404)
         }
         break
     }
@@ -444,7 +463,7 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
     }
 
     if (qr.page_id) {
-            if ((qr as any).pages?.status && (qr as any).pages.status !== "published" && !req.nextUrl.searchParams.has("preview")) return noticeResponse("🚧", "Page en préparation", "Cette page n'est pas encore publiée. Revenez bientôt !", appUrl, 404)
+            if ((qr as any).pages?.status && (qr as any).pages.status !== "published" && !req.nextUrl.searchParams.has("preview")) return murResponse({ raison: "brouillon", ...(await commerceDuQr()), appUrl }, 404)
       // Slug déjà joint au lookup initial (pages(slug)) -> pas de 2ᵉ aller-retour DB
       // sur le chemin le plus fréquent. Repli sur une requête si l'embed manque.
       const joinedSlug = (qr as any).pages?.slug as string | undefined
@@ -453,9 +472,9 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
       if (pg?.slug) return redirectNoStore(`${appUrl}/${pg.slug}?s=${encodeURIComponent(code)}`)
     }
 
-    return noticeResponse("⚠️", "Une erreur est survenue", "Impossible d'ouvrir ce QR Code pour le moment. Réessayez plus tard.", appUrl, 500)
+    return murResponse({ raison: "erreur", appUrl }, 500)
   } catch (e) {
     console.error("[qr-redirect]", e)
-    return noticeResponse("⚠️", "Une erreur est survenue", "Impossible d'ouvrir ce QR Code pour le moment. Réessayez plus tard.", appUrl, 500)
+    return murResponse({ raison: "erreur", appUrl }, 500)
   }
 }

@@ -490,3 +490,77 @@ d'instanciation (TS2589) et la compilation échouait. Le filtre s'écrit à la m
 avec la constante ; la garde vérifie qu'aucune requête ne l'oublie.
 
 Suite complète : 4 827 tests, 293 fichiers. Build vert.
+
+---
+
+## v78 — le mur au bout du QR imprimé
+
+**Relevé.** En scannant, sur le serveur compilé, un code qui n'existe pas :
+
+```
+GET /q/code-qui-nexiste-pas → 404
+liens de la page : https://qrowg.com | Créer votre propre QR Code →
+```
+
+Un seul lien. Les trois écrans d'échec de `/q/<code>` — « QR Code introuvable »
+(404), « Ce QR Code a expiré » (410), « QR Code temporairement indisponible »
+(503), plus « Page en préparation » (404) — offraient exactement la même sortie
+unique : une publicité pour QRowg. Une personne debout devant la vitrine, le
+flyer à la main, recevait une réclame pour l'outil de son commerçant. C'est
+l'inverse de ce que le commerçant a acheté, et c'est le seul moment où le produit
+tient vraiment son client par la main.
+
+Or dans quatre cas sur cinq le produit SAIT à quel commerce ce code appartient :
+le QR porte `page_id`, la page porte un titre et des blocs « Appeler »,
+« WhatsApp », « Itinéraire », « Écrire » — que le lot v73 a d'ailleurs rendus
+obligatoires sur les 43 modèles.
+
+**Ce que le lot change.**
+
+- `q/[code]/joindreLeCommerce.ts` (nouveau, PUR) — `moyensDeJoindre(blocs)` lit
+  les blocs de la page et en tire au plus quatre boutons, classés par l'urgence
+  réelle de quelqu'un qui est devant le commerce : Appeler, WhatsApp, Itinéraire,
+  Écrire. Un bloc vide n'est pas un moyen ; un même libellé n'apparaît qu'une
+  fois. Les URL sont construites par `buildDestUrl`, celui-là même qui sert aux
+  destinations de QR — une seule façon d'écrire un `tel:` dans le produit.
+- `titreDuMur` / `phraseDuMur` — le mur porte le nom du commerce, et dit ce qui
+  s'est passé puis ce qu'on peut faire. La seconde moitié dépend de ce qu'on a
+  vraiment à offrir : « Le Comptoir reste joignable autrement » seulement si des
+  boutons suivent, sinon « Réessayez un peu plus tard » ou « Demandez le nouveau
+  à la personne qui vous l'a remis ». Le vieux « Ce QR Code n'existe pas ou n'est
+  plus actif » disait deux choses contradictoires et n'aidait à rien.
+- `q/[code]/route.ts` — trois gabarits HTML presque identiques (`pausedHtml`,
+  `expiredHtml`, `noticeHtml`) remplacés par un seul, `murHtml`, avec une teinte,
+  un emoji et une étiquette par raison. Le lien QRowg reste, en bas, sous un
+  filet : « QR Code créé avec QRowg ». Il n'est plus la seule sortie.
+- Les blocs de la page ne sont lus QUE sur les branches d'échec : un scan qui
+  réussit ne paie pas cette requête.
+- `?mur=<raison>` (harnais uniquement, jamais en production) rend l'écran avec un
+  commerce d'exemple. Ce mur était le seul écran du produit qu'aucun écran
+  d'administration ne montre : pour le voir, il fallait casser un QR.
+
+**Mesures.** Écran rendu à 390 px : titre 22 px, texte 15 px, étiquette 12 px,
+boutons de 52 px de haut, lien de pied 32 px, aucun défilement horizontal.
+Contrastes sur la carte `#0F0E0B` : texte 9,6:1, titre 17,0:1, pied 6,2:1,
+boutons 9,8:1, étiquettes 6,2 à 7,3:1 — tous au-dessus des 4,5:1 de la maison.
+
+**Garde.** `q/[code]/murDuQr.test.ts` (16) : les moyens lus, leur ordre, leur
+déduplication, le refus d'un bloc vide, le plafond de quatre ; la phrase qui ne
+promet rien sans boutons et qui ne colle pas un article à un nom propre ; côté
+route, qu'aucun ancien gabarit ne subsiste, que chaque `murResponse` posé après
+la résolution du QR passe par `commerceDuQr()`, que le lien QRowg existe encore
+sans être seul, et que les tailles, les cibles et les contrastes tiennent — cet
+écran étant du HTML écrit à la main, il échappe à l'arbre React balayé par
+`lisibiliteEtCibles`.
+
+**Vérification par mutation.** Cinq défauts réinjectés : un mur qui oublie le
+commerce, un texte gris sous 4,5:1, des boutons de 28 px, un bloc vide redevenu
+un moyen de joindre, un doublon d'« Appeler ». Chaque fois la garde tombe.
+
+**Deux gardes voisines réparées.** `motDePasse.test.ts` bornait sa lecture sur le
+littéral « QR Code introuvable », parti dans le nouveau module — borne réancrée
+sur `raison: "introuvable"`. Et `orthographeInterface.test.ts` a refusé la
+variante `non_publiee` (un mot français sans son accent) : elle s'appelle
+`brouillon`, qui est d'ailleurs le nom du statut côté base.
+
+Suite complète : 4 843 tests, 294 fichiers. Build vert.

@@ -20,7 +20,9 @@ describe("le déverrouillage par mot de passe aboutit vraiment", () => {
 
   it("le chemin du formulaire ne renvoie plus une redirection", () => {
     // `sortir()` remplace `redirectNoStore` sur toutes les issues du lien instantané.
-    const bloc = ROUTE.slice(ROUTE.indexOf("const sortir ="), ROUTE.indexOf("QR Code introuvable"))
+    // Fin du bloc : le mur « code inconnu », juste après les issues du lien
+    // instantané (le titre littéral a migré vers ./joindreLeCommerce.ts au v78).
+    const bloc = ROUTE.slice(ROUTE.indexOf("const sortir ="), ROUTE.indexOf('raison: "introuvable"'))
     expect(bloc).toContain("viaFormulaire ? htmlNoStore(relaisHtml(")
     expect(bloc, "une issue renvoie encore une redirection directe").not.toContain("return redirectNoStore(")
   })
