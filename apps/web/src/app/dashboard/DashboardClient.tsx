@@ -12,12 +12,13 @@ import { accessibleOwnerIds } from "@/lib/team"
 import RecentLeadsCard from "./RecentLeadsCard"
 import { useToast } from "@/components/Toast"
 import { Button } from "@/components/ui/Button"
+import { APPAREIL_ROBOT } from "@/lib/robots"
+import { consequencesDeSuppression, phraseCodesImprimes, exigeConfirmationEcrite, confirmationAttendue, confirmationValide, type CeQuiDisparait } from "@/lib/suppressionDePage"
 import { Modal } from "@/components/ui/Modal"
 import PostCheckoutBanner from "@/components/PostCheckoutBanner"
 import { erreurLisible } from "@/lib/erreurLisible"
 import { prochaineEtape } from "./prochaineEtape"
 import { raisonDeProposer, accrocheOffre, avantagesEnPlus } from "./offreUtile"
-import { APPAREIL_ROBOT } from "@/lib/robots"
 
 type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string }
 type Profile = { full_name: string | null; plan: string; total_scans: number; total_pages: number; avatar_url: string | null }
@@ -25,14 +26,50 @@ type Profile = { full_name: string | null; plan: string; total_scans: number; to
 // Couleur par plan ; le NOM vient de lib/plans.ts (une seule source, cf. revue du 9 septembre).
 const PLAN_COULEUR: Record<string, string> = { free: "var(--muted)", pro: "var(--accent)", business: "var(--success)" }
 
-function DeleteModal({ page, onConfirm, onCancel, deleting }: { page: Page; onConfirm: () => void; onCancel: () => void; deleting: boolean }) {
+/**
+ * Ce qu'on montre avant de supprimer une page.
+ *
+ * La phrase d'avant disait « le QR code », au singulier, sans un chiffre : une
+ * page porte autant de QR qu'elle a de supports, ils sont collés sur des tables
+ * et distribués en flyers, et la clé étrangère les détruit en cascade — le
+ * `short_code` étant unique, aucun nouveau QR ne peut le reprendre (lot v84,
+ * voir lib/suppressionDePage.ts). On nomme, on chiffre, et quand la perte est
+ * irrattrapable on demande d'écrire le nom de la page.
+ */
+function DeleteModal({ page, perte, chargement, onConfirm, onCancel, deleting }: { page: Page; perte: CeQuiDisparait | null; chargement: boolean; onConfirm: () => void; onCancel: () => void; deleting: boolean }) {
+  const [saisie, setSaisie] = useState("")
+  const lignes = perte ? consequencesDeSuppression(perte) : []
+  const imprimes = perte ? phraseCodesImprimes(perte.supports.length) : null
+  const exige = !!perte && exigeConfirmationEcrite(perte)
+  const pret = !chargement && (!exige || confirmationValide(saisie, page.title))
   return (
     <Modal open onClose={onCancel} title="Supprimer cette page ?"
       footer={<>
         <Button variant="ghost" onClick={onCancel} disabled={deleting}>Annuler</Button>
-        <Button variant="danger" onClick={onConfirm} loading={deleting} leftIcon={<Trash2 size={15} />}>Supprimer définitivement</Button>
+        <Button variant="danger" onClick={onConfirm} loading={deleting} disabled={!pret} leftIcon={<Trash2 size={15} />}>Supprimer définitivement</Button>
       </>}>
-      Vous êtes sur le point de supprimer <strong style={{ color: "var(--ink)" }}>« {page.title} »</strong>. Cette action supprimera aussi les blocs, le QR code et toutes les données analytics associées. Elle est irréversible.
+      Vous êtes sur le point de supprimer <strong style={{ color: "var(--ink)" }}>« {page.title} »</strong>.
+      {chargement && <p style={{ color: "var(--muted)", fontSize: 13, margin: "10px 0 0" }}>Vérification de ce qui disparaîtrait…</p>}
+      {!chargement && lignes.length > 0 && (
+        <ul style={{ margin: "12px 0 0", paddingLeft: 18, color: "var(--ink)", fontSize: 13.5, lineHeight: 1.7 }}>
+          {lignes.map((l, i) => <li key={i}>{l}</li>)}
+        </ul>
+      )}
+      {!chargement && imprimes && (
+        <p style={{ color: "#FBBF24", fontSize: 13, margin: "12px 0 0", lineHeight: 1.6 }}>{imprimes}</p>
+      )}
+      {!chargement && lignes.length === 0 && (
+        <p style={{ color: "var(--muted)", fontSize: 13, margin: "10px 0 0" }}>Cette page n&apos;a ni QR imprimable, ni historique : sa suppression n&apos;emporte que son contenu.</p>
+      )}
+      {exige && (
+        <div style={{ marginTop: 14 }}>
+          <label htmlFor="conf-suppr" style={{ display: "block", color: "var(--muted)", fontSize: 12.5, margin: "0 0 6px" }}>
+            Pour confirmer, écrivez le nom de la page : <strong style={{ color: "var(--ink)" }}>{confirmationAttendue(page.title)}</strong>
+          </label>
+          <input id="conf-suppr" value={saisie} onChange={e => setSaisie(e.target.value)} autoComplete="off"
+            style={{ width: "100%", height: 42, background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 10, color: "var(--ink)", fontSize: 14, padding: "0 12px", boxSizing: "border-box" }} />
+        </div>
+      )}
     </Modal>
   )
 }
@@ -56,6 +93,8 @@ export default function DashboardClient({
   const [pages, setPages] = useState<Page[]>(initialPages)
   const [loading, setLoading] = useState(!initialProfile) // pas de spinner si déjà seedé par le serveur
   const [pageToDelete, setPageToDelete] = useState<Page | null>(null)
+  const [perte, setPerte] = useState<CeQuiDisparait | null>(null)
+  const [perteEnCours, setPerteEnCours] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [hour] = useState(new Date().getHours())
   const [monthViews, setMonthViews] = useState(initialMonthViews) // vues du mois en cours (quota)
@@ -107,6 +146,29 @@ export default function DashboardClient({
   // Si le serveur a déjà seedé les données (props), on évite le fetch initial
   // (et le 2e getUser()). load() reste utilisé pour rafraîchir après une mutation.
   useEffect(() => { if (!initialProfile) load() }, [])
+
+  // Ce que la cascade emporterait : les supports (nommés), l'historique de
+  // scans, les vues, les messages. Lu à l'ouverture du modal, pas avant.
+  useEffect(() => {
+    if (!pageToDelete) { setPerte(null); return }
+    let vivant = true
+    setPerteEnCours(true)
+    const supabase = createClient()
+    Promise.all([
+      supabase.from("qr_codes").select("label, short_code").eq("page_id", pageToDelete.id),
+      // Les mêmes chiffres que ceux de l'écran Statistiques : les aperçus de
+      // lien y sont écartés (lot v77). Annoncer ici un total « robots compris »
+      // donnerait deux nombres différents pour la même chose.
+      supabase.from("scans").select("id", { count: "exact", head: true }).eq("page_id", pageToDelete.id).neq("device", APPAREIL_ROBOT),
+      supabase.from("page_views").select("id", { count: "exact", head: true }).eq("page_id", pageToDelete.id).neq("device", APPAREIL_ROBOT),
+      supabase.from("leads").select("id", { count: "exact", head: true }).eq("page_id", pageToDelete.id),
+    ]).then(([qr, sc, vu, ms]) => {
+      if (!vivant) return
+      setPerte({ supports: (qr.data as any) || [], scans: sc.count ?? 0, vues: vu.count ?? 0, messages: ms.count ?? 0 })
+      setPerteEnCours(false)
+    }, () => { if (vivant) { setPerte({ supports: [] }); setPerteEnCours(false) } })
+    return () => { vivant = false }
+  }, [pageToDelete])
 
   async function deletePage(page: Page) {
     setDeleting(true)
@@ -225,6 +287,8 @@ export default function DashboardClient({
       {pageToDelete && (
         <DeleteModal
           page={pageToDelete}
+          perte={perte}
+          chargement={perteEnCours}
           onConfirm={() => deletePage(pageToDelete)}
           onCancel={() => setPageToDelete(null)}
           deleting={deleting}

@@ -927,3 +927,72 @@ faux positif de la même famille qu'à l'époque, le champ portait un nom de cor
 de réponse alors qu'il contient déjà une phrase traduite. Il s'appelle `phrase`.
 
 Suite complète : 4 921 tests, 299 fichiers. Build vert.
+
+---
+
+## v84 — la suppression qui emporte les QR déjà collés
+
+**Relevé.** Ce que le produit faisait confirmer avant de supprimer une page :
+
+> Vous êtes sur le point de supprimer « X ». Cette action supprimera aussi les
+> blocs, **le QR code** et toutes les données analytics associées. Elle est
+> irréversible.
+
+Et ce que la base fait, depuis le schéma initial, sur `qr_codes` :
+
+```sql
+page_id  uuid not null references public.pages(id) on delete cascade,
+short_code text unique not null,
+```
+
+Trois choses manquaient dans cette phrase :
+
+1. **« le QR code », au singulier.** Une page porte autant de QR qu'elle a de
+   supports — et le lot v83 vient d'ouvrir ce chemin officiellement : vitrine,
+   tables, flyers, chacun son code vers la même page.
+2. **Ces codes sont dehors.** Les supprimer ne les met pas en pause (lot v82) :
+   il les détruit. `short_code` est unique ; un nouveau QR en porterait un autre.
+   Il faut donc tout réimprimer — la phrase ne le disait pas.
+3. **Aucun chiffre.** Ni le nombre de supports, ni l'historique de scans qui part
+   avec.
+
+Un clic sur « Supprimer définitivement » suffisait à éteindre les autocollants de
+toutes les tables d'un restaurant.
+
+**Ce que le lot change.**
+
+- `lib/suppressionDePage.ts` (nouveau, PUR) — `consequencesDeSuppression` nomme
+  et chiffre : « 2 QR imprimables : Vitrine, Table 4 », « 1 420 scans
+  enregistrés », « 38 messages reçus ». Elle ne liste que ce qui existe : annoncer
+  « 0 message » n'apprend rien et noie ce qui compte. Un support sans nom est
+  désigné par son code.
+- `phraseCodesImprimes` dit ce qui manquait : « Ces codes sont peut-être déjà
+  collés ou distribués : ils cesseront de fonctionner définitivement. De nouveaux
+  QR porteraient d'autres codes — il faudrait réimprimer les supports. »
+- **Écrire le nom de la page** est exigé dès qu'un support imprimé ou un
+  historique de scans existe — comme le produit le fait déjà pour la suppression
+  d'un compte. Pas pour un brouillon vide : on n'impose pas une friction à qui
+  supprime du rien.
+- Le modal lit ces chiffres AVANT de les faire disparaître, et le bouton reste
+  bloqué tant que le nom n'est pas écrit.
+
+**Garde.** `lib/suppressionDePage.test.ts` (16) : les supports nommés au lieu de
+« le QR code », le singulier, le débordement au-delà de quatre, le repli sur le
+code, le silence sur ce qui n'existe pas, la phrase du définitif, la confirmation
+écrite exigée au bon moment seulement, la saisie qui pardonne casse et espaces —
+et, côté source, que l'écran lit bien ce qui disparaîtrait et que le bouton en
+dépend. Le dernier test relit le **schéma SQL** : si `qr_codes` cessait d'être
+supprimé en cascade, ou si `short_code` cessait d'être unique, la phrase de
+réimpression deviendrait fausse et la garde le dirait.
+
+**Vérification par mutation.** Quatre défauts réinjectés : le retour à « le QR
+code », la phrase du définitif supprimée, la confirmation écrite désactivée, le
+bouton libéré. Chaque fois la garde tombe.
+
+**Une garde voisine rencontrée.** `scansHonnetes` (lot v77) a refusé les deux
+nouveaux comptages : ils ne filtraient pas les aperçus de lien. Ils les filtrent
+désormais — non pour minimiser la destruction, mais pour annoncer **les mêmes
+chiffres que l'écran Statistiques**. Deux nombres différents pour la même chose
+auraient été un défaut de plus.
+
+Suite complète : 4 937 tests, 300 fichiers. Build vert.
