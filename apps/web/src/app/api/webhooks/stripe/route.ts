@@ -9,22 +9,57 @@ import { EMAIL_FROM } from "@/lib/emailFrom"
 import { serverError } from "@/lib/apiError"
 import { dynLimit } from "@/lib/plans"
 import { planDynamicReconcile } from "@/lib/dynamicReconcile"
+import { PAUSE_QUOTA, phraseApresLaBascule } from "@/lib/pauseDeQuota"
+import { emailShell, emailH1, emailButton } from "@/lib/emailLayout"
 
 // Réconcilie les QR modifiables d'un utilisateur avec le sous-quota de son plan :
 // promeut les anciens essais en permanents, met en pause les excédents après un
 // changement de plan vers le bas, réactive ceux que le quota re-couvre. Best-effort.
 // Appelée sur CHAQUE changement de plan : le quota des QR modifiables vient
 // désormais du plan principal, il doit bouger avec lui.
-async function reconcileDynamicLinks(userId: string, plan: string) {
+async function reconcileDynamicLinks(userId: string, plan: string): Promise<number> {
   const { data: links } = await supabase
     .from("instant_qrs")
-    .select("id, status, expires_at")
+    .select("id, status, expires_at, paused_reason, label")
     .eq("user_id", userId).eq("dynamic", true)
     .order("created_at", { ascending: true })
-  if (!links?.length) return
+  if (!links?.length) return 0
   const ops = planDynamicReconcile(links as any, dynLimit(plan), Date.now())
   for (const op of ops) {
     await supabase.from("instant_qrs").update(op.patch).eq("id", op.id)
+  }
+  // Combien de QR IMPRIMÉS viennent de s'éteindre. Le produit le savait déjà —
+  // il l'écrivait en base sous `paused_reason: "quota"` — et ne le disait à
+  // personne (lot v82, lib/pauseDeQuota.ts).
+  return ops.filter(o => (o.patch as any)?.paused_reason === PAUSE_QUOTA).length
+}
+
+/**
+ * Prévenir le commerçant que des supports déjà imprimés ne mènent plus nulle
+ * part. Best-effort, comme les autres e-mails du webhook : ne bloque jamais.
+ */
+async function prevenirQrCoupes(userId: string, nb: number, plan: string) {
+  const phrase = phraseApresLaBascule(nb, dynLimit(plan))
+  if (!phrase) return
+  try {
+    if (!process.env.RESEND_API_KEY) return
+    const { data: prof } = await supabase.from("profiles").select("email").eq("id", userId).single()
+    if (!prof?.email) return
+    const resend = new Resend(process.env.RESEND_API_KEY)
+    await resend.emails.send({
+      from: EMAIL_FROM,
+      to: prof.email,
+      subject: nb > 1 ? `${nb} de vos QR imprimés ne fonctionnent plus` : "Un de vos QR imprimés ne fonctionne plus",
+      html: emailShell({
+        preheader: phrase,
+        content: `${emailH1("Des QR imprimés se sont arrêtés")}
+          <p style="margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#F5F0E8;line-height:1.6;">${phrase}</p>
+          <p style="margin:0 0 24px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#8A8478;line-height:1.6;">Les codes déjà collés ou distribués restent valables : reprendre un plan qui les couvre les rallume, sans rien réimprimer.</p>
+          ${emailButton("Voir mes QR →", "https://qrowg.com/dashboard/qr-link")}`,
+      }),
+    })
+  } catch (e) {
+    console.warn("[stripe webhook] email QR coupes non envoye:", (e as any)?.message)
   }
 }
 
@@ -129,7 +164,10 @@ export async function POST(req: NextRequest) {
           ...(outcome.periodEnd ? { current_period_end: new Date(outcome.periodEnd * 1000).toISOString() } : {}),
           cancel_at_period_end: outcome.cancelAtEnd,
         }, { onConflict: "user_id" }))
-        if (outcome.plan) await reconcileDynamicLinks(outcome.userId, outcome.plan)
+        if (outcome.plan) {
+          const coupes = await reconcileDynamicLinks(outcome.userId, outcome.plan)
+          await prevenirQrCoupes(outcome.userId, coupes, outcome.plan)
+        }
         break
 
       case "subscription_deleted":
@@ -139,8 +177,9 @@ export async function POST(req: NextRequest) {
           status: "canceled",
           canceled_at: new Date().toISOString(),
         }).eq("stripe_subscription_id", outcome.subId))
-        // Retour au gratuit : les QR modifiables au-delà du quota passent en pause.
-        await reconcileDynamicLinks(outcome.userId, "free")
+        // Retour au gratuit : les QR modifiables au-delà du quota passent en
+        // pause — et le commerçant l'apprend, parce que ces QR sont imprimés.
+        await prevenirQrCoupes(outcome.userId, await reconcileDynamicLinks(outcome.userId, "free"), "free")
         break
 
       case "payment_failed":

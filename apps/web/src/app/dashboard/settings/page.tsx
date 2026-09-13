@@ -1,10 +1,11 @@
 "use client"
 
-import { getPlan } from "@/lib/plans"
+import { getPlan, dynLimit } from "@/lib/plans"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { SettingsSection, champStyle } from "@/components/ui/SettingsSection"
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { qrQuiSArretent, phraseAvantDeRetomber } from "@/lib/pauseDeQuota"
 import { Save, Check, AlertTriangle, Eye, EyeOff, Bell, Shield, Trash2, LogOut, Key, Globe, Palette, Moon, CreditCard, ArrowRight, Loader2, Download, DatabaseBackup } from "lucide-react"
 import { Button } from "@/components/ui/Button"
 import { Switch } from "@/components/ui/Switch"
@@ -42,6 +43,11 @@ function Toggle({ value, onChange, label, description }: { value: boolean; onCha
 
 export default function SettingsPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
+  // Ce qu'un retour au plan gratuit couperait : des QR MODIFIABLES déjà
+  // imprimés, collés sur des tables et distribués en flyers. Le webhook Stripe
+  // les met en pause sans un mot (lot v82, lib/pauseDeQuota.ts) — cette page est
+  // le dernier écran avant « Gérer mon abonnement ».
+  const [qrCoupes, setQrCoupes] = useState(0)
   const [loading, setLoading] = useState(true)
 
   // Mot de passe
@@ -80,6 +86,13 @@ export default function SettingsPage() {
       const { data } = await supabase.from("profiles").select("id,email,full_name,plan,preferences").eq("id", user.id).single()
       if (data) {
         setProfile(data)
+        if ((data as any).plan && (data as any).plan !== "free") {
+          const { data: liens } = await supabase
+            .from("instant_qrs").select("id, status, expires_at, paused_reason, label")
+            .eq("user_id", user.id).eq("dynamic", true)
+            .order("created_at", { ascending: true })
+          setQrCoupes(qrQuiSArretent((liens as any) || [], dynLimit("free")).length)
+        }
         const p = (data as any).preferences || {}
         // opt-out (défaut activé) pour email_leads/scan_alert/weekly_report ;
         // opt-in (défaut désactivé) pour product_updates/marketing.
@@ -248,6 +261,12 @@ export default function SettingsPage() {
             <div>
               <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>Plan {getPlan(profile?.plan).label}</p>
               <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>Factures et reçus envoyés par e-mail à chaque paiement.</p>
+              {/* Dit AVANT, pas découvert après : ce qu'un retour au gratuit coupe. */}
+              {phraseAvantDeRetomber(qrCoupes) && (
+                <p style={{ color: "#FBBF24", fontSize: 12, margin: "8px 0 0", lineHeight: 1.5, maxWidth: 460 }}>
+                  ⚠ En cas de retour au plan gratuit : {phraseAvantDeRetomber(qrCoupes)}
+                </p>
+              )}
             </div>
             <a href="/upgrade" className="da-btn-primary da-btn-primary--sm" style={{ flexShrink: 0 }}>
               <span>{profile?.plan === "free" ? "Découvrir les offres" : "Gérer mon abonnement"}</span> <ArrowRight className="da-ic da-ic-arrow" size={14} />

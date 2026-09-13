@@ -777,3 +777,78 @@ brouillon, la mention du destinataire retirée. Chaque fois la garde tombe.
 conservé, avec sa nouvelle valeur et la raison écrite au-dessus.
 
 Suite complète : 4 895 tests, 297 fichiers. Build vert.
+
+---
+
+## v82 — le QR imprimé qui s'arrête quand on arrête de payer
+
+**Relevé.** En suivant un retour au plan gratuit dans le code. Webhook Stripe,
+`customer.subscription.deleted` :
+
+```
+await reconcileDynamicLinks(outcome.userId, "free")
+// « Retour au gratuit : les QR modifiables au-delà du quota passent en pause. »
+```
+
+et, au-delà du quota, `planDynamicReconcile` écrit :
+
+```
+{ status: "paused", paused_reason: "quota" }
+```
+
+Le plan gratuit couvre UN QR modifiable (`limits.dyn: 1`). Un commerçant qui en
+avait six — vitrine, tables, flyers — en voit donc cinq s'éteindre. Ces cinq-là
+sont **imprimés** : collés sur du mobilier, distribués dans le quartier. Le
+lendemain, cinq clients sur six tombent sur « QR Code temporairement
+indisponible ».
+
+Ce que sa liste de QR affichait alors :
+
+```
+etatLien → { badge: "En pause", phrase: "En pause — ne redirige plus" }
+```
+
+Exactement la phrase d'une pause qu'il aurait décidée lui-même. `paused_reason`
+existait dans le type, valait « quota », et **n'était lu nulle part**. Il ne
+pouvait ni savoir que son changement de plan avait coupé ses supports, ni
+comment les rallumer.
+
+Et pendant ce temps la grille tarifaire promettait, sur le plan gratuit :
+« Vues illimitées — **un QR imprimé ne s'arrête jamais** ».
+
+**Ce que le lot change.**
+
+- `lib/pauseDeQuota.ts` (nouveau, PUR) — `etatDePause(raison)` sépare enfin les
+  deux pauses : celle qu'on a voulue reste sobre, celle que le plan impose dit
+  « Votre plan ne couvre plus ce QR : imprimé ou non, il ne mène plus nulle
+  part » et ajoute quoi faire — « le code imprimé reste valable ».
+  `qrQuiSArretent(liens, limite)` prévoit exactement ce que la bascule
+  couperait, avec les mêmes règles que le code qui l'exécute (essais expirés
+  ignorés, pause manuelle ignorée, seuls les permanents actifs au-delà du quota).
+- **Dit avant** : l'écran Facturation, dernier avant « Gérer mon abonnement »,
+  affiche « ⚠ En cas de retour au plan gratuit : 5 de vos QR modifiables
+  cesseraient de fonctionner, y compris ceux déjà imprimés… ». Rien quand rien
+  ne risque de s'arrêter.
+- **Dit après** : le webhook compte les QR réellement coupés et envoie un e-mail
+  — sur les deux chemins de descente (changement de plan ET annulation) — qui
+  nomme la limite du nouveau plan et rappelle que les codes déjà collés restent
+  valables.
+- **Et la grille cesse de promettre le contraire** : la ligne du plan gratuit
+  devient « Vues illimitées, sans compteur qui s'arrête ». La promesse porte sur
+  ce qu'elle peut tenir.
+
+**Garde.** `lib/pauseDeQuota.test.ts` (13). La plus importante : *« et dit la
+même chose que le code qui exécute la bascule »* — la prévision est confrontée à
+`planDynamicReconcile` sur le même jeu de liens (essai valide, essai expiré,
+pause manuelle, permanents), parce qu'une prévision qui diverge de l'acte est
+pire que pas de prévision. Plus : les deux pauses distinguées, un motif inconnu
+qui retombe sur la phrase sobre plutôt que sur une alarme, le singulier et le
+pluriel, la limite réelle nommée, les deux écrans qui préviennent, et qu'aucun
+plan ni la page d'accueil ne promet plus qu'un QR imprimé ne s'arrête jamais.
+
+**Vérification par mutation.** Quatre défauts réinjectés : la liste qui reconfond
+les deux pauses, la prévision qui diverge de la bascule, la promesse intenable
+remise dans la grille, l'annulation qui ne prévient plus. Chaque fois la garde
+tombe.
+
+Suite complète : 4 908 tests, 298 fichiers. Build vert.

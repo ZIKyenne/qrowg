@@ -787,9 +787,13 @@ export default function QrLinkPage() {
             </div>
 
             {/* État du QR (au premier plan) */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "11px 13px", borderRadius: 12, background: `${ex.couleur}14`, border: `1px solid ${ex.couleur}44`, marginBottom: 12 }}>
-              <span style={{ width: 8, height: 8, borderRadius: "50%", background: ex.couleur, flexShrink: 0 }} />
-              <span style={{ color: ex.couleur, fontSize: 12.5, fontWeight: 700 }}>{ex.phrase}</span>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "11px 13px", borderRadius: 12, background: `${ex.couleur}14`, border: `1px solid ${ex.couleur}44`, marginBottom: 12 }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: ex.couleur, flexShrink: 0, marginTop: 4 }} />
+              <div>
+                <span style={{ color: ex.couleur, fontSize: 12.5, fontWeight: 700 }}>{ex.phrase}</span>
+                {/* Un QR coupé par le plan est imprimé quelque part : on dit quoi faire. */}
+                {ex.action && <p style={{ color: MUTED, fontSize: 12, margin: "5px 0 0", lineHeight: 1.5 }}>{ex.action}</p>}
+              </div>
             </div>
 
             {detail.dynamic ? (

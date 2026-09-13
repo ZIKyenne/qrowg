@@ -25,7 +25,7 @@ export const LANDING_BENEFITS: Record<string, { text: string; ok: boolean; preuv
   free: [
     { text: "Votre page en ligne en 5 minutes", ok: true, preuve: "limits.pages" },
     { text: "3 QR codes, dont 1 modifiable après impression", ok: true, preuve: "limits.qr" },
-    { text: "Vues illimitées — votre QR ne s'arrête jamais", ok: true, preuve: "limits.views" },
+    { text: "Vues illimitées, sans compteur qui s'arrête", ok: true, preuve: "limits.views" },
     { text: "Suivez vos premières visites", ok: true, preuve: "produit:app/dashboard/analytics/AnalyticsClient.tsx" },
     { text: "Sans la mention QRowg", ok: false },
     { text: "Votre nom de domaine", ok: false },

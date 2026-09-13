@@ -113,7 +113,11 @@ export const PLANS: Record<PlanId, Plan> = {
     features: ["1 page", "Vues illimitées", "3 QR autonomes, dont 1 modifiable", "Branding QRowg visible", "Statistiques de base"],
     perks: [
       { text: "1 page publiée", included: true, preuve: "limits.pages", groupe: "Pages" },
-      { text: "Vues illimitées — un QR imprimé ne s'arrête jamais", included: true, preuve: "limits.views", groupe: "Pages" },
+      // « un QR imprimé ne s'arrête jamais » : faux sur ce plan. Un retour au
+      // gratuit met en pause les QR modifiables au-delà de `limits.dyn` — cinq
+      // supports imprimés sur six, pour qui en avait six (lot v82). La promesse
+      // porte sur ce qu'elle peut tenir : le nombre de vues.
+      { text: "Vues illimitées, sans compteur qui s'arrête", included: true, preuve: "limits.views", groupe: "Pages" },
       { text: "3 QR autonomes", included: true, preuve: "limits.qr", groupe: "QR codes" },
       { text: "1 QR modifiable après impression", included: true, preuve: "limits.dyn", groupe: "QR codes" },
       { text: "Hébergement inclus", included: true, preuve: "produit:app/[slug]/page.tsx", groupe: "Pages" },

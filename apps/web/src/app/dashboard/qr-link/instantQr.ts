@@ -8,6 +8,7 @@
 
 import type { ScanStats } from "@/lib/scanStats"
 import { eccOuDefaut, presetQr, ENCRE_QR_DEFAUT, FOND_QR_DEFAUT, type NiveauEcc } from "@/lib/stylesQr"
+import { etatDePause } from "@/lib/pauseDeQuota"
 
 export type StatutQr = "active" | "paused" | "expired"
 
@@ -49,6 +50,8 @@ export type EtatLien = {
   badge: string
   /** Phrase complète, pour la fiche. Toujours cohérente avec le badge. */
   phrase: string
+  /** Ce que le commerçant peut faire, quand il y a quelque chose à faire. */
+  action?: string
   couleur: string
   expire: boolean
 }
@@ -66,12 +69,19 @@ const VERT = "var(--success)"
  * ligne pouvait dire « Essai · expire dans 3 j » et « Permanent (aucune
  * expiration) ». Une seule branche décide maintenant des deux libellés.
  */
-export function etatLien(qr: Pick<InstantQr, "dynamic" | "status" | "expires_at"> | null | undefined, maintenant: number = Date.now()): EtatLien {
+export function etatLien(qr: (Pick<InstantQr, "dynamic" | "status" | "expires_at"> & Partial<Pick<InstantQr, "paused_reason">>) | null | undefined, maintenant: number = Date.now()): EtatLien {
   if (!qr?.dynamic) {
     return { badge: "Statique", phrase: "Contenu encodé — n'expire pas", couleur: "var(--success)", expire: false }
   }
   if (qr.status === "expired") return { badge: "Expiré", phrase: "Expiré", couleur: ROUGE, expire: true }
-  if (qr.status === "paused") return { badge: "En pause", phrase: "En pause — ne redirige plus", couleur: AMBRE, expire: false }
+  if (qr.status === "paused") {
+    // `paused_reason` était écrit en base et lu nulle part : un QR coupé par un
+    // retour au plan gratuit affichait la même phrase qu'une pause voulue. Le
+    // commerçant ne pouvait pas savoir que ses supports IMPRIMÉS étaient morts
+    // (lot v82, voir lib/pauseDeQuota.ts).
+    const p = etatDePause(qr.paused_reason)
+    return { badge: p.badge, phrase: p.phrase, action: p.action ?? undefined, couleur: p.action ? ROUGE : AMBRE, expire: false }
+  }
 
   if (!qr.expires_at) {
     return { badge: "Actif", phrase: "Actif, sans date de fin", couleur: VERT, expire: false }
