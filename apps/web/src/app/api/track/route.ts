@@ -8,6 +8,7 @@ const LIGNES_EVENEMENTS_MAX = 80
 import { estUnScan } from "@/lib/premierScan"
 import { previenirPremierScan } from "@/lib/premierScanEnvoi"
 import { codeDansUrl, estUnCode, sourceRetenue, appareilRetenu } from "@/lib/sourceVue"
+import { estUnRobot } from "@/lib/robots"
 
 // Endpoint de tracking (vues / clics / événements d'engagement). Remplace les
 // inserts anonymes directs (RLS "insert with check(true)") qui permettaient
@@ -65,6 +66,12 @@ export async function POST(req: NextRequest) {
     if (!(await rateLimit("track:" + ipOf(req), 60, 60_000))) return NextResponse.json({ ok: false }, { status: 429 })
     const body = await req.json().catch(() => null)
     if (!body || typeof body !== "object") return NextResponse.json({ ok: false }, { status: 400 })
+
+    // Un programme qui ouvre la page (navigateur sans tête, robot d'audit, sonde
+    // de disponibilité) exécute le script et appelle cet endpoint comme un
+    // visiteur. Il n'en est pas un : rien ne s'écrit. La requête répond « ok »
+    // pour ne rien apprendre à qui sonde — cf. lib/robots.ts.
+    if (estUnRobot(req.headers.get("user-agent"))) return NextResponse.json({ ok: true, skipped: true })
 
     const { type, pageId } = body as { type?: string; pageId?: string }
     if (!pageId || typeof pageId !== "string" || !UUID.test(pageId)) return NextResponse.json({ ok: false }, { status: 400 })

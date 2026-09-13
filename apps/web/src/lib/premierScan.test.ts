@@ -71,7 +71,9 @@ function fausseBase(lignes: Record<string, unknown>) {
     from(t: string) {
       tables.push(t)
       const q: Record<string, unknown> = {}
-      for (const m of ["select", "eq", "order", "limit"]) q[m] = () => q
+      // `neq` s'est ajouté au lot v77 : la recherche de la première visite-scan
+      // écarte les lignes « bot » écrites avant que la redirection ne les refuse.
+      for (const m of ["select", "eq", "neq", "order", "limit"]) q[m] = () => q
       q.maybeSingle = async () => ({ data: lignes[t] ?? null })
       return q
     },

@@ -3,6 +3,7 @@
 
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
+import { APPAREIL_ROBOT } from "@/lib/robots"
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const supabase = await createServerSupabaseClient()
@@ -36,7 +37,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     .from("scans")
     .select("id", { count: "exact", head: true })
     .eq("qr_code_id", id)
-    .gte("scanned_at", fromDate.toISOString())
+    .gte("scanned_at", fromDate.toISOString()).neq("device", APPAREIL_ROBOT)
 
   // Scans période précédente (pour évolution)
   const { count: scansPrev } = await supabase
@@ -44,14 +45,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     .select("id", { count: "exact", head: true })
     .eq("qr_code_id", id)
     .gte("scanned_at", prevFrom.toISOString())
-    .lt("scanned_at", fromDate.toISOString())
+    .lt("scanned_at", fromDate.toISOString()).neq("device", APPAREIL_ROBOT)
 
   // Top device
   const { data: deviceRows } = await supabase
     .from("scans")
     .select("device")
     .eq("qr_code_id", id)
-    .gte("scanned_at", fromDate.toISOString())
+    .gte("scanned_at", fromDate.toISOString()).neq("device", APPAREIL_ROBOT)
 
   const deviceMap: Record<string, number> = {}
   for (const r of deviceRows ?? []) {
@@ -66,7 +67,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     .select("country")
     .eq("qr_code_id", id)
     .gte("scanned_at", fromDate.toISOString())
-    .not("country", "is", null)
+    .not("country", "is", null).neq("device", APPAREIL_ROBOT)
 
   const countryMap: Record<string, number> = {}
   for (const r of countryRows ?? []) {
@@ -80,7 +81,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     .from("scans")
     .select("scanned_at")
     .eq("qr_code_id", id)
-    .gte("scanned_at", fromDate.toISOString())
+    .gte("scanned_at", fromDate.toISOString()).neq("device", APPAREIL_ROBOT)
     .order("scanned_at", { ascending: true })
 
   // Construire tableau jours

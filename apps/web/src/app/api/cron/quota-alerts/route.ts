@@ -18,6 +18,7 @@ import { emailShell, emailH1, emailP, emailButton } from "@/lib/emailLayout"
 import { escapeHtml } from "@/lib/escapeHtml"
 import { noterPassage, sansAdresses } from "@/lib/journalCron"
 import { gardeCron } from "@/lib/gardeCron"
+import { APPAREIL_ROBOT } from "@/lib/robots"
 
 
 // Alerte de quota, sur la coquille partagée (vouvoiement, nom échappé) — cohérente
@@ -73,7 +74,7 @@ export async function GET(req: NextRequest) {
         const ids = (pages ?? []).map(pg => pg.id)
         if (!ids.length) continue
 
-        const { count } = await supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", monthStart)
+        const { count } = await supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", monthStart).neq("device", APPAREIL_ROBOT)
         const views = count ?? 0
         const threshold = views >= limit ? "over" : views >= limit * 0.8 ? "near" : null
         if (!threshold) continue

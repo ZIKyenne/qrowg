@@ -118,6 +118,10 @@ export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null;
                   ))}
                 </div>
                 {totalWindow === 0 && <p style={{ color: "#6E685E", fontSize: 11, textAlign: "center", margin: "6px 0 0" }}>Aucun scan sur la période — partagez votre QR pour voir les données arriver.</p>}
+                {/* Ce qui a été retiré du compte est dit, pas caché. */}
+                {details.robots > 0 && <p style={{ color: "#6E685E", fontSize: 11, textAlign: "center", margin: "6px 0 0" }}>
+                  {details.robots} aperçu{details.robots > 1 ? "s" : ""} de lien écarté{details.robots > 1 ? "s" : ""} du compte — un programme qui ouvre votre lien n&apos;est pas un client.
+                </p>}
 
                 {/* Appareils */}
                 {(details.byDevice || []).length > 0 && (

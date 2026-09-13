@@ -425,3 +425,68 @@ Au passage, deux arrondis retournés : l'exigence s'arrondit désormais vers le 
 **Vérifié au navigateur** : sur un sticker de table avec pastille carrée, l'onglet « Vérifier » affiche « Zone silencieuse · Marge suffisante autour du QR » — et cette fois c'est vrai. Avant ce lot, le même verdict s'affichait sur 0,8 mm de marge là où il en fallait 4,1.
 
 Gardes : `app/silenceImprime.test.ts` (10 cas : les 16 supports, le verdict du pré-vol sur un roll-up avec et sans la marge requise, la démonstration que l'ancien filet n'y suffisait nulle part, le plancher de 20 mm tenu sur toutes les combinaisons restantes, et les mesures réellement passées par l'écran). Vérifiée par injection : rétablir le filet de 2,8 % fait échouer deux cas.
+
+---
+
+## v77 — les robots comptés comme des clients
+
+**Relevé.** En suivant une requête de scan : `/q/<code>` écrit une ligne dans
+`scans` à CHAQUE appel. Elle lit pourtant déjà l'en-tête `User-Agent` —
+`parseDevice` en tire un « appareil », et cet appareil peut valoir **`"bot"`**.
+Le produit reconnaissait donc le robot, l'écrivait noir sur blanc dans la colonne
+`device`, et le comptait quand même : le déclencheur SQL `increment_scan_counters`
+incrémentait `qr_codes.total_scans`, `pages.total_views` et `profiles.total_scans`,
+puis l'écran de statistiques additionnait tout, `"bot"` compris (`DEVICE_ORDER`
+le listait explicitement).
+
+Qui suit un lien sans être un client : l'aperçu de WhatsApp, Messenger, Slack,
+Discord, Telegram, LinkedIn ; les passerelles de sécurité du courrier (Safe Links,
+Proofpoint, Barracuda) qui ouvrent les liens avant de livrer le message ; les
+moteurs de recherche ; les outils en ligne de commande. Un commerçant qui colle
+son lien dans un groupe WhatsApp récoltait un « scan » par aperçu — sur un compte
+qui en compte trois, cela fait toute la mesure.
+
+**Ce que le lot change.**
+
+- `lib/robots.ts` (nouveau) — `estUnRobot(userAgent)` sur une liste de signatures
+  réelles (aperçus sociaux, moteurs, passerelles de courrier, outils, navigateurs
+  sans tête) ; un agent absent ou vide compte aussi comme non humain. Volontairement
+  large : mieux vaut ne pas compter un visiteur douteux que compter un robot comme
+  un client. `ligneDeRobot(device)` porte le même jugement sur une ligne déjà
+  écrite, et `APPAREIL_ROBOT` nomme la valeur que `parseDevice` écrit.
+- **Écriture.** `/q/[code]` n'insère plus ni `scans` ni `instant_scan_events` pour
+  un robot. `/api/track` (vue, clic, événements d'engagement) répond « ok » sans
+  rien écrire quand l'agent est un programme — un navigateur sans tête exécute le
+  script comme un visiteur, il n'en est pas un.
+- **Lecture.** Les lignes déjà en base cessent de peser : `.neq("device",
+  APPAREIL_ROBOT)` sur toutes les requêtes qui comptent des scans ou des vues —
+  tableau de bord (vues du mois, du jour, de la semaine, des 90 jours), écran
+  Statistiques, `/api/qr-stats`, rapport hebdomadaire, rapports envoyés, alerte de
+  quota, et la recherche de la première visite-scan (une ligne robot pouvait voler
+  la place et empêcher l'email « premier scan »). `aggregateScanEvents` écarte les
+  robots côté JavaScript et rend leur nombre.
+- **Dit, pas caché.** L'écran Statistiques affiche « N aperçus de lien écartés du
+  compte : un programme qui ouvre votre lien (WhatsApp, Slack, un antivirus de
+  messagerie) n'est pas un visiteur », et la fiche d'un QR dynamique la même chose.
+  Aucun chiffre ne baisse en silence.
+
+**Garde.** `app/scansHonnetes.test.ts` (14) balaie tout l'arbre `src/` : aucune
+insertion dans `scans`, `page_views`, `instant_scan_events`, `block_clicks` ou
+`page_events` sans que le fichier consulte `estUnRobot` ; aucune requête sur
+`scans` ou `page_views` sans `.neq("device", APPAREIL_ROBOT)`. L'exception
+assumée — `instant_scan_events` lu entier pour pouvoir annoncer le nombre
+d'aperçus écartés — est écrite dans la garde. `lib/robots.test.ts` (29) vérifie le
+jugement sur des chaînes d'agent complètes et réelles.
+
+**Vérification par mutation.** Quatre défauts réinjectés : la redirection qui
+réécrit le scan sans distinguer le robot, l'agrégation qui recompte les lignes
+`"bot"`, le tableau de bord qui recompte les vues robots, l'alerte de quota qui
+les recompte. Chaque fois, la garde tombe ; restaurée, elle repasse.
+
+**Note d'outillage.** Une aide générique `sansRobots(requete)` a été écrite puis
+retirée : sur les sélections larges et dans les tuples de `Promise.all`,
+l'inférence de son paramètre faisait dépasser à TypeScript sa profondeur
+d'instanciation (TS2589) et la compilation échouait. Le filtre s'écrit à la main,
+avec la constante ; la garde vérifie qu'aucune requête ne l'oublie.
+
+Suite complète : 4 827 tests, 293 fichiers. Build vert.

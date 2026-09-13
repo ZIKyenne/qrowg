@@ -2,6 +2,8 @@
 // Alimente la pop-up « Statistiques » (palier Pro+). Données 100% réelles issues de
 // la table instant_scan_events (un événement par scan) — aucun chiffre inventé.
 
+import { ligneDeRobot } from "./robots"
+
 export type DeviceKind = "mobile" | "tablet" | "desktop" | "bot" | "unknown"
 
 // Déduit le type d'appareil depuis le User-Agent. Ordre important : bot avant tout,
@@ -18,7 +20,10 @@ export function parseDevice(ua?: string | null): DeviceKind {
 export type ScanEvent = { scanned_at: string; device?: string | null; country?: string | null }
 
 export type ScanStats = {
+  /** Scans humains de la fenêtre. Les robots n'y sont plus. */
   total: number
+  /** Lignes écartées parce qu'elles portent `device: "bot"`. Affiché, pas caché. */
+  robots: number
   byDay: { date: string; count: number }[]      // `days` derniers jours, ordre chronologique (YYYY-MM-DD, UTC)
   byDevice: { device: DeviceKind; count: number }[] // trié décroissant, buckets non vides
   byCountry: { country: string; count: number }[]   // trié décroissant (code ISO), "??" si inconnu
@@ -29,7 +34,13 @@ const DEVICE_ORDER: DeviceKind[] = ["mobile", "desktop", "tablet", "bot", "unkno
 const toUtcDay = (iso: string): string => new Date(iso).toISOString().slice(0, 10)
 
 // Agrège une liste d'événements sur les `days` derniers jours (fenêtre finissant à `now`).
-export function aggregateScanEvents(events: ScanEvent[], days: number, now: number): ScanStats {
+//
+// Les lignes déjà écrites avec `device: "bot"` sont écartées ici : l'historique se
+// répare à la lecture, sans toucher à la base (cf. lib/robots.ts). Leur nombre est
+// rendu dans `robots` — le commerçant voit ce qui a été retiré, il ne le devine pas.
+export function aggregateScanEvents(tous: ScanEvent[], days: number, now: number): ScanStats {
+  const events = tous.filter(e => !ligneDeRobot(e?.device))
+  const robots = tous.length - events.length
   // Squelette des jours (du plus ancien au plus récent), tous à 0.
   const dayCounts = new Map<string, number>()
   const order: string[] = []
@@ -66,7 +77,7 @@ export function aggregateScanEvents(events: ScanEvent[], days: number, now: numb
     .map(([country, count]) => ({ country, count }))
     .sort((a, b) => b.count - a.count || a.country.localeCompare(b.country))
 
-  return { total: events.length, byDay, byDevice, byCountry, peakDay }
+  return { total: events.length, robots, byDay, byDevice, byCountry, peakDay }
 }
 
 // Emoji drapeau depuis un code pays ISO-2 (ex. "FR" -> 🇫🇷). "??" ou invalide -> 🌍.

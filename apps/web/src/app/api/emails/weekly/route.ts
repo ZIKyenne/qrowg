@@ -7,6 +7,7 @@ import { emailShell, emailH1, emailP, emailButton } from "@/lib/emailLayout"
 import { semaineEcoulee, resumeSemaine, nombre } from "@/lib/weeklyReport"
 import { noterPassage, sansAdresses } from "@/lib/journalCron"
 import { gardeCron } from "@/lib/gardeCron"
+import { APPAREIL_ROBOT } from "@/lib/robots"
 
 // Carte de statistique (nombre dore + libelle). Cellule d'une rangee a 2 colonnes.
 function statCard(value: string, label: string, side: "left" | "right"): string {
@@ -81,11 +82,11 @@ async function envoyer(req: NextRequest) {
         const ids = pagesDe.get(profile.id) ?? []
         if (ids.length) {
           const [{ count: v }, { count: sc }] = await Promise.all([
-            supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", debutIso),
+            supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", debutIso).neq("device", APPAREIL_ROBOT),
             // `scans` n'a pas de colonne de ce nom — son horodatage est `scanned_at`.
             // PostgREST répondait 42703, supabase-js ne lève rien, `count` valait null :
             // TOUS les rapports hebdomadaires annonçaient « 0 scan cette semaine ».
-            supabase.from("scans").select("id", { count: "exact", head: true }).in("page_id", ids).gte("scanned_at", debutIso),
+            supabase.from("scans").select("id", { count: "exact", head: true }).in("page_id", ids).gte("scanned_at", debutIso).neq("device", APPAREIL_ROBOT),
           ])
           vuesSemaine = v ?? 0
           scansSemaine = sc ?? 0

@@ -4,6 +4,7 @@ import DashboardClient from "./DashboardClient"
 import GoalsShell from "./goals/GoalsShell"
 import { accessibleOwnerIds } from "@/lib/team"
 import { destinationApresConnexion, ECHAPPE } from "./atterrissage"
+import { APPAREIL_ROBOT } from "@/lib/robots"
 
 // Rendu SERVEUR des données initiales du dashboard : évite le 2e getUser() côté
 // client + le waterfall de requêtes + le spinner. DashboardClient garde son
@@ -38,9 +39,9 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
     const weekStart = new Date(todayStart); weekStart.setDate(weekStart.getDate() - 6)
     const [{ count: mCount }, { count: tCount }, { data: wRows }] = await Promise.all([
-      supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", monthStart),
-      supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", todayStart.toISOString()),
-      supabase.from("page_views").select("viewed_at").in("page_id", ids).gte("viewed_at", weekStart.toISOString()),
+      supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", monthStart).neq("device", APPAREIL_ROBOT),
+      supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", todayStart.toISOString()).neq("device", APPAREIL_ROBOT),
+      supabase.from("page_views").select("viewed_at").in("page_id", ids).gte("viewed_at", weekStart.toISOString()).neq("device", APPAREIL_ROBOT),
     ])
     monthViews = mCount ?? 0
     todayViews = tCount ?? 0
@@ -60,7 +61,7 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
   if (ids.length) {
     const [gc, gv] = await Promise.all([
       supabase.from("block_clicks").select("block_id, click_target, clicked_at, page_id, blocks(type)").in("page_id", ids).gte("clicked_at", since90.toISOString()).order("clicked_at", { ascending: false }),
-      supabase.from("page_views").select("viewed_at, page_id").in("page_id", ids).gte("viewed_at", since90.toISOString()),
+      supabase.from("page_views").select("viewed_at, page_id").in("page_id", ids).gte("viewed_at", since90.toISOString()).neq("device", APPAREIL_ROBOT),
     ])
     goalClicks = (gc.data || []).map((c: any) => ({ block_id: c.block_id, click_target: c.click_target, clicked_at: c.clicked_at, page_id: c.page_id, block_type: c.blocks?.type || "cta_button" }))
     goalViews = gv.data || []

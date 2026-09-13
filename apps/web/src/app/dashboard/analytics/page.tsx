@@ -2,6 +2,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import AnalyticsShell from "./AnalyticsShell"
 import { accessibleOwnerIds } from "@/lib/team"
+import { APPAREIL_ROBOT, ligneDeRobot } from "@/lib/robots"
 
 export const metadata = { title: "Statistiques — QRowg" }
 
@@ -33,6 +34,15 @@ export default async function AnalyticsPage() {
 
   // Requêtes indépendantes (ne dépendent que de pageIds) lancées EN PARALLÈLE
   // (avant : ~6 allers-retours séquentiels -> latence additionnée sur le TTFB).
+  // Filtre posé à la main, et non par `sansRobots` : sur cette sélection à huit
+  // colonnes, le générique de l'aide dépassait la profondeur d'instanciation de
+  // TypeScript. Même filtre, même colonne, même constante.
+  const requeteScans = supabase.from("scans")
+    .select("scanned_at, device, country, city, os, browser, page_id, qr_code_id")
+    .in("page_id", pageIds).gte("scanned_at", since.toISOString())
+    .neq("device", APPAREIL_ROBOT)
+    .order("scanned_at", { ascending: false }).limit(LIM)
+
   const [
     { data: recentScans },
     { data: recentClicks },
@@ -41,10 +51,7 @@ export default async function AnalyticsPage() {
     { data: baseEventsRaw },
     { data: tapEventsRaw },
   ] = await Promise.all([
-    supabase.from("scans")
-      .select("scanned_at, device, country, city, os, browser, page_id, qr_code_id")
-      .in("page_id", pageIds).gte("scanned_at", since.toISOString())
-      .order("scanned_at", { ascending: false }).limit(LIM),
+    requeteScans,
     supabase.from("block_clicks")
       .select("block_id, click_target, clicked_at, page_id, blocks(type)")
       .in("page_id", pageIds).gte("clicked_at", since90.toISOString())
@@ -52,6 +59,7 @@ export default async function AnalyticsPage() {
     supabase.from("page_views")
       .select("viewed_at, device, source, country, page_id")
       .in("page_id", pageIds).gte("viewed_at", since.toISOString())
+      .neq("device", APPAREIL_ROBOT)
       .order("viewed_at", { ascending: false }).limit(LIM),
     supabase.from("blocks")
       .select("id, type, page_id, position, is_visible")
@@ -77,7 +85,7 @@ export default async function AnalyticsPage() {
     { data: supportLeads },
   ] = (await Promise.all([
     (supabase.from("qr_codes") as any).select("id, short_code, label, page_id").in("page_id", pageIds).order("created_at", { ascending: false }).limit(2000),
-    (supabase.from("page_views") as any).select("qr_source").in("page_id", pageIds).gte("viewed_at", since.toISOString()).not("qr_source", "is", null).limit(LIM),
+    (supabase.from("page_views") as any).select("qr_source").in("page_id", pageIds).gte("viewed_at", since.toISOString()).not("qr_source", "is", null).neq("device", APPAREIL_ROBOT).limit(LIM),
     (supabase.from("block_clicks") as any).select("qr_source").in("page_id", pageIds).gte("clicked_at", since90.toISOString()).not("qr_source", "is", null).limit(LIM),
     (supabase.from("leads") as any).select("qr_source").in("page_id", pageIds).gte("created_at", since.toISOString()).not("qr_source", "is", null).limit(LIM),
   ])) as any[]
@@ -97,8 +105,13 @@ export default async function AnalyticsPage() {
     block_type:   c.blocks?.type || "cta_button",
   }))
 
+  // Les cartes « pays » et « appareils » se lisent sur les scans humains : une ligne
+  // `device: "bot"` est un aperçu de lien, pas une visite (cf. lib/robots.ts). Le
+  // tableau complet part quand même au client, qui dit combien ont été écartés.
+  const scansHumains = (recentScans || []).filter((s: any) => !ligneDeRobot(s.device))
+
   // Données géo normalisées
-  const geoScans = (recentScans || []).map((s: any) => ({
+  const geoScans = scansHumains.map((s: any) => ({
     country:    s.country,
     city:       s.city ?? null,
     page_id:    s.page_id,
@@ -106,7 +119,7 @@ export default async function AnalyticsPage() {
   }))
 
   // Données device normalisées
-  const deviceScans = (recentScans || []).map((s: any) => ({
+  const deviceScans = scansHumains.map((s: any) => ({
     device:     s.device,
     os:         s.os ?? null,
     browser:    s.browser ?? null,

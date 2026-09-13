@@ -17,6 +17,7 @@ import PostCheckoutBanner from "@/components/PostCheckoutBanner"
 import { erreurLisible } from "@/lib/erreurLisible"
 import { prochaineEtape } from "./prochaineEtape"
 import { raisonDeProposer, accrocheOffre, avantagesEnPlus } from "./offreUtile"
+import { APPAREIL_ROBOT } from "@/lib/robots"
 
 type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string }
 type Profile = { full_name: string | null; plan: string; total_scans: number; total_pages: number; avatar_url: string | null }
@@ -85,9 +86,9 @@ export default function DashboardClient({
       const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
       const weekStart  = new Date(todayStart); weekStart.setDate(weekStart.getDate() - 6)
       const [{ count: mCount }, { count: tCount }, { data: wRows }] = await Promise.all([
-        supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", monthStart),
-        supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", todayStart.toISOString()),
-        supabase.from("page_views").select("viewed_at").in("page_id", ids).gte("viewed_at", weekStart.toISOString()),
+        supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", monthStart).neq("device", APPAREIL_ROBOT),
+        supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", todayStart.toISOString()).neq("device", APPAREIL_ROBOT),
+        supabase.from("page_views").select("viewed_at").in("page_id", ids).gte("viewed_at", weekStart.toISOString()).neq("device", APPAREIL_ROBOT),
       ])
       setMonthViews(mCount ?? 0)
       setTodayViews(tCount ?? 0)

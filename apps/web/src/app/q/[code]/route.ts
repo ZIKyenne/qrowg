@@ -2,6 +2,7 @@
 // Résolution QR avec gestion des statuts
 
 import { createAdminClient } from "@/lib/supabase/server"
+import { estUnRobot } from "@/lib/robots"
 import { NextRequest, NextResponse, after } from "next/server"
 import { createHash } from "node:crypto"
 import { resolveOverrideDest, detectDevice, escapeHtml, type OverrideDest } from "./qrResolve"
@@ -320,8 +321,9 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
         const instDevice = parseDevice(req.headers.get("user-agent"))
         const instCountry = req.headers.get("x-vercel-ip-country") || null
         const instReferrer = (req.headers.get("referer") || "").slice(0, 300) || null
+        const instRobot = estUnRobot(req.headers.get("user-agent"))
         after(() => rateLimit(`scan:${code}:${ipOf(req)}`, 20, 60_000).then((allow) => {
-          if (!allow) return
+          if (!allow || instRobot) return    // un aperçu de lien n'est pas un scan
           const nowIso = new Date().toISOString()
           supabase.from("instant_qrs").update({ total_scans: (inst.total_scans ?? 0) + 1, last_scan_at: nowIso }).eq("id", inst.id).then(() => {}, () => {})
           // Événement détaillé (stats Pro+) — best-effort, ne bloque jamais la redirection.
@@ -415,8 +417,13 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
     // Anti-abus best-effort : au-delà de 20 scans/min pour un même code+IP, on
     // n'enregistre plus (évite le gonflage des stats/quotas par bouclage d'un
     // short_code). NON bloquant : la redirection n'attend pas ce check.
+    // Un aperçu de lien n'est pas un client. Le produit lisait déjà l'agent —
+    // `parseDevice` en tirait « bot » — et enregistrait le scan quand même
+    // (relevé du 13 septembre, voir lib/robots.ts). La redirection, elle, se
+    // fait toujours : on ne compte pas, on n'empêche rien.
+    const robot = estUnRobot(req.headers.get("user-agent"))
     after(() => rateLimit(`scan:${code}:${ipOf(req)}`, 20, 60_000).then((allow) => {
-      if (allow) return supabase.from("scans").insert({
+      if (allow && !robot) return supabase.from("scans").insert({
         qr_code_id: qr.id, page_id: qr.page_id, device,
         country, city, os, browser, referrer, ip_hash: ipHash,
         utm_source: utmSource, utm_campaign: utmCampaign, utm_medium: utmMedium,

@@ -6,6 +6,7 @@
 
 import { EMAIL_FROM } from "./emailFrom"
 import { SOURCE_SCAN, SUJET_PREMIER_SCAN, alerteActivee, emailPremierScan, estLaPremiere } from "./premierScan"
+import { APPAREIL_ROBOT } from "./robots"
 
 type Issue = "envoye" | "pas-la-premiere" | "desactive" | "impossible"
 
@@ -23,7 +24,7 @@ export async function previenirPremierScan(
       .from("page_views")
       .select("id")
       .eq("page_id", pageId)
-      .eq("source", SOURCE_SCAN)
+      .eq("source", SOURCE_SCAN).neq("device", APPAREIL_ROBOT)
       .order("viewed_at", { ascending: true })
       .order("id", { ascending: true })
       .limit(1)

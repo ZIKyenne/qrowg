@@ -20,6 +20,7 @@ import ScrollDepthPanel from "./ScrollDepthPanel"
 import ConversionFunnelPanel from "./ConversionFunnelPanel"
 import HeatmapPanel from "./HeatmapPanel"
 import SupportPanel from "./SupportPanel"
+import { ligneDeRobot } from "@/lib/robots"
 
 type Profile = { total_pages: number; total_scans: number; plan: string; email?: string; full_name?: string } | null
 type Page = { id: string; title: string; slug: string; total_views: number; unique_views: number; status: string }
@@ -98,13 +99,20 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
     try { window.history.replaceState(null, "", `${window.location.pathname}?${p.toString()}`) } catch {}
   }, [tab, period])
 
+  // Les lignes déjà enregistrées avec `device: "bot"` sortent du compte ici : un
+  // aperçu de lien (WhatsApp, Slack, une passerelle de courrier) n'est pas une
+  // visite. L'écriture, elle, a cessé côté redirection — cf. lib/robots.ts.
+  const scansHumains = useMemo(() => recentScans.filter(s => !ligneDeRobot(s.device)), [recentScans])
+  const vuesHumaines = useMemo(() => recentViews.filter(v => !ligneDeRobot(v.device)), [recentViews])
+  const robotsEcartes = (recentScans.length - scansHumains.length) + (recentViews.length - vuesHumaines.length)
+
   const filteredScans = useMemo(() =>
-    selectedPage === "all" ? recentScans : recentScans.filter(s => s.page_id === selectedPage),
-    [recentScans, selectedPage]
+    selectedPage === "all" ? scansHumains : scansHumains.filter(s => s.page_id === selectedPage),
+    [scansHumains, selectedPage]
   )
   const filteredViews = useMemo(() =>
-    selectedPage === "all" ? recentViews : recentViews.filter(v => v.page_id === selectedPage),
-    [recentViews, selectedPage]
+    selectedPage === "all" ? vuesHumaines : vuesHumaines.filter(v => v.page_id === selectedPage),
+    [vuesHumaines, selectedPage]
   )
 
   // QR de la sélection = supports (vitrine/table/flyer…). Le funnel par support est calculé
@@ -400,6 +408,13 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             </div>
           ))}
         </div>
+        )}
+
+        {/* Ce qui a été retiré du compte est dit, pas caché. */}
+        {tab === "overview" && robotsEcartes > 0 && (
+          <p style={{ color: "var(--muted)", fontSize: 12, margin: "-10px 0 22px" }}>
+            {pluriel(robotsEcartes, "aperçu")} de lien {robotsEcartes > 1 ? "écartés" : "écarté"} du compte : un programme qui ouvre votre lien (WhatsApp, Slack, un antivirus de messagerie) n&apos;est pas un visiteur.
+          </p>
         )}
 
         {/* Sections détaillées — masquées tant qu'il n'y a aucune donnée */}

@@ -11,6 +11,7 @@ import { EMAIL_FROM } from "@/lib/emailFrom"
 import { noterPassage, sansAdresses } from "@/lib/journalCron"
 import { gardeCron } from "@/lib/gardeCron"
 import { estDuPourEnvoi } from "@/lib/abonnementsRapport"
+import { APPAREIL_ROBOT } from "@/lib/robots"
 
 
 function buildEmailHtml(params: {
@@ -156,27 +157,27 @@ export async function GET(req: NextRequest) {
           .from("page_views")
           .select("id", { count: "exact", head: true })
           .in("page_id", pageIds)
-          .gte("viewed_at", since.toISOString())
+          .gte("viewed_at", since.toISOString()).neq("device", APPAREIL_ROBOT)
 
         const { count: prevViews } = await supabase
           .from("page_views")
           .select("id", { count: "exact", head: true })
           .in("page_id", pageIds)
           .gte("viewed_at", prevSince.toISOString())
-          .lt("viewed_at", since.toISOString())
+          .lt("viewed_at", since.toISOString()).neq("device", APPAREIL_ROBOT)
 
         const { count: totalScans } = await supabase
           .from("scans")
           .select("id", { count: "exact", head: true })
           .in("page_id", pageIds)
-          .gte("scanned_at", since.toISOString())
+          .gte("scanned_at", since.toISOString()).neq("device", APPAREIL_ROBOT)
 
         const { count: prevScans } = await supabase
           .from("scans")
           .select("id", { count: "exact", head: true })
           .in("page_id", pageIds)
           .gte("scanned_at", prevSince.toISOString())
-          .lt("scanned_at", since.toISOString())
+          .lt("scanned_at", since.toISOString()).neq("device", APPAREIL_ROBOT)
 
         const { data: clicksRaw } = await supabase
           .from("block_clicks")
@@ -201,7 +202,7 @@ export async function GET(req: NextRequest) {
         // dans le même email.
         const { data: vuesPeriode } = await supabase
           .from("page_views").select("page_id")
-          .in("page_id", pageIds).gte("viewed_at", since.toISOString())
+          .in("page_id", pageIds).gte("viewed_at", since.toISOString()).neq("device", APPAREIL_ROBOT)
         const parPage: Record<string, number> = {}
         for (const v of (vuesPeriode ?? [])) if (v.page_id) parPage[v.page_id] = (parPage[v.page_id] || 0) + 1
         const titreDe = new Map((pages ?? []).map(p => [p.id as string, p.title as string]))
