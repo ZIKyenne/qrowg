@@ -32,6 +32,7 @@ import { AccSection, ColorField, hexToRgb, rgbToHex, GLYPH_COULEURS, GLYPH_MODUL
 import { diagnostiquer, lireContraste, correctionsAuto, contrasteWcag, type ScanScore, type Ecc } from "./diagnosticQr"
 import type QRCodeStyling from "qr-code-styling"
 import { ajouterUnSupport, messageDeSupport } from "./ajoutDeSupport"
+import { TaillePhysique } from "./TaillePhysique"
 
 const G     = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -145,6 +146,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [expFormat,     setExpFormat]     = useState<"png"|"png-t"|"webp"|"svg"|"pdf">("png")
   const [expSize,       setExpSize]       = useState<512|1024|2048|4096|"custom">(1024)
   const [expCustomSize, setExpCustomSize] = useState(1024)
+  // La taille que le commerçant compte IMPRIMER, en mm. 0 = il ne l'a pas dite.
+  const [expMm,         setExpMm]         = useState(0)
   const [expMargin,     setExpMargin]     = useState(10)
   const [expFilename,   setExpFilename]   = useState("")
   const [expIncludeName,setExpIncludeName]= useState(false)
@@ -2846,6 +2849,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   Export : <strong style={{ color:G }}>{realPx}×{realPx}px</strong>
                   {(expIncludeName || expIncludeUrl) && " + bandeau"}
                 </p>
+                {/* Des pixels, alors qu'on imprime des centimètres (lot v85). */}
+                <TaillePhysique px={realPx} mm={expMm} onMm={setExpMm} onTaille={p => setExpSize(p as any)} MUTED={MUTED} />
               </div>
 
               {/* -- Options (repliées sur mobile pour désencombrer) ---------- */}

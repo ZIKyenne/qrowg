@@ -996,3 +996,68 @@ chiffres que l'écran Statistiques**. Deux nombres différents pour la même cho
 auraient été un défaut de plus.
 
 Suite complète : 4 937 tests, 300 fichiers. Build vert.
+
+---
+
+## v85 — des pixels, alors que le commerçant imprime des centimètres
+
+**Relevé.** Sur l'écran d'export du QR Studio — le chemin par lequel passe tout
+le monde pour récupérer son QR. Le panneau « Taille » offre quatre boutons —
+512px, 1024px, 2048px, 4096px — et, sous eux, une seule ligne :
+
+```
+Export : 1024×1024px
+```
+
+C'est tout. Rien ne relie ces pixels à la seule question que se pose celui qui va
+imprimer : **ça fait quelle taille sur mon autocollant ?**
+
+Le produit connaît pourtant la réponse, et se l'applique ailleurs :
+
+- `qr-codes/printPreflight.ts` note la résolution — `grade3(m.dpi, 300, 150)` :
+  300 DPI « qualité imprimeur », 150 DPI « correct pour un tirage rapide », en
+  dessous « trop faible pour l'impression » ;
+- `qr-codes/exportPlan.ts` sait déjà convertir ;
+- `print-studio/tailleQrImprimable.ts` (lot v74) connaît le plancher de 20 mm en
+  dessous duquel un QR ne se scanne plus.
+
+Un commerçant qui prend « 512px » — le premier bouton — et le fait tirer en
+autocollant de 10 cm imprime à **130 DPI** : sous le seuil que le produit
+lui-même appelle « trop faible pour l'impression ». Personne ne le lui dit.
+
+**Ce que le lot change.**
+
+- `qr-codes/taillePourImpression.ts` (nouveau, PUR) — la conversion dans les deux
+  sens, avec **les seuils du produit** et non des valeurs réinventées.
+  `phraseTaille(1024)` → « 87 mm de côté chez un imprimeur, jusqu'à 17,3 cm en
+  tirage rapide ». `formatTaille` parle en millimètres sous 10 cm, en centimètres
+  au-delà — l'unité dans laquelle on pense à chaque échelle.
+- **Le commerçant dit sa taille**, pas ses pixels : un champ « Je l'imprime en
+  … mm de côté ». Le verdict suit, dans les mots de `printPreflight` — et quand
+  ça ne passe pas, un bouton « Prendre 2048px » choisit la plus petite taille qui
+  suffit vraiment.
+- Sous 20 mm, la résolution ne sauve rien et on le dit : « c'est sous le plancher
+  de 20 mm : le QR ne se scannera pas, quelle que soit la résolution. »
+- `tailleConseillee` ne renvoie rien quand aucune taille proposée ne suffit — on
+  ne fait pas croire qu'un bouton fera l'affaire.
+
+**Garde.** `qr-codes/taillePourImpression.test.ts` (15) : la conversion et son
+aller-retour, le refus des entrées absurdes, l'unité d'affichage, le cas exact du
+relevé (512 px sur 10 cm → 130 DPI, insuffisant, avec le nombre de pixels à
+prendre), le plancher de scannabilité et sa limite exacte, et — le test qui tient
+tout — que `DPI_IMPRIMEUR`/`DPI_TIRAGE_RAPIDE` sont bien ceux que
+`printPreflight` applique, relu dans son code. Plus : ce que le module conseille
+passe son propre jugement, sur six tailles.
+
+**Vérification par mutation.** Quatre défauts réinjectés : le plancher de
+scannabilité ignoré, la taille conseillée arrondie vers le bas, un seuil DPI qui
+dérive de celui de `printPreflight`, l'affichage de la taille physique retiré.
+Chaque fois la garde tombe.
+
+**Une garde voisine rencontrée, deux fois.** `testsDeterministes` tient
+`QRStudio.tsx` sous 3 000 lignes : le bloc a d'abord poussé le fichier à 3 016,
+il vit maintenant dans `TaillePhysique.tsx` et le fichier est à 2 998. Le lot v83
+avait rencontré la même borne — c'est la deuxième fois qu'elle fait extraire au
+lieu de laisser grossir.
+
+Suite complète : 4 954 tests, 301 fichiers. Build vert.
