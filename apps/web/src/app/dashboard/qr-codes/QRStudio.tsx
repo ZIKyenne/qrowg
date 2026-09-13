@@ -31,6 +31,7 @@ import { PRESET_CATS, PRESETS, CORNER_STYLES, EC_LEVELS, canUsePreset, presetUps
 import { AccSection, ColorField, hexToRgb, rgbToHex, GLYPH_COULEURS, GLYPH_MODULES, GLYPH_COINS, GLYPH_AVANCES, GLYPH_LOGO, GLYPH_MARGE } from "./panneauxQr"
 import { diagnostiquer, lireContraste, correctionsAuto, contrasteWcag, type ScanScore, type Ecc } from "./diagnosticQr"
 import type QRCodeStyling from "qr-code-styling"
+import { ajouterUnSupport, messageDeSupport } from "./ajoutDeSupport"
 
 const G     = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -217,6 +218,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [copyQRId,   setCopyQRId]   = useState<string | null>(null)
   const [dupId,      setDupId]      = useState<string | null>(null)
+  const [supportId,  setSupportId]  = useState<string | null>(null)
   const [showModal,  setShowModal]  = useState(false)
   const [scene,      setScene]      = useState<"none"|"phone"|"card"|"poster"|"sticker"|"tent">("none") // aperçu immersif
   const [level,      setLevel]      = useState<"simple"|"inter"|"expert">("simple") // niveau de réglages (désencombre le panneau)
@@ -554,6 +556,23 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     } finally {
       setDupId(null)
     }
+  }
+
+  // -- Ajouter un SUPPORT à la même page ----------------------------------------
+  // Ce que le panneau « Performance par support » demandait sans que rien ne le
+  // permette : un deuxième QR vers LA MÊME page (lot v83). L'appel vit dans
+  // ./ajoutDeSupport.
+  async function ajouterSupport(qr: any) {
+    setMenuId(null)
+    if (supportId || !qr?.page_id) return
+    setSupportId(qr.id)
+    const r = await ajouterUnSupport(qr.page_id)
+    setSupportId(null)
+    if (!r.ok) { toast.error(r.phrase); return }
+    setQRCodes(prev => [r.qr, ...prev])
+    setActiveId(r.qr.id)
+    setMobileView("editor")
+    toast.success(messageDeSupport(r))
   }
 
   // -- Fonctions QR Status ------------------------------------------------------
@@ -1414,7 +1433,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       { icon: <ExternalLink size={11}/>, label: "Changer la destination", action: () => { setActiveId(qr.id); setMenuId(null); setDestModal(true) }, color: "var(--ink)", disabled: false },
                       { icon: isC ? <Check size={11}/> : <Copy size={11}/>, label: isC ? "Copie !" : "Copier lien", action: () => copyQRLink(qr.id, url), color: isC ? "var(--success)" : "#F5F0E8", disabled: false },
                       { icon: <Download size={11}/>, label: "PNG",          action: () => { setActiveId(qr.id); setTimeout(() => downloadPNG(400), 100); setMenuId(null) }, color: "var(--ink)", disabled: false },
-                      { icon: dupId === qr.id ? <Loader2 size={11} style={{ animation:"mo-spin 0.8s linear infinite" }}/> : <Copy size={11}/>, label: dupId === qr.id ? "Duplication..." : "Dupliquer", action: () => duplicateQR(qr.id), color: "var(--ink)", disabled: dupId === qr.id },
+                      ...(qr.page_id ? [{ icon: supportId === qr.id ? <Loader2 size={11} style={{ animation:"mo-spin 0.8s linear infinite" }}/> : <Plus size={11}/>, label: supportId === qr.id ? "Ajout..." : "Ajouter un support", action: () => ajouterSupport(qr), color: "var(--ink)", disabled: supportId === qr.id }] : []),
+                      { icon: dupId === qr.id ? <Loader2 size={11} style={{ animation:"mo-spin 0.8s linear infinite" }}/> : <Copy size={11}/>, label: dupId === qr.id ? "Duplication..." : "Dupliquer (nouvelle page)", action: () => duplicateQR(qr.id), color: "var(--ink)", disabled: dupId === qr.id },
                       ...(qs === "active" ? [{ icon: <Archive size={11}/>, label: "Mettre en pause", action: () => requestAction(qr.id, "pause", "Mettre en pause"), color: "#F97316", disabled: false }] : []),
                       ...(qs === "paused" || qs === "draft" ? [{ icon: <Check size={11}/>, label: "Activer", action: () => changeQRStatus(qr.id, "activate"), color: "var(--success)", disabled: false }] : []),
                       ...(qs !== "archived" ? [{ icon: <Archive size={11}/>, label: "Archiver", action: () => requestAction(qr.id, "archive", "Archiver ce QR"), color: "#6B7280", disabled: false }] : [{ icon: <RotateCcw size={11}/>, label: "Restaurer", action: () => changeQRStatus(qr.id, "restore"), color: "var(--action)", disabled: false }]),

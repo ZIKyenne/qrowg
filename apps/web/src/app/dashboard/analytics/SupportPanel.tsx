@@ -8,6 +8,7 @@
 import { useMemo, useState } from "react"
 import { Store, Eye, MousePointerClick, Target, Pencil } from "lucide-react"
 import { buildSupportFunnel, supportTotals, defaultSupportLabel, type SupportRow } from "@/lib/supportFunnel"
+import { CONSIGNE_SUPPORTS, CONSIGNE_DUPLICATION } from "@/lib/supportImprime"
 
 type Q = { id: string; short_code: string; label?: string | null; page_id?: string | null }
 type ScanRow = { qr_code_id?: string | null }
@@ -73,9 +74,15 @@ export default function SupportPanel({ qrs, scans, views, clicks, leads }: {
       </div>
 
       {rows.length === 0 ? (
-        <p style={{ color: MUTED, fontSize: 13, margin: "16px 0 2px", textAlign: "center", padding: "20px 0" }}>
-          Aucun QR pour cette sélection. Créez un QR par support (un pour la vitrine, un pour les tables…) — dupliquez un QR depuis le QR Studio pour une même page.
-        </p>
+        <div style={{ margin: "16px 0 2px", textAlign: "center", padding: "20px 0" }}>
+          {/* L'ancienne consigne envoyait dupliquer un QR « pour une même page » :
+              la duplication crée aussi une page (lot v83). Elle dit maintenant ce
+              que le produit fait, et « Ajouter un support » le fait vraiment. */}
+          <p style={{ color: MUTED, fontSize: 13, margin: 0, maxWidth: 520, marginInline: "auto", lineHeight: 1.6 }}>
+            Aucun QR pour cette sélection. {CONSIGNE_SUPPORTS}
+          </p>
+          <p style={{ color: DIM, fontSize: 12, margin: "8px 0 0" }}>{CONSIGNE_DUPLICATION}</p>
+        </div>
       ) : (
         <div style={{ overflowX: "auto", marginTop: 16 }}>
           <table style={{ width: "100%", minWidth: 560, borderCollapse: "collapse", fontVariantNumeric: "tabular-nums" }}>

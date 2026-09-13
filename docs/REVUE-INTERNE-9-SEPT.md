@@ -852,3 +852,78 @@ remise dans la grille, l'annulation qui ne prévient plus. Chaque fois la garde
 tombe.
 
 Suite complète : 4 908 tests, 298 fichiers. Build vert.
+
+---
+
+## v83 — le support qu'on ne peut pas créer
+
+**Relevé.** En comparant ce que le produit DIT et ce qu'il FAIT.
+
+Il dit, sur l'écran fait pour ça — panneau « Performance par support », état
+vide :
+
+> Aucun QR pour cette sélection. Créez un QR par support (un pour la vitrine, un
+> pour les tables…) — dupliquez un QR depuis le QR Studio **pour une même page**.
+
+et dans sa FAQ publique (`app/qr-code/verticals.ts`) :
+
+> Créez un QR par support pour comparer les scans par affiche, flyer ou
+> publication.
+
+Il fait, dans `api/qr-duplicate` :
+
+```
+// 2. Dupliquer la page liee (si elle existe)
+if (orig.page_id) { … setIfPresent(p, "slug", …); setIfPresent(p, "status", "draft") … }
+q.page_id = newPageId
+```
+
+La duplication crée **toujours** une nouvelle page : nouveau slug, remise en
+brouillon, contenu dédoublé. Suivre la consigne donne donc, pour quatre supports,
+quatre pages à tenir à jour — et le panneau, qui attribue les scans par
+`qr_code_id` sur UNE page, reste vide pour toujours. **L'écran ne peut pas être
+rempli en suivant sa propre consigne.**
+
+Rien dans la base ne s'y opposait : `qr_codes.page_id` est une clé étrangère
+ordinaire, plusieurs QR peuvent pointer la même page, et toute la chaîne de
+mesure existait déjà — `qr_source` posé par `/q/<code>`, `supportFunnel`,
+`api/qr-label` qui nomme « Vitrine », « Table 4 ». Ce qui manquait, c'était le
+bouton.
+
+**Ce que le lot change.**
+
+- `api/qr-support` (nouveau) — un QR de plus vers **la même page** : nouveau
+  `short_code`, un nom libre (« Support 2 »), la page vérifiée comme étant celle
+  du demandeur. La règle de quota n'est pas réécrite : `initialQrStatus` décide,
+  comme pour la duplication, si le support arrive actif ou en brouillon.
+- `lib/supportImprime.ts` (PUR) — `peutAjouterUnSupport` **dit** la règle de
+  `lib/quota.ts` au lieu de la laisser découvrir : « Votre plan couvre un seul QR
+  actif : un deuxième support demande un plan supérieur. » `nomDeSupportLibre`
+  évite les doublons, casse et espaces compris.
+- L'action « Ajouter un support » dans le QR Studio, et — parce que
+  `QRStudio.tsx` est tenu sous 3 000 lignes par `testsDeterministes` —
+  l'appel réseau extrait dans `./ajoutDeSupport`.
+- **Les libellés disent ce qu'ils font** : « Dupliquer » devient « Dupliquer
+  (nouvelle page) ». La consigne du panneau et la réponse de la FAQ décrivent le
+  vrai chemin.
+
+**Garde.** `lib/supportImprime.test.ts` (13) : la règle de quota dite et non
+inventée, le nommage sans doublon, et — côté source — que la route ajoute bien un
+QR à la même page **et ne crée aucune page**, qu'elle vérifie le propriétaire,
+qu'elle réutilise `initialQrStatus`/`uniqueShortCode`, que l'écran l'offre, que
+« Dupliquer » annonce la page qu'il crée (vérifié contre le code de
+`qr-duplicate`, pas supposé), et que l'ancienne consigne inapplicable a disparu
+des deux endroits.
+
+**Vérification par mutation.** Quatre défauts réinjectés : la route qui recrée
+une page, le nommage qui ignore les noms pris, la consigne qui se remet à
+promettre sans dire « même page », l'ancienne consigne remise dans le panneau.
+Chaque fois la garde tombe.
+
+**Deux gardes voisines rencontrées.** `testsDeterministes` a refusé
+`QRStudio.tsx` à 3 008 lignes — l'action a été extraite plutôt que le plafond
+relevé. Et `messagesLisibles` (lot v71) a signalé `toast.error(r.message)` : un
+faux positif de la même famille qu'à l'époque, le champ portait un nom de corps
+de réponse alors qu'il contient déjà une phrase traduite. Il s'appelle `phrase`.
+
+Suite complète : 4 921 tests, 299 fichiers. Build vert.

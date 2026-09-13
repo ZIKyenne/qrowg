@@ -193,7 +193,7 @@ export const VERTICALS: Record<string, Vertical> = {
     faq: [
       { q: "Puis-je modifier le programme après impression des affiches ?", a: "Oui. Le QR code reste identique, et vous modifiez le programme et les infos autant que nécessaire — même le jour J." },
       { q: "Puis-je renvoyer vers ma billetterie ?", a: "Oui. Ajoutez un bouton qui pointe vers votre plateforme de billetterie existante." },
-      { q: "Puis-je savoir quel flyer marche le mieux ?", a: "Oui. Créez un QR par support pour comparer les scans par affiche, flyer ou publication." },
+      { q: "Puis-je savoir quel flyer marche le mieux ?", a: "Oui. Depuis vos statistiques, ajoutez un support par affiche, flyer ou publication : chacun reçoit son propre QR vers la même page, et compte ses scans séparément." },
     ],
     ctaTitle: "Créez le QR code de votre événement",
     related: ["carte-de-visite", "wifi", "avis-google"],
