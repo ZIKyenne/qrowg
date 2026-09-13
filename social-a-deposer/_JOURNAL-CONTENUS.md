@@ -3,6 +3,42 @@
 > **À lire AVANT toute création.** Aucun slug, angle ou accroche listé ici ne peut être
 > réutilisé. Après chaque run, ajouter la ligne du jour en bas.
 
+---
+
+# 🛑 ÉTAPE 0 — HYGIÈNE BUFFER, AVANT TOUT LE RESTE (règle permanente, 13/09/2026)
+
+**Rien ne se produit tant que la file n'est pas propre.** Cette étape est inscrite en
+tête du prompt de la tâche planifiée `qrowg-marketinglocal` et s'exécute chaque matin.
+
+**Le piège, en une phrase :** Instagram renvoie à Buffer une erreur
+« flagged this post as potential spam » sur des posts **qu'il a pourtant publiés**.
+Buffer garde la ligne rouge, elle reste dans l'onglet Queue avec un bouton
+**Retry Now**, et le jour où on clique — ou qu'un run la requeue — le doublon part.
+C'est ce qui a produit le doublon du 07/09, et le risque est revenu les 11 et 12/09.
+
+**Le geste, à chaque run, sans exception :**
+
+1. `list_posts` status `["error"]`.
+2. Pour chaque post : `execute_query` sur les `sent` du même canal avec `sentAt`,
+   `externalLink`, `text`. Si un `sent` existe au même horaire que le `dueAt`, ou avec
+   le même texte → **le post est en ligne**.
+3. → `edit_post` `saveToDraft: true`, légende préfixée
+   `[DÉJÀ EN LIGNE — NE PAS RETRY] <permalien>`.
+   Instagram exige qu'on repasse `metadata.instagram {type, shouldShareToFeed,
+   isAiGenerated}`, sinon l'édition est rejetée.
+4. Seulement si **aucun** `sent` ne correspond : le post n'est jamais sorti, on peut le
+   reprogrammer (`edit_post` + `mode:"addToQueue"`).
+5. Même traitement pour les `scheduled` qui rejouent un contenu déjà publié — un run
+   interrompu en recrée (cas du 13/09 : carrousel TikTok du 12/09 dupliqué).
+
+**Trois interdits :** ne jamais cliquer Retry · ne jamais supprimer un post ·
+ne jamais requeuer sans avoir fait le point 2.
+
+À la fin de l'étape 0, l'onglet `error` est vide et le nombre de `scheduled` est le
+chiffre qui pilote le remplissage du jour.
+
+---
+
 ## ⚑ Source des chiffres (lire en premier)
 
 **Buffer ne mesure PAS Pinterest.** Ses `metrics` renvoient `Impressions: 0` sur toutes
@@ -1008,3 +1044,88 @@ TikTok (l'API la refuse sur ce format).
 > « flagged as potential spam ». Contrôle `sent` + `externalLink` : le post
 > `6aa4a3efe57597c26e5a339d` est parti le 11/09 à 19 h 20 et **est en ligne**
 > (`/p/DdKJhKRm8bc/`). Laissé en `error`, à supprimer à la main.
+
+---
+
+## 13/09 — production du jour · DÉPOSÉE ET MISE EN FILE
+
+> **Secteur du jour : restaurant · anniversaire et privatisation de la salle**, angle
+> jamais traité. Rotation respectée (12/09 = bar). Réserve `_STOCK` **vide** au
+> démarrage : production 100 % neuve. Dimanche = jour vidéo.
+> **Zéro doublon** : aucun slug, aucun couple (secteur, angle) et aucune accroche déjà
+> vus dans ce journal ni dans Buffer (`sent` sur 45 posts + `scheduled` + `error` + `draft`).
+> 4 épingles, **4 angles distincts**, **4 gabarits distincts (0, 1, 2, 3)** et
+> **4 tableaux distincts**. Une seule épingle hors-food (boutique · notice) : pont tenu.
+> Contrôle qualité : **16 visuels, 0 alerte**, les 8 QR décodés vers leur lien tracké.
+> Revue à l'œil : couverture + une épingle de chaque gabarit. L'épingle boulangerie a été
+> re-rendue une fois — le guillemet fermant s'orphelinait en bout de titre.
+>
+> **Dépôt fait** (16 PNG via `QRowg-Depot.cmd`), puis **6 posts mis en file** :
+> épingle boulangerie · farines (13 h 17 UTC, QR code boutique commerce),
+> épingle producteur · vente à la ferme (18 h 27, QR code food truck),
+> carrousel Instagram (19 h 07), épingle food truck · festivals (19 h 11, QR code
+> restaurant), carrousel photo TikTok (14/09, 06 h 40) et épingle boutique · notice
+> (14/09, 12 h 18, **Avis Google commerce** — premier épinglage sur ce tableau).
+> **File à 6/10**, aucune erreur, réserve `_STOCK` de nouveau **vide**.
+> Rien n'est parti au stock : les 16 visuels tenaient tous dans la file.
+>
+> **Ménage Buffer du jour** : le post TikTok `6aa69d38eba7bc56779655dc`, créé le 13/09 à
+> 12 h 55 pour le 14/09 à 06 h 40, **rejouait à l'identique le carrousel quiz du 12/09
+> déjà publié** (tiktok.com/…/7684674117684972833, 250 vues). Passé en **brouillon**,
+> pas supprimé. La file Buffer est donc à **0/10**.
+>
+> **Instagram — contrôle obligatoire fait, puis nettoyé.** Deux posts en `error`
+> (« flagged as potential spam ») encombraient la file et affichaient un bouton
+> **Retry Now** : `6aa3dd3a5a67efa86a9733d1` (11/09, marché · recette du potimarron) et
+> `6aa54d69c637430b6b56fe1b` (12/09, bar · soirée quiz). Les deux ont été confrontés aux
+> posts `sent` du canal : **ils sont en ligne** — `/p/DdKJhKRm8bc/` (11/09 21 h 20) et
+> `/p/DdM3eavI0m-/` (12/09 22 h 40), aux horaires exacts de leur `dueAt`. Cliquer sur
+> Retry aurait publié un doublon, exactement le scénario du 07/09.
+> **Les deux sont passés en brouillon**, avec en tête de légende un avertissement
+> `[DÉJÀ EN LIGNE — NE PAS RETRY]` et le permalien Instagram. Ils ne sont pas supprimés.
+> La file Buffer ne contient donc plus que les 6 posts du jour.
+>
+> ⚑ **À retenir pour les prochains runs :** le statut `error` d'Instagram reste affiché
+> indéfiniment et repeuple l'onglet Queue. Le réflexe n'est pas de le corriger mais de
+> le **vider en brouillon après vérification** — sinon le bouton Retry finit par être
+> cliqué à la main, et le doublon part.
+>
+> **Apprentissage Buffer.** TikTok reste le seul canal réellement distribué : 250 à 272
+> vues par carrousel photo, très stable. Le temps de visionnage moyen, lui, s'effondre —
+> **9,68 s le 09/09 et 9,23 s le 07/09 contre 2,47 s le 12/09**. Les deux meilleurs sont
+> aussi les deux publiés **tôt le matin (04 h 06 et 06 h 41 UTC)** et portaient un sujet
+> « carte qui change avec la saison » (cocktails de saison, camion privatisé). Sujet à
+> garder, angle à renouveler, créneau matinal à privilégier pour TikTok.
+> Instagram : 0 vue, 0 reach sur tous les carrousels — les posts sortent et ne touchent
+> personne. Pinterest : les `metrics` Buffer restent inexploitables (0 à 4 impressions,
+> défaut de reporting connu) ; la lecture se fait dans Pinterest Analytics, prochaine
+> échéance le **15/09** pour l'indicateur « clic sortant » de la série `utm_content=clic`.
+
+| Date | Secteur | Slugs produits | Canaux |
+|---|---|---|---|
+| 13/09 | restaurant · anniversaire (100 % inédit) | qr-code-anniversaire-privatisation-salle-restaurant (carrousel IG + TikTok + reel 32,2 s), qr-code-farines-et-provenances-affichees-boulangerie, qr-code-vente-a-la-ferme-hors-marche-producteur, qr-code-tournee-festivals-dates-et-scene-food-truck, qr-code-notice-et-mode-d-emploi-du-produit-boutique | Pinterest, IG, TikTok |
+
+### Angles basculés en « déjà faits » le 13/09
+| Secteur | Angle | Dates |
+|---|---|---|
+| Restaurant | Anniversaire / privatisation de la salle, demande de groupe (carrousel + reel) | 13/09 |
+| Boulangerie | Les farines et provenances affichées | 13/09 |
+| Marché / producteur | La vente à la ferme hors marché | 13/09 |
+| Food truck | Le camion en tournée de festival (dates et scène) | 13/09 |
+| Commerce / boutique | La notice et le mode d'emploi du produit sans papier | 13/09 |
+
+### Accroches ajoutées le 13/09 (ne plus réutiliser)
+- « Une table de 14, demandée à 23 h par SMS. »
+- « Tu réponds lundi. Ils ont réservé ailleurs dimanche. »
+- « D'où vient ta farine ? »
+- « Tu vends aussi à la ferme. Personne ne le sait. »
+- « Le camion joue le festival. Mais où, exactement ? »
+- « La notice est pliée en huit. Elle finit à la poubelle. »
+
+### Angles NEUFS ajoutés le 13/09 (remplacent les cinq consommés)
+- Restaurant · le menu enfant allergènes remis aux parents avant de commander.
+- Boulangerie · la commande de pain de mie et brioches pour un événement de famille.
+- Marché / producteur · le calendrier des semis et des récoltes affiché sur l'étal.
+- Food truck · la fiche « nos allergènes » du camion.
+- Commerce / boutique · la liste d'attente sur un produit en rupture.
+- Bar · le tableau des scores de la ligue de fléchettes (déjà en réserve, non consommé).

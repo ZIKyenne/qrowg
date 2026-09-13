@@ -124,7 +124,7 @@ Aucun post en statut `error` ni `draft` sur Buffer au 03/09.
 | en-file | qr-code-tarifs-durees-prestations-salon-coiffure.png | Pinterest | QR code salon coiffure (726416683586817657) | salon/coiffeur · tarifs et durées des prestations · le prix affiché sans avoir à le demander | https://qrowg.com/qr-code/salon | 2026-09-06 |
 | en-file | qr-code-menu-buffet-reception-traiteur.png | Pinterest | QR code restaurant (726416683586817614) | traiteur · formules buffet et devis · la demande aboutit au lieu de dormir dans une boîte mail | https://qrowg.com/qr-code/artisan | 2026-09-06 |
 | en-file | qr-code-carte-cadeau-dematerialisee-boutique.png | Pinterest | QR code boutique commerce (726416683586817655) | commerce · carte cadeau dématérialisée · offrir sans emballer ni imprimer | https://qrowg.com/qr-code/boutique | 2026-09-06 |
-| **dispo** | qr-code-arrivee-tardive-check-in-autonome-hotel.png | Pinterest | QR code hôtel (726416683586817656) | hôtel/chambre d'hôtes · arrivée tardive en autonomie · le code, l'étage et la marche à suivre sur la porte | https://qrowg.com/qr-code/hotel | 2026-09-06 |
+| retiré | qr-code-arrivee-tardive-check-in-autonome-hotel.png | Pinterest | QR code hôtel (726416683586817656) | hôtel/chambre d'hôtes · arrivée tardive en autonomie — **remplacée** par la version re-rendue le 07/09 avec le slug de campagne du jour, publiée le 07/09 à 19 h 03 | — | 2026-09-06 |
 
 > L'épingle **hôtel** a été rendue puis écartée de la sélection du jour pour respecter la
 > règle du pont d'audience (`audience-bridge.md` : une seule épingle hors-food par jour ;
@@ -415,3 +415,54 @@ Résumé des titres et tableaux Pinterest :
 **Titre Pinterest** : Dossier de location : la page à créer en 4 étapes
 **Tableau** : QR code immobilier — unique épingle hors-food
 `#immobilier #location #agentimmobilier #qrcode`
+
+---
+
+## 13/09 — production du jour · DÉPOSÉE ET MISE EN FILE (réserve vide)
+
+> Réserve **vide** au démarrage (tout en `en-file`) : production 100 % neuve.
+> Contrôle qualité : **16 visuels, 0 alerte**, les 8 QR décodés vers leur lien tracké.
+> **Dépôt fait** (16 PNG via `QRowg-Depot.cmd`), puis **6 posts mis en file** :
+> épingle boulangerie (13 h 17 UTC), épingle producteur (18 h 27), carrousel Instagram
+> (19 h 07), épingle food truck (19 h 11), carrousel photo TikTok (14/09, 06 h 40) et
+> épingle boutique (14/09, 12 h 18). **File à 6/10**, aucune erreur.
+> Le stock repasse à **vide** (`en-file` partout).
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| en-file | qr-code-anniversaire-privatisation-salle-restaurant-01..06.png | Instagram (carrousel) | — | restaurant · anniversaire et privatisation de la salle · la demande de groupe arrive écrite au lieu d'un SMS à 23 h | https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=bio&utm_campaign=20260913-restaurant | 2026-09-13 |
+| en-file | tiktok-qr-code-anniversaire-privatisation-salle-restaurant-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 | https://qrowg.com/qr-code/restaurant?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260913-restaurant | 2026-09-13 |
+| en-file | qr-code-farines-et-provenances-affichees-boulangerie.png | Pinterest | QR code boutique commerce (726416683586817655) — gabarit 0 | boulangerie · provenance des farines · « elle vient d'où, ta farine ? » | https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260913-restaurant&utm_content=clic | 2026-09-13 |
+| en-file | qr-code-vente-a-la-ferme-hors-marche-producteur.png | Pinterest | QR code food truck (726416683586817654) — gabarit 1 | marché/producteur · vente à la ferme hors marché · le client du samedi ignore qu'il peut passer le mercredi | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260913-restaurant&utm_content=clic&utm_term=producteur | 2026-09-13 |
+| en-file | qr-code-tournee-festivals-dates-et-scene-food-truck.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 2 | food truck · tournée de festivals · la scène, l'entrée et l'heure de service changent à chaque date | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260913-restaurant&utm_content=clic | 2026-09-13 |
+| en-file | qr-code-notice-et-mode-d-emploi-du-produit-boutique.png | Pinterest | **Avis Google commerce** (726416683586817650) — gabarit 3 — *unique épingle hors-food* | commerce/boutique · notice et mode d'emploi · le papier part à la poubelle avec le carton | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260913-restaurant&utm_content=clic&utm_term=notice | 2026-09-13 |
+
+> La vidéo `qr-code-anniversaire-privatisation-salle-restaurant-reel.mp4` (32,2 s,
+> 1080×1920) reste **manuelle** et n'entre jamais en réserve.
+
+## Textes prêts — 13/09
+
+Légendes complètes (Instagram, TikTok, Pinterest ×4, reel) avec bouton Copier :
+`social-a-deposer\2026-09-13\textes-du-jour-2026-09-13.html`.
+Bios : `social-a-deposer\2026-09-13\bios-du-jour-2026-09-13.html`.
+Pas de LinkedIn ni de X aujourd'hui (dimanche).
+
+### qr-code-farines-et-provenances-affichees-boulangerie
+**Titre Pinterest** : Provenance des farines : la page à faire en 4 étapes
+**Tableau** : QR code boutique commerce
+`#boulangerie #farine #artisanboulanger #commercelocal`
+
+### qr-code-vente-a-la-ferme-hors-marche-producteur
+**Titre Pinterest** : Vente à la ferme : la page à créer gratuitement en 5 min
+**Tableau** : QR code food truck
+`#producteurlocal #ventealaferme #circuitcourt #commercelocal`
+
+### qr-code-tournee-festivals-dates-et-scene-food-truck
+**Titre Pinterest** : Tournée de festivals : le planning à monter en 5 minutes
+**Tableau** : QR code restaurant
+`#foodtruck #streetfood #festival #commercelocal`
+
+### qr-code-notice-et-mode-d-emploi-du-produit-boutique
+**Titre Pinterest** : Notice du produit : la page à créer en 4 étapes, gratuite
+**Tableau** : Avis Google commerce — premier épinglage sur ce tableau
+`#boutique #commercelocal #organisation #qrcode`

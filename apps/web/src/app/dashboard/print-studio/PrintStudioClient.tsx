@@ -5,6 +5,7 @@
 // Consomme les modules purs : catalog / mockup / states / tokens.
 
 import { useEffect, useMemo, useRef, useState } from "react"
+import { bornesCurseur, distanceLisible, MM_MIN_SCANNABLE } from "./tailleQrImprimable"
 import { useIsMobile } from "@/lib/useIsMobile"
 import Link from "next/link"
 import { ArrowLeft, Lock, Unlock, Eye, EyeOff, ChevronUp, Check, X, Download, ShieldCheck, AlertTriangle, ChevronDown, Copy, Layers, Undo2, Redo2, Plus, MoreVertical,
@@ -1369,7 +1370,12 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               // Borne RÉELLE du support (ajustement.partQrMax), pas une estimation : le
               // curseur annonçait des millimètres que le rendu ne pouvait pas donner.
               const qMax = (partQrMax(item.shape === "round", qrBadge as Pastille, item.shape === "round" ? 0.15 : 0.09, layout.content === "qrbig") * minDimMm) / item.qrMm
-              const qMin = Math.min(qMax * 0.55, Math.max(0.55, Math.min(0.95, 20 / item.qrMm)))
+              // Le plancher de 20 mm est un PLANCHER : `Math.min` le faisait tomber dès que
+              // la mise en page serrait — 63 combinaisons atteignables sous 20 mm sur les
+              // 16 supports, la pire à 5,4 mm (relevé du 13 septembre). Voir
+              // tailleQrImprimable.ts.
+              const bornes = bornesCurseur(item.qrMm, qMax)
+              const qMin = bornes.min
               const clampS = (v: number) => Math.min(qMax, Math.max(qMin, v))
               const sem = qrScale <= qMin + (qMax - qMin) * 0.34 ? "compact" : qrScale >= qMin + (qMax - qMin) * 0.67 ? "max" : "reco"
               const chips: [string, string, number][] = [["compact", "Compact", qMin], ["reco", "Recommandé", qMax < 1 ? (qMin + qMax) / 2 : 1], ["max", "Maximum", qMax]]
@@ -1378,7 +1384,8 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                   <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: 4 }}>{chips.map(([cid, lab, val]) => (
                     <button key={cid} onClick={() => setQrScale(val)} style={{ flex: 1, minHeight: 40, borderRadius: 9, border: "none", cursor: "pointer", background: sem === cid ? "var(--surface-2)" : "transparent", color: sem === cid ? "var(--ink)" : C.fgMuted, boxShadow: sem === cid ? "inset 0 -2px 0 var(--accent)" : "none", fontSize: 12.5, fontWeight: sem === cid ? 700 : 500 }}>{lab}</button>
                   ))}</div>
-                  <Range value={clampS(qrScale)} min={qMin} max={qMax} step={0.02} onChange={v => setQrScale(clampS(v))} hint={`${Math.round(item.qrMm * size.factor * qrScale)} mm${preflight.scanDistanceM ? ` · lisible ~${preflight.scanDistanceM} m` : ""}`} />
+                  <Range value={clampS(qrScale)} min={qMin} max={qMax} step={0.02} onChange={v => setQrScale(clampS(v))} hint={`${Math.round(item.qrMm * size.factor * qrScale)} mm · lisible ${distanceLisible(item.qrMm * size.factor * qrScale)}`} />
+                  {bornes.troopetit && <p style={{ color: "var(--danger)", fontSize: 11.5, margin: "6px 0 0", lineHeight: 1.45 }}>Cette mise en page ne laisse que {bornes.minMm} mm au QR ; il en faut {MM_MIN_SCANNABLE} pour qu'il se scanne. Retirez un élément, ou choisissez un support plus grand.</p>}
                 </div>
               </Field>
             })()}
@@ -1591,7 +1598,9 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                 // Borne RÉELLE du support (ajustement.partQrMax), pas une estimation : le
               // curseur annonçait des millimètres que le rendu ne pouvait pas donner.
               const qMax = (partQrMax(item.shape === "round", qrBadge as Pastille, item.shape === "round" ? 0.15 : 0.09, layout.content === "qrbig") * minDimMm) / item.qrMm
-                const qMin = Math.min(qMax * 0.55, Math.max(0.55, Math.min(0.95, 20 / item.qrMm)))
+                // Même plancher qu'au-dessus : voir tailleQrImprimable.ts.
+                const bornes = bornesCurseur(item.qrMm, qMax)
+                const qMin = bornes.min
                 const clampS = (v: number) => Math.min(qMax, Math.max(qMin, v))
                 const sem = qrScale <= qMin + (qMax - qMin) * 0.34 ? "compact" : qrScale >= qMin + (qMax - qMin) * 0.67 ? "max" : "reco"
                 const chips: [string, string, number][] = [["compact", "Compact", qMin], ["reco", "Recommandé", qMax < 1 ? (qMin + qMax) / 2 : 1], ["max", "Maximum", qMax]]
@@ -1600,7 +1609,8 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                     <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: 4 }}>{chips.map(([cid, lab, val]) => (
                       <button key={cid} onClick={() => setQrScale(val)} style={{ flex: 1, minHeight: 40, borderRadius: 9, border: "none", cursor: "pointer", background: sem === cid ? "var(--surface-2)" : "transparent", color: sem === cid ? "var(--ink)" : C.fgMuted, boxShadow: sem === cid ? "inset 0 -2px 0 var(--accent)" : "none", fontSize: 12.5, fontWeight: sem === cid ? 700 : 500 }}>{lab}</button>
                     ))}</div>
-                    <Range value={clampS(qrScale)} min={qMin} max={qMax} step={0.02} onChange={v => setQrScale(clampS(v))} hint={`${Math.round(item.qrMm * size.factor * qrScale)} mm${preflight.scanDistanceM ? ` · ~${preflight.scanDistanceM} m` : ""}`} />
+                    <Range value={clampS(qrScale)} min={qMin} max={qMax} step={0.02} onChange={v => setQrScale(clampS(v))} hint={`${Math.round(item.qrMm * size.factor * qrScale)} mm · ${distanceLisible(item.qrMm * size.factor * qrScale)}`} />
+                    {bornes.troopetit && <p style={{ color: "var(--danger)", fontSize: 11.5, margin: "6px 0 0", lineHeight: 1.45 }}>Cette mise en page ne laisse que {bornes.minMm} mm au QR ; il en faut {MM_MIN_SCANNABLE} pour qu'il se scanne. Retirez un élément, ou choisissez un support plus grand.</p>}
                   </div>
                 </Field>
               })()}

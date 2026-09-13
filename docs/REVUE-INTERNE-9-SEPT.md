@@ -338,3 +338,30 @@ La règle s'applique **à l'export**, pas modèle par modèle : `PAGE_TEMPLATES`
 Mesuré après : **0 modèle sur 48** sans moyen de joindre le commerce.
 
 Gardes : `builder/blocJoindre.test.ts` (6 cas sur la règle, dont la copie du contenu par modèle) et `app/joindreLeCommerce.test.ts` (9 cas : la couverture des 48, le passage par l'export, la place haute, l'absence de numéro inventé, la question de l'assistant sur tout modèle concerné, le bout en bout, et l'absence de doublon). Vérifiées par injection : retirer le passage par l'export, ou mettre un numéro dans le bloc, fait échouer sept cas.
+
+
+## Lot v74 — le plancher qui n'en était pas un
+
+L'atelier d'impression portait ce commentaire, à l'endroit exact du calcul :
+
+> *Taille EFFECTIVE du QR = palier × curseur fin. Sert au rendu ET au contrôle (guard ≥ 20 mm honnête).*
+
+Et la borne basse du curseur était écrite ainsi :
+
+```js
+const qMin = Math.min(qMax * 0.55, Math.max(0.55, Math.min(0.95, 20 / item.qrMm)))
+```
+
+Un `Math.min` entre le plancher de 20 mm et 55 % du maximum autorisé par la mise en page. Dès que la mise en page serre — une pastille carrée, un QR géant, un petit support —, c'est le second terme qui gagne et le plancher tombe. Mesuré sur les 16 supports du catalogue, toutes pastilles et mises en page confondues :
+
+> **63 combinaisons atteignables sous 20 mm. La pire à 5,4 mm.**
+
+Carte de visite : 11,9 mm. Étiquette de bouteille : 11,9 mm. Sticker de table : 8,2 mm. Cinq millimètres et demi dans le pire cas — un QR de la taille d'un ongle, sur un support que le commerçant fait imprimer, paie, et colle sur sa vitrine. Il n'a aucun moyen de s'en apercevoir avant d'avoir reçu la commande.
+
+**`print-studio/tailleQrImprimable.ts`** (module pur) fait du plancher un plancher : le curseur ne descend jamais sous 20 mm. Et quand la mise en page ne peut pas accueillir 20 mm, il est **épinglé à son maximum** et l'écran le dit — « Cette mise en page ne laisse que 12 mm au QR ; il en faut 20 pour qu'il se scanne. Retirez un élément, ou choisissez un support plus grand. » — au lieu de laisser descendre en silence.
+
+**Au passage, la distance de lecture.** L'indication sous le curseur venait d'un champ de contrôle séparé et disparaissait quand il était absent. Elle se calcule maintenant sur la taille réelle, avec la règle du métier — côté × 10 : un QR de 20 mm se lit à 20 cm, celui d'une vitrine lue à deux mètres en demande 200. Le commerçant voit donc, en déplaçant le curseur, à quelle distance son code sera lisible.
+
+**Vérifié au navigateur** sur l'atelier : en poussant le curseur à fond vers le bas, l'indication s'arrête à « **20 mm · lisible environ 20 cm** ». Le même support descendait à 14,9 mm avant ce lot.
+
+Gardes : `print-studio/tailleQrImprimable.test.ts` (6 cas sur le plancher et la distance) et `app/qrScannable.test.ts` (6 cas, dont le balayage du catalogue entier — 16 supports × 3 pastilles × 2 mises en page — et la disparition de l'ancienne expression aux deux curseurs). Vérifiées par injection : rétablir le `Math.min` d'origine fait échouer cinq cas.

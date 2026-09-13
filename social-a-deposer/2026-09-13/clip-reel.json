@@ -1,0 +1,32 @@
+{
+  "format": "reel",
+  "fps": 30,
+  "scrim": 0.74,
+  "progress": true,
+  "maxDuration": 36,
+  "brand": { "handle": "@qrowg", "logo": true },
+  "motion": { "effect": "drift", "palette": "or", "density": 1400, "speed": 1.0, "seed": 21 },
+  "scenes": [
+    { "dur": 4.6, "kicker": "QROWG", "align": "center", "titleSize": 110,
+      "title": "Une table de 14.\nÀ 23 h, par SMS.",
+      "motion": { "effect": "portal" } },
+    { "dur": 4.6, "title": "Tu réponds lundi.",
+      "sub": "Ils ont réservé ailleurs dimanche.",
+      "motion": { "effect": "glitch", "speed": 1.1 } },
+    { "dur": 4.6, "title": "Le budget. Le gâteau.",
+      "sub": "Les allergies. L'heure. Tout dans un fil de messages.",
+      "motion": { "effect": "shatter" } },
+    { "dur": 4.6, "title": "Un QR sur la carte.",
+      "sub": "La demande arrive écrite, datée, complète.",
+      "motion": { "effect": "scan", "speed": 1.25 } },
+    { "dur": 4.6, "title": "La formule groupe change.",
+      "sub": "Tu modifies la page en cinq minutes.",
+      "motion": { "effect": "focus" } },
+    { "dur": 4.6, "title": "14 couverts, une demande.",
+      "sub": "Et chaque scan dit combien de tables ont regardé.",
+      "motion": { "effect": "stats" } },
+    { "dur": 4.6, "align": "center", "title": "Crée ta page groupes",
+      "cta": "qrowg.com",
+      "motion": { "effect": "publish" } }
+  ]
+}

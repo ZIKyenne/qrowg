@@ -1,0 +1,118 @@
+{
+  "total": 16,
+  "avec_alerte": 0,
+  "details": [
+    {
+      "fichier": "qr-code-anniversaire-privatisation-salle-restaurant-01.png",
+      "fond_sombre_pct": 92.9,
+      "or_pct": 1.1,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-anniversaire-privatisation-salle-restaurant-02.png",
+      "fond_sombre_pct": 92.5,
+      "or_pct": 0.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-anniversaire-privatisation-salle-restaurant-03.png",
+      "fond_sombre_pct": 85.1,
+      "or_pct": 9.5,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_medium=carrousel&utm_campaign=20260913-restaurant",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-anniversaire-privatisation-salle-restaurant-04.png",
+      "fond_sombre_pct": 92.7,
+      "or_pct": 1.0,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-anniversaire-privatisation-salle-restaurant-05.png",
+      "fond_sombre_pct": 86.9,
+      "or_pct": 0.9,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-anniversaire-privatisation-salle-restaurant-06.png",
+      "fond_sombre_pct": 83.8,
+      "or_pct": 6.8,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_medium=carrousel&utm_campaign=20260913-restaurant",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-farines-et-provenances-affichees-boulangerie.png",
+      "fond_sombre_pct": 91.6,
+      "or_pct": 4.7,
+      "qr": "https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260913-restaurant&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-notice-et-mode-d-emploi-du-produit-boutique.png",
+      "fond_sombre_pct": 91.2,
+      "or_pct": 4.3,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260913-restaurant&utm_content=clic&utm_term=notice",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-tournee-festivals-dates-et-scene-food-truck.png",
+      "fond_sombre_pct": 90.4,
+      "or_pct": 3.9,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260913-restaurant&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-vente-a-la-ferme-hors-marche-producteur.png",
+      "fond_sombre_pct": 89.8,
+      "or_pct": 4.7,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260913-restaurant&utm_content=clic&utm_term=producteur",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-anniversaire-privatisation-salle-restaurant-01.png",
+      "fond_sombre_pct": 92.9,
+      "or_pct": 1.1,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-anniversaire-privatisation-salle-restaurant-02.png",
+      "fond_sombre_pct": 92.6,
+      "or_pct": 0.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-anniversaire-privatisation-salle-restaurant-03.png",
+      "fond_sombre_pct": 85.1,
+      "or_pct": 9.5,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_medium=carrousel&utm_campaign=20260913-restaurant",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-anniversaire-privatisation-salle-restaurant-04.png",
+      "fond_sombre_pct": 92.7,
+      "or_pct": 1.0,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-anniversaire-privatisation-salle-restaurant-05.png",
+      "fond_sombre_pct": 86.9,
+      "or_pct": 0.9,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-anniversaire-privatisation-salle-restaurant-06.png",
+      "fond_sombre_pct": 83.8,
+      "or_pct": 6.8,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_medium=carrousel&utm_campaign=20260913-restaurant",
+      "alertes": []
+    }
+  ]
+}

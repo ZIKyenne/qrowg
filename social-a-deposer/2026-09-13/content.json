@@ -1,0 +1,87 @@
+{
+  "carousels": [
+    {
+      "slug": "qr-code-anniversaire-privatisation-salle-restaurant",
+      "sector": "restaurant",
+      "url": "https://qrowg.com/qr-code/restaurant?utm_medium=carrousel&utm_campaign=20260913-restaurant",
+      "slides": [
+        {
+          "kind": "cover",
+          "tag": "Restaurant · anniversaire",
+          "title": "Une table de 14, demandée à 23 h par [[SMS]].",
+          "body": "Tu réponds lundi. Ils ont réservé ailleurs dimanche."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le problème",
+          "title": "Un anniversaire se décide en deux [[jours]].",
+          "body": "Le budget, le gâteau, les allergies, l'heure : tout tient dans un fil de messages que personne ne relit."
+        },
+        {
+          "kind": "qr",
+          "kicker": "Sur la carte",
+          "title": "Un QR, et la demande arrive [[complète]].",
+          "body": "Date, couverts, formule, allergies, gâteau. Écrit, daté, dans ta boîte."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le geste",
+          "title": "La formule groupe change à la [[saison]].",
+          "body": "Tu modifies la page en cinq minutes. Le carton posé sur la table, lui, ne bouge plus jamais."
+        },
+        {
+          "kind": "metric",
+          "kicker": "Preuve",
+          "number": "14 couverts",
+          "title": "tenus sur une seule [[demande]]",
+          "body": "Et chaque scan te dit combien de tables ont regardé sans oser demander."
+        },
+        {
+          "kind": "cta",
+          "title": "Crée ta page groupes en 5 [[minutes]]",
+          "body": "Gratuit, sans carte bancaire, prêt à imprimer.",
+          "cta": "qrowg.com",
+          "qr": true
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "slug": "qr-code-farines-et-provenances-affichees-boulangerie",
+      "tag": "Boulangerie",
+      "layout": 0,
+      "qr": true,
+      "title": "« D'où vient ta [[farine]] ? »",
+      "subtitle": "La marche à suivre : 4 étapes, 5 minutes →",
+      "url": "https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260913-restaurant&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-vente-a-la-ferme-hors-marche-producteur",
+      "tag": "Producteur",
+      "layout": 1,
+      "qr": true,
+      "title": "Tu vends aussi à la ferme. Personne ne le [[sait]].",
+      "subtitle": "Gratuit, sans carte bancaire →",
+      "url": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260913-restaurant&utm_content=clic&utm_term=producteur"
+    },
+    {
+      "slug": "qr-code-tournee-festivals-dates-et-scene-food-truck",
+      "tag": "Food truck",
+      "layout": 2,
+      "qr": true,
+      "title": "Le camion joue le festival. Mais [[où]], exactement ?",
+      "subtitle": "La page à monter en 5 minutes →",
+      "url": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260913-restaurant&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-notice-et-mode-d-emploi-du-produit-boutique",
+      "tag": "Boutique",
+      "layout": 3,
+      "qr": true,
+      "title": "La notice est pliée en huit. Elle finit à la [[poubelle]].",
+      "subtitle": "Les 4 étapes pour créer la page →",
+      "url": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260913-restaurant&utm_content=clic&utm_term=notice"
+    }
+  ]
+}
