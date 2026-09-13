@@ -1061,3 +1061,65 @@ avait rencontré la même borne — c'est la deuxième fois qu'elle fait extrair
 lieu de laisser grossir.
 
 Suite complète : 4 954 tests, 301 fichiers. Build vert.
+
+---
+
+## v86 — le nom du support qui ne sort jamais de l'écran des statistiques
+
+**Relevé.** Le produit demande au commerçant de nommer ses supports — c'est le
+rôle explicite de `api/qr-label` : « renomme un QR (nom du support pour
+l'attribution : « Vitrine », « Table 4 »…) » — et il affiche ces noms dans
+« Performance par support ».
+
+Partout ailleurs, `qr_codes.label` n'était pas lu. À la place, le titre de la
+PAGE :
+
+```
+// nom du fichier exporté (QRStudio)
+expFilename.trim() || active?.pages?.title?.replace(…) || short_code
+
+// liste de choix de l'atelier d'impression (PrintStudioClient)
+.select("short_code, pages(title, slug)")      ← `label` pas même demandé
+label: pg?.title || pg?.slug || "QR code"
+```
+
+Or depuis le lot v83, une page porte plusieurs supports pour de bon. Au moment
+précis où il faut les distinguer :
+
+- l'atelier d'impression affiche **« Le Comptoir » quatre fois de suite**, et
+  rien ne dit lequel est la vitrine ;
+- quatre exports atterrissent dans le dossier Téléchargements sous
+  « le-comptoir.png », « le-comptoir (1).png », « le-comptoir (2).png »… C'est
+  chez l'imprimeur qu'on s'en aperçoit.
+
+Le titre de la page ne distingue rien : c'est le même pour tous ses supports.
+
+**Ce que le lot change.**
+
+- `lib/nomDuQr.ts` (nouveau, PUR) — une seule règle dans tout le produit : le nom
+  du support, sinon le titre de la page, sinon le code. `nomDuQrSitue` garde les
+  deux quand les deux existent (« Le Comptoir — Vitrine ») et ne fabrique jamais
+  « Le Comptoir — Le Comptoir ». `fichierDuQr` produit « vitrine-ab12 » :
+  lisible dans un dossier, et distinct même entre deux supports homonymes.
+- L'atelier d'impression **demande** enfin `label` et l'affiche.
+- Le fichier exporté, la fiche du QR, la recherche et le tri parlent du support.
+- `suppressionDePage.nomDuSupport` (lot v84) passe par la même règle : un nom, un
+  seul endroit où il se décide.
+
+**Garde.** `lib/nomDuQr.test.ts` (14) : l'ordre de priorité, les blancs qui ne
+comptent pas, la jointure PostgREST en objet comme en tableau, les accents et la
+ponctuation dans un nom de fichier, un nom de fichier jamais vide quoi qu'on
+donne, deux supports homonymes qui restent distincts — et, côté source, que
+l'atelier demande bien `label` à la base, que le nom de fichier ne repart plus du
+titre de page, et que la règle du lot v84 est la même que celle-ci.
+
+**Vérification par mutation.** Quatre défauts réinjectés : le titre de page
+repassé devant le nom du support, le code court retiré du nom de fichier,
+`label` retiré de la requête de l'atelier, la recherche qui oublie le support.
+Chaque fois la garde tombe.
+
+**La même borne, une troisième fois.** `QRStudio.tsx` repassait au-dessus de
+3 000 lignes. Plutôt que de relever le plafond, le commentaire est parti dans le
+module qui porte la règle et une ligne vide a sauté : 2 999.
+
+Suite complète : 4 968 tests, 302 fichiers. Build vert.

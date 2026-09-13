@@ -29,6 +29,7 @@ import { printPreflight, hexContrastRatio } from "../qr-codes/printPreflight"
 import { color as C, radius as R } from "./tokens"
 import { ajusterAuSupport, lignesDeTitre, partQrMax, type Pastille } from "./ajustement"
 import { bandeApercuMobile, dimensionsApercuMobile, legendeVisible, vhFeuilleMax, estPaysage, largeurTiroirPaysage, largeurApercuMobile, HAUT_BARRE_PAYSAGE } from "./apercuMobile"
+import { nomDuQrSitue } from "@/lib/nomDuQr"
 
 // item.layout est parfois une clé de contenu ('stack'), parfois un id de layout ('orne').
 // On résout toujours vers un id de LAYOUTS valide (pour le volet Mise en page).
@@ -461,7 +462,10 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     let alive = true
     const sb = createClient()
     Promise.all([
-      sb.from("qr_codes").select("short_code, pages(title, slug)").order("created_at", { ascending: false }).limit(60),
+      // `label` — le nom du support — n'était pas même demandé : la liste
+      // affichait « Le Comptoir » autant de fois qu'il y a de supports, sans
+      // qu'on puisse dire lequel est la vitrine (lot v86).
+      sb.from("qr_codes").select("short_code, label, pages(title, slug)").order("created_at", { ascending: false }).limit(60),
       sb.from("instant_qrs").select("id, label, kind, payload, dynamic, short_code").order("created_at", { ascending: false }).limit(60),
     ]).then(([a, b]) => {
       if (!alive) return
@@ -469,12 +473,12 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       for (const r of ((a.data || []) as any[])) {
         if (!r.short_code) continue
         const pg = Array.isArray(r.pages) ? r.pages[0] : r.pages
-        list.push({ id: `q_${r.short_code}`, label: pg?.title || pg?.slug || "QR code", url: `${appUrl}/q/${r.short_code}` })
+        list.push({ id: `q_${r.short_code}`, label: nomDuQrSitue({ label: r.label, pageTitre: pg?.title || pg?.slug, short_code: r.short_code }), url: `${appUrl}/q/${r.short_code}` })
       }
       for (const r of ((b.data || []) as any[])) {
         const url = r.dynamic && r.short_code ? `${appUrl}/q/${r.short_code}` : (r.payload || "")
         if (!url) continue
-        list.push({ id: `i_${r.id}`, label: r.label || (r.kind ? `QR ${r.kind}` : "QR instantané"), url })
+        list.push({ id: `i_${r.id}`, label: r.label || (r.kind ? `QR ${r.kind}` : "QR instantané"), url })   // QR autonome : pas de page derrière
       }
       setMyQRs(list)
       // Présélection depuis ?qr=<short_code> (ouverture depuis un QR code) : on cible ce QR précis.

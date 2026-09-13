@@ -33,6 +33,7 @@ import { diagnostiquer, lireContraste, correctionsAuto, contrasteWcag, type Scan
 import type QRCodeStyling from "qr-code-styling"
 import { ajouterUnSupport, messageDeSupport } from "./ajoutDeSupport"
 import { TaillePhysique } from "./TaillePhysique"
+import { fichierDuQr, nomDeFichier, nomDuQr, nomDeLigneQr } from "@/lib/nomDuQr"
 
 const G     = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -480,7 +481,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
   // -- Nom de fichier auto ----------------------------------------------------
   function getFilename(ext: string): string {
-    const base = expFilename.trim() || active?.pages?.title?.replace(/[^a-z0-9]/gi, "-").toLowerCase() || active?.short_code || "qr"
+    const base = expFilename.trim() || fichierDuQr({ label: (active as any)?.label, pageTitre: active?.pages?.title, short_code: active?.short_code })
     return `${base}.${ext}`
   }
 
@@ -560,7 +561,6 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       setDupId(null)
     }
   }
-
   // -- Ajouter un SUPPORT à la même page ----------------------------------------
   // Ce que le panneau « Performance par support » demandait sans que rien ne le
   // permette : un deuxième QR vers LA MÊME page (lot v83). L'appel vit dans
@@ -775,7 +775,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       try { const d = (document as Document & { fonts?: { load: (f: string) => Promise<unknown> } }); if (d.fonts) { await Promise.all([d.fonts.load(`700 32px '${suppFont}'`), d.fonts.load(`400 24px '${suppSubFont}'`)]) } } catch { /* noop */ }
       const outCanvas = document.createElement("canvas")
       await renderSupport(outCanvas, tpl, { title:suppTitle, subtitle:suppSubtitle, qrDataUrl, fg, bg, qrUrl, titreParDefaut: active?.pages?.title, scale:2, theme:SUPP_THEMES.find(t=>t.id===suppTheme), phone:suppPhone, website:suppWebsite, font:suppFont, titleColor:suppTitleColor, subColor:suppSubColor, offX:suppOffX, offY:suppOffY, subFont:suppSubFont, tracking:suppTracking, titleScale:suppTitleSize, subScale:suppSubSize })
-      const filename  = `${(tpl.label).replace(/\s+/g,"-").toLowerCase()}-${active?.short_code ?? "qr"}.${fmt}`
+      const filename  = `${nomDeFichier(tpl.label)}-${fichierDuQr({ label: (active as any)?.label, pageTitre: active?.pages?.title, short_code: active?.short_code })}.${fmt}`
       if (fmt === "pdf") {
         // Vrai PDF via jsPDF, oriente selon le support
         const { jsPDF } = await import("jspdf")
@@ -1048,7 +1048,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
   const filteredQR = qrCodes
     .filter(qr => {
-      const t  = qr.pages?.title?.toLowerCase() ?? ""
+      const t  = `${(qr as any).label ?? ""} ${qr.pages?.title ?? ""}`.toLowerCase()
       const c  = qr.short_code?.toLowerCase() ?? ""
       const qs = qr.status ?? "active"
       // Masquer les archives sauf si filtre explicite ou showArchived
@@ -1060,7 +1060,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       let cmp = 0
       if (sb_asc === "scans") cmp = (a.total_scans ?? 0) - (b.total_scans ?? 0)
       if (sb_asc === "date")  cmp = new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-      if (sb_asc === "name")  cmp = (a.pages?.title ?? "").localeCompare(b.pages?.title ?? "")
+      if (sb_asc === "name")  cmp = nomDeLigneQr(a).localeCompare(nomDeLigneQr(b))
       return sb_dir === "desc" ? -cmp : cmp
     })
 
@@ -1120,7 +1120,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             {/* Header */}
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", width:"100%" }}>
               <div>
-                <p style={{ color:"var(--ink)", fontSize:16, fontWeight:700, margin:"0 0 3px" }}>{active?.pages?.title}</p>
+                <p style={{ color:"var(--ink)", fontSize:16, fontWeight:700, margin:"0 0 3px" }}>{nomDeLigneQr(active)}</p>
                 <p style={{ color:"var(--muted)", fontSize:11, margin:0 }}>Scannez pour tester * {appUrl}/q/{active?.short_code}</p>
               </div>
               <button type="button" onClick={() => setShowModal(false)}
@@ -1273,7 +1273,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       {confirmAction !== null && (() => {
         const { action, qrId, label } = confirmAction
         const qr = qrCodes.find(q => q.id === qrId)
-        const nom = qr?.pages?.title || qr?.short_code || "ce QR"
+        const nom = nomDuQr({ label: (qr as any)?.label, short_code: qr?.short_code })
         const destructif = action === "delete"
         const texte = action === "pause"
           ? `« ${nom} » cessera de rediriger : un scan affichera une page « en pause » jusqu'à sa réactivation. Le code imprimé reste valable.`

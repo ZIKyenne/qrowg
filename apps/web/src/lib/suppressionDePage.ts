@@ -24,6 +24,8 @@
 // Une case à cocher mentale — « oui oui, supprimer » — suffit aujourd'hui à
 // éteindre les autocollants de toutes les tables d'un restaurant. Module PUR.
 
+import { nomDuQr } from "./nomDuQr"
+
 export type SupportSupprime = { label?: string | null; short_code?: string | null }
 
 export type CeQuiDisparait = {
@@ -37,12 +39,14 @@ function nombre(n: number): string {
   return n.toLocaleString("fr-FR")
 }
 
-/** Le nom d'un support, ou son code quand il n'a pas été nommé. */
+/**
+ * Le nom d'un support. Une seule règle dans tout le produit, tenue par
+ * `lib/nomDuQr` : le nom donné par le commerçant, sinon le titre de la page,
+ * sinon le code. Ici on ne passe pas de titre de page — la page qu'on supprime
+ * est la même pour tous ses supports, elle ne les distinguerait pas.
+ */
 export function nomDuSupport(s: SupportSupprime): string {
-  const l = (s.label || "").trim()
-  if (l) return l
-  const c = (s.short_code || "").trim()
-  return c ? `code ${c}` : "QR sans nom"
+  return nomDuQr({ label: s.label, short_code: s.short_code })
 }
 
 /**
