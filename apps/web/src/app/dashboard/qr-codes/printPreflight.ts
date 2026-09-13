@@ -17,6 +17,7 @@ export type PreflightMetrics = {
   qrSizeMm?: number | null       // taille physique du QR (côté), en mm
   contrastRatio?: number | null  // ratio WCAG 1..21 entre modules et fond immédiat
   quietZoneMm?: number | null    // espace vide autour du QR, en mm
+  qrModules?: number | null      // côté du code en modules : la marge exigée en dépend
   logoPct?: number | null        // taille du logo en % de la largeur du QR (0 = pas de logo)
   dpi?: number | null            // résolution d'export
   edgeMarginMm?: number | null   // distance du bord le plus proche (élément ↔ bord), en mm
@@ -153,14 +154,22 @@ export function printPreflight(m: PreflightMetrics): PreflightResult {
   }
 
   // 3) Zone silencieuse (marge blanche autour du QR).
+  //
+  // Ce contrôle jugeait sur 4 MILLIMÈTRES fixes. La norme demande 4 MODULES —
+  // ce qui fait 3,3 mm sur une carte de visite, mais 30 mm sur un roll-up.
+  // Relevé du 13 septembre : les 16 supports du catalogue passaient ce contrôle
+  // alors qu'aucun n'atteignait la marge requise (facteur 4 à 5 d'écart).
   {
-    const s = grade3(m.quietZoneMm, 4, 2)   // ≥4 mm ok ; 2–4 limite ; <2 fail
+    const exige = m.qrSizeMm != null && m.qrModules != null && m.qrModules > 0
+      ? (4 * m.qrSizeMm) / m.qrModules
+      : 4
+    const s = grade3(m.quietZoneMm, exige, exige / 2)
     checks.push({
       id: "quiet", label: "Zone silencieuse", status: s, weight: 16,
       detail: s === "na" ? "Non mesurée."
         : s === "ok" ? "Marge suffisante autour du QR."
-        : s === "warn" ? "Marge un peu juste — laisser ≥ 4 mm de vide autour du QR."
-        : "Trop d'éléments collés au QR — laisser du vide autour (≥ 4 mm).",
+        : s === "warn" ? `Marge un peu juste — laisser ≥ ${exige.toFixed(1)} mm de vide autour du QR (quatre modules).`
+        : `Trop d'éléments collés au QR — laisser ≥ ${exige.toFixed(1)} mm de vide autour (quatre modules).`,
     })
   }
 

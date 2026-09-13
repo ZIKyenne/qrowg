@@ -5,6 +5,8 @@
 // Consomme les modules purs : catalog / mockup / states / tokens.
 
 import { useEffect, useMemo, useRef, useState } from "react"
+import { margeReelleMm, type Pastille as PastilleAj } from "./ajustement"
+import { modulesPourCharge } from "../qr-codes/margeQr"
 import { bornesCurseur, distanceLisible, MM_MIN_SCANNABLE } from "./tailleQrImprimable"
 import { useIsMobile } from "@/lib/useIsMobile"
 import Link from "next/link"
@@ -507,10 +509,18 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   // - Zone franche : le QR (marge intégrée) + pastille blanche la garantissent ; le vrai risque = QR posé sur une PHOTO sans pastille.
   // - Safe-area : distance des éléments libres au bord (mode Studio libre).
   const noBadgeOnPhoto = qrBadge === "aucune" && !!bgImage
+  // Le code réellement encodé : sa taille en modules commande la marge exigée.
+  const modulesDuCode = modulesPourCharge(qrValue || "https://qrowg.com", "M")
   const preflight = printPreflight({
     qrSizeMm: item ? +(item.qrMm * effSize.factor).toFixed(1) : null,
     contrastRatio: (qrSource === "png" || noBadgeOnPhoto) ? null : hexContrastRatio(style.qr, style.qrBg),
-    quietZoneMm: qrBadge === "aucune" ? (bgImage ? 1 : null) : 5,
+    // La marge n'est plus affirmée à 5 mm quoi qu'il arrive : elle est mesurée
+    // sur la pastille réellement dessinée, et jugée contre les quatre modules
+    // que la norme exige pour CE code (relevé du 13 septembre, voir ajustement.ts).
+    quietZoneMm: qrBadge === "aucune"
+      ? (bgImage ? 1 : null)
+      : (item ? margeReelleMm(qrBadge as Pastille, item.qrMm * effSize.factor, modulesDuCode) : null),
+    qrModules: modulesDuCode,
     logoPct: 0,
     // Export vectoriel (QR + texte) = net à toute taille ; seule une PHOTO de fond est limitée par le DPI du support.
     dpi: item ? (bgImage ? item.dpi : Math.max(300, item.dpi)) : null,
@@ -1369,7 +1379,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               const minDimMm = Math.min(trimWidthMm(item), item.hMm)
               // Borne RÉELLE du support (ajustement.partQrMax), pas une estimation : le
               // curseur annonçait des millimètres que le rendu ne pouvait pas donner.
-              const qMax = (partQrMax(item.shape === "round", qrBadge as Pastille, item.shape === "round" ? 0.15 : 0.09, layout.content === "qrbig") * minDimMm) / item.qrMm
+              const qMax = (partQrMax(item.shape === "round", qrBadge as Pastille, item.shape === "round" ? 0.15 : 0.09, layout.content === "qrbig", modulesDuCode) * minDimMm) / item.qrMm
               // Le plancher de 20 mm est un PLANCHER : `Math.min` le faisait tomber dès que
               // la mise en page serrait — 63 combinaisons atteignables sous 20 mm sur les
               // 16 supports, la pire à 5,4 mm (relevé du 13 septembre). Voir
@@ -1597,7 +1607,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                 const minDimMm = Math.min(trimWidthMm(item), item.hMm)
                 // Borne RÉELLE du support (ajustement.partQrMax), pas une estimation : le
               // curseur annonçait des millimètres que le rendu ne pouvait pas donner.
-              const qMax = (partQrMax(item.shape === "round", qrBadge as Pastille, item.shape === "round" ? 0.15 : 0.09, layout.content === "qrbig") * minDimMm) / item.qrMm
+              const qMax = (partQrMax(item.shape === "round", qrBadge as Pastille, item.shape === "round" ? 0.15 : 0.09, layout.content === "qrbig", modulesDuCode) * minDimMm) / item.qrMm
                 // Même plancher qu'au-dessus : voir tailleQrImprimable.ts.
                 const bornes = bornesCurseur(item.qrMm, qMax)
                 const qMin = bornes.min

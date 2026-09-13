@@ -1,3 +1,7 @@
+import { MODULES_SILENCE } from "../qr-codes/margeQr"
+
+/** Un code d'URL courante : 29 modules. Sert de repli quand la charge est inconnue. */
+const MODULES_PAR_DEFAUT = 29
 // Faire tenir le contenu dans le support — au lieu de le couper.
 //
 // LE DÉFAUT. Toutes les tailles du Atelier d'impression sont des fractions du support
@@ -151,10 +155,27 @@ function tient(b: BesoinContenu, k: number, dispo: number): boolean {
 
 export type Pastille = "carre" | "cercle" | "aucune"
 
-/** Marge de la pastille carrée, en fraction du support. */
-export const PAD_PASTILLE_CARREE = 0.028
-/** Marge de la pastille ronde, en fraction du CÔTÉ du QR (la moitié de √2−1, plus un filet). */
-export const PAD_PASTILLE_RONDE = (Math.SQRT2 - 1) / 2 + 0.035
+// Relevé du 13 septembre. La pastille laissait 2,8 % du côté en blanc autour du
+// QR — un filet décidé à l'œil. La norme demande quatre MODULES, ce qui fait
+// 4/n du côté, soit 13,8 % pour un code de 29 modules. Sur les 16 supports du
+// catalogue, la marge réelle valait 0,6 à 6,2 mm là où il en fallait 3 à 30 :
+// **tous insuffisants**, d'un facteur 4 à 5. Et le pré-vol les déclarait bons,
+// puisqu'il jugeait sur 4 mm fixes (voir printPreflight).
+//
+// La marge dépend donc du code, comme la norme le veut.
+
+/** Marge de la pastille carrée, en fraction du côté du QR : quatre modules. */
+export function padPastilleCarree(modules: number): number {
+  return MODULES_SILENCE / Math.max(1, modules)
+}
+
+/**
+ * Marge de la pastille ronde, en fraction du CÔTÉ du QR : la moitié de √2−1
+ * (le carré inscrit dans le cercle) plus les quatre modules de silence.
+ */
+export function padPastilleRonde(modules: number): number {
+  return (Math.SQRT2 - 1) / 2 + padPastilleCarree(modules)
+}
 
 /**
  * Côté maximal du QR, en fraction de min(largeur, hauteur) du support.
@@ -164,14 +185,31 @@ export const PAD_PASTILLE_RONDE = (Math.SQRT2 - 1) / 2 + 0.035
  * entre si c√2 ≤ diamètre utile. La pastille agrandit ce carré, donc réduit
  * d'autant le QR — une pastille ronde coûte plus qu'une carrée.
  */
-export function partQrMax(rond: boolean, badge: Pastille, marge: number, qrGeant = false): number {
+export function partQrMax(rond: boolean, badge: Pastille, marge: number, qrGeant = false, modules: number = MODULES_PAR_DEFAUT): number {
+  const padCarre = padPastilleCarree(modules)
   if (rond) {
     const zone = Math.max(0.1, 1 - 2 * marge)          // diamètre utile
-    if (badge === "cercle") return zone / (1 + 2 * PAD_PASTILLE_RONDE)
-    if (badge === "carre") return Math.max(0.1, zone / Math.SQRT2 - 2 * PAD_PASTILLE_CARREE)
+    if (badge === "cercle") return zone / (1 + 2 * padPastilleRonde(modules))
+    if (badge === "carre") return Math.max(0.1, zone / Math.SQRT2 - 2 * padCarre)
     return zone / Math.SQRT2
   }
   const plafond = qrGeant ? 0.5 : 0.86
-  if (badge === "carre") return Math.max(0.1, plafond - 2 * PAD_PASTILLE_CARREE)
+  if (badge === "carre") return Math.max(0.1, plafond - 2 * padCarre)
   return plafond
+}
+
+/** La marge blanche réellement laissée autour du QR, en millimètres. */
+export function margeReelleMm(badge: Pastille, qrMm: number, modules: number): number | null {
+  if (badge === "aucune") return null                  // dépend de la mise en page, pas de la pastille
+  const pad = badge === "cercle" ? padPastilleCarree(modules) : padPastilleCarree(modules)
+  return Math.floor(pad * qrMm * 100) / 100
+}
+
+/**
+ * Ce que la norme exige autour de CE code, en millimètres. Arrondi vers le HAUT :
+ * une exigence arrondie vers le bas est une exigence sous-estimée, et le
+ * centième manquant suffit à faire passer un support qui ne devrait pas.
+ */
+export function margeExigeeMm(qrMm: number, modules: number): number {
+  return Math.ceil(((MODULES_SILENCE * qrMm) / Math.max(1, modules)) * 100) / 100
 }

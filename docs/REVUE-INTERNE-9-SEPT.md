@@ -397,3 +397,31 @@ Le réglage devient « Normale · 4 modules » / « Large · 6 modules », le cu
 **Vérifié au navigateur** sur l'atelier QR : le canvas rendu en 720 px porte une marge haute de 97 px, soit les quatre modules attendus pour cette charge. L'ancien réglage en donnait dix.
 
 Gardes : `qr-codes/margeQr.test.ts` (8 cas, dont la confrontation de la table à l'encodeur embarqué) et `app/zoneSilencieuse.test.ts` (9 cas : trois charges × cinq tailles passées au verdict du testeur public, la démonstration que l'ancien réglage y échouait, et la disparition du réglage en pixels). Vérifiées par injection : rétablir `o.style.margin ?? 10` fait échouer trois cas.
+
+
+## Lot v76 — la même marge, mais sur le support imprimé
+
+Le lot précédent a réglé la marge blanche de l'**image** exportée. Restait celle du **support**, et elle était fausse de la même façon, mais à l'envers : la pastille laissait un filet fixe, et le contrôle le jugeait avec une règle fixe.
+
+La pastille réservait **2,8 % du côté du QR** — une valeur décidée à l'œil. La norme demande quatre modules, soit `4/n` du côté : 13,8 % pour un code de 29 modules. Mesuré sur les 16 supports du catalogue :
+
+```
+Carte de visite   :  0,7 mm laissés   pour   3,3 mm exigés
+Sticker vitrine   :  1,7 mm           pour   8,3 mm
+Affiche A2        :  5,6 mm           pour  27,6 mm
+Roll-up           :  6,2 mm           pour  30,3 mm
+```
+
+**Les seize étaient insuffisants**, d'un facteur 4 à 5 — et l'écart se creuse avec la taille du support, c'est-à-dire précisément là où le code est scanné de loin et où l'échec coûte le plus cher.
+
+Et le pré-vol les déclarait tous bons. Il jugeait sur **4 millimètres fixes** (« laisser ≥ 4 mm de vide autour du QR ») quand la norme parle de **modules** ; sur un roll-up, 4 mm valent un demi-module. L'écran, de son côté, ne mesurait même pas : il affirmait `quietZoneMm: 5` quelle que soit la pastille et quelle que soit la taille du QR.
+
+**Trois corrections, une même règle.** La marge de la pastille se calcule en modules (`ajustement.ts`). Le pré-vol juge contre `4 × taille / modules` et le dit dans son verdict (« laisser ≥ 30,3 mm — quatre modules »). Et l'écran lui passe la marge **réellement dessinée** plus le nombre de modules du code réellement encodé, au lieu d'une constante.
+
+Au passage, deux arrondis retournés : l'exigence s'arrondit désormais vers le **haut** et la mesure vers le **bas**. Une exigence arrondie vers le bas est une exigence sous-estimée, et le centième manquant suffisait à faire passer un support qui ne devait pas.
+
+**Ce que la correction coûte, et qui est dit.** Avec une vraie zone de silence, la pastille prend plus de place : sur les 48 combinaisons support × pastille, **13 ne peuvent plus tenir un QR de 20 mm** — et l'écran le signale, depuis le lot v74, au lieu de servir un code trop petit en silence (« Cette mise en page ne laisse que 14 mm au QR ; il en faut 20 »). Les 35 autres restent utilisables, et sur un petit support le commerçant a le choix : pas de pastille, ou un support plus grand. C'est un choix qu'on lui rend, pas une fonction qu'on lui retire.
+
+**Vérifié au navigateur** : sur un sticker de table avec pastille carrée, l'onglet « Vérifier » affiche « Zone silencieuse · Marge suffisante autour du QR » — et cette fois c'est vrai. Avant ce lot, le même verdict s'affichait sur 0,8 mm de marge là où il en fallait 4,1.
+
+Gardes : `app/silenceImprime.test.ts` (10 cas : les 16 supports, le verdict du pré-vol sur un roll-up avec et sans la marge requise, la démonstration que l'ancien filet n'y suffisait nulle part, le plancher de 20 mm tenu sur toutes les combinaisons restantes, et les mesures réellement passées par l'écran). Vérifiée par injection : rétablir le filet de 2,8 % fait échouer deux cas.
