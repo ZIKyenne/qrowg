@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest"
+import { modulesPourCharge, silenceObtenu, MODULES_SILENCE } from "./margeQr"
 import { buildOptions, mapDotType, mapCornerSquareType, mapCornerDotType, type QROptions, type QRStyleConfig } from "./qrRender"
 
 const base = (style: QRStyleConfig = {}, over: Partial<QROptions> = {}): QROptions => ({
@@ -43,16 +44,29 @@ describe("mapCornerDotType", () => {
 })
 
 describe("buildOptions — base", () => {
-  it("taille et marge par defaut", () => {
+  // Lot v75 : la marge ne se règle plus en pixels. La norme — et le testeur
+  // public de QRowg — la comptent en MODULES ; le réglage en pixels donnait
+  // 0,66 à 0,97 module par défaut, et se dégradait en agrandissant l'export.
+  it("la marge par défaut fait quatre modules, pas dix pixels", () => {
     const o = buildOptions(base())
     expect(o.width).toBe(400)
     expect(o.height).toBe(400)
-    expect(o.margin).toBe(10)
+    const n = modulesPourCharge(o.data, "M")
+    expect(silenceObtenu(400, o.margin, n)).toBeGreaterThanOrEqual(MODULES_SILENCE - 0.05)
+    expect(o.margin).not.toBe(10)
   })
-  it("taille et marge personnalisees", () => {
-    const o = buildOptions(base({ margin: 2 }, { size: 1024 }))
+  it("elle suit la taille de l'export : quatre modules aussi en 1024", () => {
+    const o = buildOptions(base({}, { size: 1024 }))
     expect(o.width).toBe(1024)
-    expect(o.margin).toBe(2)
+    const n = modulesPourCharge(o.data, "M")
+    expect(silenceObtenu(1024, o.margin, n)).toBeGreaterThanOrEqual(MODULES_SILENCE - 0.05)
+  })
+  it("on peut demander plus de silence, jamais moins", () => {
+    const large = buildOptions(base({ silence: 6 }))
+    const normal = buildOptions(base())
+    expect(large.margin).toBeGreaterThan(normal.margin)
+    // un réglage sous la norme est ramené à la norme
+    expect(buildOptions(base({ silence: 1 })).margin).toBe(normal.margin)
   })
   it("repli sur l'URL de marque si data vide", () => {
     expect(buildOptions(base({}, { data: "" })).data).toBe("https://qrowg.com")

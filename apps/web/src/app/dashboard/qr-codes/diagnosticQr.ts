@@ -11,6 +11,7 @@
 // il faudra choisir lequel fait foi. Cette extraction rend au moins la
 // contradiction visible et testable.
 import type { QRStyleConfig } from "./QRStudio"
+import { MODULES_SILENCE } from "./margeQr"
 
 export type Ecc = "L" | "M" | "Q" | "H"
 
@@ -134,16 +135,20 @@ export function diagnostiquer(e: EntreeDiagnostic): ScanScore {
   }
 
   // -- 5. Marge insuffisante -------------------------------------------------
-  const margin = e.style.margin ?? 10
-  if (margin < 4) {
+  // Ce contrôle disait « minimum 4 modules (10px) » : l'équivalence était fausse.
+  // Dix pixels sur un export de 400 px font 0,7 module, et 0,3 sur un export de
+  // 1000 px. On compte donc en modules, comme la norme et comme le testeur
+  // public de QRowg (relevé du 13 septembre, voir margeQr.ts).
+  const silence = e.style.silence ?? MODULES_SILENCE
+  if (silence < MODULES_SILENCE) {
     issues.push({ id:"margin-none", severity:"critical",
-      title:"Marge trop petite", detail:`Marge ${margin}px -- minimum 4 modules (10px) requis pour la decouverte.`,
-      fix:"Ajouter une marge de 12px", fixable:true })
+      title:"Marge trop petite", detail:`Zone silencieuse de ${silence} module(s) — la norme en demande ${MODULES_SILENCE}.`,
+      fix:`Porter la marge à ${MODULES_SILENCE} modules`, fixable:true })
     score -= 18
-  } else if (margin < 8) {
+  } else if (silence < MODULES_SILENCE + 2) {
     issues.push({ id:"margin-low", severity:"warning",
-      title:"Marge réduite", detail:`Marge ${margin}px -- 10px+ recommande pour l'impression.`,
-      fix:"Ajouter une marge de 10px", fixable:true })
+      title:"Marge juste", detail:`Zone silencieuse de ${silence} modules — confortable à l'impression à partir de ${MODULES_SILENCE + 2}.`,
+      fix:`Porter la marge à ${MODULES_SILENCE + 2} modules`, fixable:true })
     score -= 6
   }
 
@@ -233,10 +238,10 @@ export function correctionsAuto(score: ScanScore, e: EntreeDiagnostic): Correcti
         newEc = "H"
         break
       case "margin-none":
-        newStyleConf = { ...newStyleConf, margin: 12 }
+        newStyleConf = { ...newStyleConf, silence: 6 }
         break
       case "margin-low":
-        newStyleConf = { ...newStyleConf, margin: 10 }
+        newStyleConf = { ...newStyleConf, silence: 4 }
         break
       case "gradient-contrast":
         newStyleConf = { ...newStyleConf, gradient: "none", fg2: "" }

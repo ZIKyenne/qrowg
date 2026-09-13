@@ -365,3 +365,35 @@ Carte de visite : 11,9 mm. Étiquette de bouteille : 11,9 mm. Sticker de table :
 **Vérifié au navigateur** sur l'atelier : en poussant le curseur à fond vers le bas, l'indication s'arrête à « **20 mm · lisible environ 20 cm** ». Le même support descendait à 14,9 mm avant ce lot.
 
 Gardes : `print-studio/tailleQrImprimable.test.ts` (6 cas sur le plancher et la distance) et `app/qrScannable.test.ts` (6 cas, dont le balayage du catalogue entier — 16 supports × 3 pastilles × 2 mises en page — et la disparition de l'ancienne expression aux deux curseurs). Vérifiées par injection : rétablir le `Math.min` d'origine fait échouer cinq cas.
+
+
+## Lot v75 — la marge blanche que QRowg exige des autres
+
+QRowg publie un testeur de QR code (`/outils/testeur-qr-code`). Il écrit, noir sur blanc, dans son propre code :
+
+> *« Marge blanche autour du code, exprimée en modules. La norme demande quatre modules ; c'est la première chose que les gens suppriment en recadrant, et c'est une des premières causes de code illisible. »*
+
+Son générateur, lui, comptait en **pixels**. `margin: 10` par défaut, un curseur d'export de 0 à 30 px, et deux préréglages nommés « Petit · 8 » et « Grand · 20 ». Mesuré sur les charges réelles du produit — lien court, lien de page, domaine du client — aux tailles d'export proposées :
+
+```
+400 px,  marge 10 px (défaut)   →  0,66 à 0,97 module
+400 px,  marge 30 px (maximum)  →  2,2  à 3,3  modules
+400 px,  marge 0 px  (minimum)  →  0    module
+1000 px, marge 10 px            →  0,26 à 0,38 module
+```
+
+**Le produit ne pouvait produire aucun code conforme**, pas même en poussant le curseur à fond. Et plus on exportait grand, pire c'était : la marge était en pixels quand les modules, eux, rétrécissaient.
+
+Passées dans le testeur de QRowg lui-même — ses seuils, sa tolérance —, ces sorties ressortent « **risque · La marge blanche est trop courte** » pour l'export par défaut, et « **bloquant · Le code n'a plus de marge** » pour l'export en 1000 px. Le produit échouait à son propre contrôle, avec ses propres mots.
+
+Le contrôle interne du studio l'écrivait même en toutes lettres : « *minimum 4 modules (10px) requis* ». L'équivalence est fausse — dix pixels font 0,7 module sur un export de 400 px et 0,3 sur un export de 1000.
+
+**`qr-codes/margeQr.ts`** (module pur) compte en modules. Le nombre de modules d'un code se déduit de sa charge et de son niveau de correction par la table des capacités du mode binaire ; cette table n'est pas recopiée de mémoire : la garde la confronte à l'encodeur réellement embarqué, sur les charges du produit et aux quatre niveaux de correction. La marge se calcule alors par inversion — `marge = silence × taille / (modules + 2 × silence)` —, ce que le réglage en pixels ne faisait pas, et c'est précisément pour cela qu'agrandir l'export dégradait la marge au lieu de la conserver.
+
+Le réglage devient « Normale · 4 modules » / « Large · 6 modules », le curseur d'export en pixels ne pilote plus la zone silencieuse, et le diagnostic juge en modules. Un réglage sous la norme est ramené à la norme : on peut demander plus de silence, jamais moins.
+
+**Trouvé en chemin** : `QRStyleConfig` existait en double, dans `QRStudio.tsx` et dans `qrRender.ts` — deux définitions jumelles, donc deux endroits où ajouter un champ. Une seule demeure, celle du renderer, qui est celle que l'export utilise vraiment.
+
+**Vérifié au navigateur** sur l'atelier QR : le canvas rendu en 720 px porte une marge haute de 97 px, soit les quatre modules attendus pour cette charge. L'ancien réglage en donnait dix.
+
+Gardes : `qr-codes/margeQr.test.ts` (8 cas, dont la confrontation de la table à l'encodeur embarqué) et `app/zoneSilencieuse.test.ts` (9 cas : trois charges × cinq tailles passées au verdict du testeur public, la démonstration que l'ancien réglage y échouait, et la disparition du réglage en pixels). Vérifiées par injection : rétablir `o.style.margin ?? 10` fait échouer trois cas.

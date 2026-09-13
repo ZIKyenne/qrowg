@@ -6,7 +6,7 @@ import { diagnostiquer, lireContraste, correctionsAuto, contrasteWcag, type Entr
 // pouvait les atteindre. Extraites, les voici tenues.
 
 const base = (o: Partial<EntreeDiagnostic> = {}): EntreeDiagnostic => ({
-  fg: "#080808", bg: "#FFFFFF", ecc: "M", eccEffectif: "M", style: { margin: 10, dotStyle: "square", gradient: "none" }, ...o,
+  fg: "#080808", bg: "#FFFFFF", ecc: "M", eccEffectif: "M", style: { silence: 6, dotStyle: "square", gradient: "none" }, ...o,
 })
 
 describe("contraste WCAG", () => {
@@ -43,7 +43,7 @@ describe("les fautes qui rendent un QR illisible", () => {
   })
 
   it("logo de 30 % sans correction H : deux critiques", () => {
-    const r = diagnostiquer(base({ style: { margin: 10, logoUrl: "x", logoSize: 30 } }))
+    const r = diagnostiquer(base({ style: { silence: 6, logoUrl: "x", logoSize: 30 } }))
     const ids = r.issues.map(i => i.id)
     expect(ids).toContain("logo-big")
     expect(ids).toContain("ecc-logo")
@@ -51,12 +51,12 @@ describe("les fautes qui rendent un QR illisible", () => {
   })
 
   it("un logo avec correction H ne reproche que sa taille", () => {
-    const r = diagnostiquer(base({ eccEffectif: "H", style: { margin: 10, logoUrl: "x", logoSize: 30 } }))
+    const r = diagnostiquer(base({ eccEffectif: "H", style: { silence: 6, logoUrl: "x", logoSize: 30 } }))
     expect(r.issues.map(i => i.id)).not.toContain("ecc-logo")
   })
 
   it("marge absente : la découverte du QR n'est plus garantie", () => {
-    const r = diagnostiquer(base({ style: { margin: 2 } }))
+    const r = diagnostiquer(base({ style: { silence: 2 } }))
     expect(r.issues.map(i => i.id)).toContain("margin-none")
   })
 
@@ -68,7 +68,7 @@ describe("les fautes qui rendent un QR illisible", () => {
   it("le score ne descend jamais sous zéro, même en cumulant tout", () => {
     const r = diagnostiquer(base({
       fg: "#777777", bg: "#808080", ecc: "L", eccEffectif: "L",
-      style: { margin: 0, logoUrl: "x", logoSize: 30, transparent: true, dotStyle: "neon", gradient: "linear", fg2: "#7A7A7A" },
+      style: { silence: 0, logoUrl: "x", logoSize: 30, transparent: true, dotStyle: "neon", gradient: "linear", fg2: "#7A7A7A" },
     }))
     expect(r.score).toBe(0)
     expect(r.grade).toBe("Risque")
@@ -77,7 +77,7 @@ describe("les fautes qui rendent un QR illisible", () => {
 
 describe("les remarques qui ne sont pas des fautes", () => {
   it("un style Néon avertit, mais ne se corrige pas tout seul", () => {
-    const r = diagnostiquer(base({ style: { margin: 10, dotStyle: "neon" } }))
+    const r = diagnostiquer(base({ style: { silence: 6, dotStyle: "neon" } }))
     const i = r.issues.find(x => x.id === "style-complex")!
     expect(i.severity).toBe("warning")
     expect(i.fixable).toBe(false)
@@ -89,14 +89,15 @@ describe("la correction automatique répare ce qu'elle signale", () => {
   it("un QR catastrophique redevient sain en une passe", () => {
     const e = base({
       fg: "#777777", bg: "#808080", ecc: "L", eccEffectif: "L",
-      style: { margin: 2, logoUrl: "x", logoSize: 30, transparent: true, gradient: "linear", fg2: "#7A7A7A" },
+      style: { silence: 2, logoUrl: "x", logoSize: 30, transparent: true, gradient: "linear", fg2: "#7A7A7A" },
     })
     const c = correctionsAuto(diagnostiquer(e), e)
     expect(c.fg).toBe("#080808"); expect(c.bg).toBe("#FFFFFF")
     expect(c.ecc).toBe("H")
     expect(c.style.logoSize).toBe(20)
     expect(c.style.transparent).toBe(false)
-    expect(c.style.margin).toBe(12)
+    // Lot v75 : la marge se compte en modules, plus en pixels.
+    expect(c.style.silence).toBe(6)
     expect(c.style.gradient).toBe("none")
 
     // Et le résultat corrigé ne se plaint plus de rien de corrigeable.

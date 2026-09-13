@@ -74,24 +74,11 @@ interface Props {
 }
 
 // -- QR Style Config type -----------------------------------------------------
-export type QRStyleConfig = {
-  fg2?:          string    // couleur secondaire (degrade)
-  cornerColor?:  string    // couleur des coins
-  eyeColor?:     string    // couleur des yeux (centres)
-  transparent?:  boolean   // fond transparent
-  gradient?:     "none"|"linear"|"radial"|"diagonal"
-  gradientBg?:   string    // couleur fin de degrade fond
-  dotStyle?:     "square"|"rounded"|"dot"|"softSquare"|"pixel"|"minimal"|"neon"|"luxury"
-  cornerStyle?:  "square"|"rounded"|"circle"|"diamond"|"luxury"|"minimal"
-  margin?:       number    // 0-30
-  density?:      "low"|"medium"|"high"
-  logoUrl?:      string    // data URL ou URL Supabase
-  logoSize?:     number    // % du QR, 10-30, defaut 18
-  logoShape?:    "square"|"rounded"|"circle"
-  logoBg?:       "transparent"|"white"|"black"|"custom"
-  logoBgColor?:  string
-  logoPadding?:  number    // px, 0-12, defaut 4
-}
+// Le type du style vivait ici ET dans qrRender.ts — deux définitions jumelles,
+// donc deux endroits où ajouter un champ. Une seule désormais : celle du
+// renderer, qui est celle que l'export utilise vraiment.
+export type { QRStyleConfig } from "./qrRender"
+import type { QRStyleConfig } from "./qrRender"
 
 export const DOT_STYLES: { id: QRStyleConfig["dotStyle"]; label: string; emoji: string }[] = [
   { id:"square",     label:"Classique",    emoji:"⬛" },
@@ -125,7 +112,7 @@ export const GRADIENT_OPTS: { id: QRStyleConfig["gradient"]; label: string }[] =
 export const DEFAULT_STYLE: QRStyleConfig = {
   fg2: "", cornerColor: "", eyeColor: "", transparent: false,
   gradient: "none", gradientBg: "", dotStyle: "square",
-  cornerStyle: "square", margin: 10, density: "medium",
+  cornerStyle: "square", silence: 4, density: "medium",
   logoUrl: "", logoSize: 18, logoShape: "rounded",
   logoBg: "white", logoBgColor: "#FFFFFF", logoPadding: 4,
 }
@@ -808,7 +795,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       const isTransparent = expFormat === "png-t"
       const opts: QROptions = {
         data: qrUrl, fg, bg, ecc: effectiveEcc,
-        style: { ...renderStyle, transparent: isTransparent || renderStyle.transparent, margin: expMargin },
+        // La zone silencieuse suit la norme (modules) et non un réglage en pixels :
+        // `expMargin` ne la pilote plus (relevé du 13 septembre, voir margeQr.ts).
+        style: { ...renderStyle, transparent: isTransparent || renderStyle.transparent },
         size: px,
       }
 
@@ -932,7 +921,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       gradientBg:   preset.gradientBg ?? "",
       dotStyle:     (preset.dotStyle as any) ?? "square",
       cornerStyle:  (preset.cornerStyle as any) ?? "square",
-      ...(preset.margin  !== undefined ? { margin: preset.margin }   : {}),
+      // Les préréglages portaient une marge en pixels : on ne la reprend plus.
+      ...(preset.silence !== undefined ? { silence: preset.silence } : {}),
       ...(preset.density !== undefined ? { density: preset.density } : {}),
       ...(preset.transparent !== undefined ? { transparent: preset.transparent } : {}),
     }))
@@ -2560,10 +2550,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   <div>
                     <p style={{ color:MUTED, fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 7px" }}>Marge (zone silencieuse)</p>
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
-                      {([["Petit",8],["Grand",20]] as const).map(([lbl,val]) => {
-                        const on = (styleConf.margin ?? 10) <= 12 ? val === 8 : val === 20
+                      {([["Normale · 4 modules",4],["Large · 6 modules",6]] as const).map(([lbl,val]) => {
+                        const on = (styleConf.silence ?? 4) <= 5 ? val === 4 : val === 6
                         return (
-                          <button key={lbl} type="button" onClick={() => setStyleConf(p => ({ ...p, margin: val }))}
+                          <button key={lbl} type="button" onClick={() => setStyleConf(p => ({ ...p, silence: val }))}
                             style={{ padding:"10px 8px", background:on?"color-mix(in srgb, var(--accent) 12%, transparent)":"rgba(255,255,255,0.02)", border:`1px solid ${on?"color-mix(in srgb, var(--accent) 40%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:9, color:on?G:"var(--ink)", fontSize:12, fontWeight:on?700:500, cursor:"pointer" }}>
                             {lbl}
                           </button>

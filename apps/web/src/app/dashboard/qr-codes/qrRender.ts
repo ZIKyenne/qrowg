@@ -6,6 +6,7 @@
 // =============================================================================
 
 import QRCodeStyling from "qr-code-styling"
+import { margePourCharge, MODULES_SILENCE, type Ecc } from "./margeQr"
 import type {
   DotType, CornerSquareType, CornerDotType, GradientType,
 } from "qr-code-styling"
@@ -20,6 +21,8 @@ export type QRStyleConfig = {
   dotStyle?:     "square" | "rounded" | "dot" | "softSquare" | "pixel" | "minimal" | "neon" | "luxury"
   cornerStyle?:  "square" | "rounded" | "circle" | "diamond" | "luxury" | "minimal"
   margin?:       number
+  /** Zone silencieuse, en MODULES (norme : 4). Remplace `margin`, qui était en pixels. */
+  silence?:      number
   density?:      "low" | "medium" | "high"
   logoUrl?:      string
   logoSize?:     number
@@ -75,7 +78,12 @@ export function mapCornerDotType(s?: string): CornerDotType {
 // (ne construit aucune instance, aucun canvas requis).
 export function buildOptions(o: QROptions): any {
   const size   = o.size ?? 400
-  const margin = o.style.margin ?? 10
+  // La marge ne se compte pas en pixels : la norme la demande en MODULES, et le
+  // testeur public de QRowg la vérifie ainsi. En pixels, l'export par défaut
+  // donnait 0,66 à 0,97 module — et se dégradait en agrandissant l'image
+  // (relevé du 13 septembre, voir margeQr.ts).
+  const silence = Math.max(MODULES_SILENCE, o.style.silence ?? MODULES_SILENCE)
+  const margin = margePourCharge(size, o.data || "https://qrowg.com", (o.ecc as Ecc) ?? "M", silence)
 
   const hasGrad  = !!(o.style.gradient && o.style.gradient !== "none" && o.style.fg2)
   const gradType: GradientType = o.style.gradient === "radial" ? "radial" : "linear"

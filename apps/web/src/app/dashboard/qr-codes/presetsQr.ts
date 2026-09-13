@@ -21,6 +21,8 @@ export type Preset = {
   cornerStyle?: string
   ecc?:     "L"|"M"|"Q"|"H"
   margin?:  number
+  /** Zone silencieuse en MODULES (norme : 4). */
+  silence?: number
   density?: "low"|"medium"|"high"
   transparent?: boolean
   plan:     string
