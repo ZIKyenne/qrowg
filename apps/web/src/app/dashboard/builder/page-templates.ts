@@ -2,6 +2,7 @@
 // Appliqué depuis le builder : pose un thème cohérent + un jeu de blocs prêts à personnaliser.
 // N'utilise QUE des types de blocs existants et des clés de contenu réelles (mêmes clés que le rendu).
 import type { PageTheme } from "./types"
+import { avecMoyenDeJoindre } from "./blocJoindre"
 import { STUDIO_TEMPLATES, STUDIO_THEMES } from "./templatesStudio"
 
 export type PageTemplate = {
@@ -35,7 +36,7 @@ const T = {
 // Petits helpers de contenu récurrents.
 const social = (extra: Record<string, string> = {}) => ({ instagram: "https://instagram.com", ...extra })
 
-export const PAGE_TEMPLATES: PageTemplate[] = [
+const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
   // ── Restauration ────────────────────────────────────────────────────────────
   {
     key: "resto_bistrot", group: "Restauration", label: "Bistrot français", emoji: "🍽️",
@@ -344,6 +345,15 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     ],
   },
 ]
+
+// Relevé du 12 septembre : 43 modèles sur 48 ne contenaient AUCUN bloc pour
+// joindre le commerce — ni appel, ni e-mail, ni formulaire. `studio_gastro`
+// alignait dix-huit blocs sans permettre d'appeler le restaurant. Et comme
+// l'assistant dérive ses questions des blocs PRÉSENTS, le numéro n'était même
+// jamais demandé. La règle vaut pour tout modèle, y compris ceux à venir :
+// une place pour appeler, sans numéro inventé (voir blocJoindre.ts).
+export const PAGE_TEMPLATES: PageTemplate[] = PAGE_TEMPLATES_ECRITS.map(t => ({ ...t, blocks: avecMoyenDeJoindre(t.blocks as any) as any }))
+
 
 // Modèles « nouvelle génération » (templatesStudio.ts) : bâtis sur les blocs de création
 // libre, avec leurs thèmes sur mesure. Concaténés ici pour qu'ils alimentent d'un coup le

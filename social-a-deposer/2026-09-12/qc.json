@@ -1,0 +1,118 @@
+{
+  "total": 16,
+  "avec_alerte": 0,
+  "details": [
+    {
+      "fichier": "qr-code-abonnement-midi-habitues-food-truck.png",
+      "fond_sombre_pct": 90.3,
+      "or_pct": 4.1,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260912-bar&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-dossier-de-location-prerempli-immobilier.png",
+      "fond_sombre_pct": 90.0,
+      "or_pct": 4.8,
+      "qr": "https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260912-bar&utm_content=clic&utm_term=location",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-origine-des-produits-fiche-plat-restaurant.png",
+      "fond_sombre_pct": 91.1,
+      "or_pct": 4.3,
+      "qr": "https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260912-bar&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-soiree-quiz-feuilles-de-score-bar-01.png",
+      "fond_sombre_pct": 93.6,
+      "or_pct": 1.2,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-soiree-quiz-feuilles-de-score-bar-02.png",
+      "fond_sombre_pct": 93.1,
+      "or_pct": 1.0,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-soiree-quiz-feuilles-de-score-bar-03.png",
+      "fond_sombre_pct": 86.3,
+      "or_pct": 9.2,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_medium=carrousel&utm_campaign=20260912-bar",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-soiree-quiz-feuilles-de-score-bar-04.png",
+      "fond_sombre_pct": 93.1,
+      "or_pct": 1.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-soiree-quiz-feuilles-de-score-bar-05.png",
+      "fond_sombre_pct": 87.6,
+      "or_pct": 0.6,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-soiree-quiz-feuilles-de-score-bar-06.png",
+      "fond_sombre_pct": 84.7,
+      "or_pct": 6.8,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_medium=carrousel&utm_campaign=20260912-bar",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-tournee-livraison-entreprises-boulangerie.png",
+      "fond_sombre_pct": 89.1,
+      "or_pct": 5.6,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260912-bar&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-soiree-quiz-feuilles-de-score-bar-01.png",
+      "fond_sombre_pct": 93.6,
+      "or_pct": 1.2,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-soiree-quiz-feuilles-de-score-bar-02.png",
+      "fond_sombre_pct": 93.1,
+      "or_pct": 1.0,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-soiree-quiz-feuilles-de-score-bar-03.png",
+      "fond_sombre_pct": 86.3,
+      "or_pct": 9.3,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_medium=carrousel&utm_campaign=20260912-bar",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-soiree-quiz-feuilles-de-score-bar-04.png",
+      "fond_sombre_pct": 93.1,
+      "or_pct": 1.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-soiree-quiz-feuilles-de-score-bar-05.png",
+      "fond_sombre_pct": 87.6,
+      "or_pct": 0.6,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-soiree-quiz-feuilles-de-score-bar-06.png",
+      "fond_sombre_pct": 84.7,
+      "or_pct": 6.8,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_medium=carrousel&utm_campaign=20260912-bar",
+      "alertes": []
+    }
+  ]
+}

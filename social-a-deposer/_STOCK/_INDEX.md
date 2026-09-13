@@ -361,3 +361,57 @@ Les quatre titres, descriptions (toutes ≤ 500 caractères) et tableaux sont da
 > Les 16 visuels du jour (6 slides + 6 copies TikTok + 4 épingles) tiennent dans la file
 > (10 places libres) : **rien ne part au stock aujourd'hui**.
 > Le reel de 32,2 s est **manuel** et n'entre jamais en réserve.
+
+---
+
+## 12/09 — production du jour · réserve VIDE au démarrage
+
+> Aucun contenu en statut `dispo` au démarrage : rien à réinjecter, production 100 % neuve.
+> Les 16 visuels du jour (6 slides + 6 copies TikTok + 4 épingles) tiennent dans la file
+> (9 places libres, 6 posts à programmer) : **rien ne part au stock aujourd'hui**.
+> Le reel de 32,2 s est **manuel** et n'entre jamais en réserve.
+> **Dépôt fait et file remplie** : 16 images déposées, puis **6 posts mis en file**
+> (TikTok 15 h 39 · Pinterest restaurant 16 h 11 · Pinterest boulangerie 17 h 27 ·
+> Instagram 20 h 40 · Pinterest food truck 21 h 29 · Pinterest immobilier 13/09 10 h 26).
+> Le stock repasse à **vide** (`en-file` partout).
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| en-file | qr-code-soiree-quiz-feuilles-de-score-bar-01..06.png | Instagram (carrousel) | — | bar · soirée quiz · les feuilles de score comptées à la main en plein service | https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=bio&utm_campaign=20260912-bar | 2026-09-12 |
+| en-file | tiktok-qr-code-soiree-quiz-feuilles-de-score-bar-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 | https://qrowg.com/qr-code/restaurant?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260912-bar | 2026-09-12 |
+| en-file | qr-code-origine-des-produits-fiche-plat-restaurant.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 0 | restaurant · origine des produits · le serveur improvise la réponse | https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260912-bar&utm_content=clic | 2026-09-12 |
+| en-file | qr-code-tournee-livraison-entreprises-boulangerie.png | Pinterest | QR code boutique commerce (726416683586817655) — gabarit 1 | boulangerie · tournée de livraison aux entreprises · cinquante salariés à côté, zéro commande | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260912-bar&utm_content=clic | 2026-09-12 |
+| en-file | qr-code-abonnement-midi-habitues-food-truck.png | Pinterest | QR code food truck (726416683586817654) — gabarit 2 | food truck · formule des habitués · trois midis par semaine et toujours la même file | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260912-bar&utm_content=clic | 2026-09-12 |
+| en-file | qr-code-dossier-de-location-prerempli-immobilier.png | Pinterest | QR code immobilier (726416683586817652) — gabarit 3 — *unique épingle hors-food* | immobilier · dossier de location prérempli · douze visites, douze dossiers incomplets | https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260912-bar&utm_content=clic&utm_term=location | 2026-09-12 |
+
+> La vidéo `qr-code-soiree-quiz-feuilles-de-score-bar-reel.mp4` (32,2 s, 1080×1920) reste
+> **manuelle** et n'entre jamais dans ce circuit. La planche-contact `.sheet.png` est
+> archivée dans `2026-09-12\_controle\` et **exclue du dossier de dépôt**.
+
+## Textes prêts — 12/09
+
+Légendes complètes (Instagram, TikTok, Pinterest ×4, X, reel) avec bouton Copier :
+`social-a-deposer\2026-09-12\textes-du-jour-2026-09-12.html`.
+Bios : `social-a-deposer\2026-09-12\bios-du-jour-2026-09-12.html`.
+Pas de post LinkedIn aujourd'hui (LinkedIn = lundi → vendredi).
+Résumé des titres et tableaux Pinterest :
+
+### qr-code-origine-des-produits-fiche-plat-restaurant
+**Titre Pinterest** : Origine des produits : la fiche à faire en 4 étapes
+**Tableau** : QR code restaurant
+`#restaurant #producteurlocal #cartedujour #commercelocal`
+
+### qr-code-tournee-livraison-entreprises-boulangerie
+**Titre Pinterest** : Livraison aux entreprises : la page à monter en 5 minutes
+**Tableau** : QR code boutique commerce
+`#boulangerie #livraison #entreprise #commercelocal`
+
+### qr-code-abonnement-midi-habitues-food-truck
+**Titre Pinterest** : Formule des habitués : la créer en 4 étapes, sans carte bancaire
+**Tableau** : QR code food truck
+`#foodtruck #streetfood #pausedejeuner #commercelocal`
+
+### qr-code-dossier-de-location-prerempli-immobilier
+**Titre Pinterest** : Dossier de location : la page à créer en 4 étapes
+**Tableau** : QR code immobilier — unique épingle hors-food
+`#immobilier #location #agentimmobilier #qrcode`

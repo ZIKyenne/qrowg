@@ -14,6 +14,7 @@
 // rendu, aucun accès réseau. Ajouter un modèle = ajouter un objet ici.
 
 import type { PageTheme } from "./types"
+import { avecMoyenDeJoindre } from "./blocJoindre"
 import { isLightTheme } from "./shared-renderer/models/layoutStyle"
 import type { PageTemplate } from "./page-templates"
 import { sectorArt, sectorArtImages, mixHex, type SectorArt } from "./templateArt"
@@ -145,7 +146,7 @@ const shape = (color: string, s = "Vague", height = "48") => ({
 const anchor = (name: string) => ({ type: "anchor_target", content: { name, offset: "18" } })
 
 // ── Modèles ─────────────────────────────────────────────────────────────────
-export const STUDIO_TEMPLATES: PageTemplate[] = [
+const STUDIO_TEMPLATES_ECRITS: PageTemplate[] = [
   // ══ Restauration ══════════════════════════════════════════════════════════
   {
     key: "studio_gastro", group: "Restauration", label: "Table gastronomique", emoji: "🍷",
@@ -882,3 +883,12 @@ export const STUDIO_TEMPLATES: PageTemplate[] = [
     ],
   },
 ]
+
+// Relevé du 12 septembre : 43 modèles sur 48 ne contenaient AUCUN bloc pour
+// joindre le commerce — ni appel, ni e-mail, ni formulaire. `studio_gastro`
+// alignait dix-huit blocs sans permettre d'appeler le restaurant. Et comme
+// l'assistant dérive ses questions des blocs PRÉSENTS, le numéro n'était même
+// jamais demandé. La règle vaut pour tout modèle, y compris ceux à venir :
+// une place pour appeler, sans numéro inventé (voir blocJoindre.ts).
+export const STUDIO_TEMPLATES: PageTemplate[] = STUDIO_TEMPLATES_ECRITS.map(t => ({ ...t, blocks: avecMoyenDeJoindre(t.blocks as any) as any }))
+

@@ -1,0 +1,32 @@
+{
+  "format": "reel",
+  "fps": 30,
+  "scrim": 0.74,
+  "progress": true,
+  "maxDuration": 36,
+  "brand": { "handle": "@qrowg", "logo": true },
+  "motion": { "effect": "drift", "palette": "or", "density": 1400, "speed": 1.0, "seed": 12 },
+  "scenes": [
+    { "dur": 4.6, "kicker": "QROWG", "align": "center", "titleSize": 110,
+      "title": "Tu comptes.\nEn plein service.",
+      "motion": { "effect": "vortex" } },
+    { "dur": 4.6, "title": "Vingt équipes.",
+      "sub": "Vingt feuilles, et un stylo qui fuit.",
+      "motion": { "effect": "maze", "speed": 1.1 } },
+    { "dur": 4.6, "title": "Le total ne tombe jamais.",
+      "sub": "On le refait deux fois. Personne n'est d'accord.",
+      "motion": { "effect": "cascade" } },
+    { "dur": 4.6, "title": "Un QR sur la table.",
+      "sub": "Les équipes s'inscrivent et suivent leur score.",
+      "motion": { "effect": "laser", "speed": 1.25 } },
+    { "dur": 4.6, "title": "Jeudi prochain, autre manche.",
+      "sub": "Tu changes la page en cinq minutes.",
+      "motion": { "effect": "mosaic" } },
+    { "dur": 4.6, "title": "Le sous-bock ne bouge plus.",
+      "sub": "Et chaque scan dit combien d'équipes ont joué.",
+      "motion": { "effect": "equalizer" } },
+    { "dur": 4.6, "align": "center", "title": "Crée ta page quiz",
+      "cta": "qrowg.com",
+      "motion": { "effect": "share" } }
+  ]
+}

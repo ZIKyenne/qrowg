@@ -229,17 +229,21 @@ doublons réels, à supprimer côté Instagram :
 | Commerce | Horaires exceptionnels affichés en vitrine | 11/09 |
 | Food truck | Fiche « où se garer » pour les entreprises | 11/09 |
 | Immobilier | Panneau « à vendre » qui montre l'intérieur | 11/09 |
+| Bar | Soirée quiz : feuilles de score et comptage à la main (carrousel + reel) | 12/09 |
+| Restaurant | Origine des produits / fiche « d'où vient ce plat » | 12/09 |
+| Boulangerie | Tournée de livraison aux entreprises | 12/09 |
+| Food truck | Formule / abonnement midi des habitués | 12/09 |
+| Immobilier | Dossier de location prérempli | 12/09 |
 
 ## Angles NEUFS disponibles (piocher ici en priorité)
 - Restaurant : plat à emporter du soir · anniversaire / privatisation ·
   fiche « d'où vient ce plat » (producteurs) · le menu de Noël réservé dès novembre ·
   le vestiaire et les objets oubliés · la table dressée pour un anniversaire ·
   le brunch du dimanche sur réservation.
-- Bar : quiz / jeu de table ·
-  happy hour qui change selon l'heure · la carte des bières de saison ·
+- Bar : happy hour qui change selon l'heure · la carte des bières de saison ·
   la privatisation de l'arrière-salle · la carte des softs travaillés pour le conducteur.
 - Boulangerie : commande de galette / bûche selon la saison · liste d'allergènes ·
-  les farines et provenances affichées · la tournée de livraison aux entreprises.
+  les farines et provenances affichées.
 - Food truck : le camion en tournée de festival (dates et scène) ·
   la carte allergènes du camion · l'abonnement midi des habitués.
 - Marché / producteur : la vente à la ferme hors marché ·
@@ -252,7 +256,13 @@ doublons réels, à supprimer côté Instagram :
   la fiche « ce qu'on a fait sur tes cheveux » remise en fin de rendez-vous ·
   les produits utilisés, référencés et rachetables.
 - Immobilier : les diagnostics et le plan sur le panneau · la visite virtuelle depuis la vitrine
-  de l'agence · le dossier de location prérempli.
+  de l'agence.
+- **Angles neufs ajoutés le 12/09 (remplacent ceux consommés)** : Bar · le tableau des
+  scores de la ligue de fléchettes tenu à jour · la carte des digestifs et cafés d'après-repas.
+  Restaurant · la fiche « qui cuisine ce soir » (l'équipe en salle et en cuisine).
+  Boulangerie · le pain de la veille à prix réduit annoncé le matin.
+  Food truck · le calendrier des fermetures et congés. Immobilier · le récapitulatif des
+  charges et taxes du bien. Commerce · la garantie et la notice archivées après l'achat.
 - Transverse : « ton QR imprimé en 2024 marche encore » (QR dynamique) ·
   le plafond souple (la page ne se coupe pas) · QR statique vs dynamique en 20 s ·
   ce que ton support papier ne te dit pas (mesure) · un support, une page, un chiffre.
@@ -352,6 +362,11 @@ doublons réels, à supprimer côté Instagram :
 - « Le match est à 21 h. Personne ne le sait. »
 - « Le gâteau se commande. Pas au téléphone à 8 h. »
 - « Une annulation à 14 h. Un fauteuil vide à 15 h. »
+- « Tu comptes les points à la main. En plein service. »
+- « "C'est d'où, la viande ?" Le serveur improvise. »
+- « Cinquante salariés à côté. Zéro commande. »
+- « Trois midis par semaine. Et toujours la même file. »
+- « Douze visites. Douze dossiers incomplets. »
 
 | 05/09 | commerce / boutique (100 % inédit) | qr-code-stock-disponible-magasin-boutique (carrousel IG + TikTok + reel 32,2 s), qr-code-retours-garantie-ticket-caisse-boutique, qr-code-carte-sandwichs-du-midi-boulangerie, qr-code-carte-bieres-pression-du-moment-bar | Pinterest, IG, TikTok, X |
 
@@ -910,3 +925,86 @@ jour sont tous entrés). Dimensions confirmées côté Buffer : TikTok en 1080×
 plafond de 2 073 600 px), Instagram en 2160×2700, épingles en 2000×3000.
 Mention « contenu généré par IA » posée sur Instagram ; **non envoyée** sur le carrousel photo
 TikTok (l'API la refuse sur ce format).
+
+| 12/09 | bar · soirée quiz (100 % inédit) | qr-code-soiree-quiz-feuilles-de-score-bar (carrousel IG + TikTok + reel 32,2 s), qr-code-origine-des-produits-fiche-plat-restaurant, qr-code-tournee-livraison-entreprises-boulangerie, qr-code-abonnement-midi-habitues-food-truck, qr-code-dossier-de-location-prerempli-immobilier | Pinterest, IG, TikTok, X |
+
+> **Note 12/09 — file Buffer trouvée à 1/10**, 9 places libres. Réserve `_STOCK` **vide**
+> au démarrage (aucun `dispo`) : production 100 % neuve, zéro doublon contrôlé contre ce
+> journal et contre les 30 derniers posts Buffer.
+> Secteur du jour : **bar · la soirée quiz**, angle jamais traité. Rotation respectée
+> (11/09 = marché/producteur). Samedi = jour vidéo **et** jour X ; pas de LinkedIn.
+> 4 épingles, **4 angles distincts**, **4 gabarits distincts (layouts 0, 1, 2, 3)** et
+> **4 tableaux distincts** — QR code restaurant, QR code boutique commerce, QR code food
+> truck, QR code immobilier. Pont d'audience tenu : une seule épingle hors-food
+> (immobilier · dossier de location).
+> **Contrôle qualité : 16 visuels, 0 alerte.** Contrôle QR refait indépendamment
+> (décodage OpenCV multi-échelle contre `attendus.json`) : **8 visuels porteurs de QR,
+> 8 décodés vers l'URL attendue exacte, 0 écart**. URL du carrousel à **83 caractères**
+> (règle des ~100 du 11/09 respectée). Revue à l'œil : couverture, slide CTA et les
+> 4 gabarits d'épingle propres, modules sombres sur plaque or, flèches non orphelinées.
+>
+> **Vidéo Motion 32,2 s** (ffprobe), 1080×1920, 7 scènes, **7 moteurs différents**
+> (orbit · rain · swarm · focus · ripple · radar · bloom), palette `or`, `scrim: 0,82`,
+> `maxDuration: 36` (validateur actif, seul l'avertissement de durée). **À publier à la main.**
+>
+> **⚠️ Correctif du jour : la palette `or` contient du turquoise.** Premier jet rendu avec
+> `maze`, `mosaic` et `equalizer` : la planche-contact est sortie **massivement turquoise**,
+> hors charte noir/or. Cause trouvée dans `qrowg-motion.js` — `PALETTES.or` vaut
+> `[gold, orange, turq, gold clair, gold]` : le **turquoise est natif de la palette**. Les
+> moteurs à **grille** (maze, mosaic, equalizer, typegrid, lattice) échantillonnent toute la
+> palette sur des centaines de cellules et exposent donc le turquoise en grand ; les moteurs
+> à **particules** (orbit, rain, swarm, ripple, radar, bloom, drift, starfield) n'en montrent
+> que des points isolés.
+> **Règle ajoutée : sur palette `or`, éviter les moteurs à grille.** Préférer les moteurs à
+> particules, et **toujours regarder la planche-contact avant le rendu** — c'est elle qui a
+> attrapé l'écart. `scrim` monté de 0,74 à 0,82 dans la foulée pour la lisibilité des sous-titres.
+>
+> **⚠️ Doublon auto-recréé, TOUJOURS EN FILE — à traiter à la main.** Post Buffer
+> `6aa436077caf1cf172b98393` : Pinterest, programmé le **12/09 à 14 h 40 UTC**, créé le
+> 11/09 à 17 h 10 hors run. Il porte la **légende Instagram du 11/09** (marché · recette du
+> produit de saison) collée sur la **couverture du carrousel** `...-01.png` en 2160×2700 —
+> contenu déjà publié le 11/09 sur Pinterest **et** sur Instagram (`/p/DdKJhKRm8bc/`).
+> Le phénomène de re-création automatique noté les 10 et 11/09 **se reproduit donc chaque nuit**.
+> Tentative de bascule en brouillon **refusée par le garde-fou d'écriture** de la session :
+> **à passer en brouillon ou à supprimer à la main dans Buffer.**
+>
+> **Apprentissage Buffer.** TikTok reste le seul canal réellement distribué, mais le
+> visionnage moyen **s'érode quatre jours de suite** : 9,68 s le 09/09 (bar · cocktails,
+> 2 réactions, 1 partage, 1,18 % d'engagement) → 3,80 s le 10/09 → **3,65 s le 11/09**,
+> à volume de vues stable (254 → 268 → 257). Le pic du 09/09 tenait au **sujet bar**, pas
+> au format : d'où le retour au bar aujourd'hui, avec un angle neuf (la soirée quiz).
+> Instagram : toujours **0 vue, 0 reach** sur tous les carrousels — problème d'audience,
+> pas de publication. Pinterest : ne pas lire les impressions dans Buffer (défaut de
+> reporting établi le 08/09), la vérité est dans Pinterest Analytics natif.
+>
+> **DÉPÔT FAIT ET FILE REMPLIE — run clos.** Emilien a lancé `QRowg-Depot.cmd` : **16 images
+> déposées** sous `social/2026-09-12/`, vidéo isolée automatiquement vers
+> `QRowg-Videos-a-publier\2026-09-12\`. Puis **6 posts mis en file**, aucun en erreur,
+> dans l'ordre prescrit :
+>
+> | heure UTC | canal | contenu | tableau |
+> |---|---|---|---|
+> | 15 h 39 | TikTok | carrousel photo, copies `tiktok-` 1080×1350 | — |
+> | 16 h 11 | Pinterest | épingle restaurant · origine des produits | QR code restaurant |
+> | 17 h 27 | Pinterest | épingle boulangerie · livraison aux entreprises | QR code boutique commerce |
+> | 20 h 40 | Instagram | carrousel 6 slides 2160×2700 | — |
+> | 21 h 29 | Pinterest | épingle food truck · formule des habitués | QR code food truck |
+> | 13/09 10 h 26 | Pinterest | épingle immobilier · dossier de location | QR code immobilier |
+>
+> Dimensions confirmées côté Buffer : TikTok **1080×1350** (sous le plafond de 2 073 600 px),
+> Instagram **2160×2700**, épingles **2000×3000**. Mention « contenu généré par IA » posée sur
+> Instagram ; **non envoyée** sur le carrousel photo TikTok (l'API la refuse sur ce format).
+> **File à 7/10** en comptant le doublon auto-recréé resté programmé ; **6/10** une fois
+> celui-ci supprimé. Réserve `_STOCK` **vide** : les 6 posts du jour sont tous entrés,
+> rien n'a eu à partir au stock.
+>
+> **Incident de mise en file :** la première tentative de création de l'épingle restaurant a
+> renvoyé un **504 (timeout 30 s)**. Contrôle fait avant de relancer (`list_posts` sur le canal
+> Pinterest) : **le post n'avait pas été créé**. Relance propre, aucun doublon produit.
+> *Règle : après un 504 sur un `create_post`, toujours vérifier la file avant de réessayer.*
+>
+> **Post Instagram en `error` du 11/09 — NON rejoué** (règle du 09/09 appliquée) :
+> `6aa3dd3a5a67efa86a9733d1`, carrousel « recette du produit de saison », rejeté
+> « flagged as potential spam ». Contrôle `sent` + `externalLink` : le post
+> `6aa4a3efe57597c26e5a339d` est parti le 11/09 à 19 h 20 et **est en ligne**
+> (`/p/DdKJhKRm8bc/`). Laissé en `error`, à supprimer à la main.

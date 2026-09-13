@@ -315,3 +315,26 @@ Le commerçant ajoutait « Appeler » depuis la bibliothèque, voyait le bouton 
 **Ce que ce lot ne fait pas** : il n'ajoute aucune action aux pages de démonstration. Elles restent à 19 sur 34 sans action au premier écran, et c'est normal — leurs destinations sont vides depuis le lot v64, volontairement. Ce qui change, c'est que le commerçant l'apprend dans son éditeur, avant de publier, au lieu de le découvrir en ligne.
 
 Gardes : `app/actionsPubliees.test.ts` (6 cas, dont celui qui **ferme la classe** : tout bloc du rendu public pouvant ne rien rendre doit être déclaré dans la doctrine), plus les cas ajoutés aux gardes existantes de l'état vide. Vérifiées par injection : retirer un des treize, ou rendre le détecteur d'intégration aveugle à l'hôte, fait échouer la garde.
+
+
+## Lot v73 — on ne pouvait pas joindre le commerce
+
+Le lot précédent a mesuré que 19 pages de démonstration sur 34 n'offraient aucune action à celui qui vient de scanner, et a fait annoncer les blocs vides dans l'éditeur. Restait la question de fond : pourquoi si peu d'actions ? En comptant les blocs des 48 modèles (34 de la galerie, 14 du studio) :
+
+> **43 modèles sur 48 ne contenaient aucun bloc pour joindre le commerce.**
+
+Ni bouton d'appel, ni e-mail, ni WhatsApp, ni formulaire de contact. `studio_gastro` aligne **dix-huit blocs** et aucun ne permet d'appeler le restaurant. Ce n'est pas un champ laissé vide : le bloc n'est pas dans le modèle.
+
+**Et l'effet se propageait.** L'assistant de modèle dérive ses questions des blocs **présents** — c'est ce qui fait sa justesse. Pas de bouton d'appel dans le modèle, donc aucune question sur le téléphone : le commerçant répondait à dix-sept questions (le nom, la phrase, l'adresse, les horaires, la carte, les avis, les réseaux…), publiait, et son client ne pouvait pas l'appeler. **Personne ne lui avait jamais demandé son numéro.**
+
+**Le correctif**, dans `builder/blocJoindre.ts` (module pur) : un modèle qui n'offre aucun moyen de joindre le commerce reçoit un bouton d'appel, placé juste après les blocs d'identité — on sait chez qui on est avant qu'on propose d'appeler. Il arrive avec son libellé et **sans numéro**, conformément à la doctrine du lot v63 : on donne la place et le titre, jamais l'affirmation.
+
+La règle s'applique **à l'export**, pas modèle par modèle : `PAGE_TEMPLATES` et `STUDIO_TEMPLATES` passent par `avecMoyenDeJoindre`. Un modèle écrit demain entrera par la même porte. Les cinq modèles qui offraient déjà un moyen de contact ne sont pas touchés — pas de doublon.
+
+**Ce que cela déclenche tout seul.** Le bloc étant là, l'assistant pose enfin la question : « Bistrot français » demande désormais « Votre numéro de téléphone », entre l'adresse et le site internet. Si le commerçant répond, le bouton est réel et la page publiée porte un vrai lien d'appel — vérifié bout en bout dans la garde. S'il ne répond pas, le lot v72 le lui annonce dans l'éditeur (« Ajoutez le numéro à appeler », « invisible en ligne tant qu'il est vide ») et dans la liste d'avant publication.
+
+**Ce que ce lot ne change pas** : les pages de démonstration n'affichent toujours pas de bouton d'appel, puisque leur numéro est vide — c'est exactement le comportement voulu. Vérifié au navigateur : la place existe, le bouton n'apparaît pas sans numéro.
+
+Mesuré après : **0 modèle sur 48** sans moyen de joindre le commerce.
+
+Gardes : `builder/blocJoindre.test.ts` (6 cas sur la règle, dont la copie du contenu par modèle) et `app/joindreLeCommerce.test.ts` (9 cas : la couverture des 48, le passage par l'export, la place haute, l'absence de numéro inventé, la question de l'assistant sur tout modèle concerné, le bout en bout, et l'absence de doublon). Vérifiées par injection : retirer le passage par l'export, ou mettre un numéro dans le bloc, fait échouer sept cas.

@@ -1,0 +1,88 @@
+{
+  "carousels": [
+    {
+      "slug": "qr-code-soiree-quiz-feuilles-de-score-bar",
+      "sector": "bar",
+      "url": "https://qrowg.com/qr-code/restaurant?utm_medium=carrousel&utm_campaign=20260912-bar",
+      "slides": [
+        {
+          "kind": "cover",
+          "tag": "Bar · soirée quiz",
+          "title": "Tu comptes les points à la main. En plein [[service]].",
+          "body": "Vingt équipes, vingt feuilles, un stylo qui fuit."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le problème",
+          "title": "La soirée quiz tient sur du [[papier]].",
+          "body": "Questions photocopiées, réponses raturées, total refait deux fois parce que personne n'est d'accord."
+        },
+        {
+          "kind": "qr",
+          "kicker": "Sur la table",
+          "title": "Un QR, et les équipes [[jouent]].",
+          "body": "Elles s'inscrivent, répondent, suivent leur score. Toi, tu sers."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le geste",
+          "title": "Jeudi prochain, d'autres [[questions]].",
+          "body": "Tu remplaces la manche en cinq minutes. Le sous-bock imprimé, lui, ne bouge plus jamais."
+        },
+        {
+          "kind": "metric",
+          "kicker": "Preuve",
+          "number": "0 feuille",
+          "title": "à photocopier avant le [[jeudi]]",
+          "body": "Et chaque scan te dit combien d'équipes ont vraiment joué."
+        },
+        {
+          "kind": "cta",
+          "title": "Crée ta page quiz en 5 [[minutes]]",
+          "body": "Gratuit, sans carte bancaire, prêt à imprimer.",
+          "cta": "qrowg.com",
+          "qr": true
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "slug": "qr-code-origine-des-produits-fiche-plat-restaurant",
+      "tag": "Restaurant",
+      "sector": "restaurant",
+      "layout": 0,
+      "qr": true,
+      "title": "« C'est d'où, la viande ? » Le serveur [[improvise]].",
+      "subtitle": "La marche à suivre : 4 étapes, 5 minutes →",
+      "url": "https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260912-bar&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-tournee-livraison-entreprises-boulangerie",
+      "tag": "Boulangerie",
+      "layout": 1,
+      "qr": true,
+      "title": "Cinquante salariés à côté. Zéro [[commande]].",
+      "subtitle": "Gratuit, sans carte bancaire →",
+      "url": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260912-bar&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-abonnement-midi-habitues-food-truck",
+      "tag": "Food truck",
+      "layout": 2,
+      "qr": true,
+      "title": "Trois midis par semaine. Et toujours la même [[file]].",
+      "subtitle": "La page à monter en 5 minutes →",
+      "url": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260912-bar&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-dossier-de-location-prerempli-immobilier",
+      "tag": "Immobilier",
+      "layout": 3,
+      "qr": true,
+      "title": "Douze visites. Douze dossiers [[incomplets]].",
+      "subtitle": "Les 4 étapes pour créer la page →",
+      "url": "https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260912-bar&utm_content=clic&utm_term=location"
+    }
+  ]
+}
