@@ -30,9 +30,9 @@ type Page = { id: string; title: string; slug: string; theme: any; total_views: 
 // le legacy, qui se charge alors tout seul.
 const RenduLegacy = dynamic(() => import("./renduLegacy").then(m => m.RenduLegacy))
 
-function RenderBlock({ block, theme, pageId, ownerEmail, totalViews, h1Owner }: { block: Block; theme: any; pageId: string; ownerEmail?: string; totalViews?: number; h1Owner?: string }) {
+function RenderBlock({ block, theme, pageId, ownerEmail, totalViews, h1Owner, nomCommerce }: { block: Block; theme: any; pageId: string; ownerEmail?: string; totalViews?: number; h1Owner?: string; nomCommerce?: string | null }) {
   const SharedPublic = resolvePublicBlock(block.type)
-  if (!SharedPublic) return <RenduLegacy block={block} theme={theme} pageId={pageId} ownerEmail={ownerEmail} totalViews={totalViews} h1Owner={h1Owner} />
+  if (!SharedPublic) return <RenduLegacy block={block} theme={theme} pageId={pageId} ownerEmail={ownerEmail} totalViews={totalViews} h1Owner={h1Owner} nomCommerce={nomCommerce} />
   // Mêmes valeurs, au caractère près, que dans l'ancien corps de RenderBlock.
   return <SharedPublic content={block.content} ctx={{
     theme,
@@ -321,7 +321,7 @@ export default function PublicPageClient({ page, blocks, showBranding = true, in
             <AnimatedBlock key={block.id} delay={idx < 3 ? idx * 80 : 0}>
               <div className={cls || undefined} style={deco.style} data-qf-block={block.id}>
                 <BlockBoundary>
-                  <RenderBlock block={block} theme={theme} pageId={page.id} ownerEmail={page.profiles?.contact_email || page.profiles?.email} totalViews={page.total_views} h1Owner={h1Owner} />
+                  <RenderBlock block={block} theme={theme} pageId={page.id} ownerEmail={page.profiles?.contact_email || page.profiles?.email} totalViews={page.total_views} h1Owner={h1Owner} nomCommerce={page.title} />
                 </BlockBoundary>
               </div>
             </AnimatedBlock>

@@ -59,7 +59,7 @@ function LienPublic({ href, children, ...reste }: { href?: string | null } & Omi
   return <a href={cible} {...reste}>{children}</a>
 }
 
-export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Owner }: { block: Block; theme: any; pageId: string; ownerEmail?: string; totalViews?: number; h1Owner?: string }) {
+export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Owner, nomCommerce }: { block: Block; theme: any; pageId: string; ownerEmail?: string; totalViews?: number; h1Owner?: string; nomCommerce?: string | null }) {
   const c = block.content
   const G = theme.primary || "#C9A84C"
   const MUTED = theme.muted || "#8A8478"
@@ -278,7 +278,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
     // Réutilise le formulaire de leads partagé (envoi réel via submitLead → /api/leads,
     // owner résolu côté serveur, honeypot, état d'envoi, anti-double-clic, accusé email).
     // Ancienne version : <form> décorative sans handler ⇒ les messages étaient perdus.
-    case "contact_form": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} leadType="contact" title={c.title || "Contact"} fields={contactFormFields(c)} button={c.button_label || "Envoyer"} accent={`linear-gradient(90deg,${G},${G}cc)`} buttonTextColor="#080808" subject="Nouveau message de contact" TEXT={TEXT} MUTED={MUTED} />
+    case "contact_form": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} nomCommerce={nomCommerce} leadType="contact" title={c.title || "Contact"} fields={contactFormFields(c)} button={c.button_label || "Envoyer"} accent={`linear-gradient(90deg,${G},${G}cc)`} buttonTextColor="#080808" subject="Nouveau message de contact" TEXT={TEXT} MUTED={MUTED} />
 
 
     case "testimonials": {
@@ -1617,7 +1617,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         </div>
       ) : null
     }
-    case "event_register": return <EventRegisterPublic block={block} pageId={pageId} TEXT={TEXT} MUTED={MUTED} ownerEmail={ownerEmail} />
+    case "event_register": return <EventRegisterPublic block={block} pageId={pageId} TEXT={TEXT} MUTED={MUTED} ownerEmail={ownerEmail} nomCommerce={nomCommerce} />
     case "rsvp": return <RsvpPublic block={block} pageId={pageId} TEXT={TEXT} MUTED={MUTED} />
     case "add_to_calendar": { const cal = calendarLinks({ name: c.event_name, start: c.start_date, end: c.end_date, location: c.location, description: c.description }); const gUrl = c.google_url || cal?.google; return (c.event_name || gUrl) ? (
       <div style={{ padding: "10px 24px 14px" }}>
@@ -1756,7 +1756,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
       const appel = telLink(ligneDirecte)
       return (
         <>
-          <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} leadType="reservation" title={c.title || "Réserver"} fields={reservationFormFields(c)} button={c.button_label || "Réserver"} accent="linear-gradient(90deg,#EF4444,#dc2626)" subject={`Réservation: ${c.title || ""}`} TEXT={TEXT} MUTED={MUTED} />
+          <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} nomCommerce={nomCommerce} leadType="reservation" title={c.title || "Réserver"} fields={reservationFormFields(c)} button={c.button_label || "Réserver"} accent="linear-gradient(90deg,#EF4444,#dc2626)" subject={`Réservation: ${c.title || ""}`} TEXT={TEXT} MUTED={MUTED} />
           {appel && (
             <p style={{ textAlign: "center", margin: "8px 0 0", fontSize: 13 }}>
               <a href={appel} onClick={() => trackLinkClick(pageId, block.id, appel)} style={{ color: MUTED, textDecoration: "none" }}>
@@ -1767,8 +1767,8 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         </>
       )
     }
-    case "quote_form": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} leadType="quote" title={c.title || "Demander un devis"} description={c.description} fields={quoteFormFields(c)} button={c.button_label || "Envoyer ma demande"} accent={`linear-gradient(90deg,${G},${G}cc)`} buttonTextColor="#080808" subject="Demande de devis" TEXT={TEXT} MUTED={MUTED} />
-    case "booking_request": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} leadType="booking" title={c.title || "Réserver pour un événement"} description={c.description} fields={bookingRequestFields(c)} button={c.button_label || "Envoyer ma demande"} accent="linear-gradient(90deg,#9146FF,#7B3FCC)" subject="Demande de réservation événement" TEXT={TEXT} MUTED={MUTED} />
+    case "quote_form": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} nomCommerce={nomCommerce} leadType="quote" title={c.title || "Demander un devis"} description={c.description} fields={quoteFormFields(c)} button={c.button_label || "Envoyer ma demande"} accent={`linear-gradient(90deg,${G},${G}cc)`} buttonTextColor="#080808" subject="Demande de devis" TEXT={TEXT} MUTED={MUTED} />
+    case "booking_request": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} nomCommerce={nomCommerce} leadType="booking" title={c.title || "Réserver pour un événement"} description={c.description} fields={bookingRequestFields(c)} button={c.button_label || "Envoyer ma demande"} accent="linear-gradient(90deg,#9146FF,#7B3FCC)" subject="Demande de réservation événement" TEXT={TEXT} MUTED={MUTED} />
     case "quick_contact": {
       const items = [[c.phone, "📞", "var(--success)", telLink(c.phone) || null], [c.email, "✉️", "var(--action)", c.email ? `mailto:${c.email}` : null], [c.whatsapp, "💬", "#25D366", waLink(c.whatsapp, undefined, c.whatsapp_cc || "33") || null], [c.address, "📍", G, null], [c.hours, "🕐", MUTED, null]].filter(([v]) => v)
       return items.length > 0 ? (

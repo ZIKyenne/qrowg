@@ -705,3 +705,75 @@ tombe — la deuxième après avoir resserré le test de rendu, qui se contentai
 d'abord de regarder la forme de l'expression.
 
 Suite complète : 4 882 tests, 296 fichiers. Build vert.
+
+---
+
+## v81 — ce que le formulaire promet au client
+
+**Relevé.** Sur le serveur compilé. Le harnais de page publique porte exprès un
+identifiant qui n'est pas un UUID, pour que rien ne s'écrive en base. On envoie
+donc un message comme le ferait un client :
+
+```
+POST /api/leads → 400 {"error":"Page invalide"}
+```
+
+Rien n'est enregistré. Et la logique de soumission du produit répondait :
+
+```
+decideResult(false, hasOwnerEmail=true) → { status: "success", action: "mailto" }
+                                            // « repli mailto = succès »
+```
+
+ce qui affichait au client, en vert, avec une coche :
+
+> ✅ Demande envoyée, merci ! Nous revenons vers vous rapidement.
+
+**Deux affirmations, toutes deux fausses.**
+
+1. « envoyée » — rien n'est parti. Le navigateur a seulement tenté d'ouvrir la
+   messagerie du visiteur avec un brouillon pré-rempli. Sur un téléphone sans
+   application de courrier configurée, il ne se passe rien du tout ; et même
+   quand elle s'ouvre, il reste à appuyer sur « Envoyer ».
+2. « Nous revenons vers vous rapidement » — le produit promet, AU NOM DU
+   COMMERÇANT, un délai de réponse que ni lui ni le commerçant ne maîtrisent.
+
+Et un silence : le formulaire demande un nom, un e-mail, un numéro de téléphone,
+et ne dit à aucun moment qui les reçoit.
+
+**Ce que le lot change.**
+
+- `lib/promesseDuFormulaire.ts` (nouveau, PUR) — trois issues, trois phrases :
+  *enregistré* (« Votre message est bien arrivé. Le Comptoir le retrouvera dans
+  ses messages. »), *courrier* (« Votre message n'est pas encore parti. Nous
+  avons ouvert votre messagerie avec le message déjà écrit : il reste à
+  l'envoyer. »), *échec* (« L'envoi n'a pas abouti. Réessayez dans un instant —
+  ou appelez directement le commerce. »). Aucune ne promet de réponse : personne
+  ici ne peut la promettre à la place du commerçant.
+- `decideResult` — le repli courrier a son propre état, `"courrier"`, au lieu
+  d'être un `"success"` déguisé. La coche verte et la couleur de succès ne sont
+  plus posées sur un message qui n'est pas parti.
+- Les deux formulaires publics (générique et inscription à un événement) et la
+  vue partagée passent par la même table de phrases.
+- `mentionDestinataire` sous chaque formulaire : « Vos informations sont
+  transmises à *Le Comptoir*, qui les reçoit dans son espace QRowg. » Le nom
+  vient du titre de la page, descendu jusqu'au bloc ; sans nom, la phrase reste
+  vraie.
+
+**Garde.** `lib/promesseDuFormulaire.test.ts` (13) : la machine qui distingue les
+trois issues, l'absence de toute promesse de délai dans chacune des phrases, le
+fait que « nous » ne désigne que QRowg et seulement pour ce que QRowg a fait,
+trois phrases distinctes et complètes, le nom du commerce quand on le connaît, et
+— côté source — que les anciennes phrases ont disparu des rendus publics, que
+chacun passe par la même table, et que la mention du destinataire est posée sous
+chaque formulaire.
+
+**Vérification par mutation.** Quatre défauts réinjectés : le repli courrier
+redevenu un succès, la promesse de délai de retour, la coche verte sur le
+brouillon, la mention du destinataire retirée. Chaque fois la garde tombe.
+
+**Une garde voisine mise à jour.** `forms.test.tsx` figeait
+`decideResult(false, true) → success` : c'était exactement le défaut. Le cas est
+conservé, avec sa nouvelle valeur et la raison écrite au-dessus.
+
+Suite complète : 4 895 tests, 297 fichiers. Build vert.

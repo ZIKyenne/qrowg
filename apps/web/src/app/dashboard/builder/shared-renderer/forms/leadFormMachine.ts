@@ -4,7 +4,7 @@
 // sinon repli mailto (si ownerEmail) → succès ; sinon erreur. Anti-double-submit via canSubmit.
 import type { SharedLeadFormModel } from "./formTypes"
 
-export type LeadFormStatus = "idle" | "validation_error" | "sending" | "success" | "error"
+export type LeadFormStatus = "idle" | "validation_error" | "sending" | "success" | "courrier" | "error"
 export type LeadValidation = { ok: boolean; missing: string[]; emailInvalid: boolean }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -42,12 +42,19 @@ export function decideSubmit(
 
 export type ResultDecision =
   | { status: "success"; action: "none" }
-  | { status: "success"; action: "mailto" }
+  | { status: "courrier"; action: "mailto" }
   | { status: "error"; action: "none" }
 
-// Décide de l'état après la réponse réseau (succès uniquement après OK confirmé).
+// Décide de l'état après la réponse réseau.
+//
+// Le repli courrier N'EST PAS un succès (lot v81). Mesuré : /api/leads répond
+// 400 « Page invalide », rien n'est écrit — et l'écran affichait « ✅ Demande
+// envoyée, merci ! ». Or le navigateur n'a fait qu'ouvrir la messagerie du
+// visiteur avec un brouillon : il reste à appuyer sur « Envoyer », quand une
+// application de courrier existe. Ce cas a désormais son propre état, et sa
+// propre phrase (lib/promesseDuFormulaire.ts).
 export function decideResult(ok: boolean, hasOwnerEmail: boolean): ResultDecision {
   if (ok) return { status: "success", action: "none" }
-  if (hasOwnerEmail) return { status: "success", action: "mailto" } // repli mailto = succès (comme le legacy)
+  if (hasOwnerEmail) return { status: "courrier", action: "mailto" }
   return { status: "error", action: "none" }
 }

@@ -7,6 +7,7 @@
 import type { CSSProperties } from "react"
 import type { LeadFormStatus } from "./leadFormMachine"
 import type { SharedLeadFormModel } from "./formTypes"
+import { confirmationDuFormulaire, mentionDestinataire, COULEUR_DU_TON, EMOJI_DU_TON } from "@/lib/promesseDuFormulaire"
 
 export type SharedLeadFormViewProps = {
   model: SharedLeadFormModel
@@ -19,20 +20,34 @@ export type SharedLeadFormViewProps = {
   onSubmit?: () => void
   readOnly?: boolean
   previewNotice?: string
+  /** Le nom du commerce, pour nommer qui reçoit les informations du client. */
+  nomCommerce?: string | null
   TEXT: string
   MUTED: string
   accent: string
 }
 
 export function SharedLeadFormView(props: SharedLeadFormViewProps) {
-  const { model, values, status, emailInvalid, errorMessage, idPrefix, onChange, onSubmit, readOnly, previewNotice, TEXT, MUTED, accent } = props
+  const { model, values, status, emailInvalid, errorMessage, idPrefix, onChange, onSubmit, readOnly, previewNotice, nomCommerce, TEXT, MUTED, accent } = props
   const inputStyle: CSSProperties = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "11px 13px", color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }
 
-  if (status === "success") return (
-    <div style={{ padding: "10px 24px 14px" }}>
-      <div role="status" aria-live="polite" style={{ background: "rgba(57,255,143,0.08)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 12, padding: "16px", textAlign: "center", color: "var(--success)", fontSize: 14, fontWeight: 700 }}>✅ {model.successMessage}</div>
-    </div>
-  )
+  // Trois issues, trois phrases : enregistré, brouillon ouvert, échec. Une coche
+  // verte sur un message qui n'est pas parti serait un mensonge (lot v81).
+  if (status === "success" || status === "courrier" || status === "error") {
+    const conf = confirmationDuFormulaire(
+      status === "success" ? "enregistre" : status === "courrier" ? "courrier" : "echec",
+      { nomCommerce, libelle: model.leadType === "register" ? "Votre inscription" : "Votre message" },
+    )
+    const couleur = COULEUR_DU_TON[conf.ton]
+    return (
+      <div style={{ padding: "10px 24px 14px" }}>
+        <div role="status" aria-live="polite" style={{ background: `${couleur}14`, border: `1.5px solid ${couleur}4d`, borderRadius: 12, padding: "16px", textAlign: "center" }}>
+          <p style={{ color: couleur, fontSize: 14, fontWeight: 700, margin: 0 }}>{EMOJI_DU_TON[conf.ton]} {conf.titre}</p>
+          <p style={{ color: MUTED, fontSize: 13, fontWeight: 500, margin: "6px 0 0", lineHeight: 1.5 }}>{conf.detail}</p>
+        </div>
+      </div>
+    )
+  }
 
   const errId = `${idPrefix}-err`
   return (
@@ -57,8 +72,10 @@ export function SharedLeadFormView(props: SharedLeadFormViewProps) {
           )
         })}
         {emailInvalid && <p id={errId} style={{ color: "#F59E0B", fontSize: 12, margin: 0 }}>Adresse email invalide.</p>}
-        {status === "error" && <p role="alert" style={{ color: "#EF4444", fontSize: 12, margin: 0 }}>{errorMessage || "Une erreur est survenue. Réessayez."}</p>}
+        {errorMessage && <p role="alert" style={{ color: "#EF4444", fontSize: 12, margin: 0 }}>{errorMessage}</p>}
         <button type="button" onClick={readOnly ? undefined : onSubmit} disabled={readOnly || status === "sending"} aria-disabled={readOnly || undefined} style={{ background: accent, borderRadius: 10, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", border: "none", cursor: readOnly || status === "sending" ? "not-allowed" : "pointer", opacity: status === "sending" ? 0.55 : 1 }}>{status === "sending" ? "Envoi…" : model.submitLabel}</button>
+        {/* Le client donne son nom, son e-mail, son téléphone : il sait à qui. */}
+        <p style={{ color: MUTED, fontSize: 11.5, margin: "2px 0 0", lineHeight: 1.5 }}>{mentionDestinataire(nomCommerce)}</p>
       </div>
     </div>
   )

@@ -119,9 +119,13 @@ describe("B09.13 — machine de soumission", () => {
     expect(decideSubmit("idle", { honeypotFilled: false, validation: validateLeadForm(m, {}) }).status).toBe("validation_error")
     expect(decideSubmit("idle", { honeypotFilled: false, validation: validateLeadForm(m, { name: "A", email: "a@b.c" }) }).action).toBe("send")
   })
-  it("résultat : ok → success ; échec+owner → mailto ; échec sans owner → error", () => {
+  // Le repli courrier N'EST PLUS un succès (lot v81) : mesuré, /api/leads
+  // répondait 400 et l'écran affichait « ✅ Demande envoyée, merci ! » alors que
+  // le navigateur avait seulement ouvert un brouillon de courrier. Il a
+  // désormais son propre état — voir lib/promesseDuFormulaire.
+  it("résultat : ok → success ; échec+owner → courrier ; échec sans owner → error", () => {
     expect(decideResult(true, false)).toEqual({ status: "success", action: "none" })
-    expect(decideResult(false, true)).toEqual({ status: "success", action: "mailto" })
+    expect(decideResult(false, true)).toEqual({ status: "courrier", action: "mailto" })
     expect(decideResult(false, false)).toEqual({ status: "error", action: "none" })
   })
 })

@@ -15,6 +15,7 @@ import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
 import { contactFormFields, registerFormFields } from "@/lib/leadForms"
 import { openStatus, DAY_KEYS, countdownParts, shareLinks, calendarLinks, extHref, announcementMeta, SOCIAL_NETWORKS_MAP, destinationUtile } from "../dashboard/builder/types"
+import { confirmationDuFormulaire, mentionDestinataire, COULEUR_DU_TON, EMOJI_DU_TON, type ResultatEnvoi } from "@/lib/promesseDuFormulaire"
 import { chezLeCommerce, dateChezLeCommerce, fuseauDuBloc, fuseauDuVisiteur, memeHeureQue, mentionFuseau } from "@/lib/heureDuCommerce"
 import { etatDesConges } from "@/lib/congesDates"
 
@@ -531,14 +532,14 @@ export function RsvpPublic({ block, pageId, TEXT, MUTED }: { block: Block; pageI
 }
 
 // ── Inscription événement public (enregistrée en base) ───────────────────────
-export function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail }: { block: Block; pageId: string; TEXT: string; MUTED: string; ownerEmail?: string }) {
+export function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail, nomCommerce }: { block: Block; pageId: string; TEXT: string; MUTED: string; ownerEmail?: string; nomCommerce?: string | null }) {
   const c = block.content
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
   const [company, setCompany] = useState("")
   const [hp, setHp] = useState("") // honeypot anti-spam
-  const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle")
+  const [status, setStatus] = useState<"idle" | "sending" | "enregistre" | "courrier" | "error">("idle")
   const inputStyle: any = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "11px 13px", color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }
   // Quels champs ce formulaire demande, et sous quel libellé : une seule liste,
   // celle que lit aussi l'aperçu du builder. Les états restent nommés un par un —
@@ -549,26 +550,24 @@ export function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail }: 
   const emailOk = !email.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
   const canSubmit = !!name && !!email && emailOk && status !== "sending"
   const submit = async () => {
-    if (hp) { setStatus("done"); return } // honeypot rempli = bot
+    if (hp) { setStatus("enregistre"); return } // honeypot rempli = bot
     setStatus("sending")
     trackLinkClick(pageId, block.id, "register")
     const data: Record<string, any> = { nom: name, email }
     if (demande("phone")) data.telephone = phone
     if (demande("company")) data.societe = company
     const ok = await submitLead({ pageId, blockId: block.id, type: "register", name, email, phone: demande("phone") ? phone : undefined, message: `Inscription: ${c.title || "événement"}`, data })
-    if (ok) { setStatus("done"); return }
-    // Repli mailto si l'enregistrement échoue
+    if (ok) { setStatus("enregistre"); return }
+    // Repli mailto : un brouillon ouvert n'est pas une inscription enregistrée.
     if (ownerEmail) {
       const body = encodeURIComponent(Object.entries(data).map(([k, v]) => `${k}: ${v}`).join("\n"))
       window.location.href = `mailto:${ownerEmail}?subject=${encodeURIComponent(`Inscription: ${c.title || "événement"}`)}&body=${body}`
-      setStatus("done")
+      setStatus("courrier")
     } else setStatus("error")
   }
-  if (status === "done") return (
-    <div style={{ padding: "10px 24px 14px" }}>
-      <div style={{ background: "rgba(57,255,143,0.08)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 12, padding: "16px", textAlign: "center", color: "var(--success)", fontSize: 14, fontWeight: 700 }}>✅ Inscription enregistrée, merci !</div>
-    </div>
-  )
+  if (status === "enregistre" || status === "courrier" || status === "error") {
+    return <ConfirmationEnvoi resultat={status === "enregistre" ? "enregistre" : status === "courrier" ? "courrier" : "echec"} nomCommerce={nomCommerce} libelle="Votre inscription" MUTED={MUTED} />
+  }
   return (
     <div style={{ padding: "10px 24px 14px" }}>
       <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{c.title || "S'inscrire gratuitement"}</p>
@@ -580,17 +579,38 @@ export function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail }: 
         {demande("phone") && <input placeholder={libelle("phone")} aria-label={libelle("phone")} type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={e => setPhone(e.target.value)} style={inputStyle} />}
         {demande("company") && <input placeholder={libelle("company")} aria-label={libelle("company")} autoComplete="organization" value={company} onChange={e => setCompany(e.target.value)} style={inputStyle} />}
         {email.trim() && !emailOk && <p style={{ color: "#F59E0B", fontSize: 12, margin: 0 }}>Adresse email invalide.</p>}
-        {status === "error" && <p style={{ color: "#EF4444", fontSize: 12, margin: 0 }}>Une erreur est survenue. Réessayez.</p>}
         <button onClick={submit} disabled={!canSubmit} style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 10, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", border: "none", cursor: canSubmit ? "pointer" : "not-allowed", opacity: canSubmit ? 1 : 0.55 }}>{status === "sending" ? "Envoi…" : (c.button_label || "Je m'inscris")}</button>
+        <p style={{ color: MUTED, fontSize: 11.5, margin: "2px 0 0", lineHeight: 1.5 }}>{mentionDestinataire(nomCommerce)}</p>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * La confirmation d'envoi, une seule fois pour tous les formulaires publics.
+ * Trois issues, trois phrases, trois couleurs — et aucune promesse de réponse
+ * faite au nom du commerçant (lot v81).
+ */
+export function ConfirmationEnvoi({ resultat, nomCommerce, libelle, MUTED }: { resultat: ResultatEnvoi; nomCommerce?: string | null; libelle?: string; MUTED: string }) {
+  const conf = confirmationDuFormulaire(resultat, { nomCommerce, libelle })
+  const couleur = COULEUR_DU_TON[conf.ton]
+  return (
+    <div style={{ padding: "10px 24px 14px" }}>
+      <div role="status" aria-live="polite" style={{ background: `${couleur}14`, border: `1.5px solid ${couleur}4d`, borderRadius: 12, padding: "16px", textAlign: "center" }}>
+        <p style={{ color: couleur, fontSize: 14, fontWeight: 700, margin: 0 }}>{EMOJI_DU_TON[conf.ton]} {conf.titre}</p>
+        <p style={{ color: MUTED, fontSize: 13, fontWeight: 500, margin: "6px 0 0", lineHeight: 1.5 }}>{conf.detail}</p>
       </div>
     </div>
   )
 }
 
 // ── Formulaire public générique (enregistré en base, repli mailto) ───────────
-export function LeadFormPublic({ block, pageId, ownerEmail, leadType, title, description, descColor, fields, button, accent, buttonTextColor = "#fff", subject, TEXT, MUTED }: { block: Block; pageId: string; ownerEmail?: string; leadType: string; title: string; description?: string; descColor?: string; fields: { key: string; label: string; area?: boolean }[]; button: string; accent: string; buttonTextColor?: string; subject: string; TEXT: string; MUTED: string }) {
+export function LeadFormPublic({ block, pageId, ownerEmail, leadType, title, description, descColor, fields, button, accent, buttonTextColor = "#fff", subject, nomCommerce, TEXT, MUTED }: { block: Block; pageId: string; ownerEmail?: string; leadType: string; title: string; description?: string; descColor?: string; fields: { key: string; label: string; area?: boolean }[]; button: string; accent: string; buttonTextColor?: string; subject: string; nomCommerce?: string | null; TEXT: string; MUTED: string }) {
   const [vals, setVals] = useState<Record<string, string>>({})
-  const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle")
+  // « done » n'existe plus tel quel : l'enregistrement et le repli courrier ne
+  // sont pas la même chose, et l'écran ne doit pas dire la même phrase pour les
+  // deux (lot v81, lib/promesseDuFormulaire.ts).
+  const [status, setStatus] = useState<"idle" | "sending" | "enregistre" | "courrier" | "error">("idle")
   const [hp, setHp] = useState("") // honeypot anti-spam (invisible pour un humain)
   const set = (k: string, v: string) => setVals(p => ({ ...p, [k]: v }))
   const required = fields.slice(0, 2).map(f => f.key)
@@ -609,27 +629,27 @@ export function LeadFormPublic({ block, pageId, ownerEmail, leadType, title, des
   const inputStyle: any = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "11px 13px", color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }
   const submit = async () => {
     // Honeypot rempli = bot -> on simule un envoi reussi sans rien enregistrer.
-    if (hp) { setStatus("done"); return }
+    if (hp) { setStatus("enregistre"); return }
     setStatus("sending")
     trackLinkClick(pageId, block.id, "form")
     const data: Record<string, any> = {}
     fields.forEach(f => { if (vals[f.key]) data[f.label] = vals[f.key] })
     const ok = await submitLead({ pageId, blockId: block.id, type: leadType, name: vals.name, email: vals.email, phone: vals.phone, message: vals.message || vals.project || subject, data })
-    if (ok) { setStatus("done"); return }
+    if (ok) { setStatus("enregistre"); return }
     // Repli si l'enregistrement echoue : on ouvre le courrier du visiteur vers
     // l'adresse choisie par le commercant sur ce bloc, a defaut celle du compte.
+    // Ce n'est PAS un envoi : le brouillon reste à envoyer, et sur un téléphone
+    // sans messagerie configurée il ne s'ouvre même pas.
     const dest = adresseEmailValide((block.content as any)?.email_dest) || ownerEmail
     if (dest) {
       const body = encodeURIComponent(fields.map(f => `${f.label}: ${vals[f.key] || ""}`).join("\n"))
       window.location.href = `mailto:${dest}?subject=${encodeURIComponent(subject)}&body=${body}`
-      setStatus("done")
+      setStatus("courrier")
     } else setStatus("error")
   }
-  if (status === "done") return (
-    <div style={{ padding: "10px 24px 14px" }}>
-      <div style={{ background: "rgba(57,255,143,0.08)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 12, padding: "16px", textAlign: "center", color: "var(--success)", fontSize: 14, fontWeight: 700 }}>✅ Demande envoyée, merci ! Nous revenons vers vous rapidement.</div>
-    </div>
-  )
+  if (status === "enregistre" || status === "courrier" || status === "error") {
+    return <ConfirmationEnvoi resultat={status === "enregistre" ? "enregistre" : status === "courrier" ? "courrier" : "echec"} nomCommerce={nomCommerce} MUTED={MUTED} />
+  }
   return (
     <div style={{ padding: "10px 24px 14px" }}>
       <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{title}</p>
@@ -643,8 +663,9 @@ export function LeadFormPublic({ block, pageId, ownerEmail, leadType, title, des
           ? <textarea key={f.key} placeholder={f.label} aria-label={f.label} value={vals[f.key] || ""} onChange={e => set(f.key, e.target.value)} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
           : <input key={f.key} {...fieldProps(f.key)} placeholder={f.label} aria-label={f.label} value={vals[f.key] || ""} onChange={e => set(f.key, e.target.value)} style={inputStyle} />)}
         {emailVal && !emailOk && <p style={{ color: "#F59E0B", fontSize: 12, margin: 0 }}>Adresse email invalide.</p>}
-        {status === "error" && <p style={{ color: "#EF4444", fontSize: 12, margin: 0 }}>Une erreur est survenue. Réessayez.</p>}
         <button onClick={submit} disabled={!ready || status === "sending"} style={{ background: accent, borderRadius: 10, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: buttonTextColor, border: "none", cursor: ready && status !== "sending" ? "pointer" : "not-allowed", opacity: ready && status !== "sending" ? 1 : 0.55 }}>{status === "sending" ? "Envoi…" : button}</button>
+        {/* Le client donne son nom, son e-mail, son téléphone : il sait à qui. */}
+        <p style={{ color: MUTED, fontSize: 11.5, margin: "2px 0 0", lineHeight: 1.5 }}>{mentionDestinataire(nomCommerce)}</p>
       </div>
     </div>
   )
