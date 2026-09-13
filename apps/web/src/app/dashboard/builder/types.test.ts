@@ -827,25 +827,29 @@ describe("parseHourRanges", () => {
 })
 
 describe("openStatus", () => {
+  // Les instants sont construits en UTC et le commerce est déclaré sur UTC : ces
+  // cas mesurent la LOGIQUE d'ouverture, pas un fuseau. Avant le lot v79 ils
+  // s'appuyaient sur l'horloge de la machine de test — ce qui passait ici et
+  // rendait « Fermé » à New York d'un commerce ouvert (lib/heureDuCommerce.ts).
   const uniform = { mon_fri: "9h - 18h", saturday: "9h - 18h", sunday: "9h - 18h" }
   it("ouvert pendant les heures -> ferme a X", () => {
-    const r = openStatus(uniform, new Date(2026, 6, 8, 10, 30))
+    const r = openStatus(uniform, new Date(Date.UTC(2026, 6, 8, 10, 30)), "UTC")
     expect(r?.open).toBe(true)
     expect(r?.label).toBe("Ouvert · ferme à 18h")
     expect(r?.color).toBe("#39FF8F")
   })
   it("avant ouverture -> ouvre a X", () => {
-    const r = openStatus(uniform, new Date(2026, 6, 8, 8, 0))
+    const r = openStatus(uniform, new Date(Date.UTC(2026, 6, 8, 8, 0)), "UTC")
     expect(r?.open).toBe(false)
     expect(r?.label).toBe("Fermé · ouvre à 9h")
   })
   it("apres fermeture -> ouvre demain (scan des jours suivants)", () => {
-    const r = openStatus(uniform, new Date(2026, 6, 8, 20, 0))
+    const r = openStatus(uniform, new Date(Date.UTC(2026, 6, 8, 20, 0)), "UTC")
     expect(r?.open).toBe(false)
     expect(r?.label).toBe("Fermé · ouvre demain à 9h")
   })
   it("ferme bientot (<= 30 min avant la fermeture)", () => {
-    const r = openStatus(uniform, new Date(2026, 6, 8, 17, 40))
+    const r = openStatus(uniform, new Date(Date.UTC(2026, 6, 8, 17, 40)), "UTC")
     expect(r?.open).toBe(true)
     expect(r?.label).toBe("Ferme bientôt · à 18h")
     expect(r?.color).toBe("#FBBF24")
@@ -853,30 +857,30 @@ describe("openStatus", () => {
   it("apres fermeture -> nomme le prochain jour ouvre (lundi / samedi)", () => {
     const c = { mon_fri: "9h - 18h", saturday: "", sunday: "" }
     // 2026-07-10 = vendredi 20h : samedi/dimanche vides, puis lundi 9h -> ouvre lundi
-    expect(openStatus(c, new Date(2026, 6, 10, 20, 0))?.label).toBe("Fermé · ouvre lundi à 9h")
+    expect(openStatus(c, new Date(Date.UTC(2026, 6, 10, 20, 0)), "UTC")?.label).toBe("Fermé · ouvre lundi à 9h")
     // un seul jour ouvert dans la semaine, consulté juste apres sa fermeture le meme jour -> Fermé
     const only = { mon_fri: "", saturday: "9h - 12h", sunday: "" }
-    expect(openStatus(only, new Date(2026, 6, 4, 13, 0))?.label).toBe("Fermé · ouvre samedi à 9h")
+    expect(openStatus(only, new Date(Date.UTC(2026, 6, 4, 13, 0)), "UTC")?.label).toBe("Fermé · ouvre samedi à 9h")
   })
   it("selectionne le bon champ selon le jour", () => {
     const c = { mon_fri: "9h - 18h", saturday: "10h - 16h", sunday: "" }
     // 2026-07-04 = samedi, 2026-07-06 = lundi, 2026-07-05 = dimanche
-    expect(openStatus(c, new Date(2026, 6, 4, 11, 0))?.label).toBe("Ouvert · ferme à 16h")
-    expect(openStatus(c, new Date(2026, 6, 6, 11, 0))?.label).toBe("Ouvert · ferme à 18h")
-    expect(openStatus(c, new Date(2026, 6, 5, 11, 0))).toBeNull() // dimanche vide -> pas de badge
+    expect(openStatus(c, new Date(Date.UTC(2026, 6, 4, 11, 0)), "UTC")?.label).toBe("Ouvert · ferme à 16h")
+    expect(openStatus(c, new Date(Date.UTC(2026, 6, 6, 11, 0)), "UTC")?.label).toBe("Ouvert · ferme à 18h")
+    expect(openStatus(c, new Date(Date.UTC(2026, 6, 5, 11, 0)), "UTC")).toBeNull() // dimanche vide -> pas de badge
   })
   it("coupure midi : ferme entre les deux plages", () => {
     const c = { mon_fri: "9h-12h, 14h-18h", saturday: "", sunday: "" }
-    expect(openStatus(c, new Date(2026, 6, 6, 13, 0))?.label).toBe("Fermé · ouvre à 14h")
-    expect(openStatus(c, new Date(2026, 6, 6, 15, 0))?.open).toBe(true)
+    expect(openStatus(c, new Date(Date.UTC(2026, 6, 6, 13, 0)), "UTC")?.label).toBe("Fermé · ouvre à 14h")
+    expect(openStatus(c, new Date(Date.UTC(2026, 6, 6, 15, 0)), "UTC")?.open).toBe(true)
   })
   it("mode jour par jour : chaque jour a son horaire", () => {
     const c = { mon: "9h - 19h", tue: "9h - 19h", wed: "Fermé", thu: "9h - 19h", fri: "9h - 19h", sat: "10h - 17h", sun: "" }
-    expect(openStatus(c, new Date(2026, 6, 6, 11, 0))?.label).toBe("Ouvert · ferme à 19h") // lundi
+    expect(openStatus(c, new Date(Date.UTC(2026, 6, 6, 11, 0)), "UTC")?.label).toBe("Ouvert · ferme à 19h") // lundi
     // mercredi 2026-07-08 fermé -> scan : jeudi 9h
-    expect(openStatus(c, new Date(2026, 6, 8, 11, 0))?.label).toBe("Fermé · ouvre demain à 9h")
+    expect(openStatus(c, new Date(Date.UTC(2026, 6, 8, 11, 0)), "UTC")?.label).toBe("Fermé · ouvre demain à 9h")
     // dimanche 2026-07-05 vide -> pas de badge
-    expect(openStatus(c, new Date(2026, 6, 5, 11, 0))).toBeNull()
+    expect(openStatus(c, new Date(Date.UTC(2026, 6, 5, 11, 0)), "UTC")).toBeNull()
   })
 })
 

@@ -12,6 +12,7 @@
 
 import type { BlockDef } from "./types"
 import { ANNOUNCEMENT_TYPES, DOC_TYPES, LAYOUT_STYLE_FIELDS, SOCIAL_NETWORKS } from "./types"
+import { FUSEAUX_PROPOSES } from "@/lib/heureDuCommerce"
 
 export const BLOCK_DEFS: Record<string, BlockDef> = {
   // ── Identite ──────────────────────────────────────────────────────────────
@@ -413,6 +414,10 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "sun", label: "Dimanche", type: "text", placeholder: "Fermé", showIf: { key: "mode", equals: "Jour par jour" } },
       { key: "exception", label: "Exception / congés (optionnel)", type: "text", placeholder: "Fermé du 1er au 15 août", hint: "Message mis en avant (congés, jour férié, ouverture exceptionnelle…)" },
       { key: "note", label: "Note (optionnel)", type: "text", placeholder: "Réservation recommandée" },
+      // Le badge « Ouvert / Fermé » se calculait sur l'horloge du visiteur : un
+      // bistrot parisien en plein service était annoncé « Fermé » à New York.
+      // Ce champ dit à quelle heure le commerce vit (cf. lib/heureDuCommerce.ts).
+      { key: "fuseau", label: "Fuseau horaire du commerce", type: "select", options: [...FUSEAUX_PROPOSES], hint: "Le badge « Ouvert / Fermé » se lit à cette heure-là, où que soit le visiteur" },
     ],
   },
   contact_form: {

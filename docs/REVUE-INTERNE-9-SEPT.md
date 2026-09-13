@@ -564,3 +564,72 @@ variante `non_publiee` (un mot français sans son accent) : elle s'appelle
 `brouillon`, qui est d'ailleurs le nom du statut côté base.
 
 Suite complète : 4 843 tests, 294 fichiers. Build vert.
+
+---
+
+## v79 — l'heure du commerce, pas celle du téléphone
+
+**Relevé.** Au navigateur, modèle « Bistrot français » (Lun-Ven 12 h-14 h 30 et
+19 h-23 h), un seul et même instant réel — lundi 22 h 30 à Paris — rendu dans
+trois fuseaux :
+
+```
+Europe/Paris      → « Ferme bientôt · à 23h »    (vrai)
+America/New_York  → « Fermé · ouvre à 19h »      (faux : le service tourne)
+Asia/Tokyo        → « Fermé · ouvre à 12h »      (faux, et mauvais jour)
+```
+
+La cause tenait en deux lignes : `openStatus` lisait `now.getDay()` et
+`now.getHours()`, c'est-à-dire l'horloge DU VISITEUR, et le surlignage
+« Aujourd'hui » lisait `new Date().getDay()` pour la même raison. Un client à
+l'étranger qui prépare sa venue, un touriste dont le téléphone n'a pas changé de
+fuseau, un lien partagé dans un groupe international : tous lisaient « Fermé »
+d'un commerce ouvert. Un horaire appartient au lieu.
+
+**Ce que le lot change.**
+
+- `lib/heureDuCommerce.ts` (nouveau, PUR) — `chezLeCommerce(now, fuseau)` rend le
+  jour et la minute tels qu'on les lit sur place, via `Intl` : l'heure d'été est
+  suivie toute seule, écrire le décalage à la main c'est se tromper deux
+  dimanches par an. `fuseauDuBloc`, `fuseauValide`, `memeHeureQue`,
+  `mentionFuseau`.
+- `openStatus(c, now, fuseau?)` calcule dans le fuseau du commerce. Les quatre
+  rendus du bloc — page publiée, rendu partagé, aperçu de l'éditeur — le
+  suivent, surlignage du jour compris.
+- **Le visiteur sait à quelle heure il lit** : quand son décalage diffère de
+  celui du commerce, le badge ajoute « · heure de Paris ». Sans cette mention,
+  « Ouvert » se lit comme « ouvert maintenant, chez moi ». La comparaison porte
+  sur les DÉCALAGES, pas sur les noms : Paris et Madrid marquent la même heure,
+  prévenir n'apporterait rien.
+- **Le défaut est assumé et réversible** : `Europe/Paris`, parce que QRowg est un
+  produit français — interface, modèles et commerçants. Un nouveau champ
+  « Fuseau horaire du commerce » (18 fuseaux, métropole et outre-mer) le change
+  en un clic, sans nous écrire. Un commerçant qui ne touche à rien garde une
+  page juste.
+
+**Mesure après.** Le même instant, les mêmes trois fuseaux :
+`Europe/Paris → « Ferme bientôt · à 23h »`, `America/New_York` et `Asia/Tokyo →
+« Ferme bientôt · à 23h · heure de Paris »`. Badge de 258 px sur un écran de
+320 px, aucun débordement.
+
+**Garde.** `lib/heureDuCommerce.test.ts` (18) : la lecture dans chaque fuseau, le
+passage de minuit dans les deux sens, l'heure d'été, le repli sur le défaut, la
+validité des 18 fuseaux proposés ; le badge identique partout dans le monde ; la
+mention qui ne se déclenche que si l'heure diffère vraiment — y compris le cas
+extrême de deux fuseaux à 24 h d'écart (Kiritimati et Tahiti affichent « 10:30 »
+au même instant, un mardi et un lundi) ; et, côté source, qu'aucun des trois
+rendus n'appelle plus `openStatus(c, new Date())` ni `new Date().getDay()`.
+
+**Vérification par mutation.** Trois défauts réinjectés : `openStatus` qui
+reprend `getDay`/`getHours`, le surlignage qui reprend l'horloge du visiteur, le
+calcul de décalage qui oublie le franchissement de minuit. Chaque fois la garde
+tombe.
+
+**Une garde voisine mise au clair.** Les cas d'`openStatus` de `types.test.ts`
+construisaient leurs instants avec `new Date(2026, 6, 8, 8, 0)` — l'heure LOCALE
+de la machine de test. Ils passaient parce que le produit lisait la même horloge
+qu'eux : l'hypothèse était partagée, donc invisible. Ils déclarent maintenant leur
+fuseau (`Date.UTC` + commerce sur `"UTC"`) et mesurent la logique d'ouverture,
+plus l'accord fortuit de deux horloges.
+
+Suite complète : 4 861 tests, 295 fichiers. Build vert.

@@ -20,6 +20,7 @@ function champsDe(type: string, c: Record<string, any>): LeadField[] {
   return (CHAMPS_FORMULAIRE[type] ?? (() => []))(c)
 }
 import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
+import { fuseauDuBloc } from "@/lib/heureDuCommerce"
 
   function FAQItem({ q, a, theme, link, linkLabel, compact }: { q: string; a: string; theme: PageTheme; link?: string; linkLabel?: string; compact?: boolean }) {
     const [open, setOpen] = useState(false)
@@ -55,10 +56,12 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
   function OpenBadge({ c }: { c: any }) {
     const [st, setSt] = useState<ReturnType<typeof openStatus>>(null)
     useEffect(() => {
-      const upd = () => setSt(openStatus(c, new Date()))
+      // Heure du commerce, pas celle de l'auteur : un commerçant à La Réunion
+      // qui règle les horaires de sa boutique doit voir le badge de sa boutique.
+      const upd = () => setSt(openStatus(c, new Date(), fuseauDuBloc(c)))
       upd(); const t = setInterval(upd, 60000); return () => clearInterval(t)
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [c.mon_fri, c.saturday, c.sunday, c.mon, c.tue, c.wed, c.thu, c.fri, c.sat, c.sun, c.mode])
+    }, [c.mon_fri, c.saturday, c.sunday, c.mon, c.tue, c.wed, c.thu, c.fri, c.sat, c.sun, c.mode, c.fuseau])
     if (!st) return null
     return <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: `${st.color}18`, border: `1px solid ${st.color}55`, color: st.color, borderRadius: 20, padding: "2px 9px", fontSize: 10, fontWeight: 700 }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: st.color }} />{st.label}</span>
   }

@@ -15,6 +15,7 @@ import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
 import { contactFormFields, registerFormFields } from "@/lib/leadForms"
 import { openStatus, DAY_KEYS, countdownParts, shareLinks, calendarLinks, extHref, announcementMeta, SOCIAL_NETWORKS_MAP, destinationUtile } from "../dashboard/builder/types"
+import { chezLeCommerce, fuseauDuBloc, fuseauDuVisiteur, memeHeureQue, mentionFuseau } from "@/lib/heureDuCommerce"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 
@@ -206,15 +207,24 @@ export function ShareButton({ pageId, blockId, style, inner }: { pageId: string;
 // ── Badge "Ouvert / Fermé" calculé en direct (tick 60s) ──────────────────────
 export function OpenBadge({ c, FONT_B }: { c: any; FONT_B: string }) {
   const [st, setSt] = useState<ReturnType<typeof openStatus>>(null)
+  // Vrai quand le visiteur ne lit pas la même heure que le commerce : on le dit,
+  // sinon « Ouvert » se lit comme « ouvert maintenant, chez moi ».
+  const [ailleurs, setAilleurs] = useState(false)
+  const fuseau = fuseauDuBloc(c)
   useEffect(() => {
-    const upd = () => setSt(openStatus(c, new Date()))
+    const upd = () => {
+      const maintenant = new Date()
+      setSt(openStatus(c, maintenant, fuseau))
+      setAilleurs(!memeHeureQue(maintenant, fuseau, fuseauDuVisiteur()))
+    }
     upd(); const t = setInterval(upd, 60000); return () => clearInterval(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [c.mon_fri, c.saturday, c.sunday, c.mon, c.tue, c.wed, c.thu, c.fri, c.sat, c.sun, c.mode])
+  }, [c.mon_fri, c.saturday, c.sunday, c.mon, c.tue, c.wed, c.thu, c.fri, c.sat, c.sun, c.mode, fuseau])
   if (!st) return null
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: `${st.color}18`, border: `1px solid ${st.color}55`, color: st.color, borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700, fontFamily: FONT_B }}>
       <span style={{ width: 7, height: 7, borderRadius: "50%", background: st.color, boxShadow: `0 0 6px ${st.color}` }} />{st.label}
+      {ailleurs && <span style={{ fontWeight: 500, opacity: 0.85 }}>· {mentionFuseau(fuseau)}</span>}
     </span>
   )
 }
@@ -223,7 +233,10 @@ export function OpenBadge({ c, FONT_B }: { c: any; FONT_B: string }) {
 // bannière d'exception (congés), badge de statut en direct. `todayIdx` en effet -> pas de mismatch SSR.
 export function HoursPublic({ c, theme }: { c: any; theme: any }) {
   const [today, setToday] = useState(-1)
-  useEffect(() => { setToday(new Date().getDay()) }, [])
+  // Le jour surligné est celui du COMMERCE : à Tokyo, la page d'un bistrot
+  // parisien marquait « Aujourd'hui » sur la mauvaise ligne.
+  const fuseauBloc = fuseauDuBloc(c)
+  useEffect(() => { setToday(chezLeCommerce(new Date(), fuseauBloc).jour) }, [fuseauBloc])
   const MUTED = theme.muted || "#8A8478"
   const TEXT = theme.text || "#F5F0E8"
   const G = theme.primary || "#C9A84C"

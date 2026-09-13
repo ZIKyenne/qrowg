@@ -89,7 +89,7 @@ describe("ce qu'on dit au client", () => {
       expect(sansRien, r).not.toContain("joignable")
       expect(sansRien, r).not.toContain("Voici comment")
       // À défaut, la phrase dit quand même quoi faire.
-      expect(sansRien.split(". ")[1]?.length ?? 0, r).toBeGreaterThan(10)
+      expect((sansRien.split(". ")[1] ?? "").length, r).toBeGreaterThan(10)
     }
   })
 
@@ -148,9 +148,9 @@ describe("l'écran rendu par la redirection", () => {
     // aussi, sur un écran que personne ne regarde jamais en interne.
     const mur = ROUTE.slice(ROUTE.indexOf("function murHtml("), ROUTE.indexOf("function murResponse("))
     const CARTE = "#0F0E0B"
-    const couleurs = [...mur.matchAll(/color:\s*(#[0-9A-Fa-f]{6})/g)].map(m => m[1])
+    const couleurs = [...mur.matchAll(/color:\s*(#[0-9A-Fa-f]{6})/g)].map(m => m[1] ?? "")
     expect(couleurs.length).toBeGreaterThanOrEqual(3)
-    const trop = couleurs.filter(c => contraste(c, CARTE) < CONTRASTE_MIN)
+    const trop = couleurs.filter(c => (contraste(c, CARTE) ?? 0) < CONTRASTE_MIN)
     expect(trop, `sous ${CONTRASTE_MIN}:1 sur la carte : ${trop.join(", ")}`).toEqual([])
   })
 

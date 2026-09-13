@@ -12,6 +12,7 @@
 import { useEffect, useState } from "react"
 import { horaires, estAujourdhui, estFerme } from "../../models/horairesGalerieReseaux"
 import { openStatus } from "../../../types"
+import { chezLeCommerce, fuseauDuBloc, fuseauDuVisiteur, memeHeureQue, mentionFuseau } from "@/lib/heureDuCommerce"
 import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { sz, editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 
@@ -19,17 +20,24 @@ import { sz, editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, typ
  *  serveur rend la page puis la met en cache, son heure serait fausse. */
 function Badge({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   const [st, setSt] = useState<ReturnType<typeof openStatus>>(null)
+  const [ailleurs, setAilleurs] = useState(false)
+  const fuseau = fuseauDuBloc(c)
   useEffect(() => {
-    const maj = () => setSt(openStatus(c, new Date()))
+    const maj = () => {
+      const maintenant = new Date()
+      setSt(openStatus(c, maintenant, fuseau))
+      setAilleurs(!memeHeureQue(maintenant, fuseau, fuseauDuVisiteur()))
+    }
     maj()
     const t = setInterval(maj, 60000)
     return () => clearInterval(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [c.mon_fri, c.saturday, c.sunday, c.mon, c.tue, c.wed, c.thu, c.fri, c.sat, c.sun, c.mode])
+  }, [c.mon_fri, c.saturday, c.sunday, c.mon, c.tue, c.wed, c.thu, c.fri, c.sat, c.sun, c.mode, fuseau])
   if (!st) return null
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: sz(u, 6), background: `${st.color}18`, border: `1px solid ${u.lisible(st.color, 3)}55`, color: u.lisible(st.color), borderRadius: 20, padding: `${sz(u, 4)}px ${sz(u, 12)}px`, fontSize: sz(u, 12), fontWeight: 700, fontFamily: u.FONT_B }}>
       <span style={{ width: sz(u, 7), height: sz(u, 7), borderRadius: "50%", background: u.lisible(st.color, 3), boxShadow: `0 0 6px ${st.color}` }} />{st.label}
+      {ailleurs && <span style={{ fontWeight: 500, opacity: 0.85 }}>· {mentionFuseau(fuseau)}</span>}
     </span>
   )
 }
@@ -39,7 +47,8 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   // -1 tant que l'heure n'est pas connue : le serveur et le navigateur rendent
   // alors le meme HTML (pas de remplacement complet a l'hydratation).
   const [jour, setJour] = useState(-1)
-  useEffect(() => { setJour(new Date().getDay()) }, [])
+  const fuseauBloc = fuseauDuBloc(c)
+  useEffect(() => { setJour(chezLeCommerce(new Date(), fuseauBloc).jour) }, [fuseauBloc])
   const note = h.note && (
     <div style={{ padding: `${sz(u, 9)}px ${sz(u, 16)}px`, background: `${u.G}05` }}>
       <p style={{ color: u.MUTED, fontSize: sz(u, 13.5), margin: 0, fontStyle: "italic", fontFamily: u.FONT_B }}>{h.note}</p>

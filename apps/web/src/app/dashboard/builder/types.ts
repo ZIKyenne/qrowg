@@ -1,5 +1,6 @@
 import { rapportOuPire, niveauContraste } from "@/lib/contrasteQr"
 import { construireVCard, echapperVCard, separerNom } from "@/lib/vcard"
+import { chezLeCommerce, fuseauDuBloc } from "@/lib/heureDuCommerce"
 // QRowg Builder — Types & Definitions
 
 // ── Types de base ─────────────────────────────────────────────────────────────
@@ -767,15 +768,22 @@ export function dayField(c: any, day: number): string | undefined {
 // Statut d'ouverture au moment `now`. Supporte le mode jour-par-jour ET le mode simple hérité.
 // Gère : ouvert, ferme bientôt (<= 30 min), fermé/ouvre à X aujourd'hui, ouvre demain / tel jour.
 // Renvoie { open, label, color } ou null si aucune info pour aujourd'hui. `now` injectable (testabilité).
+//
+// L'heure lue est celle DU COMMERCE (`fuseau`), jamais celle du téléphone : un
+// horaire appartient au lieu. Sans ce fuseau, la même page annonçait « Fermé »
+// à New York d'un bistrot parisien en plein service — relevé au navigateur, voir
+// lib/heureDuCommerce.ts.
 export function openStatus(
-  c: { mon_fri?: string; saturday?: string; sunday?: string; mon?: string; tue?: string; wed?: string; thu?: string; fri?: string; sat?: string; sun?: string },
-  now: Date
+  c: { mon_fri?: string; saturday?: string; sunday?: string; mon?: string; tue?: string; wed?: string; thu?: string; fri?: string; sat?: string; sun?: string; fuseau?: string },
+  now: Date,
+  fuseau?: string,
 ): { open: boolean; label: string; color: string } | null {
-  const day = now.getDay() // 0=dim, 6=sam
+  const ici = chezLeCommerce(now, fuseau ?? fuseauDuBloc(c))
+  const day = ici.jour // 0=dim, 6=sam
   const field = dayField(c, day)
   if (!field || !field.trim()) return null // pas d'info pour aujourd'hui -> pas de badge
   const ranges = parseHourRanges(field)
-  const mins = now.getHours() * 60 + now.getMinutes()
+  const mins = ici.minutes
 
   const current = ranges.find(r => mins >= r.start && mins < r.end)
   if (current) {
