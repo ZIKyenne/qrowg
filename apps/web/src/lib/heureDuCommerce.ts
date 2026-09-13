@@ -87,6 +87,20 @@ export function chezLeCommerce(now: Date, fuseau: string): { jour: number; minut
   return { jour: jour < 0 ? now.getDay() : jour, minutes: h * 60 + m }
 }
 
+/**
+ * Le jour CALENDAIRE du commerce à cet instant, ramené à minuit UTC. Sert à
+ * comparer des dates entre elles (congés, exceptions) sans jamais mélanger
+ * l'heure du visiteur avec celle du lieu.
+ */
+export function dateChezLeCommerce(now: Date, fuseau: string): Date {
+  const tz = fuseauValide(fuseau) ? fuseau : FUSEAU_DEFAUT
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit",
+  }).formatToParts(now)
+  const lire = (t: string) => Number(parts.find(p => p.type === t)?.value ?? "0")
+  return new Date(Date.UTC(lire("year"), lire("month") - 1, lire("day")))
+}
+
 /** Décalage d'un fuseau à cet instant, en minutes (positif à l'est de Greenwich). */
 function decalage(now: Date, fuseau: string): number {
   const { jour, minutes } = chezLeCommerce(now, fuseau)

@@ -1,6 +1,7 @@
 import { rapportOuPire, niveauContraste } from "@/lib/contrasteQr"
 import { construireVCard, echapperVCard, separerNom } from "@/lib/vcard"
-import { chezLeCommerce, fuseauDuBloc } from "@/lib/heureDuCommerce"
+import { chezLeCommerce, dateChezLeCommerce, fuseauDuBloc } from "@/lib/heureDuCommerce"
+import { etatDesConges, phrasePendantConges } from "@/lib/congesDates"
 // QRowg Builder — Types & Definitions
 
 // ── Types de base ─────────────────────────────────────────────────────────────
@@ -774,11 +775,18 @@ export function dayField(c: any, day: number): string | undefined {
 // à New York d'un bistrot parisien en plein service — relevé au navigateur, voir
 // lib/heureDuCommerce.ts.
 export function openStatus(
-  c: { mon_fri?: string; saturday?: string; sunday?: string; mon?: string; tue?: string; wed?: string; thu?: string; fri?: string; sat?: string; sun?: string; fuseau?: string },
+  c: { mon_fri?: string; saturday?: string; sunday?: string; mon?: string; tue?: string; wed?: string; thu?: string; fri?: string; sat?: string; sun?: string; fuseau?: string; exception?: string },
   now: Date,
   fuseau?: string,
 ): { open: boolean; label: string; color: string } | null {
   const ici = chezLeCommerce(now, fuseau ?? fuseauDuBloc(c))
+  // Les congés passent AVANT l'horaire habituel : une page annonçait « Ouvert ·
+  // ferme à 18h » juste à côté de « Fermé du 1er au 15 août » (relevé du
+  // 13 septembre, voir lib/congesDates.ts). Quand le commerçant a écrit ses
+  // dates, elles font foi tant qu'elles courent.
+  const tz = fuseau ?? fuseauDuBloc(c)
+  const conges = etatDesConges(c.exception, dateChezLeCommerce(now, tz))
+  if (conges.etat === "pendant") return { open: false, label: phrasePendantConges(conges), color: "#FBBF24" }
   const day = ici.jour // 0=dim, 6=sam
   const field = dayField(c, day)
   if (!field || !field.trim()) return null // pas d'info pour aujourd'hui -> pas de badge

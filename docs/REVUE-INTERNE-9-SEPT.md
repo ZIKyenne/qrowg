@@ -633,3 +633,75 @@ fuseau (`Date.UTC` + commerce sur `"UTC"`) et mesurent la logique d'ouverture,
 plus l'accord fortuit de deux horloges.
 
 Suite complète : 4 861 tests, 295 fichiers. Build vert.
+
+---
+
+## v80 — le message de congés qui ne s'éteint jamais
+
+**Relevé.** Au navigateur, bloc « Horaires » garni d'un contenu de vrai
+commerçant. Lundi 14 septembre 2026, 10 h, heure de Paris :
+
+```
+badge     : « Ouvert · ferme à 18h »
+bannière  : « 📅 Fermé du 1er au 15 août »
+```
+
+Deux affirmations contraires dans la même rangée, un mois après la fin des
+congés. Le champ « Exception / congés » est un texte libre sans date : le
+commerçant l'écrit en juillet, part, revient — et le message reste en ligne
+jusqu'à ce qu'il pense à l'effacer. Personne ne pense à l'effacer.
+
+Or **la date est écrite dans le texte**. Le commerçant l'a donnée : « du 1er au
+15 août ». Le produit peut la lire.
+
+*(En chemin, une deuxième trouvaille : le bloc « Horaires » n'avait aucune
+garniture dans le harnais des 51 blocs — il s'y rendait vide, donc ni tableau,
+ni badge, ni bannière. C'est en la posant que la contradiction est apparue.)*
+
+**Ce que le lot change.**
+
+- `lib/congesDates.ts` (nouveau, PUR) — `periodeDeConges(texte, aujourdHui)` lit
+  les formes qu'écrivent les commerçants : « du 1er au 15 août » (le mois du
+  début vient de la fin), « du 24 décembre au 2 janvier » (passage d'année),
+  « du 01/08 au 15/08/2026 », « jusqu'au 15 août », « le 25 décembre ».
+  L'année manquante est celle qui place la période au plus près d'aujourd'hui :
+  août lu en septembre est l'août qui vient de passer.
+  **Et le module se tait dès qu'il n'est pas sûr** : « Fermé cet été », « congés
+  annuels », « Fermé du lundi au vendredi » ne renvoient rien. Mieux vaut ne
+  rien savoir que se tromper sur les congés de quelqu'un.
+- `openStatus` — les congés passent AVANT l'horaire habituel : pendant la
+  période, le badge annonce « Fermé · réouverture le 16 août ». Les deux lignes
+  disent enfin la même chose.
+- **La bannière périmée n'est plus publiée** — ni sur la page, ni dans le rendu
+  partagé. Le texte du commerçant n'est pas touché : il l'attend dans son bloc.
+- **Et il l'apprend** : `AlertesPublication` (près du bouton « Publier ») ajoute
+  « Message d'exception terminé depuis 30 jours — il n'est plus affiché en
+  ligne ». Rien quand aucune date n'est lisible : on ne signale que ce qu'on
+  sait.
+
+**Mesure après**, au même instant qu'au relevé : la bannière a disparu, le badge
+dit « Ouvert · ferme à 18h » — plus de contradiction. Et le 10 août, en pleine
+période : « Fermé · réouverture le 16 août » au-dessus de « Fermé du 1er au
+15 août », d'accord l'un avec l'autre.
+
+**Garde.** `lib/congesDates.test.ts` (21) : chaque forme reconnue, le passage
+d'année, l'année la plus proche, le silence sur tout ce qui n'est pas daté, le
+refus des dates impossibles ; les trois états et le dernier jour qui compte
+entièrement ; le badge pendant et après ; la phrase faite au commerçant et son
+arrivée dans les alertes de publication ; et, côté source, que la bannière
+affichée dépend bien de l'état de la période et qu'aucun rendu n'écrit dans le
+contenu du client.
+
+**Un défaut de mon propre module, attrapé par ma propre garde.** Le report à
+l'année précédente s'appliquait sans condition : « du 15 au 1er août » — une
+inversion de saisie — devenait des congés de douze mois (15 août 2025 →
+1er août 2026). Le report ne vaut plus que sur un vrai passage d'année, et
+au-delà de 120 jours le module se tait.
+
+**Vérification par mutation.** Quatre défauts réinjectés : le badge qui ignore
+les congés en cours, la bannière périmée qui repart en ligne, le dernier jour qui
+bascule trop tôt, le commerçant qui n'est plus prévenu. Chaque fois la garde
+tombe — la deuxième après avoir resserré le test de rendu, qui se contentait
+d'abord de regarder la forme de l'expression.
+
+Suite complète : 4 882 tests, 296 fichiers. Build vert.

@@ -7,6 +7,7 @@ import { BLOCK_DEFS } from "./blockDefs"
 import { boutonsSansLien } from "./boutonSansLien"
 import { hasPublishableContent, EMPTY_STATE_BLOCK_TYPES } from "./blockEmptyState"
 import { problemesDeTheme, phraseProbleme } from "./themeLisible"
+import { etatDesConges, phraseCongesTermines } from "@/lib/congesDates"
 import type { Block } from "./types"
 
 /** `blocId` vide : l'alerte porte sur la PAGE (son thème), pas sur un bloc. */
@@ -20,7 +21,7 @@ export type AlertePublication = { blocId: string; bloc: string; texte: string }
  *    ni avis, ni chiffres, ni adresse, donc un modèle appliqué tel quel arrive avec
  *    des emplacements à remplir. Ils sont annoncés ici plutôt que découverts en ligne.
  */
-export function alertesPublication(blocks: Block[]): AlertePublication[] {
+export function alertesPublication(blocks: Block[], aujourdHui: Date = new Date()): AlertePublication[] {
   const out: AlertePublication[] = []
   for (const b of blocks) {
     if (b.visible === false) continue
@@ -33,6 +34,14 @@ export function alertesPublication(blocks: Block[]): AlertePublication[] {
       out.push({ blocId: b.id, bloc, texte: "Bloc vide — rien à publier pour l'instant" })
       continue
     }
+    // Un message d'exception dont la période annoncée est passée : le produit ne
+    // le publie plus (il contredisait le badge), et le commerçant l'apprend ici
+    // plutôt que de le découvrir absent. Rien n'est effacé : son texte l'attend
+    // dans le bloc. Silence total quand aucune date n'est lisible — on ne devine
+    // pas les congés de quelqu'un (lot v80, lib/congesDates.ts).
+    const perimee = phraseCongesTermines(etatDesConges((b.content as any)?.exception, aujourdHui))
+    if (perimee) out.push({ blocId: b.id, bloc, texte: perimee })
+
     for (const o of boutonsSansLien(b.type, b.content as any)) out.push({ blocId: b.id, bloc, texte: `Bouton « ${o.libelle} » sans lien` })
   }
   return out

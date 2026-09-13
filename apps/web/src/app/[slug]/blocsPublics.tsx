@@ -15,7 +15,8 @@ import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
 import { contactFormFields, registerFormFields } from "@/lib/leadForms"
 import { openStatus, DAY_KEYS, countdownParts, shareLinks, calendarLinks, extHref, announcementMeta, SOCIAL_NETWORKS_MAP, destinationUtile } from "../dashboard/builder/types"
-import { chezLeCommerce, fuseauDuBloc, fuseauDuVisiteur, memeHeureQue, mentionFuseau } from "@/lib/heureDuCommerce"
+import { chezLeCommerce, dateChezLeCommerce, fuseauDuBloc, fuseauDuVisiteur, memeHeureQue, mentionFuseau } from "@/lib/heureDuCommerce"
+import { etatDesConges } from "@/lib/congesDates"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 
@@ -237,6 +238,15 @@ export function HoursPublic({ c, theme }: { c: any; theme: any }) {
   // parisien marquait « Aujourd'hui » sur la mauvaise ligne.
   const fuseauBloc = fuseauDuBloc(c)
   useEffect(() => { setToday(chezLeCommerce(new Date(), fuseauBloc).jour) }, [fuseauBloc])
+  // Un message d'exception dont la période est PASSÉE n'est plus affiché : il
+  // annonçait « Fermé du 1er au 15 août » à côté d'un badge « Ouvert », un mois
+  // après (relevé du 13 septembre). Le texte reste dans l'éditeur, et le
+  // commerçant y est prévenu. Calculé après le montage, comme le reste.
+  const [exceptionPerimee, setExceptionPerimee] = useState(false)
+  useEffect(() => {
+    setExceptionPerimee(etatDesConges(c.exception, dateChezLeCommerce(new Date(), fuseauBloc)).etat === "terminee")
+  }, [c.exception, fuseauBloc])
+  const exceptionAffichee = c.exception && !exceptionPerimee
   const MUTED = theme.muted || "#8A8478"
   const TEXT = theme.text || "#F5F0E8"
   const G = theme.primary || "#C9A84C"
@@ -254,7 +264,7 @@ export function HoursPublic({ c, theme }: { c: any; theme: any }) {
       { label: "Dimanche", hours: c.sunday, dayIdx: 0 },
     ].filter(r => r.hours) as any
   }
-  if (rows.length === 0 && !c.exception) return null
+  if (rows.length === 0 && !exceptionAffichee) return null
   const isToday = (dayIdx: number) => dayIdx === today || (dayIdx === -1 && today >= 1 && today <= 5)
   return (
     <div style={{ padding: "6px 24px 16px" }}>
@@ -262,7 +272,7 @@ export function HoursPublic({ c, theme }: { c: any; theme: any }) {
         {c.title ? <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: 0, fontFamily: FONT_B }}>{c.title}</p> : <span />}
         <OpenBadge c={c} FONT_B={FONT_B} />
       </div>
-      {c.exception && (
+      {exceptionAffichee && (
         <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 11, padding: "10px 13px", marginBottom: 10 }}>
           <span style={{ fontSize: 16, flexShrink: 0 }}>📅</span>
           <p style={{ color: "#FBBF24", fontSize: 12.5, fontWeight: 600, margin: 0, fontFamily: FONT_B }}>{c.exception}</p>

@@ -96,4 +96,10 @@ export const FILL: Record<string, Record<string, any>> = {
   pricing: { title: "Tarifs", title1: "Starter", price1: "9€", desc1: "Pour débuter", title2: "Pro", price2: "29€", desc2: "Le plus choisi", cta_label: "Choisir", cta_url: "https://exemple.com" },
   skills: { title: "Compétences", skill1: "Design", skill2: "Développement", skill3: "SEO" },
   languages: { title: "Langues", lang1: "Français", level1: "Natif", lang2: "Anglais", level2: "Courant" },
+  // Le bloc « Horaires » n'avait AUCUNE garniture : le harnais le rendait vide,
+  // c'est-à-dire qu'il ne montrait ni le tableau, ni le badge, ni la bannière de
+  // congés — les trois choses qu'on vient y regarder. Contenu de vrai commerçant,
+  // congés d'été compris : c'est ainsi qu'on a vu la bannière et le badge se
+  // contredire (cf. lib/congesDates.ts).
+  opening_hours: { title: "Horaires", mode: "Simple (Lun-Ven / Sam / Dim)", mon_fri: "9h - 18h", saturday: "10h - 16h", sunday: "Fermé", exception: "Fermé du 1er au 15 août", note: "Réservation recommandée" },
 }

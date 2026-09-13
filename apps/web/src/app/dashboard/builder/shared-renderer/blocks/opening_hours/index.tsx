@@ -12,7 +12,8 @@
 import { useEffect, useState } from "react"
 import { horaires, estAujourdhui, estFerme } from "../../models/horairesGalerieReseaux"
 import { openStatus } from "../../../types"
-import { chezLeCommerce, fuseauDuBloc, fuseauDuVisiteur, memeHeureQue, mentionFuseau } from "@/lib/heureDuCommerce"
+import { chezLeCommerce, dateChezLeCommerce, fuseauDuBloc, fuseauDuVisiteur, memeHeureQue, mentionFuseau } from "@/lib/heureDuCommerce"
+import { etatDesConges } from "@/lib/congesDates"
 import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { sz, editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 
@@ -49,6 +50,14 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   const [jour, setJour] = useState(-1)
   const fuseauBloc = fuseauDuBloc(c)
   useEffect(() => { setJour(chezLeCommerce(new Date(), fuseauBloc).jour) }, [fuseauBloc])
+  // Un message d'exception dont la période est passée n'est plus publié : il
+  // contredisait le badge (cf. lib/congesDates.ts). Le texte reste dans
+  // l'éditeur, où AlertesPublication dit au commerçant ce qu'il en est.
+  const [perimee, setPerimee] = useState(false)
+  useEffect(() => {
+    setPerimee(etatDesConges(c.exception, dateChezLeCommerce(new Date(), fuseauBloc)).etat === "terminee")
+  }, [c.exception, fuseauBloc])
+  const exception = perimee ? "" : h.exception
   const note = h.note && (
     <div style={{ padding: `${sz(u, 9)}px ${sz(u, 16)}px`, background: `${u.G}05` }}>
       <p style={{ color: u.MUTED, fontSize: sz(u, 13.5), margin: 0, fontStyle: "italic", fontFamily: u.FONT_B }}>{h.note}</p>
@@ -60,10 +69,10 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
         {h.titre ? <p style={{ color: u.MUTED, fontSize: sz(u, 11), textTransform: "uppercase", letterSpacing: 2, margin: 0, fontFamily: u.FONT_B }}>{h.titre}</p> : <span />}
         <Badge u={u} c={c} />
       </div>
-      {h.exception && (
+      {exception && (
         <div style={{ display: "flex", alignItems: "center", gap: sz(u, 8), background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 11, padding: `${sz(u, 10)}px ${sz(u, 13)}px`, marginBottom: sz(u, 10) }}>
           <span style={{ fontSize: sz(u, 16), flexShrink: 0 }}>📅</span>
-          <p style={{ color: "#FBBF24", fontSize: sz(u, 12.5), fontWeight: 600, margin: 0, fontFamily: u.FONT_B }}>{h.exception}</p>
+          <p style={{ color: "#FBBF24", fontSize: sz(u, 12.5), fontWeight: 600, margin: 0, fontFamily: u.FONT_B }}>{exception}</p>
         </div>
       )}
       {h.lignes.length > 0 ? (
