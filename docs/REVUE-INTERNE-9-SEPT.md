@@ -1725,3 +1725,70 @@ sans en-tête, l'ancienne promesse de suppression, et un `extra` capable de
 redonner du cache. Trois tests tombent.
 
 Suite complète : 5 114 tests, 310 fichiers. Build vert.
+
+---
+
+## v96 — le produit prévient mieux pour une page que pour tout le compte
+
+**Le relevé**, les deux écrans côte à côte.
+
+```
+SUPPRIMER UNE PAGE (lot v84) :
+  · 4 QR imprimables : Table 1, Table 2, Table 3, Table 4
+  · 1 420 scans enregistrés · 3 800 vues de la page · 12 messages reçus
+  · Ces codes sont peut-être déjà collés ou distribués : ils cesseront de
+    fonctionner définitivement. […] il faudrait réimprimer les supports.
+  + il faut RECOPIER le titre de la page pour débloquer le bouton.
+
+SUPPRIMER TOUT LE COMPTE :
+  · « La suppression de votre compte effacera définitivement toutes vos pages,
+     QR codes et données analytics. Cette action est irréversible. »
+  + il faut recopier son e-mail.
+```
+
+Une phrase, aucun chiffre. Et six choses que l'écran ne disait pas **alors que
+`api/account/delete` les fait** :
+
+```
+NON — le nombre de QR imprimés qui cesseront de fonctionner
+NON — que ces codes sont dehors et qu'il faudra réimprimer
+NON — que l'équipe est supprimée et ses membres perdent l'accès
+NON — que l'abonnement en cours est résilié
+NON — que les domaines personnalisés cessent de résoudre
+NON — que l'adresse publique redevient libre
+```
+
+La route est pourtant soignée : elle résilie chez Stripe **avant** de supprimer
+quoi que ce soit, refuse la suppression si Stripe échoue, supprime les équipes
+possédées, détache les filleuls. Tout ce travail, et l'écran n'en disait rien.
+
+**Ce que le lot change.** `lib/suppressionDeCompte.ts`, module pur :
+`consequencesDuCompte` (les lignes chiffrées, même règle qu'au lot v84 — on ne
+liste que ce qui existe), et cinq phrases — `phraseCodesDuCompte`,
+`phraseEquipe`, `phraseAbonnement`, `phraseDomaines`, `phraseAdressePublique`.
+
+Deux choix tiennent le lot :
+
+- sur les codes déjà collés, le module **délègue au lot v84**. Il n'y a qu'une
+  chose vraie à dire, et elle est déjà écrite ;
+- l'adresse publique est le seul élément qui, lui, **redevient libre** —
+  contrairement au code court d'un QR, unique et jamais réattribué. Le produit
+  le dit : « quelqu'un d'autre pourra la prendre. »
+
+La lecture vit dans `settings/ceQuiDisparaitDuCompte.ts` et ne compte que ce que
+le compte **possède** : les équipes dont il est seulement membre ne disparaissent
+pas avec lui.
+
+**Garde.** `lib/suppressionDeCompte.test.ts` (17 tests), dont la règle de classe :
+**le compte annonce au moins autant de lignes qu'une seule page**, et une seule
+formulation pour les codes déjà collés.
+
+**Ce que la garde a appris au passage.** Le libellé du plan `business` n'est pas
+« Business » mais « Multi-sites » : le test le lit dans `lib/plans` au lieu de
+l'écrire — c'est le produit qui a raison sur ses propres noms.
+
+**Vérification par mutation.** Deux défauts réinjectés — l'écran qui reprend sa
+phrase générique, et le module qui réécrit sa propre phrase de codes imprimés.
+Quatre tests tombent.
+
+Suite complète : 5 131 tests, 311 fichiers. Build vert.

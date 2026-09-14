@@ -1148,9 +1148,13 @@ TikTok (l'API la refuse sur ce format).
 > temps de visionnage exploitable ; prochaine lecture demain. Échéance Pinterest
 > Analytics « clic sortant » (`utm_content=clic`, base 0,17 %) : **demain 15/09**.
 >
-> **Dépôt NON fait** (tâche sans utilisateur, proxy bloquant supabase.co) : les 16 visuels
-> partent en réserve `dispo`, **aucun post créé dans Buffer** — Buffer refuse une image
-> dont l'URL n'est pas déjà accessible. File inchangée à **1/10**.
+> **Dépôt fait en cours de run** (16 PNG déposés via `QRowg-Depot.cmd`), puis **6 posts
+> mis en file** : épingle producteur (14 h 13 UTC), carrousel Instagram (16 h 49),
+> épingle hôtel (18 h 47), épingle restaurant (19 h 03), carrousel photo TikTok
+> (15/09, 04 h 40), épingle immobilier (15/09, 13 h 28). Relecture `list_posts` après
+> coup : **7 `scheduled` exactement** (les 6 du jour + l'épingle boutique du 13/09),
+> ni plus ni moins. **File à 7/10.** Réserve repassée à vide.
+> Premier épinglage sur le tableau **QR code hôtel**.
 
 | Date | Secteur | Slugs produits | Canaux |
 |---|---|---|---|

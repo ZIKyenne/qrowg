@@ -1,6 +1,8 @@
 "use client"
 
 import { getPlan, dynLimit } from "@/lib/plans"
+import { consequencesDuCompte, avertissementsDuCompte, type CeQuiDisparaitDuCompte } from "@/lib/suppressionDeCompte"
+import { lireCeQuiDisparait } from "./ceQuiDisparaitDuCompte"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { SettingsSection, champStyle } from "@/components/ui/SettingsSection"
 import { useEffect, useState } from "react"
@@ -75,6 +77,7 @@ export default function SettingsPage() {
 
   // Danger zone
   const [deleteConfirm, setDeleteConfirm] = useState("")
+  const [ceQuiDisparait, setCeQuiDisparait] = useState<CeQuiDisparaitDuCompte | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState("")
 
@@ -83,7 +86,9 @@ export default function SettingsPage() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { window.location.href = "/auth/login"; return }
-      const { data } = await supabase.from("profiles").select("id,email,full_name,plan,preferences").eq("id", user.id).single()
+      const { data } = await supabase.from("profiles").select("id,email,full_name,plan,preferences,username").eq("id", user.id).single()
+      // Ce que la suppression emporterait — lu AVANT qu'on la propose (lot v96).
+      lireCeQuiDisparait(supabase, user.id, data as any).then(setCeQuiDisparait).catch(() => {})
       if (data) {
         setProfile(data)
         if ((data as any).plan && (data as any).plan !== "free") {
@@ -420,8 +425,22 @@ export default function SettingsPage() {
           </div>
           <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
             <p style={{ color: MUTED, fontSize: 13, margin: 0, lineHeight: 1.6 }}>
-              La suppression de votre compte effacera définitivement toutes vos pages, QR codes et données analytics. Cette action est irréversible.
+              La suppression de votre compte est définitive. Voici ce qu'elle emporte :
             </p>
+            {/* Une page supprimée annonce cinq lignes chiffrées depuis le lot v84 ;
+                le compte entier n'en annonçait aucune (lot v96). */}
+            {consequencesDuCompte(ceQuiDisparait).length > 0 && (
+              <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 5 }}>
+                {consequencesDuCompte(ceQuiDisparait).map((l, i) => (
+                  <li key={i} style={{ color: "var(--ink)", fontSize: 13, display: "flex", gap: 7 }}>
+                    <span style={{ color: "var(--danger)", flexShrink: 0 }}>·</span>{l}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {avertissementsDuCompte(ceQuiDisparait).map((p, i) => (
+              <p key={i} style={{ color: MUTED, fontSize: 12.5, margin: 0, lineHeight: 1.55 }}>{p}</p>
+            ))}
             <div>
               <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 5 }}>Confirmez en tapant votre e-mail : <span style={{ color: "var(--danger)" }}>{profile?.email}</span></label>
               <input value={deleteConfirm} onChange={e => setDeleteConfirm(e.target.value)}

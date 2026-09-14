@@ -469,7 +469,7 @@ Pas de LinkedIn ni de X aujourd'hui (dimanche).
 
 ---
 
-## 14/09 — production du jour · EN RÉSERVE `dispo` (dépôt non lancé)
+## 14/09 — production du jour · DÉPOSÉE ET MISE EN FILE (réserve vide)
 
 > Réserve **vide** au démarrage (tout en `en-file`) : production 100 % neuve.
 > Étape 0 : un post Instagram en `error` (carrousel anniversaire du 13/09) correspondait
@@ -478,18 +478,20 @@ Pas de LinkedIn ni de X aujourd'hui (dimanche).
 > `scheduled` (1 seul post : épingle boutique du 13/09, due le 14/09 à 12 h 18).
 > **9 places libres** dans la file.
 > Contrôle qualité : **16 visuels, 0 alerte**, les 8 QR décodés vers leur lien tracké.
-> **Dépôt NON fait** : la tâche tourne sans l'utilisateur et le proxy bloque supabase.co.
-> Les 16 PNG sont donc archivés ici en statut `dispo`. Dès que `QRowg-Depot.cmd` est
-> lancé et que les URLs reviennent, ces lignes passent en `en-file`.
+> **Dépôt fait** (16 PNG via `QRowg-Depot.cmd`), puis **6 posts mis en file** : épingle
+> producteur (14 h 13 UTC), carrousel Instagram (16 h 49), épingle hôtel (18 h 47),
+> épingle restaurant (19 h 03), carrousel photo TikTok (15/09, 04 h 40) et épingle
+> immobilier (15/09, 13 h 28). Avec l'épingle boutique du 13/09 encore en attente,
+> **file à 7/10**, aucune erreur. Le stock repasse à **vide** (`en-file` partout).
 
 | statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
 |---|---|---|---|---|---|---|
-| dispo | qr-code-fiche-technique-couleur-formule-salon-01..06.png | Instagram (carrousel) | — | salon · fiche technique de la couleur · la formule est lisible par toute l'équipe, même sans la coloriste | https://qrowg.com/qr-code/salon?utm_source=instagram&utm_medium=bio&utm_campaign=20260914-salon | 2026-09-14 |
-| dispo | tiktok-qr-code-fiche-technique-couleur-formule-salon-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 | https://qrowg.com/qr-code/salon?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260914-salon | 2026-09-14 |
-| dispo | qr-code-calendrier-semis-et-recoltes-etal-producteur.png | Pinterest | QR code food truck (726416683586817654) — gabarit 0 | producteur · calendrier des semis et des récoltes · « c'est quand, les fraises ? » | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic&utm_term=producteur | 2026-09-14 |
-| dispo | qr-code-bonnes-adresses-du-quartier-hotel.png | Pinterest | QR code hôtel (726416683586817656) — gabarit 1 | hôtel · bonnes adresses du quartier tenues à jour · le classeur de la réception date de trois ans | https://qrowg.com/qr-code/hotel?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic | 2026-09-14 |
-| dispo | qr-code-objets-oublies-vestiaire-restaurant.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 2 | restaurant · vestiaire et objets oubliés · l'écharpe sous la banquette et personne à rappeler | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic | 2026-09-14 |
-| dispo | qr-code-charges-et-taxes-du-bien-immobilier.png | Pinterest | QR code immobilier (726416683586817652) — gabarit 3 — *unique épingle hors-food* | immobilier · récapitulatif des charges et taxes du bien · la question tombe à chaque visite | https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic&utm_term=charges | 2026-09-14 |
+| en-file | qr-code-fiche-technique-couleur-formule-salon-01..06.png | Instagram (carrousel) | — | salon · fiche technique de la couleur · la formule est lisible par toute l'équipe, même sans la coloriste | https://qrowg.com/qr-code/salon?utm_source=instagram&utm_medium=bio&utm_campaign=20260914-salon | 2026-09-14 |
+| en-file | tiktok-qr-code-fiche-technique-couleur-formule-salon-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 | https://qrowg.com/qr-code/salon?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260914-salon | 2026-09-14 |
+| en-file | qr-code-calendrier-semis-et-recoltes-etal-producteur.png | Pinterest | QR code food truck (726416683586817654) — gabarit 0 | producteur · calendrier des semis et des récoltes · « c'est quand, les fraises ? » | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic&utm_term=producteur | 2026-09-14 |
+| en-file | qr-code-bonnes-adresses-du-quartier-hotel.png | Pinterest | QR code hôtel (726416683586817656) — gabarit 1 | hôtel · bonnes adresses du quartier tenues à jour · le classeur de la réception date de trois ans | https://qrowg.com/qr-code/hotel?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic | 2026-09-14 |
+| en-file | qr-code-objets-oublies-vestiaire-restaurant.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 2 | restaurant · vestiaire et objets oubliés · l'écharpe sous la banquette et personne à rappeler | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic | 2026-09-14 |
+| en-file | qr-code-charges-et-taxes-du-bien-immobilier.png | Pinterest | QR code immobilier (726416683586817652) — gabarit 3 — *unique épingle hors-food* | immobilier · récapitulatif des charges et taxes du bien · la question tombe à chaque visite | https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic&utm_term=charges | 2026-09-14 |
 
 > Pas de vidéo aujourd'hui (jours vidéo : mer, ven, sam, dim).
 
