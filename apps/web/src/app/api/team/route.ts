@@ -8,6 +8,10 @@ import { emailShell, emailH1, emailButton } from "@/lib/emailLayout"
 import { getPrimaryTeam, resolveRole, roleAtLeast, ASSIGNABLE_ROLES, type TeamRole } from "@/lib/team"
 import { rateLimit } from "@/lib/rateLimit"
 import { canTeam, teamLimit } from "@/lib/plans"
+import {
+  DUREE_INVITATION_JOURS, siegesOccupes, invitationsExpirees,
+  phraseLimiteAtteinte, mentionDelaiEmail,
+} from "@/lib/invitationsEquipe"
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 
@@ -25,20 +29,24 @@ export async function GET() {
 
   const [{ data: members }, { data: invitations }] = await Promise.all([
     admin.from("team_members").select("id, user_id, role, joined_at, profiles(email, full_name)").eq("team_id", team.id).order("joined_at"),
-    admin.from("team_invitations").select("id, email, role, created_at").eq("team_id", team.id).is("accepted_at", null).order("created_at"),
+    admin.from("team_invitations").select("id, email, role, created_at, expires_at").eq("team_id", team.id).is("accepted_at", null).order("created_at"),
   ])
 
   const myRole = await resolveRole(admin, team, user.id)
+  // Un lien expiré ne mène plus nulle part : il ne prend le siège de personne.
+  const enAttente = invitations ?? []
+  const maintenant = new Date()
   return NextResponse.json({
     team: { id: team.id, name: team.name, ownerId: team.owner_id },
     owner: { id: team.owner_id, email: ownerProf?.email, name: ownerProf?.full_name },
     members: members ?? [],
-    invitations: invitations ?? [],
+    invitations: enAttente,
     myRole,
     plan: ownerProf?.plan ?? "free",
     teamEnabled: canTeam(ownerProf?.plan),
     teamLimit: teamLimit(ownerProf?.plan),
-    seatsUsed: (members?.length ?? 0) + (invitations?.length ?? 0),
+    seatsUsed: siegesOccupes(members?.length ?? 0, enAttente, maintenant),
+    invitationsExpirees: invitationsExpirees(enAttente, maintenant).length,
   })
 }
 
@@ -73,12 +81,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "La fonction Équipe nécessite le plan Business.", upgrade: true }, { status: 403 })
   }
   const limit = teamLimit(ownerProf?.plan) ?? 0
-  const [{ count: memberCount }, { count: inviteCount }] = await Promise.all([
+  const [{ count: memberCount }, { data: enAttente }] = await Promise.all([
     admin.from("team_members").select("id", { count: "exact", head: true }).eq("team_id", team.id),
-    admin.from("team_invitations").select("id", { count: "exact", head: true }).eq("team_id", team.id).is("accepted_at", null),
+    admin.from("team_invitations").select("expires_at, created_at").eq("team_id", team.id).is("accepted_at", null),
   ])
-  if ((memberCount ?? 0) + (inviteCount ?? 0) >= limit) {
-    return NextResponse.json({ error: `Limite de ${limit} membres atteinte pour votre plan.` }, { status: 403 })
+  // Une invitation expirée ne peut plus être acceptée : elle n'occupe pas de
+  // siège. Sans ce filtre, cinq liens morts rendaient un plan Business « plein ».
+  const maintenant = new Date()
+  const occupes = siegesOccupes(memberCount ?? 0, enAttente ?? [], maintenant)
+  if (occupes >= limit) {
+    const mortes = invitationsExpirees(enAttente ?? [], maintenant).length
+    return NextResponse.json({ error: phraseLimiteAtteinte(limit, mortes) }, { status: 403 })
   }
 
   // Ne pas s'inviter soi-même.
@@ -92,7 +105,8 @@ export async function POST(req: NextRequest) {
   }
 
   const token = randomUUID()
-  const expiresAt = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString() // +7 jours (reposé à chaque ré-invitation)
+  // +7 jours (reposé à chaque ré-invitation) — la durée du produit, dite à l'invité.
+  const expiresAt = new Date(Date.now() + DUREE_INVITATION_JOURS * 24 * 3600 * 1000).toISOString()
   const { error: invErr } = await admin.from("team_invitations")
     .upsert({ team_id: team.id, email, role, token, invited_by: user.id, accepted_at: null, expires_at: expiresAt }, { onConflict: "team_id,email" })
   if (invErr) return NextResponse.json({ error: "Impossible de créer l'invitation." }, { status: 500 })
@@ -110,7 +124,10 @@ export async function POST(req: NextRequest) {
           <strong style="color:#F5F0E8;">${esc(inviter)}</strong> vous invite à collaborer sur <strong style="color:#F5F0E8;">${esc(team.name)}</strong> dans QRowg, en tant que <strong style="color:#C9A84C;">${esc(roleLabel)}</strong>.
         </p>
         ${emailButton("Rejoindre l'équipe", acceptUrl)}
-        <p style="margin:22px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:12.5px;color:#8A8478;line-height:1.6;">
+        <p style="margin:22px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#B8B2A4;line-height:1.6;">
+          ${esc(mentionDelaiEmail(expiresAt))}
+        </p>
+        <p style="margin:10px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:12.5px;color:#8A8478;line-height:1.6;">
           Si vous n'avez pas de compte QRowg, créez-en un avec cette adresse e-mail, puis rouvrez ce lien.
         </p>`
       await new Resend(apiKey).emails.send({

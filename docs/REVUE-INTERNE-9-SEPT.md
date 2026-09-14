@@ -1171,3 +1171,75 @@ quelques heures plus tôt sert de garde-fou à la suivante — c'est exactement 
 rôle.
 
 Suite complète : 4 971 tests, 302 fichiers. Build vert.
+
+---
+
+## v88 — l'invitation morte qui occupe un siège payant
+
+**Le relevé.** Depuis la migration `20260728160000`, une invitation d'équipe
+expire : `expires_at timestamptz not null default (now() + interval '7 days')`.
+C'est la bonne décision — un lien transféré ne doit pas rester acceptable
+indéfiniment — et `api/team/accept` la fait respecter : « Invitation expirée.
+Demandez-en une nouvelle. »
+
+Mais `expires_at` n'était lu QUE là. Sur une équipe Business (limite 5), cinq
+invitations en attente dont trois expirées, zéro membre :
+
+```
+ÉCRAN ÉQUIPE — « Invitations en attente »
+   chef@lecomptoir.fr        Invité·e comme Administrateur
+   serveur@lecomptoir.fr     Invité·e comme Éditeur
+   compta@lecomptoir.fr      Invité·e comme Éditeur        ← morte depuis 16 j
+   stagiaire@gmail.com       Invité·e comme Éditeur        ← morte depuis 89 j
+   ancien@lecomptoir.fr      Invité·e comme Administrateur ← morte depuis 133 j
+
+   Membres  5 / 5
+
+INVITER UNE PERSONNE DE PLUS :
+   refus — « Limite de 5 membres atteinte pour votre plan. »
+
+L'E-MAIL D'INVITATION DIT-IL QUE LE LIEN A UNE DATE LIMITE ?  non — rien
+```
+
+Personne dans l'équipe, deux liens vivants, et le plan payant est « plein ».
+Trois causes, toutes dans le même oubli :
+
+- `GET /api/team` demandait `select("id, email, role, created_at")` — la date
+  limite n'était pas même lue ;
+- le garde de sièges comptait `accepted_at is null` sans regarder la date ;
+- l'e-mail reçu par l'invité n'annonçait aucun délai : celui qui l'ouvre le
+  huitième jour tombe sur « Invitation indisponible » sans avoir jamais su qu'il
+  y en avait un.
+
+**Ce que le lot change.** `lib/invitationsEquipe.ts`, module pur :
+
+- `expirationDe` / `etatInvitation` — `active`, `bientot` (moins de 2 jours),
+  `expiree` ; la date se lit dans `expires_at`, à défaut se reconstitue depuis
+  `created_at` avec les 7 jours du produit, et sans rien des deux on ne conclut
+  pas ;
+- `siegesOccupes(membres, invitations)` — un lien mort ne prend la place de
+  personne. Le relevé passe de « 5 / 5 » à « 2 / 5 », et la 6ᵉ invitation part ;
+- `phraseInvitation` — « Expire dans 6 jours », « Expire dans moins de
+  24 heures », « Expirée depuis 16 jours — le lien ne fonctionne plus » ;
+- `phraseSiegesMorts`, `phraseLimiteAtteinte` — le compteur s'explique, et le
+  refus ne promet pas une place qui n'existe pas ;
+- `mentionDelaiEmail` — la phrase que l'e-mail ne disait pas : « Ce lien expire
+  le 21 septembre 2026 — dans 7 jours. »
+
+L'écran affiche l'état de chaque invitation dans la couleur qui va avec, et une
+invitation expirée porte un bouton « Renvoyer » — c'est le même `POST /api/team`
+(upsert sur `team_id + e-mail`), qui repose le jeton et la date. `api/team/accept`
+juge désormais avec `etatInvitation` au lieu de sa propre comparaison.
+
+**Garde.** `lib/invitationsEquipe.test.ts` (25 tests). Les 7 jours sont vérifiés
+contre le SQL de la migration, pas contre une constante recopiée. Deux balayages
+d'arbre : aucun fichier ne compte des invitations en attente avec
+`count: "exact"` sans lire leur date, et toute lecture qui sort `created_at`
+sort aussi `expires_at`.
+
+**Vérification par mutation.** Trois défauts réinjectés — l'API qui reprend son
+`select` court et son addition, l'écran qui calcule l'état sans l'afficher,
+l'acceptation qui refait sa propre comparaison de date. Six tests tombent au
+total.
+
+Suite complète : 4 996 tests, 303 fichiers. Build vert.

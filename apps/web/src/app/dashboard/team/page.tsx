@@ -3,15 +3,16 @@
 import { PageHeader } from "@/components/ui/PageHeader"
 import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
-import { Users, Mail, Trash2, ShieldCheck, Pencil, Crown, Loader2, LogOut, Sparkles, ArrowRight } from "lucide-react"
+import { Users, Mail, Trash2, ShieldCheck, Pencil, Crown, Loader2, LogOut, Sparkles, ArrowRight, RefreshCw } from "lucide-react"
 import { useToast } from "@/components/Toast"
 import { useConfirm } from "@/components/ui/Confirm"
 import { Button } from "@/components/ui/Button"
 import { erreurLisible, MessageUtilisateur } from "@/lib/erreurLisible"
+import { etatInvitation, phraseInvitation, phraseSiegesMorts, COULEUR_ETAT } from "@/lib/invitationsEquipe"
 
 type Role = "owner" | "admin" | "editor" | "viewer"
 type Member = { id: string; user_id: string; role: Role; joined_at: string; profiles?: { email?: string; full_name?: string } }
-type Invitation = { id: string; email: string; role: Role; created_at: string }
+type Invitation = { id: string; email: string; role: Role; created_at: string; expires_at?: string | null }
 export type TeamData = {
   team: { id: string; name: string; ownerId: string }
   owner: { id: string; email?: string; name?: string }
@@ -22,6 +23,7 @@ export type TeamData = {
   teamEnabled: boolean
   teamLimit: number | null
   seatsUsed: number
+  invitationsExpirees?: number
 }
 
 const GOLD = "var(--accent)"
@@ -107,6 +109,18 @@ export default function TeamPage({ initialData }: { initialData?: TeamData } = {
       toast.success("Invitation annulée")
       load()
     } catch (e) { toast.error(erreurLisible(e, "L'invitation n'a pas pu être annulée.")) }
+  }
+
+  // Renvoyer : la même invitation, avec un lien neuf. `POST /api/team` repose le
+  // token et la date d'expiration (upsert sur team_id + e-mail).
+  const resendInvite = async (inv: Invitation) => {
+    try {
+      const res = await fetch("/api/team", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: inv.email, role: inv.role }) })
+      const d = await res.json()
+      if (!res.ok) throw new MessageUtilisateur(d.error || "L'invitation n'a pas pu être renvoyée.")
+      toast.success("Nouvelle invitation envoyée à " + inv.email)
+      load()
+    } catch (e) { toast.error(erreurLisible(e, "L'invitation n'a pas pu être renvoyée.")) }
   }
 
   const leaveTeam = async () => {
@@ -223,20 +237,35 @@ export default function TeamPage({ initialData }: { initialData?: TeamData } = {
           {data.invitations.length > 0 && (
             <div style={card}>
               <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: "0 0 6px" }}>Invitations en attente</p>
-              {data.invitations.map(inv => (
-                <div key={inv.id} style={rowStyle}>
-                  <Mail size={15} color="var(--muted)" />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ color: "var(--ink)", fontSize: 14, overflow: "hidden", textOverflow: "ellipsis" }}>{inv.email}</div>
-                    <div style={{ color: "var(--muted)", fontSize: 12 }}>Invité·e comme {ROLE_LABEL[inv.role]}</div>
+              {phraseSiegesMorts(data.invitationsExpirees ?? 0) && (
+                <p style={{ color: "var(--muted)", fontSize: 12.5, margin: "0 0 8px", lineHeight: 1.5 }}>{phraseSiegesMorts(data.invitationsExpirees ?? 0)}</p>
+              )}
+              {data.invitations.map(inv => {
+                const etat = etatInvitation(inv)
+                const delai = phraseInvitation(inv)
+                return (
+                  <div key={inv.id} style={rowStyle}>
+                    <Mail size={15} color={etat === "expiree" ? "var(--danger)" : "var(--muted)"} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ color: "var(--ink)", fontSize: 14, overflow: "hidden", textOverflow: "ellipsis" }}>{inv.email}</div>
+                      <div style={{ color: "var(--muted)", fontSize: 12 }}>
+                        Invité·e comme {ROLE_LABEL[inv.role]}
+                        {delai ? <> · <span style={{ color: COULEUR_ETAT[etat], fontWeight: etat === "active" ? 400 : 600 }}>{delai}</span></> : null}
+                      </div>
+                    </div>
+                    {canManage && etat === "expiree" && (
+                      <button type="button" onClick={() => resendInvite(inv)} className="da-btn-neutral da-btn-neutral--sm">
+                        <RefreshCw size={13} /> Renvoyer
+                      </button>
+                    )}
+                    {canManage && (
+                      <button type="button" onClick={() => cancelInvite(inv.id)} className="da-btn-neutral da-btn-neutral--sm">
+                        Annuler
+                      </button>
+                    )}
                   </div>
-                  {canManage && (
-                    <button type="button" onClick={() => cancelInvite(inv.id)} className="da-btn-neutral da-btn-neutral--sm">
-                      Annuler
-                    </button>
-                  )}
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server"
 import { canTeam, teamLimit } from "@/lib/plans"
+import { etatInvitation } from "@/lib/invitationsEquipe"
 
 // POST — accepter une invitation via son token (l'utilisateur connecté rejoint l'équipe).
 export async function POST(req: NextRequest) {
@@ -15,12 +16,13 @@ export async function POST(req: NextRequest) {
 
   const admin = createAdminClient()
   const { data: inv } = await admin.from("team_invitations")
-    .select("id, team_id, email, role, accepted_at, expires_at")
+    .select("id, team_id, email, role, accepted_at, expires_at, created_at")
     .eq("token", token)
     .maybeSingle()
   if (!inv) return NextResponse.json({ error: "Invitation introuvable ou expirée." }, { status: 404 })
   if (inv.accepted_at) return NextResponse.json({ error: "Invitation déjà utilisée." }, { status: 410 })
-  if (inv.expires_at && new Date(inv.expires_at).getTime() < Date.now()) {
+  // Même règle que la liste et le compteur de sièges — `lib/invitationsEquipe`.
+  if (etatInvitation({ expires_at: inv.expires_at, created_at: inv.created_at }) === "expiree") {
     return NextResponse.json({ error: "Invitation expirée. Demandez-en une nouvelle." }, { status: 410 })
   }
 
