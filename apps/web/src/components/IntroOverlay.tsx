@@ -5,6 +5,7 @@
 // retire seul après ~4,5 s → aucun impact possible sur le design du site.
 // Space Grotesk est self-hébergée (pas de CDN Google, cohérent avec la perf).
 import { useEffect, useRef, useState, type CSSProperties } from "react"
+import { ecrire, lire } from "@/lib/memoireDuNavigateur"
 
 const ONCE_PER_SESSION = true   // true = une seule fois par session (recommandé en prod)
 const DURATION_MS = 3900        // BAR_DELAY(250) + LOAD(2400) + HOLD_FULL(400) + EXIT(850)
@@ -16,10 +17,10 @@ export default function IntroOverlay() {
   const pctRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (ONCE_PER_SESSION && sessionStorage.getItem("qw-intro-seen")) { setVisible(false); return }
+    if (ONCE_PER_SESSION && lire("qw-intro-seen", "onglet")) { setVisible(false); return }
     // Systeme regle sur « moins d'animations » : on n'impose pas 3,9 s de film.
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { setVisible(false); return }
-    if (ONCE_PER_SESSION) sessionStorage.setItem("qw-intro-seen", "1")
+    if (ONCE_PER_SESSION) ecrire("qw-intro-seen", "1", "onglet")
 
     const html = document.documentElement
     const prevOverflow = html.style.overflow

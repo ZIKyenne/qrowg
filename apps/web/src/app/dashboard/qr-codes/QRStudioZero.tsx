@@ -20,6 +20,7 @@ import { PRESETS, PRESET_CATS, canUsePreset, type Preset } from "./presetsQr"
 import { PLAN_RANK } from "@/lib/plans"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
 import { attente } from "@/lib/reponseAttendue"
+import { ecrire, lire, oublier } from "@/lib/memoireDuNavigateur"
 
 const G = "var(--accent)"
 const INK = "var(--ink)"
@@ -79,7 +80,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   const qrUrl = active ? `${appUrl}/q/${active.short_code}` : ""
 
   // Restaurer la palette focus persistée (mode focus laptop).
-  useEffect(() => { try { if (localStorage.getItem("qrowg-qr-focus") === "1") setCollapsed(true) } catch {} }, [])
+  useEffect(() => { try { if (lire("qrowg-qr-focus") === "1") setCollapsed(true) } catch {} }, [])
 
   // Charger la config du QR actif (et geler l'autosave le temps du chargement).
   useEffect(() => {
@@ -197,7 +198,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   }
 
   function copyUrl() { try { navigator.clipboard.writeText(qrUrl); setCopied(true); setTimeout(() => setCopied(false), 1500) } catch {} }
-  function toggleFocus() { setCollapsed(v => { const n = !v; try { n ? localStorage.setItem("qrowg-qr-focus", "1") : localStorage.removeItem("qrowg-qr-focus") } catch {} ; return n }) }
+  function toggleFocus() { setCollapsed(v => { const n = !v; try { n ? ecrire("qrowg-qr-focus", "1") : oublier("qrowg-qr-focus") } catch {} ; return n }) }
 
   // Liste filtrée (archivés masqués) — la colonne ne sert qu'à changer de QR, pas à gérer.
   const list = useMemo(() => {

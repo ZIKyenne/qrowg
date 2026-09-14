@@ -5,6 +5,7 @@ import { ImageIcon, LayoutGrid, Type, Palette, Sparkles, Layers, ChevronDown, Wa
 import ImageUpload from "./ImageUpload"
 import { BANNER_GRADIENTS, BANNER_ANIM_CSS, BANNER_FONTS, BANNER_IMG_FILTERS, BANNER_NOISE_URL as NOISE_URL, bannerBackgroundStyle, bannerImageStyle } from "./types"
 import { BANNER_PRESETS } from "./editorPresets"
+import { ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
 
 const G = "#C9A84C"
 const MUTED = "#A8A190"
@@ -96,12 +97,12 @@ const PALETTE = ["#C9A84C", "var(--success)", "#F5F0E8", "#ffffff", "#080808", "
 function ColorStudio({ label, value, fallback, onChange }: { label: string; value?: string; fallback: string; onChange: (v: string) => void }) {
   const [recent, setRecent] = useState<string[]>([])
   const [open, setOpen] = useState(false)
-  useEffect(() => { try { setRecent(JSON.parse(localStorage.getItem("qfb_recent_colors") || "[]")) } catch {} }, [])
+  useEffect(() => { setRecent(lireJson("qfb_recent_colors", [])) }, [])
   const commit = (v: string) => {
     onChange(v)
     try {
       const next = [v, ...recent.filter(c => c.toLowerCase() !== v.toLowerCase())].slice(0, 8)
-      setRecent(next); localStorage.setItem("qfb_recent_colors", JSON.stringify(next))
+      setRecent(next); ecrireJson("qfb_recent_colors", next)
     } catch {}
   }
   return (
@@ -217,10 +218,10 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
   const [hasClip, setHasClip] = useState(false)
   const [flash, setFlash] = useState("")
   const toggle = (id: string) => setOpen(o => o === id ? "" : id)
-  useEffect(() => { try { setHasClip(!!localStorage.getItem("qfb_banner_style")) } catch {} }, [])
+  useEffect(() => { try { setHasClip(!!lire("qfb_banner_style")) } catch {} }, [])
   const notify = (m: string) => { setFlash(m); setTimeout(() => setFlash(""), 1600) }
-  const copyStyle = () => { try { const o: Record<string, string> = {}; BANNER_STYLE_KEYS.forEach(k => { if (c[k] !== undefined && c[k] !== "") o[k] = String(c[k]) }); localStorage.setItem("qfb_banner_style", JSON.stringify(o)); setHasClip(true); notify("Style copié") } catch {} }
-  const pasteStyle = () => { try { const o = JSON.parse(localStorage.getItem("qfb_banner_style") || "{}"); Object.entries(o).forEach(([k, v]) => onChange(k, String(v))); notify("Style appliqué") } catch {} }
+  const copyStyle = () => { try { const o: Record<string, string> = {}; BANNER_STYLE_KEYS.forEach(k => { if (c[k] !== undefined && c[k] !== "") o[k] = String(c[k]) }); ecrireJson("qfb_banner_style", o); setHasClip(true); notify("Style copié") } catch {} }
+  const pasteStyle = () => { try { const o = JSON.parse(lire("qfb_banner_style") || "{}"); Object.entries(o).forEach(([k, v]) => onChange(k, String(v))); notify("Style appliqué") } catch {} }
   const resetStyle = () => { BANNER_STYLE_KEYS.forEach(k => onChange(k, "")); notify("Style réinitialisé") }
   const set = (k: string, v: any) => onChange(k, String(v))
   const applyPreset = (preset: Record<string, any>) => Object.entries(preset).forEach(([k, v]) => onChange(k, String(v)))

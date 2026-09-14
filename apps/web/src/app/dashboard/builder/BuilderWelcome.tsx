@@ -6,6 +6,7 @@
 // mobile, Focus, apercu) car il ne depend d'AUCUN element du DOM du builder.
 // Chaque etape surligne la bonne zone sur une mini-carte de l'interface.
 import { useEffect, useState, type CSSProperties } from "react"
+import { ecrire, lire } from "@/lib/memoireDuNavigateur"
 
 const KEY = "qrfolio_builder_coach_done"
 const G = "#C9A84C"
@@ -59,7 +60,7 @@ export default function BuilderWelcome({ mobile = false }: { mobile?: boolean })
   const [i, setI] = useState(0)
 
   useEffect(() => {
-    try { if (localStorage.getItem(KEY) !== "1") setShow(true) } catch {}
+    try { if (lire(KEY) !== "1") setShow(true) } catch {}
   }, [])
 
   useEffect(() => {
@@ -75,7 +76,7 @@ export default function BuilderWelcome({ mobile = false }: { mobile?: boolean })
   }, [show])
 
   function finish() {
-    try { localStorage.setItem(KEY, "1") } catch {}
+    ecrire(KEY, "1")
     setShow(false)
   }
 

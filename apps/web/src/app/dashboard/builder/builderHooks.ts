@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from "react"
+import { ecrire, lire } from "@/lib/memoireDuNavigateur"
 
 // ── Réordonnancement (glisser-déposer) ────────────────────────────────────
 // PURE + testable. Déplace l'élément d'index `from` pour qu'il s'insère AVANT la
@@ -128,7 +129,7 @@ export function useUndoRedo<T>(initial: T) {
 export function useResize(key: string, defaultW: number, min: number, max: number) {
   const [width, setWidth] = useState(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem(`qrfolio_resize_${key}`)
+      const saved = lire(`qrfolio_resize_${key}`)
       if (saved) return Math.min(max, Math.max(min, parseInt(saved)))
     }
     return defaultW
@@ -156,7 +157,7 @@ export function useResize(key: string, defaultW: number, min: number, max: numbe
       document.body.style.cursor = ""
       document.body.style.userSelect = ""
       setWidth(prev => {
-        localStorage.setItem(`qrfolio_resize_${key}`, String(prev))
+        ecrire(`qrfolio_resize_${key}`, String(prev))
         return prev
       })
       window.removeEventListener("mousemove", onMove)

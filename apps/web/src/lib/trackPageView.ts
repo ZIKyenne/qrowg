@@ -2,6 +2,7 @@
 // Appelé côté client sur les pages publiques
 import { detectTrafficSource } from "./detectTrafficSource"
 import { qrSource } from "./qrSource"
+import { ecrire, lire } from "@/lib/memoireDuNavigateur"
 
 // Déduplication par pageId (et non par contexte JS) : une vue comptée une seule fois par
 // page, tout en supportant la navigation client-side entre plusieurs pages publiques et
@@ -16,10 +17,10 @@ export async function trackPageView(pageId: string) {
     const { source, referrer } = detectTrafficSource()
 
     // Session pseudo-anonyme (localStorage, jamais de cookie tiers)
-    let sessionId = sessionStorage.getItem("qrf_sid")
+    let sessionId = lire("qrf_sid", "onglet")
     if (!sessionId) {
       sessionId = Math.random().toString(36).slice(2) + Date.now().toString(36)
-      sessionStorage.setItem("qrf_sid", sessionId)
+      ecrire("qrf_sid", sessionId, "onglet")
     }
 
     // Device

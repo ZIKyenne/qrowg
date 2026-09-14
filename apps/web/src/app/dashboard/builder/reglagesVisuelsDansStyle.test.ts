@@ -80,7 +80,8 @@ describe("canevas d'abord", () => {
     expect(src).toContain('useResize("right", 300, 280, 520)')
   })
   it("écran étroit sans préférence : la bibliothèque s'ouvre repliée (un clic la déploie)", () => {
-    expect(src).toContain('if (localStorage.getItem("qrfolio_blocks_collapsed") !== null) return')
+    // Même préférence, même règle : seule la façon de la lire a changé (v112).
+    expect(src).toContain('if (lire("qrfolio_blocks_collapsed") !== null) return')
     expect(src).toContain("if (window.innerWidth >= 1024 && window.innerWidth < 1366) setBlocksCollapsed(true)")
     // et jamais dans l'initialiseur d'état (rendu serveur ≠ client → erreur d'hydratation)
     expect(src).not.toMatch(/useState\(\(\) => \{[^}]*innerWidth/)

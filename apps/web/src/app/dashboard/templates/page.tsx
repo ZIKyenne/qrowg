@@ -23,6 +23,7 @@ import { FUNNEL, marque, origine, etiquette } from "@/lib/funnel"
 import { useDialogue } from "@/components/ui/useDialogue"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
 import { attente } from "@/lib/reponseAttendue"
+import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
 
 // Source unique partagée avec le builder : les modèles de page complets (métier + sous-variantes)
 // alimentent AUSSI la galerie d'onboarding (en plus des 14 modèles curés historiques).
@@ -229,14 +230,14 @@ export default function TemplatesPage() {
   }, [])
 
   useEffect(() => {
-    try { setFavs(JSON.parse(localStorage.getItem(FAV_KEY) || "[]")) } catch {}
+    setFavs(lireJson(FAV_KEY, []))
   }, [])
 
   function toggleFav(id: string, e: React.MouseEvent) {
     e.stopPropagation()
     const next = favs.includes(id) ? favs.filter(f => f !== id) : [...favs, id]
     setFavs(next)
-    localStorage.setItem(FAV_KEY, JSON.stringify(next))
+    ecrireJson(FAV_KEY, next)
   }
 
   // ── Filtrage ──────────────────────────────────────────────────────────────

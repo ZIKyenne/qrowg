@@ -21,6 +21,7 @@ import { chezLeCommerce, dateChezLeCommerce, fuseauDuBloc, fuseauDuVisiteur, mem
 import { etatDesConges } from "@/lib/congesDates"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
 import { resultatDuRsvp, confirmationRsvp, reponseRejouable, choixArrete, type EtatReponse } from "@/lib/reponseEnregistree"
+import { ecrire, lire } from "@/lib/memoireDuNavigateur"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 
@@ -717,7 +718,7 @@ export function AnnouncementPublic({ c, theme, pageId, blockId }: { c: any; them
   useEffect(() => {
     const tick = () => setNow(Date.now())
     tick()
-    try { if (c.dismissible === "Oui" && localStorage.getItem("qf-ann-" + blockId) === "1") setDismissed(true) } catch {}
+    try { if (c.dismissible === "Oui" && lire("qf-ann-" + blockId) === "1") setDismissed(true) } catch {}
     // Ré-évalue la fenêtre de dates sans rechargement (apparition/expiration en direct).
     if (c.start_date || c.end_date) { const t = setInterval(tick, 60000); return () => clearInterval(t) }
   }, [c.dismissible, c.start_date, c.end_date, blockId])
@@ -737,7 +738,7 @@ export function AnnouncementPublic({ c, theme, pageId, blockId }: { c: any; them
   const color = (typeof c.color === "string" && /^#[0-9a-fA-F]{6}$/.test(c.color.trim())) ? c.color.trim() : meta.color
   const icon = (c.emoji || "").trim() || meta.icon
   const compact = c.style === "Compact"
-  const dismiss = () => { setDismissed(true); try { localStorage.setItem("qf-ann-" + blockId, "1") } catch {} }
+  const dismiss = () => { setDismissed(true); ecrire("qf-ann-" + blockId, "1") }
   return (
     <div style={{ padding: compact ? "6px 24px" : "8px 24px" }}>
       <div role="status" style={{ background: `${color}14`, border: `1.5px solid ${color}44`, borderRadius: 13, padding: compact ? "10px 13px" : "15px 17px", position: "relative" }}>

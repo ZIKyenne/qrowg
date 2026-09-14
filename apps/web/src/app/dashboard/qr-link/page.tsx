@@ -36,6 +36,7 @@ import { useSessionShell } from "../sessionShell"
 import { jourDuCommerce, serieDeJours, dateLisible } from "@/lib/jourDuCommerce"
 import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
 import { attente } from "@/lib/reponseAttendue"
+import { ecrireJson, lire } from "@/lib/memoireDuNavigateur"
 
 const G = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -175,7 +176,7 @@ export default function QrLinkPage() {
   useFermetureModale(bulkOpen, fermerBulk)
 
   const [history, setHistory] = useState<QrHistEntry[]>([])
-  useEffect(() => { try { const h = JSON.parse(localStorage.getItem("qrfolio_qr_history") || "[]"); if (Array.isArray(h)) setHistory(h.slice(0, 8)) } catch {} }, [])
+  useEffect(() => { try { const h = JSON.parse(lire("qrfolio_qr_history") || "[]"); if (Array.isArray(h)) setHistory(h.slice(0, 8)) } catch {} }, [])
   // Charge les QR instantanés enregistrés (serveur) — seulement avec une session :
   // un visiteur sans compte n'a rien à charger, et l'appel finissait en 401.
   const { signedIn } = useSessionShell()
@@ -191,7 +192,7 @@ export default function QrLinkPage() {
     // au serveur. Le brouillon garde tout sauf lui ; on le retape, c'est tout.
     const entry: QrHistEntry = { type: qrType, url: url.trim(), ssid, wifiPass: "", wifiEnc, text: text.trim(), vc, phone, em, sms, fg, bg, ecc, styleKey }
     const next = [entry, ...prev.filter(e => payload(e) !== data)].slice(0, 8)
-    try { localStorage.setItem("qrfolio_qr_history", JSON.stringify(next)) } catch {}
+    ecrireJson("qrfolio_qr_history", next)
     return next
   })
   const loadEntry = (h: QrHistEntry) => {

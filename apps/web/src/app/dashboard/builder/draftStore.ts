@@ -15,6 +15,7 @@
 // Module PUR : aucune dépendance React ni Supabase, testable seul.
 
 import type { SaveBlock } from "./savePage"
+import { stockage, type StockageLike } from "@/lib/memoireDuNavigateur"
 
 /** Version du format. Un brouillon d'une autre version est ignoré, jamais deviné. */
 export const DRAFT_VERSION = 1
@@ -40,28 +41,14 @@ export type LocalDraft = {
   templateKey?: string
 }
 
-/** Interface minimale de localStorage — permet de tester sans navigateur. */
-export type StorageLike = {
-  getItem(k: string): string | null
-  setItem(k: string, v: string): void
-  removeItem(k: string): void
-}
+// Le geste a quitté ce module : il est celui de tout le produit (lot v112).
+// Ici on ne garde que les deux noms, pour ne rien casser des appelants.
+export type StorageLike = StockageLike
 
 export type SaveResult = { ok: true; bytes: number } | { ok: false; reason: "too_big" | "unavailable" }
 
 /** localStorage quand il existe ET qu'il répond. Null en rendu serveur, ou navigation privée verrouillée. */
-export function browserStorage(): StorageLike | null {
-  try {
-    if (typeof window === "undefined" || !window.localStorage) return null
-    // Certains navigateurs exposent l'objet mais lèvent à la première écriture.
-    const probe = "__qrowg_probe__"
-    window.localStorage.setItem(probe, "1")
-    window.localStorage.removeItem(probe)
-    return window.localStorage
-  } catch {
-    return null
-  }
-}
+export const browserStorage = stockage
 
 /**
  * Un bloc réduit à ce qui compte, sans champ parasite venu de l'éditeur.

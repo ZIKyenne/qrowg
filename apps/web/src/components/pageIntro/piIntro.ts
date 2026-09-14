@@ -1,4 +1,5 @@
 import { encreLisible } from "@/lib/contrasteQr"
+import { ecrire, lire, oublier } from "@/lib/memoireDuNavigateur"
 /**
  * QRowg — Intro d'entrée thémable (runtime vanilla, zéro dépendance).
  * Issu du handoff design. Scopé sous #pi-intro / .pi-* ; SSR-safe.
@@ -270,8 +271,8 @@ export function initIntro(config: Partial<IntroConfig>, mountEl?: HTMLElement): 
 
   if (cfg.oncePerSession) {
     try {
-      if (sessionStorage.getItem(SESSION_KEY)) return noop
-      sessionStorage.setItem(SESSION_KEY, "1")
+      if (lire(SESSION_KEY, "onglet")) return noop
+      ecrire(SESSION_KEY, "1", "onglet")
     } catch { /* mode privé : on joue quand même */ }
   }
 
@@ -435,7 +436,7 @@ export function initIntro(config: Partial<IntroConfig>, mountEl?: HTMLElement): 
 
 /** Rejouer en ignorant oncePerSession (preview builder). */
 export function resetIntroSession() {
-  try { sessionStorage.removeItem(SESSION_KEY) } catch { /* noop */ }
+  oublier(SESSION_KEY, "onglet")
 }
 
 export default initIntro

@@ -15,6 +15,7 @@ import QrowgLogo from "@/components/QrowgLogo"
 import { BandeauHorsConnexion } from "@/components/BandeauHorsConnexion"
 import { jauge, nombreFr } from "@/lib/chiffresLisibles"
 import { attente } from "@/lib/reponseAttendue"
+import { ecrire, lire } from "@/lib/memoireDuNavigateur"
 
 const DEFAULT_ACCENT = "#D4AF45"
 const MUTED = "var(--muted)"
@@ -270,7 +271,7 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
   useEffect(() => {
     setMounted(true)
     // accent instantané depuis le cache local (évite le flash)
-    const cached = localStorage.getItem("qrfolio_accent")
+    const cached = lire("qrfolio_accent")
     if (cached) setAccent(cached)
     const supabase = createClient()
     supabase.auth.getUser().then(({ data }) => {
@@ -282,7 +283,7 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
           .then(({ data: p }) => {
             setProfile(p)
             const acc = p?.preferences?.accent_color || p?.accent_color
-            if (acc) { setAccent(acc); localStorage.setItem("qrfolio_accent", acc) }
+            if (acc) { setAccent(acc); ecrire("qrfolio_accent", acc) }
           })
         // Compteurs (le sien + celui des équipes dont il est membre) : messages non lus + QR actifs (quota).
         accessibleOwnerIds(supabase, data.user.id).then(ownerIds => {
@@ -325,7 +326,7 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
       const mob = window.innerWidth < 860
       setIsMobile(mob)
       if (mob) setCollapsed(true)
-      else setCollapsed(localStorage.getItem("qrfolio_sidebar") === "collapsed")
+      else setCollapsed(lire("qrfolio_sidebar") === "collapsed")
     }
     onResize()
     window.addEventListener("resize", onResize)
@@ -336,7 +337,7 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
     // Ne pas persister un repli piloté par le mode Focus (préférence utilisateur préservée).
     if (mounted && !isMobile && !focusActive.current) {
       const v = collapsed ? "collapsed" : "expanded"
-      localStorage.setItem("qrfolio_sidebar", v)
+      ecrire("qrfolio_sidebar", v)
       document.cookie = `qrfolio_sidebar=${v}; path=/; max-age=31536000; samesite=lax`
     }
   }, [collapsed, mounted, isMobile])

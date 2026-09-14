@@ -2,6 +2,7 @@
 
 import { useEffect } from "react"
 import { AlertTriangle, RotateCw, ArrowLeft } from "lucide-react"
+import { ecrire, lire } from "@/lib/memoireDuNavigateur"
 
 // Erreur de chargement de chunk (fréquente après un redéploiement : la page en cache
 // référence des chunks JS dont le hash a changé). Détection large.
@@ -20,9 +21,9 @@ export default function DashboardError({ error, reset }: { error: Error & { dige
     if (chunk && typeof window !== "undefined") {
       try {
         const KEY = "qf_chunk_reload_at"
-        const last = Number(sessionStorage.getItem(KEY) || 0)
+        const last = Number(lire(KEY, "onglet") || 0)
         if (Date.now() - last > 12000) {
-          sessionStorage.setItem(KEY, String(Date.now()))
+          ecrire(KEY, String(Date.now()), "onglet")
           window.location.reload()
         }
       } catch { /* sessionStorage indisponible -> on laisse l'écran d'erreur */ }

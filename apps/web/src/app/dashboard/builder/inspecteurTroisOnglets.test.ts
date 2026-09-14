@@ -46,7 +46,9 @@ describe("inspecteur — aucun réglage n'a disparu", () => {
     expect(style.indexOf('only="layout"')).toBeGreaterThan(-1)
   })
   it("la préférence « expert » d'avant ouvre le repli au lieu de disparaître", () => {
-    expect(src).toContain('if (localStorage.getItem("qrfolio_expert_mode") === "1") { setExpertModeRaw(true); setAvanceOuvert(true) }')
+    // Ancré sur l'INTENTION : depuis le lot v112 la lecture passe par
+    // `lire`, qui ne lève pas quand le navigateur refuse de se souvenir.
+    expect(src).toContain('if (lire("qrfolio_expert_mode") === "1") { setExpertModeRaw(true); setAvanceOuvert(true) }')
     expect(src).toContain('label: expertMode ? "Replier les réglages avancés" : "Déplier les réglages avancés"')
   })
 })

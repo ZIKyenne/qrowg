@@ -2849,3 +2849,77 @@ Au passage : quatre blocs d'une seule instruction de `QRStudio` et un de
 `BuilderV4` ramenés à une ligne pour tenir sous le plafond de ces fichiers.
 
 Suite complète : 5 416 tests, 326 fichiers. Build vert.
+
+---
+
+## Lot v112 — un refus de mémoire n'efface pas l'écran
+
+**Le relevé.** Soixante-quinze accès à `localStorage` / `sessionStorage` dans
+vingt-trois fichiers. **Quinze** n'étaient protégés par rien ; les soixante
+autres l'étaient par un `try { … } catch {}` écrit sur place — soixante copies
+du même geste, avec autant de replis différents.
+
+Ce n'est pas une précaution théorique. En navigation privée Safari, avec les
+données de site bloquées, ou sous une politique d'entreprise, `localStorage`
+existe et **lève au premier appel** :
+
+```
+BuilderV4.tsx:301
+  const [sidebarCollapsed] = useState(() => {
+    if (typeof window !== "undefined") return localStorage.getItem(…) === "true"
+  })
+```
+
+Une exception dans un initialiseur de `useState` n'est pas rattrapée : le
+composant ne monte pas. **L'éditeur entier devient un écran blanc**, pour une
+préférence de barre latérale repliée. Puis : la couleur d'accent du commerçant
+qui ne charge plus, l'écriture qui lève à chaque poignée de redimensionnement,
+et l'enregistrement du profil qui s'interrompt au milieu.
+
+**Le produit avait déjà le bon geste.** `browserStorage()`, dans
+`dashboard/builder/draftStore.ts`, **sonde** le stockage par une écriture
+jetable avant de le rendre — parce que certains navigateurs exposent l'objet et
+ne lèvent qu'à la première écriture. Mais il vivait dans un module de l'éditeur,
+et lui seul s'en servait.
+
+**Ce que le lot change.** Le geste sort de l'éditeur :
+`lib/memoireDuNavigateur.ts`.
+
+```ts
+stockage(duree?) · memoireDisponible(duree?)
+lire(cle, duree?) · ecrire(cle, valeur, duree?) -> boolean · oublier(cle, duree?)
+lireJson<T>(cle, repli, duree?) · ecrireJson(cle, valeur, duree?) -> boolean
+```
+
+`ecrire` **rend `false`** quand le navigateur a refusé, pour que l'appelant
+puisse le dire plutôt que de croire que c'est fait. `lireJson` rend le repli sur
+un contenu illisible — écrit par une version précédente, tronqué par un quota
+atteint — jamais une exception et jamais `undefined`. La sonde est faite une
+fois par chargement de page : elle coûte une écriture, et se retrouvait sinon
+dans des gestes répétés (une poignée de redimensionnement écrit à chaque pixel).
+
+`draftStore.browserStorage` **réexporte** le geste plutôt que d'en garder une
+copie, et la garde le vérifie par identité de fonction.
+
+**Branché** : les soixante-quinze appels des vingt-trois fichiers. Dix-sept
+`try { … } catch {}` devenus inutiles ont été retirés, et les lectures JSON
+ramenées à `lireJson` / `ecrireJson`.
+
+**Garde.** `lib/memoireQuiPeutRefuser.test.ts` (11 tests). La règle de classe :
+**un refus de mémoire n'efface pas l'écran.** Le balayage interdit à tout
+fichier du produit de toucher `localStorage` ou `sessionStorage` directement —
+un seul endroit en a le droit. Trois navigateurs sont joués : celui qui répond,
+celui qui lève à tout, et **le sournois** qui expose l'objet et ne lève qu'à
+l'écriture — c'est lui qui justifie la sonde, et sans elle il passe pour
+disponible. Un contre-test exige plus de quinze fichiers concernés et plus de
+cinquante appels vus : un balayage devenu aveugle ne prouve rien.
+
+**Vérification par mutation.** Quatre défauts réinjectés : un écran qui reprend
+l'accès direct (1 test tombe), la sonde qui disparaît (2), l'éditeur qui reprend
+sa propre copie du geste (1), et une écriture qui ment sur son résultat (1).
+
+Deux gardes plus anciennes ont été réancrées : elles épinglaient le texte
+`localStorage.getItem(...)` d'une préférence de l'éditeur ; elles épinglent
+maintenant la même intention, lue par `lire`.
+
+Suite complète : 5 427 tests, 327 fichiers. Build vert.

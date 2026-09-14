@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
+import { ecrire, lire } from "@/lib/memoireDuNavigateur"
 
 // Frontiere d'erreur applicative (sous le layout racine) : toute erreur non geree dans
 // une route affiche cette page de marque au lieu de l'ecran d'erreur brut de Next.
@@ -16,8 +17,8 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
     if (chunk && typeof window !== "undefined") {
       try {
         const KEY = "qf_chunk_reload_at"
-        const last = Number(sessionStorage.getItem(KEY) || 0)
-        if (Date.now() - last > 12000) { sessionStorage.setItem(KEY, String(Date.now())); window.location.reload() }
+        const last = Number(lire(KEY, "onglet") || 0)
+        if (Date.now() - last > 12000) { ecrire(KEY, String(Date.now()), "onglet"); window.location.reload() }
       } catch { /* noop */ }
     }
   }, [chunk])

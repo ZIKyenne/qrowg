@@ -17,6 +17,7 @@ import {
 import { LIBRARY_LABEL_OVERRIDES } from "./builderLibrary"
 import { SettingsFieldRenderer } from "./SettingsFieldRenderer"
 import { BlockContextToolbar } from "./BlockContextToolbar"
+import { ecrire, lire } from "@/lib/memoireDuNavigateur"
 
 const MUTED = BUILDER_UI.text.muted
 const TONE: Record<string, string> = { neutral: MUTED, warning: "var(--warning)", accent: "var(--accent)", success: "var(--success)" }
@@ -60,7 +61,7 @@ export function BlockSettingsPanel(props: BlockSettingsPanelProps) {
   const [section, setSection] = useState<string>("content")
   useEffect(() => {
     try {
-      const saved = resolveSettingsMode(localStorage.getItem(SETTINGS_MODE_KEY))
+      const saved = resolveSettingsMode(lire(SETTINGS_MODE_KEY))
       if (saved !== "simple") setMode(saved)
     } catch { /* noop */ }
   }, [])
@@ -70,7 +71,7 @@ export function BlockSettingsPanel(props: BlockSettingsPanelProps) {
 
   const setModePersist = useCallback((next: BlockSettingsMode) => {
     setMode(next)
-    try { localStorage.setItem(SETTINGS_MODE_KEY, next) } catch { /* noop */ }
+    ecrire(SETTINGS_MODE_KEY, next)
   }, [])
 
   const doConfirm = useCallback(async (msg: string) => {

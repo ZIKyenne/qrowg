@@ -10,6 +10,7 @@ import { lireBibliotheque, usagesDuMedia } from "../assets/usagesDesMedias"
 import { createClient } from "@/lib/supabase/client"
 import ImageCropModal from "./ImageCropModal"
 import { correspond } from "@/lib/rechercheSouple"
+import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
 
 type Props = {
   value: string
@@ -37,8 +38,8 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
   // #07 : favoris (persistes par URL). Les images favorites remontent en tete.
   // Defaut vide (= SSR) puis lecture apres montage -> pas de mismatch d'hydratation (cf review #2).
   const [favs, setFavs] = useState<Set<string>>(new Set())
-  useEffect(() => { try { const s = JSON.parse(localStorage.getItem("qrfolio_media_favs") || "[]"); if (Array.isArray(s) && s.length) setFavs(new Set(s)) } catch {} }, [])
-  const toggleFav = (url: string) => setFavs(prev => { const n = new Set(prev); if (n.has(url)) n.delete(url); else n.add(url); try { localStorage.setItem("qrfolio_media_favs", JSON.stringify([...n])) } catch {} return n })
+  useEffect(() => { const s = lireJson<string[]>("qrfolio_media_favs", []); if (Array.isArray(s) && s.length) setFavs(new Set(s)) }, [])
+  const toggleFav = (url: string) => setFavs(prev => { const n = new Set(prev); if (n.has(url)) n.delete(url); else n.add(url); ecrireJson("qrfolio_media_favs", [...n]); return n })
 
   async function openLibrary() {
     setLibOpen(true)

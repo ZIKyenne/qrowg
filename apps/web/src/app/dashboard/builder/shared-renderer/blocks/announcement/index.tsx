@@ -13,6 +13,7 @@ import { annonce, etatFenetre, mentionFenetre } from "../../models/informationsE
 import { texteFige, texteEditable } from "../../primitives/TexteInline"
 import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { sz, editorCtx, publicCtx, type RenduTexte, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { ecrire, lire } from "@/lib/memoireDuNavigateur"
 
 function Vue({ u, c, Texte, blockId }: { u: UnifiedCtx; c: Record<string, any>; Texte: RenduTexte; blockId: string }) {
   const a = annonce(c)!
@@ -23,7 +24,7 @@ function Vue({ u, c, Texte, blockId }: { u: UnifiedCtx; c: Record<string, any>; 
   useEffect(() => {
     const battre = () => setMaintenant(Date.now())
     battre()
-    try { if (a.fermable && localStorage.getItem("qf-ann-" + blockId) === "1") setFerme(true) } catch {}
+    try { if (a.fermable && lire("qf-ann-" + blockId) === "1") setFerme(true) } catch {}
     if (a.debut || a.fin) { const t = setInterval(battre, 60000); return () => clearInterval(t) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [a.fermable, a.debut, a.fin, blockId])
@@ -50,7 +51,7 @@ function Vue({ u, c, Texte, blockId }: { u: UnifiedCtx; c: Record<string, any>; 
               : <span aria-disabled="true" style={{ display: "inline-flex", alignItems: "center", gap: sz(u, 5), marginTop: sz(u, 9), color: a.couleur, fontSize: sz(u, 12.5), fontWeight: 700 }}>{a.cta.label} <span aria-hidden>→</span></span>)}
           </div>
           {a.fermable && (u.mode === "public"
-            ? <button onClick={() => { setFerme(true); try { localStorage.setItem("qf-ann-" + blockId, "1") } catch {} }} aria-label="Fermer l'annonce"
+            ? <button onClick={() => { setFerme(true); ecrire("qf-ann-" + blockId, "1") }} aria-label="Fermer l'annonce"
                 style={{ position: "absolute", top: sz(u, 8), right: sz(u, 10), width: sz(u, 22), height: sz(u, 22), display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", color: a.couleur, opacity: 0.7, fontSize: sz(u, 18), lineHeight: 1, cursor: "pointer" }}>×</button>
             : <span aria-hidden style={{ position: "absolute", top: sz(u, 8), right: sz(u, 10), color: a.couleur, opacity: 0.6, fontSize: sz(u, 18), lineHeight: 1 }}>×</span>)}
         </div>

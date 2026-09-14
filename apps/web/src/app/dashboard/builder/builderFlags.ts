@@ -10,6 +10,7 @@
 // param uniquement hors production ; repli OFF ; AUCUN secret ni email codé en dur.
 
 import { useEffect, useState } from "react"
+import { ecrire, lire, oublier } from "@/lib/memoireDuNavigateur"
 
 // Valeur ENV (build) — utilisée pour le rendu SSR et comme base d'hydratation.
 //
@@ -59,7 +60,7 @@ export function useBuilderRedesign(): boolean {
     const compute = () => {
       let localOverride: string | null = null
       let queryOverride: string | null = null
-      try { localOverride = localStorage.getItem(REDESIGN_STORAGE_KEY) } catch { /* noop */ }
+      localOverride = lire(REDESIGN_STORAGE_KEY)
       try { queryOverride = new URLSearchParams(window.location.search).get(REDESIGN_QUERY_PARAM) } catch { /* noop */ }
       return resolveBuilderRedesignEnabled({
         envEnabled: BUILDER_REDESIGN,
@@ -72,8 +73,8 @@ export function useBuilderRedesign(): boolean {
     // suivante le garde, sans reposer le paramètre dans l'URL.
     try {
       const q = new URLSearchParams(window.location.search).get(REDESIGN_QUERY_PARAM)
-      if (q === "1" || q === "true") localStorage.setItem(REDESIGN_STORAGE_KEY, "1")
-      else if (q === "0" || q === "false") localStorage.setItem(REDESIGN_STORAGE_KEY, "0")
+      if (q === "1" || q === "true") ecrire(REDESIGN_STORAGE_KEY, "1")
+      else if (q === "0" || q === "false") ecrire(REDESIGN_STORAGE_KEY, "0")
     } catch { /* noop */ }
     setEnabled(compute())
     const onStorage = (e: StorageEvent) => { if (e.key === REDESIGN_STORAGE_KEY) setEnabled(compute()) }
@@ -88,7 +89,7 @@ export function useBuilderRedesign(): boolean {
 // À appeler depuis la console : window.__qrowgBuilderRedesign(true|false).
 export function setBuilderRedesignOverride(on: boolean | null): void {
   try {
-    if (on === null) localStorage.removeItem(REDESIGN_STORAGE_KEY)
-    else localStorage.setItem(REDESIGN_STORAGE_KEY, on ? "1" : "0")
+    if (on === null) oublier(REDESIGN_STORAGE_KEY)
+    else ecrire(REDESIGN_STORAGE_KEY, on ? "1" : "0")
   } catch { /* noop */ }
 }

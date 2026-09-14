@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { lire } from "@/lib/memoireDuNavigateur"
 
 // Couleur d'accent par défaut (or signature QRowg)
 export const DEFAULT_ACCENT = "#D4AF45"
@@ -17,7 +18,7 @@ export const DEFAULT_ACCENT = "#D4AF45"
 export function useAccent(): string {
   const [accent, setAccent] = useState(DEFAULT_ACCENT)
   useEffect(() => {
-    const cached = localStorage.getItem("qrfolio_accent")
+    const cached = lire("qrfolio_accent")
     if (cached) setAccent(cached)
     const onAccent = (e: Event) => {
       const c = (e as CustomEvent).detail

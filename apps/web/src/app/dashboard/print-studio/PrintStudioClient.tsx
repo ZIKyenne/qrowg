@@ -33,6 +33,7 @@ import { nomDuQrSitue } from "@/lib/nomDuQr"
 import { effetDe, serveurAFait, refusDuServeur, refusDeLaBase } from "@/lib/effetConfirme"
 import { correspond, correspondAuxChamps } from "@/lib/rechercheSouple"
 import { attente } from "@/lib/reponseAttendue"
+import { ecrire, ecrireJson, lire, oublier } from "@/lib/memoireDuNavigateur"
 
 // item.layout est parfois une clé de contenu ('stack'), parfois un id de layout ('orne').
 // On résout toujours vers un id de LAYOUTS valide (pour le volet Mise en page).
@@ -356,7 +357,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const [realSize, setRealSize] = useState(false)         // #24 : aperçu à TAILLE RÉELLE (physique) dans le plein écran
   const [calib, setCalib] = useState(false)               // panneau de calibrage (carte bancaire de référence)
   const [pxPerMm, setPxPerMm] = useState(96 / 25.4)       // px/mm de l'écran (défaut = référence CSS 96 dpi ; calibrable)
-  useEffect(() => { try { const v = parseFloat(localStorage.getItem("qrowg-px-per-mm") || ""); if (v > 1 && v < 20) setPxPerMm(v) } catch {} }, [])
+  useEffect(() => { try { const v = parseFloat(lire("qrowg-px-per-mm") || ""); if (v > 1 && v < 20) setPxPerMm(v) } catch {} }, [])
   const [addOpen, setAddOpen] = useState(false)           // bibliothèque « + Ajouter » (formes/icônes catégorisées)
   const [addSearch, setAddSearch] = useState("")          // recherche dans la bibliothèque d'éléments
   const [libre, setLibre] = useState(false)               // mode « Studio libre » (édition à plat + éléments libres)
@@ -395,7 +396,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       .then(({ data, error }) => {
         if (!a.encoreAttendue()) return
         if (!error && data) { setSavedPresets(data.map((r: any) => ({ id: r.id, name: r.name, cfg: r.cfg || {} }))); setPresetsRemote(true) }
-        else { try { const raw = localStorage.getItem("qrowg-print-presets"); if (raw) setSavedPresets(JSON.parse(raw)) } catch {} }
+        else { const raw = lire("qrowg-print-presets"); if (raw) setSavedPresets(JSON.parse(raw)) }
       })
     // Charte : peut renvoyer plusieurs lignes en équipe (une par membre) -> on prend la plus récente.
     // Sélection avec accent2 (couleur secondaire) : si la colonne n'existe pas encore (migration non appliquée),
@@ -404,7 +405,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       .then(({ data, error }) => {
         if (!a.encoreAttendue()) return
         if (!error) { setBrandRemote(true); if (data) setBrandKit({ logo: (data as any).logo || null, accent: (data as any).accent || "auto", accent2: (data as any).accent2 || "", typo: (data as any).typo || "auto" }) }
-        else { try { const raw = localStorage.getItem("qrowg-print-brandkit"); if (raw) { const k = JSON.parse(raw); setBrandKit({ accent2: "", ...k }) } } catch {} }
+        else { const raw = lire("qrowg-print-brandkit"); if (raw) { const k = JSON.parse(raw); setBrandKit({ accent2: "", ...k }) } }
       })
     return a.abandonner
   }, [])
@@ -457,7 +458,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     try { window.dispatchEvent(new CustomEvent("qrowg:builder-focus", { detail: phase === "studio" })) } catch {}
     return () => { try { window.dispatchEvent(new CustomEvent("qrowg:builder-focus", { detail: false })) } catch {} }
   }, [phase, isMobile])
-  function persistPresets(next: { id: string; name: string; cfg: Record<string, any> }[]) { setSavedPresets(next); try { localStorage.setItem("qrowg-print-presets", JSON.stringify(next)) } catch {} }
+  function persistPresets(next: { id: string; name: string; cfg: Record<string, any> }[]) { setSavedPresets(next); ecrireJson("qrowg-print-presets", next) }
 
   // QR existants de l'utilisateur (codes statiques liés à une page + QR instantanés dynamiques/statiques).
   // RLS scope automatiquement. Le QR imprimé encode /q/<short_code> (redirigeable) ou le payload direct.
@@ -596,7 +597,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   async function saveBrandKit() {
     const kit = { logo: logoUrl, accent, accent2: ctaColor || "", typo: eTypo }
     setBrandKit(kit)
-    try { localStorage.setItem("qrowg-print-brandkit", JSON.stringify(kit)) } catch {}   // backup local systématique
+    ecrireJson("qrowg-print-brandkit", kit)   // backup local systématique
     if (brandRemote) {
       // Tente avec accent2 ; si la colonne manque (migration non appliquée), replie sur les colonnes historiques.
       const sb = createClient(), now = new Date().toISOString()
@@ -1034,7 +1035,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               <span style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)" }}>Vous ne trouvez pas votre support ?</span>
               <span style={{ fontSize: 11.5, color: "var(--muted)" }}>L'éditeur libre part d'un format A4 : vous posez le QR où vous voulez.</span>
             </div>
-            <button type="button" className="ps2-editeur" onClick={() => { setMode("studio"); try { localStorage.setItem("qrowg-print-mode", "studio") } catch {}; openItem("i11") }} style={{ marginLeft: "auto", padding: "9px 18px", borderRadius: 999, border: "1px solid color-mix(in srgb, var(--accent) 35%, transparent)", background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, transparent), color-mix(in srgb, var(--accent) 10%, transparent))", color: "var(--gold-light)", fontSize: 12.5, fontWeight: 700, whiteSpace: "nowrap", cursor: "pointer" }}>Éditeur libre</button>
+            <button type="button" className="ps2-editeur" onClick={() => { setMode("studio"); ecrire("qrowg-print-mode", "studio"); openItem("i11") }} style={{ marginLeft: "auto", padding: "9px 18px", borderRadius: 999, border: "1px solid color-mix(in srgb, var(--accent) 35%, transparent)", background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, transparent), color-mix(in srgb, var(--accent) 10%, transparent))", color: "var(--gold-light)", fontSize: 12.5, fontWeight: 700, whiteSpace: "nowrap", cursor: "pointer" }}>Éditeur libre</button>
           </div>
         </div>
       </div>
@@ -1075,7 +1076,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   }
   // #34 : bascule Simple/Studio (persistée). Passer en Simple ferme l'édition libre et rabat vers un volet essentiel.
   function applyMode(m: "simple" | "studio") {
-    setMode(m); try { localStorage.setItem("qrowg-print-mode", m) } catch {}
+    setMode(m); ecrire("qrowg-print-mode", m)
     if (m === "simple") { setLibre(false); setSelEl(null); setOngletDroite("contenu") }
     else setLibre(true)   // Studio = édition libre d'office
   }
@@ -1833,9 +1834,9 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
         <div style={{ position: "fixed", inset: 0, zIndex: 95, background: "rgba(0,0,0,0.95)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 22, padding: 24 }}>
           <p style={{ color: "#fff", fontSize: 14, textAlign: "center", maxWidth: 360, margin: 0, lineHeight: 1.45 }}>Placez une carte bancaire contre l'écran et ajustez jusqu'à ce que le rectangle ait <b>exactement</b> sa taille.</p>
           <div style={{ width: 85.6 * pxPerMm, height: 53.98 * pxPerMm, borderRadius: 3.18 * pxPerMm, border: `2px solid ${C.gold}`, background: C.goldSoft, display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.8)", fontSize: 12, flexShrink: 0 }}>Carte bancaire</div>
-          <div style={{ width: "min(90vw, 360px)" }}><Range value={pxPerMm} min={2.5} max={7.5} step={0.01} onChange={v => { setPxPerMm(v); try { localStorage.setItem("qrowg-px-per-mm", String(v)) } catch {} }} hint={`${pxPerMm.toFixed(2)} px/mm`} /></div>
+          <div style={{ width: "min(90vw, 360px)" }}><Range value={pxPerMm} min={2.5} max={7.5} step={0.01} onChange={v => { setPxPerMm(v); ecrire("qrowg-px-per-mm", String(v)) }} hint={`${pxPerMm.toFixed(2)} px/mm`} /></div>
           <div style={{ display: "flex", gap: 10 }}>
-            <button onClick={() => { setPxPerMm(96 / 25.4); try { localStorage.removeItem("qrowg-px-per-mm") } catch {} }} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.24)", color: "#fff", cursor: "pointer", fontSize: 12.5, fontWeight: 700, borderRadius: 999, padding: "10px 18px" }}>Réinitialiser</button>
+            <button onClick={() => { setPxPerMm(96 / 25.4); oublier("qrowg-px-per-mm") }} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.24)", color: "#fff", cursor: "pointer", fontSize: 12.5, fontWeight: 700, borderRadius: 999, padding: "10px 18px" }}>Réinitialiser</button>
             <Button variant="primary" onClick={() => setCalib(false)}>Terminé</Button>
           </div>
         </div>

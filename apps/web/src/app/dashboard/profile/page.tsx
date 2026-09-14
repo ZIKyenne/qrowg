@@ -32,6 +32,7 @@ import { badges as badgesDe, niveau as niveauDe, type Badge } from "./progressio
 import { SectionCard, StatPill, CountUp, SqueletteProfil, inputStyle, labelStyle, formatDate } from "./briquesProfil"
 import { ACTIVITY_CFG, ACTIVITY_FILTER_OPTS, DEFAULT_PREFS, PLAN_CFG, type PlanLimit, type Profile, type ApiKey, type RecentPage, type RecentScan, type UserPreferences, type DomainRecord, type QRStat } from "./typesProfil"
 import { dateLisible, champsDuCommerce, aujourdHuiDuCommerce } from "@/lib/jourDuCommerce"
+import { ecrire } from "@/lib/memoireDuNavigateur"
 
 
 // -- Constantes ---------------------------------------------------------------
@@ -316,7 +317,7 @@ export default function ProfilePage() {
     if (key === "accent_color" && typeof value === "string") {
       const next = { ...prefs, accent_color: value }
       setPrefs(next)
-      localStorage.setItem("qrfolio_accent", value)
+      ecrire("qrfolio_accent", value)
       window.dispatchEvent(new CustomEvent("qrfolio-accent", { detail: value }))
       if (profile) {
         createClient().from("profiles").update({ preferences: next }).eq("id", profile.id).then(() => {})

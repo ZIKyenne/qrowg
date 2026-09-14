@@ -13,6 +13,7 @@ import BannerStudio from "./BannerStudio"
 import ImageUpload from "./ImageUpload"
 import FileUpload from "./FileUpload"
 import { parseMenuPaste } from "./menuImport"
+import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
 
   // Prompt « parfait » à donner à une IA (ChatGPT) : l'utilisateur colle ce prompt + une photo de sa
   // carte, l'IA renvoie des lignes que notre parseur importe directement. Format aligné sur menuImport.ts.
@@ -942,13 +943,13 @@ Tiramisu;6,50€;Fait maison`
     const [activeCat, setActiveCat] = useState<string>(PRESET_CATEGORIES[0].id)
     const [colorFormat, setColorFormat] = useState<"hex"|"rgb"|"hsl">("hex")
     const [recentColors, setRecentColors] = useState<string[]>(() => {
-      try { return JSON.parse(localStorage.getItem("qrfolio_recent_colors") || "[]") } catch { return [] }
+      return lireJson("qrfolio_recent_colors", [])
     })
 
     function addRecentColor(hex: string) {
       setRecentColors(prev => {
         const next = [hex, ...prev.filter(c => c !== hex)].slice(0, 10)
-        localStorage.setItem("qrfolio_recent_colors", JSON.stringify(next))
+        ecrireJson("qrfolio_recent_colors", next)
         return next
       })
     }

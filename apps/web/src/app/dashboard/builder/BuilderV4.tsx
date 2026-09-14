@@ -61,6 +61,7 @@ import { attente } from "@/lib/reponseAttendue"
   import PublishedScreen from "./PublishedScreen"
   import { browserStorage, loadDraft, saveDraft, clearDraft, makeDraft, draftIsMeaningful, draftSummary, type LocalDraft } from "./draftStore"
   import { useDialogue } from "@/components/ui/useDialogue"
+import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
 
   // Helper module-scope (evite la temporal-dead-zone du UUID_RE interne au composant).
   const IS_UUID = (s?: string | null): boolean => !!s && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)
@@ -186,10 +187,10 @@ import { attente } from "@/lib/reponseAttendue"
     // Defaut false = ce que rend le SSR ; on lit localStorage APRES montage (pas de mismatch d'hydratation),
     // et on persiste DANS le setter (pas dans un effet -> pas d'ecrasement au montage). Cf review #2.
     const [expertMode, setExpertModeRaw] = useState(false)
-    useEffect(() => { try { if (localStorage.getItem("qrfolio_expert_mode") === "1") { setExpertModeRaw(true); setAvanceOuvert(true) } } catch {} }, [])
+    useEffect(() => { try { if (lire("qrfolio_expert_mode") === "1") { setExpertModeRaw(true); setAvanceOuvert(true) } } catch {} }, [])
     const setExpertMode = (v: boolean | ((p: boolean) => boolean)) => setExpertModeRaw(prev => {
       const next = typeof v === "function" ? v(prev) : v
-      try { localStorage.setItem("qrfolio_expert_mode", next ? "1" : "0") } catch {}
+      ecrire("qrfolio_expert_mode", next ? "1" : "0")
       return next
     })
     // Modeles par metier : menu deplie a la demande (replie par defaut) pour alleger la palette.
@@ -298,11 +299,11 @@ import { attente } from "@/lib/reponseAttendue"
 
     // ── États collapse panneaux ────────────────────────────────────────────────
     const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-      if (typeof window !== "undefined") return localStorage.getItem("qrfolio_sidebar_collapsed") === "true"
+      if (typeof window !== "undefined") return lire("qrfolio_sidebar_collapsed") === "true"
       return false
     })
     const [blocksCollapsed, setBlocksCollapsed] = useState(() => {
-      if (typeof window !== "undefined") return localStorage.getItem("qrfolio_blocks_collapsed") === "true"
+      if (typeof window !== "undefined") return lire("qrfolio_blocks_collapsed") === "true"
       return false
     })
     const [rightCollapsed, setRightCollapsed] = useState(false)
@@ -312,19 +313,19 @@ import { attente } from "@/lib/reponseAttendue"
 
     // Persister collapse sidebar
     useEffect(() => {
-      if (typeof window !== "undefined") localStorage.setItem("qrfolio_sidebar_collapsed", String(sidebarCollapsed))
+      if (typeof window !== "undefined") ecrire("qrfolio_sidebar_collapsed", String(sidebarCollapsed))
     }, [sidebarCollapsed])
 
     // Écran étroit (1024–1365 px) sans préférence enregistrée : la bibliothèque s'ouvre repliée,
     // le canevas d'abord (revue du 9 septembre). Décidé au montage — pas dans l'initialiseur, qui
     // ferait diverger le rendu serveur du rendu client. Déclaré AVANT l'effet qui mémorise le choix.
     useEffect(() => {
-      if (localStorage.getItem("qrfolio_blocks_collapsed") !== null) return
+      if (lire("qrfolio_blocks_collapsed") !== null) return
       if (window.innerWidth >= 1024 && window.innerWidth < 1366) setBlocksCollapsed(true)
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
     useEffect(() => {
-      if (typeof window !== "undefined") localStorage.setItem("qrfolio_blocks_collapsed", String(blocksCollapsed))
+      if (typeof window !== "undefined") ecrire("qrfolio_blocks_collapsed", String(blocksCollapsed))
     }, [blocksCollapsed])
 
     // ── Raccourcis clavier ────────────────────────────────────────────────────
@@ -453,14 +454,14 @@ import { attente } from "@/lib/reponseAttendue"
     }, [])
 
     const [favorites, setFavorites] = useState<string[]>(() => {
-      if (typeof window !== "undefined") { try { return JSON.parse(localStorage.getItem("qrfolio_fav_blocks") || "[]") } catch { return [] } }
+      if (typeof window !== "undefined") { return lireJson("qrfolio_fav_blocks", []) }
       return []
     })
 
     const toggleFav = useCallback((type: string) => {
       setFavorites(prev => {
         const next = prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
-        localStorage.setItem("qrfolio_fav_blocks", JSON.stringify(next))
+        ecrireJson("qrfolio_fav_blocks", next)
         return next
       })
     }, [])
@@ -469,28 +470,28 @@ import { attente } from "@/lib/reponseAttendue"
 
     // ── Blocs récents ─────────────────────────────────────────────────────────
     const [recentBlocks, setRecentBlocks] = useState<string[]>(() => {
-      if (typeof window !== "undefined") { try { return JSON.parse(localStorage.getItem("qrfolio_recent_blocks") || "[]") } catch { return [] } }
+      if (typeof window !== "undefined") { return lireJson("qrfolio_recent_blocks", []) }
       return []
     })
 
     const pushRecent = useCallback((type: string) => {
       setRecentBlocks(prev => {
         const next = [type, ...prev.filter(t => t !== type)].slice(0, 8)
-        localStorage.setItem("qrfolio_recent_blocks", JSON.stringify(next))
+        ecrireJson("qrfolio_recent_blocks", next)
         return next
       })
     }, [])
 
     // ── Catégories repliées ───────────────────────────────────────────────────
     const [collapsedCats, setCollapsedCats] = useState<string[]>(() => {
-      if (typeof window !== "undefined") { try { return JSON.parse(localStorage.getItem("qrfolio_collapsed_cats") || "[]") } catch { return [] } }
+      if (typeof window !== "undefined") { return lireJson("qrfolio_collapsed_cats", []) }
       return []
     })
 
     const toggleCat = useCallback((catId: string) => {
       setCollapsedCats(prev => {
         const next = prev.includes(catId) ? prev.filter(c => c !== catId) : [...prev, catId]
-        localStorage.setItem("qrfolio_collapsed_cats", JSON.stringify(next))
+        ecrireJson("qrfolio_collapsed_cats", next)
         return next
       })
     }, [])
