@@ -9,6 +9,7 @@ import { estUnScan } from "@/lib/premierScan"
 import { previenirPremierScan } from "@/lib/premierScanEnvoi"
 import { codeDansUrl, estUnCode, sourceRetenue, appareilRetenu } from "@/lib/sourceVue"
 import { estUnRobot } from "@/lib/robots"
+import { vueACompterEnBase } from "@/lib/compteursDePage"
 
 // Endpoint de tracking (vues / clics / événements d'engagement). Remplace les
 // inserts anonymes directs (RLS "insert with check(true)") qui permettaient
@@ -107,6 +108,23 @@ export async function POST(req: NextRequest) {
       // L'email « premier scan » ne part que sur un scan PROUVÉ : il partait
       // jusqu'ici sur la seule parole du client, donc au premier appel fabriqué.
       if (scanProuve && estUnScan(source)) await previenirPremierScan(admin, pageId, idVue)
+
+      // `pages.total_views` n'était incrémenté que par le trigger du schéma, et
+      // ce trigger écoute `scans` : la colonne appelée « vues » ne comptait que
+      // les scans du QR. Une page à 40 scans et 300 visites par lien affichait
+      // « 40 vues » (lot v94). On compte ici, et seulement ici, celles que
+      // personne ne comptait — sans doubler celles que le trigger a déjà vues.
+      //
+      // Lecture puis écriture : sans fonction SQL, l'incrément n'est pas
+      // atomique. Deux vues simultanées peuvent n'en compter qu'une — le chiffre
+      // reste prudent, jamais gonflé, et il vaut mieux que les 12 % d'avant.
+      if (idVue && vueACompterEnBase(scanProuve)) {
+        try {
+          const { data: pv } = await admin.from("pages").select("total_views").eq("id", pageId).maybeSingle()
+          await admin.from("pages").update({ total_views: ((pv as { total_views?: number } | null)?.total_views ?? 0) + 1 }).eq("id", pageId)
+        } catch { /* un compteur raté ne doit pas faire échouer le suivi */ }
+      }
+
     } else if (type === "click") {
       if (!str(body.clickTarget, 500)) return NextResponse.json({ ok: true })
       await insertTracked(admin, "block_clicks", {

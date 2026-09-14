@@ -18,10 +18,10 @@ export default async function E2EStatistiquesPage({ searchParams }: { searchPara
   const now = Date.now()
   const iso = (jours: number, h = 10) => new Date(now - jours * 864e5 - h * 36e5).toISOString()
   const pages = jeune
-    ? [{ id: "demo-page-1", title: "Ma carte (démo)", slug: "ma-carte-demo", total_views: 4, unique_views: 3, status: "published" }]
+    ? [{ id: "demo-page-1", title: "Ma carte (démo)", slug: "ma-carte-demo", total_views: 4, status: "published" }]
     : [
-      { id: "demo-page-1", title: "Carte restaurant (démo)", slug: "carte-restaurant-demo", total_views: 384, unique_views: 250, status: "published" },
-      { id: "demo-page-2", title: "Avis Google (démo)", slug: "avis-google-demo", total_views: 123, unique_views: 90, status: "published" },
+      { id: "demo-page-1", title: "Carte restaurant (démo)", slug: "carte-restaurant-demo", total_views: 384, status: "published" },
+      { id: "demo-page-2", title: "Avis Google (démo)", slug: "avis-google-demo", total_views: 123, status: "published" },
     ]
   const N = { scans: jeune ? 3 : 90, vues: jeune ? 4 : 200, clics: jeune ? 1 : 60, events: jeune ? 6 : 120 }
   const devices = ["mobile", "mobile", "mobile", "desktop", "tablet"]
@@ -39,7 +39,7 @@ export default async function E2EStatistiquesPage({ searchParams }: { searchPara
   const pageEvents = Array.from({ length: N.events }, (_, i) => ({ kind: (["scroll", "impression", "dwell", "tap"] as const)[i % 4], ref: i % 4 === 0 ? String(25 * ((i % 4) + 1)) : "demo-b1", value: i % 4 === 0 ? 25 * ((i >> 2) % 4 + 1) : 3, x: 0.3 + (i % 5) / 10, y: 0.2 + (i % 7) / 10, page_id: "demo-page-1", created_at: iso(i % 30, i % 8) }))
   return (
     <ToastProvider><ConfirmProvider><AnalyticsShell
-      profile={{ total_pages: jeune ? 1 : 2, total_scans: jeune ? 3 : 169, plan: jeune ? "free" : "pro", email: "demo@qrowg.fr", full_name: jeune ? "Nouveau compte (démo)" : "Studio Horizon (démo)" }}
+      profile={{ total_scans: jeune ? 3 : 169, plan: jeune ? "free" : "pro", email: "demo@qrowg.fr", full_name: jeune ? "Nouveau compte (démo)" : "Studio Horizon (démo)" }}
       pages={pages} recentScans={recentScans} recentViews={recentViews} clicks={clicks} blocks={blocks}
       geoScans={geoScans} deviceScans={deviceScans} pageEvents={pageEvents} userEmail="demo@qrowg.fr"
       supportQrs={[{ id: "demo-qr-1", short_code: "demo1", label: "Sticker de table (démo)", page_id: "demo-page-1" }, { id: "demo-qr-2", short_code: "demo2", label: "Chevalet (démo)", page_id: "demo-page-2" }]}

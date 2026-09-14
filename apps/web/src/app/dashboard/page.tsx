@@ -17,7 +17,7 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
 
   const ownerIds = await accessibleOwnerIds(supabase, user.id)
   const [{ data: prof }, { data: pgs }] = await Promise.all([
-    supabase.from("profiles").select("full_name,plan,total_scans,total_pages,avatar_url").eq("id", user.id).single(),
+    supabase.from("profiles").select("full_name,plan,total_scans,avatar_url").eq("id", user.id).single(),
     supabase.from("pages").select("id,title,slug,status,total_views,created_at").in("user_id", ownerIds).order("created_at", { ascending: false }).limit(PAGES_LISTE),
   ])
 

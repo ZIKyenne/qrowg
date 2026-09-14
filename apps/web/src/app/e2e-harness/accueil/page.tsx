@@ -26,10 +26,10 @@ export default async function E2EAccueilPage({ searchParams }: { searchParams?: 
     { id: "demo-page-3", title: "Menu du soir (démo)", slug: "menu-du-soir-demo", status: "draft", total_views: 0, created_at: il_y_a(2) },
   ]
   const profil = lance
-    ? { full_name: "Compte lancé (démo)", plan: "free", total_scans: 64, total_pages: 1, avatar_url: null }
+    ? { full_name: "Compte lancé (démo)", plan: "free", total_scans: 64, avatar_url: null }
     : jeune
-    ? { full_name: "Nouveau compte (démo)", plan: "free", total_scans: 3, total_pages: 1, avatar_url: null }
-    : { full_name: "Studio Horizon (démo)", plan: "pro", total_scans: 169, total_pages: 3, avatar_url: null }
+    ? { full_name: "Nouveau compte (démo)", plan: "free", total_scans: 3, avatar_url: null }
+    : { full_name: "Studio Horizon (démo)", plan: "pro", total_scans: 169, avatar_url: null }
   return <ToastProvider><ConfirmProvider><DashboardClient
       initialProfile={profil}
       initialPages={pages}

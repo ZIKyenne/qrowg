@@ -34,6 +34,9 @@
 /** Ce que la LISTE de cartes du tableau de bord affiche — inchangé. */
 export const PAGES_LISTE = 20
 
+/** L'aperçu « dernières pages » du profil : une liste, pas un périmètre. */
+export const PAGES_APERCU_PROFIL = 5
+
 /** Ce que la mesure des objectifs lit : toutes les pages, jusqu'à ce plafond. */
 export const PAGES_MESUREES = 500
 

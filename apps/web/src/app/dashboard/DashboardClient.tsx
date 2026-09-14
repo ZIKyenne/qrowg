@@ -22,7 +22,7 @@ import { prochaineEtape } from "./prochaineEtape"
 import { raisonDeProposer, accrocheOffre, avantagesEnPlus } from "./offreUtile"
 
 type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string }
-type Profile = { full_name: string | null; plan: string; total_scans: number; total_pages: number; avatar_url: string | null }
+type Profile = { full_name: string | null; plan: string; total_scans: number; avatar_url: string | null }
 
 // Couleur par plan ; le NOM vient de lib/plans.ts (une seule source, cf. revue du 9 septembre).
 const PLAN_COULEUR: Record<string, string> = { free: "var(--muted)", pro: "var(--accent)", business: "var(--success)" }
@@ -113,7 +113,7 @@ export default function DashboardClient({
     // Pages accessibles : les siennes + celles des équipes dont il est membre.
     const ownerIds = await accessibleOwnerIds(supabase, user.id)
     const [{ data: prof }, { data: pgs }, { data: pagesMesurees }] = await Promise.all([
-      supabase.from("profiles").select("full_name,plan,total_scans,total_pages,avatar_url").eq("id", user.id).single(),
+      supabase.from("profiles").select("full_name,plan,total_scans,avatar_url").eq("id", user.id).single(),
       supabase.from("pages").select("id,title,slug,status,total_views,created_at").in("user_id", ownerIds).order("created_at", { ascending: false }).limit(PAGES_LISTE),
       supabase.from("pages").select("id").in("user_id", ownerIds).order("created_at", { ascending: false }).limit(PAGES_MESUREES),
     ])

@@ -13,14 +13,14 @@ export default async function AnalyticsPage() {
 
   // Profil + périmètre d'accès en parallèle (indépendants, ne dépendent que du user).
   const [{ data: profile }, ownerIds] = await Promise.all([
-    supabase.from("profiles").select("total_pages, total_scans, plan, email, full_name").eq("id", user.id).single(),
+    supabase.from("profiles").select(" total_scans, plan, email, full_name").eq("id", user.id).single(),
     accessibleOwnerIds(supabase, user.id),
   ])
 
   // Pages accessibles : les siennes + celles des équipes dont il est membre.
   const { data: pages } = await supabase
     .from("pages")
-    .select("id, title, slug, total_views, unique_views, status")
+    .select("id, title, slug, total_views, status")
     .in("user_id", ownerIds)
     .order("total_views", { ascending: false })
 

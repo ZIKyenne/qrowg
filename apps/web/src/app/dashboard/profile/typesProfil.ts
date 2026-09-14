@@ -11,7 +11,7 @@ import { PLAN_LIST, fmtPrice } from "@/lib/plans"
 export type Profile = {
   id: string; email: string; full_name: string | null; username: string | null
   bio: string | null; avatar_url: string | null; plan: string; website: string | null
-  total_pages: number; total_scans: number; created_at: string; ref_code: string | null
+  total_scans: number; created_at: string; ref_code: string | null
 }
 
 export type ApiKey = {
@@ -22,7 +22,7 @@ export type ApiKey = {
 
 export type RecentPage = {
   id: string; title: string; slug: string; status: string
-  total_views: number; unique_views: number; updated_at: string; created_at: string
+  total_views: number; updated_at: string; created_at: string
 }
 
 export type RecentScan = {

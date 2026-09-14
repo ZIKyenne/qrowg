@@ -1596,3 +1596,73 @@ jour où Vercel change d'adresse. Les deux lisent désormais la même source.
 Cinq tests tombent.
 
 Suite complète : 5 089 tests, 308 fichiers. Build vert.
+
+---
+
+## v94 — trois compteurs affichés, et ce qu'ils comptent vraiment
+
+**Le relevé**, en lisant le schéma comme oracle.
+
+```
+QUI INCRÉMENTE `pages.total_views` ?
+   trigger on_scan_created          after insert on scans
+      update public.qr_codes set total_scans = total_scans + 1 …
+      update public.pages     set total_views = total_views + 1 …
+      update public.profiles  set total_scans = total_scans + 1 …
+   Trigger sur `page_views` : AUCUN
+```
+
+La colonne qui s'appelle « vues » compte les **scans du QR**, et jamais une
+visite arrivée par un lien. Sur une page de restaurant, un mois — 40 scans en
+salle, 300 visites depuis le lien Instagram :
+
+```
+Carte de la page (dashboard)   « 40 vues »    ← pages.total_views
+Écran Statistiques             « 340 vues »   ← lignes page_views
+Écart : 300 visites, soit 88 % du trafic de la page.
+```
+
+C'est le chiffre que le commerçant voit en premier, et celui qui part sur sa
+page **publique** (compteur de visiteurs). Le commentaire du produit sur la
+rétention affirmait d'ailleurs que ces compteurs sont « incrémentés par trigger
+à l'insertion » — sans dire à l'insertion de quoi.
+
+**Deux autres colonnes ne sont écrites nulle part.** `pages.unique_views` :
+affichée en « Visiteurs uniq » avec l'infobulle « Visiteurs uniques (hors
+doublons) », donc **zéro pour tout le monde**, et exportée dans deux CSV.
+`profiles.total_pages` : lue par quatre écrans — le rapport hebdomadaire l'avait
+déjà constatée morte le 9 septembre, sans que personne aille voir qui d'autre la
+lisait.
+
+**Ce que le lot change.** `lib/compteursDePage.ts`, module pur :
+
+- `vueACompterEnBase(scanProuve)` — `/api/track` incrémente désormais
+  `pages.total_views` pour les visites que **personne** ne comptait (celles qui
+  ne viennent pas d'un QR), sans doubler celles que le trigger a déjà vues. Pas
+  de migration : la route sait déjà, depuis le lot sur l'attribution par
+  support, si la visite vient d'un scan prouvé ;
+- `visiteursUniques(lignes)` — les visiteurs uniques se **mesurent** depuis les
+  sessions de `page_views` sur 90 jours, robots exclus, au lieu de se lire dans
+  une colonne vide. La carte s'appelle maintenant « Visiteurs (90 j) » : un
+  chiffre sans période ne veut rien dire ;
+- `unique_views` et `total_pages` quittent le code — requêtes, types, exports
+  CSV et bancs d'essai compris.
+
+**Garde.** `lib/compteursDePage.test.ts` (12 tests). Le trigger du schéma sert
+d'oracle dans les deux sens : il écoute bien `scans` et touche bien ces trois
+compteurs-là ; les deux colonnes mortes ne sont écrites nulle part. Puis le
+balayage général : **tout compteur `total_*` / `unique_*` lu dans un `select`
+doit être écrit quelque part** — par le schéma ou par le code.
+
+**Ce que les gardes des lots précédents ont attrapé.** Trois d'un coup : le
+plafond de pages du profil (`.limit(5)`) est devenu un périmètre de mesure dès
+que l'écran s'est mis à compter — garde v89, corrigée en nommant le plafond
+`PAGES_APERCU_PROFIL` ; le plafond de 3 000 lignes de `profile/page.tsx`, qui a
+forcé à extraire le calcul dans son module ; et trois bancs d'essai qui figeaient
+la colonne morte dans leur jeu de données.
+
+**Vérification par mutation.** Deux défauts réinjectés — la route qui cesse de
+compter les visites directes, et le profil qui relit la colonne morte. Trois
+tests tombent.
+
+Suite complète : 5 101 tests, 309 fichiers. Build vert.

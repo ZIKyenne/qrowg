@@ -37,8 +37,10 @@ describe("l'état « retour » est mesurable : le banc d'essai le monte", () => 
     // Le lot v69 a ajouté un troisième état (?debut=2, le QR qui tourne) : la page
     // de démonstration porte donc ses vues et son âge selon l'état monté.
     expect(banc).toContain('{ id: "demo-page-1", title: "Ma carte (démo)", slug: "ma-carte-demo", status: "published", total_views: lance ? 88 : 4, created_at: il_y_a(lance ? 26 : 3) },')
-    expect(banc).toContain('plan: "free", total_scans: 3, total_pages: 1')
+    // `profiles.total_pages` a quitté le banc d'essai au lot v94 : rien ne
+    // l'incrémente depuis le premier schéma, aucun écran ne la lit plus.
+    expect(banc).toContain('plan: "free", total_scans: 3')
     // et l'état mûr reste montable, pour vérifier qu'on n'a rien cassé pour lui
-    expect(banc).toContain('total_scans: 169, total_pages: 3')
+    expect(banc).toContain('total_scans: 169')
   })
 })

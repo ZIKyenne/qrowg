@@ -75,7 +75,9 @@ describe("elle ne domine plus l'écran", () => {
 describe("les deux états sont montables, donc mesurables", () => {
   it("?debut=1 n'a pas de raison, ?debut=2 en a une", () => {
     expect(banc).toContain('const lance = debut === "2"')
-    expect(banc).toContain('plan: "free", total_scans: 64, total_pages: 1')
-    expect(banc).toContain('plan: "free", total_scans: 3, total_pages: 1')
+    // `profiles.total_pages` a quitté le banc d'essai au lot v94 : rien ne
+    // l'incrémente depuis le premier schéma, aucun écran ne la lit plus.
+    expect(banc).toContain('plan: "free", total_scans: 64')
+    expect(banc).toContain('plan: "free", total_scans: 3')
   })
 })

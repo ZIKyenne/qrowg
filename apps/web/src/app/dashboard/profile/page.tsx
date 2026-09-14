@@ -3,6 +3,9 @@
 import { useEffect, useState, useRef, useCallback } from "react"
 import { useConfirm } from "@/components/ui/Confirm"
 import { createClient } from "@/lib/supabase/client"
+import { libelleVisiteursUniques, infobulleVisiteursUniques } from "@/lib/compteursDePage"
+import { PAGES_APERCU_PROFIL } from "@/lib/perimetreDeMesure"
+import { compterVisiteursUniques } from "./visiteursUniquesDuCompte"
 import { PLAN_LIST, PLAN_ORDER, PLANS, fmtPrice } from "@/lib/plans"
 import { Button } from "@/components/ui/Button"
 import { ActionRow } from "@/components/ui/ActionRow"
@@ -75,6 +78,7 @@ export default function ProfilePage() {
   const [cropSrc, setCropSrc]           = useState<string|null>(null)
   const [deletingAvatar, setDeletingAvatar] = useState(false)
   const [allPages,   setAllPages]   = useState<RecentPage[]>([])
+  const [visiteursUniquesMesures, setVisiteursUniquesMesures] = useState(0)
   const [qrStats,    setQrStats]    = useState<QRStat[]>([])
   const [statsLoading, setStatsLoading] = useState(true)
   const [statsTooltip, setStatsTooltip]     = useState<string | null>(null)
@@ -158,8 +162,8 @@ export default function ProfilePage() {
         supabase.from("profiles").select("*").eq("id", user.id).single(),
         supabase.from("referrals").select("id,status,reward_months,created_at,referred_id").eq("referrer_id", user.id).order("created_at", { ascending: false }),
         supabase.from("api_keys").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
-        supabase.from("pages").select("id,title,slug,status,total_views,unique_views,updated_at,created_at").eq("user_id", user.id).order("updated_at", { ascending: false }).limit(5),
-        supabase.from("pages").select("id,title,slug,status,total_views,unique_views,updated_at,created_at").eq("user_id", user.id),
+        supabase.from("pages").select("id,title,slug,status,total_views,updated_at,created_at").eq("user_id", user.id).order("updated_at", { ascending: false }).limit(PAGES_APERCU_PROFIL),
+        supabase.from("pages").select("id,title,slug,status,total_views,updated_at,created_at").eq("user_id", user.id),
         supabase.from("qr_codes").select("id,short_code,total_scans,status,created_at,pages(title)").eq("user_id", user.id).order("total_scans", { ascending: false }),
         supabase.from("subscriptions").select("current_period_start,current_period_end,cancel_at_period_end,status").eq("user_id", user.id).maybeSingle(),
       ])
@@ -183,6 +187,9 @@ export default function ProfilePage() {
       if (keys)  setApiKeys(keys)
       if (pages)       setRecentPages(pages)
       if (allPagesData) setAllPages(allPagesData)
+
+      // Visiteurs uniques : mesurés, jamais lus dans `unique_views` (lot v94).
+      setVisiteursUniquesMesures(await compterVisiteursUniques(supabase, (allPagesData ?? []).map((pg: any) => pg.id)))
       // postgrest infere pages en tableau ; au runtime c'est un objet (relation many-to-one)
       if (qrData)      setQrStats(qrData as unknown as QRStat[])
       // Charger activity_logs (ou construire depuis donnees existantes)
@@ -646,7 +653,7 @@ export default function ProfilePage() {
               plan: profile.plan, created_at: profile.created_at,
             },
             preferences: prefs,
-            pages: allPages.map(p => ({ id:p.id, title:p.title, slug:p.slug, status:p.status, total_views:p.total_views, unique_views:p.unique_views, created_at:p.created_at })),
+            pages: allPages.map(p => ({ id:p.id, title:p.title, slug:p.slug, status:p.status, total_views:p.total_views, created_at:p.created_at })),
             qr_codes: qrStats.map(q => ({ id:q.id, short_code:q.short_code, total_scans:q.total_scans, status:q.status })),
             referrals: referrals.map(r => ({ id:r.id, status:r.status, reward_months:r.reward_months, created_at:r.created_at })),
             api_keys: apiKeys.map(k => ({ id:k.id, name:k.name, key_preview:k.key_preview, is_active:k.is_active, created_at:k.created_at, last_used_at:k.last_used_at })),
@@ -661,7 +668,7 @@ export default function ProfilePage() {
 
         case "pages": {
           // Pages en CSV
-          const rows = allPages.map(p => ({ titre:p.title, slug:p.slug, statut:p.status, vues:p.total_views, visiteurs_uniques:p.unique_views, cree_le:p.created_at, modifie_le:p.updated_at }))
+          const rows = allPages.map(p => ({ titre:p.title, slug:p.slug, statut:p.status, vues:p.total_views, cree_le:p.created_at, modifie_le:p.updated_at }))
           const fn   = `qrowg-pages-${slug}-${ts}.csv`
           downloadBlob(arrayToCsv(rows), fn, TYPE_CSV)
           setJobStatus(jobId, "done", fn)
@@ -681,7 +688,7 @@ export default function ProfilePage() {
 
         case "analytics": {
           // Analytics pages en CSV
-          const rows = allPages.map(p => ({ page:p.title, slug:p.slug, vues_total:p.total_views, visiteurs_uniques:p.unique_views }))
+          const rows = allPages.map(p => ({ page:p.title, slug:p.slug, vues_total:p.total_views }))
           const fn   = `qrowg-analytics-${slug}-${ts}.csv`
           downloadBlob(arrayToCsv(rows), fn, TYPE_CSV)
           setJobStatus(jobId, "done", fn)
@@ -717,7 +724,10 @@ export default function ProfilePage() {
   const publishedPages = allPages.filter(p => p.status === "published").length
   const draftPages     = allPages.filter(p => p.status === "draft").length
   const totalViews     = allPages.reduce((s, p) => s + (p.total_views || 0), 0)
-  const uniqueViews    = allPages.reduce((s, p) => s + (p.unique_views || 0), 0)
+  // `pages.unique_views` n'est écrit nulle part depuis le premier schéma : la
+  // carte « Visiteurs uniq » affichait zéro à tout le monde. On mesure depuis
+  // les sessions de `page_views` (lot v94, lib/compteursDePage).
+  const uniqueViews    = visiteursUniquesMesures
   const totalQR        = qrStats.length
   const activeQR       = qrStats.filter(q => (q.status ?? "active") === "active").length
   const totalScansQR   = qrStats.reduce((s, q) => s + (q.total_scans || 0), 0)
@@ -1493,7 +1503,7 @@ export default function ProfilePage() {
                     { icon:CheckCircle,label:"Publiees",      value:publishedPages,          color:"var(--success)",  tooltip:"Pages avec statut Publié" },
                     { icon:QrCode,     label:"QR actifs",     value:activeQR,                color:"var(--accent)",  tooltip:"QR Codes avec statut Actif" },
                     { icon:TrendingUp, label:"Vues total",    value:totalViews.toLocaleString("fr-FR"), color:"var(--accent)", tooltip:"Total des vues sur toutes les pages" },
-                    { icon:Users,      label:"Visiteurs uniq",value:uniqueViews.toLocaleString("fr-FR"),color:"var(--accent)", tooltip:"Visiteurs uniques (hors doublons)" },
+                    { icon:Users,      label:libelleVisiteursUniques(),value:uniqueViews.toLocaleString("fr-FR"),color:"var(--accent)", tooltip:infobulleVisiteursUniques() },
                     { icon:QrCode,     label:"Scans QR",      value:totalScansQR.toLocaleString("fr-FR"),color:"var(--accent)",tooltip:"Total des scans sur tous les QR" },
                   ].map((s, i) => (
                     <div key={i}

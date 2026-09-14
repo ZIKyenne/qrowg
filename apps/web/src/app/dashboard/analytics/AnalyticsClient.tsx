@@ -22,8 +22,8 @@ import HeatmapPanel from "./HeatmapPanel"
 import SupportPanel from "./SupportPanel"
 import { ligneDeRobot } from "@/lib/robots"
 
-type Profile = { total_pages: number; total_scans: number; plan: string; email?: string; full_name?: string } | null
-type Page = { id: string; title: string; slug: string; total_views: number; unique_views: number; status: string }
+type Profile = { total_scans: number; plan: string; email?: string; full_name?: string } | null
+type Page = { id: string; title: string; slug: string; total_views: number; status: string }
 type Scan = { scanned_at: string; device: string; country: string | null; page_id: string; qr_code_id?: string | null }
 type SupportQr = { id: string; short_code: string; label?: string | null; page_id?: string | null }
 type SrcRow = { qr_source?: string | null }
