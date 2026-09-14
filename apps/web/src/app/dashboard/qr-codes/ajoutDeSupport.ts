@@ -5,6 +5,8 @@
 // l'écran ne garde que ce qui le regarde — l'état du bouton et le message.
 import { messageDeRoute } from "@/lib/messageDeRoute"
 
+import { phraseSupportEnBrouillon } from "@/lib/qrEnBrouillon"
+
 export type ResultatSupport =
   | { ok: true; qr: any; brouillon: boolean }
   | { ok: false; phrase: string }
@@ -32,6 +34,6 @@ export async function ajouterUnSupport(pageId: string): Promise<ResultatSupport>
 /** Ce qu'on dit une fois le support posé. */
 export function messageDeSupport(r: Extract<ResultatSupport, { ok: true }>): string {
   return r.brouillon
-    ? "Support créé en brouillon : limite de QR actifs atteinte. Activez-le après avoir mis un autre QR en pause."
+    ? phraseSupportEnBrouillon()
     : `Support « ${r.qr.label} » ajouté — il mène à la même page et compte ses scans à part.`
 }

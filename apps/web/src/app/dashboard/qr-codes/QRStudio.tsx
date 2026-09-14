@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback, type ReactNode } from "react"
 import { messageDeRoute } from "@/lib/messageDeRoute"
 import { construireCsv, nomDeFichierCsv, TYPE_CSV } from "@/lib/exportCsv"
+import { phraseCopieEnBrouillon } from "@/lib/qrEnBrouillon"
 import {
   QrCode, Download, Link, Check, Lock, Pencil, Plus,
   Eye, EyeOff, ChevronRight, ScanLine, Clock,
@@ -552,9 +553,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       setQRCodes(prev => [d.qr, ...prev])
       setActiveId(d.qr.id)
       setMobileView("editor")
-      if (d.qr.status === "draft") {
-        toast.success("Copie créée en brouillon : limite de QR actifs atteinte. Activez-la après avoir mis un autre QR en pause.")
-      }
+      if (d.qr.status === "draft") toast.success(phraseCopieEnBrouillon())
     } catch {
       toast.error("Duplication impossible : erreur réseau")
     } finally {

@@ -1856,3 +1856,62 @@ bibliothèque d'images de l'éditeur, que le relevé manuel avait manqué.
 tombent.
 
 Suite complète : 5 148 tests, 312 fichiers. Build vert.
+
+---
+
+## v98 — la route le dit, trois écrans sur quatre ne l'écoutent pas
+
+**Le relevé.** Quand le quota de QR actifs du plan est atteint, une page
+nouvellement créée reçoit un QR en **brouillon**. `lib/quota` le documente :
+« créé quand même, mais non visitable tant qu'un slot n'est pas libéré ». Les
+deux routes de création renvoient l'information, sous le même nom :
+
+```js
+return NextResponse.json({ pageId, success: true, qrStatus,
+                           atActiveLimit: qrStatus === "draft" })
+```
+
+Qui l'écoutait :
+
+```
+templates/page.tsx:708  (modal de nommage)   OUI — « Page créée en brouillon :
+                          limite de QR actifs atteinte. Mettez un QR en pause
+                          puis activez celle-ci. »
+templates/page.tsx:628  (assistant)          non — « Page créée — à vous de jouer »
+onboarding/OnboardingClient.tsx:37           non — l'écran promet pourtant
+                          « Page + blocs + QR + objectif »
+BuilderV4.tsx:566  (/api/pages/create)       non
+```
+
+Trois chemins sur quatre livraient une page dont le QR affiche le mur
+« brouillon » au scan (lot v78), sans le dire. Le commerçant peut l'imprimer.
+
+**Ce que le lot change.** `lib/qrEnBrouillon.ts`, module pur. La phrase existait
+déjà et elle est bonne : on la sort de l'écran qui l'avait, on lui ajoute le
+chiffre du plan (« Votre plan permet 10 QR actifs. »), et les quatre chemins la
+disent.
+
+`messageApresCreation` traite le champ absent comme un **message neutre** : si
+une route cessait de le renvoyer, on ne veut ni alarmer, ni promettre.
+
+**Ce que la garde a trouvé toute seule.** Deux autres écrans créent des QR et
+avaient chacun écrit *leur* phrase : la duplication dans QR Studio (« Copie créée
+en brouillon… ») et l'ajout de support du lot v83 (« Support créé en
+brouillon… »). Elles vivent maintenant dans le module, avec le chiffre du plan —
+trois phrases justes sur l'objet dont elles parlent, une seule vérité sur le
+quota.
+
+**Garde.** `lib/qrEnBrouillon.test.ts` (14 tests). La règle de classe : **une
+information que le serveur prend la peine de renvoyer est lue par tous ceux qui
+appellent la route — sinon elle n'existe pas.** Et un balayage qui refuse qu'un
+écran annonce « Page créée » en dur juste après une réponse qui porte
+`atActiveLimit`.
+
+**Le plafond de 3 000 lignes, encore.** L'import ajouté à `QRStudio.tsx` l'a fait
+passer à 3 000 pile : le bloc `if` de trois lignes est devenu une ligne, comme
+les trois fois précédentes. La contrainte fait son travail.
+
+**Vérification par mutation.** Deux défauts réinjectés — l'assistant qui reprend
+son « à vous de jouer », et l'onboarding qui cesse d'écouter. Deux tests tombent.
+
+Suite complète : 5 162 tests, 313 fichiers. Build vert.

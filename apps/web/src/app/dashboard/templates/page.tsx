@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react"
 import { messageDeRoute } from "@/lib/messageDeRoute"
+import { messageApresCreation } from "@/lib/qrEnBrouillon"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { PLAN_RANK, getPlan, PLANS } from "@/lib/plans"
@@ -635,7 +636,9 @@ export default function TemplatesPage() {
               if (res.status === 401) return applyTemplateAsGuest({ key: String(wizardFor), name, theme: composed.theme, blocks })
               const json = await res.json()
               if (!res.ok || !json.pageId) return { error: messageDeRoute(res.status, json, "Votre page n'a pas pu être créée.") }
-              toast.success("Page créée — à vous de jouer")
+              // Ce chemin-ci ne lisait pas `atActiveLimit` : il annonçait « à vous
+              // de jouer » sur une page dont le QR affiche le mur au scan (lot v98).
+              toast.success(messageApresCreation(json))
               setTimeout(() => router.push("/dashboard/builder/" + json.pageId), 400)
               return { ok: true }
             }}
@@ -705,11 +708,8 @@ export default function TemplatesPage() {
               if (!res.ok || !json.pageId) {
                 return { error: messageDeRoute(res.status, json, "Votre page n'a pas pu être créée.") }
               }
-              if (json.atActiveLimit) {
-                toast.success("Page créée en brouillon : limite de QR actifs atteinte. Mettez un QR en pause puis activez celle-ci.")
-              } else {
-                toast.success("Page créée avec succès")
-              }
+              // Une seule phrase pour les quatre chemins de création (lot v98).
+              toast.success(messageApresCreation(json))
               setTimeout(() => router.push("/dashboard/builder/" + json.pageId), 500)
               return { ok: true }
             }}

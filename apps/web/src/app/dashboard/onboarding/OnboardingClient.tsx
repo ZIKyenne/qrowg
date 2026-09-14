@@ -5,6 +5,8 @@
 // atterrit dans le builder. Réutilise POST /api/templates/use + POST /api/goals (aucune migration).
 import { useState, useEffect } from "react"
 import { messageDeRoute } from "@/lib/messageDeRoute"
+import { messageApresCreation, qrVisitable } from "@/lib/qrEnBrouillon"
+import { useToast } from "@/components/Toast"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Sparkles } from "lucide-react"
@@ -16,6 +18,7 @@ const MUT = "#A8A190"
 
 export default function OnboardingClient() {
   const router = useRouter()
+  const toast = useToast()
   const [chosen, setChosen] = useState<Objective | null>(null)
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
@@ -40,6 +43,9 @@ export default function OnboardingClient() {
       })
       const d = await res.json().catch(() => ({} as any))
       if (!res.ok || !d.pageId) { setErr(messageDeRoute(res.status, d, "Création impossible pour le moment.")); setBusy(false); return }
+      // L'écran promet « Page + blocs + QR + objectif ». Quand le quota de QR
+      // actifs est atteint, le QR arrive en brouillon : on le dit (lot v98).
+      if (!qrVisitable(d)) toast.info(messageApresCreation(d))
       if (goal) {
         fetch("/api/goals", {
           method: "POST", headers: { "Content-Type": "application/json" },

@@ -42,6 +42,7 @@ import { actionClavier } from "./raccourcisClavier"
   import { useBuilderRedesign } from "./builderFlags"
   import { useIsMobile } from "@/lib/useIsMobile"
   import { useToast } from "@/components/Toast"
+import { messageApresCreation, qrVisitable } from "@/lib/qrEnBrouillon"
   import { useConfirm } from "@/components/ui/Confirm"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
@@ -566,6 +567,9 @@ import { actionClavier } from "./raccourcisClavier"
           const res = await fetch("/api/pages/create", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: claimed?.pageName || pageName }) })
           const json = await res.json().catch(() => ({}))
           if (!res.ok || !json?.pageId) { setBootstrapError(json?.message || json?.error || "Impossible de créer la page."); return }
+          // Quota de QR actifs atteint : le QR existe mais affiche le mur au
+          // scan. L'éditeur le dit au lieu de laisser imprimer (lot v98).
+          if (!qrVisitable(json)) toast.info(messageApresCreation(json))
           if (claimed) {
             setBlocksRaw(claimed.blocks.map(b => ({ id: IS_UUID(b.id) ? b.id : genId(), type: b.type, content: { ...b.content }, visible: b.visible !== false, draft: b.draft, locked: b.locked })))
             setPageName(claimed.pageName)
