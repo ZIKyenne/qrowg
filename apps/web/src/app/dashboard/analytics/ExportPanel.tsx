@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { Download, Calendar, Lock, CheckCircle, Loader, Eye, QrCode, Link2, Layers, Globe } from "lucide-react"
+import { construireCsv, TYPE_CSV } from "@/lib/exportCsv"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type ViewRow    = { viewed_at: string; device: string; source: string | null; country: string | null; page_id: string }
@@ -47,23 +48,14 @@ const G     = "var(--accent)"
 const MUTED = "var(--muted)"
 
 // ── CSV helpers ───────────────────────────────────────────────────────────────
-function escapeCell(v: unknown): string {
-  const s = v == null ? "" : String(v)
-  if (s.includes(",") || s.includes('"') || s.includes("\n")) {
-    return '"' + s.replace(/"/g, '""') + '"'
-  }
-  return s
-}
-
+// Échappement, séparateur et neutralisation : `lib/exportCsv`, comme les cinq
+// autres exports du produit (lot v90).
 function toCSV(headers: string[], rows: unknown[][]): string {
-  const lines = [headers.map(escapeCell).join(",")]
-  rows.forEach(r => lines.push(r.map(escapeCell).join(",")))
-  return lines.join("\r\n")
+  return construireCsv(headers, rows)
 }
 
 function downloadCSV(csv: string, filename: string) {
-  const bom = "\uFEFF"
-  const blob = new Blob([bom + csv], { type: "text/csv;charset=utf-8;" })
+  const blob = new Blob([csv], { type: TYPE_CSV })
   const url  = URL.createObjectURL(blob)
   const a    = document.createElement("a")
   a.href     = url

@@ -21,6 +21,7 @@ import {
 import NextStepCard from "@/components/NextStepCard"
 import { useToast } from "@/components/Toast"
 import { erreurLisible } from "@/lib/erreurLisible"
+import { csvDepuisObjets, TYPE_CSV } from "@/lib/exportCsv"
 import { cycleDe, echeance, type LigneAbonnement } from "@/lib/cycleAbonnement"
 import { construireJournal, type ActivityEvent, type ActivityEventType } from "./journalActivite"
 import { badges as badgesDe, niveau as niveauDe, type Badge } from "./progressionProfil"
@@ -615,11 +616,11 @@ export default function ProfilePage() {
     a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
 
+  // Une seule fabrique de CSV dans le produit — `lib/exportCsv`. L'échappement
+  // écrit ici doublait le guillemet en TRIPLE : le fichier cassait dès la
+  // première page dont le titre en contenait un (lot v90).
   function arrayToCsv(rows: Record<string,any>[], cols?: string[]): string {
-    if (!rows.length) return ""
-    const keys = cols ?? Object.keys(rows[0])
-    const esc  = (v: any) => `"${String(v ?? "").replace(/"/g, '"\""' )}"`
-    return [keys.join(","), ...rows.map(r => keys.map(k => esc(r[k])).join(","))].join("\r\n")
+    return csvDepuisObjets(rows, cols)
   }
 
   function setJobStatus(id: string, status: ExportJob["status"], filename?: string) {
@@ -662,7 +663,7 @@ export default function ProfilePage() {
           // Pages en CSV
           const rows = allPages.map(p => ({ titre:p.title, slug:p.slug, statut:p.status, vues:p.total_views, visiteurs_uniques:p.unique_views, cree_le:p.created_at, modifie_le:p.updated_at }))
           const fn   = `qrowg-pages-${slug}-${ts}.csv`
-          downloadBlob("\uFEFF" + arrayToCsv(rows), fn, "text/csv;charset=utf-8")
+          downloadBlob(arrayToCsv(rows), fn, TYPE_CSV)
           setJobStatus(jobId, "done", fn)
           setExportHistory(h => [{ date:new Date().toISOString(), label:"Pages", format:"CSV" }, ...h].slice(0,10))
           break
@@ -672,7 +673,7 @@ export default function ProfilePage() {
           // QR Codes en CSV
           const rows = qrStats.map(q => ({ short_code:q.short_code, page:(q.pages as any)?.title||"", total_scans:q.total_scans, statut:q.status||"active" }))
           const fn   = `qrowg-qrcodes-${slug}-${ts}.csv`
-          downloadBlob("\uFEFF" + arrayToCsv(rows), fn, "text/csv;charset=utf-8")
+          downloadBlob(arrayToCsv(rows), fn, TYPE_CSV)
           setJobStatus(jobId, "done", fn)
           setExportHistory(h => [{ date:new Date().toISOString(), label:"QR Codes", format:"CSV" }, ...h].slice(0,10))
           break
@@ -682,7 +683,7 @@ export default function ProfilePage() {
           // Analytics pages en CSV
           const rows = allPages.map(p => ({ page:p.title, slug:p.slug, vues_total:p.total_views, visiteurs_uniques:p.unique_views }))
           const fn   = `qrowg-analytics-${slug}-${ts}.csv`
-          downloadBlob("\uFEFF" + arrayToCsv(rows), fn, "text/csv;charset=utf-8")
+          downloadBlob(arrayToCsv(rows), fn, TYPE_CSV)
           setJobStatus(jobId, "done", fn)
           setExportHistory(h => [{ date:new Date().toISOString(), label:"Analytics", format:"CSV" }, ...h].slice(0,10))
           break

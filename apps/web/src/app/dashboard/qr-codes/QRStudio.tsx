@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback, type ReactNode } from "react"
 import { messageDeRoute } from "@/lib/messageDeRoute"
+import { construireCsv, nomDeFichierCsv, TYPE_CSV } from "@/lib/exportCsv"
 import {
   QrCode, Download, Link, Check, Lock, Pencil, Plus,
   Eye, EyeOff, ChevronRight, ScanLine, Clock,
@@ -434,13 +435,12 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       if (d.empty || d.error) { setStatsExporting(false); return } // pas de CSV vide si QR introuvable/erreur
       const rows = d.sparkline?.map((v: number, i: number) => {
         const date = new Date(); date.setDate(date.getDate() - 30 + i)
-        return `${date.toLocaleDateString("fr-FR")},${v}`
+        return [date.toLocaleDateString("fr-FR"), v]
       }) ?? []
-      const csv  = ["Date,Scans", ...rows].join("\r\n")
-      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" })
+      const blob = new Blob([construireCsv(["Date", "Scans"], rows)], { type: TYPE_CSV })
       const url  = URL.createObjectURL(blob)
       const a    = document.createElement("a")
-      a.href = url; a.download = `scans-${active.short_code}.csv`; a.click()
+      a.href = url; a.download = nomDeFichierCsv(`scans-${active.short_code}`); a.click()
       URL.revokeObjectURL(url)
     } catch {}
     setStatsExporting(false)

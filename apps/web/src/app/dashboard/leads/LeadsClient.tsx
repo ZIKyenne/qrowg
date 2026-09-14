@@ -7,6 +7,7 @@ import { Inbox, Mail, Phone, Trash2, Check, Search } from "lucide-react"
 import { useConfirm } from "@/components/ui/Confirm"
 import { useToast } from "@/components/Toast"
 import { erreurLisible } from "@/lib/erreurLisible"
+import { construireCsv, nomDeFichierCsv, TYPE_CSV } from "@/lib/exportCsv"
 
 const G = "var(--accent, #C9A84C)"
 const MUTED = "var(--muted)"
@@ -85,16 +86,17 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
     setLeads(prev => prev.filter(l => l.id !== id))
   }
   const exportCsv = () => {
-    const rows = [["Date", "Type", "Page", "Nom", "Email", "Téléphone", "Message", "Détails"]]
-    filtered.forEach(l => rows.push([
+    // Le message vient du formulaire PUBLIC : `lib/exportCsv` le neutralise pour
+    // que le tableur l'affiche au lieu de l'exécuter (lot v90).
+    const lignes = filtered.map(l => [
       fmtDate(l.created_at), TYPE_LABELS[l.type] || l.type, pageTitle(l.page_id),
-      l.name || "", l.email || "", l.phone || "", (l.message || "").replace(/\n/g, " "),
+      l.name || "", l.email || "", l.phone || "", (l.message || "").replace(/[\r\n]+/g, " "),
       Object.entries(l.data || {}).map(([k, v]) => `${k}=${v}`).join("; "),
-    ]))
-    const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n")
-    const url = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" }))
+    ])
+    const csv = construireCsv(["Date", "Type", "Page", "Nom", "Email", "Téléphone", "Message", "Détails"], lignes)
+    const url = URL.createObjectURL(new Blob([csv], { type: TYPE_CSV }))
     const a = document.createElement("a")
-    a.href = url; a.download = `messages-qrowg.csv`; a.click()
+    a.href = url; a.download = nomDeFichierCsv("messages-qrowg"); a.click()
     URL.revokeObjectURL(url)
   }
 
