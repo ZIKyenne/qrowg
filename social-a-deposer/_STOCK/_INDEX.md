@@ -466,3 +466,56 @@ Pas de LinkedIn ni de X aujourd'hui (dimanche).
 **Titre Pinterest** : Notice du produit : la page à créer en 4 étapes, gratuite
 **Tableau** : Avis Google commerce — premier épinglage sur ce tableau
 `#boutique #commercelocal #organisation #qrcode`
+
+---
+
+## 14/09 — production du jour · EN RÉSERVE `dispo` (dépôt non lancé)
+
+> Réserve **vide** au démarrage (tout en `en-file`) : production 100 % neuve.
+> Étape 0 : un post Instagram en `error` (carrousel anniversaire du 13/09) correspondait
+> exactement à un `sent` de 19 h 07 → **il était en ligne**, passé en brouillon avec la
+> mention `[DÉJÀ EN LIGNE — NE PAS RETRY]`. Onglet `error` vide. Aucun doublon parmi les
+> `scheduled` (1 seul post : épingle boutique du 13/09, due le 14/09 à 12 h 18).
+> **9 places libres** dans la file.
+> Contrôle qualité : **16 visuels, 0 alerte**, les 8 QR décodés vers leur lien tracké.
+> **Dépôt NON fait** : la tâche tourne sans l'utilisateur et le proxy bloque supabase.co.
+> Les 16 PNG sont donc archivés ici en statut `dispo`. Dès que `QRowg-Depot.cmd` est
+> lancé et que les URLs reviennent, ces lignes passent en `en-file`.
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| dispo | qr-code-fiche-technique-couleur-formule-salon-01..06.png | Instagram (carrousel) | — | salon · fiche technique de la couleur · la formule est lisible par toute l'équipe, même sans la coloriste | https://qrowg.com/qr-code/salon?utm_source=instagram&utm_medium=bio&utm_campaign=20260914-salon | 2026-09-14 |
+| dispo | tiktok-qr-code-fiche-technique-couleur-formule-salon-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 | https://qrowg.com/qr-code/salon?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260914-salon | 2026-09-14 |
+| dispo | qr-code-calendrier-semis-et-recoltes-etal-producteur.png | Pinterest | QR code food truck (726416683586817654) — gabarit 0 | producteur · calendrier des semis et des récoltes · « c'est quand, les fraises ? » | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic&utm_term=producteur | 2026-09-14 |
+| dispo | qr-code-bonnes-adresses-du-quartier-hotel.png | Pinterest | QR code hôtel (726416683586817656) — gabarit 1 | hôtel · bonnes adresses du quartier tenues à jour · le classeur de la réception date de trois ans | https://qrowg.com/qr-code/hotel?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic | 2026-09-14 |
+| dispo | qr-code-objets-oublies-vestiaire-restaurant.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 2 | restaurant · vestiaire et objets oubliés · l'écharpe sous la banquette et personne à rappeler | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic | 2026-09-14 |
+| dispo | qr-code-charges-et-taxes-du-bien-immobilier.png | Pinterest | QR code immobilier (726416683586817652) — gabarit 3 — *unique épingle hors-food* | immobilier · récapitulatif des charges et taxes du bien · la question tombe à chaque visite | https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic&utm_term=charges | 2026-09-14 |
+
+> Pas de vidéo aujourd'hui (jours vidéo : mer, ven, sam, dim).
+
+## Textes prêts — 14/09
+
+Légendes complètes (Instagram, TikTok, Pinterest ×4, LinkedIn) avec bouton Copier :
+`social-a-deposer\2026-09-14\textes-du-jour-2026-09-14.html`.
+Bios : `social-a-deposer\2026-09-14\bios-du-jour-2026-09-14.html`.
+Pas de X aujourd'hui (X = mardi, jeudi, samedi).
+
+### qr-code-calendrier-semis-et-recoltes-etal-producteur
+**Titre Pinterest** : Calendrier des récoltes : la page à créer en 5 minutes
+**Tableau** : QR code food truck
+`#producteurlocal #circuitcourt #marche #commercelocal`
+
+### qr-code-bonnes-adresses-du-quartier-hotel
+**Titre Pinterest** : Bonnes adresses du quartier : le guide à monter en 4 étapes
+**Tableau** : QR code hôtel — premier épinglage sur ce tableau
+`#hotel #chambredhotes #voyage #commercelocal`
+
+### qr-code-objets-oublies-vestiaire-restaurant
+**Titre Pinterest** : Objets trouvés au restaurant : la page à créer en 5 minutes
+**Tableau** : QR code restaurant
+`#restaurant #restauration #serviceclient #commercelocal`
+
+### qr-code-charges-et-taxes-du-bien-immobilier
+**Titre Pinterest** : Charges et taxes du bien : la fiche à monter en 4 étapes
+**Tableau** : QR code immobilier — unique épingle hors-food
+`#immobilier #agentimmobilier #investissement #qrcode`

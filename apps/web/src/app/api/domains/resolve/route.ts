@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { escapeHtml } from "@/lib/escapeHtml"
 import { candidats, proprietaire } from "@/lib/proprietaireDomaine"
+import { entetesDeRedirection } from "@/lib/enteteDeRedirection"
 
 export async function GET(req: NextRequest) {
   const rawDomain = req.nextUrl.searchParams.get("domain")
@@ -54,7 +55,9 @@ export async function GET(req: NextRequest) {
         // `https://primary.com@evil.com` (host = evil.com) = open-redirect.
         const path = rawPath.startsWith("/") ? rawPath : "/" + rawPath
         const dest = `https://${primaryDomain.domain}${path !== "/" ? path : ""}`
-        return NextResponse.redirect(dest, { status: 301 })
+        // Sans en-tête, ce 301 reste dans le navigateur du visiteur : changer
+        // de domaine principal ne changeait rien pour lui (lot v95).
+        return NextResponse.redirect(dest, { status: 301, headers: entetesDeRedirection() })
       }
     }
 
@@ -84,7 +87,7 @@ export async function GET(req: NextRequest) {
         ? redirect.to_url
         : new URL(redirect.to_url.startsWith("/") ? redirect.to_url : "/" + redirect.to_url, appUrl).toString()
 
-      return NextResponse.redirect(dest, { status: redirect.redirect_type })
+      return NextResponse.redirect(dest, { status: redirect.redirect_type, headers: entetesDeRedirection() })
     }
 
     // Redirection wildcard (domaine seul, chemin "/" par défaut)
@@ -102,7 +105,7 @@ export async function GET(req: NextRequest) {
         const dest = wildcardRedir.to_url.startsWith("http")
           ? wildcardRedir.to_url
           : new URL(wildcardRedir.to_url, appUrl).toString()
-        return NextResponse.redirect(dest, { status: wildcardRedir.redirect_type })
+        return NextResponse.redirect(dest, { status: wildcardRedir.redirect_type, headers: entetesDeRedirection() })
       }
     }
 
@@ -139,7 +142,7 @@ export async function GET(req: NextRequest) {
     if (routes && routes.length > 0) {
       const page = resolveRoute(routes, sub)
       if (page) {
-        return NextResponse.redirect(new URL(`/${(page as any).slug}`, appUrl))
+        return NextResponse.redirect(new URL(`/${(page as any).slug}`, appUrl), { headers: entetesDeRedirection() })
       }
     }
 
@@ -154,7 +157,7 @@ export async function GET(req: NextRequest) {
 
     if (verif?.pages) {
       const page = verif.pages as any
-      return NextResponse.redirect(new URL(`/${page.slug}`, appUrl))
+      return NextResponse.redirect(new URL(`/${page.slug}`, appUrl), { headers: entetesDeRedirection() })
     }
 
     // ── 404 ────────────────────────────────────────────────────────────────────

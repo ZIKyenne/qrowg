@@ -2,6 +2,7 @@
 
 import { PageHeader } from "@/components/ui/PageHeader"
 import { messageDeRoute } from "@/lib/messageDeRoute"
+import { phraseSuppression, phraseCacheNavigateur } from "@/lib/enteteDeRedirection"
 import { sourceParDefaut, SOUS_DOMAINE_QROWG } from "./sourceParDefaut"
 import { useState, useEffect } from "react"
 import { useConfirm } from "@/components/ui/Confirm"
@@ -140,7 +141,9 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
   // La ligne ne disparaît QU'APRÈS confirmation du serveur.
   async function del(id: string) {
     const r = redirects.find(x => x.id === id)
-    if (!(await confirm({ title: "Supprimer cette redirection ?", message: r ? `${r.from_domain}${r.from_path || ""} ne redirigera plus vers ${r.to_url}.` : "Elle cessera immédiatement.", confirmLabel: "Supprimer", danger: true }))) return
+    // « Elle cessera immédiatement » était faux pour une redirection permanente :
+    // le navigateur des visiteurs déjà passés la retient (lot v95).
+    if (!(await confirm({ title: "Supprimer cette redirection ?", message: phraseSuppression(r), confirmLabel: "Supprimer", danger: true }))) return
     setDeleting(id)
     try {
       const res = await fetch("/api/redirects", {
@@ -380,7 +383,7 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
               <p style={{ color:"var(--ink)", fontSize:12, fontWeight:700, margin:"0 0 6px" }}>301 vs 302 — Lequel choisir ?</p>
               <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
                 <p style={{ color:MUTED, fontSize:11, margin:0 }}>
-                  <strong style={{ color:"var(--accent)" }}>301 Permanent</strong> — Le domaine/page a définitivement changé. Google transfère le PageRank vers la nouvelle URL. À utiliser pour les migrations définitives.
+                  <strong style={{ color:"var(--accent)" }}>301 Permanent</strong> — Le domaine/page a définitivement changé. Google transfère le PageRank vers la nouvelle URL. À utiliser pour les migrations définitives. {phraseCacheNavigateur(301)}
                 </p>
                 <p style={{ color:MUTED, fontSize:11, margin:0 }}>
                   <strong style={{ color:"rgba(239,233,223,0.85)" }}>302 Temporaire</strong> — La redirection est temporaire. Google garde le SEO sur l'URL source. À utiliser pour des tests ou des promotions limitées.

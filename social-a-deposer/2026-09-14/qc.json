@@ -1,0 +1,118 @@
+{
+  "total": 16,
+  "avec_alerte": 0,
+  "details": [
+    {
+      "fichier": "qr-code-bonnes-adresses-du-quartier-hotel.png",
+      "fond_sombre_pct": 90.4,
+      "or_pct": 4.7,
+      "qr": "https://qrowg.com/qr-code/hotel?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-calendrier-semis-et-recoltes-etal-producteur.png",
+      "fond_sombre_pct": 91.0,
+      "or_pct": 4.8,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic&utm_term=producteur",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-charges-et-taxes-du-bien-immobilier.png",
+      "fond_sombre_pct": 90.1,
+      "or_pct": 4.9,
+      "qr": "https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic&utm_term=charges",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-fiche-technique-couleur-formule-salon-01.png",
+      "fond_sombre_pct": 92.7,
+      "or_pct": 1.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-fiche-technique-couleur-formule-salon-02.png",
+      "fond_sombre_pct": 92.7,
+      "or_pct": 1.7,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-fiche-technique-couleur-formule-salon-03.png",
+      "fond_sombre_pct": 85.2,
+      "or_pct": 9.2,
+      "qr": "https://qrowg.com/qr-code/salon?utm_medium=carrousel&utm_campaign=20260914-salon",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-fiche-technique-couleur-formule-salon-04.png",
+      "fond_sombre_pct": 92.8,
+      "or_pct": 0.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-fiche-technique-couleur-formule-salon-05.png",
+      "fond_sombre_pct": 86.8,
+      "or_pct": 9.2,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-fiche-technique-couleur-formule-salon-06.png",
+      "fond_sombre_pct": 83.8,
+      "or_pct": 9.9,
+      "qr": "https://qrowg.com/qr-code/salon?utm_medium=carrousel&utm_campaign=20260914-salon",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-objets-oublies-vestiaire-restaurant.png",
+      "fond_sombre_pct": 89.9,
+      "or_pct": 4.8,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-fiche-technique-couleur-formule-salon-01.png",
+      "fond_sombre_pct": 92.7,
+      "or_pct": 1.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-fiche-technique-couleur-formule-salon-02.png",
+      "fond_sombre_pct": 92.7,
+      "or_pct": 1.7,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-fiche-technique-couleur-formule-salon-03.png",
+      "fond_sombre_pct": 85.3,
+      "or_pct": 9.3,
+      "qr": "https://qrowg.com/qr-code/salon?utm_medium=carrousel&utm_campaign=20260914-salon",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-fiche-technique-couleur-formule-salon-04.png",
+      "fond_sombre_pct": 92.8,
+      "or_pct": 0.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-fiche-technique-couleur-formule-salon-05.png",
+      "fond_sombre_pct": 86.8,
+      "or_pct": 9.2,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-fiche-technique-couleur-formule-salon-06.png",
+      "fond_sombre_pct": 83.8,
+      "or_pct": 9.9,
+      "qr": "https://qrowg.com/qr-code/salon?utm_medium=carrousel&utm_campaign=20260914-salon",
+      "alertes": []
+    }
+  ]
+}

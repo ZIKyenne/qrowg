@@ -1666,3 +1666,62 @@ compter les visites directes, et le profil qui relit la colonne morte. Trois
 tests tombent.
 
 Suite complète : 5 101 tests, 309 fichiers. Build vert.
+
+---
+
+## v95 — la leçon apprise sur /q, et les écrans où elle ne l'était pas
+
+**Le relevé.** Toutes les redirections que le produit émet, et ce qu'elles
+disent au navigateur :
+
+```
+app/q/[code]/route.ts               l.21    302            no-store
+app/api/domains/resolve/route.ts    l.57    301            AUCUN en-tête
+app/api/domains/resolve/route.ts    l.87    301 (au choix) AUCUN en-tête
+app/api/domains/resolve/route.ts    l.105   301 (au choix) AUCUN en-tête
+app/api/domains/resolve/route.ts    l.142   302            AUCUN en-tête
+app/api/domains/resolve/route.ts    l.157   302            AUCUN en-tête
+app/api/subdomain/resolve/route.ts  l.64    302            AUCUN en-tête
+```
+
+La redirection du QR — le cœur du produit, dont la destination se change à tout
+moment — porte `Cache-Control: no-store, must-revalidate`. Les six autres, dont
+les destinations sont **tout aussi modifiables** depuis le tableau de bord, n'en
+portaient aucun.
+
+Un 301 est retenu par le **navigateur** du visiteur, souvent sans date de
+péremption. Donc :
+
+- le commerçant se trompe de destination et corrige cinq minutes plus tard : ses
+  clients déjà passés restent sur la mauvaise adresse ;
+- il change de domaine principal : l'ancien continue de renvoyer vers le
+  précédent ;
+- il supprime la règle, et l'écran lui promet — littéralement — qu'elle
+  « cessera immédiatement ».
+
+L'aide « 301 vs 302 » du panneau est par ailleurs bien écrite, mais elle ne
+parle que de Google : le mot « navigateur » n'y figurait pas une seule fois.
+
+**Ce que le lot change.** `lib/enteteDeRedirection.ts`, module pur :
+`CACHE_REDIRECTION` (la formulation exacte de `/q/[code]`, qui sert d'oracle),
+`entetesDeRedirection` (qui ne peut pas être neutralisée par un `extra` bien
+placé), `estPermanente`, `phraseCacheNavigateur`, `phraseSuppression`,
+`phraseDesactivation`.
+
+Les six redirections des résolveurs portent l'en-tête. Le `no-store` n'enlève
+rien au SEO — Google recrawle et obéit au 301 comme avant ; il rend seulement la
+correction possible. Et l'écran dit la vérité : « … Les 1 420 visiteurs déjà
+passés peuvent continuer d'être redirigés quelque temps : leur navigateur retient
+une redirection permanente. »
+
+**Garde.** `lib/enteteDeRedirection.test.ts` (13 tests). La formulation est
+vérifiée contre celle de `/q/[code]` — si le cœur du produit change d'en-tête, la
+règle est revue. Puis le balayage : chaque `NextResponse.redirect` des résolveurs
+porte un en-tête de cache, et personne ne recopie la formulation dans son coin —
+`/q/[code]` reste le seul à la porter en clair, puisque c'est lui l'oracle.
+
+**Vérification par mutation.** Trois défauts réinjectés — la règle du commerçant
+sans en-tête, l'ancienne promesse de suppression, et un `extra` capable de
+redonner du cache. Trois tests tombent.
+
+Suite complète : 5 114 tests, 310 fichiers. Build vert.

@@ -1129,3 +1129,70 @@ TikTok (l'API la refuse sur ce format).
 - Food truck · la fiche « nos allergènes » du camion.
 - Commerce / boutique · la liste d'attente sur un produit en rupture.
 - Bar · le tableau des scores de la ligue de fléchettes (déjà en réserve, non consommé).
+
+---
+
+## 14/09 — lundi · salon / coiffeur (100 % inédit)
+
+> **Étape 0 (hygiène Buffer) :** 1 post `error` Instagram (carrousel anniversaire du 13/09,
+> `dueAt` 19 h 07) confronté aux `sent` du canal → un `sent` à **19 h 07 min 42 s**,
+> permalien `https://www.instagram.com/p/DdPRnIimsFM/` : **le post était en ligne**.
+> Passé en brouillon avec `[DÉJÀ EN LIGNE — NE PAS RETRY]`, métadonnées Instagram
+> repassées. Onglet `error` **vide**. Côté `scheduled` : 1 seul post (épingle boutique du
+> 13/09, due aujourd'hui 12 h 18), slug absent des `sent` → **pas un doublon, conservé**.
+> **9 places libres.**
+>
+> **Apprentissage :** Supermetrics non appelé (essai expiré). Buffer ne mesure pas
+> Pinterest — aucune hypothèse tirée de ses `metrics`. TikTok : le carrousel photo du
+> 13/09 est sorti ce matin à 06 h 41 (`7685277033768766752`), trop récent pour lire un
+> temps de visionnage exploitable ; prochaine lecture demain. Échéance Pinterest
+> Analytics « clic sortant » (`utm_content=clic`, base 0,17 %) : **demain 15/09**.
+>
+> **Dépôt NON fait** (tâche sans utilisateur, proxy bloquant supabase.co) : les 16 visuels
+> partent en réserve `dispo`, **aucun post créé dans Buffer** — Buffer refuse une image
+> dont l'URL n'est pas déjà accessible. File inchangée à **1/10**.
+
+| Date | Secteur | Slugs produits | Canaux |
+|---|---|---|---|
+| 14/09 | salon · fiche technique couleur (100 % inédit) | qr-code-fiche-technique-couleur-formule-salon (carrousel IG + TikTok), qr-code-calendrier-semis-et-recoltes-etal-producteur, qr-code-bonnes-adresses-du-quartier-hotel, qr-code-objets-oublies-vestiaire-restaurant, qr-code-charges-et-taxes-du-bien-immobilier | Pinterest, IG, TikTok, LinkedIn |
+
+### Angles basculés en « déjà faits » le 14/09
+| Secteur | Angle | Dates |
+|---|---|---|
+| Salon / coiffeur | La fiche technique de la couleur (formule, nuances, temps de pose) | 14/09 |
+| Marché / producteur | Le calendrier des semis et des récoltes affiché sur l'étal | 14/09 |
+| Hôtel / chambre d'hôtes | Les bonnes adresses du quartier tenues à jour | 14/09 |
+| Restaurant | Le vestiaire et les objets oubliés | 14/09 |
+| Immobilier | Le récapitulatif des charges et taxes du bien | 14/09 |
+
+### Accroches ajoutées le 14/09 (ne plus réutiliser)
+- « Ta coloriste est en congé. »
+- « La cliente revient jeudi pour sa retouche. »
+- « C'est quand, les fraises ? »
+- « On mange bien où, par ici ? »
+- « L'écharpe oubliée sous la banquette. »
+- « Et les charges, ça fait combien ? »
+
+### Angles NEUFS ajoutés le 14/09 (remplacent les cinq consommés)
+- Salon · le book des coupes réalisées par le salon, consultable en attendant son tour.
+- Marché / producteur · la commande groupée entre voisins pour une livraison unique.
+- Hôtel · le règlement intérieur et les horaires (piscine, petit-déjeuner, départ) affichés.
+- Restaurant · la fiche « qui cuisine ce soir » (l'équipe en salle et en cuisine).
+- Immobilier · la visite virtuelle lancée depuis la vitrine de l'agence, hors horaires.
+- Commerce · l'inscription à la newsletter en caisse, sans dicter son adresse à voix haute.
+
+### Écarts assumés le 14/09
+- Le secteur **restaurant** revient en épingle secondaire au lendemain d'un carrousel
+  restaurant. La règle ne vise que le **secteur principal** deux jours de suite ; le
+  principal du jour est le salon, et l'angle « vestiaire / objets oubliés » est inédit
+  dans tout le journal.
+- **Deux épingles hors-food** auraient déséquilibré le pont d'audience : l'épingle
+  commerce (newsletter en caisse) a été écartée au profit de l'hôtel, dont le sujet
+  « où manger dans le quartier » fait le pont food. Une seule épingle hors-food
+  (immobilier), conformément aux runs du 12 et du 13/09.
+- Angles écartés pour quasi-doublon : boulangerie · commande pour événement de famille
+  (trop proche du gâteau d'anniversaire du 08/09) · boulangerie · pain de la veille
+  (anti-gaspi déjà traité le 04/09) · immobilier · diagnostics sur le panneau
+  (panneau « à vendre » traité le 11/09) · commerce · liste d'attente sur produit en
+  rupture (trop proche du stock disponible du 05/09) · hôtel · petit-déjeuner commandé
+  la veille (traité les 26 et 30/08, sous 21 jours).

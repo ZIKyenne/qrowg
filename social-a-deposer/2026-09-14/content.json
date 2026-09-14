@@ -1,0 +1,88 @@
+{
+  "carousels": [
+    {
+      "slug": "qr-code-fiche-technique-couleur-formule-salon",
+      "sector": "salon",
+      "url": "https://qrowg.com/qr-code/salon?utm_medium=carrousel&utm_campaign=20260914-salon",
+      "slides": [
+        {
+          "kind": "cover",
+          "tag": "Salon · couleur",
+          "title": "Ta coloriste est en [[congé]].",
+          "body": "La cliente revient jeudi pour sa retouche. Sa formule est dans un classeur."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le problème",
+          "title": "La formule vit sur une fiche [[cartonnée]].",
+          "body": "Nuances, oxydant, temps de pose, écrits à la main. Une seule personne sait où la chercher."
+        },
+        {
+          "kind": "qr",
+          "kicker": "Sur la carte de fidélité",
+          "title": "Un QR, et la fiche s'ouvre en [[entier]].",
+          "body": "Formule, nuances, temps de pose, date du dernier passage. Lisible par toute l'équipe."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le geste",
+          "title": "Tu retouches la couleur, la page [[suit]].",
+          "body": "Tu modifies en trente secondes. La carte imprimée, elle, n'a pas besoin d'être refaite."
+        },
+        {
+          "kind": "metric",
+          "kicker": "Preuve",
+          "number": "4 secondes",
+          "title": "pour retrouver la bonne [[formule]]",
+          "body": "Et chaque scan te dit combien de clientes relisent leur fiche entre deux rendez-vous."
+        },
+        {
+          "kind": "cta",
+          "title": "Crée ta fiche couleur en 5 [[minutes]]",
+          "body": "Gratuit, sans carte bancaire, prêt à imprimer.",
+          "cta": "qrowg.com",
+          "qr": true
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "slug": "qr-code-calendrier-semis-et-recoltes-etal-producteur",
+      "tag": "Producteur",
+      "layout": 0,
+      "qr": true,
+      "title": "C'est quand, les [[fraises]] ?",
+      "subtitle": "Le calendrier à afficher en 5 minutes →",
+      "url": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic&utm_term=producteur"
+    },
+    {
+      "slug": "qr-code-bonnes-adresses-du-quartier-hotel",
+      "tag": "Hôtel",
+      "layout": 1,
+      "qr": true,
+      "title": "On mange bien où, par [[ici]] ?",
+      "subtitle": "Tes bonnes adresses, tenues à jour →",
+      "url": "https://qrowg.com/qr-code/hotel?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-objets-oublies-vestiaire-restaurant",
+      "tag": "Restaurant",
+      "sector": "restaurant",
+      "layout": 2,
+      "qr": true,
+      "title": "L'écharpe oubliée sous la [[banquette]].",
+      "subtitle": "La page objets trouvés en 4 étapes →",
+      "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-charges-et-taxes-du-bien-immobilier",
+      "tag": "Immobilier",
+      "layout": 3,
+      "qr": true,
+      "title": "Et les charges, ça fait [[combien]] ?",
+      "subtitle": "La fiche à créer gratuitement →",
+      "url": "https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260914-salon&utm_content=clic&utm_term=charges"
+    }
+  ]
+}

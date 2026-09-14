@@ -2,6 +2,7 @@
 // Résout un sous-domaine username.qrowg.com → page principale de l'utilisateur
 
 import { createAdminClient } from "@/lib/supabase/server"
+import { entetesDeRedirection } from "@/lib/enteteDeRedirection"
 import { NextRequest, NextResponse } from "next/server"
 import { escapeHtml } from "@/lib/escapeHtml"
 
@@ -61,8 +62,10 @@ export async function GET(req: NextRequest) {
     }
 
     // Réécriture interne → /{slug} sur qrowg.com
+    // La page derrière un sous-domaine peut changer (renommage, dépublication) :
+    // le navigateur ne doit pas garder l'ancienne (lot v95).
     return NextResponse.redirect(new URL(`/${page.slug}`, appUrl), {
-      headers: { "X-Subdomain": username },
+      headers: entetesDeRedirection({ "X-Subdomain": username }),
     })
   } catch {
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 })
