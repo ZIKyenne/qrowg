@@ -2617,3 +2617,82 @@ reprend l'horloge du serveur (2 tests), l'heure de pointe celle du navigateur
 (2), et la borne qui n'est plus ramenée à minuit (3).
 
 Suite complète : 5 375 tests, 323 fichiers. Build vert.
+
+---
+
+## Lot v109 — un refus se voit
+
+**Le relevé.** Le lot v100 avait posé une règle : *l'écran ne montre un
+changement que si le serveur l'a fait.* Il avait traité l'écran qui **agit sans
+vérifier**. Le lot v107 celui qui **agit à travers une aide**. Restait la
+troisième face, la plus silencieuse : **l'écran qui vérifie, et se tait.**
+
+Treize fonctions lisaient la réponse, voyaient le refus, et n'en disaient rien.
+Les deux plus coûteuses sont sur l'écran qui encaisse l'argent :
+
+```
+upgrade/page.tsx:61   handleUpgrade
+  if (data.url)    { window.location.href = data.url; return }
+  if (data.portal) { await ouvrirPortail(); return }
+  setLoading(null)                    ← le refus finit ici, sans un mot
+
+upgrade/page.tsx:82   ouvrirPortail
+  if (d.url) window.location.href = d.url
+  } catch {}                          ← idem
+```
+
+Le commerçant clique « Passer à Pro », le bouton tourne, s'arrête, et il ne se
+passe rien. Il reclique. « Gérer mon abonnement » ne fait rien non plus. Rien
+n'est cassé à l'écran : c'est exactement pour ça que personne ne le signale.
+
+Puis : l'abonnement aux rapports (l'interrupteur revient tout seul), la
+suppression d'un QR dynamique (le QR reste dans la liste), le nom d'un support
+(`/* silencieux */` était écrit dans le code), et le studio d'impression, le cas
+le plus discret — le repli **local** réussit toujours, donc rien ne semble
+cassé, mais le style est gardé sur cet appareil et pas sur le compte.
+
+**Le défaut que le lot v100 avait sous les yeux.** `QRStudio:325 archiveQR`
+écrivait puis modifiait l'écran sans lire son résultat — le défaut v100 tel
+quel. Son balayage l'avait raté parce que l'écriture passe par le **client
+Supabase** et non par `fetch`. Son voisin `deleteQR`, dans le même fichier,
+porte pourtant la phrase : « la ligne ne quitte l'écran qu'après confirmation
+de la base ».
+
+**Ce que le lot change.** Le module du lot v100 est **étendu**, pas doublé :
+
+```ts
+refusDeLaBase(erreur, repli): string | null   // null quand il n'y a pas de refus
+ligneTouchee(reponse): boolean                // data vide n'est pas une réussite
+```
+
+`ligneTouchee` traite le cas que personne ne teste : `update`/`delete`
+réussissent sans rien changer quand la ligne n'existe plus ou que la politique
+d'accès la masque — `error` est nul et `data` est vide. Pour l'écran, ce n'est
+pas une réussite : il allait retirer une ligne qui est toujours là.
+
+Le message n'est pas réinventé : `refusDeLaBase` passe par `erreurLisible`, et
+un code SQL brut ne s'affiche jamais.
+
+**Branché** : les deux boutons de paiement (`upgrade`), l'abonnement aux
+rapports, l'archivage d'un QR, la suppression d'un QR dynamique, le nom d'un
+support, et les deux enregistrements du studio d'impression, qui disent
+maintenant « Style gardé sur cet appareil seulement. »
+
+**Garde.** `lib/refusQuiSeVoit.test.ts` (12 tests). La règle de classe :
+**une fonction qui écrit ne reste pas muette sur un refus.** Le balayage lit
+tous les `.tsx` du produit, découpe les fonctions `async`, garde celles qui
+écrivent (`POST/PUT/PATCH/DELETE`, `effetDe`, `insert`, `update`, `upsert`,
+`delete`) et exige que chacune **dise** quelque chose. « Dire » est une
+**forme**, pas une liste de noms : nommer l'échec dans le nom de l'état posé
+(`setDestError`) ou dans sa valeur (`setStatus("error")`), appeler une
+infobulle, ou lever. Un contre-test exige que le balayage voie plus de vingt
+fonctions qui écrivent et en reconnaisse plus de vingt qui parlent — un
+balayage devenu aveugle ne prouve rien. Un dernier test exige que les gardes
+v100 et v107 soient toujours là : sans elles, celle-ci ne couvre qu'un tiers du
+chemin.
+
+**Vérification par mutation.** Trois défauts réinjectés : le portail Stripe
+redevient muet (1 test tombe), l'archivage rejette de nouveau son résultat (2),
+et une écriture qui ne touche aucune ligne passe pour réussie (1).
+
+Suite complète : 5 387 tests, 324 fichiers. Build vert.

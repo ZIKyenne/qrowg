@@ -30,7 +30,7 @@ import { color as C, radius as R } from "./tokens"
 import { ajusterAuSupport, lignesDeTitre, partQrMax, type Pastille } from "./ajustement"
 import { bandeApercuMobile, dimensionsApercuMobile, legendeVisible, vhFeuilleMax, estPaysage, largeurTiroirPaysage, largeurApercuMobile, HAUT_BARRE_PAYSAGE } from "./apercuMobile"
 import { nomDuQrSitue } from "@/lib/nomDuQr"
-import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
+import { effetDe, serveurAFait, refusDuServeur, refusDeLaBase } from "@/lib/effetConfirme"
 import { correspond, correspondAuxChamps } from "@/lib/rechercheSouple"
 
 // item.layout est parfois une clé de contenu ('stack'), parfois un id de layout ('orne').
@@ -564,8 +564,11 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     const name = saveName.trim() || `Mon style ${savedPresets.length + 1}`
     setSaving(false); setSaveName("")
     if (presetsRemote) {
-      const { data, error } = await createClient().from("print_presets").insert({ name, cfg: currentCfg }).select("id, name, cfg").single()
-      if (!error && data) { setSavedPresets(p => [{ id: (data as any).id, name: (data as any).name, cfg: (data as any).cfg || {} }, ...p]); return }
+      const rep = await createClient().from("print_presets").insert({ name, cfg: currentCfg }).select("id, name, cfg").single()
+      if (!rep.error && rep.data) { setSavedPresets(p => [{ id: (rep.data as any).id, name: (rep.data as any).name, cfg: (rep.data as any).cfg || {} }, ...p]); return }
+      // Le repli local réussit toujours : sans un mot, le commerçant croyait son
+      // style enregistré SUR SON COMPTE, et ne le retrouvait pas ailleurs (v109).
+      setDesignErreur(refusDeLaBase(rep.error, "Style gardé sur cet appareil seulement.") ?? "Style gardé sur cet appareil seulement.")
     }
     persistPresets([...savedPresets, { id: `sv_${Date.now()}`, name, cfg: currentCfg }])
   }
@@ -597,7 +600,11 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       // Tente avec accent2 ; si la colonne manque (migration non appliquée), replie sur les colonnes historiques.
       const sb = createClient(), now = new Date().toISOString()
       const { error } = await sb.from("print_brand_kit").upsert({ logo: logoUrl, accent, accent2: ctaColor || null, typo: eTypo, updated_at: now }, { onConflict: "user_id" })
-      if (error) { try { await sb.from("print_brand_kit").upsert({ logo: logoUrl, accent, typo: eTypo, updated_at: now }, { onConflict: "user_id" }) } catch {} }
+      if (error) {
+        const repli = await sb.from("print_brand_kit").upsert({ logo: logoUrl, accent, typo: eTypo, updated_at: now }, { onConflict: "user_id" })
+        // Les deux ont échoué : la charte ne vit plus que sur cet appareil (v109).
+        if (repli.error) setDesignErreur(refusDeLaBase(repli.error, "Charte gardée sur cet appareil seulement.")!)
+      }
     }
   }
   function applyBrandKit() {

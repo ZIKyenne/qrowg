@@ -26,6 +26,8 @@ describe("pas de double abonnement", () => {
   })
   it("la page Tarifs envoie l'abonné vers le portail au lieu d'un bouton mort", () => {
     expect((page.match(/if \(data\.portal\) \{ await ouvrirPortail\(\); return \}/g) || []).length).toBe(2)
-    expect(page).toContain('fetch("/api/stripe/portal", { method: "POST" })')
+    // Ancré sur l'INTENTION, pas sur la forme de l'appel : depuis le lot v109 il
+    // passe par `effetDe`, qui lit la réponse et dit le refus.
+    expect(page).toContain('effetDe("/api/stripe/portal", { method: "POST" })')
   })
 })

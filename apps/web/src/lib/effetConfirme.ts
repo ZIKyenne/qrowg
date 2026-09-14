@@ -86,3 +86,64 @@ export async function effetDe(url: string, init?: RequestInit): Promise<ReponseL
     return { statut: STATUT_RESEAU_MUET, corps: null }
   }
 }
+
+// ── La troisième face de la règle (lot v109) ─────────────────────────────────
+//
+// Relevé du 14 septembre. Le lot v100 a traité l'écran qui AGIT SANS VÉRIFIER,
+// le lot v107 celui qui agit À TRAVERS UNE AIDE. Reste la troisième :
+// **l'écran qui vérifie, et se tait.**
+//
+// Treize fonctions écrivent et ne disent jamais rien quand le serveur refuse.
+// Les plus coûteuses sont sur l'écran qui encaisse l'argent :
+//
+//   upgrade/page.tsx:61   handleUpgrade
+//     if (data.url)    { window.location.href = data.url; return }
+//     if (data.portal) { await ouvrirPortail(); return }
+//     setLoading(null)                       ← le refus finit ici, sans un mot
+//
+//   upgrade/page.tsx:82   ouvrirPortail
+//     if (d.url) window.location.href = d.url
+//     } catch {}                             ← idem
+//
+// Le commerçant clique « Passer à Pro », le bouton tourne, s'arrête, et il ne se
+// passe rien. Il reclique. « Gérer mon abonnement » ne fait rien non plus.
+//
+//   ReportSubscriptionPanel:62   toggle
+//     if (data.ok) { … }                     ← l'interrupteur revient tout seul
+//
+//   QRStudio:325   archiveQR
+//     await sb.from("pages").update({ status: "archived" }).eq("id", pid)
+//     setQRCodes(…)                          ← résultat jeté, écran modifié
+//
+// Ce dernier est le défaut du lot v100 tel quel, raté par son balayage parce que
+// l'écriture passe par le client Supabase et non par `fetch`. Son voisin
+// `deleteQR`, dans le même fichier, porte pourtant la phrase : « la ligne ne
+// quitte l'écran qu'après confirmation de la base ».
+//
+// La règle ne change pas, elle se complète : **un refus se voit.**
+
+import { erreurLisible } from "./erreurLisible"
+
+/**
+ * Le message d'un refus venu du CLIENT Supabase — l'autre moitié du produit.
+ * `null` quand il n'y a pas eu de refus, comme `refusDuServeur` : un écran ne
+ * peut pas afficher l'erreur et le succès en même temps.
+ */
+export function refusDeLaBase(erreur: unknown, repli: string): string | null {
+  if (!erreur) return null
+  return erreurLisible(erreur, repli)
+}
+
+/**
+ * Une écriture Supabase dont on veut savoir si elle a porté sur quelque chose.
+ *
+ * `update`/`delete` réussissent sans rien changer quand la ligne n'existe plus
+ * ou que la politique d'accès la masque : `error` est nul et `data` est vide.
+ * Pour l'écran, ce n'est pas une réussite — il allait effacer une ligne qui est
+ * toujours là.
+ */
+export function ligneTouchee(reponse: { data?: unknown; error?: unknown } | null | undefined): boolean {
+  if (!reponse || reponse.error) return false
+  const d = reponse.data
+  return Array.isArray(d) ? d.length > 0 : d != null
+}

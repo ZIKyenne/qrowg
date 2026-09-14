@@ -34,6 +34,7 @@ import { etatLien, styleSur, type InstantQr, type StatsLien } from "./instantQr"
 import { Button } from "@/components/ui/Button"
 import { useSessionShell } from "../sessionShell"
 import { jourDuCommerce, serieDeJours, dateLisible } from "@/lib/jourDuCommerce"
+import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
 
 const G = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -275,10 +276,11 @@ export default function QrLinkPage() {
     finally { setSaveBusy(false) }
   }
   async function deleteInstant(id: string) {
-    try {
-      const res = await fetch("/api/qr-instant", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) })
-      if (res.ok) setSaved(prev => prev.filter(s => s.id !== id))
-    } catch {}
+    // Un refus ne faisait rien du tout : le QR restait dans la liste, sans un
+    // mot. Son voisin `patchLink` disait déjà son erreur (lot v109).
+    const r = await effetDe("/api/qr-instant", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) })
+    if (serveurAFait(r)) setSaved(prev => prev.filter(s => s.id !== id))
+    else erreur(refusDuServeur(r, "Ce QR n'a pas pu être supprimé.")!)
   }
 
   // QR DYNAMIQUE (lien/texte/appel/email) : le QR encode qrowg.com/q/<code>, expirable (essai 30 j).

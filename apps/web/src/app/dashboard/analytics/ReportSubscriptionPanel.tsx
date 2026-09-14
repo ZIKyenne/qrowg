@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Mail, Calendar, Bell, BellOff, CheckCircle, Clock, Loader, ChevronRight, BarChart2 } from "lucide-react"
 import { dateLisible } from "@/lib/jourDuCommerce"
+import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
 
 type Subscription = {
   id:           string
@@ -45,6 +46,7 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
   const [saving,  setSaving]  = useState<"weekly" | "monthly" | null>(null)
   const email = userEmail
   const [saved,   setSaved]   = useState<"weekly" | "monthly" | null>(null)
+  const [refus,   setRefus]   = useState("")
 
   const isPaid = PAID_PLANS.includes(plan?.toLowerCase() ?? "")
 
@@ -65,20 +67,21 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
     const enabled = !(current?.enabled ?? false)
     setSaving(freq)
 
-    const res = await fetch("/api/reports/subscribe", {
+    // Un refus laissait l'interrupteur revenir tout seul à sa position, sans un
+    // mot : le commerçant croyait avoir activé son rapport (lot v109).
+    setRefus("")
+    const r = await effetDe("/api/reports/subscribe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ frequency: freq, enabled }),
     })
-    const data = await res.json()
-
-    if (data.ok) {
-      setSubs(prev => {
-        const filtered = prev.filter(s => s.frequency !== freq)
-        return [...filtered, data.subscription]
-      })
+    const data = (r.corps ?? {}) as { ok?: boolean; subscription?: Subscription }
+    if (serveurAFait(r) && data.ok && data.subscription) {
+      setSubs(prev => [...prev.filter(s => s.frequency !== freq), data.subscription!])
       setSaved(freq)
       setTimeout(() => setSaved(null), 2500)
+    } else {
+      setRefus(refusDuServeur(r, "Ce réglage n'a pas pu être enregistré.") ?? "Ce réglage n'a pas pu être enregistré.")
     }
     setSaving(null)
   }
@@ -103,6 +106,10 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
           </p>
         </div>
       </div>
+
+      {refus && (
+        <div role="alert" style={{ background: "var(--danger-bg)", border: "1px solid var(--danger-border)", color: "var(--danger)", borderRadius: 11, padding: "11px 14px", fontSize: 13, marginBottom: 16, lineHeight: 1.45 }}>{refus}</div>
+      )}
 
       {!isPaid ? (
         /* Paywall */

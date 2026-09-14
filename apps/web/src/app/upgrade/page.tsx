@@ -12,6 +12,7 @@ import { GENERATION_IA_ACTIVE } from "@/lib/generationIa"
 import { useAccent } from "@/lib/useAccent"
 import SubscribeButton from "@/components/SubscribeButton"
 import CheckoutErrorBanner from "@/components/CheckoutErrorBanner"
+import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
 
 // UI par plan (icône, CTA, mise en avant) ; les DONNÉES viennent de lib/plans
 const PLAN_UI = {
@@ -58,33 +59,39 @@ export default function UpgradePage() {
     })
   }, [])
 
+  // Ce que le serveur a refusé, dit à l'écran (lot v109).
+  const [refus, setRefus] = useState("")
+
   async function handleUpgrade(plan: typeof PLANS[0]) {
     if (plan.ctaDisabled || currentPlan === plan.id) return
-    setLoading(plan.id)
+    setLoading(plan.id); setRefus("")
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { window.location.href = "/auth/login"; return }
-    try {
-      const res = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: plan.id, annual, userId: user.id }),
-      })
-      const data = await res.json()
-      if (data.url) { window.location.href = data.url; return }
-      // Déjà abonné : le serveur refuse une seconde caisse et renvoie vers le
-      // portail Stripe, où l'on change de plan sans créer un doublon.
-      if (data.portal) { await ouvrirPortail(); return }
-      setLoading(null)
-    } catch { setLoading(null) }
+    // Le refus finissait sur `setLoading(null)`, sans un mot : le bouton
+    // tournait, s'arrêtait, et il ne se passait rien. Sur l'écran qui encaisse
+    // l'argent, le commerçant recliquait (lot v109).
+    const r = await effetDe("/api/stripe/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ plan: plan.id, annual, userId: user.id }),
+    })
+    const data = (r.corps ?? {}) as { url?: string; portal?: boolean }
+    if (serveurAFait(r) && data.url) { window.location.href = data.url; return }
+    // Déjà abonné : le serveur refuse une seconde caisse et renvoie vers le
+    // portail Stripe, où l'on change de plan sans créer un doublon.
+    if (data.portal) { await ouvrirPortail(); return }
+    setRefus(refusDuServeur(r, "Le paiement n'a pas pu démarrer. Réessayez dans un instant.") ?? "Le paiement n'a pas pu démarrer. Réessayez dans un instant.")
+    setLoading(null)
   }
 
   async function ouvrirPortail() {
-    try {
-      const r = await fetch("/api/stripe/portal", { method: "POST" })
-      const d = await r.json()
-      if (d.url) window.location.href = d.url
-    } catch {}
+    setRefus("")
+    const r = await effetDe("/api/stripe/portal", { method: "POST" })
+    const d = (r.corps ?? {}) as { url?: string }
+    if (serveurAFait(r) && d.url) { window.location.href = d.url; return }
+    setRefus(refusDuServeur(r, "L'espace de gestion de l'abonnement n'a pas pu s'ouvrir.") ?? "L'espace de gestion de l'abonnement n'a pas pu s'ouvrir.")
+    setLoading(null)
   }
 
   // Renvoie l'URL de paiement Stripe ; le SubscribeButton redirige lui-même en fin
@@ -118,6 +125,9 @@ export default function UpgradePage() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", fontFamily: "DM Sans, sans-serif", padding: "0 24px 80px", position: "relative", isolation: "isolate" }}>
       <CheckoutErrorBanner error={payErr} onClose={() => setPayErr(null)} />
+      {refus && (
+        <div role="alert" style={{ maxWidth: 1100, margin: "16px auto 0", background: "var(--danger-bg)", border: "1px solid var(--danger-border)", color: "var(--danger)", borderRadius: 11, padding: "12px 15px", fontSize: 13.5, lineHeight: 1.45 }}>{refus}</div>
+      )}
 
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         {/* Revue du 9 septembre : un visiteur sans compte arrive ici depuis le site — il reçoit la

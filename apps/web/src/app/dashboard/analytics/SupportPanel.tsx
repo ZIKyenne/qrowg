@@ -10,6 +10,7 @@ import { Store, Eye, MousePointerClick, Target, Pencil } from "lucide-react"
 import { buildSupportFunnel, supportTotals, defaultSupportLabel, type SupportRow } from "@/lib/supportFunnel"
 import { CONSIGNE_SUPPORTS, CONSIGNE_DUPLICATION } from "@/lib/supportImprime"
 import { pourcentage } from "@/lib/chiffresLisibles"
+import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
 
 type Q = { id: string; short_code: string; label?: string | null; page_id?: string | null }
 type ScanRow = { qr_code_id?: string | null }
@@ -40,22 +41,25 @@ export default function SupportPanel({ qrs, scans, views, clicks, leads }: {
   // Renommage en ligne : override local + sauvegarde serveur.
   const [over, setOver] = useState<Record<string, string>>({})
   const [editing, setEditing] = useState<string | null>(null)
+  const [refus, setRefus] = useState("")
   const [draft, setDraft] = useState("")
   const labelOf = (r: SupportRow) => over[r.id] ?? r.label
 
   async function saveLabel(r: SupportRow) {
     const value = draft.trim()
-    setEditing(null)
-    try {
-      const res = await fetch("/api/qr-label", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ qr_id: r.id, label: value }) })
-      if (res.ok) setOver(prev => ({ ...prev, [r.id]: value || defaultSupportLabel(r.shortCode) }))
-    } catch { /* silencieux */ }
+    setEditing(null); setRefus("")
+    // « silencieux » : le commerçant renommait son support, l'écran gardait le
+    // nouveau nom, et rien n'était enregistré (lot v109).
+    const rep = await effetDe("/api/qr-label", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ qr_id: r.id, label: value }) })
+    if (serveurAFait(rep)) setOver(prev => ({ ...prev, [r.id]: value || defaultSupportLabel(r.shortCode) }))
+    else setRefus(refusDuServeur(rep, "Ce nom n'a pas pu être enregistré.")!)
   }
 
   const card: React.CSSProperties = { background: "rgba(255,255,255,0.02)", border: "1px solid rgba(201,168,76,0.14)", borderRadius: 18, padding: 20 }
 
   return (
     <div style={card}>
+      {refus && <div role="alert" style={{ background: "var(--danger-bg)", border: "1px solid var(--danger-border)", color: "var(--danger)", borderRadius: 10, padding: "10px 13px", fontSize: 12.5, marginBottom: 14 }}>{refus}</div>}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 4 }}>
         <div>
           <p style={{ color: "var(--ink)", fontSize: 16, fontWeight: 700, margin: 0, display: "flex", alignItems: "center", gap: 8 }}>

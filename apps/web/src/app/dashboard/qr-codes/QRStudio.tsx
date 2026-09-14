@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback, type ReactNode } from "react"
 import { messageDeRoute } from "@/lib/messageDeRoute"
-import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
+import { effetDe, serveurAFait, refusDuServeur, refusDeLaBase, ligneTouchee } from "@/lib/effetConfirme"
 import { construireCsv, nomDeFichierCsv, TYPE_CSV } from "@/lib/exportCsv"
 import { phraseCopieEnBrouillon } from "@/lib/qrEnBrouillon"
 import {
@@ -300,9 +300,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       qrInstRef.current = createQR(qrOpts(720))
       container.innerHTML = ""
       qrInstRef.current.append(container)
-    } else {
-      updateQR(qrInstRef.current, qrOpts(720))
-    }
+    } else { updateQR(qrInstRef.current, qrOpts(720)) }
   }, [qrUrl, fg, bg, corner, ecLevel, styleConf])
 
   // PNG du QR pour les scènes d'aperçu immersif (généré uniquement si une scène est active)
@@ -326,9 +324,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setArchivingId(id)
     const sb = createClient()
     const pid = qrCodes.find(q => q.id === id)?.page_id ?? ""
-    if (pid) await sb.from("pages").update({ status: "archived" }).eq("id", pid)
-    setQRCodes(prev => prev.map(q => q.id === id
-      ? { ...q, pages: q.pages ? { ...q.pages, status: "archived" } : null } : q))
+    // Résultat jeté, écran modifié : le défaut v100, hors de portée de son balayage — l'écriture passe par le client Supabase (lot v109).
+    const rep = pid ? await sb.from("pages").update({ status: "archived" }).eq("id", pid).select("id") : null
+    const refus = pid && (rep?.error || !ligneTouchee(rep)) ? refusDeLaBase(rep?.error, "Ce QR n'a pas pu être archivé.") ?? "Ce QR n'a pas pu être archivé." : null
+    if (refus) toast.error(refus)
+    else setQRCodes(prev => prev.map(q => q.id === id ? { ...q, pages: q.pages ? { ...q.pages, status: "archived" } : null } : q))
     setArchivingId(null); setMenuId(null)
   }
 
