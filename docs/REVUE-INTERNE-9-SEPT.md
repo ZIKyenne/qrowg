@@ -2478,3 +2478,71 @@ l'exception qui cesse de dire pourquoi, et une colonne d'ordre inventée. De un 
 deux tests tombent à chaque fois.
 
 Suite complète : 5 345 tests, 321 fichiers. Build vert.
+
+---
+
+## v107 — L'angle mort de la garde v100
+
+**Le relevé.** Le lot v100 a posé la règle : *l'écran ne montre un changement que
+si le serveur l'a fait.* Son balayage cherche un `await fetch(` qui modifie,
+suivi d'un changement d'écran non vérifié. Il ne voit donc **pas** les écrans qui
+écrivent à travers une fonction du produit.
+
+Le produit en a sept qui écrivent par le réseau ; deux rendent un résultat :
+`submitLead` et `ajouterUnSupport`. Un seul appel jetait ce résultat, et c'était
+sur la **page publique** :
+
+```
+blocsPublics.tsx:512  RsvpPublic
+  const pick = (val) => {
+    setChoice(val)                     ← l'écran bascule d'abord
+    trackLinkClick(…)
+    submitLead({ … })                  ← ni `await`, ni résultat lu
+  }
+
+puis, aussitôt :  « ✅ Merci, votre réponse est enregistrée ! »
+```
+
+**`/api/leads` refuse pour de vraies raisons** : 429 au-delà de 15 soumissions
+par IP et par 10 minutes, 404 si la page n'existe plus, 500 si l'insertion
+échoue. Un mariage, une soirée, une réunion de copropriété : les invités
+répondent depuis le Wi-Fi du lieu, donc depuis **une seule IP**. Le seizième
+lisait « enregistrée » et n'était pas sur la liste — celle sur laquelle le
+commerçant compte ses couverts.
+
+**Les deux autres formulaires de la même page font le bon geste** depuis le lot
+v81 : ils attendent, distinguent « enregistré » de « repli courrier » et
+d'« échec », et affichent la phrase juste. Le RSVP, plus ancien, gardait son
+bandeau vert écrit à la main.
+
+**Ce que le lot change.** `lib/reponseEnregistree.ts` donne au RSVP le même
+vocabulaire que ses deux voisins — il n'invente aucune phrase, il les prend dans
+`lib/promesseDuFormulaire`. Le RSVP attend, lit le résultat, et affiche la
+confirmation correspondante. Un échec ne verrouille plus le choix : le message
+s'affiche **au-dessus** des boutons, qui restent cliquables. Pendant l'envoi ils
+sont désactivés.
+
+**Un défaut d'accord, trouvé en branchant.** `confirmationDuFormulaire` écrivait
+« Votre message est bien arrivé » — juste — mais « Votre réponse est bien
+arrivé » dès qu'on changeait le libellé. Le genre d'un nom français ne se devine
+pas avec une règle : l'appelant le dit désormais, comme le lot v102 l'avait déjà
+tranché pour `phraseAucunResultat`.
+
+**Et un champ mort qui portait la même promesse.** `leadFormModels.rsvpFormModel`
+déclare `successMessage: "Merci, votre réponse est enregistrée !"` — que rien ne
+lit aujourd'hui. Il vient maintenant du module : s'il est lu un jour, il dira la
+chose vraie.
+
+**Garde.** `lib/reponseEnregistree.test.ts` (12 tests). La règle de classe : **la
+règle du lot v100 vaut aussi quand l'écriture passe par une fonction du
+produit.** Le balayage **retrouve** ces fonctions dans le code plutôt que de les
+lister — une huitième aide écrite demain entre dans la règle sans qu'on y pense —
+puis refuse tout appel qui jette leur résultat. Un second balayage refuse toute
+phrase d'enregistrement écrite en dur. Et un dernier test exige que la garde v100
+soit toujours là : sans elle, celle-ci ne couvrirait plus que la moitié du chemin.
+
+**Vérification par mutation.** Trois défauts réinjectés : le RSVP qui rebascule
+sans attendre (2 tests), le bandeau écrit en dur qui revient (2), l'accord qui
+disparaît (1).
+
+Suite complète : 5 357 tests, 322 fichiers. Build vert.

@@ -50,19 +50,22 @@ function nomOuDefaut(nom?: string | null): string {
  * moment-là — aucune ne promet de réponse, parce que personne ici ne peut la
  * promettre à la place du commerçant.
  */
-export function confirmationDuFormulaire(resultat: ResultatEnvoi, opts?: { nomCommerce?: string | null; libelle?: string }): Confirmation {
+export function confirmationDuFormulaire(resultat: ResultatEnvoi, opts?: { nomCommerce?: string | null; libelle?: string; feminin?: boolean }): Confirmation {
   const commerce = nomOuDefaut(opts?.nomCommerce)
   const quoi = (opts?.libelle || "Votre message").trim()
+  // Le genre du libellé ne se devine pas avec une règle : « votre message est
+  // arrivé », « votre réponse est arrivée ». L'appelant le dit (lot v107).
+  const e = opts?.feminin ? "e" : ""
   switch (resultat) {
     case "enregistre":
       return {
-        titre: `${quoi} est bien arrivé.`,
-        detail: `${commerce} le retrouvera dans ses messages.`,
+        titre: `${quoi} est bien arrivé${e}.`,
+        detail: `${commerce} ${opts?.feminin ? "la" : "le"} retrouvera dans ses messages.`,
         ton: "ok",
       }
     case "courrier":
       return {
-        titre: `${quoi} n'est pas encore parti.`,
+        titre: `${quoi} n'est pas encore parti${e}.`,
         detail: "Nous avons ouvert votre messagerie avec le message déjà écrit : il reste à l'envoyer.",
         ton: "attention",
       }

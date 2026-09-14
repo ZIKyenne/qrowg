@@ -19,6 +19,7 @@ import { confirmationDuFormulaire, mentionDestinataire, COULEUR_DU_TON, EMOJI_DU
 import { chezLeCommerce, dateChezLeCommerce, fuseauDuBloc, fuseauDuVisiteur, memeHeureQue, mentionFuseau } from "@/lib/heureDuCommerce"
 import { etatDesConges } from "@/lib/congesDates"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
+import { resultatDuRsvp, confirmationRsvp, reponseRejouable, choixArrete, type EtatReponse } from "@/lib/reponseEnregistree"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 
@@ -507,26 +508,43 @@ export function AccordionPublic({ items, title, G, TEXT, MUTED, FONT_B }: { item
 }
 
 // ── RSVP interactif public (réponse enregistrée en base + trackée) ───────────
-export function RsvpPublic({ block, pageId, TEXT, MUTED }: { block: Block; pageId: string; TEXT: string; MUTED: string }) {
+export function RsvpPublic({ block, pageId, TEXT, MUTED, nomCommerce }: { block: Block; pageId: string; TEXT: string; MUTED: string; nomCommerce?: string | null }) {
   const c = block.content
-  const [choice, setChoice] = useState<string | null>(null)
-  const pick = (val: string) => {
-    setChoice(val)
+  // L'écran basculait sur « ✅ enregistrée ! » AVANT l'enregistrement, et sans
+  // jamais lire son résultat. Sur le Wi-Fi d'un lieu, la limite de 15 envois par
+  // IP et par 10 minutes est vite atteinte : le seizième invité lisait
+  // « enregistrée » et n'était pas sur la liste (lot v107).
+  const [etat, setEtat] = useState<EtatReponse | null>(null)
+  const pick = async (val: string) => {
+    setEtat("envoi")
     trackLinkClick(pageId, block.id, `rsvp:${val}`)
-    submitLead({ pageId, blockId: block.id, type: "rsvp", message: val, data: { question: c.title || "RSVP", reponse: val } })
+    const ok = await submitLead({ pageId, blockId: block.id, type: "rsvp", message: val, data: { question: c.title || "RSVP", reponse: val } })
+    setEtat(resultatDuRsvp(ok))
   }
+  const conf = etat && etat !== "envoi" ? confirmationRsvp(etat, nomCommerce) : null
   return (
     <div style={{ padding: "10px 24px 14px" }}>
       <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{c.title || "Serez-vous présent ?"}</p>
       {c.description && <p style={{ color: MUTED, fontSize: 13.5, margin: "0 0 14px" }}>{c.description}</p>}
-      {choice ? (
-        <div style={{ background: "rgba(57,255,143,0.08)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 11, padding: "14px", textAlign: "center", color: "var(--success)", fontSize: 13, fontWeight: 700 }}>✅ Merci, votre réponse est enregistrée !</div>
-      ) : (
-        <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={() => pick("oui")} style={{ flex: 2, background: "rgba(57,255,143,0.1)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 11, padding: "13px 8px", color: "var(--success)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{c.yes_label || "✅ Oui, je viens"}</button>
-          <button onClick={() => pick("peut-etre")} style={{ flex: 1, background: "rgba(251,191,36,0.08)", border: "1.5px solid rgba(251,191,36,0.25)", borderRadius: 11, padding: "13px 8px", color: "#FBBF24", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>{c.maybe_label || "🤔 Peut-être"}</button>
-          <button onClick={() => pick("non")} style={{ flex: 1, background: "rgba(239,68,68,0.08)", border: "1.5px solid rgba(239,68,68,0.2)", borderRadius: 11, padding: "13px 8px", color: "#EF4444", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>{c.no_label || "❌ Non"}</button>
+      {conf && choixArrete(etat!) ? (
+        <div role="status" aria-live="polite" style={{ background: `${COULEUR_DU_TON[conf.ton]}14`, border: `1.5px solid ${COULEUR_DU_TON[conf.ton]}4d`, borderRadius: 11, padding: "14px", textAlign: "center" }}>
+          <p style={{ color: COULEUR_DU_TON[conf.ton], fontSize: 13.5, fontWeight: 700, margin: 0 }}>{EMOJI_DU_TON[conf.ton]} {conf.titre}</p>
+          <p style={{ color: MUTED, fontSize: 12.5, fontWeight: 500, margin: "5px 0 0", lineHeight: 1.5 }}>{conf.detail}</p>
         </div>
+      ) : (
+        <>
+        {conf && reponseRejouable(etat!) && (
+          <div role="alert" style={{ background: `${COULEUR_DU_TON[conf.ton]}14`, border: `1.5px solid ${COULEUR_DU_TON[conf.ton]}4d`, borderRadius: 11, padding: "11px 13px", marginBottom: 10, textAlign: "center" }}>
+            <p style={{ color: COULEUR_DU_TON[conf.ton], fontSize: 13, fontWeight: 700, margin: 0 }}>{EMOJI_DU_TON[conf.ton]} {conf.titre}</p>
+            <p style={{ color: MUTED, fontSize: 12.5, margin: "4px 0 0" }}>{conf.detail}</p>
+          </div>
+        )}
+        <div style={{ display: "flex", gap: 8 }}>
+          <button disabled={etat === "envoi"} onClick={() => pick("oui")} style={{ flex: 2, background: "rgba(57,255,143,0.1)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 11, padding: "13px 8px", color: "var(--success)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{c.yes_label || "✅ Oui, je viens"}</button>
+          <button disabled={etat === "envoi"} onClick={() => pick("peut-etre")} style={{ flex: 1, background: "rgba(251,191,36,0.08)", border: "1.5px solid rgba(251,191,36,0.25)", borderRadius: 11, padding: "13px 8px", color: "#FBBF24", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>{c.maybe_label || "🤔 Peut-être"}</button>
+          <button disabled={etat === "envoi"} onClick={() => pick("non")} style={{ flex: 1, background: "rgba(239,68,68,0.08)", border: "1.5px solid rgba(239,68,68,0.2)", borderRadius: 11, padding: "13px 8px", color: "#EF4444", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>{c.no_label || "❌ Non"}</button>
+        </div>
+        </>
       )}
     </div>
   )

@@ -4,6 +4,7 @@
 // mêmes 2 premiers champs requis, mêmes leadType/subject. Aucune soumission, aucun React.
 import { contactFormFields, reservationFormFields, quoteFormFields, bookingRequestFields, registerFormFields } from "../../../../../lib/leadForms"
 import type { SharedLeadFormModel, SharedRsvpModel, SharedFormField } from "./formTypes"
+import { confirmationDuFormulaire } from "@/lib/promesseDuFormulaire"
 
 type C = Record<string, any> | null | undefined
 
@@ -83,6 +84,8 @@ export function rsvpFormModel(content: C): SharedRsvpModel {
       { value: "peut-etre", label: c.maybe_label || "🤔 Peut-être" },
       { value: "non", label: c.no_label || "❌ Non" },
     ],
-    successMessage: "Merci, votre réponse est enregistrée !",
+    // Ce champ n'est lu nulle part aujourd'hui, mais il porte la même promesse
+    // que le bandeau supprimé du RSVP : il vient donc du module, comme elle.
+    successMessage: confirmationDuFormulaire("enregistre", { libelle: "Votre réponse", feminin: true }).titre,
   }
 }
