@@ -13,6 +13,7 @@ import RecentLeadsCard from "./RecentLeadsCard"
 import { useToast } from "@/components/Toast"
 import { Button } from "@/components/ui/Button"
 import { APPAREIL_ROBOT } from "@/lib/robots"
+import { PAGES_LISTE, PAGES_MESUREES } from "@/lib/perimetreDeMesure"
 import { consequencesDeSuppression, phraseCodesImprimes, exigeConfirmationEcrite, confirmationAttendue, confirmationValide, type CeQuiDisparait } from "@/lib/suppressionDePage"
 import { Modal } from "@/components/ui/Modal"
 import PostCheckoutBanner from "@/components/PostCheckoutBanner"
@@ -111,14 +112,16 @@ export default function DashboardClient({
     if (!user) { window.location.href = "/auth/login"; return }
     // Pages accessibles : les siennes + celles des équipes dont il est membre.
     const ownerIds = await accessibleOwnerIds(supabase, user.id)
-    const [{ data: prof }, { data: pgs }] = await Promise.all([
+    const [{ data: prof }, { data: pgs }, { data: pagesMesurees }] = await Promise.all([
       supabase.from("profiles").select("full_name,plan,total_scans,total_pages,avatar_url").eq("id", user.id).single(),
-      supabase.from("pages").select("id,title,slug,status,total_views,created_at").in("user_id", ownerIds).order("created_at", { ascending: false }).limit(20),
+      supabase.from("pages").select("id,title,slug,status,total_views,created_at").in("user_id", ownerIds).order("created_at", { ascending: false }).limit(PAGES_LISTE),
+      supabase.from("pages").select("id").in("user_id", ownerIds).order("created_at", { ascending: false }).limit(PAGES_MESUREES),
     ])
     if (prof) setProfile(prof)
     if (pgs) setPages(pgs)
-    // Vues du mois en cours (quota) — compte les page_views des pages de l'user depuis le 1er du mois
-    const ids = (pgs ?? []).map(p => p.id)
+    // Vues du mois en cours (quota) — sur TOUTES les pages, pas sur les vingt
+    // affichées : la liste est un écran, pas un périmètre de mesure (lot v89).
+    const ids = (pagesMesurees ?? []).map(p => p.id)
     if (ids.length) {
       const now = new Date()
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()

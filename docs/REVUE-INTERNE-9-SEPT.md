@@ -1243,3 +1243,70 @@ l'acceptation qui refait sa propre comparaison de date. Six tests tombent au
 total.
 
 Suite complète : 4 996 tests, 303 fichiers. Build vert.
+
+---
+
+## v89 — « Toutes les pages », sauf les vôtres
+
+**Le relevé.** Compte Business (pages illimitées), 26 pages. Le tableau de bord
+charge ses pages ainsi :
+
+```
+.select("id,title,slug,status,total_views,created_at")
+.order("created_at", { ascending: false }).limit(20)
+```
+
+Vingt, c'est la bonne taille pour une **liste de cartes**. Mais les mêmes vingt
+identifiants servaient ensuite de **périmètre de mesure** : vues du mois, vues du
+jour, courbe de la semaine, et les clics/vues des objectifs de conversion — dont
+la carte, elle, annonce « Toutes les pages ».
+
+Ce que l'écran affichait, et ce que valaient réellement les mêmes objectifs :
+
+```
+WhatsApp — vitrine   whatsapp · 90 j · Page
+     0 conv. | taux   —   |   0 % | en retard      (réel : 270 | 7,5 % | en bonne voie)
+WhatsApp — partout   whatsapp · 90 j · Toutes les pages
+    90 conv. | taux  20 % |  90 % | en retard      (réel : 360 | 8,9 % | en bonne voie)
+```
+
+Trois choses fausses, et une pire que les autres :
+
+- les pages qui tombent hors des vingt sont les **plus anciennes** — celles qui
+  ont de l'historique. L'objectif posé sur la première page du compte lit zéro,
+  et son nom s'affiche même « Page », faute de la trouver dans la liste ;
+- le total « Toutes les pages » vaut le quart du vrai ;
+- le taux de conversion, lui, est **gonflé** — 20 % au lieu de 8,9 % — parce que
+  la page manquante pesait plus en vues qu'en clics. Un chiffre faux dans le sens
+  flatteur est celui sur lequel on décide.
+
+**Ce que le lot change.** `lib/perimetreDeMesure.ts`, module pur :
+`PAGES_LISTE = 20` (la liste, inchangée), `PAGES_MESUREES = 500` (ce que la
+mesure lit), `FENETRE_OBJECTIFS_JOURS = 90` ; `perimetreLu`,
+`phrasePerimetreIncomplet`, `periodeMesuree` / `phrasePeriodeTronquee`,
+`nomDePageObjectif`, `objectifSansPage`.
+
+Le tableau de bord lit désormais **toutes** les pages pour tout ce qui se compte
+— rendu serveur et rafraîchissement client, qui comptaient chacun de leur côté.
+Il connaît aussi le nombre réel de pages (`count: "exact"`) : au-delà du plafond,
+la section le dit au lieu de laisser croire. Sur la carte, une page supprimée est
+nommée comme telle (les zéros s'expliquent), et une période plus longue que la
+fenêtre chargée est signalée — l'API accepte `period_days` jusqu'à 365 quand
+l'écran ne lit que 90.
+
+**Garde.** `lib/perimetreDeMesure.test.ts` (19 tests), avec un balayage d'arbre
+qui refuse qu'un fichier borne ses pages par un nombre écrit à la main **et**
+compte ensuite des événements sur ces pages. Une liste peut être bornée — c'est
+un choix d'écran ; ce qui est interdit, c'est que ce plafond devienne le
+périmètre d'un chiffre sans que personne l'ait décidé.
+
+**Ce que la garde a trouvé toute seule.** Écrite pour `page.tsx`, elle a
+immédiatement désigné `DashboardClient.tsx` : le même `.limit(20)`, servant au
+compteur de vues du mois après chaque publication ou suppression. Le rendu
+serveur et le rafraîchissement client ne comptaient donc même pas la même chose
+sur le même écran.
+
+**Vérification par mutation.** Trois défauts réinjectés — le périmètre serveur,
+le périmètre client, le nom de page en `?? "Page"`. Trois tests tombent.
+
+Suite complète : 5 015 tests, 304 fichiers. Build vert.

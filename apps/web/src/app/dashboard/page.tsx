@@ -5,6 +5,7 @@ import GoalsShell from "./goals/GoalsShell"
 import { accessibleOwnerIds } from "@/lib/team"
 import { destinationApresConnexion, ECHAPPE } from "./atterrissage"
 import { APPAREIL_ROBOT } from "@/lib/robots"
+import { PAGES_LISTE, PAGES_MESUREES, FENETRE_OBJECTIFS_JOURS } from "@/lib/perimetreDeMesure"
 
 // Rendu SERVEUR des données initiales du dashboard : évite le 2e getUser() côté
 // client + le waterfall de requêtes + le spinner. DashboardClient garde son
@@ -17,7 +18,7 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
   const ownerIds = await accessibleOwnerIds(supabase, user.id)
   const [{ data: prof }, { data: pgs }] = await Promise.all([
     supabase.from("profiles").select("full_name,plan,total_scans,total_pages,avatar_url").eq("id", user.id).single(),
-    supabase.from("pages").select("id,title,slug,status,total_views,created_at").in("user_id", ownerIds).order("created_at", { ascending: false }).limit(20),
+    supabase.from("pages").select("id,title,slug,status,total_views,created_at").in("user_id", ownerIds).order("created_at", { ascending: false }).limit(PAGES_LISTE),
   ])
 
   // Un compte qui n'a jamais rien créé n'a rien à administrer : on l'emmène
@@ -31,7 +32,18 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
   })
   if (versCreation) redirect(versCreation)
 
-  const ids = (pgs ?? []).map((p) => p.id)
+  // Les vingt pages ci-dessus sont la LISTE de cartes : c'est la bonne taille
+  // pour un écran, ce n'est pas un périmètre de mesure. Tout ce qui se COMPTE
+  // ensuite — vues du mois, courbe de la semaine, objectifs de conversion — part
+  // de la totalité des pages. Relevé du 14 septembre, compte à 26 pages : un
+  // objectif « Toutes les pages » affichait 90 conversions pour 360, et un taux
+  // de 20 % pour 8,9 % réels.
+  const [{ data: pagesMesurees }, { count: pagesTotal }] = await Promise.all([
+    supabase.from("pages").select("id,title,slug").in("user_id", ownerIds).order("created_at", { ascending: false }).limit(PAGES_MESUREES),
+    supabase.from("pages").select("id", { count: "exact", head: true }).in("user_id", ownerIds),
+  ])
+  const ids = (pagesMesurees ?? []).map((p: any) => p.id)
+
   let monthViews = 0, todayViews = 0, weekViews: number[] = []
   if (ids.length) {
     const now = new Date()
@@ -55,8 +67,7 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
   }
 
   // Objectifs : la section vit désormais EN BAS du Dashboard (#objectifs), plus de page dédiée.
-  // Données 90 j (clics + vues) sur les pages de l'utilisateur/équipe — mêmes que l'ancienne page.
-  const since90 = new Date(); since90.setDate(since90.getDate() - 90)
+  const since90 = new Date(); since90.setDate(since90.getDate() - FENETRE_OBJECTIFS_JOURS)
   let goalClicks: any[] = [], goalViews: any[] = []
   if (ids.length) {
     const [gc, gv] = await Promise.all([
@@ -77,7 +88,9 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
         initialWeekViews={weekViews}
       />
       <section id="objectifs" style={{ scrollMarginTop: 20, maxWidth: 1180, margin: "0 auto", padding: "0 clamp(16px, 4vw, 24px) 60px" }}>
-        <GoalsShell clicks={goalClicks} pageViews={goalViews as any} pages={(pgs ?? []).map((p: any) => ({ id: p.id, title: p.title, slug: p.slug }))} />
+        <GoalsShell clicks={goalClicks} pageViews={goalViews as any}
+          pages={(pagesMesurees ?? []).map((p: any) => ({ id: p.id, title: p.title, slug: p.slug }))}
+          pagesTotal={pagesTotal ?? null} />
       </section>
     </>
   )

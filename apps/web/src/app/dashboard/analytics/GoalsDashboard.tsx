@@ -14,6 +14,10 @@ import {
   AreaChart, Area, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid
 } from "recharts"
+import {
+  perimetreLu, phrasePerimetreIncomplet, phrasePeriodeTronquee,
+  nomDePageObjectif, objectifSansPage,
+} from "@/lib/perimetreDeMesure"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Goal = {
@@ -35,6 +39,8 @@ interface Props {
   clicks:    ClickRow[]
   pageViews: ViewRow[]
   pages:     PageRow[]
+  /** Nombre RÉEL de pages du compte : dit si la mesure les couvre toutes. */
+  pagesTotal?: number | null
 }
 
 // ── Config types d'objectifs ──────────────────────────────────────────────────
@@ -149,7 +155,7 @@ const fieldLabel: React.CSSProperties = { color: "#C8BFB2", fontSize: 11, fontWe
 const inputStyle: React.CSSProperties = { width: "100%", background: FIELD, border: `1px solid ${BORDER}`, borderRadius: 10, color: TEXT, padding: "10px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }
 
 // ── Composant principal ───────────────────────────────────────────────────────
-export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
+export default function GoalsDashboard({ clicks, pageViews, pages, pagesTotal }: Props) {
   const [goals,      setGoals]      = useState<Goal[]>([])
   const [loading,    setLoading]    = useState(true)
   const [showForm,   setShowForm]   = useState(false)
@@ -328,6 +334,11 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
             </div>
           ))}
         </div>
+      )}
+      {phrasePerimetreIncomplet(perimetreLu(pages.length, pagesTotal).manquantes) && (
+        <p role="note" style={{ color: MUTED, fontSize: 12, margin: "-12px 0 20px", lineHeight: 1.5 }}>
+          {phrasePerimetreIncomplet(perimetreLu(pages.length, pagesTotal).manquantes)}
+        </p>
       )}
 
       {/* Formulaire création / édition — 2 étapes */}
@@ -519,7 +530,9 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
           {goals.map((goal, gi) => {
             const cfg   = GOAL_TYPES[goal.goal_type] ?? GOAL_TYPES.custom
             const stats = allStats[gi] ?? { total: 0, ctr: null, progress: null, chartData: [], totalViews: 0, pace: null, paceMarker: null }
-            const pageName = goal.page_id ? (pages.find(p => p.id === goal.page_id)?.title ?? "Page") : "Toutes les pages"
+            const pageName = nomDePageObjectif(goal.page_id, pages)
+            const pageAbsente = objectifSansPage(goal.page_id, pages)
+            const periodeRognee = phrasePeriodeTronquee(goal.period_days)
 
             return (
               <div key={goal.id} style={{ background: CARD, border: `1px solid color-mix(in srgb, ${goal.color} 22%, ${BORDER})`, borderRadius: 16, padding: 20 }}>
@@ -548,6 +561,13 @@ export default function GoalsDashboard({ clicks, pageViews, pages }: Props) {
                       <p style={{ color: MUTED, fontSize: 11.5, margin: 0 }}>
                         {cfg.label} · {goal.period_days} j · {pageName}
                       </p>
+                      {(pageAbsente || periodeRognee) && (
+                        <p style={{ color: "var(--warning)", fontSize: 11.5, margin: "4px 0 0", lineHeight: 1.45 }}>
+                          {pageAbsente
+                            ? "Cette page n'existe plus : les chiffres ci-dessous sont ceux d'un objectif sans page."
+                            : periodeRognee}
+                        </p>
+                      )}
                     </div>
                   </div>
 
