@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Loader2, ShieldCheck, KeyRound } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
+import { attente } from "@/lib/reponseAttendue"
 
 const FIELD: React.CSSProperties = {
   width: "100%", height: 52, boxSizing: "border-box",
@@ -29,12 +30,9 @@ export default function ResetPasswordForm() {
   // Verifie qu'une session de recuperation est bien ouverte (via /auth/callback).
   useEffect(() => {
     const supabase = createClient()
-    let active = true
-    supabase.auth.getUser().then(({ data }) => {
-      if (!active) return
-      setPhase(data.user ? "ready" : "invalid")
-    })
-    return () => { active = false }
+    const a = attente()
+    supabase.auth.getUser().then(a.siEncoreLa(({ data }: any) => setPhase(data.user ? "ready" : "invalid")))
+    return a.abandonner
   }, [])
 
   async function onSubmit(e: React.FormEvent) {

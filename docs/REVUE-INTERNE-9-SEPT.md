@@ -2772,3 +2772,80 @@ Au passage, trois lectures identiques de `localStorage` dans `BuilderV4` ont ét
 ramenées à une ligne chacune pour tenir sous le plafond du fichier.
 
 Suite complète : 5 401 tests, 325 fichiers. Build vert.
+
+---
+
+## Lot v111 — une réponse ne parle que si elle est encore attendue
+
+**Le relevé.** Douze effets **attendent** (`await`, `.then`) puis **posent** un
+état, avec des dépendances qui changent — donc deux réponses possibles en vol
+pour deux questions différentes. Six portaient le bon geste, six ne l'avaient
+pas.
+
+```
+QRStudio.tsx:385   deps = [activeId, statsPeriod]
+  fetch(`/api/qr-stats/${activeId}?period=${statsPeriod}`)
+    .then(d => setStats(d))
+    .finally(() => setStatsLoading(false))
+```
+
+Le commerçant clique un QR, puis un autre avant que le premier n'ait répondu.
+La réponse du **premier** arrive en dernier et s'installe sous le nom du
+**second** : il lit 312 scans en face du mauvais QR, et rien ne le dit. Le
+`finally` fait pire — la réponse périmée éteint le voyant de chargement pendant
+que la bonne est toujours en route.
+
+Puis : la vérification d'adresse des modèles, qui écrivait « disponible » sur
+une adresse qu'on ne tapait plus (le `clearTimeout` couvre la frappe, pas
+l'appel une fois parti) ; et le compteur de messages non lus, qui pouvait
+afficher le nombre d'une page sur une autre. Les trois derniers sont des
+bascules à risque théorique : ils prennent la même règle, parce qu'une règle qui
+souffre des exceptions au cas par cas n'est plus une règle.
+
+**Le vrai relevé, corrigé deux fois.** Le produit connaît le bon geste — il
+l'écrit à la main. Le premier balayage cherchait `cancelled` et `vivant` et en
+a trouvé six. La garde de ce lot, écrite ensuite, en a trouvé trois de plus dans
+`PrintStudioClient` sous le nom `alive` ; puis, une fois la règle passée de la
+liste de noms à une **forme**, une dernière dans `ResetPasswordForm` sous le nom
+`active`. **Dix copies, quatre vocabulaires.** Toutes correctes — simplement
+introuvables pour qui ne connaissait pas le bon mot. C'est cela le risque : une
+règle qui se cherche à quatre endroits finit par avoir une onzième copie qui
+oublie le nettoyage.
+
+**Ce que le lot change.** `lib/reponseAttendue.ts`, un seul geste nommé :
+
+```ts
+attente(): { encoreAttendue(); abandonner(); siEncoreLa(faire) }
+```
+
+`abandonner` se rend tel quel comme nettoyage (`return a.abandonner`), et
+`siEncoreLa` enrobe le rappel de sorte que le nom de l'attente soit visible sur
+la ligne qui pose l'état. React nettoie l'effet **avant** de le relancer : une
+réponse en retard trouve donc son attente fermée, et se tait.
+
+**Branché** : les six endroits du relevé, plus les dix copies manuelles
+ramenées au même geste.
+
+**Garde.** `lib/reponseAttenduePartout.test.ts` (15 tests). La règle de classe :
+**une réponse ne parle que si elle est encore attendue.** Trois balayages. Le
+premier exige une attente dans tout effet qui peut se faire doubler. Le
+deuxième descend d'un cran — ouvrir une attente en tête ne suffit pas, c'est la
+**ligne qui pose l'état** qui doit la nommer : chaque rappel `.then`/`.catch`/
+`.finally` posant un état doit passer par `siEncoreLa` ou porter un
+`encoreAttendue()`. Le troisième interdit de réécrire le geste à la main, par
+sa forme et non par une liste de noms : un booléen d'effet qu'on **rabaisse
+dans le nettoyage** est toujours cette attente-là. Et seulement celui-là — un
+verrou « envoyé une fois » (`dwellSent`, suivi de lecture de la page publique)
+est un booléen d'effet lui aussi, mais il ne se rabaisse jamais au départ ; la
+règle ne l'avale pas. Un contre-test exige plus de quatre-vingts effets vus,
+plus de cinq à risque, et plus de cinq reconnus gardés.
+
+**Vérification par mutation.** Quatre défauts réinjectés : les stats du QR qui
+rejettent la question posée (2 tests tombent), le voyant qu'une réponse périmée
+peut éteindre (2), un quatrième vocabulaire qui apparaît (1), et le compteur de
+messages qui reprend la réponse d'une autre page (2).
+
+Au passage : quatre blocs d'une seule instruction de `QRStudio` et un de
+`BuilderV4` ramenés à une ligne pour tenir sous le plafond de ces fichiers.
+
+Suite complète : 5 416 tests, 326 fichiers. Build vert.

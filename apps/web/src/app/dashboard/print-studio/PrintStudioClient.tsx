@@ -32,6 +32,7 @@ import { bandeApercuMobile, dimensionsApercuMobile, legendeVisible, vhFeuilleMax
 import { nomDuQrSitue } from "@/lib/nomDuQr"
 import { effetDe, serveurAFait, refusDuServeur, refusDeLaBase } from "@/lib/effetConfirme"
 import { correspond, correspondAuxChamps } from "@/lib/rechercheSouple"
+import { attente } from "@/lib/reponseAttendue"
 
 // item.layout est parfois une clé de contenu ('stack'), parfois un id de layout ('orne').
 // On résout toujours vers un id de LAYOUTS valide (pour le volet Mise en page).
@@ -388,11 +389,11 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const [brandRemote, setBrandRemote] = useState(false)
   // Modèles : d'abord le compte (Supabase, multi-appareils) ; repli localStorage si la table n'existe pas encore.
   useEffect(() => {
-    let alive = true
+    const a = attente()
     const sb = createClient()
     sb.from("print_presets").select("id, name, cfg").order("created_at", { ascending: false })
       .then(({ data, error }) => {
-        if (!alive) return
+        if (!a.encoreAttendue()) return
         if (!error && data) { setSavedPresets(data.map((r: any) => ({ id: r.id, name: r.name, cfg: r.cfg || {} }))); setPresetsRemote(true) }
         else { try { const raw = localStorage.getItem("qrowg-print-presets"); if (raw) setSavedPresets(JSON.parse(raw)) } catch {} }
       })
@@ -401,11 +402,11 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     // la requête échoue → repli localStorage (aucune donnée perdue). Sinon, source de vérité = le compte.
     sb.from("print_brand_kit").select("logo, accent, accent2, typo").order("updated_at", { ascending: false }).limit(1).maybeSingle()
       .then(({ data, error }) => {
-        if (!alive) return
+        if (!a.encoreAttendue()) return
         if (!error) { setBrandRemote(true); if (data) setBrandKit({ logo: (data as any).logo || null, accent: (data as any).accent || "auto", accent2: (data as any).accent2 || "", typo: (data as any).typo || "auto" }) }
         else { try { const raw = localStorage.getItem("qrowg-print-brandkit"); if (raw) { const k = JSON.parse(raw); setBrandKit({ accent2: "", ...k }) } } catch {} }
       })
-    return () => { alive = false }
+    return a.abandonner
   }, [])
   // Montage à la demande de la planche PDF : on la monte, on laisse le QR se rendre, puis on imprime.
   // Rouvrir un design enregistré : arrivée depuis un QR (?qr=) → on restaure sa composition si elle existe.
@@ -413,11 +414,11 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     let code = ""
     try { code = new URLSearchParams(window.location.search).get("qr") || "" } catch {}
     if (!code) return
-    let alive = true
+    const a = attente()
     fetch(`/api/print-design?short_code=${encodeURIComponent(code)}`)
-      .then(r => r.json()).then(d => { if (alive && d && d.design && typeof d.design === "object") restoreDesign(d.design) })
+      .then(r => r.json()).then(d => { if (a.encoreAttendue() && d && d.design && typeof d.design === "object") restoreDesign(d.design) })
       .catch(() => {})
-    return () => { alive = false }
+    return a.abandonner
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   // Arrivée depuis une page publiée (bouton « Imprimer un support ») : la page a déjà déduit
@@ -462,7 +463,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   // RLS scope automatiquement. Le QR imprimé encode /q/<short_code> (redirigeable) ou le payload direct.
   useEffect(() => {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
-    let alive = true
+    const att = attente()   // `a` est déjà pris plus bas par la première réponse
     const sb = createClient()
     Promise.all([
       // `label` — le nom du support — n'était pas même demandé : la liste
@@ -471,7 +472,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       sb.from("qr_codes").select("short_code, label, pages(title, slug)").order("created_at", { ascending: false }).limit(60),
       sb.from("instant_qrs").select("id, label, kind, payload, dynamic, short_code").order("created_at", { ascending: false }).limit(60),
     ]).then(([a, b]) => {
-      if (!alive) return
+      if (!att.encoreAttendue()) return
       const list: { id: string; label: string; url: string }[] = []
       for (const r of ((a.data || []) as any[])) {
         if (!r.short_code) continue
@@ -489,7 +490,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       try { const q = new URLSearchParams(window.location.search).get("qr"); if (q && list.some(x => x.id === `q_${q}`)) preferred = `q_${q}` } catch {}
       setQrPickId(prev => prev || preferred || (list[0]?.id ?? ""))
     }).catch(() => { /* liste vide : on retombe sur l'import PNG, pas de crash */ })
-    return () => { alive = false }
+    return att.abandonner
   }, [])
 
   const item = itemId ? ITEM_BY_ID[itemId] : null

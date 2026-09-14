@@ -19,6 +19,7 @@ import { DOT_STYLES, CORNER_STYLE_LIST, DEFAULT_STYLE, type QRStyleConfig, type 
 import { PRESETS, PRESET_CATS, canUsePreset, type Preset } from "./presetsQr"
 import { PLAN_RANK } from "@/lib/plans"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
+import { attente } from "@/lib/reponseAttendue"
 
 const G = "var(--accent)"
 const INK = "var(--ink)"
@@ -108,13 +109,13 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   // Logo : ECC forcé H (le logo masque des modules) + logo COMPOSÉ (forme/fond) au rendu, comme l'ancien.
   const effectiveEcc = styleConf.logoUrl ? "H" : ecc
   useEffect(() => {
-    let cancelled = false
+    const a = attente()
     const src = styleConf.logoUrl
     if (!src) { setComposedLogo(""); return }
     composeLogo(src, { shape: styleConf.logoShape, bg: styleConf.logoBg, bgColor: styleConf.logoBgColor })
-      .then(u => { if (!cancelled) setComposedLogo(u) })
-      .catch(() => { if (!cancelled) setComposedLogo(src) })
-    return () => { cancelled = true }
+      .then(a.siEncoreLa(setComposedLogo))
+      .catch(a.siEncoreLa(() => setComposedLogo(src)))
+    return a.abandonner
   }, [styleConf.logoUrl, styleConf.logoShape, styleConf.logoBg, styleConf.logoBgColor])
   const renderStyle: QRStyleConfig = (styleConf.logoUrl && composedLogo && composedLogo !== styleConf.logoUrl)
     ? { ...styleConf, logoUrl: composedLogo } : styleConf

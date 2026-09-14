@@ -22,6 +22,7 @@ import { safeMetier, SECTEUR_LABEL, safeEntryLink, applyEntryLink, linkLabel } f
 import { FUNNEL, marque, origine, etiquette } from "@/lib/funnel"
 import { useDialogue } from "@/components/ui/useDialogue"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
+import { attente } from "@/lib/reponseAttendue"
 
 // Source unique partagée avec le builder : les modèles de page complets (métier + sous-variantes)
 // alimentent AUSSI la galerie d'onboarding (en plus des 14 modèles curés historiques).
@@ -766,17 +767,22 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
     if (guest) { setSlugStatus("idle"); setSuggestions([]); return }
     if (!slug) { setSlugStatus("idle"); setSuggestions([]); return }
     setSlugStatus("checking")
+    // Le `clearTimeout` couvre la frappe, pas l'appel une fois parti : une
+    // réponse périmée écrivait « disponible » sur une adresse abandonnée (v111).
+    const a = attente()
     const t = setTimeout(async () => {
       try {
         const res = await fetch("/api/slug/check?slug=" + encodeURIComponent(slug))
         const json = await res.json()
-        setSlugStatus(json.status === "available" ? "available" : json.status === "taken" ? "taken" : json.status === "reserved" ? "reserved" : "invalid")
-        setSuggestions(json.suggestions || [])
+        a.siEncoreLa(() => {
+          setSlugStatus(json.status === "available" ? "available" : json.status === "taken" ? "taken" : json.status === "reserved" ? "reserved" : "invalid")
+          setSuggestions(json.suggestions || [])
+        })()
       } catch {
-        setSlugStatus("idle")
+        a.siEncoreLa(() => setSlugStatus("idle"))()
       }
     }, 400)
-    return () => clearTimeout(t)
+    return () => { a.abandonner(); clearTimeout(t) }
   }, [slug])
 
   const nameValid = name.trim().length >= 2 && name.trim().length <= 80

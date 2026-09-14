@@ -14,6 +14,7 @@ import { countryFlag, DEVICE_LABEL } from "@/lib/scanStats"
 import { useFermetureModale } from "@/lib/useFermetureModale"
 import { useIsMobile } from "@/lib/useIsMobile"
 import { etatLien, dateLisible, type InstantQr, type StatsLien } from "./instantQr"
+import { attente } from "@/lib/reponseAttendue"
 
 const G = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -30,13 +31,13 @@ export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null;
   const id = qr?.id
   useEffect(() => {
     if (!id) { setDetails(null); return }
-    let vivant = true
+    const a = attente()
     setChargement(true); setDetails(null)
     fetch(`/api/qr-instant/stats?id=${id}`).then(r => r.json())
-      .then(d => { if (vivant) setDetails(d) })
-      .catch(() => { if (vivant) setDetails(null) })
-      .finally(() => { if (vivant) setChargement(false) })
-    return () => { vivant = false }
+      .then(a.siEncoreLa(setDetails))
+      .catch(a.siEncoreLa(() => setDetails(null)))
+      .finally(a.siEncoreLa(() => setChargement(false)))
+    return a.abandonner
   }, [id])
 
   if (!qr) return null

@@ -14,6 +14,7 @@ import { pageLimit, getPlan, PLANS } from "@/lib/plans"
 import QrowgLogo from "@/components/QrowgLogo"
 import { BandeauHorsConnexion } from "@/components/BandeauHorsConnexion"
 import { jauge, nombreFr } from "@/lib/chiffresLisibles"
+import { attente } from "@/lib/reponseAttendue"
 
 const DEFAULT_ACCENT = "#D4AF45"
 const MUTED = "var(--muted)"
@@ -298,10 +299,12 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
   // Rafraîchit le compteur quand on quitte la page Messages (les lus y sont marqués)
   useEffect(() => {
     if (!user || pathname === "/dashboard/leads") return
+    const a = attente()   // en naviguant vite, le compte d'une page s'affichait sur une autre (v111)
     const supabase = createClient()
     accessibleOwnerIds(supabase, user.id).then(ownerIds =>
       supabase.from("leads").select("id", { count: "exact", head: true }).in("user_id", ownerIds).eq("is_read", false)
-        .then(({ count }: any) => { if (typeof count === "number") setUnreadLeads(count) }))
+        .then(a.siEncoreLa(({ count }: any) => { if (typeof count === "number") setUnreadLeads(count) })))
+    return a.abandonner
   }, [pathname, user])
 
   // Mise à jour live quand on change la couleur depuis la page Profil

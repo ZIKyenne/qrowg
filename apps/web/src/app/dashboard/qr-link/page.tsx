@@ -35,6 +35,7 @@ import { Button } from "@/components/ui/Button"
 import { useSessionShell } from "../sessionShell"
 import { jourDuCommerce, serieDeJours, dateLisible } from "@/lib/jourDuCommerce"
 import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
+import { attente } from "@/lib/reponseAttendue"
 
 const G = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -180,7 +181,9 @@ export default function QrLinkPage() {
   const { signedIn } = useSessionShell()
   useEffect(() => {
     if (!signedIn) return
-    fetch("/api/qr-instant").then(r => r.json()).then(d => { if (Array.isArray(d.items)) setSaved(d.items); if (d.plan) setPlan(d.plan) }).catch(() => {})
+    const a = attente()
+    fetch("/api/qr-instant").then(r => r.json()).then(a.siEncoreLa((d: any) => { if (Array.isArray(d.items)) setSaved(d.items); if (d.plan) setPlan(d.plan) })).catch(() => {})
+    return a.abandonner
   }, [signedIn])
   const saveToHistory = () => setHistory(prev => {
     // Le mot de passe Wifi était écrit en clair dans localStorage à chaque

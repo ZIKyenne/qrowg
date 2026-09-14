@@ -21,6 +21,7 @@ import { erreurLisible } from "@/lib/erreurLisible"
 import { prochaineEtape } from "./prochaineEtape"
 import { raisonDeProposer, accrocheOffre, avantagesEnPlus } from "./offreUtile"
 import { debutDuMois, debutDuJour, debutDuJourIlYA, serieDeJours, jourDuCommerce, heureDuCommerce } from "@/lib/jourDuCommerce"
+import { attente } from "@/lib/reponseAttendue"
 
 type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string }
 type Profile = { full_name: string | null; plan: string; total_scans: number; avatar_url: string | null }
@@ -160,7 +161,7 @@ export default function DashboardClient({
   // scans, les vues, les messages. Lu à l'ouverture du modal, pas avant.
   useEffect(() => {
     if (!pageToDelete) { setPerte(null); return }
-    let vivant = true
+    const a = attente()
     setPerteEnCours(true)
     const supabase = createClient()
     Promise.all([
@@ -172,11 +173,11 @@ export default function DashboardClient({
       supabase.from("page_views").select("id", { count: "exact", head: true }).eq("page_id", pageToDelete.id).neq("device", APPAREIL_ROBOT),
       supabase.from("leads").select("id", { count: "exact", head: true }).eq("page_id", pageToDelete.id),
     ]).then(([qr, sc, vu, ms]) => {
-      if (!vivant) return
+      if (!a.encoreAttendue()) return
       setPerte({ supports: (qr.data as any) || [], scans: sc.count ?? 0, vues: vu.count ?? 0, messages: ms.count ?? 0 })
       setPerteEnCours(false)
-    }, () => { if (vivant) { setPerte({ supports: [] }); setPerteEnCours(false) } })
-    return () => { vivant = false }
+    }, a.siEncoreLa(() => { setPerte({ supports: [] }); setPerteEnCours(false) }))
+    return a.abandonner
   }, [pageToDelete])
 
   async function deletePage(page: Page) {

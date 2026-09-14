@@ -16,6 +16,7 @@ import { rapportContraste, estInverse } from "@/lib/contrasteQr"
 import { STYLES_QR, ENCRES_QR, FONDS_QR, NIVEAUX_ECC, TYPES_QR, presetQr, nommerCouleur, STYLE_QR_DEFAUT, ENCRE_QR_DEFAUT, FOND_QR_DEFAUT, ECC_DEFAUT, type TypeQr, type NiveauEcc } from "@/lib/stylesQr"
 import { creerUrl } from "../creer/entry"
 import { qrLimit, dynLimit } from "@/lib/plans"
+import { attente } from "@/lib/reponseAttendue"
 
 const G = "#C9A84C", INK = "#F5F0E8", MUT = "rgba(168,161,144,0.92)", BOR = "rgba(255,255,255,0.1)"
 
@@ -59,11 +60,13 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
 
   useEffect(() => {
     if (!authed) return // anonyme : aucun compte, donc aucun quota à charger
-    fetch("/api/qr-instant").then(r => (r.ok ? r.json() : null)).then(d => {
+    const a = attente()
+    fetch("/api/qr-instant").then(r => (r.ok ? r.json() : null)).then(a.siEncoreLa((d: any) => {
       if (!d) return
       if (Array.isArray(d.items)) setUsage(d.items)
       if (d.plan) setPlan(d.plan)
-    }).catch(() => {})
+    })).catch(() => {})
+    return a.abandonner
   }, [authed])
 
   const data = useMemo(() => {

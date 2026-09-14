@@ -37,6 +37,7 @@ import type QRCodeStyling from "qr-code-styling"
 import { ajouterUnSupport, messageDeSupport } from "./ajoutDeSupport"
 import { TaillePhysique } from "./TaillePhysique"
 import { fichierDuQr, nomDeFichier, nomDuQr, nomDeLigneQr } from "@/lib/nomDuQr"
+import { attente } from "@/lib/reponseAttendue"
 
 const G     = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -273,13 +274,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   // version composee n'est utilisee qu'au RENDU (renderStyle), pas de double stockage.
   const [composedLogo, setComposedLogo] = useState("")
   useEffect(() => {
-    let cancelled = false
+    const a = attente()
     const src = styleConf.logoUrl
     if (!src) { setComposedLogo(""); return }
     composeLogo(src, { shape: styleConf.logoShape, bg: styleConf.logoBg, bgColor: styleConf.logoBgColor })
-      .then(u => { if (!cancelled) setComposedLogo(u) })
-      .catch(() => { if (!cancelled) setComposedLogo(src) })
-    return () => { cancelled = true }
+      .then(a.siEncoreLa(setComposedLogo))
+      .catch(a.siEncoreLa(() => setComposedLogo(src)))
+    return a.abandonner
   }, [styleConf.logoUrl, styleConf.logoShape, styleConf.logoBg, styleConf.logoBgColor])
 
   // Style de RENDU : logo remplace par sa version composee (fallback = logo brut).
@@ -306,7 +307,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   // PNG du QR pour les scènes d'aperçu immersif (généré uniquement si une scène est active)
   useEffect(() => {
     if (scene === "none" || !qrUrl) return
-    let cancelled = false
+    const a = attente()
     ;(async () => {
       try {
         const blob = await getQRBlob({ data: qrUrl, fg, bg, ecc: effectiveEcc, style: renderStyle, size: 600 }, "png")
@@ -314,10 +315,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         // garde-fou, blobToDataUrl recevait null et l'aperçu de scène plantait.
         if (!blob) return
         const url = await blobToDataUrl(blob)
-        if (!cancelled) setQrPng(url)
+        a.siEncoreLa(setQrPng)(url)
       } catch { /* ignore */ }
     })()
-    return () => { cancelled = true }
+    return a.abandonner
   }, [scene, qrUrl, fg, bg, ecLevel, styleConf])
 
   async function archiveQR(id: string) {
@@ -344,9 +345,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       setQRCodes(rest)
       if (activeId === id) setActiveId(rest[0]?.id ?? null)
       toast.success("QR supprimé")
-    } finally {
-      setDeletingId(null); setConfirmId(null); setMenuId(null)
-    }
+    } finally { setDeletingId(null); setConfirmId(null); setMenuId(null) }
   }
 
   function copyQRLink(id: string, url: string) {
@@ -384,13 +383,16 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   // Charger stats QR au changement de selection ou periode
   useEffect(() => {
     if (!activeId) return
+    // Deux QR cliqués coup sur coup : la réponse du premier arrivait en dernier et s'installait sous le nom du second (lot v111).
+    const a = attente()
     setStats(null)
     setStatsLoading(true)
     fetch(`/api/qr-stats/${activeId}?period=${statsPeriod}`)
       .then(r => r.json())
-      .then(d => { if (!d.error && !d.empty) setStats(d) }) // empty = QR introuvable/erreur -> on laisse l'état vide, pas des zéros
+      .then(a.siEncoreLa(d => { if (!d.error && !d.empty) setStats(d) })) // empty = QR introuvable/erreur -> on laisse l'état vide, pas des zéros
       .catch(() => {})
-      .finally(() => setStatsLoading(false))
+      .finally(a.siEncoreLa(() => setStatsLoading(false)))
+    return a.abandonner
   }, [activeId, statsPeriod])
 
   // Dessiner la sparkline quand stats change
@@ -559,9 +561,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       if (d.qr.status === "draft") toast.success(phraseCopieEnBrouillon())
     } catch {
       toast.error("Duplication impossible : erreur réseau")
-    } finally {
-      setDupId(null)
-    }
+    } finally { setDupId(null) }
   }
   // -- Ajouter un SUPPORT à la même page ----------------------------------------
   // Ce que le panneau « Performance par support » demandait sans que rien ne le
@@ -598,9 +598,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       } else {
         toast.error(messageDeRoute(res.status, d, "Cette action n'a pas pu aboutir."))
       }
-    } catch {
-      toast.error("Erreur réseau")
-    }
+    } catch { toast.error("Erreur réseau") }
     setQrStatusLoading(null)
     setConfirmAction(null)
     setMenuId(null)
@@ -625,9 +623,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         if (activeId === qrId) setActiveId(rest[0]?.id ?? null)
         toast.success("QR supprimé")
       }
-    } catch {
-      toast.error("Connexion impossible. Réessayez.")
-    }
+    } catch { toast.error("Connexion impossible. Réessayez.") }
     setQrStatusLoading(null)
     setConfirmAction(null)
   }

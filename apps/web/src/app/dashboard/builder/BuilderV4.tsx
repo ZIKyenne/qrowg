@@ -44,6 +44,7 @@ import { actionClavier } from "./raccourcisClavier"
   import { useToast } from "@/components/Toast"
 import { messageApresCreation, qrVisitable } from "@/lib/qrEnBrouillon"
 import { limite } from "@/lib/limitesDeSaisie"
+import { attente } from "@/lib/reponseAttendue"
   import { useConfirm } from "@/components/ui/Confirm"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
@@ -217,9 +218,7 @@ import { limite } from "@/lib/limitesDeSaisie"
         applyPageTemplate(data.template as PageTemplate) // applique + ferme la modale
       } catch {
         setAiGenError("Connexion impossible. Réessayez.")
-      } finally {
-        setAiGenLoading(false)
-      }
+      } finally { setAiGenLoading(false) }
     }
     const [activeCategory, setActiveCategory] = useState("essentials")
     const [search, setSearch] = useState("")
@@ -554,6 +553,7 @@ import { limite } from "@/lib/limitesDeSaisie"
       if (authState !== "user") return        // invité ou session inconnue : aucune écriture
       if (creatingRef.current) return
       creatingRef.current = true
+      const att = attente()
       ;(async () => {
         try {
           // Reprise du travail fait AVANT l'inscription : le brouillon local devient
@@ -561,6 +561,7 @@ import { limite } from "@/lib/limitesDeSaisie"
           const claimed = claimRef.current
           const res = await fetch("/api/pages/create", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: claimed?.pageName || pageName }) })
           const json = await res.json().catch(() => ({}))
+          if (!att.encoreAttendue()) return   // l'éditeur a été quitté : plus rien à poser (v111)
           if (!res.ok || !json?.pageId) { setBootstrapError(json?.message || json?.error || "Impossible de créer la page."); return }
           // Quota de QR actifs atteint : le QR existe mais affiche le mur au
           // scan. L'éditeur le dit au lieu de laisser imprimer (lot v98).
@@ -589,9 +590,10 @@ import { limite } from "@/lib/limitesDeSaisie"
           if (json.slug) setPageSlug(json.slug)
           try { window.history.replaceState(null, "", "/dashboard/builder/" + json.pageId) } catch {}
         } catch (e: any) {
-          setBootstrapError(e?.message || "Impossible de créer la page.")
+          att.siEncoreLa(() => setBootstrapError(e?.message || "Impossible de créer la page."))()
         }
       })()
+      return att.abandonner
     }, [pageId, authState])
 
     useEffect(() => {
@@ -600,8 +602,8 @@ import { limite } from "@/lib/limitesDeSaisie"
       // pas encore en base. Relire maintenant reviendrait à l'effacer.
       if (skipLoadRef.current) { skipLoadRef.current = false; setLoadState("loaded"); return }
       const supabase = createClient()
-      let cancelled = false                 // ignore les résultats si l'effet est remplacé/démonté
-      const alive = () => !cancelled && mountedRef.current
+      const a = attente()                   // ignore les résultats si l'effet est remplacé/démonté
+      const alive = () => a.encoreAttendue() && mountedRef.current
       setLoadState("loading")
       async function load() {
         try {
@@ -655,7 +657,7 @@ import { limite } from "@/lib/limitesDeSaisie"
         }
       }
       load()
-      return () => { cancelled = true }
+      return a.abandonner
     }, [liveId, loadNonce])
 
     // ── Invité : restauration du brouillon ────────────────────────────────────
