@@ -4,6 +4,7 @@ import { useMemo, useState, useEffect, type ReactNode } from "react"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts"
 import { MousePointerClick, ArrowUpDown, TrendingUp, ExternalLink, Hash, Share2, Package, Tag, PartyPopper, Megaphone, Music, Calendar, Camera, MapPin, Link2, Play } from "lucide-react"
 import { compte, pourcentage } from "@/lib/chiffresLisibles"
+import { cleDeLien, cleDeRegroupement, libelleDeCle, cleOuvrable } from "@/lib/cleDeLien"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Click = {
@@ -140,8 +141,11 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
     }> = {}
 
     filteredClicks.forEach(c => {
-      const target = c.click_target || "—"
-      const key = `${c.block_id}::${target}`
+      // La MÊME normalisation qu'à l'écriture : les clics déjà enregistrés sous
+      // « …/lecomptoir », « www…/lecomptoir/ » et « …?utm_source=x » se
+      // rassemblent donc au prochain affichage, sans toucher à la base (v104).
+      const target = cleDeLien(c.click_target) || "—"
+      const key = cleDeRegroupement(c.block_id, c.click_target)
       if (!map[key]) {
         map[key] = {
           key, target, blockType: c.block_type || "cta_button",
@@ -156,7 +160,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
       ...item,
       // CTR = clics / vues : INDÉFINI si 0 vue pistée (jamais ÷0 → « — », pas 500 %).
       ctr:   totalViews > 0 ? parseFloat(((item.clicks / totalViews) * 100).toFixed(1)) : null as number | null,
-      label: truncateUrl(item.target),
+      label: truncateUrl(libelleDeCle(item.target)),
       icon: BLOCK_TYPE_ICON[item.blockType] || <Share2 size={13} />,
       typeLabel: BLOCK_TYPE_LABELS[item.blockType] || item.blockType,
     }))
@@ -305,11 +309,11 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
               {/* Lien */}
               <div style={{ overflow: "hidden" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                  <a href={row.target.startsWith("http") ? row.target : "#"} target="_blank" rel="noopener noreferrer"
+                  <a href={cleOuvrable(row.target) ? row.target : "#"} target="_blank" rel="noopener noreferrer"
                     style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600, textDecoration: "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {row.label}
                   </a>
-                  {row.target.startsWith("http") && <ExternalLink size={10} color={MUTED} style={{ flexShrink: 0 }} />}
+                  {cleOuvrable(row.target) && <ExternalLink size={10} color={MUTED} style={{ flexShrink: 0 }} />}
                 </div>
               </div>
 

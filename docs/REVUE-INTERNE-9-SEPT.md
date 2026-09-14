@@ -2256,3 +2256,78 @@ ordinaire (5 tests), la confirmation qui cesse d'appliquer (1), le module des
 chiffres qui remet une espace qui casse (5, dans les deux fichiers de garde).
 
 Suite complète : 5 276 tests, 318 fichiers. Build vert.
+
+---
+
+## v104 — Le même lien, compté une fois
+
+**Le relevé.** Les statistiques regroupent les clics ainsi :
+
+    key = `${c.block_id}::${c.click_target}`        TopLinksPanel:144
+
+et la clé émise par les boutons est, presque partout, **l'adresse elle-même** :
+
+    u.trackClick(trackTarget ?? href)               LayoutSurface:59
+
+Sur les 52 blocs publics qui rendent un lien : **3** passent une clé stable
+(`download_file` → « download », `email_button` → « email », `whatsapp_button` →
+« whatsapp »), **11** passent `url || "repli"` — donc l'URL dès qu'elle existe —
+et les autres passent l'URL, ou rien, auquel cas `SmartCta` retombe sur le `href`.
+
+Ce que ça donne pour un commerçant qui écrit puis corrige son lien Instagram :
+
+| saisie | clé enregistrée |
+|---|---|
+| `https://instagram.com/lecomptoir` | A |
+| `https://www.instagram.com/lecomptoir` | **B** |
+| `https://www.instagram.com/lecomptoir?utm_source=qr` | **C** |
+| `https://www.instagram.com/lecomptoir/#bio` | B |
+
+Quatre saisies du même lien, trois clés. « Top 10 liens » affiche le même bouton
+trois fois, ses clics coupés en trois. Le commerçant croit que son lien Instagram
+marche mal ; il marche, il est compté en morceaux. Et ajouter un `?utm_source=`
+pour mesurer une campagne — le geste que le produit encourage — suffit à couper
+l'historique.
+
+**Le produit l'avait écrit**, dans `SmartCta` : « on conserve les clés historiques
+pour ne pas casser les statistiques déjà collectées ». Trois blocs sur
+cinquante-deux appliquent la phrase.
+
+**Ce que le lot change.** `lib/cleDeLien.ts`, module pur. Une adresse est ramenée
+à ce qui la rend unique : schéma et hôte en minuscules, `www.` retiré, barre
+finale retirée, ancre retirée, paramètres de campagne retirés (`utm_*`, `fbclid`,
+`gclid`, `igshid`…). Le reste est conservé : `?lang=en` mène ailleurs et reste,
+`…/menu` et `…/carte` restent deux liens, la casse du chemin compte, `http` n'est
+pas `https`.
+
+Une clé déjà stable (« download », « calendar:ics », « copy-address ») **traverse
+sans être touchée** — c'est ce qui préserve l'historique des trois blocs qui
+avaient raison.
+
+**La réparation ne touche pas la base.** La même règle est posée aux deux bouts :
+à l'écriture dans `trackLinkClick` — le point unique par lequel passent les deux
+moteurs de rendu, y compris les 87 appels directs de `renduLegacy` — et à la
+lecture dans `TopLinksPanel`. Les clics **déjà enregistrés** se rassemblent donc
+d'eux-mêmes au prochain affichage.
+
+**Un effet de bord réparé au passage.** Le tableau proposait d'ouvrir la cible
+dès qu'elle commençait par `http`. Les clés stables (« download ») n'étaient donc
+pas ouvrables, mais s'affichaient telles quelles. `libelleDeCle` les rend
+lisibles — « Téléchargement », « WhatsApp » — sans prétendre qu'elles sont des
+liens, et une clé inconnue reste montrée brute plutôt que renommée au hasard.
+
+**Une fausse piste, en chemin.** Le premier balayage annonçait « 9 blocs sur 52
+rendent un lien sans compter le clic ». Faux : les neuf passent par `SmartCta`,
+qui compte avec `trackTarget ?? href`. Le vrai défaut n'était pas l'absence de
+comptage mais la **clé** utilisée pour compter.
+
+**Garde.** `lib/cleDeLien.test.ts` (23 tests). La règle de classe : **la clé d'un
+clic est normalisée au point unique qui l'écrit, et avec la même règle à la
+lecture.** Le balayage refuse qu'un écran recompose `${bloc}::${cible}` dans son
+coin, et qu'un second endroit poste un « click » vers `/api/track`.
+
+**Vérification par mutation.** Quatre défauts réinjectés : l'écriture qui cesse de
+normaliser, la lecture qui recompose la clé à la main, `www.` redevenu un hôte
+différent, une clé stable réécrite. De un à quatre tests tombent à chaque fois.
+
+Suite complète : 5 299 tests, 319 fichiers. Build vert.
