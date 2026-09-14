@@ -9,6 +9,7 @@
 import { useMemo, useState, useEffect, useRef, type ReactNode } from "react"
 import { Modal } from "@/components/ui/Modal"
 import { scoreBlock, type SearchableDef } from "./builderSearch"
+import { correspondAuxChamps } from "@/lib/rechercheSouple"
 
 export interface PaletteCommand {
   id: string
@@ -51,7 +52,7 @@ export function CommandPalette({ open, onClose, commands, blockDefs, onInsertBlo
 
   const filteredCommands = useMemo(() => {
     if (!query) return commands
-    return commands.filter(c => (c.label + " " + (c.keywords ?? "")).toLowerCase().includes(query))
+    return commands.filter(c => correspondAuxChamps([c.label, c.keywords], query))
   }, [commands, query])
 
   const filteredBlocks = useMemo(() => {

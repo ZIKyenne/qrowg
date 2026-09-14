@@ -6,6 +6,7 @@ import { useToast } from "@/components/Toast"
 import { useConfirm } from "@/components/ui/Confirm"
 import { Button } from "@/components/ui/Button"
 import { jourDuCommerce, serieDeJours, etiquetteDeJour } from "@/lib/jourDuCommerce"
+import { correspond } from "@/lib/rechercheSouple"
 import {
   Target, Plus, Trash2, Pencil, TrendingUp, TrendingDown, CheckCircle,
   MessageCircle, Calendar, Phone, Mail, ShoppingBag,
@@ -98,7 +99,7 @@ function calcConversions(goal: Goal, clicks: ClickRow[], views: ViewRow[]) {
 
   const conversions = periodClicks.filter(c => {
     if (c.block_type === goal.goal_type) return true
-    if (autoMatch && c.click_target?.toLowerCase().includes(autoMatch.toLowerCase())) return true
+    if (autoMatch && correspond(c.click_target, autoMatch)) return true
     return false
   })
 

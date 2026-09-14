@@ -8,6 +8,7 @@ import { useConfirm } from "@/components/ui/Confirm"
 import { useToast } from "@/components/Toast"
 import { erreurLisible } from "@/lib/erreurLisible"
 import { construireCsv, nomDeFichierCsv, TYPE_CSV } from "@/lib/exportCsv"
+import { correspondAuxChamps } from "@/lib/rechercheSouple"
 
 const G = "var(--accent, #C9A84C)"
 const MUTED = "var(--muted)"
@@ -56,11 +57,8 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
       if (filter === "unread" && l.is_read) return false
       if (filter !== "all" && filter !== "unread" && l.type !== filter) return false
       if (statusFilter !== "all" && (l.status || "new") !== statusFilter) return false
-      if (query) {
-        const q = query.toLowerCase()
-        const hay = [l.name, l.email, l.phone, l.message, JSON.stringify(l.data)].join(" ").toLowerCase()
-        if (!hay.includes(q)) return false
-      }
+      // « Élodie » se trouvait en tapant « Élodie », pas « elodie » (lot v105).
+      if (!correspondAuxChamps([l.name, l.email, l.phone, l.message, JSON.stringify(l.data)], query)) return false
       return true
     })
   }, [leads, filter, statusFilter, query])

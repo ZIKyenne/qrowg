@@ -31,6 +31,7 @@ import { ajusterAuSupport, lignesDeTitre, partQrMax, type Pastille } from "./aju
 import { bandeApercuMobile, dimensionsApercuMobile, legendeVisible, vhFeuilleMax, estPaysage, largeurTiroirPaysage, largeurApercuMobile, HAUT_BARRE_PAYSAGE } from "./apercuMobile"
 import { nomDuQrSitue } from "@/lib/nomDuQr"
 import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
+import { correspond, correspondAuxChamps } from "@/lib/rechercheSouple"
 
 // item.layout est parfois une clé de contenu ('stack'), parfois un id de layout ('orne').
 // On résout toujours vers un id de LAYOUTS valide (pour le volet Mise en page).
@@ -891,7 +892,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     const allItems = filterItems("Tout", "Tout")
     const totalFormats = new Set(allItems.map(i => i.size)).size
     const q = suppSearch.trim().toLowerCase()
-    const match = (i: Item) => !q || [i.name, i.support, i.size, i.place, i.plain].some(s => s.toLowerCase().includes(q))
+    const match = (i: Item) => correspondAuxChamps([i.name, i.support, i.size, i.place, i.plain], q)
     const sortList = (l: Item[]) => (suppSort === "az" ? l.slice().sort((a, b) => a.name.localeCompare(b.name, "fr")) : l)
     const hasFilter = metier !== "Tout" || objectif !== "Tout"
     const reco = sortList(filterItems(metier, objectif).filter(match))
@@ -2393,7 +2394,7 @@ function TemplateLibrary({ item, onApply, onApplyVariant }: { item: Item; onAppl
   const [cat, setCat] = useState("pour-vous")
   const [hoverT, setHoverT] = useState<{ t: PrintTemplate; x: number; y: number } | null>(null)
   const ql = q.trim().toLowerCase()
-  const matchSearch = (t: PrintTemplate) => !ql || t.name.toLowerCase().includes(ql) || t.business.some(b => b.toLowerCase().includes(ql)) || t.objective.some(o => o.toLowerCase().includes(ql)) || t.style.some(s => s.toLowerCase().includes(ql))
+  const matchSearch = (t: PrintTemplate) => correspondAuxChamps([t.name, ...t.business, ...t.objective, ...t.style], ql)
   let list = filterTemplates(item).filter(matchSearch)
   if (!ql && cat !== "pour-vous") { const c = TPL_CATS.find(x => x.id === cat); if (c?.m) list = list.filter(c.m) }
   const showReco = !ql && cat === "pour-vous"
@@ -2438,10 +2439,10 @@ function TemplateLibrary({ item, onApply, onApplyVariant }: { item: Item; onAppl
    Ne montre pas 40 boutons en vrac — sections claires + filtre. Sur choix : ajoute l'élément et ferme. */
 function AddLibrary({ query, setQuery, onComp, onText, onShape, onIcon }: { query: string; setQuery: (v: string) => void; onComp: (id: string) => void; onText: () => void; onShape: (id: string) => void; onIcon: (name: string) => void }) {
   const q = query.trim().toLowerCase()
-  const comps = q ? COMPOSITIONS.filter(c => c.label.toLowerCase().includes(q) || c.hint.toLowerCase().includes(q)) : COMPOSITIONS
-  const shownShapes = q ? SHAPES.filter(s => s.label.toLowerCase().includes(q)) : SHAPES
-  const cats = ICON_CATS.map(c => ({ cat: c.cat, items: q ? c.items.filter(i => i.label.toLowerCase().includes(q) || i.name.toLowerCase().includes(q)) : c.items })).filter(c => c.items.length)
-  const showText = !q || "texte".includes(q) || "text".includes(q)
+  const comps = COMPOSITIONS.filter(c => correspondAuxChamps([c.label, c.hint], q))
+  const shownShapes = SHAPES.filter(s => correspond(s.label, q))
+  const cats = ICON_CATS.map(c => ({ cat: c.cat, items: c.items.filter(i => correspondAuxChamps([i.label, i.name], q)) })).filter(c => c.items.length)
+  const showText = !q || correspond("texte text", q)
   const empty = !comps.length && !showText && !shownShapes.length && !cats.length
   const gridStyle: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(74px,1fr))", gap: 8 }
   const tile: React.CSSProperties = { display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "10px 6px", borderRadius: 10, border: `1px solid ${C.hairline}`, background: C.surfaceUp, color: C.fg, cursor: "pointer", fontSize: 10.5, minHeight: 62 }

@@ -24,6 +24,7 @@
 //    categories. Un en-tete de FAQ qui n'existerait pas.
 
 import { AVAILABILITY_STATUSES, announcementMeta, destinationUtile } from "../../types"
+import { correspondAuxChamps } from "@/lib/rechercheSouple"
 
 const txt = (v: unknown): string => (typeof v === "string" ? v.trim() : "")
 
@@ -153,5 +154,5 @@ export function filtrer(items: Question[], recherche: string, categorie: string)
   const q = recherche.trim().toLowerCase()
   return items.filter(it =>
     (!categorie || it.categorie === categorie) &&
-    (!q || it.q.toLowerCase().includes(q) || it.a.toLowerCase().includes(q)))
+    correspondAuxChamps([it.q, it.a], q))
 }

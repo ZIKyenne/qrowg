@@ -21,6 +21,7 @@ import { browserStorage, saveDraft, makeDraft } from "../builder/draftStore"
 import { safeMetier, SECTEUR_LABEL, safeEntryLink, applyEntryLink, linkLabel } from "../../creer/entry"
 import { FUNNEL, marque, origine, etiquette } from "@/lib/funnel"
 import { useDialogue } from "@/components/ui/useDialogue"
+import { correspondAuxChamps } from "@/lib/rechercheSouple"
 
 // Source unique partagée avec le builder : les modèles de page complets (métier + sous-variantes)
 // alimentent AUSSI la galerie d'onboarding (en plus des 14 modèles curés historiques).
@@ -247,9 +248,7 @@ export default function TemplatesPage() {
     const matchPlan = activePlan === "all" || getPlan(t.plan).id === activePlan
     const q = search.toLowerCase()
     const matchSearch = !q
-      || t.name.toLowerCase().includes(q)
-      || t.description.toLowerCase().includes(q)
-      || (t.tags || []).some((tag: string) => tag.toLowerCase().includes(q))
+      || correspondAuxChamps([t.name, t.description, ...(t.tags || [])], q)
     return matchMetier && matchPlan && matchSearch
   }), [activeMetier, activePlan, search])
 

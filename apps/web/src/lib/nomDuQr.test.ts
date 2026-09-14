@@ -117,10 +117,13 @@ describe("le nom sort enfin des statistiques", () => {
   it("la liste, la recherche et le tri parlent du support", () => {
     const studio = lire("app/dashboard/qr-codes/QRStudio.tsx")
     expect(studio).toContain("nomDeLigneQr(")
-    // La recherche lit le nom du support EN PLUS du titre de la page.
-    const recherche = studio.split("\n").find(l => l.includes("const t  ="))!
+    // La recherche lit le nom du support EN PLUS du titre de la page. Ancré sur
+    // l'INTENTION, pas sur la forme : depuis le lot v105 le filtre passe par
+    // `correspondAuxChamps`, qui ignore accents et ordre des mots.
+    const recherche = studio.split("\n").find(l => /correspondAuxChamps\(\[.*qr\./.test(l))!
     expect(recherche, "la recherche ignore le nom du support").toContain("label")
     expect(recherche).toContain("pages?.title")
+    expect(recherche, "et le code court reste cherchable").toContain("short_code")
   })
 
   it("et le nom donné par le commerçant est bien celui que qr-label écrit", () => {

@@ -18,6 +18,7 @@ import { qrScannability, scanLevelColor } from "./qrScannability"
 import { DOT_STYLES, CORNER_STYLE_LIST, DEFAULT_STYLE, type QRStyleConfig, type QRCode } from "./QRStudio"
 import { PRESETS, PRESET_CATS, canUsePreset, type Preset } from "./presetsQr"
 import { PLAN_RANK } from "@/lib/plans"
+import { correspondAuxChamps } from "@/lib/rechercheSouple"
 
 const G = "var(--accent)"
 const INK = "var(--ink)"
@@ -202,7 +203,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
     const q = search.trim().toLowerCase()
     return qrCodes
       .filter(x => (x.status ?? "active") !== "archived")
-      .filter(x => !q || (x.pages?.title || "").toLowerCase().includes(q) || x.short_code.toLowerCase().includes(q))
+      .filter(x => correspondAuxChamps([x.pages?.title, x.short_code], q))
   }, [qrCodes, search])
 
   const statusText = status === "saving" ? "Enregistrement…" : status === "saved" ? "Enregistré" : status === "error" ? "Échec — réessayer" : "Enregistré"

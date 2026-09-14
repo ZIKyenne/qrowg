@@ -18,6 +18,7 @@ import { openStatus, DAY_KEYS, countdownParts, shareLinks, calendarLinks, extHre
 import { confirmationDuFormulaire, mentionDestinataire, COULEUR_DU_TON, EMOJI_DU_TON, type ResultatEnvoi } from "@/lib/promesseDuFormulaire"
 import { chezLeCommerce, dateChezLeCommerce, fuseauDuBloc, fuseauDuVisiteur, memeHeureQue, mentionFuseau } from "@/lib/heureDuCommerce"
 import { etatDesConges } from "@/lib/congesDates"
+import { correspondAuxChamps } from "@/lib/rechercheSouple"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 
@@ -97,7 +98,7 @@ export function FAQPublic({ c, theme, pageId, blockId }: { c: any; theme: any; p
   const FONT_B = theme.fontBody || "DM Sans, sans-serif"
   const cats = Array.from(new Set(items.map(it => it.cat).filter(Boolean)))
   const q = query.trim().toLowerCase()
-  const filtered = items.filter(it => (!cat || it.cat === cat) && (!q || it.q.toLowerCase().includes(q) || it.a.toLowerCase().includes(q)))
+  const filtered = items.filter(it => (!cat || it.cat === cat) && correspondAuxChamps([it.q, it.a], q))
   const chip = (active: boolean): any => ({ padding: "6px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: "pointer", border: `1px solid ${active ? theme.primary + "60" : "rgba(255,255,255,0.1)"}`, background: active ? `${theme.primary}14` : "transparent", color: active ? theme.primary : MUTED, whiteSpace: "nowrap" })
   return (
     <div style={{ padding: "6px 24px 16px" }}>

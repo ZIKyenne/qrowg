@@ -23,6 +23,7 @@ import { BlockSettingsPanel } from "./BlockSettingsPanel"
 import { type Block } from "./types"
 import { BLOCK_DEFS } from "./blockDefs"
 import type { BlockActionId } from "./builderUx"
+import { correspondAuxChamps } from "@/lib/rechercheSouple"
 
 const MUTED = BUILDER_UI.text.muted
 
@@ -130,7 +131,7 @@ export function MobileBuilderShell(p: MobileBuilderShellProps) {
   const filteredStructure = useMemo(() => {
     const q = structureQuery.trim().toLowerCase()
     if (!q) return p.blocks
-    return p.blocks.filter(b => (BLOCK_DEFS[b.type]?.label ?? b.type).toLowerCase().includes(q) || b.type.includes(q))
+    return p.blocks.filter(b => correspondAuxChamps([BLOCK_DEFS[b.type]?.label ?? b.type, b.type], q))
   }, [p.blocks, structureQuery])
 
   const sheetTitle: Record<MobileBuilderTab, string> = { add: "Ajouter un bloc", structure: "Structure de la page", edit: "Réglages du bloc", style: "Style de la page", preview: "Aperçu", publish: "Publier la page" }

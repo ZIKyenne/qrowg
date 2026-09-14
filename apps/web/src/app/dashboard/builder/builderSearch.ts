@@ -1,3 +1,4 @@
+import { pliage } from "@/lib/rechercheSouple"
 // builderSearch.ts — Recherche de blocs du Builder : moteur PUR (scoring pondéré +
 // synonymes FR), partagé par la bibliothèque de blocs ET la palette de commandes
 // (Cmd+K). Extrait de BuilderV4 pour être réutilisable et testable (voir §2.7 du
@@ -29,16 +30,19 @@ export interface SearchableDef { label: string; description: string; category: s
 // label exact 100 · préfixe 90 · inclus 80 · description 60 · type 50 · catégorie 40 ·
 // synonyme→label 35 · synonyme→description 25.
 export function scoreBlock(type: string, def: SearchableDef, q: string): number {
-  const query = q.toLowerCase().trim()
+  // Les libellés du produit PORTENT les accents (lib/accents.ts les impose) :
+  // « Réserver », « Modèle », « Téléchargement ». Comparés bruts, ils étaient
+  // introuvables à qui tape sans accent (lot v105).
+  const query = pliage(q)
   if (!query) return 0
-  const label = def.label.toLowerCase()
-  const desc = def.description.toLowerCase()
-  const cat = def.category.toLowerCase()
+  const label = pliage(def.label)
+  const desc = pliage(def.description)
+  const cat = pliage(def.category)
   if (label === query) return 100
   if (label.startsWith(query)) return 90
   if (label.includes(query)) return 80
   if (desc.includes(query)) return 60
-  if (type.toLowerCase().includes(query)) return 50
+  if (pliage(type).includes(query)) return 50
   if (cat.includes(query)) return 40
   for (const [syn, aliases] of Object.entries(BLOCK_SYNONYMS)) {
     const allTerms = [syn, ...aliases]

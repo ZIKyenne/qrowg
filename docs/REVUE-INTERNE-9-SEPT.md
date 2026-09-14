@@ -2331,3 +2331,80 @@ normaliser, la lecture qui recompose la clé à la main, `www.` redevenu un hôt
 différent, une clé stable réécrite. De un à quatre tests tombent à chaque fois.
 
 Suite complète : 5 299 tests, 319 fichiers. Build vert.
+
+---
+
+## v105 — Le produit exige les accents, puis ne les trouve plus
+
+**Le relevé.** Les dix-huit recherches du produit — pages, QR, médias, modèles,
+blocs, messages reçus, palette de commandes, studio d'impression, et la FAQ de la
+page publique — filtraient toutes de la même façon :
+
+    hay.toLowerCase().includes(q.toLowerCase())
+
+Ce qu'un commerçant tape, ce qu'il trouve :
+
+| page | recherche | résultat |
+|---|---|---|
+| Café du Coin | `cafe` | **introuvable** |
+| Menu Été 2026 | `ete` | **introuvable** |
+| Réservations | `reservation` | **introuvable** |
+| Crème brûlée | `creme` | **introuvable** |
+| Naïve Déco | `naive` | **introuvable** |
+| L'Épicerie | `epicerie` | **introuvable** |
+| Où manger ? | `ou manger` | **introuvable** |
+| Bar à Tapas | `tapas` | trouvée |
+| Le Comptoir | `comptoir` | trouvée |
+
+Sept sur neuf. Et l'ironie est complète : `lib/accents.ts` **impose** les accents
+au produit — au motif que « c'est la vitrine du commerçant qui a l'air bâclée » —
+et 638 des 2 931 libellés de blocs en portent un. Le produit force les accents
+dans le contenu, puis ne sait plus le retrouver.
+
+**Deux autres formes du même défaut**, mesurées ensuite :
+
+    « Café du Coin »   ← « cafe coin »    introuvable   (ordre des mots)
+    « L'Épicerie »     ← « l'epicerie »   introuvable   (apostrophe droite
+                                                         contre apostrophe courbe)
+
+Personne ne tape le titre exact, dans l'ordre exact, avec la bonne apostrophe.
+
+**Ce que le lot change.** `lib/rechercheSouple.ts`, module pur. `pliage` réduit
+un texte à ce qui se compare : `NFD` sépare la lettre de son accent, on retire
+les accents, on épelle les ligatures (`œ` → `oe`), on ramène les trois
+apostrophes et les trois espaces à une seule, on met en minuscules. `correspond`
+exige que **chaque mot** tapé se retrouve, pas forcément dans l'ordre.
+
+**Une lettre élidée n'est pas exigée** : « l'atelier » cherche « atelier », sinon
+une page nommée « Atelier du Pain » resterait introuvable à qui met l'article.
+Mais chercher une seule lettre reste une recherche.
+
+**La FAQ de la page publique en fait partie**, et c'est le cas le plus coûteux :
+là, c'est le VISITEUR qui cherche « horaires » chez un commerçant. Celui-là n'a
+pas de seconde chance, il ferme la page.
+
+**Pas de seconde table.** `lib/accents.ts` en tient déjà une, pour une autre
+raison — la rédaction. Une seconde dériverait. Ici c'est `NFD` qui travaille, et
+la garde le vérifie. Un test boucle sur **toute** la table de `lib/accents` :
+chaque mot que le produit exige accentué doit se retrouver sans son accent.
+
+**Une garde du lot v103 a tiré.** Le module écrivait les espaces insécables en
+dur dans sa regex ; v103 exige qu'elles ne s'écrivent qu'à un endroit. Elles sont
+maintenant importées de `lib/typographieFr`. La garde a fait exactement son
+travail sur le lot suivant.
+
+**Une garde de `nomDuQr` aussi**, ancrée sur la ligne `const t = …` de QRStudio
+que la réécriture a supprimée. Réancrée sur l'intention — la recherche lit le nom
+du support, le titre de la page et le code court — avec la raison écrite.
+
+**Garde.** `lib/rechercheSouple.test.ts` (31 tests). La règle de classe : **une
+recherche compare ce qui se lit, pas ce qui est écrit.** Le balayage refuse tout
+`toLowerCase().includes(` restant dans le produit, et `builderSearch` — qui
+compare six champs — ne doit plus contenir un seul `toLowerCase()` : un champ
+laissé en brut suffirait à rater un libellé accentué.
+
+**Vérification par mutation.** Quatre défauts réinjectés : le pliage qui cesse de
+retirer les accents (5 tests), l'ordre des mots redevenu obligatoire (3), la FAQ
+publique refiltrée en brut (2), un champ de `scoreBlock` comparé en brut (1).
+
+Suite complète : 5 330 tests, 320 fichiers. Build vert.

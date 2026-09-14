@@ -85,6 +85,7 @@ interface Props {
 // renderer, qui est celle que l'export utilise vraiment.
 export type { QRStyleConfig } from "./qrRender"
 import type { QRStyleConfig } from "./qrRender"
+import { correspondAuxChamps } from "@/lib/rechercheSouple"
 
 export const DOT_STYLES: { id: QRStyleConfig["dotStyle"]; label: string; emoji: string }[] = [
   { id:"square",     label:"Classique",    emoji:"⬛" },
@@ -1048,12 +1049,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
   const filteredQR = qrCodes
     .filter(qr => {
-      const t  = `${(qr as any).label ?? ""} ${qr.pages?.title ?? ""}`.toLowerCase()
-      const c  = qr.short_code?.toLowerCase() ?? ""
       const qs = qr.status ?? "active"
       // Masquer les archives sauf si filtre explicite ou showArchived
       if (qs === "archived" && filterSt !== "archived" && !showArchived) return false
-      return (!search || t.includes(search.toLowerCase()) || c.includes(search.toLowerCase()))
+      return correspondAuxChamps([(qr as any).label, qr.pages?.title, qr.short_code], search)
         && (filterSt === "all" || qs === filterSt)
     })
     .sort((a, b) => {

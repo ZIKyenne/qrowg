@@ -9,6 +9,7 @@ import { phraseSuppressionMedia } from "@/lib/mediaUtilise"
 import { lireBibliotheque, usagesDuMedia } from "../assets/usagesDesMedias"
 import { createClient } from "@/lib/supabase/client"
 import ImageCropModal from "./ImageCropModal"
+import { correspond } from "@/lib/rechercheSouple"
 
 type Props = {
   value: string
@@ -213,7 +214,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
                       style={{ aspectRatio: "1", border: "2px dashed color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 9, background: "color-mix(in srgb, var(--accent) 4%, transparent)", color: G, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, fontSize: 11.5, fontWeight: 600 }}>
                       <Plus size={18} /> Ajouter
                     </button>}
-                    {libAssets.filter(a => !libQuery || a.name.toLowerCase().includes(libQuery.toLowerCase()))
+                    {libAssets.filter(a => correspond(a.name, libQuery))
                       .slice().sort((a, b) => (favs.has(b.url) ? 1 : 0) - (favs.has(a.url) ? 1 : 0))
                       .map(a => (
                       <div key={a.url} style={{ position: "relative", aspectRatio: "1" }}
@@ -236,7 +237,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
                     {libAssets.length === 0 && (
                       <p style={{ gridColumn: "1 / -1", color: MUTED, fontSize: 12, textAlign: "center", padding: "18px 0 4px", margin: 0 }}>Aucune image encore — utilisez « Ajouter » ci-dessus.</p>
                     )}
-                    {libAssets.length > 0 && libQuery && libAssets.filter(a => a.name.toLowerCase().includes(libQuery.toLowerCase())).length === 0 && (
+                    {libAssets.length > 0 && libQuery && libAssets.filter(a => correspond(a.name, libQuery)).length === 0 && (
                       <p style={{ gridColumn: "1 / -1", color: MUTED, fontSize: 12, textAlign: "center", padding: "18px 0 4px", margin: 0 }}>Aucun résultat pour « {libQuery} ».</p>
                     )}
                   </div>}

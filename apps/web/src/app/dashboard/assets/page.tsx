@@ -9,6 +9,7 @@ import { useConfirm } from "@/components/ui/Confirm"
 import { phraseSuppressionMedia, phraseSuppressionLot } from "@/lib/mediaUtilise"
 import { lireBibliotheque, usagesDuMedia, type Bibliotheque } from "./usagesDesMedias"
 import { createClient } from "@/lib/supabase/client"
+import { correspond } from "@/lib/rechercheSouple"
 
 const G = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -59,7 +60,7 @@ export default function AssetsPage() {
   useEffect(() => { load() }, [])
 
   const q = query.trim().toLowerCase()
-  const assets = (tab === "image" ? images : files)?.filter(a => !q || pretty(a.name).toLowerCase().includes(q)) ?? null
+  const assets = (tab === "image" ? images : files)?.filter(a => correspond(pretty(a.name), q)) ?? null
 
   // ── Sélection multiple ────────────────────────────────────────────────────
   const selCount = selected.size
