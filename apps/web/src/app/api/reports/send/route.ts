@@ -15,6 +15,7 @@ import { APPAREIL_ROBOT } from "@/lib/robots"
 import { accessibleOwnerIds } from "@/lib/team"
 import { raisonDuRapportAbonne, pagesDuRapport, detailDuPassage, type RaisonNonEnvoi } from "@/lib/rapportHebdo"
 import { evolution, nombreFr } from "@/lib/chiffresLisibles"
+import { dateLisible } from "@/lib/jourDuCommerce"
 
 
 function buildEmailHtml(params: {
@@ -235,7 +236,7 @@ export async function GET(req: NextRequest) {
         // Le libellé mensuel nommait le mois de `since` : un rapport envoyé le 1er mars
         // couvre le 30 janvier au 1er mars et s'intitulait « Mois de janvier ».
         // On annonce la période réellement mesurée.
-        const jour = (d: Date) => d.toLocaleDateString("fr-FR", { day: "numeric", month: "long" })
+        const jour = (d: Date) => dateLisible(d)
         const periodLabel = sub.frequency === "weekly"
           ? `Semaine du ${jour(since)}`
           : `Du ${jour(since)} au ${jour(now)}`

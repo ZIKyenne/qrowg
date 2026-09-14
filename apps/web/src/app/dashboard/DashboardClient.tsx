@@ -20,6 +20,7 @@ import PostCheckoutBanner from "@/components/PostCheckoutBanner"
 import { erreurLisible } from "@/lib/erreurLisible"
 import { prochaineEtape } from "./prochaineEtape"
 import { raisonDeProposer, accrocheOffre, avantagesEnPlus } from "./offreUtile"
+import { debutDuMois, debutDuJour, debutDuJourIlYA, serieDeJours, jourDuCommerce, heureDuCommerce } from "@/lib/jourDuCommerce"
 
 type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string }
 type Profile = { full_name: string | null; plan: string; total_scans: number; avatar_url: string | null }
@@ -97,7 +98,8 @@ export default function DashboardClient({
   const [perte, setPerte] = useState<CeQuiDisparait | null>(null)
   const [perteEnCours, setPerteEnCours] = useState(false)
   const [deleting, setDeleting] = useState(false)
-  const [hour] = useState(new Date().getHours())
+  // « Bonjour » / « Bonsoir » : l'heure du commerce, comme tout le reste (v108).
+  const [hour] = useState(() => heureDuCommerce(Date.now()) ?? 12)
   const [monthViews, setMonthViews] = useState(initialMonthViews) // vues du mois en cours (quota)
   const [todayViews, setTodayViews] = useState(initialTodayViews) // vues aujourd'hui (vie du dashboard)
   const [weekViews, setWeekViews] = useState<number[]>(initialWeekViews) // 7 derniers jours (mini-sparkline)
@@ -123,23 +125,27 @@ export default function DashboardClient({
     // affichées : la liste est un écran, pas un périmètre de mesure (lot v89).
     const ids = (pagesMesurees ?? []).map(p => p.id)
     if (ids.length) {
-      const now = new Date()
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
-      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-      const weekStart  = new Date(todayStart); weekStart.setDate(weekStart.getDate() - 6)
+      // Les mêmes bornes que l'alerte de quota, calculées au même endroit : sinon
+      // « ce mois-ci » ne veut pas dire la même chose des deux côtés (lot v108).
+      const monthStart = debutDuMois()
+      const todayStart = debutDuJour()
+      const weekStart  = debutDuJourIlYA(6)
       const [{ count: mCount }, { count: tCount }, { data: wRows }] = await Promise.all([
         supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", monthStart).neq("device", APPAREIL_ROBOT),
-        supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", todayStart.toISOString()).neq("device", APPAREIL_ROBOT),
-        supabase.from("page_views").select("viewed_at").in("page_id", ids).gte("viewed_at", weekStart.toISOString()).neq("device", APPAREIL_ROBOT),
+        supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", todayStart).neq("device", APPAREIL_ROBOT),
+        supabase.from("page_views").select("viewed_at").in("page_id", ids).gte("viewed_at", weekStart).neq("device", APPAREIL_ROBOT),
       ])
       setMonthViews(mCount ?? 0)
       setTodayViews(tCount ?? 0)
       // Répartition sur 7 jours pour la mini-courbe
-      const buckets = Array(7).fill(0)
+      // Le rang se lit sur le JOUR, pas sur un écart de 24 h : les deux dimanches
+      // de changement d'heure durent 23 h et 25 h, et un pas fixe y décale toute
+      // la courbe (lot v108).
+      const jours = serieDeJours(7)
+      const buckets = Array(jours.length).fill(0)
       for (const r of (wRows ?? [])) {
-        const d = new Date((r as any).viewed_at)
-        const idx = Math.floor((d.getTime() - weekStart.getTime()) / 86400000)
-        if (idx >= 0 && idx < 7) buckets[idx]++
+        const idx = jours.indexOf(jourDuCommerce((r as any).viewed_at))
+        if (idx >= 0) buckets[idx]++
       }
       setWeekViews(buckets)
     } else { setMonthViews(0); setTodayViews(0); setWeekViews([]) }

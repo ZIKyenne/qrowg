@@ -5,6 +5,7 @@
 // Sorties de page.tsx (3 294 lignes) : de l'affichage pur, sans lien avec le compte.
 import { SettingsSection, champStyle, etiquetteStyle } from "@/components/ui/SettingsSection"
 import { useEffect, useRef, useState, type ReactNode } from "react"
+import { dateLisible } from "@/lib/jourDuCommerce"
 
 const G     = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -62,7 +63,7 @@ export const labelStyle: React.CSSProperties = etiquetteStyle
 
 /** Une date en toutes lettres, en français : « 14 mars 2026 ». */
 export function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })
+  return dateLisible(iso, { day: "numeric", month: "short", year: "numeric" })
 }
 
 /** L'écran d'attente : la forme de la page, en gris, pendant le chargement. */

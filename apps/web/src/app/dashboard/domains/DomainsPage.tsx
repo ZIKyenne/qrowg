@@ -10,6 +10,7 @@ import MultiBrandDomainsPanel from "./MultiBrandDomainsPanel"
 import DomainRoutesPanel from "./DomainRoutesPanel"
 import { Button } from "@/components/ui/Button"
 import { useToast } from "@/components/Toast"
+import { dateLisible } from "@/lib/jourDuCommerce"
 import {
   Globe, Plus, Trash2, CheckCircle, Clock, AlertCircle,
   Copy, ExternalLink, Loader, ChevronDown, ChevronUp, X, RefreshCw, Star } from "lucide-react"
@@ -171,7 +172,7 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
   }
 
   function formatDate(iso: string) {
-    return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })
+    return dateLisible(iso, { day: "numeric", month: "short", year: "numeric" })
   }
 
   return (

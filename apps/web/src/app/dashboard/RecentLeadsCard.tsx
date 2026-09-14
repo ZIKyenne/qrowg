@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { Inbox, ArrowRight } from "lucide-react"
+import { dateLisible } from "@/lib/jourDuCommerce"
 
 const MUTED = "var(--muted)"
 
@@ -25,7 +26,7 @@ function ago(iso: string) {
   if (s < 86400) return `il y a ${Math.floor(s / 3600)} h`
   const d = Math.floor(s / 86400)
   if (d < 30) return `il y a ${d} j`
-  return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" })
+  return dateLisible(iso, { day: "2-digit", month: "short" })
 }
 
 export default function RecentLeadsCard() {

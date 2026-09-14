@@ -33,7 +33,7 @@ import { useFermetureModale, carteCliquable } from "@/lib/useFermetureModale"
 import { etatLien, styleSur, type InstantQr, type StatsLien } from "./instantQr"
 import { Button } from "@/components/ui/Button"
 import { useSessionShell } from "../sessionShell"
-import { jourDuCommerce, serieDeJours } from "@/lib/jourDuCommerce"
+import { jourDuCommerce, serieDeJours, dateLisible } from "@/lib/jourDuCommerce"
 
 const G = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -824,7 +824,7 @@ export default function QrLinkPage() {
                     </div>
                     <div style={secRow}>
                       <span style={secRowLabel}><Clock size={14} /> Expiration</span>
-                      <span style={{ flex: 1, fontSize: 12, color: detail.expires_at ? "#FBBF24" : MUTED }}>{detail.expires_at ? new Date(detail.expires_at).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" }) : "Permanent"}</span>
+                      <span style={{ flex: 1, fontSize: 12, color: detail.expires_at ? "#FBBF24" : MUTED }}>{detail.expires_at ? dateLisible(detail.expires_at, { day: "numeric", month: "short", year: "numeric" }) : "Permanent"}</span>
                       <button style={secBtn} onClick={() => demanderExpiration(detail)}>Modifier</button>
                     </div>
                     <div style={secRow}>

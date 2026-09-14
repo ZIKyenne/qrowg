@@ -5,6 +5,7 @@
 // sous les 3 000 lignes. `formatDate` a maintenant ses propres tests : elle est lue
 // à chaque ligne de la liste des QR.
 
+import { dateLisible } from "@/lib/jourDuCommerce"
 export const STATUS_CFG: Record<string, { label: string; dot: string; badge: string; text: string }> = {
   published: { label: "Publié",    dot: "var(--success)", badge: "rgba(57,255,143,0.12)",  text: "var(--success)" },
   draft:     { label: "Brouillon", dot: "#A8A190", badge: "rgba(138,132,120,0.12)", text: "#A8A190" },
@@ -41,5 +42,5 @@ export function formatDate(iso: string | null): string {
   if (diff < 60)   return `il y a ${diff}min`
   if (diff < 1440) return `il y a ${Math.floor(diff / 60)}h`
   if (diff < 10080) return `il y a ${Math.floor(diff / 1440)}j`
-  return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" })
+  return dateLisible(d, { day: "numeric", month: "short" })
 }

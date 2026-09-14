@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Mail, Calendar, Bell, BellOff, CheckCircle, Clock, Loader, ChevronRight, BarChart2 } from "lucide-react"
+import { dateLisible } from "@/lib/jourDuCommerce"
 
 type Subscription = {
   id:           string
@@ -84,7 +85,7 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
 
   function formatLastSent(iso: string | null): string {
     if (!iso) return "Jamais envoyé"
-    return "Dernier envoi : " + new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })
+    return "Dernier envoi : " + dateLisible(iso, { day: "numeric", month: "long" })
   }
 
   return (

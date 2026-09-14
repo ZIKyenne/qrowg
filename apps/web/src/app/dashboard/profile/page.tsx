@@ -24,7 +24,6 @@ import {
 import NextStepCard from "@/components/NextStepCard"
 import { useToast } from "@/components/Toast"
 import { erreurLisible } from "@/lib/erreurLisible"
-import { aujourdHuiDuCommerce } from "@/lib/jourDuCommerce"
 import { pourcentage, partDeJauge, nombreFr } from "@/lib/chiffresLisibles"
 import { csvDepuisObjets, TYPE_CSV } from "@/lib/exportCsv"
 import { cycleDe, echeance, type LigneAbonnement } from "@/lib/cycleAbonnement"
@@ -32,6 +31,7 @@ import { construireJournal, type ActivityEvent, type ActivityEventType } from ".
 import { badges as badgesDe, niveau as niveauDe, type Badge } from "./progressionProfil"
 import { SectionCard, StatPill, CountUp, SqueletteProfil, inputStyle, labelStyle, formatDate } from "./briquesProfil"
 import { ACTIVITY_CFG, ACTIVITY_FILTER_OPTS, DEFAULT_PREFS, PLAN_CFG, type PlanLimit, type Profile, type ApiKey, type RecentPage, type RecentScan, type UserPreferences, type DomainRecord, type QRStat } from "./typesProfil"
+import { dateLisible, champsDuCommerce, aujourdHuiDuCommerce } from "@/lib/jourDuCommerce"
 
 
 // -- Constantes ---------------------------------------------------------------
@@ -238,7 +238,7 @@ export default function ProfilePage() {
     if (m < 60) return `il y a ${m}min`
     if (h < 24) return `il y a ${h}h`
     if (d < 7)  return `il y a ${d}j`
-    return new Date(iso).toLocaleDateString("fr-FR", { day:"numeric", month:"short" })
+    return dateLisible(iso, { day:"numeric", month:"short" })
   }
 
   function groupLabel(iso: string): string {
@@ -1654,7 +1654,7 @@ export default function ProfilePage() {
                     <div style={{ textAlign:"right" as const }}>
                       <p style={{ color:MUTED, fontSize:11, margin:0 }}>Dernière connexion</p>
                       <p style={{ color:"var(--ink)", fontSize:11.5, fontWeight:600, margin:0 }}>
-                        {new Date(lastSignIn).toLocaleDateString("fr-FR", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" })}
+                        {dateLisible(lastSignIn, { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" })}
                       </p>
                     </div>
                   )}
@@ -1880,7 +1880,7 @@ export default function ProfilePage() {
                         <span style={{ flex:1, color:MUTED, fontSize:11.5 }}>{h.label}</span>
                         <span style={{ background:"rgba(255,255,255,0.05)", borderRadius:4, padding:"1px 6px", fontSize:11.5, color:MUTED, fontFamily:"monospace" }}>{h.format}</span>
                         <span style={{ color:MUTED, fontSize:11 }}>
-                          {new Date(h.date).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}
+                          {dateLisible(h.date, {hour:"2-digit",minute:"2-digit"})}
                         </span>
                       </div>
                     ))}
@@ -2539,19 +2539,17 @@ export default function ProfilePage() {
                         </div>
                         {/* Meta cle */}
                         <div style={{ display:"flex", gap:12, padding:"7px 13px", background:"rgba(0,0,0,0.15)", borderTop:"1px solid rgba(255,255,255,0.04)" }}>
-                          <span style={{ color:MUTED, fontSize:11 }}>
-                            Cree le {new Date(key.created_at).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})}
-                          </span>
+                          <span style={{ color:MUTED, fontSize:11 }}>Créé le {dateLisible(key.created_at, {day:"numeric",month:"short",year:"numeric"})}</span>
                           {key.last_used_at ? (
                             <span style={{ color:MUTED, fontSize:11 }}>
-                              {" . "}Dernière util. {new Date(key.last_used_at).toLocaleDateString("fr-FR",{day:"numeric",month:"short"})}
+                              {" . "}Dernière util. {dateLisible(key.last_used_at, {day:"numeric",month:"short"})}
                             </span>
                           ) : (
                             <span style={{ color:MUTED, fontSize:11 }}>{" . "}Jamais utilisee</span>
                           )}
                           {key.expires_at && (
                             <span style={{ color:new Date(key.expires_at)<new Date()?"var(--danger)":"var(--accent)", fontSize:11 }}>
-                              {" . "}Expire le {new Date(key.expires_at).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})}
+                              {" . "}Expire le {dateLisible(key.expires_at, {day:"numeric",month:"short",year:"numeric"})}
                             </span>
                           )}
                         </div>
@@ -2763,7 +2761,7 @@ export default function ProfilePage() {
                         <div style={{ display:"flex", alignItems:"center", gap:6, padding:"6px 13px", background:"rgba(57,255,143,0.03)", borderTop:"1px solid rgba(57,255,143,0.08)" }}>
                           <Shield size={10} color="var(--success)"/>
                           <span style={{ color:"rgba(57,255,143,0.7)", fontSize:11 }}>
-                            SSL actif {dm.verified_at ? `depuis le ${new Date(dm.verified_at).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})}` : ""}
+                            SSL actif {dm.verified_at ? `depuis le ${dateLisible(dm.verified_at, {day:"numeric",month:"short",year:"numeric"})}` : ""}
                           </span>
                         </div>
                       )}
@@ -2887,18 +2885,19 @@ export default function ProfilePage() {
                   <Clock size={11} color="var(--accent)"/>
                   <span style={{ color:MUTED, fontSize:11.5 }}>
                     Apercu : {(() => {
-                      const now = new Date()
-                      const d   = now.getDate().toString().padStart(2,"0")
-                      const m   = (now.getMonth()+1).toString().padStart(2,"0")
-                      const y   = now.getFullYear()
-                      const h24 = now.getHours().toString().padStart(2,"0")
-                      const min = now.getMinutes().toString().padStart(2,"0")
-                      const h12 = now.getHours() % 12 || 12
-                      const ampm = now.getHours() >= 12 ? "PM" : "AM"
+                      // L'heure du commerce, comme les autres dates de l'écran (v108).
+                      const now = champsDuCommerce(Date.now())!
+                      const d   = now.jour.toString().padStart(2,"0")
+                      const m   = now.mois.toString().padStart(2,"0")
+                      const y   = now.annee
+                      const h24 = now.heure.toString().padStart(2,"0")
+                      const min = now.minute.toString().padStart(2,"0")
+                      const h12 = now.heure % 12 || 12
+                      const ampm = now.heure >= 12 ? "PM" : "AM"
                       const dateStr = prefs.date_format === "DD/MM/YYYY" ? `${d}/${m}/${y}`
                         : prefs.date_format === "MM/DD/YYYY" ? `${m}/${d}/${y}`
                         : prefs.date_format === "YYYY-MM-DD" ? `${y}-${m}-${d}`
-                        : `${now.getDate()} ${now.toLocaleString("fr-FR",{month:"long"})} ${y}`
+                        : `${now.jour} ${dateLisible(Date.now(), { month:"long" })} ${y}`
                       const timeStr = prefs.time_format === "24 heures" ? `${h24}:${min}` : `${h12}:${min} ${ampm}`
                       return `${dateStr} a ${timeStr}`
                     })()}

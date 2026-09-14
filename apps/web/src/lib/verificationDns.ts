@@ -29,6 +29,7 @@
 // Un domaine se vérifie en le résolvant, à chaque fois, et en comparant des
 // noms d'hôte, pas des morceaux de chaîne. Module PUR.
 
+import { dateLisible } from "./jourDuCommerce"
 /** Les IP publiées par Vercel pour un domaine racine. */
 export const VERCEL_IPS = ["76.76.21.21", "76.76.21.22"]
 
@@ -129,6 +130,6 @@ export function phraseRegression(verifieLe: string | Date | null | undefined): s
 
 /** Et la phrase quand tout va bien : depuis quand on le sait. */
 export function phraseDerniereVerification(quand: Date = new Date()): string {
-  const heure = quand.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
+  const heure = dateLisible(quand, { hour: "2-digit", minute: "2-digit" })
   return `Vérifié à l'instant, à ${heure}.`
 }

@@ -9,6 +9,7 @@ import { useToast } from "@/components/Toast"
 import { erreurLisible } from "@/lib/erreurLisible"
 import { construireCsv, nomDeFichierCsv, TYPE_CSV } from "@/lib/exportCsv"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
+import { dateLisible } from "@/lib/jourDuCommerce"
 
 const G = "var(--accent, #C9A84C)"
 const MUTED = "var(--muted)"
@@ -35,8 +36,8 @@ const TYPE_LABELS: Record<string, string> = {
 
 function fmtDate(iso: string) {
   const d = new Date(iso)
-  return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" }) + " · " +
-    d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
+  return dateLisible(d, { day: "2-digit", month: "short", year: "numeric" }) + " · " +
+    dateLisible(d, { hour: "2-digit", minute: "2-digit" })
 }
 
 export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }: { leads: Lead[]; pages: Page[]; setupNeeded?: boolean }) {

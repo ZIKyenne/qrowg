@@ -2,6 +2,7 @@
 
 import { getPlan } from "@/lib/plans"
 import { useState, useEffect } from "react"
+import { dateLisible } from "@/lib/jourDuCommerce"
 import {
   Globe, Star, StarOff, Crown, Plus, Trash2,
   CheckCircle, AlertCircle, Clock, ExternalLink,
@@ -121,7 +122,7 @@ export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrim
               <StatusBadge status={rec.vercel_status} verified={rec.verified}/>
             </div>
             <p style={{ color:MUTED, fontSize:11, margin:0 }}>
-              → {rec.pages?.title ?? pages.find(p => p.id === rec.page_id)?.title ?? "Page non liée"} · {new Date(rec.created_at).toLocaleDateString("fr-FR")}
+              → {rec.pages?.title ?? pages.find(p => p.id === rec.page_id)?.title ?? "Page non liée"} · {dateLisible(rec.created_at, { day: "2-digit", month: "2-digit", year: "numeric" })}
             </p>
           </div>
 

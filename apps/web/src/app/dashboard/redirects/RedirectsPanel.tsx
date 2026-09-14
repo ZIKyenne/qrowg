@@ -7,6 +7,7 @@ import { sourceParDefaut, SOUS_DOMAINE_QROWG } from "./sourceParDefaut"
 import { useState, useEffect } from "react"
 import { useConfirm } from "@/components/ui/Confirm"
 import { Button } from "@/components/ui/Button"
+import { dateLisible } from "@/lib/jourDuCommerce"
 import {
   ArrowRight, Plus, Trash2, Pencil, ToggleLeft,
   ToggleRight, Loader, AlertCircle, CheckCircle,
@@ -162,7 +163,7 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
   }
 
   function formatDate(iso: string) {
-    return new Date(iso).toLocaleDateString("fr-FR", { day:"numeric", month:"short" })
+    return dateLisible(iso, { day:"numeric", month:"short" })
   }
 
   const active   = redirects.filter(r => r.enabled).length

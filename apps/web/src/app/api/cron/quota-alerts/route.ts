@@ -21,6 +21,7 @@ import { detailDuPassage } from "@/lib/rapportHebdo"
 import { gardeCron } from "@/lib/gardeCron"
 import { APPAREIL_ROBOT } from "@/lib/robots"
 import { pourcentage, nombreFr } from "@/lib/chiffresLisibles"
+import { debutDuMois, cleDuMois } from "@/lib/jourDuCommerce"
 
 
 // Alerte de quota, sur la coquille partagée (vouvoiement, nom échappé) — cohérente
@@ -58,9 +59,11 @@ export async function GET(req: NextRequest) {
   try {
     const supabase = createAdminClient()
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrowg.com"
-    const now = new Date()
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
-    const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
+    // Le serveur tourne en UTC : le 1er juillet à 00 h 30 à Paris, il était encore
+    // le 30 juin pour lui, et bornait le mois au 1er JUIN. Il comptait un mois de
+    // trop, et pouvait annoncer un quota dépassé sur des vues de juin (lot v108).
+    const monthStart = debutDuMois()
+    const monthKey = cleDuMois()
 
     const { data: profiles } = await supabase.from("profiles").select("id, email, full_name, plan")
     if (!profiles?.length) { await noterPassage(supabase, TACHE, "rien", "aucun profil", Date.now() - debut); return NextResponse.json({ sent: 0 }) }

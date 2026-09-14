@@ -9,14 +9,15 @@
 // Un rapport de période doit parler de la période. Module PUR : les bornes et les
 // libellés se testent sans base de données.
 
+import { dateLisible } from "./jourDuCommerce"
 export const JOUR_MS = 24 * 60 * 60 * 1000
 
 /** Bornes des sept derniers jours, et libellé lisible (« du 18 au 24 août »). */
 export function semaineEcoulee(maintenant: Date): { debutIso: string; libelle: string } {
   const fin = new Date(maintenant)
   const debut = new Date(maintenant.getTime() - 7 * JOUR_MS)
-  const jour = (d: Date) => d.getDate()
-  const mois = (d: Date) => d.toLocaleDateString("fr-FR", { month: "long" })
+  const jour = (d: Date) => Number(dateLisible(d, { day: "numeric" }))
+  const mois = (d: Date) => dateLisible(d, { month: "long" })
   const libelle = mois(debut) === mois(fin)
     ? `du ${jour(debut)} au ${jour(fin)} ${mois(fin)}`
     : `du ${jour(debut)} ${mois(debut)} au ${jour(fin)} ${mois(fin)}`

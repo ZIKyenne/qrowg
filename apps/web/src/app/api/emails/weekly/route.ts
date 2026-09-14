@@ -9,6 +9,7 @@ import { noterPassage, sansAdresses } from "@/lib/journalCron"
 import { gardeCron } from "@/lib/gardeCron"
 import { APPAREIL_ROBOT } from "@/lib/robots"
 import { raisonDuRapportSimple, pagesDuRapport, detailDuPassage, type RaisonNonEnvoi } from "@/lib/rapportHebdo"
+import { dateLisible } from "@/lib/jourDuCommerce"
 
 // Carte de statistique (nombre dore + libelle). Cellule d'une rangee a 2 colonnes.
 function statCard(value: string, label: string, side: "left" | "right"): string {
@@ -85,7 +86,9 @@ async function envoyer(req: NextRequest) {
     const destinataires = (profiles ?? []).filter(p => (pagesDe.get(p.id)?.length ?? 0) > 0)
     if (!destinataires.length) { await noterPassage(supabase, TACHE, "rien", "aucun destinataire", Date.now() - debut); return NextResponse.json({ sent: 0 }) }
 
-    const dateLabel = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })
+    // Formatée sur l'horloge du serveur (UTC), la date d'un envoi du lundi
+    // 00 h 30 à Paris portait celle de la veille (lot v108).
+    const dateLabel = dateLisible(Date.now())
     // Un rapport de période doit parler de la période : on borne les sept derniers jours.
     const { debutIso, libelle: periode } = semaineEcoulee(new Date())
 

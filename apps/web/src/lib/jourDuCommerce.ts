@@ -150,3 +150,116 @@ export function mentionFuseauDesStats(fuseauLecteur?: string | null, fuseauComme
   const ville = commerce.split("/").pop()?.replace(/_/g, " ") ?? commerce
   return `Jours comptés à l'heure de ${ville}.`
 }
+
+// ── L'angle mort du balayage de ce module (lot v108) ────────────────────────
+//
+// Relevé du 14 septembre. Le balayage du lot v101 interdit
+// `toISOString().slice(0, 10)`. Il ne voit pas les DEUX autres façons de lire une
+// horloge qui n'est pas celle du commerçant :
+//
+//   `now.getMonth()`, `getDate()`, `getHours()`  → l'horloge de la machine
+//   `toLocaleDateString("fr-FR", { … })`         → l'horloge de la machine
+//
+// Trois conséquences mesurées :
+//
+//  1. Le MOIS du quota n'est pas celui du tableau de bord.
+//       cron/quota-alerts:62   new Date(now.getFullYear(), now.getMonth(), 1)
+//     Le serveur tourne en UTC. Le 1er juillet à 00 h 30 à Paris, il est encore
+//     le 30 juin pour lui : sa borne de mois est le 1er JUIN. Il compte un mois
+//     de trop, et peut annoncer un quota dépassé sur des vues de juin — l'alerte
+//     qui pousse à changer de plan.
+//
+//  2. L'HEURE DE POINTE est celle du navigateur.
+//       AnalyticsClient:195    new Date(t).getHours()
+//     Un même scan donne 21 h à Paris, 19 h en UTC, 15 h à la Martinique, 9 h à
+//     Tahiti. Le produit dit « votre heure de pointe » comme un fait sur le
+//     commerce ; c'est un fait sur l'appareil qui regarde.
+//
+//  3. La DATE DES E-MAILS est celle du serveur.
+//       emails/weekly:88       new Date().toLocaleDateString("fr-FR", { … })
+//     Un rapport parti lundi 00 h 30 à Paris porte la date de la veille.
+//
+// La règle du lot v101 ne change pas, elle s'étend : **une heure, un jour, un
+// mois sont ceux du commerçant, pas ceux de l'horloge qui calcule.**
+
+/** Les champs d'un instant, lus chez le commerçant. */
+export type ChampsDuJour = { annee: number; mois: number; jour: number; heure: number; minute: number }
+
+export function champsDuCommerce(instant: Date | string | number | null | undefined, fuseau?: string | null): ChampsDuJour | null {
+  const d = instantDe(instant)
+  if (!d) return null
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: tzDe(fuseau), year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hour12: false,
+  }).formatToParts(d)
+  const n = (t: string) => Number(parts.find(p => p.type === t)?.value ?? "0")
+  // « 24 » à minuit sur certains moteurs : ramené à 0, le jour est déjà le bon.
+  return { annee: n("year"), mois: n("month"), jour: n("day"), heure: n("hour") % 24, minute: n("minute") }
+}
+
+/** L'heure (0–23) de cet instant chez le commerçant. `null` si illisible. */
+export function heureDuCommerce(instant: Date | string | number | null | undefined, fuseau?: string | null): number | null {
+  return champsDuCommerce(instant, fuseau)?.heure ?? null
+}
+
+/** La clé du mois — « 2026-07 » — chez le commerçant. */
+export function cleDuMois(instant: Date | string | number = Date.now(), fuseau?: string | null): string {
+  const c = champsDuCommerce(instant, fuseau)
+  return c ? `${c.annee}-${String(c.mois).padStart(2, "0")}` : ""
+}
+
+/**
+ * L'instant précis où le jour a commencé chez le commerçant, en ISO.
+ *
+ * On part de son jour calendaire, puis on cherche l'instant UTC qui s'y projette
+ * à minuit : `Intl` seul ne rend pas de décalage, et l'écrire à la main se
+ * trompe deux dimanches par an.
+ */
+function minuitChez(cle: CleDeJour, fuseau?: string | null): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(cle)
+  if (!m) return ""
+  const tz = tzDe(fuseau)
+  // Première approximation : minuit UTC de ce jour. On corrige du décalage lu
+  // à cet instant-là (l'heure d'été change le décalage, pas la méthode).
+  let t = Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+  for (let i = 0; i < 3; i++) {
+    const c = champsDuCommerce(t, tz)
+    if (!c) return new Date(t).toISOString()
+    const ecart = (c.heure * 60 + c.minute) + (jourDuCommerce(t, tz) > cle ? 1440 : jourDuCommerce(t, tz) < cle ? -1440 : 0)
+    if (ecart === 0) break
+    t -= ecart * 60_000
+  }
+  return new Date(t).toISOString()
+}
+
+/** Le début du jour en cours chez le commerçant, en ISO — une borne de requête. */
+export function debutDuJour(now: number = Date.now(), fuseau?: string | null): string {
+  return minuitChez(jourDuCommerce(now, fuseau), fuseau)
+}
+
+/** Le début du mois en cours chez le commerçant, en ISO. */
+export function debutDuMois(now: number = Date.now(), fuseau?: string | null): string {
+  const c = champsDuCommerce(now, fuseau)
+  if (!c) return ""
+  return minuitChez(`${c.annee}-${String(c.mois).padStart(2, "0")}-01`, fuseau)
+}
+
+/** Le début du jour, N jours plus tôt, chez le commerçant. */
+export function debutDuJourIlYA(jours: number, now: number = Date.now(), fuseau?: string | null): string {
+  const serie = serieDeJours(Math.max(1, Math.floor(jours) + 1), fuseau, now)
+  return minuitChez(serie[0], fuseau)
+}
+
+/**
+ * Une date écrite pour le commerçant — jamais sur l'horloge de la machine qui
+ * la formate. C'est le même oubli que `getHours()`, sous une autre forme.
+ */
+export function dateLisible(
+  instant: Date | string | number | null | undefined,
+  options: Intl.DateTimeFormatOptions = { day: "numeric", month: "long" },
+  fuseau?: string | null,
+): string {
+  const d = instantDe(instant)
+  if (!d) return ""
+  return new Intl.DateTimeFormat("fr-FR", { timeZone: tzDe(fuseau), ...options }).format(d)
+}

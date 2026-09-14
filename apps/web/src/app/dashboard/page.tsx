@@ -6,6 +6,7 @@ import { accessibleOwnerIds } from "@/lib/team"
 import { destinationApresConnexion, ECHAPPE } from "./atterrissage"
 import { APPAREIL_ROBOT } from "@/lib/robots"
 import { PAGES_LISTE, PAGES_MESUREES, FENETRE_OBJECTIFS_JOURS } from "@/lib/perimetreDeMesure"
+import { debutDuMois, debutDuJour, debutDuJourIlYA, serieDeJours, jourDuCommerce } from "@/lib/jourDuCommerce"
 
 // Rendu SERVEUR des données initiales du dashboard : évite le 2e getUser() côté
 // client + le waterfall de requêtes + le spinner. DashboardClient garde son
@@ -46,22 +47,25 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
 
   let monthViews = 0, todayViews = 0, weekViews: number[] = []
   if (ids.length) {
-    const now = new Date()
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-    const weekStart = new Date(todayStart); weekStart.setDate(weekStart.getDate() - 6)
+    // Le pendant SERVEUR de DashboardClient : sur Vercel il tourne en UTC, donc
+    // il bornait le mois et le jour ailleurs que le navigateur du commerçant. Les
+    // deux comptaient « ce mois-ci » sur deux mois différents (lot v108).
+    const monthStart = debutDuMois()
+    const todayStart = debutDuJour()
+    const weekStart = debutDuJourIlYA(6)
     const [{ count: mCount }, { count: tCount }, { data: wRows }] = await Promise.all([
       supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", monthStart).neq("device", APPAREIL_ROBOT),
-      supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", todayStart.toISOString()).neq("device", APPAREIL_ROBOT),
-      supabase.from("page_views").select("viewed_at").in("page_id", ids).gte("viewed_at", weekStart.toISOString()).neq("device", APPAREIL_ROBOT),
+      supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", todayStart).neq("device", APPAREIL_ROBOT),
+      supabase.from("page_views").select("viewed_at").in("page_id", ids).gte("viewed_at", weekStart).neq("device", APPAREIL_ROBOT),
     ])
     monthViews = mCount ?? 0
     todayViews = tCount ?? 0
-    const buckets = Array(7).fill(0)
+    // Le rang se lit sur le JOUR, pas sur un écart de 24 h (lot v108).
+    const jours = serieDeJours(7)
+    const buckets = Array(jours.length).fill(0)
     for (const r of (wRows ?? [])) {
-      const d = new Date((r as any).viewed_at)
-      const idx = Math.floor((d.getTime() - weekStart.getTime()) / 86400000)
-      if (idx >= 0 && idx < 7) buckets[idx]++
+      const idx = jours.indexOf(jourDuCommerce((r as any).viewed_at))
+      if (idx >= 0) buckets[idx]++
     }
     weekViews = buckets
   }

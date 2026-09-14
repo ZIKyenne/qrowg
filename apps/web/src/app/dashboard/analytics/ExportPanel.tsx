@@ -4,6 +4,7 @@ import { useState, useCallback } from "react"
 import { Download, Calendar, Lock, CheckCircle, Loader, Eye, QrCode, Link2, Layers, Globe } from "lucide-react"
 import { construireCsv, TYPE_CSV } from "@/lib/exportCsv"
 import { aujourdHuiDuCommerce, serieDeJours } from "@/lib/jourDuCommerce"
+import { dateLisible } from "@/lib/jourDuCommerce"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type ViewRow    = { viewed_at: string; device: string; source: string | null; country: string | null; page_id: string }
@@ -66,7 +67,7 @@ function downloadCSV(csv: string, filename: string) {
 }
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })
+  return dateLisible(iso, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })
 }
 
 function todaySlug(): string {
@@ -209,7 +210,7 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
         if (csv) downloadCSV(csv, filename)
       })
 
-      setLastExport(new Date().toLocaleTimeString("fr-FR"))
+      setLastExport(dateLisible(Date.now(), { hour: "2-digit", minute: "2-digit", second: "2-digit" }))
       setExporting(false)
     }, 100)
   }, [isPaid, selected, period, customFrom, customTo, views, scans, clicks, blocks, geoScans, pageMap])

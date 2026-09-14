@@ -86,6 +86,7 @@ interface Props {
 export type { QRStyleConfig } from "./qrRender"
 import type { QRStyleConfig } from "./qrRender"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
+import { dateLisible } from "@/lib/jourDuCommerce"
 
 export const DOT_STYLES: { id: QRStyleConfig["dotStyle"]; label: string; emoji: string }[] = [
   { id:"square",     label:"Classique",    emoji:"⬛" },
@@ -438,7 +439,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       if (d.empty || d.error) { setStatsExporting(false); return } // pas de CSV vide si QR introuvable/erreur
       const rows = d.sparkline?.map((v: number, i: number) => {
         const date = new Date(); date.setDate(date.getDate() - 30 + i)
-        return [date.toLocaleDateString("fr-FR"), v]
+        return [dateLisible(date, { day: "2-digit", month: "2-digit", year: "numeric" }), v]
       }) ?? []
       const blob = new Blob([construireCsv(["Date", "Scans"], rows)], { type: TYPE_CSV })
       const url  = URL.createObjectURL(blob)
@@ -1759,7 +1760,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   { label:"Scans total",   value:active.total_scans.toLocaleString(),               color:"var(--accent)", icon:"📡" },
                   { label:"Vues page",     value:(active.pages?.total_views ?? 0).toLocaleString(),  color:"var(--success)", icon:"👁" },
                   { label:"Dernier scan",  value:formatDate(active.last_scan_at),                   color:"var(--muted)", icon:"🕐" },
-                  { label:"Créé le",       value:new Date(active.created_at).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"}), color:"var(--muted)", icon:"📅" },
+                  { label:"Créé le",       value:dateLisible(active.created_at, {day:"numeric",month:"short",year:"numeric"}), color:"var(--muted)", icon:"📅" },
                 ].map((s,i) => (
                   <div key={i} style={{ background:"var(--surface)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:9, padding:"10px 12px" }}>
                     <p style={{ color:"var(--muted)", fontSize:11, textTransform:"uppercase", letterSpacing:1.2, margin:"0 0 4px" }}>{s.icon} {s.label}</p>

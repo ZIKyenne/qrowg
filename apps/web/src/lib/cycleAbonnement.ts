@@ -2,6 +2,7 @@
 // Les identifiants de prix Stripe restent côté serveur ; le cycle se lit sur la
 // durée de la période en cours (un mois ≈ 28-31 jours, un an ≈ 365).
 
+import { dateLisible } from "./jourDuCommerce"
 export type LigneAbonnement = {
   current_period_start?: string | null
   current_period_end?: string | null
@@ -24,6 +25,6 @@ export function echeance(l: LigneAbonnement | null | undefined, maintenant = Dat
   if (!l?.current_period_end) return null
   const t = Date.parse(l.current_period_end)
   if (!Number.isFinite(t) || t < maintenant) return null
-  const date = new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })
+  const date = dateLisible(t, { day: "numeric", month: "long", year: "numeric" })
   return { libelle: l.cancel_at_period_end ? "Se termine le" : "Renouvellement le", date }
 }

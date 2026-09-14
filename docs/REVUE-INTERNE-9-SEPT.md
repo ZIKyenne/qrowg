@@ -2546,3 +2546,74 @@ sans attendre (2 tests), le bandeau écrit en dur qui revient (2), l'accord qui
 disparaît (1).
 
 Suite complète : 5 357 tests, 322 fichiers. Build vert.
+
+---
+
+## v108 — L'angle mort du balayage v101
+
+**Le relevé.** Le lot v101 a posé : *un jour, c'est un jour chez le commerçant.*
+Son balayage interdit `toISOString().slice(0, 10)`. Il ne voit pas les **deux
+autres** façons de lire une horloge qui n'est pas la sienne :
+
+    now.getMonth(), getDate(), getHours()      → l'horloge de la machine
+    toLocaleDateString("fr-FR", { … })         → l'horloge de la machine
+
+**1. Le mois du quota n'est pas celui du tableau de bord.** La même ligne, aux
+deux bouts :
+
+    cron/quota-alerts:62   new Date(now.getFullYear(), now.getMonth(), 1)
+    DashboardClient:127    new Date(now.getFullYear(), now.getMonth(), 1)
+
+Le serveur tourne en UTC, le navigateur à l'heure du commerçant. Le 1er juillet à
+00 h 30 à Paris :
+
+| | borne du mois |
+|---|---|
+| serveur (alerte de quota) | `2026-06-01T00:00:00Z` — le 1er **juin** |
+| navigateur (tableau de bord) | `2026-07-01T00:00:00+02` |
+
+L'alerte comptait **un mois de trop**, et pouvait annoncer un quota dépassé sur
+des vues de juin — l'alerte qui pousse à changer de plan. Le pendant serveur du
+tableau de bord (`dashboard/page.tsx:50`) avait le même défaut.
+
+**2. L'heure de pointe est celle du navigateur.** `AnalyticsClient:195` faisait
+`new Date(t).getHours()`. Un même scan (`2026-07-11T19:30:00Z`) donne :
+
+    Europe/Paris 21 h · UTC 19 h · America/Martinique 15 h · Pacific/Tahiti 9 h
+
+Le produit dit « votre heure de pointe » comme un fait sur le commerce ; c'était
+un fait sur l'appareil qui regarde.
+
+**3. La date des e-mails est celle du serveur.** `emails/weekly:88` formatait sur
+l'horloge de la machine : un rapport parti lundi 00 h 30 à Paris portait la date
+de la veille. 24 autres dates d'écran avaient le même oubli.
+
+**Ce que le lot change.** Le module du lot v101 est **étendu**, pas doublé : le
+fuseau par défaut y reste importé de `lib/heureDuCommerce`, et la garde le
+vérifie. `champsDuCommerce`, `heureDuCommerce`, `cleDuMois`, `debutDuJour`,
+`debutDuMois`, `debutDuJourIlYA`, `dateLisible`.
+
+Les bornes ne sont pas calculées avec un décalage écrit à la main : on part de
+minuit UTC du jour visé et on **relit** l'heure chez le commerçant jusqu'à
+tomber sur minuit. Quatre tests le vérifient sur le dimanche de 25 h.
+
+**Une courbe corrigée au passage.** Les sept jours du tableau de bord se
+rangeaient par `Math.floor((d - weekStart) / 86400000)` — un pas fixe de 24 h. Les
+deux dimanches de changement d'heure durent 23 h et 25 h : toute la courbe y
+glissait d'une colonne. Le rang se lit maintenant sur le jour.
+
+**Branché** : l'alerte de quota, les deux moitiés du tableau de bord (serveur et
+navigateur), l'heure de pointe, les deux e-mails, et les 25 dates d'écran.
+
+**Garde.** `lib/horlogeDuCommercant.test.ts` (18 tests). La règle de classe :
+**une heure, un jour, un mois sont ceux du commerçant, pas ceux de l'horloge qui
+calcule.** Deux balayages — les champs `getMonth/getDate/getHours` d'une part,
+`toLocale*String` sans `timeZone` d'autre part. Les durées relatives et l'année
+du pied de page sont exemptées : elles ne nomment aucun jour. Et un dernier test
+exige que la garde v101 soit toujours là.
+
+**Vérification par mutation.** Trois défauts réinjectés : l'alerte de quota qui
+reprend l'horloge du serveur (2 tests), l'heure de pointe celle du navigateur
+(2), et la borne qui n'est plus ramenée à minuit (3).
+
+Suite complète : 5 375 tests, 323 fichiers. Build vert.

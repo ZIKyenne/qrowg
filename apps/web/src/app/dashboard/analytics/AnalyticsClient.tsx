@@ -22,6 +22,7 @@ import HeatmapPanel from "./HeatmapPanel"
 import SupportPanel from "./SupportPanel"
 import { ligneDeRobot } from "@/lib/robots"
 import { nombreFr, evolution as evolutionChiffree } from "@/lib/chiffresLisibles"
+import { heureDuCommerce } from "@/lib/jourDuCommerce"
 
 type Profile = { total_scans: number; plan: string; email?: string; full_name?: string } | null
 type Page = { id: string; title: string; slug: string; total_views: number; status: string }
@@ -192,7 +193,10 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
     const topSource = sourceData[0]?.name || null
     const topDevice = deviceData[0]?.name || null
     const hourCount: Record<number, number> = {}
-    times.forEach(t => { const h = new Date(t).getHours(); hourCount[h] = (hourCount[h] || 0) + 1 })
+    // `getHours()` lisait l'horloge du NAVIGATEUR : le même scan donnait 21 h à
+    // Paris, 15 h à la Martinique, 9 h à Tahiti. « Votre heure de pointe » est un
+    // fait sur le commerce, pas sur l'appareil qui regarde (lot v108).
+    times.forEach(t => { const h = heureDuCommerce(t); if (h !== null) hourCount[h] = (hourCount[h] || 0) + 1 })
     const peakEntry = Object.entries(hourCount).sort((a, b) => b[1] - a[1])[0]
     return { evenements: times.length, assez, topSource, topDevice, peakHour: peakEntry ? Number(peakEntry[0]) : null }
   }, [noData, sourceData, deviceData, filteredScans, filteredViews])
