@@ -1454,3 +1454,78 @@ le filtre « published », la préférence relue à la main sans dédoublonnage,
 compte sans adresse redevenu invisible. Cinq tests tombent.
 
 Suite complète : 5 053 tests, 306 fichiers. Build vert.
+
+---
+
+## v92 — la règle du 10 septembre, et le chemin qui lui échappait
+
+**Le relevé.** Le produit s'est donné une règle, écrite noir sur blanc dans
+`app/preuveNonInventee.test.ts` le 10 septembre :
+
+> le pré-remplissage donne la **structure** et le **titre** (l'emplacement),
+> jamais l'**affirmation**. Les champs de preuve arrivent vides.
+
+Elle est tenue par les 34 modèles de page et par les recettes de la création
+guidée. Elle n'a jamais été appliquée à la **génération par IA**.
+
+Le brief que le prompt du produit demande lui-même, pour « Le Comptoir, bistrot
+à Lyon », passé dans `aiBriefToTemplate` : 8 blocs, **14 affirmations
+inventées**.
+
+```
+testimonials.name1        = « Marie L. »
+testimonials.text1        = « La meilleure quenelle de Lyon. »
+testimonials.stars1       = « 5 »
+menu_section.item1_price  = « 18 € »
+opening_hours.mon_fri     = « 12h-14h / 19h-22h »
+google_maps_embed.address = « 14 rue des Marronniers, 69002 Lyon »
+social_links.instagram    = « https://instagram.com »
+cta_button.url            = « # »
+```
+
+C'est mot pour mot l'exemple que la revue du 10 septembre citait — « Marie L. —
+La meilleure entrecôte de Paris » — revenu par une autre porte. Et pire que sur
+un modèle : la page est présentée au commerçant comme **la sienne**, faite à
+partir de sa description. Les horaires inventés alimentent ensuite le badge
+public « Ouvert · ferme à 22 h » (lot v79) ; l'adresse inventée s'affiche en
+carte ; le lien Instagram mène à l'accueil d'Instagram, pas à son compte ; le
+bouton « Réserver » pointe `#`.
+
+Trois de ces quatorze venaient du **code lui-même**, pas de l'IA : la note par
+défaut `"5"`, le repli `SOCIAL_FALLBACK`, et l'URL `"#"`.
+
+**Ce que le lot change.** `lib/faitsDuCommercant.ts`, module pur. Deux natures
+de champ, deux traitements :
+
+- la **preuve** (avis, notes, chiffres de vanité, logos, certifications) n'est
+  jamais écrite par le produit — même si la description la contient : personne
+  d'autre que ses clients ne peut la donner ;
+- le **fait chiffré** (prix, horaires, adresse, lien, téléphone) n'est gardé que
+  s'il vient de ce que le commerçant a écrit. La règle est vérifiable :
+  **tous** les chiffres de la valeur doivent se retrouver dans sa description ;
+  une valeur sans chiffre doit y retrouver un de ses mots. Sans description,
+  rien n'est relayé.
+
+Le mapper fait passer chaque bloc par cette règle, la route lui donne la
+description, le prompt cesse de demander une note 1-5 par avis et une section de
+« preuve sociale », et les trois fabrications du code disparaissent. La
+structure, elle, ne bouge pas : « Quenelle de brochet » reste, « 18 € » attend.
+
+**Garde.** `lib/faitsDuCommercant.test.ts` (16 tests) rejoue le brief du relevé
+et exige zéro affirmation, vérifie que la structure survit, et que ce que le
+commerçant a écrit arrive bien dans sa page. Dernier test : **les trois
+fabricants de blocs du produit — modèles, recettes, IA — ont chacun une garde
+nommée.** Un quatrième apparaîtrait sans garde ; c'est exactement ce qui était
+arrivé à l'IA.
+
+**Quatre gardes à moi, mises à jour.** `ai-generate.test.ts` figeait l'ancien
+comportement : `item1_price = "8€"` sans description, `url = "#"`, les replis
+`twitch.tv` / `t.me`, le secours `instagram.com`. Les cas sont conservés avec
+leur nouvelle valeur et la raison écrite au-dessus — plus un cas ajouté qui
+vérifie que la structure reste quand les faits partent.
+
+**Vérification par mutation.** Trois défauts réinjectés — le nettoyage retiré,
+la note revenue à « 5 », et la règle des chiffres passée de « tous » à « au
+moins un ». Quatre tests tombent.
+
+Suite complète : 5 069 tests, 307 fichiers. Build vert.

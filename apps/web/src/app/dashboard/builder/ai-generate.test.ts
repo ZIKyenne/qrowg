@@ -45,7 +45,12 @@ describe("aiBriefToTemplate", () => {
         { kind: "map", title: "Adresse", text: "12 rue de Paris", items: [] },
       ],
     }
-    const t = aiBriefToTemplate(brief)
+    // Depuis le lot v92, un prix / horaire / adresse / lien n'entre dans la page
+    // que s'il vient de ce que le commerçant a écrit. On le lui donne ici : ce
+    // cas vérifie le MAPPAGE, pas la règle des faits (elle a sa propre garde).
+    const DESCRIPTION = "Coaching et restauration. Soupe maison 8€, formule Pro 49€/mois. "
+      + "Ouvert 9h-18h sur RDV, 12 rue de Paris. Réservation https://calendly.com, instagram.com/x"
+    const t = aiBriefToTemplate(brief, DESCRIPTION)
     assertValidBlocks(t.blocks)
     const types = t.blocks.map(b => b.type)
     expect(types).toEqual([
@@ -58,13 +63,24 @@ describe("aiBriefToTemplate", () => {
     expect(byType.services_list.s1_icon).toBe("💪")
     expect(byType.menu_section.item1_price).toBe("8€")
     expect(byType.pricing.title1).toBe("Pro")
-    expect(byType.testimonials.stars1).toBe("5")
+    // La preuve, elle, n'est jamais relayée — même écrite dans la description :
+    // personne d'autre que ses clients ne peut la donner (lot v92).
+    expect(byType.testimonials.stars1).toBe("")
+    expect(byType.testimonials.name1).toBe("")
     expect(byType.faq.a1).toBe("Oui")
     expect(byType.opening_hours.mon_fri).toBe("9h-18h")
     expect(byType.opening_hours.note).toBe("Sur RDV")
     expect(byType.cta_button.url).toBe("https://calendly.com")
     expect(byType.social_links.instagram).toBe("https://instagram.com/x")
     expect(byType.google_maps_embed.address).toBe("12 rue de Paris")
+
+    // Et sans description, la même structure arrive sans aucun de ces faits.
+    const nu = Object.fromEntries(aiBriefToTemplate(brief).blocks.map(b => [b.type, b.content]))
+    expect(nu.menu_section.item1_name, "la structure doit rester").toBe("Soupe")
+    for (const [type, champ] of [["menu_section", "item1_price"], ["opening_hours", "mon_fri"],
+      ["google_maps_embed", "address"], ["cta_button", "url"], ["social_links", "instagram"]] as const) {
+      expect(nu[type][champ], `${type}.${champ}`).toBe("")
+    }
   })
 
   it("plafonne les listes à 3 (rendu public) et ignore les lignes vides", () => {
@@ -83,19 +99,29 @@ describe("aiBriefToTemplate", () => {
 
   it("cta : n'accepte comme URL que ce qui ressemble à un lien (jamais une phrase)", () => {
     const phrase = aiBriefToTemplate({ ambiance: "gold", sections: [{ kind: "cta", title: "Réserver", text: "Contactez-nous vite", items: [] }] })
-    expect(phrase.blocks.find(b => b.type === "cta_button")!.content.url).toBe("#") // phrase -> pas de href cassé
-    const withUrl = aiBriefToTemplate({ ambiance: "gold", sections: [{ kind: "cta", title: "Réserver", text: "une phrase", items: [{ label: "", value: "calendly.com/x", detail: "" }] }] })
-    expect(withUrl.blocks.find(b => b.type === "cta_button")!.content.url).toBe("calendly.com/x") // repli sur l'item URL
+    // Valait « # » avant le lot v92 : un bouton mort en ligne, qui a l'air d'un
+    // lien. Sans lien réel, l'emplacement reste vide et l'écran de publication
+    // le signale (« Bouton « Réserver » sans lien »).
+    expect(phrase.blocks.find(b => b.type === "cta_button")!.content.url).toBe("")
+    // Et un vrai lien n'est gardé que s'il vient de la description.
+    const withUrl = aiBriefToTemplate(
+      { ambiance: "gold", sections: [{ kind: "cta", title: "Réserver", text: "une phrase", items: [{ label: "", value: "calendly.com/x", detail: "" }] }] },
+      "Réservations sur calendly.com/x",
+    )
+    expect(withUrl.blocks.find(b => b.type === "cta_button")!.content.url).toBe("calendly.com/x")
   })
 
-  it("social : domaines de secours corrects (twitch.tv, t.me)", () => {
+  it("social : un réseau nommé sans lien ne devient pas un lien vers l'accueil du réseau", () => {
+    // Le mapper repliait sur « https://twitch.tv » / « https://t.me » : sur la
+    // page d'un commerçant, ce n'est pas son compte, c'est l'accueil du réseau.
+    // Un bouton qui promet un profil et n'y mène pas (lot v92).
     const t = aiBriefToTemplate({ ambiance: "gold", sections: [{ kind: "social", title: "", text: "", items: [
       { label: "Twitch", value: "", detail: "" },
       { label: "Telegram", value: "", detail: "" },
     ] }] })
     const soc = t.blocks.find(b => b.type === "social_links")!.content
-    expect(soc.twitch).toBe("https://twitch.tv")
-    expect(soc.telegram).toBe("https://t.me")
+    expect(soc.twitch).toBeUndefined()
+    expect(soc.telegram).toBeUndefined()
   })
 
   it("kind inconnu ou section vide -> ignoré (pas de bloc parasite)", () => {
@@ -114,16 +140,17 @@ describe("aiBriefToTemplate", () => {
     expect(aiBriefToTemplate(null as any).blocks[0].type).toBe("profile")
   })
 
-  it("réseau social : libellés libres normalisés + secours instagram", () => {
+  it("réseau social : libellés libres normalisés, et seuls les vrais liens gardés", () => {
     const t = aiBriefToTemplate({ name: "X", ambiance: "gold", sections: [
       { kind: "social", title: "", text: "", items: [
         { label: "insta", value: "", detail: "" },
         { label: "Le Facebook", value: "https://fb.com/x", detail: "" },
         { label: "zzz", value: "", detail: "" },
       ] },
-    ] })
+    ] }, "Notre page facebook : https://fb.com/x")
     const soc = t.blocks.find(b => b.type === "social_links")!.content
-    expect(soc.instagram).toBe("https://instagram.com")
+    // « insta » sans URL ne produit plus « https://instagram.com » (lot v92).
+    expect(soc.instagram).toBeUndefined()
     expect(soc.facebook).toBe("https://fb.com/x")
     expect(soc.zzz).toBeUndefined()
   })

@@ -80,7 +80,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Réponse illisible de l'IA. Réessayez." }, { status: 502 })
     }
 
-    const template = aiBriefToTemplate(brief)
+    // La description sert d'oracle : un prix, un horaire, une adresse ou un lien
+    // n'entre dans la page que s'il vient de là (lot v92).
+    const template = aiBriefToTemplate(brief, description)
     if (!template.blocks.length) {
       return NextResponse.json({ error: "Aucun contenu généré. Réessayez avec plus de détails." }, { status: 502 })
     }

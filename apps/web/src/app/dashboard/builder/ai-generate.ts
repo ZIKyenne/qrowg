@@ -3,6 +3,7 @@
 // Le mapper PUR ci-dessous transforme ce brief en un PageTemplate valide (types + clés de blocs réels),
 // donc l'IA ne peut jamais émettre de bloc malformé. Fichier sans React -> testable (ai-generate.test.ts).
 import { themeForAmbiance, AMBIANCE_KEYS, type PageTemplate } from "./page-templates"
+import { nettoyerLesBlocs } from "@/lib/faitsDuCommercant"
 
 // ── Schéma de sortie imposé à l'IA (JSON Schema pour output_config.format) ────────
 export const AI_SECTION_KINDS = [
@@ -61,13 +62,10 @@ const nonEmpty = (v: string) => v.length > 0
 
 // Réseau social : normalise un libellé libre ("Instagram", "insta") vers une clé connue.
 const SOCIAL_KEYS = ["instagram", "facebook", "tiktok", "linkedin", "youtube", "twitter", "x", "whatsapp", "snapchat", "pinterest", "twitch", "telegram"]
-// URL d'accueil correcte par réseau (les domaines diffèrent : twitch.tv, t.me, wa.me…).
-const SOCIAL_FALLBACK: Record<string, string> = {
-  instagram: "https://instagram.com", facebook: "https://facebook.com", tiktok: "https://tiktok.com",
-  linkedin: "https://linkedin.com", youtube: "https://youtube.com", twitter: "https://twitter.com",
-  x: "https://x.com", whatsapp: "https://wa.me", snapchat: "https://snapchat.com",
-  pinterest: "https://pinterest.com", twitch: "https://twitch.tv", telegram: "https://t.me",
-}
+// Il y avait ici une table d'URL d'accueil par réseau, utilisée quand l'IA
+// nommait un réseau sans donner de lien. Elle a été retirée au lot v92 :
+// « https://instagram.com » sur la page d'un commerçant n'est pas son compte,
+// c'est l'accueil d'Instagram — un bouton qui promet un profil et n'y mène pas.
 // Une chaîne ressemble-t-elle à une URL/lien (pas une phrase) ? (pas d'espace + un caractère d'URL)
 function looksLikeUrl(v: string): boolean {
   return v.length > 0 && !/\s/.test(v) && /[.#/@:]/.test(v)
@@ -84,7 +82,13 @@ function socialKeyOf(label: string): string | null {
 }
 
 // ── Mapper PUR : brief IA -> PageTemplate valide ─────────────────────────────────
-export function aiBriefToTemplate(brief: AiBrief): PageTemplate {
+/**
+ * @param description Ce que le commerçant a écrit. Un prix, un horaire, une
+ * adresse ou un lien n'entre dans sa page que s'il vient de là — et une preuve
+ * (avis, note, chiffre de vanité) n'y entre jamais. Règle du 10 septembre,
+ * appliquée au chemin IA depuis le lot v92 (`lib/faitsDuCommercant`).
+ */
+export function aiBriefToTemplate(brief: AiBrief, description?: string | null): PageTemplate {
   const name = s(brief?.name, 80) || "Mon activité"
   const tagline = s(brief?.tagline, 120)
   const badge = s(brief?.badge, 40)
@@ -115,7 +119,7 @@ export function aiBriefToTemplate(brief: AiBrief): PageTemplate {
     emoji: "✨",
     desc: tagline || "Généré par l'IA",
     theme,
-    blocks,
+    blocks: nettoyerLesBlocs(blocks, description) as PageTemplate["blocks"],
   }
 }
 
@@ -174,7 +178,9 @@ function mapSection(kind: string, title: string, text: string, rows: { label: st
         const n = i + 1
         content[`name${n}`] = r.label
         content[`text${n}`] = r.detail || r.value
-        content[`stars${n}`] = /^[1-5]$/.test(r.value) ? r.value : "5"
+        // Une note que personne n'a donnée n'est pas « 5 » par défaut : elle
+        // n'existe pas. `lib/faitsDuCommercant` vide de toute façon ce champ.
+        content[`stars${n}`] = /^[1-5]$/.test(r.value) ? r.value : ""
       })
       return { type: "testimonials", content }
     }
@@ -199,7 +205,9 @@ function mapSection(kind: string, title: string, text: string, rows: { label: st
     case "cta": {
       const label = title || rows[0]?.label || "Me contacter"
       // N'utilise comme href que ce qui ressemble vraiment à une URL (jamais une phrase).
-      const url = [text, rows[0]?.value].find(v => v && looksLikeUrl(v)) || "#"
+      // Un bouton qui pointe « # » est un bouton mort en ligne. Sans lien réel,
+      // on laisse l'emplacement vide : l'écran de publication le signale.
+      const url = [text, rows[0]?.value].find(v => v && looksLikeUrl(v)) || ""
       return { type: "cta_button", content: { label, url, style: "gold", icon: "" } }
     }
     case "announcement": {
@@ -211,9 +219,10 @@ function mapSection(kind: string, title: string, text: string, rows: { label: st
       const content: Record<string, string> = {}
       rows.forEach(r => {
         const key = socialKeyOf(r.label)
-        if (key) content[key] = looksLikeUrl(r.value) ? r.value : (SOCIAL_FALLBACK[key] || `https://${key}.com`)
+        // L'accueil du réseau n'est pas le compte du commerçant : sans URL
+        // réelle, on n'écrit pas de lien (lot v92).
+        if (key && looksLikeUrl(r.value)) content[key] = r.value
       })
-      if (!Object.keys(content).length) content.instagram = "https://instagram.com"
       return { type: "social_links", content }
     }
     case "map": {
@@ -234,11 +243,12 @@ export function buildSystemPrompt(): string {
     "",
     "Règles :",
     "- Écris TOUT en français, ton premium et concret (pas de remplissage générique).",
-    "- Invente un nom crédible si aucun n'est donné, une accroche courte et un petit badge (ex. « ⭐ Recommandé », « Ouvert »).",
+    "- Invente un nom crédible si aucun n'est donné, et une accroche courte. Le badge décrit le métier (« Bistrot », « Coiffeur »), jamais une recommandation ni un état (« Recommandé », « Ouvert », « 4,9/5 ») : le produit ne les écrirait pas.",
     `- ambiance : choisis la clé la plus adaptée parmi : ${AMBIANCE_KEYS.join(", ")}. (velvet/neon = restauration chaleureuse, rose/spa = beauté/bien-être, navy/slate = corporate/tech, wood = artisan, ink/violet/coral = créatif, forest = association, gold = premium neutre, calm/cocktail = ambiance douce/nocturne.)`,
-    "- sections : 4 à 7 sections pertinentes pour le métier, dans un ordre logique (présentation, offre, preuve sociale, infos pratiques, contact).",
-    "- Types de section (kind) : about (texte), services, menu (restauration), pricing, testimonials, faq, hours (horaires), cta (bouton d'action), announcement (annonce), social (réseaux), map (adresse), skills (compétences).",
-    "- items : lignes génériques {label, value, detail}. Selon le kind : services -> label=nom, value=emoji, detail=description ; menu -> label=plat, value=prix, detail=description ; pricing -> label=formule, value=prix, detail=détail ; testimonials -> label=auteur, value=note 1-5, detail=avis ; faq -> label=question, detail=réponse ; hours -> value=horaires (3 lignes : Lun-Ven, Samedi, Dimanche) ; social -> label=réseau, value=URL.",
+    "- sections : 4 à 7 sections pertinentes pour le métier, dans un ordre logique (présentation, offre, infos pratiques, contact).",
+    "- N'INVENTE JAMAIS un fait que seul le commerçant connaît : pas d'avis ni de note, pas de chiffre de réussite, et aucun prix, horaire, adresse ou lien qui ne figure pas dans sa description. Laisse ces champs vides — la page les signalera comme à compléter. Écris la structure et les intitulés, pas les affirmations.",
+    "- Types de section (kind) : about (texte), services, menu (restauration), pricing, testimonials (emplacement seulement : laisse les items vides), faq, hours (horaires), cta (bouton d'action), announcement (annonce), social (réseaux), map (adresse), skills (compétences).",
+    "- items : lignes génériques {label, value, detail}. Selon le kind : services -> label=nom, value=emoji, detail=description ; menu -> label=plat, value=prix, detail=description ; pricing -> label=formule, value=prix, detail=détail ; faq -> label=question, detail=réponse ; hours -> value=horaires (3 lignes : Lun-Ven, Samedi, Dimanche) ; social -> label=réseau, value=URL.",
     "- Remplis chaque champ requis (mets une chaîne vide si non pertinent). Reste sobre : 3 items max par section (menu, services, pricing, testimonials, faq).",
   ].join("\n")
 }
