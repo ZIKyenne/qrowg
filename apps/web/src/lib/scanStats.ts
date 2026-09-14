@@ -3,6 +3,7 @@
 // la table instant_scan_events (un événement par scan) — aucun chiffre inventé.
 
 import { ligneDeRobot } from "./robots"
+import { jourDuCommerce, serieDeJours } from "./jourDuCommerce"
 
 export type DeviceKind = "mobile" | "tablet" | "desktop" | "bot" | "unknown"
 
@@ -24,37 +25,38 @@ export type ScanStats = {
   total: number
   /** Lignes écartées parce qu'elles portent `device: "bot"`. Affiché, pas caché. */
   robots: number
-  byDay: { date: string; count: number }[]      // `days` derniers jours, ordre chronologique (YYYY-MM-DD, UTC)
+  byDay: { date: string; count: number }[]      // `days` derniers jours, ordre chronologique (YYYY-MM-DD chez le commerçant)
   byDevice: { device: DeviceKind; count: number }[] // trié décroissant, buckets non vides
   byCountry: { country: string; count: number }[]   // trié décroissant (code ISO), "??" si inconnu
   peakDay: { date: string; count: number } | null   // jour le plus actif de la fenêtre
 }
 
 const DEVICE_ORDER: DeviceKind[] = ["mobile", "desktop", "tablet", "bot", "unknown"]
-const toUtcDay = (iso: string): string => new Date(iso).toISOString().slice(0, 10)
 
 // Agrège une liste d'événements sur les `days` derniers jours (fenêtre finissant à `now`).
+//
+// Les jours sont ceux DU COMMERÇANT (`lib/jourDuCommerce`). Découpés en UTC, la
+// moitié d'un service du samedi soir partait sur la veille : à Paris, tout ce qui
+// arrive entre minuit et 2 h du matin tombe encore dans la journée UTC de la
+// veille (lot v101).
 //
 // Les lignes déjà écrites avec `device: "bot"` sont écartées ici : l'historique se
 // répare à la lecture, sans toucher à la base (cf. lib/robots.ts). Leur nombre est
 // rendu dans `robots` — le commerçant voit ce qui a été retiré, il ne le devine pas.
-export function aggregateScanEvents(tous: ScanEvent[], days: number, now: number): ScanStats {
+export function aggregateScanEvents(tous: ScanEvent[], days: number, now: number, fuseau?: string | null): ScanStats {
   const events = tous.filter(e => !ligneDeRobot(e?.device))
   const robots = tous.length - events.length
   // Squelette des jours (du plus ancien au plus récent), tous à 0.
   const dayCounts = new Map<string, number>()
   const order: string[] = []
-  for (let i = days - 1; i >= 0; i--) {
-    const d = new Date(now - i * 86400000).toISOString().slice(0, 10)
-    dayCounts.set(d, 0); order.push(d)
-  }
+  for (const d of serieDeJours(days, fuseau, now)) { dayCounts.set(d, 0); order.push(d) }
 
   const devCounts = new Map<DeviceKind, number>()
   const ctryCounts = new Map<string, number>()
 
   for (const e of events) {
     if (!e?.scanned_at) continue
-    const day = toUtcDay(e.scanned_at)
+    const day = jourDuCommerce(e.scanned_at, fuseau)
     if (dayCounts.has(day)) dayCounts.set(day, (dayCounts.get(day) || 0) + 1)
 
     const dev = (DEVICE_ORDER.includes(e.device as DeviceKind) ? e.device : "unknown") as DeviceKind

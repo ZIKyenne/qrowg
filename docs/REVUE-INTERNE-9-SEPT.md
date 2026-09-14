@@ -2033,3 +2033,78 @@ plus strict que le plafond général — 2 998.
 Chaque fois, deux tests tombent : celui de l'endroit, et le balayage de classe.
 
 Suite complète : 5 200 tests, 315 fichiers. Build vert.
+
+---
+
+## v101 — Un jour, c'est un jour chez le commerçant
+
+**Le relevé.** En rejouant les agrégations du produit sur un service du samedi
+soir dans un bar parisien (juillet, UTC+2) :
+
+| horodatage en base | heure à Paris | jour affiché | jour réel |
+|---|---|---|---|
+| `2026-07-11T19:10:00Z` | 21h10 | 11 samedi | 11 samedi |
+| `2026-07-11T21:40:00Z` | 23h40 | 11 samedi | 11 samedi |
+| `2026-07-11T22:15:00Z` | 00h15 | 11 samedi | **12 dimanche** |
+| `2026-07-11T22:50:00Z` | 00h50 | 11 samedi | **12 dimanche** |
+| `2026-07-11T23:30:00Z` | 01h30 | 11 samedi | **12 dimanche** |
+
+    le produit affichait : { "2026-07-11": 6 }
+    la réalité           : { "2026-07-11": 3, "2026-07-12": 3 }
+
+La moitié du service partait sur la veille. Pour un bar, un restaurant, une
+salle, toutes leurs heures de 0 h à 2 h tombaient un jour trop tôt : « votre
+meilleur jour : samedi » quand c'était dimanche. Le pic n'était pas un fait,
+c'était un artefact du découpage.
+
+**Et « aujourd'hui » suivait.** À 00 h 30 le dimanche, le tableau de bord disait
+« aujourd'hui = samedi ». Le commerçant ferme, fait sa caisse, ouvre l'appli, et
+lit les chiffres de la veille sous l'étiquette du jour.
+
+**Un quatrième défaut, pour l'outre-mer que l'éditeur propose lui-même.**
+`formatDay` faisait `new Date("2026-07-11").getDate()` — minuit UTC, relu dans
+l'horloge du navigateur :
+
+| fuseau | étiquette |
+|---|---|
+| `Europe/Paris` | 11/7 |
+| `Indian/Reunion` | 11/7 |
+| `America/Martinique` | **10/7** |
+| `Pacific/Tahiti` | **10/7** |
+
+Ces quatre fuseaux sont dans `FUSEAUX_PROPOSES`. Le produit les offre et les
+comptait de travers.
+
+**La décision existait déjà.** `lib/heureDuCommerce.ts` (lot v-horaires) l'a
+écrite pour les horaires d'ouverture : « un horaire appartient au lieu, on le lit
+donc dans le fuseau du lieu », avec `FUSEAU_DEFAUT = "Europe/Paris"`, hypothèse
+assumée et réversible. Un scan aussi appartient au lieu. Ce lot étend la décision
+aux chiffres — même fuseau par défaut, importé et non recopié, et la garde le
+vérifie.
+
+**Ce que le lot change.** `lib/jourDuCommerce.ts`, module pur bâti sur `Intl` —
+qui connaît l'heure d'été ; l'écrire à la main, c'est se tromper deux dimanches
+par an. `serieDeJours` avance de 24 h puis **relit** le jour dans le fuseau au
+lieu de décaler une date : les deux dimanches de changement d'heure durent 23 h
+et 25 h, et un décalage brut y saute ou répète un jour. Deux tests tiennent ces
+dimanches-là.
+
+`etiquetteDeJour` lit les trois nombres de la chaîne « YYYY-MM-DD » au lieu de la
+relire comme un instant — c'est tout le défaut de l'outre-mer.
+
+Branché sur `scanStats`, `analyticsAgg`, `GoalsDashboard`, le nom des fichiers
+exportés (CSV et JSON), les bornes du sélecteur de période et le champ de date
+d'expiration d'un QR.
+
+**Garde.** `lib/jourDuCommerce.test.ts` (26 tests). La règle de classe : **aucun
+jour montré au commerçant n'est découpé sur l'horloge UTC.** Deux balayages —
+`toISOString().slice(0, 10)` et la forme plus discrète `scanned_at.slice(0, 10)`.
+Une seule exception, et elle doit dire pourquoi dans son propre fichier : le nom
+du dossier de rangement des visuels sociaux, que personne ne lit.
+
+**Vérification par mutation.** Quatre défauts réinjectés : le découpage UTC dans
+`scanStats`, `formatDay` repassé par `new Date()`, le squelette de 30 jours
+reconstruit avec `setDate`. Chaque fois, deux à quatre tests tombent — dont
+toujours le balayage de classe.
+
+Suite complète : 5 226 tests, 316 fichiers. Build vert.

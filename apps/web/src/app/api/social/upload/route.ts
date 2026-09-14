@@ -66,7 +66,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Fichier trop lourd (15 Mo maximum)." }, { status: 400 })
     }
 
-    // Dossier par jour : les visuels restent rangés et faciles à purger.
+    // Dossier par jour : les visuels restent rangés et faciles à purger. Ce jour-ci
+    // est un nom de dossier de stockage, jamais un chiffre montré au commerçant —
+    // c'est le seul découpage en UTC que la garde du lot v101 laisse passer.
     const day = new Date().toISOString().slice(0, 10)
     const name = safeName(String(form.get("name") || file.name), ext)
     const path = `${PREFIX}/${day}/${name}`

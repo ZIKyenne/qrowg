@@ -29,6 +29,8 @@
 // Un seul module, six appelants. Module PUR.
 
 /** Le séparateur qu'attend le tableur de l'artisan français. */
+import { jourDuCommerce } from "./jourDuCommerce"
+
 export const SEPARATEUR = ";"
 
 /** RFC 4180 : les lignes se terminent par CRLF. */
@@ -117,6 +119,7 @@ export const TYPE_CSV = "text/csv;charset=utf-8"
 export function nomDeFichierCsv(base: string, date: Date = new Date()): string {
   const propre = (base || "export").toLowerCase().normalize("NFD")
     .replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "export"
-  const jour = Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10)
+  // Le jour du commerçant : à 0 h 30 un dimanche, le fichier s'appelait « …-samedi ».
+  const jour = Number.isNaN(date.getTime()) ? "" : jourDuCommerce(date)
   return jour ? `${propre}-${jour}.csv` : `${propre}.csv`
 }

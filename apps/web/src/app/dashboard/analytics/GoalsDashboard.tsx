@@ -5,6 +5,7 @@ import { messageDeRoute } from "@/lib/messageDeRoute"
 import { useToast } from "@/components/Toast"
 import { useConfirm } from "@/components/ui/Confirm"
 import { Button } from "@/components/ui/Button"
+import { jourDuCommerce, serieDeJours, etiquetteDeJour } from "@/lib/jourDuCommerce"
 import {
   Target, Plus, Trash2, Pencil, TrendingUp, TrendingDown, CheckCircle,
   MessageCircle, Calendar, Phone, Mail, ShoppingBag,
@@ -123,17 +124,16 @@ function calcConversions(goal: Goal, clicks: ClickRow[], views: ViewRow[]) {
   }
 
   // Données pour le mini graphique (par jour)
+  // Les jours sont ceux du commerçant : `.slice(0, 10)` sur l'horodatage donnait
+  // le jour UTC, donc une conversion de 0 h 30 comptée la veille (lot v101).
   const dailyMap: Record<string, number> = {}
-  for (let i = goal.period_days - 1; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i)
-    dailyMap[d.toISOString().slice(0, 10)] = 0
-  }
+  for (const cle of serieDeJours(goal.period_days)) dailyMap[cle] = 0
   conversions.forEach(c => {
-    const day = c.clicked_at.slice(0, 10)
+    const day = jourDuCommerce(c.clicked_at)
     if (day in dailyMap) dailyMap[day]++
   })
   const chartData = Object.entries(dailyMap).map(([date, count]) => ({
-    date: date.slice(5), count
+    date: etiquetteDeJour(date), count
   }))
 
   return { total, ctr, progress, chartData, totalViews, pace, paceMarker }

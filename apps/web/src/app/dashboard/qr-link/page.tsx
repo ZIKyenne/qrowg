@@ -33,6 +33,7 @@ import { useFermetureModale, carteCliquable } from "@/lib/useFermetureModale"
 import { etatLien, styleSur, type InstantQr, type StatsLien } from "./instantQr"
 import { Button } from "@/components/ui/Button"
 import { useSessionShell } from "../sessionShell"
+import { jourDuCommerce, serieDeJours } from "@/lib/jourDuCommerce"
 
 const G = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -327,7 +328,7 @@ export default function QrLinkPage() {
   const demanderMotDePasse = (s: InstantQr) => setDemande({ type: "motDePasse", qr: s, valeur: "" })
   const demanderRetraitMotDePasse = (s: InstantQr) => setDemande({ type: "retirerMotDePasse", qr: s })
   const demanderExpiration = (s: InstantQr) =>
-    setDemande({ type: "expiration", qr: s, valeur: s.expires_at ? new Date(s.expires_at).toISOString().slice(0, 10) : "" })
+    setDemande({ type: "expiration", qr: s, valeur: s.expires_at ? jourDuCommerce(s.expires_at) : "" })
   const demanderSuppression = (s: InstantQr) => setDemande({ type: "supprimer", qr: s })
 
   async function toggleManualPause(s: InstantQr) {
@@ -939,7 +940,7 @@ export default function QrLinkPage() {
                 qui perdait la saisie quand le format n'était pas le bon. */}
             <input
               type="date"
-              min={new Date(Date.now() + 86400000).toISOString().slice(0, 10)}
+              min={serieDeJours(1, null, Date.now() + 86400000)[0]}
               value={demande.valeur}
               onChange={e => setDemande({ ...demande, valeur: e.target.value })}
               style={{ ...field, colorScheme: "dark" }}

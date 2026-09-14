@@ -14,6 +14,7 @@ import { Switch } from "@/components/ui/Switch"
 import { Input } from "@/components/ui/Input"
 import { jugerPassage, INTERVALLE_H, type Passage } from "@/lib/journalCron"
 import { erreurLisible } from "@/lib/erreurLisible"
+import { aujourdHuiDuCommerce } from "@/lib/jourDuCommerce"
 
 // Les trois interrupteurs de notification qui dépendent d'une tâche planifiée,
 // et le nom de cette tâche dans le journal.
@@ -176,7 +177,7 @@ export default function SettingsPage() {
       const blob = await res.blob()
       const a = document.createElement("a")
       a.href = URL.createObjectURL(blob)
-      a.download = `qrowg-export-${new Date().toISOString().slice(0, 10)}.json`
+      a.download = `qrowg-export-${aujourdHuiDuCommerce()}.json`
       a.click()
       URL.revokeObjectURL(a.href)
     } catch {

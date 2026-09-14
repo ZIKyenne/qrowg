@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react"
 import { Download, Calendar, Lock, CheckCircle, Loader, Eye, QrCode, Link2, Layers, Globe } from "lucide-react"
 import { construireCsv, TYPE_CSV } from "@/lib/exportCsv"
+import { aujourdHuiDuCommerce, serieDeJours } from "@/lib/jourDuCommerce"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type ViewRow    = { viewed_at: string; device: string; source: string | null; country: string | null; page_id: string }
@@ -69,16 +70,16 @@ function formatDate(iso: string): string {
 }
 
 function todaySlug(): string {
-  return new Date().toISOString().slice(0, 10)
+  return aujourdHuiDuCommerce()
 }
 
 export default function ExportPanel({ plan, pages, views, scans, clicks, blocks, geoScans }: Props) {
   const [selected,    setSelected]    = useState<Set<DatasetId>>(new Set(["visits"]))
   const [period,      setPeriod]      = useState<PeriodId>("30d")
   const [customFrom,  setCustomFrom]  = useState(() => {
-    const d = new Date(); d.setDate(d.getDate() - 30); return d.toISOString().slice(0, 10)
+    return serieDeJours(31)[0]
   })
-  const [customTo,    setCustomTo]    = useState(() => new Date().toISOString().slice(0, 10))
+  const [customTo,    setCustomTo]    = useState(() => aujourdHuiDuCommerce())
   const [exporting,   setExporting]   = useState(false)
   const [lastExport,  setLastExport]  = useState<string | null>(null)
 

@@ -1,4 +1,5 @@
 import { libelleSource } from "@/lib/sourcesTrafic"
+import { jourDuCommerce, serieDeJours, etiquetteDeJour } from "@/lib/jourDuCommerce"
 // analyticsAgg.ts — Agregations pures et testables pour le tableau de bord analytics.
 // Aucune dependance React : ces fonctions sont couvertes par des tests unitaires.
 // `now` est injectable partout ou une fenetre glissante est calculee (testabilite).
@@ -8,29 +9,27 @@ export type AggView = { viewed_at: string; source?: string | null; page_id?: str
 export type DailyPoint = { date: string; scans: number; views: number }
 export type NameValue = { name: string; value: number }
 
-// Libelle court jour/mois a partir d'une date ISO (ex "2026-07-05" -> "5/7").
+// Libelle court jour/mois a partir d'une cle de jour (ex "2026-07-05" -> "5/7").
+// Passait par `new Date(cle).getDate()`, c'est-a-dire minuit UTC relu dans
+// l'horloge du navigateur : a la Martinique ou a Tahiti — deux fuseaux que
+// l'editeur propose — l'etiquette reculait d'un jour (lot v101).
 export function formatDay(dateStr: string): string {
-  const d = new Date(dateStr)
-  return `${d.getDate()}/${d.getMonth() + 1}`
+  return etiquetteDeJour(dateStr)
 }
 
-// Serie sur les 30 derniers jours (buckets UTC), scans + vues par jour.
+// Serie sur les 30 derniers jours, scans + vues par jour. Les jours sont ceux du
+// COMMERCANT (lib/jourDuCommerce) : `.slice(0, 10)` sur l'horodatage donnait le
+// jour UTC, donc la soiree d'un bar comptee sur la veille (lot v101).
 // Les jours sans evenement restent a 0 (pas de trous dans le graphe).
-export function buildDailyData(scans: AggScan[], views: AggView[], now: number = Date.now()): DailyPoint[] {
+export function buildDailyData(scans: AggScan[], views: AggView[], now: number = Date.now(), fuseau?: string | null): DailyPoint[] {
   const map: Record<string, DailyPoint> = {}
-  const base = new Date(now)
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date(base)
-    d.setDate(d.getDate() - i)
-    const key = d.toISOString().slice(0, 10)
-    map[key] = { date: formatDay(key), scans: 0, views: 0 }
-  }
+  for (const key of serieDeJours(30, fuseau, now)) map[key] = { date: formatDay(key), scans: 0, views: 0 }
   for (const s of scans) {
-    const key = (s.scanned_at || "").slice(0, 10)
+    const key = jourDuCommerce(s.scanned_at, fuseau)
     if (map[key]) map[key].scans++
   }
   for (const v of views) {
-    const key = (v.viewed_at || "").slice(0, 10)
+    const key = jourDuCommerce(v.viewed_at, fuseau)
     if (map[key]) map[key].views++
   }
   return Object.values(map)

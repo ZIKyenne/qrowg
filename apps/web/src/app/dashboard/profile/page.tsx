@@ -24,6 +24,7 @@ import {
 import NextStepCard from "@/components/NextStepCard"
 import { useToast } from "@/components/Toast"
 import { erreurLisible } from "@/lib/erreurLisible"
+import { aujourdHuiDuCommerce } from "@/lib/jourDuCommerce"
 import { csvDepuisObjets, TYPE_CSV } from "@/lib/exportCsv"
 import { cycleDe, echeance, type LigneAbonnement } from "@/lib/cycleAbonnement"
 import { construireJournal, type ActivityEvent, type ActivityEventType } from "./journalActivite"
@@ -638,8 +639,7 @@ export default function ProfilePage() {
     if (!profile) return
     setJobStatus(jobId, "running")
     const slug = profile.username || profile.id.slice(0,8)
-    const ts   = new Date().toISOString().slice(0,10)
-
+    const ts   = aujourdHuiDuCommerce()
     try {
       switch (jobId) {
 

@@ -3,6 +3,7 @@
 // requete aux donnees de l'utilisateur (pas besoin du service-role).
 import { NextResponse } from "next/server"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { aujourdHuiDuCommerce } from "@/lib/jourDuCommerce"
 
 export async function GET() {
   const supabase = await createServerSupabaseClient()
@@ -40,7 +41,7 @@ export async function GET() {
     leads,
   }
 
-  const date = new Date().toISOString().slice(0, 10)
+  const date = aujourdHuiDuCommerce()
   return new NextResponse(JSON.stringify(payload, null, 2), {
     headers: {
       "Content-Type": "application/json; charset=utf-8",
