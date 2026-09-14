@@ -2696,3 +2696,79 @@ redevient muet (1 test tombe), l'archivage rejette de nouveau son résultat (2),
 et une écriture qui ne touche aucune ligne passe pour réussie (1).
 
 Suite complète : 5 387 tests, 324 fichiers. Build vert.
+
+---
+
+## Lot v110 — une limite qui coupe sans se voir
+
+**Le relevé.** Vingt-huit endroits coupent du texte côté serveur avec
+`.slice(0, n)`. **Deux** écrans seulement portent une limite de saisie. Le
+nombre est écrit à la main, dans un fichier que personne ne lit en tapant.
+
+```
+api/qr-instant:85     label.trim().slice(0, 80)      le nom d'un QR
+api/pages/create:52   title.trim().slice(0, 80)      le titre d'une page
+api/qr-label:14       label.trim().slice(0, 60)      le nom d'un support
+api/qr-support:41     label.trim().slice(0, 60)      idem, à la création
+api/leads:34-37       name 200, email 200, phone 60, message 3000
+```
+
+Le commerçant nomme son QR, l'écran accepte tout, la base garde 80 caractères ;
+au rechargement le nom est coupé en plein mot. Sur le **formulaire public** —
+celui qui lui ramène des prospects — c'est le message d'un client qui s'arrête
+au milieu d'une phrase, et une adresse de plus de 200 caractères devient une
+adresse à laquelle on ne peut plus répondre. Le lead est là, injoignable.
+
+**Pire que la coupe.** `leads.data` est borné à 8 Ko d'un bloc, et un objet trop
+gros n'est pas tronqué : il est **jeté** (`objetBorne(...) ?? {}`). Un visiteur
+bavard sur un seul champ faisait perdre au commerçant les réponses de **tous**
+les autres champs de son formulaire.
+
+**Le seul endroit qui faisait bien** est le sous-domaine : la route répond
+« Maximum 30 caractères » et le champ porte `maxLength={30}`. Les deux nombres
+étaient d'accord — écrits deux fois, et rien ne les tenait ensemble.
+
+**Ce que le lot change.** `lib/limitesDeSaisie.ts` nomme les plafonds une fois :
+
+```ts
+LIMITES = { nomDeSupport: 60, nomDeQr: 80, titreDePage: 80, sousDomaine: 30,
+            leadNom: 200, leadEmail: 200, leadTelephone: 60, leadMessage: 3000,
+            champDeFormulaire: 500, … }
+limite(cle) · champBorne(v, cle) · limiteDuChampPublic(cle) ·
+tropLong · resteAEcrire · compteurDeSaisie
+```
+
+Deux colonnes qui portent le même mot « label » ne sont pas le même champ : le
+nom d'un support imprimé vaut 60, le nom d'un QR direct 80. La table les nomme
+à part, et un test l'exige.
+
+**Le module ne double pas `lib/bornes.ts` : c'est l'inverse.** `bornes.texte`
+n'a plus sa propre copie de la coupe, il **est** `coupe` — il n'existe qu'un
+seul geste de coupe dans le produit, et la garde le vérifie par identité de
+fonction. `bornes` garde ce qui touche au corps JSON (octets, objets, tableaux),
+qui n'a rien à faire dans un paquet navigateur.
+
+**Branché** : les six routes du relevé, les deux formulaires publics (avec un
+compteur qui apparaît dans les vingt derniers caractères et se tait avant), le
+nom d'un support, le titre d'une page, le sous-domaine.
+
+**Garde.** `lib/limiteQuiSeVoit.test.ts` (14 tests). La règle de classe :
+**une limite qui coupe sans se voir n'est pas une limite, c'est une perte.**
+Deux balayages. Le premier relève les noms qui portent le corps de la requête
+dans chaque route (`await req.json()`, destructuration comprise) et interdit
+toute coupe à la main sur l'un d'eux. Le second interdit à un écran d'écrire
+`maxLength` en chiffres. Un contre-test exige que le balayage voie plus de
+vingt routes qui lisent un corps JSON, plus de cinq qui passent par la table et
+plus de sept champs limités — un balayage devenu aveugle ne prouve rien. Un
+dernier test refuse une entrée de la table que personne n'applique : un plafond
+inutilisé n'est pas une règle, c'est un souhait.
+
+**Vérification par mutation.** Quatre défauts réinjectés : la coupe du nom d'un
+prospect réécrite à la main (2 tests tombent), le `maxLength={60}` littéral (2),
+`bornes.texte` qui reprend sa propre copie de la coupe (1), et une entrée de
+table que rien n'applique (1).
+
+Au passage, trois lectures identiques de `localStorage` dans `BuilderV4` ont été
+ramenées à une ligne chacune pour tenir sous le plafond du fichier.
+
+Suite complète : 5 401 tests, 325 fichiers. Build vert.

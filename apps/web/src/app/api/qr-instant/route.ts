@@ -15,6 +15,7 @@ import { countInstantQrs, countDynamicQrs } from "@/lib/quota"
 import { hashLinkPassword, mdpLienTropLong, LONGUEUR_MAX_MDP_LIEN } from "@/lib/linkPassword"
 import { uniqueShortCode } from "@/lib/shortCode"
 import { objetBorne } from "@/lib/bornes"
+import { champBorne } from "@/lib/limitesDeSaisie"
 
 const KINDS = new Set(["link", "wifi", "text", "contact", "phone", "call", "email", "sms"])
 // Types éligibles au DYNAMIQUE (redirigé + expirable). Wi-Fi et Contact restent STATIQUES : ils
@@ -82,7 +83,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const label = typeof body?.label === "string" ? body.label.trim().slice(0, 80) || null : null
+  const label = champBorne(body?.label, "nomDeQr")
   // 16 Ko chacun : un QR n'a pas besoin de plus, et rien n'empêchait d'en stocker des Mo.
   const inputs = objetBorne(body?.inputs, 16_000) ?? (body?.inputs ? null : {})
   const style = objetBorne(body?.style, 16_000) ?? (body?.style ? null : {})
@@ -159,7 +160,7 @@ export async function PATCH(req: NextRequest) {
     if (!dest) return NextResponse.json({ error: "Lien invalide (http/https requis)." }, { status: 400 })
     patch.dest_url = dest
   }
-  if (typeof body?.label === "string") patch.label = body.label.trim().slice(0, 80) || null
+  if (typeof body?.label === "string") patch.label = champBorne(body.label, "nomDeQr")
 
   const action = body?.action as string | undefined
   const wantsSecurity = ("password" in body) || ("expires_at" in body) || action === "pause" || action === "resume"

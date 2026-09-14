@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { authApiKey } from "@/lib/apiAuth"
 import { createAdminClient } from "@/lib/supabase/server"
 import { rateLimit } from "@/lib/rateLimit"
+import { champBorne } from "@/lib/limitesDeSaisie"
 import { consommerQuotaApi, reponseQuotaDepasse, enTetesQuota } from "@/lib/quotaApi"
 import { buildDestUrl, validateDest, type DestType } from "../../../../qr-destination/qrDestination"
 
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ cod
   const corps = await req.json().catch(() => ({}))
   const type = typeof corps?.type === "string" ? corps.type : ""
   const value = typeof corps?.value === "string" ? corps.value : ""
-  const label = typeof corps?.label === "string" ? corps.label.slice(0, 80) : undefined
+  const label = typeof corps?.label === "string" ? (champBorne(corps.label, "nomDeQr") ?? "") : undefined
   if (!type || !value) return NextResponse.json({ error: "type et value requis" }, { status: 400 })
 
   const err = validateDest(type as DestType, value)

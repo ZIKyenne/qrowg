@@ -13,6 +13,7 @@ import { sizesGrille } from "../dashboard/builder/shared-renderer/models/horaire
 import { adresseEmailValide } from "@/lib/destinataireLead"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
+import { limite, limiteDuChampPublic, compteurDeSaisie } from "@/lib/limitesDeSaisie"
 import { contactFormFields, registerFormFields } from "@/lib/leadForms"
 import { openStatus, DAY_KEYS, countdownParts, shareLinks, calendarLinks, extHref, announcementMeta, SOCIAL_NETWORKS_MAP, destinationUtile } from "../dashboard/builder/types"
 import { confirmationDuFormulaire, mentionDestinataire, COULEUR_DU_TON, EMOJI_DU_TON, type ResultatEnvoi } from "@/lib/promesseDuFormulaire"
@@ -593,10 +594,10 @@ export function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail, no
       {c.description && <p style={{ color: "#EC4899", fontSize: 12, margin: "0 0 13px", fontWeight: 600 }}>⚡ {c.description}</p>}
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" value={hp} onChange={e => setHp(e.target.value)} style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0, pointerEvents: "none" }} />
-        <input placeholder={libelle("name")} aria-label={libelle("name")} autoComplete="name" value={name} onChange={e => setName(e.target.value)} style={inputStyle} />
-        <input placeholder={libelle("email")} aria-label={libelle("email")} type="email" inputMode="email" autoComplete="email" autoCapitalize="off" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
-        {demande("phone") && <input placeholder={libelle("phone")} aria-label={libelle("phone")} type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={e => setPhone(e.target.value)} style={inputStyle} />}
-        {demande("company") && <input placeholder={libelle("company")} aria-label={libelle("company")} autoComplete="organization" value={company} onChange={e => setCompany(e.target.value)} style={inputStyle} />}
+        <input placeholder={libelle("name")} aria-label={libelle("name")} autoComplete="name" maxLength={limite("leadNom")} value={name} onChange={e => setName(e.target.value)} style={inputStyle} />
+        <input placeholder={libelle("email")} aria-label={libelle("email")} type="email" inputMode="email" autoComplete="email" autoCapitalize="off" maxLength={limite("leadEmail")} value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
+        {demande("phone") && <input placeholder={libelle("phone")} aria-label={libelle("phone")} type="tel" inputMode="tel" autoComplete="tel" maxLength={limite("leadTelephone")} value={phone} onChange={e => setPhone(e.target.value)} style={inputStyle} />}
+        {demande("company") && <input placeholder={libelle("company")} aria-label={libelle("company")} autoComplete="organization" maxLength={limite("champDeFormulaire")} value={company} onChange={e => setCompany(e.target.value)} style={inputStyle} />}
         {email.trim() && !emailOk && <p style={{ color: "#F59E0B", fontSize: 12, margin: 0 }}>Adresse email invalide.</p>}
         <button onClick={submit} disabled={!canSubmit} style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 10, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", border: "none", cursor: canSubmit ? "pointer" : "not-allowed", opacity: canSubmit ? 1 : 0.55 }}>{status === "sending" ? "Envoi…" : (c.button_label || "Je m'inscris")}</button>
         <p style={{ color: MUTED, fontSize: 11.5, margin: "2px 0 0", lineHeight: 1.5 }}>{mentionDestinataire(nomCommerce)}</p>
@@ -678,9 +679,18 @@ export function LeadFormPublic({ block, pageId, ownerEmail, leadType, title, des
         <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true"
           value={hp} onChange={e => setHp(e.target.value)}
           style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0, pointerEvents: "none" }} />
-        {fields.map(f => f.area
-          ? <textarea key={f.key} placeholder={f.label} aria-label={f.label} value={vals[f.key] || ""} onChange={e => set(f.key, e.target.value)} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
-          : <input key={f.key} {...fieldProps(f.key)} placeholder={f.label} aria-label={f.label} value={vals[f.key] || ""} onChange={e => set(f.key, e.target.value)} style={inputStyle} />)}
+        {fields.map(f => {
+          // Le plafond que la route appliquera, dit ici — et le reste annoncé
+          // dans les derniers caractères plutôt que découvert après coup (v110).
+          const max = limiteDuChampPublic(f.key, f.area)
+          const reste = compteurDeSaisie(vals[f.key] || "", max)
+          return <div key={f.key}>
+            {f.area
+              ? <textarea placeholder={f.label} aria-label={f.label} maxLength={max} value={vals[f.key] || ""} onChange={e => set(f.key, e.target.value)} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
+              : <input {...fieldProps(f.key)} placeholder={f.label} aria-label={f.label} maxLength={max} value={vals[f.key] || ""} onChange={e => set(f.key, e.target.value)} style={inputStyle} />}
+            {reste && <p style={{ color: MUTED, fontSize: 11, margin: "3px 0 0" }}>{reste}</p>}
+          </div>
+        })}
         {emailVal && !emailOk && <p style={{ color: "#F59E0B", fontSize: 12, margin: 0 }}>Adresse email invalide.</p>}
         <button onClick={submit} disabled={!ready || status === "sending"} style={{ background: accent, borderRadius: 10, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: buttonTextColor, border: "none", cursor: ready && status !== "sending" ? "pointer" : "not-allowed", opacity: ready && status !== "sending" ? 1 : 0.55 }}>{status === "sending" ? "Envoi…" : button}</button>
         {/* Le client donne son nom, son e-mail, son téléphone : il sait à qui. */}

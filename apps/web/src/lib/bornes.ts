@@ -4,11 +4,10 @@
 // (blocs illimités, objets JSON de taille libre, pause_message sans type,
 // page_id d'un autre compte). Ces fonctions PURES bornent avant d'écrire.
 
-export function texte(v: unknown, max: number): string | null {
-  if (typeof v !== "string") return null
-  const t = v.trim().slice(0, max)
-  return t.length ? t : null
-}
+// Le geste de coupe vit dans `lib/limitesDeSaisie` — avec la table des plafonds
+// que l'écran lit aussi, pour dire la limite avant de la faire subir (lot v110).
+// Pour un champ NOMMÉ du produit, préférer `champBorne(v, "nomDeQr")`.
+export { coupe as texte } from "./limitesDeSaisie"
 
 export function entier(v: unknown, min: number, max: number, defaut: number): number {
   const n = typeof v === "number" ? v : typeof v === "string" && v.trim() !== "" ? Number(v) : NaN

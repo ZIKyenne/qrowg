@@ -7,6 +7,7 @@ import {
   CheckCircle, Copy, ExternalLink, Pencil, Trash2
 } from "lucide-react"
 import { useConfirm } from "@/components/ui/Confirm"
+import { limite } from "@/lib/limitesDeSaisie"
 
 interface Props {
   currentUsername: string | null
@@ -228,7 +229,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
                 value={input}
                 onChange={e => setInput(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))}
                 placeholder="votre-nom"
-                maxLength={30}
+                maxLength={limite("sousDomaine")}
                 autoFocus
                 style={{ flex:1, background:"transparent", border:"none", color:"var(--ink)", padding:"10px 10px", fontSize:13, fontWeight:600, outline:"none", minWidth:0 }}
               />

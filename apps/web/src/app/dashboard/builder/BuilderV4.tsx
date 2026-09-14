@@ -43,6 +43,7 @@ import { actionClavier } from "./raccourcisClavier"
   import { useIsMobile } from "@/lib/useIsMobile"
   import { useToast } from "@/components/Toast"
 import { messageApresCreation, qrVisitable } from "@/lib/qrEnBrouillon"
+import { limite } from "@/lib/limitesDeSaisie"
   import { useConfirm } from "@/components/ui/Confirm"
   import BannerStudio from "./BannerStudio"
   import ImageUpload from "./ImageUpload"
@@ -453,9 +454,7 @@ import { messageApresCreation, qrVisitable } from "@/lib/qrEnBrouillon"
     }, [])
 
     const [favorites, setFavorites] = useState<string[]>(() => {
-      if (typeof window !== "undefined") {
-        try { return JSON.parse(localStorage.getItem("qrfolio_fav_blocks") || "[]") } catch { return [] }
-      }
+      if (typeof window !== "undefined") { try { return JSON.parse(localStorage.getItem("qrfolio_fav_blocks") || "[]") } catch { return [] } }
       return []
     })
 
@@ -471,9 +470,7 @@ import { messageApresCreation, qrVisitable } from "@/lib/qrEnBrouillon"
 
     // ── Blocs récents ─────────────────────────────────────────────────────────
     const [recentBlocks, setRecentBlocks] = useState<string[]>(() => {
-      if (typeof window !== "undefined") {
-        try { return JSON.parse(localStorage.getItem("qrfolio_recent_blocks") || "[]") } catch { return [] }
-      }
+      if (typeof window !== "undefined") { try { return JSON.parse(localStorage.getItem("qrfolio_recent_blocks") || "[]") } catch { return [] } }
       return []
     })
 
@@ -487,9 +484,7 @@ import { messageApresCreation, qrVisitable } from "@/lib/qrEnBrouillon"
 
     // ── Catégories repliées ───────────────────────────────────────────────────
     const [collapsedCats, setCollapsedCats] = useState<string[]>(() => {
-      if (typeof window !== "undefined") {
-        try { return JSON.parse(localStorage.getItem("qrfolio_collapsed_cats") || "[]") } catch { return [] }
-      }
+      if (typeof window !== "undefined") { try { return JSON.parse(localStorage.getItem("qrfolio_collapsed_cats") || "[]") } catch { return [] } }
       return []
     })
 
@@ -1406,6 +1401,8 @@ import { messageApresCreation, qrVisitable } from "@/lib/qrEnBrouillon"
           <h1 style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap", margin: 0 }}>{pageName || "Page sans titre"} — éditeur</h1>
           <input value={pageName} onChange={e => { const v = e.target.value; setPageName(v); undoRedo.push({ blocks: blocksKbRef.current, theme: themeRef.current, name: v }, "pagename") }}
             aria-label="Nom de la page"
+            // `/api/pages/create` coupait le titre à 80 sans le dire (lot v110).
+            maxLength={limite("titreDePage")}
             // 18 px de haut sur téléphone : on tape à côté et on ouvre autre chose.
             style={{ background: "transparent", border: "none", color: "var(--ink)", fontSize: 14, fontWeight: 600, outline: "none", minWidth: 0, textOverflow: "ellipsis", ...(isMobile ? { flex: "1 1 0", minHeight: 40 } : { width: 200, minHeight: 32, padding: "0 6px", borderRadius: 6 }) }} />
           {/* Statut de sauvegarde. Flag ON (C01) : indicateur unifié tokenisé + a11y (role=status/aria-live).

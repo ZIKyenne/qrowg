@@ -11,6 +11,7 @@ import { buildSupportFunnel, supportTotals, defaultSupportLabel, type SupportRow
 import { CONSIGNE_SUPPORTS, CONSIGNE_DUPLICATION } from "@/lib/supportImprime"
 import { pourcentage } from "@/lib/chiffresLisibles"
 import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
+import { limite } from "@/lib/limitesDeSaisie"
 
 type Q = { id: string; short_code: string; label?: string | null; page_id?: string | null }
 type ScanRow = { qr_code_id?: string | null }
@@ -107,7 +108,7 @@ export default function SupportPanel({ qrs, scans, views, clicks, leads }: {
                 <tr key={r.id}>
                   <td style={{ padding: "11px 10px", borderBottom: "1px solid rgba(255,255,255,0.05)", maxWidth: 240 }}>
                     {editing === r.id ? (
-                      <input autoFocus value={draft} maxLength={60}
+                      <input autoFocus value={draft} maxLength={limite("nomDeSupport")}
                         onChange={e => setDraft(e.target.value)}
                         onBlur={() => saveLabel(r)}
                         onKeyDown={e => { if (e.key === "Enter") saveLabel(r); if (e.key === "Escape") setEditing(null) }}

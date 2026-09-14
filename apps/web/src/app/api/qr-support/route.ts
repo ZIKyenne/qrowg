@@ -15,6 +15,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { initialQrStatus } from "@/lib/quota"
 import { uniqueShortCode } from "@/lib/shortCode"
 import { nomDeSupportLibre } from "@/lib/supportImprime"
+import { champBorne } from "@/lib/limitesDeSaisie"
 
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabaseClient()
@@ -37,9 +38,8 @@ export async function POST(req: NextRequest) {
   const { data: prof } = await supabase.from("profiles").select("plan").eq("id", user.id).single()
   const statut = await initialQrStatus(supabase, user.id, prof?.plan as string)
 
-  const nom = typeof label === "string" && label.trim()
-    ? label.trim().slice(0, 60)
-    : nomDeSupportLibre((existants || []).map((q: any) => q.label))
+  const nom = champBorne(label, "nomDeSupport")
+    ?? nomDeSupportLibre((existants || []).map((q: any) => q.label))
 
   const ligne: Record<string, unknown> = {
     page_id,

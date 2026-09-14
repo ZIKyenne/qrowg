@@ -3,6 +3,7 @@
 // Sécurité : client de session utilisateur + RLS -> seul le propriétaire peut modifier son QR.
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
+import { champBorne } from "@/lib/limitesDeSaisie"
 
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabaseClient()
@@ -11,7 +12,7 @@ export async function POST(req: NextRequest) {
 
   const { qr_id, label } = await req.json().catch(() => ({} as any))
   if (!qr_id || typeof qr_id !== "string") return NextResponse.json({ error: "qr_id requis" }, { status: 400 })
-  const clean = typeof label === "string" ? label.trim().slice(0, 60) || null : null
+  const clean = champBorne(label, "nomDeSupport")
 
   // `label` hors types Supabase générés (migration récente) -> cast any.
   // `.select("id")` : une mise à jour refusée par la RLS ne renvoie PAS d'erreur,

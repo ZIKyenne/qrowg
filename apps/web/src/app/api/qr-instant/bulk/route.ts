@@ -8,6 +8,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { canDynMasse } from "@/lib/plans"
 import { normalizeBulkUrl } from "@/lib/bulkCsv"
 import { uniqueShortCode } from "@/lib/shortCode"
+import { champBorne } from "@/lib/limitesDeSaisie"
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrowg.com"
 const MAX_BULK = 100 // borne par requête (anti-abus)
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
   for (const r of input.slice(0, MAX_BULK)) {
     const dest = normalizeBulkUrl(String(r?.dest || ""))
     if (!dest) { skipped++; continue }
-    const label = (typeof r?.label === "string" ? r.label.trim().slice(0, 80) : "") || null
+    const label = champBorne(r?.label, "nomDeQr")
     let code: string
     try { code = await uniqueShortCode(supabase, seen) } catch { skipped++; continue }
     // Business = quota illimité ; aucun QR ne porte d'expiration à la création.

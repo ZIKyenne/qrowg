@@ -5,6 +5,7 @@ import { cookies } from "next/headers"
 import { MAX_PAGES, countPages, initialQrStatus } from "@/lib/quota"
 import { slugifyUnique } from "@/lib/slug"
 import { uniqueShortCode } from "@/lib/shortCode"
+import { champBorne } from "@/lib/limitesDeSaisie"
 import { DEFAULT_PAGE_THEME } from "@/app/dashboard/builder/types"
 
 // Cree une page VIERGE (brouillon) et renvoie son id. Utilise par le builder
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
     const qrStatus = await initialQrStatus(supabaseAdmin, user.id, prof?.plan as string)
 
     const body = await req.json().catch(() => ({}))
-    const title = (body?.title && typeof body.title === "string" && body.title.trim()) ? body.title.trim().slice(0, 80) : "Ma page"
+    const title = champBorne(body?.title, "titreDePage") ?? "Ma page"
 
     // Slug unique : quelques tentatives en cas de collision (23505).
     let newPage: any = null

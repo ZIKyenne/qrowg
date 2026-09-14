@@ -9,6 +9,7 @@ import { notifierProprietaireLead } from "@/lib/notifierProprietaireLead"
 import { envoyerAccuseReception } from "@/lib/accuseReceptionLead"
 import { after } from "next/server"
 import { objetBorne } from "@/lib/bornes"
+import { champBorne } from "@/lib/limitesDeSaisie"
 
 export async function POST(req: NextRequest) {
   if (!(await rateLimit("lead:" + ipOf(req), 15, 600_000))) {
@@ -29,18 +30,20 @@ export async function POST(req: NextRequest) {
 
   const base = {
     page_id:  pageId,
-    block_id: body.blockId ? String(body.blockId).slice(0, 200) : null,
-    type:     typeof body.type === "string" && body.type ? body.type.slice(0, 40) : "form",
-    name:     typeof body.name === "string" ? body.name.slice(0, 200) || null : null,
-    email:    typeof body.email === "string" ? body.email.slice(0, 200) || null : null,
-    phone:    typeof body.phone === "string" ? body.phone.slice(0, 60) || null : null,
-    message:  typeof body.message === "string" ? body.message.slice(0, 3000) || null : null,
+    // Les plafonds sont nommés dans lib/limitesDeSaisie : le formulaire public
+    // lit les mêmes et les dit AVANT de couper (lot v110).
+    block_id: champBorne(body.blockId, "leadBloc"),
+    type:     champBorne(body.type, "leadType") ?? "form",
+    name:     champBorne(body.name, "leadNom"),
+    email:    champBorne(body.email, "leadEmail"),
+    phone:    champBorne(body.phone, "leadTelephone"),
+    message:  champBorne(body.message, "leadMessage"),
     data:     objetBorne(body.data, 8_000) ?? {},   // 8 Ko : les champs d'un formulaire, pas une pièce jointe
   }
   // Attribution par support (qr_source) — insert résilient : si la colonne n'existe pas
   // encore (migration non appliquée), on réessaie SANS -> la soumission ne casse jamais.
   // `qr_source` pas encore dans les types Supabase générés (migration récente) -> cast any.
-  const qs = typeof body.qrSource === "string" ? body.qrSource.slice(0, 40) || null : null
+  const qs = champBorne(body.qrSource, "leadSource")
   let { error } = await admin.from("leads").insert((qs ? { ...base, qr_source: qs } : base) as any)
   if (error && qs) ({ error } = await admin.from("leads").insert(base))
   if (error) return NextResponse.json({ error: "Enregistrement impossible" }, { status: 500 })
