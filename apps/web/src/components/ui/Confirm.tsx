@@ -10,6 +10,7 @@
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from "react"
 import { Modal } from "./Modal"
 import { Button } from "./Button"
+import { typoFr } from "@/lib/typographieFr"
 
 export interface ConfirmOptions {
   /** Titre du dialogue (défaut : « Confirmer »). */
@@ -45,7 +46,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
 
   // Rend les \n comme sauts de ligne quand le message est une simple chaîne.
   const body: ReactNode = typeof opts?.message === "string"
-    ? <span style={{ whiteSpace: "pre-line" }}>{opts.message}</span>
+    ? <span style={{ whiteSpace: "pre-line" }}>{typoFr(opts.message)}</span>
     : opts?.message
 
   return (
@@ -55,10 +56,10 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
         <Modal
           open
           onClose={() => settle(false)}
-          title={opts.title ?? "Confirmer"}
+          title={typoFr(opts.title ?? "Confirmer")}
           footer={<>
-            <Button variant="ghost" onClick={() => settle(false)}>{opts.cancelLabel ?? "Annuler"}</Button>
-            <Button variant={opts.danger ? "danger" : "primary"} onClick={() => settle(true)}>{opts.confirmLabel ?? "Confirmer"}</Button>
+            <Button variant="ghost" onClick={() => settle(false)}>{typoFr(opts.cancelLabel ?? "Annuler")}</Button>
+            <Button variant={opts.danger ? "danger" : "primary"} onClick={() => settle(true)}>{typoFr(opts.confirmLabel ?? "Confirmer")}</Button>
           </>}
         >
           {body}

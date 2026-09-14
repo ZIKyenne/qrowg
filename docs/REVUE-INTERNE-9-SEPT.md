@@ -2183,3 +2183,76 @@ profil, celui de la jauge, celui du rapport, le plafond de la baisse, et la lign
 du module qui refuse d'écrire zéro. De un à cinq tests tombent à chaque fois.
 
 Suite complète : 5 252 tests, 317 fichiers. Build vert.
+
+---
+
+## v103 — Le produit parle français, ses espaces aussi
+
+**Le relevé.** En balayant toutes les chaînes du produit et en classant l'espace
+qui précède chaque signe double :
+
+| signe | espace insécable | espace ordinaire | aucune espace |
+|---|---|---|---|
+| `%` | **0** | 65 | 453 |
+| `€` | **0** | 148 | 101 |
+| `?` | **0** | 2 256 | 92 |
+| `!` | **0** | 71 | 19 |
+| `«` | **0** | 297 | 0 |
+
+Zéro. Pas un seul caractère insécable dans tout le produit. (Le relevé a été
+repris après coup : le produit en a 21, mais écrits `&nbsp;`, tous dans du HTML
+d'e-mail. Aucun dans une phrase d'interface.)
+
+**Deux défauts, pas un.**
+
+1. Les 453 « 12% » et 101 « 12€ » n'ont pas d'espace du tout. Et le produit s'en
+   sait : 65 endroits écrivent « 12 % ». Le même signe s'écrit de deux façons
+   dans le même écran.
+
+2. Les 2 256 autres ont une espace **ordinaire**, qui casse. Sur un téléphone —
+   là où le commerçant lit ses alertes — une confirmation se rend ainsi :
+
+       Supprimer « Menu du midi »
+       ?
+
+   et une jauge de quota :
+
+       Vous en êtes à 1 240 / 1 500 vues (82
+       %)
+
+   Le signe part seul à la ligne. C'est précisément ce que l'espace insécable
+   existe pour empêcher.
+
+**Ce que le lot change.** On ne corrige pas 3 000 chaînes à la main. On corrige
+les **quatre endroits** par lesquels les phrases du produit passent pour être
+rendues : l'infobulle (`Toast`), la confirmation (`Confirm` — message, titre et
+les deux boutons), la coquille des e-mails (`emailH1`, `emailP`, `emailButton`),
+et le module des chiffres, qui écrit désormais sa propre fine insécable. Une
+phrase écrite n'importe où traverse l'un des quatre.
+
+`lib/typographieFr.ts`, module pur. Fine insécable (U+202F) avant `; ! ? %`,
+insécable (U+00A0) avant `:`, autour des guillemets, et devant `€`.
+
+**Ce à quoi elle ne touche pas** : les adresses web et e-mail (leurs `?` et `:`
+sont de la syntaxe), les balises HTML des e-mails, `12:30`, `??`, `!!`. Le texte
+est découpé sur ces morceaux et seul le reste est corrigé.
+
+**Idempotente** — c'est ce qui permet de l'appliquer au point de rendu sans
+savoir ce qui a déjà été fait en amont. Six phrases du produit le vérifient.
+
+**Garde.** `lib/typographieFr.test.ts` (24 tests). La règle de classe : **une
+seule fonction pose ces espaces.** Un caractère invisible collé en dur ailleurs,
+personne ne le voit dans un diff — le balayage en exige zéro hors du module.
+L'entité `&nbsp;` reste permise, mais seulement dans les fichiers qui fabriquent
+du HTML : dans une phrase d'interface elle s'afficherait telle quelle.
+
+**Une garde du lot précédent a tiré.** `chiffresLisibles.test.ts` figeait
+« 0,3 % » avec une espace ordinaire dans ses littéraux. Les attentes composent
+maintenant la fine au lieu de l'écrire — sinon deux chaînes visuellement
+identiques diffèrent, et le message d'échec est illisible.
+
+**Vérification par mutation.** Trois défauts réinjectés : la fine redevenue
+ordinaire (5 tests), la confirmation qui cesse d'appliquer (1), le module des
+chiffres qui remet une espace qui casse (5, dans les deux fichiers de garde).
+
+Suite complète : 5 276 tests, 318 fichiers. Build vert.

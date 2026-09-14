@@ -4,6 +4,7 @@
 // toasts dispersés). Monté une fois dans le layout dashboard ; s'utilise partout
 // via useToast(). Accessible : conteneur aria-live, fermeture clavier, auto-dismiss.
 import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from "react"
+import { typoFr } from "@/lib/typographieFr"
 
 type ToastKind = "success" | "error" | "info"
 type ToastAction = { label: string; onClick: () => void }
@@ -89,7 +90,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 color: s.bar, fontWeight: 700, fontSize: 13, display: "flex",
                 alignItems: "center", justifyContent: "center", marginTop: 1,
               }}>{s.ico}</span>
-              <span style={{ flex: 1, color: "var(--ink)", fontSize: 14, lineHeight: 1.45 }}>{t.msg}</span>
+              {/* Le signe ne part plus seul à la ligne : sur téléphone, « Supprimer
+                  « Menu du midi » » et son « ? » se séparaient (lot v103). */}
+              <span style={{ flex: 1, color: "var(--ink)", fontSize: 14, lineHeight: 1.45 }}>{typoFr(t.msg)}</span>
               {t.action && (
                 <button
                   type="button"

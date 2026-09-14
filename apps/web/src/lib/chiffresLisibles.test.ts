@@ -36,6 +36,12 @@ import path from "node:path"
 import {
   nombreFr, compte, pourcentage, partDeJauge, jauge, evolution, phraseEvolution,
 } from "./chiffresLisibles"
+import { FINE } from "./typographieFr"
+
+// Depuis le lot v103, l'espace avant le « % » est une FINE INSÉCABLE : ordinaire,
+// elle laissait le signe partir seul à la ligne. Les attentes la composent au
+// lieu de l'écrire — sinon deux chaînes visuellement identiques diffèrent.
+const pc = (x: string) => `${x}${FINE}%`
 
 const SRC = path.join(__dirname, "..")
 const lire = (p: string) => fs.readFileSync(path.join(SRC, p), "utf8")
@@ -46,24 +52,24 @@ const ancien = (part: number, total: number) => Math.round((part / total) * 100)
 describe("le cas du relevé : « 0 % » alors qu'il y en a", () => {
   it("une part non nulle ne s'écrit jamais zéro", () => {
     expect(ancien(3, 1200)).toBe(0)
-    expect(pourcentage(3, 1200)).toBe("0,3 %")
+    expect(pourcentage(3, 1200)).toBe(pc("0,3"))
     expect(ancien(4, 1000)).toBe(0)
-    expect(pourcentage(4, 1000)).toBe("0,4 %")
-    expect(pourcentage(1, 900)).toBe("0,1 %")
+    expect(pourcentage(4, 1000)).toBe(pc("0,4"))
+    expect(pourcentage(1, 900)).toBe(pc("0,1"))
   })
 
   it("mais une part réellement nulle, si", () => {
-    expect(pourcentage(0, 1000)).toBe("0 %")
+    expect(pourcentage(0, 1000)).toBe(pc("0"))
   })
 
   it("et sous le centième, on le dit au lieu d'écrire un zéro", () => {
-    expect(pourcentage(1, 1_000_000)).toBe("< 0,01 %")
+    expect(pourcentage(1, 1_000_000)).toBe(pc("< 0,01"))
   })
 
   it("au-dessus, l'arrondi entier reprend la main — on n'encombre pas", () => {
-    expect(pourcentage(5, 1000)).toBe("1 %")
-    expect(pourcentage(110, 1000)).toBe("11 %")
-    expect(pourcentage(1, 2)).toBe("50 %")
+    expect(pourcentage(5, 1000)).toBe(pc("1"))
+    expect(pourcentage(110, 1000)).toBe(pc("11"))
+    expect(pourcentage(1, 2)).toBe(pc("50"))
   })
 
   it("rien à diviser : on ne fabrique pas un pourcentage", () => {
@@ -78,9 +84,9 @@ describe("le cas du relevé : la jauge pleine à 199 sur 200", () => {
   it("l'étiquette ne dit « 100 % » que si c'est vrai", () => {
     expect(ancien(199, 200)).toBe(100)
     const j = jauge(199, 200)
-    expect(j.texte).toBe("99,5 %")
+    expect(j.texte).toBe(pc("99,5"))
     expect(j.pleine).toBe(false)
-    expect(jauge(200, 200).texte).toBe("100 %")
+    expect(jauge(200, 200).texte).toBe(pc("100"))
     expect(jauge(200, 200).pleine).toBe(true)
   })
 
@@ -101,22 +107,22 @@ describe("le cas du relevé : la jauge pleine à 199 sur 200", () => {
   })
 
   it("et au-delà de 99,99 %, on le dit plutôt que d'écrire « 100 % »", () => {
-    expect(pourcentage(99_999, 100_000)).toBe("> 99,99 %")
+    expect(pourcentage(99_999, 100_000)).toBe(pc("> 99,99"))
   })
 })
 
 describe("le cas du relevé : « +0 % » et « -100 % »", () => {
   it("un écart réel n'est pas « stable »", () => {
     expect(ancien(1002 - 1000, 1000)).toBe(0)
-    expect(evolution(1002, 1000)).toEqual({ texte: "+0,2 %", sens: "hausse" })
+    expect(evolution(1002, 1000)).toEqual({ texte: pc("+0,2"), sens: "hausse" })
     expect(evolution(1000, 998).sens).toBe("hausse")
   })
 
   it("une baisse est plafonnée à 100 : on ne perd pas plus que tout", () => {
     expect(Math.round(((7 - 2000) / 2000) * 100)).toBe(-100)
-    expect(evolution(7, 2000)).toEqual({ texte: "−99,7 %", sens: "baisse" })
+    expect(evolution(7, 2000)).toEqual({ texte: pc("−99,7"), sens: "baisse" })
     // Mais tout perdre s'écrit bien « −100 % ».
-    expect(evolution(0, 50)).toEqual({ texte: "−100 %", sens: "baisse" })
+    expect(evolution(0, 50)).toEqual({ texte: pc("−100"), sens: "baisse" })
   })
 
   it("partir de zéro est « nouveau », pas « +100 % » — la règle de lectureHonnete", () => {
@@ -139,7 +145,7 @@ describe("le cas du relevé : « +0 % » et « -100 % »", () => {
   })
 
   it("la phrase des e-mails dit la même chose, sans flèche", () => {
-    expect(phraseEvolution(1002, 1000, "vue")).toBe(`${nombreFr(1002)} vues (+0,2 % par rapport à la semaine dernière).`)
+    expect(phraseEvolution(1002, 1000, "vue")).toBe(`${nombreFr(1002)} vues (${pc("+0,2")} par rapport à la semaine dernière).`)
     expect(phraseEvolution(12, 0, "vue")).toBe("12 vues — une première.")
     expect(phraseEvolution(40, 40, "vue")).toBe("40 vues, comme la semaine dernière.")
   })

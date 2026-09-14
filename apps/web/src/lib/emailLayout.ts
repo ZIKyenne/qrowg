@@ -5,6 +5,8 @@
 // Les valeurs dynamiques (nom, etc.) doivent etre echappees par l'appelant.
 // =============================================================================
 
+import { typoFr } from "./typographieFr"
+
 const APP = "https://qrowg.com"
 const GOLD = "#D4AF45"
 
@@ -22,16 +24,18 @@ export function emailButton(label: string, href: string): string {
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
       <td align="center" bgcolor="${GOLD}" style="border-radius:12px;">
-        <a href="${href}" style="display:inline-block;padding:15px 34px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:700;color:#0A0A0A;text-decoration:none;border-radius:12px;">${label}</a>
+        <a href="${href}" style="display:inline-block;padding:15px 34px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:700;color:#0A0A0A;text-decoration:none;border-radius:12px;">${typoFr(label)}</a>
       </td></tr></table>
   </td></tr></table>`
 }
 
 // Titre + paragraphe reutilisables (styles coherents)
+// `typoFr` traverse les balises sans les toucher : le HTML déjà stylisé passe,
+// seules les phrases reçoivent leurs espaces insécables (lot v103).
 export const emailH1 = (txt: string) =>
-  `<h1 style="margin:0 0 12px;font-family:Georgia,'Times New Roman',serif;font-size:27px;font-weight:700;color:#F5F0E8;line-height:1.18;">${txt}</h1>`
+  `<h1 style="margin:0 0 12px;font-family:Georgia,'Times New Roman',serif;font-size:27px;font-weight:700;color:#F5F0E8;line-height:1.18;">${typoFr(txt)}</h1>`
 export const emailP = (html: string, mb = 18) =>
-  `<p style="margin:0 0 ${mb}px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.65;color:#B8B2A4;">${html}</p>`
+  `<p style="margin:0 0 ${mb}px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.65;color:#B8B2A4;">${typoFr(html)}</p>`
 
 // Coquille complete : header + contenu (deja stylise) + footer.
 export function emailShell(opts: {

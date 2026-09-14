@@ -42,6 +42,10 @@
 // zéro, ni un incomplet en total.** Quand l'arrondi effacerait le fait, on
 // montre une décimale de plus au lieu de mentir d'un cran. Module PUR.
 
+// L'espace avant le « % » est une FINE INSÉCABLE : ordinaire, elle laissait le
+// signe partir seul à la ligne sur téléphone — « (82 » puis « %) » (lot v103).
+import { FINE } from "./typographieFr"
+
 /** Le séparateur de milliers français vient d'`Intl`, pas d'une regex maison. */
 export function nombreFr(n: unknown): string {
   const v = typeof n === "number" ? n : Number(n)
@@ -106,10 +110,10 @@ export function pourcentage(part: unknown, total: unknown, options: OptionsPourc
     // Trop petit (ou trop proche du total) pour qu'un chiffre parle : on le dit.
     const seuil = fr(1 / 10 ** DECIMALES_MAX, DECIMALES_MAX)
     return borne < 1
-      ? `< ${seuil} %`
-      : `> ${fr((plafond ?? 100) - 1 / 10 ** DECIMALES_MAX, DECIMALES_MAX)} %`
+      ? `< ${seuil}${FINE}%`
+      : `> ${fr((plafond ?? 100) - 1 / 10 ** DECIMALES_MAX, DECIMALES_MAX)}${FINE}%`
   }
-  return `${fr(borne, d)} %`
+  return `${fr(borne, d)}${FINE}%`
 }
 
 /** La part exacte, pour la LARGEUR d'une barre — bornée, jamais arrondie. */
@@ -157,7 +161,7 @@ export function evolution(courant: unknown, precedent: unknown): Evolution {
   const d = decimalesUtiles(Math.abs(brut), brut < 0 ? 100 : null)
   const sens = brut > 0 ? "hausse" : "baisse"
   if (d < 0) return { texte: brut > 0 ? "à peine plus" : "à peine moins", sens }
-  return { texte: `${brut > 0 ? "+" : "−"}${fr(Math.abs(brut), d)} %`, sens }
+  return { texte: `${brut > 0 ? "+" : "−"}${fr(Math.abs(brut), d)}${FINE}%`, sens }
 }
 
 /** Le même fait, en une phrase — pour les e-mails, qui n'ont pas de flèche. */
