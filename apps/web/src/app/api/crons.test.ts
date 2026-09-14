@@ -104,9 +104,14 @@ describe("les tâches planifiées mènent quelque part", () => {
   it("le journal ne conserve aucune adresse email", () => {
     // `detail` citait « client@resto.fr: rate_limit_exceeded » : le journal
     // devenait un fichier d'adresses.
+    // Depuis le lot v91, le détail d'un passage est assemblé par
+    // `lib/rapportHebdo.detailDuPassage` (envoyés, ignorés, échecs) : la liste
+    // d'erreurs n'est plus jointe dans la route. Ce qui doit rester vrai, c'est
+    // que RIEN de ce qui contient des adresses n'atteint le journal sans passer
+    // par `sansAdresses` — quel que soit l'endroit où la jointure se fait.
     for (const c of crons) {
       const src = readFileSync(fichierDe(c.path), "utf8")
-      const lignes = src.split("\n").filter(l => l.includes('.join(" · ")'))
+      const lignes = src.split("\n").filter(l => l.includes('.join(" · ")') || l.includes("detailDuPassage("))
       expect(lignes.length, `${c.path} : plus aucune liste d'erreurs ?`).toBeGreaterThan(0)
       for (const l of lignes) {
         expect(l.includes("sansAdresses("), `${c.path} : ${l.trim()}`).toBe(true)

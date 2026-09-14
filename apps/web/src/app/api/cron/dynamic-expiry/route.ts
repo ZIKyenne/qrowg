@@ -19,6 +19,7 @@ import { emailShell, emailH1, emailP, emailButton } from "@/lib/emailLayout"
 import { escapeHtml } from "@/lib/escapeHtml"
 import { daysUntil, expiryAlertStage, expiryHorizonIso } from "@/lib/dynamicExpiry"
 import { noterPassage, sansAdresses } from "@/lib/journalCron"
+import { detailDuPassage } from "@/lib/rapportHebdo"
 import { gardeCron } from "@/lib/gardeCron"
 
 
@@ -75,6 +76,9 @@ export async function GET(req: NextRequest) {
 
     let sent = 0
     const errors: string[] = []
+    // Un QR qui va expirer et dont le propriétaire n'a pas d'adresse : c'est
+    // exactement ce qu'il faut voir dans le journal (lot v91).
+    const ignores: Partial<Record<"sans_adresse", number>> = {}
 
     for (const qr of rows) {
       try {
@@ -86,7 +90,7 @@ export async function GET(req: NextRequest) {
         const { data: prof } = await supabase
           .from("profiles").select("email, full_name").eq("id", qr.user_id).single()
         const email = (prof as any)?.email
-        if (!email) continue
+        if (!email) { ignores.sans_adresse = (ignores.sans_adresse ?? 0) + 1; continue }
 
         const res = await fetch("https://api.resend.com/emails", {
           method: "POST",
@@ -108,7 +112,8 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    await noterPassage(supabase, TACHE, errors.length ? "erreur" : sent > 0 ? "ok" : "rien", sansAdresses(errors.join(" · ")) || `${sent} envoyé(s)`, Date.now() - debut)
+    await noterPassage(supabase, TACHE, errors.length ? "erreur" : sent > 0 ? "ok" : "rien",
+      sansAdresses(detailDuPassage(sent, ignores, errors)), Date.now() - debut)
     return NextResponse.json({ sent, total: rows.length, errors: errors.length ? errors : undefined })
   } catch (e: any) {
     // Une tâche qui plante ne laissait AUCUNE trace : c'est justement le cas

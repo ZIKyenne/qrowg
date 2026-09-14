@@ -12,6 +12,8 @@ import { noterPassage, sansAdresses } from "@/lib/journalCron"
 import { gardeCron } from "@/lib/gardeCron"
 import { estDuPourEnvoi } from "@/lib/abonnementsRapport"
 import { APPAREIL_ROBOT } from "@/lib/robots"
+import { accessibleOwnerIds } from "@/lib/team"
+import { raisonDuRapportAbonne, pagesDuRapport, detailDuPassage, type RaisonNonEnvoi } from "@/lib/rapportHebdo"
 
 
 function buildEmailHtml(params: {
@@ -129,6 +131,11 @@ export async function GET(req: NextRequest) {
 
     let sent = 0
     const errors: string[] = []
+    // Un destinataire écarté doit apparaître dans le journal : « 0 envoyé(s) »
+    // ne distinguait pas « personne à servir » de « tout le monde sauté en
+    // silence » (lot v91).
+    const ignores: Partial<Record<Exclude<RaisonNonEnvoi, null>, number>> = {}
+    const ignorer = (r: Exclude<RaisonNonEnvoi, null>) => { ignores[r] = (ignores[r] ?? 0) + 1 }
 
     for (const sub of due) {
       try {
@@ -140,46 +147,57 @@ export async function GET(req: NextRequest) {
 
         const { data: profile } = await supabase
           .from("profiles")
-          .select("full_name, email")
+          .select("full_name, email, preferences")
           .eq("id", sub.user_id)
           .single()
 
+        // L'interrupteur « Rapport hebdomadaire » des Réglages gouverne les deux
+        // tâches : sans cela l'écran Réglages ment à qui le coupe (lot v91).
+        const refus = raisonDuRapportAbonne({ email: sub.email, preferences: (profile as any)?.preferences, frequence: sub.frequency })
+        if (refus) { ignorer(refus); continue }
+
+        // Périmètre : les pages du compte ET celles des équipes dont il est
+        // membre, tous statuts confondus. Une visite enregistrée pendant la
+        // semaine reste un fait si la page repasse en brouillon le lundi.
+        const ownerIds = await accessibleOwnerIds(supabase, sub.user_id)
         const { data: pages } = await supabase
           .from("pages")
           .select("id, title, total_views")
-          .eq("user_id", sub.user_id)
-          .eq("status", "published")
+          .in("user_id", ownerIds)
 
-        const pageIds = (pages ?? []).map(p => p.id)
-        if (!pageIds.length) continue
+        // Aucune page : le rapport part quand même, avec ses zéros. Sauter en
+        // silence laissait `last_sent_at` intact — l'abonnement était re-tenté
+        // tous les jours, indéfiniment, sans jamais rien envoyer.
+        const pageIds = pagesDuRapport(pages)
 
-        const { count: totalViews } = await supabase
+        const vide = pageIds.length === 0
+        const { count: totalViews } = vide ? { count: 0 } : await supabase
           .from("page_views")
           .select("id", { count: "exact", head: true })
           .in("page_id", pageIds)
           .gte("viewed_at", since.toISOString()).neq("device", APPAREIL_ROBOT)
 
-        const { count: prevViews } = await supabase
+        const { count: prevViews } = vide ? { count: 0 } : await supabase
           .from("page_views")
           .select("id", { count: "exact", head: true })
           .in("page_id", pageIds)
           .gte("viewed_at", prevSince.toISOString())
           .lt("viewed_at", since.toISOString()).neq("device", APPAREIL_ROBOT)
 
-        const { count: totalScans } = await supabase
+        const { count: totalScans } = vide ? { count: 0 } : await supabase
           .from("scans")
           .select("id", { count: "exact", head: true })
           .in("page_id", pageIds)
           .gte("scanned_at", since.toISOString()).neq("device", APPAREIL_ROBOT)
 
-        const { count: prevScans } = await supabase
+        const { count: prevScans } = vide ? { count: 0 } : await supabase
           .from("scans")
           .select("id", { count: "exact", head: true })
           .in("page_id", pageIds)
           .gte("scanned_at", prevSince.toISOString())
           .lt("scanned_at", since.toISOString()).neq("device", APPAREIL_ROBOT)
 
-        const { data: clicksRaw } = await supabase
+        const { data: clicksRaw } = vide ? { data: [] } : await supabase
           .from("block_clicks")
           .select("click_target")
           .in("page_id", pageIds)
@@ -200,7 +218,7 @@ export async function GET(req: NextRequest) {
         // création de la page : le tableau annonçait « Menu — 5 400 » sous un titre
         // « Mois de … » où la carte « Vues » affichait 0. Deux chiffres contradictoires
         // dans le même email.
-        const { data: vuesPeriode } = await supabase
+        const { data: vuesPeriode } = vide ? { data: [] } : await supabase
           .from("page_views").select("page_id")
           .in("page_id", pageIds).gte("viewed_at", since.toISOString()).neq("device", APPAREIL_ROBOT)
         const parPage: Record<string, number> = {}
@@ -269,8 +287,9 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    await noterPassage(supabase, TACHE, errors.length ? "erreur" : sent > 0 ? "ok" : "rien", sansAdresses(errors.join(" · ")) || `${sent} envoyé(s)`, Date.now() - debut)
-    return NextResponse.json({ sent, total: due.length, errors })
+    await noterPassage(supabase, TACHE, errors.length ? "erreur" : sent > 0 ? "ok" : "rien",
+      sansAdresses(detailDuPassage(sent, ignores, errors)), Date.now() - debut)
+    return NextResponse.json({ sent, total: due.length, ignores, errors })
   } catch (err: any) {
     // Une tâche qui plante ne laissait AUCUNE trace : c'est justement le cas
     // qu'on veut voir dans le journal.

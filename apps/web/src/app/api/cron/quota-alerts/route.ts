@@ -17,6 +17,7 @@ import { EMAIL_FROM } from "@/lib/emailFrom"
 import { emailShell, emailH1, emailP, emailButton } from "@/lib/emailLayout"
 import { escapeHtml } from "@/lib/escapeHtml"
 import { noterPassage, sansAdresses } from "@/lib/journalCron"
+import { detailDuPassage } from "@/lib/rapportHebdo"
 import { gardeCron } from "@/lib/gardeCron"
 import { APPAREIL_ROBOT } from "@/lib/robots"
 
@@ -63,10 +64,13 @@ export async function GET(req: NextRequest) {
 
     let sent = 0
     const errors: string[] = []
+    // Un compte qu'on devait alerter et qu'on n'a pas pu joindre n'est pas un
+    // non-événement : il apparaît dans le journal (lot v91).
+    const ignores: Partial<Record<"sans_adresse", number>> = {}
 
     for (const p of profiles) {
       try {
-        if (!p.email) continue
+        if (!p.email) { ignores.sans_adresse = (ignores.sans_adresse ?? 0) + 1; continue }
         const limit = getPlan(p.plan as string).limits.views
         if (limit == null) continue // plan illimité
 
@@ -108,7 +112,8 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    await noterPassage(supabase, TACHE, errors.length ? "erreur" : sent > 0 ? "ok" : "rien", sansAdresses(errors.join(" · ")) || `${sent} envoyé(s)`, Date.now() - debut)
+    await noterPassage(supabase, TACHE, errors.length ? "erreur" : sent > 0 ? "ok" : "rien",
+      sansAdresses(detailDuPassage(sent, ignores, errors)), Date.now() - debut)
     return NextResponse.json({ sent, errors: errors.length ? errors : undefined })
   } catch (e: any) {
     // Une tâche qui plante ne laissait AUCUNE trace : c'est justement le cas

@@ -8,6 +8,7 @@ import { semaineEcoulee, resumeSemaine, nombre } from "@/lib/weeklyReport"
 import { noterPassage, sansAdresses } from "@/lib/journalCron"
 import { gardeCron } from "@/lib/gardeCron"
 import { APPAREIL_ROBOT } from "@/lib/robots"
+import { raisonDuRapportSimple, pagesDuRapport, detailDuPassage, type RaisonNonEnvoi } from "@/lib/rapportHebdo"
 
 // Carte de statistique (nombre dore + libelle). Cellule d'une rangee a 2 colonnes.
 function statCard(value: string, label: string, side: "left" | "right"): string {
@@ -54,12 +55,32 @@ async function envoyer(req: NextRequest) {
       .select("id, email, full_name, total_scans, preferences")
 
     const { data: toutesLesPages } = await supabase.from("pages").select("id, user_id")
-    const pagesDe = new Map<string, string[]>()
+    const pagesDuProprietaire = new Map<string, string[]>()
     for (const pg of (toutesLesPages ?? []) as { id: string; user_id: string }[]) {
-      const liste = pagesDe.get(pg.user_id) ?? []
+      const liste = pagesDuProprietaire.get(pg.user_id) ?? []
       liste.push(pg.id)
-      pagesDe.set(pg.user_id, liste)
+      pagesDuProprietaire.set(pg.user_id, liste)
     }
+
+    // Périmètre : ses pages ET celles des équipes dont il est membre — le même
+    // que `api/reports/send`, sinon les deux rapports annoncent deux chiffres
+    // pour la même semaine (lot v91).
+    const { data: membres } = await supabase.from("team_members").select("user_id, teams(owner_id)")
+    const pagesDe = new Map<string, string[]>(pagesDuProprietaire)
+    for (const m of (membres ?? []) as any[]) {
+      const proprietaire = Array.isArray(m?.teams) ? m.teams[0]?.owner_id : m?.teams?.owner_id
+      const membre = m?.user_id
+      if (proprietaire && membre && proprietaire !== membre) {
+        const dejaLa = pagesDe.get(membre) ?? []
+        pagesDe.set(membre, [...new Set([...dejaLa, ...(pagesDuProprietaire.get(proprietaire) ?? [])])])
+      }
+    }
+
+    // Qui reçoit déjà le rapport DÉTAILLÉ de son abonnement : il ne doit pas en
+    // recevoir un second le même lundi, avec d'autres chiffres.
+    const { data: abonnements } = await supabase
+      .from("report_subscriptions").select("user_id").eq("enabled", true).eq("frequency", "weekly")
+    const abonnesHebdo = new Set((abonnements ?? []).map((a: any) => a.user_id))
 
     const destinataires = (profiles ?? []).filter(p => (pagesDe.get(p.id)?.length ?? 0) > 0)
     if (!destinataires.length) { await noterPassage(supabase, TACHE, "rien", "aucun destinataire", Date.now() - debut); return NextResponse.json({ sent: 0 }) }
@@ -70,16 +91,23 @@ async function envoyer(req: NextRequest) {
 
     let sent = 0
     const echecs: string[] = []
+    const ignores: Partial<Record<Exclude<RaisonNonEnvoi, null>, number>> = {}
     for (const profile of destinataires) {
-      // Respecte la préférence utilisateur (opt-out) : rapport hebdo désactivé.
-      if ((profile as any).preferences?.weekly_report === false) continue
+      // Une seule règle pour les deux tâches : interrupteur des Réglages,
+      // adresse, et pas de doublon avec le rapport détaillé (`lib/rapportHebdo`).
+      const refus = raisonDuRapportSimple({
+        email: profile.email,
+        preferences: (profile as any).preferences,
+        abonneHebdo: abonnesHebdo.has(profile.id),
+      })
+      if (refus) { ignores[refus] = (ignores[refus] ?? 0) + 1; continue }
       const clean = profile.full_name && String(profile.full_name).trim() ? escapeHtml(String(profile.full_name).trim()) : ""
       const greeting = clean ? `Bonjour ${clean},` : "Bonjour,"
       // Activité RÉELLE de la semaine, page par page. Sans cela l'email répétait
       // les cumuls de toujours et n'apprenait rien à personne.
       let vuesSemaine = 0, scansSemaine = 0
       try {
-        const ids = pagesDe.get(profile.id) ?? []
+        const ids = pagesDuRapport((pagesDe.get(profile.id) ?? []).map(id => ({ id })))
         if (ids.length) {
           const [{ count: v }, { count: sc }] = await Promise.all([
             supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", debutIso).neq("device", APPAREIL_ROBOT),
@@ -122,9 +150,7 @@ async function envoyer(req: NextRequest) {
       else sent++
     }
 
-    const detail = echecs.length
-      ? sansAdresses(`${sent} envoyé(s), ${echecs.length} échec(s) : ${echecs.join(" · ")}`)
-      : `${sent} envoyé(s)`
+    const detail = sansAdresses(detailDuPassage(sent, ignores, echecs))
     await noterPassage(supabase, TACHE, echecs.length ? "erreur" : sent > 0 ? "ok" : "rien", detail, Date.now() - debut)
     return NextResponse.json({ success: echecs.length === 0, sent, echecs: echecs.length })
   } catch (e: any) {

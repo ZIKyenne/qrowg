@@ -1378,3 +1378,79 @@ la neutralisation retirée, la virgule revenue, et le profil refabriquant son
 échappement. Six tests tombent.
 
 Suite complète : 5 033 tests, 305 fichiers. Build vert.
+
+---
+
+## v91 — deux rapports hebdomadaires, deux interrupteurs, deux chiffres
+
+**Le relevé.** `vercel.json` planifie **deux** tâches qui envoient chacune un
+rapport hebdomadaire :
+
+```
+/api/emails/weekly   « 0 8 * * 1 »     (lundi 8 h)
+/api/reports/send    « 0 8 * * * »     (tous les jours, filtre last_sent_at)
+```
+
+Sur un compte réel — trois pages publiées, une remise en brouillon lundi
+dernier, plus une page de l'équipe dont il est membre :
+
+```
+/api/emails/weekly   « Votre semaine »   730 visites  sur 4 pages
+/api/reports/send    « Semaine du … »    420 visites  sur 3 pages
+écart : 310 visites — la page remise en brouillon.
+Ni l'un ni l'autre ne compte la page de l'équipe (180 visites).
+```
+
+Et deux interrupteurs, dans deux écrans différents :
+
+```
+Réglages : Rapport hebdo OFF      → aucun e-mail
+Réglages OFF + abonnement ON      → reports/send            (1 e-mail)
+Réglages ON  + abonnement ON      → les deux                (2 e-mails)
+```
+
+Celui qui coupe « Rapport hebdomadaire » dans ses Réglages continue donc d'en
+recevoir un, avec d'autres chiffres ; celui qui s'abonne depuis l'écran
+Statistiques en reçoit deux le lundi.
+
+**Et pire.** `reports/send` faisait `if (!pageIds.length) continue` : aucun
+e-mail, `last_sent_at` **non mis à jour** — l'abonnement est donc re-sélectionné
+tous les jours, indéfiniment, sans jamais rien envoyer — et le journal notait
+« 0 envoyé(s) », un état d'apparence saine. Un abonnement proposé dans le
+produit ne partait jamais, et rien nulle part ne le disait.
+
+**Ce que le lot change.** `lib/rapportHebdo.ts`, module pur : `hebdoDesactive`,
+`raisonDuRapportSimple`, `raisonDuRapportAbonne`, `pagesDuRapport`,
+`journalDesIgnores`, `detailDuPassage`.
+
+- l'interrupteur des Réglages gouverne les **deux** tâches ;
+- le rapport simple du lundi n'est plus envoyé à qui reçoit déjà le rapport
+  détaillé de son abonnement : une semaine, un e-mail ;
+- même périmètre des deux côtés — les pages du compte **et** celles des équipes
+  dont il est membre, tous statuts confondus : une visite enregistrée pendant la
+  semaine reste un fait si la page repasse en brouillon le lundi ;
+- plus de saut silencieux : sans page, le rapport part avec ses zéros (le
+  produit sait déjà écrire ce cas, `lib/weeklyReport`), et chaque destinataire
+  écarté est compté et nommé dans le journal.
+
+**Garde.** `lib/rapportHebdo.test.ts` (20 tests), avec un balayage des cinq
+tâches planifiées : **un saut faute de coordonnées est toujours compté**. « En
+dessous du palier » ou « déjà alerté » sont des non-événements ; une adresse
+manquante, non.
+
+**Ce que la garde a trouvé toute seule.** `quota-alerts` et `dynamic-expiry`
+sautaient elles aussi, sans trace, le compte sans adresse — un QR sur le point
+d'expirer dont le propriétaire est injoignable est précisément ce qu'on veut
+voir dans un journal. Les deux tâches comptent désormais ce cas.
+
+**Deux gardes à moi, mises à jour.** `crons.test.ts` cherchait la jointure des
+erreurs dans la route (elle vit maintenant dans `detailDuPassage`) et
+`reglagesNotifications.test.ts` cherchait le littéral `weekly_report` dans la
+route (il vit dans le module). Les deux sont ré-ancrées sur l'intention, pas sur
+la forme, avec la raison écrite au-dessus.
+
+**Vérification par mutation.** Trois défauts réinjectés — le saut silencieux et
+le filtre « published », la préférence relue à la main sans dédoublonnage, et le
+compte sans adresse redevenu invisible. Cinq tests tombent.
+
+Suite complète : 5 053 tests, 306 fichiers. Build vert.

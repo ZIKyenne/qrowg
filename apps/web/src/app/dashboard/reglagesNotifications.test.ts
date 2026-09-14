@@ -46,7 +46,13 @@ describe("rapport hebdomadaire", () => {
   const route = lire("../api/emails/weekly/route.ts")
 
   it("la route lit la préférence", () => {
-    expect(route).toContain("weekly_report")
+    // Depuis le lot v91, la clé vit dans `lib/rapportHebdo` : les DEUX rapports
+    // hebdomadaires du produit lisent le même interrupteur, au lieu que celui de
+    // l'abonnement l'ignore. La route applique la règle, elle ne la réécrit pas.
+    expect(route).toContain("raisonDuRapportSimple(")
+    const module = lire("../../lib/rapportHebdo.ts")
+    expect(module).toContain("weekly_report")
+    expect(lire("../api/reports/send/route.ts")).toContain("raisonDuRapportAbonne(")
   })
 
   it("et une tâche planifiée l'appelle vraiment", () => {
